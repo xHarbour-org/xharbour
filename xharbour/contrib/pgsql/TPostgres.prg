@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.15 2004/04/28 16:52:24 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.16 2004/04/28 20:07:50 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -52,31 +52,7 @@
 
 #include "common.ch"
 #include "hbclass.ch"
-
-#define CONNECTION_OK                   0
-#define CONNECTION_BAD                  1
-#define CONNECTION_STARTED              2
-#define CONNECTION_MADE                 3
-#define CONNECTION_AWAITING_RESPONSE    4
-#define CONNECTION_AUTH_OK              5
-#define CONNECTION_SETENV               6
-#define CONNECTION_SSL_STARTUP          7
-#define CONNECTION_NEEDED               8
-
-#define PGRES_EMPTY_QUERY               0
-#define PGRES_COMMAND_OK                1
-#define PGRES_TUPLES_OK                 2
-#define PGRES_COPY_OUT                  3
-#define PGRES_COPY_IN                   4
-#define PGRES_BAD_RESPONSE              5
-#define PGRES_NONFATAL_ERROR            6
-#define PGRES_FATAL_ERROR               7
-
-#define PQTRANS_IDLE                    0
-#define PQTRANS_ACTIVE                  1
-#define PQTRANS_INTRANS                 2
-#define PQTRANS_INERROR                 3
-#define PQTRANS_UNKNOWN                 4
+#include "postgres.ch"
 
 CLASS TPQServer
     DATA     pDb
@@ -426,7 +402,7 @@ CLASS TPQQuery
 
     METHOD   Struct()
     
-    METHOD   FieldGet( nRow, nField )
+    METHOD   FieldGet( nField, nRow )
     METHOD   GetRow( nRow )   
     METHOD   GetBlankRow()  
 ENDCLASS
@@ -805,20 +781,20 @@ METHOD Update(oRow) CLASS TPQquery
 RETURN result
 
 
-METHOD FieldGet( nRow, nField ) CLASS TPQquery
+METHOD FieldGet( nField, nRow ) CLASS TPQquery
     Local result
     Local i
     Local cType
     Local nSize
     Local tmp
 
+    if ISCHARACTER(nField)
+        nField := ::Fieldpos(nField)
+    endif
+                    
     if ! ::NetErr().and. nField >= 1 .and. nField <= ::nFields .and. ! ::lclosed
         
-        if ISCHARACTER(nField)
-            nField := ::Fieldpos(nField)
-        endif
-                    
-        result := PQgetvalue( ::pQuery, nRow, nField)
+        result := PQgetvalue( ::pQuery, iif( ISNIL(nRow), ::nRecno, nRow), nField)
         cType := ::aStruct[ nField, 2 ] 
         nSize := ::aStruct[ nField, 3 ] 
                                     
@@ -879,8 +855,8 @@ METHOD Getrow( nRow ) CLASS TPQquery
             ASize(aOld, ::nFields)
 
             For nCol := 1 to ::nFields
-                aRow[nCol] := ::Fieldget(nRow, nCol)    
-                aOld[nCol] := ::Fieldget(nRow, nCol)                    
+                aRow[nCol] := ::Fieldget(nCol, nRow)    
+                aOld[nCol] := ::Fieldget(nCol, nRow)                    
             Next
 
             result := TPQRow():New( aRow, aOld, ::aStruct )

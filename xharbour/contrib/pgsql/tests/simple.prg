@@ -1,3 +1,9 @@
+/*
+ *
+ * $Id$
+ *
+ */
+
 #include "common.ch"
 
 Function main()
@@ -118,14 +124,14 @@ Function main()
     DO WHILE ! oQuery:Eof()
         ? oQuery:Recno(),;
           oQuery:Fieldpos('code'),;
-          oQuery:Fieldget(oQuery:Recno(), oQuery:Fieldpos('code')), ;
-          oQuery:Fieldget(oQuery:Recno(),4), ;
-          oQuery:Fieldget(oQuery:Recno(),2), ;
+          oQuery:Fieldget(oQuery:Fieldpos('code')), ;
+          oQuery:Fieldget(4), ;
+          oQuery:Fieldget(2), ;
           oQuery:Fieldname(1),;
           oQuery:Fieldtype(1), ;
           oQuery:Fielddec(1), ;
           oQuery:Fieldlen(1),;
-          oQuery:Fieldget(oQuery:Recno(), 3)
+          oQuery:Fieldget(3)
     
         if oQuery:Recno() == 50
             oRow := oQuery:getrow()

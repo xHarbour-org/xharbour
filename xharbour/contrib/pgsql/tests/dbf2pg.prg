@@ -1,4 +1,7 @@
 /*
+ *
+ * $Id$
+ *
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table
  *
@@ -49,10 +52,11 @@
  */
 
 #include "inkey.ch"
+#include "common.ch"
 
 #define CRLF chr(13) + chr(10)
 
-procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
+procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20)
 
    local cTok, nTok := 1
    local cHostName := "localhost"
@@ -63,14 +67,21 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
    local lCreateTable := .F.
    local oServer, oTable, oRecord
    Local cField
-   Local cType
    Local sType
+   Local dType
    Local cValue
-   Local nCommit := 500
+   Local nCommit := 100
+   Local cError
+   Local nHandle
+   Local nCount := 0
+   Local nRecno := 0
+   Local lTruncate := .F.
+   Local lUseTrans := .F.
 
    SET CENTURY ON
    SET EPOCH TO 1960
    SET DELETE ON
+   SET DATE FORMAT "dd/mm/yyyy"
 
    rddSetDefault( "DBFDBT" )
 
@@ -82,7 +93,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
    i := 1
    // Scan parameters and setup workings
    while (i <= PCount())
-
+      
       cTok := hb_PValue(i++)
 
       do case
@@ -107,14 +118,32 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
       case cTok == "-c"
          lCreateTable := .T.
 
+      case cTok == "-x"
+         lTruncate := .T.
+
+      case cTok == "-s"
+         lUseTrans := .T.
+         
+      case cTok == "-m"
+         nCommit := val(hb_PValue(i++))
+
+      case cTok == "-r"
+         nRecno := val(hb_PValue(i++))
+
       otherwise
          help()
          quit
       endcase
    enddo
 
-   dbUseArea(.T.,, cFile, "dbffile",, .T.)
-   aDbfStruct := dbffile->(dbStruct())
+   // create log file
+   if (nHandle := FCreate(Trim(cTable) + '.log')) == -1
+        ? 'Cannot create log file'
+        quit
+   endif        
+
+   USE (cFile) SHARED
+   aDbfStruct := DBStruct()
 
    oServer := TPQServer():New(cHostName, cDatabase, cUser, cPassWord)
    if oServer:NetErr()
@@ -129,100 +158,139 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
          oServer:DeleteTable(cTable)
          if oServer:NetErr()
             ? oServer:Error()
+            FWrite( nHandle, "Error: " + oServer:Error() + CRLF )
+            FClose( nHandle )
             quit
          endif
       endif
       oServer:CreateTable(cTable, aDbfStruct)
       if oServer:NetErr()
          ? oServer:Error()
+         FWrite( nHandle, "Error: " + oServer:Error() + CRLF )
+         FClose( nHandle )
          quit
       endif
+   endif
+   
+   if lTruncate
+        oServer:Execute('truncate table ' + cTable)        
+        if oServer:NetErr()
+            ? oServer:Error()
+            FWrite( nHandle, "Error: " + oServer:Error() + CRLF )
+            FClose( nHandle )
+            quit
+        endif        
    endif
 
    oTable := oServer:Query("SELECT * FROM " + cTable + " LIMIT 1")
    if oTable:NetErr()
       Alert(oTable:Error())
+      FWrite( nHandle, "Error: " + oTable:Error() + CRLF )
+      FClose( nHandle )
       quit
    endif
 
-   oServer:StartTransaction()
+   if lUseTrans
+      oServer:StartTransaction()
+   endif      
    
+   FWrite( nHandle, "Start: " + time() + CRLF )
+
    ? "Start: ", time()
    ? 
+   
+   if ! Empty(nRecno)
+      dbgoto(nRecno)
+   endif      
 
-   while !dbffile->(eof()) .AND. Inkey() <> K_ESC
-
+   while ! eof() .and. Inkey() <> K_ESC .and. (empty(nRecno) .or. nRecno == recno())
       oRecord := oTable:GetBlankRow()
       
-      for i := 1 to dbffile->(FCount())
-         cField := lower(dbffile->(fieldname(i)))
-         cType := dbffile->(valtype(fieldget(i)))
-         sType := Valtype(oRecord:Fieldget(oRecord:Fieldpos(cfield)))
-         cValue := dbffile->(fieldget(i))
+      for i := 1 to oTable:FCount()
+         cField := lower(oTable:FieldName(i))
+         sType := fieldtype(fieldpos(cField))
+         dType := oRecord:Fieldtype(i)
+         cValue := fieldget(fieldpos(cField))
          
-         
-         if oRecord:Fieldpos( cField ) != 0
-            if sType != cType           
-               if sType == 'C' .and. cType == 'N'
+         if ! ISNIL(cValue)
+            if dType != sType           
+               if dType == 'C' .and. sType == 'N'
                  cValue := Str(cValue)
                  
-               elseif sType == 'C' .and. cType == 'D'
+               elseif dType == 'C' .and. sType == 'D'
                  cValue := DtoC(cValue)
             
-               elseif sType == 'C' .and. cType == 'L'
-                 cValue := IIF( cValue, 'Y', 'N' )
+               elseif dType == 'C' .and. sType == 'L'
+                 cValue := IIF( cValue, "S", "N" )
                  
-               elseif sType == 'N' .and. cType == 'C'
+               elseif dType == 'N' .and. sType == 'C'
                  cValue := val(cValue)
                  
-               elseif sType == 'N' .and. cType == 'D'
+               elseif dType == 'N' .and. sType == 'D'
                  cValue := Val(DtoS(cValue))
             
-               elseif sType == 'N' .and. cType == 'L'
-                 cValue := IIF( cValue, 'y', 'n' )
+               elseif dType == 'N' .and. sType == 'L'
+                 cValue := IIF( cValue, 1, 0 )
                  
-               elseif sType == 'D' .and. cType == 'C'
+               elseif dType == 'D' .and. sType == 'C'
                  cValue := CtoD(cValue)
                  
-               elseif sType == 'D' .and. cType == 'N'
+               elseif dType == 'D' .and. sType == 'N'
                  cValue := StoD(Str(cValue))
+                 
+               elseif dType == 'L' .and. sType == 'N'
+                 cValue := ! Empty(cValue)
+
+               elseif dType == 'L' .and. sType == 'C'
+                 cValue := IIF( alltrim(cValue) $ "YySs1", .T., .F. )                                                  
             
                end
             end            
             
-            if ! Empty(cValue)
-                oRecord:FieldPut(oRecord:Fieldpos(cfield), cValue)
+            if ! ISNIL(cValue)
+                oRecord:FieldPut(i, cValue)
             end             
          end
       next
 
-      oTable:Append(oRecord)
-      if oTable:NetErr()
+      cError := oTable:Append(oRecord)
+      
+      if ! Empty(cError) 
          ?
-         ? "Record: ", recno(), " ", oTable:Error()
+         ? "Error Record: ", recno(), left(cError,50)
          ? 
+         FWrite( nHandle, "Error at record: " + Str(recno()) + " Description: " + cError + CRLF )         
+      else
+         nCount++         
       endif
 
-      dbffile->(dbSkip())
+      dbSkip()
 
-      if (dbffile->(RecNo()) % nCommit) == 0
+      if (nCount % nCommit) == 0
          DevPos(Row(), 1)
-         DevOut("imported recs: " + Str(dbffile->(RecNo())))
+         DevOut("imported recs: " + Str(nCount))         
          
-         oServer:commit()
-         oServer:StartTransaction()
+         if lUseTrans
+            oServer:commit()
+            oServer:StartTransaction()
+         endif            
       endif
    enddo
    
-   if (dbffile->(RecNo()) % nCommit) != 0
-        oServer:commit()
+   if (nCount % nCommit) != 0
+        if lUseTrans
+            oServer:commit()
+        endif            
    endif        
 
-   ?
+   FWrite( nHandle, "End: " +  time() + ", records in dbf: " + ltrim(str(recno())) + ", imported recs: " + ltrim(str(nCount)) + CRLF )
+
    ? "End: ", time()
    ? 
 
-   dbffile->(dbCloseArea())
+   FClose( nHandle )
+
+   close all
    oTable:Destroy()
    oServer:Destroy()
 return
@@ -238,7 +306,10 @@ procedure Help()
    ? "-t name of table to add records to"
    ? "-c delete existing table and create a new one"
    ? "-f name of .dbf file to import"
-   ? "all parameters but -h -u -p -c are mandatory"
+   ? "-x truncate table before append records"
+   ? "-s use transaction"
+   ? "-m commit interval"
+   ? "-r insert only record number"
    ? ""
 
 return

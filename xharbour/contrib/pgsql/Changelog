@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.13 2004/04/27 17:34:39 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.14 2004/04/27 18:06:29 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-30 15:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  + postgres.ch
+    + Add new file with database definitions
+  * TPostgres.prg
+    * Changed fieldget parameters, fixed bug when parameter field is char
+  * tests/simple.prg
+  * tests/stress.prg
+  * tests/test.prg
+    ! Fix some bugs
+  * tests/dbf2pg.prg
+    ! Add new features and new parameter, like use transaction, commit interval, etc.    
+  
 2004-04-25 14:33 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * TPostgres.prg
     ! Fixed (INSERT, DELETE, UPDATE) result error when row is updated
