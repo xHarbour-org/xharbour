@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1996 2004/01/05 21:09:03 paultucker Exp $
+ * $Id: ChangeLog,v 1.1997 2004/01/05 21:17:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-06 02:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * contrib/pgsql/Makefile
+    ! fixed include path
+  ! contrib/pgsql/postgres.c
+    ! fixed compilation error
+    ITEM -> PHB_ITEM
+    
 2004-01-05 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbver.h
   * bin/!pack_bin.bat
