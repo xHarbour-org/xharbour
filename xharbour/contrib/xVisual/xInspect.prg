@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.39 2002/10/23 23:42:39 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.40 2002/10/24 19:07:04 ronpinkas Exp $
  */
 
 /*
@@ -345,7 +345,7 @@ METHOD OnCreate() CLASS StringList
       cText += ( cItem + CRLF )
    NEXT
 
-   //cText:= Left( cText, Len( cText ) -2 )
+   cText:= Left( cText, Len( cText ) -2 )
    SetDlgItemText( ::handle, 103, cText )
    //nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
    SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInsp:CurObject:Items:Text ) ) ) + " Lines" )
@@ -375,8 +375,10 @@ METHOD OnCommand( nwParam ) CLASS StringList
            FOR n := 1 TO nLines
                cText := I2Bin( 100 ) + Space( 200 )
                SendDlgItemMessage( ::handle, 103, EM_GETLINE, n - 1, @cText )
+               cText := StrTran( cText, Chr(0) , '' )
                cText := StrTran( cText, Chr(10), '' )
                cText := StrTran( cText, Chr(13), '' )
+               view cText
                oApp:MainFrame:ObjInsp:CurObject:Items:Add( AllTrim( cText ) )
            NEXT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.7 2002/10/22 23:08:10 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.8 2002/10/23 02:19:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -228,7 +228,6 @@ CLASS TWBrowse FROM TWinControl
    METHOD drawdata()
    METHOD GoToCol()
    METHOD drawheader()
-   METHOD OnChange()
    METHOD UpdateVScrollBar()
    METHOD UpdateHScrollBar()
    METHOD GoToPos()
