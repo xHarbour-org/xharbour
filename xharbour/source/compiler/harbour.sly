@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.35 2003/02/26 06:45:30 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.36 2003/02/28 10:37:20 ronpinkas Exp $
  */
 
 /*
@@ -1982,7 +1982,9 @@ SwitchCases : CASE { hb_compLinePush(); } Constant Crlf
            ;
 
 Constant   : NUM_INTEGER         { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | '-' NUM_INTEGER       { $$ = hb_compExprNewLong( - $2.iNumber ); }
            | NUM_LONG            { $$ = hb_compExprNewLong( $1.lNumber ); }
+           | '-' NUM_LONG        { $$ = hb_compExprNewLong( - $2.lNumber ); }
            | LITERAL             {
                                     if( $1[1] == '\0' )
                                     {
