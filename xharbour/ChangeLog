@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3410 2004/09/06 19:25:38 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3411 2004/09/06 19:53:38 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-06 22:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/libnf/color2n.c
+    * enabled color2n for all platforms - why it was only for
+      DOS and Windows?
+
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    * added hbpg lib (PostgreSQL) to be compilant with last Lorenzo
+      changes in pack_src.sh
+
+  * xharbour/contrib/pgsql/postgres.c
+    * initialize some variables which could not be uninitialized on some
+      errors in PG or bad user parameters and cause GPF - I only fix it
+      on C level - the same should be done for .prg returned values to
+      not confuse .prg programmers on errors (if any).
 
 2004-09-06 12:45 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/ads_rdd/adsfunc.c

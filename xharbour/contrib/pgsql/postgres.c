@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.12 2004/05/02 21:48:52 druzus Exp $
+ * $Id: postgres.c,v 1.13 2004/06/02 14:45:44 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -110,7 +110,7 @@ HB_FUNC(PQCLEAR)
 
 HB_FUNC(PQEXEC)
 {
-    PGresult   *res;
+    PGresult   *res = NULL;
 
     if (hb_pcount() == 2)
         res = PQexec(( PGconn * ) hb_parptr(1), hb_parcx(2));
@@ -120,7 +120,7 @@ HB_FUNC(PQEXEC)
 
 HB_FUNC(PQEXECPARAMS)
 {
-    PGresult   *res;
+    PGresult   *res = NULL;
     const char **paramvalues;
     int        i;
     long       n;
@@ -414,7 +414,7 @@ HB_FUNC(PQSENDQUERY)
 
 HB_FUNC(PQGETRESULT)
 {
-    PGresult   *res;
+    PGresult   *res = NULL;
 
     if (hb_parinfo(1))
         res = PQgetResult(( PGconn * ) hb_parptr(1));

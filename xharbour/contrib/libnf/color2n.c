@@ -1,5 +1,5 @@
 /*
- * $Id: color2n.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id: color2n.c,v 1.3 2004/03/23 22:16:52 andijahja Exp $
  */
 
 /*
@@ -55,21 +55,16 @@ static char * _ftStripIt( char * cColor );
 
 HB_FUNC(FT_COLOR2N)
 {
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
-   {
+   int iRet = 0;
 
-       int iRet = 0;
+   // make sure parameter is a char type and that it is 8 chars or less
 
-       // make sure parameter is a char type and that it is 8 chars or less
+   if ( ISCHAR( 1 )  && hb_parclen( 1 ) < 8 )
+      iRet = _ftColor2I( hb_parcx( 1 ) );
 
-       if ( ISCHAR( 1 )  && hb_parclen( 1 ) < 8 )
-          iRet = _ftColor2I( hb_parcx( 1 ) );
+   hb_retni( iRet );
 
-       hb_retni( iRet );
-
-       return;
-   }
-#endif
+   return;
 }
 
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.18 2004/06/15 11:55:53 druzus Exp $
+# $Id: make_rpm.sh,v 1.19 2004/08/29 00:26:20 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,6 +14,7 @@
 # Conditional build:
 # --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
+# --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --with allegro     - build GTALLEG - Allegro based GT driver
@@ -70,10 +71,11 @@ do
             then
                 [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} MySQL-devel"
                 [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixodbc-devel"
-            else    
+            else
                 [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} mysql-devel"
                 [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixODBC-devel"
             fi
+            [ "$1" = "pgsql" ] && NEED_RPM="${NEED_RPM} postgresql-devel"
             [ "$1" = "allegro" ] && NEED_RPM="${NEED_RPM} allegro-devel"
         fi
     fi
@@ -84,6 +86,10 @@ done
 if test_reqrpm "MySQL-devel" || test_reqrpm "mysql-devel"
 then 
     INST_PARAM="${INST_PARAM} --with mysql"
+fi
+if test_reqrpm "postgresql-devel"
+then 
+    INST_PARAM="${INST_PARAM} --with pgsql"
 fi
 if test_reqrpm "unixodbc-devel" || test_reqrpm "unixODBC-devel"
 then

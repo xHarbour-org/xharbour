@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.60 2004/08/29 00:26:20 druzus Exp $
+# $Id: xharbour.spec,v 1.61 2004/08/29 20:35:43 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,6 +14,7 @@
 # Conditional build:
 # --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
+# --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --without nf       - do not build nanforum lib
@@ -68,7 +69,7 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_plat  export HB_PLAT=%{platform}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
-%define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}
+%define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
 %define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
 
 %define hb_host  www.xharbour.org
@@ -565,6 +566,7 @@ rm -rf $RPM_BUILD_ROOT
 %{!?_without_nf: %{prefix}/lib/%{name}/libnf*.a}
 %{?_with_adsrdd: %{prefix}/lib/%{name}/librddads*.a}
 %{?_with_mysql: %{prefix}/lib/%{name}/libmysql*.a}
+%{?_with_pgsql: %{prefix}/lib/%{name}/libhbpg*.a}
 
 %files lib
 %defattr(-,root,root,755)
