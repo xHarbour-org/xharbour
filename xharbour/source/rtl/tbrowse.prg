@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.37 2003/04/25 10:46:37 lculik Exp $
+ * $Id: tbrowse.prg,v 1.38 2003/04/25 12:35:50 anoncvs_ivtv Exp $
  */
 
 /*
@@ -2585,7 +2585,7 @@ return nReturn
 Method hitTest( mrow,mcol ) CLASS TBROWSE
   Local nVisCol
   ::mRowPos := ::rowPos
-  ::mColPos := ::ncolPos
+  ::mColPos := ::colPos
 
 
   if mRow< ::rect[ 1 ] .or. mRow > ::rect[ 3 ]
@@ -2644,7 +2644,7 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
          oBrowse:down()
       enddo
 
-      n := oBrowse:mcolpos - oBrowse:ncolpos
+      n := oBrowse:mcolpos - oBrowse:colpos
 
       do while ( n < 0 )
          n++
