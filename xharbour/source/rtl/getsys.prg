@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.8 2003/01/12 04:42:58 what32 Exp $
+ * $Id: getsys.prg,v 1.9 2003/01/14 23:45:31 jonnymind Exp $
  */
 
 /*
@@ -63,22 +63,18 @@
 
 #include "common.ch"
 #include "hbsetup.ch"
+#include "setcurs.ch"
 
 #ifdef HB_COMPAT_C53
-FUNCTION ReadModal( GetList, nPos, nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
+FUNCTION ReadModal( GetList, nPos,;
+                    oMenu, nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
+
+   LOCAL oGetMsg, cColor
 #else
 FUNCTION ReadModal( GetList, nPos )
 #endif
 
    LOCAL oGetList, oSaveGetList
-
-#ifdef HB_COMPAT_C53
-   LOCAL lMsgFlag
-   LOCAL cSaveColor
-   LOCAL cOldMsg
-   LOCAL lColorFlag
-   LOCAL oGet
-#endif
 
    IF Empty( GetList )
       SetPos( MaxRow() - 1, 0 )
@@ -88,82 +84,92 @@ FUNCTION ReadModal( GetList, nPos )
    oGetList := HBGetList():New( GetList )
    oGetList:cReadProcName := ProcName( 1 )
    oGetList:nReadProcLine := ProcLine( 1 )
+   #ifdef HB_COMPAT_C53
+   oGetList:nSaveCursor   := SetCursor(SC_NONE)
+   #endif
 
    oSaveGetList := __GetListActive( )
    __GetListSetActive( oGetList )
    __GetListLast( oGetList )
 
+#ifdef HB_COMPAT_C53
+
+   IF ISNUMBER( nPos )
+      oGetList:nPos := oGetList:Settle( nPos, TRUE )
+   ELSE
+      oGetList:nPos := oGetList:Settle(    0, TRUE )
+   ENDIF
+
+   oGetMsg := GetMssgLine():new( nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
+
+   if oGetMsg:Flag
+      cColor := setColor( oGetMsg:Color )
+      @ oGetMsg:row, oGetMsg:left CLEAR TO oGetMsg:row, oGetMsg:right
+      setColor( cColor )
+      oGetMsg:saveScreen()
+   endif
+
+   oGetList:nNextGet := 0
+   oGetList:nHitCode := 0
+   oGetList:nMenuID  := 0
+
+#else
+
    IF ! ( ISNUMBER( nPos ) .AND. nPos > 0 )
       oGetList:nPos := oGetList:Settle( 0 )
    ENDIF
 
-#ifdef HB_COMPAT_C53
-   if     ( ! ValType( nMsgRow ) == "N" )
-      lMsgFlag := .f.
-
-   elseif ( ! ValType( nMsgLeft ) == "N" )
-      lMsgFlag := .f.
-
-   elseif ( ! ValType( nMsgRight ) == "N" )
-      lMsgFlag := .f.
-
-   else
-      lMsgFlag := .t.
-      cOldMsg := SaveScreen( nMsgRow, nMsgLeft, nMsgRow, nMsgRight )
-      lColorFlag := ( ValType( cMsgColor ) == "C" )
-
-   endif
 #endif
 
-   DO WHILE oGetList:nPos != 0
+   WHILE oGetList:nPos != 0
 
       oGetList:oGet := oGetList:aGetList[ oGetList:nPos ]
       oGetList:PostActiveGet()
 
+/*
 #ifdef HB_COMPAT_C53
-      if ( lMsgFlag )
+      if oGetMsg:Flag
          oGet := oGetList:aGetList[ oGetList:nPos ]
-            if ( lColorFlag )
-               cSaveColor := SetColor( cMsgColor )
-            endif
-
-            if ( ValType( oGet:Control ) == "O" )
-               @ nMsgRow, nMsgLeft ;
-               say PadC( oGet:Control:Message, nMsgRight - nMsgLeft + 1 )
-            else
-               @ nMsgRow, nMsgLeft ;
-               say PadC( oGet:Message, nMsgRight - nMsgLeft + 1 )
-            endif
-
-            if ( lColorFlag )
-               SetColor( cSaveColor )
-            endif
+         oGetMsg:Show( oGet )
       endif
 #endif
+*/
 
       IF ISBLOCK( oGetList:oGet:Reader )
 #ifdef HB_COMPAT_C53
-         Eval( oGetList:oGet:Reader, oGetList:oGet ,oGetlist)
+
+         Eval( oGetList:oGet:Reader, oGetList:oGet ,oGetlist, oMenu, oGetMsg )
+      ELSE
+         oGetList:Reader( oMenu, oGetMsg )
+      ENDIF
+
+      oGetList:nPos := oGetList:Settle( , FALSE )
 #else
          Eval( oGetList:oGet:Reader, oGetList:oGet )
-#endif
       ELSE
          oGetList:Reader()
       ENDIF
 
       oGetList:nPos := oGetList:Settle()
+#endif
 
    ENDDO
 
+/*
 #ifdef HB_COMPAT_C53
-   if ( lMsgFlag )
-      RestScreen( nMsgRow, nMsgLeft, nMsgRow, nMsgRight, cOldMsg )
+   if oGetMsg:Flag
+      oGetMsg:restScreen()
    endif
 #endif
+*/
 
    __GetListSetActive( oSaveGetList )
 
    SetPos( MaxRow() - 1, 0 )
+
+#ifdef HB_COMPAT_C53
+   SetCursor(oGetList:nSaveCursor)
+#endif
 
    RETURN oGetList:lUpdated
 
@@ -238,7 +244,7 @@ FUNCTION GetPostValidate( oGet )
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-
+      
       RETURN oGetList:GetPostValidate()
    ENDIF
 
@@ -301,9 +307,9 @@ PROCEDURE __SetFormat( bFormat )
 
    IF oGetList != NIL
       IF ISBLOCK( bFormat )
-         oGetList:SetFormat( bFormat )
+         oGetList:SetFormat( bFormat, TRUE )
       ELSE
-         oGetList:SetFormat()
+         oGetList:SetFormat( , TRUE )
       ENDIF
    ENDIF
 
@@ -314,9 +320,9 @@ FUNCTION ReadFormat( bFormat )
 
    IF oGetList != NIL
       IF PCount() >= 1
-         RETURN oGetList:SetFormat( bFormat )
+         RETURN oGetList:SetFormat( bFormat, TRUE )
       ELSE
-         RETURN oGetList:SetFormat()
+         RETURN oGetList:SetFormat( , FALSE )
       ENDIF
    ENDIF
 
@@ -344,7 +350,7 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
    ENDIF
 
    IF Set( _SET_SCOREBOARD )
-
+      
       cMessage := Left( NationMsg( _GET_RANGE_FROM ) + LTrim( Transform( xLow, "" ) ) + ;
                         NationMsg( _GET_RANGE_TO ) + LTrim( Transform( xHigh, "" ) ), MaxCol() )
 
@@ -356,7 +362,8 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
       SetPos( nOldRow, nOldCol )
       HBConsoleUnlock()
 
-      Inkey( 0 )
+      DO WHILE NextKey() == 0
+      ENDDO
 
       HBConsoleLock()
       DispOutAt( SCORE_ROW, Min( 60, MaxCol() - Len( cMessage ) ), Space( Len( cMessage ) ) )
@@ -369,42 +376,25 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
 
 #ifdef HB_COMPAT_C53
 
-PROCEDURE GUIReader( oGet, oGetlist, a, b )
-
-   oGetlist:GuiReader( oGet, oGetList, a, b )
-
-   RETURN
-
-PROCEDURE TBReader( oGet, oGetList, aMsg )
-
-   oGetlist:TBReader( oGet, oGetList, aMsg )
+PROCEDURE GUIReader( oGet, oGetlist, oMenu, oGetMsg )
+ 
+   oGetlist:GuiReader( oGet, oMenu, oGetMsg )
 
    RETURN
 
-PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  aMsg )
+PROCEDURE GuiApplyKey( oGet, nKey, oMenu, oGetMsg )
    LOCAL oGetList := __GetListActive()
 
    IF oGetList != NIL
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-      oGetList:Tbapplykey( oGet, oTB, GetList, nKey, aMsg )
-   ENDIF
-   RETURN
-
-PROCEDURE GuiApplyKey(oGet,nKey)
-   LOCAL oGetList := __GetListActive()
-
-   IF oGetList != NIL
-      IF oGet != NIL
-         oGetList:oGet := oGet
-      ENDIF
-      oGetList:GUIApplyKey(oGet, nKey )
+      oGetList:GUIApplyKey( oGet:control, nKey, oMenu, oGetMsg )
    ENDIF
 
    RETURN
 
-FUNCTION GuiGetPreValidate( oGet ,oGui)
+FUNCTION GuiGetPreValidate( oGet, oGui, oGetMsg )
    LOCAL oGetList := __GetListActive()
 
    IF oGetList != NIL
@@ -412,24 +402,41 @@ FUNCTION GuiGetPreValidate( oGet ,oGui)
          oGetList:oGet := oGet
       ENDIF
 
-      RETURN oGetList:GetPreValidate()
+      RETURN oGetList:GetPreValidate( oGui, oGetMsg )
    ENDIF
 
    RETURN .F.
 
-FUNCTION GuiGetPostValidate( oGet,oGui )
+FUNCTION GuiGetPostValidate( oGet, oGui, oGetMsg )
    LOCAL oGetList := __GetListActive()
 
    IF oGetList != NIL
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-
-      RETURN oGetList:GuiGetPostValidate(oGui)
+      
+      RETURN oGetList:GuiGetPostValidate( oGui, oGetMsg )
    ENDIF
 
    RETURN .F.
 
+
+PROCEDURE TBReader( oGet, oGetList, oMenu, oGetMsg )
+
+   oGetList:TBReader( oGet, oMenu, oGetMsg )
+
+   RETURN
+
+PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  oGetMsg )
+   LOCAL oGetList := __GetListActive()
+
+   IF oGetList != NIL
+      IF oGet != NIL
+         oGetList:oGet := oGet
+      ENDIF
+      oGetList:Tbapplykey( oGet, oTB, nKey, oGetMsg )
+   ENDIF
+   RETURN 
 
 FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    LOCAL oGetList := __GetListActive()
@@ -437,7 +444,6 @@ FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    IF oGetList != NIL
       RETURN oGetlist:Hittest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    ENDIF
-
    RETURN 0
 
 /***
@@ -453,7 +459,7 @@ FUNCTION Accelerator( aGetList, nKey, aMsg ) // Removed STATIC
    IF oGetList != NIL
       RETURN oGetlist:Accelerator( aGetList, nKey, aMsg ) // Removed STATIC
    ENDIF
-
    RETURN 0
 
 #endif
+
