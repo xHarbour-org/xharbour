@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.106 2004/06/04 06:57:25 bdj Exp $
+ * $Id: gtwvt.c,v 1.107 2004/06/05 09:56:28 vouchcac Exp $
  */
 
 /*
@@ -1892,22 +1892,22 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_wvt_gtTranslateKey( K_DOWN , K_SH_DOWN , K_ALT_DOWN , K_CTRL_DOWN  );
           break;
         case VK_HOME:
-          hb_wvt_gtTranslateKey( K_HOME , K_HOME , K_ALT_HOME , K_CTRL_HOME  );
+          hb_wvt_gtTranslateKey( K_HOME , K_SH_HOME , K_ALT_HOME , K_CTRL_HOME  );
           break;
         case VK_END:
-          hb_wvt_gtTranslateKey( K_END  , K_END  , K_ALT_END  , K_CTRL_END   );
+          hb_wvt_gtTranslateKey( K_END  , K_SH_END  , K_ALT_END  , K_CTRL_END   );
           break;
         case VK_DELETE:
-          hb_wvt_gtTranslateKey( K_DEL  , K_DEL  , K_ALT_DEL  , K_CTRL_DEL   );
+          hb_wvt_gtTranslateKey( K_DEL  , K_SH_DEL  , K_ALT_DEL  , K_CTRL_DEL   );
           break;
         case VK_INSERT:
-          hb_wvt_gtTranslateKey( K_INS  , K_INS  , K_ALT_INS  , K_CTRL_INS   );
+          hb_wvt_gtTranslateKey( K_INS  , K_SH_INS  , K_ALT_INS  , K_CTRL_INS   );
           break;
         case VK_PRIOR:
-          hb_wvt_gtTranslateKey( K_PGUP , K_PGUP , K_ALT_PGUP , K_CTRL_PGUP  );
+          hb_wvt_gtTranslateKey( K_PGUP , K_SH_PGUP , K_ALT_PGUP , K_CTRL_PGUP  );
           break;
         case VK_NEXT:
-          hb_wvt_gtTranslateKey( K_PGDN , K_PGDN , K_ALT_PGDN , K_CTRL_PGDN  );
+          hb_wvt_gtTranslateKey( K_PGDN , K_SH_PGDN , K_ALT_PGDN , K_CTRL_PGDN  );
           break;
         case VK_F1:
           hb_wvt_gtTranslateKey( K_F1   , K_SH_F1, K_ALT_F1   , K_CTRL_F1    );
@@ -2044,7 +2044,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
               hb_wvt_gtTranslateKey( K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB );
               break;
             case VK_RETURN:
-              hb_wvt_gtTranslateKey( K_RETURN, K_RETURN, K_ALT_RETURN, K_CTRL_RETURN );
+              hb_wvt_gtTranslateKey( K_RETURN, K_SH_RETURN, K_ALT_RETURN, K_CTRL_RETURN );
               break;
             case VK_ESCAPE:
               hb_wvt_gtAddCharToInputQueue( K_ESC );

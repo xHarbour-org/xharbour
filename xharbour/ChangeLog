@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3031 2004/06/06 03:10:40 modalsist Exp $
+ * $Id: ChangeLog,v 1.3032 2004/06/06 10:20:32 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-06 13:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * include/inkey.ch
+    * Added codes for K_SH_INS, K_SH_DEL, K_SH_HOME, K_SH_END, 
+    * K_SH_PGUP, K_SH_PGDN, K_SH_RETURN, K_SH_ENTER
+    * Added #ifndef HB_CTRL_KEYS_CODES if someone want to use
+    * CTRL codes that do not overlap other keys. 
+    * The default are the Clipper codes of course.
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtsln/keytrans.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+    * Added support of new K_SH_* keys. 
+  * source/rtl/gtwvt/wvtcore.c
+    * Deleted unused POINT xy; to avoid C warnings.
+    * Wvt_DrawShadedRect guarded by #ifdef WINVER > 0x500
+  * source/rtl/gtwvt/wvtutils.c
+    * Tooltips functions guarded by #ifdef _WIN32_IE > 0x400
+  To avoid build errors with mingw32. 
 
 2004-06-06 14:05 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/odbc/hdo_odbc.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.2 2004/05/22 11:59:43 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.3 2004/06/05 09:56:28 vouchcac Exp $
  */
 
 /*
@@ -204,6 +204,7 @@ HB_FUNC( WVT_MESSAGEBOX )
    MessageBox( _s->hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) );
 }
 
+#if _WIN32_IE > 0x400
 //-------------------------------------------------------------------//
 //
 //                              Tooltips
@@ -319,6 +320,7 @@ HB_FUNC( WVT_GETTOOLTIPTEXTCOLOR )
 {
    hb_retnl( ( COLORREF ) SendMessage( _s->hWndTT, TTM_GETTIPTEXTCOLOR, 0, 0 ) );
 }
+#endif
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.2 2004/05/22 11:59:43 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.3 2004/06/05 09:56:28 vouchcac Exp $
  */
 
 /*
@@ -1557,7 +1557,6 @@ HB_FUNC( WVT_DRAWTOOLBUTTONSTATE )
    int iLeft       = ( _s->PTEXTSIZE.x * hb_parni( 2 ) ) + hb_parni( 5,2 );
    int iBottom     = ( _s->PTEXTSIZE.y * ( hb_parni( 3 ) + 1 ) ) - 1 + hb_parni( 5,3 );
    int iRight      = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
-   POINT xy;
 
    switch ( hb_parni( 6 ) )
    {
@@ -1773,6 +1772,7 @@ HB_FUNC( WVT_DRAWSCROLLTHUMBHORZ )
    hb_wvt_gtDrawBoxRaised( iTop+1, iThumbLeft+1, iBottom-2, iThumbRight-2 );
 }
 
+#if WINVER > 0x500
 //-------------------------------------------------------------------//
 //
 //    Wvt_DrawShadedRect( nTop, nLeft, nBottom, nRight, aPxlOffSet, nHorVert, aRGBb, aRGBe  )
@@ -1812,9 +1812,9 @@ HB_FUNC( WVT_DRAWSHADEDRECT )
 
       bGF = ( BOOL ) _s->pfnGF( _s->hdc, vert, 2, &gRect, 1, iMode );
    }
-
    hb_retl( bGF );
 }
+#endif
 
 //-------------------------------------------------------------------//
 //
