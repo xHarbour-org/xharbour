@@ -905,7 +905,7 @@ PROCEDURE RP_Dot()
    bCount := .F.
 
    IF File( "rp_dot.ch" )
-      //PP_PreProFile( "rp_dot.ch" )
+      PP_PreProFile( "rp_dot.ch" )
    ELSE
       PP_LoadDot()
    ENDIF
