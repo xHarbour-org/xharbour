@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.11 2003/09/25 02:24:02 paultucker Exp $
+# $Id: gcc.cf,v 1.12 2004/10/31 13:15:46 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -56,10 +56,6 @@ endif
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
-# This library is needed for CharToOemBuff() and OemToCharBuff() support.
-#This library is needed for tprinter
-LINKLIBS += -luser32 -lwinspool
-
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
@@ -103,6 +99,11 @@ endif
 # cyclic dependencies, but I think it is not really necessary if the
 # libraries are kept in proper order.
 # LINKLIBS += -Wl,-)
+
+SYSLIBS = -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 \
+          -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32
+
+LINKLIBS += $(SYSLIBS)
 
 LDFLAGS = $(LINKPATHS)
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/04/09 17:47:14 lculik Exp $
+# $Id: Makefile,v 1.3 2003/09/17 04:30:39 lculik Exp $
 #
 
 ROOT = ../../
@@ -18,6 +18,10 @@ PRG_SOURCES=\
 LIBNAME=rddads
 ifneq ($(HB_ARCHITECTURE),dos)
 MT_LIBNAME=rddadsmt
+endif
+
+ifeq ($(HB_ARCHITECTURE),w32)
+  C_USR += -DWIN32
 endif
 
 include $(TOP)$(ROOT)config/header.cf

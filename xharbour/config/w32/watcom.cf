@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.21 2004/12/27 11:06:10 lf_sfnet Exp $
+# $Id: watcom.cf,v 1.22 2005/01/11 23:53:43 likewolf Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -11,7 +11,7 @@ EXE_EXT = .exe
 LIB_PREF =
 LIB_EXT = .lib
 
-$(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP = $(subst /,\,$(GRANDP))
+$(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP = $(subst \,/,$(GRANDP))
 
 CC = wpp386
 CC_IN =
@@ -61,22 +61,22 @@ endef
 LD = wlink
 LDFLAGS = debug all OP osn=NT OP stack=65536 OP CASEEXACT
 
-HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
+HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 
 ifeq ($(HB_LIB_COMPILE),)
-LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
-LINKLIBS += $(foreach lib, $(LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
+LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
+LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 else
-LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(HB_LIB_COMPILE)/$(lib)))
-LINKLIBS += $(foreach lib, $(LIBS), $(subst /,\,$(HB_LIB_COMPILE)/$(lib)))
+LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
+LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
 endif
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 ifeq ($(HB_LIB_COMPILE),)
-RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
+RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
 else
-RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(HB_LIB_COMPILE)/$(drv)))
+RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(HB_LIB_COMPILE)/$(drv)))
 endif
 endif
 
@@ -95,7 +95,7 @@ GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)/$(HB_DEFAULT_GT)
 endif
 endif
 
-GTLIBS := $(subst /,\,$(GTLIBS))
+GTLIBS := $(subst \,/,$(GTLIBS))
 endif
 
 
@@ -119,8 +119,8 @@ AR_RULE = $(create_library)
 
 include $(TOP)$(ROOT)config/rules.cf
 
-HB := $(subst /,\,$(HB))
-HB_FLAGS := $(subst /,\,$(HB_FLAGS))
+HB := $(subst \,/,$(HB))
+HB_FLAGS := $(subst \,/,$(HB_FLAGS))
 
 # work arround to DOS command line size limit
 export HARBOURCMD := $(HB_FLAGS)

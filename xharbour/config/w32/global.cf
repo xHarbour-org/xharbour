@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.15 2005/02/11 18:58:35 druzus Exp $
+# $Id: global.cf,v 1.16 2005/02/17 19:52:26 druzus Exp $
 #
 
 ifndef MK
@@ -39,6 +39,8 @@ ifeq ($(COMSPEC),) #location of command.com
 endif
 ifeq ($(findstring cmd.exe,$(COMSPEC)),cmd.exe)
   CMD_EXE := yes
+else
+  COMMAND_COM := yes
 endif
 
 ifeq ($(CMD_EXE),yes)

@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.5 2004/01/28 22:02:36 druzus Exp $
+# $Id: bcc32.cf,v 1.6 2004/10/31 13:15:46 druzus Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -10,15 +10,6 @@ OBJ_EXT = .obj
 EXE_EXT = .exe
 LIB_PREF =
 LIB_EXT = .lib
-
-_HB_INC_COMPILE = $(subst /,\,$(HB_INC_COMPILE))
-_HL = $(notdir $(HB_LIB_COMPILE))
-ifeq ($(_HL),)
-#there is an ending slash
-_HB_LIB_COMPILE = $(subst /,\,$(HB_LIB_COMPILE))
-else
-_HB_LIB_COMPILE = $(subst /,\,$(HB_LIB_COMPILE)/)
-endif
 
 CC = bcc32
 CC_IN = -c
@@ -58,10 +49,6 @@ LINKLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul$(LIB_EXT)
 endif
 endif
 
-# HB_SCREEN_LIB: empty, or one of ncurses, slang
-# HB_SCREEN_LIB=ncurses
-# HB_SCREEN_LIB=slang
-
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += $(HB_SCREEN_LIB)
 endif
@@ -89,12 +76,13 @@ $(foreach file, $(^F), $(link_file))
 $(foreach file, $(LINKLIBS), $(link_file))
 $(LD) $(LD_OUT)$@ $(LDFLAGS) @__link__.tmp
 endef
+
 #echo kernel32.lib, user32.lib, winspool.lib, oleaut32.lib, uuid.lib, comctl32.lib >> __link__.tmp
 
 LD = bcc32
-LDFLAGS = $(LINKPATHS)
+LDFLAGS = $(LINKPATHS) $(L_USR)
 LD_OUT = -e
-LD_RULE = $(link_exe_file)
+LD_RULE = $(LD) $(LD_OUT)$@ $(LDFLAGS) $(^F) $(LINKLIBS)
 
 #Note: The empty line below HAVE TO exist!
 define lib_object
@@ -110,8 +98,13 @@ endef
 
 AR = tlib
 ARFLAGS = $(A_USR)
+AROBJS = $(foreach file, $(^F), -+$(file))
+AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS)
+
+ifeq ($(COMMAND_COM),yes)
+# workarounf for command line size limit
+LD_RULE = $(link_exe_file)
 AR_RULE = $(create_library)
-#AROBJS = $(foreach file, $(^F), -+$(file))
-#AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS),,
+endif
 
 include $(TOP)$(ROOT)config/rules.cf
