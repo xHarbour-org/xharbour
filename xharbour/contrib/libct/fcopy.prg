@@ -46,6 +46,11 @@ Do while ! lDone
 Enddo
 if lStillOpen
    fSeek(nSrcHand, nTotBytes, FS_SET)
+else
+   /* 28/04/2004 - <maurilio.longo@libero.it>
+      Since lMode is not supported (fully, at least) if file has been fully copyed into destination
+      close source file handle or else it stays open */
+   fClose(nSrcHand)
 endif
 fClose(nDestHand)
 Return(nTotBytes)
@@ -69,7 +74,7 @@ Do while ! lDone
    nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
    if nDestBytes < nSrcBytes
       lStillOpen := .T.
-      lDone      := .T. 
+      lDone      := .T.
    else
       lDone := (nSrcBytes == 0)
    endif
@@ -104,7 +109,7 @@ Do while ! lDone
    nSrcBytes := fRead(nSrcHand, @cBuffer, F_BLOCK)
    nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
    if nDestBytes < nSrcBytes
-      lDone := .T. // error in this case 
+      lDone := .T. // error in this case
    else
       lDone := (nSrcBytes == 0)
    endif

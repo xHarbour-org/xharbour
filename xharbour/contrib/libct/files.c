@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.22 2004/04/05 10:03:18 andijahja Exp $
+ * $Id: files.c,v 1.23 2004/04/06 01:50:54 druzus Exp $
  */
 
 /*
@@ -84,10 +84,10 @@
    #endif
       #include "hb_io.h"
       #include "dos.h"
-	 #if defined( __WATCOMC__ )
-	 #else
+    #if defined( __WATCOMC__ )
+    #else
       #include <dir.h>
-	 #endif
+    #endif
 #endif
 #if defined( __GNUC__ ) && !defined( __MINGW32__ )
    #include <sys/types.h>
@@ -138,7 +138,7 @@
    #define FA_VOLCOMP      32768   /* M */
 #endif
 
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 static USHORT osToHarbourMask(  USHORT usMask  )
 {
    USHORT usRetMask;
@@ -580,7 +580,7 @@ HB_FUNC( FILESIZE )
    }
 }
 
-#elif defined( OS_UNIX_COMPATIBLE )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
 {
    if ( hb_pcount(  ) >0 )
