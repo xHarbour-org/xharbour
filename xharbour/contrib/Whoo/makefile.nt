@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.8 2003/10/09 05:31:55 paultucker Exp $
+# $Id: makefile.nt,v 1.9 2003/10/10 13:33:52 paultucker Exp $
 #
 
 # File:     makefile.nt
@@ -83,21 +83,18 @@ WHOOOBJ    = \
     $(OBJ_DIR)\TCListBox.obj \
     $(OBJ_DIR)\TCommonDialog.obj \
     $(OBJ_DIR)\TComponent.obj \
-    $(OBJ_DIR)\TControl.obj \
+    $(OBJ_DIR)\Controls.obj \
     $(OBJ_DIR)\TCProgBar.obj \
     $(OBJ_DIR)\TCRadio.obj \
     $(OBJ_DIR)\TCRebar.obj \
     $(OBJ_DIR)\TCStatic.obj \
     $(OBJ_DIR)\TCStatusBar.obj \
     $(OBJ_DIR)\TCToolBar.obj \
-    $(OBJ_DIR)\TCustomControl.obj \
     $(OBJ_DIR)\TCustomForm.obj \
     $(OBJ_DIR)\TCustomFrame.obj \
-    $(OBJ_DIR)\TCustomImageList.obj \
     $(OBJ_DIR)\TCustomTab.obj \
     $(OBJ_DIR)\TForm.obj \
     $(OBJ_DIR)\TFrame.obj \
-    $(OBJ_DIR)\THintWindow.obj \
     $(OBJ_DIR)\TMainMenu.obj \
     $(OBJ_DIR)\TMenu.obj \
     $(OBJ_DIR)\TMenuActionLink.obj \
@@ -117,7 +114,6 @@ WHOOOBJ    = \
     $(OBJ_DIR)\TTreeview.obj \
     $(OBJ_DIR)\TTVItem.obj \
     $(OBJ_DIR)\TWColumn.obj \
-    $(OBJ_DIR)\TWinControl.obj \
     $(OBJ_DIR)\TypeDef.obj
 
 !if ( "$(MK_FLAGS:Y=)"=="A" )
