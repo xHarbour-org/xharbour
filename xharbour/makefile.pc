@@ -2,6 +2,10 @@
 # ³ PELLESC MAKEFILE ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
+#
+# $Id: makefile.gp,v 1.3 2005/02/17 12:22:26 andijahja Exp $
+# makefile for PellesC compiler
+#
 
 !if !$d(ECHO)
 ECHO = @echo.
@@ -243,7 +247,6 @@ PROJECT = \
    $(DESIGN_LIB) \
    $(HTML_LIB) \
    $(HBTEST_EXE) \
-   $(HBRUN_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
    $(HBPP_EXE) \
@@ -4778,52 +4781,52 @@ $(OBJ_DIR)\hbmake.c : $(HBMAKE_DIR)\hbmake.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
 
 $(OBJ_DIR)\hbmake.obj : $(OBJ_DIR)\hbmake.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\tmake.c : $(HBMAKE_DIR)\tmake.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\tmake.obj : $(OBJ_DIR)\tmake.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\hbmutils.c : $(HBMAKE_DIR)\hbmutils.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\hbmutils.obj : $(OBJ_DIR)\hbmutils.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\radios.c : $(HBMAKE_DIR)\radios.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\radios.obj : $(OBJ_DIR)\radios.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\checks.c : $(HBMAKE_DIR)\checks.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\checks.obj : $(OBJ_DIR)\checks.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\pickarry.c : $(HBMAKE_DIR)\pickarry.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\pickarry.obj : $(OBJ_DIR)\pickarry.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\pickfile.c : $(HBMAKE_DIR)\pickfile.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\pickfile.obj : $(OBJ_DIR)\pickfile.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\prb_stak.c : $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ XBSCRIPT.EXE dependencies ³Û
@@ -4841,7 +4844,7 @@ $(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
 
 $(OBJ_DIR)\xbscript.obj : $(OBJ_DIR)\xbscript.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBPP.EXE dependencies ³Û
@@ -4862,4 +4865,4 @@ $(HBPP_EXE) : \
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
 $(OBJ_DIR)\hbpp.obj : $(HBPP_DIR)\hbpp.c
-   $(CC) $(CFLAGS) -Fo$@ $**
+   $(CC_CMD)

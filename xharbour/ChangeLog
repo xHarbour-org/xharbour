@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3849 2005/02/20 15:37:19 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3850 2005/02/20 17:06:16 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-21 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * makefile.pc
+    * add CVS version control for easy tracking
+    * remove double entry in PROJECT entries for hbrun.exe
+
+  * hrbdll.gc
+    * CFLAGS on math.c caused some math functions not exported. Fixed.
+
+  * source/vm/thread.c
+    * remove spurious HB_EXPORT
+
+  * source/vm/errorapi.c
+    * commented unused variable
+
+  * contrib/gtwvw/gtwvw.c
+    * fixed warnings on uninitialized variables
 
 2005-02-21 00:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/doc/whatsnew.txt

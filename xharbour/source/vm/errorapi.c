@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.49 2004/11/01 05:38:11 likewolf Exp $
+ * $Id: errorapi.c,v 1.50 2005/02/19 05:04:16 ronpinkas Exp $
  */
 
 /*
@@ -1395,7 +1395,7 @@ PHB_ITEM HB_EXPORT hb_errRT_SubstArray( char *szSubSystem, ULONG ulGenCode, ULON
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
 
-   ULONG ulArgPos;
+   // ULONG ulArgPos;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_BASE_SubstArray()") );
 

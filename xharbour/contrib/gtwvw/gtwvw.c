@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.9 2005/02/15 21:05:53 andijahja Exp $
+ * $Id: gtwvw.c,v 1.10 2005/02/17 07:39:06 andijahja Exp $
  */
 
 /*
@@ -3300,7 +3300,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       USHORT      irow;
       RECT        updateRect, rcRect;
       int         ixbeyond;
-      int colStart, colStop, rowStart, rowStop;
+      int colStart = 0 , colStop = 0, rowStart = 0, rowStop = 0;
       HFONT       hOldFont;
 
       GetUpdateRect( hWnd, &updateRect, FALSE );
@@ -8464,7 +8464,7 @@ HB_FUNC( WVW_DRAWLABELOBJ )
    int      iTop, iLeft, iBottom, iRight, x, y;
    RECT     rect;
    HFONT    oldFont;
-   int      oldTextAlign, iAlignHorz, iAlignVert, iAlignH, iAlignV;
+   int      oldTextAlign, iAlignHorz, iAlignVert, iAlignH = 0, iAlignV;
    COLORREF oldBkColor, oldTextColor;
    UINT     uiOptions;
    SIZE     sz;
@@ -8963,7 +8963,7 @@ HB_FUNC( WVW_DRAWTEXTBOX )
 
    int iAlignHorz   = ( ISNIL( 8 ) ? 0 : hb_parni( 8 ) );
 
-   int iAlignH;
+   int iAlignH = 0;
 
    COLORREF oldTextColor, oldBkColor;
    HFONT    oldFont;
@@ -9227,9 +9227,9 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
    PHB_ITEM pFirst = hb_param( 3,HB_IT_ANY );
    PHB_ITEM pFunc  = NULL ;
    PHB_DYNS pExecSym;
-   HWND     hDlg ;
+   HWND     hDlg = NULL;
    int      iIndex;
-   int      iType;
+   int      iType = 0;
    int      iResource = hb_parni( 4 );
 
    /* check if we still have room for a new dialog */
@@ -15413,7 +15413,7 @@ HB_FUNC( WVW_CBGETCURTEXT )
    UINT uiCBid = hb_parni(2);
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
    int iCurSel,iTextLen;
-   LPTSTR lptstr;
+   LPTSTR lptstr = NULL;
 
    if (pcd==NULL)
    {
@@ -15499,7 +15499,7 @@ HB_FUNC( WVW_CBISDROPPED )
 
 HB_FUNC( WIN_SENDMESSAGE )
 {
-   char *cText ;
+   char *cText = NULL;
 
    if( ISBYREF( 4 ) )
    {
@@ -15754,7 +15754,7 @@ HB_FUNC( WIN_LOADICON )
 
 HB_FUNC( WIN_LOADIMAGE )
 {
-   HBITMAP hImage;
+   HBITMAP hImage = NULL;
    int     iSource = hb_parni( 2 );
 
    switch ( iSource )

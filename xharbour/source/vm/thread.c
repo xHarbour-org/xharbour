@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.183 2005/01/10 18:45:42 druzus Exp $
+* $Id: thread.c,v 1.184 2005/02/12 19:54:04 druzus Exp $
 */
 
 /*
@@ -122,29 +122,29 @@ static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
 #if defined(HB_OS_WIN_32)
-   HB_EXPORT DWORD hb_dwCurrentStack;
+   DWORD hb_dwCurrentStack;
 #elif defined(HB_OS_OS2)
-   HB_EXPORT PPVOID hb_dwCurrentStack;
-   HB_EXPORT HEV  hb_hevWakeUpAll; /* posted to wake up all threads waiting somewhere on an INDEFINITE wait */
+   PPVOID hb_dwCurrentStack;
+   HEV  hb_hevWakeUpAll; /* posted to wake up all threads waiting somewhere on an INDEFINITE wait */
 #else
    pthread_key_t hb_pkCurrentStack;
 #endif
 
 /* Declarations of shell mutexes */
-HB_EXPORT HB_COND_T hb_threadStackCond;
+HB_COND_T hb_threadStackCond;
 
-HB_EXPORT HB_CRITICAL_T hb_globalsMutex;
-HB_EXPORT HB_CRITICAL_T hb_staticsMutex;
-HB_EXPORT HB_CRITICAL_T hb_memvarsMutex;
-HB_EXPORT HB_CRITICAL_T hb_macroMutex;
-HB_EXPORT HB_CRITICAL_T hb_allocMutex;
-HB_EXPORT HB_CRITICAL_T hb_garbageAllocMutex;
-HB_EXPORT HB_CRITICAL_T hb_outputMutex;
-HB_EXPORT HB_CRITICAL_T hb_mutexMutex;
-HB_EXPORT HB_CRITICAL_T hb_cancelMutex;
-HB_EXPORT HB_CRITICAL_T hb_dynsymMutex;
+HB_CRITICAL_T hb_globalsMutex;
+HB_CRITICAL_T hb_staticsMutex;
+HB_CRITICAL_T hb_memvarsMutex;
+HB_CRITICAL_T hb_macroMutex;
+HB_CRITICAL_T hb_allocMutex;
+HB_CRITICAL_T hb_garbageAllocMutex;
+HB_CRITICAL_T hb_outputMutex;
+HB_CRITICAL_T hb_mutexMutex;
+HB_CRITICAL_T hb_cancelMutex;
+HB_CRITICAL_T hb_dynsymMutex;
 
-HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
+HB_SHARED_RESOURCE hb_runningStacks;
 
 BOOL hb_bIdleFence;
 
