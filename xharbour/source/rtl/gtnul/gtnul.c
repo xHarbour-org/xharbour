@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.18 2004/02/06 17:07:29 jonnymind Exp $
+ * $Id: gtnul.c,v 1.19 2004/02/07 11:41:01 druzus Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 
 #define HB_GT_MAX_ 16
 static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
+static int hb_gtFindNoNul( void );
 
 #if defined(HB_DEFAULT_GT)
    char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
