@@ -38,10 +38,19 @@ FUNCTION Main
                :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'StatusBar'  , 109, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'TabControl' , 110, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-
+               
             END
          END
          :SetWindowMenu()
+         :WindowMenu:Gray( 102 )
+         :WindowMenu:Gray( 103 )
+         :WindowMenu:Gray( 104 )
+         :WindowMenu:Gray( 105 )
+         :WindowMenu:Gray( 106 )
+         :WindowMenu:Gray( 107 )
+         :WindowMenu:Gray( 108 )
+         :WindowMenu:Gray( 109 )
+         :WindowMenu:Gray( 110 )
 
 //----------------------------------------------------------------------------------------------
 //   IMAGELIST CLASS UNDER CONSTRUCTION
@@ -71,7 +80,7 @@ FUNCTION Main
             END
             :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :Tools:handle, 110, 26, 150 , "", NIL )
 
-            WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0, 0,  0 ) )
+            WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0,  0,  0) )
                :AddTab( "Standard")
                :AddTab( "Aditional")
                :AddTab( "Win32")
@@ -83,7 +92,7 @@ FUNCTION Main
                :AddTab( "Activex")
                :Configure()
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 60, , "", NIL )
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 65, , "", NIL )
 
          END
          

@@ -49,7 +49,19 @@ GLOBAL EXTERNAL hThisInstance
    METHOD GetUniquePropName()
    METHOD OnDestroy()
    METHOD SetGridSize(x,y)
+   METHOD OnCloseQuery()  INLINE    ::Parent:WindowMenu:Enable( 101 ),;
+                                    ::Parent:WindowMenu:Gray( 102 ),;
+                                    ::Parent:WindowMenu:Gray( 103 ),;
+                                    ::Parent:WindowMenu:Gray( 104 ),;
+                                    ::Parent:WindowMenu:Gray( 105 ),;
+                                    ::Parent:WindowMenu:Gray( 106 ),;
+                                    ::Parent:WindowMenu:Gray( 107 ),;
+                                    ::Parent:WindowMenu:Gray( 108 ),;
+                                    ::Parent:WindowMenu:Gray( 109 ),;
+                                    ::Parent:WindowMenu:Gray( 110 ),;
+                                    nil
 
+   
  END CLASS
 
 //----------------------------------------------------------------------------//
@@ -166,14 +178,16 @@ METHOD CreateSub()
 
    ::SetGridSize()
 
-   ::WindowMenu := TMenu():New()
-
-   ::WindowMenu:AddPopup( 'popup 1' )
-   
-      ::WindowMenu:Popup:AddItem( 'item 100', 100, {|| ::MsgBox( 'HI FROM EDITOR')})
-      ::WindowMenu:Popup:AddItem( 'item 101', 101)
-      
-   ::SetWindowMenu()
+   ::Parent:WindowMenu:Gray( 101 )
+   ::Parent:WindowMenu:Enable( 102 )
+   ::Parent:WindowMenu:Enable( 103 )
+   ::Parent:WindowMenu:Enable( 104 )
+   ::Parent:WindowMenu:Enable( 105 )
+   ::Parent:WindowMenu:Enable( 106 )
+   ::Parent:WindowMenu:Enable( 107 )
+   ::Parent:WindowMenu:Enable( 108 )
+   ::Parent:WindowMenu:Enable( 109 )
+   ::Parent:WindowMenu:Enable( 110 )
 
    xRet := super:OnCreate()
 
