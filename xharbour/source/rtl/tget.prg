@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.48 2003/05/07 20:05:49 walito Exp $
+ * $Id: tget.prg,v 1.49 2003/05/12 04:50:58 walito Exp $
  */
 
 /*
@@ -547,7 +547,7 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
 
    DEFAULT lReFormat TO .t.
 
-   if ::bBlock != nil
+   if ::bBlock != nil .and. xValue != nil
       Eval( ::bBlock, xValue )
       if lReFormat
          if !::hasfocus
@@ -582,6 +582,9 @@ METHOD Untransform( cBuffer ) CLASS Get
       return ::VarGet()
    endif
 */
+   if cBuffer == NIL
+      return NIL
+   endif
 
    Switch ::type
    case "C"
