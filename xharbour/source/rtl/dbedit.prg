@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.14 2003/12/09 23:08:20 maurifull Exp $
+ * $Id: dbedit.prg,v 1.16 2003/12/21 02:17:39 maurifull Exp $
  */
 
 /*
@@ -180,7 +180,15 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
     oTBR:setKey(K_LEFT, Nil)
     oTBR:setKey(K_RIGHT, Nil)
   End
-  IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
+  If LastKey() In {K_ESC, K_ENTER}
+    Keyboard Chr(K_HOME)
+    Inkey()
+  End
+  If Empty(xFunc)
+    bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}
+  Else
+    bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}"))
+  End
 
   // EXTENSION: Initialization call
   _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)

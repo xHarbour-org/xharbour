@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2125 2004/01/22 03:47:59 maurifull Exp $
+ * $Id: ChangeLog,v 1.2126 2004/01/22 20:56:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-22 18:35 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/dbedit.prg
+    ! Fixed a bug causing DbEdit() to quit inmediatly if LastKey() == K_ESC | K_ENTER
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed mouse events to be reported at FontHeight and FontWidth multiples
 
 2004-01-22 18:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * source/odbc/todbc.prg
@@ -30,7 +36,7 @@
   * source/rtl/gtalleg/ssf.h
   * source/rtl/gtalleg/ssf.c
   * source/rtl/gtalleg/fixedth.c
-    ! Fixed $Id: ChangeLog,v 1.2125 2004/01/22 03:47:59 maurifull Exp $ header
+    ! Fixed $Id: ChangeLog,v 1.2126 2004/01/22 20:56:56 lculik Exp $ header
 
 2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg
