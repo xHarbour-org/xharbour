@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.178 2003/03/14 00:32:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.179 2003/03/14 11:22:31 jonnymind Exp $
  */
 
 /*
@@ -493,11 +493,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 #endif
 }
 
-void HB_EXPORT hb_vmQuit( void )
+void HB_EXPORT hb_vmQuit( BOOL bDoExit )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)", bDoExit));
 
    //printf( "\nvmQuit()\n" );
 
@@ -508,7 +508,11 @@ void HB_EXPORT hb_vmQuit( void )
    #endif
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
-   hb_vmDoExitFunctions();       /* process defined EXIT functions */
+
+   if( bDoExit )
+   {
+      hb_vmDoExitFunctions();       /* process defined EXIT functions */
+   }
    //printf( "After Functions\n" );
 
    /* release all known items stored in subsystems */

@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.20 2001/08/13 19:16:50 alkresin Exp $
+ * $Id: mainwin.c,v 1.1.1.1 2001/12/21 10:40:57 ronpinkas Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    hb_cmdargInit( argc, argv );
    hb_vmInit( TRUE );
-   hb_vmQuit();
+   hb_vmQuit( TRUE );
 
    LocalFree( pArgs );  /* QUESTION: It seems we never reach here,
                                      so how may we free it ? */
