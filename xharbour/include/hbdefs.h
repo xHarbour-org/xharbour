@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.10 2003/07/06 17:15:40 lculik Exp $
+ * $Id: hbdefs.h,v 1.11 2003/07/10 12:50:41 jonnymind Exp $
  */
 
 /*
@@ -329,10 +329,17 @@ typedef BYTE HB_ATTR;
 #if !defined( LONGLONG)
 #if defined(__GNUC__)
   typedef long long LONGLONG;
-  typedef unsigned long long ULONGLONG;
 #else
   typedef __int64 LONGLONG;
+#endif
+#endif
+
+#if !defined( ULONGLONG)
+#if defined(__GNUC__)
+  typedef unsigned long long ULONGLONG;
+#else
   typedef __int64 ULONGLONG;
 #endif
 #endif
+#
 #endif /* HB_DEFS_H_ */
