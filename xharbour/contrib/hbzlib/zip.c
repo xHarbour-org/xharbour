@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.28 2004/03/18 03:38:59 ronpinkas Exp $
+ * $Id: zip.c,v 1.29 2004/03/22 13:55:38 lculik Exp $
  */
 
 /*
@@ -303,8 +303,6 @@ static void ZipCreateArray( PHB_ITEM pParam )
 //
             hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
 
-            hb_fsChDir( pCurDir ) ;
-            hb_xfree( pCurDir ) ;
             ulLen = WildFile.item.asArray.value->ulLen;
 
             for ( ul = 0; ul < ulLen ; ul ++ )
