@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.31 2002/11/17 23:43:15 what32 Exp $
+ * $Id: TCRebar.prg,v 1.32 2002/11/19 08:00:00 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -115,7 +115,7 @@ METHOD CoolBarProc(nMsg,nwParam,nlParam) CLASS TCoolBar
    LOCAL acRect
    LOCAL aRect
 
-   acRect:=GetClientRect(::Parent:handle)
+   acRect:=GetClientRect(::FParent:Fhandle)
    aRect :=GetWindowRect(::handle)
       
    ::FWidth := acRect[3]
@@ -130,7 +130,7 @@ METHOD CoolBarProc(nMsg,nwParam,nlParam) CLASS TCoolBar
 METHOD CreateWnd() CLASS TCoolBar
    ::Super:CreateWnd()
    
-   ::nrProc := SetProcedure( ::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam|;
+   ::nrProc := SetProcedure( ::FParent:FHandle,{|hWnd, nMsg,nwParam,nlParam|;
                             ::CoolBarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
    ::CoolBarProc( WM_SIZE,0,0)
    

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.70 2002/11/20 06:03:15 what32 Exp $
+ * $Id: xInspect.prg,v 1.71 2002/12/24 17:26:11 what32 Exp $
  */
 
 /*
@@ -131,6 +131,7 @@ METHOD Create( oParent ) CLASS ObjInspect
    // ComboBox   
    InspCombo := ComboInsp():Create( self )
    InspCombo:FWidth := ::FWidth - 8
+   InspCombo:FHeight:= 200
    InspCombo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    InspCombo:SetParent( Self )
    InspCombo:SetItemHeight( -1, 15 )
@@ -428,9 +429,15 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
       DO CASE
          CASE cType == "L"
               aRect   := ::GetItemRect()
-              ::oCtrl := TComboBox():New( self, 222, aRect[1]-1, aRect[2]-1,;
-                                                     aRect[3]-aRect[1]+1, 100)
-              ::oCtrl:Create()
+              
+              ::oCtrl := TComboBox():Create( self )
+              ::oCtrl:FLeft   := aRect[1]-1
+              ::oCtrl:FTop    := aRect[2]-1
+              ::oCtrl:FWidth  := aRect[3]-aRect[1]+1
+              ::oCtrl:FHeight := 100
+              
+              ::oCtrl:SetParent( Self )
+
               ::oCtrl:SetItemHeight( -1, aRect[4]-(aRect[2]+5) )
               ::oCtrl:AddString( "TRUE" )
               ::oCtrl:AddString( "FALSE" )
@@ -440,8 +447,16 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
 
          CASE cType == "O"
               aRect:=::GetItemRect()
-              ::oCtrl:=TButton():New( self, "...", 333, aRect[3]-(aRect[4]-aRect[2]+1), aRect[2]-1, (aRect[4]-aRect[2]+1), aRect[4]-aRect[2]+1)
-              ::oCtrl:Create()
+              
+              ::oCtrl := TButton():Create( Self )
+              ::oCtrl:FLeft   := aRect[3]-(aRect[4]-aRect[2]+1)
+              ::oCtrl:FTop    := aRect[2]-1
+              ::oCtrl:FWidth  := aRect[4]-aRect[2]+1
+              ::oCtrl:FHeight := aRect[4]-aRect[2]+1
+              ::oCtrl:FCaption:= "..."
+              ::oCtrl:Id      := 333
+              
+              ::oCtrl:SetParent( Self )
               ::oCtrl:SetFocus()
       ENDCASE
    ENDIF

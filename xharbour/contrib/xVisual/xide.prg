@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.135 2002/11/20 06:03:15 what32 Exp $
+ * $Id: xide.prg,v 1.136 2002/12/24 17:26:11 what32 Exp $
  */
 
 /*
@@ -186,28 +186,28 @@ METHOD MainToolBar() CLASS MainForm
    oBand2:MinHeight := 56
 
     // add the xmake toolbar
-   WITH OBJECT TToolBar():Create( MainForm )
+   WITH OBJECT ( oTool := TToolBar():Create( MainForm ) )
       :SetParent( MainForm )
-      oBand1:SetChild( ::ToolBar1 )
+      oBand1:SetChild( oTool )
 
-      oTb := ToolButton():Create( ::ToolBar1 )
+      oTb := ToolButton():Create( oTool )
       oTb:Hint := "New Project"
       oTb:OnClick := {|| FormEdit := TFormEdit():Create( MainForm ) }
 //      oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
       
-      ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Build Application"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Build and Launch Application"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Re-Build Application"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Re-Build and Launch Application"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Launch Application"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Compile Single Source"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Compile All Sources"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Link Only"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Compile to PPO"
-      ToolButton():Create( ::ToolBar1 ):Hint := "View"
-      ToolButton():Create( ::ToolBar1 ):Hint := "Files"
+      ToolButton():Create( oTool ):Hint := "Open Project"
+      ToolButton():Create( oTool ):Hint := "Properties"
+      ToolButton():Create( oTool ):Hint := "Build Application"
+      ToolButton():Create( oTool ):Hint := "Build and Launch Application"
+      ToolButton():Create( oTool ):Hint := "Re-Build Application"
+      ToolButton():Create( oTool ):Hint := "Re-Build and Launch Application"
+      ToolButton():Create( oTool ):Hint := "Launch Application"
+      ToolButton():Create( oTool ):Hint := "Compile Single Source"
+      ToolButton():Create( oTool ):Hint := "Compile All Sources"
+      ToolButton():Create( oTool ):Hint := "Link Only"
+      ToolButton():Create( oTool ):Hint := "Compile to PPO"
+      ToolButton():Create( oTool ):Hint := "View"
+      ToolButton():Create( oTool ):Hint := "Files"
 
       :RowCount := 2
 
@@ -244,6 +244,7 @@ METHOD MainToolBar() CLASS MainForm
    With Object ::ToolTabs:StdTab
       oCoolBar := TCoolBar():Create( MainForm:ToolTabs:StdTab )
       oCoolBar:SetParent( MainForm:ToolTabs:StdTab )
+      oCoolBar:SetStyle( WS_BORDER, .F. )
 
       oBand := TCoolBand():Create( oCoolBar )
       oBand:MinWidth  := 190

@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.33 2002/11/15 01:56:34 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.34 2002/11/17 09:03:42 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -215,10 +215,10 @@ METHOD CreateWnd() CLASS TToolBar
 //   SendMessage( ::FHandle, TB_BUTTONSTRUCTSIZE, tbb:sizeof(), 0 )
    
 
-   ::FHandle := CreateToolBarEx( ::Parent:Handle, ::FStyle, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
+   ::FHandle := CreateToolBarEx( ::FParent:FHandle, ::FStyle, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
 
-   ::ntProc := SetProcedure(::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
+   ::ntProc := SetProcedure(::FParent:FHandle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
    ::Created:=.T.
    ShowWindow( ::FHandle, SW_SHOW )
