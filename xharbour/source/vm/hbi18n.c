@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.7 2003/06/24 00:41:05 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.8 2003/06/24 09:18:11 jonnymind Exp $
  */
 
 /*
@@ -85,36 +85,36 @@ static char s_current_language_name[50];
 */
 PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
 {
-   int iLower = 1;
-   int iHigher = hb_arrayLen( pTable );
-   int iPoint = ( iLower + iHigher ) / 2;
+   ULONG ulLower = 1;
+   ULONG ulHigher = hb_arrayLen( pTable );
+   ULONG ulPoint = ( ulLower + ulHigher ) / 2;
    int iRes;
    char *cInt = pStr->item.asString.value;
 
    while ( 1 )
    {
       // get the table row
-      PHB_ITEM pRow = hb_arrayGetItemPtr( pTable, iPoint );
+      PHB_ITEM pRow = hb_arrayGetItemPtr( pTable, ulPoint );
 
-      iRes = hb_stricmp( hb_arrayGetCPtr( pRow, 1), cInt );
+      iRes = strcmp( hb_arrayGetCPtr( pRow, 1), cInt );
 
       if ( iRes == 0 )
       {
          return hb_arrayGetItemPtr( pRow, 2 );
       }
       else {
-         if ( iLower == iHigher )
+         if ( ulLower == ulHigher )
          {
             break;
          }
          // last try. In pair distros, it can be also in the other node
-         else if ( iLower == iHigher -1 )
+         else if ( ulLower == ulHigher -1 )
          {
-            // essendo matematica intera, iPoint è per difetto, ed ha
+            // essendo matematica intera, ulPoint è per difetto, ed ha
             // già esaminato il punto lower
-            pRow = hb_arrayGetItemPtr( pTable, iHigher );
+            pRow = hb_arrayGetItemPtr( pTable, ulHigher );
 
-            if ( hb_stricmp( hb_arrayGetCPtr( pRow, 1), cInt ) == 0 )
+            if ( strcmp( hb_arrayGetCPtr( pRow, 1), cInt ) == 0 )
             {
                return hb_arrayGetItemPtr( pRow, 2 );
             }
@@ -123,13 +123,13 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
 
          if ( iRes > 0 )
          {
-            iHigher = iPoint;
+            ulHigher = ulPoint;
          }
          else
          {
-            iLower = iPoint;
+            ulLower = ulPoint;
          }
-         iPoint = ( iLower + iHigher ) / 2;
+         ulPoint = ( ulLower + ulHigher ) / 2;
       }
    }
 
@@ -616,7 +616,7 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
 {
    PHB_ITEM pStr = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pRet;
-   
+
    if ( pStr == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "I18N must be called on a string", NULL,
@@ -759,3 +759,27 @@ void hb_i18nExit( void )
 }
 
 
+/*******************************************
+* Publishing the hashtable search algorithm
+*/
+HB_FUNC( HB_HFIND )
+{
+   HB_THREAD_STUB
+   PHB_ITEM pHash = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pRet;
+
+   if ( pHash == NULL || pKey == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter format", NULL,
+         2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+
+   pRet = hb_i18n_scan_table( pKey, pHash );
+
+   // The key scan returns the same pKey if not found
+   if ( pRet != pKey )
+      hb_itemReturnCopy( pRet );
+   else
+      hb_ret();
+}
