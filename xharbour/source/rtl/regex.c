@@ -6382,6 +6382,10 @@ HB_FUNC( HB_ATX )
 
             pReg = &re;
          }
+         else
+         {
+            pReg = NULL;
+         }
       }
 
       if( pReg )
