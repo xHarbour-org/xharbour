@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.22 2005/01/10 18:45:10 druzus Exp $
+# $Id: make_rpm.sh,v 1.23 2005/01/12 16:36:00 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,7 +19,7 @@
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --with allegro     - build GTALLEG - Allegro based GT driver
-# --without gpl      - do not build libs which needs GPL 3-rd party code
+# --without gpl      - do not build code which needs GPL 3-rd party libs
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT and GTXWC
 # --without gpm      - build GTSLN and GTCRS without GPM support

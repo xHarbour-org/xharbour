@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.140 2004/12/28 09:29:27 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.173 2004/12/31 11:56:06 druzus Exp $
  */
 
 /*
@@ -734,12 +734,9 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else if ( hb_itemType( pTag->pKeyItem ) == HB_IT_BLOCK )
+   else if ( HB_IS_BLOCK( pTag->pKeyItem ) )
    {
-      hb_vmPushSymbol( &hb_symEval );
-      hb_vmPush( pTag->pKeyItem );
-      hb_vmSend( 0 );
-      pKey = hb_cdxKeyPutItem( pKey, hb_stackReturnItem(), pArea->ulRecNo, pTag, FALSE, TRUE );
+      pKey = hb_cdxKeyPutItem( pKey, hb_vmEvalBlock( pTag->pKeyItem ), pArea->ulRecNo, pTag, FALSE, TRUE );
    }
    else
    {
@@ -798,12 +795,9 @@ static BOOL hb_cdxEvalCond( CDXAREAP pArea, PHB_ITEM pCondItem, BOOL fSetWA )
          iCurrArea = 0;
    }
 
-   if ( hb_itemType( pCondItem ) == HB_IT_BLOCK )
+   if ( HB_IS_BLOCK( pCondItem ) )
    {
-      hb_vmPushSymbol( &hb_symEval );
-      hb_vmPush( pCondItem );
-      hb_vmSend( 0 );
-      fRet = hb_itemGetL( hb_stackReturnItem() );
+      fRet = hb_itemGetL( hb_vmEvalBlock( pCondItem ) );
    }
    else
    {
@@ -827,7 +821,7 @@ static BOOL hb_cdxEvalSeekCond( LPCDXTAG pTag, PHB_ITEM pCondItem )
    BOOL fRet;
    HB_ITEM ItemKey;
 
-   if ( hb_itemType( pCondItem ) != HB_IT_BLOCK )
+   if ( ! HB_IS_BLOCK( pCondItem ) )
       return TRUE;
 
    ItemKey.type = HB_IT_NIL;
@@ -7912,7 +7906,7 @@ static BOOL hb_cdxSortKeyGet( LPCDXSORTINFO pSort, BYTE ** pKeyVal, ULONG *pulRe
          if ( pSort->pSwapPage[ ulPage ].ulKeyBuf == 0 )
          {
             ULONG ulKeys = HB_MIN( pSort->ulPgKeys, pSort->pSwapPage[ ulPage ].ulKeys );
-            ULONG ulSize = ulKeys * ( pSort->keyLen + 4 );
+            ULONG ulSize = ulKeys * ( iLen + 4 );
 
             if ( hb_fsSeek( pSort->hTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
                  hb_fsReadLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize )
@@ -8300,12 +8294,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             {
                SELF_GETVALUE( ( AREAP ) pArea, pTag->nField, pItem );
             }
-            else if ( hb_itemType( pTag->pKeyItem ) == HB_IT_BLOCK )
+            else if ( HB_IS_BLOCK( pTag->pKeyItem ) )
             {
-               hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pTag->pKeyItem );
-               hb_vmSend( 0 );
-               hb_itemCopy( pItem, hb_stackReturnItem() );
+               hb_itemCopy( pItem, hb_vmEvalBlock( pTag->pKeyItem ) );
             }
             else
             {

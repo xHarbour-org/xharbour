@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.72 2005/01/10 18:45:11 druzus Exp $
+# $Id: xharbour.spec,v 1.73 2005/01/12 16:36:00 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,7 +18,7 @@
 # --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
-# --without gpl      - do not build libs which needs GPL 3-rd party code
+# --without gpl      - do not build code which needs GPL 3-rd party libs
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT and GTXWC
 # --without gpm      - build GTSLN and GTCRS without GPM support

@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.10 2004/05/02 19:29:32 druzus Exp $
+# $Id: djgpp.cf,v 1.11 2004/10/31 13:15:46 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -69,7 +69,7 @@ echo. CREATE $@ > __lib__.tmp
 $(foreach file, $(^F), $(lib_object))
 echo. SAVE >> __lib__.tmp
 echo. END >> __lib__.tmp
-$(AR) -M < __lib__.tmp
+$(AR) $(ARFLAGS) -M < __lib__.tmp
 endef
 
 # NOTE: The empty line below HAVE TO exist!
