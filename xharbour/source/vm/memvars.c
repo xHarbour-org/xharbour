@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.36 2003/09/10 19:31:22 ronpinkas Exp $
+ * $Id: memvars.c,v 1.37 2003/09/10 20:45:36 ronpinkas Exp $
  */
 
 /*
@@ -174,16 +174,22 @@ void hb_memvarsRelease( void )
       while( --ulCnt )
       {
          /*
-          * 2003-Sep-09 Ron Pinkas commented. - OK to release detached variables, we simply added:
-          * if( s_GlobalTable == NULL ) to hb_memvarValueDecRef() and hb_memvarValueDecGarbageRef()
-          *
+          * 2003-Sep-10 Ron Pinkas - Ok to process all, including detached variables.
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
-         */
+          */
          {
-            if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            if( HB_IS_STRING( &s_globalTable[ ulCnt ].item ) )
             {
-               //hb_itemClear( &s_globalTable[ ulCnt ].item );
-               hb_memvarValueDecRef( ulCnt );
+               hb_itemReleaseString( &s_globalTable[ ulCnt ].item );
+            }
+            else if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            {
+               /*
+                * We do NOT need to worry about Arrays & Blcoks as these values have been released
+                * by hb_gcReleaseAll() unconditionally!
+                *
+               hb_itemClear( &s_globalTable[ ulCnt ].item );
+               */
             }
 
             s_globalTable[ ulCnt ].counter = 0;
@@ -233,20 +239,26 @@ void hb_memvarsRelease( HB_STACK *pStack )
       while( --ulCnt )
       {
          /*
-          * 2003-Sep-09 Ron Pinkas commented. - OK to release detached variables, we simply added:
-          * if( s_GlobalTable == NULL ) to hb_memvarValueDecRefMT() and hb_memvarValueDecGarbageRef()
-          *
-         if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
+          * 2003-Sep-10 Ron Pinkas - Ok to process all, including detached variables.
+         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
           */
          {
-            if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
+            if( HB_IS_STRING( &pStack->globalTable[ ulCnt ].item ) )
             {
-               //hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
-               hb_memvarValueDecRefMT( ulCnt, pStack );
+               hb_itemReleaseString( &pStack->globalTable[ ulCnt ].item );
             }
-
-            pStack->globalTable[ ulCnt ].counter = 0;
+            else if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
+            {
+               /*
+                * We do NOT need to worry about Arrays & Blcoks as these values have been released
+                * by hb_gcReleaseAll() unconditionally!
+                *
+                hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
+                */
+            }
          }
+
+          pStack->globalTable[ ulCnt ].counter = 0;
       }
 
       hb_xfree( pStack->globalTable );
@@ -389,8 +401,10 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       {
          memcpy( &pValue->item, pSource, sizeof(HB_ITEM) );
 
-         if( HB_IS_ARRAY( pSource ) )
+         if( HB_IS_ARRAY( pSource ) && pSource->item.asArray.value )
          {
+            //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, &pValue->item );
+
             #ifndef HB_ARRAY_USE_COUNTER
                hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
             #endif
@@ -482,6 +496,7 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
           s_privateStack[ s_privateStackCnt ]->hMemvar = hOldValue;
       }
    }
+
    s_privateStackBase = ulBase;
 }
 
@@ -572,12 +587,6 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   // hb_vmQuit() - Memvars have been released already.
-   if( s_globalTable == NULL )
-   {
-      return;
-   }
-
    pValue = s_globalTable + hValue;
 
    //TraceLog( NULL, "Memvar item (%i) Counter: %li\n", hValue, pValue->counter );
@@ -659,50 +668,42 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   // hb_vmQuit() - Memvars have been released already.
-   if( s_globalTable == NULL )
-   {
-      return;
-   }
-
    pValue = s_globalTable + hValue;
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
 
-   if( pValue->counter > 0 )
+   /* Notice that Counter can be equal to 0.
+   * This can happen if for example PUBLIC variable holds a codeblock
+   * with detached variable. When hb_memvarsRelease() is called then
+   * detached variable can be released before the codeblock. So if
+   * the codeblock will be released later then it will try to release
+   * again this detached variable.
+   */
+   if( --pValue->counter <= 0 )
    {
-      /* Notice that Counter can be equal to 0.
-      * This can happen if for example PUBLIC variable holds a codeblock
-      * with detached variable. When hb_memvarsRelease() is called then
-      * detached variable can be released before the codeblock. So if
-      * the codeblock will be released later then it will try to release
-      * again this detached variable.
-      */
-      if( --pValue->counter == 0 )
+      if( HB_IS_STRING( &pValue->item ) )
       {
-         if( HB_IS_STRING( &pValue->item ) )
-         {
-            //JC1: It is safe to use it in this locked area.
-            hb_itemReleaseString( &pValue->item );
-         }
-       #ifndef HB_ARRAY_USE_COUNTER
-         else if( HB_IS_ARRAY( &pValue->item ) )
-         {
-            if( pValue->item.item.asArray.value )
-            {
-               hb_arrayReleaseHolder( pValue->item.item.asArray.value, (void *) &( pValue->item ) );
-            }
-         }
-       #endif
-
-         #ifndef HB_THREAD_SUPPORT
-         hb_memvarRecycle( hValue );
-         #else
-         hb_memvarRecycleMT( hValue, &HB_VM_STACK );
-         #endif
-
-         HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
+         hb_itemReleaseString( &pValue->item );
       }
+      else if( HB_IS_COMPLEX( &pValue->item ) )
+      {
+         /*
+          * We do NOT need to worry about Arrays & Blcoks as these values have been released
+          * by hb_gcReleaseAll() unconditionally!
+          *
+         hb_itemClear( &pValue->item );
+         */
+      }
+
+      pValue->item.type = HB_IT_NIL;
+
+      #ifndef HB_THREAD_SUPPORT
+         hb_memvarRecycle( hValue );
+      #else
+         hb_memvarRecycleMT( hValue, &HB_VM_STACK );
+      #endif
+
+      HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
    }
 }
 
@@ -786,6 +787,7 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          {
             hb_itemCopy( pItem, pGetItem );
          }
+
          bSuccess = SUCCESS;
       }
    }
@@ -809,18 +811,21 @@ void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
       USHORT uiAction = E_RETRY;
       HB_ITEM_PTR pError;
 
-      pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
-                              NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
+      pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
 
       while( uiAction == E_RETRY )
       {
          uiAction = hb_errLaunch( pError );
+
          if( uiAction == E_RETRY )
          {
             if( hb_memvarGet( pItem, pMemvarSymb ) == SUCCESS )
+            {
                uiAction = E_DEFAULT;
+            }
          }
       }
+
       hb_errRelease( pError );
    }
 }
@@ -876,6 +881,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          while( uiAction == E_RETRY )
          {
             uiAction = hb_errLaunch( pError );
+
             if( uiAction == E_RETRY )
             {
                if( hb_threadGetHMemvar( pDyn ) )
@@ -884,13 +890,15 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
                   pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
                   pItem->item.asMemvar.offset = 0;
                   pItem->item.asMemvar.value = hb_threadGetHMemvar( pDyn );
+
                   #ifndef HB_THREAD_SUPPORT
-                  pItem->item.asMemvar.itemsbase = &s_globalTable;
-                  ++s_globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
+                     pItem->item.asMemvar.itemsbase = &s_globalTable;
+                     ++s_globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
                   #else
-                  pItem->item.asMemvar.itemsbase = &HB_VM_STACK.globalTable;
-                  ++HB_VM_STACK.globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
+                     pItem->item.asMemvar.itemsbase = &HB_VM_STACK.globalTable;
+                     ++HB_VM_STACK.globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
                   #endif
+
                   uiAction = E_DEFAULT;
                }
             }
@@ -998,6 +1006,7 @@ void hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue )
 static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITEM pValue )
 {
    HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarCreateFromDynSymbol(%p, %d, %p)", pDynVar, bScope, pValue));
 
    if( bScope & VS_PUBLIC )
@@ -1052,6 +1061,7 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
 static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
 {
    HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarRelease(%p)", pMemvar));
 
    if( HB_IS_STRING( pMemvar ) )
@@ -1076,6 +1086,7 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
             if( hb_stricmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
             {
                PHB_ITEM pRef;
+
                pRef = &s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item;
 
                if( HB_IS_COMPLEX( pRef ) )
@@ -1168,7 +1179,9 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScopeGet(%p)", pDynVar));
 
    if( hb_threadGetHMemvar( pDynVar ) == 0 )
+   {
       return HB_MV_UNKNOWN;
+   }
    else
    {
       ULONG ulBase = s_privateStackCnt;    /* start from the top of the stack */
@@ -1177,12 +1190,18 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
       while( ulBase )
       {
          --ulBase;
+
          if( pDynVar == s_privateStack[ ulBase ] )
          {
             if( ulBase >= s_privateStackBase )
+            {
                iMemvar = HB_MV_PRIVATE_LOCAL;
+            }
             else
+            {
                iMemvar = HB_MV_PRIVATE_GLOBAL;
+            }
+
             ulBase = 0;
          }
       }
@@ -1219,6 +1238,7 @@ int hb_memvarScope( char * szVarName )
 static HB_DYNS_FUNC( hb_memvarClear )
 {
    HB_THREAD_STUB
+
    HB_SYMBOL_UNUSED( Cargo );
 
    if( hb_threadGetHMemvar( pDynSymbol ) )
@@ -1284,6 +1304,7 @@ static int hb_memvarCount( int iScope )
       int iPublicCnt = 0;
 
       hb_dynsymEval( hb_memvarCountPublics, ( void * ) &iPublicCnt );
+
       return iPublicCnt;
    }
    else
@@ -1534,9 +1555,13 @@ HB_FUNC( __MVRELEASE )
          BOOL bIncludeVar;
 
          if( iCount > 1 )
+         {
             bIncludeVar = hb_parl( 2 );
+         }
          else
+         {
             bIncludeVar = TRUE;
+         }
 
          if( pMask->item.asString.value[ 0 ] == '*' )
          {
@@ -1668,9 +1693,11 @@ HB_FUNC( __MVGET )
          while( uiAction == E_RETRY )
          {
             uiAction = hb_errLaunch( pError );
+
             if( uiAction == E_RETRY )
             {
                pDynVar = hb_memvarFindSymbol( pName );
+
                if( pDynVar )
                {
                   HB_ITEM retValue;
@@ -1737,7 +1764,7 @@ HB_FUNC( __MVPUT )
          hb_memvarCreateFromDynSymbol( hb_dynsymGet( pName->item.asString.value ), VS_PRIVATE, pValue );
       }
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
    }
    else
    {
@@ -1755,7 +1782,7 @@ HB_FUNC( __MVPUT )
          hb_itemRelease( pRetValue );
       }
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
    }
 }
 
@@ -2025,7 +2052,9 @@ HB_FUNC( __MVRESTORE )
                   BYTE pbyLogical[ 1 ];
 
                   if( hb_fsRead( fhnd, pbyLogical, 1 ) == 1 )
+                  {
                      pItem = hb_itemPutL( NULL, pbyLogical[ 0 ] != 0 );
+                  }
 
                   break;
                }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.80 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.81 2003/09/10 06:07:30 ronpinkas Exp $
  */
 
 /*
@@ -376,6 +376,7 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Create
 
 #ifndef HB_ARRAY_USE_COUNTER
    extern void hb_arrayReleaseHolder( PHB_BASEARRAY pBaseArray, void *pOwner );
+   extern void hb_arrayReleaseHolderGarbage( PHB_BASEARRAY pBaseArray, void *pOwner );
    extern void hb_arrayRegisterHolder( PHB_BASEARRAY pBaseArray, void *pHolder );
    extern void hb_arrayResetHolder( PHB_BASEARRAY pBaseArray, void *pOldHolder, void *pNewHolder );
 #endif

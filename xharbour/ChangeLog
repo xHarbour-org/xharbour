@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1441 2003/09/10 22:07:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1442 2003/09/10 22:32:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-10 23:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/arrays.c
+    + Added void hb_arrayReleaseHolderGarbage( PHB_BASEARRAY pBaseArray, void *pOwner );
+    * Modified hb_arrayReleaseGarbage() to use hb_arrayReleaseHolderGarbage() instead of hb_arrayReleaseHolder()
+      hb_arrayReleaseHolderGarbage() does not call hb_arrayReleaseBase() even for last Owner to avoid Cyclic issues.
+      like premature release of a block refernced by an element, which is already scheduled for removal by the GC.
+
+  * source/vm/estack.c
+    * Added commented debuging TraceLog() calls.
+
+  * source/vm/hvm.c
+    * Moved hb_memvarsRelease() call till after hb_gcReleaseAll(). This fixed GPF trap because a detached local from a block
+      will refer to item in the memvars table, which no longer exists.
+
+  * source/vm/memvars.c
+    * Made sure that cyclic issues are avoided in hb_memvarValueDecGarbageRef()
 
 2003-09-10 23:27 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbf1.c

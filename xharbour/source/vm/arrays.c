@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.75 2003/09/10 22:02:59 ronpinkas Exp $
+ * $Id: arrays.c,v 1.76 2003/09/10 22:32:52 ronpinkas Exp $
  */
 
 /*
@@ -1518,7 +1518,11 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            * allocated by the GC, its just a portion of the
            * pItems chunk, which will be released as one piece.
            * --------------------------------------------------*/
-         if( HB_IS_ARRAY( pItem ) )
+         if( HB_IS_STRING( pItem ) )
+         {
+            hb_itemReleaseString( pItem );
+         }
+         else if( HB_IS_ARRAY( pItem ) )
          {
             #ifdef HB_ARRAY_USE_COUNTER
                if( pItem->item.asArray.value == pBaseArray )
@@ -1527,18 +1531,25 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                }
                else
                {
+                  /*
+                   * We do NOT need to process arrays, because they will be directly released by GC if not refernced.
                   hb_itemClear( pItem );
+                  */
                }
             #else
                if( pItem->item.asArray.value )
                {
-                  hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
+                  hb_arrayReleaseHolderGarbage( pItem->item.asArray.value, pItem );
                }
             #endif
          }
          else if( HB_IS_COMPLEX( pItem ) )
          {
+            /*
+             * Avoid cyclic problems like a code block refernce in this array, may have been released already as garbage!.
+             * If we attemp to refernce it here, we might get a GPF. If it's not refernce elsewhere it will be released anyway.
             hb_itemClear( pItem );
+             */
          }
 
          ++pItem;
@@ -1709,6 +1720,74 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
          hb_procinfo( 0, szProc, &uiLine, szModule  );
          TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
+      }
+
+      //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
+   }
+
+   void hb_arrayReleaseHolderGarbage( PHB_BASEARRAY pBaseArray, void *pHolder )
+   {
+      PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pPrevious = NULL;
+
+      //TraceLog( NULL, "hb_arrayReleaseHolderGarbage( %p, %p )\n", pBaseArray, pHolder );
+
+      if( pBaseArray == NULL )
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Invalid base array passed to hb_arrayReleaseHolderGarbage().", NULL, NULL );
+      }
+
+      #ifdef DEBUG_ARRAYS
+         TraceLog( NULL, "-UNRegistering: %p of %p\n", pBaseArray, pHolder );
+      #endif
+
+      while( pOwners )
+      {
+         if( pOwners->pOwner == pHolder )
+         {
+            if( pPrevious )
+            {
+               pPrevious->pNext = pOwners->pNext;
+            }
+            else
+            {
+               pBaseArray->pOwners = pOwners->pNext;
+            }
+
+            #ifdef DEBUG_ARRAYS
+               TraceLog( NULL, "Released pOwners: %p\n", pOwners );
+            #endif
+
+            hb_xfree( (void *) pOwners );
+            break;
+         }
+
+         pPrevious = pOwners;
+         pOwners = pOwners->pNext;
+      }
+
+      if( pOwners )
+      {
+         /*
+          * We do not want to release it directly, it will be released by the GC shortly.
+          *
+         if( pBaseArray->pOwners == NULL )
+         {
+            #ifdef DEBUG_ARRAYS
+               TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
+            #endif
+
+            //TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
+            hb_arrayReleaseBase( pBaseArray );
+         }
+         */
+      }
+      else
+      {
+         char szProc[64], szModule[64];
+         USHORT uiLine;
+
+         hb_procinfo( 0, szProc, &uiLine, szModule  );
+         TraceLog( NULL, "Warning! Could not locate owner %p of garbage array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
       }
 
       //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );

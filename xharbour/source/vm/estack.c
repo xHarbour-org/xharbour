@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.40 2003/09/08 02:42:26 ronpinkas Exp $
+ * $Id: estack.c,v 1.41 2003/09/10 06:07:32 ronpinkas Exp $
  */
 
 /*
@@ -127,19 +127,23 @@ void hb_stackPush( void )
 
       /* no, make more headroom: */
       /* hb_stackDispLocal(); */
-      HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *)HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
+      HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( (void *) HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
                                 ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
       #ifndef HB_ARRAY_USE_COUNTER
          if( HB_VM_STACK.pItems != pOldItems )
          {
-            for( i = 0; i < CurrIndex; ++i )
+            //TraceLog( NULL, "Expanding Stack: %p\n", pOldItems );
+
+            for( i = 0; i < CurrIndex; i++ )
             {
                if( HB_IS_ARRAY( HB_VM_STACK.pItems[ i ] ) && HB_VM_STACK.pItems[ i ]->item.asArray.value )
                {
                   hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
                }
             }
+
+            //TraceLog( NULL, "New Stack: %p\n", HB_VM_STACK.pItems );
          }
       #endif
 
@@ -148,7 +152,7 @@ void hb_stackPush( void )
       HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
       HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
 
-      for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
+      for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; i++ )
       {
          HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
       }
