@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2914 2004/05/10 13:31:42 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2915 2004/05/10 13:45:49 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-10 12:20 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/dbedit.prg
+    ! Fixed empty column behavior in parameters (Clipper compat)
+
 2004-05-10 16:39 UTC+0200 Mindaugas Kavaliauskas <dbtopas/at/dbtopas.lt>
   * source/vm/macro.c
     * Argument is passed to error block in case of argument or syntax error
@@ -15,21 +19,21 @@
 
 2004-05-10 15:26 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/console.c
-    ! print files and print pipes must be sent the command sequence CRLF 
+    ! print files and print pipes must be sent the command sequence CRLF
       independently from the underlying system. So,
-      
+
       hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
-      
+
       has been changed:
-      
+
       hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\r\n", 2 );
-      
+
       /* notice: the RIGHT way to do this is to still retain ( BYTE * ) s_szCrLf (different
          from system to system), and to use ioctl to automatically translate "\n" unix chars
          into CRLF printer control sequence if the priter handler is redirected to a raw
          printer (piped to lp/lpr).
       */
-      
+
 
 2004-05-10 13:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/gtwvt/gtwvt.c

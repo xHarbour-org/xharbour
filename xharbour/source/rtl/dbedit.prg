@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.19 2004/04/01 16:12:05 srobert Exp $
+ * $Id: dbedit.prg,v 1.20 2004/04/01 16:16:44 srobert Exp $
  */
 
 /*
@@ -137,45 +137,47 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
 #endif
 
   For Each i In aCols
-    If HB_ISARRAY(i)
-      bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
-    Else
-      bFun := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
-    End
-    If ValType(Eval(bFun)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
-      bFun := {|| "  <Memo>  "}
-    End
+    If !Empty( i[1] )
+       If HB_ISARRAY(i)
+         bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
+       Else
+         bFun := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
+       End
+       If ValType(Eval(bFun)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
+         bFun := {|| "  <Memo>  "}
+       End
 
-    If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[HB_EnumIndex()])  // handle empty column headers
-      IIf(HB_ISSTRING(i), xHdr[HB_EnumIndex()] := i, "<block>")
-    End
+       If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[HB_EnumIndex()])  // handle empty column headers
+         IIf(HB_ISSTRING(i), xHdr[HB_EnumIndex()] := i, "<block>")
+       End
 
-    oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[HB_EnumIndex()]), bFun)
+       oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[HB_EnumIndex()]), bFun)
 
-    If HB_ISARRAY(i)
-      oTBC:colorBlock := i[2]
-    End
-    If HB_ISARRAY(xCSep)
-      oTBC:colSep := xCSep[HB_EnumIndex()]
-    End
-    If HB_ISARRAY(xHSep)
-      oTBC:headSep := xHSep[HB_EnumIndex()]
-    End
-    If HB_ISARRAY(xFSep)
-      oTBC:footSep := xFSep[HB_EnumIndex()]
-    End
-    If HB_ISARRAY(xFoot)
-      oTBC:footing := xFoot[HB_EnumIndex()]
-    ElseIf HB_ISSTRING(xFoot)
-      oTBC:footing := xFoot
-    End
-    If HB_ISARRAY(xPict)
-      oTBC:picture := xPict[HB_EnumIndex()]
-    ElseIf HB_ISSTRING(xPict)
-      oTBC:picture := xPict
-    End
+       If HB_ISARRAY(i)
+         oTBC:colorBlock := i[2]
+       End
+       If HB_ISARRAY(xCSep)
+         oTBC:colSep := xCSep[HB_EnumIndex()]
+       End
+       If HB_ISARRAY(xHSep)
+         oTBC:headSep := xHSep[HB_EnumIndex()]
+       End
+       If HB_ISARRAY(xFSep)
+         oTBC:footSep := xFSep[HB_EnumIndex()]
+       End
+       If HB_ISARRAY(xFoot)
+         oTBC:footing := xFoot[HB_EnumIndex()]
+       ElseIf HB_ISSTRING(xFoot)
+         oTBC:footing := xFoot
+       End
+       If HB_ISARRAY(xPict)
+         oTBC:picture := xPict[HB_EnumIndex()]
+       ElseIf HB_ISSTRING(xPict)
+         oTBC:picture := xPict
+       End
 
-    oTBR:addColumn(oTBC)
+       oTBR:addColumn(oTBC)
+    EndIf
   Next
 
   If Len(aCols) == 1
