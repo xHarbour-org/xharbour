@@ -173,7 +173,7 @@ HB_FUNC ( UNREGISTERCLASS )
     HANDLE hInstance   = (HANDLE)  hb_parnl(2);
     BOOL   lOk ;
 
-    if ( ! ( lOk = UnregisterClass(cClassName,hInstance ) ) )
+    if ( ! ( lOk = UnregisterClass(cClassName,(HINSTANCE)hInstance ) ) )
     {
        MessageBox(0, "Window Registration Failed!", "Error!",
        MB_ICONEXCLAMATION | MB_OK | MB_SYSTEMMODAL);
@@ -614,8 +614,8 @@ HB_FUNC ( GETWINDOWTEXT )
     LPCTSTR lpString    = (LPCTSTR) hb_parc(2);  // text buffer
     int nMaxCount       =  hb_parni(3);          // maximum number of characters to copy
 
-    hb_retni( (int) GetWindowText( hwnd, &lpString, nMaxCount ) );
-    hb_storc( lpString, 2 );
+    hb_retni( (int) GetWindowText( hwnd, (char *)&lpString, nMaxCount ) );
+    hb_storc( (char *)lpString, 2 );
 }
 
 // The IsChild function tests whether a window is a child window or descendant window of a specified

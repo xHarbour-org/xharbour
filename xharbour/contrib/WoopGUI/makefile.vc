@@ -1,0 +1,164 @@
+#
+# File:     makefile.vc
+# Author:   Paul Tucker <ptucker@sympatico.ca>
+# Created:  2002
+# Updated:
+#
+# Makefile : Builds woopgui library (Harbour & MSVC)
+
+# Global paths
+#
+
+HBR_DIR=..\..
+WG_DIR=.
+WH_DIR=.
+OBJ_DIR=obj\vc
+LIB_DIR=lib\vc
+SRCDIR =source
+
+MK_FILE  = makefile.vc
+MK_FLAGS = $(MAKEFLAGS: =)
+
+#-- HARBOUR COMPILER ----
+hbc      =$(HBR_DIR)\BIN\harbour
+hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
+
+#-- C COMPILER ----------
+CC       =cl
+CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+
+#-- RESOURCE COMPILER ---
+rc       =rc
+rcflags  =-r -x -fo$*.res
+
+.SUFFIXES: .prg .c
+
+.c.obj:
+ $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+
+
+# library
+#
+WOOPGUILIB = $(LIB_DIR)\woopgui.lib
+WAPILIB    = $(LIB_DIR)\wapilib.lib
+WOOPGUIRES = $(LIB_DIR)\woopgui.res
+
+LIBLIST  = $(WOOPGUILIB) $(WAPILIB) $(WOOPGUIRES)
+
+{$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(SRCDIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
+   $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $*.c
+
+{$(SRCDIR)}.rc{$(OBJ_DIR)}.res:
+   $(rc) $(rcflags) $<
+
+WOOPGUIOBJ = \
+    $(OBJ_DIR)\arrayfunc.obj \
+    $(OBJ_DIR)\char.obj \
+    $(OBJ_DIR)\condeval.obj \
+    $(OBJ_DIR)\cstr.obj \
+    $(OBJ_DIR)\datetime.obj \
+    $(OBJ_DIR)\ERRORSYS.OBJ \
+    $(OBJ_DIR)\menufunc.obj \
+    $(OBJ_DIR)\t3state.obj \
+    $(OBJ_DIR)\tapplication.obj \
+    $(OBJ_DIR)\tbrush.obj \
+    $(OBJ_DIR)\tbutton.obj \
+    $(OBJ_DIR)\tcalendar.obj \
+    $(OBJ_DIR)\tcheckbox.obj \
+    $(OBJ_DIR)\tcolor.obj \
+    $(OBJ_DIR)\tcolorDB.obj \
+    $(OBJ_DIR)\tcombobox.obj \
+    $(OBJ_DIR)\tcontrol.obj \
+    $(OBJ_DIR)\tdatetime.obj \
+    $(OBJ_DIR)\tdialog.obj \
+    $(OBJ_DIR)\tdropdcb.obj \
+    $(OBJ_DIR)\tdroplcb.obj \
+    $(OBJ_DIR)\tedit.obj \
+    $(OBJ_DIR)\teditmulti.obj \
+    $(OBJ_DIR)\tfont.obj \
+    $(OBJ_DIR)\tframe.obj \
+    $(OBJ_DIR)\tgdiobj.obj \
+    $(OBJ_DIR)\tget.obj \
+    $(OBJ_DIR)\tgetlist.obj \
+    $(OBJ_DIR)\tgroupbox.obj \
+    $(OBJ_DIR)\tinifile.obj \
+    $(OBJ_DIR)\tmenu.obj \
+    $(OBJ_DIR)\tmenubar.obj \
+    $(OBJ_DIR)\tmenuitem.obj \
+    $(OBJ_DIR)\tmenupopup.obj \
+    $(OBJ_DIR)\tobject.obj \
+    $(OBJ_DIR)\tpanel.obj \
+    $(OBJ_DIR)\tpushbtn.obj \
+    $(OBJ_DIR)\tradiobtn.obj \
+    $(OBJ_DIR)\tradiogrp.obj \
+    $(OBJ_DIR)\tsimplecb.obj \
+    $(OBJ_DIR)\tstack.obj \
+    $(OBJ_DIR)\tstatic.obj \
+    $(OBJ_DIR)\tstatictext.obj \
+    $(OBJ_DIR)\tstatusbar.obj \
+    $(OBJ_DIR)\tsyssettings.obj \
+    $(OBJ_DIR)\ttooltip.obj \
+    $(OBJ_DIR)\twindow.obj \
+    $(OBJ_DIR)\twindowbase.obj \
+    $(OBJ_DIR)\twindowdef.obj \
+    $(OBJ_DIR)\txget.obj \
+    $(OBJ_DIR)\xget.obj
+
+WOOPGUIRC  = $(LIB_DIR)\woopgui.res
+
+WAPIOBJ    =  \
+    $(OBJ_DIR)\cdate.obj \
+    $(OBJ_DIR)\ccontrols.obj \
+    $(OBJ_DIR)\ccommon.obj \
+    $(OBJ_DIR)\cwindowdef.obj \
+    $(OBJ_DIR)\capplication.obj \
+    $(OBJ_DIR)\cwindow.obj \
+    $(OBJ_DIR)\cmenu.obj \
+    $(OBJ_DIR)\cfont.obj \
+    $(OBJ_DIR)\cdialog.obj \
+    $(OBJ_DIR)\cstatusbar.obj \
+    $(OBJ_DIR)\ctooltip.obj
+
+
+UTILSOBJ   = \
+    $(OBJ_DIR)\cstr.obj \
+    $(OBJ_DIR)\xget.obj \
+    $(OBJ_DIR)\char.obj \
+    $(OBJ_DIR)\arrayfunc.obj \
+    $(OBJ_DIR)\datetime.obj \
+    $(OBJ_DIR)\condeval.obj
+
+!if ( "$(MK_FLAGS)"=="A" )
+
+all: zot \
+   $(LIBLIST)
+
+MK_FLAGS = $(MK_FLAGS:A=)
+
+zot:
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
+
+!else
+
+all: \
+   $(LIBLIST)
+
+!endif
+
+$(WOOPGUILIB)  : $(WOOPGUIOBJ)
+   lib /out:$@ $**
+
+$(WAPILIB)     : $(WAPIOBJ)
+   lib /out:$@ $**
+
+#$(WOOPGUIRES)  : $(WOOPGUIRC)
+#   lib /out:$@ $**

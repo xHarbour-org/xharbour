@@ -54,7 +54,7 @@ HB_FUNC ( WG_CREATESTATUSBAR )
 
     // Allocate an array for holding the right edge coordinates.
     hloc = LocalAlloc(LHND, sizeof(int) * nParts);
-    lpParts = LocalLock(hloc);
+    lpParts = ( int *) LocalLock(hloc);
 
     // Calculate the right edge coordinate for each part, and
     // copy the coordinates to the array.

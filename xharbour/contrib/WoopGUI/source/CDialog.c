@@ -126,7 +126,7 @@ HB_FUNC ( GETEDITTEXT )
 {
    HWND   hDlg = (HWND) hb_parnl( 1 );
    int    id = hb_parni( 2 );
-   USHORT iLen = SendMessage( GetDlgItem( hDlg,id ), WM_GETTEXTLENGTH, 0, 0 );
+   ULONG iLen = SendMessage( GetDlgItem( hDlg,id ), WM_GETTEXTLENGTH, 0, 0 );
    char *cText = (char*) hb_xgrab( iLen+2 );
 
    GetDlgItemText(
@@ -317,7 +317,7 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
    *p++ = WG_GetObjectDataLong( pObj, "NCLASSNAME" );           //        - windowClass
 
    // Get the title
-   nchar = nCopyAnsiToWideChar( p, (LPWORD) WG_GetObjectDataString( pObj, "CNAME" ) );
+   nchar = nCopyAnsiToWideChar( p, ( char *) WG_GetObjectDataString( pObj, "CNAME" ) );
    p += nchar;
    //*p++ = 0;
 

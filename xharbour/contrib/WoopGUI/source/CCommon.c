@@ -827,7 +827,7 @@ const char *WG_DecodeMessageName(int message)
 HB_FUNC ( WG_DECODEMESSAGENAME )
 {
     int nMessage = (int) hb_parni(1);
-    hb_retc( WG_DecodeMessageName( nMessage ) );
+    hb_retc( ( char *) WG_DecodeMessageName( nMessage ) );
 }
 
 //HB_FUNC ( WG_CONTROLPAINT )
