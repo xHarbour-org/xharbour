@@ -6434,9 +6434,9 @@ HB_FUNC( HB_REGEX )
 
    if( pRegEx == NULL || pString == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_REGEX", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
+         NULL,
+         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
       return;
    }
 
@@ -6499,9 +6499,9 @@ HB_FUNC( HB_REGEXCOMP )
 
    if( pRegEx == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_REGEXCOMP", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
+         NULL,
+         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
       return;
    }
 
@@ -6525,4 +6525,67 @@ HB_FUNC( HB_REGEXCOMP )
    {
       hb_ret();
    }
+}
+
+/**********
+* Returns just true or false on match
+***********/
+
+HB_FUNC( HB_REGEXMATCH )
+{
+   #ifndef REGEX_MAX_GROUPS
+   #define REGEX_MAX_GROUPS 16
+   #endif
+
+   regex_t re;
+   regex_t *pReg;
+   regmatch_t aMatches[REGEX_MAX_GROUPS];
+   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
+
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
+
+   if( pRegEx == NULL || pString == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
+         NULL,
+         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
+      return;
+   }
+
+   /* now check if it is a precompiled regex */
+   if ( memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
+   {
+      pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
+      aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
+   }
+   else
+   {
+      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+      {
+         CFlags |= REG_ICASE;
+      }
+      if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+      {
+         CFlags |= REG_NEWLINE;
+      }
+      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
+      {
+         hb_retl( FALSE );
+         return;
+      }
+      pReg = &re;
+      aMatches[0].rm_eo = pRegEx->item.asString.length;
+   }
+
+   aMatches[0].rm_so = 0;
+   if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+   {
+      hb_retl( TRUE );
+      return;
+   }
+
+   hb_retl( FALSE );
 }
