@@ -117,6 +117,7 @@ FUNCTION Main
                      //---------------------------------------------------------------------
                   END
                   :AddBand( NIL, RBBS_NOVERT, :TabTools:handle, 100, 34,  , "", NIL )
+                  :TabTools:DisableAll()
                END
             END
          END

@@ -30,10 +30,10 @@ GLOBAL EXTERNAL hThisInstance
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::Editing := .F.        ,;
                                     ::aCtrl   := {}         ,;
-                                    ::left    := 100        ,;
-                                    ::top     := 100        ,;
-                                    ::width   := 400        ,;
-                                    ::height  := 300        ,;
+                                    ::left    := 200        ,;
+                                    ::top     := 160        ,;
+                                    ::width   := 600        ,;
+                                    ::height  := 350        ,;
                                     ::xGrid   := 8          ,;
                                     ::yGrid   := 8          ,;
                                     ::GridColor:=RGB(0,0,0) ,;
@@ -59,6 +59,7 @@ GLOBAL EXTERNAL hThisInstance
                                     ::Parent:WindowMenu:Gray( 108 ),;
                                     ::Parent:WindowMenu:Gray( 109 ),;
                                     ::Parent:WindowMenu:Gray( 110 ),;
+                                    ::Parent:Rebar:Tabs:Tabs[1]:TabBand:TabTools:DisableAll(),;
                                     nil
 
    
@@ -189,6 +190,8 @@ METHOD CreateSub()
    ::Parent:WindowMenu:Enable( 108 )
    ::Parent:WindowMenu:Enable( 109 )
    ::Parent:WindowMenu:Enable( 110 )
+
+   ::Parent:Rebar:Tabs:Tabs[1]:TabBand:TabTools:EnableAll()
 
    xRet := super:OnCreate()
 
