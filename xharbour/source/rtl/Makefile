@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.38 2003/09/11 12:08:28 jonnymind Exp $
+# $Id: Makefile,v 1.39 2003/09/13 20:55:07 walito Exp $
 #
 
 ROOT = ../../
@@ -124,7 +124,6 @@ C_SOURCES=\
         substr.c     \
         teditorl.c   \
         tone.c       \
-        tprint.c     \
         tprinter.c   \
         trace.c      \
         transfrm.c   \
