@@ -273,6 +273,7 @@ static void hb_rddCloseAll( void )
       {
          pCurrArea = pAreaNode;
          pAreaNode = pAreaNode->pNext;
+         s_pCurrArea = pCurrArea;
          if ( isFinish )
          {
             SELF_RELEASE( ( AREAP ) pCurrArea->pArea );
