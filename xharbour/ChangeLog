@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2192 2004/01/31 08:24:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2193 2004/01/31 20:18:25 tommir Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-31 21:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  + include/gtinfo.ch
+    + Added following helper constants:
+      GTI_ISGRAPHIC     - Query only
+      GTI_SCREENWIDTH   - Query/Set
+      GTI_SCREENHEIGHT  - Query/Set
+      GTI_SCREENDEPTH   - Query/Set
+      GTI_FONTSIZE      - Query/Set
+      GTI_FONTWIDTH     - Query/Set
+      GTI_DESKTOPWIDTH  - Query only
+      GTI_DESKTOPHEIGHT - Query only
+      GTI_DESKTOPDEPTH  - Query only
+  * include/Makefile
+    + Added gtinfo.ch to PRG_HEADERS
+  * source/rtl/gtalleg/gtalleg.c
+    + New PRG level GTInfo() function to query/set gfx gt info
+    ! Reverted change to defaulting 16 bpp under DOS & Linux FB
+  * source/rtl/gtalleg/ssf.h
+    * Changed ssfFrame.thickdir to unsigned char
+  + tests/gt_info.prg
+    + New test to show GTInfo() usage
 
 2004-01-31 22:15 UTC+0200 Tommi Rouvali <tommi@rouvali.com>
   * source/rtl/hbserial.prg
