@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.482 2002/11/09 00:50:08 lculik Exp $
+ * $Id: ChangeLog,v 1.483 2002/11/09 07:50:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-11-11 01:24 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/itemapi.c
+    + add conditional code if !(__DJGPP__) around #include <math.h>
+
 2002-11-08 23:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
-    ! Fixed reset of Enumration Var when EXIT used from FOR EACH loop.
+    ! Fixed reset of Enumeration Var when EXIT used from FOR EACH loop.
 
   * source/rtl/alert.prg
     - Removed wrong and ugly "fix" to line wrapping in Alert().
@@ -24,7 +28,7 @@
   *utils/hbmake/hbmlang.c
     ! added code to display the gauge bar
 
-2002/07/11 02:05 UTC/0300 Walter Negro <anegro@overnet.com.ar>
+2002-07-11 02:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/achoice.prg
     ! Fix, if no UDF is set, pressing an alpha key it
       go to first item finding this letter without respecting
