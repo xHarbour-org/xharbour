@@ -1,5 +1,5 @@
 /*
- * $Id: TCEdit.prg,v 1.22 2003/01/09 08:21:25 what32 Exp $
+ * $Id: TCEdit.prg,v 1.23 2003/03/07 15:17:18 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -53,7 +53,12 @@ CLASS TEdit FROM TCustomControl
 
    DATA WinClass    PROTECTED INIT "edit"
    DATA ControlName EXPORTED INIT "Edit"
-
+   METHOD Create( oOwner ) constructor
 //   METHOD SetText( c ) INLINE SetDlgItemText( ::Parent:handle, ::id, c )
 ENDCLASS
 
+METHOD CREATE( oOwner ) CLASS TEdit 
+   ::Wndproc:="DefaultHandler"
+
+   ::Super:Create( oOwner )
+RETURN Self

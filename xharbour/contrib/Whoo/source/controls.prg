@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.6 2004/03/12 17:01:57 patrickmast Exp $
+ * $Id: controls.prg,v 1.7 2004/03/29 14:21:23 lculik Exp $
  */
 
 /*
@@ -43,7 +43,8 @@
 #include "classex.ch"
 
 GLOBAL EXTERNAL Application
-
+#define CM_BASE                    45056
+#define CM_TEXTCHANGED             CM_BASE + 18
 CLASS TControl FROM TComponent
 
   PROPERTY Parent READ FParent WRITE SetParent
@@ -126,7 +127,7 @@ CLASS TControl FROM TComponent
   DATA ScalingFlags               PROTECTED
   DATA ShowHint
   DATA TBDockHeight
-  DATA Text                       PROTECTED
+  DATA Text           INIT " "    PROTECTED
   DATA UndockHeight
   DATA UndockWidth
 
@@ -261,6 +262,7 @@ CLASS TControl FROM TComponent
 
 ENDCLASS
 
+
 METHOD SetName( Value ) CLASS TControl
 
    LOCAL bChangeText
@@ -285,7 +287,7 @@ METHOD SetParentComponent( Value ) CLASS TControl
       ::SetParent( Value )
    ENDIF
 
-Return NIL
+RETURN NIL
 
 METHOD SetParent( oParent ) CLASS TControl
 
@@ -306,7 +308,7 @@ METHOD SetParent( oParent ) CLASS TControl
       ENDIF
    ENDIF
 
-Return NIL
+RETURN NIL
 
 METHOD SetVisible( Value ) CLASS TControl
 
@@ -424,13 +426,17 @@ typedef struct tagLOGBRUSH { ;
 //----------------------------------------------------------------------------//
 
 CLASS TWinControl FROM TControl
-
+   private:
+   DATA FTabStop AS LOGICAL PROTECTED
+   public: 
    DATA Icon         EXPORTED
    DATA Color        EXPORTED INIT COLOR_BTNFACE+1
    DATA Style        PROTECTED INIT WS_OVERLAPPEDWINDOW
    DATA ExStyle      PROTECTED INIT 0
 
    PROPERTY Caption      READ FCaption WRITE SetText
+   PROPERTY Text         READ GetText  WRITE SetTextx
+
    PROPERTY Handle       READ GetHandle
    PROPERTY ParentWindow READ FParentWindow WRITE SetParentWindow
 
@@ -438,7 +444,7 @@ CLASS TWinControl FROM TControl
 
 //   DATA Handle       PROTECTED
 
-   DATA Id           PROTECTED
+   DATA Id           
    DATA ResName      PROTECTED
    DATA Modal        PROTECTED INIT .F.
    DATA Instance     PROTECTED
@@ -468,6 +474,9 @@ CLASS TWinControl FROM TControl
    ACCESS Showing    INLINE ::FShowing
    ASSIGN Showing( lShow ) INLINE ::FShowing := lShow
 
+   // New Propertie
+   property TabStop as LOGICAL read FTabStop write SetTabStop default .F.
+
 
    METHOD Register()
    METHOD Create() CONSTRUCTOR
@@ -493,11 +502,13 @@ CLASS TWinControl FROM TControl
    METHOD Enable()              INLINE EnableWindow( ::handle, .t.)
    METHOD Hide()                INLINE ShowWindow( ::handle, SW_HIDE)
    METHOD Show(n)               INLINE ::FShowing := .T., ShowWindow( ::handle, n)
+   METHOD Shows()               INLINE ::FShowing := .T., ShowWindow( ::handle, SW_SHOW)
    METHOD SetFocus()            INLINE SetFocus( ::handle),self
    METHOD SetWindowFocus()      INLINE ::SetFocus()
    METHOD WindowRect()          INLINE GetWindowRect( ::FHandle )
    METHOD ClientRect()
    METHOD SetText(cText)        INLINE TraceLog( ::ClassName, ::FHandle, cText ), ::FCaption := cText, IIF( ::FHandle != NIL, SetWindowText( ::FHandle, cText ), )
+   METHOD SetTextx(cText)       INLINE ::FText := cText, IIF( ::FHandle != NIL, ::SetTextBuf(cText ), )
 
    METHOD BringToTop()          INLINE BringWindowToTop( ::handle )
    METHOD ScreenToClient( aPt)  INLINE ScreenToClient( ::handle, @aPt )
@@ -630,7 +641,21 @@ CLASS TWinControl FROM TControl
    METHOD WMNCLButtonUp()       VIRTUAL
    METHOD WMNCLButtonDown()     VIRTUAL
    METHOD WMNotify()            VIRTUAL
+   // especialized method (for retriving text on tedit controls
+   METHOD Perform ( nMsg, nwParam, nlParam )
+   METHOD GetTextLen()
+   METHOD SetTextBuf(Buffer) 
+
+   METHOD GetText()
+ 
+   METHOD GetTextBuf(Buffer,BufSize)
+
+
+   METHOD DefaultHandler( hWnd, nMsg, nwParam, nlParam )
+   METHOD SetTabStop(Value) 
 ENDCLASS
+
+
 
 //----------------------------------------------------------------------------
 METHOD Register() CLASS TWinControl
@@ -650,6 +675,7 @@ METHOD Register() CLASS TWinControl
       IF ValType( ::MenuName ) == "C"
          wc:lpszMenuName  := ::MenuName
       ENDIF
+
       IF ::Parent == NIL
          ::lHaveProc := .T.
          RETURN( RegisterClass( wc , ::FormType, HB_ObjMsgPtr( Self, ::WndProc ), ::Msgs, self ) )
@@ -702,6 +728,7 @@ METHOD CreateWnd() CLASS TWinControl
 
       ENDIF
    ELSE
+
       ::FHandle := CreateWindowEx( ::ExStyle, ::ClassName, ::FCaption, ::Style, ;
                                   ::FLeft, ::FTop, ::FWidth, ::FHeight, ;
                                   ParentHandle, 0, ::Instance )
@@ -719,7 +746,6 @@ RETURN ::FHandle
 METHOD Create( oOwner ) CLASS TWinControl
 
    ::Super:Create( oOwner )
-
 
    ::Instance := oOwner:Instance
 
@@ -744,7 +770,7 @@ RETURN( __objGetMsgList( self ) )
 METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
    local cPaint, hDC, nRet, oMenuItem, nCode, nId, aRect, dis, n, hdr, aPt, msg, lpMenuItemInfo, cBuffer
-   local SubMenuItem, MenuItem, OsVer, mi
+   local SubMenuItem, MenuItem, OsVer, mi,cText,ncode1,nid1
    IF ::Parent != NIL .AND. ::Parent:InstMsg != NIL
       IF nMsg == ::Parent:InstMsg
          SetForegroundWindow( hWnd )
@@ -820,6 +846,13 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
       CASE WM_CHAR
            nRet := ::WMChar( nwParam, nlParam )
+           IF nRet == NIL
+              IF ValType( ::Controls[n]:OnKeyPress ) == "B"
+                 nRet := EVAL( ::Controls[n]:OnKeyPress, ::Controls[n],nwParam)
+              ELSEIF ValType( ::Controls[n]:OnKeyPress ) == "N"
+                 nRet := HB_Exec( ::Controls[n]:OnKeyPress, ::Controls[n],nwParam)
+              ENDIF
+           ENDIF
            EXIT
 
       CASE WM_CLOSE
@@ -867,13 +900,21 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
       CASE WM_COMMAND
            nCode := HIWORD( nwParam )
            nId   := LOWORD( nwParam )
-
+           nCode1 := HIWORD( nlParam )
+           nId1   := LOWORD( nlParam )
+           
            IF ( n := ASCAN( ::Controls, {|o| o:handle == nlParam } ) ) > 0
 
               IF ValType( ::Controls[n]:OnClick ) == "B"
                  nRet := EVAL( ::Controls[n]:OnClick, ::Controls[n] )
               ELSEIF ValType( ::Controls[n]:OnClick ) == "N"
                  nRet := HB_Exec( ::Controls[n]:OnClick, ::Controls[n] )
+              ENDIF
+
+              IF ValType( ::Controls[n]:OnChange ) == "B"
+                 nRet := EVAL( ::Controls[n]:OnChange, ::Controls[n] )
+              ELSEIF ValType( ::Controls[n]:OnChange ) == "N"
+                 nRet := HB_Exec( ::Controls[n]:OnChange, ::Controls[n] )
               ENDIF
 
               IF nRet!=nil
@@ -1148,10 +1189,34 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
            nRet := ::WMDropFiles( nwParam, nlParam )
            EXIT
 
-      CASE WM_SETTEXT
+/*      CASE WM_SETTEXT
            nRet := ::WMSetText( nwParam, nlParam )
            EXIT
 
+      CASE  WM_GETTEXTLENGTH
+           IF Valtype(::FText ) != "C"
+              nRet :=  0
+           ELSE
+              nRet := Len(::FText)
+           ENDIF
+           EXIT
+
+      CASE WM_SETTEXT
+           cText :=  nlParam
+           ::fText := Nil
+           ::fText := cText
+           nRet := 1
+           exit
+      CASE WM_GETTEXT
+          IF ::FText != NIL
+             cText := ::FText
+          ELSE
+             cText := ''
+          ENDIF
+
+          nRet := len( nlParam := Left(cText, nWParam - 1))
+          EXIT
+*/
       DEFAULT
            IF nMsg >= WM_USER
               nRet := ::WMUserMsg( nMsg, nwParam, nlParam)
@@ -1185,7 +1250,7 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
       END
    ENDIF
 
-   return( CallWindowProc( ::nProc, ::handle, nMsg, nwParam, nlParam ) )
+   RETURN( CallWindowProc( ::nProc, ::handle, nMsg, nwParam, nlParam ) )
 
 METHOD Center( NewX, NewY, hParent ) CLASS TWinControl
 
@@ -1223,7 +1288,7 @@ METHOD Center( NewX, NewY, hParent ) CLASS TWinControl
       ::Move( aPoint_[ 1 ] , aPoint_[ 2 ] , iCWidth, iCHeight, .t. )
    EndIf
 
-   Return( NIL )
+   RETURN( NIL )
 
 //----------------------------------------------------------------------------//
 
@@ -1258,7 +1323,7 @@ METHOD SetParentWindow( Value ) CLASS TWinControl
       ::UpdateControlState()
    ENDIF
 
-Return NIL
+RETURN NIL
 
 METHOD Insert( oControl ) CLASS TWinControl
 
@@ -1273,7 +1338,7 @@ METHOD Insert( oControl ) CLASS TWinControl
       oControl:FParent := Self
    ENDIF
 
-Return NIL
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 
@@ -1317,7 +1382,7 @@ METHOD InsertControl( oControl ) CLASS TWinControl
 
    //::Perform( CM_CONTROLCHANGE, Integer( oControl ), Integer( .T. ) )
 
-Return NIL
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 METHOD RemoveControl( oControl ) CLASS TWinControl
@@ -1341,7 +1406,7 @@ METHOD RemoveControl( oControl ) CLASS TWinControl
 
   ::Realign()
 
-Return NIL
+RETURN NIL
 //----------------------------------------------------------------------------//
 
 METHOD UpdateShowing() CLASS TWinControl
@@ -1526,6 +1591,96 @@ METHOD AlignControl( oControl ) CLASS TWinControl
 
 RETURN NIL
 
+/* NEW METHODS TO GET  SPECIFIC DATAS */
+METHOD SetTabStop(Value) CLASS TWinControl
+LOCAL  Style
+
+  IF ::FTabStop <> Value 
+
+    ::FTabStop := Value
+    IF ::HandleAllocated() 
+
+      Style := GetWindowLong(::FHandle, GWL_STYLE) .and. ! WS_TABSTOP
+      IF Value
+         Style := Style .or. WS_TABSTOP
+      ENDIF
+      SetWindowLong(::FHandle, GWL_STYLE, Style)
+
+//      ::Perform(CM_TABSTOPCHANGED, 0, 0)
+    ENDIF
+  ENDIF
+RETURN SELF
+
+
+METHOD DefaultHandler( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
+   LOCAL nret, cPaint, hDC, aRect, n, hdr,P
+
+      Switch nMsg  
+
+      CASE WM_GETTEXT
+        
+          if ::FText != nil
+             P := ::FText
+          else
+             P := ''
+          endif
+          nret := 1
+          ::fText:=left(p,nwParam)
+
+        exit
+      CASE WM_GETTEXTLENGTH
+        if ::FText == nil
+           nRet := 0
+        else
+           nRet := Len(::FText)
+        endif
+        exit
+      CASE WM_SETTEXT
+          nRet := 0
+       exit 
+       Default
+         nRet := ::ControlProc(hWnd, nMsg, nwParam, nlParam)
+        end
+    RETURN nRet
+
+
+METHOD Perform( nMsg, nwParam, nlParam ) CLASS TWinControl
+   LOCAL nRet
+   nret := ::&( ::WndProc )( ::handle, nMsg, nwParam, nlParam )
+
+RETURN nRet
+
+METHOD GetTextLen() CLASS TWinControl
+RETURN iif(VALTYPE(::fText)=="U",0,SendMessage(::Handle,WM_GETTEXTLENGTH,0,0))
+
+
+METHOD  SetTextBuf(Buffer) CLASS TWinControl
+
+  ::Perform(WM_SETTEXT, 0, @Buffer)
+  ::Perform(CM_TEXTCHANGED, 0, 0)
+RETURN self
+
+METHOD GetText() CLASS TWinControl
+
+  LOCAL  Len
+  LOCAL  cBuf
+
+  Len := ::GetTextLen()
+
+  cBuf := Space( Len )
+  if Len <> 0
+   ::GetTextBuf(@cBuf, Len + 1)
+endif
+RETURN cBuf
+
+METHOD GetTextBuf(Buffer,BufSize) CLASS TWinControl
+   Local Ret := SendMessage(::Handle,WM_GETTEXT, BufSize, @Buffer)
+   ::Perform(WM_GETTEXT,BufSize,@Buffer)
+RETURN  Ret
+
+
+
+
 *------------------------------------------------------------------------------*
 IMPORT C STRUCTURE NMHDR
 *------------------------------------------------------------------------------*
@@ -1540,6 +1695,8 @@ CLASS TCustomControl FROM TWinControl
    METHOD DrawItem() VIRTUAL
    METHOD ControlProc()
    METHOD CreateWnd()
+   METHOD Perform( nMsg, nwParam, nlParam )
+
 ENDCLASS
 
 *------------------------------------------------------------------------------*
@@ -1552,6 +1709,7 @@ METHOD Create( oOwner ) CLASS TCustomControl
    ::lControl := .T.
 
    ::WndProc := IFNIL(::WndProc,'ControlProc',::WndProc)
+
 
    IF ! oOwner:ClassName() == "OCTRLMASK"
 
@@ -1615,19 +1773,29 @@ METHOD DelControl() CLASS TCustomControl
 
 METHOD ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS TCustomControl
    LOCAL nret, cPaint, hDC, aRect, n, hdr
-   DO CASE
+   Local cText
+
+
+    Do Case
 
       CASE nMsg == WM_COMMAND
            nRet := ::WMCommand( nwParam, nlParam )
 
+
            IF nRet == NIL
               IF ( n := ASCAN( ::Controls, {|o| o:handle == nlParam } ) ) > 0
-
                  IF ValType( ::Controls[n]:OnClick ) == "B"
                     nRet := EVAL( ::Controls[n]:OnClick, ::Controls[n] )
                  ELSEIF ValType( ::Controls[n]:OnClick ) == "N"
                     nRet := HB_Exec( ::Controls[n]:OnClick, ::Controls[n] )
                  ENDIF
+
+                 IF ValType( ::Controls[n]:OnChange ) == "B"
+                    nRet := EVAL( ::Controls[n]:OnChange, ::Controls[n] )
+                 ELSEIF ValType( ::Controls[n]:OnChange ) == "N"
+                    nRet := HB_Exec( ::Controls[n]:OnChange, ::Controls[n] )
+                 ENDIF
+
 
                  IF nRet != NIL
                     RETURN nRet
@@ -1648,6 +1816,15 @@ METHOD ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS TCustomControl
            ENDIF
       CASE nMsg == WM_CHAR
            nRet := ::WMChar( nwParam, nlParam )
+
+           IF nRet == NIL
+              IF ValType( ::Controls[n]:OnKeyPress ) == "B"
+                 nRet := EVAL( ::Controls[n]:OnKeyPress, ::Controls[n],nwParam)
+              ELSEIF ValType( ::Controls[n]:OnKeyPress ) == "N"
+                 nRet := HB_Exec( ::Controls[n]:OnKeyPress, ::Controls[n],nwParam)
+              ENDIF
+           ENDIF
+
 
       CASE nMsg == WM_PAINT
            IF __ClsMsgAssigned( self, "WMPaint" )
@@ -1694,13 +1871,51 @@ METHOD ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS TCustomControl
       CASE nMsg == WM_SETFOCUS
            nRet := ::WMSetFocus( nwParam )
 
+      CASE nMsg == WM_SETTEXT
+           nRet := ::WMSetText( nwParam, nlParam )
+
+      CASE nMsg ==   WM_GETTEXTLENGTH
+
+
+           IF Valtype(::FText ) != "C"
+              nRet :=  0
+           ELSE
+              nRet := Len(::FText)
+           ENDIF
+
+
+      CASE nMsg ==  WM_SETTEXT
+           cText :=  nlParam
+           ::fText := Nil
+           ::fText := cText
+           nRet := 1
+
+      CASE nMsg == WM_GETTEXT
+          IF ::FText != nil
+             cText := ::FText
+          ELSE
+             cText := ''
+          ENDIF
+
+          nRet := Len( nlParam := Left( cText, nWParam - 1 ) )
+
+
+
+      //For Text
    ENDCASE
 
    IF nRet != nil
-      return( nret )
+      RETURN( nret )
    ENDIF
 
 RETURN CallWindowProc( ::nProc, ::handle, nMsg, nwParam, nlParam )
+
+
+METHOD Perform( nMsg, nwParam, nlParam ) CLASS TCustomControl
+   LOCAL nRet
+   nret := ::&( ::WndProc )( ::handle, nMsg, nwParam, nlParam )
+
+RETURN nRet
 
 // THintWindow ------------------------------------------------------------------------------
 pragma pack(4)
@@ -1775,7 +1990,7 @@ METHOD WMCreate() CLASS THintWindow
 
    SendMessage( ::handle, TTM_ADDTOOL, 0, ti:value )
    ::Tip := ti
-return(nil)
+RETURN(nil)
 
 METHOD TrackHint(n) CLASS THintWindow
 
@@ -1813,7 +2028,7 @@ METHOD SetText(c) CLASS THintWindow
    ti:rect:bottom := ::FParent:FHeight
 
    SendMessage( ::handle, TTM_UPDATETIPTEXT , 0, ti:value )
-return(nil)
+RETURN(nil)
 
 *-----------------------------------------------------------------------------*
 // *** Not implemented yet ***.

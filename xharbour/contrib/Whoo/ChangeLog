@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.16 2004/03/12 17:01:28 patrickmast Exp $
+ * $Id: ChangeLog,v 1.17 2004/03/29 14:23:24 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 19:50 UTC-0300 Luiz Rafael Culik<culikr@brturbo.com>
+   * source/controls.prg
+     ! Added code to allow TEDIT controls get text(an related methods. logic retrived
+       from CBuilder/Delphi VCL
+       Also process onchange message for TEDIT controls
+   * source/tcedit.prg
+     ! Added Create( oOwner ) method to override parent WndProc, otherwise, text
+     typed on control is now displayed
+   * source/types.ch
+     + new types
 
 2004-03-29 11:20 UTC-0300 Luiz Rafael Culik<culikr@brturbo.com>
    * source/tccombo.prg

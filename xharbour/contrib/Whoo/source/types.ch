@@ -195,3 +195,8 @@ TYPEDEFINE TBorderStyle = (bsNone,bsSingle) AS VALUES
 
 // ------------------------------------------------------------------------
 
+TYPEDEFINE  TEditCharCase = (ecNormal, ecUpperCase, ecLowerCase)
+TYPEDEFINE  TControlStyle = (csAcceptsControls, csCaptureMouse,;
+    csDesignInteractive, csClickEvents, csFramed, csSetCaption, csOpaque,;
+    csDoubleClicks, csFixedWidth, csFixedHeight, csNoDesignVisible,;
+    csReplicatable, csNoStdEvents, csDisplayDragImage, csReflector)
