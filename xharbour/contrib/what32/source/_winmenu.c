@@ -382,7 +382,8 @@ HB_FUNC( CHECKMENURADIOITEM )
                                (UINT) hb_parni(3), (UINT) hb_parni(4), (UINT) hb_parni(5) ) ) ; 
 }
 
-
-
-
+HB_FUNC( ISMENU )
+{
+   hb_retl( IsMenu((HMENU) hb_parnl(1) ) );
+}
 
