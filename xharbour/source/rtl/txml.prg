@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.3 2003/06/17 10:16:10 jonnymind Exp $
+ * $Id: txml.prg,v 1.4 2003/06/30 23:06:27 jonnymind Exp $
  */
 
 /*
@@ -217,6 +217,11 @@ METHOD Find( cName, cAttribute, cValue, cData ) CLASS TXmlIterator
    ::cAttribute := cAttribute
    ::cValue := cValue
    ::cData := cData
+
+   IF ::cName == NIL .and. ::cValue == NIL .and. ::cAttrib == NIL .and. ::cData == NIL
+      ::nType := HBXML_ITERATOR_ALL
+   ENDIF
+   
 RETURN ::Next()
 
 METHOD Next() CLASS TXmlIterator

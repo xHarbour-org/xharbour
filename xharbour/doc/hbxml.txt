@@ -1,304 +1,435 @@
 
-                        X H A R B O U R - XML DOM oriented model
+                     X H A R B O U R - XML DOM oriented model
 
-                          Technical Notes for xHB developers
+                        Technical Notes for xHB developers
 
-                                  Giancarlo Niccolai
+                              Giancarlo Niccolai
 
-                                    gian@nccolai.ws
+                               gian@nccolai.ws
 
 
-$Id$
+$Id: hbxml.txt,v 1.1 2003/06/15 21:05:14 jonnymind Exp $
 
 
 STATUS OF THE LIBRARY
 =====================
 
-Most functions have still to be tested. They have been tested under
-other systems, and outside the xharbour compiler context, but the
-while library must be considered work in progress.
+Functions and classes of this library have been tested in a test
+environment; a wide range test on  big/heavy XML documents has
+still to be performed
 
 TODO: Namespace management
-TODO: pre-defined entity management
 TODO: User-defined entity management
 TODO: x-Path oriented search
+TODO: Indexing of the nodes for faster searches.
 
 
-API
-===
+LIBRARY CONCEPTS
+================
 
-===================
-HB_XmlCreate( [xData] ) --> xmlDocument
+Library has an object oriented interface; an xml document object
+can be created by using a disk stored file, or a string held in memory.
+A document can also be created empty, and then populated by the user.
+A node can be created by passing constituent data (type, name attributes
+and eventually node data); then the node can be added to a specific node
+in the document, or to others "free floating node".
 
-xData can be a file handle from which an XML can be read,
+A node can be searched in various ways, most notabily by using regex searches,
+and the node tree can be navigated or altered in any fashon.
+
+Garbage collector takes care of destroying unused nodes at function return,
+or as soon as the GC system is invoked.
+
+Standard defines and hbclass.ch are defined in the file hbxml.ch, that
+should be included in any document using this classes.
+
+
+XML DOCUMENT CLASS
+==================
+
+TXmlDocument:New( xElem ) --> xmlDocument
+
+xElem can be a file handle from which an XML can be read,
 a string containing an XML tree or NIL, in which case the
-document is created empty.
+document is created empty. On error, the nStatus member of
+the returned document is set to HBXML_STATUS_ERROR or
+HBXML_STATUS_MALFORMED, and the error code is set in the
+nError member. The line at which error has encountered is
+then set to nLine. A description of the error can be
+retreived with HB_XMLERRORDESC( nError )-->cDesc function.
 
+On success, the oRoot node will contain an HBXML_TYPE_DOCUMENT node,
+which is practically a "transparent" node use just as a container
+for lower level nodes.
 
-===================
-HB_XmlDestroy( xmlDocument ) --> NIL
+* TODO: an XML document must not contain more than a toplevel tag.
+  This constraint has not yet be enforced.
 
-Destroys a document and all the associated XML data.
-TODO: I would like to do this automatically in garbage collector.
-
-
-===================
-HB_XmlStatus( xmlDocument[, nNewStatus] ) --> nStatus
-
-Returns one of the HBXML_STATUS variables telling what is the
-status of the document. IF nNewStatus is set, the status of the
-document will be updated.
 
 
 ===================
-HB_XmlError( xmlDocument[, nNewStatus] ) --> nError
 
-Returns one of the HBXML_ERROR type telling what is the error
-encountered while processing the document. IF nNewStatus is set,
-the status of the document will be updated.
+TXmlDocument:Read( fhHandle, nStyle ) --> lResult
+
+Reads a document from a filehandle. Once that an empty document
+is created, this method can be called and the result is identical
+as calling ::New( fhHandle ) except for the fact that a boolean
+result is returned (false on failure). If the document was already
+loaded, or was anyhow not empty, all the previous content is
+discarded.
+
+nStyle can be 0 or a combination of the following:
+
+- HBXML_STYLE_NOESCAPE: if specified, the xml standard escapes like
+     &amp; are untraslated. This can be useful if the application
+     need the data untranslate do do its own processing. Escapes
+     translation is a rather fast operation, in reading, while
+     it is pretty expensive in writing, as all the characters
+     have to be tested to see if they need escaping.
 
 
 ===================
-HB_XmlLine( xmlDocument ) --> nLine
 
-Returns the lines that have been processed. If an error is encountered,
-it returns the position in the file where the error have been detected.
+TXmlDocument:ToString( [nStyle] ) --> cXmlDocument
+
+The document tree is transformed into a string containing a
+a representation of the document. The style attribute can be
+a combination of zero or more of the followings:
+
+- HBXML_STYLE_INDENT: the document is indented to make the output
+     more readable. A single space is used to indent child tags,
+     if no other style is specified.
+
+- HBXML_STYLE_TAB: if HBXML_STYLE_INDENT is also specified, the
+     a TAB character is used to indent inner nodes.
+
+- HBXML_STYLE_THREESPACES: if HBXML_STYLE_INDENT is also specified
+     three spaces are used to indent inner nodes. Cannot be used
+     if HBXML_STYLE_TAB is also specified
+
+- HBXML_STYLE_NOESCAPE: if specified, the xml standard escapes like
+     &amp; are untraslated. This can be useful if the application
+     need the data untranslate do do its own processing. Escapes
+     translation is a rather fast operation, in reading, while
+     it is pretty expensive in writing, as all the characters
+     have to be tested to see if they need escaping.
+
 
 
 ===================
+
+TXmlDocument:Write( fhHandle, [nStyle] ) --> lResult
+
+Writes a document to an opened file handle. Returns ture on sucess,
+or false otherwise (see ::New() method on how to retreive error).
+
+nStyle is optinal and equivalent to the style parameter of ::ToString()
+method.
+
+
+
+===================
+
+TXmlDocument:FindFirst( cName, cAttrib, cValue, cData ) --> oNode | NIL
+
+Finds a node in the document matching the criteria specified in the
+parameters, returning the node that has been found, or NIL if a matching
+node can't be retreived.
+
+Any of the above paramter can be omitted. If all the parameters are NIL
+(or if no parameter is given), the first node in the document is returned;
+this method can be used to traverse the whole tree.
+
+The paramter match is additive. ALL the (given) parameters must be
+matched for a node to be found; also, matches are case sensitive.
+
+cName matches the tag name. cAttrib matches a node having an attribute
+with the given name. cValue matches a node having an attribute with
+the given value, while cData matches a node having a data that contains
+the given text. cData match can be then just "partial", as the data
+element of a node is usually relatively long. To have an exact match,
+use ::FindFirstRegex() method, giving the data tha has to be found between
+a "^" and a "$" (that indicates a whole match).
+
+Once a first node has been found, the next node matching the given criteria
+can be retreived using the ::FindNext() method; a typical loop to scan all
+the node named "item" can be the following:
+
+   ....
+   oNode := oXmlDocument:FindFirst( "item" )
+   DO WHILE oNode != NIL
+      ... // do something with node
+
+      oNode := oXmlDocumetn:FindNext()
+   ENDDO
+
+
+===================
+
+TXmlDocument:FindFirstRegex( cName, cAttrib, cValue, cData ) --> oNode | NIL
+
+This method works exactly as ::FindFirst, but the parameters can be
+both pre-compiled or direct regular expression. For faster processing,
+you can pre-compile the expressions using HB_RegexComp() function and
+use it's output as input parameter for ::FindFirstRegex().
+
+Being regular expression, the match can be over a partial string; so
+::FindFirstRegex( "item" ) would find all the node with item as a part
+of their name. Prepend the character "^" and postpend a "$" to find an
+exact match. I.e. ::FindFirstRegex( "^item$" ) would find every node
+which name is exactly "item".
+
+
+
+====================
+
+TXmlDocument:FindNext() --> oNode | NIL
+
+Find the next node matching the criteria given in ::FindFirst() or
+::FindFirstRegex() methods. When no more nodes are available, NIL
+is returned. A new ::FindFirst() or ::FindFirstRegex() can
+reset the search in any moment.
+
+
+
+
+
+XML NODE CLASS
+==============
+
+
+Anatomy of a node
+-----------------
+
+A node is the minimal unit to store data in an xml document. Anything
+from the <?xml declaration to the comments, to the data between tags
+can be seen as a node. The toplevel node is a member of TXMLDocument
+named oRoot, and that is actually an "empty" container for all the
+other nodes in the document.
+
+Each node has fuor properties that define its type, name, attributes
+and possibly "data":  they are named nType, cName, aAttributes and
+cData.
+
+Possible node types are:
+
+- HBXML_TYPE_TAG: the most common xml node, used to describe xml
+     objects, like <item>value</item>. This nodes must have
+     cName valorized, will have a list of attributes (that can
+     be an empty array, but not a NIL), and can have a "private"
+     data. A Tag node can have also one or more children (see
+     below); in this case, if the node has only one data child
+     the parser stores the data contained in the tag in the ::cData
+     property. This is to simplify the programming of
+     configuration-oriented XML parsers. When there is an item that
+     contains more than a data node, this simplifcation cannot be made,
+     and a data nodes will be created instad. This examples clarifies
+     the situations:
+
+     Example 1:
+     <item> value </item>   --> item node will have ::cData == "value"
+
+     Example 2:
+     <item>
+         value1
+         <tag/>
+         value2
+     </item>         --> item node will have ::cData == NIL, and two
+                         data type nodes will be added as children of item.
+
+
+- HBXML_TYPE_COMMENT: a comment inside <!-- ... -->. The name is
+     meaningless, and ::cData is the node content.
+
+- HBXML_TYPE_PI: a processing instruction like <?php ...?> the name
+     is the tag following <?, while the data is the content inside the
+     tag. The <?xml ... ?> document declaration is considered a PI
+     TODO: Have a type for XML document declaration.
+
+- HBXML_TYPE_DIRECTIVE: A declaration like <!...>. ::cName is the string
+     immediately following <!, while ::cData is the rest.
+
+- HBXML_TYPE_DATA: A pure data node. In this nodes only ::cData is valorized,
+     as all other elements are meaningless
+
+- HBXML_TYPE_DOCUMENT: an empty container that just holds a set of nodes,
+     which will be treated as a single and complete XML document. Usually
+     this node type is created and managed by the TXMLDocument class.
+
+
+The ::aAttriubte property is an array of arrays, each of which has two element:
+the first is the attribute name, and the second is the attribute value. The
+attribute value is ALWAYS specified as a string. Only "tag" type nodes have
+::aAttribute always set (having an empty list in the worst case);
+all the others have ::aAttribute set to NIL.
+
+
+A node has also fuor "directional" properties that refers to other nodes
+that may be linked in an xml tree:
+
+- oParent: is the parent of the current node, or the immediately higher
+     level node in an XML hierarcy.
+
+- oChild: is the topmost child of this node. You can access all the
+     children of a node by getting the topmost child, and navigating
+     each ::oNext field until this property is NIL
+
+- oNext: is the next brother of the current node in the hyerarcy.
+
+- oPrev: is the previous brother of the current node in the hyerarcy.
+
+If a direction in the DOM tree is not available, the property will be
+set to NIL. So, if ::oParent is NIL, the node has no parents, if ::oChild
+is NIL, it hasn't any children, if ::oNext is NIL, there isn't any node
+below this one at the same level of hyerarcy, while if ::oPrev is NIL,
+this is the first node at this level of hyerarcy.
+
+
+
+===================
+
+TXmlNode:New( nType, cName [, aAttributes [, cData]] ) --> oNode
+
+Creates a new node with the given type, name, attribute set and data.
+Both attribute and data paramters can be omitted; depending on type,
+the node name can be omitted and the data becomes mandatory.
+
+
+
+===================
+
+TXmlNode:Clone() --> oNode
+
+Creates a clone of the current node; the clone is not linked to the
+tree of the source node; all the directional properties are set to
+NIL, and the node can be considered "floating".
+
+
+===================
+
+TXmlNode:CloneTree() --> oNode
+
+Creates a clone of the node and all its subtree. The returned node has
+a set of children identical to the cloned node, and each child is
+a clone of the original ones. The topmost node is "floating", in the
+sense that it is not linked with any parent or any brother node.
+
+
+===================
+
+TXmlNode:Unlink()
+
+This method unlinks the current node and all its children, so that:
+1) the tree from which the node comes from is "squeezed", and its
+brothers are relinked together.
+2) the children of this node are still attached to it.
+
+
+===================
+
+TXmlNode:NextInTree()  --> oNode | NIL
+
+Allows a complete tree traversal, by descending the node tree up to the
+lower leaf, then rising back to the parent and selecting its brother;
+Only the lower child of the last node will return NIL, indicating that
+there isn't any more node to be returned.
+
+
+===================
+
+TXmlNode:InsertBefore( oNode )
+
+Inserts oNode before the current node. If the current node is the first child
+of its parent, the tree structure is correctly update.
+
+
+===================
+
+TXmlNode:InsertAfter( oNode )
+
+Inserts oNode after the current node.
+
+
+===================
+
+TXmlNode:InsertBelow( oNode )
+
+Adds a tree level so that all the children of the current node are moved
+to oNode, and oNode becomes the only child of the object for which this
+method is called. This effectively inserts a new level between the current
+node and its former children. It is possible to populate this new level
+with ::AddBelow() method. If the current node hasn't any child, oNode is
+simply added as the first child.
+
+
+===================
+
+TXmlNode:AddBelow( oNode )
+
+Adds a new node as the last child of current node. If the current node
+has not any child, oNode becomes its first child.
+
+
+===================
+
+TXmlNode:GetAttribute( cAttrib ) --> cValue | NIL
+
+If the current node has the attribute described in cAttrib, its value
+(as a string) is returned. Else, NIL is returned
+
+
+===================
+
+TXmlNode:SetAttribute( cAttrib, cValue )
+
+If the current node has a given attribute, its value is set to cValue
+(that must be a string), else a new attribute is created with the
+given value
+
+===================
+
+TXmlNode:Depth() --> nDepth
+
+Returns how many parents this node has plus one ( the topmost level has
+depth 1).
+
+
+===================
+
+TXmlNode:Path() --> cPath | NIL
+
+Returns the path of the current node. A path is a set of all the parent nodes
+separated by the slash ("/") character. Only tag type nodes having tag type
+parents can have a valid path; for all the others, the path is NIL.
+
+
+===================
+
+TXmlNode:ToString( nStyle ) --> cXml
+
+Transforms the current node and all its children to an XML string
+representation. See TXMLDocument:ToString() for a description of the
+nStyle parameter.
+
+===================
+
+TXmlNode:Write( fhHandle, nStyle ) --> lValue
+
+Writes an XML string representation of current node and all its children to
+an open file handle. See TXMLDocument:Write() for a description of the nStyle
+parameter.
+
+
+
+
+
+
+UTILITY FUNCTIONS
+=================
+
 HB_XmlErrorDesc( nErrorNumber ) --> cErrorDesc
 
 Returns a descriptive string telling what the error number is meaning.
+Use this function to retreive a descriptive reason for the
+TXmlDocument:nError code.
 
-
-===================
-HB_XmlGetIterator( xmlDocument ) -->xmlIterator
-
-Creates an iterator starting positioned at the root node of the current
-document.
-Notice: since the iterator is a flat pointer, it is stored
-in an xharbour string, so that garbage collector can easily dispose of it
-when needed, and so that it can easily inspected from PRG programs.
-NOTICE: At creation, the iterator is positioned on the toplevel root item,
-so to get the real first node in the document (generally the <?xml> tag),
-you have to do a first HB_XmlNextOnTree(), or HB_XmlDescend()
-
-
-===================
-HB_XmlCloneIterator( xmlIterator ) -->xmlIterator
-
-Clones the iterator.
-
-
-===================
-HB_XmlDepth( xmlIterator ) --> nDepth
-
-Returns the depth of the node where the iterator is currently pointing.
-0 means document root, which is above every node in the document.
-Toplevel nodes have depth 1.
-Notice that if you build an iterator on a document that is built on
-a subtree of another document, it's depth will be relative to the
-new document tree, not to the original one.
-
-
-
-===================
-HB_XmlAscend( xmlIterator ) --> lCanGo
-
-Climbs up in the current hierarcy of the tree. Will return true if
-this operation is possible, else the iterator won't be moved, and
-the return value will be .F.
-
-
-
-===================
-HB_XmlDescend( xmlIterator ) --> lCanGo
-
-Enters the child of the current node, if it exists. Will return true if
-this operation is possible, else the iterator won't be moved, and
-the return value will be .F.
-
-
-
-===================
-HB_XmlNext( xmlIterator ) --> lCanGo
-
-Moves the iterator to the following brother of the current node, if it
-exists. Will return true if this operation is possible, else the
-iterator won't be moved, and the return value will be .F.
-
-
-===================
-HB_XmlPrevious( xmlIterator ) --> lCanGo
-
-Moves the iterator to the preceding brother of the current node, if it
-exists. Will return true if this operation is possible, else the
-iterator won't be moved, and the return value will be .F.
-
-
-===================
-HB_XmlNextInTree( xmlIterator ) --> lCanGo
-
-Moves the iterator to the next node in the tree, ascending when necessary.
-This function traverses all the nodes in the tree, if called interactively.
-Will return true if this operation is possible, else the
-iterator won't be moved, and the return value will be .F.
-
-
-===================
-HB_XmlSetTop( xmlIterator ) --> NIL
-
-Sets the current node of the iterator as the top node: depth of this
-node will be 0, and "next" calls will traverse only the children
-of this node. HB_XmlGoTop will position the iterator at this node.
-
-
-===================
-HB_XmlGoTop( xmlIterator ) --> NIL
-
-Positions the iterator to its topmost node, that is usually the document
-root node, unless another position has been specified with HB_XMLSetTop().
-
-
-===================
-HB_XmlAddBelow( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
-cNodeData ) --> lCanDo
-HB_XmlAddBelow( xmlIterator, aNode ) --> lCanDo
-HB_XmlAddBelow( xmlIterator, xmlIterator ) --> lCanDo
-
-Inserts a node as the last child of current node. The node can be passed
-directly with all its components (first grammar), packed in an array
-(second grammar) or can be copied from an iterator, that can point to
-any node of the same tree of the first iterator, or even at another tree.
-The function returns false on failure, that is if the current node cannot
-have childs (like data or comment nodes), or if there isn't enough memory
-left.
-
-
-===================
-HB_XmlInsertBelow( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
-cNodeData ) --> lCanDo
-HB_XmlInsertBelow( xmlIterator, aNode ) --> lCanDo
-HB_XmlInsertBelow( xmlIterator, xmlIterator ) --> lCanDo
-
-Inserts a node between the target node pointed by the iterator and
-the first of its children, if it has, thus effectively inserting a
-new level in the tree.
-The inserted node can already have following brothers, but NOT preceding
-brothers NOR children (in case it is pointed by an iterator, last grammar).
-The function returns false on failure, that is if the current node cannot
-have childs (like data or comment nodes), or if there isn't enough memory
-left.
-
-
-===================
-HB_XmlInsertBefore( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
-cNodeData ) --> lCanDo
-HB_XmlInsertBefore( xmlIterator, aNode ) --> lCanDo
-HB_XmlInsertBefore( xmlIterator, xmlIterator ) --> lCanDo
-
-Inserts a node before currently pointed node. The node must NOT have
-brothers, but can have children (in the last grammar). If the target
-node is the first child of the parent of this node tree, the inserted
-node becomes the new first child.
-
-The function returns false on failure, that is if the current node cannot
-have broters (root document node), or if there isn't enough memory
-left.
-
-
-
-===================
-HB_XmlInsertAfter( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
-cNodeData ) --> lCanDo
-HB_XmlInsertAfter( xmlIterator, aNode ) --> lCanDo
-HB_XmlInsertAfter( xmlIterator, xmlIterator ) --> lCanDo
-
-Inserts a node after currently pointed node. The node must NOT have
-brothers, but can have children (in the last grammar). If the target
-node is the last child of the parent of this node tree, the inserted
-node is appended at the end of the list.
-
-The function returns false on failure, that is if the current node cannot
-have broters (root document node), or if there isn't enough memory
-left.
-
-
-
-===================
-HB_XmlDeleteNode( xmlIterator ) --> lCanDo
-
-Deletes current node and all its children.
-The iterator is then set to the next brother of the destroyed node;
-if the destroyed node has not a next brother, the iterator is set to
-its parent.
-It is not possible to destroy the root node in this way.
-
-The function returns false on failure, that is if the current node
-is the topmost node. Use HB_XmlDestroy() on the document to do that.
-
-
-===================
-HB_XmlRemoveNode( xmlIterator ) --> xmlDocument | NIL
-
-Removes the current node from the tree, and creates a new tree where
-the removed node is the only child of the topmost (document) node.
-The iterator is then set to the next brother of the destroyed node;
-if the destroyed node has not a next brother, the iterator is set to
-its parent.
-It is not possible to remove the root node in this way.
-
-The function returns NIL on failure, that is if the current node
-is the topmost node.
-
-
-===================
-HB_XmlSetNode( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
-cNodeData ) --> lCanDo
-HB_XmlSetNode( xmlIterator, aNode ) --> lCanDo
-
-Sets current node to the required values. Notice that, to ensure
-consistency of the resulting XML document, you have to correctly
-specify all the elements of the node; setting an element to NIL
-or not specifying it will have the effect of destroying it.
-So, if you want to modify an item, first read it with HB_XmlGetNode(),
-them modify it and then set it back.
-
-The function returns false if the current iterator cannot be set
-(the document root element cannot be changed!), or if the passed
-parameters are not consistent.
-
-
-
-===================
-HB_XmlGetNode( xmlIterator ) --> aNode
-
-Returns the current node in an array with format:
-{ nType, cName, aAttributes, cData }
-
-aAttribute member having the format:
-{ { cName1, cValue1} ... { cNameN, cValueN } }
-
-If the node has not a single data child, then the cData member
-is returned as NIL.
-
-
-===================
-HB_XmlGetPath( xmlIterator ) --> cPath | NIL
-
-Returns the path of the current node. Nodes that have not
-a "name" cannot have a path, thus this function return NIL
-if applied on data or comment nodes.
-
-
-
-===================
-HB_XmlToString( xmlDocument [, nStyle] ) --> cXml | NIL
-
-Writes an XML document to a string.
-
-
-===================
-HB_XmlWrite( xmlDocument, nFileHandle, nStyle ) --> nStatus
-
-Writes an XML document to a file; returns the HB_XML status.
