@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.86 2002/10/14 04:35:32 what32 Exp $
+ * $Id: xide.prg,v 1.87 2002/10/16 03:32:06 what32 Exp $
  */
 
 /*
@@ -109,120 +109,110 @@ return(self)
 METHOD MainToolBar() CLASS MainFrame
    local n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
-   With Object ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
-      // add the xmake toolbar
-      With Object :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20, 14 ))
-         :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
-         :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
-         :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
-         :AddButton( "Build",        ToolButton():New( 3,,"Build Application",              103 ) )
-         :AddButton( "BldLunch",     ToolButton():New( 4,,"Build and Launch Application",   104 ) )
-         :AddButton( "ReBldLunch",   ToolButton():New( 5,,'Re-Build Application',           105 ) )
-         :AddButton( "ReBldLunchApp",ToolButton():New( 6,,'Re-Build and Launch Application',106 ) )
-         :AddButton( "LunchApp",     ToolButton():New( 7,,'Launch Application',             107 ) )
-         :AddButton( "SingSource",   ToolButton():New( 8,,'Compile Single Source',          108 ) )
-         :AddButton( "AllSources",   ToolButton():New( 9,,'Compile All Sources',            109 ) )
-         :AddButton( "LinkOnly",     ToolButton():New(10,,'Link Only',                      110 ) )
-         :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',                 111 ) )
-         :AddButton( "View",         ToolButton():New(12,,'View',                           112 ) )
-         :AddButton( "Files",        ToolButton():New(13,,'Files',                          113 ) )
+   ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
 
-         SendMessage( :handle, TB_SETROWS, 2 )
+    // add the xmake toolbar
+   With Object ::Add( 'Tools', TToolBar():New( oApp:MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
+      :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
+      :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
+      :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
+      :AddButton( "Build",        ToolButton():New( 3,,"Build Application",              103 ) )
+      :AddButton( "BldLunch",     ToolButton():New( 4,,"Build and Launch Application",   104 ) )
+      :AddButton( "ReBldLunch",   ToolButton():New( 5,,'Re-Build Application',           105 ) )
+      :AddButton( "ReBldLunchApp",ToolButton():New( 6,,'Re-Build and Launch Application',106 ) )
+      :AddButton( "LunchApp",     ToolButton():New( 7,,'Launch Application',             107 ) )
+      :AddButton( "SingSource",   ToolButton():New( 8,,'Compile Single Source',          108 ) )
+      :AddButton( "AllSources",   ToolButton():New( 9,,'Compile All Sources',            109 ) )
+      :AddButton( "LinkOnly",     ToolButton():New(10,,'Link Only',                      110 ) )
+      :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',                 111 ) )
+      :AddButton( "View",         ToolButton():New(12,,'View',                           112 ) )
+      :AddButton( "Files",        ToolButton():New(13,,'Files',                          113 ) )
+
+      SendMessage( :handle, TB_SETROWS, 2 )
+      // ----------------------------------------------------   set imagelist
+      hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
+      hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+      ImageList_AddMasked( hImg1, hBmp, RGB( 0, 255, 255 ) )
+      DeleteObject(hBmp)
+      SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
+      //---------------------------------------------------------------------
+   End
+   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::Tools:handle, 200, 52, 200, "", NIL )
+
+   // add the TabControl on the Rebarband
+   With Object ::Add( 'Tabs', TTabControl():New( oApp:MainFrame, 445,  0,  0,  0,  0) )
+      :AddTab( "StdTab", TabPage():New( oApp:MainFrame:Tabs, "Standard" ) )
+      :AddTab( "Additional" )
+      :AddTab( "Win32", TabPage():New( oApp:MainFrame:Tabs, "Win32" ) )
+      :AddTab( "System" )
+      :AddTab( "Internet" )
+      :AddTab( "Dialogs" )
+      :AddTab( "Win 3.1" )
+      :AddTab( "Samples" )
+      :AddTab( "Activex" )
+      :Configure()
+   End
+   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::Tabs:handle, 550, 56, , "", NIL )
+
+   // sets the controls toolbar on the TabControl
+   With Object ::Tabs:StdTab
+      :Add( 'TabBand', TRebar():New( oApp:MainFrame:Tabs:StdTab ) )
+      :TabBand:SetStyle( WS_BORDER, .F. )
+      With Object :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Tabs:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
+         :SetStyle( TBSTYLE_CHECKGROUP )
+         aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
+                          'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
+                          'RadioGroup', 'Panel', 'ActionList' }
+         for n:=0 to 16
+             oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
+             oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
+             oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+             :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
+         next
+
          // ----------------------------------------------------   set imagelist
-         hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
-         hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
-         ImageList_AddMasked( hImg1, hBmp, RGB( 0, 255, 255 ) )
+         hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
+         hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+         ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
          DeleteObject(hBmp)
-         SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
+         SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
          //---------------------------------------------------------------------
       End
-      :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tools"):handle, 200, 52, 200, "", NIL )
-
-      // add the TabControl on the Rebarband
-      With Object :Add( 'Tabs', TTabControl():New( oApp:MainFrame:GetObj("Rebar"), 445,  0,  0,  0,  0) )
-         :AddTab( "StdTab", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Standard" ) )
-         :AddTab( "Additional" )
-         :AddTab( "Win32", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Win32" ) )
-         :AddTab( "System" )
-         :AddTab( "Internet" )
-         :AddTab( "Dialogs" )
-         :AddTab( "Win 3.1" )
-         :AddTab( "Samples" )
-         :AddTab( "Activex" )
-         :Configure()
-      End
-      :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tabs"):handle, 550, 56, , "", NIL )
-
-      // sets the controls toolbar on the TabControl
-      With Object :Tabs:StdTab
-         With Object :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:StdTab ) )
-            :SetStyle( WS_BORDER, .F. )
-            With Object :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:StdTab:TabBand, 444, 14, , , 28, 28, 20, 20 ) )
-               :SetStyle( TBSTYLE_CHECKGROUP )
-
-               aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
-                                'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
-                                'RadioGroup', 'Panel', 'ActionList' }
-               for n:=0 to 16
-                   oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
-                   oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
-                   oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
-                   :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
-               next
-
-               // ----------------------------------------------------   set imagelist
-               hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
-               hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
-               ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
-               DeleteObject(hBmp)
-               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
-               //---------------------------------------------------------------------
-
-            End
-            :AddBand( NIL, RBBS_NOVERT, :GetObj("StdTools"):handle, 100, 30,  , "", NIL )
-            :GetObj("StdTools"):DisableAll()
-
-            //--------- sets a QUICK access to the control
-            oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
-         End
-      End
+      :TabBand:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
+      :StdTools:DisableAll()
+   End
 
 //----------------------------------------------------------------------------------------------
+   With Object ::Tabs:Win32
+      :Add( 'TabWin32', TRebar():New( oApp:MainFrame:Tabs:Win32 ) )
+      :TabWin32:SetStyle( WS_BORDER, .F. )
+      With Object :Add( 'Win32Tools', TToolBar():New( oApp:MainFrame:Tabs:Win32, 445, 14, , , 28, 28, 20, 20 ) )
+         :SetStyle( TBSTYLE_CHECKGROUP )
+         aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
+                      '', '', '', '', '', '', ;
+                      '', '', '' }
+         for n:=0 to 16
+             oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
+             oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
+             oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+             :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
+         next
 
-      With Object :Tabs:Win32
-         With Object :Add( 'TabWin32', TRebar():New( oApp:MainFrame:Rebar:Tabs:Win32 ) )
-            :SetStyle( WS_BORDER, .F. )
-            With Object :Add( 'Win32Tools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Win32:TabWin32, 445, 14, , , 28, 28, 20, 20 ) )
+         // ----------------------------------------------------   set imagelist
+         hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
+         hBmp := LoadImage( hInstance(), "WIN32", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+         ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
+         DeleteObject(hBmp)
+         SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
+         //---------------------------------------------------------------------
 
-               :SetStyle( TBSTYLE_CHECKGROUP )
-
-               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
-                                '', '', '', '', '', '', ;
-                                '', '', '' }
-               for n:=0 to 16
-                   oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
-                   oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
-                   oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
-                   :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
-               next
-
-               // ----------------------------------------------------   set imagelist
-               hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
-               hBmp := LoadImage( hInstance(), "WIN32", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
-               ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
-               DeleteObject(hBmp)
-               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
-               //---------------------------------------------------------------------
-
-            End
-            :AddBand( NIL, RBBS_NOVERT, :GetObj("Win32Tools"):handle, 100, 30,  , "", NIL )
-            :GetObj("Win32Tools"):DisableAll()
-
-            //--------- sets a QUICK access to the control
-            oApp:MainFrame:SetLink( 'Win32Bar', :GetObj("Win32Tools") )
-         End
       End
+      :TabWin32:AddBand( NIL, RBBS_NOVERT, :Win32Tools:handle, 100, 30,  , "", NIL )
+      :Win32Tools:DisableAll()
    End
+   //--------- sets a QUICK access to the control
+   ::SetLink( 'StdBar',   ::Tabs:StdTab:StdTools)
+   ::SetLink( 'Win32Bar', ::Tabs:Win32:Win32Tools )
 return(self)
 
 //----------------------------------------------------------------------------------------------

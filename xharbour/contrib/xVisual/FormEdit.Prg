@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.60 2002/10/10 21:50:04 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.61 2002/10/16 03:32:06 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -31,6 +31,7 @@
 #include "what32.ch"
 #include "wintypes.ch"
 #Include "cstruct.ch"
+#include "toolbar.ch"
 #include "debug.ch"
 
 #define XFM_Header   1
@@ -199,7 +200,7 @@ METHOD CreateControl(aRect)
    LOCAL oObj
    LOCAL nInd:=0
    LOCAL cName
-
+   static cRebar
    IF ! Empty( ::CtrlName )
 
       IF Empty(aRect)
@@ -236,10 +237,19 @@ METHOD CreateControl(aRect)
          oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="TreeView"
          oObj:=::Add(cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+
+
       CASE ::CtrlName=="Rebar"
          oObj:=::Add(cName, TRebar():New( self ) )
+         cRebar := cName
+
       CASE ::CtrlName=="ToolBar"
-         oObj:=::Add(cName, TToolBar():New( self, 511, 15, , , 26, 26, 20, 20, 14 ) )
+         oObj:=::Add(cName, TToolBar():New( self, 511, , HINST_COMMCTRL, IDB_STD_LARGE_COLOR, 26, 26, 20, 20, 14 ) )
+         if cRebar != nil
+            ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT, oObj:handle, 200, 24, 200, "", NIL )
+         endif
+
+
       CASE ::CtrlName=="ProgressBar"
          oObj:=::Add(cName, TProgressBar():New(   self,          aRect[1], aRect[2], aRect[3], aRect[4] ) )
       OTHERWISE // unknown name

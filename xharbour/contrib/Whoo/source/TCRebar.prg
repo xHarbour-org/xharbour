@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TCRebar.prg,v 1.17 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -41,7 +41,7 @@ pragma pack(4)
 
 *------------------------------------------------------------------------------*
 
-CLASS TRebar FROM TForm
+CLASS TRebar FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT    0
@@ -50,7 +50,7 @@ CLASS TRebar FROM TForm
    DATA Height  INIT  100
 
    DATA Style   INIT  WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
-                      RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
+                      /*RBS_VARHEIGHT+*/RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
    DATA ExStyle INIT  WS_EX_TOOLWINDOW
 
    DATA lRegister PROTECTED INIT .F.
@@ -130,7 +130,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
 
    rbBand:Reset()
    rbBand:cbSize     := rbBand:sizeof()
-   rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE +RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
+   rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE+RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
    rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT,nStyle)
    rbBand:hwndChild  := IFNIL(hChild,0,hChild)
    
