@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2682 2004/03/30 09:29:44 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2683 2004/03/30 09:31:54 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-29 16:53 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
+* source\rtl\str.c
+    ! Corrected a compile error under BCC
+     * move up declaration of szResult and change the line calling
+       hb_itemStr() in function STR()
 
 2004-03-30 11:42 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/gtos2/gtos2.c
