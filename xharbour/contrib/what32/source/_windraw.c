@@ -398,7 +398,7 @@ HB_FUNC( POLYPOLYLINE )
    if (ISARRAY( 2 ) && ISARRAY( 3 ) )
    {
        iPolyCount = hb_parinfa(3,0) ;
-       PolyPoints = hb_xgrab( iPolyCount * sizeof( DWORD ) ) ;
+       PolyPoints = (DWORD *) hb_xgrab( iPolyCount * sizeof( DWORD ) ) ;
 
        for ( i=0 ; i < iPolyCount ; i++ )
        {
@@ -775,7 +775,7 @@ HB_FUNC( POLYPOLYGON )
    if (ISARRAY( 2 ) && ISARRAY( 3 ) )
    {
        iPolyCount = hb_parinfa(3,0) ;
-       PolyPoints = hb_xgrab( iPolyCount * sizeof( INT ) ) ;
+       PolyPoints = ( INT *) hb_xgrab( iPolyCount * sizeof( INT ) ) ;
 
        for ( i=0 ; i < iPolyCount ; i++ )
        {

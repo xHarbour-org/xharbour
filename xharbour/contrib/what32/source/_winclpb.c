@@ -144,7 +144,7 @@ HB_FUNC( GETCLIPBOARDDATA )
 
    if( hClipMem )
     {
-      lpClip = GlobalLock(hClipMem) ;
+      lpClip = (LPSTR)  GlobalLock(hClipMem) ;
       hb_retclen( lpClip , GlobalSize(hClipMem) ) ;
       GlobalUnlock( hClipMem ) ;
     }

@@ -316,7 +316,7 @@ HB_FUNC( GETGRAPHICSMODE )
 HB_FUNC( GDICOMMENT )
 {
 
-   hb_retl( GdiComment( (HDC) hb_parnl( 1 ), (UINT) hb_parni( 2 ), hb_parc( 3 ) ) ) ;
+   hb_retl( GdiComment( (HDC) hb_parnl( 1 ), (UINT) hb_parni( 2 ), ( const BYTE * ) hb_parc( 3 ) ) ) ;
 
 }
 
@@ -444,7 +444,7 @@ HB_FUNC( LPTODP )
    if (ISARRAY( 2 ) )
    {
        iCount = hb_parinfa( 2, 0 ) ;
-       Point = hb_xgrab( iCount * sizeof (POINT) ) ;
+       Point = ( POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY); 
        
        for ( i = 0 ; i<iCount ; i++ )
@@ -501,7 +501,7 @@ HB_FUNC( DPTOLP )
    if (ISARRAY( 2 ) )
    {
        iCount = hb_parinfa( 2, 0 ) ;
-       Point = hb_xgrab( iCount * sizeof (POINT) ) ;
+       Point = ( POINT * ) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY); 
        
        for ( i = 0 ; i<iCount ; i++ )

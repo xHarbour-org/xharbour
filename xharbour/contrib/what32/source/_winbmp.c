@@ -478,7 +478,7 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
      SetBkColor(hDC, RGB(255,255,255)) ; //White)
      SetTextColor(hDC, RGB(0,0,0)) ;     //Black)
 
-     hbmDefault=SelectObject(hDCMem, hBmp);
+     hbmDefault=(HBITMAP)SelectObject(hDCMem, hBmp);
      SelectObject(hDCMem2, hbmTransMask)   ;
 
     // build mask based on transparent color.
@@ -489,13 +489,13 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
     if( disabled)
       {
         hBr=CreateSolidBrush(GetSysColor(COLOR_BTNHIGHLIGHT));
-        hOld=SelectObject(hDC,hBr)  ;
+        hOld=(HBRUSH)SelectObject(hDC,hBr)  ;
         BitBlt(hDC, x+1, y+1, dx-2, dy-2, hDCMem2, 0, 0, 12060490) ;
         SelectObject(hDC,hOld) ;
         DeleteObject(hBr)      ;
 
         hBr=CreateSolidBrush(GetSysColor(COLOR_BTNSHADOW)) ;
-        hOld=SelectObject(hDC,hBr) ;
+        hOld=(HBRUSH)SelectObject(hDC,hBr) ;
         BitBlt(hDC, x, y, dx-2, dy-2, hDCMem2, 0, 0, 12060490) ;
         SelectObject(hDC,hOld) ;
         DeleteObject(hBr) ;
