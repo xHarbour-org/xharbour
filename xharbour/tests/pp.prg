@@ -1377,7 +1377,9 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ENDIF
 
                IF sBlock = "PP__"
+
                   IF sBlock = "PP__FOR"
+
                      s_nFlowId++
                      aSize( s_acFlowType, s_nFlowId )
                      s_acFlowType[ s_nFlowId ] := "F"
@@ -1410,7 +1412,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__NEXT"
 
-                     IF s_nCompLoop == 0 .OR. s_aLoopJumps[ s_nCompLoop ][3] != "F"
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "F"
                         Eval( bErrHandler, ErrorNew( [PP], 2029, [Parse], [NEXT does not match FOR], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
@@ -1423,7 +1425,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         NEXT
 
                         s_nCompLoop--
-                        //aSize( s_aIfJumps, s_nCompIf )
+                        s_nFlowId--
                      ENDIF
 
                      LOOP
@@ -1456,7 +1458,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__CATCH"
 
-                     IF s_acFlowType[ s_nFlowId ] != "T"
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "T"
                         Eval( bErrHandler, ErrorNew( [PP], 2046, [Parse], [CATCH with no TRY in sight!], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_JUMP, nLine } ) // Unconditional Jump to END
@@ -1470,8 +1472,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__RECOVER"
 
-                     IF s_acFlowType[ s_nFlowId ] != "B"
-                        Eval( bErrHandler, ErrorNew( [PP], 2046, [Parse], [RECOVER with no TRY in sight!], sBlock ) )
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "B"
+                        Eval( bErrHandler, ErrorNew( [PP], 2046, [Parse], [RECOVER with no BEGIN SEQUENCE in sight!], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_JUMP, nLine } ) // Unconditional Jump to END
 
@@ -1518,10 +1520,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      LOOP
 
                   ELSEIF sBlock = "PP__ENDDO"
-                     s_nFlowId--
-                     //aSize( s_acFlowType, s_nFlowId )
 
-                     IF s_nCompLoop == 0
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "W"
                         Eval( bErrHandler, ErrorNew( [PP], 2028, [Parse], [ENDDO does not match WHILE], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, PP_OP_JUMP, nLine } ) // Loop back
@@ -1533,7 +1533,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         NEXT
 
                         s_nCompLoop--
-                        //aSize( s_aIfJumps, s_nCompIf )
+                        s_nFlowId--
                      ENDIF
 
                      LOOP
@@ -1551,7 +1551,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__CASE"
 
-                     IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
                         Eval( bErrHandler, ErrorNew( [PP], 2031, [Parse], [CASE does not match DO CASE], sBlock ) )
                         LOOP
                      ELSE
@@ -1583,10 +1583,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      LOOP
 
                   ELSEIF sBlock = "PP__ENDCASE"
-                     s_nFlowId--
-                     //aSize( s_acFlowType, s_nFlowId )
 
-                     IF s_nCompIf == 0
+                     IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
                         Eval( bErrHandler, ErrorNew( [PP], 2030, [Parse], [ENDCASE with no DO CASE in sight!], sBlock ) )
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1599,7 +1597,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         ENDIF
 
                         s_nCompIf--
-                        //aSize( s_aIfJumps, s_nCompIf )
+                        s_nFlowId--
                      ENDIF
 
                      LOOP
@@ -1646,10 +1644,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      LOOP
 
                   ELSEIF sBlock = "PP__ENDIF"
-                     s_nFlowId--
-                     //aSize( s_acFlowType, s_nFlowId )
-
-                     IF s_nCompIf == 0
+                     IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I"
                         Eval( bErrHandler, ErrorNew( [PP], 2027, [Parse], [ENDIF does not match IF], sBlock ) )
                      ELSE
                         aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1660,14 +1655,14 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         NEXT
 
                         s_nCompIf--
-                        //aSize( s_aIfJumps, s_nCompIf )
+                        s_nFlowId--
                      ENDIF
 
                      LOOP
 
                   ELSEIF sBlock = "PP__END"
 
-                     IF s_nCompIf == 0 .AND. s_nCompLoop == 0
+                     IF s_nFlowId == 0
                         Eval( bErrHandler, ErrorNew( [PP], 2027, [Parse], [END with no Flow-Control structure in sight!], sBlock ) )
                      ELSE
                         IF s_acFlowType[ s_nFlowId ] $ "FW"
@@ -1714,14 +1709,12 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                            NEXT
 
                            s_nCompIf--
-                           //aSize( s_aIfJumps, s_nCompIf )
 
                         ENDIF
 
                      ENDIF
 
                      s_nFlowId--
-                     //aSize( s_acFlowType, s_nFlowId )
 
                      LOOP
 
