@@ -838,7 +838,7 @@ PROCEDURE RP_Dot()
    LOCAL aCpyCommRules, aCpyCommResults
    LOCAL aCpyTranRules, aCpyTranResults
 
-   LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp
+   LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp, bKey5, bKey24
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
@@ -876,16 +876,20 @@ PROCEDURE RP_Dot()
 
    aFill( aKBCommands, sLine )
 
-   SetKey(  5, { || IIF( nKBCommand >  1, sLine := aKBCommands[ --nKBCommand ], ) } )
-   SetKey( 24, { || IIF( nKBCommand < 16, sLine := aKBCommands[ ++nKBCommand ], ) } )
-
    DO WHILE .T.
       sLine := aKBCommands[ nKBCommand ]
 
       @ MaxRow(), 00 SAY '.'
       @ MaxRow(), 01 GET sLine PICTURE '@KS79'
       SET CURSOR ON
+
+      bKey5  := SetKey(  5, { || IIF( nKBCommand >  1, sLine := aKBCommands[ --nKBCommand ], ) } )
+      bKey24 := SetKey( 24, { || IIF( nKBCommand < 16, sLine := aKBCommands[ ++nKBCommand ], ) } )
+
       READ
+
+      SetKey(  5, bKey5  )
+      SetKey( 24, bKey24 )
 
       IF ! sLine == aKBCommands[ nKBCommand ]
          IF ( nTemp := aScan( aKBCommands, sLine ) ) == 0
