@@ -2117,15 +2117,15 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      /* Force read record */
-      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
-
       if( !pArea->fPositioned )
          return SUCCESS;
 
       /* Buffer is hot? */
       if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
+         return FAILURE;
+
+      /* Force read record */
+      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 
       if( hb_fptFileLockEx( pArea, TRUE ) )
