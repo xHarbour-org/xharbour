@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.473 2002/10/31 20:27:15 walito Exp $
+ * $Id: ChangeLog,v 1.474 2002/11/04 12:25:13 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,7 +11,7 @@
 2002-11-04 09:20 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/macro/macro.y
     + added support for If() function in macro execution with optional 3th 
-      parameter, as Cl*pper does : if(<lCondition>,<uResult1>,[<uResult2>])
+      parameter, as Cl*pper does : if(<lCondition>,<uResult1> [,<uResult2>])
 
 2002-10-31 17:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
