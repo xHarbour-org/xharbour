@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.423 2002/10/05 16:19:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.424 2002/10/05 23:27:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-05 23:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tget.prg
+    * Fixed small problem when using Mouse to select the editing get
 
 2002-10-05 16:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
