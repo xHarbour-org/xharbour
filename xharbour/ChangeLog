@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3355 2004/08/27 07:53:50 paultucker Exp $
+ * $Id: ChangeLog,v 1.3357 2004/08/27 12:15:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-27 12:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * makefile.bc
+     * minor fix to avoid \source\ct compiling conflit.
+   * make_b32.bat
+     * added libct.lib to delete lib list when used "clean" parameter.
 
 2004-08-27 10:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * source/ct/Makefile
