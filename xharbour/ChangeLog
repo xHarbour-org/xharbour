@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2385 2004/02/23 22:55:03 brianhays Exp $
+ * $Id: ChangeLog,v 1.2386 2004/02/24 03:10:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,8 +10,8 @@
 
 2004-02-23 19:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
-    ! Fixed reversed arguments for :Keys() and :Values() psudo methods of Hash.
-    % Optimized out HB_ITEM, byt using &(HB_VM_STACK.Return) directly as the reciever.
+    ! Fixed reversed arguments for :Keys() and :Values() pseudo methods of Hash.
+    % Optimized out HB_ITEM, byt using &(HB_VM_STACK.Return) directly as the receiver.
 
   * source/vm/proc.c
     ! Fixed GPF trap, when Object Method is not a valid Method for that class.
