@@ -1,6 +1,8 @@
 #
-# $Id: Makefile,v 1.21 2001/07/24 00:12:46 lculik Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
 #
+
+HB_LEX := SIMPLEX
 
 ROOT = ../../
 
