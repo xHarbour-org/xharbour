@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.115 2004/03/24 03:17:57 lculik Exp $
+ * $Id: hbmake.prg,v 1.116 2004/04/06 19:16:34 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2345,7 +2345,7 @@ FUNCTION CompileUpdatedFiles()
                xItem := Substr( cPrg, Rat( IIF( s_lGcc, '/', '\' ), cPrg ) + 1 )
                nPos  := aScan( s_aObjs, { | x | x := Substr( x, Rat( IIF( s_lGcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
-               IF Fileisnewer( cPrg, s_aObjs[ npos ] )
+               IF !empty( cPrg ) .AND. Fileisnewer( cPrg, s_aObjs[ npos ] )
 
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
