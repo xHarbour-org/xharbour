@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2817 2004/04/21 15:21:30 lculik Exp $
+ * $Id: ChangeLog,v 1.2818 2004/04/21 16:37:45 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-22 13:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/teditor.prg
+    * All the fixes offered by Eduardo Fernandez with little modifications and optimizations.
+      Still more fixes. Now Insert/Overstike mode is exactly Clipper comaptible. 
+      In my experiments memoedit without wordwrap is behaving exactly like Clipper but
+      for only one bug ( I am desperately after ), memoedit with wordwrap still have some
+      differences which I hope will be covered soon.
+
+    /* Phil - I am sorry that your fix has been overwritten, which was due to excessive
+       merging of CVS updates, please re-fix it as I have lost old code.
+    */ 
 
 2004-04-21 09:36 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tget.prg
