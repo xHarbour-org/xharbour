@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:36 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/06/06 06:45:10 druzus Exp $
 #
 
 ROOT = ../
@@ -10,6 +10,7 @@ DIRS=\
 	hbdoc \
 	hbtest \
 	hbmake \
+	hbdict \
 #	hbextern \
 
 include $(ROOT)config/dir.cf

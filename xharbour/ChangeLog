@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1445 2003/09/11 10:38:59 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1446 2003/09/11 12:08:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-11 15:12 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+   * utils/Makefile
+   * utils/hbdict/Makefile
+      ! Using standard utils makefile for linux.
+
+   * utils/hbdict/hbdict.prg
+      ! Mistype in a '<' instead of '>' caused HIT files
+      to be invalid. Fixed.
 
 2003-09-11 14:06 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
    * tests/Makefile

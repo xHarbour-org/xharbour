@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.5 2003/07/19 07:24:09 fsgiudice Exp $
+* $Id: hbdict.prg,v 1.6 2003/09/05 01:15:34 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -273,6 +273,7 @@ FUNCTION SaveTable( cFileName, aTable )
    aHeader[1] := Chr( 3 ) + "HIT"
    aHeader[6] := Len( aTable[2] )
 
+   ASort( aTable[2],,,{| x, y | AsciiOrder(x[1], y[1]) < 0} )
    IF HB_I18nSaveTable( cFileName, aHeader, aTable[2] )
       Popup( i18n( "Success" ) )
       @12,12 SAY i18n( "The file has been saved" )
@@ -363,7 +364,7 @@ FUNCTION AsciiOrder( cStr1, cStr2 )
    DO WHILE nPos <= Len( cStr1 ) .and. nPos <= Len( cStr2 )
       IF asc( cStr1[nPos] ) < asc( cStr2[ nPos ] )
          RETURN -1
-      ELSEIF asc( cStr1[nPos] ) < asc( cStr2[ nPos ] )
+      ELSEIF asc( cStr1[nPos] ) > asc( cStr2[ nPos ] )
          RETURN 1
       ELSE
          nPos ++
