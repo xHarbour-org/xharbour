@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.74 2001/12/05 18:55:05 vszakats Exp $
+ * $Id: math.c,v 1.1.1.1 2001/12/21 10:42:17 ronpinkas Exp $
  */
 
 /*
@@ -94,14 +94,14 @@ static PHB_MATH_HANDLERCHAINELEMENT s_pChain = NULL; /* TODO: make this thread s
 HB_MATH_HANDLERHANDLE hb_mathInstallHandler( HB_MATH_HANDLERPROC handlerproc )
 {
    PHB_MATH_HANDLERCHAINELEMENT pChain, pNewChainelement;
- 
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mathInstallHandler (%p)", handlerproc));
    pNewChainelement = (PHB_MATH_HANDLERCHAINELEMENT)hb_xgrab (sizeof (HB_MATH_HANDLERCHAINELEMENT));
    pNewChainelement->handlerproc = handlerproc;
    pNewChainelement->status      = HB_MATH_HANDLER_STATUS_ACTIVE;
                                    /* initially activated */
    pNewChainelement->pnext       = NULL;
- 
+
    pChain = s_pChain;
    if( pChain == NULL )
    {
@@ -113,7 +113,7 @@ HB_MATH_HANDLERHANDLE hb_mathInstallHandler( HB_MATH_HANDLERPROC handlerproc )
          pChain = pChain->pnext;
       pChain->pnext = pNewChainelement;
    }
- 
+
    return ( HB_MATH_HANDLERHANDLE ) pNewChainelement;
 }
 
@@ -121,7 +121,7 @@ HB_MATH_HANDLERHANDLE hb_mathInstallHandler( HB_MATH_HANDLERPROC handlerproc )
 int hb_mathDeinstallHandler( HB_MATH_HANDLERHANDLE handle )
 {
    PHB_MATH_HANDLERCHAINELEMENT pChain;
- 
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mathDeinstallHandler (%p)", handle));
 
    if( handle != NULL )
@@ -135,7 +135,7 @@ int hb_mathDeinstallHandler( HB_MATH_HANDLERHANDLE handle )
       else
       {
          pChain = s_pChain;
-        
+
          while( pChain != NULL )
          {
             if( pChain->pnext == ( PHB_MATH_HANDLERCHAINELEMENT ) handle )
@@ -144,12 +144,12 @@ int hb_mathDeinstallHandler( HB_MATH_HANDLERHANDLE handle )
                hb_xfree( ( void * ) handle );
                return 0;
             }
-            
+
             pChain = pChain->pnext;
          }
       }
    }
- 
+
    return -1;  /* not found, not deinstalled, so return error code */
 }
 
@@ -157,9 +157,9 @@ int hb_mathDeinstallHandler( HB_MATH_HANDLERHANDLE handle )
 int hb_mathSetHandlerStatus( HB_MATH_HANDLERHANDLE handle, int status )
 {
    int oldstatus = HB_MATH_HANDLER_STATUS_NOTFOUND;
-  
+
    HB_TRACE(HB_TR_DEBUG, ("hb_mathSetHandlerStatus (%p, %i)", handle, status));
-  
+
    if( handle != NULL )
    {
       oldstatus = ( ( PHB_MATH_HANDLERCHAINELEMENT ) handle )->status;
@@ -363,28 +363,22 @@ HB_FUNC( LOG )
 {
    if( ISNUM( 1 ) )
    {
-#if defined(HB_MATH_HANDLER)
-      double dResult = log( hb_parnd( 1 ) );
-
-      if( s_internal_math_error )
-      {
-         hb_errRT_BASE_SubstR( s_internal_math_error, 1095, NULL, "LOG", 1, hb_paramError( 1 ) );
-         s_internal_math_error = 0;
-      }
-      else
-         hb_retnd( dResult );
-#else
       double dNumber = hb_parnd( 1 );
 
       if( dNumber <= 0.0 )
+      {
          /* Indicate overflow if called with an invalid argument */
          hb_retndlen( log( dNumber ), 99, -1 );
+      }
       else
+      {
          hb_retnd( log( dNumber ) );
-#endif
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1095, NULL, "LOG", 1, hb_paramError( 1 ) );
+   }
 }
 
 HB_FUNC( SQRT )

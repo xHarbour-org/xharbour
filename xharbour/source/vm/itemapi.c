@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.15 2002/03/22 15:40:14 map Exp $
+ * $Id: itemapi.c,v 1.16 2002/04/17 18:28:16 walito Exp $
  */
 
 /*
@@ -1151,9 +1151,18 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
             #else
                || dNumber == s_dInfinity || dNumber == -s_dInfinity
             #endif
-            )
+              )
+            {
+               iSize = 20;
+
+               if( hb_set.HB_SET_DECIMALS )
+               {
+                  iSize += hb_set.HB_SET_DECIMALS + 1;
+               }
+
                /* Numeric overflow */
                iBytes = iSize + 1;
+            }
             else
             {
                int iDecR;

@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
+ * $Id: str.c,v 1.2 2002/04/28 03:08:04 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_FUNC( STR )
          {
             pWidth = hb_param( 2, HB_IT_NUMERIC );
          }
-         else if( ! ISNIL( 2 ) )
+         else //if( ! ISNIL( 2 ) )
          {
             bValid = FALSE;
          }
@@ -83,7 +83,7 @@ HB_FUNC( STR )
          {
             pDec = hb_param( 3, HB_IT_NUMERIC );
          }
-         else if( ! ISNIL( 3 ) )
+         else //if( ! ISNIL( 3 ) )
          {
             bValid = FALSE;
          }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.180 2002/04/28 20:18:38 lculik Exp $
+ * $Id: ChangeLog,v 1.181 2002/04/29 01:00:05 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-28 18:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/math.c
+    * Minor optimization.
+
+  * source/rtl/str.c
+    * Coorected latest change - Clipper does not accept NIL or implied NIL parameters as valid.
+
+  * source/vm/itemapi.c
+    * Made hb_itemStr() more Clipper compatible.
+
 2002-04-28 22:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/tprint.hpp
     * Added missing require file for Winprinter support
