@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2366 2004/02/22 04:24:42 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2367 2004/02/22 06:54:14 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-22 08:42 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/vm/estack.c
+  * source/vm/hvm.c
+    ! de-tangled termination sequence for MT. Many overkills that were 
+      introduced before are now removed, and only essential code is
+      (or should be) in.
+      
+  * source/vm/thread.c
+    ! Detangled termination sequence
+    ! As hb_treadKillAll() is now an idle inspector, and unkind 
+      cancelation is serial to the cancellor in windows implementation,
+      all the cares taken in the hb_threadTermination() routine must NOT
+      be used; a subset of what is needed is moved into hb->threadKillAll()
+      
+  * source/vm/garbage.c
+    ! Latest bool flag added to hb_gcCollectAll was not added to MT branch;
+      this caused every MT program to collect at the end as if 
+      hb_gcCollectAll( FALSE ) was called, causing unfreed memory. PLZ, 
+      try to have a little of regards in adding things also in MT 
+      branches...
+      
+  * tests/mtcomplex.prg
+  * tests/mttest.prg
+    * visual & better reporting.
+    
 
 2004-02-22 07:58 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/vm/hbi18n.c

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.155 2004/02/20 00:22:41 ronpinkas Exp $
+* $Id: thread.c,v 1.156 2004/02/21 08:58:27 jonnymind Exp $
 */
 
 /*
@@ -193,17 +193,7 @@ void hb_threadInit( void )
 
 void hb_threadExit( void )
 {
-   hb_threadKillAll();
-   hb_threadWaitAll();
-
-   hb_ht_stack = NULL; //signal we are not ready anymore to collect vm stats
    hb_threadDestroyStack( &hb_stack );
-
-   // the main stack still exists, but we must signal it has not items anymore
-   hb_stack.pItems = NULL;
-   hb_stack.pBase  = NULL;
-   hb_stack.pPos   = NULL;
-   hb_stack.wItems = 0;
 }
 
 void hb_threadCloseHandles( void )
@@ -238,6 +228,7 @@ void hb_threadCloseHandles( void )
    #endif
 
    HB_CRITICAL_DESTROY( s_thread_unique_id_mutex );
+   hb_ht_stack = NULL; //signal we are not ready anymore to collect vm stats
 }
 
 
@@ -481,7 +472,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_threadDestroyStack(%p)", pStack));
 
-   /* Free each element of the stack */
+   /* Free each element of the stack, but not for main stack; main stack
+      is freed by hb_stackFree as in ST */
    if( pStack != &hb_stack )
    {
       for( pPos = pStack->pItems; pPos < pStack->pPos; pPos++)
@@ -491,6 +483,15 @@ void hb_threadDestroyStack( HB_STACK *pStack )
             hb_itemClear( *pPos );
          }
       }
+      
+      /* Free each element of the stack */
+      for( i = 0; i < pStack->wItems; i++ )
+      {
+         hb_xfree( pStack->pItems[ i ] );
+      }
+      /* Free the stack */
+   
+      hb_xfree( pStack->pItems );
    }
 
    /* Eventually free the return value of the stack */
@@ -506,14 +507,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_itemRelease( pStack->errorBlock );
    }
 
-   /* Free each element of the stack */
-   for( i = 0; i < pStack->wItems; i++ )
-   {
-      hb_xfree( pStack->pItems[ i ] );
-   }
-   /* Free the stack */
-
-   hb_xfree( pStack->pItems );
    if ( pStack->aTryCatchHandlerStack )
    {
       hb_itemRelease( pStack->aTryCatchHandlerStack );
@@ -967,6 +960,7 @@ HB_EXPORT void hb_threadWaitAll()
    HB_SHARED_LOCK( hb_runningStacks );
    hb_runningStacks.content.asLong --;
    HB_VM_STACK.bInUse = 0;
+   HB_SHARED_SIGNAL( hb_runningStacks );
 
    while ( hb_runningStacks.content.asLong > 0 || hb_ht_stack->next != NULL )
    {
@@ -1004,22 +998,38 @@ HB_EXPORT void hb_threadKillAll()
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
       #else
-         /* Shell locking the thread */
-         HB_CRITICAL_LOCK( hb_cancelMutex );
          if ( ! pStack->bCanCancel )
          {
             pStack->bCanceled = TRUE;
-            HB_CRITICAL_UNLOCK( hb_cancelMutex );
          }
          else
          {
-            hb_threadCancel( pStack ); // also unlocks the mutex
+            HB_MUTEX_STRUCT *pMtx;
+            
+            /* This is a subset of terminateThread: as this routine is
+               an idle inspector, many of the cares in terminateThread may
+               NOT be applied. */
+            TerminateThread( pStack->th_h, 0 );
+            CloseHandle( pStack->th_h );
+
+            pMtx = hb_ht_mutex;
+            while( pMtx != NULL )
+            {
+               if ( HB_SAME_THREAD( pMtx->locker, pStack->th_id) )
+               {
+                  hb_mutexForceUnlock( pMtx );
+               }
+               pMtx = pMtx->next;
+            }
+
+            /* now we can detach this thread */
+            hb_threadUnlinkStack( pStack );
+            hb_threadDestroyStack( pStack );
          }
       #endif
       pStack = pStack->next;
    }
    hb_threadIdleEnd();
-   hb_threadWaitAll();
 }
 
 /*
@@ -1262,6 +1272,25 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
 /**************************************************************/
 
 /*
+   Garbage finalization function for XHARBOUR thread objects.
+   When the gc detects a thread object is not anymore referenced,
+   the object is cleared; the thread is left alive though.
+*/
+HB_GARBAGE_FUNC( hb_threadThreadIdFinalize )
+{
+   PHB_THREAD_ID ThreadID = (PHB_THREAD_ID) Cargo;
+
+   if ( ThreadID->sign != HB_THREAD_ID_SIGN )
+   {
+      hb_errInternal( HB_EI_MEMCORRUPT,
+         "hb_threadThreadIdFinalize: Corrupted thread object at 0x%p",
+         (char *) ThreadID, NULL );
+      return;
+   }
+   
+   hb_gcFree( ThreadID );
+}
+/*
    Starts a new thread;
 */
 HB_FUNC( STARTTHREAD )
@@ -1378,7 +1407,7 @@ HB_FUNC( STARTTHREAD )
    }
 
    // Create the thread ID object; for now it is a flat pointer
-   pThread =(PHB_THREAD_ID)   hb_gcAlloc( sizeof( HB_THREAD_ID ), NULL );
+   pThread = (PHB_THREAD_ID) hb_gcAlloc( sizeof( HB_THREAD_ID ), hb_threadThreadIdFinalize );
    pThread->sign = HB_THREAD_ID_SIGN;
 
    // Create the stack here to avoid cross locking of alloc mutex
@@ -1594,7 +1623,7 @@ HB_FUNC( GETCURRENTTHREAD )
 {
    HB_THREAD_STUB
    PHB_THREAD_ID pThread = (PHB_THREAD_ID)
-         hb_gcAlloc( sizeof( HB_THREAD_ID ), NULL );
+         hb_gcAlloc( sizeof( HB_THREAD_ID ), hb_threadThreadIdFinalize );
 
    pThread->sign = HB_THREAD_ID_SIGN;
    pThread->threadId = HB_CURRENT_THREAD();
@@ -1935,7 +1964,7 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 
    HB_CRITICAL_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
-   hb_arrayRelease( Mutex->aEventObjects );
+   hb_itemRelease( Mutex->aEventObjects );
    hb_gcFree( Mutex );
 }
 
@@ -2263,7 +2292,7 @@ HB_FUNC( NOTIFYALL )
 
    if ( bClear )
    {
-      hb_itemClear( pVal );
+      hb_itemRelease( pVal );
    }
 }
 

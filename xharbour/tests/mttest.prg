@@ -5,6 +5,7 @@ PROCEDURE Main()
   LOCAL nStart := Seconds()
   LOCAL oMyObject := MyClass()
   LOCAL MethodPtr := HB_ObjMsgPtr( oMyObject, "Count" )
+  LOCAL xThread
 
   CLEAR SCREEN
 

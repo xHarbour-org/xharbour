@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.15 2003/11/27 23:39:13 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.16 2003/12/11 14:44:52 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -66,6 +66,7 @@ PROCEDURE Main()
       @ 17, 10 SAY 'Cycle over, Monitor Stopped     '
    ENDIF
       
+   @18, 10 SAY 'Waiting for thread termination                  '      
    WaitforThreads()
 
    @ 19, 10 SAY 'Program over - press a key    '

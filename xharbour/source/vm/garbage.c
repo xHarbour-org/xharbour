@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.73 2004/02/20 00:42:24 ronpinkas Exp $
+ * $Id: garbage.c,v 1.74 2004/02/21 04:45:20 ronpinkas Exp $
  */
 
 /*
@@ -533,14 +533,18 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
-      if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      if ( s_pCurrBlock == 0 || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
       {
          HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          return;
       }
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
+      /* Force this thread to be an idle inspector: only this thread can run
+         past this point; depending on settings, this thread may prevents others
+         to regain control or just wait for a time where no thread is active. */
       hb_threadWaitForIdle();
+      
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {

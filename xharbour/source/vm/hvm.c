@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.332 2004/02/21 08:58:25 jonnymind Exp $
+ * $Id: hvm.c,v 1.333 2004/02/22 04:24:44 jonnymind Exp $
  */
 
 /*
@@ -798,16 +798,12 @@ int HB_EXPORT hb_vmQuit( void )
 #endif
    //printf("After Memvar\n" );
 
-#ifndef HB_THREAD_SUPPORT
-   //JC1: under threads, we'll kill our stack when needed
    hb_stackFree();
    //printf("After hbStackFree\n" );
-#else
+#ifdef HB_THREAD_SUPPORT
    hb_threadExit();
    //printf("After thread exit\n" );
 #endif
-
-   //printf("After stackFree\n" );
 
    /* hb_dynsymLog(); */
 
