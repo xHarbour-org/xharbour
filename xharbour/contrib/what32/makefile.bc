@@ -10,7 +10,7 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=c:\bcc55
+BCC_DIR=e:\bcc55
 WH_DIR=.
 
 
@@ -18,7 +18,7 @@ WH_DIR=.
 
 # library
 #
-WHAT32LIB  = lib\what32.lib
+WHAT32LIB  = lib\b32\what32.lib
 
 WHAT32OBJ  = _winbrsh.obj    _wincall.obj    _winclpb.obj    _wincret.obj    _windate.obj \
              _windc.obj      _windll.obj     _windraw.obj    _winfont.obj    _winhead.obj \
