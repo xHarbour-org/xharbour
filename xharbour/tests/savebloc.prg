@@ -47,8 +47,8 @@ PROCEDURE Main()
       bBlock := NIL
 
       ? "Restoring Object Data Block..."
-      oObj:Data := HB_RestoreBlock( SavedBlock )
-
+      oObj:Data := HB_RestoreBlock( SavedBlock, oObj )
+  
       ?
       ? "Getting value using Restored Object Data Block..."
       ? Eval( oObj:Data )

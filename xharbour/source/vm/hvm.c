@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.432 2005/01/10 18:45:39 druzus Exp $
+ * $Id: hvm.c,v 1.433 2005/01/25 10:47:54 druzus Exp $
  */
 
 /*
@@ -153,6 +153,8 @@
    /* DEBUG only*/
    #include <windows.h>
 #endif
+
+static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg );
 
 static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
 {
@@ -1913,6 +1915,43 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                   w++;
                   break;
+               }
+            }
+            else if ( HB_IS_HASH( pSelf ) )
+            {
+               char * szIndex = hb_stackItemFromTop( -2 )->item.asSymbol.value->szName;
+               ULONG ulPos;
+
+               if( strcmp( szIndex, "CLASSNAME" ) == 0 )
+               {
+                  hb_itemPutC( *( HB_VM_STACK.pPos - 2 ), "HASH" );
+               }
+               else if( strcmp( szIndex, "CLASSH" ) == 0 )
+               {
+                  hb_itemPutNI( *( HB_VM_STACK.pPos - 2 ), 0 );
+               }
+               else if( strcmp( szIndex, "KEYS" ) == 0 )
+               {
+                  hb_hashGetKeys( *( HB_VM_STACK.pPos - 2 ), pSelf );
+               }
+               else if( strcmp( szIndex, "VALUES" ) == 0 )
+               {
+                  hb_hashGetValues( *( HB_VM_STACK.pPos - 2 ), pSelf );
+               }
+               else
+               {
+                  HB_ITEM hbIndex;
+                  hbIndex.type = HB_IT_NIL;
+                  hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
+
+                  if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
+                  {
+                     hb_hashGet( pSelf, ulPos, *( HB_VM_STACK.pPos - 2 ) );
+                  }
+                  else
+                  {
+                     hb_vmClassError( 0, "HASH", szIndex );
+                  }
                }
             }
             else
