@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1452 2003/09/11 22:13:21 paultucker Exp $
+ * $Id: ChangeLog,v 1.1453 2003/09/12 02:09:32 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-09-11 15:12 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+2003-09-12 04:26 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/memvars.c
+    ! fixed windows compilation
+
+2003-09-11 04:10 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/hvm.c
   * source/vm/memvars.c
     ! fixed memvar access under MT.
+
+  * tests/mtstress.prg
+    + added tests for memvars
 
 2003-09-11 18:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/clipsamp/gauge.c

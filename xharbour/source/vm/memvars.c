@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.39 2003/09/11 17:27:08 ronpinkas Exp $
+ * $Id: memvars.c,v 1.40 2003/09/12 02:09:34 jonnymind Exp $
  */
 
 /*
@@ -1255,7 +1255,7 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
  */
 int hb_memvarScope( char * szVarName )
 {
-   HB_THREAD_STUB;
+   HB_THREAD_STUB
    int iMemvar;
    PHB_DYNS pDynVar;
 
@@ -2203,7 +2203,7 @@ void hb_memvarsIsMemvarRef( void )
 
 HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {
-   HB_THREAD_STUB;
+   HB_THREAD_STUB
    PHB_DYNS pDyn;
 
    #ifdef HB_THREAD_SUPPORT
