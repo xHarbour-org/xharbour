@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.12 2002/09/10 22:57:14 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.13 2002/09/13 02:49:55 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-13 16:05 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   * source/TApplication.prg
+     + method Quit()
+   * source/TControl.prg
+     * commented out auto-initialization for non-dialog forms
+   * source/TDialog.prg
+     * cleaned OnInitDialog() from duplicated lines that are already in super TPanel
+   * source/TFrame.prg
+     - method OnDestroy() added from August. It is already inherited from parent
+   * source/TPanel.prg
+     * corrected OnInitDialog()
+   * source/TWindow.prg
+     * fixed OnDestroy()
+   * tests/demo.prg
 
 2002-09-13 04:45 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    * include/woopgui.ch

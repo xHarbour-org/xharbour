@@ -67,6 +67,7 @@ CLASS TApplication FROM TObject
     //METHOD  FindWinClassByName()
     METHOD OnInit()
     METHOD OnQuit()
+    METHOD Quit( nRet )              INLINE PostQuitMessage( IIF( nRet == NIL, 0, nRet ) )
 
     METHOD DisableLogWrite()         INLINE ::EnableLogWrite( FALSE )
     METHOD EnableLogWrite( lEnable ) INLINE IIF( lEnable == NIL, lEnable := TRUE, NIL ),;
@@ -151,13 +152,14 @@ RETURN Self
 
 METHOD MainLoop() CLASS TApplication
    LOCAL cMsg
-
+   WG_DebugTrace( "TApplication:MainLoop() - Start MainLoop", "Self", Self )
    DO WHILE GetMessage( @cMsg, 0, 0, 0 )
       IF !IsDialogMessage( , cMsg )
          TranslateMessage( cMsg )
          DispatchMessage( cMsg )
       ENDIF
    ENDDO
+   WG_DebugTrace( "TApplication:MainLoop() - End MainLoop", "Self", Self )
 
 RETURN 0
 

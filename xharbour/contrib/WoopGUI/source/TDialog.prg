@@ -118,27 +118,10 @@ RETURN nRet
 
 METHOD OnInitDialog( wParam, lParam ) CLASS TDialog
    LOCAL nRet        := -1
-   LOCAL lSetDefault := FALSE
 
    WG_DebugTrace( "TDialog:OnInitDialog()", "wParam", wParam, "lParam", lParam )
-   //MessageBox(, "TDIALOG Window Proc INIT DIALOG" )
    IF ::lInitialize
-      aEval( ::GetChildren(), ;
-             {|oItem| ;
-              WG_DebugTrace( "TDialog:OnInitDialog() - Initialize Children", "oItem:ClassName", oItem:ClassName, "oItem:nID", oItem:nID ),;
-              oItem:nHandle := GetDlgItem( ::nHandle, oItem:nID ), ; // Set nHandle
-              oItem:Init(), ; // Init controls
-              IIF( oItem:lDefault .AND. !lSetDefault, ( oItem:SetFocus(), lSetDefault := TRUE ), NIL ) ;
-             } )
-      IF lSetDefault
-         nRet := -1
-      ELSE
-         nRet := 0  // No default set, make defwndproc do this
-      ENDIF
-      // MessageBox(,"Impostati Handle ai controlli" )
-
-      // Active read getlist
-
+      nRet := ::Super:OnInitDialog( wParam, lParam )
 
       IF ::lStatusBar
          // Create SIMPLE status bar

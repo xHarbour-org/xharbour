@@ -174,7 +174,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnClose()                        VIRTUAL // FSG - to be implemented
     METHOD OnCloseWindow()                  VIRTUAL // FSG - to be implemented
     METHOD OnCreate( lParam )               VIRTUAL //INLINE ::Create( lParam )
-    METHOD OnDestroy()                      //VIRTUAL // FSG - to be implemented
+    METHOD OnDestroy()                      VIRTUAL
     METHOD OnDropFile()                     VIRTUAL // FSG - to be implemented
     METHOD OnEraseBackground()              VIRTUAL // FSG - to be implemented
     METHOD OnIdle()                         VIRTUAL // FSG - to be implemented
@@ -471,9 +471,6 @@ RETURN nRet
 //    nPrevHandleFocused := SetFocus( ::nHandle )
 // RETURN nPrevHandleFocused
 
-METHOD OnDestroy() CLASS TWindow
-   WG_DebugTrace( "TWindow:OnDestroy()", "Self", Self )
-RETURN -1
 
 METHOD OnNCDestroy() CLASS TWindow
    WG_DebugTrace( "TWindow:OnNCDestroy() - shrink array", "Self", Self )

@@ -87,9 +87,9 @@ METHOD New( cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bA
 
     ::bAction := bAction
 
-    IF !::oParent:IsDerivedFrom( "TDIALOG" )
-       ::Init()
-    ENDIF
+    //IF !::oParent:IsDerivedFrom( "TDIALOG" )
+    //   ::Init()
+    //ENDIF
 
 RETURN Self
 

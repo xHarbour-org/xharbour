@@ -101,7 +101,7 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
    SET WINDOW oWnd1 TITLE "Francesco's Window"
    //oWnd1:SetTitle( "Francesco's Window" )
 
-   SET WINDOW oWnd1 EVENTHANDLER {|hWnd, nMsg, wParam, lParam| MyEvent( hWnd, nMsg, wParam, lParam, oWnd1 ) }
+   SET WINDOW oWnd1 EVENTHANDLER {|hWnd, nMsg, wParam, lParam| MyEvent( hWnd, nMsg, wParam, lParam, oWnd1, oApp ) }
    //oWnd1:SetEventHandler( {|hWnd, nMsg, wParam, lParam| MyEvent( hWnd, nMsg, wParam, lParam, oWnd1 ) } )
 
    // oWnd1:Show()
@@ -112,7 +112,7 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
 
    APPLICATION ACTIVATE
    //oApp:Activate()
-   // APPLICATION QUIT -- Now called on exiting from application activate
+   // APPLICATION QUIT
    //oApp:Quit()
 
 return (0)
@@ -121,7 +121,7 @@ STATIC PROCEDURE Appl_Quit()
   // Here you can put your closing application calls
 RETURN
 
-FUNCTION MyEvent( hWnd, nMsg, wParam, lParam, oWnd )
+FUNCTION MyEvent( hWnd, nMsg, wParam, lParam, oWnd, oApp )
   LOCAL nRet := -1
   DO CASE
      CASE nMsg == WM_CLOSE
@@ -130,6 +130,7 @@ FUNCTION MyEvent( hWnd, nMsg, wParam, lParam, oWnd )
                           MB_YESNO) == IDYES)
               WG_DebugTrace( "DEMO_MyEvent - WM_CLOSE - Destroy Application Windows" )
               oWnd:Destroy()
+              oApp:Quit( 0 )
           ENDIF
           nRet := 0  // Something is done.
   ENDCASE

@@ -42,7 +42,6 @@ CLASS TFrame FROM TWindow
     METHOD SetTitle( cTitle ) INLINE ::SetValue( cTitle )
 
     METHOD OnCreate()
-    METHOD OnDestroy() VIRTUAL
     METHOD WindowProc()
 
     // Hidden methods
