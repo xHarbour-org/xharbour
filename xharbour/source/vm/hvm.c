@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.293 2003/12/05 05:25:56 jonnymind Exp $
+ * $Id: hvm.c,v 1.294 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -398,19 +398,7 @@ void hb_vmDoInitOle( void )
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
 #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-   PHB_DYNS pDynSymHbNoMouse;
-#endif
-
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-   }
-
-   /* No need to lock dynsyms: we are single thread now */
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-   pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
+   PHB_DYNS pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
 #endif
 
    #if defined(HB_OS_OS2)
@@ -437,6 +425,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    #endif
 
 #ifndef HB_THREAD_SUPPORT
+   HB_VM_STACK.pItems = NULL; /* keep this here as it is used by fm.c */
    HB_VM_STACK.Return.type = HB_IT_NIL;
    /* under threads, thread context have been already initialized */
 
@@ -466,6 +455,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
+
+   /* Under mt, this is done by static initializers */
+   #ifndef HB_THREAD_SUPPORT
+      HB_TRACE( HB_TR_INFO, ("stackInit" ) );
+      hb_stackInit();
+   #endif
 
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
