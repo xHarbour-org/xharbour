@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.8 2002/01/05 20:31:13 lculik Exp $
+ * $Id: filesys.c,v 1.9 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -145,6 +145,7 @@
       #include <dir.h>
       #include <dos.h>
       #include <windows.h>
+      extern int __NTerror     (void);
    #endif
 
    #if defined(_MSC_VER) || defined(__MINGW32__)
@@ -1113,6 +1114,14 @@ BOOL hb_fsDelete( BYTE * pFilename )
 
    errno = 0;
    bResult = ( unlink( ( char * ) pFilename ) == 0 );
+      #if defined(__DJGPP__) || defined(__RSX32__)
+         if (errno==22)
+            errno=2;
+         if (errno==4)
+            errno=5;
+
+      #endif
+
    s_uiErrorLast = errno;
 
 #elif defined(_MSC_VER) || defined(__MINGW32__)
@@ -1138,14 +1147,26 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
 
 #if defined(HB_OS_WIN_32)
-
+   errno=0;
    bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName );
-   s_uiErrorLast = ( USHORT ) GetLastError();
+   #if !defined(__BORLANDC__)
+      errno=GetLastError();
+   #else
+     __NTerror();
+   #endif
+
+
+   s_uiErrorLast = errno;
 
 #elif defined(HB_FS_FILE_IO)
 
    errno = 0;
    bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
+      #if defined(__DJGPP__) || defined(__RSX32__)
+         if (errno==22)
+            errno=2;
+      #endif
+
    s_uiErrorLast = errno;
 
 #else
@@ -1413,9 +1434,20 @@ BOOL    hb_fsMkDir( BYTE * pDirname )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
 
 #if defined(HB_OS_WIN_32)
-
+   errno=0;
    bResult = CreateDirectory( ( char * ) pDirname, NULL );
-   s_uiErrorLast = ( USHORT ) GetLastError();
+   if (!bResult)
+        #if !defined(__BORLANDC__)
+        errno=GetLastError();
+        #else
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+             errno=5;
+        else
+           __NTerror();
+        #endif
+
+      
+   s_uiErrorLast = errno;
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
@@ -1473,9 +1505,14 @@ BOOL    hb_fsRmDir( BYTE * pDirname )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRmDir(%s)", (char*) pDirname));
 
 #if defined(HB_OS_WIN_32)
-
+   errno=0;
    bResult = RemoveDirectory( ( char * ) pDirname );
-   s_uiErrorLast = ( USHORT ) GetLastError();
+   #if !defined(__BORLANDC__)
+      errno=GetLastError();
+   #else
+      __NTerror();
+   #endif
+   s_uiErrorLast = errno;
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 

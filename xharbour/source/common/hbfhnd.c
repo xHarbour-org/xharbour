@@ -1,5 +1,5 @@
 /*
- * $Id: hbfhnd.c,v 1.4 2002/01/15 00:21:16 dholm Exp $
+ * $Id: hbfhnd.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
    #ifdef _NFILE_
       #undef _NFILE_
    #endif
-   #define _NFILE_ 600
+   #define _NFILE_ 1250
    
    #include <stdio.h>
    #include <io.h>
