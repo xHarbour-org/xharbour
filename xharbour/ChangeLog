@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3314 2004/08/17 17:03:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3315 2004/08/17 19:32:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-18 15:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/compiler/harbour.c
+    ! Use of static BOOL hb_comp_bExternal was masking an intended
+      error condition.  I haven't seen the downside to commenting
+      out its use (yet?).
 
 2004-08-17 12:27 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/vm/estack.c

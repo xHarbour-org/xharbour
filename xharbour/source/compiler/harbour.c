@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.84 2004/07/21 20:59:48 ronpinkas Exp $
+ * $Id: harbour.c,v 1.85 2004/08/05 16:41:45 paultucker Exp $
  */
 
 /*
@@ -218,7 +218,12 @@ short          hb_comp_iGlobals;
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
  */
+/*
+  I don't see where this is needed  - pt
+  see 3 other occurrances of this variable
+
 static BOOL hb_comp_bExternal   = FALSE;
+*/
 
 /* Limit the warning that stop compilation into ambiguous reference only so
    that warnings on uninitialized locals would not stop compilation when
@@ -577,7 +582,9 @@ void hb_compExternAdd( char * szExternName ) /* defines a new extern name */
       }
       pLast->pNext = pExtern;
    }
+/*
    hb_comp_bExternal = TRUE;
+ */
 }
 
 void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType )
@@ -3113,13 +3120,17 @@ void hb_compLinePushIfInside( void ) /* generates the pcode with the currently c
    /* This line can be placed inside a procedure or function only
     * except EXTERNAL
     */
+/*
    if( ! hb_comp_bExternal )
    {
+ */
       if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
       }
+/*
    }
+ */
 
    hb_comp_functions.pLast->bFlags |= FUN_STATEMENTS;
    hb_compLinePush();
@@ -5239,7 +5250,10 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
   hb_xfree( pExtern );
   }
 */
+/*
          hb_comp_bExternal = FALSE;
+ */
+
       }
    }
    else
