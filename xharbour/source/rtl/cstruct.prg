@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.23 2004/01/10 05:51:26 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.24 2004/01/10 06:14:38 ronpinkas Exp $
  */
 
 /*
@@ -458,7 +458,7 @@ Function HB_CTypeArrayID( CType, nLen )
       Counter++
       __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
 
-      //TraceLog( "Registered: " + cArrayClassName, nID, Len( s_aArrayClasses ) )
+      //TraceLog( "Registered: " + cArrayClassName, nID, Len( s_aArrayClasses ), HB_SizeOfCStructure( aCTypes, 1 ), nLen )
    ELSE
       nID := s_aArrayClasses[nID][3]
       //TraceLog( "Reused: " + s_aClasses[nID][1], nID )
@@ -532,7 +532,7 @@ STATIC Function DeValue( lAdopt )
    LOCAL xProperty, nLen := Len( QSelf() ) - CLASS_PROPERTIES
    LOCAL Buffer := QSelf():InternalBuffer
 
-   //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ) )
+   //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ), lAdopt )
 
    IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
       aValues := Array( nLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.27 2003/12/10 18:30:23 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.28 2003/12/12 05:31:20 jonnymind Exp $
  */
 
 /*
@@ -471,4 +471,96 @@ STATIC FUNCTION Arguments( oErr )
    ENDIF
 
 RETURN cArguments
+
+#ifdef __PLATFORM__Windows
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbvm.h"
+#include "hbvmpub.h"
+#include "hbfast.h"
+#include "hbstack.h"
+#include "thread.h"
+
+#include "Windows.h"
+
+static PHB_FUNC s_xHbFunc;
+
+PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested );
+
+LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
+{
+   PHB_DYNS pExecSym;
+
+   hb_dynsymLock();
+   pExecSym = hb_dynsymFindFromFunction( s_xHbFunc );
+   hb_dynsymUnlock();
+
+   if( pExecSym )
+   {
+      HB_ITEM Exception;
+      PHB_DYNS pDyn = hb_dynsymFind( "HB_CSTRUCTURE" );
+
+      Exception.type = HB_IT_NIL;
+
+      //TraceLog( NULL, "%s(%p)\n", pExecSym->pSymbol->szName, ExceptionInfo );
+
+      if( pDyn )
+      {
+         hb_vmPushSymbol( pDyn->pSymbol );
+         hb_vmPushNil();
+         hb_itemPushStaticString( "EXCEPTION_POINTERS", 18 );
+         hb_vmPushLong( 8 );
+         hb_vmDo( 2 );
+
+         if( HB_VM_STACK.Return.type == HB_IT_OBJECT )
+         {
+            HB_ITEM Buffer, Adopt;
+
+            hb_itemForwardValue( &Exception, &HB_VM_STACK.Return );
+
+            Buffer.type = HB_IT_STRING;
+            Buffer.item.asString.value = (char *) ExceptionInfo;
+            Buffer.item.asString.length = sizeof( EXCEPTION_POINTERS );
+            Buffer.item.asString.bStatic = TRUE;
+
+            Adopt.type = HB_IT_LOGICAL;
+            Adopt.item.asLogical.value = FALSE;
+
+            hb_objSendMsg( &Exception, "Buffer", 2, &Buffer, &Adopt );
+         }
+      }
+
+      hb_vmPushSymbol( pExecSym->pSymbol );
+      hb_vmPushNil();
+      hb_itemPushForward( &Exception );
+      hb_vmDo( 1 );
+
+      //TraceLog( NULL, "Done\n" );
+   }
+
+   return hb_itemGetNL( &HB_VM_STACK.Return );
+}
+
+HB_FUNC( SETERRORMODE )
+{
+   hb_retni( SetErrorMode( hb_parni( 1 ) ) ) ;
+}
+
+HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
+{
+   LPTOP_LEVEL_EXCEPTION_FILTER pDefaultHandler;
+
+   s_xHbFunc = (PHB_FUNC) hb_parnl( 1 );
+
+   pDefaultHandler = SetUnhandledExceptionFilter( PRGUnhandledExceptionFilter );
+   //TraceLog( NULL, "Default: %p\n", pDefaultHandler );
+
+   hb_retnl( (long) pDefaultHandler );
+}
+
+#pragma ENDDUMP
+
+#endif
 *+ EOF: ERRORSYS.PRG

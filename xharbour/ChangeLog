@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2026 2004/01/10 05:51:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2027 2004/01/10 07:59:56 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-10 02:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstruct.prg
+  * source/vm/arrayshb.c
+    ! Fixed some GPF trap, and optimized.
+
+  * source/rtl/errorsys.prg
+    + Added (windows specific and guarded) support for registration of a PRG Function as a GPF Handler.
+
+  + include/hbexcept.ch
+    + New (windows specific and guarded) exception handling.
+
+  + tests/testgpf.prg
+    + New sample to demonstrate PRG level GPF Handler on Windows.
 
 2004-01-10 13:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
    * xharbour/source/rtl/gtwvt/gtwvt.c
