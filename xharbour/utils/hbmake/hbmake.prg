@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.93 2003/09/08 21:53:51 lculik Exp $
+ * $Id: hbmake.prg,v 1.94 2003/09/09 04:00:32 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1451,9 +1451,9 @@ cResname += cAllRes
          aAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
          IF s_lExtended
-            aAdd( s_aCommands, { ".prg.o:", "harbour -n  -go -I/usr/include/xharbour -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.o:", "harbour -n  -go -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
          ELSE
-            aAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
          ENDIF
 
       ELSE
