@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.216 2003/06/21 07:36:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.217 2003/06/21 09:28:41 ronpinkas Exp $
  */
 
 /*
@@ -4631,10 +4631,10 @@ void hb_vmDo( USHORT uiParams )
    PHB_ITEM pSelf;
    PHB_FUNC pFunc;
    BOOL     bDebugPrevState;
-   ULONG    ulClock = 0;
    int      iPresetBase = s_iBaseLine;
 
    #ifndef HB_NO_PROFILER
+      ULONG    ulClock = 0;
       BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
    #endif
 
@@ -4757,14 +4757,14 @@ void hb_vmSend( USHORT uiParams )
    PHB_ITEM       pSelf;
    PHB_FUNC       pFunc = NULL;
    BOOL           bDebugPrevState;
-   ULONG          ulClock = 0;
-   PMETHOD        pMethod = NULL;
    PHB_BASEARRAY  pSelfBase = NULL;
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
    BOOL           bConstructor = FALSE;
 
    #ifndef HB_NO_PROFILER
+      ULONG       ulClock = 0;
+      PMETHOD     pMethod = NULL;
       BOOL        bProfiler = hb_bProfiler; /* because profiler state may change */
    #endif
 
@@ -7403,7 +7403,7 @@ HB_FUNC( HB_RESTOREBLOCK )
 
             Block.type = HB_IT_BLOCK;
             Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
-            Block.item.asBlock.value->uLen = PCode.item.asString.length;
+            Block.item.asBlock.value->uLen = (USHORT) PCode.item.asString.length;
             Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
             Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
 
