@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.26 2004/03/03 01:33:37 ronpinkas Exp $
+ * $Id: direct.c,v 1.27 2004/03/03 04:48:39 ronpinkas Exp $
  */
 
 /*
@@ -261,6 +261,20 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    }
 }
 
+static char *hb_stripfilepath ( char *name )
+{
+    char *path_end;
+    path_end = strrchr (name, '\\');
+
+    if (path_end == NULL)
+        path_end = strrchr (name, '/');
+
+    if (path_end != NULL)
+        memmove (name, path_end + 1, strlen (path_end));
+
+    return (name);
+}
+
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, BOOL bMatchCase )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
@@ -272,8 +286,8 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       // Arbitary value which should be enough
       char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
 
-      Wild2RegEx( szFName, sRegEx, bMatchCase );
 
+      Wild2RegEx( szFName, sRegEx, bMatchCase );
       if ( szEntry[ strlen( szEntry ) - 1 ] != '.' )
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
@@ -288,6 +302,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
          }
          else
          {
+            hb_stripfilepath( szEntry );
             if( hb_strMatchRegExp( (const char *) szEntry, (const char *) sRegEx ) )
             {
                hb_arrayAddForward( pResult, pEntry );
@@ -309,7 +324,7 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    if( s_bTop )
    {
       cCurDsk = hb_fsCurDrv() ;
-      pCurDir = hb_strdup( hb_fsCurDir( cCurDsk ) );
+      pCurDir = (BYTE*) hb_strdup( (char*) hb_fsCurDir( (char) cCurDsk ) );
       s_bTop = FALSE;
    }
    else
@@ -334,7 +349,7 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
       sRoot[1] = '\0';
 
       hb_fsChDrv( (BYTE ) cCurDsk );
-      hb_fsChDir( sRoot );
+      hb_fsChDir( (BYTE*) sRoot );
       hb_fsChDir( pCurDir );
 
       hb_xfree( pCurDir );
