@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.19 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.20 2002/03/06 04:56:32 ronpinkas Exp $
  */
 
 /*
@@ -245,13 +245,13 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
    if( szText == NULL || szText[0] == '\0' )
    {
       pItem->item.asString.length = 0;
-      pItem->item.asString.value = s_sNull;
+      pItem->item.asString.value = (char *) s_sNull;
       pItem->item.asString.bStatic = TRUE;
    }
    else if( szText[0] == ' ' && szText[0] == '\0' )
    {
       pItem->item.asString.length = 1;
-      pItem->item.asString.value = s_sSpace;
+      pItem->item.asString.value = (char *) s_sSpace;
       pItem->item.asString.bStatic = TRUE;
    }
    else
