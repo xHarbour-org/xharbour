@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.15 2004/02/28 23:05:11 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.16 2004/03/02 12:58:13 andijahja Exp $
  */
 
 /*
@@ -655,9 +655,11 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
             if( pBlock  !=  NULL )
             {
                HB_ITEM FileName;
+               HB_ITEM Pos;
 
+               POS.type = HB_IT_NIL;
                FileName.type = HB_IT_NIL;
-               hb_vmEvalBlockV( pBlock, 1, hb_itemPutC( &FileName, ( char * )szFileNameInZip ) );
+               hb_vmEvalBlockV( pBlock, 2, hb_itemPutC( &FileName, ( char * )szFileNameInZip ),hb_itemPutNI(&Pos,iCause) );
 
                hb_itemClear( &FileName );
             }
