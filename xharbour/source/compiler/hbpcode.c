@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.20 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.21 2003/06/29 04:42:33 andijahja Exp $
  */
 
 /*
@@ -365,9 +365,7 @@ static BYTE s_pcode_len[] = {
 
 extern BOOL hb_comp_iGenVarList;
 extern FILE *hb_comp_pCodeList;
-
 static PCODELIST pCodeFirst = NULL;
-static BOOL bpCodeInit = FALSE;
 
 static PCODELIST hb_compPCodeList( PCODELIST pCodeCurrent, PCODELIST pCodeLast, char* pCodeName )
 {
@@ -448,11 +446,6 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
       {
          if( bWriteList )
          {
-            if( !bpCodeInit )
-            {
-               bpCodeInit = TRUE;
-            }
-
             pCodeLast = (PCODELIST) hb_xgrab( sizeof( PCODELIST ) );
 
             if( pCodeFirst )
@@ -464,7 +457,6 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
                pCodeFirst = hb_compPCodeList( pCodeCurrent, pCodeLast, pCodeList [ opcode ] );
                pCodeCurrent = pCodeFirst;
             }
-
          }
 
          usSkip = s_pcode_len[ opcode ];
@@ -507,7 +499,6 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
           pCodeTemp = pCodeFirst;
       }
 
-      bpCodeInit = FALSE;
       pCodeFirst = NULL;
    }
 }
