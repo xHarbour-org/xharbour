@@ -1,0 +1,60 @@
+#
+# File:		makelib.b32
+# Author:	Julian Smart
+# Created:	1999
+# Updated:	
+# Copyright:
+#
+# Include file for libraries. Set LIBTARGET and OBJECTS
+# before including this file.
+
+# WXWIN and BCCDIR are set by parent make
+
+!include $(WG_DIR)\env\makeb32.env
+
+lib: $(WOOPGUILIB) $(WAPILIB) $(UTILSLIB) $(WOOPGUIRES)
+
+#   $(rc) $(rcflags) $(rcvars) /fo$(LIBDIR)\$. $(SRCDIR)\$&.rc
+
+$(WOOPGUIRES): $(WOOPGUIRC)
+    $(rc) $(rcflags) $(rcvars) /fo$(LIBDIR)\$&.res $(SRCDIR)\$&.rc
+#   -erase $(WOOPGUIRES)
+#   $(rc) $(rcflags) $(rcvars) "$(SRCDIR)\$(WOOPGUIRC)" @&&!
+#+$(**: = &^
+#+)
+# 
+#!
+
+$(WOOPGUILIB): $(WOOPGUIOBJ)
+   -erase $(WOOPGUILIB)
+   $(lib) "$(WOOPGUILIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+
+$(WAPILIB): $(WAPIOBJ)
+   -erase $(WAPILIB)
+   $(lib) "$(WAPILIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+
+$(UTILSLIB): $(UTILSOBJ)
+   -erase $(UTILSLIB)
+   $(lib) "$(UTILSLIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+clean:
+        -erase *.obj
+        -erase *.exe
+        -erase *.res
+        -erase *.map
+        -erase *.rws
+        -erase $(WOOPGUILIB)
+        -erase $(UTILSLIB)
+
+
