@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3347 2004/08/27 03:09:35 walito Exp $
+ * $Id: ChangeLog,v 1.3348 2004/08/27 03:32:09 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-27 01:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  - contrib/libct
+  - contrib/winprn
+  * contrib/MakeFile
+  * makallvc.bat
+  * makallbc.bat
+    - contrib/libct
+  * makefile.nt
+  * makefile.bc
+  * makefile.vc
+  * makefile.wc
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+    + source/ct
+  * source/rtl/gtwin/gtwin.c
+    + Alt-Numpad support.
+    ! temp numpad del key fix - other proper fixes coming.
+    * Note: This likely disables things like K_ALT_UP to K_ALT_PGDN from the
+    * keypad.  ... you can't have both!  (ATM, it may also disable these key
+    * combos when using the dedicated keys to the left of the numpad - that's
+    * a side effect of the way gtwin determines keystrokes (being fixed now)
 
 2004-08-27 00:05 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * source/vm/thread.c
