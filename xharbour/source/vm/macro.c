@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.23 2003/05/26 18:09:43 mlombardo Exp $
+ * $Id: macro.c,v 1.24 2003/07/13 19:34:34 jonnymind Exp $
  */
 
 /*
@@ -1223,7 +1223,8 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
 
       if( pSym )
       {
-         if( HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->pFunPtr == NULL )
+         if( ! pSym->hArea &&
+	     (HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->pFunPtr == NULL ) )
          {
             HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
             HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */

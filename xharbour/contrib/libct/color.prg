@@ -1,5 +1,5 @@
 /*
- * $Id: color.prg,v 1.3 2002/09/25 18:03:16 mbirdyg Exp $
+ * $Id: color.prg,v 1.1 2003/03/04 21:04:21 lculik Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ FUNCTION NTOCOLOR( nColor, lChar )
 
   DEFAULT lChar TO .f.
 
-  if valtype( nColor ) == "N" .and. nColor > 0 .and. nColor < 256
+  if valtype( nColor ) == "N" .and. nColor >= 0 .and. nColor < 256
 
      nColorFore = nColor % 16
      nColorBack = INT( nColor / 16 )

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.22 2003/05/06 08:53:08 druzus Exp $
+ * $Id: set.c,v 1.23 2003/07/01 08:17:45 ronpinkas Exp $
  */
 
 /*
@@ -1090,7 +1090,8 @@ void hb_setInitialize( void )
    hb_set.HB_SET_CONSOLE = TRUE;
    hb_set.HB_SET_DATEFORMAT = ( char * ) hb_xgrab( 9 );
    memcpy( hb_set.HB_SET_DATEFORMAT, "mm/dd/yy", 9 );
-   hb_set.HB_SET_DEBUG = TRUE;
+   /* hb_set.HB_SET_DEBUG = TRUE; */
+   hb_set.HB_SET_DEBUG = hb_dynsymFind( "__DBGENTRY" ) ? TRUE : FALSE;
    hb_set.HB_SET_DECIMALS = 2;
    hb_set.HB_SET_DEFAULT = ( char * ) hb_xgrab( 1 );
    hb_set.HB_SET_DEFAULT[ 0 ] = '\0';

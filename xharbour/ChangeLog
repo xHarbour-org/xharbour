@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1302 2003/07/27 15:06:39 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1303 2003/07/27 20:15:09 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-29 18:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/set.c
+    ! in hb_setInitialize() hb_set.HB_SET_DEBUG = TRUE; changed to
+      hb_set.HB_SET_DEBUG = hb_dynsymFind( "__DBGENTRY" ) ? TRUE : FALSE;
+      to avoid problem with linking debugger when user have to call ALTD(0)
+      for using K_ALT_D and K_ALT_DOWN.
+      It's a work around and I still vote to move ALTD() function from
+      lib debug to libvm or librtl
+
+  * xharbour/source/vm/macro.c
+    ! bug in TYPE( "FUNC(ALIAS->FIELD)" ) fixed. if FUNC, ALIAS and
+      FIELD exist TYPE should return "UI" not "U"
+
+  * xharbour/contrib/libct/color.prg
+    ! bug in ntocolor(0) fixed
 
 2003-07-27 22:13 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/memvars.c
