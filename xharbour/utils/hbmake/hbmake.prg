@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.28 2002/07/10 00:55:42 lculik Exp $
+ * $Id: hbmake.prg,v 1.29 2002/07/13 22:53:10 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -130,7 +130,9 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
         RETURN NIL
 
     ENDIF
-
+    if upper(OS()) == "WINDOWS XP"
+         cLinker := "makefile.tmp"
+    endif
     SET DATE Ansi
     SET SCORE Off
     SET CENTURY ON
@@ -1388,11 +1390,11 @@ FUNC crtmakfile( cFile )
 
         IF lExtended
 
-            Aadd( aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + if(lFwh," -I$(FWH)\include" ,if(lMinigui," -I$(MINIGUI)" , "" )) +" -o$* $**" } )
+            Aadd( aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + if(lFwh," -I$(FWH)\include" ,if(lMinigui," -I$(MINIGUI)\include" , "" )) +" -o$* $**" } )
 
         ELSE
 
-            Aadd( aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + if(lFwh," -I$(FWH)\include" ,if(lMinigui," -I$(MINIGUI)" , "" )) +" -o$* $**" } )
+            Aadd( aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + if(lFwh," -I$(FWH)\include" ,if(lMinigui," -I$(MINIGUI)\include" , "" )) +" -o$* $**" } )
 
         ENDIF
 
@@ -1484,7 +1486,7 @@ FUNC crtmakfile( cFile )
             cTopFile := pickfile( "*.prg" )
 
         ELSE
-
+            asort(ain)
             cTopFile := pickafile( ain )
 
         ENDIF
