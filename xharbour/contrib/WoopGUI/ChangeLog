@@ -1,114 +1,16 @@
-                      WoopGUI - Win32 OOP GUI library for Harbour
-                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                     (C) Francesco Saverio Giudice <fsgiudice@iow.it>
+/*
+ * $Id: ChangeLog,v 1.376 2002/09/06 10:49:52 andijahja Exp $
+ */
 
-                             What's new in the last version
-                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
 
+2002-08-31 20:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/CMenu.c
+    * Reinstated OnContextMenu() definition because of compiler warning.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[!] Important
-[+] New
-[-] Fixed error
-[*] Changes
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-2002-09-06 August Infante  Started to remove API calls already in What32.lib - updated makefile.bc
-           so far i have built demo.exe successfully
-
-
-
-
-WoopGUI 1.03 ( 2002-06-02 ) alpha release (for the moment this changelog isn't aligned with files
-~~~~~~~~~~~~~~~~~~~~~~~~~~                 because the changes are so much)
-
-[!] Rewrite the core of event handler. Now it is possibile to associate a Window Proc to 
-    many controls so you can define your event managment.
-    Thanks to Andy Wos e Manu Exposito for suggestions.
-    Look SET WINDOW oWnd1 EVENTHANDLER command in \tests\demo.prg and search WindowProc methods
-    in source file to see the mechanism.
-    Write initial preprocessor commands.
-    Dialog windows not function properly. No tabs. No key accellerators. 
-    This version had as goal to create a stable OOP core. On next release i hope to fix dialogs
-    and add all basic controls.
-
-[+] Preprocessor commands. Look at include\woopgui.ch for syntax. Some parts are not functionally
-    only for idea. Some ideas from Fivewin.ch.
-    
-[*] Break WoopGUI.lib in three parts: WoopGUI.lib, WAPILIB.lib and UTILS.lib
-    The goal is to include WHAT32.lib in place of WAPILIB.lib (Let's go Andy & friends !)
-
-[+] ArrayFunc.prg - contains utility functions
-[+] CGDI.c        - Added SelectObj and DeleteObj functions
-[*] corrected system of windows coordinates.  It was invert :-O
-[+] Added GetActiveWindow() and SetActiveWindow() functions.
-[+] Added MenuFunc.prg - Menu functions for Menu preprocessor commands. Now it is possible to 
-    create theorically infinite nested menus.
-[+] Added NewExtended() Method to many class so we have a basic New() method with essetial parameters
-    and NewExtended() method for preprocessor command.
-[+] Added Var management for controls. So you can use a var to retrieve value inside program without
-    need to call methods.
-[+] Added TApplication:EventsWrite() methos with related. If active you can have a file which
-    contains event calls. For debbugging purpose.
-[+] Added TRadioGroup Class that is a service class to manage a group of RadioButtons.
-    With this class it is possible to display vertical or horizontal group of Radio Buttons.
-[+] Added TStack class. Basically for menus.
-
-[*] A lot of fixes.
-
-WoopGUI 1.02 ( 2002-05-22 )
-~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-
-[*] Changed name of the class TForm in TFrame as wxWindows defines
-
-[*] Changed name of TFrame:InitStatusBar in TFrame:CreateStatusBar as wxWindows
-
-[+] TFont, TStatic and TStaticText classes added
-
-[!] rewrite many part of base class TWindow basing on class define from wxWindow
-
-[*] many parts
-
-
-WoopGUI 1.01 ( 2002-05-18 )
-~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-
-[+] Add this changelog.txt
-
-[*] Add TApplication:Activate() that run MainLoop() function (Thanks to Ron Pinkas)
-
-[-] Erased #pragma BEGINDUMP/ENDDUMP line from C source (Thanks to Ron Pinkas)
-
-[*] Change Windows.ch to add various #define from window.ch
-
-[+] Add Calling Virtual Method TControl:GetValue() [as standard message name to retrieve value]
-
-[-] Change Calling Message name for TComboBox:GetCurSel() [which is c api function name]
-    to TComboBox:GetValue() [as standard message name to retrieve value]
-
-[+] Add GetValue() Method to TButton
-    Add GetValueAsString() Method to TControl
-    
-[*] In TControl:New() add AddControl() call to add to parent window controls i create
-
-[+] Add file called version_x.xx where x.xx show the current version of library
-
-[*] Made some some minor corrections in capplication.c cwindow.c and cmenu.c
-    (Thanks to Ron Pikas)
-    
-[+] Add TIniFile() Class from sample file by Ron Pinkas
-
-[+] Add TForm Class from which derives all standard windows (like application)
-    and TDialog Class from which derives all dialog windows
-    
-[+] and more ....
-
-
-WoopGUI 1.00 ( 2002-05-15 )
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[+] Initial public release
+  * tests/Bld_b32.bat
+    * Corrected path to what32.lib to be relative.

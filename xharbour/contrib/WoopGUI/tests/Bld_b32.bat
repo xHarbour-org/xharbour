@@ -6,7 +6,7 @@ if exist error.log del error.log
 set HB_INSTALL=..\..\..
 set WGUI_INSTALL=..
 set BCC_DIR=c:\bcc55
-set WHAT32_LIB=c:\what32a\lib
+set WHAT32_LIB=..\..\what32\lib
 ECHO Compiling...
 
 %HB_INSTALL%\bin\harbour %1 -p -n -w -i%HB_INSTALL%\include;%WGUI_INSTALL%\include > clip.log

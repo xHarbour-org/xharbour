@@ -1,0 +1,37 @@
+#
+# File:		makefile.b32
+# Author:	Francesco Saverio Giudice (on a makefile by Julian Smart)
+# Created:	2002
+# Updated:	
+# Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
+#
+# Makefile : Builds woopgui library (Harbour & BC++ 32-bit)
+
+# Global paths
+#
+HBR_DIR=..\..
+BCC_DIR=c:\bcc55
+WH_DIR=.
+
+
+!include <env\bccwin32.mak>
+
+# library
+#
+WHAT32LIB  = lib\what32.lib
+
+WHAT32OBJ  = _winbrsh.obj    _wincall.obj    _winclpb.obj    _wincret.obj    _windate.obj \
+             _windc.obj      _windll.obj     _windraw.obj    _winfont.obj    _winhead.obj \
+             _winicon.obj    _winilst.obj    _winini.obj     _winkbrd.obj    _winlv.obj   \
+             _winmapi.obj    _winmem.obj     _winmenu.obj    _winmeta.obj    _winmous.obj \
+             _winmsg.obj     _winpen.obj     _winprn.obj     _winrect.obj    _winreg.obj  \
+             _winrgn.obj     _winscrlb.obj   _wintab.obj     _wintext.obj    _winview.obj \
+             _winbmp.obj     _wincdlg.obj    _wincomm.obj    _windir.obj     _windlg.obj  \
+             _wingdi.obj     _winmain.obj    _winmisc.obj    _winshell.obj   _winsys.obj  \
+             _winwnd.obj                                                                  \
+             Debug.obj ErrorSys.obj WhatUtil.obj WinIni.obj WinCDlg.obj WinComm.obj       \
+             WinCore.obj
+             
+          
+!include $(WH_DIR)\env\makelib.b32
+

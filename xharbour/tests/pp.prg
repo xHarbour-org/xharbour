@@ -4172,7 +4172,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         nOptional := 0
 
                         IF bDbgMatch
-                           ? "Nested last optional, Rewinded to:", nMatch
+                           ? "1 - Nested last optional, Rewinded to:", nMatch
                         ENDIF
 
                         LOOP
@@ -4222,7 +4222,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         nOptional := 0
 
                         IF bDbgMatch
-                           ? "Nested last optional, Rewinded to:", nMatch
+                           ? "2 - Nested last optional, Rewinded to:", nMatch
                         ENDIF
 
                         LOOP

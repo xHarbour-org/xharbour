@@ -83,8 +83,9 @@ VOID APIENTRY DisplayContextMenu(HWND hwnd, POINT pt, HMENU hmenu)
     // Destroy the menu. 
  
     //DestroyMenu(hmenu); 
-} 
-/*                                          
+}
+ 
+                                          
 BOOL WINAPI OnContextMenu(HWND hwnd, int x, int y, HMENU hmenu) 
 { 
     RECT rc;                    // client area of window 
@@ -114,7 +115,8 @@ BOOL WINAPI OnContextMenu(HWND hwnd, int x, int y, HMENU hmenu)
  
     return FALSE; 
 } 
-*/
+
+
 HB_FUNC( WG_ONCONTEXTMENU )
 {
    HWND  hwnd  = (HWND)  hb_parnl( 1 );  // Window handle

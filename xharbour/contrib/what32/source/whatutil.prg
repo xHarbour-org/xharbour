@@ -8,7 +8,7 @@
 
 #Include 'wintypes.ch'
 #Include 'cstruct.ch'
-#Define CTYPE_BOOL 5
+//#Define CTYPE_BOOL 5
 
 //#DEFINE NTRIM( n ) AllTrim( str( n ) )
 
