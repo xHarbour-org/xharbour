@@ -2,22 +2,18 @@
 
 #ifndef _DEFINE_TYPES_
 
-  #translate TYPEDEFINE <typename> = (<list,...>) =>;
-        GLOBAL EXTERNAL <list>
+  #xcommand TYPEDEFINE <typename> = (<list,...>) => GLOBAL EXTERNAL <list>
 
-  #translate TYPEDEFINE <typename> = (<list,...>) AS VALUES =>
+  #xcommand TYPEDEFINE <typename> = (<list,...>) AS VALUES =>
 
 #else
 
   #ifdef _TYPE_GLOBAL_DECLARATION_
-     #translate TYPEDEFINE <typename> = (<list,...>) =>;
-                GLOBAL <list>
-     #translate TYPEDEFINE <typename> = (<list,...>) AS VALUES =>
+     #xcommand TYPEDEFINE <typename> = (<list,...>) => GLOBAL <list>
+     #xcommand TYPEDEFINE <typename> = (<list,...>) AS VALUES =>
   #else
-     #translate TYPEDEFINE <typename> = (<list,...>) =>;
-          hb_declareType( <"typename">, {<"list">} )
-     #translate TYPEDEFINE <typename> = (<list,...>) AS VALUES =>;
-          hb_declareTypeAsValues( <"typename">, {<list>} )
+     #xcommand TYPEDEFINE <typename> = (<list,...>) => hb_declareType( <"typename">, {<"list">} )
+     #xcommand TYPEDEFINE <typename> = (<list,...>) AS VALUES => hb_declareTypeAsValues( <"typename">, {<list>} )
   #endif
 
 #endif
@@ -76,7 +72,7 @@ TYPEDEFINE TResType = (rtBitmap, rtCursor, rtIcon)
 
 //  type TOverlay = 0..3;
 
-TYPEDEFINE TOverlay = ( 0, 1, 2, 3 ) AS VALUE
+TYPEDEFINE TOverlay = ( 0, 1, 2, 3 ) AS VALUES
 
 // ------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.87 2003/10/25 23:03:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.88 2003/10/26 03:34:11 ronpinkas Exp $
  */
 
 /*
@@ -134,8 +134,8 @@ static int    WorkTranslate( char *, char *, COMMANDS *, int * );
 static int    CommandStuff( char *, char *, char *, int *, BOOL, BOOL );
 static int    RemoveSlash( char *, BOOL );
 static int    WorkMarkers( char **, char **, char *, int *, BOOL );
-static int    getExpReal( char *, char **, BOOL, int, BOOL );
-static BOOL   isExpres( char *, BOOL );
+static int    getExpReal( char *, char **, char, int, BOOL );
+static BOOL   isExpres( char *, char );
 static BOOL   TestOptional( char *, char * );
 static BOOL   CheckOptional( char *, char *, char *, int *, BOOL, BOOL );
 static void   SkipOptional( char ** );
@@ -2687,7 +2687,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
                      *ptri += lenreal;
                   }
                }
-               else if( isExpres( expreal, *(exppatt+2) == '1' ) )
+               else if( isExpres( expreal, *(exppatt+2) ) )
                {
                   //printf( "Accepted: >%s<\n", expreal );
                   *ptri += lenreal;
@@ -2724,7 +2724,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      /* Copying a real expression to 'expreal' */
      if( !lenreal )
      {
-        lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '5', maxlenreal, FALSE );
      }
 
      //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
@@ -2740,7 +2740,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   }
   else if( *(exppatt+2) == '4' )       /*  ----  extended match marker  */
   {
-     if( !lenreal ) lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
+     if( !lenreal ) lenreal = getExpReal( expreal, ptri, '4', maxlenreal, FALSE );
      {
         SearnRep( exppatt,expreal,lenreal,ptro,lenres);
      }
@@ -2776,7 +2776,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
            {
               rezrestr = 1;
               /*  (*ptri)++; */
-              lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
+              lenreal = getExpReal( expreal, ptri, '2', maxlenreal, FALSE );
               SearnRep( exppatt,expreal,lenreal,ptro,lenres);
               break;
            }
@@ -2821,7 +2821,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      if( !lenreal )
      {
-        lenreal = getExpReal( expreal, ptri, TRUE, maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '1', maxlenreal, FALSE );
 
         #if 0
            printf( "List Len: %i Exp: %s\n", lenreal, expreal );
@@ -2843,7 +2843,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      if( ! lenreal )
      {
         //printf( "Getting >%s<\n", *ptri );
-        lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '0', maxlenreal, FALSE );
      }
 
      //printf("Len: %i Pat: >%s< Exp: >%s<\n", lenreal, exppatt, expreal );
@@ -2861,7 +2861,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   return 1;
 }
 
-static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BOOL bStrict )
+static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxrez, BOOL bStrict )
 {
    int lens = 0;
    char * sZnaki = "+-=><*/$.:#%!^";
@@ -2880,12 +2880,12 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    char cLastChar = '\0';
    /* Ron Pinkas end 2000-06-17 */
 
-   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict));
+   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, bStrict));
 
    //#define DEBUG_EXP
 
    #ifdef DEBUG_EXP
-      printf( "\ngetExpReal( %p, '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
+      printf( "\ngetExpReal( %p, '%s', %d, %i, %d )\n", expreal, *ptri, cMarkerType, maxrez, bStrict );
    #endif
 
    HB_SKIPTABSPACES( *ptri );
@@ -2897,7 +2897,6 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    {
       return 0;
    }
-
 
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
@@ -3123,7 +3122,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             {
                if( **ptri == ',' )
                {
-                  if( ! prlist )
+                  if( cMarkerType != '1' )
                   {
                      rez = TRUE;
                   }
@@ -3164,56 +3163,194 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                else
                /* Ron Pinkas end 2000-06-02 */
                {
+                  int i;
+
+                  /* Ron Pinkas added 2003-10-25 */
                   if( **ptri == '.' )
                   {
-                     if( lens == 0 || isspace( *(*ptri - 1) ) || *(*ptri + 1) == '\0' )
+                     if( cMarkerType == '4' || *(*ptri + 1) == '\0' )
                      {
-                        // always accept as new top or as terminator.
+                        // always accept as extended marker, or end of stream.
+                        State = STATE_ID;
                      }
                      else if( isdigit( *(*ptri + 1) ) )
                      {
-                        if( lens && ! isdigit( *(*ptri - 1) ) )
+                        int iLen;
+
+                        for( iLen = 1; iLen < lens; iLen++ )
                         {
-                           //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
-                           rez = TRUE;
+                           //printf( "Back scan: %c %i of %i\n", *(*ptri - iLen), iLen, lens );
+
+                           if( isalpha( *(*ptri - iLen) ) )
+                           {
+                              //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
+                              rez = TRUE;
+                              break;
+                           }
+                           else if( ! isdigit( *(*ptri - iLen) ) )
+                           {
+                              break;
+                           }
+                        }
+
+                        if( rez == FALSE )
+                        {
+                           //printf( "Processing number: %s\n", *ptri );
+
+                           // grab the dot.
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+
+                           // grab while digits
+                           while( isdigit( **ptri ) )
+                           {
+                              //printf( "Grabing: %c\n", **ptri );
+
+                              if( expreal != NULL )
+                              {
+                                 *expreal++ = **ptri;
+                              }
+
+                              (*ptri)++;
+                              lens++;
+                           }
+
+                           //printf( "Stopper: %c\n", **ptri );
+
+                           if( isalpha( **ptri ) )
+                           {
+                              rez = TRUE;
+                           }
+                           else
+                           {
+                              State = STATE_ID_END;
+                              cLastChar = *(*ptri - 1);
+                              continue;
+                           }
                         }
                      }
                      else if( isalpha( *(*ptri + 1) ) || *(*ptri + 1) == '_' )
                      {
-                        if( lens && ! ( isalpha( *(*ptri - 1) ) || *(*ptri - 1) == '.' ) )
-                        {
-                           //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
-                           rez = TRUE;
-                        }
+                        // Accept even following a digit.
+                        State = STATE_ID;
                      }
 
                      if( ( *(*ptri + 1) == 'A' || *(*ptri + 1) == 'a' ) && ( *(*ptri + 2) == 'N' || *(*ptri + 2) == 'n' ) && ( *(*ptri + 3) == 'D' || *(*ptri + 3) == 'd' ) && *(*ptri + 4) == '.' )
                      {
+                        for( i = 1; i <= 5; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
                         State = STATE_EXPRES;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && ( *(*ptri + 2) == 'O' || *(*ptri + 2) == 'o' ) && ( *(*ptri + 3) == 'T' || *(*ptri + 3) == 't' ) && *(*ptri + 4) == '.' )
                      {
+                        for( i = 1; i <= 5; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
                         State = STATE_EXPRES;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'O' || *(*ptri + 1) == 'o' ) && ( *(*ptri + 2) == 'R' || *(*ptri + 2) == 'r' ) && *(*ptri + 3) == '.' )
                      {
+                        for( i = 1; i <= 4; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
                         State = STATE_EXPRES;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'T' || *(*ptri + 1) == 't' ) && *(*ptri + 2) == '.' )
                      {
-                        State = STATE_EXPRES;
+                        for( i = 1; i <= 3; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
+                        State = STATE_ID_END;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'F' || *(*ptri + 1) == 'f' ) && *(*ptri + 2) == '.' )
                      {
-                        State = STATE_EXPRES;
+                        for( i = 1; i <= 3; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
+                        State = STATE_ID_END;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'Y' || *(*ptri + 1) == 'y' ) && *(*ptri + 2) == '.' )
                      {
-                        State = STATE_EXPRES;
+                        for( i = 1; i <= 3; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
+                        State = STATE_ID_END;
+                        cLastChar = '.';
+                        continue;
                      }
                      else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && *(*ptri + 2) == '.' )
                      {
-                        State = STATE_EXPRES;
+                        for( i = 1; i <= 3; i++ )
+                        {
+                           if( expreal != NULL )
+                           {
+                              *expreal++ = **ptri;
+                           }
+
+                           (*ptri)++;
+                           lens++;
+                        }
+                        State = STATE_ID_END;
+                        cLastChar = '.';
+                        continue;
                      }
                   }
                   else
@@ -3221,6 +3358,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                      State = STATE_EXPRES;
                   }
                }
+               /* END - Ron Pinkas added 2003-10-25 */
 
                // Must terminate macro if any.
                bMacro = FALSE;
@@ -3314,7 +3452,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             }
             else if( **ptri == ',' )
             {
-               if( !prlist )
+               if( cMarkerType != '1' )
                {
                   rez = TRUE; State = STATE_EXPRES;
                }
@@ -3422,16 +3560,16 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    return lens;
 }
 
-static BOOL isExpres( char * stroka, BOOL prlist )
+static BOOL isExpres( char * stroka, char cMarkerType )
 {
-  int l1,l2;
+  int l1, l2;
 
   HB_TRACE(HB_TR_DEBUG, ("isExpres(%s)", stroka));
 
   //printf( "isExp: >%s<\n", stroka );
 
   l1 = strlen( stroka );
-  l2 = getExpReal( NULL, &stroka, prlist, HB_PP_STR_SIZE, TRUE );
+  l2 = getExpReal( NULL, &stroka, cMarkerType, HB_PP_STR_SIZE, TRUE );
 
   //printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
 

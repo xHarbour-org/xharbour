@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1629 2003/10/26 03:34:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1630 2003/10/26 18:41:43 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-26 12:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Clipper compatability of '.' handling in GetExpReal().
+      /*
+         In Extended Marker '.' should be accepted unconditionally.
+         In non Extended Marker '.' starts a new numeric exp if following charcater is a digit
+         even if preceding character is a digit which terminates and alphanumeric token
+         (identifier).
+
+         Once entering a numeric token, numeric extraction ends on first non digit character,
+         even if continues.
+
+         If character following a '.' is alpha it's accepted uncondtionally.
+       */
+
+  * contrib/Whoo/source/types.ch
+    % Optimized #translate to #xcommand.
 
 2003-10-20 19:38 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
    * source/rtl/gtwin/gtwin.c
