@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.41 2003/03/28 05:52:05 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.42 2003/04/29 23:55:40 ronpinkas Exp $
  */
 
 /*
@@ -1806,7 +1806,7 @@ IfEndif    : IfBegin EndIf                    { hb_compGenJumpHere( $1 ); }
            ;
 
 EmptyStatements : LineStat             { $<lNumber>$ = $<lNumber>1; }
-           | EmptyStatements LineStat  { $<lNumber>$ += $<lNumber>3; }
+           | EmptyStatements LineStat  { $<lNumber>$ += $<lNumber>2; }
            ;
 
 EmptyStats : /* empty */           { $<lNumber>$ = 0; }
