@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1961 2003/12/29 23:38:55 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1960 2003/12/29 22:29:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,6 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
 
 2003-12-30 00:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapigt.h
@@ -31,6 +30,127 @@
     ! Using the console to write timer data.
 
   * source/rtl/hblog.prg
+
+2003-12-29  14:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed wrong conversion of [...] to "..." when strotrim was called from CommandStuff()
+      by adding logic to reset s_bArray based on the value of the KEY of the rule.
+
+2003-12-29 22:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/watcom.cf
+    - removed -ol optimization
+
+  * xharbour/config/w32/watcom.cf
+    + added proper include directory
+
+  * xharbour/source/rtl/gtdos/gtdos.c
+    * time sync before tone for Clipper compatibility
+
+2003-12-29  11:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/rtl/seconds.c
+    * Added HB_EXPORT to hb_secondsCPU()
+
+  * source/rtl/gtwin/gtwin.c
+    * MSVC compilation
+
+2003-12-29 16:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * utils/hbdoc/genng.prg
+    utils/hbdoc/genrtf.prg
+     ! REPL() calls changes to replicate()
+
+2003-12-29 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/hbffind.c
+   ! added error 25 to winToDosError
+
+2003-12-29 10:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * xharbour/source/rtl/filesys.c
+   ! Fix to hb_fsWrite and hb_fsWriteLarge on Win32 api section, when number of bytes to write is 0
+
+2003-12-29 11:41 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/strfile.prg
+   * fixed strfile() - we still haven't SETSHARE()/GETSHARE()/SETFCREATE()
+     when they will be implemented this function has to be updated
+
+  * xharbour/source/rtl/filesys.c
+   * added errorcodes conversion for OpenWatcom.
+     full conversion table for all compilers is on my TODO list
+     but with low priority
+
+  * xharbour/source/rtl/gtpca/gtpca.c
+   ! small fix for OpenWatcom
+
+2003-12-29 14:26 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + added K_LDBLCLK & K_RDBLCLK support
+   + Turn off K_MOUSEMOVE handling by default ( see hbgtwvt.h )
+  * include/hbgtwvt.h
+   + added extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+   *     - allows mouse movement events to be handled
+
+2003-12-29 02:25 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + doc/en/bkgtsks.txt
+  * doc/en/set.txt
+    + Added background tasks documentation.
+
+2003-12-28 23:14 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/rules.cf
+   * small fixes
+
+  * xharbour/config/dos/djgpp.cf
+   * fixed include dirs
+
+  * xharbour/config/dos/watcom.cf
+   * fixed include dirs
+   * some optimizations enabled - Loernzo please check your sources
+     if it will break anything I would like to know so I'll rewert it.
+
+  * xharbour/xharbour.spec
+   * fixed missing "'" in PLD detection
+   * Aurox distro detection added
+
+  * xharbour/source/vm/errorapi.c
+   * small change to cause GPF in DJGPP for //ERRGPF switch.
+
+  * xharbour/contrib/libct/keyset.c
+   * fixed missing ")"
+
+  * xharbour/contrib/libct/files.c
+   * disabled some part of code to compile it with OpenWatcom
+     It should be reverted and OpenWatcom support added.
+
+  * xharbour/source/rtl/inkey.c
+   * replaced fixed 100 with sysconf(_SC_CLK_TCK)
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/idle.c
+   + added new function: void hb_idleSleep( double dSeconds )
+     we have new feature: background task, they should be served
+     in idle loops too. So instead of changing a lot of files
+     to add such support I created new function hb_idleSleep
+     and replaced all idle loops with timer I found with call to it.
+     I want to group all this functions in one place (Giancarlo,
+     I'm thinking about ThreadSleep too) and then add support for
+     asynchronous background task execution for these platforms where
+     it is possible eliminating counters, time checking and
+     keyboard polling from main VM loop just after 0.92
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+   * replaced idle loops with timer with hb_idleSleep()
+     Paul I live some comments in GTWIN gt_tone() function.
+     Can you read it and check if it works.
+
+  * xharbour/source/vm/Makefile
+   + thread.c has to be compiled on DOS too as far as it has functions
+     which are used in ST programs (SECONDSSLEEP())
+
+  * xharbour/source/vm/thread.c
+   + added support for DOS OpenWatcom
 
 2003-12-27 13:10 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/bkgtsks.c
