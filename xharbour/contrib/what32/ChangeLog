@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.23 2002/09/28 08:51:16 andy_wos Exp $
+ * $Id: ChangeLog,v 1.24 2002/09/28 11:23:47 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-28 23:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
+   * _WinINet.c
+     + Added prototypes for every function
+     * Some bug fixes
+     
 2002-09-28 16:45 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    + _WinINet.c
      * Internet functions related with FTP functionality.
