@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.49 2002/04/17 00:52:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.50 2002/04/17 01:33:07 ronpinkas Exp $
  */
 
 /*
@@ -3268,32 +3268,34 @@ static void hb_vmArrayPush( void )
    }
    else if( HB_IS_STRING( pArray ) )
    {
-      if( (long) ulIndex > 0 )
-      {
-         ulIndex--;
-      }
-      else if( (long) ulIndex < 0 )
-      {
-         (long) ulIndex += pArray->item.asString.length;
+	  long lIndex = (long) ulIndex;
 
-         if( (long) ulIndex < 0 )
+      if( lIndex > 0 )
+      {
+         lIndex--;
+      }
+      else if( lIndex < 0 )
+      {
+         lIndex += pArray->item.asString.length;
+
+         if( lIndex < 0 )
          {
-            ulIndex = 0;
+            lIndex = 0;
          }
       }
 
       hb_stackPop();
 
-      if( ulIndex < pArray->item.asString.length )
+      if( lIndex < pArray->item.asString.length )
       {
          if( pArray->item.asString.bStatic )
          {
-            pArray->item.asString.value  = (char *) ( hb_vm_acAscii[ (int) ( pArray->item.asString.value[ulIndex] ) ] );
+            pArray->item.asString.value  = (char *) ( hb_vm_acAscii[ (int) ( pArray->item.asString.value[lIndex] ) ] );
             pArray->item.asString.length = 1;
          }
          else
          {
-            unsigned char cChar = pArray->item.asString.value[ulIndex];
+            unsigned char cChar = pArray->item.asString.value[lIndex];
 
             hb_itemReleaseString( pArray );
 
