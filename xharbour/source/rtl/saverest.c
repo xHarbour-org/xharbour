@@ -1,5 +1,5 @@
 /*
- * $Id: saverest.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: saverest.c,v 1.4 2002/10/22 02:08:33 paultucker Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( SAVESCREEN )
    void * pBuffer;
 
    hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
-   pBuffer = hb_xgrab( uiSize );
+   pBuffer = hb_xgrab( uiSize +1 );  /* why +1? */
 
    hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
    hb_retclenAdopt( ( char * ) pBuffer, uiSize );
