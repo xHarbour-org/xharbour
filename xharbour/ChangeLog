@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3796 2005/02/06 15:52:01 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.3797 2005/02/06 20:35:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-08 14:44 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * tests/wincheck.prg
+     ! it was not fixing registry when it have to.
 
 2005-02-06 21:06 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

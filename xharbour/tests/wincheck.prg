@@ -52,25 +52,30 @@ PROCEDURE MAIN()
   ELSE
     ? "NO Windows Terminal Server Client detected"
   ENDIF
-  ?
-  ? 'Checking and setting network for Windows'
-  ? '----------------------------------------'
-  ?
-  IF OS_ISWTSCLIENT() .AND. !OS_NETREGOK()
-    ? 'Registry on WTS server is not set correctly for networking.'
-  ELSEIF OS_NETREGOK( .T. )
-    ? 'Registry set OK for networking'
-  ELSE
-    ? 'Failed to set registry - May need "Administrator" rights'
-  ENDIF
-  ?
-  IF !OS_NETVREDIROK( @nResult )
-    ? 'Invalid RVREDIR.VXD file installed'
-    IF nResult = 950
-      ? 'You need file VREDRUPD.EXE if your vredir.vxd is dated "09:50:00"'
-    ELSEIF nResult == 1111
-      ? 'You need file VRDRUPD.EXE if your vredir.vxd is dated "11:11:10"'
-    ENDIF
-  ENDIF
-  WAIT
-  RETURN
+
+   ?
+   ? 'Checking and setting network for Windows'
+   ? '----------------------------------------'
+   ?
+   IF OS_ISWTSCLIENT() .AND. !OS_NETREGOK()
+      ? 'Registry on WTS server is not set correctly for networking.'
+      IF OS_NETREGOK( .T. )
+         ? 'Registry set OK for networking'
+      ELSE
+         ? 'Failed to set registry - May need "Administrator" rights'
+      ENDIF
+   ENDIF
+   ?
+
+   IF !OS_NETVREDIROK( @nResult )
+      ? 'Invalid RVREDIR.VXD file installed'
+      IF nResult = 950
+         ? 'You need file VREDRUPD.EXE if your vredir.vxd is dated "09:50:00"'
+      ELSEIF nResult == 1111
+         ? 'You need file VRDRUPD.EXE if your vredir.vxd is dated "11:11:10"'
+      ENDIF
+   ENDIF
+
+   WAIT
+
+RETURN
