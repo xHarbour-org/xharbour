@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.336 2004/02/25 15:10:58 lculik Exp $
+ * $Id: hvm.c,v 1.337 2004/02/25 15:32:49 lculik Exp $
  */
 
 /*
@@ -5001,7 +5001,7 @@ static void hb_vmArrayPop( void )
             }
 
             pArray->item.asString.value           =  sNew;
-            pArray->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+            pArray->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
             *( pArray->item.asString.puiHolders ) = 1;
             pArray->item.asString.bStatic         = FALSE;
          }
