@@ -24,35 +24,44 @@ Static lStillOpen := .F.
 */
 Function FileCopy(cSource, cDest, lMode)
 
-Local nDestHand
-Local cBuffer   := Space(F_BLOCK)
-Local lDone     := .F.
-Local nSrcBytes, nDestBytes, nTotBytes := 0
+  Local nDestHand
+  Local cBuffer   := Space(F_BLOCK)
+  Local lDone     := .F.
+  Local nSrcBytes, nDestBytes, nTotBytes := 0
 
-lStillOpen := .F.
-nSrcHand := fOpen(cSource, FO_READ)
-nDestHand := fCreate(cDest)
+  lStillOpen := .F.
+  nSrcHand := fOpen(cSource, FO_READ)
 
-Do while ! lDone
-   nSrcBytes  := fRead(nSrcHand, @cBuffer, F_BLOCK)
-   nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
-   if nDestBytes < nSrcBytes
-      lStillOpen := .T.
-      lDone      := .T.
-   else
-      lDone := (nSrcBytes == 0)
-   endif
-   nTotBytes += nDestBytes
-Enddo
-if lStillOpen
-   fSeek(nSrcHand, nTotBytes, FS_SET)
-else
-   /* 28/04/2004 - <maurilio.longo@libero.it>
-      Since lMode is not supported (fully, at least) if file has been fully copyed into destination
-      close source file handle or else it stays open */
-   fClose(nSrcHand)
-endif
-fClose(nDestHand)
+  IF nSrcHand > 0
+
+  	nDestHand := fCreate(cDest)
+
+ 	  IF nDestHand > 0
+			Do while ! lDone
+			   nSrcBytes  := fRead(nSrcHand, @cBuffer, F_BLOCK)
+			   nDestBytes := fWrite(nDestHand, cBuffer, nSrcBytes)
+			   if nDestBytes < nSrcBytes
+			      lStillOpen := .T.
+			      lDone      := .T.
+			   else
+			      lDone := (nSrcBytes == 0)
+			   endif
+			   nTotBytes += nDestBytes
+      Enddo
+
+	//		if lStillOpen
+	//		   fSeek(nSrcHand, nTotBytes, FS_SET)
+	//		else
+			   /* 28/04/2004 - <maurilio.longo@libero.it>
+			      Since lMode is not supported (fully, at least) if file has been fully copyed into destination
+			      close source file handle or else it stays open */
+			   fClose(nSrcHand)
+	//		endif
+			fClose(nDestHand)
+    ELSE
+	  	fClose(nSrcHand)
+	  ENDIF
+	endif
 Return(nTotBytes)
 
 /***/

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3196 2004/07/22 20:18:37 kaddath Exp $
+ * $Id: ChangeLog,v 1.3197 2004/07/22 21:21:08 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-23 09:56 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/libct/fcopy.prg
+    - FILECOPY( cSource, cDest ) fixed so that cDest is not overwritten if cSource cannot be opened
+
 2004-07-23 09:25 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/gtwvt/gtwvt.c
     - hb_wvt_gtGetColRowFromXYRect() fixed for when updateRect EXACTLY overlays text characters
