@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.6 2002/06/14 18:32:51 ronpinkas Exp $
+ * $Id: getsys.prg,v 1.7 2002/06/21 20:34:54 walito Exp $
  */
 
 /*
@@ -173,9 +173,18 @@ PROCEDURE GetReader( oGet )
    RETURN
 
 FUNCTION GetActive( oGet )
+   
+   STATIC oDefaultGet
+   
    LOCAL oGetList := __GetListActive()
 
-   IF oGetList != NIL
+   IF oGetList == NIL
+      IF PCount() >= 1
+         oDefaultGet := oGet  
+      ENDIF   
+      
+      RETURN oDefaultGet
+   ELSE
       IF PCount() >= 1
          RETURN oGetList:GetActive( oGet )
       ELSE
@@ -183,7 +192,7 @@ FUNCTION GetActive( oGet )
       ENDIF
    ENDIF
 
-   RETURN NIL
+RETURN NIL
 
 PROCEDURE GetDoSetKey( keyBlock, oGet )
    LOCAL oGetList := __GetListActive()
