@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.73 2003/08/05 10:20:51 ronpinkas Exp $
+ * $Id: classes.c,v 1.74 2003/08/15 22:17:26 ronpinkas Exp $
  */
 
 /*
@@ -521,7 +521,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
 
          if( pRealClass->pModuleSymbols == NULL || pBlockModuleSymbols == NULL )
          {
-            TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->procname );
+            // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->procname );
          }
          else
          {
@@ -541,7 +541,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
       {
          if( pRealClass->pModuleSymbols == NULL || (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols == NULL )
          {
-            TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
+            // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
          }
          else
          {
@@ -1696,6 +1696,7 @@ HB_FUNC( __CLSNEW )
    pNewCls->uiDatas = 0;
    pNewCls->uiMethods = 0;
    pNewCls->uiDatasShared = 0;
+   pNewCls->pModuleSymbols = NULL;
 
    if( uiSuper )
    {
@@ -1907,8 +1908,8 @@ HB_FUNC( __CLSNEW )
       pNewCls->pClassDatas    = hb_itemArrayNew( 0 );
       pNewCls->pInlines       = hb_itemArrayNew( 0 );
       pNewCls->pFunError      = NULL;
-      pNewCls->pModuleSymbols = NULL;
    }
+
    hb_itemRelease( pahSuper );
 
    HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
