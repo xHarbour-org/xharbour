@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.68 2003/09/10 06:07:31 ronpinkas Exp $
+ * $Id: arrays.c,v 1.69 2003/09/10 06:40:56 ronpinkas Exp $
  */
 
 /*
@@ -987,10 +987,15 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
    if( pBaseArray->pItems )
    {
-      HB_ITEM_PTR pItem = pBaseArray->pItems; //, pValue;
+      HB_ITEM_PTR pItems = pBaseArray->pItems, pItem; //, pValue;
       ULONG ulLen = pBaseArray->ulLen;
 
       //TraceLog( NULL, "Releasing BaseArray %p\n", pBaseArray );
+
+      // HACK! Avoid possible recursion problem when one of the items in turn points to this Array.
+      pBaseArray->pItems = (PHB_ITEM) 1;
+
+      pItem = pItems;
 
       while( ulLen-- )
       {
@@ -1028,8 +1033,9 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
          ++pItem;
       }
 
-      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
-      hb_xfree( pBaseArray->pItems );
+      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
+      hb_xfree( pItems );
+
       pBaseArray->pItems = NULL;
    }
 
@@ -1584,7 +1590,6 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    #endif
 
    //TraceLog( NULL, "DONE hb_arrayReleaseGarbage( %p )\n", pBaseArray );
-
 }
 
 #ifndef HB_ARRAY_USE_COUNTER
