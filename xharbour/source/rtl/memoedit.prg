@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.16 2004/02/28 13:33:55 vouchcac Exp $
+ * $Id: memoedit.prg,v 1.17 2004/04/17 23:27:21 jonnymind Exp $
  */
 
 /*
@@ -323,7 +323,7 @@ FUNCTION MemoEdit(cString,;
    DEFAULT nBottom         TO MaxRow()
    DEFAULT nRight          TO MaxCol()
    DEFAULT lEditMode       TO .T.
-   DEFAULT nLineLength     TO nRight - nLeft +1
+   DEFAULT nLineLength     TO nRight - nLeft 
    DEFAULT nTabSize        TO 4
    DEFAULT nTextBuffRow    TO 1
    DEFAULT nTextBuffColumn TO 0

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2801 2004/04/18 18:02:27 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2802 2004/04/19 01:52:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-18 23:05 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * source/rtl/memoedit.prg
+  Reverted back to previus default
+      From
+         DEFAULT nLineLength     TO nRight - nLeft + 1
+      INTO
+         DEFAULT nLineLength     TO nRight - nLeft
+      By GianCarlo Niccolain request
 
 2004-04-19 03:50 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/teditor.prg
