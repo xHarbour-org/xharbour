@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.5 2003/05/16 19:52:00 druzus Exp $
+# $Id: gcc.cf,v 1.6 2003/09/25 02:24:02 paultucker Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -51,7 +51,8 @@ endif
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
-####LINKLIBS += -Wl,--start-group
+
+# LINKLIBS += -Wl,--start-group
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
@@ -100,10 +101,10 @@ LINKLIBS += -lpthread
 endif
 
 LINKLIBS += -lm
-#### -Wl,--end-group
+# -Wl,--end-group
 
 LDFLAGS = $(LINKPATHS)
-LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS) $(LINKLIBS)
 
 #AR = ar
 #ARFLAGS = $(A_USR)

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.2 2003/11/24 16:57:26 lf_sfnet Exp $
+* $Id: hbserv.c,v 1.3 2003/11/26 03:17:49 likewolf Exp $
 */
 
 /*
@@ -60,7 +60,7 @@
 #include "hbvm.h"
 #include <stdio.h>
 
-#if !defined(HB_OS_DOS) // dos can't compile this module
+#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN) // dos and Darwin can't compile this module
 #if defined( HB_OS_UNIX )
 #include <sys/types.h>
 #include <unistd.h>

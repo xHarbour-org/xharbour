@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.99 2003/11/18 03:39:38 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.100 2003/11/19 16:26:14 ronpinkas Exp $
  */
 
 /*
@@ -4486,12 +4486,15 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
   HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
 
-  lenreal--;
-  while( expreal[ lenreal ] == ' ' )
+  if (lenreal)
   {
      lenreal--;
+     while( expreal[ lenreal ] == ' ' )
+     {
+        lenreal--;
+     }
+     lenreal++;
   }
-  lenreal++;
 
   #ifdef DEBUG_MARKERS
      printf( "   %c, '%s', %i, '%s', %i\n", patttype, expreal, lenreal, ptro, lenres );
