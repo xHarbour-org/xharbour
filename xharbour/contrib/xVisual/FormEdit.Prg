@@ -22,7 +22,9 @@ GLOBAL EXTERNAL hThisInstance
    DATA GridColor
    DATA xGrid
    DATA yGrid
-
+   DATA hBmpGrid
+   DATA xBmpSize
+   DATA yBmpSize
 
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::Editing:=.F.       ,;
@@ -37,10 +39,11 @@ GLOBAL EXTERNAL hThisInstance
                                     super:New( oParent )
 
    METHOD Add()
-   METHOD OnPaint( hDC )     INLINE DrawGrid(hDC, ::width, ::height, ::GridColor, ::xGrid, ::yGrid ), 0
+ //  METHOD OnPaint( hDC )     INLINE DrawGrid(hDC, ::width, ::height, ::GridColor, ::xGrid, ::yGrid ), 0
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-
+   METHOD OnPaint( hDC ) INLINE ::TileGrid(hDC)
+   METHOD TileGrid(hDC)
    METHOD OnMenuCommand(oItem)
    METHOD CreateSub()
    METHOD GetUniquePropName()
@@ -124,6 +127,17 @@ METHOD CreateSub()
    LOCAL xRet
 
 
+   LOCAL xSize
+   LOCAL ySize
+   LOCAL cBits := MakeGridTile(::xGrid,::yGrid,@xSize,@ySize)
+
+   IF !Empty(::hBmpGrid)
+      DeleteObject(::hBmpGrid)
+   ENDIF
+   ::hBmpGrid  := CreateBitmap( @xSize, ySize, 1, 1, cBits )
+   ::xBmpSize:=xSize
+   ::yBmpSize:=ySize
+
    ::WindowMenu := TMenu():New()
 
    ::WindowMenu:AddPopup( 'popup 1' )
@@ -136,6 +150,8 @@ METHOD CreateSub()
 
    xRet := super:OnCreate()
 
+
+
    ::oMask:=oCtrlMask():New( self )
    ::oMask:Create()
    ::oMask:GetSiblings()
@@ -145,6 +161,85 @@ METHOD CreateSub()
    RETURN( xRet )
 
 
+//----------------------------------------------------------------------------//
+
+// Delphi grid max: 128
+// make the tile as close to 200x200 as possible
+
+FUNCTION MakeGridTile(nxGrid,nyGrid,width,height)
+
+   LOCAL nWidth   := 200-200%nxGrid
+   LOCAl nHeight  := 200-200%nyGrid
+   LOCAL cBits    := ""
+   LOCAL nByte    := 1
+   LOCAL nVal     := 0
+   LOCAL cDotted
+   LOCAL cEmpty
+   LOCAL nBits
+   LOCAL nPos
+   LOCAL i
+
+   width  := nWidth  // actual bitmap x size
+   height := nHeight // actual bitmap y size
+
+   nWidth:=ceiling(nWidth/8) // convert to bytes
+   nWidth := If( nWidth%2==0, nWidth, nWidth+1 ) // align on word
+
+   cDotted  := Replicate(chr(255),nWidth)
+   cEmpty   := cDotted
+
+   nBits    := (8* nWidth) -1 // -1 for the counter
+
+   FOR i:=0 TO nBits STEP nxGrid
+      IF i >= nByte*8 // next byte
+         cDotted[nByte]:=255-nVal
+         nVal:=2^((i%8)+1)
+         nByte:=Int(i/8)+1
+      ELSE
+         nVal+=2^((i%8)+1)
+      ENDIF
+   NEXT
+   cDotted[nByte]:=255-nVal
+
+   nHeight--
+   FOR i:=0 TO nHeight
+      IF i % nyGrid == 0
+         cBits += cDotted
+      ELSE
+         cBits += cEmpty
+      ENDIF
+   NEXT
+
+   RETURN(cBits)
+
+
+*------------------------------------------------------------------------------
+
+
+
+METHOD TileGrid(hDC) //, ::width, ::height, ::GridColor ), 0
+
+   LOCAL hMemDC := CreateCompatibleDC(hDC)
+   LOCAL i:=0
+   LOCAL j:=0
+   LOCAL hOldBmp := SelectObject(hMemDC,::hBmpGrid)
+
+   SetTextColor(hDC,::GridColor)
+   DO WHILE j < ::Height
+      i:=0
+      DO WHILE i < ::Width
+         BitBlt(hDC,i,j,::xBmpSize,::yBmpSize, hMemDC, 0, 0, SRCAND)
+         i+=::xBmpSize
+      ENDDO
+      j+=::yBmpSize
+   ENDDO
+
+   SelectObject(hMemDC,hOldBmp)
+   DeleteDC(hMemDC)
+
+   RETURN(0)
+
+/*
 
 *------------------------------------------------------------------------------
 * Low Level C Routines
@@ -186,7 +281,7 @@ HB_FUNC( DRAWGRID )
 #pragma ENDDUMP
 
 
-
+*/
 
 
 //----------------------------------------------------------------------------//
