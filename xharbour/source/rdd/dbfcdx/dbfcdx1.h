@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.10 2002/04/24 12:12:01 horacioroldan Exp $
+ * $Id: dbfcdx1.h,v 1.13 2002/10/12 00:42:30 horacioroldan Exp $
  */
 
 /*
@@ -7,7 +7,7 @@
  * DBFCDX RDD
  *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * Copyright 2000 Horacio Roldán <horacioroldan@usa.net> (portions)
+ * Copyright 2000-2002 Horacio Roldan <harbour_ar@yahoo.com.ar> (portions)
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.17 2002/09/28 04:56:26 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.7 2002/10/12 00:38:25 horacioroldan Exp $
  */
 
 /*
@@ -452,7 +452,7 @@ extern ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 extern ERRCODE hb_cdxOrderListClear( CDXAREAP pArea );
 #define hb_cdxOrderListDelete                      NULL
 extern ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
-#define hb_cdxOrderListRebuild                     NULL
+static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea );
 #define hb_cdxOrderCondition                       NULL
 extern ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo );
 extern ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
