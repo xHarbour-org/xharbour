@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: maindll.c,v 1.3 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -90,6 +90,34 @@ LONG HB_EXPORT PASCAL HBDLLENTRY( char * cProcName )
    hb_itemDoC( cProcName, 0, 0 );
 
    return 0;
+}
+
+
+#elif defined(HB_OS_OS2)
+
+int _CRT_init (void);
+void _CRT_term (void);
+void __ctordtorInit (void);
+void __ctordtorTerm (void);
+
+APIENTRY unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long flag)
+{
+
+  switch (flag)
+    {
+    case 0:
+      if (_CRT_init () != 0)
+        return 0;
+      __ctordtorInit ();
+      return 1;
+    case 1:
+       __ctordtorTerm ();
+      _CRT_term ();
+      return 1;
+    default:
+      fprintf(stdout, "_DLL_InitTerm(%lu, %lu) error!\r\n", mod_handle, flag);
+      return 0;
+    }
 }
 
 #endif

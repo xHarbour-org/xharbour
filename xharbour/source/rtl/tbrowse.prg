@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.94 2004/11/02 08:39:18 bdj Exp $
+ * $Id: tbrowse.prg,v 1.95 2004/11/23 15:52:02 mauriliolongo Exp $
  */
 
 /*
@@ -1682,16 +1682,27 @@ Return Self
 //---------------------------------------------------------------------//
 
 METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
-   LOCAL nTop, nBottom, redraw
 
+   local i
+
+   /* Since we're going to change aRect we need to refresh previous
+      aRect covered area
+   */
+   if ::lRect .AND. ! Empty( ::aRedraw )
+      for i := ::aRect[ 1 ] to ::aRect[ 3 ]
+         ::aRedraw[ i ] := .T.
+      next
+   endif
+
+   // Let's set a new aRect region
    if Len( aRect ) > 0
       ::aRect       := Array( 4 )
       ::aRectColor  := aRectColor
 
-      ::aRect[ 1 ] := nTop    := Max( aRect[ 1 ], 1 )
-      ::aRect[ 3 ] := nBottom := Min( aRect[ 3 ], ::rowCount )
-      ::aRect[ 2 ] :=            Max( aRect[ 2 ], 1 )
-      ::aRect[ 4 ] :=            Min( aRect[ 4 ], ::colCount )
+      ::aRect[ 1 ] := Max( aRect[ 1 ], 1 )
+      ::aRect[ 3 ] := Min( aRect[ 3 ], ::rowCount )
+      ::aRect[ 2 ] := Max( aRect[ 2 ], 1 )
+      ::aRect[ 4 ] := Min( aRect[ 4 ], ::colCount )
       ::lRect      := .t.
 
    else
@@ -1700,10 +1711,17 @@ METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
       ::lRect      := .f.
    endif
 
-   ::refreshAll()
+   /* and now let's refresh new aRect covered area */
+   If ::lRect .AND. ! Empty( ::aRedraw )
+      for i := ::aRect[ 1 ] to ::aRect[ 3 ]
+         ::aRedraw[ i ] := .T.
+      next
+   endif
+
+   ::stable := .F.
    ::ForceStable()
 
-   Return Self
+Return Self
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//

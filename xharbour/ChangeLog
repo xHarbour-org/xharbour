@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3613 2004/11/23 15:51:49 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3614 2004/11/23 17:03:52 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-11-23 19:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  ! source/rtl/tbrowse.prg
+    Fixed ::ColorRect() method which was causing a full repaint of tbrowse
+    while this is not needed, since only the area covered by the aRect
+    needs to be considered.
+  * source/vm/Makefile
+    source/vm/maindll.c
+    + Added OS/2 support that is dll init code to be able to have a
+      harbour.dll even on OS/2
 
 2004-11-23 18:05 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/odbc/Makefile

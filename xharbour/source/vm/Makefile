@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2004/10/20 19:36:59 druzus Exp $
+# $Id: Makefile,v 1.19 2004/11/21 21:44:24 druzus Exp $
 #
 
 ROOT = ../../
@@ -12,11 +12,11 @@ ifeq ($(HB_ARCHITECTURE),w32)
         endif
     endif
 else
-    ifeq ($(HB_ARCHITECTURE),os2)
-        C_MAIN := mainstd.c 
-    else
-        C_MAIN := main.c
-    endif
+      ifeq ($(HB_ARCHITECTURE),os2)
+            C_MAIN := mainstd.c maindll.c
+      else
+            C_MAIN := main.c
+      endif
 endif
 
 C_SOURCES=\
