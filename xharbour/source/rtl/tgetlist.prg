@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.5 2002/03/17 23:27:28 lculik Exp $
+ * $Id: tgetlist.prg,v 1.6 2002/03/18 22:15:17 ronpinkas Exp $
  */
 
 /*
@@ -1030,13 +1030,13 @@ method TBReader( oGet,oGetsys,  aMsg ) Class HBGETLIST
       oTB:Hilite()
 
       IF oGet:exitState == GE_NOEXIT  // Added.
-     IF ( ::nHitcode == HTCELL )
-     tracelog('hitcode ',::nHitcode )
-	    // Replaces call to TBMouse( oTB, mROW(), mCOL() ):
-	    oTB:RowPos := oTb:mRowPos
-	    oTB:ColPos := oTb:mColPos
-	    oTB:Invalidate()
-	 ENDIF
+         IF ( ::nHitcode == HTCELL )
+           //tracelog('hitcode ',::nHitcode )
+           // Replaces call to TBMouse( oTB, mROW(), mCOL() ):
+           oTB:RowPos := oTb:mRowPos
+           oTB:ColPos := oTb:mColPos
+           oTB:Invalidate()
+         ENDIF
       ENDIF  // Added.
 
       ::nHitcode := 0
