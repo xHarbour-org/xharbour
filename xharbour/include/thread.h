@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.90 2004/05/30 20:37:18 likewolf Exp $
+* $Id: thread.h,v 1.91 2004/06/04 13:29:29 mauriliolongo Exp $
 */
 
 /*
@@ -660,6 +660,7 @@ typedef struct tag_HB_SHARED_RESOURCE
    #endif
 #endif
 
+
 /*********************************************************************/
 /* More elegant guard of a small section of code                     */
 #define HB_THREAD_GUARD( mutex, code )\
@@ -783,8 +784,9 @@ void hb_threadCancelInternal( void );
    #define HB_THREAD_STUB
 
    #ifndef HB_VM_STACK
-      #define HB_VM_STACK hb_stack
+      #define HB_VM_STACK (*hb_GetStack())
    #endif
+
 
    #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
