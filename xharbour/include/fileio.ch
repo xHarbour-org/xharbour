@@ -1,5 +1,5 @@
 /*
- * $Id: fileio.ch,v 1.22 2001/04/12 19:12:56 dholm Exp $
+ * $Id: fileio.ch,v 1.1.1.1 2001/12/21 10:47:14 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,11 @@
 #define FO_READ       0        /* File is opened for reading             */
 #define FO_WRITE      1        /* File is opened for writing             */
 #define FO_READWRITE  2        /* File is opened for reading and writing */
+
+/* File open flags */
+#define FO_CREAT     0x0100  /* create and open file */
+#define FO_TRUNC     0x0200  /* open with truncation */
+#define FO_EXCL      0x0400  /* create and open only if file doesn't exist */
 
 /* File sharing flags */
 #define FO_COMPAT     0        /* No sharing specified                               */

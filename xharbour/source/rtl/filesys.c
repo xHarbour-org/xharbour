@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.16 2002/07/12 00:00:37 lculik Exp $
+ * $Id: filesys.c,v 1.17 2002/08/01 00:33:15 lculik Exp $
  */
 
 /*
@@ -399,6 +399,34 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
 
+static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result_flags, unsigned * result_pmode )
+{
+   HB_TRACE(HB_TR_DEBUG, ("convert_create_flags_ex(%hu, %hu, %p, %p)", uiAttr, uiFlags, result_flags, result_pmode));
+
+   /* by default FC_NORMAL is set */
+
+   /* *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR; */
+   *result_flags = convert_open_flags( uiFlags ) | O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
+   if ( uiFlags & FO_EXCL )
+      *result_flags |= O_EXCL;
+
+   *result_pmode = S_IRUSR | S_IWUSR;
+
+   if( uiAttr & FC_READONLY )
+   {
+      *result_pmode = S_IRUSR;
+      HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: S_IRUSR"));
+   }
+
+   if( uiAttr & FC_HIDDEN )
+      *result_flags |= 0;
+
+   if( uiAttr & FC_SYSTEM )
+      *result_flags |= 0;
+
+   HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
+}
+
 #endif
 
 
@@ -645,8 +673,8 @@ FHANDLE hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
 #if defined(HB_FS_FILE_IO)
 
    errno = 0;
-   convert_create_flags( uiAttr, &oflag, &pmode );
-   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ), pmode );
+   convert_create_flags_ex( uiAttr, uiFlags, &oflag, &pmode );
+   hFileHandle = open( ( char * ) pFilename, oflag, pmode );
    if( hFileHandle == -1 )
    {
       /* This if block is required, because errno will be set
