@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.232 2002/05/21 20:53:36 lculik Exp $
+ * $Id: ChangeLog,v 1.233 2002/05/22 03:07:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-221 08:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+    ! Fixed GPF on Eval() when compiled by MACRO
+
+  * source/rtl/errorsys.prg
+    * Corrected formatting.
 
 2002-05-21 08:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * utils/hbmake/hbmake.prg

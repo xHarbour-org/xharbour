@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.6 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.7 2002/05/18 08:55:49 ronpinkas Exp $
  */
 
 /*
@@ -360,7 +360,14 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && iCount )
       {
          /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
-         return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, "EVAL" ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
+         #if defined( HB_MACRO_SUPPORT )
+            // Will be freed by hb_compExprUseSend() (when MACRO).
+            char *szMsg = hb_strdup( "EVAL" );
+
+            return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, szMsg ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
+         #else
+            return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, "EVAL" ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
+         #endif
       }
       else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
           (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && iCount >= 10) )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.23 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.24 2002/05/21 15:58:55 ronpinkas Exp $
  */
 
 /*
@@ -2047,8 +2047,12 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
 #if defined( HB_MACRO_SUPPORT )
          {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pObject );
+
             if( pSelf->value.asMessage.pParms )
+            {
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
+            }
+
             HB_XFREE( pSelf->value.asMessage.szMessage );
          }
 #endif
