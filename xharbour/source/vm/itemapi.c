@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.101 2004/05/02 10:47:49 druzus Exp $
+ * $Id: itemapi.c,v 1.102 2004/09/09 21:27:53 druzus Exp $
  */
 
 /*
@@ -1826,11 +1826,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             buffer = ( char * ) hb_xgrab( size );
             do
             {
-               #if defined( _MSC_VER ) && ! defined( __XCC__ )
-                  n = _snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
-               #else
-                  n = snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
-               #endif
+               n =  snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
 
                if( (n > -1) && (n < size) )
                {
