@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.5 2004/05/08 04:25:12 ronpinkas Exp $
+ * $Id: expropt2.c,v 1.6 2004/05/08 05:26:06 ronpinkas Exp $
  */
 
 /*
@@ -564,13 +564,32 @@ HB_EXPR_PTR hb_compExprReduceNE( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
             }
             break;
 
+         case HB_ET_NIL:
+            {
+               hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+               hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+               pSelf->ExprType = HB_ET_LOGICAL;
+               pSelf->ValType  = HB_EV_LOGICAL;
+               pSelf->value.asLogical = FALSE;
+            }
+            break;
       }
    }
    else
    {
       /* Exp != .T. | .T. != Exp -> ! Exp
          Exp != .F. | .F. != Exp -> Exp */
-      if( pLeft->ExprType == HB_ET_LOGICAL )
+
+      if(( pLeft->ExprType == HB_ET_NIL && pRight->ExprType < HB_ET_VARREF ) ||
+         ( pRight->ExprType == HB_ET_NIL && pLeft->ExprType < HB_ET_VARREF ))
+      {
+         hb_compExprFree( pLeft, HB_MACRO_PARAM );
+         hb_compExprFree( pRight, HB_MACRO_PARAM );
+         pSelf->ExprType = HB_ET_LOGICAL;
+         pSelf->ValType  = HB_EV_LOGICAL;
+         pSelf->value.asLogical = TRUE;
+      }
+      else if( pLeft->ExprType == HB_ET_LOGICAL )
       {
          if( ! pLeft->value.asLogical )
          {
@@ -927,14 +946,32 @@ HB_EXPR_PTR hb_compExprReduceEQ( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                pSelf->value.asLogical = bResult;
             }
             break;
+         case HB_ET_NIL:
+            {
+               hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+               hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+               pSelf->ExprType = HB_ET_LOGICAL;
+               pSelf->ValType  = HB_EV_LOGICAL;
+               pSelf->value.asLogical = TRUE;
+            }
+            break;
       }
    }
    else
    {
+      if(( pLeft->ExprType == HB_ET_NIL && pRight->ExprType < HB_ET_VARREF ) ||
+         ( pRight->ExprType == HB_ET_NIL && pLeft->ExprType < HB_ET_VARREF ))
+      {
+         hb_compExprFree( pLeft, HB_MACRO_PARAM );
+         hb_compExprFree( pRight, HB_MACRO_PARAM );
+         pSelf->ExprType = HB_ET_LOGICAL;
+         pSelf->ValType  = HB_EV_LOGICAL;
+         pSelf->value.asLogical = FALSE;
+      }
       // Has a compatibility side effect: IF NIL == .T. -> IF NIL // R/T Error!!!
       #ifdef HB_OPTIMIZE_LOGICAL_COMPARISON
 
-        if( pLeft->ExprType == HB_ET_LOGICAL )
+        else if( pLeft->ExprType == HB_ET_LOGICAL )
         {
            if( pLeft->value.asLogical )
            {
