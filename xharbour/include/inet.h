@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.13 2003/01/02 06:07:39 jonnymind Exp $
+* $Id: inet.h,v 1.14 2003/01/02 06:32:35 jonnymind Exp $
 */
 
 /*
@@ -90,6 +90,7 @@
           int errorCode;
           struct sockaddr_in remote;
           ULONG count;
+          int timeout;
           /* HB_CRITICAL_T Mutex;*/
       } HB_SOCKET_STRUCT;
 
@@ -133,6 +134,7 @@
              HB_SOCKET_ZERO_ERROR( s );\
              s->com = 0;\
              s->count = 0;\
+             s->timeout = -1;\
              /*HB_CRITICAL_INET_INIT( s->Mutex );*/\
           }
 

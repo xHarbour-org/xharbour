@@ -108,12 +108,11 @@ FUNCTION Connect( cAddress, nPort )
    MutexUnlock( MutexCnt )
 
    /* now we can be interrupted */
-   Socket := InetConnect( cAddress, nPort, aServiceData[1] )
+   InetConnect( cAddress, nPort, aServiceData[1] )
 
    /* now we need to be not interrupted */
    MutexLock( MutexCnt )
-   aServiceData[ 1 ] := Socket
-   IF InetErrorCode( Socket ) != 0
+   IF InetErrorCode( aServiceData[ 1 ] ) > 0
       aServiceData[ 3 ] := 2  // Connection rejected
    ELSE
       aServiceData[ 3 ] := 1  // Connection done.
@@ -131,14 +130,12 @@ FUNCTION CheckTime( nTimeout )
 
    DO WHILE .T.
       ThreadSleep( 1000 )
-      ? seconds()
       MutexLock( MutexCnt )
       FOR EACH aTicket IN aCntSockets
 
          /* If status is still connecting ... */
          IF aTicket[ 3 ] == 0 .and. aTicket[ 4 ] + nTimeout < Seconds()
-            ? "killing the thread"
-            KillThread( aTicket[ 2 ] )
+            //KillThread( aTicket[ 2 ] )
             aTicket[ 3 ] := -1
             InetDestroy( aTicket[1] )
          ENDIF

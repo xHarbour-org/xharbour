@@ -43,7 +43,8 @@ PROCEDURE Main( cAddress, cPort )
    cText := space( 60 )
    @2,2 SAY "Waiting (at max. 10 seconds) for server response now"
 
-   nLen := InetDGRecvTout( Socket, 10000, cText, 60 )
+   InetSetTimeout( Socket, 10000 )
+   nLen := InetDGRamRecv( Socket, cText, 60 )
 
    /* Now, if nLen == 0, the server didn't answered */
    DO CASE
@@ -51,7 +52,7 @@ PROCEDURE Main( cAddress, cPort )
          @3,2 SAY "Response timeout; no server found."
 
       CASE nLen < 0
-         @3,2 SAY "Error in InetDGRecvTout function call or in Socket "
+         @3,2 SAY "Error in InetDGTout function call or in Socket "
          @4,2 SAY "(" + AllTrim( Str( InetErrorCode( Socket ) ) ) + ")" + InetErrorDesc( Socket )
 
       CASE Substr( cText, 1, nLen ) != "HERE!"
