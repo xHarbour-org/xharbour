@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.13 2002/12/15 23:06:03 ronpinkas Exp $
+ * $Id: set.c,v 1.14 2002/12/16 06:02:47 ronpinkas Exp $
  */
 
 /*
@@ -138,7 +138,8 @@ static int set_number( PHB_ITEM pItem, int iOldValue )
 
 static char * set_string( PHB_ITEM pItem, char * szOldString )
 {
-   char * szString;
+   char * szString = NULL;
+   ULONG ulLen = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("set_string(%p, %s)", pItem, szOldString));
 
@@ -155,8 +156,17 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
       memcpy( szString, hb_itemGetCPtr( pItem ), ulLen );
       szString[ ulLen ] = '\0';
    }
+   else if( HB_IS_NIL( pItem ) )
+   {
+      if( szOldString ) szString = ( char * ) hb_xrealloc( szOldString, 1 );
+      else szString = ( char * ) hb_xgrab( 1 );
+
+      szString[ 0 ] = '\0';
+   }
    else
+   {
       szString = szOldString;
+   }
 
    return szString;
 }
@@ -249,7 +259,7 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
       if( ( bPipe = ( set_specifier == HB_SET_PRINTFILE && \
                       (char) *file_name == '|' ) ) ) {
          file_name++;
-	 bAppend = FALSE;
+         bAppend = FALSE;
       }
    #endif
    if( ! bPipe ) {
@@ -789,7 +799,10 @@ HB_FUNC( SET )
                 }
 
             if (!hb_set.hb_set_winprinter)
+            {
                close_binary( hb_set.hb_set_printhan );
+               hb_set.hb_set_printhan = FS_ERROR;
+            }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
             else{
                hb_set.hb_set_winprinter=FALSE;
