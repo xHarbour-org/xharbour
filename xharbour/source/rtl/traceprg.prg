@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.6 2003/03/19 08:50:12 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.7 2003/03/19 13:30:47 jonnymind Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )
 
-   LOCAL FileHandle, Counter := 1, ProcName, aParams, xParam
+   LOCAL cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, aParams, xParam
 
    IF ! SET( _SET_TRACE )
       RETURN .T.
@@ -64,18 +64,26 @@ FUNCTION TraceLog( ... )
 
    aParams := HB_aParams()
 
-   FileHandle := FOpen( SET( _SET_TRACEFILE ), 1 )
+   IF File( cFile )
+      FileHandle := FOpen( cFile, 1 )
+   ELSE
+      FileHandle := FCreate( cFile )
+   ENDIF
 
    FSeek( FileHandle, 0, 2 )
 
-   IF SET( _SET_TRACESTACK ) > 0
-      FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+   IF nLevel > 0
+      FWrite( FileHandle, '[' + ProcName( 1 ) + '] (' + Str( Procline(1), 5 ) + ')' )
    ENDIF
 
-   IF SET( _SET_TRACESTACK ) > 1
-      DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
-         FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
+   IF nLevel > 1 .AND. ! ( ProcName( 2 ) == '' )
+      FWrite( FileHandle,  ' Called from: '  + CRLF )
+      nLevel := 1
+      DO WHILE ! ( ( ProcName := ProcName( ++nLevel ) ) == '' )
+         FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( nLevel ), 5 ) + ')' + CRLF )
       ENDDO
+   ELSE
+      FWrite( FileHandle,  CRLF )
    ENDIF
 
    FOR EACH xParam IN aParams

@@ -1656,6 +1656,12 @@
       }
 
       //----------------------------------------------------------------------------//
+      static HB_FUNC( GETARRAYPREFIX )
+      {
+         hb_retl( s_bArrayPrefix );
+      }
+
+      //----------------------------------------------------------------------------//
       static HB_FUNC( NEXTTOKEN )
       {
          PHB_ITEM pLine       = hb_param( 1, HB_IT_STRING );
@@ -1666,6 +1672,11 @@
          BOOL lDontRecord;
          size_t Counter, nLen;
 
+         #ifdef DEBUG_TOKEN
+            char sProc[64];
+            USHORT uiLine;
+         #endif
+
          if( pLine == NULL || pLine->item.asString.length == 0 )
          {
             hb_ret();
@@ -1675,7 +1686,10 @@
          sLine = pLine->item.asString.value;
          nLen = pLine->item.asString.length;
 
-         //printf( "\nProcessing: '%s'\n", sLine );
+         #ifdef DEBUG_TOKEN
+            hb_procinfo( 1, (char *) &sProc, &uiLine );
+            printf( "%s[%i] Processing: '%s'\n", (char *) sProc, uiLine, sLine );
+         #endif
 
          if( pDontRecord == NULL )
          {
@@ -2005,7 +2019,9 @@
             //printf( "\nToken: '%s' ***value: '%s'\n", sReturn, pLine->item.asString.value );
          }
 
-         //printf( "\nToken: '%s'\n", sReturn );
+         #ifdef DEBUG_TOKEN
+            printf( "Token: '%s'\n", sReturn );
+         #endif
 
          hb_retclen( sReturn, nLen );
       }

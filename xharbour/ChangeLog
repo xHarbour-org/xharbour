@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1079 2003/05/28 23:22:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1080 2003/05/29 20:44:23 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-05-29 15:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/trace.c
+    - Uncommented code to create "trace.log" file and changed logic to reset the file if it exists.
+  * source/rtl/traceprg.prg
+    + Added logic to create Trace File if missing.
+    * Refnied output format.
+
+  * tests/pp.prg
+    + Added logic to Save s_bArrayPrefix before calls to MatchRule() and Restore it if it failed.
+    ! Fixed #translate rule for At( <what>, <where>, <from> ) for Clipper.
+    ! Fixed NextToken() (prg version) handling of '' strings.
+    ! Fixed #include logic to NOT conver filename to uppercase.
+    + Added burned-in rules for "rp_dot.ch"
+    + Added logic to use burned-in rules UNLESS "rp_dot.ch" is persent.
+
+    /* pp once again functional when compiled with Clipper. */
+
+  * tests/pp_harb.ch
+    + Added SetArrayPrefix() interface.
 
 2003-05-29 22:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/tests/pp.prg

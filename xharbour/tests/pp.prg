@@ -182,7 +182,7 @@
 
    #DEFINE __CLIPPER__
 
-   #translate At( <find>, <where>, <from> ) => IIF( ( M->__AT__  := At( <find>, SubStr( <where>, <from> ) ) ) == 0, 0, M->__AT__ )
+   #translate At( <find>, <where>, <from> ) => IIF( ( M->__AT__  := At( <find>, SubStr( <where>, <from> ) ) ) == 0, 0, <from> + M->__AT__ - 1 )
 
    #ifndef CRLF
       #DEFINE  CRLF Chr(13) + Chr(10)
@@ -343,7 +343,7 @@ STATIC s_acFlowType := {},  s_nFlowId := 0
    STATIC s_bRecursive := .F.
 #endif
 
-STATIC s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
+STATIC s_lRunLoaded := .F., s_lDotLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
 STATIC s_aSwitchDefs := {}
 
 //--------------------------------------------------------------//
@@ -407,12 +407,13 @@ STATIC s_aSwitchDefs := {}
 
    #ifdef __XHARBOUR__
       #ifdef __PLATFORM__Linux
-         if right( hb_argv( 0 ), 6 ) == "/pprun"
-            bCount := .F.
+         IF Right( hb_argv( 0 ), 6 ) == "/pprun"
+            bCount  := .F.
             sSwitch := ""
+
             aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9 }
-	    aSize( aParams, PCount() )
-	 endif
+            aSize( aParams, PCount() )
+         ENDIF
       #endif
    #endif
 
@@ -469,6 +470,7 @@ STATIC s_aSwitchDefs := {}
       /* Generate compiled header. */
       IF "-CCH" $ sSwitch
          bCCH := .T.
+         bCompile := .F.
       ENDIF
 
       /* Debug tracing options. */
@@ -872,7 +874,12 @@ PROCEDURE RP_Dot()
 
    bCount := .F.
 
-   PP_PreProFile( "rp_dot.ch" )
+   IF File( "ro_dot.ch" )
+      PP_PreProFile( "rp_dot.ch" )
+   ELSE
+      PP_LoadDot()
+   ENDIF
+
    #ifdef WIN
       PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "TInterpreter for Windows", 0 )' )
    #endif
@@ -2555,7 +2562,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    LOCAL nLen, nMaxPos, cChar := '', nClose, nBase, nNext, nLine := 0
    LOCAL sRight, nPath := 0, nPaths := Len( s_asPaths ), nNewLine
    LOCAL sPath := "", cError, sPrevFile := s_sFile
-   LOCAL sTmp
+   LOCAL sTmp, nLastPosition := 0
 
    IF At( '.', sSource ) == 0
      sSource += ".prg"
@@ -2625,8 +2632,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
       nPosition := 1
       nMaxPos   := nLen - 1
 
-      //TraceLog( sLine, sBuffer )
-
       WHILE nPosition < nMaxPos
 
           cPrev := cChar
@@ -2660,6 +2665,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          Alert( [ERROR! Unterminated '/**/' ] + "[" + Str( ProcLine() ) + "]" )
                       ENDIF
                       nMaxPos   := nLen - 1
+                      TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -2695,6 +2701,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          BREAK "//"
                       ENDIF
                       nMaxPos   := nLen - 1
+                      TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -2759,6 +2766,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          BREAK "&&"
                       ENDIF
                       nMaxPos   := nLen - 1
+                      TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -3093,6 +3101,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sError
    LOCAL sBackupLine
    LOCAL sSkipped
+   LOCAL bArrayPrefix
 
    //TraceLog( sLine )
 
@@ -3261,7 +3270,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          ELSEIF sDirective == Left( "INCLUDE", nLen )
 
-
             ExtractLeadingWS( @sLine )
             DropTrailingWS( @sLine )
 
@@ -3414,6 +3422,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          sPassed += sSkipped
 
+         // Save incase MatchRule fails.
+         #ifdef USE_C_BOOST
+            bArrayPrefix := GetArrayPrefix()
+         #else
+            bArrayPrefix := s_bArrayPrefix
+         #endif
+
          IF ( nRule := MatchRule( sToken, @sLine, aDefRules, aDefResults, .F., .F. ) ) > 0
             //? "DEFINED: " + sLine
             //WAIT
@@ -3465,6 +3480,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
             // Re-Reprocess the line ...
             BREAK
+         ELSE
+            // Restore since MatchRule() faild.
+            #ifdef USE_C_BOOST
+               SetArrayPrefix( bArrayPrefix )
+            #else
+               s_bArrayPrefix := bArrayPrefix
+            #endif
          ENDIF
 
          sPassed += sToken
@@ -3479,6 +3501,14 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
          //? "Token = '"  + sToken + "'"
          //WAIT
+
+         // Save incase MatchRule fails.
+         #ifdef USE_C_BOOST
+            bArrayPrefix := GetArrayPrefix()
+         #else
+            bArrayPrefix := s_bArrayPrefix
+         #endif
+
          IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
             //? "TRANSLATED: " + sLine
             //WAIT
@@ -3532,6 +3562,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             ENDIF
 
             BREAK
+         ELSE
+            // Restore since MatchRule() faild.
+            #ifdef USE_C_BOOST
+               SetArrayPrefix( bArrayPrefix )
+            #else
+               s_bArrayPrefix := bArrayPrefix
+            #endif
          ENDIF
 
          sPassed += sToken
@@ -3640,6 +3677,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    IF ! Empty( sOut )
       //? "Returning: " + sOut
       //WAIT
+      //TraceLog( sOut )
    ENDIF
 
    IF bCompile
@@ -4536,7 +4574,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
    LOCAL sDigits
    LOCAL sToken
 
-   //TRaceLog( sLine, lDontRecord )
+   //TraceLog( sLine, lDontRecord )
 
    IF Empty( sLine )
       RETURN NIL
@@ -4698,7 +4736,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
             //Alert( "ERROR! [NextToken()] Unterminated ['] at: " + sLine )
             sReturn := "'"
          ELSE
-            sReturn := SubStr( sLine, 2, nClose )
+            sReturn := SubStr( sLine, 2, nClose - 2 )
             IF ! ( '"' $ sReturn )
                sReturn := '"' + sReturn + '"'
             ELSE
@@ -4795,7 +4833,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
    #endif
 
-   //TraceLog( "TOKEN = '" + sReturn, sLine, s_bArrayPrefix )
+   //TraceLog( "TOKEN = >" + sReturn + "<", sLine, s_bArrayPrefix )
 
 RETURN sReturn
 
@@ -8843,6 +8881,60 @@ STATIC FUNCTION InitRunResults()
 RETURN .T.
 
 //--------------------------------------------------------------//
+STATIC FUNCTION InitDotRules()
+
+   /* Defines */
+
+   /* Translates */
+   aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+
+   /* Commands */
+   aAdd( aCommRules, { 'CLS' ,  , .F. } )
+   aAdd( aCommRules, { 'BROWSE' ,  , .F. } )
+   aAdd( aCommRules, { 'EXIT' ,  , .F. } )
+   aAdd( aCommRules, { 'IF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ELSEIF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ELSE' ,  , .F. } )
+   aAdd( aCommRules, { 'ENDIF' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'END' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'DO' , { {    0,   0, 'CASE', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'CASE' , { {    1,   0, NIL, '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'OTHERWISE' ,  , .F. } )
+   aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'PRG', NIL, NIL } } , .F. } )
+
+RETURN .T.
+
+//--------------------------------------------------------------//
+STATIC FUNCTION InitDotResults()
+
+   /* Defines Results*/
+
+   /* Translates Results*/
+   aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
+   aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
+
+   /* Commands Results*/
+   aAdd( aCommResults, { { {   0, 'Scroll( 2, 0, MaxRow() - 1, MaxCol() ) ; SetPos( 2, 0 )' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, 'Browse( 1, 0, MaxRow() - 1, MaxCol() )' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, '__QUIT()' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, '__SetIf( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetElseIf( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetElse()' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, '__SetEnd()' } }, { -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetEnd()' } }, { -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetDoCase()' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, '__SetCase( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetOtherwise()' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, '__SetEndCase()' } }, { -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg" )' } }, { -1,  2, -1} , { NIL }  } )
+
+RETURN .T.
+
+//--------------------------------------------------------------//
 PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 
    IF ValType( aProcedures ) != 'A' .OR. ValType( aInitExit ) != 'A'
@@ -9186,6 +9278,17 @@ PROCEDURE PP_LoadRun()
       s_lRunLoaded := .T.
       InitRunRules()
       InitRunResults()
+   ENDIF
+
+RETURN
+
+//--------------------------------------------------------------//
+PROCEDURE PP_LoadDot()
+
+   IF ! s_lDotLoaded
+      s_lDotLoaded := .T.
+      InitDotRules()
+      InitDotResults()
    ENDIF
 
 RETURN
