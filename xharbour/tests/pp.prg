@@ -3524,13 +3524,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                       /* Rewind to beging of same level and then search for the stopper match */
                       WHILE nMatch > 1
                          nMatch--
-                         IF aRules[nRule][2][nMatch][2] >= 0 .AND. aRules[nRule][2][nMatch][2] < nOPtional
+                         IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
                             EXIT
                          ENDIF
                       ENDDO
-                      IF aRules[nRule][2][nMatch][2] >= 0 .AND. aRules[nRule][2][nMatch][2] < nOPtional
-                         nMatch++
-                      ENDIF
+                      nMatch++
                   #endif
 
                   /* Now search for the stopper. */
@@ -3712,24 +3710,20 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   ENDIF
 
                   /* Current level */
-                  nOptional := aMP[2]
-                  IF nOptional < 0
-                     nOptional := Abs( nOptional )
-                  ENDIF
+                  nOptional := Abs( aMP[2] )
 
                   IF Len( asRevert ) >= nOptional
                      asRevert[ nOptional ] := NIL
                   ENDIF
 
                   // Now rewind.
-                  IF aRules[nRule][2][nMatch][2] < 0
-                     WHILE nMatch > 1
-                        nMatch--
-                        IF aRules[nRule][2][nMatch][2] == nOPtional
-                           EXIT
-                        ENDIF
-                     ENDDO
-                  ENDIF
+                  WHILE nMatch > 1
+                     nMatch--
+                     IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                        EXIT
+                     ENDIF
+                  ENDDO
+                  nMatch++
 
                   nOptional := 0
 
@@ -3813,6 +3807,8 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   */
                ENDIF
 
+               // TODO: rethink this! Should only match if failure becuase we ran out of input and OPTIONAL. ???
+
                /* Optional (last) didn't match - Rule can still match. */
                IF nMatch == nMatches
                   IF bStatement .AND. ! Empty( sWorkLine )
@@ -3822,10 +3818,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         nOptional--
                         WHILE nMatch > 1
                            nMatch--
-                           IF aRules[nRule][2][nMatch][2] == nOPtional
+                           IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
                               EXIT
                            ENDIF
                         ENDDO
+                        nMatch++
 
                         nOptional := 0
 
@@ -3871,7 +3868,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         nOptional--
                         WHILE nMatch > 1
                            nMatch--
-                           IF aRules[nRule][2][nMatch][2] == nOPtional
+                           IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
                               EXIT
                            ENDIF
                         ENDDO

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.201 2002/05/04 02:05:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.202 2002/05/04 04:02:37 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-03 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+     ! Fixed bug in MatchRule() introduced by change in 2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+     /* Note:
+        Rewind logic was missing rewind of all adjucent left optional of same level.
+        I fixed the rewinf to perform such rewind, but code is simpler than prior version.
+        Incase of problem compare with version prior to 2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+     */
 
 2002-05-03 21:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/tprint.hpp
