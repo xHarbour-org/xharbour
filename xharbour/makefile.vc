@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.35 2003/02/16 02:34:53 paultucker Exp $
+# $Id: makefile.vc,v 1.36 2003/03/18 15:02:36 jonnymind Exp $
 #
 
 #
@@ -265,6 +265,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\hbcompress.obj \
+   $(OBJ_DIR)\hbffind.obj \
    $(OBJ_DIR)\hbrandom.obj \
    $(OBJ_DIR)\hbsrlraw.obj \
    $(OBJ_DIR)\idle.obj \
@@ -592,7 +593,6 @@ DEBUG_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 COMMON_LIB_OBJS = \
-   $(OBJ_DIR)\hbffind.obj \
    $(OBJ_DIR)\hbfhnd.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
