@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2621 2004/03/21 17:02:46 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2622 2004/03/21 21:19:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-21 23:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * some workaround for GCC3 optimization bug. I marked at the code
+     where is the problem and added alternate code which is compiled
+     correctly by GCC3.3.2 and -O2 but works on little endian machines
+     only. I do not plan to work longer on this problem - it's a waste
+     of time. With -O3 should work OK so please remember about it when
+     you will make stable release (it's default in make_{rpm,tgz}.sh)
+   
+  * xharbour/source/rtl/filesys.c
+    * fixed my typo in including header files for OpenWatcom and Windows
+      (thanks to Lorenzo for info)
+
+  * xharbour/source/vm/itemapi.c
+    * use finite() for double number checking on MSC
 
 2004-03-21 13:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/pp/ppcore.c

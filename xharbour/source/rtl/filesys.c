@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.73 2004/03/20 23:24:47 druzus Exp $
+ * $Id: filesys.c,v 1.74 2004/03/21 15:55:05 druzus Exp $
  */
 
 /*
@@ -161,7 +161,7 @@
       #include <dir.h>
       #include <dos.h>
       #include <windows.h>
-   #elif defined(__BORLANDC__)
+   #elif defined(__WATCOMC__)
       #include <dos.h>
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.116 2004/03/18 14:24:28 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.117 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -1638,7 +1638,8 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 {
    int iKey, iTrl, iDup, iReq, iTmp, iNum, iLen, iShift;
    BYTE *pKeyPos, *pRecPos, *pSrc;
-   ULONG RNMask;
+   ULONG RNMask, ulRec;
+   USHORT usBit;
 
 #ifdef HB_CDX_DBGCODE
    if ( ( pPage->PageType & CDX_NODE_LEAF ) == 0 )
@@ -1666,29 +1667,38 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
       iDup = pSrc[ iNum + 4 ];
       iTrl = pSrc[ iNum + 5 ];
       iTmp = iNum - iTrl - iDup;
-      HB_PUT_LE_USHORT( &pRecPos[ iReq - 2 ],
-               ( iTrl << iShift ) | ( iDup << ( iShift - pPage->DCBits ) ) );
-      HB_PUT_LE_ULONG( pRecPos, ( HB_GET_LE_ULONG( pRecPos ) & RNMask ) |
-                                HB_GET_LE_ULONG( &pSrc[ iNum ] ) );
+      usBit = ( iTrl << iShift ) | ( iDup << ( iShift - pPage->DCBits ) );
+#if 1 
+      /* this _PROPER_C_CODE_ is badly optimized by GCC3 and -O2 switch
+       * below is a little endian version which is not effectd
+       * by this bugy optimization. If you have troubles and
+       * use litle endian machine use it I don't plan to longer fight
+       * with it causing general slownes in other compilers. I hope
+       * GCC 3.4 will work OK.
+       */
+      HB_PUT_LE_USHORT( &pRecPos[ iReq - 2 ], usBit );
+      ulRec = ( HB_GET_LE_ULONG( pRecPos ) & RNMask ) | HB_GET_LE_ULONG( &pSrc[ iNum ] );
+      HB_PUT_LE_ULONG( pRecPos, ulRec );
+#else
+      memcpy( &pRecPos[ iReq - 2 ], &usBit, 2 );
+      memcpy( &ulRec, &pRecPos[ 0 ], 4 );
+      ulRec &= RNMask;
+      ulRec |= HB_GET_LE_ULONG( &pSrc[ iNum ] );
+      memcpy( &pRecPos[ 0 ], &ulRec, 4 );
+#endif
       if ( iTmp > 0 )
       {
          pKeyPos -= iTmp;
          memcpy( pKeyPos, &pSrc[ iDup ], iTmp );
       }
-      /* '#ifdef' commented because it's a workaround for bug in -O3
-       * optimization in GCC 3.3.2 in DJGPP (I haven't tested this GCC
-       * version in Linux so far, GCC 3.2 seems to work OK in this code
-       * but I've found other places which gives bad code when optimization
-       * is enabled
-       */
-/* #ifdef HB_CDX_DBGCODE */
+#ifdef HB_CDX_DBGCODE
       else if ( iTmp < 0 )
       {
          printf("\r\n[%s][%s]", pSrc - iLen, pSrc);
          printf("\r\npPage->Page=0x%lx, iKey=%d, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iKey, iNum, iDup, iTrl); fflush(stdout);
          hb_cdxErrInternal( "hb_cdxPageLeafEncode: index corrupted." );
       }
-/* #endif */
+#endif
    }
    if ( pRecPos < pKeyPos )
       memset( pRecPos, 0, pKeyPos - pRecPos );
@@ -1724,7 +1734,8 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 static void hb_cdxPageLeafDecode( LPCDXPAGE pPage, BYTE * pKeyBuf )
 {
    int iKey, iTmp, iBits, iDup, iTrl, iNew, iReq, iLen = pPage->TagParent->uiLen;
-   BYTE *pDst, *pSrc, *pRec, bTrail = ( pPage->TagParent->uiType == 'C' ) ? ' ' : '\0';
+   BYTE *pDst, *pSrc, *pRec, *pTmp, bTrail = ( pPage->TagParent->uiType == 'C' ) ? ' ' : '\0';
+   ULONG ulRec;
 
 #ifdef HB_CDX_DBGCODE
    if ( ( pPage->PageType & CDX_NODE_LEAF ) == 0 )
@@ -1740,7 +1751,8 @@ static void hb_cdxPageLeafDecode( LPCDXPAGE pPage, BYTE * pKeyBuf )
    iReq = pPage->ReqByte;
    for ( iKey = 0; iKey < pPage->iKeys; iKey++, pRec += iReq )
    {
-      iTmp = HB_GET_LE_USHORT( &pRec[ iReq - 2 ] ) >> iBits;
+      pTmp = &pRec[ iReq - 2 ];
+      iTmp = HB_GET_LE_USHORT( pTmp ) >> iBits;
       iDup = ( iKey == 0 ) ? 0 : ( iTmp & pPage->DCMask );
       iTrl = ( iTmp >> pPage->DCBits ) & pPage->TCMask;
       iNew = iLen - iDup - iTrl;
@@ -1767,7 +1779,8 @@ static void hb_cdxPageLeafDecode( LPCDXPAGE pPage, BYTE * pKeyBuf )
          memset( pDst, bTrail, iTrl );
          pDst += iTrl;
       }
-      HB_PUT_LE_ULONG( pDst, HB_GET_LE_ULONG( pRec ) & pPage->RNMask );
+      ulRec = HB_GET_LE_ULONG( pRec ) & pPage->RNMask;
+      HB_PUT_LE_ULONG( pDst, ulRec );
       pDst += 4;
       *(pDst++) = ( BYTE ) iDup;
       *(pDst++) = ( BYTE ) iTrl;
@@ -3313,6 +3326,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
       return;
 
    SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->KeyExpr );
+   /* TODO: RT error if SELF_COMPILE return FAILURE */
    pTag->pKeyItem = pTag->pIndex->pArea->valResult;
    pTag->pIndex->pArea->valResult = NULL;
    /* Get a blank record before testing expression */
@@ -3361,6 +3375,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
       hb_strncpyUpper( pTag->ForExpr, ( const char * ) pHeader.keyExpPool +
                        strlen( pTag->KeyExpr ) + 1, CDX_MAXKEY );
       SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->ForExpr );
+      /* TODO: RT error if SELF_COMPILE return FAILURE */
       pTag->pForItem = pTag->pIndex->pArea->valResult;
       pTag->pIndex->pArea->valResult = NULL;
       pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pForItem );
@@ -7970,10 +7985,10 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
    v = ( USHORT ) ( pSort->NodeList[ Lvl ]->Entry_Ct *
        pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes );
    k = HB_GET_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace );
-   HB_PUT_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace,
-                     k - ( USHORT ) ( pSort->CurTag->uiLen +
-                     pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes -
-                     cd - ct ) );
+   c = k - ( USHORT ) ( pSort->CurTag->uiLen +
+                        pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes -
+                        cd - ct );
+   HB_PUT_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace, c );
    k += v;
    /* RECMASK */
 /*
