@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.467 2002/10/27 14:41:35 lculik Exp $
+ * $Id: ChangeLog,v 1.468 2002/10/28 20:36:51 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,7 +11,7 @@
 2002-10-26 17:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/dymsym.c
     + added Workaround for Symbol table lenght limited up to 10 chars
-      this can but turned on by defining HB_SYMLIMIT_10_WORKAROUND
+      this can be turned on by defining HB_SYMLIMIT_10_WORKAROUND
 
 2002-10-27 11:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbapierr.h

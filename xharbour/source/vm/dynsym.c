@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.3 2002/10/13 18:06:30 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.4 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -316,6 +316,113 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
       }
    }
+
+   #ifdef HB_SYMLIMIT_10_WORKAROUND
+
+   /*
+   *  (c) 2002, Marcelo Lombardo <lombardo@uol.com.br>
+   *  This is an emulation workaround for the symbol table limited to 10 chars,
+   *  Since the build flag -DHB_SYMBOL_NAME_LEN=10 is not an option anymore.
+   */
+
+   if (s_uiClosestDynSym < s_uiDynSymbols)
+   {
+      USHORT iLen1 = strlen( szName );
+      USHORT iLen2 = strlen( s_pDynItems[ s_uiClosestDynSym ].pDynSym->pSymbol->szName );
+      BOOL   bOk  = 1;
+      USHORT uiPos;
+
+      /*
+      *  Let's check the closer symbol found
+      *  This code compares each char in the smallest symbol name to the largest symbol name, if both are
+      *  greater than 10 chars long.
+      */
+
+      if (iLen1 >= 10 && iLen2 >= 10 && (!(iLen1 == iLen2 && iLen1 == 10)))
+      {
+         if (iLen1 > iLen2)
+         {
+            for( uiPos = 0; uiPos < iLen2; uiPos++ )
+            {
+               if (szName[uiPos] != s_pDynItems[ s_uiClosestDynSym ].pDynSym->pSymbol->szName[uiPos])
+               {
+                  bOk = 0;
+                  break;
+               }
+            }
+         }
+         else if (iLen2 > iLen1)
+         {
+            for( uiPos = 0; uiPos < iLen1; uiPos++ )
+            {
+               if (szName[uiPos] != s_pDynItems[ s_uiClosestDynSym ].pDynSym->pSymbol->szName[uiPos])
+               {
+                  bOk = 0;
+                  break;
+               }
+            }
+         }
+         else if (iLen1 == iLen2)
+         {
+            bOk = 0;
+         }
+         
+         if (bOk)
+         {
+            return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+         }
+      }
+      
+      /*
+      *  We did not find the symbol, but :
+      *  "nCount" looks closer to the tree search than "nCountDial", for instance.
+      *  So our last chance is to cut off szName up to 10 chars and redo the search.
+      */
+      
+      if (iLen1 > 10 && iLen2 < 10)
+      {
+         USHORT uiFirst = 0;
+         USHORT uiLast = s_uiDynSymbols;
+         USHORT uiMiddle = uiLast / 2;
+         char szNameLimited[ 10 + 1 ];
+         char * pDest = szNameLimited;
+         
+         iLen1 = 10;
+
+         pDest[ iLen1 ] = '\0';
+         while( iLen1-- )
+         {
+            *pDest++ = *szName++;
+         }
+   
+         s_uiClosestDynSym = uiMiddle;                  /* Start in the middle      */
+   
+         while( uiFirst < uiLast )
+         {
+            int iCmp = strcmp( s_pDynItems[ uiMiddle ].pDynSym->pSymbol->szName, szNameLimited );
+   
+            if( iCmp == 0 )
+            {
+               s_uiClosestDynSym = uiMiddle;
+               return s_pDynItems[ uiMiddle ].pDynSym;
+            }
+            else if( iCmp < 0 )
+            {
+               uiLast = uiMiddle;
+               s_uiClosestDynSym = uiMiddle;
+            }
+            else /* if( iCmp > 0 ) */
+            {
+               uiFirst = uiMiddle + 1;
+               s_uiClosestDynSym = uiFirst;
+            }
+            uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
+         }
+      
+      }
+   }
+   
+   #endif
 
    return NULL;
 }
