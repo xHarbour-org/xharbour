@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.92 2003/11/01 06:00:54 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.93 2003/11/01 12:45:05 ronpinkas Exp $
  */
 
 /*
@@ -1325,7 +1325,7 @@ ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const c
 
       while( ulPos < ulLen && ulSubPos < ulSubLen )
       {
-         if( szText[ ulPos ] == '"' )
+         if( szText[ ulPos ] == '"' && ( ulPos == 0 || szText[ ulPos - 1 ] != '<' ) )
          {
             while( ++ulPos < ulLen && szText[ ulPos ] != '"' )
             {
