@@ -157,7 +157,7 @@ linking the VMGUI library code into it.
        => ;
           [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
              local uResult ;;
-             Local hInstDLL  :=LoadLibrary(<DllName>);;
+             Local hInstDLL  :=LoadLibrary(<(DllName)>);;
              Local nProcAddr :=GetProcAddress(hInstDLL,<(alias>));;
              uResult = CallDLL(hInstDLL, nProcAddr, [<flags>], <return> [, <type1>, <uParam1> ] [, <typeN>, <uParamN> ] ) ;;
              FreeLibrary(<hInstDLL>);;
@@ -171,7 +171,7 @@ linking the VMGUI library code into it.
        => ;
           [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
              local uResult ;;
-             Local hInstDLL  :=LoadLibrary(<DllName>);;
+             Local hInstDLL  :=LoadLibrary(<(DllName)>);;
              Local nProcAddr :=GetProcAddress(hInstDLL,<(alias>));;
              uResult = CallDLL(hInstDLL, nProcAddr, [<flags>], <return> [, <type1>, <uParam1> ] [, <typeN>, <uParamN> ] ) ;;
              FreeLibrary(<hInstDLL>);;
