@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.4 2003/11/20 16:44:33 jonnymind Exp $
+* $Id: tipclient.prg,v 1.5 2003/11/28 16:05:40 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -86,8 +86,12 @@ METHOD New( oUrl, oCredentials ) CLASS tIPClient
 
 RETURN oRet
 
-METHOD Open() CLASS tIPClient
+METHOD Open( cUrl ) CLASS tIPClient
    LOCAL nPort
+
+   IF HB_IsString( cUrl )
+      ::oUrl := tUrl():New( cUrl )
+   ENDIF
 
    IF ::oUrl:nPort == -1
       nPort := ::nDefaultPort

@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipurl.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tipurl.prg,v 1.2 2003/06/16 00:41:28 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -26,9 +26,6 @@ CLASS tURL
    DATA cPath
    DATA cQuery
    DATA cFile
-   DATA cFname
-   DATA cExt
-   DATA bDynamic
    DATA nPort
    DATA cUserid
    DATA cPassword
@@ -37,6 +34,11 @@ CLASS tURL
    METHOD SetAddress( cUrl )
    METHOD BuildAddress()
    METHOD BuildQuery( )
+
+HIDDEN:
+   CLASSDATA   cREuri   INIT HB_RegexComp("(?:(.*)://)?([^?/]*)/?([^?]*)?\??(.*)")
+   CLASSDATA   cREServ  INIT HB_RegexComp("(?:([^:@]*):?([^@:]*)@|)([^:]+):?(.*)")
+   CLASSDATA   cREFile  INIT HB_RegexComp("^((?:/.*/)|/)*(.*)$")
 
 ENDCLASS
 
@@ -47,99 +49,51 @@ RETURN Self
 
 
 METHOD SetAddress( cUrl ) CLASS tURL
-   LOCAL nPos
+   LOCAL aMatch, cServer, cPath
 
-   ::cAddress := NIL
-   ::cProto := NIL
-   ::cUserid := NIL
-   ::cPassword := NIL
-   ::cServer := NIL
-   ::cPath := NIL
-   ::cQuery := NIL
-   ::cFile := NIL
-   ::cFname := NIL
-   ::cExt := NIL
-   ::bDynamic := .F.
+   ::cAddress := ""
+   ::cProto := ""
+   ::cUserid := ""
+   ::cPassword := ""
+   ::cServer := ""
+   ::cPath := ""
+   ::cQuery := ""
+   ::cFile := ""
    ::nPort := -1
 
    IF Empty( cUrl ) .or. Len( cUrl ) == 0
       RETURN .T.
    ENDIF
 
-   ::cAddress := cUrl
+   // TOPLEVEL url parsing
+   aMatch:= HB_Regex( ::cREuri, cUrl )
 
-   // Parse protocol e.g. http://
-   nPos := At( "://", cUrl )
-   IF nPos != 0
-      ::cProto := Lower(Substr( cUrl, 1 , nPos -1 ))
-      cUrl := Substr( cUrl, nPos + 3 )
+   //May fail
+   IF Empty( aMatch )
+      RETURN .F.
    ENDIF
 
-   // parse userid/password
-   nPos := At("@", cUrl )
-   IF At( "/", cUrl ) == 0 .or. At( "/", cUrl ) > nPos
-      ::cUserid := Substr( cUrl, 1 , nPos -1 )
-      cUrl := Substr( cUrl, nPos + 1 )
-      nPos := At( ":", ::cUserid )
-      IF nPos > 0
-         ::cPassword := Substr( ::cUserid, nPos + 1 )
-         ::cUserid := Substr( ::cUserid, 1 , nPos - 1 )
-      ENDIF
-      IF Empty( ::cPassword )
-         ::cPassword = ""
-      ENDIF
-      ::cUserid := StrTran( ::cUserid, "&at;", "@" )
-      ::cPassword := StrTran( ::cPassword, "&at;", "@" )
-   ENDIF
-   //Parse server e.g. www.altavista.com
-   nPos := At("/", cUrl )
-   IF nPos != 1
-      IF nPos == 0      // No more slashes?
-         ::cServer := cUrl
-         ::cPath := "/"
-         RETURN .T.
-      ELSE
-         ::cServer := Substr( cUrl, 1, nPos -1 )
-         cUrl := Substr( cUrl, nPos +1 )
-      ENDIF
-      // finds the port
-      nPos := At( ":", ::cServer )
-      IF nPos > 1
-         ::nPort := Val( Substr( ::cServer, nPos+1 ) )
-         ::cServer := Substr( ::cServer , 1, nPos-1 )
-      ENDIF
-   ELSE
-      cUrl := SubStr( cUrl, 2 )
-   ENDIF
+   ::cProto := Lower( aMatch[2] )
+   cServer := aMatch[3]
+   cPath := aMatch[4]
+   ::cQuery := aMatch[5]
 
-   //now get pat
-   nPos := Rat("/", cUrl )
-   IF nPos != 0
-      ::cPath := "/" + Substr( cUrl, 1, nPos -1 )
-      cUrl := Substr( cUrl, nPos + 1 )
-   ELSE
-      ::cPath := "/"
-   ENDIF
+   ? "Main match", ValToPRg( aMatch )
+   // server parsing (can't fail)
+   aMatch := HB_Regex( ::cREServ, cServer )
+   ::cUserId := aMatch[2]
+   ::cPassword := aMatch[3]
+   ::cServer := aMatch[4]
+   ::nPort := Val(aMatch[5])
+   ? "Server match", ValToPRg( aMatch )
 
-   // get query portion
-   nPos := At( "?", cUrl )
-   IF nPos > 0
-      ::bDynamic := .T.
-      ::cQuery := Substr( cUrl, nPos +1 )
-      cUrl := Substr( cUrl, 1, nPos -1 )
-   ENDIF
+   // Parse path and file (can't fail )
+   aMatch := HB_Regex( ::cREFile, cPath )
+   ::cPath := aMatch[2]
+   ::cFile := aMatch[3]
+   ? "Path match", ValToPRg( aMatch )
 
-   // now let's get the file
-   IF Len( cUrl ) > 0
-      ::cFile := cUrl
-      nPos := Rat(".", cUrl )
-      IF nPos > 0
-         ::cFname := Substr( cUrl, 1, nPos -1 )
-         ::cExt := Substr( cUrl, nPos +1 )
-      ENDIF
-   ENDIF
-
-RETURN .F.
+RETURN .T.
 
 
 METHOD BuildAddress() CLASS tURL
@@ -168,23 +122,13 @@ METHOD BuildAddress() CLASS tURL
       ENDIF
    ENDIF
 
-   IF .not. Empty( ::cPath ) .or. .not. Empty( ::cFile ) .or. .not. Empty( ::cQuery )
-      cRet += "/"
-      IF .not. Empty( ::cPath )
-         IF At( "/", ::cPath ) == 1
-            cRet += Substr( ::cPath, 2 )
-         ELSE
-            cRet += ::cPath
-         ENDIF
-         cRet += "/"
-      ENDIF
-      IF .not. Empty( ::cFile )
-         cRet += ::cFile
-      ENDIF
+   IF Len( ::cPath ) == 0 .or. ::cPath[-1] != "/"
+      ::cPath += "/"
+   ENDIF
 
-      IF ! Empty( ::cQuery )
-         cRet += "?" + ::cQuery
-      ENDIF
+   cRet += ::cPath + ::cFile
+   IF .not. Empty( ::cQuery )
+      cRet += "?" + ::cQuery
    ENDIF
 
    IF Len( cRet ) == 0
@@ -200,12 +144,13 @@ RETURN cRet
 METHOD BuildQuery( ) CLASS tURL
    LOCAL cLine
 
-   cLine := ::cPath + "/"
-   IF .not. Empty( ::cFile )
-      cLine += ::cFile
-      IF .not. Empty( ::cQuery )
-         cLine += "?" + ::cQuery
-      ENDIF
+   IF Len( ::cPath ) == 0 .or. ::cPath[-1] != "/"
+      ::cPath += "/"
+   ENDIF
+
+   cLine := ::cPath + ::cFile
+   IF .not. Empty( ::cQuery )
+      cLine += "?" + ::cQuery
    ENDIF
 
 RETURN cLine

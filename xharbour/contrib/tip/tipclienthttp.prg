@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.6 2003/11/29 03:22:03 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.7 2003/12/01 00:19:39 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -56,13 +56,31 @@ RETURN .F.
 
 
 METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
+   LOCAL cData, nI
+
+   IF HB_IsHash( cPostData )
+      cData := ""
+      FOR nI := 1 TO Len( cPostData )
+         cData += TipEncoderUrl_Encode( AllTrim(CStr(HGetKeyAt( cPostData, nI ))) ) + "=" +;
+            AllTrim(CStr(TipEncoderUrl_Encode( HGetValueAt( cPostData, nI ) ))) + "&"
+      NEXT
+      cData[-1] = ""
+   ELSEIF HB_IsString( cPostData )
+      cData := cPostData
+   ELSE
+      Alert( "TipClientHTTP_PostRequest: Invalid parameters" )
+      Return
+   ENDIF
+
    InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
+
    InetSendAll( ::SocketCon, "Content-Length: " + ;
-         LTrim(Str( Len( cPostData ) ) ) + ::cCRLF )
+         LTrim(Str( Len( cData ) ) ) + ::cCRLF )
    InetSendAll( ::SocketCon, ::cCRLF )
+
    IF InetErrorCode( ::SocketCon  ) ==  0
-      InetSendAll( ::SocketCon, cPostData )
+      InetSendAll( ::SocketCon, cData )
       RETURN ::ReadHeaders()
    ENDIF
 RETURN .F.

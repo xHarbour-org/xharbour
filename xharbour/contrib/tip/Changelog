@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.22 2003/12/06 15:10:18 lculik Exp $
+ * $Id: Changelog,v 1.23 2003/12/07 14:07:01 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-07 15:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * contrib/tip/tipurl.prg
+    ! Fixed URL parsing, now using latest REGEX
+
+  * contrib/tip/tipclient.prg
+    ! Now URL can be created also while opening
+
+  * contrib/tip/tipclienthttp.prg
+    + If provided with a Hash, method PostRequest will create an HTTP
+      request using key/values pair from the hash, automatically
+      translating them into strings AND encoding them.
+      
 2003-12-07 15:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipencoderbase64.prg
     ! Must used unsigned char instead of char to encode binary
