@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.552 2002/12/26 02:48:34 jonnymind Exp $
+ * $Id: ChangeLog,v 1.553 2002/12/27 22:34:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,41 +8,50 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-12-27 21:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Excluded estack.h from being included when building compiler.
+      This fixes many compiles error related to premature inclusion of windows.h on Windows platforms.
+
+  * source/rtl/console.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+    * Added guard to NOT call hb_LWRM_[un]lock() unless MT is indded utilized.
+      This fixes GPF related to th eabove functions in NON MT applications.
+
 2002-12-27 23:28 UTC+0100    Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbstack.h
+  * include/inet.h
+  * source/rtl/inet.c
+  * source/vm/estack.c
+  * source/vm/thread.c
+    ! compilation problems with -DHB_NO_DEFAULT_THREADS are now fixed
 
-* include/hbstack.h
-* include/inet.h
-* source/rtl/inet.c
-* source/vm/estack.c
-* source/vm/thread.c
-  ! compilation problems with -DHB_NO_DEFAULT_THREADS are now fixed
-
-* source/rtl/inet.c
-  * Removed completely (using comments) locking mechanism upon sockets. To be studied
-    more deeply when MT/GC is working.
+  * source/rtl/inet.c
+    * Removed completely (using comments) locking mechanism upon sockets. To be studied
+      more deeply when MT/GC is working.
 
 2002-12-26 03:38 UTC+0100  Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/thread.h
+    source/vm/thread.c
+    + Added multiplatform lightweight reentrant mutex to be used internally by x-harbour
+    + hb_LWRM_lock( HB_LWR_MUTEX *lpMutex ) / hb_LWRM_unlock( HB_LWR_MUTEX *lpMutex )
 
-* include/thread.h
-  source/vm/thread.c
-  + Added multiplatform lightweight reentrant mutex to be used internally by x-harbour
-  + hb_LWRM_lock( HB_LWR_MUTEX *lpMutex ) / hb_LWRM_unlock( HB_LWR_MUTEX *lpMutex )
+  * source/rtl/console.c
+    * Changed the internal mutex to a lightweight reentrant mutex
 
-* source/rtl/console.c
-  * Changed the internal mutex to a lightweight reentrant mutex
+  * source/rtl/idle.c
+     % Added a "marker" around the point that generates an error in MT. Will have to work it
+     out in the next days
 
-* source/rtl/idle.c
-   % Added a "marker" around the point that generates an error in MT. Will have to work it
-   out in the next days
+  * source/rtl/inet.c
+    * Commented out mutex sections; will have to decide if keep them (and turn them into LWRM or
+      remove them) in the next few days
 
-* source/rtl/inet.c
-  * Commented out mutex sections; will have to decide if keep them (and turn them into LWRM or
-    remove them) in the next few days
+  * source/vm/fm.c
+    source/vm/garbage.c
+    ! Added mutex around concurrent allocation/deallocation of shared memory.
 
-* source/vm/fm.c
-  source/vm/garbage.c
-  ! Added mutex around concurrent allocation/deallocation of shared memory.
-  
 2002-25-12 12:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
     ! Fix, PanLeft() and PanRight() methods.

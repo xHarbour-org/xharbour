@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.48 2002/12/23 00:14:22 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.49 2002/12/23 02:47:27 jonnymind Exp $
  */
 
 /*
@@ -230,7 +230,9 @@ extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before relea
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
-   #include "hbstack.h"
+   #ifndef HB_COMP_H_
+      #include "hbstack.h"
+   #endif
 
     #define hb_pcount()                          ( ( int ) ( ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ) ? ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt : ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
 

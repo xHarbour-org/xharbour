@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.25 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: garbage.c,v 1.26 2002/12/26 02:48:47 jonnymind Exp $
  */
 
 /*
@@ -163,9 +163,12 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    #ifdef GC_RECYCLE
       if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
@@ -191,15 +194,23 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
 
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+            hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
+
       return (void *)( pAlloc + 1 );   /* hide the internal data */
    }
    else
    {
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+            hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
+
       return NULL;
    }
 
@@ -208,17 +219,27 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 /* release a memory block allocated with hb_gcAlloc() */
 void hb_gcFree( void *pBlock )
 {
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
+
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+            hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
+
       return;
    }
 
@@ -247,10 +268,13 @@ void hb_gcFree( void *pBlock )
    {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
    }
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
 
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 }
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
@@ -265,9 +289,12 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    #ifdef GC_RECYCLE
       if( s_pAvailableItems )
@@ -304,14 +331,21 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       }
 
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+            hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
+
       return pItem;
    }
    else
    {
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+             hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
 
       return NULL;
@@ -320,17 +354,24 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
-
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
+
       #ifdef HB_THREAD_SUPPORT
-         hb_LWRM_unlock( &hb_internal_monitor );
+         if( hb_ht_context )
+         {
+            hb_LWRM_unlock( &hb_internal_monitor );
+         }
       #endif
 
       return;
@@ -354,9 +395,13 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
       HB_GARBAGE_FREE( pAlloc );
    }
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 
 }
 
@@ -365,9 +410,12 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 */
 void * hb_gcLock( void * pBlock )
 {
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    if( pBlock )
    {
@@ -383,9 +431,13 @@ void * hb_gcLock( void * pBlock )
       ++pAlloc->locked;
    }
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
+
    return pBlock;
 }
 
@@ -394,9 +446,12 @@ void * hb_gcLock( void * pBlock )
 */
 void *hb_gcUnlock( void *pBlock )
 {
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    if( pBlock )
    {
@@ -413,9 +468,13 @@ void *hb_gcUnlock( void *pBlock )
          }
       }
    }
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 
    return pBlock;
 }
@@ -424,9 +483,12 @@ void *hb_gcUnlock( void *pBlock )
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    if( HB_IS_BYREF( pItem ) )
    {
@@ -505,9 +567,13 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       }
    }
    /* all other data types don't need the GC */
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 }
 
 void hb_gcCollect( void )
@@ -523,9 +589,12 @@ void hb_gcCollectAll( void )
    //extern PHB_ITEM **hb_vm_pGlobals;
    //extern short    hb_vm_iGlobals;
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
@@ -682,18 +751,25 @@ void hb_gcCollectAll( void )
        */
       s_uUsedFlag ^= HB_GC_USED_FLAG;
    }
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 }
 
 void hb_gcReleaseAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_lock( &hb_internal_monitor );
+      }
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
@@ -778,9 +854,12 @@ void hb_gcReleaseAll( void )
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
 
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_LWRM_unlock( &hb_internal_monitor );
+      }
+   #endif
 }
 
 /* service a single garbage collector step
