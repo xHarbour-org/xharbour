@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.90 2004/03/10 22:12:52 andijahja Exp $
+ * $Id: dbcmd.c,v 1.91 2004/03/10 22:47:13 andijahja Exp $
  */
 
 /*
@@ -320,19 +320,24 @@ static void hb_rddCloseAll( void )
    //JC1: system not initialized, not needed to cleanup
    //In MT causes segfault. In ST is just useless to go on.
    if ( s_pWorkAreas == NULL )
+   {
       return;
+   }
 
    LOCK_AREA
+
    while( isParents )
    {
       pAreaNode = s_pWorkAreas;
       isParents = FALSE;
+
       while( pAreaNode )
       {
          pCurrArea = pAreaNode;
          pAreaNode = pAreaNode->pNext;
          s_pCurrArea = pCurrArea;
          s_uiCurrArea = ( ( AREAP ) pCurrArea->pArea )->uiArea;
+
          if ( isFinish )
          {
             SELF_RELEASE( ( AREAP ) pCurrArea->pArea );
@@ -342,15 +347,20 @@ static void hb_rddCloseAll( void )
          else if( pCurrArea->pArea )
          {
             if( ( ( AREAP ) pCurrArea->pArea )->uiParents )
+            {
                isParents = TRUE;
+            }
             else
             {
                SELF_CLOSE( ( AREAP ) pCurrArea->pArea );
             }
          }
       }
+
       if( !isParents && !isFinish )
+      {
          isParents = isFinish = TRUE;
+      }
    }
 
    s_uiCurrArea = 1;
@@ -591,19 +601,29 @@ void  HB_EXPORT hb_rddReleaseCurrentArea( void )
    SELF_RELEASE( ( AREAP ) s_pCurrArea->pArea );
 
    LOCK_AREA
+
    if( s_pWorkAreas == s_pCurrArea )
    {
       s_pWorkAreas = s_pCurrArea->pNext;
+
       if( s_pWorkAreas )
+      {
          s_pWorkAreas->pPrev = NULL;
+      }
    }
    else
    {
       if( s_pCurrArea->pPrev )
+      {
          s_pCurrArea->pPrev->pNext = s_pCurrArea->pNext;
+      }
+
       if( s_pCurrArea->pNext )
+      {
          s_pCurrArea->pNext->pPrev = s_pCurrArea->pPrev;
+      }
    }
+
    UNLOCK_AREA
 
    hb_xfree( s_pCurrArea );
@@ -1450,9 +1470,11 @@ HB_FUNC( DBCREATE )
       uiLen = 0;
    }
 
-   if( ( strlen( szFileName ) == 0 ) || !pStruct || uiLen == 0 )
+   if( ( strlen( szFileName ) == 0 ) || uiLen == 0 )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+      //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
@@ -1463,6 +1485,9 @@ HB_FUNC( DBCREATE )
       if( hb_arrayLen( pFieldDesc ) < 4 )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
+
          return;
       }
 
@@ -1473,6 +1498,8 @@ HB_FUNC( DBCREATE )
           !( hb_arrayGetType( pFieldDesc, 4 ) & HB_IT_NUMERIC ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
          return;
       }
    }
@@ -1538,30 +1565,37 @@ HB_FUNC( DBCREATE )
       if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
       {
          hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBCREATE" );
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
          return;
       }
    }
 
-   if ( hb_rddGetTempAlias( szAliasTmp ) )
+   if( hb_rddGetTempAlias( szAliasTmp ) )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBCREATE" );
+      //hb_errRT_BASE( EG_ARG, EDBCMD_DUPALIAS, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
    /* Create a new WorkArea node */
-   if( !hb_rddInsertAreaNode( szDriver ) )
+   if( ! hb_rddInsertAreaNode( szDriver ) )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
-   if( !pFileName->szExtension )
+   if( ! pFileName->szExtension )
    {
       s_DefaultExtension.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
+
       if( s_DefaultExtension.item.asString.value )
       {
          strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
@@ -1590,18 +1624,22 @@ HB_FUNC( DBCREATE )
    if( SELF_CREATEFIELDS( ( AREAP ) s_pCurrArea->pArea, pStruct ) == FAILURE )
    {
       hb_rddReleaseCurrentArea();
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
    if( SELF_CREATE( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
    {
       hb_rddReleaseCurrentArea();
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
+      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
-   if( !bOpen )
+   if( ! bOpen )
    {
       hb_rddReleaseCurrentArea();
       hb_rddSelectWorkAreaNumber( uiPrevArea );
@@ -1648,10 +1686,15 @@ HB_FUNC( DBCREATE )
 HB_FUNC( DBDELETE )
 {
    HB_THREAD_STUB
+
    if( s_pCurrArea )
+   {
       SELF_DELETE( ( AREAP ) s_pCurrArea->pArea );
+   }
    else
+   {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBDELETE" );
+   }
 }
 
 HB_FUNC( DBFILTER )
