@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.6 2002/03/01 19:18:57 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.7 2002/03/06 03:43:31 ronpinkas Exp $
  */
 
 /*
@@ -224,6 +224,9 @@ char * hb_pp_szWarnings[] =
    "1Redefinition or duplicate definition of #define %s",
    "1No directives in command definitions file"
 };
+
+//#define HB_ECHO_TRACE_HB_TR_DEBUG(x)    HB_ECHO_CREATE(HB_TR_DEBUG, x)
+//#define HB_ECHO_STEALTH_HB_TR_DEBUG(x)  HB_ECHO_STEALTH(HB_TR_DEBUG, x)
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 {
@@ -1610,6 +1613,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
                    ipos = NextName( &ptr, tmpname );
                    ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE );
 
+  HB_TRACE(HB_TR_DEBUG, ("2"));
                    if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
                    {
                       ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
@@ -1871,7 +1875,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   int rezrestr, ipos, nBra;
   char * ptr, * ptrtemp;
 
-  HB_TRACE(HB_TR_DEBUG, ("WorkMarkers(%s, %s, %s, %i, %i)", *ptrmp, *ptri, ptro, *lenres, com_or_xcom));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("WorkMarkers(%s, %s, %s, %i, %i)", *ptrmp, *ptri, ptro, *lenres, com_or_xcom));
 
   //printf( "WorkMarkers( '%s', '%s', '%s', %i, %i) %i\n", *ptrmp, *ptri, ptro, *lenres, com_or_xcom, s_numBrackets );
 
@@ -2142,7 +2146,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
 
    HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict));
 
-   //printf( "getExpReal('%s', '%s', %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict );
+   //printf( "getExpReal( '%s', '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
 
    HB_SKIPTABSPACES( *ptri );
 
@@ -2557,16 +2561,12 @@ static BOOL isExpres( char * stroka, BOOL prlist )
 
   HB_TRACE(HB_TR_DEBUG, ("isExpres(%s)", stroka));
 
-  #if 0
-     printf( "Exp: >%s<\n", stroka );
-  #endif
+  //printf( "isExp: >%s<\n", stroka );
 
   l1 = strlen( stroka );
   l2 = getExpReal( NULL, &stroka, prlist, HB_PP_STR_SIZE, TRUE );
 
-  #if 0
-     printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
-  #endif
+  //printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
 
   /* Ron Pinkas modified 2000-06-17 Expression can't be valid if last charcter is one of these: ":/+*-%^=(<>"
   return ( l1 <= l2 );
@@ -2581,35 +2581,60 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
   BOOL flagname = FALSE;
   int statevar = 0;
 
-  HB_TRACE(HB_TR_DEBUG, ("TestOptional(%s, %s)", ptr1, ptr2));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("TestOptional('%s', '%s')", ptr1, ptr2));
 
   while( ptr1 <= ptr2 )
-    {
-      if( *ptr1 == '[' ) nbr++;
-      else if( *ptr1 == ']' )
+  {
+     if( *ptr1 == '[' )
+     {
+        nbr++;
+     }
+     else if( *ptr1 == ']' )
+     {
+        if( nbr )
         {
-          if( nbr )
-            {
-              nbr--;
-              flagname = FALSE;
-            }
-          else return 0;
+           nbr--;
+           flagname = FALSE;
         }
-      else if( *ptr1 == '\1' && *(ptr1+2) == '2' && nbr ) statevar = 1;
-      else if( *ptr1 == '>' && statevar ) statevar = 0;
-      else if( *ptr1 != ' ' && *ptr1 != '\t' && !statevar )
+        else
         {
-          if( nbr ) flagname = TRUE;
-          else return 0;
+           return 0;
         }
-      ptr1++;
-    }
-  /*   if( !flagname )
-       while( *ptr1 != ']' )
-       {
-       if( *ptr1 == '[' || *ptr1 == '\0' ) return 0;
-       ptr1++;
-       } */
+     }
+     else if( *ptr1 == '\1' && *(ptr1+2) == '2' && nbr )
+     {
+        statevar = 1;
+     }
+     else if( *ptr1 == '>' && statevar )
+     {
+        statevar = 0;
+     }
+     else if( *ptr1 != ' ' && *ptr1 != '\t' && !statevar )
+     {
+        if( nbr )
+        {
+           flagname = TRUE;
+        }
+        else
+        {
+           return 0;
+        }
+     }
+
+     ptr1++;
+  }
+
+  /*
+  if( !flagname )
+  {
+     while( *ptr1 != ']' )
+     {
+        if( *ptr1 == '[' || *ptr1 == '\0' ) return 0;
+        ptr1++;
+     }
+  }
+  */
+
   return !flagname;
 }
 
@@ -2929,7 +2954,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
       s_aIsRepeate[ s_Repeate - 1 ]++;
    }
 
-   //printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptrOut );
+   //printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );
 }
 
 static int ReplacePattern( char patttype, char * expreal, int lenreal, char * ptro, int lenres )
@@ -3142,7 +3167,7 @@ static void pp_rQuotes( char * expreal, char * sQuotes )
   BOOL lQuote1 = FALSE;
   BOOL lQuote2 = FALSE;
 
-  HB_TRACE(HB_TR_DEBUG, ("pp_rQuotes(%s, %s)", expreal, sQuotes));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("pp_rQuotes(%s, %s)", expreal, sQuotes));
 
   /*
   printf( "String: >%s< Delim: %s\n", expreal, sQuotes );
@@ -3371,7 +3396,7 @@ int hb_pp_WrStr( FILE * handl_o, char * buffer )
 #endif
   int lens = strlen(buffer);
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_pp_WrStr(%p, %s)", handl_o, buffer));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_pp_WrStr(%p, >%s<)", handl_o, buffer ));
 
   /* Ron Pinkas added 2001-01-20 */
   if( hb_comp_files.iFiles == 1 )
@@ -3402,9 +3427,9 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
   int lCase = ( *szSub == '\1' )? 0:1;
   char cLastChar = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %i, %i, %i)", szSub, lSubLen, szText, checkword, checkPrth, bRule));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %i, %i, %i)", szSub, lSubLen, szText, checkword, checkPrth, bRule));
 
-  //printf( "md_strAt( '%s', %d, '%s', %i, %i, %i )\n", szSub, lSubLen, szText, checkword, checkPrth, bRule );
+  //printf( "\nmd_strAt( '%s', %d, '%s', %i, %i, %i )\n", szSub, lSubLen, szText, checkword, checkPrth, bRule );
 
   while( *(szText+lPos) != '\0' && lSubPos < lSubLen )
   {
@@ -3455,9 +3480,9 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               lPos++;
               continue;
            }
-           else if( *(szText+lPos) == ',' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+           else if( *(szText+lPos) == ',' )
            {
-              cLastChar = '[';
+              cLastChar = ',';
               lPos++;
               continue;
            }
@@ -3583,21 +3608,24 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
   }
 
   #if 0
-     if( bRule == 0 && szSub[0] != ';' )
-     {
-        printf( "Rule: %i Find: >%s< In: >%s<\n", bRule, szSub, szText );
-        printf( "Pos: %i Len: %i At: >%s<\n", lPos, lSubLen, (szText+lPos-lSubLen) );
-     }
+     if( bRule )
+        printf( "Finished (Rule: %i) Find: >%s< In: >%s<\n", bRule, szSub, szText );
+     else
+        printf( "Finished - Find: >%s< In: >%s<\n", szSub, szText );
+
+     if( lSubPos == lSubLen )
+        printf( "Found at Pos: %i >%s<\n", lPos - lSubLen, ( szText + lPos- lSubLen ) );
   #endif
 
-  return (lSubPos < lSubLen? 0: lPos - lSubLen + 1);
+  return ( lSubPos < lSubLen ? 0 : lPos - lSubLen + 1 );
 }
 
 static char * PrevSquare( char * ptr, char * bound, int * kolmark )
 {
    int State = STATE_NORMAL;
 
-   HB_TRACE(HB_TR_DEBUG, ("PrevSquare(%s, %s, %d)", ptr, bound, *kolmark));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("PrevSquare(%s, %s, %p, %i)", ptr, bound, kolmark, ( kolmark ? *kolmark: 0 )));
+
    while( ptr > bound )
    {
       if( State == STATE_QUOTE1 )
@@ -3618,7 +3646,8 @@ static char * PrevSquare( char * ptr, char * bound, int * kolmark )
       }
       ptr--;
    }
-   return ( *ptr == '[' && State == STATE_NORMAL )? ptr:NULL;
+
+   return ( *ptr == '[' && State == STATE_NORMAL ) ? ptr : NULL;
 }
 
 static int IsInStr( char symb, char * s )
@@ -3634,7 +3663,7 @@ void hb_pp_Stuff(char *ptri, char * ptro, int len1, int len2, int lenres )
   char *ptr1, *ptr2;
   int i;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_pp_Stuff(%s, %s, %d, %d, %d)", ptri, ptro, len1, len2, lenres));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_pp_Stuff(%s, %s, %d, %d, %d)", ptri, ptro, len1, len2, lenres));
 
   if( len1 > len2 )
     {
@@ -3857,7 +3886,7 @@ static int NextName( char ** sSource, char * sDest )
 
   int lenName = 0, State = STATE_NORMAL;
 
-  HB_TRACE(HB_TR_DEBUG, ("NextName(%p, %s)", sSource, sDest));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("NextName(%p, %s)", sSource, sDest));
 
   #if 0
      printf( "In: >%s<\n", *sSource );

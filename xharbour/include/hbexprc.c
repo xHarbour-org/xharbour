@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.4 2002/01/21 20:51:42 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.5 2002/01/30 19:02:41 ronpinkas Exp $
  */
 
 /*
@@ -546,20 +546,18 @@ BOOL hb_compExprCheckMacroVar( char * szText )
  * pExpr is the first expression on the list
  */
 HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight, HB_MACRO_DECL )
-#if defined( HB_MACRO_SUPPORT )
 {
+  #if defined( HB_MACRO_SUPPORT )
+
    pLeft->value.asString.string = (char *) hb_xrealloc( pLeft->value.asString.string, pLeft->ulLength + pRight->ulLength + 1 );
    pLeft->value.asString.dealloc = TRUE;
-   memcpy( pLeft->value.asString.string + pLeft->ulLength,
-      pRight->value.asString.string, pRight->ulLength );
+   memcpy( pLeft->value.asString.string + pLeft->ulLength, pRight->value.asString.string, pRight->ulLength );
    pLeft->ulLength += pRight->ulLength;
    pLeft->value.asString.string[ pLeft->ulLength ] = '\0';
    hb_compExprFree( pRight, HB_MACRO_PARAM );
 
-   return pLeft;
-}
 #else
-{
+
    /* NOTE: compiler uses the hash table for storing identifiers and literals
     * Strings passed for reduction can be referenced by other expressions
     * then we cannot resize them or deallocate
@@ -575,7 +573,9 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    pLeft->value.asString.dealloc = TRUE;
    hb_compExprFree( pRight, HB_MACRO_PARAM );
 
-   HB_SYMBOL_UNUSED( HB_MACRO_PARAM );    /* to suppress BCC warning */
+#endif
+
+   HB_SYMBOL_UNUSED( pMacro );    /* to suppress BCC warning */
+
    return pLeft;
 }
-#endif
