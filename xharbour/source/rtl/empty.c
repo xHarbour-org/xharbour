@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.12 2001/04/12 18:56:29 dholm Exp $
+ * $Id: empty.c,v 1.1.1.1 2001/12/21 10:41:31 ronpinkas Exp $
  */
 
 /*
@@ -82,6 +82,10 @@ HB_FUNC( EMPTY )
 
       case HB_IT_DATE:
          hb_retl( hb_itemGetDL( pItem ) == 0 );
+         break;
+
+      case HB_IT_POINTER:
+         hb_retl( hb_itemGetPtr( pItem ) == NULL );
          break;
 
       case HB_IT_LOGICAL:

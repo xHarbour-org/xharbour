@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.26 2003/04/21 01:40:30 jonnymind Exp $
+* $Id: inet.c,v 1.27 2003/04/22 08:12:56 mauriliolongo Exp $
 */
 
 /*
@@ -1187,13 +1187,15 @@ HB_FUNC( INETRECVENDBLOCK )
          Buffer = ( char * ) hb_xrealloc( Buffer, iAllocated );
       }
 
+      iLen = 0;
+
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, &cChar, 1, MSG_NOSIGNAL );
          HB_DISABLE_ASYN_CANC;
-         HB_STACK_LOCK;
+
       }
       else {
          HB_DISABLE_ASYN_CANC;

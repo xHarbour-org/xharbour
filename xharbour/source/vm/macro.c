@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.19 2003/04/17 09:28:34 paultucker Exp $
+ * $Id: macro.c,v 1.20 2003/05/02 16:30:57 ronpinkas Exp $
  */
 
 /*
@@ -605,6 +605,7 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       BOOL bCopy = FALSE;
 
       ulLen--;
+      szString = pItem->item.asString.value;
       while( szString[ulLen] == ' ' )
       {
          ulLen--;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.999 2003/05/05 23:06:11 lculik Exp $
+ * $Id: ChangeLog,v 1.1000 2003/05/06 03:56:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-06 11:02 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/empty.c
+    ! check for HB_IT_POINTER was not present, so any "pointer" kind
+      variable returned .T. in Empty() checks. Fixed.
+
+  * source/vm/inet.c
+    ! In InetRecvEndBlock() if timeout expired witout reading, detection
+      of the error was faulty; fixed.
+
+  * source/vm/macro.c
+    ! In hb_macroSetValue() a loop to trim the trailing space was done
+      NOT on the variable holding the macro code, but on the NON
+      INITIALIZED space where the variable would have been copied. Fixed.
 
 2003-05-05 20:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
