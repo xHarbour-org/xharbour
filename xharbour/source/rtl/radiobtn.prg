@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.4 2001/12/08 18:07:33 lculik Exp $
+ * $Id: radiobtn.prg,v 1.1.1.1 2001/12/21 10:41:48 ronpinkas Exp $
  */
 
 /*
@@ -152,14 +152,19 @@ METHOD kILLFOcus()  CLASS HBRadioButton
 METHOD DISPLAy()  CLASS HBRadioButton
    
    local cColor := SetColor(), cCurStyle, nCurRow:= Row(), nCurCol:= ;
-   Col(), cPairs, cPairs3, nPos, cPairs4, cOldCaption 
+   Col(), cPairs, cPairs3, nPos, cPairs4, cOldCaption
+   if ( ::hasfocus  )
+      cPairs4 := __guicolor( ::colorspec, 7)
+   else
+      cPairs4 := __guicolor( ::colorspec, 6)
+   endif
 
    cCurStyle := ::Style
    dispbegin()
-   if ( ::hasfocus )
-      set color to (__guicolor(::colorspec, 2))
+   if ( ::Buffer )
+      set color to (__guicolor(::colorspec, 4))
    else
-      set color to (__guicolor(::colorspec, 1))
+      set color to (__guicolor(::colorspec, 2))
    endif
    SetPos(::Row, ::Col)
    ?? Left(cCurStyle, 1)
@@ -189,6 +194,7 @@ METHOD DISPLAy()  CLASS HBRadioButton
    set color to (cColor)
    SetPos(nCurRow, nCurCol)
    return Self
+
 METHOD IsAccel( xValue )  CLASS HBRadioButton
    
    local nPos, cCaption, xResult

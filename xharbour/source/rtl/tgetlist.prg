@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.19 2003/09/13 20:37:30 walito Exp $
+ * $Id: tgetlist.prg,v 1.20 2003/11/12 08:42:04 andijahja Exp $
  */
 
 /*
@@ -989,7 +989,7 @@ METHOD GuiReader( oGet, oMenu, oGetMsg ) CLASS HBGetList
       end
 
          // De-activate the GET
-      IF ( ( oGUI:ClassName() $ "LISTBOX_RADIOGROUP" ) .AND. ;
+      IF ( ( oGUI:ClassName() $ "LISTBOX_HBRADIOGROUP" ) .AND. ;
          VALTYPE( oGet:VarGet() ) == "N" )
          // Need to test the Value here:
          oGet:VarPut( oGUI:Value )
@@ -1040,9 +1040,10 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
       nKey := 0
 
    endif
-
+   tracelog(oGUI:ClassName )
    if nKey == 0
-   elseif ( oTheClass := oGUI:ClassName() ) == "RADIOGROUP"
+   elseif ( oTheClass := oGUI:ClassName() ) == "HBRADIOGROUP"
+   tracelog( nKey )
       if nKey == K_UP
          oGUI:PrevItem()
          nKey := 0
@@ -1286,7 +1287,7 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
    IF ( !( oGUI:ClassName() == "TBROWSE" ) )
       uOldData := oGet:VarGet()
 
-      IF ( oGUI:ClassName() $ "LISTBOX_RADIOGROUP" .AND. ;
+      IF ( oGUI:ClassName() $ "LISTBOX_HBRADIOGROUP" .AND. ;
          VALTYPE( oGet:VarGet() ) == "N" )
          uNewData := oGUI:Value
       ELSE

@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.2 2002/03/17 23:27:28 lculik Exp $
+ * $Id: checkbox.prg,v 1.3 2003/02/20 02:33:16 lculik Exp $
  */
 
 /*
@@ -270,7 +270,7 @@ RETURN ( cColor == "W/N,N/W,N/N,N/N,N/W" )
 
 FUNCTION Checkbox( nr, ncol, cCaption )
 
-   DEFAULT cCaption TO ''
+   DEFAULT cCaption TO ""
 
 RETURN HBCHECKBOX():new( nr, nCol, cCaption )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.6 2003/04/26 16:26:24 lculik Exp $
+ * $Id: radiogrp.prg,v 1.7 2003/06/04 14:40:54 walito Exp $
  */
 
 /*
@@ -108,7 +108,6 @@ CLASS HBRadioGroup
    DATA TextValue INIT ""
 
    DATA Top
-   DATA CLASSName INIT "RADIOGROUP"
    DATA TypeOut INIT .F.
 
    DATA Value INIT 0
