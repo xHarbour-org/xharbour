@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.9 2003/11/23 14:44:35 jonnymind Exp $
+ * $Id: txml.prg,v 1.10 2004/03/23 18:09:29 jonnymind Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ RETURN NIL
    Iterator class
 *********************************************/
 CLASS TXmlIterator
-   METHOD New( oNodeTop )
+   METHOD New( oNodeTop )           CONSTRUCTOR
    METHOD Next()
    METHOD Rewind()                  INLINE   ::oNode := ::oTop
    METHOD Find( cName, cAttribute, cValue, cData )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3155 2004/07/14 22:44:12 paultucker Exp $
+ * $Id: ChangeLog,v 1.3156 2004/07/15 03:21:57 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-07-14 12:22 UTC-0200 Giancarlo Niccolai <antispam /at/ niccolai "dot" ws>
+  * doc/hbxml.txt
+    * Documentation refined and updated; added Iterator description and integrated
+      Harlan Thomas refinements.
+
+  * doc/inet.txt
+    * Minor fix.
+
+  * source/rtl/txml.prg
+    ! New() method of TXmlIterator class had not the CONSTRUCTOR clause
+
 
 2004-07-15 08:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c

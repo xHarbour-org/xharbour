@@ -14,40 +14,40 @@
  *  $ONELINER$
  *      XHARBOUR INET API
  *  $DESCRIPTION$
- *      
+ *
  *      STATUS OF THIS DOCUMENT
- *      
- *      
+ *
+ *
  *      This is just a draft, a survival guide with minimal API instructions
  *      extracted from the inet.c program comments and from some posting to
  *      the xharbour newsgroup.
- *      
+ *
  *      More adequate version will be available soon.
- *      
- *      
+ *
+ *
  *      XHARBOUR INET API
  *      =================
- *      
- *      
+ *
+ *
  *      Startup / cleanup functions
  *      ---------------------------
- *      
+ *
  *      InetInit() -->NIL
  *        Activates inet support; mainly used for winsock start up at the moment, but
  *        could be used in the future for many other purpose. Put it at the beginning
  *        of every program using INET functions.
- *      
- *      
+ *
+ *
  *      InetCleanup() -->NIL
  *        Closes Inet support; mainly used for win32. Put it at the end of any program
  *        using Inet functions, just before program exits.
- *      
+ *
  *      InetCreate() --> SOCKET
  *        Creates the raw data of the socket, that can be passed to an asynchronoys
  *        connection function (InetConnect or InetConnectIP). This will prevent the
  *        connection function to allocate some data that could be never used on
  *        certain case, i.e. an asynchronously detected timeout.
- *      
+ *
  *      InetClose( SOCKET ) --> NUMERIC
  *        Closes the socket, notifiying both ends of the communication pipe that the
  *        connection is over. If you have threads waiting for data to be read from
@@ -59,13 +59,13 @@
  *        thread is using it.
  *        RETURNS 0 on success or -1 on error; on error, the error code is set;
  *        (actually, on success the socket error code is set to 1 -- socket closed )
- *      
- *      
+ *
+ *
  *      InetDestroy( SOCKET ) --> Numeric
  *        Closes AND destroys a socket. After this call, the socket can't be used
  *        anymore. Returns 0 on success -1 on failure.
- *      
- *      
+ *
+ *
  *      InetSetTimeout( SOCKET, nMillisecs ) --> NIL
  *        Sets the default timeout of the given socket. Default timeout is used in all
  *        blocking operations: if the operation can't be done in nMillisec milliseconds,
@@ -78,49 +78,49 @@
  *        that if any of that raw socket read operation is going to take more than
  *        nMillisecs, the function will be terminated.
  *        When created, a socket is created with an infinite default timeout (-1).
- *      
+ *
  *      InetGetTimeout( SOCKET ) --> NUMERIC
  *        Returns the timeout set for the given socket.
- *      
+ *
  *      InetClearTimeout( SOCKET, nMillisecs ) --> NIL
  *        Clears the default timeout of the given socket. Default timeout is used in all
  *        blocking operations.
- *      
- *      
+ *
+ *
  *      Informative functions
  *      ---------------------
- *      
+ *
  *      InetErrorCode( SOCKET ) --> Numeric
  *        Returns the last error code that has been provoked by a network operation,
  *        or 0 if none. Error codes are the one used for winsock or UnixSockets (they
  *        are the same); 1 is reserved for "connection closed" message.
- *      
- *      
+ *
+ *
  *      InetErrorDesc( SOCKET ) --> String
  *        Returns a string describing the last error that have occoured to the socket;
  *        the string is system dependent, and should be used only for debugging
  *        purposes.
- *      
- *      
+ *
+ *
  *      InetCount( SOCKET ) --> Numeric
  *        Returns the amount of characters read or written in the latest socket
  *        operation.
- *      
- *      
+ *
+ *
  *      InetAdderss( SOCKET ) --> STRING
  *        Returns a string representing the remote server addres in quad dot notation,
  *        e.g. "192.168.1.1", or the local server address if the socket is server
  *        side.
  *        TODO: have a version that returns a vector of 4 numbers.
- *      
- *      
+ *
+ *
  *      InetPort( SOCKET ) --> STRING
  *        Returns the port to which this socket is bound, or the remote port if this
  *        socket is connected with a remote host or client
- *      
+ *
  *      Server Side socket functions
  *      ----------------------------
- *      
+ *
  *      InetServer( port [, cBindAddr [, nListenLimit]]  ) --> SOCKET
  *        Creates a server that can accept connections from client on a certain port.
  *        If the computer on which InetServe is called has more than one logical
@@ -141,15 +141,15 @@
  *        the kernel. Usually,  a value of 10 (the default) is enough for even
  *        heavy duty server.
  *        On error, sets error description in the newly returned socket.
- *      
+ *
  *      InetAccept( SOCKET ) --> SOCKET
  *        Waits until a connection is available on a socket created with InetServer;
  *        Returns a socket that can be used to communicate with the incoming client.
  *        On error, sets error in the newly returned socket.
- *      
+ *
  *      Client side socket functions
  *      ----------------------------
- *      
+ *
  *      InetConnect( cAddress, nPort ) --> SOCKET
  *      InetConnect( cAddress, nPort, SOCKET ) --> NIL
  *        Connects to a remote server described by cAddress, that can be in
@@ -172,8 +172,8 @@
  *        On error, the error of the returned socket is set. The error could
  *        be due to unavailable name resolving service, host name not valid,
  *        host address not reachable and host reachable but port not open.
- *      
- *      
+ *
+ *
  *      InetConnectIP( cAddress, PORT ) --> SOCKET
  *      InetConnectIP( cAddress, PORT, SOCKET ) --> NIL
  *        Connects to a remote server described by cAddress, that can be specified
@@ -185,14 +185,14 @@
  *        as parameter. This allows to kill asyncronously a thread waiting
  *        for InetConnectIP to connect, and then cleaning up the leftover
  *        socket data. Also, it is possible to give timeout at the given SOCKET.
- *      
+ *
  *        On error, the error of the returned socket is set.
- *      
- *      
- *      
+ *
+ *
+ *
  *      Sening and receiving data
  *      ----------------------------
- *      
+ *
  *      InetRecv( SOCKET, @cString [, nAmount] ) --> NUMERIC
  *        Reads at maximum nAmount bytes (or a number of bytes equal to cString
  *        length if nAmount is not given) from the socket into cString.
@@ -208,16 +208,16 @@
  *        process until the whole cString is filled (or nAmuount bytes are read),
  *        use the InetRecvALL().
  *        RETURNS the number of the characters read from the SOCKET.
- *      
- *      
- *      InetRecvAll( SOCKET, @cString [, nAmount] ) --> NUMERIC
+ *
+ *
+ *      InetRecvAll( SOCKET, @cString [, @nAmount] ) --> NUMERIC
  *        This function works exaclty as InetRecv, except for the fact that it
  *        blocks untill nAmount bytes are read, if nAmount is given, or
  *        cString is filled for it's whole lenght.
  *        RETURNS the number of the characters read from the SOCKET. Might be
  *        less than nAmount on premature socket closing or on network error.
- *      
- *      
+ *
+ *
  *      InetRecvLine( SOCKET [, @nResult, [, nMaxLength [, nBufSize]]] ) --> STRING
  *        Blocks the calling thread until a sequence CRLF is read from the socket.
  *        Incremental allocation and end-of-line checking are done in an efficient
@@ -238,16 +238,16 @@
  *        can provide here a different allocation strategy (e.g. setting nBufSize
  *        equal to nMaxLenght, memory for reading the line will be allocated only
  *        once, at the beginning of the function).
- *      
- *      
+ *
+ *
  *      InetRecvEndBlock( SOCKET [, cBlock [, @nResult, [, nMaxLength [,
  *             nBufSize]]]] ) --> STRING
  *        This functions operates exactly the same way as InetRecvLine, but
  *        the "record termination" is customizable thorugh the cBlock parameter.
  *        If not given, this parameter defaults to the CRLF sequence.
  *        Provided by: Marcelo Lombardo
- *      
- *      
+ *
+ *
  *      InetDataReady( SOCKET [, nMillisecs] ) --> NUMERIC
  *        Verifies if some data is available to be read in the socket without blocking
  *        execution of the caller. If nMillisecs is not given, the functions returns
@@ -259,8 +259,8 @@
  *        reqired lenght) without blocking.
  *        On error, InetErrorCode and InetErrorDesc can be use to determine what kind
  *        of error happend.
- *      
- *      
+ *
+ *
  *      InetSend( SOCKET, STRING [, nLength ] ) --> NUNERIC
  *        Send data being stored in a string over the socket. Returns the amount of
  *        data written, 0 if the socket has been closed in the meanwhile or -1 on
@@ -273,15 +273,15 @@
  *        To ensure that all the data is sent before the function returns, use the
  *        InetSendAll() function.
  *        On error, the error in the socket is set.
- *      
- *      
+ *
+ *
  *      InetSendAll( SOCKET, STRING [, nLength ] ) --> NUNERIC
  *        This function works exactly as InetSend() but it ensures that all the
  *        data to be sent is written before returning.
- *      
+ *
  *      Utitlity Functions
  *      ------------------
- *      
+ *
  *      InetGetHosts( cName ) --> aHosts
  *        Returns an array containing all the IP addresses associated with a given
  *        host name. The IP addressess returned by this funtions are strings in
@@ -292,24 +292,24 @@
  *        dot notation.
  *        NOTE: This function is not thread safe (by desing), and programmers
  *        must be sure not to use it at the same time in two different threads,
- *        or not to use it together with a InetConnect(). If this kind of situation 
+ *        or not to use it together with a InetConnect(). If this kind of situation
  *        should ever arise, you are advised to use a thread MUTEX.
  *        On error, and if the server can't be found, the function returns NIL.
- *      
- *      
+ *
+ *
  *      InetGetAlias( cName ) --> aHosts
  *        Returns an array containing the aliases ( CNAME DNS records ) by
  *        which the server is currently known. Wether this function is able
  *        to have the complete list of alias or not depends on the verbosity
  *        of the DNS server.
- *      
- *      
+ *
+ *
  *      InetCRLF() --> String
  *        Returns a CRLF sequence used in many internet protocols.
- *      
+ *
  *      UDP (User Datagram Protocol) Compliant Routines
  *      -----------------------------------------------
- *      
+ *
  *      InetDGram( [bBroadcast] ) --> SOCKET
  *        Creates a datagram oriented socket that will be able to send data and
  *        eventually receive data. Since the socket is not bound, the program can't
@@ -321,8 +321,8 @@
  *        requires special user privileges.
  *        Returns the socket, and if an error occours, the socket error message
  *        and code are set.
- *      
- *      
+ *
+ *
  *      InetDGramBind( nPort, [cAddress [, bBroadcast] ] ) --> SOCKET
  *        Creates a datagram oriented socket and binds it to a particular port, and
  *        eventually to a certain interface if cAddress is given and not NIL.
@@ -331,8 +331,8 @@
  *        requires special user privileges.
  *        Returns the socket, and if an error occours, the socket error message
  *        and code are set.
- *      
- *      
+ *
+ *
  *      InetDGramSend( SOCKET, cAddress, nPort, cBuffer [, nSize ] ) --> NUMERIC
  *        Sends a datagram (a fixed lengt data) to a determined ip address (cAddress,
  *        to be specified in quad-dot notation) and port. If nSize is not specified,
@@ -348,7 +348,7 @@
  *        If the socket is created in broadcast mode, the cAddress element
  *        can be a broadcast address.
  *        Returns -1 on error, or the number of bytes actually sent on success.
- *      
+ *
  *      InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
  *        Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
  *        given, or reads at maximum cBuffer length if nSize is not given.
