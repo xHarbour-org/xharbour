@@ -1,6 +1,6 @@
 ************************************************************
 * i18ntest.prg
-* $Id: i18ntest.prg,v 1.1 2003/06/20 17:32:42 jonnymind Exp $
+* $Id: i18ntest.prg,v 1.2 2003/06/24 00:41:05 jonnymind Exp $
 *
 * Test for internationalization system
 *
@@ -10,7 +10,7 @@
 #include "inkey.ch"
 
 Procedure MAIN()
-   LOCAL nChoiche
+   LOCAL nChoice
    LOCAL aLanguages
    LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR" }
 

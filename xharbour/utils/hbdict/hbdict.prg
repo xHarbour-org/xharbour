@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.1 2003/06/21 06:59:23 jonnymind Exp $
+* $Id: hbdict.prg,v 1.2 2003/06/24 00:41:05 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -19,9 +19,10 @@
 #include "inkey.ch"
 
 PROCEDURE Main( cInput, cOutput )
-   LOCAL aInput, output
+   LOCAL aInput, aOutput
    LOCAL recpos
    LOCAL nKey
+   LOCAL lModified := .F.
 
    SET COLOR TO W+/B
    CLEAR SCREEN
@@ -79,7 +80,13 @@ PROCEDURE Main( cInput, cOutput )
       ShowRecord( recpos, aInput[2] )
       nKey := Inkey(0)
       IF nKey == K_ESC
-         EXIT
+         IF lModified
+            IF( Alert( i18n( "Dictionary modified !;Do you really want to exit ?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1 )
+              EXIT
+            ENDIF
+         ELSE
+            EXIT
+         ENDIF
       ENDIF
 
       SWITCH nKey
@@ -100,13 +107,17 @@ PROCEDURE Main( cInput, cOutput )
 
          CASE K_ENTER
             EditEntry( recpos, aInput[2] )
+            lModified := .T.
          EXIT
 
          DEFAULT
             IF Upper( Chr( nKey ) ) == 'S'
-               SaveTable( cOutput, aInput )
+               IF SaveTable( cOutput, aInput )
+                  lModified := .F.
+               ENDIF
             ELSEIF Upper( Chr( nKey ) ) == 'E'
                ReadHeader( aInput[1] )
+               lModified := .T.
             ENDIF
 
       END
@@ -186,8 +197,9 @@ PROCEDURE EditEntry( nPos, aTable )
 
 RETURN
 
-PROCEDURE SaveTable( cFileName, aTable )
+FUNCTION SaveTable( cFileName, aTable )
    LOCAL aHeader
+   LOCAL lOk := .F.
 
    Popup( i18n( "Saving file" ) )
    @12,12 SAY i18n( "Saving file to " ) + cFileName
@@ -201,6 +213,7 @@ PROCEDURE SaveTable( cFileName, aTable )
    IF HB_I18nSaveTable( cFileName, aHeader, aTable[2] )
       Popup( i18n( "Success" ) )
       @12,12 SAY i18n( "The file has been saved" )
+      lOk := .T.
    ELSE
       Popup( i18n( "Failure" ) )
       @12,12 SAY i18n( "The File has not been saved" )
@@ -209,7 +222,7 @@ PROCEDURE SaveTable( cFileName, aTable )
    @13,13 SAY i18n( "(Press any key)" )
    Inkey(0)
    @10,10 clear to 16, 71
-RETURN
+RETURN lOk
 
 PROCEDURE ReadHeader( aHeader )
    LOCAL GetList := {}
