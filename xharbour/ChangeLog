@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3579 2004/11/02 23:07:38 paultucker Exp $
+ * $Id: ChangeLog,v 1.3580 2004/11/03 20:11:08 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-03 13:04 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbexcept.ch
+    * Removed incorrect ';'
+
+  * include/hbpp.h
+  * source/pp/ppcore.c
+  * source/pp/pragma.c
+    ! Fixed to process BEGINDUMP-ENDDUMP sections as C code when code is excluded
+      using conditional directives.
+    + Added logic to detect and report UN-blanaced #if*/#endif in #include files.
+      This does NOT yet use the standard hb_compGenWarning() to avoid set of hb_comp_bAnyWarning.
+      Ultimately, we'll probably need to add a way to enable/disable specific warnings in PP,
+      and probably the compiler in general.
+
+  * utils/xbscript/xbs_harb.ch
+    * Minor cleanup.
 
 2004-11-03 15:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc

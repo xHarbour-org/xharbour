@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.5 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbpp.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ extern COMMANDS * hb_pp_topTranslate;
 
 /* PRAGMA.C exported functions */
 
-extern void hb_pp_ParsePragma( char * szline );
+extern void hb_pp_ParsePragma( char * szline, BOOL bValidCode );
 
 #define STATE_INIT      0
 #define STATE_NORMAL    1

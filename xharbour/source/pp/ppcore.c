@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.183 2004/10/26 01:30:40 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.184 2004/11/01 06:33:46 ronpinkas Exp $
  */
 
 /*
@@ -222,6 +222,8 @@ extern BOOL hb_pp_bInline;
 extern int hb_pp_LastOutLine;
 #endif
 
+int *hb_pp_aiLastIf = NULL, *hb_pp_aiOuterIfLevel = NULL;
+
 /* Table with parse errors */
 char * hb_pp_szErrors[] =
 {
@@ -391,6 +393,7 @@ void hb_pp_Free( void )
       hb_xfree( stdef );
       s_kolAddDefs--;
    }
+
    while( s_kolAddComs )
    {
       stcmd = hb_pp_topCommand;
@@ -818,6 +821,7 @@ int hb_pp_ParseDirective( char * sLine )
   char szInclude[ _POSIX_PATH_MAX ];
   int i;
   char szExpandedLine[ HB_PP_STR_SIZE ];
+  extern BOOL hb_pp_bInline;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseDirective(%s)", sLine));
 
@@ -872,6 +876,16 @@ int hb_pp_ParseDirective( char * sLine )
      hb_pp_ParseExpression( pTemp, szExpandedLine );
 
      ParseIf( sLine ); /* --- #if  --- */
+
+     if( hb_pp_aiLastIf )
+     {
+        hb_pp_aiLastIf = (int *) hb_xrealloc( (void*) hb_pp_aiLastIf, hb_pp_nCondCompile * sizeof( int ) );
+     }
+     else
+     {
+        hb_pp_aiLastIf = (int *) hb_xgrab( hb_pp_nCondCompile * sizeof( int ) );
+     }
+     hb_pp_aiLastIf[ hb_pp_nCondCompile - 1 ] = hb_comp_iLine - 1;
   }
   else if( i == 4 && memcmp( sDirective, "ELIF", 4 ) == 0 )
   {     /* ---  #elif  --- */
@@ -967,15 +981,51 @@ int hb_pp_ParseDirective( char * sLine )
     else
     {
        hb_pp_nCondCompile--;
+
+       //printf( "%s(%i)*** #endif %i ***\n", hb_comp_files.pLast->szFileName, hb_comp_iLine, hb_pp_nCondCompile );
+
+       if( hb_pp_nCondCompile )
+       {
+         hb_pp_aiLastIf = (int *) hb_xrealloc( (void*) hb_pp_aiLastIf, hb_pp_nCondCompile * sizeof( int ) );
+       }
+       else
+       {
+          hb_xfree( (void*) hb_pp_aiLastIf );
+          hb_pp_aiLastIf = NULL;
+       }
     }
   }
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "IFDEF", i ) == 0 )
   {
      ParseIfdef( sLine, TRUE ); /* --- #ifdef  --- */
+
+     if( hb_pp_aiLastIf )
+     {
+        hb_pp_aiLastIf = (int *) hb_xrealloc( (void*) hb_pp_aiLastIf, hb_pp_nCondCompile * sizeof( int ) );
+     }
+     else
+     {
+        hb_pp_aiLastIf = (int *) hb_xgrab( hb_pp_nCondCompile * sizeof( int ) );
+     }
+     hb_pp_aiLastIf[ hb_pp_nCondCompile - 1 ] = hb_comp_iLine - 1;
   }
   else if( i >= 4 && i <= 6 && memcmp( sDirective, "IFNDEF", i ) == 0 )
   {
      ParseIfdef( sLine, FALSE ); /* --- #ifndef  --- */
+
+     if( hb_pp_aiLastIf )
+     {
+        hb_pp_aiLastIf = (int *) hb_xrealloc( (void*) hb_pp_aiLastIf, hb_pp_nCondCompile * sizeof( int ) );
+     }
+     else
+     {
+        hb_pp_aiLastIf = (int *) hb_xgrab( hb_pp_nCondCompile * sizeof( int ) );
+     }
+     hb_pp_aiLastIf[ hb_pp_nCondCompile - 1 ] = hb_comp_iLine - 1;
+  }
+  else if( i == 6 && memcmp( sDirective, "PRAGMA", 6 ) == 0 )
+  {
+     hb_pp_ParsePragma( sLine, hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 );   /* --- #pragma  --- */
   }
   else if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
   {
@@ -1075,10 +1125,6 @@ int hb_pp_ParseDirective( char * sLine )
      else if( i == 4 && memcmp( sDirective, "LINE", 4 ) == 0 )
      {
         return -1;
-     }
-     else if( i == 6 && memcmp( sDirective, "PRAGMA", 6 ) == 0 )
-     {
-        hb_pp_ParsePragma( sLine );   /* --- #pragma  --- */
      }
      else
      {
@@ -1272,6 +1318,8 @@ static int ParseIfdef( char * sLine, int usl )
   DEFINES * stdef;
 
   HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
+
+  //printf( "%i %s(%i)->ParseIfdef(%s, %d)\n", hb_pp_nCondCompile, hb_comp_files.pLast->szFileName, hb_comp_iLine, sLine, usl );
 
   if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
   {
@@ -7106,6 +7154,17 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
      hb_comp_files.pLast = pFile;
      hb_comp_files.iFiles++;
 
+     if( hb_pp_aiOuterIfLevel )
+     {
+        hb_pp_aiOuterIfLevel = (int *) hb_xrealloc( (void *) hb_pp_aiOuterIfLevel, hb_comp_files.iFiles * sizeof( int ) );
+     }
+     else
+     {
+        hb_pp_aiOuterIfLevel = (int *) hb_xgrab( hb_comp_files.iFiles * sizeof( int ) );
+     }
+
+     hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] = hb_pp_nCondCompile;
+
      return TRUE;
   }
 
@@ -7115,6 +7174,42 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
 void CloseInclude( void )
 {
    PFILE pFile;
+
+   if( hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] < hb_pp_nCondCompile )
+   {
+      int i = hb_pp_nCondCompile, iOffset = 0;
+
+      while( i > hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] )
+      {
+         printf( "\r%s(%i) Warning P0001  Suspectious unclosed #if* directive.\n", hb_comp_files.pLast->szFileName, hb_pp_aiLastIf[ --i ] );
+         iOffset++;
+      }
+
+      i = hb_comp_files.iFiles - 1;
+
+      // Avoid redundant and erronous warnings in outer modules.
+      while( i )
+      {
+         hb_pp_aiOuterIfLevel[ i-- ] += iOffset;
+      }
+   }
+   else if( hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] > hb_pp_nCondCompile )
+   {
+      int i = hb_pp_nCondCompile, iOffset = 0;
+
+      while( i < hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] )
+      {
+         printf( "\r%s(0) Warning P0002  Suspectious excessive #endif directive.\n", hb_comp_files.pLast->szFileName );
+         i++;
+         iOffset++;
+      }
+
+      // Avoid redundant and erronous warnings in outer modules.
+      while( i )
+      {
+         hb_pp_aiOuterIfLevel[ i-- ] -= iOffset;
+      }
+   }
 
    /* we close the currently include file and continue */
    fclose( hb_comp_files.pLast->handle );
@@ -7133,6 +7228,16 @@ void CloseInclude( void )
    }
 
    hb_comp_files.iFiles--;
+
+   if( hb_comp_files.iFiles )
+   {
+     hb_pp_aiOuterIfLevel = (int *) hb_xrealloc( (void*) hb_pp_aiOuterIfLevel, hb_comp_files.iFiles * sizeof( int ) );
+   }
+   else
+   {
+      hb_xfree( (void*) hb_pp_aiOuterIfLevel );
+      hb_pp_aiOuterIfLevel = NULL;
+   }
 }
 
 int hb_pp_NextToken( char** pLine, char *sToken )

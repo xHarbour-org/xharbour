@@ -73,7 +73,7 @@
         PVOID ExceptionAddress;
         DWORD NumberParameters;
         ULONG_PTR ExceptionInformation[EXCEPTION_MAXIMUM_PARAMETERS];
-      } EXCEPTION_RECORD, *PEXCEPTION_RECORD;
+      } EXCEPTION_RECORD, *PEXCEPTION_RECORD
 
       typedef struct _CONTEXT {;
           ULONGLONG FltF0;
@@ -146,12 +146,13 @@
           DWORD Psr;
           DWORD ContextFlags;
           DWORD Fill[4];
-      } CONTEXT, *PCONTEXT;
+      } CONTEXT, *PCONTEXT
 
       typedef struct _EXCEPTION_POINTERS { ;
         PEXCEPTION_RECORD ExceptionRecord;
         PCONTEXT ContextRecord;
-      } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
+      } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS
+
    #endif
 
 #endif

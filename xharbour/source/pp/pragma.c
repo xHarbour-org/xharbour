@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.3 2002/12/18 16:34:12 ronpinkas Exp $
+ * $Id: pragma.c,v 1.4 2004/04/05 10:03:20 andijahja Exp $
  */
 
 /*
@@ -75,13 +75,13 @@ static BOOL s_bTracePragma = FALSE;
           RequestLib    /R
 */
 
-void hb_pp_ParsePragma( char * szLine )
+void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParsePragma(%s)", szLine));
 
    HB_SKIPTABSPACES( szLine );
 
-   if( HB_ISOPTSEP( szLine[ 0 ] ) )
+   if( bValidCode && HB_ISOPTSEP( szLine[ 0 ] ) )
    {
       switch( szLine[ 1 ] )
       {
@@ -185,12 +185,7 @@ void hb_pp_ParsePragma( char * szLine )
    {
       hb_strupr( szLine );
 
-      if( memcmp( szLine, "AUTOMEMVAR", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bAutoMemvarAssume = StringToBool( szLine, hb_comp_bAutoMemvarAssume );
-         DebugPragma( szLine, -1, hb_comp_bAutoMemvarAssume );
-      }
-      else if( memcmp( szLine, "BEGINDUMP", PRAGMAS_LEN ) == 0 )
+      if( memcmp( szLine, "BEGINDUMP", PRAGMAS_LEN ) == 0 )
       {
          char sBuffer[ HB_PP_STR_SIZE ], *pBuffer, sDirective[8] ;
          int iSize;
@@ -199,18 +194,22 @@ void hb_pp_ParsePragma( char * szLine )
 #endif
          PINLINE pInline;
 
-         if( hb_comp_bPPO )
-         {
-            hb_pp_WrStr( hb_comp_yyppo, "#pragma BEGINDUMP" );
-         }
-
          hb_pp_bInline = TRUE;
 
-         pInline = hb_compInlineAdd( NULL );
+         if( bValidCode )
+         {
+            if( hb_comp_bPPO )
+            {
+               hb_pp_WrStr( hb_comp_yyppo, "#pragma BEGINDUMP" );
+            }
+
+            pInline = hb_compInlineAdd( NULL );
+         }
 
        DigestInline :
 
          iSize = hb_pp_Internal( hb_comp_bPPO ? hb_comp_yyppo : NULL, sBuffer );
+
          if( iSize == 0 )
          {
             hb_pp_bInline = FALSE;
@@ -223,6 +222,7 @@ void hb_pp_ParsePragma( char * szLine )
          {
             pBuffer++;
          }
+
          if( *pBuffer == '#' )
          {
             pBuffer++;
@@ -239,6 +239,7 @@ void hb_pp_ParsePragma( char * szLine )
             {
                pBuffer += 6;
             }
+
             while( *pBuffer == ' ' || *pBuffer == '\t' )
             {
                pBuffer++;
@@ -255,78 +256,90 @@ void hb_pp_ParsePragma( char * szLine )
             }
          }
 
-         if( pInline->pCode == NULL )
+         if( bValidCode )
          {
-            pInline->pCode = (BYTE *) hb_xgrab( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
-            strcpy( (char*) pInline->pCode, (char*) sBuffer );
+            if( pInline->pCode == NULL )
+            {
+               pInline->pCode = (BYTE *) hb_xgrab( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               strcpy( (char*) pInline->pCode, (char*) sBuffer );
+            }
+            else
+            {
+               pInline->pCode = (BYTE *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               strcpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer );
+            }
+
+            pInline->lPCodeSize += iSize;
          }
-         else
-         {
-            pInline->pCode = (BYTE *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
-            strcpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer );
-         }
-         pInline->lPCodeSize += iSize;
 
          goto DigestInline;
       }
-      else if( memcmp( szLine, "DEBUGINFO", PRAGMAS_LEN ) == 0 )
+      else if( bValidCode )
       {
-         hb_comp_bDebugInfo = StringToBool( szLine, hb_comp_bDebugInfo );
-         hb_comp_bLineNumbers = hb_comp_bDebugInfo;
-         DebugPragma( szLine, -1, hb_comp_bDebugInfo );
-      }
-      else if( memcmp( szLine, "ENABLEWARNINGS", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_iWarnings = StringToBool( szLine, hb_comp_iWarnings != 0 ) ? 1 : 0;
-         DebugPragma( szLine, hb_comp_iWarnings, FALSE );
-      }
-      else if( memcmp( szLine, "EXITSEVERITY", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_iExitLevel = StringToInt( szLine, hb_comp_iExitLevel );
-         if( hb_comp_iExitLevel != HB_EXITLEVEL_DEFAULT   &&
-             hb_comp_iExitLevel != HB_EXITLEVEL_SETEXIT   &&
-             hb_comp_iExitLevel != HB_EXITLEVEL_DELTARGET )
+         if( memcmp( szLine, "AUTOMEMVAR", PRAGMAS_LEN ) == 0 )
          {
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
+            hb_comp_bAutoMemvarAssume = StringToBool( szLine, hb_comp_bAutoMemvarAssume );
+            DebugPragma( szLine, -1, hb_comp_bAutoMemvarAssume );
          }
-         DebugPragma( szLine, hb_comp_iExitLevel, FALSE );
-      }
-      else if( memcmp( szLine, "DYNAMICMEMVAR", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bForceMemvars = StringToBool( szLine, hb_comp_bForceMemvars );
-         DebugPragma( szLine, -1, hb_comp_bForceMemvars );
-      }
-      else if( memcmp( szLine, "LINENUMBER", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bLineNumbers = StringToBool( szLine, hb_comp_bLineNumbers );
-         DebugPragma( szLine, -1, hb_comp_bLineNumbers );
-      }
-      else if( memcmp( szLine, "NOSTARTPROC", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bStartProc = StringToBool( szLine, hb_comp_bStartProc );
-         DebugPragma( szLine, -1, hb_comp_bStartProc );
-      }
-      else if( memcmp( szLine, "PREPROCESSING", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bPPO = StringToBool( szLine, hb_comp_bPPO );
-         DebugPragma( szLine, -1, hb_comp_bPPO );
-      }
-      else if( memcmp( szLine, "SHORTCUT", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_bShortCuts = StringToBool( szLine, hb_comp_bShortCuts );
-         DebugPragma( szLine, -1, hb_comp_bShortCuts );
-      }
-      else if( memcmp( szLine, "WARNINGLEVEL", PRAGMAS_LEN ) == 0 )
-      {
-         hb_comp_iWarnings = StringToInt( szLine, hb_comp_iWarnings );
-         if( hb_comp_iWarnings < 0 || hb_comp_iWarnings > 3 )
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
-         DebugPragma( szLine, hb_comp_iWarnings, FALSE );
-      }
-      else if( memcmp( szLine, "TRACEPRAGMAS", PRAGMAS_LEN ) == 0 )
-      {
-         s_bTracePragma = StringToBool( szLine, s_bTracePragma );
-         DebugPragma( szLine, -1, s_bTracePragma );
+         else if( memcmp( szLine, "DEBUGINFO", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bDebugInfo = StringToBool( szLine, hb_comp_bDebugInfo );
+            hb_comp_bLineNumbers = hb_comp_bDebugInfo;
+            DebugPragma( szLine, -1, hb_comp_bDebugInfo );
+         }
+         else if( memcmp( szLine, "ENABLEWARNINGS", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_iWarnings = StringToBool( szLine, hb_comp_iWarnings != 0 ) ? 1 : 0;
+            DebugPragma( szLine, hb_comp_iWarnings, FALSE );
+         }
+         else if( memcmp( szLine, "EXITSEVERITY", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_iExitLevel = StringToInt( szLine, hb_comp_iExitLevel );
+            if( hb_comp_iExitLevel != HB_EXITLEVEL_DEFAULT   &&
+                hb_comp_iExitLevel != HB_EXITLEVEL_SETEXIT   &&
+                hb_comp_iExitLevel != HB_EXITLEVEL_DELTARGET )
+            {
+               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
+            }
+            DebugPragma( szLine, hb_comp_iExitLevel, FALSE );
+         }
+         else if( memcmp( szLine, "DYNAMICMEMVAR", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bForceMemvars = StringToBool( szLine, hb_comp_bForceMemvars );
+            DebugPragma( szLine, -1, hb_comp_bForceMemvars );
+         }
+         else if( memcmp( szLine, "LINENUMBER", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bLineNumbers = StringToBool( szLine, hb_comp_bLineNumbers );
+            DebugPragma( szLine, -1, hb_comp_bLineNumbers );
+         }
+         else if( memcmp( szLine, "NOSTARTPROC", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bStartProc = StringToBool( szLine, hb_comp_bStartProc );
+            DebugPragma( szLine, -1, hb_comp_bStartProc );
+         }
+         else if( memcmp( szLine, "PREPROCESSING", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bPPO = StringToBool( szLine, hb_comp_bPPO );
+            DebugPragma( szLine, -1, hb_comp_bPPO );
+         }
+         else if( memcmp( szLine, "SHORTCUT", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_bShortCuts = StringToBool( szLine, hb_comp_bShortCuts );
+            DebugPragma( szLine, -1, hb_comp_bShortCuts );
+         }
+         else if( memcmp( szLine, "WARNINGLEVEL", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_iWarnings = StringToInt( szLine, hb_comp_iWarnings );
+            if( hb_comp_iWarnings < 0 || hb_comp_iWarnings > 3 )
+               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
+            DebugPragma( szLine, hb_comp_iWarnings, FALSE );
+         }
+         else if( memcmp( szLine, "TRACEPRAGMAS", PRAGMAS_LEN ) == 0 )
+         {
+            s_bTracePragma = StringToBool( szLine, s_bTracePragma );
+            DebugPragma( szLine, -1, s_bTracePragma );
+         }
       }
    }
 }
