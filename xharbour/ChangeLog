@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3209 2004/07/24 23:08:15 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3210 2004/07/24 23:11:54 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-26 09:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/fstemp.c
+    - altered Linux/BSD version of hb_fsCreateTemp() for case where P_tmpdir is used
+      for the temporary directory and hb.set.HB_SET_DIRCASE is UPPER or LOWER
 
 2004-07-24 17:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.13 2004/04/09 01:04:45 druzus Exp $
+ * $Id: fstemp.c,v 1.14 2004/07/22 08:28:19 druzus Exp $
  */
 
 /*
@@ -144,6 +144,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 }
 #else
 
+#include <ctype.h> /* isupper()/islower() */
 #include "hbset.h"
 
 FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
@@ -165,6 +166,22 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       else
       {
          strcpy( pszName, P_tmpdir );
+         if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER || hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+         {
+           // check to see if temp directory already upper or lower. If not use current directory ( "." )
+           int (*pt2Function)( int );
+           char *psZ = pszName ;
+           pt2Function = ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER ) ? isupper : islower ;
+           while ( *psZ )
+           {
+              if ( ( *pt2Function )( ( int ) *psZ ) )
+             {
+               strcpy( pszName, "." ) ;
+               break ;
+             }
+             psZ++ ;
+           }
+         }
       }
       if ( pszName[0] != '\0' )
       {
