@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.66 2003/09/10 01:03:58 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.67 2003/09/15 16:39:26 druzus Exp $
  */
 
 /*
@@ -1153,13 +1153,32 @@ static void hb_cdxTagTagStore( LPCDXTAG pTag )
    hb_cdxIndexPageWrite( pTag->pIndex, pTag->TagBlock, &pHeader, sizeof( CDXTAGHEADER ) );
 }
 
+/*
+static void hb_cdxDispKeys( LPCDXPAGEINFO pPage, char *inf )
+{
+   LPCDXKEYINFO pKey;
+   int i;
+
+   if ( pPage != NULL )
+   {
+      printf("\r\n(%s) ", inf);
+      pKey = pPage->pKeys;
+      for (i=0; i<pPage->uiKeys; i++)
+      {
+         printf("key%d.val=%s ", i, pKey->Value);
+         pKey = pKey->pNext;
+      }
+      printf("\r\n"); fflush(stdout);
+   }
+}
+*/
+
 static void hb_cdxTagTagOpen( LPCDXTAG pTag, BYTE bCode )
 {
    hb_cdxIndexLockRead( pTag->pIndex, pTag );
    hb_cdxTagTagClose( pTag );
    pTag->RootBlock = hb_cdxTagNewRoot( pTag );
    pTag->RootPage = hb_cdxPageNew( pTag, NULL, pTag->RootBlock );
-
    /*
    if( bCode == 2 )
       return;
@@ -2101,6 +2120,24 @@ static void hb_cdxPagePoolCheck( LPCDXTAG pTag )
    }
 }
 #endif
+
+static void hb_cdxPagePoolFullFree( LPCDXINDEX pIndex )
+{
+   LPCDXTAG pTag;
+
+   if ( pIndex->pCompound )
+   {
+      hb_cdxTagTagClose( pIndex->pCompound );
+      hb_cdxPagePoolFreeTag( pIndex->pCompound, 0 );
+   }
+   pTag = pIndex->TagList;
+   while ( pTag )
+   {
+      hb_cdxTagTagClose( pTag );
+      hb_cdxPagePoolFreeTag( pTag, 0 );
+      pTag = pTag->pNext;
+   }
+}
 
 static void hb_cdxPagePoolFree( LPCDXINDEX pIndex, int nPagesLeft )
 {
@@ -4065,7 +4102,7 @@ static USHORT hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
       {
          pIndex->NextAvail = -1;
          pIndex->ulVersion = ulVersion;
-         hb_cdxPagePoolFree( pIndex, 0 );
+         hb_cdxPagePoolFullFree( pIndex );
          pTag = pIndex->TagList;
          while ( pTag ) {
             if( pTag->RootPage != NULL )
