@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.10 2001/12/15 11:22:29 vszakats Exp $
+ * $Id: dbgtwin.prg,v 1.1.1.1 2001/12/21 10:43:45 ronpinkas Exp $
  */
 
 /*
@@ -226,16 +226,18 @@ METHOD ShowModal() CLASS TDbWindow
          Eval( ::bKeyPressed, nKey )
       endif
 
-      do case
-         case nKey == K_ESC
+      Switch nKey
+         case K_ESC
               lExit := .t.
+              exit
 
-         case nKey == K_LBUTTONDOWN
+         case K_LBUTTONDOWN
               if MRow() == ::nTop .and. MCol() >= ::nLeft + 1 .and. ;
                  MCol() <= ::nLeft + 3
                  lExit := .t.
               endif
-      endcase
+              exit
+      end
    end
 
    ::Hide()
@@ -276,37 +278,42 @@ METHOD Move() Class TDbWindow
 
       nKey := Inkey( 0 )
 
-      do case
-         case nkey == K_UP
+      Switch nKey
+         case K_UP
               if ::ntop != 0
                  ::ntop--
                  ::nbottom--
               endif
+              exit
 
-         case nKey == K_DOWN
+         case K_DOWN
               if ::nBottom != MaxRow()
                  ::nTop++
                  ::nBottom++
               endif
+              exit
 
-         case nKey == K_LEFT
+         case K_LEFT
               if ::nLeft != 0
                  ::nLeft--
                  ::nRight--
               endif
+              exit
 
-         case nKey == K_RIGHT
+         case K_RIGHT
               if ::nBottom != MaxRow()
                  ::nLeft++
                  ::nRight++
               endif
+              exit
 
-         case nKey == K_ESC
+         case K_ESC
               ::nTop    := nOldTop
               ::nLeft   := nOldLeft
               ::nBottom := nOldBottom
               ::nRight  := nOldRight
-      endcase
+              exit
+      end
 
       if nKey == K_ESC .or. nKey == K_ENTER
          exit
