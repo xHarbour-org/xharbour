@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.19 2002/05/24 03:40:56 lculik Exp $
+ * $Id: hbmake.prg,v 1.20 2002/05/25 16:22:12 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -101,7 +101,7 @@ STATIC lLinux        := .F.
 STATIC szProject     := ""
 STATIC lLibrary      := .f.
 STATIC lIgnoreErrors := .F.
-STATIC lExtended     := .F.
+STATIC lExtended     := .T.
 STATIC lOs2          := .F.
 STATIC lRecurse      := .F.
 STATIC lEditMode     := .F.
@@ -1102,6 +1102,7 @@ FUNCTION Compfiles()
 
                     cComm := Strtran( cComm, "$<", aRes[ nFiles ] )
                     Outstd( " " )
+                    ? cComm
                     ! ( cComm )
 
                 ENDIF
@@ -1227,6 +1228,7 @@ FUNC crtmakfile( cFile )
     LOCAL cHtmlLib       := ""
     LOCAL lLinux         := At( 'linux', Lower( Os() ) ) > 0
     LOCAL nWriteFiles    := 0
+    Local cResName       := Space(50)
 
     nLinkHandle := Fcreate( cFile )
     WriteMakeFileHeader()
@@ -1273,7 +1275,7 @@ FUNC crtmakfile( cFile )
     @ 10,  1 SAY aLangMessages[ 38 ]   GET cUserDef     PICT "@s15"
     @ 10, 40 SAY aLangMessages[ 39 ]  GET cUserInclude PICT "@s15"
     @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ] 
-
+    @ 12,  1 Say "Resource file Name" Get CResName 
     READ
 
     IF !Empty( cUserDef )
@@ -1745,9 +1747,9 @@ FUNC crtmakfile( cFile )
         ENDIF
 
     ENDIF
-
-    Fwrite( nLinkHandle, "RESFILES = " + CRLF )
-    Fwrite( nLinkHandle, "RESDEPEN = $(RESFILES)" + CRLF )
+    CResName :=lower(CResName ) 
+    Fwrite( nLinkHandle, "RESFILES = "+ CResName  + CRLF )
+    Fwrite( nLinkHandle, "RESDEPEN = "+ strtran(CResName,".rc",".res")  + CRLF )
 
     IF lRddads
 
@@ -1863,7 +1865,7 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "LINKER = ilink32" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ = " + If( lFwh, "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES)" + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib cw32.lib" + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
 
