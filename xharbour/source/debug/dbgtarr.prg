@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.4 2003/01/30 02:23:58 walito Exp $
+ * $Id: dbgtarr.prg,v 1.12 2003/05/21 16:03:42 antoniolinares Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 #include "hbclass.ch"
 #include "inkey.ch"
 #include "common.ch"
+
 Class TDBGArray
 
 data aWindows
@@ -69,12 +70,16 @@ method SetsKeyPressed
 end class
 
 method new(aArray,pArName,lEditable) Class TDBGArray
+
    DEFAULT lEditable TO .t.
-::aWindows:={}
-::arrayName:=parName
-::TheArray:=aArray
-::nCurWindow:=0
-::addWindows(::TheArray)
+
+   ::aWindows:={}
+   ::arrayName:=parName
+   ::TheArray:=aArray
+   ::nCurWindow:=0
+   ::lEditable := lEditable
+   ::addWindows(::TheArray)
+
 Return Self
 
 Method addWindows(aArray,nRow) Class TDBGArray
@@ -132,71 +137,65 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
    Local nPos
 
    local nRecsToSkip
-
-   Switch nKey
-
-      case K_UP
+   do case
+      case nKey == K_UP
               oBrwSets:Up()
-              exit
-      case K_DOWN
-              oBrwSets:Down()
-              exit
-      case K_HOME
-      case K_CTRL_PGUP
-      case K_CTRL_HOME
-              oBrwSets:GoTop()
-              exit
-      case K_END
-      case K_CTRL_PGDN
-      case K_CTRL_END
-              oBrwSets:GoBottom()
-              exit
-      Case K_PGDN
-              oBrwSets:pageDown()
-              exit
-      Case K_PGUP
-              oBrwSets:PageUp()
-              exit
-      Case K_ENTER
 
-               if valtype(aArray[nSet])=="A"
+      case nKey == K_DOWN
+              oBrwSets:Down()
+
+      case nKey == K_HOME .or. (nKey == K_CTRL_PGUP) .or. (nKey == K_CTRL_HOME)
+              oBrwSets:GoTop()
+
+      case nKey == K_END .or. (nkey == K_CTRL_PGDN) .or. (nkey == K_CTRL_END )
+              oBrwSets:GoBottom()
+
+      Case nKey == K_PGDN
+              oBrwSets:pageDown()
+
+      Case nKey == K_PGUP
+              OBrwSets:PageUp()
+
+      Case nKey == K_ENTER
+           if valtype(aArray[nSet])=="A"
                   SetPos(ownd:nBottom,ownd:nLeft)
                   ::aWindows[::nCurwindow]:lFocused:=.f.
                   ::arrayname:= ::arrayname+"["+alltrim(cTemp)+"]"
                   ::AddWindows(aArray[nSet],oBrwSets:RowPos+oBrwSets:nTop)
                   ::arrayname:=coldname
 
-                  adel(::aWindows,::nCurWindow, .t.)
+                  adel(::aWindows,::nCurWindow)
+                  asize(::awindows,len(::awindows)-1)
                   if ::nCurwindow==0
                   ::ncurwindow:=1
                   else
                   ::ncurwindow--
                   endif
-               elseif valtype(aArray[nSet])=="B"
+           elseif valtype(aArray[nSet])=="B"
                   Alert("Value cannot be edited")
-               else
-                  if ::lEditable
-                     oBrwSets:RefreshCurrent()
-                    if ValType( aArray[ nSet ] ) == "O"
-                       __DbgObject( aArray[ nSet ], cName + ;
+           else
+              if ::lEditable
+                 oBrwSets:RefreshCurrent()
+                 if ValType( aArray[ nSet ] ) == "O"
+                    __DbgObject( aArray[ nSet ], cName + ;
                                  "[" + AllTrim( Str( nSet ) ) + "]" )
-                    else
-                       ::doget(oBrwsets,aarray,nSet)
-                    endif
-
-                     oBrwSets:RefreshCurrent()
-                     oBrwSets:ForceStable()
                  else
-                    Alert("Value cannot be edited")
-                  endif
-               endif
-            exit
+                    ::doget(oBrwsets,aarray,nSet)
+                 endif
+                 oBrwSets:RefreshCurrent()
+                 oBrwSets:ForceStable()
+              else
+                 Alert("Value cannot be edited")
+              endif
 
-   end
-      RefreshVarsS(oBrwSets)
+           endif
 
-      ::aWindows[::nCurwindow]:SetCaption( cName + "["+AllTrim( Str( oBrwSets:cargo[1] ) ) +".."+ ;
-                       Alltrim(str(LenArr))+ "]")
+   endcase
+
+   RefreshVarsS( oBrwSets )
+
+   ::aWindows[::nCurwindow]:SetCaption( cName + "["+AllTrim( Str( oBrwSets:cargo[1] ) ) +".."+ ;
+                                        Alltrim(str(LenArr))+ "]")
 return self
 
 static function ValToStr( uVal )
@@ -204,44 +203,38 @@ static function ValToStr( uVal )
    local cType := ValType( uVal )
    local cResult := "U"
 
-   Switch cType
-      case "U"
+   do case
+      case uVal == nil
            cResult := "NIL"
-           exit
-      Case "B"
-           cResult:= "{ || ... }"
-           exit
-      case "A"
+
+      Case cType  =="B"
+         cResult:= "{ || ... }"
+
+      case cType == "A"
            cResult := "{ ... }"
-           exit
 
-      case "C"
-      case "M"
+      case cType $ "CM"
            cResult := '"' + uVal + '"'
-           exit
 
-      case "L"
+      case cType == "L"
            cResult := iif( uVal, ".T.", ".F." )
-           exit
 
-      case "D"
+      case cType == "D"
            cResult := DToC( uVal )
-           exit
 
-      case "N"
+      case cType == "N"
            cResult := AllTrim( Str( uVal ) )
-           exit
 
-      case "O"
+      case cType == "O"
            cResult := "Class " + uVal:ClassName() + " object"
-           exit
-   end
+   endcase
 
 return cResult
 
-METHOD doGet(oBro,pItem,nSet) Class TDBGArray
-    LOCAL column,  nKey
-    local getlist:={}
+METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
+
+    LOCAL nKey
+    local getlist := {}
     // save state
     LOCAL lScoreSave := Set( _SET_SCOREBOARD, .f. )
     LOCAL lExitSave  := Set( _SET_EXIT, .t. )
@@ -254,9 +247,8 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     // if confirming new record, append blank
 
     // set insert key to toggle insert mode and cursor
-    SetKey( K_INS, ;
-        { || SetCursor( if(ReadInsert(!ReadInsert()), SC_NORMAL, SC_INSERT)) };
-          )
+    SetKey( K_INS, { || SetCursor( if( ReadInsert( ! ReadInsert() ),;
+            SC_NORMAL, SC_INSERT ) ) } )
 
     // initial cursor setting
     SetCursor( IF( ReadInsert(), SC_INSERT, SC_NORMAL ) )
@@ -264,10 +256,13 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     // create a corresponding GET
     @ row(), oBro:nLeft + oBro:GetColumn( 1 ):width + 1 GET cValue ;
        VALID If( Type( cValue ) == "UE", ( Alert( "Expression error" ), .f. ), .t. )
+
     READ
+
     if LastKey() == K_ENTER
        pItem[ nSet ] = &cValue
     endif
+
     SetCursor( 0 )
     Set( _SET_SCOREBOARD, lScoreSave )
     Set( _SET_EXIT, lExitSave )
@@ -278,6 +273,7 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     IF nKey == K_UP .OR. nKey == K_DOWN .OR. nKey == K_PGUP .OR. nKey == K_PGDN
         KEYBOARD CHR( nKey )
     END
+
 RETURN  nil
 
 function __DbgArrays( aArray, cArrayName, lEditable )
@@ -285,19 +281,13 @@ function __DbgArrays( aArray, cArrayName, lEditable )
 return TDBGArray():New( aArray, cArrayName, lEditable )
 
 Static function GetTopPos(nPos)
-
-   Local nReturn:=0
-
-   nReturn:=if((maxrow()-nPos)<5,Maxrow()-nPos,nPos)
-
-   return nReturn
+Local nReturn:=0
+nReturn:=if((maxrow()-nPos)<5,Maxrow()-nPos,nPos)
+return nReturn
 
 Static function GetBottomPos(nPos)
-
-   Local nReturn:=0
-
-   nReturn :=if(nPos<maxrow()-2,nPos ,maxrow()-2)
-
+Local nReturn:=0
+nReturn :=if(nPos<maxrow()-2,nPos ,maxrow()-2)
 return nReturn
 
 static procedure RefreshVarsS( oBrowse )
@@ -312,9 +302,7 @@ static procedure RefreshVarsS( oBrowse )
       oBrowse:hilite():colpos:=1
    endif
    oBrowse:hilite()
-
-return
-
+   return
 static function ArrayBrowseSkip( nPos, oBrwSets,n )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
