@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.115 2004/07/23 10:35:29 likewolf Exp $
+ * $Id: filesys.c,v 1.116 2004/07/30 13:45:36 mauriliolongo Exp $
  */
 
 /*
@@ -278,7 +278,7 @@
    #define HB_FS_FILE_IO
 #endif
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__IBMCPP__) || defined(__WATCOMC__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__IBMCPP__) || defined(__WATCOMC__) || defined(HB_OS_OS2)
 /* These compilers use sopen() rather than open(), because their
    versions of open() do not support combined O_ and SH_ flags */
    #define HB_FS_SOPEN

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3344 2004/08/26 08:20:09 brianhays Exp $
+ * $Id: ChangeLog,v 1.3345 2004/08/26 11:54:26 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-26 18:01 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/filesys.c
+     ! On OS/2 sopen() needs to be used.
+
 2004-08-26 08:51 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
   * utils/hbmake/hbmake.prg
-    ! fix to createlibmakefile (to allow create of makefile when 
+    ! fix to createlibmakefile (to allow create of makefile when
        Recurse directory is used)
-       
+
 2004-08-26 01:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c
     * added error handling to adsSysName to trap errors in calls to
@@ -293,17 +297,17 @@
 
       procedure main()
 
- 		setcursor(3)
- 		devpos(row(),MaxCol()-11)
- 		devout(Replicate("a", 10))
- 		? setcursor()
- 		inkey(0)
+      setcursor(3)
+      devpos(row(),MaxCol()-11)
+      devout(Replicate("a", 10))
+      ? setcursor()
+      inkey(0)
 
- 		devpos(row()+1,MaxCol()-10)
- 		devout(Replicate("b",11))
- 		? setcursor()
- 		inkey(0)
-	  return
+      devpos(row()+1,MaxCol()-10)
+      devout(Replicate("b",11))
+      ? setcursor()
+      inkey(0)
+     return
 
 2004-08-14 12:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -322,36 +326,36 @@
 
       function main()
 
-   		LOCAL ncValore := 21.00
-   		LOCAL cPicture := "@ZE ##,###.##"
-   		LOCAL oGet :=  GetNew( 1 , 1 ,;
+         LOCAL ncValore := 21.00
+         LOCAL cPicture := "@ZE ##,###.##"
+         LOCAL oGet :=  GetNew( 1 , 1 ,;
                        { |x| Iif( pCount() == 0 , ncValore , ncValore := x ) } , , cPicture )
 
-   		oGet:SetFocus()
-   		oGet:pos := oGet:DecPos + 1
-   		oGet:Clear   := .F.
-   		oGet:Changed := .T.
-   		oGet:Buffer := Transform( 0 , oGet:Picture )
-   		oGet:Insert("1")
-   		oGet:Assign()
-   		? oGet:VarGet()
-   		? oGet:Untransform()
-   		? ncValore
-	  return
+         oGet:SetFocus()
+         oGet:pos := oGet:DecPos + 1
+         oGet:Clear   := .F.
+         oGet:Changed := .T.
+         oGet:Buffer := Transform( 0 , oGet:Picture )
+         oGet:Insert("1")
+         oGet:Assign()
+         ? oGet:VarGet()
+         ? oGet:Untransform()
+         ? ncValore
+     return
 
-	  Without this fix clipper prints .10 .10 .10 while xharbour  1 1 1,
-	  with this fix harbour prints .1 .1 .1
+     Without this fix clipper prints .10 .10 .10 while xharbour  1 1 1,
+     with this fix harbour prints .1 .1 .1
 
-	! ::setFocus() on clipper does not set ::minus to .T. when edited var
-	  has a negative value.
+   ! ::setFocus() on clipper does not set ::minus to .T. when edited var
+     has a negative value.
 
    /* NB: I think that tget.prg should not use exported iVars to keep
-		  internal values, for example ::minus is used in this way but
-		  clipper says that ::minus is .T. only when a "-" is pressed
-		  and ::buffer has a value of 0, every other change should reset
-		  it to .F.
-		  I have the impression that other iVars could not strictly follow
-		  clipper behaviour.
+        internal values, for example ::minus is used in this way but
+        clipper says that ::minus is .T. only when a "-" is pressed
+        and ::buffer has a value of 0, every other change should reset
+        it to .F.
+        I have the impression that other iVars could not strictly follow
+        clipper behaviour.
    */
 
 2004-08-14 00:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
@@ -389,32 +393,32 @@
       with picture "XXXXXXXX" was not editable. See example.
 
     /*
-    	function main()
+      function main()
 
-   			LOCAL ncValore := CToD("")
-   			LOCAL cPicture := "XXXXXXXX"
-   			LOCAL aGet := { GetNew( 1 , 1 ,;
-            				      { |x| Iif( pCount() == 0 , ncValore , ncValore := x ) } , , cPicture ) }
+            LOCAL ncValore := CToD("")
+            LOCAL cPicture := "XXXXXXXX"
+            LOCAL aGet := { GetNew( 1 , 1 ,;
+                              { |x| Iif( pCount() == 0 , ncValore , ncValore := x ) } , , cPicture ) }
 
-   			ReadModal(aGet)
+            ReadModal(aGet)
 
-		return
+      return
     */
 
 2004-08-11 23:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
-	! fixed handling of column's colsep/footsep when tbrowse has not a
-	  colsep/footsep and/or only a few columns have a colsep/footsep.
+   ! fixed handling of column's colsep/footsep when tbrowse has not a
+     colsep/footsep and/or only a few columns have a colsep/footsep.
 
-	/*
-	  oB := TBrowseNew(...)
-	  for i := 1 to 10
-	  	oB:AddColumn(...)
-	  	if i == 10
-	  	   oB:GetColumn(i):FootSep := "-------"
-	  	endif
-	  next
-	*/
+   /*
+     oB := TBrowseNew(...)
+     for i := 1 to 10
+      oB:AddColumn(...)
+      if i == 10
+         oB:GetColumn(i):FootSep := "-------"
+      endif
+     next
+   */
 
 2004-08-11 22:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
@@ -433,31 +437,31 @@
 
   /* Try this before this fix to see what happens.
      function main()
-   		LOCAL cCol := SetColor( "1/2,3/4,5/6,7/8,9/10" )
+         LOCAL cCol := SetColor( "1/2,3/4,5/6,7/8,9/10" )
 
-	    clear screen
+       clear screen
 
-   		ColorSelect( 1 )
-   		DevPos( 5, 1 )
-   		DevOutPict( 1 , "####", NIL )
+         ColorSelect( 1 )
+         DevPos( 5, 1 )
+         DevOutPict( 1 , "####", NIL )
 
-   		DevPos( 5, 1 )
-   		DevOutPict( 1 , "####" )
-	 return
+         DevPos( 5, 1 )
+         DevOutPict( 1 , "####" )
+    return
   */
 
 2004-08-10 15:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
-  	! ::colPos can go "out of bound" when tbrowse is not ::stable,
-  	  that is it can reach a value < 1 or > ::ColCount; I've found
-  	  that this should work even with xharbour TBrowse when it is
-  	  not ::stable. I Had to make changes to ::PerformStabilization
-  	  and movement methods.
-  	- removed call to ::Moved inside ::colPos assignement, not needed
-  	! ::PanLeft() and ::PanRight did move cursor from current column
-  	  even when not needed. Fixed.
-  	+ Added a new element to ::aColsInfo[] to hold column position
-  	  when on screen to be able to remove an iVar from TBColumn.
+   ! ::colPos can go "out of bound" when tbrowse is not ::stable,
+     that is it can reach a value < 1 or > ::ColCount; I've found
+     that this should work even with xharbour TBrowse when it is
+     not ::stable. I Had to make changes to ::PerformStabilization
+     and movement methods.
+   - removed call to ::Moved inside ::colPos assignement, not needed
+   ! ::PanLeft() and ::PanRight did move cursor from current column
+     even when not needed. Fixed.
+   + Added a new element to ::aColsInfo[] to hold column position
+     when on screen to be able to remove an iVar from TBColumn.
   * source/rtl/tbcolumn.prg
     - removed ColPos iVar which is not an exported iVar of clipper
       tbcolumn.
@@ -518,14 +522,14 @@
       space is colored with the right color.
       To see what I mean, just add a color block to a column inside
       tests/testbrw.prg and shorten locals aTest0..3
-      		local aTest0 := { "This" }
-   			local aTest1 := { "1" }
-   			local aTest2 := { date() }
-   			local aTest3 := { .t. }
-   	  and add a
-   	  		oBrowse:GetColumn(5):defcolor = {3,3}
-	  after column initialization, then build with clipper and with
-	  xharbour before this fix.
+            local aTest0 := { "This" }
+            local aTest1 := { "1" }
+            local aTest2 := { date() }
+            local aTest3 := { .t. }
+        and add a
+            oBrowse:GetColumn(5):defcolor = {3,3}
+     after column initialization, then build with clipper and with
+     xharbour before this fix.
 
   /* NB: when a column has a colorblock or a defcolor clipper paints
          using that colors even column header and footer.
