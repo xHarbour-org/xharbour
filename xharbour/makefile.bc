@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.52 2003/06/19 02:44:47 druzus Exp $
+# $Id: makefile.bc,v 1.53 2003/06/20 00:24:14 druzus Exp $
 #
 
 #
@@ -645,6 +645,7 @@ VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\extend.obj \
    $(VM_OBJ_DIR)\fm.obj \
    $(VM_OBJ_DIR)\garbage.obj \
+   $(VM_OBJ_DIR)\hbi18n.obj \
    $(VM_OBJ_DIR)\hvm.obj \
    $(VM_OBJ_DIR)\inet.obj \
    $(VM_OBJ_DIR)\initexit.obj \
@@ -1282,6 +1283,10 @@ $(VM_OBJ_DIR)\harbinit.c : $(VM_DIR)\harbinit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(VM_OBJ_DIR)\harbinit.obj : $(VM_OBJ_DIR)\harbinit.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
+
+$(VM_OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1150 2003/06/20 17:32:38 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1151 2003/06/20 18:00:55 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-20 20:15 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * makefile.bc
+    + added compilation of hbi18n.c in VM
+    (Please, someone do it in makefile.vc)
 
 2003-06-20 19:59 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   + include/hbi18n.h
