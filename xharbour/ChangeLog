@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3132 2004/07/02 04:38:35 lculik Exp $
+ * $Id: ChangeLog,v 1.3133 2004/07/02 13:00:32 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-02 09:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    * additional makefile errors
+  * bin/bld.bat
+    + comdlg32.lib for msvc
+
 2004-07-02 09:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * makefil.vc
+  * makefile.vc
     * corrected gtwvt rules
 
 2004-07-02 01:30 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
@@ -39,7 +45,7 @@
 	// Sorry Ron, It's was my fault! I Remove the variable cRet
 
 2004-07-01 10:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * makefil.nt
+  * makefile.nt
     * corrected gtwvt rules
   * source/rtl/at.c
     + #include <ctype.h>
