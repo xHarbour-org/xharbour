@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.16 2002/12/30 05:05:01 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.17 2002/12/30 21:24:09 ronpinkas Exp $
  */
 
 /*
@@ -68,11 +68,16 @@ extern short hb_vm_iGlobals;
 /* Creates the codeblock structure
  *
  * pBuffer -> the buffer with pcodes (without HB_P_PUSHBLOCK)
- * wLocals -> number of local variables referenced in a codeblock
+ * uiLocals -> number of local variables referenced in a codeblock
  * pLocalPosTable -> a table with positions on eval stack for referenced variables
  * pSymbols    -> a pointer to the module symbol table
  *
  * Note: pLocalPosTable cannot be used if uiLocals is ZERO
+ *
+ * Another note:
+ *       pLocalPosTable actually resides in the pcode before pBuffer, and we
+ *       must use HB_PCODE_MKUSHORT( pLocalPosTable++ ) to handle
+ *       little-endian platform-indepent pcode on big-endian machines.
  *
  */
 HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
@@ -115,7 +120,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
          /*
           * Swap the current value of local variable with the reference to this value.
           */
-         pLocal = hb_stackItemFromBase( *pLocalPosTable++ );
+         pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable++ ) );
 
          if( ! HB_IS_MEMVAR( pLocal ) )
          {

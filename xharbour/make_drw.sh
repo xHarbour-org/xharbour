@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_drw.sh,v 1.1 2002/12/04 23:06:28 likewolf Exp $
+# $Id: make_drw.sh,v 1.2 2003/01/17 12:28:33 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -17,7 +17,7 @@
 export HB_ARCHITECTURE=darwin
 export HB_COMPILER=gcc
 export HB_GPM_MOUSE=yes
-export HB_GT_LIB=gtstd
+if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtstd; fi
 
 # Set to constant value to be consistent with the non-GNU make files.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.13 2002/11/12 17:24:14 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.14 2003/01/16 01:30:34 ronpinkas Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ void hb_compStrongType( int iSize )
 
      case HB_P_DO :
      case HB_P_FUNCTION :
-       wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
        /* DON't put break; Has to fall through */
      case HB_P_DOSHORT :
      case HB_P_FUNCTIONSHORT :
@@ -644,7 +644,7 @@ void hb_compStrongType( int iSize )
           ;/* The Object is not declared. */
        else if( cSubType1 == 'S' )
        {
-          pSym = hb_compSymbolGetPos( pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256 );
+          pSym = hb_compSymbolGetPos( HB_PCODE_MKUSHORT( &( pFunc->pCode[ ulPos + 1 ] ) ) );
 
           if( pSym && pSym->szName && pFunc->iStackClasses && pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
           {
@@ -685,7 +685,7 @@ void hb_compStrongType( int iSize )
 
      /* Also handled by HB_P_MESSAGE. */
      case HB_P_SEND :
-       wVar = * ( ( SHORT * ) &( pFunc->pCode )[ ulPos + 1 ] );
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        /* Fall Through - don't add break !!! */
 
@@ -1780,7 +1780,7 @@ void hb_compStrongType( int iSize )
 		  }
           else
 		  {
-             pSym = hb_compSymbolGetPos( pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256 );
+             pSym = hb_compSymbolGetPos( HB_PCODE_MKUSHORT( &( pFunc->pCode[ ulPos + 1 ] ) ) );
 		  }
 
           /*printf( "\nSymbol: %s\n", pSym->szName );*/
@@ -1861,7 +1861,7 @@ void hb_compStrongType( int iSize )
        }
        else
        {
-          wVar = * ( ( SHORT * ) &( pFunc->pCode )[ ulPos + 1 ] );
+          wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
        }
 
        /* we are accesing variables within a codeblock */
@@ -1947,7 +1947,7 @@ void hb_compStrongType( int iSize )
      case HB_P_PUSHSTATICREF :
      case HB_P_PUSHSTATIC :
        pTmp = hb_comp_functions.pFirst;
-       wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        while( pTmp->pNext && pTmp->pNext->iStaticsBase < wVar )
        {
@@ -2027,7 +2027,7 @@ void hb_compStrongType( int iSize )
      case HB_P_PUSHALIASEDFIELD :
      case HB_P_PUSHFIELD :
        if( ! pSym )
-         pSym = hb_compSymbolGetPos( pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256 );
+         pSym = hb_compSymbolGetPos( HB_PCODE_MKUSHORT( &( pFunc->pCode[ ulPos + 1 ] ) ) );
 
        if( pSym && pSym->szName && pFunc->pFields )
        {
@@ -2041,7 +2041,7 @@ void hb_compStrongType( int iSize )
      case HB_P_PUSHMEMVARREF :
      case HB_P_PUSHMEMVAR :
        if( ! pSym )
-          pSym = hb_compSymbolGetPos( pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256 );
+          pSym = hb_compSymbolGetPos( HB_PCODE_MKUSHORT( &( pFunc->pCode[ ulPos + 1 ] ) ) );
 
        if( pSym )
        {
@@ -2148,7 +2148,7 @@ void hb_compStrongType( int iSize )
      /* Arrays. */
 
      case HB_P_ARRAYDIM :
-       wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        if( pFunc->iStackIndex < wVar )
           /* TODO Error Message after finalizing all possible pcodes. */
@@ -2164,7 +2164,7 @@ void hb_compStrongType( int iSize )
        break;
 
      case HB_P_ARRAYGEN :
-       wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        /* TODO Error Message after finalizing all possible pcodes. */
        if( pFunc->iStackIndex < wVar )
@@ -2358,7 +2358,7 @@ void hb_compStrongType( int iSize )
      case HB_P_POPFIELD :
        if( pFunc->pCode[ ulPos ] == HB_P_POPFIELD || pFunc->pCode[ ulPos ] == HB_P_POPALIASEDFIELD )
        {
-          wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+          wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
           pSym = hb_compSymbolGetPos( wVar );
        }
 
@@ -2388,7 +2388,7 @@ void hb_compStrongType( int iSize )
        pFunc->iStackIndex--;
 
        if( pFunc->pCode[ ulPos ] == HB_P_POPMEMVAR )
-          wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+          wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        if( ! pSym )
           pSym = hb_compSymbolGetPos( wVar );
@@ -2700,7 +2700,7 @@ void hb_compStrongType( int iSize )
 
        if( pFunc->pCode[ ulPos ] == HB_P_POPLOCAL )
        {
-          wVar = * ( ( SHORT * ) &( pFunc->pCode )[ ulPos + 1 ] );
+          wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
        }
        else
        {
@@ -2890,7 +2890,7 @@ void hb_compStrongType( int iSize )
        pFunc->iStackIndex--;
 
        pTmp = hb_comp_functions.pFirst;
-       wVar = pFunc->pCode[ ulPos + 1 ] + pFunc->pCode[ ulPos + 2 ] * 256;
+       wVar = HB_PCODE_MKSHORT( &( pFunc->pCode[ ulPos + 1 ] ) );
 
        while( pTmp->pNext && pTmp->pNext->iStaticsBase < wVar )
           pTmp = pTmp->pNext;

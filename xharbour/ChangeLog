@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.635 2003/01/19 21:43:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.636 2003/01/19 23:15:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-21 07:30 UTC+0300 Phil Krylov <phil@mail.ru>
+  * make_drw.sh
+    * Allow building with gtcrs. 
+  * include/hbdefs.h
+    + Added HB_PCODE_MKSHORT, HB_PCODE_MKUSHORT, HB_PCODE_LONG,
+      HB_PCODE_MKULONG, HB_PCODE_MK24BIT macros to handle platform-independent
+      little-endian pcode on big-endian machines
+  * source/compiler/genc.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    ! Use HB_PCODE_MK* to access pcode all over the place. It fixes most
+      Darwin bugs and should improve performance a little on little-endian
+      platforms too (as I think).
+  * source/vm/codebloc.c
+    ! Use HB_PCODE_MKUSHORT( pLocalPosTable++ ) in hb_codeblockNew(). This
+      is done with an assumption that pLocalPosTable is always located inside
+      pcode.
+  * tests/Makefile
+    * Adjusted Darwin configuration
+
 2003-01-20 06:10 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rtl/transfrm.c
     ! fixed bug reported by Vic< vic@guerra.com.mx>

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.5 2002/10/22 02:11:47 paultucker Exp $
+ * $Id: hbdefs.h,v 1.6 2003/01/07 10:48:18 likewolf Exp $
  */
 
 /*
@@ -165,6 +165,24 @@
                                        ( ( ( ULONG ) ( b3 ) ) << 16 ) | \
                                        ( ( ( ULONG ) ( b2 ) ) <<  8 ) | \
                                        ( ( ( ULONG ) ( b1 ) ) ) )
+
+#ifndef HB_BIG_ENDIAN
+
+   #define HB_PCODE_MKSHORT( p )	( *( SHORT * )( p ) )
+   #define HB_PCODE_MKUSHORT( p )	( *( USHORT * )( p ) )
+   #define HB_PCODE_MKLONG( p )		( *( LONG * )( p ) )
+   #define HB_PCODE_MKULONG( p )	( *( ULONG * )( p ) )
+   
+#else
+
+   #define HB_PCODE_MKSHORT( p )	HB_MKSHORT( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ] )
+   #define HB_PCODE_MKUSHORT( p )	HB_MKUSHORT( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ] )
+   #define HB_PCODE_MKLONG( p )		HB_MKLONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], ( ( BYTE * )( p ) )[ 3 ] )
+   #define HB_PCODE_MKULONG( p )	HB_MKULONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], ( ( BYTE * )( p ) )[ 3 ] )
+
+#endif
+
+#define HB_PCODE_MK24BIT( p )		HB_MKLONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], 0 )
 
 #define HB_SYMBOL_UNUSED( symbol ) ( void ) symbol
 
