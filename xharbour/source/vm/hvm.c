@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.185 2003/03/26 20:50:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.186 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -289,6 +289,8 @@ HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
 PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+
+int hb_vm_iOptimizedSend = 0;
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
@@ -1075,7 +1077,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             USHORT usParams =  pCode[ w + 1 ];
 
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
 
             if( hb_vm_iExtraParamsIndex == 0 )
             {
@@ -1086,7 +1088,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) )
                   {
                      BOOL bConstructor;
-                     PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+                     PHB_FUNC pFunc;
+
+                     hb_vm_iOptimizedSend = 1;
+
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+
+                     hb_vm_iOptimizedSend = 0;
 
                      if( pFunc == hb___msgGetData )
                      {
@@ -1134,7 +1142,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) )
                   {
                      BOOL bConstructor;
-                     PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor );
+                     PHB_FUNC pFunc;
+
+                     hb_vm_iOptimizedSend = 1;
+
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor );
+
+                     hb_vm_iOptimizedSend = 0;
 
                      if( pFunc == hb___msgSetData )
                      {
@@ -1186,7 +1200,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            hb_vmSend( usParams );
+            if( s_uiActionRequest != HB_BREAK_REQUESTED )
+            {
+               hb_vmSend( usParams );
+            }
 
          SEND_Finalization:
 
@@ -1216,7 +1233,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             if( HB_IS_OBJECT( pSelf ) )
             {
                BOOL bConstructor;
-               PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+               PHB_FUNC pFunc;
+
+               hb_vm_iOptimizedSend = 2;
+
+               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+
+               hb_vm_iOptimizedSend = 0;
 
                if( pFunc == hb___msgGetData )
                {
@@ -1243,7 +1266,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      hb_arrayGetByRef( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, *( HB_VM_STACK.pPos - 2 ) );
                   }
                }
-               else
+               else if( s_uiActionRequest != HB_BREAK_REQUESTED )
                {
                   hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "No instance variable", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
 

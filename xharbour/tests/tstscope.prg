@@ -5,7 +5,7 @@ static oChild
 
 PROCEDURE Main()
 
-   LOCAL oErr, oStranger := TSranger()
+   LOCAL oErr, oStranger := TStranger()
    LOCAL oParent := TParent()
 
    oChild := TChild():Create()
@@ -29,6 +29,13 @@ PROCEDURE Main()
 
    TRY
       oChild:ProtectedReadOnlyOfParent := "Can NOT assign a READONLY or PROTECTED outside of [DERIVED] Class!"
+      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
+   TRY
+      TestByRef( @( oChild:ReadOnlyOfParent ) )
       ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
       ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
@@ -102,7 +109,7 @@ METHOD Create() CLASS TChild
 
 RETURN Self
 
-CLASS TSranger
+CLASS TStranger
 
    METHOD TestScope()
 
@@ -120,3 +127,10 @@ METHOD TestScope()
    END
 
 RETURN NIL
+
+PROCEDURE TestByRef( xByRef )
+
+   ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+   xByRef := "New Value"
+
+RETURN

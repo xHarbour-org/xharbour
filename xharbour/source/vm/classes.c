@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.45 2003/03/25 04:31:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.46 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -163,6 +163,7 @@
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
 extern BOOL hb_bProfiler; /* profiler activity status */
+extern int hb_vm_iOptimizedSend;
 
 static PCLASS   s_pClasses     = NULL;
 static USHORT   s_uiClasses    = 0;
@@ -437,7 +438,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
    //printf( "Method: '%s' Scope: %i\n\r", pMethod->pMessage->pSymbol->szName,uiScope );
 
-   if( uiScope & HB_OO_CLSTP_READONLY )
+   if( uiScope & HB_OO_CLSTP_READONLY && hb_vm_iOptimizedSend != 2 )
    {
       // Allow anyway if all we do is read a property.
       if( pMethod->pMessage->pSymbol->szName[0] != '_' )
@@ -453,8 +454,11 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
       PHB_ITEM * pBase = HB_VM_STACK.pBase;
       PHB_ITEM pCaller;
 
-      // Outer function level.
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      if( hb_vm_iOptimizedSend == 0 )
+      {
+         // Outer function level.
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      }
 
       #ifdef CLASSY_SCOPE
          // Outer while in Inline, Eval() or aEval().
