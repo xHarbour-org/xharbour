@@ -1,5 +1,5 @@
 
-#include "struct.ch"
+#include "hbstruct.ch"
 
 procedure main()
 
