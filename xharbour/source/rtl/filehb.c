@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.2 2002/01/15 00:21:16 dholm Exp $
+ * $Id: filehb.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -58,5 +58,5 @@
 
 HB_FUNC( FILE )
 {
-   hb_retl( ISCHAR( 1 ) ? hb_spFile( ( BYTE * ) hb_parc( 1 ) ) : FALSE );
+   hb_retl( ISCHAR( 1 ) ? hb_spFile( ( BYTE * ) hb_parc( 1 ), NULL ) : FALSE );
 }

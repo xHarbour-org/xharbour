@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.4 2002/01/10 19:32:59 dholm Exp $
+ * $Id: spfiles.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -53,12 +53,13 @@
 #include "hbapifs.h"
 #include "hbset.h"
 
-static BOOL FindFile( BYTE * pFilename, BYTE * path )
+BOOL hb_spFile( BYTE * pFilename, BYTE RetPath[ _POSIX_PATH_MAX + 3 + 10 ] )
 {
+   BYTE path[ _POSIX_PATH_MAX + 3 + 10 ];
    BOOL bIsFile = FALSE;
    PHB_FNAME pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("FindFile(%s, %p)", (char*) pFilename, path));
+   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename));
 
    pFilepath = hb_fsFNameSplit( (char*) pFilename );
    if( pFilepath->szPath )
@@ -89,28 +90,28 @@ static BOOL FindFile( BYTE * pFilename, BYTE * path )
    }
    hb_xfree( pFilepath );
 
-   if( !bIsFile )
+   if( bIsFile )
+   {
+      if( RetPath )
+      {
+         strcpy( (char *) RetPath, path );
+      }
+   }
+   else
+   {
       *path = '\0';
+   }
 
    return bIsFile;
 }
 
-BOOL hb_spFile( BYTE * pFilename )
-{
-   BYTE path[ _POSIX_PATH_MAX + 1 ];
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename, path));
-
-   return FindFile( pFilename, path );
-}
-
 FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags )
 {
-   BYTE path[ _POSIX_PATH_MAX + 1 ];
+   BYTE path[ _POSIX_PATH_MAX + 3 + 10 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_spOpen(%p, %hu)", pFilename, uiFlags));
 
-   if( FindFile( pFilename, path ) )
+   if( hb_spFile( pFilename, path ) )
       return hb_fsOpen( path, uiFlags );
    else
       return hb_fsOpen( pFilename, uiFlags );

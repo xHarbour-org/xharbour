@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.111 2002/03/15 21:19:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.112 2002/03/15 23:34:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-15 16:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapifs.h
+  * source/rtl/spfiles.c
+    * Changed hb_spFile() to receive 2nd [output] parameter to return the qualified path of the found file.
+    - Removed FindFile() redundant level of indirection.
+
+  * source/rtl/filehb.c
+    * Changed to add 2nd NULL parameter in call to hb_spFile().
 
 2002-03-15 15:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/garbage.c
