@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.12 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hbfsapi.c,v 1.1.1.1 2001/12/21 10:44:34 ronpinkas Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 /* NOTE: Not really belongs here, but until we can't find a better place 
          it will do it. [vszakats] */
 extern void hb_fhnd_ForceLink( void );
+
 
 /*
  * Function that adds at most one path to a list of pathnames to search
@@ -201,6 +202,7 @@ PHB_FNAME hb_fsFNameSplit( char * pszFileName )
 /* This function joins path, name and extension into a string with a filename */
 char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 {
+   char szPathSep[] = {OS_PATH_DELIMITER,0}; /* see NOTE below */
    char * pszName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameMerge(%p, %p)", pszFileName, pFileName));
@@ -210,12 +212,18 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 
    /* Strip preceding path separators from the filename */
    pszName = pFileName->szName;
-   if( pszName && pszName[ 0 ] != '\0' && strchr( OS_PATH_DELIMITER_LIST, pszName[ 0 ] ) )
+   if( pszName && pszName[ 0 ] != '\0' && strchr( OS_PATH_DELIMITER_LIST, pszName[ 0 ] ) != NULL )
       pszName++;
 
    /* Add path if specified */
    if( pFileName->szPath )
       strcat( pszFileName, pFileName->szPath );
+
+   /*
+      NOTE: be _very_ careful about 'optimising' this next section code!
+      (specifically, initialising szPathSep) as MSVC with /Oi
+      (or anything that infers it like /Ox) will cause you trouble.
+    */
 
    /* If we have a path, append a path separator to the path if there
       was none. */
@@ -225,12 +233,16 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 
       if( strchr( OS_PATH_DELIMITER_LIST, pszFileName[ iLen ] ) == NULL )
       {
-         char szPathSep[ 2 ];
+         /*
+             char szPathSep[2];
 
-         szPathSep[ 0 ] = OS_PATH_DELIMITER;
-         szPathSep[ 1 ] = '\0';
+             szPathSep[ 0 ] = OS_PATH_DELIMITER;
+             szPathSep[ 1 ] = '\0';
+
+          */
 
          strcat( pszFileName, szPathSep );
+
       }
    }
 
@@ -257,4 +269,3 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 
    return pszFileName;
 }
-
