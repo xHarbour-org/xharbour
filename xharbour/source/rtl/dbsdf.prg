@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.6 2003/01/27 03:37:23 walito Exp $
+ * $Id: dbsdf.prg,v 1.7 2003/10/01 17:41:47 paultucker Exp $
  */
 
 /*
@@ -252,9 +252,9 @@ STATIC FUNCTION ImportFixed( handle, index, lLineEnd )
               cType == "CURDOUBLE" .or. ;
               cType == "AUTOINC"
             Return VAL( cBuffer )
-         CASE "D"
+         CASE cType == "D"
             Return HB_STOD( cBuffer )
-         CASE "L"
+         CASE cType == "L"
             Return cBuffer == "T"
       ENDCASE
    ENDIF
