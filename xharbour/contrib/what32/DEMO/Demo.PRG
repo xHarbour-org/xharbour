@@ -32,15 +32,15 @@ static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOut
 
 
 #DEFINE SHOWDEBUG
-#include "hbclass.ch"
-#Include "windows.ch"
+
+#Include "winuser.ch"
+#INCLUDE "WinGdi.ch"
 #Include "commdlg.ch"
-#Include "WinLView.ch"
+#Include "commctrl.ch"
+
+#include "hbclass.ch"
 #Include "debug.ch"
 #Include "what32.ch"
-#Include "toolbar.ch"
-#Include "accel.ch"
-#INCLUDE "WinGdi.ch"
 #include "wintypes.ch"
 #Include "cstruct.ch"
 
@@ -64,11 +64,6 @@ static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOut
 #define C_CYAN        RGB(0, 128, 128)
 #define C_LIGHTCYAN   RGB(0, 255, 255)
 #define C_PURPLE      RGB(128, 0, 128)
-
-#define CLR_NONE                0xFFFFFFFFL
-
-#define ILD_NORMAL              0x0000
-#define ILD_TRANSPARENT         0x0001
 
 #define SND_SYNC            0x0000  /* play synchronously (default) */
 #define SND_ASYNC           0x0001  /* play asynchronously */
@@ -208,7 +203,7 @@ typedef struct tagLOGFONT { ;
    BYTE lfClipPrecision;
    BYTE lfQuality;
    BYTE lfPitchAndFamily;
-   TCHAR lfFaceName[LF_FACESIZE];
+   TCHAR lfFaceName[32];
 } LOGFONT
 
 typedef struct { ;   // cf

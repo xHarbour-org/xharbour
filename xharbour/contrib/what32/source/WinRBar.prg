@@ -7,9 +7,8 @@
 
 
 
-#Include "windows.ch"
+#Include "winuser.ch"
 #include "hbclass.ch"
-
 
 #Include "wintypes.ch"
 #Include "cstruct.ch"
@@ -19,11 +18,85 @@ pragma pack(4)
 #Include "winstruc.ch"
 
 #Include 'what32.ch'
-#Include "toolbar.ch"
-#Include "rbstruct.ch"
-
+#Include "commctrl.ch"
 
 #Include 'debug.ch'
+
+typedef struct tagREBARINFO;
+{;
+    UINT        cbSize;
+    UINT        fMask;
+    HIMAGELIST  himl;
+}   REBARINFO, FAR *LPREBARINFO
+
+typedef struct tagREBARBANDINFOA;
+{;
+    UINT        cbSize;
+    UINT        fMask;
+    UINT        fStyle;
+    COLORREF    clrFore;
+    COLORREF    clrBack;
+    LPSTR       lpText;
+    UINT        cch;
+    int         iImage;
+    HWND        hwndChild;
+    UINT        cxMinChild;
+    UINT        cyMinChild;
+    UINT        cx;
+    HBITMAP     hbmBack;
+    UINT        wID;
+    UINT        cyChild;
+    UINT        cyMaxChild;
+    UINT        cyIntegral;
+    UINT        cxIdeal;
+    LPARAM      lParam;
+    UINT        cxHeader;
+}   REBARBANDINFO, FAR *LPREBARBANDINFOA;
+
+typedef struct tagNMREBARCHILDSIZE;
+{;
+    NMHDR hdr;
+    UINT uBand;
+    UINT wID;
+    RECT rcChild;
+    RECT rcBand;
+} NMREBARCHILDSIZE, *LPNMREBARCHILDSIZE
+
+typedef struct tagNMREBAR;
+{;
+    NMHDR   hdr;
+    DWORD   dwMask;           // RBNM_*
+    UINT    uBand;
+    UINT    fStyle;
+    UINT    wID;
+    LPARAM  lParam;
+} NMREBAR, *LPNMREBAR
+
+typedef struct tagNMRBAUTOSIZE;
+{;
+    NMHDR hdr;
+    BOOL fChanged;
+    RECT rcTarget;
+    RECT rcActual;
+} NMRBAUTOSIZE, *LPNMRBAUTOSIZE
+
+typedef struct tagNMREBARCHEVRON;
+{;
+    NMHDR hdr;
+    UINT uBand;
+    UINT wID;
+    LPARAM lParam;
+    RECT rc;
+    LPARAM lParamNM;
+} NMREBARCHEVRON, *LPNMREBARCHEVRON
+
+typedef struct _RB_HITTESTINFO;
+{;
+    POINT pt;
+    UINT flags;
+    int iBand;
+} RBHITTESTINFO, FAR *LPRBHITTESTINFO
+
 
 *-----------------------------------------------------------------------------*
 

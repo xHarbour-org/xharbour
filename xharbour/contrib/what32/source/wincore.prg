@@ -12,14 +12,12 @@
 #xCommand ? ? < x > = > OutputDebugString( asString( < x > ) )
 #xCommand ? < x > = > OutputDebugString( asString( < x > ) + chr( 13 ) )
 
-#Define RCF_DIALOG     0      // used internally (user custom dialog class - advanced option)
-#Define RCF_WINDOW     1      // use DefWindowProc()
-#Define RCF_MDIFRAME   2      // use DefFrameProc()
-#Define RCF_MDICHILD   4      // use DefMDIChildProc()
+#Define WT_DIALOG     0      // used internally (user custom dialog class - advanced option)
+#Define WT_WINDOW     1      // use DefWindowProc()
+#Define WT_MDIFRAME   2      // use DefFrameProc()
+#Define WT_MDICHILD   4      // use DefMDIChildProc()
 
-#Define WIN_WANT_VER4
-#Define WIN_WANT_ALL
-#Include "windows.ch"
+#Include "winuser.ch"
 #Include "hboo.ch"
 
 Static hWndActive := 0
@@ -154,7 +152,7 @@ Function CreateWindow( cClass, cTitle, nStyle, nX, nY, nWidth, nHeight, ;
          aAdd( aWindow[ nIndex, 3 ] , aClass[ n, 3 ] )
       EndIf
    Else
-      aWindow[ nIndex ] := { 0, RCF_WINDOW, { } }         // no default codeblock
+      aWindow[ nIndex ] := { 0, WT_WINDOW, { } }         // no default codeblock
    EndIf
 
    // create a window
@@ -200,7 +198,7 @@ Function CreateMDIWindow( cClass, cTitle, nStyle, nX, nY, nWidth, nHeight, ;
          aAdd( aWindow[ nIndex, 3 ] , aClass[ n, 3 ] )
       EndIf
    Else
-      aWindow[ nIndex ] := { 0, RCF_MDICHILD, { } }         // no default codeblock
+      aWindow[ nIndex ] := { 0, WT_MDICHILD, { } }         // no default codeblock
    EndIf
 
    // create a window
@@ -226,7 +224,7 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
    Local i := 0
    Local anWM
    Local bProc
-   Local nType := RCF_WINDOW
+   Local nType := WT_WINDOW
    Local nRet := 0
    Local nProc //:=aProc[nIndex]
    Local hMenu
@@ -256,7 +254,7 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
    // still in creation process ?
 
    If ( n := aScan( aWindow, { | x | hWnd == x[ 1 ] } ) ) == 0 //find the window
-      If ( ( n := aScan( aWindow, { | x | 0 == x[ 1 ] .AND. RCF_DIALOG <> x[ 2 ] } ) ) > 0 )
+      If ( ( n := aScan( aWindow, { | x | 0 == x[ 1 ] .AND. WT_DIALOG <> x[ 2 ] } ) ) > 0 )
          aWindow[ n, 1 ] := hWnd
       EndIf
    EndIf
@@ -309,13 +307,13 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
    // process message
 
    If i == 0 // no subclassed proc
-      If nType == RCF_MDICHILD
+      If nType == WT_MDICHILD
          nRet := DefMDIChildProc( hWnd, nMsg, nwParam, nlParam )
-      ElseIf nType == RCF_MDIFRAME
+      ElseIf nType == WT_MDIFRAME
          nRet := DefFrameProc( hWnd, nMsg, nwParam, nlParam )
-      ElseIf nType == RCF_DIALOG
+      ElseIf nType == WT_DIALOG
          nRet := DefDlgProc( hWnd, nMsg, nwParam, nlParam ) 
-      Else  //RCF_WINDOW 
+      Else  //WT_WINDOW 
          nRet := DefWindowProc( hWnd, nMsg, nwParam, nlParam )
       EndIf
    Else
@@ -371,8 +369,8 @@ Function _ProcessDlgMsg( hDlg, nMsg, nwParam, nlParam )
          Return( 0 )
       Else
          aDialog[ nIndex, 1 ] := hDlg
-         If ( ( n := aScan( aWindow, { | x | 0 == x[ 1 ] .AND. RCF_DIALOG == x[ 2 ] } ) ) > 0 )
-            aWindow[ n ] := { hDlg, RCF_DIALOG, { } }
+         If ( ( n := aScan( aWindow, { | x | 0 == x[ 1 ] .AND. WT_DIALOG == x[ 2 ] } ) ) > 0 )
+            aWindow[ n ] := { hDlg, WT_DIALOG, { } }
          EndIf
       EndIf
    EndIf
@@ -386,7 +384,7 @@ Function _ProcessDlgMsg( hDlg, nMsg, nwParam, nlParam )
 
    If nMsg == WM_NCDESTROY
       aDialog[ nIndex ] := { NIL , NIL , NIL, NIL, NIL }
-      If ( n := aScan( aWindow, { | x | hDlg == x[ 1 ] .AND. RCF_DIALOG == x[ 2 ] .AND. Empty( x[ 3 ] ) } ) ) > 0
+      If ( n := aScan( aWindow, { | x | hDlg == x[ 1 ] .AND. WT_DIALOG == x[ 2 ] .AND. Empty( x[ 3 ] ) } ) ) > 0
          __KillWindow( hDlg )
       EndIf
    EndIf
@@ -527,10 +525,10 @@ Function CreateDialog( hInst, acnDlg , hWnd, bAction, oObj, xCargo )
       // note type 0
 
       If ( n := aScan( aWindow, { | x | x[ 1 ] == NIL } ) ) == 0
-         aAdd( aWindow, { 0, RCF_DIALOG, { } } )
+         aAdd( aWindow, { 0, WT_DIALOG, { } } )
          n := Len( aWindow )
       Else
-         aWindow[ n ] := { 0, RCF_DIALOG, { } }  // window 0 means waiting ...
+         aWindow[ n ] := { 0, WT_DIALOG, { } }  // window 0 means waiting ...
       EndIf
 
       // create the dialog
@@ -611,7 +609,7 @@ Function SetProcedure( hWnd, bAction, anWM, oObj, xCargo )
             aAdd( aWindow, )
             n := Len( aWindow )
          EndIf
-         aWindow[ n ] := { hWnd, RCF_WINDOW, { } }
+         aWindow[ n ] := { hWnd, WT_WINDOW, { } }
       EndIf
 
       // get a unique procedure address

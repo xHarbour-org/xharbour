@@ -3,16 +3,13 @@
 // Tollbar class
 
 
-#Include "windows.ch"
+#Include "winuser.ch"
 #include "hbclass.ch"
-#Include "toolbar.ch"
+#Include "commctrl.ch"
 #Include 'debug.ch'
-#Include "tabctrl.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include 'what32.ch'
-#Include "tooltips.ch"
-#Include "winlview.ch"
 
 pragma pack(4)
 

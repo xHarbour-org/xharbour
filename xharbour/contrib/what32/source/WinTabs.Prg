@@ -1,7 +1,7 @@
-#Include "windows.ch"
+#Include "winuser.ch"
 #include "hbclass.ch"
 #Include 'debug.ch'
-#Include "tabctrl.ch"
+#Include "commctrl.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include "winGdi.ch"

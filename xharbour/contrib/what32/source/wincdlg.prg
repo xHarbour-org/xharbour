@@ -1,9 +1,9 @@
 
 // WHAT32
 // Common Dialog interface
-#Define RCF_DIALOG     0      // used internally (user custom dialog class - advanced option)
+#Define WT_DIALOG     0      // used internally (user custom dialog class - advanced option)
 #Include "commdlg.ch"
-#Include "windows.ch"
+#Include "winuser.ch"
 /*
 pragma(4)
 #Include "ctruct.ch"
@@ -40,10 +40,10 @@ Function FindText( hWnd, hInst, nFlags, cFindWhat, bAction)
    // note type 0
 
    If ( n := aScan( aWindow, { | x | x[ 1 ] == NIL } ) ) == 0
-       aAdd( aWindow, { 0, RCF_DIALOG, { } } )
+       aAdd( aWindow, { 0, WT_DIALOG, { } } )
        n := Len( aWindow )
    Else
-      aWindow[ n ] := { 0, RCF_DIALOG, { } }  // window 0 means waiting ...
+      aWindow[ n ] := { 0, WT_DIALOG, { } }  // window 0 means waiting ...
    EndIf
 
    // create the dialog
@@ -86,10 +86,10 @@ Function ReplaceText( hWnd, hInst, nFlags, cFindWhat, cReplaceWith, bAction)
    // note type 0
 
    If ( n := aScan( aWindow, { | x | x[ 1 ] == NIL } ) ) == 0
-       aAdd( aWindow, { 0, RCF_DIALOG, { } } )
+       aAdd( aWindow, { 0, WT_DIALOG, { } } )
        n := Len( aWindow )
    Else
-      aWindow[ n ] := { 0, RCF_DIALOG, { } }  // window 0 means waiting ...
+      aWindow[ n ] := { 0, WT_DIALOG, { } }  // window 0 means waiting ...
    EndIf
 
    // create the dialog

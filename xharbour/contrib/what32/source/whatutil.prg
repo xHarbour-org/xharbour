@@ -1,15 +1,13 @@
 
 //Clipper-like Alert function
 
-#Include "windows.ch"
+#Include "winuser.ch"
 #Include "What32.ch"
 #Include 'debug.ch'
 #Include 'wingdi.ch'
 
 #Include 'wintypes.ch'
 #Include 'cstruct.ch'
-
-#define SPI_GETNONCLIENTMETRICS    41
 
 #Define CTYPE_BOOL 5
 
@@ -31,7 +29,7 @@ typedef struct tagLOGFONT { ;
    BYTE lfClipPrecision; 
    BYTE lfQuality; 
    BYTE lfPitchAndFamily; 
-   TCHAR lfFaceName[LF_FACESIZE]; 
+   TCHAR lfFaceName[32]; 
 } LOGFONT; 
 
 typedef struct tagNONCLIENTMETRICS { ;

@@ -2,16 +2,9 @@
 
 // common controls and common dialogs
 
-#Include "windows.ch"
-#include 'statbar.ch'
+#Include "winuser.ch"
+#include 'commctrl.ch'
 #include 'what32.ch'
-
-//#define CCM_FIRST                 8192      // Common control shared messages
-//#define CCM_SETBKCOLOR          (CCM_FIRST + 1) // lParam is bkColor
-#define SB_SETBKCOLOR           CCM_SETBKCOLOR      // lParam = bkColor
-//#define SB_SETICON              (WM_USER+15)
-//#define SB_SETTIPTEXT           (WM_USER+16)
-
 
 
 *------------------------------------------------------------------------------
