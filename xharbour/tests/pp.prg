@@ -3967,6 +3967,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                             EXIT
                          ENDIF
                       ENDDO
+
+                      // Added June-1-2003 (yes I know it's a commented section.)
+                      IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                         nMatch++
+                      ENDIF
                   #endif
 
                   /* Now search for the stopper. */
@@ -4250,6 +4255,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         ENDIF
                      ENDDO
                   ENDIF
+                  // Added June-1-2003
+                  IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                     nMatch++
+                  ENDIF
 
                   nOptional := 0
 
@@ -4349,6 +4358,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                               EXIT
                            ENDIF
                         ENDDO
+                        // Added June-1-2003
+                        IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                           nMatch++
+                        ENDIF
 
                         nOptional := 0
 
@@ -4384,7 +4397,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      /* Skip dependents and nested optionals, if any. */
                      nTemp := aMP[2]
                      nMatch++
-                     WHILE nMatch <= nMatches .AND. Abs( aRules[nRule][2][nMatch][2] ) >= nTemp
+                     WHILE ( nMatch <= nMatches ) .AND. ( Abs( aRules[nRule][2][nMatch][2] ) >= nTemp )
                         nMatch++
                      ENDDO
 
@@ -4399,6 +4412,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                               EXIT
                            ENDIF
                         ENDDO
+                        // Added June-1-2003
+                        IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                           nMatch++
+                        ENDIF
 
                         nOptional := 0
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.71 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.72 2003/05/26 05:58:54 paultucker Exp $
  */
 
 /*
@@ -3447,6 +3447,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    char lastchar = '0';
    char *ptr, *ptr2, *ptrOut = ptro, *pPrevSquare = NULL;
 
+   // Ron Pinkas added June-03-2003
+   int iOffset, iResidualOffset;
+
    HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %i, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
 
    #ifdef DEBUG_MARKERS
@@ -3551,10 +3554,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                {
                   char cMarkerCount = '0', cGroupCount = '0';
 
-                  lennew = ptr2-ptr-1;
+                  lennew = ptr2 - ptr - 1;
 
                   // Flagging the instanciated Marker in Repeatable group as Instanciated.
-                  for( i=0; i < lennew; i++ )
+                  for( i = 0; i < lennew; i++ )
                   {
                      if( ptr[i] == '\1' )
                      {
@@ -3600,7 +3603,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                       goto Instanciated;
                   }
 
-                  memcpy( expnew, ptr+1, lennew );
+                  memcpy( expnew, ptr + 1, lennew );
                   *(expnew + lennew++) = ' ';
                   *(expnew + lennew) = '\0';
 
@@ -3610,7 +3613,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         printf( "   Expand: '%s' at %i\n", exppatt, i );
                      #endif
 
-                     lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+                     lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew + i - 1, lennew );
                   }
 
                   if( kolmarkers )
@@ -3621,14 +3624,14 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         printf( "   Increased to %c;", s_groupchar );
                      #endif
 
-                     for( i = 0; i<lennew; i++ )
+                     for( i = 0; i < lennew; i++ )
                      {
-                        if( *(expnew+i) == '\1' )
+                        if( *( expnew + i ) == '\1' )
                         {
-                           *(expnew+i+3) = s_groupchar;
+                           *( expnew + i + 3 ) = s_groupchar;
 
                            #ifdef DEBUG_MARKERS
-                              printf( "   Group char: %s\n", (expnew+i+3) );
+                              printf( "   Group char: %s\n", ( expnew + i + 3 ) );
                            #endif
 
                            i += 4;
@@ -3638,7 +3641,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                   hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
                   *lenres += lennew;
-                  isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+                  isdvig = ptr - ptro + ( ptr2 - ptr - 1 ) + lennew;
                   rezs = TRUE;
 
                   #ifdef DEBUG_MARKERS
@@ -3709,7 +3712,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                            }
                         }
 
-                        // *** EITHER *** this block OR the #if 0 below!!!
+                        // Ron Pinkas added June-03-2003
+                        iResidualOffset = 0;
+                        /*
+                         * iResidualOffset is counting the impact of the Expansion of Marker into the Residual.
+                         * This is because the effect is DOUBLED when the expended residual is ALSO Instanciated.
+                         */
+                        // *** EITHER *** this block OR the #else below!!!
                         #if 1
                             while( (i = hb_strAt( exppatt, 2, ptr + 1, lennew )) > 0 )
                             {
@@ -3717,34 +3726,55 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                                   printf( "   Expand: '%s' at %i\n", exppatt, i );
                                #endif
 
-                               lennew += ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, lennew );
+                               // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
+                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, lennew );
+                               lennew += iOffset;
+                               iResidualOffset += iOffset;
                             }
 
-                            //printf( "   Replaced Non Repeatable into Residual Group '%s'\n", ptr );
-                        #endif
+                            #ifdef DEBUG_MARKERS
+                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
+                            #endif
 
-                        memcpy( expnew, ptr+1, lennew );
-                        *(expnew + lennew++) = ' ';
-                        *(expnew + lennew) = '\0';
+                            memcpy( expnew, ptr + 1, lennew );
+                            *( expnew + lennew++ ) = ' ';
+                            *(expnew + lennew) = '\0';
+                        #else
+                            /*
+                             * This is the original segment. It does NOT install the Marker Value into the residual
+                             * - it only installs it into the instanciated group.
+                             */
+                            memcpy( expnew, ptr + 1, lennew );
+                            *(expnew + lennew++) = ' ';
+                            *(expnew + lennew) = '\0';
 
-                        #if 0
                             while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
                             {
                                #ifdef DEBUG_MARKERS
                                   printf( "   Expand: '%s' at %i\n", exppatt, i );
                                #endif
 
-                               lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+                               lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew + i - 1, lennew );
                             }
+
+                            #ifdef DEBUG_MARKERS
+                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
+                            #endif
                         #endif
 
-                        hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
-                        *lenres += lennew;
-
-                        isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+                        // Ron Pinkas added + iResidualOffset June-03-2003
+                        hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres - ( ptr - ptro ) + 1 + iResidualOffset );
 
                         #ifdef DEBUG_MARKERS
-                           printf( "   Instanciated Repeatable Group: %s with Non Repeatable %s\n", expnew, expreal );
+                           printf( "lenres: %i ptr2 - ptr: %i ptr - ptro: %i lennew: %i Line after residual: >%s<\n", *lenres, ptr2 - ptr, ptr - ptro, lennew, ptro );
+                        #endif
+
+                        *lenres += lennew + iResidualOffset;
+
+                        isdvig = ptr - ptro + ( ptr2 - ptr - 1 ) + lennew + iResidualOffset;
+
+                        #ifdef DEBUG_MARKERS
+                           printf( "   Instanciated Repeatable Group: >%s< with Non Repeatable >%s<\n", expnew, expreal );
                         #endif
 
                         bDontInstanciate = TRUE;
@@ -3789,7 +3819,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             //printf( "Expnading place holder, and flaged for NO instanciation." );
          }
 
-         *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
+         *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres - isdvig - ifou + 1 );
          isdvig += ifou - 1;
       }
       else if( !s_bReplacePat )
@@ -3836,7 +3866,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     pp_rQuotes( expreal, sQuotes );
     hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
     if( lenreal )
-      hb_pp_Stuff( expreal, ptro+1, lenreal, 0, lenres );
+    {
+       hb_pp_Stuff( expreal, ptro+1, lenreal, 0, lenres );
+    }
     rmlen = lenreal + 2;
     break;
   case '2':  /* Normal stringify result marker  */

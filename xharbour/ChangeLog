@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1095 2003/06/03 04:08:48 druzus Exp $
+ * $Id: ChangeLog,v 1.1096 2003/06/03 15:55:44 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-03 23:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug with expansion of NON repeatable Marker into Repeatable Residual group.
+
+  * tests/pp.prg
+    ! Minor fixed to rewinding logic in MatchRule()
+
+  - tests/PP_info.prg
+    - Removed unneeded file.
+
+  * source/vm/extend.c
+    - Removed 1 unused var.
+
+  * xdiff.txt
+    * Updated to include:
+      + Properties by Refernce.
+      + Module Scope.
+      + Persistent Blocks.
 
 2003-05-03 12:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * source/rdd/dbcmd.c

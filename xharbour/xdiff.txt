@@ -5,6 +5,39 @@ input.
 As it stands at this point, xHarbour offers many Syntax extensions over Harbour
 and Clipper, including:
 
+PERSISTENT Codeblocks:
+----------------------
+
+Codeblocks may be persisted. Persisted Blocks must be restored within an
+Application containing the Compiled Module which the original Block was
+created at.
+
+   Syntax:
+   -------
+
+   HB_SaveBlock( <Block> ) -> PersistedBlock Stream
+
+   HB_RestoreBlock( <PersistedBlock> ) -> Block
+
+
+Module Scope:
+-------------
+
+OOP Scoping supports PRIVATE/HIDDEN, PROTECTED, and READONLY scopes. Classes
+sharing the SAME compilation unit may freely access such restricted access
+Members, without causing any scope violation.
+
+Properties by Reference:
+------------------------
+
+Instance Variables of Objects may be passed by REFERENCE to Functions and
+Methods.
+
+   Syntax:
+   -------
+
+   SomeFunction( @<SomeObj>:<SomeVar> )
+
 Associative Arrays:
 -------------------
 
