@@ -1,5 +1,5 @@
 /*
- * $Id: hblog.ch,v 1.2 2003/07/13 19:34:33 jonnymind Exp $
+ * $Id: hblog.ch,v 1.3 2003/07/22 11:35:11 jonnymind Exp $
  */
 
 /*
@@ -71,6 +71,7 @@
    [<mon: MONITOR> ([<nMonPrio>[,<nMonPort>]])] ;
    [<sys: SYSLOG> ([<nSysPrio>[,<nSysId>]])] ;
    [<ema: EMAIL> ([<nEmaPrio> [,<cHelo>[,<cServer>[,<cDest>[,<cSubject>[,<cFrom>]]]]]])] ;
+   [<dbg: DEBUG> ( [<nDebugPrio> [,<nMaxDebugPrio>]] )] ;
    [NAME <cName>]=>;
    HB_InitStandardLog() ;;
    if <.con.>;;
@@ -88,13 +89,18 @@
    if <.ema.> ;;
       HB_StandardLogAdd( HB_LogEmail():New( <nEmaPrio> ,<cHelo>,<cServer>,<cDest>,<cSubject>,<cFrom>));;
    endif;;
+   if <.dbg.> ;;
+      HB_StandardLogAdd( HB_LogDebug():New( <nDebugPrio>, <nMaxDebugPrio> ) ) ;;
+   endif;;
+   HB_StandardLogName( <cName> );;
    HB_OpenStandardLog()
 
 
 #xcommand SET LOG STYLE <nStyle> => HB_SetStandardLogStyle( <nStyle> )
 
-#xcommand LOG <data,...> => HB_StandardLog( HB_BldLogMsg( <data> ) )
-#xcommand LOG <data,...> PRIO[RITY] <prio> => ;
+#xcommand LOG <data,...> [PRIORITY <prio>] => ;
+      HB_StandardLog( HB_BldLogMsg( <data> ), <prio> )
+#xcommand LOG <data,...> [PRIO <prio>] => ;
       HB_StandardLog( HB_BldLogMsg( <data> ), <prio> )
 
 #xcommand CLOSE LOG =>  HB_CloseStandardLog()

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.94 2003/07/27 20:15:12 jonnymind Exp $
+* $Id: thread.c,v 1.95 2003/08/01 11:36:05 jonnymind Exp $
 */
 
 /*
@@ -641,12 +641,12 @@ HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
       {
          hb_ht_mutex = p->next;
       }
+      if( p->lock_count )
+      {
+         HB_MUTEX_UNLOCK( p->mutex );
+      }
    }
 
-   if( p->lock_count )
-   {
-      HB_MUTEX_UNLOCK( p->mutex );
-   }
 
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 

@@ -1,6 +1,6 @@
 ************************************************************
 * logtest.prg
-* $Id: logtest.prg,v 1.4 2003/07/14 08:00:23 jonnymind Exp $
+* $Id: logtest.prg,v 1.5 2003/07/22 11:35:11 jonnymind Exp $
 *
 * Demonstrates the standard log system
 * See inline help strings to know how to use this
@@ -14,6 +14,7 @@
 #include "hblog.ch"
 #include "inkey.ch"
 GLOBAL oEmail
+GLOBAL oDebug
 
 Procedure MAIN()
    LOCAL nChoice
@@ -52,7 +53,7 @@ Procedure MAIN()
    @5,5 SAY "To the file logtest.log: only INFO or above"
    @6,5 SAY "To the system log: only error or critical."
    @7,5 SAY "To a monitor internet port: connect to this host at port 7761."
-   @8,5 SAY "To 'console': all messages. Press F1 to activate EMAIL log"
+   @8,5 SAY "To 'console': all messages. Press F1 to activate EMAIL log, F2 for debug"
    @9,3 SAY "Press ESC to select another priority; Press it again to exit."
    @10,3 SAY "** To demonstrate self log file rolling feature, log file limit is set to 2K"
 
@@ -66,10 +67,6 @@ Procedure MAIN()
    @22,0 SAY Space( 80 )
    @22,0
 
-      /*
-      SYSLOG( HB_LOG_ERROR,  0x3ffaaffaa ), ;
-      MONITOR, ;
-*/
    INIT LOG ON ;
       File( HB_LOG_INFO, "logtest.log", 2, 5 ) ;
       CONSOLE() ;
@@ -96,6 +93,7 @@ Procedure MAIN()
 
    nChoice := 1
    SET KEY K_F1 TO ActivateEmail()
+   SET KEY K_F2 TO ActivateDebug()
    DO WHILE nChoice > 0
       MakeBox( 12,2, 20, 25 )
       @12,5 SAY  "Select Level: "
@@ -198,4 +196,20 @@ PROCEDURE ActivateEmail()
    SET COLOR TO w+/b
    RESTORE SCREEN
 
+RETURN
+
+PROCEDURE ActivateDebug()
+   IF oDebug == NIL
+      oDebug := HB_LogDebug():New( HB_LOG_DEBUG+2, HB_LOG_DEBUG )
+      oDebug:open()
+      HB_StandardLogAdd( oDebug )
+
+      @22,0 SAY Space(80)
+      @22,0
+      LOG "Opened debug logger" PRIORITY HB_LOG_DEBUG
+      @22,0 SAY Space(80)
+      @22,0
+      LOG "This window will display only messages with priority DEBUG or lower" ;
+         PRIORITY HB_LOG_DEBUG
+   ENDIF
 RETURN

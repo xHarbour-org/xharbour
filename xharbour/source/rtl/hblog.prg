@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.9 2003/07/24 01:55:58 jonnymind Exp $
+* $Id: hblog.prg,v 1.10 2003/08/01 11:36:05 jonnymind Exp $
 */
 
 /*
@@ -157,6 +157,15 @@ PROCEDURE HB_SetStandardLogStyle( nStyle )
    ENDIF
 RETURN
 
+PROCEDURE HB_StandardLogName( cName )
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( StdLogMutex )
+      #Endif
+      StdLogger:cProgName := cName
+      #ifdef HB_THREAD_SUPPORT
+         MutexUnlock( StdLogMutex )
+      #Endif
+RETURN
 
 PROCEDURE HB_StandardLog( cMsg, nPrio )
    IF StdLogger != NIL
@@ -430,7 +439,7 @@ RETURN .T.
 
 PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogConsole
    OutStd( ::Format( nStyle, cMessage, cName, nPriority ) , HB_OsNewLine() )
-RETURN 
+RETURN
 
 
 /**********************************************
@@ -588,3 +597,33 @@ METHOD Send( nType, cMessage, cName, nPrio ) CLASS HB_LogSyslog
 RETURN HB_SyslogMessage( ::Format( HB_LOG_ST_LEVEL, cMessage, cName, nPrio ), nPrio, ::nId )
 
 
+/**********************************************
+* Debug channel
+***********************************************/
+
+CLASS HB_LogDebug FROM HB_LogChannel
+   DATA nMaxLevel
+
+   METHOD New( nLevel, nMaxLevel )
+   // Nothing to do in this version
+   METHOD Open( cName )    INLINE .T.
+   METHOD Close( cName )   INLINE .T.
+PROTECTED:
+   METHOD Send( nStyle, cMessage, nPriority )
+
+ENDCLASS
+
+METHOD New( nLevel, nMaxLevel ) CLASS HB_LogChannel
+   ::Super:New( nLevel )
+   ::nMaxLevel := nMaxLevel
+RETURN Self
+
+PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogConsole
+   IF .not. Empty( ::nMaxLevel )
+      IF nPriority < ::nMaxLevel
+         RETURN
+      ENDIF
+   ENDIF
+
+   HB_OutDebug( ::Format( nStyle, cMessage, cName, nPriority ) )
+RETURN
