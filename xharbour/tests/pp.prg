@@ -6766,6 +6766,22 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ELSE
                nOptionalAt := 0
             ENDIF
+         ELSE
+            TraceLog( "Warning, no markers in repeatable group: " + SubStr( sResult, nOptionalAt ) )
+
+            nCloseOptionalAt := At( ']', sResult, nOptionalAt )
+            WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
+               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
+            ENDDO
+
+            IF nCloseOptionalAt > 0
+               TraceLog( "Skipped: " + SubStr( sResult, nOptionalAt, nCloseOptionalAt - nOptionalAt + 1 ) )
+               sResult := Left( sResult, nOptionalAt - 1 ) + SubStr( sResult, nCloseOptionalAt + 1 )
+               LOOP
+            ELSE
+               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               BREAK
+            ENDIF
          ENDIF
       ENDIF
 
@@ -6780,6 +6796,12 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
                nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
+
+            IF nCloseOptionalAt == 0
+               TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
+               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               BREAK
+            ENDIF
          ELSE
             nCloseOptionalAt := At( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
@@ -6794,6 +6816,10 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   nOptionalAt := 0
                   nMarkerAt   := 0
                ENDIF
+            ELSE
+               TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
+               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               BREAK
             ENDIF
          ENDIF
       ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.86 2003/10/23 22:04:09 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.87 2003/10/25 23:03:00 ronpinkas Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ static int    WorkPseudoF( char **, char *, DEFINES * );   /* Replace pseudofunc
 static int    WorkCommand( char *, char *, COMMANDS * );
 static int    WorkTranslate( char *, char *, COMMANDS *, int * );
 static int    CommandStuff( char *, char *, char *, int *, BOOL, BOOL );
-static int    RemoveSlash( char * );
+static int    RemoveSlash( char *, BOOL );
 static int    WorkMarkers( char **, char **, char *, int *, BOOL );
 static int    getExpReal( char *, char **, BOOL, int, BOOL );
 static BOOL   isExpres( char *, BOOL );
@@ -245,14 +245,17 @@ char * hb_pp_szErrors[] =
    "Too many nested #includes, can\'t open: \'%s\'",
    "Input buffer overflow",
    "Label missing in #define \'%s\'.",
-   "Too many match markers in #translate or #command"
+   "Too many match markers in #translate or #command",
+   "Unclosed optional group '[%s'",
+   "Unclosed repeatable group '[%s'"
 };
 
 /* Table with warnings */
 char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s",
-   "1No directives in command definitions file"
+   "1No directives in command definitions file",
+   "1No markers in repeatble group [%s] - group will never be used."
 };
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
@@ -1217,7 +1220,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   if( bOk || bRemove )
   {
     // Ron Pinkas commented 2002-09-23
-    //RemoveSlash( mpatt );
+    //RemoveSlash( mpatt, FALSE );
     mlen = strotrim( mpatt, TRUE );
 
     /* Ron Pinkas removed 2000-12-03
@@ -1230,7 +1233,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
     ConvertPatterns( mpatt, mlen, rpatt, rlen );
 
     // Ron Pinkas added 2002-09-23
-    RemoveSlash( mpatt );
+    RemoveSlash( mpatt, FALSE );
 
     if( bRemove )
     {
@@ -1323,9 +1326,10 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   char lastchar = '@', exptype;
   char * ptr, * ptrtmp;
   unsigned int uiOpenBrackets = 0;
+  char *pOpen = NULL;
+  BOOL bMarkers = FALSE;
 
   HB_TRACE(HB_TR_DEBUG, ("ConvertPatterns(%s, %d, %s, %d)", mpatt, mlen, rpatt, rlen));
-
 
   while( *(mpatt+i) != '\0' )
   {
@@ -1333,11 +1337,21 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         uiOpenBrackets++;
         mpatt[i] = '\16';
+
+        if( pOpen == NULL )
+        {
+           pOpen = mpatt + i;
+        }
      }
      else if( *(mpatt+i) == ']' && ( i == 0 || *(mpatt+i-1) != '\\' ) && uiOpenBrackets )
      {
         uiOpenBrackets--;
         mpatt[i] = '\17';
+
+        if( uiOpenBrackets == 0 )
+        {
+           pOpen = NULL;
+        }
      }
      else if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
@@ -1567,22 +1581,46 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      i++;
   }
 
+  if( uiOpenBrackets )
+  {
+     hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNCLOSED_OPTIONAL, pOpen + 1, NULL );
+  }
+
   uiOpenBrackets = 0;
   i = 0;
+
   while( rpatt[i] != '\0' )
   {
      if( rpatt[i] == '[' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
      {
         uiOpenBrackets++;
         rpatt[i] = '\16';
+        pOpen = rpatt + i;
+        bMarkers = FALSE;
      }
      else if( rpatt[i] == ']' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) && uiOpenBrackets )
      {
         uiOpenBrackets--;
+
+        if( bMarkers == FALSE )
+        {
+           rpatt[i] = '\0';
+           hb_compGenWarning( hb_pp_szWarnings, 'I', HB_PP_WARN_NO_MARKERS, pOpen + 1, NULL );
+        }
+
         rpatt[i] = '\17';
+     }
+     else if( rpatt[i] == '\1' )
+     {
+        bMarkers = TRUE;
      }
 
      i++;
+  }
+
+  if( uiOpenBrackets )
+  {
+     hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNCLOSED_REPEATABLE, pOpen + 1, NULL );
   }
 }
 
@@ -2457,7 +2495,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   //printf( "%s\n", ptro );
   strotrim( ptro, ptro[0] == '#' ); // Removing excess spaces.
-  *lenres = RemoveSlash( ptro );   /* Removing '\', '[' and ']' from result string */
+  *lenres = RemoveSlash( ptro, TRUE );   /* Removing '\', '[' and ']' from result string */
   //printf( "%s\n", ptro );
 
   if( com_or_tra )
@@ -2470,7 +2508,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   }
 }
 
-static int RemoveSlash( char * stroka )
+static int RemoveSlash( char * stroka, BOOL bRemoveBrackets )
 {
   char *ptr = stroka;
   int State = STATE_INIT;
@@ -2478,7 +2516,7 @@ static int RemoveSlash( char * stroka )
   int lenres = strlen( stroka );
   char cLastChar = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("RemoveSlash(%s)", stroka));
+  HB_TRACE(HB_TR_DEBUG, ("RemoveSlash(%s, %i)", stroka, bREmoveBrackets));
 
   while( *ptr != '\0' )
   {
@@ -2502,6 +2540,8 @@ static int RemoveSlash( char * stroka )
           }
           else //if( !bDirective )
           {
+             char *pClose;
+
              // Ron Pinkas commented 2002-09-23
              if( *ptr == '\\' /* && ( *(ptr+1) == '[' || *(ptr+1) == ']' ||
                                    *(ptr+1) == '{' || *(ptr+1) == '}' || *(ptr+1) == '<' ||
@@ -2509,6 +2549,11 @@ static int RemoveSlash( char * stroka )
              {
                 hb_pp_Stuff( "", ptr, 0, 1, lenres - (ptr - stroka) );
                 lenres--;
+             }
+             else if( *ptr == '\16' && bRemoveBrackets && ( pClose = strchr( ptr, '\17' ) ) != NULL )
+             {
+                hb_pp_Stuff( "", ptr, 0, pClose - ptr + 1, lenres - (ptr - stroka) );
+                lenres -= pClose - ptr + 1;
              }
           }
           break;

@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.9 2003/01/24 09:52:42 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.10 2003/06/21 06:59:22 jonnymind Exp $
  */
 
 /*
@@ -176,9 +176,12 @@ extern "C" {
 #define HB_PP_ERR_BUFFER_OVERFLOW               18
 #define HB_PP_ERR_LABEL_MISSING                 19
 #define HB_PP_ERR_TOO_MANY_MARKERS              20
+#define HB_PP_ERR_UNCLOSED_OPTIONAL             21
+#define HB_PP_ERR_UNCLOSED_REPEATABLE           22
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2
+#define HB_PP_WARN_NO_MARKERS                   3
 
 extern void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 ); /* generic parsing error management function */
 extern void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2); /* generic parsing warning management function */

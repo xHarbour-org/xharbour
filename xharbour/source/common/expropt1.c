@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.7 2003/10/10 04:19:49 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.8 2003/10/15 01:16:58 ronpinkas Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ HB_EXPR_PTR hb_compExprNewAliasExpr( HB_EXPR_PTR pAlias, HB_EXPR_PTR pExpList )
    if( pAlias->ExprType == HB_ET_MACRO )
    {
        /* Is it a special case &variable->( expressionList ) */
-       if( pAlias->value.asMacro.SubType == HB_ET_MACRO_VAR )
+       //if( pAlias->value.asMacro.SubType == HB_ET_MACRO_VAR )
            pAlias->value.asMacro.SubType = HB_ET_MACRO_ALIASED;
    }
 

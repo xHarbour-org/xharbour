@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1627 2003/10/24 05:12:47 walito Exp $
+ * $Id: ChangeLog,v 1.1628 2003/10/25 23:02:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-25 20:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbclass.ch
+     * Minor corrections to comply with PP.
+
+  * include/hberrors.h
+    + Added:
+       #define HB_PP_ERR_UNCLOSED_OPTIONAL             21
+       #define HB_PP_ERR_UNCLOSED_REPEATABLE           22
+       #define HB_PP_WARN_NO_MARKERS                   3
+
+  * source/pp/ppcore.c
+    + Added to hb_pp_szErrors[]:
+       "Unclosed optional group '[%s'",
+       "Unclosed repeatable group '[%s'"
+    + Added to hb_pp_szWarnings[]:
+       "1No markers in repeatble group [%s] - group will never be used."
+    + Added logic to detect and produce errors on unclosed optional groups,
+      and unclosed repetable groups
+    + Added logic to detect and produce warning for repeatble groups without any markers.
+    + Added 2nd BOOL param to RemoveSlash, when set to TRUE scaning and removing residual uninstanciated repeatble groups.
+
+  * tests/pp.prg
+    + Added logic to detect and produce errors on unclosed optional groups,
+      and unclosed repetable groups
+    + Added logic to detect and produce warning and skip repeatble groups without any markers.
+
+  * include/hbexprb.c
+  * source/common/expropt1.c
+    ! Fixed compliation of macro aliased expression &(...)->( ... ) and &Macro.Suffix->( ... )
 
 2003-10-25 16:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.67 2003/10/10 04:19:49 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.68 2003/10/19 18:11:44 ronpinkas Exp $
  */
 
 /*
@@ -1274,9 +1274,14 @@ static HB_EXPR_FUNC( hb_compExprUseMacro )
                   HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asMacro.szMacro, strlen( pSelf->value.asMacro.szMacro ) + 1 );
                }
             }
+
             /* compile & run - leave a result on the eval stack
              */
-            if( pSelf->value.asMacro.SubType == HB_ET_MACRO_SYMBOL || pSelf->value.asMacro.SubType == HB_ET_MACRO_VAR_REF )
+            if( pSelf->value.asMacro.SubType & HB_ET_MACRO_ALIASED )
+            {
+                break;
+            }
+            else if( pSelf->value.asMacro.SubType == HB_ET_MACRO_SYMBOL || pSelf->value.asMacro.SubType == HB_ET_MACRO_VAR_REF )
             {
                HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROSYMBOL );
 
