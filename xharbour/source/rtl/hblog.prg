@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.10 2003/08/01 11:36:05 jonnymind Exp $
+* $Id: hblog.prg,v 1.11 2003/08/01 16:56:52 jonnymind Exp $
 */
 
 /*
@@ -117,8 +117,6 @@ PROCEDURE HB_StandardLogAdd( oChannel )
       #ifdef HB_THREAD_SUPPORT
          MutexUnlock( StdLogMutex )
       #endif
-
-      oChannel:Open()
 
    ENDIF
 
@@ -257,7 +255,7 @@ PROCEDURE Open() CLASS HB_Logger
       oChannel:Open( ::cProgName )
    NEXT
 
-RETURN 
+RETURN
 
 /**
 * Close all the channels calling their ::Close() method

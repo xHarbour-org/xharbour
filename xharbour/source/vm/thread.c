@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.101 2003/08/27 19:04:06 jonnymind Exp $
+* $Id: thread.c,v 1.102 2003/09/10 06:07:33 ronpinkas Exp $
 */
 
 /*
@@ -1680,7 +1680,7 @@ void hb_threadWaitAll()
 
    // check for the main stack to be the only one left
    HB_CRITICAL_LOCK( hb_threadStackMutex );
-   while( hb_ht_stack->next != NULL )
+   while( hb_ht_stack->next != NULL && hb_vmRequestQuery() != HB_QUIT_REQUESTED )
    {
       HB_CRITICAL_UNLOCK( hb_threadStackMutex );
       HB_STACK_UNLOCK;
@@ -1698,6 +1698,10 @@ void hb_threadWaitAll()
       HB_CRITICAL_LOCK( hb_threadStackMutex );
    }
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+
+   if (hb_vmRequestQuery() != HB_QUIT_REQUESTED) {
+      hb_threadKillAll();
+   }
 }
 
 void hb_threadKillAll()

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.36 2003/07/13 19:34:33 jonnymind Exp $
+# $Id: Makefile,v 1.37 2003/07/24 01:55:58 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -52,6 +52,7 @@ C_SOURCES=\
         hbcrypt.c    \
         hboutdebug.c  \
         hbhextonum.c \
+        hbservice.c \
         hbsyslog.c \
         hbffind.c \
         hbrandom.c   \
