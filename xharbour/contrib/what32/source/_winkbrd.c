@@ -17,8 +17,11 @@ Modified functions:
 #define _WIN32_WINNT   0x0400
 
 #include <windows.h>
+//#include <commctrl.h>
+//#include <winuser.h>
 #include "item.api"
 #include "hbapi.h"
+//#include "commctrl.h"
 
 
 //-----------------------------------------------------------------------------
@@ -297,3 +300,54 @@ HB_FUNC( TRANSLATEACCELERATOR )
                                  ) ) ;
 }
 
+/*
+
+
+//LRESULT CallNextHookEx(
+//  HHOOK hhk,      // handle to current hook
+//  int nCode,      // hook code passed to hook procedure
+//  WPARAM wParam,  // value passed to hook procedure
+//  LPARAM lParam   // value passed to hook procedure
+//);
+ 
+HB_FUNC( CALLNEXTHOOKEX )
+{
+    CallNextHookEx( (HHOOK) hb_parni(1), (int) hb_parni(2), (WPARAM) hb_parnl(3), (LPARAM) hb_parnl(4) );
+}
+
+
+
+
+//HHOOK SetWindowsHookEx(
+//  int idHook,        // type of hook to install
+//  HOOKPROC lpfn,     // address of hook procedure
+//  HINSTANCE hMod,    // handle to application instance
+//  DWORD dwThreadId   // identity of thread to install hook for
+//);
+
+HB_FUNC( SETWINDOWSHOOKEX )
+{
+    SetWindowsHookEx( (int) hb_parni(1), (HOOKPROC) hb_parnl(2), (HINSTANCE) hb_parnl(3), (DWORD) hb_parnl(4) );
+}
+
+HB_FUNC( MAKEPROCINSTANCE )
+{
+   hb_retc( (FARPROC) MakeProcInstance( (FARPROC) hb_parc(1), (HINSTANCE) hb_parnl(2) ) );
+}
+
+
+//BOOL UnhookWindowsHookEx(
+//  HHOOK hhk   // handle to hook procedure to remove
+//);
+
+HB_FUNC( UNHOOKWINDOWSHOOKEX )
+{
+    UnhookWindowsHookEx( (HHOOK) hb_parni(1) );
+}
+
+
+HB_FUNC( GETCURRENTPROCESS )
+{
+   GetCurrentProcess();
+}
+*/

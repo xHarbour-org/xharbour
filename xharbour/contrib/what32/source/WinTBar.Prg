@@ -1,3 +1,14 @@
+#define TPM_LEFTBUTTON        0
+#define TPM_CENTERALIGN       4
+#define TPM_RIGHTALIGN        8
+
+#define TPM_TOPALIGN              0
+#define TPM_VCENTERALIGN         16
+#define TPM_BOTTOMALIGN          32
+
+#define TPM_HORIZONTAL            0     // Horz alignment matters more
+#define TPM_VERTICAL             64     // Vert alignment matters more
+#define TPM_NONOTIFY            128     // Don't send any notification msgs
 
 
 // What32.Lib
@@ -13,6 +24,7 @@
 #Include "cstruct.ch"
 #Include 'what32.ch'
 #Include "tooltips.ch"
+#Include "winlview.ch"
 
 pragma pack(4)
 
@@ -62,6 +74,14 @@ typedef struct {;
     UINT      uflags;     // flag indicating how to interpret the idFrom member of the NMHDR structure that is included in the structure
 } TOOLTIPTEXT, FAR *LPTOOLTIPTEXT
 
+/*
+typedef struct tagNMTBHOTITEM {;
+    NMHDR hdr;
+    int idOld;
+    int idNew;
+    DWORD dwFlags;
+} NMTBHOTITEM, FAR *LPNMTBHOTITEM
+*/
 
 // based on cToolBar  class
 *-----------------------------------------------------------------------------*
@@ -79,6 +99,8 @@ CLASS TOOLBAR
  DATA hBmp
  DATA nProc
  DATA aTips
+ DATA nBtn HIDDEN
+ DATA aMenus
 METHOD Init() CONSTRUCTOR
 
 METHOD AddButton
@@ -108,6 +130,7 @@ method disableall
 method enableall
 method CheckButton
 method IsButtonChecked
+method AddMenu
 ENDCLASS
 
 
@@ -117,13 +140,13 @@ METHOD Init()
 
   InitCommonControlsEx(ICC_BAR_CLASSES)
   ::aButtons:={}
-  ::aTips:={}
-  ::nStyle:=0
-  ::nId:=0
+  ::aTips   :={}
+  ::nStyle  :=0
+  ::nId     :=0
   ::Created := .F.
-  ::aText :={}
+  ::aText   :={}
   ::aBitmaps:={}
-
+  ::aMenus  :={}
 RETURN(self)
 
 
@@ -168,6 +191,10 @@ METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip )
 
 RETURN(self)
 
+METHOD AddMenu(nId,aMenuItems)
+AADD(::aMenus,{nId,aMenuItems})
+return(self)
+
 *-----------------------------------------------------------------------------*
 METHOD addstring(cText)
 
@@ -205,7 +232,7 @@ METHOD Create(hParent,nStyle,nId,nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp)
       cButtons+=::aButtons[i]:Value
    NEXT
 
- //  ::hWnd:=CreateWindowEx(0,TOOLBARCLASSNAME,"",::nStyle,0,0,300,30,::hParent,::nId)
+// ::hWnd:=CreateWindowEx(0,TOOLBARCLASSNAME,"",::nStyle,0,0,300,30,::hParent,::nId)
 
 
  ::hWnd:=CreateToolBarEx(::hParent,::nStyle,::nId,nImg,hBMInst,nBMId,cButtons,LEN(::aButtons),;
@@ -214,15 +241,13 @@ METHOD Create(hParent,nStyle,nId,nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp)
  ::nProc:=SetProcedure(::hParent,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY})
 
 
-
-
 //   SendMessage(::hWnd,TB_BUTTONSTRUCTSIZE,::aButtons[1]:sizeof,0)
 
  //  FOR i:=1 TO LEN(::aBitmaps)
  //    SendMessage(::hWnd,TB_ADDBITMAP,::aBitmaps[i,2],::aBitmaps[i,1]:value)
  //  NEXT
 
-   sendmessage(::hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
+//   sendmessage(::hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
 
 
    //SendMessage(::hWnd,TB_ADDBUTTONS,LEN(::aButtons),cButtons)
@@ -249,14 +274,30 @@ METHOD tbProc(nMsg,nwParam,nlParam)
    LOCAL Ttt
    LOCAL nmt
    LOCAL nID
-
-   LOCAL n
-
+   LOCAL hMenu,rc,aRect
+   LOCAL n,x
+   LOCAL hic
    DO CASE
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
      Hdr:Buffer(peek(nlParam,Hdr:sizeof))
      DO CASE
+     /*
+     CASE Hdr:code==TBN_DROPDOWN
+         Nmt IS NMTOOLBAR
+         nmt:buffer(peek(nlParam,nmt:sizeof))
+         IF (n:=ASCAN(::aMenus,{|a| a[1]==nmt:iItem})) > 0
+            ::nBtn:=nmt:iItem
+            SendMessage(::hWnd,TB_SETSTATE,nmt:iItem,MAKELONG(TBSTATE_ENABLED+TBSTATE_PRESSED,0) )
+            hMenu = CreatePopupMenu( )
+            FOR x:=1 TO LEN(::aMenus[n][2])
+                AppendMenu( hMenu, MF_ENABLED + MF_STRING,::aMenus[n][2][1],::aMenus[n][2][2])
+            NEXT
+            aRect:=GetToolBarItemRect(::hWnd,n-1)
+            TrackPopupMenu( hMenu,TPM_TOPALIGN + TPM_HORIZONTAL, aRect[1], aRect[4], 0, ::hWnd)
+            DestroyMenu(hMenu)
+         end
+         */
      CASE Hdr:code==TTN_NEEDTEXT
        IF (n:=ASCAN(::aButtons,{|btn| btn:idCommand==Hdr:idFrom})) > 0
          Ttt IS TOOLTIPTEXT
@@ -272,7 +313,6 @@ METHOD tbProc(nMsg,nwParam,nlParam)
      CASE Hdr:code==TBN_GETBUTTONINFO
          Nmt IS NMTOOLBAR
          nmt:buffer(peek(nlParam,nmt:sizeof))
-         view nmt
          /*
          int     iItem;      // cmd
          TBBUTTON tbButton;
@@ -405,4 +445,3 @@ RETURN(SELF)
 
 method IsButtonChecked(nBtn)
 RETURN(IIF(SendMessage(::hWnd,TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.))
-

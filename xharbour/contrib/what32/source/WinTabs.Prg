@@ -62,12 +62,13 @@ CLASS TabControl
    METHOD SetPadding()
    METHOD SetToolTips()
    METHOD SetUnicodeFormat()
-
+   METHOD TabSubClass()
+   METHOD OnInit() VIRTUAL
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( hDlg, nL, nT, nW, nH, nStyle, nSel,nId )
+METHOD New( hDlg, nL, nT, nW, nH, nStyle, nSel,nId ) CLASS TabControl
    ::hParent:=hDlg
    ::Tabs:={}
    ::Dlgs:={}
@@ -90,7 +91,7 @@ FUNCTION _TempPageProc(nMsg)
 
 *-----------------------------------------------------------------------------*
 
-METHOD TabProc(hDlg, nMsg, nwParam, nlParam)
+METHOD TabProc(hDlg, nMsg, nwParam, nlParam) CLASS TabControl
 
    LOCAL tnhdr
 
@@ -146,7 +147,7 @@ METHOD TabProc(hDlg, nMsg, nwParam, nlParam)
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add(cText,cRes,bProc,nImgPos)
+METHOD Add(cText,cRes,bProc,nImgPos) CLASS TabControl
 LOCAL hTab
    if (hTab:=TabCtrl_AddItem(::hTab,cText,nImgPos)) > -1
       AADD(::Dlgs,cRes)
@@ -158,7 +159,7 @@ LOCAL hTab
 
 *-----------------------------------------------------------------------------*
 
-METHOD Insert(nPos,cText,cRes,bProc)
+METHOD Insert(nPos,cText,cRes,bProc) CLASS TabControl
 
    if TabCtrl_InsertItem(::hTab,cText,nPos) > -1
       AINS(::Dlgs,nPos,cRes,.T.)
@@ -171,7 +172,7 @@ METHOD Insert(nPos,cText,cRes,bProc)
 
 *-----------------------------------------------------------------------------*
 
-METHOD Delete(nPos)
+METHOD Delete(nPos) CLASS TabControl
 
    Local nCount:=LEN(::Tabs)
    if nPos > 0 .and. nPos <= nCount
@@ -192,7 +193,7 @@ METHOD Delete(nPos)
 
 *-----------------------------------------------------------------------------*
 
-METHOD Configure()
+METHOD Configure() CLASS TabControl
 
    LOCAL aTab :=GetClientRect(::hTab)
    local acRect:={0,0,0,0}
@@ -241,14 +242,14 @@ Static Function CreatePage(acRes,hParent,aProcs, i)
    RETURN CreateDialog( , acRes, hParent, bBlock )
 
 *-----------------------------------------------------------------------------*
-METHOD AdjustRect(lDisplay,aRect)
+METHOD AdjustRect(lDisplay,aRect) CLASS TabControl
 
    TabCtrl_AdjustRect(::hTab,lDisplay,@aRect)
 
    RETURN(aRect)
 
 *-----------------------------------------------------------------------------*
-METHOD DeleteAll()
+METHOD DeleteAll() CLASS TabControl
 
   Local lRet:=TabCtrl_DeleteAllItems(::hTab)
 
@@ -261,135 +262,135 @@ METHOD DeleteAll()
   RETURN(lRet)
 
 *-----------------------------------------------------------------------------*
-METHOD DeselectAll(lExcludeFocus)
+METHOD DeselectAll(lExcludeFocus) CLASS TabControl
 
    TabCtrl_DeselectAll(::hTab,lExcludeFocus)
 
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
-METHOD GetCurFocus()
+METHOD GetCurFocus() CLASS TabControl
 
   RETURN TabCtrl_GetCurFocus(::hTab )+1
 
 *-----------------------------------------------------------------------------*
-METHOD GetCurSel()
+METHOD GetCurSel() CLASS TabControl
 
    RETURN TabCtrl_GetCurSel(::hTab)+1
 
 *-----------------------------------------------------------------------------*
-METHOD GetExtendedStyle()
+METHOD GetExtendedStyle() CLASS TabControl
 
    RETURN TabCtrl_GetExtendedStyle(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD GetImageList()
+METHOD GetImageList() CLASS TabControl
 
    RETURN NIL //TabCtrl_GetImageList(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD GetItem(nItem,ptrItem)
+METHOD GetItem(nItem,ptrItem) CLASS TabControl
 
    RETURN TabCtrl_GetItem(::hTab,nItem-1,@ptrItem)
 
 *-----------------------------------------------------------------------------*
-METHOD GetItemCount()
+METHOD GetItemCount() CLASS TabControl
 
    RETURN TabCtrl_GetItemCount(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD GetItemRect(nItem)
+METHOD GetItemRect(nItem) CLASS TabControl
 
    RETURN TabCtrl_GetItemRect(::hTab,nItem-1)
 
 *-----------------------------------------------------------------------------*
-METHOD GetRowCount()
+METHOD GetRowCount() CLASS TabControl
 
    RETURN TabCtrl_GetRowCount(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD GetToolTips()
+METHOD GetToolTips() CLASS TabControl
 
    RETURN TabCtrl_GetToolTips(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD GetUnicodeFormat()
+METHOD GetUnicodeFormat() CLASS TabControl
 
    RETURN TabCtrl_GetUnicodeFormat(::hTab)
 
 *-----------------------------------------------------------------------------*
-METHOD HighlightItem(nItem,nHighlight)
+METHOD HighlightItem(nItem,nHighlight) CLASS TabControl
 
    RETURN TabCtrl_HighlightItem(::hTab,nItem-1,nHighlight)
 
 *-----------------------------------------------------------------------------*
-METHOD HitTest(nPtrHitTestInfo)
+METHOD HitTest(nPtrHitTestInfo) CLASS TabControl
 
    RETURN TabCtrl_HitTest(::hTab,nPtrHitTestInfo) + 1
 
 *-----------------------------------------------------------------------------*
-METHOD RemoveImage(nImageIndex)
+METHOD RemoveImage(nImageIndex) CLASS TabControl
 
    RETURN TabCtrl_RemoveImage(::hTab, nImageIndex-1)
 
 *-----------------------------------------------------------------------------*
-METHOD SetCurFocus(nItem)
+METHOD SetCurFocus(nItem) CLASS TabControl
 
    TabCtrl_SetCurFocus(::hTab, nItem-1)
 
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
-METHOD SetCurSel(nItem)
+METHOD SetCurSel(nItem) CLASS TabControl
 
    RETURN TabCtrl_SetCurSel(::hTab, nItem-1) + 1
 
 *-----------------------------------------------------------------------------*
-METHOD SetExtendedStyle(nExStyle)
+METHOD SetExtendedStyle(nExStyle) CLASS TabControl
 
    RETURN TabCtrl_SetExtendedStyle(::hTab,nExStyle)
 
 *-----------------------------------------------------------------------------*
-METHOD SetImageList(hImageList)
+METHOD SetImageList(hImageList) CLASS TabControl
 
    RETURN TabCtrl_SetImageList(::hTab, hImageList)
 
 *-----------------------------------------------------------------------------*
-METHOD SetItem(nItem, cText)
+METHOD SetItem(nItem, cText) CLASS TabControl
 
    RETURN TabCtrl_SetItem(::hTab, nItem-1, cText )
 
 *-----------------------------------------------------------------------------*
-METHOD SetItemExtra(nBytes)
+METHOD SetItemExtra(nBytes) CLASS TabControl
 
    RETURN TabCtrl_SetItemExtra(::hTab, nBytes)
 
 *-----------------------------------------------------------------------------*
-METHOD SetItemSize(x,y)
+METHOD SetItemSize(x,y) CLASS TabControl
 
    RETURN TabCtrl_SetItemSize(::hTab, x, y )
 
 *-----------------------------------------------------------------------------*
-METHOD SetMinTabWidth(dx)
+METHOD SetMinTabWidth(dx) CLASS TabControl
 
    RETURN TabCtrl_SetMinTabWidth( ::hTab, dx )
 
 *-----------------------------------------------------------------------------*
-METHOD SetPadding( cx, cy )
+METHOD SetPadding( cx, cy ) CLASS TabControl
 
    TabCtrl_SetPadding( ::hTab, cx, cy )
 
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
-METHOD SetToolTips( hToolTips )
+METHOD SetToolTips( hToolTips ) CLASS TabControl
 
    TabCtrl_SetToolTips( ::hTab, hToolTips )
 
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
-METHOD SetUnicodeFormat( lUnicode )
+METHOD SetUnicodeFormat( lUnicode ) CLASS TabControl
 
    RETURN TabCtrl_SetUnicodeFormat( ::hTab, lUnicode )
 
@@ -485,3 +486,9 @@ Function TransferChildren(hDlg,hPage,lShow)
 
 */
 
+METHOD TabSubClass(hDlg,nMsg,nwParam,nlParam)
+DO CASE
+   CASE nMsg==WM_INITDIALOG
+        ::OnInit(hDlg)
+END        
+RETURN(self)
