@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.3 2002/01/30 04:10:05 ronpinkas Exp $
+ * $Id: macro.c,v 1.4 2002/01/31 05:08:31 ronpinkas Exp $
  */
 
 /*
@@ -1191,6 +1191,7 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    int iVar;
 
    iVar = hb_compLocalVarGetPos( szVarName, HB_MACRO_PARAM );
+
    if( iVar )
    {
       /* this is a codeblock parameter */
@@ -1198,7 +1199,17 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
+      HB_DYNS_PTR pSym = hb_dynsymFind( szVarName );
+
+      if( pSym && ! pSym->hMemvar )
+      {
+         hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
+      }
+      else
+      {
+         hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
+      }
+
       hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
@@ -1274,6 +1285,7 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
    int iVar;
 
    iVar = hb_compLocalVarGetPos( szVarName, HB_MACRO_PARAM );
+
    if( iVar )
    {
       /* this is a codeblock parameter */
@@ -1281,7 +1293,22 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
+      HB_DYNS_PTR pSym = hb_dynsymFind( szVarName );
+
+      if( pSym && pSym->hMemvar )
+      {
+         hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+      }
+      else if( pSym )
+      {
+         hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
+      }
+      else
+      {
+         // Will result in: HB_MACRO_UNKN_SYM + ~HB_MACRO_CONT
+         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
+      }
+
       hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }

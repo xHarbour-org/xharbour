@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.116 2002/03/17 00:10:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.117 2002/03/17 00:50:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-16 19:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+    ! Fixed bug in Macro Compiler where Field Assignment is compiled mistakenly as a Memvar Assignment.
+    /* Bug reported by Gerhard ? on Harbour's List. */
 
 2002-03-16 16:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.c
