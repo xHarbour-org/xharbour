@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.91 2004/06/04 13:29:29 mauriliolongo Exp $
+* $Id: thread.h,v 1.92 2004/07/31 23:07:31 lculik Exp $
 */
 
 /*
@@ -784,7 +784,8 @@ void hb_threadCancelInternal( void );
    #define HB_THREAD_STUB
 
    #ifndef HB_VM_STACK
-      #define HB_VM_STACK (*hb_GetStack())
+      #define HB_VM_STACK hb_stack
+      // note this shouw be       #define HB_VM_STACK hb_getStack()
    #endif
 
 
