@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.12 2002/06/21 20:37:02 walito Exp $
+ * $Id: tgetlist.prg,v 1.13 2002/07/03 22:00:09 walito Exp $
  */
 
 /*
@@ -1268,16 +1268,18 @@ METHOD Accelerator( nKey) CLASS HBGETLIST  // Removed STATIC
    return  0
 
 METHOD  HitTest( nMouseRow, nMouseCol, aMsg ) CLASS HBGETLIST
-   Local nCount, nTotal, lGUI
+//   Local nCount
+   Local lGUI
+   Local oGet
 
-   ::nNextGet := 0
-   nTotal  := len( ::aGetList )
-
-   for nCount := 1 to nTotal
-      if (::nHitCode := ::aGetList[ nCount ]:HitTest( nMouseRow, nMouseCol )) != HTNOWHERE
-         ::nNextGet := nCount
+//   nCount := 1
+   for each oGet in ::aGetList
+      if ( ::nHitCode := oGet:HitTest( nMouseRow, nMouseCol ) ) != HTNOWHERE
+//         ::nNextGet := nCount
+         ::nNextGet := HB_EnumIndex()
          exit
       endif
+//      nCount++
    next
 
    // do while !( ::nNextGet == 0 )  // Commented out.
