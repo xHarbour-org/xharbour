@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.128 2004/08/14 07:57:54 ronpinkas Exp $
+ * $Id: classes.c,v 1.129 2004/09/12 15:37:31 lf_sfnet Exp $
  */
 
 /*
@@ -162,7 +162,7 @@
 #define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
-#if defined(HB_OPT_CON) || defined(HB_OPT_GUI)
+#if ( defined(HB_OPT_CON) || defined(HB_OPT_GUI) ) && !defined(HB_NO_PROFILER)
    #define HB_NO_PROFILER
 #endif
  

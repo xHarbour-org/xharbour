@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.419 2004/09/10 17:31:19 druzus Exp $
+ * $Id: hvm.c,v 1.420 2004/09/12 15:37:32 lf_sfnet Exp $
  */
 
 /*
@@ -110,13 +110,18 @@
 #endif
 
 #ifdef HB_OPT_CON
+   #undef HB_NO_PROFILER
    #define HB_NO_PROFILER
+   #undef HB_NO_TRACE
    #define HB_NO_TRACE
 #endif
 
 #ifdef HB_OPT_GUI
+   #undef HB_NO_PROFILER
    #define HB_NO_PROFILER
+   #undef HB_NO_TRACE
    #define HB_NO_TRACE
+   #undef HB_GUI
    #define HB_GUI
 #endif
 
