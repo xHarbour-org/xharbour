@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.87 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: filesys.c,v 1.88 2004/04/03 14:04:30 srobert Exp $
  */
 
 /*
@@ -122,15 +122,20 @@
    #if defined( _MSC_VER )
 
       #if _MSC_VER >= 1010
-         __inline void * LongToHandle(  const long h )
-         {
-            return((void *) (INT_PTR) h );
-         }
+         #ifdef __USE_INLINE__
+            __inline void * LongToHandle( const long h )
+            {
+                return((void *) (INT_PTR) h );
+            }
 
-         __inline long HandleToLong( const void *h )
-         {
-            return((long) h );
-         }
+            __inline long HandleToLong( const void *h )
+            {
+               return((long) h );
+            }
+         #else
+            static HANDLE LongToHandle( const long h ) ;
+            static FHANDLE HandleToLong( const void *h );
+         #endif
       #endif
 
       #if !defined( INVALID_SET_FILE_POINTER )
@@ -3480,3 +3485,14 @@ BYTE HB_EXPORT * hb_fileNameConv(char *str) {
    return (( BYTE * ) str);
 }
 
+#if ( defined( X__WIN32__ ) && defined( _MSC_VER ) && (_MSC_VER >= 1010) && !defined(__USE_INLINE__) )
+static HANDLE LongToHandle( const long h )
+{
+   return((void *) (INT_PTR) h );
+}
+
+static FHANDLE HandleToLong( const void *h )
+{
+   return((long) h );
+}
+#endif

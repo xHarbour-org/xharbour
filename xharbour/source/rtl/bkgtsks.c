@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.9 2004/04/02 01:35:20 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.10 2004/04/04 19:50:30 fsgiudice Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
 
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
-   pBkgTask->ulTaskID = ( pBkgTask->ulTaskID == NULL ? (ULONG) 1 : ++pBkgTask->ulTaskID );
+   pBkgTask->ulTaskID = ( pBkgTask->ulTaskID == 0 ? (ULONG) 1 : ++pBkgTask->ulTaskID );
    pBkgTask->pTask    = hb_itemNew( pBlock );
    pBkgTask->dSeconds = hb_secondsCPU( 3 );
    pBkgTask->millisec = nMillisec;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2742 2004/04/04 13:44:43 map Exp $
+ * $Id: ChangeLog,v 1.2743 2004/04/04 19:54:02 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-05 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filesys.c
+    ! Definition of __inline functions for certain version of _MSC_VER (?)
+      which does not support __inline functions when X__WIN32__ is defined.
+      Those supports __inline may define __USE_INLINE__ when compiling
+      filesys.c to gain speed.
+
+  * source/rtl/bkgtsks.c
+    ! Minor corrections on line 118: NULL -> 0
+      Some compilers treats NULL as void *, so NULL is rejected here.
 
 2004-04-04 21:55 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
   * source/include/hbapi.h
