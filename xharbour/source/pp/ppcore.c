@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.133 2004/03/06 19:54:31 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.134 2004/03/07 01:07:53 ronpinkas Exp $
  */
 
 /*
@@ -2429,10 +2429,13 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
   //printf( "Command Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", stcmd->name, stcmd->mpatt, stcmd->value , ptri );
 
   lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
-  ptrmp = stcmd->mpatt;                      /* Pointer to a match pattern */
+  ptrmp = hb_strdup( stcmd->mpatt );                      /* Pointer to a match pattern */
   s_Repeate = 0;
   s_groupchar = '@';
+
   rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom, stcmd->name );
+
+  hb_xfree( ptrmp );
 
   if( rez >= 0 )
   {
@@ -2454,11 +2457,13 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   //printf( "Translate Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", sttra->name, sttra->mpatt, sttra->value , ptri );
 
   lenres = hb_pp_strocpy( ptro, sttra->value );
-  ptrmp = sttra->mpatt;
+  ptrmp = hb_strdup( sttra->mpatt );
   s_Repeate = 0;
   s_groupchar = '@';
 
   rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom, sttra->name );
+
+  hb_xfree( ptrmp );
 
   if( rez >= 0 )
   {
@@ -2476,7 +2481,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   int ipos;
   char * lastopti[ HB_PP_MAX_NESTED_OPTIONALS ], * strtopti = NULL, * strtptri = NULL;
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
-  int isWordInside = 0;
+  char *pTemp;
 
   HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %i, %i)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
 
@@ -2547,11 +2552,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
         switch( *ptrmp )
         {
         case '\16':
-          if( !s_numBrackets )
-          {
-             isWordInside = 0;
-          }
-
           s_aIsRepeate[ s_Repeate ] = 0;
           lastopti[ s_Repeate ] = ptrmp;
 
@@ -2579,68 +2579,14 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           if( s_Repeate )
           {
              s_Repeate--;
-
-             if( s_aIsRepeate[ s_Repeate ] )
-             {
-                if( ISNAME( *ptri ) )
-                {
-                   ptr  = ptri;
-                   ipos = NextStopper( &ptr, tmpname );
-                   ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE, TRUE );
-
-                   //printf( "TestOptional, %s, %i\n", tmpname, ipos );
-
-                   if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
-                   {
-                      ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
-
-                      //printf( "2-Rewinded: %s\n", ptr );
-
-                      if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
-                      {
-                         ptrmp = lastopti[s_Repeate];
-                         ptrmp++;
-                         s_Repeate++;
-                         SkipOptional( &ptrmp );
-                         s_numBrackets++;
-                         ptrmp++;
-                         strtptri = ptri;
-                      }
-                      else
-                      {
-                         ptrmp = lastopti[s_Repeate];
-                      }
-                   }
-                   else
-                   {
-                      ptrmp = lastopti[s_Repeate];
-                   }
-                }
-                else
-                {
-                   ptrmp = lastopti[s_Repeate];
-                }
-             }
-             else
-             {
-                ptrmp++;
-             }
-
-             s_numBrackets--;
           }
-          else
-          {
-             s_numBrackets--; ptrmp++;
-          }
+
+          s_numBrackets--;
+          ptrmp++;
 
           break;
 
         case ',':
-          if( s_numBrackets == 1 )
-          {
-             isWordInside = 1;
-          }
-
           if( !s_numBrackets )
           {
              strtopti = NULL;
@@ -2670,14 +2616,18 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
              strtopti = NULL;
           }
 
-          if( s_numBrackets == 1 && *(ptrmp+2) == '2' )
-          {
-             isWordInside = 1; /*  restricted match marker  */
-          }
-
           //printf( "\nCommandStuff->WorkMarkers: >%s< MP: >%s<\n", ptri, ptrmp );
 
-          if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
+          pTemp = ptrmp;
+          if( WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
+          {
+             if( s_Repeate && s_aIsRepeate[ s_Repeate - 1 ] == FALSE )
+             {
+                pTemp[2] = 'X';
+                //printf( "Flaged USED and NON Repeatable: %i %i\n", s_Repeate, s_aIsRepeate[ s_Repeate - 1 ] );
+             }
+          }
+          else
           {
              //printf( "Failed!\n" );
 
@@ -2708,11 +2658,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           break;
 
         default:    /*   Key word    */
-          if( s_numBrackets == 1 )
-          {
-             isWordInside = 1;
-          }
-
           if( !s_numBrackets )
           {
              strtopti = NULL;
@@ -2912,6 +2857,13 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("WorkMarkers(%s, %s, %s, %i, %i)", *ptrmp, *ptri, ptro, *lenres, com_or_xcom));
 
   //printf( "WorkMarkers( '%s', '%s', '%s', %i, %i) %i\n", *ptrmp, *ptri, ptro, *lenres, com_or_xcom, s_numBrackets );
+
+  if( (*ptrmp)[2] == 'X' )
+  {
+     // USED and NON repeatable - can't match anything!
+     //printf( "Rejected USED and NON Repetable >%s<\n", *ptrmp );
+     return 0;
+  }
 
   /* Copying a match pattern to 'exppatt' */
   lenpatt = stroncpy( exppatt, *ptrmp, 4 );
@@ -3246,7 +3198,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          {
             strncpy( expreal, *ptri, lens );
             expreal[lens] = '\0';
-            expreal += lens;
+            //expreal += lens; // Not needed - avoid compile warning!
          }
 
          *ptri += lens;
@@ -3258,7 +3210,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          if( expreal )
          {
             strcpy( expreal, *ptri );
-            expreal += lens;
+            //expreal += lens; // Not needed - avoid compile warning!
          }
 
          *ptri += lens;
@@ -3501,6 +3453,47 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   {
                      State = STATE_EXPRES;
                   }
+               }
+               else if( State == STATE_ID_END && toupper( (*ptri)[0] ) == 'A' && toupper( (*ptri)[1] ) == 'S' && (*ptri)[2] == ' ' && cMarkerType == '1' )
+               {
+                  //HACK! Accept AS <type> postfix for <Param,...> Matchers
+                  *expreal++ = **ptri; //'A'
+                  (*ptri)++;
+                  *expreal++ = **ptri; //'S'
+                  (*ptri)++;
+                  *expreal++ = **ptri; //' '
+                  (*ptri)++;
+
+                  lens += 3;
+
+                  //HACK! Accept AS ARRAY OF <type> postfix for <Param,...> Matchers
+                  if( toupper( (*ptri)[0] ) == 'A' && toupper( (*ptri)[1] ) == 'R' && (*ptri)[2] == 'R' &&
+                      toupper( (*ptri)[3] ) == 'A' && toupper( (*ptri)[4] ) == 'Y' && (*ptri)[5] == ' ' &&
+                      toupper( (*ptri)[6] ) == 'O' && toupper( (*ptri)[7] ) == 'F' && (*ptri)[8] == ' ' )
+                  {
+                     *expreal++ = **ptri; //'A'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'R'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'R'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'A'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'Y'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //' '
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'O'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //'F'
+                     (*ptri)++;
+                     *expreal++ = **ptri; //' '
+                     (*ptri)++;
+
+                     lens += 9;
+                  }
+
+                  State = STATE_EXPRES;
                }
                else
                {
@@ -4193,7 +4186,8 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    static char expnew[ MAX_EXP ];
 
    int ifou, isdvig = 0;
-   BOOL rezs, bFound = FALSE, bDontInstanciate = FALSE;
+   BOOL rezs, bDontInstanciate = FALSE;
+   //BOOL bFound = FALSE;
    int kolmarkers;
    int lennew, i;
    char lastchar = '0';
@@ -4226,7 +4220,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          printf( "   Found: >%s< At: %i In: >%s< MarkerCount: %i\n", exppatt, ifou, ptrOut, (ptrOut + ifou)[2] - '0' );
       #endif
 
-      bFound = TRUE;
+      //bFound = TRUE;
       rezs = FALSE;
       ptr = ptrOut + ifou - 2;
       kolmarkers = 0;
@@ -4605,10 +4599,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
       ptrOut = ptro + isdvig;
    }
 
-   if( !bFound && s_Repeate )
+   /* Ron Pinkas commented 2004-03-07 - Seems incorrect and unnecessary.
+   if( ( !bFound ) && s_Repeate )
    {
+      printf( "Found: %i s_Repeate %i\n", bFound, s_Repeate );
       s_aIsRepeate[ s_Repeate - 1 ]++;
    }
+   */
 
    #ifdef DEBUG_MARKERS
       printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );

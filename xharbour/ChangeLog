@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2516 2004/03/07 14:42:21 likewolf Exp $
+ * $Id: ChangeLog,v 1.2517 2004/03/07 21:42:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-07 16:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added logic to mark USED and NON Repeatble Marker by changing it's type to 'X'
+    + Added logic to REJECT any further matching of already USED and NON Repeatble Marker.
+    - Removed redundant logic in CommandStuff() under case '\17':
+    + Added HACK to getExpReal() to accept AS <type> postfix when matching List Markers.
+    + Added HACK to getExpReal() to accept AS ARRAY OF <type> postfix when matching List Markers.
+
 2004-03-08 04:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/hvm.c
     + there are 10 instances of hb_itemReleaseString() in hvm.c. 8 of which
