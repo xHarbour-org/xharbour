@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3437 2004/09/16 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3437 2004/09/16 15:26:43 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-16 20:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/pp/ppcore.c
+    ! Increased the maximum number of preprocessor passes on a single line
+      from 256 to 4096. This prevents false recursion error messages for some
+      applications.
 
 2004-09-16 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/alert.prg
