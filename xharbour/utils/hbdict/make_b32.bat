@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bldsvr.bat,v 1.5 2003/01/12 22:30:07 fsgiudice Exp $
+rem $Id: make_b32.bat,v 1.1 2003/06/24 02:17:21 fsgiudice Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -11,8 +11,14 @@ rem Instead, make a local copy and modify that one, or make a call to
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
 
-SET HB_MT=mt
+SET HB_MT=
 SET HB_GT_LIB=gtwin
 
-bld_b32 hbdict
+call %HB_BIN_INSTALL%\bld.bat hbdict
+
+if errorlevel 1 goto exit
+copy hbdict.exe %HB_BIN_INSTALL%
+copy i18n\it_IT.hit %HB_BIN_INSTALL%\hbdict_it_IT.hit
+
+exit:
 

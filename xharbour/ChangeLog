@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1646 2003/11/02 04:58:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1647 2003/11/02 05:28:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-03 05:50 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hbi18n.c
+    + Added HB_I18NInitialized() to test for correct I18n initialization.
+
+  * utils/hbdict/make_b32.bat
+  * utils/hbdict/bld_b32.bat
+  * utils/hbdict/Makefile
+    ! Make process now copies internationalization files into $HB_BIN_INSTALL
+      with hbdict_ prefix.
+    ! (should be) fixed windows make process in make_b32.bat. bld_b32 will
+      be removed as soon as tested.
+
+  * utils/hbdict/hbdict.prg
+    * Now the internationalization files are read also from the program
+      starting directory.
+
+  * doc/hbi18n.txt
+    + Added documentation for HB_I18nInitialized() and a little example code
+      slice
 
 2003-11-01 21:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
@@ -21,7 +41,7 @@
     * Added .F. for bAutoCompile in call to PP_PreProTExt()
     * Commented out non used ScriptSiteAutomateGlobals()
 
-2003-02-11 05:30 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-02 05:30 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * utils/hbdict/hbdict.prg
   * utils/hbdict/i18n/it_IT.hit
     * Using Tbrowse and TEdit to make the program more appealing.

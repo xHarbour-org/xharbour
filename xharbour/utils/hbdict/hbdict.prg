@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.8 2003/10/11 13:27:37 lculik Exp $
+* $Id: hbdict.prg,v 1.9 2003/11/02 04:29:54 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -31,10 +31,22 @@ PROCEDURE Main( cInput, cOutput )
    LOCAL lModified := .F.
    LOCAL oBrowse := TBrowseNew( 8, 2, 22, 75 )
    LOCAL lContinue := .T.
+   LOCAL cLang, cProgPath
 
    SAVE SCREEN
    SET COLOR TO W+/B
    CLEAR SCREEN
+
+   /* Load internationalization language if not already loaded */
+   IF .not. HB_I18nInitialized()
+      cLang := GetEnv( "LANG" )
+      IF .not. Empty(cLang)
+         HB_FnameSplit( hb_argv(0), @cProgPath )
+         HB_I18nSetPath( cProgPath )
+         cLang := "hbdict_" + cLang
+         HB_I18nSetLanguage( cLang )
+      ENDIF
+   ENDIF
 
    @0,0 SAY PadC( ;
       i18n( "X H A R B O U R - Dictionary Editor (preview, 3rd)" ), MaxCol() )

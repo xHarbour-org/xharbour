@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.10 2003/08/28 01:35:31 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.11 2003/09/11 13:23:30 mlombardo Exp $
  */
 
 /*
@@ -754,6 +754,12 @@ HB_FUNC( HB_I18NSETBASELANGUAGE )
       strncpy( s_current_language, szCode , HB_I18N_CODELEN );
       strncpy( s_current_language_name, szName, HB_I18N_NAMELEN );
    }
+}
+
+HB_FUNC( HB_I18NINITIALIZED )
+{
+   HB_THREAD_STUB
+   hb_retl( s_i18n_table != NULL );
 }
 
 /***********************************************

@@ -8,7 +8,7 @@
                                   gian@nccolai.ws
 
 
-$Id: hbi18n.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
+$Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
 
 
 /*  $DOC$
@@ -340,16 +340,21 @@ $Id: hbi18n.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
  *         If the string is not present, cString will be returned untranslated,
  *         without any new allocation or copy being made.
  *      
- *      
+ *      HB_I18nInitalized() --> lInitialized
+ *
+ *         Returns true if the I18N has been initalized correctly at startup or
+ *         with api functions. This can be useful to take default actions or
+ *         to search dictionary files in non standard directories.
+ *
  *      HB_I18nSetPath( cPath )
- *      
+ *
  *         Sets the current languages tables search pat to cpath. No tests is
  *         made to see if cPath is a valid path. The path can be relative,
  *         if it does not begin with a drive specification (windows) or with
  *         a slash, or absolute. Default directory set at program startup is
  *         i18n/
- *      
- *      
+ *
+ *
  *      HB_I18nGetPath() --> cPath
  *      
  *        Returns the currently selected path for searching i18n table files.
@@ -406,7 +411,7 @@ $Id: hbi18n.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
  *         written, that is set with HB_I18NSetBaseLanguage().
  *
  *
- *      HB_I18NGetLanguageName() --> cLanguage
+ *      HB_I18NGetBaseLanguageName() --> cLanguage
  *
  *         Returns the name of the language that the program has been written in.
  *         Generally, this is a descriptive non-internationalized name of the
@@ -500,16 +505,38 @@ $Id: hbi18n.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
  *         files, efficiency should not be a concern.
  *      
  *      
- *      
+ *
  *      Low level api
  *      -------------
- *      
+ *
  *      Yet undocmuented. refer to source/vm/hbi18n.c file to see what those function
  *      are doing; generally they implement low level operations required by higher
  *      level api, and they are all written in C.
- *      
- *      
- *      
+ *
+ *
+ *
+ *      Absolutization of path
+ *      ----------------------
+ *
+ *      If you want to execute a small internationalized executable from a
+ *      variable location (i.e. if you want to put it in the path and just call it
+ *      you can add a code slice like the one in this example to your program:
+ *
+ *          ...
+ *          LOCAL cLang, cProgPath
+ *
+ *          IF .not. HB_I18nInitialized()
+ *             cLang := GetEnv( "LANG" )
+ *             IF .not. Empty(cLang)
+ *                HB_FnameSplit( hb_argv(0), @cProgPath )
+ *                /* You can also put HIT files directly in cProgPath */
+ *                HB_I18nSetPath( cProgPath + HB_OSPathSpearator() + "i18n")
+ *                HB_I18nSetLanguage( cLang )
+ *             ENDIF
+ *          ENDIF
+ *
+ *
+ *
  *  $END$
  */
 

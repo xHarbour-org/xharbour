@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/09/11 13:12:05 jonnymind Exp $
+# $Id: Makefile,v 1.4 2003/10/11 13:27:37 lculik Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -31,3 +31,10 @@ LIBS=\
 
 include $(TOP)$(ROOT)config/bin.cf
 
+INSTALL_RULE=\
+	cp -f $(HB_ARCHITECTURE)/$(HB_COMPILER)/hbdict $(HB_BIN_INSTALL);\
+	for file in $$(ls i18n/*.hit); do\
+		cp -f $$file $(HB_BIN_INSTALL)/hbdict_$${file\#\#i18n/};\
+	done;\
+		
+	
