@@ -1,5 +1,5 @@
 /*
- * $Id: input.txt,v 1.9 2001/04/28 02:30:51 dholm Exp $
+ * $Id: input.txt,v 1.1.1.1 2001/12/21 10:48:52 ronpinkas Exp $
  */
 
 /*
@@ -445,5 +445,140 @@
  *      Library is rtl
  *  $SEEALSO$
  *      MROW()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETINKEYBEFOREBLOCK()
+ *  $CATEGORY$
+ *      Console input
+ *  $ONELINER$
+ *      Sets a codeblock that is called before each INKEY() call
+ *  $SYNTAX$
+ *      SETINKEYBEFOREBLOCK( [<bBlock>]) --> bOldBlock
+ *  $ARGUMENTS$
+ *      <bBlock> is the codeblock to execute. If no parameter is passed
+ *      then the function returns bOldBlock only. To remove an existing
+ *      codeblock the function must explicitly pass NIL
+ *  $RETURNS$
+ *      the existing codeblock or NIL if none present
+ *  $DESCRIPTION$
+ *      SETINKEYBEFOREBLOCK() can be used perform processing before
+ *      the actual call to INKEY() - such as pasting a key stroke from
+ *      an internal Copy/Paste buffer
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+ *        LOCAL nKey:=0
+ *        KeyBuffer("ABCDEFGHIJKLMNOP"+CHR(27))
+ *        SETINKEYBEFOREBLOCK({ || KeyBuffer()})
+ *        CLS
+ *        ?
+ *        DO WHILE nKey != 27
+ *           nKey:= INKEY(0)
+ *           ?? CHR(nKey)
+ *         ENDDO
+ *         WAIT
+ *         RETURN(NIL)
+ *
+ *      PROCEDURE KeyBuffer(cFillBuffer)
+ *        STATIC cBuffer:= ""
+ *        IF cFillBuffer <> NIL
+ *          cBuffer:= cFillBuffer
+ *        ELSEIF LEN(cBUFFER)>0
+ *          HB_KEYPUT(ASC(cBUFFER[1]))
+ *          cBUFFER:= RIGHT(cBUFFER,LEN(cBUFFER)-1)
+ *        ENDIF
+ *        RETURN
+ *  </fixed>
+ *  $TESTS$
+ *
+ *  </fixed>
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      SETINKEYBEFOREBLOCK() is a Harbour extension.
+ *  $FILES$
+ *      Library is rtl
+ *  $SEEALSO$
+ *      INKEY(), SETINKETAFTERBLOCK()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETINKEYAFTERBLOCK()
+ *  $CATEGORY$
+ *      Console input
+ *  $ONELINER$
+ *      Sets a codeblock that is called AFTER each INKEY() call
+ *      but before returning from INKEY()
+ *  $SYNTAX$
+ *      SETINKEYAFTERBLOCK( [<bBlock>]) --> bOldBlock
+ *  $ARGUMENTS$
+ *      <bBlock> is the codeblock to execute. If no parameter is passed
+ *      then the function returns bOldBlock only. To remove an existing
+ *      codeblock the function must explicitly pass NIL
+ *  $RETURNS$
+ *      the existing codeblock or NIL if none present
+ *  $DESCRIPTION$
+ *      SETINKEYAFTERBLOCK() can be used perform processing after
+ *      the actual call to INKEY(). Examples of use;
+ *          - Special Translate keys
+ *          - Recording keyboard macros
+ *          - Copy/Paste ( K_CTRL_C / K_CTRL_V )
+ *          - Keyboard logging
+ *      The code block that is passed should accept one parameter
+ *      which is the return value of INKEY(). If INKEY() returns 0 then
+ *      the codeblock is not called. The code block must return a numeric
+ *      which is used as the return value for INKEY(). It the codeblock
+ *      returns 0, INKEY() is called again without returning to the
+ *      caller.
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+ *        LOCAL nKey:=0
+ *        KeyBuffer("ABCDEFGHIJKLMNOP"+CHR(27))
+ *        SETINKEYBEFOREBLOCK({ || KeyBuffer()})
+ *        SETINKEYAFTERBLOCK({ |nKey| KeySwap(nKey)})
+ *        CLS
+ *        ?
+ *        DO WHILE nKey != 27
+ *           nKey:= INKEY(0)
+ *           ?? CHR(nKey)
+ *         ENDDO
+ *         WAIT
+ *         RETURN(NIL)
+ *
+ *      PROCEDURE KeyBuffer(cFillBuffer)
+ *        STATIC cBuffer:= ""
+ *        IF cFillBuffer <> NIL
+ *          cBuffer:= cFillBuffer
+ *        ELSEIF LEN(cBUFFER)>0
+ *          HB_KEYPUT(ASC(cBUFFER[1]))
+ *          cBUFFER:= RIGHT(cBUFFER,LEN(cBUFFER)-1)
+ *        ENDIF
+ *        RETURN
+ *
+ *      FUNCTION KeySwap(nKey)
+ *        LOCAL cKey:= CHR(nKey)
+ *        IF nKey > 65 .AND. nKey< 72
+ *          nKey = 63
+ *        ELSEIF cKey == 'P'
+ *          nKey = 64
+ *        ENDIF
+ *        RETURN(nKey)
+ *
+ *  </fixed>
+ *  $TESTS$
+ *
+ *  </fixed>
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      SETINKEYAFTERBLOCK() is a Harbour extension.
+ *  $FILES$
+ *      Library is rtl
+ *  $SEEALSO$
+ *      INKEY(), SETINKETBEFOREBLOCK()
  *  $END$
  */
