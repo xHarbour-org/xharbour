@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.7 2003/11/27 21:44:54 likewolf Exp $
+ * $Id: hbffind.c,v 1.8 2003/12/02 12:25:55 lculik Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.7 2003/11/27 21:44:54 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.8 2003/12/02 12:25:55 lculik Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -833,7 +833,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       if( !*info->pattern )
       {
-         strcpy( info->pattern, "*.*" );
+         strcpy( info->pattern, "*" );
       }
 
       tzset();

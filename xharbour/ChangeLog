@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1840 2003/12/09 23:23:23 maurifull Exp $
+ * $Id: ChangeLog,v 1.1841 2003/12/10 00:07:57 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-12-10 01:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/hbffind.c
+    ! unix "universal" patter is NOT "*.*"  but "*"
 
 2003-12-10 01:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/regex.c
