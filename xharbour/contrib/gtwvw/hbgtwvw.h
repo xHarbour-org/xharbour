@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h $
+ * $Id: hbgtwvw.h,v 1.3 2005/01/13 04:41:17 bdj Exp $
  */
 
 /*
@@ -90,13 +90,15 @@
    #if defined(_MSC_VER)
       #include <conio.h>
 
-      #if !defined( LONG_PTR )
-         typedef __int64 LONG_PTR ;
-         #ifndef SetWindowLongPtr
-            #define SetWindowLongPtr SetWindowLong
-         #endif
-         #ifndef GetWindowLongPtr
-            #define GetWindowLongPtr GetWindowLong
+      #if !defined( __POCC__ )
+         #if !defined( LONG_PTR )
+            typedef __int64 LONG_PTR ;
+            #ifndef SetWindowLongPtr
+               #define SetWindowLongPtr SetWindowLong
+            #endif
+            #ifndef GetWindowLongPtr
+               #define GetWindowLongPtr GetWindowLong
+            #endif
          #endif
       #endif
    #endif
@@ -213,6 +215,10 @@ typedef BOOL ( WINAPI *wvwGradientFill )     (
                       ULONG      dwMode      );
 
 /*-------------------------------------------------------------------*/
+
+#ifndef _MAX_PATH
+   #define _MAX_PATH 256
+#endif
 
 typedef struct bitmap_handle
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.8 2005/01/14 04:42:57 bdj Exp $
+ * $Id: gtwvw.c,v 1.9 2005/02/15 21:05:53 andijahja Exp $
  */
 
 /*
@@ -101,6 +101,10 @@
 
 #include <windows.h>
 #include <commctrl.h>
+
+#if defined(__WATCOMC__)
+  #include <conio.h>
+#endif
 
 /***
 
@@ -305,8 +309,10 @@ static int PackedDibGetInfoHeaderSize (BITMAPINFO * pPackedDib);
 static int PackedDibGetColorsUsed (BITMAPINFO * pPackedDib);
 static int PackedDibGetNumColors (BITMAPINFO * pPackedDib);
 static int PackedDibGetColorTableSize (BITMAPINFO * pPackedDib);
+#if 0
 static RGBQUAD * PackedDibGetColorTablePtr (BITMAPINFO * pPackedDib);
 static RGBQUAD * PackedDibGetColorTableEntry (BITMAPINFO * pPackedDib, int i);
+#endif
 static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib);
 
 /* bitmap caching functions: */
@@ -1085,7 +1091,7 @@ char * HB_GT_FUNC(gt_Version( int iType ))
 }
 
 /*-------------------------------------------------------------------*/
-
+#if 0
 static void HB_GT_FUNC( gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bChar ) )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_xPutch( %hu, %hu, %d, %i )", iRow, iCol, ( int ) bAttr, bChar ) );
@@ -1104,6 +1110,7 @@ static void HB_GT_FUNC( gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bC
     hb_wvw_GTFUNCEpilogue( );
   }
 }
+#endif
 
 /*-------------------------------------------------------------------*/
 /*                                                                   */
@@ -1411,7 +1418,7 @@ int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
 /*                                                                   */
 /*   Copied from gtwin                                               */
 /*                                                                   */
-#if defined( __BORLANDC__ ) || defined( _MSC_VER )
+#if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined(__WATCOMC__) || defined(__MINGW32__)
 static int hb_Inp9x( USHORT usPort )
 {
   USHORT usVal;
@@ -1423,9 +1430,27 @@ static int hb_Inp9x( USHORT usPort )
      __emit__( 0xEC );        /* ASM  IN AL, DX */
      __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
      usVal = _AX;
+
+  #elif defined( __XCC__ )
+
+     __asm {
+              mov   dx, usPort
+              xor   ax, ax
+              in    al, dx
+              mov   usVal, ax
+           }
+
+  #elif defined( __MINGW32__ )
+     __asm__ __volatile__ ("inb %w1,%b0":"=a" (usVal):"Nd" (usPort));
+
+  #elif defined( __WATCOMC__ )
+
+     usVal = inp( usPort );
+
   #else
 
      usVal = _inp( usPort );
+
   #endif
 
   return( usVal );
@@ -1439,15 +1464,33 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
 
-  #if defined( __BORLANDC__ )
-    _DX = usPort;
-    _AL = usVal;
-    __emit__( 0xEE );        /* ASM OUT DX, AL */
-    __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
-    usVal = _AX;
-  #else
-     _outp( usPort, usVal );
-  #endif
+   #if defined( __BORLANDC__ )
+
+      _DX = usPort;
+      _AL = usVal;
+      __emit__(0xEE);        /* ASM OUT DX, AL */
+
+   #elif defined( __XCC__ )
+
+      __asm {
+               mov   dx, usPort
+               mov   ax, usVal
+               out   dx, al
+            }
+
+   #elif defined( __MINGW32__ )
+
+      __asm__ __volatile__ ("outb %b0,%w1": :"a" (usVal), "Nd" (usPort));
+
+   #elif defined( __WATCOMC__ )
+
+       outp( usPort, usVal );
+
+   #else
+
+      _outp( usPort, usVal );
+
+   #endif
 
   return( usVal );
 }
@@ -1568,7 +1611,7 @@ void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined( __BORLANDC__ ) || defined( _MSC_VER )
+       #if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__)
           HB_GT_FUNC( gt_w9xTone( dFrequency, dDuration ) );
        #else
           HB_GT_FUNC( gt_wNtTone( dFrequency, dDuration ) );
@@ -12432,7 +12475,7 @@ static int PackedDibGetColorTableSize (BITMAPINFO * pPackedDib)
      else
           return PackedDibGetNumColors (pPackedDib) * sizeof (RGBQUAD) ;
 }
-
+#if 0
 static RGBQUAD * PackedDibGetColorTablePtr (BITMAPINFO * pPackedDib)
 {
      if (PackedDibGetNumColors (pPackedDib) == 0)
@@ -12452,6 +12495,7 @@ static RGBQUAD * PackedDibGetColorTableEntry (BITMAPINFO * pPackedDib, int i)
      else
           return PackedDibGetColorTablePtr (pPackedDib) + i ;
 }
+#endif
 
 static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib)
 {
@@ -14898,7 +14942,7 @@ HB_FUNC( WVW_CBCREATE)
    WIN_DATA * pWindowData = s_pWindows[usWinNum];
    HWND hWndParent = pWindowData->hWnd;
    HWND hWndCB;
-   HWND hWndLB;
+   // HWND hWndLB;
    POINT xy;
    int   iTop, iLeft, iBottom, iRight;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
