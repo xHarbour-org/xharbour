@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1375 2003/08/22 20:44:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1376 2003/08/22 21:16:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-23 12:45 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    ! A wrong REGEX used in HB_REGEX now causes an error. Normally,
+      using a wrong regex is a programming error, and should be
+      signaled this way. In situations where the regex is created
+      on-the-fly and thus may be wrong, a try-catch statement should
+      be used.
+    ! the sequence $$$ used to distinguish pre-compiled regex has
+      changed with ***; $$$ is "valid" even if useless, while ***
+      is not, and can be safely used to mark a compiled regex.
+
+  * tests/regextest
+    ! using a try/catch to detect errors in regex compilation
+
+  * tests/Makefile
+    ! Defaulting to gtcts in HB_GT_LIB
 
 2003-08-22 14:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
@@ -95,11 +112,13 @@
          The above may be very common in RDD.
       */
 
+>>>>>>> 1.1376
 2003-08-20 20:03 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/gtcrs/gtcrs.c
     * small fix in hardcoded xterm key mapping for buggy terminfos,
       map \177 as K_BS not K_DEL
 
+>>>>>>> 1.1367
 2003-08-20 14:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/hbcrypt.c
     ! Fixed two GPFs if empty parameters are passed
@@ -147,6 +166,7 @@
     ! Fixed some warning messages
 
 2003-08-19 13:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+>>>>>>> 1.1366
   * source/rtl/regex.c
     ! Parenthetized expressions must be returned by HB_Regex &co
       even if they are not found. See this case:

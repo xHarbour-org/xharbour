@@ -6455,7 +6455,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    /* now check if it is a precompiled regex */
    if ( pRegEx->item.asString.length > 3 &&
-      memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
+      memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
    {
       pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
       aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
@@ -6474,6 +6474,10 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
       if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
       {
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",
+            "Regex subsystem",
+            4, pRegEx, pString,
+            hb_paramError( 3 ), hb_paramError( 4 ));
          return FALSE;
       }
 
@@ -6642,8 +6646,14 @@ HB_FUNC( HB_REGEXCOMP )
    if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
    {
       cRegex = (char *) hb_xgrab( sizeof( re ) + 3 );
-      memcpy( cRegex, "$$$", 3 );
+      memcpy( cRegex, "***", 3 );
       memcpy( cRegex + 3, &re, sizeof( re ) );
       hb_retclenAdoptRaw( cRegex, sizeof( re ) + 3 );
    }
+   else {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",
+      "Regex subsystem",
+      3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ));
+   }
 }
+
