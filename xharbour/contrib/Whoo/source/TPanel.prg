@@ -1,3 +1,6 @@
+
+// WHOO.LIB
+
 #include "hbclass.ch"
 #include "windows.ch"
 
@@ -6,11 +9,18 @@
 #Define RCF_MDIFRAME   2
 #Define RCF_MDICHILD   4
 
+*-----------------------------------------------------------------------------*
+
 CLASS TPanel FROM TForm
+
    METHOD New()
+
 ENDCLASS
 
+*-----------------------------------------------------------------------------*
+
 METHOD New( oParent ) CLASS TPanel
+   
    super:New( oParent )
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
@@ -20,5 +30,7 @@ METHOD New( oParent ) CLASS TPanel
    ::lRegister := .f.
    ::lControl  := .F.
    ::Modal     := .T.
-return( self )
+   
+   return( self )
 
+*-----------------------------------------------------------------------------*

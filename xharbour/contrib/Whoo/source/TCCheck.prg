@@ -1,14 +1,23 @@
+
+// WHOO.LIB
+
 #include "windows.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"
 
+*------------------------------------------------------------------------------*
 
 CLASS TCheck FROM TControl
+
    METHOD New() CONSTRUCTOR
+
 ENDCLASS
 
+*------------------------------------------------------------------------------*
+
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TCheck
+
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
@@ -17,9 +26,11 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TCheck
    ::Caption   := cCaption
    ::Left      := nLeft
    ::Top       := nTop
-   ::Width     := nWidth
+   ::Width     := IFNIL( nWidth , IFNIL( ::Width , 80, ::Width ), nWidth )
    ::Height    := IFNIL( nHeight, IFNIL( ::height, 20, ::height), nHeight)
    ::Name      := 'button'
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_AUTOCHECKBOX + BS_LEFTTEXT
-return( super:new( oParent ) )
+   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_AUTOCHECKBOX //+ BS_LEFTTEXT
 
+   RETURN( super:new( oParent ) )
+
+*------------------------------------------------------------------------------*

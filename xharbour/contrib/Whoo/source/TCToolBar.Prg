@@ -1,3 +1,6 @@
+
+// WHOO.LIB
+
 #define TPM_LEFTBUTTON        0
 #define TPM_CENTERALIGN       4
 #define TPM_RIGHTALIGN        8
@@ -13,7 +16,6 @@
 
 // What32.Lib
 // Tollbar class
-
 
 #Include "windows.ch"
 #include "hbclass.ch"
@@ -76,6 +78,7 @@ typedef struct {;
 
 
 CLASS TToolbar FROM TControl
+
    DATA abuttons
    DATA aBitmaps
    DATA hParent
@@ -94,18 +97,19 @@ CLASS TToolbar FROM TControl
    METHOD AddButton()
    METHOD AddBitmap()
    METHOD AddString()
-   method Create()
+   METHOD Create()
    METHOD tbProc()
 
-   method disable(nBtn)           INLINE ::SendMessage(TB_ENABLEBUTTON,nBtn,0)
-   method enable(nBtn,lFlag)      INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
+   METHOD Disable(nBtn)           INLINE ::SendMessage(TB_ENABLEBUTTON,nBtn,0)
+   METHOD Enable(nBtn,lFlag)      INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
                                          ::SendMessage(TB_ENABLEBUTTON,nBtn,If(lFlag,1,0))
-   method disableall()
-   method enableall()
-   method CheckButton(nBtn,lFlag) INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
+   METHOD Disableall()
+   METHOD Enableall()
+   METHOD CheckButton(nBtn,lFlag) INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
                                          ::SendMessage(TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
-   method IsButtonChecked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
-   method AddMenu()
+   METHOD IsButtonChecked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
+   METHOD AddMenu()
+
 ENDCLASS
 
 
@@ -113,85 +117,97 @@ ENDCLASS
 
 METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS TToolBar
 
-  InitCommonControlsEx(ICC_BAR_CLASSES)
+   InitCommonControlsEx(ICC_BAR_CLASSES)
   
-  ::nImg    := nImg
-  ::hBMInst := hBMInst
-  ::nBMId   := nBMId
-  ::xBtn    := xBtn
-  ::yBtn    := yBtn
-  ::xBmp    := xBmp
-  ::yBmp    := yBmp
+   ::nImg    := nImg
+   ::hBMInst := hBMInst
+   ::nBMId   := nBMId
+   ::xBtn    := xBtn
+   ::yBtn    := yBtn
+   ::xBmp    := xBmp
+   ::yBmp    := yBmp
   
-  ::aButtons:={}
-  ::aTips   :={}
-  ::Style   :=TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
+   ::aButtons:={}
+   ::aTips   :={}
+   ::Style   :=TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
               WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD
-  ::Id      := nId
-  ::Created := .F.
-  ::aText   :={}
-  ::aBitmaps:={}
-  ::aMenus  :={}
+   ::Id      := nId
+   ::Created := .F.
+   ::aText   :={}
+   ::aBitmaps:={}
+   ::aMenus  :={}
 
-  ::lRegister := .F.
-  ::lControl  := .T.
+   ::lRegister := .F.
+   ::lControl  := .T.
 
-  ::Msgs      := IFNIL( ::Msgs, {WM_SIZE}, ::Msgs )
-  ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
-  ::Left      := 0
-  ::Top       := 0
-  ::Width     := 0
-  ::Height    := 0
-  ::Name      := 'ToolBar32'
-  ::ExStyle   := 0
+   ::Msgs      := IFNIL( ::Msgs, {WM_SIZE}, ::Msgs )
+   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
+   ::Left      := 0
+   ::Top       := 0
+   ::Width     := 0
+   ::Height    := 0
+   ::Name      := 'ToolBar32'
+   ::ExStyle   := 0
 
-RETURN( super:New( oParent ) )
-
+   RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
 METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
-  LOCAL tbab IS TBADDBITMAP
-    DEFAULT nButtons TO 1
-    tbab:hInst := hInst
-    tbab:nId   := nhIdBmp
-    AADD(::aBitmaps,{tbab,nButtons})
-    IF ::created
-      SendMessage(::hWnd,TB_ADDBITMAP,nButtons,tbab:value)
-    ENDIF
-RETURN(1)
+ 
+   LOCAL tbab IS TBADDBITMAP
+  
+   DEFAULT nButtons TO 1
+  
+   tbab:hInst := hInst
+   tbab:nId   := nhIdBmp
+   AADD(::aBitmaps,{tbab,nButtons})
+   IF ::created
+     SendMessage(::hWnd,TB_ADDBITMAP,nButtons,tbab:value)
+   ENDIF
+
+   RETURN(1)
 
 *-----------------------------------------------------------------------------*
 
 METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip ) CLASS TToolBar
-  LOCAL tbb IS TBBUTTON
 
-  tbb:ibitmap   :=IFNIL(nIndex,-1,nIndex)
-  tbb:idCommand :=nId // must be supplied
-  tbb:fsState   :=IFNIL(nState,TBSTATE_ENABLED,nState)
-  tbb:fsStyle   :=IFNIL(nStyle,TBSTYLE_BUTTON,nStyle)
-  tbb:dwData    :=IFNIL(ncargo,0,nCargo)
-  tbb:iString   :=IFNIL(nString,0,nString)
+   LOCAL tbb IS TBBUTTON
 
-  AADD(::aButtons,tbb)
-  AADD(::aTips,cToolTip)
-  IF ::Created
+   tbb:ibitmap   :=IFNIL(nIndex,-1,nIndex)
+   tbb:idCommand :=nId // must be supplied
+   tbb:fsState   :=IFNIL(nState,TBSTATE_ENABLED,nState)
+   tbb:fsStyle   :=IFNIL(nStyle,TBSTYLE_BUTTON,nStyle)
+   tbb:dwData    :=IFNIL(ncargo,0,nCargo)
+   tbb:iString   :=IFNIL(nString,0,nString)
+
+   AADD(::aButtons,tbb)
+   AADD(::aTips,cToolTip)
+   IF ::Created
      SendMessage(::hWnd,TB_ADDBUTTONS,1,tbb:value)
-  Endif
-RETURN(self)
+   ENDIF
 
-METHOD AddMenu(nId,aMenuItems)
-   AADD(::aMenus,{nId,aMenuItems})
-return(self)
+RETURN(self)
 
 *-----------------------------------------------------------------------------*
+
+METHOD AddMenu(nId,aMenuItems)
+
+   AADD(::aMenus,{nId,aMenuItems})
+
+   RETURN(self)
+
+*-----------------------------------------------------------------------------*
+
 METHOD addstring(cText) CLASS TToolBar
-  IF ::created
-     SendMessage(::hWnd,TB_ADDSTRING,0,cText)
-  Else
-     AADD(::aText,cText)
-  Endif
-RETURN(self)
+
+   IF ::created
+      SendMessage(::hWnd,TB_ADDSTRING,0,cText)
+   Else
+      AADD(::aText,cText)
+   Endif
+
+   RETURN(self)
 
 *-----------------------------------------------------------------------------*
 
@@ -201,13 +217,14 @@ METHOD Create() CLASS TToolBar
    LOCAL cStrings:=""
    LOCAL tbb IS TBBUTTON
    LOCAL i
-   if ISNIL(::hBMInst) .AND. ISNIL(::nBMId)
+
+   IF ISNIL(::hBMInst) .AND. ISNIL(::nBMId)
       ::hBMInst:=HINST_COMMCTRL
       ::nBMId  :=IDB_STD_LARGE_COLOR
-   endif
-   for i:=1 TO LEN(::aButtons)
+   ENDIF
+   FOR i:=1 TO LEN(::aButtons)
        cButtons+=::aButtons[i]:Value
-   next
+   NEXT
    ::handle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,LEN(::aButtons),;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
    ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY})
@@ -216,12 +233,14 @@ METHOD Create() CLASS TToolBar
       ::SendMessage(TB_ADDSTRING,0,::aText[i])
    NEXT
    ::Created:=.T.
-RETURN( self )
+
+   RETURN( self )
 
 
 *-----------------------------------------------------------------------------*
 
 METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
+
    LOCAL Hdr
    LOCAL Ttt
    LOCAL nmt
@@ -229,6 +248,7 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
    LOCAL hMenu,rc,aRect
    LOCAL n,x
    LOCAL hic
+
    DO CASE
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
@@ -241,22 +261,37 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
          Ttt:lpszText:=::aTips[n]
          poke(nlParam,Ttt:value,Ttt:sizeof)
        ENDIF
+
      CASE Hdr:code==TBN_QUERYINSERT
          RETURN(1)
+
      CASE Hdr:code==TBN_QUERYDELETE
          RETURN(1)
+
      CASE Hdr:code==TBN_GETBUTTONINFO
          Nmt IS NMTOOLBAR
          nmt:buffer(peek(nlParam,nmt:sizeof))
          RETURN(1)
+
      ENDCASE
    ENDCASE
-RETURN( CallWindowProc(::ntProc,::Parent:handle,nMsg,nwParam,nlParam))
 
-method disableall() CLASS TToolBar
+   RETURN( CallWindowProc(::ntProc,::Parent:handle,nMsg,nwParam,nlParam))
+
+*-----------------------------------------------------------------------------*
+
+METHOD disableall() CLASS TToolBar
+
    AEVAL(::aButtons,{|btn| ::disable(btn:idCommand)})
-return(self)
 
-method enableall() CLASS TToolBar
+   RETURN(self)
+
+*-----------------------------------------------------------------------------*
+
+METHOD enableall() CLASS TToolBar
+
    AEVAL(::aButtons,{|btn| ::enable(btn:idCommand)})
-return(self)
+
+   RETURN(self)
+
+*-----------------------------------------------------------------------------*

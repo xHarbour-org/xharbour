@@ -1,3 +1,6 @@
+
+// WHOO.LIB
+
 #include "hbclass.ch"
 #include "windows.ch"
 
@@ -6,16 +9,22 @@
 #Define RCF_MDIFRAME   2
 #Define RCF_MDICHILD   4
 
+*-----------------------------------------------------------------------------*
 
 CLASS TFrame FROM TWindow
+
    METHOD New()
    METHOD Add()
+   
 ENDCLASS
 
+*-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TFrame
+
    InitCommonControls()
    InitCommonControlsEx(ICC_COOL_CLASSES)
+
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .T.
@@ -23,10 +32,17 @@ METHOD New( oParent ) CLASS TFrame
    ::ExStyle   := WS_EX_APPWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
-return( super:New( oParent ) )
+
+   return( super:New( oParent ) )
+
+*-----------------------------------------------------------------------------*
 
 METHOD Add( cName, oObj ) CLASS TFrame
+   
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
    oObj:Create()
-return( oObj )
+   
+   return( oObj )
+
+*-----------------------------------------------------------------------------*

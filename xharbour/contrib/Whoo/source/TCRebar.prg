@@ -1,3 +1,6 @@
+
+// WHOO.LIB
+
 #Include "windows.ch"
 #include "hbclass.ch"
 #Include "wintypes.ch"
@@ -11,36 +14,52 @@ pragma pack(4)
 #Include "rbstruct.ch"
 #Include "debug.ch"
 
-
+*------------------------------------------------------------------------------*
 
 CLASS TRebar FROM TForm
+
    VAR nrProc
    VAR rect
+
    METHOD New() CONSTRUCTOR
    METHOD AddBand()
    METHOD RebarProc()
    METHOD OnCreate() INLINE ::OnCreateRebar()
    METHOD OnCreateRebar()
+
 ENDCLASS
 
+*------------------------------------------------------------------------------*
+
 METHOD OnCreateRebar() CLASS TRebar
+
    ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
                             ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
    ::RebarProc(WM_SIZE,0,0)
-return(super:OnCreate())
+
+   RETURN(super:OnCreate())
+
+*------------------------------------------------------------------------------*
 
 METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
+
    LOCAL acRect
    LOCAL aRect
-   if nMsg==WM_SIZE
+
+   IF nMsg==WM_SIZE
       acRect:=GetClientRect(::Parent:handle)
       aRect:=GetWindowRect(::handle)
       MoveWindow(::handle,0,0,acRect[3],aRect[4]-aRect[2],.t.)
-   endif
-RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
+   ENDIF
+   
+   RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
+
+*------------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TRebar
+   
    super:new( oParent )
+    
    ::Name      := REBARCLASSNAME
    ::id        := 1
    ::lRegister := .F.
@@ -56,11 +75,15 @@ METHOD New( oParent ) CLASS TRebar
    ::ExStyle   := WS_EX_TOOLWINDOW
    ::Style     := WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                   RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
-return( self )
+   RETURN( self )
+
+*------------------------------------------------------------------------------*
 
 METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
+
    LOCAL rbBand IS REBARBANDINFO
    LOCAL aRect:=GetWindowRect(hChild)
+
    rbBand:Reset()
    rbBand:cbSize     := rbBand:sizeof()
    rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE +RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
@@ -71,6 +94,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    rbBand:cx         := IFNIL(cx,GetClientRect(::hParent)[3],cx)
    rbBand:lpText     := IFNIL(cText,"Test",cText)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
-return( ::SendMessage( RB_INSERTBAND, -1, rbBand:value ) <> 0 )
 
+   RETURN( ::SendMessage( RB_INSERTBAND, -1, rbBand:value ) <> 0 )
 
+*------------------------------------------------------------------------------*
