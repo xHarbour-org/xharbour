@@ -1226,18 +1226,17 @@ HB_FUNC( SETMINMAXINFO )
 
 }
 
-/*
-BOOL LockSetForegroundWindow(          UINT uLockCode
-);
-*/
 
-HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
-{
-   hb_retl( LockSetForegroundWindow( (UINT) hb_parni( 1 ) ) );
-}
-
+//-----------------------------------------------------------------------------
 /*
-BOOL AllowSetForegroundWindow(          DWORD dwProcessId
+BOOL AllowSetForegroundWindow( DWORD dwProcessId
+
+usage:
+
+#define ASFW_ANY    (-1)
+
+AllowSetForegroundWindow( ASFW_ANY or GetCurrentProcessId() )  
+
 );
 */
 

@@ -981,7 +981,12 @@ BOOL WriteFile(
 */
 
 
-
+//-----------------------------------------------------------------------------
+/*
+DWORD GetCurrentProcessId( VOID )
+*/
  
-
-
+HB_FUNC ( GETCURRENTPROCESSID )
+{
+   GetCurrentProcessId() ;
+}
