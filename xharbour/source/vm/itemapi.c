@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.74 2004/02/11 04:02:54 druzus Exp $
+ * $Id: itemapi.c,v 1.75 2004/02/11 21:18:46 andijahja Exp $
  */
 
 /*
@@ -833,18 +833,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLen( PHB_ITEM pItem, double dNumber, int iWidth, i
 #ifndef HB_LONG_LONG_OFF
    else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
    {
-/*
-/ --- WARNING -----------------------------------------------------------\
-| This is a real hack for MSVC. xHarbour will process LONGLONG as double |
-| when LONGLONG is enabled. This comment has been written for reference  |
-| to correct the situation once a solution is found.                     |
-\------------------------------------------------------------------------/
-*/
-#ifdef _MSC_VER
-      return hb_itemPutNDLen( pItem, dNumber, iWidth, 0 );
-#else
       return hb_itemPutNLLLen( pItem, (LONGLONG) dNumber, iWidth );
-#endif
    }
 #endif
    else
@@ -1489,7 +1478,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
 #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
-#if defined( __MINGW32__ )
+#if defined( __MINGW32__ ) || defined( _MSC_VER )
          {
             LONGLONG llVal = pNumber->item.asLongLong.value;
             BOOL fNeg = ( llVal < 0 );
