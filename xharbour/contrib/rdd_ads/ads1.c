@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.58 2005/02/28 10:17:28 andijahja Exp $
+ * $Id: ads1.c,v 1.60 2005/04/01 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -77,6 +77,7 @@ static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
 static int iSetListenerHandle;
 
 void hb_oemansi(char* pcString, LONG lLen);
+void hb_ansioem(char* pcString, LONG lLen);
 
 HB_FUNC( _ADS );
 HB_FUNC( ADS_GETFUNCTABLE );
@@ -1427,6 +1428,10 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                  pulLen++;                 /* make room for NULL */
                  pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
                  AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
+                 if( adsOEM )
+                 {
+                    hb_ansioem(pucBuf, pulLen);
+                 }
                  hb_itemPutCL( pItem, ( char * ) pucBuf, pulLen );
                  hb_xfree( pucBuf );
               }
@@ -1599,14 +1604,10 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
             if( adsOEM )
             {
-               ulRetVal = AdsSetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ),
-                  (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+               hb_oemansi( hb_itemGetCPtr( pItem ), uiCount );
             }
-            else
-            {
-               ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
-               (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
-            }
+            ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
+            (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
          }
          break;
    }
