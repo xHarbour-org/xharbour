@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.3 2003/09/09 01:32:26 druzus Exp $
+ * $Id: simplex.c,v 1.4 2003/09/30 20:35:07 ronpinkas Exp $
  */
 
 /*
@@ -545,7 +545,7 @@ YY_DECL
        {
           RESET_LEX();
           DEBUG_INFO( printf(  "Returning: <EOF>\n" ) );
-          return -1; \
+          return -1;
        }
     }
 
@@ -687,11 +687,11 @@ int SimpLex_GetNextToken( void )
                            }
                         }
 
-                        /* Match */ \
-                        if( sTerm[iTermLen] == '\0' ) \
-                        { \
-                           /* Moving to next postion after the Stream Terminator. */ \
-                           szBuffer += ( iTermLen - 1 ); \
+                        /* Match */
+                        if( sTerm[iTermLen] == '\0' )
+                        {
+                           /* Moving to next postion after the Stream Terminator. */
+                           szBuffer += ( iTermLen - 1 );
 
                            sPair[ iPairLen ] = '\0';
 
@@ -857,8 +857,8 @@ int SimpLex_GetNextToken( void )
                 {
                    s_szBuffer = szBuffer;
                    RESET_LEX();
-                   DEBUG_INFO( printf(  "Returning: <EOF>\n", iRet ) ); \
-                   return -1; \
+                   DEBUG_INFO( printf(  "Returning: <EOF>\n", iRet ) );
+                   return -1;
                 }
             }
         }
@@ -917,13 +917,13 @@ int SimpLex_CheckToken( void )
     return iRet;
 }
 
-int Reduce( int iToken )
+static int Reduce( int iToken )
 {
   BeginReduce :
 
    if( iToken < LEX_CUSTOM_ACTION )
    {
-      iToken = CUSTOM_ACTION( iToken ); \
+      iToken = CUSTOM_ACTION( iToken );
    }
 
    if( iToken > DONT_REDUCE )
@@ -984,7 +984,7 @@ int Reduce( int iToken )
 
             if( iToken < LEX_CUSTOM_ACTION )
             {
-               iToken = CUSTOM_ACTION( iToken ); \
+               iToken = CUSTOM_ACTION( iToken );
             }
 
             if( iToken > DONT_REDUCE )

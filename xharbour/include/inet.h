@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.19 2003/04/21 01:40:30 jonnymind Exp $
+* $Id: inet.h,v 1.20 2003/07/23 12:35:57 druzus Exp $
 */
 
 /*
@@ -95,7 +95,7 @@
           char *errorDesc;
           int errorCode;
           struct sockaddr_in remote;
-          ULONG count;
+          LONG count;
           int timeout;
           int timelimit;
           PHB_ITEM caPeriodic;

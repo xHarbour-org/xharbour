@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.25 2003/10/07 00:47:50 paultucker Exp $
+ * $Id: gtwin.c,v 1.26 2003/10/26 18:41:52 jonnymind Exp $
  */
 
 /*
@@ -370,11 +370,11 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osv);
-    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) 
+    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
         s_dwAltGrBits = RIGHT_ALT_PRESSED;
     }
-    else 
+    else
     {
         s_dwAltGrBits = LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED;
     }
@@ -1248,7 +1248,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     int ch = 0, extended = 0;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
-      
+
     /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
     if( s_bBreak )
     {
@@ -1291,7 +1291,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
              if ( s_wRepeated > 0 ) /* Might not be redundant */
                 s_wRepeated--;
-                
+
              if ( dwState & CAPSLOCK_ON )
              {
                 if ( dwState & SHIFT_PRESSED )
@@ -1674,6 +1674,7 @@ static int hb_Inp9x( USHORT usPort )
        __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
        usVal = _AX;
     #else
+
        usVal = _inp( usPort );
     #endif
 
@@ -1693,7 +1694,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
       __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
       usVal = _AX;
     #else
-       usVal = _outp( usPort, usVal );
+       _outp( usPort, usVal );
     #endif
 
     return usVal;
@@ -1724,12 +1725,12 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
 
       lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
 
-      if( lAdjFreq < 0 )
+      if( (LONG) lAdjFreq < 0 )
          uLSB = lAdjFreq + 65536;
       else
          uLSB = lAdjFreq % 256;
 
-      if( lAdjFreq < 0 )
+      if( (LONG) lAdjFreq < 0 )
          uMSB = lAdjFreq + 65536;
       else
          uMSB = lAdjFreq / 256;

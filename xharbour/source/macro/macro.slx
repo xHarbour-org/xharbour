@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.8 2003/09/30 20:35:07 ronpinkas Exp $
+ * $Id: macro.slx,v 1.9 2003/11/01 06:00:54 ronpinkas Exp $
  */
 
 /*
@@ -430,8 +430,10 @@ long hb_macro_SLX_Hex2L( char* sHex )
    return lSum;
 }
 
-int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )
+static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )
 {
+   HB_SYMBOL_UNUSED( sToken );
+
    switch ( x )
    {
       case HB_LIT_ACT :

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.7 2003/10/07 23:48:23 ronpinkas Exp $
+ * $Id: classes.h,v 1.8 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -89,22 +89,15 @@ typedef struct
    PSYMBOLS pModuleSymbols;
 } CLASS, * PCLASS;
 
-void     hb_clsReleaseAll( void );
-BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
+extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
+extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
 
-PCLASS   hb_clsClassesArray( void );
-USHORT   hb_clsMaxClasses( void );
+extern HB_EXPORT PCLASS hb_clsClassesArray( void );
+extern HB_EXPORT USHORT hb_clsMaxClasses( void );
 
+extern PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 
-HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject );
-HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
-HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
-HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
-HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int bOptimized );
-HB_EXPORT PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
-HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
-
-void *   hb_mthRequested( void );
+void * hb_mthRequested( void );
 
 #if defined(HB_EXTERN_C)
 }

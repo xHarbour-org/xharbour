@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.95 2003/11/02 05:28:43 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.96 2003/11/11 02:38:53 ronpinkas Exp $
  */
 
 /*
@@ -1809,7 +1809,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
            if( pClose )
            {
-              pClose = '>';
+              pClose[0] = '>';
            }
         }
      }

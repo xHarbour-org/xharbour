@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.22 2003/10/19 00:17:36 jonnymind Exp $
+ * $Id: errorapi.c,v 1.23 2003/11/04 08:31:04 druzus Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName );
 /* NOTE: This is called via its symbol name, so we should make sure
          that it gets linked. WARNING ! DON'T make this function static.
          [vszakats] */
-void hb_errForceLink()
+void hb_errForceLink( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errForceLink()"));
 
@@ -533,7 +533,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
             hb_set.HB_SET_OUTPUTSAFETY = FALSE;
-            
+
             /* no more unstoppable thread */
             HB_VM_STACK.uiIdleInspecting--;
             hb_runningStacks.aux = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.14 2003/10/02 22:39:52 mlombardo Exp $
+ * $Id: runner.c,v 1.15 2003/10/03 00:00:48 paultucker Exp $
  */
 
 /*
@@ -361,7 +361,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
    /* Open as binary */
 
-   while ( ( file = hb_hrbFileOpen( szFileName ) ) == NULL )
+   while ( ( file = hb_hrbFileOpen( szFileName ) ) == 0 )
    {
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
       if( uiAction == E_DEFAULT || uiAction == E_BREAK )

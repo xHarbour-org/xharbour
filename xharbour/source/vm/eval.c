@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.9 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: eval.c,v 1.10 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 #include "hbapierr.h"
 #include "hbfast.h"
 #include "hbvm.h"
+#include "classes.h"
 
 BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.90 2003/11/08 00:14:23 jonnymind Exp $
+ * $Id: hbapi.h,v 1.91 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -418,32 +418,33 @@ extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL
 
 extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 
+
 /* class management */
-extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
-extern BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a class handle inherited from szParentName Class ? */
-extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
+extern HB_EXPORT BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a class handle inherited from szParentName Class ? */
+extern HB_EXPORT BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 
 /* object management */
-HB_EXPORT extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
-HB_EXPORT extern char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
-HB_EXPORT extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-HB_EXPORT extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
-HB_EXPORT extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
-HB_EXPORT extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
-HB_EXPORT extern PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDestNullable ); /* Returns a property */
-HB_EXPORT extern void     hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue ); /* Set a property to a certain value */
+extern HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
+extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
+extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
+extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
+extern HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
+extern HB_EXPORT void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+extern HB_EXPORT PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDestNullable ); /* Returns a property */
+extern HB_EXPORT void     hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue ); /* Set a property to a certain value */
+extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
 
 /* dynamic symbol table management */
-extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
-extern PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
-extern PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
-extern PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
-extern PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
-extern void     HB_EXPORT hb_dynsymLog( void );             /* displays all dynamic symbols */
-extern void     HB_EXPORT hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
-extern USHORT   HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
-extern PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
-extern PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+extern HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
+extern HB_EXPORT PHB_DYNS hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
+extern HB_EXPORT PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
+extern HB_EXPORT PHB_DYNS hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
+extern HB_EXPORT PHB_DYNS hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
+extern HB_EXPORT void     hb_dynsymLog( void );             /* displays all dynamic symbols */
+extern HB_EXPORT void     hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
+extern HB_EXPORT USHORT   hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern HB_EXPORT PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
+extern HB_EXPORT PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
 
 /* Command line and environment argument management */
 extern void HB_EXPORT hb_cmdargInit( int argc, char * argv[] ); /* initialize command line argument API's */

@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.2 2003/11/09 23:38:11 jonnymind Exp $
+ * $Id: hash.c,v 1.3 2003/11/10 01:48:29 jonnymind Exp $
  */
 
 /*
@@ -293,9 +293,10 @@ BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_hashScan(%p, %p, %p)", pHash, pKey, ulIndex));
 
    ulHigher = pHash->item.asHash.value->ulLen;
+
    if ( ulHigher == 0 )
    {
-      ulIndex = 0;
+      *ulIndex = 0;
       return FALSE;
    }
    ulHigher --;
@@ -1143,7 +1144,7 @@ HB_FUNC( HGETPAIRAT )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pKey, pValue;
-   PHB_ITEM pArrRet = NULL;
+   PHB_ITEM pArrRet;
 
    PHB_BASEHASH pBaseHash;
    ULONG ulPos;
@@ -1412,7 +1413,7 @@ HB_FUNC( HCOPY )
       ulEnd = ulLen;
    }
 
-   if ( ulEnd - ulStart  >= 0 )
+   if ( (long) ( ulEnd - ulStart )  >= 0 )
    {
       hb_hashMerge( pDest, pSource, ulStart, ulEnd, pBlock );
    }

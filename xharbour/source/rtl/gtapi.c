@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.12 2003/11/07 18:20:53 jonnymind Exp $
+ * $Id: gtapi.c,v 1.13 2003/11/07 21:52:38 jonnymind Exp $
  */
 
 /*
@@ -237,10 +237,10 @@ USHORT HB_EXPORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
       if( Left != Right )
          Ret = hb_gt_BoxD( Top, Left, Bottom, Right, ( BYTE * ) _B_DOUBLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       else
-         Ret = hb_gt_VertLine( Left, Top, Bottom, HB_B_DOUBLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_VertLine( Left, Top, Bottom, (unsigned char) HB_B_DOUBLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
    }
    else
-      Ret = hb_gt_HorizLine( Top, Left, Right, HB_B_DOUBLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      Ret = hb_gt_HorizLine( Top, Left, Right, (unsigned char) HB_B_DOUBLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 
@@ -256,10 +256,10 @@ USHORT HB_EXPORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
       if( Left != Right )
          Ret = hb_gt_BoxS( Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       else
-         Ret = hb_gt_VertLine( Left, Top, Bottom, HB_B_SINGLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_VertLine( Left, Top, Bottom, (unsigned char) HB_B_SINGLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
    }
    else
-      Ret = hb_gt_HorizLine( Top, Left, Right, HB_B_SINGLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      Ret = hb_gt_HorizLine( Top, Left, Right, (unsigned char) HB_B_SINGLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 
@@ -1120,7 +1120,7 @@ USHORT HB_EXPORT hb_gtSuspend( void )
     * to prepare screen for outside output
     */
    if( !hb_gt_Suspend() )
-      return -1;
+      return (USHORT) -1;
 
    return 0;
 }
@@ -1136,7 +1136,7 @@ USHORT HB_EXPORT hb_gtResume( void )
          hb_gt_DispBegin();
    }
    else
-      return -1;
+      return (USHORT) -1;
 
    return  0;
 }

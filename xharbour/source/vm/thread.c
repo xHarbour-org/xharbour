@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.113 2003/10/19 00:57:54 jonnymind Exp $
+* $Id: thread.c,v 1.114 2003/11/09 23:16:40 jonnymind Exp $
 */
 
 /*
@@ -69,6 +69,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbstack.h"
+#include "classes.h"
 
 #ifdef HB_OS_WIN_32
    #include <windows.h>
@@ -1074,7 +1075,7 @@ HB_FUNC( STOPTHREAD )
          HB_CRITICAL_LOCK( hb_cancelMutex );
          stack->bCanceled = TRUE;
          HB_CRITICAL_UNLOCK( hb_cancelMutex );
-   
+
          HB_TEST_CANCEL_ENABLE_ASYN;
          WaitForSingleObject( stack->th_h, INFINITE );
          HB_DISABLE_ASYN_CANC;
@@ -1120,7 +1121,7 @@ HB_FUNC( KILLTHREAD )
       /* Shell locking the thread */
       HB_STACK_UNLOCK;
       stack = hb_threadGetStackNoError( th );
-      if ( stack != NULL ) 
+      if ( stack != NULL )
       {
          HB_CRITICAL_LOCK( hb_cancelMutex );
          if ( ! stack->bCanCancel )
@@ -1881,7 +1882,7 @@ BOOL hb_threadCondInit( HB_WINCOND_T *cond )
    cond->nWaitersGone = 0;
    cond->nWaitersBlocked = 0;
    cond->nWaitersToUnblock = 0;
-      
+
    InitializeCriticalSection( &(cond->mtxUnblockLock) );
    cond->semBlockLock = NULL;
    cond->semBlockQueue = NULL;
@@ -1913,17 +1914,17 @@ void hb_threadCondDestroy( HB_WINCOND_T *cond )
 }
 
 
-void hb_threadCondSignal( HB_WINCOND_T *cond ) 
+void hb_threadCondSignal( HB_WINCOND_T *cond )
 {
-   register int result;         
+   register int result;
    register int nSignalsToIssue;
-   
+
    EnterCriticalSection( &(cond->mtxUnblockLock) );
-   
-   if ( cond->nWaitersToUnblock ) {        
+
+   if ( cond->nWaitersToUnblock ) {
       if ( ! cond->nWaitersBlocked ) {        // NO-OP
          LeaveCriticalSection( &cond->mtxUnblockLock );
-         return;  
+         return;
       }
       cond->nWaitersToUnblock += nSignalsToIssue=cond->nWaitersBlocked;
       cond->nWaitersBlocked = 0;
@@ -1954,13 +1955,13 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
    register int nSignalsWasLeft;
    register int nWaitersWasGone;
    register int bTimeout;
-   
+
    WaitForSingleObject( cond->semBlockLock, INFINITE );
    cond->nWaitersBlocked++;
    ReleaseSemaphore( cond->semBlockLock, 1, NULL );
 
    HB_MUTEX_UNLOCK( mutex );
-   
+
    HB_TEST_CANCEL_ENABLE_ASYN
    if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) != WAIT_OBJECT_0 )
    {
@@ -1972,10 +1973,10 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
    }
    HB_DISABLE_ASYN_CANC
 
-   EnterCriticalSection( &cond->mtxUnblockLock ); 
-    
-   if ( (nSignalsWasLeft = cond->nWaitersToUnblock) != 0) 
-   {   
+   EnterCriticalSection( &cond->mtxUnblockLock );
+
+   if ( (nSignalsWasLeft = cond->nWaitersToUnblock) != 0)
+   {
       if ( bTimeout ) {                       // timeout (or canceled)
          if ( cond->nWaitersBlocked != 0) {
             cond->nWaitersBlocked--;
@@ -1984,34 +1985,34 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
             cond->nWaitersGone++;
          }
       }
-      
-      if ( --cond->nWaitersToUnblock == 0) 
+
+      if ( --cond->nWaitersToUnblock == 0)
       {
-         if ( cond->nWaitersBlocked != 0) 
+         if ( cond->nWaitersBlocked != 0)
          {
             ReleaseSemaphore( cond->semBlockLock, 1, NULL );
-            nSignalsWasLeft = 0;                
+            nSignalsWasLeft = 0;
          }
-         else if ( (nWaitersWasGone = cond->nWaitersGone) != 0) 
+         else if ( (nWaitersWasGone = cond->nWaitersGone) != 0)
          {
             cond->nWaitersGone = 0;
          }
       }
    }
-   else if ( ++cond->nWaitersGone == 2000000000L ) 
-   { 
+   else if ( ++cond->nWaitersGone == 2000000000L )
+   {
       WaitForSingleObject( cond->semBlockLock, INFINITE );
-      cond->nWaitersBlocked -= cond->nWaitersGone;     
+      cond->nWaitersBlocked -= cond->nWaitersGone;
       ReleaseSemaphore( cond->semBlockLock, 1, NULL );
       cond->nWaitersGone = 0;
    }
    LeaveCriticalSection( &(cond->mtxUnblockLock) );
 
-   if ( nSignalsWasLeft == 1 ) 
+   if ( nSignalsWasLeft == 1 )
    {
-      if ( nWaitersWasGone != 0) 
+      if ( nWaitersWasGone != 0)
       {
-         while ( nWaitersWasGone-- ) 
+         while ( nWaitersWasGone-- )
          {
             WaitForSingleObject( cond->semBlockQueue, INFINITE );
          }

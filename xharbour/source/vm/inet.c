@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.32 2003/07/15 09:15:34 andijahja Exp $
+* $Id: inet.c,v 1.33 2003/09/03 23:50:09 mlombardo Exp $
 */
 
 /*
@@ -1429,16 +1429,19 @@ HB_FUNC( INETSEND )
    HB_TEST_CANCEL_ENABLE_ASYN;
 
    Socket->count = 0;
+
    if( hb_selectWriteSocket( Socket ) )
    {
       Socket->count = send( Socket->com, Buffer, iLen, MSG_NOSIGNAL );
    }
+
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
    hb_retni( Socket->count );
 
-   if( Socket->count == 0 ) {
+   if( Socket->count == 0 )
+   {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
    }
 

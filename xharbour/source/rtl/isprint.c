@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.21 2003/09/23 03:51:39 lculik Exp $
+ * $Id: isprint.c,v 1.22 2003/10/08 06:54:39 peterrees Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
    static DWORD IsPrinterError(HANDLE hPrinter);
 
    static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs);
-   static DWORD hb_printerIsReadyn( char * pszPrinterName );
+          DWORD hb_printerIsReadyn( char * pszPrinterName );
    static DWORD IsPrinterErrorn(HANDLE hPrinter);
    extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 #endif
@@ -307,16 +307,19 @@ static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs) {
   return Result;
 }
 
-DWORD hb_printerIsReadyn( char * pszPrinterName ) {
+DWORD hb_printerIsReadyn( char * pszPrinterName )
+{
   DWORD dwPrinter= -1;
   HANDLE hPrinter;
+
   if (*pszPrinterName && OpenPrinter( pszPrinterName, &hPrinter, NULL ))
     dwPrinter =  IsPrinterErrorn( hPrinter );
     CloseHandle(hPrinter) ;
   return dwPrinter;
 }
 
-HB_FUNC( XISPRINTER ) {
+HB_FUNC( XISPRINTER )
+{
   char DefaultPrinter[MAXBUFFERSIZE];
   DWORD pdwBufferSize = MAXBUFFERSIZE;
   hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.30 2003/11/01 06:00:55 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.31 2003/11/01 06:34:43 ronpinkas Exp $
  */
 
 /*
@@ -1251,7 +1251,7 @@ RETURN uObj
           //printf( "Default %i!\n", RetVal.n1.n2.vt );
           if( s_nOleError == S_OK )
           {
-             (LONG) s_nOleError = -1;
+             s_nOleError = E_UNEXPECTED;
           }
 
           hb_ret();

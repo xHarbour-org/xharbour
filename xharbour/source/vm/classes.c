@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.81 2003/11/08 00:14:22 jonnymind Exp $
+ * $Id: classes.c,v 1.82 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -187,7 +187,9 @@ static BOOL     s_bClsAutoInit = TRUE;
 
 static PHB_ITEM hb_clsInst( USHORT uiClass );
 static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend );
-BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
+
+BOOL            hb_clsIsParent( USHORT uiClass, char * szParentName );
+
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
 
@@ -794,7 +796,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
    return TRUE;
 }
 
-BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
+HB_EXPORT BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
 {
    USHORT uiAt, uiLimit;
 
@@ -1149,7 +1151,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    return NULL;
 }
 
-BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+HB_EXPORT BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
 
@@ -2906,7 +2908,6 @@ static HARBOUR hb___msgClsFullSel( void )
    USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
    PHB_ITEM pReturn = hb_itemNew( NULL );
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
-   BOOL bSuper = ( ISLOG( 3 ) ? hb_parl( 3 ) : TRUE );
 
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {

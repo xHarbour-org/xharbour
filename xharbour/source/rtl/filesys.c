@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.52 2003/09/16 15:51:13 ronpinkas Exp $
+ * $Id: filesys.c,v 1.53 2003/09/17 07:00:39 jonnymind Exp $
  */
 
 /*
@@ -528,8 +528,6 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
-   HB_THREAD_STUB
-
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -614,14 +612,20 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
                execve("/bin/sh", argv, environ);
                exit(1);
             }
-         } else {
+         }
+         else
+         {
             close( hPipeHandle[0] );
             close( hPipeHandle[1] );
          }
       }
+
       hb_fsSetError( errno );
+
       if( pbyTmp )
+      {
          hb_xfree( pbyTmp );
+      }
    }
 
    HB_STACK_LOCK;
@@ -631,7 +635,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pMode );
 
-   hb_fsSetError( FS_ERROR );
+   hb_fsSetError( (unsigned short) FS_ERROR );
 
 #endif
 
@@ -2947,8 +2951,8 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
       else
       {
          _chdrive( uiSave );
-         uiResult = FS_ERROR;
-         hb_fsSetError( FS_ERROR );
+         uiResult = (unsigned short) FS_ERROR;
+         hb_fsSetError( (unsigned short) FS_ERROR );
       }
       HB_DISABLE_ASYN_CANC
 
@@ -3020,8 +3024,8 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
       }
       else
       {
-         uiResult = FS_ERROR;
-         hb_fsSetError( FS_ERROR );
+         uiResult = (unsigned short) FS_ERROR;
+         hb_fsSetError( (unsigned short) FS_ERROR );
       }
 
       _chdrive( uiSave );
@@ -3124,7 +3128,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
 
-   hb_fsSetError( FS_ERROR );
+   hb_fsSetError( (unsigned short) FS_ERROR );
 
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pDefExt );

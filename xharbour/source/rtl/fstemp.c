@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.4 2003/03/07 13:32:15 jonnymind Exp $
+ * $Id: fstemp.c,v 1.5 2003/03/08 13:37:59 likewolf Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       }
    }
 
-   hb_fsSetError( FS_ERROR );
+   hb_fsSetError( (unsigned short) FS_ERROR );
    return FS_ERROR;
 }
 #else
@@ -120,7 +120,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
    FHANDLE fd;
 
    pszName[0] = '\0';
-   
+
    if ( pszDir != NULL && pszDir[0] != '\0' )
    {
       int len;
@@ -129,22 +129,22 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
       pszName[ len + 1 ] = '\0';
    }
-   
+
    if ( pszPrefix != NULL )
    {
       strcat(pszName, pszPrefix );
    }
-   
+
    strcat(pszName, "XXXXXX" );
-   
-   while( --nAttemptLeft ) 
+
+   while( --nAttemptLeft )
    {
       if( (fd = (FHANDLE) mkstemp( pszName ) ) != -1 )
       {
          return fd;
       }
    }
- 
+
    hb_fsSetError( FS_ERROR );
    return FS_ERROR;
 }

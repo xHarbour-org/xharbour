@@ -1,14 +1,14 @@
 /*
- * $Id: cdplt.c,v 1.1 2003/09/12 19:32:06 snaiperis $
+ * $Id: cdpltwin.c,v 1.1 2003/11/06 23:42:47 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( LT ) 
+ * National Collation Support Module ( LT )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Lithuanian collation sequence 
+ * Lithuanian collation sequence
  * 2003, by Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -65,13 +65,13 @@
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all 
-                                       characters being compared are the same 
+                                       only if the unaccented versions of all
+                                       characters being compared are the same
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -94,7 +94,7 @@ HB_CODEPAGE_ANNOUNCE( LT );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_LT )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_LT )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_LT
 #endif
 
