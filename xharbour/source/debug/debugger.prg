@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.50 2004/08/19 08:55:26 likewolf Exp $
+ * $Id: debugger.prg,v 1.51 2004/08/19 13:11:27 likewolf Exp $
  */
 
 /*
@@ -263,9 +263,9 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
           return
         endif
 
-   IF s_lExit
-     RETURN
-   ENDIF
+        IF s_lExit
+          RETURN
+        ENDIF
 
         if s_oDebugger:lCodeblock
           s_oDebugger:lCodeblock := .F.
@@ -333,6 +333,7 @@ CLASS TDebugger
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
+   DATA   nAppTypeAhead
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -2123,6 +2124,7 @@ return nil
 
 
 METHOD RestoreAppState() CLASS TDebugger
+  Set( _SET_TYPEAHEAD, ::nAppTypeAhead )
   SetLastKey( ::nAppLastKey )
   SetInkeyAfterBlock( ::bAppInkeyAfter )
   SetInkeyBeforeBlock( ::bAppInkeyBefore )
@@ -2162,6 +2164,7 @@ return nil
 
 
 METHOD SaveAppState() CLASS TDebugger
+  ::nAppTypeAhead := Set( _SET_TYPEAHEAD, 16 )
   ::nAppLastKey := LastKey()
   ::bAppInkeyAfter := SetInkeyAfterBlock( NIL )
   ::bAppInkeyBefore := SetInkeyBeforeBlock( NIL )
