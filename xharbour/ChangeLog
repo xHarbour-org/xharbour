@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2072 2004/01/16 00:36:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2073 2004/01/16 12:27:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-01-16 14:15 UTC+0100 Ignacio Ortiz <iozuniga@ozs.com>
+* xharbour/source/common/hbver.c
+   + Added define VER_SUITE_PERSONAL
+   + Added define VER_SUITE_BLADE
+   + Added support for detecting Windows Server 2003.
+   + Added workstation type for Windows NT 4.0, Windows 2000 Professional, and Windows XP Home Edition or Professional.
+   + Added server type for Windows Server 2003, Windows 2000 and Windows NT 4.0.
+* xharbour/source/pp/ppcore.c
+   + Added define VER_SUITE_PERSONAL
+   + Added define VER_SUITE_BLADE
+   + Added support for detecting Windows Server 2003.
+   + Added workstation type for Windows NT 4.0, Windows 2000 Professional, and Windows XP Home Edition or Professional.
+   + Added server type for Windows Server 2003, Windows 2000 and Windows NT 4.0.
+   (Credits to Pedro Gil)
+ 
 2004-01-16 09:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/rtl/file.c
     ! hb_fsFile fix changed to use hb_Filetrim

@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.6 2003/06/27 05:05:35 ronpinkas Exp $
+ * $Id: hbver.c,v 1.7 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -86,6 +86,12 @@
    #endif
    #ifndef VER_PLATFORM_WIN32_CE
       #define VER_PLATFORM_WIN32_CE 3
+   #endif
+   #ifndef VER_SUITE_PERSONAL
+      #define VER_SUITE_PERSONAL 0x200
+   #endif
+   #ifndef VER_SUITE_BLADE
+      #define VER_SUITE_BLADE 0x400
    #endif
 
 #elif defined(HB_OS_UNIX)
@@ -221,12 +227,72 @@ char * hb_verPlatform( void )
 
             case VER_PLATFORM_WIN32_NT:
 
-               if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
+               if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
+                  pszName = "Windows Server 2003";
+               else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
                   pszName = "Windows XP";
                else if( osVer.dwMajorVersion == 5 )
                   pszName = "Windows 2000";
                else
                   pszName = "Windows NT";
+
+               /* test for specific product on Windows NT 4.0 SP6 and later */
+
+               {
+                  OSVERSIONINFOEX osVerEx;
+
+                  osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
+
+                  if( GetVersionEx( &osVerEx ) )
+                  {
+                     /* workstation type */
+
+                     if( osVerEx.wProductType == VER_NT_WORKSTATION )
+                     {
+                        if( osVerEx.dwMajorVersion == 4 )
+                           strcat( pszName, " Workstation 4.0" );
+                        else if( osVerEx.wSuiteMask & VER_SUITE_PERSONAL )
+                           strcat( pszName, " Home Edition" );
+                        else
+                           strcat( pszName, " Professional" );
+                     }
+
+                     /* server type */
+
+                     else if( osVerEx.wProductType == VER_NT_SERVER )
+                     {
+                        if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 2 )
+                        {
+                           if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
+                              strcat( pszName, " Datacenter Edition" );
+                           else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
+                              strcat( pszName, " Enterprise Edition" );
+                           else if( osVerEx.wSuiteMask == VER_SUITE_BLADE )
+                              strcat( pszName, " Web Edition" );
+                           else
+                              strcat( pszName, " Standard Edition" );
+                        }
+
+                        else if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 0 )
+                        {
+                           if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
+                              strcat( pszName, " Datacenter Server" );
+                           else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
+                              strcat( pszName, " Advanced Server" );
+                           else
+                              strcat( pszName, " Server" );
+                        }
+
+                        else
+                        {
+                           if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
+                              strcat( pszName, " Server 4.0, Enterprise Edition" );
+                           else
+                              strcat( pszName, " Server 4.0" );
+                        }
+                     }
+                  }
+               }
 
                break;
 
