@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3927 2005/03/09 23:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3927 2005/03/09 21:07:30 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-09 13:18 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/hberrors.h
+    + Added:
+      #define HB_PP_ERR_EMPTY_OPTIONAL                27
+      #define HB_PP_ERR_EMPTY_REPEATABLE              28
+  * source/pp/ppcore.c
+    + Added detection of empty optional clause and empty repeatable group,
+      and generation of respective compile error.
 
 2005-03-09 23:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/blank.prg

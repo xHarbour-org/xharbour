@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.197 2005/03/08 22:35:14 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.198 2005/03/09 00:51:32 ronpinkas Exp $
  */
 
 /*
@@ -250,7 +250,9 @@ char * hb_pp_szErrors[] =
    "Unknown result marker <%s> in #directive",
    "Too many instanced of marker or group",
    "Too many nested optional groups",
-   "Parse error in constant expression '%s'"
+   "Parse error in constant expression '%s'",
+   "Empty optional match clause in #directive.",
+   "Empty repeatable result group in #directive."
 };
 
 /* Table with warnings */
@@ -2223,6 +2225,28 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNCLOSED_OPTIONAL, pOpen + 1, NULL );
   }
 
+  i = 0;
+  while( mpatt[i] != '\0' )
+  {
+     if( mpatt[i] == '\16' )
+     {
+        while( mpatt[++i] != '\17' )
+        {
+           if( ! isspace( mpatt[i] ) )
+           {
+              break;
+           }
+        }
+
+        if( mpatt[i] == '\17' )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_EMPTY_OPTIONAL, NULL, NULL );
+        }
+     }
+
+     i++;
+  }
+
   uiOpenBrackets = 0;
   i = 0;
 
@@ -2332,6 +2356,28 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   if( uiOpenBrackets )
   {
      hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNCLOSED_REPEATABLE, pOpen + 1, NULL );
+  }
+
+  i = 0;
+  while( rpatt[i] != '\0' )
+  {
+     if( rpatt[i] == '\16' )
+     {
+        while( rpatt[++i] != '\17' )
+        {
+           if( ! isspace( rpatt[i] ) )
+           {
+              break;
+           }
+        }
+
+        if( rpatt[i] == '\17' )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_EMPTY_REPEATABLE, NULL, NULL );
+        }
+     }
+
+     i++;
   }
 
   #ifdef DEBUG_PATTERNS
