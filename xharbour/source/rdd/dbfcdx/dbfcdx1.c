@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.109 2004/03/07 14:22:11 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.110 2004/03/15 12:45:25 druzus Exp $
  */
 
 /*
@@ -4744,7 +4744,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
             {
                if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                   break;
-               if( regexec( pReg, pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+               if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
                {
                   //fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( pTag->CurKey->val );
                   fFound = TRUE;
@@ -4773,9 +4773,9 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          {
             if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                break;
-            if( regexec( pReg, pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+            if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
             {
-               fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( pTag->CurKey->val );
+               fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( (const char *) pTag->CurKey->val );
                //fFound = TRUE;
                if ( fFound )
                   break;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2573 2004/03/15 12:45:23 druzus Exp $
+ * $Id: ChangeLog,v 1.2574 2004/03/15 16:58:23 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-15 14:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * Missing type casts.
+
 2004-03-15 22:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
     * More optimizations, formatting and few bug fixes.
@@ -15,7 +19,7 @@
 
   * xharbour/source/rtl/gtwvt/gtwvt.c
     * Replaced GetDC( hWnd )/ReleaseDC( hDC ) with _s.hdc where applicable, has decresed the
-      screen refresh time with some percent. 
+      screen refresh time with some percent.
 
 2004-03-15 13:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfntx/dbfntx1.c
@@ -79,7 +83,7 @@
            endif
            dborderinfo(DBOI_SKIPREGEX,,,cRegex)
         enddo
-        
+
         for more test and time comparision please try:
         xharbour/tests/skipeval.prg
 
@@ -105,7 +109,7 @@
     * A small bug fix introduced at previous commit where ::aColorSpec was not set in ::configure().
 
   * xharbour/tests/wvtgui.prg
-    * Synchronized with recent changes in gtwvt. 
+    * Synchronized with recent changes in gtwvt.
 
 2004-03-14 22:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
@@ -113,7 +117,7 @@
 
 2004-03-14 19:25 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
-    * Root level changes to optimize, few new methods introduced. 
+    * Root level changes to optimize, few new methods introduced.
       Now TBrowse is 25-33% faster than Clipper with GTWVT. I could not test it
       with other GTs, so please inform what performance gain is achieved.
       Still there is lot more room to optimize it and I am sure in days to come
@@ -125,20 +129,20 @@
 
 2004-03-13 18:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
-    * Introduced a new variable ::aColorSpec which parses and holds the oBrw:colorSpec 
+    * Introduced a new variable ::aColorSpec which parses and holds the oBrw:colorSpec
       which is parsed at the time of assignment of oBrw:ColorSpec := cColorString
-      and is used in ::DispCell() method instead of calling hb_colorIndex() with 
+      and is used in ::DispCell() method instead of calling hb_colorIndex() with
       each cell display. Now Tbrowse is almost as fast as Clipper, measured with gtwvt.
 
       Also, array browsers were showing a weired behaviour where the length of cells
       were based on first record encountered, well asked in NG, has been fixed.
 
       /* Here is a request, please post your amendments either to Walter or to me
-         as far as tbrowse is concerned. I have done this amendment 2nd time as someone 
+         as far as tbrowse is concerned. I have done this amendment 2nd time as someone
          broke it earlier also. I have kept the old code as well which will be removed
          a few days hence.
       */
- 
+
 2004-03-12 22:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbexprb.c
    * source/compiler/harbour.sly
