@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.351 2004/03/07 21:42:52 andijahja Exp $
+ * $Id: hvm.c,v 1.352 2004/03/08 11:13:19 andijahja Exp $
  */
 
 /*
@@ -1413,7 +1413,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      if( pFunc == hb___msgGetData )
                      {
-                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) pSelf->item.asArray.value->ulLen ) /* Resize needed ? */
                         {
                            hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
                         }
@@ -1462,7 +1462,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      if( pFunc == hb___msgSetData )
                      {
-                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) pSelf->item.asArray.value->ulLen ) /* Resize needed ? */
                         {
                            hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
                         }
@@ -1568,7 +1568,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                if( pFunc == hb___msgGetData )
                {
-                  if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                  if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) pSelf->item.asArray.value->ulLen ) /* Resize needed ? */
                   {
                      hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
                   }
@@ -3483,6 +3483,7 @@ static void hb_vmMinus( void )
          hb_xmemcpy( pNewString, pItem1->item.asString.value, pItem1->item.asString.length );
 
          hb_itemReleaseString( pItem1 );
+
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
 
          pItem1->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
@@ -6160,8 +6161,8 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
    }
    else
    {
-      pSym->pDynSym = ( PHB_DYNS ) hb_arrayLen( &s_aStatics );
-      hb_arraySize( &s_aStatics, hb_arrayLen( &s_aStatics ) + uiStatics );
+      pSym->pDynSym = ( PHB_DYNS ) (&s_aStatics)->item.asArray.value->ulLen;
+      hb_arraySize( &s_aStatics, (&s_aStatics)->item.asArray.value->ulLen + uiStatics );
       //TraceLog( NULL, "Symbol: %s Statics: %i Size: %i\n", pSym->szName, uiStatics, hb_arrayLen( &s_aStatics ) );
    }
 

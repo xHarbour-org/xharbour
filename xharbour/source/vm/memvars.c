@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.64 2004/03/05 06:28:15 andijahja Exp $
+ * $Id: memvars.c,v 1.65 2004/03/07 00:01:19 andijahja Exp $
  */
 
 /*
@@ -1485,7 +1485,7 @@ HB_FUNC( __MVPUBLIC )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
                HB_ITEM VarItem;
 
                ( &VarItem )->type = HB_IT_NIL;
@@ -1530,7 +1530,7 @@ HB_FUNC( __MVPRIVATE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
                HB_ITEM VarItem;
 
                ( &VarItem )->type = HB_IT_NIL;
@@ -1575,7 +1575,7 @@ HB_FUNC( __MVXRELEASE )
             {
                /* we are accepting an one-dimensional array of strings only
                 */
-               ULONG j, ulLen = hb_arrayLen( pMemvar );
+               ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
                HB_ITEM VarItem;
 
                ( &VarItem )->type = HB_IT_NIL;

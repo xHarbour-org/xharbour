@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.39 2004/03/05 13:26:04 andijahja Exp $
+ * $Id: extend.c,v 1.40 2004/03/07 00:01:19 andijahja Exp $
  */
 
 /*
@@ -669,7 +669,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
    if( pArray )
    {
       if( uiArrayIndex == 0 )
-         return hb_arrayLen( pArray );
+         return pArray->item.asArray.value->ulLen;
       else
          return ( LONG ) hb_arrayGetType( pArray, uiArrayIndex );
    }

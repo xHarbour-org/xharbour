@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.105 2004/03/05 08:59:29 andijahja Exp $
+ * $Id: classes.c,v 1.106 2004/03/07 00:01:19 andijahja Exp $
  */
 
 /*
@@ -1500,7 +1500,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_B
 
             pNewMeth->uiScope = uiScope;
 
-            if( ( USHORT ) hb_arrayLen( pClass->pClassDatas ) < pNewMeth->uiData )
+            if( ( USHORT ) pClass->pClassDatas->item.asArray.value->ulLen < pNewMeth->uiData )
             {
                hb_arraySize( pClass->pClassDatas, pNewMeth->uiData );
             }
@@ -1552,7 +1552,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_B
             break;
 
          case HB_OO_MSG_INLINE:
-            pNewMeth->uiData = ( USHORT ) ( hb_arrayLen( pClass->pInlines ) + 1 );
+            pNewMeth->uiData = ( USHORT ) pClass->pInlines->item.asArray.value->ulLen + 1 ;
             pNewMeth->uiScope = uiScope;
             hb_arraySize( pClass->pInlines, pNewMeth->uiData );
             hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) lID_or_FuncPointer_or_BlockPointer );
@@ -1708,8 +1708,8 @@ HB_FUNC( __CLSNEW )
                            cases it is enough. This eliminate random GPFs
                            in this function for big classes */
 
-   PHB_ITEM pahSuper;
-   USHORT i, uiSuper;
+   PHB_ITEM pahSuper = hb_param( 4, HB_IT_ARRAY );
+   USHORT i, uiSuper = 0;
    /*USHORT nLenShrDatas = 0;*/
    USHORT nLenClsDatas = 0;
    USHORT nLenInlines = 0;
@@ -1720,8 +1720,10 @@ HB_FUNC( __CLSNEW )
 
    HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
 
-   pahSuper = hb_param( 4, HB_IT_ARRAY );      /* Replace the initial uiSuper   */
-   uiSuper  = ( USHORT ) hb_itemSize( pahSuper ); /* Number of Super class present */
+   if ( pahSuper )
+   {
+      uiSuper = ( USHORT ) pahSuper->item.asArray.value->ulLen; /* Number of Super class present */
+   }
 
    if( s_pClasses )
    {
@@ -1789,13 +1791,13 @@ HB_FUNC( __CLSNEW )
          else
          {
             /* Ok add now the previous len to the offset */
-            nLenClsDatas  = ( USHORT ) hb_itemSize( pNewCls->pClassDatas );
-            nLenInlines   = ( USHORT ) hb_itemSize( pNewCls->pInlines );
+            nLenClsDatas  = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
+            nLenInlines   = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
             nLenDatas     = ( USHORT ) pNewCls->uiDatas;
 
             /* ClassDatas */
             pClsAnyTmp = hb_arrayClone( pSprCls->pClassDatas, NULL );
-            nLen = ( USHORT ) hb_itemSize( pClsAnyTmp );
+            nLen = ( USHORT ) pClsAnyTmp->item.asArray.value->ulLen;
             for( ui = 1; ui <= nLen; ui++ )
             {
                 HB_ITEM Tmp;
@@ -1811,7 +1813,7 @@ HB_FUNC( __CLSNEW )
 
             /* Inlines */
             pClsAnyTmp = hb_arrayClone( pSprCls->pInlines, NULL );
-            nLen = ( USHORT ) hb_itemSize( pClsAnyTmp );
+            nLen = ( USHORT ) pClsAnyTmp->item.asArray.value->ulLen;
 
             for( ui = 1; ui <= nLen; ui++ )
             {
@@ -2677,7 +2679,7 @@ HB_FUNC( __CLS_CNTCLSDATA )
    if( uiClass )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
-      hb_retni( hb_arrayLen( pClass->pClassDatas ) );
+      hb_retni( pClass->pClassDatas->item.asArray.value->ulLen );
    }
    else hb_retni( 0 );
 }
@@ -3306,7 +3308,7 @@ HARBOUR hb___msgGetData( void )
    USHORT uiIndex = (HB_VM_STACK.pMethod)->uiData;
 
    /* will arise only if the class has been modified after first instance */
-   if( uiIndex > ( USHORT ) hb_arrayLen( pObject ) ) /* Resize needed */
+   if( uiIndex > ( USHORT ) pObject->item.asArray.value->ulLen ) /* Resize needed */
    {
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
    }
@@ -3332,7 +3334,7 @@ HARBOUR hb___msgSetData( void )
    USHORT uiIndex = (HB_VM_STACK.pMethod)->uiData;
 
    /* will arise only if the class has been modified after first instance */
-   if( uiIndex > ( USHORT ) hb_arrayLen( pObject ) ) /* Resize needed ? */
+   if( uiIndex > ( USHORT ) pObject->item.asArray.value->ulLen ) /* Resize needed ? */
    {
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
    }
