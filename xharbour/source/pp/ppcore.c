@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.63 2003/04/21 08:09:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.64 2003/04/22 22:34:32 ronpinkas Exp $
  */
 
 /*
@@ -4767,6 +4767,8 @@ static int strotrim( char * stroka, BOOL bRule )
 
   char cLastChar = '\0';
 
+  char *sFirstToken = stroka;
+
   HB_TRACE(HB_TR_DEBUG, ("strotrim(%s)", stroka));
 
   #if 0
@@ -4784,6 +4786,7 @@ static int strotrim( char * stroka, BOOL bRule )
            if( ! bRule )
            {
               *stroka = '\0';
+
               if( strchr( pString, '"' ) == NULL )
               {
                  *pString = '"';
@@ -4793,6 +4796,7 @@ static int strotrim( char * stroka, BOOL bRule )
               {
                  *stroka = '\'';
               }
+
               curc = *stroka;
            }
         }
@@ -4813,6 +4817,7 @@ static int strotrim( char * stroka, BOOL bRule )
            if( ! bRule )
            {
               *stroka = '\0';
+
               if( strchr( pString, '"' ) == NULL )
               {
                  *pString = '"';
@@ -4827,6 +4832,7 @@ static int strotrim( char * stroka, BOOL bRule )
               {
                  *stroka = ']';
               }
+
               curc = *stroka;
            }
         }
@@ -4845,10 +4851,38 @@ static int strotrim( char * stroka, BOOL bRule )
         }
         /* Ron Pinkas added 2000-11-05 */
         /* Ron Pinkas 2001-02-14 added bRule logic */
-        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )
+        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL ) )
         {
-           pString = ptr;
-           State = STATE_QUOTE3;
+           if( ISNAME( cLastChar ) )
+           {
+              if( lens < 8 && toupper( sFirstToken[0] ) == 'R' && toupper( sFirstToken[1] ) == 'E' &&
+                  toupper( sFirstToken[2] ) == 'T' && toupper( sFirstToken[3] ) == 'U'  )
+              {
+                 if( sFirstToken[4] == ' ' )
+                 {
+                    pString = ptr;
+                    State = STATE_QUOTE3;
+                 }
+                 else if( toupper( sFirstToken[4] ) == 'R' )
+                 {
+                    if( sFirstToken[5] == ' ' )
+                    {
+                       pString = ptr;
+                       State = STATE_QUOTE3;
+                    }
+                    else if( toupper( sFirstToken[5] ) == 'N' && sFirstToken[6] == ' ' )
+                    {
+                       pString = ptr;
+                       State = STATE_QUOTE3;
+                    }
+                 }
+              }
+           }
+           else
+           {
+              pString = ptr;
+              State = STATE_QUOTE3;
+           }
         }
         /* END - Ron Pinkas added 2000-11-05 */
         else if( curc == '\t' )
@@ -4879,9 +4913,12 @@ static int strotrim( char * stroka, BOOL bRule )
         lastc = curc;
         lens++;
 
-        if( State == STATE_NORMAL && curc != ' ' )
+        if( State == STATE_NORMAL )
         {
-           cLastChar = curc;
+           if( curc != ' ' )
+           {
+              cLastChar = curc;
+           }
         }
      }
 
@@ -5369,7 +5406,7 @@ int hb_pp_NextToken( char** pLine )
    sLine = *pLine;
    nLen = strlen( sLine );
 
-   //printf( "\nProcessing: '%s'\n", sLine );
+   //printf( "\nProcessing: >%s<\n", sLine );
 
    // *** To be removed after final testing !!!
    while( sLine[0] == ' ' )
@@ -5651,7 +5688,7 @@ int hb_pp_NextToken( char** pLine )
 
    *pLine = (char *) sLine;
 
-   //printf( "\nToken: '%s' Line: '%s'\n", s_sToken, *pLine );
+   //printf( "Token: >%s< Line: >%s<\n", s_sToken, *pLine );
 
    return nLen + iPad;
 }
