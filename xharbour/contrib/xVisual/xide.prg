@@ -19,7 +19,7 @@ FUNCTION Main
    
    oApp := Application():Initialize()
 
-   oSplash := Splash():New( oApp )
+   oSplash := Splash():New( oApp, "visual_xharbour.bmp", 5000 )
 
    WITH OBJECT oApp
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
@@ -127,9 +127,6 @@ FUNCTION Main
             :SetPanelText( 2, "Enjoy" )
          END
       END
-      
-      UpdateWindow(oApp:MainFrame:handle)
-    
       :Run()
   END
 RETURN( nil)
@@ -155,18 +152,19 @@ ENDCLASS
 
 CLASS Splash FROM TForm
    DATA bitmap
-   METHOD New() CONSTRUCTOR
+   METHOD New()          CONSTRUCTOR
    METHOD OnPaint( hDC ) INLINE DrawBitmap(hDC,::bitmap),0
    METHOD OnDestroy()    INLINE DeleteObject(::bitmap),NIL
    METHOD OnTimer(n)     INLINE if( n==1,::Destroy(),)
 ENDCLASS
 
-METHOD New( oParent ) CLASS Splash
+METHOD New( oParent, cFile, nTimeOut ) CLASS Splash
    local aRect,abRect
    super:new( oParent )
+   DEFAULT nTimeOut TO 2000
    aRect := GetWindowRect(GetDesktopWindow())
    
-   ::bitmap:= LoadImage( NIL, "visual_xharbour.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+   ::bitmap:= LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
    abRect  := GetBitmapSize( ::bitmap )
    
    ::width := abRect[1]
@@ -176,6 +174,6 @@ METHOD New( oParent ) CLASS Splash
    ::style := WS_POPUP + WS_BORDER
    ::ExStyle:= WS_EX_TOPMOST
    ::Create()
-   SetTimer( ::handle, 1, 5000 )
    UpdateWindow( ::handle)
+   SetTimer( ::handle, 1, nTimeOut )
 return( self )
