@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.28 2003/09/08 19:18:42 druzus Exp $
+# $Id: xharbour.spec,v 1.29 2003/09/10 21:35:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,11 +14,18 @@
 ## Definitions.
 ######################################################################
 
+# please add your distro suffix if it not belong to the one recognized below
+# and remember that order checking can be important
+
+%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
+%if "%{platform}" == ""
+  %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
+%endif
+
 %define name     xharbour
 %define dname    xHarbour
 %define version  0.82.0
 %define releasen 0
-%define platform rh73
 %define prefix   /usr
 %define hb_pref  xhb
 %define hb_gt    crs
@@ -774,6 +781,9 @@ rm -rf $RPM_BUILD_ROOT
 ######################################################################
 
 %changelog
+* Thu Sep 11 2003 Przemyslaw Czerpak <druzus@polbox.com>
+- automatic platform checking - now MDK and RH, please add others
+
 * Sat Aug 09 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - removed ${RPM_OPT_FLAGS} from C_USR
 

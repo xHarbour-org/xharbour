@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.13 2003/09/08 19:18:42 druzus Exp $
+# $Id: make_tgz.sh,v 1.14 2003/09/10 21:35:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -9,6 +9,13 @@
 #
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
+
+# please add your distro suffix if it not belong to the one recognized below
+# and remember that order checking can be important
+hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
+[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
+
+[ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
 
 name="xharbour"
 hb_ver="0.82.0"
@@ -404,5 +411,5 @@ then
     done
 fi
 
-tar -czvf ${name}-${hb_ver}.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
+tar -czvf ${name}-${hb_ver}${hb_platform}.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"
