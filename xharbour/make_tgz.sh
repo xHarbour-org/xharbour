@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.25 2004/01/02 17:22:44 druzus Exp $
+# $Id: make_tgz.sh,v 1.26 2004/05/21 02:31:39 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -97,8 +97,12 @@ ln -s xbscript ${HB_BIN_INSTALL}/xprompt
 tar -czvf "${hb_archfile}" --owner=root --group=root -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"
 
-cat > ${hb_instfile} <<EOF
+cat > "${hb_instfile}" <<EOF
 #!/bin/sh
+if [ "\$1" == "--extract" ]; then
+    sed -e '1,/^HB_INST_EOF\$/ d' \$0 > "${hb_archfile}"
+    exit
+fi
 if [ \`id -u\` != 0 ]; then
     echo "This package has to be installed from root account."
     exit 1
@@ -112,6 +116,6 @@ fi
 exit \$?
 HB_INST_EOF
 EOF
-cat "${hb_archfile}" >> ${hb_instfile}
-chmod +x ${hb_instfile}
+cat "${hb_archfile}" >> "${hb_instfile}"
+chmod +x "${hb_instfile}"
 rm -f "${hb_archfile}"

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.46 2004/06/04 19:15:47 kaddath Exp $
+ * $Id: ads1.c,v 1.47 2004/07/30 16:37:32 ronpinkas Exp $
  */
 
 /*
@@ -3634,10 +3634,10 @@ HB_FUNC( ADS_GETFUNCTABLE )
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    * uiCount = RDDFUNCSCOUNT;
+   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
 
    HB_TRACE(HB_TR_DEBUG, ("ADS_GETFUNCTABLE(%i, %p)", *uiCount, pTable));
 
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
    if( pTable )
    {
       adsSetSend();

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.18 2004/02/01 22:52:07 likewolf Exp $
+# $Id: Makefile,v 1.19 2004/03/04 00:27:39 likewolf Exp $
 #
 
 ROOT = ../../
@@ -7,7 +7,7 @@ ROOT = ../../
 PRG_HEADERS = \
 	include/ct.ch \
 	include/cterror.ch \
-        include/ctvideo.ch \
+	include/ctvideo.ch \
 	include/ctwin.ch \
 
 C_SOURCES = \
@@ -69,7 +69,7 @@ C_SOURCES = \
 	token1.c \
 	token2.c \
 	trig.c \
-        video.c \
+	video.c \
 	wordrepl.c \
 	wordtoch.c \
 
