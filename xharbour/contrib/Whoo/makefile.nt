@@ -17,7 +17,7 @@ SRCDIR  =source
 LIBDIR  =lib\vc
 
 
-MK_FILE  = makefile.vc
+MK_FILE  = makefile.nt
 MK_FLAGS = $(MAKEFLAGS: =)
 
 #-- HARBOUR COMPILER ----

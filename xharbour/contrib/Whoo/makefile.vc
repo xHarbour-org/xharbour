@@ -22,7 +22,7 @@ MK_FLAGS = $(MAKEFLAGS: =)
 
 #-- HARBOUR COMPILER ----
 hbc      =$(HBR_DIR)\BIN\harbour
-hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
+hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
