@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.6 2004/03/02 00:28:18 druzus Exp $
+ * $Id: hbmath.h,v 1.7 2004/05/24 10:31:44 jonnymind Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ extern HB_MATH_HANDLERPROC hb_mathGetHandler (void);
 
 /* JC1: Providing a prototype for a random number
    Is there any place better to put this? */
-extern double hb_random_num( void );
+HB_EXPORT double hb_random_num( void );
 
 /* include defines from math.ch */
 #include <math.ch>
