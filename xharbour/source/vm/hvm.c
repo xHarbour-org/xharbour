@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.279 2003/11/22 01:41:10 ronpinkas Exp $
+ * $Id: hvm.c,v 1.280 2003/11/22 02:03:38 ronpinkas Exp $
  */
 
 /*
@@ -366,6 +366,7 @@ void hb_vmDoInitRdd( void )
    }
 }
 
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
 void hb_vmDoInitOle( void )
 {
    PHB_DYNS pDynSym;
@@ -380,6 +381,7 @@ void hb_vmDoInitOle( void )
       hb_vmDo(0);
    }
 }
+#endif
 
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
@@ -507,7 +509,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
-   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
       hb_vmDoInitOle();
    #endif
 

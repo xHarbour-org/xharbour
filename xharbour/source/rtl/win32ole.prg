@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.31 2003/11/01 06:34:43 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.32 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,8 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 //----------------------------------------------------------------------------//
 
-INIT PROCEDURE Initialize_Ole
+// Called directly by HVM to ensure avilability of OLE to other INIT Procedures.
+/*INIT*/ PROCEDURE Initialize_Ole
    IF ! bOleInitialized
       bOleInitialized := .T.
       Ole_Initialize()
