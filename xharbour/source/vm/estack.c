@@ -92,8 +92,6 @@ HB_STACK *hb_stackGetCurrentStack( void )
 #undef HB_VM_STACK
 #define HB_VM_STACK (*Stack)
 #define HB_THREAD_STUB  HB_STACK *Stack = hb_stackGetCurrentStack();
-   
-extern HB_CRITICAL_T hb_gcCollectionMutex;
 
 #else
 
@@ -162,7 +160,6 @@ void hb_stackPush( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPush()"));
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
    TopIndex  = HB_VM_STACK.wItems - 1;
 
@@ -194,7 +191,6 @@ void hb_stackPush( void )
    HB_VM_STACK.pPos++;
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 void hb_stackInit( void )
@@ -240,9 +236,7 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
       hb_stackDispLocal();
       hb_errInternal( HB_EI_VMNOTSYMBOL, NULL, "hb_vmDo()", NULL );
    }
- 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-   
+
    pStack->lBaseItem = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    pStack->iStatics = HB_VM_STACK.iStatics;
 
@@ -250,8 +244,6 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
    pItem->item.asSymbol.paramcnt = uiParams;
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + pItem->item.asSymbol.stackbase;
    pItem->item.asSymbol.stackbase = pStack->lBaseItem;
-
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -265,12 +257,8 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
       hb_stackPop();
    }
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;
    HB_VM_STACK.iStatics = pStack->iStatics;
-
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #undef hb_stackTopOffset
@@ -369,8 +357,6 @@ void hb_stackDispLocal( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispLocal()"));
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
    printf( hb_conNewLine() );
    printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"), ( *(HB_VM_STACK.pBase) )->item.asSymbol.value->szName, ( *(HB_VM_STACK.pBase) )->item.asSymbol.lineno );
    printf( hb_conNewLine() );
@@ -433,7 +419,6 @@ void hb_stackDispLocal( void )
             break;
       }
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 void hb_stackDispCall( void )
@@ -441,8 +426,6 @@ void hb_stackDispCall( void )
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispCall()"));
-   
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    while( pBase != HB_VM_STACK.pItems )
    {
@@ -462,7 +445,6 @@ void hb_stackDispCall( void )
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #ifdef HB_INCLUDE_WINEXCHANDLER
