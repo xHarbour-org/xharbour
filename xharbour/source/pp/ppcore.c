@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.30 2002/09/25 18:46:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.31 2002/09/27 02:43:49 ronpinkas Exp $
  */
 
 /*
@@ -1140,7 +1140,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         rmlen = i - ipos + 1;
 
         /* Convert match marker into inner format */
-        lastchar = (lastchar!='Z') ? ( (char) ( (unsigned int)lastchar + 1 ) ): 'a';
+        lastchar = (lastchar == 'Z' ) ? 'a' : ( (char) ( (unsigned char) lastchar + 1 ) );
 
         expreal[1] = lastchar;
         expreal[2] = exptype;
@@ -1153,7 +1153,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         /* Look for appropriate result markers */
         ptr = rpatt;
 
-        while( (ifou = hb_strAt( exppatt, explen, ptr, rlen-(ptr-rpatt) )) > 0 )
+        while( ( ifou = hb_strAt( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
         {
            /* Convert result marker into inner format */
            ifou --;
