@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.11 2004/02/24 17:41:14 paultucker Exp $
+ * $Id: dbffpt1.c,v 1.12 2004/02/27 14:40:38 paultucker Exp $
  */
 
 /*
@@ -1060,6 +1060,7 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
             errCode = EDBF_CORRUPT;
          }
          break;
+      case FPTIT_FLEXAR_BYTE1:
       case FPTIT_FLEXAR_BYTE:
          if ( bBufEnd - (*pbMemoBuf) >= 2 )
          {
