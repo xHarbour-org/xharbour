@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.2 2004/07/22 16:58:26 likewolf Exp $
+ * $Id: token1.c,v 1.3 2004/07/30 07:16:04 likewolf Exp $
  */
 
 /*
@@ -283,6 +283,13 @@ static void do_token1 (int iSwitch)
     
       ulToken++;
 
+      if (pc == NULL)
+      {
+        pc = pcSubStr+sSubStrLen;  /* little trick for return values */
+        break;  /* we must leave the while loop even if we have not
+                   yet found the <ulTokenCounter>th token */
+      }
+ 
       /* should we find the last token, but string ends with tokenizer, i.e.
          pc points to the last character at the moment ?
          -> break here ! */
@@ -312,13 +319,6 @@ static void do_token1 (int iSwitch)
          }
       }
 
-      if (pc == NULL)
-      {
-        pc = pcSubStr+sSubStrLen;  /* little trick for return values */
-        break;  /* we must leave the while loop even if we have not
-                   yet found the <ulTokenCounter>th token */
-      }
- 
     } /* while (ulToken < ulTokenCounter) */
 
     switch (iSwitch)
