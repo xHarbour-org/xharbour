@@ -213,7 +213,7 @@ typedef struct real_pcre_extra pcre_extra;
 functions if required. Some magic is required for Win32 DLL; it is null on
 other OS. */
 
-PCRE_DL_IMPORT extern void *(*pcre_malloc)(size_t);
+PCRE_DL_IMPORT extern void *(*pcre_malloc)(ULONG);
 PCRE_DL_IMPORT extern void  (*pcre_free)(void *);
 
 #undef PCRE_DL_IMPORT

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3253 2004/08/02 01:45:45 maurifull Exp $
+ * $Id: ChangeLog,v 1.3254 2004/08/02 12:37:11 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-02 19:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdefs.h
+   ! include <stdint.h> only for GCC - other developers can make the same
+     for their compilers if supported
+
+  * xharbour/include/regex.h
+  * xharbour/source/rtl/regex.c
+   + added memory statistic for regular expressions
+   ! fixed memory leak in regex. Each time regcomp is used then
+     regree() should be called later to free compiled pcre structure.
+     Because we store compiled regex as character itmes (Ron I don't
+     like it - it should be IMGO GC pointer item without hits "***"
+     hack) I hacked the returned pcre structure and increased the size
+     of returned string adding the compiled pcre also. It's working but
+     not elegant. Please test it. I'm surprised that for such long time
+     knowone noticed it but regex where consuming memory each time they
+     were used (regcomp)
 
 2004-08-02 14:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * include/Makefile

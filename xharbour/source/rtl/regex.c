@@ -897,8 +897,8 @@ between all threads. */
 extern "C" {
 #endif
 
-void *(*pcre_malloc)(size_t) = malloc;
-void  (*pcre_free)(void *) = free;
+void *(*pcre_malloc)(ULONG) = hb_xgrab;
+void  (*pcre_free)(void *) = hb_xfree;
 
 #ifdef __cplusplus
 }
@@ -6284,7 +6284,7 @@ preg->re_erroffset = (size_t)(-1);   /* Only has meaning after compile */
 
 if (nmatch > 0)
   {
-  ovector = (int *)malloc(sizeof(int) * nmatch * 3);
+  ovector = (int *)(pcre_malloc)(sizeof(int) * nmatch * 3);
   if (ovector == NULL) return REG_ESPACE;
   }
 
@@ -6320,14 +6320,14 @@ if (rc >= 0)
       pmatch[i].rm_eo += iStartOffset;
       }
     }
-  if (ovector != NULL) free(ovector);
+  if (ovector != NULL) (pcre_free)(ovector);
   for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
   return 0;
   }
 
 else
   {
-  if (ovector != NULL) free(ovector);
+  if (ovector != NULL) (pcre_free)(ovector);
   switch(rc)
     {
     case PCRE_ERROR_NOMATCH: return REG_NOMATCH;
@@ -6410,8 +6410,10 @@ HB_FUNC( HB_ATX )
             }
 
             hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
+            regfree( &re );
             return;
          }
+         regfree( &re );
       }
    }
 
@@ -6449,6 +6451,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
    PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
+   BOOL fFree = FALSE;
 
    if( pRegEx == NULL )
    {
@@ -6487,6 +6490,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       }
 
       pReg = &re;
+      fFree = TRUE;
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
 
@@ -6527,14 +6531,20 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                }
             }
 
-           return TRUE;
+            if ( fFree )
+               regfree( pReg );
+            return TRUE;
          }
 
          case 1: // HB_P_LIKE
-           return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
+            if ( fFree )
+               regfree( pReg );
+            return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
 
          case 2: // HB_P_MATCH
-           return TRUE;
+            if ( fFree )
+               regfree( pReg );
+            return TRUE;
 
          case 3: // Split
          {
@@ -6562,6 +6572,8 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
          }
 
+         if ( fFree )
+            regfree( pReg );
          return TRUE;
 
          case 4: // Wants Results AND positions
@@ -6607,6 +6619,8 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                hb_itemArrayPut( &(HB_VM_STACK.Return), i + 1, &aSingleMatch );
             }
 
+            if ( fFree )
+               regfree( pReg );
             return TRUE;
 
          }
@@ -6616,6 +6630,9 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    /* If we have no match, we must anyway return an array of one element
       for request kind == 3 (split) */
+   if ( fFree )
+      regfree( pReg );
+
    if( cRequest == 3 )
    {
       hb_arrayNew( &(HB_VM_STACK.Return), 0 );
@@ -6759,10 +6776,14 @@ HB_FUNC( HB_REGEXCOMP )
 
    if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
    {
-      cRegex = (char *) hb_xgrab( sizeof( re ) + 3 );
+      ULONG nSize = ((real_pcre *) re.re_pcre)->size;
+      cRegex = (char *) hb_xgrab( 3 + sizeof( re ) + nSize );
+      memcpy( cRegex + 3 + sizeof( re ), re.re_pcre, nSize );
+      (pcre_free)(re.re_pcre);
+      re.re_pcre = (pcre *) cRegex + 3 + sizeof( re );
       memcpy( cRegex, "***", 3 );
       memcpy( cRegex + 3, &re, sizeof( re ) );
-      hb_retclenAdoptRaw( cRegex, sizeof( re ) + 3 );
+      hb_retclenAdoptRaw( cRegex, 3 + sizeof( re ) + nSize );
    }
    else {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",
@@ -6770,4 +6791,3 @@ HB_FUNC( HB_REGEXCOMP )
       3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ));
    }
 }
-

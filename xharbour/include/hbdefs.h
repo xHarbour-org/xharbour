@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.49 2004/06/30 10:05:14 likewolf Exp $
+ * $Id: hbdefs.h,v 1.50 2004/08/02 12:37:13 druzus Exp $
  */
 
 /*
@@ -57,7 +57,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined( __GNUC__ )
 #include <stdint.h>
+#endif
 
 #include "hbsetup.h"
 #include "hbtrace.h"
