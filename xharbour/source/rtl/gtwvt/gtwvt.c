@@ -1,6 +1,6 @@
 
 /*
- * $Id: gtwvt.c,v 1.18 2004/01/03 13:03:03 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.19 2004/01/03 20:51:47 fsgiudice Exp $
  */
 
 /*
@@ -2831,7 +2831,7 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon )
 
 DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
 {
-  HICON hIcon = LoadImage( ( HINSTANCE ) hb_hInstance, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
+  HICON hIcon = (HICON) LoadImage( ( HINSTANCE ) hb_hInstance, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
 
   if ( hIcon )
   {

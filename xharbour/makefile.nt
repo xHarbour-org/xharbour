@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.59 2003/12/19 01:32:39 fsgiudice Exp $
+# $Id: makefile.nt,v 1.60 2003/12/21 23:35:26 fsgiudice Exp $
 #
 
 #
@@ -24,6 +24,7 @@
 #
 #       CFLAGS       - Extra C compiler options for libraries and for
 #                      executables
+#       LFLAGS       - Extra C Linker options
 #       CLIBFLAGS    - Extra C compiler options for the libraries
 #       C_USR        - Extra C compiler options for libraries and for
 #                      executables (GNU make compatible envvar)
@@ -140,7 +141,7 @@ C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
-LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE
+LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE $(LFLAGS)
 L_DFLAGSNMT  =$(LFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
 !ifdef HB_MT
 L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
