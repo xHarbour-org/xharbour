@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3653 2004/12/04 22:37:40 druzus Exp $
+ * $Id: ChangeLog,v 1.3654 2004/12/05 23:30:26 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-06 00:30 UTC+0100 Henryk Olkowski <oh1@op.pl>
+  * source/rtl/gtapi.c
+   ! fixed hb_gtwrite()
+   ! fixed hb_gtwriteAT()
+     Problem:
+      @ 0,0 say replicate("*",maxcol()+5)
+      x:=row(); y:=col()
+      ? x,y
+     Result in Clipper 5.3b linking without ctus.obj and ct53.lib
+      0 84
+     Result in Clipper 5.3b linking with ctus.obj and ct53.lib
+      1 0
+     Temporary solution for xHarbour
+      - if not use WOPEN() result: 0 84
+      - after use WOPEN() result:  1 0
 
 2004-12-05 17:24 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * bin/bld.bat
