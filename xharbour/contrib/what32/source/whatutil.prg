@@ -355,9 +355,9 @@ Function asString( x )
       Return AllTrim( str( x ) )
    Case v == "L"
       If x
-         Return ".T."
+         Return "TRUE"
       Else
-         Return ".F."
+         Return "FALSE"
       EndIf
    Case v == "D"
       Return dtoc( x )
@@ -366,7 +366,7 @@ Function asString( x )
    Case v == "A"
       Return "<Array>"
    Case v == "O"
-      Return "<Object " + x:classname( ) + ">"
+      Return x:classname()
    Case v == "B"
       Return "<Block>"
    Otherwise

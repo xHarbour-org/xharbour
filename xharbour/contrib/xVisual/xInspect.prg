@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.35 2002/10/23 02:18:25 what32 Exp $
+ * $Id: xInspect.prg,v 1.36 2002/10/23 06:31:58 what32 Exp $
  */
 
 /*
@@ -370,6 +370,7 @@ METHOD OnCommand( nwParam ) CLASS StringList
                cText:=STRTRAN(cText,CHR(10))
                cText:=STRTRAN(cText,CHR(13))
                oApp:MainFrame:ObjInsp:CurObject:Items:Add(ALLTRIM(cText))
+               oApp:MainFrame:ObjInsp:CurObject:Parent:XFMControl( , oApp:MainFrame:ObjInsp:CurObject, .F. )
            NEXT
            nLines := NIL
            EndDialog( ::handle, IDOK )

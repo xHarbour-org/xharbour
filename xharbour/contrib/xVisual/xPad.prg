@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.17 2002/10/17 17:16:20 what32 Exp $
+ * $Id: xPad.prg,v 1.2 2002/10/22 17:23:46 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -3435,14 +3435,9 @@ Function readafile(cFileName,aText,nTabSpace) // atext must be by reference
 
   // reset atext buffer
   aText:={''}
-
   nTabSpace:=If(ValType(nTabSpace)=='N',nTabSpace,4)
-
   h:=fOpen(cFileName)
-
   // verify fopen error
-
-
   If h == -1
     nRetVal:=-1
   Else
@@ -3493,8 +3488,6 @@ Function readafile(cFileName,aText,nTabSpace) // atext must be by reference
           Exit
         EndIf
       EndDo
-        
-
       cBuff:=Space(32768)
     EndDo
 
@@ -3611,8 +3604,6 @@ Function parsexpr(c,lHonorSpacing,lInRemark,lUpperKeyWord)
 
   Return(aWords)
 
-
-
 *-----------------------------------------------------------------------------*
 * returns next word from the Clipper source line
 *-----------------------------------------------------------------------------*
@@ -3629,8 +3620,6 @@ Static Function getword(cText,lHonorSpacing)
   Local adouble:={'->','::','||','++','--','**',':=','<=','>=',;
                   '<>','!=','==','+=','-=','*=','/=','%=','^=',;
                   '//','/*','*/','&&'}
-
-
                   // space added for SQL field names containing spaces
 
                   If ch==',' // lists
