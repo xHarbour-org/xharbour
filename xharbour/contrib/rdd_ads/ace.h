@@ -63,6 +63,8 @@
    typedef short          SIGNED16;
    typedef unsigned char  UNSIGNED8;
    typedef char           SIGNED8;
+   typedef int            UINT;
+   typedef unsigned char UCHAR;
 #endif
    typedef unsigned long  ADSHANDLE;
    typedef double         DOUBLE;

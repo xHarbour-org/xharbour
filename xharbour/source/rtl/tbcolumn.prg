@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.3 2002/06/21 20:45:50 walito Exp $
+ * $Id: tbcolumn.prg,v 1.4 2002/09/01 00:47:19 lculik Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    ::block    := bBlock
 
 #ifdef HB_COMPAT_C53
-   ::aSetStyle := ARRAY( 4096 )
+   ::aSetStyle := ARRAY( 3 )
 
    ::aSetStyle[ TBC_READWRITE ] := .f.
    ::aSetStyle[ TBC_MOVE ]      := .f.

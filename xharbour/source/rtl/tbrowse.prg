@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.10 2002/08/25 19:20:38 map Exp $
+ * $Id: tbrowse.prg,v 1.12 2002/09/03 00:31:51 lculik Exp $
  */
 
 /*
@@ -267,7 +267,7 @@ METHOD New(nTop, nLeft, nBottom, nRight) CLASS TBrowse
    ::message         :=''
    ::nRow            := 0
    ::nCol            := 0
-   ::aSetStyle       := ARRAY( 4096 )
+   ::aSetStyle       := ARRAY( 5 )
    
    ::aSetStyle[ TBR_APPEND ]    := .f.
    ::aSetStyle[ TBR_APPENDING ] := .f.
