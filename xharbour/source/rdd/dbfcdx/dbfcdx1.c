@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.96 2002/05/13 03:55:13 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.25 2002/09/19 03:56:41 horacioroldan Exp $
  */
 
 /*
@@ -417,7 +417,7 @@ static void hb_cdxAddFreeBlocks( CDXAREAP pArea, ULONG ulBlock, ULONG ulBlocks )
    LPMEMOFREEBLOCK pFreeBlock;
    */
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxAddFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, uiBlocks));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxAddFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, ulBlocks));
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( ulBlock );
    HB_SYMBOL_UNUSED( ulBlocks );
@@ -512,7 +512,7 @@ static BOOL hb_cdxCompleteFromFreeBlocks( CDXAREAP pArea, ULONG ulBlock, ULONG u
    MEMOBLOCK mbBlock;
    */
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxCompleteFromFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, uiBlocks));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxCompleteFromFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, ulBlocks));
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( ulBlock );
    HB_SYMBOL_UNUSED( ulBlocks );
