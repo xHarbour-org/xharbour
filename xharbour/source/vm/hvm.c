@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.67 2002/05/02 18:23:10 map Exp $
+ * $Id: hvm.c,v 1.68 2002/05/02 18:36:41 ronpinkas Exp $
  */
 
 /*
@@ -816,7 +816,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             {
                hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * hb_stack.pPos, 1 ) );
             }
-            hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_stackItemFromTop( -1 )->pOrigin;
+            hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
             hb_stackPop();
             hb_vm_wEnumCollectionCounter++;
             w++;
@@ -1566,7 +1566,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                   dNewVal = pTop->item.asDouble.value + iAdd;
                }
             }
-            else if( HB_IS_STRING( pTop ) && pTop->item.asString.bChar )
+            else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
             {
                pTop->type = HB_IT_LONG;
                pTop->item.asLong.value  = pTop->item.asString.value[0] + iAdd;
@@ -2334,7 +2334,7 @@ static void hb_vmNegate( void )
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
       pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
-   else if( HB_IS_STRING( pItem ) && pItem->item.asString.bChar )
+   else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
       pItem->item.asInteger.value = - pItem->item.asString.value[0];
       pItem->type = HB_IT_INTEGER;
@@ -2371,7 +2371,7 @@ static void hb_vmPlus( void )
 
       hb_vmPushNumType( dNumber1 + dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
    }
-   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.bChar )
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.length == 1 )
    {
       BYTE bChar = pItem2->item.asString.value[0];
       int iDec;
@@ -2447,7 +2447,7 @@ static void hb_vmPlus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
       }
    }
-   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.bChar && HB_IS_NUMERIC( pItem2 ) )
+   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.length == 1 && HB_IS_NUMERIC( pItem2 ) )
    {
       BYTE bChar = pItem1->item.asString.value[0];
       int iDec;
@@ -2508,7 +2508,7 @@ static void hb_vmMinus( void )
 
       hb_vmPushNumType( dNumber1 - dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
    }
-   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.bChar )
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.length == 1 )
    {
       BYTE bChar = pItem2->item.asString.value[0];
       int iDec;
@@ -2571,7 +2571,7 @@ static void hb_vmMinus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
    }
-   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.bChar && HB_IS_NUMERIC( pItem2 ) )
+   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.length == 1 && HB_IS_NUMERIC( pItem2 ) )
    {
       BYTE bChar = pItem1->item.asString.value[0];
       int iDec;
@@ -3428,6 +3428,10 @@ static void hb_vmArrayPush( void )
    {
       ulIndex = ( ULONG ) pIndex->item.asDouble.value;
    }
+   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
+   {
+      ulIndex = ( ULONG ) pIndex->item.asString.value[0];
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -3513,7 +3517,7 @@ static void hb_vmArrayPush( void )
          }
 
          pArray->item.asString.length  = 1;
-         pArray->item.asString.bChar   = TRUE;
+         //pArray->item.asString.bChar   = TRUE;
       }
       else
       {
@@ -3545,6 +3549,11 @@ static void hb_vmArrayPop( void )
    pArray = hb_stackItemFromTop( -2 );
    pIndex = hb_stackItemFromTop( -1 );
 
+   if( HB_IS_BYREF( pArray ) )
+   {
+      pArray = hb_itemUnRef( pArray );
+   }
+
    if( HB_IS_INTEGER( pIndex ) )
    {
       ulIndex = ( ULONG ) pIndex->item.asInteger.value;
@@ -3556,6 +3565,10 @@ static void hb_vmArrayPop( void )
    else if( HB_IS_DOUBLE( pIndex ) )
    {
       ulIndex = ( ULONG ) pIndex->item.asDouble.value;
+   }
+   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
+   {
+      ulIndex = ( ULONG ) pIndex->item.asString.value[0];
    }
    else
    {
@@ -3581,7 +3594,6 @@ static void hb_vmArrayPop( void )
          #endif
 
          hb_arraySet( pArray, ulIndex, pValue );
-         hb_itemCopy( pArray, pValue );  /* places pValue at pArray position */
          hb_stackPop();
          hb_stackPop();
          hb_stackPop();    /* remove the value from the stack just like other POP operations */
@@ -3608,7 +3620,7 @@ static void hb_vmArrayPop( void )
       {
          BYTE bNewChar;
 
-         pArray = pArray->pOrigin;
+         //pArray = pArray->item.asString.pOrigin;
 
          if( pValue->type == HB_IT_STRING )
          {
@@ -3653,12 +3665,12 @@ static void hb_vmArrayPop( void )
       }
       else
       {
-         hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+         hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
       }
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
    }
 }
 
@@ -4990,7 +5002,6 @@ static void hb_vmPushLocal( SHORT iLocal )
    if( HB_IS_BYREF( pLocal ) )
    {
       hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pLocal ) );
-      ( * hb_stack.pPos )->pOrigin = pLocal;
    }
    else
    {
@@ -5033,7 +5044,6 @@ static void hb_vmPushStatic( USHORT uiStatic )
    if( HB_IS_BYREF( pStatic ) )
    {
       hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pStatic ) );
-      ( * hb_stack.pPos )->pOrigin = pStatic;
    }
    else
    {

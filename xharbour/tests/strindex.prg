@@ -3,8 +3,9 @@ Procedure Main
    LOCAL Counter, cVar := "Some test string to decode..."
 
    SimpleCode( @cVar )
-   SimpleDeCode( @cVar )
+   ? cVar
 
+   SimpleDeCode( @cVar )
    ? cVar
 
 Return

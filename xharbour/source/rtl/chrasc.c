@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.4 2002/04/18 17:10:38 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.5 2002/04/23 05:01:41 ronpinkas Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( CHR )
       ( &hb_stack.Return )->item.asString.value   = hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ];
       ( &hb_stack.Return )->item.asString.length  = 1;
       ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-      ( &hb_stack.Return )->item.asString.bChar   = FALSE;
+      //( &hb_stack.Return )->item.asString.bChar   = TRUE;
       ( &hb_stack.Return )->type = HB_IT_STRING;
    }
    else

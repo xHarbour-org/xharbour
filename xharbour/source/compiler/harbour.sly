@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.11 2002/05/01 22:54:59 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.12 2002/05/04 06:47:51 ronpinkas Exp $
  */
 
 /*
@@ -1949,16 +1949,17 @@ ForStatements : EmptyStats NEXT                     { hb_compLinePush(); --hb_co
            | EmptyStats END IdentName               { hb_compLinePush(); --hb_comp_wForCounter; }
            ;
 
-ForEach    : FOREACH LValue  /* 1  2 */
+ForEach    : FOREACH IdentName  /* 1  2 */
                {  /* 3 */
                   hb_compLinePush();
                   hb_compDebugStart();
                   ++hb_comp_wForCounter;
-                  hb_compExprGenPush( $2 );
+                  //$2->ExprType = HB_ET_VARREF; hb_compExprGenPush( $2 );
+                  hb_compExprDelete( hb_compExprGenPush( hb_compExprNewVarRef( $2 ) ) );
                }
              IN Expression /* 4 5 */
                { /* 6 */
-                  hb_compExprGenPush( $5 );
+                  hb_compExprDelete( hb_compExprGenPush( $5 ) );
                   hb_compGenPCode1( HB_P_FOREACH );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 6 */
                   hb_compGenPCode1( HB_P_ENUMERATE );
@@ -1975,8 +1976,6 @@ ForEach    : FOREACH LValue  /* 1  2 */
                   hb_compGenJumpHere( $<lNumber>8 );
                   hb_compLoopEnd();
                   hb_compGenPCode1( HB_P_ENDENUMERATE );
-                  hb_compExprDelete( $5 );
-                  hb_compExprDelete( $2 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                }
            ;

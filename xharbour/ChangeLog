@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.203 2002/05/04 05:43:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.204 2002/05/04 06:47:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-05 19:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+     - Removed elements pOrigin and asString.bChar from HB_ITEM to retain HB_ITEM compatibility with Harbour.
+
+   * include/hbexprb.c
+     * Changed AnyVar[...] := ... to push AnyVar BYREF incase it's String manipulated as an Array.
+     * Changed FOR EACH AnyVar IN ... to push AnyVar BYREF.
+       /* Both these changes replaces the use of pOrigin */
+
+   * source/compiler/harbour.sly
+     * Correted FOR EACH to only accept Identifier as oppose to any LValue.
+
+   * source/rtl/chrasc.c
+     - removed reference to asString.bChar.
+
+   * source/vm/fastitem.c
+     - removed references to item.asString.bChar.
+     - removed references to item.pOrigin.
+
+   * source/vm/hvm.c
+     - Changed refrences of item.asString.bChar to item.asString.length == 1
+     * Changed HB_P_FOREACH to use hb_itemUnRef() instead of ->pOrigin
+     * Changed hb_vmArrayPop() to use hb_itemUnRef() instead of ->pOrigin.
+     + Added support for CHARTYPE as Array Index.
+
+   * tests/strindex.prg
+     + Added display of the coded string.
 
 2002-05-03 23:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/compiler/harbour.sly

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.17 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.18 2002/04/29 18:20:25 ronpinkas Exp $
  */
 
 /*
@@ -936,14 +936,12 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
    {
       case HB_EA_REDUCE:
          {
-            HB_EXPR_PTR pIdx;
-
             pSelf->value.asList.pExprList = HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_REDUCE );
             pSelf->value.asList.pIndex = HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_REDUCE );
-            pIdx = pSelf->value.asList.pIndex;
 
-            if( pIdx->ExprType == HB_ET_NUMERIC )
+            if( pSelf->value.asList.pIndex->ExprType == HB_ET_NUMERIC )
             {
+               HB_EXPR_PTR pIdx = pSelf->value.asList.pIndex;
                HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList; /* the expression that holds an array */
 
                if( pExpr->ExprType == HB_ET_ARRAY )   /* is it a literal array */
@@ -1036,6 +1034,12 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
       case HB_EA_POP_PCODE:
          {
+            /* Force to BYREF incase it's a STRING used as an Array - Real arrays are always BYREF anyway. */
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
+            {
+               pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
+            }
+
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOP );

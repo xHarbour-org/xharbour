@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.29 2002/04/28 03:08:04 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.30 2002/05/02 00:05:03 ronpinkas Exp $
  */
 
 /*
@@ -208,8 +208,6 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   pDest->pOrigin = pSource;
-
    if( HB_IS_STRING( pSource ) )
    {
       if( pSource->item.asString.bStatic == FALSE )
@@ -254,21 +252,18 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
       pItem->item.asString.length  = 0;
       pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
-      pItem->item.asString.bChar   = FALSE;
    }
    else if( szText[1] == '\0' )
    {
       pItem->item.asString.length  = 1;
       pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
-      pItem->item.asString.bChar   = TRUE;
    }
    else
    {
       pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
-      pItem->item.asString.bChar           = FALSE;
       pItem->item.asString.length          = strlen( szText );
       pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
       strcpy( pItem->item.asString.value, szText );
@@ -300,21 +295,18 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
       pItem->item.asString.length  = 0;
       pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
-      pItem->item.asString.bChar   = FALSE;
    }
    else if( ulLen == 1 )
    {
       pItem->item.asString.length  = 1;
       pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
-      pItem->item.asString.bChar   = TRUE;
    }
    else
    {
       pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
-      pItem->item.asString.bChar           = FALSE;
       pItem->item.asString.length          = ulLen;
       pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
       hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
@@ -344,7 +336,6 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( pItem->item.asString.puiHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.bChar   = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
@@ -372,7 +363,6 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 
    pItem->type = HB_IT_STRING;
    pItem->item.asString.bStatic = TRUE;
-   pItem->item.asString.bChar   = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
@@ -398,7 +388,6 @@ PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
    pItem->type = HB_IT_STRING;
    pItem->item.asString.bStatic = TRUE;
-   pItem->item.asString.bChar   = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
@@ -486,13 +475,9 @@ void hb_itemPushStaticString( char * szText, ULONG length )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
 
    pTop->type = HB_IT_STRING;
-   //pTop->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-   //*( pTop->item.asString.puiHolders ) = 1;
    pTop->item.asString.length  = length;
    pTop->item.asString.value   = szText;
    pTop->item.asString.bStatic = TRUE;
-   pTop->item.asString.bChar   = FALSE;
-   pTop->item.asString.bChar   = FALSE;
 
    hb_stackPush();
 }
@@ -518,7 +503,6 @@ void hb_retcAdopt( char * szText )
    ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
    ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.bChar   = FALSE;
    ( &hb_stack.Return )->item.asString.value   = szText;
    ( &hb_stack.Return )->item.asString.length  = strlen( szText );
 }
@@ -546,7 +530,6 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
    ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
    ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.bChar   = FALSE;
    ( &hb_stack.Return )->item.asString.value   = szText;
    ( &hb_stack.Return )->item.asString.length  = ulLen;
 }
@@ -570,7 +553,6 @@ void hb_retcStatic( char * szText )
 
    ( &hb_stack.Return )->type = HB_IT_STRING;
    ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-   ( &hb_stack.Return )->item.asString.bChar   = TRUE;
    ( &hb_stack.Return )->item.asString.value   = szText;
    ( &hb_stack.Return )->item.asString.length  = strlen( szText );
 }
@@ -594,7 +576,6 @@ void hb_retclenStatic( char * szText, ULONG ulLen )
 
    ( &hb_stack.Return )->type = HB_IT_STRING;
    ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-   ( &hb_stack.Return )->item.asString.bChar   = TRUE;
    ( &hb_stack.Return )->item.asString.value   = szText;
    ( &hb_stack.Return )->item.asString.length  = ulLen;
 }
