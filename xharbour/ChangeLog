@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2671 2004/03/28 22:26:21 peterrees Exp $
+ * $Id: ChangeLog,v 1.2672 2004/03/29 00:03:21 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-29 14:54 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwin/gtwin.c
+    - '*' & '+' on Keypad fied when CapsLock ON
+
 2004-03-29 12:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     - fix handling of Scroll Lock key

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.48 2004/03/05 23:00:04 andijahja Exp $
+ * $Id: gtwin.c,v 1.49 2004/03/09 12:54:53 lf_sfnet Exp $
  */
 
 /*
@@ -1396,14 +1396,14 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                       case 37:
                       case 94:
                       case 38:
-                      case 42:
+//                      case 42:
                       case 40:
                       case 41:
                          ch = wChar;
                          break;
-                      case 43:
-                         ch = 61;
-                         break;
+//                      case 43:
+//                         ch = 61;
+//                         break;
                       case 58:
                          ch = 59;
                          break;
@@ -1492,12 +1492,12 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                       ch = K_CTRL_SH_TAB;   /* Ctrl+Shift+TAB */
                    }
                    else
-                   {                   
+                   {
                       extended = 1;
                       #ifdef HB_DEBUG_KEYBOARD
                          fprintf( stdout, "1" );
                       #endif
-                   }       
+                   }
                 }
                 else if( ch == 0 )
                 {
@@ -1891,13 +1891,13 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
          {
             *pulMaxSize = iLen;
          }
-         
+
          // still nothing ?
          if ( *pulMaxSize == 0 )
          {
             return;
          }
-         
+
          memcpy( szData, lptstr, *pulMaxSize );
          szData[*pulMaxSize] = '\0';
          GlobalUnlock(hglb);
@@ -1971,7 +1971,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
       lptstr = (LPSTR) GlobalLock(hglb);
       if (lptstr != NULL)
       {
-         ret = strlen( lptstr );         
+         ret = strlen( lptstr );
          GlobalUnlock(hglb);
       }
    }
