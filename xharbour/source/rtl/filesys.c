@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.51 2003/09/15 18:58:28 jonnymind Exp $
+ * $Id: filesys.c,v 1.52 2003/09/16 15:51:13 ronpinkas Exp $
  */
 
 /*
@@ -1557,11 +1557,17 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       else if( uiFlags & FO_DENYWRITE )
          iShare = SH_DENYWR;
 
+      // allowing async cancelation here
+      HB_TEST_CANCEL_ENABLE_ASYN
+
       errno = 0;
       if( iShare )
          hFileHandle = sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
       else
          hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+
+      HB_DISABLE_ASYN_CANC
+
       hb_fsSetError( errno );
    }
 
@@ -1638,14 +1644,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
    HB_DISABLE_ASYN_CANC
 
-   if( hFileHandle == -1 )
-   {
-      /* This if block is required, because errno will be set
-         if the file did not exist and had to be created, even
-         when the create is successful! */
-      errno = GnuErrtoDosErr( errno );
-      hb_fsSetError( errno );
-   }
+   hb_fsSetError( errno );
 
 #else
 
@@ -1733,6 +1732,7 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
       hb_fsSetError( (USHORT) GetLastError() );
    }
    #else
+   errno = 0;
    if ( close( hFileHandle ) != 0)
    {
       hb_fsSetError( errno );
