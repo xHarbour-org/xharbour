@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.830 2003/03/12 15:42:23 walito Exp $
+ * $Id: ChangeLog,v 1.831 2003/03/13 00:52:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-13 03:50 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * thread.h
+  * thread.c
+    ! Removed all compiation warnings (tnx Andy ;-)
+    + Added async cancelation for threads in the new framework
+      under windows.
+    * Changed StopThread() behavior: under windows, it kindly
+      requests the thread to terminate. Use KillThread() or
+      KillAllThreads() to really interrupt a thread, and use
+      KillThread( th ) / JoinThread( th ) to kill a thread and
+      wait for cleanup functions to be completed. I could port
+      this behavior also under linux, but since linux cancelation
+      are safe, there is no need for a "kind" StopThread().
+      Comments are welcome.
 
 2003-03-12 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

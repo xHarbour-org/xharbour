@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.62 2003/03/12 00:24:10 jonnymind Exp $
+* $Id: thread.c,v 1.63 2003/03/12 13:31:23 jonnymind Exp $
 */
 
 /*
@@ -442,6 +442,12 @@ HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
          hb_ht_mutex = p->next;
       }
    }
+
+   if( p->lock_count )
+   {
+      HB_MUTEX_UNLOCK( p->mutex );
+   }
+
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
    return p;
@@ -582,13 +588,15 @@ void hb_threadCancelInternal( )
 }
 
 /***
-* Warning: running stack mutex must be held before calling this one
+* Warning: cancel mutex must be held before calling this one
 * NEVER use this function to cancel the calling thread
 */
 void hb_threadCancel( HB_STACK *pStack )
 {
-   CONTEXT context;
 
+   /*
+   previous section using kind cancellation
+   CONTEXT context;
    // stack resource mutex is being locked now
    pStack->bInUse = TRUE;  // mark the stack as used   
    SuspendThread( pStack->th_h ); // stop thread before he can do something with stack
@@ -600,6 +608,12 @@ void hb_threadCancel( HB_STACK *pStack )
    SetThreadContext(  pStack->th_h , &context);
    ResumeThread(  pStack->th_h );
    HB_CRITICAL_UNLOCK( hb_cancelMutex );
+   */
+
+   TerminateThread( pStack->th_h, 0 );
+   hb_threadTerminator( (void *)pStack );
+   HB_CRITICAL_UNLOCK( hb_cancelMutex );
+      
 }
    
 #endif
@@ -639,14 +653,12 @@ void hb_threadTerminator( void *pData )
    HB_SET_SHARED( hb_runningStacks, HB_COND_INC, -1 );
 }
 
-
-
 void hb_mutexForceUnlock( void *mtx )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
    Mutex->locker = 0;
    Mutex->lock_count = 0;
-   HB_CRITICAL_UNLOCK( Mutex->mutex );	
+   HB_MUTEX_UNLOCK( Mutex->mutex );	
 }
 
 void hb_rawMutexForceUnlock( void * mtx )
@@ -906,20 +918,13 @@ HB_FUNC( STOPTHREAD )
       pthread_join( th, NULL );
       
    #else
-
       stack = hb_threadGetStack( th );
-      /* Shell locking the thread */
+      
       HB_CRITICAL_LOCK( hb_cancelMutex );
-      if ( ! stack->bCanCancel )
-      {
-         stack->bCanceled = TRUE;
-         HB_CRITICAL_UNLOCK( hb_cancelMutex );
-         WaitForSingleObject( stack->th_h, INFINITE );
-      }
-      else
-      {
-         hb_threadCancel( stack ); // also unlocks the mutex
-      }
+      stack->bCanceled = TRUE;
+      HB_CRITICAL_UNLOCK( hb_cancelMutex );
+      
+      WaitForSingleObject( stack->th_h, INFINITE );
    
    #endif
        
@@ -1019,7 +1024,7 @@ HB_FUNC( CREATEMUTEX )
 
    mt = (HB_MUTEX_STRUCT *) hb_xgrab( sizeof( HB_MUTEX_STRUCT ) );
 
-   HB_CRITICAL_INIT( mt->mutex );
+   HB_MUTEX_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
 
    mt->lock_count = 0;
@@ -1055,13 +1060,7 @@ HB_FUNC( DESTROYMUTEX )
 
    hb_threadUnlinkMutex( Mutex );
    
-   while( Mutex->lock_count )
-   {
-      HB_CRITICAL_UNLOCK( Mutex->mutex );
-      Mutex->lock_count--;
-   }
-
-   HB_CRITICAL_DESTROY( Mutex->mutex );
+   HB_MUTEX_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_itemRelease( Mutex->aEventObjects );
 }
@@ -1094,7 +1093,7 @@ HB_FUNC( MUTEXLOCK )
    else
    {  
       //HB_CRITICAL_UNLOCK( hb_mutexMutex );
-      HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_MUTEX_LOCK( Mutex->mutex );
       Mutex->locker = HB_CURRENT_THREAD();
       Mutex->lock_count = 1;
    }
@@ -1130,7 +1129,7 @@ HB_FUNC( MUTEXUNLOCK )
       if( Mutex->lock_count == 0 )
       {
          Mutex->locker = 0;
-         HB_CRITICAL_UNLOCK( Mutex->mutex );
+         HB_MUTEX_UNLOCK( Mutex->mutex );
       }
    }
    //HB_CRITICAL_UNLOCK( hb_mutexMutex );
@@ -1166,7 +1165,7 @@ HB_FUNC( SUBSCRIBE )
    if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
-      HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_MUTEX_LOCK( Mutex->mutex );
    }
    else
    {
@@ -1206,7 +1205,7 @@ HB_FUNC( SUBSCRIBE )
 
    if( ! islocked )
    {
-      HB_CRITICAL_UNLOCK( Mutex->mutex );
+      HB_MUTEX_UNLOCK( Mutex->mutex );
    }
    else
    {
@@ -1263,7 +1262,7 @@ HB_FUNC( SUBSCRIBENOW )
    if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
-      HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_MUTEX_LOCK( Mutex->mutex );
    }
    else
    {
@@ -1309,7 +1308,7 @@ HB_FUNC( SUBSCRIBENOW )
 
    if( ! islocked )
    {
-      HB_CRITICAL_UNLOCK( Mutex->mutex );
+      HB_MUTEX_UNLOCK( Mutex->mutex );
       Mutex->locker = 0;
    }
    else
@@ -1521,19 +1520,19 @@ JC: I am leaving this in the source code for now; you can never know, this could
 be useful in the future.
 */
 #if defined( HB_OS_WIN_32 ) //&& ( WINVER < 0x0400)
-DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
+DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
    HB_THREAD_STUB 
    int iStatus;
    HB_SYMBOL_UNUSED( bUnused );
    
-   HB_CRITICAL_UNLOCK( hToSignal );
+   HB_MUTEX_UNLOCK( hToSignal );
    // here we can allow cancellation
    HB_ENABLE_ASYN_CANC;
    /* return 0 on success like unix functions */
    iStatus = WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0;
    HB_DISABLE_ASYN_CANC;
-   HB_CRITICAL_LOCK( hToSignal );
+   HB_MUTEX_LOCK( hToSignal );
    
    return iStatus;
 }

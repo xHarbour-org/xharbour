@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.33 2003/03/12 00:24:02 jonnymind Exp $
+* $Id: thread.h,v 1.34 2003/03/12 13:31:23 jonnymind Exp $
 */
 
 /*
@@ -80,6 +80,12 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_CRITICAL_UNLOCK( x )     LeaveCriticalSection( &(x) )
    #define HB_CRITICAL_TRYLOCK( x )    TryEnterCriticalSection( &(x) )
 
+   #define HB_MUTEX_T                  HANDLE
+   #define HB_MUTEX_INIT( x )          ( x = CreateSemaphore( NULL, 1, 1, NULL) )
+   #define HB_MUTEX_DESTROY( x )       CloseHandle( x )
+   #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
+   #define HB_MUTEX_UNLOCK( x )        ReleaseSemaphore( x, 1, NULL )
+
    #define HB_COND_T                   HANDLE
    #define HB_COND_INIT( x )           x = CreateEvent( NULL,FALSE, FALSE, NULL )
    #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
@@ -87,7 +93,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_COND_SIGNAL( x )         SetEvent( x )
    #define HB_COND_DESTROY( x )        CloseHandle( x )
 
-   typedef void ( * HB_IDLE_FUNC )();
+   typedef void ( * HB_IDLE_FUNC )( void );
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
 
@@ -177,10 +183,15 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
          pthread_mutexattr_destroy( &attr );\
       }
    
-   #define HB_CRITICAL_DESTROY( x )         pthread_mutex_destroy( &(x) )
-   #define HB_CRITICAL_LOCK( x )            pthread_mutex_lock( &(x) )
-   #define HB_CRITICAL_UNLOCK( x )          pthread_mutex_unlock( &(x) )
+   #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
+   #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
+   #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
    #define HB_CRITICAL_TRYLOCK( x )    ( pthread_mutex_trylock( &(x) ) != EBUSY )
+
+   #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
+   #define HB_MUTEX_DESTROY( x )       HB_CRITICAL_DESTROY( x )
+   #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
+   #define HB_MUTEX_UNLOCK( x )        HB_CRITICAL_UNLOCK( x )
    
    extern int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec );
    
@@ -216,8 +227,8 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       {\
          hb_runningStacks.content.asLong++;\
          HB_VM_STACK.bInUse = TRUE;\
+         HB_COND_SIGNAL( hb_runningStacks.Cond );\
       }\
-      HB_COND_SIGNAL( hb_runningStacks.Cond );\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
       HB_CLEANUP_POP;\
    } 
@@ -277,7 +288,7 @@ typedef struct tag_HB_STACK
 
 /* Complex Mutex Structure*/
 typedef struct tag_HB_MUTEX_STRUCT {
-   HB_CRITICAL_T mutex;
+   HB_MUTEX_T mutex;
    HB_COND_T cond;
    HB_THREAD_T locker;
    USHORT lock_count;
@@ -484,23 +495,23 @@ extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
 extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
-extern void hb_threadWaitAll();
-extern void hb_threadKillAll();
+extern void hb_threadWaitAll( void );
+extern void hb_threadKillAll( void );
 extern void hb_threadSleep( int millisec );
 extern void hb_mutexForceUnlock( void *);
 extern void hb_rawMutexForceUnlock( void *);
 extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
 extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
 extern void hb_threadTerminator( void *pData );
-extern void hb_threadCancelInternal();   
 
 /* Win 32 specific functions */
 #ifdef HB_OS_WIN_32
-   DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
-   void hb_threadSuspendAll();
-   void hb_threadResumeAll();
+   DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
+   void hb_threadSuspendAll( void );
+   void hb_threadResumeAll( void );
    void hb_threadSubscribeIdle( HB_IDLE_FUNC );
-   void hb_threadCallIdle(); 
+   void hb_threadCallIdle( void ); 
+   void hb_threadCancelInternal( void );   
 #endif
 
 
