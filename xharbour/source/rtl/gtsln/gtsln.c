@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.32 2004/11/25 04:48:47 guerra000 Exp $
+ * $Id: gtsln.c,v 1.33 2004/12/15 13:39:34 druzus Exp $
  */
 
 /*
@@ -543,8 +543,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
                 /* initialize conversion tables */
                 hb_sln_colorTrans();
-                hb_sln_setCharTrans( s_cdpage, NULL, TRUE );
-                hb_sln_setKeyTrans( s_cdpage, NULL );
+                hb_sln_setCharTrans( hb_cdp_page, NULL, TRUE );
+                hb_sln_setKeyTrans( hb_cdp_page, NULL );
                 /* HB_GT_FUNC(gt_build_conv_tabs()); */
 
                 /* ensure we are in a normal chars set */
@@ -1538,7 +1538,7 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox ))
    if ( pszHostCDP && *pszHostCDP )
       cdpHost = hb_cdpFind( pszHostCDP );
    if ( ! cdpHost )
-      cdpHost = s_cdpage;
+      cdpHost = hb_cdp_page;
 
    if ( pszTermCDP && *pszTermCDP )
       cdpTerm = hb_cdpFind( pszTermCDP );
@@ -1561,7 +1561,7 @@ void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
    if ( pszHostCDP && *pszHostCDP )
       cdpHost = hb_cdpFind( pszHostCDP );
    if ( ! cdpHost )
-      cdpHost = s_cdpage;
+      cdpHost = hb_cdp_page;
 
    if ( pszTermCDP && *pszTermCDP )
       cdpTerm = hb_cdpFind( pszTermCDP );

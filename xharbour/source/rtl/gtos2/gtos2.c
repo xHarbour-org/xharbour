@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.22 2004/11/25 05:11:58 guerra000 Exp $
+ * $Id: gtos2.c,v 1.23 2004/12/20 09:35:15 mauriliolongo Exp $
  */
 
 /*
@@ -96,7 +96,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /* convert 16:16 address to 0:32 */
@@ -1349,7 +1348,7 @@ void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
    }
 
    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
@@ -1393,7 +1392,7 @@ void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
    }
 
    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )

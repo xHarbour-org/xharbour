@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.37 2004/07/10 04:52:08 guerra000 Exp $
+ * $Id: transfrm.c,v 1.38 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -72,8 +72,7 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
-  extern PHB_CODEPAGE s_cdpage;
-  #define TOUPPER(c)    ((s_cdpage->nChars)? (char)s_cdpage->s_upper[c&255] : toupper(c))
+  #define TOUPPER(c)    ((hb_cdp_page->nChars)? (char)hb_cdp_page->s_upper[c&255] : toupper(c))
 #else
   #define TOUPPER(c)    toupper(c)
 #endif

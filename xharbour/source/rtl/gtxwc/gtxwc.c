@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.6 2004/11/23 17:04:24 lf_sfnet Exp $
+ * $Id: gtxwc.c,v 1.7 2004/11/25 05:11:59 guerra000 Exp $
  */
 
 /*
@@ -2834,7 +2834,7 @@ static PXWND_DEF hb_xvt_gtCreateWndDef( void )
    wnd->fInit = FALSE;
    hb_xvt_gtSetScrBuff( wnd, XVT_DEFAULT_COLS, XVT_DEFAULT_ROWS );
    wnd->fWinResize = FALSE;
-   wnd->hostCDP = s_cdpage;
+   wnd->hostCDP = hb_cdp_page;
    wnd->cursorType = SC_NORMAL;
 
    pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
@@ -3964,8 +3964,8 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox ))
     */
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      if ( s_cdpage )
-         pszHostCDP = s_cdpage->id;
+      if ( hb_cdp_page )
+         pszHostCDP = hb_cdp_page->id;
       else if ( pszTermCDP && *pszTermCDP )
          pszHostCDP = pszTermCDP;
    }
@@ -4000,8 +4000,8 @@ void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
     */
    if ( !pszTermCDP || !*pszTermCDP )
    {
-      if ( s_cdpage )
-         pszTermCDP = s_cdpage->id;
+      if ( hb_cdp_page )
+         pszTermCDP = hb_cdp_page->id;
       else if ( pszHostCDP && *pszHostCDP )
          pszTermCDP = pszHostCDP;
    }

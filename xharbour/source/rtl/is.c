@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.6 2004/02/22 20:37:40 andijahja Exp $
+ * $Id: is.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /* determines if first char of string is letter */
@@ -70,8 +69,8 @@ HB_FUNC( ISALPHA )
       if( isalpha( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] &&
-           ( strchr( s_cdpage->CharsUpper, *szString ) || strchr( s_cdpage->CharsLower, *szString ) ) )
+      else if( hb_cdp_page->nChars && szString[0] &&
+           ( strchr( hb_cdp_page->CharsUpper, *szString ) || strchr( hb_cdp_page->CharsLower, *szString ) ) )
          hb_retl( TRUE );
 #endif
       else
@@ -104,7 +103,7 @@ HB_FUNC( ISUPPER )
       if( isupper( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsUpper, *szString ) )
+      else if( hb_cdp_page->nChars && szString[0] && strchr( hb_cdp_page->CharsUpper, *szString ) )
          hb_retl( TRUE );
 #endif
       else
@@ -125,7 +124,7 @@ HB_FUNC( ISLOWER )
       if( islower( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsLower, *szString ) )
+      else if( hb_cdp_page->nChars && szString[0] && strchr( hb_cdp_page->CharsLower, *szString ) )
          hb_retl( TRUE );
 #endif
       else

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.51 2004/11/24 18:31:05 lf_sfnet Exp $
+ * $Id: gtcrs.c,v 1.52 2004/11/25 04:48:46 guerra000 Exp $
  */
 
 /*
@@ -3421,7 +3421,7 @@ void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
       if ( !pszHostCDP )
          pszHostCDP = pszTermCDP;
    }
@@ -3467,7 +3467,7 @@ void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
    }
 
    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )

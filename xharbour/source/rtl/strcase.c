@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.18 2004/09/21 02:52:36 druzus Exp $
+ * $Id: strcase.c,v 1.20 2004/09/21 04:09:20 druzus Exp $
  */
 
 /*
@@ -59,7 +59,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /* converts szText to lower case. Does not create a new string! */
@@ -70,9 +69,9 @@ HB_EXPORT char * hb_strLower( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strLower(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( s_cdpage->nChars )
+   if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) s_cdpage->s_lower[szText[i]&255];
+         szText[ i ] = (char) hb_cdp_page->s_lower[szText[i]&255];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -89,9 +88,9 @@ HB_EXPORT char * hb_strLowerCopy( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strLowerCopy(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( s_cdpage->nChars )
+   if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) s_cdpage->s_lower[szText[i]&255];
+         szCopy[ i ] = (char) hb_cdp_page->s_lower[szText[i]&255];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -109,9 +108,9 @@ HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpperCopy(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( s_cdpage->nChars )
+   if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) s_cdpage->s_upper[szText[i]&255];
+         szCopy[ i ] = (char) hb_cdp_page->s_upper[szText[i]&255];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -129,9 +128,9 @@ HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpper(%s, %lu)", szText, ulLen));
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( s_cdpage->nChars )
+   if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) s_cdpage->s_upper[szText[i]&255];
+         szText[ i ] = (char) hb_cdp_page->s_upper[szText[i]&255];
    else
 #endif
       for( i = 0; i < ulLen; i++ )

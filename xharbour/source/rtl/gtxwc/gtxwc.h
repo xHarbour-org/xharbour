@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtxwc.h,v 1.1 2004/09/08 00:17:17 druzus Exp $
  */
 
 /*
@@ -71,7 +71,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 #include <signal.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.76 2004/11/25 22:53:35 guerra000 Exp $
+ * $Id: gtwin.c,v 1.77 2004/11/27 04:05:18 guerra000 Exp $
  */
 
 /*
@@ -90,7 +90,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 #include <string.h>
@@ -2137,7 +2136,7 @@ void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
    }
 
    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
@@ -2181,7 +2180,7 @@ void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
 #ifndef HB_CDP_SUPPORT_OFF
    if ( !pszHostCDP || !*pszHostCDP )
    {
-      pszHostCDP = s_cdpage->id;
+      pszHostCDP = hb_cdp_page->id;
    }
 
    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )

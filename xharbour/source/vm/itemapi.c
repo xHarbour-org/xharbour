@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.105 2004/12/14 00:15:40 druzus Exp $
+ * $Id: itemapi.c,v 1.106 2004/12/15 13:39:35 druzus Exp $
  */
 
 /*
@@ -100,7 +100,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 #if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(_MSC_VER)
@@ -1243,8 +1242,8 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    if( ulMinLen )
    {
 #ifndef HB_CDP_SUPPORT_OFF
-      if( s_cdpage->lSort )
-         iRet = hb_cdpcmp( szFirst,szSecond,ulMinLen,s_cdpage, &ulCounter );
+      if( hb_cdp_page->lSort )
+         iRet = hb_cdpcmp( szFirst, szSecond, ulMinLen, hb_cdp_page, &ulCounter );
       else
 #endif
          for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )

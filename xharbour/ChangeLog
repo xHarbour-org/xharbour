@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3697 2004/12/27 11:06:04 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3698 2004/12/28 06:38:57 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-28 08:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/rtl/is.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/rtl/gtxwc/gtxwc.h
+  * xharbour/source/vm/itemapi.c
+    * renamed s_cdpage to hb_cdp_page
 
 2004-12-28 07:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   - xharbour/source/codepage/cpdos437.c

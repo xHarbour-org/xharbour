@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.8 2004/06/09 15:51:04 druzus Exp $
+ * $Id: gtsln.h,v 1.9 2004/10/18 10:22:26 likewolf Exp $
  */
 
 /*
@@ -74,7 +74,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /*

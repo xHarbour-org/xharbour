@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.14 2004/12/10 03:43:34 mlombardo Exp $
+ * $Id: gtcrs.h,v 1.15 2004/12/11 00:43:04 druzus Exp $
  */
 
 /*
@@ -68,7 +68,6 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
 #endif
 
 #ifdef HB_NCURSES_194
