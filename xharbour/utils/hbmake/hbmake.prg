@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.138 2004/01/17 21:54:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.139 2005/01/21 16:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.138"
+STATIC s_cHbMakeVersion := "1.139"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -85,7 +85,7 @@ STATIC s_aObjs           := {}
 STATIC s_aObjsc          := {}
 STATIC s_aSrcPaths       := {}
 STATIC s_lEof            := .F.
-STATIC s_aRes            := {}
+STATIC s_aResources      := {}
 STATIC s_nMakeFileHandle 
 STATIC s_cMakeFileName   := "makefile.lnk"
 STATIC s_cLinkCommands   := ""
@@ -111,8 +111,8 @@ STATIC s_cDefLang
 STATIC s_cLog            := ""
 STATIC s_nLang           := 2    //  default is english 
 STATIC s_lMt             := .F.
-STATIC s_cUserDef        := "                                        "
-STATIC s_cUserInclude    := "                                        "
+STATIC s_cUserDefine     := ""
+STATIC s_cUserInclude    := ""
 STATIC s_lxFwh           := .F.
 STATIC s_nFilesToAdd     := 5
 STATIC s_nWarningLevel   := 0
@@ -591,7 +591,7 @@ FUNCTION ParseMakeFile( cFile )
             ENDIF
 
             IF aTemp[ 1 ] == "RESFILES"
-               s_aRes := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               s_aResources := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
             ENDIF
 
          ELSE
@@ -1094,7 +1094,7 @@ FUNCTION CompileFiles()
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCs ) )   // Changed s_aPrgs to s_aCs, Ath 2004-06-08
                      nFile ++
-                     //                            Outstd( cComm )
+                     // Outstd( cComm )
                      setpos(9,0)
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
@@ -1163,7 +1163,7 @@ FUNCTION CompileFiles()
 
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
-                  //                        Outstd( Hb_OsNewLine() )
+                  // Outstd( Hb_OsNewLine() )
                   nFile ++
                   setpos(9,0)
                   __RUN( (cComm) )
@@ -1196,11 +1196,11 @@ FUNCTION CompileFiles()
             cOld  := cComm
          ENDIF
 
-         FOR nFiles := 1 TO Len( s_aRes )
+         FOR nFiles := 1 TO Len( s_aResources )
 
-            IF ! Empty( s_aRes[ nFiles ] )
-               cComm := Strtran( cComm, "$<", s_aRes[ nFiles ] )
-               Outstd( " " )
+            IF ! Empty( s_aResources[ nFiles ] )
+               cComm := Strtran( cComm, "$<", s_aResources[ nFiles ] )
+               outstd( " " )
                ? cComm
                setpos(9,0)
                __RUN( (cComm) )
@@ -1361,7 +1361,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cHtmlLib     := ""
    LOCAL lLinux       := "linux" IN Lower( Os() )
    LOCAL nWriteFiles  := 0
-   LOCAL cResName     := Space( 50 )
+   LOCAL cResName     := space(200)
    LOCAL aSelFiles
 
    LOCAL cBuild       := " "
@@ -1395,6 +1395,10 @@ FUNCTION CreateMakeFile( cFile )
 
    LOCAL cHarbourLibDir := GetHarbourDir()+iif(s_lLinux,"/lib","\lib")
    LOCAL lCancelMake := .F.
+
+
+   s_cUserInclude  := space(200)
+   s_cUserDefine   := space(200)
 
 
    IF File( cFile )
@@ -1464,14 +1468,15 @@ FUNCTION CreateMakeFile( cFile )
          s_cAppName      := oMake:cAppLibName
          s_lCompress     := oMake:lCompress
          s_lExternalLib  := oMake:lExternalLib
-         s_cUserInclude  := PadR(oMake:cUserInclude,40," ")
-         s_cUserDef      := PadR(oMake:cUserDef,40," ")
+         s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
+         s_cUserDefine   := PadR(oMake:cUserDef,200," ")
          s_lxFwh         := oMake:lxFwh
          s_nFilesToAdd   := oMake:cFilesToAdd
          s_lMt           := oMake:lMt
          s_nWarningLevel := oMake:cWarningLevel
          cTopFile        := PadR(oMake:cTopModule,50," ")
-         cResName        := PadR(oMake:cRes,50)
+         cResName        := PadR(oMake:cRes,200)
+
 
          if !s_lRecursive
             s_lRecursive := oMake:lRecurse
@@ -1573,6 +1578,7 @@ FUNCTION CreateMakeFile( cFile )
             RETURN NIL
 
          endif
+
 
          WriteMakeFileHeader()
          lNew := .T.
@@ -1688,7 +1694,7 @@ FUNCTION CreateMakeFile( cFile )
    ENDIF
 
    IF nOption = 2 // create a new makefile
-      cResName := PadR(alltrim(cResName)+iIF(!empty(cResName)," ","")+alltrim(cAllRes),50," ")
+      cResName := PadR(alltrim(cResName)+iIF(!empty(cResName)," ","")+alltrim(cAllRes),200 )
    ENDIF
 
 //   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
@@ -1702,19 +1708,19 @@ FUNCTION CreateMakeFile( cFile )
    @ 07, 40 GET lSupressLine checkbox caption s_aLangMessages[ 35 ] style "[X ]"
    @ 08, 01 GET lGenPPO      checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08, 40 GET lCompMod     checkbox caption s_aLangMessages[ 37 ] style "[X ]"
-   @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDef PICT "@s15"
-   @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s10"
+   @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
+   @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
    @ 10, 01 GET s_lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[X ]"
    @ 10, 40 GET s_lxFwh        checkbox caption "xHarbour FWH" style "[X ]"
-   @ 11, 01 SAY "Resource file Name: " GET cResName
+   @ 11, 01 SAY "Resource file Name: " GET cResName pict "@s55"
    @ 12, 01 SAY s_aLangMessages[ 43 ] GET s_nFilestoAdd PICT "99" VALID s_nFilestoAdd > 0
    @ 13, 01 GET s_lMt checkbox caption s_aLangMessages[ 44 ] style "[X ]"
    @ 13, 40 SAY s_aLangMessages[ 46 ] GET s_nWarningLevel Pict "9" VALID s_nWarningLevel>=0 .AND. s_nWarningLevel <= 4
 // READ
    READ msg at maxrow()-1,1,maxcol()-1
 
-   IF ! Empty( s_cUserDef )
-      aUserDefs := ListasArray2(Alltrim( s_cUserDef ), ";")
+   IF ! Empty( s_cUserDefine )
+      aUserDefs := ListasArray2(Alltrim( s_cUserDefine ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cHarbourFlags += " -D" + Alltrim( cCurrentDef ) + " "
@@ -2096,9 +2102,9 @@ FUNCTION CreateMakeFile( cFile )
 
    FWrite( s_nMakeFileHandle, "WARNINGLEVEL = " + Str(s_nWarningLevel, 2) + CRLF )
 
-   FWrite( s_nMakeFileHandle, "USERDEFINE = " + s_cUserDef + CRLF )
+   FWrite( s_nMakeFileHandle, "USERDEFINE = " + alltrim(s_cUserDefine) + CRLF )
 
-   FWrite( s_nMakeFileHandle, "USERINCLUDE = " + s_cUserInclude + CRLF )
+   FWrite( s_nMakeFileHandle, "USERINCLUDE = " + alltrim(s_cUserInclude) + CRLF )
 
    IF lFwh
       FWrite( s_nMakeFileHandle, "FWH = " + alltrim(cFwhPath) + CRLF )
@@ -2263,9 +2269,9 @@ FUNCTION CreateMakeFile( cFile )
 
    ENDIF
 
-   cResName := Lower( cResName )
+   cResName := Lower( alltrim(cResName) )
    FWrite( s_nMakeFileHandle, "RESFILES = " + cResName + CRLF )
-   FWrite( s_nMakeFileHandle, "RESDEPEN = " + Strtran( cResName, ".rc", ".res" ) + CRLF )
+   FWrite( s_nMakeFileHandle, "RESDEPEN = " + StrTran( cResName, ".rc", ".res" ) + CRLF )
    FWrite( s_nMakeFileHandle, "TOPMODULE = " + alltrim(cTopFile) + CRLF )
 
    IF lRddads
@@ -2491,7 +2497,7 @@ FUNCTION CreateMakeFile( cFile )
    ELSEIF s_lMSVcc
 
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + Alltrim( s_cUserInclude ) + " " + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
@@ -3063,11 +3069,11 @@ FUNCTION CompileUpdatedFiles()
             cOld  := cComm
          ENDIF
 
-         FOR nFiles := 1 TO Len( s_aRes )
+         FOR nFiles := 1 TO Len( s_aResources )
 
-            IF ! Empty( s_aRes[ nFiles ] )
-               cComm := Strtran( cComm, "$<", s_aRes[ nFiles ] )
-               Outstd( " " )
+            IF ! Empty( s_aResources[ nFiles ] )
+               cComm := Strtran( cComm, "$<", s_aResources[ nFiles ] )
+               outstd( " " )
                setpos(9,0)
                __RUN( (cComm) )
             ENDIF
@@ -3264,8 +3270,8 @@ FUNCTION CreateLibMakeFile( cFile )
          lCompMod        := oMake:lCompMod
          lGenPPO         := oMake:lGenppo
          lInstallLib     := oMake:lInstallLib
-         s_cUserInclude  := PadR(oMake:cUserInclude,40," ")
-         s_cUserDef      := PadR(oMake:cUserDef,40," ")
+         s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
+         s_cUserDefine      := PadR(oMake:cUserDef,200," ")
          if !empty(oMake:cFmc)
              cLibName    := PadR(oMake:cFmc,200)
          endif
@@ -3434,16 +3440,16 @@ FUNCTION CreateLibMakeFile( cFile )
    @ 07,40 GET lSupressLine  checkbox caption s_aLangMessages[ 35 ] style "[X ]"
    @ 08,01 GET lGenPPO       checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08,40 GET lCompMod      checkbox caption s_aLangMessages[ 37 ] style "[X ]"
-   @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDef PICT "@s15"
-   @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s10"
+   @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
+   @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
    @ 10,01 GET lInstallLib   checkbox caption s_aLangMessages[ 61 ] style "[X ]"
 
    READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
 
 // SET CURSOR ON
 
-   IF ! Empty( s_cUserDef )
-      aUserDefs := ListasArray2(Alltrim( s_cUserDef ), ";")
+   IF ! Empty( s_cUserDefine )
+      aUserDefs := ListasArray2(Alltrim( s_cUserDefine ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cHarbourFlags += " -D" + Alltrim( cCurrentDef ) + " "
@@ -3758,8 +3764,8 @@ FUNCTION CreateLibMakeFile( cFile )
    FWrite( s_nMakeFileHandle, "DEFFILE = " + CRLF )
    FWrite( s_nMakeFileHandle, "HARBOURFLAGS = " + cHarbourFlags + CRLF )
    FWrite( s_nMakeFileHandle, "INSTALLLIB = " + IIF( lInstallLib, "YES","NO" ) + CRLF )
-   FWrite( s_nMakeFileHandle, "USERDEFINE = " + s_cUserDef + CRLF )
-   FWrite( s_nMakeFileHandle, "USERINCLUDE = " + s_cUserInclude + CRLF )
+   FWrite( s_nMakeFileHandle, "USERDEFINE = " + alltrim(s_cUserDefine) + CRLF )
+   FWrite( s_nMakeFileHandle, "USERINCLUDE = " + alltrim(s_cUserInclude) + CRLF )
 
    IF s_lBcc
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" + CRLF )
@@ -4878,7 +4884,7 @@ FUNCTION ResetInternalVars()
    s_aObjs         := {}
    s_aObjsc        := {}
    s_lEof          := .F.
-   s_aRes          := {}
+   s_aResources    := {}
 // s_cMakeFileName := "makefile.lnk"
    s_cLinkCommands := ""
    s_lBcc          := .T.
