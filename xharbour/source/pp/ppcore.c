@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.9 2002/03/11 23:54:57 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.10 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -2823,7 +2823,16 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
    HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %i, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
 
-   //printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+   #if 0
+   if( s_bReplacePat )
+   {
+      printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+   }
+   else
+   {
+      printf( "Scan '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+   }
+   #endif
 
    if( *( exppatt + 1 ) == '\0' )
    {
@@ -2842,6 +2851,14 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
       if( ptr )
       {
+         //printf( "   Repeat: %i Previous Square: '%s'\n", s_Repeate, ptr );
+
+         // Ron Pinkas added 2002-04-26 ( Dont replace not repeatable into the Repeatable residual container
+         if( s_Repeate == 0 && s_bReplacePat && lenreal )
+         {
+            return;
+         }
+
          if( s_Repeate )
          {
             s_aIsRepeate[ s_Repeate - 1 ]++;
@@ -2896,19 +2913,21 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
                {
-                  //printf( "1\n" );
+                  //printf( "   1\n" );
                   lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
                }
 
                if( kolmarkers )
                {
                   s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
+                  //printf( "   Increased to %c;", s_groupchar );
 
                   for( i=0; i<lennew; i++ )
                   {
                      if( *(expnew+i) == '\1' )
                      {
                          *(expnew+i+3) = s_groupchar;
+                         //printf( "   Group char: %s\n", (expnew+i+3) );
                          i += 4;
                      }
                   }
@@ -2922,7 +2941,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          }
       }
 
-      if( !rezs && s_bReplacePat )
+      if( ( ! rezs ) && s_bReplacePat )
       {
          if( *(ptrOut + ifou + 2) != '0' && *(exppatt+1) )
          {
@@ -2931,13 +2950,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                lastchar = *(ptrOut + ifou + 2);
             }
 
-            //printf( "lastchar: '%c' '%c'\n", lastchar, *(ptrOut + ifou + 2) );
+            //printf( "Repeate: %i lastchar: '%c' '%c'\n", s_Repeate, lastchar, *(ptrOut + ifou + 2) );
 
-            if( lastchar == *(ptrOut + ifou + 2) )
-            {
-               lastchar++;
-            }
-            else
+            // Ron Pinkas added [s_Repeate &&] 2002-04-26
+            if( s_Repeate && lastchar != *(ptrOut + ifou + 2) )
             {
                isdvig += ifou + 3;
                ptrOut = ptro + isdvig;
@@ -2945,7 +2961,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             }
          }
 
-         //printf( "2\n" );
+         //printf( "   2\n" );
          *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
          isdvig += ifou - 1;
       }
