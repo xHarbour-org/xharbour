@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2085 2004/01/17 02:39:10 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2086 2004/01/17 15:12:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-17 16:00 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * source/rtl/filesys.c
+    + hb_fileNameConv()  function added
+    * All calls to hb_filecase change to hb_fileNameConv()
+  * source/rtl/direct.c
+    source/rtl/file.c
+    source/rdd/dbcmd.c
+    source/rdd/dbfcdx/dbfcdx1.c
+    source/rtl/dbfntx/dbfntx1.c
+    contrib/libct/files.c
+     * All calls to hb_filecase change to hb_fileNameConv()
+  * include/hbapifs.h
+    + hb_fileNameConv() prototype
+
 
 2004-01-17 16:11 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.8 2003/12/04 17:55:53 druzus Exp $
+ * $Id: direct.c,v 1.9 2003/12/05 04:52:25 ronpinkas Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ HB_FUNC( DIRECTORY )
       }
 
    szDirSpec = pDirSpec ?
-               hb_filecase( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) :
+               hb_fileNameConv( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) :
                (BYTE *) HB_DIR_ALL_FILES_MASK;
 
    /* Get the file list */

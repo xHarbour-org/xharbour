@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.7 2003/09/26 00:15:46 paultucker Exp $
+ * $Id: files.c,v 1.8 2003/12/28 22:25:33 druzus Exp $
  */
 
 /*
@@ -903,7 +903,7 @@ HB_FUNC( FILEDELETE )
 
    if ( ISCHAR( 1 ) )
    {
-      pDirSpec = hb_filecase( hb_strdup( hb_parc( 1 ) ) );
+      pDirSpec = hb_fileNameConv( hb_strdup( hb_parc( 1 ) ) );
 
       if ( ISNUM( 2 ) )
       {

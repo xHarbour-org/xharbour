@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.91 2003/12/12 10:16:05 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.92 2003/12/13 17:55:11 druzus Exp $
  */
 
 /*
@@ -5467,7 +5467,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 3 );
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
-   szFileName = ( char * ) hb_filecase( szFileName ) ;
+   szFileName = ( char * ) hb_fileNameConv( szFileName ) ;
 
    if ( strlen( szFileName ) == 0 )
    {

@@ -1440,17 +1440,10 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    HB_THREAD_STUB
 
    FHANDLE hFileHandle;
-   char * szFile ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-   if ( hb_set.HB_SET_TRIMFILENAME )
-      szFile = (char *) hb_fileTrim( pFilename );
-   else
-      szFile = (char * ) pFilename;
-
-
-   pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * )pFilename) );
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
@@ -1594,9 +1587,6 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    hb_xfree( pFilename );
 
-   if (hb_set.HB_SET_TRIMFILENAME)
-      hb_xfree( szFile );
-
    return hFileHandle;
 }
 
@@ -1610,13 +1600,8 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
-   if (hb_set.HB_SET_TRIMFILENAME)
-      szFile = (char *) hb_fileTrim(  pFilename );
-   else
-      szFile = (char * ) pFilename;
 
-
-   pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
 
@@ -1679,9 +1664,6 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
-
-   if (hb_set.HB_SET_TRIMFILENAME)
-      hb_xfree(szFile);
 
    return hFileHandle;
 }
@@ -3447,15 +3429,68 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
 char HB_EXPORT * hb_fileTrim( BYTE * szFile)  /* Caller must free the buffer returned */
 {
 
-   char * szFileTrim = (char*) szFile;
+   char * szFileTrim ;
    ULONG ulPos;
-
-   szFile = (BYTE * ) hb_xgrab( 255 );
-   ulPos =  hb_strRTrimLen( ( const char *) szFile, strlen( (const char *) szFile ), FALSE );
-   szFile = (BYTE *) hb_strLTrim( ( const char *) szFile, &ulPos );
-   strncpy( szFileTrim, ( const char *) szFile, ulPos );
+   szFileTrim = (char * ) hb_xgrab( 255 );
+   ulPos =  hb_strRTrimLen( szFile, strlen( szFile ), FALSE );
+   szFile = hb_strLTrim( szFile, &ulPos );
+   strncpy( szFileTrim, szFile, ulPos );
    szFileTrim[ulPos]  = '\0';
 
    return szFileTrim;
+}
+
+
+BYTE HB_EXPORT * hb_fileNameConv(char *str) {
+   // Convert file and dir case. The allowed SET options are:
+   // LOWER - Convert all caracters of file to lower
+   // UPPER - Convert all caracters of file to upper
+   // MIXED - Leave as is
+
+   // The allowed environment options are:
+   // FILECASE - define the case of file
+   // DIRCASE - define the case of path
+   // DIRSEPARATOR - define separator of path (Ex. "/")
+
+   size_t a;
+   char *filename;
+   char *dirname=str;
+   size_t dirlen;
+   char * szFileTrim =str;
+   ULONG ulPos;
+   if ( hb_set.HB_SET_TRIMFILENAME )
+   {
+      ulPos =  hb_strRTrimLen( szFileTrim, strlen( szFileTrim ), FALSE );
+      szFileTrim = hb_strLTrim( szFileTrim, &ulPos );
+      memcpy( str, szFileTrim, ulPos-1);
+      str[ulPos] = '\0';
+      dirname=str;
+   }
+
+
+   // Look for filename (Last "\" or DIRSEPARATOR)
+   if( hb_set.HB_SET_DIRSEPARATOR != '\\' ) {
+      for(a=0;a<strlen(str);a++)
+         if( str[a] == '\\' )
+            str[a] = hb_set.HB_SET_DIRSEPARATOR;
+   }
+   if(( filename = strrchr( str, hb_set.HB_SET_DIRSEPARATOR )) != NULL)
+      filename++;
+   else
+      filename=str;
+   dirlen=filename-str;
+
+   // FILECASE
+   if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
+      hb_strLower( filename, strlen(filename) );
+   else if( hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER )
+      hb_strUpper( filename, strlen(filename) );
+
+   // DIRCASE
+   if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )
+      hb_strLower(dirname,dirlen);
+   else if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      hb_strUpper(dirname,dirlen);
+   return (( BYTE * ) str);
 }
 

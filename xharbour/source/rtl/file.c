@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.10 2004/01/14 22:28:45 andijahja Exp $
+ * $Id: file.c,v 1.11 2004/01/16 11:41:20 lculik Exp $
  */
 
 /*
@@ -64,12 +64,8 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
    char * szFile ;
-   if (hb_set.HB_SET_TRIMFILENAME)
-      szFile = (char *) hb_fileTrim(  pFilename );
-   else
-      szFile = (char * ) pFilename;
 
-   pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
    {
@@ -85,9 +81,6 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
    }
 
    hb_xfree(pFilename);
-
-   if (hb_set.HB_SET_TRIMFILENAME)
-      hb_xfree(szFile);
 
    hb_fsSetError( 0 );
 

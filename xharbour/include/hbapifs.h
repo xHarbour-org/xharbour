@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.25 2004/01/07 11:58:45 jonnymind Exp $
+ * $Id: hbapifs.h,v 1.26 2004/01/16 11:36:50 lculik Exp $
  */
 
 /*
@@ -210,6 +210,7 @@ extern char      HB_EXPORT * hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
 extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to environment case */
 
 extern char      HB_EXPORT * hb_fileTrim( BYTE * szFile) ; /* Caller must free the buffer returned */
+extern BYTE HB_EXPORT * hb_fileNameConv(char *str) ;
 
 #ifdef HB_OS_WIN_32
    extern int WintoDosError( unsigned long lError);
