@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipurl.prg,v 1.2 2003/06/16 00:41:28 jonnymind Exp $
+* $Id: tipurl.prg,v 1.3 2003/12/10 00:11:22 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -36,7 +36,7 @@ CLASS tURL
    METHOD BuildQuery( )
 
 HIDDEN:
-   CLASSDATA   cREuri   INIT HB_RegexComp("(?:(.*)://)?([^?/]*)/?([^?]*)?\??(.*)")
+   CLASSDATA   cREuri   INIT HB_RegexComp("(?:(.*)://)?([^?/]*)(/[^?]*)?\??(.*)")
    CLASSDATA   cREServ  INIT HB_RegexComp("(?:([^:@]*):?([^@:]*)@|)([^:]+):?(.*)")
    CLASSDATA   cREFile  INIT HB_RegexComp("^((?:/.*/)|/)*(.*)$")
 
@@ -78,20 +78,20 @@ METHOD SetAddress( cUrl ) CLASS tURL
    cPath := aMatch[4]
    ::cQuery := aMatch[5]
 
-   ? "Main match", ValToPRg( aMatch )
    // server parsing (can't fail)
    aMatch := HB_Regex( ::cREServ, cServer )
    ::cUserId := aMatch[2]
    ::cPassword := aMatch[3]
    ::cServer := aMatch[4]
    ::nPort := Val(aMatch[5])
-   ? "Server match", ValToPRg( aMatch )
+   IF ::nPort < 1
+      ::nPort := -1
+   ENDIF
 
    // Parse path and file (can't fail )
    aMatch := HB_Regex( ::cREFile, cPath )
    ::cPath := aMatch[2]
    ::cFile := aMatch[3]
-   ? "Path match", ValToPRg( aMatch )
 
 RETURN .T.
 

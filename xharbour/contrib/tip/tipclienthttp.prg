@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.7 2003/12/01 00:19:39 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.8 2003/12/10 00:11:22 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -81,6 +81,7 @@ METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
 
    IF InetErrorCode( ::SocketCon  ) ==  0
       InetSendAll( ::SocketCon, cData )
+      ::bInitialized := .T.
       RETURN ::ReadHeaders()
    ENDIF
 RETURN .F.
@@ -132,7 +133,7 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
    IF aVersion == NIL
       ::nVersion := 0
-      ::nSubvesion := 9
+      ::nSubversion := 9
       ::nReplyCode := 0
       ::cReplyDescr := ""
    ELSE
@@ -146,9 +147,10 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
    ::bChunked := .F.
    cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
 
-   DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. Len( cLine ) > 0
+   DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
       aHead := HB_RegexSplit( ":", cLine,,, 1 )
       IF aHead == NIL .or. Len( aHead ) != 2
+         cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
          LOOP
       ENDIF
 
