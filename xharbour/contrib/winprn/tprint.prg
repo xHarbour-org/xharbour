@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.4 2004/01/21 22:08:08 peterrees Exp $
+ * $Id: tprint.prg,v 1.5 2004/01/21 23:49:20 peterrees Exp $
  */
 
 /*
@@ -767,7 +767,7 @@ static HB_FUNC( CREATEFONT )
   if (hFont)
   {
     Result = TRUE;
-    hOldFont = SelectObject(hDC, hFont) ;
+    hOldFont = (HFONT) SelectObject(hDC, hFont) ;
     if ( hOldFont )
     {
       DeleteObject(hOldFont) ;
@@ -783,7 +783,7 @@ static HB_FUNC( GETPRINTERFONTNAME )
   {
     unsigned char cFont[128] ;
     GetTextFace(hDC, 127, (LPTSTR) cFont) ;
-    hb_retc( cFont ) ;
+    hb_retc( (char*) cFont ) ;
   }
   else
   {
@@ -810,7 +810,7 @@ static HB_FUNC( SETDOCUMENTPROPERTIES )
   {
     HANDLE hPrinter ;
     LPTSTR pszPrinterName = hb_parc(2) ;
-    PDEVMODE pDevMode ;
+    PDEVMODE pDevMode = NULL ;
     LONG lSize ;
     if (OpenPrinter(pszPrinterName, &hPrinter, NULL))
     {
@@ -850,7 +850,7 @@ static HB_FUNC( LOADBITMAPFILE )
     dwFileSize = GetFileSize (hFile, &dwHighSize) ;
     if ((dwFileSize != INVALID_FILE_SIZE) && !dwHighSize) // Do not continue if File size error or TOO big for memory
     {
-      pbmfh = hb_xgrab(dwFileSize) ;
+      pbmfh = (BITMAPFILEHEADER *) hb_xgrab(dwFileSize) ;
       if (pbmfh)
       {
         bSuccess = ReadFile (hFile, pbmfh, dwFileSize, &dwBytesRead, NULL) ;
@@ -940,5 +940,5 @@ static HB_FUNC( GETEXEFILENAME )
 {
   unsigned char pBuf[1024] ;
   GetModuleFileName(NULL, (LPTSTR) pBuf, 1023) ;
-  hb_retc(pBuf) ;
+  hb_retc( (char*) pBuf ) ;
 }

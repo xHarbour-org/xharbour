@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2119 2004/01/21 23:44:38 walito Exp $
+ * $Id: ChangeLog,v 1.2120 2004/01/21 23:48:31 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/winprn/tprint.prg
+     + added MSVC castings
+     + initialised pDevMode to NULL in SETDOCUMENTPROPERTIES()
+         thanks to Andi Jahja
+
 2004-01-22 12:46 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg
      + added hb_ret() to ENUMFONTS()
