@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.126 2004/02/11 17:34:37 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.127 2004/02/14 01:29:41 andijahja Exp $
  */
 
 /*
@@ -3223,10 +3223,12 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
       else
       {
-         return 0;
+         lens = 0;
+         goto Done;
       }
    }
 
+   // Extended Match Marker
    if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
    {
       char *pTmp = strpbrk( *ptri, " ,\"'" );
@@ -3878,7 +3880,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
    }
 
-   if( expreal != NULL )
+   if( expreal )
    {
       if( *(expreal-1) == ' ' )
       {
@@ -3890,26 +3892,18 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       *expreal = '\0';
    }
 
- Done:
    /* Ron Pinkas added 2000-06-21 */
    if( bStrict )
    {
-      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3
-          || State == STATE_QUOTE4 ||
+      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3 || State == STATE_QUOTE4 ||
           State == STATE_BRACKET || StBr1 || StBr2 || StBr3  )
       {
-          /* Alexander should we include this???
-          expreal = NULL;
-          */
           lens = 0;
       }
    }
    /* Ron Pinkas end 2000-06-21 */
 
-   if( expreal )
-   {
-      *expreal = '\0';
-   }
+ Done:
 
    #ifdef DEBUG_EXP
       if( lens )

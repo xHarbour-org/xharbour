@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.66 2004/01/17 22:15:53 andijahja Exp $
+ * $Id: tget.prg,v 1.67 2004/01/28 22:36:22 andijahja Exp $
  */
 
 /*
@@ -1613,9 +1613,9 @@ METHOD Picture( cPicture ) CLASS Get
 
       ::cPicture := cPicture
 
-      if ::xVarGet != NIL
+      // if ::xVarGet != NIL
          ::ParsePict( cPicture )
-      endif
+      // endif
 
 //      ::buffer  := ::PutMask( )
 //      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )

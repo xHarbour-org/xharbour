@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.13 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: eval.c,v 1.14 2004/02/14 01:29:44 andijahja Exp $
  */
 
 /*
@@ -864,6 +864,7 @@ HB_FUNC( HB_EXEC )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
       pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
+      pPointer->item.asSymbol.uiSuperClass = 0;
 
       hb_dynsymUnlock();
 

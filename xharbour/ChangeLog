@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2296 2004/02/15 20:13:39 peterrees Exp $
+ * $Id: ChangeLog,v 1.2297 2004/02/15 20:21:38 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 14:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/eval.c
+  * source/vm/thread.c
+    + Added few missing initializations of asSymbol.uiSuperClass
+
+  * source/pp/ppcore.c
+    * Corrected execution flow to avoid usage of uninitialized State.
+
+  * source/rtl/tget.prg
+    ! Fixed Picture to call ParsePict() even if the GET Variable is NIL.
+
 2004-02-16 03:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/val.c
   * source/vm/hvm.c

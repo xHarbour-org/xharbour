@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.152 2004/02/14 19:48:52 andijahja Exp $
+* $Id: thread.c,v 1.153 2004/02/14 21:01:19 andijahja Exp $
 */
 
 /*
@@ -392,6 +392,7 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = pPointer->item.asSymbol.value;
       (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
+      (*pPos)->item.asSymbol.uiSuperClass = pPointer->item.asSymbol.uiSuperClass;
       pPos++;
       (*pPos)->type = HB_IT_NIL;
 
@@ -414,6 +415,7 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
       (*pPos)->type = HB_IT_SYMBOL;
       (*pPos)->item.asSymbol.value = &hb_symEval;
       (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
+      (*pPos)->item.asSymbol.uiSuperClass = 0;
       pPos++;
       (*pPos)->type = HB_IT_NIL;
       hb_itemCopy( (*pPos), pPointer );
@@ -1298,6 +1300,7 @@ HB_FUNC( STARTTHREAD )
       // Converting it to its Symbol.
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.uiSuperClass = 0;
       hb_dynsymUnlock();
    }
    /* Is it an object? */
@@ -1335,6 +1338,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.uiSuperClass = 0;
    }
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
@@ -1352,6 +1356,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.uiSuperClass = 0;
       hb_dynsymUnlock();
    }
    /* Is it a code block? */
