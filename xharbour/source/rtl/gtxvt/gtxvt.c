@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.24 2004/02/03 12:32:54 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.25 2004/02/06 17:07:31 jonnymind Exp $
  */
 
 /*
@@ -4253,6 +4253,13 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
 ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
+   USHORT appMsg;
+   appMsg = XVT_ICM_GETSELECTION;
+
+   write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   // wait until the feedback is done
+   xvt_appProcess( XVT_ICM_SETSELECTION );
+
    return s_clipsize;
 }
 

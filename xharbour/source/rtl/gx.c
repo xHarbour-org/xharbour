@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.7 2004/02/06 18:13:00 jonnymind Exp $
+ * $Id: gx.c,v 1.8 2004/02/08 12:07:39 jonnymind Exp $
  */
 
 /*
@@ -175,6 +175,7 @@ HB_FUNC( GTGETCLIPBOARD )
       ulMaxLen = hb_itemGetCLen( pData );
       if ( ulMaxLen == 0 )
       {
+         hb_retc("");
          return;
       }
       szData = hb_itemGetCPtr( pData );
@@ -188,7 +189,7 @@ HB_FUNC( GTGETCLIPBOARD )
       ulMaxLen = hb_gtGetClipboardSize();
       if ( ulMaxLen == 0 )
       {
-         hb_retc("");
+         hb_retc("zero");
          return;
       }
       szData = (char *) hb_xgrab( ulMaxLen+1 );
@@ -204,6 +205,10 @@ HB_FUNC( GTGETCLIPBOARD )
    if ( pCount == 0 )
    {
       hb_retclenAdoptRaw( szData , ulMaxLen );
+   }
+   else
+   {
+      hb_itemReturn( pData );
    }
 }
 
