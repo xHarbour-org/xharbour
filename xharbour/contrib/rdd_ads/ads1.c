@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.49 2004/08/26 08:20:12 brianhays Exp $
+ * $Id: ads1.c,v 1.50 2004/08/27 07:20:56 brianhays Exp $
  */
 
 /*
@@ -864,6 +864,11 @@ static ERRCODE adsAppend( ADSAREAP pArea, BOOL bUnLockAll )
    HB_SYMBOL_UNUSED( bUnLockAll );
    HB_TRACE(HB_TR_DEBUG, ("adsAppend(%p, %d)", pArea, (int) bUnLockAll));
 
+   if( pArea->uiParents )
+   {
+      AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+      // xxx trying to keep child from going to eof when add at same time as other station
+   }
    ulRetVal = AdsAppendRecord( pArea->hTable );
    if( ulRetVal == AE_SUCCESS )
    {
@@ -1497,8 +1502,10 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    }
 
 
-   if( pArea->uiParents )
+   if( pArea->uiParents && (pArea->fEof || pArea->fBof) )
    {
+      // ads has optimization to not move children until accessed.
+      // had bug where child in relation is not repositioned if try to write to child immediately after moving parent
       hb_adsCheckBofEof( pArea );
    }
 
@@ -1846,6 +1853,8 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
 static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
+   UNSIGNED32 uRetVal;
+
    HB_TRACE(HB_TR_DEBUG, ("adsInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    switch( uiIndex )
@@ -1885,7 +1894,12 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case DBI_GETLOCKARRAY:
       {
          USHORT uiCount;
-         AdsGetNumLocks( pArea->hTable, &uiIndex );
+         uRetVal = AdsGetNumLocks( pArea->hTable, &uiIndex );
+         if( uRetVal != AE_SUCCESS )
+         {
+            return FAILURE;
+         }
+
          if(uiIndex)
          {
             UNSIGNED32 *puLocks;
@@ -1894,14 +1908,19 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
             if( uiIndex )
             {
-               hb_arraySize( pItem, uiIndex );
-               for( uiCount=0; uiCount < uiIndex; uiCount++ )
+               hb_arrayNew( pItem, uiIndex );
+               for( uiCount = 0; uiCount < uiIndex; uiCount++ )
                {
                   hb_itemPutNL( hb_arrayGetItemPtr( pItem, (ULONG) uiCount + 1 ),
                                 puLocks[ uiCount ] );
                }
             }
             hb_xfree( puLocks );
+
+         }
+         if( ! uiIndex )
+         {
+            hb_arrayNew( pItem, 0 );    // don't return nil
          }
 
          break;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3481 2004/09/30 15:31:30 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3482 2004/09/30 23:24:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-30 08:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * fixed dbInfo (DBI_GETLOCKARRAY)
+    * added eof test before APPEND to clear an unusual problem
+      with child tables seeming to be at eof immediately after append.
 
 2004-09-30 16:23 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
