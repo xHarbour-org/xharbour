@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3707 2004/12/30 08:25:12 bdj Exp $
+ * $Id: ChangeLog,v 1.3708 2004/12/31 11:55:42 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-01 12:45 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    * ::nVisWidth and ::rowCount will be updated when ::nTop, ::nBottom,
+      ::nLeft or ::nRight changes.
 
 2004-12-31 12:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapicdp.h

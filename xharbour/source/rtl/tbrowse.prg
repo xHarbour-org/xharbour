@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.100 2004/12/01 10:43:26 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.101 2004/12/08 04:52:07 guerra000 Exp $
  */
 
 /*
@@ -168,13 +168,13 @@ CLASS TBrowse
                                      ::nColPos
 
    ACCESS nBottom             INLINE ::nwBottom +  iif( ::cBorder == "", 0, 1 )
-   ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif( ::cBorder == "", 0, 1 )
+   ASSIGN nBottom( nBottom )  INLINE ::PreConfigVertical(   ::nwBottom := nBottom - iif( ::cBorder == "", 0, 1 ) )
    ACCESS nLeft               INLINE ::nwLeft   -  iif( ::cBorder == "", 0, 1 )
-   ASSIGN nLeft( nLeft )      INLINE ::lConfigured := .f., ::nwLeft   := nLeft   + iif( ::cBorder == "", 0, 1 )
+   ASSIGN nLeft( nLeft )      INLINE ::PreConfigHorizontal( ::nwLeft   := nLeft   + iif( ::cBorder == "", 0, 1 ) )
    ACCESS nRight              INLINE ::nwRight  +  iif( ::cBorder == "", 0, 1 )
-   ASSIGN nRight( nRight )    INLINE ::lConfigured := .f., ::nwRight  := nRight  - iif( ::cBorder == "", 0, 1 )
+   ASSIGN nRight( nRight )    INLINE ::PreConfigHorizontal( ::nwRight  := nRight  - iif( ::cBorder == "", 0, 1 ) )
    ACCESS nTop                INLINE ::nwTop    -  iif( ::cBorder == "", 0, 1 )
-   ASSIGN nTop( nTop )        INLINE ::lConfigured := .f., ::nwTop    := nTop    + iif( ::cBorder == "", 0, 1 )
+   ASSIGN nTop( nTop )        INLINE ::PreConfigVertical(   ::nwTop    := nTop    + iif( ::cBorder == "", 0, 1 ) )
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
    ASSIGN colSep( cColSep )   INLINE ::lConfigured := .f., ::cColSep  := cColSep
@@ -258,6 +258,8 @@ CLASS TBrowse
    METHOD CheckRowPos()
    METHOD AColInfo()
    METHOD PerformStabilization()          // "Real" stabilization procedure
+   METHOD PreConfigHorizontal( uValue )   // This method calculates variables related to horizontal coordinates
+   METHOD PreConfigVertical( uValue )     // This method calculates variables related to vertical coordinates
 
    DATA aRect                             // The rectangle specified with ColorRect()
    DATA aRectColor                        // The color positions to use in the rectangle specified with ColorRect()
@@ -265,10 +267,10 @@ CLASS TBrowse
    DATA lHeaders                          // Internal variable which indicates whether there are column headers to paint
    DATA lFooters                          // Internal variable which indicates whether there are column footers to paint
 
-   DATA lHeadSep                          // Internal variable which indicates whether TBrowse has line headers to paint
-   DATA lFootSep                          // Internal variable which indicates whether TBrowse has line footers to paint
-   DATA lColHeadSep                       // Internal variable which indicates whether at least a TBColumn has line headers to paint
-   DATA lColFootSep                       // Internal variable which indicates whether at least a TBColumn has line footers to paint
+   DATA lHeadSep                          INIT .f. // Internal variable which indicates whether TBrowse has line headers to paint
+   DATA lFootSep                          INIT .f. // Internal variable which indicates whether TBrowse has line footers to paint
+   DATA lColHeadSep                       INIT .f. // Internal variable which indicates whether at least a TBColumn has line headers to paint
+   DATA lColFootSep                       INIT .f. // Internal variable which indicates whether at least a TBColumn has line footers to paint
 
    DATA lRedrawFrame                      // True if I need to redraw Headers/Footers
    DATA nColsWidth                        // Total width of visible columns plus ColSep
@@ -281,12 +283,12 @@ CLASS TBrowse
    DATA nRowData                          // Row, first row of data
    DATA nColPos
 
-   DATA nwBottom                          // Bottom row number for the TBrowse display
-   DATA nwLeft                            // Leftmost column for the TBrowse display
-   DATA nwRight                           // Rightmost column for the TBrowse display
-   DATA nwTop                             // Top row number for the TBrowse display
+   DATA nwBottom                          INIT 0 // Bottom row number for the TBrowse display
+   DATA nwLeft                            INIT 0 // Leftmost column for the TBrowse display
+   DATA nwRight                           INIT 0 // Rightmost column for the TBrowse display
+   DATA nwTop                             INIT 0 // Top row number for the TBrowse display
 
-   DATA cBorder
+   DATA cBorder                           INIT ""
    DATA cColorSpec
 
    DATA cColSep                           // Column separator character
@@ -544,7 +546,7 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    do while .t.     // Reduce footer, headers and separator if the data
                     // not fit in the visible area.
-                    // If if didn't fit, it generate error.
+                    // If it didn't fit, it generate error.
 
       ::nVisWidth := ::nwRight - ::nwLeft + 1
 
@@ -2640,6 +2642,29 @@ METHOD SetBorder( cBorder ) CLASS TBrowse
    Return self
 
 //---------------------------------------------------------------------//
+
+// This method calculates variables related to horizontal coordinates
+METHOD PreConfigHorizontal( uValue ) CLASS TBrowse
+
+   ::lConfigured := .f.
+   ::nVisWidth := ::nwRight - ::nwLeft + 1
+
+return uValue
+
+//---------------------------------------------------------------------//
+
+// This method calculates variables related to vertical coordinates
+METHOD PreConfigVertical( uValue ) CLASS TBrowse
+
+   ::lConfigured := .f.
+   ::rowCount := ::nwBottom - ::nwTop + 1 - iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
+                  iif( ::lFooters, ::nFooterHeight, 0 ) - ;
+                  iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - ;
+                  iif( ::lFootSep .OR. ::lColFootSep, 1, 0 )
+
+return uValue
+
+//---------------------------------------------------------------------//
 //
 //                      Clipper 5.3b Compatibility
 //
@@ -2787,7 +2812,7 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
 
    Return lRet
 
-//-------------------------------------------------------------------//
+//---------------------------------------------------------------------//
 
 static Function EvalSkipBlock( bBlock, nSkip )
    LOCAL lSign   := nSkip >= 0
