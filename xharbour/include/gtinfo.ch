@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.10 2004/10/22 11:26:42 paultucker Exp $
+ * $Id: gtinfo.ch,v 1.11 2004/10/22 20:37:13 likewolf Exp $
  */
 
 /*
@@ -90,6 +90,12 @@
 /* these 2 are used for MaxCol(.t.) and MaxRow(.t.) */
 #define GTI_VIEWMAXHEIGHT 34  /* Maximum viewport height:for current mode */
 #define GTI_VIEWMAXWIDTH  35  /* Max viewport width:either win or full scrn */
+
+/* these are used _by_ MaxRow/Col */
+#define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */
+#define GTI_SCREEN         1  /* Maximum screen size ('Screen' in CT terms) */
+#define GTI_CLIENT         2  /* Maximum possible client size of a window */
+#define GTI_MAX            3  /* Maximum possible window size (in Windows) */
 
 /* Font weights */
 #define GTI_FONTW_THIN     1

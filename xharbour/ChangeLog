@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3555 2004/10/28 04:33:07 paultucker Exp $
+ * $Id: ChangeLog,v 1.3556 2004/10/28 07:58:44 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-28 10:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/gtinfo.ch
+  * source/rtl/maxrow.c
+    * new params for MaxRow(<x>) <x> is logic, or one of:
+    + GTI_WINDOW  /* default: the window if active, otherwise, the screen */
+    + GTI_SCREEN  /* (or logic .t.)  Screen Rows when a window is active */
+    + GTI_CLIENT  /* Future use - the client area of a window */
+    + GTI_MAX     /* Currently for GTWin only: Returns the max possible
+                     dimension that will fit on the current screen. For
+                     unsuported GT's, param will return -1.  This will
+                     still work in a call to SetMode() for example. */
 
 2004-10-28 15:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples

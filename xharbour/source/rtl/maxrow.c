@@ -1,15 +1,15 @@
 /*
- * $Id: maxrow.c,v 1.3 2004/10/23 23:31:31 oh1 Exp $
+ * $Id: maxrow.c,v 1.4 2004/10/27 19:37:40 oh1 Exp $
  */
 
 /*
  * Harbour Project source code:
  * MAXROW(), MAXCOL() functions
  *
+ * Copyright 2004 Paul Tucker <ptucker@sympatico.ca>
+ *
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
- *
- * 2004 ptucker added support for 'viewport' size
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,26 +59,39 @@
 /****************************************************************************/
 HB_FUNC( MAXROW ) /* Return the highest screen/window row number (zero origin) */
 {
-   hb_retni( hb_parl(1) ? hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) : hb_gtMaxRow() );
+   int nMode;
 
-/*
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      hb_retni( hb_ctMaxRow( TRUE ) );
-   else
-      hb_retni( hb_gtMaxRow() );
-*/
+   switch( nMode = hb_parni(1) )
+   {
+      default:
+      case GTI_WINDOW:
+      case GTI_SCREEN:
+      case GTI_CLIENT:       /* 'client' is future use */
+         hb_retni( hb_ctMaxRow( nMode == GTI_SCREEN ) );
+         break;
+      case GTI_MAX:
+         hb_retni( hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) );
+         break;
+   }
+
 }
 
 /****************************************************************************/
 HB_FUNC( MAXCOL ) /* Return the highest screen/window column number (zero origin) */
 {
-   hb_retni( hb_parl(1) ? hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) : hb_gtMaxCol() );
+   int nMode;
 
-/*
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      hb_retni( hb_ctMaxCol( TRUE ) );
-   else
-      hb_retni( hb_gtMaxCol() );
-*/
+   switch( nMode = hb_parni(1) )
+   {
+      default:
+      case GTI_WINDOW:
+      case GTI_SCREEN:
+      case GTI_CLIENT:       /* 'client' is future use */
+         hb_retni( hb_ctMaxCol( nMode == GTI_SCREEN ) );
+         break;
+      case GTI_MAX:
+         hb_retni( hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) );
+         break;
+   }
+
 }
-/****************************************************************************/
