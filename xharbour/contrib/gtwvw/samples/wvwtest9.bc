@@ -1,0 +1,42 @@
+#
+# Modified from:
+# This file is created by MAKERMK2 03/06/2004 23:37:07
+# for BCC55/ MAKE
+# specific for compiling WINMAIN.C et all
+#
+
+#
+# Our environments
+#
+HARBOURDIR=c:\software\xharbour
+HARBOURLIB=$(HARBOURDIR)\lib
+HARBOUREXE=$(HARBOURDIR)\bin\harbour.exe
+CTLIBDIR=$(HARBOURDIR)\contrib\libct
+BCCDIR=c:\software\borland\bcc55
+HRBFLAGS = /n /w /m /p /i$(HARBOURDIR)\include;$(HARBOURDIR)\contrib\what32\include
+CFLAGS = -W -DHB_STATISTICS_OFF -DHB_OS_WIN_32 -O2 -OS -d -L$(BCCDIR)\lib;$(HARBOURLIB) -c -I$(HARBOURDIR)\include;$(CTLIBDIR)\include;$(BCCDIR)\include
+LFLAGS = -L$(HARBOURLIB);$(BCCDIR)\lib -Gn -M -m -s -Tpe -aa
+
+#
+# Response file (from MAKELNK2.PRG)
+#
+RESP_FILE = wvwtest9.rsp
+
+#
+# EXE dependency to OBJ:
+#
+C:tb.EXE : \
+  wvwtest9.obj \
+  wvwmouse.obj \
+  winapi.obj 
+      ilink32 $(LFLAGS) -t @$(RESP_FILE)
+
+# C to OBJ compile rule:
+.c.obj:
+  bcc32 $(CFLAGS) $<
+
+
+# PRG to C compile rule:
+.prg.c:
+  $(HARBOUREXE) $< $(HRBFLAGS)
+
