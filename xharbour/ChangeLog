@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.432 2002/10/09 20:51:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.433 2002/10/10 16:44:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,66 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-11 21:35 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbapirdd.h
+   * include/hbrdddbf.h
+   * include/hbrddcdx.h
+   * include/hbrddntx.h
+   * source/rdd/dbcmd.c
+   * source/rdd/workarea.c
+   * contrib/rdd_ads/ads1.c
+   * contrib/rdd_ads/rddads.h
+        + Changed fieldname max length handling,
+          it is now a workarea property. (set by the RDD)
+          (in ADS, this is just a patch)
+
+   * source/rdd/dbfcdx/dbfcdx1.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+        ! fixed bug reported by Richard Chidiak
+        + added function hb_cdxMacroRun
+        ! fixed bug reported by Peter Rees.
+        * changed index creation and updating:
+          some spaces in keys aren't compressed now, so ADS can read
+          the indexes. (it couldn't with some special keys)
+
+   * dbcmd synched with Harbour:
+    2002-10-04 14:42 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+      * source/rdd/dbcmd.c
+        ! Bug fixed in COPY TO, APPEND FROM with aliased fields
+
+   * dbfntx synched with Harbour:
+    2002-10-04 15:552 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+      * source/rdd/dbfntx/dbfntx1.c
+        ! Bug fixed in key appending with few open indexes
+    2002-10-04 13:58 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+      * source/rdd/dbfntx/dbfntx1.c
+        ! Few bugs fixed, related to OrdKeyNo() and OrdKeyCount()
+
+   * rdd_ads synched with Harbour:
+      * contrib/rdd_ads/*.*
+        * copied from Harbour
+     2002-10-03 0:40 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+      * contrib/rdd_ads/ace.h
+        + added (void) to AdsApplicationExit( void );
+                This removes a compiler warning about missing the prototype.
+                Let me know if this creates a problem with any other compilers.
+      * contrib/rdd_ads/adsfunc.c
+        + added AdsGetLastError() contrib. by Randy Portnoff (Thanks!)
+      * contrib/rdd_ads/ads1.c
+        * Cleaned up adsPutValue and adsGetValue formatting,
+        * Fixed fieldname length references
+        * Removed errant setting of uiLen in adsGetValue since these
+                are set in adsOpen now.
+        * adsOrderInfo(DBOI_KEYVAL): fixed ntx handling of numerics
+                Added special decoding for keys of Negative values.
+        * adsCreate: fixed fielddefs buffer sizing
+        * adsOpen: fixed fieldname length references
+                        set uiLen of extended types
+        * adsInfo: reformatted, prepared for fleshing out the rest
+                of the options.
+                Added support for dbinfo(DBI_ISFLOCK)
 
 2002-10-10 09:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
