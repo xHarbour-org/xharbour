@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.153 2004/02/14 21:01:19 andijahja Exp $
+* $Id: thread.c,v 1.154 2004/02/15 21:58:47 ronpinkas Exp $
 */
 
 /*
@@ -201,6 +201,8 @@ void hb_threadExit( void )
 
    // the main stack still exists, but we must signal it has not items anymore
    hb_stack.pItems = NULL;
+   hb_stack.pBase  = NULL;
+   hb_stack.pPos   = NULL;
    hb_stack.wItems = 0;
 }
 
@@ -466,8 +468,10 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 {
    LONG i;
    PHB_ITEM *pPos;
+
    /* Free each element of the stack */
-   if ( pStack != &hb_stack ) {
+   if( pStack != &hb_stack )
+   {
       for( pPos = pStack->pItems; pPos < pStack->pPos; pPos++)
       {
          if( HB_IS_COMPLEX( *pPos ) )
@@ -489,10 +493,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    {
       // Harbour should remove the error handler of the main stack
       // from PRG level or around that.
-      if( pStack != &hb_stack ) {
+      if( pStack != &hb_stack )
+      {
          hb_itemClear( pStack->errorBlock );
       }
    }
+
    /* Free each element of the stack */
    for( i = 0; i < pStack->wItems; i++ )
    {
@@ -519,12 +525,10 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->hMemvars );
 */
 
-
    #ifdef HB_OS_WIN_32
-   hb_xfree( pStack->pCleanUp );
-   hb_xfree( pStack->pCleanUpParam );
+      hb_xfree( pStack->pCleanUp );
+      hb_xfree( pStack->pCleanUpParam );
    #endif
-
 
    // Free only if we are not destroing the main stack
    if ( pStack != &hb_stack )

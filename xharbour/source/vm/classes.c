@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.96 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: classes.c,v 1.97 2004/02/19 04:41:56 mlombardo Exp $
  */
 
 /*
@@ -1704,7 +1704,6 @@ HB_FUNC( __CLSADDMSG )
  * <nDatas>     Number of DATAs in the class
  * <nMethods>   Number of additional Methods in the class
  * <ahSuper>    Optional handle(s) of superclass(es)
- * <ahSuper>    Optional superclass(es) Object instance
  */
 HB_FUNC( __CLSNEW )
 {
@@ -1723,9 +1722,9 @@ HB_FUNC( __CLSNEW )
 
    HB_THREAD_STUB
 
-   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_itemParam(4) ) ) );
+   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
 
-   pahSuper = hb_itemParam( 4 );      /* Replace the initial uiSuper   */
+   pahSuper = hb_param( 4, HB_IT_ARRAY );      /* Replace the initial uiSuper   */
    uiSuper  = ( USHORT ) hb_itemSize( pahSuper ); /* Number of Super class present */
 
    if( s_pClasses )
@@ -1754,7 +1753,7 @@ HB_FUNC( __CLSNEW )
       for( i = 1; i <= uiSuper; i++ )
       {
          PHB_DYNS pMsg;
-         PHB_ITEM pSuper;
+         HB_ITEM Super;
          PHB_ITEM pClsAnyTmp;
          USHORT nSuper;
          USHORT ui, uiAt, uiLimit, uiCurrent ;
@@ -1762,13 +1761,12 @@ HB_FUNC( __CLSNEW )
          USHORT nLen;
          BOOL bResize ;
 
-         pSuper  =  hb_itemNew( NULL );
-         hb_arrayGet( pahSuper, i, pSuper);
-         nSuper  = ( USHORT ) hb_itemGetNL( pSuper );
+         Super.type = HB_IT_NIL;
+         hb_arrayGet( pahSuper, i, &Super);
+
+         nSuper  = ( USHORT ) hb_itemGetNL( &Super );
          pSprCls = s_pClasses + ( nSuper - 1 );
          uiLimit = ( USHORT ) ( pSprCls->uiHashKey * BUCKET );
-
-         hb_itemRelease( pSuper );
 
          pNewCls->uiDataFirst += pSprCls->uiDatas;
          pNewCls->uiDatas      = ( USHORT ) ( pNewCls->uiDataFirst + hb_parni( 2 ) );
@@ -1964,8 +1962,6 @@ HB_FUNC( __CLSNEW )
       pNewCls->pInlines       = hb_itemArrayNew( 0 );
       pNewCls->pFunError      = NULL;
    }
-
-   hb_itemRelease( pahSuper );
 
    HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
 
@@ -2817,11 +2813,16 @@ HB_FUNC( __SENDER )
 HB_FUNC( __CLASSH )
 {
    HB_THREAD_STUB
-   PHB_ITEM pObject = hb_itemParam( 1 );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
 
-   hb_retni( HB_IS_OBJECT( pObject ) ? pObject->item.asArray.value->uiClass : 0 );
-
-   hb_itemRelease( pObject );
+   if( pObject )
+   {
+      hb_retni( pObject->item.asArray.value->uiClass );
+   }
+   else
+   {
+      hb_retni( 0 );
+   }
 }
 
 /*
@@ -2830,17 +2831,20 @@ HB_FUNC( __CLASSH )
 HB_FUNC( __EVAL )
 {
    HB_THREAD_STUB
-   PHB_ITEM pObject = hb_itemParam( 1 );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_BLOCK );
    USHORT uiPCount = hb_pcount();
 
-   if( HB_IS_BLOCK( pObject ) )
+   if( pObject )
    {
       USHORT uiParam;
 
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pObject );                     /* Push block               */
+
       for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+      {
          hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+      }
 
       hb_vmSend( ( USHORT ) uiPCount );     /* Self is also an argument */
    }
@@ -2848,9 +2852,6 @@ HB_FUNC( __EVAL )
    {
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );
    }
-
-   hb_itemRelease( pObject );
-
 }
 
 /* ================================================ */
@@ -3383,19 +3384,17 @@ HB_FUNC( __CLS_PARAM )
 HB_FUNC( __CLS_PAR00 )
 {
    HB_THREAD_STUB
-   PHB_ITEM array;
+   HB_ITEM Array;
    USHORT uiParam = ( USHORT ) hb_pcount();
    USHORT n;
 
-   array = hb_itemArrayNew( uiParam );
-   for( n = 1; n <= uiParam; n++ )
-    {
-         PHB_ITEM iTmp = hb_itemParam( n );
-         hb_arraySet( array, n, iTmp );
-         hb_itemRelease( iTmp );
-    }
+   Array.type = HB_IT_NIL;
+   hb_arrayNew( &Array, uiParam );
 
-   hb_itemRelease( hb_itemReturn( array ) );
+   for( n = 1; n <= uiParam; n++ )
+   {
+      hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
+   }
 }
 
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */

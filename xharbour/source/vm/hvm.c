@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.322 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: hvm.c,v 1.323 2004/02/15 20:21:39 andijahja Exp $
  */
 
 /*
@@ -789,21 +789,15 @@ int HB_EXPORT hb_vmQuit( void )
    }
    //printf("\nAfter Globals\n" );
 
-   /* release all known garbage */
-   hb_gcReleaseAll();
-   //printf("After GC\n" );
-
 #ifndef HB_THREAD_SUPPORT
    hb_memvarsRelease();    /* clear all PUBLIC variables */
 #else
    hb_memvarsRelease( &hb_stack );
 #endif
-
    //printf("After Memvar\n" );
 
 #ifndef HB_THREAD_SUPPORT
    //JC1: under threads, we'll kill our stack when needed
-
    hb_stackFree();
    //printf("After hbStackFree\n" );
 #else
@@ -814,6 +808,14 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After stackFree\n" );
 
    /* hb_dynsymLog(); */
+
+   /* release all known garbage */
+   #ifdef DEBUG_MEMORY_LEAKS
+      hb_gcCollectAll();
+   #else
+      hb_gcReleaseAll();
+   #endif
+   //printf("After GC\n" );
 
    hb_xexit();
    //printf("After xexit\n" );

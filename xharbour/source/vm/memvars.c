@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.52 2004/01/21 19:58:17 peterrees Exp $
+ * $Id: memvars.c,v 1.53 2004/02/14 21:01:19 andijahja Exp $
  */
 
 /*
@@ -201,8 +201,11 @@ void hb_memvarsRelease( void )
                 * We do NOT need to worry about Arrays & Blcoks as these values have been released
                 * by hb_gcReleaseAll() unconditionally!
                 *
-               hb_itemClear( &s_globalTable[ ulCnt ].item );
                */
+               #ifdef DEBUG_MEMORY_LEAKS
+                  // hb_gcAll() is used instead of hb_gcReleaseAll() - so we need to clean afterall.
+                  hb_itemClear( &s_globalTable[ ulCnt ].item );
+               #endif
             }
 
             s_globalTable[ ulCnt ].counter = 0;

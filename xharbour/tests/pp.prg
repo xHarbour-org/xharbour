@@ -1907,7 +1907,7 @@ PROCEDURE PP_Locals( aVars )
          cInit := "NIL"
       ENDIF
 
-      IF Type( aVars[nVar] ) = 'U'
+      IF Type( aVars[nVar] ) = 'U' .OR. Upper( aVars[nVar] ) = "GETLIST"
          __QQPUB( aVars[nVar] )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asLocals, aVars[nVar] )

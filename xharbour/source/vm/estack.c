@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.57 2003/12/17 23:55:14 ronpinkas Exp $
+ * $Id: estack.c,v 1.58 2003/12/19 07:30:01 ronpinkas Exp $
  */
 
 /*
@@ -231,7 +231,9 @@ void hb_stackFree( void )
    hb_xfree( hb_stack.pItems );
 
    hb_stack.pItems = NULL;
-   hb_stack.pBase = NULL;
+   hb_stack.pBase  = NULL;
+   hb_stack.pPos   = NULL;
+   hb_stack.wItems = 0;
 
    #endif
 }
