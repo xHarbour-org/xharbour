@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.49 2003/12/11 14:28:54 jonnymind Exp $
+ * $Id: fm.c,v 1.50 2003/12/15 02:35:37 jonnymind Exp $
  */
 
 /*
@@ -102,7 +102,10 @@
 #include "hbmemory.ch"
 
 #ifndef HB_FM_STATISTICS
-# undef HB_PARANOID_MEM_CHECK
+#  undef HB_PARANOID_MEM_CHECK
+#endif
+#ifndef HB_OS_WIN_32
+#  undef HB_FM_WIN32_ALLOC
 #endif
 
 #ifdef HB_PARANOID_MEM_CHECK
@@ -205,11 +208,11 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_CRITICAL_LOCK( hb_allocMutex );
    
-   #ifndef HB_OS_WIN_32
-   pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   #endif
+#else
+   pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+#endif
    
    if( ! pMem )
    {
@@ -304,11 +307,11 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-   #ifndef HB_OS_WIN_32
-   pMem = malloc( ulSize );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
-   #endif
+#else
+   pMem = malloc( ulSize );
+#endif
    
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -336,11 +339,11 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_CRITICAL_LOCK( hb_allocMutex );
    
-   #ifndef HB_OS_WIN_32
-   pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   #endif
+#else
+   pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+#endif
 
    if( ! pMem )
    {
@@ -437,11 +440,11 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-   #ifndef HB_OS_WIN_32
-   pMem = malloc( ulSize );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
-   #endif
+#else
+   pMem = malloc( ulSize );
+#endif
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -499,12 +502,12 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
    }
 
-   #ifndef HB_OS_WIN_32
-   pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalReAlloc( (HLOCAL) pMemBlock, 
-         ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ), LMEM_MOVEABLE );
-   #endif
+          ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ), LMEM_MOVEABLE );
+#else
+   pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+#endif
    
    s_lMemoryConsumed += ( ulSize - ulMemSize );
 
@@ -572,11 +575,11 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-   #ifndef HB_OS_WIN_32
-   pMem = realloc( pMem, ulSize );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalReAlloc( (HLOCAL) pMem, ulSize, LMEM_MOVEABLE );
-   #endif
+#else
+   pMem = realloc( pMem, ulSize );
+#endif
    
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -649,11 +652,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       pMemBlock->ulSignature = *pSig = 0;
 
-      #ifndef HB_OS_WIN_32
-      free( ( void * ) pMemBlock );
-      #else
+#ifdef HB_FM_WIN32_ALLOC
       LocalFree( (HLOCAL) pMemBlock );
-      #endif
+#else
+      free( ( void * ) pMemBlock );
+#endif
       HB_CRITICAL_UNLOCK( hb_allocMutex );
    }
    else
@@ -675,11 +678,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-   #ifndef HB_OS_WIN_32
-      free( pMem );
-   #else
+#ifdef HB_FM_WIN32_ALLOC
       LocalFree( (HLOCAL) pMem );
-   #endif
+#else
+      free( pMem );
+#endif
 
 #ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -691,9 +694,6 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    }
 
 #endif
-
-
-
 }
 
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is

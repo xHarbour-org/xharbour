@@ -1,15 +1,16 @@
 #
-# $Id: dir.cf,v 1.1.1.1 2001/12/21 10:47:59 ronpinkas Exp $
+# $Id: dir.cf,v 1.2 2003/11/24 10:25:13 druzus Exp $
 #
-
-include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
 
 ifeq ($(PM),) # Only traverse directories if not compiling a specific module
 
 ifeq ($(DIRS),) # Empty directory list
-DIR_RULE =\
-	@echo Done
+
+DIR_RULE = @echo Done
+
 else
+
+ifeq ($(SHLVL),) # COMMAND.COM
 
 # We have to use script to overcome the DOS limit of max 128 characters
 # NOTE: The empty line directly before 'endef' HAVE TO exist!
@@ -23,6 +24,17 @@ DIR_LIST := $(subst /,\,$(DIRS))
 DIR_MAKE := $(subst /,\,$(MK))
 DIR_RULE = $(foreach file, $(DIR_LIST), $(dir_mk))
 
-endif
+else  # bash
+
+DIR_RULE =\
+	for d in $(DIRS); do \
+	  if [ -d $$d ]; then \
+	    $(MAKE) -C $$d $@; \
+	  fi \
+	done
+
+endif # ! COMMAND.COM
+
+endif # ! Empty directory list
 
 endif # ! compiling a specific program module

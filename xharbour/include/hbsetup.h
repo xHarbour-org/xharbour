@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.15 2003/09/24 02:51:49 druzus Exp $
+ * $Id: hbsetup.h,v 1.16 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -137,6 +137,13 @@
 #  define HB_ARRAY_USE_COUNTER
 #endif
 
+/* ***********************************************************************
+ * Use native Windows memory allocation functions (HB_OS_WIN_32)
+ * This option can disabled compiler memory allocation optimization
+ * so you should really have a good reason to enable it
+ */
+
+/* #define HB_FM_WIN32_ALLOC */
 
 /* ***********************************************************************
  * This symbol defines if we want an ability to create and link OBJ files

@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.9 2003/11/30 10:02:45 druzus Exp $
+# $Id: global.cf,v 1.10 2003/12/21 21:31:52 druzus Exp $
 #
 
 ifndef MK
@@ -55,6 +55,7 @@ dirbase_mt::
 clean::
 	-@for %f in ($(ARCH_DOS)\*.* $(ARCH_DOS)_mt\*.* *.bak *.obj *.o *.tds) do $(RM) %f
 	-@for %d in ($(ARCH_DOS) $(ARCH_DOS)_mt $(HB_ARCHITECTURE)) do if exist %d\nul $(RD) %d
+
 else  # bash
 
 ARCH_DIR = $(ARCH)
@@ -69,7 +70,6 @@ MD = mkdir
 #this will be used only under MINGW
 RANLIB = ranlib
 
-
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
 	 [ -d $(ARCH_DIR) ] || $(MD) $(ARCH_DIR)
@@ -81,5 +81,6 @@ dirbase_mt::
 clean::
 	-$(RD) $(ARCH)
 	-$(RD) $(ARCH)_mt
+
 endif
 endif

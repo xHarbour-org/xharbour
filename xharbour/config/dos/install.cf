@@ -1,8 +1,14 @@
 #
-# $Id: install.cf,v 1.3 2003/12/07 19:36:18 druzus Exp $
+# $Id: install.cf,v 1.4 2003/12/13 17:55:11 druzus Exp $
 #
 
-include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+ifeq ($(INSTALL_OBJS),) # Empty install list
+
+INSTALL_RULE = @echo Done
+
+else
+
+ifeq ($(SHLVL),) # COMMAND.COM
 
 # We have to use script to overcome the DOS limit of max 128 characters
 # NOTE: The empty line directly before 'endef' HAVE TO exist!
@@ -14,3 +20,26 @@ endef
 
 INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
 INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file))
+
+else  # bash
+
+INSTALL_RULE =\
+	@if [ ! -d $(INSTALL_DIR) ]; \
+	then \
+	  echo "! Can't install, path not found:" $(INSTALL_DIR); \
+	else \
+	  for i in $(INSTALL_OBJS); \
+	  do \
+	    if [ -r $$i ]; \
+	    then \
+	      echo "! Installing $$i on $(INSTALL_DIR)"; \
+	      $(CP) $$i $(INSTALL_DIR); \
+	    else \
+	      echo "! Can't install $$i, not found"; \
+	    fi \
+	  done \
+	fi
+
+endif
+
+endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1930 2003/12/22 23:58:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.1931 2003/12/23 00:46:58 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-23 01:44 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/dir.cf
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/install.cf
+  * xharbour/config/w32/global.cf
+    * small cleanups
+
+  * xharbour/include/hbsetup.h
+  * xharbour/source/vm/fm.c
+    + new macro HB_FM_WIN32_ALLOC which enable Win API
+      LocalAlloc()/LocalFree() instead of C malloc()/free()
+    * HB_FM_WIN32_ALLOC is disable by default
+
+  + xharbour/tests/speedtst.prg
+    + simple program for speed test added
+
 2003-12-23 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/persist.prg
   + fixed bug if CHR(13) or CHR(10) embedded in character string variable
