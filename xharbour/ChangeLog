@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1494 2003/09/19 01:10:33 lculik Exp $
+ * $Id: ChangeLog,v 1.1495 2003/09/19 17:04:09 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-19 09:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/listbox.prg
+  * utils/hbmake/hbmake.prg
+    ! __CAPLENGT() to __CAPLENGTH()
+
+  - include/hbgetcmt.ch
+    - Removed, no longer needed.
+
+  * tests/tstchbx.prg
+    * Formatting.
 
 2003-18-09 22:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/listbox.prg
@@ -55,7 +66,7 @@
 
 2003-09-16 08:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
-    + Aded GET support to HB_In logic.
+    + Added GET support to HB_IN logic.
 
   * source/rtl/filesys.c
     + Added few missing HB_THREAD_STUB

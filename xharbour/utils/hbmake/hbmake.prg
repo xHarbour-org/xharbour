@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.94 2003/09/09 04:00:32 lculik Exp $
+ * $Id: hbmake.prg,v 1.95 2003/09/11 18:25:35 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -52,7 +52,6 @@
 #include "common.ch"
 #include "radios.ch"
 
-#include "hbgetcmt.ch"
 #define EOL Hb_OsNewLine()
 #define CRLF Hb_OsNewLine()
 #xtranslate TimeToSec(<x>) => ( ( Val( Substr( <x>, 1, 2 ) ) * 3600 ) +( Val( Substr( <x>, 4, 2 ) ) * 60 ) + ( Val( Substr( <x>, 7, 2 ) ) ) )
