@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2749 2004/04/05 02:29:29 druzus Exp $
+ * $Id: ChangeLog,v 1.2750 2004/04/05 10:03:16 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-05 13:32 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/filesys.c
+    ! BCC compilation fixed
+
 2004-04-05 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbpcode.c
     - remmed: unused hb_compPrivateFind()

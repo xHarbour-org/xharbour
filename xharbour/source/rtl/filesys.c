@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.88 2004/04/03 14:04:30 srobert Exp $
+ * $Id: filesys.c,v 1.90 2004/04/05 02:29:31 druzus Exp $
  */
 
 /*
@@ -1712,7 +1712,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
    /* TODO: HB_WIN32_IO support */
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__DJGPP__) || defined(__CYGWIN__) || defined(__WATCOMC__)
-
+{
    int iRet = 0;
 
    switch( uiDevMode )
@@ -1726,9 +1726,9 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
          break;
    }
    hb_fsSetIOError( iRet != -1, 0 );
-
+}
 #elif defined(_MSC_VER) || defined(__MINGW32__)
-
+{
    int iRet = 0;
 
    switch( uiDevMode )
@@ -1742,7 +1742,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
          break;
    }
    hb_fsSetIOError( iRet != -1, 0 );
-
+}
 #elif defined( HB_OS_UNIX )
 
    HB_SYMBOL_UNUSED( hFileHandle );
