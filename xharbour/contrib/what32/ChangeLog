@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.22 2002/09/27 22:39:50 what32 Exp $
+ * $Id: ChangeLog,v 1.23 2002/09/28 08:51:16 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-
+2002-09-28 16:45 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
+   + _WinINet.c
+     * Internet functions related with FTP functionality.
+   + WinINet.ch
+     * Manifest constants for _WinINet.c
+   * Makefile.bc
+     * Updated to include _WinINet.c
+       
+       Please do forgive me if there are mistakes. It is my first endeavour
+       at this type of work. Most of the functions are tested and are 
+       working barring a few ones, which I hope you experts will set right.
+       
 2002-09-28 18:51 UCT+1000 AJ Wos <andrwos@aust1.net>
    * Windows.ch
      + completed CB*_* definitions for combo boxes
