@@ -1,0 +1,179 @@
+#
+# $Id: makefile.vc,v 1.1 2003/02/23 23:15:17 lculik Exp $
+#
+
+#
+# Makefile for Harbour Project for Microsoft C++
+#
+
+#
+# NOTE: You can use these envvars to configure the make process:
+#       (note that these are all optional)
+#
+#       CFLAGS       - Extra C compiler options for libraries and for 
+#                      executables
+#       C_USR        - Extra C compiler options for libraries and for 
+#                      executables (GNU make compatible envvar)
+#       CLIBFLAGS    - Extra C compiler options for the libraries
+#       HARBOURFLAGS - Extra Harbour compiler options
+#       PRG_USR      - Extra Harbour compiler options
+#                      (GNU make compatible envvar)
+#
+
+#
+# NOTE: "echo." intentionally used instead of "echo", to avoid conflicts
+#       with external commands named echo.
+#
+
+CC = cl
+
+BIN_DIR = ..\..\bin
+OBJ_DIR = ..\..\obj\vc
+LIB_DIR = ..\..\lib\vc
+
+#
+# Directory macros. These should never have to change.
+#
+
+INCLUDE_DIR  = ..\..\include
+HTML_DIR    = .
+HTML1_DIR   = examples
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CFLAGS         = -G6 -Ox -GA -TP $(HB_MT) -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(C_USR) $(CFLAGS)
+CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
+CLIBFLAGSDEBUG = -v $(CLIBFLAGS)
+HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q -w0 -gc0 $(PRG_USR) $(HARBOURFLAGS) -p
+LDFLAGS        = $(LDFLAGS)
+
+#
+# Macros to access our library names
+#
+
+HTML_LIB    = $(LIB_DIR)\html.lib
+
+HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
+
+#
+# Rules
+#
+
+#
+# HTML.LIB rules
+#
+HTML_LIB_OBJS = \
+    $(OBJ_DIR)\ohtm.obj \
+    $(OBJ_DIR)\htmbrows.obj \
+    $(OBJ_DIR)\oedit.obj \
+    $(OBJ_DIR)\ofile.obj \
+    $(OBJ_DIR)\jlist.obj   \
+    $(OBJ_DIR)\oini.obj \
+    $(OBJ_DIR)\jwindow.obj \
+    $(OBJ_DIR)\ocgi.obj \
+    $(OBJ_DIR)\oframe.obj \
+    $(OBJ_DIR)\counter.obj \
+    $(OBJ_DIR)\hterrsys.obj \
+    $(OBJ_DIR)\htmutil.obj 
+
+#
+# Our default target
+#
+
+all: \
+   $(HTML_LIB) \
+
+#
+# Library dependencies and build rules
+#
+
+$(HTML_LIB)  : $(HTML_LIB_OBJS)
+   lib /out:$@ $**
+
+$(OBJ_DIR)\ohtm.c : $(HTML_DIR)\ohtm.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ohtm.obj : $(OBJ_DIR)\ohtm.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htmbrows.c : $(HTML_DIR)\htmbrows.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htmbrows.obj : $(OBJ_DIR)\htmbrows.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\oedit.c : $(HTML_DIR)\oedit.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\oedit.obj : $(OBJ_DIR)\oedit.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\ofile.c : $(HTML_DIR)\ofile.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ofile.obj : $(OBJ_DIR)\ofile.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\jlist.c : $(HTML_DIR)\jlist.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\jlist.obj : $(OBJ_DIR)\jlist.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+
+$(OBJ_DIR)\oini.c : $(HTML_DIR)\oini.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\oini.obj : $(OBJ_DIR)\oini.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\jwindow.c : $(HTML_DIR)\jwindow.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\jwindow.obj : $(OBJ_DIR)\jwindow.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\ocgi.c : $(HTML_DIR)\ocgi.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ocgi.obj : $(OBJ_DIR)\ocgi.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\oframe.c : $(HTML_DIR)\oframe.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\oframe.obj : $(OBJ_DIR)\oframe.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\counter.c : $(HTML_DIR)\counter.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\counter.obj : $(OBJ_DIR)\counter.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\hterrsys.c : $(HTML_DIR)\hterrsys.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hterrsys.obj : $(OBJ_DIR)\hterrsys.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htmutil.c : $(HTML_DIR)\htmutil.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htmutil.obj : $(OBJ_DIR)\htmutil.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+#   lib $(HTML_LIB) $(ARFLAGS) -+$@,,
+
