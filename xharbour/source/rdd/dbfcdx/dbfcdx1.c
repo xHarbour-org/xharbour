@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.5 2002/01/21 23:42:31 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.6 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -1389,10 +1389,20 @@ static int hb_cdxKeyCompare( LPKEYINFO pKey1, LPKEYINFO pKey2, USHORT * EndPos, 
    int iLimit, iResult;
 
    * EndPos = 0;
+   if ( pKey1 == NULL )
+      return ( pKey2 == NULL ) ? 0 : -1;
+   if ( pKey2 == NULL )
+      return 1;
+   if ( pKey1->length == 0 )
+      return ( pKey2->length == 0 ) ? 0: -1;
+   if ( pKey2->length == 0 )
+      return 1;
+   /*
    if( pKey2 == NULL || pKey2->length == 0 )
       return 1;
    if( pKey1 == NULL || pKey1->length == 0 )
       return ( pKey2->length == 0 ) ? 0: -1;
+   */
 
    iLimit = (pKey1->length > pKey2->length) ? pKey2->length : pKey1->length;
 
