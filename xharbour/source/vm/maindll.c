@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.5 2005/02/25 10:43:47 andijahja Exp $
+ * $Id: maindll.c,v 1.6 2005/02/26 02:12:22 andijahja Exp $
  */
 
 /*
@@ -63,12 +63,15 @@
 #if defined(HB_OS_WIN_32)
 #if defined(__DMC__) || defined(__POCC__)
 BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+{
+   HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,
+             pvReserved ) );
 #else
 BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
-#endif
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
+#endif
 
    HB_SYMBOL_UNUSED( hInstance );
    HB_SYMBOL_UNUSED( fdwReason );

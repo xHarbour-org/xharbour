@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.51 2005/02/20 22:14:07 andijahja Exp $
+ * $Id: errorapi.c,v 1.52 2005/02/21 06:15:26 ronpinkas Exp $
  */
 
 /*
@@ -950,7 +950,7 @@ UINT hb_errGetVmThreadId( PHB_ITEM pError )
 
 PHB_ITEM HB_EXPORT hb_errPutVmThreadId( PHB_ITEM pError, UINT uiThid )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_errPutRunningThreads(%p, %d)", pError, uiThid));
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutVmThreadId(%p, %d)", pError, uiThid));
 
    hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymGet( "_VMTHREADID" )->pSymbol );
@@ -1398,7 +1398,7 @@ PHB_ITEM HB_EXPORT hb_errRT_SubstParams( char *szSubSystem, ULONG ulGenCode, ULO
    PHB_ITEM pError;
    PHB_ITEM pArray;
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_BASE_SubstArray()") );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_SubstParams()") );
 
    pError = hb_errRT_New_Subst( ES_ERROR, szSubSystem ? szSubSystem : HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
