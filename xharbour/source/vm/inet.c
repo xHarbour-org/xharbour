@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.19 2003/03/08 02:06:47 jonnymind Exp $
+* $Id: inet.c,v 1.20 2003/03/16 07:28:31 jonnymind Exp $
 */
 
 /*
@@ -359,8 +359,8 @@ HB_FUNC( INETCLOSE )
    {
       hb_retni( -1 );
    }
-
 }
+
 
 HB_FUNC( INETDESTROY )
 {
@@ -397,6 +397,25 @@ HB_FUNC( INETDESTROY )
 /************************************************
 * Socket data access & management
 ***/
+
+HB_FUNC( INETSTATUS )
+{
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   HB_SOCKET_STRUCT *Socket;
+
+   if( pSocket == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORCODE", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+
+   hb_retni( Socket->com == 0 ? -1 : 0 );
+}
 
 
 HB_FUNC( INETERRORCODE )
@@ -596,7 +615,6 @@ HB_FUNC( INETRECV )
       hb_itemRelease( pArgs );
       return;
    }
-   HB_STACK_UNLOCK;
 
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
@@ -619,16 +637,21 @@ HB_FUNC( INETRECV )
 
    Buffer = pBuffer->item.asString.value;
 
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    HB_SOCKET_ZERO_ERROR( Socket );
    if( hb_selectReadSocket( Socket ) )
    {
       iLen = recv( Socket->com, Buffer, iMaxLen, MSG_NOSIGNAL  );
+      HB_DISABLE_ASYN_CANC;
+      HB_STACK_LOCK;
    }
    else
    {
+      HB_DISABLE_ASYN_CANC;
+      HB_STACK_LOCK;
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
       hb_retni( 0 );
-      HB_STACK_LOCK;
       return;
    }
 
@@ -641,7 +664,6 @@ HB_FUNC( INETRECV )
       HB_SOCKET_SET_ERROR( Socket );
    }
    hb_retni( iLen );
-   HB_STACK_LOCK;
 }
 
 HB_FUNC( INETRECVALL )
@@ -685,11 +707,13 @@ HB_FUNC( INETRECVALL )
    HB_SOCKET_ZERO_ERROR( Socket );
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    
    do
    {
       iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMax-iReceived ? iMax-iReceived : HB_SENDRECV_BUFFER_SIZE;
-
+      
+      
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
@@ -700,14 +724,16 @@ HB_FUNC( INETRECVALL )
       }
       else
       {
+         HB_STACK_LOCK;
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
          hb_retni( iReceived );
-         HB_STACK_LOCK;
          return;
       }
 
    }
    while( iReceived < iMax && iLen > 0 );
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    Socket->count = iReceived;
 
@@ -725,7 +751,6 @@ HB_FUNC( INETRECVALL )
       HB_SOCKET_SET_ERROR( Socket );
       hb_retni( -1 );
    }
-   HB_STACK_UNLOCK;   
 }
 
 
@@ -778,6 +803,7 @@ HB_FUNC( INETRECVLINE )
    iAllocated = iBufferSize;
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    do
    {
       if( iPos == iAllocated - 1 )
@@ -810,6 +836,8 @@ HB_FUNC( INETRECVLINE )
 
    }
    while( iMax == 0 || iPos < iMax );
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    if( iLen <= 0 )
    {
@@ -860,8 +888,6 @@ HB_FUNC( INETRECVLINE )
          hb_retc( NULL );
       }
    }
-   
-   HB_STACK_LOCK;
 }
 
 
@@ -931,6 +957,7 @@ HB_FUNC( INETRECVENDBLOCK )
    iAllocated = iBufferSize;
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    
    do
    {
@@ -972,6 +999,8 @@ HB_FUNC( INETRECVENDBLOCK )
       }
    }
    while( iMax == 0 || iPos < iMax );
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    if( iLen <= 0 )
    {
@@ -1023,7 +1052,6 @@ HB_FUNC( INETRECVENDBLOCK )
          hb_retc( NULL );
       }
    }
-   HB_STACK_LOCK;
 }
 
 
@@ -1057,7 +1085,14 @@ HB_FUNC( INETDATAREADY )
 
    FD_ZERO(&rfds);
    FD_SET(Socket->com, &rfds);
+
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+   
    iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
+   
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
    /* Don't rely on the value of tv now! */
 
    if( iLen < 0 )
@@ -1101,11 +1136,16 @@ HB_FUNC( INETSEND )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+   
    Socket->count = 0;
    if( hb_selectWriteSocket( Socket ) )
    {
       Socket->count = send( Socket->com, Buffer, iLen, MSG_NOSIGNAL );
    }
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    hb_retni( Socket->count );
 
@@ -1152,6 +1192,9 @@ HB_FUNC( INETSENDALL )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    while( iSent < iSend )
    {
       iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ? iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
@@ -1176,6 +1219,8 @@ HB_FUNC( INETSENDALL )
          break;
       }
    }
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    Socket->count = iSent;
 
@@ -1212,7 +1257,11 @@ HB_FUNC( INETGETHOSTS )
    }
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    Host = hb_getHosts( pHost->item.asString.value, NULL );
+
+   HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
    aHosts = hb_itemArrayNew( 0 );
@@ -1251,7 +1300,13 @@ HB_FUNC( INETGETALIAS )
       return;
    }
 
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    Host = hb_getHosts( pHost->item.asString.value, NULL );
+
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    aHosts = hb_itemArrayNew( 0 );
 
@@ -1425,12 +1480,14 @@ HB_FUNC( INETACCEPT )
    HB_SOCKET_ZERO_ERROR( Socket );
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    /* Connection incoming */
    if( hb_selectReadSocket( Socket ) )
    {
       /* On error (e.g. async connection closed) , com will be -1 and
          errno == 22 (invalid argument ) */
       incoming = accept( Socket->com, (struct sockaddr *) &si_remote, &Len );
+      HB_DISABLE_ASYN_CANC;
       /* this prevents unreleased memory to be generated in accept */
       HB_SOCKET_INIT( NewSocket );
       if( incoming > 0 )
@@ -1442,13 +1499,14 @@ HB_FUNC( INETACCEPT )
    /* Timeout expired */
    else
    {
+      HB_DISABLE_ASYN_CANC;
       HB_SOCKET_INIT( NewSocket );
       NewSocket->com = 0;
       HB_SOCKET_SET_ERROR2( NewSocket, -1, "Timeout" );
    }
    
    HB_STACK_LOCK;
-   
+      
    if( NewSocket->com == -1 )
    {
       HB_SOCKET_SET_ERROR( NewSocket );
@@ -1494,7 +1552,14 @@ HB_FUNC( INETCONNECT )
       HB_SOCKET_INIT( Socket );
    }
 
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    Host = hb_getHosts( pHost->item.asString.value, Socket );
+
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
+
    /* error had been set by get hosts */
 
    if ( Host == NULL )
@@ -1521,7 +1586,11 @@ HB_FUNC( INETCONNECT )
    Socket->remote.sin_addr.s_addr = (*(unsigned int *)Host->h_addr_list[0]);
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    hb_socketConnect( Socket );
+
+   HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
 ret:
@@ -1582,7 +1651,11 @@ HB_FUNC( INETCONNECTIP )
    Socket->remote.sin_addr.s_addr = inet_addr( pHost->item.asString.value );
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    hb_socketConnect( Socket );
+
+   HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
 ret:
@@ -1737,11 +1810,17 @@ HB_FUNC( INETDGRAMSEND )
    HB_SOCKET_ZERO_ERROR( Socket );
 
    Socket->count = 0;
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
    if( hb_selectWriteSocket( Socket ) )
    {
       Socket->count = sendto( Socket->com, Buffer, iLen, 0,
             (const struct sockaddr *) &Socket->remote, sizeof( Socket->remote ) );
    }
+
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
 
    hb_retni( Socket->count );
 
@@ -1797,6 +1876,7 @@ HB_FUNC( INETDGRAMRECV )
    HB_SOCKET_ZERO_ERROR( Socket );
 
    HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    iLen = -2;
    if( hb_selectReadSocket( Socket ) )
    {
@@ -1804,6 +1884,7 @@ HB_FUNC( INETDGRAMRECV )
             (struct sockaddr *) &Socket->remote, &iDtLen );
    }
 
+   HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
    
    if( iLen == -2 )

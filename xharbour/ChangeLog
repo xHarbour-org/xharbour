@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.843 2003/03/16 07:28:29 jonnymind Exp $
+ * $Id: ChangeLog,v 1.844 2003/03/16 13:00:50 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-03-16 16:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/inet.c
+    + Added InetStatus() function to get the status of a socket. Currently used
+      to know if a socket is active (0) or closed (-1): TODO more status
+    ! Put HB_STACK_LOCK/UNLOCK and HB_TEST_CANCEL_ENABLE_ASYN/ DISABLE in
+      the right places. Now asynchronous killing of a thread waiting on a socket is 
+      working ( use KillThread()/jointhread )
+
+  * source/rtl/trpc.prg
+    ! Using cleaner cleanup of accepting tread, closing their sockets instead of killing
+      them.
 
 2003-03-16 13:56 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c

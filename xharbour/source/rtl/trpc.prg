@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.8 2003/03/10 23:22:00 jonnymind Exp $
+ * $Id: trpc.prg,v 1.9 2003/03/16 13:01:00 jonnymind Exp $
  */
 
 /*
@@ -1125,22 +1125,24 @@ METHOD Stop() CLASS tRPCService
       RETURN .F.
    ENDIF
 
-   KillThread( ::thAccept )
+   InetClose( ::skServer )
+   // closing the socket will make their infinite loops to terminate.
    JoinThread( ::thAccept )
    IF ::thUDP > 0
-      KillThread( ::thUdp )
+      InetClose( ::skUdp )
       JoinThread( ::thUdp )
    ENDIF
 
-   // now destroy all the allocated resources
-   InetDestroy( ::skServer )
-   InetDestroy( ::skUdp )
    FOR EACH oElem IN ::aServing
       KillThread( oElem:thSelf )
       JoinThread( oElem:thSelf )
       InetDestroy( oElem:skRemote )
    NEXT
    ASize( ::aServing, 0 )
+
+   // now destroy all the allocated resources
+   InetDestroy( ::skServer )
+   InetDestroy( ::skUdp )
 
    MutexUnlock( ::mtxBusy )
 
@@ -1153,6 +1155,10 @@ METHOD Accept() CLASS tRPCService
    DO WHILE .T.
       skIn := InetAccept( ::skServer )
       // todo: better sync
+      IF InetStatus( ::skServer ) < 0
+         InetDestroy( skIn )
+         EXIT
+      ENDIF
       ::StartService( skIn )
    ENDDO
 RETURN .T.
@@ -1175,6 +1181,9 @@ METHOD UDPListen( ) CLASS tRPCService
 
    DO WHILE .T.
       nPacketLen := InetDGramRecv( ::skUdp, @cData, 1000 )
+      IF InetStatus( ::skUdp ) < 0 
+         EXIT
+      ENDIF
       ::UDPParseRequest( cData, nPacketLen )
    ENDDO
 RETURN .T.
