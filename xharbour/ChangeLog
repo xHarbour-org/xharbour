@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1373 2003/08/21 04:02:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1374 2003/08/21 16:49:34 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-22 13:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    * Removed redundant exclusion logic in SubStr() optimization regarding declared vars (see hb_compExprUseArrayAt()).
+    + Added logic to exclude CodeBlock locals in MACRO, when forcing MEMVAR context in hb_compExprUseArrayAt().
 
 2003-08-21 18:17 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbrddcdx.h

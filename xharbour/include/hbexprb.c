@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.63 2003/08/21 01:56:20 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.64 2003/08/21 02:01:24 ronpinkas Exp $
  */
 
 /*
@@ -1091,8 +1091,15 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
             {
                #if defined( HB_MACRO_SUPPORT )
-                  // Force MEMVAR context.
-                  pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_strdup( "MEMVAR" ) ), pSelf->value.asList.pExprList );
+                  if( hb_compLocalVarGetPos( pSelf->value.asList.pExprList->value.asSymbol, HB_MACRO_PARAM ) )
+                  {
+                     // Codeblock local - do not change context.
+                  }
+                  else
+                  {
+                     // Force MEMVAR context.
+                     pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_strdup( "MEMVAR" ) ), pSelf->value.asList.pExprList );
+                  }
                #else
                   if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
                       hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
@@ -1772,26 +1779,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      // SubStr( Str, n, 1 ) => Str[n]
                      else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
                      {
-
-                        if( pString->ExprType == HB_ET_VARIABLE )
-                        {
-                           #if defined( HB_MACRO_SUPPORT )
-                              goto PostOptimization;
-                           #else
-                              if( hb_compLocalGetPos( pString->value.asSymbol ) == 0 &&
-                                  hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pLast ) == 0 &&
-                                  hb_compVariableGetPos( hb_comp_pGlobals, pString->value.asSymbol ) == 0 &&
-                                  ( hb_comp_bStartProc == TRUE || hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pFirst ) == 0 ) )
-                              {
-                                 /*
-                                    We do NOT want to optimize if the Variable IS NON declared, because it may be a FIELD,
-                                    but the Array context will force a MEMVAR context in Array optimization!
-                                 */
-                                 goto PostOptimization;
-                              }
-                           #endif
-                        }
-
                         // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.
                         pSelf->value.asFunCall.pParms->value.asList.pExprList = pLen;
@@ -1801,9 +1788,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
                         pSelf->value.asList.pIndex    = pStart;
-
-                        PostOptimization :
-                        ;
                      }
                   }
                }
