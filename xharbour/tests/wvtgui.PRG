@@ -112,24 +112,33 @@ RETURN
 PROCEDURE GuiGets_1()
 
    LOCAL aLastPaint, clr, scr
-   LOCAL get_1   := ctod( '' )
-   LOCAL get_2   := Space( 35 )
-   LOCAL get_3   := Space( 35 )
-   LOCAL get_4   := Space( 35 )
-   LOCAL get_5   := Space( 35 )
-   LOCAL get_6   := 0
-   LOCAL aBlocks := {}
-   LOCAL nColGet := 8
-   LOCAL GetList := {}
-   LOCAL nTop    := 4
-   LOCAL nLft    := 4
-   LOCAL nBtm    := 20
-   LOCAL nRgt    := 75
-   LOCAL kf2     := SetKey( K_F2, {|| GuiGets_1() } )
-   LOCAL kf3     := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
-   LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
-   LOCAL cLabel  := 'VOUCH, that GROWS with you'
-
+   LOCAL get_1      := ctod( '' )
+   LOCAL get_2      := Space( 35 )
+   LOCAL get_3      := Space( 35 )
+   LOCAL get_4      := Space( 35 )
+   LOCAL get_5      := Space( 35 )
+   LOCAL get_6      := 0
+   LOCAL aBlocks    := {}
+   LOCAL nColGet    := 8
+   LOCAL GetList    := {}
+   LOCAL nTop       := 4
+   LOCAL nLft       := 4
+   LOCAL nBtm       := 20
+   LOCAL nRgt       := 75
+   LOCAL kf2        := SetKey( K_F2, {|| GuiGets_1() } )
+   LOCAL kf3        := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
+   LOCAL kf4        := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
+   LOCAL cLabel     := 'VOUCH, that GROWS with you'
+   LOCAL aPallet    := Wvt_GetPallete()
+   LOCAL aNewPallet := aclone( aPallet )
+   
+   // Change the values of pallatte arbitrarily though yu can fine tune 
+   // these values with realistic values.
+   //
+   aNewPallet[ 8 ] := aNewPallet[ 8 ] + 100000
+   
+   Wvt_SetPallete( aNewPallet )
+   
    aAdd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
    aAdd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
@@ -168,6 +177,7 @@ PROCEDURE GuiGets_1()
    // Restore Environment
    //
    Wvt_setBlocks( aLastPaint )
+   Wvt_SetPallete( aPallet )
    SetColor( clr )
    RestScreen( 0,0,maxrow(),maxcol(), scr )
 

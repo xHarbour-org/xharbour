@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2063 2004/01/15 12:58:25 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2065 2004/01/15 13:48:19 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-15 20:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + WVT_GETPALLETE() -> aRGBColors
+    + WVT_SETPALLETE( aRGBColors )
+    Retuens and set the new pallete values.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate the usage of Wvt_GetPallete() and Wvt_SetPallete().
+
+  /* Few  hours back I had made this entry but is not found now */
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Formatted.
+    * Changed the sequence of some functions to their respective groups.        
 
 2004-01-15 14:58 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c

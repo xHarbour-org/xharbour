@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.47 2004/01/15 00:17:55 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.48 2004/01/15 13:27:19 vouchcac Exp $
  */
 
 /*
@@ -3255,6 +3255,40 @@ HB_FUNC( WVT_GETFONTINFO )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETPALLETE )
+{
+   PHB_ITEM  info;
+   PHB_ITEM  temp;
+   int       i;
+   
+   info = hb_itemArrayNew( 16 );
+
+   for ( i = 0; i < 16; i++ )
+   {
+      temp = hb_itemPutNL( NULL, _COLORS[ i ] );
+      hb_arraySet( info, i+1, temp );
+      hb_itemRelease( temp );
+   }
+   hb_itemReturn( info );
+   hb_itemRelease( info );
+}
+
+//-------------------------------------------------------------------//
+//
+//    Wvt_SetPallet( aRGBValues ) -> An array of 16 elements with RGB values
+//
+HB_FUNC( WVT_SETPALLETE )
+{
+   int       i;
+   
+   for ( i = 0; i < 16; i++ )
+   {
+      _COLORS[ i ] = hb_parnl( 1, i+1 );
+   }
+}
+
+//-------------------------------------------------------------------//
 //
 //                 Peter Rees <peter@rees.co.nz>
 //
@@ -4010,5 +4044,9 @@ HB_FUNC( WVT_DRAWGRIDVERT )
    hb_retl( TRUE );
 }
 
+//-------------------------------------------------------------------//
+//
+//                    End of Graphic Functions
+//
 //-------------------------------------------------------------------//
 
