@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.9 2004/10/22 11:56:14 paultucker Exp $
+ * $Id: dateshb.c,v 1.10 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -218,7 +218,7 @@ HB_FUNC( DTOS )
 
 HB_FUNC( STOD )
 {
-   hb_retds( hb_parcx( 1 ) );
+   hb_retds( hb_parclen( 1 ) >= 8 ? hb_parc( 1 ) : NULL );
 }
 
 HB_FUNC( HB_STOD )
