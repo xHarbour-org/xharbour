@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.105 2004/04/09 01:47:56 druzus Exp $
+ * $Id: dbcmd.c,v 1.106 2004/04/14 10:32:13 druzus Exp $
  */
 
 /*
@@ -5339,5 +5339,418 @@ HB_FUNC( __DBDELIM )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "__DBDELIM" );
    }
 }
+
+// Escaping SQL string very basic. Need to be optimized/improved
+static char *hb_sqlescape( char *szInput )
+{
+   int     lLength = 0;
+   BOOL    bHasOne = FALSE;
+   char  * szChr;
+   char  * szEscape = NULL;
+   char  * szReturn = NULL;
+   
+   szChr = szInput;
+   
+   while( *szChr )
+   {
+      if( *szChr == '\'' ) // || *szChr == '\\' || *szChr == '"' )
+      {
+         bHasOne = TRUE;
+      }   
+      szChr++;
+   }
+   
+   lLength = szChr - szInput;
+  
+   szReturn = szEscape = ( char * ) hb_xgrab( lLength * 2 + 4 ); 
+   
+	if( !bHasOne )
+   {
+      strcpy( szEscape, szInput );
+   }   
+	else
+	{
+      szChr = szInput;
+      while ( *szChr )
+      {
+         if( *szChr == '\'' || *szChr < ' ' ) // *szChr == '\\' || *szChr == '"'  )
+         {
+            *szEscape++ = '\'';
+         }
+         *szEscape++ = *szChr++;
+      }
+      *szEscape = '\0';
+	}
+   
+   return szReturn;
+} 
+
+// Export field values to SQL script file
+static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
+{
+   
+  char *szString;
+ 
+   switch( pValue->type )
+   {
+      // a "C" field
+      case HB_IT_STRING:
+      {
+         char *szStrEsc;
+         char *szText = pValue->item.asString.value;
+         /* commented due a GPF in gcc
+         USHORT iSzLen = ( USHORT ) pValue->item.asString.length;
+        
+         // RTRIM( szText )
+         while( iSzLen && HB_ISSPACE( szText[ iSzLen - 1 ] ) )
+         {
+            iSzLen--;
+         }
+         szText[ iSzLen ] = '\0';
+         // szString := cDelim + szText + cDelim
+         */
+
+         szStrEsc = hb_sqlescape( szText );
+         szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
+
+         // FWrite( handle, szString )
+         hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+
+         // Orphaned, get rif off it
+         hb_xfree( szString );
+         hb_xfree( szStrEsc );
+         break;
+      }
+      // a "D" field
+      case HB_IT_DATE:
+      {
+         char *szDate = (char*) hb_xgrab( 9 );
+         char *szSqlDate = (char*) hb_xgrab( 11 );
+
+         hb_itemGetDS( pValue, szDate );
+         sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
+         szSqlDate[ 10 ] = '\0';
+         szString = hb_xstrcpy( NULL,cDelim,szSqlDate,cDelim,NULL);
+         hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+         hb_xfree( szDate );
+         hb_xfree( szSqlDate );
+         hb_xfree( szString );
+         break;
+      }
+      // an "L" field
+      case HB_IT_LOGICAL:
+      {
+         szString = hb_xstrcpy( NULL,cDelim,( pValue->item.asLogical.value ? "Y" : "N" ),cDelim,NULL);
+         hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+         hb_xfree( szString );
+         break;
+      }
+      // an "N" field
+      case HB_IT_NUMERIC:
+      {
+         char * szResult = hb_itemStr( pValue, NULL, NULL );
+
+         if ( szResult )
+         {
+            szResult ++;
+            while( HB_ISSPACE( *szResult ) )
+            {
+               szResult++ ;
+            }
+            hb_fsWriteLarge( handle, (BYTE*) szResult, strlen( szResult ) );
+            hb_xfree( szResult );
+         }
+         break;
+      }
+      // an "M" field or the other, might be a "V" in SixDriver
+      default:
+      // We do not want MEMO contents
+         return FALSE;
+   }
+   return TRUE;
+}
+
+// Export DBF content to a SQL script file
+static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
+                        char *cDelim, FHANDLE handle, BYTE *cSep, int nCount, char *cTable, char *cHeader )
+{
+   HB_THREAD_STUB
+   AREAP pArea = HB_CURRENT_WA;
+
+   int iSepLen;
+   USHORT uiFields = 0;
+   USHORT ui;
+   HB_ITEM Tmp;
+   long lRecNo = 0;
+   BOOL bWriteSep = FALSE;
+
+   char *szInsert = ( char * ) hb_xgrab( 13 + strlen( cTable ) + 12 );
+   strcpy( szInsert, "INSERT INTO \"" );
+   strcat( szInsert, cTable );
+   strcat( szInsert, "\" VALUES ( " );
+
+   char *szRecNo = ( char * ) hb_xgrab( 9 );
+   
+   BOOL bEof = TRUE;
+   BOOL bBof = TRUE;
+
+   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+
+   if( ! handle )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBF2SQL" );
+      return;
+   }
+
+   if ( !cDelim )
+   {
+      cDelim = "\'";
+   }
+
+   if ( cSep )
+   {
+      iSepLen = strlen( (char*) cSep );
+   }
+   else
+   {
+      cSep = (BYTE*) ',';
+      iSepLen = 1;
+   }
+
+   hb_fsWriteLarge( handle, (BYTE*) cHeader, strlen( cHeader ) );
+      
+   SELF_FIELDCOUNT( pArea, &uiFields );
+
+   Tmp.type = HB_IT_NIL;
+
+   while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+   {
+      // While !BOF() .AND. !EOF()
+      SELF_EOF( pArea, &bEof );
+      SELF_BOF( pArea, &bBof );
+
+      if ( bEof || bBof )
+      {
+         break;
+      }
+
+      // For condition is met
+      // if For is NULL, hb__Eval returns TRUE
+      if ( hb___Eval ( pFor ) )
+      {
+         hb_fsWriteLarge( handle, (BYTE*) szInsert, strlen( szInsert ) );
+
+         sprintf( szRecNo, "%d,", ++lRecNo );
+         
+         hb_fsWriteLarge( handle, (BYTE*) szRecNo, strlen( szRecNo ) );
+         
+         // User does not request fields, copy all fields
+         if ( bNoFieldPassed )
+         {
+            for ( ui = 1; ui <= uiFields; ui ++ )
+            {
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               SELF_GETVALUE( pArea, ui, &Tmp );
+               bWriteSep = hb_ExportSqlVar( handle, &Tmp, cDelim );
+               hb_itemClear( &Tmp );
+            }
+         }
+         // Only requested fields are exorted here
+         else
+         {
+            USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
+            USHORT uiItter;
+
+            for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+            {
+               char *szFieldName = hb_arrayGetC( pFields, uiItter );
+
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               if ( szFieldName )
+               {
+                  int iFieldLen = strlen( szFieldName );
+                  char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
+                  int iPos;
+
+                  hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
+                  iPos = hb_rddFieldIndex( pArea, szName );
+                  hb_xfree( szName );
+
+                  SELF_GETVALUE( pArea, iPos, &Tmp );
+                  bWriteSep = hb_ExportSqlVar( handle, &Tmp, cDelim );
+                  hb_itemClear( &Tmp );
+               }
+
+               hb_xfree( szFieldName );
+            }
+         }
+         hb_fsWriteLarge( handle, (BYTE*) " );\r\n", 5 );
+         bWriteSep = FALSE;
+      }
+
+      if ( nCount != -1 )
+      {
+         nCount-- ;
+      }
+
+      // DBSKIP()
+      SELF_SKIP( pArea, 1 );
+   }
+
+   // Writing EOF
+   // hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
+
+   hb_xfree( szInsert );
+   hb_xfree( szRecNo );
+   
+}
+
+HB_FUNC( __DBSQL )
+{
+   HB_THREAD_STUB
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( pArea )
+   {
+      PHB_ITEM pError = NULL;
+      BOOL bExport = hb_parl( 1 );
+      char *cFileName = hb_parcx( 2 );
+      char *cTable = hb_parcx( 3 );
+      PHB_ITEM pFields = hb_param( 4, HB_IT_ARRAY );
+      PHB_ITEM pFor = hb_param( 5, HB_IT_BLOCK );
+      PHB_ITEM pWhile = hb_param( 6, HB_IT_BLOCK );
+      PHB_ITEM pNext = hb_param( 7, HB_IT_NUMERIC );
+      PHB_ITEM pRecord = hb_param( 8, HB_IT_NUMERIC );
+      PHB_ITEM pRest = hb_param( 9, HB_IT_LOGICAL );
+      char *cHeader = hb_parcx( 10 );
+
+      PHB_FNAME pFileName;
+      FHANDLE handle;
+      LONG lStart, lCount;
+      char cSeparator[] = ",";
+      char cDelim[] = "\'";
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
+
+      BOOL bRetry;
+
+      // Process the file name argument.
+      pFileName = hb_fsFNameSplit( cFileName );
+
+      if ( ! pFileName->szExtension )
+      {
+         // No file name extension, so provide the default.
+         pFileName->szExtension = ".sql";
+      }
+
+      hb_fsFNameMerge( szFileName, pFileName );
+
+      // Immediately cleared things, don't want it no more
+      hb_xfree( pFileName );
+
+      // Determine where to start and how many records to process.
+      if( pRecord )
+      {
+        // The RECORD clause has the highest priority.
+         lStart = hb_parnl( 8 );
+         lCount = 1;
+      }
+      else if ( pNext )
+      {
+         // The NEXT clause has the next highest priority.
+         lStart = -1;
+         lCount = hb_parnl( 7 );
+      }
+      else if ( pWhile || ( pRest && pRest->item.asLogical.value ) )
+      {
+         // The WHILE and REST clauses have equal priority.
+         lStart = -1;
+         lCount = -1;
+      }
+      else
+      {
+         // Followed by the FOR clause or the ALL clause.
+         lStart = 0;
+         lCount = -1;
+      }
+
+      // COPY TO SQL
+      if ( bExport )
+      {
+         // Try to create text file
+         do
+         {
+            handle = hb_fsCreate( (BYTE*) szFileName, FC_NORMAL );
+
+            if( handle == F_ERROR )
+            {
+               if( pError == NULL )
+               {
+                  pError = hb_errNew();
+                  hb_errPutSeverity( pError, ES_ERROR );
+                  hb_errPutGenCode( pError, EG_CREATE );
+                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
+                  hb_errPutSubCode( pError, 1002 ); // Where is the Macro ?
+                  hb_errPutFileName( pError, szFileName );
+                  hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
+                  hb_errPutSubSystem( pError, "DELIM" );
+               }
+
+               hb_errPutOsCode( pError, hb_fsError() );
+               bRetry = hb_errLaunch( pError );
+            }
+            else
+            {
+               bRetry = FALSE;
+            }
+         } while( bRetry );
+
+         if( pError )
+         {
+            hb_itemRelease( pError );
+            pError = NULL;
+         }
+
+         if ( lStart > -1 )
+         {
+            // Only reposition if a starting record was specified or implied.
+            if ( lStart == 0 )
+            {
+               // DBGOTOP()
+               SELF_GOTOP( pArea );
+            }
+            else
+            {
+               // DBGOTO( lStart )
+               HB_ITEM pGoto;
+               pGoto.type = HB_IT_NIL;
+               hb_itemPutNL( &pGoto, lStart );
+               SELF_GOTOID( pArea, &pGoto );
+               // Clean up
+               hb_itemClear( &pGoto );
+            }
+         }
+
+         // Doing things now
+         hb_Dbf2Sql( pWhile, pFor, pFields, cDelim, handle, ( BYTE *)cSeparator, lCount, cTable, cHeader );
+
+         hb_fsClose( handle );
+      }
+   }
+   else
+   {
+      // No workarea to do the job
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "__DBDELIM" );
+   }
+}
+
+
 #if 0
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2823 2004/04/23 03:32:48 lculik Exp $
+ * $Id: ChangeLog,v 1.2824 2004/04/23 07:46:05 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-23 12:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    + added functions __dbsql, hb_Dbf2Sql, hb_ExportSqlVar, hb_sqlescape.
+      It could be the base for a COPY TO ... SQL SCRIPT command but at the moment
+      is hard coded for FireBirdSQL.
 
 2004-04-23 13:05 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
