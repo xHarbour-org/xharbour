@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3678 2004/12/17 08:07:25 bdj Exp $
+ * $Id: ChangeLog,v 1.3679 2004/12/17 10:58:10 aleytys Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-17 14:14 UTC+0100 Giancarlo Niccolai <gc at niccolai dot ws>
+  * source/vm/hash.c
+    ! HGetValues() was retriving keys instead of values on flat hashes.
+      Funny; I am quite sure this worked a while ago.
 
 2004-12-17 10:50 UTC+0000 Philip Chee <philip@aleytys.pc.my>
   + source\ct\setkeys.prg

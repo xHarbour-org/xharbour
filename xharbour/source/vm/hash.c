@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.35 2004/11/21 21:44:27 druzus Exp $
+ * $Id: hash.c,v 1.36 2004/12/12 06:40:37 walito Exp $
  */
 
 /*
@@ -1699,7 +1699,7 @@ PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
    {
       ulLen = pHash->item.asHash.value->ulLen;
       hb_arrayNew( pVals, ulLen );
-      pV = pHash->item.asHash.value->pKeys;
+      pV = pHash->item.asHash.value->pValues;
       pArr = pVals->item.asArray.value->pItems;
 
       for ( ulPosLoop = 1 ; ulPosLoop <= ulLen; ulPosLoop ++, pV++, pArr++ )
@@ -2270,7 +2270,7 @@ HB_FUNC( HCOPY )
    if ( pSource == NULL || pDest == NULL )
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HCOPY", 5,
-         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), 
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
          hb_paramError( 4 ), hb_paramError( 5 ) );
       return;
    }
