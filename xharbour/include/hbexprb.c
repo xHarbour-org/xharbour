@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.31 2002/10/17 00:48:07 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.32 2002/10/17 04:41:29 ronpinkas Exp $
  */
 
 /*
@@ -1381,7 +1381,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && usCount == 2 )
                {
                   HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pText = pSub->pNext, HB_EA_REDUCE;
+                  HB_EXPR_PTR pText = pSub->pNext;
 
                   if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
                   {
