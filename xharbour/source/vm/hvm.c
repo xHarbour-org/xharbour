@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.80 2002/06/17 08:07:36 ronpinkas Exp $
+ * $Id: hvm.c,v 1.81 2002/06/17 20:39:02 andijahja Exp $
  */
 
 /*
@@ -404,12 +404,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
-    * because INIT function can use static variables
+    * because INIT function can use static variables.
     */
+   hb_vmDoInitStatics();
 
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
-   hb_vmDoInitStatics();
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 
    /* This is undocumented CA-Clipper, if there's a function called _APPMAIN

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.282 2002/06/19 01:00:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.283 2002/06/19 01:30:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-19 14:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed non released memory in macro compiler, related to @VarByRef.
+
+  * source/compiler/genhrb.c
+    + Added Harbour compatible version header.
+
+  * source/vm/hvm.c
+    ! Fixed intialization of static variables to precede call to ClipInit().
 
 2002-06-18 18:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/cstruct.ch
@@ -77,7 +87,7 @@
 
 2002-06-17 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
-    ! Fixed Minimal Match Marker when inside first eelement of an OPTIONAL group.
+    ! Fixed Minimal Match Marker when inside first element of an OPTIONAL group.
 
 2002-06-17 01:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * doc/cstruct.txt
