@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3385 2004/09/01 02:01:18 modalsist Exp $
+ * $Id: ChangeLog,v 1.3386 2004/09/01 09:15:30 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-01 18:17 UTC+0200 Giancarlo Niccolai <gc /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Fixed a potential problem in managin the blinking cursor.
 
 2004-09-01 11:11 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/memoedit.prg

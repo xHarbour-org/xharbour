@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.41 2004/07/29 14:33:10 lf_sfnet Exp $
+ * $Id: gtxvt.c,v 1.42 2004/08/30 08:40:59 jonnymind Exp $
  */
 
 /*
@@ -1038,6 +1038,7 @@ static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, int weight, int 
       case GTI_FONTW_THIN: wname = "medium"; break;
       case GTI_FONTW_NORMAL: wname = "medium"; break;
       case GTI_FONTW_BOLD: wname = "bold"; break;
+      default: wname = "medium";
    }
 
    snprintf( fontString, 149, "-*-%s-%s-r-normal-*-%d-*-*-*-*-*-%s",
@@ -2778,7 +2779,7 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
 
 static void xvt_processMessages( PXWND_DEF wnd )
 {
-   static int count = 0;
+   static unsigned int count = 0;
    USHORT appMsg;
    XEvent evt;
    fd_set updateSet;
@@ -2949,7 +2950,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
          wnd->status->mouseDblClick2TO--;
       }
 
-      if ( ++count == 100 ) {
+      if ( ++count >= 100 ) {
          s_cursorState = s_cursorState ? 0: 1;
          xvt_cursorPaint( wnd );
          count = 0;
@@ -3441,6 +3442,7 @@ void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
 
    s_buffer->curs_style = usStyle;
+   COMMIT_BUFFER( s_buffer );
 
    if ( s_childPid > 0 )
    {
