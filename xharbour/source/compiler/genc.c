@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.38 2003/05/13 19:15:18 ronpinkas Exp $
+ * $Id: genc.c,v 1.39 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -47,10 +47,10 @@ typedef struct HB_stru_genc_info
 typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
-void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* generates the C language output */
+void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSourcePath )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
-   char szSourceName[ _POSIX_PATH_MAX ];
+   char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
    char *pszFileName;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
@@ -77,7 +77,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
    hb_fsFNameMerge( szFileName, pFileName );
 
    pFileName->szExtension = szSourceExtension;
+   pFileName->szPath = szSourcePath;
    hb_fsFNameMerge( szSourceName, pFileName );
+
+   while( ( pTmp = strchr( szSourceName, '\\' ) ) != NULL )
+   {
+      *pTmp = '/';
+   }
 
    hb_strupr( pFileName->szName );
 

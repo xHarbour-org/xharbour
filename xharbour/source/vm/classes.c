@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.55 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: classes.c,v 1.56 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -437,7 +437,6 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 {
    USHORT uiScope = pMethod->uiScope;
 
-
    //#define DEBUG_SCOPE
 
    if( uiScope & HB_OO_CLSTP_READONLY && hb_vm_iOptimizedSend != 2 )
@@ -476,25 +475,47 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
       #else
          if( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )
          {
+            PHB_ITEM pBlock;
             char *szCaller;
             char *pAt;
 
             if( HB_IS_BLOCK( *( pBase + 1 ) ) )
             {
-               szCaller = ( *( pBase + 1 ) )->item.asBlock.value->procname;
+               pBlock = *( pBase + 1 );
             }
             else
             {
-               // The Block paramater to the aEval().
-               szCaller = ( *( pBase + 1 + 2 ) )->item.asBlock.value->procname;
+               pBlock = *( pBase + 1 + 2 );
             }
 
-            pAt = strchr( szCaller, ':' );
-
-            if( pAt )
+            if( pBlock->item.asBlock.value->pSelfBase == NULL )
             {
-               // Same class.
-               if( strncmp( szCaller, ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, pAt - szCaller ) == 0 )
+               szCaller = pBlock->item.asBlock.value->procname;
+
+               pAt = strchr( szCaller, ':' );
+
+               if( pAt )
+               {
+                  // Same class.
+                  if( strncmp( szCaller, ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, pAt - szCaller ) == 0 )
+                  {
+                     return TRUE;
+                  }
+               }
+               else
+               {
+                  // Block is a Data of Object initialized at Class Creation Function.
+                  if( strcmp( szCaller, ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName ) == 0 )
+                  {
+                     return TRUE;
+                  }
+               }
+            }
+            else
+            {
+               // pObject and the HB_QSelf() of block are same class.
+               if( strcmp( ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName,
+                           ( s_pClasses + ( pBlock->item.asBlock.value->pSelfBase->uiClass - 1 ) )->szName ) == 0 )
                {
                   return TRUE;
                }
@@ -2927,6 +2948,11 @@ HARBOUR hb___msgGetData( void )
    }
 
    hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
+
+   if( HB_VM_STACK.Return.type == HB_IT_BLOCK && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
+   {
+      HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pObject->item.asArray.value;
+   }
 }
 
 /*

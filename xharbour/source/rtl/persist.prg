@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.10 2003/01/27 05:27:23 ronpinkas Exp $
+ * $Id: persist.prg,v 1.11 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -78,6 +78,8 @@ CLASS HBPersistent
 ENDCLASS
 
 METHOD LoadFromText( cObjectText ) CLASS HBPersistent
+
+   EXTERN HB_RestoreBlock
 
    LOCAL nLines := MLCount( cObjectText, 254 )
    LOCAL nLine  := 1, cLine, cToken
@@ -180,6 +182,7 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
       IF HB_EnumIndex() > Len( aBasePropertiesAndValues ) .OR. ;
          cType != ValType( aBasePropertiesAndValues[ HB_EnumIndex() ][ 2 ] ) .OR. ;
+         ValType( xValue ) == 'B' .OR. ;
          ! ( xValue == aBasePropertiesAndValues[ HB_EnumIndex() ][ 2 ] )
 
          SWITCH cType
@@ -278,14 +281,7 @@ STATIC FUNCTION ValToText( xValue, nIndent, Self )
          cText := 'HB_STOD( "' + DToS( xValue ) + '" )'
 
       CASE "B"
-         M->oObject := Self
-         xValue := Eval( xValue )
-
-         IF ValType( xValue ) == 'O' .AND. xValue == Self
-            cText := "{|| oObject }"
-         ELSE
-            cText := "{|| " + ValToPrgExp( xValue, ) + " }"
-         ENDIF
+         cText := ValToPrgExp( xValue  )
 
          EXIT
 

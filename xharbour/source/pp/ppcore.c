@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.69 2003/05/12 20:49:55 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.70 2003/05/19 18:43:46 ronpinkas Exp $
  */
 
 /*
@@ -5039,7 +5039,7 @@ static int NextName( char ** sSource, char * sDest )
      s_bNewLine = FALSE;
   }
 
-  while( **sSource != '\0' && ( State != STATE_NORMAL || **sSource != '_' && ! isalpha( **sSource ) ) )
+  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha( **sSource ) ) ) )
   {
      if( State == STATE_QUOTE1 )
      {

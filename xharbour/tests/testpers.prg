@@ -1,5 +1,5 @@
 //
-// $Id: testpers.prg,v 1.3 2003/05/23 03:27:09 ronpinkas Exp $
+// $Id: testpers.prg,v 1.4 2003/05/24 00:29:10 ronpinkas Exp $
 //
 // Class HBPersistent test
 
@@ -28,6 +28,9 @@ PROCEDURE Main()
    ?
    ? oTest:SaveToText()            // We save it to a text
 
+   ? "Evaluating Restored Block Property..."
+   ? Eval( oTest:Five )
+
 RETURN
 
 CLASS Test FROM HBPersistent
@@ -40,6 +43,8 @@ CLASS Test FROM HBPersistent
    METHOD Another() INLINE { 1, { "One", "Two" }, Date() }
    METHOD More()    VIRTUAL
 
+   // Yes we can even persist Blocks!!!
+   DATA   Five      INIT {|| HB_QSelf():One } PROPERTY
 ENDCLASS
 
 CLASS Test2 FROM HBPersistent

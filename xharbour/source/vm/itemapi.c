@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.35 2003/04/22 08:58:43 mauriliolongo Exp $
+ * $Id: itemapi.c,v 1.36 2003/05/16 19:52:12 druzus Exp $
  */
 
 /*
@@ -940,21 +940,11 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
             break;
 
          case HB_IT_INTEGER:
+         case HB_IT_DATE:
+         case HB_IT_STRING:
             if( piWidth )
             {
                *piWidth = ( int ) pItem->item.asInteger.length;
-            }
-
-            if( piDecimal )
-            {
-               *piDecimal = 0;
-            }
-            break;
-
-         case HB_IT_DATE:
-            if( piWidth )
-            {
-               *piWidth = ( int ) 10;
             }
 
             if( piDecimal )
@@ -976,7 +966,6 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
 
       }
    }
-
 }
 
 ULONG HB_EXPORT hb_itemSize( PHB_ITEM pItem )
@@ -1266,8 +1255,6 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemStr(%p, %p, %p)", pNumber, pWidth, pDec));
 
-
-
    if( pNumber )
    {
       /* Default to the width and number of decimals specified by the item,
@@ -1463,6 +1450,14 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
                case HB_IT_LONG:
                   iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asLong.value );
+                  break;
+
+               case HB_IT_DATE:
+                  iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asDate.value );
+                  break;
+
+               case HB_IT_STRING:
+                  iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asString.value[0] );
                   break;
 
                default:

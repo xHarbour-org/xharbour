@@ -9,7 +9,9 @@ PROCEDURE Main()
    LOCAL oParent := TParent()
 
    oChild := TChild():Create()
+
    oParent:ChangeReadOnly( 7 )
+   ? Eval( oParent:ExposePrivateOfParent )
 
    oChild:PublicOfChild := "Public is Ok."
 
@@ -72,6 +74,8 @@ CLASS TParent
 
    PUBLIC:
    METHOD ChangeReadOnly(x) INLINE ::ReadOnlyOfParent := x
+
+   DATA ExposePrivateOfParent INIT {|| HB_QSelf():PrivateOfParent }
 
 ENDCLASS
 

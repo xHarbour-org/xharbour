@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1047 2003/05/25 17:09:34 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1048 2003/05/25 22:23:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,75 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-25 17:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Added missing () as per GCC warning.
+
+  * include/hbvmpub.h
+    + Added memebr PHB_BASEARRAY pSelfBase to HB_CODEBLOCK structure.
+
+  * source/vm/hvm.c
+    + Added logic to reset pModuleSymbols of HB_VM_STACK on termination of hb_vmDo().
+    + Added logic to reset pModuleSymbols of HB_VM_STACK on termination of hb_vmExecute().
+    + Added logic to store appropriate HB_QSelf() value in each Codeblock. This Greatly improves the utility of HB_QSelf().
+    + Added new:
+
+        HB_SaveBlock( <Block> ) -> PersistedBlock Stream
+
+      which can correctly persist any Codeblock.
+
+    + Added new:
+
+        HB_RestoreBlock( <PersistedBlock> ) -> Block
+
+      which can correctly restore any persisted Codeblock. Block must be restored within an Application containing
+      the Compiled Module which the original Block was created at.
+
+  + tests/savebloc.prg
+    + Added sample test of new HB_Saveblock() and HB_RestoreBlock().
+
+  * source/rtl/cstr.prg
+    + Added Block support in ValToPrg() and ValToPrgExp() using new HB_SaveBlcok() and HB_RestoreBlock()
+
+  * source/rtl/persist.prg
+    + Added Block support using new HB_SaveBlcok() and HB_RestoreBlock()
+
+  * source/vm/classes.c
+    + Added logic to hb_clsValidScope() to take advantage of Codeblock embeded HB_QSelf() value. This solved 2 newly discovered scope bugs.
+
+  * source/vm/estack.c
+    + Added logic to initilize pSymbolModule member of HB_STACK in hb_stackInit().
+
+  * source/compiler/harbour.sly
+    + Added Line Number generation to MEMEBER_DECLARE Statements. This solved missing line numbers for Blocks created at Class Functions.
+
+  * include/hbcomp.h
+  * source/compiler/gencobj.c
+  * source/compiler/genc.c
+    + Added 3rd param char * szSourcePath to hb_compGenCCode() and hb_compGenCObj()
+
+  * source/compiler/harbour.c
+    * Added 3rd paramater char *szSourcePath to hb_compGenOutput()
+    + Added logic to retain source file path, and pass it as 3rd paramater to hb_compGenOutput()
+      which then forwards it to hb_compGenCCode() and hb_compGenCObj()
+
+  * source/compiler/genc.c
+    + Added logic to conver '\' to '/' in __PRG_SOURCE__ to correct display problem.
+    + Added logic to use source file path when generating __PRG_SOURCE__
+
+  * source/vm/extend.c
+    + Added HB_IT_DATE and HB_IT_STRING support in hb_param() when Mask is HB_IT_NUMERIC.
+
+  * source/vm/itemapi.c
+    + Added HB_IT_DATE and HB_IT_STRING support in hb_itemNLen()
+    + Added HB_IT_DATE and HB_IT_STRING support in hb_itemStr()
+
+  * tests/tstscope.prg
+    + Added test of a Data Block using INIT accessing restriced scope Data.
+
+  * tests/testpers.prg
+    + Added Block proerty to demonstrate HBPersist support for Block type.
 
 2003-05-25 18:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * contrib/rdd_ads/ads1.c
@@ -55,7 +124,6 @@
 
   * source/vm/arrays.c
     - remove old comments.
-    
 
 2003-05-23 17:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h

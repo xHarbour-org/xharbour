@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.42 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.43 2003/05/13 21:53:19 ronpinkas Exp $
  */
 
 /*
@@ -1676,8 +1676,8 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
              }
            | DECLARE IdentName { hb_comp_pLastClass = hb_compClassAdd( $2 ); } ClassInfo Crlf { hb_comp_iVarScope = VS_NONE; }
            | DECLARE_CLASS IdentName Crlf { hb_comp_pLastClass = hb_compClassAdd( $2 ); hb_comp_iVarScope = VS_NONE; }
-           | DECLARE_MEMBER DecMethod Crlf { hb_comp_iVarScope = VS_NONE; }
-           | DECLARE_MEMBER '{' AsType { hb_comp_cDataListType = hb_comp_cVarType; } DecDataList '}' Crlf { hb_comp_cDataListType = 0; hb_comp_iVarScope = VS_NONE; }
+           | DECLARE_MEMBER DecMethod Crlf { hb_comp_iVarScope = VS_NONE; hb_compLinePushIfInside(); }
+           | DECLARE_MEMBER '{' AsType { hb_comp_cDataListType = hb_comp_cVarType; } DecDataList '}' Crlf { hb_comp_cDataListType = 0; hb_comp_iVarScope = VS_NONE; hb_compLinePushIfInside(); }
            ;
 
 DecDataList: DecData

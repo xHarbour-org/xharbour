@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.7 2003/02/26 06:45:29 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.8 2003/03/07 03:04:46 ronpinkas Exp $
  */
 
 /*
@@ -227,6 +227,8 @@ typedef struct _HB_CODEBLOCK
    ULONG    ulCounter;    /* numer of references to this codeblock */
    BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
    PHB_ITEM **pGlobals;
+   USHORT   uLen;
+   PHB_BASEARRAY pSelfBase;
 } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.10 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.11 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN cRet
 
       CASE 'B'
-         RETURN "{|| " + ValToPrgExp( Eval( xVal ) ) + " }"
+         RETURN ValToPrgExp( xVal )
 
       CASE 'O'
          IF nPad == NIL
@@ -246,6 +246,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
    LOCAL cType := ValType( xVal )
    LOCAL aVars, aVar, cRet, nObj
+   LOCAL cChar
 
    //TraceLog( xVal, cName, nPad, aObjs )
 
@@ -289,7 +290,19 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          RETURN cRet
 
       CASE 'B'
-         RETURN "{|| " + ValToPrgExp( Eval( xVal ) ) + " }"
+         cRet := "HB_RestoreBlock( {"
+         xVal := HB_SaveBlock( xVal )
+
+         cRet += '"' + xVal[1] + [", ]
+
+         FOR EACH cChar IN xVal[2]
+             cRet += "Chr(" + Str( cChar, 3 ) + ")+"
+         NEXT
+
+         cRet[-1] := ", "
+         cRet += Str( xVal[3], 3 ) + "} )"
+
+         RETURN cRet
 
       CASE 'O'
          aVars := __objGetValueDiff( xVal )

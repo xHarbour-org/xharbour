@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.13 2003/01/25 01:44:46 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.14 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -445,11 +445,11 @@ extern BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearchPath );  /*
 extern char * hb_comp_buffer; /* yacc input buffer */
 
 /* output related functions defined in gen*.c */
-extern void hb_compGenCCode( PHB_FNAME, char * );      /* generates the C language output */
+extern void hb_compGenCCode( PHB_FNAME, char *, char * );      /* generates the C language output */
 extern void hb_compGenJava( PHB_FNAME );       /* generates the Java language output */
 extern void hb_compGenPortObj( PHB_FNAME );    /* generates the portable objects */
 extern void hb_compGenObj32( PHB_FNAME );      /* generates OBJ 32 bits */
-extern void hb_compGenCObj( PHB_FNAME, char * );       /* generates platform dependant object module */
+extern void hb_compGenCObj( PHB_FNAME, char *, char * );       /* generates platform dependant object module */
 
 /* hbident.c   */
 extern char * hb_compIdentifierNew( char * szName, BOOL bCopy ); /* create the reusable identifier */

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.36 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: harbour.c,v 1.37 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@
 #endif
 
 static void hb_compInitVars( void );
-static void hb_compGenOutput( int, char *szSourceExtension );
+static void hb_compGenOutput( int, char *szSourceExtension, char *szSourcePath );
 static void hb_compOutputFile( void );
 
 int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
@@ -4326,13 +4326,13 @@ static void hb_compInitVars( void )
    hb_comp_pEnum          = NULL;
 }
 
-static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
+static void hb_compGenOutput( int iLanguage, char *szSourceExtension, char *szSourcePath )
 {
 
    switch( iLanguage )
    {
       case LANG_C:
-         hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
+         hb_compGenCCode( hb_comp_pFileName, szSourceExtension, szSourcePath );
          break;
 
       case LANG_OBJ32:
@@ -4348,7 +4348,7 @@ static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
          break;
 
       case LANG_OBJ_MODULE:
-         hb_compGenCObj( hb_comp_pFileName, szSourceExtension );
+         hb_compGenCObj( hb_comp_pFileName, szSourceExtension, szSourcePath );
          break;
    }
 }
@@ -4389,7 +4389,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    {
       char szFileName[ _POSIX_PATH_MAX ];    /* filename to parse */
       char szPpoName[ _POSIX_PATH_MAX ];
-      char *szSourceExtension;
+      char *szSourceExtension, *szSourcePath;
 
       if( !hb_comp_pFileName->szExtension )
       {
@@ -4397,6 +4397,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       }
 
       szSourceExtension = hb_comp_pFileName->szExtension;
+      szSourcePath = hb_comp_pFileName->szPath;
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
@@ -4614,7 +4615,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
                }
 
-               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
+               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension, szSourcePath );
             }
          }
          else

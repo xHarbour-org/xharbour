@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.15 2003/03/08 02:06:47 jonnymind Exp $
+ * $Id: extend.c,v 1.16 2003/03/10 23:22:01 jonnymind Exp $
  */
 
 /*
@@ -73,7 +73,7 @@
  */
 
 #define HB_THREAD_OPTIMIZE_STACK
- 
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbset.h"
@@ -86,16 +86,19 @@
 PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %d)", iParam, iMask));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
       PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam  );
       USHORT uiType;
+      BOOL bByRef = FALSE;
 
       if( pItem->type & HB_IT_BYREF )
       {
+         bByRef = TRUE;
+
          pItem = hb_itemUnRef( pItem );
 
          if( iMask == HB_IT_BYREF )
@@ -110,13 +113,20 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
       {
          return pItem;
       }
+      else
+      {
+         if( iMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
+         {
+            return pItem;
+         }
+      }
    }
 
    return NULL;
 }
 
 PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
-{   
+{
    static HB_ITEM s_NIL;
 
    PHB_ITEM pParam = hb_param( iParam, HB_IT_ANY );
@@ -136,7 +146,7 @@ PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
 BOOL HB_EXPORT hb_extIsArray( int iParam )
 {
    HB_THREAD_STUB
-   
+
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
       PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
@@ -153,7 +163,7 @@ BOOL HB_EXPORT hb_extIsArray( int iParam )
 char HB_EXPORT * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -188,7 +198,7 @@ char HB_EXPORT * hb_parc( int iParam, ... )
 ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parclen(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -227,7 +237,7 @@ ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parcsiz(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -268,7 +278,7 @@ ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 char  HB_EXPORT * hb_pards( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_pards(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -305,7 +315,7 @@ char  HB_EXPORT * hb_pards( int iParam, ... )
 char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_pardsbuff(%p, %d, ...)", szDate, iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -340,7 +350,7 @@ char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 int  HB_EXPORT hb_parl( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parl(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -387,7 +397,7 @@ int  HB_EXPORT hb_parl( int iParam, ... )
 double  HB_EXPORT hb_parnd( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parnd(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -434,7 +444,7 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
 int  HB_EXPORT hb_parni( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parni(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -481,7 +491,7 @@ int  HB_EXPORT hb_parni( int iParam, ... )
 long  HB_EXPORT hb_parnl( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -533,7 +543,7 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
 void *hb_parptr( int iParam, ... )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -599,7 +609,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
 int  HB_EXPORT hb_parinfo( int iParam )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_parinfo(%d)", iParam));
 
    if( iParam == 0 )
@@ -633,7 +643,7 @@ int  HB_EXPORT hb_parinfo( int iParam )
 int  HB_EXPORT hb_pcount( void )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
    return ( int )( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt < 255 ? ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt : ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt - 256 );
@@ -643,7 +653,7 @@ int  HB_EXPORT hb_pcount( void )
 void  HB_EXPORT hb_ret( void )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_ret()"));
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
