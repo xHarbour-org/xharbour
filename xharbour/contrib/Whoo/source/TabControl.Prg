@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.34 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TabControl.Prg,v 1.35 2002/11/15 01:56:35 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -83,7 +83,6 @@ CLASS TTabControl FROM TCustomControl
    DATA WinClass    PROTECTED INIT WC_TABCONTROL
    DATA ControlName PROTECTED INIT "TabControl"
 
-   METHOD AddTab()
    METHOD InsertTab()
    METHOD DeleteTab()
    METHOD Configure()
@@ -126,48 +125,12 @@ METHOD Notify( hdr ) CLASS TTabControl
    LOCAL nSel
 
    nSel := TabCtrl_GetCurSel( ::FHandle ) + 1
-   IF ::Cursel <> nSel
+   
+   IF ::Cursel != nSel
       ShowWindow( ::Controls[::CurSel]:FHandle, SW_HIDE )
       ::CurSel := nSel
       ShowWindow( ::Controls[::CurSel]:FHandle, SW_SHOW )
    ENDIF
-
-RETURN NIL
-
-*-----------------------------------------------------------------------------*
-
-METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
-/*
-   LOCAL hTab, cRes
-   local hClass, nSeq
-   
-   if VALTYPE( oPage ) == "C"
-      cRes := oPage
-      oPage:= NIL
-   endif
-   
-   DEFAULT oPage TO TabPage():Create( self )
-   
-   if cRes != NIL
-      oPage:resname := cRes
-      oPage:ImageIndex := nImgPos
-   endif
-   oPage:Name := cName
-   oPage:Caption := cName
-
-
-   IF ( hTab := TabCtrl_AddItem( ::FHandle, oPage:Caption, oPage:ImageIndex ) ) > -1
- 
-      AADD( ::Controls, oPage )
-      __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
-      __ObjSetValueList( self, { { cName, oPage } } )
-
-   ENDIF
-
-   IF Len( ::Controls ) > 1
-      oPage:Hide()
-   ENDIF
-*/
 
 RETURN 0
 
@@ -427,9 +390,8 @@ return(nil)
 CLASS TabPage FROM TPanel
    DATA ImageIndex
    METHOD Create() CONSTRUCTOR
-//   METHOD WMCommand()
+   METHOD WMCommand()
    METHOD CreateWnd()
-//   METHOD WMCtlColor() INLINE GetStockObject( NULL_BRUSH )
 ENDCLASS
 
 METHOD Create( oOwner ) CLASS TabPage
@@ -447,13 +409,11 @@ METHOD Create( oOwner ) CLASS TabPage
    
 RETURN Self
 
-/*
 METHOD WMCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL
       RETURN(::Parent:SendTo:SendMessage( WM_COMMAND, nwParam, nlParam ))
    ENDIF
 return(0)
-*/
 
 METHOD CreateWnd() CLASS TabPage
 
@@ -467,8 +427,6 @@ METHOD CreateWnd() CLASS TabPage
    
    IF SendMessage( ::FParent:Handle, TCM_INSERTITEM,  Len( ::FParent:Controls ), tci:value ) > -1
 
-//   IF ( hTab := TabCtrl_AddItem( ::FParent:Handle, ::Caption, ::ImageIndex ) ) > -1
-
       AADD( ::FParent:Controls, Self )
 
       __objAddData( ::FParent, ::Name, HB_OO_CLSTP_PROTECTED )
@@ -478,8 +436,8 @@ METHOD CreateWnd() CLASS TabPage
 
    rc IS RECT
    
-   rc:Left  := ::FParent:FLeft
-   rc:Top   := ::FParent:FTop
+   rc:Left  := 0//::FParent:FLeft
+   rc:Top   := 0//::FParent:FTop
    rc:Right := ::FParent:FWidth
    rc:Bottom:= ::FParent:FHeight
    SendMessage( ::FParent:Handle, TCM_ADJUSTRECT, 0, rc:value )
@@ -494,7 +452,7 @@ METHOD CreateWnd() CLASS TabPage
    ::Super:CreateWnd()
 
    IF Len( ::FParent:Controls ) > 1
-      ::Hide()
+      ShowWindow( ::FHandle, SW_HIDE )
    ENDIF
 
 RETURN Self

@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.9 2002/11/13 02:13:57 what32 Exp $
+ * $Id: TSplash.prg,v 1.10 2002/11/14 07:59:26 what32 Exp $
  */
 
 /*
@@ -48,6 +48,8 @@ METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash
    local aRect,abRect
    DEFAULT nTimeOut TO 2000
 
+   ::Super:Create( oParent )
+
    ::style   := WS_POPUP + WS_VISIBLE + WS_BORDER
    ::ExStyle := WS_EX_TOPMOST
 
@@ -61,12 +63,9 @@ METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash
    ::FLeft   := (aRect[3]/2)-(::FWidth/2)
    ::FTop    := (aRect[4]/2)-(::FHeight/2)
 
-   ::Super:Create( oParent )
-   
-   ::CreateHandle()
+   ::HandleNeeded()
+   ::Update()
    
    SetTimer( ::FHandle, 1, nTimeOut )
 
-   Application:ProcessMessages()
-
-return( self )
+RETURN Self

@@ -1301,3 +1301,8 @@ HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
 
 #endif
 
+HB_FUNC ( LOCKWINDOWUPDATE )
+{
+   hb_retl( LockWindowUpdate( (HWND) hb_parnl( 1 ) ) );
+}
+

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.20 2002/11/11 23:18:02 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.21 2002/11/14 07:59:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -302,6 +302,7 @@ METHOD Create( oParent ) CLASS TWBrowse
    ::Msgs      := -1
    ::WndProc   := "FormProc"
 
+   ::Parent := oParent
    ::Super:Create( oParent )
 
    ::wantHiliteAll   := .F.
@@ -493,6 +494,13 @@ METHOD CreateWnd() CLASS TWBrowse
    ENDIF
    
    ::Super:CreateWnd()
+   IF ::Font == NIL
+      ::Font := SendMessage( ::Parent:Handle, WM_GETFONT, 0, 0 )
+   ENDIF
+   IF ::Font == 0
+      ::Font := GetMessageFont()
+   ENDIF
+   SendMessage( ::Fhandle, WM_SETFONT, ::Font, 0 )
    
    ::Configure()
    

@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.6 2002/11/13 00:57:52 ronpinkas Exp $
+ * $Id: TCustomForm.prg,v 1.7 2002/11/13 02:13:57 what32 Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ CLASS TCustomForm FROM TScrollingWinControl
 
     METHOD SetWindowMenu( oMenu )
     METHOD RefreshMDIMenu()
-    METHOD SetParent( oParent )
+//    METHOD SetParent( oParent )
 
 ENDCLASS
 
@@ -207,7 +207,7 @@ METHOD RefreshMDIMenu() CLASS TCustomForm
    ENDIF
 
 Return NIL
-
+/*
 METHOD SetParent( oParent ) CLASS TCustomForm
 
    IF ( ! ::Parent == oParent) .AND. ( ! oParent == Self )
@@ -224,3 +224,4 @@ METHOD SetParent( oParent ) CLASS TCustomForm
 
 RETURN NIL
 
+*/

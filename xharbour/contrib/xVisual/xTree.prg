@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.22 2002/11/14 07:59:28 what32 Exp $
+ * $Id: xTree.prg,v 1.23 2002/11/15 01:56:37 what32 Exp $
  */
 
 /*
@@ -44,7 +44,7 @@ CLASS ObjTree FROM TForm
    
    METHOD Create()
    METHOD WMCreate()
-   METHOD WMSize(n,x,y)  INLINE IIF( ! ::oTree == NIL, ::oTree:Move( , , x, y, .t. ), ), NIL
+   METHOD WMSize(n,x,y)  INLINE ::oTree:Move( , , x, y, .t. )
 
 ENDCLASS
 
@@ -61,7 +61,7 @@ METHOD Create( oParent ) CLASS ObjTree
    ::ExStyle  := WS_EX_TOOLWINDOW
 
    ::SetParent( MainForm )
-   ::HandleNeeded()
+
 RETURN( Self )
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.42 2002/11/13 00:45:53 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.43 2002/11/14 07:59:27 what32 Exp $
  */
 
 /*
@@ -129,6 +129,8 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS oCtrlMask
 
+   ::Super:Create( oParent )
+
    ::Fleft      := 0
    ::Ftop       := 0
    ::Fwidth     := oParent:Fwidth
@@ -158,8 +160,6 @@ METHOD Create( oParent ) CLASS oCtrlMask
    ::aSelected := {}
    ::aClickPt  := {}
 
-   ::Super:Create( oParent )
-
 RETURN Self
 
 
@@ -168,7 +168,7 @@ RETURN Self
 
 METHOD WMRButtonDown()
 
-   messagebox( ::Parent:Handle, "TrackPopupMenu comes here" )
+   messagebox( ::FParent:Handle, "TrackPopupMenu comes here" )
    SetFocus( ::Handle )
 
    RETURN( NIL )
@@ -230,7 +230,7 @@ METHOD WMKeyDown( wParam, lParam )
          CASE wParam == VK_ESCAPE
             ::aSelected := {}
             ::nClick    := HTCLIENT
-            InvalidateRect( ::Parent:Handle,, .F. )
+            InvalidateRect( ::FParent:Handle,, .F. )
             ::SetFocus()
             RETURN( NIL )
 
@@ -257,7 +257,7 @@ METHOD WMKeyDown( wParam, lParam )
                   aRect := GetWindowRect( ::aSiblings[n] )
                   RectScreenToClient( ::Handle, aRect )
                   ::aSelected := {{ ::aSiblings[n], aclone( aRect ), 0, 0, {}, {} } }   // handle,rect,anchorX,anchorY,aHot
-                  InvalidateRect( ::Parent:Handle ,, .F. )
+                  InvalidateRect( ::FParent:Handle ,, .F. )
 
                   ::ChangeInspector( 0 )
 
@@ -371,7 +371,7 @@ METHOD WMKeyDown( wParam, lParam )
       IF !lOnBorder
          FOR EACH a IN ::aSelected
 
-            InvalidateRect( ::Parent:Handle, a[ SEL_OLDRECT ] , .F. )
+            InvalidateRect( ::FParent:Handle, a[ SEL_OLDRECT ] , .F. )
             a[ SEL_OLDRECT ][ 1 ] += l
             a[ SEL_OLDRECT ][ 2 ] += t
             a[ SEL_OLDRECT ][ 3 ] += r
@@ -444,7 +444,7 @@ METHOD Refresh()
       a[ SEL_OLDRECT ] := aClone( aRect )
    NEXT
 
-   InvalidateRect( ::Parent:Handle,, .T. )
+   InvalidateRect( ::FParent:Handle,, .T. )
    ::BringToTop()
    ::SetFocus()
 
@@ -493,7 +493,7 @@ METHOD WMLButtonDown( wParam, x, y )
                aRect := aClone( aWRect )
                RectScreenToClient( ::Handle, aRect )
                aEval( ::aSelected, {|a| ShowWindow( a[ SEL_HANDLE ], SW_HIDE ),;
-               RedrawWindow( ::Parent:Handle, aRect,, RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN),;
+               RedrawWindow( ::FParent:Handle, aRect,, RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN),;
                ShowWindow( a[ SEL_HANDLE ], SW_SHOW ) } )
                ::aSelected := { { hChild, aclone( aRect ), x - aRect[1], y - aRect[2], {}, aclone( aRect ) } }   // handle,rect,anchorX,anchorY,aHot
             ENDIF
@@ -538,7 +538,7 @@ METHOD WMLButtonDown( wParam, x, y )
          aRect  := aClone( aWRect )
          RectScreenToClient( ::Handle, aRect )
          aEval( ::aSelected, {|a| ShowWindow( a[ SEL_HANDLE ], SW_HIDE ),;
-                RedrawWindow( ::Parent:Handle, aRect,, RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN ),;
+                RedrawWindow( ::FParent:Handle, aRect,, RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN ),;
                 ShowWindow( a[ SEL_HANDLE ], SW_SHOW ) } )
       NEXT
 
@@ -573,7 +573,7 @@ METHOD WMLButtonDown( wParam, x, y )
    ::mousedown := .T.
    SetCapture( ::Handle )
 
-   UpdateWindow( ::Parent:handle )
+   UpdateWindow( ::FParent:handle )
 
    IF wParam != NIL
       IF lFound
@@ -599,7 +599,7 @@ METHOD ChangeInspector( n )
 
    IF n == 1
       FOR EACH Item IN ObjTree:TreeView1:Items
-          IF Item:cargo == ::Parent:handle
+          IF Item:cargo == ::FParent:handle
              Item:Select()
              nSelObj := ::handle
              EXIT
@@ -687,7 +687,7 @@ METHOD WMMouseMove( aParam, x, y )
 //         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
 //                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
 
-         UpdateWindow( ::Parent:handle )
+         UpdateWindow( ::FParent:handle )
 
 
          //new
@@ -779,7 +779,7 @@ METHOD WMLButtonUp( wParam, x, y )
    ENDIF
 
    IF ::moving .OR. ::sizing
-      UpdateWindow( ::Parent:handle )
+      UpdateWindow( ::FParent:handle )
    ENDIF
 
    ::mousedown := .F.
@@ -952,7 +952,7 @@ METHOD MoveCtrl( hWnd, aPt )
 // in reversed order
 
 METHOD GetSiblings()
-   LOCAL hWnd  := GetWindow( ::Parent:Handle, GW_CHILD )
+   LOCAL hWnd  := GetWindow( ::FParent:Handle, GW_CHILD )
    ::aSiblings := {}
 
    DO WHILE !empty( hWnd )

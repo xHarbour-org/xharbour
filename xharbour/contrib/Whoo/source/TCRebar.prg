@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.28 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TCRebar.prg,v 1.29 2002/11/15 01:56:34 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -38,6 +38,7 @@ pragma pack(4)
 #Include "toolbar.ch"
 #Include "rbstruct.ch"
 #Include "debug.ch"
+#Include "classex.ch"
 
 *------------------------------------------------------------------------------*
 
@@ -62,9 +63,9 @@ CLASS TCoolBar FROM TCustomControl
 
    DATA WinClass    PROTECTED INIT REBARCLASSNAME
    DATA ControlName PROTECTED INIT "CoolBar"
+   DATA Bands       PROTECTED INIT {}
 
    METHOD CreateWnd()
-   METHOD AddBand()
    METHOD CoolBarProc()
    METHOD Delete()
    METHOD DelControl()
@@ -82,13 +83,16 @@ METHOD Delete() CLASS TCoolBar
 
 
 METHOD DelControl() CLASS TCoolBar
-   local n
-   if( n := ascan( ::Parent:Controls, {|o|o:handle==::handle} ) )>0
-      __objDelData( ::Parent, UPPER(::name ))
-      adel( ::Parent:Controls, n, .t. )
+   
+   LOCAL n
+   
+   IF( n := aScan( ::Parent:Controls, {|o|o:Handle==::Handle} ) ) > 0
+      __objDelData( ::Parent, UPPER( ::Name ) )
+      aDel( ::Parent:Controls, n, .t. )
       ::Destroy()
-   endif
-   RETURN(self)
+   ENDIF
+   
+RETURN(self)
 
 *------------------------------------------------------------------------------*
 
@@ -119,30 +123,88 @@ METHOD CreateWnd() CLASS TCoolBar
    
 RETURN NIL
 
-*------------------------------------------------------------------------------*
+//---------------------------------------------------------------------------------------------
 
-METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
+CLASS TCoolBand
+   DATA oStruct PROTECTED
+   DATA Index   PROTECTED
+   DATA Parent  PROTECTED
 
-   LOCAL rbBand IS REBARBANDINFO
-   LOCAL aRect:=GetWindowRect(hChild)
-   local nBand
+   DATA BorderStyles    AS ARRAY INIT { 0, RBBS_CHILDEDGE }
+   DATA BreakStyles     AS ARRAY INIT { 0, RBBS_BREAK }
+   DATA FixedBmpStyles  AS ARRAY INIT { 0, RBBS_FIXEDBMP }
+   DATA FixedSizeStyles AS ARRAY INIT { 0, RBBS_FIXEDSIZE }
+   DATA GripperStyles   AS ARRAY INIT { RBBS_GRIPPERALWAYS, RBBS_NOGRIPPER }
    
-   rbBand:Reset()
-   rbBand:cbSize     := rbBand:sizeof()
-   rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE+RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
-   rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT,nStyle)
-   rbBand:hwndChild  := IFNIL(hChild,0,hChild)
-   
-   rbBand:cxMinChild := IFNIL(cxMin,aRect[3]-aRect[1],cxMin)
-   rbBand:cyMinChild := IFNIL(cyMin,aRect[4]-aRect[2],cyMin)
-   
-   rbBand:cx         := IFNIL(cx,GetClientRect(::Parent:handle)[3],cx)
-   
-   rbBand:lpText     := IFNIL( cText, "Test", cText)
-   rbBand:hbmBack    := IFNIL( hBmp, 0, hBmp)
+   PROPERTY MinHeight READ FMinHeight WRITE SetMinHeight
+   PROPERTY MinWidth  READ FMinWidth  WRITE SetMinWidth
+   PROPERTY Width     READ FWidth     WRITE SetWidth
+   PROPERTY Text      READ FText      WRITE SetText 
+   PROPERTY Grippers  READ FGrippers  WRITE SetGrippers
 
-   nBand := ::SendMessage( RB_INSERTBAND, -1, rbBand:value )
+   METHOD Create()
+   METHOD SetChild()
+   METHOD SetWidth()
+   METHOD SetMinWidth()
+   METHOD SetMinHeight()
+   METHOD SetText()
+   METHOD SetGrippers()
+ENDCLASS
 
-RETURN( nBand <> 0 )
+METHOD Create( oOwner ) CLASS TCoolBand
 
-*------------------------------------------------------------------------------*
+   ::Parent := oOwner
+   ::oStruct IS REBARBANDINFO
+
+   ::oStruct:cbSize     := ::oStruct:sizeof()
+   ::oStruct:fMask      := RBBIM_STYLE
+   ::oStruct:fStyle     := RBBS_GRIPPERALWAYS + RBBS_NOVERT
+
+   ::Index := oOwner:SendMessage( RB_GETBANDCOUNT, 0, 0 )
+   oOwner:SendMessage( RB_INSERTBAND, -1, ::oStruct:value )
+
+   aAdd( oOwner:Bands, Self )
+
+RETURN Self
+
+METHOD SetGrippers( Value ) CLASS TCoolBand
+   IF Value
+      ::oStruct:fStyle := OR( ::oStruct:fStyle, RBBS_GRIPPERALWAYS )
+   ELSE
+      ::oStruct:fStyle := AND( ::oStruct:fStyle, NOT( RBBS_GRIPPERALWAYS ) )
+      ::oStruct:fStyle := OR( ::oStruct:fStyle, RBBS_NOGRIPPER )
+   ENDIF
+   ::oStruct:fMask := RBBIM_STYLE
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+
+METHOD SetChild( oChild ) CLASS TCoolBand
+   ::oStruct:fMask      := RBBIM_CHILD
+   ::oStruct:hwndChild  := oChild:Handle
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+
+METHOD SetMinWidth( Value ) CLASS TCoolBand
+   ::oStruct:fMask      := RBBIM_CHILDSIZE
+   ::oStruct:cxMinChild := Value
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+
+METHOD SetMinHeight( Value ) CLASS TCoolBand
+   ::oStruct:fMask      := RBBIM_CHILDSIZE
+   ::oStruct:cyMinChild := Value
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+
+METHOD SetWidth( Value ) CLASS TCoolBand
+   ::oStruct:fMask      := RBBIM_SIZE
+   ::oStruct:cx := Value
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+
+METHOD SetText( Value ) CLASS TCoolBand
+   ::oStruct:fMask      := RBBIM_TEXT
+   ::oStruct:lpText := Value
+   ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
+RETURN Self
+

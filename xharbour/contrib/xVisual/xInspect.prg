@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.66 2002/11/14 07:59:28 what32 Exp $
+ * $Id: xInspect.prg,v 1.67 2002/11/15 01:56:37 what32 Exp $
  */
 
 /*
@@ -54,12 +54,14 @@ CLASS ObjInspect FROM TForm
 
    METHOD Create()
 
-   METHOD OnSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::ComboBox1:Width := x,;
+
+   METHOD WMSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::Combo:Width := x,;
                                                           InspTabs:Move( , 25, x, y-25, .T. ),;
                                                           ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
                                                           ::browser:FHeight:= InspTabs:Properties:ClientRect()[4],;
                                                           ::browser:Move( , , , , .T. ) ), ),;
                                                           NIL
+
    METHOD SetBrowserData()
    METHOD SaveVar()
 ENDCLASS
@@ -101,11 +103,12 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------
 
 METHOD Create( oParent ) CLASS ObjInspect
-
+   
+   LOCAL oPage
+   
    // Object Inspector Window
 
    ::Super:Create( oParent )
-   ::SetParent( MainForm )
 
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
@@ -115,35 +118,38 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::FHeight  := 297
    ::ExStyle  := WS_EX_TOOLWINDOW
 
-   ::HandleNeeded()
+   ::SetParent( MainForm )
 
    // ComboBox   
    ::Combo := ComboInsp():Create( self )
-   ::Combo:SetParent( Self )
-
    ::Combo:FWidth := ::FWidth - 8
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
+   ::Combo:SetParent( Self )
    ::Combo:SetItemHeight( -1, 15 )
 
 
    // TabControls
    InspTabs := TTabControl():Create( self )
-   InspTabs:SetParent( Self )
 
    InspTabs:FTop   := 25
    InspTabs:FWidth := ::FWidth - 8
    InspTabs:FHeight:= ::FHeight - 50
+
+   InspTabs:SetParent( Self )
    
-   InspTabs:HandleNeeded()
+   oPage := TabPage():Create( InspTabs )
+   oPage:Name    := "Properties"
+   oPage:Caption := "Properties"
+   oPage:SetParent( InspTabs )
 
-   InspTabs:AddTab( "Properties", TabPage():Create( InspTabs ) )
-   InspTabs:AddTab( "Events", TabPage():Create( InspTabs ) )
+   oPage := TabPage():Create( InspTabs )
+   oPage:Name    := "Events"
+   oPage:Caption := "Events"
+   oPage:SetParent( InspTabs )
 
-
-//   InspTabs:Configure()
+   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
    
-   // Browser
-//   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
+   OBjInspect := Self
 return( Self )
 
 //----------------------------------------------------------------------------------------------
@@ -361,9 +367,8 @@ METHOD Create( oParent ) CLASS InspectBrowser
    LOCAL oCol1,oCol2, aProp := { {"",""} }
 
    ::Source := aProp
-
+   
    ::Super:Create( oParent )
-   ::SetParent( MainForm )
 
    ::FLeft  := 0
    ::FTop   := 0
@@ -388,12 +393,7 @@ METHOD Create( oParent ) CLASS InspectBrowser
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    
-   
-   ::Font          := oParent:Font
-
-      
-   ::CreateHandle()
-   
+   ::SetParent( oParent )
 RETURN self
 
 //-------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.130 2002/11/15 01:56:37 what32 Exp $
+ * $Id: xide.prg,v 1.131 2002/11/15 02:12:52 what32 Exp $
  */
 
 /*
@@ -58,7 +58,6 @@ FUNCTION Main
 
    WITH OBJECT Application
       WITH OBJECT :CreateForm( MainForm(), @MainForm )
-         
          :OnCloseQuery := {|o| IIF( o:MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 ) }
 
          :SetStyle( WS_THICKFRAME, .F. )
@@ -68,10 +67,12 @@ FUNCTION Main
          :MainToolBar()
          :MainStatusBar()
 
+//         LockWindowUpdate()
+
          // add the object windows
-//         ObjTree    := ObjTree():Create( MainForm )
-//         ObjInspect := ObjInspect():Create( MainForm )
-//         ObjEdit    := ObjEdit():Create( MainForm )
+         ObjTree    := ObjTree():Create( MainForm )
+         ObjInspect := ObjInspect():Create( MainForm )
+         ObjEdit    := ObjEdit():Create( MainForm )
          // focus to main Frame
          :SetFocus()
 
@@ -96,6 +97,8 @@ CLASS MainForm FROM TForm
    METHOD MainMenu()
    METHOD MainToolBar()
    METHOD MainStatusBar()
+//   METHOD WMCreate() INLINE LockWindowUpdate( ::FHandle )
+
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------
@@ -150,19 +153,31 @@ return(self)
 
 METHOD MainToolBar() CLASS MainForm
 
-   LOCAL n, oTool, oSplash, oPage
-   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb, oCB
+   LOCAL n, oTool, oSplash, oPage, oBand1, oBand2
+   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb, oCB, oCoolBar, oBand
 
+   // Add the main CoolBar
    oCB := TCoolBar():Create( MainForm )
    oCB:SetParent( MainForm )
+
+   // Add the bands
+   oBand1 := TCoolBand():Create( oCB )
+   oBand1:MinWidth  := 190
+   oBand1:MinHeight := 54
    
+   oBand2 := TCoolBand():Create( oCB )
+   oBand2:MinWidth  := ::Width - 250
+   oBand2:MinHeight := 56
+
     // add the xmake toolbar
    WITH OBJECT TToolBar():Create( MainForm )
       :SetParent( MainForm )
-      
+      oBand1:SetChild( ::ToolBar1 )
+
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
-      oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
+      oTb:OnClick := {|| FormEdit := TFormEdit():Create( MainForm ) }
+//      oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
       
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
@@ -188,13 +203,13 @@ METHOD MainToolBar() CLASS MainForm
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    END
-   oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
+
 
    // add the TabControl on the Rebarband
 
    WITH OBJECT ToolTabs():Create( MainForm )
       :SetParent( MainForm )
-      oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Handle, 550, 56, , "", NIL )
+      oBand2:SetChild( ::ToolTabs )
 
       oPage := TabPage():Create( MainForm:ToolTabs )
       oPage:Name    := "StdTab"
@@ -206,25 +221,23 @@ METHOD MainToolBar() CLASS MainForm
       oPage:Caption := "Win32"
       oPage:SetParent( MainForm:ToolTabs )
 
-//      :AddTab( "Additional" )
-//      :AddTab( "System" )
-//      :AddTab( "Internet" )
-//      :AddTab( "Dialogs" )
-//      :AddTab( "Samples" )
-//      :AddTab( "Activex" )
    END
-
 
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
-      TCoolBar():Create( MainForm:ToolTabs:StdTab )
-      :CoolBar1:SetStyle( WS_BORDER, .F. )
+      oCoolBar := TCoolBar():Create( MainForm:ToolTabs:StdTab )
+      oCoolBar:SetParent( MainForm:ToolTabs:StdTab )
+
+      oBand := TCoolBand():Create( oCoolBar )
+      oBand:MinWidth  := 190
+      oBand:MinHeight := 54
+      oBand:Grippers  := .F.
+      
       With Object StdTools():Create( MainForm:ToolTabs:StdTab )
          :SetParent( MainForm:ToolTabs:StdTab )
-         
          :SetStyle( TBSTYLE_CHECKGROUP )
-         Application:ProcessMessages()
+         oBand:SetChild( MainForm:ToolTabs:StdTab:StdTools )
 
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
@@ -241,22 +254,29 @@ METHOD MainToolBar() CLASS MainForm
          hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
          hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
          ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
-         DeleteObject(hBmp)
+         DeleteObject( hBmp )
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
-
          //---------------------------------------------------------------------
       End
-      :CoolBar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
       :StdTools:Disable()
    End
 
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
-      TCoolBar():Create( MainForm:ToolTabs:Win32 )
-      :CoolBar1:SetStyle( WS_BORDER, .F. )
+      oCoolBar := TCoolBar():Create( MainForm:ToolTabs:Win32 )
+      oCoolBar:SetParent( MainForm:ToolTabs:Win32 )
+      oCoolBar:SetStyle( WS_BORDER, .F. )
+      
+      oBand := TCoolBand():Create( oCoolBar )
+      oBand:MinWidth  := 190
+      oBand:MinHeight := 54
+      oBand:Grippers  := .F.
+      
       With Object WinTools():Create( ::ToolTabs:Win32 )
+         :SetParent( MainForm:ToolTabs:Win32 )
          :SetStyle( TBSTYLE_CHECKGROUP )
+         oBand:SetChild( MainForm:ToolTabs:Win32:WinTools )
 
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'CoolBar', ;
                       '', '' }
@@ -278,7 +298,6 @@ METHOD MainToolBar() CLASS MainForm
          //---------------------------------------------------------------------
 
       End
-      :CoolBar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
       :WinTools:Disable()
    End
 
@@ -290,7 +309,7 @@ METHOD MainToolBar() CLASS MainForm
    ::SetLink( ::ToolTabs:Win32:WinTools )
 
 
-return(self)
+RETURN Self
 
 //----------------------------------------------------------------------------------------------
 
@@ -302,7 +321,7 @@ METHOD MainStatusBar() CLASS MainForm
    ::StatusBar1:SetPanels( { 150,380,480,580,-1 } )
    ::StatusBar1:SetPanelText( 0, "Visual xHarbour" )
 
-return(self)
+RETURN Self
 
 //----------------------------------------------------------------------------------------------
 

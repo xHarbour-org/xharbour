@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.90 2002/11/13 00:45:53 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.91 2002/11/14 07:59:27 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -83,7 +83,7 @@ CLASS TFormEdit FROM TForm
 
    METHOD WMCreate()
    METHOD WMSize()
-   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
+//   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
    METHOD WMPaint()
    METHOD WMDestroy()
 
@@ -125,7 +125,7 @@ RETURN oCtrl
 METHOD Create( oParent ) CLASS TFormEdit 
 
    ::Super:Create( oParent )
-
+   
    ::FCaption := 'TForm' + LTrim( Str( ++::nForms ) )
    ::Editing  := .F.
    ::aCtrl    := {}
@@ -137,8 +137,11 @@ METHOD Create( oParent ) CLASS TFormEdit
    ::yGrid    := 8
    ::GridColor:=RGB(0,0,0)
    ::OnCloseQuery := {|| MainForm:StdBar:Disable(), ObjInspect:ComboBox1:DelObject( HB_QSELF() ), NIL }
+   
    ::XFMTop()
-
+   
+   ::SetParent( MainForm )
+   
 RETURN Self
 
 METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit 
@@ -151,9 +154,9 @@ METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit
       ::oMask:Refresh()
    ENDIF
 
-   ObjInspect:SetBrowserData( Self, .F. )
+//   ObjInspect:SetBrowserData( Self, .F. )
 
-   RETURN NIL
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 
@@ -359,32 +362,32 @@ METHOD WMCreate() CLASS TFormEdit
    LOCAL oBtn
    LOCAL xRet
    Local oTree
-/*
+
    ::SetGridSize()
 
    MainForm:StdBar:Enable()
    MainForm:Win32Bar:Enable()
 
-   ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
+//   ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
    oTree     := ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
    oTree:Select()
 
 
    ::oMask:=oCtrlMask():Create( self )
-   ::oMask:GetHandle()
+   ::oMask:SetParent( Self )
 
    ::oMask:GetSiblings()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
-*/
+
 //   ::oMask:Hint:=""
 //   ::oMask:HintWindow:SetMaxTipWidth(10)
-   RETURN NIL
+RETURN NIL
 
 *------------------------------------------------------------------------------
 
 METHOD WMPaint( hDC ) CLASS TFormEdit 
-/*
+
    LOCAL hMemDC  := CreateCompatibleDC(hDC)
    LOCAL i       := 0
    LOCAL j       := 0
@@ -402,8 +405,8 @@ METHOD WMPaint( hDC ) CLASS TFormEdit
 
    SelectObject(hMemDC,hOldBmp)
    DeleteDC(hMemDC)
-*/
-   RETURN(0)
+
+RETURN(0)
 
 
 //----------------------------------------------------------------------------//

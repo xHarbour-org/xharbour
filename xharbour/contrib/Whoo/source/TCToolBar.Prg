@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.32 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.33 2002/11/15 01:56:34 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -96,12 +96,12 @@ CLASS TToolBar FROM TCustomControl
    DATA Caption PROTECTED INIT ""
    DATA FLeft   PROTECTED  INIT    0
    DATA FTop    PROTECTED  INIT    0
-   DATA FWidth  PROTECTED  INIT    50
-   DATA FHeight PROTECTED  INIT    0
+   DATA FWidth  PROTECTED  INIT    100
+   DATA FHeight PROTECTED  INIT    24
 
-   DATA Style   INIT  TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
-                      WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD
-   DATA ExStyle INIT  0
+   DATA FStyle   INIT  WS_CHILD + WS_VISIBLE + TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + CCS_NODIVIDER + CCS_NORESIZE
+   
+   DATA ExStyle  INIT  0
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
@@ -118,7 +118,7 @@ CLASS TToolBar FROM TCustomControl
    
    VAR nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp PROTECTED
 
-   DATA WinClass    PROTECTED INIT "toolbar32"
+   DATA WinClass    PROTECTED INIT TOOLBARCLASSNAME
    DATA ControlName PROTECTED INIT "ToolBar"
 
    METHOD Add()
@@ -207,13 +207,23 @@ METHOD CreateWnd() CLASS TToolBar
       ::hBMInst:=HINST_COMMCTRL
       ::nBMId  :=IDB_STD_LARGE_COLOR
    ENDIF
-   ::FHandle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
+   
+
+// New REMEMBER TO MAKE IT WORK CreateToolBarEx is obsolete
+
+//   ::FHandle := CreateWindowEx( 0, TOOLBARCLASSNAME,"", WS_CHILD,  ::FLeft, ::FTop, ::FWidth, ::FHeight, ::Parent:FHandle, ::Id, hInstance() )
+//   SendMessage( ::FHandle, TB_BUTTONSTRUCTSIZE, tbb:sizeof(), 0 )
+   
+
+   ::FHandle := CreateToolBarEx( ::Parent:Handle, ::FStyle, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
+
    ::ntProc := SetProcedure(::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
    ::Created:=.T.
+   ShowWindow( ::FHandle, SW_SHOW )
 
-return( self )
+RETURN Self
 
 
 *-----------------------------------------------------------------------------*
@@ -273,8 +283,9 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
 
      ENDCASE
    ENDCASE
-
-   RETURN CallWindowProc( ::ntProc, hWnd, nMsg, nwParam, nlParam )
+   
+   RETURN 0
+   //RETURN CallWindowProc( ::ntProc, hWnd, nMsg, nwParam, nlParam )
 
 
 *-----------------------------------------------------------------------------*
