@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.14 2003/12/28 22:25:34 druzus Exp $
+ * $Id: gtnul.c,v 1.15 2004/02/01 23:40:50 jonnymind Exp $
  */
 
 /*
@@ -842,6 +842,13 @@ void hb_gt_SetDispCP(char * pszTermCDP, char * pszHostCDP, BOOL bBox)
 void hb_gt_SetKeyCP(char * pszTermCDP, char * pszHostCDP)
 {
    GT_FUNCS.SetKeyCP( pszTermCDP, pszHostCDP );
+}
+
+/* ********************************************************************** */
+
+int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
+{
+   GT_FUNCS.info( iMsgType, bUpdate, iParam, vpParam );
 }
 
 /* ********************************************************************** */

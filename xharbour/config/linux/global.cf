@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.7 2004/01/03 14:06:20 jonnymind Exp $
+# $Id: global.cf,v 1.8 2004/01/28 04:14:34 maurifull Exp $
 #
 
 all : first
@@ -12,9 +12,9 @@ HB_GT_LIBS=\
         gtstd \
         gtxvt \
         gtnul \
-        
+
 ifeq ($(HB_GTALLEG),yes)
-    HB_GT_LIBS += gtalleg
+   HB_GT_LIBS += gtalleg
 endif
 
 ifeq ($(HB_GT_LIB),)

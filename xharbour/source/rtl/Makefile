@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.45 2003/12/19 02:09:14 maurifull Exp $
+# $Id: Makefile,v 1.46 2004/01/24 16:29:28 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -164,8 +164,8 @@ PRG_SOURCES=\
         getlist.prg  \
         getsys.prg   \
         input.prg    \
-	hblog.prg    \
-	hblognet.prg \
+        hblog.prg    \
+        hblognet.prg \
         hbini.prg \
         hbserial.prg \
         listbox.prg  \
@@ -185,7 +185,7 @@ PRG_SOURCES=\
         scrollbr.prg \
         setfunc.prg  \
         setta.prg    \
-	sprintf.prg  \
+        sprintf.prg  \
         tclass.prg   \
         tbcolumn.prg \
         tbrowse.prg  \
@@ -206,7 +206,7 @@ PRG_SOURCES=\
         ttable.prg   \
         ttextlin.prg \
         ttopbar.prg  \
-	txml.prg     \
+        txml.prg     \
         typefile.prg \
         wait.prg     \
         win32ole.prg \

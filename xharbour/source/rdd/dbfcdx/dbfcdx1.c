@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.96 2004/01/26 15:00:50 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.97 2004/01/28 14:45:40 druzus Exp $
  */
 
 /*
@@ -1650,7 +1650,7 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 /* #ifdef HB_CDX_DBGCODE */
       else if ( iTmp < 0 )
       {
-         printf("\r\npPage->Page=%lx, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iNum, iDup, iTrl); fflush(stdout);
+         printf("\r\npPage->Page=%lx, iKey=%d, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iKey, iNum, iDup, iTrl); fflush(stdout);
          hb_cdxErrInternal( "hb_cdxPageLeafEncode: index corrupted." );
       }
 /* #endif */

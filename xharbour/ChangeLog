@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2210 2004/02/03 12:32:52 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2211 2004/02/03 13:03:43 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 15:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * small debug info added
+
+  * xharbour/source/rtl/gtnul/gtnul.c
+   + hb_gt_info() added to GTNUL. Now there is no necessary to implement
+     gt_info in each GT
+
+  * xharbour/source/rtl/Makefile
+   * TAB to SPACE conversion
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+   ! fixes for non C99 compilers (eg. GCC 2.9x in default mode)
+
+  * xharbour/source/rtl/gtcrs/chrmap.c
+   * s_szDefaultCharMapFile changed to global
+
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/linux/global.cf
+   * small changes for GTALLEG
 
 2004-02-03 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg

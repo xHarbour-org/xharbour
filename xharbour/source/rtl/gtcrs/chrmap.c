@@ -1,5 +1,5 @@
 /*
- * $Id: chrmap.c,v 1.2 2003/05/22 11:48:04 druzus Exp $
+ * $Id: chrmap.c,v 1.3 2003/05/27 14:02:08 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include <string.h>
 
 #define MAX_CHAR_VAL	0xff
-static char s_szDefaultCharMapFile[] = "/etc/harbour/hb-charmap.def";
+char *s_szDefaultCharMapFile = "/etc/harbour/hb-charmap.def";
 
 static void skip_blank(char **buf)
 {
@@ -334,7 +334,7 @@ int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ))
 	{
 	    pszFile = getenv("HB_ROOT");
 	    if ( pszFile != NULL && sizeof(szFile) > 
-		             strlen(pszFile) + sizeof(s_szDefaultCharMapFile) )
+		             strlen(pszFile) + strlen(s_szDefaultCharMapFile) )
 	    {
 		strcpy(szFile, pszFile);
 		strcat(szFile, s_szDefaultCharMapFile);

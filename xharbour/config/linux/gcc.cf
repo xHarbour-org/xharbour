@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.21 2004/01/26 14:59:46 druzus Exp $
+# $Id: gcc.cf,v 1.22 2004/01/28 04:14:34 maurifull Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -101,6 +101,11 @@ HB_SCREEN_LIB:=ncurses
 else
 ifeq ($(HB_GT_LIB),gtsln)
 HB_SCREEN_LIB:=slang
+else
+ifeq ($(HB_GT_LIB),gtalleg)
+HB_GTALLEG:=yes
+LINKLIBS += `allegro-config --static`
+endif
 endif
 endif
 ifneq ($(HB_SCREEN_LIB),)
@@ -113,9 +118,6 @@ endif
 # HB_GPM_MOUSE: use gpm mouse driver
 ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
-endif
-ifeq ($(HB_GTALLEG),yes)
-LINKLIBS += `allegro-config --static`
 endif
 endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.15 2004/02/02 14:45:54 lf_sfnet Exp $
+ * $Id: gtalleg.c,v 1.16 2004/02/03 05:00:45 maurifull Exp $
  */
 
 /*
@@ -1665,7 +1665,7 @@ void HB_GT_FUNC(mouse_GetBounds( int *piTop, int *piLeft, int *piBottom, int *pi
 */
 int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   int iOldValue;
+   int iOldValue = 0;
    int iWidth, iHeight;
 
    HB_SYMBOL_UNUSED( vpParam );
@@ -1677,18 +1677,19 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
 
       case GTI_SCREENWIDTH:
          if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
-	 {
-         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
-         if ( bUpdate && iParam > 0 )
          {
-            s_usGFXWidth = (USHORT) iParam;
+            iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
+            if ( bUpdate && iParam > 0 )
+            {
+               s_usGFXWidth = (USHORT) iParam;
 //            lClearInit = ( s_pbyScrBuffer == NULL );
 //            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+            }
          }
       return iOldValue;
 
       case GTI_SCREENHEIGHT:
-         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontHeight * s_usScrHeight : AL_SCREEN_H );
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontSize * s_usScrHeight : AL_SCREEN_H );
          if ( bUpdate && iParam > 0 )
          {
             s_usGFXHeight = (USHORT) iParam;
