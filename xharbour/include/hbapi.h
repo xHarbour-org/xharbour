@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.64 2003/05/30 06:49:32 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.65 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -541,7 +541,9 @@ extern char * hb_getenv( const char * name );
 /* Translation related things */
 
 /* Dummy define for start */
-#define HB_I_( x ) x
+#ifndef HB_I_
+   #define HB_I_( x ) x
+#endif
 
 #if defined(HB_EXTERN_C)
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hblang.ch,v 1.2 2003/01/27 04:24:05 walito Exp $
+ * $Id: hblang.ch,v 1.3 2003/06/17 22:10:22 druzus Exp $
  */
 
 /*
@@ -54,7 +54,9 @@
 #define HB_LANG_CH_
 
 /* Dummy define for start */
-#define HB_I_( x ) x
+#ifndef HB_I_
+   #define HB_I_( x ) x
+#endif
 
 #define HB_LANG_ITEM_BASE_ID            0
 #define HB_LANG_ITEM_BASE_MONTH         6
