@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.87 2004/10/20 03:14:40 ronpinkas Exp $
+ * $Id: harbour.c,v 1.88 2004/10/27 05:27:37 ronpinkas Exp $
  */
 
 /*
@@ -709,7 +709,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    }
 
    // STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
-   if( hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
+   if( hb_comp_functions.iCount > 1 && hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, "STATIC", NULL );
    }
