@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.50 2005/02/19 05:04:16 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.51 2005/02/20 22:14:07 andijahja Exp $
  */
 
 /*
@@ -1390,24 +1390,29 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, char *
    return pRetVal;
 }
 
-PHB_ITEM HB_EXPORT hb_errRT_SubstArray( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, PHB_ITEM pArray )
+PHB_ITEM HB_EXPORT hb_errRT_SubstParams( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
-
-   // ULONG ulArgPos;
+   PHB_ITEM pArray;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_BASE_SubstArray()") );
 
    pError = hb_errRT_New_Subst( ES_ERROR, szSubSystem ? szSubSystem : HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
+
+   pArray = hb_arrayFromParams( HB_VM_STACK.pBase );
 
    /* Assign the new array to the object data item. */
    hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPush( pError );
-   hb_vmPush( pArray );
+   hb_itemPushForward( pArray );
    hb_vmSend( 1 );
+
+   hb_itemRelease( pArray );
 
    /* Ok, launch... */
    pRetVal = hb_errLaunchSubst( pError );

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.65 2005/02/19 22:54:50 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.66 2005/02/20 09:45:05 ronpinkas Exp $
  */
 
 /*
@@ -81,6 +81,8 @@ RETURN TOleAuto():GetActiveObject( cString )
    #endif
 
    #define NONAMELESSUNION
+
+   #include <string.h>
 
    #include "hbapi.h"
    #include "hbstack.h"
@@ -1444,14 +1446,17 @@ RETURN xRet
      }
      else
      {
-        PHB_ITEM paArgs, pReturn;
+        PHB_ITEM pReturn;
         char *sDescription;
 
         hb_objSendMsg( hb_stackSelfItem(), "cClassName", 0 );
 
         if( s_nOleError == DISP_E_EXCEPTION )
         {
-           sDescription = WideToAnsi( excep.bstrDescription );
+           char *sTemp = WideToAnsi( excep.bstrDescription );
+           sDescription = (char *) malloc( strlen( sTemp ) + 1 );
+           strcpy( sDescription, sTemp );
+           hb_xfree( sTemp );
         }
         else
         {
@@ -1460,13 +1465,11 @@ RETURN xRet
 
         //TraceLog( NULL, "Desc: '%s'\n", sDescription );
 
-        paArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-        pReturn = hb_errRT_SubstArray( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, paArgs );
-        hb_itemRelease( paArgs );
+        pReturn = hb_errRT_SubstParams( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
 
         if( s_nOleError == DISP_E_EXCEPTION )
         {
-           hb_xfree( (void *) sDescription );
+           free( (void *) sDescription );
         }
 
         if( pReturn )

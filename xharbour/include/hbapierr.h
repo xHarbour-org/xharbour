@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.8 2004/04/16 04:41:37 ronpinkas Exp $
+ * $Id: hbapierr.h,v 1.9 2005/02/19 05:04:15 ronpinkas Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ extern PHB_ITEM HB_EXPORT hb_errRT_New_Subst( USHORT uiSeverity, char * szSubSys
    USHORT uiOsCode,
    USHORT uiFlags );
 
-extern PHB_ITEM HB_EXPORT hb_errRT_SubstArray ( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, PHB_ITEM pArray );
+extern PHB_ITEM HB_EXPORT hb_errRT_SubstParams( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation );
 
 extern USHORT   HB_EXPORT hb_errRT_BASE           ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, ULONG ulArgCount, ... );
 extern USHORT   HB_EXPORT hb_errRT_BASE_Ext1      ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... );

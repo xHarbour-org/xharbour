@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3850 2005/02/20 17:06:16 bdj Exp $
+ * $Id: ChangeLog,v 1.3851 2005/02/20 22:13:48 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-20 22:14 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+      - PHB_ITEM HB_EXPORT hb_errRT_SubstArray ( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, PHB_ITEM pArray )
+      + PHB_ITEM HB_EXPORT hb_errRT_SubstParams ( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation );
+  * source/rtl/win32ole.prg
+    * Modified to avoid un-released memory blocks, if error is raised which forces app termination.
+
 2005-02-21 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * makefile.pc
     * add CVS version control for easy tracking
