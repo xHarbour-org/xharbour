@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.29 2002/10/06 02:00:27 lculik Exp $
+ * $Id: tget.prg,v 1.30 2002/10/15 05:00:23 walito Exp $
  */
 
 /*
@@ -1321,6 +1321,7 @@ METHOD DelEnd() CLASS Get
 
    ::Pos := ::nMaxEdit
 
+   ::Delete( .f. )
    do while ::Pos > nPos
       ::BackSpace( .f. )
    enddo
