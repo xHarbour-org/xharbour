@@ -1,5 +1,5 @@
 /*
- * $Id: genpdf1.prg,v 1.5 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genpdf1.prg,v 1.1.1.1 2001/12/21 10:45:30 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,9 @@
 #define ERRORLINE    20
 #define LONGLINE     600
 #define LONGONELINE  66
+#define a4_width    595.0
+#define a4_height   842.0
+
 MEMVAR aDirlist
 MEMVAR aDocInfo,awww,aResult
 STATIC aAlso
@@ -186,13 +189,14 @@ local hhh
    //  loop through all of the files
    if lmemory
 //   oPdf := tPdf():new( "pdf\temp.pdf" )
-   HB_PDFNEW("pdf\temp.pdf")
-   hb_pdfnewpage("Harbour Guide",'Harbour Guide')
+
+   HB_PDFNEW("pdf\temp.pdf",,a4_height,a4_width)
+   hb_pdfnewpage("XHarbour Guide",'XHarbour Guide')
    hb_pdfendpage()
    else
 //   ? 'im here'
-   HB_PDFNEW("pdf\harbour.pdf")
-   hb_pdfnewpage("Harbour Guide",'Harbour Guide')
+   HB_PDFNEW("pdf\xharbour.pdf",,a4_height,a4_width)
+   hb_pdfnewpage("XHarbour Guide",'XHarbour Guide')
    hb_pdfinitbook(aResult)
    hb_pdfendpage()
    hhh:=fcreate('ssss.sss')

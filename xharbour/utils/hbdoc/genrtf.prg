@@ -1,5 +1,5 @@
 /*
- * $Id: genrtf.prg,v 1.1.1.1 2001/12/21 10:45:33 ronpinkas Exp $
+ * $Id: genrtf.prg,v 1.2 2003/03/03 02:08:58 lculik Exp $
  */
 
 /*
@@ -186,7 +186,7 @@ FUNCTION ProcessRtf()
    @ INFILELINE, 20 SAY "Extracting: "          
    @ MODULELINE, 20 SAY "Documenting: "         
    //  loop through all of the files
-   oRtf := tRtf():new( "rtf\Harbour.rtf" ):WriteHeader()
+   oRtf := tRtf():new( "rtf\xharbour.rtf" ):WriteHeader()
    FOR i := 1 TO nFiles
 
       //  Open file for input
@@ -738,7 +738,7 @@ oRtf:WritePar( "" )                 //:endpar()
    NEXT
    ortf:close()
 
-RETURN NIL
+RETURN oRtf:aIdh
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
