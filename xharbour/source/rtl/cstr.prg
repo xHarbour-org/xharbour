@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.6 2002/11/29 20:07:55 walito Exp $
+ * $Id: cstr.prg,v 1.7 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -186,6 +186,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ENDIF
          cRet[ -1 ] := '}'
 
+         RETURN cRet
+
       /*
       CASE 'B'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
@@ -214,10 +216,9 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             ENDIF
          NEXT
 
-         cRet += sPace( nPad ) + "END OBJECT"
+         RETURN cRet + sPace( nPad ) + "END OBJECT"
 
       DEFAULT
-         return ""
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName(), 1, { xVal, cName, nPad } )
    END
 

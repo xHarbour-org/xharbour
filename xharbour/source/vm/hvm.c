@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.155 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: hvm.c,v 1.156 2003/01/27 04:32:22 walito Exp $
  */
 
 /*
@@ -5979,12 +5979,16 @@ void hb_vmRequestBreak( PHB_ITEM pItem )
    if( s_lRecoverBase )
    {
       if( pItem )
+      {
          hb_itemCopy( hb_stackItem( s_lRecoverBase + HB_RECOVER_VALUE ), pItem );
+      }
 
       s_uiActionRequest = HB_BREAK_REQUESTED;
    }
    else
+   {
       s_uiActionRequest = HB_QUIT_REQUESTED;
+   }
 }
 
 USHORT hb_vmRequestQuery( void )
