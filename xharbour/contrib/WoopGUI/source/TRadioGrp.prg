@@ -39,7 +39,7 @@ CLASS TRadioGroup FROM TObject
 
 ENDCLASS
 
-METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
+METHOD New( aValues AS ARRAY OF STRING, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
             lVertical, nSelected ) CLASS TRadioGroup
     LOCAL n, nHPos, nVPos
 
@@ -60,11 +60,11 @@ METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bA
 
     FOR n := 1 TO LEN( aValues )
         IF ::lVertical
-           nVPos := nRow+((n-1)*(nHeight+2))
-           nHPos := nCol
+           nVPos := nTop+((n-1)*(nHeight+2))
+           nHPos := nLeft
         ELSE
-           nVPos := nRow
-           nHPos := nCol+((n-1)*(nWidth+2))
+           nVPos := nTop
+           nHPos := nLeft+((n-1)*(nWidth+2))
         ENDIF
 
         ::AddItem( TRadioButton():New( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;
@@ -75,7 +75,7 @@ METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bA
 
 RETURN Self
 
-METHOD NewExtended( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, ;
+METHOD NewExtended( aValues AS ARRAY OF STRING, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, ;
                     lVertical, nSelected, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TRadioGroup
     LOCAL n, nHPos, nVPos
 
@@ -100,11 +100,11 @@ METHOD NewExtended( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oPa
 
     FOR n := 1 TO LEN( aValues )
         IF ::lVertical
-           nVPos := nRow+((n-1)*(nHeight+2))
-           nHPos := nCol
+           nVPos := nTop+((n-1)*(nHeight+2))
+           nHPos := nLeft
         ELSE
-           nVPos := nRow
-           nHPos := nCol+((n-1)*(nWidth+2))
+           nVPos := nTop
+           nHPos := nLeft+((n-1)*(nWidth+2))
         ENDIF
 
         ::AddItem( TRadioButton():NewExtended( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;

@@ -58,14 +58,14 @@ CLASS TFrameMDIParent FROM TFrame
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrameMDIParent
+METHOD New( cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrameMDIParent
 
     ASSIGN ::nExStyle     WITH 0 //WS_EX_MDICHILD
     ASSIGN ::cClassName   WITH "WoopGUIFrmClass"
     ASSIGN ::cName        WITH cName                   DEFAULT "Frame_1"
     ASSIGN ::nStyle       WITH nStyle                  DEFAULT WS_OVERLAPPEDWINDOW
-    ASSIGN ::nRow         WITH nRow                    DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol                    DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop                    DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft                   DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth                  DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight                 DEFAULT CW_USEDEFAULT
     //ASSIGN ::nChild       WITH NULL
@@ -75,17 +75,17 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CL
 
     ::oMDIClientWindow := TWindow():New()
 
-    ::Super:New( ::cName, ::nStyle, ::nRow, ::nCol, ::nWidth, ::nHeight, oParent, lStatusBar )
+    ::Super:New( ::cName, ::nStyle, ::nTop, ::nLeft, ::nWidth, ::nHeight, oParent, lStatusBar )
 
 RETURN Self
 
-METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
+METHOD NewExtended( cTitle, nStyle, nTop, nLeft, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent, lStatusBar, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
                     lNoIconize, lNoMaximize, lPixel ) CLASS TFrameMDIParent
 
-   ::New( cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar )
+   ::New( cTitle, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar )
 
    IF ValType( oMenu ) == "O" THEN ::SetMenu( oMenu )
    // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )

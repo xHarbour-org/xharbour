@@ -30,8 +30,8 @@ CLASS TDialogTemplate
     DATA nExStyle    AS LONG    INIT 0
     DATA nStyle      AS LONG
     ACCESS nDlgItems INLINE Len( ::aoItems )
-    DATA nRow
-    DATA nCol
+    DATA nTop
+    DATA nLeft
     DATA nWidth
     DATA nHeight
     DATA nMenu       AS NUMERIC INIT 0
@@ -53,14 +53,14 @@ CLASS TDialogTemplate
 
 ENDCLASS
 
-METHOD New( cTitle, nRow, nCol, nWidth, nHeight ) CLASS TDialogTemplate
+METHOD New( cTitle, nTop, nLeft, nWidth, nHeight ) CLASS TDialogTemplate
 
     ASSIGN ::nExStyle     WITH WS_EX_DLGMODALFRAME //+ WS_EX_CONTROLPARENT
     //ASSIGN ::cClassName   WITH "WoopGUIDlgClass"
     ASSIGN ::cTitle       WITH cTitle               DEFAULT "Dialog_1"
     ASSIGN ::nStyle       WITH WS_TABSTOP + WS_POPUP + WS_DLGFRAME + WS_BORDER
-    ASSIGN ::nRow         WITH nRow                 DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft                DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth               DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight              DEFAULT CW_USEDEFAULT
 

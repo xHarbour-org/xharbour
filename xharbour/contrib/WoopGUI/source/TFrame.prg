@@ -33,8 +33,6 @@ CLASS TFrame FROM TWindow
     METHOD New()         CONSTRUCTOR
     METHOD NewExtended() CONSTRUCTOR
 
-    METHOD Create()
-
     //METHOD oStatusBar() SETGET
 
     //METHOD GetStatusBar()
@@ -43,6 +41,7 @@ CLASS TFrame FROM TWindow
     METHOD SetStatusBar()
     METHOD SetTitle( cTitle ) INLINE ::SetValue( cTitle )
 
+    METHOD OnCreate()
     METHOD OnDestroy()
     METHOD WindowProc()
 
@@ -55,13 +54,13 @@ CLASS TFrame FROM TWindow
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrame
+METHOD New( cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrame
 
     ASSIGN ::cClassName   WITH "FrmClass"
     ASSIGN ::cName        WITH cName                   DEFAULT "Frame_1"
     ASSIGN ::nStyle       WITH nStyle                  DEFAULT WS_OVERLAPPEDWINDOW
-    ASSIGN ::nRow         WITH nRow                    DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol                    DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop                    DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft                   DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth                  DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight                 DEFAULT CW_USEDEFAULT
     //ASSIGN ::nChild       WITH NULL
@@ -70,40 +69,22 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CL
     ASSIGN ::lStatusBar   WITH lStatusBar           DEFAULT FALSE
 
     ::Super:New( ::nExStyle, ::cClassName, ::cName, ::nStyle, ;
-                 ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                 ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                  oParent /*, ::nChild, ::nApplication, ::pStruct*/ )
 
 RETURN Self
 
-METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
+METHOD NewExtended( cTitle, nStyle, nTop, nLeft, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent, lStatusBar, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
                     lNoIconize, lNoMaximize, lPixel ) CLASS TFrame
 
-   ::New( cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar )
+   ::New( cTitle, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar )
 
-   IF ValType( oMenu ) == "O" THEN ::SetMenu( oMenu )
+   ::oMenu := oMenu
    // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
    // IF ValType( oIcon ) == "O" THEN ::SetIcon( oIcon )
-
-RETURN Self
-
-METHOD Create()
-
-    ::Super:Create()
-
-    ::SetCurrentWindow( Self )
-
-    IF ValType( ::oMenu ) == "O" THEN ::SetMenu( ::oMenu )
-   // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
-   // IF ValType( oIcon ) == "O" THEN ::SetIcon( oIcon )
-
-    IF ::lStatusBar
-       // Create SIMPLE status bar
-       // FSG - Define application variable to make a standard statusbar
-       ::CreateStatusBar()
-    ENDIF
 
 RETURN Self
 
@@ -129,6 +110,24 @@ METHOD SetStatusBar( cString, nPart, uFlags ) CLASS TFrame
    ENDIF
 RETURN Self
 
+METHOD OnCreate() CLASS TFrame
+   LOCAL nRet := ::Super:OnCreate()
+   WG_DebugTrace( "TFrame:OnCreate()", "Self", Self )
+   ::SetMenu( ::oMenu )
+   ::SetCurrentWindow( Self )
+
+   IF ValType( ::oMenu ) == "O" THEN ::SetMenu( ::oMenu )
+   // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
+   // IF ValType( oIcon ) == "O" THEN ::SetIcon( oIcon )
+
+   IF ::lStatusBar
+      // Create SIMPLE status bar
+      // FSG - Define application variable to make a standard statusbar
+      ::CreateStatusBar()
+   ENDIF
+RETURN nRet
+
+
 METHOD OnDestroy() CLASS TFrame
    LOCAL nRet := -1
    WG_DebugTrace( "TFrame:OnDestroy()", "Self", Self )
@@ -138,6 +137,7 @@ RETURN nRet
 
 METHOD WindowProc( nMsg, wParam, lParam ) CLASS TFrame
    LOCAL nRet := -1
+   WG_DebugTrace( "TFrame:WindowProc()", "Self", Self, "nHandle", ::nHandle )
    IF ValType( ::bWindowProc ) == "B"
       // User event handler
       nRet := Eval( ::bWindowProc, ::nHandle, nMsg, wParam, lParam )
@@ -145,6 +145,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TFrame
    IF nRet == -1
       // Class event handler
       // A frame can have a status bar, a menu, , so we must check its event handler
+
       IF nRet == -1 .AND. ValType( ::oStatusBar ) == "O"   THEN nRet := ::oStatusBar:WindowProc( nMsg, wParam, lParam )
       IF nRet == -1 .AND. ValType( ::oMenu ) == "O"        THEN nRet := ::oMenu:WindowProc( nMsg, wParam, lParam )
       IF nRet == -1 .AND. ValType( ::oContextMenu ) == "O" THEN nRet := ::oContextMenu:WindowProc( nMsg, wParam, lParam )

@@ -181,11 +181,11 @@ ENDCLASS
 
 //---------------------------------------------------------------------------//
 
-METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
+METHOD New( nTop, nLeft, bVarBlock, cVarName, cPicture, cColorSpec, ;
             nWidth, nHeight, oParent, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize ) CLASS TXGet
 
-    ::oGet := Get():New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
-    ::Super:New( cVarName,, nRow, nCol, nWidth, nHeight, oParent, , cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword )
+    ::oGet := Get():New( nTop, nLeft, bVarBlock, cVarName, cPicture, cColorSpec )
+    ::Super:New( cVarName,, nTop, nLeft, nWidth, nHeight, oParent, , cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword )
 
     ASSIGN ::lAutoSize WITH lAutosize DEFAULT FALSE
 
@@ -195,12 +195,12 @@ RETURN Self
 
 //---------------------------------------------------------------------------//
 
-METHOD NewExtended( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
+METHOD NewExtended( nTop, nLeft, bVarBlock, cVarName, cPicture, cColorSpec, ;
                     nWidth, nHeight, oParent, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize, ;
                     oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TXGet
 
-    ::New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
+    ::New( nTop, nLeft, bVarBlock, cVarName, cPicture, cColorSpec, ;
             nWidth, nHeight, oParent, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
@@ -246,7 +246,7 @@ METHOD AdjustWidth() CLASS TXGet
    WG_DebugTrace( "TXGet:AdjustWidth()", "::oGet:nDispLen", ::oGet:nDispLen, "::oFont:nHandle", ::oFont:nHandle )
    nW := UnMapDialogRect( Replicate( "X", ::oGet:nDispLen ), ::oFont:nHandle ) [ 1 ]
    WG_DebugTrace( "TXGet:AdjustWidth()", "nW", nW, "::lPixel", ::lPixel, "::oGet:Picture", ::oGet:Picture, "::oGet:nMaxLen", ::oGet:nMaxLen )
-   WG_DebugTrace( "TXGet:AdjustWidth()", "::nWidth", ::nWidth, "::nHeight", ::nHeight, "::nRow", ::nRow, "::nCol", ::nCol )
+   WG_DebugTrace( "TXGet:AdjustWidth()", "::nWidth", ::nWidth, "::nHeight", ::nHeight, "::nTop", ::nTop, "::nLeft", ::nLeft )
    ::nWidth := Int( nW )
    ::SetSize()
 RETURN Self
@@ -543,7 +543,7 @@ METHOD Display( lForced ) CLASS TXGet
    if ::oGet:buffer != NIL .and. ( lForced .or. ( ::oGet:nDispPos != ::oGet:nOldPos ) )
 
       WG_DebugTrace("TXGet:Display", "::oGet:cDelimit", ::oGet:cDelimit, "::oGet:nDispPos", ::oGet:nDispPos , "::oGet:nOldPos", ::oGet:nOldPos, "::oGet:nDispLen", ::oGet:nDispLen )
-      SetPos( ::nRow, ::nCol )
+      SetPos( ::nTop, ::nLeft )
       if !(::oGet:cDelimit == NIL)
          ::SetText( Substr( ::oGet:cDelimit, 1, 1) + Pad( Substr( ::oGet:buffer, ::oGet:nDispPos, ::oGet:nDispLen ), ::oGet:nDispLen ) + Substr( ::oGet:cDelimit, 2, 1) )
       else
@@ -568,7 +568,7 @@ METHOD Display( lForced ) CLASS TXGet
 
    if ::oGet:Pos != NIL
       ::SetInsertionPoint( ::oGet:Pos - ::oGet:nDispPos + if( ::oGet:cDelimit == NIL, 0, 1 ) )
-      SetPos( ::nRow, ::nCol + ::oGet:Pos - ::oGet:nDispPos + if( ::oGet:cDelimit == NIL, 0, 1 ) )
+      SetPos( ::nTop, ::nLeft + ::oGet:Pos - ::oGet:nDispPos + if( ::oGet:cDelimit == NIL, 0, 1 ) )
    endif
 
    //SetCursor( nOldCursor )

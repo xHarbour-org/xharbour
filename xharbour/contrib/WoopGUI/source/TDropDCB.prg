@@ -29,20 +29,20 @@ CLASS TDropDownComboBox FROM TComboBox
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TDropDownComboBox
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TDropDownComboBox
 
     DEFAULT lPixel TO TRUE
 
     ASSIGN ::cName     WITH cName    DEFAULT "DropDCB_1"
     ASSIGN ::nStyle    WITH WS_VISIBLE + WS_CHILD + WS_TABSTOP + WS_VSCROLL + CBS_DROPDOWN
-    ASSIGN ::nRow      WITH nRow     DEFAULT 0
-    ASSIGN ::nCol      WITH nCol     DEFAULT 0
+    ASSIGN ::nTop      WITH nTop     DEFAULT 0
+    ASSIGN ::nLeft     WITH nLeft    DEFAULT 0
     ASSIGN ::nWidth    WITH nWidth   DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight   WITH nHeight  DEFAULT IIF( lPixel, 100, WG_Pixel2DialogY( 100 ) )
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cName, ::nStyle, ;
-                          ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                          ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                           oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
 
 RETURN Self

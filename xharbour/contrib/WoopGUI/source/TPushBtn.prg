@@ -30,7 +30,7 @@ CLASS TPushButton FROM TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID ) CLASS TPushButton
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID ) CLASS TPushButton
 
     WG_DebugTrace( "TPushButton:New()" )
 
@@ -38,26 +38,26 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 
     ASSIGN ::cName     WITH cName    DEFAULT "PushBtn_1"
     ASSIGN ::nStyle    WITH WS_VISIBLE + WS_CHILD + WS_TABSTOP + BS_PUSHBUTTON + BS_NOTIFY
-    ASSIGN ::nRow      WITH nRow     DEFAULT 0
-    ASSIGN ::nCol      WITH nCol     DEFAULT 0
+    ASSIGN ::nTop      WITH nTop     DEFAULT 0
+    ASSIGN ::nLeft     WITH nLeft    DEFAULT 0
     ASSIGN ::nWidth    WITH nWidth   DEFAULT IIF( lPixel, 80, WG_Pixel2DialogX( 80 ) )
     ASSIGN ::nHeight   WITH nHeight  DEFAULT IIF( lPixel, 24, WG_Pixel2DialogY( 24 ) )
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cName, ::nStyle, ;
-                          ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                          ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                           oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
                     lDefault, nID, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TPushButton
 
     WG_DebugTrace( "TPushButton:NewExtended()" )
 
     //WG_ParamDisplay( Self, hb_aparams(), "TPushButton_Extend" )
 
-    ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID )
+    ::New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID )
     ::Extend( , oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

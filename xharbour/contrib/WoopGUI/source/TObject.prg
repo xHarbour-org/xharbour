@@ -28,8 +28,6 @@ CLASS TObject  // FROM HBObject
     DATA cargo                          // cargo as in Clipper
 
     METHOD New() CONSTRUCTOR
-    METHOD Destructor()            INLINE Self := NIL
-
 
     /*
     // This data and methods came from standard [x]Harbour object class
@@ -62,12 +60,36 @@ CLASS TObject  // FROM HBObject
                                     INLINE __objDerivedFrom( Self, Upper( cGrandFather ) )
     */
 
+    // FSG - as Delphi
+    METHOD AfterConstruction()           VIRTUAL
+	METHOD BeforeDestruction()           VIRTUAL
+	METHOD ClassInfo()                   VIRTUAL  // FSG - to be implemented
+	//METHOD ClassName                            // FSG - already have from harbour
+	METHOD ClassNameIs( cName )          INLINE  Upper( cName ) == ::ClassName
+	METHOD ClassParent()                 INLINE  ::Super
+	METHOD ClassType                     VIRTUAL  // FSG - to be implemented
+	METHOD CleanupInstance               VIRTUAL  // FSG - to be implemented
+	METHOD Create                        VIRTUAL  // FSG - to be implemented
+	METHOD DefaultHandler                VIRTUAL
+	METHOD Destroy                       VIRTUAL
+	METHOD Dispatch                      VIRTUAL
+	METHOD FieldAddress                  VIRTUAL  // FSG - to be implemented
+	METHOD Free                          INLINE  IIF( Self <> NIL, ::Destroy(), NIL ), Self := NIL
+	METHOD FreeInstance                  VIRTUAL
+	METHOD GetInterface                  VIRTUAL  // FSG - to be implemented
+	METHOD GetInterfaceEntry             VIRTUAL  // FSG - to be implemented
+    METHOD GetInterfaceTable             VIRTUAL  // FSG - to be implemented
+	METHOD InheritsFrom( cGrandFather )  INLINE  ::IsDerivedFrom( cGrandFather AS STRING )
+	METHOD InitInstance                  VIRTUAL  // FSG - to be implemented
+	METHOD InstanceSize                  VIRTUAL  // FSG - to be implemented
+	METHOD MethodAddress                 VIRTUAL  // FSG - to be implemented
+	METHOD MethodName                    VIRTUAL  // FSG - to be implemented
+	METHOD NewInstance                   VIRTUAL
+	METHOD SafeCallException             VIRTUAL  // FSG - to be implemented
+
     METHOD DisplayData()
     METHOD DisplayMethods()
     METHOD DisplayArray()
-
-
-    //ON ERROR ErrorHandler( oError )
 
 ENDCLASS
 
@@ -138,23 +160,4 @@ METHOD DisplayMethods( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
    ENDIF
 
 RETURN cString
-
-//#include "error.ch"
-//
-//METHOD ErrorHandler( oErrore, x, y, z ) CLASS TObject
-//   LOCAL oErr
-//   WG_ParamDisplay( Self, hb_aparams(), "ErrorHandler" )
-//   // Qui la gestione errori
-//   MessageBox( , "Errore: n. di parametri "+str(PCOUNT())  )
-//   oErr := ErrorNew()
-//      oErr:severity    := ES_ERROR
-//      oErr:genCode     := EG_OPEN
-//      oErr:subSystem   := "BASE"
-//      oErr:SubCode     := 2009
-//      oErr:Description := "Errore generico"
-//      Eval( ErrorBlock(), oErr )
-//
-//   WG_ApplObj():Quit()
-//
-//RETURN TRUE
 

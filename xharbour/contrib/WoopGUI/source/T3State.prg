@@ -32,14 +32,14 @@ CLASS T3StateButton FROM TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS T3StateButton
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS T3StateButton
 
     DEFAULT lPixel TO TRUE
 
     ASSIGN ::cName     WITH cName       DEFAULT "3State_1"
     ASSIGN ::nStyle    WITH WS_VISIBLE + WS_CHILD + WS_TABSTOP + BS_AUTO3STATE + WS_GROUP
-    ASSIGN ::nRow      WITH nRow        DEFAULT 0
-    ASSIGN ::nCol      WITH nCol        DEFAULT 0
+    ASSIGN ::nTop      WITH nTop        DEFAULT 0
+    ASSIGN ::nLeft     WITH nLeft       DEFAULT 0
     ASSIGN ::nWidth    WITH nWidth      DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight   WITH nHeight     DEFAULT IIF( lPixel,  28, WG_Pixel2DialogY(  28 ) )
 
@@ -47,15 +47,15 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cName, ::nStyle, ;
-                          ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                          ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                           oParent, bAction, cToolTip, cStatusBar, lPixel, nID )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS T3StateButton
 
-    ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
+    ::New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

@@ -36,8 +36,8 @@ CLASS TPanel FROM TWindow
     //DATA nExStyle    AS NUMERIC INIT 0
     //DATA nStyle      AS NUMERIC
     ACCESS nDlgItems INLINE Len( ::aoChilds )
-    //DATA nRow
-    //DATA nCol
+    //DATA nTop
+    //DATA nLeft
     //DATA nWidth
     //DATA nHeight
     DATA nMenu       AS NUMERIC INIT 0
@@ -89,6 +89,7 @@ CLASS TPanel FROM TWindow
     // Events
     METHOD OnCommand()
     METHOD OnContextMenu()
+    //METHOD OnCreate()
     METHOD OnCtlColor()
     METHOD OnDrawItem()
     METHOD OnInitDialog()
@@ -96,7 +97,7 @@ CLASS TPanel FROM TWindow
 
 ENDCLASS
 
-METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixel, lModal ) CLASS TPanel
+METHOD New( nExStyle, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lPixel, lModal ) CLASS TPanel
 
     ASSIGN ::lModal       WITH lModal               DEFAULT FALSE
     ASSIGN ::nExStyle     WITH nExStyle             DEFAULT 0 //WS_EX_CLIENTEDGE
@@ -107,8 +108,8 @@ METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixe
                                //IIF( ::lModal, ;
                                //     WS_POPUP + WS_SYSMENU + WS_CAPTION + DS_MODALFRAME + DS_3DLOOK,;
                                //     WS_TABSTOP + WS_POPUP + WS_DLGFRAME + WS_BORDER + DS_3DLOOK + WS_SYSMENU + WS_MINIMIZEBOX )
-    ASSIGN ::nRow         WITH nRow                 DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft                DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth               DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight              DEFAULT CW_USEDEFAULT
     ASSIGN ::oParent      WITH oParent
@@ -119,7 +120,7 @@ METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixe
     ::oFont := TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
                        .F., 0, 1, 2, 1, 34, "MS Sans Serif" )
 
-    ::Super:New( ::nExStyle, ::cClassName, ::cName, ::nStyle, ::nRow, ::nCol, ;
+    ::Super:New( ::nExStyle, ::cClassName, ::cName, ::nStyle, ::nTop, ::nLeft, ;
                  ::nWidth, ::nHeight, ::oParent /*, ::nChild, ::nApplication, pStruct */ )
 
     // Set as current dialog window
@@ -127,13 +128,13 @@ METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixe
 
 RETURN Self
 
-METHOD NewExtended( nExStyle, cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
+METHOD NewExtended( nExStyle, cTitle, nStyle, nTop, nLeft, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent AS OBJECT, lPixel, lModal, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder ) CLASS TPanel
 
 
-   ::New( nExStyle, cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixel, lModal )
+   ::New( nExStyle, cTitle, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lPixel, lModal )
 
 RETURN Self
 
@@ -281,6 +282,10 @@ METHOD OnCtlColor( wParam, lParam ) CLASS TPanel
    ENDIF
 
 RETURN nRet
+
+//METHOD OnCreate()
+//  ::Create()
+//RETURN ::Super:OnCreate()
 
 METHOD OnDrawItem( nID, lParam ) CLASS TPanel
    LOCAL nRet := -1

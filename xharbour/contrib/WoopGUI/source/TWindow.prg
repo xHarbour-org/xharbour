@@ -33,8 +33,8 @@ CLASS TWindow FROM TWindowBase
     // DATA cClassName    AS STRING        // Registered class name
     // DATA cName         AS STRING        // Window name
     // DATA nStyle        AS NUMERIC       // Window style
-    // DATA nRow          AS NUMERIC       // horizontal position of window
-    // DATA nCol          AS NUMERIC       // vertical position of window
+    // DATA nTop          AS NUMERIC       // horizontal position of window
+    // DATA nLeft          AS NUMERIC       // vertical position of window
     // DATA nWidth        AS NUMERIC       // window width
     // DATA nHeight       AS NUMERIC       // window height
     // DATA nParent       AS NUMERIC       // Handle to parent or owner window
@@ -173,7 +173,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnCtlColor()                     VIRTUAL
     METHOD OnClose()                        VIRTUAL // FSG - to be implemented
     METHOD OnCloseWindow()                  VIRTUAL // FSG - to be implemented
-    METHOD OnCreate()                       VIRTUAL // FSG - to be implemented
+    METHOD OnCreate( lParam )               VIRTUAL //INLINE ::Create( lParam )
     METHOD OnDestroy()                      //VIRTUAL // FSG - to be implemented
     METHOD OnDropFile()                     VIRTUAL // FSG - to be implemented
     METHOD OnEraseBackground()              VIRTUAL // FSG - to be implemented
@@ -271,7 +271,7 @@ CLASS TWindow FROM TWindowBase
 
 ENDCLASS
 
-METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nChild, nApplication, pStruct ) CLASS TWindow
+METHOD New( nExStyle, cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, nChild, nApplication, pStruct ) CLASS TWindow
 
     WG_DebugTrace( "TWindow:New()" )
     //DEFAULT nWinID TO 1000
@@ -281,8 +281,8 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     ASSIGN ::cClassName   WITH cClassName        DEFAULT WG_ApplObj():oFrmClass:cClassName //"WoopGUIWinClass"
     ASSIGN ::cName        WITH cName             DEFAULT "Window_1"
     ASSIGN ::nStyle       WITH nStyle            DEFAULT WS_OVERLAPPEDWINDOW
-    ASSIGN ::nRow         WITH nRow              DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol              DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop              DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft             DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth            DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight           DEFAULT CW_USEDEFAULT
     IF ValType( oParent ) == "O"
@@ -310,7 +310,7 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
 
     // Low level call
     //::nHandle := CreateWindowEx( ::nExStyle, ::cClassName, ::cName, ::nStyle, ;
-    //                             ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+    //                             ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
     //                             ::nParent, ::nChild, ::nApplication, ::pStruct )
     //
     //IF ValType( ::nHandle ) == "N" .AND. ::nHandle > 0
@@ -321,7 +321,7 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     //   __Quit()
     //ENDIF
 
-    ::Super:New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nChild, nApplication, pStruct )
+    ::Super:New( nExStyle, cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, nChild, nApplication, pStruct )
 
 RETURN Self
 
@@ -329,17 +329,17 @@ RETURN Self
 // RETURN CenterWindow( ::nHandle )
 
 
-METHOD Activate()
-
+METHOD Activate() CLASS TWindow
+   WG_DebugTrace( "TWindow:Activate()", "Self", Self )
    IF !::lCreated
       ::Create()
    ENDIF
 
 RETURN ::Super:Activate()
 
-METHOD Create()
-
-   ::Super:Create()
+METHOD Create( lParam ) CLASS TWindow
+   WG_DebugTrace( "TWindow:Create()", "Self", Self )
+   ::Super:Create( lParam )
    ::lCreated := TRUE
 
 RETURN Self
@@ -440,8 +440,8 @@ RETURN cValue
 
 METHOD Move( nX, nY, nWidth, nHeight, lRepaint ) CLASS TWindow
    LOCAL nRet
-   DEFAULT nX      TO ::nRow
-   DEFAULT nY      TO ::nCol
+   DEFAULT nX      TO ::nTop
+   DEFAULT nY      TO ::nLeft
    DEFAULT nWidth  TO ::nWidth
    DEFAULT nHeight TO ::nHeight
    IF ::lPixel
@@ -571,9 +571,13 @@ METHOD SetForeGroundColor( ncoFgColor ) CLASS TWindow
 RETURN oOldColor
 
 METHOD SetMenu( oMenu ) CLASS TWindow
+   LOCAL lOk := TRUE
    ::oMenu := oMenu
-   ::oMenu:SetParent( Self )  // Define parent window of menu
-RETURN SetMenu( ::nHandle, oMenu:nHandle )
+   IF ::oMenu <> NIL
+      ::oMenu:SetParent( Self )  // Define parent window of menu
+      lOk := SetMenu( ::nHandle, oMenu:nHandle )
+   ENDIF
+RETURN lOk
 
 // METHOD SetParentByHandle( nParent AS NUMERIC ) CLASS TWindow
 //    ::oParent := WG_ApplObj():FindWindowByHandle( nParent )
@@ -599,8 +603,8 @@ RETURN cOldToolTip
 
 // METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS TWindow
 //    LOCAL lOk := SetWindowPos( ::nHandle, nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags )
-//    UPDATE ::nRow    TO nX      NOT NIL
-//    UPDATE ::nCol    TO nY      NOT NIL
+//    UPDATE ::nTop    TO nX      NOT NIL
+//    UPDATE ::nLeft    TO nY      NOT NIL
 //    UPDATE ::nWidth  TO nWidth  NOT NIL
 //    UPDATE ::nHeight TO nHeight NOT NIL
 // RETURN lOk
@@ -624,6 +628,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin
 
+   WG_DebugTrace( "TWindow:WindowProc()", "Self", Self, "nHandle", ::nHandle )
+
    // Check if there is a user event handler
    IF ::HasEventHandler() // ValType( ::bWindowProc ) == "B"
       // Evaluate User event handler
@@ -638,6 +644,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
        */
       DO CASE
          CASE nMsg == WM_ACTIVATE
+              WG_DebugTrace( "TWindow:WindowProc() - WM_ACTIVATE - ::OnActivate", "Self", Self )
               nRet := ::OnActivate(wParam, lParam)
          CASE nMsg == WM_ACTIVATEAPP   // FSG - to be implemented
          //CASE nMsg == WM_APPCOMMAND    // FSG - to be implemented
@@ -645,12 +652,15 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          CASE nMsg == WM_CHAR
               nRet := ::OnChar(wParam, lParam)
          CASE nMsg == WM_COMMAND
+              WG_DebugTrace( "TWindow:WindowProc() - WM_COMMAND - ::OnCommand", "Self", Self )
               nRet := ::OnCommand(wParam, lParam)
          CASE nMsg == WM_CONTEXTMENU
               nRet := ::OnContextMenu(wParam, lParam)
          CASE nMsg == WM_CLOSE
+              WG_DebugTrace( "TWindow:WindowProc() - WM_CLOSE - ::OnClose", "Self", Self )
               nRet := ::OnClose(wParam, lParam)
          CASE nMsg == WM_CREATE
+              WG_DebugTrace( "TWindow:WindowProc() - WM_CREATE - ::OnCreate", "Self", Self )
               nRet := ::OnCreate(lParam)
          CASE nMsg == WM_CTLCOLORDLG
               //SetBrushOrgEx(wParam, 11,11,NIL)
@@ -667,16 +677,19 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          CASE nMsg == WM_DRAWITEM
               nRet := ::OnDrawItem(wParam, lParam )
          CASE nMsg == WM_DESTROY
+              WG_DebugTrace( "TWindow:WindowProc() - WM_DESTROY - ::OnDestroy", "Self", Self )
               nRet := ::OnDestroy()
          CASE nMsg == WM_DROPFILES
               nRet := ::OnDropFile(wParam)
          CASE nMsg == WM_HSCROLL
               nRet := ::OnHScroll(wParam, LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_INITDIALOG
+              WG_DebugTrace( "TWindow:WindowProc() - WM_INITDIALOG - ::OnInitDialog", "Self", Self )
               nRet := ::OnInitDialog(wParam, lParam)
          CASE nMsg == WM_KEYDOWN
               nRet := ::OnKeyDown(wParam, lParam)
          CASE nMsg == WM_KILLFOCUS
+              WG_DebugTrace( "TWindow:WindowProc() - WM_KILLFOCUS - ::OnKillFocus", "Self", Self )
               IF ::lStartFocusEvents THEN nRet := ::OnKillFocus()
          //CASE nMsg == WM_LBUTTONDBLCLK
          //     nRet := ::OnLDblClick(LoWord(lParam), HiWord(lParam), wParam)
@@ -693,6 +706,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          CASE nMsg == WM_MOUSEMOVE
               nRet := ::OnMouseMove(LoWord(lParam), HiWord(lParam), wParam)
          CASE nMsg == WM_NCDESTROY
+              WG_DebugTrace( "TWindow:WindowProc() - WM_NCDESTROY - ::OnNCDestroy", "Self", Self )
               nRet := ::OnNCDestroy()
          //     if (nRet := ::OnNCDestroy()) == nil
          //         if (nRet := ::DefaultMessage(nMsg, wParam, lParam)) == nil
@@ -709,18 +723,20 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          CASE nMsg == WM_NCMOUSEMOVE
               nRet := ::OnNCMouseMove( wParam, lParam )
          CASE nMsg == WM_MOVE   // x, y
+              WG_DebugTrace( "TWindow:WindowProc() - WM_MOVE - ::OnMove", "Self", Self )
               nRet := ::OnMove(LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_NOTIFY
-              //MessageBox(,"Passato da WM_NOTIFY" )
-              //::DisplayData()
+              WG_DebugTrace( "TWindow:WindowProc() - WM_NOTIFY - ::OnNotify", "Self", Self )
               nRet := ::OnNotify( wParam, lParam )
          CASE nMsg == WM_PAINT
+              WG_DebugTrace( "TWindow:WindowProc() - WM_PAINT - ::OnPaint", "Self", Self )
               nRet := ::OnPaint()
          //CASE nMsg == WM_RBUTTONDOWN
          //     nRet := ::OnRBtnDown(LoWord(lParam), HiWord(lParam), wParam)
          //CASE nMsg == WM_RBUTTONUP
          //     nRet := ::OnRBtnUp(LoWord(lParam), HiWord(lParam), wParam)
          CASE nMsg == WM_SETFOCUS
+              WG_DebugTrace( "TWindow:WindowProc() - WM_SETFOCUS - ::OnSetFocus", "Self", Self )
               IF ::lStartFocusEvents THEN nRet := ::OnSetFocus()
          CASE nMsg == WM_SIZE
               nRet := ::OnSize(wParam, LoWord(lParam), HiWord(lParam))
@@ -763,7 +779,7 @@ RETURN 0
 // interface between Windows API event handling and Class handling
 // ----------------------------------------------------
 FUNCTION WG_DefWndEvents( hWnd, nMsg, wParam, lParam )
-  LOCAL oWin, oWinClass
+  LOCAL oWin, oInCstr
   LOCAL nRet := -1
   //LOCAL hPrevWndProc :=
 
@@ -784,6 +800,14 @@ FUNCTION WG_DefWndEvents( hWnd, nMsg, wParam, lParam )
      //WG_DebugTrace( "WG_DefWndEvents - Call oWin:WindowProc" )
      // Call his window procedure
      nRet := oWin:WindowProc( nMsg, wParam, lParam )
+  ELSE
+     IF ( oInCstr := TWindowBase():GetWindowInCreation() ) <> NIL .AND. ;
+          oInCstr:nHandle == 0 .AND. ;
+          nMsg == WM_CREATE
+        WG_DebugTrace( "WG_DefWndEvents - oWin == NIL. Call oInCstr:WindowProc", "oInCstr", oInCstr, "nHandle", oInCstr:nHandle )
+        oInCstr:nHandle := hWnd
+        nRet := oInCstr:WindowProc( nMsg, wParam, lParam )
+     ENDIF
   ENDIF
   IF nRet == NIL .OR. nRet == -1
      // Windows not yet create

@@ -26,7 +26,7 @@
 
 static snWinID
 
-
+static soInCreation
 
 CLASS TWindowBase FROM TObject
 
@@ -67,8 +67,8 @@ CLASS TWindowBase FROM TObject
     //DATA cClassName         AS STRING        // Registered class name
     DATA cName              AS STRING        // Window name
     DATA nStyle             AS NUMERIC       // Window style
-    DATA nRow               AS NUMERIC       // horizontal position of window
-    DATA nCol               AS NUMERIC       // vertical position of window
+    DATA nTop               AS NUMERIC       // horizontal position of window
+    DATA nLeft               AS NUMERIC       // vertical position of window
     DATA nWidth             AS NUMERIC       // window width
     DATA nHeight            AS NUMERIC       // window height
     DATA nParent            AS NUMERIC       // Handle to parent or owner window
@@ -78,7 +78,6 @@ CLASS TWindowBase FROM TObject
 
     METHOD New() CONSTRUCTOR
     METHOD Init()
-    METHOD Create()
 
     METHOD AddWinClass( oWin AS OBJECT )       INLINE aAdd( ::aoWinClasses, oWin )
 
@@ -107,6 +106,7 @@ CLASS TWindowBase FROM TObject
     METHOD CentreOnParent()                    INLINE ::CenterOnParent()
     METHOD CentreOnScreen()                    INLINE ::CenterOnScreen()
     METHOD Close()                             INLINE CloseWindow( ::nHandle )
+    METHOD Create()
     METHOD Destroy()                           INLINE DestroyWindow( ::nHandle ), Self := NIL
     METHOD Disable()                           INLINE EnableWindow( ::nHandle, FALSE )
     METHOD Enable()                            INLINE EnableWindow( ::nHandle, TRUE )
@@ -173,7 +173,7 @@ CLASS TWindowBase FROM TObject
     METHOD SetIconSmFromFile()
     METHOD SetId( nId )                        INLINE ::nID := nId
     METHOD SetName()                           INLINE ::SetValue()
-    METHOD SetSize( nWidth, nHeight )          INLINE ::Move( ::nRow, ::nCol, nWidth, nHeight, TRUE /*lRepaint*/ )
+    METHOD SetSize( nWidth, nHeight )          INLINE ::Move( ::nTop, ::nLeft, nWidth, nHeight, TRUE /*lRepaint*/ )
     METHOD SetStyle( nStyle )                  INLINE ::nStyle := nStyle ,;
                                                       SetWindowLongPtr( ::nHandle, GWL_STYLE, nStyle )
     METHOD SetTitle()                          INLINE ::SetValue()
@@ -190,9 +190,12 @@ CLASS TWindowBase FROM TObject
     METHOD Update()                            INLINE UpdateWindow( ::nHandle )
     METHOD WindowProc()
 
+    HIDDEN:
+    METHOD GetWindowInCreation()               INLINE soInCreation
+
 ENDCLASS
 
-METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nMenu, nApplication, pStruct ) CLASS TWindowBase
+METHOD New( nExStyle, cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, nMenu, nApplication, pStruct ) CLASS TWindowBase
 
     LOCAL oClass := TWindowDef()    // Get Windows class defaults
 
@@ -220,8 +223,8 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     //ASSIGN ::cClassName   WITH cClassName        //DEFAULT "WoopGUIBaseClass"
     ASSIGN ::cName        WITH cName             DEFAULT "WindowBase_1"
     ASSIGN ::nStyle       WITH nStyle            DEFAULT WS_OVERLAPPEDWINDOW
-    ASSIGN ::nRow         WITH nRow              DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol              DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop              DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft             DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth            DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight           DEFAULT CW_USEDEFAULT
 
@@ -279,19 +282,24 @@ METHOD Create() CLASS TWindowBase
 
    WG_DebugTrace( "TWindowBase:Create()", "::nExStyle", ::nExStyle, "::cClassName", ::cClassName, "::cName", ::cName, ;
                                           "::nStyle", ::nStyle, ;
-                                          "::nRow", ::nRow, "::nCol", ::nCol, "::nWidth", ::nWidth, "::nHeight", ::nHeight, ;
+                                          "::nTop", ::nTop, "::nLeft", ::nLeft, "::nWidth", ::nWidth, "::nHeight", ::nHeight, ;
                                           "::nParent", ::nParent, "::nMenu", ::nMenu, "::nApplication", ::nApplication,;
                                           "::pStruct", ::pStruct )
 
+   // Save to use in WM_CREATE
+   soInCreation := Self
+   WG_DebugTrace( "TWindowBase:Create() - Save this object", "Self", Self )
    ::nHandle := CreateWindowEx( ::nExStyle, ::cClassName, ::cName, ::nStyle, ;
-                                ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                                ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                                 ::nParent, ::nMenu, ::nApplication, ::pStruct )
-
-   //::DisplayData( "TWindowBase" )
+   // Clean var
+   soInCreation := NIL
 
    IF ValType( ::nHandle ) == "N" .AND. ::nHandle > 0
       ::AddWindow( Self )
       WG_DebugTrace( "TWindowBase:Create() - After creation", "Self", Self, "nHandle", ::nHandle )
+      //::OnCreate()
+      //WG_DebugTrace( "TWindowBase:Create() - Call forcely ::OnCreate()" )
    ELSE
       //PostQuitMessage(0)
       WG_DebugTrace( "TWindowBase:Create() - Error during creation. Quitting." )
@@ -305,10 +313,12 @@ RETURN Self
 METHOD Register() CLASS TWindowBase
   LOCAL nHandle
 
-  WG_DebugTrace( "TWindowBase:Register()", "::cClassName", ::cClassName )
+  WG_DebugTrace( "TWindowBase:Register() - before registration", "::cClassName", ::cClassName )
 
   nHandle := RegisterClassEx( ::nClassStyle, 0/*bWindowProc*/, ::hInstance, ::hIcon, ::hCursor, ::hbrBackground,;
                               ::nMenu, ::cClassName, ::hIconSm )
+
+  WG_DebugTrace( "TWindowBase:Register() - after registration", "::cClassName", ::cClassName, "nHandle", nHandle )
   IF nHandle <> 0
      ::AddWinClass( Self )
   ENDIF
@@ -361,8 +371,8 @@ RETURN Self
 
 METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS TWindowBase
    LOCAL lOk := SetWindowPos( ::nHandle, nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags )
-   UPDATE ::nRow    TO nX      NOT NIL
-   UPDATE ::nCol    TO nY      NOT NIL
+   UPDATE ::nTop    TO nX      NOT NIL
+   UPDATE ::nLeft   TO nY      NOT NIL
    UPDATE ::nWidth  TO nWidth  NOT NIL
    UPDATE ::nHeight TO nHeight NOT NIL
 RETURN lOk

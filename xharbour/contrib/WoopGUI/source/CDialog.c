@@ -301,15 +301,15 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
    *p++ = WG_GetObjectDataLong( pObj, "NDLGITEMS" );            //        - cDlgItems
    if (lPixel)
    {
-      *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pObj, "NCOL" ) ); //    - x
-      *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pObj, "NROW" ) ); //    - y
+      *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pObj, "NLEFT" ) ); //    - x
+      *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pObj, "NTOP" ) ); //    - y
       *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pObj, "NWIDTH" ) );  // cx
       *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pObj, "NHEIGHT" ) ); // cy
    }
    else
    {
-      *p++ = WG_GetObjectDataInteger( pObj, "NCOL" ); //    - x
-      *p++ = WG_GetObjectDataInteger( pObj, "NROW" ); //    - y
+      *p++ = WG_GetObjectDataInteger( pObj, "NLEFT" ); //    - x
+      *p++ = WG_GetObjectDataInteger( pObj, "NTOP" ); //    - y
       *p++ = WG_GetObjectDataInteger( pObj, "NWIDTH" );  // cx
       *p++ = WG_GetObjectDataInteger( pObj, "NHEIGHT" ); // cy
    }
@@ -343,15 +343,15 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
       *p++ = HIWORD( WG_GetObjectDataLong( pItem, "NSTYLE" ) );
       if (lPixel)
       {
-         *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NCOL" ) ); // x
-         *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NROW" ) ); // y
+         *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NLEFT" ) ); // x
+         *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NTOP" ) ); // y
          *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NWIDTH" ) ); // cx
          *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NHEIGHT" ) ); // cy
       }
       else
       {
-         *p++ = WG_GetObjectDataInteger( pItem, "NCOL" ); // x
-         *p++ = WG_GetObjectDataInteger( pItem, "NROW" ); // y
+         *p++ = WG_GetObjectDataInteger( pItem, "NLEFT" ); // x
+         *p++ = WG_GetObjectDataInteger( pItem, "NTOP" ); // y
          *p++ = WG_GetObjectDataInteger( pItem, "NWIDTH" ); // cx
          *p++ = WG_GetObjectDataInteger( pItem, "NHEIGHT" ); // cy
       }

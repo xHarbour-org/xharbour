@@ -110,7 +110,7 @@ FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
 RETURN oGet
 */
 
-FUNCTION _XGET_( cVarName, bSetGet, cType, cCaption, nRow, nCol, nWidth, nHeight, ;
+FUNCTION _XGET_( cVarName, bSetGet, cType, cCaption, nTop, nLeft, nWidth, nHeight, ;
                  oParent, cToolTip, cStatusMsg, cMsg, lPixel, nID, ;
                  nLimit, aVal, xDef, cPicture, bDisplay, bReader, bValid, bWhen, bHelp, bMeaning, cAlias, ;
                  bAction, bReadblock, oMaint, nKey, cLetter, bExit, lReadOnly, lPassword, ;
@@ -133,15 +133,15 @@ FUNCTION _XGET_( cVarName, bSetGet, cType, cCaption, nRow, nCol, nWidth, nHeight
       ENDIF
    ENDIF
 
-   oGet := TXGet():NewExtended( nRow, nCol, bSetGet, cVarName, cPicture,, ;
+   oGet := TXGet():NewExtended( nTop, nLeft, bSetGet, cVarName, cPicture,, ;
                                    nWidth, nHeight, oParent, cToolTip,;
                                    cStatusMsg, lPixel, nID, xDef, nLimit, lReadOnly, lPassword, !lNoAutoSize, ;
                                    oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
-   IF nRow <> NIL .AND. nCol <> NIL
-      SetPos( nRow, nCol )
+   IF nTop <> NIL .AND. nLeft <> NIL
+      SetPos( nTop, nLeft )
    ELSE
-      SetPos( oGet:nRow, oGet:nCol )
+      SetPos( oGet:nTop, oGet:nLeft )
    ENDIF
 
    oGet:PreBlock := bWhen

@@ -110,7 +110,7 @@
 
 // Dialog commands
 #xcommand DEFINE DIALOG <oDlg> ;
-             [ AT <nRow>, <nCol> ] ;
+             [ AT <nTop>, <nLeft> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
              [ TITLE <cTitle> ] ;
@@ -132,7 +132,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oDlg> := TDialog():NewExtended( <cTitle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oDlg> := TDialog():NewExtended( <cTitle>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lStatusBar.>, <.lPixel.>, <.lModal.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [Upper(<(border)>)], !<.NoSysMenu.>, !<.NoCaption.>,;
@@ -140,7 +140,7 @@
 
 // Panel commands
 #xcommand DEFINE PANEL <oDlg> ;
-             [ AT <nRow>, <nCol> ] ;
+             [ AT <nTop>, <nLeft> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
              [ <color: COLOR, COLORS> <nClrFore> [,<nClrBack>] ];
@@ -156,7 +156,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oDlg> := TPanel():NewExtended( ,,, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oDlg> := TPanel():NewExtended( ,,, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lPixel.>, <.lModal.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [<.lBorder.>], <oFont>, <cFontName>, <nFontSize> )
@@ -171,7 +171,7 @@
 
 // Window commands
 #xcommand DEFINE WINDOW <oWnd> ;
-             [ AT <nRow>, <nCol> ] ;
+             [ AT <nTop>, <nLeft> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [<lPixel: PIXEL>] ;
              [ TITLE <cTitle> ] ;
@@ -193,7 +193,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oWnd> := TFrame():NewExtended( <cTitle>, <nStyle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oWnd> := TFrame():NewExtended( <cTitle>, <nStyle>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lStatusBar.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [Upper(<(border)>)], !<.NoSysMenu.>, !<.NoCaption.>,;
@@ -237,7 +237,7 @@
 
 // Control commands
 
-#xcommand @ <nRow>, <nCol> CHECKBOX [ <oBtn> VAR ] <lVar> ;
+#xcommand @ <nTop>, <nLeft> CHECKBOX [ <oBtn> VAR ] <lVar> ;
              [ PROMPT <cCaption> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -255,13 +255,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] TCheckBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TCheckBox():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   <nID>, ;
                                                   <.lSelected>, LocalBlock(<lVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                   <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> GROUPBOX [ TO <oBtn> ] ;
+#xcommand @ <nTop>, <nLeft> GROUPBOX [ TO <oBtn> ] ;
              [ <label:LABEL,PROMPT> <cLabel> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -273,12 +273,12 @@
              [ FONTSIZE <nFontSize> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] TGroupBox():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TGroupBox():NewExtended( <cLabel>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                   <oWnd>, , <cToolTip>,,<.lPixel.>,;
                                                   , <oFont>, <cFontName>, <nFontSize>,,, <ncFgColor>, <ncBgColor>)
 
 
-#xcommand @ <nRow>, <nCol> PUSHBUTTON [ <oBtn> PROMPT ] <cCaption> ;
+#xcommand @ <nTop>, <nLeft> PUSHBUTTON [ <oBtn> PROMPT ] <cCaption> ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
              [ ACTION <bAction,...> ] ;
@@ -295,13 +295,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] TPushButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TPushButton():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   <.lDefault.>, <nID>, ;
                                                   <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                   <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> RADIOGROUP [ <oBtn> VAR ] <nVar>;
+#xcommand @ <nTop>, <nLeft> RADIOGROUP [ <oBtn> VAR ] <nVar>;
              [ <prm: PROMPT, ITEMS> <cItems,...> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -319,13 +319,13 @@
              [ SELECT <nPos> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] TRadioGroup():NewExtended( {<cItems>}, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TRadioGroup():NewExtended( {<cItems>}, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   !<.lHoriz.>, <nPos>, ;
                                                   LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                   <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> TRISTATEBUTTON [ <oBtn> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> TRISTATEBUTTON [ <oBtn> VAR ] <nVar> ;
              [ PROMPT <cCaption> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -343,13 +343,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] T3StateButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] T3StateButton():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                     <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                     <nID>, ;
                                                     <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                     <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> COMBOBOX [ <oCbx> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> COMBOBOX [ <oCbx> VAR ] <nVar> ;
              [ PROMPT <cCaption> ] ;
              [ <it: PROMPTS, ITEMS, ROWS> <aItems> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
@@ -368,13 +368,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] TSimpleComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TSimpleComboBox():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                    <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> DROPDOWN [ <oCbx> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> DROPDOWN [ <oCbx> VAR ] <nVar> ;
              [ PROMPT <cCaption> ] ;
              [ <it: PROMPTS, ITEMS, ROWS> <aItems> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
@@ -393,13 +393,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] TDropDownComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TDropDownComboBox():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                    <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> DROPLIST [ <oCbx> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> DROPLIST [ <oCbx> VAR ] <nVar> ;
              [ PROMPT <cCaption> ] ;
              [ <it: PROMPTS, ITEMS, ROWS> <aItems> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
@@ -418,13 +418,13 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] TDropListComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TDropListComboBox():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                    <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> LABEL <cLabel> [ TO <oBtn> ] ;
+#xcommand @ <nTop>, <nLeft> LABEL <cLabel> [ TO <oBtn> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
              [ <of:OF, WINDOW, DIALOG> <oWnd> ] ;
@@ -437,13 +437,13 @@
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
              [ <cAlign: LEFT, CENTER, CENTERED, RIGHT> ] ;
-      => [ <oBtn> := ] TStaticText():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TStaticText():NewExtended( <cLabel>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                   <oWnd>, , <cToolTip>,,<.lPixel.>,;
                                                   <nID>, [<(cAlign)>],,;
                                                   <oFont>, <cFontName>, <nFontSize>,,,;
                                                   <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> EDITBOX [ <oEdt> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> EDITBOX [ <oEdt> VAR ] <nVar> ;
              [ CAPTION <cCaption> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -464,13 +464,13 @@
              [ BACKCOLOR <ncBgColor> ] ;
              [ <lReadOnly: READONLY> ] ;
              [ <lPassword: PASSWORD> ] ;
-      => [ <oEdt> := ] TEdit():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oEdt> := ] TEdit():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <cValue>, <nLimit>, <.lReadOnly.>, <.lPassword.>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                    <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> EDITBOX MULTILINE [ <oEdt> VAR ] <nVar> ;
+#xcommand @ <nTop>, <nLeft> EDITBOX MULTILINE [ <oEdt> VAR ] <nVar> ;
              [ CAPTION <cCaption> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -493,14 +493,14 @@
              [ <lVScroll: VSCROLL, VERTICAL SCROLL> ] ;
              [ <lReadOnly: READONLY> ] ;
              [ <lPassword: PASSWORD> ] ;
-      => [ <oEdt> := ] TEditMultiline():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oEdt> := ] TEditMultiline():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <cValue>, <nLimit>, <.lReadOnly.>, <.lPassword.>, <.lHScroll.>, <.lVScroll.>, ;
                                                    LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
                                                    <{bValid}>, <ncFgColor>, <ncBgColor> )
 
-#xcommand @ <nRow>, <nCol> CALENDAR [ <oCal> VAR ] <dVar> ;
+#xcommand @ <nTop>, <nLeft> CALENDAR [ <oCal> VAR ] <dVar> ;
              [ CAPTION <cCaption> ] ;
              [ SIZE <nWidth>, <nHeight> ] ;
              [ <lPixel: PIXEL> ] ;
@@ -518,7 +518,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCal> := ] TCalendar():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCal> := ] TCalendar():NewExtended( <cCaption>, <nTop>, <nLeft>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <dValue>, LocalBlock(<dVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -637,7 +637,7 @@
 
 // XGET .....................................................................
 
-#xcommand @ <nRow>, <nCol> XGET [ <oXg> VAR ] <xVar>;             // Extended Gets
+#xcommand @ <nTop>, <nLeft> XGET [ <oXg> VAR ] <xVar>;             // Extended Gets
                          [ TYPE <cType: EDIT, COMBO, CHECK, RADIOBUTTON,    ;
                                         BUTTON, SECRET, CHAR>]                ;
                          [ CAPTION <cCaption> ]                               ;
@@ -680,8 +680,8 @@
                                      LocalBlock(<xVar>),;
                                      <"cType">,;
                                      <cCaption>,;
-                                     IIF( <.nRow.>, <nRow>, Row() ), ;
-                                     IIF( <.nCol.>, <nCol>, Col() ), ;
+                                     IIF( <.nTop.>, <nTop>, Row() ), ;
+                                     IIF( <.nLeft.>, <nLeft>, Col() ), ;
                                      <nWidth>, <nHeight>, ;
                                      <oWnd>,;
                                      <cToolTip>, <cStatusMsg>, <cMsg>, <.lPixel.>, <nID>, ;

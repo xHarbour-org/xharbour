@@ -60,7 +60,7 @@ CLASS TControl FROM TWindow
 
 ENDCLASS
 
-METHOD New( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, ;
+METHOD New( cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, ;
             cStatusBar, lPixel, lDefault, nID ) CLASS TControl
 
     //WG_ParamDisplay( Self, hb_aparams(), "TControl_New" )
@@ -73,7 +73,7 @@ METHOD New( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAc
 
     // Make instance through TControl class
     ::Super:New( 0, cClassName, cName, nStyle, ;
-                 nRow, nCol, nWidth, nHeight, ;
+                 nTop, nLeft, nWidth, nHeight, ;
                  ::oParent )
 
     UPDATE ::nID TO nID NOT NIL
@@ -111,12 +111,12 @@ METHOD Init() CLASS TControl
 
 RETURN Self
 
-METHOD NewExtended( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
+METHOD NewExtended( cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
                     lDefault, nID, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TControl
 
     WG_DebugTrace( "TControl:NewExtended()" )
 
-    ::New( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID )
+    ::New( cClassName, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

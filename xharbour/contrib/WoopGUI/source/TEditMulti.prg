@@ -34,7 +34,7 @@ CLASS TEditMultiline FROM TEdit
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
             nLimitText, lReadOnly, lPassword, lHScroll, lVScroll ) CLASS TEditMultiline
 
     WG_DebugTrace( "TEditMultiline:New()")
@@ -47,25 +47,25 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
                               IIF( ::lHScroll, WS_HSCROLL + ES_AUTOHSCROLL, 0 ) +;
                               IIF( ::lVScroll, WS_VSCROLL + ES_AUTOVSCROLL, 0 ) +;
                               ES_LEFT
-    ASSIGN ::nRow        WITH nRow       DEFAULT 0
-    ASSIGN ::nCol        WITH nCol       DEFAULT 0
+    ASSIGN ::nTop        WITH nTop       DEFAULT 0
+    ASSIGN ::nLeft       WITH nLeft      DEFAULT 0
     ASSIGN ::nWidth      WITH nWidth     DEFAULT IIF( lPixel, IIF( ::lVScroll, 120, 100 ), WG_Pixel2DialogX( IIF( ::lVScroll, 120, 100 ) ) )
     ASSIGN ::nHeight     WITH nHeight    DEFAULT IIF( lPixel, 100, WG_Pixel2DialogY( 100 ) )
 
     // Creo l'istanza tramite la classe window
     ::Super:New( cName, ::nStyle, ;
-                                 ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                                 ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                                  oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, lHScroll, lVScroll, ;
                     bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TEditMultiline
 
     WG_DebugTrace( "TEditMultiline:NewExtended()")
 
-    ::New( cName,nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, lHScroll, lVScroll )
+    ::New( cName,nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, lHScroll, lVScroll )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

@@ -27,8 +27,8 @@ CLASS TDialogItem
     DATA nHelpID     AS NUMERIC    INIT 0
     DATA nExStyle    AS NUMERIC    INIT 0
     DATA nStyle      AS NUMERIC
-    DATA nRow
-    DATA nCol
+    DATA nTop
+    DATA nLeft
     DATA nWidth
     DATA nHeight
     DATA nId
@@ -39,14 +39,14 @@ CLASS TDialogItem
 
 ENDCLASS
 
-METHOD New( cTitle, nRow, nCol, nWidth, nHeight, cClassName, nStyle ) CLASS TDialogItem
+METHOD New( cTitle, nTop, nLeft, nWidth, nHeight, cClassName, nStyle ) CLASS TDialogItem
 
     ASSIGN ::nExStyle     WITH 0
     //ASSIGN ::cClassName   WITH "WoopGUIDlgClass"
     ASSIGN ::cTitle       WITH cTitle               DEFAULT "DialogItem_1"
     ASSIGN ::nStyle       WITH WS_TABSTOP + WS_POPUP
-    ASSIGN ::nRow         WITH nRow                 DEFAULT CW_USEDEFAULT
-    ASSIGN ::nCol         WITH nCol                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nTop         WITH nTop                 DEFAULT CW_USEDEFAULT
+    ASSIGN ::nLeft        WITH nLeft                DEFAULT CW_USEDEFAULT
     ASSIGN ::nWidth       WITH nWidth               DEFAULT CW_USEDEFAULT
     ASSIGN ::nHeight      WITH nHeight              DEFAULT CW_USEDEFAULT
     ASSIGN ::cClassName   WITH cClassName           DEFAULT "BUTTON"

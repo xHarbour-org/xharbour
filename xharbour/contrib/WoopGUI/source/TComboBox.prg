@@ -69,15 +69,15 @@ CLASS TComboBox FROM TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TComboBox
+METHOD New( cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TComboBox
 
     DEFAULT lPixel TO TRUE
 
     ASSIGN ::cClassName  WITH "COMBOBOX"
     ASSIGN ::cName       WITH cName      DEFAULT "ComboBox_1"
     ASSIGN ::nStyle      WITH nStyle     DEFAULT WS_VISIBLE + WS_CHILD + WS_TABSTOP + WS_VSCROLL + CBS_AUTOHSCROLL
-    ASSIGN ::nRow        WITH nRow       DEFAULT 0
-    ASSIGN ::nCol        WITH nCol       DEFAULT 0
+    ASSIGN ::nTop        WITH nTop       DEFAULT 0
+    ASSIGN ::nLeft       WITH nLeft      DEFAULT 0
     ASSIGN ::nWidth      WITH nWidth     DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight     WITH nHeight    DEFAULT IIF( lPixel, 100, WG_Pixel2DialogY( 100 ) )
 
@@ -85,7 +85,7 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction,
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cClassName, ::cName, ::nStyle, ;
-                                 ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                                 ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                                  oParent, bAction, cToolTip, cStatusBar, lPixel,, nID )
 
     // Save value for init
@@ -93,10 +93,10 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction,
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, aRows, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TComboBox
 
-    ::New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
+    ::New( cName, nTop, nLeft, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

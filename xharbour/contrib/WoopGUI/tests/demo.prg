@@ -108,6 +108,8 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
    WINDOW oWnd1 ACTIVATE
    // oWnd1:Activate()
 
+   oWnd1:SetStatusBar( chr(9)+"This text is centered", 1 )
+
    APPLICATION ACTIVATE
    //oApp:Activate()
    // APPLICATION QUIT -- Now called on exiting from application activate
@@ -691,7 +693,7 @@ RETURN 0
 
 PROCEDURE AboutBox(oWnd)
    MessageBox(oWnd:nHandle, "WoopGUI - A Win32 OOP GUI for Harbour"+CRLF+;
-                            "(C) Francesco Saverio Giudice - 2002")
+                            "(C) Francesco Saverio Giudice - 2002", "About Box")
 RETURN
 
 PROCEDURE NothingToDo()

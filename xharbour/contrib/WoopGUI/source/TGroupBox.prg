@@ -31,28 +31,28 @@ CLASS TGroupBox FROM TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel ) CLASS TGroupBox
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel ) CLASS TGroupBox
 
     DEFAULT lPixel TO TRUE
 
     ASSIGN ::cName     WITH cName    DEFAULT "GrpBox_1"
     ASSIGN ::nStyle    WITH WS_VISIBLE + WS_CHILD + WS_TABSTOP + BS_GROUPBOX + WS_GROUP
-    ASSIGN ::nRow      WITH nRow     DEFAULT 0
-    ASSIGN ::nCol      WITH nCol     DEFAULT 0
+    ASSIGN ::nTop      WITH nTop     DEFAULT 0
+    ASSIGN ::nLeft     WITH nLeft    DEFAULT 0
     ASSIGN ::nWidth    WITH nWidth   DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight   WITH nHeight  DEFAULT IIF( lPixel,  28, WG_Pixel2DialogY(  28 ) )
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cName, ::nStyle, ;
-                          ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                          ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                           oParent, bAction, cToolTip, cStatusBar, lPixel )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TGroupBox
 
-    ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel )
+    ::New( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

@@ -43,13 +43,14 @@ CLASS TDialog FROM TPanel
     METHOD WindowProc()
 
     // Events
+    METHOD OnCreate()
     METHOD OnInitDialog()
     METHOD OnSysCommand()
     METHOD OnNotify()
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal ) CLASS TDialog
+METHOD New( cName, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal ) CLASS TDialog
 
     ASSIGN ::nExStyle     WITH WS_EX_DLGMODALFRAME //+ WS_EX_CONTROLPARENT
     ASSIGN ::cName        WITH cName                DEFAULT "Dialog_1"
@@ -59,19 +60,19 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lMo
     ASSIGN ::nMenu        WITH 0
     ASSIGN ::lStatusBar   WITH lStatusBar           DEFAULT FALSE
 
-    ::Super:New( ::nExStyle, ::cName, ::nStyle, nRow, nCol, ;
+    ::Super:New( ::nExStyle, ::cName, ::nStyle, nTop, nLeft, ;
                  nWidth, nHeight, oParent, lPixel, lModal )
 
 RETURN Self
 
-METHOD NewExtended( cTitle, nRow, nCol, nWidth, nHeight,;
+METHOD NewExtended( cTitle, nTop, nLeft, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent AS OBJECT, lStatusBar, lPixel, lModal, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
                     lNoIconize, lNoMaximize, oFont, cFontName, nFontSize ) CLASS TDialog
 
 
-   ::New( cTitle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal )
+   ::New( cTitle, nTop, nLeft, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal )
 
    IF ValType( oMenu ) == "O" THEN ::SetMenu( oMenu )
    // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
@@ -109,6 +110,11 @@ RETURN Self
 
 //------------------------------------------------------------------------------
 // Events
+
+METHOD OnCreate()
+  LOCAL nRet := ::Super:OnCreate()
+  ::SetMenu( ::oMenu )
+RETURN nRet
 
 METHOD OnInitDialog( wParam, lParam ) CLASS TDialog
    LOCAL nRet        := -1

@@ -115,7 +115,7 @@ CLASS TEdit FROM TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
+METHOD New( cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
             nLimitText, lReadOnly, lPassword ) CLASS TEdit
 
     WG_DebugTrace( "TEdit:New()" )
@@ -129,8 +129,8 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
     ASSIGN ::cName       WITH cName      DEFAULT "" //"Edit_1"
     ASSIGN ::nStyle      WITH nStyle     DEFAULT WS_CHILD + WS_VISIBLE + WS_TABSTOP + WS_BORDER	+ ES_LEFT + ES_AUTOHSCROLL
                                                  //ES_WANTRETURN | WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_MULTILINE | WS_VSCROLL | WS_HSCROLL | ES_AUTOHSCROLL
-    ASSIGN ::nRow        WITH nRow       DEFAULT 0
-    ASSIGN ::nCol        WITH nCol       DEFAULT 0
+    ASSIGN ::nTop        WITH nTop       DEFAULT 0
+    ASSIGN ::nLeft       WITH nLeft      DEFAULT 0
     ASSIGN ::nWidth      WITH nWidth     DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight     WITH nHeight    DEFAULT IIF( lPixel,  20, WG_Pixel2DialogY(  20 ) )
 
@@ -141,18 +141,18 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cClassName, ::cName, ::nStyle, ;
-                                 ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                                 ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                                  oParent, bAction, cToolTip, cStatusBar, lPixel,, nID )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, ;
                     bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TEdit
 
     WG_DebugTrace( "TEdit:NewExtended()" )
 
-    ::New( cName,, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword )
+    ::New( cName,, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

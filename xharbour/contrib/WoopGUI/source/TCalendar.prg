@@ -48,7 +48,7 @@ CLASS TCalendar FROM TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue ) CLASS TCalendar
+METHOD New( cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue ) CLASS TCalendar
 
 
     //WG_ParamDisplay( Self, hb_aparams(), "TCalendar_New" )
@@ -57,8 +57,8 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
     ASSIGN ::cClassName  WITH "SysDateTimePick32"
     ASSIGN ::cName       WITH cName      DEFAULT "Calendar_1"
     ASSIGN ::nStyle      WITH nStyle     DEFAULT WS_VISIBLE + WS_CHILD + WS_TABSTOP
-    ASSIGN ::nRow        WITH nRow       DEFAULT 0
-    ASSIGN ::nCol        WITH nCol       DEFAULT 0
+    ASSIGN ::nTop        WITH nTop       DEFAULT 0
+    ASSIGN ::nLeft       WITH nLeft      DEFAULT 0
     ASSIGN ::nWidth      WITH nWidth     DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight     WITH nHeight    DEFAULT IIF( lPixel, 20, WG_Pixel2DialogY( 20 ) )
     ASSIGN ::xValue      WITH dValue     DEFAULT Date()
@@ -68,18 +68,18 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 
     // Creo l'istanza tramite la classe window
     ::Super:New( ::cClassName, ::cName, ::nStyle, ;
-                                 ::nRow, ::nCol, ::nWidth, ::nHeight, ;
+                                 ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
                                  oParent, bAction, cToolTip, cStatusBar, lPixel,, nID )
     //MessageBox(,"Passato da calendar" )
 
 RETURN Self
 
-METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+METHOD NewExtended( cName, nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, dValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TCalendar
 
     //WG_ParamDisplay( Self, hb_aparams(), "TCalendar_NewExtended" )
 
-    ::New( cName, ,nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue )
+    ::New( cName, ,nTop, nLeft, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self

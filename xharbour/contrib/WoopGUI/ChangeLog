@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.11 2002/09/10 22:24:53 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.12 2002/09/10 22:57:14 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-13 04:45 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   * include/woopgui.ch
+   * source/CDialog.c
+   * source/T3State.prg
+   * source/TButton.prg
+   * source/TCalendar.prg
+   * source/TCheckBox.prg
+   * source/TComboBox.prg
+   * source/TControl.prg
+   * source/TDialog.prg
+   * source/TDlgItmTpl.prg
+   * source/TDlgTpl.prg
+   * source/TDropDCB.prg
+   * source/TDropLCB.prg
+   * source/TEdit.prg
+   * source/TEditMulti.prg
+   * source/TFrame.prg
+   * source/TFrameMDIParent.prg
+   * source/TGroupBox.prg
+   * source/TObject.prg
+   * source/TPanel.prg
+   * source/TPushBtn.prg
+   * source/TRadioBtn.prg
+   * source/TRadioGrp.prg
+   * source/TSimpleCB.prg
+   * source/TStatic.prg
+   * source/TStaticText.prg
+   * source/TWindow.prg
+   * source/TWindowBase.prg
+   * source/TXGet.prg
+   * source/XGet.prg
+   * tests/demo.prg
+     * mofidy logic of creation. Now follow Windows Events
+     * Changed names of properties nRow -> nTop and nCol -> nLeft
+
 
 2002-09-11 00:54 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    * include/winuser.ch
