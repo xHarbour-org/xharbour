@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.74 2005/03/20 21:39:56 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.75 2005/03/21 02:23:43 andijahja Exp $
  */
 
 /*
@@ -456,7 +456,7 @@ RETURN xRet
 
         for( n = 0; n < nArgs; n++ )
         {
-           // Pramateres processed in reveresed order.
+           // Parameters are processed in reversed order.
            nArg = nArgs - n;
 
            VariantInit( &( pArgs[ n ] ) );
@@ -474,7 +474,7 @@ RETURN xRet
               s_OleRefFlags[ nArg ] = FALSE;
            }
 
-           TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, uParam->type, bByRef );
+           //TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, uParam->type, bByRef );
 
            aPrgParams[ n ] = uParam;
 
