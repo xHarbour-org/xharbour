@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.11 2002/06/29 03:02:18 lculik Exp $
+ * $Id: set.c,v 1.12 2002/08/02 22:33:52 lculik Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ static void close_binary( FHANDLE handle )
       hb_fsSetError( user_ferror );
    }
 }
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
 static void close_binarywin( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_binarywin(%p)", handle));
@@ -207,7 +207,7 @@ static void close_text( FHANDLE handle )
       hb_fsSetError( user_ferror );
    }
 }
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
 static FHANDLE openw_handle(char *szPrinter,HB_set_enum set_specifier)
 {
    FHANDLE hHandle;
@@ -620,7 +620,7 @@ HB_FUNC( SET )
                   hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
                }
             }
-      #if defined(HB_OS_WIN_32)
+      #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
             else
             {
                if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 &&
@@ -790,7 +790,7 @@ HB_FUNC( SET )
 
             if (!hb_set.hb_set_winprinter)
                close_binary( hb_set.hb_set_printhan );
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
             else{
                hb_set.hb_set_winprinter=FALSE;
                close_binarywin(hb_set.hb_set_winhan);

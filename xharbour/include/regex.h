@@ -146,7 +146,7 @@ make changes to pcre.in. */
 /* Win32 uses DLL by default */
 
 #ifdef _WIN32
-# ifdef STATIC
+# if 1//def STATIC // Ron Pinkas
 #  define PCRE_DL_IMPORT
 # else
 #  define PCRE_DL_IMPORT __declspec(dllimport)
@@ -287,10 +287,12 @@ time, run time or study time, respectively. */
 
 /* Miscellaneous definitions */
 
+/* Ron Pinkas - use xHarbour definition.
 typedef int BOOL;
 
 #define FALSE   0
 #define TRUE    1
+*/
 
 /* Escape items that are just an encoding of a particular data value. Note that
 ESC_N is defined as yet another macro, which is set in config.h to either \n

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.17 2002/10/03 15:49:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.18 2002/10/13 18:42:16 ronpinkas Exp $
  */
 
 /*
@@ -49,6 +49,14 @@
  *
  */
 
+#ifndef __PLATFORM__Windows
+  Function CreateObject()
+  Return NIL
+
+  FUNCTION GetActiveObject( cString )
+  Return NIL
+#else
+
 Static bOleInitialized := .F.
 
 #include "hbclass.ch"
@@ -81,11 +89,20 @@ RETURN TOleAuto():GetActiveObject( cString )
    #include "hboo.ch"
    #include "hbfast.h"
 
-   #define __STDC__ 1
-   #define CINTERFACE 1
+   #ifndef __STDC__
+      #define __STDC__ 1
+   #endif
+
+   #ifndef CINTERFACE
+      #define CINTERFACE 1
+   #endif
 
    #ifndef __FLAT__
      #define __FLAT__ 1
+   #endif
+
+   #ifdef __MINGW32__
+      #define NONAMELESSUNION
    #endif
 
    #include <ctype.h>
@@ -93,8 +110,18 @@ RETURN TOleAuto():GetActiveObject( cString )
    #include <Windows.h>
    #include <Ole2.h>
    #include <OleAuto.h>
-   #include <OleDB.h>
+
+   #ifndef __MINGW32__
+       // Missing in Mingw V 2.
+      #include <OleDB.h>
+   #endif
+
    #include <ShlObj.h>
+
+   #ifdef __MINGW32__
+      // Missing in oleauto.h
+      WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
+   #endif
 
    static HRESULT s_nOleError = 0;
    static HB_ITEM  OleAuto;
@@ -104,6 +131,19 @@ RETURN TOleAuto():GetActiveObject( cString )
    static PHB_DYNS s_pSym_New     = NULL;
 
    static char *s_OleRefFlags = NULL;
+
+   HB_FUNC_STATIC( OLE_INITIALIZE )
+   {
+      s_nOleError = OleInitialize( NULL );
+
+      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_New  = hb_dynsymFindName( "NEW" );
+   }
+
+   HB_FUNC_STATIC( OLE_UNINITIALIZE )
+   {
+      OleUninitialize();
+   }
 
    HB_FUNC( SETOLEREFFLAGS )
    {
@@ -117,19 +157,6 @@ RETURN TOleAuto():GetActiveObject( cString )
       {
          s_OleRefFlags = hb_strdup( hb_stackItemFromBase( 1 )->item.asString.value );
       }
-   }
-
-   HB_FUNC_STATIC( OLE_INITIALIZE )
-   {
-      s_nOleError = OleInitialize( NULL );
-
-      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New  = hb_dynsymFindName( "NEW" );
-   }
-
-   HB_FUNC_STATIC( OLE_UNINITIALIZE )
-   {
-      OleUninitialize();
    }
 
 #pragma ENDDUMP
@@ -1762,3 +1789,4 @@ RETURN uObj
 
 #pragma ENDDUMP
 
+#endif

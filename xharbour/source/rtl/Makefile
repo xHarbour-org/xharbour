@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2002/06/12 11:53:06 ronpinkas Exp $
+# $Id: Makefile,v 1.6 2002/12/11 11:06:55 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -167,12 +167,13 @@ PRG_SOURCES=\
 	tmenuitm.prg \
 	tobject.prg  \
 	tpopup.prg   \
-        traceprg.prg  \
+        traceprg.prg \
 	treport.prg  \
 	ttextlin.prg \
 	ttopbar.prg  \
 	typefile.prg \
 	wait.prg     \
+        win32ole.prg \
 
 LIBNAME=rtl
 

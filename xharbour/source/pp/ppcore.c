@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.34 2002/10/09 20:42:59 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.35 2002/10/16 04:20:25 ronpinkas Exp $
  */
 
 /*
@@ -77,17 +77,41 @@
    #endif
 #endif
 
-#include <time.h>
-#include <errno.h>
+// For hb_ppPlatform()
+#define INCL_DOSMISC
 
-#include "hbpp.h"
-#include "hbcomp.h"
+#define HB_OS_WIN_32_USED
+
+#include "hbapi.h"
+#include "hbver.h"
+
+#if defined(HB_OS_WIN_32)
+
+   #include <ctype.h>
+   #ifndef VER_PLATFORM_WIN32_WINDOWS
+      #define VER_PLATFORM_WIN32_WINDOWS 1
+   #endif
+   #ifndef VER_PLATFORM_WIN32_CE
+      #define VER_PLATFORM_WIN32_CE 3
+   #endif
+
+#elif defined(HB_OS_UNIX)
+
+   #include <sys/utsname.h>
+
+#endif
 
 #if defined( OS_UNIX_COMPATIBLE )
    #include <sys/timeb.h>
 #else
    #include <sys\timeb.h>
 #endif
+
+#include <time.h>
+#include <errno.h>
+
+#include "hbpp.h"
+#include "hbcomp.h"
 
 int hb_pp_ParseDefine( char * );                         /* Process #define directive */
 
@@ -382,6 +406,197 @@ void hb_pp_Free( void )
    }
 }
 
+char * hb_ppPlatform( void )
+{
+   char * pszPlatform;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
+
+   /* NOTE: Must be larger than 128, which is the maximum size of
+            osVer.szCSDVersion (Win32). [vszakats] */
+   pszPlatform = ( char * ) hb_xgrab( 256 );
+
+#if defined(HB_OS_DOS)
+
+   {
+      union REGS regs;
+
+      regs.h.ah = 0x30;
+      HB_DOS_INT86( 0x21, &regs, &regs );
+
+      sprintf( pszPlatform, "DOS %d.%02d", regs.h.al, regs.h.ah );
+
+      /* Host OS detection: Windows 2.x, 3.x, 95/98 */
+
+      {
+         regs.HB_XREGS.ax = 0x1600;
+         HB_DOS_INT86( 0x2F, &regs, &regs );
+
+         if( regs.h.al != 0x00 && regs.h.al != 0x80 )
+         {
+            char szHost[ 128 ];
+
+            if( regs.h.al == 0x01 || regs.h.al == 0xFF )
+               sprintf( szHost, " (Windows 2.x)" );
+            else
+               sprintf( szHost, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+
+            strcat( pszPlatform, szHost );
+         }
+      }
+
+      /* Host OS detection: Windows NT/2000 */
+
+      {
+         regs.HB_XREGS.ax = 0x3306;
+         HB_DOS_INT86( 0x21, &regs, &regs );
+
+         if( regs.HB_XREGS.bx == 0x3205 )
+            strcat( pszPlatform, " (Windows NT/2000)" );
+      }
+
+      /* Host OS detection: OS/2 */
+
+      {
+         regs.h.ah = 0x30;
+         HB_DOS_INT86( 0x21, &regs, &regs );
+
+         if( regs.h.al >= 10 )
+         {
+            char szHost[ 128 ];
+
+            if( regs.h.al == 20 && regs.h.ah > 20 )
+               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+            else
+               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+
+            strcat( pszPlatform, szHost );
+         }
+      }
+   }
+
+#elif defined(HB_OS_OS2)
+
+   {
+      unsigned long aulQSV[ QSV_MAX ] = { 0 };
+      APIRET rc;
+
+      rc = DosQuerySysInfo( 1L, QSV_MAX, ( void * ) aulQSV, sizeof( ULONG ) * QSV_MAX );
+
+      if( rc == 0 )
+      {
+         /* is this OS/2 2.x ? */
+         if( aulQSV[ QSV_VERSION_MINOR - 1 ] < 30 )
+         {
+            sprintf( pszPlatform, "OS/2 %ld.%02ld",
+               aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10,
+               aulQSV[ QSV_VERSION_MINOR - 1 ] );
+         }
+         else
+            sprintf( pszPlatform, "OS/2 %2.2f",
+               ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
+      }
+      else
+         sprintf( pszPlatform, "OS/2" );
+   }
+
+#elif defined(HB_OS_WIN_32)
+
+   {
+      OSVERSIONINFO osVer;
+
+      osVer.dwOSVersionInfoSize = sizeof( osVer );
+
+      if( GetVersionEx( &osVer ) )
+      {
+         char * pszName = "Windows";
+
+         switch( osVer.dwPlatformId )
+         {
+            case VER_PLATFORM_WIN32_WINDOWS:
+
+               if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
+                  pszName = "Windows 95";
+               else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
+                  pszName = "Windows 98";
+               else
+                  pszName = "Windows ME";
+
+               break;
+
+            case VER_PLATFORM_WIN32_NT:
+
+               if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
+                  pszName = "Windows XP";
+               else if( osVer.dwMajorVersion == 5 )
+                  pszName = "Windows 2000";
+               else
+                  pszName = "Windows NT";
+
+               break;
+
+            case VER_PLATFORM_WIN32s:
+               pszName = "Windows 32s";
+               break;
+
+            case VER_PLATFORM_WIN32_CE:
+               pszName = "Windows CE";
+               break;
+         }
+
+         sprintf( pszPlatform, "%s %lu.%02lu.%04d",
+            pszName,
+            ( ULONG ) osVer.dwMajorVersion,
+            ( ULONG ) osVer.dwMinorVersion,
+            ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
+
+         /* Add service pack/other info */
+
+         if( osVer.szCSDVersion )
+         {
+            int i;
+
+            /* Skip the leading spaces (Win95B, Win98) */
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( int ) osVer.szCSDVersion[ i ] ); i++ );
+
+            if( osVer.szCSDVersion[ i ] != '\0' )
+            {
+               strcat( pszPlatform, " " );
+               strcat( pszPlatform, osVer.szCSDVersion + i );
+            }
+         }
+      }
+      else
+         sprintf( pszPlatform, "Windows" );
+   }
+
+#elif defined(HB_OS_UNIX)
+
+   {
+      struct utsname un;
+
+      uname( &un );
+
+      sprintf( pszPlatform, "%s %s", un.sysname, un.release );
+   }
+
+#elif defined(HB_OS_MAC)
+
+   {
+      strcpy( pszPlatform, "MacOS compatible" );
+   }
+
+#else
+
+   {
+      strcpy( pszPlatform, "(unknown)" );
+   }
+
+#endif
+
+   return pszPlatform;
+}
+
 void hb_pp_Init( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_Init()"));
@@ -397,6 +612,35 @@ void hb_pp_Init( void )
        hb_pp_aCondCompile = ( int * ) hb_xgrab( sizeof( int ) * 5 );
 
    hb_pp_nCondCompile = 0;
+
+   {
+      char sOS[64];
+      char sVer[64];
+      char * szPlatform = hb_ppPlatform();
+      char * pSpace = strchr( szPlatform, ' ' );
+
+      sOS[0] = 0;
+      sVer[0] = '"';
+      sVer[1] = 0;
+
+      strcat( (char *) sOS, "__PLATFORM__" );
+
+      if( pSpace )
+      {
+         strncat( (char *) sOS, szPlatform, pSpace - szPlatform );
+         strcat( (char *) sVer, pSpace + 1 );
+         strcat( (char *) sVer, "\"" );
+      }
+      else
+      {
+         strcat( (char *) sOS, szPlatform );
+         strcat( (char *) sVer, "\"" );
+      }
+
+      hb_pp_AddDefine( (char *) sOS, (char *) sVer );
+
+      hb_xfree( szPlatform );
+   }
 
    {
       char szResult[ 6 ];

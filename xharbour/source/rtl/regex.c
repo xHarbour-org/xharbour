@@ -57,6 +57,8 @@ restrictions:
  *
  */
 
+#include "hbapi.h"
+
 /* Begin of maketables.c */
 
 /* This file is compiled on its own as part of the PCRE library. However,
@@ -6320,8 +6322,6 @@ else
 /* End of pcreposix.c */
 
 /* Ron Pinkas - Begin of additions. */
-
-#include "hbapi.h"
 
 HB_FUNC( HB_ATX )
 {

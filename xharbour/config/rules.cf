@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.16 2000/03/06 03:43:04 vszel Exp $
+# $Id: rules.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 # How to run yacc.
@@ -42,6 +42,7 @@ ifeq ($(SOURCE_DIR),)
 SOURCE_DIR = $(GRANDP)
 endif
 
+# .C
 # BCC (at least version 3.1) requires that the output file be listed ahead of the input file
 ifeq ($(CC),bcc)
 # Rule to generate an object file from a C source file in the parent.

@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.6 2000/08/30 22:05:48 vszel Exp $
+# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 all : first
@@ -26,7 +26,11 @@ ARCH_DOS = $(subst /,\,$(ARCH))
 MK := $(subst \,/,$(subst \~,~,$(MAKE)))
 
 ifeq ($(COMSPEC),) #location of command.com
-  COMSPEC := command.com
+  ifeq ($(OS),Windows_NT)
+    COMSPEC := cmd.exe
+  else
+    COMSPEC := command.com
+  endif
 endif
 
 RM = del
@@ -41,6 +45,7 @@ dirbase::
 
 clean::
 	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f
+	-for %%f in ($(ARCH_DOS)\*.*) do $(RM) %%f
 	-if exist *.bak $(RM) *.bak
 	-if exist *.obj $(RM) *.obj
 	-if exist core $(RM) core

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.18 2002/08/27 20:16:10 horacioroldan Exp $
+ * $Id: filesys.c,v 1.19 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -1165,7 +1165,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
          __NTerror();
       #endif
    s_uiErrorLast = errno;
-   
+
 #elif defined(HAVE_POSIX_IO)
 
    errno = 0;
@@ -1306,7 +1306,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
             break;
 
          case FL_UNLOCK:
-            bResult = ( _locking( hFileHandle, _LK_UNLOCK, ulLength ) == 0 );
+            bResult = ( _locking( hFileHandle, _LK_UNLCK, ulLength ) == 0 );
             break;
 
          default:

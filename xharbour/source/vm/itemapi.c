@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.27 2002/10/25 07:59:27 andijahja Exp $
+ * $Id: itemapi.c,v 1.28 2002/11/11 04:22:49 walito Exp $
  */
 
 /*
@@ -1299,9 +1299,11 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                s_dInfinity = -log( ( double ) 0 );
                hb_mathSetHandler (fOldMathHandler);
                s_bInfinityInit = TRUE;
-
-
             }
+            #endif
+
+            #if defined(__MINGW32__)
+               sprintf( szResult, "%f", dNumber );
             #endif
 
             /* TODO: look if isinf()/_isinf or finite()/_finite() does exist for your compiler and add this to the check
@@ -1316,6 +1318,8 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   always sets the return value to 0.0, switching this off, see above, yields -INF for log(0);
                   additionally one can use _finite() to check for infinity [martin vogel] */
                || dNumber == s_dInfinity || dNumber == -s_dInfinity || _finite(dNumber)==0
+            #elif defined(__MINGW32__)
+               || dNumber == s_dInfinity || dNumber == -s_dInfinity || strstr( szResult, "#IND" )
             #elif defined(__DJGPP__)
                || !finite( dNumber ) || dNumber == s_dInfinity || dNumber == -s_dInfinity
             #elif defined(__linux__)

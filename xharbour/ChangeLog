@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.524 2002/12/13 10:23:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.525 2002/12/13 20:06:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-15 15:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * config/w32/global.cf
+    * Minor corrections.
+
+  * include/regex.h
+    - Commented out definitions for BOOL, TRUE, FALSE
+
+  * source/rtl/Makefile
+    + Added win32ole.prg
+
+  * bin/bld.bat
+    * Added missing libs to MINGW32 section.
+
+  * source/pp/ppcore.c
+    + Added hb_ppPlatform() based on code from hb_verPlatform()
+    + Added support for auto-defined __PLATFORM__... ... where ... is first word from hb_ppPlatform() // Need to correct OS/2 and check L*x.
+
+  * source/rtl/set.c
+  * source/rtl/console.c
+  * source/rtl/tprint.cpp
+    + added && (!defined(__MINGW32__)) guards arounf Windows specific function calls that are not yet setup for MingW32.
+
+    /* Anyone knows how to add tprint.cpp to source/rtl/Makefile so we can fix this FIX this!!! */
+
+  * source/rtl/filesys.c
+    ! Corrected _LK_UNLOCK to _LK_UNLCK within __MINGW32__ guard.
+
+  * source/rtl/regex.c
+    Moved #include "hbapi.h" to top.
+
+  * source/rtl/win32ole.prg
+    + Added #ifndef __PLTAFORM_Windows guard so we may have CreateObject() and GetActiveObject() return NIL on NON Windows platforms.
+
+  * source/vm/itemapi.c
+    ! Fixed GPF in MingW32 build for Str(Log(-1))
+
+    /* Can someone more familiar with match exceptions review this
+       - Log(-1) returns 1.IND#00, this was the quickest way for me to fix this. */
+
+    /* Under MingW we have 111 failing tests - this is related to Log(-1) Sqr(-1) upper() and lower()
+       can anybody review this... (Paul?) */
 
 2002-12-13 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
