@@ -810,7 +810,11 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
                     
     if ! ::NetErr().and. nField >= 1 .and. nField <= ::nFields .and. ! ::lclosed
         
-        result := PQgetvalue( ::pQuery, iif( ISNIL(nRow), ::nRecno, nRow), nField)
+        if ISNIL(nRow)
+            nRow := ::nRecno
+        endif
+                    
+        result := PQgetvalue( ::pQuery, nRow, nField)
         cType := ::aStruct[ nField, 2 ] 
         nSize := ::aStruct[ nField, 3 ] 
                                     
@@ -840,6 +844,10 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
             end
             
         elseif cType == "C"
+            if Empty(nSize)
+                nSize := PQgetLength(::pQuery, nRow, nField)
+            endif
+                            
             if ISNIL(result)
                 result := Space(nSize)
             else
