@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.31 2004/02/08 13:00:08 lculik Exp $
+   $Id: xwt_gtk.c,v 1.32 2004/08/21 17:27:14 lf_sfnet Exp $
 
    Global declarations, common functions
 
@@ -25,7 +25,7 @@
 /*
  Static function to change an color of an widget for buttons,checkboxes/radios and others
 */
-void widget_set_color(GtkWidget* entry,GdkColor* color,int 
+void widget_set_color(GtkWidget* entry,GdkColor* color,int
 component)
 
 {
@@ -202,11 +202,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
             case XWT_TYPE_IMAGE:
             return xwt_gtk_imageLoad( wWidget, prop->value.text );
-	    	    
+
             case XWT_TYPE_PROGRESSBAR:
                gtk_progress_bar_set_text(GTK_PROGRESS_BAR (wSelf), prop->value.text );
                return TRUE;
-   
+
 
             case XWT_TYPE_GRID: case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
                if ( wSelf != wMain )
@@ -240,7 +240,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          {
             case XWT_VIS_HIDDEN:
 	       if(  wWidget->type ==XWT_TYPE_CALENDAR)
-	       { 
+	       {
 	         PXWT_GTK_CALENDAR itm = (PXWT_GTK_CALENDAR) wWidget->widget_data ;
                  gtk_widget_hide( GTK_WIDGET(itm->window ));
 	       }
@@ -454,7 +454,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          gtk_file_selection_set_filename(GTK_FILE_SELECTION(wMain), prop->value.text);
          return TRUE;
 //      case XWT_PROP_FONTNAME:
-      
+
 
       case XWT_PROP_ATTACH:
 
@@ -633,10 +633,10 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 	       PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
 		gtk_widget_modify_font(GTK_WIDGET(itm->label),font_desc);
 		pango_font_description_free (font_desc);
-		
+
 	       break;
-	    }	
-        }		
+	    }
+        }
 	 return TRUE;
    }
    return FALSE;
@@ -672,7 +672,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
         return TRUE;
    }
-    
+
          case XWT_PROP_BGCOLOR:
       {
         GdkColor color;
@@ -697,7 +697,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 ;
 /*	        gtk_widget_modify_bg (wSelf, GTK_STATE_NORMAL, &color);
 */
-	    }	    
+	    }
             break;
 
          }
@@ -717,19 +717,19 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
 		widget_set_color(wSelf, &color,BASECOLOR);
-	    
+
 		break;
             case XWT_TYPE_LABEL:
 	    	widget_set_color(wMain, &color,BASECOLOR);
 
-	    break;	    
+	    break;
 	    case XWT_TYPE_MENUITEM:
 	    {
 //	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
 	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
 		widget_set_color(itm->label, &color,BASECOLOR);
 }
-	    	    
+
             break;
 
          }
@@ -741,32 +741,32 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       switch ( prop->value.number )
       {
       case 0:
-         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf),
                       GTK_PROGRESS_LEFT_TO_RIGHT);
 
       case 1:
-         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf),
                       GTK_PROGRESS_RIGHT_TO_LEFT);
 
       case 2:
-         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf),
                       GTK_PROGRESS_BOTTOM_TO_TOP);
 
       case 3:
-         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf),
                       GTK_PROGRESS_TOP_TO_BOTTOM);
 
       }
       return TRUE;
-      case XWT_PROP_SETCOMBOITEMS:  
+      case XWT_PROP_SETCOMBOITEMS:
           xwt_gtk_ComboAddItem(wWidget,(PHB_ITEM) prop->value.data);
 	  return TRUE;
-      case XWT_PROP_SETLISTITEMS:  
+      case XWT_PROP_SETLISTITEMS:
           xwt_gtk_ListAddItem(wWidget,(PHB_ITEM) prop->value.data);
 	  return TRUE;
 
 //      case XWT_PROP_SETCOMBOEDIT:
-         
+
 
       case XWT_PROP_PROGRESSFRAC:
          gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR (wSelf),prop->value.number);
@@ -781,7 +781,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	{    
+	{
 	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
     		widget_set_color(child, &color,FGCOLOR)
 ;
@@ -821,7 +821,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
    // GTK always return static data
    prop->bStatic = TRUE;
-   
+
    switch( prop->type )
    {
       case XWT_PROP_FOCUS:
@@ -943,7 +943,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TEXTBOX:
                prop->value.text = gtk_entry_get_text (GTK_ENTRY(wMain) );
             return TRUE;
-	    
+
 	    case XWT_TYPE_COMBOBOX:
     	       prop->value.text= gtk_entry_get_text (GTK_ENTRY( GTK_COMBO(wSelf)->entry ));
 	    return TRUE;
@@ -1095,7 +1095,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
-      case XWT_PROP_GETDATEMODAL:        
+      case XWT_PROP_GETDATEMODAL:
          if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
          {
 	    gtk_XwtCalendar_GetDate( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf),&prop->year, &prop->month, &prop->day);
@@ -1110,7 +1110,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
-      case XWT_PROP_GETDATE:        
+      case XWT_PROP_GETDATE:
             gtk_calendar_get_date (GTK_CALENDAR( wSelf ),&prop->year, &prop->month, &prop->day);
          return TRUE;
 
@@ -1122,8 +1122,8 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
-      
-      
+
+
 
       case XWT_PROP_BOX:
          if( wWidget->type == XWT_TYPE_LAYOUT ||  wWidget->type == XWT_TYPE_PANE || wWidget->type == XWT_TYPE_GRID )
@@ -1324,7 +1324,7 @@ BOOL xwt_drv_quit()
 
 gboolean xwt_idle_function( gpointer data )
 {
-   hb_idleState();
+   hb_idleState( 0 );
    return TRUE;
 }
 

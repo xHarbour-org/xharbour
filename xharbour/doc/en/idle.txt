@@ -1,5 +1,5 @@
 /*
- * $Id: idle.txt,v 1.5 2000/11/02 22:33:00 lculik Exp $
+ * $Id: idle.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
 */
 
 /*  $DOC$
@@ -28,8 +28,13 @@
  *
  *      For signaling the idle state from C code see the hb_idleState()
  *      API function.
+ *
+ *      For altering the way the CPU is released see HB_IDLESLEEPMSEC()
+ *      and HB_IDLEWAITNOCPU()
+ *
  *  $SEEALSO$
- *      HB_IDLEADD(),HB_IDLEDEL()
+ *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESTATE(),HB_IDLESLEEPMSEC(),
+ *      HB_IDLEWAITNOCPU()
  *  $END$
  */
 
@@ -64,7 +69,7 @@
  *  $FILES$
  *      source/rtl/idle.c
  *  $SEEALSO$
- *      HB_IDLEDEL(),HB_IDLESTATE()
+ *      HB_IDLEDEL(),HB_IDLESTATE(),HB_IDLESLEEPMSEC(),HB_IDLEWAITNOCPU()
  *  $END$
  */
 
@@ -103,19 +108,19 @@
  *  $FILES$
  *      source/rtl/idle.c
  *  $SEEALSO$
- *      HB_IDLEADD(),HB_IDLESTATE()
+ *      HB_IDLEADD(),HB_IDLESTATE(),HB_IDLESLEEPMSEC(),HB_IDLEWAITNOCPU()
  *  $END$
  */
 
 /*  $DOC$
  *  $FUNCNAME$
- *      HB_IdleState()
+ *      HB_IDLESTATE()
  *  $CATEGORY$
  *      The idle states
  *  $ONELINER$
  *      Evaluates a single background task and calls the garbage collector.
  *  $SYNTAX$
- *      HB_IDLESTATE()
+ *      HB_IDLESTATE( bIndefinite )
  *  $ARGUMENTS$
  *      None
  *  $RETURNS$
@@ -129,6 +134,10 @@
  *
  *      This function can be safely called even if there are no background
  *      tasks defined.
+ *
+ *      See description of hb_idleState() "C" function below for
+ *      details of bIndefinite parameter
+ *
  *  $EXAMPLES$
  *      nTask1 := HB_IDLEADD( {|| SayTime()} )
  *      nTask2 := HB_IDLEADD( {|| SaveScreen()} )
@@ -148,7 +157,7 @@
  *  $FILES$
  *      source/rtl/idle.c
  *  $SEEALSO$
- *      HB_IDLEADD(),HB_IDLEDEL()
+ *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESLEEPMSEC(),HB_IDLEWAITNOCPU()
  *  $END$
  */
 
@@ -160,7 +169,7 @@
  *  $ONELINER$
  *      Evaluates a single background task and calls the garbage collector.
  *  $SYNTAX$
- *      void hb_idleState( void );
+ *      void hb_idleState( BOOL bIndefinite );
  *  $ARGUMENTS$
  *      None
  *  $RETURNS$
@@ -172,8 +181,11 @@
  *      platforms that require it.
  *
  *      Every call for this function evaluates different task in the
- *      order of task creation. There are no arguments passed during
- *      codeblock evaluation.
+ *      order of task creation.
+ *
+ *      The argument bIndefinite is passed onto hb_releaseCPU(). This
+ *      determines if the operating system WaitMessage() function is used
+ *      for the Sleep state. See HB_IDLEWAITNOCPU(),
  *
  *      This function can be safely called even if there are no background
  *      tasks defined.
@@ -186,6 +198,83 @@
  *  $FILES$
  *      source/rtl/idle.c
  *  $SEEALSO$
- *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESTATE()
+ *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESTATE(),HB_IDLESLEEPMSEC(),
+ *      HB_IDLEWAITNOCPU()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_IDLESLEEPMSEC()
+ *  $CATEGORY$
+ *      The idle states
+ *  $ONELINER$
+ *      Allows tuning of the number of MilliSeconds to Sleep during idle state
+ *  $SYNTAX$
+ *      HB_IDLESLEEPMSEC( <nMilliSeconds> ) --> nMilliSecondsPrevious
+ *  $ARGUMENTS$
+ *      <nMilliSeconds> is the number of milli-seconds to sleep during each
+ *      hb_idlestate() call
+ *  $RETURNS$
+ *      <nMilliSecondsPrevious> the number of milli-seconds of sleep time currently
+ *      set ( before being reset by this call if <nMilliSeconds> is passed )
+ *
+ *  $DESCRIPTION$
+ *      This function allows you to tune the sleep time on the platform you are
+ *      using to optomise CPU usage. It is particularly useful on a multi-user
+ *      system such as Linux or Windows Terminal Server where the minimum amount
+ *      of background processing is desirable
+ *  $EXAMPLES$
+ *      ? HB_IDLESLEEPMSEC()
+ *      nOldMSec := HB_IDLESLEEPMSEC( 50 )
+ *      INKEY(10)
+ *      HB_IDLESLEEPMSEC( nOldMSec )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/idle.c
+ *  $SEEALSO$
+ *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESTATE(),HB_IDLEWAITNOCPU(),
+ *      HB_IDLESLEEPMSEC()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_IDLEWAITNOCPU()
+ *  $CATEGORY$
+ *      The idle states
+ *  $ONELINER$
+ *      Allows most efficient idle sleep state to be used by operating system
+ *  $SYNTAX$
+ *      HB_IDLEWAITNOCPU( <bNewState> ) -->  bOldState
+ *  $ARGUMENTS$
+ *      <bNewState> is .T. or .F.. If .T. then hb_releaseCPU() will use the OS
+ *      efficient idle sleep state - but only if implemented on that platform
+ *  $RETURNS$
+ *      <bOldState> the state before being reset by this call
+ *
+ *  $DESCRIPTION$
+ *      This function tells hb_releaseCPU() to use the most efficient sleep state
+ *      so that the minimum CPU cycles are wasted. If idle tasks have been added
+ *      with HB_IDLEADD() then the setting of this state will be ignored. The
+ *      setting will only by used with INKEY() when called with INKEY( 0 )
+ *  $EXAMPLES$
+ *      ? HB_IDLEWAITNOCPU()
+ *      bOldState := HB_IDLEWAITNOCPU( .T. )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/idle.c
+ *  $SEEALSO$
+ *      HB_IDLEADD(),HB_IDLEDEL(),HB_IDLESTATE(),HB_IDLEWAITNOCPU()
  *  $END$
  */

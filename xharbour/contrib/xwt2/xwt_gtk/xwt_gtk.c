@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.3 2004/05/20 15:41:38 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -248,7 +248,7 @@ BOOL xwt_gtk_disconnect( PXWT_WIDGET wWidget )
 
 gboolean xwt_idle_function( gpointer data )
 {
-   hb_idleState();
+   hb_idleState( 0 );
    return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.15 2004/02/23 00:53:50 peterrees Exp $
+ * $Id: idle.c,v 1.16 2004/04/28 18:30:40 druzus Exp $
  */
 
 /*
@@ -95,23 +95,62 @@ static USHORT s_uiIdleTask = 0;
 /* number of tasks in the list */
 static USHORT s_uiIdleMaxTask = 0;
 
+#ifdef HB_THREAD_SUPPORT || defined(HB_OS_UNIX)
+   #define HB_IDLE_MSEC_DEFAULT 10
+#else
+   #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
+      #define HB_IDLE_MSEC_DEFAULT 20
+   #else
+      #define HB_IDLE_MSEC_DEFAULT 1
+   #endif
+#endif
+/* sleep idle time in milli-seconds */
+static USHORT s_uiIdleSleepMsec = HB_IDLE_MSEC_DEFAULT;
+/* indicates if OS wait state is to be used instead of sleep() type function */
+static int s_iIdleWaitNoCpu = 0;
+
 /* flag to indicate GarbageCollection should be done in idle state. */
 BOOL hb_vm_bCollectGarbage = TRUE;
 
-static void hb_releaseCPU( void )
+
+static USHORT hb_idleSleepMsec( USHORT uiMsec )
 {
+   USHORT uiWas = s_uiIdleSleepMsec;
+   HB_TRACE(HB_TR_DEBUG, ( "hb_idleSleepMsec(%d)", uiMsec));
+   s_uiIdleSleepMsec= uiMsec;
+   return( uiWas );
+}
+
+static int hb_idleWaitNoCpu( int iUseIt )
+{
+   int iWas = s_iIdleWaitNoCpu;
+   HB_TRACE(HB_TR_DEBUG, ( "hb_idleWaitNoCpu(%d)", iUseIt));
+   s_iIdleWaitNoCpu= iUseIt;
+   return( iWas );
+}
+
+
+static void hb_releaseCPU( BOOL bIndefinite )
+{
+   BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */
    HB_TRACE(HB_TR_DEBUG, ("releaseCPU()"));
 
    /* TODO: Add code to release time slices on all platforms */
 #ifdef HB_THREAD_SUPPORT
-   hb_threadSleep( 10 );
+   hb_threadSleep( s_uiIdleSleepMsec, bIdleWaitNoCpu );
 
 #else
 
    #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
       /* Forfeit the remainder of the current time slice. */
-      Sleep( 20 );
-
+      if ( bIdleWaitNoCpu )
+      {
+         WaitMessage() ;
+      }
+      else
+      {
+         Sleep( s_uiIdleSleepMsec );
+      }
    #elif defined(HB_OS_OS2)
       /* 23/nov/2000 - maurilio.longo@libero.it
          Minimum time slice under OS/2 is 32 milliseconds, passed 1 will be rounded to 32 and
@@ -119,7 +158,7 @@ static void hb_releaseCPU( void )
          Passing 0 causes current thread to give up its time slice only if there are threads of
          equal priority waiting to be dispatched. Note: certain versions of OS/2 kernel have a
          bug which causes DosSleep(0) not to work as expected.  */
-      DosSleep( 1 ); /* Duration is in milliseconds */
+      DosSleep( s_uiIdleSleepMsec ); /* Duration is in milliseconds */
 
    #elif defined(HB_OS_DOS)
 
@@ -144,10 +183,15 @@ static void hb_releaseCPU( void )
       }
 
    #elif defined(HB_OS_DARWIN)
-      usleep( 1 );
+      usleep( s_uiIdleSleepMsec );
    #elif defined(HB_OS_UNIX)
    {
       static struct timespec nanosecs = { 0, 1000 };
+      /* Copied from /vm/thread.c */
+/*
+      nanosecs.tv_sec = s_uiIdleSleepMsec / 1000;
+      nanosecs.tv_nsec = ( s_uiIdleSleepMsec  % 1000) * 1000000;
+*/
       /* NOTE: it will sleep at least 10 miliseconds (forced by kernel) */
       nanosleep( &nanosecs, NULL );
    }
@@ -160,7 +204,7 @@ static void hb_releaseCPU( void )
 }
 
 /* performs all tasks defined for idle state */
-void hb_idleState( void )
+void hb_idleState( BOOL bIndefinite )
 {
    if( ! s_bIamIdle )
    {
@@ -192,7 +236,7 @@ void hb_idleState( void )
             s_uiIdleTask = 0;
             hb_vm_bCollectGarbage = TRUE;
          }
-         hb_releaseCPU();
+         hb_releaseCPU( bIndefinite );
       }
       s_bIamIdle = FALSE;
    }
@@ -238,7 +282,7 @@ void hb_idleSleep( double dSeconds )
    while( clock() < end_clock )
 #endif
    {
-      hb_idleState();
+      hb_idleState( FALSE );
    }
    hb_idleReset();
 }
@@ -246,7 +290,7 @@ void hb_idleSleep( double dSeconds )
 /* signal that the user code is in idle state */
 HB_FUNC( HB_IDLESTATE )
 {
-   hb_idleState();
+   hb_idleState( ( int ) hb_parl( 1 ) );
 }
 
 /* call from user code to reset idle state */
@@ -372,5 +416,23 @@ HB_FUNC( HB_IDLEDEL )
    else
    {
       hb_itemReturn( pItem ); /* return a codeblock */
+   }
+}
+
+HB_FUNC( HB_IDLESLEEPMSEC )
+{
+   hb_retnl( s_uiIdleSleepMsec );
+   if ( hb_pcount() > 0 )
+   {
+      s_uiIdleSleepMsec = ( USHORT ) hb_parnl( 1 );
+   }
+}
+
+HB_FUNC( HB_IDLEWAITNOCPU )
+{
+   hb_retnl( ( LONG ) s_iIdleWaitNoCpu );
+   if ( hb_pcount() > 0 )
+   {
+      s_iIdleWaitNoCpu = ( int ) hb_parnl( 1 );
    }
 }

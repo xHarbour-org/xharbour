@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.37 2004/05/07 21:38:40 likewolf Exp $
+ * $Id: inkey.c,v 1.38 2004/06/23 10:23:48 bdj Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
                   return 0;
                }
 
-               hb_idleState();
+               hb_idleState( TRUE );
             }
             hb_idleReset();
          }
@@ -225,7 +225,7 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
             {
                return 0;
             }
-            hb_idleState();
+            hb_idleState( FALSE );
          }
          hb_idleReset();
       }

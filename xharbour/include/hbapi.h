@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.147 2004/11/21 21:43:36 druzus Exp $
+ * $Id: hbapi.h,v 1.148 2004/11/26 17:46:25 druzus Exp $
  */
 
 /*
@@ -486,7 +486,7 @@ extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg,
    {\
 */
 extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
-extern HB_EXPORT USHORT   hb_objGetClass( PHB_ITEM pItem ); 
+extern HB_EXPORT USHORT   hb_objGetClass( PHB_ITEM pItem );
 
 /* dynamic symbol table management */
 
@@ -635,7 +635,7 @@ extern char   HB_EXPORT * hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* dete
 extern char   HB_EXPORT * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
 /* idle states */
-extern void     hb_idleState( void ); /* services a single idle state */
+extern void     hb_idleState( BOOL bIndefinite ); /* services a single idle state */
 extern void     hb_idleReset( void ); /* reset idle state routine count*/
 extern void     hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */
 

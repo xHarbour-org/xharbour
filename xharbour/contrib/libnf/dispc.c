@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.2 2003/10/09 05:31:55 paultucker Exp $
+ * $Id: dispc.c,v 1.3 2004/03/18 03:46:55 ronpinkas Exp $
  */
 
 /*
@@ -912,7 +912,7 @@ static int keyin()
         ch = hb_inkeyTranslate( hb_gtReadKey( ( HB_inkey_enum ) 0 ), ( HB_inkey_enum ) 0);
         if (ch == 257)   /* error compiling with bcc55 */
            ch = 27;      /* ESC with CapsLock ON = 257, with CapsLock OFF = 27 */
-        hb_idleState();
+        hb_idleState( 0 );
     }
 
 

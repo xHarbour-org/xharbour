@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3642 2004/11/30 21:58:55 ath1 Exp $
+ * $Id: ChangeLog,v 1.3643 2004/12/01 00:18:57 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-12-01 13:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /include/thread.h
+  * /source/vm/thread.c
+    - change hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu );
+    - added support for WaitMessage() under Windows
+         support for other OS still TODO
+  * /include/hbapi.h
+  * /contrib/libnf/dispc.c
+  * /contrib/xwt/src/xwt_gtk/xwt_gtk.c
+  * /contrib/xwt2/src/xwt_gtk/xwt_gtk.c
+  * /source/rtl/inkey.c
+    - change hb_idleState( BOOL bIndefinite )  - added parameter
+  * /doc/en/idle.txt
+  * /source/rtl/idle.c
+    + HB_FUNC( HB_IDLESLEEPMSEC )  See /doc/en/idle.txt
+    + HB_FUNC( HB_IDLEWAITNOCPU )  - allows use of WaitMessage() under Windows
+                                     support for other OS still TODO
+  * /doc/en/idle.txt
+    + updated doc for new IDLE functions
+
 2004-12-01 13:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /include/regex.h
   * /source/rtl/regex.c

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.96 2004/11/01 05:38:09 likewolf Exp $
+* $Id: thread.h,v 1.97 2004/11/02 23:07:48 paultucker Exp $
 */
 
 /*
@@ -332,7 +332,7 @@ extern PPVOID hb_dwCurrentStack;
 	    pthread_mutex_lock( &((x).lock) ); \
             (x).owner = self; \
          } \
-      }   
+      }
    #define HB_CRITICAL_UNLOCK( x ) \
       { \
 	 if ( pthread_equal( (x).owner, pthread_self() ) ) \
@@ -348,7 +348,7 @@ extern PPVOID hb_dwCurrentStack;
             } \
 	 } \
       }
-	 
+
    #define HB_CRITICAL_TRYLOCK( x ) \
       ( pthread_equal( pthread_self(), (x).owner ) \
         ? ( (x).count++, TRUE ) \
@@ -758,7 +758,7 @@ extern int hb_threadCountStacks( void );
 extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
 extern void hb_threadWaitAll( void );
 extern void hb_threadKillAll( void );
-extern void hb_threadSleep( int millisec );
+extern void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu );
 extern void hb_mutexForceUnlock( void *);
 extern void hb_rawMutexForceUnlock( void *);
 extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );

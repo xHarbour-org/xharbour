@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.177 2004/09/02 03:11:39 walito Exp $
+* $Id: thread.c,v 1.178 2004/11/01 05:38:12 likewolf Exp $
 */
 
 /*
@@ -751,7 +751,7 @@ void hb_threadIsLocalRef( void )
             hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }
       }
-      
+
       // stack memvars:
       hb_memvarsIsMemvarRef( pStack );
 
@@ -881,7 +881,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
       {
          int oldstate;
 
-         /* The second parameter is not optional in Darwin! */	 
+         /* The second parameter is not optional in Darwin! */
 	 pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, &oldstate );
       }
       /* pop cleanup; also calls the cleanup function */
@@ -991,7 +991,7 @@ void hb_threadTerminator( void *pData )
    {
       int oldstate;
 
-      /* The second parameter is not optional in Darwin! */	 
+      /* The second parameter is not optional in Darwin! */
       pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, &oldstate );
    }
 #endif
@@ -2559,7 +2559,7 @@ HB_FUNC( NOTIFYALL )
 /* Part 7: Xharbour thread functions available in ST mode         */
 /******************************************************************/
 
-void hb_threadSleep( int millisec )
+void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
 {
    HB_THREAD_STUB
 
@@ -2586,7 +2586,14 @@ void hb_threadSleep( int millisec )
 
    #elif defined(HB_OS_WIN_32)
       HB_TEST_CANCEL_ENABLE_ASYN;
-      Sleep( millisec );
+      if ( bIdleWaitNoCpu )
+      {
+         WaitMessage() ;
+      }
+      else
+      {
+         Sleep( millisec );
+      }
       HB_DISABLE_ASYN_CANC;
    #else
       /* Note: delay() in <dos.h> for DJGPP does not work and
@@ -2607,7 +2614,7 @@ HB_FUNC( THREADSLEEP )
       return;
    }
 
-   hb_threadSleep( hb_parni( 1 ) );
+   hb_threadSleep( hb_parni( 1 ), hb_parl( 2 ) );
 }
 
 HB_FUNC( SECONDSSLEEP )
@@ -2623,7 +2630,7 @@ HB_FUNC( SECONDSSLEEP )
    }
 
    sleep = (int) (hb_parnd( 1 ) * 1000.0);
-   hb_threadSleep( sleep );
+   hb_threadSleep( sleep, FALSE );
 }
 
 /* Become thread inspector */
