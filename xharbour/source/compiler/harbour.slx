@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.41 2003/11/01 06:00:54 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.42 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -595,6 +595,8 @@ LANGUAGE_RULES_ARE {
          } \
          else \
          { \
+            szBuffer --; \
+            szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
             iSize = 0; \
             return LITERAL + DONT_REDUCE; \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1844 2003/12/10 18:35:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1845 2003/12/10 23:16:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-12-11 12:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/pp/ppcore.c
+    * Increase MAX_EXP to 4096 (previously 2048) to enable pp to process longer
+      codes (else harbour.exe will GPF ). Actually, this is an ugly hack, a much
+      more elegant solution would be a pp error trapper when codes processed is
+      bigger than MAX_EXP. (Per Toninho's report)
+  * source/compiler/harbour.slx
+    * Minor changes to print correct error message upon unterminated string.
+      (Per Patrick Mast report)
 
 2003-12-10 15:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg

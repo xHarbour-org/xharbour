@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.102 2003/12/03 13:01:21 mauriliolongo Exp $
+ * $Id: ppcore.c,v 1.103 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ int hb_pp_NextToken( char** pLine, char *sToken );
 #define IS_ESC_STRING( c ) ( toupper( c ) == 'E' && (&c)[1] == '\"' )
 /** END **/
 #define MAX_NAME     255
-#define MAX_EXP      2048
+#define MAX_EXP      4096
 #define PATTERN_SIZE HB_PP_STR_SIZE
 #define MAX_CICLES   256
 
