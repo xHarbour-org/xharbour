@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2761 2004/04/06 09:58:21 andijahja Exp $
+ * $Id: ChangeLog,v 1.2762 2004/04/06 19:16:00 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-07 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + make_w32.bat
+  + makefile.wc
+    ! makefiles for Open-Watcom (Windows 32bit only)
+
 2004-04-06 16:30 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * utils/hbmake/hbmake.prg
     utils/hbmake/pickarry.prg
