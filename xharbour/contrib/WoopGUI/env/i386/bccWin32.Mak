@@ -13,7 +13,7 @@ hbcflags  = -n -w -es2 -i$(WG_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
 #-- C COMPILER ----------
 cc      = $(BCC_DIR)\BIN\bcc32
 cdebug  = 
-cflags  = -tWM -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -d -a8 -OS -O2 -c -w-8075 -I$(WG_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
+cflags  = -tW -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -d -a8 -OS -O2 -c -w-8075 -I$(WG_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
 #cflags  = -tWM -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -d -a8 -OS -O2 -5 -c -w-8075 -I$(WG_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
 #cflags  = -tWM -DHB_API_MACROS -M -O2 -c -w-8075 -I$(WG_DIR)\include;$(HBR_DIR)\include;$(BCC_DIR)\include
 #cflags  = -tWM -5 -c -I$(WG_DIR)\include;$(BCC_DIR)\include
