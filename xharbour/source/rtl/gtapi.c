@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.25 2004/02/07 20:06:35 andijahja Exp $
+ * $Id: gtapi.c,v 1.26 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -206,6 +206,10 @@ void hb_gtExit( void )
 
       hb_gt_Exit();
 
+      if ( s_pOnClose != NULL )
+      {
+         hb_itemRelease( s_pOnClose );
+      }
       hb_xfree( s_pColor );
    }
 
