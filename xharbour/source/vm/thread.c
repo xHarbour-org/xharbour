@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.57 2003/03/07 10:36:01 likewolf Exp $
+* $Id: thread.c,v 1.58 2003/03/08 02:06:47 jonnymind Exp $
 */
 
 /*
@@ -473,13 +473,13 @@ void hb_mutexForceUnlock( void *mtx)
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
    Mutex->locker = 0;
    Mutex->lock_count = 0;
-   HB_MUTEX_UNLOCK( &(Mutex->mutex));	
+   HB_MUTEX_UNLOCK( Mutex->mutex);	
 }
 
 void hb_rawMutexForceUnlock( void * mtx)
 {
    HB_MUTEX_T *Mutex = (HB_MUTEX_T *) mtx;
-   HB_MUTEX_UNLOCK( Mutex );	
+   HB_MUTEX_UNLOCK( *Mutex );	
 }
 
 
@@ -495,7 +495,11 @@ void hb_rawMutexForceUnlock( void * mtx)
    if ( Cargo != 0 ) return 0;
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
-   HB_CLEANUP_PUSH( hb_threadTerminator, (void *) &HB_VM_STACK );
+#ifdef HB_OS_WIN_32
+   HB_CLEANUP_PUSH( hb_threadTerminator, &(HB_VM_STACK) );
+#else
+   HB_CLEANUP_PUSH( hb_threadTerminator, HB_VM_STACK );
+#endif
 
    // Do and Send reduce the count of function by one.
    if( _pStack_->bIsMethod )
@@ -1378,7 +1382,7 @@ void hb_threadExit( void )
    hb_threadKillAll();
    hb_threadWaitAll();
    
-   hb_threadDestroyStack( &hb_ht_stack );
+   hb_threadDestroyStack( hb_ht_stack );
    hb_ht_stack = NULL;
    s_threadStarted = 0;
    

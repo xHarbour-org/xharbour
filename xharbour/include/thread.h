@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.28 2003/03/02 18:45:18 jonnymind Exp $
+* $Id: thread.h,v 1.29 2003/03/08 02:06:44 jonnymind Exp $
 */
 
 /*
@@ -104,7 +104,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_CLEANUP_PUSH(X,Y) \
    { \
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = X;\
-      HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount++ ] = Y;\
+      HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount++ ] = (void *) Y;\
    }
  
    #define HB_CLEANUP_POP     HB_VM_STACK.iCleanCount--;
