@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.25 2005/01/09 06:08:25 likewolf Exp $
+ * $Id: hbusage.c,v 1.27 2005/02/25 22:13:18 andijahja Exp $
  */
 
 /*
@@ -199,7 +199,7 @@ void hb_compPrintCredits( void )
            "Mighty-Siil <siil@usa.net>\n"
            "Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>\n"
            "Nicolas del Pozo <niko@geroa.com>\n"
-           "Patrick Mast <harbour@winfakt.com>\n"
+           "Patrick Mast <patrick@xHarbour.com>\n"
            "Paul Tucker <ptucker@sympatico.ca>\n"
            "Pavel Tsarenko <tpe2@mail.ru>\n"
            "Peter Rees <peter@rees.co.nz>\n"
