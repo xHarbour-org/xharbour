@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.3 2003/06/21 07:17:55 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.4 2003/06/21 15:04:30 jonnymind Exp $
  */
 
 /*
@@ -55,17 +55,10 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
-#include "stdio.h"
 #include "hbi18n.h"
 
-
-#include <fcntl.h>
-#include <errno.h>
-
-#ifndef HB_OS_WIN_32
+#if defined( HB_OS_UNIX )
    #include <unistd.h>
-#else
-   #include <io.h>
 #endif
 
 
@@ -102,11 +95,7 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
       // get the table row
       PHB_ITEM pRow = hb_arrayGetItemPtr( pTable, iPoint );
 
-      #ifdef HB_OS_WIN_32
-         iRes = stricmp( hb_arrayGetC( pRow, 1), cInt );
-      #else
-         iRes = strcasecmp( hb_arrayGetC( pRow, 1), cInt );
-      #endif
+      iRes = hb_stricmp( hb_arrayGetCPtr( pRow, 1), cInt );
 
       if ( iRes == 0 )
       {
@@ -123,11 +112,8 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
             // essendo matematica intera, iPoint è per difetto, ed ha
             // già esaminato il punto lower
             pRow = hb_arrayGetItemPtr( pTable, iHigher );
-            #ifdef HB_OS_WIN_32
-            if ( stricmp( hb_arrayGetC( pRow, 1), cInt ) == 0 )
-            #else
-            if ( strcasecmp( hb_arrayGetC( pRow, 1), cInt ) == 0 )
-            #endif
+
+            if ( hb_stricmp( hb_arrayGetCPtr( pRow, 1), cInt ) == 0 )
             {
                return hb_arrayGetItemPtr( pRow, 2 );
             }
@@ -194,7 +180,7 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
 }
 
 /* read the header of a table, and puts it in a HB array */
-PHB_ITEM hb_i18n_read_table_header( int handle )
+PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
 {
    PHB_ITEM pRet;
    HB_I18N_TAB_HEADER header;
@@ -203,7 +189,7 @@ PHB_ITEM hb_i18n_read_table_header( int handle )
    // force rewind
    lseek( handle, 0, 0 );
 
-   nRead = read( handle, &header, sizeof( header ) );
+   nRead = hb_fsRead( handle, (BYTE * ) &header, sizeof( header ) );
    if ( nRead != sizeof( header ) )
    {
       return NULL;
@@ -229,7 +215,7 @@ PHB_ITEM hb_i18n_read_table_header( int handle )
 }
 
 /* saving the table header from an xharbour array */
-BOOL hb_i18n_write_table_header( int handle, PHB_ITEM pHeader )
+BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader )
 {
    HB_I18N_TAB_HEADER header;
    int nWrite;
@@ -242,7 +228,7 @@ BOOL hb_i18n_write_table_header( int handle, PHB_ITEM pHeader )
    strncpy( header.language_code, hb_arrayGetCPtr( pHeader, 5 ), sizeof(header.language_code));
    header.entries = hb_arrayGetNI( pHeader, 6 );
 
-   nWrite = write( handle, &header, sizeof( header ) );
+   nWrite = hb_fsWrite( handle, (BYTE *) &header, sizeof( header ) );
    if ( nWrite != sizeof( header ) )
    {
       return FALSE;
@@ -259,7 +245,7 @@ BOOL hb_i18n_write_table_header( int handle, PHB_ITEM pHeader )
 * Returns a new table in an array of array, or NULL on failure
 */
 
-PHB_ITEM hb_i18n_read_table( int handle, int count )
+PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
 {
    char szStrLen[9];
    int nStrLen, nRead;
@@ -283,7 +269,7 @@ PHB_ITEM hb_i18n_read_table( int handle, int count )
 
       for ( j = 1; j <= 2 ; j ++ )
       {
-         nRead = read( handle, szStrLen, 8 );
+         nRead = hb_fsRead( handle, (BYTE *) szStrLen, 8 );
          if ( nRead == 8 )
          {
             nStrLen = atoi( szStrLen );
@@ -292,7 +278,7 @@ PHB_ITEM hb_i18n_read_table( int handle, int count )
             if ( nStrLen > 0 ) // sanitizing unwritten strings
             {
                char *str = ( char * ) hb_xgrab( nStrLen );
-               nRead = read( handle, str, nStrLen );
+               nRead = hb_fsRead( handle, (BYTE * ) str, nStrLen );
                // using trailing zero as file integrity check
                // (zero is the last character read, so we check nStrLen-1)
                if ( nRead != nStrLen || str[nStrLen-1] != 0 )
@@ -342,7 +328,7 @@ PHB_ITEM hb_i18n_read_table( int handle, int count )
 * Saving table data to disk
 */
 
-BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable )
+BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
 {
    char szStrLen[9];
    int nStrLen;
@@ -359,7 +345,7 @@ BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable )
          if (nStrLen == 1 )
          {
             sprintf( szStrLen,"%8d", 0 );
-            if ( write( handle, szStrLen, 8 ) != 8 )
+            if ( hb_fsWrite( handle, (BYTE *) szStrLen, 8 ) != 8 )
             {
                return FALSE;
             }
@@ -369,12 +355,12 @@ BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable )
 
          sprintf( szStrLen,"%8d", nStrLen );
 
-         if ( write( handle, szStrLen, 8 ) != 8 )
+         if ( hb_fsWrite( handle, (BYTE *) szStrLen, 8 ) != 8 )
          {
             return FALSE;
          }
 
-         if ( write( handle, hb_arrayGetCPtr( pRow, j ), nStrLen ) != nStrLen )
+         if ( hb_fsWrite( handle, hb_arrayGetCPtr( pRow, j ), nStrLen ) != nStrLen )
          {
             return FALSE;
          }
@@ -395,22 +381,19 @@ BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable )
 BOOL hb_i18n_load_language( char *language )
 {
    char *path;
-   int handle, nRead;
+   FHANDLE handle;
+   int nRead;
    HB_I18N_TAB_HEADER header;
    PHB_ITEM pTable;
 
    path = hb_i18n_build_table_filename( NULL, language );
-   #ifdef HB_OS_WIN_32
-      handle = open( path, O_RDONLY | _O_BINARY ); // on error will fail on next op
-   #else
-      handle = open( path, O_RDONLY  ); // on error will fail on next op
-   #endif
+   handle = hb_fsOpen( path, FO_READ ); // on error will fail on next op
    hb_xfree( path );
 
-   nRead = read( handle, &header, sizeof( header ) );
+   nRead = hb_fsRead( handle, (BYTE *) &header, sizeof( header ) );
    if ( nRead != sizeof( header ) )
    {
-      close( handle );
+      hb_fsClose( handle );
       return FALSE;
    }
 
@@ -418,7 +401,7 @@ BOOL hb_i18n_load_language( char *language )
    if ( strcmp( header.signature, "\3HIL" ) != 0 &&
       strcmp( header.signature, "\3HIT" ) != 0 )
    {
-      close( handle );
+      hb_fsClose( handle );
       return FALSE;
    }
 
@@ -476,11 +459,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      #ifdef HB_OS_WIN_32
-         handle = open( hb_itemGetC( pParam ), O_RDONLY | _O_BINARY );
-      #else
-         handle = open( hb_itemGetC( pParam ), O_RDONLY );
-      #endif
+      handle = hb_fsOpen( hb_itemGetC( pParam ), FO_READ );
    }
    else
    {
@@ -512,7 +491,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      close( handle );
+      hb_fsClose( handle );
    }
 }
 
@@ -548,7 +527,6 @@ HB_FUNC( HB_I18NSORTTABLE )
    // setting first element
    hb_arraySet( pResult, 1, hb_arrayGetItemPtr( pTable, 1 ));
    //TODO: Use fixed len table and do quicksort algo.
-
 
    for( i = 2; i <= hb_arrayLen( pTable ) ; i ++ )
    {
@@ -600,12 +578,9 @@ HB_FUNC( HB_I18NSAVETABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      #ifdef HB_OS_WIN_32
-         handle = open( hb_itemGetC( pParam ), O_WRONLY | O_CREAT | _O_BINARY );
-      #else
-         handle = open( hb_itemGetC( pParam ), O_WRONLY | O_CREAT );
-      #endif
-      
+
+      handle = hb_fsCreate( hb_itemGetC( pParam ), FO_WRITE );
+
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
          hb_retl( FALSE );
@@ -629,7 +604,7 @@ HB_FUNC( HB_I18NSAVETABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      close( handle );
+      hb_fsClose( handle );
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.2 2003/06/16 15:07:18 jonnymind Exp $
+ * $Id: hbxml.c,v 1.3 2003/06/16 20:13:34 jonnymind Exp $
  */
 
 /*
@@ -78,6 +78,7 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
+#include "hbapifs.h"
 
 #include "hbxml.h"
 
@@ -1395,11 +1396,12 @@ void mxml_output_func_to_stream( MXML_OUTPUT *out, char *s, int len )
 */
 void mxml_output_func_to_handle( MXML_OUTPUT *out, char *s, int len )
 {
-   int fh = (int) out->data;
+   FHANDLE fh = (FHANDLE) out->data;
    int olen;
-   olen = write( fh, s, len );
+   olen = hb_fsWrite( fh, (BYTE *) s, len );
 
-   if ( olen < len ) {
+   if ( olen < len )
+   {
       out->status = MXML_STATUS_ERROR;
       out->error = MXML_ERROR_IO;
    }
@@ -1540,10 +1542,10 @@ void mxml_refil_ungetc( MXML_REFIL *ref, int chr )
 
 void mxml_refill_from_handle_func( MXML_REFIL *ref )
 {
-   int fh = (int) ref->data;
+   FHANDLE fh = (FHANDLE) ref->data;
    int len;
 
-   len = read( fh, ref->buffer, ref->bufsize );
+   len = hb_fsRead( fh, (BYTE *) ref->buffer, ref->bufsize );
 
    if ( len == -1 ) {
       ref->status = MXML_STATUS_ERROR;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.217 2003/06/21 09:28:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.218 2003/06/22 22:29:16 andijahja Exp $
  */
 
 /*
@@ -95,6 +95,8 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
+
+#include "hbi18n.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -402,6 +404,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
    hb_memvarsInit();
 
+   HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
+   hb_i18nInit( NULL, NULL);  // try to open default language.
+
    //HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
    //hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
 
@@ -545,6 +550,8 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_idleShutDown();
    //printf( "After Idle\n" );
+
+   hb_i18nExit();
 
    hb_errExit();
    //printf( "After Err\n" );

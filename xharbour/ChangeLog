@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1172 2003/06/23 17:41:14 druzus Exp $
+ * $Id: ChangeLog,v 1.1173 2003/06/23 18:50:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-06-23 22:26 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbi18n.h
+  * source/vm/hbi18n.c
+  * source/rtl/hbxml.c
+    ! Using hb_fs* api instead of os dependant open*() to access
+      file handles.
+
+  * source/vm/hvm.c
+    ! hb_i18nInit() and hb_i18nQuit() had been erroneously removed
+      duiring a previous commit, thus disallowing automatic I18N
+      setting at program startup. Now they have been put in again.
 
 2003-06-23 11:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbinit.h

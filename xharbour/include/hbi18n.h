@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.h,v 1.1 2003/06/20 18:00:57 jonnymind Exp $
+ * $Id: hbi18n.h,v 1.2 2003/06/21 06:59:22 jonnymind Exp $
  */
 
 /*
@@ -53,6 +53,8 @@
 #ifndef HB_I18N_H
 #define HB_I18N_H
 
+#include "hbapifs.h"
+
 #define HB_DEFAULT_I18N_PATH     "i18n"
 #define HB_I18N_LIST_EXT         "hil"
 #define HB_I18N_TAB_EXT          "hit"
@@ -75,10 +77,10 @@ void hb_i18nExit( void );
 
 /** Internal routines **/
 char * hb_i18n_build_table_filename( char *i18n_dir, char *language );
-PHB_ITEM hb_i18n_read_table_header( int handle );
-BOOL hb_i18n_write_table_header( int handle, PHB_ITEM pHeader );
-PHB_ITEM hb_i18n_read_table( int handle, int count );
-BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable );
+PHB_ITEM hb_i18n_read_table_header( FHANDLE handle );
+BOOL hb_i18n_write_table_header( FHANDLE handle, PHB_ITEM pHeader );
+PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count );
+BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable );
 BOOL hb_i18n_load_language( char *language );
 
 #endif
