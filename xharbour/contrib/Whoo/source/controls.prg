@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.4 2004/02/20 19:45:50 ronpinkas Exp $
+ * $Id: controls.prg,v 1.5 2004/03/04 06:29:48 ronpinkas Exp $
  */
 
 /*
@@ -1202,6 +1202,9 @@ METHOD Center( NewX, NewY, hParent ) CLASS TWinControl
    Else
       hWndParent := hparent
    EndIf
+   if hWndParent == 0  // Center in the desktop if no Owner
+       hWndParent := GetDesktopWindow()
+   endif
    aParent_ := GetClientRect( hWndParent )
    aPoint_ := { ( aParent_[ 3 ] / 2 ) , ( aParent_[ 4 ] / 2 ) }
    ClientToScreen( hWndParent, aPoint_ )
