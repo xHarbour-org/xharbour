@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.7 2004/08/25 21:54:21 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.8 2004/08/26 07:31:59 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,14 +13,14 @@
 	  + added OS/2 low level C code
 
 2004-08-25 23:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/telepath.prg
-	  + tp_crc32()
+   * tp_/telepath.prg
+     + tp_crc32()
 
 2004-08-25 15:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/telepath.prg
-	* tp_/win32.c
-	  + tp_baud(), tp_sendsub()
-	  ! tp_send() and tp_receive() seem to work as expected.
+   * tp_/telepath.prg
+   * tp_/win32.c
+     + tp_baud(), tp_sendsub()
+     ! tp_send() and tp_receive() seem to work as expected.
 
 2004-08-25 10:35 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * tp_/telepath.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.6 2004/08/25 13:43:53 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.7 2004/08/25 21:54:22 mauriliolongo Exp $
  */
 
 /*
@@ -145,13 +145,17 @@ function tp_close( nPort )
       return 0
    endif
 
-   fClose( aPorts[ nPort, TPFP_HANDLE ] )
+   if aPorts[ nPort, TPFP_HANDLE ] >= 0
 
-   /* Port parameters should stay the same for the case the port
-      gets reopened
-   */
-   aPorts[ nPort, TPFP_OC ] := .F.
-   aPorts[ nPort, TPFP_INBUF ] := ""
+      fClose( aPorts[ nPort, TPFP_HANDLE ] )
+
+      /* Port parameters should stay the same for the case the port
+         gets reopened
+      */
+      aPorts[ nPort, TPFP_OC ] := .F.
+      aPorts[ nPort, TPFP_INBUF ] := ""
+      aPorts[ nPort, TPFP_HANDLE ] := -1
+   endif
 
 return 0
 
@@ -417,6 +421,7 @@ function tp_send( nPort, cString, nTimeout )
 
    local nWritten, nTotWritten, nDone
    local cLocString                 // a copy of cString to be able to change it
+   local lEnterLoop := .T.          // To enter while loop at least once
 
    default cString to "", nTimeout to 0
 
@@ -430,11 +435,11 @@ function tp_send( nPort, cString, nTimeout )
       cLocString := cString
    endif
 
-   nDone := Seconds() + iif( nTimeout >= 0, nTimeout+1, 0)
+   nDone := Seconds() + iif( nTimeout >= 0, nTimeout, 0)
    nWritten := nTotWritten := 0
 
    while Len( cLocString ) > 0 .AND. nTotWritten < Len( cString ) .AND. ;
-         ( nTimeout < 0 .OR. Seconds() < nDone )
+         ( nTimeout < 0 .OR. Seconds() <= nDone ) .OR. lEnterLoop
 
       nWritten := p_WritePort( aPorts[ nPort, TPFP_HANDLE ], cLocString )
 
@@ -450,6 +455,7 @@ function tp_send( nPort, cString, nTimeout )
 
          // Send remaining part of string
          cLocString := SubStr( cLocString, nWritten + 1)
+         lEnterLoop := .F.    // From now on exit when other conditions are met
 
       else     // nWritten < 0, error occurred
          exit
@@ -599,6 +605,8 @@ function tp_crc32( cString )
 
 return p_CRC32( cString )
 
+
+
 /*
 /// sorry, no waitproc at this time.
 function tp_waitfor( nPort, nTimeout, acList, lIgnorecase )
@@ -660,54 +668,27 @@ function tp_waitfor( nPort, nTimeout, acList, lIgnorecase )
       return nRet
    endif
 return 0
-
-// telepathy says...
-// returns old rts value 0,1,2
-// sets to 0 = rts off, 1 dtr on, 2 = dtr flow control autotoggle
-// I don't support 2.  who uses dtr for flow control anyway...
-function tp_ctrlrts( nPort, nParamNewval )
-    LOCAL nph, nnewval, noldval
+*/
 
 
-   if ! isopenport( nPort )
-      return -1
+
+function tp_ctrlrts( nPort, nNewCtrl )
+
+   local nCurrentValue
+/*
+   if nNewCtrl IN { 0, 1, 2 }
+      nCurrentValue := p_RTS( nPort, nNewCtrl )
+
+   else
+      nCurrentValue := p_RTS( nPort )
+
    endif
-   nph := aPorts[ nPort, TPFP_HANDLE ]
-HB_INLINE( nph ,@nnewval, @noldval)
-   {
-        double nph = hb_parnd( 1 );
-        double nnewval, noldval;
-      unsigned int rtsresult = 0;
-      ioctl( nph, TIOCMGET, &rtsresult );
-      if ( rtsresult & TIOCM_RTS )
-         noldval = 1;
-      else
-         noldval = 0;
+*/
+return nCurrentValue
 
-      if ( noldval != nnewval )
-      {
-         if ( nnewval == 0 )
-         {
-            rtsresult &= ~TIOCM_RTS;
-            ioctl( nph, TIOCMSET, &rtsresult );
-         }
-         else if ( nnewval == 1 )
-         {
-            rtsresult |= TIOCM_RTS;
-            ioctl( nph, TIOCMSET, &rtsresult );
-         }
-         /// if newval == 2?  uhhhhhhh
 
-       }
-       hb_stornd(nnewval,2);
-       hb_stornd(noldval,3);
-   }
 
-   if nNewval == 2
-      run( "stty crtscts < " + aPorts[ nPort, TPFP_NAME ] )
-   endif
-return noldval
-
+/*
 function tp_isri( nPort )
     LOCAL rinph, riretval
 
@@ -859,23 +840,25 @@ return 0
 // internal (static) functions ---------------------------------------------------
 
 static function isopenport( nPort )
+
    _tpinit()
+
    if ! isport( nPort )
       return .f.
    endif
 
-   if ! aPorts[ nPort, TPFP_OC ]
-      return .f.
-   endif
-return .t.
+return aPorts[ nPort, TPFP_OC ]
 
 
 
 static function isport( nPort )
+
    _tpinit()
+
    if valtype( nPort ) != "N" .or. nPort < 1 .or. nPort > TP_MAXPORTS
       return .f.
    endif
+
 return .t.
 
 
@@ -899,6 +882,7 @@ return Len( cStr )
 
 
 static function _tpinit
+
    local x
 
    if aPorts == nil

@@ -1,5 +1,5 @@
 /*
- * $Id: TELEPATH.CH,v 1.1 2004/08/25 08:49:06 mauriliolongo Exp $
+ * $Id: TELEPATH.CH,v 1.2 2004/08/25 21:54:21 mauriliolongo Exp $
  */
 
 /*
@@ -53,15 +53,15 @@
 
 #define TP_MAXPORTS  8
 
-#define TPFP_NAME    		1		// Structure of ports array
-#define TPFP_HANDLE  		2
-#define TPFP_BAUD    		3
-#define TPFP_DBITS   		4
-#define TPFP_PARITY  		5
-#define TPFP_SBITS   		6
-#define TPFP_OC      		7		// Open/Close Flag
-#define TPFP_INBUF			8
-#define TPFP_INBUF_SIZE		9		// Size of input buffer
+#define TPFP_NAME          1     // Structure of ports array
+#define TPFP_HANDLE        2
+#define TPFP_BAUD          3
+#define TPFP_DBITS         4
+#define TPFP_PARITY        5
+#define TPFP_SBITS         6
+#define TPFP_OC            7     // Open/Close Flag
+#define TPFP_INBUF         8
+#define TPFP_INBUF_SIZE    9     // Size of input buffer
 
 
 //  Error code definitions
@@ -115,3 +115,17 @@
 #define TXS_END     11              // End of transfer
 
 #define TP_32MAGIC  558161692
+
+
+//  Handshaking flags for tp_hshk()
+
+#define THS_RDSR    1               // Require DSR
+#define THS_RCTS    2               // Require CTS
+#define THS_RXOFF   4               // Respect XON/XOFF
+#define THS_RDCD    8               // Require DCD
+#define THS_ADTR    16              // Assert DTR
+#define THS_CDTR    32              // Flow control with DTR
+#define THS_ARTS    64              // Assert RTS
+#define THS_CRTS    128             // Flow control with RTS
+#define THS_SXOFF   256             // Send XON/XOFF
+

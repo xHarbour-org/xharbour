@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: os2.c,v 1.1 2004/08/26 07:31:59 mauriliolongo Exp $
  */
 
 /*
@@ -120,6 +120,16 @@ HB_FUNC( P_INITPORTSPEED ) {
 
       } else {
 
+         /* tp_ help says: on port open
+         DTR      ON   (value 1)
+         CTS      OFF
+         DCD      IGNORE
+         DSR      OFF
+         RTS      ON   (value 1)
+         XON/XOFF OFF
+         */
+         dcb.fbCtlHndShake = MODE_DTR_HANDSHAKE | MODE_RTS_HANDSHAKE;
+         dcb.fbFlowReplace = MODE_RTS_HANDSHAKE;
          dcb.fbTimeout = MODE_NO_WRITE_TIMEOUT | MODE_NOWAIT_READ_TIMEOUT;
 
          if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_SETDCBINFO, &dcb,
