@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.5 2004/03/01 13:00:22 lculik Exp $
+ * $Id: hbdoc.prg,v 1.6 2004/03/17 01:29:30 lculik Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2004/03/01 13:00:22 $
- * Revision..: $Revision: 1.5 $
+ * Date......: $Date: 2004/03/17 01:29:30 $
+ * Revision..: $Revision: 1.6 $
  * Log file..: $Logfile:     $
  *
  *
@@ -248,7 +248,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    //  Get the linkfile name and get the info in it
 
    IF cLinkName = NIL
-      ?? "XHarbour Doc Extractor"
+      ?? "xHarbour Doc Extractor"
       ? "Copyright 1999-2004, http://www.xharbour.org"
       ? ""
       ? "Syntax:  hbdoc [options] <linkname> [<ifile>]"
@@ -492,21 +492,21 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       FWRITE( nHpj, 'REPORT=Yes' + CRLF )
       FWRITE( nHpj, 'CONTENTS=IDH_OVERVIEW' + CRLF )
       FWRITE( nHpj, 'TITLE='+cTitle + CRLF )
-      FWRITE( nHpj, 'COPYRIGHT=XHarbour (C) http://www.xharbour.org http://www.xharbour.com' + CRLF )
+      FWRITE( nHpj, 'COPYRIGHT=xHarbour (C) http://www.xHarbour.org http://www.xHarbour.com' + CRLF )
       FWRITE( nHpj, 'HLP=.\'+ lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hlp"+ CRLF )
       FWRITE( nHpj, 'ROOT=\' + CURDIR() + "\RTF" + CRLF )
       FWRITE( nHpj, 'CNT=.\'+ lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".cnt"+ CRLF )
       FWRITE( nHpj, '[FILES]' + CRLF )
-      FWRITE( nHpj, "xharbour.rtf" + CRLF )
+      FWRITE( nHpj, "xHarbour.rtf" + CRLF )
       FWRITE( nHpj, '[CONFIG]' + CRLF + 'contents()' + CRLF + 'prev()' + CRLF + 'next()' + CRLF + 'BrowseButtons()' + CRLF )
-      FWRITE( nHpj, '[WINDOWS]' + CRLF + 'Commands="XHarbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' +;
-                     CRLF +'API="XHarbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Error="XHarbour Run Time Errors",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Tools="XHarbour Tools",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Class="XHarbour OOP Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Funca="XHarbour Run Time Functions A-M",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Funcn="XHarbour Run Time Functions N-_",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
-                     'Main="XHARBOUR",(117,100,894,873),60672,(r14876671),(r12632256),f2' + CRLF )
+      FWRITE( nHpj, '[WINDOWS]' + CRLF + 'Commands="xHarbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' +;
+                     CRLF +'API="xHarbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Error="xHarbour Run Time Errors",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Tools="xHarbour Tools",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Class="xHarbour OOP Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Funca="xHarbour Run Time Functions A-M",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Funcn="xHarbour Run Time Functions N-_",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +;
+                     'Main="xHarbour",(117,100,894,873),60672,(r14876671),(r12632256),f2' + CRLF )
       FWRITE( nHpj, '[MAP]'+CRLF)
       for each ppp in aRtfid
       fwrite(nHpj, "#define "+ppp[1] +" " + str(ppp[2])+CRLF)
@@ -517,7 +517,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       FWRITE( nHpj, ':Base '+ lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hlp"+ CRLF )
       FWRITE( nHpj, ':Title '+cTitle+CRLF)
       FWRITE( nHpj, ':Index '+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +'='+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hlp"+ CRLF )
-      FWRITE( nHpj, '1 XHarbour'+CRLF)
+      FWRITE( nHpj, '1 xHarbour'+CRLF)
       asort(      aWww,,,{|x,y| x[3]+x[1]<y[3]+y[1]})
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]=='Document'
@@ -525,13 +525,13 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
           endif
       Next
       asort(aWww,,,{|x,y| x[3]+x[1]<y[3]+y[1]})
-      FWRITE( nHpj, '1 XHarbour Run Time Error'+CRLF)
+      FWRITE( nHpj, '1 xHarbour Run Time Error'+CRLF)
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]=='Run Time Errors'
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">Error"+CRLF)
           endif
       Next
-      FWRITE( nHpj, '1 XHarbour Runtime functions and Commands by Name'+CRLF)
+      FWRITE( nHpj, '1 xHarbour Runtime functions and Commands by Name'+CRLF)
       asort(aWww,,,{|x,y| x[1]<y[1]})
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]<>'Run Time Errors' .and. aWww[ppp,3] <>"Document"  .and. aWww[ppp,3] <>"The garbage collector"  .and. aWww[ppp,3] <>"OOP Command" .and. aWww[ppp,3] <>"Command"  .and. aWww[ppp,3] <>"The idle states"
@@ -539,7 +539,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
           endif
       Next
 
-      FWRITE( nHpj, '1 XHarbour Runtime functions Category'+CRLF)
+      FWRITE( nHpj, '1 xHarbour Runtime functions Category'+CRLF)
       asort(aWww,,,{|x,y| x[3]<y[3]})
 //        SET CONSOLE ON
       nItem := len(aResult)
@@ -552,13 +552,13 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
         endif
       Next
 
-      FWRITE( nHpj, '1 XHarbour Commands'+CRLF)
+      FWRITE( nHpj, '1 xHarbour Commands'+CRLF)
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]=='Command'
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">Commands"+CRLF)
           endif
       Next
-      FWRITE( nHpj, '1 XHarbour OOP commands'+CRLF)
+      FWRITE( nHpj, '1 xHarbour OOP commands'+CRLF)
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]=='OOP Command'
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">Class"+CRLF)
@@ -579,8 +579,8 @@ set console off
       asort(adocinfo,,,{|x,y| x[1]+x[2]<y[1]+y[2]})
             do while .t.
           citem:=adocinfo[1,1]
-          AADD(aMetaContents,{"GENERATOR","HBDOC XHarbour document Extractor"})
-          aadd(aMetaContents,{'Keywords',"XHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
+          AADD(aMetaContents,{"GENERATOR","HBDOC xHarbour document Extractor"})
+          aadd(aMetaContents,{'Keywords',"xHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
           ohtm:=THTML():new('htm\hb'+strtran(citem," ","")+'.htm',aMetaContents)
           ohtm:WriteText('<h2>'+adocinfo[1,1]+'</h2><br>')
           ohtm:WriteText("<table>")
@@ -594,12 +594,12 @@ set console off
            ohtm:close()
            citem:=adocinfo[ppp,1]
            aMetaContents:={}
-          AADD(aMetaContents,{"GENERATOR","HBDOC XHarbour document Extractor"})
-          aadd(aMetaContents,{'Keywords',"XHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
+          AADD(aMetaContents,{"GENERATOR","HBDOC xHarbour document Extractor"})
+          aadd(aMetaContents,{'Keywords',"xHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
 
            ohtm:=THTML():new('htm\hb'+strtran(adocinfo[ppp,1]," ","")+'.htm',aMetaContents)
 
-//                    oHtm:WriteMetaTag('Keywords',"XHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem)
+//                    oHtm:WriteMetaTag('Keywords',"xHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem)
            ohtm:WriteText('<h2>'+adocinfo[ppp,1]+'</h2><br>')
            ohtm:WriteText("<table>")
            oHtm:WritelinkTable(adocinfo[ppp,4],adocinfo[ppp,2],adocinfo[ppp,3])
@@ -612,22 +612,22 @@ set console off
            ohtm:WriteText("</table>")
         ohtm:close()
            aMetaContents:={}
-          AADD(aMetaContents,{"GENERATOR","HBDOC XHarbour document Extractor"})
-          aadd(aMetaContents,{'Keywords',"XHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
+          AADD(aMetaContents,{"GENERATOR","HBDOC xHarbour document Extractor"})
+          aadd(aMetaContents,{'Keywords',"xHarbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,"+cItem})
 
-      oHtm1 := THTML():New( "htm\xharbour.htm" ,aMetaContents)
+      oHtm1 := THTML():New( "htm\xHarbour.htm" ,aMetaContents)
 //          oHtm:WriteMetaTag('Keywords',"Harbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,Harbour Documentation")
-      oHtm1:WriteTitle( "XHarbour Reference Guide" )
-      oHtm1:WriteText( "<H1>XHarbour Reference Guide</H1>" )
-      oHtm1:WriteText( "<H2>XHARBOUR</H2>" + hb_osnEwline() + '<UL>' )
-      oHtm1:WriteLink( "overview", UpperLower( "XHarbour Read me" ) )
-      oHtm1:WriteLink( "license", UpperLower( "XHarbour License" ) )
+      oHtm1:WriteTitle( "xHarbour Reference Guide" )
+      oHtm1:WriteText( "<H1>xHarbour Reference Guide</H1>" )
+      oHtm1:WriteText( "<H2>xHarbour</H2>" + hb_osnEwline() + '<UL>' )
+      oHtm1:WriteLink( "overview", UpperLower( "xHarbour Read me" ) )
+      oHtm1:WriteLink( "license", UpperLower( "xHarbour License" ) )
       oHtm1:WriteLink( "http://www.gnu.org/copyleft/gpl.html", "GNU License" )
       oHtm1:WriteLink( "compileroptions.htm", "Compiler Options" )
-      oHtm1:WriteLink( "harbourextensions.htm", "XHarbour Extensions" )
+      oHtm1:WriteLink( "harbourextensions.htm", "xHarbour Extensions" )
       oHtm1:WriteLink( "thegarbagecollector.htm", "The Garbage Collector" )
       oHtm1:WriteLink( "theidlestates.htm", "The Idle States" )
-      ohtm1:WriteLink( "http://www.xharbour.org","Xharbour.org Web page")
+      ohtm1:WriteLink( "http://www.xHarbour.org","xHarbour.org Web page")
       oHtm1:WriteText( "</UL>" )
       oHtm1:WriteText( "<H2>Alphabetical list of functions by Categorie</H2>" )
       ohtm1:writetext('<ul>')
@@ -687,7 +687,7 @@ set console off
           ohtm:WriteText("<ul>")
           oHtm:ListItem()
           oHtm:AddObject("text/sitemap")
-          oHTm:AddParam('Name','XHARBOUR')
+          oHTm:AddParam('Name','xHarbour')
           ohtm:EndObject()
           ohtm:WriteText("<ul>")
           writeChmContentFile(aDocinfo,"Document",oHtm)
@@ -696,7 +696,7 @@ set console off
         ohtm:WriteText("<ul>")
           oHtm:ListItem()
           oHtm:AddObject("text/sitemap")
-          oHTm:AddParam('Name','XHarbour Run Time Error')
+          oHTm:AddParam('Name','xHarbour Run Time Error')
           ohtm:EndObject()
           ohtm:WriteText("<ul>")
           writeChmContentFile(aDocinfo,"Run Time Errors",oHtm)
@@ -705,7 +705,7 @@ set console off
     oHtm:WriteText( "<UL>" )
           oHtm:ListItem()
           oHtm:AddObject("text/sitemap")
-          oHTm:AddParam('Name','XHarbour Runtime functions and Commands by Name')
+          oHTm:AddParam('Name','xHarbour Runtime functions and Commands by Name')
           ohtm:EndObject()
           ohtm:WriteText("<ul>")
           asort(aDocinfo,,,{|x,y|x[2]<y[2]})
@@ -724,7 +724,7 @@ set console off
     oHtm:WriteText( "<UL>" )
     ohtm:ListItem()
     oHtm:AddObject("text/sitemap")
-    ohtm:addParam("Name","XHarbour Functions by Categorie")
+    ohtm:addParam("Name","xHarbour Functions by Categorie")
     oHtm:Endobject()
 //    oHtm:WriteText( "<UL>" )
       asort(aDocinfo,,,{|x,y| x[1]<y[1]})
@@ -755,7 +755,7 @@ set console off
          oHtm:WriteText( "<UL>" )
           oHtm:ListItem()
           oHtm:AddObject("text/sitemap")
-          oHTm:AddParam('Name','XHarbour Commands')
+          oHTm:AddParam('Name','xHarbour Commands')
           ohtm:EndObject()
           ohtm:WriteText("<ul>")
         asort(aDocinfo,,,{|x,y| x[2]<y[2]})
@@ -765,7 +765,7 @@ set console off
          oHtm:WriteText( "<UL>" )
           oHtm:ListItem()
           oHtm:AddObject("text/sitemap")
-          oHTm:AddParam('Name','XHarbour OOP Commands')
+          oHTm:AddParam('Name','xHarbour OOP Commands')
           ohtm:EndObject()
           ohtm:WriteText("<ul>")
         asort(aDocinfo,,,{|x,y| x[2]<y[2]})
@@ -807,7 +807,7 @@ set console off
 
          ? "REM  Link the files"
          ? "Echo Linking library"
-         ? "hcw Xharbour.hpj"
+         ? "hcw xHarbour.hpj"
          ? " "
 
       ELSEIF lNgi
