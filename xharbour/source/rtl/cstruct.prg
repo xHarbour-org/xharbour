@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.32 2004/05/21 23:52:03 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.33 2004/05/24 20:42:12 ronpinkas Exp $
  */
 
 /*
@@ -439,6 +439,10 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
+      IF Abs( CType ) == 1
+         __clsAddMsg( hClass, "AsString", @AsString()   , HB_OO_MSG_METHOD )
+      ENDIF
+
       FOR Counter := 1 TO nLen
          cMember := LTrim( Str( Counter ) )
 
@@ -590,8 +594,22 @@ STATIC Function Pointer( nNewPointer, lAdopt )
    ENDIF
 
 RETURN QSelf()
-//---------------------------------------------------------------------------//
 
+//---------------------------------------------------------------------------//
+STATIC Function AsString()
+
+   LOCAL cChar, nLen := Len( QSelf() ) - CLASS_PROPERTIES, cString := Space( nLen )
+
+   FOR EACH cChar IN QSelf()
+      IF HB_EnumIndex() > nLen
+         EXIT
+      ENDIF
+
+      cString[ HB_EnumIndex() ] := cChar
+   NEXT
+
+RETURN cString
+//---------------------------------------------------------------------------//
 #pragma BEGINDUMP
   #include "hbapi.h"
   #include "hbvmpub.h"

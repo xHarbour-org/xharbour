@@ -9656,20 +9656,29 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
    LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure
 
+   #ifdef __XHARBOUR__
+      LOCAL bReleaseProc
+   #endif
+
    IF nLine == NIL
       nLine := 0
    ENDIF
 
-   s_aProcedures := aProcedures
-
    #ifdef __XHARBOUR__
-      // TODO - Change that so the DynList is saved/restored.
-      // Incase of nested execution.
-      PP_ReleaseDynProcedures()
+     IF s_aProcedures == aProcedures
+        bReleaseProc := .F.
+     ELSE
+        s_aProcedures := aProcedures
 
-      FOR EACH aProcedure IN aProcedures
-          PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
-      NEXT
+        bReleaseProc := .T.
+        // TODO - Change that so the DynList is saved/restored.
+        // Incase of nested execution.
+        PP_ReleaseDynProcedures()
+
+        FOR EACH aProcedure IN aProcedures
+           PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
+        NEXT
+     ENDIF
    #endif
 
    bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
@@ -9725,7 +9734,9 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
    END
 
    #ifdef __XHARBOUR__
-      PP_ReleaseDynProcedures()
+     IF bReleaseProc
+        PP_ReleaseDynProcedures()
+     ENDIF
    #endif
 
    ErrorBlock( bErrHandler )

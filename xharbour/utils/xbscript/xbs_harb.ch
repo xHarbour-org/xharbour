@@ -2633,11 +2633,14 @@
                                s_pDynList[i].pDyn->pSymbol->value.pFunPtr );
              #endif
 
+             if( s_pDynList[i].pDyn->pSymbol->value.pFunPtr == s_pDynList[i].pAsm->pFunPtr )
+             {
+                s_pDynList[i].pDyn->pSymbol->value.pFunPtr = NULL;
+             }
+
+             hb_xfree( (void *) ( s_pDynList[i].pAsm->pFunPtr ) );
              hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
              hb_xfree( (void *) ( s_pDynList[i].pcode ) );
-             hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->value.pFunPtr ) );
-
-             s_pDynList[i].pDyn->pSymbol->value.pFunPtr = NULL;
           }
 
           if( s_iDyn )
