@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2199 2004/02/01 20:55:49 maurifull Exp $
+ * $Id: ChangeLog,v 1.2200 2004/02/01 22:38:57 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-02 01:55 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/files.c
+    ! Fixed SetFDaTi() to work similarly to the original.
+  + contrib/libct/pack.c
+    + Implemented CharPack() and CharUnpack() (only the RLE method for now).
+  * contrib/libct/Makefile
+    + Added pack.c.
+  + contrib/libct/tests/pack.prg
+    + A test for CharPack() and CharUnpack().
+  + contrib/libct/tests/fdati.prg
+    + A test for FileDate(), FileTime() and SetFDaTi().
+  * contrib/libct/tests/Makefile
+    + Added fdati.prg and pack.prg.
 
 2004-02-01 17:38 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt

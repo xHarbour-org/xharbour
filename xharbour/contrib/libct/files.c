@@ -1,10 +1,10 @@
 /*
- * $Id: files.c,v 1.10 2004/01/23 09:48:17 andijahja Exp $
+ * $Id: files.c,v 1.11 2004/01/26 00:30:48 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- *   FILESEEK,FILESIZE,FILEATTR,FILETIME,FILEDATE,SETFATTR CT3 files function
+ *   CT3 files functions: FILESEEK,FILESIZE,FILEATTR,FILETIME,FILEDATE,SETFATTR,SETFDATI
  *
  * Copyright 2001 Luiz Rafael Culik<culik@sl.conex.net>
  *
@@ -897,39 +897,69 @@ LPTSTR GetTime( FILETIME *rTime )
 #endif
 
 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETFDATI()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *      Sets file date and time
+ *  $SYNTAX$
+ *      SETFDATI(<cFilename>, [<dDate>], [<cTime>]) --> lDone
+ *  $ARGUMENTS$
+ *      <cFilename> is the name of the file whose date/time are to be changed.
+ *      <dDate> is the date to set. The default value is the current date.
+ *      <cTime> is the time to set. The default value is the current time.
+ *  $RETURNS$
+ *      .T. if the date/time was changed.
+ *  $DESCRIPTION$
+ *      SETFDATI() allows to set a file's date and time. Time is specified as a
+ *      character string in "hh:mm:ss" format.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      UNIX, Windows
+ *  $FILES$
+ *      Source is files.c, library is libct.
+ *  $SEEALSO$
+ *      FILEDATE(), FILETIME()
+ *  $END$
+ */
+
 HB_FUNC( SETFDATI )
 {
    if (hb_pcount() >= 1)
    {
       char *szFile = hb_parc(1);
       char *szDate = NULL, *szTime = NULL;
-      int year, month, day, hour, minute, second;
+      int year, month, day, hour = 0, minute = 0, second = 0;
       
-      if (ISDATE(2))
+      if (ISDATE(2) || ISDATE(3))
       {
-         szDate = hb_pards(2);
+         szDate = ISDATE(2) ? hb_pards(2) : hb_pards(3);
          sscanf(szDate, "%4d%2d%2d", &year, &month, &day);
       }
-      if (ISCHAR(3))
+      if (ISCHAR(2) || ISCHAR(3))
       {
-         szTime = hb_parc(3);
+         szTime = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
          sscanf(szTime, "%2d:%2d:%2d", &hour, &minute, &second);
       }
 
 #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
       {
          FILETIME ft, local_ft;
-         SYSTEMTIME st, old_st;
+         SYSTEMTIME st;
          HANDLE f = (HANDLE)_lopen(szFile, OF_READWRITE | OF_SHARE_COMPAT);
          
          if (f != (HANDLE)HFILE_ERROR)
          {
             if (!szDate || !szTime)
             {
-               GetSystemTime(&st);
-               GetFileTime(f, NULL, NULL, &ft);
-               FileTimeToLocalFileTime(&ft, &local_ft);
-               FileTimeToSystemTime(&local_ft, &old_st);
+               GetLocalTime(&st);
             }
             if (szDate)
             {
@@ -937,23 +967,11 @@ HB_FUNC( SETFDATI )
                st.wMonth = month;
                st.wDay = day;
             }
-            else
-            {
-               st.wYear = old_st.wYear;
-               st.wMonth = old_st.wMonth;
-               st.wDay = old_st.wDay;
-            }
             if (szTime)
             {
                st.wHour = hour;
                st.wMinute = minute;
                st.wSecond = second;
-            }
-            else
-            {
-               st.wHour = old_st.wHour;
-               st.wMinute = old_st.wMinute;
-               st.wSecond = old_st.wSecond;
             }
             SystemTimeToFileTime(&st, &local_ft);
             LocalFileTimeToFileTime(&local_ft, &ft);
@@ -965,7 +983,7 @@ HB_FUNC( SETFDATI )
 #elif defined( OS_UNIX_COMPATIBLE )
       {
          struct utimbuf buf;
-         struct tm old_value, new_value;
+         struct tm new_value;
          
          if (!szDate && !szTime)
          {
@@ -975,11 +993,8 @@ HB_FUNC( SETFDATI )
          
          if (!szDate || !szTime)
          {
-            struct stat st;
             time_t current_time;
             
-            stat(szFile, &st);
-            localtime_r(&st.st_mtime, &old_value);
             current_time = time(NULL);
             localtime_r(&current_time, &new_value);
          }
@@ -989,23 +1004,11 @@ HB_FUNC( SETFDATI )
             new_value.tm_mon = month - 1;
             new_value.tm_mday = day;
          }
-         else
-         {
-            new_value.tm_year = old_value.tm_year;
-            new_value.tm_mon = old_value.tm_mon;
-            new_value.tm_mday = old_value.tm_mday;
-         }
          if (szTime)
          {
             new_value.tm_hour = hour;
             new_value.tm_min = minute;
             new_value.tm_sec = second;
-         }
-         else
-         {
-            new_value.tm_hour = old_value.tm_hour;
-            new_value.tm_min = old_value.tm_min;
-            new_value.tm_sec = old_value.tm_sec;
          }
          buf.actime = buf.modtime = mktime(&new_value);
          hb_retl(utime(szFile, &buf) == 0);

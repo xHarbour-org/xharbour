@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: Makefile,v 1.1 2003/03/25 15:32:51 mbirdyg Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -68,10 +68,12 @@ PRG_SOURCES=\
 	csetref.prg \
 	datetime.prg \
 	expomant.prg \
+        fdati.prg \
 	finan.prg \
 	math.prg \
 	num1.prg \
 	numtoken.prg \
+        pack.prg \
 	rangerem.prg \
 	rangerepl.prg \
 	setatlik.prg \
