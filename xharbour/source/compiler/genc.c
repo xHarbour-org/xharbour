@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.26 2002/10/13 18:06:28 ronpinkas Exp $
+ * $Id: genc.c,v 1.27 2002/10/24 17:59:26 ronpinkas Exp $
  */
 
 /*
@@ -2222,6 +2222,15 @@ static HB_GENC_FUNC( hb_p_endenumerate )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_enumindex )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_ENUMINDEX,\n" );
+   return 1;
+}
+
 static HB_GENC_FUNC( hb_p_pushglobal )
 {
    fprintf( cargo->yyc, "\tHB_P_PUSHGLOBAL, %i,",
@@ -2417,7 +2426,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_endenumerate,
    hb_p_pushglobal,
    hb_p_popglobal,
-   hb_p_pushglobalref
+   hb_p_pushglobalref,
+   hb_p_enumindex
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.11 2002/09/21 05:21:06 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.12 2002/09/23 00:40:37 ronpinkas Exp $
  */
 
 /*
@@ -208,6 +208,7 @@ typedef enum
    HB_P_PUSHGLOBAL,            /* 142 */
    HB_P_POPGLOBAL,             /* 143 */
    HB_P_PUSHGLOBALREF,         /* 144 */
+   HB_P_ENUMINDEX,             /* 145 */
 
 /* NOTE: This have to be the last definition */
    HB_P_LAST_PCODE             /* 145 this defines the number of defined pcodes */

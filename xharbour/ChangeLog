@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.484 2002/11/11 04:26:13 walito Exp $
+ * $Id: ChangeLog,v 1.485 2002/11/12 03:03:19 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-12 09:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed support of compile time Upper() to NOT use compile time string sharing.
+    + Added optimization HB_EnumIndex() -> HB_P_ENUMINDEX
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_ENUMINDEX.
 
 2002-11-12 00:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rdd/dbfntx/dbfntx1.c

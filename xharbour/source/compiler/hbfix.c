@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.13 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.14 2002/09/23 00:40:37 ronpinkas Exp $
  */
 
 /*
@@ -477,7 +477,8 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_ENDENUMERATE,         */
    NULL,                       /* HB_P_PUSHGLOBAL,           */
    NULL,                       /* HB_P_POPGLOBAL,            */
-   NULL                        /* HB_P_PUSHGLOBALREF         */
+   NULL,                       /* HB_P_PUSHGLOBALREF,        */
+   NULL                        /* HB_P_ENUMINDEX             */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )

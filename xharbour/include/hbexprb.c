@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.34 2002/10/17 14:57:10 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.35 2002/10/18 05:15:55 ronpinkas Exp $
  */
 
 /*
@@ -1415,6 +1415,11 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   if( pReduced->ExprType == HB_ET_STRING )
                   {
                      ULONG i;
+                     char *sCopy = hb_xgrab( pReduced->ulLength + 1 );
+
+                     memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
+                     pReduced->value.asString.string = sCopy;
+                     pReduced->value.asString.dealloc = TRUE;
 
                      for ( i = 0; i < pReduced->ulLength; i++ )
                      {
@@ -1767,10 +1772,18 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 )
                {
                   bPcode = HB_P_LEFT;
+                  // See more code below!
                }
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
                {
                   bPcode = HB_P_RIGHT;
+                  // See more code below!
+               }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_ENUMINDEX" ) == 0 )
+               {
+                   hb_compGenPCode1( HB_P_ENUMINDEX );
+
+                   break;
                }
 
                if( bPcode )
