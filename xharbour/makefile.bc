@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.115 2004/10/22 11:55:51 paultucker Exp $
+# $Id: makefile.bc,v 1.116 2004/10/22 14:28:48 paultucker Exp $
 #
 
 #
@@ -1512,7 +1512,7 @@ $(OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
 $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\calconst.obj : $(PP_DIR)\calconst.c
+$(OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
@@ -3407,12 +3407,12 @@ $(CT_OBJ_DIR)\util.obj : $(CT_OBJ_DIR)\util.c
 #
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c \
-   $(PP_DIR)\calconst.c \
+   $(COMPILER_DIR)\calconst.c \
    $(PP_LIB_OBJS) \
    $(COMMON_LIB_OBJS)
 
    $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbpp.obj $(HBPP_DIR)\hbpp.c
-   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\calconst.obj $(PP_DIR)\calconst.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\calconst.obj $(COMPILER_DIR)\calconst.c
    $(ECHO) $(CFLAGS) > make.tmp
    $(ECHO) -e$(HBPP_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbpp.obj >> make.tmp

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.99 2004/10/22 14:28:48 paultucker Exp $
+# $Id: makefile.nt,v 1.100 2004/10/22 14:34:41 paultucker Exp $
 #
 
 #
@@ -1257,7 +1257,7 @@ CLEAN:
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
@@ -1417,7 +1417,7 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c \
-   $(PP_DIR)\calconst.c
+   $(COMPILER_DIR)\calconst.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
