@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.10 2002/03/20 15:22:06 ronpinkas Exp $
+ * $Id: estack.c,v 1.11 2002/03/22 15:06:37 map Exp $
  */
 
 /*
@@ -52,6 +52,10 @@
 
 #if defined(HB_INCLUDE_WINEXCHANDLER)
    #define HB_OS_WIN_32_USED
+#endif
+
+#ifdef HB_STACK_MACROS
+   #undef HB_STACK_MACROS
 #endif
 
 #include "hbapi.h"
