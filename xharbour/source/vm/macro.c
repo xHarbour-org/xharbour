@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.21 2003/05/06 08:31:40 jonnymind Exp $
+ * $Id: macro.c,v 1.22 2003/05/10 01:46:28 ronpinkas Exp $
  */
 
 /*
@@ -948,7 +948,7 @@ char * hb_macroGetType( HB_ITEM_PTR pItem )
             else
             {
                /* something unpleasant happened during macro evaluation */
-               szType = "UE";
+               szType = "U";
             }
          }
          else

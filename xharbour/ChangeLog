@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1058 2003/05/26 15:46:28 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1059 2003/05/26 16:38:04 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-05-26 15:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/macro.c
+    ! Fixed return code for TYPE() function for endefined variables
+  * source/rtl/memoline.c
+    + Added MemoLineLong() - works exactly like memoline but does not
+      have the 254 chars line limit
 
 2003-05-26 18:35 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/trpccli.prg
