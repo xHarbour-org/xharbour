@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.12 2003/05/28 04:10:18 ronpinkas Exp $
+ * $Id: runner.c,v 1.13 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -67,12 +67,12 @@
 #include "hbapifs.h"
 #include "hbvm.h"
 #include "hbpcode.h"
+#include "hb_io.h"
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
 /* TOFIX: Change this assembler hack to something standard and portable */
-/* TODO: Change the fopen()/fread()/fclose() calls to hb_fs*() */
 /* TOFIX: Fix the memory leak on error. */
 
 /* NOTE: This is the assembler output from : hb_vmExecute( pcode, symbols ).  */
@@ -134,13 +134,13 @@ static PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Creat
 static void      hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
 static void      hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 
-static FILE *    hb_hrbFileOpen( char * szFileName );
-static void      hb_hrbFileRead( FILE * file, char * szFileName, char * cBuffer, int iSize, int iCount );
-static BYTE      hb_hrbFileReadByte( FILE * file, char * szFileName );
-static int       hb_hrbFileReadHead( FILE * file, char * szFileName );
-static char *    hb_hrbFileReadId( FILE * file, char * szFileName );
-static long      hb_hrbFileReadLong( FILE * file, char * szFileName );
-static void      hb_hrbFileClose( FILE * file );
+static FHANDLE   hb_hrbFileOpen( char * szFileName );
+static void      hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount );
+static BYTE      hb_hrbFileReadByte( FHANDLE file, char * szFileName );
+static int       hb_hrbFileReadHead( FHANDLE file, char * szFileName );
+static char *    hb_hrbFileReadId( FHANDLE file, char * szFileName );
+static long      hb_hrbFileReadLong( FHANDLE file, char * szFileName );
+static void      hb_hrbFileClose( FHANDLE file );
 
 static ULONG     s_ulSymEntry = 0;              /* Link enhancement         */
 
@@ -342,7 +342,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    PHB_FNAME pFileName;
-   FILE * file;
+   FHANDLE file;
    BOOL bError = FALSE;
    PHRB_BODY pHrbBody = NULL;
 
@@ -363,8 +363,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
    while ( ( file = hb_hrbFileOpen( szFileName ) ) == NULL )
    {
-      USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, 0, EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
-
+      USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
       if( uiAction == E_DEFAULT || uiAction == E_BREAK )
       {
          break;
@@ -663,7 +662,7 @@ static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded 
    return ulRet;
 }
 
-static int hb_hrbFileReadHead( FILE * file, char * szFileName )
+static int hb_hrbFileReadHead( FHANDLE file, char * szFileName )
 {
    unsigned char szHead[] = { (unsigned char)192,'H','R','B' }, szBuf[4];
    char cInt[ 2 ];
@@ -685,7 +684,7 @@ static int hb_hrbFileReadHead( FILE * file, char * szFileName )
 
 /* ReadId
    Read the next (zero terminated) identifier */
-static char * hb_hrbFileReadId( FILE * file, char * szFileName )
+static char * hb_hrbFileReadId( FHANDLE file, char * szFileName )
 {
    char * szTemp;                                /* Temporary buffer         */
    char * szIdx;
@@ -720,7 +719,7 @@ static char * hb_hrbFileReadId( FILE * file, char * szFileName )
 }
 
 
-static BYTE hb_hrbFileReadByte( FILE * file, char * szFileName )
+static BYTE hb_hrbFileReadByte( FHANDLE file, char * szFileName )
 {
    BYTE bRet;
 
@@ -732,7 +731,7 @@ static BYTE hb_hrbFileReadByte( FILE * file, char * szFileName )
 }
 
 
-static long hb_hrbFileReadLong( FILE * file, char * szFileName )
+static long hb_hrbFileReadLong( FHANDLE file, char * szFileName )
 {
    char cLong[ 4 ];                               /* Temporary long           */
 
@@ -757,11 +756,13 @@ static long hb_hrbFileReadLong( FILE * file, char * szFileName )
 
 /*  hb_hrbFileRead
     Controlled read from file. If errornous -> Break */
-static void hb_hrbFileRead( FILE * file, char * szFileName, char * cBuffer, int iSize, int iCount )
+static void hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileRead(%p, %s, %p, %d, %d)", file, szFileName, cBuffer, iSize, iCount));
 
-   if( iCount != ( int ) fread( cBuffer, iSize, iCount, file ) )
+//   if( iCount != ( int ) fread( cBuffer, iSize, iCount, file ) )
+
+   if( iCount != ( int ) ( hb_fsRead( file, cBuffer, (USHORT) iCount * iSize ) / iSize ) )
    {
       hb_errRT_BASE_Ext1( EG_READ, 9999, NULL, szFileName, 0, EF_NONE, 0 );
    }
@@ -770,23 +771,22 @@ static void hb_hrbFileRead( FILE * file, char * szFileName, char * cBuffer, int 
 
 /*  hb_hrbFileOpen
     Open an .HRB file  */
-static FILE * hb_hrbFileOpen( char * szFileName )
+static FHANDLE hb_hrbFileOpen( char * szFileName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileOpen(%s)", szFileName));
-
-   return fopen( szFileName, "rb" );
+//   return fopen( szFileName, "rb" );
+   return hb_fsOpen( szFileName, FO_READ );
 }
 
 
 /*  hb_hrbFileClose
     Close an .HRB file  */
-static void hb_hrbFileClose( FILE * file )
+static void hb_hrbFileClose( FHANDLE file )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileClose(%p)", file));
-
-   fclose( file );
+//   fclose( file );
+   hb_fsClose( file );
 }
-
 
 /*
    Create dynamic function.

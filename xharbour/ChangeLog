@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1540 2003/10/02 03:40:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1541 2003/10/02 20:34:30 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-02 18:40 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/runner.c
+    ! Changed all calls to fopen, fclose and fread to hb_fs* related
+      functions, so hbrun can handle linux paths and file names
 
 2003-10-02 16:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * include/hbapigt.h
