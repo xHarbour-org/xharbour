@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.17 2004/03/23 22:16:53 andijahja Exp $
+ * $Id: hbxml.c,v 1.18 2004/03/23 22:30:22 jonnymind Exp $
  */
 
 /*
@@ -821,6 +821,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
       {
          case 0:
             if ( isalpha( chr ) ) {
+               // can't cause reallocations
                buf[ iPos++ ] = chr;
                iStatus = 1;
             }
@@ -835,6 +836,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
          case 1:
             if ( isalnum( chr ) || chr == '_' || chr == '-' || chr == ':' ) 
             {
+               // can't cause reallocations
                buf[ iPos++ ] = chr;
             }
             else if ( chr == '>' || chr == ' ' || chr == '/' || chr == '\r'
@@ -855,6 +857,11 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
       if ( iPos >= iAllocated ) {
          iAllocated += MXML_ALLOC_BLOCK;
          buf = (char *) MXML_REALLOCATOR( buf, iAllocated );
+         if (! buf ) 
+         {
+            hbxml_set_doc_status( ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_NAMETOOLONG );
+            return MXML_STATUS_MALFORMED;
+         }
       }
   }
 
@@ -863,13 +870,6 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
       MXML_DELETOR( buf );
       hbxml_set_doc_status( ref, doc, pNode, ref->status, ref->error );
       return ref->status;
-   }
-
-   if ( iStatus != 2  ) 
-   {
-      MXML_DELETOR( buf );
-      hbxml_set_doc_status( ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_NAMETOOLONG );
-      return MXML_STATUS_MALFORMED;
    }
 
    hbtemp.type = HB_IT_NIL;
@@ -1179,7 +1179,7 @@ static int mxml_node_read_closing( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
       return ref->status;
    }
 
-   if ( chr != '>' || iPos == iLen || (strncmp( HB_VM_STACK.Return.item.asString.value, buf, iLen ) != 0) )
+   if ( chr != '>' || iPos == iLen || (strncmp( HB_VM_STACK.Return.item.asString.value, buf, iLen-1 ) != 0) )
    {
       MXML_DELETOR( buf );
       hbxml_set_doc_status( ref, doc, pNode, MXML_STATUS_MALFORMED, MXML_ERROR_UNCLOSED );
@@ -1985,7 +1985,7 @@ char *mxml_error_desc( MXML_ERROR_CODE code )
    if ( iCode < 0 || iCode > sizeof( edesc ) / sizeof( char * ) )
       return NULL;
 
-   return edesc[ code ];
+   return edesc[ iCode ];
 }
 
 
