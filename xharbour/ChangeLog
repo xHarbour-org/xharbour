@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2441 2004/03/02 01:08:34 likewolf Exp $
+ * $Id: ChangeLog,v 1.2442 2004/03/02 01:58:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-01 20:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed hb_vmOperatorCall() to not recycle pObjItem for Return Value as it may have been passed BYREF.
+
+  * source/rtl/win32ole.prg
+    * Support for ASP collections in Collection Method.
 
 2004-03-01 18:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbclass.ch

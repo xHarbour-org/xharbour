@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.40 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: win32ole.prg,v 1.41 2004/03/01 22:58:11 ronpinkas Exp $
  */
 
 /*
@@ -574,11 +574,20 @@ RETURN uObj
 
 METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 
+	 LOCAL xRet
+
    IF PCount() == 1
       RETURN ::Item( xIndex )
    ENDIF
 
-RETURN ::SetItem( xIndex, xValue )
+	 TRY
+			// ASP Collection syntax.
+			xRet := ::Set( "Item", xIndex, xValue )
+	 CATCH
+			xRet := ::SetItem( xIndex, xValue )
+	 END
+
+RETURN xRet
 
 //--------------------------------------------------------------------
 

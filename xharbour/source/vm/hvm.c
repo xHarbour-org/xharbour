@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.339 2004/02/26 04:56:55 mlombardo Exp $
+ * $Id: hvm.c,v 1.340 2004/03/01 22:58:12 ronpinkas Exp $
  */
 
 /*
@@ -5212,14 +5212,17 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
       hb_vmSend( 1 );
    }
 
-   /* pop passed arguments - only one here */
-   hb_stackPop();               /* pMsgItem */
+   // pMsgItem
+   hb_stackPop();
+
+   // pObjItem
+   hb_stackPop();
 
    /* Push return value on the stack
-    * NOTE: for performance reason we don't pop the second argument.
-    * We can replace the second argument with the return value.
+    * NOTE: for performance reason we could have avoided pop of the second argument.
+    * and recycle it with the return value, but that would be WRONG in case of Argument BYREF.
     */
-   hb_itemForwardValue( pObjItem, &(HB_VM_STACK.Return) );
+   hb_vmPush( &(HB_VM_STACK.Return) );
 }
 
 static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
