@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.5 2003/11/23 03:13:54 jonnymind Exp $
+* $Id: hashmass.prg,v 1.6 2003/11/26 14:03:15 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -17,6 +17,7 @@ PROCEDURE Main()
 
    //LOCAL aaArr := TAssociativeArray()
 
+   SET COLOR TO w+/b
    Clear Screen
    @nRow++,0 SAY PadC(" --- HASH MASSIVE tests ---", MaxCol() )
    @nRow++,0 SAY PadC(" Giancarlo Niccolai ", MaxCol() )

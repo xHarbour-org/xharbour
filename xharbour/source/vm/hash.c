@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.14 2003/11/24 15:15:26 lf_sfnet Exp $
+ * $Id: hash.c,v 1.15 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -1233,7 +1233,6 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
             hb_itemClear( pValue );
          }
 
-         // This should always be true atm, but I may implement numeric keys.
          if( HB_IS_COMPLEX( pKey ) )
          {
             hb_itemClear( pKey );
@@ -1292,58 +1291,7 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 
    HB_TRACE( HB_TR_INFO, ( "hb_hashReleaseGarbage( %p )", pBaseHash ) );
 
-
-   if( pBaseHash->ulAllocated )
-   {
-
-      PHB_ITEM pKey = pBaseHash->pKeys;
-      PHB_ITEM pValue = pBaseHash->pValues;
-      ULONG ulLen = pBaseHash->ulLen;
-
-      // Avoid possible recursion problem when one of the items
-      // in turn points to this hash. ulAllocated is no longer
-      // needed, as the only thing we can do now is to free keys
-      // and values.
-
-      pBaseHash->ulAllocated = 0;
-
-      while( ulLen-- )
-      {
-         HB_TRACE( HB_TR_INFO, ( "Hash Key %p, Value %p, type:%i",
-               pKey, pValue, pValue->type ) );
-
-         if( HB_IS_HASH( pValue ) && pValue->item.asHash.value == pBaseHash )
-         {
-            HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pValue, pValue->item.asHash.value ) );
-            TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pValue, pValue->item.asHash.value );
-         }
-         if( HB_IS_STRING( pValue ) )
-         {
-            hb_itemReleaseString( pValue );
-         }
-         else if( HB_IS_MEMVAR( pValue ) )
-         {
-            hb_memvarValueDecGarbageRef( pValue->item.asMemvar.value );
-         }
-
-         // This should always be true atm, but I may implement numeric keys.
-         if( HB_IS_STRING( pKey ) )
-         {
-            hb_itemReleaseString( pKey );
-         }
-
-         pKey++;
-         pValue++;
-      }
-
-      HB_TRACE( HB_TR_INFO, ( "Release pKeys %p", pBaseHash->pKeys ) );
-      hb_xfree( pBaseHash->pKeys );
-      pBaseHash->pKeys = NULL;
-
-      HB_TRACE( HB_TR_INFO, ( "Release pValues %p", pBaseHash->pValues ) );
-      hb_xfree( pBaseHash->pValues );
-      pBaseHash->pValues = NULL;
-   }
+   hb_hashReleaseBase( pBaseHash );
 }
 
 PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
