@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.10 2003/06/19 00:07:59 druzus Exp $
+ * $Id: hbapigt.h,v 1.11 2003/06/19 22:39:02 druzus Exp $
  */
 
 /*
@@ -162,45 +162,45 @@ typedef enum
 extern void   hb_gtInit( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr );
 extern void   hb_gtExit( void );
 extern void   hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen );
-extern USHORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
-extern USHORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
-extern USHORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
-extern USHORT hb_gtColorSelect( USHORT uiColorIndex );
-extern USHORT hb_gtColorToN( char * szColorString );
-extern USHORT hb_gtDispBegin( void );
-extern USHORT hb_gtDispCount( void );
-extern USHORT hb_gtDispEnd( void );
-extern USHORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
-extern USHORT hb_gtGetBlink( BOOL * pbBlink );
-extern USHORT hb_gtGetColorStr( char * pszColorString );
-extern USHORT hb_gtGetCursor( USHORT * puiCursorShape );
-extern USHORT hb_gtGetPos( SHORT * piRow, SHORT * piCol );
-extern BOOL   hb_gtIsColor( void );
-extern USHORT hb_gtMaxCol( void );
-extern USHORT hb_gtMaxRow( void );
-extern USHORT hb_gtPostExt( void );
-extern USHORT hb_gtPreExt( void );
-extern USHORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
-extern USHORT hb_gtResume( void ); /* resume the terminal after the shell output */
+extern USHORT HB_EXPORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
+extern USHORT HB_EXPORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
+extern USHORT HB_EXPORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
+extern USHORT HB_EXPORT hb_gtColorSelect( USHORT uiColorIndex );
+extern USHORT HB_EXPORT hb_gtColorToN( char * szColorString );
+extern USHORT HB_EXPORT hb_gtDispBegin( void );
+extern USHORT HB_EXPORT hb_gtDispCount( void );
+extern USHORT HB_EXPORT hb_gtDispEnd( void );
+extern USHORT HB_EXPORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
+extern USHORT HB_EXPORT hb_gtGetBlink( BOOL * pbBlink );
+extern USHORT HB_EXPORT hb_gtGetColorStr( char * pszColorString );
+extern USHORT HB_EXPORT hb_gtGetCursor( USHORT * puiCursorShape );
+extern USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol );
+extern BOOL   HB_EXPORT hb_gtIsColor( void );
+extern USHORT HB_EXPORT hb_gtMaxCol( void );
+extern USHORT HB_EXPORT hb_gtMaxRow( void );
+extern USHORT HB_EXPORT hb_gtPostExt( void );
+extern USHORT HB_EXPORT hb_gtPreExt( void );
+extern USHORT HB_EXPORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
+extern USHORT HB_EXPORT hb_gtResume( void ); /* resume the terminal after the shell output */
 extern int    hb_gtExtendedKeySupport( void );
 extern int    hb_gtReadKey( HB_inkey_enum eventmask );
-extern USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
-extern USHORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
-extern USHORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
-extern USHORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
-extern USHORT hb_gtScrDim( USHORT * puiHeight, USHORT * puiWidth );
-extern USHORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols );
-extern USHORT hb_gtSetBlink( BOOL bBlink );
-extern USHORT hb_gtSetColorStr( char * pszColorString );
-extern USHORT hb_gtSetCursor( USHORT uiCursorShape );
-extern USHORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
-extern USHORT hb_gtSetPos( SHORT iRow, SHORT iCol );
-extern USHORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode );
-extern USHORT hb_gtSetSnowFlag( BOOL bNoSnow );
+extern USHORT HB_EXPORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
+extern USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
+extern USHORT HB_EXPORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
+extern USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
+extern USHORT HB_EXPORT hb_gtScrDim( USHORT * puiHeight, USHORT * puiWidth );
+extern USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols );
+extern USHORT HB_EXPORT hb_gtSetBlink( BOOL bBlink );
+extern USHORT HB_EXPORT hb_gtSetColorStr( char * pszColorString );
+extern USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorShape );
+extern USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
+extern USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol );
+extern USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode );
+extern USHORT HB_EXPORT hb_gtSetSnowFlag( BOOL bNoSnow );
 extern void   hb_gtTone( double dFrequency, double dDuration );
-extern USHORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
-extern USHORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
-extern USHORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
+extern USHORT HB_EXPORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
+extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
+extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
 extern int    hb_gtCurrentColor( void );
 extern char * hb_gtVersion( void );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
@@ -221,14 +221,14 @@ extern void   hb_gtWCurrent( HB_GT_WND * wnd );
 extern void   hb_gtWPos( HB_GT_WND * wnd, HB_GT_RECT * rect );
 extern BOOL   hb_gtWVis( HB_GT_WND * wnd, USHORT uiStatus );
 
-extern USHORT hb_gtSLR( HB_GT_SLR * pSLR ); /* System Level Request */
-extern USHORT hb_gtModalRead( void * );
-extern USHORT hb_gtBeginWrite( void );
-extern USHORT hb_gtEndWrite( void );
-extern USHORT hb_gtFlushCursor( void );
-extern USHORT hb_gtSetColor( HB_GT_RGB * color );
-extern USHORT hb_gtGetColor( HB_GT_RGB * color );
-extern USHORT hb_gtSetBorder( HB_GT_RGB * color );
+extern USHORT HB_EXPORT hb_gtSLR( HB_GT_SLR * pSLR ); /* System Level Request */
+extern USHORT HB_EXPORT hb_gtModalRead( void * );
+extern USHORT HB_EXPORT hb_gtBeginWrite( void );
+extern USHORT HB_EXPORT hb_gtEndWrite( void );
+extern USHORT HB_EXPORT hb_gtFlushCursor( void );
+extern USHORT HB_EXPORT hb_gtSetColor( HB_GT_RGB * color );
+extern USHORT HB_EXPORT hb_gtGetColor( HB_GT_RGB * color );
+extern USHORT HB_EXPORT hb_gtSetBorder( HB_GT_RGB * color );
 
 /* Private interface listed below. these are common to all platforms */
 
@@ -343,9 +343,9 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define HB_GT_FUNC_( x, id )    HB_GT_FUNC__( x, id )
 #define HB_GT_FUNC__( x, id )   hb##id##_##x
 
-#define HB_GT_DRVNAME( id )           HB_GT_DRVNAME_( _HB_GT_PREF_( id ) )
-#define HB_GT_DRVNAME_( id )          HB_GT_DRVNAME__( id )
-#define HB_GT_DRVNAME__( id )         HB_GT_DRV##id
+#define HB_GT_DRVNAME( id )     HB_GT_DRVNAME_( _HB_GT_PREF_( id ) )
+#define HB_GT_DRVNAME_( id )    HB_GT_DRVNAME__( id )
+#define HB_GT_DRVNAME__( id )   HB_GT_DRV##id
 
 #define HB_GT_REQUEST( id )     HB_GT_REQUEST_( _HB_GT_PREF_( id ) )
 #define HB_GT_REQUEST_( id )    HB_GT_REQUEST__( id )

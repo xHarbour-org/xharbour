@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1539 2003/10/01 19:22:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1540 2003/10/02 03:40:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-02 16:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * include/hbapigt.h
+   * source/rtl/gtapi.c
+     * added HB_EXPORT to expose gtapi when in a .dll
+   * bin/bld.bat
+     * if you SET HB_DLL=x <anything>, before running BLD, then it will
+     * use Harbour.dll (currently for bcc and msvc only)
+     * (exe size is reduced dramatically)
 
 2003-10-01 12:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * dll_vc.bat

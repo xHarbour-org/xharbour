@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.8 2003/06/24 04:34:39 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.9 2003/07/23 22:09:30 druzus Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ void hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
    }
 }
 
-USHORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame )
+USHORT HB_EXPORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame )
 {
    USHORT Ret;
    USHORT tmp;
@@ -228,7 +228,7 @@ USHORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFra
    return Ret;
 }
 
-USHORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
+USHORT HB_EXPORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
 {
    USHORT Ret;
 
@@ -247,7 +247,7 @@ USHORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
    return Ret;
 }
 
-USHORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
+USHORT HB_EXPORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
 {
    USHORT Ret;
 
@@ -266,7 +266,7 @@ USHORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
    return Ret;
 }
 
-USHORT hb_gtColorSelect( USHORT uiColorIndex )
+USHORT HB_EXPORT hb_gtColorSelect( USHORT uiColorIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtColorSelect(%hu)", uiColorIndex));
 
@@ -279,7 +279,7 @@ USHORT hb_gtColorSelect( USHORT uiColorIndex )
       return 1;
 }
 
-USHORT hb_gtDispBegin( void )
+USHORT HB_EXPORT hb_gtDispBegin( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtDispBegin()"));
 
@@ -291,14 +291,14 @@ USHORT hb_gtDispBegin( void )
    return 0;
 }
 
-USHORT hb_gtDispCount( void )
+USHORT HB_EXPORT hb_gtDispCount( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtDispCount()"));
 
    return hb_gt_DispCount();
 }
 
-USHORT hb_gtDispEnd( void )
+USHORT HB_EXPORT hb_gtDispEnd( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtDispEnd()"));
 
@@ -310,7 +310,7 @@ USHORT hb_gtDispEnd( void )
    return 0;
 }
 
-USHORT hb_gtPreExt( void )
+USHORT HB_EXPORT hb_gtPreExt( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtPreExt()"));
 
@@ -341,7 +341,7 @@ USHORT hb_gtPreExt( void )
    return 0;
 }
 
-USHORT hb_gtPostExt( void )
+USHORT HB_EXPORT hb_gtPostExt( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtPostExt()"));
 
@@ -367,7 +367,7 @@ USHORT hb_gtPostExt( void )
          That seems like a 127+1 buffer size, plus lazy overflow checking.
          [vszakats] */
 
-USHORT hb_gtGetColorStr( char * pszColorString )
+USHORT HB_EXPORT hb_gtGetColorStr( char * pszColorString )
 {
    USHORT uiColorIndex;
    int iPos = 0;
@@ -444,7 +444,7 @@ USHORT hb_gtGetColorStr( char * pszColorString )
    return 0;
 }
 
-USHORT hb_gtColorToN( char * szColorString )
+USHORT HB_EXPORT hb_gtColorToN( char * szColorString )
 {
    char c;
    USHORT nColor = 0;
@@ -509,7 +509,7 @@ USHORT hb_gtColorToN( char * szColorString )
    return nColor;
 }
 
-USHORT hb_gtSetColorStr( char * szColorString )
+USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
 {
    char c;
    char buff[ 6 ];
@@ -674,7 +674,7 @@ USHORT hb_gtSetColorStr( char * szColorString )
    return 0;
 }
 
-USHORT hb_gtGetCursor( USHORT * uipCursorStyle )
+USHORT HB_EXPORT hb_gtGetCursor( USHORT * uipCursorStyle )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetCursor(%p)", uipCursorStyle));
 
@@ -683,7 +683,7 @@ USHORT hb_gtGetCursor( USHORT * uipCursorStyle )
    return 0;
 }
 
-USHORT hb_gtSetCursor( USHORT uiCursorStyle )
+USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorStyle )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetCursor(%hu)", uiCursorStyle));
 
@@ -702,7 +702,7 @@ USHORT hb_gtSetCursor( USHORT uiCursorStyle )
       return 1;
 }
 
-USHORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
+USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetPos(%p, %p)", piRow, piCol));
 
@@ -724,7 +724,7 @@ USHORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
 /* NOTE: Should be exactly the same as hb_gtSetPosContext(), but without the
          additional third parameter. */
 
-USHORT hb_gtSetPos( SHORT iRow, SHORT iCol )
+USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetPos(%hd, %hd)", iRow, iCol));
 
@@ -751,7 +751,7 @@ USHORT hb_gtSetPos( SHORT iRow, SHORT iCol )
 /* NOTE: Should be exactly the same as hb_gtSetPos(), but with the additional
          parameter. */
 
-USHORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
+USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetPosContext(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
@@ -782,21 +782,21 @@ BOOL hb_gtIsColor( void )
    return hb_gt_IsColor();
 }
 
-USHORT hb_gtMaxCol( void )
+USHORT HB_EXPORT hb_gtMaxCol( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtMaxCol()"));
 
    return s_Width - 1;
 }
 
-USHORT hb_gtMaxRow( void )
+USHORT HB_EXPORT hb_gtMaxRow( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtMaxRow()"));
 
    return s_Height - 1;
 }
 
-USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * uipBuffSize )
+USHORT HB_EXPORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * uipBuffSize )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRectSize(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, uipBuffSize));
 
@@ -805,7 +805,7 @@ USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRig
    return 0;
 }
 
-USHORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount )
+USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRepChar(%hu, %hu, %d, %hu)", uiRow, uiCol, (int) byChar, uiCount));
 
@@ -815,7 +815,7 @@ USHORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount )
    return 0;
 }
 
-USHORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff )
+USHORT HB_EXPORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRest(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pScrBuff));
 
@@ -824,7 +824,7 @@ USHORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, 
    return 0;
 }
 
-USHORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff )
+USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSave(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pScrBuff));
 
@@ -833,7 +833,7 @@ USHORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, 
    return 0;
 }
 
-USHORT hb_gtScrDim( USHORT * uipHeight, USHORT * uipWidth )
+USHORT HB_EXPORT hb_gtScrDim( USHORT * uipHeight, USHORT * uipWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScrDim(%p, %p)", uipHeight, uipWidth));
 
@@ -843,7 +843,7 @@ USHORT hb_gtScrDim( USHORT * uipHeight, USHORT * uipWidth )
    return 0;
 }
 
-USHORT hb_gtGetBlink( BOOL * bpBlink )
+USHORT HB_EXPORT hb_gtGetBlink( BOOL * bpBlink )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetBlink(%p)", bpBlink));
 
@@ -852,7 +852,7 @@ USHORT hb_gtGetBlink( BOOL * bpBlink )
    return 0;
 }
 
-USHORT hb_gtSetBlink( BOOL bBlink )
+USHORT HB_EXPORT hb_gtSetBlink( BOOL bBlink )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetBlink(%d)", (int) bBlink));
 
@@ -861,7 +861,7 @@ USHORT hb_gtSetBlink( BOOL bBlink )
    return 0;
 }
 
-USHORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
+USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetMode(%hu, %hu)", uiRows, uiCols));
 
@@ -877,7 +877,7 @@ USHORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 /* NOTE: This is a compatibility function.
          If you're running on a CGA and snow is a problem speak up! */
 
-USHORT hb_gtSetSnowFlag( BOOL bNoSnow )
+USHORT HB_EXPORT hb_gtSetSnowFlag( BOOL bNoSnow )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetSnowFlag(%d)", (int) bNoSnow));
 
@@ -886,7 +886,7 @@ USHORT hb_gtSetSnowFlag( BOOL bNoSnow )
    return 0;
 }
 
-USHORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
+USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
 {
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWrite(%p, %lu)", pStr, ulLength));
@@ -906,7 +906,7 @@ USHORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
    return 0;
 }
 
-USHORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength )
+USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength )
 {
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWriteAt(%hu, %hu, %p, %lu)", uiRow, uiCol, pStr, ulLength));
@@ -927,7 +927,7 @@ USHORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ulLength )
 
 #define WRITECON_BUFFER_SIZE 512
 
-USHORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
+USHORT HB_EXPORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
 {
    int iLen = 0;
    BOOL bDisp = FALSE;
@@ -1045,7 +1045,7 @@ USHORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
    return 0;
 }
 
-USHORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols )
+USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScroll(%hu, %hu, %hu, %hu, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, iRows, iCols));
 
@@ -1056,7 +1056,7 @@ USHORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight
 
 /* NOTE: It would be better if the clipping was done by the low level API */
 
-USHORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr )
+USHORT HB_EXPORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr )
 {
    USHORT uiMaxRow;
    USHORT uiMaxCol;
@@ -1099,7 +1099,7 @@ char * hb_gtVersion( void )
    return hb_gt_Version();
 }
 /* prepare the terminal for system call */
-USHORT hb_gtSuspend( void )
+USHORT HB_EXPORT hb_gtSuspend( void )
 {
    USHORT uidc;
 
@@ -1121,7 +1121,7 @@ USHORT hb_gtSuspend( void )
    return( 0 );
 }
 
-USHORT hb_gtResume( void )
+USHORT HB_EXPORT hb_gtResume( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtResume()"));
 
