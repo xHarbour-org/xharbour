@@ -1,5 +1,5 @@
-As it stands at this point, xHarbour offers many syntax extensions over Harbour
-and Clipper, including:
+As it stands at this point, xHarbour offers many syntax
+extensions over Harbour and Clipper, including:
 
 HASH Variable type:
 -------------------
