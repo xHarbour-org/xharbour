@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.41 2003/03/07 08:14:11 ronpinkas Exp $
+ * $Id: classes.c,v 1.42 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -524,8 +524,12 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             // Either NOT same Class, or Block was created from NON Method, or INLINE Method!
             if( pBase != HB_VM_STACK.pItems )
             {
-               // Backtrack 1 level incase it's INLINE Method.
-               pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+               do
+               {
+                  // Backtrack 1 level incase it's INLINE Method.
+                  pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+               }
+               while( ( HB_IS_BLOCK( *( pBase + 1 ) ) && pBase != HB_VM_STACK.pItems ) );
             }
          }
       #endif

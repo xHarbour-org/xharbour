@@ -1,5 +1,5 @@
 /*
- * $Id: classex.ch,v 1.1 2003/02/27 05:16:14 ronpinkas Exp $
+ * $Id: classex.ch,v 1.2 2003/03/07 15:18:12 what32 Exp $
  */
 
 /*
@@ -123,14 +123,14 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED  ;;
-           DATA F<x>     [AS <astype>] EXPORTED [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )           ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] READ <rf> WRITE <wf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
-           DATA F<x>     [AS <astype>] EXPORTED  [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )          ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
@@ -139,26 +139,26 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED   ;;
-           DATA F<x>     [AS <astype>] EXPORTED  [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] WRITE <wf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
-           DATA F<x>     [AS <astype>] EXPORTED  [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
 #xcommand PROPERTY <x>  [TYPE <type>] [AS <astype>] [INDEX <i>] READ <rf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED   ;;
-           DATA F<x>     [AS <astype>] EXPORTED  [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )
 
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] READ <rf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
-           DATA F<x>     [AS <astype>] EXPORTED  [INIT <d>] ;;
+           DATA F<x>     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.2 2002/12/08 20:10:50 ronpinkas Exp $
+ * $Id: terror.prg,v 1.3 2003/03/08 22:59:13 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,8 @@
 /* Error Class. We are keeping Clipper compatibility here, instead of using
    TError():New() style and also avoiding hungarian notation. */
 
+#include "error.ch"
+
 static s_aErrHandlers := {}
 
 FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
@@ -73,7 +75,7 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
       s_oClass:AddData( "GenCode"      , 0 )
       s_oClass:AddData( "Operation"    , "" )
       s_oClass:AddData( "OsCode"       , 0 )
-      s_oClass:AddData( "Severity"     , 0 )
+      s_oClass:AddData( "Severity"     , ES_ERROR )
       s_oClass:AddData( "SubCode"      , 0 )
       s_oClass:AddData( "SubSystem"    , 0 )
       s_oClass:AddData( "Tries"        , 0 )
