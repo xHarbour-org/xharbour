@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.18 2002/12/29 23:32:42 jonnymind Exp $
+ * $Id: fm.c,v 1.19 2002/12/30 19:44:00 ronpinkas Exp $
  */
 
 /*
@@ -746,11 +746,13 @@ ULONG hb_xquery( USHORT uiMode )
    ULONG ulResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
+   #ifdef HB_FM_STATISTICS
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( s_CriticalMutex );
+      #endif
+
    #endif
-
    /* TODO: Return the correct values instead of 9999 [vszakats] */
 
    switch( uiMode )
@@ -938,11 +940,11 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+   #ifdef HB_FM_STATISTICS
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      #endif
    #endif
-
    return ulResult;
 }
 

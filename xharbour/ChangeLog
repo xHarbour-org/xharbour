@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.563 2002/12/31 00:58:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.564 2002/12/31 07:18:42 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-31 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/vm/fm.c
+    ! Fixed Compilation Error on Line 751 and 945(usage of HB_THREAD_SUPPORT with
+    out the HB_FM_STATISTICS defined (Reported by Itamar Lins)
 
 2002-12-31 08:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
 
