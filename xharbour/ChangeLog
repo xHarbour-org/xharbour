@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.245 2002/05/24 02:35:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.246 2002/05/24 02:55:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-24 02:02 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/console.c
+    ! Fix print in the same line when the new position is previus
+      to the current one.
+
+  * source/rtl/getsys.prg
+    ! Fix, lost the reference to the current oGetList with recursive
+      execution of ReadModal.
 
 2002-05-23 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/pptable.c
