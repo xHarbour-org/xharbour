@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.54 2002/01/28 11:36:55 ignacioortiz Exp $
+ * $Id: tget.prg,v 1.3 2002/01/29 04:38:12 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,6 @@ CLASS Get
    // Exported
 
    DATA BadDate
-   DATA Block
    DATA Buffer
    DATA Cargo
    DATA Changed
@@ -103,6 +102,7 @@ CLASS Get
 
    DATA cColorSpec   HIDDEN   // Used only for METHOD ColorSpec
    DATA cPicture     HIDDEN   // Used only for METHOD Picture
+   DATA bBlock       HIDDEN   // Used only for METHOD Block
 
    METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
 
@@ -111,8 +111,9 @@ CLASS Get
    MESSAGE _Assign METHOD Assign()
 #endif
 
-   METHOD ColorSpec() SETGET  // Replace to DATA ColorSpec
-   METHOD Picture()   SETGET  // Replace to DATA Picture
+   METHOD Block( bBlock )         SETGET  // Replace to DATA Block
+   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
+   METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
    METHOD Display()
    METHOD ColorDisp( cColorSpec ) INLINE ::ColorSpec := cColorSpec, ::Display(), Self
    METHOD KillFocus()
@@ -121,10 +122,10 @@ CLASS Get
    METHOD SetFocus()
    METHOD Undo()
    METHOD UnTransform()
-   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask(), ::Assign(), Self
+   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask(), ::Assign():Display(), Self
 
    METHOD VarGet()
-   METHOD VarPut()
+   METHOD VarPut(xValue, lReFormat)
 
    METHOD End()
 #ifdef HB_COMPAT_XPP
@@ -173,6 +174,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cPicture   TO ""
    DEFAULT cColorSpec TO hb_ColorIndex( SetColor(), CLR_UNSELECTED ) + "," + hb_ColorIndex( SetColor(), CLR_ENHANCED )
 
+   ::HasFocus   := .f.
    ::BadDate    := .f.
    ::Block      := bVarBlock
    ::Changed    := .f.
@@ -181,7 +183,6 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::ColorSpec  := cColorSpec
    ::DecPos     := NIL
    ::ExitState  := 0
-   ::HasFocus   := .f.
    ::Minus      := .f.
    ::Name       := cVarName
    ::Original   := ::VarGet()
@@ -267,7 +268,7 @@ METHOD ParsePict( cPicture ) CLASS Get
 
       case ::type == "N"
 
-         cNum := Str( ::Original )
+         cNum := Str( ::VarGet() )
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0
             ::cPicMask := Replicate( '9', nAt - 1 ) + iif( ::lDecRev, ",", "." )
             ::cPicMask += Replicate( '9', Len( cNum ) - Len( ::cPicMask ) )
@@ -299,7 +300,7 @@ return ::cPicFunc + ' ' + ::cPicMask
 
 METHOD Assign() CLASS Get
 
-   ::VarPut( ::unTransform() )
+   ::VarPut( ::unTransform(), .f.  )
 
 return Self
 
@@ -312,7 +313,11 @@ METHOD Display( lForced ) CLASS Get
    DEFAULT lForced TO .t.
 
    if ::HasScroll() .and. ::Pos != NIL
-      ::nDispPos := Max( 1, Min( ::Pos - Int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
+      if ::nDispLen > 8
+         ::nDispPos := Max( 1, Min( ::Pos - ::nDispLen + 4, ::nMaxLen - ::nDispLen + 1 ) )
+      else
+         ::nDispPos := Max( 1, Min( ::Pos - int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
+      endif
    endif
 
    if lForced .or. ( ::nDispPos != ::nOldPos )
@@ -379,9 +384,8 @@ return Self
 METHOD Undo() CLASS Get
 
    if ::hasfocus
-      ::buffer := ::PutMask( ::original )
+      ::VarPut( ::Original, .t. )
       ::pos    := 1
-      ::VarPut( ::Original )
    endif
 
 return Self
@@ -394,6 +398,7 @@ METHOD SetFocus() CLASS Get
    ::rejected   := .f.
    ::typeout    := .f.
 
+   ::Original   := ::VarGet()
    ::buffer     := ::PutMask( ::VarGet(), .f. )
    ::changed    := .f.
    ::clear      := ( "K" $ ::cPicFunc .or. ::type == "N")
@@ -425,8 +430,8 @@ METHOD KillFocus() CLASS Get
 
    ::Assign()
 
-   ::buffer   := ::PutMask()
    ::hasfocus := .f.
+   ::buffer   := ::PutMask()
    ::pos      := NIL
 
    ::Display()
@@ -435,13 +440,19 @@ return Self
 
 //---------------------------------------------------------------------------//
 
-METHOD VarPut( xValue ) CLASS Get
+METHOD VarPut( xValue, lReFormat ) CLASS Get
+
+   DEFAULT lReFormat TO .t.
 
    if ::block != nil
       Eval( ::block, xValue )
-      ::Type     := ValType( xValue )
-      ::nDispLen := NIL
-      ::Picture( ::cPicture )
+      if lReFormat
+         if !::hasfocus
+            ::Original := xValue
+         endif
+         ::Type     := ValType( xValue )
+         ::Picture( ::cPicture )
+      endif
    endif
 
 return xValue
@@ -528,6 +539,7 @@ METHOD overstrike( cChar ) CLASS Get
       ::lEdit  := .t.
    endif
 
+
    do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxLen
       ::pos++
    enddo
@@ -544,6 +556,7 @@ METHOD overstrike( cChar ) CLASS Get
    endif
 
    ::buffer := SubStr( ::buffer, 1, ::Pos - 1 ) + cChar + SubStr( ::buffer, ::Pos + 1 )
+
    ::Changed := !( ::unTransform() == ::Original )
    ::Assign()
    ::Right( .f. )
@@ -806,6 +819,7 @@ METHOD ToDecPos() CLASS Get
    ::Clear  := .f.
    ::buffer := ::PutMask( ::UnTransform(), .f. )
    ::pos    := ::DecPos + 1
+   ::lEdit  := .t.
 
    ::Display( .t. )
 
@@ -931,16 +945,15 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    if lEdit .and. ::type == "N" .and. ! Empty( ::cPicMask )
       nLen  := Len( cBuffer )
+      cMask := ::cPicMask
       if "E" $ ::cPicFunc
-         cMask := StrTran(::cPicMask, ",", Chr(1))
+         cMask := StrTran(cMask, ",", Chr(1))
          cMask := StrTran(cMask, ".", ",")
          cMask := StrTran(cMask, Chr(1), ".")
-      else
-         cMask := ::cPicFunc
       endif
       for nFor := 1 to nLen
          cChar := SubStr( cMask, nFor, 1 )
-         if cChar $ ",." .and. !( SubStr( cBuffer, nFor, 1 ) == cChar )
+         if cChar $ ",." .and. SubStr( cBuffer, nFor, 1 ) != cChar
             cBuffer := SubStr( cBuffer, 1, nFor - 1 ) + cChar + SubStr( cBuffer, nFor + 1 )
          endif
       next
@@ -1134,7 +1147,7 @@ return Self
 
 //---------------------------------------------------------------------------//
 
-/* The METHOD ColorSpec and MESSAGE _ColorSpec allow to replace the
+/* The METHOD ColorSpec and DATA cColorSpec allow to replace the
  * property ColorSpec for a function to control the content and
  * to carry out certain actions to normalize the data.
  * The particular case is that the function receives a single color and
@@ -1163,7 +1176,7 @@ return ::cColorSpec
 
 //---------------------------------------------------------------------------//
 
-/* The METHOD Picture and MESSAGE _Picture allow to replace the
+/* The METHOD Picture and DATA cPicture allow to replace the
  * property Picture for a function to control the content and
  * to carry out certain actions to normalize the data.
  * The particular case is that the Picture is loaded later on
@@ -1174,6 +1187,8 @@ return ::cColorSpec
 METHOD Picture( cPicture ) CLASS Get
 
    if cPicture != NIL
+
+      ::nDispLen := NIL
 
       ::cPicture := cPicture
       ::ParsePict( cPicture )
@@ -1188,3 +1203,29 @@ METHOD Picture( cPicture ) CLASS Get
    endif
 
 return ::cPicture
+
+//---------------------------------------------------------------------------//
+
+/* The METHOD Block and DATA bBlock allow to replace the
+ * property Block for a function to control the content and
+ * to carry out certain actions to normalize the data.
+ * The particular case is that the Block is loaded later on
+ * to the creation of the object, being necessary to carry out
+ * several tasks to adjust the internal data of the object
+ * to display correctly.
+ */
+
+METHOD Block( bBlock ) CLASS Get
+
+   if bBlock != NIL .AND. !::HasFocus
+
+      ::bBlock   := bBlock
+      ::Original := ::VarGet()
+      ::Type     := ValType( ::Original )
+
+      ::Picture( ::Picture )
+
+   endif
+
+return ::bBlock
+
