@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.93 2002/10/25 21:29:12 ronpinkas Exp $
+ * $Id: xide.prg,v 1.94 2002/10/26 08:57:48 ronpinkas Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ METHOD MainMenu() CLASS TMainFrame
       :AddPopup('&Test')
       With Object :Popup
          :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), oApp:MainFrame ) } )
-         :AddItem( 'Open', 102, {|| XFMOpen( "Form1.prg" ) } )
+         :AddItem( 'Open', 102, {|| XFMOpen( "Form1a.prg" ) } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
