@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.46 2004/01/15 00:01:32 peterrees Exp $
+ * $Id: gtwvt.c,v 1.47 2004/01/15 00:17:55 fsgiudice Exp $
  */
 
 /*
@@ -3220,7 +3220,7 @@ HB_FUNC( WVT_GETFONTINFO )
    PHB_ITEM  info;
    PHB_ITEM  temp;
 
-   info = hb_itemArrayNew( 5 );
+   info = hb_itemArrayNew( 7 );
 
    temp = hb_itemPutC( NULL, _s.fontFace );
    hb_arraySet( info, 1, temp );
@@ -3242,17 +3242,27 @@ HB_FUNC( WVT_GETFONTINFO )
    hb_arraySet( info, 5, temp );
    hb_itemRelease( temp );
 
+   temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.y );
+   hb_arraySet( info, 6, temp );
+   hb_itemRelease( temp );
+   
+   temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.x );
+   hb_arraySet( info, 7, temp );
+   hb_itemRelease( temp );
+   
    hb_itemReturn( info );
    hb_itemRelease( info );
 }
 
-//               Peter Rees <peter@rees.co.nz>
-
+//-------------------------------------------------------------------//
+//
+//                 Peter Rees <peter@rees.co.nz>
+//
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETMENU )
 {
-  SetMenu(_s.hWnd, (HMENU) hb_parni(1)) ;
+  SetMenu( _s.hWnd, ( HMENU ) hb_parni( 1 ) ) ;
   hb_wvt_gtResetWindow();
 }
 
@@ -3260,68 +3270,70 @@ HB_FUNC( WVT_SETMENU )
 
 HB_FUNC( WVT_CREATEMENU )
 {
-  hb_retnl((LONG) CreateMenu()) ;
+  hb_retnl( ( LONG ) CreateMenu() ) ;
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_APPENDMENU )
 {
-  char ucBuf[256];
-  int i,iLen ;
+  char    ucBuf[ 256 ];
+  int     i,iLen ;
   LPCTSTR lpszCaption;
-  if (ISCHAR(4))
+
+  if ( ISCHAR( 4 ) )
   {
-    iLen = hb_parclen(4);
-    if (iLen> 0 && iLen < 256 )   // Translate '~' to '&'
+    iLen = hb_parclen( 4 );
+    if ( iLen > 0 && iLen < 256 )   // Translate '~' to '&'
     {
-      lpszCaption= hb_parc(4) ;
+      lpszCaption = hb_parc( 4 ) ;
       for ( i=0; i< iLen ; i++ )
       {
-        ucBuf[i] = (*lpszCaption == '~') ? '&' : *lpszCaption ;
+        ucBuf[ i ] = ( *lpszCaption == '~' ) ? '&' : *lpszCaption ;
         lpszCaption++;
       }
-      ucBuf[iLen]= '\0';
+      ucBuf[ iLen ]= '\0';
       lpszCaption = ucBuf ;
     }
     else
     {
-      lpszCaption = hb_parc(4) ;
+      lpszCaption = hb_parc( 4 ) ;
     }
   }
   else
   {
-    lpszCaption = (LPCTSTR) hb_parni(4) ; // It is a
+    lpszCaption = ( LPCTSTR ) hb_parni( 4 ) ; // It is a
   }
-  hb_retl(AppendMenu((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT_PTR) hb_parni(3),(LPCTSTR) lpszCaption)) ;
+
+  hb_retl( AppendMenu( ( HMENU ) hb_parnl( 1 ), ( UINT ) hb_parni( 2 ), ( UINT_PTR ) hb_parni( 3 ),( LPCTSTR ) lpszCaption ) ) ;
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_DELETEMENU )
 {
-  hb_retl(DeleteMenu((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT) hb_parni(3)));
+  hb_retl( DeleteMenu( ( HMENU ) hb_parnl( 1 ), ( UINT ) hb_parni( 2 ), ( UINT ) hb_parni( 3 ) ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_DESTROYMENU )
 {
-  hb_retl(DestroyMenu((HMENU) hb_parnl(1)));
+  hb_retl( DestroyMenu( ( HMENU ) hb_parnl( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_ENABLEMENUITEM )
 {
-  hb_retni(EnableMenuItem((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT) hb_parni(3)));
+  hb_retni( EnableMenuItem( ( HMENU ) hb_parnl( 1 ), ( UINT ) hb_parni( 2 ), ( UINT ) hb_parni( 3 ) ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETLASTMENUEVENT )
 {
-  hb_retni(hb_wvt_gtGetLastMenuEvent()) ;
+  hb_retni( hb_wvt_gtGetLastMenuEvent() ) ;
 }
 
 //-------------------------------------------------------------------//
@@ -3329,39 +3341,41 @@ HB_FUNC( WVT_GETLASTMENUEVENT )
 HB_FUNC( WVT_SETMENUKEYEVENT )
 {
   int iEvent = 0;
-  if (ISNUM(1))
+
+  if ( ISNUM( 1 ) )
   {
-    iEvent = hb_parnl(1) ;
+    iEvent = hb_parnl( 1 ) ;
   }
-  hb_retni(hb_wvt_gtSetMenuKeyEvent(iEvent)) ;
+
+  hb_retni( hb_wvt_gtSetMenuKeyEvent( iEvent ) ) ;
 }
 
 //-------------------------------------------------------------------//
 
-HB_FUNC(WVT_GETSCREENWIDTH)
+HB_FUNC( WVT_GETSCREENWIDTH )
 {
-  hb_retni(GetSystemMetrics(SM_CXSCREEN));
+  hb_retni( GetSystemMetrics( SM_CXSCREEN ) );
 }
 
 //-------------------------------------------------------------------//
 
-HB_FUNC(WVT_GETSCREENHEIGHT)
+HB_FUNC( WVT_GETSCREENHEIGHT )
 {
-  hb_retni(GetSystemMetrics(SM_CYSCREEN));
+  hb_retni( GetSystemMetrics( SM_CYSCREEN ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETWINDOWCENTRE )
 {
-  hb_wvt_gtSetCentreWindow(hb_parl(1),hb_parl(2)) ;
+  hb_wvt_gtSetCentreWindow( hb_parl( 1 ), hb_parl( 2 ) ) ;
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETALTF4CLOSE )
 {
-  hb_retl(hb_wvt_gtSetAltF4Close(hb_parl(1)));
+  hb_retl( hb_wvt_gtSetAltF4Close( hb_parl( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3369,18 +3383,42 @@ HB_FUNC( WVT_SETALTF4CLOSE )
 HB_FUNC( WVT_PROCESSMESSAGES )
 {
   hb_wvt_gtDoProcessMessages();
-  hb_retl(1);
+ 
+  hb_retl( 1 );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETTITLE )
 {
-  unsigned char ucText[1024];
-  hb_wvt_gtGetWindowTitle( (char*) ucText, 1023);
-  hb_retc((char*) ucText) ;
+  unsigned char ucText[ 1024 ];
+
+  hb_wvt_gtGetWindowTitle( ( char* ) ucText, 1023 );
+ 
+  hb_retc( ( char* ) ucText ) ;
 }
 
+//-------------------------------------------------------------------//
+//   Author.....: Francesco Saverio Giudice <info@fsgiudice.com>
+//   Syntax.....: Wvt_GetRGBColor( nColor ) --> nRGBColor
+//   Description: Return the RGB values passing the color positional value
+//                0=Black, 1=Blue, etc
+//                as returned from hb_ColorToN()
+//   Creat. Date: 2004/01/15
+//   Last Modif.: 2004/01/15
+//
+HB_FUNC( WVT_GETRGBCOLOR )
+{
+   int iColor;
+   if ( !ISNIL( 1 ) )
+   {
+      iColor = hb_parni( 1 );
+      if ( iColor >= 0 && iColor <= 16 )  /* Test bound error */
+      {
+         hb_retnl( _COLORS[ iColor ] );
+      }
+   }
+}
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -3924,21 +3962,21 @@ HB_FUNC( WVT_DRAWGRIDHORZ )
    int   iLeft, iRight;
 
    iLeft  = ( hb_parni( 2 ) * _s.PTEXTSIZE.x );
-	iRight = ( ( ( hb_parni( 3 ) + 1 ) * _s.PTEXTSIZE.x ) - 1 );
+   iRight = ( ( ( hb_parni( 3 ) + 1 ) * _s.PTEXTSIZE.x ) - 1 );
 
-	SelectObject( _s.hdc, _s.currentPen );
+   SelectObject( _s.hdc, _s.currentPen );
 
-	for ( i = 0; i < iRows; i++ )
-	{
+   for ( i = 0; i < iRows; i++ )
+   {
       y = ( ( iAtRow ) * _s.PTEXTSIZE.y );
 
       MoveToEx( _s.hdc, iLeft, y, NULL );
       LineTo( _s.hdc, iRight, y );
 
       iAtRow++;
-	}
+   }
 
-	hb_retl( TRUE );
+   hb_retl( TRUE );
 }
 
 //-------------------------------------------------------------------//
@@ -3951,10 +3989,10 @@ HB_FUNC( WVT_DRAWGRIDVERT )
    int i;
    int iTabs = hb_parni( 4 );
 
-	if ( ! iTabs )
-	{
-	   hb_retl( FALSE );
-	}
+   if ( ! iTabs )
+   {
+      hb_retl( FALSE );
+   }
 
    iTop    = ( hb_parni( 1 ) * _s.PTEXTSIZE.y );
    iBottom = ( ( hb_parni( 2 ) + 1 ) * _s.PTEXTSIZE.y ) - 1;
@@ -3970,30 +4008,6 @@ HB_FUNC( WVT_DRAWGRIDVERT )
    }
 
    hb_retl( TRUE );
-}
-
-//-------------------------------------------------------------------//
-
-//-------------------------------------------------------------------//
-//   Author.....: Francesco Saverio Giudice <info@fsgiudice.com>
-//   Syntax.....: Wvt_GetRGBColor( nColor ) --> nRGBColor
-//   Description: Return the RGB values passing the color positional value
-//                0=Black, 1=Blue, etc
-//                as returned from hb_ColorToN()
-//   Creat. Date: 2004/01/15
-//   Last Modif.: 2004/01/15
-//
-HB_FUNC( WVT_GETRGBCOLOR )
-{
-   int iColor;
-   if ( !ISNIL( 1 ) )
-   {
-      iColor = hb_parni( 1 );
-      if ( iColor >= 0 && iColor <= 16 )  /* Test bound error */
-      {
-         hb_retnl( _COLORS[ iColor ] );
-      }
-   }
 }
 
 //-------------------------------------------------------------------//
