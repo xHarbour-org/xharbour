@@ -135,10 +135,11 @@ Function GetBccDir()
      Local cEnv  := Gete( "PATH" )
      Local aEnv  := listasarray2( cEnv, ";" )
      Local nPos
+     Local  cCurEnv := ""
 
-     For nPos := 1 To Len( aEnv )
-        If File( aenv[ nPos ] + '\bcc32.exe' ) .or. File( Upper( aenv[ nPos ] ) + '\BCC32.EXE' )
-           cPath := aenv[ nPos ]
+     For EACH cCurEnv In aEnv 
+        If File( cCurEnv + '\bcc32.exe' ) .or. File( Upper( cCurEnv ) + '\BCC32.EXE' )
+           cPath := cCurEnv
            cPath := Left( cPath, Rat( '\', cPath ) - 1 )
            Exit
         Endif
@@ -151,10 +152,11 @@ Function GetVccDir()
      Local cEnv AS STRING := Gete( "PATH" )
      Local aEnv as array of string := listasarray2( cEnv, ";" )
      Local nPos as numeric
+     Local  cCurEnv := ""
 
-     For nPos := 1 To Len( aEnv )
-        If File( aenv[ nPos ] + '\cl.exe' ) .or. File( Upper( aenv[ nPos ] ) + '\cl.EXE' )
-           cPath := aenv[ nPos ]
+     For each cCurEnv In aEnv 
+        If File( cCurEnv + '\cl.exe' ) .or. File( Upper( cCurEnv ) + '\cl.EXE' )
+           cPath := cCurEnv
            cPath := Left( cPath, Rat( '\', cPath ) - 1 )
            Exit
         Endif

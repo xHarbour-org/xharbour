@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.15 2002/05/20 00:03:27 lculik Exp $
+ * $Id: hbmake.prg,v 1.14 2002/05/18 13:19:29 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -53,18 +53,24 @@
 #include "radios.ch"
 
 #ifdef __HARBOUR__
-  #include "hbgetcmt.ch"
-  #define EOL hb_osnewline()
-  #define CRLF hb_osnewline()
+#include "hbgetcmt.ch"
+#define EOL hb_osnewline()
+#define CRLF hb_osnewline()
 #else
-  #define EOL chr(13)+chr(10)
-  #define hb_osnewline() chr(13)+chr(10)
-  #define CRLF hb_osnewline()
-  #include "hbclip.ch"
+#define EOL chr(13)+chr(10)
+#define hb_osnewline() chr(13)+chr(10)
+#define CRLF hb_osnewline()
+#include "hbclip.ch"
 #endif
 #xtranslate timetosec(<x>) => ((val(substr(<x>,1,2))*3600)+(val(substr(<x>,4,2))*60)+(val(substr(<x>,7,2))))
-#translate datediff(<x>,<y>) => (<x>-<y>)
 
+
+
+#ifdef __HARBOUR__
+#translate datediff(<x>,<y>) => (<x>-<y>)
+#else
+#translate datediff(<x>,<y>) => (<x>-<y>)
+#endif
 /*
       Beginning Static Variables Table
 
@@ -112,6 +118,8 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
     LOCAL cOs      := Os()
     LOCAL allParam
     LOCAL nLang    := GETUSERLANG()
+    Local oProfile := HBProfile():new()
+   __setProfiler( .T. )
 
     IF Pcount() == 0
 
@@ -246,6 +254,8 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
 
     Outstd( cLinkComm )
     ! ( cLinkcomm )
+         oProfile:gather()       
+         HBProfileReportToFile():new( oProfile:TimeSort() ):generate( {|o| o:nCalls > 0 } )
 
 RETURN nil
 
@@ -770,12 +780,15 @@ FUNCTION Compfiles()
     LOCAL lEnd     := .f.
     LOCAL xItem
     LOCAL lLinux   := At( 'linux', Lower( Os() ) ) > 0
+    LOCAL cPrg := ''
+    LOCAL cOrder := ""
 
-    FOR nCount := 1 TO Len( aOrder )
+//    FOR nCount := 1 TO Len( aOrder )
+      For EACH cOrder in aOrder 
 
         IF !lExtended
 
-            IF aOrder[ nCount ] == "$(CFILES)"
+            IF cOrder == "$(CFILES)"
 
                 nPos := Ascan( aCommands, { | x | x[ 1 ] == ".prg.c:" } )
 
@@ -797,17 +810,17 @@ FUNCTION Compfiles()
 
                 ENDIF
 
-                FOR nFiles := 1 TO Len( aPrgs )
+                FOR EACH cPrg in aPrgs 
 
-                    xItem := Substr( aPrgs[ nFiles ], Rat( If( lgcc, '/', '\' ), ;
-                                     aPrgs[ nFiles ] ) + 1 )
+                    xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), ;
+                                     cPrg ) + 1 )
                     nPos := Ascan( aCs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), ;
                         Left( x, At( ".", x ) ) == Left( xItem, At( ".", xItem ) ) } )
 
                     IF nPos > 0
 
                         cComm := Strtran( cComm, "o$*", "o" + aCs[ nPos ] )
-                        cComm := Strtran( cComm, "$**", aPrgs[ nFiles ] )
+                        cComm := Strtran( cComm, "$**", cPrg )
 
                         cComm += " > test.out"
                         Outstd( cComm )
@@ -834,7 +847,7 @@ FUNCTION Compfiles()
 
             ENDIF
 
-            IF aOrder[ nCount ] == "$(OBJFILES)"
+            IF cOrder == "$(OBJFILES)"
 
                 IF lGcc
 
@@ -914,7 +927,7 @@ FUNCTION Compfiles()
 
         ELSE /****** Extended mode *****/
 
-            IF aOrder[ nCount ] == "$(CFILES)"
+            IF cOrder == "$(CFILES)"
 
                 IF lGcc
 
@@ -992,7 +1005,7 @@ FUNCTION Compfiles()
 
             ENDIF
 
-            IF aOrder[ nCount ] == "$(OBJFILES)"
+            IF cOrder == "$(OBJFILES)"
 
                 IF lGcc
 
@@ -1023,10 +1036,11 @@ FUNCTION Compfiles()
 
                 ENDIF
 
-                FOR nFiles := 1 TO Len( aprgs )
+//                FOR nFiles := 1 TO Len( aprgs )
+                FOR EACH cPrg In aprgs 
 
-                    xItem := Substr( aprgs[ nFiles ], Rat( If( lgcc, '/', '\' ), ;
-                                     aprgs[ nFiles ] ) + 1 )
+                    xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), ;
+                                     cPrg ) + 1 )
                     nPos := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), ;
                         Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
@@ -1042,7 +1056,7 @@ FUNCTION Compfiles()
 
                         ENDIF
 
-                        cComm := Strtran( cComm, "$**", aprgs[ nFiles ] )
+                        cComm := Strtran( cComm, "$**", cPrg )
                         cComm += " > test.out"
                         Outstd( " " )
 
@@ -1071,7 +1085,7 @@ FUNCTION Compfiles()
             ENDIF
 
         ENDIF
-        IF aOrder[ nCount ] == "$(RESDEPEN)"
+        IF cOrder == "$(RESDEPEN)"
 
             nPos := Ascan( aCommands, { | x | x[ 1 ] == ".rc.res:" } )
 
@@ -1953,11 +1967,14 @@ FUNCTION CompUpdatedfiles()
     LOCAL cErrText    := ""
     LOCAL xItem
     LOCAL nObjPos
-    FOR nCount := 1 TO Len( aOrder )
+    Local cOrder := ""
+    Local cPrg := ""
 
+//    FOR nCount := 1 TO Len( aOrder )
+      FOR EACH cOrder in  aOrder 
         IF !lextended
 
-            IF aOrder[ nCount ] == "$(CFILES)"
+            IF cOrder == "$(CFILES)"
 
                 nPos := Ascan( aCommands, { | x | x[ 1 ] == ".prg.c:" } )
 
@@ -2007,7 +2024,7 @@ FUNCTION CompUpdatedfiles()
 
             ENDIF
 
-            IF aOrder[ nCount ] == "$(OBJFILES)"
+            IF cOrder == "$(OBJFILES)"
 
                 IF lGcc
 
@@ -2066,7 +2083,7 @@ FUNCTION CompUpdatedfiles()
 
         ELSE /**************Extended mode ******/           ////
 
-            IF aOrder[ nCount ] == "$(CFILES)"
+            IF cOrder == "$(CFILES)"
 
                 nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" } )
 
@@ -2126,7 +2143,7 @@ FUNCTION CompUpdatedfiles()
 
             ENDIF
 
-            IF aOrder[ nCount ] == "$(OBJFILES)"
+            IF cOrder == "$(OBJFILES)"
 
                 IF lGcc
 
@@ -2156,17 +2173,18 @@ FUNCTION CompUpdatedfiles()
 
                 ENDIF
 
-                FOR nFiles := 1 TO Len( aprgs )
+//                FOR nFiles := 1 TO Len( aprgs )
+                  FOR EACH cPrg IN aprgs 
 
-                    xItem := Substr( aprgs[ nFiles ], Rat( If( lgcc, '/', '\' ), aprgs[ nFiles ] ) + 1 )
+                    xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), cPrg ) + 1 )
                     nPos  := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
-                    IF fileisnewer( aprgs[ nFiles ], aobjs[ npos ] )
+                    IF fileisnewer( cPrg, aobjs[ npos ] )
 
                         IF nPos > 0
 
                             cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
-                            cComm := Strtran( cComm, "$**", aprgs[ nFiles ] )
+                            cComm := Strtran( cComm, "$**", cPrg )
                             cComm += " > test.out"
                             Outstd( " " )
                             Outstd( cComm )
@@ -2197,7 +2215,7 @@ FUNCTION CompUpdatedfiles()
 
         ENDIF
 
-        IF aOrder[ nCount ] == "$(RESDEPEN)"
+        IF cOrder == "$(RESDEPEN)"
 
             nPos := Ascan( aCommands, { | x | x[ 1 ] == ".rc.res:" } )
 
