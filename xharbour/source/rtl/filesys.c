@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.129 2005/01/09 22:48:25 guerra000 Exp $
+ * $Id: filesys.c,v 1.130 2005/01/10 18:45:33 druzus Exp $
  */
 
 /*
@@ -1901,8 +1901,7 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
          else
          {
              dwWritten = 0;
-             fResult = ( SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) != -1 ) &&
-                       SetEndOfFile( DostoWinHandle(hFileHandle) );
+             fResult = SetEndOfFile( DostoWinHandle(hFileHandle) );
          }
          hb_fsSetIOError( fResult, 0 );
 
@@ -2053,8 +2052,7 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
       }
       else
       {
-         hb_fsSetIOError( ( SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) != -1 ) &&
-                          SetEndOfFile( DostoWinHandle(hFileHandle) ), 0 );
+         hb_fsSetIOError( SetEndOfFile( DostoWinHandle(hFileHandle) ), 0 );
       }
 
       HB_STACK_LOCK

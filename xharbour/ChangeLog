@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3728 2005/01/10 21:28:57 peterrees Exp $
+ * $Id: ChangeLog,v 1.3729 2005/01/11 08:43:38 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-01-11 09:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-11 11:44 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/filesys.c
+    - Removed reduntant "SetFilePointer" calls (as Przemyslaw said).
+
+2005-01-11 09:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_tgz.sh
     * other DJGPP modifications - now make_tgz.sh should work in DOS
       DJGPP env.
@@ -30,7 +34,7 @@
   * include/hbstack.h
     - altered to respect setting of #define HB_NO_DEFAULT_API_MACROS
 
-2004-01-10 19:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-10 19:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
   * xharbour/make_gnu.sh
     * set HB_GPM_MOUSE=yes only for Linux and exist /usr/include/gpm.h
