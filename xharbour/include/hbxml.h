@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.1 2003/06/15 20:27:01 jonnymind Exp $
+ * $Id: hbxml.h,v 1.2 2003/06/16 15:07:18 jonnymind Exp $
  */
 
 /*
@@ -92,6 +92,7 @@
 #define MXML_STYLE_INDENT        0x0001
 #define MXML_STYLE_TAB           0x0002
 #define MXML_STYLE_THREESPACES   0x0004
+#define MXML_STYLE_NOESCAPE      0x0008
 
 /* Status vaules */
 
@@ -120,7 +121,9 @@ typedef enum
    MXML_ERROR_NAMETOOLONG,
    MXML_ERROR_ATTRIBTOOLONG,
    MXML_ERROR_VALATTOOLONG,
-   MXML_ERROR_UNCLOSED
+   MXML_ERROR_UNCLOSED,
+   MXML_ERROR_UNCLOSEDENTITY,
+   MXML_ERROR_WRONGENTITY
 } MXML_ERROR_CODE;
 
 /* Node types */
@@ -216,7 +219,7 @@ void mxml_node_insert_after( PHB_ITEM tg, PHB_ITEM node );
 void mxml_node_insert_below( PHB_ITEM tg, PHB_ITEM node );
 void mxml_node_add_below( PHB_ITEM tg, PHB_ITEM node );
 
-MXML_STATUS mxml_node_read( MXML_REFIL *data, PHB_ITEM node, PHB_ITEM doc );
+MXML_STATUS mxml_node_read( MXML_REFIL *data, PHB_ITEM node, PHB_ITEM doc, int style );
 
 MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style );
 
@@ -224,8 +227,8 @@ MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style );
 /* Attribute oriented operations */
 PHB_ITEM mxml_attribute_new( void );
 
-PHB_ITEM mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc );
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHB_ITEM attr );
+PHB_ITEM mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, int style );
+MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHB_ITEM attr, int style );
 
 /* Refil routines */
 MXML_REFIL *mxml_refil_new( MXML_REFIL_FUNC func, char *buf, int buflen,
@@ -247,6 +250,7 @@ void mxml_output_destroy( MXML_OUTPUT *out );
 MXML_STATUS mxml_output_char( MXML_OUTPUT *out, int c );
 MXML_STATUS mxml_output_string_len( MXML_OUTPUT *out, char *s, int len );
 MXML_STATUS mxml_output_string( MXML_OUTPUT *out, char *s );
+MXML_STATUS mxml_output_string_escape( MXML_OUTPUT *out, char *s );
 
 void mxml_output_func_to_stream( MXML_OUTPUT *out, char *s, int len );
 void mxml_output_func_to_handle( MXML_OUTPUT *out, char *s, int len );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.ch,v 1.1 2003/06/16 00:03:21 jonnymind Exp $
+ * $Id: hbxml.ch,v 1.2 2003/06/17 10:16:09 jonnymind Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
 #define HBXML_STYLE_INDENT        1
 #define HBXML_STYLE_TAB           2
 #define HBXML_STYLE_THREESPACES   4
+#define HBXML_STYLE_NOESCAPE      8
 
 /* Status vaules */
 #define HBXML_STATUS_ERROR        0
@@ -82,6 +83,8 @@
 #define HBXML_ERROR_ATTRIBTOOLONG 9
 #define HBXML_ERROR_VALATTOOLONG  10
 #define HBXML_ERROR_UNCLOSED      11
+#define HBXML_ERROR_UNCLOSEDENTITY   12
+#define HBXML_ERROR_WRONGENTITY      13
 
 /* Node types */
 #define HBXML_TYPE_TAG            0

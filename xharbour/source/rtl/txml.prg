@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.2 2003/06/16 20:13:34 jonnymind Exp $
+ * $Id: txml.prg,v 1.3 2003/06/17 10:16:10 jonnymind Exp $
  */
 
 /*
@@ -326,8 +326,8 @@ CLASS TXmlDocument
    DATA nLine
    DATA nNodeCount
 
-   METHOD New( xElem )                CONSTRUCTOR
-   METHOD Read( xData )               INLINE HBXML_DATAREAD( Self, xData )
+   METHOD New( xElem, nStyle )        CONSTRUCTOR
+   METHOD Read( xData, nStyle )       INLINE HBXML_DATAREAD( Self, xData, nStyle )
    METHOD ToString( nStyle )          INLINE ::oRoot:ToString( nStyle )
    METHOD Write( fHandle, nStyle )    INLINE ::oRoot:Write( fHandle, nStyle )
 
@@ -340,7 +340,7 @@ HIDDEN:
 
 ENDCLASS
 
-METHOD New( xElem ) CLASS TXmlDocument
+METHOD New( xElem, nStyle ) CLASS TXmlDocument
    ::nStatus := HBXML_STATUS_OK
    ::nError := HBXML_ERROR_NONE
    ::nLine := 1
@@ -357,7 +357,7 @@ METHOD New( xElem ) CLASS TXmlDocument
          CASE 'N'
          CASE 'C'
             ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
-            ::Read( xElem )
+            ::Read( xElem, nStyle )
       END
    ENDIF
 

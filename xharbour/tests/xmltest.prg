@@ -1,6 +1,6 @@
 ************************************************************
 * xmltest.prg
-* $Id: xmltest.prg,v 1.3 2003/06/16 20:13:34 jonnymind Exp $
+* $Id: xmltest.prg,v 1.4 2003/06/17 10:16:10 jonnymind Exp $
 *
 * Test for XML routines of Xharbour rtl (MXML/HBXML)
 *
@@ -124,4 +124,6 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
    ? ""
    ? "Terminated. Press any key to continue"
    Inkey( 0 )
+   ?
+   ?
 RETURN

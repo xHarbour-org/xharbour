@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1201 2003/06/30 17:07:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1202 2003/06/30 21:42:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-01 00:50 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbxml.ch
+  * include/hbxml.h
+  * source/rtl/hbxml.c
+  * source/rtl/txml.prg
+    + added support for &amp; like standard xml escape, ( both in input
+      and in output ) with relative error detection.
+    ! Fixed various memory leacks.
+
+  * tests/xmltest.prg
+  * tests/xmltest.xml
+    ! added test for escapes.
+
+
 2003-07-01 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
     ! Put b_MouseEnable into #if defined(HB_OS_WIN_32_USED) || defined(__WIN32__)
