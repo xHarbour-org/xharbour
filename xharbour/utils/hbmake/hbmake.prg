@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.95 2003/09/11 18:25:35 lculik Exp $
+ * $Id: hbmake.prg,v 1.96 2003/09/19 17:05:49 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -1164,7 +1164,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage"
-   LOCAL cHarbDll         := "bcc640.lib hbdll_"
+   LOCAL cHarbDll         := "bcc640.lib harbour.lib"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
    LOCAL cSystemLibs      := "-lncurses -lslang -lgpm -lpthread -lm"
 
@@ -1292,7 +1292,7 @@ FUNC CreateMakeFile( cFile )
    lWhoo  := "Whoo" in cGui
 
    IF lUseXharbourDll
-      cDefBccLibs      := cHarbDll+"bc.lib"
+//      cDefBccLibs      := cHarbDll+"bc.lib"
       cDefLibGccLibs   := cHARso
    ENDIF
 
