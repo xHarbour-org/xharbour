@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1152 2003/06/20 18:14:58 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1153 2003/06/20 18:25:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-20 16:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/odbc/odbc.c
+    ! Fixed: SqlGetData() - completally new and optimized, now you can retrieve any data size
+    ! Fixed TYPOs
+    + Added New PRG level functions:
+        SQLGETINFO()
+        SQLSETCONNECTOPTION()
+        SQLSETSTMTOPTION()
+        SQLGETCONNECTOPTION()
+        SQLGETSTMTOPTION()
+        SQLCOMMIT()
+        SQLROLLBACK()
+  * source/odbc/todbc.prg
+    ! Minor fixes and reformating
+    + Added New Methods:
+        METHOD SetCnnOptions( nType, uBuffer )
+        METHOD GetCnnOptions( nType )
+        METHOD Commit()
+        METHOD RollBack()
+        METHOD SetStmtOptions( nType, uBuffer )
+        METHOD GetStmtOptions( nType )
+        METHOD SetAutocommit( lEnable )
+  * source/odbc/sql.ch
+    + Added SQLOptions constants
 
 2003-06-20 11:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.bc
