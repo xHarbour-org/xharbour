@@ -50,7 +50,7 @@ CLASS TEdit FROM TControl
    DATA Name      PROTECTED INIT "edit"
 
    METHOD New() CONSTRUCTOR
-
+   METHOD SetText( c ) INLINE SetDlgItemText( ::Parent:handle, ::id, c )
 ENDCLASS
 
 *------------------------------------------------------------------------------*

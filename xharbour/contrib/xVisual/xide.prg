@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.74 2002/10/06 06:07:09 what32 Exp $
+ * $Id: xide.prg,v 1.75 2002/10/06 21:57:52 what32 Exp $
  */
 
 /*
@@ -205,7 +205,7 @@ CLASS ObjEdit FROM TForm
                                 ::height  := 300,;
                                 super:new( oParent )
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE ::QuickEdit:Move(,,::ClientRect()[3],::ClientRect()[4],.t.),nil
+   METHOD OnSize(n,x,y)  INLINE ::QuickEdit:Move(,,x,y,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjEdit

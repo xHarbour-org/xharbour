@@ -112,7 +112,6 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
          aAdd( oForm:Controls, aVar[2] )
 
          WITH OBJECT aVar[2]
-            :Name      := WinClass( :ClassName )
             :Parent    := oForm
             :Instance  := oForm:Instance
             :Create()
