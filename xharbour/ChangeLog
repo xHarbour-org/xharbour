@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1169 2003/06/23 02:49:30 andijahja Exp $
+ * $Id: ChangeLog,v 1.1170 2003/06/23 07:24:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,66 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-23 21:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/compiler/hbusage.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+    + Add option to create *.var file ( /gc3 )
+
+  /*
+     VAR file is a compilation by-product created by using /gc3 option.
+
+     Using /gc3 option, harbour.exe will produce C file in verbose mode
+     (/gc2) and will also generate VAR file, thus /gc3 is actually /gc2
+     _PLUS_ VAR file creation.
+
+     VAR file will be created in the same directory with PRG file. VAR file
+     is formatted in such a way to resemble common INI file to make it easy
+     for further manipulation, eg.:
+
+     // main.prg
+     proc main
+     local x := 1, y := 2
+     x := y
+
+     // main.var
+     [MAIN]
+     X=1
+     Y=2
+
+     The main purpose of creating VAR file is to enable developer to review
+     how effective he is using LOCALs in PRG file. The above example shows
+     that variable X is used once ( X=1 ) and variable Y is used 2 times
+     (Y=2). The INI section name, MAIN, denotes function name while the entries,
+     X and Y, denote LOCAL var names and the values of X and Y denote how many
+     times they are used in main.prg under function MAIN. The entries and
+     the values are simply picked-up from members of pVar: szName and iUsed.
+
+     Developers should have taken note when the value of any entries is 0,
+     which means unused, as too much unused variables would only cause less
+     productivity, thus degrade performance because the VM engine has to
+     process pCode for nothing. Statics, Publics, Privates and Globals are not
+     listed on the ground that they would not as many as locals, thus easy to
+     control. Furthermore, there is a rule of thumb (Clipper) that using
+     Publics or Privates would degrade performance to a certain degree, hence
+     the use of them is always discouraged. [ Do not ask me why please :-) ]
+
+     I am not sure if this feature will be useful for others, but as for me,
+     it is quite useful in attempts to remove un-needed locals from my PRG
+     files so that I do not have to "walk" the file line-by-line. It is easy
+     to look for un-needed variable if the PRG is small, but if the PRG is
+     some tens of KB or when we have to analyze a project of many PRGs which
+     comprise a LIBrary or a BIG exe, then this feature might be our good
+     friend :)
+
+     Depending on developer's creativity, a small routine can be programmed
+     to grab information from .var files produced from a (big) project and
+     summarize them in such a way to produce an overall picture
+     [ "management summary" ;-) ] of that project.
+
+     Nevertheless, this may look silly to experts and if this is the case,
+     what you need to do is "do not use /gc3". ;-)
+  */
 
 2003-06-22 00:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

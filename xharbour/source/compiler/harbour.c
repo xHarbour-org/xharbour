@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.43 2003/06/21 22:08:54 andijahja Exp $
+ * $Id: harbour.c,v 1.44 2003/06/22 21:19:22 andijahja Exp $
  */
 
 /*
@@ -254,6 +254,12 @@ extern char * hb_comp_szAnnounce;
 
 extern void yyrestart( FILE * );
 
+/*
+ The following two variables are for the purpose of
+ creating Local Variable List (.var) file
+*/
+BOOL hb_comp_iGenVarList = FALSE;
+FILE *hb_comp_VariableList = NULL;
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
@@ -343,6 +349,9 @@ int main( int argc, char * argv[] )
    {
       iStatus = EXIT_FAILURE;
    }
+
+   if( hb_comp_VariableList != NULL )
+      fclose( hb_comp_VariableList );
 
    return iStatus;
 }
@@ -3740,6 +3749,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 {
    USHORT w;
 
+
    if( pFunc == NULL )
       return;
 
@@ -3796,11 +3806,15 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       BOOL bSkipSFRAME;
 
       pLocal = pFunc->pLocals;
+
       while( pLocal )
       {
+         if( hb_comp_VariableList != NULL )
+            fprintf(hb_comp_VariableList,"%s=%i\n",pLocal->szName, pLocal->iUsed);
          pLocal = pLocal->pNext;
          bLocals++;
       }
+
 
       if( bLocals || pFunc->wParamCount )
       {
@@ -3854,7 +3868,10 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          pFunc->lPCodePos -= 3;
          memmove( pFunc->pCode + 3, pFunc->pCode + 6, pFunc->lPCodePos - 3 );
       }
+
+      // hb_xfree( szFunctionName );
    }
+
 }
 
 int
@@ -4403,6 +4420,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 {
    int iStatus = EXIT_SUCCESS;
    PHB_FNAME pFileName;
+   BOOL bFunc;
 
    hb_comp_pFileName = hb_fsFNameSplit( szPrg );
 
@@ -4411,6 +4429,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       char szFileName[ _POSIX_PATH_MAX ], szFileLiteral[ _POSIX_PATH_MAX + 2 ];
       char szPpoName[ _POSIX_PATH_MAX ];
       char szHILName[ _POSIX_PATH_MAX ];
+      char szVarListName[ _POSIX_PATH_MAX ];
 
       char *szSourceExtension, *szSourcePath;
 
@@ -4426,6 +4445,16 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
       sprintf( szFileLiteral, "\"%s\"", szFileName );
       hb_pp_AddDefine( "__FILE__", szFileLiteral );
+
+      /* Local Variable List (.var) File
+         hb_comp_iGenVarList is TRUE if /gc3 is used
+      */
+      if ( hb_comp_iGenVarList )
+      {
+         hb_comp_pFileName->szExtension = ".var";
+         hb_fsFNameMerge( szVarListName, hb_comp_pFileName );
+         hb_comp_VariableList = fopen( szVarListName, "w" );
+      }
 
       if( hb_comp_bPPO )
       {
@@ -4665,7 +4694,15 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                while( pFunc )
                {
+                  bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp(pFunc->szName,"(_INITSTATICS)") > 0  ) ) ;
+
+                  /* Using function name as section name */
+                  if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
+
                   hb_compOptimizeFrames( pFunc );
+
+                  /* Just a new line for readability */
+                  if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"\n");
 
                   if( szFirstFunction == NULL && pFunc->szName[0] && ! ( pFunc->cScope & HB_FS_INIT || pFunc->cScope & HB_FS_EXIT ) )
                   {
@@ -4673,6 +4710,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   }
 
                   pFunc = pFunc->pNext;
+
                }
 
                if( szFirstFunction )

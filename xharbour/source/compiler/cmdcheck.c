@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.6 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: cmdcheck.c,v 1.7 2003/06/21 06:59:22 jonnymind Exp $
  */
 
 /*
@@ -49,7 +49,8 @@
 
 #include "hbcomp.h"
 
-extern int hb_pp_ParseDefine( char * );
+extern int  hb_pp_ParseDefine( char * );
+extern BOOL hb_comp_iGenVarList;
 
 /* TODO: Add support for this compiler switches
    -r -t || hb_getenv( "TMP" )
@@ -570,6 +571,11 @@ void hb_compChkEnvironVar( char * szSwitch )
                       switch( *( s + 2 ) )
                       {
                          case '\0':
+
+                         case '3':
+                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+                            hb_comp_iGenVarList = TRUE;
+                            break;
 
                          case '2':
                             hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;

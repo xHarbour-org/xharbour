@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.8 2003/01/16 16:07:42 walito Exp $
+ * $Id: hbusage.c,v 1.9 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cg<type>         output type generated is <type> (see below)",
            "\n          %cgc[<type>]      output type: C source (.c) (default)",
            "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
+           "\n                                   3=generate variable list (.var) file",
            "\n          %cgo              output type: Platform dependant object module",
            "\n          %cgw              output type: Windows/DOS OBJ32 (.obj)",
            "\n          %cgh              output type: Harbour Portable Object (.hrb)",
