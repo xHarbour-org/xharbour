@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.112 2004/01/24 17:26:44 lculik Exp $
+ * $Id: hbmake.prg,v 1.113 2004/01/28 15:07:55 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -106,7 +106,7 @@ STATIC s_cUserInclude  := "                                        "
 STATIC s_lxFwh         := .F.
 STATIC s_nFilesToAdd   := 5
 STATIC s_nWarningLevel := 0
-
+STATIC s_AppName       := ""
 
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
@@ -228,6 +228,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    ENDIF
 
    s_cLog := Substr( cFile,1 , AT(".",cFile) -1) + ".out"
+   s_AppName := Substr( cFile,1 , AT(".",cFile) -1)
 
    Ferase( (s_cLog) )
 
@@ -1186,7 +1187,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL x
    LOCAL getlist          := {}
    LOCAL cTopFile         := Space( 30 )
-   LOCAL cAppName         := Space( 50 )
+   LOCAL cAppName         := s_Appname + Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
