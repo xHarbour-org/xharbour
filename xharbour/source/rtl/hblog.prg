@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.17 2003/12/14 01:58:54 ronpinkas Exp $
+* $Id: hblog.prg,v 1.18 2003/12/29 23:38:56 jonnymind Exp $
 */
 
 /*
@@ -556,7 +556,7 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
    HB_FCommit( ::nFileHandle );
 
    // see file limit and eventually swap file.
-   IF ::nFileLimit > 0 .and. FError() == 0
+   IF ::nFileLimit > 0
       IF FSeek( ::nFileHandle, 0, FS_RELATIVE ) > ::nFileLimit * 1024
          Fwrite( ::nFileHandle, HB_BldLogMsg( HB_LogDateStamp(), Time(), "LogFile: Closing file due to size limit breaking", HB_OsNewLine() ) )
          FClose( ::nFileHandle )

@@ -1,5 +1,5 @@
 /*
- * $Id: hblog.ch,v 1.4 2003/08/01 16:56:52 jonnymind Exp $
+ * $Id: hblog.ch,v 1.5 2003/12/12 05:31:20 jonnymind Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
       HB_StandardLogAdd( HB_LogConsole():New( <nConPrio> ));;
    endif;;
    if <.fil.> ;;
-      HB_StandardLogAdd( HB_LogFile():New( <nFilPrio>, <cFileName> ));;
+      HB_StandardLogAdd( HB_LogFile():New( <nFilPrio>, <cFileName>, <nFileSize>, <nFileCount> ));;
    endif ;;
    if <.mon.> ;;
       HB_StandardLogAdd( HB_LogInetPort():New( <nMonPrio>, <nMonPort> ));;
