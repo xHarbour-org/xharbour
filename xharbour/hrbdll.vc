@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.25 2003/11/16 02:13:02 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.26 2003/11/26 00:05:17 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -166,6 +166,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\philes53.obj \
   $(OBJ_DIR)\philesx.obj \
   $(OBJ_DIR)\rat.obj \
+  $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\regex.obj \
   $(OBJ_DIR)\replic.obj \
   $(OBJ_DIR)\right.obj \
@@ -1212,6 +1213,9 @@ $(OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c

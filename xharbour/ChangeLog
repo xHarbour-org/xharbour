@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1865 2003/12/13 17:09:48 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1866 2003/12/13 17:45:07 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +9,7 @@
 */
 
 2003-12-13 12:43 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * hrbdll.vc
   * makefile.nt
   * makefile.vc
     + source/rtl/readline.c
