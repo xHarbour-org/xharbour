@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2846 2004/04/28 22:24:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2847 2004/04/28 22:49:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-29 08:45 UTC-0400 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/fserror.c
+    * Added defined(HB_OS_WIN_32) to each (HB_WIN32_IO) because MSVC family
+      compiler don't report the right error number.
+    Ex: if hb_fsdelete() failed the error number was 0
 
 2004-04-28 15:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/itemapi.c
