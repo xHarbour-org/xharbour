@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.88 2003/10/26 03:34:11 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.89 2003/10/26 20:14:18 ronpinkas Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ static BOOL   OpenInclude( char *, HB_PATHNAMES *, PHB_FNAME, BOOL bStandardOnly
 static BOOL   IsIdentifier( char *szProspect );
 static int    NextStopper( char ** sSource, char * sDest );
 
-int hb_pp_NextToken( char** pLine );
+int hb_pp_NextToken( char** pLine, char *sToken );
 
 #define ISID( c )  ( isalpha( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
@@ -1148,7 +1148,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
      }
   #else
 
-     ipos = hb_pp_NextToken( &sLine );
+     ipos = hb_pp_NextToken( &sLine, s_sToken );
 
      if( ipos == 0 || ipos > MAX_NAME )
      {
@@ -1841,7 +1841,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
         ptri = sLine + isdvig + iOffset;
         ptrb = ptri;
 
-        if( *ptrb && ( lenToken = hb_pp_NextToken( &ptrb ) ) > 0 )
+        if( *ptrb && ( lenToken = hb_pp_NextToken( &ptrb, s_sToken ) ) > 0 )
         {
            #if 0
               printf( "Token: >%s< Line: >%s<\n", s_sToken, ptri );
@@ -1908,7 +1908,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
         HB_SKIPTABSPACES( ptri );
 
-        hb_pp_NextToken( &ptri );
+        hb_pp_NextToken( &ptri, s_sToken );
 
         #if 0
            printf( "Command: >%s< Line: >%s<\n", s_sToken, ptri );
@@ -2650,7 +2650,18 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
      //printf( "Stoper: >%.*s<\n", lenreal, expreal );
 
-     if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
+     if( lenreal )
+     {
+        char *pDummy = expreal, sStopper[ HB_SYMBOL_NAME_LEN ];
+
+        expreal[lenreal] = '\0';
+        lenreal = hb_pp_NextToken( &pDummy, sStopper );
+        expreal[lenreal] = '\0';
+
+        //printf( "*** Stoper: >%.*s<\n", lenreal, expreal );
+     }
+
+     if( lenreal && (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
      {
         if( ptrtemp > *ptrmp )
         {
@@ -6024,7 +6035,7 @@ void CloseInclude( void )
    hb_comp_files.iFiles--;
 }
 
-int hb_pp_NextToken( char** pLine )
+int hb_pp_NextToken( char** pLine, char *sToken )
 {
    char *sLine, *pTmp;
    char s2[3];
@@ -6045,7 +6056,7 @@ int hb_pp_NextToken( char** pLine )
       sLine++; nLen--; iPad++;
    }
 
-   s_sToken[0] = '\0';
+   sToken[0] = '\0';
    s2[2]      = '\0';
 
    if( nLen >= 2 )
@@ -6055,9 +6066,9 @@ int hb_pp_NextToken( char** pLine )
 
       if( strstr( "++\\--\\->\\:=\\==\\!=\\<>\\>=\\<=\\+=\\-=\\*=\\^=\\**\\/=\\%=", (char*) s2 ) )
       {
-         s_sToken[0] = s2[0];
-         s_sToken[1] = s2[1];
-         s_sToken[2] = '\0';
+         sToken[0] = s2[0];
+         sToken[1] = s2[1];
+         sToken[2] = '\0';
 
          goto Done;
       }
@@ -6066,13 +6077,13 @@ int hb_pp_NextToken( char** pLine )
          pTmp = strstr( sLine + 2, "]]" );
          if( pTmp == NULL )
          {
-            s_sToken[0] = '['; // Clipper does NOT consider '[[' a single token
-            s_sToken[1] = '\0';
+            sToken[0] = '['; // Clipper does NOT consider '[[' a single token
+            sToken[1] = '\0';
          }
          else
          {
-            strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 2 );
-            s_sToken[( pTmp - sLine ) + 2] = '\0';
+            strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 2 );
+            sToken[( pTmp - sLine ) + 2] = '\0';
          }
 
          goto Done;
@@ -6088,15 +6099,15 @@ int hb_pp_NextToken( char** pLine )
          pTmp = strchr( pTmp, '"' );
          if( pTmp == NULL )
          {
-            s_sToken[0] = '"';
-            s_sToken[1] = '\0';
+            sToken[0] = '"';
+            sToken[1] = '\0';
             break;
          }
          else
          {
             if ( pTmp[-1] != '\\' ) {
-               strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
-               s_sToken[( pTmp - sLine ) + 1] = '\0';
+               strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
+               sToken[( pTmp - sLine ) + 1] = '\0';
                break;
             }
             pTmp++; // skip current "
@@ -6109,59 +6120,59 @@ int hb_pp_NextToken( char** pLine )
 
    if( isalpha( sLine[0] ) || sLine[0] == '_' )
    {
-      s_sToken[0] = sLine[0];
+      sToken[0] = sLine[0];
       Counter = 1;
 
       // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
       while( isalnum( sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
       {
-         s_sToken[Counter] = sLine[Counter];
+         sToken[Counter] = sLine[Counter];
          Counter++;
       }
 
-      s_sToken[Counter] = '\0';
+      sToken[Counter] = '\0';
       goto Done;
    }
    else if( isdigit( sLine[0] ) )
    {
-      s_sToken[0] = sLine[0];
+      sToken[0] = sLine[0];
       Counter = 1;
       while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
       {
-         s_sToken[Counter] = sLine[Counter];
+         sToken[Counter] = sLine[Counter];
          Counter++;
       }
 
       // Consume the point (and subsequent digits) only if digits follow...
       if( sLine[Counter] == '.' && isdigit( sLine[Counter + 1] ) )
       {
-         s_sToken[Counter] = '.';
+         sToken[Counter] = '.';
          Counter++;
-         s_sToken[Counter] = sLine[Counter];
+         sToken[Counter] = sLine[Counter];
          Counter++;
          while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
          {
-            s_sToken[Counter] = sLine[Counter];
+            sToken[Counter] = sLine[Counter];
             Counter++;
          }
       }
 
       // Either way we are done.
-      s_sToken[Counter] = '\0';
+      sToken[Counter] = '\0';
       goto Done;
    }
    else if( sLine[0] == '.' && isdigit( sLine[1] ) )
    {
-      s_sToken[0] = '.';
-      s_sToken[1] = sLine[1];
+      sToken[0] = '.';
+      sToken[1] = sLine[1];
       Counter = 2;
       while( isdigit( sLine[Counter] ) )
       {
-         s_sToken[Counter] = sLine[Counter];
+         sToken[Counter] = sLine[Counter];
          Counter++;
       }
 
-      s_sToken[Counter] = '\0';
+      sToken[Counter] = '\0';
       goto Done;
    }
    else if( sLine[0] == '.' )
@@ -6170,19 +6181,19 @@ int hb_pp_NextToken( char** pLine )
       {
          if( toupper( sLine[1] ) == 'A' && toupper( sLine[2] ) == 'N' && toupper( sLine[3] ) == 'D' )
          {
-            s_sToken[0] = '.';
-            s_sToken[1] = 'A';
-            s_sToken[2] = 'N';
-            s_sToken[3] = 'D';
-            s_sToken[4] = '.';
-            s_sToken[5] = '\0';
+            sToken[0] = '.';
+            sToken[1] = 'A';
+            sToken[2] = 'N';
+            sToken[3] = 'D';
+            sToken[4] = '.';
+            sToken[5] = '\0';
 
             goto Done;
          }
          else if( toupper( sLine[1] ) == 'N' && toupper( sLine[2] ) == 'O' && toupper( sLine[3] ) == 'T' )
          {
-            s_sToken[0] = '!';
-            s_sToken[1] = '\0';
+            sToken[0] = '!';
+            sToken[1] = '\0';
 
             /* Skip the unaccounted letters ( .NOT. <-> ! ) */
             sLine += 4;
@@ -6193,11 +6204,11 @@ int hb_pp_NextToken( char** pLine )
 
       if( nLen >= 4 && sLine[3] == '.' && toupper( sLine[1] ) == 'O' && toupper( sLine[2] ) == 'R' )
       {
-         s_sToken[0] = '.';
-         s_sToken[1] = 'O';
-         s_sToken[2] = 'R';
-         s_sToken[3] = '.';
-         s_sToken[4] = '\0';
+         sToken[0] = '.';
+         sToken[1] = 'O';
+         sToken[2] = 'R';
+         sToken[3] = '.';
+         sToken[4] = '\0';
 
          goto Done;
       }
@@ -6206,26 +6217,26 @@ int hb_pp_NextToken( char** pLine )
       {
          if( toupper( sLine[1] ) == 'T' )
          {
-            s_sToken[0] = '.';
-            s_sToken[1] = 'T';
-            s_sToken[2] = '.';
-            s_sToken[3] = '\0';
+            sToken[0] = '.';
+            sToken[1] = 'T';
+            sToken[2] = '.';
+            sToken[3] = '\0';
 
             goto Done;
          }
          else if( toupper( sLine[1] ) == 'F' )
          {
-            s_sToken[0] = '.';
-            s_sToken[1] = 'F';
-            s_sToken[2] = '.';
-            s_sToken[3] = '\0';
+            sToken[0] = '.';
+            sToken[1] = 'F';
+            sToken[2] = '.';
+            sToken[3] = '\0';
 
             goto Done;
          }
       }
 
-      s_sToken[0] = '.';
-      s_sToken[1] = '\0';
+      sToken[0] = '.';
+      sToken[1] = '\0';
 
       goto Done;
    }
@@ -6234,13 +6245,13 @@ int hb_pp_NextToken( char** pLine )
       pTmp = strchr( sLine + 1, '"' );
       if( pTmp == NULL )
       {
-         s_sToken[0] = '"';
-         s_sToken[1] = '\0';
+         sToken[0] = '"';
+         sToken[1] = '\0';
       }
       else
       {
-         strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
-         s_sToken[( pTmp - sLine ) + 1] = '\0';
+         strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
+         sToken[( pTmp - sLine ) + 1] = '\0';
       }
 
       goto Done;
@@ -6250,18 +6261,18 @@ int hb_pp_NextToken( char** pLine )
       pTmp = strchr( sLine + 1, '\'' );
       if( pTmp == NULL )
       {
-         s_sToken[0] = '\'';
-         s_sToken[1] = '\0';
+         sToken[0] = '\'';
+         sToken[1] = '\0';
       }
       else
       {
-         strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
-         s_sToken[( pTmp - sLine ) + 1] = '\0';
+         strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
+         sToken[( pTmp - sLine ) + 1] = '\0';
 
-         if( strchr( s_sToken, '"' ) == NULL )
+         if( strchr( sToken, '"' ) == NULL )
          {
-            s_sToken[0] = '"';
-            s_sToken[( pTmp - sLine )] = '"';
+            sToken[0] = '"';
+            sToken[( pTmp - sLine )] = '"';
          }
       }
 
@@ -6271,31 +6282,31 @@ int hb_pp_NextToken( char** pLine )
    {
       if( s_bArray )
       {
-         s_sToken[0] = '[';
-         s_sToken[1] = '\0';
+         sToken[0] = '[';
+         sToken[1] = '\0';
       }
       else
       {
          pTmp = strchr( sLine + 1, ']' );
          if( pTmp == NULL )
          {
-            s_sToken[0] = '[';
-            s_sToken[1] = '\0';
+            sToken[0] = '[';
+            sToken[1] = '\0';
          }
          else
          {
-            strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
-            s_sToken[( pTmp - sLine ) + 1] = '\0';
+            strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
+            sToken[( pTmp - sLine ) + 1] = '\0';
 
-            if( strchr( (char *) s_sToken, '"' ) == NULL )
+            if( strchr( (char *) sToken, '"' ) == NULL )
             {
-               s_sToken[0] = '"';
-               s_sToken[( pTmp - sLine )] = '"';
+               sToken[0] = '"';
+               sToken[( pTmp - sLine )] = '"';
             }
-            else if( strchr( (char *) s_sToken, '\'' ) == NULL )
+            else if( strchr( (char *) sToken, '\'' ) == NULL )
             {
-               s_sToken[0] = '\'';
-               s_sToken[( pTmp - sLine )] = '\'';
+               sToken[0] = '\'';
+               sToken[( pTmp - sLine )] = '\'';
             }
          }
       }
@@ -6304,16 +6315,16 @@ int hb_pp_NextToken( char** pLine )
    }
    else if( sLine[0] == '\\' )
    {
-      s_sToken[0] = '\\';
-      s_sToken[1] = sLine[1];
-      s_sToken[2] = '\0';
+      sToken[0] = '\\';
+      sToken[1] = sLine[1];
+      sToken[2] = '\0';
 
       goto Done;
    }
    else if ( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~\16\17", sLine[0] ) )
    {
-      s_sToken[0] = sLine[0];
-      s_sToken[1] = '\0';
+      sToken[0] = sLine[0];
+      sToken[1] = '\0';
 
       goto Done;
    }
@@ -6322,21 +6333,21 @@ int hb_pp_NextToken( char** pLine )
       // TODO: Generic Error.
       //printf( "\nUnexpected case: %s\n", sLine );
       //getchar();
-      s_sToken[0] = sLine[0];
-      s_sToken[1] = '\0';
+      sToken[0] = sLine[0];
+      sToken[1] = '\0';
    }
 
  Done:
 
-   sLine += ( nLen = strlen( (char *) s_sToken ) );
+   sLine += ( nLen = strlen( (char *) sToken ) );
 
-   if( s_sToken[0] == '.' && nLen > 1 && s_sToken[nLen - 1] == '.' )
+   if( sToken[0] == '.' && nLen > 1 && sToken[nLen - 1] == '.' )
    {
       s_bArray = FALSE;
    }
    else
    {
-      s_bArray = ( isalnum( s_sToken[0] ) || strchr( "])}._", s_sToken[0] ) );
+      s_bArray = ( isalnum( sToken[0] ) || strchr( "])}._", sToken[0] ) );
    }
 
    while( sLine[0] == ' ' || sLine[0] == '\t' )
@@ -6348,7 +6359,7 @@ int hb_pp_NextToken( char** pLine )
    *pLine = (char *) sLine;
 
    #ifdef DEBUG_TOKEN
-      printf( "Token: >%s< Line: >%s<\n", s_sToken, *pLine );
+      printf( "Token: >%s< Line: >%s<\n", sToken, *pLine );
    #endif
 
    return nLen + iPad;
