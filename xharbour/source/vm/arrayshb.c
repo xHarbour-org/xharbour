@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.37 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: arrayshb.c,v 1.38 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -717,7 +717,10 @@ UINT SizeOfCStructure( PHB_ITEM aDef, UINT uiAlign )
 
          default:
          {
-            PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            HB_ITEM ID;
+
+            ID.type = HB_IT_NIL;
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE_PTR )
             {
@@ -725,16 +728,17 @@ UINT SizeOfCStructure( PHB_ITEM aDef, UINT uiAlign )
             }
             else if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE )
             {
-               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
+               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
 
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-
                   uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
+                  hb_itemRelease( pStructure );
                }
                else
                {
+                  hb_itemRelease( pStructure );
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "SizeOfCStructure", 1, hb_paramError( 1 ) );
                   return 0;
                }
@@ -930,7 +934,10 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
 
          default:
          {
-            PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            HB_ITEM ID;
+
+             ID.type = HB_IT_NIL;
+             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE_PTR )
             {
@@ -938,16 +945,17 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
             }
             else if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE )
             {
-               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
+               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
 
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-
                   uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
+                  hb_itemRelease( pStructure );
                }
                else
                {
+                  hb_itemRelease( pStructure );
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
                   return NULL;
                }
@@ -1411,7 +1419,10 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          default:
          {
-            PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            HB_ITEM ID;
+
+             ID.type = HB_IT_NIL;
+             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
             {
@@ -1419,16 +1430,17 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
             }
             else if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE )
             {
-               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
+               PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
 
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-
                   uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
+                  hb_itemRelease( pStructure );
                }
                else
                {
+                  hb_itemRelease( pStructure );
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 1, hb_paramError( 1 ) );
                   return pRet;;
                }
@@ -1533,9 +1545,21 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          default:
          {
-            PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
-            PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
+            HB_ITEM ID;
+            PHB_ITEM pStructure;
+
+            ID.type = HB_IT_NIL;
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+
+            pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
             UINT uiNestedSize /*, uiNestedAlign */ ;
+
+            if( ! HB_IS_OBJECT( pStructure ) )
+            {
+               hb_itemRelease( pStructure );
+               hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+               return pRet;
+            }
 
             hb_objSendMsg( pStructure, "NALIGN", 0 );
             // uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
@@ -1545,62 +1569,53 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
             //TraceLog( NULL, "* NestedSize: %i Offset: %i\n", uiNestedSize, uiOffset );
 
-            if( HB_IS_OBJECT( pStructure ) )
+            if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
             {
-               if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
-               {
-                  //printf( "Offset %i Pointer: %p\n", uiOffset, *(char **) ( (LONG ** )( Buffer + uiOffset ) ) );
+               //printf( "Offset %i Pointer: %p\n", uiOffset, *(char **) ( (LONG ** )( Buffer + uiOffset ) ) );
 
-                  if( *(char **) ( (LONG ** )( Buffer + uiOffset ) ) )
-                  {
-                     PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
-                     PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
-
-                     if( bAdoptNested )
-                     {
-                        hb_itemPutCRaw( pInternalBuffer, *(char **) ( (LONG **)( Buffer + uiOffset ) ), uiNestedSize );
-                     }
-                     else
-                     {
-                        hb_itemPutCRawStatic( pInternalBuffer, *(char **) ( (LONG **)( Buffer + uiOffset ) ), uiNestedSize );
-                     }
-
-                     hb_objSendMsg( pStructure, "DEVALUE", 0 );
-                  }
-                  else
-                  {
-                     //hb_objSendMsg( pStructure, "RESET", 0 );
-                     hb_itemClear( pStructure );
-                  }
-               }
-               else
+               if( *(char **) ( (LONG ** )( Buffer + uiOffset ) ) )
                {
                   PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
                   PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
-                  HB_ITEM Adopt;
 
-                  Adopt.type = HB_IT_LOGICAL;
-                  Adopt.item.asLogical.value = bAdoptNested;
+                  if( bAdoptNested )
+                  {
+                     hb_itemPutCRaw( pInternalBuffer, *(char **) ( (LONG **)( Buffer + uiOffset ) ), uiNestedSize );
+                  }
+                  else
+                  {
+                     hb_itemPutCRawStatic( pInternalBuffer, *(char **) ( (LONG **)( Buffer + uiOffset ) ), uiNestedSize );
+                  }
 
-                  //TraceLog( NULL, "Before Devalue\n" );
-
-                  hb_itemPutCRawStatic( pInternalBuffer, (char *) (BYTE *)( Buffer + uiOffset ), uiNestedSize );
-
-                  hb_objSendMsg( pStructure, "DEVALUE", 1, &Adopt );
-
-                  //TraceLog( NULL, "After Devalue\n" );
+                  hb_objSendMsg( pStructure, "DEVALUE", 0 );
                }
-
-               hb_itemForwardValue( pBaseVar->pItems + ulIndex, pStructure );
-
-               hb_itemRelease( pID );
-               hb_itemRelease( pStructure );
+               else
+               {
+                  //hb_objSendMsg( pStructure, "RESET", 0 );
+                  hb_itemClear( pStructure );
+               }
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-               return pRet;
+               PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
+               PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
+               HB_ITEM Adopt;
+
+               Adopt.type = HB_IT_LOGICAL;
+               Adopt.item.asLogical.value = bAdoptNested;
+
+               //TraceLog( NULL, "Before Devalue\n" );
+
+               hb_itemPutCRawStatic( pInternalBuffer, (char *) (BYTE *)( Buffer + uiOffset ), uiNestedSize );
+
+               hb_objSendMsg( pStructure, "DEVALUE", 1, &Adopt );
+
+               //TraceLog( NULL, "After Devalue\n" );
             }
+
+            hb_itemForwardValue( pBaseVar->pItems + ulIndex, pStructure );
+
+            hb_itemRelease( pStructure );
          }
       }
 
