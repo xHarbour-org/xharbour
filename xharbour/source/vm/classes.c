@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.87 2003/11/26 23:01:22 jonnymind Exp $
+ * $Id: classes.c,v 1.88 2003/12/03 11:16:08 jonnymind Exp $
  */
 
 /*
@@ -149,6 +149,7 @@
 #include "hbvm.h"
 #include "hboo.ch"
 #include "classes.h"
+#include "hashapi.h"
 
 #include <ctype.h>             /* For toupper() */
 

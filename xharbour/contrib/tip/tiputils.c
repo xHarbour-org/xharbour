@@ -4,11 +4,15 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.2 2003/12/01 03:41:03 ronpinkas Exp $
+* $Id: tiputils.c,v 1.3 2003/12/03 00:51:16 fsgiudice Exp $
 ************************************************/
 
 #include "hbapi.h"
-#include <time.h>
+#include "hbdate.h"
+
+#ifndef HB_OS_WIN_32
+   #include <time.h>
+#endif
 
 #if defined _MSC_VER || defined __BORLANDC__
    #include <windows.h>
@@ -18,6 +22,77 @@
 * Useful internet timestamp based on RFC822
 */
 
+/* sadly, many strftime windows implementations are broken */
+#ifdef HB_OS_WIN_32
+
+HB_FUNC( TIP_TIMESTAMP )
+{
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   ULONG ulHour = hb_parl(2);
+   int nLen;
+   TIME_ZONE_INFORMATION tzInfo;
+   long lDate, lYear, lMonth, lDay;
+   char *days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+   char *months[] = { 
+         "Jan", "Feb", "Mar", 
+         "Apr", "May", "Jun", 
+         "Jul", "Aug", "Sep", 
+         "Oct", "Nov", "Dec" };
+   char *szRet = (char *) hb_xgrab( 64 );
+   SYSTEMTIME st;
+
+   
+   if ( !ulHour )
+   {
+      ulHour = 0;
+   }
+
+   if ( GetTimeZoneInformation( &tzInfo ) == TIME_ZONE_ID_INVALID )
+   {
+      tzInfo.Bias = 0;
+   }
+   else
+   {
+      tzInfo.Bias -= tzInfo.Bias;
+   }
+   
+   if ( !pDate )
+   {
+      GetLocalTime( &st );
+      
+      sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
+            days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1], 
+            st.wYear,
+            st.wHour, st.wMinute, st.wSecond, 
+            tzInfo.Bias/60,
+            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ); 
+   }
+   else
+   {
+      lDate = hb_itemGetDL( pDate );
+      hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
+         
+      sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
+            days[ hb_dateDOW( lYear, lMonth, lDay ) - 1 ], lDay, 
+            months[ lMonth -1], lYear,
+            ulHour / 3600, (ulHour % 3600) / 60, (ulHour % 60),
+            tzInfo.Bias/60,
+            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ); 
+   }
+
+
+   nLen = strlen( szRet );
+
+   if ( nLen < 64 )
+   {
+      szRet = (char *) hb_xrealloc( szRet, nLen + 1 );
+   }
+   hb_retclenAdoptRaw( szRet, nLen );
+
+}
+
+#else
+
 HB_FUNC( TIP_TIMESTAMP )
 {
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
@@ -25,41 +100,19 @@ HB_FUNC( TIP_TIMESTAMP )
    int nLen;
    char szDate[9];
    struct tm tmTime;
-
-   char *szRet = (char *) hb_xgrab( 180 );
+   time_t current;
+   
+   char *szRet = (char *) hb_xgrab( 64 );
 
    if ( !ulHour )
    {
       ulHour = 0;
    }
 
-   #if defined( HB_OS_WIN_32 )
-   if ( !pDate )
-   {
-      SYSTEMTIME st;
-      GetSystemTime( &st );
-
-      tmTime.tm_year = st.wYear - 1900;
-      tmTime.tm_mon = st.wMonth - 1;
-      tmTime.tm_mday = st.wDay;
-      tmTime.tm_wday = st.wDayOfWeek;
-      tmTime.tm_hour = st.wHour;
-      tmTime.tm_min = st.wMinute;
-      tmTime.tm_sec = st.wSecond;
-   }
-
-   /* Signal isdst not available */
-   tmTime.tm_isdst = -1;
-
-   #else
-   {
-      time_t current;
-
-      /* init time structure anyway */
-      time( &current );
-      localtime_r( &current , &tmTime );
-   }
-   #endif
+   
+   /* init time structure anyway */
+   time( &current );
+   localtime_r( &current , &tmTime );
 
    if ( pDate )
    {
@@ -84,11 +137,13 @@ HB_FUNC( TIP_TIMESTAMP )
       tmTime.tm_sec = (ulHour % 60);
    }
 
-   nLen = strftime( szRet, 180, "%a, %d %b %Y %H:%M:%S %z", &tmTime );
-   if ( nLen < 180 )
+   nLen = strftime( szRet, 64, "%a, %d %b %Y %H:%M:%S %z", &tmTime );
+
+   if ( nLen < 64 )
    {
       szRet = (char *) hb_xrealloc( szRet, nLen + 1 );
    }
    hb_retclenAdoptRaw( szRet, nLen );
 }
 
+#endif

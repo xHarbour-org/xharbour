@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.19 2003/12/02 04:08:06 jonnymind Exp $
+ * $Id: Changelog,v 1.20 2003/12/03 00:51:16 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-03 15:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tiputils.c
+    ! strftime does not work very well on windows, or maybe is the
+      BORLANDC strftime failing. Anyhow, I have now implemented native
+      windows api + sprintf() to get timezone, so there is no need
+      of it under windows.
 
 2003-12-03 01:44 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * tiputils.c
