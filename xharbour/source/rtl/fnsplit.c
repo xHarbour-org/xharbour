@@ -1,5 +1,5 @@
 /*
- * $Id: fnsplit.c,v 1.1.1.1 2001/12/21 10:41:35 ronpinkas Exp $
+ * $Id: fnsplit.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,7 @@ HB_FUNC( HB_FNAMESPLIT )
 
       hb_xfree( pFileName );
    }
+   hb_ret();
 }
 
 HB_FUNC( HB_FNAMEMERGE )

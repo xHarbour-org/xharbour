@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.18 2004/03/03 19:41:27 andijahja Exp $
+ * $Id: hbffind.c,v 1.19 2004/03/04 21:51:50 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.18 2004/03/03 19:41:27 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.19 2004/03/04 21:51:50 andijahja Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -738,7 +738,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       strncpy( szPath, pszFileName, 3 );
       info->hFindFile = INVALID_HANDLE_VALUE;
 
-      if ( szPath[2] != OS_PATH_DELIMITER && szPath[2] == NULL )
+      if ( szPath[2] == '\0' )
       {
          // 2004-03-05 Clipper compatibility for Directory( "C:", "V" )
          szPath[2] = OS_PATH_DELIMITER;

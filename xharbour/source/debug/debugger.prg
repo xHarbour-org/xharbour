@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.26 2004/03/03 13:20:55 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.27 2004/03/12 12:37:25 likewolf Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
           //In TRACE mode (step over procedure)
           IF s_oDebugger:nTraceLevel < Len( s_oDebugger:aCallStack )
             s_oDebugger:lTrace := (! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
-                                 .AND. !HB_DBG_INVOKEDEBUG())
+                                   .AND. !HB_DBG_INVOKEDEBUG())
             IF s_oDebugger:lTrace
               RETURN
             ENDIF
@@ -413,6 +413,8 @@ CLASS TDebugger
    METHOD Static()
 
    METHOD Step()
+
+   METHOD StripPath( cFileName )
 
    METHOD TabWidth() INLINE ;
           ::nTabWidth := ::InputBox( "Tab width", ::nTabWidth )
@@ -1070,8 +1072,7 @@ return nil
 METHOD EndProc() CLASS TDebugger
 
    if Len( ::aCallStack ) > 0
-      ADel( ::aCallStack, 1 )
-      ASize( ::aCallStack, Len( ::aCallStack ) - 1 )
+      ADel( ::aCallStack, 1, .T. )
       if ::oBrwStack != nil .and. ! ::lTrace
          ::oBrwStack:RefreshAll()
       endif
@@ -1472,9 +1473,9 @@ METHOD LoadSettings() CLASS TDebugger
             ::lShowCallStack = .t.
 
          case Upper( SubStr( cLine, 1,  2 ) ) == "BP"
-            AAdd( ::aBreakPoints,;
-               { Val( SubStr( cLine, 4, RAt( " ", cLine ) - 4 ) ),;
-                 SubStr( cLine, RAt( " ", cLine ) ) } )
+            AAdd( ::aBreakPoints, ;
+                  { Val( SubStr( cLine, 4, RAt( " ", cLine ) - 4 ) ), ;
+                    ::StripPath( SubStr( cLine, RAt( " ", cLine ) ) ) } )
 
       endcase
    next
@@ -1698,18 +1699,15 @@ return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
 METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
    // always treat filename as lower case - we need it consistent for comparisons   
    LOCAL nPos:=RAT( ":", cModuleName )
-
-   ASize( ::aCallStack, Len( ::aCallStack ) + 1 )
-   AIns( ::aCallStack, 1 )
-
-   // nil means that no line number is stored yet
-   ::aCallStack[1]:= { ;
+   LOCAL aEntry := { ;
      IIF(::lCodeBlock,"(b)","")+SubStr( cModuleName, nPos + 1 ),;    //function name
      {},;   //local vars
-     nil,;  //line no
+     nil,;  //line no, nil means that no line number is stored yet
      lower(LEFT( cModuleName, nPos - 1 )),; // and the module name
      {}, ;  // static vars
      nProcLevel }
+
+   AIns( ::aCallStack, 1, aEntry, .T. )     
 return nil
 
 //METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
@@ -1743,6 +1741,7 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
             cPrgName += cPrgName +".ppo"
          ENDIF
       endif    
+
       if !empty( cPrgName ) 
          if ( cPrgName != ::cPrgName .OR. ::oBrwText == NIL )
             if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
@@ -1777,6 +1776,10 @@ METHOD Open() CLASS TDebugger
    if !EMPTY(cFileName) .AND. (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
       if ! File( cFileName ) .and. ! Empty( ::cPathForFiles )
          cFileName := ::LocatePrgPath( cFileName )
+         if Empty( cFileName )
+           Alert( "File not found!" )
+           return NIL
+         endif
       endif
       ::cPrgName := cFileName
       ::lppo := RAT(".PPO", UPPER(cFileName)) > 0
@@ -1833,7 +1836,7 @@ METHOD RedisplayBreakPoints() CLASS TDebugger
 
    local n
    for n := 1 to Len( ::aBreakpoints )
-      if ::aBreakpoints[ n ] [ 2 ] == ::cPrgName
+      if ::aBreakpoints[ n ] [ 2 ] == ::StripPath( ::cPrgName )
         ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ] [ 1 ], .T.)
       Endif
    next
@@ -2230,23 +2233,35 @@ METHOD Static() CLASS TDebugger
 
 return nil
 
+
+// Strip path from filename
+METHOD StripPath( cFileName ) CLASS TDebugger
+  LOCAL cName, cExt
+  
+  HB_FNAMESPLIT( cFileName, NIL, @cName, @cExt )
+RETURN cName + cExt
+
+
 // Toggle a breakpoint at the cursor position in the currently viewed file
 // which may be different from the file in which execution was broken
 METHOD ToggleBreakPoint() CLASS TDebugger
   // look for a breakpoint which matches both line number and program name
   local nAt
   LOCAL cLine
+  local cFileName
 
   cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
   IF ::oBrwText:lLineNumbers
     cLine := SUBSTR( cLine, AT(":",cLine)+1 )
   ENDIF
   IF IsValidStopLine( cLine )
+    cFileName := ::StripPath( ::cPrgName )
+    
     nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == ::oBrwText:nRow ;
-                                    .AND. aBreak [ 2 ] == ::cPrgName} ) // it was nLine
+                                    .AND. aBreak[ 2 ] == cFileName } ) // it was nLine
 
     if nAt == 0
-      AAdd( ::aBreakPoints, { ::oBrwText:nRow, ::cPrgName } )     // it was nLine
+      AAdd( ::aBreakPoints, { ::oBrwText:nRow, cFileName } )     // it was nLine
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .T.)
     else
       ADel( ::aBreakPoints, nAt )
@@ -2535,7 +2550,7 @@ METHOD ToCursor() CLASS TDebugger
     cLine := SUBSTR( cLine, AT(":",cLine)+1 )
   ENDIF
   IF IsValidStopLine( cLine )
-    ::aToCursor := { ::oBrwText:nRow, ::cPrgName }
+    ::aToCursor := { ::oBrwText:nRow, ::StripPath( ::cPrgName ) }
     ::RestoreAppStatus()
     ::lToCursor := .t.
     ::Exit()
