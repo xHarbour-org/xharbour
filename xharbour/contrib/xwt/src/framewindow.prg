@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: framewindow.prg,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: framewindow.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Frame window class. A window with a menu, a central area and a statusbar
 */
@@ -24,6 +24,7 @@ ENDCLASS
 
 METHOD New( cText ) CLASS XWTFrameWindow
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_FRAME
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_FRAME )
    IF .not. Empty( cText )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.3 2003/04/07 18:20:30 jonnymind Exp $
+   $Id: viewport.prg,v 1.1 2003/04/12 23:47:15 jonnymind Exp $
 
    View port class. Should contain a single widget, most likely
    a container, but also html panes etc.
@@ -33,6 +33,7 @@ ENDCLASS
 
 METHOD New( nWidth, nHeight ) CLASS XWTViewPort
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_VIEWPORT
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_VIEWPORT )
 
    IF .not. Empty( nWidth ) .and. .not. Empty( nHeight )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: splitter.prg,v 1.1 2003/04/22 19:03:34 jonnymind Exp $
+   $Id: splitter.prg,v 1.2 2003/05/11 11:21:19 jonnymind Exp $
 
    Splitter - a container with two resizable area;
    It is not really implemented as a container (in fact is a
@@ -41,7 +41,7 @@ ENDCLASS
 
 METHOD New( nMode, oFirstWidget, oSecondWidget, nSizeX, nSizeY ) CLASS XWTSplitter
    ::Super:New()
-
+   ::nWidgetType := XWT_TYPE_SPLITTER
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_SPLITTER )
    XWT_SetProperty( ::oRawWidget, XWT_PROP_LAYMODE, nMode )
 

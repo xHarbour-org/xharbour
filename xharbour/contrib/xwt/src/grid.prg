@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: grid.prg,v 1.3 2003/04/08 18:21:46 jonnymind Exp $
+   $Id: grid.prg,v 1.4 2003/04/12 23:47:15 jonnymind Exp $
 
    Grid Pane class.
    The child objects are arranged in a fixed size grid,
@@ -26,6 +26,7 @@ ENDCLASS
 
 METHOD New(iRows, iCols ) CLASS XWTGrid
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_GRID
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_GRID )
 
    IF iRows < 1

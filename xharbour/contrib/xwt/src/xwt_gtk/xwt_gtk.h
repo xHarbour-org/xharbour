@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.9 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.10 2003/04/22 19:03:36 jonnymind Exp $
 
    GTK interface
 */
@@ -142,6 +142,7 @@ PXWT_WIDGET xwt_gtk_createRadioButton( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createSplitter( PHB_ITEM pSelf );
+PXWT_WIDGET xwt_gtk_createToggleButton( PHB_ITEM pSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );

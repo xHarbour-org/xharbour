@@ -7,15 +7,14 @@ GLOBAL oOtherBox
 
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
-   LOCAL oMenuSec, oPane, oTextbox, oLabel, oViewPort
+   LOCAL oMenuSec, oTextbox, oLabel, oViewPort, oPane
    LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
-   LOCAL oGrid
+   LOCAL oGrid, obtnStatus
 
    XwtInit()
-   altd()
 
    /*** Window creation ****/
-   oWindow:= XwtFrameWindow():New("Hello World")
+   oWindow:= XwtFrameWindow():New("Hola Mundo. Thefull desde Linux")
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
 
    /*** Splitter panes layout( our new main widget) ***/
@@ -59,6 +58,13 @@ PROCEDURE MAIN()
    oPane:SetBox( .T.,"A fixed pane" )
    oPane:Add( XWTCheckbox():New("Ckbox 1", .T., 10,75 ) )
    oPane:Add( XWTCheckbox():New("Ckbox 2", .T., 110,75 ) )
+   oPane:Add( XWTToggleButton():New("Button Toggle 1", .T., 10,105 ) )
+   oPane:Add( XWTToggleButton():New("Button Toggle 2", .F., 120,105 ) )
+   // add a button to query the status.
+   oButton := XwtButton():New( "Click to Query pane status" )
+   oButton:move( 10, 135 )
+   oButton:AddEventListener( XWT_E_CLICKED, @PaneStatus() )
+   oPane:Add( oButton )
    oVLay:Add( oPane )
 
    /* A beautiful GRID */
@@ -79,7 +85,7 @@ PROCEDURE MAIN()
 
    oGrid:SetBox( .T.,"A Grid " )
 
-   oVLay:Add( oGrid )
+   oVLay2:Add( oGrid )
 
    /*** IMAGE ***/
    oImg := XwtImage():New( "icon.png" )
@@ -141,7 +147,8 @@ PROCEDURE MAIN()
    /*** Going to terminate */
    //oButton:Destroy()  // the button might or might not be deteached from window
    oWindow:Destroy()
-RETURN
+
+RETURN 
 
 
 
@@ -202,4 +209,19 @@ FUNCTION InputChanged( oEvent )
    NEXT
 
 ?  ""
-RETURN
+RETURN .F.
+
+
+FUNCTION PaneStatus( oEvent )
+   LOCAL oObj
+
+   ? "Clicked QUERY PANE STATUS Button"
+   FOR EACH oObj in oEvent:oSender:oOwner:aChildren
+      IF oObj:GetType() == XWT_TYPE_CHECKBOX .or. oObj:GetType() == XWT_TYPE_TOGGLEBUTTON
+         ? oObj:GetText(), IIF( oObj:GetStatus(), "(Active)", "(NOT Active)" )
+      ELSE
+         ? oObj:GetText()
+      ENDIF
+   NEXT
+   ? ""
+RETURN .T.

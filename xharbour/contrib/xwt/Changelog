@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.13 2003/04/22 19:02:53 jonnymind Exp $
+ * $Id: Changelog,v 1.14 2003/05/11 11:21:04 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * src/button.prg
+  * src/checkbox.prg
+  * src/filesel.prg
+  * src/framewindow.prg
+  * src/grid.prg
+  * src/image.prg
+  * src/inputmask.prg
+  * src/label.prg
+  * src/layout.prg
+  * src/menu.prg
+  * src/menuitem.prg
+  * src/pane.prg
+  * src/radiobutton.prg
+  * src/splitter.prg
+  * src/textbox.prg
+  * src/viewport.prg
+  * src/widget.prg
+    + Added GetType() that returns widget numeric XWT type.
+      (it could have been done with getClassName(), but I think
+      a numeric ID is more flexible).
+
+  * include/xwt.ch
+  * src/xwt_gtk/xwt_gtk.h
+  * src/xwt_gtk/xwt_gtk.c
+  + src/togglebutton.prg
+  + src/xwt_gtk/xwt_gtk_togglebutton.c
+    + Added toggle button widget (a switchable button).
+    This commit was made by Rafa Carmona.
+
+  * test/xwt_test.prg
+    + Added a test for togglebuttons and Widget::GetType()
+    
+[gian@head xwt]$
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/splitter.prg
     ! Fixed a mispelled macro.

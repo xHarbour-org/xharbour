@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: menuitem.prg,v 1.2 2003/04/08 18:21:47 jonnymind Exp $
 
    Menuitem class.
 */
@@ -22,7 +22,7 @@ ENDCLASS
 METHOD New( cStr, nId, oCalled, oMethod ) CLASS XWTMenuItem
    ::Super:New()
    ::nId := nId
-
+   ::nWidgetType := XWT_TYPE_MENUITEM
    IF .not. Empty( oCalled )
       ::AddEventListener( XWT_E_CLICKED, oCalled, oMethod )
    ENDIF

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: pane.prg,v 1.2 2003/04/07 15:41:06 jonnymind Exp $
+   $Id: pane.prg,v 1.3 2003/04/07 18:20:31 jonnymind Exp $
 
    Pane class. A basic void container.
    (Container is an abstract class, and have not a DRV method)
@@ -18,6 +18,7 @@ ENDCLASS
 
 METHOD New() CLASS XWTPane
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_PANE
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_PANE )
 RETURN Self
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: label.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: label.prg,v 1.2 2003/04/07 15:41:05 jonnymind Exp $
 
    Label class. Just a concrete widget implementation
 */
@@ -19,6 +19,7 @@ METHOD New( cText, x, y ) CLASS XWTLabel
    ::Super:New()
    // sooner or later I will want to add event management for labels,
    // so, I put here the Self parameter needed for event callbacks
+   ::nWidgetType := XWT_TYPE_LABEL
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_LABEL )
    
    IF .not. Empty( cText )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menu.prg,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: menu.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Menu class
 */
@@ -18,7 +18,7 @@ ENDCLASS
 METHOD New( cStr ) CLASS XWTMenu
    ::Super:New()
    // Self is not needed here
-
+   ::nWidgetType := XWT_TYPE_MENU
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_MENU )
 
    IF .not. Empty( cStr )

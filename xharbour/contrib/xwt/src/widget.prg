@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.3 2003/04/07 22:06:39 jonnymind Exp $
+   $Id: widget.prg,v 1.4 2003/04/12 23:47:15 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -43,6 +43,8 @@ CLASS XWTWidget
    METHOD SetText( cText )
    METHOD GetText()
 
+   METHOD GetType()        INLINE   ::nWidgetType
+
    METHOD SetSensible()
    METHOD IsSensible()
 
@@ -52,6 +54,9 @@ CLASS XWTWidget
 
    METHOD RiseEvent( oEvent )
    METHOD Destroy()
+
+PROTECTED:
+   DATA nWidgetType
 
 ENDCLASS
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael
 
-   $Id: filesel.prg,v 1.2 2003/04/17 23:42:17 lculik Exp $
+   $Id: filesel.prg,v 1.3 2003/04/18 13:28:49 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -20,6 +20,7 @@ ENDCLASS
 
 METHOD New( cText, cFileName ) CLASS XWTFileSel
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_FILESEL
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_FILESEL )
    IF .not. Empty( cText )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )

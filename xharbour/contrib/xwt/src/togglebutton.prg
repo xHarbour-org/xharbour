@@ -1,9 +1,9 @@
 /*
    XWT - xHarbour Windowing Toolkit
 
-   (C) 2003 Giancarlo Niccolai
+   (C) 2003 Rafa Carmona ( Thefull )
 
-   $Id: checkbox.prg,v 1.1 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: togglebutton.prg,v 1.0 2003/05/12 02:30:15 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -11,16 +11,16 @@
 #include "hbclass.ch"
 #include "xwt.ch"
 
-CLASS XWTCheckbox FROM XWTWidget
-   METHOD New( cText, bStatus )
+CLASS XWTToggleButton FROM XWTWidget
+   METHOD New( cText, bStatus, nX, nY )
    METHOD SetStatus( bStatus )
    METHOD GetStatus()
 ENDCLASS
 
-METHOD New( cText, bStatus, nX, nY ) CLASS XWTCheckbox
+METHOD New( cText, bStatus, nX, nY ) CLASS XWTToggleButton
    ::Super:New()
-   ::nWidgetType := XWT_TYPE_CHECKBOX
-   ::oRawWidget := XWT_Create( Self, XWT_TYPE_CHECKBOX )
+   ::nWidgetType := XWT_TYPE_TOGGLEBUTTON
+   ::oRawWidget := XWT_Create( Self, XWT_TYPE_TOGGLEBUTTON )
    IF .not. Empty( cText )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
    ENDIF
@@ -32,13 +32,13 @@ METHOD New( cText, bStatus, nX, nY ) CLASS XWTCheckbox
    ENDIF
 RETURN Self
 
-METHOD SetStatus( bStatus ) CLASS XWTCheckbox
+METHOD SetStatus( bStatus ) CLASS XWTToggleButton
    IF ValType( bStatus ) == "L" .and. bStatus
       RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_STATUS, 1 )
    ENDIF
 RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_STATUS, 0 )
 
-METHOD GetStatus() CLASS XWTCheckbox
+METHOD GetStatus() CLASS XWTToggleButton
    LOCAL bRet
 
    IF XWT_GetProperty( ::oRawWidget, XWT_PROP_STATUS, @bRet )

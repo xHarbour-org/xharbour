@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: image.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: image.prg,v 1.2 2003/04/08 18:21:47 jonnymind Exp $
 
    Pane class. A basic void container.
    (Container is an abstract class, and have not a DRV method)
@@ -22,6 +22,7 @@ ENDCLASS
 
 METHOD New( cFilename ) CLASS XWTImage
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_IMAGE
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_IMAGE )
 
    ::iStatus := XWT_IMG_NOTREADY

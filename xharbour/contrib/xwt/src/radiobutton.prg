@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.3 2003/04/07 22:06:39 jonnymind Exp $
+   $Id: radiobutton.prg,v 1.1 2003/04/12 23:47:15 jonnymind Exp $
 
    Radio box - A certain cooperation of the container widget is needed
 */
@@ -22,7 +22,7 @@ ENDCLASS
 
 METHOD New( cText ) CLASS XWTRadioButton
    ::Super:New()
-
+   ::nWidgetType := XWT_TYPE_RADIOBUTTON
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_RADIOBUTTON )
    IF .not. Empty( cText )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )

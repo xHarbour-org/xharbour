@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id$
+   $Id: inputmask.prg,v 1.1 2003/04/12 23:47:15 jonnymind Exp $
 
    This is an "input" mask. It has a grid, an Ok and a Cancel button.
    When the OK button is pressed, the variables are automagically updated,
@@ -39,7 +39,7 @@ METHOD New( aInputFields, bDisplayBtn ) CLASS XWTInputMask
    LOCAL oBox, nCount
    LOCAL nFields := Len( aInputFields )
    LOCAL nRows
-
+   
    ::Super:New( XWT_LM_VERT )
 
    IF Empty( bDisplayBtn )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.3 2003/04/07 18:20:30 jonnymind Exp $
+   $Id: layout.prg,v 1.4 2003/04/12 23:47:15 jonnymind Exp $
 
    Pane class. Each widget is arranged below the
    previous one.
@@ -23,6 +23,7 @@ ENDCLASS
 
 METHOD New( nMode, nWidth, nHeight ) CLASS XWTLayout
    ::Super:New()
+   ::nWidgetType := XWT_TYPE_LAYOUT
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_LAYOUT )
 
    XWT_SetProperty( ::oRawWidget, XWT_PROP_LAYMODE, nMode )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.11 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.12 2003/04/22 19:03:35 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -108,6 +108,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
 
             case XWT_TYPE_BUTTON:
+            case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
                gtk_button_set_label (GTK_BUTTON(wSelf), prop->value.text );
@@ -408,7 +409,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       return FALSE;
 
       case XWT_PROP_STATUS:
-         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
+         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON || wWidget->type == XWT_TYPE_TOGGLEBUTTON )
          {
             gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( wSelf ), (gboolean) prop->value.setting );
             return TRUE;
@@ -587,6 +588,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
 
             case XWT_TYPE_BUTTON:
+            case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
                prop->value.text = gtk_button_get_label (GTK_BUTTON(wSelf) );
@@ -733,7 +735,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          return TRUE;
 
       case XWT_PROP_STATUS:
-         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
+         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON || wWidget->type == XWT_TYPE_TOGGLEBUTTON)
          {
             prop->value.setting = (gboolean) gtk_toggle_button_get_active(
                   GTK_TOGGLE_BUTTON( wSelf ) );
@@ -781,6 +783,7 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( pSelf );
       case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
       case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( pSelf );
+      case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( pSelf );
    }
    return FALSE;
 }

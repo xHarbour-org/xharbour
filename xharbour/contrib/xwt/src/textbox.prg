@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: textbox.prg,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: textbox.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Text box Control. 
 */
@@ -30,6 +30,7 @@ ENDCLASS
 
 METHOD New( cText, x, y ) CLASS XWTTextBox
    ::Super:New( cText )
+   ::nWidgetType := XWT_TYPE_TEXTBOX
    // sooner or later I will want to add event management for labels,
    // so, I put here the Self parameter needed for event callbacks
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_TEXTBOX )
