@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.3 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ typedef enum
    HB_P_MPUSHMEMVAR,           /*  61 */
    HB_P_MPUSHMEMVARREF,        /*  62 */
    HB_P_MPUSHSYM,              /*  63 */
-   HB_P_MPUSHVARIABLE,         /*  64 */
+   HB_P_MPUSHVARIABLE,         /*  64 */  // Note also 132 HB_P_MPUSHSTR
 /* end: */
    HB_P_MULT,                  /*  65 multiplies the latest two values on the stack, removing them and leaving there the result */
    HB_P_NEGATE,                /*  66 numerically negates the latest value on the stack */
@@ -195,8 +195,9 @@ typedef enum
    HB_P_LEFT,                  /* 129 Optimized Left(). */
    HB_P_RIGHT,                 /* 130 Optimized Right(). */
    HB_P_SUBSTR,                /* 131 Optimized SubStr() */
+   HB_P_MPUSHSTR,              /* 132 Macro compiled Pushed String. */
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 132 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 133 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

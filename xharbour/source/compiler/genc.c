@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.4 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: genc.c,v 1.5 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -2092,7 +2092,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_addint,
    hb_p_left,
    hb_p_right,
-   hb_p_substr
+   hb_p_substr,
+   hb_p_dummy
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

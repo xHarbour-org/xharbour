@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.33 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.34 2002/01/30 03:32:40 ronpinkas Exp $
  */
 
 /*
@@ -1934,6 +1934,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
             hb_vmPushVariable( ( *pDynSym )->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
+            break;
+         }
+
+         case HB_P_MPUSHSTR:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_MPUSHSTR") );
+         {
+            USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
+
+            hb_vmPushString( ( char * ) ( pCode ) + w + 3, ( ULONG )( uiSize - 1 ) );
+
+            w += ( 3 + uiSize );
             break;
          }
 
