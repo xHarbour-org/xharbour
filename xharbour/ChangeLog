@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2037 2004/01/11 20:36:13 peterrees Exp $
+ * $Id: ChangeLog,v 1.2038 2004/01/11 21:24:07 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-11 14:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/debug.c
+    ! Fixed GPF Trap in __VMPARLLIST() due to missing test on asSymbol.paramcnt (for > 255 )
+    ! Fixed GPF Trap in AddToArray() due to uninitialized asString.bStatic
+
+    /*
+       I performed a golbal search in all c sources for "= HB_IT_STRING"
+       and found only 1 more instance in memvars.c where .bStatic and
+       .puiHolder were not initialized. I also search for .paramcnt and
+       found no other instance.
+    */
+
+  * source/vm/memvars.c
+    ! Fixed GPF Trap related to unitinialized asString.bStatic
+
 2004-01-12 10:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     + Handle K_CTRL_TAB

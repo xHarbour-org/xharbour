@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.5 2002/01/27 09:01:57 ronpinkas Exp $
+ * $Id: debug.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -68,11 +68,16 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
    if( pItem->type == HB_IT_SYMBOL )
    {                                            /* Symbol is pushed as text */
       pTemp = hb_itemNew( NULL );               /* Create temporary string */
-      pTemp->type = HB_IT_STRING;
+
+	  pTemp->type = HB_IT_STRING;
       pTemp->item.asString.length = strlen( pItem->item.asSymbol.value->szName ) + 2;
       pTemp->item.asString.value = ( char * ) hb_xgrab( pTemp->item.asString.length + 1 );
 
       sprintf( pTemp->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
+
+      pTemp->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      *( pTemp->item.asString.puiHolders ) = 1;
+      pTemp->item.asString.bStatic         = FALSE;
 
       hb_arraySet( pReturn, ulPos, pTemp );
       hb_itemRelease( pTemp );                  /* Get rid of temporary str.*/
@@ -94,7 +99,10 @@ static USHORT hb_stackLenGlobal( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackLenGlobal()"));
 
-   for( pItem = HB_VM_STACK.pItems; pItem++ <= HB_VM_STACK.pPos; uiCount++ );
+   for( pItem = HB_VM_STACK.pItems; pItem <= HB_VM_STACK.pPos; uiCount++ )
+   {
+      pItem++;
+   }
 
    return uiCount;
 }
@@ -176,7 +184,9 @@ HB_FUNC( __VMSTKLLIST )
    pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
 
    for( pItem = pBase; pItem < HB_VM_STACK.pBase; pItem++ )
+   {
       AddToArray( *pItem, pReturn, uiPos++ );
+   }
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
@@ -196,14 +206,23 @@ HB_FUNC( __VMPARLLIST )
    PHB_ITEM * pItem;
    USHORT uiLen, uiPos = 1;
 
-   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+   while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
+   {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
 
    uiLen = ( * pBase )->item.asSymbol.paramcnt;
+   if( uiLen > 255 )
+   {
+      uiLen -= 256;
+   }
+
    pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
 
    for( pItem = pBase + 2; uiLen--; pItem++ )
+   {
       AddToArray( *pItem, pReturn, uiPos++ );
+   }
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
@@ -214,7 +233,9 @@ HB_FUNC( __VMVARLGET )
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+   {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
 
    hb_itemCopy( &(HB_VM_STACK.Return), *(pBase + 1 + hb_parni( 2 )) );
 }

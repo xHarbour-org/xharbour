@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.49 2003/12/19 07:30:01 ronpinkas Exp $
+ * $Id: memvars.c,v 1.50 2004/01/06 21:13:09 peterrees Exp $
  */
 
 /*
@@ -963,6 +963,8 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
    itName.type = HB_IT_STRING;
    itName.item.asString.value  = szVarName;
    itName.item.asString.length = *pulLen;
+   itName.item.asString.bStatic = TRUE;
+   itName.item.asString.puiHolders = NULL;
 
    hb_dynsymLock();
    pDynVar = hb_memvarFindSymbol( &itName );
