@@ -8,6 +8,96 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-14 18:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + xharbour/sourc/rtl/gtwvt/wvtcore.c
+    Contains all GUI primitive functions.
+
+  + xharbour/sourc/rtl/gtwvt/wvtutils.c
+    Contain all utility functions except GT related.
+
+  * xharbour/sourc/rtl/gtwvt/gtwvt.c
+    Break the code in smaller logical chunks and distributed them in
+    multiple files. This file now contains core GT functionality and 
+    rest of functions are distributed in above files.
+  
+  * xharbour/include/hbgtwvt.h
+    Some prototype rotation from static to extern.
+
+  * xharbour/ makefile.bc
+  * xharbour/ makefile.nt
+  * xharbour/ makefile.wc
+  * xharbour/ makefile.vc
+    Added above files.
+
+  /*
+     The management of GTWVT was becoming more and more complex due to 
+     everything being put in single file. Moreover, as I am about to add
+     Wvt*Classes to make WVT OOP instead of function oriented, I felt the
+     need to give it a proper code placement.
+  */
+
+2004-05-12 04:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    + define _WIN32_IE if not defined. For MinGW and Open-Watcom
+
+2004-05-11 23:33 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawStatusbar()
+      Draws Windows alike statusbar on the row ( defaults to maxrow() ) specified
+      Panels.
+
+    + static void hb_wvt_gtCreateToolTipWindow( void )
+      Creates and places the hWndTT returned by above function in _s.hWndTT member.
+
+    + Wvt_SetTooltipActive( lYesNo )
+      Get/Set flag to show or prevent tooltip to be displayed.
+
+    + Wvt_SetToolTip( nTop, nLeft, nBottom, nRight, cToolText )
+      Sets a tooltip to be displayed when mouse hovers over specified screen coordinates.
+
+  * xharbour/include/hbgtwvt.ch
+    + HWND hWndTT;
+    + BOOL bToolTipActive;
+      Added members to GLOBAL_DATA _s to hold functionality of tooltips.
+
+    /*
+    Functions above are the building blocks of upcoming Wvt*Classes and must not
+    be used as per.
+
+    The working classes which can be enhanced greatly per now are:
+
+    WvtDialog():New( nRows, nCols, cBarTitle, cFont, nFontHeight, nFontWidth, nFontWeight )
+       This adjusts the current window to above parameters and is the parent to all classes below.
+
+    WvtBrowse():New( oParent, nID, nTop, nLeft, nBottom, nRight )
+    WvtStatusBar():New( oParent, nID, nTop, nLeft, nBottom, nRight )
+    WvtPanel():New( oParent, nID, nTop, nLeft, nBottom, nRight )
+
+    Now the point is where this class library be put on CVS?
+
+    My proposal is it should be part of existing gtwvt.lib and be placed
+    in source/rtl/gtwvt alongwith gtwvt.c. But more knowledgable comments are welcome.
+
+    Please note that these classes are enhancement over and above the normal
+    behavior of GTWVT and in no way interrupt its functioning. Instead, developer is
+    free to use the classes per requirements.
+    */
+
+2004-05-10 13:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! fixed some warnings reported by Lorenzo. Please check it since
+      I cannot test it on Linux.
+
+2004-05-07 17:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * added support for K_SH_UP, K_SH_DOWN, K_SH_LEFT, K_SH_RIGHT
+    * removed HB_INKEY_RAW, HB_INKEY_EXTENDED, HB_K_MULTICODE from inkey.ch
+
+2004-05-03 13:25 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + xharbour/rtl/gtwvt/ChangeLog
+    Added WVT specific ChangeLog entries compiled from CVS root ChangeLog
+    files. If possible, please make the WVT specific entries in above
+    file also. If not, I will ever try to keep it uptodate.
 
 2004-04-30 17:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwvt/gtwvt.c
