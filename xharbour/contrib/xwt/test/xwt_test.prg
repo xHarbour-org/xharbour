@@ -51,10 +51,10 @@ PROCEDURE MAIN()
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
 
    @ 10,40  TEXTBOX oOtherBox VAR "Another box" OF oPane
-   @ 10,75  CHECKBOX        TEXT "CkBox 1" VAR .T. OF oPane FONT "Sans" COLOR "#09FC20"  BGCOLOR "#3A1803"  TEXTCOLOR "#112233"
-   @ 110,75 CHECKBOX oCheck TEXT "CkBox 2" VAR .F. OF oPane FONT "Courier" COLOR "#222222"  BGCOLOR "#A38103"  TEXTCOLOR "#FF3400"
-   @ 010,105 TOGGLEBUTTON   TEXT "Button Toggle 1" VAR .T. OF oPane FONT "Clean" COLOR "#334455"  BGCOLOR "#66CFAA"  TEXTCOLOR "#FF0000"
-   @ 120,105 TOGGLEBUTTON   TEXT "Button Toggle 2" VAR .F. OF oPane FONT "Helvetica" COLOR "#556677"  BGCOLOR "#44FFCC"  TEXTCOLOR "#DD0000"
+   @ 10,75  CHECKBOX        TEXT "CkBox 1" VAR .T. OF oPane FONT "Sans" COLOR "#09FC20"  BGCOLOR "#3A1803"  TEXTCOLOR "#112233" SIZE 5
+   @ 110,75 CHECKBOX oCheck TEXT "CkBox 2" VAR .F. OF oPane FONT "Courier" COLOR "#222222"  BGCOLOR "#A38103"  TEXTCOLOR "#FF3400" SIZE 20
+   @ 010,105 TOGGLEBUTTON   TEXT "Button Toggle 1" VAR .T. OF oPane FONT "Clean" COLOR "#334455"  BGCOLOR "#66CFAA"  TEXTCOLOR "#FF0000" SIZE 15
+   @ 120,105 TOGGLEBUTTON   TEXT "Button Toggle 2" VAR .F. OF oPane FONT "Helvetica" COLOR "#556677"  BGCOLOR "#44FFCC"  TEXTCOLOR "#DD0000" SIZE 12
 
    // add a button to query the status.
    @10,135 BUTTON oButton TEXT "Click to Query pane status"  OF oPane FONT "Helvetica" COLOR "#556677"  BGCOLOR "#44FFCC"  TEXTCOLOR "#DD0000"
@@ -104,9 +104,9 @@ PROCEDURE MAIN()
 
    /***  Radio buttons ***/
    oRadioPanel := XWTLayout():New( XWT_LM_VERT )
-   oRadioPanel:add( XWTRadioButton():New( "Option 1" ) )
-   oRadioPanel:add( XWTRadioButton():New( "Option 2" ) )
-   oRadioPanel:add( XWTRadioButton():New( "Option 3" ) )
+   oRadioPanel:add( XWTRadioButton():New( "Option 1" ,"Sans",5,"#111110","#A38103",,"#A38103") )
+   oRadioPanel:add( XWTRadioButton():New( "Option 2" ,"Sans",6,"#A38103","#456789",,"#A38103") )
+   oRadioPanel:add( XWTRadioButton():New( "Option 3" ,"Sans",7,"#111210","#222222","#A38103","#A38103") )
 
    oVLay2:Add( oRadioPanel )
    /***** A list **********/

@@ -3,9 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.19 2003/08/29 02:06:42 lculik Exp $
+   $Id: xwt_gtk.c,v 1.20 2003/08/29 18:28:30 lculik Exp $  
 
    Global declarations, common functions
+   
+  2003-08-25 Luiz Rafael Culik Guimaraes
+     Color and Font support
+      
 */
 
 #include <hbapi.h>
@@ -543,9 +547,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_PROP_FONT:
       {
          PangoFontDescription *font_desc =  pango_font_description_from_string(prop->value.font);
-         GtkRcStyle *style = gtk_widget_get_modifier_style(GTK_LABEL(wMain) );
-         style -> font_desc = font_desc;
-	 
+         GtkRcStyle *style ;
 	 switch( wWidget->type )
         {
             case XWT_TYPE_BUTTON:
@@ -553,19 +555,26 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
 	    {
-//	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
-//	        gtk_widget_modify_font(child,font_desc);
-//	        gtk_widget_modify_style(GTK_BUTTON(wSelf) , style);
-	        gtk_widget_modify_style(GTK_WIDGET(wSelf) , style);
+	
+	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
+//                style = gtk_widget_get_modifier_style(child);
+//                style -> font_desc = font_desc;
+//	        gtk_widget_modify_style(GTK_WIDGET(child) , style);
+		gtk_widget_modify_font(GTK_WIDGET(child),font_desc);
 	    }
 		break;
             case XWT_TYPE_LABEL:
+	        style = gtk_widget_get_modifier_style(wMain);
+                style -> font_desc = font_desc;
+
 	        gtk_widget_modify_style(GTK_WIDGET(wMain) , style);
 		break;
             case XWT_TYPE_MENUITEM:
 	    {
 	       PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
 	       GtkWidget *child = itm->label;
+               style = gtk_widget_get_modifier_style(child);
+               style -> font_desc = font_desc;
                gtk_widget_modify_style(GTK_WIDGET( child ) , style);
 	       break;
 	    }	
@@ -588,7 +597,6 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 		widget_set_color(wSelf, &color,FGCOLOR);
 		break;
             case XWT_TYPE_LABEL:
-//                gtk_widget_modify_fg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
 		widget_set_color(wMain, &color,FGCOLOR);
 		break;
 	    case XWT_TYPE_MENUITEM:
@@ -613,7 +621,6 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 		widget_set_color(wSelf, &color,BGCOLOR);
 		break;
             case XWT_TYPE_LABEL:
-//        	gtk_widget_modify_bg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
 		widget_set_color(wMain, &color,BGCOLOR);
     		break;
 	    case XWT_TYPE_MENUITEM:
@@ -642,7 +649,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 		break;
             case XWT_TYPE_LABEL:
 	    	widget_set_color(wMain, &color,BASECOLOR);
-            //gtk_widget_modify_base ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+
 	    break;	    
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
@@ -667,13 +674,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 	{    
 	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
     		widget_set_color(child, &color,FGCOLOR);
-//	            gtk_widget_modify_text ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
-//		widget_set_color(wSelf, &color,TEXTCOLOR);		    
-            }	
+        }	
 		break;
             case XWT_TYPE_LABEL:
 	    widget_set_color(wMain, &color,TEXTCOLOR);
-//            gtk_widget_modify_text ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+
 break;	    
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_text (wSelf, GTK_STATE_NORMAL, &color);
