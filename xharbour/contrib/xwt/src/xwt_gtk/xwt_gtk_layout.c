@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_gtk_layout.c,v 1.1 2003/04/07 10:27:45 jonnymind Exp $
 
    Layout - Horizontal or vertical layout manager
 */
@@ -40,13 +40,18 @@ PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
    gtkLayout->iMode = -1; // still undefined
    gtkLayout->frame = NULL; // no frame for now
    gtkLayout->layout = NULL; // still not available
+   gtkLayout->owner = pSelf->item.asArray.value;
+
+   gtkLayout->iPadding = 0;
+   gtkLayout->bFill = FALSE;
+   gtkLayout->bExpand = FALSE;
 
    // no need for destructor, the data is just our widget for now
    XWT_CREATE_WIDGET( xwtData );
    xwtData->type = XWT_TYPE_LAYOUT;
    // no widget for now.
    xwtData->widget_data = (void *) gtkLayout;
-   xwtData->destructor = NULL;
+   xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = layout_get_mainwidget;
    xwtData->get_top_widget = layout_get_topwidget;
 
@@ -81,7 +86,6 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode  )
 BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget )
 {
    PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
-   GtkWidget *parent;
 
    //Have we already a box?
    if ( lay->frame != NULL )
@@ -89,19 +93,7 @@ BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget )
       return FALSE;
    }
 
-   // let's get layout parent
-   lay->frame = gtk_frame_new( NULL );
-
-   parent = gtk_widget_get_parent( lay->layout );
-   gtk_widget_reparent( lay->layout, lay->frame );
-
-   //Moving the new frame to the old parent if necessary
-   if ( parent != NULL )
-   {
-      gtk_container_add( GTK_CONTAINER( parent ), lay->frame );
-   }
-   gtk_widget_show( lay->frame );
-
+   lay->frame = xwt_gtk_enframe( lay->layout );
    return TRUE;
 }
 
@@ -109,7 +101,6 @@ BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget )
 BOOL xwt_gtk_layout_reset_box( PXWT_WIDGET wWidget )
 {
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT ) wWidget->widget_data;
-   GtkWidget *parent;
 
    //if we haven't a box...
    if ( lay->frame == NULL )
@@ -117,18 +108,8 @@ BOOL xwt_gtk_layout_reset_box( PXWT_WIDGET wWidget )
       return FALSE;
    }
 
-   parent = gtk_widget_get_parent( lay->frame );
-
-   if ( parent != NULL )
-   {
-      gtk_widget_reparent( lay->layout, lay->frame );
-   }
-   else
-   {
-      gtk_container_remove( GTK_CONTAINER( lay->frame ), lay->layout );
-   }
-   gtk_widget_destroy( lay->frame );
+   xwt_gtk_deframe( lay->frame, lay->layout );
    lay->frame = NULL;
-
    return TRUE;
 }
+

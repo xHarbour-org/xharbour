@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: vpane.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: layout.prg,v 1.1 2003/04/07 10:27:45 jonnymind Exp $
 
    Pane class. Each widget is arranged below the
    previous one.
@@ -42,7 +42,6 @@ METHOD New( nMode, nWidth, nHeight ) CLASS XWTLayout
    IF .not. Empty( nWidth ) .and. .not. Empty( nHeight )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_SIZE, nWidth, nHeight )
    ENDIF
-
 RETURN Self
 
 
@@ -100,9 +99,9 @@ RETURN .F.
 
 METHOD SetBox( bHasBox, cBoxTitle ) CLASS XWTLayout
 
-   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_BOX, @bHasBox )
+   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_BOX, bHasBox )
       IF .not. Empty( cBoxTitle )
-         RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, @cBoxTitle )
+         RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cBoxTitle )
       ENDIF
       RETURN .T.
    ENDIF

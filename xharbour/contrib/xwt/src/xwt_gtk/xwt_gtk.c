@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.7 2003/04/01 22:36:27 gian Exp $
+   $Id: xwt_gtk.c,v 1.2 2003/04/07 10:27:45 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -137,8 +137,8 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_IMAGE:
             return xwt_gtk_imageLoad( wWidget, prop->value.text );
 
-            case XWT_TYPE_LAYOUT:
-               if ( wSelf )
+            case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
+               if ( wSelf != NULL )
                {
                   gtk_frame_set_label( GTK_FRAME( wSelf ), prop->value.text );
                   return TRUE;
@@ -217,8 +217,8 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_PADDING:
          if( wWidget->type == XWT_TYPE_LAYOUT )
          {
-            gtk_box_set_spacing( GTK_BOX( wWidget->get_main_widget( wWidget->widget_data ) ),
-               prop->value.number);
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            lay->iPadding = prop->value.number;
             return TRUE;
          }
       return FALSE;
@@ -227,14 +227,18 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_FILL:
          if( wWidget->type == XWT_TYPE_LAYOUT )
          {
-
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            lay->bFill = prop->value.setting;
+            return TRUE;
          }
       return FALSE;
 
       case XWT_PROP_EXPAND:
          if( wWidget->type == XWT_TYPE_LAYOUT )
          {
-          //TODO
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            lay->bExpand = prop->value.setting;
+            return TRUE;
          }
       return FALSE;
 
@@ -249,23 +253,41 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       return FALSE;
 
       case XWT_PROP_BORDER:
-         if( wWidget->type == XWT_TYPE_LAYOUT )
+         if( wWidget->type == XWT_TYPE_LAYOUT || wWidget->type == XWT_TYPE_PANE ||
+             wWidget->type == XWT_TYPE_FRAME || wWidget->type == XWT_TYPE_WINDOW )
          {
-          //TODO
+            gtk_container_set_border_width(
+               GTK_CONTAINER( wWidget->get_main_widget( wWidget->widget_data ) ),
+                  (gint) prop->value.number );
+
+            return TRUE;
          }
       return FALSE;
 
       case XWT_PROP_BOX:
-         if( wWidget->type == XWT_TYPE_LAYOUT )
+         switch( wWidget->type )
          {
-            if ( prop->value.setting )
-            {
-               return xwt_gtk_layout_set_box( wWidget );
-            }
-            else
-            {
-               return xwt_gtk_layout_reset_box( wWidget );
-            }
+            case XWT_TYPE_LAYOUT:
+               if ( prop->value.setting )
+               {
+                  return xwt_gtk_layout_set_box( wWidget );
+               }
+               else
+               {
+                  return xwt_gtk_layout_reset_box( wWidget );
+               }
+            break;
+
+            case XWT_TYPE_PANE:
+               if ( prop->value.setting )
+               {
+                  return xwt_gtk_pane_set_box( wWidget );
+               }
+               else
+               {
+                  return xwt_gtk_pane_reset_box( wWidget );
+               }
+            break;
          }
       return FALSE;
    }
@@ -402,7 +424,17 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return FALSE;
 
             case XWT_TYPE_IMAGE:
-            //TODO
+               prop->value.text = ( (PXWT_GTK_IMAGE) wWidget->widget_data)->filename;
+            return TRUE;
+
+            case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
+            {
+               if( wSelf != NULL )
+               {
+                  prop->value.text = gtk_frame_get_label( GTK_FRAME( wSelf ) );
+                  return TRUE;
+               }
+            }
             return FALSE;
          }
       return FALSE;
@@ -425,7 +457,69 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             }
             return TRUE;
          }
+      return FALSE;
 
+      case XWT_PROP_BORDER:
+         if( wWidget->type == XWT_TYPE_LAYOUT || wWidget->type == XWT_TYPE_PANE ||
+             wWidget->type == XWT_TYPE_FRAME || wWidget->type == XWT_TYPE_WINDOW )
+         {
+            prop->value.number = gtk_container_get_border_width(
+               GTK_CONTAINER( wWidget->get_main_widget( wWidget->widget_data )));
+
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_HOMOGENEOUS:
+         if( wWidget->type == XWT_TYPE_LAYOUT )
+         {
+            prop->value.setting = gtk_box_get_homogeneous(
+                  GTK_BOX( wWidget->get_main_widget( wWidget->widget_data ) ) ) ;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_PADDING:
+         if( wWidget->type == XWT_TYPE_LAYOUT )
+         {
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            prop->value.number = lay->iPadding;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_FILL:
+         if( wWidget->type == XWT_TYPE_LAYOUT )
+         {
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            prop->value.setting = lay->bFill;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_EXPAND:
+         if( wWidget->type == XWT_TYPE_LAYOUT )
+         {
+            PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
+            prop->value.setting = lay->bExpand;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_BOX:
+         if( wWidget->type == XWT_TYPE_LAYOUT ||  wWidget->type == XWT_TYPE_PANE )
+         {
+            if ( wWidget->get_top_widget( wWidget->widget_data) !=
+                  wWidget->get_main_widget( wWidget->widget_data) )
+            {
+               prop->value.setting = TRUE;
+            }
+            else
+            {
+               prop->value.setting = FALSE;
+            }
+            return TRUE;
+         }
       return FALSE;
    }
 
@@ -446,6 +540,7 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( pSelf );
       case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( pSelf );
       case XWT_TYPE_IMAGE:  return xwt_gtk_createImage( pSelf );
+      case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( pSelf );
    }
    return FALSE;
 }
@@ -474,7 +569,7 @@ BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
 
    switch( wWSelf->type )
    {
-      case XWT_TYPE_WINDOW: 
+      case XWT_TYPE_WINDOW:
       case XWT_TYPE_PANE:
          gtk_fixed_put( GTK_FIXED( wSelf ), wChild, 0, 0 );
       break;
@@ -482,11 +577,18 @@ BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
       case XWT_TYPE_FRAME:
          gtk_table_attach_defaults( GTK_TABLE( wSelf ), wChild, 0,1,0,1 );
       break;
-      
+
       case XWT_TYPE_MENU:
          gtk_menu_shell_append (GTK_MENU_SHELL(wSelf), wChild );
       break;
-      
+
+      case XWT_TYPE_LAYOUT:
+      {
+         PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWSelf->widget_data;
+         gtk_box_pack_start( GTK_BOX( wSelf ), wChild, lay->bExpand, lay->bFill, lay->iPadding );
+      }
+      break;
+
       default:
          gtk_container_add( GTK_CONTAINER( wSelf ), wChild );
    }
@@ -546,3 +648,47 @@ void *xwt_gtk_get_topwidget_neuter( void *data )
 {
    return data;
 }
+
+
+GtkWidget *xwt_gtk_enframe( GtkWidget *framed )
+{
+   GtkWidget *parent;
+   GtkWidget *frame;
+
+   frame = gtk_frame_new( NULL );
+   parent = gtk_widget_get_parent( framed );
+
+   //Moving the new frame to the old parent if necessary
+   if ( parent != NULL )
+   {
+      g_object_ref( framed );
+      gtk_container_remove( GTK_CONTAINER( parent ) , framed );
+      gtk_container_add( GTK_CONTAINER( parent ), frame );
+   }
+   gtk_container_add( GTK_CONTAINER( frame ), framed );
+   if ( parent != NULL )
+   {
+      g_object_unref( framed );
+   }
+   gtk_widget_show( frame );
+
+   return frame;
+}
+
+
+void xwt_gtk_deframe( GtkWidget *frame, GtkWidget *framed )
+{
+   GtkWidget *parent;
+   parent = gtk_widget_get_parent( frame );
+
+   g_object_ref( framed );
+   gtk_container_remove( GTK_CONTAINER( frame ), framed );
+
+   if ( parent != NULL )
+   {
+      gtk_container_remove( GTK_CONTAINER( parent ) , frame );
+      gtk_container_add( GTK_CONTAINER( parent ), framed );
+   }
+   gtk_widget_destroy( frame );
+}
+

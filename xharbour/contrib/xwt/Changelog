@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+ * $Id: Changelog,v 1.2 2003/04/07 10:27:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-04-07 17:46 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * src/layout.prg
+  * src/xwt_gtk/xwt_gtk_layout.c
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+    ! Now layout is fully operational
+
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk_pane.c
+  * src/pane.prg
+  * src/widget.prg
+    + Added support for "framed" pane ( a frame box can be drawn
+      around a fixed pane).
+
+  * test/xwt_test.prg
+    + Added test for vertical, horizontal, and fixed layouts
+    
 
 2003-04-07 12:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   - src/hpane.prg

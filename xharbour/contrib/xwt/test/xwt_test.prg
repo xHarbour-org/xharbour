@@ -5,41 +5,68 @@ Global oOtherBox
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
    LOCAL oMenuSec, oPane, oTextbox, oLabel
-   LOCAL oImg
+   LOCAL oImg, oHlay, oVLay
 
    XwtInit()
+   altd()
 
-   oWindow:= XwtFrameWindow():New("HelloWorld")
+   /*** Window creation ****/
+   oWindow:= XwtFrameWindow():New("Hello World")
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
-  
-   oPane := XwtPane():New()
-   oWindow:Add( oPane )
+
+   /*** Horizontal layout( our new main widget) ***/
+   oVLay := XwtLayout():New( XWT_LM_VERT )
+   oVLay:SetPadding( 5 )
+   oVLay:SetBorder( 2 )
+   oWindow:Add( oVLay )
+
+   /*** Text And Button ***/
    oButton := XwtButton():New( "Hello" )
    oButton:AddListener( @DumpEvent() )
-   oPane:Add( oButton )
-   oLabel := XwtLabel():New( "Text: ",10,10 )
-   
-   oPane:Add( oLabel )
-   oButton:Move( 50, 10 )
-   
-   oTextbox := XwtTextbox():New("A text", 10, 40 )
+   oLabel := XwtLabel():New( "Text: " )
+
+   // inside an horiz. layout
+   oHLay := XwtLayout():New( XWT_LM_HORIZ )
+
+   oHLay:Add( oLabel )
+   oHLay:SetFill( .T. )
+   oHLay:SetExpand( .T. )
+   oHLay:Add( oButton )
+   oHLay:SetBox( .T., "Horiz Box" )
+
+   oVlay:Add( oHLay )
+
+   /* A couple of Textboxes in a pane */
+   oPane := XwtPane():New()
+
+   oTextbox := XwtTextbox():New("A text", 10, 10 )
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
    oPane:Add( oTextbox  )
-   oOtherBox := XwtTextbox():New("Another box", 10, 70 )
+   oOtherBox := XwtTextbox():New("Another box", 10, 40 )
    oPane:Add( oOtherBox )
-   
+   oPane:SetBox( .T.,"A fixed pane" )
+
+   oVLay:Add( oPane )
+
+   /*** IMAGE ***/
+   oImg := XwtImage():New( "icon.png" )
+   oImg:SetSensible()
+   oVLay:add( oImg )
+
+   /*** Showing window ***/
    oWindow:Resize( 200, 200 )
    oWindow:Show()
    oWindow:AddListener( @WindowReceive() )
-   
+
+   /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )
-   
+
    oMenuItem := XwtMenuItem():New( "Op_en", 1 , @FileEvent())
 
    oMenu:Add( oMenuItem )
    oMenu:Add( XwtMenuItem():New( "Close", 2 , @FileEvent()))
    oMenu:Add( XwtMenuItem():New( "QUIT", 3 , @FileEvent()))
-   
+
    oMenuSec := XwtMenu():New( "Submenu" )
    oMenuSec:Add( XwtMenuItem():New( "Opt1", 10 , @FileEvent()))
    oMenuSec:Add( XwtMenuItem():New( "Opt2", 11 , @FileEvent()))
@@ -51,14 +78,14 @@ PROCEDURE MAIN()
 
    oWindow:SetMenuBar( { oMenu, oMenuHelp } )
 
-   oImg := XwtImage():New( "icon.png" )
-   oImg:Move( 10, 100 )
-   oImg:SetSensible()
-   oPane:add( oImg )
+   /*** Main LOOP ***/
    XwtMainLoop()
-   
+
+   /*** Going to terminate */
    oWindow:Destroy()
 RETURN
+
+
 
 FUNCTION WindowReceive( oEvent )
    ? "Received event at top level ", oEvent:nType, " from ", oEvent:oSender:GetText()

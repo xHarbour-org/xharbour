@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_api.c,v 1.2 2003/04/07 10:27:45 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -178,6 +178,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_HOMOGENEOUS:
       case XWT_PROP_EXPAND:
       case XWT_PROP_FILL:
+      case XWT_PROP_BOX:
          prop.value.setting = hb_parl( 3 );
       break;
 
@@ -201,10 +202,10 @@ HB_FUNC( XWT_SETPROPERTY )
       break;
 
       //Numeric parameters
+      case XWT_PROP_VISIBILITY:
       case XWT_PROP_PADDING:
       case XWT_PROP_LAYMODE:
       case XWT_PROP_BORDER:
-      case XWT_PROP_VISIBILITY:
          prop.value.number = hb_parni( 3 );
       break;
 
@@ -250,6 +251,10 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_VISIBLE:
       case XWT_PROP_FIXED:
       case XWT_PROP_MODAL:
+      case XWT_PROP_HOMOGENEOUS:
+      case XWT_PROP_EXPAND:
+      case XWT_PROP_FILL:
+      case XWT_PROP_BOX:
          if( pParam1 != NULL )
          {
             hb_itemPutL( pParam1, prop.value.setting );
@@ -283,13 +288,16 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_NAME:
          if( pParam1 != NULL )
          {
-            hb_itemPutC( pParam1, (const char *)prop.value.text );
+            hb_itemPutC( pParam1, (char *)prop.value.text );
             bRet = TRUE;
          }
       break;
 
       //Numeric parameters
       case XWT_PROP_VISIBILITY:
+      case XWT_PROP_PADDING:
+      case XWT_PROP_LAYMODE:
+      case XWT_PROP_BORDER:
          if( pParam1 != NULL )
          {
             hb_itemPutNI( pParam1, prop.value.number );

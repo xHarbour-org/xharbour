@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: container.prg,v 1.4 2003/03/28 14:44:40 gian Exp $
+   $Id: container.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -34,12 +34,13 @@ RETURN Self
 
 METHOD Add( oChild ) CLASS XWTContainer
    LOCAL bRet
+
    bRet := ::RiseEvent( XwtEvent():New( XWT_E_ADDCHILD, Self, { oChild } ) )
-   
+
    IF .not. bRet
       AAdd( ::aChildren, oChild )
       oChild:oOwner := Self
-      XWT_add( ::oRawWidget, oChild:oRawWidget, oChild:x, oChild:y )
+      XWT_add( ::oRawWidget, oChild:oRawWidget )
       // ensure a relative refresh after addition.
       oChild:Move( oChild:x, oChild:y )
    ENDIF
