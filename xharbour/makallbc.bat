@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.6 2003/10/09 05:31:53 paultucker Exp $
+rem $Id: makallbc.bat,v 1.7 2004/01/06 09:37:51 paultucker Exp $
 rem 
 
 echo create system files
@@ -88,6 +88,13 @@ if errorlevel 1 goto end
 echo tip
 cd contrib\tip
 call make_b32.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:unicode
+echo unicode
+cd contrib\unicode
+if exist make_b32.bat call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.2 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2004/01/14 06:17:25 andijahja Exp $
 #
 
 #
@@ -11,6 +11,7 @@ INCLUDE_DIR = ..\..\include;include
 BIN_DIR     = ..\..\bin
 LIB_DIR     = ..\..\lib\vc
 OBJ_DIR     = ..\..\obj\vc
+INCLUDE_DIR = ..\..\include
 
 #
 # C compiler definition and C flags. These should never have to change.

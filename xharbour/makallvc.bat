@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.7 2003/10/09 05:31:53 paultucker Exp $
+rem $Id: makallvc.bat,v 1.8 2004/01/06 09:37:53 paultucker Exp $
 rem 
 
 echo creating system files
@@ -87,6 +87,13 @@ if errorlevel 1 goto end
 echo tip
 cd contrib\tip
 call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:unicode
+echo unicode
+cd contrib\unicode
+if exist make_vc.bat call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
