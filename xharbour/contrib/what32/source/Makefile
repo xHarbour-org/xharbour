@@ -30,6 +30,7 @@ C_SOURCES=\
 	_winmenu.c \
 	_winmeta.c \
 	_winmisc.c \
+	_winmmcap.c \
 	_winmous.c \
 	_winmsg.c \
 	_winpen.c \

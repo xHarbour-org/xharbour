@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.69 2004/09/09 11:54:07 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.70 2004/12/12 01:14:25 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-12 00:24 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
+  + contrib/what32/source/_winmmcap.c
+    Added functions for video capture (work in progress).
+  * contrib/what32/makefile.bc
+  * contrib/what32/makefile.nt
+  * contrib/what32/makefile.vc
+  * contrib/what32/what32.bc
+  * contrib/what32/What32.xhp
+  * contrib/what32/source/makefile.xhp
+    Added file _winmmcap.c.
 
 2004-12-09 09:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/what32/source/_windir.c

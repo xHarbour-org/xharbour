@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.10 2003/10/10 13:33:52 paultucker Exp $
+# $Id: makefile.vc,v 1.11 2003/12/11 11:07:29 vouchcac Exp $
 #
 
 # File:     makefile.vc
@@ -100,6 +100,7 @@ WHAT32OBJ = \
     $(OBJ_DIR)\_winmenu.obj \
     $(OBJ_DIR)\_winmeta.obj \
     $(OBJ_DIR)\_winmisc.obj \
+    $(OBJ_DIR)\_winmmcap.obj \
     $(OBJ_DIR)\_winmous.obj \
     $(OBJ_DIR)\_winmsg.obj \
     $(OBJ_DIR)\_winpen.obj \
