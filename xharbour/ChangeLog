@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2382 2004/02/23 18:23:41 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2383 2004/02/23 18:24:24 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-24 02:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+  * contrib/hbzlib/zip.c
+    * reverted introduction of hb_itemParamStack() function since it is
+      against common programming concept when dealing with structure and
+      is a definitive GPF trap.
 
 2004-02-23 01:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * doc/howtoext.txt

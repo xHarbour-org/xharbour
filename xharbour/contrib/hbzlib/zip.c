@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.10 2004/02/22 02:00:15 lculik Exp $
+ * $Id: zip.c,v 1.11 2004/02/22 12:15:57 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,15 @@ HB_FUNC( HB_ZIPFILE )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
-      HB_ITEM pProgress = hb_itemParamStack( 9 );
+      PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
+      HB_ITEM iProgress;
+
+      iProgress.type = HB_IT_NIL;
+
+      if( pProgress )
+      {
+        hb_itemCopy( &iProgress, pProgress );
+      }
 
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -75,7 +83,7 @@ HB_FUNC( HB_ZIPFILE )
                                     ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                    &pProgress );
+                                    &iProgress );
       }
       else if( ISARRAY( 2 ) )
       {
@@ -87,7 +95,7 @@ HB_FUNC( HB_ZIPFILE )
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 &pProgress );
+                                 &iProgress );
 
       }
    }
@@ -135,7 +143,15 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
-      HB_ITEM pProgress = hb_itemParamStack( 10 );
+      PHB_ITEM pProgress = hb_param( 10, HB_IT_BLOCK );
+      HB_ITEM iProgress;
+
+      iProgress.type = HB_IT_NIL;
+
+      if( pProgress )
+      {
+        hb_itemCopy( &iProgress, pProgress );
+      }
 
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -150,7 +166,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                                 &pProgress );
+                                 &iProgress );
       }
       else if( ISARRAY( 2 ) )
       {
@@ -163,7 +179,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                               ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                               ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                               ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                              &pProgress );
+                              &iProgress );
       }
    }
 
@@ -177,7 +193,15 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
-      HB_ITEM pProgress = hb_itemParamStack( 9 );
+      PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
+      HB_ITEM iProgress;
+
+      iProgress.type = HB_IT_NIL;
+
+      if( pProgress )
+      {
+        hb_itemCopy( &iProgress, pProgress );
+      }
 
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -191,7 +215,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 &pProgress );
+                                 &iProgress );
       }
       else if( ISARRAY( 2 ) )
       {
@@ -203,7 +227,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                               ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                               ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                               ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                              &pProgress );
+                              &iProgress );
       }
    }
 
@@ -217,7 +241,15 @@ HB_FUNC( HB_UNZIPFILE )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
-      HB_ITEM pProgress = hb_itemParamStack( 7 );
+      PHB_ITEM pProgress = hb_param( 7, HB_IT_BLOCK );
+      HB_ITEM iProgress;
+
+      iProgress.type = HB_IT_NIL;
+
+      if( pProgress )
+      {
+        hb_itemCopy( &iProgress, pProgress );
+      }
 
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -229,7 +261,7 @@ HB_FUNC( HB_UNZIPFILE )
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              hb_parc( 6 ),
-                             &pProgress);
+                             &iProgress);
       }
       else if( ISARRAY( 6 ) )
       {
@@ -239,7 +271,7 @@ HB_FUNC( HB_UNZIPFILE )
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              hb_param( 6, HB_IT_ARRAY ),
-                             &pProgress );
+                             &iProgress );
       }
       else
       {
@@ -248,7 +280,7 @@ HB_FUNC( HB_UNZIPFILE )
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
-                             &pProgress);
+                             &iProgress);
       }
    }
 
@@ -316,7 +348,15 @@ HB_FUNC( HB_UNZIPFILEINDEX )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
-      HB_ITEM pProgress = hb_itemParamStack( 7 );
+      PHB_ITEM pProgress = hb_param( 7, HB_IT_BLOCK );
+      HB_ITEM iProgress;
+
+      iProgress.type = HB_IT_NIL;
+
+      if( pProgress )
+      {
+        hb_itemCopy( &iProgress, pProgress );
+      }
 
       strcpy( szFile, hb_parc( 1 ) );
 
@@ -328,7 +368,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
                                   ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                                   hb_parc( 5 ),
                                   hb_parni( 6 ),
-                                  &pProgress );
+                                  &iProgress );
       }
       else if( ISARRAY( 6 ) )
       {
@@ -338,7 +378,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
                                   ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                                   hb_parc( 5 ),
                                   hb_param( 6, HB_IT_ARRAY ),
-                                  &pProgress );
+                                  &iProgress );
       }
    }
 

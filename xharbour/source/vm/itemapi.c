@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.81 2004/02/23 04:03:27 andijahja Exp $
+ * $Id: itemapi.c,v 1.82 2004/02/23 10:01:44 andijahja Exp $
  */
 
 /*
@@ -150,6 +150,11 @@ PHB_ITEM HB_EXPORT hb_itemParam( USHORT uiParam )
    return pNew;
 }
 
+#if 0
+/*
+Deffed Out. This function is against a common programming concept when dealing
+with structure because it returns value of a pointer.
+*/
 HB_ITEM HB_EXPORT hb_itemParamStack( USHORT uiParam )
 {
    HB_ITEM pNew;
@@ -167,6 +172,7 @@ HB_ITEM HB_EXPORT hb_itemParamStack( USHORT uiParam )
 
    return pNew;
 }
+#endif
 
 /* Internal Item API. Use this with care. */
 
