@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.99 2002/10/27 19:36:16 ronpinkas Exp $
+ * $Id: xide.prg,v 1.101 2002/10/28 02:19:05 what32 Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ METHOD MainMenu() CLASS MainFrame
       :AddPopup('&Test')
       With Object :Popup
          :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
-         :AddItem( 'Open', 102, {|| XFMOpen( "Form1.prg" ) } )
+         :AddItem( 'Open', 102, {|| OpenProject():Create() } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
@@ -227,15 +227,35 @@ METHOD MainStatusBar() CLASS MainFrame
 return(self)
 
 //----------------------------------------------------------------------------------------------
-   CLASS ToolTabs FROM TTabControl
-      DATA Name INIT "ToolTabs"
-   ENDCLASS
-   CLASS StdTools FROM TToolBar
-      DATA Name INIT "StdTools"
-   ENDCLASS
-   CLASS WinTools FROM TToolBar
-      DATA Name INIT "WinTools"
-   ENDCLASS
+
+CLASS ToolTabs FROM TTabControl
+   DATA Name INIT "ToolTabs"
+ENDCLASS
+
+//----------------------------------------------------------------------------------------------
+
+CLASS StdTools FROM TToolBar
+   DATA Name INIT "StdTools"
+ENDCLASS
+
+//----------------------------------------------------------------------------------------------
+
+CLASS WinTools FROM TToolBar
+   DATA Name INIT "WinTools"
+ENDCLASS
+
+//----------------------------------------------------------------------------------------------
+
+CLASS OpenProject FROM TOpenDialog
+   METHOD Create() INLINE ::Filter     := { {"xIde Files (*.prg)","*.prg"} },;
+                          ::handle     := MainFrame:handle,;
+                          ::Title      := "Open Project",;
+                          ::InitialDir := GetModuleFileName(),;
+                          ::FileName   := space( 255 ),;
+                          ::Execute(),;
+                          XFMOpen( ::FileName )
+ENDCLASS
+
 //----------------------------------------------------------------------------------------------
 
 
