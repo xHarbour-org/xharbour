@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.6 2002/09/04 03:11:25 lculik Exp $
+ * $Id: teditor.prg,v 1.7 2002/10/30 02:09:37 lculik Exp $
  */
 
 /*
@@ -420,9 +420,10 @@ return Self
 // Insert a line of text at a defined row
 METHOD InsertLine(cLine, lSoftCR, nRow) CLASS HBEditor
 
-   ::AddLine()
-   AIns(::aText, nRow)
-   ::aText[nRow] := HBTextLine():New(cLine, lSoftCR)
+//   ::AddLine()
+   ::naTextLen++
+   AIns(::aText, nRow, HBTextLine():New(cLine, lSoftCR), .T.)
+//   ::aText[nRow] := HBTextLine():New(cLine, lSoftCR)
 
 return Self
 
@@ -430,8 +431,9 @@ return Self
 // Remove a line of text
 METHOD RemoveLine(nRow) CLASS HBEditor
 
-   ADel(::aText, nRow)
-   ASize(::aText, --::naTextLen)
+   ADel(::aText, nRow, .T.)
+//   ASize(::aText, --::naTextLen)
+   ::naTextLen--
 
 return Self
 
