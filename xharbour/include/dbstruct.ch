@@ -1,10 +1,10 @@
 /*
- * $Id: dbstruct.ch,v 1.4 2001/04/27 19:03:46 dholm Exp $
+ * $Id: dbstruct.ch,v 1.5 2002/10/14 07:19:27 brianhays Exp $
  */
 
 /*
  * Harbour Project source code:
- * Header file for DBSTRUCT() function
+ * Header file for DBSTRUCT() function.   >> Also used by C code <<
  *
  * Copyright 1999 {list of individual authors and e-mail addresses}
  * www - http://www.harbour-project.org

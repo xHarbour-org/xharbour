@@ -1,5 +1,5 @@
 /*
- * $Id: ord.ch,v 1.1.1.1 2001/12/21 10:47:52 ronpinkas Exp $
+ * $Id: ord.ch,v 1.5 2002/10/14 07:19:27 brianhays Exp $
  */
 
 /*
@@ -74,5 +74,7 @@
                                        ; OrdScope( 1, <x> )
 
 #command SET SCOPE TO ,<x>            => OrdScope( 1, <x> )
+
+#include "dbinfo.ch"
 
 #endif /* HB_ORD_CH_ */
