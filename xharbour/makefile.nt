@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.23 2003/04/09 19:47:12 paultucker Exp $
+# $Id: makefile.nt,v 1.24 2003/04/17 09:27:47 paultucker Exp $
 #
 
 #
@@ -519,6 +519,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgru866.obj \
    $(OBJ_DIR)\msgruwin.obj \
    $(OBJ_DIR)\msgsr852.obj \
+   $(OBJ_DIR)\msgsrwin.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgzhgb.obj \
    $(OBJ_DIR)\msgzhb5.obj

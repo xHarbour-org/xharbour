@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.41 2003/04/10 16:54:53 ronpinkas Exp $
+# $Id: makefile.bc,v 1.42 2003/04/13 11:15:43 jonnymind Exp $
 #
 
 #
@@ -491,6 +491,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgru866.obj \
    $(OBJ_DIR)\msgruwin.obj \
    $(OBJ_DIR)\msgsr852.obj \
+   $(OBJ_DIR)\msgsrwin.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgzhgb.obj \
    $(OBJ_DIR)\msgzhb5.obj
@@ -2365,6 +2366,10 @@ $(OBJ_DIR)\msgruwin.obj : $(LANG_DIR)\msgruwin.c
    tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgsr852.obj : $(LANG_DIR)\msgsr852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
