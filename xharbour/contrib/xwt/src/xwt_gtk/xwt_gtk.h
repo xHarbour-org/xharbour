@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.18 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_gtk.h,v 1.19 2004/01/30 18:34:12 lculik Exp $
 
    GTK interface
 */
@@ -216,6 +216,8 @@ BOOL xwt_gtk_createCalendar( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createComboBox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createListBox( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );

@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.29 2004/01/26 20:30:25 lculik Exp $
+   $Id: xwt_gtk.c,v 1.30 2004/01/30 18:34:12 lculik Exp $
 
    Global declarations, common functions
 
@@ -1170,9 +1170,11 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_BROWSE:      return xwt_gtk_createBrowse( xwtData );
       case XWT_TYPE_FONTSEL:     return xwt_gtk_createFontSelection( xwtData );
       case XWT_TYPE_CALENDAR:    return xwt_gtk_createCalendar(xwtData);
-      case XWT_TYPE_CALENDARM:    return xwt_gtk_createCalendarModal(xwtData);
-      case XWT_TYPE_COMBOBOX: return  xwt_gtk_createComboBox(xwtData);
-      case XWT_TYPE_LISTBOX: return xwt_gtk_createListBox( xwtData );
+      case XWT_TYPE_CALENDARM:   return xwt_gtk_createCalendarModal(xwtData);
+      case XWT_TYPE_COMBOBOX:    return  xwt_gtk_createComboBox(xwtData);
+      case XWT_TYPE_LISTBOX:     return xwt_gtk_createListBox( xwtData );
+      case XWT_TYPE_COLORSELECT: return xwt_gtk_createColorSelection( xwtData );
+      case XWT_TYPE_PROGRESSBAR: return xwt_gtk_createProgressBar( xwtData );
 
    }
    return FALSE;

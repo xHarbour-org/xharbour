@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.23 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt.ch,v 1.24 2004/01/30 18:34:12 lculik Exp $
 
    Definitions
 */
@@ -194,6 +194,7 @@
 #define XWT_TYPE_CALENDARM 120
 #define XWT_TYPE_COMBOBOX    130
 #define XWT_TYPE_LISTBOX    140
+#define XWT_TYPE_COLORSELECT 150
 // Container of Widgets ---------------------------
 
 #endif
