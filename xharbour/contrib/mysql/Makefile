@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/04/09 17:47:00 lculik Exp $
+# $Id: Makefile,v 1.5 2003/12/07 19:36:18 druzus Exp $
 #
 
 ROOT = ../../
@@ -17,8 +17,8 @@ ifeq ($(HB_ARCHITECTURE),linux)
 
 # a workaround of a problem with different include directories 
 # for mysql header files between different unix distributions
-CFLAGS += -I/usr/include/mysql -I/usr/local/include/mysql \
-          -I/usr/local/mysql/include/mysql
+C_USR += -I/usr/include/mysql -I/usr/local/include/mysql \
+          -I/usr/local/mysql/include/mysql -I/usr/include
 
 endif
 
