@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1689 2003/11/10 17:01:11 paultucker Exp $
+ * $Id: ChangeLog,v 1.1690 2003/11/10 21:33:17 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-11 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * include/hbinkey.ch
+    ! typo on definition of HB_K_ALT_DOWN, it must be 1232 instead of 1231.
 
 2003-11-10 22:25 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinkey.ch,v 1.3 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: hbinkey.ch,v 1.1.1.1 2001/12/21 10:47:42 ronpinkas Exp $
  */
 
 /*
@@ -318,7 +318,7 @@
 #define HB_K_ALT_LEFT                   1227
 #define HB_K_ALT_RIGHT                  1229
 #define HB_K_ALT_END                    1231
-#define HB_K_ALT_DOWN                   1231
+#define HB_K_ALT_DOWN                   1232
 #define HB_K_ALT_PG_DN                  1233
 #define HB_K_ALT_INS                    1234
 #define HB_K_ALT_DEL                    1235
