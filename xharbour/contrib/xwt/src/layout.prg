@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.4 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: layout.prg,v 1.5 2003/05/11 15:14:43 jonnymind Exp $
 
    Pane class. Each widget is arranged below the
    previous one.
@@ -14,14 +14,15 @@
 
 CLASS XWTLayout FROM XWTLayContainer
 
-   METHOD New( nMode, nWidth, nHeight ) CONSTRUCTOR
+   METHOD New( nMode, nWidth, nHeight, iPadding, iBorder, oParent ) CONSTRUCTOR
 
    METHOD SetPadding( iPadding )
    METHOD GetPadding( iPadding )
 
 ENDCLASS
 
-METHOD New( nMode, nWidth, nHeight ) CLASS XWTLayout
+METHOD New( nMode, nWidth, nHeight, iPadding, iBorder, oParent ) CLASS XWTLayout
+
    ::Super:New()
    ::nWidgetType := XWT_TYPE_LAYOUT
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_LAYOUT )
@@ -30,6 +31,20 @@ METHOD New( nMode, nWidth, nHeight ) CLASS XWTLayout
    IF .not. Empty( nWidth ) .and. .not. Empty( nHeight )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_SIZE, nWidth, nHeight )
    ENDIF
+
+   IF !Empty( iPadding )
+       XWT_SetProperty( ::oRawWidget, XWT_PROP_PADDING, iPadding )
+   ENDIF
+
+   IF !Empty( iBorder )
+      ::SetBorder( iBorder )
+   ENDIF
+   
+   IF oParent != NIL
+      oParent:Add( Self )
+   ENDIF
+
+
 RETURN Self
 
 

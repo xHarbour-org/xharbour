@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.13 2003/06/05 17:06:21 jonnymind Exp $
+   $Id: xwt.ch,v 1.14 2003/06/08 14:05:31 jonnymind Exp $
 
    Definitions
 */
@@ -165,5 +165,17 @@
 #define XWT_TYPE_SPLITTER 70
 #define XWT_TYPE_TREEITEM 80
 #define XWT_TYPE_TREELIST 81
+
+
+// Container of Widgets ---------------------------
+#xcommand DEFINE PANE <oPane> [ <lHasBox: BOX >];
+                              [ TITLE <cTitle>] [ OF <oParent> ];
+                       => <oPane> := XWTPane():New( <.lHasBox.>, <cTitle>, <oParent> )
+
+#xcommand DEFINE LAYOUT <oLayout> [ MODE <nMode>] [ SIZE <nWidth>,<nHeigth> ];
+                                  [ PADDING <nPadding>] [BORDER <nBorder> ];
+                                  [ OF <oParent> ] ;
+=> <oLayout> := XWTLayout():New( <nMode>, <nWidth>, <nHeigth>, <nPadding>, <nBorder>, <oParent> )
+
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.19 2003/06/08 14:04:38 jonnymind Exp $
+ * $Id: Changelog,v 1.20 2003/07/05 22:31:40 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-20 22:45 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * src/pane
+  * src/layout
+    + Added passed news parameters and support of parent widget
+
+  * test/xwt_test.prg
+    + Used news commands prepro: DEFINE PANE & DEFINE LAYOUT
+      < example:
+        DEFINE PANE oPane OF oWindow     >
+
+  * /include/xwt.ch
+    + New commands preprocesador DEFINE PANE & DEFINE LAYOUT
+
 
 2003-07-06 00:33 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * doc/es/XwtMsgBox.txt
