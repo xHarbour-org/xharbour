@@ -1,3 +1,5 @@
+#include "assocarr.ch"
+
 PROCEDURE Main()
 
     LOCAL aaContact  := TAssociativeArray()

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.2 2002/12/04 23:07:10 likewolf Exp $
+ * $Id: hbpp.c,v 1.3 2003/04/07 06:08:46 ronpinkas Exp $
  */
 
 /*
@@ -386,6 +386,18 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
               len_mpatt++;
           }
 
+          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_mpatt );
+              len_mpatt += 2;
+          }
+
+          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_mpatt );
+              len_mpatt += 2;
+          }
+
           fprintf( handl_o, "\"%s\",", s_szLine );
       }
       else
@@ -400,6 +412,18 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
+          }
+
+          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_value );
+              len_value += 2;
+          }
+
+          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_value );
+              len_value += 2;
           }
 
           if( len_mpatt + len_value > 80 )
@@ -453,14 +477,29 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
   {
       fprintf( handl_o, "\n   static COMMANDS sT___%i = ", num );
       fprintf( handl_o, "{%d,\"%s\",", stcmd2->com_or_xcom, stcmd2->name );
+
       if( stcmd2->mpatt != NULL )
       {
           len_mpatt = hb_pp_strocpy( s_szLine, stcmd2->mpatt );
+
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_mpatt );
               len_mpatt++;
           }
+
+          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_mpatt ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_mpatt );
+              len_mpatt += 2;
+          }
+
+          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_mpatt ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_mpatt );
+              len_mpatt += 2;
+          }
+
           fprintf( handl_o, "\"%s\",", s_szLine );
       }
       else
@@ -471,10 +510,23 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * end
       if( stcmd2->value != NULL )
       {
           len_value = hb_pp_strocpy( s_szLine, stcmd2->value );
+
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
           {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
+          }
+
+          while( ( ipos = hb_strAt( "\16", 1, s_szLine, len_value ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\16", s_szLine + ipos - 1, 3, 1, len_value );
+              len_value += 2;
+          }
+
+          while( ( ipos = hb_strAt( "\17", 1, s_szLine, len_value ) ) > 0 )
+          {
+              hb_pp_Stuff( "\\17", s_szLine + ipos - 1, 3, 1, len_value );
+              len_value += 2;
           }
 
           if( len_mpatt + len_value > 80 )

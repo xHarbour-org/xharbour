@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1715 2003/11/12 23:56:54 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1716 2003/11/12 23:57:58 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-13 17:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    * Added few missing escapes (\) in STRICT_OO mode.
+
+  * utils/hbpp/hbpp.c
+    * Fixed to produce escape charcaters for compiled [ and ].
+
+  * source/pp/pptable.c
+    - Removed TAssociativeArray support.
+
+  + include/assocarr.ch
+    + New header with TAssociativeArray() support.
+
+  * tests/assocarr.prg
+    + Added #include "assocarr.ch"
 
 2003-11-13 00:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hboutdebug.c

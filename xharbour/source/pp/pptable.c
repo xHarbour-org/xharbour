@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.32 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: pptable.c,v 1.33 2003/11/10 00:06:29 jonnymind Exp $
  */
 
 /*
@@ -482,13 +482,10 @@ void hb_pp_Table( void )
    static COMMANDS sC___271 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___270 };
 #endif
 
-
-   static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 \16,\1C00 => \1D00\17 }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } \16,{ \1C00,\1D00 } \17 } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
+   static COMMANDS sT___01 = {0,"{","\16\1A00\17 => \16\1B00\17 \16,\1C00 => \1D00 \17 }", "Hash(\16\1A00,\1B00\17 \16,\1C00,\1D00 \17 )",NULL };
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___02 };
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
-   static COMMANDS sT___05 = {0,"{","\1A00 :> \1B00 \16,\1C00 :> \1D00\17 }", "Hash( \1A00,\1B00 \16, \1C00,\1D00 \17 )",&sT___04 };
-   static COMMANDS sT___06 = {0,"{"," :> }", "Hash()",&sT___05 };
 
 #if defined( HB_COMPAT_C53 )
    hb_pp_topCommand = &sC___271;
@@ -497,6 +494,5 @@ void hb_pp_Table( void )
 #endif
 
    hb_pp_topDefine = &sD___60;
-   hb_pp_topTranslate = &sT___06;
-
+   hb_pp_topTranslate = &sT___04;
 }
