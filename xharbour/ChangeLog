@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1771 2003/11/26 06:29:35 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1772 2003/11/26 09:55:00 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -16,7 +16,7 @@
     * added missing header files for make install
 
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
-    ! small fix for bug in DJGPP and -O3 optymalization
+    ! small fix for bug in DJGPP and -O3 optimization
 
 2003-11-26 07:33 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hvm.c
