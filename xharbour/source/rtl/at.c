@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
+ * $Id: at.c,v 1.2 2002/04/17 02:47:12 ronpinkas Exp $
  */
 
 /*
@@ -56,18 +56,45 @@
 
 /* locates a substring in a string */
 
-HB_FUNC( AT )
-{
-   PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
+#ifdef HB_C52_STRICT
 
-   if( pText && pSub )
-   {
-      hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
-}
+    HB_FUNC( AT )
+    {
+       PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
+       PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
 
+       if( pText && pSub )
+       {
+          hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
+       }
+       else
+       {
+          hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+       }
+    }
+
+#else
+
+    HB_FUNC( AT )
+    {
+       PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
+       PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
+
+       if( pText && pSub )
+       {
+          ULONG ulLength = pText->item.asString.length;
+          ULONG ulStart = ISNUM( 3 ) ? hb_parnl( 3 ) : 1;
+          ULONG ulEnd = ISNUM( 4 ) ? hb_parnl( 4 ) : ulLength;
+          ULONG ulPos;
+
+          ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + ulStart - 1, ulEnd - ulStart + 1 );
+
+          hb_retnl( ulPos ? ulPos + ( ulStart - 1 ) : 0 );
+       }
+       else
+       {
+          hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+       }
+    }
+
+#endif

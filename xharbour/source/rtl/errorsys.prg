@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.7 2002/04/17 20:01:15 lculik Exp $
+ * $Id: errorsys.prg,v 1.8 2002/05/04 06:47:51 ronpinkas Exp $
  */
 
 /*
@@ -260,8 +260,8 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "Deleted is :" + strvalue( Set( 11 ), .T. ) )
         FWriteLine( nHandle, "Cancel is :" + strvalue( Set( 12 ), .T. ) )
         FWriteLine( nHandle, "Debug is :" + strvalue( Set( 13 ) ) )
-        FWriteLine( nHandle, "Color em :" + strvalue( Set( 15 ) ) )
-        FWriteLine( nHandle, "Cursor em :" + strvalue( Set( 16 ) ) )
+        FWriteLine( nHandle, "Color is :" + strvalue( Set( 15 ) ) )
+        FWriteLine( nHandle, "Cursor is :" + strvalue( Set( 16 ) ) )
         FWriteLine( nHandle, "Console is :" + strvalue( Set( 17 ), .T. ) )
         FWriteLine( nHandle, "Alternate is :" + strvalue( Set( 18 ), .T. ) )
         FWriteLine( nHandle, "AltFile is :" + strvalue( Set( 19 ) ) )
@@ -296,6 +296,7 @@ STATIC FUNCTION LogError( oerr )
               ( nCount )->( FWriteLine( nHandle, "" ) )
            Endif
         Next
+
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", Maxcol(), "+" ) )
         FWriteLine( nHandle, "" )
