@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.7 2005/03/17 00:42:13 modalsist Exp $
+ * $Id: disk.c,v 1.8 2005/03/17 13:54:08 andijahja Exp $
  */
 /*
  * xHarbour Project source code:
@@ -255,7 +255,8 @@ if ( !ct_getsafety() )
    BYTE * sDiskName;
    char * sRoot=NULL;
    char * sVolName=NULL;
-   
+   char   sRootBuf[3], sVolNameBuf[12];
+
    if( ISCHAR(1) && hb_parclen(1) > 0 )
    {
      sDiskName = hb_fileNameConv( hb_strdup( hb_parcx(1) ) );
@@ -264,24 +265,21 @@ if ( !ct_getsafety() )
      {
         if( fname->szPath )
         {
-         sRoot = ""; 
-         strncat( sRoot, fname->szPath, 2 ); // truncate in 2 positions: trailing backslash isn't needed.
-         strcat( sRoot , "\0" );
+         strncpy( sRootBuf, fname->szPath, 2 ); // truncate in 2 positions: trailing backslash isn't needed.
+         sRoot = sRootBuf;
         }
         if( fname->szName )
         {   
-         sVolName="           ";
-         strncpy( sVolName, fname->szName, 11 );
-         strcat( sVolName, "\0" );
+         strncpy( sVolNameBuf, fname->szName, 11 );
+         sVolName = sVolNameBuf;
         }     
 
         hb_xfree( fname );
-     }
+     }                      
      else
      {
-       sVolName="           ";
-       strncpy( sVolName, (char *) sDiskName, 11 );
-       strcat( sVolName, "\0" );
+       strncpy( sVolNameBuf, (char *) sDiskName, 11 );
+       sVolName = sVolNameBuf;
      }
    }
 #if defined(HB_OS_WIN_32)

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3952 2005/03/17 08:41:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.3953 2005/03/17 13:53:55 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-17 16:25 UTC+0200 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
+  * source/ct/disk.c
+    ! fixed C string buffer usage
+
 2005-03-17 20:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/ct/disk.c
-    ! GetVolInfo() and VolSerial():
+    + GetVolInfo() and VolSerial():
       + when no drive parameter is passed -> assumed to querry current drive.
       ! simplification of param manipulation
 
