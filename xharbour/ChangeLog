@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.715 2003/02/14 10:58:02 paultucker Exp $
+ * $Id: ChangeLog,v 1.716 2003/02/14 17:13:30 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-14 19:10 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/hbzlib/zipnew.cpp
+    contrib/hbzlib/zipcomp.cpp
+     ! Major Formatting
+     % Fixed Gpf
+     % Fixed Return from hb_zipfile()/hb_zipfilebytdspan() and hb_zipfilebypkspan() function when File was not
+      able to be created or the file to be added to zipfile is invalid( Reported By Jon Berg)
+     ! Code Clean up
+  * contrib/mysql/mysql.prg
+     ! method GetRow() from TMySQLQuery class and Function ClipValue2SQL() Respect Set Date Setting
+  * contrib/rdd_ads/adsfunc.c
+     ! Minor formating
+     % Renamed Function ADSROLLBACKTRANSACTION() to ROLLBACK() Per request
+     + ADSDDCREATE() and ADSCONNECT60() function added to ADS 6.0 compile Section
 
 2003-02-14 18:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
   * source/rtl/Makefile
@@ -37,7 +52,7 @@
     ! hb_cdxTagDoIndex
       Removed unused bCondAll and bCondRest
 
-2003-02-14 00:30 UTC-0200 Luiz Rafale Culik <culikr@uol.com.br>
+2003-02-14 00:30 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/zip.c
     ! Source code reformatted
 
