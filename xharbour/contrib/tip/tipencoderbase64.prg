@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderbase64.prg,v 1.2 2003/12/01 00:19:39 jonnymind Exp $
+* $Id: tipencoderbase64.prg,v 1.3 2003/12/07 14:07:01 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -55,6 +55,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
 
    // read the status of bHttpExcept
@@ -182,6 +183,7 @@ HB_FUNC( TIPENCODERBASE64_DECODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
 
 

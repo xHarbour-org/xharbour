@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderqp.prg,v 1.1 2003/12/01 00:19:39 jonnymind Exp $
+* $Id: tipencoderqp.prg,v 1.2 2003/12/07 14:07:01 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -47,6 +47,7 @@ HB_FUNC( TIPENCODERQP_ENCODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
 
    // Preallocating maximum possible length
@@ -122,6 +123,7 @@ HB_FUNC( TIPENCODERQP_DECODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
 
 

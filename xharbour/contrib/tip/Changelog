@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.24 2003/12/10 00:11:22 jonnymind Exp $
+ * $Id: Changelog,v 1.25 2003/12/10 01:48:33 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-12-07 02:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+2003-12-10 14:32 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclienthttp.prg
+    * GetRequest and PostRequest method have been changed into Get()
+      and Post().
+    * cQuery field is now optional, if not given it defaults
+      to URL path+file+query.
+    * Post method now accepts a non optional parameter that may be
+      a string or a hash.
+
+  * tipencoderqp.prg
+  * tipencoderurl.prg
+  * tipencoderbase64.prg
+    ! IF string to encode is emptu, return immediately.
+
+2003-12-10 02:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipclienthttp.prg
     ! fixed a loop and initialization of READ() in PostRequest
       method

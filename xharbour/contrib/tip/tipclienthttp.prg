@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.8 2003/12/10 00:11:22 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.9 2003/12/10 01:48:33 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -27,8 +27,8 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA cUserAgent   INIT  "Mozilla/3.0 (compatible XHarbour-Tip/1.0)"
 
    METHOD New()
-   METHOD GetRequest( cQuery )
-   METHOD PostRequest( cQuery, cPostData )
+   METHOD Get( cQuery )
+   METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
    METHOD Read( nLen )
 
@@ -45,7 +45,11 @@ METHOD New() CLASS tIPClientHTTP
 RETURN Self
 
 
-METHOD GetRequest( cQuery ) CLASS tIPClientHTTP
+METHOD Get( cQuery ) CLASS tIPClientHTTP
+   IF .not. HB_IsString( cQuery )
+      cQuery := ::oUrl:BuildQuery()
+   ENDIF
+
    InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
    InetSendAll( ::SocketCon, ::cCRLF )
@@ -55,28 +59,38 @@ METHOD GetRequest( cQuery ) CLASS tIPClientHTTP
 RETURN .F.
 
 
-METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
+METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
    LOCAL cData, nI
 
    IF HB_IsHash( cPostData )
       cData := ""
       FOR nI := 1 TO Len( cPostData )
          cData += TipEncoderUrl_Encode( AllTrim(CStr(HGetKeyAt( cPostData, nI ))) ) + "=" +;
-            AllTrim(CStr(TipEncoderUrl_Encode( HGetValueAt( cPostData, nI ) ))) + "&"
+           TipEncoderUrl_Encode( AllTrim(CStr( HGetValueAt( cPostData, nI  )))) + "&"
       NEXT
       cData[-1] = ""
    ELSEIF HB_IsString( cPostData )
       cData := cPostData
    ELSE
       Alert( "TipClientHTTP_PostRequest: Invalid parameters" )
-      Return
+      RETURN .F.
+   ENDIF
+
+   IF .not. HB_IsString( cQuery )
+      cQuery := ::oUrl:BuildQuery()
    ENDIF
 
    InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
+   IF .not. "Content-Type" IN ::hFields
+      InetSendAll( ::SocketCon, e"Content-Type: application/x-www-form-urlencoded\r\n" )
+   ENDIF
+
    InetSendAll( ::SocketCon, "Content-Length: " + ;
          LTrim(Str( Len( cData ) ) ) + ::cCRLF )
+
+   // End of header
    InetSendAll( ::SocketCon, ::cCRLF )
 
    IF InetErrorCode( ::SocketCon  ) ==  0
@@ -191,7 +205,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
 
    IF .not. ::bInitialized
       ::bInitialized := .T.
-      IF .not. ::GetRequest( ::oUrl:BuildQuery() )
+      IF .not. ::Get()
          RETURN NIL
       ENDIF
    ENDIF

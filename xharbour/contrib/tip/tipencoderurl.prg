@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderbase64.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
+* $Id: tipencoderurl.prg,v 1.1 2003/12/01 00:19:40 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -46,8 +46,8 @@ HB_FUNC( TIPENCODERURL_ENCODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
-
 
    // Giving maximum final length possible
    cRet = (char *) hb_xgrab( nLen * 3 );
@@ -64,7 +64,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
          (cElem >= 'A' && cElem <= 'Z') ||
          (cElem >= 'a' && cElem <= 'z') ||
          cElem == '.' || cElem == ',' || cElem == '&' ||
-         cElem == '=' || cElem == '/' || cElem == ';')
+         cElem == '=' || cElem == '/' || cElem == ';' || cElem =='_' )
       {
          cRet[ nPosRet ] = cElem;
       }
@@ -110,6 +110,7 @@ HB_FUNC( TIPENCODERURL_DECODE )
    if ( ! nLen )
    {
       hb_retc( "" );
+      return;
    }
 
 
