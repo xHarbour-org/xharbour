@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.92 2003/12/13 17:55:11 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.93 2004/01/17 17:51:42 lculik Exp $
  */
 
 /*
@@ -4798,7 +4798,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
             pOwnerPage = pPage;
             pPage = pPage->Child;
          }
-         while ( (USHORT) pPage->iKeys < ulKeyNo && pOwnerPage &&
+         while ( (USHORT) pPage->iKeys < (USHORT) ulKeyNo && pOwnerPage &&
                  ( ulNextPg = pTag->UsrAscend ?
                    pPage->Right : pPage->Left ) != CDX_DUMMYNODE )
          {
@@ -4807,7 +4807,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
             hb_cdxPageFree( pPage, FALSE );
             pPage = pOwnerPage->Child;
          }
-         if ( (USHORT) pPage->iKeys >= ulKeyNo )
+         if ( (USHORT) pPage->iKeys >= (USHORT) ulKeyNo )
          {
             pPage->iCurKey = pTag->UsrAscend ? ( SHORT ) ulKeyNo - 1 : pPage->iKeys - ( SHORT ) ulKeyNo;
             hb_cdxSetCurKey( pPage );
