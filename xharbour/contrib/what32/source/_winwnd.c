@@ -171,11 +171,12 @@ HB_FUNC ( DEFWINDOWPROC )
   hb_retnl( DefWindowProc( (HWND) hb_parnl(1), hb_parnl(2), hb_parnl(3), hb_parnl(4)));
 }
 
+//-----------------------------------------------------------------------------
+
 HB_FUNC ( DEFDLGPROC )
 {
   hb_retnl( DefDlgProc( (HWND) hb_parnl(1), hb_parnl(2), hb_parnl(3), hb_parnl(4)));
 }
-
 
 //-----------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.14 2002/09/19 22:21:19 andy_wos Exp $
+ * $Id: ChangeLog,v 1.15 2002/09/20 00:38:41 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2002-09-22 20:17 UCT -0300 Augusto Infante <systems@quesoro.com>
+   * _WinWnd.c
+     + DefDlgProc()
+
 2002-09-19 21:35 UCT -0300 Augusto Infante <systems@quesoro.com>
    * WhatUtil.Prg
      + GetMessageFont()
