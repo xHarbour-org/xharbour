@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2545 2004/03/10 19:16:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2546 2004/03/10 19:24:55 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,12 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-11 03:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/fparse.c
+    ! empty string "" was translated as " ", chr(32), space. This is not
+      correct. This change converts empty string to NULL, '\0'.
+
 2004-03-11 02:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/dbdelim.prg
     * remove PRG sub-routine and unused variable for readability
 
   + source/rtl/dbdelim_old.prg
-    % old version of dbdelim.prg for arcive purposes
+    % old version of dbdelim.prg for archive purposes
 
 2004-03-10 11:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/gtwvt/gtwvt.c
@@ -45,7 +50,7 @@
     ! More enhancement by using C functions for APPENDTODB() and DBF2TEXT()
       Append/Copy from/to text delimited now should be faster.
 
-    - put all PRG sun-routines into #ifdef __USE_OLD__
+    - put all PRG sub-routines into #ifdef __USE_OLD__
     % tests/tstdelim.prg now 0.15 seconds from 0.22 seconds
 
   * source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.6 2004/03/09 10:07:05 andijahja Exp $
+ * $Id: fparse.c,v 1.7 2004/03/10 02:54:53 andijahja Exp $
  */
 
 /*
@@ -122,8 +122,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
                 }
                 else
                 {
-                   szResult [ ui ] = ' ';
-                   szResult [ ui + 1 ] = '\0';
+                   szResult [ ui ] = '\0';
                 }
 
                 ++ i;
@@ -157,7 +156,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
                 if ( word_count == 0 )
                 {
                    /* add an empty string */
-                   szResult [ ui ] = ' ';
+                   szResult [ ui ] = '\0';
                 }
                 else
                 {
@@ -167,7 +166,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
                    {
                       /* delimiter after delimiter */
                       /* just add an empty string */
-                      szResult [ ui ] = ' ';
+                      szResult [ ui ] = '\0';
                    }
                    else
                    {
