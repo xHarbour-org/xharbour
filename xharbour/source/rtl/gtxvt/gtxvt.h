@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.11 2004/06/09 14:29:06 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.12 2004/06/28 14:16:34 jonnymind Exp $
  */
 
 /*
@@ -80,7 +80,7 @@
 #define XVT_DEFAULT_FONT_WEIGHT "medium"
 #define XVT_DEFAULT_FONT_HEIGHT 18
 #define XVT_DEFAULT_FONT_WIDTH 9
-
+#define XVT_DEFAULT_FONTW GTI_FONTW_NORMAL
 /************************************************************/
 /* Utility functions                                        */
 typedef USHORT HB_GT_CELLTYPE;
@@ -139,6 +139,7 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_ICM_SETSELECTION  20    // Set X selection.
 #define XVT_ICM_GETSELECTION  21    // Set X selection.
 #define XVT_ICM_FONTSIZE      30    // font size
+#define XVT_ICM_FONTWEIGHT    31    // font size
 #define XVT_ICM_BEGIN         50
 #define XVT_ICM_QUIT          100   // App requests message loop to quit
 
@@ -312,6 +313,7 @@ typedef struct tag_x_wnddef
    XFontStruct *xfs;
    int fontHeight;
    int fontWidth;
+   int fontWeight;
 
    // useful flags;
    USHORT usFlags;

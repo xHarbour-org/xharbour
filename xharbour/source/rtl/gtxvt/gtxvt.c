@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.40 2004/06/28 14:16:34 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.41 2004/07/29 14:33:10 lf_sfnet Exp $
  */
 
 /*
@@ -297,7 +297,7 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
 static void xvt_windowResize( PXWND_DEF wnd );
 static void xvt_windowSetCursor( PXWND_DEF wnd );
 static void xvt_windowSetHints( PXWND_DEF wnd );
-static XFontStruct *xvt_fontNew( Display *dpy, char *fontFace, char *weight, int size,  char *encoding );
+static XFontStruct *xvt_fontNew( Display *dpy, char *fontFace, int weight, int size,  char *encoding );
 static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs );
 void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate );
 static void xvt_windowRepaintColRow( PXWND_DEF wnd,
@@ -388,6 +388,7 @@ static char *s_clipboard = NULL;
 static ULONG s_clipsize = 0;
 
 /** Font request cache **/
+static int s_fontReqWeight = XVT_DEFAULT_FONTW;
 static int s_fontReqSize = XVT_DEFAULT_FONT_HEIGHT;
 static int s_fontReqWidth = XVT_DEFAULT_FONT_WIDTH;
 static char s_fontReqName[XVT_FONTNAME_SIZE];
@@ -404,7 +405,7 @@ static char s_fontReqName[XVT_FONTNAME_SIZE];
 static int s_errorHandler( Display *dpy, XErrorEvent *e )
 {
     char errorText[1024];
-    sprintf( errorText, "%s", "Xlib error: " );
+    snprintf( errorText, 1023, "%s", "Xlib error: " );
 
     XGetErrorText( dpy, e->error_code,
          errorText + strlen( errorText ),
@@ -864,7 +865,7 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
 
 
    // load the standard font
-   xfs = xvt_fontNew( dpy, s_fontReqName, XVT_DEFAULT_FONT_WEIGHT,
+   xfs = xvt_fontNew( dpy, s_fontReqName, s_fontReqWeight,
                   s_fontReqSize, NULL );
    if ( xfs == NULL )
    {
@@ -1027,13 +1028,20 @@ static void xvt_windowSetCursor( PXWND_DEF wnd )
 }
 
 /*************** Loads a font into memory ********************/
-static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, char *weight, int size,  char *encoding )
+static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, int weight, int size,  char *encoding )
 {
    char fontString[150];
    XFontStruct *xfs;
+   char *wname;
+
+   switch( weight ) {
+      case GTI_FONTW_THIN: wname = "medium"; break;
+      case GTI_FONTW_NORMAL: wname = "medium"; break;
+      case GTI_FONTW_BOLD: wname = "bold"; break;
+   }
 
    snprintf( fontString, 149, "-*-%s-%s-r-normal-*-%d-*-*-*-*-*-%s",
-      fontFace, weight, size, encoding == NULL ? "*-*" : encoding);
+      fontFace, wname, size, encoding == NULL ? "*-*" : encoding);
 
    xfs = XLoadQueryFont( dpy, fontString );
 
@@ -1044,15 +1052,16 @@ static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, char *weight, in
 /*************** Sets a font into an existing window **************************/
 static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
 {
-   
+
    wnd->fontHeight =  xfs->ascent+ xfs->descent;
    wnd->fontWidth = xfs->max_bounds.width;
    wnd->width = wnd->buffer->cols * wnd->fontWidth;
    wnd->height = wnd->buffer->rows * wnd->fontHeight;
+
    /*
    if ( wnd->xfs != 0 )
        XFreeFont( wnd->dpy, wnd->xfs );
-   */    
+   */
    wnd->xfs = xfs;
    xvt_windowSetCursor( wnd );
    if ( wnd->gc != NULL )
@@ -2309,11 +2318,11 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
          ikey = K_TAB;
          break;
       case XK_ISO_Left_Tab:
-         if ( s_modifiers.bCtrl ) 
+         if ( s_modifiers.bCtrl )
          {
             ikey = K_CTRL_SH_TAB;
-         } 
-         else 
+         }
+         else
          {
             ikey = K_SH_TAB;
          }
@@ -2905,12 +2914,14 @@ static void xvt_processMessages( PXWND_DEF wnd )
                s_fontReqWidth = (int) usData;
                read( streamUpdate[0], &usData, sizeof( usData ) );
                s_fontReqSize = (int) usData;
-               
+               read( streamUpdate[0], &usData, sizeof( usData ) );
+               s_fontReqWeight = (int) usData;
+
                read( streamUpdate[0], &usData, sizeof( usData ) );
                read( streamUpdate[0], s_fontReqName, usData );
 
                xfs = xvt_fontNew( wnd->dpy, s_fontReqName,
-                  XVT_DEFAULT_FONT_WEIGHT,
+                  s_fontReqWeight,
                   s_fontReqSize, NULL );
                if ( xfs )
                {
@@ -3282,7 +3293,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_iStdOut = iFilenoStdout;
    s_iStdErr = iFilenoStderr;
    strcpy( s_fontReqName, XVT_DEFAULT_FONT_NAME );
-   
+
    // In case of a fatal error, immediately stops
    //s_Xdisplay = XOpenDisplay( NULL );
 
@@ -4470,17 +4481,37 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
                appMsg = XVT_ICM_FONTSIZE;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
-               
+
                appMsg = (USHORT) s_fontReqWidth;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
-               
+
                appMsg = (USHORT) s_fontReqSize;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
-               
+
+               appMsg = (USHORT) s_fontReqWeight;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+
                appMsg = (USHORT) strlen( s_fontReqName );
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
                write( streamUpdate[1], s_fontReqName, appMsg );
             }
+         }
+      return iOldValue;
+
+      case GTI_FONTWEIGHT:
+         if ( s_wnd != 0 )
+         {
+            iOldValue =  s_wnd->fontWeight;
+         }
+         // else, use our local image.
+         else
+         {
+            iOldValue = s_fontReqWeight;
+         }
+
+         if ( bUpdate )
+         {
+            s_fontReqWeight = iParam;
          }
       return iOldValue;
 
@@ -4500,7 +4531,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             s_fontReqWidth = iParam;
          }
       return iOldValue;
-      
+
       case GTI_FONTNAME:
          if ( bUpdate )
          {
