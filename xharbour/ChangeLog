@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3619 2004/11/24 04:13:57 bdj Exp $
+ * $Id: ChangeLog,v 1.3620 2004/11/24 04:49:10 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-11-24 11:28 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! fixed ::Hilite() method which was calling ::DispCell() with wrong
+      parameters. Removed redundant logic to test if current cell is
+      inside ::ColorRect() bounds. This completely fixes news.xharbour.org
+      reported slowness when painting a cursor which extends to a full row.
 
 2004-11-23 20:48 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc

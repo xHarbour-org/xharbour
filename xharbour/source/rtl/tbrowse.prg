@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.95 2004/11/23 15:52:02 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.96 2004/11/23 18:22:42 mauriliolongo Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ CLASS TBrowse
 
    METHOD PosCursor()                     // Positions the cursor to the beginning of the call, used only when autolite==.F.
    METHOD LeftDetermine()                 // Determine leftmost unfrozen column in display
-   METHOD DispCell( nColumn, nColor, aColors )  // Displays a single cell and returns position of first char of displayed value
+   METHOD DispCell( nRow, nCol, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
    METHOD HowManyCol()                    // Counts how many cols can be displayed
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
    METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
@@ -2063,13 +2063,11 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    LOCAL nColFrom
    LOCAL lDisplay
    LOCAL nCol, nRow2Fill, nLeftColPos
-   LOCAL lInRect
    LOCAL nRowsToSkip, nSkipped
    LOCAL lAllRows
 
    colorSpec  := ::aColorSpec[ 1 ]
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
-   lInRect    := .f.
 
 
    // If nRow is ommited or equal to 0, redraws all pending rows
@@ -2123,46 +2121,24 @@ METHOD DrawARow( nRow ) CLASS TBrowse
          if ::nFrozenCols == 0
             DispOutAt( nRow + ::nRowData, ::nwLeft, ::cSpacePre, ColorSpec )
 
-            if ! ::lRect
-               for nCol:= nColFrom to ::rightVisible
-                  ::DispCell( nCol , TBC_CLR_STANDARD )
+            for nCol:= nColFrom to ::rightVisible
+               ::DispCell( nRow, nCol, TBC_CLR_STANDARD )
 
-                  if nCol < ::rightVisible .and. ::aColsInfo[ nCol, o_lColSep ]
-                     DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
-                  endif
-               next
-            else
-               lInRect := ( ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow )
-
-               for nCol := nColFrom to ::rightVisible
-                  if lInRect .and. ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
-                     ::DispCell( nCol, TBC_CLR_STANDARD, ::aRectColor )
-                  else
-                     ::DispCell( nCol , TBC_CLR_STANDARD )
-                  endif
-
-                  if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
-                     DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
-                  endif
-               next
-            endif
+               if nCol < ::rightVisible .and. ::aColsInfo[ nCol, o_lColSep ]
+                  DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
+               endif
+            next
 
          else      //  ::nFrozenCols > 0
             DevPos( nRow + ::nRowData, ::nwLeft )
-            if ::lRect
-               lInRect := ( ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow )
-            endif
 
             for nCol := nColFrom to ::rightVisible
                if nCol == ::nFrozenCols + 1
                   nCol := ::leftVisible
                   DispOut( ::cSpacePre, ColorSpec )
                endif
-               if ::lRect .and. lInRect .and. ::aRect[ 2 ] <= nCol  .and. ::aRect[ 4 ] >= nCol
-                  ::DispCell( nCol, TBC_CLR_STANDARD, ::aRectColor )
-               else
-                  ::DispCell( nCol, TBC_CLR_STANDARD )
-               endif
+
+               ::DispCell( nRow, nCol, TBC_CLR_STANDARD )
 
                if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
                   DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
@@ -2378,14 +2354,7 @@ METHOD Hilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      if ::lRect .and.;
-         ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
-         ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
-
-         nNotLeftCol := ::DispCell( ::nColPos, TBC_CLR_ENHANCED, ::aRectColor )
-      else
-         nNotLeftCol := ::DispCell( ::nColPos, TBC_CLR_ENHANCED )
-      endif
+      nNotLeftCol := ::DispCell( ::RowPos, ::nColPos, TBC_CLR_ENHANCED )
 
       SetPos( nRow, iif( nNotLeftCol <> NIL, nNotLeftCol, nCol ) )
 
@@ -2400,7 +2369,7 @@ Return Self
 
 //-------------------------------------------------------------------//
 
-METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
+METHOD DispCell( nRow, nColumn, nColor ) CLASS TBrowse
 
    LOCAL aColsInfo := ::aColsInfo[ nColumn ]
    LOCAL oCol      := aColsInfo[ o_Obj ]
@@ -2410,10 +2379,6 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
 
    // Screen col position of first char for not left justified columns
    LOCAL nNotLeftCol
-
-   // NOTE: When nColor is used as an array index we need to increment
-   // it by one since CLR_STANDARD is 0
-   //
    LOCAL cColor, cColorBKG
 
    // if called when the column type is not defined, then do nothing
@@ -2421,7 +2386,14 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
       Return nil // nCol
    endif
 
-   if aColors == NIL
+   if ::lRect .AND.;
+      nRow >= ::aRect[ 1 ] .AND. nColumn >= ::aRect[ 2 ] .AND.;
+      nRow <= ::aRect[ 3 ] .AND. nColumn <= ::aRect[ 4 ]
+
+      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, nColor ) - 1 )
+      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, TBC_CLR_STANDARD ) - 1 )
+
+   else
       if oCol:ColorBlock == NIL
          cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
          cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
@@ -2431,11 +2403,6 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
          cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, TBC_CLR_STANDARD ) - 1 )
 
       endif
-
-   else
-      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, nColor ) - 1 )
-      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, TBC_CLR_STANDARD ) - 1 )
-
    endif
 
    Switch aColsInfo[ o_Type ]
