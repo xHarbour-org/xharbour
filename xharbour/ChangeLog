@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1300 2003/07/27 01:23:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1302 2003/07/27 15:06:39 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-27 22:13 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/memvars.c
+  * source/vm/thread.c
+    ! Support for memvars reduced to a "working" test for windows.
+      Possibly, don't use memvars, and avoid macros, under MT.
 
 2003-07-27 16:59 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.24 2003/07/20 17:50:03 jonnymind Exp $
+ * $Id: memvars.c,v 1.25 2003/07/27 14:59:01 jonnymind Exp $
  */
 
 /*
@@ -114,7 +114,9 @@ static HB_VALUE_PTR s_globalTable = NULL;
 #define  s_globalFreeCnt     (HB_VM_STACK.globalFreeCnt)
 #define  s_globalTable       (HB_VM_STACK.globalTable)
 
-#define hb_threadGetHMemvar( pDyn )      ( HB_VM_STACK.hMemvars[ pDyn->hMemvar ] )
+//#define hb_threadGetHMemvar( pDyn )      ( HB_VM_STACK.hMemvars[ pDyn->hMemvar ] )
+#define hb_threadGetHMemvar( pDyn )      ( pDyn->hMemvar )
+#define hb_threadSetHMemvar( pDyn, hv )  ( pDyn->hMemvar = hv )
 #endif
 
 #define TABLE_INITHB_VALUE   100

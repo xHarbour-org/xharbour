@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.92 2003/07/20 19:43:08 jonnymind Exp $
+* $Id: thread.c,v 1.93 2003/07/27 14:59:01 jonnymind Exp $
 */
 
 /*
@@ -255,9 +255,10 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    hb_memvarsInit( tc );
 
    /* Initialization of dynsym pointers to memvars */
-   tc->hMemvars = (HB_HANDLE *) hb_xgrab( sizeof( HB_HANDLE ) * TABLE_INITHB_VALUE );
+   /*tc->hMemvars = (HB_HANDLE *) hb_xgrab( sizeof( HB_HANDLE ) * TABLE_INITHB_VALUE );
    tc->hMemvarsAllocated = TABLE_INITHB_VALUE;
-   tc->hMemvarsLastFree = 0;
+   tc->hMemvarsLastFree = 1;
+   tc->hMemvars[0]= 0;*/
 }
 
 /* TODO: collecting of unused old memvars. */
@@ -441,8 +442,10 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
    hb_memvarsFree( pStack );
 
+/*
    if( pStack->hMemvars )
       hb_xfree( pStack->hMemvars );
+*/
 
    /*
    #ifdef HB_OS_WIN_32
