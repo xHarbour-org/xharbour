@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2300 2004/02/15 22:49:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2301 2004/02/15 23:00:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 16:45 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/adsfunc.c
+     * restored AdsGetServerTime (by Toninho) (had been removed?)
+     ! Someone had removed  ADS_REFRESHCOUNT  from
+         AdsGetRecordCount( pArea->hTable, ADS_IGNOREFILTERS | ADS_REFRESHCOUNT, pRecCount );
+       apparently from editing an earlier version and then posting it,
+       thus losing code.  This flag MUST be in this call or unacceptably
+       wrong values are returned from lastrec().
+
+     + AdsRestructureTable()
+        wrapper to add/edit/delete fields in a table
+
+     + AdsCopyTableContents from NG post by Klaas den Dekker (Thanks!)
+
+     + Added 3 ADS function wrappers by Luis Krause Mantilla (Thanks!)
+                                        from Harbour cvs:
+        adsGetNumOpenTables()
+        adsShowError()
+        adsGetNumActiveLinks()
+
+  * contrib/rdd_ads/rddads.h
+      + added prototypes for AdsGetFieldRaw AdsSetFieldRaw.
+         I think it works better for additions to go here rather
+         than in ace.h which should stay as close to the
+         Extended Systems, Inc.  iriginal as possible since
+         it periodically gets updated.
 
 2004-02-15 20:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/libct/files.c
