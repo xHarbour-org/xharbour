@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.21 2003/01/16 16:39:56 walito Exp $
+ * $Id: tbrowse.prg,v 1.22 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -1962,14 +1962,14 @@ METHOD ForceStabilize() CLASS TBrowse
                   // I'm at top or bottom of TBrowse so I can scroll
                   //
                   if ::nNewRowPos == ::RowCount
-                     Scroll( nFirstRow + nRecsSkipped - 1, ::nLeft, nFirstRow + ::RowCount - 1, ::nRight, nRecsSkipped )
+                     Scroll( nFirstRow + nRecsSkipped - 1, ::nwLeft, nFirstRow + ::RowCount - 1, ::nwRight, nRecsSkipped )
                      ::nLastRetrieved := ::RowCount
-                     DispOutAt( ::nRowData + ::RowCount, ::nLeft, space( ::nVisWidth ), colorSpec )
+                     DispOutAt( ::nRowData + ::RowCount, ::nwLeft, space( ::nVisWidth ), colorSpec )
 
                   else
-                     Scroll( nFirstRow, ::nLeft, nFirstRow + ::RowCount + nRecsSkipped, ::nRight, nRecsSkipped )
+                     Scroll( nFirstRow, ::nwLeft, nFirstRow + ::RowCount + nRecsSkipped, ::nwRight, nRecsSkipped )
                      ::nLastRetrieved := 1
-                     DispOutAt( ::nRowData+1, ::nLeft, space( ::nVisWidth ), colorSpec )
+                     DispOutAt( ::nRowData+1, ::nwLeft, space( ::nVisWidth ), colorSpec )
 
                   endif
 
@@ -2045,7 +2045,7 @@ METHOD ForceStabilize() CLASS TBrowse
             //  It is almost identical, but please do not try to merge it in one.
             //
             if ::nFrozenCols == 0
-               DispOutAt( nRow + ::nRowData, ::nLeft, cSpacePre, ColorSpec )
+               DispOutAt( nRow + ::nRowData, ::nwLeft, cSpacePre, ColorSpec )
 
                for n := nColFrom to ::rightVisible
 
