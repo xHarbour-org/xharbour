@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3103 2004/06/22 19:28:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3104 2004/06/23 07:56:40 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-23 17:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/inkey.c
+    ! hb_inkeyNext() now returns -99 if no char available in kb buffer.
+      This is to avoid ambiguity with chr(0).
+      The following code does not hang anymore:
+        proc main
+          __keyboard(chr(0))
+          inkey(0)
+        return
+
+  * include/hbver.h
+    * Refreshed.
 
 2004-06-23 10:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/compiler/hbusage.c

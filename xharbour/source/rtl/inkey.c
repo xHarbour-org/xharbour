@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.36 2004/05/06 23:42:29 peterrees Exp $
+ * $Id: inkey.c,v 1.37 2004/05/07 21:38:40 likewolf Exp $
  */
 
 /*
@@ -188,7 +188,7 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          /* There is no point in waiting forever for no input events! */
          if( ( event_mask & ( INKEY_ALL + INKEY_RAW ) ) != 0 )
          {
-            while( hb_inkeyNext( event_mask ) == 0 )
+            while( hb_inkeyNext( event_mask ) == -99 ) /* bdj: was == 0 */
             {
                // immediately break if a VM request is pending.
                if ( hb_vmRequestQuery() != 0 )
@@ -211,10 +211,14 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          struct tms tm;
 
          end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
-         while( hb_inkeyNext( event_mask ) == 0 && (times( &tm ) < end_clock) )
+
+         /* bdj: was == 0 */
+         while( hb_inkeyNext( event_mask ) == -99 && (times( &tm ) < end_clock) )
 #else
          clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
-         while( hb_inkeyNext( event_mask ) == 0 && clock() < end_clock )
+
+         /* bdj: was == 0 */
+         while( hb_inkeyNext( event_mask ) == -99 && clock() < end_clock )
 #endif
          {
             if ( hb_vmRequestQuery() != 0 )
@@ -255,9 +259,15 @@ int hb_setInkeyLast( int ch )      /* Force a value to s_inkeyLast and return pr
    return last;
 }
 
+/*
+  bdj:
+  WARNING: hb_inkeyNext() returns -99 if no key is present
+           returns 0 if chr(0) is in kb buffer
+*/
 int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without extracting it */
 {
-   int key = s_inkeyForce;    /* Assume that typeahead support is disabled */
+   /* bdj: was simply s_inkeyForce */
+   int key = (s_inkeyForce == 0 ? -99 : s_inkeyForce);    /* Assume that typeahead support is disabled */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeyNext()"));
 
@@ -268,7 +278,7 @@ int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without
       /* Proper typeahead support is enabled */
       if( s_inkeyHead == s_inkeyTail )
       {
-         key = 0;
+         key = -99;  /* bdj: was = 0 */
       }
       else
       {
@@ -591,7 +601,12 @@ HB_FUNC( HB_KEYPUT )
 
 HB_FUNC( NEXTKEY )
 {
-   hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
+   /* bdj: was simply:
+      hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
+   */
+
+   int iRetval = hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK );
+   hb_retni( iRetval == -99 ? 0 : iRetval );
 }
 
 HB_FUNC( LASTKEY )
