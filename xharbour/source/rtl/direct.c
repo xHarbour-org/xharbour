@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.27 2004/03/03 04:48:39 ronpinkas Exp $
+ * $Id: direct.c,v 1.28 2004/03/03 06:35:18 andijahja Exp $
  */
 
 /*
@@ -263,16 +263,21 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
 static char *hb_stripfilepath ( char *name )
 {
-    char *path_end;
-    path_end = strrchr (name, '\\');
+   char *path_end;
 
-    if (path_end == NULL)
-        path_end = strrchr (name, '/');
+   path_end = strrchr( name, '\\' );
 
-    if (path_end != NULL)
-        memmove (name, path_end + 1, strlen (path_end));
+   if ( path_end == NULL )
+   {
+      path_end = strrchr( name, '/' );
+   }
 
-    return (name);
+   if ( path_end != NULL )
+   {
+      memmove( name, path_end + 1, strlen( path_end ) );
+   }
+
+   return( name );
 }
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, BOOL bMatchCase )
