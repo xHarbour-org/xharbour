@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.14 2003/03/03 15:55:59 ignacioortiz Exp $
+ * $Id: transfrm.c,v 1.15 2003/03/07 23:32:25 ronpinkas Exp $
  */
 
 /*
@@ -464,7 +464,7 @@ HB_FUNC( TRANSFORM )
          }
 
          /* TODO: maybe replace this 16 with something else */
-         szResult = ( char * ) hb_xgrab( ulPicLen + 16 );   /* Grab enough */
+         szResult = ( char * ) hb_xgrab( ulPicLen + (ULONG) iOrigWidth + (ULONG) iOrigDec + 16 );   /* Grab enough */
          *szResult = '\0';
 
          for( i = 0; i < ulPicLen && !bFound; i++ )      /* Count number in front    */
