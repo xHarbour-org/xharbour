@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.73 2003/10/10 13:33:48 paultucker Exp $
+# $Id: makefile.vc,v 1.74 2003/10/21 15:31:05 paultucker Exp $
 #
 
 #
@@ -835,6 +835,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fastitem.obj \
    $(OBJ_DIR)$(MT)\fm.obj \
    $(OBJ_DIR)$(MT)\garbage.obj \
+   $(OBJ_DIR)$(MT)\hash.obj \
    $(OBJ_DIR)$(MT)\hbi18n.obj \
    $(OBJ_DIR)$(MT)\hvm.obj \
    $(OBJ_DIR)$(MT)\inet.obj \
