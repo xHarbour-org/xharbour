@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.4 2002/03/19 05:45:31 ronpinkas Exp $
+ * $Id: tbrowse.prg,v 1.5 2002/03/31 16:53:50 lculik Exp $
  */
 
 /*
@@ -472,11 +472,12 @@ return nHowMany
 METHOD SetColumnWidth( oCol ) CLASS TBrowse
 
    LOCAL xRes, cType, nTokenPos := 0, nL, cHeading
-   LOCAL nWidthMax := ::nRight - ::nLeft+1    // Visible width of TBrowse
-   LOCAL nWidth := 0,nColWidth:=0
+   LOCAL nWidthMax := ::nRight - ::nLeft +1    // Visible width of TBrowse
+   LOCAL nWidth := 0,nColWidth:=0,nLen:=0
 
+   tracelog('nWidthMax : ',nWidthMax)
    // if oCol has :Width property set I use it
-   if oCol:Width <> nil .AND. oCol:Width < (nWidthMax - 4)
+   if oCol:Width <> nil //.AND. oCol:Width < (nWidthMax - 4)
       nWidth := oCol:Width
 
    else
@@ -486,38 +487,38 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
 
          do case
             case cType == "N"
-               nWidth := Len( Str( xRes ) )
+               nLen := Len( Str( xRes ) )
 
             case cType == "L"
-               nWidth := 1
+               nLen:=1
 
             case cType == "C"
-               nWidth := Len( xRes )
+               nLen := Len( xRes )
 
             case cType == "D"
-               nWidth := Len( DToC( xRes ) )
+                nLen=  len(DToC( xRes ) )
 
             otherwise
-               nWidth := 0
+               nLen := 0
          endcase
+         
 
          cHeading := oCol:Heading + ";"
          while (nL := Len(__StrTkPtr(@cHeading, @nTokenPos, ";"))) > 0
-            if nL > nWidth
-               nColWidth := nL
-            endif
+               nColWidth += nL
          enddo
-       if nColWidth> nWidth
-          nColWidth:=nWidth
-       endif
-
-         if nWidth > nWidthMax
-            // with values lower than -4 it SIGSEVs here and there :-(
-            nWidth := nWidthMax - 4
-         endif
-
       endif
    endif
+    if nColWidth>nWidthMax
+        nColWidth:=nWidthMax
+    endif
+    if nlen>nWidthMax
+        nLen:=nWidthMax
+    endif
+    nWidth:= if(nColwidth>nLen,nColwidth,nLen)
+    tracelog('nColwidth : ',nColwidth)
+    tracelog('nLen : ',nLen)
+    tracelog('nwidth : ',nWidth)
 
 return nWidth
 
