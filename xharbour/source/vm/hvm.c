@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.396 2004/05/16 23:54:11 ronpinkas Exp $
+ * $Id: hvm.c,v 1.397 2004/05/17 00:42:52 ronpinkas Exp $
  */
 
 /*
@@ -303,13 +303,13 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 //JC1: in MT this are handled by the single thread stack creation.
 #ifndef HB_THREAD_SUPPORT
    HB_ITEM hb_vm_aWithObject[ HB_MAX_WITH_OBJECTS ];
-   USHORT  hb_vm_wWithObjectCounter; // Initialized in hb_vmInit()
+   UINT    hb_vm_wWithObjectCounter; // Initialized in hb_vmInit()
    BOOL    hb_vm_bWithObject = FALSE;
 
    HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
    ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
-   ULONG    hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
+   UINT     hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
 
    PHB_SEQUENCE hb_vm_pSequence;
 
@@ -8309,7 +8309,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
 #ifndef HB_THREAD_SUPPORT
     void hb_vmIsLocalRef( void )
     {
-       int i;
+       UINT i;
 
        HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 

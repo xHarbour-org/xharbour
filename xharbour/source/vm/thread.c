@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.169 2004/05/10 10:38:07 mauriliolongo Exp $
+* $Id: thread.c,v 1.170 2004/05/16 23:54:12 ronpinkas Exp $
 */
 
 /*
@@ -684,7 +684,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 void hb_threadIsLocalRef( void )
 {
    HB_STACK *pStack;
-   int i;
+   UINT i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.84 2004/05/10 10:38:04 mauriliolongo Exp $
+* $Id: thread.h,v 1.85 2004/05/16 23:54:11 ronpinkas Exp $
 */
 
 /*
@@ -375,14 +375,14 @@ typedef struct tag_HB_STACK
 
    /* Mt With Object index */
    HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
-   USHORT  wWithObjectCounter;
+   UINT    wWithObjectCounter;
    BOOL    bWithObject;
 
    /* Mt for each enumeration index */
    HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];
    ULONG    awEnumIndex[ HB_MAX_ENUMERATIONS ];
-   USHORT   wEnumCollectionCounter;
+   UINT     wEnumCollectionCounter;
 
    /* management of codeblock and macro params */
    int aiExtraParams[HB_MAX_MACRO_ARGS];
