@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2446 2004/03/02 12:58:02 andijahja Exp $
+ * $Id: ChangeLog,v 1.2447 2004/03/02 17:31:27 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 10:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Reinstated hb_itemClear() on hb_vm_aEnumCollection[] and hb_vm_aWithObject[]
+
+     /*
+        This solves uiHolders overflow and memory leak when RETURN was issues
+        from WITH OBJECT or FOR EACJ construct. I tested with Return and Break,
+        and could not find a scenario where double release might occure.
+        Please report any new GPF expreience that might be related to WITH OBJECT
+        or FOR EACH.
+     */
+
+   * utils/hbtest/rt_ccall.prg
+     * bcc55 was erroring on 5000000000LL changed to (LONGLONG) 5000000000
+       Did not have time to review, so just a quick patch.
 
 2004-03-02 18:22 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
    * xharbour/source/vm/itemapi.c

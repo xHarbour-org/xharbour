@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.341 2004/03/02 04:46:56 ronpinkas Exp $
+ * $Id: hvm.c,v 1.342 2004/03/02 17:31:28 druzus Exp $
  */
 
 /*
@@ -3236,9 +3236,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
    {
       hb_vm_wEnumCollectionCounter--;
-      //hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
-      // We might get here from BREAK, so item may have been released.
-      hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
+      hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
    }
 
@@ -3246,9 +3244,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    while( hb_vm_wWithObjectCounter > wWithObjectCounter )
    {
       --hb_vm_wWithObjectCounter;
-      //hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-      // We might get here from BREAK, so item may have been released.
-      hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
+      hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
    }
 
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
