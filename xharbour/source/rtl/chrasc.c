@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.3 2002/04/18 05:33:51 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include <ctype.h>
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbstack.h"
@@ -83,7 +84,7 @@ HB_FUNC( CHR )
       }
 
       /* Believe it or not, clipper does this! */
-      hb_stack.Return.item.asString.value   = hb_vm_acAscii[ hb_parnl( 1 ) % 256 ];
+      hb_stack.Return.item.asString.value   = (char *) hb_vm_acAscii[ hb_parnl( 1 ) % 256 ];
       hb_stack.Return.item.asString.length  = 1;
       hb_stack.Return.item.asString.bStatic = TRUE;
       hb_stack.Return.item.asString.bChar   = FALSE;

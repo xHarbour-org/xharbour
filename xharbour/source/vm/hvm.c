@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.56 2002/04/18 00:56:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.57 2002/04/18 05:33:51 ronpinkas Exp $
  */
 
 /*
@@ -3481,7 +3481,7 @@ static void hb_vmArrayPop( void )
 
          if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
          {
-            char *sNew = hb_xgrab( pArray->item.asString.length + 1 );
+            char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 
             memcpy( sNew, pArray->item.asString.value, pArray->item.asString.length );
             sNew[ pArray->item.asString.length ] = '\0';
