@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.757 2003/02/22 02:56:41 lculik Exp $
+ * $Id: ChangeLog,v 1.758 2003/02/22 05:54:55 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -27,7 +27,14 @@
     + Added a KillAllThreads() test
     * Visual upgrade
 
+  * config/gcc.cf
+    + ADDED -DHB_OS_LINUX to better identify linux specific extensions
+    - REMOVED "-g" (debug) switch from default compilation. You will have
+      to add it to CUSR to have this in.
+
   * include/hbsetup.h
+    + Added #ifdef HB_OS_LINUX --> #define HB_OS_UNIX
+
   * include/hbstack.h
   * include/thread.h
     % Now thread is ALWAYS included if stack is included. If thread support
