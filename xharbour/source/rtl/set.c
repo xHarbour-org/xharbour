@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.7 2002/04/28 20:18:43 lculik Exp $
+ * $Id: set.c,v 1.8 2002/04/28 21:57:33 lculik Exp $
  */
 
 /*
@@ -585,7 +585,7 @@ HB_FUNC( SET )
            char * sPrinterName;
            strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
            szResult=hb_strupr(szTemp);
-           if(stricmp(szResult, "WIN:") == 0)
+           if(hb_stricmp(szResult, "WIN:") == 0)
            {
                sPrinterName = hb_set.HB_SET_PRINTFILE + 4;
                hb_set.hb_set_winprinter=TRUE;
@@ -740,9 +740,9 @@ HB_FUNC( SET )
            BOOL bOpen=TRUE;
            strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
            szResult=hb_strupr(szTemp);
-           if (stricmp(szResult, "WIN:") == 0)
+           if (hb_stricmp(szResult, "WIN:") == 0)
                bOpen=FALSE;
-           if (stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ {
+           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ {
                 bOpen=FALSE;  
                 hb_set.hb_set_printerjob=hb_set.HB_SET_PRINTFILE + 4;
                 }
