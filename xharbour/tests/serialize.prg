@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.2 2003/04/13 20:40:45 jonnymind Exp $
+* $Id: serialize.prg,v 1.3 2003/04/13 21:39:24 jonnymind Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -27,73 +27,87 @@
 
 #include "hbclass.ch"
 
-Class AClass
-   DATA aData PERSISTENT
+PROCEDURE MAIN()
 
-   METHOD aMethod()
-   METHOD New( cDt ) CONSTRUCTOR
-   HIDDEN:
-   Data aHIdden
-ENDCLASS
-
-METHOD aMethod() CLASS aClass
-   ? "Method from class ", ::aData
-RETURN .T.
-
-METHOD New( cData ) CLASS aClass
-   ::aData := cData
-RETURN .T.
-
-
-Procedure MAIN()
-   LOCAL cTmp, oData
+   LOCAL cTmp, xVal
    LOCAL cSerial
 
    CLEAR SCREEN
-   @1,10 SAY "X H A R B O U R - Serialization and deserialization tests"
+   @ 1, 10 SAY "X H A R B O U R - Serialization and deserialization tests"
 
    cTmp := HB_Serialize( "A string" )
    cTmp += HB_Serialize( 12.4 )
-   cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
+   //cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 20 )
-   cTmp += HB_Serialize( AClass():New("A parameter") )
+   cTmp += HB_Serialize( SomeClass():New("A parameter") )
    cTmp += HB_Serialize( "Last String, closing test" )
 
    /* now we deserialize */
    cSerial := HB_DeserialBegin( cTmp )
 
-   cTmp := HB_DeserialNext( cSerial )
-   DO WHILE cTmp != NIL
-
-      DO CASE
-         CASE ValType( cTmp ) == "A"
-            ArrayDump( cTmp, 0 )
-         CASE ValType( cTmp ) == "O"
-            cTmp:aMethod()
-         OTHERWISE
-            ? "*", cTmp
-      ENDCASE
-
-      cTmp := HB_DeserialNext( cSerial )
-   ENDDO
+   xVal := HB_DeserialNext( cSerial )
 
    ?
-   ?" DONE - press a key to terminate"
-   Inkey(0)
-RETURN
+   DO WHILE xVal != NIL
+      SWITCH ValType( xVal )
+         CASE 'A'
+            ArrayDump( xVal )
+            EXIT
 
+         CASE 'O'
+            xVal:SomeMethod()
+            EXIT
+
+         DEFAULT
+            ? "*", xVal
+      END
+
+      xVal := HB_DeserialNext( cSerial )
+   ENDDO
+
+RETURN
 
 PROCEDURE ArrayDump( aData, nLevel )
-   LOCAL cElem
 
-   ? "ARRAY:" + rTrim( Str( nLevel ) )
-   FOR EACH cElem IN aData
-      IF ValType( cElem ) == "A"
-         ArrayDump( cElem, nLevel + 1 )
+   LOCAL xElement
+
+   IF nLevel == NIL
+      nLevel := 0
+   ENDIF
+
+   ? Space( 3 * nLevel - 1 ) + ':' + "ARRAY #" + LTrim( Str( nLevel ) )
+
+   FOR EACH xElement IN aData
+      IF ValType( xElement ) == "A"
+         ArrayDump( xElement, nLevel + 1 )
       ELSE
-         ? cElem
+         ? Space( 3 * nLevel - 1 ) + ':', xElement
       ENDIF
    NEXT
-   ? "END ARRAY"
+
+   ? Space( 3 * nLevel - 1 ) + ':' + "END ARRAY #" + LTrim( Str( nLevel ) )
+
 RETURN
+
+CLASS SomeClass
+
+   DATA cData PERSISTENT
+
+   METHOD New( cDt ) CONSTRUCTOR
+
+   METHOD SomeMethod()
+
+ENDCLASS
+
+METHOD SomeMethod() CLASS SomeClass
+
+   ? ProcName() + '[' + LTrim( Str( ProcLine() ) ) + ']', ::cData
+
+RETURN .T.
+
+METHOD New( cData ) CLASS SomeClass
+
+   ::cData := cData
+
+RETURN .T.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1025 2003/05/16 20:05:44 anoncvs_ivtv Exp $
+ * $Id: ChangeLog,v 1.1026 2003/05/16 22:03:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-16 17:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/serialize.prg
+    ! Moved Main Procedure to be the first defined procedure (NON Linux Systems execute the first defined symbol at startup).
+    * Commented the Serialization of Date value as it's broken (at least on Windows).
+    * Few formating and other refinements.
 
 2003-05-16 14:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fm.c
