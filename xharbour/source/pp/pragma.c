@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.8 2001/12/21 11:41:17 antoniolinares Exp $
+ * $Id: pragma.c,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ void hb_pp_ParsePragma( char * szLine )
       }
       else if( memcmp( szLine, "BEGINDUMP", PRAGMAS_LEN ) == 0 )
       {
-         char sBuffer[ HB_PP_STR_SIZE ], *pBuffer, sDirective[9] ;
+         char sBuffer[ HB_PP_STR_SIZE ], *pBuffer, sDirective[8] ;
          int iSize;
 #ifndef __WATCOMC__
          extern BOOL hb_pp_bInline;
@@ -230,7 +230,11 @@ void hb_pp_ParsePragma( char * szLine )
             {
                pBuffer++;
             }
-            hb_strupr( strncpy( sDirective, pBuffer, 6 ) );
+
+            strncpy( (char *) sDirective, pBuffer, 6 );
+            sDirective[6] = '\0';
+            hb_strupr( sDirective );
+
             if( memcmp( sDirective, "PRAGMA", 6 ) == 0 )
             {
                pBuffer += 6;
@@ -239,7 +243,11 @@ void hb_pp_ParsePragma( char * szLine )
             {
                pBuffer++;
             }
-            hb_strupr( strncpy( sDirective, pBuffer, 7 ) );
+
+            strncpy( sDirective, pBuffer, 7 );
+            sDirective[7] = '\0';
+            hb_strupr( sDirective );
+
             if( memcmp( sDirective, "ENDDUMP", 7 ) == 0 )
             {
                hb_pp_bInline = FALSE;
