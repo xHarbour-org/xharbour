@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.8 2003/04/18 13:28:50 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.9 2003/04/21 06:56:33 jonnymind Exp $
 
    GTK interface
 */
@@ -35,6 +35,15 @@ typedef struct tag_xwt_gtk_modal
   BOOL modal;
   BOOL canceled;
 } XWT_GTK_MODAL, *PXWT_GTK_MODAL;
+
+typedef struct tag_xwt_gtk_splitter
+{
+   XWT_GTK_BASE;
+   GtkWidget *first_widget;
+   GtkWidget *second_widget;
+   BOOL bShrink1;
+   BOOL bShrink2;
+} XWT_GTK_SPLITTER, *PXWT_GTK_SPLITTER;
 
 typedef struct tag_xwt_gtk_wnd
 {
@@ -132,7 +141,7 @@ PXWT_WIDGET xwt_gtk_createViewPort( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createRadioButton( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf );
-
+PXWT_WIDGET xwt_gtk_createSplitter( PHB_ITEM pSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
@@ -140,6 +149,7 @@ BOOL xwt_gtk_imageLoad( PXWT_WIDGET xwtData, const char *fname );
 BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf );
 
 BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode );
+BOOL xwt_gtk_splitter_create_with_mode( PXWT_WIDGET wWidget, int mode );
 
 BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget );
 BOOL xwt_gtk_container_reset_box( PXWT_WIDGET wWidget );

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.8 2003/04/17 23:42:17 lculik Exp $
+   $Id: xwt.ch,v 1.9 2003/04/21 06:56:33 jonnymind Exp $
 
    Definitions
 */
@@ -80,6 +80,11 @@
 #define XWT_PROP_FILEMASK  80
 #define XWT_PROP_FILENAME  81
 
+#define XWT_PROP_FIRSTWID  90 // Widget (data)
+#define XWT_PROP_SECWID    91 // Widget (data)
+#define XWT_PROP_FIRSTSHRINK  92 //bool
+#define XWT_PROP_SECSHRINK 93 //bool
+
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool
 #define XWT_PROP_VISIBILITY 102 // int (see widget visibility)
@@ -151,5 +156,6 @@
 #define XWT_TYPE_TEXTBOX  40
 #define XWT_TYPE_IMAGE    50
 #define XWT_TYPE_FILESEL  60
+#define XWT_TYPE_SPLITTER 70
 
 #endif

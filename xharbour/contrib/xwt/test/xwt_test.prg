@@ -8,7 +8,7 @@ GLOBAL oOtherBox
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
    LOCAL oMenuSec, oPane, oTextbox, oLabel, oViewPort
-   LOCAL oImg, oHlay, oVLay, oFrame
+   LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
    LOCAL oGrid
 
    XwtInit()
@@ -18,11 +18,19 @@ PROCEDURE MAIN()
    oWindow:= XwtFrameWindow():New("Hello World")
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
 
-   /*** Horizontal layout( our new main widget) ***/
+   /*** Splitter panes layout( our new main widget) ***/
    oVLay := XwtLayout():New( XWT_LM_VERT )
    oVLay:SetPadding( 5 )
    oVLay:SetBorder( 2 )
-   oWindow:Add( oVLay )
+
+   oVLay2 := XwtLayout():New( XWT_LM_VERT )
+   oVLay2:SetPadding( 5 )
+   oVLay2:SetBorder( 2 )
+
+   oSplit := XwtSplitter():New( XWT_LM_HORIZ, oVLay, oVLay2 )
+   oSplit:SetShrinkFirst( .F. )
+
+   oWindow:Add( oSplit )
 
    /*** Text And Button ***/
    oButton := XwtButton():New( "Hello" )
@@ -54,8 +62,9 @@ PROCEDURE MAIN()
    oVLay:Add( oPane )
 
    /* A beautiful GRID */
+
    oGrid := XwtGrid():New(2,3)
-   
+
    oLabel := XwtLabel():New("Field label")
 
    oGrid:setPadding( 2, 10 )
@@ -75,7 +84,7 @@ PROCEDURE MAIN()
    /*** IMAGE ***/
    oImg := XwtImage():New( "icon.png" )
    oImg:SetSensible()
-   oVLay:add( oImg )
+   oVLay2:add( oImg )
 
    /*** An input mask ***/
    aInputs := {;
@@ -91,7 +100,7 @@ PROCEDURE MAIN()
    oFrame:add( oViewPort )
    oViewPort:SetContent( oInput )
    oFrame:SetBox( .T., "Inside a scrollable..." )
-   oVLay:Add( oFrame )
+   oVLay2:Add( oFrame )
 
 
    /***  Radio buttons ***/
@@ -100,7 +109,7 @@ PROCEDURE MAIN()
    oRadioPanel:add( XWTRadioButton():New( "Option 2" ) )
    oRadioPanel:add( XWTRadioButton():New( "Option 3" ) )
 
-   oVLay:Add( oRadioPanel )
+   oVLay2:Add( oRadioPanel )
    /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )
 

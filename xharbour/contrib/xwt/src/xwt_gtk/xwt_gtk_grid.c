@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_grid.c,v 1.1 2003/04/08 18:23:07 jonnymind Exp $
+   $Id: xwt_gtk_grid.c,v 1.2 2003/04/21 06:56:33 jonnymind Exp $
 
    Grid - a col/row layout adapter
 */
@@ -21,6 +21,9 @@ PXWT_WIDGET xwt_gtk_createGrid( PHB_ITEM pSelf )
    grid->iRows = 1; // still undefined
    grid->iCols = 1; // no frame for now
    grid->main_widget = gtk_table_new( 1, 1, FALSE );
+   grid->align = NULL; // no frame for now
+   grid->iHAlign = XWT_ALIGN_CENTER; // no frame for now
+   grid->iVAlign = XWT_ALIGN_TOP; // no frame for now
    grid->frame = NULL;
    grid->iYPad = 0;
    grid->iXPad = 0;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.10 2003/04/18 13:28:50 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.11 2003/04/21 06:56:33 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -239,6 +239,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             xwt_gtk_layout_create_with_mode( wWidget, prop->value.number );
             return TRUE;
          }
+         else if ( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            xwt_gtk_splitter_create_with_mode( wWidget, prop->value.number );
+            return TRUE;
+         }
       return FALSE;
 
       case XWT_PROP_PADDING:
@@ -281,6 +286,44 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          {
             PXWT_GTK_GRID grid = ( PXWT_GTK_GRID ) wWidget->widget_data;
             grid->bShrink = prop->value.setting;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_FIRSTSHRINK:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER split = ( PXWT_GTK_SPLITTER ) wWidget->widget_data;
+            if ( split->bShrink1 != prop->value.setting )
+            {
+               split->bShrink1 = prop->value.setting;
+               if ( split->first_widget != NULL )
+               {
+                  g_object_ref( G_OBJECT( split->first_widget ) );
+                  gtk_container_remove( GTK_CONTAINER(wMain), split->first_widget );
+                  gtk_paned_pack1( GTK_PANED( wMain ), split->first_widget,
+                     TRUE, split->bShrink1);
+               }
+            }
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_SECSHRINK:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER split = ( PXWT_GTK_SPLITTER ) wWidget->widget_data;
+            if ( split->bShrink2 != prop->value.setting )
+            {
+               split->bShrink2 = prop->value.setting;
+               if ( split->second_widget != NULL )
+               {
+                  g_object_ref( G_OBJECT( split->second_widget ) );
+                  gtk_container_remove( GTK_CONTAINER(wMain), split->second_widget );
+                  gtk_paned_pack2( GTK_PANED( wMain ), split->second_widget,
+                     TRUE, split->bShrink2);
+               }
+            }
             return TRUE;
          }
       return FALSE;
@@ -367,7 +410,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_STATUS:
          if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
          {
-            gtk_toggle_button_set_active( GTK_BUTTON( wSelf ), (gboolean) prop->value.setting );
+            gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( wSelf ), (gboolean) prop->value.setting );
             return TRUE;
          }
       return FALSE;
@@ -381,6 +424,51 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
+
+      case XWT_PROP_FIRSTWID:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER split = (PXWT_GTK_SPLITTER) wWidget->widget_data;
+            PXWT_WIDGET wid = ( PXWT_WIDGET) prop->value.data;
+
+            if( split->first_widget != NULL )
+            {
+               gtk_object_ref( GTK_OBJECT(prop->value.data) );
+               gtk_container_remove( GTK_CONTAINER( wSelf ), split->first_widget );
+            }
+
+            if ( wid !=  NULL )
+            {
+               split->first_widget = wid->get_top_widget( wid->widget_data );
+               gtk_paned_pack1( GTK_PANED( wSelf ), split->first_widget,
+                  (gboolean) TRUE, (gboolean) split->bShrink1);
+            }
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_SECWID:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER split = (PXWT_GTK_SPLITTER) wWidget->widget_data;
+            PXWT_WIDGET wid = ( PXWT_WIDGET) prop->value.data;
+
+            if( split->second_widget != NULL )
+            {
+               gtk_object_ref( GTK_OBJECT(prop->value.data) );
+               gtk_container_remove( GTK_CONTAINER( wSelf ), split->second_widget );
+            }
+            if ( wid != NULL )
+            {
+               split->second_widget = wid->get_top_widget( wid->widget_data );
+               gtk_paned_pack2( GTK_PANED( wSelf ), split->second_widget,
+                  (gboolean) TRUE, (gboolean) split->bShrink2);
+            }
+            return TRUE;
+         }
+     return FALSE;
+
+
    }
 
    return FALSE;
@@ -615,6 +703,24 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_FIRSTSHRINK:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER lay = ( PXWT_GTK_SPLITTER ) wWidget->widget_data;
+            prop->value.setting = lay->bShrink1;
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_SECSHRINK:
+         if( wWidget->type == XWT_TYPE_SPLITTER )
+         {
+            PXWT_GTK_SPLITTER lay = ( PXWT_GTK_SPLITTER ) wWidget->widget_data;
+            prop->value.setting = lay->bShrink2;
+            return TRUE;
+         }
+      return FALSE;
+
       case XWT_PROP_FILENAME:
          if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
          {
@@ -629,7 +735,8 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_STATUS:
          if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
          {
-            prop->value.setting = (gboolean) gtk_toggle_button_get_active( GTK_BUTTON( wSelf ) );
+            prop->value.setting = (gboolean) gtk_toggle_button_get_active(
+                  GTK_TOGGLE_BUTTON( wSelf ) );
             return TRUE;
          }
       return FALSE;
@@ -673,7 +780,7 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( pSelf );
       case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( pSelf );
       case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
-
+      case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( pSelf );
    }
    return FALSE;
 }

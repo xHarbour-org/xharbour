@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.8 2003/04/17 23:42:17 lculik Exp $
+   $Id: xwt_api.c,v 1.9 2003/04/18 13:28:50 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -175,7 +175,7 @@ HB_FUNC( XWT_DESTROY )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
-   
+
    hb_retl( xwt_drv_destroy( wSelf ) );
 }
 
@@ -200,6 +200,8 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_EXPAND:
       case XWT_PROP_FILL:
       case XWT_PROP_SHRINK:
+      case XWT_PROP_FIRSTSHRINK:
+      case XWT_PROP_SECSHRINK:
       case XWT_PROP_BOX:
       case XWT_PROP_STATUS:
          prop.value.setting = hb_parl( 3 );
@@ -250,6 +252,8 @@ HB_FUNC( XWT_SETPROPERTY )
       break;
 
       // Pointer
+      case XWT_PROP_FIRSTWID:
+      case XWT_PROP_SECWID:
       case XWT_PROP_RADIOGROUP:
          prop.value.data = hb_parptr( 3 );
       break;
