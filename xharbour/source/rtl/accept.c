@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.6 2001/06/18 18:12:00 dholm Exp $
+ * $Id: accept.c,v 1.1.1.1 2001/12/21 10:41:09 ronpinkas Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ HB_FUNC( __ACCEPT )
          case K_LEFT:
             if( ulLen > 0 )
             {
-               hb_gtWriteCon( ( BYTE * ) "\x8 \x8", 3 ); /* Erase it from the screen. */
+               hb_conOutAlt( "\x8 \x8", 3 ); /* Erase it from the screen. */
                ulLen--; /* Adjust input count to get rid of last character */
             }
             break;
@@ -115,7 +115,7 @@ HB_FUNC( __ACCEPT )
             if( ulLen < ( ACCEPT_BUFFER_LEN - 1 ) && input >= 32 )
             {
                szAcceptResult[ ulLen ] = input; /* Accept the input */
-               hb_gtWriteCon( ( BYTE * ) &szAcceptResult[ ulLen ], sizeof( char ) ); /* Then display it */
+               hb_conOutAlt( &szAcceptResult[ ulLen ], sizeof( char ) ); /* Then display it */
                ulLen++;  /* Then adjust the input count */
             }
       }

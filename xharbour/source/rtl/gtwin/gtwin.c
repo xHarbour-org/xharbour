@@ -1,16 +1,16 @@
 /*
- * $Id: gtwin.c,v 1.8 2002/10/01 17:29:11 map Exp $
+ * $Id: gtwin.c,v 1.9 2002/10/08 12:33:46 map Exp $
  */
 
 /*
  * Harbour Project source code:
  * Video subsystem for Win32 compilers ver.2
- * Copyright 2002 Przemysˆaw Czerpak <druzus@polbox.com>
+ * Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
  *
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemysˆaw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
  *
@@ -178,11 +178,10 @@ static void hb_gt_xSetCursorStyle( void )
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xSetCursorStyle(%hu)", s_usCursorStyle));
 
-    GetConsoleCursorInfo( s_HOutput, &cci );
-
     switch( s_usCursorStyle )
     {
     case SC_NONE:
+        cci.dwSize = 25;
         cci.bVisible = FALSE;
         break;
 
@@ -206,8 +205,9 @@ static void hb_gt_xSetCursorStyle( void )
     case SC_NORMAL:
     default:
         cci.bVisible = TRUE;
-        cci.dwSize = 25; /* this was 12, but when used in full screen dos window
-                            cursor state is erratic  - doesn't turn off, etc. */
+        cci.dwSize = 12;  /* this was 12, but when used in full screen dos window
+                             cursor state is erratic  - doesn't turn off, etc.
+			     09-10-2002 druzus: I hope now it's OK. */
         break;
     }
     s_usOldCurStyle = s_usCursorStyle;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.36 2002/10/05 23:27:43 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.37 2002/10/06 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -381,6 +381,7 @@ extern int      hb_memvarScope( char * szVarName, ULONG ulLength ); /* retrieve 
 extern void     hb_conInit( void ); /* initialize the console API system */
 extern void     hb_conRelease( void ); /* release the console API system */
 extern char *   hb_conNewLine( void ); /* retrieve a pointer to a static buffer containing new-line characters */
+extern void     hb_conOutAlt( char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
 extern void     hb_conOutStd( char * pStr, ULONG ulLen ); /* output an string to STDOUT */
 extern void     hb_conOutErr( char * pStr, ULONG ulLen ); /* output an string to STDERR */
 extern USHORT   hb_conSetCursor( BOOL bSetCursor, USHORT usNewCursor ); /* retrieve and optionally set cursor shape */

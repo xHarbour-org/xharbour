@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.428 2002/10/08 12:33:45 map Exp $
+ * $Id: ChangeLog,v 1.429 2002/10/08 21:28:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-09 04:53 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * source/rtl/gtwin/gtwin.c
+    * An attempt to fix cursor hiding problem again :-)
+      It eliminates one call to slow WinConsole subsystem
+      and makes the 'NORMAL' cursor shape more similar to DOS one.
+
+  * include/hbapi.h
+  * source/rtl/accept.c
+  * source/rtl/console.c
+    * Fixed ACCEPT to respect SET CONSOLE and similar sets.
+    * hb_conOutAlt() is global function now.
+    
 2002-10-08 14:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
     * Fixed initialization of cLastChar in NextIdentifier()

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.9 2002/07/30 01:06:39 lculik Exp $
+ * $Id: console.c,v 1.10 2002/09/20 19:18:17 map Exp $
  */
 
 /*
@@ -236,7 +236,7 @@ void hb_conOutErr( char * pStr, ULONG ulLen )
 }
 
 /* Output an item to the screen and/or printer and/or alternate */
-static void hb_conOutAlt( char * pStr, ULONG ulLen )
+void hb_conOutAlt( char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
 
