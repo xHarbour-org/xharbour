@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.115 2004/07/22 15:36:51 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.116 2004/07/22 21:19:56 peterrees Exp $
  */
 
 /*
@@ -3949,7 +3949,7 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
          iOldValue = _s.PTEXTSIZE.y * _s.ROWS;
          if ( bUpdate )
          {
-            HB_GT_FUNC( gt_SetMode( iParam/_s.PTEXTSIZE.y , _s.COLS ) );
+            HB_GT_FUNC( gt_SetMode( (USHORT) (iParam/_s.PTEXTSIZE.y), _s.COLS ) );
          }
          return iOldValue;
 
@@ -3957,7 +3957,7 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
          iOldValue = _s.PTEXTSIZE.x * _s.COLS;
          if ( bUpdate )
          {
-            HB_GT_FUNC( gt_SetMode( _s.ROWS, iParam/_s.PTEXTSIZE.x ) );
+            HB_GT_FUNC( gt_SetMode( _s.ROWS, (USHORT) (iParam/_s.PTEXTSIZE.x) ) );
          }
          return iOldValue;
 
@@ -4172,7 +4172,7 @@ HB_EXPORT HWND hb_wvt_gtCreateDialog( char * pszDlgResource, BOOL bOnTop )
       _s.hDlgModeless = NULL;
    }
 
-   hDlg = CreateDialog( hb_hInstance, pszDlgResource, hwnd, hb_wvt_gtDlgProcModeless );
+   hDlg = CreateDialog( ( HINSTANCE ) hb_hInstance, pszDlgResource, hwnd, hb_wvt_gtDlgProcModeless );
 
    if ( hDlg )
    {
