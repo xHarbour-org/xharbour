@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2551 2004/03/11 00:43:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2552 2004/03/11 01:25:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-10 18:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/inkey.c
+    ! Fixed initialziation of s_inKeyBlockBefore and s_inKeyBlockAfter to avoid GPF traps.
+
 2004-03-11 08:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rdd/dbcmd.c
     ! DBF2TEXT() GPF when called w/o argument -> error trapper added.
