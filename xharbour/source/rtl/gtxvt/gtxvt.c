@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.20 2004/01/25 19:15:39 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.21 2004/01/26 01:39:17 jonnymind Exp $
  */
 
 /*
@@ -92,9 +92,6 @@ typedef struct ClipKeyCode {
     int ctrl_key;
     int shift_key;
 } ClipKeyCode;
-
-
-#define KP_CENTER 10001
 
 static const ClipKeyCode stdKeyTab[CLIP_KEY_COUNT] = {
     {K_SPACE,              0,             0,         0}, /*  32 */
@@ -380,6 +377,9 @@ Display *s_Xdisplay;
 
 static HB_GT_GOBJECT *s_gLastObj = NULL;
 
+PXWND_DEF s_wnd = NULL;
+
+
 /**********************************************************************
 *                                                                     *
 * PART 1: XVT INTERNAL API FUNCTIONS                                  *
@@ -431,10 +431,13 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    // Pipe stream for input queue (wnd to app)
    pipe( streamChr );
 
-   s_childPid = fork();
-   if ( s_childPid != 0 )
+   if ( hb_set.HB_SET_GTMODE == 1 )
    {
-      return;
+      s_childPid = fork();
+      if ( s_childPid != 0 )
+      {
+         return;
+      }
    }
 
    // With NULL, it gets the DISPLAY environment variable.
@@ -510,16 +513,23 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    }
    s_countPoints[1] = icount;
 
-   //we'r done. Now the ball passes to the window managing function
-   xvt_processMessages( wnd );
+   if ( hb_set.HB_SET_GTMODE == 1 )
+   {
+      //we'r done. Now the ball passes to the window managing function
+      xvt_processMessages( wnd );
 
-   // exiting
-   if ( wnd->xfs ) {
-      XFreeFont( wnd->dpy, wnd->xfs );
+      // exiting
+      if ( wnd->xfs ) {
+         XFreeFont( wnd->dpy, wnd->xfs );
+      }
+      XCloseDisplay( wnd->dpy );
+      hb_xfree( wnd );
+      exit( 0 );
    }
-   XCloseDisplay( wnd->dpy );
-   hb_xfree( wnd );
-   exit( 0 );
+   else
+   {
+      s_wnd = wnd;
+   }
 }
 
 /**********************************************************************
@@ -624,11 +634,14 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       if ( buf->rInvalid.y2 < bottom ) buf->rInvalid.y2 = bottom;
    }
 
-   if ( s_uiDispCount == 0 && s_childPid > 0 )
+   if ( s_uiDispCount == 0 && (s_childPid > 0 || s_wnd != NULL) )
    {
       USHORT appMsg;
 
-      COMMIT_BUFFER( buf );
+      if ( s_wnd == NULL )
+      {
+         COMMIT_BUFFER( buf );
+      }
       // new objects added?
       if ( hb_gt_gobjects == NULL && s_gLastObj != NULL )
       {
@@ -656,8 +669,17 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       appMsg = XVT_ICM_UPDATE;
       write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
       write( streamUpdate[1], &buf->rInvalid, sizeof( XSegment ) );
+
+      /* Single process? --> update! */
+      if ( s_wnd != NULL )
+      {
+         xvt_processMessages( s_wnd );
+      }
+
       buf->bInvalid = FALSE;
    }
+
+
 }
 
 /******************** Clears the whole buffer *******************************/
@@ -993,15 +1015,16 @@ static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
 /******************** Repaint the window if necessary **********************/
 void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate )
 {
-   USHORT appMsg;
+   //USHORT appMsg;
 
    xvt_windowRepaintColRow( wnd,
       rUpdate->x1, rUpdate->y1,
       rUpdate->x2, rUpdate->y2);
+   XFlush( wnd->dpy );
 
    /* Signal the buffer filler that we have done with it */
-   appMsg = XVT_ICM_UPDATE;
-   write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
+   //appMsg = XVT_ICM_UPDATE;
+   //write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
 }
 
 /******** Draws the GT graphical objects **********/
@@ -2589,7 +2612,13 @@ static void xvt_processMessages( PXWND_DEF wnd )
       // wait for app input
       //usleep( 25000 );
       timeout.tv_sec = 0;
-      timeout.tv_usec = 25000;
+      if ( s_wnd == NULL )
+      {
+         timeout.tv_usec = 25000;
+      }
+      else {
+         timeout.tv_usec = 0;
+      }
 
       FD_SET(streamUpdate[0], &updateSet );
       bLoop = TRUE;
@@ -2691,6 +2720,12 @@ static void xvt_processMessages( PXWND_DEF wnd )
          XNextEvent( wnd->dpy, &evt );
          xvt_eventManage( wnd, &evt );
       }
+
+      /* Do just one loop if in single process mode */
+      if ( s_wnd != NULL )
+      {
+         break;
+      }
    }
 }
 
@@ -2707,10 +2742,11 @@ static void xvt_appProcess()
 
    period --;
 
-   // quit immediately if child is died
    if ( period == 0 )
    {
-      if( s_childPid != 0 && waitpid( s_childPid, NULL, WNOHANG ) == s_childPid )
+      // quit immediately if child is died
+      if( s_childPid != 0 &&
+               waitpid( s_childPid, NULL, WNOHANG ) == s_childPid )
       {
          hb_vmRequestQuit();
          return;
@@ -2724,9 +2760,6 @@ static void xvt_appProcess()
          read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
          switch( appMsg )
          {
-            case XVT_ICM_UPDATE:
-               s_buffer->bInvalid = FALSE;
-               break;
 
             case XVT_ICM_RESIZE:
             {
@@ -3007,6 +3040,16 @@ void HB_GT_FUNC(gt_Exit( void ))
       waitpid( s_childPid, &result, 0 );
    }
 
+   if ( s_wnd != NULL )
+   {
+      // exiting
+      if ( s_wnd->xfs ) {
+         XFreeFont( s_wnd->dpy, s_wnd->xfs );
+      }
+      XCloseDisplay( s_wnd->dpy );
+      hb_xfree( s_wnd );
+   }
+
    munmap( s_buffer, sizeof( XVT_BUFFER) );
    munmap( s_status, sizeof( XVT_STATUS) );
 }
@@ -3140,7 +3183,7 @@ void HB_GT_FUNC(gt_DispEnd())
    {
       --s_uiDispCount;
 
-      if ( s_uiDispCount == 0 && s_childPid > 0 )
+      if ( s_uiDispCount == 0 && ( s_childPid > 0 || s_wnd != NULL ) )
       {
          USHORT appMsg;
 
@@ -3148,6 +3191,11 @@ void HB_GT_FUNC(gt_DispEnd())
          appMsg = XVT_ICM_UPDATE;
          write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
          write( streamUpdate[1], &s_buffer->rInvalid, sizeof( XSegment ) );
+         /* Single process? --> update! */
+         if ( s_wnd != NULL )
+         {
+            xvt_processMessages( s_wnd );
+         }
       }
    }
 }
@@ -3806,6 +3854,11 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
    XVT_INITIALIZE
+
+   if ( s_wnd != NULL )
+   {
+      xvt_processMessages( s_wnd );
+   }
 
    xvt_appProcess();
 

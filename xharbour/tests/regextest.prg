@@ -1,6 +1,6 @@
 ***********************************************************
 * regextest.prg
-* $Id: regextest.prg,v 1.2 2003/08/19 15:33:20 jonnymind Exp $
+* $Id: regextest.prg,v 1.3 2003/08/23 10:48:21 jonnymind Exp $
 * Test for regular expression functions -
 * This allows to use a finetune regex to use them in programs
 *
@@ -16,6 +16,7 @@ PROCEDURE Main()
    LOCAL aMatch, cMatch
    LOCAL GetList := {}
 
+   SET GTMODE TO INLINE
    SET COLOR TO w+/b
    SET CONFIRM ON
    CLEAR SCREEN

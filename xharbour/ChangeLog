@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2167 2004/01/28 14:45:38 druzus Exp $
+ * $Id: ChangeLog,v 1.2168 2004/01/28 15:15:44 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-28 17:40 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbset.h
+  * include/set.ch
+  * source/pp/pptable.c
+  * source/rtl/set.c
+    + Added support for SET GTMODE TO DETACHED|INLINE
+      (also with Set( _HB_SET_GTMODE, "..." )
+      Defaults to detached (hb_set.HB_SET_GTMODE == 1 )
+
+  *source/rtl/gtxvt/gtxvt.c
+    ! Now GT MODE can be inline (single process) or detached
+      (dobule process). Inline process screen refresh is updated
+      when there are screen updates or inkey() polls.
+
+  * tests/videotst.prg
+  * tests/vidtest.prg
+  * tests/regextest.prg
+    * Testing using SET GtMode ...
+    
 
 2004-01-28 13:10 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * utils/hbmake/hbmake.prg

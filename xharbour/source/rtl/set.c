@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.38 2004/01/16 11:41:20 lculik Exp $
+ * $Id: set.c,v 1.39 2004/01/27 03:06:59 ronpinkas Exp $
  */
 
 /*
@@ -847,6 +847,24 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_GTMODE      :
+         hb_retni( hb_set.HB_SET_GTMODE );
+         if( args > 1 && HB_IS_STRING(pArg2) )
+         {
+            if ( hb_stricmp( hb_itemGetCPtr(pArg2), "DETACHED" ) == 0 )
+            {
+               hb_set.HB_SET_GTMODE = 1;
+               break;
+            }
+            else if ( hb_stricmp( hb_itemGetCPtr(pArg2), "INLINE" ) == 0 )
+            {
+               hb_set.HB_SET_GTMODE = 0;
+               break;
+            }
+         }
+         hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         break;
+
       case HB_SET_INSERT     :
          hb_retl( hb_set.HB_SET_INSERT );
          if( args > 1 )
@@ -1438,6 +1456,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_EXTRAFILE = NULL;
    hb_set.hb_set_extrahan = FS_ERROR;
    hb_set.HB_SET_FIXED = FALSE;
+   hb_set.HB_SET_GTMODE = 1;
    hb_set.HB_SET_IDLEREPEAT = TRUE;
    hb_set.HB_SET_INSERT = FALSE;
    hb_set.HB_SET_INTENSITY = TRUE;

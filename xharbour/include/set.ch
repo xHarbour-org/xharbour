@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.8 2003/12/19 01:32:39 fsgiudice Exp $
+ * $Id: set.ch,v 1.9 2004/01/16 11:36:50 lculik Exp $
  */
 
 /*
@@ -127,8 +127,9 @@
 #define _SET_DBFLOCKSCHEME   110 /* Harbour extension */
 #define _SET_BACKGROUNDTASKS 111 /* Harbour extension */
 #define _SET_TRIMFILENAME    112 /* Harbour extension */
+#define _SET_GTMODE          113 /* Harbour extension */
 
 #define HB_SET_BASE        100
-#define HB_SET_COUNT       13
+#define HB_SET_COUNT       14
 
 #endif /* _SET_CH */

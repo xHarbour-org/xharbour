@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.18 2003/12/19 01:32:39 fsgiudice Exp $
+ * $Id: hbset.h,v 1.19 2004/01/16 11:36:50 lculik Exp $
  */
 
 /*
@@ -133,7 +133,8 @@ typedef enum
    HB_SET_OUTPUTSAFETY    = 109,
    HB_SET_DBFLOCKSCHEME   = 110,
    HB_SET_BACKGROUNDTASKS = 111,
-   HB_SET_TRIMFILENAME    = 112
+   HB_SET_TRIMFILENAME    = 112,
+   HB_SET_GTMODE          = 113
 
 } HB_set_enum;
 
@@ -212,6 +213,7 @@ typedef struct
    BOOL    hb_set_winprinter;
    FHANDLE hb_set_winhan;
    char *  hb_set_printerjob;
+   int     HB_SET_GTMODE; 
 } HB_SET_STRUCT;
 
 #define HB_SET_CASE_MIXED  0

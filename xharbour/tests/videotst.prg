@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.1 2000/05/24 14:38:37 dholm Exp $
+ * $Id: videotst.prg,v 1.1.1.1 2001/12/21 10:46:34 ronpinkas Exp $
  */
 * VIDEOTST.PRG
 *
@@ -13,7 +13,6 @@
 #define HB_PROMPT 3
 
 FUNCTION MAIN()
-
  LOCAL nMode:= 1, nRow, lSuccess
  LOCAL aVModes:= {;
              { 12, 40, " 12 x 40 " },;
@@ -27,6 +26,8 @@ FUNCTION MAIN()
              { 50, 80, " 50 x 80 " },;
              { 60, 80, " 60 x 80 " } }
 
+ SET GTMODE INLINE
+ 
  DO WHILE (nMode != 0)
 
     CLEAR SCREEN
