@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3136 2004/07/05 20:55:38 peterrees Exp $
+ * $Id: ChangeLog,v 1.3137 2004/07/07 01:36:02 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-06 21:39 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/cmdcheck.c
+    + Added missing support for /j[HIL file] to match existing -j[HIL file]
+
 2004-07-06 18:34 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * doc/en/zipnew.txt
      ! fixed spelling and incorrect specifications in all zip functions
- 
+
 2004-07-06 08:55 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/winprn/tprint.prg
     - fix HB_FUNC_STATIC( DRAWBITMAP ) so StretchDIBits() uses correct co-ords passed

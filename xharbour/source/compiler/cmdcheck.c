@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.16 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.17 2004/04/14 22:39:19 andijahja Exp $
  */
 
 /*
@@ -270,15 +270,6 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        j = strlen( Args[i] );
                        continue;
 
-                     case 'k' :
-                     case 'K' :
-                       Args[i] += ( j - 1 );
-                       hb_compChkEnvironVar( Args[i] );
-
-                       /* Accept rest as part of #define and continue with next Args[]. */
-                       j = strlen( Args[i] );
-                       continue;
-
                      case 'j':
                      case 'J':
                         hb_comp_bI18n = TRUE;
@@ -298,6 +289,15 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                         /* The file will be eventually created when we find an i18n() */
                         continue;
+
+                     case 'k' :
+                     case 'K' :
+                       Args[i] += ( j - 1 );
+                       hb_compChkEnvironVar( Args[i] );
+
+                       /* Accept rest as part of #define and continue with next Args[]. */
+                       j = strlen( Args[i] );
+                       continue;
 
                      case 'n' :
                      case 'N' :
@@ -663,6 +663,23 @@ void hb_compChkEnvironVar( char * szSwitch )
              case 'i':
              case 'I':
                 hb_fsAddSearchPath( s + 1, &hb_comp_pIncludePath );
+                break;
+
+             case 'j':
+             case 'J':
+                hb_comp_bI18n = TRUE;
+
+                if ( s[2] )
+                {
+                   hb_comp_szHILout = (char *) hb_xgrab( strlen( s ) );
+                   strcpy( hb_comp_szHILout, s + 1 );
+                }
+                else
+                {
+                   hb_comp_szHILout = NULL;
+                }
+
+                /* The file will be eventually created when we find an i18n() */
                 break;
 
              case 'k':
