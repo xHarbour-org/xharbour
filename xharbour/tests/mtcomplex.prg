@@ -6,8 +6,8 @@ PROCEDURE Main()
 
     CLS
 
-    StartThread ( @ThreadFunc(), NIL,  8, "1st. Thread:", 200, Mutex )
-    StartThread ( @ThreadFunc(), NIL,  9, "2nd. Thread:", 500, Mutex )
+    StartThread ( @ThreadFunc(), NIL,  8, "1st. Thread:", 100, Mutex )
+    StartThread ( @ThreadFunc(), NIL,  9, "2nd. Thread:", 400, Mutex )
     StartThread ( @ThreadFunc(), NIL, 10, "3rd. Thread:", 600, Mutex )
     Thread4Handle := StartThread( @ThreadFunc(), NIL, 11, "4th. Thread", 700, Mutex )
 
@@ -74,8 +74,10 @@ PROCEDURE MonitorFunc( Mutex )
          @ 3, 26 SAY "waiting ...           "
       ENDIF
 
-      ThreadSleep( 2000 )
+      ThreadSleep( 500 )
    ENDDO
+
+RETURN
 
 PROCEDURE FourthMonitor( ThreadHandle, Mutex )
 
@@ -83,7 +85,7 @@ PROCEDURE FourthMonitor( ThreadHandle, Mutex )
 
    JoinThread( ThreadHandle )
 
-   @ 5, 5 SAY "FourthMonitor: 4th. Thread Finished!"
+   @ 5, 5 SAY "FourthMonitor: 4th. Thread Finished/Killed!"
 
 RETURN
 
