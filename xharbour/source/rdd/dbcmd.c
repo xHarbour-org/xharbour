@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.28 2003/02/01 14:14:49 lculik Exp $
+ * $Id: dbcmd.c,v 1.30 2003/03/08 01:30:46 horacioroldan Exp $
  */
 
 /*
@@ -2289,18 +2289,34 @@ HB_FUNC( FIELDPOS )
 
    if( s_pCurrArea )
    {
-      if ( hb_parc( 1 ) && ( (int) hb_parclen( 1 ) <= (int) ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength ) )
+      char *szFieldName = hb_parc( 1 );
+
+      if( szFieldName )
       {
-         szName = ( char * ) hb_xgrab( ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength + 1 );
-         hb_strncpyUpperTrim( szName, hb_parc( 1 ), hb_parclen( 1 ) );
+         int iLen = hb_parclen( 1 );
+
+         if( iLen > (int) ( ( ( AREAP ) s_pCurrArea->pArea )->uiMaxFieldNameLength ) )
+         {
+            iLen = (int) ( ( ( AREAP ) s_pCurrArea->pArea )->uiMaxFieldNameLength );
+         }
+
+         szName = ( char * ) hb_xgrab( iLen + 1 );
+
+         hb_strncpyUpperTrim( szName, szFieldName, iLen );
+
          hb_retni( hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName ) );
+
          hb_xfree( szName );
       }
       else
+      {
          hb_retni( 0 );
+      }
    }
    else
+   {
       hb_retni( 0 );
+   }
 }
 
 HB_FUNC( FIELDPUT )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1012 2003/05/09 04:20:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1013 2003/05/09 18:43:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-09 18:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+    ! Fixed FieldPos() to trim names longer than supported field length.
+
+  * source/vm/macro.c
+    ! Fixed hb_macroTextSubst() to restore trailing spaces in processed text.
+    % Minor Optimizations to hb_macroTextSubst() and hb_macroSetValue().
 
 2003-05-09 11:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

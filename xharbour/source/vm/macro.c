@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.20 2003/05/02 16:30:57 ronpinkas Exp $
+ * $Id: macro.c,v 1.21 2003/05/06 08:31:40 jonnymind Exp $
  */
 
 /*
@@ -294,9 +294,9 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
    ULONG ulResStrLen;
    ULONG ulResBufLen;
    ULONG ulCharsLeft;
+   ULONG ulPad = 0;
    char * pHead;
    char * pTail;
-   BOOL bCopy = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroTextSubst(%s, %li)", szString, *pulStringLen));
 
@@ -304,26 +304,20 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
    while( szString[*pulStringLen] == ' ' )
    {
       (*pulStringLen)--;
-      bCopy = TRUE;
+      ulPad++;
    }
    (*pulStringLen)++;
 
    pHead = (char *) memchr( (void *)szString, '&', *pulStringLen );
+
    if( pHead == NULL )
    {
-      if( bCopy )
-      {
-         szResult = ( char *) hb_xgrab( *pulStringLen + 1 );
-         strncpy( szResult, szString, *pulStringLen );
-         szResult[*pulStringLen] = '\0';
-         return szResult;
-      }
-
-      return szString;  /* no more processing is required */
+      return szString;  /* no processing is required */
    }
 
    /* initial length of the string and the result buffer (it can contain null bytes) */
-   ulResBufLen = ulResStrLen = *pulStringLen;
+   ulResBufLen = ulResStrLen = *pulStringLen + ulPad;
+
    /* initial buffer for return value */
    szResult = (char *) hb_xgrab( ulResBufLen + 1 );
 
@@ -340,6 +334,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
        * from this point after macro expansion
        */
       pTail = pHead;
+
       /* check if the next character can start a valid identifier
       * (only _a-zA-Z are allowed)
       */
@@ -394,6 +389,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
                   ++pHead;
                   ++ulNameLen;
                }
+
                ++ulNameLen;   /* count also the '&' character */
 
                /* number of characters left on the right side of a variable name */
@@ -408,23 +404,29 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
                if( ulValLen > ulNameLen )
                {
                   ulResStrLen += ( ulValLen - ulNameLen );
+
                   if( ulResStrLen > ulResBufLen )
                   {
                      ULONG ulHead = pHead - szResult;
                      ULONG ulTail = pTail - szResult;
+
                      ulResBufLen = ulResStrLen;
-                     szResult = ( char * ) hb_xrealloc( szResult, ulResBufLen + 1 );
-                     pHead = szResult + ulHead;
-                     pTail = szResult + ulTail;
+                     szResult    = ( char * ) hb_xrealloc( szResult, ulResBufLen + 1 );
+                     pHead       = szResult + ulHead;
+                     pTail        = szResult + ulTail;
                   }
                }
                else
+               {
                   ulResStrLen -= ( ulNameLen - ulValLen );
+               }
 
                /* move bytes located on the right side of a variable name */
                memmove( pTail + ulValLen, pHead, ulCharsLeft + 1 );
+
                /* copy substituted value */
                memcpy( pTail, szValPtr, ulValLen );
+
                /* restart scanning from the beginning of replaced string */
                /* NOTE: This causes that the following code:
                 *    a := '&a'
@@ -436,6 +438,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
             }
          }
       }
+
       ulCharsLeft = ulResStrLen - ( pHead - szResult );
    }
    while( ulCharsLeft && ( pHead = (char *) memchr( (void *)pHead, '&', ulCharsLeft ) ) != NULL );
@@ -447,7 +450,16 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
        */
       szResult = ( char * ) hb_xrealloc( szResult, ulResStrLen + 1 );
    }
+
    szResult[ ulResStrLen ] = 0;  /* place terminating null character */
+
+   // Restoring the trailing spaces.
+   while( ulPad )
+   {
+      szResult[ ulResStrLen - ulPad ] = ' ';
+      ulPad--;
+   }
+
    /* return a length of result string */
    *pulStringLen = ulResStrLen;
 
@@ -602,26 +614,20 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       HB_MACRO struMacro;
       int iStatus;
       ULONG ulLen = pItem->item.asString.length;
-      BOOL bCopy = FALSE;
+
+      szString = pItem->item.asString.value;
 
       ulLen--;
-      szString = pItem->item.asString.value;
       while( szString[ulLen] == ' ' )
       {
          ulLen--;
-         bCopy = TRUE;
       }
-      ulLen--;
+      ulLen++;
 
-      if( bCopy )
+      if( ulLen < pItem->item.asString.length )
       {
-         szString = ( char *) hb_xgrab( ulLen + 1 );
-         strncpy( szString, pItem->item.asString.value, ulLen );
+         // Terminate to avoid trailing spaces.
          szString[ulLen] = '\0';
-      }
-      else
-      {
-         szString = pItem->item.asString.value;
       }
 
       struMacro.Flags      = HB_MACRO_GEN_POP;
@@ -642,9 +648,10 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
          hb_macroSyntaxError( &struMacro );
       }
 
-      if( bCopy )
+      if( ulLen < pItem->item.asString.length )
       {
-         hb_xfree( szString );
+         // Restore the original space.
+         szString[ulLen] = ' ';
       }
    }
 }
