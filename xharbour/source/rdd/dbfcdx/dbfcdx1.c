@@ -2731,7 +2731,10 @@ static LONG hb_cdxTagKeyFind( LPCDXTAG pTag, LPCDXKEYINFO pKey )
    if ( pKey->Tag == CDX_MAX_REC_NUM ) {
       USHORT dav;
       hb_cdxPageRetrieveKey( pTag->RootPage, &pTag->CurKeyInfo );
-      hb_cdxTagKeyRead( pTag, PREV_RECORD );
+      if( pTag->AscendKey )
+         hb_cdxTagKeyRead( pTag, PREV_RECORD );
+      else
+         hb_cdxTagKeyRead( pTag, NEXT_RECORD );
       if ( pTag->CurKeyInfo->Tag ) {
          if ( hb_cdxKeyCompare( pKey, pTag->CurKeyInfo, &dav, FALSE ) == 0 )
             ret = pTag->CurKeyInfo->Tag;
@@ -3980,14 +3983,10 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
       for ( j = i ; j < nChilds ; j++ )
       {
          /* Delete parent key */
-         pKey = hb_cdxPageGetKey( pPage, nFirstChild + j - 1 );
+         pKey = hb_cdxPageGetKey( pPage, nFirstChild + i - 1 );
          pKeyTmp = pKey->pNext;
-         if ( pKeyTmp  && pKeyTmp->pNext)
-            pKey->pNext = pKeyTmp->pNext;
-           /* Hope my logic is not wrong, But pages should only be release if the pointer is valid */
-         if (  pKeyTmp ) 
-            hb_cdxKeyFree( pKeyTmp );        
-
+         pKey->pNext = pKeyTmp->pNext;
+         hb_cdxKeyFree( pKeyTmp );
          pPage->uiKeys--;
 
          childs[j]->Owner    = NULL;
@@ -6714,10 +6713,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
    LPCDXTAG pTag = hb_cdxGetActiveTag( pArea );
 
    HB_TRACE(HB_TR_DEBUG, ("cdxSeek(%p, %d, %p, %d)", pArea, bSoftSeek, pKey, bFindLast));
-   /*HB_SYMBOL_UNUSED( pArea );       */
-   /*HB_SYMBOL_UNUSED( bSoftSeek );   */
-   /*HB_SYMBOL_UNUSED( pKey );        */
-   /*HB_SYMBOL_UNUSED( bFindLast );   */
 
    if( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6740,6 +6735,13 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
 
       pKey2 = hb_cdxKeyNew();
       hb_cdxKeyPutItem( pKey2, pKey );
+      if ( !pTag->AscendKey )
+      {
+         if ( bFindLast )
+            bFindLast = 0;
+         else
+            bFindLast = 1;
+      }
       if( bFindLast )
          pKey2->Tag = CDX_MAX_REC_NUM;
       else
@@ -6749,20 +6751,8 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       hb_cdxIndexLockRead( pTag->pIndex, pTag );
 
       lRecno = hb_cdxTagKeyFind( pTag, pKey2 );
-      /*
-      if( bFindLast )
-      {
-         USHORT dav;
-         hb_cdxTagKeyRead( pTag, PREV_RECORD );
-         if ( pTag->CurKeyInfo->Tag ) {
-            if ( hb_cdxKeyCompare( pKey2, pTag->CurKeyInfo, &dav, FALSE ) == 0 )
-               lRecno = pTag->CurKeyInfo->Tag;
-         }
-      }
-      */
       pArea->fEof = pTag->TagEOF;
       pArea->fBof = pTag->TagBOF;
-      /* hb_cdxKeyFree( pKey2 ); */
 
       if( lRecno > 0 )
       {
@@ -6776,16 +6766,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
                   lRecno = 0;
                   pTag->TagEOF = 1;
                }
-               /*-----------------20/09/2002 11:38a.---------------
-                * maybe this is not needed anymore after last changes
-                * --------------------------------------------------
-               else if( strncmp( pKey->item.asString.value, pTag->CurKeyInfo->Value,
-                  ( pKey->item.asString.length < pTag->CurKeyInfo->length ?
-                    pKey->item.asString.length : pTag->CurKeyInfo->length) ) != 0 )
-               {
-                  lRecno = 0;
-               }
-               */
                break;
             }
          }
@@ -6825,7 +6805,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
                }
             }
          hb_cdxKeyFree( pKey2 );
-         /* return retvalue; */
       }
       else
       {
@@ -6834,7 +6813,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
 
          if( bSoftSeek && !pTag->TagEOF )
          {
-            //return SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
             retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
             if( retvalue != FAILURE )
                if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
@@ -6844,7 +6822,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
                   else
                      retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
                }
-            /* return retvalue; */
          }
          else
          {
@@ -6858,7 +6835,6 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       hb_cdxIndexUnLockRead( pTag->pIndex, pTag );
       return retvalue;
    }
-   /*return SUCCESS; */
 }
 
 // ( DBENTRYP_L )     hb_cdxSkip        : NULL
