@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.10 2002/11/11 18:43:30 what32 Exp $
+ * $Id: TComponent.prg,v 1.11 2002/11/12 05:38:34 ronpinkas Exp $
  */
 
 /*
@@ -96,7 +96,6 @@ CLASS TComponent FROM TPersistent
    METHOD SetDesignInstance      VIRTUAL   // PROTECTED
    METHOD SetInline              VIRTUAL   // PROTECTED
    METHOD SetName                VIRTUAL   // PROTECTED
-   METHOD SetParentComponent     VIRTUAL   // PROTECTED
    METHOD SetSubComponent        VIRTUAL
    METHOD UpdateAction           VIRTUAL
    METHOD Updated                VIRTUAL   // PROTECTED

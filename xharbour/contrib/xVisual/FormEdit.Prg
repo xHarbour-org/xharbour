@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.88 2002/11/12 02:18:37 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.89 2002/11/12 05:38:34 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -61,7 +61,7 @@ GLOBAL EXTERNAL ObjEdit
 
 //----------------------------------------------------------------------------//
 
- CLASS TFormEdit FROM TForm
+CLASS TFormEdit FROM TForm
 
    CLASSDATA nForms  PROTECTED INIT 0
    CLASSDATA aBases  PROTECTED INIT {0}
@@ -79,25 +79,7 @@ GLOBAL EXTERNAL ObjEdit
    DATA CtrlName     PROTECTED
    DATA aXFM         PROTECTED INIT Array( XFM_Size )
 
-   METHOD Create( oParent )  INLINE ::FCaption := 'TForm' + LTrim( Str( ++::nForms ) ), ;
-                                    ::Editing  := .F.        ,;
-                                    ::aCtrl    := {}         ,;
-                                    ::FLeft    := 200        ,;
-                                    ::FTop     := 125        ,;
-                                    ::FWidth   := 600        ,;
-                                    ::FHeight  := 400        ,;
-                                    ::xGrid    := 8          ,;
-                                    ::yGrid    := 8          ,;
-                                    ::GridColor:=RGB(0,0,0) ,;
-                                    ::OnCloseQuery := {|| MainFrame:StdBar:Disable(),;
-                                                          ObjInspect:ComboBox1:DelObject( HB_QSELF() ),;
-                                                          NIL },;
-                                    ::XFMTop(),;
-                                    ::Super:Create( oParent ) ,;
-                                    Self
-
-
-   METHOD AddControl()
+   METHOD Create()
 
    METHOD WMCreate()
    METHOD WMSize()
@@ -118,10 +100,10 @@ GLOBAL EXTERNAL ObjEdit
    METHOD XFMReflect()
    METHOD XFMTrace()
 
- END CLASS
+ENDCLASS
 
 //----------------------------------------------------------------------------//
-
+/*
 METHOD AddControl( oObj )
 
    LOCAL oCtrl
@@ -137,10 +119,29 @@ METHOD AddControl( oObj )
    ::XFMControl( oObj:Name, oObj, .F. )
 
 RETURN oCtrl
-
+*/
 //----------------------------------------------------------------------------//
 
-METHOD WMSize( nFlag, Width, Height)
+METHOD Create( oParent ) CLASS TFormEdit 
+
+   ::Super:Create( oParent )
+
+   ::FCaption := 'TForm' + LTrim( Str( ++::nForms ) )
+   ::Editing  := .F.
+   ::aCtrl    := {}
+   ::FLeft    := 200
+   ::FTop     := 125
+   ::FWidth   := 600
+   ::FHeight  := 400
+   ::xGrid    := 8
+   ::yGrid    := 8
+   ::GridColor:=RGB(0,0,0)
+   ::OnCloseQuery := {|| MainFrame:StdBar:Disable(), ObjInspect:ComboBox1:DelObject( HB_QSELF() ), NIL }
+   ::XFMTop()
+
+RETURN Self
+
+METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit 
 
    LOCAL aRect
 
@@ -156,7 +157,7 @@ METHOD WMSize( nFlag, Width, Height)
 
 //----------------------------------------------------------------------------//
 
-METHOD WMDestroy()
+METHOD WMDestroy() CLASS TFormEdit 
 
    IF !Empty(::hBmpGrid)
       DeleteObject(::hBmpGrid)
@@ -166,7 +167,7 @@ METHOD WMDestroy()
 
 //----------------------------------------------------------------------------//
 
-METHOD OnMenuCommand(oItem)
+METHOD OnMenuCommand(oItem) CLASS TFormEdit 
 
    // check for the range of commands which create controls
    // otherwise process the command as usual
@@ -217,20 +218,22 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       cName:=::GetUniquePropName(::CtrlName)
 
       DO CASE
-      CASE ::CtrlName=="Button"
-         oObj:=::Add( TButton():New(   self, , 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
-
-      CASE ::CtrlName=="Edit"
-         oObj:=::Add( TEdit():New(     self, , 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName == "Button"
+         oObj := TButton():Create( self )
+         oObj:Caption := oObj:Name
+         
+      CASE ::CtrlName == "Edit"
+         oObj := TEdit():Create( self )
+         oObj:Caption := oObj:Name
 
       CASE ::CtrlName=="Label"
-         oObj:=::Add( TStatic():New(   self, , 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TStatic():Create( self )
 
       CASE ::CtrlName=="CheckBox"
-         oObj:=::Add( TCheck():New(    self, , 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TCheck():New(    self, , 503,  aRect[1], aRect[2], aRect[3], aRect[4] )
 
       CASE ::CtrlName=="RadioButton"
-         oObj:=::Add( TRadio():New(    self, , 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TRadio():New(    self, , 504,  aRect[1], aRect[2], aRect[3], aRect[4] )
 
       CASE ::CtrlName=="ComboBox"
          oObj:=::Add( TComboBox():New( self,   505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
@@ -316,7 +319,7 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
 RETURN oObj
 //----------------------------------------------------------------------------//
-METHOD GetUniquePropName(cName)
+METHOD GetUniquePropName(cName) CLASS TFormEdit 
 
    LOCAL nInd:=1
 
@@ -329,7 +332,7 @@ METHOD GetUniquePropName(cName)
 
 //----------------------------------------------------------------------------//
 
-METHOD SetGridSize(x,y)
+METHOD SetGridSize(x,y) CLASS TFormEdit 
 
    LOCAL xSize
    LOCAL ySize
@@ -351,12 +354,12 @@ METHOD SetGridSize(x,y)
 
 //----------------------------------------------------------------------------//
 
-METHOD WMCreate()
+METHOD WMCreate() CLASS TFormEdit 
 
    LOCAL oBtn
    LOCAL xRet
    Local oTree
-
+/*
    ::SetGridSize()
 
    MainFrame:StdBar:Enable()
@@ -367,23 +370,21 @@ METHOD WMCreate()
    oTree:Select()
 
 
-   xRet := super:WMCreate()
-
    ::oMask:=oCtrlMask():Create( self )
    ::oMask:GetHandle()
 
    ::oMask:GetSiblings()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
-
+*/
 //   ::oMask:Hint:=""
 //   ::oMask:HintWindow:SetMaxTipWidth(10)
-   RETURN( xRet )
+   RETURN NIL
 
 *------------------------------------------------------------------------------
 
-METHOD WMPaint( hDC )
-
+METHOD WMPaint( hDC ) CLASS TFormEdit 
+/*
    LOCAL hMemDC  := CreateCompatibleDC(hDC)
    LOCAL i       := 0
    LOCAL j       := 0
@@ -401,7 +402,7 @@ METHOD WMPaint( hDC )
 
    SelectObject(hMemDC,hOldBmp)
    DeleteDC(hMemDC)
-
+*/
    RETURN(0)
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.125 2002/11/12 02:18:37 what32 Exp $
+ * $Id: xide.prg,v 1.126 2002/11/12 05:38:34 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ RETURN( nil)
 //----------------------------------------------------------------------------------------------
 
 CLASS MainFrame FROM TFrame
-   METHOD Create( oParent ) INLINE ::FCaption  := 'xHarbour xIde',;
+   METHOD Create( oOwner ) INLINE  ::FCaption  := 'xHarbour xIde',;
                                    ::FLeft     := 0,;
                                    ::FTop      := 0,;
                                    ::FWidth    := GetWindowRect( GetDesktopWindow() )[3],;
@@ -91,7 +91,7 @@ CLASS MainFrame FROM TFrame
                                    ::ExStyle   := WS_EX_APPWINDOW,;
                                    ::FrameWnd  := .T.,;
                                    ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
-                                   ::Super:Create( oParent )
+                                   ::Super:Create( oOwner )
 
    METHOD MainMenu()
    METHOD MainToolBar()
@@ -193,6 +193,8 @@ METHOD MainToolBar() CLASS MainFrame
    // add the TabControl on the Rebarband
 
    WITH OBJECT ToolTabs():Create( MainFrame )
+      :SetParent( MainFrame )
+
       :AddTab( "StdTab", TabPage():Create( MainFrame:ToolTabs ) )
       :StdTab:Caption := "Standard"
 
@@ -206,7 +208,7 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Samples" )
       :AddTab( "Activex" )
 
-      :Configure()
+//      :Configure()
    END
 
    ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )

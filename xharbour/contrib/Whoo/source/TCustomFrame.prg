@@ -1,5 +1,5 @@
 /*
- * $Id: TPopup.prg,v 1.6 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCustomFrame.prg,v 1.1 2002/11/07 02:45:07 fsgiudice Exp $
  */
 
 /*
@@ -40,7 +40,6 @@ CLASS TCustomFrame FROM TScrollingWinControl
     METHOD CreateParams           virtual  //(var Params: TCreateParams); override;
     METHOD GetChildren            virtual  //(Proc: TGetChildProc; Root: TComponent); override;
     METHOD Notification           virtual  //(AComponent: TComponent; Operation: TOperation); override;
-    METHOD SetParent              virtual  //(AParent: TWinControl); override;
   PUBLIC:
     METHOD Create                 virtual  //CONSTRUCTOR (AOwner: TComponent); override;
 

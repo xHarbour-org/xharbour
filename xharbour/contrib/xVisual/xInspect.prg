@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.63 2002/11/11 23:18:06 what32 Exp $
+ * $Id: xInspect.prg,v 1.64 2002/11/12 00:51:47 what32 Exp $
  */
 
 /*
@@ -53,8 +53,6 @@ CLASS ObjInspect FROM TForm
    VAR CurObject AS OBJECT
 
    METHOD Create()
-   METHOD OnCloseQuery() INLINE 0
-
 
    METHOD OnSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::ComboBox1:Width := x,;
                                                           InspTabs:Move( , 25, x, y-25, .T. ),;
@@ -105,7 +103,9 @@ RETURN Self
 METHOD Create( oParent ) CLASS ObjInspect
 
    // Object Inspector Window
+
    ::Super:Create( oParent )
+   ::SetParent( MainFrame )
 
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
@@ -116,15 +116,16 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::ExStyle  := WS_EX_TOOLWINDOW
 
    // ComboBox   
-   ::Combo        := ComboInsp():Create( self )
-
+   ::Combo := ComboInsp():Create( self )
+   ::Combo:SetParent( Self )
    ::Combo:FWidth := ::FWidth - 8
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    ::Combo:SetItemHeight( -1, 15 )
-   ::Combo:GetHandle()
+
 
    // TabControls
    InspTabs := TTabControl():Create( self )
+   InspTabs:SetParent( Self )
 
    InspTabs:FTop   := 25
    InspTabs:FWidth := ::FWidth - 8
@@ -136,7 +137,7 @@ METHOD Create( oParent ) CLASS ObjInspect
    
    // Browser
    ::Browser:=InspectBrowser():Create( InspTabs:Properties )
-   
+   ::Browser:SetParent( InspTabs:Properties )
 return( Self )
 
 //----------------------------------------------------------------------------------------------
@@ -217,8 +218,8 @@ METHOD MyOnClick(nwParam,nlParam) CLASS ComboInsp
          .AND. ( ! FormEdit:oMask:mousedown ) .AND. ( ! FormEdit:oMask:moving ) .AND. ( ! FormEdit:oMask:sizing ) ;
          .AND. ( ! FormEdit:oMask:selecting )
 
-         FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-         FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+         FormEdit:oMask:WMLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+         FormEdit:oMask:WMLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
       ENDIF
 
    ENDIF
@@ -253,8 +254,8 @@ METHOD SetCurSel(n) CLASS ComboInsp
             .AND. ( ! FormEdit:oMask:mousedown ) .AND. ( ! FormEdit:oMask:moving ) .AND. ( ! FormEdit:oMask:sizing ) ;
             .AND. ( ! FormEdit:oMask:selecting )
 
-            FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-            FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+            FormEdit:oMask:WMLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+            FormEdit:oMask:WMLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
          ENDIF
 
       ENDIF
@@ -379,7 +380,10 @@ METHOD Create( oParent ) CLASS InspectBrowser
    ::AddColumn( oCol2 )
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
-   ::Font          := oParent:Parent:font
+   
+   ::SetParent( MainFrame )
+   
+   ::Font          := oParent:Font
    
    ::GetHandle()
    

@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.14 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TPanel.prg,v 1.15 2002/11/07 20:05:56 what32 Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS TPanel
    
-   super:Create( oParent )
+   ::Super:Create( oParent )
 
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
@@ -82,6 +82,6 @@ METHOD Create( oParent ) CLASS TPanel
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    ::Modal     := IFNIL(::Modal,.F.,::Modal)
 
-   RETURN( Self )
+RETURN( Self )
 
 *-----------------------------------------------------------------------------*

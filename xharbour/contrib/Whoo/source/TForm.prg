@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.56 2002/11/08 05:45:03 what32 Exp $
+ * $Id: TForm.prg,v 1.57 2002/11/11 18:43:31 what32 Exp $
  */
 
 /*
@@ -31,6 +31,7 @@
 #include "windows.ch"
 #include "debug.ch"
 #include "what32.ch"
+#include "classex.ch"
 
 #include "error.ch"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.45 2002/11/11 18:43:27 what32 Exp $
+ * $Id: TApplication.prg,v 1.46 2002/11/12 05:38:33 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,7 +43,7 @@ GLOBAL EXTERNAL lPrevInstance
 
 *------------------------------------------------------------------------------*
 
-CLASS Application
+CLASS Application FROM TComponent
 
    PROPERTY OnIdle READ FOnIdle WRITE FOnIdle
 
@@ -51,6 +51,7 @@ CLASS Application
    DATA Instance
    DATA InstMsg
 
+   
    PROPERTY Handle READ FHandle
    DATA FTerminate INIT .F.
 
@@ -62,7 +63,8 @@ CLASS Application
    DATA AppForms              INIT {}
 
    PROPERTY MainForm READ FMainForm
-
+   DATA Showing INIT .F.
+   
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()
@@ -118,24 +120,26 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
 
    oForm:Create( Self )
 
-   TraceLog( "Created" )
-
    //oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
    //__objAddData( Self, oForm:Name )
    //__ObjSetValueList( self, { { oForm:Name, oForm } } )
 
    //TraceLog( :Caption, :Top, :Left, :Height, :Width )
-
+/*
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
+   
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
          aVar[2]:Create( oForm )
       ENDIF
    NEXT
-
+*/
+   ::Showing := .T.
+   
    IF ::FMainForm == NIL
       ::FMainForm := oForm
    ELSE
+      TraceLog( ::FMainForm )
       oForm:SetParent( ::FMainForm )
    ENDIF
 

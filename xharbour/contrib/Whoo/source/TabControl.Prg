@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.30 2002/11/11 18:43:32 what32 Exp $
+ * $Id: TabControl.Prg,v 1.31 2002/11/11 23:18:02 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -128,6 +128,8 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    endif
    
    DEFAULT oPage TO TabPage():Create( self )
+
+   oPage:SetParent( Self )
    
    if cRes != NIL
       oPage:resname := cRes
@@ -136,14 +138,12 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    oPage:Name := cName
    oPage:Caption := cName
 
-   if (hTab:=TabCtrl_AddItem(::FHandle,oPage:Caption,oPage:ImageIndex)) > -1
+
+   IF (hTab:=TabCtrl_AddItem( ::Handle, oPage:Caption, oPage:ImageIndex ) ) > -1
+   
       AADD(::Controls,oPage )
       __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
       __ObjSetValueList( self, { { cName, oPage } } )
-   ENDIF
-
-   IF oPage:FHandle == NIL
-      oPage:CreateWnd()
    ENDIF
 
    IF Len( ::Controls ) > 1
@@ -215,9 +215,7 @@ METHOD Configure() CLASS TTabControl
 
    FOR i:=1 TO LEN(::Controls)
       IF ::Controls[i]!=NIL
-         IF Empty( ::Controls[i]:FHandle )
-            ::GetHandle()
-         ENDIF
+
          ::Controls[i]:FLeft   := acRect[1]
          ::Controls[i]:FTop    := acRect[2]+acRect[4]
          ::Controls[i]:FWidth  := aTab[3]-6
@@ -410,6 +408,9 @@ CLASS TabPage FROM TPanel
 ENDCLASS
 
 METHOD Create( oParent ) CLASS TabPage
+
+   ::Super:Create( oParent )
+
    ::FLeft    := 0
    ::FTop     := 0
    ::FWidth   := 10
@@ -418,7 +419,7 @@ METHOD Create( oParent ) CLASS TabPage
    ::modal    := .F.
    ::resname  := NIL
    ::ImageIndex := 0
-   ::Super:Create( oParent )
+   
 return( Self )
 
 METHOD WMCommand(nwParam,nlParam) CLASS TabPage

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.40 2002/11/08 05:45:10 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.41 2002/11/11 23:18:06 what32 Exp $
  */
 
 /*
@@ -110,28 +110,25 @@ CLASS oCtrlMask FROM TWinControl
    DATA lChanged    INIT .F.
 
    METHOD Create() CONSTRUCTOR
-   METHOD OnGetDlgCode() INLINE DLGC_WANTARROWS + DLGC_WANTTAB
-   METHOD OnRButtonDown()
-   METHOD OnLButtonDown()
-   METHOD OnLButtonUp()
-   METHOD OnPaint()
-   METHOD OnKeyDown()
-   METHOD OnKeyUp()
+   METHOD WMGetDlgCode() INLINE DLGC_WANTARROWS + DLGC_WANTTAB
+   METHOD WMRButtonDown()
+   METHOD WMLButtonDown()
+   METHOD WMLButtonUp()
+   METHOD WMPaint()
+   METHOD WMKeyDown()
+   METHOD WMKeyUp()
    METHOD GetSiblings()
-   METHOD OnMouseMove()
+   METHOD WMMouseMove()
    METHOD MoveCtrl()
    METHOD Refresh()
    METHOD ChangeInspector()
    METHOD IsFocused()
-   METHOD Add() INLINE Self
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
 METHOD Create( oParent ) CLASS oCtrlMask
 
-   ::Super:Create( oParent )
-   
    ::Fleft      := 0
    ::Ftop       := 0
    ::Fwidth     := oParent:Fwidth
@@ -161,13 +158,15 @@ METHOD Create( oParent ) CLASS oCtrlMask
    ::aSelected := {}
    ::aClickPt  := {}
 
+   ::Super:Create( oParent )
+
 RETURN Self
 
 
 *-----------------------------------------------------------------------------*
 
 
-METHOD OnRButtonDown()
+METHOD WMRButtonDown()
 
    messagebox( ::Parent:Handle, "TrackPopupMenu comes here" )
    SetFocus( ::Handle )
@@ -185,12 +184,12 @@ METHOD OnRButtonDown()
 
 
 // ALT key to swich over to main window
-// Check in OnSysKeyDown
+// Check in WMSysKeyDown
 
 // TAB next control ( even if none selected )
 
 
-METHOD OnKeyDown( wParam, lParam )
+METHOD WMKeyDown( wParam, lParam )
 
      LOCAL o
      LOCAL cKbd
@@ -387,7 +386,7 @@ METHOD OnKeyDown( wParam, lParam )
 
 *-----------------------------------------------------------------------------*
 
- METHOD OnKeyUp( wParam, lParam )
+ METHOD WMKeyUp( wParam, lParam )
 
    LOCAL a
    LOCAL oObj
@@ -413,7 +412,7 @@ METHOD OnKeyDown( wParam, lParam )
 
 *-----------------------------------------------------------------------------*
 
-METHOD OnPaint( hDC )
+METHOD WMPaint( hDC )
    LOCAL a
    LOCAL n:=0
    IF !empty( ::aSelected )
@@ -466,7 +465,7 @@ RETURN( .F. )
 
 // client area coordinates
 
-METHOD OnLButtonDown( wParam, x, y )
+METHOD WMLButtonDown( wParam, x, y )
 
    LOCAL aPt := {ASWORD(x), ASWORD(y)}
    LOCAL hChild
@@ -580,9 +579,9 @@ METHOD OnLButtonDown( wParam, x, y )
       IF lFound
          ::ChangeInspector( 0 )
 
-         ::HintWindow:Activate(1)
-         ::HintWindow:TrackHint(1)
-         ::lHintActive := .T.
+//         ::HintWindow:Activate(1)
+//         ::HintWindow:TrackHint(1)
+//         ::lHintActive := .T.
       ELSE
          // Only if MOUSE Click, NOT simulated
          ::ChangeInspector( 1 )
@@ -648,7 +647,7 @@ RETURN NIL
 
 // client coordinates
 
-METHOD OnMouseMove( aParam, x, y )
+METHOD WMMouseMove( aParam, x, y )
 
    LOCAL aPt := {ASWORD(x),ASWORD(y)}
    LOCAL hChild
@@ -684,9 +683,9 @@ METHOD OnMouseMove( aParam, x, y )
            DrawFocusRect( hDC, aTipRect ) //::aEditRect )
          ENDIF
 
-         ::HintWindow:SetTitle(0,"")
-         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
-                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
+//         ::HintWindow:SetTitle(0,"")
+//         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
+//                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
 
          UpdateWindow( ::Parent:handle )
 
@@ -733,10 +732,10 @@ METHOD OnMouseMove( aParam, x, y )
                ENDIF
 
                IF oLastObj == NIL .OR. hChild != oLastObj:handle .OR. ::lHintActive
-                  ::HintWindow:Activate(1)
-                  ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
-                  ::HintWindow:SetText( "Object: " + oObj:name )
-                  ::lHintActive := .F.
+//                  ::HintWindow:Activate(1)
+//                  ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
+//                  ::HintWindow:SetText( "Object: " + oObj:name )
+//                  ::lHintActive := .F.
                   oLastObj      := oObj
                endif
 
@@ -745,7 +744,7 @@ METHOD OnMouseMove( aParam, x, y )
          NEXT
          IF !lFound
             oLastObj := NIL
-            ::HintWindow:Activate(0)
+//            ::HintWindow:Activate(0)
             WinSetCursor( LoadCursor(, IDC_ARROW ) )
          ENDIF
       ELSE
@@ -760,7 +759,7 @@ METHOD OnMouseMove( aParam, x, y )
 
 // client coordinates
 
-METHOD OnLButtonUp( wParam, x, y )
+METHOD WMLButtonUp( wParam, x, y )
 
    LOCAL aPt := { ASWORD(x), ASWORD(y) }
    LOCAL aTemp
@@ -795,7 +794,7 @@ METHOD OnLButtonUp( wParam, x, y )
       ELSE
         DrawFocusRect( hDC, ::aEditRect )
       ENDIF
-      ::HintWindow:Activate(0)
+//      ::HintWindow:Activate(0)
 
    ENDIF
 
