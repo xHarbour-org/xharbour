@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.8 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: errorapi.c,v 1.9 2003/05/27 00:36:22 mlombardo Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    HB_THREAD_STUB
 
    PHB_ITEM pError;
-   char *szModuleName = hb_vmGetModuleName();
+   char *szModuleName = hb_vmGetModuleName( NULL );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.72 2003/05/26 05:58:54 paultucker Exp $
+ * $Id: ppcore.c,v 1.73 2003/06/03 22:41:22 ronpinkas Exp $
  */
 
 /*
@@ -732,17 +732,15 @@ int hb_pp_ParseDirective( char * sLine )
             hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
           *(sLine+i) = '\0';
 
-          if( !OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
+          if( ! OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
           {
             if( errno == 0 || errno == EMFILE )
+            {
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
+            }
             else
             {
-            #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
-              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
-            #else
-              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, sys_errlist[ errno ] );
-            #endif
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
             }
           }
         }

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.206 2003/05/28 11:59:07 druzus Exp $
+ * $Id: hvm.c,v 1.207 2003/06/06 06:45:09 druzus Exp $
  */
 
 /*
@@ -3870,7 +3870,9 @@ static void hb_vmAnd( void )
       hb_vmPushLogical( bResult );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpAnd" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPAND" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1078, NULL, ".AND.", 2, pItem1, pItem2 );
@@ -6586,11 +6588,20 @@ PSYMBOLS hb_vmFindModuleByName( char *szModuleName )
 }
 
 
-char * hb_vmGetModuleName( void )
+char * hb_vmGetModuleName( PSYMBOLS pSymbols )
 {
    HB_THREAD_STUB
 
-   PSYMBOLS pModuleSymbols = hb_vmFindModule( HB_VM_STACK.pModuleSymbols );
+   PSYMBOLS pModuleSymbols;
+
+   if( pSymbols )
+   {
+      pModuleSymbols = hb_vmFindModule( pSymbols );
+   }
+   else
+   {
+      pModuleSymbols = hb_vmFindModule( HB_VM_STACK.pModuleSymbols );
+   }
 
    if( pModuleSymbols )
    {

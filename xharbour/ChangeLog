@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1127 2003/06/17 10:16:08 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1128 2003/06/17 11:15:57 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-17 7:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvm.h
+  * include/hbvmprv.h
+  * source/vm/hvm.c
+     Added optional param to hb_vmGetModuleName( PSYMBOLS pSymbols );
+
+  * source/vm/errorapi.c
+     * Added param to hb_vmGetModuleName( PSYMBOLS pSymbols );
+
+  * source/compiler/gencobj.c
+  * source/rtl/filesys.c
+    * Replaced (non ansi c) unlink() with remove()
+
+  * source/compiler/hbslex.c
+  * source/macro/macroslx.c
+    * Corrected Dir-Separator based on platform.
+
+  * source/compiler/harbour.slx
+    * Corrected inconsistent declaration/definition.
+
+  * source/pp/ppcore.c
+    * Replaced deprecated sys_errlist[ errno ] with strerror( errno ).
+
+  * source/vm/classes.c
+    * Added TODO item in hb_clsValidScope() regarding Module Scope and __ObjSendMsg().
 
 2003-06-17 12:30 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
   * source/debug/dbgmenu.prg
@@ -26,8 +52,8 @@
     * added a couple of safety checks
     * sync with Harbour
   * source/debug/tbrwtext.prg
-    * sync with Harbour  
- 
+    * sync with Harbour
+
 2003-06-17 12:11 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/regex.c
     ! Minor fix in error reporting (really minor :-)
@@ -42,11 +68,11 @@
 
   * tests/xmltest.prg
     + Added test for find features
-    
+
 2003-06-17 02:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/lib.cf
   * xharbour/config/linux/dir.cf
-    * minor cleanup to avoid installing lib.a when there is no special MT 
+    * minor cleanup to avoid installing lib.a when there is no special MT
       version of library
 
   * xharbour/contrib/libct/Makefile
@@ -69,7 +95,7 @@
 
   * tests/xmltest.prg
     % More adaptation to the model and stylistic fixes
-    
+
 2003-06-16 17:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
   * source/rtl/hbxml.c

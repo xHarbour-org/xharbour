@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.32 2003/04/16 10:16:01 jonnymind Exp $
+ * $Id: filesys.c,v 1.33 2003/05/14 08:44:23 jonnymind Exp $
  */
 
 /*
@@ -1468,7 +1468,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 #elif defined(HAVE_POSIX_IO)
 
    errno = 0;
-   bResult = ( unlink( ( char * ) pFilename ) == 0 );
+   bResult = ( remove( ( char * ) pFilename ) == 0 );
    errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 

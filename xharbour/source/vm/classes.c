@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.61 2003/06/07 06:04:22 ronpinkas Exp $
+ * $Id: classes.c,v 1.62 2003/06/10 23:46:19 ronpinkas Exp $
  */
 
 /*
@@ -509,6 +509,13 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
          {
             // Backtrack 1 level.
             pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+
+            // Same Module and Method is NOT Inherited.
+            if( ( ! uiScope & HB_OO_CLSTP_SUPER ) && pClass->pModuleSymbols && ( pClass->pModuleSymbols == /* TODO*/ NULL ) )
+            {
+               // TraceLog( NULL, "Same Module: %s\n", hb_vmFindModule( pClass->pModuleSymbols )->szModuleName );
+               return TRUE;
+            }
          }
 
          if( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )

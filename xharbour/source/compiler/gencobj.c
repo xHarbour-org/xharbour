@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.5 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: gencobj.c,v 1.6 2003/06/07 19:34:18 lculik Exp $
  */
 
 /*
@@ -225,7 +225,9 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension, char *szSourc
       /* Delete intermediate .c file */
       /* QUESTION: Leave this file if C compiler fails ? */
       if( bDelTmp ) /* && iSuccess ) */
-         unlink( ( char * ) szFileName );
+      {
+         remove( ( char * ) szFileName );
+      }
 
       if( ! hb_comp_bQuiet )
       {
