@@ -53,6 +53,10 @@ RETURN( nil)
 CLASS MainFrame FROM TFrame
    
    METHOD New( oParent ) INLINE ::Caption := 'Main Form from TFrame',;
+                                ::left    := 0,;
+                                ::top     := 0,;
+                                ::width   := 200,;
+                                ::height  := 100,;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
@@ -114,21 +118,20 @@ METHOD CreateSub() CLASS SubForm1
       
    ::SetWindowMenu()
 
-   ::Add('TestButton',  TButton(), 'Lets see it',                500,   0,  0, 200, 100 )
-   ::Add('TestEdit',      TEdit(), 'This is an edit control',    501, 210,  0, 200,  20 )
-   ::Add('TestCombo', TComboBox(), 'This is a ComboBox control', 502, 210, 30, 200, 100 )
-   ::Add('TestText',    TStatic(), 'This is a Static control',   503, 210, 55, 200,  20 )
-   ::Add('TestRadio',    TRadio(), 'This is a Radio Button',     504, 210, 80, 200,  20 )
-   ::Add('TestCheck',    TCheck(), 'This is a Check Button',     505, 210,105, 200,  20 )
+
+   ::Add('TestButton',  TButton():New( self, 'OOPS',                       500,   0,  0, 200, 100 ) ) 
+   ::Add('TestEdit',      TEdit():New( self, 'This is an edit control',    501, 210,  0, 200,  20 ) )
+   ::Add('TestCombo', TComboBox():New( self, 'This is a ComboBox control', 502, 210, 30, 200, 100 ) )
+   ::Add('TestText',    TStatic():New( self, 'This is a Static control',   503, 210, 55, 200,  20 ) )
+   ::Add('TestRadio',    TRadio():New( self, 'This is a Radio Button',     504, 210, 80, 200,  20 ) )
+   ::Add('TestCheck',    TCheck():New( self, 'This is a Check Button',     505, 210,105, 200,  20 ) )
 
    ::TestButton:SetFocus()
 
-/*
-   xRet := super:OnCreate()
    oMask:=oCtrlMask():New( ::TestButton )
-   oMask:Create()
-*/   
-return( nil )
+   ::Add('mask', oMask)
+
+return( super:OnCreate() )
 
 //----------------------------------
 
