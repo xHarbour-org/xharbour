@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.50 2003/07/13 18:15:40 walito Exp $
+ * $Id: itemapi.c,v 1.51 2003/10/06 03:35:40 ronpinkas Exp $
  */
 
 /*
@@ -1084,6 +1084,9 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
 
       case HB_IT_MEMO:
          return "M";
+
+      case HB_IT_POINTER:
+         return "P";
    }
 
    return "U";

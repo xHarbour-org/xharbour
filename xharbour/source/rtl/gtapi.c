@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.10 2003/10/02 20:34:36 paultucker Exp $
+ * $Id: gtapi.c,v 1.11 2003/10/07 22:25:46 paultucker Exp $
  */
 
 /*
@@ -706,8 +706,8 @@ USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetPos(%p, %p)", piRow, piCol));
 
-   if( s_iRow >= 0 && s_iRow < s_Height &&
-       s_iCol >= 0 && s_iCol < s_Width )
+   if( s_Width <=0 || (s_iRow >= 0 && s_iRow < s_Height &&
+       s_iCol >= 0 && s_iCol < s_Width))
    {
       /* Only return the actual cursor position if the current
          cursor position was not previously set out of bounds. */
@@ -729,14 +729,14 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetPos(%hd, %hd)", iRow, iCol));
 
    /* Validate the new cursor position */
-   if( iRow >= 0 && iRow < s_Height &&
-       iCol >= 0 && iCol < s_Width )
+   if( s_Width <= 0|| (iRow >= 0 && iRow < s_Height &&
+       iCol >= 0 && iCol < s_Width) )
    {
       hb_gt_SetPos( iRow, iCol, HB_GT_SET_POS_BEFORE );
 
       /* If cursor was out bounds, now enable it */
-      if( s_iRow < 0 || s_iRow >= s_Height ||
-          s_iCol < 0 || s_iCol >= s_Width )
+      if( s_Width > 0 && ( s_iRow < 0 || s_iRow >= s_Height ||
+          s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
    else
@@ -756,14 +756,14 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetPosContext(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
    /* Validate the new cursor position */
-   if( iRow >= 0 && iRow < s_Height &&
-       iCol >= 0 && iCol < s_Width )
+   if( s_Width <= 0|| (iRow >= 0 && iRow < s_Height &&
+       iCol >= 0 && iCol < s_Width) )
    {
       hb_gt_SetPos( iRow, iCol, iMethod );
 
       /* If cursor was out bounds, now enable it */
-      if( s_iRow < 0 || s_iRow >= s_Height ||
-          s_iCol < 0 || s_iCol >= s_Width )
+      if( s_Width <= 0|| (s_iRow < 0 || s_iRow >= s_Height ||
+          s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
    else
@@ -786,7 +786,7 @@ USHORT HB_EXPORT hb_gtMaxCol( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtMaxCol()"));
 
-   return s_Width - 1;
+   return s_Width > 0 ? s_Width - 1: 0;
 }
 
 USHORT HB_EXPORT hb_gtMaxRow( void )
@@ -838,7 +838,7 @@ USHORT HB_EXPORT hb_gtScrDim( USHORT * uipHeight, USHORT * uipWidth )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScrDim(%p, %p)", uipHeight, uipWidth));
 
    *uipHeight = s_Height - 1;
-   *uipWidth = s_Width - 1;
+   *uipWidth = s_Width > 0 ? s_Width - 1: -1;
 
    return 0;
 }
@@ -867,7 +867,7 @@ USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 
    if (hb_gt_SetMode( uiRows, uiCols ))
    {
-	  s_Height = uiRows;
+      s_Height = uiRows;
       s_Width = uiCols;
       return 0;
    }
@@ -892,12 +892,14 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWrite(%p, %lu)", pStr, ulLength));
 
    /* Display the text if the cursor is on screen */
-   if( s_iCol >= 0 && s_iCol < s_Width &&
-       s_iRow >= 0 && s_iRow < s_Height )
+   if( s_Width <= 0 || ( s_iCol >= 0 && s_iCol < s_Width &&
+       s_iRow >= 0 && s_iRow < s_Height ) )
    {
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( s_iRow, s_iCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
-         HB_MIN( ulLength, ( ULONG ) ( s_Width - s_iCol ) ) );
+         s_Width > 0 ?
+            HB_MIN( ulLength, ( ULONG ) ( s_Width - s_iCol ) ):
+            ulLength );
    }
 
    /* Finally, save the new cursor position, even if off-screen */
@@ -912,11 +914,13 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ul
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWriteAt(%hu, %hu, %p, %lu)", uiRow, uiCol, pStr, ulLength));
 
    /* Display the text if the cursor is on screen */
-   if( uiCol < s_Width && uiRow < s_Height )
+   if( s_Width <= 0 ||  ( s_iCol < s_Width && uiRow < s_Height ) )
    {
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( uiRow, uiCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
-         HB_MIN( ulLength, ( ULONG ) ( s_Width - uiCol ) ) );
+         s_Width > 0 ?
+            HB_MIN( ulLength, ( ULONG ) ( s_Width - uiCol ) ):
+            ulLength);
    }
 
    /* Finally, save the new cursor position, even if off-screen */
@@ -947,7 +951,7 @@ USHORT HB_EXPORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
       on the high end, but don't limit it on the low end. */
 
    iRow = ( s_iRow <= iMaxRow ) ? s_iRow : iMaxRow;
-   iCol = ( s_iCol <= iMaxCol ) ? s_iCol : iMaxCol;
+   iCol = ( iMaxCol > 0 || s_iCol <= iMaxCol ) ? s_iCol : iMaxCol;
 
    if( iRow != s_iRow || iCol != s_iCol )
       hb_gtSetPos( iRow, iCol );
@@ -967,7 +971,7 @@ USHORT HB_EXPORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
                --iCol;
                bDisp = TRUE;
             }
-            else if( iCol == 0 && iRow > 0 )
+            else if( iMaxCol > 0 && iCol == 0 && iRow > 0 )
             {
                iCol = iMaxCol;
                --iRow;
@@ -996,7 +1000,7 @@ USHORT HB_EXPORT hb_gtWriteCon( BYTE * pStr, ULONG ulLength )
 
          default:
             ++iCol;
-            if( iCol > iMaxCol || iCol <= 0 )
+            if( iMaxCol > 0 && (iCol > iMaxCol || iCol <= 0) )
             {
                /* If the cursor position started off the left edge,
                   don't display the first character of the string */

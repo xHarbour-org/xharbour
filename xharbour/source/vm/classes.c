@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.78 2003/10/07 23:48:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.79 2003/11/07 10:03:10 jonnymind Exp $
  */
 
 /*
@@ -2412,7 +2412,7 @@ PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__objGetPropValue()", 0 );
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "hb_objGetPropValue()", 0 );
    }
    return NULL;
 }
@@ -2435,7 +2435,7 @@ void hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__objSetPropValue()", 0 );
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "hb_objSetPropValue()", 0 );
    }
 }
 

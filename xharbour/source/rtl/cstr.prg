@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.12 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.13 2003/06/06 14:46:50 ronpinkas Exp $
  */
 
 /*
@@ -94,6 +94,9 @@ FUNCTION CStr( xExp )
       CASE 'O'
          RETURN "{ " + xExp:ClassName() + " Object }"
 
+      CASE 'P'
+         RETURN HB_NumToHex( xExp )
+
       DEFAULT
          RETURN "Type: " + cType
    END
@@ -110,6 +113,9 @@ FUNCTION CStrToVal( cExp, cType )
    SWITCH cType
       CASE 'C'
          RETURN cExp
+
+      CASE 'P'
+         RETURN HB_HexToNum( cExp )
 
       CASE 'D'
          IF cExp[3] >= '0' .AND. cExp[3] <= '9' .AND. cExp[5] >= '0' .AND. cExp[5] <= '9'
@@ -193,6 +199,9 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
       CASE 'B'
          RETURN ValToPrgExp( xVal )
+
+      CASE 'P'
+         RETURN "HB_HexToNum('" + HB_NumToHex( xVal ) + "')"
 
       CASE 'O'
          IF nPad == NIL
@@ -295,14 +304,17 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
          cRet += '"' + xVal[1] + [", ]
 
-         FOR EACH cChar IN xVal[2]
-             cRet += "Chr(" + Str( cChar, 3 ) + ")+"
+         FOR EACH cChar in xVal[2]
+            cRet += 'Chr(' + Trim(Str( Asc( cChar ),3)) + ')+'
          NEXT
 
          cRet[-1] := ", "
          cRet += Str( xVal[3], 3 ) + "} )"
 
          RETURN cRet
+
+      CASE 'P'
+         RETURN "HB_HexToNum('" + HB_NumToHex( xVal ) + "')"
 
       CASE 'O'
          aVars := __objGetValueDiff( xVal )

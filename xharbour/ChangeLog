@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1666 2003/11/07 10:03:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1667 2003/11/07 18:04:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,39 @@
 2003-11-07 10:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
     * Minor optimization.
+
+2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/itemapi.c
+  * source/rtl/cstr.prg
+    ! Codeblock was no longer correctly translated into string.
+    + Added ValType 'P' for pointer
+    + Pointer are represented in ValToPrg as 'HexToNum( "Pointer" )'
+
+  * source/rtl/hbhextonum.c
+    ! Accepting both Numeric and Pointers in HB_NumToHex()
+
+  * source/rtl/gtapi.c
+  * source/rtl/gtcgi/gtcgi.c
+    ! Fixed GTCGI. MaxRow() returns 1, and MaxCol() returns 0. Gtapi.c has
+      been updated so to allow infinite row lenght if MaxCol() is 0, and
+      being MaxRow() ==1, the screen is scrolled each time a line is
+      commited.
+      As gtcgi may be used to write headers for web servers, the first
+      newline written is ignored if it is not preceded by any other
+      character ( so "?" works as in clipper writing a CRLF BEFORE the
+      text, but the first one does not advance).
+      Also, since GTCGI is meant mainly to communicate with servers,
+      the CRLF (standard internet line separator) is used on every
+      system.
+
+  * source/rtl/alert.prg
+  * source/rtl/errorsys.prg
+    ! Not displaying alert box and not getting video dump if the current
+      GT is not capable to provide it.
+
+  * source/vm/classes.c
+    * Retouches in hb_objGetPropValue()
+
 
 2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h

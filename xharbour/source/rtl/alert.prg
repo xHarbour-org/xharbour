@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.9 2002/12/23 06:46:01 jonnymind Exp $
+ * $Id: alert.prg,v 1.10 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -103,9 +103,6 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    IF PCount() == 0
       RETURN NIL
    ENDIF
-   
-   /* Apply mutex here */
-   HBConsoleLock()
 
    IF ISARRAY( xMessage )
 
@@ -404,9 +401,6 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       ENDDO
 
    ENDIF
-   
-   /* Apply mutex here */
-   HBConsoleUnlock()
 
    RETURN nChoice
 

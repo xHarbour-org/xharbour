@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.22 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.23 2003/10/19 00:17:36 jonnymind Exp $
  */
 
 /*
@@ -111,43 +111,45 @@ STATIC FUNCTION DefError( oError )
 
      // Build buttons
 
-     aOptions := {}
+     IF MaxCol() > 0
+         aOptions := {}
 
-     // AAdd( aOptions, "Break" )
-     Aadd( aOptions, "Quit" )
+         // AAdd( aOptions, "Break" )
+         Aadd( aOptions, "Quit" )
 
-     If oError:canRetry
-        Aadd( aOptions, "Retry" )
-     Endif
+         If oError:canRetry
+            Aadd( aOptions, "Retry" )
+         Endif
 
-     If oError:canDefault
-        Aadd( aOptions, "Default" )
-     Endif
+         If oError:canDefault
+            Aadd( aOptions, "Default" )
+         Endif
 
-     // Show alert box
-     //TraceLog( cMessage )
+         // Show alert box
+         //TraceLog( cMessage )
 
-     nChoice := 0
-     While nChoice == 0
+         nChoice := 0
+         While nChoice == 0
 
-       If Empty( oError:osCode )
-          nChoice := Alert( cMessage, aOptions )
-       Else
-          nChoice := Alert( cMessage + ";" + cDOSError, aOptions )
-       Endif
+            If Empty( oError:osCode )
+               nChoice := Alert( cMessage, aOptions )
+            Else
+               nChoice := Alert( cMessage + ";" + cDOSError, aOptions )
+            Endif
 
-     Enddo
+         Enddo
 
-     If !Empty( nChoice )
-        Do Case
-            Case aOptions[ nChoice ] == "Break"
-                Break( oError )
-            Case aOptions[ nChoice ] == "Retry"
-                Return .T.
-            Case aOptions[ nChoice ] == "Default"
-                Return .F.
-        Endcase
-     Endif
+         If !Empty( nChoice )
+            Do Case
+                  Case aOptions[ nChoice ] == "Break"
+                     Break( oError )
+                  Case aOptions[ nChoice ] == "Retry"
+                     Return .T.
+                  Case aOptions[ nChoice ] == "Default"
+                     Return .F.
+            Endcase
+         Endif
+     ENDIF
 
      // "Quit" selected
 
@@ -215,7 +217,7 @@ Return cMessage
 
 STATIC FUNCTION LogError( oerr )
 
-     LOCAL cScreen     := Savescreen()
+     LOCAL cScreen
      LOCAL cLogFile    := 'error.log'
      LOCAL nRange      := ( Maxcol() + 1 ) * 2
      LOCAL nStart      := 1
@@ -237,6 +239,9 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nBytes
      LOCAL nMemCount
 
+     IF MaxCol() > 0
+        cScreen := Savescreen()
+     ENDIF
      //Alert( 'An error occured, Information will be ;written to error.log' )
 
      nHandle := Fcreate( cLogFile, FC_NORMAL )
@@ -292,7 +297,11 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "MCenter is :" + strvalue( Set( 37 ), .T. ) )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, Padc( 'Detalaid Work Area Items', Maxcol(), "=" ) )
+        IF MaxCol() > 0
+            FWriteLine( nHandle, Padc( 'Detalaid Work Area Items', Maxcol(), "=" ) )
+        ELSE
+            FWriteLine( nHandle, 'Detalaid Work Area Items ' )
+        ENDIF
         FWriteLine( nHandle, "" )
 
         IF Type( "Select()" ) == "UI"
@@ -311,7 +320,11 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
 
         FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", Maxcol(), "+" ) )
+        IF MaxCol() > 0
+            FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", Maxcol(), "+" ) )
+        ELSE
+            FWriteLine( nHandle, " Internal Error Handling Information  " )
+        ENDIF
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "Subsystem Call: " + oErr:subsystem() )
         FWriteLine( nHandle, "   System Code: " + strvalue( oErr:suBcode() ) )
@@ -341,23 +354,28 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
 
-        FWriteLine( nHandle, " Video Screen Dump " )
-        FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
-        FWriteLine( nHandle, "" )
-        For nCount := 1 To Maxrow()
-           cOutString := ''
-           cSubString := Substr( cScreen, nStart, nRange )
-           For nForLoop := 1 To nRange step 2
-              cOutString += Substr( cSubString, nForLoop, 1 )
-           Next
-           FWriteLine( nHandle, "|" + cOutString + "|" )
-           nStart += nRange
-        Next
-        FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
-        FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, "" )
+        IF MaxCol() > 0
+            FWriteLine( nHandle, " Video Screen Dump " )
+            FWriteLine( nHandle, "" )
+            FWriteLine( nHandle, "" )
+            FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
+            FWriteLine( nHandle, "" )
+            For nCount := 1 To Maxrow()
+               cOutString := ''
+               cSubString := Substr( cScreen, nStart, nRange )
+               For nForLoop := 1 To nRange step 2
+                  cOutString += Substr( cSubString, nForLoop, 1 )
+               Next
+               FWriteLine( nHandle, "|" + cOutString + "|" )
+               nStart += nRange
+            Next
+            FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
+            FWriteLine( nHandle, "" )
+            FWriteLine( nHandle, "" )
+        ELSE
+            FWriteLine( nHandle, " Video Screen Dump not available" )
+        ENDIF
+
 
         /*
         FWriteLine( nHandle, padc(" Avaliable Memory Variables ",maxcol(),'+') )

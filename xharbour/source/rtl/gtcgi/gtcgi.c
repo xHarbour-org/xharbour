@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: gtcgi.c,v 1.7 2003/09/23 15:16:21 jonnymind Exp $
  */
 
 /*
@@ -70,6 +70,7 @@ static BOOL   s_bBlink;
 static USHORT s_uiDispCount;
 static char * s_szCrLf;
 static ULONG  s_ulCrLf;
+static BOOL s_OutputDone;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
@@ -78,11 +79,11 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
    s_uiDispCount = 0;
-
+   s_OutputDone = FALSE;
    s_iRow = 0;
    s_iCol = 0;
-   s_uiMaxRow = 25;
-   s_uiMaxCol = 80;
+   s_uiMaxRow = 1;
+   s_uiMaxCol = 0;
    s_uiCursorStyle = SC_NORMAL;
    s_bBlink = FALSE;
 
@@ -111,11 +112,14 @@ static void out_stdout( char * pStr, ULONG ulLen )
    unsigned uiErrorOld = hb_fsError(); /* Save current user file error code */
    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pStr, ulLen );
    hb_fsSetError( uiErrorOld );        /* Restore last user file error code */
+   s_OutputDone = TRUE;
 }
 
 static void out_newline( void )
 {
-   out_stdout( s_szCrLf, s_ulCrLf );
+   if ( s_OutputDone )
+      out_stdout( s_szCrLf, s_ulCrLf );
+   s_OutputDone = TRUE;
 }
 
 int HB_GT_FUNC(gt_ExtendedKeySupport())
@@ -136,47 +140,49 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
    USHORT row = s_iRow;
    USHORT col = s_iCol;
    ULONG ulCount;
+   BOOL bCrLfSeq;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_AdjustPos(%s, %lu)", pStr, ulLen ));
+
+   /* CGI output allows only internet valid CRLF, indipendently from
+      CR/LF combinations in the source data.*/
 
    for( ulCount = 0; ulCount < ulLen; ulCount++ )
    {
       switch( *pStr++  )
       {
          case HB_CHAR_BEL:
+            bCrLfSeq = FALSE;
             break;
 
          case HB_CHAR_BS:
             if( col )
                col--;
-            else
-            {
-               col = s_uiMaxCol;
-               if( row )
-                  row--;
-            }
-            break;
-
-         case HB_CHAR_LF:
-            if( row < s_uiMaxRow )
-               row++;
+            bCrLfSeq = FALSE;
             break;
 
          case HB_CHAR_CR:
+            row++;
             col = 0;
+            out_newline();
+            bCrLfSeq = TRUE;
+            break;
+
+         case HB_CHAR_LF:
+            if ( ! bCrLfSeq ) {
+               row++;
+               col = 0;
+               out_newline();
+               break;
+            }
+            bCrLfSeq = FALSE;
             break;
 
          default:
-            if( col < s_uiMaxCol )
-               col++;
-            else
-            {
-               col = 0;
-               if( row < s_uiMaxRow )
-                  row++;
-            }
+            col++;
       }
    }
+   s_OutputDone = TRUE;
    HB_GT_FUNC(gt_SetPos( row, col, HB_GT_SET_POS_AFTER ));
    return TRUE;
 }
@@ -206,17 +212,15 @@ void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
-   if( iMethod == HB_GT_SET_POS_BEFORE )
+   if ( iMethod == HB_GT_SET_POS_BEFORE && s_OutputDone )
    {
-      /* Only set the screen position when the cursor
-         position is changed BEFORE text is displayed.
-      */
-      if( iRow != s_iRow )
+      if( iRow != s_iRow  )
       {
          out_newline();
          s_iCol = 0;
       }
-      if( s_iCol < iCol ) while( s_iCol++ < iCol ) out_stdout( " ", 1 );
+      while( s_iCol++ < iCol-1 ) out_stdout( " ", 1 );
+      s_OutputDone = TRUE;
    }
 
    s_iRow = iRow;
