@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.36 2002/12/29 19:58:43 ronpinkas Exp $
+ * $Id: arrays.c,v 1.40 2002/12/30 05:05:01 ronpinkas Exp $
  */
 
 /*
@@ -1096,8 +1096,17 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 {
    PHB_ITEM pArray = hb_itemNew( NULL );
-   PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
+   PHB_BASEARRAY pBaseArray;
    USHORT uiPos;
+
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        hb_threadForbid( &hb_gcCollectionMutex );
+     }
+   #endif
+
+   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
    //printf( "Got: %p\n", pBaseArray );
 
@@ -1128,16 +1137,34 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 
    pArray->item.asArray.value = pBaseArray;
 
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        // FORCING a ref to the array just to protect from GC
+        hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
+        hb_threadAllow( &hb_gcCollectionMutex );
+     }
+   #endif
+
    return pArray;
 }
 
 PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
    PHB_ITEM pArray = hb_itemNew( NULL );
-   PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
+   PHB_BASEARRAY pBaseArray;
    USHORT uiPos, uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
+
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        hb_threadForbid( &hb_gcCollectionMutex );
+     }
+   #endif
+
+   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
    //printf( "Got: %p\n", pBaseArray );
 
@@ -1171,6 +1198,15 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    }
 
    pArray->item.asArray.value = pBaseArray;
+
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        // FORCING a ref to the array just to protect from GC
+        hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
+        hb_threadAllow( &hb_gcCollectionMutex );
+     }
+   #endif
 
    return pArray;
 }
