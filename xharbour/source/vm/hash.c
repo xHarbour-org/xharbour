@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.7 2003/11/12 16:05:01 jonnymind Exp $
+ * $Id: hash.c,v 1.8 2003/11/14 16:36:04 jonnymind Exp $
  */
 
 /*
@@ -1137,6 +1137,8 @@ HB_FUNC( HGETKEYAT )
       return;
    }
 
+   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
+   // pagination
    hb_itemCopy ( &HB_VM_STACK.Return, pBaseHash->pKeys + (ulPos -1 ) );
 }
 
@@ -1163,6 +1165,8 @@ HB_FUNC( HGETVALUEAT )
       return;
    }
 
+   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
+   // pagination
    hb_itemCopy ( &HB_VM_STACK.Return, pBaseHash->pValues + (ulPos -1 ) );
 }
 

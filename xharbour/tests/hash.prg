@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.4 2003/11/12 16:05:01 jonnymind Exp $
+* $Id: hash.prg,v 1.5 2003/11/14 16:36:04 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -37,20 +37,24 @@ PROCEDURE Main()
    ? "Hash type:", ValType( hHash )
    ? "Hash length:", Len( hHash )
    ? "Hash value:", ValToPrg( hHash )
-   ? "Empty hash value:", ValToPrg( {=>} )
+   ? "Empty hash value:", ValToPrg( { => } )
    ? "String representation (should be nothing):", {=>}
    ? "Equality of hashes (Success for .T. , .F.): ", hHash == hHash, hHash == {=>}
    ? "Plus operator: ", ValToPrg( { 1=>1, 'a'=>2} + { 3=>3, 'b'=>4 } )
    hHash += { 5=> "numkey 3" }
-   ? "Plusequal operator (success if Len(hHash) == 9: ", Len(hHash), ",(", hHash[5], ")"
+   ? "Plusequal operator (success if Len(hHash) == 9: ",;
+          Len(hHash), ",(", hHash[5], ")"
    hTemp := {'a'=>1, 1=>2, 'c'=>3}
    ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1=>2, 'c'=>3} )
    ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'a'} )
    ? "Minus hash - item operator: ", ValToPrg( hTemp - 'a' )
    ? "Hash is now: ", ValToPrg( hHash )
+   ? "operator kval IN hash", ('Str1' IN hHash)
+   ? "operator {=>} IN hash", ({ "Str8" => "String key 1" } IN hHash)
    ? "Press a Key to continue"
    ?
    Inkey(0)
+
    ? "VM compliance test:"
    ? "Numeric key value hHash[4]:", hHash[4]
    ? "Date key value hHash[CToD('1/1/2003')]:", hHash[CToD('1/1/2003')]

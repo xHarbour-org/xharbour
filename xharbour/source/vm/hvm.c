@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.276 2003/11/12 16:05:01 jonnymind Exp $
+ * $Id: hvm.c,v 1.277 2003/11/14 16:36:04 jonnymind Exp $
  */
 
 /*
@@ -4192,6 +4192,51 @@ static void hb_vmInstringOrArray( void )
       hb_stackPop();
 
       hb_vmPushLogical( bResult );
+   }
+   else if( HB_IS_HASH( pItem2 ) &&
+      ( HB_IS_ORDERABLE( pItem1 ) ||
+         ( HB_IS_HASH( pItem1 ) && hb_hashLen( pItem1 ) == 1) )
+      )
+   {
+      ULONG ulPos;
+      // waring: change IN operator (hb_vmInstringOrArray() ) when changing
+      // pagination
+
+      if ( HB_IS_HASH( pItem1 ) ) // length 1 by hypotesis
+      {
+         if ( hb_hashScan( pItem2, pItem1->item.asHash.value->pKeys, &ulPos ) )
+         {
+            HB_ITEM hbV1;
+            PHB_ITEM pV2 = pItem2->item.asHash.value->pValues + ( ulPos -1 );
+
+            hb_itemCopy( &hbV1, pItem1->item.asHash.value->pValues);
+            hb_stackPop();
+            hb_stackPop();
+
+            hb_stackPush();
+            hb_itemCopy( *( HB_VM_STACK.pPos - 1 ), &hbV1 );
+            hb_stackPush();
+            hb_itemCopy( *( HB_VM_STACK.pPos - 1 ), pV2 );
+
+            // now in the stack we have our values.
+            hb_vmEqual( TRUE );  //this will pop params and push result
+         }
+         else
+         {
+            hb_stackPop();
+            hb_stackPop();
+            hb_vmPushLogical( FALSE );
+         }
+
+      }
+      else
+      {
+         BOOL bRes = hb_hashScan( pItem2, pItem1, &ulPos );
+         hb_stackPop();
+         hb_stackPop();
+
+         hb_vmPushLogical( bRes );
+      }
    }
    else
    {
