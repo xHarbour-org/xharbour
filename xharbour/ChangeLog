@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1793 2003/11/28 23:20:21 walito Exp $
+ * $Id: ChangeLog,v 1.1794 2003/11/29 00:55:10 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-11-28 01:50 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-29 03:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hash.c
+    ! Ops. The FIRST item of the hash was not cleared with HB_IT_NIL type
+      before assigning data to it. (Obviously fixed).
+      Thanks (so many) to Francesco Saverio Giudice.
+
+2003-11-29 01:50 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * test/service.prg
     + Added support for ST operations.
 

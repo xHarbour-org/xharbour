@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.15 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: hash.c,v 1.16 2003/11/26 23:12:42 jonnymind Exp $
  */
 
 /*
@@ -373,7 +373,9 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
 
             pBaseHash->ulLen = 1;
             pBaseHash->ulTotalLen = 1;
+            pBaseHash->pKeys->type = HB_IT_NIL;
             hb_itemCopy( pBaseHash->pKeys, pKey );
+            pBaseHash->pValues->type = HB_IT_NIL;
             hb_itemForwardValue( pBaseHash->pValues, pPage );
             return TRUE;
 
@@ -494,8 +496,10 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
       // find the point where I have to insert the data.
       if ( ulLen == 0 )
       {
-         hb_itemCopy( pBaseHash->pValues, pValue );
+         pBaseHash->pKeys->type = HB_IT_NIL;
          hb_itemCopy( pBaseHash->pKeys, pKey );
+         pBaseHash->pValues->type = HB_IT_NIL;
+         hb_itemCopy( pBaseHash->pValues, pValue );
       }
       else {
          pPos = pBaseHash->pValues + ulLen;
@@ -582,8 +586,10 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
       // find the point where I have to insert the data.
       if ( ulLen == 0 )
       {
-         hb_itemForwardValue( pBaseHash->pValues, pValue );
+         pBaseHash->pKeys->type = HB_IT_NIL;
          hb_itemForwardValue( pBaseHash->pKeys, pKey );
+         pBaseHash->pValues->type = HB_IT_NIL;
+         hb_itemForwardValue( pBaseHash->pValues, pValue );
       }
       else {
          pPos = pBaseHash->pValues + ulLen;
@@ -1497,7 +1503,7 @@ HB_FUNC( HASH )
       }
    }
 
-   hb_itemForwardValue( &HB_VM_STACK.Return, pHash );
+   hb_itemReturn( pHash );
 }
 
 
