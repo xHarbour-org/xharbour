@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3089 2004/06/18 09:38:11 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3090 2004/06/18 16:48:02 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-19 01:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/libct/files.c
+    ! Fixed FILESIZE() to return -1 if the file is not found.
+    ! Fixed FILEATTR() to return FA_ARCH on non-MS platforms.
+  * contrib/libct/range.c
+    ! Fixed RANGEREPL() and RANGEREM() to work with empty strings.
 
 2004-06-18 12:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/tbrowse.prg
@@ -64,7 +71,7 @@
             such as hb_fsopen() failing ( file in use ) or hb_xgrab() failure ( insufficient memory ) .
 
 2004-06-17 23:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
-  * contrib/lict/screen2.prg
+  * contrib/libct/screen2.prg
     ! Fixed SAYSCREEN() to work with empty strings.
 
 2004-06-17 10:45 UTC-0800 Ron Pinkas <ron at xharbour.com>

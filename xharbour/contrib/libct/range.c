@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.4 2002/05/05 19:03:26 mbirdyg Exp $
+ * $Id: range.c,v 1.1 2003/03/04 21:04:48 lculik Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ HB_FUNC (RANGEREM)
 
     iMode = (ucChar2 < ucChar1);
 
-    pcRet = ( char * )hb_xgrab (sStrLen);
+    pcRet = (char *)hb_xgrab( sStrLen + 1 );
     sRetIndex = 0;
     for (pc = pcString; pc < pcString+sStrLen; pc++)
     {
@@ -272,7 +272,7 @@ HB_FUNC (RANGEREPL)
 
     iMode = (ucChar2 < ucChar1);
 
-    pcRet = ( char * )hb_xgrab (sStrLen);
+    pcRet = (char *)hb_xgrab( sStrLen + 1 );
     sRetIndex = 0;
     for (pc = pcString; pc < pcString+sStrLen; pc++)
     {

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.24 2004/05/04 16:35:24 mauriliolongo Exp $
+ * $Id: files.c,v 1.25 2004/05/12 02:25:08 druzus Exp $
  */
 
 /*
@@ -231,7 +231,7 @@ HB_FUNC( FILEATTR )
    }
    #else
    {
-      hb_retnl( 1 );
+      hb_retnl( FA_ARCH );
    }
    #endif
 
@@ -256,51 +256,10 @@ HB_FUNC( SETFATTR )
             iFlags=32;
          }
 
-         switch ( iFlags )
-         {
-            case FA_RDONLY :
-               iReturn=_chmod( szFile,1,FA_RDONLY );
-               break;
-            case FA_HIDDEN :
-               iReturn=_chmod( szFile,1,FA_HIDDEN );
-               break;
-            case FA_SYSTEM :
-               iReturn=_chmod( szFile,1,FA_SYSTEM );
-               break;
-            case  ( FA_ARCH ) :
-               iReturn=_chmod( szFile,1,FA_ARCH );
-               break;
-            case  ( FA_RDONLY|FA_ARCH ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_ARCH );
-               break;
-            case  ( FA_RDONLY|FA_SYSTEM ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_SYSTEM );
-               break;
-            case  ( FA_RDONLY|FA_HIDDEN ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_HIDDEN );
-               break;
-            case  ( FA_SYSTEM|FA_ARCH ) :
-               iReturn=_chmod( szFile,1,FA_SYSTEM|FA_ARCH );
-               break;
-            case  ( FA_SYSTEM|FA_HIDDEN ) :
-               iReturn=_chmod( szFile,1,FA_SYSTEM|FA_HIDDEN );
-               break;
-            case  ( FA_HIDDEN|FA_ARCH ) :
-               iReturn=_chmod( szFile,1,FA_HIDDEN|FA_ARCH );
-               break;
-            case  ( FA_RDONLY|FA_SYSTEM|FA_HIDDEN ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_HIDDEN|FA_SYSTEM );
-               break;
-            case  ( FA_RDONLY|FA_ARCH|FA_SYSTEM ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_ARCH|FA_SYSTEM );
-               break;
-            case  ( FA_RDONLY|FA_ARCH|FA_HIDDEN ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_ARCH|FA_HIDDEN );
-               break;
-            case  ( FA_RDONLY|FA_ARCH|FA_HIDDEN|FA_SYSTEM ) :
-               iReturn=_chmod( szFile,1,FA_RDONLY|FA_ARCH|FA_HIDDEN|FA_SYSTEM );
-               break;
-         }
+         if ( !( iFlags & ~( FA_ARCH | FA_HIDDEN | FA_RDONLY | FA_SYSTEM ) ) )
+	 {
+	    iReturn = _chmod( szFile, 1, iFlags );
+	 }
 
          hb_retni( iReturn );
       }
@@ -329,7 +288,7 @@ HB_FUNC( SETFATTR )
          dwFlags |= FILE_ATTRIBUTE_SYSTEM;
 
       if(  iAttr & FA_NORMAL  )
-         dwFlags |=    FILE_ATTRIBUTE_NORMAL;
+         dwFlags |= FILE_ATTRIBUTE_NORMAL;
 
       lSuccess=SetFileAttributes( cFile,dwFlags );
 
@@ -528,7 +487,10 @@ HB_FUNC( FILESIZE )
                hb_retnl( -1 );
             }
          }
-
+	 else
+	 {
+	    hb_retnl( -1 );
+	 }
       }
 
    else
