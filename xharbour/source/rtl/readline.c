@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.0 2003/11/27 13:27:21 lf_sfnet Exp $
+ * $Id: readline.c,v 1.1 2003/12/08 01:36:13 mlombardo Exp $
  */
 
 /*
@@ -59,12 +59,12 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxLineLen, char ** Proto, int * iprotosize, USHORT iprotos  )
+USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxLineLen, char ** Term, int * iTermSizes, USHORT iTerms  )
 {
-   USHORT protos, read, iPos, iPosProto;
-   BOOL bProtoFound;
+   USHORT protos, read, iPos, uiPosition;
+   BOOL bFound;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %p, %hu, %p, %p, %hu)", hFileHandle, pBuff, uiMaxLineLen, Proto, iprotosize, iprotos ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %p, %hu, %p, %p, %hu)", hFileHandle, pBuff, uiMaxLineLen, Term, iTermSizes, iTerms ));
 
    /* read from file */
    read = hb_fsRead( hFileHandle, pBuff, uiMaxLineLen );
@@ -75,38 +75,38 @@ USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxL
    {
       for( iPos=0; iPos<read; iPos++ )
       {
-         bProtoFound = 0;
-         for( protos=0;protos < iprotos;protos++)
+         bFound = 0;
+         for( protos=0;protos < iTerms;protos++)
          {
             /* Compare with the LAST char in every terminator */
-            if( pBuff[iPos] == Proto[protos][iprotosize[protos]-1] && (iprotosize[protos]-1) <= iPos )
+            if( pBuff[iPos] == Term[protos][iTermSizes[protos]-1] && (iTermSizes[protos]-1) <= iPos )
             {
-               bProtoFound = 1;
-               for(iPosProto=0; iPosProto < (iprotosize[protos]-1); iPosProto++)
+               bFound = 1;
+               for(uiPosition=0; uiPosition < (iTermSizes[protos]-1); uiPosition++)
                {
-                  if(Proto[protos][iPosProto] != pBuff[ (iPos-iprotosize[protos])+iPosProto+1 ])
+                  if(Term[protos][uiPosition] != pBuff[ (iPos-iTermSizes[protos])+uiPosition+1 ])
                   {
-                     bProtoFound = 0;
+                     bFound = 0;
                      break;
                   }
                }
-               if(bProtoFound)
+               if(bFound)
                {
                   break;
                }
             }
          }
-         if(bProtoFound)
+         if(bFound)
          {
             break;
          }
       }
-      if(bProtoFound)
+      if(bFound)
       {
-         pBuff[iPos-iprotosize[protos]+1] = '\0';
+         pBuff[iPos-iTermSizes[protos]+1] = '\0';
          /* Set handle pointer in the end of the line */
          hb_fsSeek( hFileHandle, (((((long)read)-((long)iPos)))*-1)+1, FS_RELATIVE );
-         return( iPos-iprotosize[protos] );
+         return( iPos-iTermSizes[protos] );
       }
    }
    return( read );
@@ -116,15 +116,15 @@ USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxL
 
 HB_FUNC( FREADLINE )
 {
-   PHB_ITEM pProto, pProtoOpt;
+   PHB_ITEM pTerm1, pOpt;
    PHB_ITEM pResult     = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 3, HB_IT_NUMERIC );
    FHANDLE hFileHandle  = (FHANDLE) hb_parnl( 1 );
-   char ** Proto;
+   char ** Term;
    BYTE * pBuffer;
-   int * iprotosize;
+   int * iTermSizes;
    int result;
-   USHORT iMax, i, iprotos;
+   USHORT iMax, i, iTerms;
 
    if( (!ISBYREF( 2 )) || (!ISNUM( 1 )) )
    {
@@ -138,10 +138,10 @@ HB_FUNC( FREADLINE )
    {
       if( ISARRAY( 4 ) )
       {
-         pProto  = hb_param( 4, HB_IT_ARRAY );
-         iprotos = (int) pProto->item.asArray.value->ulLen;
+         pTerm1  = hb_param( 4, HB_IT_ARRAY );
+         iTerms = (int) pTerm1->item.asArray.value->ulLen;
 
-         if( iprotos <= 0 )
+         if( iTerms <= 0 )
          {
             hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "FREADLINE", 4,
                hb_paramError(1), hb_paramError(2),
@@ -149,34 +149,34 @@ HB_FUNC( FREADLINE )
             return;
          }
 
-         Proto   = (char**) hb_xgrab( sizeof(char*) * iprotos );
-         iprotosize = (int *) hb_xgrab( sizeof(int) * iprotos );
+         Term   = (char**) hb_xgrab( sizeof(char*) * iTerms );
+         iTermSizes = (int *) hb_xgrab( sizeof(int) * iTerms );
 
-         for(i=0;i<iprotos;i++)
+         for(i=0;i<iTerms;i++)
          {
-            pProtoOpt     = hb_itemArrayGet( pProto, i+1 );
-            Proto[i]      = (char *) pProtoOpt->item.asString.value;
-            iprotosize[i] = pProtoOpt->item.asString.length;
-            hb_itemRelease( pProtoOpt );
+            pOpt          = hb_itemArrayGet( pTerm1, i+1 );
+            Term[i]       = (char *) pOpt->item.asString.value;
+            iTermSizes[i] = pOpt->item.asString.length;
+            hb_itemRelease( pOpt );
          }
       }
       else
       {
-         pProto        = hb_param( 4, HB_IT_STRING );
-         Proto         = (char**) hb_xgrab( sizeof(char*) );
-         iprotosize    = (int *) hb_xgrab( sizeof(int) );
-         Proto[0]      = (char *) pProto->item.asString.value;
-         iprotosize[0] = pProto->item.asString.length;
-         iprotos       = 1;
+         pTerm1        = hb_param( 4, HB_IT_STRING );
+         Term          = (char**) hb_xgrab( sizeof(char*) );
+         iTermSizes    = (int *) hb_xgrab( sizeof(int) );
+         Term[0]       = (char *) pTerm1->item.asString.value;
+         iTermSizes[0] = pTerm1->item.asString.length;
+         iTerms        = 1;
       }
    }
    else
    {
-      Proto         = (char**) hb_xgrab( sizeof(char*) );
-      iprotosize    = (int *) hb_xgrab( sizeof(int) );
-      Proto[0]      = (char *) "\r\n";    /* Should be preplaced with the default EOL sequence */
-      iprotos       = 1;
-      iprotosize[0] = 2;
+      Term          = (char**) hb_xgrab( sizeof(char*) );
+      iTermSizes    = (int *) hb_xgrab( sizeof(int) );
+      Term[0]       = (char *) "\r\n";    /* Should be preplaced with the default EOL sequence */
+      iTerms        = 1;
+      iTermSizes[0] = 2;
    }
 
    if( pMaxSize )
@@ -189,7 +189,7 @@ HB_FUNC( FREADLINE )
    }
 
    pBuffer = ( BYTE * ) pResult->item.asString.value;
-   result  = hb_fsReadLine( hFileHandle, pBuffer, iMax, Proto, iprotosize, iprotos  );
+   result  = hb_fsReadLine( hFileHandle, pBuffer, iMax, Term, iTermSizes, iTerms  );
 
    if( result > 0 )
    {
@@ -198,6 +198,6 @@ HB_FUNC( FREADLINE )
    }
 
    hb_retnl( result );
-   hb_xfree( Proto );
-   hb_xfree( iprotosize );
+   hb_xfree( Term );
+   hb_xfree( iTermSizes );
 }
