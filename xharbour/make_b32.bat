@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.6 2003/01/11 01:01:04 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.7 2003/02/19 16:50:50 iananderson Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -35,6 +35,7 @@ if "%1" == "CLEAN" goto CLEAN
 
    copy bin\b32\*.exe bin\*.* > nul
    copy lib\b32\*.lib lib\*.* > nul
+   copy obj\b32\hvm*.obj lib\*.* > nul
    goto EXIT
 
 :BUILD_ERR
