@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.16 2002/09/19 01:57:42 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.17 2002/10/03 15:49:58 ronpinkas Exp $
  */
 
 /*
@@ -643,6 +643,10 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
 
          RETURN Eval( ErrorBlock(), oErr )
       ELSEIF ( cError := Ole2TxtError() ) != "S_OK"
+         IF cMsg == "END"
+            RETURN OleRelease( ::hObj )
+         ENDIF
+
          oErr := ErrorNew()
          oErr:Args          := { Self, cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 }
          oErr:CanDefault    := .F.

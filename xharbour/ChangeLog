@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.435 2002/10/13 02:22:21 lculik Exp $
+ * $Id: ChangeLog,v 1.436 2002/10/13 18:06:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-13 11:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    + Added support for End() method calls into OnError()
 
 2002-10-13 11:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvmpub.h
