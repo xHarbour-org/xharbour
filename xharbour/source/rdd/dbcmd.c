@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.91 2004/03/10 22:47:13 andijahja Exp $
+ * $Id: dbcmd.c,v 1.92 2004/03/10 23:21:46 ronpinkas Exp $
  */
 
 /*
@@ -5182,97 +5182,130 @@ HB_FUNC( DBF2TEXT )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pWhile = hb_param( 1, HB_IT_BLOCK );
-   PHB_ITEM pFor = hb_param( 2, HB_IT_BLOCK );
-   PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
-   char *cDelim = hb_parc( 4 );
-   int handle = hb_parnl( 5 );
-   BYTE *cSep = (BYTE*) hb_parc( 6 );
-   int iSepLen = hb_parclen( 6 );
-   int nCount = hb_parni( 7 );
-   USHORT uiFields = 0;
-   USHORT ui;
-   HB_ITEM Tmp;
-   BOOL bWriteSep = FALSE;
-
-   BOOL bEof = TRUE;
-   BOOL bBof = TRUE;
-
-   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
-
-   SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
-
-   Tmp.type = HB_IT_NIL;
-
-   while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+   if( s_pCurrArea )
    {
-      SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bEof );
-      SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBof );
+      PHB_ITEM pWhile = hb_param( 1, HB_IT_BLOCK );
+      PHB_ITEM pFor = hb_param( 2, HB_IT_BLOCK );
+      PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
+      char *cDelim;
+      int handle = hb_parnl( 5 );
+      BYTE *cSep;
+      int iSepLen;
+      int nCount = hb_parni( 7 );
+      USHORT uiFields = 0;
+      USHORT ui;
+      HB_ITEM Tmp;
+      BOOL bWriteSep = FALSE;
 
-      if ( bEof || bBof )
+      BOOL bEof = TRUE;
+      BOOL bBof = TRUE;
+
+      BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+
+      if( ! handle || ! ISNUM( 7 ) )
       {
-         break;
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBF2TEXT" );
+         return;
       }
 
-      if ( hb___Eval ( pFor ) )
+      if ( ISCHAR( 4 ) )
       {
-         if ( bNoFieldPassed )
-         {
-            for ( ui = 1; ui <= uiFields; ui ++ )
-            {
-               if ( bWriteSep )
-               {
-                  hb_fsWriteLarge( handle, cSep, iSepLen );
-               }
+         cDelim = hb_parc( 4 );
+      }
+      else
+      {
+         cDelim = "\"";
+      }
 
-               SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, ui, &Tmp );
-               bWriteSep = ExportVar( handle, &Tmp, cDelim );
-               hb_itemClear( &Tmp );
-            }
+      if ( ISCHAR( 6 ) )
+      {
+         cSep = (BYTE*) hb_parc( 6 );
+         iSepLen = hb_parclen( 6 );
+      }
+      else
+      {
+         cSep = (BYTE*) ',';
+         iSepLen = 1;
+      }
+
+      SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
+
+      Tmp.type = HB_IT_NIL;
+
+      while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+      {
+         SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bEof );
+         SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBof );
+
+         if ( bEof || bBof )
+         {
+            break;
          }
-         else
+
+         if ( hb___Eval ( pFor ) )
          {
-            USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
-            USHORT uiItter;
-
-            for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+            if ( bNoFieldPassed )
             {
-               char *szFieldName = hb_arrayGetC( pFields, uiItter );
-
-               if ( bWriteSep )
+               for ( ui = 1; ui <= uiFields; ui ++ )
                {
-                  hb_fsWriteLarge( handle, cSep, iSepLen );
-               }
+                  if ( bWriteSep )
+                  {
+                     hb_fsWriteLarge( handle, cSep, iSepLen );
+                  }
 
-               if ( szFieldName )
-               {
-                  int iFieldLen = strlen( szFieldName );
-                  char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
-                  int iPos;
-
-                  hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
-                  iPos = hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName );
-                  hb_xfree( szName );
-
-                  SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, iPos, &Tmp );
+                  SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, ui, &Tmp );
                   bWriteSep = ExportVar( handle, &Tmp, cDelim );
                   hb_itemClear( &Tmp );
                }
-
-               hb_xfree( szFieldName );
             }
+            else
+            {
+               USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
+               USHORT uiItter;
+
+               for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+               {
+                  char *szFieldName = hb_arrayGetC( pFields, uiItter );
+
+                  if ( bWriteSep )
+                  {
+                     hb_fsWriteLarge( handle, cSep, iSepLen );
+                  }
+
+                  if ( szFieldName )
+                  {
+                     int iFieldLen = strlen( szFieldName );
+                     char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
+                     int iPos;
+
+                     hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
+                     iPos = hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName );
+                     hb_xfree( szName );
+
+                     SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, iPos, &Tmp );
+                     bWriteSep = ExportVar( handle, &Tmp, cDelim );
+                     hb_itemClear( &Tmp );
+                  }
+
+                  hb_xfree( szFieldName );
+               }
+            }
+            hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
+            bWriteSep = FALSE;
          }
-         hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
-         bWriteSep = FALSE;
+
+         if ( nCount != -1 )
+         {
+            nCount-- ;
+         }
+
+         SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
       }
 
-      if ( nCount != -1 )
-      {
-         nCount-- ;
-      }
-
-      SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+      hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
    }
-
-   hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
+   else
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBF2TXT" );
+   }
 }
