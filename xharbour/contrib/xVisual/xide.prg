@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.94 2002/10/26 08:57:48 ronpinkas Exp $
+ * $Id: xide.prg,v 1.95 2002/10/26 09:19:15 ronpinkas Exp $
  */
 
 /*
@@ -479,7 +479,7 @@ int XFMParse( char *sText )
 
    SKIP_SPACE();
 
-   if( strncmp( sText, " FROM", 4 ) )
+   if( strncmp( sText, "FROM", 4 ) )
    {
       return 0;
    }
@@ -494,7 +494,7 @@ int XFMParse( char *sText )
    }
    sFromClass[i] = '\0';
 
-   OutputDebugString( "From: " );
+   OutputDebugString( " From: " );
    OutputDebugString( (char *) sFromClass );
    OutputDebugString( "\n" );
 
