@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.56 2004/03/11 22:03:59 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.58 2004/12/26 14:21:23 ptsarenko Exp $
  */
 /*
  * xHarbour Project source code:
@@ -332,7 +332,7 @@ void Idle( MSG *pMsg )
    HB_ITEM HB_Done;
    HB_ITEM HB_OnIdle;
 
-   hb_idleState();
+   hb_idleState( 0 );
 
    if( pSymExec == NULL )
    {
