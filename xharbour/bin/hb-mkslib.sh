@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.5 2004/11/01 05:38:08 likewolf Exp $
+# $Id: hb-mkslib.sh,v 1.6 2004/11/01 21:36:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -43,7 +43,7 @@ REVIS="${REVIS#${MINOR}}"
 REVIS="${REVIS#.}"
 REVIS="${REVIS%%.*}"
 [ -n "${MAJOR}" ] || MAJOR=0
-[ -n "${MINOR}" ] || MINOR=0
+[ -n "${MINOR}" ] || MINOR=1
 [ -n "${REVIS}" ] || REVIS=0
 VERSION="${MAJOR}.${MINOR}.${REVIS}"
 

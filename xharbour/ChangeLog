@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3580 2004/11/03 20:11:08 paultucker Exp $
+ * $Id: ChangeLog,v 1.3581 2004/11/03 21:19:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-04 01:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_tgz.sh
+    * fiexed typo (replace 'endif' by 'fi')
+  * xharbour/bin/hb-mkslib.sh
+    * set MINOR number to 1 by default: 0.0 seems to be forbidden
 
 2004-11-03 13:04 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbexcept.ch

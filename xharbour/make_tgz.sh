@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.30 2004/11/01 05:38:04 likewolf Exp $
+# $Id: make_tgz.sh,v 1.31 2004/11/01 22:40:57 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -166,7 +166,7 @@ if [ "${HB_ARCHITECTURE}" = darwin ]; then
   DO_LDCONFIG=""
 else
   DO_LDCONFIG="&& ldconfig"
-endif
+fi
 cat > "${hb_instfile}" <<EOF
 #!/bin/sh
 if [ "\$1" == "--extract" ]; then
@@ -182,7 +182,7 @@ read ASK
 if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
     exit 1
 fi
-(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | $TAR xvf - -C /) $DO_LDCONFIG
+(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | $TAR xvf - -C /) ${DO_LDCONFIG}
 exit \$?
 HB_INST_EOF
 EOF
