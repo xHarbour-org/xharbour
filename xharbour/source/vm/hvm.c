@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.141 2002/12/30 05:05:01 ronpinkas Exp $
+ * $Id: hvm.c,v 1.142 2002/12/30 19:44:00 ronpinkas Exp $
  */
 
 /*
@@ -97,7 +97,8 @@
 #endif
 
 #ifdef HB_THREAD_SUPPORT
-   extern HB_FORBID_MUTEX hb_gcCollectionMutex;
+   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 /* DEBUG only*/
@@ -3848,7 +3849,8 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadForbid( &hb_gcCollectionMutex );
+         //hb_threadForbid( &hb_gcCollectionForbid );
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
       }
    #endif
 
@@ -3865,7 +3867,8 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadAllow( &hb_gcCollectionMutex );
+         //hb_threadAllow( &hb_gcCollectionForbid );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       }
    #endif
 }
@@ -3880,7 +3883,8 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadForbid( &hb_gcCollectionMutex );
+         //hb_threadForbid( &hb_gcCollectionForbid );
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
       }
    #endif
 
@@ -3912,7 +3916,8 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadAllow( &hb_gcCollectionMutex );
+         //hb_threadAllow( &hb_gcCollectionForbid );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       }
    #endif
 }
@@ -5009,7 +5014,8 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadForbid( &hb_gcCollectionMutex );
+         //hb_threadForbid( &hb_gcCollectionForbid );
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
       }
    #endif
 
@@ -5034,7 +5040,8 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadAllow( &hb_gcCollectionMutex );
+         //hb_threadAllow( &hb_gcCollectionForbid );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       }
    #endif
 }
@@ -5054,7 +5061,8 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadForbid( &hb_gcCollectionMutex );
+         //hb_threadForbid( &hb_gcCollectionForbid );
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
       }
    #endif
 
@@ -5078,7 +5086,8 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadAllow( &hb_gcCollectionMutex );
+         //hb_threadAllow( &hb_gcCollectionForbid );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       }
    #endif
 }

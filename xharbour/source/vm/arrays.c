@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.42 2002/12/30 06:52:59 ronpinkas Exp $
+ * $Id: arrays.c,v 1.43 2002/12/30 08:17:15 ronpinkas Exp $
  */
 
 /*
@@ -77,7 +77,8 @@
 #include "hbstack.h"
 
 #ifdef HB_THREAD_SUPPORT
-   extern HB_FORBID_MUTEX hb_gcCollectionMutex;
+   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 extern char *hb_vm_acAscii[256];
@@ -851,7 +852,8 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       #ifdef HB_THREAD_SUPPORT
         if( hb_ht_context )
         {
-           hb_threadForbid( &hb_gcCollectionMutex );
+           //hb_threadForbid( &hb_gcCollectionForbid );
+           HB_CRITICAL_LOCK( hb_gcCollectionMutex );
         }
       #endif
 
@@ -913,7 +915,8 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       #ifdef HB_THREAD_SUPPORT
         if( hb_ht_context )
         {
-           hb_threadAllow( &hb_gcCollectionMutex );
+           //hb_threadAllow( &hb_gcCollectionForbid );
+           HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
         }
       #endif
 
@@ -1150,7 +1153,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
    #ifdef HB_THREAD_SUPPORT
      if( hb_ht_context )
      {
-        hb_threadForbid( &hb_gcCollectionMutex );
+        //hb_threadForbid( &hb_gcCollectionForbid );
+        HB_CRITICAL_LOCK( hb_gcCollectionMutex );
      }
    #endif
 
@@ -1189,8 +1193,9 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
      if( hb_ht_context )
      {
         // FORCING a ref to the array just to protect from GC
-        hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
-        hb_threadAllow( &hb_gcCollectionMutex );
+        //hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
+        //hb_threadAllow( &hb_gcCollectionForbid );
+        HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
      }
    #endif
 
@@ -1208,7 +1213,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    #ifdef HB_THREAD_SUPPORT
      if( hb_ht_context )
      {
-        hb_threadForbid( &hb_gcCollectionMutex );
+        //hb_threadForbid( &hb_gcCollectionForbid );
+        HB_CRITICAL_LOCK( hb_gcCollectionMutex );
      }
    #endif
 
@@ -1251,8 +1257,9 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
      if( hb_ht_context )
      {
         // FORCING a ref to the array just to protect from GC
-        hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
-        hb_threadAllow( &hb_gcCollectionMutex );
+        //hb_itemCopy( &( HB_VM_STACK.Return ), pArray );
+        //hb_threadAllow( &hb_gcCollectionForbid );
+        HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
      }
    #endif
 
@@ -1270,7 +1277,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    #ifdef HB_THREAD_SUPPORT
      if( hb_ht_context )
      {
-        hb_threadForbid( &hb_gcCollectionMutex );
+        //hb_threadForbid( &hb_gcCollectionForbid );
+        HB_CRITICAL_LOCK( hb_gcCollectionMutex );
      }
    #endif
 
@@ -1280,7 +1288,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    #ifdef HB_THREAD_SUPPORT
      if( hb_ht_context )
      {
-        hb_threadAllow( &hb_gcCollectionMutex );
+        //hb_threadAllow( &hb_gcCollectionForbid );
+        HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
      }
    #endif
 

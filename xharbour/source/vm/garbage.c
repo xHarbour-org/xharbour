@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.35 2002/12/30 08:17:15 ronpinkas Exp $
+ * $Id: garbage.c,v 1.36 2002/12/30 19:44:00 ronpinkas Exp $
  */
 
 /*
@@ -112,9 +112,9 @@ static ULONG s_uAllocated = 0;
 #endif
 
 #ifdef HB_THREAD_SUPPORT
-   HB_FORBID_MUTEX hb_gcCollectionMutex;
+   //HB_FORBID_MUTEX hb_gcCollectionForbid;
    static HB_CRITICAL_T s_CriticalMutex;
-   static HB_CRITICAL_T s_CollectionMutex;
+   HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 /* Forward declaration.*/
@@ -530,20 +530,21 @@ void hb_gcCollectAll( void )
 
    #ifdef HB_THREAD_SUPPORT
 
-      HB_CRITICAL_LOCK( hb_threadContextMutex );
+      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex.Control );
+      /*
+      HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );
 
-      while( hb_gcCollectionMutex.lCount )
+      while( hb_gcCollectionForbid.lCount )
       {
-         if( hb_gcCollectionMutex.lCount < 0 )
+         if( hb_gcCollectionForbid.lCount < 0 )
          {
-            HB_CRITICAL_UNLOCK( hb_gcCollectionMutex.Control );
+            HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
             printf( "Unexpected condition!\n" );
             exit(1);
          }
 
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex.Control );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
 
          #if defined(HB_OS_WIN_32)
              Sleep( 0 );
@@ -554,12 +555,11 @@ void hb_gcCollectAll( void )
              nanosleep( &nanosecs, NULL );
          #endif
 
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex.Control );
+         HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );
       }
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex.Control );
-
-      HB_CRITICAL_LOCK( s_CollectionMutex );
+      HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
+      */
    #endif
 
 
@@ -733,8 +733,7 @@ void hb_gcCollectAll( void )
    }
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CollectionMutex );
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    #endif
 
    //printf( "Done Collecting...\n" );
@@ -834,18 +833,18 @@ void hb_gcReleaseAll( void )
 void hb_gcInit( void )
 {
    #ifdef HB_THREAD_SUPPORT
-      hb_threadForbidenInit( &hb_gcCollectionMutex );
+      //hb_threadForbidenInit( &hb_gcCollectionForbid );
       HB_CRITICAL_INIT( s_CriticalMutex );
-      HB_CRITICAL_INIT( s_CollectionMutex );
+      HB_CRITICAL_INIT( hb_gcCollectionMutex );
    #endif
 }
 
 void hb_gcExit( void )
 {
    #ifdef HB_THREAD_SUPPORT
-      hb_threadForbidenDestroy( &hb_gcCollectionMutex );
+      //hb_threadForbidenDestroy( &hb_gcCollectionForbid );
       HB_CRITICAL_DESTROY( s_CriticalMutex );
-      HB_CRITICAL_DESTROY( s_CollectionMutex );
+      HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
    #endif
 }
 
