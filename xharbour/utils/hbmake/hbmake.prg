@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.84 2003/08/16 03:50:52 lculik Exp $
+ * $Id: hbmake.prg,v 1.85 2003/08/18 05:13:05 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1810,7 +1810,7 @@ cResname += cAllRes
    ELSEIF s_lGcc
 
       IF cOs == "Linux"
-         fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " " + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = -Wl,--start-group" + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group" + CRLF )
       ELSEIF cOs == "OS/2"
          fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSE
