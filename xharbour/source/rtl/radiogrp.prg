@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.2 2002/03/17 23:27:28 lculik Exp $
+ * $Id: radiogrp.prg,v 1.3 2002/11/13 04:19:24 walito Exp $
  */
 
 /*
@@ -298,9 +298,9 @@ METHOD  InsItem( nPos, oButtom ) CLASS HBRadioGroup
    if ( !( ISOBJECT( oButtom ) ) )
    elseif ( !( oButtom:classname() == "RADIOBUTTN" ) )
    elseif ( nPos < ::ItemCount )
-      asize(::aItems, ++::ItemCount)
-      ains(::aItems, nPos)
-      ::aItems[ nPos ] := oButtom
+//      asize(::aItems, ++::ItemCount)
+      ains(::aItems, nPos, oButtom, .T. )
+//      ::aItems[ nPos ] := oButtom
    endif
    return ::aItems[ nPos ]
 
@@ -469,8 +469,9 @@ METHOD  Display() CLASS HBRadioGroup
 METHOD  DelItem( xItem ) CLASS HBRadioGroup
 
    if xItem >= 1 .AND. xItem <= ::ItemCount
-      adel(::aItems[ xItem ])
-      asize(::aItems, --::ItemCount)
+      adel(::aItems[ xItem ], .T.)
+//      asize(::aItems, --::ItemCount)
+      ::ItemCount--
    endif
 
    if ::HasFocus .AND. ::ItemCount < ::Value
