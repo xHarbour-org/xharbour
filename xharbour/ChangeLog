@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.647 2003/01/26 02:48:40 likewolf Exp $
+ * $Id: ChangeLog,v 1.648 2003/01/27 05:04:01 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-26 21:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/color53.prg
+    + Added missing declaration for variable cToken
+
+  * source/rtl/persist.prg
+    + Added missing #include common.ch
 
 2003-01-27 01:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * makefile.bc
@@ -114,7 +121,7 @@
     ! Fixed to work properly on big-endian machines.
   * source/vm/thread.c
     ! Fixed Darwin usleep() call in THREADSLEEP().
-  
+
 2003-01-25 18:40 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     * Minor Fix
@@ -131,6 +138,7 @@
     + Added files rewritten for hbdoc processing.
   * doc/en/set.txt
     * Added description to _SET_FILECASE,_SET_DIRCASE,_SET_DIRSEPARATOR inside set Function
+
 2003-01-24 17:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h
     + Added #define HB_MAX_SWITCHES 16

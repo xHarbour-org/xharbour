@@ -1,5 +1,5 @@
 /*
- * $Id: colo53.prg,v 1.0 2003/01/16 16:40:55 walito Exp $
+ * $Id: color53.prg,v 1.1 2003/01/27 04:11:03 walito Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-
+#include "common.ch"
 
 Function GETCLRPAIR( cColor, nColor )
    Local nPos
