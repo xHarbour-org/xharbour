@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.795 2003/03/03 13:44:25 lculik Exp $
+ * $Id: ChangeLog,v 1.796 2003/03/03 16:03:43 ignacioortiz Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-03 16:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.y
+    % Fixed multiple memory leaks when error in compiling a macro.
+
+  * tests/macro.prg
+    * Minor correction.
+
+  * tests/tstscope.prg
+    + Added more tests.
 
 2003-03-03 17:55 UTC+0100 Ignacio Ortiz <ignacio@ozs.com>
   * source/rtl/transfrm.c
@@ -26,13 +36,13 @@
 2003-03-02 19:45 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h
   * source/vm/hvm.c
-  * source/vm/thread.c      
+  * source/vm/thread.c
     ! fixed compilation under windows. WARNING: Windows version is
       Work in Progress, and currently unstable.
 
 2003-03-02 16:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   ! source/rtl/regex.c
-    ! New version of regex was not returning true or false for 
+    ! New version of regex was not returning true or false for
       HB_RegexMatch(). Fixed.
 
   * include/hbstack.h
@@ -45,16 +55,16 @@
   * source/vm/garbage.c
   * source/vm/hvm.c
   * source/vm/inet.c
-  * source/vm/thread.c  
+  * source/vm/thread.c
   * source/rtl/console.c
   * source/rtl/idle.c
     ! Different threading model has been enforced in. HIGLY EXPERIMENTAL.
-    
+
   * source/rtl/trace.c
     ! Minor fix to mutexes
-    
+
   NOTE: This commit WON'T compile under windows/MT (should compile windows
-  without MT). I am now fixing windows port; should be done in about one 
+  without MT). I am now fixing windows port; should be done in about one
   hour.
 
 2003-02-28 13:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

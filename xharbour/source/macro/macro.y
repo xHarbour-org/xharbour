@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.6 2002/11/18 00:38:41 ronpinkas Exp $
+ * $Id: macro.y,v 1.7 2002/12/08 02:20:26 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,12 @@
 #define malloc  hb_xgrab
 #undef free
 #define free hb_xfree
+
+#define HB_MAX_PENDING_MACRO_EXP 16
+
+static HB_EXPR_PTR s_Pending[ HB_MAX_PENDING_MACRO_EXP ];
+static int s_iPending = 0;
+
 /* This is workaround of yyparse() declaration bug in bison.simple
 */
 
@@ -224,47 +230,84 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 
 %%
 
-Main : Expression '\n' {
+Main : Expression '\n'  {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
+
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
+                           {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
                            else
+                           {
                               hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
+
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
-
-     | Expression      {
+     | Expression       {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
+
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
+                           {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
                            else
+                           {
                               hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
+
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
      | AsParamList      {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
+
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
+                           {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
                            else
+                           {
                               hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
+
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
-     | Expression error   {
-                 HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
-                 hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
-		 hb_compExprDelete( $1, HB_MACRO_PARAM );
-                 if( yylval.string )
-                 {
-                    hb_xfree( yylval.string );
-                 }
-		 YYABORT;
-	       }
-     | error   {
-                 HB_TRACE(HB_TR_DEBUG, ("macro -> invalid syntax: %s", HB_MACRO_DATA->string));
-                 hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
-		 YYABORT;
-	       }
-;
+     | Expression error {
+                           HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
+
+                           //printf( "Macro: %s\n", HB_MACRO_DATA->string );
+
+                           hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+                           hb_compExprDelete( $1, HB_MACRO_PARAM );
+
+                           if( hb_compchar == IDENTIFIER && yylval.string )
+                           {
+                              hb_xfree( yylval.string );
+                           }
+
+                           YYABORT;
+                        }
+     | error            {
+                           // This case is when error maybe nested in say a CodeBlock.
+                           HB_TRACE(HB_TR_DEBUG, ("macro -> invalid syntax: %s", HB_MACRO_DATA->string));
+
+                           //printf( "2-Macro: %s\n", HB_MACRO_DATA->string );
+
+                           hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+
+                           while ( s_iPending )
+                           {
+                              hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
+                           }
+
+                           if( hb_compchar == IDENTIFIER && yylval.string )
+                           {
+                              hb_xfree( yylval.string );
+                           }
+
+                           YYABORT;
+                        }
+     ;
 
 /* Numeric values
  */
@@ -298,7 +341,14 @@ SelfValue  : SELF            { $$ = hb_compExprNewSelf(); }
 
 /* Literal array
  */
-Array      : '{' ArgList '}'          { $$ = hb_compExprNewArray( $2 ); }
+Array      : '{' ArgList '}'     {
+                                   $$ = hb_compExprNewArray( $2 );
+
+                                   if( s_iPending && s_Pending[ s_iPending - 1 ] == $2 )
+                                   {
+                                      s_iPending--;
+                                   }
+                                 }
            ;
 
 /* Literal array access
@@ -414,15 +464,34 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
 
 /* Function call
  */
-FunCall    : IDENTIFIER '(' ArgList ')'   { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( $1 ), $3, HB_MACRO_PARAM );
+FunCall    : IDENTIFIER '(' ArgList ')'   {
+                                            $$ = hb_compExprNewFunCall( hb_compExprNewFunName( $1 ), $3, HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( $$ );
+
+                                            if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
+                                            {
+                                               s_iPending--;
+                                            }
                                           }
-           | MacroVar '(' ArgList ')'     { $$ = hb_compExprNewFunCall( $1, $3, HB_MACRO_PARAM );
+           | MacroVar '(' ArgList ')'     {
+                                            $$ = hb_compExprNewFunCall( $1, $3, HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( $$ );
+
+                                            if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
+                                            {
+                                               s_iPending--;
+                                            }
                                           }
 ;
 
-ArgList    : Argument                     { $$ = hb_compExprNewArgList( $1 ); }
+ArgList    : Argument                     {
+                                            $$ = hb_compExprNewArgList( $1 );
+
+                                            if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
+                                            {
+                                               s_Pending[ s_iPending++ ] = $$;
+                                            }
+                                          }
            | ArgList ',' Argument         { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
 
@@ -456,7 +525,14 @@ ObjectData  : NumValue ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 )
 
 /* Object's method
  */
-ObjectMethod : ObjectData '(' ArgList ')'    { $$ = hb_compExprNewMethodCall( $1, $3 ); }
+ObjectMethod : ObjectData '(' ArgList ')'    {
+                                               $$ = hb_compExprNewMethodCall( $1, $3 );
+
+                                               if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
+                                               {
+                                                  s_iPending--;
+                                               }
+                                             }
             ;
 
 SimpleExpression :
@@ -488,8 +564,8 @@ SimpleExpression :
            | ExprRelation                     { $$ = $1; }
 ;
 
-Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ); }
-           | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ); }
+Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ) }
+           | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ) }
 ;
 
 RootParamList : EmptyExpression ',' {
@@ -745,14 +821,41 @@ IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr
            ;
 
 CodeBlock  : '{' '|'
-                  { $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar
-             '|' BlockExpList '}'
-                  { $$ = $<asExpr>3; }
+                  {
+                    $$ = hb_compExprNewCodeBlock();
+
+                    if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
+                    {
+                       s_Pending[ s_iPending++ ] = $$;
+                    }
+                  }
+             BlockNoVar '|' BlockExpList '}'
+                  {
+                    $$ = $<asExpr>3;
+
+                    if( s_iPending && s_Pending[ s_iPending - 1 ] == $$ )
+                    {
+                       s_iPending--;
+                    }
+                  }
            | '{' '|'
-                  { $<asExpr>$ = hb_compExprNewCodeBlock(); }
-             BlockVarList
-             '|' BlockExpList '}'
-                  { $$ = $<asExpr>3; }
+                  {
+                    $$ = hb_compExprNewCodeBlock();
+
+                    if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
+                    {
+                       s_Pending[ s_iPending++ ] = $$;
+                    }
+                  }
+             BlockVarList '|' BlockExpList '}'
+                  {
+                    $$ = $<asExpr>3;
+
+                    if( s_iPending && s_Pending[ s_iPending - 1 ] == $$ )
+                    {
+                       s_iPending--;
+                    }
+                  }
            ;
 
 /* NOTE: This uses $-2 then don't use BlockExpList in other context

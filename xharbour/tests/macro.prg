@@ -1,7 +1,7 @@
 Procedure Main()
 
    LOCAL cMacro := "1, 2, 3"
-   PRIVATE Var 
+   PRIVATE Var
 
    /*
    USE TEST
@@ -11,7 +11,7 @@ Procedure Main()
    */
 
    Var := Test( &cMacro + 4 )
-   ? Var 
+   ? Var
 
 return
 

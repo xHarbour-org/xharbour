@@ -6,8 +6,10 @@ static oChild
 PROCEDURE Main()
 
    LOCAL oErr, oStranger := TSranger()
+   LOCAL oParent := TParent()
 
    oChild := TChild():Create()
+   oParent:ChangeReadOnly( 7 )
 
    oChild:PublicOfChild := "Public is Ok."
 
@@ -60,6 +62,9 @@ CLASS TParent
 
    PRIVATE:
       DATA PrivateOfParent
+
+   PUBLIC:
+   METHOD ChangeReadOnly(x) INLINE ::ReadOnlyOfParent := x
 
 ENDCLASS
 
