@@ -584,13 +584,8 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       aAdd( s_aProcStack[s_nProcStack], Array( nVars, 2 ) )
       FOR nVar := 1 TO nVars
          s_aProcStack[s_nProcStack][4][nVar][1] := s_asLocals[nVar]
-         #ifdef __HARBOUR__
-            s_aProcStack[s_nProcStack][4][nVar][2] := __MVGET( s_asLocals[nVar] )
-            __MVPUT( s_asLocals[nVar], NIL ) // *** Harbour __MXRelease() not working !!!
-         #else
-            s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
-            __MXRelease( s_asLocals[nVar] )
-         #endif
+         s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
+         __MXRelease( s_asLocals[nVar] )
          //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
       NEXT
       aSize( s_asLocals, 0 )
@@ -629,11 +624,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
    /* Releasing Privates created by the Procedure */
    nVars := Len( s_asPrivates )
    FOR nVar := 1 TO nVars
-      #ifdef __HARBOUR__
-         __MVPUT( s_asPrivates[nVar], NIL )
-      #else
-         __MXRelease( s_asPrivates[nVar] )
-      #endif
+      __MXRelease( s_asPrivates[nVar] )
       //Alert( [Released private: ] + s_asPrivates[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
    NEXT
    aSize( s_asPrivates, 0 )
@@ -641,11 +632,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
    /* Releasing Locals created by the Procedure */
    nVars := Len( s_asLocals )
    FOR nVar := 1 TO nVars
-      #ifdef __HARBOUR__
-         __MVPUT( s_asLocals[nVar], NIL )
-      #else
-         __MXRelease( s_asLocals[nVar] )
-      #endif
+      __MXRelease( s_asLocals[nVar] )
       //Alert( [Released local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
    NEXT
    aSize( s_asLocals, 0 )
@@ -659,7 +646,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       FOR nVar := 1 TO nVars
          aAdd( s_asPrivates, s_aProcStack[s_nProcStack][3][nVar][1] )
          #ifdef __HARBOUR__
-            //__QQPub( s_aProcStack[s_nProcStack][3][nVar][1] ) // *** Harbour Var was never released because of bug in __MXRelease() !!!
+            __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
             __MVPUT( s_aProcStack[s_nProcStack][3][nVar][1], s_aProcStack[s_nProcStack][3][nVar][2] )
          #else
             __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
@@ -672,7 +659,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       FOR nVar := 1 TO nVars
          aAdd( s_asLocals, s_aProcStack[s_nProcStack][4][nVar][1] )
          #ifdef __HARBOUR__
-            //__QQPub( s_aProcStack[s_nProcStack][4][nVar][1] ) // *** Harbour Var was never released because of bug in __MXRelease() !!!
+            __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
             __MVPUT( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
          #else
             __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
