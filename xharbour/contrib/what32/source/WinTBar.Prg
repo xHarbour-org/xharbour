@@ -1,15 +1,3 @@
-#define TPM_LEFTBUTTON        0
-#define TPM_CENTERALIGN       4
-#define TPM_RIGHTALIGN        8
-
-#define TPM_TOPALIGN              0
-#define TPM_VCENTERALIGN         16
-#define TPM_BOTTOMALIGN          32
-
-#define TPM_HORIZONTAL            0     // Horz alignment matters more
-#define TPM_VERTICAL             64     // Vert alignment matters more
-#define TPM_NONOTIFY            128     // Don't send any notification msgs
-
 
 // What32.Lib
 // Tollbar class
