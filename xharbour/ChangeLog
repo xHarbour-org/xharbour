@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.512 2002/12/05 01:19:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.513 2002/12/05 20:56:53 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-12-05 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+2002-12-06 01:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    ! Missing Local variable declaration
 
-  * now tbrowse support:
+2002-12-05 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    * now tbrowse support:
 
     * support nTop,nLeft,nRigth,nBottom increase/decrease dynamically
       with automatic adjustment of the width of the columns.
