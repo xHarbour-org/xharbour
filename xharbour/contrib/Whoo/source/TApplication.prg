@@ -26,7 +26,6 @@ CLASS Application
    METHOD Terminate()                            INLINE PostQuitMessage(0)
    METHOD MessageBox( cText, cCaption, nFlags )  INLINE MessageBox( GetActiveWindow(), cText, cCaption, nFlags )
 
-//   METHOD NotifyForms( nMsg, nwParam, nlParam )  INLINE 
 ENDCLASS
 
 METHOD Initialize() CLASS Application

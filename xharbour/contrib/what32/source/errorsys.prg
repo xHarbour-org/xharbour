@@ -7,6 +7,7 @@
 #include "what32.ch"
 #include "windows.ch"
 #include "error.ch"
+#include "debug.ch"
 
 #xtranslate NTRIM( < n > ) = > lTrim( Str( < n > ) )
 #define LOGFILE error.log // don't use quotes
@@ -411,8 +412,12 @@ STATIC FUNCTION DosErrText( n )
      Check that code number is within known upper limit,
      AND that a description is available For it.
    */
-
+/*
    IF ( n > ( Len( desc_ ) - 1 ) ) .OR. ( desc_[ n ] == NIL )
+      n := Len( desc_ )
+   ENDIF
+*/
+   IF ( ( n < 1 ) .OR. n > ( Len( desc_ ) - 1 ) ) .OR. ( desc_[ n ] == NIL )
       n := Len( desc_ )
    ENDIF
 
@@ -467,10 +472,15 @@ STATIC FUNCTION GenCodeText( n )
      Check that code number is within known upper limit,
      AND that a description is available For it.
    */
-
+/*
    IF ( n > ( Len( desc_ ) - 1 ) ) .OR. ( desc_[ n ] == NIL )
       n := Len( desc_ )
    ENDIF
+*/
+   IF ( ( n < 1 ) .OR. n > ( Len( desc_ ) - 1 ) ) .OR. ( desc_[ n ] == NIL )
+      n := Len( desc_ )
+   ENDIF
+
 
    RETURN NTRIM( n ) + ": " + desc_[ n ]
 

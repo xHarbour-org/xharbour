@@ -102,6 +102,8 @@ return(0)
 METHOD CreateSub() CLASS SubForm1
 
    local oBtn
+   local oMask
+   local xRet
 
    ::WindowMenu := TMenu():New()
 
@@ -112,11 +114,18 @@ METHOD CreateSub() CLASS SubForm1
       
    ::SetWindowMenu()
 
-   oBtn := TButton():New( self, 500, 0, 0, 200, 100 )
-   oBtn:Caption := 'Testing a Button'
-   oBtn:Create()
-   oBtn:SetFocus()
-return( 0 )
+   ::AddControl('TestButton', 'button', 'Lets see it',                500,   0,  0, 200, 100 )
+   ::AddControl('TestEdit',     'edit', 'This is an edit control',    501, 210,  0, 200,  20 )
+   ::AddControl('TestCombo','combobox', 'This is a ComboBox control', 502, 210, 30, 200, 100 )
+
+   ::TestButton:SetFocus()
+
+
+   xRet := super:OnCreate()
+   oMask:=oCtrlMask():New( ::TestButton )
+   oMask:Create()
+   
+return( nil )
 
 //----------------------------------
 
