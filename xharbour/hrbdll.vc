@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.50 2004/10/26 20:09:55 oh1 Exp $
+# $Id: hrbdll.vc,v 1.51 2004/11/10 15:23:47 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -463,34 +463,38 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
-  $(OBJ_DIR)\cdpesdos.obj \
-  $(OBJ_DIR)\cdpesmwin.obj \
-  $(OBJ_DIR)\cdpeswin.obj \
-  $(OBJ_DIR)\cdpgedos.obj \
-  $(OBJ_DIR)\cdpgewin.obj \
-  $(OBJ_DIR)\cdpltwin.obj \
-  $(OBJ_DIR)\cdppt850.obj \
-  $(OBJ_DIR)\cdpptiso.obj \
-  $(OBJ_DIR)\cdppl852.obj \
-  $(OBJ_DIR)\cdppliso.obj \
-  $(OBJ_DIR)\cdpplmaz.obj \
-  $(OBJ_DIR)\cdpplwin.obj \
-  $(OBJ_DIR)\cdpru866.obj \
-  $(OBJ_DIR)\cdpruwin.obj \
-  $(OBJ_DIR)\cdprukoi.obj \
-  $(OBJ_DIR)\cdphr852.obj \
-  $(OBJ_DIR)\cdphr1250.obj \
+  $(OBJ_DIR)\cpesdos.obj \
+  $(OBJ_DIR)\cpesmwin.obj \
+  $(OBJ_DIR)\cpeswin.obj \
+  $(OBJ_DIR)\cpgedos.obj \
+  $(OBJ_DIR)\cpgewin.obj \
+  $(OBJ_DIR)\cphr1250.obj \
+  $(OBJ_DIR)\cphr852.obj \
+  $(OBJ_DIR)\cpltwin.obj \
+  $(OBJ_DIR)\cppl852.obj \
+  $(OBJ_DIR)\cppliso.obj \
+  $(OBJ_DIR)\cpplmaz.obj \
+  $(OBJ_DIR)\cpplwin.obj \
+  $(OBJ_DIR)\cppt850.obj \
+  $(OBJ_DIR)\cpptiso.obj \
+  $(OBJ_DIR)\cpru866.obj \
+  $(OBJ_DIR)\cprukoi.obj \
+  $(OBJ_DIR)\cpruwin.obj \
+  $(OBJ_DIR)\cpsl852.obj \
+  $(OBJ_DIR)\cpsliso.obj \
+  $(OBJ_DIR)\cpslwin.obj \
+  $(OBJ_DIR)\cpsrwin.obj \
   $(OBJ_DIR)\uc1250.obj \
   $(OBJ_DIR)\uc1251.obj \
   $(OBJ_DIR)\uc1257.obj \
-#  $(OBJ_DIR)\uc437.obj \
-  $(OBJ_DIR)\uc850.obj \
-  $(OBJ_DIR)\uc852.obj \
-  $(OBJ_DIR)\uc866.obj \
+  $(OBJ_DIR)\uc850.obj  \
+  $(OBJ_DIR)\uc852.obj  \
+  $(OBJ_DIR)\uc866.obj  \
   $(OBJ_DIR)\uc8859_1.obj \
   $(OBJ_DIR)\uc8859_2.obj \
-  $(OBJ_DIR)\uckoi8.obj \
-  $(OBJ_DIR)\ucmaz.obj \
+  $(OBJ_DIR)\uc88591b.obj \
+  $(OBJ_DIR)\uckoi8.obj  \
+  $(OBJ_DIR)\ucmaz.obj
 #
 # hbtip
 #
