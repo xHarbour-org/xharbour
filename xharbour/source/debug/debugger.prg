@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.37 2004/05/07 21:38:41 likewolf Exp $
+ * $Id: debugger.prg,v 1.38 2004/05/08 16:26:18 likewolf Exp $
  */
 
 /*
@@ -332,8 +332,9 @@ CLASS TDebugger
    DATA   aToCursor
    DATA   lNextRoutine INIT .F.
    DATA   oBrwPnt, oWndPnt
-   DATA   lppo INIT .F.    //view preprocessed output
+   DATA   lPPO INIT .F.
    DATA   lRunAtStartup
+   DATA   lLineNumbers INIT .T.
 
    METHOD New()
    METHOD Activate()
@@ -353,6 +354,8 @@ CLASS TDebugger
    METHOD CodeWindowProcessKey( nKey )
    METHOD Colors()
    METHOD CommandWindowProcessKey( nKey )
+   METHOD DoCommand( cCommand )
+   METHOD DoScript( cFileName )
    METHOD EditColor( nColor, oBrwColors )
    METHOD EditSet( nSet, oBrwSets )
    METHOD EditVar( nVar )
@@ -367,6 +370,7 @@ CLASS TDebugger
    METHOD InputBox( cMsg, uValue, bValid, lEditable )
    METHOD Inspect( uValue, cValueName )
    METHOD IsBreakPoint( nLine, cPrgName )
+   METHOD LoadColors()
    METHOD LoadSettings()
    METHOD LoadVars()
    METHOD LoadCallStack()
@@ -380,15 +384,16 @@ CLASS TDebugger
 //   METHOD Resume() INLINE IIF( LEN(::aCallStack[1])>0, ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] ), NIL)
    METHOD Resume() INLINE ::ShowCodeLine( 1 )
    METHOD OSShell()
-   METHOD PathForFiles()
+   METHOD PathForFiles( cPathForFiles )
 
    METHOD PrevWindow()
    METHOD Private()
    METHOD Public()
    METHOD Quit() INLINE ::Exit(), ::Hide(), s_lExit := .T., s_oDebugger := NIL, __QUIT()
+   METHOD RefreshVars()
    METHOD RestoreAppStatus()
    METHOD RestoreSettings()
-   METHOD RunAtStartup() INLINE ::lRunAtStartup := !::lRunAtStartup
+   METHOD RunAtStartup() INLINE ::lRunAtStartup := ::oPullDown:GetItemByIdent( "ALTD" ):checked := !::lRunAtStartup
    METHOD SaveAppStatus()
    METHOD SaveSettings()
    METHOD Show()
@@ -425,17 +430,17 @@ CLASS TDebugger
 
    METHOD ToCursor()
    METHOD NextRoutine()
-   METHOD CodeblockTrace() INLINE ::lCBTrace := ! ::lCBTrace
+   METHOD CodeblockTrace() INLINE ::oPullDown:GetItemByIdent( "CODEBLOCK" ):checked := ::lCBTrace := ! ::lCBTrace
    METHOD ViewSets()
    METHOD WndVarsLButtonDown( nMRow, nMCol )
-   METHOD LineNumbers()          // Toggles numbering of source code lines
+   METHOD LineNumbers( lLineNumbers ) // Toggles numbering of source code lines
    METHOD Locate()
    METHOD FindNext()
    METHOD FindPrevious()
    METHOD RemoveWindow()
    METHOD SearchLine()
-   METHOD ToggleAnimate() INLINE ::lAnimate := ! ::lAnimate
-   METHOD ToggleCaseSensitive() INLINE ::lCaseSensitive := ! ::lCaseSensitive
+   METHOD ToggleAnimate() INLINE ::oPullDown:GetItemByIdent( "ANIMATE" ):checked := ::lAnimate := ! ::lAnimate
+   METHOD ToggleCaseSensitive() INLINE ::oPullDown:GetItemByIdent( "CASE" ):checked := ::lCaseSensitive := ! ::lCaseSensitive
    METHOD ShowWorkAreas() INLINE __dbgShowWorkAreas( Self )
 
    METHOD TracepointAdd( cExpr )
@@ -495,20 +500,9 @@ METHOD New() CLASS TDebugger
    ::lSortVars         := .f.
    ::cSettingsFileName := "init.cld"
    ::lRunAtStartup     := .t. //Clipper compatible
-
-   if File( ::cSettingsFileName )
-      ::LoadSettings()
-   endif
-   ::lGo := ::lRunAtStartup
+   ::lGo               := ::lRunAtStartup
 
    ::oPullDown      := __dbgBuildMenu( Self )
-   ::oPullDown:GetItemByIdent( "ALTD" ):Checked := ::lRunAtStartup
-   ::oPullDown:GetItemByIdent( "PUBLIC" ):Checked := ::lShowPublics
-   ::oPullDown:GetItemByIdent( "PRIVATE" ):Checked := ::lShowPrivates
-   ::oPullDown:GetItemByIdent( "STATIC" ):Checked := ::lShowStatics
-   ::oPullDown:GetItemByIdent( "LOCAL" ):Checked := ::lShowLocals
-   ::oPullDown:GetItemByIdent( "ALL" ):Checked := ;
-      ::lShowPublics .AND. ::lShowPrivates .AND. ::lShowStatics .AND. ::lShowLocals
 
    ::oWndCode       := TDbWindow():New( 1, 0, MaxRow() - 6, MaxCol() )
    ::oWndCode:Cargo       := { ::oWndCode:nTop, ::oWndCode:nLeft }
@@ -523,16 +517,13 @@ METHOD New() CLASS TDebugger
    ::BuildCommandWindow()
    ::BuildBrowseStack()
 
-return Self
-
-METHOD PathForFiles() CLASS TDebugger
-
-   ::cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
-   IF ! RIGHT(::cPathForFiles,1) $ HB_OSPATHDELIMITERS()
-     ::cPathForFiles:=::cPathForFiles + HB_OSPATHSEPARATOR()
-   ENDIF
+   if File( ::cSettingsFileName )
+      ::LoadSettings()
+   endif
+   ::lGo := ::lRunAtStartup
 
 return Self
+
 
 METHOD Activate() CLASS TDebugger
 
@@ -562,7 +553,7 @@ METHOD All() CLASS TDebugger
    ::lShowPublics := ::lShowPrivates := ::lShowStatics := ;
    ::lShowLocals := ::lAll := ! ::lAll
 
-   iif( ::lAll, ( ::LoadVars(), ::ShowVars() ), ::HideVars() )
+   ::RefreshVars()  
 
 return nil
 
@@ -761,6 +752,7 @@ METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
 
 return nil
 
+
 METHOD Colors() CLASS TDebugger
 
    local oWndColors := TDbWindow():New( 4, 5, 16, MaxCol() - 5,;
@@ -771,7 +763,6 @@ METHOD Colors() CLASS TDebugger
 
    local oBrwColors := TBrowseNew( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
                                  oWndColors:nBottom - 1, oWndColors:nRight - 1 )
-   local n := 1
    local nWidth := oWndColors:nRight - oWndColors:nLeft - 1
    local oCol
 
@@ -803,16 +794,10 @@ METHOD Colors() CLASS TDebugger
                                { || ::EditColor( oBrwColors:Cargo[1], oBrwColors ) } ) }
    oWndColors:ShowModal()
 
-   ::oPullDown:LoadColors()
-   ::oPullDown:Refresh()
-   ::BarDisplay()
+   ::LoadColors()
 
-   for n := 1 to Len( ::aWindows )
-      ::aWindows[ n ]:LoadColors()
-      ::aWindows[ n ]:Refresh()
-   next
+RETURN NIL
 
-return nil
 
 METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
@@ -853,65 +838,9 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
               AAdd( ::aLastCommands, cCommand )
               ::nCommand++
               ::oWndCommand:ScrollUp( 1 )
+              ::DoCommand( cCommand )
            endif
 
-           do case
-              case Empty( cCommand )
-                 lDisplay = .f.
-
-              case SubStr( LTrim( cCommand ), 1, 2 ) == "??" .or. ;
-                       SubStr( LTrim( cCommand ), 1, 1 ) == "?"
-                 lDisplay := !Empty( cResult := DoCommand( Self,cCommand ) )
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "ANIM" .or. ;
-                   Upper( SubStr( LTrim( cCommand ), 1, 7 ) ) == "ANIMATE"
-                 ::lAnimate = .t.
-                 ::Animate()
-                 SetCursor( SC_NORMAL )
-                 lDisplay = .f.
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 3 ) ) == "DOS"
-                 ::OsShell()
-                 SetCursor( SC_NORMAL )
-                 lDisplay = .f.
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "HELP"
-                 ::ShowHelp()
-                 lDisplay = .f.
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "QUIT"
-                 ::Quit()
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 6 ) ) == "OUTPUT"
-                 SetCursor( SC_NONE )
-                 ::ShowAppScreen()
-                 SetCursor( SC_NORMAL )
-                 lDisplay = .f.
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 3 ) ) == "WP "
-                 //add watchpoint
-                 ::WatchpointAdd( SUBSTR( LTRIM(cCommand), 3 ) )
-                 lDisplay = .f.
-
-              case Upper( SubStr( LTrim( cCommand ), 1, 3 ) ) == "TP "
-                 //add tracepoint
-                 ::TracepointAdd( SUBSTR( LTRIM(cCommand), 3 ) )
-                 lDisplay = .f.
-
-              otherwise
-                 cResult = "Command error"
-                 lDisplay = .t.
-
-           endcase
-
-           DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1,;
-              Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 1 ),;
-              __DbgColors()[ 2 ] )
-           if lDisplay
-              DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 3,;
-                         cResult, __DbgColors()[ 2 ] )
-              ::oWndCommand:ScrollUp( 1 )
-           endif
            DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, "> ",;
               __DbgColors()[ 2 ] )
            cCommand := Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 3 )
@@ -921,10 +850,214 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            ::oGetListCommand:oGet:Display()
 
       otherwise
-      ::oGetListCommand:GetApplyKey( nKey )
+           ::oGetListCommand:GetApplyKey( nKey )
    endcase
 
 return nil
+
+
+/*
+ * ?? <expr>
+ *      displays inspect window with value or display nothing on error
+ * ? <expr>
+ *      displays either result or error description in command window
+ */
+METHOD DoCommand( cCommand ) CLASS TDebugger
+   LOCAL aCmnd
+   LOCAL cParam, cParam1 := ""
+   LOCAL cResult
+   LOCAL lValid
+   LOCAL n
+
+   cCommand := ALLTRIM( cCommand )
+   aCmnd := { NIL, NIL, NIL }
+   
+   DO CASE
+      CASE Empty( cCommand )
+         RETURN ""
+
+      CASE starts( cCommand, "??" )
+         cParam := AllTrim( SUBSTR( cCommand, 3 ) )
+         cCommand := "??"
+
+      CASE starts( cCommand, "?" )
+         cParam := SUBSTR( cCommand, 2 )
+         cCommand := "?"
+
+      OTHERWISE
+         IF ( n := At( " ", cCommand ) ) > 0
+            cParam := AllTrim( SubStr( cCommand, n + 1 ) )
+            cCommand := Left( cCommand, n - 1 )
+         ENDIF
+         cCommand := Upper( cCommand )
+
+   ENDCASE
+
+   DO CASE
+      CASE cCommand == "??" .OR. cCommand == "?"
+         aCmnd[WP_TYPE] := cCommand
+         aCmnd[WP_EXPR] := cParam
+         cResult := CreateExpression( cParam, aCmnd )
+         IF( EMPTY(cResult) )
+            //valid syntax
+            cResult := GetWatchValue( aCmnd, @lValid )
+            IF( aCmnd[WP_TYPE] == "??" )
+               IF( lValid )
+                  ::Inspect( aCmnd[WP_EXPR], cResult )
+               ENDIF
+               cResult := ''  //discard result
+            ELSE
+               IF( lValid )
+                  cResult := ValToStr( cResult )
+               ENDIF
+            ENDIF
+         ELSE
+            IF( aCmnd[WP_TYPE] == "??" )
+               cResult := ''  //ignore error
+            ENDIF
+         ENDIF
+
+     CASE starts( "ANIMATE", cCommand )
+        IF ::lActive
+           ::lAnimate = .t.
+           ::Animate()
+           SetCursor( SC_NORMAL )
+        ENDIF
+
+     CASE starts( "BP", cCommand )
+        IF !Empty( cParam )
+           AAdd( ::aBreakPoints, ;
+                 { Val( cParam ), ;
+                   strip_path( SubStr( cParam, RAt( " ", cParam ) + 1 ) ) } )
+        ELSE
+           ::ToggleBreakPoint()
+        ENDIF
+
+     CASE starts( "DOS", cCommand )
+        ::OsShell()
+        SetCursor( SC_NORMAL )
+
+     CASE starts( "HELP", cCommand )
+        ::ShowHelp()
+
+     CASE starts( "MONITOR", cCommand )
+        cParam := Upper( cParam )
+        DO CASE
+           CASE starts( "LOCAL", cParam )
+              ::Local()
+           CASE starts( "PRIVATE", cParam )
+              ::Private()
+           CASE starts( "PUBLIC", cParam )
+              ::Public()
+           CASE starts( "SORT", cParam )
+              ::Sort()
+           CASE starts( "STATIC", cParam )
+              ::Static()
+           OTHERWISE
+              cResult := "Command error"
+         ENDCASE
+
+      CASE starts( "NUM", cCommand )
+         IF Upper( cParam ) == "OFF"
+            ::LineNumbers( .F. )
+         ELSEIF Upper( cParam ) == "ON"
+            ::LineNumbers( .T. )
+         ELSE
+            cResult := "Command error"
+         ENDIF
+        
+      CASE starts( "OPTIONS", cCommand )
+         IF ( n := At( " ", cParam ) ) > 0
+            cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
+            cParam := Left( cParam, n - 1 )
+         ENDIF
+         cParam := Upper( cParam )
+         DO CASE
+            CASE starts( "COLORS", cParam )
+               IF Empty( cParam1 )
+                  ::Colors()
+               ELSE
+                  cParam1 := SubStr( cParam1, At( "{", cParam1 ) + 1 )
+                  FOR n := 1 TO 11
+                     IF At( ",", cParam1 ) != 0
+                        ::aColors[ n ] := ;
+                           StrTran( Left( cParam1, At( ",", cParam1 ) - 1 ), '"', "" )
+                        cParam1 := SubStr( cParam1, At( ",", cParam1 ) + 1 )
+                     ELSE
+                        ::aColors[ n ] := ;
+                           StrTran( Left( cParam1, At( "}", cParam1 ) - 1 ), '"', "" )
+                     ENDIF
+                  NEXT
+                  ::LoadColors()
+               ENDIF
+            CASE starts( "NORUNATSTARTUP", cParam )
+               ::lRunAtStartup := .f.
+            CASE starts( "PATH", cParam )
+               ::PathForFiles( AllTrim( cParam1 ) )
+            CASE starts( "TAB", cParam )
+               ::nTabWidth = Val( Left( cParam1, 3 ) )
+            OTHERWISE
+               cResult := "Command error"
+         ENDCASE
+
+      CASE starts( "OUTPUT", cCommand )
+        
+        SetCursor( SC_NONE )
+        ::ShowAppScreen()
+        SetCursor( SC_NORMAL )
+
+     CASE starts( "QUIT", cCommand )
+        ::Quit()
+
+     CASE starts( "TP", cCommand )
+        ::TracepointAdd( cParam )
+
+     CASE starts( "VIEW", cCommand )
+        IF !Empty( cParam ) .AND. starts( "CALLSTACK", Upper( cParam ) )
+           ::Stack()
+        ELSE
+           cResult := "Command error"
+        ENDIF
+
+     CASE starts( "WP", cCommand )
+        ::WatchpointAdd( cParam )
+
+     OTHERWISE
+        cResult := "Command error"
+
+   ENDCASE
+
+   IF ::lActive   
+      DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, ;
+                 Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 1 ), ;
+                 __DbgColors()[ 2 ] )
+      IF !Empty( cResult )
+         DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 3, ;
+                     cResult, __DbgColors()[ 2 ] )
+         ::oWndCommand:ScrollUp( 1 )
+      ENDIF
+   ENDIF
+
+RETURN cResult
+
+
+METHOD DoScript( cFileName ) CLASS TDebugger
+
+   local cInfo
+   local n, cLine, nLen
+
+   IF File( cFileName )
+      cInfo := MemoRead( cFileName )
+      nLen := MLCount( cInfo, , , .F. )
+      for n := 1 to nLen
+         /* Dreadful MemoLine() limit is 254. It often cuts the end of the PATH */
+         cLine := MemoLine( cInfo, 254, n, , .F. )
+         ::DoCommand( cLine )
+      next
+   ENDIF
+
+RETURN NIL   
+
 
 METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
 
@@ -1260,23 +1393,34 @@ METHOD Hide() CLASS TDebugger
 
 return nil
 
-METHOD MonoDisplay() CLASS TDebugger
 
-   local n
-
-   ::lMonoDisplay := ! ::lMonoDisplay
+METHOD LoadColors() CLASS TDebugger
+  
+   LOCAL n
 
    ::oPullDown:LoadColors()
-   ::oPullDown:Refresh()
-
-   ::BarDisplay()
-
+   IF ::lActive
+      ::oPullDown:Refresh()
+      ::BarDisplay()
+   ENDIF
    for n := 1 to Len( ::aWindows )
       ::aWindows[ n ]:LoadColors()
-      ::aWindows[ n ]:Refresh()
+      IF ::lActive
+         ::aWindows[ n ]:Refresh()
+      ENDIF
    next
+ 
+RETURN NIL
+
+
+METHOD MonoDisplay() CLASS TDebugger
+
+   ::lMonoDisplay := ! ::lMonoDisplay
+   ::oPullDown:GetItemByIdent( "MONO" ):checked := ::lMonoDisplay
+   ::LoadColors()
 
 return nil
+
 
 METHOD NextWindow() CLASS TDebugger
 
@@ -1299,6 +1443,20 @@ METHOD NextWindow() CLASS TDebugger
    endif
 
 return nil
+
+
+METHOD PathForFiles( cPathForFiles ) CLASS TDebugger
+
+   IF cPathForFiles == NIL  
+      cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
+   ENDIF
+   IF ! RIGHT(cPathForFiles, 1) $ HB_OSPATHDELIMITERS()
+     cPathForFiles += HB_OSPATHSEPARATOR()
+   ENDIF
+   ::cPathForFiles := cPathForFiles
+
+RETURN Self
+
 
 METHOD PrevWindow() CLASS TDebugger
 
@@ -1434,66 +1592,10 @@ RETURN NIL
 
 METHOD LoadSettings() CLASS TDebugger
 
-   local cInfo := MemoRead( ::cSettingsFileName )
-   local n, cLine, nColor, nLen
-
-   nLen := MLCount( cInfo )
-   for n := 1 to nLen
-      cLine := MemoLine( cInfo, 120, n )
-      do case
-         case Upper( SubStr( cLine, 1, 14 ) ) == "OPTIONS COLORS"
-            cLine := SubStr( cLine, At( "{", cLine ) + 1 )
-            nColor := 1
-            while nColor < 12
-               if At( ",", cLine ) != 0
-                  ::aColors[ nColor ] := ;
-                     StrTran( SubStr( cLine, 1, At( ",", cLine ) - 1 ), '"', "" )
-                  cLine := SubStr( cLine, At( ",", cLine ) + 1 )
-               else
-                  ::aColors[ nColor ] := ;
-                     StrTran( SubStr( cLine, 1, At( "}", cLine ) - 1 ), '"', "" )
-               endif
-               nColor++
-            end
-
-         case Upper( SubStr( cLine, 1, 11 ) ) == "OPTIONS TAB"
-            cLine = SubStr( cLine, 12, 3 )
-            ::nTabWidth = Val( cLine )
-
-         case Upper( SubStr( cLine, 1, 12 ) ) == "OPTIONS PATH"
-            cLine = SubStr( cLine, 13, 120 )
-            ::cPathForFiles = AllTrim( cLine )
-
-         case Upper( SubStr( cLine, 1, 22 ) ) == "OPTIONS NORUNATSTARTUP"
-            ::lRunAtStartup := .f.
-
-         case Upper( SubStr( cLine, 1, 14 ) ) == "MONITOR STATIC"
-            ::lShowStatics = .t.
-
-         case Upper( SubStr( cLine, 1, 14 ) ) == "MONITOR PUBLIC"
-            ::lShowPublics = .t.
-
-         case Upper( SubStr( cLine, 1, 13 ) ) == "MONITOR LOCAL"
-            ::lShowLocals = .t.
-
-         case Upper( SubStr( cLine, 1, 15 ) ) == "MONITOR PRIVATE"
-            ::lShowPrivates = .t.
-
-         case Upper( SubStr( cLine, 1, 12 ) ) == "MONITOR SORT"
-            ::lSortVars = .t.
-
-         case Upper( SubStr( cLine, 1, 14 ) ) == "VIEW CALLSTACK"
-            ::lShowCallStack = .t.
-
-         case Upper( SubStr( cLine, 1,  2 ) ) == "BP"
-            AAdd( ::aBreakPoints, ;
-                  { Val( SubStr( cLine, 4, RAt( " ", cLine ) - 4 ) ), ;
-                    strip_path( SubStr( cLine, RAt( " ", cLine ) ) ) } )
-
-      endcase
-   next
+   ::DoScript( ::cSettingsFileName )
 
 return nil
+
 
 METHOD LoadVars() CLASS TDebugger // updates monitored variables
 
@@ -1564,6 +1666,24 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
    endif
 
 return nil
+
+
+METHOD RefreshVars() CLASS TDebugger
+   ::oPulldown:GetItemByIdent( "LOCAL" ):checked := ::lShowLocals
+   ::oPulldown:GetItemByIdent( "PRIVATE" ):checked := ::lShowPrivates
+   ::oPulldown:GetItemByIdent( "PUBLIC" ):checked := ::lShowPublics
+   ::oPulldown:GetItemByIdent( "STATIC" ):checked := ::lShowStatics
+   ::oPulldown:GetItemByIdent( "ALL" ):checked := ::lAll
+   IF ::lActive
+      if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
+         ::LoadVars()
+         ::ShowVars()
+      else
+         ::HideVars()
+      endif
+   ENDIF
+RETURN NIL
+
 
 METHOD ShowHelp( nTopic ) CLASS TDebugger
 
@@ -1675,6 +1795,7 @@ METHOD ShowVars() CLASS TDebugger
          lRepaint := .t.
       else
          ::oBrwVars:RefreshAll():ForceStable()
+         ::oWndVars:Refresh()
       endif
       if ! ::oWndVars:lVisible .OR. lRepaint
          ::ResizeWindows( ::oWndVars )
@@ -1774,7 +1895,8 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
                ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
                                              ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
                                              __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                                             __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
+                                             __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
+                                             ::lLineNumbers )
 
                ::oWndCode:Browser := ::oBrwText
 
@@ -1816,7 +1938,8 @@ METHOD Open() CLASS TDebugger
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
                    ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cFileName,;
                    __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
+                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
+                   ::lLineNumbers )
       ::oWndCode:Browser := ::oBrwText
       ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
       ::oWndCode:SetCaption( ::cPrgName )
@@ -1849,12 +1972,14 @@ METHOD OpenPPO() CLASS TDebugger
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
         ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPrgName,;
         __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
+        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ::lLineNumbers )
       ::oWndCode:Browser := ::oBrwText
       ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
       ::oWndCode:SetCaption( ::cPrgName )
       ::oWndCode:Refresh()// to force the window caption to update
    endif
+
+   ::oPullDown:GetItemByIdent( "PPO" ):checked := ::lPPO
 
 return lSuccess
 
@@ -2076,42 +2201,26 @@ METHOD GotoLine( nLine ) CLASS TDebugger
 
 return nil
 
+
 METHOD Local() CLASS TDebugger
 
    ::lShowLocals := ! ::lShowLocals
-
-   if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
-      ::LoadVars()
-      ::ShowVars()
-   else
-      ::HideVars()
-   endif
-
+   ::RefreshVars()
+   
 return nil
+
 
 METHOD Private() CLASS TDebugger
 
    ::lShowPrivates := ! ::lShowPrivates
-
-   if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
-      ::LoadVars()
-      ::ShowVars()
-   else
-      ::HideVars()
-   endif
+   ::RefreshVars()
 
 return nil
 
 METHOD Public() CLASS TDebugger
 
    ::lShowPublics := ! ::lShowPublics
-
-   if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
-      ::LoadVars()
-      ::ShowVars()
-   else
-      ::HideVars()
-   endif
+   ::RefreshVars()
 
 return nil
 
@@ -2135,15 +2244,7 @@ METHOD RestoreSettings() CLASS TDebugger
 
    if LastKey() != K_ESC
       ::LoadSettings()
-
-      ::oPullDown:LoadColors()
-      ::oPullDown:Refresh()
-      ::BarDisplay()
       ::ShowVars()
-      for n := 1 to Len( ::aWindows )
-        ::aWindows[ n ]:LoadColors()
-        ::aWindows[ n ]:Refresh()
-      next
    endif
 
 return nil
@@ -2231,9 +2332,13 @@ METHOD SaveSettings() CLASS TDebugger
          cInfo += "View CallStack" + HB_OsNewLine()
       endif
 
+      if ! ::lLineNumbers
+         cInfo += "Num Off" + HB_OsNewLine()
+      endif
+
       if ! Empty( ::aBreakPoints )
          for n := 1 to Len( ::aBreakPoints )
-            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ] ) ) + " " + ;
+            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ], , 0 ) ) + " " + ;
                      AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
          next
       endif
@@ -2245,10 +2350,14 @@ return nil
 
 METHOD Stack() CLASS TDebugger
 
-   if ::lShowCallStack := ! ::lShowCallStack
-      ::ShowCallStack()
-   else
-      ::HideCallStack()
+   ::lShowCallStack := ! ::lShowCallStack  
+   ::oPulldown:GetItemByIdent( "CALLSTACK" ):checked := ::lShowCallStack
+   if ::lActive
+      if ::lShowCallStack
+         ::ShowCallStack()
+      else
+         ::HideCallStack()
+      endif
    endif
 
 return nil
@@ -2256,13 +2365,7 @@ return nil
 METHOD Static() CLASS TDebugger
 
    ::lShowStatics := ! ::lShowStatics
-
-   ::LoadVars()
-   if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
-      ::ShowVars()
-   else
-      ::HideVars()
-   endif
+   ::RefreshVars()
 
 return nil
 
@@ -2274,6 +2377,10 @@ METHOD ToggleBreakPoint() CLASS TDebugger
   local nAt
   LOCAL cLine
   local cFileName
+
+  IF !::lActive
+    RETURN NIL
+  ENDIF
 
   cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
   IF ::oBrwText:lLineNumbers
@@ -2465,10 +2572,15 @@ static function ValToStr( uVal )
 
 return cResult
 
-METHOD LineNumbers() CLASS TDebugger
+METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 
-   ::oBrwText:lLineNumbers := !::oBrwText:lLineNumbers
-   ::oBrwText:RefreshAll()
+   If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
+   ::lLineNumbers := lLineNumbers
+   ::oPulldown:GetItemByIdent( "LINE" ):checked := ::lLineNumbers
+   IF ::oBrwText != NIL
+      ::oBrwText:lLineNumbers := lLineNumbers
+      ::oBrwText:RefreshAll()
+   ENDIF
 
 return Self
 
@@ -3193,50 +3305,6 @@ return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
        iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;
        Len(oBrwSets:cargo[ 2 ][ 1 ]) - oBrwSets:cargo[ 1 ], nPos ) )
 
-/*
- * ?? <expr>
- *      displays inspect window with value or display nothing on error
- * ? <expr>
- *      displays either result or error description in command window
- */
-static function DoCommand( o,cCommand )
-   LOCAL aCmnd
-   LOCAL cResult
-   LOCAL lValid
-
-   cCommand := ALLTRIM( cCommand )
-   aCmnd := { NIL, NIL, NIL }
-   IF( Left( cCommand, 2 ) == "??" )
-      cCommand := SUBSTR( cCommand, 3 )
-      aCmnd[WP_TYPE] := "??"
-
-   ELSEIF( Left( cCommand, 1 ) == "?" )
-      cCommand := SUBSTR( cCommand, 2 )
-      aCmnd[WP_TYPE] := "?"
-   ENDIF
-   aCmnd[WP_EXPR] := cCommand
-   cResult := CreateExpression( cCommand, aCmnd )
-   IF( EMPTY(cResult) )
-      //valid syntax
-      cResult := GetWatchValue( aCmnd, @lValid )
-      IF( aCmnd[WP_TYPE] == "??" )
-         IF( lValid )
-            o:Inspect( aCmnd[WP_EXPR], cResult )
-         ENDIF
-         cResult := ''  //discard result
-      ELSE
-         IF( lValid )
-            cResult := ValToStr( cResult )
-         ENDIF
-      ENDIF
-   ELSE
-      IF( aCmnd[WP_TYPE] == "??" )
-         cResult := ''  //ignore error
-      ENDIF
-   ENDIF
-
-RETURN cResult
-
 
 static function PathToArray( cList )
 
@@ -3257,13 +3325,19 @@ static function PathToArray( cList )
 
       aadd( aList, cList )              // Add final element
 
+      /* Strip ending delimiters */
       AEval(aList, {|x, i| if( x[-1] $ cDirSep,  aList[ i ] := Left( x, Len( x ) - 1 ), ) } )
    endif
 
 return aList
 
 
-// Strip path from filename
+/* Check if a string starts with another string */
+STATIC FUNCTION starts( cLine, cStart )
+RETURN ( cStart == Left( cLine, Len( cStart ) ) )
+
+
+/* Strip path from filename */
 STATIC FUNCTION strip_path( cFileName )
   LOCAL cName := "", cExt := ""
   DEFAULT cFileName TO ""

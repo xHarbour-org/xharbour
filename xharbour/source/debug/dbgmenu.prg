@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.5 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.6 2004/05/08 16:26:18 likewolf Exp $
  */
 
 /*
@@ -55,9 +55,9 @@
 #xcommand MENU [<oMenu>] => [ <oMenu> := ] TDbMenu():New()
 #xcommand MENUITEM [ <oMenuItem> PROMPT ] <cPrompt> ;
           [ IDENT <nIdent> ] [ ACTION <uAction,...> ] ;
-          [ <checked: CHECK, CHECKED> ] => ;
+          [ CHECKED <bChecked> ] => ;
    [ <oMenuItem> := ] TDbMenu():AddItem( TDbMenuItem():New( <cPrompt>,;
-   [{|Self|<uAction>}], [<.checked.>], [<nIdent>] ) )
+   [{|Self|<uAction>}], [<bChecked>], [<nIdent>] ) )
 #xcommand SEPARATOR => TDbMenu():AddItem( TDbMenuItem():New( "-" ) )
 #xcommand ENDMENU => ATail( TDbMenu():aMenus ):Build()
 
@@ -90,8 +90,9 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
          MENUITEM " ~Previous"        ACTION oDebugger:FindPrevious()
          MENUITEM " ~Goto line..."    ACTION oDebugger:SearchLine()
          SEPARATOR
-         MENUITEM oCaseSensitive PROMPT " ~Case sensitive " ;
-            ACTION ( oDebugger:ToggleCaseSensitive(), oCaseSensitive:Toggle() )
+         MENUITEM oCaseSensitive PROMPT " ~Case sensitive " IDENT "CASE" ;
+            ACTION oDebugger:ToggleCaseSensitive() ;
+            CHECKED oDebugger:lCaseSensitive
       ENDMENU
 
       MENUITEM " ~View "
@@ -100,14 +101,16 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
          MENUITEM " ~WorkAreas   F6"  ACTION oDebugger:ShowWorkAreas()
          MENUITEM " ~App Screen  F4 " ACTION oDebugger:ShowAppScreen()
          SEPARATOR
-         MENUITEM oCallStack PROMPT " ~CallStack" ;
-            ACTION ( oDebugger:Stack(), oCallStack:Toggle() )
+         MENUITEM oCallStack PROMPT " ~CallStack" IDENT "CALLSTACK";
+            ACTION oDebugger:Stack() ;
+            CHECKED oDebugger:lShowCallStack
       ENDMENU
 
       MENUITEM " ~Run "
       MENU
-         MENUITEM " ~Animate" ;
-            ACTION ( oDebugger:ToggleAnimate(), oDebugger:Animate() )
+         MENUITEM " ~Animate" IDENT "ANIMATE" ;
+            ACTION oDebugger:ToggleAnimate() ;
+            CHECKED oDebugger:lAnimate
          MENUITEM " ~Step              F8 " ACTION oDebugger:Step()
          MENUITEM " ~Trace            F10"  ACTION oDebugger:Trace()
          MENUITEM " ~Go                F5"  ACTION oDebugger:Go()
@@ -128,22 +131,25 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
       MENUITEM " ~Monitor "
       MENU
          MENUITEM oPublic PROMPT " ~Public" IDENT "PUBLIC" ;
-            ACTION ( oDebugger:Public(), oPublic:Toggle() )
+            ACTION oDebugger:Public() ;
+            CHECKED oDebugger:lShowPublics
 
          MENUITEM oPrivate PROMPT " pri~Vate " IDENT "PRIVATE" ;
-            ACTION ( oDebugger:Private(), oPrivate:Toggle() )
-
+            ACTION oDebugger:Private() ;
+            CHECKED oDebugger:lShowPrivates
+            
          MENUITEM oStatic PROMPT " ~Static" IDENT "STATIC" ;
-            ACTION ( oDebugger:Static(), oStatic:Toggle() )
-
+            ACTION oDebugger:Static() ;
+            CHECKED oDebugger:lShowStatics
+           
          MENUITEM oLocal PROMPT " ~Local" IDENT "LOCAL" ;
-            ACTION ( oDebugger:Local(), oLocal:Toggle() )
-
+            ACTION oDebugger:Local() ;
+            CHECKED oDebugger:lShowLocals
+            
          SEPARATOR
          MENUITEM oAll PROMPT " ~All" IDENT "ALL" ;
-            ACTION ( oDebugger:All(), oAll:Toggle(),;
-                     oPublic:lChecked := oPrivate:lChecked := oStatic:lChecked := ;
-                     oLocal:lChecked := oAll:lChecked )
+            ACTION oDebugger:All() ;
+            CHECKED oDebugger:lAll
 
          MENUITEM " s~Ort" ACTION oDebugger:Sort()
       ENDMENU
@@ -151,21 +157,26 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
       MENUITEM " ~Options "
       MENU
          MENUITEM oPPo PROMPT " ~Preprocessed Code" IDENT "PPO" ;
-            ACTION IIF( oDebugger:OpenPPO(), oPPo:Toggle(), NIL )
-         MENUITEM oLineNumbers PROMPT " ~Line Numbers" ;
-            ACTION ( oDebugger:LineNumbers(), oLineNumbers:Toggle() ) CHECKED
+            ACTION oDebugger:OpenPPO() ;
+            CHECKED oDebugger:lPPO
+         MENUITEM oLineNumbers PROMPT " ~Line Numbers" IDENT "LINE" ;
+            ACTION oDebugger:LineNumbers() ;
+            CHECKED oDebugger:lLineNumbers
          MENUITEM " ~Exchange Screens"      ACTION oDebugger:NotSupported()
          MENUITEM " swap on ~Input"         ACTION oDebugger:NotSupported()
-         MENUITEM oCBTrace PROMPT " code~Block Trace" ;
-            ACTION ( oDebugger:CodeblockTrace(), oCBTrace:Toggle() ) CHECKED
+         MENUITEM oCBTrace PROMPT " code~Block Trace" IDENT "CODEBLOCK" ;
+            ACTION oDebugger:CodeblockTrace() ;
+            CHECKED oDebugger:lCBTrace
          MENUITEM " ~Menu Bar"              ACTION oDebugger:NotSupported()
-         MENUITEM oMonoDisplay PROMPT " mono ~Display" ;
-            ACTION ( oDebugger:MonoDisplay(), oMonoDisplay:Toggle() )
+         MENUITEM oMonoDisplay PROMPT " mono ~Display" IDENT "MONO";
+            ACTION oDebugger:MonoDisplay() ;
+            CHECKED oDebugger:lMonoDisplay
          MENUITEM " ~Colors..."             ACTION oDebugger:Colors()
          MENUITEM " ~Tab Width..."          ACTION oDebugger:TabWidth()
          MENUITEM " path for ~Files..."     ACTION oDebugger:PathForFiles()
          MENUITEM oRunAtStartup PROMPT " R~un at startup" IDENT "ALTD" ;
-            ACTION ( oDebugger:RunAtStartup(), oRunAtStartup:Toggle() ) CHECKED
+            ACTION oDebugger:RunAtStartup() ;
+            CHECKED oDebugger:lRunAtStartup
          SEPARATOR
          MENUITEM " ~Save Settings..."      ACTION oDebugger:SaveSettings()
          MENUITEM " ~Restore Settings... "  ACTION oDebugger:RestoreSettings()

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.9 2004/04/21 01:18:16 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.10 2004/04/22 12:01:35 likewolf Exp $
  */
 
 /*
@@ -96,16 +96,17 @@ CLASS TBrwText FROM HBEditor
 ENDCLASS
 
 
-METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor) CLASS TBrwText
+METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS TBrwText
 
    DEFAULT cColor TO SetColor()
+   DEFAULT lLineNumbers TO .T.
 
    ::cFileName := cFileName
    ::nActiveLine := 1
 
    ::aBreakPoints := {}
 
-   ::lLineNumbers := .T.
+   ::lLineNumbers := lLineNumbers
 
    Super:New("", nTop, nLeft, nBottom, nRight, .T.)
    Super:SetColor(cColor)
