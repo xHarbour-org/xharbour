@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.46 2003/07/06 19:53:54 lculik Exp $
+ * $Id: itemapi.c,v 1.47 2003/07/07 01:49:16 jonnymind Exp $
  */
 
 /*
@@ -1737,7 +1737,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, LONGLONG dNumber )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutND(%p, %lf)", pItem, dNumber));
 
-   
+
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -1753,15 +1753,15 @@ PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, LONGLONG dNumber )
    pItem->type = HB_IT_LDOUBLE;
    pItem->item.asLDouble.length = 20;
    pItem->item.asLDouble.value = dNumber;
-   
+
 
    return pItem;
 }
 PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, LONGLONG dNumber, int iWidth)
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLDLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth, iDec));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLDLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth));
 
-   
+
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -1782,7 +1782,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, LONGLONG dNumber, int iWidt
    pItem->type = HB_IT_LDOUBLE;
    pItem->item.asLDouble.length = iWidth;
    pItem->item.asLDouble.value = dNumber;
- 
+
    return pItem;
 
 }

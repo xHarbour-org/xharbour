@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.12 2003/06/27 05:05:36 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.13 2003/07/04 10:34:34 jonnymind Exp $
  */
 
 /*
@@ -1332,7 +1332,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
       }
    }
 
-   if( hb_langSelect( NULL ) )
+   if( hb_langID() )
    {
       hb_conOutErr( hb_conNewLine(), 0 );
       sprintf( title, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR ), ulIntCode );

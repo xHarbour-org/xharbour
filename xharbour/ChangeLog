@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.1218 2003/07/06 19:32:47 lculik Exp $
+ * $Id: ChangeLog,v 1.1219 2003/07/06 20:01:18 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-06 19:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    * Corrected typo which cause MSVC compile error.
+
+  * source/vm/errorapi.c
+    - Removed invalid use of hb_langSelect( NULL ) with hb_langID().
+      /*
+         This fixes "Internal error: invalid language selected."
+      */
 
 2003-07-06 22:00 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   + bin/bld_solib.sh
@@ -30,7 +40,7 @@
   * source/vm/itemapi.c
     * minor fix regard last commit
   * utils/hbmake/hbmake.prg
-    ! Minor fix to Screen position 
+    ! Minor fix to Screen position
 
 2003-07-06 14:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/transform.c
@@ -127,7 +137,7 @@
   * source/rtl/txml.prg
     ! an empty FindFirst() was not scanning all the DOM tree.
       Fixed.
-      
+
 
 2003-07-01 15:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/Whoo/source/TOpenDialog.prg
