@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.73 2003/01/09 08:22:37 what32 Exp $
+ * $Id: xInspect.prg,v 1.74 2003/01/29 10:27:32 what32 Exp $
  */
 
 /*
@@ -442,6 +442,8 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
               ::oCtrl:AddString( "FALSE" )
 
          CASE cType == "C"
+              ::EditCell(,::Columns[::ColPos]:bSaveBlock,,,,)
+         CASE cType == "N"
               ::EditCell(,::Columns[::ColPos]:bSaveBlock,,,,)
 
          CASE cType == "O"
