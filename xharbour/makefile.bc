@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.100 2004/08/03 01:39:34 paultucker Exp $
+# $Id: makefile.bc,v 1.101 2004/08/05 16:41:42 paultucker Exp $
 #
 
 #
@@ -929,6 +929,7 @@ HBTEST_EXE_OBJS = \
 HBDOC_EXE_OBJS = \
    $(OBJ_DIR)\hbdoc.obj \
    $(OBJ_DIR)\genasc.obj \
+   $(OBJ_DIR)\teeasc.obj \
    $(OBJ_DIR)\genhpc.obj \
    $(OBJ_DIR)\genhtm.obj \
    $(OBJ_DIR)\genchm.obj \

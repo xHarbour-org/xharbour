@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.107 2004/08/03 01:39:34 paultucker Exp $
+# $Id: makefile.vc,v 1.108 2004/08/05 16:41:42 paultucker Exp $
 #
 
 #
@@ -1185,6 +1185,7 @@ $(HBDOC_EXE) : \
    $(HBDOC_DIR)\genrtf.prg \
    $(HBDOC_DIR)\genhpc.prg \
    $(HBDOC_DIR)\genasc.prg \
+   $(HBDOC_DIR)\teeasc.prg \
    $(HBDOC_DIR)\html.prg \
    $(HBDOC_DIR)\ng.prg \
    $(HBDOC_DIR)\os2.prg \
@@ -1203,6 +1204,7 @@ $(HBDOC_EXE) : \
                                       $(OBJ_DIR)\genrtf.c \
                                       $(OBJ_DIR)\genhpc.c \
                                       $(OBJ_DIR)\genasc.c \
+                                      $(OBJ_DIR)\teeasc.c \
                                       $(OBJ_DIR)\html.c \
                                       $(OBJ_DIR)\ng.c \
                                       $(OBJ_DIR)\os2.c \
