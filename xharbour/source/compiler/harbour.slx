@@ -53,6 +53,7 @@
 //#define SHOW_LEX_TOKENS
 //#define DEBUG_LEX
 
+#include "hbexemem.h"
 #define HB_INLINE_MAX 999
 
 #ifdef DEBUG_LEX

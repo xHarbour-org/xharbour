@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.4 2004/09/21 22:31:12 druzus Exp $
+ * $Id: hbfsapi.c,v 1.5 2004/11/21 21:43:43 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hbexemem.h"
 
 /* NOTE: Not really belongs here, but until we can't find a better place 
          it will do it. [vszakats] */

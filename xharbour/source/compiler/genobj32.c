@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: genobj32.c,v 1.3 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -27,6 +27,7 @@
  */
 
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 static ULONG GetSymbolsSize( void );
 static PCOMSYMBOL GetFirstSymbol( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.14 2004/10/27 05:27:37 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.15 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -71,6 +71,8 @@
  */
 #define  HB_XGRAB( size )  hb_xgrab( (size) )
 #define  HB_XFREE( pPtr )  hb_xfree( (void *)(pPtr) )
+
+#include "hbexemem.h"
 
 static char * s_OperTable[] = {
    "",

@@ -48,6 +48,7 @@
 #include <time.h>
 
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 extern int  hb_pp_ParseDefine( char * );
 extern int  hb_pp_ParseDirective( char * );

@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.8 2005/01/02 03:37:14 guerra000 Exp $
+ * $Id: pragma.c,v 1.9 2005/03/10 23:19:40 andijahja Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 
 #include "hbpp.h"
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 static BOOL StringToBool( char *, BOOL );
 static int  StringToInt( char *, int );

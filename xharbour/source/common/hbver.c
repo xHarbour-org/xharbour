@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.27 2005/03/09 05:35:23 andijahja Exp $
+ * $Id: hbver.c,v 1.28 2005/03/19 13:51:07 andijahja Exp $
  */
 
 /*
@@ -75,6 +75,7 @@
 #include "hbver.h"
 #include "hbcomp.h"
 #include "hbmemory.ch"
+#include "hbexemem.h"
 
 #if defined(HB_OS_WIN_32)
 

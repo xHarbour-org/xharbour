@@ -66,6 +66,7 @@
 
 #include "hbapi.h"
 #include "hbmath.h"
+#include "hbexemem.h"
 
 ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
@@ -791,7 +792,6 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
 }
 
 /*
-  AJ: 2005-03-26
   Simple routine to extract uncommented part of (read) buffer
 */
 HB_EXPORT char *hb_stripOutComments( char* buffer )
@@ -802,6 +802,7 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
       char *szOut = (char*) hb_xgrab( ui + 1 );
       int i;
       int uu = 0;
+      char *last;
 
       for ( i = 0; i < ui; i ++ )
       {
@@ -835,6 +836,25 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
       }
 
       szOut[ uu ] = 0;
+
+      /* trim left */
+      while ( HB_ISSPACE( *szOut ) )
+      {
+         strcpy( szOut, szOut + 1 );
+      }
+
+      /* trim right */
+      last = szOut + strlen ( szOut );
+      while ( last > szOut )
+      {
+         if ( !HB_ISSPACE( *( last - 1 ) ) )
+         {
+            break;
+         }
+         last--;
+      }
+
+      *last = 0;
 
       return( szOut );
    }

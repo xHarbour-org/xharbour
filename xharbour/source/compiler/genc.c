@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.88 2005/03/30 21:29:36 andijahja Exp $
+ * $Id: genc.c,v 1.89 2005/03/31 03:16:10 druzus Exp $
  */
 
 /*
@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 static int hb_comp_iBaseLine;
 
@@ -459,21 +460,21 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                if( pSym->cScope & HB_FS_PUBLIC )
                {
                   fprintf( yyc, " | HB_FS_PUBLIC" );
-                  /*
-                     We found first public function in program body and
-                     make it starting procedure.
-                  */
-                  if ( !bSymFIRST && !hb_compFunCallFind( pSym->szName ) && !hb_comp_bNoStartUp )
-                  {
-                     fprintf( yyc, " | HB_FS_FIRST" );
-                     iStartupOffset = iSymOffset;
-                     bSymFIRST = TRUE;
-                  }
                }
             }
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
+               /*
+                  We found first public function in program body and
+                  make it starting procedure.
+               */
+               if ( !bSymFIRST && !hb_compFunCallFind( pSym->szName ) && !hb_comp_bNoStartUp )
+               {
+                  fprintf( yyc, " | HB_FS_FIRST" );
+                  iStartupOffset = iSymOffset;
+                  bSymFIRST = TRUE;
+               }
             }
 
             if( pSym->cScope & VS_MEMVAR )

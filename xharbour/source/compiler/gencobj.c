@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.11 2004/09/03 16:01:52 lf_sfnet Exp $
+ * $Id: gencobj.c,v 1.12 2005/01/11 23:53:43 likewolf Exp $
  */
 
 /*
@@ -36,6 +36,8 @@ static char * hb_searchpath( const char *, char *, char * );
 
 /* QUESTION: Allocate buffer dynamically ? */
 #define HB_CFG_LINE_LEN    100
+
+#include "hbexemem.h"
 
 /*--------------------------------------------------------------------------*/
 

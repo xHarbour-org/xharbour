@@ -84,6 +84,7 @@
 
 #include "hbapi.h"
 #include "hbver.h"
+#include "hbexemem.h"
 
 #if defined(HB_OS_WIN_32)
 

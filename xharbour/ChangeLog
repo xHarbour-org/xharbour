@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3984 2005/03/31 03:11:18 druzus Exp $
+ * $Id: ChangeLog,v 1.3985 2005/03/31 06:15:00 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-31 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + include/hbexemem.h
+    * definitions of memory routines dedicated to compiler creation
+
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/common/expropt1.c
+  * source/common/hbfsapi.c
+  * source/common/hbgete.c
+  * source/common/hbhash.c
+  * source/common/hbstr.c
+  * source/common/hbver.c
+  * source/pp/ppcore.c
+  * source/pp/pragma.c
+  * source/compiler/calconst.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/genc.c
+  * source/compiler/hbident.c
+  * source/compiler/hbpcode.c
+  * source/compiler/gencobj.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + include "hbexemem.h" to enable to force compiler functions
+      to explicitely use its own hb_xgrab, hb_xfree and hb_xrealloc.
 
 2005-03-31 00:08 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./hrbdll.bc

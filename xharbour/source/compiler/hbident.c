@@ -1,5 +1,5 @@
 /*
- * $Id: hbident.c,v 1.6 2001/06/15 17:44:14 dholm Exp $
+ * $Id: hbident.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
  */
 
 /*
@@ -30,6 +30,7 @@
 
 #include "hbhash.h"
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 #define HB_IDENT_TABLE_SIZE    509UL
 

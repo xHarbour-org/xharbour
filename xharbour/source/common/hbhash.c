@@ -1,5 +1,5 @@
 /*
- * $Id: hbhash.c,v 1.1 2001/12/10 23:18:13 vszakats Exp $
+ * $Id: hbhash.c,v 1.1.1.1 2001/12/21 10:44:33 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbhash.h"
+#include "hbexemem.h"
 
 static HB_HASH_ITEM_PTR hb_hashItemNew( ULONG ulKey, void * pValue )
 {

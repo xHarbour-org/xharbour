@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.6 2004/10/27 17:21:31 ronpinkas Exp $
+ * $Id: calconst.c,v 1.7 2004/11/01 21:36:46 druzus Exp $
  */
 
 /*
@@ -48,6 +48,7 @@ double CalcConstant( char **pExp );
 
 #ifdef STAND_ALONE
   #define hb_compGenError( aArray, cType, sMsg, sInfo, sMore ) printf( "Parse Error: >%s<\n", sInfo )
+  #include "hbexemem.h"
 
   int main( char argc, char *argv[] )
   {
@@ -73,6 +74,7 @@ double CalcConstant( char **pExp );
 
    #define malloc( p ) hb_xgrab( p )
    #define free( p )   hb_xfree( p )
+   #include "hbexemem.h"
 #endif
 
 double CalcConstant( char **pExp )

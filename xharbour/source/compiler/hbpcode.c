@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.33 2004/11/21 21:43:46 druzus Exp $
+ * $Id: hbpcode.c,v 1.34 2005/01/02 03:31:13 guerra000 Exp $
  */
 
 /*
@@ -40,6 +40,7 @@
 #include <assert.h>
 
 #include "hbcomp.h"
+#include "hbexemem.h"
 
 /* pCode List File */
 typedef struct _CODELIST

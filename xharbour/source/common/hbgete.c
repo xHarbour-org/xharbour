@@ -1,5 +1,5 @@
 /*
- * $Id: hbgete.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbgete.c,v 1.3 2004/02/16 12:28:45 andijahja Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #define HB_OS_WIN_32_USED
 
 #include "hbapi.h"
+#include "hbexemem.h"
 
 /* NOTE: Warning, this function _may_ return NULL as a result if
          the environment variable reading fails form some reason.

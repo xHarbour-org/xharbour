@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.15 2004/05/08 04:25:09 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.16 2004/10/27 05:27:36 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,8 @@
  */
 #define  HB_XGRAB( size )  hb_xgrab( (size) )
 #define  HB_XFREE( pPtr )  hb_xfree( (void *)(pPtr) )
+
+#include "hbexemem.h"
 
 /* Table with operators precedence
  * NOTE:

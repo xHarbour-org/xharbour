@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.13 2004/05/30 20:44:09 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.14 2004/06/29 22:14:11 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,8 @@
 #include "hbmacro.ch"
 
 extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
+
+#include "hbexemem.h"
 
 /* ************************************************************************* */
 

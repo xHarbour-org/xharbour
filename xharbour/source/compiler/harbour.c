@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.97 2005/03/30 21:29:42 andijahja Exp $
+ * $Id: harbour.c,v 1.98 2005/03/31 03:16:11 druzus Exp $
  */
 
 /*
@@ -104,6 +104,7 @@
 #include "hbcomp.h"
 #include "hbhash.h"
 #include "hbi18n.h"
+#include "hbexemem.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
@@ -290,7 +291,6 @@ extern int iEndDump;
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
-
 {
    int iStatus = EXIT_SUCCESS;
    int i;

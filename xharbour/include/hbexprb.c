@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.89 2005/01/03 16:52:42 guerra000 Exp $
+ * $Id: hbexprb.c,v 1.90 2005/01/03 16:59:15 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,8 @@ extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
  */
 #define  HB_XGRAB( size )  hb_xgrab( (size) )
 #define  HB_XFREE( pPtr )  hb_xfree( (void *)(pPtr) )
+
+#include "hbexemem.h"
 
 /* Forward declarations
  */
