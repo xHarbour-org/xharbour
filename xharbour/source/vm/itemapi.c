@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.84 2004/03/02 00:28:18 druzus Exp $
+ * $Id: itemapi.c,v 1.85 2004/03/02 17:31:29 druzus Exp $
  */
 
 /*
@@ -1431,7 +1431,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       }
       else
       {
-         double dInt, dFract, dDig;
+         double dInt, dFract, dDig, doBase = 10.0;
          int iPrec, iFirst = -1;
 
          //dNumber = hb_numRound( dNumber, iDec );
@@ -1455,8 +1455,8 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
          while ( iPos-- > 0 )
          {
-            dDig = modf( dInt / 10.0 + 0.01, &dInt ) * 10.0;
-            szResult[ iPos ] = ( char ) ( dDig + 0.01 ) + '0';
+            dDig = modf( dInt / doBase + 0.01, &dInt ) * doBase;
+            szResult[ iPos ] = '0' + ( char ) ( dDig + 0.01 );
             if ( szResult[ iPos ] != '0' )
                iFirst = iPos;
             if ( dInt < 1 )
@@ -1476,8 +1476,8 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          {
             for ( iPos = iDot + 1; iPos < iSize; iPos++ )
             {
-               dFract = modf( dFract * 10, &dDig );
-               szResult[ iPos ] = ( char ) ( dDig + 0.01 ) + '0';
+               dFract = modf( dFract * doBase, &dDig );
+               szResult[ iPos ] = '0' + ( char ) ( dDig + 0.01 );
                if ( iFirst < 0 )
                {
                   if ( szResult[ iPos ] != '0' )
@@ -1504,8 +1504,8 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             }
             else
             {
-               iZer = iSize - iFirst - iPrec - 1;
-               dFract = modf( dFract * 10, &dDig );
+               iZer = iSize - iFirst - iPrec - ( iDec > 0 ? 1 : 0 );
+               dFract = modf( dFract * doBase, &dDig );
                iLast = ( int ) ( dDig + 0.01 );
             }
             /* hack for x.xxxx4999999999, f.e. 8.995 ~FL 8.994999999999999218.. */
@@ -1513,7 +1513,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             {
                for ( iPos = -iZer; iPos > 0; --iPos )
                {
-                  dFract = modf( dFract * 10, &dDig );
+                  dFract = modf( dFract * doBase, &dDig );
                   if ( dDig + 0.01 < 9 && ( iPos != 1 || dDig < 2 ) )
                      break;
                }
