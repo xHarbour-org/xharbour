@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3875 2005/02/26 15:27:52 likewolf Exp $
+ * $Id: ChangeLog,v 1.3878 2005/02/26 20:41:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-26 21:49 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/simplex.c
+    + Added support for optionsal White Space predefined match pattern ?WS?
+    + Added support for Delimiters and Self Contained tokens to be matched as literals within coumpunded words.
+  * source/compiler/harbour.slx
+    + Added optimized compounded words definitions, using new ?WS? matcher, and commented respective match rules.
+    - Removed no longer needed hack for special tokens FIELD, QSELF, IIF and _GET_ when used as Identifers, and followed by reserved words.
+
+  /*
+     Above changes allow for much more elegant and simplified definitions, but involved complex change, that is
+     very difficult to fully test. I ran as many tests as I could, including building all of our sources, as well
+     as my private sources, and FWH. In the case that I get some problem reports I may have to revert these
+     optimizations.
+   */
+
+  * source/pp/pptable.c
+    * Corrected use of if() to IIF() to avoid extranous translations and generate better readable PPO.
+  * source/pp/ppcore.c
+    + Added support for IN, HAS, and LIKE as native operators, in getExpReal()
+
+  * contrib/htmllib/include/forms.ch
+    * Corrected few rules which had [IN <oForm>], since <oForm> can NOT be empty ot the production:
+         <oForm>:AddControl( ... )
+    will generate compile time errors (missing WITH OBJECT).
+
 2005-02-27 03:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/errorapi.c
   * source/vm/maindll.c

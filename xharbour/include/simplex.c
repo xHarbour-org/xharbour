@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.12 2005/02/17 00:56:32 ronpinkas Exp $
+ * $Id: simplex.c,v 1.13 2005/02/26 09:43:29 ronpinkas Exp $
  */
 
 /*
@@ -549,7 +549,7 @@ YY_DECL
        else
        {
           RESET_LEX();
-          DEBUG_INFO( printf(  "Returning: <EOF>\n" ) );
+          DEBUG_INFO( printf(  "1 - Returning: <EOF>\n" ) );
           return -1;
        }
     }
@@ -581,6 +581,9 @@ int SimpLex_GetNextToken( void )
             /* Not using LEX_CASE() yet (white space)!!! */
             if( acOmmit[(int)chr] )
             {
+               /* Reset. */
+               sSelf[0] = '\0';
+
                while( iSize && acOmmit[(int)(*szBuffer)] )
                {
                   iSize--; szBuffer++;
@@ -635,7 +638,7 @@ int SimpLex_GetNextToken( void )
                      /* Resetting. */
                      iPairToken = 0;
 
-                     // Rollingback.
+                     /* Rollingback. */
                      while( --iStartLen )
                      {
                         szBuffer--;
@@ -836,6 +839,9 @@ int SimpLex_GetNextToken( void )
                        NEW_LINE_ACTION();
                     }
 
+                    /* Reset. */
+                    sSelf[0] = '\0';
+
                     DEBUG_INFO( printf(  "Reducing Delimiter: '%c' As: %i\n", chr, acReturn[(int)chr] ) );
                     return acReturn[(int)chr];
                 }
@@ -875,7 +881,7 @@ int SimpLex_GetNextToken( void )
                 {
                    s_szBuffer = szBuffer;
                    RESET_LEX();
-                   DEBUG_INFO( printf(  "Returning: <EOF>\n", iRet ) );
+                   DEBUG_INFO( printf(  "2 - Returning: <EOF>\n", iRet ) );
                    return -1;
                 }
             }
@@ -1135,6 +1141,8 @@ void SimpLex_CheckWords( void )
    unsigned int i, iMax, iLenMatched, iBaseSize = 0, iKeyLen, iSavedLen = 0;
    char *pNextSpacer, *sKeys2Match = NULL, *szBaseBuffer = s_szBuffer, cSpacer = chr;
    LEX_WORD *aCheck;
+   BOOL bOptionalSpacer;
+   char sDelimiterString[2], *sWord2Check;
 
   #ifdef DEBUG_LEX
    char sKeyDesc[] = "Key", sWordDesc[] = "Word", *sDesc;
@@ -1168,17 +1176,19 @@ void SimpLex_CheckWords( void )
 
    DEBUG_INFO( printf( "Pre-Scaning %ss for Token: %s at Positions: %i-%i\n", sDesc, (char*) sToken, i, iMax -1 ) );
 
+   sWord2Check = (char *) sToken;
+
    while( i < iMax )
    {
-      if( sToken[1] < aCheck[i].sWord[1] )
+      if( sWord2Check[1] < aCheck[i].sWord[1] )
       {
-         DEBUG_INFO( printf( "Gave-Up! Token [%s] < Pattern [%s]\n", sToken, aCheck[i].sWord ) );
+         DEBUG_INFO( printf( "Gave-Up! Token [%s] < Pattern [%s]\n", sWord2Check, aCheck[i].sWord ) );
          iRet = 0;
          return;
       }
-      else if( sToken[1] > aCheck[i].sWord[1] )
+      else if( sWord2Check[1] > aCheck[i].sWord[1] )
       {
-         DEBUG_INFO( printf( "Skip... %s [%s] < [%s]\n", sDesc, aCheck[i].sWord, sToken ) );
+         DEBUG_INFO( printf( "Skip... %s [%s] < [%s]\n", sDesc, aCheck[i].sWord, sWord2Check ) );
          i++;
          DEBUG_INFO( printf( "Continue with larger: [%s]\n", aCheck[i].sWord ) );
          continue;
@@ -1194,21 +1204,39 @@ void SimpLex_CheckWords( void )
       if( sKeys2Match )
       {
          pNextSpacer = strstr( sKeys2Match, "{WS}" );
+         if( pNextSpacer )
+         {
+            bOptionalSpacer = FALSE;
+         }
+         else
+         {
+            pNextSpacer = strstr( sKeys2Match, "?WS?" );
+            bOptionalSpacer = TRUE;
+         }
       }
       else
       {
          sKeys2Match = aCheck[ i ].sWord;
          pNextSpacer = strstr( sKeys2Match, "{WS}" );
+         if( pNextSpacer )
+         {
+            bOptionalSpacer = FALSE;
+         }
+         else
+         {
+            pNextSpacer = strstr( sKeys2Match, "?WS?" );
+            bOptionalSpacer = TRUE;
+         }
       }
 
-      if( sToken[0] < sKeys2Match[0] )
+      if( sWord2Check[0] < sKeys2Match[0] )
       {
-         DEBUG_INFO( printf( "Gave-Up! Token [%s] < Pattern [%s]\n", sToken, sKeys2Match ) );
+         DEBUG_INFO( printf( "Gave-Up! Token [%s] < Pattern [%s]\n", sWord2Check, sKeys2Match ) );
          break;
       }
-      else if( sToken[0] > sKeys2Match[0] )
+      else if( sWord2Check[0] > sKeys2Match[0] )
       {
-         DEBUG_INFO( printf( "Skip... %s [%s] < [%s]\n", sDesc, sKeys2Match, sToken ) );
+         DEBUG_INFO( printf( "Skip... %s [%s] < [%s]\n", sDesc, sKeys2Match, sWord2Check ) );
          i++;
          if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
          {
@@ -1235,7 +1263,7 @@ void SimpLex_CheckWords( void )
       if( pNextSpacer )
       {
          /* Token not followed by white space - can't match this [or any latter] pattern! */
-         if( ! acOmmit[(int)cSpacer] )
+         if( bOptionalSpacer == FALSE && ! acOmmit[(int)cSpacer] )
          {
             DEBUG_INFO( printf( "Skip... Pattern [%s] requires {WS}, cSpacer: %c\n", sKeys2Match, cSpacer ) );
 
@@ -1281,7 +1309,7 @@ void SimpLex_CheckWords( void )
 
       if( iLen2Match > iKeyLen && i < iMax - 1 )
       {
-         DEBUG_INFO( printf( "Trying Next... length mismatch - iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sToken, sKeys2Match ) );
+         DEBUG_INFO( printf( "Trying Next... length mismatch - iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sWord2Check, sKeys2Match ) );
          i++;
 
          if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
@@ -1306,18 +1334,18 @@ void SimpLex_CheckWords( void )
          }
       }
 
-      DEBUG_INFO( printf( "iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sToken, sKeys2Match ) );
+      DEBUG_INFO( printf( "iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sWord2Check, sKeys2Match ) );
 
-      iCompare = strncmp( (char*) sToken, sKeys2Match, iLen2Match );
+      iCompare = strncmp( (char*) sWord2Check, sKeys2Match, iLen2Match );
      #else
-      iCompare = strcmp( (char*) sToken, sKeys2Match );
+      iCompare = strcmp( (char*) sWord2Check, sKeys2Match );
      #endif
 
       if( iCompare == 0 ) /* Match found */
       {
          if( pNextSpacer == NULL ) /* Full Match! */
          {
-            DEBUG_INFO( printf( "Saving Tentative %s [%s] == [%s]\n", sDesc, sToken, sKeys2Match ) );
+            DEBUG_INFO( printf( "Saving Tentative %s [%s] == [%s]\n", sDesc, sWord2Check, sKeys2Match ) );
 
             iTentative  = i;
             iLenMatched = strlen( aCheck[i].sWord );
@@ -1329,7 +1357,7 @@ void SimpLex_CheckWords( void )
             /* No White Space after last Token! */
             if( iHold || iPairToken )
             {
-               DEBUG_INFO( printf( "No White space after [%s] Holding: %i\n", sToken, aiHold[0] ) );
+               DEBUG_INFO( printf( "No White space after [%s] Holding: %i\n", sWord2Check, aiHold[0] ) );
                break;
             }
 
@@ -1339,7 +1367,18 @@ void SimpLex_CheckWords( void )
             /* Is there a next potential Pattern, that is an extended version of the current Pattern. */
             if( i < iMax && strncmp( aCheck[i - 1].sWord, aCheck[i].sWord, iLenMatched ) == 0 )
             {
-               if( strlen( aCheck[i].sWord ) > ( iLenMatched + 4 ) && ( pNextSpacer = strstr( aCheck[i].sWord + iLenMatched, "{WS}" ) ) != NULL )
+               pNextSpacer = strstr( aCheck[i].sWord + iLenMatched, "{WS}" );
+               if( pNextSpacer )
+               {
+                  bOptionalSpacer = FALSE;
+               }
+               else
+               {
+                  pNextSpacer = strstr( sKeys2Match, "?WS?" );
+                  bOptionalSpacer = TRUE;
+               }
+
+               if( strlen( aCheck[i].sWord ) > ( iLenMatched + 4 ) && pNextSpacer )
                {
                   /* Same relative position, in the next Pattern. */
                   sKeys2Match = pNextSpacer + 4;
@@ -1360,7 +1399,26 @@ void SimpLex_CheckWords( void )
          else
          {
             sKeys2Match = pNextSpacer + 4;
-            DEBUG_INFO( printf( "Partial %s Match! [%s] == [%s] - Looking for: [%s]\n", sDesc, sToken, aCheck[i].sWord, sKeys2Match ) );
+            DEBUG_INFO( printf( "Partial %s Match! [%s] == [%s] - Looking for: [%s]\n", sDesc, sWord2Check, aCheck[i].sWord, sKeys2Match ) );
+
+            if( iHold )
+            {
+               iHold--;
+
+               if( aiHold[iHold] < 256 )
+               {
+                  iLen = 1;
+               }
+               else if( sSelf[0] )
+               {
+                  iLen = strlen( (char *) sSelf );
+               }
+
+               s_szBuffer -= iLen;
+               iSize += iLen;
+
+               DEBUG_INFO( printf( "Rewinded held: %i token [%s] to [%s]\n", iHold, sWord2Check, s_szBuffer ) );
+            }
 
             /* Saving this pointer of the input stream, we might have to get here again. */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
@@ -1374,17 +1432,38 @@ void SimpLex_CheckWords( void )
          /* i may have been increased above - don't want to read next token if it won't get used! */
          if( i < iMax )
          {
+            int iNextToken;
+
             bRecursive = TRUE;
             cSpacer = chr;
 
             DEBUG_INFO( printf( "Getting next Token...\n" ) );
-            SimpLex_GetNextToken();
+
+            iNextToken = SimpLex_GetNextToken();
+
+            if( iNextToken != 0 && sSelf[0] )
+            {
+               sWord2Check = (char *) sSelf;
+            }
+            else if( iNextToken > 0 && iNextToken < 256 && iHold == 0 )
+            {
+               sDelimiterString[0] = iNextToken;
+               sDelimiterString[1] = '\0';
+
+               sWord2Check = (char *) sDelimiterString;
+            }
+            else
+            {
+               sWord2Check = (char *) sToken;
+            }
+
+            DEBUG_INFO( printf( "sToken [%s] sWord2Check [%s] iRet: %i iHold: %i\n", (char *) sToken, (char *) sWord2Check, iRet, iLen ) );
             continue;
          }
       }
       else if( iCompare > 0 )
       {
-         DEBUG_INFO( printf( "Trying Next %s Pattern... [%s] > [%s]\n", sDesc, sToken, sKeys2Match ) );
+         DEBUG_INFO( printf( "Trying Next %s Pattern... [%s] > [%s]\n", sDesc, sWord2Check, sKeys2Match ) );
          i++;
 
          if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
@@ -1410,7 +1489,7 @@ void SimpLex_CheckWords( void )
       }
       else
       {
-         DEBUG_INFO( printf( "Gave-Up! [%s] < [%s]\n", sToken, sKeys2Match ) );
+         DEBUG_INFO( printf( "Gave-Up! [%s] < [%s]\n", sWord2Check, sKeys2Match ) );
          break;
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: forms.ch,v 1.1 2003/02/23 23:15:15 lculik Exp $
+ * $Id: forms.ch,v 1.1 2003/09/23 21:23:56 paultucker Exp $
  */
 
 /*
@@ -218,25 +218,25 @@
 // --> Literals
 
 #xCommand LINE BREAK                       ;
-          [IN <oForm>]                     ;
+          IN <oForm>                       ;
           =>                               ;
           <oForm>:AddControl( "<BR>"+CRLF() )
 
 
-#xCommand LINE [IN <oForm>]                ;
+#xCommand LINE IN <oForm>                  ;
           =>                               ;
           <oForm>:AddControl( CRLF()+'<HR WIDTH = 100%>'+CRLF() )
 
-#xCommand SPACE <n> [IN <oForm>]           ;
+#xCommand SPACE <n> IN <oForm>             ;
           =>                               ;
           <oForm>:AddControl( replicate( "&nbsp;", <n> ) )
 
 
-#xCommand TEXT <c> [IN <oForm>]            ;
+#xCommand TEXT <c> IN <oForm>              ;
           =>                               ;
           <oForm>:AddControl( <c> )
 
-#xCommand SCRIPT <c> [IN <oForm>]          ;
+#xCommand SCRIPT <c> IN <oForm>            ;
           =>                               ;
           <oForm>:AddControl( <c> )
 

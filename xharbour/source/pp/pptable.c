@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.49 2004/11/11 19:49:43 ronpinkas Exp $
+ * $Id: pptable.c,v 1.50 2004/11/13 18:30:28 ronpinkas Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ void hb_pp_Table( void )
    static DEFINES sD___39 = {"_SET_WRAP",NULL,-1,"35", &sD___38 };
    static DEFINES sD___40 = {"_SET_COUNT",NULL,-1,"47", &sD___39 };
    static DEFINES sD___41 = {"_SET_CH",NULL,-1,NULL, &sD___40 };
-   static DEFINES sD___42 = {"_DFSET","\1A,\1B",2,"Set( _SET_DATEFORMAT, if(__SetCentury(), \1A, \1B) )", &sD___41 };
+   static DEFINES sD___42 = {"_DFSET","\1A,\1B",2,"Set( _SET_DATEFORMAT, IIF(__SetCentury(), \1A, \1B) )", &sD___41 };
    static DEFINES sD___43 = {"_SET_VIDEOMODE",NULL,-1,"40", &sD___42 };
    static DEFINES sD___44 = {"_SET_MBLOCKSIZE",NULL,-1,"41", &sD___43 };
    static DEFINES sD___45 = {"_SET_MFILEEXT",NULL,-1,"42", &sD___44 };
@@ -200,8 +200,8 @@ void hb_pp_Table( void )
    static COMMANDS sC___59 = {0,"SET","COLOR TO \16\1A30\17","SetColor( \1A10 )",&sC___58 };
    static COMMANDS sC___60 = {0,"SET","COLOR TO ( \1A00 )","SetColor( \1A00 )",&sC___59 };
    static COMMANDS sC___61 = {0,"SET","COLOUR TO \16\1A30\17","SET COLOR TO \16\1A00\17",&sC___60 };
-   static COMMANDS sC___62 = {0,"SET","CURSOR \1A20ON,OFF,&>","SetCursor( if(Upper(\1A30) == 'ON', 1, 0) )",&sC___61 };
-   static COMMANDS sC___63 = {0,"SET","CURSOR (\1A00)","SetCursor( if(\1A00, 1, 0) )",&sC___62 };
+   static COMMANDS sC___62 = {0,"SET","CURSOR \1A20ON,OFF,&>","SetCursor( IIF(Upper(\1A30) == 'ON', 1, 0) )",&sC___61 };
+   static COMMANDS sC___63 = {0,"SET","CURSOR (\1A00)","SetCursor( IIF(\1A00, 1, 0) )",&sC___62 };
    static COMMANDS sC___64 = {0,"?","\16 \1A10\17","QOut( \1A00 )",&sC___63 };
    static COMMANDS sC___65 = {0,"?","? \16 \1A10\17","QQOut( \1A00 )",&sC___64 };
    static COMMANDS sC___66 = {0,"EJECT","","__Eject()",&sC___65 };
@@ -275,7 +275,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___110 = {0,"SET","MESSAGE TO","Set( _SET_MESSAGE, 0 ) ; Set( _SET_MCENTER, .f. )",&sC___109 };
    static COMMANDS sC___111 = {0,"@","\1A00, \1B00 PROMPT \1C00 \16MESSAGE \1D00\17 \16COLOR \1E00\17",
        "__AtPrompt( \1A00, \1B00, \1C00 , \1D00 ,\1E00 )",&sC___110 };
-   static COMMANDS sC___112 = {0,"MENU","TO \1A00","\1A00 := __MenuTo( {|_1| if(PCount() == 0, \1A00, \1A00 := _1)}, \1A10 )",&sC___111 };
+   static COMMANDS sC___112 = {0,"MENU","TO \1A00","\1A00 := __MenuTo( {|_1| IIF(PCount() == 0, \1A00, \1A00 := _1)}, \1A10 )",&sC___111 };
    static COMMANDS sC___113 = {0,"SAVE","SCREEN","__XSaveScreen()",&sC___112 };
    static COMMANDS sC___114 = {0,"RESTORE","SCREEN","__XRestScreen()",&sC___113 };
    static COMMANDS sC___115 = {0,"SAVE","SCREEN TO \1A00","\1A00 := SaveScreen( 0, 0, Maxrow(), Maxcol() )",&sC___114 };
@@ -333,7 +333,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___164 = {0,"SELECT","\1A00(\16\1B10\17)","dbSelectArea( \1A00(\1B00) )",&sC___163 };
    static COMMANDS sC___165 = {0,"USE","","dbCloseArea()",&sC___164 };
    static COMMANDS sC___166 = {0,"USE","\1A40 \16VIA \1B00\17 \16ALIAS \1C00\17 \16\1D20 NEW>\17 \16\1E20 EXCLUSIVE>\17 \16\1F20 SHARED>\17 \16\1G20 READONLY>\17 \16CODEPAGE \1H00\17 \16INDEX \1I40 \16, \1J40\17\17",
-       "dbUseArea( \1D50, \1B00, \1A30, \1C30, if(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30 ) \16; dbSetIndex( \1I30 )\17 \16; dbSetIndex( \1J30 )\17",&sC___165 };
+       "dbUseArea( \1D50, \1B00, \1A30, \1C30, IIF(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30 ) \16; dbSetIndex( \1I30 )\17 \16; dbSetIndex( \1J30 )\17",&sC___165 };
    static COMMANDS sC___167 = {0,"APPEND","BLANK","dbAppend()",&sC___166 };
    static COMMANDS sC___168 = {0,"PACK","","__dbPack()",&sC___167 };
    static COMMANDS sC___169 = {0,"ZAP","","__dbZap()",&sC___168 };
@@ -350,7 +350,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___180 = {0,"SKIP","\1A00","dbSkip( \1A00 )",&sC___179 };
    static COMMANDS sC___181 = {0,"SKIP","ALIAS \1A00","\1A00 -> ( dbSkip(1) )",&sC___180 };
    static COMMANDS sC___182 = {0,"SKIP","\1A00 ALIAS \1B00","\1B00 -> ( dbSkip(\1A00) )",&sC___181 };
-   static COMMANDS sC___183 = {0,"SEEK","\1A00 \16\1B20 SOFTSEEK>\17","dbSeek( \1A00, if( \1B50, .T., NIL ) )",&sC___182 };
+   static COMMANDS sC___183 = {0,"SEEK","\1A00 \16\1B20 SOFTSEEK>\17","dbSeek( \1A00, IIF( \1B50, .T., NIL ) )",&sC___182 };
    static COMMANDS sC___184 = {0,"FIND","\1A30","dbSeek( \1A30 )",&sC___183 };
    static COMMANDS sC___185 = {0,"FIND",":= \1A00","( find := \1A00 )",&sC___184 };
    static COMMANDS sC___186 = {0,"FIND","= \1A00","( find := \1A00 )",&sC___185 };
@@ -435,7 +435,7 @@ void hb_pp_Table( void )
        "ordCondSet( \1D20, \1D40, \16\1E50\17, \1F40, \1J40, \1K00, RECNO(), \1G00, \1H00, \16\1I50\17, \16\1N50\17,, \16\1P50\17, \16\1O50\17, \16\1R50\17, \16\1S50\17, \1F20 ) ;  ordCreate(\1C30, \1B30, \1A20, \1A40, \16\1L50\17 )",&sC___230 };
 #endif
    static COMMANDS sC___232 = {0,"INDEX","ON \1A00 TO \1B40 \16\1C20 UNIQUE>\17",
-       "dbCreateIndex( \1B30, \1A20, \1A40, if( \1C50, .t., NIL ) )",&sC___231 };
+       "dbCreateIndex( \1B30, \1A20, \1A40, IIF( \1C50, .t., NIL ) )",&sC___231 };
    static COMMANDS sC___233 = {0,"DELETE","TAG \1A40 \16 IN \1B40 \17 \16, \1C40 \16 IN \1D40 \17 \17",
        "ordDestroy( \1A30, \1B30 ) \16; ordDestroy( \1C30, \1D30 ) \17",&sC___232 };
    static COMMANDS sC___234 = {0,"REINDEX","\16EVAL \1A00\17 \16EVERY \1B00\17",

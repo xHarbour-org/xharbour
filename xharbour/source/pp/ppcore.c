@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.193 2005/02/13 01:22:44 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.194 2005/02/26 15:16:49 andijahja Exp $
  */
 
 /*
@@ -3926,7 +3926,58 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       {
          case STATE_BRACKET:
          {
-            if( **ptri == '(' )
+            // Operator IN may be followed by a literal string.
+            if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'I' && toupper( *(*ptri + 1) ) == 'N' && isspace( *(*ptri + 2) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+               }
+
+               (*ptri) += 2;
+               lens += 2;
+
+               // Fake continuation.
+               cLastChar = '$';
+               continue;
+            }
+            // Operator HAS may be followed by a literal string.
+            else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'H' && toupper( *(*ptri + 1) ) == 'A' && toupper( *(*ptri + 2) ) == 'S' && isspace( *(*ptri + 3) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+                  *expreal++ = *(*ptri+2);
+               }
+
+               (*ptri) += 3;
+               lens += 3;
+
+               // Fake continuation.
+               cLastChar = '$';
+               continue;
+            }
+            // Operator LIKE may be followed by a literal string.
+            else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'L' && toupper( *(*ptri + 1) ) == 'I' && toupper( *(*ptri + 2) ) == 'K' && toupper( *(*ptri + 3) ) == 'E' && isspace( *(*ptri + 4) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+                  *expreal++ = *(*ptri+2);
+                  *expreal++ = *(*ptri+3);
+               }
+
+               (*ptri) += 4;
+               lens += 4;
+
+               // Fake continuation.
+               cLastChar = '$';
+               continue;
+            }
+            else if( **ptri == '(' )
             {
                StBr1++;
             }
@@ -3972,7 +4023,60 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          case STATE_ID:
          case STATE_ID_END:
          {
-            if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (BYTE) (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
+            // Operator IN may be followed by a literal string.
+            if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'I' && toupper( *(*ptri + 1) ) == 'N' && isspace( *(*ptri + 2) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+               }
+
+               (*ptri) +=2;
+               lens += 2;
+
+               cLastChar = '$';
+               State = STATE_EXPRES;
+
+               // Fake continuation.
+               continue;
+            }
+            // Operator HAS may be followed by a literal string.
+            else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'H' && toupper( *(*ptri + 1) ) == 'A' && toupper( *(*ptri + 2) ) == 'S' && isspace( *(*ptri + 3) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+                  *expreal++ = *(*ptri+2);
+               }
+
+               (*ptri) += 3;
+               lens += 3;
+
+               // Fake continuation.
+               cLastChar = '$';
+               continue;
+            }
+            // Operator LIKE may be followed by a literal string.
+            else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'L' && toupper( *(*ptri + 1) ) == 'I' && toupper( *(*ptri + 2) ) == 'K' && toupper( *(*ptri + 3) ) == 'E' && isspace( *(*ptri + 4) ) )
+            {
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+                  *expreal++ = *(*ptri+1);
+                  *expreal++ = *(*ptri+2);
+                  *expreal++ = *(*ptri+3);
+               }
+
+               (*ptri) += 4;
+               lens += 4;
+
+               // Fake continuation.
+               cLastChar = '$';
+               continue;
+            }
+            else if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (BYTE) (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
             {
                if( **ptri == ',' )
                {
@@ -4634,7 +4738,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
       else
       {
-         printf( "State %i, Inavlid Expression %s\n", State, *ptri );
+         printf( "State %i, Invalid Expression %s\n", State, *ptri );
       }
    #endif
 

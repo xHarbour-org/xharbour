@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.58 2005/02/26 01:23:00 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.59 2005/02/26 09:43:29 ronpinkas Exp $
  */
 
 /*
@@ -259,6 +259,12 @@ SELF_CONTAINED_WORDS_ARE {
 
 #define HB_TEXT_ID       LEX_CUSTOM_ACTION - 29
 
+#define HB_QSELF         LEX_CUSTOM_ACTION - 30
+
+#define HB_FIELD_ALIAS   LEX_CUSTOM_ACTION - 31
+
+#define HB_IIF_OPEN      LEX_CUSTOM_ACTION - 32
+
 #define USE_KEYWORDS
 
 /* Key Words. */
@@ -355,23 +361,39 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}OBJECT"                     ) AS_TOKEN( AS_OBJECT          + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}STRING"                     ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}USUAL"                      ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
-                     LEX_WORD( "FIELD"                            ) AS_TOKEN( FIELD              ),
+
+                  /* LEX_WORD( "FIELD"                            ) AS_TOKEN( FIELD              ), */
+
+                     LEX_WORD( "FIELD?WS?->"                      ) AS_TOKEN( HB_FIELD_ALIAS     ),
                      LEX_WORD( "HAS"                              ) AS_TOKEN( HB_AFTER_EXP - MATCH             ),
                      LEX_WORD( "HB_INLINE"                        ) AS_TOKEN( HB_INLINE          ),
-                     LEX_WORD( "IF"                               ) AS_TOKEN( IIF                ),
-                     LEX_WORD( "IIF"                              ) AS_TOKEN( IIF                ),
+
+                  /* LEX_WORD( "IF"                               ) AS_TOKEN( IIF                ),
+                     LEX_WORD( "IIF"                              ) AS_TOKEN( IIF                ), */
+
+                     LEX_WORD( "IF?WS?("                          ) AS_TOKEN( HB_IIF_OPEN        ),
+
+                     LEX_WORD( "IIF?WS?("                         ) AS_TOKEN( HB_IIF_OPEN        ),
                      LEX_WORD( "IN"                               ) AS_TOKEN( HB_IN              ),
                      LEX_WORD( "LIKE"                             ) AS_TOKEN( HB_AFTER_EXP - LIKE              ),
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),
                      LEX_WORD( "NIL"                              ) AS_TOKEN( NIL                + DONT_REDUCE ),
                      LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( OPTIONAL           ),
-                     LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF              ),
+
+                  /* LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF              ), */
+
+                     LEX_WORD( "QSELF?WS?(?WS?)"                  ) AS_TOKEN( HB_QSELF           ),
+
                   /* LEX_WORD( "SELF"                             ) AS_TOKEN( SELF               ), */
+
                      LEX_WORD( "STEP"                             ) AS_TOKEN( HB_AFTER_EXP - STEP              ),
                      LEX_WORD( "TO"                               ) AS_TOKEN( HB_AFTER_EXP - TO                ),
                      LEX_WORD( "WITH"                             ) AS_TOKEN( HB_WITH            ),
-                     LEX_WORD( "_FIELD"                           ) AS_TOKEN( FIELD              ),
-                     LEX_WORD( "_GET_"                            ) AS_TOKEN( GET                )
+
+                  /* LEX_WORD( "_FIELD"                           ) AS_TOKEN( FIELD              ), */
+
+                     LEX_WORD( "_FIELD?WS?->"                     ) AS_TOKEN( HB_FIELD_ALIAS     ),
+                     LEX_WORD( "_GET_?WS?("                       ) AS_TOKEN( GET                )
                    };
 
 /* Intermediate Reductions when still ambigious or need further reductions. */
@@ -477,8 +499,8 @@ LANGUAGE_RULES_ARE {
 
 
                     /* This FIELD is NOT at BOL wants only ->. */
-                    IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+                 /* IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ), */
 
 
                  /* IF_SEQUENCE_IS( SELF        , ':'         , 0      , 0          ) PASS_THROUGH(),
@@ -487,8 +509,8 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( QSELF       , '('         , ')'    , 0          ) REDUCE_TO( SELF + DONT_REDUCE, 0             ),
                     IF_SEQUENCE_IS( QSELF       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
-                    IF_SEQUENCE_IS( IIF         , '('         , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( IIF         , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER      , 0            ),
+                 /* IF_SEQUENCE_IS( IIF         , '('         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( IIF         , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER      , 0            ), */
 
                     IF_SEQUENCE_IS( OPTIONAL    , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( OPTIONAL    , '@'         , 0      , 0          ) PASS_THROUGH(),
@@ -497,8 +519,8 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( PROCREQ     , '('         , 0      , 0          ) REDUCE_TO( PROCREQ + DONT_REDUCE, 0          ),
                     IF_SEQUENCE_IS( PROCREQ     , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
-                    IF_SEQUENCE_IS( GET         , '('         , 0      , 0          ) REDUCE_TO( GET + DONT_REDUCE , 0             ),
-                    IF_SEQUENCE_IS( GET         , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+                 /* IF_SEQUENCE_IS( GET         , '('         , 0      , 0          ) REDUCE_TO( GET + DONT_REDUCE , 0             ),
+                    IF_SEQUENCE_IS( GET         , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ), */
 
                     IF_SEQUENCE_IS( NE1         , _LINE_      , 0      , 0          ) REDUCE_TO( LINE + DONT_REDUCE, 0             ),
                     IF_SEQUENCE_IS( _LINE_      , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
@@ -734,7 +756,10 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    char* tmpPtr;
    int   iElement;
 
+   #if 0
    /*
+      Feb-26-2005 Resolved without the hack by adding ?WS? support to SimpLex.
+
       Hack to work around these tokens which may be folowed by a RESERVED WORD, and thus revert to IDENTIFIER.
       Example:
 
@@ -776,6 +801,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
          return iRet;
       }
    }
+   #endif
 
    yytext = szToken;
    yyleng = (int) iTokenLen;
@@ -1475,6 +1501,18 @@ static int hb_comp_SLX_CustomAction( int x )
       case HB_TEXT_ID :
          yylval.string = hb_compIdentifierNew( "TEXT", TRUE );
          return IDENTIFIER + DONT_REDUCE;
+
+      case HB_QSELF :
+         bIgnoreWords = FALSE;
+         return SELF;
+
+      case HB_FIELD_ALIAS :
+         aiHold[ iHold++ ] = ALIASOP;
+         return FIELD;
+
+      case HB_IIF_OPEN :
+         aiHold[ iHold++ ] = '(';
+         return IIF;
 
       default:
          printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, hb_comp_iLine - 1 );
