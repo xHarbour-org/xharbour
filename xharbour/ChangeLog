@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3595 2004/11/13 04:29:55 druzus Exp $
+ * $Id: ChangeLog,v 1.3596 2004/11/13 16:13:11 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-11-13 11:21 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/hbsetup.h
+    * move snprintf -> _snprintf here for the moment
+    
 2004-11-13 11:11 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/ct/ctnet.c
     - re#definition of snprintf

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.22 2004/09/12 15:37:31 lf_sfnet Exp $
+ * $Id: hbsetup.h,v 1.23 2004/11/01 05:38:09 likewolf Exp $
  */
 
 /*
@@ -372,6 +372,10 @@
    #if ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
       #define snprintf(s, len, args...) sprintf( (s), ##args )
    #endif
+#else
+  #ifdef _MSC_VER
+      #define snprintf _snprintf
+  #endif
 #endif
 
 
@@ -389,4 +393,3 @@
 #endif
 
 #endif /* HB_SETUP_H_ */
-
