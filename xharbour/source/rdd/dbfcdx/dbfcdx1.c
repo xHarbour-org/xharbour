@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.96 2002/05/13 03:55:13 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.16 2002/05/21 16:45:43 horacioroldan Exp $
  */
 
 /*
@@ -3584,7 +3584,7 @@ static void hb_cdxTagClearScope( LPCDXTAG pTag, USHORT nScope )
    PHB_ITEM *pScope;
    LPKEYINFO *pScopeKey;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxTagClearScope(%p, %hu)", pArea, nScope));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxTagClearScope(%p, %hu)", pTag, nScope));
 
    pScope    = (nScope == 0) ? &(pTag->topScope) : &(pTag->bottomScope);
    pScopeKey = (nScope == 0) ? &(pTag->topScopeKey) : &(pTag->bottomScopeKey);
