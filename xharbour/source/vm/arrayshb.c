@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.49 2004/08/25 02:01:16 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.50 2004/08/26 08:00:33 ronpinkas Exp $
  */
 
 /*
@@ -1677,12 +1677,12 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             else if( bAdoptNested )
             {
                //TraceLog( NULL, "Adopt: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (BYTE **) ( Buffer + uiOffset ) ) );
+               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
             }
             else
             {
                //TraceLog( NULL, "Static: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
-               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (BYTE **) ( Buffer + uiOffset ) ) );
+               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
             }
             break;
 
