@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.16 2003/07/23 22:09:30 druzus Exp $
+ * $Id: errorapi.c,v 1.17 2003/07/30 20:45:40 andijahja Exp $
  */
 
 /*
@@ -210,13 +210,24 @@ void HB_EXPORT hb_errExit( void )
 
 PHB_ITEM HB_EXPORT hb_errNew( void )
 {
-
    HB_THREAD_STUB
 
+   static PHB_DYNS pDyn;
    PHB_ITEM pError;
    char *szModuleName;
 
-   #if 1
+   HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
+
+   if( pDyn == NULL )
+   {
+      pDyn = hb_dynsymGet( "ERRORNEW" );
+
+      if( pDyn == NULL )
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Couldn't locate ErrorNew() symbol in hb_errNew()", NULL, NULL );
+      }
+   }
+
    if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
       szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
@@ -225,17 +236,19 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    {
       szModuleName = NULL;
    }
-   #endif
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
    pError = hb_itemNew( NULL );
 
-   hb_vmPushSymbol( hb_dynsymGet( "ERRORNEW" )->pSymbol );
+   hb_vmPushSymbol( pDyn->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
 
    hb_itemForwardValue( pError, &(HB_VM_STACK.Return) );
+
+   if( ! HB_IS_OBJECT( pError ) )
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Couldn't create Error object in hb_errNew()", NULL, NULL );
+   }
 
    if( szModuleName )
    {
@@ -1276,8 +1289,9 @@ USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, char * szDescr
 USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation )
 {
    USHORT uiAction;
-   PHB_ITEM pError =
-      hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
+   PHB_ITEM pError;
+
+   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
    uiAction = hb_errLaunch( pError );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1366 2003/08/20 17:29:35 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1367 2003/08/20 18:05:58 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-20 13:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+    + Some commented trace messages.
+
+  * source/rdd/dbcmd.c
+    ! Fixed GetTheOtherArea() to be respectfull of hb_vmRequestQuery().
+    ! Fixed rddMoveRecords() to be respectfull of hb_vmRequestQuery().
+
+     /*
+         Above fixes APPEND FROM command to be working correctly with TRY/CATCH.
+         It also fixes very bad GPF if an Error Evaluation was issuing a Break()
+         any where in this sequence.
+
+         This situation highlight a very dangerous situation we MUST protect. We
+         will need to add:
+
+         if( hb_vmRequestQuery() )
+         {
+            return ...
+         }
+
+         or:
+
+         if( hb_vmRequestQuery() == 0 )
+         {
+            hb_errRT_DBCMD( EG_OPEN, 0, NULL, "DBAPP" ); // Could not open it
+         }
+         else
+         {
+            return ...
+         }
+
+         After EACH and EVERY function call, that might in turn call hb_err...()
+
+         The problem is that such error might have activated a Break(), and the
+         problem is 2 folds:
+
+         1. We need to respect the rquest.
+         2. Stack is now in an unstable condition, and GPF is imminent!
+
+         The above may be very common in RDD.
+      */
 
 2003-08-20 20:03 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/gtcrs/gtcrs.c

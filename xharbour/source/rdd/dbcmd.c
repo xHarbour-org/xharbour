@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.44 2003/08/13 02:28:43 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.45 2003/08/15 00:50:59 jonnymind Exp $
  */
 
 /*
@@ -295,8 +295,8 @@ static void hb_rddCloseAll( void )
    //JC1: system not initialized, not needed to cleanup
    //In MT causes segfault. In ST is just useless to go on.
    if ( s_pWorkAreas == NULL )
-      return; 
-      
+      return;
+
    LOCK_AREA
    while( isParents )
    {
@@ -4026,129 +4026,175 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
 
-  if ( !pRDDNode )
+  if( ! pRDDNode )
   {
-    hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
-    return NULL;
+     hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
+     return NULL;
   }
 
-/* Fill pInfo structure */
+  /* Fill pInfo structure */
   memset( &pInfo, 0, sizeof(DBOPENINFO) );
+
   pInfo.uiArea = hb_rddFindFirstFreeAreaNum();
   pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
-  strcpy( ( char * ) pInfo.abName, szFileName );
+
+  strcpy( ( char * ) ( pInfo.abName ), szFileName );
+
   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
   pInfo.fShared = FALSE;
   pInfo.fReadonly = FALSE;
 
-/* get the new area node */
-    pAreaNode =  hb_rddNewAreaNode( pRDDNode, uiRddID );
+  /* get the new area node */
+  pAreaNode =  hb_rddNewAreaNode( pRDDNode, uiRddID );
 
-/* check the extension */
-    pFileName = hb_fsFNameSplit( szFileName );
-    if( !pFileName->szExtension )
-    {
-       pFileExt = hb_itemPutC( NULL, "" );
-       SELF_INFO( ( AREAP ) pAreaNode->pArea, DBI_TABLEEXT, pFileExt );
-       strncat( (char *) pInfo.abName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
-                strlen( (char *) pInfo.abName ) );
-       hb_itemRelease( pFileExt );
-    }
-    hb_xfree( pFileName );
+  /* check the extension */
+  pFileName = hb_fsFNameSplit( szFileName );
+
+  if( ! pFileName->szExtension )
+  {
+      pFileExt = hb_itemPutC( NULL, "" );
+
+      SELF_INFO( ( AREAP ) pAreaNode->pArea, DBI_TABLEEXT, pFileExt );
+
+      strncat( (char *) ( pInfo.abName ), hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( (char *) ( pInfo.abName ) ) );
+
+      hb_itemRelease( pFileExt );
+  }
+
+  hb_xfree( pFileName );
 
   if ( createIt )
   {
-    PHB_ITEM pFieldArray, pItem, pData;
-    USHORT uiFields, uiCount;
+     PHB_ITEM pFieldArray, pItem, pData;
+     USHORT uiFields, uiCount;
 
-/* get the table structure */
-    pFieldArray = hb_itemNew( NULL );
-    SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
-    hb_arrayNew( pFieldArray, 0 );
-    pData = hb_itemNew( NULL );
-    pItem = hb_itemNew( NULL );
-    if( pFields )
-    {
-       USHORT i;
-       char *ptr;
+     /* get the table structure */
+     pFieldArray = hb_itemNew( NULL );
 
-       uiFields = ( USHORT ) hb_arrayLen( pFields );
-       for ( i=0; i<uiFields; i++ )
-       {
-          PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
-          ptr = strrchr( (char *)pField->item.asString.value,'>' );
-          if( ptr && ptr > (char *)pField->item.asString.value && *(ptr-1)=='-' )
-             ptr ++;
-          else
-             ptr = (char *)pField->item.asString.value;
-          if( ( uiCount = hb_rddFieldIndex( (AREAP) s_pCurrArea->pArea,
-                           hb_strUpper( ptr,strlen(ptr)) ) ) != 0 )
-             AddField( pFieldArray, pItem, pData, uiCount );
-       }
-    }
-    else
-    {
-       for( uiCount = 1; uiCount <= uiFields; uiCount++ )
-         /*if ( !pFields || IsFieldIn( (( PHB_DYNS )((( AREAP )s_pCurrArea->pArea)->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields )) */
-          AddField( pFieldArray, pItem, pData, uiCount );
-    }
-    hb_itemRelease( pItem );
-    hb_itemRelease( pData );
-    if( !hb_arrayLen( pFieldArray ) )
-    {
-       hb_itemRelease( pFieldArray );
-       SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
-       hb_xfree( pInfo.abName );
-       hb_xfree( pAreaNode );
-       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-       return NULL;
-    }
+     SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
 
-/* check for table existence and if true, drop it */
-    tableItem = hb_itemNew( NULL );
-    hb_itemPutCL( tableItem, szFileName, strlen(szFileName) );
-    if( SELF_EXISTS( pRDDNode, tableItem, NULL ))
-      SELF_DROP( pRDDNode, tableItem );
-    hb_itemRelease( tableItem );
+     hb_arrayNew( pFieldArray, 0 );
+     pData = hb_itemNew( NULL );
+     pItem = hb_itemNew( NULL );
 
-/* now create a new table based on the current Area's record layout */
-    ( ( AREAP ) pAreaNode->pArea )->atomAlias = hb_dynsymGet( ( char * ) pInfo.atomAlias );
-    if( SELF_CREATEFIELDS( ( AREAP ) pAreaNode->pArea, pFieldArray ) == FAILURE )
-    {
-      SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
-      hb_xfree( pInfo.abName );
-      hb_xfree( pAreaNode );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
-      return NULL;
-    }
+     if( pFields )
+     {
+        USHORT i;
+        char *ptr;
 
-    if( SELF_CREATE( ( AREAP ) pAreaNode->pArea, &pInfo ) == FAILURE )
-    {
-      SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
-      hb_xfree( pInfo.abName );
-      hb_xfree( pAreaNode );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
-      return NULL;
-    }
-    hb_itemRelease( pFieldArray );
-    SELF_CLOSE( ( AREAP ) pAreaNode->pArea );
-    SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
-    hb_xfree( pAreaNode );
+        uiFields = ( USHORT ) hb_arrayLen( pFields );
 
-/* get a new area node for this AREA */
-    pAreaNode =  hb_rddNewAreaNode( pRDDNode, uiRddID );
+        for( i=0; i < uiFields; i++ )
+        {
+           PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
+
+           ptr = strrchr( (char *)pField->item.asString.value,'>' );
+
+           if( ptr && ptr > (char *)pField->item.asString.value && *(ptr-1)=='-' )
+           {
+              ptr++;
+           }
+           else
+           {
+              ptr = (char *)pField->item.asString.value;
+           }
+
+           if( ( uiCount = hb_rddFieldIndex( (AREAP) s_pCurrArea->pArea, hb_strUpper( ptr,strlen(ptr)) ) ) != 0 )
+           {
+              AddField( pFieldArray, pItem, pData, uiCount );
+           }
+        }
+     }
+     else
+     {
+        for( uiCount = 1; uiCount <= uiFields; uiCount++ )
+        {
+           /*if ( !pFields || IsFieldIn( (( PHB_DYNS )((( AREAP )s_pCurrArea->pArea)->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields )) */
+           AddField( pFieldArray, pItem, pData, uiCount );
+        }
+     }
+
+     hb_itemRelease( pItem );
+     hb_itemRelease( pData );
+
+     if( ! hb_arrayLen( pFieldArray ) )
+     {
+        hb_itemRelease( pFieldArray );
+
+        SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+
+        hb_xfree( pInfo.abName );
+        hb_xfree( pAreaNode );
+
+        hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+        return NULL;
+     }
+
+     /* check for table existence and if true, drop it */
+     tableItem = hb_itemNew( NULL );
+     hb_itemPutCL( tableItem, szFileName, strlen(szFileName) );
+
+     if( SELF_EXISTS( pRDDNode, tableItem, NULL ))
+     {
+        SELF_DROP( pRDDNode, tableItem );
+     }
+
+     hb_itemRelease( tableItem );
+
+     /* now create a new table based on the current Area's record layout */
+     ( ( AREAP ) pAreaNode->pArea )->atomAlias = hb_dynsymGet( ( char * ) pInfo.atomAlias );
+
+     if( SELF_CREATEFIELDS( ( AREAP ) pAreaNode->pArea, pFieldArray ) == FAILURE )
+     {
+        SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+
+        hb_xfree( pInfo.abName );
+        hb_xfree( pAreaNode );
+
+        hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
+        return NULL;
+     }
+
+     if( SELF_CREATE( ( AREAP ) pAreaNode->pArea, &pInfo ) == FAILURE )
+     {
+        SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+
+        hb_xfree( pInfo.abName );
+        hb_xfree( pAreaNode );
+
+        hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
+        return NULL;
+     }
+
+     hb_itemRelease( pFieldArray );
+
+     SELF_CLOSE( ( AREAP ) pAreaNode->pArea );
+     SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+
+     hb_xfree( pAreaNode );
+
+     /* get a new area node for this AREA */
+     pAreaNode =  hb_rddNewAreaNode( pRDDNode, uiRddID );
   }
 
-/* open it */
+  /* open it */
   if( SELF_OPEN( ( AREAP ) pAreaNode->pArea, &pInfo ) == FAILURE )
   {
-    SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
-    hb_xfree( pInfo.abName );
-    hb_xfree( pAreaNode );
-    hb_errRT_DBCMD( EG_OPEN, 0, NULL, "DBAPP" ); // Could not open it
-    return NULL;
+     SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+
+     hb_xfree( pInfo.abName );
+     hb_xfree( pAreaNode );
+
+     if( hb_vmRequestQuery() == 0 )
+     {
+        hb_errRT_DBCMD( EG_OPEN, 0, NULL, "DBAPP" ); // Could not open it
+     }
+
+     return NULL;
   }
+
   hb_xfree( pInfo.abName );
+
   return pAreaNode;
 }
 
@@ -4208,88 +4254,128 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
 
   /*get the RDD Driver to use for the "other" Area*/
   if( cDriver )
+  {
      szDriver = cDriver;
+  }
   else
+  {
      szDriver = s_szDefDriver;
+  }
 
-  if( !cAreaFrom && ! cAreaTo )          /*File is needed*/
+  if( ( ! cAreaFrom ) && ( ! cAreaTo ) )          /*File is needed*/
   {
      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
      return EG_ARG;
   }
 
-  if ( pFields && hb_arrayLen( pFields ) == 0 )  /*no field clause?*/
-    pFields = NULL;
-
-  if ( cAreaTo )  /*it's a COPY TO*/
+  if( pFields && hb_arrayLen( pFields ) == 0 )  /*no field clause?*/
   {
-    pAreaRelease = GetTheOtherArea( szDriver, cAreaTo, TRUE, pFields );
-    pAreaTo = (AREAP) pAreaRelease->pArea;
+     pFields = NULL;
+  }
+
+  if( cAreaTo )  /*it's a COPY TO*/
+  {
+     pAreaRelease = GetTheOtherArea( szDriver, cAreaTo, TRUE, pFields );
+     pAreaTo = (AREAP) pAreaRelease->pArea;
   }
   else
-    pAreaTo = (AREAP) s_pCurrArea->pArea;
+  {
+     pAreaTo = (AREAP) s_pCurrArea->pArea;
+  }
 
-
-  if ( cAreaFrom )     /*it's an APPEND FROM*/
+  if( cAreaFrom )     /*it's an APPEND FROM*/
   {                    /*make it current*/
-    bNameMatch = TRUE; /*we pass fields by name */
-    pAreaRelease = s_pCurrArea = GetTheOtherArea( szDriver, cAreaFrom, FALSE, NULL );
-    pAreaFrom =  (AREAP) pAreaRelease->pArea;
+     bNameMatch = TRUE; /*we pass fields by name */
+     pAreaRelease = s_pCurrArea = GetTheOtherArea( szDriver, cAreaFrom, FALSE, NULL );
+
+     if( hb_vmRequestQuery() )
+     {
+        return EG_NOTABLE;
+     }
+
+     pAreaFrom =  (AREAP) pAreaRelease->pArea;
   }
   else
-    pAreaFrom = (AREAP) s_pCurrArea->pArea;
+  {
+     pAreaFrom = (AREAP) s_pCurrArea->pArea;
+  }
 
   /* one or the other but never none*/
-  if ( !pAreaRelease )   /*We need another Area to APPEND TO*/
+  if ( ! pAreaRelease )   /*We need another Area to APPEND TO*/
   {
      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBAPP" );
      return EG_NOTABLE;
   }
 
-  if ( lRec > 0 )                      /* only one record */
-    SELF_GOTO( pAreaFrom, lRec );      /* go there */
+  if( lRec > 0 )
+  {                      /* only one record */
+     SELF_GOTO( pAreaFrom, lRec );      /* go there */
+  }
   else
   {
-    if( !pWhile && !bRest && !lNext )  /* these two stay current */
-       SELF_GOTOP( pAreaFrom );        /* else start from the top */
+     if( ( ! pWhile ) && ( ! bRest ) && ( ! lNext ) )  /* these two stay current */
+     {
+        SELF_GOTOP( pAreaFrom );        /* else start from the top */
+     }
   }
 
   /*move those records assuming we are positioned on one.*/
   while( keepGoing )
   {
-    keepGoing = FALSE;
-    if( !pAreaFrom->fEof )  /*until eof or an evaluation failed*/
-    {
-       if( pWhile )
-          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-       else
-          bWhile = TRUE;
+     keepGoing = FALSE;
 
-       if( pFor )
-          bFor = hb_itemGetL( hb_vmEvalBlock( pFor ) );
-       else
-          bFor = TRUE;
+     if( ! pAreaFrom->fEof )  /*until eof or an evaluation failed*/
+     {
+        if( pWhile )
+        {
+           bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+        }
+        else
+        {
+           bWhile = TRUE;
+        }
 
-      if( bWhile && (!lNext || toGo > 0 ))                /*candidate?*/
-      {
-         if ( bFor )
-         {
-            if ( cAreaFrom )
-               s_pCurrArea = s_pCurrAreaSaved;
-            SELF_APPEND( ( AREAP ) pAreaTo, FALSE );      /*put a new one on TO Area*/
-            if ( cAreaFrom )
-               s_pCurrArea = pAreaRelease;
-            rddMoveFields( pAreaFrom, pAreaTo, pFields, bNameMatch,(cAreaFrom)?s_pCurrAreaSaved:NULL ); /*move the data*/
-         }
-         if ( lRec == 0 || pFor )  /*not only one record? Or there's a For clause?*/
-            keepGoing = TRUE;
-         else
-            continue;
-      }
+        if( pFor )
+        {
+           bFor = hb_itemGetL( hb_vmEvalBlock( pFor ) );
+        }
+        else
+        {
+           bFor = TRUE;
+        }
 
-      toGo--;                      /*one less to go*/
-      SELF_SKIP( pAreaFrom, 1L );  /*get the next one*/
-    }
+        if( bWhile && ( ! lNext || toGo > 0 ) )                /*candidate?*/
+        {
+           if( bFor )
+           {
+              if( cAreaFrom )
+              {
+                 s_pCurrArea = s_pCurrAreaSaved;
+              }
+
+              SELF_APPEND( ( AREAP ) pAreaTo, FALSE );      /*put a new one on TO Area*/
+
+              if( cAreaFrom )
+              {
+                 s_pCurrArea = pAreaRelease;
+              }
+
+              rddMoveFields( pAreaFrom, pAreaTo, pFields, bNameMatch,(cAreaFrom)?s_pCurrAreaSaved:NULL ); /*move the data*/
+           }
+
+           if( lRec == 0 || pFor )  /*not only one record? Or there's a For clause?*/
+           {
+              keepGoing = TRUE;
+           }
+           else
+           {
+              continue;
+           }
+        }
+
+        toGo--;                      /*one less to go*/
+        SELF_SKIP( pAreaFrom, 1L );  /*get the next one*/
+     }
   }
 
   s_pCurrArea = s_pCurrAreaSaved;  /*set current WorkArea to initial state*/
@@ -4297,6 +4383,7 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
   /*Close the File*/
   SELF_CLOSE( ( AREAP ) pAreaRelease->pArea );
   SELF_RELEASE( ( AREAP ) pAreaRelease->pArea );
+
   hb_xfree( pAreaRelease );
 
   return SUCCESS;

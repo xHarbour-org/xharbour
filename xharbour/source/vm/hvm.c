@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.249 2003/08/14 23:49:47 jonnymind Exp $
+ * $Id: hvm.c,v 1.250 2003/08/15 00:51:00 jonnymind Exp $
  */
 
 /*
@@ -5103,8 +5103,7 @@ void hb_vmDo( USHORT uiParams )
    else
    {
       HB_TRACE( HB_TR_ERROR, ( "hb_vmDo() internal logic error, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->pFunPtr, pSelf->type ) );
-      fprintf( stderr, "Error! hb_vmDo() internal logic failure, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->pFunPtr, pSelf->type );
-      exit(1);
+      hb_errInternal( HB_EI_ERRUNRECOV, "Error! hb_vmDo() internal logic failure, Symbol: '%s'.", pSym->szName, NULL );
    }
 
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
@@ -5347,6 +5346,7 @@ void hb_vmSend( USHORT uiParams )
          {
             PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
 
+            //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
             sprintf( (char *) sDesc, "Class: '%s' has no property", sClass );
             hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, pSym->szName + 1, 1, pArgsArray );
             hb_itemRelease( pArgsArray );
@@ -5355,6 +5355,7 @@ void hb_vmSend( USHORT uiParams )
          {
             PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
 
+            //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
             sprintf( (char *) sDesc, "Class: '%s' has no exported method", sClass );
             hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, pSym->szName, 1, pArgsArray );
             hb_itemRelease( pArgsArray );
