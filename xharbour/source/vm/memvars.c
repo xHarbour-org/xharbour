@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.45 2003/12/05 01:38:29 jonnymind Exp $
+ * $Id: memvars.c,v 1.46 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -1450,8 +1450,8 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
       if( ulLen )
       {
          #ifdef HB_THREAD_SUPPORT
-            HB_THREAD_STUB;
             char szNewName[270];
+            HB_THREAD_STUB;
             sprintf( szNewName, ":TH:%d:%s", _pStack_->th_vm_id, pName->item.asString.value );
             pDynSym = hb_dynsymFindName( szNewName );
          #else
@@ -1743,19 +1743,20 @@ HB_FUNC( __MVGET )
          hb_dynsymUnlock();
 
          ( &retValue )->type = HB_IT_NIL;
-         hb_memvarGetValue( &retValue, pDynVar->pSymbol );
+         hb_memvarGetValue( &retValue, pSymbol );
 
          hb_itemReturn( &retValue );
       }
       else
       {
+         USHORT uiAction = E_RETRY;
+         HB_ITEM_PTR pError;
+
          /* Generate an error with retry possibility
           * (user created error handler can create this variable)
           */
          hb_dynsymUnlock();
 
-         USHORT uiAction = E_RETRY;
-         HB_ITEM_PTR pError;
 
          pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
                                  NULL, pName->item.asString.value, 0, EF_CANRETRY );
@@ -1825,9 +1826,11 @@ HB_FUNC( __MVPUT )
    {
       /* the first parameter is a string with not empty variable name
        */
-      hb_dynsymLock();
-      HB_DYNS_PTR pDynVar = hb_memvarFindSymbol( pName );
+      HB_DYNS_PTR pDynVar;
 
+      hb_dynsymLock();
+      pDynVar = hb_memvarFindSymbol( pName );
+      
       if( pDynVar )
       {
          /* variable was declared somwhere - assign a new value
