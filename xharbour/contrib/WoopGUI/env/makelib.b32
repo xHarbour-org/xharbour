@@ -26,7 +26,7 @@ $(WOOPGUIRES): $(WOOPGUIRC)
 #!
 
 $(WOOPGUILIB): $(WOOPGUIOBJ)
-   -erase $(WOOPGUILIB)
+   -@if exist $(WOOPGUILIB) erase $(WOOPGUILIB)
    $(lib) "$(WOOPGUILIB)" /P512 @&&!
 +$(**: = &^
 +)
@@ -34,7 +34,7 @@ $(WOOPGUILIB): $(WOOPGUIOBJ)
 !
 
 $(WAPILIB): $(WAPIOBJ)
-   -erase $(WAPILIB)
+   -@if exist $(WAPILIB) erase $(WAPILIB)
    $(lib) "$(WAPILIB)" /P512 @&&!
 +$(**: = &^
 +)

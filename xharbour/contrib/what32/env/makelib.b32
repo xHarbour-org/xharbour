@@ -4,7 +4,7 @@
 lib: $(WHAT32LIB) 
 
 $(WHAT32LIB): $(WHAT32OBJ)
-   -erase $(WHAT32LIB)
+   -@if exist $(WHAT32LIB) erase $(WHAT32LIB)
    $(lib) "$(WHAT32LIB)" /P512 @&&!
 +$(**: = &^
 +)
@@ -12,11 +12,11 @@ $(WHAT32LIB): $(WHAT32OBJ)
 !
 
 clean:
-        -erase *.obj
-        -erase *.exe
-        -erase *.res
-        -erase *.map
-        -erase *.rws
-        -erase $(WHAT32LIB)
+        -@if exist obj\b32\*.obj erase obj\b32\*.obj
+        -@if exist obj\b32\*.exe erase obj\b32\*.exe
+        -@if exist obj\b32\*.res erase obj\b32\*.res
+        -@if exist obj\b32\*.map erase obj\b32\*.map
+        -@if exist obj\b32\*.rws erase obj\b32\*.rws
+        -@if exist $(WHAT32LIB) erase $(WHAT32LIB)
 
 
