@@ -1,0 +1,3426 @@
+/*
+ * $Id: ChangeLog,v 1.288 2002/06/24 04:17:19 ronpinkas Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2002-06-23 21:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Increased FOR_EACH counter to ULONG from USHORT.
+
+2002-06-21 23:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  + lib/bcc640.lib
+    + Lib for extending the number of open files for xharbour for bcc32
+  * bin/bld.bat
+    utils/hbmake/hbmake.prg
+     * Added bcc640.lib to be linked when Bcc32 is used
+
+2002-06-21 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/getsys.prg
+    ! Fix call to SET() without setting values.
+      ReadExit() and ReadInsert()
+
+  * source/rtl/tgetlist.prg
+    ! Fix call to SET() without setting values.
+      METHOD ReadExit()
+    + Add #include tbrowse.ch for TBrowse defines.
+
+  * source/rtl/teditor.prg
+    ! Fix call to SET() without setting values.
+      METHOD InsertState()
+
+  * source/rtl/tbrowse.prg
+    + Initial support for SetStyle method, compatible with
+      Clipper 5.3.
+      See tbrowse.ch for support values.
+
+  * source/rtl/tbcolumn.prg
+    + Initial support for SetStyle method, compatible with
+      Clipper 5.3.
+      See tbrowse.ch for support values.
+
+  * include/tbrowse.ch
+    + Defines for TBrowse and TBColumn Classes
+
+  * include/button.ch
+    - Defines defined in TBrowse.ch
+
+2002-06-21 12:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed non expansion of nested #defines.
+
+  * include/hbapi.h
+  * source/vm/arrays.c
+    + Added: BOOL hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pItemValue );
+
+  * source/vm/arrayshb.c
+    + Added: HB_aTokens( cStringToParse, cDelimiter ) => aTokens
+
+  * include/cstruct.ch
+    + Added support for C like syntax: <typedef struct ...>
+
+  * source/rtl/cstruct.prg
+    + Added HB_CStructureCSyntax( cStructure, cDefList, cTag, cSynonList, nAlign )
+
+  + tests/wintypes.ch
+    + Added common Windows C TYPE defines sample header.
+
+  * tests/tstcstru.prg
+    + Added C Syntax sample of Structure declaration - use -dC_SYNTAX to test.
+
+2002-06-19 14:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed non released memory in macro compiler, related to @VarByRef.
+
+  * source/compiler/genhrb.c
+    + Added Harbour compatible version header.
+
+  * source/vm/hvm.c
+    ! Fixed intialization of static variables to precede call to ClipInit().
+
+2002-06-18 18:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+    - Removed obsolete syntax AS C STRUCTURE <strucName>
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * tests/tstcstru.prg
+    + Minor modifications.
+
+2002-06-18 17:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Modified syntax for Members of basic type to use IS instead of AS syntax.
+    + Added support for syntax IS <structureName> as a replacement to IS C STRUCTURE <structureName>
+    + Added support for syntax MEMBER <member> AS <structureName> as a replacement to AS C STRUCTURE <structureName>
+    + Added suport for optional := | INIT | FROM { ... } as an optional postfix to IS <structureName>
+    + Added Method Init( <aValues> ) to initialize the structure from a supplied [possibly nested] array.
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * tests/tstcstru.prg
+    * Modified to demonstrate Members of basic type syntax was changed to: IS CTYPE*
+    * Modified to that nested structure are declared with the much simpler:
+         IS <structureName> or AS <structureName> instead of IS|AS C STRUCTURE <structureName>.
+    * Modified to demonstrate new IS <structureName> := {...} syntax to provide inline initialization of all members.
+
+2002-06-17 22:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Greatly simplified and optimized.
+    + Added support for IS caluse as an alternative to INPLACE. The AS clause can't be used with this clause.
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * tests/tstcstru.prg
+    * Modified INPLACE sample to use IS syntax, and added an explanation comment.
+
+2002-06-18 05:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/rtl/win32.ole
+     ! Modify macros to enable win32ole.prg be included in DLL :
+       * static HB_FUNC( OLE_INITIALIZE ) => HB_FUNC_STATIC( OLE_INITIALIZE )
+       * static HB_FUNC( OLE_UNINITIALIZE ) => HB_FUNC_STATIC( OLE_UNINITIALIZE )
+
+   * hrbdll.bc
+     * force compilation in SimpLex flavor
+     + inclusion of cstruct.prg, win32ole.prg and traceprg.prg
+
+   * hrbdll.vc
+     + inclusion of cstruct.prg, win32ole.prg and traceprg.prg
+     + added ole32.lib abd oleaut32.lib to link script
+
+2002-06-18 04:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source\compiler\genc.c
+     ! Correction on typo :
+       "Harbour Compiler, Apha build" => "xHarbour Compiler," ( no Alpha, to be consistent with hbusage.c )
+
+2002-06-18 03:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    + HB_FUN__OPCOUNT -  returns the total amount of opcodes
+    + HB_FUN__OPGETPRF - returns an array with an opcode called and consumed times { nTimes, nTime }
+    Note: Some changes were made here and there in order to make profiler.prg works with xHarbour. These stuffs are borrowed from Harbour.
+          ( I dunno if "borrow" is the right word, since AFAIK, when one borrows something, then he must one time in future return it :-)) ).
+          Anyway, \tests\testprof.prg now should work and creation of DLL should be OK too.
+
+2002-06-17 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed Minimal Match Marker when inside first element of an OPTIONAL group.
+
+2002-06-17 01:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * doc/cstruct.txt
+    * Updated documentation of C Structure implementation.
+
+2002-06-17 00:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Moved hb_stack.Return cleanup logic into hb_vmSend() and removed as prefix to calls.
+
+  * include/hbapiitm.h
+  * source/vm/fastitem.c
+    + Added hb_itemPutCRawStatic()
+
+  * include/cstruct.ch
+  * source/vm/arrayshb.c
+    + Added support for INPLACE nested structures.
+    + Added support for C ARRAYs as structure members.
+
+  * source/rtl/cstruct.prg
+    + Added support for CTYPE_*SHORT*.
+    + Added support for INPLACE nested structures.
+    + Added support for C ARRAYs as structure members.
+    + Added Function HB_IS_CStructure()
+    + Added Method SayMembers()
+
+  * tests/tstcstru.prg
+    - Removed obsolete array syntax.
+    * Modified to demo INPLACE Nested Structures and Array Members.
+
+2002-06-15 17:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/hvm.c
+    ! Fixed support for FOR_NEXT with STEP 0
+
+2002-06-14 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/getsys.prg
+    ! Fixed 2 warings about RETURN.
+
+  * source/vm/arrayshb.c
+    * Replaced min() with ( x < y ? ) syntax.
+
+2002-06-14 11:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    ! Fixed alignment logic.
+
+  * source/rtl/cstruct.prg
+    * Changed default alignment to 8.
+
+  * tests/tstcstru.prg
+    * Changed test to use DWORD Alignment (4).
+
+2002-06-14 14:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/getlist.prg
+    + Add __GetListLast() for support to the functions Update() and
+      ReadUpdate()
+    * source/rtl/getsys.prg
+    ! Fixed compatibility functions Update() and ReadUpdate().
+      Now use __GetListLast() instead of __GetListActive().
+      __GetListActive() reference to the active oGetList, beginning and
+       concluding with the ReadModal.
+      __GetListLast() reference to the last oGetList form the beginning
+       of the ReadModal until another ReadModal begins.
+    ! Fix bug in Accelerator(), Clipper 5.3 compatibility function.
+    * Some cleanup.
+  * source/rtl/tget.prg
+    + Add support for SET DELIMITERS
+  * source/rtl/tgetlist.prg
+    ! Change __GetListActive() for __GetListLast() for support to
+      Update() and ReadUpdate()
+
+2002-06-13 20:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapiitm.h
+    + Added: PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+
+  * source/vm/fastitem.c
+    + Added: extern PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+    * Reverted hb_itemPutCPtr() to override last char with a NULL Terminator.
+
+  * source/vm/arrayshb.c
+  * tests/tstcstru.prg
+    * Replaced hb_itemPutCPtr() calls, with hb_itemPutCRaw()
+
+2002-06-13 16:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    ! Fixed minor bug in HB_ArrayToStructure
+
+2002-06-13 15:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+  * include/hbapi.h
+    + Added: hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+
+    /*
+       NOTE: I belive few individuals wrote variations of this function
+       PLEASE standardise your code with this API documented function.
+    */
+
+  * source/vm/eval.c
+    ! Fixed hb_itemDo() and hb_itemDoC() to not require 3rd parameter.
+
+  * source/vm/fastitem.c
+    ! Fixed hb_itemPutCPtr() to NOT overiride last char with a NULL Terminator.
+
+  * source/vm/hvm.c
+    ! Fixed minor bug in HB_P_LOCALNEARSETINT and HB_P_ADDINT
+
+  * source/vm/arrayshb.c
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    + Added support for nested structures.
+
+  * tests/tstcstru.prg
+    * Modified the sample to demo Nested Structures.
+
+  + doc/cstruct.txt
+    + New documention for C Structure support.
+
+  /*
+     Syntax:
+     -------
+
+        Definition:
+        -----------
+        C STRUCTURE <strucName> [Align <nAlign>]
+          MEMBER <memberName>   AS <CTYPEDEF>
+          ...
+        END C STRUCTURE
+
+        Usage:
+        ------
+
+        <lValue> := C STRUCTURE <strucName>
+
+        <strucObj>:<memberName>
+
+
+     CLASS C Structure:
+     ------------------
+
+     Properties:
+
+        acTypes        -> Array Of CTYPE Definitions of Structure Members.
+        nAlign         -> [READ ONLY] Alignment attribute of the C Structure.
+        SizeOf         -> [READ ONLY] The equivalent of C' sizeof( STRUCTURE ).
+        nId            -> [READ ONLY] Unique ID of this Structure.
+        InternalBuffer -> [READ ONLY] String reprentation of the C Structure memory image.
+
+        [xMember] -> Each Structure Member is represented by a given Property of the same name.
+
+     Methods:
+
+        Reset           -> Initializes all Structure Member properties to NIL.
+
+        Buffer( [New] ) -> Optionaly SET the InternalBuffer to a new image, which will automatically
+                           call the DeValue() Method to reflect the change in Member Properties.
+
+                           Return a copy of the InternalBuffer.
+
+        Value           -> Return a newly calculated C Strucure Image which and record it into InternalBuffer.
+
+        DeValue         -> Calculates new values for all Member Properties to reflect the current image of
+                           the C Structure from the InternalBuffer.
+
+                           Return Array of Member Properties values.
+
+        Array           -> Return Array of Member Properties values.
+
+     PRG Support Functions:
+
+        __ActiveStructure( cStructure, aStructure, nAlign ) -> PP Syntax Support. Registers the new Structure.
+
+                                                               Return the last registered Structure.
+
+        HB_CStructureID( cStructure )                       -> Returns the ID of a given Structure by LITERAL Name.
+
+
+        HB_CStructure( cStructure, aStructure, nAlign )     -> Creates a new Instance of a C Structure Class for the
+                                                               given defintions. If such Structure was already defined
+                                                               it will instanciate an object of the pre-existing class,
+                                                               otherwise it will create new Class matching the definitions
+                                                               and will instanciate the new class.
+
+                                                               Return new object instance of the specified C Structure class.
+
+       HB_CStructureFromID( nId, nAlign )                   -> Creates a new Instance of a C Structure based on the Structure ID.
+
+                                                               Return new object instance of the specified C Structure class.
+
+       HB_SizeOfCStructure( acTypes, nAlign )               -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given specs.
+
+       HB_ArrayToStructure( aValues, acTypes, nAlign )      -> Return a String representation of the C Structure memory image
+                                                               for the given values in array aVales based on given defintions.
+
+       HB_StructureToArray( Buffer, acTypes, nAlign )       -> Return an Array calculated from the given C Structure memory image
+                                                               based on given defintions.
+
+
+     C Support Functions:
+
+       unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
+       -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given defintions.
+
+  */
+
+2002-06-13 19:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/console.c
+    * Minor fix for hb_conDevPos()
+
+2002-06-12 04:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fm.c
+    * Minor refinment of error messages in hb_xfree()
+
+  * source/vm/arrays.c
+    ! Minor optimization to hb_arrayFill()
+
+  * source/vm/arrayshb.c
+    + Added new ArrayToStructure()
+    + Added new StructureToArray()
+
+  + include/cstruct.ch
+  + source/rtl/cstruct.prg
+    + New C STRUCTURE support.
+
+  + tests/tstcstru.prg
+    + Sample test to demonstrate new C STRUCTURE support.
+
+  * makefile.bc
+  * makefile.vc
+  * source/rtl/Makefile
+    + Added new cstruct.prg to make files.
+
+2002-06-10 13:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Reverted recent fix in TestOptional() untim more complete fix.
+
+   * tests/pp.prg
+     ! Fixed minor bug in MatchRule()
+
+2002-06-08 14:51 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+     + added hb_cdxOrderDestroy, hb_cdxIndexDelTag functions,
+       ordDestroy() is working now for dbfcdx rdd.
+
+2002-06-07 12:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtwin/gtwin.c
+    ! Removed Clipper-incompatible change that made Shift+ESC
+      return 641 instead of 27 in normal keyboard input mode,
+      instead of only returning 641 in HB_INKEY_EXTENDED mode.
+      by David G. Holm
+
+2002-06-07 12:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tgetlist.prg
+  * source/rtl/getsys.prg
+    ! Modification of work for save oGetList active.
+      Save oGetList for recursives calls to ReadModal().
+      Necessary to support post-evaluation functions
+      to the exit of the ReadModal().
+      eg: UPDATE()
+
+2002-06-06 11:36 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtwin/gtwin.c
+    ! Fixed Esc key translation problem that only occurred in some
+      international versions of Windows.
+      by David G. Holm and minor fix by Walter Negro.
+
+2002-06-05 19:38 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/compiler/gencobj.c
+     ! fixed uninitialized pointer.
+
+2002-06-05 12:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/tget.prg
+     ! Fixed operation of picture "@Z"
+       Reported by Pritpal Bedi
+
+2002-06-02 09:30 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbdefs.h
+     + added __XHARBOUR__ define
+
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug updating conditionals indexes, reported by Walter Negro
+     ! fixed bug in dbgoto, reported by Pritpal Bedi
+
+2002-05-30 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/hbmutils.prg
+    * minor fixed related to Recurse directory
+
+2002-05-30 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    * Minor Fix relating to compile of .rc files
+
+2002-05-30 00:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    + Add two instance variables, nRow and nCol. Existing in Clipper 5.3.
+      Only was modified the Hilite and SetPos method, for save in
+      this variables, the position of cursor.
+
+2002-05-25 21:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix picture function in lower case. (eg: @s )
+    Reported by Luiz Rafael Culik Guimaraes
+
+2002-05-25 15:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * hrbdll.bc
+    dll_55.bat
+    * minor fix
+  * source/rtl/tprint.cpp
+    * minor fix
+
+2002-05-25 13:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    * Minor Fix
+  * source/rtl/dbedit.prg
+    * Minor Fix
+  * hrbdll.bc
+    hrbdll.vc
+    * Added source/rtl/tprint.cpp and source/rtl/tprinter.cpp to
+      dependencie list
+
+2002-05-24 19:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in TestOptional() which caused a match of a STOP word to be accepted within a Nested Optional.
+
+    /* NOTE: This could open new issues! I did test as much as I could including making sure all of FWH
+       compiles correctly - but extensive testing is needed by compiling everything that was compiling
+       before this change.
+    */
+
+2002-05-24 16:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/achoice.prg
+    * More compliant with Cli**er.
+    ! Fix minor bug when press CTRL_END and the quantity of items
+      is smaller to the long of the window.
+      This bug exist in previous versions of achoice().
+    Reported by Carlos Vargas.
+
+2002-05-24 13:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix @R pictures with "-" or "(" characters
+
+    Reported by somebody in sourceforge
+
+  * source/rtl/achoice.prg
+    * More compliant with Cli**er.
+    *  Support for use acItems directly without internal copy.
+          This permit modify acItems and reflect this changes.
+
+    *  Support for use xSelect directly, if its an array,
+       without internal copy.
+          This permit modify xSelect and reflect this changes.
+
+    *  No call to xUserFunc again when xUserFunc its call with
+       nMode = AC_EXCEPT, and xUserFunc return AC_CONT
+
+    *  Always redraw the page when return from xUserFunc.
+
+    *  Support for return AC_REDRAW.
+
+2002-05-24 06:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Corrected hb_pp_ParseDefine() so that compiled marker qualify as valid array prefix.
+
+  * source/pp/pptable.c
+    ! Corrected representation of #define _DFSET ... to match hb_pp_ParseDefine()
+
+2002-05-24 02:02 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/console.c
+    ! Fix print in the same line when the new position is previus
+      to the current one.
+
+  * source/rtl/getsys.prg
+    ! Fix, lost the reference to the current oGetList with recursive
+      execution of ReadModal.
+
+2002-05-23 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/pptable.c
+    + Added support for INDEX clause to INDEX commands.
+    * Minor correction to representation of #define _DFSET ...
+
+  * include/hbver.h
+    * Updated ChangeLog entries.
+
+  /* I'll greatly aprreciated one more cicle of build confirmation. */
+
+2002-05-23 19:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! more fix in handling of repeatable/non repeatables into a repeatable group.
+
+2002-05-23 22:25 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * source/vm/estack.c
+    ! All stack hb_stackxxx API functions are now included, no matter
+      the build options (HB_STACK_MACROS)
+
+2002-05-23 12:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    ! Removed few commented lines.
+
+  * source/compiler/harbour.sly
+    ! Fixed logic of GetA
+
+  + tests/tstgetar.prg
+    + Added tests for GET on Complex Arrays.
+
+2002-05-23 13:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix, it was always written in the position 1 the first number
+      of a numeric field although the cursor was moved to write in
+      another position.
+    ! Fix minor bug in PutMask( )
+
+2002-05-22 18:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    + Added support for an optional 4th paramater to aIns() as a logical flag to Auo Extend the Array Size
+      to allow for aIns() to add an Element without losing the last Array Element Value.
+      /* The functionality of aIns was so un-natural, that I actually forgot it discards last element.
+         - Now it's under our control. */
+
+  * source/rtl/alert.prg
+    * Revised to use 4th paramater to aIns().
+
+  * include/hbver.h
+    * Updated ChangeLog entries
+      /* :-) .AND. :-( */
+
+2002-05-22 17:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/alert.prg
+    ! Fixed to autowarp if message is longer than 58 characters long (like Clipper).
+      /* Long Error Messages can finally display correctly! */
+
+  * source/vm/arrayshb.c
+    + Added support for an optional 3rd paramater to aIns() representing the value to insert.
+      /* For the longest time I was frustrated with Clipper only inserting a NIL */
+
+  * include/hbver.h
+    * Updated ChangeLog entries
+      /* I seriously hope this is the last time for Build 73. */
+
+2002-05-22 18:39 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * tests/test.dbf
+    ! synched with Harbour
+
+2002-05-22 22:25 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * tests/test.dbf
+    ! synched with Harbour
+
+2002-05-22 16:11 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/vm/hvm.c
+     ! fixed gpf with static strings optimizations
+
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fix in locking logic.
+
+2002-05-22 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+    ! Fixed unreleased memory resulting from optimization of EVAL().
+
+2002-05-22 08:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+    ! Fixed GPF on Eval() when compiled by MACRO
+
+  * source/rtl/errorsys.prg
+    * Corrected formatting.
+
+2002-05-21 08:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * utils/hbmake/hbmake.prg
+    * Commented Profiler code left overs.
+
+  * include/hbver.h
+    * Updated ChangeLog entries
+
+2002-05-21 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+    ! Some For x := 1 to Len( array )  replaced with fastern FOR EACH xxx IN Array
+  * include/hbver.h
+    * Updated entry
+
+2002-05-21 13:35 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddntx.h
+   * source/rdd/dbstrux.prg
+   * source/rdd/dbf1.c
+   * source/rdd/dbfntx/dbfntx1.c
+     ! synched from Harbour
+
+   * source/rdd/workarea.c
+     ! fixed bof flag in go bottom with no valid records
+
+   * include/hbapirdd.h
+   * source/rdd/dbcmd.c
+     + added functions ordKeyAdd and ordKeyDel (need support from each RDD)
+     ! fixed compatibility issue: ordListAdd(nil) is valid in Clipper
+     ! fixed return value of dbGoTo()
+     + added support of 4th value of dbOrderInfo
+     ! others changes synched from Harbour
+
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed gpf reported by Lorenzo Fiorini
+     + added helper function hb_cdxGoEof
+     + added default tag name when not specified
+     + fixed support for dbSeek(last)
+     + added scope support: ordScope, dbOrderInfo(..scope..),
+         ordKeyCount, ordKeyNo.
+     ! fixed found() flag when last record in order must be
+       filtered (eg: deleted), bug reported by Lorenzo Fiorini.
+     + added dummy handler for DBOI_CUSTOM.
+     ! minor changes
+     ! fixed preventing reopening of same cdx.
+
+2002-05-21 08:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed bug in optimization of (equality test):
+        xExp = .T.
+        xExp = .F.
+
+2002-05-20 15:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed minor bug in hb_vmProcessSymbols() where sModule was NOT allocated.
+
+2002-05-20 23:20 UTC+0100 J.lefebvre (Mafact) <jfl@mafact.com>
+ * source/compiler/hbusage.c
+   * void hb_compPrintCredits( void )
+     Major bug fixed where my name was missing from the list ;-))))
+
+2002-05-20 13:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    + Corrected inclusion of <errno.h>
+
+  * makefile.bc
+    ! Corrected path of hbmlang.c
+
+  * include/hberrors.h
+    + Added: #define HB_PP_ERR_LABEL_MISSING                 19
+
+  * source/pp/pptable.c
+    ! Corrected representation of #define _DFSET ...
+
+  * source/pp/ppcore.c
+    ! Corrected hb_pp_ParseDefine() to compile Pseudo-Functions such that parametes are correctly expanded.
+
+  * utils/hbmake/hbmake.prg
+    ! Corrected invalid #define (used #translate format).
+
+2002-05-19 21:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    * Fixed an minor bug
+  * source/rtl/tprint.cpp
+    source/rtl/tprinter.cpp
+    include/tprint.hpp
+    * Mijor formatting.
+    * Fixed compilation warning
+
+2002-05-18 10:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * makefile.bc
+    makefile.vc
+    utils/hbmake/Makefile
+    * Added hbmlang.c to dependencie list
+  * utils/hbmake/hbmake.prg
+    - Removed GETLANG() function and moved to an new file
+  + utils/hbmake/hbmlang.c
+    * GETLANG.c is on this file now
+
+2002-05-18 13:40 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/compiler/harbour.c
+    * Fixed errno compilation problem under Linux
+
+2002-05-18 01:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Corrected typo in #define hb_itemArrayPut
+
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+    ! Fixed possible GPF when Function Call is a macro.
+    + Added warning on meaningless function call for At() Left() Right() and SubStr()
+      if used as a statement line.
+
+  * source/compiler/simplex.c
+  * source/compiler/harbour.slx
+    * Minor formatting.
+
+  * source/compiler/harbour.c
+    * Changed hb_xgrab() hb_xrealloc() and hb_xfree() to use Heap*() under MSVC.
+      /* This solves strange GPFs - details documented in top of file. */
+
+  * source/compiler/harbour.sly
+    * Minor optimization and formatting.
+
+  * source/vm/hvm.c
+    * Changed parameter to va_arg() from USHORT to int to correct compiler warning.
+
+2002-05-16 13:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * source/compiler/harbour.sly
+  * source/pp/ppcore.c
+    * .AND. shortcut more Clipper compatible.
+    * IF()/IIF() parsing optimized.
+
+  * source/rtl/errorsys.prg
+    - Commented Alert() regarding error.log
+
+2002-05-15 19:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    - Removed 1 unneed initialization.
+
+  * source/rtl/errorapi.c
+    ! Corrected hb_errInternal() to not GPF if called before hb_langRegister() is called.
+    + Added output ot error.log
+    + Added MessageBox() output if under Windows.
+
+  * include/hbinit.h
+  * include/hbsetup.h
+  * include/hbvm.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+    + Added support for version check of PCODE in compiled prg.
+
+  * source/vm/initsymb.c
+  * source/vm/runner.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    + Added version indicator.
+
+  /*
+    NOTE: xHarbour will now report error when a prg was compiled with incompatible version of Harbour or xHarbour.
+        : If you don't recompile all prg files you will get such error when linking it with this version.
+  */
+
+2002-05-14 21:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+ * source/rtl/console.c
+   ! fix for printing on Windows when an Set printer to Win:xxx is issued
+
+2002-05-14 09:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbexprb.c
+     * Minor correction to handling of HB_P_ARRAYPOP ( reset of HB_ET_VARREF )
+
+2002-05-13 21:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+ * utils/hbmake/hbmake.prg
+    % Optimized The Code
+    ! New text Formating
+    + Support for Roberto's Minigui
+    + Internationalization Started
+ * utils/hbmake/hbmutils.prg
+    * Minor fix
+
+2002-05-13 13:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/menuto.prg
+    ! Fix, initial value was not used.
+      Reported by Horacio Roldan.
+
+2002-05-12 10:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    * Removed redundant ElemList, replaced with ArgList.
+
+  * source/macro/macro.y
+    * Corrected <Array> to support Elements ByRef.
+
+  * source/vm/arrays.c
+    * Corrected hb_arraySet() to correctly handlke assignment into BYREF Elements.
+
+2002-05-11 22:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+   * tests/pp_harb.ch
+     + Added support for MiniGUI
+
+   /*
+    Note: You need to use -dMINIGUI to enable the support.
+        : xBaseScript can now run MiniGUI demo.prg.
+   */
+
+2002-05-11 13:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+     + Added explicit logic for Empty( sWorkLine ) under sucessful match IF section.
+     /* Not all sublogic fully tested yet. */
+
+2002-05-10 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rtl/win32ole.prg
+     + Now allows return parameter to return OLE object.
+     + Added support for SQL NULL.
+     - Removed the need for :End() deinitialization is automated.
+
+   * tests/pp.prg
+     + Added (under #ifdef WIN): EXTERN CreatObject
+
+   * tests/testole.prg
+     - Removed :End() calls.
+
+2002-05-09 20:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rtl/win32ole.prg
+     * Increased COM parameters support from 6 to 9.
+
+   * tests/pp.prg
+     * Added logic to default nLine to 0
+
+2002-05-08 23:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/vm/hvm.c
+     ! Corrected HB_P_PUSHBYTE, HB_P_PUSHINT to support signed values.
+     + Added support for negative indexes into arrays.
+       Note: -1 == Last Element
+           : -1 on an empty array, will return NIL.
+
+   * include/hbexprb.c
+     ! Optimized Right( x, 1 ) => x[-1]
+     ! Optimized aTail( x ) => x[-1]
+     ! Optimized ArrayVar[ Len( ArrayVar ) ] => ArrayVar[-1]
+     Note: These optimizations result in much faster execution for code that uses the above.
+
+   * source/compiler/genc.c
+   * source/compiler/harbour.c
+     ! Corrected code generation to use HB_P_PUSHBYTE and HB_P_PUSHINT for signed values within their respective ranges.
+       Note: This change FORCES a RECOMPILE of ALL modules.
+           : xHarbour is not compatible with Harbour compiled modules, until if/when
+             this fix will be implemented in Harbour.
+           : Generated files will now be smaller for modules including negative numbers.
+
+2002-05-08 22:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Minor correction PP_PreProText() if nLines == 0
+    + Added nLine support to PP_Run_Err()
+
+  * source/rtl/errorsys.prg
+    + Added Proc Name and Line as well as arguments to the Alert() Message.
+
+2002-05-08 16:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * TODO
+    * Updated status.
+
+2002-05-08 16:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/hbfunchk.c
+    * Changed AT() to allow 4 paramaters.
+
+  * source/rtl/win32ole.prg
+    - Deffed out un-used code, which was using _asm code.
+    * Few improvements and fixes.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    ! Fixed PP_PreProText() handling of Chr(10), comments, and retaing line numbers.
+
+2002-05-08 14:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    - Removed prototype declaration of QOUT and QQOUT from hb_compDeclaredInit()
+    * Corrected prototype declaration of AT to 4 parameters in hb_compDeclaredInit()
+
+  * source/rtl/at.c
+    + Added support for optional nStart and nEnd 3rd. and 4th. parameters.
+
+  * source/rtl/errorsys.prg
+    * Formatting and typos.
+
+2002-05-06 23:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tbrowse.prg
+    ! Bug fixed reported by Lorenzo Fiorini.
+
+2002-05-05 19:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+     - Removed elements pOrigin and asString.bChar from HB_ITEM to retain HB_ITEM compatibility with Harbour.
+
+   * include/hbexprb.c
+     * Changed AnyVar[...] := ... to push AnyVar BYREF incase it's String manipulated as an Array.
+     * Changed FOR EACH AnyVar IN ... to push AnyVar BYREF.
+       /* Both these changes replaces the use of pOrigin */
+
+   * source/compiler/harbour.sly
+     * Correted FOR EACH to only accept Identifier as oppose to any LValue.
+
+   * source/rtl/chrasc.c
+     - removed reference to asString.bChar.
+
+   * source/vm/fastitem.c
+     - removed references to item.asString.bChar.
+     - removed references to item.pOrigin.
+
+   * source/vm/hvm.c
+     - Changed refrences of item.asString.bChar to item.asString.length == 1
+     * Changed HB_P_FOREACH to use hb_itemUnRef() instead of ->pOrigin
+     * Changed hb_vmArrayPop() to use hb_itemUnRef() instead of ->pOrigin.
+     + Added support for CHARTYPE as Array Index.
+
+   * tests/strindex.prg
+     + Added display of the coded string.
+
+2002-05-03 23:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/compiler/harbour.sly
+     ! Fixed minor bug in handling of pArrayIndexAsList
+
+   * source/rtl/errorsys.prg
+     - Commented out section that output MEMVARS to Log File, because it was causing nested error and
+       there are better ways to get list of MEMVARS.
+     + Added STATIC FUNCTION Arguments() and use it to log Argument Errors.
+
+   * source/rtl/tgetlist.prg
+     ! Corrected minor bug in using Len() on oGet:Buffer, where it might be NIL.
+
+2002-05-03 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+     ! Fixed bug in MatchRule() introduced by change in 2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+     /* Note:
+        Rewind logic was missing rewind of all adjucent left optional of same level.
+        I fixed the rewinf to perform such rewind, but code is simpler than prior version.
+        Incase of problem compare with version prior to 2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+     */
+
+2002-05-03 21:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/tprint.hpp
+   * source/rtl/isprint.c
+   * source/rtl/tprint.cpp
+   * source/rtl/tprinter.cpp
+     ! Corrected #if guards and added missing #include <winspool.h>
+
+   * tests/pp.prg
+     ! Fixed but with introduced in last fix to RETURN [...]
+
+2002-05-03 19:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! One more fix in SernRep() - rewrote the handling of repeatable/non repeatables into a repeatable group.
+
+  * tests/pp.prg
+    ! Fixed support for RETURN [...] to exit the current procedure.
+
+2002-05-03 00:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * config/w32/gcc.cf
+     - removed user32 and winspool from added libs.
+
+   * source/rtl/isprint.c
+     - removed  && !defined(__CYGWIN__) from line 70
+
+   * source/rtl/set.c
+     ! Corrected ambigious else.
+
+   * source/rtl/win32ole.prg
+     * Corrected some declarations and type casts.
+
+2002-05-02 17:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   + tests/testole.prg
+     + Added demo of OLE/COM usage.
+
+2002-05-02 15:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   + source/rtl/win32ole.prg
+     + New self contained COM Interface - based on José F. Giménez original work.
+       /* New improvements include improved compatibility and support for parameters
+          passed by refernce to COM Servers. */
+
+   * makefile.bc
+   * makefile.vc
+     + Added support for new win32ole module.
+
+2002-05-02 11:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Added few missing type casts.
+
+2002-05-02 20:30 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/vm/hvm.c
+    * Fixed string sharing broken during last string optimizations
+
+2002-05-02 15:30 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/vm/runner.c
+    * Added missing newline at EOF
+
+  * source/vm/hvm.c
+    * Some string manipulation optimizations
+
+2002-05-01 17:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+     + Added declaration of hb_retcAdopt(), hb_retcStatic(), hb_retclenAdopt(), hb_retclenStatic()
+     + Added #define HB_API_MACROS to force MACRO usage by default.
+
+   * include/hbfast.h
+     - Removed declaration of hb_retcAdopt(), hb_retcStatic(), hb_retclenAdopt(), hb_retclenStatic()
+
+   * source/vm/extend.c
+   * source/vm/fastitem.c
+     + Added #undef directive preceding each of the functions that have a MACRO version.
+
+2002-05-01 15:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbset.h
+    ! Corrected declarations of CloseWinPrinter() and WinPrinterEject()
+
+  * source/compiler/harbour.sly
+  * source/macro/macro.y
+    * Minor formating corretions, based on new warnings by Bison 1.35
+
+2002-05-01 11:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp_harb.ch
+    ! Many improvements in OLE inteface. It now supports parameters by reference.
+
+2002-05-01 01:41 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+   * source/rdd/dbfcdx/dbfcdx1.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+     + multiple CDXs support for:
+       hb_cdxOrderListAdd, hb_cdxOrderListFocus, hb_cdxGoCold,
+       hb_cdxGoHot, hb_cdxGetTagByNumber, hb_cdxGetActiveTag,
+       DBOI_ORDERCOUNT, DBOI_UNIQUE, ordName, ordBagName.
+     ! fixed a bug in: gotop, gobbotom, skip
+     + begin of hb_cdxZap
+     + added support for: DBOI_ISCOND, DBOI_ISDESC, DBOI_FILEHANDLE
+     + added index locking routines
+     ! fixed some structures definitions for gcc/vc/...
+     ! fixed autopen bug on Linux
+     ! fixed recno() while indexing
+     ! fixed sharing flags in index creation
+     ! fixed tag order after index creation
+     + added function hb_cdxReorderTagList
+     + added dummies handlers for DBOI_KEYADD, DBOI_KEYDELETE.
+
+2002-04-29 23:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added ->pOrigin fix in hb_vmPushLocal() and hb_vmPushStatic()
+
+2002-04:30 01:41 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/memoedit.prg
+    ! Fix minor bug related with support for Set Key defined Keys
+  * source/rtl/getlist.prg
+    ! Fix bug when release last getlist
+      Reported by Alexander Kresin
+
+2002-04-29 19:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/teditor.prg
+    * Minor fix
+
+2002-04-29 16:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/set.c
+    ! Replaced calls to stricmp with hb_stricmp
+
+2002-04-29 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * include/hbexprc.c
+    ! Fixed GPF when left side of an optimized assignment is a macro.
+
+  * tests/pp.prg
+  * tests/rp_dot.ch
+  * tests/rp_run.ch
+    ! Corrected #translate of _GET_().
+
+2002-04-28 19:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/math.c
+    * Log(), Exp(), and Sqrt() more Clipper compatible.
+
+2002-04-28 19:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.vc
+    + Added missing libs to hbtest production
+
+  * source/rtl/str.c
+    + Added #include "hbfast.h"
+
+2002-04-28 18:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/math.c
+    * Minor optimization.
+
+  * source/rtl/str.c
+    * Coorected latest change - Clipper does not accept NIL or implied NIL parameters as valid.
+
+  * source/vm/itemapi.c
+    * Made hb_itemStr() more Clipper compatible.
+
+2002-04-28 22:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  + include/tprint.hpp
+    * Added missing require file for Winprinter support
+
+2002-04-28 17:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbset.h
+    * Added the necessary member to work WinPrinter
+  * source/rtl/console.c
+    sourcr/rtl/set.c
+    * Added support for Winprinter on SET()
+       Set(24,"job:xxx") Set the winprinter Jobname
+       Set(24,"Win:xxx") Set the Windows Printer to USE( must match the Printer
+       name on Printer Folder
+  + source/rtl/tprint.cpp
+    source/rtl/tprinter.cpp
+    * Printer Class and wrapper for Winprinter
+  * makefile.bc
+    makefile.gc
+    * Updated makefiles
+  + tests/testwprn.prg
+    * Test file for printer enhacementes
+
+2002-04-27 20:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added Harbour compatibility wrappers:
+        #define hb_retc_buffer( szText )                   hb_retcAdopt( szText )
+        #define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
+        #define hb_retc_const( szText )                    hb_retcStatic( szText )
+        #define hb_itemArrayPut ( pArray, ulIndex, pItem ) ( hb_arraySet( pArray, ulIndex, pItem ), pArray )
+
+    * Added -DHB_API_MACROS support for some missing hb_ret*().
+
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added:
+        PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
+        PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+        void     hb_retcStatic( char * szText )
+        void     hb_retclenStatic( char * szText, ULONG ulLen )
+
+  * source/pp/pptable.c
+    + Added support for:
+        #command SET AUTOPEN <x:ON,OFF,&>       => Set( _SET_AUTOPEN, <(x)> )
+        #command SET AUTOPEN (<x>)              => Set( _SET_AUTOPEN, <x> )
+
+  * source/rtl/str.c
+    * Clipper compatibility improved.
+
+  * source/vm/extend.c
+    * All retc* functions are included regardless of -DHB_API_MACROS
+
+2002-04-27 23:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/teditor.prg
+    * Added Support lookup on SetKey()'s Defined functions on Edit()
+      and BrowseText() then this are not Handle by TMemoEditor:Edit() method
+
+2002-04-27 22:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/isprint.c
+    + Added GETPRINTERS() function(win32) to retrive all instaled printer
+      on an computer to an array
+      Each Array element is {"Printer Name"," Printer Port"} Where Printer Name
+      is the Name that apear on the printers folder, and Printer port, what port
+      this printer use
+
+2002-04-27 17:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/dbedit.prg
+    *Fix an bug on dbedit function that was Generating an Recursive call to DBEDIT()
+     functions if the acColumns parameter was defined like below
+     aCol[1]:={"Name"+" "+"AddRess"+" "+"phone"}
+
+2002-04-26 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbextern.ch
+    * Corrected __ClassInstance to __ClassIns
+
+  * source/pp/ppcore.c
+    * Final fix in SernRep() - This fixes all output issues I was aware of.
+
+2002-04-26 12:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Corrected replacments of non repeatable marker within repeatable result group.
+
+2002-04-25 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/memoedit.prg
+    * Readded old Support for Set key defined Keys on Edit() method
+
+2002-04-25 08:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tbrowse.prg
+    * Method SetColumnWidth() now return the corrent Value(Clipper return the Greater value of either Heading;Data; or footer
+
+2002-04-25 23:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Corrected 1 bug with regard to replacement of non repeatable marler value within repeatable group.
+
+  * include/hbexprb.c
+    * Corrected error when Self Value is used as an Array.
+
+  * source/compiler/harbour.slx
+    * Correction [] as an Index after SELF
+
+  * source/rtl/strcase.c
+    * Corrected hb_strLowerCopy() and hb_strUpperCopy() to have terminating '\0'.
+
+  * source/vm/classes.c
+    - Commented out __ClassNew(), __ClassAdd(), and __ClassIns()
+  * source/rtl/tclass.prg
+    + Added Clipper compatible __ClassNew(), __ClassAdd(), and __ClassIns()
+
+  * source/vm/hvm.c
+    + Added new PRG level function HB_FuncPtr()
+      NOTE: This is the Run-Time equivalent of @FuncName() - It allows passing function pointers at run time:
+      Sample: __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
+
+/*
+   Now code that was using Clipper undocumented class creation functions should perform correctly.
+*/
+
+2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Few minor corrections and optimizations to MatchRule()
+
+2002-04-24 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   - source/rdd/dblist.new
+     - Removed unneeded file.
+
+   * bin/!pack_bin.bat
+     * Corrected typo.
+
+   + bin/!pack_src.bat
+     + Added batch file to create source archive.
+
+2002-04-24 00:42 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/workarea.c
+     ! fixed bug with set relation to, found by Walter Negro.
+
+2002-04-24 04:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/devoutp.prg
+    ! More compliant with Cli**er for certain types of data.
+      Now only accept character, memo, numeric, date and logical
+      types of data.
+      Any other types of data is ignored.
+
+2002-04-23 17:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Corrected hb_vmInit() to excplictly initialize ClipInit, DBFNTX, and DFBCDX.
+      /* No longer relaying on INIT procedures because execution order is not guaranteed.
+
+  * source/rdd/dbfcdx/dbfcdx0.prg
+  * source/rdd/dbfntx/dbfntx0.prg
+  * source/vm/harbinit.prg
+    * Removed INIT qualifier.
+
+2002-04-22 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    * Minor formatting.
+
+  * source/rtl/chrasc.c
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+    * Changed hb_vm_acAscii to char * hb_vmAscii[256].
+
+2002-04-22 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + #define HB_MAX_ENUMERATIONS 16
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added support for new HB_P_FOREACH, HB_P_ENUMERATE, HB_P_ENDENUMERATE
+
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/vm/hvm.c
+    + Added support for new syntax:
+      FOR EACH <id> IN <Arrayr>|<Object>
+         [...]
+      NEXT
+
+      Note: FOR EACH may be nested up-to HB_MAX_ENUMERATIONS levels deep.
+
+  /*
+     This allows for automatic enumeration of all elements in an Array, and/or all Properties of an Object.
+  */
+
+2002-04-20 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + #define HB_MAX_WITH_OBJECTS 16
+
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    + void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for WITH OBJECT <obj> statement */
+    + void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
+
+  * include/hberrors.h
+    + #define HB_COMP_ERR_UNMATCHED_WITHOBJECT        54
+  * source/compiler/hbgenerr.c
+    + "WITH Message [%s] with no WITH OBJECT in sight."
+
+  * include/hbexprop.h
+  * source/common/expropt1.c
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for: WITH OBJECT <obj> ; :WithProperty; :WithMethod([...]); END syntax
+      /* Nested WITH OBJECT are supported up to HB_MAX_WITH_OBJECTS levels. */
+
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * include/hbpcode.h
+  * source/vm/hvm.c
+    + Added support for new: HB_P_WITHOBJECT, HB_P_SENDWITH, HB_P_SENDWITHSHORT, HB_P_ENDWITHOBJECT
+
+  /*
+     The new WITH OBJECT syntax produce smaller ans slightly faster executables.
+  */
+
+2002-04-18 10:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/chrasc.c
+  * source/vm/hvm.c
+    * Added missing type cast.
+
+2002-04-17 22:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/chrasc.c
+    ! Optimized and fixed bug.
+
+  * source/vm/hvm.c
+    * Minor optimization.
+
+2002-04-17 17:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Added member bChar to struString
+
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+    + Added support for new type CHAR as a subtype of a STRING
+
+  + tests/testchar.prg
+    + New test to demonstrate usage of new String Indexing and CHAR type.
+
+ /*
+    The new CHAR type is a smart automatic conversion based on context.
+    It is implicitly created when an indexed string ( cVar[n] ) is used
+    in math operations. This implementation retains 100% Clipper
+    compatibility with regards to strings. This means that:
+
+    cVar := "Hello"
+    ? cVar[1]      // H
+
+    // Auto conversion to NUMERIC due to math context.
+    ? cVar[1] - 1  //         71
+    ? cVar[1] + 1  //         73
+    ? - cVar[1]    //        -72
+
+    cVar[1] := 'h'
+    ? cVar         // hello
+
+    // Auto conversion from NUMERIC due to STRING assignment context.
+    cVar[1] := 72
+    ? cVar         // Hello
+
+    Please review tests/testchar.prg for an example of a simple, Super-Fast
+    Encoder/Decoder which demonstrates a 'C' level string processing speed/power.
+
+ */
+
+ // Todo: rest of math operators support for CHAR.
+
+2002-04-17 14:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Corrected minor typos.
+
+  * include/hbexpra.c
+    * Updated TODO item.
+
+  * include/hbexprb.c
+    * Removed compile time check for negative Array Index.
+
+2002-04-17 13:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Added element pOrigin to HB_ITEM.
+
+  * source/vm/fastitem.c
+    * Modified hb_itemCopy() to keep track of the origin in pDest->pOrigin
+
+  * source/vm/hvm.c
+    + Added support for Assignment into String indexed as Array:
+
+      cVar    := "Hello "
+      cVar[6] := '!'
+      cVar -> "Hello!"
+
+      Please note: this will not record such modification if the variable is a database field.
+      This will only change a single character at the specified position. If the new value is
+      longer than 1 character, only the first character will be used.
+
+    /*
+       The current implementation supports negative index, much like SubStr(). I wonder if we
+       should support negative index (from tail) in general for array. This can easily be done.
+    */
+
+2002-04-17 19:59 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbapiitm.h
+    + Add definition for hb_itemUnRefOnce().
+  * source/vm/itemapi.c
+    * Subdivision of the function hb_itemUnRef() in
+      hb_itemUnRef() and hb_itemUnRefOnce().
+  * source/rtl/valtype.c
+    + Add function: HB_ISBYREF().
+      This function allows in PRGs to know if a parameter has been
+      passed by value or by reference.
+
+2002-04-17 18:17 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix bug in DeleteAll method. Change DTOC() for CTOD().
+
+    * Bug fixed, reported by Lorenzo Fiorini.
+
+2002-04-17 18:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/teditor.prg
+    + Added of calls to IdleHook and KeyboardHook for handling of
+      special keys when the mode edition is not used.
+
+    * Bug fixed, reported by Marek Horodyski.
+
+2002-04-17 02:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/filesys.c
+    * convert_create_flags() now Set File mask on linux to 777
+  * source/rtl/errorsys.prg
+    * Enhaced errorsys.prg to produce an error.log when user click on quit button
+
+2002-04-16 19:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+    + Added compile time optimization of AT() and removed 1 TODO item.
+
+  * source/rtl/at.c
+    * Minor optimization.
+
+2002-04-16 18:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+    * Minor corrections to recent change.
+
+2002-04-16 17:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+    ! Optimized hb_itemPutC() and hb_itemPutCL() so that all strings of single character are now offsets
+      into one shared static table of all ASCII chars.
+  * source/vm/hvm.c
+    + Added support for strings as array of characters. Now any string expression may be indexed:
+
+       cVar := "Hello"
+       cVar[1] => 'H'
+
+      This kind of indexing is much faster than using SubStr( cVar, 1, 1 )
+
+    + Added support for HB_P_RIGHT - Optimization of Right( x, n ) is now complete.
+
+  * include/hbexprb.c
+    + Optimization of Right( x, n ) to use new HB_P_RIGHT.
+    + Added Automatic optimization of SubStr( x, n, 1 ) (where the len is 1) to x[n] which is much faster.
+
+  /* The above optimization of SubStr() with the following test:
+
+        Procedure Main
+
+          LOCAL nStart := Seconds(), Counter, cString := "Hello", cChar
+
+          FOR Counter := 1 to 1000000
+             cChar := SubStr( cString, 1, 1 ) // Same as cChar := cString[1]
+          NEXT
+
+          ? ( Seconds() - nStart )
+
+        Return
+
+     Produced the following timing:
+
+        Harbour  : 17.15 Sec.
+        xHarbour :  1.25 Sec.
+
+  */
+
+2002-04-16 18:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * make_gnu.sh
+  * config/linux/gcc.cf
+  * doc/en/gtslang.txt
+  * source/rtl/gtsln/Makefile
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/gtsln.h
+  * source/rtl/gtsln/kbsln.c
+  * source/rtl/gtsln/mousesln.c
+  * source/rtl/gtsln/termtype.c
+    + Added gpm mouse support on linux console
+    * Fixed mouse support under xterm
+
+2002-04-14 22:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * doc/inline_c.txt
+    * Minor correction.
+
+  * include/hbapi.h
+    * Minor correction to #define hb_retptr( voidPtr )
+
+  * include/hbexprb.c
+  * source/common/expropt2.c
+    ! Optimized:
+      Exp == .T. | .T. == Exp => Exp
+      Exp = .T.  | .T. = Exp  => Exp
+      Exp != .T. | .T. != Exp => ! Exp
+      Exp == .F. | .F. == Exp => ! Exp
+      Exp = .F.  | .F. = Exp  => ! Exp
+      Exp != .F. | .F. != Exp => Exp
+
+2002-04-06 23:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rtl/gtsln/Makefile
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/kbsln.c
+  * source/rtl/gtsln/mousesln.c
+  + source/rtl/gtsln/gtsln.h
+  + source/rtl/gtsln/termtype.c
+    + Added very basic mouse support under xterm
+
+2002-04-04 11:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Fixed minor bug in PPOut() - If last element of result was a static text which ended a repeat group,
+      the group was output only once, instead of N times.
+
+2002-04-02 21:30 UTC+0200 JF Lefebvre (Mafact) <jfl@mafact.com>
+   * include/hbclass.ch
+     + Refined Class(y) compatibility as needed by Horacio.
+
+2002-04-02 04:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/menuto.prg
+     ! Fix recursive executions and exit without pressing key.
+       Now use local pointer and save static pointer.
+
+2002-04-01 13:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/filesys.c
+    + Added HB_SYMBOL_UNUSED( ... ) to remove 2 compiler warnings.
+  * source/macro/macro.slx
+    + Added HB_SYMBOL_UNUSED( ... ) to remove 1 compiler warning.
+
+  * source/rdd/dbfntx/dbfntx1.c
+    - Removed 2 unysed variables.
+
+  * source/vm/memvars.c
+    - Removed static qualifier from hb_memvarReleasePublic() definition.
+
+2002-04-01 00:45 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rtl/gtsln/gtsln.c
+    * Fixed improper hb_getenv usage
+
+2002-03-31 09:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbver.h
+  * bin\!pack_bin.bat
+    * Updated to 0.72.0 in preparation for new Release.
+
+2002-03-31 14:00 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+  * source/rtl/tbrowse.prg
+    * Fixed an problem on SetColumnwidth() method that was Tbrowse not be properly show on screen
+
+2002-03-30 19:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Removed few #ifdef __HARBOUR__ around previously non functional __MXRELEASE().
+
+2002-03-30 19:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbfntx/dbfntx1.c
+    * Added 2 missing type casts
+
+2002-03-30 18:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/set.c
+  * source/vm/runner.c
+    > Synched with Harbour.
+
+  * source/vm/memvars.c
+    > Synched with Harbour.
+    + Added void hb_memvarReleasePublic( PHB_ITEM pMemVar ) and static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
+    * Implemented logic for releasing public variables in hb_memvarRelease().
+
+    /* Implementation of RELEASE xVar1 [, xVarN ] ( __MXRELEASE() / __MVXRELEASE() ) is now completed. */
+
+2002-03-30 20:05 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rdd/hbdbsort.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rtl/mlcount.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtcrs/kbdcrs.c
+  * source/rtl/gtsln/kbsln.c
+    * Fixed gcc warnings
+
+2002-03-29 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    ! Corrected typo in GetVar (included item belonging to GetVarArray
+
+2002-03-27 02:26 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbset.h
+   * source/rtl/set.c
+     * changed definition of HB_SET_AUTORDER from BOOL into int.
+     * changed initial value of HB_SET_AUTOPEN to TRUE.
+
+2002-03-26 07:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/spfiles.c
+    * Added 1 missing type cast
+
+2002-03-25 21:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+   * Clipper always uses MEMVAR as oppose to FIELD or VARIABLE
+     when assigning into ambigious variable in Macro Compiler.
+
+2002-03-25 21:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/spfiles.c
+    * Minor optimization in hb_spFile().
+
+  * include/hbapi.h
+  * source/vm/proc.c
+    * Removed parameter BOOL bSkipBlock, and added USHORT *uLine to hb_procline()
+    * Rewrote and Renamed hb_procline() to hb_procinfo()
+
+  * source/vm/hvm.c
+    * Changed call to hb_procline() to hb_procinfo()
+
+  * source/rtl/tgetint.prg
+    * Corrected __GET() to be more Clipper compatible.
+
+2002-03-25 21:58 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/tget.prg
+     ! Fix bug in picture "999,999.99" and "999.999,99".
+     ! Fix bug in picture with initial spaces.
+
+2002-03-24 16:08 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * include\hbtrace.h
+     + Added #defines HB_TR_LEVEL_xxx
+
+   * This allows to skip the limitation of DOS and WINDOWS to include the
+     symbol '=' inside an environment variable.
+     Ex:
+         SET CFLAGS=-DHB_TR_LEVEL_DEBUG
+     it's equal to
+         SET CFLAGS=-DHB_TR_LEVEL_DEBUG=5      // Not permited in DOS &WIN
+
+2002-03-22 19:49 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/tget.prg
+     ! Fix bug in PICTURE '@S'
+     ! Fix some bugs and formatting indentation
+   * source/rtl/tgetlist.prg
+     ! Fix some bugs and formatting indentation
+
+2002-03-22 15:32 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/tget.prg
+     ! Fix ::unTransform() for numeric Get with complex Picture.
+
+2002-03-21 21:25 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/garbage.c
+  * source/vm/itemapi.c
+    + Added some GC enhancements, allowing it to
+      collect memory allocated at a C level
+
+2002-03-20 14:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    * Synched with Harbour
+
+  * source/vm/macro.c
+    * Defed out MPUSH* optimization (recent MPOP correction still active)
+
+  * tests/pp.txt
+    * Added some documentation.
+
+2002-03-20 07:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/estack.c
+    * Reverted some deffed out prior work in progress.
+
+2002-03-19 11:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    + Added #ifdef GC_RECYCLE protection around recycling logic (not defined by default!)
+
+2002-03-18 19:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+    + Added #include "hbapirdd.h"
+
+  * source/rdd/dbfntx/dbfntx1.c
+    * Few type casts for MSVC
+
+  * source/rtl/tgetlist.prg
+  * source/rtl/tbrowse.prg
+    * Commented stray TraceLog()s
+    * More formatting of strange indentation.
+
+2002-03-18 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/getexit.ch
+    - Removed 2 defines.
+
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+    + Added USHORT  hb_rddGetCurrentFieldPos( char * szName );
+
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+    > Synched with Harbour.
+
+  * source/vm/macro.c
+    ! Improved recent fix.
+
+2002-03-18 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/getexit.ch
+    + Added few missing defines for recent Luiz's post.
+
+  * source/rtl/tgetlist.prg
+    * Corrcted formatting.
+
+2002-03-18 12:56 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+   * source/rtl/menuto.prg
+     * Added mouse capabilities
+
+2002-03-18 01:48 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     + added compatibility with Clipper 5.3 (FlexFile) memo headers
+     bug reported by Walter Negro.
+
+2002-03-17 20:25 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+  * source/rtl/listbox.org
+    source/rtl/radiobtn.prg
+    source/rtl/radiogpr.prg
+    source/rtl/checkbox.prg
+    source/rtl/tget.prg
+    source/rtl/pushbtn.prg
+    source/rtl/tbrowse.prg
+    source/rtl/getsys.prg
+    source/rtl/tgetsys.prg
+    * Added the missing Clip53 Methods and Functions
+    % minor fix to Clip53 classes
+  * include/hbgetcmt.ch
+    * Added the @ Get... Tbrowse command
+
+2002-03-16 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbtrace.h
+  * source/rtl/trace.c
+    + Added void TraceLog( const char * sFile, const char * sTraceMsg );
+
+  * source/vm/hvm.c
+    ! Fixed bug - codeblock execution was not resetting the Base Stack for Memvars.
+
+  * source/vm/memvars.c
+    ! Fixed bug in __MVSAVE() - was not saving from absolute base (0).
+    /* Bug reported by Michael Harris */
+
+2002-03-16 19:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+    ! Fixed bug in Macro Compiler where Field Assignment is compiled mistakenly as a Memvar Assignment.
+    /* Bug reported by Gerhard ? on Harbour's List. */
+
+2002-03-16 16:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    ! Minor correction to HB_P_LINEOFFSET (when overwriting previous place holder).
+
+2002-03-16 18:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/genc.c
+    ! Minor corretion to line number in verbose comments.
+
+  * source/compiler/harbour.sly
+    ! Fixed minor bug with GetA and MACROTEXT (due to recent optimization of MACROTEXT)
+      - Added new MacroText to encapsulate the optimization and make available in one more context.
+
+    + Implemented few TODOs - Allowing xHarbour to compile:
+      @ x,y GET &xMacro.Suffix -> Clipper complain -> Error C2081  Macro of declared symbol: '&CMACRO.1' (if cMacro is declared)
+      @ x,y GET &( xMacro ) -> Clipper complain -> Error C2047  GET contains complex macro.
+      @ x,y GET &( xMacro )[...] -> Clipper complain -> Error C2047  GET contains complex macro.
+
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+    ! Fixed few compatibility problems:
+      - Clipper is not erroring if Get value is Array or Block - it simply skips the Get.
+      - Clipper skips a GET if the value of the get is NIL or "" (or Array or Block).
+      - Clipper will correctly re-display and will allow editing of a var which was previosly NIL, or "", or Array, or Block
+        once the value is reset to editable value.
+
+  * tests/testget.prg
+    + Added #ifdef __HARBOUR__ to protect sample code which Clipper can't compile.
+
+  * tests/tstblock.prg
+    + Added 1 comment.
+
+2002-03-16 19:31 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug with keys updating
+
+2002-03-15 17:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/filehb.c
+    + Added logic to protect against too long file name parameter.
+
+2002-03-15 16:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapifs.h
+  * source/rtl/spfiles.c
+    * Changed hb_spFile() to receive 2nd [output] parameter to return the qualified path of the found file.
+    - Removed FindFile() redundant level of indirection.
+
+  * source/rtl/filehb.c
+    * Changed to add 2nd NULL parameter in call to hb_spFile().
+
+2002-03-15 15:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    ! Minor correction to last post.
+
+2002-03-15 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+    + Added #define HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE 53 -> "Optimized local [%s] out of range, after offsetting %s PARAMETERS."
+
+  * source/compiler/hbfix.c
+    + Added hb_p_localnearaddint, hb_p_localnearsetint, and hb_p_localnearsetstr
+
+2002-03-15 07:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp_harb.ch
+    * Replaced few hb_itemFromBase() with direct code.
+    * Replaced few hb_retclen()+hb_xfree() to hb_rectclen_buffer() when compiled with Harbour as oppose to xHarbour.
+
+2002-03-14 20:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    + Implemented 1 todo.
+
+2002-03-15 2:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source\rtl\tget.prg
+    * METHOD _Delete()
+     * modification to be more Clip*r compliant and behaviour.
+      * changes in the logic of the function.
+        before, the function only erased the character under the cursor.
+        now it drags the other characters.
+        dragging is limited by the non editable characters.
+    * METHOD Insert()
+     * modification to be more Clip*r compliant and behaviour.
+      * changes in the logic of the function.
+        now insert a character and displaces to the right the rest of
+        the characters until the first non editable character.
+  * source\rtl\tgetlist.prg
+    * METHOD GetPostValidate()
+     * modification to be more Clip*r compliant and behaviour.
+      - eliminate call to SetFocus() when BadDate = .T., this fix makes
+        that the buffer is not erased if the date is incorrect.
+  Synched with Harbour.
+
+2002-03-13 21:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    - Removed 1 stray debug printf().
+
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+    + Added #define HB_COMP_ERR_MISSING_ENDTEXT             52 -> "Missing ENDTEXT"
+
+  * source/compiler/harbour.slx
+    + Added TEXT <TextFunction>, <ResetTextFunction> ... ENDTEXT implementation.
+
+ /*
+    Clipper PP pre-process TEXT [TO FILE <(File)> | TO PRINTER] to:
+
+    [ __TextSave( <(file)> | "PRINTER" ) ; ]
+    TEXT QOut, QQOut | TextRestore */
+
+    As can be seen above, Clipper hardwire TextFunction to QOut(), and ResetTextFunction to either QQOut() or TextRestore()
+
+    Please note that one may code the TEXT command as follows:
+
+    TEXT MyTextFunc, MyResetFunc
+    ...
+    ENDTEXT
+
+    In the above case the PP will not get involved and Clipper will call MyTextFunc() once for each line (until ENDTEXT)
+    passing as a single paramter the given line of text (excluding the CR). Once encountering the ENDTEXT command, it will call
+    MyResetFunc() once without any parameter.
+
+    So Clipper hardwire TEXT in STD.ch simply uses QOut() as the output function and QQOut() as a dummy reset function or
+    TextRestore() as an actual reseting function in the case that echo to FILE or PRINTER was requested.
+
+    xHarbour now is 100% compatible with the above description of the Clipper implemntaion of both PP and Compiler.
+ */
+
+2002-03-11 19:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/set.c
+    + Re-added support for HB_SET_TRACE ( _SET_TRACE ) ON by default.
+      /* Was mistakenly removed by Luiz, on last post. */
+
+  * tests/pp.prg
+    * Added rules reset logic to RP_Dot()
+
+2002-03-11 15:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * source/rdd/dbf1.c
+    ! Corrcted MSVC compiler warnings.
+
+2002-03-11 14:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+    ! Corrected few compiler warnings.
+
+2002-03-11 14:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprc.c
+    ! Corrected 1 compiler warning.
+
+  * source/compiler/harbour.sly
+    ! Correted minor bug in GetA
+
+  * source/pp/ppcore.c
+    * Some tracing revisions.
+
+
+2002-03-10 15:25 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+  * source/pp/pptable.c
+    * Fixed command for SET PRINTER TO
+  * source/rtl/set.c
+    * Fixed The SET_PRINTFILE
+  *utils/hbmake/hbmake.prg
+   utils/hbmake/hbmtuils.prg
+    * Sync with harbour
+
+2002-03-10 10:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_BASELINE
+    ! Finalized implementation of line numder optimization.
+
+  * tests/pp.prg
+    + Added resetting logic to PP_RunFile()
+
+2002-03-09 16:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+  * source/vm/hvm.c
+    * Additional fine tuning to recent LINE NO Optimization.
+
+2002-03-09 12:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+  * source/vm/hvm.c
+    * Minor correction to recent LINE NO Optimization.
+
+2002-03-09 11:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new PCODE HB_P_LINEOFFSET.
+
+  /* xHarbour executable (using line numbers) are now significantly smaller and faster. */
+
+2002-03-08 15:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    + Added reycling logic for HB_ITEMs and HB_BASEARRAYs.
+
+  * source/vm/fm.c
+    + Added Counters logic for Allocations, ReAllocations and Freed.
+    * Revised hb_xexit() //info display and added the statistics of the new counters.
+
+2002-03-07 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+  * source/vm/garbage.c
+    * Few GC improvements.
+
+  * source/vm/hvm.c
+    * Added 1 comment line.
+
+  * tests/pp_harb.ch
+    * Protected OLE related methods with #ifdef WIN
+
+2002-03-07 14:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    + Added ole32 and oleaut32 libraries to the MSVC line.
+    + Added /FORCE:MULTIPLE to the link options of MSVC to allow for duplicate symbols.
+
+  * source/vm/arrays.c
+    - Commented out HB_IS_MEMVAR logic from hb_arrayReleaseGarbage()
+
+  * tests/pp.prg
+    ! Minor fix in PP_PreProTExt()
+    * Few refniments in display of errors.
+  * tests/pp_harb.ch
+    + Added self contained OLE Client based on Jose Gimenez's excelent work.
+
+  /* Now scripts have full access for COM Servers. */
+
+2002-03-05 22:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+    + Added type casts required by MSVC.
+
+2002-03-05 22:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbextern.ch
+  * source/common/hbstr.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/workarea.c
+  * source/vm/dynlibhb.c
+  * source/vm/runner.c
+    -> Synched with Harbour.
+
+  * source/vm/arrayshb.c
+    * Defaulted 2nd paramater of aDel() to 1
+
+2002-03-05 20:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+    -> Synched with Harbour.
+
+  * source/vm/fastitem.c
+    % Minor optimization to hb_itemPutC()
+
+2002-03-05 19:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/debug/dbgtarr.prg
+  * source/debug/debugger.prg
+  * source/rtl/dbedit.prg
+  * source/rtl/dbsdf.prg
+  * source/rtl/persist.prg
+  * source/rtl/tbcolumn.prg
+  * source/rtl/tbrowse.prg
+    -> Synched with Harbour.
+
+2002-03-05 19:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in md_strAt() where '(' or '{' would be counted twice if following a letter which was part of a match.
+    ! Fixed bug in WorkDefine() which didn't expand define within literal array.
+    * Some tracing additions and corrections.
+
+2002-03-04 11:48 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug seek and set deleted on, reported by Lorenzo Fiorini
+       also fix bug with set filter
+     ! fixed bug with ordkeyno() and ordkeycount(),
+       reported by Manuel Mercado Gómez
+
+2002-03-03 23:10 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+   * source/rtl/persist.prg
+      * added 254 as linelength to MLCount call in LoadFromText so
+         it matches later call to MemoLine
+
+   * source\common\hbffind.c
+      *  fixed the "Directory() can't see files with cleared
+                     archive bits" problem.
+
+2002-03-01 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests\pp.prg
+    ! Fixed PP_PreProText() to correctly handle comment lines starting with '*'
+    ! Fixed PP_PreProText() to correctly handle line continuations with ';'
+
+  * tests\prgscrpt.prg
+    * Modified to use ';' line continuation.
+
+2002-03-01 11:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added logic to SearnRep() to allow optional marker *not* utilized in the result rule to be repeatable.
+    * Some formatting.
+
+  * tests\pp.prg
+    + Added PP_ModuleName()
+
+  * tests\pp_harb.ch
+    + Added PP_ModuleName( "_TINTERPRETER_" ) to Method Compile to set the default module name.
+
+2002-02-21 06:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    * METHOD ::ParsePict() - The change is because if ::Original it is not
+          numeric, it would generate an error.
+
+    - METHOD ::Undo() - Delete assignment to ::buffer because
+          ::VarPut( ::Original, .t. ) makes this assignment.
+
+    - METHOD ::VarPut() - Delete ::nDispLen := NIL line, because
+          ::Picture() makes this assignment.
+                      - Revert changes of Ignacio Ortiz because the
+          problem was with ::nDispLen and not with empty cPicture.
+
+    - METHOD ::Block() - Delete ::nDispLen := NIL line, because
+          ::Picture() makes this assignment.
+
+    * METHOD ::Picture() - Add ::nDispLen := NIL line, reset the variable.
+          Only ::ParsePict() can load a value that can differ of
+          nMaxLen.
+
+    ! METHOD ::KillFocus() - Change position of lines, hasfocus should be
+          before the call to Putmask.
+          This makes that in numeric fields, points or comas are not
+          shown before the numbers.
+
+    * and other previous modifications coming from Harbour-project
+      by Walter Negro and Ignacio Ortiz
+
+  * source/rtl/tgetlist.prg
+    * minor modification
+    * fixed with display previous to call to PostBlock()
+
+2002-02-17 20:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/vm/itemapi.c
+     ! hb_itemStr() - Eliminated the limit of 9 decimals if not SET FIXED ON
+     ! hb_itemStr() - Rounded starting from 17th less significant number.
+                      This is the behavior of Clipper.
+       Ex:
+          Before ? str( 1191.63, 20, 15 ) -> 1191.629999999999882
+          Now    ? str( 1191.63, 20, 15 ) -> 1191.630000000000000
+
+   * source/rtl/val.c
+     ! hb_strVal() - Change dValue from double to long double.
+       This allows that the string-number conversions are same for program
+       and for compilation.
+       ? ( val("1191.63") == 1191.63 ) -> TRUE
+
+2002-02-15 19:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in ParseCommand()
+
+2002-02-15 18:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbf1.c
+    ! Corrcted 1 compiler warning.
+
+2002-02-15 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added: BYTE   hb_itemParamId( PHB_ITEM pItem );
+
+  * source/compiler/hbgenerr.c
+    ! Fixed order of a Warning Message.
+
+  * source/vm/fm.c
+    * Minor correction to errror messages.
+
+  * source/pp/ppcore.c
+    ! Fixed bug in md_strAt()
+
+  * source/vm/arrays.c
+    * Minor revision to tracing.
+    + Added some work in progress within #if 0
+
+  * source/vm/estack.c
+    + Added some work in progress within #if 0
+
+  * source/vm/hvm.c
+    + Added some work in progress within #if 0
+    + Added Some tracing.
+    * Minro formatting.
+    * Added inplace code for HB_P_FUNCTION* to avoid call to hb_vmFunction() which is forced to use hb_itemCopy()
+      instead of hb_itemForwardValue() to avoid problem with ill behaved use of hb_stack.Return in 3rd party products like FWH.
+
+  * utils/hbtest/make_c5x.bat
+    * Minor correction.
+
+2002-02-05 02:04 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbf1.c
+     ! reverted changes to hb_dbfGoTo
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug with bof flag
+
+2002-02-04 23:10 UTC+0100 JFL (mafact) <jfl@mafact.com>
+   * source/vm/hvm.c
+   * source/vm/classes.c
+     ! fixed bug where object overloading was using modulus in place of power
+       for "**" expression
+
+2002-02-04 02:23 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbf1.c
+     ! fixed bug with flags in hb_dbfGoTo
+
+2002-02-02 08:50 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+  * source/rtl/isprint.c
+    * Fixes for cygwin
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+      *Enhaced support for big make files
+
+2002-02-01 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
+    + Added USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
+    + Added HB_FUNC( ARRAYCYCLICCOUNT )
+  * source/vm/arrays.c
+    * Added test of memvar in hb_arrayReleaseGarbage.
+  * source/vm/estack.c
+    * Trace added.
+
+2002-01-31 19:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    * Corrected typo in erased line.
+
+2002-01-31 17:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/workarea.c
+    * Added missing typecasts required by VC
+
+2002-01-31 17:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+    * Corrected typo.
+
+2002-01-31 17:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/!pack_bin.bat
+  * bin/bld.bat
+    * Minor adjustements.
+  * source/vm/codebloc.c
+    * Added missing null.
+  * source/vm/arrays.c
+    * Optimized hb_itemClear() to hb_itemRelease() in hb_arrayReleaseGarbage()
+
+2002-01-31 14:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/workarea.c
+    * Minor correction to recent correction of string conversion.
+
+2002-01-31 08:40 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx1.c
+     ! fixed bug with append and empty keys
+
+2002-01-30 21:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + source/rtl/cstr.prg
+    + New file to host CStr() function
+
+  * makefile.bc
+  * makefile.vc
+  * source/rtl/Makefile
+    + Added new cstr.prg to RTL productions
+
+  * source/rtl/traceprg.prg
+    - Removed CStr() to minimize linking conflicts.
+
+2002-01-30 21:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/traceprg.prg
+    - Removed INIT PROCEDURE InitTrace()
+  * source/vm/hvm.c
+    + Added trace.log file creation to hb_vmInit()
+
+2002-01-30 21:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + source/rtl/traceprg.prg
+    + New file with TraceLog() functionality, and new CStr() (converts any type to a String).
+      /* Tracing info can be turned ON or OFF with new SET TRACE ON|OFF command (ON by default). */
+
+  * makefile.bc
+  * makefile.vc
+  * source/rtl/Makefile
+    + Added support for new traceprg.prg
+
+  * include/hbset.h
+  * include/set.ch
+  * source/rtl/set.c
+    + Support for new HB_SET_TRACE ( _SET_TRACE ) ON by default.
+
+  * source/pp/pptable.c
+    + Burned support for new #define _SET_TRACE
+    + Burned support for new #command SET TRACE ON|OFF
+
+  * source/rtl/errorsys.prg
+    - Removed the TraceLog functionality.
+
+  * source/vm/arrayshb.c
+    + Added copyright notice of HB_aParams() and HB_aExpressions()
+
+  * source/vm/macro.c
+    * Synched with following GHarbour change:
+        2002-01-30 12:30 UTC+0200 Chen Kedem <niki@actcom.co.il>
+           * source/vm/macro.c
+             ! hb_macroCheckParam() - Wrong error code 1080 is used, changed into 1065
+
+  * tests/pp.prg
+    * Renamed xToStr() to CStr() and revised #ifdef __XHARBOUR__ with regard to TraceLog()
+
+2002-01-30 18:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added missing #include "hbstack.h" within #ifdef HB_API_MACROS
+    * Corrcted definition of hb_pcount() within #ifdef HB_API_MACROS
+
+2002-01-30 18:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added missing hb_itemClear() in hb_vmOperatorCall()
+    * Changed hb_itemForwardValue() to hb_itemCopy() in hb_vmFunction().
+      /* This fixes brush problem in FWH */
+
+2002-01-30 15:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + tests/rp_dot.ch
+    + Added missing file.
+
+  * source/compiler/harbour.sly
+    * Optimized MACROTEXT
+
+    /* xHarbour now support complex macros referencing declared symbols, where Clipper produces an error:
+
+          LOCAL cMacro  := "mVar"
+
+          PRIVATE mVar1 := "I'm mVar"
+
+          ? &cMacro.1
+
+       Complex macros will now work faster, due to compile time optimization.
+
+     */
+
+2002-01-30 11:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Corrected 4 instances of hb_compGenPushString() to include the terminating byte.
+
+2002-01-29 08:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    * Added support for HB_P_MPUSHSTR
+
+2002-01-29 07:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added missing declaration of hb_strUpperCopy()
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+    * Minor formatting, and corrected usage of string conversion.
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    * Minor formatting, and corrected usage of string conversion.
+  * tests/pp.prg
+    + Added ifndef __XHARBOUR__ guard for Tracelog() definition.
+
+2002-01-29 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * make_b32.bat
+  * make_vc.bat
+    + Added auto creation of production folders.
+
+  * include/hbexprb.c
+    * Added explicit type conversion.
+
+2002-01-28 23:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/Makefile
+  * source/rtl/persist.prg
+  * source/rtl/filesys.c
+    * Synched with Harbour.
+
+  * source/rtl/errorsys.prg
+    * Renamed xToStr() to CStr()
+
+2002-01-28 20:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Clipper marks Optional Match Marker that's *not* used in Result Rule as REPEATing Marker.
+
+  * source/rtl/tget.prg
+  * source/rdd/dbf1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/profiler.prg
+    * Synched with following Harbour changes:
+        2002-01-28 12:36 UTC+0100 Ignacio Ortiz <ignacio@fivetech.com>
+          * source/rtl/tget.prg
+            * Bug fixed in VarPut() method, reported by Lorenzo Fiorini
+
+        2002-01-28 14:21 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbf1.c
+            * Bug fixed in dbfGetMemo(), reported by Jos© Luis Capel
+
+        2002-01-28 13:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            ! Bug fixed in ntxGoBottom(), reported by Lorenzo Fiorini
+
+        2002-01-24 10:27 UTC+0000 Dave Pearson <davep@davep.org>
+           * source/rtl/profiler.prg
+             * HBProfileLowLevel:gatherOPCodes() wasn't making a call to
+               HBProfile:ignoreSymbol() to allow for opcode filtering in sub
+               classes. Fixed.
+             * Improved the formatting of OPCODE names so that they sort
+               properly.
+
+        2002-01-24 10:03 UTC+0000 Dave Pearson <davep@davep.org>
+           * source/rtl/profiler.prg
+             + Added class HBProfileOPCode.
+             + Added class HBProfileLowLevel. It inherits from HBProfile and adds
+               OPCODE usage entries.
+
+2002-01-27 14:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/vm/hvm.c
+    * Completed implementation of HB_P_LOCALNEARSETSTR
+
+  * include/hbver.h
+  * source/common/hbver.c
+  * source/compiler/genc.c
+  * source/compiler/genjava.c
+  * source/compiler/genobj32.c
+  * source/compiler/hbusage.c
+    * Updated to reflect xHarbour, and set build to 71.0 in preparation for next binary distribution.
+
+2002-01-27 11:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbfntx/dbfntx1.c
+    * Reverted 2 hb_xgrab() calls to hb_xalloc()
+    * Synched with Harbour fix:
+        2002-01-27 19:35 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            ! Bug fixed, reported by Lorenzo Fiorini
+            * UNIQUE indexes creation implemented
+
+  * source/rtl/oemansi.c
+    + Added missing #include "hbstack.h"
+
+  * source/vm/fm.c
+    + Reinstated hb_xalloc() (it's not gerenating an error if failing to aloccate).
+  * source/vm/memvars.c
+    * Reverted one hb_xgrab() to hb_xalloc()
+
+2002-01-27 02:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/arrays.c
+  * source/rtl/left.c
+  * source/vm/arrayshb.c
+    * Corrected compiler's warnings
+
+2002-01-27 02:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/transfrm.c
+    ! Corrected few bugs.
+  * source/vm/hvm.c
+    ! Corrected support for Eval( @bBlock )
+
+  /* HBTEST down to 155 "errors". */
+
+2002-01-27 00:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+  * source/rtl/oemansi.c
+  * source/rtl/setkey.c
+  * source/rtl/transfrm.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/debug.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * source/vm/pvalue.c
+    * Fixed wrong hb_itemReturn() calls to hb_itemCopy( &hb_stack.Return, ... )
+
+  * include/hbapi.h
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+    * Optimized and corrected aFill()
+
+2002-01-26 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/errorapi.c
+  * source/vm/fastitem.c
+  * source/vm/itemapi.c
+    * Improved tracing calls.
+
+  * source/vm/hvm.c
+    * Modified HB_P_PUSHSTR* to support non terminated strings from modules compiled with Harbour.
+    ! Fixed minor bug in HB_P_LOCALNEARADDINT
+
+  * source/rtl/left.c
+    ! Optimized Left() (if called by non xHarbour compiled module).
+
+2002-01-26 13:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbdbf.h
+  * include/hbdbsort.h
+  * include/hboo.ch
+  * include/hbrddcdx.h
+  * source/vm/cmdarg.c
+    * Added missing newline at end of file.
+
+  * source/vm/arrays.c
+    - Removed 1 unused var.
+
+2002-01-26 12:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/errorsys.prg
+    + Addd support for TraceLog()
+
+  * include/hbexprb.c
+    + Added optimization for int + x
+
+  * source/vm/hvm.c
+    ! Optimized hb_vmArrayGen()
+    + Added HB_TRACE() to all PCODES  (except macros for now).
+
+2002-01-25 21:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Added HB_IS_DATE() to logic of HB_P_*ADDINT
+
+2002-01-25 21:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Changed HB_P_FUNCTION* to use hb_vmFunction() instead of hb_vmDo()
+    * Added Clear Logic of hb_stack.Return to hb_vmFunction()
+
+2002-01-25 18:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+  * source/vm/fastitem.c
+    * Minor typos corrected.
+
+  * source/rdd/dbfntx/dbfntx1.c
+  * tests/testpers.prg
+    * Synched with following Harbour changes:
+        2002-01-25 21:35 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            ! Few type casts for MSVC
+
+        2002-01-25 18:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            * Few bugs fixed
+            * Implemented indexing of a very big files, which keys aren't fit in memory.
+
+        2002-01-25 14:25 UTC+0000 Dave Pearson <davep@davep.org>
+           * tests/testpers.prg
+             - Removed the use of cName, it hasn't been supported for a long time
+               and it was stopping this test from working.
+
+2002-01-23 21:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed hb_vmMessage() to use the swap logic (which was removed in test before removal).
+
+2002-01-23 18:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Reinstated hb_vmMessage() to support 3rd part products that still rely on the function.
+
+2002-01-23 15:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added support for __XHARBOUR__ auto defined.
+
+  * source/vm/hvm.c
+    * Added logic in hb_vmDo() to detect ill-behaved calls to hb_vmDo(), which were suppose to call hb_vmSend() instead.
+      /* This can only happen in 3rd party tools internals, like FWH, etc. */
+
+  * tests/pp_harb.ch
+    + Added _#ifdef __XHARBOUR__ to protect against xHarbour fastapi reliance, when compiled by other compilers.
+
+  * tests/tstloop.prg
+    + Added Left( @cVarByRef ) test.
+
+2002-01-23 08:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/Makefile
+    + Added fastitem.c to list of sources.
+
+  * include/hbexprb.c
+  * source/vm/hvm.c
+    ! Minor optimization for Left( @cVarByRef, ... )
+
+  * source/common/hbffind.c
+  * /source/rdd/dbfntx/dbfntx1
+    * Synched with the following from Harbour:
+        2002-01-23 09:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * Since I had used an undocumented 0x04000 as an attribute check.
+            * it was causing trouble. Fixed.
+
+        2002-01-23 09:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * removed extra comment marker.
+
+        2002-01-22 22:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * It seems that at some point prior to the release of Win2k, MS
+            * changed the definition of FILE_ATTRIBUTE_ENCRYPTED from
+            * 0x00004000 to 0x00000040
+            * If you installed the Release Win2k over a beta or RC version of
+            * the O/S, then Harbour's directory() will show an attribute of
+            * 'I' for Encrypted files.  Otherwise, it will show 'E'.  It seems
+            * that the only way to corect this is to reinstall the OS fresh.
+            * (This text is subject to correction if anyone has a better description)
+
+2002-01-22 10:20 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+  * source/rdd/dbfntx/dbfntx1.c
+    * bug fixed, reported by Jorge A. Giraldo
+
+2002-01-22 19:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/!pack_bin.bat
+    * Changed archive name to xharbour from harbour
+
+  * include/hbver.h
+    * Updated versions info to 0.70
+
+2002-01-22 18:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtapi.c
+    #defed out redundant hb_gtReadKey()
+
+  * source/rtl/inkey.c
+    ! Changed hb_gtReadKey() call to hb_gt_ReadKey()
+
+  * source/vm/hvm.c
+    - Removed call to hb_inkeyPoll() from hb_vmDo().
+    + Added logic to detect Alt-C in hb_vmExecute() every 65535 pCodes.
+
+  /* Now xHarbour support Alt-C in long loops, like Clipper does */
+
+  /* Now xHarbour Function/Procedure/Properties/Methods are 5 times faster,
+     and are even faster than Clipper!!!
+
+    Here are the latest results for 1,000,000 iterrations:
+
+              Proc    Func
+              -----   -----
+    xHarbour:  1.97    2.66
+    Clipper :  2.58    3.41
+    Harbour : 11.92   14.31
+  */
+
+2002-01-22 20:10 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+  * source/common/hbffind.c
+    * Fixes for linux
+  + doc\es\idle.txt
+  + doc\es\codebloc.txt
+  + doc\es\dbstrux.txt
+  + doc\es\hbpplib.txt
+  + doc\es\clipper.txt
+  + doc\es\pcode.txt
+  + doc\es\pragma.txt
+  + doc\es\statics.txt
+  + doc\es\tracing.txt
+  + doc\es\vm.txt
+  + doc\es\howtobsd.txt
+  + doc\es\harbext.txt
+  + doc\es\cmdline.txt
+  + doc\es\simplex.txt
+  + doc\es\dirstruc.txt
+  + doc\es\readme.txt
+  + doc\es\strotype.txt
+  + doc\es\dbdelim.txt
+  + doc\es\dbsdf.txt
+     * Doc translation to spanish provided by Alejandro de Garate
+
+2002-01-21 04:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    - Removed Function call support from hb_vmSend()
+
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/do.c
+  * source/rtl/errorapi.c
+  * source/rtl/xhelp.c
+  * source/vm/arrays.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/eval.c
+  * source/vm/evalhb.c
+  * source/vm/macro.c
+  * source/vm/runner.c
+    ! Converted all calls to hbvmDo() which actually deal with objects to hb_vmSend()
+
+  /* Now hb_vmDo() just "does" and hb_vmSend() just "sends" all duplications and ambiguities removed! */
+
+2002-01-21 03:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  *ChangeLog
+  *config/dos/bcc16.cf
+  *include/hbextern.ch
+  *include/hbstack.h
+  *source/rdd/dbfcdx/dbfcdx1.c
+  *source/rdd/dbfcdx/dbfcdx2.h
+  *source/rdd/dbfntx/dbfntx1.c
+  *source/vm/hvm.c
+  *source/vm/memvars.c
+    * Synched the following patches from Harbour:
+
+        2002-01-21 00:19 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+           * include/hbstack.h
+             ! fixed a few errors inside macro definition of stack operations
+               -DHB_STACK_MACROS defined
+
+        2002-01-21 17:00 UTC-0500 David G. Holm <dholm@jsd-llc.com>
+          * config/dos/bcc16.cf
+            ! Force a minimum symbol length of 48 characters, due to the length
+              of some the class member function names in source/rtl/profiler.prg.
+            ! Added the library name conversion to remove the LIB prefix in one
+              spot that I had missed the first time around.
+            ! LINKLIB contents were being replaced instead of accumulating, with
+              the result that no CONTRIBS libraries were included.
+
+        2002-01-21 23:24 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+           * include/hbextern.ch
+             * minor fix, hbrun now works better ( thanks to Viktor Szakats ).
+
+        2002-01-21 10:10 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/vm/hvm.c
+          * source/vm/memvars.c
+            * Added resetting of HB_IT_MEMOFLAG in functions:
+               hb_vmArrayPop(), hb_vmPopLocal(), hb_vmPopStatic(), hb_memvarSetValue()
+          * source/rdd/dbfntx/dbfntx1.c
+            * Added support of DBOI_POSITION and DBOI_KEYCOUNT to ntxOrderInfo()
+              and empty prototypes of hb_ntxTagKeyNo(), hb_ntxTagKeyCount()
+
+        2002-01-19 17:55 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+           * source/rdd/dbfcdx1.c
+             ! speed boost for ordKeyNo() and ordKeyCount()
+
+        2002-01-19 13:39 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+           * source/rdd/dbfcdx1.c
+             ! fixed a bug in descending skipping
+             + added support for ordKeyNo() and ordKeyCount()
+
+        2002-01-19 08:00 UTC+0700 Andi Jahja <harbour@cbn.net.id>
+           * source/rtl/typefile.prg
+             * modification to be more Clip*r compliant and behaviour.
+
+2002-01-21 12:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/estack.c
+    * Minor formatting.
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Modified message handling to use same stack structure as a function call:
+      Sym/Message + Object + Paramaters
+
+  * source/vm/hvm.c
+  * source/vm/classes.c
+    * Modified hb_vmMessage() calls to hb_vmPushSymbol().
+
+  * source/vm/hvm.c
+    - Removed Function handling logic from hb_vmSend()
+
+2002-01-21 01:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added #define HB_IS_COMPLEX() and #define HB_IS_SIMPLE().
+
+  * include/hbapiitm.h
+    - Removed unneeded hb_itemInit()
+
+  * source/vm/itemapi.c
+    - Removed unneeded hb_itemInit()
+    - #defed out hb_itemReturn()
+    ! Optimized calls to hb_itemClear()
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Minor improvments
+    + Added optimization for + HB_IT_INTEGER.
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added HB_P_ADDINT.
+
+  * source/vm/arrays.c
+    ! Optimized aDel, aIns, and aSize()
+
+  * source/vm/fastitem.c
+    + Added hb_itemReturn() utilizing hb_itemForwardValue()
+    ! Optimized calls to hb_itemClear()
+
+  * source/rtl/errorapi.c
+  * source/rtl/idle.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    ! Optimized calls to hb_itemClear()
+
+  * tests/speed.prg
+  * tests/tstloop.prg
+    * More tests.
+
+2002-01-20 12:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    #defed out hb_itemClear(), hb_itemSwap(), hb_itemPutC(), hb_itemPutCL(), hb_itemPutCPtr()
+
+  * source/vm/fastitem.c
+    + Added the String Sharing version of hb_itemSwap()
+
+2002-01-21 02:25:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * source/vm/itemapi.c
+   * source/vm/hvm.c
+   * source/vm/fastitem.c
+     ! MSVC wants explicit type casts when allocating memory via hb_xgrab.
+       Such casts added.
+
+2002-01-20 13:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+  * source/common/hbffind.c
+    * Added Check for Error(With this File() function has the correct error(Win32/DOS)
+  * source/rtl/filesys.c
+    * Fixed Some error return(In DJGPP some error codes are direferent, set to correct value).
+  * source/common/hbfhnd.c
+    * increase __NFILE__ from 600 to 1250
+
+2002-01-19 06:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    ! Minor bug correction.
+
+  * include/hbpcode.h
+  * include/hbcomp.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+    + Added support for HB_P_LOCALNEARADDINT, HB_P_LOCALNEARSETINT, HB_P_LEFT, HB_P_RIGHT*, HB_P_SUBSTR*
+      /* HB_P_RIGHT & HB_P_SUBSTR are not completed yet. */
+
+  * include/hbapi.h
+  * source/vm/eval.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/compiler/harbour.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    * Enhanced string sharing and fast item technology, and optimized loops, := += -= ++ -- and Left().
+
+  + tests/tstloop.prg
+    + Added extensive loop speed testing.
+
+/* xHarbour is now more than 400% faster than Harbour on most common code, and about 40% faster than Clipper on same.  */
+
+     Here are the results for tests/tstloop.prg:
+
+              Empty Loops    Eval()      :=      := +=      -=      Left()     Total
+              -----------    ------    ------    -----    ------    ------    ------
+  xHarbour:          7.71     32.07      9.02    13.79     11.11     19.72     93.47 Sec.
+  Clippe  :         13.29     34.22     14.94    17.52     18.90     31.80    130.67 Sec.
+  Harbour :         12.77     43.76     15.92    24.75     24.15    140.77    262.17 Sec.
+
+  The above was for 10,000,000 loops for each operation on an 1Ghz Athlon Win XP using BCC 5.5.
+
+  You can confirm those results by downloading BCC 5.5 bin distribution from http://www.Profit-Master/Downloads/xhb-bin-bcc.zip
+
+  NOTE: FWH users *must* recompile ALL FWH PRG files!!!
+
+*/
+
+  * makefile.bc
+  * makefile.vc
+  * config/bsd/gcc.cf
+  * config/dos/bcc16.cf
+  * config/dos/djgpp.cf
+  * config/dos/rsx32.cf
+  * config/dos/watcom.cf
+  * config/linux/gcc.cf
+  * config/os2/gcc.cf
+  * config/os2/icc.cf
+  * config/w32/bcc32.cf
+  * config/w32/gcc.cf
+  * config/w32/mingw32.cf
+  * config/w32/msvc.cf
+  * config/w32/rsxnt.cf
+  * doc/dirstruc.txt
+  * include/hbrddntx.h
+  * include/hbver.h
+  * source/common/hbffind.c
+  * source/common/hbfhnd.c
+  * source/common/hbgete.c
+  * source/common/hbver.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/gencobj.c
+  * source/compiler/genjava.c
+  * source/compiler/genobj32.c
+  * source/compiler/hbusage.c
+  * source/lang/msg_tpl.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/macro/macro.y
+  * source/pp/ppcore.c
+  * source/pp/pptable.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/console.c
+  * source/rtl/direct.c
+  * source/rtl/filehb.c
+  * source/rtl/gete.c
+  * source/rtl/isprint.c
+  * source/rtl/listbox.prg
+  * source/rtl/memofile.c
+  * source/rtl/profiler.prg
+  * source/rtl/spfiles.c
+  * source/rtl/tget.prg
+  * source/rtl/typefile.prg
+  * source/rtl/gtsln/kbsln.c
+  * source/vm/Makefile
+  * source/vm/dynlibhb.c
+  * source/rtl/descend.c
+  * source/rtl/transfrm.c
+  * source/vm/maindll.c
+  * source/vm/maindllh.c
+  * source/vm/maindllp.c
+  * utils/hbmake/ffile1.prg
+  * utils/hbmake/ft_funcs.prg
+  * utils/hbmake/hbmake.prg
+    * Synched with Harbour upto:
+        2002-01-18 17:45 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            * support of EVAL and EVERY clauses of INDEX ON command implemented
+
+2002-01-17 15:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapiitm.h
+    * Reinstated declaration of hb_itemCopy()
+
+  * source/vm/fastitem.c
+    * Renamed hb_itemFastCopy() to hb_itemCopy()
+
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/errorapi.c
+  * source/rtl/setkey.c
+  * source/vm/arrays.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/debug.c
+  * source/vm/garbage.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+  * source/vm/hvm.c
+  * source/vm/runner.c
+    * Reverted hb_itemFastCopy() to hb_itemCopy() (but now using String Sharing Version in source/vm/fastitem.c)
+
+  * source/rtl/filesys.c
+    * Temporarily reverted to X__WIN32__
+
+  * source/vm/hvm.c
+  * include/hbexpra.c
+    * Optimized Eval() processing, and added support for bBlock:Eval().
+
+  * tests/speed.prg
+    * Speed test from Marek Horodyski
+
+  /* On my Athlon 1Ghz XP Notebook xHarbour is almost 10 times faster than Harbour on this Eval() speed test.
+
+    Clipper :  4.17
+    xHarbour:  4.30
+    Harbour : 39.74 // Not a typo!
+
+    Actual single Eval() is almost 4-5 times faster.
+  */
+
+2002-01-13 22:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + tests/ppclass.ch
+    + Added a Clipper compliant version of hbclass.ch (syntax relys on Harbour PP bugs)
+      /* This is the file used to burn the internal support for #include "hbclass.ch". */
+
+  * tests/pp.prg
+    + Added -I description to -H switch.
+    ! Corrected processing of repeatable groups.
+      Clipper will repeat N times, based on the marker with the HIGHEST number of values in the given group.
+      Clipper also allows a Repeatble Group to refernce a marker that is NON Optional. In such case, the
+      respective Marker will only accept 1 value, and consider it required!
+
+2002-01-12 02:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/clipdefs.h
+  * include/error.ch
+  * include/extend.api
+  * include/hbapi.h
+  * include/hbapifs.h
+  * include/hbapiitm.h
+  * include/hbapilng.h
+  * include/hbdefs.h
+  * include/hbsetup.h
+  * include/hbundoc.api
+  * include/hbvmpub.h
+    * Synched with Harbour.
+
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    * Renamed hb_itemShareValue() hb_itemFastCopy()
+    * Renamed hb_itemPushEnvelopeString) hb_itemPushStaticString()
+    - Removed hb_itemVarAssign()
+    + Added hb_itemFastClear()
+
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/errorapi.c
+  * source/rtl/setkey.c
+  * source/vm/arrays.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/eval.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+    * Changed hb_itemShareValue() calls, to hb_itemFastCopy().
+
+  /* String optimizations now completed. xHarbour will never copy any string,
+     from one item to another, it always reuse an existing string. */
+
+  * tests/pp.prg
+    * Changed ifdef DONT_BOOST to NO_BOOST
+    + Added -R to -h[elp] switch.
+
+2002-10-01 22:10 GMT-3 Luiz Rafael Culik <culik@sl.conex.net>
+  * source/common/hbffind.c
+    * Now works properly on linux
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+    * Some fixes for linux
+  * source/rtl/listbox.prg
+    * Some formatting
+  * source/rtl/direct.c
+    source/rtl/isprint.c
+    * Sync with harbour
+
+2002-01-09 02:15:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * include/hbapiitm.h
+     ! remove declarations of fastitem.c functions and add include
+     hbfast.h instead ( MSVC wants it )
+
+2002-01-09 01:40 UTC+0700 Andi Jahja <harbour@cbn.net.id>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! remove spurious type casts
+
+2002-01-07 11:15:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   + hrbdll.vc
+     makefile for harbour.dll with MSVC
+   + dll_vc.bat
+     batch file to create harbour.dll with MSVC
+   * tests/vcdll.bat
+     batch file to create application with harbour.dll ( MSVC )
+
+2002-01-06 14:00:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * source/compiler/harbour.c
+     + BOOL hb_comp_bNoStartUp = FALSE, initialization for option to create
+       C-source with startup flag ( HB_FS_FIRST ).
+   * source/compiler/cmdcheck.c
+     + additional arguments to switch /n :
+       /n or /n0 = do not generate implicit procedure but generate
+        startup flag ( HB_FS_FIRST )
+       /n1 = do not generate implicit procedure and startup flag ( HB_FS_FIRST )
+       /n- = forces implicit procedure generation
+   * source/compiler/genc.c
+     + switch /n1 creates C-Source with no HB_FS_FIRST ( no startup )
+   * source/compiler/hbusage.c
+     ! bump copyright year to 2002
+     + add info on switch /n1
+   * include/hbdefs.h
+     + add argument __EXPORT__ for exporting functions so that exports
+       will be done only on explicit request by #define __EXPORT__ in makefile
+       or make switch ( -D__EXPORT__ )
+     ! typo : _declspec => __declspec
+   * include/hbcomp.h
+     + BOOL hb_comp_bNoStartUp, public variable for generating C-source with
+       no_startup flag ( HB_FS_FIRST ) option.
+   + hrbdll.bc
+     makefile for harbour.dll with Borland CPP 5.5.1
+   + dll_55.bat
+     batch file to create harbour.dll with Borland CPP 5.5.1
+   * tests/dll55.bat
+     batch file to create application with harbour.dll ( BCC 5.5.1 )
+   * tests/dll.mak
+     makefile to create application with harbour.dll ( BCC 5.5.1 )
+
+2002-01-05 17:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * include/hbfsapi.h
+     * under Win32 FHANDLE is typedef to long
+   * source/rtl/filesys.c
+     * Replaced all X__WIN32__ with __WIN32__
+     * hb_fscommit() now used true Win32 Api calls
+     * No more file limit on Win32
+     + DosHandleToWinHandle() function to handle the special file handles(STDIN/STDOUT/STDERR)
+   * source/rtl/console.c
+     * Updated to reflect the changes in filesys.c
+   * source/rtl/philes.c
+     * Changes all functions to recieve/return the File handle value as an long
+
+2002-01-04 19:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+  * source/vm/garbage.c
+    ! Minor corrections.
+
+  * source/vm/fastitem.c
+    + Added void hb_itemReleaseString( PHB_ITEM pItem )
+
+  * source/vm/itemapi.c
+    ! Changed hb_itemClear() to call new hb_itemReleaseString() for HB_IT_STRING.
+
+  * source/vm/hvm.c
+    ! Now using hb_itemPushEnevleopString()
+
+  * tests/logtime.prg
+    * Changed to use fwrite() instead of QOut() to allow output redirection.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    + Added support for -dDONT_BOOST to avoid using C versions if desiring pure PRG even with Harbour.
+
+/* Current statistcs for hbtest //info > hbtest.log are:
+
+             xHarbour           Harbour     % Difference
+            ---------          ---------    ------------
+Time:            0.77               1.02             32%
+Aloccated:  4,138,118          6,570,947             58%
+
+This will get further boost upon completion of the string sharing optimization.
+
+2002-01-04 18:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    + Added missing type casts.
+
+2002-01-05 05:30:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * sourc/vm/dynlibhb.c
+     - remove function hb_StartApp()
+   * source/vm/hvm.c
+     - remove reference to hb_StartApp()
+
+2002-01-05 04:30:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * include/hbapiitm.h
+     + function declarations fron fastitem.c
+   * source/rtl/strcase.c
+     * added typecast
+
+2002-01-04 09:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+    + Added more security logic to hb_itemVarAssign()
+
+2002-01-03 23:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added void hb_itemVarAssign( PHB_ITEM pVar )
+
+  * source/vm/eval.c
+  * source/vm/hvm.c
+    ! More optimizations.
+
+2002-01-03 17:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  *  xharbour/source/vm/fastitem.c
+  *  xharbour/source/vm/hvm.c
+     ! More speed optimizations.
+
+     /* xHarbour executables are now about 30% faster than Harbour executables. */
+
+  *  xharbour/tests/pp.prg
+  *  xharbour/tests/pp_harb.ch
+     ! Fixed C functions to use itemapi instead of direct access.
+
+2002-01-03 08:00 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * updated the date
+   * utils/hbmake/hbmutils.prg
+    * Reupdaload again, the function Getlibs() is in this module
+
+2002-01-02 22:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/garbage.c
+  * xharbour/source/vm/hvm.c
+    * Further optimization/cleanup to garbage collection.
+
+2002-01-02 20:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/rtl/filesys.c
+    ! Changed #ifdef __WIN32__ to #ifdef X__WIN32__ to disable win32 logic, which is still broken.
+
+  * xharbour/utils/hbmake/hbmake.prg
+    ! Commented out line 1107 :
+        aLibs:=Getlibs( lgcc ,GetMakeDir()+'\lib')
+      because it refrences a non existent function GetLibs().
+
+    /* Luiz, please fix this, as hbmake can not be used now. */
+
+
+2002-01-02 19:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/vm/itemapi.c
+  * xharbour/include/hbapiitm.h
+    - Removed unneeded hb_itemReturnPtr() and hb_itemArrayPut()
+
+  * xharbour/source/rtl/memofile.c
+    + Added #include "hbstack.h"
+    ! Changed hb_itemReturnPtr() to &hb_stack.Return
+
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/debug.c
+    ! Changed hb_itemArrayPut() to hb_arraySet()
+
+  * xharbour/source/rtl/ampm.c
+  * xharbour/source/rtl/descend.c
+  * xharbour/source/rtl/dir.c
+  * xharbour/source/rtl/errorapi.c
+  * xharbour/source/rtl/gete.c
+  * xharbour/source/rtl/hardcr.c
+  * xharbour/source/rtl/langapi.c
+  * xharbour/source/rtl/memoline.c
+  * xharbour/source/rtl/mouseapi.c
+  * xharbour/source/rtl/mtran.c
+  * xharbour/source/rtl/net.c
+  * xharbour/source/rtl/oemansi.c
+  * xharbour/source/rtl/padc.c
+  * xharbour/source/rtl/padl.c
+  * xharbour/source/rtl/padr.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/rtl/replic.c
+  * xharbour/source/rtl/saverest.c
+  * xharbour/source/rtl/setkey.c
+  * xharbour/source/rtl/space.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/strtran.c
+  * xharbour/source/rtl/strzero.c
+  * xharbour/source/rtl/stuff.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/valtostr.c
+  * xharbour/source/rtl/version.c
+    + Added #include "hbfast.h" to resolve compiler warnings.
+
+  * xharbour/source/vm/memvars.c
+    * Corrected compiler warnning in __MVEXIST()
+
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/hvm.c
+    * Optimization work in progress.
+
+  * xharbour/tests/pp.prg
+    - Removed INLINE_C versions of ExtractLeadingWS() DropTrailingWS() and DropTrailingExtraWS()
+  * xharbour/tests/pp_harb.ch
+    + Added c versions of ExtractLeadingWS() DropTrailingWS() and DropTrailingExtraWS()
+
+2002-01-03 00:40 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * include/hbfsapi.h
+     * under Win32 FHANDLE is typedef to long
+   * source/rtl/filesys.c
+     * Replaced all X__WIN32__ with __WIN32__
+     * hb_fscommit() now used true Win32 Api calls
+     * No more file limit on Win32
+
+2002-01-02 07:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * updated the date
+   * utils/hbmake/hbmutils.prg
+    * Sinc with harbour
+
+2002-01-01 20:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/itemapi.c
+    + Tracing info.
+
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/garbage.c
+    ! Fixed few more GPFs to do with hb_arrayReleaseGarabage().
+
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/hvm.c
+    ! Fixed initialization of top item in hb_stackInit()
+
+  * xharbour/tests/inline_c.prg
+    ! Fixed aTokens() parsing of last token with just one character.
+
+2001-12-31 08:25 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * Sinc with harbour.Also command line are free now. ie hbmake -ex ola.bc
+
+2001-12-29 19:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/include/hbfast.h
+  * xharbour/source/vm/fastitem.c
+    + void hb_itemPushForward( PHB_ITEM pItem );
+
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/hvm.c
+    ! Optimized many hb_vmPush() to new hb_itemPushForward()
+    ! Optimized many hb_itemCopy() to new hb_itemForwardValue()
+
+  /*
+     After this 2nd optimization installment, xHarbour is now about 10-15% faster than Harbour.
+     For example on my 1Ghz Notebook, hbtest.exe (output directed to file) takes 0.85 Second,
+     as oppose to Harbour's 0.97 Second.
+
+     All tests run fine.
+  */
+
+2001-12-29 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/makefile.bc
+  * xharbour/makefile.vc
+  * xharbour/source/vm/Makefile
+    + Added support for new source/vm/fastitem.c
+
+  * xharbour/include/hbapi.h
+    + Added member bShadow to HB_ITEM structure.
+
+  + xharbour/include/hbfast.h
+  + xharbour/source/vm/fastitem.c
+    + New functions:
+       void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource );
+       void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
+       void hb_itemPushEnvelopeString( char * szText, ULONG length );
+       void hb_retcAdopt( char * szText );
+       void hb_retclenAdopt( char * szText, ULONG ulLen );
+
+  * xharbour/include/hbexprb.c
+    * Now includes terminating NULL in generated strings of PCODE.
+
+  * xharbour/source/vm/fm.c
+    + Tracing info.
+
+  * xharbour/source/vm/hvm.c
+    ! Support for additional NULL in PCODE strings.
+
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/rtl/ampm.c
+  * xharbour/source/rtl/chrasc.c
+  * xharbour/source/rtl/colorind.c
+  * xharbour/source/rtl/datec.c
+  * xharbour/source/rtl/dateshb.c
+  * xharbour/source/rtl/descend.c
+  * xharbour/source/rtl/fkmax.c
+  * xharbour/source/rtl/gete.c
+  * xharbour/source/rtl/hardcr.c
+  * xharbour/source/rtl/langapi.c
+  * xharbour/source/rtl/left.c
+  * xharbour/source/rtl/memoline.c
+  * xharbour/source/rtl/mouseapi.c
+  * xharbour/source/rtl/mtran.c
+  * xharbour/source/rtl/net.c
+  * xharbour/source/rtl/oemansi.c
+  * xharbour/source/rtl/padc.c
+  * xharbour/source/rtl/padl.c
+  * xharbour/source/rtl/padr.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/rtl/replic.c
+  * xharbour/source/rtl/right.c
+  * xharbour/source/rtl/saverest.c
+  * xharbour/source/rtl/setcolor.c
+  * xharbour/source/rtl/space.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/strtran.c
+  * xharbour/source/rtl/strzero.c
+  * xharbour/source/rtl/stuff.c
+  * xharbour/source/rtl/substr.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/trim.c
+  * xharbour/source/rtl/type.c
+  * xharbour/source/rtl/valtostr.c
+  * xharbour/source/rtl/version.c
+    * First installment of an overhaul optimization of the RT.
+      so far only taking advantage of hb_retc[]Adopt() from fastitem.c.
+
+      After thoutough testings system appears stable and already faster
+      than Harbour.
+
+2001-12-24 21:35 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * Some minor fixes to both edit mode
+
+2001-12-23 09:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+   * include/hbundoc.api
+     * #define cleanup synched with harbour.
+   * source/rtl/filesys.c
+     * return value checking for the Win32 API synched with harbour.
+   * source/vm/dynlibhb.c
+     + New function hb_StartApp() synched with harbour.
+   * source/vm/hvm.c
+     * Function hb_StartApp() used from hb_vmProcessSymbols() synched with harbour.
+
+2001-12-22 07:50 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * Some alingment of the text on edit mode.
+   * utils/hbmake/hbmutils.prg
+     * Getsourcefiles() function speed optimized(thanks Victor)
+
+2001-12-21 22:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + bin/!pack_bin.bat
+  + bin/bld.bat
+  + bin/bld_b16.bat
+  + bin/bld_b32.bat
+  + bin/bld_vc.bat
+    + Added missing build and release batch files.
+
+  * include/hbinit.h
+  * source/rtl/filesys.c
+    * Synched with Harbour
+
+  - source/compiler/fixflex.c
+    - Removed.
+
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/itemapi.c
+    * Final fixes, formating, and few notes and tracing added.
