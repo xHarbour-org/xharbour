@@ -388,7 +388,9 @@ STATIC s_sPending
 STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
-STATIC s_bExternalRecovery
+#ifdef EXTERNAL_RECOVERY
+   STATIC s_bExternalRecovery
+#endif
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -794,6 +796,19 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    ELSE
       Eval( ErrorBlock(), ErrorNew( [PP], 1004, sProcName, [Missing Method: ], s_aParams ) )
    ENDIF
+
+RETURN s_xRet
+
+//--------------------------------------------------------------//
+
+FUNCTION PP_ExecProcID( nProc, aParams )
+
+    s_xRet := NIL
+    s_aParams := aParams
+
+    TraceLog()
+
+    PP_ExecProcedure( s_aProcedures, nProc )
 
 RETURN s_xRet
 
@@ -1350,10 +1365,6 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
             ENDIF
 
             IF sBlock = "PP_PROC"
-               IF Len( aProcedures[ nProcId ][2] ) > 0
-                  bProc := {|| PP_ExecProcedure( &nProcID ) }
-               ENDIF
-
                sSymbol := Upper( LTrim( SubStr( sBlock, At( ' ', sBlock ) ) ) )
                aSize( aProcedures, ++nProcId )
 
@@ -1772,7 +1783,7 @@ FUNCTION PP_ProcName( nLevel )
       nLevel := 0
    ENDIF
 
-   TraceLog( s_nProcStack, nLevel )
+   //TraceLog( s_nProcStack, nLevel )
 
    IF nLevel >= 0 .AND. nLevel < s_nProcStack
       RETURN s_aProcStack[ s_nProcStack - nLevel ][1]
@@ -1965,6 +1976,7 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
    LOCAL bErrHandler, oError
+   LOCAL aProcedure
 
    IF bBlanks == NIL
       bBlanks := .T.
@@ -2000,7 +2012,7 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
       //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
       IF s_sModule == cFile
-         TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+         //TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
       ELSE
          s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
          s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
@@ -2010,6 +2022,12 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
          PP_PreProFile( cFile, sPPOExt, bBlanks )
          bCompile  := .F.
       ENDIF
+
+      #ifdef __XHARBOUR__
+         FOR EACH aProcedure IN s_aProcedures
+            PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
+         NEXT
+      #endif
 
       PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
@@ -2103,54 +2121,58 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
 
    oRecover := oErr
 
-   IF oErr:SubCode == 1001
-      IF s_sModule != NIL
-         sProc := s_sModule + oErr:Operation
-         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-      ELSE
-         nProc := 0
-      ENDIF
-      IF nProc == 0
-         sProc := oErr:Operation
-         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-      ENDIF
-
-      IF nProc > 0
-         s_xRet := NIL
-         IF ValType( oErr:Args ) == 'A'
-            s_aParams := oErr:Args
+   #ifndef __XHARBOUR__
+      IF oErr:SubCode == 1001
+         IF s_sModule != NIL
+            sProc := s_sModule + oErr:Operation
+            nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
          ELSE
-            s_aParams := {}
+            nProc := 0
+         ENDIF
+         IF nProc == 0
+            sProc := oErr:Operation
+            nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
          ENDIF
 
-         lSuccess := .T.
+         IF nProc > 0
+            s_xRet := NIL
+            IF ValType( oErr:Args ) == 'A'
+               s_aParams := oErr:Args
+            ELSE
+               s_aParams := {}
+            ENDIF
 
-         BEGIN SEQUENCE
-            PP_ExecProcedure( aProcedures, nProc )
-         RECOVER USING oRecover
-            lSuccess := .F.
-            oRecover:Cargo := oErr
-         END
+            lSuccess := .T.
 
-         IF lSuccess
-            RETURN s_xRet
+            BEGIN SEQUENCE
+               PP_ExecProcedure( aProcedures, nProc )
+            RECOVER USING oRecover
+               lSuccess := .F.
+               oRecover:Cargo := oErr
+            END
+
+            IF lSuccess
+               RETURN s_xRet
+            ENDIF
          ENDIF
       ENDIF
-   ENDIF
+   #endif
 
    oRecover:ProcName   := PP_ProcName()
    oRecover:ProcLine   := PP_ProcLine()
    oRecover:ModuleName := s_sFile
 
-   IF s_bExternalRecovery != NIL
-      s_xRet := Eval( s_bExternalRecovery, oRecover )
+   #ifdef EXTERNAL_RECOVERY
+      IF s_bExternalRecovery != NIL
+         s_xRet := Eval( s_bExternalRecovery, oRecover )
 
-      IF oRecover:SubCode == 1003 .AND. ( ValType( s_xRet ) != "L" .OR. s_xRet == .F. )
-         Break( oRecover )
+         IF oRecover:SubCode == 1003 .AND. ( ValType( s_xRet ) != "L" .OR. s_xRet == .F. )
+            Break( oRecover )
+         ENDIF
+
+         RETURN s_xRet
       ENDIF
-
-      RETURN s_xRet
-   ENDIF
+   #endif
 
    Break( oRecover )
 
@@ -9459,6 +9481,7 @@ PROCEDURE PP_LoadDot()
 RETURN
 
 //--------------------------------------------------------------//
+#ifdef EXTERNAL_RECOVERY
 FUNCTION PP_RecoveryBlock( bRetryRecovery )
 
    LOCAL bPresetBlock
@@ -9470,10 +9493,15 @@ FUNCTION PP_RecoveryBlock( bRetryRecovery )
    ENDIF
 
 RETURN s_bExternalRecovery
+#endif
 
 //--------------------------------------------------------------//
 PROCEDURE PP_Warning( cMsg )
    ? cMsg
+RETURN
+
+STATIC PROCEDURE ForceSymbol()
+   PP_ExecProcID() // Force generation of fake PUSHSYM to be used by PP_GenDynProc()
 RETURN
 
 //--------------------------------------------------------------//

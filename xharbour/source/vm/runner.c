@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.15 2003/10/03 00:00:48 paultucker Exp $
+ * $Id: runner.c,v 1.16 2003/11/11 20:20:55 ronpinkas Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb );
 void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 static ULONG     hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded );
-static PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
 static void      hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
 static void      hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 
@@ -803,7 +803,7 @@ static void hb_hrbFileClose( FHANDLE file )
    If a .PRG contains 10 functions, 10 dynamic functions are created which
    are all the same :-) except for 2 pointers.
 */
-static PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
+HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
 {
    PASM_CALL asmRet;
 

@@ -23,9 +23,11 @@
 
 #ifdef __HARBOUR__
 
-  #define HB_CLS_NOTOBJECT
-
   #include "hbclass.ch"
+
+  #ifdef AX
+     #define EXTERNAL_RECOVERY
+  #endif
 
   //----------------------------------------------------------------------------//
   CLASS  TInterpreter
@@ -51,7 +53,10 @@
      #ifdef __XHARBOUR__
         METHOD IsProcedure( cName )
         METHOD EvalExpression()
-        METHOD RecoverSiteGlobals( oErr )
+
+        #ifdef EXTERNAL_RECOVERY
+           METHOD RecoverSiteGlobals( oErr )
+        #endif
      #endif
 
      METHOD ClearRules()       INLINE PP_ResetRules()
@@ -78,7 +83,10 @@
 
      LOCAL aParams := HB_aParams(), xRet
      LOCAL bErrHandler
-     LOCAL bRecoveryBlock
+
+     #ifdef EXTERNAL_RECOVERY
+        LOCAL bRecoveryBlock
+     #endif
 
      IF Len( ::aScriptHostGlobals ) > 0
         ErrorBlock( {|e| Break( e ) } )
@@ -97,17 +105,21 @@
 
      IF ::nProcs > 0
         BEGIN SEQUENCE
-           IF Len( ::aScriptHostGlobals ) > 0
-              bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
-           ENDIF
+           #ifdef EXTERNAL_RECOVERY
+              IF Len( ::aScriptHostGlobals ) > 0
+                 bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+              ENDIF
+           #endif
            xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
         RECOVER USING xRet
            // xRet will be returned below.
         END SEQUENCE
 
-        IF Len( ::aScriptHostGlobals ) > 0
-           PP_RecoveryBlock( bRecoveryBlock )
-        ENDIF
+        #ifdef EXTERNAL_RECOVERY
+           IF Len( ::aScriptHostGlobals ) > 0
+              PP_RecoveryBlock( bRecoveryBlock )
+           ENDIF
+        #endif
      ENDIF
 
      ErrorBlock( bErrHandler )
@@ -126,12 +138,17 @@
 
   METHOD EvalExpression( cExp, aParams ) CLASS  TInterpreter
 
-     LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } )
-     LOCAL bRecoveryBlock, xRet
+     LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } ), xRet
 
-     IF Len( ::aScriptHostGlobals ) > 0
-        bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
-     ENDIF
+     #ifdef EXTERNAL_RECOVERY
+        LOCAL bRecoveryBlock
+     #endif
+
+     #ifdef EXTERNAL_RECOVERY
+        IF Len( ::aScriptHostGlobals ) > 0
+           bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+        ENDIF
+     #endif
 
      BEGIN SEQUENCE
         IF aParams != NIL .AND. cExp[-1] == ')'
@@ -144,59 +161,55 @@
         // xRet will be returned below.
      END SEQUENCE
 
-     IF Len( ::aScriptHostGlobals ) > 0
-        PP_RecoveryBlock( bRecoveryBlock )
-     ENDIF
+     #ifdef EXTERNAL_RECOVERY
+        IF Len( ::aScriptHostGlobals ) > 0
+           PP_RecoveryBlock( bRecoveryBlock )
+        ENDIF
+     #endif
 
      ErrorBlock( bErrHandler )
 
   RETURN xRet
 
   //----------------------------------------------------------------------------//
-  METHOD RecoverSiteGlobals( oErr )
+  #ifdef EXTERNAL_RECOVERY
+     METHOD RecoverSiteGlobals( oErr )
 
-      LOCAL Global, xRet
+         LOCAL Global, xRet
 
-      //Alert( ProcName() + ":" + oErr:Operation + "->" + oErr:Description )
+         //Alert( ProcName() + ":" + oErr:Operation + "->" + oErr:Description )
 
-      SWITCH oErr:SubCode
-         CASE 1001
-         //CASE 1003
-            FOR EACH Global IN ::aScriptHostGlobals
-                //Alert( "Trying: "  + oErr:Operation + " with: " + Global[1] )
+         SWITCH oErr:SubCode
+            CASE 1001
+               FOR EACH Global IN ::aScriptHostGlobals
+                   //Alert( "Trying: "  + oErr:Operation + " with: " + Global[1] )
 
-                TRY
-                   xRet := Global[3]:&( oErr:Operation )
-                CATCH xRet
-                   //Alert( "OLE Error: " + xRet:Operation + "->" + xRet:Description )
-                END
+                   TRY
+                      xRet := Global[3]:&( oErr:Operation )
+                   CATCH xRet
+                      //Alert( "OLE Error: " + xRet:Operation + "->" + xRet:Description )
+                   END
 
-                IF ! xRet:ClassName == "ERROR"
-                   EXIT
-                ENDIF
-            NEXT
+                   IF ! xRet:ClassName == "ERROR"
+                      EXIT
+                   ENDIF
+               NEXT
 
-            EXIT
+               EXIT
 
-         DEFAULT
-            TraceLog( oErr )
-      END
+            DEFAULT
+               TraceLog( oErr )
+         END
 
-      IF oErr:SubCode == 1003
-/*
-         IF xRet:ClassName == "TOLEAUTO"
-            __QQPub( oErr:Operation )
-            __MVPUT( oErr:Operation, xRet )
-            RETURN .T.
-         ELSE
+         IF oErr:SubCode == 1003
             RETURN .F.
          ENDIF
-*/
-         RETURN .F.
-      ENDIF
 
-  RETURN xRet
+     RETURN xRet
   #endif
+
+  #endif
+
   //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
 
@@ -285,6 +298,13 @@
     RETURN .T.
     */
 
+  #endif
+
+  //--------------------------------------------------------------//
+  #ifdef __XHARBOUR__
+  EXIT PROCEDURE PP_EXIT()
+       PP_ReleaseDynProcedures()
+  RETURN
   #endif
 
   //--------------------------------------------------------------//
@@ -2440,6 +2460,103 @@
          #endif
       }
 
+      #ifdef __XHARBOUR__
+         #include "hbpcode.h"
+
+         typedef union
+         {
+            BYTE *   pAsmData;                           /* The assembler bytes      */
+            PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
+                                                            function                 */
+         } ASM_CALL, * PASM_CALL;
+
+         typedef struct
+         {
+            PASM_CALL pAsm;
+            BYTE *pcode;
+            PHB_DYNS pDyn;
+         } DYN_PROC;
+
+         extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+
+         static DYN_PROC *s_pDynList;
+         static int s_iDyn = 0;
+
+         HB_FUNC_STATIC( PP_GENDYNPROCEDURE )
+         {
+            char *sFunctionName = hb_parc( 1 );
+            short int iID = hb_parni( 2 );
+            BYTE *pcode = (BYTE *) hb_xgrab( 15 );
+            PASM_CALL pDynFunc;
+            PHB_DYNS pDynSym;
+
+            pcode[ 0] = HB_P_PUSHSYMNEAR;
+            pcode[ 1] = 34;                   /* PP_EXECPROCID */
+
+            pcode[ 2] = HB_P_PUSHNIL;
+
+            pcode[ 3] = HB_P_PUSHINT;
+            pcode[ 4] = HB_LOBYTE( iID );
+            pcode[ 5] = HB_HIBYTE( iID );
+
+            pcode[ 6] = HB_P_PUSHSYMNEAR;
+            pcode[ 7] = 31;                 /* HB_APARAMS */
+
+            pcode[ 8] = HB_P_PUSHNIL;
+
+            pcode[ 9] = HB_P_FUNCTIONSHORT;
+            pcode[10] = 0;
+
+            pcode[11] = HB_P_FUNCTIONSHORT;
+            pcode[12] = 2;
+
+            pcode[13] = HB_P_RETVALUE;
+            pcode[14] = HB_P_ENDPROC;
+
+            pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
+
+            //printf( "Dyn: '%s'\n", sFunctionName );
+
+            pDynSym = hb_dynsymGet( sFunctionName );
+            pDynSym->pSymbol->pFunPtr = pDynFunc->pFunPtr;
+
+            if( s_iDyn == 0 )
+            {
+               s_pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) );
+
+               s_pDynList[0].pAsm  = pDynFunc;
+               s_pDynList[0].pcode = pcode;
+               s_pDynList[0].pDyn  = pDynSym;
+            }
+            else
+            {
+               s_pDynList = hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
+
+               s_pDynList[s_iDyn].pAsm  = pDynFunc;
+               s_pDynList[s_iDyn].pcode = pcode;
+               s_pDynList[s_iDyn].pDyn  = pDynSym;
+            }
+
+            s_iDyn++;
+         }
+
+         HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
+         {
+            int i;
+
+            for( i = 0; i < s_iDyn; i++ )
+            {
+               hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
+               hb_xfree( (void *) ( s_pDynList[i].pcode ) );
+               hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->pFunPtr ) );
+            }
+
+            if( s_iDyn )
+            {
+               hb_xfree( (void *) s_pDynList );
+            }
+         }
+      #endif
     #pragma ENDDUMP
 
   #endif

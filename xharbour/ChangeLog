@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1803 2003/12/01 03:45:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1804 2003/12/01 03:53:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-30 21:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/runner.c
+    * Removed static from hb_hrbAsmCreateFun
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    + Added dynmic function generation so that error handling is no longer needed to resolve script level functions.
+      /* Interpreter is now many times faster. (can someone test if it works correctly under Linux?) */
 
 2003-11-30 19:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/tip/makefile.bc
