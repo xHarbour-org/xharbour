@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.2 2004/02/02 12:40:17 andijahja Exp $
+ * $Id: hbencode.c,v 1.3 2004/02/02 21:21:21 andijahja Exp $
  */
 
 /*
@@ -111,12 +111,13 @@ B64ENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFileMask>] ) -> int
       -2 = cannot create output file
       -3 = invalid number of lines per file
 
-YYENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+YYENCODE_FILE( <cFileInput>, [<cFileOutput>], [<nCharPerLine>] ) -> int
    Description:
       YYEncode a given file
    Parameters:
       cFileInput = source filename to be encoded
       cFileOutput = output filename
+      nCharPerLine = number of characters per line of encoded file (defaut=128)
    Returns:
        0 = success
       -1 = cannot open source file
@@ -124,7 +125,7 @@ YYENCODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       -3 = Error in reading file for encoding
       -4 = Error in writing encoded file
 
-YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>] ) -> int
+YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>], [<nCharPerLine>] ) -> int
    Description:
       YYEncode a given file into file chunks whose size are determined
       ny nLinePerFile
@@ -132,6 +133,7 @@ YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>] ) -> int
       cFileInput = source filename to be encoded
       nLinePerFile = number of line per file chunk
       cFileMask = output filename mask
+      nCharPerLine = number of characters per line of encoded file (defaut=128)
    Returns:
        0 = success
       -1 = cannot open source file
@@ -209,7 +211,7 @@ static void CrcAdd(int c)
 }
 
 //----------------------------------------------------------------------------//
-static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int part, long fulllen)
+static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int part, long fulllen, int linelength )
 {
    long restlen;
    long srclen;
@@ -220,10 +222,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
    unsigned char * desp;
    unsigned char c;
    int id;
-   int linelength;
    static long pbegin, pend;
-
-   linelength=128;  // max 255 - due to desbuf size
 
    if (part==0)  // SinglePart message
    {
@@ -869,8 +868,10 @@ HB_FUNC( YYENCODE_FILE )
    PHB_FNAME pFileName;
    PHB_ITEM pIn  = hb_param(1,HB_IT_STRING);
    PHB_ITEM pOut = hb_param(2,HB_IT_STRING);
+   PHB_ITEM pLineLength = hb_param(3,HB_IT_NUMERIC);
    char szYYEFileName[ _POSIX_PATH_MAX ] ;
    char pszFileName[ _POSIX_PATH_MAX ];
+   USHORT YYELineLength = 128;
 
    if ( !pIn )
    {
@@ -908,7 +909,20 @@ HB_FUNC( YYENCODE_FILE )
       return;
    }
 
-   hb_retni( yEncode( fDes, pszFileName, fSrc, filelen, 0, 0 ) );
+   if ( pLineLength )
+   {
+      if (( pLineLength->item.asInteger.value > 0 ) &&
+          ( pLineLength->item.asInteger.value <= 255 ))
+      {
+         YYELineLength = pLineLength->item.asInteger.value;
+      }
+      else if ( pLineLength->item.asInteger.value > 255 )
+      {
+         YYELineLength = 255;
+      }
+   }
+
+   hb_retni( yEncode( fDes, pszFileName, fSrc, filelen, 0, 0, YYELineLength ) );
 
    hb_xfree( pFileName );
 
@@ -929,9 +943,11 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    PHB_ITEM pIn   = hb_param(1,HB_IT_STRING);
    PHB_ITEM pLine = hb_param(2,HB_IT_NUMERIC);
    PHB_ITEM pOut  = hb_param(3,HB_IT_STRING);
+   PHB_ITEM pLineLength = hb_param(4,HB_IT_NUMERIC);
    char szYYEFileName[ _POSIX_PATH_MAX ] ;
    char pszFileName[ _POSIX_PATH_MAX ];
    char *cMask;
+   USHORT YYELineLength = 128;
    USHORT iPart = 1;
    int iResult = 0;
 
@@ -972,17 +988,30 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       return;
    }
 
+   if ( pLineLength )
+   {
+      if (( pLineLength->item.asInteger.value > 0 ) &&
+          ( pLineLength->item.asInteger.value <= 255 ))
+      {
+         YYELineLength = pLineLength->item.asInteger.value;
+      }
+      else if ( pLineLength->item.asInteger.value > 255 )
+      {
+         YYELineLength = 255;
+      }
+   }
+
    do
    {
       nTotalEncoded += nBytes;
 
       /*
       This (nBytes) is a rough calculation of bytes to be written based on the
-      supplied line number per chunk. YYencoded line is 130 bytes while the
-      header is 50 bytes and the footer is 50 bytes, makes it 100
+      supplied line number per chunk. YYencoded line is determined by
+      YYELineLegth which is 128 bytes by default.
       */
 
-      nBytes = (( pLine->item.asLong.value * 130 ) + 100 );
+      nBytes = pLine->item.asLong.value * YYELineLength;
 
       if (( nTotalEncoded + nBytes ) > filelen )
       {
@@ -996,7 +1025,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 
          if ( fDes )
          {
-            iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
+            iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen, YYELineLength );
             fclose( fDes );
 
             if ( iResult != 0 )
