@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.46 2004/07/09 11:52:09 likewolf Exp $
+ * $Id: debugger.prg,v 1.47 2004/07/09 19:55:04 likewolf Exp $
  */
 
 /*
@@ -314,7 +314,7 @@ CLASS TDebugger
    DATA   oBar, oBrwText, cPrgName, oBrwStack, oBrwVars, aVars
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
-   DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore
+   DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -2105,6 +2105,7 @@ METHOD RestoreAppState() CLASS TDebugger
   SetLastKey( ::nAppLastKey )
   SetInkeyAfterBlock( ::bAppInkeyAfter )
   SetInkeyBeforeBlock( ::bAppInkeyBefore )
+  __SetClassScope( ::bAppClassScope )
 RETURN NIL
 
 
@@ -2143,6 +2144,7 @@ METHOD SaveAppState() CLASS TDebugger
   ::nAppLastKey := LastKey()
   ::bAppInkeyAfter := SetInkeyAfterBlock( NIL )
   ::bAppInkeyBefore := SetInkeyBeforeBlock( NIL )
+  ::bAppClassScope := __SetClassScope( .F. )
 RETURN NIL
 
 
