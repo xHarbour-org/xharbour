@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3335 2004/08/24 13:55:35 lculik Exp $
+ * $Id: ChangeLog,v 1.3336 2004/08/24 20:46:30 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-24 19:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/regex.c
+    + Added optional 3rd logical paramater to HB_RegExMatch() to indicate if match must be full
+     (default to .F. as it was before).
+  * source/vm/arrayshb.c
+    + Added support for memebers of type structure or pointer to structure to allow numeric (pointer address)
+  * utils/xbscript/xbs_harb.ch
+    + Added support for Extended Strings in NextToken()
+
 2004-08-25 08:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /include/hbapirdd.h
     + added #ifndef HARBOUR_MAX_RDD_ALIAS_LENGTH check

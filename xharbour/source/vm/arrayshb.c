@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.47 2004/07/30 18:23:20 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.48 2004/08/24 02:15:14 ronpinkas Exp $
  */
 
 /*
@@ -1420,7 +1420,18 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             {
                PHB_ITEM pStructure = pBaseVar->pItems + ulIndex;
 
-               if( HB_IS_NIL( pStructure ) )
+               if( HB_IS_LONG( pStructure ) )
+               {
+                  if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
+                  {
+                     *( (void **) ( Buffer + uiOffset ) ) = (void *) pStructure->item.asLong.value;
+                  }
+                  else
+                  {
+                     memcpy( (void *) ( Buffer + uiOffset ), (void *) pStructure->item.asLong.value, uiMemberSize );
+                  }
+               }
+               else if( HB_IS_NIL( pStructure ) )
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                   {

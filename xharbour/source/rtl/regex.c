@@ -6555,19 +6555,30 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                }
             }
 
-            if ( fFree )
+            if( fFree )
+            {
                regfree( pReg );
+            }
+
             return TRUE;
          }
 
          case 1: // HB_P_LIKE
-            if ( fFree )
+            if( fFree )
+            {
+               //TraceLog( NULL, "%s like %s\n", pString->item.asString.value, pRegEx->item.asString.value );
                regfree( pReg );
+            }
+
             return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
 
          case 2: // HB_P_MATCH
-            if ( fFree )
+            if( fFree )
+            {
+               //TraceLog( NULL, ">%s< has >%s<\n", pString->item.asString.value, pRegEx->item.asString.value );
                regfree( pReg );
+            }
+
             return TRUE;
 
          case 3: // Split
@@ -6596,8 +6607,11 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
          }
 
-         if ( fFree )
+         if( fFree )
+         {
             regfree( pReg );
+         }
+
          return TRUE;
 
          case 4: // Wants Results AND positions
@@ -6655,7 +6669,9 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    /* If we have no match, we must anyway return an array of one element
       for request kind == 3 (split) */
    if ( fFree )
+   {
       regfree( pReg );
+   }
 
    if( cRequest == 3 )
    {
@@ -6757,7 +6773,7 @@ HB_FUNC( HB_REGEXMATCH )
 #ifdef HB_API_MACROS
    HB_THREAD_STUB
 #endif
-   hb_retl ( hb_regex( 2, NULL, NULL ) );
+   hb_retl ( hb_regex( hb_parl(3) ? 1 : 2, NULL, NULL ) );
 }
 
 // Splits the string in an array of matched expressions
