@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.785 2003/02/27 05:16:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.786 2003/02/27 22:01:49 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-28 06:55 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! Fixed hb_cdxSeek() to respond to null queries (dbSeek( "" )) in the 
+      same way as Clipper do : Found() ==> .T. and pointing to the first 
+      logical record in the table.
 
 2003-02-26 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/zip.c

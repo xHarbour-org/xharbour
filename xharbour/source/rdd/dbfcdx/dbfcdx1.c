@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.39 2003/02/13 14:36:04 mlombardo Exp $
+ * $Id: dbfcdx1.c,v 1.40 2003/02/14 10:58:07 paultucker Exp $
  */
 
 /*
@@ -5209,27 +5209,37 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       else
       {
          hb_cdxKeyFree( pKey2 );
-         pArea->fFound = FALSE;
 
-         if( bSoftSeek && !pTag->TagEOF )
+         if ( pTag->uiType == 'C' &&  pKey->item.asString.length == 0 )
          {
-            //return SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
-            retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
-            if( retvalue != FAILURE )
-               if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
-               {
-                  if( bFindLast )
-                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-                  else
-                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
-               }
-            /* return retvalue; */
+            retvalue = SELF_GOTOP( ( AREAP ) pArea );
+            pArea->fFound = TRUE;
          }
          else
          {
-            retvalue = hb_cdxGoEof( pArea );
+            pArea->fFound = FALSE;
+   
+            if( bSoftSeek && !pTag->TagEOF )
+            {
+               //return SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+               retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+               if( retvalue != FAILURE )
+                  if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
+                  {
+                     if( bFindLast )
+                        retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
+                     else
+                        retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
+                  }
+               /* return retvalue; */
+            }
+            else
+            {
+               retvalue = hb_cdxGoEof( pArea );
+            }
          }
       }
+
       if( !hb_cdxTopScope( pTag, pTag->CurKeyInfo ) ||
           !hb_cdxBottomScope( pTag, pTag->CurKeyInfo ) )
          hb_cdxGoEof( pArea );
