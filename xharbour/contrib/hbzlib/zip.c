@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.36 2004/05/18 13:52:41 lculik Exp $
+ * $Id: zip.c,v 1.37 2004/05/22 04:17:56 lculik Exp $
  */
 
 /*
@@ -403,12 +403,12 @@ HB_FUNC( HB_ZIPFILE )
             strcpy( szFile, (char *) pCurDir );
             strcat( szFile, OS_PATH_DELIMITER_STRING) ;
             strcat( szFile, hb_parc( 1 ) ) ;
-            hb_xfree( pCurDir ) ;
          }
          else
          {
             strcpy( szFile, hb_parc( 1 ) );
          }
+         hb_xfree( pCurDir) ;
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
