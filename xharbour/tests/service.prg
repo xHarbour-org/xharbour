@@ -12,7 +12,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: openportd.prg,v 1.2 2003/07/25 23:49:33 gian Exp $
+* $Id: service.prg,v 1.1 2003/09/11 12:08:29 jonnymind Exp $
 *
 
 #include "hbservice.ch"
@@ -66,7 +66,7 @@ Function Handle( nSignal, aParams )
 RETURN HB_SERVICE_HANDLED
 
 PROCEDURE Waiter()
-   LOCAL nCount := 30
+   LOCAL nCount := 10
 
    WHILE bWait
       ThreadSleep( 1000 )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.9 2003/07/17 21:11:10 jonnymind Exp $
+ * $Id: hbxml.c,v 1.10 2003/08/07 05:54:12 jonnymind Exp $
  */
 
 /*
@@ -97,7 +97,7 @@ static void hbxml_set_doc_status( PHB_ITEM doc, int status, int error )
 static void hbxml_doc_new_line( PHB_ITEM pDoc )
 {
    HB_ITEM number;
-   
+
    number.type = HB_IT_NIL;
    hb_objSendMsg( pDoc, "NLINE", 0 );
    hb_itemPutNI( &number, HB_VM_STACK.Return.item.asInteger.value + 1);
@@ -922,7 +922,7 @@ static void mxml_node_read_tag( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
 {
    char chr;
    HB_ITEM hbtemp;
-   
+
    hbtemp.type = HB_IT_NIL;
    hb_itemPutNI( &hbtemp, MXML_TYPE_TAG );
    hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
@@ -1832,7 +1832,7 @@ HB_FUNC( HBXML_DATAREAD )
 {
    PHB_ITEM pParam = hb_param(2, HB_IT_ANY );
    PHB_ITEM pDoc = hb_param(1, HB_IT_OBJECT );
-   int iStyle = hb_parni(1);
+   int iStyle = hb_parni(3);
    HB_ITEM root;
    MXML_REFIL refil;
    char buffer[512];
@@ -1843,7 +1843,7 @@ HB_FUNC( HBXML_DATAREAD )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
          NULL,
-         2, hb_param(1, HB_IT_ANY ), hb_param(2, HB_IT_ANY ) );
+         2, hb_paramError(1), hb_paramError(2), hb_param(4, HB_IT_ANY ) );
       return;
    }
 
