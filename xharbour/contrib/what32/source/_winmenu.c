@@ -162,7 +162,7 @@ HB_FUNC( TRACKPOPUPMENU )
    rc.right  = hb_parni(7,3);
    rc.bottom = hb_parni(7,4);
  }
- hb_retl( TrackPopupMenu((HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4),
+ hb_retnl( TrackPopupMenu((HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4),
                          hb_parni(5), (HWND) hb_parnl(6), (ISNIL(7) ? NULL : &rc) ) ) ;
 }
 
