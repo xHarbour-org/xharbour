@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3034 2004/06/06 18:33:22 bdj Exp $
+ * $Id: ChangeLog,v 1.3035 2004/06/06 19:23:46 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-06-07 02:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * ChangeLog
+    Fix typo in my previous ChangeLog entry.
+
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtcrs/gtcrs.c
+    Apply HB_EXT_SHIFT_KEYS_CODES for 11 extended shift key codes.
+    Note:
+    I can't test these two gt, somebody pls kindly test if I broke something.
+
 2004-06-06 21:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtxvt/gtxvt.c
     * Added new K_SH_* codes.
   * bin/bld.bat
-    * Added -lcomdlg32 for mingw32. 
+    * Added -lcomdlg32 for mingw32.
 
 2004-06-07 01:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * include/inkey.ch
-  * source/rtl/gtwvt/gtwin.c
+  * source/rtl/gtwin/gtwin.c
   * source/rtl/gtwvt/gtwvt.c
     Usage of these extended shift key codes:
        K_SH_LEFT    K_SH_UP      K_SH_RIGHT   K_SH_DOWN

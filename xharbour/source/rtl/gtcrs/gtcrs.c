@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.38 2004/05/25 20:27:22 druzus Exp $
+ * $Id: gtcrs.c,v 1.39 2004/06/06 11:33:20 lf_sfnet Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ typedef struct mouseEvent {
 } mouseEvent;
 
 typedef struct keyTab {
-    int	ch;
+    int  ch;
     int key;
     struct keyTab *nextCh;
     struct keyTab *otherCh;
@@ -301,6 +301,8 @@ static const ClipKeyCode extdKeyTab[NO_EXTDKEYS] = {
     {K_F10,        K_ALT_F10,    K_CTRL_F10,  K_SH_F10}, /*  09 */
     {K_F11,        K_ALT_F11,    K_CTRL_F11,  K_SH_F11}, /*  10 */
     {K_F12,        K_ALT_F12,    K_CTRL_F12,  K_SH_F12}, /*  11 */
+
+  #ifdef HB_EXT_SHIFT_KEYS_CODES
     {K_UP,          K_ALT_UP,     K_CTRL_UP,   K_SH_UP}, /*  12 */
     {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN, K_SH_DOWN}, /*  13 */
     {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT, K_SH_LEFT}, /*  14 */
@@ -311,10 +313,29 @@ static const ClipKeyCode extdKeyTab[NO_EXTDKEYS] = {
     {K_END,        K_ALT_END,    K_CTRL_END,  K_SH_END}, /*  19 */
     {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP, K_SH_PGUP}, /*  20 */
     {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN, K_SH_PGDN}, /*  21 */
+  #else
+    {K_UP,          K_ALT_UP,     K_CTRL_UP,         0}, /*  12 */
+    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN,         0}, /*  13 */
+    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT,         0}, /*  14 */
+    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT,         0}, /*  15 */
+    {K_INS,        K_ALT_INS,    K_CTRL_INS,         0}, /*  16 */
+    {K_DEL,        K_ALT_DEL,    K_CTRL_DEL,         0}, /*  17 */
+    {K_HOME,      K_ALT_HOME,   K_CTRL_HOME,         0}, /*  18 */
+    {K_END,        K_ALT_END,    K_CTRL_END,         0}, /*  19 */
+    {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP,         0}, /*  20 */
+    {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN,         0}, /*  21 */
+  #endif
+
     {K_BS,          K_ALT_BS,           127,         0}, /*  22 */
     {K_TAB,        K_ALT_TAB,    K_CTRL_TAB,  K_SH_TAB}, /*  23 */
     {K_ESC,        K_ALT_ESC,         K_ESC,         0}, /*  24 */
+
+  #ifdef HB_EXT_SHIFT_KEYS_CODES
     {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,K_SH_ENTER}, /*  25 */
+  #else
+    {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  25 */
+  #endif
+
     {K_ENTER,   KP_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  26 */
     {KP_CENTER,            0,     KP_CTRL_5,         0}, /*  27 */
     {K_PRTSCR,             0, K_CTRL_PRTSCR,         0}, /*  28 */
@@ -326,42 +347,42 @@ static int getClipKey(int nKey)
     int nRet = 0, nFlag = 0, n;
 
     if (IS_CLIPKEY(nKey))
-	nRet = GET_CLIPKEY(nKey);
+   nRet = GET_CLIPKEY(nKey);
     else {
-	nFlag = GET_KEYMASK(nKey);
-	nKey = CLR_KEYMASK(nKey);
-	if (nFlag & KEY_EXTDMASK) {
-	    if (nKey >= 0 && nKey < NO_EXTDKEYS) {
-		if ((nFlag & KEY_ALTMASK) && (nFlag & KEY_CTRLMASK) &&
-		     extdKeyTab[nKey].shift_key != 0)
-		    nRet = extdKeyTab[nKey].shift_key;
-		else if ((nFlag & KEY_ALTMASK) && extdKeyTab[nKey].alt_key != 0)
-		    nRet = extdKeyTab[nKey].alt_key;
-		else if ((nFlag & KEY_CTRLMASK) && extdKeyTab[nKey].ctrl_key != 0)
-		    nRet = extdKeyTab[nKey].ctrl_key;
-		else
-		    nRet = extdKeyTab[nKey].key;
-	    }
-	} else {
-	    if (nKey > 0 && nKey < 32) {
-		nFlag |= KEY_CTRLMASK;
-		nKey += 64;
-	    }
-	    n = nKey - 32;
-	    if (n >= 0 && n < NO_STDKEYS) {
-		if ((nFlag & KEY_ALTMASK) && (nFlag & KEY_CTRLMASK) &&
-		     stdKeyTab[n].shift_key != 0)
-		    nRet = stdKeyTab[n].shift_key;
-		else if ((nFlag & KEY_ALTMASK) && stdKeyTab[n].alt_key != 0)
-		    nRet = stdKeyTab[n].alt_key;
-		else if ((nFlag & KEY_CTRLMASK) && stdKeyTab[n].ctrl_key != 0)
-		    nRet = stdKeyTab[n].ctrl_key;
-		else
-		    nRet = stdKeyTab[n].key;
-	    } else
-		nRet = nKey;
+   nFlag = GET_KEYMASK(nKey);
+   nKey = CLR_KEYMASK(nKey);
+   if (nFlag & KEY_EXTDMASK) {
+       if (nKey >= 0 && nKey < NO_EXTDKEYS) {
+      if ((nFlag & KEY_ALTMASK) && (nFlag & KEY_CTRLMASK) &&
+           extdKeyTab[nKey].shift_key != 0)
+          nRet = extdKeyTab[nKey].shift_key;
+      else if ((nFlag & KEY_ALTMASK) && extdKeyTab[nKey].alt_key != 0)
+          nRet = extdKeyTab[nKey].alt_key;
+      else if ((nFlag & KEY_CTRLMASK) && extdKeyTab[nKey].ctrl_key != 0)
+          nRet = extdKeyTab[nKey].ctrl_key;
+      else
+          nRet = extdKeyTab[nKey].key;
+       }
+   } else {
+       if (nKey > 0 && nKey < 32) {
+      nFlag |= KEY_CTRLMASK;
+      nKey += 64;
+       }
+       n = nKey - 32;
+       if (n >= 0 && n < NO_STDKEYS) {
+      if ((nFlag & KEY_ALTMASK) && (nFlag & KEY_CTRLMASK) &&
+           stdKeyTab[n].shift_key != 0)
+          nRet = stdKeyTab[n].shift_key;
+      else if ((nFlag & KEY_ALTMASK) && stdKeyTab[n].alt_key != 0)
+          nRet = stdKeyTab[n].alt_key;
+      else if ((nFlag & KEY_CTRLMASK) && stdKeyTab[n].ctrl_key != 0)
+          nRet = stdKeyTab[n].ctrl_key;
+      else
+          nRet = stdKeyTab[n].key;
+       } else
+      nRet = nKey;
 
-	}
+   }
     }
 
     return nRet;
@@ -384,8 +405,8 @@ static void sig_handler(int signo)
     pid_t pid;
 
     if( signo < MAX_SIGNO ) {
-	s_SignalTable[signo] = TRUE;
-	s_SignalFlag = TRUE;
+   s_SignalTable[signo] = TRUE;
+   s_SignalFlag = TRUE;
     }
 
     switch( signo ) {
@@ -417,14 +438,14 @@ static void set_signals()
 
     s_SignalFlag = FALSE;
     for (i=1; i<MAX_SIGNO; ++i) {
-	s_SignalTable[i] = FALSE;
+   s_SignalTable[i] = FALSE;
     }
 
     /* Ignore SIGPIPEs so they don't kill us. */
     signal( SIGPIPE, SIG_IGN );
 
     for ( i = 0; sigs[i]; ++i ) {
-	set_sig_handler( sigs[i] );
+   set_sig_handler( sigs[i] );
     }
 }
 
@@ -482,8 +503,8 @@ static void set_signals()
 
     s_SignalFlag = FALSE;
     for (i=1; i<MAX_SIGNO; ++i) {
-	s_SignalTable[i] = FALSE;
-	set_sig_handler( i );
+   s_SignalTable[i] = FALSE;
+   set_sig_handler( i );
     }
 }
 #endif
@@ -494,40 +515,40 @@ static int add_efds(InOutBase *ioBase, int fd, int mode, int (*eventFunc) (int, 
     int i, fl;
 
     if (eventFunc == NULL && mode != O_RDONLY)
-	return -1;
+   return -1;
 
     if (fcntl(fd, F_GETFL, &fl) == -1)
-	return -1;
+   return -1;
     fl &= O_RDONLY | O_WRONLY | O_RDWR;
 
     if ((fl == O_RDONLY && mode == O_WRONLY) ||
         (fl == O_WRONLY && mode == O_RDONLY))
-	return -1;
+   return -1;
 
     for (i = 0; i < ioBase->efds_no && !pefd; i++)
-	if (ioBase->event_fds[i]->fd == fd)
-	    pefd = ioBase->event_fds[i];
+   if (ioBase->event_fds[i]->fd == fd)
+       pefd = ioBase->event_fds[i];
 
     if (pefd) {
-	pefd->mode = mode;
-	pefd->data = data;
-	pefd->eventFunc = eventFunc;
-	pefd->status = EVTFDSTAT_RUN;
+   pefd->mode = mode;
+   pefd->data = data;
+   pefd->eventFunc = eventFunc;
+   pefd->status = EVTFDSTAT_RUN;
     } else {
-	if (ioBase->efds_size <= ioBase->efds_no) {
-	    if (ioBase->event_fds == NULL)
-		ioBase->event_fds = hb_xgrab((ioBase->efds_size += 10) * sizeof(evtFD *));
-	    else
-		ioBase->event_fds = hb_xrealloc(ioBase->event_fds, (ioBase->efds_size += 10) * sizeof(evtFD *));
-	}
+   if (ioBase->efds_size <= ioBase->efds_no) {
+       if (ioBase->event_fds == NULL)
+      ioBase->event_fds = hb_xgrab((ioBase->efds_size += 10) * sizeof(evtFD *));
+       else
+      ioBase->event_fds = hb_xrealloc(ioBase->event_fds, (ioBase->efds_size += 10) * sizeof(evtFD *));
+   }
 
-	pefd = hb_xgrab(sizeof(evtFD));
-	pefd->fd = fd;
-	pefd->mode = mode;
-	pefd->data = data;
-	pefd->eventFunc = eventFunc;
-	pefd->status = EVTFDSTAT_RUN;
-	ioBase->event_fds[ioBase->efds_no++] = pefd;
+   pefd = hb_xgrab(sizeof(evtFD));
+   pefd->fd = fd;
+   pefd->mode = mode;
+   pefd->data = data;
+   pefd->eventFunc = eventFunc;
+   pefd->status = EVTFDSTAT_RUN;
+   ioBase->event_fds[ioBase->efds_no++] = pefd;
     }
 
     return fd;
@@ -538,14 +559,14 @@ static void del_efds(InOutBase *ioBase, int fd)
     int i, n = -1;
 
     for (i=0; i<ioBase->efds_no && n == -1; i++)
-	if (ioBase->event_fds[i]->fd == fd)
-	    n = i;
+   if (ioBase->event_fds[i]->fd == fd)
+       n = i;
 
     if (n != -1) {
-	hb_xfree(ioBase->event_fds[n]);
-	ioBase->efds_no--;
-	for (i = n; i < ioBase->efds_no; i++)
-	    ioBase->event_fds[i] = ioBase->event_fds[i+1];
+   hb_xfree(ioBase->event_fds[n]);
+   ioBase->efds_no--;
+   for (i = n; i < ioBase->efds_no; i++)
+       ioBase->event_fds[i] = ioBase->event_fds[i+1];
     }
 }
 
@@ -554,13 +575,13 @@ static void del_all_efds(InOutBase *ioBase)
     int i;
 
     if (ioBase->event_fds != NULL) {
-	for (i=0; i<ioBase->efds_no; i++)
-	    hb_xfree(ioBase->event_fds[i]);
+   for (i=0; i<ioBase->efds_no; i++)
+       hb_xfree(ioBase->event_fds[i]);
 
-	hb_xfree(ioBase->event_fds);
+   hb_xfree(ioBase->event_fds);
 
-	ioBase->event_fds = NULL;
-	ioBase->efds_no = ioBase->efds_size = 0;
+   ioBase->event_fds = NULL;
+   ioBase->efds_no = ioBase->efds_size = 0;
     }
 }
 
@@ -583,89 +604,89 @@ static int get_inch(InOutBase *ioBase, int  milisec )
     }
 
     while( nRet == 0 && lRead == 0 ) {
-	n = -1;
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	for (i = 0; i < ioBase->efds_no; i++) {
-	    if (ioBase->event_fds[i]->status == EVTFDSTAT_RUN) {
-		if (ioBase->event_fds[i]->mode == O_RDWR || ioBase->event_fds[i]->mode == O_RDONLY) {
-		    FD_SET(ioBase->event_fds[i]->fd, &rfds);
-		    if (n < ioBase->event_fds[i]->fd)
-			n = ioBase->event_fds[i]->fd;
-		}
-		if (ioBase->event_fds[i]->mode == O_RDWR || ioBase->event_fds[i]->mode == O_WRONLY) {
-		    FD_SET(ioBase->event_fds[i]->fd, &wfds);
-		    if (n < ioBase->event_fds[i]->fd)
-			n = ioBase->event_fds[i]->fd;
-		}
-	    }
-	}
+   n = -1;
+   FD_ZERO(&rfds);
+   FD_ZERO(&wfds);
+   for (i = 0; i < ioBase->efds_no; i++) {
+       if (ioBase->event_fds[i]->status == EVTFDSTAT_RUN) {
+      if (ioBase->event_fds[i]->mode == O_RDWR || ioBase->event_fds[i]->mode == O_RDONLY) {
+          FD_SET(ioBase->event_fds[i]->fd, &rfds);
+          if (n < ioBase->event_fds[i]->fd)
+         n = ioBase->event_fds[i]->fd;
+      }
+      if (ioBase->event_fds[i]->mode == O_RDWR || ioBase->event_fds[i]->mode == O_WRONLY) {
+          FD_SET(ioBase->event_fds[i]->fd, &wfds);
+          if (n < ioBase->event_fds[i]->fd)
+         n = ioBase->event_fds[i]->fd;
+      }
+       }
+   }
 
-	counter = ioBase->key_counter;
-	if ( select(n+1, &rfds, &wfds, NULL, ptv) > 0 ) {
-	    for (i = 0; i < ioBase->efds_no; i++) {
-		n = (FD_ISSET(ioBase->event_fds[i]->fd, &rfds) ? 1 : 0) |
-		    (FD_ISSET(ioBase->event_fds[i]->fd, &wfds) ? 2 : 0);
-		if (n != 0) {
-		    if (ioBase->event_fds[i]->eventFunc == NULL) {
-			lRead = 1;
-			if (STDIN_BUFLEN > ioBase->stdin_inbuf) {
-            		    unsigned char buf[STDIN_BUFLEN];
+   counter = ioBase->key_counter;
+   if ( select(n+1, &rfds, &wfds, NULL, ptv) > 0 ) {
+       for (i = 0; i < ioBase->efds_no; i++) {
+      n = (FD_ISSET(ioBase->event_fds[i]->fd, &rfds) ? 1 : 0) |
+          (FD_ISSET(ioBase->event_fds[i]->fd, &wfds) ? 2 : 0);
+      if (n != 0) {
+          if (ioBase->event_fds[i]->eventFunc == NULL) {
+         lRead = 1;
+         if (STDIN_BUFLEN > ioBase->stdin_inbuf) {
+                      unsigned char buf[STDIN_BUFLEN];
 
-            		    n = read(ioBase->event_fds[i]->fd, buf, STDIN_BUFLEN-ioBase->stdin_inbuf);
-			    if (n == 0)
-				ioBase->event_fds[i]->status = EVTFDSTAT_STOP;
-			    else
-            			for (i=0; i<n; i++) {
-            			    ioBase->stdin_buf[ioBase->stdin_ptr_r++] = buf[i];
-            			    if( ioBase->stdin_ptr_r == STDIN_BUFLEN )
-                			ioBase->stdin_ptr_r = 0;
-            			    ioBase->stdin_inbuf++;
-            			}
-			}
-		    } else if (nRet == 0 && counter == ioBase->key_counter) {
-			if (n==3)
-			    mode = O_RDWR;
-			else if (n==2)
-			    mode = O_WRONLY;
-			else
-			    mode = O_RDONLY;
-			ioBase->event_fds[i]->status = EVTFDSTAT_STOP;
-			n = (ioBase->event_fds[i]->eventFunc)(ioBase->event_fds[i]->fd, mode, ioBase->event_fds[i]->data);
-			if (IS_EVTFDSTAT(n)) {
-			    ioBase->event_fds[i]->status = n;
-			    if (nchk > i)
-				nchk = i;
-			}
-			else {
-			    ioBase->event_fds[i]->status = EVTFDSTAT_RUN;
-			    if (IS_CLIPKEY(n)) {
-				nRet = n;
-				npfd = ioBase->event_fds[i]->fd;
-				if (nchk > i)
-				    nchk = i;
-			    }
-			}
-		    }
-		}
-    	    }
+                      n = read(ioBase->event_fds[i]->fd, buf, STDIN_BUFLEN-ioBase->stdin_inbuf);
+             if (n == 0)
+            ioBase->event_fds[i]->status = EVTFDSTAT_STOP;
+             else
+                     for (i=0; i<n; i++) {
+                         ioBase->stdin_buf[ioBase->stdin_ptr_r++] = buf[i];
+                         if( ioBase->stdin_ptr_r == STDIN_BUFLEN )
+                        ioBase->stdin_ptr_r = 0;
+                         ioBase->stdin_inbuf++;
+                     }
+         }
+          } else if (nRet == 0 && counter == ioBase->key_counter) {
+         if (n==3)
+             mode = O_RDWR;
+         else if (n==2)
+             mode = O_WRONLY;
+         else
+             mode = O_RDONLY;
+         ioBase->event_fds[i]->status = EVTFDSTAT_STOP;
+         n = (ioBase->event_fds[i]->eventFunc)(ioBase->event_fds[i]->fd, mode, ioBase->event_fds[i]->data);
+         if (IS_EVTFDSTAT(n)) {
+             ioBase->event_fds[i]->status = n;
+             if (nchk > i)
+            nchk = i;
+         }
+         else {
+             ioBase->event_fds[i]->status = EVTFDSTAT_RUN;
+             if (IS_CLIPKEY(n)) {
+            nRet = n;
+            npfd = ioBase->event_fds[i]->fd;
+            if (nchk > i)
+                nchk = i;
+             }
+         }
+          }
+      }
+          }
         } else
-	    lRead = 1;
+       lRead = 1;
     }
 
     for (i = n = nchk; i < ioBase->efds_no; i++) {
-	if (ioBase->event_fds[i]->status == EVTFDSTAT_DEL)
-	    hb_xfree(ioBase->event_fds[i]);
-	else if( ioBase->event_fds[i]->fd == npfd)
-	    pefd = ioBase->event_fds[i];
-	else {
-	    if (i > n)
-		ioBase->event_fds[n] = ioBase->event_fds[i];
-	    n++;
-	}
+   if (ioBase->event_fds[i]->status == EVTFDSTAT_DEL)
+       hb_xfree(ioBase->event_fds[i]);
+   else if( ioBase->event_fds[i]->fd == npfd)
+       pefd = ioBase->event_fds[i];
+   else {
+       if (i > n)
+      ioBase->event_fds[n] = ioBase->event_fds[i];
+       n++;
+   }
     }
     if (pefd)
-	ioBase->event_fds[n++] = pefd;
+   ioBase->event_fds[n++] = pefd;
     ioBase->efds_no = n;
 
     return nRet;
@@ -679,14 +700,14 @@ static int test_bufch(InOutBase *ioBase, int n, int delay)
         nKey = get_inch(ioBase, delay);
 
     return IS_CLIPKEY(nKey) ? nKey :
-	    (ioBase->stdin_inbuf > n) ?
-	      ioBase->stdin_buf[(ioBase->stdin_ptr_l + n) % STDIN_BUFLEN] : -1;
+       (ioBase->stdin_inbuf > n) ?
+         ioBase->stdin_buf[(ioBase->stdin_ptr_l + n) % STDIN_BUFLEN] : -1;
 }
 
 static void free_bufch(InOutBase *ioBase, int n)
 {
     if (n > ioBase->stdin_inbuf)
-	n = ioBase->stdin_inbuf;
+   n = ioBase->stdin_inbuf;
     ioBase->stdin_ptr_l = (ioBase->stdin_ptr_l + n) % STDIN_BUFLEN;
     ioBase->stdin_inbuf -= n;
 }
@@ -701,104 +722,104 @@ restart:
     nKey = esc = n = i = 0;
 again:
     if ((nKey = getMouseKey(&ioBase->mLastEvt)) != 0)
-	return nKey;
+   return nKey;
 
     ch = test_bufch(ioBase, i, ioBase->nTermMouseChars ? ioBase->esc_delay : milisec);
     if (counter != ioBase->key_counter)
-	goto restart;
+   goto restart;
 
     if( ch >=0 && ch <=255 ) {
-	++i;
-	if (ioBase->nTermMouseChars) {
-	    ioBase->cTermMouseBuf[3-ioBase->nTermMouseChars] = ch;
-	    free_bufch(ioBase, i);
-	    i = 0;
-	    if (--(ioBase->nTermMouseChars) == 0)
-		set_tmevt(ioBase->cTermMouseBuf, &ioBase->mLastEvt);
-	    goto again;
-	}
+   ++i;
+   if (ioBase->nTermMouseChars) {
+       ioBase->cTermMouseBuf[3-ioBase->nTermMouseChars] = ch;
+       free_bufch(ioBase, i);
+       i = 0;
+       if (--(ioBase->nTermMouseChars) == 0)
+      set_tmevt(ioBase->cTermMouseBuf, &ioBase->mLastEvt);
+       goto again;
+   }
 
         nKey = ch;
-	ptr = ioBase->pKeyTab;
-	if (i == 1 && nKey == K_ESC && esc == 0)
-	    esc = 1;
+   ptr = ioBase->pKeyTab;
+   if (i == 1 && nKey == K_ESC && esc == 0)
+       esc = 1;
         while( ch >= 0 && ch <= 255 && ptr != NULL ) {
             if( ptr->ch == ch ) {
-        	if( ptr->key != K_UNDEF ) {
-            	    nKey = ptr->key;
-		    switch (nKey) {
-			case K_METAALT:
-			    ioBase->key_flag |= KEY_ALTMASK;
-			    break;
-			case K_METACTRL:
-			    ioBase->key_flag |= KEY_CTRLMASK;
-			    break;
-			case K_NATIONAL:
-			    ioBase->nation_mode = ! ioBase->nation_mode;
-			    break;
-			case K_MOUSETERM:
-			    ioBase->nTermMouseChars = 3;
-			    break;
-			default:
-        		    n = i;
-		    }
-		    if ( n != i ) {
-			free_bufch(ioBase, i);
-			i = n = nKey = 0;
-			if (esc == 2)
-			    break;
-			esc = 0;
-			goto again;
-		    }
-        	}
-        	ptr = ptr->nextCh;
-		if (ptr)
-        	    if ((ch = test_bufch(ioBase, i, ioBase->esc_delay)) != -1)
-			++i;
-		    if (counter != ioBase->key_counter)
-			goto restart;
-	    } else
-        	ptr = ptr->otherCh;
+         if( ptr->key != K_UNDEF ) {
+                   nKey = ptr->key;
+          switch (nKey) {
+         case K_METAALT:
+             ioBase->key_flag |= KEY_ALTMASK;
+             break;
+         case K_METACTRL:
+             ioBase->key_flag |= KEY_CTRLMASK;
+             break;
+         case K_NATIONAL:
+             ioBase->nation_mode = ! ioBase->nation_mode;
+             break;
+         case K_MOUSETERM:
+             ioBase->nTermMouseChars = 3;
+             break;
+         default:
+                n = i;
+          }
+          if ( n != i ) {
+         free_bufch(ioBase, i);
+         i = n = nKey = 0;
+         if (esc == 2)
+             break;
+         esc = 0;
+         goto again;
+          }
+         }
+         ptr = ptr->nextCh;
+      if (ptr)
+             if ((ch = test_bufch(ioBase, i, ioBase->esc_delay)) != -1)
+         ++i;
+          if (counter != ioBase->key_counter)
+         goto restart;
+       } else
+         ptr = ptr->otherCh;
         }
     }
     if (ch == -1 && ioBase->nTermMouseChars)
-	ioBase->nTermMouseChars = 0;
+   ioBase->nTermMouseChars = 0;
 
     if (ch != -1 && IS_CLIPKEY(ch))
-	nKey = GET_CLIPKEY(ch);
+   nKey = GET_CLIPKEY(ch);
     else {
-	if (esc == 1 && n == 0 && (ch != -1 || i >= 2)) {
-	    nKey = 0;
-	    esc = 2;
-	    i = n = 1;
-	    goto again;
-	}
-	if (esc == 2) {
-	    if (nKey != 0)
-		ioBase->key_flag |= KEY_ALTMASK;
-	    else
-		nKey = K_ESC;
-	    if (n == 1 && i>1)
-		n = 2;
-	} else if (n == 0 && i>0)
-	    n = 1;
+   if (esc == 1 && n == 0 && (ch != -1 || i >= 2)) {
+       nKey = 0;
+       esc = 2;
+       i = n = 1;
+       goto again;
+   }
+   if (esc == 2) {
+       if (nKey != 0)
+      ioBase->key_flag |= KEY_ALTMASK;
+       else
+      nKey = K_ESC;
+       if (n == 1 && i>1)
+      n = 2;
+   } else if (n == 0 && i>0)
+       n = 1;
 
-	if (n > 0)
-	    free_bufch(ioBase, n);
+   if (n > 0)
+       free_bufch(ioBase, n);
 
-	if( ioBase->key_flag != 0 && nKey !=0 ) {
-	    nKey |= ioBase->key_flag;
-	    ioBase->key_flag = 0;
-	}
+   if( ioBase->key_flag != 0 && nKey !=0 ) {
+       nKey |= ioBase->key_flag;
+       ioBase->key_flag = 0;
+   }
 
-	if (ioBase->nation_transtbl && ioBase->nation_mode &&
-		nKey >= 32 && nKey < 128 && ioBase->nation_transtbl[nKey])
-	    nKey = ioBase->nation_transtbl[nKey];
-	if (ioBase->in_transtbl && nKey >=0 && nKey <=255 && ioBase->in_transtbl[nKey])
-	    nKey = ioBase->in_transtbl[nKey];
+   if (ioBase->nation_transtbl && ioBase->nation_mode &&
+      nKey >= 32 && nKey < 128 && ioBase->nation_transtbl[nKey])
+       nKey = ioBase->nation_transtbl[nKey];
+   if (ioBase->in_transtbl && nKey >=0 && nKey <=255 && ioBase->in_transtbl[nKey])
+       nKey = ioBase->in_transtbl[nKey];
 
-	if (nKey)
-	    nKey = getClipKey(nKey);
+   if (nKey)
+       nKey = getClipKey(nKey);
     }
 
     return nKey;
@@ -807,10 +828,10 @@ again:
 static void write_ttyseq(InOutBase *ioBase, char *seq)
 {
     if ( ioBase->baseout != NULL ) {
-	fwrite(seq, strlen(seq), 1, ioBase->baseout);
-	fflush(ioBase->baseout);
+   fwrite(seq, strlen(seq), 1, ioBase->baseout);
+   fflush(ioBase->baseout);
     } else
-	write(ioBase->base_outfd, seq, strlen(seq));
+   write(ioBase->base_outfd, seq, strlen(seq));
 }
 
 static int addKeyMap(InOutBase *ioBase, int nKey, const unsigned char *cdesc)
@@ -819,7 +840,7 @@ static int addKeyMap(InOutBase *ioBase, int nKey, const unsigned char *cdesc)
     struct keyTab **ptr;
 
     if (cdesc == NULL)
-	return ret;
+   return ret;
 
     c = (unsigned char) cdesc[i++];
     ptr = &ioBase->pKeyTab;
@@ -860,10 +881,10 @@ static int removeKeyMap(InOutBase *ioBase, unsigned char *cdesc)
         if( !c ) {
           ret = (*ptr)->key;
           (*ptr)->key = K_UNDEF;
-	  if ((*ptr)->nextCh == NULL && (*ptr)->otherCh == NULL) {
-	    hb_xfree(*ptr);
-	    *ptr = NULL;
-	  }
+     if ((*ptr)->nextCh == NULL && (*ptr)->otherCh == NULL) {
+       hb_xfree(*ptr);
+       *ptr = NULL;
+     }
         } else
           ptr = &((*ptr)->nextCh);
       } else
@@ -875,9 +896,9 @@ static int removeKeyMap(InOutBase *ioBase, unsigned char *cdesc)
 static void removeAllKeyMap(struct keyTab **ptr)
 {
     if ((*ptr)->nextCh != NULL)
-	removeAllKeyMap(&((*ptr)->nextCh));
+   removeAllKeyMap(&((*ptr)->nextCh));
     if ((*ptr)->otherCh != NULL)
-	removeAllKeyMap(&((*ptr)->otherCh));
+   removeAllKeyMap(&((*ptr)->otherCh));
 
     hb_xfree(*ptr);
     *ptr = NULL;
@@ -888,53 +909,53 @@ static int getMouseKey(mouseEvent *mEvt)
     int nKey = 0;
 
     if (mEvt->lrow != mEvt->row || mEvt->lcol != mEvt->col) {
-	nKey = K_MOUSEMOVE;
-	mEvt->lrow = mEvt->row;
-	mEvt->lcol = mEvt->col;
+   nKey = K_MOUSEMOVE;
+   mEvt->lrow = mEvt->row;
+   mEvt->lcol = mEvt->col;
     } else if (mEvt->lbuttons != mEvt->buttonstate) {
-	int butt = mEvt->lbuttons ^ mEvt->buttonstate;
+   int butt = mEvt->lbuttons ^ mEvt->buttonstate;
 
-	if (butt & M_BUTTON_LEFT) {
-	    if (mEvt->buttonstate & M_BUTTON_LEFT) {
-		mEvt->lbdn_row = mEvt->row;
-		mEvt->lbdn_col = mEvt->col;
-	    } else {
-		mEvt->lbup_row = mEvt->row;
-		mEvt->lbup_col = mEvt->col;
-	    }
-	    nKey = (mEvt->buttonstate & M_BUTTON_LEFT) ?
-			((mEvt->buttonstate & M_BUTTON_LDBLCK) ? K_LDBLCLK :
-			    K_LBUTTONDOWN) : K_LBUTTONUP;
-	    mEvt->lbuttons ^= M_BUTTON_LEFT;
-	    mEvt->buttonstate &= ~M_BUTTON_LDBLCK;
-	} else if (butt & M_BUTTON_RIGHT) {
-	    if (mEvt->buttonstate & M_BUTTON_RIGHT) {
-		mEvt->rbdn_row = mEvt->row;
-		mEvt->rbdn_col = mEvt->col;
-	    } else {
-		mEvt->rbup_row = mEvt->row;
-		mEvt->rbup_col = mEvt->col;
-	    }
-	    nKey = (mEvt->buttonstate & M_BUTTON_RIGHT) ?
-			((mEvt->buttonstate & M_BUTTON_RDBLCK) ? K_RDBLCLK :
-			    K_RBUTTONDOWN) : K_RBUTTONUP;
-	    mEvt->lbuttons ^= M_BUTTON_RIGHT;
-	    mEvt->buttonstate &= ~M_BUTTON_RDBLCK;
-	} else if (butt & M_BUTTON_MIDDLE) {
-	    if (mEvt->buttonstate & M_BUTTON_MIDDLE) {
-		mEvt->mbdn_row = mEvt->row;
-		mEvt->mbdn_col = mEvt->col;
-	    } else {
-		mEvt->mbup_row = mEvt->row;
-		mEvt->mbup_col = mEvt->col;
-	    }
-	    nKey = (mEvt->buttonstate & M_BUTTON_MIDDLE) ?
-			((mEvt->buttonstate & M_BUTTON_MDBLCK) ? K_MDBLCLK :
-			    K_MBUTTONDOWN) : K_MBUTTONUP;
-	    mEvt->lbuttons ^= M_BUTTON_MIDDLE;
-	    mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
-	} else
-	    mEvt->lbuttons = mEvt->buttonstate;
+   if (butt & M_BUTTON_LEFT) {
+       if (mEvt->buttonstate & M_BUTTON_LEFT) {
+      mEvt->lbdn_row = mEvt->row;
+      mEvt->lbdn_col = mEvt->col;
+       } else {
+      mEvt->lbup_row = mEvt->row;
+      mEvt->lbup_col = mEvt->col;
+       }
+       nKey = (mEvt->buttonstate & M_BUTTON_LEFT) ?
+         ((mEvt->buttonstate & M_BUTTON_LDBLCK) ? K_LDBLCLK :
+             K_LBUTTONDOWN) : K_LBUTTONUP;
+       mEvt->lbuttons ^= M_BUTTON_LEFT;
+       mEvt->buttonstate &= ~M_BUTTON_LDBLCK;
+   } else if (butt & M_BUTTON_RIGHT) {
+       if (mEvt->buttonstate & M_BUTTON_RIGHT) {
+      mEvt->rbdn_row = mEvt->row;
+      mEvt->rbdn_col = mEvt->col;
+       } else {
+      mEvt->rbup_row = mEvt->row;
+      mEvt->rbup_col = mEvt->col;
+       }
+       nKey = (mEvt->buttonstate & M_BUTTON_RIGHT) ?
+         ((mEvt->buttonstate & M_BUTTON_RDBLCK) ? K_RDBLCLK :
+             K_RBUTTONDOWN) : K_RBUTTONUP;
+       mEvt->lbuttons ^= M_BUTTON_RIGHT;
+       mEvt->buttonstate &= ~M_BUTTON_RDBLCK;
+   } else if (butt & M_BUTTON_MIDDLE) {
+       if (mEvt->buttonstate & M_BUTTON_MIDDLE) {
+      mEvt->mbdn_row = mEvt->row;
+      mEvt->mbdn_col = mEvt->col;
+       } else {
+      mEvt->mbup_row = mEvt->row;
+      mEvt->mbup_col = mEvt->col;
+       }
+       nKey = (mEvt->buttonstate & M_BUTTON_MIDDLE) ?
+         ((mEvt->buttonstate & M_BUTTON_MDBLCK) ? K_MDBLCLK :
+             K_MBUTTONDOWN) : K_MBUTTONUP;
+       mEvt->lbuttons ^= M_BUTTON_MIDDLE;
+       mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
+   } else
+       mEvt->lbuttons = mEvt->buttonstate;
     }
 
     return nKey;
@@ -943,38 +964,38 @@ static int getMouseKey(mouseEvent *mEvt)
 static void chk_mevtdblck(mouseEvent *mEvt)
 {
     if (mEvt->lbuttons != mEvt->buttonstate) {
-	struct timeval tv;
+   struct timeval tv;
 
-	TIMEVAL_GET(tv);
+   TIMEVAL_GET(tv);
 
-	if (mEvt->buttonstate & M_BUTTON_LEFT &&
-	    ~(mEvt->lbuttons & M_BUTTON_LEFT)) {
-	    if (TIMEVAL_LESS(tv, mEvt->BL_time))
-		mEvt->buttonstate |= M_BUTTON_LDBLCK;
-	    TIMEVAL_ADD(mEvt->BL_time, tv, mEvt->click_delay);
-	}
-	if (mEvt->buttonstate & M_BUTTON_MIDDLE &&
-	    ~(mEvt->lbuttons & M_BUTTON_MIDDLE)) {
-	    if (TIMEVAL_LESS(tv, mEvt->BM_time))
-		mEvt->buttonstate |= M_BUTTON_MDBLCK;
-	    TIMEVAL_ADD(mEvt->BM_time, tv, mEvt->click_delay);
-	}
-	if (mEvt->buttonstate & M_BUTTON_RIGHT &&
-	    ~(mEvt->lbuttons & M_BUTTON_RIGHT)) {
-	    if (TIMEVAL_LESS(tv, mEvt->BR_time))
-		mEvt->buttonstate |= M_BUTTON_RDBLCK;
-	    TIMEVAL_ADD(mEvt->BR_time, tv, mEvt->click_delay);
-	}
+   if (mEvt->buttonstate & M_BUTTON_LEFT &&
+       ~(mEvt->lbuttons & M_BUTTON_LEFT)) {
+       if (TIMEVAL_LESS(tv, mEvt->BL_time))
+      mEvt->buttonstate |= M_BUTTON_LDBLCK;
+       TIMEVAL_ADD(mEvt->BL_time, tv, mEvt->click_delay);
+   }
+   if (mEvt->buttonstate & M_BUTTON_MIDDLE &&
+       ~(mEvt->lbuttons & M_BUTTON_MIDDLE)) {
+       if (TIMEVAL_LESS(tv, mEvt->BM_time))
+      mEvt->buttonstate |= M_BUTTON_MDBLCK;
+       TIMEVAL_ADD(mEvt->BM_time, tv, mEvt->click_delay);
+   }
+   if (mEvt->buttonstate & M_BUTTON_RIGHT &&
+       ~(mEvt->lbuttons & M_BUTTON_RIGHT)) {
+       if (TIMEVAL_LESS(tv, mEvt->BR_time))
+      mEvt->buttonstate |= M_BUTTON_RDBLCK;
+       TIMEVAL_ADD(mEvt->BR_time, tv, mEvt->click_delay);
+   }
     }
 }
 
 static void set_tmevt(char *cMBuf, mouseEvent *mEvt)
 {
     switch (cMBuf[0] & 0x3) {
-	case 0x0:	mEvt->buttonstate |= M_BUTTON_LEFT; break;
-	case 0x1:	mEvt->buttonstate |= M_BUTTON_MIDDLE; break;
-	case 0x2:	mEvt->buttonstate |= M_BUTTON_RIGHT; break;
-	case 0x3:	mEvt->buttonstate = 0; break;
+   case 0x0:   mEvt->buttonstate |= M_BUTTON_LEFT; break;
+   case 0x1:   mEvt->buttonstate |= M_BUTTON_MIDDLE; break;
+   case 0x2:   mEvt->buttonstate |= M_BUTTON_RIGHT; break;
+   case 0x3:   mEvt->buttonstate = 0; break;
     }
     mEvt->col = cMBuf[1] - 33;
     mEvt->row = cMBuf[2] - 33;
@@ -998,21 +1019,21 @@ static int set_gpmevt(int fd, int mode, void *data )
     if ( Gpm_GetEvent( &gEvt ) > 0 ) {
         mEvt->row = gEvt.y;
         mEvt->col = gEvt.x;
-	if( gEvt.type & GPM_DOWN ) {
-	    if (gEvt.buttons & GPM_B_LEFT)
-		mEvt->buttonstate |= M_BUTTON_LEFT;
-	    if (gEvt.buttons & GPM_B_MIDDLE)
-		mEvt->buttonstate |= M_BUTTON_MIDDLE;
-	    if (gEvt.buttons & GPM_B_RIGHT)
-		mEvt->buttonstate |= M_BUTTON_RIGHT;
-	} else if( gEvt.type & GPM_UP ) {
-	    if (gEvt.buttons & GPM_B_LEFT)
-		mEvt->buttonstate &= ~M_BUTTON_LEFT;
-	    if (gEvt.buttons & GPM_B_MIDDLE)
-		mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
-	    if (gEvt.buttons & GPM_B_RIGHT)
-		mEvt->buttonstate &= ~M_BUTTON_RIGHT;
-	}
+   if( gEvt.type & GPM_DOWN ) {
+       if (gEvt.buttons & GPM_B_LEFT)
+      mEvt->buttonstate |= M_BUTTON_LEFT;
+       if (gEvt.buttons & GPM_B_MIDDLE)
+      mEvt->buttonstate |= M_BUTTON_MIDDLE;
+       if (gEvt.buttons & GPM_B_RIGHT)
+      mEvt->buttonstate |= M_BUTTON_RIGHT;
+   } else if( gEvt.type & GPM_UP ) {
+       if (gEvt.buttons & GPM_B_LEFT)
+      mEvt->buttonstate &= ~M_BUTTON_LEFT;
+       if (gEvt.buttons & GPM_B_MIDDLE)
+      mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
+       if (gEvt.buttons & GPM_B_RIGHT)
+      mEvt->buttonstate &= ~M_BUTTON_RIGHT;
+   }
     }
     chk_mevtdblck(mEvt);
     nKey = getMouseKey(mEvt);
@@ -1031,9 +1052,9 @@ static void flush_gpmevt(mouseEvent *mEvt)
         FD_SET( gpm_fd, &rfds );
 
         while ( select( gpm_fd+1, &rfds, NULL, NULL, &tv ) > 0 )
-	    set_gpmevt(gpm_fd, O_RDONLY, (void *) mEvt);
+       set_gpmevt(gpm_fd, O_RDONLY, (void *) mEvt);
 
-	while ( getMouseKey(mEvt) );
+   while ( getMouseKey(mEvt) );
     }
     return;
 }
@@ -1043,15 +1064,15 @@ static void mouse_init(InOutBase *ioBase)
 {
     if( ioBase->terminal_type == TERM_XTERM )
     {
-	/* save old hilit tracking & enable mouse tracking */
-	write_ttyseq(ioBase, "\033[?1001s\033[?1002h");
-	ioBase->is_mouse = 1;
-	memset((void *) &ioBase->mLastEvt, 0, sizeof(ioBase->mLastEvt));
-	ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
-	/* curses mouse buttons check */
-	ioBase->mButtons = tigetnum("btns");
-	if (ioBase->mButtons < 1)
-	    ioBase->mButtons = 2;
+   /* save old hilit tracking & enable mouse tracking */
+   write_ttyseq(ioBase, "\033[?1001s\033[?1002h");
+   ioBase->is_mouse = 1;
+   memset((void *) &ioBase->mLastEvt, 0, sizeof(ioBase->mLastEvt));
+   ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
+   /* curses mouse buttons check */
+   ioBase->mButtons = tigetnum("btns");
+   if (ioBase->mButtons < 1)
+       ioBase->mButtons = 2;
     }
 #ifdef HAVE_GPM_H
     else if( ioBase->terminal_type == TERM_LINUX )
@@ -1065,14 +1086,14 @@ static void mouse_init(InOutBase *ioBase)
         if( Gpm_Open( &ioBase->Conn, 0 ) >= 0 && gpm_fd >= 0 )
         {
             ioBase->is_mouse = 1;
-	    memset((void *) &ioBase->mLastEvt, 0, sizeof(ioBase->mLastEvt));
-	    ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
-	    flush_gpmevt(&ioBase->mLastEvt);
-	    add_efds(ioBase, gpm_fd, O_RDONLY, set_gpmevt, (void *) &ioBase->mLastEvt);
-	    ioBase->mButtons = Gpm_GetSnapshot( NULL );
+       memset((void *) &ioBase->mLastEvt, 0, sizeof(ioBase->mLastEvt));
+       ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
+       flush_gpmevt(&ioBase->mLastEvt);
+       add_efds(ioBase, gpm_fd, O_RDONLY, set_gpmevt, (void *) &ioBase->mLastEvt);
+       ioBase->mButtons = Gpm_GetSnapshot( NULL );
             if( gpm_visiblepointer )
-        	Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row, gpm_consolefd );
-	}
+         Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row, gpm_consolefd );
+   }
     }
 #endif
 }
@@ -1082,16 +1103,16 @@ static void mouse_exit(InOutBase *ioBase)
     if( ioBase->terminal_type == TERM_XTERM )
     {
         /* disable mouse tracking & restore old hilit tracking */
-	write_ttyseq(ioBase, "\033[?1002l\033[?1001r");
+   write_ttyseq(ioBase, "\033[?1002l\033[?1001r");
     }
 #ifdef HAVE_GPM_H
     else if( ioBase->terminal_type == TERM_LINUX )
     {
         if( ioBase->is_mouse && gpm_fd >= 0 )
-	{
-	    del_efds(ioBase, gpm_fd);
+   {
+       del_efds(ioBase, gpm_fd);
             Gpm_Close();
-	}
+   }
     }
 #endif
 }
@@ -1155,8 +1176,8 @@ static void set_cursor(InOutBase *ioBase, int style)
         case SC_SPECIAL1:
         case SC_SPECIAL2:
             ioBase->cursor = style;
-	    disp_cursor( ioBase );
-	    break;
+       disp_cursor( ioBase );
+       break;
     }
 }
 
@@ -1165,15 +1186,15 @@ static void gt_refresh(InOutBase *ioBase)
     if( ioBase->disp_count == 0 )
     {
 /*
-	if (ioBase->cursor == SC_NONE)
-	    leaveok( ioBase->stdscr, TRUE );
-	else
-	    leaveok( ioBase->stdscr, FALSE );
+   if (ioBase->cursor == SC_NONE)
+       leaveok( ioBase->stdscr, TRUE );
+   else
+       leaveok( ioBase->stdscr, FALSE );
 */
-/*	if (ioBase->cursor != SC_NONE) */
-	wmove( ioBase->stdscr, ioBase->row, ioBase->col );
-	wrefresh( ioBase->stdscr );
-	disp_cursor( ioBase );
+/* if (ioBase->cursor != SC_NONE) */
+   wmove( ioBase->stdscr, ioBase->row, ioBase->col );
+   wrefresh( ioBase->stdscr );
+   disp_cursor( ioBase );
 #ifdef HAVE_GPM_H
         if( ioBase->is_mouse && ioBase->terminal_type == TERM_LINUX )
             if( gpm_visiblepointer )
@@ -1185,13 +1206,13 @@ static void gt_refresh(InOutBase *ioBase)
 static void gt_ttyset(InOutBase *ioBase)
 {
     if (isatty(ioBase->base_infd))
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
+   tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
 }
 
 static void gt_ttyrestore(InOutBase *ioBase)
 {
     if (ioBase->lTIOsaved)
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
+   tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
 }
 
 static void gt_outstr(InOutBase *ioBase, int fd, const unsigned char *str, int len)
@@ -1201,19 +1222,19 @@ static void gt_outstr(InOutBase *ioBase, int fd, const unsigned char *str, int l
 
     if (ioBase->out_transtbl != NULL)
     {
-	buf = (unsigned char *) hb_xgrab(len);
-	for ( i = 0; i < len; ++i )
-	{
-	    c = str[i];
-	    if ( c != 9 && c != 10 && c != 13 && ioBase->out_transtbl[c] )
-		buf[i] = ioBase->out_transtbl[c];
-	    else
-		buf[i] = c;
-	}
-	write(fd, buf, len);
-	hb_xfree(buf);
+   buf = (unsigned char *) hb_xgrab(len);
+   for ( i = 0; i < len; ++i )
+   {
+       c = str[i];
+       if ( c != 9 && c != 10 && c != 13 && ioBase->out_transtbl[c] )
+      buf[i] = ioBase->out_transtbl[c];
+       else
+      buf[i] = c;
+   }
+   write(fd, buf, len);
+   hb_xfree(buf);
     } else
-	write(fd, str, len);
+   write(fd, str, len);
 }
 
 static void gt_outstd(InOutBase *ioBase, unsigned const char *str, int len)
@@ -1233,10 +1254,10 @@ static char* tiGetS(char *capname)
     ptr = tigetstr( capname );
     if ( ptr )
     {
-	if (ptr == (char *)-1)
-	    ptr = NULL;
-	else if ( !ptr[0] )
-	    ptr = NULL;
+   if (ptr == (char *)-1)
+       ptr = NULL;
+   else if ( !ptr[0] )
+       ptr = NULL;
     }
     return ptr;
 }
@@ -1246,23 +1267,23 @@ void get_acsc(InOutBase *ioBase, unsigned char c, chtype *pch)
     unsigned char *ptr;
 
     if (ioBase->acsc != NULL)
-	for (ptr = ioBase->acsc; *ptr && *(ptr+1); ptr+=2)
-	    if (*ptr == c)
-	    {
-		*pch = *(ptr+1) | A_ALTCHARSET;
-		return;
-	    }
+   for (ptr = ioBase->acsc; *ptr && *(ptr+1); ptr+=2)
+       if (*ptr == c)
+       {
+      *pch = *(ptr+1) | A_ALTCHARSET;
+      return;
+       }
 
     switch (c)
     {
-	case '.':	*pch = 'v' | A_NORMAL; break;
-	case ',':	*pch = '<' | A_NORMAL; break;
-	case '+':	*pch = '>' | A_NORMAL; break;
-	case '-':	*pch = '^' | A_NORMAL; break;
-	case 'a':	*pch = '#' | A_NORMAL; break;
-	case '0':
-	case 'h':	get_acsc(ioBase, 'a', pch); break;
-	default:	*pch = c | A_ALTCHARSET;
+   case '.':   *pch = 'v' | A_NORMAL; break;
+   case ',':   *pch = '<' | A_NORMAL; break;
+   case '+':   *pch = '>' | A_NORMAL; break;
+   case '-':   *pch = '^' | A_NORMAL; break;
+   case 'a':   *pch = '#' | A_NORMAL; break;
+   case '0':
+   case 'h':   get_acsc(ioBase, 'a', pch); break;
+   default: *pch = c | A_ALTCHARSET;
     }
 }
 
@@ -1341,18 +1362,18 @@ static void init_keys(InOutBase *ioBase)
       addKeyMap( ioBase, EXKEY_F11, "\033[23~" );        // kf11
       addKeyMap( ioBase, EXKEY_F12, "\033[24~" );        // kf12
 
-      addKeyMap( ioBase, EXKEY_F1 |KEY_CTRLMASK|KEY_ALTMASK, "\033[25~" );	// kf13
-      addKeyMap( ioBase, EXKEY_F2 |KEY_CTRLMASK|KEY_ALTMASK, "\033[26~" );	// kf14
-      addKeyMap( ioBase, EXKEY_F3 |KEY_CTRLMASK|KEY_ALTMASK, "\033[28~" );	// kf15
-      addKeyMap( ioBase, EXKEY_F4 |KEY_CTRLMASK|KEY_ALTMASK, "\033[29~" );	// kf16
-      addKeyMap( ioBase, EXKEY_F5 |KEY_CTRLMASK|KEY_ALTMASK, "\033[31~" );	// kf17
-      addKeyMap( ioBase, EXKEY_F6 |KEY_CTRLMASK|KEY_ALTMASK, "\033[32~" );	// kf18
-      addKeyMap( ioBase, EXKEY_F7 |KEY_CTRLMASK|KEY_ALTMASK, "\033[33~" );	// kf19
-      addKeyMap( ioBase, EXKEY_F8 |KEY_CTRLMASK|KEY_ALTMASK, "\033[34~" );	// kf20
-      addKeyMap( ioBase, EXKEY_F9 |KEY_CTRLMASK|KEY_ALTMASK, "\033[35~" );	// kf21
-      addKeyMap( ioBase, EXKEY_F10|KEY_CTRLMASK|KEY_ALTMASK, "\033[36~" );	// kf22
-      addKeyMap( ioBase, EXKEY_F11|KEY_CTRLMASK|KEY_ALTMASK, "\033[37~" );	// kf23
-      addKeyMap( ioBase, EXKEY_F12|KEY_CTRLMASK|KEY_ALTMASK, "\033[38~" );	// kf24
+      addKeyMap( ioBase, EXKEY_F1 |KEY_CTRLMASK|KEY_ALTMASK, "\033[25~" ); // kf13
+      addKeyMap( ioBase, EXKEY_F2 |KEY_CTRLMASK|KEY_ALTMASK, "\033[26~" ); // kf14
+      addKeyMap( ioBase, EXKEY_F3 |KEY_CTRLMASK|KEY_ALTMASK, "\033[28~" ); // kf15
+      addKeyMap( ioBase, EXKEY_F4 |KEY_CTRLMASK|KEY_ALTMASK, "\033[29~" ); // kf16
+      addKeyMap( ioBase, EXKEY_F5 |KEY_CTRLMASK|KEY_ALTMASK, "\033[31~" ); // kf17
+      addKeyMap( ioBase, EXKEY_F6 |KEY_CTRLMASK|KEY_ALTMASK, "\033[32~" ); // kf18
+      addKeyMap( ioBase, EXKEY_F7 |KEY_CTRLMASK|KEY_ALTMASK, "\033[33~" ); // kf19
+      addKeyMap( ioBase, EXKEY_F8 |KEY_CTRLMASK|KEY_ALTMASK, "\033[34~" ); // kf20
+      addKeyMap( ioBase, EXKEY_F9 |KEY_CTRLMASK|KEY_ALTMASK, "\033[35~" ); // kf21
+      addKeyMap( ioBase, EXKEY_F10|KEY_CTRLMASK|KEY_ALTMASK, "\033[36~" ); // kf22
+      addKeyMap( ioBase, EXKEY_F11|KEY_CTRLMASK|KEY_ALTMASK, "\033[37~" ); // kf23
+      addKeyMap( ioBase, EXKEY_F12|KEY_CTRLMASK|KEY_ALTMASK, "\033[38~" ); // kf24
 
       addKeyMap( ioBase, EXKEY_F1 |KEY_CTRLMASK, "\033[39~" );        // kf25
       addKeyMap( ioBase, EXKEY_F2 |KEY_CTRLMASK, "\033[40~" );        // kf26
@@ -1460,40 +1481,40 @@ static void gt_tone(InOutBase *ioBase, double dFrequency, double dDuration)
                           (int) dFrequency,
                           (int)(dDuration * 1000.0 / 18.2),
                           ioBase->beep );
-	escseq[ sizeof(escseq) - 1 ] = '\0';
-	write_ttyseq(ioBase, escseq);
+   escseq[ sizeof(escseq) - 1 ] = '\0';
+   write_ttyseq(ioBase, escseq);
     } else
-	/* curses beep() */
-	if ( ioBase->beep != NULL )
-	    write_ttyseq(ioBase, ioBase->beep);
-	else if ( ioBase->flash != NULL )
-	    write_ttyseq(ioBase, ioBase->flash);
+   /* curses beep() */
+   if ( ioBase->beep != NULL )
+       write_ttyseq(ioBase, ioBase->beep);
+   else if ( ioBase->flash != NULL )
+       write_ttyseq(ioBase, ioBase->flash);
 }
 
 static void set_sig_keys(InOutBase *ioBase, int key_int, int key_brk, int key_stp)
 {
     if (isatty(ioBase->base_infd)) {
 
-	/* set SIGINT character, default ^C */
-	if (key_int >= 0 && key_int <= 255)
-	    ioBase->curr_TIO.c_cc[VINTR] = key_int;
+   /* set SIGINT character, default ^C */
+   if (key_int >= 0 && key_int <= 255)
+       ioBase->curr_TIO.c_cc[VINTR] = key_int;
 
-	/* set SIGQUIT character, default ^D */
-	if (key_brk >= 0 && key_brk <= 255)
-	    ioBase->curr_TIO.c_cc[VQUIT] = key_brk;
+   /* set SIGQUIT character, default ^D */
+   if (key_brk >= 0 && key_brk <= 255)
+       ioBase->curr_TIO.c_cc[VQUIT] = key_brk;
 
-	/* set SIGTSTP character, default ^Z */
-	if (key_stp >= 0 && key_stp <= 255)
-	    ioBase->curr_TIO.c_cc[VSUSP] = key_stp;
+   /* set SIGTSTP character, default ^Z */
+   if (key_stp >= 0 && key_stp <= 255)
+       ioBase->curr_TIO.c_cc[VSUSP] = key_stp;
 
-	/* enable siganls from terminal device */
-	if ( ioBase->curr_TIO.c_cc[VINTR] != 0 ||
+   /* enable siganls from terminal device */
+   if ( ioBase->curr_TIO.c_cc[VINTR] != 0 ||
              ioBase->curr_TIO.c_cc[VQUIT] != 0 ||
              ioBase->curr_TIO.c_cc[VSUSP] != 0 )
             ioBase->curr_TIO.c_lflag |= ISIG;
 
-	/* ioctl( ioBase->base_infd, TIOCSCTTY, 0 ); */
-	gt_ttyset( ioBase );
+   /* ioctl( ioBase->base_infd, TIOCSCTTY, 0 ); */
+   gt_ttyset( ioBase );
     }
 }
 
@@ -1533,18 +1554,18 @@ static int gt_resize(InOutBase *ioBase)
     if (gt_getsize(ioBase, &rows, &cols) >= 0) {
 /*
 #if defined(NCURSES_VERSION)
-	wresize( ioBase->stdscr, rows, cols );
+   wresize( ioBase->stdscr, rows, cols );
 #endif
 */
-	endwin();
+   endwin();
         gt_refresh( ioBase );
-	ret = 0;
+   ret = 0;
 /*
 #if defined(NCURSES_VERSION)
         if ( resize_term( rows, cols ) == OK ) {
-	    ret = 0;
+       ret = 0;
             gt_refresh( ioBase );
-	}
+   }
 #endif
 */
         getmaxyx( ioBase->stdscr, ioBase->maxrow, ioBase->maxcol );
@@ -1590,17 +1611,17 @@ void setKeyTrans(InOutBase *ioBase, unsigned char *ksrc, unsigned char *kdst )
     int n;
 
     if (ksrc && kdst) {
-	if (ioBase->in_transtbl == NULL)
-	    ioBase->in_transtbl = hb_xgrab(256);
+   if (ioBase->in_transtbl == NULL)
+       ioBase->in_transtbl = hb_xgrab(256);
 
-	memset(ioBase->in_transtbl, 0, 256);
+   memset(ioBase->in_transtbl, 0, 256);
 
-	for (n=0; n<256 && (c = ksrc[n]); n++)
-	    ioBase->in_transtbl[c] = kdst[n];
+   for (n=0; n<256 && (c = ksrc[n]); n++)
+       ioBase->in_transtbl[c] = kdst[n];
 
     } else if (ioBase->in_transtbl != NULL) {
-	hb_xfree(ioBase->in_transtbl);
-	ioBase->in_transtbl = NULL;
+   hb_xfree(ioBase->in_transtbl);
+   ioBase->in_transtbl = NULL;
     }
 }
 
@@ -1611,68 +1632,68 @@ void setDispTrans(InOutBase *ioBase, unsigned char *src, unsigned char *dst, int
     chtype ch;
 
     if (src && dst)
-	aSet = 1;
+   aSet = 1;
 
     for (i = 0; i < 256; i++ )
     {
-	ch = ioBase->charmap[i] & 0xffff;
-	switch ((ioBase->charmap[i] >> 16) & 0xff)
-	{
-	    case 1:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_NORMAL;
-		break;
-	    case 2:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET;
-		break;
-	    case 3:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_PROTECT;
-		break;
-	    case 4:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
-		break;
-	    case 5:
-		get_acsc(ioBase, ch & 0xff, &ch);
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = ch & ~A_CHARTEXT;
-		ch &= A_CHARTEXT;
-		break;
-	    case 0:
-	    default:
-		ioBase->std_chmap[i] = aSet ? A_ALTCHARSET : A_NORMAL;
-		ioBase->box_chmap[i] = A_ALTCHARSET;
-		break;
-	}
-	ioBase->std_chmap[i] |= ch;
-	ioBase->box_chmap[i] |= ch;
+   ch = ioBase->charmap[i] & 0xffff;
+   switch ((ioBase->charmap[i] >> 16) & 0xff)
+   {
+       case 1:
+      ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_NORMAL;
+      break;
+       case 2:
+      ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET;
+      break;
+       case 3:
+      ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_PROTECT;
+      break;
+       case 4:
+      ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
+      break;
+       case 5:
+      get_acsc(ioBase, ch & 0xff, &ch);
+      ioBase->std_chmap[i] = ioBase->box_chmap[i] = ch & ~A_CHARTEXT;
+      ch &= A_CHARTEXT;
+      break;
+       case 0:
+       default:
+      ioBase->std_chmap[i] = aSet ? A_ALTCHARSET : A_NORMAL;
+      ioBase->box_chmap[i] = A_ALTCHARSET;
+      break;
+   }
+   ioBase->std_chmap[i] |= ch;
+   ioBase->box_chmap[i] |= ch;
 
-	if ( (unsigned int) i != (ch & A_CHARTEXT) &&
-	     (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 )
-	{
-	    if ( ioBase->out_transtbl == NULL )
-	    {
-		ioBase->out_transtbl = hb_xgrab(256);
-		memset(ioBase->out_transtbl, 0, 256);
-	    }
-	    ioBase->out_transtbl[i] = ch & A_CHARTEXT;
-	}
+   if ( (unsigned int) i != (ch & A_CHARTEXT) &&
+        (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 )
+   {
+       if ( ioBase->out_transtbl == NULL )
+       {
+      ioBase->out_transtbl = hb_xgrab(256);
+      memset(ioBase->out_transtbl, 0, 256);
+       }
+       ioBase->out_transtbl[i] = ch & A_CHARTEXT;
+   }
     }
     if (aSet)
     {
-	for (i=0; i<256 && (c = src[i]); i++)
-	{
-	    d = dst[i];
-	    ioBase->std_chmap[c] = d | A_NORMAL;
-	    if (box)
-		ioBase->box_chmap[c] = d | A_NORMAL;
-	    if ( c != d )
-	    {
-		if (ioBase->out_transtbl == NULL)
-		{
-		    ioBase->out_transtbl = hb_xgrab(256);
-		    memset(ioBase->out_transtbl, 0, 256);
-		}
-		ioBase->out_transtbl[c] = d;
-	    }
-	}
+   for (i=0; i<256 && (c = src[i]); i++)
+   {
+       d = dst[i];
+       ioBase->std_chmap[c] = d | A_NORMAL;
+       if (box)
+      ioBase->box_chmap[c] = d | A_NORMAL;
+       if ( c != d )
+       {
+      if (ioBase->out_transtbl == NULL)
+      {
+          ioBase->out_transtbl = hb_xgrab(256);
+          memset(ioBase->out_transtbl, 0, 256);
+      }
+      ioBase->out_transtbl[c] = d;
+       }
+   }
 
     }
 }
@@ -1688,29 +1709,29 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     memset(ioBase, 0, sizeof(*ioBase));
 
     if (!term || ! *term)
-	term = getenv("HB_TERM");
+   term = getenv("HB_TERM");
     if (!term || ! *term)
-	term = getenv("TERM");
+   term = getenv("TERM");
 
     if (term && *term) {
-	if (strncmp( term, "linux", 5 ) == 0)
-	    ioBase->terminal_type = TERM_LINUX;
-	else if (strstr( term, "xterm" ) != NULL ||
-	         strncmp( term, "rxvt", 4 ) == 0 ||
-		 strstr( term, "putty" ) == 0)
-	    ioBase->terminal_type = TERM_XTERM;
+   if (strncmp( term, "linux", 5 ) == 0)
+       ioBase->terminal_type = TERM_LINUX;
+   else if (strstr( term, "xterm" ) != NULL ||
+            strncmp( term, "rxvt", 4 ) == 0 ||
+       strstr( term, "putty" ) == 0)
+       ioBase->terminal_type = TERM_XTERM;
 
-	if ( (ptr = strchr( term, '/' )) != NULL )
-	{
-	    if ( (i = ptr - term) >= sizeof(buf) )
-		i = sizeof(buf) - 1;
-	    strncpy(buf, term, i);
-	    buf[i] = '\0';
-	    if ( i )
-		crsterm = buf;
-	}
-	else
-	    crsterm = term;
+   if ( (ptr = strchr( term, '/' )) != NULL )
+   {
+       if ( (i = ptr - term) >= sizeof(buf) )
+      i = sizeof(buf) - 1;
+       strncpy(buf, term, i);
+       buf[i] = '\0';
+       if ( i )
+      crsterm = buf;
+   }
+   else
+       crsterm = term;
     }
 
     ioBase->esc_delay = ESC_DELAY;
@@ -1722,40 +1743,40 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     ioBase->cursor = ioBase->lcursor = SC_UNDEF;
 
     if (!isatty(ioBase->base_outfd) && isatty(ioBase->base_infd))
-	ioBase->base_outfd = ioBase->base_infd;
+   ioBase->base_outfd = ioBase->base_infd;
 
     if (isatty(ioBase->stdoutfd))
-	ioBase->stdoutfd = -1;
+   ioBase->stdoutfd = -1;
     if (isatty(ioBase->stderrfd))
-	ioBase->stderrfd = -1;
+   ioBase->stderrfd = -1;
 
     if (isatty(ioBase->base_infd)) {
-	tcgetattr( ioBase->base_infd, &ioBase->curr_TIO ); /* save current terminal settings */
-	memcpy(&ioBase->saved_TIO, &ioBase->curr_TIO, sizeof(struct termios));
-	ioBase->lTIOsaved = 1;
+   tcgetattr( ioBase->base_infd, &ioBase->curr_TIO ); /* save current terminal settings */
+   memcpy(&ioBase->saved_TIO, &ioBase->curr_TIO, sizeof(struct termios));
+   ioBase->lTIOsaved = 1;
 
-	ioBase->curr_TIO.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-	ioBase->curr_TIO.c_lflag |= NOFLSH;
-	ioBase->curr_TIO.c_cflag &= ~(CSIZE | PARENB);
-	ioBase->curr_TIO.c_cflag |= CS8 | CREAD;
-	ioBase->curr_TIO.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-	ioBase->curr_TIO.c_oflag &= ~OPOST;
-	/* ioBase->curr_TIO.c_oflag |= ONLCR | OPOST; */
+   ioBase->curr_TIO.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+   ioBase->curr_TIO.c_lflag |= NOFLSH;
+   ioBase->curr_TIO.c_cflag &= ~(CSIZE | PARENB);
+   ioBase->curr_TIO.c_cflag |= CS8 | CREAD;
+   ioBase->curr_TIO.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+   ioBase->curr_TIO.c_oflag &= ~OPOST;
+   /* ioBase->curr_TIO.c_oflag |= ONLCR | OPOST; */
 
-	memset(ioBase->curr_TIO.c_cc, 0, NCCS);
+   memset(ioBase->curr_TIO.c_cc, 0, NCCS);
     }
 
 
     /* curses SCREEN initialisation */
     if (ioBase->base_infd == fileno(stdin))
-	ioBase->basein = stdin;
+   ioBase->basein = stdin;
     else
-	ioBase->basein = ioBase->basein = fdopen(dup(ioBase->base_infd), "r");
+   ioBase->basein = ioBase->basein = fdopen(dup(ioBase->base_infd), "r");
 
     if (ioBase->base_outfd == fileno(stdout))
-	ioBase->baseout = stdout;
+   ioBase->baseout = stdout;
     else
-	ioBase->baseout = ioBase->baseout = fdopen(dup(ioBase->base_outfd), "w");
+   ioBase->baseout = ioBase->baseout = fdopen(dup(ioBase->base_outfd), "w");
 
 
     /* curses screen initialization */
@@ -1765,8 +1786,8 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     curs_wrkaround();
 
     if ( ioBase->basescr == NULL ) {
-	destroy_ioBase(ioBase);
-	return NULL;
+   destroy_ioBase(ioBase);
+   return NULL;
     }
 
     ioBase->stdscr = stdscr;
@@ -1777,7 +1798,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     ioBase->cnorm = tiGetS("cnorm");
     ioBase->cvvis = tiGetS("cvvis");
     if ( ioBase->cvvis == NULL )
-	ioBase->cvvis = ioBase->cnorm;
+   ioBase->cvvis = ioBase->cnorm;
     ioBase->acsc  = tiGetS("acsc");
 
     ioBase->charmap = hb_xgrab(256 * sizeof(int));
@@ -1820,33 +1841,33 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 /*
         for( bg = 0; bg < COLORS; bg++ )
             for( fg = 0; fg < COLORS; fg++ )
-	    {
-		i = bg * COLORS + fg;
-		if( i == 0 )
-		    i = 7;
-		else if( i == 7 )
-		    i = 0;
+       {
+      i = bg * COLORS + fg;
+      if( i == 0 )
+          i = 7;
+      else if( i == 7 )
+          i = 0;
                 init_pair( i, color_map[ fg ], color_map[ bg ] );
-	    }
+       }
 */
         for( i = 0; i < 256; i++  ) {
             bg = ( i >> 4 ) & 0x07;         /* extract background color bits 4-6 */
             fg = ( i & 0x07 );              /* extract forground color bits 0-2 */
-	    n = bg * 8 + fg;
-	    /* n = bg * COLORS + fg */
-	    if( n == 0 )
-		n = 7;
-	    else if( n == 7 )
-		n = 0;
-	    if( (i & 0x88) == 0 )
-		init_pair( n, color_map[ fg ], color_map[ bg ] );
+       n = bg * 8 + fg;
+       /* n = bg * COLORS + fg */
+       if( n == 0 )
+      n = 7;
+       else if( n == 7 )
+      n = 0;
+       if( (i & 0x88) == 0 )
+      init_pair( n, color_map[ fg ], color_map[ bg ] );
             ioBase->attr_map[ i ] = COLOR_PAIR( n );
             if( i & 0x08 )                  /* highlight forground bit 3 */
                 ioBase->attr_map[ i ] |= A_BOLD;
             if( i & 0x80 )                  /* blink/highlight background bit 7 */
                 ioBase->attr_map[ i ] |= A_BLINK;
         }
-	ioBase->is_color = 1;
+   ioBase->is_color = 1;
     } else {
         for( i = 0; i < 256; i++  ) {
             bg = ( i >> 4 ) & 0x07;         /* extract background color bits 4-6 */
@@ -1860,7 +1881,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
                 ioBase->attr_map[ i ] |= A_BOLD;
             if( i & 0x80 )                  /* blink/highlight background bit 7 */
                 ioBase->attr_map[ i ] |= A_BLINK;
-	ioBase->is_color = 0;
+   ioBase->is_color = 0;
       }
     }
 
@@ -1908,49 +1929,49 @@ static void destroy_ioBase(InOutBase *ioBase)
     del_all_efds(ioBase);
 
     if( ioBase->terminal_type == TERM_LINUX ) {
-	/* restore a standard bell frequency and duration */
-	write_ttyseq(ioBase, "\033[10]\033[11]");
+   /* restore a standard bell frequency and duration */
+   write_ttyseq(ioBase, "\033[10]\033[11]");
     }
 
     /* curses SCREEN delete */
     if (ioBase->stdscr != NULL) {
-	ioBase->disp_count = 0;
-	/* on exit restore a cursor share and leave it visible
-	   Marek's NOTE: This is incompatible with Clipper */
-	if (ioBase->cursor != SC_UNDEF)
-	    set_cursor(ioBase, SC_NORMAL);
-	gt_refresh(ioBase);
+   ioBase->disp_count = 0;
+   /* on exit restore a cursor share and leave it visible
+      Marek's NOTE: This is incompatible with Clipper */
+   if (ioBase->cursor != SC_UNDEF)
+       set_cursor(ioBase, SC_NORMAL);
+   gt_refresh(ioBase);
     }
     if (ioBase->basescr != NULL)
-	delscreen(ioBase->basescr);
+   delscreen(ioBase->basescr);
     if (ioBase->basein != NULL && ioBase->basein != stdin)
-	fclose(ioBase->basein);
+   fclose(ioBase->basein);
     if (ioBase->baseout != NULL && ioBase->baseout != stdout)
-	fclose(ioBase->baseout);
+   fclose(ioBase->baseout);
 
     /* free allocated memory */
     if (ioBase->charmap != NULL)
-	hb_xfree(ioBase->charmap);
+   hb_xfree(ioBase->charmap);
 
     if (ioBase->in_transtbl != NULL)
-	hb_xfree(ioBase->in_transtbl);
+   hb_xfree(ioBase->in_transtbl);
 
     if (ioBase->out_transtbl != NULL)
-	hb_xfree(ioBase->out_transtbl);
+   hb_xfree(ioBase->out_transtbl);
 
     if (ioBase->nation_transtbl != NULL)
-	hb_xfree(ioBase->nation_transtbl);
+   hb_xfree(ioBase->nation_transtbl);
 
     if (ioBase->pKeyTab != NULL)
-	removeAllKeyMap(&ioBase->pKeyTab);
+   removeAllKeyMap(&ioBase->pKeyTab);
 
     /* restore terminal settings */
     gt_ttyrestore(ioBase);
 
     /* kill terminal proces if any */
     if (ioBase->termpid > 0) {
-	kill(ioBase->termpid, SIGTERM);
-	waitpid(ioBase->termpid, NULL, 0);
+   kill(ioBase->termpid, SIGTERM);
+   waitpid(ioBase->termpid, NULL, 0);
     }
 
     hb_xfree(ioBase);
@@ -1965,50 +1986,50 @@ static InOutBase* create_newXterm()
     char ptyname[64], buf[64], *ptr;
 
     if (!getenv("DISPLAY"))
-	return NULL;
+   return NULL;
 
     if (openpty(&masterfd, &slavefd, ptyname, NULL, NULL) == -1)
-	return NULL;
+   return NULL;
 
     tcsetpgrp(masterfd, getpgrp());
 
     if ((termpid = fork()) == -1) {
-	close(masterfd);
-	close(slavefd);
-	return NULL;
+   close(masterfd);
+   close(slavefd);
+   return NULL;
     }
 
     if (termpid == 0) {
-	if ((ptr = strrchr(ptyname, '/')))
-	    ++ptr;
-	else
-	    ptr = ptyname;
-	snprintf(buf, sizeof(buf), "-S%s/%d", ptr, masterfd);
-	buf[sizeof(buf)-1] = '\0';
+   if ((ptr = strrchr(ptyname, '/')))
+       ++ptr;
+   else
+       ptr = ptyname;
+   snprintf(buf, sizeof(buf), "-S%s/%d", ptr, masterfd);
+   buf[sizeof(buf)-1] = '\0';
 /*
         close(0);
         close(1);
         close(2);
 */
 /*
-	dup2(masterfd, 0);
-	dup2(masterfd, 1);
-	//fd = open("/tmp/hb-xterm.log", O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
-	fd = open("/dev/null", O_WRONLY);
-	dup2(fd, 2);
+   dup2(masterfd, 0);
+   dup2(masterfd, 1);
+   //fd = open("/tmp/hb-xterm.log", O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR);
+   fd = open("/dev/null", O_WRONLY);
+   dup2(fd, 2);
 */
-	for (fd = 3; fd < MAXFD; ++fd)
-	    if (fd != masterfd)
-		close(fd);
+   for (fd = 3; fd < MAXFD; ++fd)
+       if (fd != masterfd)
+      close(fd);
 
-	setuid(getuid());
-	setgid(getgid());
-	execlp( "xterm", "xterm", buf, "+sb",
-	        "-fg", "white",
-		"-bg", "black",
-		"-fn", "fixed",
-		"-T", "HB-XTERM Window", NULL );
-	exit(0);
+   setuid(getuid());
+   setgid(getgid());
+   execlp( "xterm", "xterm", buf, "+sb",
+           "-fg", "white",
+      "-bg", "black",
+      "-fn", "fixed",
+      "-T", "HB-XTERM Window", NULL );
+   exit(0);
     }
     close(masterfd);
     return create_ioBase("xterm", slavefd, slavefd, slavefd, termpid);
@@ -2023,9 +2044,9 @@ static int set_active_ioBase( int iNO_ioBase )
 
     if ( iNO_ioBase >= 0 && iNO_ioBase < s_iSize_ioBaseTab )
     {
-	s_iActive_ioBase = iNO_ioBase;
-	s_ioBase = s_ioBaseTab[s_iActive_ioBase];
-	set_term(s_ioBase->basescr);
+   s_iActive_ioBase = iNO_ioBase;
+   s_ioBase = s_ioBaseTab[s_iActive_ioBase];
+   set_term(s_ioBase->basescr);
     }
 
     return iPrev;
@@ -2036,26 +2057,26 @@ static int add_new_ioBase(InOutBase *ioBase)
     int i, n, add = 0;
 
     for( i = 0; i < s_iSize_ioBaseTab && !add; ++i )
-	if ( !s_ioBaseTab[i] )
-	{
-	    s_ioBaseTab[i] = ioBase;
-	    add = 1;
-	}
+   if ( !s_ioBaseTab[i] )
+   {
+       s_ioBaseTab[i] = ioBase;
+       add = 1;
+   }
 
     if ( !add )
     {
-	if (s_ioBaseTab == NULL)
-	    s_ioBaseTab = hb_xgrab( (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
-	else
-	    s_ioBaseTab = hb_xrealloc( s_ioBaseTab,
-			   (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
-	s_ioBaseTab[i] = ioBase;
-	for (n = i + 1; n < s_iSize_ioBaseTab; n++)
-	    s_ioBaseTab[n] = NULL;
+   if (s_ioBaseTab == NULL)
+       s_ioBaseTab = hb_xgrab( (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
+   else
+       s_ioBaseTab = hb_xrealloc( s_ioBaseTab,
+            (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
+   s_ioBaseTab[i] = ioBase;
+   for (n = i + 1; n < s_iSize_ioBaseTab; n++)
+       s_ioBaseTab[n] = NULL;
     }
 
     if ( !s_ioBase )
-	set_active_ioBase(i);
+   set_active_ioBase(i);
 
     return i;
 }
@@ -2066,16 +2087,16 @@ static int del_ioBase( int iNO_ioBase )
 
     if ( iNO_ioBase >= 0 && iNO_ioBase < s_iSize_ioBaseTab )
     {
-	destroy_ioBase( s_ioBaseTab[iNO_ioBase] );
-	s_ioBaseTab[iNO_ioBase] = NULL;
-	if ( s_iActive_ioBase == iNO_ioBase )
-	{
-	    s_iActive_ioBase = -1;
-	    s_ioBase = NULL;
-	    for( i = 0; i < s_iSize_ioBaseTab && !s_ioBase; ++i )
-		if ( s_ioBaseTab[i] )
-		    set_active_ioBase(i);
-	}
+   destroy_ioBase( s_ioBaseTab[iNO_ioBase] );
+   s_ioBaseTab[iNO_ioBase] = NULL;
+   if ( s_iActive_ioBase == iNO_ioBase )
+   {
+       s_iActive_ioBase = -1;
+       s_ioBase = NULL;
+       for( i = 0; i < s_iSize_ioBaseTab && !s_ioBase; ++i )
+      if ( s_ioBaseTab[i] )
+          set_active_ioBase(i);
+   }
     }
 
     return s_iActive_ioBase;
@@ -2087,11 +2108,11 @@ static void del_all_ioBase()
 
     if ( s_ioBaseTab )
     {
-	for( i = 0; i < s_iSize_ioBaseTab; ++i )
-	    if ( s_ioBaseTab[i] )
-		destroy_ioBase( s_ioBaseTab[i] );
-	hb_xfree( s_ioBaseTab );
-	s_ioBaseTab = NULL;
+   for( i = 0; i < s_iSize_ioBaseTab; ++i )
+       if ( s_ioBaseTab[i] )
+      destroy_ioBase( s_ioBaseTab[i] );
+   hb_xfree( s_ioBaseTab );
+   s_ioBaseTab = NULL;
     }
     s_iActive_ioBase = -1;
     s_ioBase = NULL;
@@ -2109,20 +2130,20 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if ( !s_ioBase )
     {
-	s_iStdIn  = iFilenoStdin;
-	s_iStdOut = iFilenoStdout;
-	s_iStdErr = iFilenoStderr;
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 #ifdef HB_GT_CRS_TTYHACK
-	{
-	    int ittyfd;
-	    if ( (ittyfd = open("/dev/tty",O_RDWR)) != -1)
-		iFilenoStdin = iFilenoStdout = ittyfd;
-	}
+   {
+       int ittyfd;
+       if ( (ittyfd = open("/dev/tty",O_RDWR)) != -1)
+      iFilenoStdin = iFilenoStdout = ittyfd;
+   }
 #endif
-	set_signals();
-	ioBase = create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
-	if ( ioBase )
-	    add_new_ioBase( ioBase );
+   set_signals();
+   ioBase = create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
+   if ( ioBase )
+       add_new_ioBase( ioBase );
     }
     if ( !s_ioBase )
     {
@@ -2155,8 +2176,8 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 
     if (s_WinSizeChangeFlag)
     {
-	s_WinSizeChangeFlag = FALSE;
-	gt_resize(s_ioBase);
+   s_WinSizeChangeFlag = FALSE;
+   gt_resize(s_ioBase);
     }
 
     return s_ioBase->maxrow;
@@ -2169,8 +2190,8 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 
     if (s_WinSizeChangeFlag)
     {
-	s_WinSizeChangeFlag = FALSE;
-	gt_resize(s_ioBase);
+   s_WinSizeChangeFlag = FALSE;
+   gt_resize(s_ioBase);
     }
 
     return s_ioBase->maxcol;
@@ -2288,7 +2309,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", uiRows, uiCols));
 
     if (gt_setsize( s_ioBase, uiRows, uiCols ) == 0)
-	return TRUE;
+   return TRUE;
 
     return FALSE;
 }
@@ -2350,17 +2371,17 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 
     if (s_ioBase)
     {
-	if (s_ioBase->stdoutfd == -1)
-	{
-	    HB_GT_FUNC(gt_DispBegin());
-	    hb_gtWriteCon( pbyStr, ulLen );
-	    HB_GT_FUNC(gt_DispEnd());
-	}
-	else
-	    gt_outstd( s_ioBase, pbyStr, ulLen );
+   if (s_ioBase->stdoutfd == -1)
+   {
+       HB_GT_FUNC(gt_DispBegin());
+       hb_gtWriteCon( pbyStr, ulLen );
+       HB_GT_FUNC(gt_DispEnd());
+   }
+   else
+       gt_outstd( s_ioBase, pbyStr, ulLen );
     }
     else
-	hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+   hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
@@ -2370,17 +2391,17 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutErr(%s, %hu)", pbyStr, ulLen));
     if (s_ioBase)
     {
-	if (s_ioBase->stderrfd == -1)
-	{
-	    HB_GT_FUNC(gt_DispBegin());
-	    hb_gtWriteCon( pbyStr, ulLen );
-	    HB_GT_FUNC(gt_DispEnd());
-	}
-	else
-	    gt_outerr( s_ioBase, pbyStr, ulLen );
+   if (s_ioBase->stderrfd == -1)
+   {
+       HB_GT_FUNC(gt_DispBegin());
+       hb_gtWriteCon( pbyStr, ulLen );
+       HB_GT_FUNC(gt_DispEnd());
+   }
+   else
+       gt_outerr( s_ioBase, pbyStr, ulLen );
     }
     else
-	hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
+   hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
@@ -2582,7 +2603,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
             iColSize += iCols;
         }
 
-	HB_GT_FUNC(gt_DispBegin());
+   HB_GT_FUNC(gt_DispBegin());
 
         for( iCount = ( iRows >= 0 ? usTop : usBottom );
               ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
@@ -2605,7 +2626,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
         hb_xfree( fpBlank );
         hb_xfree( fpBuff );
 
-	HB_GT_FUNC(gt_DispEnd());
+   HB_GT_FUNC(gt_DispEnd());
     }
 }
 
@@ -2632,7 +2653,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         ( Top    >= 0 && Top    < maxrow )  ||
         ( Bottom >= 0 && Bottom < maxrow ) )
     {
-	HB_GT_FUNC(gt_DispBegin());
+   HB_GT_FUNC(gt_DispBegin());
 
         /* Ensure that box is drawn from top left to bottom right. */
         if( Top > Bottom )
@@ -2648,8 +2669,8 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             Right = tmp;
         }
 
-	/* get color attribute */
-	chAttr = s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask;
+   /* get color attribute */
+   chAttr = s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask;
 
         /* Draw the box or line as specified */
         Height = Bottom - Top + 1;
@@ -2689,14 +2710,14 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                     if( Col < 0 )
                         Col = 0; /* The width was corrected earlier. */
                     else
-			/* Left side */
-			mvwaddch( s_ioBase->stdscr, Row, Col++,
+         /* Left side */
+         mvwaddch( s_ioBase->stdscr, Row, Col++,
                                   s_ioBase->box_chmap[ szBox[ 7 ] ] | chAttr );
                     /* Fill */
                     HB_GT_FUNC(gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 ));
                     if( Right < maxcol )
                         /* Right side */
-			mvwaddch( s_ioBase->stdscr, Row, Right,
+         mvwaddch( s_ioBase->stdscr, Row, Right,
                                   s_ioBase->box_chmap[ szBox[ 3 ] ] | chAttr );
                 }
             }
@@ -2708,12 +2729,12 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                 if( Row >= 0 && Row < maxrow )
                 {
                     if( Left >= 0 && Left < maxcol )
-			/* Left side */
-			mvwaddch( s_ioBase->stdscr, Row, Left,
+         /* Left side */
+         mvwaddch( s_ioBase->stdscr, Row, Left,
                                   s_ioBase->box_chmap[ szBox[ 7 ] ] | chAttr );
                     if( ( Width > 1 || Left < 0 ) && Right < maxcol )
-			/* Right side */
-			mvwaddch( s_ioBase->stdscr, Row, Right,
+         /* Right side */
+         mvwaddch( s_ioBase->stdscr, Row, Right,
                                   s_ioBase->box_chmap[ szBox[ 3 ] ] | chAttr );
                 }
             }
@@ -2722,8 +2743,8 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         if( Height > 1 && Width > 1 )
         {
             if( Left >= 0 && Bottom < maxrow )
-		/* Bottom left corner */
-		mvwaddch( s_ioBase->stdscr, Bottom, Left,
+      /* Bottom left corner */
+      mvwaddch( s_ioBase->stdscr, Bottom, Left,
                           s_ioBase->box_chmap[ szBox[ 6 ] ] | chAttr );
 
             Col = Left + 1;
@@ -2731,12 +2752,12 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                 Col = 0; /* The width was corrected earlier. */
 
             if( Col <= Right && Bottom < maxrow )
-		/* Bottom line */
+      /* Bottom line */
                 HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ));
 
             if( Right < maxcol && Bottom < maxrow )
-		/* Bottom right corner */
-		mvwaddch( s_ioBase->stdscr, Bottom, Right,
+      /* Bottom right corner */
+      mvwaddch( s_ioBase->stdscr, Bottom, Right,
                           s_ioBase->box_chmap[ szBox[ 4 ] ] | chAttr );
         }
 
@@ -2793,19 +2814,19 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
             Right = maxcol - 1;
 
         if( Left <= Right )
-	{
-	    wmove( s_ioBase->stdscr, Row, Left );
-	    uCols = Right - Left + 1;
-	}
-	else
-	{
-	    wmove( s_ioBase->stdscr, Row, Right );
-	    uCols = Left - Right + 1;
-	}
+   {
+       wmove( s_ioBase->stdscr, Row, Left );
+       uCols = Right - Left + 1;
+   }
+   else
+   {
+       wmove( s_ioBase->stdscr, Row, Right );
+       uCols = Left - Right + 1;
+   }
 
-	ch = s_ioBase->box_chmap[ byChar ] |
-	     ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
-	while( uCols-- )
+   ch = s_ioBase->box_chmap[ byChar ] |
+        ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
+   while( uCols-- )
             waddch( s_ioBase->stdscr, ch );
 
         /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
@@ -2850,8 +2871,8 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
             Bottom = Top;
         }
 
-	ch = s_ioBase->box_chmap[ byChar ] |
-	     ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
+   ch = s_ioBase->box_chmap[ byChar ] |
+        ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
 
         while( uRow <= Bottom )
             mvwaddch( s_ioBase->stdscr, uRow++, Col, ch );
@@ -2896,7 +2917,7 @@ void HB_GT_FUNC(mouse_Show( void ))
 #ifdef HAVE_GPM_H
     if( s_ioBase->terminal_type == TERM_LINUX && s_ioBase->is_mouse )
     {
-	gpm_visiblepointer = 1;
+   gpm_visiblepointer = 1;
         Gpm_DrawPointer( s_ioBase->mLastEvt.col, s_ioBase->mLastEvt.row, gpm_consolefd );
     }
 #endif
@@ -3082,8 +3103,8 @@ BOOL HB_GT_FUNC(gt_GetSignalFlag( int iSig ))
 
     if ( iSig > 0 && iSig < MAX_SIGNO && s_SignalTable[iSig] )
     {
-	bRetVal = TRUE;
-	s_SignalTable[iSig] = FALSE;
+   bRetVal = TRUE;
+   s_SignalTable[iSig] = FALSE;
     }
 
     return bRetVal;
@@ -3202,7 +3223,7 @@ void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
 
             hb_xfree( pszHostLetters );
             hb_xfree( pszTermLetters );
-	}
+   }
     }
 #else
     HB_SYMBOL_UNUSED( pszTermCDP );
