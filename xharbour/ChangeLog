@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.176 2002/04/27 20:37:57 lculik Exp $
+ * $Id: ChangeLog,v 1.177 2002/04/28 01:34:22 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-27 23:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/teditor.prg
+    * Added Support lookup on SetKey()'s Defined functions on Edit()
+      and BrowseText() then this are not Handle by TMemoEditor:Edit() method
 
 2002-04-27 22:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/isprint.c

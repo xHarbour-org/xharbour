@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.1.1.1 2001/12/21 10:41:59 ronpinkas Exp $
+ * $Id: teditor.prg,v 1.2 2002/04/17 18:15:38 walito Exp $
  */
 
 /*
@@ -818,7 +818,7 @@ return Self
 // handles only movement keys and discards all the others
 STATIC procedure BrowseText(oSelf, nPassedKey)
 
-   LOCAL nKey
+   LOCAL nKey,bKeyBlock
 
    while ! oSelf:lExitEdit
 
@@ -830,7 +830,12 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
          nKey := InKey(0)
       else
          nKey = nPassedKey
+
       endif
+         IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
+            eval( bKeyBlock )
+            return 
+         endif
 
       if nKey == K_ESC
          oSelf:lExitEdit := .T.
@@ -854,9 +859,11 @@ METHOD Edit(nPassedKey) CLASS HBEditor
    LOCAL nKey
    LOCAL lOldInsert
    LOCAL lDelAppend
+   LOCAL bKeyBlock
    LOCAL lSingleKeyProcess := .F.         // .T. if I have to process passed key and then exit
 
    if ! ::lEditAllow
+
       BrowseText(Self,nPassedKey)
 
    else
@@ -869,13 +876,19 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             if NextKey() == 0
                ::IdleHook()
             endif
-            nKey := InKey(0)
          else
             lSingleKeyProcess := .T.
             nKey := nPassedKey
+            
          endif
 
+            IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
+              eval( bKeyBlock )
+              return Self
+           endif
+
          do case
+
             case nKey >= K_SPACE .AND. nKey < 256
                ::lDirty := .T.
                // If I'm past EOL I need to add as much spaces as I need to reach ::nCol
