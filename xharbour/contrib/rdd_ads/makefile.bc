@@ -6,7 +6,7 @@
 # Building of rddads.lib - RDD for Advantage Database Server
 
 INCLUDE_DIR = ..\..\include
-CLIBFLAGS = -DHB_LANG_DEFAULT=PT 
+
 BIN_DIR = ..\..\bin\b32
 OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
@@ -24,8 +24,7 @@ $(OBJ_DIR)\adsfunc.obj  : adsfunc.c
 $(OBJ_DIR)\adsmgmnt.obj : adsmgmnt.c
 
 .c.obj:
-  bcc32 $(CLIBFLAGS) $(CFLAGS) -c -O2 -I$(INCLUDE_DIR) -o$@ $<
-   tdstrip -s $@
+  bcc32 $(CLIBFLAGS) -c -O2 -I$(INCLUDE_DIR) -o$@ $<
   tlib $(LIB_DIR)\rddads.lib -+$@,,
 
 .prg.c:

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.90 2002/08/12 03:21:10 ronpinkas Exp $
+ * $Id: hvm.c,v 1.91 2002/08/14 01:15:08 ronpinkas Exp $
  */
 
 /*
@@ -2444,6 +2444,13 @@ static void hb_vmPlus( void )
       double dNumber2 = hb_vmPopNumber();
 
       pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) + dNumber2 ) ];
+
+      if( pItem1->type != HB_IT_STRING )
+      {
+         pItem1->type = HB_IT_STRING;
+         pItem1->item.asString.bStatic = TRUE;
+         pItem1->item.asString.length = 1;
+      }
    }
    else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
@@ -2528,6 +2535,13 @@ static void hb_vmMinus( void )
       double dNumber2 = hb_vmPopNumber();
 
       pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) - dNumber2 ) ];
+
+      if( pItem1->type != HB_IT_STRING )
+      {
+         pItem1->type = HB_IT_STRING;
+         pItem1->item.asString.bStatic = TRUE;
+         pItem1->item.asString.length = 1;
+      }
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
@@ -3242,9 +3256,13 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
    dCurrent = hb_vmPopNumber();
 
    if( dStep >= 0 )          /* Positive loop. Use LESS */
+   {
       hb_vmPushLogical( dCurrent <= dEnd );
+   }
    else if( dStep < 0 )      /* Negative loop. Use GREATER */
+   {
       hb_vmPushLogical( dCurrent >= dEnd );
+   }
 }
 
 /* ------------------------------- */
@@ -5164,7 +5182,7 @@ static double hb_vmPopNumber( void )
          break;
 
       case HB_IT_STRING:
-         dNumber = (double) pItem->item.asString.value[0];
+         dNumber = (double) ( pItem->item.asString.value[0] );
          break;
 
       default:
