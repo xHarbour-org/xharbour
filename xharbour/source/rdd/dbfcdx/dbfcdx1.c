@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.52 2003/07/15 20:09:48 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.53 2003/07/16 17:03:04 druzus Exp $
  */
 
 /*
@@ -6809,25 +6809,34 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       else
       {
          hb_cdxKeyFree( pKey2 );
-         pArea->fFound = FALSE;
+			
+			if ( pTag->uiType == 'C' && pKey->item.asString.length == 0 )
+			{
+				retvalue = SELF_GOTOP( (AREAP) pArea);
+				pArea->fFound = TRUE;
+			}
+			else
+			{	
+        		pArea->fFound = FALSE;
 
-         if( bSoftSeek && !pTag->TagEOF )
-         {
-            retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
-            if( retvalue != FAILURE )
-               if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
-               {
-                  if( bFindLast )
-                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-                  else
-                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
-               }
-         }
-         else
-         {
-            retvalue = hb_cdxGoEof( pArea );
-         }
-      }
+	          if( bSoftSeek && !pTag->TagEOF )
+	          {
+      	      retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+	            if( retvalue != FAILURE )
+	               if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
+	               {
+	                  if( bFindLast )
+	                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
+	                  else
+	                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
+	               }
+	          }
+             else
+        		 {
+           		retvalue = hb_cdxGoEof( pArea );
+	          }
+   	   }
+		}
       if( !hb_cdxTopScope( pTag, pTag->CurKeyInfo ) ||
           !hb_cdxBottomScope( pTag, pTag->CurKeyInfo ) )
          hb_cdxGoEof( pArea );

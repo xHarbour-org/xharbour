@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.5 2003/06/05 04:55:29 brianhays Exp $
+ * $Id: memoline.c,v 1.6 2003/06/13 06:58:50 brianhays Exp $
  */
 
 /*
@@ -49,8 +49,7 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-
+#define HB_EOL_CHAR
 #include "hbapi.h"
 #include "hbfast.h"
 
@@ -92,7 +91,7 @@ HB_FUNC( MEMOLINE )
          case HB_CHAR_LF:
             ulCurLength = 0;
             ulLastSpace = 0;
-            ulLineEnd = ( ulPos >= OS_EOL_LEN ) ? ( ulPos - OS_EOL_LEN ) : ulLineBegin;
+            ulLineEnd = ( ulPos >= ( pszString[ ulPos- 1 ] = HB_CHAR_CR ? 2 : OS_EOL_LEN )) ? ( ulPos - ( pszString[ ulPos- 1 ] = HB_CHAR_CR ? 2 : OS_EOL_LEN )/*OS_EOL_LEN*/ ) : ulLineBegin;
             ulLines++;
             if( ulLines < ulLineNumber )
             {
@@ -106,6 +105,12 @@ HB_FUNC( MEMOLINE )
             break;
 
          case HB_CHAR_CR:
+//			#if defined(HB_OS_LINUX)
+//			    {
+//				  if  (pszString[ ulPos +1 ] == HB_CHAR_LF)
+//				   ulCurLength--;
+//				 }
+//			#endif	 
             break;
 
          case ' ':
@@ -156,6 +161,7 @@ HB_FUNC( MEMOLINE )
       ulLines++;
       ulLineEnd = ( ulPos == 0 ) ? 0 : ( ulPos - 1 );
    }
+//	if (pszString[ ulLineBegin + ulPos -1] ==
 
    if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
    {
@@ -176,6 +182,10 @@ HB_FUNC( MEMOLINE )
          }
 
       }
+		
+	   ulPos =0;
+		
+		
 
       hb_retclenAdopt( pszLine, ulLineLength );
    }
@@ -284,6 +294,8 @@ HB_FUNC( MEMOLINELONG )
       ulLines++;
       ulLineEnd = ( ulPos == 0 ) ? 0 : ( ulPos - 1 );
    }
+	
+//	for (*
 
    if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
    {
