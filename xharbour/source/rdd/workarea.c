@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.16 2003/08/08 22:36:39 walito Exp $
+ * $Id: workarea.c,v 1.17 2003/08/11 23:03:16 druzus Exp $
  */
 
 /*
@@ -644,11 +644,11 @@ ERRCODE hb_waSysName( AREAP pArea, BYTE * pBuffer )
 ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 {
    BOOL bFor, bWhile;
-   ULONG ulNext;
+   LONG lNext;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waEval(%p, %p)", pArea, pEvalInfo));
 
-   ulNext = 0;
+   lNext = 0;
    if( pEvalInfo->dbsci.itmRecID )
    {
       SELF_GOTO( pArea, hb_itemGetNL( pEvalInfo->dbsci.itmRecID ) );
@@ -676,9 +676,9 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
       SELF_GOTOP( pArea );
 
    if( pEvalInfo->dbsci.lNext )
-      ulNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
+      lNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
 
-   if( !pEvalInfo->dbsci.lNext || ulNext > 0 )
+   if( !pEvalInfo->dbsci.lNext || lNext > 0 )
    {
       while( !pArea->fEof )
       {
@@ -700,7 +700,7 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
          if( bFor && bWhile )
             hb_vmEvalBlock( pEvalInfo->itmBlock );
 
-         if( pEvalInfo->dbsci.lNext && --ulNext < 1 )
+         if( pEvalInfo->dbsci.lNext && --lNext < 1 )
             break;
 
          SELF_SKIP( pArea, 1 );
