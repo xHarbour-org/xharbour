@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.15 2003/01/06 12:39:27 horacioroldan Exp $
+ * $Id: workarea.c,v 1.16 2003/08/08 22:36:39 walito Exp $
  */
 
 /*
@@ -678,7 +678,7 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
    if( pEvalInfo->dbsci.lNext )
       ulNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
 
-   if( pEvalInfo->dbsci.lNext && ulNext > 0 )
+   if( !pEvalInfo->dbsci.lNext || ulNext > 0 )
    {
       while( !pArea->fEof )
       {
