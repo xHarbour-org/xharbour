@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.18 2002/01/06 12:33:25 antoniolinares Exp $
+ * $Id: error.ch,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -79,6 +79,7 @@
 #define EG_NOVARMETHOD  16
 #define EG_BADALIAS     17
 #define EG_DUPALIAS     18
+#define EG_NOOBJECT     19
 
 #define EG_CREATE       20
 #define EG_OPEN         21

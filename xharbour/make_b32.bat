@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.8 2003/02/21 15:08:04 lculik Exp $
+rem $Id: make_b32.bat,v 1.9 2003/03/07 05:32:38 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -28,7 +28,7 @@ if "%1" == "CLEAN" goto CLEAN
 
    SET HB_MT=
    make -l -fmakefile.bc %1 %2 %3 > make_b32.log
-   make -l -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 > make_b32.log
+   make -l -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 >> make_b32.log
 
    if errorlevel 1 goto BUILD_ERR
 

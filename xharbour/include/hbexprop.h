@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.4 2003/02/28 10:37:19 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.5 2003/03/14 00:32:40 ronpinkas Exp $
  */
 
 /*
@@ -225,6 +225,7 @@ typedef struct HB_EXPR_
          struct HB_EXPR_ *pObject;     /* object */
          char * szMessage;             /* message */
          struct HB_EXPR_ *pParms;      /* method parameters */
+         BOOL bByRef;
       } asMessage;
       struct
       {

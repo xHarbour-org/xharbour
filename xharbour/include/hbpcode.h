@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.15 2003/02/28 10:37:19 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.16 2003/03/14 00:32:40 ronpinkas Exp $
  */
 
 /*
@@ -213,6 +213,7 @@ typedef enum
    HB_P_LIKE,                  /* 147 */
    HB_P_MATCH,                 /* 148 */
    HB_P_PUSHMACROREF,          /* 149 */
+   HB_P_IVARREF,             /* 150 */
 
 /* NOTE: This have to be the last definition */
    HB_P_LAST_PCODE            /* 150 this defines the number of defined pcodes */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.184 2003/03/25 04:31:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.185 2003/03/26 20:50:30 ronpinkas Exp $
  */
 
 /*
@@ -94,6 +94,7 @@
 #include "hbset.h"
 #include "hbinkey.ch"
 #include "inkey.ch"
+#include "classes.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -209,6 +210,14 @@ extern void * hb_mthRequested( void ); /* profiler from classes.c */
 extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
 
 extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
+
+extern HARBOUR  hb___msgGetClsData( void );
+extern HARBOUR  hb___msgSetClsData( void );
+extern HARBOUR  hb___msgGetShrData( void );
+extern HARBOUR  hb___msgSetShrData( void );
+extern HARBOUR  hb___msgGetData( void );
+extern HARBOUR  hb___msgSetData( void );
+extern PCLASS   hb_clsClassesArray( void );
 
 BOOL hb_bProfiler = FALSE; /* profiler status is off */
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
@@ -1038,7 +1047,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
-
             hb_vmSend( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
 
             w += 3;
@@ -1054,7 +1062,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_stackPush();
                hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
             }
-
             break;
 
          case HB_P_SENDWITHSHORT:
@@ -1063,9 +1070,125 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             // Intentionally NOT breaking - fall through!
 
          case HB_P_SENDSHORT:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
+         {
+            HB_THREAD_STUB
 
-            hb_vmSend( pCode[ w + 1 ] );
+            USHORT usParams =  pCode[ w + 1 ];
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
+
+            if( hb_vm_iExtraParamsIndex == 0 )
+            {
+               if( usParams == 0 )
+               {
+                  PHB_ITEM pSelf = hb_stackItemFromTop( -1 );
+
+                  if( HB_IS_OBJECT( pSelf ) )
+                  {
+                     BOOL bConstructor;
+                     PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+
+                     if( pFunc == hb___msgGetData )
+                     {
+                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                        {
+                           hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
+                        }
+
+                        hb_arrayGet( pSelf, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
+
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                     else if( pFunc == hb___msgGetClsData )
+                     {
+                        // Recycle the Symbol Item.
+                        hb_arrayGet( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
+
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                     else if( pFunc == hb___msgGetShrData )
+                     {
+                        if( (HB_VM_STACK.pMethod)->uiSprClass )
+                        {
+                           // Recycle the Symbol Item.
+                           hb_arrayGet( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, &(HB_VM_STACK.Return) );
+                        }
+
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                  }
+               }
+               else if( usParams == 1 )
+               {
+                  PHB_ITEM pSelf = hb_stackItemFromTop( -2 );
+
+                  if( HB_IS_OBJECT( pSelf ) )
+                  {
+                     BOOL bConstructor;
+                     PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor );
+
+                     if( pFunc == hb___msgSetData )
+                     {
+                        if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                        {
+                           hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
+                        }
+
+                        hb_arraySet( pSelf, (HB_VM_STACK.pMethod)->uiData, hb_stackItemFromTop( - 1 ) );
+
+                        hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
+
+                        hb_stackPop(); //pNewValue.
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                     else if( pFunc == hb___msgSetClsData )
+                     {
+                        // Recycle the Symbol Item.
+                        hb_arraySet( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, hb_stackItemFromTop( - 1 ) );
+
+                        hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
+
+                        hb_stackPop(); //pNewValue.
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                     else if( pFunc == hb___msgSetShrData )
+                     {
+                        if( (HB_VM_STACK.pMethod)->uiSprClass )
+                        {
+                           // Recycle the Symbol Item.
+                           hb_arraySet( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, hb_stackItemFromTop( - 1 ) );
+                        }
+
+                        hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
+
+                        hb_stackPop(); //pNewValue.
+                        hb_stackPop(); //pSelf.
+                        hb_stackPop(); //Symbol.
+
+                        goto SEND_Finalization;
+                     }
+                  }
+               }
+            }
+
+            hb_vmSend( usParams );
+
+         SEND_Finalization:
 
             w += 2;
 
@@ -1082,6 +1205,63 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
 
             break;
+         }
+
+         case HB_P_IVARREF:
+         {
+            HB_THREAD_STUB
+
+            PHB_ITEM pSelf = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_OBJECT( pSelf ) )
+            {
+               BOOL bConstructor;
+               PHB_FUNC pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
+
+               if( pFunc == hb___msgGetData )
+               {
+                  if( (HB_VM_STACK.pMethod)->uiData > ( USHORT ) hb_arrayLen( pSelf ) ) /* Resize needed ? */
+                  {
+                     hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
+                  }
+
+                  // Recycle the Symbol Item.
+                  hb_arrayGetByRef( pSelf, (HB_VM_STACK.pMethod)->uiData, *( HB_VM_STACK.pPos - 2 ) );
+
+                  TraceLog( NULL, "Type: %i\n", (*( HB_VM_STACK.pPos - 1 ))->type );
+               }
+               else if( pFunc == hb___msgGetClsData )
+               {
+                  // Recycle the Symbol Item.
+                  hb_arrayGetByRef( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, *( HB_VM_STACK.pPos - 2 ) );
+               }
+               else if( pFunc == hb___msgGetShrData )
+               {
+                  if( (HB_VM_STACK.pMethod)->uiSprClass )
+                  {
+                     // Recycle the Symbol Item.
+                     hb_arrayGetByRef( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, *( HB_VM_STACK.pPos - 2 ) );
+                  }
+               }
+               else
+               {
+                  hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "No instance variable", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
+
+                  (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
+               }
+            }
+            else
+            {
+               hb_errRT_BASE_SubstR( EG_NOOBJECT, 1004, "Not object", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
+               (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
+            }
+
+            // Symbol was recycled.
+            hb_stackPop(); //pSelf.
+
+            w++;
+            break;
+         }
 
          case HB_P_BASELINE:
             s_iBaseLine = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );

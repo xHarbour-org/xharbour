@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.48 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.49 2003/03/14 00:32:40 ronpinkas Exp $
  */
 
 /*
@@ -2423,7 +2423,14 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
                /* acces to instance variable */
                HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
                HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-               HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
+               if( pSelf->value.asMessage.bByRef )
+               {
+                  HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_IVARREF );
+               }
+               else
+               {
+                  HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
+               }
             }
          }
          break;

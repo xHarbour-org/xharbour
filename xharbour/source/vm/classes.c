@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.44 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: classes.c,v 1.45 2003/03/25 04:31:23 ronpinkas Exp $
  */
 
 /*
@@ -149,6 +149,7 @@
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hboo.ch"
+#include "classes.h"
 
 #include <ctype.h>             /* For toupper() */
 
@@ -156,39 +157,6 @@
 /* #include <windows.h> */
 
 //#define DEBUG_HASH
-
-struct hb_class_method
-{
-   PHB_DYNS pMessage;            /* Method Symbolic name */
-   PHB_FUNC pFunction;           /* Function 'pointer' */
-   USHORT   uiData;              /* Item position for data (Harbour like, begin from 1) */
-   USHORT   uiDataShared;        /* Item position for datashared (original pos within Shared Class) */
-   USHORT   uiSprClass;          /* Originalclass'handel (super or current class'handel if not herited). */ /*Added by RAC&JF*/
-   USHORT   uiScope;             /* Scoping value */
-   PHB_ITEM pInitValue;          /* Init Value for data */
-   BYTE     bClsDataInitiated;   /* There is one value assigned at init time */
-   ULONG    ulCalls;             /* profiler support */
-   ULONG    ulTime;              /* profiler support */
-   ULONG    ulRecurse;           /* profiler support */
-   BOOL     bIsPersistent;       /* persistence support */
-};
-
-typedef struct hb_class_method METHOD;
-typedef struct hb_class_method * PMETHOD;
-
-typedef struct
-{
-   char *   szName;         /* Class name */
-   USHORT   uiDatas;        /* Total Data Counter */
-   USHORT   uiDataFirst;    /* First uiData from this class */
-   PMETHOD  pMethods;
-   USHORT   uiMethods;      /* Total Method initialised Counter */
-   USHORT   uiHashKey;
-   USHORT   uiDatasShared;  /* Total shared Class data within Class data */
-   PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
-   PHB_ITEM pInlines;       /* Array for inline codeblocks */
-   PHB_FUNC pFunError;      /* error handler for not defined messages */
-} CLASS, * PCLASS;
 
 #define BUCKET                   5
 #define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
@@ -235,12 +203,13 @@ static HARBOUR  hb___msgEvalInline( void );
 static HARBOUR  hb___msgClsParent( void );
 static HARBOUR  hb___msgEval( void );
 static HARBOUR  hb___msgVirtual( void );
-static HARBOUR  hb___msgGetClsData( void );
-static HARBOUR  hb___msgSetClsData( void );
-static HARBOUR  hb___msgGetShrData( void );
-static HARBOUR  hb___msgSetShrData( void );
-static HARBOUR  hb___msgGetData( void );
-static HARBOUR  hb___msgSetData( void );
+
+HARBOUR  hb___msgGetClsData( void );
+HARBOUR  hb___msgSetClsData( void );
+HARBOUR  hb___msgGetShrData( void );
+HARBOUR  hb___msgSetShrData( void );
+HARBOUR  hb___msgGetData( void );
+HARBOUR  hb___msgSetData( void );
 
 USHORT MsgToNum( const char *ptr, USHORT uiHashKey )
 {
@@ -2755,13 +2724,15 @@ static HARBOUR hb___msgClass( void )
  *
  * Internal function to return a CLASSDATA
  */
-static HARBOUR hb___msgGetClsData( void )
+HARBOUR hb___msgGetClsData( void )
 {
    HB_THREAD_STUB
    USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
 
    if( uiClass && uiClass <= s_uiClasses )
+   {
       hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
+   }
 }
 
 
@@ -2770,7 +2741,7 @@ static HARBOUR hb___msgGetClsData( void )
  *
  * Internal function to set a CLASSDATA
  */
-static HARBOUR hb___msgSetClsData( void )
+HARBOUR hb___msgSetClsData( void )
 {
    HB_THREAD_STUB
    USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
@@ -2790,7 +2761,7 @@ static HARBOUR hb___msgSetClsData( void )
  *
  * Internal function to return a SHAREDDATA
  */
-static HARBOUR hb___msgGetShrData( void )
+HARBOUR hb___msgGetShrData( void )
 {
    HB_THREAD_STUB
    USHORT uiSprCls = (HB_VM_STACK.pMethod)->uiSprClass;
@@ -2804,7 +2775,7 @@ static HARBOUR hb___msgGetShrData( void )
  *
  * Internal function to set a SHAREDDATA
  */
-static HARBOUR hb___msgSetShrData( void )
+HARBOUR hb___msgSetShrData( void )
 {
    HB_THREAD_STUB
    USHORT uiSprCls = (HB_VM_STACK.pMethod)->uiSprClass;
@@ -2824,7 +2795,7 @@ static HARBOUR hb___msgSetShrData( void )
  *
  * Internal function to return a DATA
  */
-static HARBOUR hb___msgGetData( void )
+HARBOUR hb___msgGetData( void )
 {
    HB_THREAD_STUB
    PHB_ITEM pObject = hb_stackSelfItem();
@@ -2832,7 +2803,9 @@ static HARBOUR hb___msgGetData( void )
 
    /* will arise only if the class has been modified after first instance */
    if( uiIndex > ( USHORT ) hb_arrayLen( pObject ) ) /* Resize needed */
+   {
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
+   }
 
    hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
 }
@@ -2842,7 +2815,7 @@ static HARBOUR hb___msgGetData( void )
  *
  * Internal function to set a DATA
  */
-static HARBOUR hb___msgSetData( void )
+HARBOUR hb___msgSetData( void )
 {
    HB_THREAD_STUB
    PHB_ITEM pObject = hb_stackSelfItem();
@@ -2867,6 +2840,10 @@ static HARBOUR hb___msgVirtual( void )
    ;
 }
 
+PCLASS hb_clsClassesArray( void )
+{
+   return s_pClasses;
+}
 
 /* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
          Receive an variable number of param and return an array of it.

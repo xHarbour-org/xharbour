@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.877 2003/03/27 02:20:53 lculik Exp $
+ * $Id: ChangeLog,v 1.878 2003/03/27 03:02:56 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,53 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-26 23:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + include/classes.h
+    + Added header file with classes support structure.
+
+  * include/error.ch
+    + Added #define EG_NOOBJECT 19
+
+  * include/thread.h
+    * Corrected copyright notice.
+
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/hbpcode.h
+  * source/common/expropt1.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added support for new HB_P_IVARREF
+
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_IVARREF
+    % Optimized usage of Objects Instance Variable to avoid function call.
+
+  * tests/ivarref.prg
+    + Added test sample for passing Instance Variables BYREF.
+
+  * make_b32.bat
+    * Minor correction to handling of make_b32.log file.
+
+  * utils/hbmake/hbmake.prg
+    * Changed 2 instances of ListAsArray() to ListAsArray2()
+      // Not sure if this is the correct fix for the missing external ListAsArray() error that I got.
+
+  /*
+     NOTE: - xHarbour now supports passing Instance Variables BY REFERENCE.
+           - Instance Variable access (and assignment) is now about 50% faster.
+   */
+
 2003-03-27 04:01 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbcompress.h
   * source/rtl/hbcompress.c
     ! fixed a potential error in inflate(); a code from original zlib was
       left in, and a variable check when not initialized could have bought
       to uncorrect error report while decompressing.
-    
+
 2003-03-26 23:16 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     ! changed logic of generation if -D swicht for HARBOURFLAGS section of makefile

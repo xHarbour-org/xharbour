@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.38 2003/03/14 13:08:13 jonnymind Exp $
+* $Id: thread.h,v 1.39 2003/03/16 06:00:32 jonnymind Exp $
 */
 
 /*
@@ -46,10 +46,6 @@
 * If you write modifications of your own for xHarbour, it is your choice
 * whether to permit this exception to apply to your modifications.
 * If you do not wish that, delete this exception notice.
-*
-* hb_itemClear() and hb_itemCopy() are derivative work of original code
-* in the Harbour Project http://harbour-project.org (source/vm/itemapi.c)
-* Copyright of Antonio Linares <alinares@fivetech.com>
 *
 */
 
@@ -115,7 +111,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_VM_STACK.bCanCancel = TRUE;\
       HB_CRITICAL_UNLOCK( hb_cancelMutex );\
    }
-   
+
    #define HB_TEST_CANCEL\
    {\
       HB_CRITICAL_LOCK( hb_cancelMutex );\
@@ -126,15 +122,15 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       }\
       HB_CRITICAL_UNLOCK( hb_cancelMutex );\
    }
-      
 
-   #define HB_CLEANUP_PUSH(X,Y) 
+
+   #define HB_CLEANUP_PUSH(X,Y)
    /*{ \
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = X;\
       HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount++ ] = (void *)Y;\
    }*/
- 
-   #define HB_CLEANUP_POP    
+
+   #define HB_CLEANUP_POP
    // HB_VM_STACK.iCleanCount--;
 
    #define HB_CLEANUP_POP_EXEC
@@ -257,7 +253,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
    }
-   
+
    extern void hb_threadWaitForIdle( void );
 #endif
 
@@ -436,10 +432,10 @@ typedef struct tag_HB_LWR_MUTEX
                lpMutex.Locker = HB_CURRENT_THREAD();\
             }\
          }
-         
+
     BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex );
     #define HB_CRITICAL_TRYLOCK( Mutex )   hb_critical_mutex_trylock( &(Mutex) )
-    
+
     #define HB_CRITICAL_UNLOCK( lpMutex ) \
          {\
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
@@ -523,16 +519,16 @@ extern void hb_threadTerminator( void *pData );
    void hb_threadSuspendAll( void );
    void hb_threadResumeAll( void );
    void hb_threadSubscribeIdle( HB_IDLE_FUNC );
-   void hb_threadCallIdle( void ); 
+   void hb_threadCallIdle( void );
    void hb_threadCancelInternal( void );
 #endif
 
 
-   
+
 /******************************************************/
 /* Definitions when threading is turned off */
 
-#else 
+#else
 
    #define HB_CRITICAL_LOCK( x )
    #define HB_CRITICAL_TRYLOCK( x )
@@ -542,15 +538,15 @@ extern void hb_threadTerminator( void *pData );
    #define HB_TEST_CANCEL
    #define HB_SET_SHARED( x, y, z )
    #define HB_WAIT_SHARED( x, y, z, k, m )
-   #define HB_STACK_LOCK  
-   #define HB_STACK_UNLOCK   
+   #define HB_STACK_LOCK
+   #define HB_STACK_UNLOCK
    #define HB_CLEANUP_PUSH( x, y )
    #define HB_CLEANUP_POP
    #define HB_CLEANUP_POP_EXEC
-   
+
    #define HB_THREAD_STUB
    #define HB_VM_STACK hb_stack
-   #define HB_ENABLE_ASYN_CANC   
+   #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
    #define HB_TEST_CANCEL_ENABLE_ASYN
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.54 2003/03/24 23:25:14 lculik Exp $
+ * $Id: hbmake.prg,v 1.55 2003/03/27 02:07:41 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1133,7 +1133,7 @@ FUNC CreateMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      aUserDefs := ListasArray(Alltrim( cUserDef ), ";")
+      aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "
@@ -2095,7 +2095,7 @@ FUNC CreateLibMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      aUserDefs := ListasArray(Alltrim( cUserDef ), ";")
+      aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "

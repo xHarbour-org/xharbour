@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.4 2002/12/04 06:24:07 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.5 2003/02/28 10:37:19 ronpinkas Exp $
  */
 
 /*
@@ -467,6 +467,7 @@ HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR pObject, char * szMessage )
    pExpr->value.asMessage.szMessage = szMessage;
    pExpr->value.asMessage.pObject   = pObject;
    pExpr->value.asMessage.pParms    = NULL;
+   pExpr->value.asMessage.bByRef    = FALSE;
 
    return pExpr;
 }
