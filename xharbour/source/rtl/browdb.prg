@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.14 2001/06/19 18:53:58 dholm Exp $
+ * $Id: browdb.prg,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
  */
 
 /*
@@ -66,10 +66,10 @@ STATIC FUNCTION Skipped( nRecs )
 
    LOCAL nSkipped := 0
 
-   IF LastRec() != 0
+   IF .NOT. (Eof() .AND. Bof())
       IF nRecs == 0
          dbSkip( 0 )
-      ELSEIF nRecs > 0 .AND. RecNo() != LastRec() + 1
+      ELSEIF nRecs > 0 .AND. .NOT. Eof()
          DO WHILE nSkipped < nRecs
             dbSkip( 1 )
             IF Eof()
