@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.96 2004/04/06 01:50:55 druzus Exp $
+ * $Id: filesys.c,v 1.97 2004/04/14 15:06:06 lf_sfnet Exp $
  */
 
 /*
@@ -279,28 +279,16 @@
 #if defined(HB_FS_FILE_IO)
 
 #if defined(HB_WIN32_IO)
-   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 )
-      #if defined(__USE_INLINE__)
-         __inline void * LongToHandle( const long h )
-         {
-             return((void *) (INT_PTR) h );
-         }
+   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ! defined( _BASETSD_H_)
+      __inline void * LongToHandle( const long h )
+      {
+          return((void *) (INT_PTR) h );
+      }
 
-         __inline long HandleToLong( const void *h )
-         {
-            return((long) h );
-         }
-      #else
-         static HANDLE LongToHandle( const long h )
-         {
-            return((void *) (INT_PTR) h );
-         }
-
-         static FHANDLE HandleToLong( const void *h )
-         {
-            return((long) h );
-         }
-      #endif
+      __inline long HandleToLong( const void *h )
+      {
+         return((long) h );
+      }
    #endif
 
 HANDLE DostoWinHandle( FHANDLE fHandle)
@@ -355,10 +343,10 @@ static void convert_create_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
       }
       *dwAttr = FILE_ATTRIBUTE_NORMAL;
    }
-   
+
    /* shared flags */
    *dwShare = FILE_SHARE_WRITE | FILE_SHARE_READ;
-   
+
    switch ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
    {
       case FO_DENYREAD :
