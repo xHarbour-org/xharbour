@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.5 2003/09/08 12:56:52 druzus Exp $
+# $Id: makefile.bc,v 1.6 2003/09/09 16:33:58 toninhofwi Exp $
 #
 
 #
@@ -34,8 +34,8 @@ AS = tasm
 CFLAGS = -mh $(CFLAGS)
 
 BIN_DIR = bin\b16
-OBJ_DIR = obj\b16
 LIB_DIR = lib\b16
+OBJ_DIR = obj\b16
 
 !else
 
@@ -43,8 +43,8 @@ CC = bcc32
 AS = tasm32
 
 BIN_DIR = ..\..\bin\b32
-OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
 
 # This is needed, otherwise the libs may overflow when 
 # debug info is requested with -v -y
@@ -60,7 +60,7 @@ CFLAGS = -O2 $(CFLAGS)
 # Directory macros. These should never have to change.
 #
 
-INCLUDE_DIR  = ..\..\include
+INCLUDE_DIR  = ..\..\include;include
 TOOLS_DIR    = .
 
 #
@@ -111,11 +111,12 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\charswap.obj \
    $(OBJ_DIR)\count.obj \
    $(OBJ_DIR)\ctc.obj \
+   $(OBJ_DIR)\ctchksum.obj \
+   $(OBJ_DIR)\ctcrypt.obj \
    $(OBJ_DIR)\ctmath.obj \
    $(OBJ_DIR)\ctset.obj \
    $(OBJ_DIR)\ctstr.obj \
-   $(OBJ_DIR)\ctchksum.obj \
-   $(OBJ_DIR)\ctcrypt.obj \
+   $(OBJ_DIR)\dbftools.obj \
    $(OBJ_DIR)\exponent.obj \
    $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
@@ -146,17 +147,17 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\wordrepl.obj \
    $(OBJ_DIR)\wordtoch.obj \
    \
+   $(OBJ_DIR)\blank.obj \
    $(OBJ_DIR)\color.obj \
    $(OBJ_DIR)\ct.obj \
    $(OBJ_DIR)\ctmisc.obj \
+   $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
    $(OBJ_DIR)\invertwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\time.obj \
-   $(OBJ_DIR)\ctwin.obj \
-   $(OBJ_DIR)\blank.obj \
+   $(OBJ_DIR)\time.obj
 
 #
 # Our default target
@@ -164,6 +165,11 @@ TOOLS_LIB_OBJS = \
 
 all: \
    $(TOOLS_LIB) \
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c   del $(OBJ_DIR)\*.c >nul
+   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB) >nul
 
 #
 # Library dependencies and build rules
@@ -259,6 +265,14 @@ $(OBJ_DIR)\ctc.obj : $(TOOLS_DIR)\ctc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
+$(OBJ_DIR)\ctchksum.obj : $(TOOLS_DIR)\ctchksum.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\ctcrypt.obj : $(TOOLS_DIR)\ctcrypt.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
 $(OBJ_DIR)\ctmath.obj : $(TOOLS_DIR)\ctmath.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
@@ -271,11 +285,7 @@ $(OBJ_DIR)\ctstr.obj : $(TOOLS_DIR)\ctstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\ctchksum.obj : $(TOOLS_DIR)\ctchksum.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\ctcrypt.obj : $(TOOLS_DIR)\ctcrypt.c
+$(OBJ_DIR)\dbftools.obj : $(TOOLS_DIR)\dbftools.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.2 2002/11/06 05:11:01 paultucker Exp $
+rem $Id: make_vc.bat,v 1.3 2003/03/29 18:28:03 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -26,8 +26,6 @@ if "%1"=="/?" goto exit
 
 if not exist obj md obj
 if not exist obj\vc md obj\vc
-if not exist lib md lib
-if not exist lib\vc md lib\vc
 
 set MK_FILE=makefile.vc
 if "%OS%" == "Windows_NT" set MK_FILE=makefile.nt
@@ -38,13 +36,14 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
+echo.
+echo using %mk_file%
    nmake /f %MK_FILE% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto error
 
 :BUILD_OK
 
-   copy lib\vc\*.lib lib >nul
-   copy lib\*.lib ..\..\lib >nul
+   copy ..\..\lib\vc\whoo.lib ..\..\lib >nul
    goto exit
 
 :error

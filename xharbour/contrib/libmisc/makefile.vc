@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/04/14 16:09:13 lculik Exp $
+# $Id: makefile.vc,v 1.2 2003/09/03 13:43:23 paultucker Exp $
 #
 
 #
@@ -50,9 +50,9 @@
 MK_FILE      = makefile.vc
 MK_FLAGS     = $(MAKEFLAGS: =)
 
-OBJ_DIR     = ..\..\obj\vc
-LIB_DIR     = ..\..\lib\vc
 BIN_DIR     = ..\..\bin\vc
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = obj\vc
 
 #
 # Directory macros. These should never have to change.
@@ -66,8 +66,8 @@ TOOLS_DIR    = .
 #
 
 AS             = masm
-CFLAGS         = -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
+C_FLAGS        = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+CLIBFLAGS      = -c $(C_FLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG = -Zi $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -88,7 +88,10 @@ HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 
 # override builtin
 
-.c.obj::
+.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 #
@@ -101,9 +104,6 @@ LIBLIST = \
 #
 # TOOLS.LIB rules
 #
-
-{$(TOOLS_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(TOOLS_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -132,18 +132,9 @@ all: \
    $(TOOLS_LIB)
 
 CLEAN:
-   -@if exist $(OBJ_DIR)\dates2.obj del $(OBJ_DIR)\dates2.obj
-   -@if exist $(OBJ_DIR)\hb_f.obj del $(OBJ_DIR)\hb_f.obj
-   -@if exist $(OBJ_DIR)\mathx.obj del $(OBJ_DIR)\mathx.obj
-   -@if exist $(OBJ_DIR)\strfmt.obj del $(OBJ_DIR)\strfmt.obj
-   -@if exist $(OBJ_DIR)\stringsx.obj del $(OBJ_DIR)\stringsx.obj
-   -@if exist $(OBJ_DIR)\fileread.* del $(OBJ_DIR)\fileread.*
-   -@if exist $(OBJ_DIR)\nconvert.* del $(OBJ_DIR)\nconvert.*
-   -@if exist $(OBJ_DIR)\numtxten.* del $(OBJ_DIR)\numtxten.*
-   -@if exist $(OBJ_DIR)\numtxthu.* del $(OBJ_DIR)\numtxthu.*
-   -@if exist $(OBJ_DIR)\stringp.* del $(OBJ_DIR)\stringp.*
-   -@if exist $(OBJ_DIR)\twirler.* del $(OBJ_DIR)\twirler.*
-   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB)
+   -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c del $(OBJ_DIR)\*.c >nul
+   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB) >nul
 
 #
 # Library dependencies and build rules

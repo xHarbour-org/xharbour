@@ -1,7 +1,10 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.2 2001/11/12 23:24:38 lculik Exp $
+rem $Id: make_b32.bat,v 1.1 2003/03/04 21:04:37 lculik Exp $
 rem
+
+if not exist obj md obj
+if not exist obj\b32 md obj\b32
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
@@ -13,7 +16,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD_OK
 
-   copy ..\..\lib\b32\libct.lib ..\..\lib\*.* > nul
+   copy ..\..\lib\b32\libct.lib ..\..\lib > nul
    goto EXIT
 
 :BUILD_ERR

@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.3 2003/05/28 03:10:16 paultucker Exp $
+rem $Id: make_vc.bat,v 1.5 2003/02/12 02:16:39 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -36,14 +36,17 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
-echo.
-echo using %mk_file%
-   nmake /f %MK_FILE% %1 %2 %3 >make_vc.log
+   echo.
+   echo using %mk_file%
+   echo.
+   echo NOTE: Witout GTK, this lib does not serve any purpose at this time!
+   echo.
+   nmake /f %MK_FILE% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto error
 
 :BUILD_OK
 
-   copy ..\..\lib\vc\*.lib ..\..\lib >nul
+   copy ..\..\lib\vc\xwt.lib ..\..\lib >nul
    goto exit
 
 :error

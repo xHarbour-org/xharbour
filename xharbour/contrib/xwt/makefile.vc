@@ -1,0 +1,206 @@
+#
+# $Id: makefile.nt,v 1.44 2003/09/09 02:07:54 paultucker Exp $
+#
+
+#
+# Makefile.nt - This file is identical to makefile.vc, except that
+# under something higher than Win9x, you should see overall improved
+# speed of building Harbour.
+#
+
+#
+# Makefile for Harbour Project for Microsoft Visual C (32 bit)
+#
+
+# ---------------------------------------------------------------
+# If you need to set additional compiler/linker options use the
+# environment variables below, but please DON'T MODIFY THIS FILE
+# for this purpose.
+# ---------------------------------------------------------------
+
+#
+# NOTE: You can use these envvars to configure the make process:
+#       (note that these are all optional)
+#
+#       CFLAGS       - Extra C compiler options for libraries and for
+#                      executables
+#       CLIBFLAGS    - Extra C compiler options for the libraries
+#       C_USR        - Extra C compiler options for libraries and for
+#                      executables (GNU make compatible envvar)
+#       HARBOURFLAGS - Extra Harbour compiler options
+#       HB_DOC_PDF   - Turns on the .PDF file support in the HBDOC utility.
+#                      Note that this will require the pdflib contrib.
+#       HB_GT_LIB    - To override the default GT driver
+#                      (search for HB_GT_LIBS for a list of values)
+#       PRG_USR      - Extra Harbour compiler options
+#                      (GNU make compatible envvar)
+#
+
+#
+# Notes about this makefile:
+#
+# 1. To add new files to a dependancy list, add an obj name to one of the
+#    OBJ lists for the appropriate library.
+#    NOTE: put .prg related obj's last in the lib list.
+#
+#
+# ---------------------------------------------------------------
+# "echo." intentionally used instead of "echo", to avoid conflicts
+# with external commands named echo.
+# using macros for ECHO and DEL to allow overiding such as:
+#
+#    set ECHO=cmd /c echo
+#    set DEL=cmd /c del
+#
+# The above might be needed on Windows 2000 and XP.
+# The macros are referenced in makefile.bc
+# ---------------------------------------------------------------
+
+!ifndef ECHO
+# don't indent definitions
+ECHO = echo.
+!endif
+!ifndef DEL
+# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
+DEL = del
+!endif
+
+
+MK_FILE      =makefile.vc
+MK_FLAGS     =$(MAKEFLAGS: =)
+
+BIN_DIR      =..\..\bin
+LIB_DIR      =..\..\lib\vc
+OBJ_DIR      =obj\vc
+
+#
+# Directory macros. These should never have to change.
+#
+
+INCLUDE_DIR  =include
+SOURCE_DIR   =src
+XWT_DIR      =$(SOURCE_DIR)\xwt_mfc # ??
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+AS           =ML
+C_FLAGS      =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -I$(XWT_DIR) -I..\..\include -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
+HARBOURFLAGS =-i$(INCLUDE_DIR) -i..\..\include -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE
+L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
+
+#
+# Macros to access our library names
+#
+
+XWT_LIB =$(LIB_DIR)\xwt.lib
+
+HARBOUR_EXE  =$(BIN_DIR)\harbour.exe
+
+#
+# Rules
+#
+
+.SUFFIXES: .prg .lib .c .obj .asm
+
+# override builtin
+
+.c.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+.cpp.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+#
+#
+#
+
+LIBLIST = \
+   $(XWT_LIB)
+
+#
+# XWT.LIB
+#
+
+{$(XWT_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(SOURCE_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(SOURCE_DIR)}.prg{$(OBJ_DIR)}.obj:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
+
+# List C modules first, then PRG modules
+
+XWT_LIB_OBJS = \
+   $(OBJ_DIR)\xwt_api.obj \
+   \
+   $(OBJ_DIR)\button.obj \
+   $(OBJ_DIR)\checkbox.obj \
+   $(OBJ_DIR)\container.obj \
+   $(OBJ_DIR)\event.obj \
+   $(OBJ_DIR)\filesel.obj \
+   $(OBJ_DIR)\fontsel.obj \
+   $(OBJ_DIR)\framewindow.obj \
+   $(OBJ_DIR)\grid.obj \
+   $(OBJ_DIR)\gridpane.obj \
+   $(OBJ_DIR)\hex.obj \
+   $(OBJ_DIR)\hpane.obj \
+   $(OBJ_DIR)\image.obj \
+   $(OBJ_DIR)\inputmask.obj \
+   $(OBJ_DIR)\label.obj \
+   $(OBJ_DIR)\laycontainer.obj \
+   $(OBJ_DIR)\layout.obj \
+   $(OBJ_DIR)\menu.obj \
+   $(OBJ_DIR)\menuitem.obj \
+   $(OBJ_DIR)\msgbox.obj \
+   $(OBJ_DIR)\pane.obj \
+   $(OBJ_DIR)\radiobutton.obj \
+   $(OBJ_DIR)\splitter.obj \
+   $(OBJ_DIR)\textbox.obj \
+   $(OBJ_DIR)\togglebutton.obj \
+   $(OBJ_DIR)\treeitem.obj \
+   $(OBJ_DIR)\treelist.obj \
+   $(OBJ_DIR)\viewport.obj \
+   $(OBJ_DIR)\vpane.obj \
+   $(OBJ_DIR)\widget.obj \
+   $(OBJ_DIR)\window.obj
+
+#
+# Our default target
+#
+TARGETS= \
+   $(XWT_LIB)
+
+!if ( "$(MK_FLAGS:Y=)"=="A" )
+
+all: \
+   CLEAN \
+   $(TARGETS)
+
+MK_FLAGS = $(MK_FLAGS:A=)
+
+!else
+
+all: \
+   $(TARGETS)
+
+!endif
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c >nul
+   -@if exist $(XWT_LIB) $(DEL) $(XWT_LIB) > nul
+
+
+#
+# Library dependencies and build rules
+#
+
+$(XWT_LIB) : $(XWT_LIB_OBJS)
+   lib /out:$@ $**

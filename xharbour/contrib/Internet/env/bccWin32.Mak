@@ -1,8 +1,8 @@
 #-- path vari -----------
-OUTDIR=build
+LIBDIR=..\..\lib\b32
 OBJDIR=obj\b32
+OUTDIR=build
 SRCDIR=source
-LIBDIR=lib\b32
 
 
 #-- HARBOUR COMPILER ----
@@ -35,5 +35,4 @@ EXTRA_LIBS =
 
 lib        = tlib
 libflags   = 
-
 

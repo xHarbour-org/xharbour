@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+# $Id: makefile.bc,v 1.2 2003/02/22 21:26:49 jonnymind Exp $
 #
 
 #
@@ -15,26 +15,25 @@ ID = impdef
 AS = tasm
 
 BIN_DIR = ..\..\bin
-OBJ_DIR = obj
-LIB_DIR = .
+LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
 
 #
 # Directory macros. These should never have to change.
 #
 
-INCLUDE_DIR  = ..\..\include;.\include
-WINSYS_DIR   = \WINDOWS\SYSTEM
-CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)  -DWIN32
-CLIBFLAGS  = $(CFLAGS)
+INCLUDE_DIR  = include;..\..\include
+CFLAGS       = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS) -DWIN32
+CLIBFLAGS    = $(CFLAGS)
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
-HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2  -gc0 $(PRG_USR) $(HARBOURFLAGS)
-LDFLAGS        = $(LDFLAGS)
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS      = $(LDFLAGS)
 
 #
 # Macros to access our library names
 #
 
-HBTIP_LIB= hbtip.lib
+HBTIP_LIB= $(LIB_DIR)\hbtip.lib
 
 HBTIP_OBJS=\
    $(OBJ_DIR)\tipclientftp.obj\

@@ -13,7 +13,7 @@ if not exist obj\vc md obj\vc
 
 :BUILD_OK
 
-   copy ..\..\lib\vc\hbtip.lib ..\..\lib >nul
+   copy ..\..\lib\vc\internet.lib ..\..\lib >nul
    goto EXIT
 
 :BUILD_ERR
@@ -21,4 +21,3 @@ if not exist obj\vc md obj\vc
    notepad make_vc.log
 
 :EXIT
-

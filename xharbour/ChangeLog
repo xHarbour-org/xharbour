@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1502 2003/09/23 09:33:43 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1503 2003/09/23 15:16:01 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-23 17:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  + contrib/htmllib/include
+  + contrib/libct/include
+    * move all local include files here
+  * contrib/libct/tab.c
+    * add casts on char 141
+  * contrib/htmllib/Makefile
+  + contrib/htmllib/make_b32.bat
+  * contrib/htmllib/make_vc.bat
+  * contrib/htmllib/makefile.bc
+  * contrib/htmllib/makefile.vc
+  - contrib/htmllib/htmllib.bc
+  + contrib/internet/make_vc.bat
+  + contrib/internet/makefile.vc
+  * contrib/libct/Makefile
+  * contrib/libct/makefile.bc
+  * contrib/libct/makefile.vc
+  * contrib/libct/make_b32.bat
+  * contrib/libct/make_vc.bat
+  * contrib/libmisc/makefile.bc
+  * contrib/libmisc/makefile.vc
+  * contrib/libmisc/make_b32.bat
+  * contrib/libmisc/make_vc.bat
+  * contrib/rdd_ads/makefile.vc
+  * contrib/tip/makefile.bc
+  * contrib/tip/makefile.vc
+  * contrib/tip/make_b32.bat
+  * contrib/tip/make_vc.bat
+  * contrib/what32/makefile.bc
+  * contrib/what32/makefile.nt
+  * contrib/what32/makefile.vc
+  * contrib/what32/make_b32.bat
+  * contrib/what32/make_vc.bat
+  * contrib/whoo/makefile.nt
+  * contrib/whoo/makefile.vc
+  * contrib/whoo/make_b32.bat
+  * contrib/whoo/make_vc.bat
+  * contrib/woopgui/makefile.nt
+  * contrib/woopgui/makefile.vc
+  * contrib/woopgui/make_b32.bat
+  * contrib/woopgui/make_vc.bat
+  + contrib/xwt/makefile.nt
+  + contrib/xwt/makefile.vc
+  + contrib/xwt/make_b32.bat
+  + contrib/xwt/make_vc.bat
+    * standardise bc and vc support
+  * hrbdll.vc
+  * hrbdll.bc
+  * makallvc.bat
+  + makallbc.bat
+    * These last 2 will build all .exe, .dll and .libs
+  
+  * further tweaking is probably required for other platforms)
 
 2003-09-23 17:16 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
    * source/rtl/hbsrlraw.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tab.c,v 1.1 2002/02/18 23:13:03 mbirdyg Exp $
+ * $Id: tab.c,v 1.1 2003/03/04 21:04:53 lculik Exp $
  */
 
 /*
@@ -232,7 +232,7 @@ HB_FUNC (TABEXPAND)
       else if ((unsigned char)cChar == 141)
       {
         /* soft carriage return */
-        *(pcRet+sRetLen) = 141;
+        *(pcRet+sRetLen) = ( char )141;
         sRetLen++;
         sIndex++;
         if (iIgnore141)
@@ -495,7 +495,7 @@ HB_FUNC (TABPACK)
           *(pcRet+sRetLen) = cFill;
           sRetLen++;
         }  
-        *(pcRet+sRetLen) = 141;
+        *(pcRet+sRetLen) = ( char )141;
         sRetLen++;
         sTabIndex = 0;
         sIndex++;

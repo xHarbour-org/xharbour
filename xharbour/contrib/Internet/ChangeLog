@@ -4,6 +4,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-09-23 15:10 UTC-0530 Paul Tucker <ptucker@sympatico.ca>
+   * update make files for consistancy for bc and vc builds.
+
 2002-11-10 12:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
    + Internet\Source\xhFtp.prg
 

@@ -4,7 +4,7 @@
 lib: $(INETLIB) 
 
 $(INETLIB): $(INETOBJ)
-   -erase $(INETLIB)
+   @if exist $(INETLIB) erase $(INETLIB)
    $(lib) "$(INETLIB)" /P512 @&&!
 +$(**: = &^
 +)
@@ -12,11 +12,9 @@ $(INETLIB): $(INETOBJ)
 !
 
 clean:
-        -erase *.obj
-        -erase *.exe
-        -erase *.res
-        -erase *.map
-        -erase *.rws
-        -erase $(INETLIB)
-
-
+   @if exist $(OBJDIR)\*.obj erase $(OBJDIR)\*.obj
+   @if exist $(OBJDIR)\*.c   erase $(OBJDIR)\*.c
+   @if exist $(OBJDIR)\*.res erase $(OBJDIR)\*.res
+   @if exist $(OBJDIR)\*.map erase $(OBJDIR)\*.map
+   @if exist $(OBJDIR)\*.rws erase $(OBJDIR)\*.rws
+   @if exist $(INETLIB) erase $(INETLIB)

@@ -1,13 +1,13 @@
 #
-# $Id: Makefile,v 1.7 2003/08/18 12:13:46 druzus Exp $
+# $Id: Makefile,v 1.8 2003/09/08 12:56:52 druzus Exp $
 #
 
 ROOT = ../../
 
 PRG_HEADERS = \
-	ct.ch \
-	cterror.ch \
-	ctwin.ch \
+	include/ct.ch \
+	include/cterror.ch \
+	include/ctwin.ch \
 
 C_SOURCES = \
 	addascii.c \

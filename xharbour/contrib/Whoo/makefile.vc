@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2002/11/06 05:11:01 paultucker Exp $
+# $Id: makefile.vc,v 1.6 2003/03/29 18:28:02 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -14,9 +14,10 @@
 HBR_DIR  =..\..
 WHO_DIR  =.
 WH_DIR   =..\what32
-OUTDIR   =build
+
+LIB_DIR  =..\..\lib\vc
 OBJ_DIR  =obj\vc
-LIB_DIR  =lib\vc
+
 SRCDIR   =source
 
 !ifndef ECHO
@@ -37,7 +38,7 @@ hbcflags =-n -w -es2 -q0 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
-CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+C_FLAGS   =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -c -nologo -DHB_API_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include $(CFLAGS)
 
 #-- RESOURCE COMPILER ---
 rc       =rc
@@ -46,7 +47,7 @@ rcflags  =-r
 .SUFFIXES: .prg .lib
 
 .c.obj:
- $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+ $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 WHOOLIB  = $(LIB_DIR)\whoo.lib
 
@@ -56,14 +57,14 @@ LIBLIST  = $(WHOOLIB)
 #
 
 {$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $*.c
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $*.c
 
 WHOOOBJ    = \
     $(OBJ_DIR)\TabControl.obj \
@@ -132,7 +133,7 @@ all: \
 !endif
 
 CLEAN:
-   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(WHOOLIB) $(DEL) $(WHOOLIB) > nul
    -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
    -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
    -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul

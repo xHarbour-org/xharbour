@@ -1,0 +1,195 @@
+
+# $Id: makefile.bc,v 1.67 2003/09/13 20:53:27 walito Exp $
+#
+
+#
+# Makefile for Harbour Project for Borland C/C++ 3.x, 4.x, 5.x compilers
+#
+
+# ---------------------------------------------------------------
+# If you need to set additional compiler/linker options use the
+# environment variables below, but please DON'T MODIFY THIS FILE
+# for this purpose.
+# ---------------------------------------------------------------
+
+#
+# NOTE: You can use these envvars to configure the make process:
+#       (note that these are all optional)
+#
+#       CFLAGS       - Extra C compiler options for libraries and for
+#                      executables
+#       CLIBFLAGS    - Extra C compiler options for the libraries
+#       C_USR        - Extra C compiler options for libraries and for
+#                      executables (GNU make compatible envvar)
+#       HARBOURFLAGS - Extra Harbour compiler options
+#       HB_DOC_PDF   - Turns on the .PDF file support in the HBDOC utility.
+#                      Note that this will require the pdflib contrib.
+#       HB_GT_LIB    - To override the default GT driver
+#                      (search for HB_GT_LIBS for a list of values)
+#       HB_LEX       - If set to SIMPLEX, an alternate lexer will be
+#                      used instead of the Flex based one.
+#       PRG_USR      - Extra Harbour compiler options
+#                      (GNU make compatible envvar)
+#
+
+#
+# NOTE: BCC_NOSTARTUP must be defined for Borland C++ 5.3 to make it work.
+#
+
+# ---------------------------------------------------------------
+# "echo." intentionally used instead of "echo", to avoid conflicts
+# with external commands named echo.
+# using macros for ECHO and DEL to allow overiding such as:
+#
+#    set ECHO=cmd /c echo
+#    set DEL=cmd /c del
+#
+# The above might be needed on Windows 2000 and XP.
+# The macros are referenced in makefile.bc
+# ---------------------------------------------------------------
+
+#.AUTODEPEND
+
+!if !$d(ECHO)
+   ECHO = echo.
+!endif
+!if !$d(DEL)
+   DEL = del
+!endif
+
+!if $d(B16)
+
+BCC_NOSTARTUP = ""
+
+CC = bcc
+AS = tasm
+
+# Borland C/C++ (DOS 16 bits)
+CFLAGS = -mh $(CFLAGS)
+
+BIN_DIR = ..\..\bin\b16
+LIB_DIR = ..\..\lib\b16
+OBJ_DIR = obj\b16
+
+!else
+
+CC = bcc32
+LINKER = TLIB
+# NOTE: Using TASM for some reason, this should be normally TASM32.
+#       I'll leave it to TASM until a better solution is found
+AS = tasm
+
+BIN_DIR = ..\..\bin\b32
+LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
+SRC_DIR = src
+
+# This is needed, otherwise the libs may overflow when
+# debug info is requested with -v -y
+# if debug info is requested, set ARFLAGS to /P64 in your environment
+!if !$d(ARFLAGS)
+   ARFLAGS = /0
+!endif
+
+!endif
+
+!if !$d(BCC_NOOPTIM)
+   CFLAGS = -O2 $(CFLAGS)
+!endif
+
+#
+# Directory macros. These should never have to change.
+#
+
+INCLUDE_DIR  = include;..\..\include
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
+CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
+CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
+HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS              = $(LDFLAGS)
+
+
+#
+# Macros to access our library names
+#
+
+XWT_LIB     = $(LIB_DIR)\xwt.lib
+
+HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
+
+($(SRC_DIR)).prg($(OBJ_DIR)).c:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $& -o$?
+
+($(OBJ_DIR)).c($(SRC_DIR)).prg:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$?
+
+$(OBJ_DIR).c$(OBJ_DIR).obj:
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+
+
+#
+# XWT.LIB rules
+#
+
+
+XWT_LIB_OBJS = \
+   $(SRC_DIR)\xwt_api.c \
+   \
+   $(SRC_DIR)\button.prg \
+   $(SRC_DIR)\checkbox.prg \
+   $(OBJ_DIR)\container.obj \
+   $(OBJ_DIR)\event.obj \
+   $(OBJ_DIR)\filesel.obj \
+   $(OBJ_DIR)\fontsel.obj \
+   $(OBJ_DIR)\framewindow.obj \
+   $(OBJ_DIR)\grid.obj \
+   $(OBJ_DIR)\gridpane.obj \
+   $(OBJ_DIR)\hex.obj \
+   $(OBJ_DIR)\hpane.obj \
+   $(OBJ_DIR)\image.obj \
+   $(OBJ_DIR)\inputmask.obj \
+   $(OBJ_DIR)\label.obj \
+   $(OBJ_DIR)\laycontainer.obj \
+   $(OBJ_DIR)\layout.obj \
+   $(OBJ_DIR)\menu.obj \
+   $(OBJ_DIR)\menuitem.obj \
+   $(OBJ_DIR)\msgbox.obj \
+   $(OBJ_DIR)\pane.obj \
+   $(OBJ_DIR)\radiobutton.obj \
+   $(OBJ_DIR)\splitter.obj \
+   $(OBJ_DIR)\textbox.obj \
+   $(OBJ_DIR)\togglebutton.obj \
+   $(OBJ_DIR)\treeitem.obj \
+   $(OBJ_DIR)\treelist.obj \
+   $(OBJ_DIR)\viewport.obj \
+   $(OBJ_DIR)\vpane.obj \
+   $(OBJ_DIR)\widget.obj \
+   $(OBJ_DIR)\window.obj
+
+
+#
+# Our default target
+#
+
+all: \
+   $(XWT_LIB)
+
+#
+# Library dependencies and build rules
+#
+
+$(XWT_LIB) : $(XWT_LIB_OBJS)
+    IF EXIST "$(XWT_LIB)" $(DEL) "$(XWT_LIB)" > NUL
+    $(LINKER) "$(XWT_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+

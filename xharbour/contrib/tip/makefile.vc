@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.3 2003/03/29 19:16:40 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2003/05/27 15:19:12 paultucker Exp $
 #
 
 #
@@ -50,9 +50,9 @@
 MK_FILE      = makefile.vc
 MK_FLAGS     = $(MAKEFLAGS: =)
 
-OBJ_DIR     = ..\..\obj\vc
-LIB_DIR     = ..\..\lib\vc
 BIN_DIR     = ..\..\bin
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = obj\vc
 
 #
 # Directory macros. These should never have to change.
@@ -66,8 +66,8 @@ TOOLS_DIR    = .
 #
 
 AS             = masm
-CFLAGS         = -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
+C_FLAGS        =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
+CLIBFLAGS      = -c $(C_FLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG = -Zi $(CLIBFLAGS)
 HARBOURFLAGS   = -iinclude;$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -128,15 +128,10 @@ all: \
    $(TOOLS_LIB)
 
 CLEAN:
-   -@if exist $(OBJ_DIR)\tipclientftp.* del $(OBJ_DIR)\tipclientftp.*
-   -@if exist $(OBJ_DIR)\tipclienthttp.* del $(OBJ_DIR)\tipclienthttp.*
-   -@if exist $(OBJ_DIR)\tipclientpop.* del $(OBJ_DIR)\tipclientpop.*
-   -@if exist $(OBJ_DIR)\tipclient.* del $(OBJ_DIR)\tipclient.*
-   -@if exist $(OBJ_DIR)\tipclientsmtp.* del $(OBJ_DIR)\tipclientsmtp.*
-   -@if exist $(OBJ_DIR)\tipcredentials.* del $(OBJ_DIR)\tipcredentials.*
-   -@if exist $(OBJ_DIR)\tipurl.* del $(OBJ_DIR)\tipurl.*
-   -@if exist $(OBJ_DIR)\tiputils.* del $(OBJ_DIR)\tiputils.*
-   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB)
+   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB) >nul
+   -@if exist obj\vc\*.obj del obj\vc\*.obj >nul
+   -@if exist obj\vc\*.c del obj\vc\*.c >nul
+
 
 #
 # Library dependencies and build rules

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/04/14 16:09:13 lculik Exp $
+# $Id: makefile.bc,v 1.2 2003/08/12 19:49:46 brianhays Exp $
 #
 
 #
@@ -34,8 +34,8 @@ AS = tasm
 CFLAGS = -mh $(CFLAGS)
 
 BIN_DIR = bin\b16
-OBJ_DIR = obj\b16
 LIB_DIR = lib\b16
+OBJ_DIR = obj\b16
 
 !else
 
@@ -43,8 +43,8 @@ CC = bcc32
 AS = tasm32
 
 BIN_DIR = ..\..\bin\b32
-OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
 
 # This is needed, otherwise the libs may overflow when
 # debug info is requested with -v -y
@@ -109,6 +109,11 @@ TOOLS_LIB_OBJS = \
 
 all: \
    $(TOOLS_LIB) \
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c   del $(OBJ_DIR)\*.c >nul
+   -@if exist $(TOOLS_LIB) del $(TOOLS_LIB) >nul
 
 #
 # Library dependencies and build rules

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.3 2002/11/06 05:11:01 paultucker Exp $
+# $Id: makefile.nt,v 1.4 2003/05/28 03:10:16 paultucker Exp $
 #
 
 # File:     makefile.nt
@@ -24,8 +24,10 @@ DEL = del
 HBR_DIR=..\..
 WG_DIR=.
 WH_DIR=.
+
+LIB_DIR=..\..\lib\vc
 OBJ_DIR=obj\vc
-LIB_DIR=lib\vc
+
 SRCDIR =source
 
 MK_FILE  = makefile.nt
@@ -37,7 +39,7 @@ hbcflags =-n -q0 -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
-CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+C_FLAGS   =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -c -nologo -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include $(CFLAGS)
 
 #-- RESOURCE COMPILER ---
 rc       =rc
@@ -46,7 +48,7 @@ rcflags  =-r -x -fo$*.res
 .SUFFIXES: .prg .c
 
 .c.obj::
- $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+ $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 
 # library
@@ -58,10 +60,10 @@ WOOPGUIRES = $(LIB_DIR)\woopgui.res
 LIBLIST  = $(WOOPGUILIB) $(WAPILIB) $(WOOPGUIRES)
 
 {$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj::
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
@@ -163,8 +165,9 @@ all: \
 !endif
 
 CLEAN:
-   -@if exist $(LIB_DIR)\*.res $(DEL) $(LIB_DIR)\*.res > nul
-   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(WOOPGUILIB) $(DEL) $(WOOPGUILIB) > nul
+   -@if exist $(WOOPGUIRES) $(DEL) $(WOOPGUIRES) > nul
+   -@if exist $(WAPILIB) $(DEL) $(WAPILIB) > nul
    -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
    -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
    -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul

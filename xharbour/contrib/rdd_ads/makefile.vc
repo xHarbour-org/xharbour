@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.8 2001/06/19 19:30:44 ronpinkas Exp $
+# $Id: makefile.vc,v 1.1 2002/07/11 02:57:52 lculik Exp $
 #
 
 #
@@ -7,17 +7,18 @@
 #
 
 INCLUDE_DIR = ..\..\include
-OBJ_DIR     = ..\..\obj\vc
-LIB_DIR     = ..\..\lib\vc
+
 BIN_DIR     = ..\..\bin
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = ..\..\obj\vc
 
 #
 # C compiler definition and C flags. These should never have to change.
 #
 
 CC = cl
-CFLAGS = -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32
-CLIBFLAGS = $(CFLAGS) -c
+C_FLAGS = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DWIN32 $(C_USR) $(CFLAGS)
+CLIBFLAGS = $(C_FLAGS) -c
 CLIBFLAGSDEBUG = $(CLIBFLAGS) -Zi
 
 #

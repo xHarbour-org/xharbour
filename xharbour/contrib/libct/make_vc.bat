@@ -1,7 +1,10 @@
 @echo off
 rem
-rem $Id: make_vc.bat,v 1.4 2001/11/12 23:24:38 lculik Exp $
+rem $Id: make_vc.bat,v 1.1 2003/03/04 21:04:38 lculik Exp $
 rem
+
+if not exist obj md obj
+if not exist obj\vc md obj\vc
 
 :BUILD
 
@@ -10,7 +13,7 @@ rem
 
 :BUILD_OK
 
-   copy ..\..\lib\vc\libct.lib ..\..\lib\*.* >nul
+   copy ..\..\lib\vc\libct.lib ..\..\lib >nul
    goto EXIT
 
 :BUILD_ERR
