@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.24 2003/01/09 08:21:02 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.25 2003/01/29 10:26:45 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -40,11 +40,21 @@
 #Include "wingdi.ch"
 #include "debug.ch"
 
+#define AC_SRC_OVER      0 
+#define AC_SRC_ALPHA     1 
+#define AC_SRC_NO_ALPHA  2 
 
 pragma pack(4)
 
 IMPORT C STRUCTURE TEXTMETRIC
 IMPORT C STRUCTURE NMHDR
+
+typedef struct _BLENDFUNCTION {;
+    BYTE     BlendOp;
+    BYTE     BlendFlags;
+    BYTE     SourceConstantAlpha;
+    BYTE     AlphaFormat;
+}BLENDFUNCTION;
 
 typedef struct tagSCROLLINFO {;  // si
     UINT cbSize; 
@@ -66,7 +76,7 @@ typedef struct _HDITEM {;
     LPARAM  lParam; 
     int     iImage;
     int     iOrder;
-} HDITEM, FAR * LPHDITEM
+} HDITEM
 
 typedef struct tagNMHEADER{;
     NMHDR    hdr;
@@ -74,6 +84,16 @@ typedef struct tagNMHEADER{;
     int      iButton;
     HDITEM   *pitem;
 } NMHEADER
+
+typedef struct tagNMCUSTOMDRAWINFO {;
+    NMHDR  hdr;
+    DWORD  dwDrawStage;
+    HDC    hdc;
+    RECT   rc;
+    DWORD  dwItemSpec;
+    UINT   uItemState;
+    LPARAM lItemlParam;
+} NMCUSTOMDRAW
 
 *-----------------------------------------------------------------------------*
 
@@ -199,8 +219,10 @@ CLASS TWBrowse FROM TWinControl
    DATA xTrack             PROTECTED 
    DATA xTrackOffset       PROTECTED 
    DATA xTrackColumn       PROTECTED 
-   DATA xDragColumn        PROTECTED 
-
+   DATA xDragColumn        PROTECTED INIT 0
+   DATA aDragRect          PROTECTED
+   
+   
    METHOD AddColumn()
    METHOD InsColumn()
    METHOD DelColumn()
@@ -287,7 +309,10 @@ CLASS TWBrowse FROM TWinControl
    METHOD GetItemText()
    METHOD Create() 
    METHOD CreateWnd() 
-   
+
+   METHOD WMMessage()
+   METHOD OnCustomDraw()
+   METHOD OnHeaderDrag( nProc, nwParam, nlParam )
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -648,7 +673,7 @@ METHOD RefreshAll(lNoDraw) CLASS TWBrowse
    LOCAL mask
    LOCAL fmt
    LOCAL wasHilite:=::Hilited
-
+   LOCAL nProc
    IF Empty(::handle) .OR. !IsWindow(::handle)
       RETURN(self)
    ENDIF
@@ -697,6 +722,7 @@ METHOD RefreshAll(lNoDraw) CLASS TWBrowse
          IF ::ImageList<>NIL
             Header_SetImageList(::hWndHeader,::ImageList)
          ENDIF
+
       ENDIF
 
       IF ::wantHeading .AND. IsWindow(::hWndHeader)
@@ -1137,65 +1163,150 @@ METHOD UpdateVScrollBar(lRedraw) CLASS TWBrowse
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
+METHOD WMMessage( nMsg, nwParam, nlParam)
+   IF nMsg == 999
+      ::OnEndDrag(nwParam)
+   ENDIF
+RETURN NIL
 
-METHOD WMNotify( hdr, nlParam ) CLASS TWBrowse
-   local c, a, hi
-   LOCAL nmHdr IS NMHEADER
-   
+METHOD OnCustomDraw( nlParam ) CLASS TWBrowse
+
+   LOCAL cd IS NMCUSTOMDRAW
+   cd:Pointer( nlParam )
    DO CASE
-      CASE hdr:code == HDN_BEGINTRACK
-         nmHdr:Pointer(nlParam)
-         IF !::OnBeginTrack(nmHdr)
-            RETURN(1)
-         ENDIF
-      CASE hdr:code == HDN_TRACK
-         nmHdr:Pointer(nlParam)
-         ::WMTracking(nmHdr)
+      CASE cd:dwDrawStage == CDDS_PREPAINT
+           RETURN CDRF_NOTIFYITEMDRAW   
 
-      CASE hdr:code == HDN_ENDTRACK
-         nmHdr:Pointer(nlParam)
-         IF ::OnEndTrack(nmHdr)
-            RETURN(0)
-         ENDIF
-
-      CASE hdr:code==HDN_BEGINDRAG
-         nmHdr:Pointer(nlParam)
-         IF !::OnBeginDrag(nmHdr)
-            RETURN(1)
-         ENDIF
-
-      CASE hdr:code == HDN_ENDDRAG
-         nmHdr:Pointer(nlParam, .f.)
-
-//         c:=peek(nlParam,nmHdr:sizeof())
-//         a:=Bin2A(c,{{LONG,LONG,LONG},LONG,LONG,LONG})
-         IF !::OnEndDrag(nmHdr)
-            RETURN(1)
-         ENDIF
-         
-      CASE hdr:code==HDN_GETDISPINFO
-      CASE hdr:code==HDN_ITEMCHANGING
-      CASE hdr:code==HDN_ITEMCHANGED
-         nmHdr:Pointer(nlParam)
-         ::OnItemChanged(nmHdr)
-         RETURN(1)
-
-      CASE hdr:code==HDN_ITEMCLICK
-         nmHdr:Pointer(nlParam)
-         ::GoToPos(,nmHdr:iItem+1,.T.)
-         ::OnChange()
-         ::OnHeadClick(nmHdr:iItem+1)
-
-      CASE hdr:code==HDN_ITEMDBLCLICK
-         nmHdr:Pointer(nlParam)
-         ::GoToPos(,nmHdr:iItem+1,.T.)
-         ::OnChange()
-         ::OnHeadDblClick(nmHdr:iItem+1)
-
-      CASE hdr:code==HDN_FILTERCHANGE
-
+      CASE cd:dwDrawStage == CDDS_ITEMPREPAINT
+           SetBkColor( cd:hDC, RGB(255,255,0) )
+           RETURN CDRF_NEWFONT
    ENDCASE
-return(nil)
+
+RETURN 0
+
+METHOD OnHeaderDrag( nProc, nwParam, nlParam )
+   STATIC aLast, nInit, oWnd
+   LOCAL nDif, hWnd, nPos, nLeft, nRight, xColPos, aPt, aRect, hDC, aMouse := GetCursorPos()
+   IF ::xDragColumn <> 0
+      IF ::aDragRect == NIL
+         IF aLast != NIL
+            /*
+            hDC:=GetDC(::Handle)
+            InvertRect(hDC,aLast)
+            ReleaseDC(::Handle,hDC)
+            */
+            aLast := NIL
+            nInit := NIL
+            oWnd:Destroy()
+            RETURN 0
+         ENDIF
+        ELSE
+         ScreenToClient( ::Handle, aMouse )
+         nPos := aMouse[1]
+         IF nInit == NIL
+            oWnd:=HiliteColumn():Create(Self,"BLEND")
+            oWnd:SetParent( Self )
+            oWnd:Show()
+            view oWnd:Handle
+            aLast := NIL
+            nInit := nPos
+         ENDIF
+         nDif  := nPos - nInit
+ 
+         oWnd:FLeft  := nLeft
+         oWnd:FTop   := ::HeadHeight
+         oWnd:FWidth := nRight
+         oWnd:FHeight:= ::FHeight
+         
+         oWnd:Move()
+
+/*
+         hDC   := GetDC(::Handle)
+         nLeft := ::aDragRect[1] + nDif
+         nRight:= ::aDragRect[3] + nDif
+         
+         aPt := {nLeft, nRight}
+         IF aLast != NIL
+            InvertRect(hDC,aLast)
+         ENDIF
+         aRect:={ nLeft, ::HeadHeight, nRight, ::FHeight}
+         InvertRect(hDC,aRect)
+         ReleaseDC(::Handle,hDC)
+*/
+         aLast:= ACLONE(aRect)
+      ENDIF
+   ENDIF
+   IF nProc == NIL
+      RETURN 0
+   ENDIF
+RETURN CallWindowProc( nProc, ::hWndHeader, WM_MOUSEMOVE, nwParam, nlParam ) 
+
+METHOD WMNotify( Hdr, nlParam ) CLASS TWBrowse
+   STATIC nmHdr, nProc
+   LOCAL aRect, hWnd
+   IF nmHdr == NIL
+      nmHdr IS NMHEADER
+   ENDIF
+   DO CASE
+      CASE Hdr:code == NM_CUSTOMDRAW
+           RETURN ::OnCustomDraw( nlParam )
+
+      CASE Hdr:code == HDN_BEGINTRACK
+           nmHdr:Pointer(nlParam)
+           IF !::OnBeginTrack(nmHdr)
+              RETURN(1)
+           ENDIF
+      CASE Hdr:code == HDN_TRACK
+           ::OnTracking()
+
+      CASE Hdr:code == HDN_ENDTRACK
+           IF ::OnEndTrack()
+              RETURN(0)
+           ENDIF
+
+      CASE Hdr:code==HDN_BEGINDRAG
+           nmHdr:Pointer(nlParam)
+           IF !::OnBeginDrag(nmHdr)
+              RETURN(0)
+           ENDIF
+           ::aDragRect := Header_GetItemRect( ::hWndHeader, nmHdr:iItem )
+           ::OnHeaderDrag()
+           nProc := SetProcedure( ::hWndHeader, {|hWnd,nMsg,nwParam,nlParam|::OnHeaderDrag( nProc, nwParam, nlParam )}, WM_MOUSEMOVE)
+
+      CASE Hdr:code == HDN_ENDDRAG
+           PostMessage( ::Handle, 999, nmHdr:iItem+1 )
+           ::aDragRect := NIL
+           ResetProcedure( ::hWndHeader, nProc )
+           ::OnHeaderDrag()
+      
+      CASE Hdr:code==HDN_GETDISPINFO
+      CASE Hdr:code==HDN_ITEMCHANGING
+
+      CASE Hdr:code==HDN_ITEMCHANGED
+           aRect := Header_GetItemRect( ::hWndHeader, nmHdr:iItem )
+           ::OnItemChanged(aRect)
+
+      CASE Hdr:code==HDN_ITEMCLICK
+           nmHdr:Pointer(nlParam)
+           ::GoToPos(,nmHdr:iItem+1,.T.)
+           ::OnChange()
+           ::OnHeadClick(nmHdr:iItem+1)
+           ::aDragRect := Header_GetItemRect( ::hWndHeader, nmHdr:iItem )
+           ::OnHeaderDrag()
+
+      CASE Hdr:code==HDN_ITEMDBLCLICK
+           nmHdr:Pointer(nlParam)
+           ::GoToPos(,nmHdr:iItem+1,.T.)
+           ::OnChange()
+           ::OnHeadDblClick(nmHdr:iItem+1)
+
+      CASE Hdr:code==HDN_FILTERCHANGE
+
+      OTHERWISE
+          VIEW Hdr:code
+   ENDCASE
+
+RETURN NIL
 
 //---------------------------------------------------------------------------------------------
 
@@ -1255,12 +1366,14 @@ RETURN(.F.)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnEndDrag(hdr) CLASS TWBrowse
+METHOD OnEndDrag(nItem) CLASS TWBrowse
    LOCAL lRet:=.F.
+   LOCAL aOrder, n
    IF ::lMoving
       ::lMoving:=.F.
-      IF ::xDragColumn <> hdr:pItem:iOrder+1 .AND. hdr:pItem:iOrder>=0
-         ::SetColPos(::xDragColumn,hdr:pItem:iOrder+1)
+      aOrder := Header_GetOrderArray( ::hWndHeader )
+      IF ::xDragColumn <> aOrder[nItem]+1
+         ::SetColPos(::xDragColumn,aOrder[nItem]+1)
          lRet:=.T.
       ENDIF
       ::xDragColumn:=0
@@ -1549,10 +1662,10 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnItemChanged(hdr) CLASS TWBrowse
+METHOD OnItemChanged(aRect) CLASS TWBrowse
 DO CASE
    CASE ::xTrackColumn<>0
-        ::SetColWidth( ::xTrackColumn, hdr:pItem:cxy)
+        ::SetColWidth( ::xTrackColumn, aRect[3] )
    ENDCASE
 RETURN(self)
 
@@ -2420,3 +2533,33 @@ RETURN(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 STATIC FUNCTION GetAColumn(a,i)
  RETURN whColumn():INIT( a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
+
+//------------------------------------------------------------------------------------------------
+
+CLASS HiliteColumn FROM TWinControl
+   DATA bitmap
+   METHOD Create() CONSTRUCTOR
+   METHOD WMPaint()
+ENDCLASS
+
+METHOD Create(o, cFile) CLASS HiliteColumn
+   Super:Create(o)
+   ::style       := WS_CHILD + WS_VISIBLE + WS_BORDER
+//   ::ExStyle     := WS_EX_TOPMOST + WS_EX_TRANSPARENT
+   ::bitmap      := LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+   ::WinClass    := "MyHilite"
+   ::ControlName := "MyHilite"
+   ::Msgs        := {WM_PAINT}
+   ::WndProc     := "FormProc"
+   ::Color       := NIL
+RETURN SELF
+
+METHOD WMPaint(hDC) CLASS HiliteColumn
+   LOCAL bf IS BLENDFUNCTION
+   bf:BlendOp             := AC_SRC_OVER
+   bf:BlendFlags          := 0
+   bf:SourceConstantAlpha := 172
+   bf:AlphaFormat         := 0
+   DrawBitmap( hDC, ::bitmap,,0,0,,,bf:value)
+RETURN 0
+
