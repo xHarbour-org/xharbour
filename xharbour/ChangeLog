@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.528 2002/12/15 23:48:01 lculik Exp $
+ * $Id: ChangeLog,v 1.529 2002/12/16 06:02:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-16 08:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+     * Added () around macro paramaters expansion.
 
 2002-12-15 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * config/rules.cf

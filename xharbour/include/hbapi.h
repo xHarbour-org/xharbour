@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.43 2002/10/27 14:41:36 lculik Exp $
+ * $Id: hbapi.h,v 1.44 2002/11/13 00:37:32 ronpinkas Exp $
  */
 
 /*
@@ -167,9 +167,9 @@ extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a gener
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
-#define hb_retc_buffer( szText )                   hb_retcAdopt( szText )
-#define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
-#define hb_retc_const( szText )                    hb_retcStatic( szText )
+#define hb_retc_buffer( szText )                   hb_retcAdopt( (szText) )
+#define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( (szText), (ulLen) )
+#define hb_retc_const( szText )                    hb_retcStatic( (szText) )
 
 #ifndef HB_NO_DEFAULT_API_MACROS
    #ifndef HB_API_MACROS
@@ -184,25 +184,25 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     #define hb_pcount()                          ( ( int ) ( ( ( * hb_stack.pBase )->item.asSymbol.paramcnt < 255 ) ? ( * hb_stack.pBase )->item.asSymbol.paramcnt : ( * hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
 
     #define hb_ret()                             hb_itemClear( &hb_stack.Return )
-    #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )
-    #define hb_retc( szText )                    hb_itemPutC( &hb_stack.Return, szText )
-    #define hb_retcAdopt( szText )               hb_itemPutCPtr( &hb_stack.Return, szText, strlen( szText ) )
-    #define hb_retcStatic( szText )              hb_itemPutCConst( &hb_stack.Return, szText )
-    #define hb_retclen( szText, ulLen )          hb_itemPutCL( &hb_stack.Return, szText, ulLen )
-    #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &hb_stack.Return, szText, ulLen )
-    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &hb_stack.Return, szText )
-    #define hb_retds( szDate )                   hb_itemPutDS( &hb_stack.Return, szDate )
-    #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &hb_stack.Return, lYear, lMonth, lDay )
-    #define hb_retdl( lJulian )                  hb_itemPutDL( &hb_stack.Return, lJulian )
-    #define hb_retl( iLogical )                  hb_itemPutL( &hb_stack.Return, iLogical ? TRUE : FALSE )
-    #define hb_retnd( dNumber )                  hb_itemPutND( &hb_stack.Return, dNumber )
-    #define hb_retni( iNumber )                  hb_itemPutNI( &hb_stack.Return, iNumber )
-    #define hb_retnl( lNumber )                  hb_itemPutNL( &hb_stack.Return, lNumber )
-    #define hb_retnlen( dNumber, iWidth, iDec )  hb_itemPutNLen( &hb_stack.Return, dNumber, iWidth, iDec )
-    #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, dNumber, iWidth, iDec )
-    #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, iNumber, iWidth )
-    #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth )
-    #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
+    #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, (ulLen) )
+    #define hb_retc( szText )                    hb_itemPutC( &hb_stack.Return, (szText) )
+    #define hb_retcAdopt( szText )               hb_itemPutCPtr( &hb_stack.Return, (szText), strlen( szText ) )
+    #define hb_retcStatic( szText )              hb_itemPutCConst( &hb_stack.Return, (szText) )
+    #define hb_retclen( szText, ulLen )          hb_itemPutCL( &hb_stack.Return, (szText), (ulLen) )
+    #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &hb_stack.Return, (szText), (ulLen) )
+    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &hb_stack.Return, (szText) )
+    #define hb_retds( szDate )                   hb_itemPutDS( &hb_stack.Return, (szDate) )
+    #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &hb_stack.Return, (lYear), (lMonth), (lDay) )
+    #define hb_retdl( lJulian )                  hb_itemPutDL( &hb_stack.Return, (lJulian) )
+    #define hb_retl( iLogical )                  hb_itemPutL( &hb_stack.Return, (iLogical) ? TRUE : FALSE )
+    #define hb_retnd( dNumber )                  hb_itemPutND( &hb_stack.Return, (dNumber) )
+    #define hb_retni( iNumber )                  hb_itemPutNI( &hb_stack.Return, (iNumber) )
+    #define hb_retnl( lNumber )                  hb_itemPutNL( &hb_stack.Return, (lNumber) )
+    #define hb_retnlen( dNumber, iWidth, iDec )  hb_itemPutNLen( &hb_stack.Return, (dNumber), (iWidth), (iDec) )
+    #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, (dNumber), (iWidth), (iDec) )
+    #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, (iNumber), (iWidth) )
+    #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, (lNumber), (iWidth) )
+    #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &hb_stack.Return, (voidPtr) )
 #else
     extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
