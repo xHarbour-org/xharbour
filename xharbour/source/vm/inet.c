@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.22 2003/03/18 00:39:02 jonnymind Exp $
+* $Id: inet.c,v 1.23 2003/04/13 23:55:26 jonnymind Exp $
 */
 
 /*
@@ -55,6 +55,7 @@
 #include "hbstack.h"
 #include "inet.h"
 #include <fcntl.h>
+#include <errno.h>
 
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD )
    #include <sys/time.h>
