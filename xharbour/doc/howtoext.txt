@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id$
+$Id: howtoext.txt,v 1.1 2004/02/22 16:56:40 jonnymind Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -26,7 +26,7 @@ ABSTRACT
 
 This is a short HOWTO targeted to explain the "correct" programming
 techniques and standards that have been developed lately by the xharbour
-core developers group. Theese are guidelines meant to help developers
+core developers group. These guidelines meant to help developers
 to build extensions to xharbour language, 3d party libraries or to
 contribute to the core xharbour project, both by refining older
 existing functions and add new functionalities.
@@ -37,7 +37,7 @@ you can continue reading this text even if you have never written
 an clipper extension. If you're missing details, you can consult
 the api guide (somewhere in this directory).
 
-This document is divided into fuor sections:
+This document is divided into four sections:
 
    1) Coding conventions: how to lay down C code to make other developers
       happy (to be written).
@@ -75,7 +75,7 @@ Follow those rules:
 
    3) Indent with three spaces; avoid both tabs and different spacings.
 
-   4) always use "brackts on separate lines" convention, like that:
+   4) always use "brackets on separate lines" convention, like that:
       if statement
       {
          statement
@@ -87,7 +87,7 @@ Follow those rules:
       No matter if the bracketed statement is just one line.
 
    5) write well formatted lists: parenthesis of function calls should
-      be separed by one space from the parameter list, and every element
+      be separated by one space from the parameter list, and every element
       should be separated by a comma then a space from the next. Statements
       before the parenthesis (i.e. function calls) should be immediately
       followed by open brackets. Separate operators with two spaces on
@@ -98,7 +98,7 @@ Follow those rules:
       pItem = (PHB_ITEM) hb_someFunction( param1, param2, param3 );
 
    6) use one indent for multiline statements; try to arrange on multiple
-      lines meaningfull contents. This is an example:
+      lines meaningful contents. This is an example:
 
       if( ( condition 1 || condition2 ) &&
          ( condition 3 || condition 4 ) &&
@@ -117,7 +117,7 @@ Follow those rules:
       Use // on the same line of the statement to provide
       very small reminders. Like:
 
-      /* This is the main cicle.
+      /* This is the main cycle.
          Here you will see how comments are proficiently used.
       */
       while( iCount < 100 )
@@ -138,12 +138,28 @@ Follow those rules:
          iCount ++;
       }
 
-         (*) Theese are two single line comments each near the other;
+         (*) These are two single line comments each near the other;
              it's preferable to avoid to put them in the same /* */
              group.
 
       8) Remember to put the CVS Id Command and the xharbour disclaimer
          at the head of each file you write. It's important.
+
+      9) Place new source files in correct directories. Some common 
+         folders are:
+
+         source/common - shared files by compiler, macro and run time 
+                         libraries in general
+         source/rdd    - rdd abstract (driver independent) functions
+         source/vm     - variable, function, class, memory, program flow
+                         and execution management
+         source/rtl    - runtime function library and GT
+
+      10) File names should always be lower case.
+
+      11) When new functionality is created, always create a small, self
+          contained sample in tests directory to demonstrate it.
+         
 
 Of course, no one will torture you (maybe) if you don't follow this rules,
 but you can bet that sooner or later someone will change your code to match
@@ -165,7 +181,7 @@ An xharbour extension function may be divided into parts as follows:
 
 HB_FUNC( FUNCTION_NAME )
 {
-   // 1: Parameter retrival logic
+   // 1: Parameter retrieval logic
    // 2: Parameter check logic & error signaling
    // 3: Parameter manipulation logic
    // 4: Processing logic
@@ -181,7 +197,7 @@ Let's see the various parts in detail:
 Parameter retrival logic
 ========================
 
-The first part of the function is dedicated to retreive data passed as
+The first part of the function is dedicated to retrieve data passed as
 parameters from xharbour. Xharbour supports variable length parameter functions,
 and NIL (that is missing) parameters, although your function may accept only
 fixed parameter prototypes if it prefers so.
@@ -332,7 +348,7 @@ parameters were outside the valid range.
 As szOperation, use the name of the function that caused the error.
 generally, use the capitalized function name you have in the HB_FUNC()
 macro. If the error has been detected in a service function called
-by HB_FUNC( xxx ), you may want to use the original PRG fucntion name
+by HB_FUNC( xxx ), you may want to use the original PRG function name
 or to signal specifically the uncapitalized C name of the service function
 where the error has been detected.
 
@@ -408,7 +424,7 @@ HB_FUNC( MYFUNC )
 Parameter manipulation logic
 ============================
 
-After having retreived parameters in local variables, you may want to
+After having retrieved parameters in local variables, you may want to
 extract them into C variables for easier processing, and possibly give
 some defaults if some optional parameters are missing.
 
@@ -446,7 +462,7 @@ results, from page faults to memory leaks, at best.
 There's two way to alter parameters so that the calling program receives
 the parameters changed: first method consists in having the calling program
 to pass a variable by reference with the "@" Xharbour pass-by-reference
-operator, like i.e. MyFunc( @xParam ). The called function will retreive
+operator, like i.e. MyFunc( @xParam ). The called function will retrieve
 that data  with hb_param( n, HB_IT_BYREF ); if the data is both input and
 output, that is, if the data must be used by the called function before
 being altered, the object returned by hb_param( n, HB_IT_BYREF ) must be
@@ -497,11 +513,11 @@ or even shrink them and erase each one element; the calling program
 will have the object changed. You can put new string values into string
 parameters, and you can alter hash values; what you can't do is touch
 the NATURE of the passed-by-value deep parameter. If the parameter
-is NOT retreived with the HB_IT_BYREF flag, at the end of the function
+is NOT retrieved with the HB_IT_BYREF flag, at the end of the function
 the parameters MUST retain the type they had, and their value must be
 valid. Trying to change the type of the parameter will result in very
 bad things; the parameter as WHOLE, its shell and its real value, may be
-changed only if it was passed and retreived by reference.
+changed only if it was passed and retrieved by reference.
 
 This applies also if the parameter is not a deep type; you can't put
 an array in a parameter that had been a number, or change that number,
@@ -541,8 +557,8 @@ extended function body.
 As a general rule, the processing logic should be kept inside the function
 only if it takes greatly benefit from the variable and untyped parameter
 scheme of the xharbour function call convention. In all the other cases,
-if the XHarbour function parameters can be easly translated into C function
-parameters, it's advisable to have all non-trival processing logic into
+if the XHarbour function parameters can be easily translated into C function
+parameters, it's advisable to have all non-trivial processing logic into
 separate pure C functions.
 
 This helps to create whole interfaces levels that are relatively insolated;
@@ -571,7 +587,7 @@ be immediately discarded.
 Functions, and even procedures, cannot "not-return" a value; the return
 value is always defaulted to NIL before calling the extended function.
 
-To return values, the hb_retxxx() functions are provied in hbapi.h; if
+To return values, the hb_retxxx() functions are provided in hbapi.h; if
 you create elaborate return values, as whole arrays, or you evolve
 different results that are stored in an unique PHB_ITEM object, you
 may use hb_itemReturn and hb_itemReturnCopy. We'll speak about that
@@ -590,8 +606,8 @@ and deep returns.
 
 Flat returns functions are those one returning numeric, date or logical data:
 hb_retn*(), hb_retd*() and hb_retl(). They just return an xharbour representation
-of numbers, dates or logical entitites into the VM, and translates more or less
-into a simple data copy inside the HB_VM_STACK.Return conveniency item.
+of numbers, dates or logical entities into the VM, and translates more or less
+into a simple data copy inside the HB_VM_STACK.Return convenience item.
 
 Supported returns are a set of hb_ret functions using their parameter to create
 a new item, that is then referenced by the virtual machin return. In this
@@ -636,7 +652,7 @@ NOT be added (i.e. the string is made of all-binary data taken from a file) or
 if the termination character is already present.
 
 The static version of hb_retcAdopt function family acts as their non-static
-omologue, but they mark the string object as "static"; this means that Xharbour
+homologue, but they mark the string object as "static"; this means that Xharbour
 virtual machine will never try to free the object, even if the string is item
 is discarded. It's supposed that the calling program wishes this specific memory
 location to remain valid for all the program lifetime.
@@ -657,12 +673,12 @@ We'll see this function in a separate section.
 Memory management in xharbour is simple; but it can get tricky if not well understood.
 So we'll introduce some general concept before entering into the details.
 
-Xharbour api provides two kind of dynamic memrory abstractions: collectable and
+Xharbour api provides two kind of dynamic memory abstractions: collectable and
 unmanaged. Collectable memory is employed for items, and for the vast majority of
 item values. Unmanaged memory is at disposal of extensions to just have dynamic
 heap memory allocation handy; it's also used by some internal functions.
 
-Xharbour api works with two levels of item allocation hierarcy: flat items and
+Xharbour api works with two levels of item allocation hierarchy: flat items and
 deep items. Flat items just have their structure and the data held inside that;
 deep items have this structure and a "lone" pointer, referencing the "real"
 object, called "base" object. You can consider xharbour items as shells; some
@@ -675,13 +691,13 @@ contains a "value", that can be accessed with api functions or querying directly
 HB_ITEM structure: hbItem.item.asXXXX.value.
 
 All the "shells", all the items that are created and managed by the virtual machine
-are allocated using collectable memory; so are all deep contets, that is, all
+are allocated using collectable memory; so are all deep contents, that is, all
 the values.
 
-Strings are an hybrid having both some data in the basic item strucutre and a
+Strings are an hybrid having both some data in the basic item structure and a
 pointer to a value that is allocated using unmanaged memory. By carefully recording
-string useage, in a process called reference counting, is possible to automatically
-get rid of unused string, but this "special" case for string is unefficient and
+string usage, in a process called reference counting, is possible to automatically
+get rid of unused string, but this "special" case for string is inefficient and
 may be changed in the future.
 
 
@@ -696,10 +712,10 @@ in memory allocation will cause an unrecoverable error and will terminate immedi
 the applicatio.
 
 void hb_xfree( void *data ) frees the memory allocated with hb_xgrab(). If HB_FM_STATISTICS are enabled, passing data that has not been allocated with hb_xgrab
-will cause a critical error and close the applciation
+will cause a critical error and close the application
 
 void *hb_xrealloc( void *data, ULONG ulBytes ) resizes the allocated memory;
-if sucessful, the new memory location where the data is relocated is returned, on
+if successful, the new memory location where the data is relocated is returned, on
 failure, the function causes a critical error and the application is terminated.
 
 XHarbour virtual machine records the usage of xgrabbed memory, and issues a warning
@@ -733,7 +749,7 @@ pointers, arrays and hashes, is automatically excluded from garbage collecting, 
 long as there is some item referencing them.
 
 Strings have a "collectable" shell, but their value is currently allocated using
-uncollectable memory, and their shell is partally holding some meaningful data, as
+uncollectible memory, and their shell is partially holding some meaningful data, as
 the string length.
 
 There are mainly two function set that deal with collectable memory: hb_itemNew()
@@ -743,7 +759,7 @@ values, both those values that are used in standard deep item types, as array an
 hashes, or in custom item pointers.
 
 About hb_itemNew() and hb_itemRelease(), they are mainly used by the VM itself: they
-are used in creating stack items, memvars, globals and static variablse, and there
+are used in creating stack items, memvars, globals and static variables, and there
 is very little reason for the extension library to use them; also, hb_gcAlloc() is
 primarily meant for system objects, and is useable just by extensions willing to
 provide user-defined opaque objects.
@@ -752,16 +768,16 @@ provide user-defined opaque objects.
 Using items in extensions
 =========================
 
-The most interesting useage of the itemapi for the purposes of the xharbour extension
-writer, is the ability to create complex objets, work on them and eventually return
+The most interesting usage of the item api for the purposes of the xharbour extension
+writer, is the ability to create complex objects, work on them and eventually return
 them or a copy of them. In example, having at disposal one of the best variable
-array functions around, it's pleasureable to be able to create an array from C
+array functions around, it's pleasurable to be able to create an array from C
 extension routines to store i.e. a set of log entries coming from the xharbour code,
 and eventually provide access to those entries to the xharbour functions.
 
-Also, a set of values retreived in the system, as the system time, may be stored in
+Also, a set of values retrieved in the system, as the system time, may be stored in
 an xharbour array inside an extension function, and then sent to the VM or stored
-locally for later useage.
+locally for later usage.
 
 With a minimum care, this is quite easy.
 
@@ -770,9 +786,9 @@ How to create an item?
 Usually, you'll want to have a small quantity of memory allocated in static data or
 in the stack, that can be used as an item shell. Before changing the item content,
 it's necessary to transform it in a NIL object; random initialization value may
-cause unpredictable results, as all api fucntion that can modify an item will
+cause unpredictable results, as all api function that can modify an item will
 try to clean the previous existing data before. If we have a random initial item type,
-the API will be fooled. So, before using any obhect that has been statically allocated
+the API will be fooled. So, before using any object that has been statically allocated
 use:
 
    HB_ITEM hbItem;
@@ -782,7 +798,7 @@ Now we are ready to transform this item in a flat one, like i.e. a number:
    hb_itemPutND( &hbItem, 0.5 );
    printf( "%f\n", hb_itemGetND( &hbItem ) );
 
-When the function returns, the data is destroyed, but static and globalvariables
+When the function returns, the data is destroyed, but static and global variables
 holding flat items can be created the same way; at program termination they will be
 removed.
 
@@ -800,7 +816,7 @@ heap, and store them somewhere:
    hb_xfree( pItem );
 
 If the object has a longer lifespan, it can be stored in a global variable acting as
-a pointer, and freed on unser request or at program termination.
+a pointer, and freed on user request or at program termination.
 
 Things are a little more complicated for complex objects. There is practically no
 difference if the lifespan of the object shell is short: when the shell is gone, the
@@ -810,7 +826,7 @@ above, the GC will not find the item shell in the collectable memory pool, and s
 it will recognize the value as free, and destroy it anyway!
 
 So, there are two alternatives. If we need the item only inside a function, and we
-can loose it before the VM retunrns in control, there's no problem:
+can loose it before the VM returns in control, there's no problem:
 
    HB_ITEM hbItem;
    hbItem.type = HB_IT_NIL;
@@ -882,7 +898,7 @@ hb_itemRelease does two things: deletes the shell and signals the GC that the va
 may be susceptible of collection.
 
 IMPORTANT: all the items must be released before hb_vmQuit() is called, that is,
-beofre the virtual machine terminates the execution, or the last complete
+before the virtual machine terminates the execution, or the last complete
 collection won't be able to reclaim the objects, and a warning will be issued.
 
 
@@ -891,15 +907,15 @@ Returning and copiyng values
 
 Having the ability to save virtual machine items OUTSIDE the virtual machine may
 be interesting, but is just half of what we can do. Most interesting here is to
-have the ability to send this object we have synthetized to the virtual machine,
+have the ability to send this object we have synthesized to the virtual machine,
 or to save objects coming from the virtual machine for later usage.
 
 hb_itemCopy() stores an item and its value in a locally provided item; hb_itemReturn()
 moves the value from our locally provided shell to the VM return item.
-hb_itemReturnCopy() does the same, but our local shell is left unhaltered.
+hb_itemReturnCopy() does the same, but our local shell is left unaltered.
 
 Any of this function will act on the shell, but will left untouched the value. If
-a flat object is copyied with hb_itemCopy, a change on the original flat shell would
+a flat object is copied with hb_itemCopy, a change on the original flat shell would
 not be reflected in the copy, but if a deep object is copied, both the separate shells
 share the same deep value.
 
@@ -943,7 +959,7 @@ HB_FUNC( RETURNINGARRAY )
 Now we suppose that the calling program passes an item to the extended library;
 it is necessary to store it somewhere; the extended library example also provides the
 calling program with a reference to it, or with a brand new item copied
-from the original, theese are the steps to take:
+from the original, these are the steps to take:
 
    PHB_ITEM pArray == NULL;
 
@@ -1006,7 +1022,7 @@ from the original, theese are the steps to take:
 
 To move library managed objects inside VM objects, we need to have parameters passed by
 reference, and use hb_itemCopy as we would use hb_itemReturnCopy(); the equivalent
-for hb_itemReturn is hb_itemForwardValue, that moves the shell contesnts in the target
+for hb_itemReturn is hb_itemForwardValue, that moves the shell contents in the target
 object and empties the original shell.
 
    HB_FUNC( PUT_ITEM_IN_PARAMETER )
@@ -1046,13 +1062,13 @@ statically allocated hb_item, it spares the call to hb_itemRelease.
                           Writing your own opaque objects
                ======================================================
 
-Probably, the most intriguing featrue of collectable memory management is the ability
-to be collected automagically when there's no more need of it. The hb_gcAlloc()
+Probably, the most intriguing feature of collectable memory management is the ability
+to be collected automatically when there's no more need of it. The hb_gcAlloc()
 function allows to allocate memory and to define a function that will be called
 when that memory will be collected. This allows the user to cleanly free deep memory
 that his own data structure may need, close handles, flush files and the like,
 thus obviating the need for the final Xharbour programmer to explicitly call close or
-shutdown function. Just use your extension to create new object types; when theyre not
+shutdown function. Just use your extension to create new object types; when they’re not
 needed anymore, the GC will call your function, to take care of cleanups.
 
 hb_retptr() function allows to return a value created with hb_gcAlloc(), so that
@@ -1116,7 +1132,7 @@ HB_FUNC( MYTYPEGETSTR )
 }
 
 
-The Xharbour program will beable to call
+The Xharbour program will be able to call
 
    ....
    LOCAL pMyData
@@ -1126,9 +1142,9 @@ The Xharbour program will beable to call
    ? MyTypeGetStr( pMyData )   // Hello
    ....
 
-MyFinalization is called wen pMyData is no longer needed and GC detects this fact.
+MyFinalization is called when pMyData is no longer needed and GC detects this fact.
 
-It's also adviseable to put a unique random ULONG signature field at the beginning of the
+It's also advisable to put a unique random ULONG signature field at the beginning of the
 personalized type structure; in this way, the extension will be able to check if the
 HB_IT_POINTER passed as the parameter contains a value of the desired type, or if the
 function has been called with an HB_IT_POINTER object containing something else.
