@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.3 2005/02/20 22:14:03 andijahja Exp $
+# $Id: hrbdll.gc,v 1.4 2005/03/01 21:23:17 andijahja Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -29,10 +29,35 @@ RDD_DIR      = $(HARBOUR_DIR)/source/rdd
 DEBUG_DIR    = $(HARBOUR_DIR)/source/debug
 CT_DIR       = $(HARBOUR_DIR)/source/ct
 TIP_DIR      = $(HARBOUR_DIR)/source/tip
+HBTEST_DIR   = $(HARBOUR_DIR)/utils/hbtest
+HBRUN_DIR    = $(HARBOUR_DIR)/utils/hbrun
+HBDOC_DIR    = $(HARBOUR_DIR)/utils/hbdoc
+HBMAKE_DIR   = $(HARBOUR_DIR)/utils/hbmake
+HBPP_DIR     = $(HARBOUR_DIR)/utils/hbpp
+XBSCRIPT_DIR = $(HARBOUR_DIR)/utils/xbscript
 
-HARBOUR_DLL  = $(LIB_DIR)/harbour.dll
+HARBOUR_DLL  = $(BIN_DIR)/harbour.dll
 HRBDLL_LIB   = $(LIB_DIR)/libharbour.a
 HRBDLL_DEF   = $(LIB_DIR)/harbour.def
+HBTEST_EXE   = $(BIN_DIR)/hbtestdll.exe
+HBRUN_EXE    = $(BIN_DIR)/hbrundll.exe
+HBDOC_EXE    = $(BIN_DIR)/hbdocdll.exe
+HBMAKE_EXE   = $(BIN_DIR)/hbmakedll.exe
+XBSCRIPT_EXE = $(BIN_DIR)/xbscriptdll.exe
+
+MINGW_LIBRARY = \
+   -L$(MINGWDIR)/lib -L$(LIB_DIR) \
+   -lharbour \
+   -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 \
+   -lole32 -luuid -loleaut32
+
+ALL: \
+   $(HARBOUR_DLL) \
+   $(HBDOC_EXE) \
+   $(HBTEST_EXE) \
+   $(HBMAKE_EXE) \
+   $(HBRUN_EXE) \
+   $(XBSCRIPT_EXE)
 
 DLL_OBJECTS = \
    $(OBJ_DIR)/abs.o \
@@ -267,7 +292,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/itemapi.o \
    $(OBJ_DIR)/fastitem.o \
    $(OBJ_DIR)/macro.o \
-   $(OBJ_DIR)/maindll.o \
+   $(OBJ_DIR)/maindllh.o \
    $(OBJ_DIR)/memvars.o \
    $(OBJ_DIR)/memvclip.o \
    $(OBJ_DIR)/pcount.o \
@@ -1456,7 +1481,7 @@ $(OBJ_DIR)/fastitem.o : $(VM_DIR)/fastitem.c
 $(OBJ_DIR)/macro.o : $(VM_DIR)/macro.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/maindll.o : $(VM_DIR)/maindll.c
+$(OBJ_DIR)/maindllh.o : $(VM_DIR)/maindllh.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/memvars.o : $(VM_DIR)/memvars.c
@@ -2426,3 +2451,342 @@ $(OBJ_DIR)/url.c : $(TIP_DIR)/url.prg
 $(OBJ_DIR)/url.o : $(OBJ_DIR)/url.c
 	$(CC_CMD)
 
+HBTEST_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/hbtest.o \
+   $(OBJ_DIR)/rt_hvm.o \
+   $(OBJ_DIR)/rt_hvma.o \
+   $(OBJ_DIR)/rt_math.o \
+   $(OBJ_DIR)/rt_date.o \
+   $(OBJ_DIR)/rt_str.o \
+   $(OBJ_DIR)/rt_stra.o \
+   $(OBJ_DIR)/rt_trans.o \
+   $(OBJ_DIR)/rt_array.o \
+   $(OBJ_DIR)/rt_file.o \
+   $(OBJ_DIR)/rt_misc.o \
+   $(OBJ_DIR)/rt_ccall.o
+
+$(HBTEST_EXE) : $(HBTEST_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(HBTEST_EXE) $(HBTEST_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY)
+
+$(OBJ_DIR)/hbtest.c : $(HBTEST_DIR)/hbtest.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/hbtest.o : $(OBJ_DIR)/hbtest.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_hvm.c : $(HBTEST_DIR)/rt_hvm.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_hvm.o : $(OBJ_DIR)/rt_hvm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_hvma.c : $(HBTEST_DIR)/rt_hvma.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_hvma.o : $(OBJ_DIR)/rt_hvma.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_math.c : $(HBTEST_DIR)/rt_math.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_math.o : $(OBJ_DIR)/rt_math.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_date.c : $(HBTEST_DIR)/rt_date.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_date.o : $(OBJ_DIR)/rt_date.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_str.c : $(HBTEST_DIR)/rt_str.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_str.o : $(OBJ_DIR)/rt_str.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_stra.c : $(HBTEST_DIR)/rt_stra.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_stra.o : $(OBJ_DIR)/rt_stra.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_trans.c : $(HBTEST_DIR)/rt_trans.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_trans.o : $(OBJ_DIR)/rt_trans.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_array.c : $(HBTEST_DIR)/rt_array.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_array.o : $(OBJ_DIR)/rt_array.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_file.c : $(HBTEST_DIR)/rt_file.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_file.o : $(OBJ_DIR)/rt_file.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_misc.c : $(HBTEST_DIR)/rt_misc.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_misc.o : $(OBJ_DIR)/rt_misc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rt_ccall.c : $(HBTEST_DIR)/rt_ccall.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rt_ccall.o : $(OBJ_DIR)/rt_ccall.c
+	$(CC) $(CFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -o $@ $^
+
+#-------------------------------------------------------------------------------
+# hbrun.exe
+#-------------------------------------------------------------------------------
+
+HBRUN_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/hbrun.o \
+   $(OBJ_DIR)/external.o
+
+$(HBRUN_EXE) : $(HBRUN_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(HBRUN_EXE) $(HBRUN_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY)
+
+$(OBJ_DIR)/hbrun.c : $(HBRUN_DIR)/hbrun.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/hbrun.o : $(OBJ_DIR)/hbrun.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/external.c : $(HBRUN_DIR)/external.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/external.o : $(OBJ_DIR)/external.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# hbdoc.exe
+#-------------------------------------------------------------------------------
+
+HBDOC_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/hbdoc.o \
+   $(OBJ_DIR)/genasc.o \
+   $(OBJ_DIR)/teeasc.o \
+   $(OBJ_DIR)/genhpc.o \
+   $(OBJ_DIR)/genhtm.o \
+   $(OBJ_DIR)/genchm.o \
+   $(OBJ_DIR)/genng.o \
+   $(OBJ_DIR)/genos2.o \
+   $(OBJ_DIR)/genrtf.o \
+   $(OBJ_DIR)/gentrf.o \
+   $(OBJ_DIR)/html.o \
+   $(OBJ_DIR)/ng.o \
+   $(OBJ_DIR)/os2.o \
+   $(OBJ_DIR)/rtf.o \
+   $(OBJ_DIR)/troff.o \
+   $(OBJ_DIR)/fclass1.o \
+   $(OBJ_DIR)/ffile1.o \
+   $(OBJ_DIR)/ft_funcs.o
+
+$(HBDOC_EXE) : $(HBDOC_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(HBDOC_EXE) $(HBDOC_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY)
+
+$(OBJ_DIR)/hbdoc.o : $(OBJ_DIR)/hbdoc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbdoc.c : $(HBDOC_DIR)/hbdoc.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genasc.o : $(OBJ_DIR)/genasc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genasc.c : $(HBDOC_DIR)/genasc.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/teeasc.o : $(OBJ_DIR)/teeasc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/teeasc.c : $(HBDOC_DIR)/teeasc.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genhpc.o : $(OBJ_DIR)/genhpc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genhpc.c : $(HBDOC_DIR)/genhpc.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genhtm.o : $(OBJ_DIR)/genhtm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genhtm.c : $(HBDOC_DIR)/genhtm.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genchm.o : $(OBJ_DIR)/genchm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genchm.c : $(HBDOC_DIR)/genchm.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genng.o : $(OBJ_DIR)/genng.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genng.c : $(HBDOC_DIR)/genng.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genos2.o : $(OBJ_DIR)/genos2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genos2.c : $(HBDOC_DIR)/genos2.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/genrtf.o : $(OBJ_DIR)/genrtf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genrtf.c : $(HBDOC_DIR)/genrtf.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/gentrf.o : $(OBJ_DIR)/gentrf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/gentrf.c : $(HBDOC_DIR)/gentrf.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/html.o : $(OBJ_DIR)/html.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/html.c : $(HBDOC_DIR)/html.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/ng.o : $(OBJ_DIR)/ng.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ng.c : $(HBDOC_DIR)/ng.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/os2.o : $(OBJ_DIR)/os2.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/os2.c : $(HBDOC_DIR)/os2.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/rtf.o : $(OBJ_DIR)/rtf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/rtf.c : $(HBDOC_DIR)/rtf.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/troff.o : $(OBJ_DIR)/troff.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/troff.c : $(HBDOC_DIR)/troff.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/fclass1.o : $(OBJ_DIR)/fclass1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/fclass1.c : $(HBDOC_DIR)/fclass1.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/ffile1.o : $(OBJ_DIR)/ffile1.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ffile1.c : $(HBDOC_DIR)/ffile1.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/ft_funcs.o : $(OBJ_DIR)/ft_funcs.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/ft_funcs.c : $(HBDOC_DIR)/ft_funcs.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/mainwin.o : $(VM_DIR)/mainwin.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# hbmake.exe
+#-------------------------------------------------------------------------------
+
+HBMAKE_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/hbmake.o \
+   $(OBJ_DIR)/tmake.o \
+   $(OBJ_DIR)/hbmutils.o \
+   $(OBJ_DIR)/checks.o \
+   $(OBJ_DIR)/pickarry.o \
+   $(OBJ_DIR)/pickfile.o \
+   $(OBJ_DIR)/prb_stak.o \
+   $(OBJ_DIR)/radios.o \
+   $(OBJ_DIR)/hbmlang.o
+
+$(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(HBMAKE_EXE) $(OBJ_DIR)/fclass1.o $(OBJ_DIR)/ffile1.o $(OBJ_DIR)/ft_funcs.o $(HBMAKE_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY)
+
+$(OBJ_DIR)/hbmake.o : $(OBJ_DIR)/hbmake.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbmake.c : $(HBMAKE_DIR)/hbmake.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/tmake.o : $(OBJ_DIR)/tmake.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/tmake.c : $(HBMAKE_DIR)/tmake.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/hbmutils.o : $(OBJ_DIR)/hbmutils.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbmutils.c : $(HBMAKE_DIR)/hbmutils.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/checks.o : $(OBJ_DIR)/checks.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/checks.c : $(HBMAKE_DIR)/checks.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/pickarry.o : $(OBJ_DIR)/pickarry.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/pickarry.c : $(HBMAKE_DIR)/pickarry.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/pickfile.o : $(OBJ_DIR)/pickfile.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/pickfile.c : $(HBMAKE_DIR)/pickfile.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/prb_stak.o : $(OBJ_DIR)/prb_stak.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/prb_stak.c : $(HBMAKE_DIR)/prb_stak.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/radios.o : $(OBJ_DIR)/radios.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/radios.c : $(HBMAKE_DIR)/radios.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/hbmlang.o : $(HBMAKE_DIR)/hbmlang.c
+	$(CC) $(CFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -o $@ $^
+
+#-------------------------------------------------------------------------------
+# xbscript.exe
+#-------------------------------------------------------------------------------
+
+XBSCRIPT_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/xbscript.o
+
+$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(XBSCRIPT_EXE) $(XBSCRIPT_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY)
+
+$(OBJ_DIR)/xbscript.c : $(XBSCRIPT_DIR)/xbscript.prg
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(XBSCRIPT_DIR) -o$@ $^
+
+$(OBJ_DIR)/xbscript.o : $(OBJ_DIR)/xbscript.c
+	$(CC) $(CFLAGS) -I$(XBSCRIPT_DIR) -o $@ $^

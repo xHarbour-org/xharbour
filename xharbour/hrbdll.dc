@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.2 2005/02/22 04:35:32 paultucker Exp $
+# $Id: hrbdll.dc,v 1.1 2005/02/26 02:11:24 andijahja Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -23,15 +23,22 @@ DMLIB        = $(DMCMAIN)\BIN\LIB.EXE
 DMLIB_DIR    = $(DMCMAIN)\LIB
 INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
 HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
+MAINFLAGS    = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
 CFLAGS       = -D"__EXPORT__" -Jm -cpp -mn -D"_MSC_VER" -I"$(INCLUDE_DIR)" -I"$(DMCMAIN)\INCLUDE" -I"$(DMCMAIN)\INCLUDE\WIN32" -I"$(DMCMAIN)\INCLUDE\SYS" -c
 CFLAGS       = -6 -WD -o $(CFLAGS) -D"HB_OS_WIN_32" -D"__WIN32__" $(USR_FLAGS)
 
 HARBOUR_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD      = $(CC) $(CFLAGS) -o$@ $**
 
-HARBOUR_DLL = $(LIB_DIR)\harbour.dll
+HARBOUR_DLL = $(BIN_DIR)\harbour.dll
 HRBDLL_LIB  = $(LIB_DIR)\harbour.lib
 HRBDLL_DEF  = $(LIB_DIR)\harbour.def
+
+HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
+HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
+HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
+HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
+XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 
 DMC_LIBRARY = \
    snn.lib + \
@@ -50,6 +57,11 @@ DMC_LIBRARY = \
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßß
 
+XBSCRIPT_DIR = $(XHARBOUR_ROOT)\utils\xbscript
+HBRUN_DIR    = $(XHARBOUR_ROOT)\utils\hbrun
+HBDOC_DIR    = $(XHARBOUR_ROOT)\utils\hbdoc
+HBMAKE_DIR   = $(XHARBOUR_ROOT)\utils\hbmake
+HBTEST_DIR   = $(XHARBOUR_ROOT)\utils\hbtest
 DEBUG_DIR    = $(XHARBOUR_ROOT)\source\debug
 HBTIP_DIR    = $(XHARBOUR_ROOT)\source\tip
 LIBMISC_DIR  = $(XHARBOUR_ROOT)\contrib\libmisc
@@ -63,6 +75,69 @@ VM_DIR       = $(XHARBOUR_ROOT)\source\vm
 RTL_DIR      = $(XHARBOUR_ROOT)\source\rtl
 LANG_DIR     = $(XHARBOUR_ROOT)\source\lang
 RDD_DIR      = $(XHARBOUR_ROOT)\source\rdd
+
+ALL: $(HARBOUR_DLL) \
+     $(HBTESTDLL_EXE) \
+     $(HBDOCDLL_EXE) \
+     $(HBMAKEDLL_EXE) \
+     $(HBRUNDLL_EXE) \
+     $(XBSCRIPTDLL_EXE)
+
+XBSCRIPTDLL_EXE_OBJS = \
+   $(OBJ_DIR)\xbscript.obj
+
+HBRUNDLL_EXE_OBJS = \
+   $(OBJ_DIR)\hbrun.obj
+
+HBDOCDLL_EXE_OBJS = \
+   $(OBJ_DIR)\hbdoc.obj \
+   $(OBJ_DIR)\genasc.obj \
+   $(OBJ_DIR)\teeasc.obj \
+   $(OBJ_DIR)\genhpc.obj \
+   $(OBJ_DIR)\genhtm.obj \
+   $(OBJ_DIR)\genchm.obj \
+   $(OBJ_DIR)\genng.obj \
+   $(OBJ_DIR)\genos2.obj \
+   $(OBJ_DIR)\genrtf.obj \
+   $(OBJ_DIR)\gentrf.obj \
+   $(OBJ_DIR)\html.obj \
+   $(OBJ_DIR)\ng.obj \
+   $(OBJ_DIR)\os2.obj \
+   $(OBJ_DIR)\rtf.obj \
+   $(OBJ_DIR)\troff.obj \
+   $(OBJ_DIR)\fclass1.obj \
+   $(OBJ_DIR)\ffile1.obj \
+   $(OBJ_DIR)\ft_funcs.obj
+
+HBMAKEDLL_EXE_OBJS = \
+   $(OBJ_DIR)\mainstd.obj \
+   $(OBJ_DIR)\hbmake.obj \
+   $(OBJ_DIR)\tmake.obj \
+   $(OBJ_DIR)\hbmutils.obj \
+   $(OBJ_DIR)\checks.obj \
+   $(OBJ_DIR)\pickarry.obj \
+   $(OBJ_DIR)\pickfile.obj \
+   $(OBJ_DIR)\prb_stak.obj \
+   $(OBJ_DIR)\radios.obj \
+   $(OBJ_DIR)\fclass1.obj \
+   $(OBJ_DIR)\ffile1.obj \
+   $(OBJ_DIR)\ft_funcs.obj \
+   $(OBJ_DIR)\hbmlang.obj
+
+HBTESTDLL_EXE_OBJS = \
+   $(OBJ_DIR)\mainstd.obj \
+   $(OBJ_DIR)\hbtest.obj \
+   $(OBJ_DIR)\rt_hvm.obj \
+   $(OBJ_DIR)\rt_hvma.obj \
+   $(OBJ_DIR)\rt_math.obj \
+   $(OBJ_DIR)\rt_date.obj \
+   $(OBJ_DIR)\rt_str.obj \
+   $(OBJ_DIR)\rt_stra.obj \
+   $(OBJ_DIR)\rt_trans.obj \
+   $(OBJ_DIR)\rt_array.obj \
+   $(OBJ_DIR)\rt_file.obj \
+   $(OBJ_DIR)\rt_misc.obj \
+   $(OBJ_DIR)\rt_ccall.obj
 
 HRBDLL_OBJS = \
    $(OBJ_DIR)\abs.obj \
@@ -2927,3 +3002,384 @@ $(OBJ_DIR)/dbgaltd.c : $(DEBUG_DIR)/dbgaltd.prg
 
 $(OBJ_DIR)/dbgaltd.o : $(OBJ_DIR)/dbgaltd.c
 	$(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ HBTESTDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS) $(HRBDLL_LIB)
+   $(ECHO) $(OBJ_DIR)\mainstd.obj + > make.tmp
+   $(ECHO) $(OBJ_DIR)\hbtest.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_hvm.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_hvma.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_math.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_date.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_str.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_stra.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_trans.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_array.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_file.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_misc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_ccall.obj,>> make.tmp
+   $(ECHO) $(HBTESTDLL_EXE),, >> make.tmp
+   $(ECHO) $(HRBDLL_LIB) + >> make.tmp
+   $(ECHO) $(DMC_LIBRARY),, >> make.tmp
+   $(DMLINK) @make.tmp
+
+$(OBJ_DIR)\hbtest.c : $(HBTEST_DIR)\hbtest.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbtest.obj : $(OBJ_DIR)\hbtest.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_hvm.c : $(HBTEST_DIR)\rt_hvm.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_hvm.obj : $(OBJ_DIR)\rt_hvm.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_hvma.c : $(HBTEST_DIR)\rt_hvma.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_hvma.obj : $(OBJ_DIR)\rt_hvma.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_math.c : $(HBTEST_DIR)\rt_math.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_math.obj : $(OBJ_DIR)\rt_math.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_date.c : $(HBTEST_DIR)\rt_date.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_date.obj : $(OBJ_DIR)\rt_date.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_str.c : $(HBTEST_DIR)\rt_str.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_str.obj : $(OBJ_DIR)\rt_str.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_stra.c : $(HBTEST_DIR)\rt_stra.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_stra.obj : $(OBJ_DIR)\rt_stra.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_trans.c : $(HBTEST_DIR)\rt_trans.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_trans.obj : $(OBJ_DIR)\rt_trans.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_array.c : $(HBTEST_DIR)\rt_array.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_array.obj : $(OBJ_DIR)\rt_array.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_file.c : $(HBTEST_DIR)\rt_file.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_file.obj : $(OBJ_DIR)\rt_file.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_misc.c : $(HBTEST_DIR)\rt_misc.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_misc.obj : $(OBJ_DIR)\rt_misc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rt_ccall.c : $(HBTEST_DIR)\rt_ccall.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
+   $(CC) $(CFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**
+
+$(OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ HBMAKE.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS) $(HRBDLL_LIB)
+   $(ECHO) $(OBJ_DIR)\mainstd.obj + > make.tmp
+   $(ECHO) $(OBJ_DIR)\hbmake.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\tmake.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbmutils.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\radios.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\checks.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fclass1.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ffile1.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ft_funcs.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pickarry.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pickfile.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\prb_stak.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbmlang.obj, >> make.tmp
+   $(ECHO) $(HBMAKEDLL_EXE),, >> make.tmp
+   $(ECHO) $(HRBDLL_LIB) + >> make.tmp
+   $(ECHO) $(DMC_LIBRARY),, >> make.tmp
+   $(DMLINK) @make.tmp
+
+$(OBJ_DIR)\hbmake.c : $(HBMAKE_DIR)\hbmake.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbmake.obj : $(OBJ_DIR)\hbmake.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\tmake.c : $(HBMAKE_DIR)\tmake.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\tmake.obj : $(OBJ_DIR)\tmake.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbmutils.c : $(HBMAKE_DIR)\hbmutils.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\hbmutils.obj : $(OBJ_DIR)\hbmutils.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\radios.c : $(HBMAKE_DIR)\radios.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\radios.obj : $(OBJ_DIR)\radios.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\checks.c : $(HBMAKE_DIR)\checks.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\checks.obj : $(OBJ_DIR)\checks.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pickarry.c : $(HBMAKE_DIR)\pickarry.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\pickarry.obj : $(OBJ_DIR)\pickarry.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pickfile.c : $(HBMAKE_DIR)\pickfile.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\pickfile.obj : $(OBJ_DIR)\pickfile.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\prb_stak.c : $(HBMAKE_DIR)\prb_stak.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
+   $(CC) $(CFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**
+
+$(OBJ_DIR)\fclass1.c : $(HBDOC_DIR)\fclass1.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\fclass1.obj : $(OBJ_DIR)\fclass1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ffile1.c : $(HBDOC_DIR)\ffile1.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ffile1.obj : $(OBJ_DIR)\ffile1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ft_funcs.c : $(HBDOC_DIR)\ft_funcs.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ft_funcs.obj : $(OBJ_DIR)\ft_funcs.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
+   $(CC_CMD)
+
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ HBDOCDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS) $(HRBDLL_LIB)
+   $(ECHO) $(OBJ_DIR)\mainstd.obj + > make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdoc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genasc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\teeasc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genhpc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genhtm.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genchm.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genng.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genos2.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genrtf.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gentrf.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\html.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ng.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\os2.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rtf.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\troff.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\fclass1.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ffile1.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ft_funcs.obj, >> make.tmp
+   $(ECHO) $(HBDOCDLL_EXE),, >> make.tmp
+   $(ECHO) $(HRBDLL_LIB) + >> make.tmp
+   $(ECHO) $(DMC_LIBRARY),, >> make.tmp
+   $(DMLINK) @make.tmp
+
+$(OBJ_DIR)\hbdoc.c : $(HBDOC_DIR)\hbdoc.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbdoc.obj : $(OBJ_DIR)\hbdoc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genasc.c : $(HBDOC_DIR)\genasc.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genasc.obj : $(OBJ_DIR)\genasc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\teeasc.c : $(HBDOC_DIR)\teeasc.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\teeasc.obj : $(OBJ_DIR)\teeasc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genhpc.c : $(HBDOC_DIR)\genhpc.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genhpc.obj : $(OBJ_DIR)\genhpc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genhtm.c : $(HBDOC_DIR)\genhtm.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genhtm.obj : $(OBJ_DIR)\genhtm.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genchm.c : $(HBDOC_DIR)\genchm.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genchm.obj : $(OBJ_DIR)\genchm.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genng.c : $(HBDOC_DIR)\genng.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genng.obj : $(OBJ_DIR)\genng.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genos2.c : $(HBDOC_DIR)\genos2.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genos2.obj : $(OBJ_DIR)\genos2.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genrtf.c : $(HBDOC_DIR)\genrtf.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\genrtf.obj : $(OBJ_DIR)\genrtf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gentrf.c : $(HBDOC_DIR)\gentrf.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\gentrf.obj : $(OBJ_DIR)\gentrf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\html.c : $(HBDOC_DIR)\html.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\html.obj : $(OBJ_DIR)\html.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ng.c : $(HBDOC_DIR)\ng.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ng.obj : $(OBJ_DIR)\ng.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\os2.c : $(HBDOC_DIR)\os2.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\os2.obj : $(OBJ_DIR)\os2.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\rtf.c : $(HBDOC_DIR)\rtf.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\rtf.obj : $(OBJ_DIR)\rtf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\troff.c : $(HBDOC_DIR)\troff.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\troff.obj : $(OBJ_DIR)\troff.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\fclass1.c : $(HBDOC_DIR)\fclass1.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\fclass1.obj : $(OBJ_DIR)\fclass1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ffile1.c : $(HBDOC_DIR)\ffile1.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ffile1.obj : $(OBJ_DIR)\ffile1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ft_funcs.c : $(HBDOC_DIR)\ft_funcs.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ft_funcs.obj : $(OBJ_DIR)\ft_funcs.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XBSCRIPTDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS) $(HRBDLL_LIB)
+   $(ECHO) $(OBJ_DIR)\mainstd.obj + > make.tmp
+   $(ECHO) $(OBJ_DIR)\xbscript.obj, >> make.tmp
+   $(ECHO) $(XBSCRIPTDLL_EXE),, >> make.tmp
+   $(ECHO) $(HRBDLL_LIB) + >> make.tmp
+   $(ECHO) $(DMC_LIBRARY),, >> make.tmp
+   $(DMLINK) @make.tmp
+
+$(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
+
+$(OBJ_DIR)\xbscript.obj : $(OBJ_DIR)\xbscript.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ HBRUNDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS) $(HRBDLL_LIB)
+   $(ECHO) $(OBJ_DIR)\mainstd.obj + > make.tmp
+   $(ECHO) $(OBJ_DIR)\hbrun.obj, >> make.tmp
+   $(ECHO) $(HBRUNDLL_EXE),, >> make.tmp
+   $(ECHO) $(HRBDLL_LIB) + >> make.tmp
+   $(ECHO) $(DMC_LIBRARY),, >> make.tmp
+   $(DMLINK) @make.tmp
+
+$(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
+   $(CC_CMD)

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_gc.bat,v 1.4 2005/02/17 12:50:46 andijahja Exp $
+rem $Id: dll_gc.bat,v 1.1 2005/02/19 11:22:29 andijahja Exp $
 rem
 rem Batch File For Building xHarbour DLL with MinGW32 under Windows
 rem
@@ -54,7 +54,13 @@ if not exist %OBJ_DIR%                 md %OBJ_DIR%
 
 if exist %LIB_DIR%\libharbour.a       del %LIB_DIR%\libharbour.a
 if exist %LIB_DIR%\harbour.dll        del %LIB_DIR%\harbour.dll
+if exist %BIN_DIR%\harbour.dll        del %BIN_DIR%\harbour.dll
 if exist %LIB_DIR%\harbour.def        del %LIB_DIR%\harbour.def
+if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
+if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
+if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
+if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
+if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
 if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
 if exist %OBJ_DIR%\*.o                del %OBJ_DIR%\*.o
 if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h

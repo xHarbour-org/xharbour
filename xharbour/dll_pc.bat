@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_gc.bat,v 1.4 2005/02/17 12:50:46 andijahja Exp $
+rem $Id: dll_pc.bat,v 1.1 2005/02/19 11:22:29 andijahja Exp $
 rem
 rem Batch File For Building xHarbour DLL with PellesC under Windows
 rem
@@ -58,9 +58,29 @@ if not exist %OBJ_DIR%  md %OBJ_DIR%
 
 :CLEAN
 
+if exist %LIB_DIR%\harbour.exp        del %LIB_DIR%\harbour.exp
 if exist %LIB_DIR%\harbour.lib        del %LIB_DIR%\harbour.lib
-if exist %LIB_DIR%\harbour.dll        del %LIB_DIR%\harbour.dll
+if exist %BIN_DIR%\harbour.dll        del %BIN_DIR%\harbour.dll
 if exist %LIB_DIR%\harbour.def        del %LIB_DIR%\harbour.def
+
+if exist %BIN_DIR%\hbdocdll.lib       del %BIN_DIR%\hbdocdll.lib
+if exist %BIN_DIR%\hbmakedll.lib      del %BIN_DIR%\hbmakedll.lib
+if exist %BIN_DIR%\hbrundll.lib       del %BIN_DIR%\hbrundll.lib
+if exist %BIN_DIR%\hbtestdll.lib      del %BIN_DIR%\hbtestdll.lib
+if exist %BIN_DIR%\xbscriptdll.lib    del %BIN_DIR%\xbscriptdll.lib
+
+if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
+if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
+if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
+if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
+if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
+
+if exist %BIN_DIR%\hbdocdll.exp       del %BIN_DIR%\hbdocdll.exp
+if exist %BIN_DIR%\hbmakedll.exp      del %BIN_DIR%\hbmakedll.exp
+if exist %BIN_DIR%\hbrundll.exp       del %BIN_DIR%\hbrundll.exp
+if exist %BIN_DIR%\hbtestdll.exp      del %BIN_DIR%\hbtestdll.exp
+if exist %BIN_DIR%\xbscriptdll.exp    del %BIN_DIR%\xbscriptdll.exp
+
 if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
 if exist %OBJ_DIR%\*.obj              del %OBJ_DIR%\*.obj
 if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h

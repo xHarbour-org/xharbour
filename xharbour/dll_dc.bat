@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_dc.bat,v 1.1 2005/02/19 11:22:29 andijahja Exp $
+rem $Id: dll_dc.bat,v 1.1 2005/02/26 02:11:24 andijahja Exp $
 rem
 rem Batch File For Building xHarbour DLL with DigitalMars C/C++ under Windows
 rem
@@ -19,12 +19,12 @@ ECHO DATA WRITE >> dmcdll.def
 
 :BEGIN_CFG
 rem Our DigitalMars Root Directory
-@SET DMCMAIN=C:\DM
+@SET DMCMAIN=F:\DM
 
 @SET MAKEEXE=%DMCMAIN%\bin\make.exe
 
 rem Our BISON BIN Directory
-@set BISONDIR=C:\Bison\bin
+@set BISONDIR=F:\Bison\bin
 
 rem SET xHarbour Working Root Directory Here
 SET XHARBOUR_ROOT=d:\xhrb
@@ -64,7 +64,12 @@ if not exist %OBJ_DIR%  md %OBJ_DIR%
 :CLEAN
 
 if exist %LIB_DIR%\harbour.lib        del %LIB_DIR%\harbour.lib
-if exist %LIB_DIR%\harbour.dll        del %LIB_DIR%\harbour.dll
+if exist %BIN_DIR%\harbour.dll        del %BIN_DIR%\harbour.dll
+if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
+if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
+if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
+if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
+if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
 if exist %LIB_DIR%\harbour.def        del %LIB_DIR%\harbour.def
 if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
 if exist %OBJ_DIR%\*.obj              del %OBJ_DIR%\*.obj
