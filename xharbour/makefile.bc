@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.48 2003/05/27 03:46:27 ronpinkas Exp $
+# $Id: makefile.bc,v 1.49 2003/06/09 20:41:15 lculik Exp $
 #
 
 #
@@ -339,7 +339,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbhextonum.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbreadini.obj \
-   $(RTL_OBJ_DIR)\hbserial.obj \
+   $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
    $(RTL_OBJ_DIR)\is.obj \
@@ -439,6 +439,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\getlist.obj \
    $(RTL_OBJ_DIR)\getsys.obj \
    $(RTL_OBJ_DIR)\hbsrlraw.obj \
+   $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \
    $(RTL_OBJ_DIR)\memoedit.obj \
@@ -1691,6 +1692,10 @@ $(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
