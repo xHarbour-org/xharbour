@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2284 2004/02/14 13:34:36 lculik Exp $
+ * $Id: ChangeLog,v 1.2285 2004/02/14 16:59:43 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-15 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/thread.c
+    ! minor correction on define: _MSVC_VER => _MSC_VER
+
+  * source/vm/fm.c
+    + add routine to create/append fm.log file _ONLY_ upon the occurence
+      of unreleased memory block.
+
+  + tests/tstfmlog.prg
+    ! test program for fm.log
+
 2004-02-14 14:41 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
 * contrib/hbzlib/zipnew.cpp
   contrib/hbzlib/zipcomp.cpp
