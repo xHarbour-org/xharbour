@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.136 2005/01/25 10:47:52 druzus Exp $
+ * $Id: filesys.c,v 1.137 2005/01/26 21:46:35 druzus Exp $
  */
 
 /*
@@ -2443,7 +2443,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
       DWORD dwOffsetLo = ( DWORD ) ( ulStart & 0xFFFFFFFF ),
             dwOffsetHi = ( DWORD ) ( ulStart >> 32 ),
             dwLengthLo = ( DWORD ) ( ulLength & 0xFFFFFFFF ),
-            dwLengthHi = ( DWORD ) ( ulLength >> 32 )
+            dwLengthHi = ( DWORD ) ( ulLength >> 32 );
 
       static BOOL s_bInit = 0, s_bWinNt ;
 
@@ -2465,7 +2465,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                DWORD dwFlags ;
 
                dwFlags = ( ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK ) |
-                         ( ( uiMode & FLX_WAIT ) ? 0 : LOCKFILE_FAIL_IMMEDIATELY )
+                         ( ( uiMode & FLX_WAIT ) ? 0 : LOCKFILE_FAIL_IMMEDIATELY );
 
                memset( &sOlap, 0, sizeof( OVERLAPPED ) );
                sOlap.Offset = dwOffsetLo;
@@ -2698,7 +2698,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
 
       if ( llPos == ( HB_FOFFSET ) INVALID_SET_FILE_POINTER )
       {
-         ulOffsetHigh = 0
+         ulOffsetHigh = 0;
          ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
                                        0, &ulOffsetHigh, SEEK_CUR );
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
