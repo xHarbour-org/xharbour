@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.54 2003/10/20 01:05:56 mlombardo Exp $
+ * $Id: dbcmd.c,v 1.55 2003/10/22 09:05:27 brianhays Exp $
  */
 
 /*
@@ -3040,11 +3040,11 @@ HB_FUNC( ORDKEY )
       if ( ISNUM(1) || ISNIL(1) )
       {
          if ( hb_parnl(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
-            pOrderInfo.itmOrder  = NULL;
+            pOrderInfo.itmOrder = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
-
-      }else
+      }
+      else
       {
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
          if( !pOrderInfo.itmOrder )
@@ -3110,6 +3110,47 @@ HB_FUNC( ORDKEYNO )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYNO" );
 }
 
+HB_FUNC( ORDKEYGOTO )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* Either or both may be NIL */
+
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_NUMERIC );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_POSITION, &pOrderInfo );
+      hb_retl( hb_itemGetL( pOrderInfo.itmResult ) );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYGOTO" );
+}
+
+HB_FUNC( ORDSKIPUNIQUE )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = NULL;
+      pOrderInfo.itmNewVal = hb_param( 1, HB_IT_ANY );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_SKIPUNIQUE, &pOrderInfo );
+      hb_retl( hb_itemGetL( pOrderInfo.itmResult ) );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSKIPUNIQUE" );
+}
+
 HB_FUNC( ORDKEYVAL )
 {
    HB_THREAD_STUB
@@ -3169,6 +3210,50 @@ HB_FUNC( ORDKEYDEL )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYDEL" );
+}
+
+HB_FUNC( ORDDESCEND )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* Either or both may be NIL */
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_LOGICAL );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_ISDESC, &pOrderInfo );
+      hb_retl( hb_itemGetL( pOrderInfo.itmResult ) );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDDESCEND" );
+}
+
+HB_FUNC( ORDISUNIQUE )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* HARBOUR extension: NewVal to set/reset unique flag */
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_LOGICAL );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_UNIQUE, &pOrderInfo );
+      hb_retl( hb_itemGetL( pOrderInfo.itmResult ) );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDISUNIQUE" );
 }
 
 #endif
@@ -3579,21 +3664,17 @@ HB_FUNC( DBSETDRIVER )
 HB_FUNC( ORDSCOPE )
 {
    HB_THREAD_STUB
-   PHB_ITEM pScopeValue = hb_itemNew( NULL );
-   DBORDSCOPEINFO sInfo;
 
-   if( s_pCurrArea )
+   if ( s_pCurrArea )
    {
-      if( (!ISNUM( 1 ) && !ISNIL(1) ) || (!ISNIL(2) && !( ISCHAR(2) || ISNUM(2) || ISDATE(2) || ISLOG(2) )))
-      {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDSCOPE" );
-         return;
-      }
+      DBORDSCOPEINFO sInfo;
+      PHB_ITEM pScopeValue = hb_itemNew( NULL );
+
       sInfo.nScope = hb_parni( 1 );
 
       SELF_SCOPEINFO( ( AREAP ) s_pCurrArea->pArea, sInfo.nScope, pScopeValue );
 
-      if( hb_pcount() > 1 )
+      if ( hb_pcount() > 1 )
       {
          if ( ISNIL( 2 ) )                /* explicitly passed NIL, clear it */
             sInfo.scopeValue = NULL;
@@ -3603,9 +3684,10 @@ HB_FUNC( ORDSCOPE )
          /* rdd must not alter the scopeValue item -- it's not a copy */
          SELF_SETSCOPE( ( AREAP ) s_pCurrArea->pArea, (LPDBORDSCOPEINFO) &sInfo );
 
-      }else
-         sInfo.scopeValue = NULL;
-
+         /* Clipper compatible - I'm not sure it's good to emulate it, Druzus */
+         if ( ISNIL( 2 ) )
+            pScopeValue = hb_itemPutL( pScopeValue, TRUE );
+      }
       hb_itemRelease( hb_itemReturn( pScopeValue ) );
    }
    else
@@ -4796,5 +4878,5 @@ HB_FUNC( DBSKIPPER )
       hb_retnl( nSkipped );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPER" );
 }

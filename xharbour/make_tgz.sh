@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.15 2003/09/11 09:34:26 druzus Exp $
+# $Id: make_tgz.sh,v 1.16 2003/09/11 17:59:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,8 +21,17 @@ hb_platform=""
 
 [ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
 
+get_hbver()
+{
+    FVER="include/hbver.h"
+    MAJOR=`sed -e '/HB_VER_MAJOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
+    MINOR=`sed -e '/HB_VER_MINOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
+    REVIS=`sed -e '/HB_VER_REVISION/ s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
+    echo -n "${MAJOR}.${MINOR}.${REVIS}"
+}
+
 name="xharbour"
-hb_ver="0.82.0"
+hb_ver=`get_hbver`
 hb_lnkso="yes"
 hb_pref="xhb"
 hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"
@@ -405,7 +414,7 @@ if [ "${hb_lnkso}" = yes ]
 then
     export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses -lslang -lgpm"
 
-    for utl in hbmake hbrun hbpp hbdoc hbtest
+    for utl in hbmake hbrun hbpp hbdoc hbtest hbdict
     do
         pushd utils/${utl}
         rm -fR "./${HB_ARCHITECTURE}"

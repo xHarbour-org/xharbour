@@ -1,13 +1,14 @@
 /*
- * $Id: dbfcdx0.prg,v 1.3 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbfcdx0.prg,v 1.4 2003/09/08 19:18:45 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * DBFCDX RDD
+ * DBFCDX RDD (ver.2)
  *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +51,6 @@
  *
  */
 
-#include "error.ch"
 #include "rddsys.ch"
 
 ANNOUNCE DBFCDX

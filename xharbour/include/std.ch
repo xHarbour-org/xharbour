@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.4 2001/04/27 19:03:46 dholm Exp $
+ * $Id: std.ch,v 1.1.1.1 2001/12/21 10:47:28 ronpinkas Exp $
  */
 
 /*
@@ -56,5 +56,16 @@
 #include "set.ch"
 
 /* TODO: Fill this file. */
+
+#xtranslate ORDCOND( [FOR <for>]                                        ;
+                     [<all:ALL>] [WHILE <while>]                        ;
+                     [EVAL <eval>] [EVERY <every>]                      ;
+                     [RECORD <rec>] [NEXT <next>]                       ;
+                     [<rest:REST>] [<descend: DESCENDING>] )            ;
+      => ordCondSet( <"for">, <{for}>,                                  ;
+                     [<.all.>], <{while}>,                              ;
+                     <{eval}>, <every>,                                 ;
+                     RECNO(), <next>, <rec>,                            ;
+                     [<.rest.>], [<.descend.>] )
 
 #endif /* HB_STD_CH_ */

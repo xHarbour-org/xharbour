@@ -1,5 +1,5 @@
 /*
- * $Id: dbfuncs.prg,v 1.1 2001/08/19 13:30:56 lculik Exp $
+ * $Id: dbfuncs.prg,v 1.1.1.1 2001/12/21 10:42:47 ronpinkas Exp $
  */
 
 /*
@@ -56,8 +56,8 @@ FUNCTION DBCLEARFIL()
 FUNCTION DBSETDRIVE(cDriver)
    Return DBSETDRIVER(cDriver)
 
-FUNCTION DBSETRELAT(xArea,bRelation,cRelation)
-   Return DBSETRELATION(xArea,bRelation,cRelation)
+FUNCTION DBSETRELAT(xArea,bRelation,cRelation,lScoped)
+   Return DBSETRELATION(xArea,bRelation,cRelation,lScoped)
 
 FUNCTION DBRLOCKLIS()
     Return DBRLOCKLIST()

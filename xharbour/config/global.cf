@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
+# $Id: global.cf,v 1.2 2003/09/08 12:56:52 druzus Exp $
 #
 
 GRANDP = ../../
@@ -11,6 +11,7 @@ HB_DB_DRIVERS=\
 	dbfcdx \
 	dbffpt \
 	dbfdbt \
+	dbfcdxold \
 
 ifeq ($(HB_BIN_COMPILE),)
 HB_BIN_COMPILE := $(TOP)$(ROOT)source/compiler/$(ARCH)

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1651 2003/11/03 20:09:22 brianhays Exp $
+ * $Id: ChangeLog,v 1.1652 2003/11/04 00:31:59 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,72 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-04 09:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/bin/!pack_src.sh
+    + automatic xharbour version detection
+
+  * xharbour/include/hbdefs.h
+    + new macros for LITTLE/BIG ENDIAN conversions
+
+  * xharbour/include/std.ch
+    + ORDCOND implemented - I did it based on CL 5.3 NG documentation
+      then I found that this function doesn't exist in CL 5.3
+      so maybe we should remove it.
+
+  * xharbour/source/rdd/dbcmd.c
+    + ORDKEYGOTO() implemented - currently only in DBFCDX (not ready yet)
+    + ORDSKIPUNIQUE() implemented - currently only in DBFCDX
+    + ORDDESCEND() implemented - currently only in DBFCDX
+    + ORDISUNIQUE() implemented - currently only in DBFCDX
+      this function has xHarbour extension which doesn't exist
+      in Clipper. You can use third param to make nonunique
+      index to work like unique one. In some cases it's better
+      then standard unique index because it's still full updated
+      index and only records shown to program are unique.
+    ! bug in ORDSCOPE fixed
+
+  * xharbour/source/rdd/dbfuncs.prg
+    + fourth param in DBSETRELAT()
+
+  * xharbour/source/rdd/rddord.prg
+    + ORDSETRELATION()
+  * xharbour/source/rtl/dummy.prg
+    + removed implemented functions
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/Makefile
+  * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.h
+  - xharbour/source/rdd/dbfcdx/dbfcdx2.h
+    * new rewriten DBFCDX
+
+  * xharbour/source/vm/errorapi.c
+    + GPF on internal error when //ERRGPF command line switch is used
+
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    + HB_GT_CRS_BCEHACK - hack for buggy terminals which cannot implement
+      correctly BCE (like Putty) - strictly ncurses oriented, disabled by
+      default.
+
+  + xharbour/tests/testuniq.prg
+    * simple program to demonstrate how works dynamic user setable
+      unique flag
+
+  + xharbour/tests/rddspeed.prg
+    * test of index updating speed
+
+  + xharbour/tests/rddtest/mktst.bat
+  + xharbour/tests/rddtest/out.prg
+  + xharbour/tests/rddtest/rddmktst.prg
+  + xharbour/tests/rddtest/rddtst.prg
+    * program to test RDD. In rddmktst.prg you can put any functions
+      or commands you want to test. Then run mktst.bat in Clipper 5.3
+      environment. It builds out.prg which then should be compiled
+      by xHarbour. When you run it it display the tests results.
 
 2003-11-03 22:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + contrib/libct/strfile.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.24 2003/08/20 18:06:00 druzus Exp $
+ * $Id: gtcrs.c,v 1.25 2003/09/15 22:42:22 druzus Exp $
  */
 
 /*
@@ -194,6 +194,8 @@ static void set_tmevt(char *cMBuf, mouseEvent *);
 static int getMouseKey(mouseEvent *);
 static void destroy_ioBase(InOutBase *ioBase);
 static void sig_handler(int signo);
+
+static void curs_wrkaround();
 
 typedef struct ClipKeyCode {
     int key;
@@ -1507,31 +1509,40 @@ static void set_sig_keys(InOutBase *ioBase, int key_int, int key_brk, int key_st
     }
 }
 
-static int gt_resize(InOutBase *ioBase)
+static int gt_getsize(InOutBase *ioBase, int *rows, int *cols)
 {
-
     int ret = -1;
-    int rows = 0, cols = 0;
+
+    *rows = *cols = 0;
 
     if (isatty(ioBase->base_outfd)) {
         struct winsize win;
 
-	if (ioctl(ioBase->base_outfd, TIOCGWINSZ, (char *) &win) != -1) {
-            rows = win.ws_row;
-            cols = win.ws_col;
-	}
+        if (ioctl(ioBase->base_outfd, TIOCGWINSZ, (char *) &win) != -1) {
+            *rows = win.ws_row;
+            *cols = win.ws_col;
+        }
     }
-
-    if (rows <= 0 || cols <= 0) {
+    if (*rows <= 0 || *cols <= 0) {
         char *env;
 
         if ((env = getenv("COLUMNS")))
-            cols = atoi(env);
+            *cols = atoi(env);
         if ((env = getenv("LINES")))
-            rows = atoi(env);
+            *rows = atoi(env);
     }
+    if (*rows > 0 && *cols > 0)
+        ret = ( ioBase->maxrow == *rows && ioBase->maxcol == *cols ) ? 0 : 1;
 
-    if (rows > 0 && cols > 0) {
+    return ret;
+}
+
+static int gt_resize(InOutBase *ioBase)
+{
+    int ret = -1;
+    int rows = 0, cols = 0;
+
+    if (gt_getsize(ioBase, &rows, &cols) >= 0) {
 /*
 #if defined(NCURSES_VERSION)
 	wresize( ioBase->stdscr, rows, cols );
@@ -1555,15 +1566,16 @@ static int gt_resize(InOutBase *ioBase)
 
 static int gt_setsize(InOutBase *ioBase, int rows, int cols)
 {
-    int ret = -1;
+    int ret = -1, r, c;
     char escseq[ 64 ];
 
     if (ioBase->terminal_type == TERM_XTERM) {
         snprintf( escseq, sizeof(escseq) - 1, "\033[8;%hd;%hdt", rows, cols);
         escseq[ sizeof(escseq) - 1 ] = '\0';
         write_ttyseq(ioBase, escseq);
-	/* dirty hack - wait for SIGWINCH */
-	sleep(3);
+        /* dirty hack - wait for SIGWINCH */
+        if (gt_getsize(ioBase, &r, &c) > 0)
+            sleep(3);
 
         if (s_WinSizeChangeFlag)
         {
@@ -1863,7 +1875,9 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 
     getmaxyx( ioBase->stdscr, ioBase->maxrow, ioBase->maxcol );
     scrollok( ioBase->stdscr, FALSE );
+    idlok( ioBase->stdscr, FALSE );
     idcok( ioBase->stdscr, FALSE );
+    curs_wrkaround();
     wbkgdset( ioBase->stdscr, ' ' ); //| ioBase->attr_map[ 7 ] );
     wclear( ioBase->stdscr );
     wrefresh( ioBase->stdscr );
@@ -3335,3 +3349,14 @@ HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #endif  /* HB_MULTI_GT */
 
 /* *********************************************************************** */
+
+#if defined(HB_GT_CRS_BCEHACK) && defined(NCURSES_VERSION)
+#include "ncurses/term.h"
+static void curs_wrkaround()
+{
+    back_color_erase = FALSE;
+    /* cur_term->type.Booleans[28] = 0; */
+}
+#else
+static void curs_wrkaround() {;}
+#endif

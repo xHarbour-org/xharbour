@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/05/16 19:52:09 druzus Exp $
+# $Id: Makefile,v 1.3 2003/05/17 15:55:18 druzus Exp $
 #
 
 ROOT = ../../../
@@ -15,9 +15,12 @@ include $(TOP)$(ROOT)config/lib.cf
 # a workaround of a problem with different include directories 
 # for slang curses files between different unix distributions
 CFLAGS += -I/usr/include/ncurses
+ifeq ($(HB_GT_CRS_BCEHACK),yes)
+CFLAGS += -DHB_GT_CRS_BCEHACK
+endif
 
 ifeq ($(HB_GPM_MOUSE),yes)
-CFLAGS := $(CFLAGS) -DHAVE_GPM_H
+CFLAGS += -DHAVE_GPM_H
 endif
 
 ifeq ($(HB_MULTI_GT),yes)
