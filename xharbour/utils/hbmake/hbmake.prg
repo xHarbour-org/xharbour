@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.85 2003/08/18 05:13:05 lculik Exp $
+ * $Id: hbmake.prg,v 1.86 2003/08/20 21:31:59 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1135,6 +1135,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -l-lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lncurses -lgpm -lpthread -lm"
    LOCAL cHarbDll         := "bcc640.lib hbdll_"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
+   LOCAL cSystemLibs      := "-lm -lncurses -lslang -lgpm -lpthread"
 
    LOCAL cLibs        := ""
    LOCAL citem        := ""
