@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.3 2003/01/27 04:21:36 walito Exp $
+ * $Id: inkey.c,v 1.4 2003/02/07 14:50:08 jonnymind Exp $
  */
 
 /*
@@ -344,7 +344,6 @@ HB_FUNC( INKEY )
 
 HB_FUNC( __KEYBOARD )
 {
-
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
    hb_inkeyReset( FALSE );
 
@@ -354,70 +353,83 @@ HB_FUNC( __KEYBOARD )
 
       if( size != 0 )
       {
+         BYTE * fPtr = ( BYTE * ) hb_parc( 1 );
 
-         BYTE * fPtr        = ( BYTE * ) hb_parc( 1 );
-         /* it is just a request to clear the buffer */
-         if( *fPtr == 0 )
+         /* It might be just a request to clear the buffer */
+         if( *fPtr )
          {
-            return;
-         }
+            BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
+            PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
+            PHB_inkeyKB pRoot;
 
-         BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
-         PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
-         PHB_inkeyKB pRoot;
+            pString[ size ] = 0;
+            pInkey->Pos    = size - 1;
 
-         pString[ size ] = 0;
-         pInkey->Pos    = size - 1;
+            while( size-- )
+            {
+               if( * fPtr == 59 )
+               {
+                  pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
+               }
+               else
+               {
+                  pString[ size ] = * fPtr;
+               }
 
-         while( size-- )
-         {
-            if( * fPtr == 59 )
-               pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
+               fPtr++;
+            }
+
+            pInkey->String = pString;
+            pInkey->pNext  = NULL;
+
+            // printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
+
+            if( s_inkeyKB )
+            {
+               pRoot = s_inkeyKB;
+
+               while( pRoot->pNext )
+               {
+                  pRoot = pRoot->pNext;
+               }
+
+               pRoot->pNext = pInkey;
+            }
             else
-               pString[ size ] = * fPtr;
-            fPtr++;
+            {
+               s_inkeyKB = pInkey;
+            }
+
+            hb_inkeyPut( -99 );
+
+            /*
+            // Stuff the string
+            if( size >= ( ULONG ) hb_set.HB_SET_TYPEAHEAD )
+            {
+               // Have to allow for a zero size typehead buffer
+               if( hb_set.HB_SET_TYPEAHEAD )
+               {
+                  size = ( ULONG ) ( hb_set.HB_SET_TYPEAHEAD - 1 );
+               }
+               else
+               {
+                  size = 0;
+               }
+            }
+
+            while( size-- )
+            {
+               int ch = *fPtr++;
+
+               if( ch == 59 )
+               {
+                  ch = 13; // Convert ";" to CR, like Clipper does
+               }
+
+               hb_inkeyPut( ch );
+            }
+            */
          }
-
-         pInkey->String = pString;
-         pInkey->pNext  = NULL;
-
-//         printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
-
-         if( s_inkeyKB )
-         {
-            pRoot = s_inkeyKB;
-
-            while( pRoot->pNext )
-               pRoot = pRoot->pNext;
-
-            pRoot->pNext = pInkey;
-         }
-         else
-            s_inkeyKB = pInkey;
-
-
-         hb_inkeyPut( -99 );
-
-/*
-         // Stuff the string
-
-         if( size >= ( ULONG ) hb_set.HB_SET_TYPEAHEAD )
-         {
-            // Have to allow for a zero size typehead buffer
-            if( hb_set.HB_SET_TYPEAHEAD )
-               size = ( ULONG ) ( hb_set.HB_SET_TYPEAHEAD - 1 );
-            else
-               size = 0;
-         }
-
-         while( size-- )
-         {
-            int ch = *fPtr++;
-            if( ch == 59 )
-               ch = 13; // Convert ";" to CR, like Clipper does 
-            hb_inkeyPut( ch );
-         }
-*/
       }
    }
 }
