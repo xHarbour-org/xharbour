@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.2 2002/10/27 14:41:36 lculik Exp $
+ * $Id: hbapierr.h,v 1.3 2003/01/19 21:44:01 andijahja Exp $
  */
 
 /*
@@ -101,12 +101,14 @@ extern char     HB_EXPORT * hb_errGetDescription    ( PHB_ITEM pError );
 extern char     HB_EXPORT * hb_errGetFileName       ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetFlags          ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetGenCode        ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetOperation      ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetOperation    ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetOsCode         ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetSeverity       ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetSubCode        ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetSubSystem      ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetSubSystem    ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetTries          ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetProcName     ( PHB_ITEM pError );
+extern USHORT   HB_EXPORT hb_errGetProcLine       ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errLaunch            ( PHB_ITEM pError );
 extern PHB_ITEM HB_EXPORT hb_errNew               ( void );
 extern PHB_ITEM HB_EXPORT hb_errPutArgs           ( PHB_ITEM pError, ULONG ulArgCount, ... );
@@ -120,6 +122,8 @@ extern PHB_ITEM HB_EXPORT hb_errPutSeverity       ( PHB_ITEM pError, USHORT uiSe
 extern PHB_ITEM HB_EXPORT hb_errPutSubCode        ( PHB_ITEM pError, USHORT uiSubCode );
 extern PHB_ITEM HB_EXPORT hb_errPutSubSystem      ( PHB_ITEM pError, char * szSubSystem );
 extern PHB_ITEM HB_EXPORT hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
+extern PHB_ITEM HB_EXPORT hb_errPutProcName       ( PHB_ITEM pError, char * szProcname );
+extern PHB_ITEM HB_EXPORT hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
 extern void     HB_EXPORT hb_errRelease           ( PHB_ITEM pError );
 
 /* Harbour additions */

@@ -1,0 +1,345 @@
+
+                          CREACION DE WIDGETS EN XWT
+                   (c)2003 Rafa Carmona (TheFull) 13/05/03 11:20
+
+
+Nota: Esto es un pequeño manual para que seais capaces de crear o saber como
+      se crean los widgets a nivel de XWT.
+      Abarcamos tanto la clase, la interfaz y el driver.
+      Os explicare hasta mis conocomientos llegan, de momento, más no puedo ;-)
+
+
+Para la creacion de un widget sobre XWT hay que tener en consideracion los
+siguientes pasos:
+
+( Cogeremos de ejemplo el widget Checkbox, por ejemplo )
+
+1,- DEFINIR TIPO DE widget.
+    Ruta  &  Fichero : /include/Xwt.ch
+
+    Todo tipo de widget debe de seguir el patron XWT_TYPE_<TipodeBoton>
+
+    #define XWT_TYPE_CHECKBOX 12
+
+
+2.- DEFINIR A NIVEL INTERFACE( GTK ) EL TIPO DEL WIDGET A CREAR.
+
+    Ruta & Fichero  : /src/xwt_gtk/xwt_gtk.c
+    Funcion         : xwt_drv_create()
+
+    Definir segun el tipo de widget a crear y que funcion crea dicho widget
+
+     case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( pSelf );
+
+    Estamos definiendo que cuando queramos crear un widget checkbox , debe
+    de llamar a la funcion xwt_gtk_createCheckBox().
+
+    Dicha funcion estará contenida fuera de este fichero.
+
+
+3.- DEFINIR A NIVEL DE INTERFAZ(GTK) LA CREACION DEL WIDGET.
+
+    Ruta &   Fichero: /src/xwt_gtk/Xwt_gtk_checkbox.c
+    Funcion         : Grupo de Funciones necesarios para manejar el widget.
+
+    Dentro del fichero Xwt_gtk_checkbox debemos de programar el comportamiento
+    del widget , los eventos y la creacion del widget propiamente dicho.
+
+    Empezemos por la creacion del widget.
+    Todo Widget debe estar declarado de esta forma:
+
+    PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf )
+
+      * ( Para saber mas sobre el tipo de estructura PXWT_WIDGET,
+          leer el documento de Giancarlo que viene en XWT )
+
+    Hagamos una pequeña ayuda sobre las librerias GTK para entender el
+    funcionamiento para que no vayais tan perdidos :-)
+
+
+    En GTK, todo widget es declarado como Gtkwidget, y hay que declaralo de
+    esta forma:
+
+    GtkWidget *checkbox;
+
+    Logicamente *checkbox, es un puntero a una estructura GtkWidget.
+
+    Luego, para manejar los distintos aspectos de XWT, se declara la siguiente
+    variable xwtData, que no es mas que una estructura para la creacion de
+    Widgets y ser controlados por XWT.
+
+    PXWT_WIDGET xwtData;
+
+    Logicamente, le toca el turno a la creacion del objeto en si.
+
+    checkbox = gtk_check_button_new ();
+
+    Dicha funcion, gtk_check_button_new(), no tienes que buscarla por ningun
+    sitio dentro de XWT, pues no la vas a encontrar ;-)
+    Pertenece a las librerias GTK+,y dicha funcion simplemente crea un checkbox
+    por lo tanto , la mejor maneja de saber que funciones hay es consultar
+    en http://www.gtk.org donde teneis un monton de informacion.( en english )
+
+    Bueno , seguimos. Ahora debemos de programar las retrollamadas o eventos,
+    llamalo como quieras, para que cuando , por ejemplo , presionamos el click
+    del raton se lanza la rutina que nosotros queramos.
+
+      g_signal_connect (G_OBJECT(checkbox), "clicked",
+                        G_CALLBACK (chkb_clicked), pSelf->item.asArray.value );
+
+    Para conectar retrollamadas se utiliza la funcion g_signal_connect(),
+    y debemos pasarle el objeto checkbox, G_OBJECT( checkbox ).
+    Vamos a ver, vamos a ver. Que es eso de G_OBJECT( checkbox ) ?
+
+    Si , ya se que es duro, me lo vas a decir a mi ;)
+
+    Esto es GTK+. Debeis de saber que todos los Widgets en GTK+ derivan de
+    GtkObject, por lo tanto, lo unico que estamos haciendo es pasarle el
+    objeto checkbox como un objeto Object, por que las retrollamadas esperan
+    un tipo Object, digamos que es como un 'cast' de C.
+
+    El "clicked" es el tipo de evento que vamos a tratar, es decir, "clicked"
+    significa 'cuando se a apretado el raton en el checkbox'.
+
+    Hay varios eventos dependiendo del tipo de Widget qe tratemos , en este
+    caso tenemos:
+    "preseed","released","clicked","enter","leave","toggled" para el caso
+    del checkbox.
+
+    Hay que consultar la ayuda de GTK+ para saber que eventos soporta un
+    widget determinado y cual son los que te interesa añadir.
+    ( De momento no hay ayuda de XWT, pero estamos en ello )
+
+    Despues  G_CALLBACK (chkb_clicked) es la funcion a la que tiene que saltar
+    la retrollamada. En este caso lo declarais dentro del mismo fichero como
+    static. Lo veremos mas adelante.
+
+    pSelf->item.asArray.value , estoy en ello, pero tiene que ver con la
+    estructura PHB_ITEM de xHarbour, pero el 'value' ese no se lo que es.
+
+    Ahora por fin crearemos el widget para XWT.
+
+       XWT_CREATE_WIDGET( xwtData )
+
+    Esto que parece una funcion, es realmente una macro, la podeis encontrar
+    en /include/xwt.api. Creo que lo que hace es reservar memoria.
+
+    Ahora lo que hacemos es informar del tipo de widget a XWT a traves de la
+    variable xwtData.
+
+     Tipo de widget.
+     xwtData->type = XWT_TYPE_CHECKBOX;
+
+     widget creado a traves de GTK+
+     xwtData->widget_data = checkbox;
+
+     Destructor.(Todavia no se muy bien como funciona) Leer texto de Giancarlo
+     xwtData->destructor = NULL;
+
+     De esto de momento no tengo ni idea =:-O
+     xwtData->get_main_widget = xwtData->get_top_widget = ,
+                                xwt_gtk_get_topwidget_neuter;
+
+     Hacemos visible el widget
+     gtk_widget_show( checkbox );
+
+     Y finalmente devolvemos la estructura xwtData
+     return xwtData;
+
+     Como habiamos dicho, el control de los eventos o retrollamadas, para
+     los widgets generalemente se definen asi:
+
+     static void chkb_clicked( GtkWidget *widget,  gpointer cb_data )
+     {
+       XWT_GTK_MAKESELF( cb_data );
+       xwt_rise_event( &Self, XWT_E_CLICKED, 0 );
+     }
+
+     Realemte si te digo la verdad el funcionamiento de como corre todo este
+     tinglado no lo tengo muy claro.
+     En cuanto pueda , empezare a meterme como trabaja internamente todo
+     esto y hare un apartado simplemente para ello.
+     Pero con todo lo que ves, es suficiente para avanzar por ti mismo.
+
+     Continuamos.
+
+Ahora tenemos media parte hecha, es decir, tenemos la INTERFAZ(GTK) con el
+DRIVER de XWT , que nos queda ? Nos conectar el driver con nuestro .PRG, y
+como esto es un sistema POO, nos queda crear la clase.
+
+
+4.- DEFINIR A NIVEL DE PRG LA CREACION DE LA CLASE.
+
+    Ruta  &  Fichero: /src/checkbox.prg
+    Clase           : XWTCheckBox
+
+    La clase checkbox sera la encargada de crear un objeto chechbox para
+    que nosotros podamos manejarlo a nivel de PRG.
+
+    Las clases de XWT son MUY sencillas.
+    Todas las clases de Widgets derivan de la clase XWTWidget.
+
+    Sabiendo lo basico que debemos saber de momento, que duro es esto ;) ,
+    el metodo NEW() de la clase XWTCheckbox recibe  cText, bStatus, nX, nY
+    como parametros, las cual podemos usarlo para iniciar el objeto en
+    cuestion con valores determinados.
+
+    Lo que hay que tener muy claro es que la primera llamada debe de ser a:
+
+      Super:New()                           --> OBLIGATORIO!!!
+      ::nWidgetType := XWT_TYPE_CHECKBOX     --> OBLIGATORIO!!!
+ 
+    El nWidGetType es declarado para el uso en las distintas partes del codigo
+    de XWT, se ha hecho de esta manera porque es mas claro y es mucho mas
+    rapido preguntar por una variable de instancias que preguntar que dicho
+    objeto que me viene de que clase es. Te lo explico:
+
+    IF ::nWidgetType == XWT_TYPE_CHECKBOX es mas rapido y elegante que:
+    IF oCheck:ClassName() == "XWTCheckbox"
+
+    En fin cosas de Giancarlo ;), aunque realmente tiene su logica.Seguimos.
+
+
+    ::oRawWidget := XWT_Create( Self, XWT_TYPE_CHECKBOX )
+
+    Obsevar donde se crea y se contiene el objeto devuelto por la funcion
+    a nivel de PRG.
+
+    Y saber esto es muy importante, puesto que si queremos usar una funcion
+    a nivel del driver independientemente de hacer uso de la clase,
+    ¿ como lo harias ?
+
+      Local oCkeck
+      oCheck := XWTCheckBox():New("Mi Check 1")  // Objeto Checkbox
+
+      XWT_SetProperty( oCheck, XWT_PROP_STATUS, 1 ) // Activamos check.
+
+    La linea de arriba ESTA MAL!!!!
+
+    Hay que usar la variable de instancia oRawWidget que es quien realmente
+    contiene el objeto a tratar.
+
+    Lo correcto y es muy importante es definirlo de esta manera:
+
+      XWT_SetProperty( oCheck:oRawWidget, XWT_PROP_STATUS, 1 )
+
+    Estas son las reglas minimas que debes de tener en cuenta para la creacion
+    de una clase.
+    
+    Mas adelante veremos a traves del nivel de DRIVER como funciona.
+        
+
+    El nombre de los metodos y su funcionamiento esta fuera de esta guia,
+    aunque actualmente no hay apenas ayuda disponible, que mejor ayuda que
+    el propio codigo fuente ;)
+
+    Logicamente , tambien deberemos de programar los distintos metedos que 
+    necesitamos.
+
+
+Una vez terminada la clase, debemos preparar tanto al DRIVER como a la
+INTERFAZ el nuevo comportamiento del widget creado.
+Para ello seguimos avanzando en la ya casi funcionalidad del widget.
+Ya era hora hombre!!! ;-)
+
+
+5.- DEFINICION A NIVEL DE DRIVER.
+
+    Ahora lo unico que nos queda, POR FIN ;), es la parte de conexion entre la
+    llamada del metodo de la clase, al DRIVER y este a su vez a la INTERFACE.
+
+    Antes de nada un poco de teoria ;-), para no ir tan perdidos.
+
+    Veremos ahora como añadir propiedades a los objetos a nivel del DRIVER,
+    aunque estas funciones son genericas pues para nosotros es transparente.
+    Cuando hacemos XWT_Create(...) esta a su vez hace una llamada xwt_drv_create(),
+    donde podeis ver es la conexion a nivel de Interface, quedando de esta manera,
+    tan simple:
+
+               NIVEL PRG
+              METHOD New()-----> NIVEL DRIVER
+                                 XWT_CREATE( )------> NIVEL INTERFACE
+                                                      xwt_drv_create()
+
+    De esta manera se van pasando los parametros de xHarbour a NIVEL DE PRG
+    al lenguaje C y desde este mismo lenguaje a nivel de DRIVER se le pasa 
+    al lenguaje C a nivel de INTERFACE que es la que se comunica con GTK+.
+    
+    Giancarlo desarrollo un sistema muy potente.
+
+    Cualquier otro sistema de desarrollo que se quisiera implementar bastaria
+    con reprogramar la parte correspondiente a la Interface, el resto ya
+    esta hecho!!!!.
+
+    Lo que ha nosotros nos interesa en este caso para la creacion de un widget,
+    son las llamadas a nivel de Interface, aunque logicamente pasaran por el
+    nivel del Driver localizadas en :
+    Funcion & Ruta : /src/xwt_api.c
+    
+    Por ejemplo, para verlo desde un ejemplo practica, y siguiendo con la clase
+    XWTcheckbox, veremos como desde la clase se puede cambiar el texto del
+    checkbox ya sea en el inicio de la clase o a traves del metodo apropiado.
+
+       METHOD SetStatus( bStatus ) CLASS XWTCheckbox
+           IF ValType( bStatus ) == "L" .and. bStatus
+              RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_STATUS, 1 )
+       ENDIF
+       RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_STATUS, 0 )
+
+    Dicho usa la funcion XWT_SetProperty para cambiar las cualidades de un widget,
+    pero si os fijais en el resto de las clases, esto esta pensado para que la
+    misma llamada sea usada comunmente a todos los widgets, esto es el enlace
+    entre el nivel PRG al Nivel de DRIVER.
+
+    Dicha funcion pasa el ::oRawWidget que no es mas que el widget creado, el
+    XWT_PROP_STATUS, que propiedad es sobre la que voy a actuar, y 1 es el valor
+    que valdra.
+
+    Entonces, dentro de xwt_api.c tenemos la funcion XWT_SetProperty, y podemos
+    observar que cuando queremos modificar un dato 
+    
+       XWT_PROPERTY prop;
+  
+       prop.type = hb_parni( 2 );
+   
+      switch( prop.type )
+            
+         ... otras opciones ...
+  
+         case XWT_PROP_STATUS:
+              prop.value.setting = hb_parl( 3 );
+         break;
+
+         ... otras opciones ...
+     
+    Para finalmente conectar con la Interface:
+    hb_retl( xwt_drv_set_property( wSelf, &prop ) );
+
+    
+    Lo mismo lo podemos aplicar a la funcion XWT_GETPROPERTY().
+    
+    Teniendo en cuenta esto, lo que nos queda por ultimo es ir al nivel de la interface,
+    y programar lo que nos haga falta.
+
+    Fichero & Ruta : /src/xwt_gtk/xwt_gtk.c
+     
+    Siguiendo hablando con la funcion XWT_SetProperty, que al final termina a nivel 
+    de la interface llamandose xwt_drv_set_property() , veremos finalmente como
+    se lleva a cabo el proceso de cambiar el texto del checkbox:
+
+         // Pregunta por el tipo de Widget.
+
+         case XWT_TYPE_CHECKBOX:
+               // Ejecuta la funcion GTK+ para cambiarlo.
+               gtk_button_set_label (GTK_BUTTON(wSelf), prop->value.text );
+
+    Y despues de toda esta paliza, make clean, make , make install 
+    y a correr xHarbour bajo XWT en Linux !!!!       
+
+ 
+    Espero no haberme dejado nada en el tintero, si es asin comunicarmelo.
+    Finalmente espero que la gente realmente se de cuenta que XWT es el GUI mas potente
+    que posee xHarbour, que como podeis ver, es impresionante!!!
+
+
+    Un saludo.

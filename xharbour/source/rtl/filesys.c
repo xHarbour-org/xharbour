@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.31 2003/04/13 09:29:58 jonnymind Exp $
+ * $Id: filesys.c,v 1.32 2003/04/16 10:16:01 jonnymind Exp $
  */
 
 /*
@@ -336,7 +336,7 @@ static int convert_open_flags( USHORT uiFlags )
       HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_RDWR\n"));
    }
 
-#if ! defined(HB_FS_SOPEN)
+#if ! defined(HB_FS_SOPEN) && ! defined( HB_OS_LINUX )
    /* shared flags */
    if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
    {

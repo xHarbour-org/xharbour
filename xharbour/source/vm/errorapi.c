@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.3 2003/03/14 20:35:25 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.4 2003/03/14 22:23:29 ronpinkas Exp $
  */
 
 /*
@@ -604,6 +604,54 @@ PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, char * szSubSystem )
    return pError;
 }
 
+char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errGetProcName(%p)", pError));
+
+   hb_vmPushSymbol( hb_dynsymGet( "PROCNAME" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmSend( 0 );
+
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+}
+
+PHB_ITEM HB_EXPORT hb_errPutProcName( PHB_ITEM pError, char * szProcName )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutProcName(%p, %s)", pError, szProcName));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_PROCNAME" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushString( szProcName, strlen( szProcName ) );
+   hb_vmSend( 1 );
+
+   return pError;
+}
+
+
+USHORT hb_errGetProcLine( PHB_ITEM pError )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errGetProcLine(%p)", pError));
+
+   hb_vmPushSymbol( hb_dynsymGet( "PROCLINE" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmSend( 0 );
+
+   return (USHORT) hb_itemGetNI( &(HB_VM_STACK.Return) );
+}
+
+PHB_ITEM HB_EXPORT hb_errPutProcLine( PHB_ITEM pError, USHORT uiLine )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutProcLINE(%p, %d)", pError, uiLine));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_PROCLINE" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushInteger( (int) uiLine );
+   hb_vmSend( 1 );
+
+   return pError;
+}
+
+
 USHORT HB_EXPORT hb_errGetTries( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetTries(%p)", pError));
@@ -735,6 +783,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    USHORT uiFlags )
 {
    PHB_ITEM pError = hb_errNew();
+   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
+   USHORT uLine;
 
    hb_errPutSeverity( pError, uiSeverity );
    hb_errPutSubSystem( pError, szSubSystem ? szSubSystem : HB_ERR_SS_BASE );
@@ -744,6 +794,10 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    hb_errPutOperation( pError, szOperation ? szOperation : "" );
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
+
+   hb_errPutProcName( pError, hb_procinfo( 1, szName, NULL ) );
+   hb_procinfo( 1, NULL, &uLine );
+   hb_errPutProcLine( pError, uLine );
 
    return pError;
 }
@@ -759,6 +813,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    USHORT uiFlags )
 {
    PHB_ITEM pError = hb_errNew();
+   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
+   USHORT uLine;
 
    hb_errPutSeverity( pError, uiSeverity );
    hb_errPutSubSystem( pError, szSubSystem ? szSubSystem : HB_ERR_SS_BASE );
@@ -768,6 +824,10 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    hb_errPutOperation( pError, szOperation ? szOperation : "" );
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags | EF_CANSUBSTITUTE );
+
+   hb_errPutProcName( pError, hb_procinfo( 1, szName, NULL ) );
+   hb_procinfo( 1, NULL, &uLine );
+   hb_errPutProcLine( pError, uLine );
 
    return( pError );
 }

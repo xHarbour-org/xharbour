@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.4 2003/03/18 22:12:37 ronpinkas Exp $
+ * $Id: terror.prg,v 1.5 2003/03/22 06:05:45 ronpinkas Exp $
  */
 
 /*
@@ -79,6 +79,9 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
       s_oClass:AddData( "SubCode"      , 0 )
       s_oClass:AddData( "SubSystem"    , "" )
       s_oClass:AddData( "Tries"        , 0 )
+
+      s_oClass:AddData( "ProcName"     , Procname(1) )
+      s_oClass:AddData( "ProcLine"     , Procline(1) )
 
       s_oClass:Create()
    ENDIF
