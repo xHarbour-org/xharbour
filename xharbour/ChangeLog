@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3985 2005/03/31 06:15:00 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3986 2005/03/31 14:33:08 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-31 10:21 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/achoice.prg
+    ! Fixed missing assignation for detect array size change. Thanks
+      to Jorge Dreher.
+
 2005-03-31 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   + include/hbexemem.h
     * definitions of memory routines dedicated to compiler creation

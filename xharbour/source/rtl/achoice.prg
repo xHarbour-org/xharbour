@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.24 2004/12/06 01:15:11 guerra000 Exp $
+ * $Id: achoice.prg,v 1.25 2005/01/09 23:19:31 ronpinkas Exp $
  */
 
 /*
@@ -323,6 +323,7 @@ METHOD ValidateArray() CLASS TAChoice
 LOCAL lValid
    lValid := .T.
    IF ::nArraySize != LEN( ::acItems ) .OR. ! IsAvailableItem( ::nOption )
+      ::nArraySize := LEN( ::acItems )
       ::nItems := 0
       DO WHILE ::nItems < LEN( ::acItems ) .AND. HB_ISSTRING( ::acItems[ ::nItems + 1 ] ) .AND. ! ::acItems[ ::nItems + 1 ] == ""
          ::nItems++
