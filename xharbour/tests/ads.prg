@@ -1,6 +1,12 @@
+#include "ads.ch"
+
 PROCEDURE TestAds( cDBF )
 
   LOCAL cField
+
+  IF cDbf == NIL
+     cDbf := "test"
+  ENDIF
 
   #ifdef __HARBOUR__
      RddRegister( "ADS", 1 )
@@ -39,7 +45,11 @@ RETURN
 #pragma BEGINDUMP
 
 #include <windows.h>
+
+#define WIN32
+
 #include "ace.h"
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbapiitm.h"
@@ -51,6 +61,7 @@ static PHB_ITEM pBlock;
 HB_FUNC( REGISTER_CALLBACK )
 {
    pBlock = hb_itemParam( 1 );
+
    AdsRegisterProgressCallback( ShowPercentage );
 }
 
@@ -77,6 +88,6 @@ unsigned long __stdcall ShowPercentage( UNSIGNED16 usPercentDone )
    return 0;
 }
 
-#pragma STOPDUMP
+#pragma ENDDUMP
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.25 2003/07/30 20:45:40 andijahja Exp $
+ * $Id: set.c,v 1.26 2003/08/10 22:15:14 lculik Exp $
  */
 
 /*
@@ -51,6 +51,8 @@
  */
 
 #include <ctype.h>
+
+#define HB_OS_WIN_32_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -838,23 +840,23 @@ HB_FUNC( SET )
          if ( strlen(szNewFile) != 0)
    #endif
          {
-           if ( pArg2 != NULL) 
+           if ( pArg2 != NULL)
            {
              char pszTemp[ 256 ] = "";
              if (hb_stricmp( ( char * ) hb_itemGetCPtr(pArg2), (char * ) hb_set.HB_SET_PRINTFILE ) != 0)
              {
                 pOut = hb_fsFNameSplit( ( char * ) hb_itemGetCPtr(pArg2)  );
-                if (!pOut->szExtension) 
+                if (!pOut->szExtension)
                 {
                    pOut->szExtension = ".prn";
-                }         
+                }
                 hb_fsFNameMerge( pszTemp, pOut );
                 hb_xfree( pOut );
                 hb_itemPutC( pArg2, pszTemp);
-             }  
+             }
            }
          }
-                 
+
          if( hb_set.HB_SET_PRINTFILE ) hb_retc( hb_set.HB_SET_PRINTFILE );
          else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) ) hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
@@ -863,10 +865,10 @@ HB_FUNC( SET )
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /* Check is the Passed String is a file or an Windows Printer Name or Windows Printer Job Name*/
-           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Printer Name */ 
+           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Printer Name */
                bOpen=FALSE;
 
-           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ 
+           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/
            {
                 bOpen=FALSE;
                 hb_set.hb_set_printerjob=hb_set.HB_SET_PRINTFILE + 4;
@@ -1128,10 +1130,13 @@ void hb_setInitialize( void )
 {
 
    #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
-   /* Get default Windows Printer Name Here */
-   char DefaultPrinter[ 80 ];
-   unsigned long pdwBufferSize = 80;
-   THarbourPrinter_DPGetDefaultPrinter( ( char* ) &DefaultPrinter, &pdwBufferSize);
+      /* Get default Windows Printer Name Here */
+      char DefaultPrinter[ 80 ];
+      unsigned long pdwBufferSize = 80;
+
+      extern BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+
+      THarbourPrinter_DPGetDefaultPrinter( ( char* ) &DefaultPrinter, &pdwBufferSize);
    #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_setInitialize()"));
