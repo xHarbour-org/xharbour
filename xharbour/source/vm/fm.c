@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.40 2003/08/06 10:58:57 druzus Exp $
+ * $Id: fm.c,v 1.41 2003/08/07 20:23:34 druzus Exp $
  */
 
 /*
@@ -619,7 +619,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
          s_pLastBlock = pMemBlock->pPrevBlock;
       }
 
-      pMem->ulSignature = *pSig = 0;
+      pMemBlock->ulSignature = *pSig = 0;
 
       free( ( void * ) pMemBlock );
 
