@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.1.1.1 2001/12/21 10:42:10 ronpinkas Exp $
+ * $Id: tgetint.prg,v 1.2 2002/03/26 05:06:58 ronpinkas Exp $
  */
 
 /*
@@ -72,15 +72,17 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
    LOCAL oGet
 
    IF bSetGet == NIL
-      IF FieldPos( cVarName ) > 0
+      IF Left( cVarName, 3 ) == "M->"
+         cVarName := SubStr( cVarName, 4 )
+         bSetGet := {|_1| iif( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
+      ELSEIF FieldPos( cVarName ) > 0
          // "{|_1| IIF( _1 == NIL, FIELD->&cVarName, FIELD->&cVarName := _1 )"
          bSetGet := &( "{|_1| IIF( _1 == NIL, FIELD->" + cVarName + ", FIELD->" + cVarName + " := _1 ) }" )
       ELSEIF __MVEXIST( cVarName )
          // "{|_1| IIF( _1 == NIL, M->&cVarName, M->&cVarName := _1 )"
          bSetGet := {|_1| iif( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
       ELSE
-         // Force a Run-Time Error!
-         bSetGet := &cVarName
+         bSetGet := &( "{|_1| IIF( _1 == NIL, " + cVarName + ", " + cVarName + " := _1 ) }" )
       ENDIF
    ENDIF
 
