@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.36 2003/12/13 19:40:03 andijahja Exp $
+ * $Id: macro.c,v 1.37 2004/02/14 21:01:19 andijahja Exp $
  */
 
 /*
@@ -844,6 +844,14 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
 
       szString = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
       bNewBuffer = ( szString != pItem->item.asString.value );
+
+      if( bNewBuffer == FALSE && ulLength < pItem->item.asString.length )
+      {
+         bNewBuffer = TRUE;
+         szString = hb_xgrab( ulLength + 1 );
+         strncpy( szString, pItem->item.asString.value, ulLength );
+         szString[ulLength] = '\0';
+      }
 
       if( hb_macroIsIdent( szString ) )
       {

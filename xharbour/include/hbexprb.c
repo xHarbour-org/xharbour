@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.70 2003/11/09 21:32:34 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.71 2004/01/27 09:56:08 likewolf Exp $
  */
 
 /*
@@ -414,7 +414,7 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
                         pVar =pVar->pNext;
                }
             }
-            
+
             HB_EXPR_PCODE0( hb_compLinePushIfDebugger );
 #endif
             pExpr = pSelf->value.asList.pExprList;
@@ -2398,15 +2398,35 @@ static HB_EXPR_FUNC( hb_compExprUseRTVariable )
          break;
       case HB_EA_PUSH_PCODE:
          if( pSelf->value.asRTVar.szName )
+         {
             HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asRTVar.szName, FALSE, FALSE );  /* this is not a functio */
+         }
          else
+         {
+            /*
+              Hack to avoid using macros:
+                 PUBLIC &Macro|&Complex.Macro -> __MVPublic( Macro|Complex + "Macro" )
+            */
+            pSelf->value.asRTVar.pMacro->value.asMacro.SubType = HB_ET_MACRO_ALIASED;
+
             HB_EXPR_USE( pSelf->value.asRTVar.pMacro, HB_EA_PUSH_PCODE );
+         }
          break;
+
       case HB_EA_POP_PCODE:
          if( pSelf->value.asRTVar.szName )
+         {
             HB_EXPR_PCODE1( hb_compGenPopVar, pSelf->value.asRTVar.szName );
+         }
          else
+         {
+            /*
+               Restoring - see hack above!
+             */
+            pSelf->value.asRTVar.pMacro->value.asMacro.SubType = HB_ET_MACRO_SYMBOL;
+
             HB_EXPR_USE( pSelf->value.asRTVar.pMacro, HB_EA_POP_PCODE );
+         }
          break;
 
       case HB_EA_PUSH_POP:

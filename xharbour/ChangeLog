@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2302 2004/02/16 00:40:21 brianhays Exp $
+ * $Id: ChangeLog,v 1.2303 2004/02/16 01:15:18 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 20:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprop.h
+    * Corrected a typo in a comment.
+
+  * source/vm/macro.c
+    ! Fixed hb_macroPushSymbol() to trim macro string.
+
+  * include/hbexprb.c
+    ! Optimized hb_compExprUseRTVariable() to not require R/T Macro support.
+      /* PUBLIC|PRIVATE &Macro|&Macro.Complex should be much faster. */
 
 2004-02-15 16:45 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/adsfunc.c

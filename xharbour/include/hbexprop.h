@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.7 2003/10/10 04:19:49 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.8 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ typedef enum
 /* additional definitions used to distinguish macro expressions
  */
 #define  HB_ET_MACRO_VAR       0   /* &variable */
-#define  HB_ET_MACRO_SYMBOL    1   /* &fimcall() */
+#define  HB_ET_MACRO_SYMBOL    1   /* &funcall() */
 #define  HB_ET_MACRO_ALIASED   2   /* &alias->&variable */
 #define  HB_ET_MACRO_EXPR      4   /* &( expr ) */
 #define  HB_ET_MACRO_ARGLIST   8   /* &variable used as a function call argument */
