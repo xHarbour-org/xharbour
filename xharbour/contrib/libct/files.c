@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.1 2003/03/04 21:04:34 lculik Exp $
+ * $Id: files.c,v 1.2 2003/03/22 17:22:44 lculik Exp $
  */
 
 /*
@@ -818,8 +818,9 @@ HB_FUNC( FILETIME )
    struct tm *ft;
    stat( szFile,&sStat    );
    tm_t = sStat.st_mtime;
-
+   ft = localtime( &tm_t );
    sprintf(  szTime, "%02d:%02d:%02d",ft->tm_hour, ft->tm_min, ft->tm_sec  );
+
    hb_retc( szTime );
 }
 
