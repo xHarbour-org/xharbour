@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1680 2003/11/10 00:06:26 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1681 2003/11/10 00:32:12 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,88 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-10 01:55 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+ *include\classes.h
+   ! struct hb_class_method
+      + added USHORT   uiType;              /* Type value */
+        this key now contain the class message type as defined in HB_OO_MSG_*
+
+ *include\hboo.ch
+   ! changed defines for attribute scope
+      * now HB_OO_CLSTP_PUBLISHED has value 2, renumbered other values
+        this permit to better filter variables and methods
+        i've tested these changes from March and all work as usual
+
+  /* NOTE: PLEASE MAKE A CLEAN BUILD */
+
+ *source\rtl\errorsys.prg
+   * Reformatted output
+   + Output now is send to HB_OutDebug too
+
+ *source\rtl\hbserial.prg
+   * changed __objSendMsg() call into __objSendMsgCase(). See below for explanation.
+
+ *source\rtl\objfunc.prg
+   ! added __objGetMsgFullList(), __objGetValueFullList() functions
+     * those functions permit to retrieve all informations about classes, included type and scope
+       usefull for debugging and for visual ide. See tstclsdbg.prg below.
+
+ *source\rtl\tclass.prg
+   * added control inside ConstructorCall() function to enable/disable auto class initialization
+     using class name as initializator (i.e. TObject( 100 ) instead of TObject():New( 100 ) ).
+     Default is enabled. See below for __SetClassAutoInit() function.
+   ! Fixed ConstructorCall() to call the correct constructor method in down/top sequence
+
+ *source\rtl\teditorl.c
+   + added hb_strTokenCount() function that return how many tokens are inside a string
+   + added __StrTokenCount() for PRG level
+
+ *source\rtl\tobject.prg
+   + added :SendKey(), :GetKey(), :GetKeyPos() methods, __SetAssociativeCaseSensitive() function
+     + :SendKey( cKey, [ xVal ] ) -> xOldValue
+       works as __ObjSendMsg() but for associative arrays
+       this function permit to standardize calls to associative array and permit to use vars of 1 char lenght
+       if xVal is passed assign it to cKey key, it return last value
+     + :GetKey( cKey, lCaseSensitive ) -> xValue
+       works as :SendKey() but only retrieve a value or NIL if key does not exists
+     + :GetKeyPos( cKey ) returns the position of a key inside the associative array so the value
+       can be retrieved using its position
+     + __SetAssociativeCaseSensitive( lNewCase ) -> lOldCase
+       .T. Set case sensitive, .F. case insensitive
+       set case sensitive during an internal search of a key. Keys are always store in case sensitive mode.
+
+   * changed logic for build Associative Arrays.
+     Now those store correctly the key as unique case sensitive name
+
+   /*
+     TODO: To be changed moving at object level as _Get/_Set methods
+   */
+
+ *source\rtl\traceprg.prg
+   * added hb_OutDebug() as output
+
+ *source\vm\classes.c
+   ! added hb___msgClsFullSel(), __ObjSendMsgCase(), __SetClassScope(), __SetClassAutoInit() functions
+     + hb___msgClsFullSel() permits to retrieve all values from a class
+     + __ObjSendMsgCase() call objects sending a case sensitive message (for Associative Arrays)
+     + __SetClassScope() actives/deactives class scoping. Fundamental for debuggin use.
+     + __SetClassAutoInit() as explained above.
+
+ +source\rtl\dumpvar.prg
+   + HB_DumpVar() returns a string containing the dump of values, also for arrays and objects
+   * touched also makefile.bc, makefile.vc, makefile.nt, hrbdll.bc, hrbdll.vc and
+     source\rtl\Makefile to compile this file
+
+  +tests\tstclsdbg.prg
+     + a sample of debugging classes
+
+
 2003-11-10 01:34 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * hrbdll.bc
   * hrbdll.vc
     ! updated with hash.c
-    
+
 2003-11-10 01:20 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * tests/hash.prg
   * tests/hashmass.prg
