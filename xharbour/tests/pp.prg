@@ -690,6 +690,11 @@ RETURN s_xRet
 PROCEDURE RP_Dot()
 
    LOCAL GetList := {}, sLine := Space(256)
+   LOCAL nDefines, nCommands, nTranslates
+
+   LOCAL aCopyDefRules, aCopyDefResults
+   LOCAL aCopyCommRules, aCopyCommResults
+   LOCAL aCopyTransRules, aCopyTransResults
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
@@ -702,6 +707,15 @@ PROCEDURE RP_Dot()
    #ifdef WIN
       PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "TInterpreter for Windows", 0 )' )
    #endif
+
+   aCopyDefRules     := aClone( aDefRules )
+   aCopyDefResults   := aClone( aDefResults )
+
+   aCopyCommRules    := aClone( aCommRules )
+   aCopyCommResults  := aClone( aCommResults )
+
+   aCopyTransRules   := aClone( aTransRules )
+   aCopyTransResults := aClone( aTransResults )
 
    ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
 
@@ -720,6 +734,24 @@ PROCEDURE RP_Dot()
       sLine := StrTran( sLine,  Chr(9), "  " )
 
       ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
+
+      //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
+
+      IF s_lRunLoaded
+         aDefRules     := aClone( aCopyDefRules )
+         aDefResults   := aClone( aCopyDefResults )
+
+         aCommRules    := aClone( aCopyCommRules )
+         aCommResults  := aClone( aCopyCommResults )
+
+         aTransRules   := aClone( aCopyTransRules )
+         aTransResults := aClone( aCopyTransResults )
+
+         s_lRunLoaded := .F.
+         s_lClsLoaded := .F.
+         s_lFWLoaded  := .F.
+      ENDIF
+
    ENDDO
 
 RETURN
@@ -1770,10 +1802,10 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
    //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
    IF s_sModule == cFile
-      //TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+      TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
    ELSE
-      s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
-      s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
+      //s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
+      //s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
 
       s_sModule := cFile
       bCompile  := .T.
