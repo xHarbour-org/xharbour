@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.119 2002/10/15 17:43:44 mlombardo Exp $
+ * $Id: hvm.c,v 1.120 2002/10/15 19:32:05 ronpinkas Exp $
  */
 
 /*
@@ -5111,7 +5111,7 @@ static void hb_vmPushLocal( SHORT iLocal )
 static void hb_vmPushLocalByRef( SHORT iLocal )
 {
    PHB_ITEM pTop = ( * hb_stack.pPos );
-   PHB_ITEM pLocal
+   PHB_ITEM pLocal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 
