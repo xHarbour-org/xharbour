@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.7 2004/04/28 18:21:16 druzus Exp $
+$Id: howtoext.txt,v 1.8 2004/05/02 21:48:53 druzus Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -688,7 +688,7 @@ homologue, but they mark the string object as "static"; this means that Xharbour
 virtual machine will never try to free the object, even if the string is item
 is discarded. It's supposed that the calling program wishes this specific memory
 location to remain valid for all the program lifetime, or anyhow for a longer
-timethan the returned value lifespan.
+time than the returned value lifespan.
 
 The function hb_retptrGC() is provided to create user-defined atomic objects;
 objects that are stored inside an xharbour variable (in this case, objects that
