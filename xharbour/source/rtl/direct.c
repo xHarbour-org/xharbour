@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.13 2004/02/21 20:06:42 andijahja Exp $
+ * $Id: direct.c,v 1.14 2004/02/23 08:31:56 andijahja Exp $
  */
 
 /*
@@ -109,12 +109,27 @@
    #define HB_DIR_ALL_FILES_MASK        "*.*"
 #endif
 
+#include "hbapi.h"
+#include "hbapifs.h"
+#include "hbapiitm.h"
+#include "hbfast.h"
+
+#include "directry.ch"
+
+#if defined( HB_OS_UNIX )
+   #define HB_DIR_ALL_FILES_MASK        "*"
+#else
+   #define HB_DIR_ALL_FILES_MASK        "*.*"
+#endif
+
 HB_FUNC( DIRECTORY )
 {
    PHB_ITEM  pDirSpec = hb_param( 1, HB_IT_STRING );
    PHB_ITEM  pAttributes = hb_param( 2, HB_IT_STRING );
-   BYTE *    szDirSpec;
+   BYTE *    szDirSpec ;
    USHORT    uiMask;
+   BOOL      bDirOnly = hb_parl(3);
+   BOOL      bFullPath = hb_parl(4);
 
 /*
 #if defined(__MINGW32__) || ( defined(_MSC_VER) && _MSC_VER >= 910 )
@@ -128,6 +143,10 @@ HB_FUNC( DIRECTORY )
 
    HB_ITEM pDir;
    PHB_FFIND ffind;
+   BOOL bAlloc = FALSE;
+   PHB_FNAME fDirSpec = NULL;
+   BYTE *pCurDir;
+   char cCurDsk;
 
    /* Get the passed attributes and convert them to Harbour Flags */
 
@@ -146,6 +165,21 @@ HB_FUNC( DIRECTORY )
 
    hb_arrayNew( &pDir, 0 );
 
+   if ( bDirOnly )
+   {
+      if( !pAttributes )
+      {
+         pAttributes = hb_itemNew( NULL );
+         hb_itemPutC( pAttributes, "D" );
+         bAlloc = TRUE;
+      }
+      else
+      {
+         if ( pAttributes->item.asString.value != "D" )
+            pAttributes->item.asString.value = "D";
+      }
+   }
+
    if( pAttributes && pAttributes->item.asString.length > 0 )
       if ( ( uiMask |= hb_fsAttrEncode( pAttributes->item.asString.value ) ) & HB_FA_LABEL )
       {
@@ -153,9 +187,29 @@ HB_FUNC( DIRECTORY )
          uiMask = HB_FA_LABEL;
       }
 
+
    szDirSpec = pDirSpec ?
                hb_fileNameConv( hb_strdup( ( char * ) pDirSpec->item.asString.value ) ) :
                (BYTE *) HB_DIR_ALL_FILES_MASK;
+
+   if ( bDirOnly || bFullPath )
+   {
+      cCurDsk = hb_fsCurDrv() ;
+      pCurDir = hb_fsCurDir( cCurDsk ) ;
+
+      if ( (fDirSpec = hb_fsFNameSplit( (char*) szDirSpec )) !=NULL )
+      {
+         if( fDirSpec->szDrive )
+         {
+            hb_fsChDrv( ( BYTE ) fDirSpec->szDrive );
+         }
+
+         if( fDirSpec->szPath )
+         {
+            hb_fsChDir( ( BYTE *) fDirSpec->szPath );
+         }
+      }
+   }
 
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
@@ -172,7 +226,6 @@ HB_FUNC( DIRECTORY )
       pTime.type = HB_IT_NIL ;
       pAttr.type = HB_IT_NIL ;
 
-
       do
       {
          if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
@@ -182,10 +235,20 @@ HB_FUNC( DIRECTORY )
          {
             HB_ITEM pSubarray;
             char buffer[ 32 ];
+            BOOL bAddEntry;
 
             hb_arrayNew( &pSubarray, 0 );
 
-            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, ffind->szName ) );
+            if ( bFullPath )
+            {
+               char *szFullName = hb_xstrcpy(NULL,(char*)fDirSpec->szPath,ffind->szName,NULL);
+               hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, szFullName ) );
+               hb_xfree( szFullName );
+            }
+            else
+            {
+               hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, ffind->szName ) );
+            }
          #ifndef HB_LONG_LONG_OFF
             hb_arrayAddForward( &pSubarray, hb_itemPutNLL( &pSize, ffind->size ) );
          #else
@@ -196,18 +259,47 @@ HB_FUNC( DIRECTORY )
             hb_arrayAddForward( &pSubarray, hb_itemPutC( &pAttr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
-            hb_arrayAddForward( &pDir, &pSubarray );
+            bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
+
+            if( bAddEntry )
+            {
+               hb_arrayAddForward( &pDir, &pSubarray );
+            }
+            else
+            {
+               if ( bDirOnly )
+               {
+                  hb_itemClear( &pSubarray );
+               }
+            }
          }
       }
       while( hb_fsFindNext( ffind ) );
 
       hb_fsFindClose( ffind );
+
    }
+
+   hb_itemForwardValue( &(HB_VM_STACK).Return, &pDir );
+
+   if ( bDirOnly || bFullPath )
+   {
+      hb_fsChDrv( (BYTE ) cCurDsk );
+      hb_fsChDir( pCurDir );
+   }
+
    if ( pDirSpec )
    {
       hb_xfree( szDirSpec );
    }
 
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &pDir );
-}
+   if ( bAlloc )
+   {
+      hb_itemRelease( pAttributes );
+   }
 
+   if ( fDirSpec != NULL )
+   {
+      hb_xfree( fDirSpec );
+   }
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.62 2004/02/20 22:33:56 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.63 2004/02/23 08:31:55 andijahja Exp $
  */
 
 /*
@@ -1757,14 +1757,11 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
-   pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pOpenInfo->abName)+1 );
-   strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
    pArea->atomAlias = hb_dynsymGet( ( char * ) pOpenInfo->atomAlias );
 
    if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
    {
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
-      hb_xfree( pArea->szDataFileName );
       return FAILURE;
    }
 
@@ -1851,11 +1848,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Exit if error */
    if( pArea->hDataFile == FS_ERROR )
    {
-      if( pArea->szDataFileName )
-         hb_xfree( pArea->szDataFileName );
       pArea->szDataFileName = NULL;
       return FAILURE;
    }
+
+   /* Allocate only after succesfully open file */
+   pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pOpenInfo->abName)+1 );
+   strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
 
    /* Read file header and exit if error */
    if( SELF_READDBHEADER( ( AREAP ) pArea ) == FAILURE )

@@ -4316,7 +4316,8 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   USHORT     uiRddID;
   PHB_FNAME  pFileName;
   DBOPENINFO pInfo;
-  char *szFileWithExt = NULL;
+  char szFileWithExt[_POSIX_PATH_MAX];
+  char szFile[_POSIX_PATH_MAX];
 
   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
 
@@ -4329,13 +4330,14 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   /* Fill pInfo structure */
   memset( &pInfo, 0, sizeof(DBOPENINFO) );
   pInfo.uiArea = hb_rddFindFirstFreeAreaNum();
-  pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
-  strcpy( ( char * ) ( pInfo.abName ), szFileName );
+  strcpy( szFile, szFileName );
+  pInfo.abName = ( BYTE * ) szFile;
   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
   pInfo.fShared = FALSE;
   pInfo.fReadonly = FALSE;
 
   /* get the new area node */
+  /* this is never released upon opening error on "append from notexist" */
   pAreaNode =  hb_rddNewAreaNode( pRDDNode, uiRddID );
 
   /* check the extension */
@@ -4347,7 +4349,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
      if( s_DefaultExtension.item.asString.value )
      {
-        szFileWithExt = (char *) hb_xgrab( strlen( szFileName ) + s_DefaultExtension.item.asString.length + 1 );
         sprintf( szFileWithExt, "%s%s", szFileName, s_DefaultExtension.item.asString.value );
         szFileName = szFileWithExt;
         hb_itemClear( &s_DefaultExtension );
@@ -4417,13 +4418,8 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
         SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
-        hb_xfree( pInfo.abName );
         hb_xfree( pAreaNode );
 
-        if ( szFileWithExt )
-        {
-           hb_xfree( szFileWithExt );
-        }
         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
         return NULL;
      }
@@ -4431,12 +4427,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
      /* check for table existence and if true, drop it */
      tableItem.type = HB_IT_NIL;
      hb_itemPutCL( &tableItem, szFileName, strlen( szFileName ) );
-
-     // not needed anymore
-     if ( szFileWithExt )
-     {
-        hb_xfree( szFileWithExt );
-     }
 
      if( SELF_EXISTS( pRDDNode, &tableItem, NULL ))
      {
@@ -4452,7 +4442,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
      {
         SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
-        hb_xfree( pInfo.abName );
         hb_xfree( pAreaNode );
 
         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
@@ -4463,7 +4452,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
      {
         SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
-        hb_xfree( pInfo.abName );
         hb_xfree( pAreaNode );
 
         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
@@ -4484,7 +4472,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   {
      SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
-     hb_xfree( pInfo.abName );
      hb_xfree( pAreaNode );
 
      if( hb_vmRequestQuery() == 0 )
@@ -4494,8 +4481,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
      return NULL;
   }
-
-  hb_xfree( pInfo.abName );
 
   return pAreaNode;
 }
