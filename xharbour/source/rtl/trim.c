@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: trim.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 /* trims from the left, and returns a new pointer to szText */
 /* also returns the new length in lLen */
-char * HB_EXPORT hb_strLTrim( const char * szText, ULONG * ulLen )
+HB_EXPORT char * hb_strLTrim( const char * szText, ULONG * ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strLTrim(%s, %p)", szText, ulLen));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.262 2003/09/12 02:09:34 jonnymind Exp $
+ * $Id: hvm.c,v 1.263 2003/09/18 14:40:09 jonnymind Exp $
  */
 
 /*
@@ -7489,6 +7489,13 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
    USHORT ui;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
+
+   if( s_fmInit )
+   {
+      s_fmInit = FALSE;
+      /* JC1: xinit initializes also thread, which initializes the main stack */
+      hb_xinit();
+   }
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
    pNewSymbols->pModuleSymbols = pSymbols;

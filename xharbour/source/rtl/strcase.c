@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.9 2003/09/27 16:15:41 paultucker Exp $
+ * $Id: strcase.c,v 1.10 2003/09/30 20:35:07 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /* converts szText to lower case. Does not create a new string! */
-char * HB_EXPORT hb_strLower( char * szText, ULONG ulLen )
+HB_EXPORT char * hb_strLower( char * szText, ULONG ulLen )
 {
    ULONG i;
 
@@ -81,7 +81,7 @@ char * HB_EXPORT hb_strLower( char * szText, ULONG ulLen )
    return szText;
 }
 
-char * HB_EXPORT hb_strLowerCopy( char * szText, ULONG ulLen )
+HB_EXPORT char * hb_strLowerCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -101,7 +101,7 @@ char * HB_EXPORT hb_strLowerCopy( char * szText, ULONG ulLen )
    return szCopy;
 }
 
-char * HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen )
+HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -122,7 +122,7 @@ char * HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen )
 }
 
 /* converts szText to upper case. Does not create a new string! */
-char * HB_EXPORT hb_strUpper( char * szText, ULONG ulLen )
+HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
 {
    ULONG i;
 
@@ -142,7 +142,7 @@ char * HB_EXPORT hb_strUpper( char * szText, ULONG ulLen )
 
 /* This function copies and converts szText to upper case.
  */
-char * HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
+HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
 
@@ -171,7 +171,7 @@ char * HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
 /* This function copies and converts szText to upper case AND Trims it
  */
-char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
+HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
    LONG ulSLen = strlen( pSource );
