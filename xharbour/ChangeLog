@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3823 2005/02/15 19:52:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3825 2005/02/15 22:01:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-16 05:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/winos.prg
+    ! correction on my recent changes on function OS_ISWTSCLIENT().
+
 2005-02-16 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/win32prn.prg
     ! reinstate	codes when __WRITE_FONT_INFO_TO_FILE__ is defined (without
