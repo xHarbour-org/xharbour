@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.31 2002/10/31 20:24:51 walito Exp $
+ * $Id: tget.prg,v 1.32 2002/11/29 20:14:44 walito Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ CLASS Get
    METHOD SetFocus()
    METHOD Undo()
    METHOD UnTransform()
-   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask( ), ::Assign():Display(), Self
+   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask( ), if(::lEdit, ::Assign(),), ::Display(), Self
 
    METHOD VarGet()
    METHOD VarPut(xValue, lReFormat)
