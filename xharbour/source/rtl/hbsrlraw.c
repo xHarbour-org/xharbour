@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.9 2003/04/17 09:28:34 paultucker Exp $
+ * $Id: hbsrlraw.c,v 1.10 2003/04/20 22:46:09 jonnymind Exp $
  */
 
 /*
@@ -292,7 +292,8 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       case 'D':
          ulData = hb_getlen8( (BYTE *)(cBuf + 1) );
          hb_retdl( ulData );
-
+      break;
+      
       case 'Z':
          ulData = 1;
          hb_ret();

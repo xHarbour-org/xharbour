@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1030 2003/05/17 15:55:13 druzus Exp $
+ * $Id: ChangeLog,v 1.1031 2003/05/17 17:30:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-17 20:14 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbsrlraw.c
+    ! A missing break after the 'D' deserialization code
+      was making the DeserializeSimple() function to return
+      NIL when deserializing a date. Fixed.
 
 2003-05-17 19:02 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/at.c

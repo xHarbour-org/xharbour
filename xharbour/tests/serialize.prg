@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.3 2003/04/13 21:39:24 jonnymind Exp $
+* $Id: serialize.prg,v 1.4 2003/05/17 00:26:05 ronpinkas Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -37,7 +37,7 @@ PROCEDURE MAIN()
 
    cTmp := HB_Serialize( "A string" )
    cTmp += HB_Serialize( 12.4 )
-   //cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
+   cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 20 )
    cTmp += HB_Serialize( SomeClass():New("A parameter") )
@@ -66,6 +66,9 @@ PROCEDURE MAIN()
       xVal := HB_DeserialNext( cSerial )
    ENDDO
 
+   ? "Done. Press any key to terminate."
+   Inkey( 0 )
+   
 RETURN
 
 PROCEDURE ArrayDump( aData, nLevel )
