@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.22 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: arrays.c,v 1.23 2002/10/05 23:27:43 ronpinkas Exp $
  */
 
 /*
@@ -370,11 +370,32 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
+      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+
       pItem->type = HB_IT_BYREF;
 
       pItem->item.asRefer.value = ulIndex - 1; // To offset the -1 below.
       pItem->item.asRefer.offset = 0; // Because 0 will be translated as a STATIC in hb_itemUnref();
       pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
+
+    #if IS_THIS_NEEDED
+      if( pElement->type == HB_IT_STRING && pElement->item.asString.bStatic )
+      {
+         char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
+
+         memcpy( sString, pElement->item.asString.value, pElement->item.asString.length + 1 );
+
+         pElement->item.asString.value = sString;
+         pElement->item.asString.bStatic = FALSE;
+         pElement->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
+         *( pElement->item.asString.puiHolders ) = 1;
+      }
+    #endif
 
       return TRUE;
    }

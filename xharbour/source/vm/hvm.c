@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.111 2002/10/05 23:27:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.112 2002/10/06 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -1487,6 +1487,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
+              #if IS_THIS_NEEDED
                 if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && (*pGlobals)[ iGlobal ]->item.asString.bStatic )
                 {
                    char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
@@ -1498,6 +1499,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                    (*pGlobals)[ iGlobal ]->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
                    *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) = 1;
                 }
+              #endif
 
                 hb_stackPush();
              }
