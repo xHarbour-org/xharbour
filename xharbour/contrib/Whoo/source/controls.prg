@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.1 2003/07/01 08:17:45 ronpinkas Exp $
+ * $Id: controls.prg,v 1.2 2003/10/19 06:45:43 ronpinkas Exp $
  */
 
 /*
@@ -751,7 +751,26 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
    DO CASE
       CASE nMsg == WM_ACTIVATE
-           nRet := ::WMActivate( nwParam, nlParam )
+          SWITCH nwParam
+              CASE WA_ACTIVE
+              CASE WA_CLICKACTIVE
+                 IF ValType( ::OnActivate ) == "B"
+                    nRet := EVAL( ::OnActivate, Self )
+                 ELSEIF ValType( ::OnActivate ) == "N"
+                    nRet := HB_Exec( ::OnActivate, Self )
+                 ENDIF
+                 EXIT
+
+              CASE WA_INACTIVE
+                 IF ValType( ::OnDeActivate ) == "B"
+                    nRet := EVAL( ::OnDeActivate, Self )
+                 ELSEIF ValType( ::OnDeActivate ) == "N"
+                    nRet := HB_Exec( ::OnDeActivate, Self )
+                 ENDIF
+                 EXIT
+              DEFAULT
+                nRet := ::WMActivate( nwParam, nlParam )
+           END
 
       CASE nMsg == WM_SETFONT
            nRet := ::WMSetFont()
@@ -774,7 +793,7 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
       CASE nMsg == WM_NCDESTROY
            nRet := ::WMNcDestroy()
 
-      CASE nMsg==WM_NCHITTEST
+      CASE nMsg == WM_NCHITTEST
            nRet := ::WMNCHitTest( loword(nlParam), hiword(nlParam) )
 
       CASE nMsg == WM_CREATE
@@ -923,7 +942,13 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
            nRet := ::WMLButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
 
       CASE nMsg == WM_LBUTTONUP
-           nRet := ::WMLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           //nRet := ::WMLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           //REVIEW!!!
+           IF ValType( ::OnClick ) == "B"
+              nRet := EVAL( ::OnClick, Self )
+           ELSEIF ValType( ::OnClick ) == "N"
+              nRet := HB_Exec( ::OnClick, Self )
+           ENDIF
 
       CASE nMsg == WM_LBUTTONDBLCLK
            nRet := ::WMLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
@@ -1077,11 +1102,12 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
       otherwise
            nRet := ::WMMessage( nMsg, nwParam, nlParam)
-
    endcase
+
    IF nRet != NIL
       return( nRet )
    ENDIF
+
    IF ::nProc == nil // no SetProcedure
       do CASE
          CASE ::FormType == WT_MDICHILD
@@ -1094,9 +1120,8 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
               return( 0 )
       EndCase
    ENDIF
+
    return( CallWindowProc( ::nProc, ::handle, nMsg, nwParam, nlParam ) )
-
-
 
 METHOD Center( NewX, NewY, hParent ) CLASS TWinControl
 
