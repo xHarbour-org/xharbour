@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: hbffind.c,v 1.17 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.17 2004/02/14 21:01:17 andijahja Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -204,7 +204,7 @@ FILETIME GetOldesFile( const char * szPath)
    HANDLE hLastFind;
    FILETIME ftLastWriteTime ={0x99999999,0x9999999};
 
-   char * szf = (char*)hb_xgrab(7);
+   char * szf = (char*)hb_xgrab( 7 );
 
    strcpy(szf,szPath);
    strcat(szf,"*.*");
@@ -744,7 +744,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       if (GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
       {
-        info->fFileTime = GetOldesFile( pszFileName );
+        info->fFileTime = GetOldesFile( szPath );
         bFound = TRUE;
         info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
       }
