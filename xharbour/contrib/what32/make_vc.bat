@@ -1,5 +1,5 @@
 @echo off
-rem $Id: make_vc.bat,v 1.3 2002/10/30 02:32:48 paultucker Exp $
+rem $Id: make_vc.bat,v 1.2 2002/11/03 15:17:44 paultucker Exp $
 if not exist .\lib md .\lib
 if not exist .\lib\vc md .\lib\vc
 if not exist .\obj md .\obj
@@ -32,3 +32,4 @@ copy lib\vc\*.lib lib
 copy lib\*.lib ..\..\lib
 
 :end
+set MK_FILE=
