@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3465 2004/09/26 11:26:46 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3466 2004/09/26 11:55:17 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-26 14:33 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
+  * source/vm/inet.c
+    ! All calls are now blocking, except for a special connection case.
+      Nonblocking socket option was an early choice due to different base
+      hypotesis. As each socket call is correctly guarded by a select(),
+      blocking requests won't cause program hangs.
+
+  * tests/Makefile
+    + Added multithreading support for multiGT option.
+
+  * tests/inetto.prg
+    * minor formatting.
 
 2004-09-26 13:54 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/rtl/gtcrs/gtcrs.c

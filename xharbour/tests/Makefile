@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.25 2004/05/28 18:51:22 likewolf Exp $
+# $Id: Makefile,v 1.26 2004/06/28 14:16:34 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -107,7 +107,11 @@ else
 endif
 
 ifeq ($(HB_MULTI_GT),yes)
-   ALL_LIBS = -lxharbour $(GT_LIBS) -lm $(EXTRA_LIBS)
+   ifeq ($(HB_MT),MT)
+      ALL_LIBS = -lxharbourmt $(GT_LIBS) -lm $(EXTRA_LIBS) -lpthread
+   else
+      ALL_LIBS = -lxharbour $(GT_LIBS) -lm $(EXTRA_LIBS)
+   endif
 else
    ALL_LIBS = -ldebug $(MTLIBS) -lpp -llang -lcommon $(GT_LIBS) -lm $(EXTRA_LIBS)
 endif

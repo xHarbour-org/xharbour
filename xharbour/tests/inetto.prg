@@ -5,7 +5,7 @@
 *
 * Contributed by Giancarlo Niccolai and Charles Kwon
 *
-* $Id: inetto.prg,v 1.9 2003/11/28 16:10:51 jonnymind Exp $
+* $Id: inetto.prg,v 1.10 2003/12/11 14:44:52 jonnymind Exp $
 *
 
 * This array contain the socket control objects that
@@ -18,7 +18,7 @@ GLOBAL aCntSockets
 GLOBAL MutexCnt
 
 PROCEDURE Main( cAddress, nPort, nTimeout )
-   LOCAL Socket, ThreadID, CtlThreadID
+   LOCAL Socket, CtlThreadID
    LOCAL nStatus := 0
    LOCAL nDots := 0
 

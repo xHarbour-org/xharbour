@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.47 2004/05/02 21:48:53 druzus Exp $
+* $Id: inet.c,v 1.48 2004/05/14 07:13:24 ronpinkas Exp $
 */
 
 /*
@@ -247,6 +247,27 @@ void hb_socketSetNonBlocking( HB_SOCKET_STRUCT *Socket )
 
 }
 
+
+/*** Setup the blocking method **/
+
+void hb_socketSetBlocking( HB_SOCKET_STRUCT *Socket )
+{
+
+#ifdef HB_OS_WIN_32
+   ULONG mode = 0;
+   ioctlsocket( Socket->com,  FIONBIO, &mode );
+
+#else
+   int flags;
+
+   flags = fcntl( Socket->com, F_GETFL );
+   flags &= ~O_NONBLOCK;
+   fcntl( Socket->com, F_SETFL, (LONG) flags );
+
+#endif
+
+}
+
 /*** Utility to connect to a defined remote address ***/
 
 int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
@@ -260,7 +281,7 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
 
    setsockopt( Socket->com, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
 
-   /* we'll be using a nonblocking functions */
+   /* we'll be using a nonblocking function */
    hb_socketSetNonBlocking( Socket );
 
    iErr1 = connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) );
@@ -319,6 +340,8 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
          }
       }
    }
+
+   hb_socketSetBlocking( Socket );
 
    return Socket->errorCode == 0;
 }
@@ -1540,7 +1563,7 @@ HB_FUNC( INETSERVER )
    }
 
    /* we'll be using only nonblocking sockets */
-   hb_socketSetNonBlocking( Socket );
+   //hb_socketSetNonBlocking( Socket );
 
    /* Reusable socket; under unix, do not wait it is unused */
    setsockopt( Socket->com, SOL_SOCKET, SO_REUSEADDR, (const char *) &iOpt, sizeof( iOpt ));
@@ -1666,7 +1689,7 @@ HB_FUNC( INETACCEPT )
       HB_SOCKET_INIT( NewSocket );
       memcpy( &NewSocket->remote, &si_remote, Len );
       NewSocket->com = incoming;
-      hb_socketSetNonBlocking( NewSocket );
+      //hb_socketSetNonBlocking( NewSocket );
       hb_retptrGC( NewSocket );
    }
 
@@ -1848,7 +1871,7 @@ HB_FUNC( INETDGRAMBIND )
    }
 
    /* we'll be using non blocking sockets in all functions */
-   hb_socketSetNonBlocking( Socket );
+   //hb_socketSetNonBlocking( Socket );
 
    /* Binding here */
    iPort  = htons( iPort );
@@ -1901,7 +1924,7 @@ HB_FUNC( INETDGRAM )
       setsockopt( Socket->com, SOL_SOCKET, SO_BROADCAST, (const char *) &iOpt, sizeof( iOpt ));
    }
    /* we'll be using non blocking sockets in all functions */
-   hb_socketSetNonBlocking( Socket );
+   //hb_socketSetNonBlocking( Socket );
 
    hb_retptrGC( Socket );
 }
