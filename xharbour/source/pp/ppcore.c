@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.178 2004/10/22 02:40:35 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.179 2004/10/22 02:55:42 ronpinkas Exp $
  */
 
 /*
@@ -833,7 +833,7 @@ int hb_pp_ParseDirective( char * sLine )
 
      if( szExpandedLine[0] )
      {
-        strcpy( sLine, szExpandedLine );
+        sLine = szExpandedLine;
      }
 
      ParseIf( sLine ); /* --- #if  --- */
@@ -858,7 +858,7 @@ int hb_pp_ParseDirective( char * sLine )
 
            if( szExpandedLine[0] )
            {
-              strcpy( sLine, szExpandedLine );
+              sLine = szExpandedLine;
            }
 
            hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = CalcConstant( &sLine ) ? 1 : 0;
@@ -893,8 +893,8 @@ int hb_pp_ParseDirective( char * sLine )
      }
   }
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "ENDIF", i ) == 0 )
-  {     /* --- #endif  --- */
-    if( hb_pp_nCondCompile == 0 )
+  { /* --- #endif  --- */
+    if( hb_pp_nCondCompile <= 0 )
     {
        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ENDIF, NULL, NULL );
     }
@@ -917,18 +917,21 @@ int hb_pp_ParseDirective( char * sLine )
      {    /* --- #include --- */
         char cDelimChar;
 
-        // Ron Pinkas added Oct-16-2004 to allow support of #defines #translates etc.
-        szExpandedLine[0] = '\0';
-        hb_pp_ParseExpression( sLine, szExpandedLine );
-
-        if( szExpandedLine[0] )
-        {
-           strcpy( sLine, szExpandedLine );
-        }
-
         if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
         {
-           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine, NULL );
+           // Ron Pinkas added Oct-16-2004 to allow support of #defines #translates etc.
+           szExpandedLine[0] = '\0';
+           hb_pp_ParseExpression( sLine, szExpandedLine );
+
+           if( szExpandedLine[0] )
+           {
+              sLine = szExpandedLine;
+           }
+
+           if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine, NULL );
+           }
         }
 
         cDelimChar = *sLine;
@@ -6977,7 +6980,10 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
 
   HB_TRACE(HB_TR_DEBUG, ("OpenInclude('%s', %p, %p, %p, %i, '%s')", szFileName, pSearch, pMainFileName, bStandardOnly, szInclude));
 
+  //printf( "OpenInclude( %s )\n", szFileName );
+
   errno = 0;
+
   if( bStandardOnly )
   {
      fptr = 0;
@@ -6988,7 +6994,9 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
      pFileName = hb_fsFNameSplit( szFileName );
 
      if( ( pFileName->szPath == NULL || *(pFileName->szPath) == '\0' ) && pMainFileName )
+     {
         pFileName->szPath = pMainFileName->szPath;
+     }
 
      hb_fsFNameMerge( szInclude, pFileName );
 
@@ -7001,6 +7009,7 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
       pFileName = hb_fsFNameSplit( szFileName );
       pFileName->szName = szFileName;
       pFileName->szExtension = NULL;
+
       while( pSearch && !fptr )
       {
           pFileName->szPath = pSearch->szPath;
@@ -7008,6 +7017,7 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
           fptr = fopen( szInclude, "r" );
           pSearch = pSearch->pNext;
       }
+
       hb_xfree( pFileName );
   }
 
@@ -7018,22 +7028,27 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
      pFile->pBuffer = hb_xgrab( HB_PP_BUFF_SIZE );
      pFile->iBuffer = pFile->lenBuffer = 10;
      pFile->szFileName = ( char * ) hb_xgrab( strlen( szFileName ) + 1 );
+
      hb_pp_strocpy( pFile->szFileName, szFileName );
 
      if( hb_comp_files.pLast )
+     {
         hb_comp_files.pLast->iLine = hb_comp_iLine;
+     }
+
      hb_comp_iLine = 1;
 
      pFile->iLine = 1;
      pFile->pPrev = hb_comp_files.pLast;
+
      hb_comp_files.pLast = pFile;
      hb_comp_files.iFiles++;
+
      return TRUE;
   }
 
   return FALSE;
 }
-
 
 void CloseInclude( void )
 {
@@ -7041,13 +7056,20 @@ void CloseInclude( void )
 
    /* we close the currently include file and continue */
    fclose( hb_comp_files.pLast->handle );
+
    hb_xfree( hb_comp_files.pLast->pBuffer );
    hb_xfree( hb_comp_files.pLast->szFileName );
+
    pFile = ( PFILE ) ( ( PFILE ) hb_comp_files.pLast )->pPrev;
    hb_xfree( hb_comp_files.pLast );
+
    hb_comp_files.pLast = pFile;
+
    if( hb_comp_files.pLast )
+   {
       hb_comp_iLine = hb_comp_files.pLast->iLine;
+   }
+
    hb_comp_files.iFiles--;
 }
 
