@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.96 2004/10/12 12:28:50 lculik Exp $
+# $Id: makefile.nt,v 1.97 2004/10/22 02:40:32 ronpinkas Exp $
 #
 
 #
@@ -373,7 +373,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\datec.obj \
    $(OBJ_DIR)$(MT)\dates.obj \
    $(OBJ_DIR)$(MT)\dateshb.obj \
-   $(OBJ_DIR)$(MT)\datesx.obj \
    $(OBJ_DIR)$(MT)\defpath.obj \
    $(OBJ_DIR)$(MT)\descend.obj \
    $(OBJ_DIR)$(MT)\dirdrive.obj \

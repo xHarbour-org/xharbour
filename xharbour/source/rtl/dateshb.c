@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.7 2004/02/23 10:01:42 andijahja Exp $
+ * $Id: dateshb.c,v 1.8 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -216,15 +216,14 @@ HB_FUNC( DTOS )
    }
 }
 
-/* NOTE: Harbour extension, exactly the same as STOD(). */
+HB_FUNC( STOD )
+{
+   hb_retds( hb_parcx( 1 ) );
+}
 
 HB_FUNC( HB_STOD )
 {
-#ifdef HB_FAST_STOD
-   hb_retds( hb_parcx( 1 ) );
-#else
-   hb_retds( ( ISCHAR( 1 ) && hb_parclen( 1 ) == 8 ) ? hb_parcx( 1 ) : "        " );
-#endif
+   HB_FUNCNAME( STOD )();
 }
 
 HB_FUNC( YEAR )

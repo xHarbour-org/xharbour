@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3515 2004/10/22 05:40:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3516 2004/10/22 11:26:35 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-22 08:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/dates.c
+    * datestrget() - don't check byte 8 of passed date string for compatibility.
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * makefile.bc
+    - source/rtl/datesx.c
+  - source/rtl/datesx.c
+  * source/rtl/dateshb.c
+    * STOD down to it's simplest form - no need to check params.
+    * HB_STOD now just a call to STOD.
 
 2004-10-22 07:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include\gtinfo.ch

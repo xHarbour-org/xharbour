@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.45 2004/09/19 03:58:59 kaddath Exp $
+# $Id: hrbdll.vc,v 1.46 2004/09/30 14:15:49 mlombardo Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -101,7 +101,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\datec.obj \
   $(OBJ_DIR)\dates.obj \
   $(OBJ_DIR)\dateshb.obj \
-  $(OBJ_DIR)\datesx.obj \
   $(OBJ_DIR)\defpath.obj \
   $(OBJ_DIR)\descend.obj \
   $(OBJ_DIR)\direct.obj \
@@ -991,9 +990,6 @@ $(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\datesx.obj : $(RTL_DIR)\datesx.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg

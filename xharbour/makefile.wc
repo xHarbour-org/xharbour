@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.17 2004/09/30 14:15:50 mlombardo Exp $
+# $Id: makefile.wc,v 1.18 2004/10/12 12:28:50 lculik Exp $
 #
 
 #
@@ -291,7 +291,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\datec.obj \
    $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
-   $(RTL_OBJ_DIR)\datesx.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
    $(RTL_OBJ_DIR)\descend.obj \
    $(RTL_OBJ_DIR)\dirdrive.obj \
@@ -905,6 +904,7 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptb.obj \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
+   $(OBJ_DIR)\calconst.obj \
    $(PP_LIB) \
    $(OBJ_DIR)\hbslex.obj
 
@@ -1214,6 +1214,7 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfunchk.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\calconst.obj >> make.tmp
    $(ECHO) $(COMMON_LIB) $(PP_LIB) >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HARBOUR_EXE) /subsystem:console
    $(DEL) make.tmp
@@ -1273,6 +1274,9 @@ $(OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\calconst.obj : $(PP_DIR)\calconst.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 #
@@ -1606,9 +1610,6 @@ $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(RTL_OBJ_DIR)\datesx.obj : $(RTL_DIR)\datesx.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
