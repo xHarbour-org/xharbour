@@ -14,6 +14,7 @@ Command line switches and syntax.
     --help   = Syntax and command line switches description.
     -I<path> = #include file search path(s) (';' seperated).
     -P       = Generate .pp$ pre-processed output file.
+    -Q       = Quiet.
     -R       = Run filename as a script.
     -U       = Use command definitions set in <ch-file> (or none).
 
@@ -39,6 +40,7 @@ PP has 3 personalities which are tied tightly together.
     -D:P     = Show tracing information into the Output Generator.
     -FIX     = Do not clone Clipper PreProcessor bugs.
     -I<path> = #include file search path(s) (';' separated).
+    -Q       = Quiet.
     -U       = Use command definitions set in <ch-file> (or none).
 
 2. DOT prompt, which allows most of the Clipper syntax. Please
@@ -101,6 +103,7 @@ PP has 3 personalities which are tied tightly together.
     -FIX     = Do not clone Clipper PreProcessor bugs.
     -I<path> = #include file search path(s) (';' separated).
     -P       = Generate .pp$ pre-processed output file.
+    -Q       = Quiet.
     -U       = Use command definitions set in <ch-file> (or none).
 
      a. It does support LOCAL/STATIC/PRIVATE/PUBLIC, but:
@@ -117,7 +120,8 @@ PP has 3 personalities which are tied tightly together.
         FUNCTIONs/PROCEDUREs as well as parameter passing and return values.
 
      d. It does support ALL control flow structures including BEGIN
-        SEQUENCE [BREAK] [RECOVER] END SEQUENCE and TRY [CATCH [<xCatcher>]] END.
+        SEQUENCE [BREAK] [RECOVER] END SEQUENCE TRY [CATCH [<xCatcher>]] END
+        and FOR EACH [HB_EnumIndex()] ][LOOP] [EXIT] NEXT.
 
      e. The compiled module is automatically using -n (No implicit startup
         procedure) if the script starts with a Procedure/Function definition.

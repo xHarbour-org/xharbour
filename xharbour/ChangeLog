@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2867 2004/05/03 17:29:13 druzus Exp $
+ * $Id: ChangeLog,v 1.2868 2004/05/03 23:55:29 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-03 20:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+  * tests/pp.txt
+  * tests/rp_run.src
+    + Added support for FOR EACH [HB_EnumIndex()] [LOOP] [EXIT] NEXT
 
 2004-05-04 12:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rdd/dbf1.c

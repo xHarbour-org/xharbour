@@ -77,6 +77,8 @@
 
 #COMMAND FOR <counter> := <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
 #COMMAND FOR <counter> =  <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
+#COMMAND FOR EACH <enumerator> IN <enumeration>          => PP__FOREACH <enumerator>~IN~<enumeration>
+
 #COMMAND LOOP [<x,...>]                                  => PP__LOOP [<-x->]
 #COMMAND EXIT [<x,...>]                                  => PP__EXIT [<-x->]
 #COMMAND NEXT [<x,...>]                                  => PP__NEXT [<-x->]
@@ -118,5 +120,7 @@
 
 #COMMAND FIELD <var,...>      =>
 
-#TRANSLATE ProcName( [<n>] ) => PP_ProcName( <n> )
-#TRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )
+#XTRANSLATE ProcName( [<n>] ) => PP_ProcName( <n> )
+#XTRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )
+
+#XTRANSLATE HB_EnumIndex() => PP_EnumIndex()
