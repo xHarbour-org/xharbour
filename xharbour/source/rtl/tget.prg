@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.84 2004/07/13 19:15:36 paultucker Exp $
+ * $Id: tget.prg,v 1.85 2004/07/13 19:35:57 paultucker Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Picture        := cPicture
    ::Name           := cVarName
    //::Original     := ::VarGet()
-   //::Type         := ValType( ::Original )
+   ::Type           := ValType( ::VarGet() )   // Must know the type at creation
    ::cDelimit       := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
 
    #ifdef HB_COMPAT_C53
@@ -1117,7 +1117,7 @@ METHOD IsEditable( nPos ) CLASS Get
       return .f.
    endif
 
-   cChar := SubStr( ::cPicMask, nPos, 1 )
+   cChar := UPPER( SubStr( ::cPicMask, nPos, 1 ) )
 
    Switch ::type
    case "C"

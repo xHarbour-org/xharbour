@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3204 2004/07/23 10:35:28 likewolf Exp $
+ * $Id: ChangeLog,v 1.3205 2004/07/23 13:05:39 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-23 19:24 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tget.prg
+    ! ::type must be registered when oGet is created (::New).
+    ! Fixed PICTURE "x" (lowercase) behaviour.
 
 2004-07-23 09:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbgtwvt.h
