@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2586 2004/03/16 21:31:35 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2587 2004/03/17 00:17:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-16 22:33 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
+  * utils/hbdoc/hbdoc.prg
+    ! changes on WriteContentFile() and WriteChmContentFile() to generate the content on alphabetical order
+  * contrib/mysql/mysql.c
+    contrib/mysql/tmysql.c
+    ! + 2 new paremeters on SQLCONNECT() now you an pass the port and flags to server(usefull for two mysql server on same machine with diferent ports
+      TmysqlServer:new() method change to add the new changes to sqlconnect
 
 2004-03-16 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xdiff.txt
