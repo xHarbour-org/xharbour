@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.4 2002/12/24 06:42:21 ronpinkas Exp $
+ * $Id: trace.c,v 1.5 2003/01/02 01:21:29 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,45 @@
 
 #ifdef HB_EXTENSION
 
+#ifdef HB_THREAD_SUPPORT
+   static HB_CRITICAL_T s_CriticalMutex;
+#endif
+
+void hb_traceInit( long bNoAutoCreate )
+{
+   FILE *fpTrace;
+
+   #ifdef HB_THREAD_SUPPORT
+      #ifdef HB_OS_WIN_32
+          InitializeCriticalSection( &s_CriticalMutex );
+      #endif
+   #endif
+
+   if( ! bNoAutoCreate )
+   {
+        /* Create trace.log for tracing. */
+        fpTrace = fopen( "trace.log", "w" );
+
+        if( fpTrace )
+        {
+           fclose( fpTrace );
+        }
+        //else
+        //{
+           //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+        //}
+   }
+}
+
+void hb_traceExit( void )
+{
+   #ifdef HB_THREAD_SUPPORT
+      #ifdef HB_OS_WIN_32
+          DeleteCriticalSection( &s_CriticalMutex );
+      #endif
+   #endif
+}
+
 void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 {
    FILE *hFile;
@@ -63,6 +102,15 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
    {
       return;
    }
+
+   #ifdef HB_THREAD_SUPPORT
+      #ifdef HB_OS_WIN_32
+         if( hb_ht_context )
+         {
+            EnterCriticalSection( &s_CriticalMutex );
+         }
+      #endif
+   #endif
 
    if( sFile == NULL )
    {
@@ -73,7 +121,7 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       hFile = fopen( sFile, "a" );
    }
 
-   if ( hFile )
+   if( hFile )
    {
       va_list ap;
 
@@ -83,6 +131,15 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 
       fclose( hFile );
    }
+
+   #ifdef HB_THREAD_SUPPORT
+      #ifdef HB_OS_WIN_32
+         if( hb_ht_context )
+         {
+            LeaveCriticalSection( &s_CriticalMutex );
+         }
+      #endif
+   #endif
 }
 
 HB_FUNC( HB_TRACESTATE )

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.1.1.1 2001/12/21 10:40:57 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
  */
 
 /*
@@ -81,9 +81,7 @@ BOOL hb_cmdargIsInternal( const char * szArg )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_cmdargIsInternal(%s)", szArg));
 
-   return strlen( szArg ) >= 2 &&
-          szArg[ 0 ] == '/' &&
-          szArg[ 1 ] == '/';
+   return szArg[ 0 ] == '/' && szArg[ 1 ] == '/';
 }
 
 static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
@@ -98,8 +96,7 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
 
    for( i = 1; i < s_argc; i++ )
    {
-      if( hb_cmdargIsInternal( s_argv[ i ] ) &&
-         hb_strnicmp( s_argv[ i ] + 2, pszName, strlen( pszName ) ) == 0 )
+      if( hb_cmdargIsInternal( s_argv[ i ] ) && hb_strnicmp( s_argv[ i ] + 2, pszName, strlen( pszName ) ) == 0 )
       {
          if( bRetValue )
          {
@@ -115,7 +112,9 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
             return pszRetVal;
          }
          else
+         {
             return s_argv[ i ] + 2;
+         }
       }
    }
 
@@ -126,7 +125,9 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
    if( !pszEnvVar || pszEnvVar[ 0 ] == '\0' )
    {
       if( pszEnvVar )
+      {
          hb_xfree( ( void * ) pszEnvVar );
+      }
 
       pszEnvVar = hb_getenv( "CLIPPER" );
    }
@@ -310,5 +311,9 @@ void hb_cmdargProcessVM( void )
    }
 
    if( hb_cmdargCheck( "BUILD" ) )
+   {
       hb_verBuildInfo();
+   }
+
+   hb_traceInit( hb_cmdargCheck( "NOTRACE" ) );
 }

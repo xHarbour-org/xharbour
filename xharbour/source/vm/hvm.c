@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.145 2002/12/31 02:10:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.146 2003/01/02 09:05:18 ronpinkas Exp $
  */
 
 /*
@@ -331,8 +331,6 @@ void hb_vmDoInitRdd( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-   FILE *fpTrace;
-
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
       APIRET rc = NO_ERROR;                           /* Return code                   */
@@ -375,7 +373,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
 
-   /* Moved to respective main!
+   /* Moved to hb_vmProcessSymbols() because hb_xgrab i sused from static initializers before we get here.
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
    */
@@ -414,17 +412,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
          hb_ulOpcodesCalls[ ul ] = 0;
          hb_ulOpcodesTime[ ul ] = 0;
       }
-   }
-
-   /* Create trace.log for tracing. */
-   fpTrace = fopen( "trace.log", "w" );
-   if( fpTrace )
-   {
-      fclose( fpTrace );
-   }
-   else
-   {
-      //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
    }
 
    /* Call functions that initializes static variables
@@ -588,6 +575,10 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "After xexit\n" );
 
    hb_gcExit();
+   //printf( "After gcExit\n" );
+
+   hb_traceExit();
+   //printf( "After traceExit\n" );
 
    exit( s_byErrorLevel );
 }
