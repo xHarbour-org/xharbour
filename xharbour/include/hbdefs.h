@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.54 2004/08/31 08:38:23 likewolf Exp $
+ * $Id: hbdefs.h,v 1.55 2004/09/08 00:17:11 druzus Exp $
  */
 
 /*
@@ -65,20 +65,12 @@
 #include "hbtrace.h"
 
 #if defined( HB_OS_WIN_32 )
-   #if !defined( HB_WIN32_IO_OFF ) 
+   #if !defined( HB_WIN32_IO_OFF )
       #define HB_WIN32_IO
    #endif
    #if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_32_USED )
       /* disabled to avoid problems with windows.h */
       /* #define HB_OS_WIN_32_USED */
-   #endif
-   /*
-    * This is a temporary hack to resolve problem with binary
-    * compatibility 3-rd party binaries - mostly FWH now.
-    * I hope we will be able to remove it soon
-    */
-   #ifndef HB_LONG_HOLDERS
-      #define HB_FWH_COMPATIBLE
    #endif
 #else
    #undef HB_WIN32_IO

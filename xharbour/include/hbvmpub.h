@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.30 2004/04/14 10:32:01 druzus Exp $
+ * $Id: hbvmpub.h,v 1.31 2004/04/28 18:22:08 druzus Exp $
  */
 
 /*
@@ -244,25 +244,10 @@
     {
        PHB_ITEM pItems;       /* pointer to the array items */
        ULONG    ulLen;        /* number of items in the array */
-#ifdef HB_FWH_COMPATIBLE
-    #ifdef HB_LONG_HOLDERS
-       USHORT     uiDummy;      /* dummy var for binary compatibility with old API */
-       USHORT     uiClass;      /* offset to the classes base if it is an object */
-       USHORT     uiPrevCls;    /* for fixing after access super */
-       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
-       HB_COUNTER ulHolders;    /* number of holders of this array */
-   #else
-       USHORT     ulHolders;    /* number of holders of this array */
-       USHORT     uiClass;      /* offset to the classes base if it is an object */
-       USHORT     uiPrevCls;    /* for fixing after access super */
-       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
-   #endif
-#else
        HB_COUNTER ulHolders;    /* number of holders of this array */
        USHORT     uiClass;      /* offset to the classes base if it is an object */
        USHORT     uiPrevCls;    /* for fixing after access super */
        USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
-#endif
 #ifndef HB_ARRAY_USE_COUNTER
        PHB_ARRAY_HOLDER pOwners;
 #endif
