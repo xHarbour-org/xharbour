@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.23 2002/10/20 21:44:22 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.24 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,11 @@
 #include "hbapilng.h"
 #include "cstruct.ch"
 
+#ifdef HB_THREAD_SUPPORT
+   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
+#endif
+
 /* This function creates an array item using 'iDimension' as an index
  * to retrieve the number of elements from the parameter list.
  */
@@ -78,15 +83,34 @@ static void hb_arrayNewRagged( PHB_ITEM pArray, int iDimension )
 
    ulElements = ( ULONG ) hb_parnl( iDimension );
 
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        //hb_threadForbid( &hb_gcCollectionForbid );
+        HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+     }
+   #endif
+
    /* create an array */
    hb_arrayNew( pArray, ulElements );
+
+   #ifdef HB_THREAD_SUPPORT
+     if( hb_ht_context )
+     {
+        // Called from ARRAY() which means target is HB_VM_STACK.Return which means we are safe.
+        //hb_threadForbid( &hb_gcCollectionForbid );
+        HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+     }
+   #endif
 
    if( ++iDimension <= hb_pcount() )
    {
       /* call self recursively to create next dimensions
        */
       while( ulElements )
+      {
          hb_arrayNewRagged( hb_arrayGetItemPtr( pArray, ulElements-- ), iDimension );
+      }
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.142 2002/12/30 19:44:00 ronpinkas Exp $
+ * $Id: hvm.c,v 1.143 2002/12/30 21:24:09 ronpinkas Exp $
  */
 
 /*
@@ -1985,9 +1985,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
-            hb_stackDec();
+            hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
 
-            hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos ) );
+            hb_stackDec();
 
             w += 2;
             break;
@@ -2041,7 +2041,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             USHORT uiParams;
             PHB_DYNS pDyn;
-            PHB_ITEM pTop;
 
             /* Pops a value from the eval stack and uses it to set
              * a new value of a variable of unknown type.
@@ -2055,30 +2054,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             /* memvars.c 417 */
             pDyn = ( PHB_DYNS ) (pSymbols + uiParams)->pDynSym;
+
             if( pDyn && pDyn->hMemvar )
             {
                /* If exist a memory symbol with this name use it */
                hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
-            } else {
-               /* Try with a field and after create a memvar */
-               if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbols + uiParams ) == FAILURE )
-                  hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
-            }
-
-            hb_stackDec();
-
-            pTop = ( * HB_VM_STACK.pPos );
-
-            if( HB_IS_COMPLEX( pTop ) )
-            {
-               hb_itemClear( pTop );
             }
             else
             {
-               pTop->type = HB_IT_NIL;
+               /* Try with a field and after create a memvar */
+               if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbols + uiParams ) == FAILURE )
+               {
+                  hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
+               }
             }
 
-            HB_TRACE(HB_TR_INFO, ("(hb_vmPopVariable)"));
+            hb_stackPop();
+
             w += 3;
             break;
          }
@@ -2296,20 +2288,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
             PHB_ITEM pTop;
 
-            hb_stackDec();
-
-            pTop = ( * HB_VM_STACK.pPos );
+            pTop = *( HB_VM_STACK.pPos - 1 );
 
             hb_memvarSetValue( ( *pDynSym )->pSymbol, pTop );
 
-            if( HB_IS_COMPLEX( pTop ) )
-            {
-               hb_itemClear( pTop );
-            }
-            else
-            {
-               pTop->type = HB_IT_NIL;
-            }
+            hb_stackPop();
 
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPopMemvar)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -5487,6 +5470,7 @@ static double hb_vmPopDouble( int * piDec )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopDouble(%p)", piDec));
 
    pItem = hb_stackItemFromTop( -1 );
+
    hb_stackDec();
 
    switch( pItem->type & ~HB_IT_BYREF )
@@ -5548,8 +5532,11 @@ static void hb_vmPopAliasedField( PHB_SYMB pSym )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopAliasedField(%p)", pSym));
 
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
+
    if( hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ) ) == SUCCESS )
+   {
       hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
+   }
 
    hb_rddSelectWorkAreaNumber( iCurrArea );
    hb_stackDec();    /* alias - it was cleared in hb_vmSelectWorkarea */
@@ -5582,8 +5569,12 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
       else
       {
          int iCmp = strncmp( szAlias, "MEMVAR", 4 );
+
          if( iCmp == 0 )
+         {
             iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
+         }
+
          if( iCmp == 0 )
          {  /* MEMVAR-> or MEMVA-> or MEMV-> */
             hb_memvarSetValue( pSym, hb_stackItemFromTop( -2 ) );
@@ -5593,8 +5584,12 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
          else
          {  /* field variable */
             iCmp = strncmp( szAlias, "FIELD", 4 );
+
             if( iCmp == 0 )
+            {
                iCmp = strncmp( szAlias, "FIELD", pAlias->item.asString.length );
+            }
+
             if( iCmp == 0 )
             {  /* FIELD-> */
                hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
@@ -5620,9 +5615,7 @@ static void hb_vmPopLocal( SHORT iLocal )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopLocal(%hd)", iLocal));
 
-   hb_stackDec();
-
-   pVal = ( * HB_VM_STACK.pPos );
+   pVal = *( HB_VM_STACK.pPos - 1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
    pVal->type &= ~HB_IT_MEMOFLAG;
@@ -5647,6 +5640,8 @@ static void hb_vmPopLocal( SHORT iLocal )
    }
 
    hb_itemForwardValue( pLocal, pVal );
+
+   hb_stackDec();
 }
 
 static void hb_vmPopStatic( USHORT uiStatic )
@@ -5655,9 +5650,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopStatic(%hu)", uiStatic));
 
-   hb_stackDec();
-
-   pVal = ( * HB_VM_STACK.pPos );
+   pVal = *( HB_VM_STACK.pPos - 1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
    pVal->type &= ~HB_IT_MEMOFLAG;
@@ -5665,6 +5658,8 @@ static void hb_vmPopStatic( USHORT uiStatic )
    pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
 
    hb_itemForwardValue( pStatic, pVal );
+
+   hb_stackDec();
 }
 
 /* ----------------------------------------------- */
