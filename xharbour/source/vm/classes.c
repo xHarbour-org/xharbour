@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.131 2004/10/21 21:18:48 ronpinkas Exp $
+ * $Id: classes.c,v 1.132 2004/11/21 21:44:25 druzus Exp $
  */
 
 /*
@@ -811,6 +811,14 @@ HB_EXPORT BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
    }
 
    return FALSE;
+}
+
+HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
+{
+   if ( pItem && HB_IS_ARRAY( pItem ) )
+      return pItem->item.asArray.value->uiClass;
+   else
+      return 0;
 }
 
 /* ================================================ */

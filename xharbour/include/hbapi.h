@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.146 2004/09/21 02:52:34 druzus Exp $
+ * $Id: hbapi.h,v 1.147 2004/11/21 21:43:36 druzus Exp $
  */
 
 /*
@@ -486,6 +486,7 @@ extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg,
    {\
 */
 extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
+extern HB_EXPORT USHORT   hb_objGetClass( PHB_ITEM pItem ); 
 
 /* dynamic symbol table management */
 

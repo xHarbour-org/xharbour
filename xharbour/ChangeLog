@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3632 2004/11/26 14:33:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.3633 2004/11/26 17:36:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-26 18:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/classes.c
+    + added: extern HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
+
+  * xharbour/source/rtl/gtapi.c
+    * once again - I do not know why it's still disabled - I made some
+      mistake or someone overwrite my previous commit
+      reenabled hb_gtReadKey() function - it's documented API function
+      which is used by some 3-rd party libs
 
 2004-11-26 18:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbexprb.c
