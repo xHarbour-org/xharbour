@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.52 2002/10/06 21:24:04 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.53 2002/10/06 21:39:31 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -400,7 +400,7 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
          Return Self
       ENDIF
 
-      nBase    := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } )
+      nBase := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } )
 
       XFMControl := ::aXFM[ XFM_Controls ][ nControl ]
 
@@ -421,11 +421,12 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
       aAdd( XFMControl[4], "   CONTROL " + cName + " FROM " + oControl:ClassName )
 
-      IF aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } ) == 0
+      IF ( nBase := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } ) ) == 0
          aAdd( ::aBases, __ClsInst( oControl:ClassH ) )
+         nBase := -1
       ENDIF
 
-      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ -1 ] )
+      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
 
       FOR EACH aVar IN XFMControl[ 3 ]
          aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )

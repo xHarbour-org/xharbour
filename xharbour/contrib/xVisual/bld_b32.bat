@@ -80,7 +80,6 @@ echo %BCC_DIR%\lib\cw32.lib + >> b32.bc
 echo %BCC_DIR%\lib\import32.lib, >> b32.bc
 
 IF EXIST %1.res echo %1.res >> b32.bc
-IF EXIST xide.res echo xide.res >> b32.bc
 
 ECHO *
 ECHO Linking...
