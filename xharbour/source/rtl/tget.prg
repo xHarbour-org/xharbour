@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.78 2004/05/31 02:35:11 lculik Exp $
+ * $Id: tget.prg,v 1.79 2004/05/31 02:58:11 lculik Exp $
  */
 
 /*
@@ -1757,7 +1757,7 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
    LOCAL cRet := ""
    LOCAL aTokens
    DEFAULT cColorSpec to SetColor()
-   aTokens := hb_atoken(cColorSpec,",")
+   aTokens := HB_ATOKENS(cColorSpec,",")
    /* ONLY ONE PAIR COLOR PASSED */
    
    IF  len( aTokens ) == 1
