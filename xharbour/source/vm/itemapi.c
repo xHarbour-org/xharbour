@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.56 2003/11/27 13:27:22 lf_sfnet Exp $
+ * $Id: itemapi.c,v 1.57 2003/12/13 03:25:24 andijahja Exp $
  */
 
 /*
@@ -1473,11 +1473,6 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   {
                      if( iDec <=  iDecR )
                      {
-                        char szTemp[20];
-                        sprintf( szTemp, "%f", dNumber );
-
-                        if ( !strcmp( szTemp,"-0.000000") )
-                           dNumber = 0;
 
                         iBytes = sprintf( szResult, "%*.*f", iSize, iDec, dNumber );
 
