@@ -1,5 +1,5 @@
 /*
- * $Id: hbrun.prg,v 1.2 2001/06/14 21:20:43 dholm Exp $
+ * $Id: hbrun.prg,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
  */
 
 /*
@@ -56,8 +56,8 @@ FUNCTION Main( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8,
    LOCAL xRetVal
 
    IF Empty( cHRBFile )
-      OutStd( "Harbour Runner" + HB_OSNewLine() +;
-              "Copyright 1999-2000, http://www.harbour-project.org" + HB_OSNewLine() +;
+      OutStd( "xHarbour Runner" + HB_OSNewLine() +;
+              "Copyright 1999-2005, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
               "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() +;
               HB_OSNewLine() +;

@@ -1,24 +1,28 @@
 @echo off
 rem
-rem $Id: make_gcc.bat,v 1.0 2005/02/16 08:37:21 andijahja Exp $
+rem $Id: make_gc.bat,v 1.1 2005/02/17 08:03:07 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with MinGW32 under Windows
 rem
-rem What we have to do is to set the following 2 envars, ONE and TWO
+rem What we have to do is to set the following 3 envars, ONE, TWO and THREE
 
 rem ENVAR ONE
 rem Our MinGW32 Root Directory
-@set MINGWDIR=F:\MinGW
+@set MINGWDIR=F:/MinGW
 
 rem ENVAR TWO
 rem Our BISON BIN Directory
-@set BISONDIR=F:\Bison\bin
+@set BISONDIR=F:/Bison/bin
+
+rem ENVAR THREE
+rem SET xHarbour Working Root Directory Here
+@set HARBOUR_DIR=d:/xharbour
 
 rem Set up our environment for output files here
 rem Let them be like that
-@set GCCBIN=bin\gcc
-@set GCCLIB=lib\gcc
-@set GCCOBJ=obj\gcc
+@set BIN_DIR=bin\gcc
+@set OBJ_DIR=lib\gcc
+@set LIB_DIR=obj\gcc
 
 rem Set up our BIN paths
 @set _PATH=%PATH%
@@ -86,7 +90,9 @@ if exist %GCCOBJ%\opt\gui\*.c      del %GCCOBJ%\opt\gui\*.c
 rem Clean up and restore environment
 @set PATH=%_PATH%
 @set _PATH=
-@set GCCLIB=
-@set GCCOBJ=
+@set BIN_DIR=
+@set OBJ_DIR=
+@set LIB_DIR=
 @set MINGWDIR=
 @set BISONDIR=
+@set HARBOUR_DIR=

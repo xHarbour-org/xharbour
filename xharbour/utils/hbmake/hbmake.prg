@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.140 2005/01/27 23:25:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.140 2005/01/28 01:33:06 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -4467,44 +4467,44 @@ FUNCTION ShowHelp()
 
    LOCAL cOS := Upper( Os() )
    cls
-   ? s_aLangMessages[ 1 ]
-   ? "Copyright 2000-2004 Luiz Rafael Culik <culikr@uol.com.br>"
+   OutStd( s_aLangMessages[ 1 ] + HB_OsNewLine() )
+   OutStd( "Copyright 2000-2005 Luiz Rafael Culik <culikr@uol.com.br>"  + HB_OsNewLine() )
 //   ? ""
-   ? s_aLangMessages[ 2 ]
+   OutStd( s_aLangMessages[ 2 ] + HB_OsNewLine() )
 //   ? ""
-   ? s_aLangMessages[ 3 ]
-   ? s_aLangMessages[ 4 ]
-   ? s_aLangMessages[ 5 ]
-   ? s_aLangMessages[ 6 ]
-   ? s_aLangMessages[ 7 ]
-   ? s_aLangMessages[ 8 ]
+   OutStd( s_aLangMessages[ 3 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 4 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 5 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 6 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 7 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 8 ] + HB_OsNewLine() )
 
    IF  "OS/2" IN cOS
-      ? s_aLangMessages[ 9 ]
-      ? s_aLangMessages[ 10 ]
-      ? s_aLangMessages[ 13 ]
+      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 10 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
    ELSEIF  'LINUX' IN  cOS
-      ? s_aLangMessages[ 9 ]
-      ? s_aLangMessages[ 12 ]
-      ? s_aLangMessages[ 14 ]
+      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 14 ] + HB_OsNewLine() )
    ELSE
-      ? s_aLangMessages[ 11 ]
-      ? s_aLangMessages[ 12 ]
-      ? s_aLangMessages[ 13 ]
+      OutStd( s_aLangMessages[ 11 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
    ENDIF
 
-   ? s_aLangMessages[ 15 ]
-   ? s_aLangMessages[ 16 ]
-   ? s_aLangMessages[ 17 ]
-   ? s_aLangMessages[ 18 ]
-   ? s_aLangMessages[ 19 ]
-   ? s_aLangMessages[ 20 ]
-   ? s_aLangMessages[ 21 ]
-   ? s_aLangMessages[ 22 ]
-   ? s_aLangMessages[ 23 ]
-   ? s_aLangMessages[ 24 ]
-   ? s_aLangMessages[ 25 ]
-   ? s_aLangMessages[ 26 ]
+   OutStd( s_aLangMessages[ 15 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 16 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 17 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 18 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 19 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 20 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 21 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 22 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 23 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 24 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 25 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 26 ] + HB_OsNewLine() )
 
 RETURN NIL
 

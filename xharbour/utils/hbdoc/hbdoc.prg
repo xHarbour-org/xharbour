@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.11 2005/02/01 16:16:34 kaddath Exp $ 
+ * $Id: hbdoc.prg,v 1.12 2005/02/04 09:11:30 patrickmast Exp $ 
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2005/02/01 16:16:34 $
- * Revision..: $Revision: 1.11 $
+ * Date......: $Date: 2005/02/04 09:11:30 $
+ * Revision..: $Revision: 1.12 $
  * Log file..: $Logfile:     $
  *
  *
@@ -275,31 +275,31 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    //  Get the linkfile name and get the info in it
 
    IF cLinkName = NIL
-      ?? "xHarbour Doc Extractor"
-      ? "Copyright 1999-2004, http://www.xharbour.org"
-      ? ""
-      ? "Syntax:  hbdoc [options] <linkname> [<ifile>]"
-      ? ""
-      ? "Options:  /txt Create an ASCII file instead of a Norton Guide"
-      ? "          /con Create an ASCII file without formfeeds"
-      ? "          /hpc Helpc source file"
-      ? "          /ngi Adds the -NG switch to EHC command for compile for"
-      ? "               DOS/Windows/Linux."
-      ? "          /rtf Winhelp source code for Windows"
-      ? "          /os2 OS/2 help source code For OS/2"
-      ? "          /htm Generate HTML output"
-      ? "          /ht2 Generate HTML output (new doc model)" 
-      ? "          /chm Generate HTML source files for Windows .CHM Help files"
-      ? "          /ch2 Generate HTML source files for Windows .CHM Help files"
-      ? "               (new doc model)" 
-      ? "          /pdf Generate an Adobe Portable Document (.PDF)"
-      ? "          /trf Gerenate Linux TROFF code"
-      ? "          /doc Create continuous ASCII file w/o author information"
-      ? " "
-      ? "Notes:  - Only one option can be specified at a time."
-      ? "        - <linkname> is the name of the Norton Guide Link file."
-      ? "        - <iFile> is a file containing a list of files to process"
-      ? "          otherwise *.prg, *.c, *.asm, *.ch and *.txt are used."
+      outstd( "xHarbour Doc Extractor"+ hb_osnewline() )
+      outstd( "Copyright 1999-2005, http://www.xharbour.org"+ hb_osnewline() )
+      outstd( ""+ hb_osnewline() )
+      outstd( "Syntax:  hbdoc [options] <linkname> [<ifile>]"+ hb_osnewline() )
+      outstd( ""+ hb_osnewline() )
+      outstd( "Options:  /txt Create an ASCII file instead of a Norton Guide"+ hb_osnewline() )
+      outstd( "          /con Create an ASCII file without formfeeds"+ hb_osnewline() )
+      outstd( "          /hpc Helpc source file"+ hb_osnewline() )
+      outstd( "          /ngi Adds the -NG switch to EHC command for compile for"+ hb_osnewline() )
+      outstd( "               DOS/Windows/Linux."+ hb_osnewline() )
+      outstd( "          /rtf Winhelp source code for Windows"+ hb_osnewline() )
+      outstd( "          /os2 OS/2 help source code For OS/2"+ hb_osnewline() )
+      outstd( "          /htm Generate HTML output"+ hb_osnewline() )
+      outstd( "          /ht2 Generate HTML output (new doc model)"+ hb_osnewline() ) 
+      outstd( "          /chm Generate HTML source files for Windows .CHM Help files"+ hb_osnewline() )
+      outstd( "          /ch2 Generate HTML source files for Windows .CHM Help files"+ hb_osnewline() )
+      outstd( "               (new doc model)"+ hb_osnewline() ) 
+      outstd( "          /pdf Generate an Adobe Portable Document (.PDF)"+ hb_osnewline() )
+      outstd( "          /trf Gerenate Linux TROFF code"+ hb_osnewline() )
+      outstd( "          /doc Create continuous ASCII file w/o author information"+ hb_osnewline() )
+      outstd( " "+ hb_osnewline() )
+      outstd( "Notes:  - Only one option can be specified at a time."+ hb_osnewline() )
+      outstd( "        - <linkname> is the name of the Norton Guide Link file."+ hb_osnewline() )
+      outstd( "        - <iFile> is a file containing a list of files to process"+ hb_osnewline() )
+      outstd( "          otherwise *.prg, *.c, *.asm, *.ch and *.txt are used."+ hb_osnewline() )
       RETURN NIL
    ENDIF
 
