@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.91 2004/08/11 20:09:32 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.92 2004/08/11 21:56:12 mauriliolongo Exp $
  */
 
 /*
@@ -388,6 +388,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpaceLast      := ''
    ::cSpaceWidth     := ''
    ::lRect           := .f.
+   ::aHighCellColor  := {}
 
    Return Self
 

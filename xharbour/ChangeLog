@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3301 2004/08/11 21:55:55 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3302 2004/08/12 01:14:24 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-12 19:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    ! Initialized ::aHighCellColor := {}
+      ColorToDisp() was generating an error when oBrw:dehilite() was issued before oBrw:Stabilize().
 
 2004-08-12 03:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tget.prg
