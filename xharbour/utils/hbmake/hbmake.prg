@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.36 2002/12/28 22:19:19 lculik Exp $
+ * $Id: hbmake.prg,v 1.37 2003/01/11 20:53:59 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2164,7 +2164,7 @@ FUNCTION CompUpdatedfiles()
 
                             cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " >> Test.out"
+                            cComm += " 2> Test.out"
                         @ 4,16 Say acs[nFiles]
                         GaugeUpdate(aGauge,nFile/Len( aprgs ))
                        nFile++
