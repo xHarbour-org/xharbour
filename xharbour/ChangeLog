@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.396 2002/09/23 00:47:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.397 2002/09/23 17:50:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -19,6 +19,7 @@
   * source/vm/hvm.c
     * Modified HB_ITEM hb_vm_aGlobals to static HB_ITEM s_aGlobals.
     + Added hb_arrayRelease( &s_aGlobals ) to hb_vmQuit()
+    + Added HB_FUNC( __VMVARGLIST ) returns clone of Globals Array.
 
   * source/compiler/harbour.c
     - Removed generation of hb_RELEASEGLOBALS()
