@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.5 2004/07/27 13:19:34 druzus Exp $
+ * $Id: dbinfo.ch,v 1.6 2004/08/02 12:37:13 druzus Exp $
  */
 
 /*
@@ -179,5 +179,31 @@
 #define DBI_ROLLBACK            130  /* Rollback changes made to current record */
 
 #define DBI_USER               1000  /* User-defined DBI_ constants */
+
+/* BLOB support - definitions for internal use by BLOB.CH */
+#define DBI_BLOB_DIRECT_EXPORT  201
+#define DBI_BLOB_DIRECT_GET     202
+#define DBI_BLOB_DIRECT_IMPORT  203
+#define DBI_BLOB_DIRECT_PUT     204
+#define DBI_BLOB_ROOT_GET       205
+#define DBI_BLOB_ROOT_PUT       206
+#define DBI_BLOB_ROOT_LOCK      207
+#define DBI_BLOB_ROOT_UNLOCK    208
+
+/* CA-CLIPPER documented for public use */
+#define DBI_BLOB_DIRECT_LEN     209
+#define DBI_BLOB_DIRECT_TYPE    210
+#define DBI_BLOB_INTEGRITY      211
+#define DBI_BLOB_OFFSET         212
+#define DBI_BLOB_RECOVER        213
+
+#define DBS_BLOB_GET            201  /* This is internal definition */
+#define DBS_BLOB_LEN            202
+#define DBS_BLOB_OFFSET         203
+#define DBS_BLOB_POINTER        204
+#define DBS_BLOB_TYPE           205
+
+#define BLOB_EXPORT_APPEND      1
+#define BLOB_EXPORT_OVERWRITE   0
 
 #endif /* HB_DBINFO_CH_ */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.5 2004/05/20 21:09:21 ronpinkas Exp $
+# $Id: pack_src.sh,v 1.6 2004/07/27 21:05:05 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -222,6 +222,16 @@ $hb_collect source/odbc/*.c
 $hb_collect source/odbc/*.ch
 $hb_collect source/odbc/*.prg
 
+# SOURCE\tip
+$hb_collect source/tip/Makefile
+$hb_collect source/tip/*.[ch]
+$hb_collect source/tip/*.prg
+
+# SOURCE\ct
+$hb_collect source/ct/Makefile
+$hb_collect source/ct/*.[ch]
+$hb_collect source/ct/*.prg
+
 # TESTS
 $hb_collect tests/*.bat
 $hb_collect tests/*.ch
@@ -275,12 +285,12 @@ $hb_collect utils/hbtest/*.cmd
 $hb_collect utils/hbtest/*.prg
 
 # CONTRIB\LIBCT
-$hb_collect contrib/libct/Makefile
-$hb_collect contrib/libct/*.[ch]
-$hb_collect contrib/libct/*.prg
-$hb_collect contrib/libct/*.ch
-$hb_collect contrib/libct/include/*.h
-$hb_collect contrib/libct/include/*.ch
+#$hb_collect contrib/libct/Makefile
+#$hb_collect contrib/libct/*.[ch]
+#$hb_collect contrib/libct/*.prg
+#$hb_collect contrib/libct/*.ch
+#$hb_collect contrib/libct/include/*.h
+#$hb_collect contrib/libct/include/*.ch
 
 $hb_collect contrib/rdd_ads/Makefile
 $hb_collect contrib/rdd_ads/*.c

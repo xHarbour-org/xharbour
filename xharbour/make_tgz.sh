@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.26 2004/05/21 02:31:39 druzus Exp $
+# $Id: make_tgz.sh,v 1.27 2004/08/19 01:17:24 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,6 +21,7 @@ hb_archfile="${name}-${hb_ver}${hb_platform}.bin.tar.gz"
 hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
 hb_pref="xhb"
+hb_contrib="libnf rdd_ads"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
@@ -37,10 +38,12 @@ export HB_LIB_INSTALL="/usr/lib/${name}"
 umask 022
 make -r clean
 make -r
-pushd contrib/libct
-    make -r clean
-    make -r
-popd
+for l in ${hb_contrib}
+do
+    (cd "contrib/$l"
+     make -r clean
+     make -r)
+done
 
 # install
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
@@ -58,9 +61,11 @@ mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
 make -r -i install
-pushd contrib/libct
-    make -r -i install
-popd
+for l in ${hb_contrib}
+do
+    (cd "contrib/$l"
+     make -r -i install)
+done
 
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour
@@ -84,11 +89,10 @@ then
 
     for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
     do
-        pushd utils/${utl}
-        rm -fR "./${HB_ARCHITECTURE}"
-        make -r install
-        strip ${HB_BIN_INSTALL}/${utl}
-        popd
+        (cd "utils/${utl}"
+         rm -fR "./${HB_ARCHITECTURE}"
+         make -r install
+         strip "${HB_BIN_INSTALL}/${utl}")
     done
 fi
 ln -s xbscript ${HB_BIN_INSTALL}/pprun

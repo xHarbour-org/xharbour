@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.153 2004/08/19 00:51:47 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.154 2004/08/23 15:40:04 druzus Exp $
  */
 
 /*
@@ -5322,8 +5322,15 @@ ULONG hb_cdxDBOIScopeEval( LPCDXTAG pTag, HB_EVALSCOPE_FUNC pFunc, void *pParam,
             pBtmScopeKey = pTag->bottomScopeKey;
 
    /* TODO: RT error when item type differ then Tag type */
-   pTag->topScopeKey = hb_cdxKeyPutItem( NULL, pItemLo, CDX_IGNORE_REC_NUM, pTag, TRUE, FALSE );
-   pTag->bottomScopeKey = hb_cdxKeyPutItem( NULL, pItemHi, CDX_MAX_REC_NUM, pTag, TRUE, FALSE );
+   if ( !pItemLo || HB_IS_NIL( pItemLo ) )
+      pTag->topScopeKey = NULL;
+   else
+      pTag->topScopeKey = hb_cdxKeyPutItem( NULL, pItemLo, CDX_IGNORE_REC_NUM, pTag, TRUE, FALSE );
+
+   if ( !pItemHi || HB_IS_NIL( pItemHi ) )
+      pTag->bottomScopeKey = NULL;
+   else
+      pTag->bottomScopeKey = hb_cdxKeyPutItem( NULL, pItemHi, CDX_MAX_REC_NUM, pTag, TRUE, FALSE );
 
    hb_cdxIndexLockRead( pTag->pIndex );
    hb_cdxTagGoTop( pTag );
@@ -5335,9 +5342,11 @@ ULONG hb_cdxDBOIScopeEval( LPCDXTAG pTag, HB_EVALSCOPE_FUNC pFunc, void *pParam,
    }
    hb_cdxIndexUnLockRead( pTag->pIndex );
 
-   hb_cdxKeyFree( pTag->topScopeKey );
+   if ( pTag->topScopeKey )
+      hb_cdxKeyFree( pTag->topScopeKey );
    pTag->topScopeKey = pTopScopeKey;
-   hb_cdxKeyFree( pTag->bottomScopeKey );
+   if ( pTag->bottomScopeKey )
+      hb_cdxKeyFree( pTag->bottomScopeKey );
    pTag->bottomScopeKey = pBtmScopeKey;
    pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS );
 

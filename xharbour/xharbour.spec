@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.58 2004/06/12 13:23:07 druzus Exp $
+# $Id: xharbour.spec,v 1.59 2004/06/15 11:55:53 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -17,7 +17,6 @@
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --without nf       - do not build nanforum lib
-# --without ct       - do not build clipper tools lib
 # --without x11      - do not build GTXVT
 # --without gpm      - build GTSLN and GTCRS without GPM support
 ######################################################################
@@ -69,6 +68,7 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_plat  export HB_PLAT=%{platform}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
+%define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}
 %define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
 
 %define hb_host  www.xharbour.org
@@ -288,12 +288,10 @@ rm -rf $RPM_BUILD_ROOT
 make -r
 
 # build contrib libraries
-libs="%{!?_without_ct:libct} %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}"
-for l in $libs
+for l in %{hb_ctrb}
 do
-    pushd contrib/$l
-        make -r
-    popd
+    (cd "contrib/$l"
+     make -r)
 done
 
 ######################################################################
@@ -320,12 +318,10 @@ mkdir -p $HB_LIB_INSTALL
 make -r -i install
 
 # install contrib libraries
-libs="%{!?_without_ct:libct} %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}"
-for l in $libs
+for l in %{hb_ctrb}
 do
-    pushd contrib/$l
-        make -r -i install
-    popd
+    (cd "contrib/$l"
+     make -r -i install)
 done
 
 # Keep the size of the binaries to a minimim.
@@ -369,11 +365,10 @@ then
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do
-        pushd utils/${utl}
-        rm -fR "./${HB_ARCHITECTURE}"
-        make -r install
-        strip ${HB_BIN_INSTALL}/${utl}
-        popd
+        (cd "utils/${utl}"
+         rm -fR "./${HB_ARCHITECTURE}"
+         make -r install
+         strip "${HB_BIN_INSTALL}/${utl}")
     done
 fi
 ln -s xbscript ${HB_BIN_INSTALL}/pprun
@@ -552,7 +547,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/libdebug.a
 %{prefix}/lib/%{name}/libfm*.a
 %{prefix}/lib/%{name}/libgt*.a
+%{prefix}/lib/%{name}/libhbtip*.a
 %{?_with_odbc: %{prefix}/lib/%{name}/libhbodbc.a}
+%{prefix}/lib/%{name}/libct*.a
 %{prefix}/lib/%{name}/liblang.a
 %{prefix}/lib/%{name}/libmacro*.a
 %{prefix}/lib/%{name}/libnulsys*.a
@@ -565,7 +562,6 @@ rm -rf $RPM_BUILD_ROOT
 %files contrib
 %defattr(-,root,root,755)
 %dir %{prefix}/lib/%{name}
-%{!?_without_ct: %{prefix}/lib/%{name}/libct*.a}
 %{!?_without_nf: %{prefix}/lib/%{name}/libnf*.a}
 %{?_with_adsrdd: %{prefix}/lib/%{name}/librddads*.a}
 %{?_with_mysql: %{prefix}/lib/%{name}/libmysql*.a}
@@ -588,6 +584,10 @@ rm -rf $RPM_BUILD_ROOT
 ######################################################################
 
 %changelog
+* Sat Aug 28 2004 Przemyslaw Czerpak <druzus/at/priv.onet.pl>
+- updated for recent changes in CVS structure - CT and TIP moved
+  from contrib into core
+
 * Sun Mar 07 2004 Phil Krylov <phil@newstar.rinet.ru>
 - Russian translation added.
 

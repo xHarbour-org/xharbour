@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2004/04/05 13:32:47 lf_sfnet Exp $
+# $Id: Makefile,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -27,9 +27,4 @@ ifeq ($(HB_MT),MT)
   MT_LIBNAME=hbtipmt
 endif
 
-include $(TOP)$(ROOT)config/header.cf
-INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
-
-install::
-	$(INSTALL_RULE_HEADERS)

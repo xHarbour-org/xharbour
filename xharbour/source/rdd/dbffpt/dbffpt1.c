@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.18 2004/05/08 22:07:11 druzus Exp $
+ * $Id: dbffpt1.c,v 1.19 2004/05/12 02:25:28 druzus Exp $
  */
 
 /*
@@ -270,14 +270,14 @@ HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 /*
  * Exclusive lock memo file.
  */
-static BOOL hb_fptFileLockEx( FPTAREAP pArea )
+static BOOL hb_fptFileLockEx( FPTAREAP pArea, BOOL fWait )
 {
    BOOL fRet;
 
    do
    {
       fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
-                        FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT );
+                        FL_LOCK | FLX_EXCLUSIVE | ( fWait ? FLX_WAIT : 0 ) );
    } while ( !fRet );
 
    return fRet;
@@ -286,14 +286,14 @@ static BOOL hb_fptFileLockEx( FPTAREAP pArea )
 /*
  * Shared lock memo file.
  */
-static BOOL hb_fptFileLockSh( FPTAREAP pArea )
+static BOOL hb_fptFileLockSh( FPTAREAP pArea, BOOL fWait )
 {
    BOOL fRet;
 
    do
    {
       fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
-                        FL_LOCK | FLX_SHARED | FLX_WAIT );
+                        FL_LOCK | FLX_SHARED | ( fWait ? FLX_WAIT : 0 ) );
    } while ( !fRet );
 
    return fRet;
@@ -925,6 +925,68 @@ static ULONG hb_fptGetMemoLen( FPTAREAP pArea, USHORT uiIndex )
 }
 
 /*
+ * Return the type of memo.
+ */
+static char * hb_fptGetMemoType( FPTAREAP pArea, USHORT uiIndex )
+{
+   ULONG ulBlock, ulType;
+   FPTBLOCK fptBlock;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptGetMemoLen(%p, %hu)", pArea, uiIndex));
+
+   ulBlock = hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex );
+
+   if( ulBlock == 0 )
+      return "C";
+
+   hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
+
+   if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
+                              sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
+      return "U";
+
+   ulType = HB_GET_BE_UINT32( fptBlock.type );
+
+   switch ( ulType )
+   {
+      case FPTIT_SIX_LNUM:
+      case FPTIT_SIX_DNUM:
+         return "N";
+      case FPTIT_SIX_LDATE:
+         return "D";
+      case FPTIT_SIX_LOG:
+         return "L";
+      case FPTIT_SIX_CHAR:
+         return "M";
+      case FPTIT_SIX_ARRAY:
+         return "A";
+//      case FPTIT_SIX_BLOCK:
+//      case FPTIT_SIX_VREF:
+//      case FPTIT_SIX_MREF:
+
+      case FPTIT_FLEX_ARRAY:
+         return "A";
+      case FPTIT_FLEX_NIL:
+         return "U";
+      case FPTIT_FLEX_TRUE:
+      case FPTIT_FLEX_FALSE:
+         return "L";
+      case FPTIT_FLEX_LDATE:
+         return "D";
+      case FPTIT_FLEX_BYTE:
+      case FPTIT_FLEX_SHORT:
+      case FPTIT_FLEX_LONG:
+      case FPTIT_FLEX_DOUBLE:
+         return "N";
+      case FPTIT_TEXT:
+         return "M";
+      case FPTIT_PICT:
+         return "C";
+   }
+   return "U";
+}
+
+/*
  * Read SIX item from memo.
  */
 static ERRCODE hb_fptReadSixItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBufEnd, PHB_ITEM pItem )
@@ -1279,6 +1341,10 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #ifndef HB_CDP_SUPPORT_OFF
                hb_cdpnTranslate( ( char *) pBuffer, pArea->cdPage, s_cdpage, ulSize );
 #endif
+               pBuffer[ ulSize ] = '\0';
+               hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
+               pBuffer = NULL;
+               break;
             case FPTIT_PICT:
                pBuffer[ ulSize ] = '\0';
                hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
@@ -1423,7 +1489,7 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          {
             memcpy( *bBufPtr, pItem->item.asString.value, ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
-            hb_cdpnTranslate( ( char *) *bBufPtr, pArea->cdPage, s_cdpage, ulLen );
+            hb_cdpnTranslate( ( char *) *bBufPtr, s_cdpage, pArea->cdPage, ulLen );
 #endif
             *bBufPtr += ulLen;
          }
@@ -1504,7 +1570,7 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          *bBufPtr += 2;
          memcpy( *bBufPtr, pItem->item.asString.value, ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
-         hb_cdpnTranslate( ( char *) *bBufPtr, pArea->cdPage, s_cdpage, ulLen );
+         hb_cdpnTranslate( ( char *) *bBufPtr, s_cdpage, pArea->cdPage, ulLen );
 #endif
          *bBufPtr += ulLen;
          break;
@@ -1768,7 +1834,7 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      if( hb_fptFileLockSh( pArea ) )
+      if( hb_fptFileLockSh( pArea, TRUE ) )
       {
          * pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
          hb_fptFileUnLock( pArea );
@@ -1781,43 +1847,6 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
    }
 
    return SUPER_GETVARLEN( ( AREAP ) pArea, uiIndex, pLength );
-}
-
-/*
- * Retrieve information about the current driver.
- * ( DBENTRYP_SI )    hb_fptInfo
- */
-static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_fptInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   switch( uiIndex )
-   {
-      case DBI_MEMOEXT:
-         if ( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
-         {
-            PHB_FNAME pFileName;
-
-            pFileName = hb_fsFNameSplit( ( char * ) pArea->szMemoFileName );
-            hb_itemPutC( pItem, pFileName->szExtension );
-            hb_xfree( pFileName );
-         }
-         else
-         {
-            hb_itemPutC( pItem, ( hb_set.HB_SET_MFILEEXT &&
-                                  strlen( hb_set.HB_SET_MFILEEXT ) > 0 ) ?
-                                 hb_set.HB_SET_MFILEEXT :
-                                 FPT_MEMOEXT );
-         }
-         break;
-
-      /* case DBI_RDD_VERSION */
-
-      default:
-         return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
-   }
-
-   return SUCCESS;
 }
 
 /*
@@ -1868,7 +1897,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       /* Force read record */
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
-      if( hb_fptFileLockSh( pArea ) )
+      if( hb_fptFileLockSh( pArea, TRUE ) )
       {
          uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
          hb_fptFileUnLock( pArea );
@@ -1921,7 +1950,7 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
          return FAILURE;
 
-      if( hb_fptFileLockEx( pArea ) )
+      if( hb_fptFileLockEx( pArea, TRUE ) )
       {
          uiError = hb_fptPutMemo( pArea, uiIndex -1, pItem );
          hb_fptFileUnLock( pArea );
@@ -2170,4 +2199,123 @@ static ERRCODE hb_fptWriteDBHeader( FPTAREAP pArea )
       pArea->bVersion = 0xF5;
    }
    return SUPER_WRITEDBHEADER( ( AREAP ) pArea );
+}
+
+/*
+ * Retrieve information about the current driver.
+ * ( DBENTRYP_SI )    hb_fptInfo
+ */
+static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
+
+   switch( uiIndex )
+   {
+      case DBI_MEMOEXT:
+         if ( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+         {
+            PHB_FNAME pFileName;
+
+            pFileName = hb_fsFNameSplit( ( char * ) pArea->szMemoFileName );
+            hb_itemPutC( pItem, pFileName->szExtension );
+            hb_xfree( pFileName );
+         }
+         else
+         {
+            hb_itemPutC( pItem, ( hb_set.HB_SET_MFILEEXT &&
+                                  strlen( hb_set.HB_SET_MFILEEXT ) > 0 ) ?
+                                 hb_set.HB_SET_MFILEEXT :
+                                 FPT_MEMOEXT );
+         }
+         break;
+
+      /* case DBI_RDD_VERSION */
+
+      case DBI_BLOB_DIRECT_EXPORT:
+      case DBI_BLOB_DIRECT_GET:
+      case DBI_BLOB_DIRECT_IMPORT:
+      case DBI_BLOB_DIRECT_PUT:
+      case DBI_BLOB_ROOT_GET:
+      case DBI_BLOB_ROOT_PUT:
+         break;
+
+      case DBI_BLOB_ROOT_LOCK:
+         hb_itemPutL( pItem, hb_fptFileLockEx( pArea, FALSE ) );
+         break;
+
+      case DBI_BLOB_ROOT_UNLOCK:
+         hb_fptFileUnLock( pArea );
+         hb_itemClear( pItem );
+         break;
+
+      case DBI_BLOB_DIRECT_LEN:
+      case DBI_BLOB_DIRECT_TYPE:
+      case DBI_BLOB_INTEGRITY:
+      case DBI_BLOB_OFFSET:
+      case DBI_BLOB_RECOVER:
+         /* TODO: implement it */
+         break;
+
+      default:
+         return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
+   }
+
+   return SUCCESS;
+}
+
+/*
+ * Retrieve information about a field.
+ * ( DBENTRYP_SSI )   hb_fptFieldInfo
+ */
+static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptFieldInfo(%p, %hu, %hu, %p)", pArea, uiIndex, uiType, pItem));
+
+   if( uiIndex > pArea->uiFieldCount )
+      return FAILURE;
+
+   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
+       pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
+   {
+      switch( uiType )
+      {
+         case DBS_BLOB_GET:
+         case DBS_BLOB_LEN:
+         case DBS_BLOB_OFFSET:
+         case DBS_BLOB_POINTER:
+         case DBS_BLOB_TYPE:
+            break;
+         default:
+            return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
+      }
+      if( hb_fptFileLockSh( pArea, TRUE ) )
+      {
+         switch( uiType )
+         {
+            case DBS_BLOB_GET:
+               /* TODO: !!! pItem := { <nStart>, <nCount> } */
+               break;
+            case DBS_BLOB_LEN:
+               hb_itemPutNL( pItem, hb_fptGetMemoLen( pArea, uiIndex - 1 ) );
+               break;
+            case DBS_BLOB_OFFSET:
+               hb_itemPutNL( pItem, pArea->uiMemoBlockSize * 
+                             hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
+               break;
+            case DBS_BLOB_POINTER:
+               hb_itemPutNL( pItem, 
+                             hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
+               break;
+            case DBS_BLOB_TYPE:
+               hb_itemPutC( pItem, hb_fptGetMemoType( pArea, uiIndex - 1 ) );
+               break;
+         }
+         hb_fptFileUnLock( pArea );
+      }
+   }
+   else
+   {
+      return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
+   }
+   return SUCCESS;
 }

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2004/08/02 12:37:13 druzus Exp $
+# $Id: Makefile,v 1.18 2004/08/25 17:02:57 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -55,7 +55,7 @@ C_HEADERS=\
 	hb_io.h      \
 	hrbdll.h     \
 	inet.h       \
-    local.h      \
+	local.h      \
 	regex.h      \
 	thread.h     \
 	classes.h    \
@@ -68,6 +68,7 @@ PRG_HEADERS=\
 	achoice.ch   \
 	assert.ch    \
 	assocarr.ch  \
+	blob.ch      \
 	box.ch       \
 	button.ch    \
 	color.ch     \

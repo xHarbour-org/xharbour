@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.8 2004/02/27 14:40:38 paultucker Exp $
+ * $Id: hbrddfpt.h,v 1.9 2004/02/29 00:42:07 paultucker Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ typedef struct _FPTHEADER
    BYTE  flexRev[ 4 ];              /* Offset of reversed GC page */
    BYTE  flexDir[ 4 ];              /* Offset of GC page */
    BYTE  counter[ 4 ];              /* cyclic counter to sign changes in network env. */
-   BYTE  reserved3[ 4 ];            /* */
+   BYTE  rootBlock[ 4 ];            /* Clipper 5.3 ROOT data block */
    BYTE  flexSize[ 2 ];             /* FlexFile3 alternative block size */
    BYTE  reserved4[ 482 ];          /* */
 } FPTHEADER;
@@ -231,7 +231,7 @@ typedef FPTAREA * LPFPTAREA;
 #define hb_fptDeleted                              NULL
 #define hb_fptFieldCount                           NULL
 #define hb_fptFieldDisplay                         NULL
-#define hb_fptFieldInfo                            NULL
+static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pItem );
 #define hb_fptFieldName                            NULL
 #define hb_fptFlush                                NULL
 #define hb_fptGetRec                               NULL

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3359 2004/08/27 21:42:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3359 2004/08/28 00:49:29 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-29 01:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_rpm.sh
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.sh
+  * xharbour/source/ct/Makefile
+  * xharbour/source/tip/Makefile
+   * updated for recent changes in CVS structure - CT and TIP moved
+     from contrib into core and some minor fixes
+
+  * xharbour/include/Makefile
+  + xharbour/include/blob.ch
+  * xharbour/include/dbinfo.ch
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+   * some basic support for BLOB*() functions - I'll finished it after
+     beta1.1 - please do not use it yet
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * allow to call hb_cdxDBOIScopeEval with NULL or HB_IT_NIL scope
+     values (means no scope)
 
 2004-08-27 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * utils/hbmake.prg
