@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1796 2003/11/30 10:02:37 druzus Exp $
+ * $Id: ChangeLog,v 1.1797 2003/11/30 10:23:08 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-11-29 03:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-30 11:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/macro.c
   * source/vm/hbmacro.h
     ! Removed hb_vm_aiExtra* from C file and moved to .h
       Be careful in future.
+      * tests/Makefile
+      
+    + Added an $Extra_Libs variable for greater flexibility in 
+       makefile linking.
 
 2003-11-30 11:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbcmd.c
