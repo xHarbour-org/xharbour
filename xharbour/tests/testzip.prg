@@ -1,5 +1,5 @@
 //
-// $Id: testzip.prg,v 1.2 2003/09/13 22:46:02 lculik Exp $
+// $Id: testzip.prg,v 1.3 2003/09/14 09:27:23 paultucker Exp $
 //
 
 // Requires samples.lib for gauge support
@@ -20,7 +20,7 @@ Local aGaugeFile
    ZipCreate( "TEST1.ZIP", aFiles[2] )
    ZipCreate( "TEST2.ZIP", aFiles, 8, {|cFile,nPos| qout("Added " + cFile)})
 
-   // something here may not be clipper compatible
+   // something here is not clipper compatible
    ?;?;?
    ?
    ?;?;?
@@ -54,26 +54,24 @@ Local aGaugeFile
    // or simpler, method 2
    ? str( hb_GetFileCount("test3.zip" ) ) + " files using alternate method"
 
-   HasPassword( "TEST1.ZIP" )
-   HasPassword( "test3.zip" )
+   ZipHasPassword( "TEST1.ZIP" )
+   ZipHasPassword( "test3.zip" )
 
 function ZipCreate(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
                    lPath, lDrive, bFileUpdate)
    Local lRet
 
+   Default lOverwrite to .t.
    Default lPath to .t.
-   Default lDrive to .F.
-   Default bFileUpdate to NIL
 
-   ferase(cFile)
-
-   IF ( lRet := HB_ZIPFILE( cFile, uContents, nLevel, bUpdate, lOverwrite, password, lPath, lDrive, bFileUpdate) )
+   IF ( lRet := HB_ZIPFILE( cFile, uContents, nLevel, bUpdate, lOverwrite,;
+                            password, lPath, lDrive, bFileUpdate) )
       ? cFile + " was successfully created"
    ENDIF
 
 Return lRet
 
-Function HasPassword( cFile )
+Function ZipHasPassword( cFile )
    Local lRet
 
    ? cFile + " has " + iif(lRet := hb_ZipWithPassword(cFile),"a","no" )+ " password"
