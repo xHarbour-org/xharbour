@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.9 2002/01/17 23:20:48 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.10 2002/01/20 19:17:45 andijahja Exp $
  */
 
 /*
@@ -177,93 +177,73 @@ PHB_ITEM hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
    return pItem;
 }
 
+/* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
+#if 0
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
-  if( pItem )
-  {
-     hb_itemClear( pItem );
-  }
-  else
-  {
-     pItem = hb_itemNew( NULL );
-  }
+   if( pItem )
+      hb_itemClear( pItem );
+   else
+      pItem = hb_itemNew( NULL );
 
-  if( szText == NULL )
-  {
-     szText = "";
-  }
+   if( szText == NULL )
+      szText = "";
 
-  pItem->type = HB_IT_STRING;
-  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-  *( pItem->item.asString.puiHolders ) = 1;
-  pItem->item.asString.bStatic = FALSE;
-  pItem->item.asString.length = strlen( szText );
-  pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
-  strcpy( pItem->item.asString.value, szText );
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.length = strlen( szText );
+   pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
+   strcpy( pItem->item.asString.value, szText );
 
-  return pItem;
+   return pItem;
 }
 
 PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
-  if( pItem )
-  {
-     hb_itemClear( pItem );
-  }
-  else
-  {
-     pItem = hb_itemNew( NULL );
-  }
+   if( pItem )
+      hb_itemClear( pItem );
+   else
+      pItem = hb_itemNew( NULL );
 
-  /* NOTE: CA-Clipper seems to be buggy here, it will return ulLen bytes of
-           trash if the szText buffer is NULL, at least with hb_retclen().
-           [vszakats] */
+   /* NOTE: CA-Clipper seems to be buggy here, it will return ulLen bytes of
+            trash if the szText buffer is NULL, at least with hb_retclen().
+            [vszakats] */
 
-  if( szText == NULL )
-  {
-     szText = "";
-     ulLen = 0;
-  }
+   if( szText == NULL )
+   {
+      szText = "";
+      ulLen = 0;
+   }
 
-  pItem->type = HB_IT_STRING;
-  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-  *( pItem->item.asString.puiHolders ) = 1;
-  pItem->item.asString.bStatic = FALSE;
-  pItem->item.asString.length = ulLen;
-  pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
-  hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
-  pItem->item.asString.value[ ulLen ] = '\0';
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.length = ulLen;
+   pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
+   hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
+   pItem->item.asString.value[ ulLen ] = '\0';
 
-  return pItem;
+   return pItem;
 }
 
 PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
-  if( pItem )
-  {
-     hb_itemClear( pItem );
-  }
-  else
-  {
-     pItem = hb_itemNew( NULL );
-  }
+   if( pItem )
+      hb_itemClear( pItem );
+   else
+      pItem = hb_itemNew( NULL );
 
-  pItem->type = HB_IT_STRING;
-  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-  *( pItem->item.asString.puiHolders ) = 1;
-  pItem->item.asString.bStatic = FALSE;
-  pItem->item.asString.length = ulLen;
-  pItem->item.asString.value = szText;
-  pItem->item.asString.value[ ulLen ] = '\0';
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.length = ulLen;
+   pItem->item.asString.value = szText;
+   pItem->item.asString.value[ ulLen ] = '\0';
 
-  return pItem;
+   return pItem;
 }
+#endif
 
 void hb_itemSetCMemo( PHB_ITEM pItem )
 {
@@ -858,6 +838,10 @@ void hb_itemInit( PHB_ITEM pItem )
    }
 }
 
+/* Internal API, not standard Clipper */
+
+/* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
+#if 0
 void hb_itemClear( PHB_ITEM pItem )
 {
   HB_TRACE(HB_TR_DEBUG, ( "hb_itemClear(%p) Type: %i", pItem, pItem->type ) );
@@ -887,8 +871,6 @@ void hb_itemClear( PHB_ITEM pItem )
   HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemClear(%p)", pItem ) );
 }
 
-/* Internal API, not standard Clipper */
-
 void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {
    HB_ITEM temp;
@@ -896,19 +878,18 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    HB_TRACE(HB_TR_DEBUG, ("hb_itemSwap(%p, %p)", pItem1, pItem2));
 
    temp.type = HB_IT_NIL;
-
-   /*
    hb_itemCopy( &temp, pItem2 );
    hb_itemCopy( pItem2, pItem1 );
    hb_itemCopy( pItem1, &temp );
    hb_itemClear( &temp );
-   */
 
-   /* Faster, but less safe way? - Safe enough Ron Pinkas 2002-01-11 */
+/* Faster, but less safe way
    memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
    memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
    memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
+*/
 }
+#endif
 
 /* Internal API, not standard Clipper */
 /* De-references item passed by the reference */
