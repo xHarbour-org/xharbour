@@ -12,6 +12,11 @@ Final Path=
 [xMake]
 Show Defaults=No
 
+[Project]
+Run=
+Params=
+Final Path=%HOME%
+
 [Files]
 %HB_INSTALL%\contrib\xVisual\xide.prg=1,.F.
 %HB_INSTALL%\contrib\xVisual\xTree.prg=2,.F.
@@ -37,4 +42,5 @@ Show Defaults=No
 %C_LIB_INSTALL%\CW32.LIB=22,.T.
 %C_LIB_INSTALL%\IMPORT32.LIB=23,.T.
 %HB_INSTALL%\contrib\xVisual\Xide.res=24,.F.
+%HB_INSTALL%\contrib\Whoo\Whoo.xhp=25,.F.
 

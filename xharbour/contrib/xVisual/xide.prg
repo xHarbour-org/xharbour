@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.141 2003/01/27 11:54:22 what32 Exp $
+ * $Id: xide.prg,v 1.142 2003/01/28 02:25:22 what32 Exp $
  */
 
 /*
@@ -7,7 +7,7 @@
  *
  * xIDE Main Module
  *
- * Copyright 2002 Augusto Infante [systems@quesoro.com] Andy Wos [andrwos@aust1.net] Ron Pinkas [ron@ronpinkas.com]
+ * Copyright 2002 Augusto Infante [august213@sbcglobal.net] Andy Wos [andrwos@aust1.net] Ron Pinkas [ron@ronpinkas.com]
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
