@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: gtcrs.c,v 1.5 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -156,6 +156,7 @@ typedef struct InOutBase {
     int stdoutfd;
     int stderrfd;
     pid_t termpid;
+    int lTIOsaved;
     struct termios saved_TIO, curr_TIO;
 
     unsigned char stdin_buf[STDIN_BUFLEN];
@@ -1445,7 +1446,6 @@ static int gt_resize(InOutBase *ioBase)
 {
 
     int ret = -1;
-#if defined(NCURSES_VERSION)
     int rows = 0, cols = 0;
 
     if (isatty(ioBase->base_outfd)) {
@@ -1467,13 +1467,24 @@ static int gt_resize(InOutBase *ioBase)
     }
 
     if (rows > 0 && cols > 0) {
+/*
+#if defined(NCURSES_VERSION)
+	wresize( ioBase->stdscr, rows, cols );
+#endif
+*/
+	endwin();
+        gt_refresh( ioBase );
+	ret = 0;
+/*
+#if defined(NCURSES_VERSION)
         if ( resize_term( rows, cols ) == OK ) {
 	    ret = 0;
             gt_refresh( ioBase );
 	}
+#endif
+*/
         getmaxyx( ioBase->stdscr, ioBase->maxrow, ioBase->maxcol );
     }
-#endif
     return ret;
 }
 
@@ -1516,7 +1527,7 @@ static void gt_ttyset(InOutBase *ioBase)
 
 static void gt_ttyrestore(InOutBase *ioBase)
 {
-    if (isatty(ioBase->base_infd))
+    if (ioBase->lTIOsaved)
 	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
 }
 
@@ -1556,6 +1567,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     if (isatty(ioBase->base_infd)) {
 	tcgetattr( ioBase->base_infd, &ioBase->curr_TIO ); /* save current terminal settings */
 	memcpy(&ioBase->saved_TIO, &ioBase->curr_TIO, sizeof(struct termios));
+	ioBase->lTIOsaved = 1;
 
 	ioBase->curr_TIO.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
 	ioBase->curr_TIO.c_lflag |= NOFLSH;
@@ -1765,7 +1777,7 @@ static void destroy_ioBase(InOutBase *ioBase)
 	removeAllKeyMap(&ioBase->pKeyTab);
 
     /* restore terminal settings */
-    if (isatty(ioBase->base_infd))
+    if (ioBase->lTIOsaved)
 	tcsetattr(ioBase->base_infd, TCSANOW, &ioBase->saved_TIO);
 
     /* kill terminal proces if any */
@@ -2199,7 +2211,8 @@ BOOL HB_GT_FUNC(gt_Suspend( void ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Suspend()"));
 
-    wrefresh( s_ioBase->stdscr );
+    gt_refresh( s_ioBase );
+    endwin();
     gt_ttyrestore( s_ioBase );
     return TRUE;
 }
@@ -2210,8 +2223,9 @@ BOOL HB_GT_FUNC(gt_Resume( void ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Resume()"));
 
+    wrefresh( s_ioBase->stdscr );
     gt_ttyset( s_ioBase );
-    redrawwin( curscr );
+    /* redrawwin( curscr ); */
     gt_refresh( s_ioBase );
     return TRUE;
 }
