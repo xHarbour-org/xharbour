@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.1 2003/05/16 19:52:06 druzus Exp $
+ * $Id: hbapicdp.h,v 1.2 2003/05/28 03:10:19 paultucker Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_CODEPAGE_REQUEST( id )           HB_CODEPAGE_REQUEST_( id )
 #define HB_CODEPAGE_REQUEST_( id )          extern HB_FUNC( HB_CODEPAGE_##id ); \
-                                        void hb_codepage_ForceLink( void ) \
+                                        void hb_codepage_ForceLink_##id( void ) \
                                         { \
                                            HB_FUNCNAME( HB_CODEPAGE_##id )(); \
                                         }

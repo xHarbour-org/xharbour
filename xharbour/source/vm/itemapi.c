@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.36 2003/05/16 19:52:12 druzus Exp $
+ * $Id: itemapi.c,v 1.37 2003/05/26 00:19:16 ronpinkas Exp $
  */
 
 /*
@@ -93,13 +93,15 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbmath.h"
+#ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
 
 #if defined(__BORLANDC__)
 #include <float.h>  /* for _finite() and _isnan() */
 #endif
 
-extern PHB_CODEPAGE s_cdpage;
 
 #ifdef HB_THREAD_SUPPORT
    extern HB_CRITICAL_T hb_gcCollectionMutex;
@@ -1189,9 +1191,11 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    /* Both strings not empty */
    if( ulMinLen )
    {
+#ifndef HB_CDP_SUPPORT_OFF
       if( s_cdpage->lSort )
          iRet = hb_cdpcmp( szFirst,szSecond,ulMinLen,s_cdpage, &ulCounter );
       else
+#endif
          for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )
          {
             /* Difference found */

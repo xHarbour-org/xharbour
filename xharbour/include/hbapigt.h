@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.7 2003/05/21 09:35:35 druzus Exp $
+ * $Id: hbapigt.h,v 1.8 2003/05/21 22:49:40 druzus Exp $
  */
 
 /*
@@ -346,7 +346,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define HB_GT_REQUEST( id )     HB_GT_REQUEST_( _HB_GT_PREF_( id ) )
 #define HB_GT_REQUEST_( id )    HB_GT_REQUEST__( id )
 #define HB_GT_REQUEST__( id )   extern HB_FUNC( HB_GT##id ); \
-                                void hb_gt_ForceLink( void ) \
+                                void hb_gt_ForceLink##id( void ) \
                                 { \
                                    HB_FUNCNAME( HB_GT##id )(); \
                                 }
@@ -355,7 +355,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define HB_GT_ANNOUNCE_( id )   HB_GT_ANNOUNCE__( id )
 #define HB_GT_ANNOUNCE__( id )  HB_FUNC( HB_GT##id ) {}
 
-/* conver lower case sufixes to upper */
+/* convert lower case suffixes to upper */
 #define _nul   _NUL
 #define _std   _STD
 #define _cgi   _CGI

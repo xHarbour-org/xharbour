@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.3 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtnul.c,v 1.4 2003/05/26 05:58:54 paultucker Exp $
  */
 
 /*
@@ -60,15 +60,6 @@
 
 #include "hbapigt.h"
 #include "hbapifs.h"
-
-/*
-#define USHORT unsigned short int
-#define ULONG unsigned long int
-#define SHORT short int
-#define BYTE unsigned char
-#define BOOL BYTE
-#define HB_inkey_enum int
-*/
 
 #define HB_GT_MAX_ 16
 static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );

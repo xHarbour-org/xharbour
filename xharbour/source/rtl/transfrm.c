@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.16 2003/04/21 19:55:31 walito Exp $
+ * $Id: transfrm.c,v 1.17 2003/05/16 19:52:08 druzus Exp $
  */
 
 /*
@@ -69,7 +69,14 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbstack.h"
-#include "hbapicdp.h"
+
+#ifndef HB_CDP_SUPPORT_OFF
+  #include "hbapicdp.h"
+  extern PHB_CODEPAGE s_cdpage;
+  #define TOUPPER(c)    ((s_cdpage->nChars)? (char)s_cdpage->s_upper[c&255] : toupper(c))
+#else
+  #define TOUPPER(c)    toupper(c)
+#endif
 
 /* Picture function flags */
 #define PF_LEFT       0x0001   /* @B */
@@ -87,8 +94,6 @@
 #define PF_WIDTH      0x0800   /* @S */
 #define PF_PARNEGWOS  0x1000   /* @) Similar to PF_PARNEG but without leading spaces */
 
-extern PHB_CODEPAGE s_cdpage;
-#define TOUPPER(c)    ((s_cdpage->nChars)? (char)s_cdpage->s_upper[c&255] : toupper(c))
 
 HB_FUNC( TRANSFORM )
 {

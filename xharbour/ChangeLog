@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1076 2003/05/28 04:09:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1077 2003/05/28 05:42:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-28 13:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/rtl/is.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/itemapi.c
+    * new macro HB_CDP_SUPPORT_OFF - if set during compilation codapage
+      support is disabled - remeber that if set you shouldn't link
+      your program with codepage lib.
 
 2003-05-27 22:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprc.c

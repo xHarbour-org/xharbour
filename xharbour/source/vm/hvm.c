@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.204 2003/05/26 14:49:06 ronpinkas Exp $
+ * $Id: hvm.c,v 1.205 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -199,7 +199,9 @@ static void    hb_vmReleaseLocalSymbols( void );  /* releases the memory of the 
 
 extern void * hb_mthRequested( void ); /* profiler from classes.c */
 extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
+#ifndef HB_CDP_SUPPORT_OFF
 extern void hb_cdpReleaseAll( void );
+#endif
 
 extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 
@@ -552,7 +554,9 @@ void HB_EXPORT hb_vmQuit( void )
    hb_setRelease();             /* releases Sets */
    //printf( "After Set\n" );
 
+#ifndef HB_CDP_SUPPORT_OFF
    hb_cdpReleaseAll();          /* releases codepages */
+#endif
 
    /* release all remaining items */
    hb_stackRemove( 0 );

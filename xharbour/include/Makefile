@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2003/02/12 01:13:04 jonnymind Exp $
+# $Id: Makefile,v 1.7 2003/02/23 20:13:38 jonnymind Exp $
 #
 
 ROOT = ../
@@ -11,8 +11,10 @@ C_HEADERS=\
 	hbapierr.h   \
 	hbapifs.h    \
 	hbapigt.h    \
+	hbfast.h     \
 	hbapiitm.h   \
 	hbapilng.h   \
+	hbapicdp.h   \
 	hbapirdd.h   \
 	hbcomp.h     \
 	hbdate.h     \
@@ -53,7 +55,7 @@ PRG_HEADERS=\
 	color.ch     \
 	common.ch    \
 	dbedit.ch    \
-   dbinfo.ch    \
+	dbinfo.ch    \
 	dbstruct.ch  \
 	directry.ch  \
 	error.ch     \
@@ -81,7 +83,7 @@ PRG_HEADERS=\
 	setcurs.ch   \
 	simpleio.ch  \
 	std.ch       \
-   ttable.ch    \
+	ttable.ch    \
 
 API_HEADERS=\
 	error.api    \

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpapi.c,v 1.1 2003/05/16 19:52:07 druzus Exp $
  */
 
 /*
@@ -51,6 +51,9 @@
  */
 
 #include "hbapi.h"
+
+#ifndef HB_CDP_SUPPORT_OFF
+
 #include "hbapicdp.h"
 
 #define HB_CDP_MAX_ 64
@@ -439,3 +442,5 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
    #pragma startup hb_codepage_Init_EN
 #endif
+
+#endif /* HB_CDP_SUPPORT_OFF */
