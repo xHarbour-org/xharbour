@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.22 2003/10/06 03:29:00 lculik Exp $
+ * $Id: gtwin.c,v 1.23 2003/10/06 10:35:44 toninhofwi Exp $
  */
 
 /*
@@ -285,9 +285,9 @@ static void HB_GT_FUNC(gt_xUpdtSet( USHORT usTop, USHORT usLeft, USHORT usBottom
     if ( usLeft < s_usUpdtLeft )
         s_usUpdtLeft = usLeft;
     if ( usBottom > s_usUpdtBottom )
-        s_usUpdtBottom = HB_MIN( usBottom, s_csbi.dwSize.Y - 1);
+        s_usUpdtBottom = HB_MIN( usBottom, ( USHORT )s_csbi.dwSize.Y - 1);
     if ( usRight > s_usUpdtRight )
-        s_usUpdtRight = HB_MIN( usRight, s_csbi.dwSize.X - 1);;
+        s_usUpdtRight = HB_MIN( usRight, ( USHORT )s_csbi.dwSize.X - 1);
 }
 
 /* *********************************************************************** */
@@ -1229,7 +1229,6 @@ static int IgnoreKeyCodes( int wKey )
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
     int ch = 0, extended = 0;
-    int i_mouseLast = 0;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
@@ -1615,7 +1614,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_LBUTTONDOWN;
 
              s_mouseLast = K_LBUTTONDOWN;
-             i_mouseLast = s_mouseLast ;
           }
           else if( eventmask & INKEY_RDOWN && s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
                    RIGHTMOST_BUTTON_PRESSED )
@@ -1626,7 +1624,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_RBUTTONDOWN;
 
              s_mouseLast = K_RBUTTONDOWN;
-             i_mouseLast = s_mouseLast;
           }
           else if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == 0 &&
                    s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState == 0 )
@@ -1635,7 +1632,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_LBUTTONUP;
              else if( eventmask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
                 ch = K_RBUTTONUP;
-                i_mouseLast = ch;
           }
        }
        /* Set up to process the next input event (if any) */
@@ -1843,9 +1839,8 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
         HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
                    dMillisecs, dTick ));
       }
-    }
+   }
 }
-
 
 /* *********************************************************************** */
 
@@ -1894,6 +1889,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    /* extended GT functions */
+//    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
+//    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
 }
 
 /* ********************************************************************** */
