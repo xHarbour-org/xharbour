@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARWIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CHARWIN (<nTop>, <nLeft>, <nBottom>, <nRight>, [<cNewChar|nNewChar>],
@@ -40,7 +40,7 @@
  *  $FUNCNAME$
  *      CLEARSLOW()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CLEARSLOW(<nDelay>, [<nTopline>], [<nLeftcolumn>],
@@ -83,7 +83,7 @@
  *  $FUNCNAME$
  *      COLORWIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      COLORWIN([<nTopLine>], [<nLeftCol>], [<nBottomLine>], [<nRightCol>],
@@ -123,7 +123,7 @@
  *  $FUNCNAME$
  *      COLORREPL()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      COLORREPL([<cNewAttr|nNewAttr>], [<cOldAttr|nOldAttr>]) --> cNull
@@ -154,7 +154,7 @@
  *  $FUNCNAME$
  *      SAYSPREAD()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SAYSPREAD(<cCharacterstring>, [<nDelay>], [<nLine>],
@@ -190,7 +190,7 @@
  *  $FUNCNAME$
  *      SAYMOVIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SAYMOVEIN(<cCharacterstring>, [<nDelay>],
@@ -231,7 +231,7 @@
  *  $FUNCNAME$
  *      SAYDOWN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SAYDOWN(<cCharacterstring>, [<nDelay>], [<nLine>],
@@ -266,7 +266,7 @@
  *  $FUNCNAME$
  *      SCREENSTR()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SCREENSTR ([<nRow>], [<nColumn>], [<nCharCount>]) --> cCharacterstring
@@ -300,7 +300,7 @@
  *  $FUNCNAME$
  *      STRSCREEN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      STRSCREEN(<cCharacterstring>, [<nRow>], [<nColumn>]) --> cNull
@@ -331,7 +331,7 @@
  *  $FUNCNAME$
  *      CLEAREOL()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CLEAREOL([<nRow>], [<nColumn>], [<cAttr|nAttr>],
@@ -367,7 +367,7 @@
  *  $FUNCNAME$
  *      CLWIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CLWIN([<nTopLine>], [<nLeftCol>], [<nBottomLine>],
@@ -403,7 +403,7 @@
  *  $FUNCNAME$
  *      CLEOL()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CLEOL([<nRow>], [<nColumn>]) --> cNull

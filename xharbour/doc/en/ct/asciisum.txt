@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ASCIISUM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      calculate the sum of the ASCII values of the characters in a string
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      JUSTLEFT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Move characters from the beginning to the end of a string
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      JUSTRIGHT()
  *  $CATEGORY$
- *      Harbour Tools string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Move characters from the end to the beginning of a string
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      TABEXPAND()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replace tabulator control characters with fill characters
  *  $SYNTAX$
@@ -51,7 +51,7 @@
  *  $FUNCNAME$
  *      TABPACK()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Pack fill characters to appropriate tab characters
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      XTOC()
  *  $CATEGORY$
- *      CT3 miscellaneous functions
+ *      HBCT miscellaneous functions
  *  $ONELINER$
  *  $SYNTAX$
  *      XTOC( <expValue> ) --> cValue

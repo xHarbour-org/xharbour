@@ -1,12 +1,12 @@
 /*
- * $Id: hbmutils.prg,v 1.35 2004/09/29 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.36 2004/12/08 00:00:00 modalsist Exp $
  */
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * hbmutils.prg - utils for hbmake.
  *
  * Copyright 2000,2001,2002,2003,2004 Luiz Rafael Culik <culikr@uol.com.br>
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -479,7 +479,6 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'rddads' + cSuffix, ;
                       'ace32' + cSuffix, ;
                       'libnf' + cSuffix, ;
-                      'hbct' + cSuffix, ;
                       'html' + cSuffix, ;
                       'libgt' + cSuffix, ;
                       'libmisc' + cSuffix, ;
@@ -530,17 +529,16 @@ FUNCTION GetLibs( lGcc, cDir )
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
    LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
    LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
-   LOCAL aLibsDesc   := { { "Harbour CT3        library - Hbct"   , IIF( lGcc, 'ct.a', 'hbct.lib' ) }, ;
-                          { "Harbour Misc       library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
-                          { "Harbour Html       library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
-                          { "Harbour NanFor     library - Libnf"  , IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
-                          { "Harbour GT         library - Libgt"  , 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
-                          { "Harbour Zip        library - Hbzip"  , IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
-                          { "Harbour Ole        library - HbOle"  , 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
-                          { "Harbour MySql      library - MySql"  , 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
-                          { "Harbour PostGreSql library - hbpg"   , 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
-                          { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) },;
-                          { "Harbour TIP        library - Hbtip"  , 'hbtip' + IIF( lGcc, '.a', '.lib' ) } }
+   LOCAL aLibsDesc     := { { "Harbour Misc       library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
+                            { "Harbour Html       library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
+                            { "Harbour NanFor     library - Libnf"  , IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
+                            { "Harbour GT         library - Libgt"  , 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
+                            { "Harbour Zip        library - Hbzip"  , IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
+                            { "Harbour Ole        library - HbOle"  , 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
+                            { "Harbour MySql      library - MySql"  , 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
+                            { "Harbour PostGreSql library - hbpg"   , 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
+                            { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) },;
+                            { "Harbour TIP        library - Hbtip"  , 'hbtip' + IIF( lGcc, '.a', '.lib' ) } }
 
    AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + padr(x,12) + " Library", x } ) } )
 

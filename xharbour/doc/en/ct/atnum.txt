@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      AFTERATNUM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Returns string portion after nth occurence of substring
  *  $SYNTAX$
@@ -57,7 +57,7 @@
  *  $FUNCNAME$
  *      BEFORATNUM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Returns string portion before nth occurence of substring
  *  $SYNTAX$
@@ -112,7 +112,7 @@
  *  $FUNCNAME$
  *      ATNUM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Returns the start position of the nth occurence of a substring in a string
  *  $SYNTAX$

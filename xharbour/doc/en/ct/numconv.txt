@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NTOC()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NTOC (<xNumber>[, <nBase>][,<nLength>][,<cPadChar>]) -> <cNumber>
@@ -27,7 +27,7 @@
  *  $FUNCNAME$
  *      CTON()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CTON (<xNumber>[, <nBase>][,<lMode>]) -> <nNumber>
@@ -52,7 +52,7 @@
  *  $FUNCNAME$
  *      BITTOC()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      BITTOC (<nInteger>, <cBitPattern>[,<lMode>]) -> <cBitString>
@@ -77,7 +77,7 @@
  *  $FUNCNAME$
  *      CTOBIT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CTOBIT (<cBitString>, <cBitPattern>) -> <nWord>

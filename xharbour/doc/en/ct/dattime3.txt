@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SHOWTIME()
  *  $CATEGORY$
- *      LibCT Date and Time Functions
+ *      HBCT Date and Time Functions
  *  $ONELINER$
  *      Continuously displays the time at desired screen position
  *  $SYNTAX$
@@ -92,7 +92,7 @@
  *  $FUNCNAME$
  *      SETDATE()
  *  $CATEGORY$
- *      LibCT Date and Time Functions
+ *      HBCT Date and Time Functions
  *  $ONELINER$
  *      Sets the system date
  *  $SYNTAX$
@@ -141,7 +141,7 @@
  *  $FUNCNAME$
  *      SETTIME()
  *  $CATEGORY$
- *      LibCT Date and Time Functions
+ *      HBCT Date and Time Functions
  *  $ONELINER$
  *      Sets the system clock
  *  $SYNTAX$
@@ -191,7 +191,7 @@
  *  $FUNCNAME$
  *      TIMEVALID()
  *  $CATEGORY$
- *      LibCT Date and Time Functions
+ *      HBCT Date and Time Functions
  *  $ONELINER$
  *      Determines whether a specIFied time is valid
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SETFCREATE()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SETFCREATE([<nNewFileAttr>]) --> <nOldFileAttr>
@@ -31,7 +31,7 @@
  *  $FUNCNAME$
  *      CSETSAFETY()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CSETSAFETY([<lNewSwitch>]) --> <lOldSwitch>
@@ -62,7 +62,7 @@
  *  $FUNCNAME$
  *      STRFILE()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *  $SYNTAX$
  *      STRFILE(<cCharacterstring>, <cFile>, [<lOverwrite>],
@@ -102,7 +102,7 @@
  *  $FUNCNAME$
  *      FILESTR()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *  $SYNTAX$
  *      FILESTR(<cFile>, [<nLength>], [<nOffset>], [<lCtrl_Z>]) -->
@@ -140,7 +140,7 @@
  *  $FUNCNAME$
  *      SCREENFILE()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SCREENFILE(<cFileName>, [<lOverwrite>], [<nOffset>]), [<lTrim>] -->
@@ -177,7 +177,7 @@
  *  $FUNCNAME$
  *      FILESCREEN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      FILESCREEN(<cFileName>, [<nOffset>]) --> nByte

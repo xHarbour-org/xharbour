@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      REMALL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Remove certain characters at the left and right of a string
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      REMLEFT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Remove certain characters at the left of a string
  *  $SYNTAX$
@@ -56,7 +56,7 @@
  *  $FUNCNAME$
  *      REMRIGHT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Remove certain characters at the right of a string
  *  $SYNTAX$

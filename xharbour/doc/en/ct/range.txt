@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      RANGEREM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Remove characters within a certain ASCII range from a string
  *  $SYNTAX$
@@ -36,7 +36,7 @@
  *  $FUNCNAME$
  *      RANGEREPL
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replace characters within a certain ASCII range from a string
  *  $SYNTAX$

@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.1 2004/02/01 11:36:59 lculik Exp $
+ * $Id: diskutil.prg,v 1.2 2004/12/08 00:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -7,15 +7,15 @@
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * www - http://www.xharbour.org
  *
- * DiskFormat()  - call dos/windows floppy format command.
- * DiskFree()    
- * DiskReady()   
+ * DiskFormat()  - Format disk. See notes.
+ * DiskFree()    - Return disk free available space.
+ * DiskReady()   - Return true if disk is ready.
  * DiskReadyW()  - Partially ready. See function for more details.
- * DiskTotal()   
- * DiskUsed()    - New function
- * FileValid()
- * FloppyType()  
- * RenameFile()  
+ * DiskTotal()   - Return total disk size.
+ * DiskUsed()    - Return ammount used into disk. New function is xHarbour extension.
+ * FileValid()   - Return true if a file can be oppened.
+ * FloppyType()  - Return a floppy type.
+ * RenameFile()  - Rename a file.
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -61,16 +61,40 @@
 
 #include "fileio.ch"
 #include "common.ch"
-**********************************************************************
-FUNCTION DiskFormat( cDrive, cLabel , lBoot ,lQuickFormat , nCapacity)
-**********************************************************************
+
+*----------------------------------------------------------------------------------------------------
+FUNCTION DiskFormat( cDrive, nCapacity, cUDF, cBootText, nRepetitions, cLabel , lBoot ,lQuickFormat )
+*----------------------------------------------------------------------------------------------------
    LOCAL cCommand,uScreen,nErr
 
    default( @cDrive, "A")          // floppy A
-   default( @cLabel, " " )         // no label
-   default( @lBoot, .F. )          // generates a boot disk (only for Win95/98/ME)
-   default( @lQuickFormat , .F. )  // force full format.
    default( @nCapacity , 0 )       // max floppy capacity
+
+   // CT compatibility
+   default( @cUDF, "" )            // by default, no UDF is called.
+   default( @cBootText, "" )       // no boot text message.
+   default( @nRepetitions, 1)      // one repetition if format fail.
+
+   // xHarbour extensions.
+   default( @cLabel, " " )         // without label.
+   default( @lBoot, .F. )          // only for Win95/98/ME
+   default( @lQuickFormat , .F. )  // force full format.
+
+/*
+NOTE: 
+
+December/2004 - EF
+
+1) The original CT diskformat() access low level assembly functions and bios
+   calls to format a disk. I don't be able to do the same so, this function
+   is a workaround that call the OS "format" command.
+   
+2) The <cUDF>, <cBootText> and <nRepetitions> parameters are include only for
+   maintain original diskformat CT call covention. These functionalities are
+   not yet implemented.
+      
+*/
+
 
    nErr := 0
 
@@ -138,37 +162,38 @@ FUNCTION DiskFormat( cDrive, cLabel , lBoot ,lQuickFormat , nCapacity)
       IF lQuickFormat
          cCommand += " /Q"
       ELSE
-         IF WhatWin() < 4
+         IF Os_IsWin9X()
             cCommand += " /U"  // Unconditional format. Only for Window95/98/ME.
-           ENDIF
+         ENDIF
       ENDIF
 
       IF nCapacity > 0
          cCommand += " /F:"+alltrim(str(nCapacity))
       ENDIF
 
-      IF lBoot .AND. WhatWin() < 4
+      IF lBoot .AND. OS_IsWin9X()
          cCommand += " /S" // Only for Windows95/98/ME.
       ENDIF
 
-      IF WhatWin() > 3 // WinNT/2000/XP
+      IF OS_IsWinNT() // only for NT4/2000/XP/2003
          cCommand += " /X" // force volume dismount IF necessary.
       ENDIF
 
-	// Save previous screen before call dos/format command.
+      // Save previous screen before call dos/format command.
       uScreen := SaveScreen(0,0,maxrow(),maxcol())
       Run ( cCommand )
       nErr := DosError()
-   // Restore previous screen after call dos/format commnad.
+      // Restore previous screen after call dos/format commnad.
       RestScreen(0,0,maxrow(),maxcol(),uScreen)
    ENDIF
 
 RETURN ( nErr )
 
 
-***************************
+*--------------------------
 FUNCTION DiskFree( cDrive )
-***************************
+*--------------------------
+Local nRet:=0
 
    default( @cDrive , DiskName() )
 
@@ -179,15 +204,20 @@ FUNCTION DiskFree( cDrive )
    IF at(":",cDrive)==0
       cDrive += ":"
    ENDIF
-// hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
-RETURN ( hb_DiskSpace( cDrive , HB_DISK_FREE ) )
+
+   IF DiskReady(cDrive)
+      // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+      nRet := hb_DiskSpace( cDrive , HB_DISK_FREE )
+   ENDIF
+
+RETURN (nRet)      
 
 
 
-************************************
+*-----------------------------------
 FUNCTION DiskReady( cDrive , lMode )
-************************************
-   LOCAL lRETURN
+*-----------------------------------
+LOCAL lRETURN
 
    default( @cDrive , DiskName() )
    default( @lMode , .F. )
@@ -208,14 +238,14 @@ FUNCTION DiskReady( cDrive , lMode )
       lRETURN := IsDisk( cDrive )     // Bios access mode. xHarbour RTL. Source is in
    ENDIF                              // "dirdrive.c".
 
-RETURN ( lRETURN )  // Bios access mode not implemented yet.
+RETURN ( lRETURN )
 
 
 
-*************************************
+*------------------------------------
 FUNCTION DiskReadyW( cDrive , lMode )
-*************************************
-   LOCAL nHd,cFile,lRETURN
+*------------------------------------
+LOCAL nHd,cFile,lRETURN
 
    default( @cDrive , DiskName() )
    default( @lMode  , .T. )
@@ -237,9 +267,9 @@ FUNCTION DiskReadyW( cDrive , lMode )
             FClose( nHd )
             FErase( cFile )
             RETURN .T.
-      ELSE
-             RETURN .F.
-      ENDIF
+         ELSE
+            RETURN .F.
+         ENDIF
    ELSE
       RETURN .F.
    ENDIF
@@ -248,9 +278,10 @@ ENDIF
 RETURN .F.
 
 
-****************************
+*---------------------------
 FUNCTION DiskTotal( cDrive )
-****************************
+*---------------------------
+LOCAL nRet:=0
 
    Default( @cDrive , DiskName() )
    
@@ -262,13 +293,17 @@ FUNCTION DiskTotal( cDrive )
       cDrive += ":"
    ENDIF
 
-// hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
-RETURN ( hb_DiskSpace( cDrive , HB_DISK_TOTAL ) )
+   // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+   IF DiskReady( cDrive )
+      nRet := hb_DiskSpace( cDrive , HB_DISK_TOTAL )
+   ENDIF
 
+RETURN (nRet)
 
-***************************
+*--------------------------
 FUNCTION DiskUsed( cDrive )
-***************************
+*--------------------------
+Local nRet := 0
 
    Default( @cDrive , DiskName() )
 
@@ -279,16 +314,18 @@ FUNCTION DiskUsed( cDrive )
    IF at(":",cDrive) == 0
       cDrive += ":"
    ENDIF
-// hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
-RETURN (  hb_DiskSpace( cDrive , HB_DISK_TOTAL ) - hb_DiskSpace( cDrive , HB_DISK_FREE ) )
+
+   IF DiskReady(cDrive)
+      // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+      nRet := ( hb_DiskSpace( cDrive , HB_DISK_TOTAL ) - hb_DiskSpace( cDrive , HB_DISK_FREE ) )
+   ENDIF
+   
+RETURN ( nRet )
 
 
-
-
-
-********************************
+*-------------------------------
 FUNCTION FileValid ( cFileName )
-********************************
+*-------------------------------
    LOCAL nHandle
 
    nHandle := FOpen( cFileName , FO_READWRITE )
@@ -301,10 +338,10 @@ RETURN ( IIF( nHandle > 0 , .T. , .F. ) )
 
 
 
-******************************
+*-----------------------------
 FUNCTION FloppyType ( cDrive )
-******************************
-   LOCAL nTotalBytes,nFloppyType
+*-----------------------------
+LOCAL nTotalBytes,nFloppyType
 
    Default( @cDrive , DiskName() )
 
@@ -333,9 +370,9 @@ FUNCTION FloppyType ( cDrive )
 RETURN ( nFloppyType )
 
 
-***************************************************
+*--------------------------------------------------
 FUNCTION RenameFile ( cOldFileName , cNewFileName )
-***************************************************
+*--------------------------------------------------
 // FileMove source is in "disk.c"
 RETURN ( FileMove( cOldFileName , cNewFileName )  )
 

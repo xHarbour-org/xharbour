@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ASCPOS()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      ASCII value of a character at a certain position
  *  $SYNTAX$
@@ -41,7 +41,7 @@
  *  $FUNCNAME$
  *      VALPOS()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Numerical value of a character at a certain position
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      MAXLINE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *  $SYNTAX$
  *      MAXLINE(<cString>) --> nLength

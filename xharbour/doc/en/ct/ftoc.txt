@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      FTOC()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      FTOC( <nFloatingPointNumber> ) --> cFloatingPointNumber
@@ -38,7 +38,7 @@
  *  $FUNCNAME$
  *      CTOF()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CTOF( <cFloatingPointNumber> ) --> nFloatingPointNumber

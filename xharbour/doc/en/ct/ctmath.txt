@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SETPREC()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Set precision of math functions
  *  $SYNTAX$
@@ -31,7 +31,7 @@
  *  $FUNCNAME$
  *      GETPREC()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Get precision of math functions
  *  $SYNTAX$

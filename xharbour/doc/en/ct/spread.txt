@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      EXPAND()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *  $SYNTAX$
  *      EXPAND(<cString>,[<nNumber>],[<cChar|nChar>]) --> cString
@@ -36,7 +36,7 @@
  *  $FUNCNAME$
  *      CHARSPREAD()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CHARSPREAD(<cString>,<nLength>, [<cChar|nChar>]) --> cString

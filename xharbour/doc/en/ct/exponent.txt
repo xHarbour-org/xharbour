@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      MANTISSA()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Evaluate the mantissa of a floating point number
  *  $SYNTAX$
@@ -41,7 +41,7 @@
  *  $FUNCNAME$
  *      EXPONENT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Evaluate the exponent of a floating point number
  *  $SYNTAX$

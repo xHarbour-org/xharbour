@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      LTON()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *  $SYNTAX$
  *      LTON([<lValue>]) --> nLogicalValue

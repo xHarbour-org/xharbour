@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARSWAP()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Swap neighbouring characters in a string
  *  $SYNTAX$
@@ -39,7 +39,7 @@
  *  $FUNCNAME$
  *      WORDSWAP()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Swap neighbouring double characters in a string
  *  $SYNTAX$

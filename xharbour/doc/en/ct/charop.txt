@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARADD()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Adds corresponding ASCII value of two strings
  *  $SYNTAX$
@@ -51,7 +51,7 @@
  *  $FUNCNAME$
  *      CHARSUB()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Subtracts corresponding ASCII value of two strings
  *  $SYNTAX$
@@ -100,7 +100,7 @@
  *  $FUNCNAME$
  *      CHARAND()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Combine corresponding ASCII value of two strings with bitwise AND
  *  $SYNTAX$
@@ -148,7 +148,7 @@
  *  $FUNCNAME$
  *      CHARNOT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Process each character in a string with bitwise NOT operation
  *  $SYNTAX$
@@ -192,7 +192,7 @@
  *  $FUNCNAME$
  *      CHAROR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Combine corresponding ASCII value of two strings with bitwise OR
  *  $SYNTAX$
@@ -240,7 +240,7 @@
  *  $FUNCNAME$
  *      CHARXOR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Combine corresponding ASCII value of two strings with bitwise XOR
  *  $SYNTAX$
@@ -286,7 +286,7 @@
  *  $FUNCNAME$
  *      CHARSHL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Process each character in a string with bitwise SHIFT LEFT operation
  *  $SYNTAX$
@@ -331,7 +331,7 @@
  *  $FUNCNAME$
  *      CHARSHR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Process each character in a string with bitwise SHIFT RIGHT operation
  *  $SYNTAX$
@@ -376,7 +376,7 @@
  *  $FUNCNAME$
  *      CHARRLL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Process each character in a string with bitwise ROLL LEFT operation
  *  $SYNTAX$
@@ -421,7 +421,7 @@
  *  $FUNCNAME$
  *      CHARRLR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Process each character in a string with bitwise ROLL RIGHT operation
  *  $SYNTAX$

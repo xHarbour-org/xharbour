@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      UNTEXTWIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      UNTEXTWIN(<nTopLine>, <nLeftColumn>, <nBottomLine>, <nRightColumn>,

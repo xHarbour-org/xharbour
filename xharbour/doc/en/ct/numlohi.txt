@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMLOW()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *      Gets the lower value byte of a number
  *  $SYNTAX$
@@ -31,7 +31,7 @@
  *  $FUNCNAME$
  *      NUMHIGH()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *      Gets the higher value byte of the lower value word of a number
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SCREENATTR()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SCREENATTR ( [<nRow>],[<nColumn>] ) -> <nAttr>

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARONLY()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Intersectional set of two strings based on characters
  *  $SYNTAX$
@@ -40,7 +40,7 @@
  *  $FUNCNAME$
  *      WORDONLY()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Intersectional set of two strings based on double characters
  *  $SYNTAX$
@@ -78,7 +78,7 @@
  *  $FUNCNAME$
  *      CHARREM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Removes characters from a string
  *  $SYNTAX$
@@ -115,7 +115,7 @@
  *  $FUNCNAME$
  *      WORDREM()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Removes characters from a string
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CSETARGERR()
  *  $CATEGORY$
- *      CT3 general functions
+ *      HBCT general functions
  *  $ONELINER$
  *      Sets argument error behaviour
  *  $SYNTAX$
@@ -41,7 +41,7 @@
  *  $FUNCNAME$
  *      CTCINIT()
  *  $CATEGORY$
- *      CT3 general functions
+ *      HBCT general functions
  *  $ONELINER$
  *      Initializes the CT3 library, C part
  *  $SYNTAX$
@@ -71,7 +71,7 @@
  *  $FUNCNAME$
  *      CTCEXIT()
  *  $CATEGORY$
- *      CT3 general functions
+ *      HBCT general functions
  *  $ONELINER$
  *      Uninitializes the CT3 library, C part
  *  $SYNTAX$

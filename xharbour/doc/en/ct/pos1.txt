@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      POSALPHA()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Left-most position of a letter in a string
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      POSLOWER()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Left-most position of a lowercase letter in a string
  *  $SYNTAX$
@@ -56,7 +56,7 @@
  *  $FUNCNAME$
  *      POSRANGE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Left-most position of a character from a set in a string
  *  $SYNTAX$
@@ -84,7 +84,7 @@
  *  $FUNCNAME$
  *      POSUPPER()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Left-most position of an uppercase letter in a string
  *  $SYNTAX$

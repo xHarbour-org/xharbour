@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      STRDIFF()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Evaluate the "Edit (Levensthein) Distance" of two strings
  *  $SYNTAX$

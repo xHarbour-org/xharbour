@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      LIKE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *  $SYNTAX$
  *      LIKE(<cString1>,<cString2>) --> lEqual

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      FLOOR()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Rounds down a number to the next integer
  *  $SYNTAX$
@@ -36,7 +36,7 @@
  *  $FUNCNAME$
  *      CEILING()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Rounds up a number to the next integer
  *  $SYNTAX$
@@ -70,7 +70,7 @@
  *  $FUNCNAME$
  *      SIGN()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Sign of a number
  *  $SYNTAX$
@@ -107,7 +107,7 @@
  *  $FUNCNAME$
  *      LOG10()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Decadic logarithm of a number 
  *  $SYNTAX$
@@ -140,7 +140,7 @@
  *  $FUNCNAME$
  *      FACT()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Calculates faculty 
  *  $SYNTAX$

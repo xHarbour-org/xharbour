@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      INVERTWIN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *
  *  $SYNTAX$

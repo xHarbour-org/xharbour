@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMAT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Number of occurrences of a sequence in a string
  *  $SYNTAX$

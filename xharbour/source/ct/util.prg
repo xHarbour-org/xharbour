@@ -1,5 +1,5 @@
 /*
- *  $Id: util.prg,v 1.2 2004/02/01 17:23:55 paultucker Exp $
+ *  $Id: util.prg,v 1.2 2004/12/08 00:00:00 modalsist Exp $
  */
 
 /*
@@ -9,7 +9,6 @@
  * Default()
  * IsDir()
  * Occurs()
- * WhatWin()
  *
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * http://www.xharbour.org
@@ -112,26 +111,3 @@ FUNCTION Occurs( cStr1 , cStr2 )
    NEXT
 
 RETURN ( nOccurs )
-
-******************
-FUNCTION WhatWin()
-******************
-   LOCAL nRet
-   
-   nRet := 0
-
-   IF ( "Windows 95" $ OS() )
-      nRet := 1
-   ELSEIF ( "Windows 98" $ OS() )
-      nRet := 2
-   ELSEIF ( "Windows ME" $ OS() .or. "Windows Millenium" $ OS())
-      nRet := 3
-   ELSEIF ( "Windows NT" $ OS())
-      nRet := 4
-   ELSEIF ( "Windows 2000" $ OS() )
-      nRet := 5
-   ELSEIF ( "Windows XP" $ OS() )
-      nRet := 6
-   ENDIF
-
-RETURN ( nRet )

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CTINIT()
  *  $CATEGORY$
- *      CT3 general functions
+ *      HBCT general functions
  *  $ONELINER$
  *      Initializes the CT3 library
  *  $SYNTAX$
@@ -34,7 +34,7 @@
  *  $FUNCNAME$
  *      CTEXIT()
  *  $CATEGORY$
- *      CT3 general functions
+ *      HBCT general functions
  *  $ONELINER$
  *      Uninitializes the CT3 library
  *  $SYNTAX$

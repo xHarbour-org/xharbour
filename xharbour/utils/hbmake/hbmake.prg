@@ -1,12 +1,12 @@
 /*
- * $Id: hbmake.prg,v 1.132 2004/09/29 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.133 2004/12/08 00:00:00 modalsist Exp $
  */
 /*
- * Harbour Project source code:
- * hbmake.Prg Harbour make utility main file
+ * xHarbour Project source code:
+ * hbmake.prg xHarbour make utility main file
  *
  * Copyright 2000,2001,2002,2003,2004 Luiz Rafael Culik <culikr@uol.com.br>
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.132"
+STATIC s_cHbMakeVersion := "1.133"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -1294,11 +1294,11 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL getlist          := {}
    LOCAL cTopFile         := Space( 50 )
    LOCAL cAppName         := s_Appname + Space( 50 )
-   LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib"
+   LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib hbct.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lgtnul"
-   LOCAL cDefBccLibsMt    := "bcc640mt.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib dbfdbtmt.lib common.lib gtwin.lib codepage.lib"
+   LOCAL cDefBccLibsMt    := "bcc640mt.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib dbfdbtmt.lib common.lib gtwin.lib codepage.lib hbctmt.lib"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlmt -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlmt -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage"
@@ -1803,7 +1803,7 @@ FUNCTION CreateMakeFile( cFile )
       elseif s_nLang=3
          s_cMsg := "Seleccione las LIB externas a compilar"
       else
-         s_cMsg := "Select the external LIB to compile"
+         s_cMsg := "Select the external LIBs to compile"
       endif
 
       pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{}, , s_cMsg )
@@ -2059,6 +2059,7 @@ FUNCTION CreateMakeFile( cFile )
       cExtraLibs += " -lrddads -ladsloc "
    ENDIF
 
+   // if external libs was selected...
    IF Len( aLibsOut ) > 0 .AND. s_lExternalLib
 
       IF s_lVcc .OR. s_lBcc
@@ -2074,6 +2075,7 @@ FUNCTION CreateMakeFile( cFile )
             cOldLib := cDefBccLibsMt
          ENDIF
 
+         // searching for html lib...
          nPos := aScan( aLibsOut, { | z | At( "html", Lower( z ) ) > 0 } )
 
          IF nPos > 0
@@ -2083,6 +2085,7 @@ FUNCTION CreateMakeFile( cFile )
             cOldLib := StrTran( cOldLib, "gtwin" , "gtcgi" )
          ENDIF
 
+         // searching for mysql lib...
          aEval( aLibsOut, { | cLib | cLibs += " " + cLib } )
          nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
 
@@ -2090,8 +2093,8 @@ FUNCTION CreateMakeFile( cFile )
             cLibs += " libmysql.lib"
          ENDIF
 
+         // searching for postgre lib...
          nPos := aScan( aLibsOut, { | z | At( "hbpg", Lower( z ) ) > 0 } )
-
          IF nPos >0
             cLibs += " libpq.lib"
             cLibs := strtran(cLibs,"hbpg","hbpg")
@@ -4001,8 +4004,8 @@ FUNCTION BuildLangArray( cLang )
 
    IF cLang == "EN"
 
-      aAdd( aLang, "Harbour Make Utility - the [x]Harbour make programm - version "+HbMakeVersion() )
-      aAdd( alang, "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc -ex")
+      aAdd( aLang, "Harbour Make Utility - the xHarbour make programm - version "+HbMakeVersion() )
+      aAdd( alang, "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc /ex")
       aAdd( aLang, "Options:  /e[x]   Create a new Makefile. If /ex is used it create a" )
       aAdd( aLang, "                  new make file in extended mode." )
       aAdd( aLang, "          /el[x]  Create a new Makefile. If /elx is used it create a")
@@ -4062,8 +4065,8 @@ FUNCTION BuildLangArray( cLang )
 
    ELSEIF cLang == "ES"
 
-      aAdd( aLang, "Harbour Make Utility  -  Programa Make de [x]Harbour - version "+HbMakeVersion() )
-      aAdd( aLang, "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc -ex")
+      aAdd( aLang, "Harbour Make Utility  -  Programa Make de xHarbour - version "+HbMakeVersion() )
+      aAdd( aLang, "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc /ex")
       aAdd( aLang, "Opciones: /e[x]   Crea un Makefile nuevo. Si se usa /ex se crea un nuevo" )
       aAdd( aLang, "                  makefile en modo extendido." )
       aAdd( aLang, "          /el[x]  Crea un Makefile nuevo. Si se usa /elx se crea un nuevo" )
@@ -4123,8 +4126,8 @@ FUNCTION BuildLangArray( cLang )
 
    ELSEIF cLang == "PT"
 
-      aAdd( aLang, "Harbour Make Utility  -  Programa Make do [x]Harbour - vers∆o "+HbMakeVersion() )
-      aAdd( aLang, "Sintaxe:  hbmake <arquivo>.bc [opá‰es] -  Exemplo: hbmake hello.bc -ex")
+      aAdd( aLang, "Harbour Make Utility  -  Programa Make do xHarbour - vers∆o "+HbMakeVersion() )
+      aAdd( aLang, "Sintaxe:  hbmake <arquivo>.bc [opá‰es] -  Exemplo: hbmake hello.bc /ex")
       aAdd( aLang, "Opá‰es:  /e[x]  Cria um Makefile novo. Se for usado /ex cria um makefile" )
       aAdd( aLang, "                em modo extendido." )
       aAdd( aLang, "         /el[x] Cria um Makefile novo. Se for usado /elx cria um makefile" )

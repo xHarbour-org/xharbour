@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      WORDTOCHAR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replace double with single characters
  *  $SYNTAX$

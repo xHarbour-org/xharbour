@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMANDX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMANDX( <nSignificativeBits>, <nLONG1|cHexLONG1>, <nLONG2|cHexLONG2>
@@ -46,7 +46,7 @@
  *  $FUNCNAME$
  *      NUMORX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMORX( <nSignificativeBits>, <nLONG1|cHexLONG>1, <nLONG2|cHexLONG2>
@@ -90,7 +90,7 @@
  *  $FUNCNAME$
  *      NUMXORX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMXORX( <nSignificativeBits>, <nLONG1|cHexLONG1>, <nLONG2|cHexLONG2> )
@@ -134,7 +134,7 @@
  *  $FUNCNAME$
  *      NUMNOTX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMNOTX( <nSignificativeBits>, <nLONG|cHexLONG> ) -> <nLONGNOT>
@@ -177,7 +177,7 @@
  *  $FUNCNAME$
  *      NUMROLX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMROLX( <nSignificativeBits>, <nLONG|cHexLONG>, <nWORD|cHexWORD> )
@@ -221,7 +221,7 @@
  *  $FUNCNAME$
  *      NUMMIRRX()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMMIRRX( <nSignificativeBits>, <nNumber|cHexNum> ) -> <nResult>

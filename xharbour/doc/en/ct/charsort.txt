@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARSORT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Sort sequences within a string.
  *  $SYNTAX$

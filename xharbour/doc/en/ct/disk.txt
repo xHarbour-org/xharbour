@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      DELETEFILE()
  *  $CATEGORY$
- *      LIBCT File management
+ *      HBCT File management
  *  $ONELINER$
  *      Delete an error-tolerant file.
  *  $SYNTAX$
@@ -64,7 +64,7 @@
  *  $FUNCNAME$
  *      DIRMAKE()
  *  $CATEGORY$
- *      LIBCT Directory management
+ *      HBCT Directory management
  *  $ONELINER$
  *      Create a new directory
  *  $SYNTAX$
@@ -112,7 +112,7 @@
  *  $FUNCNAME$
  *      DIRNAME()
  *  $CATEGORY$
- *      LIBCT Directory management
+ *      HBCT Directory management
  *  $ONELINER$
  *      Determines the name of the current directory
  *  $SYNTAX$
@@ -158,7 +158,7 @@
  *  $FUNCNAME$
  *      DRIVETYPE()
  *  $CATEGORY$
- *      LIBCT Disk management
+ *      HBCT Disk management
  *  $ONELINER$
  *      Determines the drive type.
  *  $SYNTAX$
@@ -213,17 +213,17 @@
  */
 /*  $DOC$
  *  $FUNCNAME$
- *    FILEMOVE()
+ *      FILEMOVE()
  *  $CATEGORY$
- *    LIBCT File management
+ *      HBCT File management
  *  $ONELINER$
  *      Move files to another directory.
  *  $SYNTAX$
- *    FILEMOVE(<cSourceFile>, <cTargetFile>) --> nErrorCode
+ *      FILEMOVE(<cSourceFile>, <cTargetFile>) --> nErrorCode
  *  $ARGUMENTS$
- *    <cSourceFile>  Designates the name and the path of the source file.
+ *      <cSourceFile>  Designates the name and the path of the source file.
  *
- *     <cTargetFile>  Designates the name and the path of the target file.
+ *      <cTargetFile>  Designates the name and the path of the target file.
  *  $RETURNS$
  *      FILEMOVE() returns a value of 0 when the file can be moved; otherwise,
  *      an error code is returned.  The codes are defined below:
@@ -275,7 +275,7 @@
  *  $FUNCNAME$
  *      NUMDISKL()
  *  $CATEGORY$
- *      CT3 disk functions
+ *      HBCT disk functions
  *  $ONELINER$
  *      Gets the number of valid drive letters.
  *  $SYNTAX$

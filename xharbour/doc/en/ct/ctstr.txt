@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CSETREF()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Determine return value of reference sensitive CT3 string functions
  *  $SYNTAX$
@@ -61,7 +61,7 @@
  *  $FUNCNAME$
  *      CSETATMUPA()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Determine "multi-pass" behaviour in some string functions
  *  $SYNTAX$
@@ -102,7 +102,7 @@
  *  $FUNCNAME$
  *      SETATLIKE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Determine scan behaviour in some string functions
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARLIST()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Generates a list of all characters in a string
  *  $SYNTAX$
@@ -39,7 +39,7 @@
  *  $FUNCNAME$
  *      CHARSLIST()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Generates a sorted list of all characters in a string
  *  $SYNTAX$
@@ -77,7 +77,7 @@
  *  $FUNCNAME$
  *      CHARNOLIST()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Generates a list of all characters not contained in a string
  *  $SYNTAX$
@@ -114,7 +114,7 @@
  *  $FUNCNAME$
  *      CHARHIST()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Generates a character histogram of a string
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMCOUNT()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMCOUNT([<nIncrement|nStartValue>,[<lMode>]]) --> nNewCounterValue

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CELSIUS()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *      Temperature conversion Fahrenheit to Celsius
  *  $SYNTAX$
@@ -38,7 +38,7 @@
  *  $FUNCNAME$
  *      FAHRENHEIT()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *      Temperature conversion Celsius to Fahrenheit
  *  $SYNTAX$
@@ -74,7 +74,7 @@
  *  $FUNCNAME$
  *      INFINITY()
  *  $CATEGORY$
- *      CT3 numeric functions
+ *      HBCT numeric functions
  *  $ONELINER$
  *      Returns the largest floating point number available in the system
  *  $SYNTAX$

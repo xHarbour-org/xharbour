@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      FV()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Future value of a capital
  *  $SYNTAX$
@@ -53,7 +53,7 @@
  *  $FUNCNAME$
  *      PV()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Present value of a loan
  *  $SYNTAX$
@@ -103,7 +103,7 @@
  *  $FUNCNAME$
  *      PAYMENT()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Payments for a loan
  *  $SYNTAX$
@@ -151,7 +151,7 @@
  *  $FUNCNAME$
  *      PERIODS()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Number of periods for a loan
  *  $SYNTAX$
@@ -204,7 +204,7 @@
  *  $FUNCNAME$
  *      RATE()
  *  $CATEGORY$
- *      CT3 math functions
+ *      HBCT math functions
  *  $ONELINER$
  *      Estimate rate of interest for a loan
  *  $SYNTAX$

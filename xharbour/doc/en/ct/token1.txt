@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ATTOKEN()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Position of a token in a string
  *  $SYNTAX$
@@ -63,7 +63,7 @@
  *  $FUNCNAME$
  *      TOKEN()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Tokens of a string
  *  $SYNTAX$
@@ -130,7 +130,7 @@
  *  $FUNCNAME$
  *      NUMTOKEN()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Retrieves the number of tokens in a string
  *  $SYNTAX$
@@ -159,7 +159,7 @@
  *  $FUNCNAME$
  *      TOKENLOWER()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Change the first letter of tokens to lower case
  *  $SYNTAX$
@@ -219,7 +219,7 @@
  *  $FUNCNAME$
  *      TOKENUPPER()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Change the first letter of tokens to upper case
  *  $SYNTAX$
@@ -279,7 +279,7 @@
  *  $FUNCNAME$
  *      TOKENSEP()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Retrieves the token separators of the last token() call
  *  $SYNTAX$

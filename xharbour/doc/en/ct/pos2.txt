@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      POSCHAR()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replace character at a certain position within a string
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      POSDEL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Delete characters at a certain position within a string
  *  $SYNTAX$
@@ -56,7 +56,7 @@
  *  $FUNCNAME$
  *      POSINS()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Insert characters at a certain position within a string
  *  $SYNTAX$
@@ -83,7 +83,7 @@
  *  $FUNCNAME$
  *      POSREPL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replace characters at a certain position within a string
  *  $SYNTAX$

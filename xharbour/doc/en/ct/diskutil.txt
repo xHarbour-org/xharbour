@@ -2,16 +2,35 @@
  *  $FUNCNAME$
  *		DISKFORMAT()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *      HBCT Disk management
  *  $ONELINER$
  *		Format a floppy disk drive in command prompt mode. Call the DOS Format command.
  *  $SYNTAX$
- *		DISKFORMAT( [<cDrive>] , [<cLabel>] , [<lBoot>] ,
- *                [<lQuickFormat>], [<cCapacity>] ) --> nDOSErrorCode
+ *      DISKFORMAT( [<cDrive>], [<nCapacity>], [<cUDF>], [<cBootText>],[<nRepetitions>],
+ *                  [<cLabel>], [<lBoot>], [<lQuickFormat>]  ) --> nDOSErrorCode
  *  $ARGUMENTS$
  *      <cDrive>  Designates the disk drive to format.  Only a floppy drive
  *      is permitted (A or B).  You may optionally specify a colon (:). The
  *      disk default is A.
+ *
+ *      <nCapacity>  This optional argument, designates the appropriate disk
+ *	 	capacity for the disk you are about to format.  Possible values are:
+ *	 	160, 180, 320, 360, and 1200 for 5.25"; 720 and 1440 for 3.5" disks.
+ *	 	The default is 0, the maximum drive capacity.
+ *
+ *      <cUDF>  Designates the name of a user-defined function call before
+ *      each format step (track or head change). The default is no UDF called.
+ *      This parameter is still without effect because not yet implemented.
+ *
+ *      <cBootText>  This optional parameter designates text, with a maximum
+ *      of 255 characters, to display if the formatted disk is booted.  The
+ *      default is described in the "Notes" section on the following page.
+ *      This parameter is still without effect because not yet implemented.
+ *
+ *      <nRepetitions>  Designates the number of repeat attempts you should
+ *      make, to format a track before the function aborts.  The default is one
+ *      repetition.
+ *      This parameter is still without effect because not yet implemented.
  *
  *      <cLabel>  Designates the string label name to disk. Maximum len is 11
  *	 	characters.
@@ -21,12 +40,7 @@
  *      Windows 95/98/ME. For WindowsNT/2000/XP this argument is ignored.
  *
  *      <lQuickFormat>  This optional parameter designates the quickly format
- *	 	capabilities of a operational system. Not recomended.
- *
- *   	<nCapacity>  This optionao argument, designates the appropriate disk
- *	 	capacity for the disk you are about to format.  Possible values are:
- *	 	160, 180, 320, 360, and 1200 for 5.25"; 720 and 1440 for 3.5" disks.
- *	 	The default is 0, the maximum drive capacity.
+ *      capabilities of operational system. Not recomended.
  *  $RETURNS$
  *      This FUNCTION return a DOSERROR() code. 0 if successfull.
  *  $DESCRIPTION$
@@ -55,7 +69,7 @@
  *  $FUNCNAME$
  *		DISKFREE()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *      Determine the space available on a floppy or hard disk.
  *  $SYNTAX$
@@ -101,7 +115,7 @@
  *  $FUNCNAME$
  *		DISKREADY()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *		Tests to see if a disk drive is ready.
  *  $SYNTAX$
@@ -163,7 +177,7 @@
  *  $FUNCNAME$
  *		DISKREADYW()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *		Queries whether you can write to a drive.
  *  $SYNTAX$
@@ -248,7 +262,7 @@
  *  $FUNCNAME$
  *		DISKTOTAL()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *		Determines the total capacity of a floppy or hard disk.
  *  $SYNTAX$
@@ -295,7 +309,7 @@
  *  $FUNCNAME$
  *		DISKUSED()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *		Determines the used space on a floppy or hard disk.
  *  $SYNTAX$
@@ -338,7 +352,7 @@
  *  $FUNCNAME$
  *		FILEDELETE()
  *  $CATEGORY$
- *      LIBCT File management
+ *      HBCT File management
  *  $ONELINER$
  *		Deletes file(s) by name and attribute
  *  $SYNTAX$
@@ -398,7 +412,7 @@
  *  $FUNCNAME$
  *		FILEVALID()
  *  $CATEGORY$
- *		LIBCT File management
+ *		HBCT File management
  *  $ONELINER$
  *		Tests whether a string has a valid file name
  *  $SYNTAX$
@@ -441,7 +455,7 @@
  *  $FUNCNAME$
  *		FLOPPYTYPE()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *		HBCT Disk management
  *  $ONELINER$
  *		Determines the exact type of floppy drive
  *  $SYNTAX$
@@ -501,7 +515,7 @@
  *  $FUNCNAME$
  *		RENAMEFILE()
  *  $CATEGORY$
- *		LIBCT File management
+ *		HBCT File management
  *  $ONELINER$
  *		Fault tolerant renaming of a file.
  *  $SYNTAX$

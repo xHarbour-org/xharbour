@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      DEFAULT()
  *  $CATEGORY$
- *      LIBCT MemVar functions
+ *      HBCT MemVar functions
  *  $ONELINER$
  *      Assign a default value to a NIL argument.
  *  $SYNTAX$
@@ -47,7 +47,7 @@
  *  $FUNCNAME$
  *      ISDIR()
  *  $CATEGORY$
- *      LIBCT Directory management
+ *      HBCT Directory management
  *  $ONELINER$
  *      VerIFy IF a directory exist.
  *  $SYNTAX$
@@ -71,7 +71,7 @@
  *  $FUNCNAME$
  *      OCCURS()
  *  $CATEGORY$
- *      LIBCT String functions
+ *      HBCT String functions
  *  $ONELINER$
  *      Return the number of times that a substring occurs in a string.
  *  $SYNTAX$
@@ -95,48 +95,6 @@
  *      Ready
  *  $COMPLIANCE$
  *      This function is CA-Visual Objects compatible.
- *  $PLATFORMS$
- *      Windows
- *  $FILES$
- *      Source is util.prg, library is libct.lib
- *  $SEEALSO$
- *  $END$
- */
-/*  $DOC$
- *  $FUNCNAME$
- *        WHATWIN()
- *  $CATEGORY$
- *      LIBCT System information
- *  $ONELINER$
- *      VerIFy Windows type operational system.
- *  $SYNTAX$
- *		WhatWin() -> nWindowsType
- *  $ARGUMENTS$
- *		Nome.
- *  $RETURNS$
- *		A number indicating the Windows type.
- *  $DESCRIPTION$
- *		WhatWin() is a system function based in OS() function.
- *  $EXAMPLES$
- *      IF WhatWin() = 1
- *			? "This is Windows 95"
- *      ELSEIF WhatWin() = 2
- *			? "This is Windows 98"
- *      ELSEIF WhatWin() = 3
- *			? "This is Windows ME"
- *      ELSEIF WhatWin() = 4
- *			? "This is Windows NT"
- *      ELSEIF WhatWin() = 5
- *			? "This is Windows 2000"
- *      ELSEIF WhatWin() = 6
- *			? "This is Windows XP"
- *      ELSE
- *       ? "This is unknow Windows system"
- *      ENDIF
- *  $STATUS$
- *      Ready
- *  $COMPLIANCE$
- *      This function is new in xHarbour.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMLINE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NUMLINE(<cString>,[<nLineLength>]) --> nNumber

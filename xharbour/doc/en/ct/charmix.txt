@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARMIX()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Mix two strings
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      PADLEFT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Fills string to a certain length on the left
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      PADRIGHT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Fills string to a certain length on the right
  *  $SYNTAX$

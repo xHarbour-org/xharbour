@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SCREENMARK()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SCREENMARK(<cSearchString>, <cAttr|nAttr>, <lUpperLower>,

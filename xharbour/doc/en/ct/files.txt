@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SETFDATI()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *      Sets file date and time
  *  $SYNTAX$
@@ -34,7 +34,7 @@
  *  $FUNCNAME$
  *      FILESMAX()
  *  $CATEGORY$
- *      CT3 file functions
+ *      HBCT file functions
  *  $ONELINER$
  *      Gets maximum number of file handles
  *  $SYNTAX$

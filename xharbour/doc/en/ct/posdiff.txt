@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      POSDIFF()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      The left-most position there two string differ
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      POSEQUAL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      The left-most position there two string begin to be equal
  *  $SYNTAX$

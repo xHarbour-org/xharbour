@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ATREPL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Search and replace sequences in a string
  *  $SYNTAX$

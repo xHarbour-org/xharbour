@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARRELA()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Character relation of two strings
  *  $SYNTAX$
@@ -30,7 +30,7 @@
  *  $FUNCNAME$
  *      CHARRELREP()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Relation dependant character replacement 
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ATADJUST()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Adjusts a sequence within a string to a specified position
  *  $SYNTAX$

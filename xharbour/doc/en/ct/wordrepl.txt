@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      WORDREPL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replacement of double characters
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      WAITPERIOD()
  *  $CATEGORY$
- *      LIBCT date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Pauses a specified time in increments of 1/100 seconds
  *  $SYNTAX$

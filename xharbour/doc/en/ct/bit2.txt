@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CLEARBIT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      CLEARBIT( <nLONG|cHexLONG>, <nBitPos1>[,...<nBitPos32>] ) -> <nNewValue>
@@ -27,7 +27,7 @@
  *  $FUNCNAME$
  *      SETBIT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SETBIT( <nLONG|cHexLONG>, <nBitPos1>[,...<nBitPos32>] ) -> <nNewValue>
@@ -52,7 +52,7 @@
  *  $FUNCNAME$
  *      ISBIT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *  $SYNTAX$
  *      ISBIT( <nLONG|cHexLONG>, <nBitPos> ) -> <lSet>

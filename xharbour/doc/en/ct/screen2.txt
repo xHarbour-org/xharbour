@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SCREENMIX()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SCREENMIX (<cCharString>, <cAttributeString>, [<nRow>], [<nCol>]) -> <cEmptyString>
@@ -26,7 +26,7 @@
  *  $FUNCNAME$
  *      SAYSCREEN()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SAYSCREEN( <cString>, [<nRow>], [<nCol>] ) -> <cEmptyString>

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NUMAND()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise logical AND operation on 16-bit numbers
  *  $SYNTAX$
@@ -30,7 +30,7 @@
  *  $FUNCNAME$
  *      NUMOR()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise logical OR operation on 16-bit numbers
  *  $SYNTAX$
@@ -58,7 +58,7 @@
  *  $FUNCNAME$
  *      NUMXOR()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise logical XOR operation on 16-bit numbers
  *  $SYNTAX$
@@ -85,7 +85,7 @@
  *  $FUNCNAME$
  *      NUMNOT()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise logical NOT operation on 16-bit numbers
  *  $SYNTAX$
@@ -112,7 +112,7 @@
  *  $FUNCNAME$
  *      NUMROL()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise ROL (rotate left) operation on 16-bit numbers
  *  $SYNTAX$
@@ -140,7 +140,7 @@
  *  $FUNCNAME$
  *      NUMMIRR()
  *  $CATEGORY$
- *      CT3 number and bit manipulation functions
+ *      HBCT number and bit manipulation functions
  *  $ONELINER$
  *      Bitwise mirror operation on 8-bit and 16-bit numbers
  *  $SYNTAX$

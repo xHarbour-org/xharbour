@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      COUNTLEFT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Count a certain character at the beginning of a string
  *  $SYNTAX$
@@ -29,7 +29,7 @@
  *  $FUNCNAME$
  *      COUNTRIGHT()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Count a certain character at the end of a string
  *  $SYNTAX$

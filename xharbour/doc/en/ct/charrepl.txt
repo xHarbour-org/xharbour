@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARREPL()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Replacement of characters
  *  $SYNTAX$

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      PRINTSTAT()
  *  $CATEGORY$
- *      CT3 printer functions
+ *      HBCT printer functions
  *  $ONELINER$
  *  $SYNTAX$
  *      PRINTSTAT ([<nPrinter>]) -> nState
@@ -26,7 +26,7 @@
  *  $FUNCNAME$
  *      PRINTREADY()
  *  $CATEGORY$
- *      CT3 printer functions
+ *      HBCT printer functions
  *  $ONELINER$
  *  $SYNTAX$
  *      PRINTREADY ([<nPrinter>]) -> lPrinterReady
@@ -50,7 +50,7 @@
  *  $FUNCNAME$
  *      PRINTSEND()
  *  $CATEGORY$
- *      CT3 printer functions
+ *      HBCT printer functions
  *  $ONELINER$
  *      Sends characters to printer
  *  $SYNTAX$

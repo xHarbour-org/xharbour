@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      NETCANCEL()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Releases the redirection of a local device
  *  $SYNTAX$
@@ -42,7 +42,7 @@
  *  $FUNCNAME$
  *      NETPRINTER()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Determines whether the current printer is a local or network printer.
  *  $SYNTAX$
@@ -82,7 +82,7 @@
  *  $FUNCNAME$
  *      NETDISK()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Determines whether a drive is local or resident on the server
  *  $SYNTAX$
@@ -121,7 +121,7 @@
  *  $FUNCNAME$
  *      NETREDIR()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Redirects a local device to a server device
  *  $SYNTAX$
@@ -186,7 +186,7 @@
  *  $FUNCNAME$
  *      NETRMTNAME()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Determines the name of a server device for a local device
  *  $SYNTAX$
@@ -228,7 +228,7 @@
  *  $FUNCNAME$
  *      NETWORK()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Tests to see if a network is active
  *  $SYNTAX$
@@ -269,7 +269,7 @@
  *  $FUNCNAME$
  *      NNETWORK()
  *  $CATEGORY$
- *      CT3 net functions
+ *      HBCT net functions
  *  $ONELINER$
  *      Determines whether or not a Novell network is active
  *  $SYNTAX$

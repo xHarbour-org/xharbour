@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      ADDMONTH()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      add months to a date
  *  $SYNTAX$
@@ -28,7 +28,7 @@
  *  $FUNCNAME$
  *      CTODOW()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      convert name of day of the week to its ordinal number
  *  $SYNTAX$
@@ -55,7 +55,7 @@
  *  $FUNCNAME$
  *      CTOMONTH()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      convert name of month to its ordinal number
  *  $SYNTAX$
@@ -82,7 +82,7 @@
  *  $FUNCNAME$
  *      DAYSINMONTH()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns the number of days in month
  *  $SYNTAX$
@@ -109,7 +109,7 @@
  *  $FUNCNAME$
  *      DAYSTOMONTH()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Total number of days from first of Jan to beginning of nMonth.
  *  $SYNTAX$
@@ -138,7 +138,7 @@
  *  $FUNCNAME$
  *      DMY()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns the date as a string in DD Month YY format
  *  $SYNTAX$
@@ -167,7 +167,7 @@
  *  $FUNCNAME$
  *      DOY()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Determines the day of the year for a specific date
  *  $SYNTAX$
@@ -195,7 +195,7 @@
  *  $FUNCNAME$
  *      ISLEAP()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      determines of year of date is a leap year
  *  $SYNTAX$
@@ -221,7 +221,7 @@
  *  $FUNCNAME$
  *      LASTDAYOM()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns the the number of days in the month.
  *  $SYNTAX$
@@ -251,7 +251,7 @@
  *  $FUNCNAME$
  *      MDY()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns the date as a string in Month DD, YY or Month DD, YYYY
  *  $SYNTAX$
@@ -280,7 +280,7 @@
  *  $FUNCNAME$
  *      NTOCDOW()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      (num of day) -> day name
  *  $SYNTAX$
@@ -307,7 +307,7 @@
  *  $FUNCNAME$
  *      NTOCMONTH()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      (num of month ) -> Month Name
  *  $SYNTAX$
@@ -334,7 +334,7 @@
  *  $FUNCNAME$
  *      QUARTER()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns a number equal to the quarter in which a date falls
  *  $SYNTAX$
@@ -362,7 +362,7 @@
  *  $FUNCNAME$
  *      WEEK()
  *  $CATEGORY$
- *      CT3 date and time functions
+ *      HBCT date and time functions
  *  $ONELINER$
  *      Returns the calendar week a number
  *  $SYNTAX$

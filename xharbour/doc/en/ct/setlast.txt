@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      SETLASTKEY()
  *  $CATEGORY$
- *      CT3 Set Status functions
+ *      HBCT Set Status functions
  *  $ONELINER$
  *  $SYNTAX$
  *      SETLASTKEY( <nKeyValue> ) -> <cNull>

@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHARONE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Reduce multiple occurences of a character to one
  *  $SYNTAX$
@@ -45,7 +45,7 @@
  *  $FUNCNAME$
  *      WORDONE()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Reduce multiple occurences of a double character to one
  *  $SYNTAX$

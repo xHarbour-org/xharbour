@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      CHAREVEN()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Returns the characters on the even positions in a string
  *  $SYNTAX$
@@ -37,7 +37,7 @@
  *  $FUNCNAME$
  *      CHARODD()
  *  $CATEGORY$
- *      CT3 string functions
+ *      HBCT string functions
  *  $ONELINER$
  *      Returns the characters on the odd positions in a string
  *  $SYNTAX$

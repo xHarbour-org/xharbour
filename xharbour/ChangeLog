@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3659 2004/12/08 04:51:49 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3661 2004/12/08 00:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-08 21:45 UTC-0300 Eduardo Fernandes <modalsit@yahoo.com.br>
+
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/hbmutils.prg
+    + HbCT.lib was added into default libs and removed from external libs.
+    
+  * source/ct/util.prg
+    - removed WhatWin() function. This function should be replaced by
+      the new OS_IsWinXXXX() functions suplied by Peter Rees.
+
+  * source/ct/diskutil.prg
+    * diskformat function was reviewed to use the new OS_IsWinXXXX() functions,
+      instead old WhatWin() function. The diskformat function was modified to
+      accept the same parameters that original diskformat CT function, but
+      only for call compatibility. See notes.
+    * diskfree(), disktotal() and diskused() functions were reviewed.
+
+  * doc/en/ct/util.txt
+  * doc/en/ct/diskutil.txt
+    * revised to the changes made above.
+
+  * doc/en/ct/*.txt
+    * all docs was reviewed to change CT3 and LibCT name category to HBCT name.
+
 2004-12-09 09:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/what32/source/_windir.c
     - remove => #define _WIN32_WINNT   0x0500

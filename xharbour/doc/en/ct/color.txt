@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *      INVERTATTR()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *      Inverts the foreground and background of an attribute
  *  $SYNTAX$
@@ -32,7 +32,7 @@
  *  $FUNCNAME$
  *      NTOCOLOR()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      NTOCOLOR ( <nAttr>, [<lColorCode>] ) -> <cAttr>
@@ -71,7 +71,7 @@
  *  $FUNCNAME$
  *      COLORTON()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *  $SYNTAX$
  *      COLORTON ( <cAttr> ) -> <nAttr>
@@ -108,7 +108,7 @@
  *  $FUNCNAME$
  *      ENHANCED()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *      Select the "ENHANCED" color value for output
  *  $SYNTAX$
@@ -135,7 +135,7 @@
  *  $FUNCNAME$
  *      STANDARD()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *      Select the "STANDARD" color value for output
  *  $SYNTAX$
@@ -162,7 +162,7 @@
  *  $FUNCNAME$
  *      UNSELECTED()
  *  $CATEGORY$
- *      CT3 video functions
+ *      HBCT video functions
  *  $ONELINER$
  *      Select the "UNSELECTED" color value for output
  *  $SYNTAX$
