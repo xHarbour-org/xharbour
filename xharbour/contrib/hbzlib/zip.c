@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.33 2004/03/26 03:23:22 lculik Exp $
+ * $Id: zip.c,v 1.34 2004/03/29 14:32:24 srobert Exp $
  */
 
 /*
@@ -53,7 +53,12 @@
 #include <hbzip2.h>
 #include "hbapifs.h"
 #include "hbapierr.h"
-
+#if defined(HB_OS_LINUX)
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <dirent.h>
+#endif
 extern HB_ITEM ZipArray;
 static HB_ITEM FileToZip;
 static HB_ITEM ExcludeFile;
@@ -910,3 +915,16 @@ HB_FUNC(SETZIPREADONLY)
 {
    hb_SetZipReadOnly( hb_parl( 1 ) );
 }
+#if defined(HB_OS_LINUX)
+
+int GetFileAttributes( char *szEntry )
+{
+      struct stat sStat;
+      stat( szEntry, &sStat );
+      return (int) sStat.st_mode;
+}
+void SetFileAttributes( char * szEntry,ULONG ulAttr)
+{
+   chmod(szEntry,ulAttr);
+}
+#endif
