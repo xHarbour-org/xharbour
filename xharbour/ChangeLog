@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1634 2003/10/27 21:23:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1635 2003/10/28 08:23:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-10-29 09:00 GMT+1200 Peter Rees <peter@rees.co.nz>
+  * /rtl/console.c
+    hb_conDevPos() (DEVPOS())
+      Fix compatibility problem for repeated @ nRow,nCol SAY ".." where nRow has the same
+      row value and nCol is <= the previous value of nCol
+      Should be 100% Clipper (5.2e) compatible now
+
+    HB_FUNC( __EJECT )
+     change: hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+         to: hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C", 2 );
+     Clipper ( 5.2e) does not send "\x0D"
 
 2003-10-28 00:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
