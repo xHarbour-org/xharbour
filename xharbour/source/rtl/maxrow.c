@@ -1,5 +1,5 @@
 /*
- * $Id: maxrow.c,v 1.4 2004/10/27 19:37:40 oh1 Exp $
+ * $Id: maxrow.c,v 1.5 2004/10/28 14:00:39 paultucker Exp $
  */
 
 /*
@@ -63,15 +63,15 @@ HB_FUNC( MAXROW ) /* Return the highest screen/window row number (zero origin) *
 
    switch( nMode = hb_parni(1) )
    {
-      default:
-      case GTI_WINDOW:
-      case GTI_SCREEN:
-      case GTI_CLIENT:       /* 'client' is future use */
-         hb_retni( hb_ctMaxRow( nMode == GTI_SCREEN ) );
-         break;
       case GTI_MAX:
          hb_retni( hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) );
          break;
+
+      case GTI_WINDOW:
+      case GTI_SCREEN:
+      case GTI_CLIENT:       /* 'client' is future use */
+      default:
+         hb_retni( hb_ctMaxRow( nMode == GTI_SCREEN ) );
    }
 
 }
@@ -83,15 +83,15 @@ HB_FUNC( MAXCOL ) /* Return the highest screen/window column number (zero origin
 
    switch( nMode = hb_parni(1) )
    {
-      default:
-      case GTI_WINDOW:
-      case GTI_SCREEN:
-      case GTI_CLIENT:       /* 'client' is future use */
-         hb_retni( hb_ctMaxCol( nMode == GTI_SCREEN ) );
-         break;
       case GTI_MAX:
          hb_retni( hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) );
          break;
+
+      case GTI_WINDOW:
+      case GTI_SCREEN:
+      case GTI_CLIENT:       /* 'client' is future use */
+      default:
+         hb_retni( hb_ctMaxCol( nMode == GTI_SCREEN ) );
    }
 
 }
