@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.161 2004/09/21 04:58:02 paultucker Exp $
+ * $Id: dbfcdx1.c,v 1.162 2004/10/01 01:56:58 druzus Exp $
  */
 
 /*
@@ -4670,6 +4670,75 @@ static void hb_cdxIndexLoad( LPCDXINDEX pIndex, char * szBaseName )
 }
 
 /*
+ * create index file name
+ */
+static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName,
+                               char * szFileName, char * szBaseName )
+{
+   PHB_FNAME pFileName;
+   BOOL fName = szBagName && strlen( szBagName ) > 0;
+   
+   pFileName = hb_fsFNameSplit( fName ? szBagName : pArea->szDataFileName );
+
+   if ( szBaseName )
+   {
+      hb_strncpyUpperTrim( szBaseName, pFileName->szName, CDX_MAXTAGNAMELEN );
+   }
+
+   if ( pFileName->szPath )
+   {
+      hb_strncpy( szFileName, pFileName->szPath, _POSIX_PATH_MAX );
+   }
+   /*
+    * This code is disabled, IMHO such behavior is better then
+    * Clipper one but unfortunately it cause incompatibilities
+    */
+/*
+   else if ( fName )
+   {
+      PHB_FNAME pDbfFName = hb_fsFNameSplit( pArea->szDataFileName );
+
+      if ( pDbfFName->szPath )
+      {
+         hb_strncpy( szFileName, pDbfFName->szPath, _POSIX_PATH_MAX );
+      }
+      else
+      {
+         szFileName[ 0 ] = '.';
+         szFileName[ 1 ] = OS_PATH_DELIMITER;
+         szFileName[ 2 ] = '\0';
+      }
+      hb_xfree( pDbfFName );
+   }
+*/
+   else
+   {
+      szFileName[ 0 ] = '.';
+      szFileName[ 1 ] = OS_PATH_DELIMITER;
+      szFileName[ 2 ] = '\0';
+   }
+   hb_strncat( szFileName, pFileName->szName, _POSIX_PATH_MAX );
+
+   if ( fName && pFileName->szExtension )
+   {
+      hb_strncat( szFileName, pFileName->szExtension, _POSIX_PATH_MAX );
+   }
+   else
+   {
+      DBORDERINFO pExtInfo;
+      memset( &pExtInfo, 0, sizeof( pExtInfo ) );
+      pExtInfo.itmResult = hb_itemPutC( NULL, "" );
+      if ( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
+           hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
+      {
+         hb_strncat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ), _POSIX_PATH_MAX );
+      }
+      hb_itemRelease( pExtInfo.itmResult );
+   }
+   hb_xfree( pFileName );
+}
+
+/*
  * free (close) used indexes, if not fAll then keep structure index
  */
 static void hb_cdxOrdListClear( CDXAREAP pArea, BOOL fAll, LPCDXINDEX pKeepInd )
@@ -4703,6 +4772,7 @@ static void hb_cdxOrdListClear( CDXAREAP pArea, BOOL fAll, LPCDXINDEX pKeepInd )
       }
    }
 }
+
 
 /*
  * find order bag by its name
@@ -6286,24 +6356,9 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 #endif
    {
       char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
-      PHB_FNAME pFileName;
       DBORDERINFO pOrderInfo;
 
-      pFileName = hb_fsFNameSplit( pArea->szDataFileName );
-      if ( pFileName->szPath )
-         hb_strncpy( szFileName, pFileName->szPath, _POSIX_PATH_MAX );
-      else
-         szFileName[ 0 ] = '\0';
-      hb_strncat( szFileName, pFileName->szName, _POSIX_PATH_MAX );
-      hb_xfree( pFileName );
-      memset( &pOrderInfo, 0, sizeof( pOrderInfo ) );
-      pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
-      if ( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pOrderInfo ) == SUCCESS &&
-           hb_itemGetCLen( pOrderInfo.itmResult ) > 0 )
-      {
-         hb_strncat( szFileName, hb_itemGetCPtr( pOrderInfo.itmResult ), _POSIX_PATH_MAX );
-      }
-      hb_itemRelease( pOrderInfo.itmResult );
+      hb_cdxCreateFName( pArea, NULL, szFileName, NULL );
 
       if ( hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
       {
@@ -6426,47 +6481,16 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   if ( hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 )
-      hb_strncpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ), _POSIX_PATH_MAX );
-   else
-      szFileName[ 0 ] = '\0';
-
-   if ( strlen( szFileName ) == 0 )
-   {
+   if ( hb_itemGetCLen( pOrderInfo->atomBagName ) == 0 )
       return FAILURE;
-   }
-   else
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( szFileName );
 
-      if ( !pFileName->szExtension )
-      {
-         DBORDERINFO pExtInfo;
-         memset( &pExtInfo, 0, sizeof( pExtInfo ) );
-         pExtInfo.itmResult = hb_itemPutC( NULL, "" );
-         if ( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
-              hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
-         {
-            hb_strncat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ), _POSIX_PATH_MAX );
-         }
-         hb_itemRelease( pExtInfo.itmResult );
-      }
-      hb_strncpyUpperTrim( szBaseName, pFileName->szName, CDX_MAXTAGNAMELEN );
-      if ( !pFileName->szPath )
-      {
-         hb_xfree( pFileName );
-         pFileName = hb_fsFNameSplit( pArea->szDataFileName );
-         if ( pFileName->szPath )
-         {
-            hb_strncpy( szSpFile, pFileName->szPath, _POSIX_PATH_MAX );
-            hb_strncat( szSpFile, szFileName, _POSIX_PATH_MAX );
-            memcpy( szFileName, szSpFile, _POSIX_PATH_MAX );
-         }
-      }
-      hb_xfree( pFileName );
-   }
+   hb_cdxCreateFName( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ),
+                      szFileName, szBaseName );
 
-   if ( pArea->lpIndexes != NULL)
+   if ( strlen( szBaseName ) == 0 )
+      return FAILURE;
+
+   if ( pArea->lpIndexes != NULL )
    {
       pIndexTmp = pArea->lpIndexes;
       while ( pIndexTmp && ( hb_stricmp( szBaseName, pIndexTmp->pCompound->szName ) != 0 ) )
@@ -6493,11 +6517,10 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
              ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE );
    do
    {
-      hFile = FS_ERROR;
-      if ( hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
-         hFile = hb_spOpen( ( BYTE * ) szSpFile, uiFlags );
-      else
+      if ( ! hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
          *szSpFile = '\0';
+
+      hFile = hb_spOpen( ( BYTE * ) ( *szSpFile ? szSpFile : szFileName ), uiFlags );
       if ( hFile == FS_ERROR )
          bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, *szSpFile ? szSpFile : szFileName,
                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
@@ -6658,8 +6681,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    HB_MACRO_PTR pExpMacro, pForMacro;
    char szCpndTagName[ CDX_MAXTAGNAMELEN + 1 ], szTagName[ CDX_MAXTAGNAMELEN + 1 ];
    char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
-   PHB_FNAME pFileName;
-   DBORDERINFO pExtInfo;
    LPCDXINDEX pIndex;
    LPCDXTAG pTag;
    USHORT uiType, uiLen;
@@ -6815,42 +6836,10 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
     * 2. atomBagName == NULL -> overwrite any index file of abBagName
     * 3. ads the Tag to index file
     */
-   /* Check file name */
 
-   memset( &pExtInfo, 0, sizeof( pOrderInfo ) );
-   if ( !pOrderInfo->abBagName || ( strlen( ( char * ) pOrderInfo->abBagName ) == 0 ) )
-   {
-      pFileName = hb_fsFNameSplit( pArea->szDataFileName );
-      if ( pFileName->szPath )
-         hb_strncpy( szFileName, pFileName->szPath, _POSIX_PATH_MAX );
-      else
-         szFileName[ 0 ] = '\0';
-      hb_strncat( szFileName, pFileName->szName, _POSIX_PATH_MAX );
-      pExtInfo.itmResult = hb_itemPutC( NULL, "" );
-      if ( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
-           hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
-      {
-         hb_strncat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ), _POSIX_PATH_MAX );
-      }
-      hb_itemRelease( pExtInfo.itmResult );
-   }
-   else
-   {
-      hb_strncpy( szFileName, ( char * ) pOrderInfo->abBagName, _POSIX_PATH_MAX );
-      pFileName = hb_fsFNameSplit( szFileName );
-      if ( !pFileName->szExtension )
-      {
-         pExtInfo.itmResult = hb_itemPutC( NULL, "" );
-         if ( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
-              hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
-         {
-            hb_strncat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ), _POSIX_PATH_MAX );
-         }
-         hb_itemRelease( pExtInfo.itmResult );
-      }
-   }
-   hb_strncpyUpperTrim( szCpndTagName, pFileName->szName, CDX_MAXTAGNAMELEN );
-   hb_xfree( pFileName );
+   hb_cdxCreateFName( pArea, ( char * ) pOrderInfo->abBagName,
+                      szFileName, szCpndTagName );
+
    if ( pOrderInfo->atomBagName && strlen( ( char * ) pOrderInfo->atomBagName ) > 0 )
    {
       hb_strncpyUpperTrim( szTagName, ( char * ) pOrderInfo->atomBagName, CDX_MAXTAGNAMELEN );
@@ -6969,6 +6958,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    /* Update DBF header */
    if ( !pArea->fHasTags )
    {
+      PHB_FNAME pFileName;
       pFileName = hb_fsFNameSplit( pArea->szDataFileName );
       hb_strncpyUpperTrim( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
       hb_xfree( pFileName );
