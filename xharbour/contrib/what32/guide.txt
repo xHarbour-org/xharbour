@@ -1,0 +1,32 @@
+
+General Guidelines to API contrinutions for WHAT32.LIB
+
+1. Remove the trailing "A" in the unicode flavour of the API function
+   for the Harbour function name as passed to HB_FUNC()
+   ( the latest version of WrapDLL does it automatically) 
+
+2. Do not rename or abbreviate Harbour function names
+
+3. Always return a value if the API function return type is other 
+   than VOID, (if a string, a point or a rectangle is expected as
+   a result of the API call (even indirectly) return the string, 
+   point or a rectangle, rather than the strlen, or logical value,
+   and possibly NIL on failure )
+
+4. Always allow for a full complement of API funtion parameters
+   with obvious exceptions such as eg. string length
+
+5. Allow to pass and return RECT and POINT structure parameters as arrays
+
+6. Where reasonable and allowed, supply sound deafults on skipped parameters
+   eg:   (ISNIL(3) ?  NULL : (HWND) hb_parnl(3)       
+
+This is aimed at achieving a self documented library, through MSDN docs,
+Win32API.Hlp, and all available books written on Windows programming. 
+ 
+Thank you.
+
+
+
+
+ 

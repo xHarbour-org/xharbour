@@ -1,0 +1,20 @@
+
+NOTE: If you define INT as the C type, (eg. in WinTypes.ch)
+It may clash with INT() function in Harbour.
+
+Make sure that when you use INT() function, you type it in mixed case
+eg. Int(), otherwise, a difficult to trace and understand compile time 
+error will be occur.
+
+Please see the importsant notes in WinStruc1.Prg.
+
+Important:
+Also, BOOL defined as 8 in WinTypes and CTYPE_BOOL degfined as 8 
+in cstruct.ch is not supported by the current xHarbour structure implementation.
+It is added for correct processing of the DLL calls.
+
+ 
+Windows version of Alert() function has been added, because some xHarbour
+functions call Alert() in case on failure, and it may lead to unexplained 
+"lock-ups" of your application.
+

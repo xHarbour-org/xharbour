@@ -1,0 +1,24 @@
+2002-07-22 20:45 UTC -0300 Luiz Rafael Culik<culikr@uol.com.br>
+   * Source/_winrect.c
+      INTERSECTRECT() function Return an Array on Success, NIL on Failure
+      COPYRECT() function Return an Array on Success, NIL on Failure
+      SETRECTEMPTY() function Return an Array on Success, NIL on Failure
+      SETRECT() function Return an Array on Success, NIL on Failure
+      UNIONRECT() function Return an Array on Success, NIL on Failure
+      SUBTRACTRECT() function Return an Array on Success, NIL on Failure
+23/07/2002 AJ Wos      
+      Moved ValidateRect from _WinRgn.c to WinRect.c
+      Added toolbar.ch
+      Added tbstruct.ch
+24/07/2002 AJ Wos
+      Corrected parameters in GetObject() -> cObjBytes:=GetObject(hObj) 
+25/07/2002 AJ Wos
+      What32.ch updated, more pseudo-functions added 
+27/07/2002 AJ Wos
+     Updated Wintypes.ch IMAGELIST type added
+     Updated WinStru.ch cleaned up NMHDR added
+     toolbar.ch updated - REBAR defines added
+     tbstruct.ch created - REBAR structures
+     ErrorSys.Prg bug fixed
+28/07/2002 AJ Wos
+     Updated What32.ch MAKELPARAM definition added 
