@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.437 2005/02/15 06:13:29 ronpinkas Exp $
+ * $Id: hvm.c,v 1.438 2005/02/15 12:52:14 snaiperis Exp $
  */
 
 /*
@@ -335,6 +335,7 @@ static BOOL     s_bDebugging;
 static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
 static BOOL     s_bDebugShowLines;  /* update source code line on the debugger display */
 static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invoked */
+static PHB_SYMB s_pSymDbgEntry = NULL; /* Cached __DBGENTRY symbol */
 
 /* Stores level of procedures call stack */
 static ULONG    s_ulProcLevel = 0;
@@ -6858,9 +6859,7 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
-   hb_dynsymLock();
-   hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
-   hb_dynsymUnlock();
+   hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_LOCALNAME );
    hb_vmPushLongConst( uiLocal );
@@ -6879,9 +6878,7 @@ static void hb_vmStaticName( USHORT uiStatic, char * szStaticName ) /* statics v
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
-   hb_dynsymLock();
-   hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
-   hb_dynsymUnlock();
+   hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_STATICNAME );
    hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
@@ -6899,9 +6896,16 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
-   hb_dynsymLock();
-   hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
-   hb_dynsymUnlock();
+
+   /* Cache __DBGENTRY symbol to speed everything up */
+   if ( !s_pSymDbgEntry )
+   {
+      hb_dynsymLock();
+      s_pSymDbgEntry = hb_dynsymFind( "__DBGENTRY" )->pSymbol;
+      hb_dynsymUnlock();
+   }
+
+   hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_MODULENAME );
    hb_vmPushString( szModuleName, strlen( szModuleName ) );
@@ -7035,9 +7039,7 @@ static void hb_vmDebuggerEndProc( void )
    hb_itemForwardValue( &item, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
-   hb_dynsymLock();
-   hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
-   hb_dynsymUnlock();
+   hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_ENDPROC );
    s_bDebuggerIsWorking = TRUE;
@@ -7053,9 +7055,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerShowLine(%hu)", uiLine));
 
    s_bDebugShowLines = FALSE;
-   hb_dynsymLock();
-   hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
-   hb_dynsymUnlock();
+   hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_SHOWLINE );
    hb_vmPushInteger( uiLine );
