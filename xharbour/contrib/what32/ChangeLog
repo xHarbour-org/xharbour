@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.58 2004/03/19 12:41:13 vouchcac Exp $
+ * $Id: ChangeLog,v 1.59 2004/03/22 06:59:16 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-26 07:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * _winclpb.c
+    * SetClipboardData() now sets properly CF_BITMAP format.
+      Thanks Andrew Wos.
+      /* Andy, I am unable to grasp NULL characters in CF_TEXT mode, but certainly earlier code
+         was not setting and retreiving bitmaps. Can you please correct that code? 
+         I ever tested on my local copy of What32 which is somewhat reduced to be workable
+         with all versions of Windows.  */
 
 2004-03-22 12:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * _winclpb.c

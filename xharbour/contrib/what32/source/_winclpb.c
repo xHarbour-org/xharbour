@@ -269,7 +269,8 @@ HB_FUNC( SETCLIPBOARDDATA )
 
       case CF_BITMAP:
          if( IsClipboardFormatAvailable( CF_BITMAP ) )
-            hb_retnl( ( LONG ) DuplicateBitmap( ( HBITMAP ) GetClipboardData( CF_BITMAP ) ) );
+              hb_retl( ( BOOL ) SetClipboardData( CF_BITMAP,
+                                  DuplicateBitmap( ( HBITMAP ) hb_parnl( 2 ) ) ) );
          else
             hb_retnl( 0 );
          break;
