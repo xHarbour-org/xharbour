@@ -9,8 +9,7 @@
 CLASS TForm FROM TWindow
    
    METHOD New()
-   METHOD AddControl()
-   METHOD AddButton()
+   METHOD Add()
    
 ENDCLASS
 
@@ -24,23 +23,16 @@ METHOD New( oParent ) CLASS TForm
    ::Style     := WS_OVERLAPPEDWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
-   ::ExStyle   := WS_EX_CONTROLPARENT
+   ::ExStyle   := 0
    
 return( super:New( oParent ) )
 
 
-METHOD AddButton( cName, cCaption, nId, nLeft, nTop, nWidth, nHeight, oBtn ) CLASS TForm
-   ::AddControl( cName, 'button', cCaption, nId, nLeft, nTop, nWidth, nHeight, oBtn )
-return( oBtn )
-
-
-
-METHOD AddControl( cName, cClass, cCaption, nId, nLeft, nTop, nWidth, nHeight, oObj ) CLASS TForm
+METHOD Add( cName, oObj, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TForm
 
    __objAddData( self, cName )
 
-   oObj := if( oObj != NIL, oObj:New( cClass, self, cCaption, nId, nLeft, nTop, nWidth, nHeight ),;
-                            TControl():New( cClass, self, cCaption, nId, nLeft, nTop, nWidth, nHeight) )
+   oObj := oObj:New( self, cCaption, nId, nLeft, nTop, nWidth, nHeight )
 
    __ObjSetValueList( self, { { cName, oObj } } )
 
