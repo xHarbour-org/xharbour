@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.86 2003/08/20 21:31:59 lculik Exp $
+ * $Id: hbmake.prg,v 1.87 2003/08/20 22:13:05 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -257,6 +257,7 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL lMt         := .f.
    LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
    LOCAL x :=1
+   LOCAL ct
 
 //   IF lDjgpp
 //      s_lBcc    := .F.
@@ -270,6 +271,12 @@ FUNCTION ParseMakeFile( cFile )
    IF s_nHandle < 0
       RETURN NIL
    ENDIF
+   
+   IF "linux" in Lower( Os () )
+      IF !FILE("hbtemp.c")
+        CreateLink()
+      ENDIF
+   ENDIF      	
 
    cBuffer := Trim( Substr( ReadLN( @s_lEof ), 1 ) )
 
@@ -317,6 +324,20 @@ FUNCTION ParseMakeFile( cFile )
          cTemp := Strtran( cTemp, " //", "" )
 
       ENDIF
+      
+/*      IF "LINUX" IN Upper( Os() ) 
+        IF AT("OBJCFILES", cTemp) >0
+	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
+    	   cTemp := ct +" hbtemp.o" +" $(OBC)"
+	ENDIF
+      ENDIF	   */
+      
+/*      IF "LINUX" IN Upper( Os() ) 
+        IF AT( "CFILES" , cTemp) >0
+	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
+    	   cTemp := ct +" hbtemp.c" +" $(CF)"
+	ENDIF
+      ENDIF*/	   
 
       aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
 
@@ -434,6 +455,7 @@ FUNCTION ParseMakeFile( cFile )
             ENDIF
 
             IF aTemp[ 1 ] == "OBJCFILES"
+	       		   
                aTemp1 := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
 
                IF Len( aTemp1 ) == 1
@@ -476,7 +498,9 @@ FUNCTION ParseMakeFile( cFile )
                ELSE
                   s_aCs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
                ENDIF
-
+	       
+        
+    
             ENDIF
 
             IF aTemp[ 1 ] == "RESFILES"
@@ -502,7 +526,11 @@ FUNCTION ParseMakeFile( cFile )
       IF lbuildSec
          s_szProject   := cTemp
          s_aBuildOrder := ListAsArray2( cTemp, ":" )
+ 
+	 TRacelog(s_aMacros)
 
+      	 TRacelog(s_aMacros)
+	      
          IF ! s_lLibrary
             SetBuild()
          ELSE
@@ -686,13 +714,14 @@ FUNCTION SetBuild()
 
       cRead        := Alltrim( readln( @s_lEof ) )
       cCurrentRead := cRead
+      tracelog(cRead)
       aMacro       := ListAsArray2( cRead, " " )
 
         FOR EACH cMacro IN aMacro
 
          IF  "$" IN  cMacro
             Findmacro( cMacro , @cRead )
-
+      tracelog(cMacro)
             IF At( '$(PROJECT)', cCurrentRead ) > 0
 
                IF ! s_lGcc
@@ -1130,12 +1159,12 @@ FUNC CreateMakeFile( cFile )
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lncurses -lgpm -lpthread -lm"
    LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib codepage.lib"
-   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -l-lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm" 
-   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -l-lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
-   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -l-lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lncurses -lgpm -lpthread -lm"
+   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm" 
+   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
+   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage"
    LOCAL cHarbDll         := "bcc640.lib hbdll_"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
-   LOCAL cSystemLibs      := "-lm -lncurses -lslang -lgpm -lpthread"
+   LOCAL cSystemLibs      := "-lncurses -lslang -lgpm -lpthread -lm"
 
    LOCAL cLibs        := ""
    LOCAL citem        := ""
@@ -1403,12 +1432,12 @@ cResname += cAllRes
 
         IF  "linux" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux"
          aAdd( s_aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
-         aAdd( s_aCommands, { ".c.o:", "gcc -I$(HB_INC_INSTALL) $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
+         aAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
          IF s_lExtended
-            aAdd( s_aCommands, { ".prg.o:", "harbour -n  -go -I$(HB_INC_INSTALL) -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.o:", "harbour -n  -go -I/usr/include/xharbour -I.  -o$* $**" } )
          ELSE
-            aAdd( s_aCommands, { ".prg.c:", "harbour -n -I$(HB_INC_INSTALL) -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour -I.  -o$* $**" } )
          ENDIF
 
       ELSE
@@ -1811,7 +1840,7 @@ cResname += cAllRes
    ELSEIF s_lGcc
 
       IF cOs == "Linux"
-         fWrite( s_nLinkHandle, "LIBFILES = -Wl,--start-group" + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group" + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = -Wl,--start-group " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + cSystemLibs  + CRLF )
       ELSEIF cOs == "OS/2"
          fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSE
@@ -1849,7 +1878,7 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
-      fWrite( s_nLinkHandle, "CFLAG1 = " +IIF( !EMPTY(cUserInclude ) ," -I" + Alltrim( cUserInclude ),"")        + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 = " +IIF( !EMPTY(cUserInclude ) ," -I" + Alltrim( cUserInclude ),"")        + IIF(  "Linux" IN cOs, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
@@ -2376,12 +2405,12 @@ FUNC CreateLibMakeFile( cFile )
 
       IF  "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux"
          aAdd( s_aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
-         aAdd( s_aCommands, { ".c.o:", "gcc -I$(HB_INC_INSTALL) $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
+         aAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
          IF s_lExtended
-            aAdd( s_aCommands, { ".prg.o:", "harbour -n $(HARBOURFLAGS) -I$(HB_INC_INSTALL) -I. -go  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.o:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour -I. -go  -o$* $**" } )
          ELSE
-            aAdd( s_aCommands, { ".prg.c:", "harbour -n $(HARBOURFLAGS) -I$(HB_INC_INSTALL) -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.c:", "harbour -n $(HARBOURFLAGS) -I/usr/include/xharbour -I.  -o$* $**" } )
          ENDIF
 
       ELSE
