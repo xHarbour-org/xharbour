@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.25 2003/04/05 22:17:43 lculik Exp $
+# $Id: Makefile,v 1.26 2003/04/13 11:35:46 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -202,8 +202,7 @@ endif
 LIBNAME=rtl
 
 # The list of all valid GT drivers is defined in config/<arch>/global.cf.
-DIRS=$(HB_GT_LIBS) \
-    uses_mt \
+DIRS=$(HB_GT_LIBS) 
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf
