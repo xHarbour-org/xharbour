@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2783 2004/04/14 10:31:59 druzus Exp $
+ * $Id: ChangeLog,v 1.2784 2004/04/14 15:06:04 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-14 02:48 UTC-0400 Sylvain Robert (s.robert/at/videotron.ca)
+  * source/rtl/filesys.c
+    - remove __USE_INLINE__ define and static definition for
+      LongToHandle() and HandleToLong()
+    + add && ! Defined(_BASETSD_H_) for the inline definition
+    Now I can compile filesys.c with HB_WIN32_IO and MSVC
 
 2004-04-14 16:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwin/gtwin.c
