@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.26 2004/10/22 11:26:45 paultucker Exp $
+ * $Id: gtnul.c,v 1.27 2004/11/23 17:04:22 lf_sfnet Exp $
  */
 
 /*
@@ -1213,6 +1213,8 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
+#elif defined(__DMC__)
+   static int hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

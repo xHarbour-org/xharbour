@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.3 2005/01/13 04:41:17 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.4 2005/02/17 07:39:06 andijahja Exp $
  */
 
 /*
@@ -202,6 +202,61 @@
 #define YELLOW         RGB( 0xFF,0xFF,0x00 )
 #define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
 
+/*-------------------------------------------------------------------*/
+#if defined(__DMC__)
+
+   #define SBT_TOOLTIPS             0x0800
+   #define SB_SETICON              (WM_USER+15)
+   #define SB_SETTIPTEXT           (WM_USER+17)
+   #define SB_GETTIPTEXT           (WM_USER+18)
+   #define TBSTYLE_FLAT            0x0800
+   #define TBSTYLE_LIST            0x1000
+   #define TBSTYLE_CUSTOMERASE     0x2000
+   #define IDB_HIST_SMALL_COLOR    8
+   #define IDB_HIST_LARGE_COLOR    9
+   #define TB_SETMAXTEXTROWS       (WM_USER + 60)
+   #define PBS_VERTICAL            0x04
+   #define PBS_SMOOTH              0x01
+   #define CCM_FIRST               0x2000      // Common control shared messages
+   #define CCM_SETBKCOLOR          (CCM_FIRST + 1) // lParam is bkColor
+   #define PBM_SETBKCOLOR          CCM_SETBKCOLOR  // lParam = bkColor
+   #define PBM_SETBARCOLOR         (WM_USER+9)		// lParam = bar color
+   #define PBM_GETRANGE            (WM_USER+7)  // wParam = return (TRUE ? low : high). lParam = PPBRANGE or NULL
+   #define PBM_GETPOS              (WM_USER+8)
+
+   typedef DWORD UINT_PTR;
+
+   typedef struct
+   {
+      int iLow;
+      int iHigh;
+   } PBRANGE, *PPBRANGE;
+
+   #define ICC_BAR_CLASSES      0x00000004
+
+   typedef USHORT COLOR16;
+
+   typedef struct _TRIVERTEX {
+         LONG    x;
+         LONG    y;
+         COLOR16 Red;
+         COLOR16 Green;
+         COLOR16 Blue;
+         COLOR16 Alpha;
+   } TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
+
+   typedef struct tagINITCOMMONCONTROLSEX {
+          DWORD dwSize;             // size of this structure
+          DWORD dwICC;              // flags indicating which classes to be initialized
+   } INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
+
+   WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+
+   typedef struct _GRADIENT_RECT {
+       ULONG UpperLeft;
+       ULONG LowerRight;
+   } GRADIENT_RECT,*PGRADIENT_RECT,*LPGRADIENT_RECT;
+#endif
 /*-------------------------------------------------------------------*/
 
 #define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )

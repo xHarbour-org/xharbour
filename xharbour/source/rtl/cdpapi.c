@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.19 2004/12/31 11:56:10 druzus Exp $
+ * $Id: cdpapi.c,v 1.20 2005/01/03 16:59:15 ronpinkas Exp $
  */
 
 /*
@@ -757,6 +757,7 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_EN
+#elif defined(__DMC__)
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

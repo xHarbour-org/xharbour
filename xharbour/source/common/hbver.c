@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.19 2004/11/21 21:43:43 druzus Exp $
+ * $Id: hbver.c,v 1.20 2005/01/09 06:08:24 likewolf Exp $
  */
 
 /*
@@ -460,6 +460,12 @@ char * hb_verCompiler( void )
    iVerMinor = 0;
 //   iVerMajor = __LCC__ / 100;
 //   iVerMinor = __LCC__ % 100;
+
+#elif defined(__DMC__)
+
+   szName = __DMC_VERSION_STRING__ ;
+   iVerMajor = __DMC__ / 100;
+   iVerMinor = __DMC__ % 100;
 
 #elif defined(_MSC_VER)
 

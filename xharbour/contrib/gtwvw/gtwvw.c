@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.10 2005/02/17 07:39:06 andijahja Exp $
+ * $Id: gtwvw.c,v 1.11 2005/02/20 22:14:07 andijahja Exp $
  */
 
 /*
@@ -1425,7 +1425,7 @@ static int hb_Inp9x( USHORT usPort )
 
   HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x( %hu )", usPort ) );
 
-  #if defined( __BORLANDC__ )
+  #if defined( __BORLANDC__ ) || defined(__DMC__)
      _DX = usPort;
      __emit__( 0xEC );        /* ASM  IN AL, DX */
      __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
@@ -1464,7 +1464,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
 
-   #if defined( __BORLANDC__ )
+   #if defined( __BORLANDC__ ) || defined(__DMC__)
 
       _DX = usPort;
       _AL = usVal;
@@ -7180,7 +7180,7 @@ BOOL HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int 
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
           if ( iPicture )
           {
             iPicture->lpVtbl->get_Width( iPicture,&lWidth );
@@ -7265,7 +7265,7 @@ IPicture * HB_EXPORT hb_wvw_gtLoadPicture( char * image )
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
           if ( iPicture )
           {
             Result = iPicture;
@@ -9287,7 +9287,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
                                                       hb_parc( 1 ),
                                                       hb_parl( 2 ) ? s_pWindows[0]->hWnd : NULL,
-                                                      hb_wvw_gtDlgProcMLess );
+                                                      (DLGPROC) hb_wvw_gtDlgProcMLess );
             }
             break;
 
@@ -9296,7 +9296,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
                                     MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                       hb_parl( 2 ) ? s_pWindows[0]->hWnd : NULL,
-                                                      hb_wvw_gtDlgProcMLess );
+                                                      (DLGPROC) hb_wvw_gtDlgProcMLess );
             }
             break;
 
@@ -9305,7 +9305,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
                                             ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                               hb_parl( 2 ) ? s_pWindows[0]->hWnd : NULL,
-                                                              hb_wvw_gtDlgProcMLess );
+                                                              (DLGPROC) hb_wvw_gtDlgProcMLess );
             }
             break;
          }
@@ -9402,7 +9402,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
          iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
                                                      hb_parc( 1 ),
                                                      hParent,
-                                                     hb_wvw_gtDlgProcModal,
+                                                     (DLGPROC) hb_wvw_gtDlgProcModal,
                                 ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
@@ -9412,7 +9412,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
          iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
                            MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                      hParent,
-                                                     hb_wvw_gtDlgProcModal,
+                                                     (DLGPROC) hb_wvw_gtDlgProcModal,
                                 ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
@@ -9422,7 +9422,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
          iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_hInstance,
                                            ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                              hParent,
-                                                             hb_wvw_gtDlgProcModal,
+                                                             (DLGPROC) hb_wvw_gtDlgProcModal,
                                         ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
@@ -12866,7 +12866,7 @@ static LRESULT CALLBACK hb_wvw_gtTBProc( HWND hWnd, UINT message, WPARAM wParam,
        RECT rTB;
        int iTop, iRight;
 
-       CallWindowProc( pWindowData->tbOldProc, hWnd, message, wParam, lParam );
+       CallWindowProc( (WNDPROC) pWindowData->tbOldProc, hWnd, message, wParam, lParam );
 
        GetClientRect(hWnd, &rTB);
        iTop = rTB.bottom - 3;
@@ -12896,7 +12896,7 @@ static LRESULT CALLBACK hb_wvw_gtTBProc( HWND hWnd, UINT message, WPARAM wParam,
 
   }
 
-  return( CallWindowProc( pWindowData->tbOldProc, hWnd, message, wParam, lParam ) );
+  return( CallWindowProc( (WNDPROC) pWindowData->tbOldProc, hWnd, message, wParam, lParam ) );
 }
 
 /*-------------------------------------------------------------------*/
@@ -14007,7 +14007,7 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
 
   }
 
-  return( CallWindowProc( OldProc, hWnd, message, wParam, lParam ) );
+  return( CallWindowProc( (WNDPROC) OldProc, hWnd, message, wParam, lParam ) );
 }
 
 /*WVW_PBcreate( [nWinNum], nTop, nLeft, nBottom, nRight, cText, cImage/nImage, bBlock, aOffset)
@@ -14890,7 +14890,7 @@ static LRESULT CALLBACK hb_wvw_gtCBProc( HWND hWnd, UINT message, WPARAM wParam,
     }
   }
 
-  return( CallWindowProc( OldProc, hWnd, message, wParam, lParam ) );
+  return( CallWindowProc( (WNDPROC) OldProc, hWnd, message, wParam, lParam ) );
 }
 
 /*WVW_CBcreate( [nWinNum], nTop, nLeft, nWidth, aText, bBlock, nListLines, ;

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
+ * $Id: wvtutils.c,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
  */
 
 /*
@@ -1279,7 +1279,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
                                                       hb_parc( 1 ),
                                                       hb_parl( 2 ) ? _s->hWnd : NULL,
-                                                      hb_wvt_gtDlgProcMLess );
+                                                      (DLGPROC) hb_wvt_gtDlgProcMLess );
             }
             break;
 
@@ -1288,7 +1288,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
                                     MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                       hb_parl( 2 ) ? _s->hWnd : NULL,
-                                                      hb_wvt_gtDlgProcMLess );
+                                                      (DLGPROC) hb_wvt_gtDlgProcMLess );
             }
             break;
 
@@ -1297,7 +1297,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
                hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
                                             ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                               hb_parl( 2 ) ? _s->hWnd : NULL,
-                                                              hb_wvt_gtDlgProcMLess );
+                                                              (DLGPROC) hb_wvt_gtDlgProcMLess );
             }
             break;
          }
@@ -1394,7 +1394,7 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
          iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
                                                      hb_parc( 1 ),
                                                      hParent,
-                                                     hb_wvt_gtDlgProcModal,
+                                                     (DLGPROC) hb_wvt_gtDlgProcModal,
                                 ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
@@ -1404,7 +1404,7 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
          iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
                            MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                      hParent,
-                                                     hb_wvt_gtDlgProcModal,
+                                                     (DLGPROC) hb_wvt_gtDlgProcModal,
                                 ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
@@ -1414,7 +1414,7 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
          iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_hInstance,
                                            ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                              hParent,
-                                                             hb_wvt_gtDlgProcModal,
+                                                             (DLGPROC) hb_wvt_gtDlgProcModal,
                                         ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;

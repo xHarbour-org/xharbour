@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.33 2005/01/09 22:35:39 peterrees Exp $
+ * $Id: gtwvt.h,v 1.3 2005/01/22 15:21:10 lf_sfnet Exp $
  */
 
 /*
@@ -142,6 +142,37 @@
 //-------------------------------------------------------------------//
 
 #define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )
+
+//-------------------------------------------------------------------//
+#if defined(__DMC__)
+   #if (_WIN32_IE >= 0x0300)
+      #if !defined(ICC_BAR_CLASSES)
+         #define ICC_BAR_CLASSES      0x00000004
+      #endif
+      #if !defined(COLOR16)
+         typedef USHORT COLOR16;
+      #endif
+      #if !defined(TRIVERTEX)
+         typedef struct _TRIVERTEX {
+            LONG    x;
+            LONG    y;
+            COLOR16 Red;
+            COLOR16 Green;
+            COLOR16 Blue;
+            COLOR16 Alpha;
+            }TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
+      #endif
+      #if !defined( INITCOMMONCONTROLSEX )
+         typedef struct tagINITCOMMONCONTROLSEX {
+             DWORD dwSize;             // size of this structure
+             DWORD dwICC;              // flags indicating which classes to be initialized
+         } INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
+      #endif
+      #if !defined(InitCommonControlsEx)
+         WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+      #endif
+   #endif
+#endif
 
 //-------------------------------------------------------------------//
 

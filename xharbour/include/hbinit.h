@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.11 2004/03/29 17:04:19 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.12 2005/02/11 18:58:53 druzus Exp $
  */
 
 /*
@@ -77,6 +77,29 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) func( void ) {
    #define HB_CALL_ON_STARTUP_END( func ) }
+
+#elif defined(__DMC__)
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static HB_SYMB symbols[] = {
+
+   #define HB_INIT_SYMBOLS_END( func ) }; \
+      static int func( void ) \
+      { \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         return 0; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static int func( void ) {
+
+   /* this allows any macros to be preprocessed first
+      so that token pasting is handled correctly */
+   #define HB_CALL_ON_STARTUP_END( func ) \
+          _HB_CALL_ON_STARTUP_END( func )
+
+   #define _HB_CALL_ON_STARTUP_END( func ) return 0; } \
+      static int static_int_##func = func();
 
 #elif defined(HB_STATIC_STARTUP) || defined(HB_PRAGMA_STARTUP)
 

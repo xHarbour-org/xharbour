@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.141 2005/01/28 03:29:31 druzus Exp $
+ * $Id: dbcmd.c,v 1.142 2005/01/30 06:45:45 druzus Exp $
  */
 
 /*
@@ -94,6 +94,8 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_DBCMD )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_vm_SymbolInit_DBCMD
+#elif defined(__DMC__)
+   static int hb_vm_auto_SymbolInit_DBCMD = hb_vm_SymbolInit_DBCMD();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -349,7 +351,9 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddRegister(%s, %hu)", szDriver, uiType));
 
    if( hb_rddFindNode( szDriver, NULL ) )    /* Duplicated RDD */
+   {
       return 1;
+   }
 
    szGetFuncTable = ( char * ) hb_xgrab( strlen( szDriver ) + 14 );
    strcpy( szGetFuncTable, szDriver );
@@ -357,7 +361,9 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    pGetFuncTable = hb_dynsymFindName( szGetFuncTable );
    hb_xfree( szGetFuncTable );
    if( !pGetFuncTable )
+   {
       return 2;              /* Not valid RDD */
+   }
 
    /* Create a new RDD node */
    pRddNewNode = ( LPRDDNODE ) hb_xgrab( sizeof( RDDNODE ) );

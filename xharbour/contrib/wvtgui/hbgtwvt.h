@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
+ * $Id: hbgtwvt.h,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
  */
 
 /*
@@ -89,6 +89,10 @@
    #if defined(_MSC_VER)
       #include <conio.h>
    #endif
+
+   #if defined(__DMC__)
+      #include <winnt.h>
+   #endif
 #else
    #include <olectl.h>
 #endif
@@ -143,6 +147,36 @@
 
 #define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )
 
+//-------------------------------------------------------------------//
+#if defined(__DMC__)
+
+   typedef DWORD UINT_PTR;
+
+   #define ICC_BAR_CLASSES      0x00000004
+
+   typedef USHORT COLOR16;
+
+   typedef struct _TRIVERTEX {
+         LONG    x;
+         LONG    y;
+         COLOR16 Red;
+         COLOR16 Green;
+         COLOR16 Blue;
+         COLOR16 Alpha;
+   } TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
+
+   typedef struct tagINITCOMMONCONTROLSEX {
+          DWORD dwSize;             // size of this structure
+          DWORD dwICC;              // flags indicating which classes to be initialized
+   } INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
+
+   WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+
+   typedef struct _GRADIENT_RECT {
+       ULONG UpperLeft;
+       ULONG LowerRight;
+   } GRADIENT_RECT,*PGRADIENT_RECT,*LPGRADIENT_RECT;
+#endif
 //-------------------------------------------------------------------//
 
 typedef BOOL ( WINAPI *wvtGradientFill )     (

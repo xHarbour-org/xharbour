@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.67 2005/02/21 06:15:25 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.68 2005/02/21 17:08:37 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ RETURN TOleAuto():GetActiveObject( cString )
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
    #endif
 
-   #if ( defined(__MINGW32__) || ( defined(__WATCOMC__) && !defined(__FORCE_LONG_LONG__) ) )
+   #if ( defined(__DMC__) || defined(__MINGW32__) || ( defined(__WATCOMC__) && !defined(__FORCE_LONG_LONG__) ) )
       #define HB_LONG_LONG_OFF
    #endif
 
@@ -1193,7 +1193,7 @@ RETURN xRet
      {
         //TraceLog( NULL, "Class: %i\n", ClassID );
         pDisp = NULL;
-        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
+        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, (void **) &pDisp );
         //TraceLog( NULL, "Result: %i\n", s_nOleError );
      }
 
@@ -1249,12 +1249,12 @@ RETURN xRet
 
         if( s_nOleError == S_OK )
         {
-           s_nOleError = GetActiveObject( &ClassID, NULL, &pUnk );
+           s_nOleError = GetActiveObject( (REFCLSID) &ClassID, NULL, &pUnk );
 
            if( s_nOleError == S_OK )
            {
               pDisp = NULL;
-              s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, riid, (void **) &pDisp );
+              s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, (void **) &pDisp );
            }
         }
      }
@@ -1282,7 +1282,7 @@ RETURN xRet
 
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                              DispID,
-                                             &IID_NULL,
+                                             (REFIID) &IID_NULL,
                                              LOCALE_USER_DEFAULT,
                                              DISPATCH_PROPERTYPUTREF,
                                              pDispParams,
@@ -1300,7 +1300,7 @@ RETURN xRet
 
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
-                                          &IID_NULL,
+                                          (REFIID) &IID_NULL,
                                           LOCALE_USER_DEFAULT,
                                           DISPATCH_PROPERTYPUT,
                                           pDispParams,
@@ -1317,7 +1317,7 @@ RETURN xRet
 
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
-                                          &IID_NULL,
+                                          (REFIID) &IID_NULL,
                                           LOCALE_USER_DEFAULT,
                                           DISPATCH_PROPERTYGET,
                                           pDispParams,
@@ -1334,7 +1334,7 @@ RETURN xRet
 
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
-                                          &IID_NULL,
+                                          (REFIID) &IID_NULL,
                                           LOCALE_USER_DEFAULT,
                                           DISPATCH_METHOD,
                                           pDispParams,
@@ -1366,7 +1366,7 @@ RETURN xRet
      if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
         wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
         hb_xfree( wMember );
         //TraceLog( NULL, "1. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, s_nOleError );
      }
@@ -1379,7 +1379,7 @@ RETURN xRet
      {
         // Try again without removing the assign prefix (_).
         wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
         hb_xfree( wMember );
         //TraceLog( NULL, "2. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, s_nOleError );
      }

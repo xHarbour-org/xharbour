@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.140 2005/02/06 20:35:41 druzus Exp $
+ * $Id: filesys.c,v 1.141 2005/02/15 21:06:05 andijahja Exp $
  */
 
 /*
@@ -339,7 +339,16 @@
       }
    #endif
 
-   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || ! defined( HandleToLong ) || defined(__USE_INLINE__) ) && ! defined( __POCC__ )
+   #if ( ( defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || ! defined( HandleToLong ) || defined(__USE_INLINE__) ) && ! defined( __POCC__ ) ) || defined( __DMC__ ))
+
+       #if defined(__DMC__) && !defined(INT_PTR)
+          #ifdef _WIN64
+             typedef __int64 INT_PTR, *PINT_PTR;
+          #else
+             typedef long INT_PTR, *PINT_PTR;
+          #endif
+       #endif
+
 
       __inline void * LongToHandle( const long h )
       {
@@ -354,7 +363,7 @@
 
 HANDLE DostoWinHandle( FHANDLE fHandle)
 {
-   HANDLE hHandle = LongToHandle( fHandle );
+   HANDLE hHandle = (HANDLE) LongToHandle( fHandle );
 
    switch (fHandle)
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.54 2005/02/23 23:00:00 ptsarenko Exp $
+ * $Id: ads1.c,v 1.54 2005/02/23 21:59:37 ptsarenko Exp $
  */
 
 /*
@@ -100,6 +100,8 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)
    #pragma startup ads1__InitSymbols
+#elif defined(__DMC__)
+   static int hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.145 2005/02/11 18:59:11 druzus Exp $
+ * $Id: gtwvt.c,v 1.146 2005/02/15 21:06:52 andijahja Exp $
  */
 
 /*
@@ -1196,7 +1196,7 @@ static int hb_Inp9x( USHORT usPort )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x( %hu )", usPort ) );
 
-   #if defined( __BORLANDC__ )
+   #if defined( __BORLANDC__ ) || defined(__DMC__)
 
       _DX = usPort;
       __emit__( 0xEC );        /* ASM  IN AL, DX */
@@ -1235,7 +1235,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
 
-   #if defined( __BORLANDC__ )
+   #if defined( __BORLANDC__ ) || defined(__DMC__)
 
       _DX = usPort;
       _AL = usVal;
@@ -3576,7 +3576,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* ) &iPicture );
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* ) &iPicture );
           if ( iPicture )
           {
             Result = iPicture;
@@ -4308,6 +4308,8 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
+#elif defined(__DMC__)
+   static int hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

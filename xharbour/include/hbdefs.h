@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.63 2005/02/11 18:58:52 druzus Exp $
+ * $Id: hbdefs.h,v 1.64 2005/02/23 22:33:47 andijahja Exp $
  */
 
 /*
@@ -181,6 +181,11 @@
    #define TRUE   (!0)
 
 #ifndef HB_LONG_LONG_OFF
+
+   #if defined(__DMC__)
+      #define __LONGLONG
+   #endif
+
    #if ! defined(_WINNT_H)
       #if !defined(LONGLONG)
          #if defined(__GNUC__)
@@ -383,11 +388,20 @@
 #define HB_LIM_INT32(l)       ( INT32_MIN <= (l) && (l) <= INT32_MAX )
 #define HB_LIM_INT64(l)       ( INT64_MIN <= (l) && (l) <= INT64_MAX )
 
+#if defined(__DMC__)
+#if HB_LONG_MAX > 10000000000LL
+#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000LL ) ) ? 20 : 10 )
+#else
+#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
+#endif
+#else
 #if HB_LONG_MAX > 10000000000
 #  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000 ) ) ? 20 : 10 )
 #else
 #  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
 #endif
+#endif
+
 #if HB_INT_MIN <= -1000000000
 #  define HB_INT_LENGTH( i )  ( ( (i) <= -1000000000 ) ? 20 : 10 )
 #else
@@ -396,7 +410,11 @@
 /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
 /* This comment is from hb_vmNeg() - if it's true only in this case then
    the limit should be changed and this function fixed */
-#define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
+#if defined(__DMC__)
+#   define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
+#else
+#   define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
+#endif
 
 /* uncomment this if you need strict Clipper compatibility */
 /* #define PCODE_LONG_LIM(l)     HB_LIM_INT32( l ) */

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.25 2005/02/15 21:06:02 andijahja Exp $
+ * $Id: odbc.c,v 1.26 2005/02/17 22:55:35 guerra000 Exp $
  */
 
 /*
@@ -106,6 +106,13 @@
    #else
       #define SQLLEN          SQLINTEGER
    #endif
+#endif
+
+#if defined(__DMC__)
+   #define SQL_NO_DATA SQL_NO_DATA_FOUND
+   #define SQLColAttribute  SQLColAttributes
+   SQLRETURN  SQL_API SQLFetchScroll(SQLHSTMT StatementHandle,
+              SQLSMALLINT FetchOrientation, SQLINTEGER FetchOffset);
 #endif
 
 HB_FUNC( SQLALLOCEN ) /* HB_SQLALLOCENV( @hEnv ) --> nRetCode */
@@ -307,7 +314,7 @@ HB_FUNC( SQLCOLATTRIBUTE )
     SQLSMALLINT wNumPtr   = hb_parni( 7 );
     WORD        wResult   = SQLColAttribute( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ),
                                             (unsigned char*) bBuffer, hb_parni( 5 ), &wBufLen,
-                                            &wNumPtr );
+                                            (SQLINTEGER FAR*) &wNumPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {

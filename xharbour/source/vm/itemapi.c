@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.108 2004/12/31 11:56:11 druzus Exp $
+ * $Id: itemapi.c,v 1.109 2005/01/11 08:44:09 druzus Exp $
  */
 
 /*
@@ -102,7 +102,7 @@
 #include "hbapicdp.h"
 #endif
 
-#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(_MSC_VER)
+#if (defined(__BORLANDC__) || defined(__WATCOMC__) || defined(_MSC_VER)) && !defined(__DMC__)
 #  include <float.h>  /* for _finite() and _isnan() */
 #elif defined( HB_OS_SUNOS )
 #  include <ieeefp.h>
@@ -1322,7 +1322,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
    does exist for your compiler and add this to the check below */
 
 #if defined(__RSXNT__) || defined(__EMX__) || \
-    defined(__XCC__) || defined(__POCC__) || \
+    defined(__XCC__) || defined(__POCC__) || defined(__DMC__) || \
     defined(HB_OS_HPUX)
 #  define HB_FINITE_DBL(d)    ( isfinite(d)!=0 )
 #elif defined(__WATCOMC__) || defined(__BORLANDC__) || defined(_MSC_VER)

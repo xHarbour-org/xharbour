@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.5 2003/09/08 12:56:53 druzus Exp $
+ * $Id: sdf1.c,v 1.6 2004/04/28 18:24:27 druzus Exp $
  */
 
 /*
@@ -72,6 +72,8 @@ HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)
    #pragma startup sdf1__InitSymbols
+#elif defined(__DMC__)
+   static int hb_vm_auto_sdf1__InitSymbols = sdf1__InitSymbols();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.9 2004/12/28 06:39:18 druzus Exp $
+ * $Id: hbmath.h,v 1.10 2005/02/15 21:06:00 andijahja Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_EXTERN_BEGIN
             #define exception _exception
          #endif
       #endif
-   #elif defined(__MINGW32__)
+   #elif ( defined(__MINGW32__) || defined(__DMC__) )
       #if !defined(HB_MATH_ERRNO)
          #define HB_MATH_HANDLER
       #endif

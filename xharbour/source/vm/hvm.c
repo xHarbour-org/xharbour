@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.438 2005/02/15 12:52:14 snaiperis Exp $
+ * $Id: hvm.c,v 1.439 2005/02/17 12:03:56 likewolf Exp $
  */
 
 /*
@@ -9303,7 +9303,7 @@ HB_FUNC( __VMVARSSET )
 #undef HB_FORCE_LINK_MAIN
 
 #if defined(HB_OS_WIN_32) && !defined(__EXPORT__) && \
-    ( defined(__WATCOMC__) || defined(__MINGW32__) )
+    ( defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW32__) )
 
 #  define HB_FORCE_LINK_MAIN  hb_forceLinkMainWin
 

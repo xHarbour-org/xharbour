@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.23 2005/01/10 18:45:36 druzus Exp $
+* $Id: hbserv.c,v 1.24 2005/02/12 19:54:03 druzus Exp $
 */
 
 /*
@@ -642,7 +642,7 @@ static void s_serviceSetHBSig( void )
          SEM_NOOPENFILEERRORBOX );
 
    SetUnhandledExceptionFilter( s_exceptionFilter );
-   s_hMsgHook = SetWindowsHookEx( WH_GETMESSAGE, s_MsgFilterFunc, NULL, GetCurrentThreadId() );
+   s_hMsgHook = SetWindowsHookEx( WH_GETMESSAGE, (HOOKPROC) s_MsgFilterFunc, NULL, GetCurrentThreadId() );
    SetConsoleCtrlHandler( s_ConsoleHandlerRoutine, TRUE );
 
 #endif

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.101 2005/02/04 12:56:01 likewolf Exp $
+* $Id: thread.h,v 1.102 2005/02/13 17:42:03 paultucker Exp $
 */
 
 /*
@@ -58,6 +58,14 @@
 #include "hbapi.h"
 #include "hbmath.h"
 
+#if defined( __DMC__ )
+   #if !defined( _MT )
+      #define _MT
+   #endif
+   #if !defined( __NT__ )
+      #define __NT__
+   #endif
+#endif
 
 /* Check if malloc/free is thread safe */
 /* temporarily disabled

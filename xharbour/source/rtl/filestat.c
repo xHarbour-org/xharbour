@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.9 2004/11/21 21:44:18 druzus Exp $
+ * $Id: filestat.c,v 1.10 2005/01/10 18:45:33 druzus Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
    #include <sys/stat.h>
 #elif defined( HB_OS_WIN_32 )
    #include <windows.h>
-   #if ( defined(__BORLANDC__) || defined(_MSC_VER) || defined(__LCC__) ) && ! defined( INVALID_FILE_ATTRIBUTES )
+   #if ( defined(__BORLANDC__) || defined(_MSC_VER) || defined(__LCC__) || defined( __DMC__ )) && ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES ((DWORD)(-1))
    #endif
 #endif

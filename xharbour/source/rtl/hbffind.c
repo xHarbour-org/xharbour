@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.28 2004/11/22 00:16:06 druzus Exp $
+ * $Id: hbffind.c,v 1.29 2005/01/10 18:45:35 druzus Exp $
  */
 
 /*
@@ -61,7 +61,23 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.28 2004/11/22 00:16:06 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.29 2005/01/10 18:45:35 druzus Exp $" )
+
+#if !defined(FILE_ATTRIBUTE_ENCRYPTED)
+   #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
+#endif
+
+#if !defined(FILE_ATTRIBUTE_SPARSE_FILE)
+   #define FILE_ATTRIBUTE_SPARSE_FILE          0x00000200
+#endif
+
+#if !defined(FILE_ATTRIBUTE_REPARSE_POINT)
+   #define FILE_ATTRIBUTE_REPARSE_POINT        0x00000400
+#endif
+
+#if !defined(FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+   #define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED  0x00002000
+#endif
 
 /* ------------------------------------------------------------- */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.184 2005/02/12 16:44:20 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.185 2005/02/14 21:14:05 druzus Exp $
  */
 
 /*
@@ -318,6 +318,8 @@ HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbfcdx1__InitSymbols
+#elif defined(__DMC__)
+   static int hb_vm_auto_dbfcdx1__InitSymbols = dbfcdx1__InitSymbols();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

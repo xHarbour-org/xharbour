@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3860 2005/02/23 21:59:36 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3861 2005/02/23 22:33:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-24 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/common/hbver.c
+  * source/common/hbffind.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/mainwin.c
+  * source/rtl/cdpapi.c
+  * source/rtl/math.c
+  * source/rtl/win32ole.prg
+  * source/rtl/filestat.c
+  * source/rtl/filesys.c
+  * source/rtl/hbserv.c
+  * source/rtl/gtnul/gtnul.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/sdf1.c
+  * source/rdd/delim1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/odbc/odbc.c
+  * contrib/wvtgui/wvtcore.c
+  * contrib/wvtgui/wvtutils.c
+  * contrib/gtwvw/gtwvw.c
+  * contrib/rdd_ads/ads1.c
+  * utils/hbtest/rt_ccall.prg
+  * include/hbinit.h
+  * include/hbmath.h
+  * include/hbdefs.h
+  * include/thread.h
+    * changes to enable compilation with DigitalMars C++ (aka
+      Symantec C++ : http://www.digitalmars.com). Was abandoned
+      by Symantec some time ago and enjoy further development
+      from DigitalMars. It is another speedy compiler for xHarbour.
+
+  + makefile.dc
+  + make_dc.bat
+    * makefiles for DigitalMars C++
 
 2005-02-24 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbdefs.h

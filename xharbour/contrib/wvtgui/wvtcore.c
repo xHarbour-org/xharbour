@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
+ * $Id: wvtcore.c,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char *
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
           if ( iPicture )
           {
             iPicture->lpVtbl->get_Width( iPicture,&lWidth );
