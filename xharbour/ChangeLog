@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.256 2002/05/30 16:06:00 lculik Exp $
+ * $Id: ChangeLog,v 1.257 2002/06/01 00:15:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-02 09:30 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbdefs.h
+     + added __XHARBOUR__ define
+
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug updating conditionals indexes, reported by Walter Negro
+     ! fixed bug in dbgoto, reported by Pritpal Bedi
+
 2002-05-30 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
   * utils/hbmake/hbmutils.prg
