@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.54 2002/04/17 20:54:11 ronpinkas Exp $
+ * $Id: hvm.c,v 1.55 2002/04/17 21:05:49 ronpinkas Exp $
  */
 
 /*
@@ -1453,6 +1453,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                   dNewVal = pTop->item.asDouble.value + iAdd;
                }
             }
+            else if( HB_IS_STRING( pTop ) && pTop->item.asString.bChar )
+            {
+               dNewVal = pTop->item.asString.value[0] + iAdd;
+               hb_stackPop();
+               hb_vmPushLong( (long) dNewVal );
+               break;
+            }
             else if( HB_IS_DATE( pTop ) )
             {
                pTop->item.asDate.value += iAdd;
@@ -2213,6 +2220,12 @@ static void hb_vmNegate( void )
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
       pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
+   else if( HB_IS_STRING( pItem ) && pItem->item.asString.bChar )
+   {
+      pItem->item.asInteger.value = - pItem->item.asString.value[0];
+      pItem->type = HB_IT_INTEGER;
+      pItem->item.asInteger.length = 10;
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1080, NULL, "-", 1, pItem );
@@ -2244,6 +2257,18 @@ static void hb_vmPlus( void )
 
       hb_vmPushNumType( dNumber1 + dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
    }
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.bChar )
+   {
+      BYTE bChar = pItem2->item.asString.value[0];
+      int iDec;
+      double dNumber;
+
+      hb_stackPop();
+
+      dNumber = hb_vmPopDouble( &iDec );
+
+      hb_vmPushNumType( dNumber + bChar, iDec, pItem1->type, HB_IT_INTEGER );
+   }
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
@@ -2272,6 +2297,18 @@ static void hb_vmPlus( void )
          HB_TRACE( HB_TR_DEBUG, ( "Error! String overflow in hb_vmPlus()" ) );
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
       }
+   }
+   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.bChar && HB_IS_NUMERIC( pItem2 ) )
+   {
+      BYTE bChar = pItem1->item.asString.value[0];
+      int iDec;
+      double dNumber;
+
+      dNumber = hb_vmPopDouble( &iDec );
+
+      hb_stackPop();
+
+      hb_vmPushNumType( dNumber + bChar, iDec, pItem2->type, HB_IT_INTEGER );
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
    {
@@ -2321,6 +2358,18 @@ static void hb_vmMinus( void )
       double dNumber1 = hb_vmPopDouble( &iDec1 );
 
       hb_vmPushNumType( dNumber1 - dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
+   }
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.bChar )
+   {
+      BYTE bChar = pItem2->item.asString.value[0];
+      int iDec;
+      double dNumber;
+
+      hb_stackPop();
+
+      dNumber = hb_vmPopDouble( &iDec );
+
+      hb_vmPushNumType( dNumber - bChar, iDec, pItem1->type, HB_IT_INTEGER );
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
    {
@@ -2372,6 +2421,18 @@ static void hb_vmMinus( void )
       {
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
+   }
+   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.bChar && HB_IS_NUMERIC( pItem2 ) )
+   {
+      BYTE bChar = pItem1->item.asString.value[0];
+      int iDec;
+      double dNumber;
+
+      dNumber = hb_vmPopDouble( &iDec );
+
+      hb_stackPop();
+
+      hb_vmPushNumType( bChar - dNumber, iDec, pItem2->type, HB_IT_INTEGER );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMinus" ) )
    {
@@ -3290,8 +3351,7 @@ static void hb_vmArrayPush( void )
       {
          if( pArray->item.asString.bStatic )
          {
-            pArray->item.asString.value  = (char *) ( hb_vm_acAscii[ (int) ( pArray->item.asString.value[lIndex] ) ] );
-            pArray->item.asString.length = 1;
+            pArray->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) ( pArray->item.asString.value[lIndex] ) ] );
          }
          else
          {
@@ -3300,9 +3360,11 @@ static void hb_vmArrayPush( void )
             hb_itemReleaseString( pArray );
 
             pArray->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) cChar ] );
-            pArray->item.asString.length  = 1;
             pArray->item.asString.bStatic = TRUE;
          }
+
+         pArray->item.asString.length  = 1;
+         pArray->item.asString.bChar   = TRUE;
       }
       else
       {
@@ -3380,7 +3442,7 @@ static void hb_vmArrayPop( void )
          hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
       }
    }
-   else if( HB_IS_STRING( pArray ) && HB_IS_STRING( pValue ) )
+   else if( HB_IS_STRING( pArray ) && ( HB_IS_STRING( pValue ) || HB_IS_NUMERIC( pValue ) ) )
    {
       long lIndex = (long) ulIndex;
 
@@ -3393,9 +3455,28 @@ static void hb_vmArrayPop( void )
          lIndex += pArray->item.asString.length;
       }
 
-      if( lIndex >= 0 && lIndex < pArray->item.asString.length )
+      if( lIndex >= 0 && (ULONG) lIndex < pArray->item.asString.length )
       {
+         BYTE bNewChar;
+
          pArray = pArray->pOrigin;
+
+         if( pValue->type == HB_IT_STRING )
+         {
+            bNewChar = pValue->item.asString.value[0];
+         }
+         else if( pValue->type == HB_IT_INTEGER )
+         {
+            bNewChar = (BYTE) pValue->item.asInteger.value;
+         }
+         else if( pValue->type == HB_IT_LONG )
+         {
+            bNewChar = (BYTE) pValue->item.asLong.value;
+         }
+         else
+         {
+            bNewChar = (BYTE) pValue->item.asDouble.value;
+         }
 
          if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
          {
@@ -3409,7 +3490,7 @@ static void hb_vmArrayPop( void )
             pArray->item.asString.bStatic         = FALSE;
          }
 
-         pArray->item.asString.value[ lIndex ] = pValue->item.asString.value[0];
+         pArray->item.asString.value[ lIndex ] = bNewChar;
 
          hb_stackPop();
          hb_stackPop();

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.13 2002/04/15 05:06:44 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.14 2002/04/17 20:36:19 ronpinkas Exp $
  */
 
 /*
@@ -200,11 +200,13 @@ struct hb_struRefer
    LONG value;
 };
 
+/* TODO: consolidate bStatic and bChar into BYTE bType and use mask constants HB_STR_STATIC and HB_STR_CHAR. */
 struct hb_struString
 {
    ULONG  length;
    char   *value;
    BOOL   bStatic;
+   BOOL   bChar;
    USHORT *puiHolders; /* number of holders of this string */
 };
 

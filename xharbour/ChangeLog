@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.158 2002/04/17 20:36:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.159 2002/04/17 21:19:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-17 17:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Added member bChar to struString
+
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+    + Added support for new type CHAR as a subtype of a STRING
+
+  + tests/testchar.prg
+    + New test to demonstrate usage of new String Indexing and CHAR type.
+
+ /*
+    The new CHAR type is a smart automatic conversion based on context.
+    It is implicitly created when an indexed string ( cVar[n] ) is used
+    in math operations. This implementation retains 100% Clipper
+    compatibility with regards to strings. This means that:
+
+    cVar := "Hello"
+    ? cVar[1]      // H
+
+    // Auto conversion to NUMERIC due to math context.
+    ? cVar[1] - 1  //         71
+    ? cVar[1] + 1  //         73
+    ? - cVar[1]    //        -72
+
+    cVar[1] := 'h'
+    ? cVar         // hello
+
+    // Auto conversion from NUMERIC due to STRING assignment context.
+    cVar[1] := 72
+    ? cVar         // Hello
+
+    Please review tests/testchar.prg for an example of a simple, Super-Fast
+    Encoder/Decoder which demonstrates a 'C' level string processing speed/power.
+
+ */
+
+ // Todo: rest of math operators support for CHAR.
 
 2002-04-17 14:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

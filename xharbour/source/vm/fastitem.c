@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.25 2002/04/17 01:33:07 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.26 2002/04/17 20:36:19 ronpinkas Exp $
  */
 
 /*
@@ -427,9 +427,10 @@ void hb_itemPushStaticString( char * szText, ULONG length )
    pTop->type = HB_IT_STRING;
    //pTop->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    //*( pTop->item.asString.puiHolders ) = 1;
+   pTop->item.asString.length  = length;
+   pTop->item.asString.value   = szText;
    pTop->item.asString.bStatic = TRUE;
-   pTop->item.asString.length = length;
-   pTop->item.asString.value = szText;
+   pTop->item.asString.bChar   = FALSE;
 
    hb_stackPush();
 }
