@@ -1,12 +1,17 @@
 /*
- * $Id: print.c,v 1.2 2001/11/16 07:22:55 davep Exp $
+ * $Id: print.c,v 1.1 2003/03/04 21:04:47 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 Printer functions: - PRINTSTAT() / PRINTREADY()
- *
+ * CT3 Printer functions:
+ * 
+ * PRINTSTAT(), PRINTREADY()
  * Copyright 2001 Walter Negro - FOEESITRA" <waltern@foeesitra.org.ar>
+ * 
+ * PRINTSEND()
+ * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
+ * 
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,6 +58,10 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+
+#ifdef __DJGPP__
+#include <dpmi.h>
+#endif
 
 
 /*  $DOC$
@@ -157,3 +166,64 @@ HB_FUNC( PRINTREADY )
 }
 
 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTSEND()
+ *  $CATEGORY$
+ *      CT3 printer functions
+ *  $ONELINER$
+ *      Sends characters to printer
+ *  $SYNTAX$
+ *      PRINTSEND(<cCharacter|nCharacter>, <nPrinter>) -> nRemaining
+ *  $ARGUMENTS$
+ *      <cCharacter|nCharacter> Code for an individual character from 0 to 255
+ *                              or a string.
+ *      <nPrinter> The printer port where output is done.
+ *  $RETURNS$
+ *      Returns the number of characters that could not be sent to printer.
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      DOS
+ *  $FILES$
+ *      Source is print.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+HB_FUNC( PRINTSEND )
+{
+#ifdef __DJGPP__
+   __dpmi_regs r;
+   
+   r.x.dx = hb_parni( 2 ) - 1;
+   
+   if ( ISNUM( 1 ) )
+   {
+      r.h.al = hb_parni( 1 );
+      __dpmi_int( 0x17, &r );
+      if ( r.h.ah & 1 )
+        hb_retni( 1 );
+      else hb_retni( 0 );
+   } else if ( ISCHAR( 1 ) ) {
+      char *string = hb_parc( 1 );
+      int i, len = hb_parclen( 1 );
+      
+      r.h.ah = 0;
+      for (i = 0; i < len && !( r.h.ah & 1 ); i++)
+      {
+         r.h.al = string[i];
+         __dpmi_int( 0x17, &r );
+      }
+      if ( r.h.ah & 1 )
+        hb_retni( len - ( i - 1 ) );
+      else
+        hb_retni( 0 );
+   }
+#endif
+}

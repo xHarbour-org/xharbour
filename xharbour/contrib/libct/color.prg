@@ -1,10 +1,14 @@
 /*
- * $Id: color.prg,v 1.1 2003/03/04 21:04:21 lculik Exp $
+ * $Id: color.prg,v 1.2 2003/07/29 16:24:00 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
  *   CT3 video functions (color-like functions)
+ *
+ *     Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>:
+ *                        - INVERTATTR()
+ *
  *     Copyright 2002 Walter Negro <anegro@overnet.com.ar>:
  *                        - NTOCOLOR()
  *                        - COLORTON()
@@ -59,6 +63,42 @@
 
 #include "color.ch"
 #include "common.ch"
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INVERTATTR()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *      Inverts the foreground and background of an attribute
+ *  $SYNTAX$
+ *      INVERTATTR( <cAttr|nAttr> ) -> <nInvertAttr>
+ *  $ARGUMENTS$
+ *      <nAttr|cAttr> Designates the attribute to invert.
+ *  $RETURNS$
+ *      INVERTATTR() returns the numeric value of the inverted attribute.
+ *  $DESCRIPTION$
+ *      This functions swaps the foreground and background colors of any
+ *      given text attribute. High intensity and blinking attributes are not
+ *      affected.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is color.prg, library is libct.
+ *  $SEEALSO$
+ *      INVERTWIN(), NTOCOLOR(), SCREENATTR()
+ *  $END$
+ */
+
+FUNCTION INVERTATTR( xAttr )
+  LOCAL n := ColorToN( xAttr )
+RETURN ( n % 8 ) * 16 + Int( n / 16 )
+
 
 /*  $DOC$
  *  $FUNCNAME$

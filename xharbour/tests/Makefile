@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.19 2003/11/30 10:23:13 jonnymind Exp $
+# $Id: Makefile,v 1.20 2003/12/29 23:38:58 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -56,7 +56,14 @@ else
     endif
     EXE_EXT=
   else
-    GT_LIBS=-lgtwin -lwsock32 -lwinspool
+    ifeq ($(HB_ARCHITECTURE),dos)
+      ifeq ($(HB_GT_LIB),)
+        HB_GT_LIB=gtstd
+      endif
+      GT_LIBS=-l$(HB_GT_LIB)
+    else
+      GT_LIBS=-lgtwin -lwsock32 -lwinspool
+    endif
     EXE_EXT=.exe
   endif
 endif

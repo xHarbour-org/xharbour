@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2467 2004/03/03 11:41:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2468 2004/03/03 13:20:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-03 22:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * config/dos/global.cf
+    ! Fixed GT library linking order.
+  * contrib/libct/color.prg
+    + Added INVERTATTR() function.
+  * contrib/libct/ctmisc.prg
+    + Added EXENAME() function.
+  * contrib/libct/disk.c
+    + Added NUMDISKL() function (only DJGPP version).
+  * contrib/libct/files.c
+    + Added FILESMAX() function (only DJGPP version).
+    + Fixed SETFDATI() to work on DJGPP.
+  * contrib/libct/print.c
+    + Added PRINTSEND() function (only DJGPP version).
+  * tests/Makefile
+    ! Fixed to work on DOS.
 
 2004-03-03 14:18 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/odbc/odbc.c

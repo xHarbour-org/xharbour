@@ -1,19 +1,22 @@
 /*
- * $Id: disk.c,v 1.3 2004/02/23 03:31:04 lculik Exp $
+ * $Id: disk.c,v 1.4 2004/02/26 18:58:52 lculik Exp $
  */
 /*
  * xHarbour Project source code:
  * LibCT (Clipper Tools) Disk, File and Directory management.
+ * 
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
- * www - http://www.xharbour.org
- *
  * DeleteFile()  - Ready. Source is in "disk.c"
  * DirMake()     - Ready. Already exist a MakeDir() function in xHarbour RT Library, but
  *                 this funtion return a more compatible error codes.
  * DirName()     - Ready.
  * DriveType()   - Ready.
  * FileMove()    - Ready.
+ * 
+ * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
+ * NUMDISKL()
  *
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +70,11 @@
 #include <shellapi.h>
 
 #define HB_OS_WIN_32_USED
+
+#elif defined(HB_OS_DOS)
+
+#include <dos.h>
+
 #endif
 
 /*  $DOC$
@@ -453,3 +461,60 @@ HB_FUNC ( FILEMOVE )
       hb_retni ( iRet * (-1) );
    }
 }
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMDISKL()
+ *  $CATEGORY$
+ *      CT3 disk functions
+ *  $ONELINER$
+ *      Gets the number of valid drive letters.
+ *  $SYNTAX$
+ *      NUMDISKL() --> nDisks
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      A numeric value which is the value of LASTDRIVE directive in CONFIG.SYS.
+ *  $DESCRIPTION$
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      DJGPP, Windows, UNIX
+ *  $FILES$
+ *      Source is disk.c, library is libct.
+ *  $SEEALSO$
+ *      NUMDISKF(), NUMDISKH()
+ *  $END$
+ */
+HB_FUNC( NUMDISKL )
+#if defined( HB_OS_DOS )
+#if defined( __DJGPP__ )
+{
+   unsigned cur_drive, n_drives;
+   
+   _dos_getdrive( &cur_drive );
+   _dos_setdrive( cur_drive, &n_drives );
+   hb_retni( n_drives );
+}   
+#else
+{
+   /* should be easily implementable somehow similar to DJGPP */
+   hb_retni( 26 );
+}
+#endif
+#elif defined( HB_OS_WIN_32 )
+{
+   /* LASTDRIVE does not affect Win32 apps, they always have 26 letters avail */
+   hb_retni( 26 );
+}
+#else
+{
+   /* For Unix, return the most harmless value... or not? */
+   hb_retni( 1 );
+}
+#endif

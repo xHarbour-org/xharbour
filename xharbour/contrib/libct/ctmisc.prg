@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.4 2002/05/04 16:37:31 mbirdyg Exp $
+ * $Id: ctmisc.prg,v 1.1 2003/03/04 21:04:26 lculik Exp $
  */
 
 /*
@@ -77,6 +77,10 @@ FUNCTION CSETCENT( nCentury )
       RETURN __SETCENTURY( nCentury )
    endif
    RETURN NIL
+
+
+FUNCTION EXENAME()
+   RETURN HB_ARGV( 0 )
 
 
 FUNCTION LTOC( l )

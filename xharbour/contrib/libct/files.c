@@ -1,12 +1,16 @@
 /*
- * $Id: files.c,v 1.15 2004/02/15 21:59:36 lculik Exp $
+ * $Id: files.c,v 1.16 2004/02/15 22:47:50 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 files functions: FILESEEK,FILESIZE,FILEATTR,FILETIME,FILEDATE,SETFATTR,SETFDATI
+ *   CT3 files functions
  *
- * Copyright 2001 Luiz Rafael Culik<culik@sl.conex.net>
+ * FILESEEK,FILESIZE,FILEATTR,FILETIME,FILEDATE,SETFATTR
+ * Copyright 2001 Luiz Rafael Culik <culik@sl.conex.net>
+ * 
+ * FILESMAX, SETFDATI
+ * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  *
  * www - http://www.harbour-project.org
  *
@@ -73,6 +77,9 @@
 #elif defined( HB_OS_DOS ) && !defined( __RSX32__ )
 
    #if defined( __DJGPP__ )
+      #include <dpmi.h>
+      #include <go32.h>
+      #include <sys/farptr.h>
       #include <sys/param.h>
    #endif
       #include "hb_io.h"
@@ -929,7 +936,7 @@ LPTSTR GetTime( FILETIME *rTime )
  *  $COMPLIANCE$
  *      This function is xHarbour libct contrib
  *  $PLATFORMS$
- *      UNIX, Windows
+ *      UNIX, Windows, DJGPP
  *  $FILES$
  *      Source is files.c, library is libct.
  *  $SEEALSO$
@@ -939,91 +946,95 @@ LPTSTR GetTime( FILETIME *rTime )
 
 HB_FUNC( SETFDATI )
 {
-   if (hb_pcount() >= 1)
+   if ( hb_pcount() >= 1 )
    {
-      char *szFile = hb_parc(1);
+      char *szFile = hb_parc( 1 );
       char *szDate = NULL, *szTime = NULL;
       int year, month, day, hour = 0, minute = 0, second = 0;
       
-      if (ISDATE(2) || ISDATE(3))
+      if ( ISDATE( 2 ) || ISDATE( 3 ) )
       {
          szDate = ISDATE(2) ? hb_pards(2) : hb_pards(3);
-         sscanf(szDate, "%4d%2d%2d", &year, &month, &day);
+         sscanf( szDate, "%4d%2d%2d", &year, &month, &day );
       }
-      if (ISCHAR(2) || ISCHAR(3))
+      if ( ISCHAR( 2 ) || ISCHAR( 3 ) )
       {
-         szTime = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
-         sscanf(szTime, "%2d:%2d:%2d", &hour, &minute, &second);
+         szTime = ISCHAR( 2 ) ? hb_parc( 2 ) : hb_parc( 3 );
+         sscanf( szTime, "%2d:%2d:%2d", &hour, &minute, &second );
       }
 
 #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
       {
          FILETIME ft, local_ft;
          SYSTEMTIME st;
-         HANDLE f = (HANDLE)_lopen(szFile, OF_READWRITE | OF_SHARE_COMPAT);
+         HANDLE f = (HANDLE)_lopen( szFile, OF_READWRITE | OF_SHARE_COMPAT );
          
-         if (f != (HANDLE)HFILE_ERROR)
+         if ( f != (HANDLE)HFILE_ERROR )
          {
-            if (!szDate || !szTime)
+            if ( !szDate || !szTime )
             {
-               GetLocalTime(&st);
+               GetLocalTime( &st );
             }
-            if (szDate)
+            if ( szDate )
             {
                st.wYear = year;
                st.wMonth = month;
                st.wDay = day;
             }
-            if (szTime)
+            if ( szTime )
             {
                st.wHour = hour;
                st.wMinute = minute;
                st.wSecond = second;
             }
-            SystemTimeToFileTime(&st, &local_ft);
-            LocalFileTimeToFileTime(&local_ft, &ft);
-            hb_retl(SetFileTime(f, NULL, &ft, &ft));
-            _lclose((HFILE)f);
+            SystemTimeToFileTime( &st, &local_ft );
+            LocalFileTimeToFileTime( &local_ft, &ft );
+            hb_retl( SetFileTime( f, NULL, &ft, &ft ) );
+            _lclose( (HFILE)f );
             return;
          }
       }
-#elif defined( OS_UNIX_COMPATIBLE )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined ( __DJGPP__ )
       {
          struct utimbuf buf;
          struct tm new_value;
          
-         if (!szDate && !szTime)
+         if ( !szDate && !szTime )
          {
-            hb_retl(utime(szFile, NULL) == 0);
+            hb_retl( utime( szFile, NULL ) == 0 );
             return;
          }
          
-         if (!szDate || !szTime)
+         if ( !szDate || !szTime )
          {
             time_t current_time;
             
-            current_time = time(NULL);
-            localtime_r(&current_time, &new_value);
+            current_time = time( NULL );
+#ifdef __DJGPP__
+            new_value = *localtime( &current_time );
+#else
+            localtime_r( &current_time, &new_value );
+#endif
          }
-         if (szDate)
+         if ( szDate )
          {
             new_value.tm_year = year - 1900;
             new_value.tm_mon = month - 1;
             new_value.tm_mday = day;
          }
-         if (szTime)
+         if ( szTime )
          {
             new_value.tm_hour = hour;
             new_value.tm_min = minute;
             new_value.tm_sec = second;
          }
-         buf.actime = buf.modtime = mktime(&new_value);
-         hb_retl(utime(szFile, &buf) == 0);
+         buf.actime = buf.modtime = mktime( &new_value );
+         hb_retl( utime( szFile, &buf ) == 0 );
          return;
       }
 #endif
    }
-   hb_retl(FALSE);
+   hb_retl( FALSE );
 }
       
    
@@ -1071,15 +1082,64 @@ HB_FUNC( FILEDELETE )
          while( hb_fsFindNext( ffind ) );
 
          hb_fsFindClose( ffind );
-         }
-         hb_xfree( pDirSpec );
       }
-      hb_fsChDrv( (BYTE ) cCurDsk );
-      hb_fsChDir( pCurDir );
-
-      if ( fname )
-         hb_xfree( fname );
-
-      hb_retl( bReturn );
+      hb_xfree( pDirSpec );
    }
+   hb_fsChDrv( (BYTE ) cCurDsk );
+   hb_fsChDir( pCurDir );
 
+   if ( fname )
+     hb_xfree( fname );
+
+   hb_retl( bReturn );
+}
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      FILESMAX()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *      Gets maximum number of file handles
+ *  $SYNTAX$
+ *      FILESMAX() --> nFiles
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      Returns the maximum number of file handles that can be open by
+ *      application.
+ *  $DESCRIPTION$
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      DJGPP
+ *  $FILES$
+ *      Source is files.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+#if defined( HB_OS_DOS )
+
+HB_FUNC( FILESMAX )
+{
+#ifdef __DJGPP__
+   __dpmi_regs r;
+   unsigned handles;
+   unsigned long psp;
+   
+   r.h.ah = 0x62; /* Get PSP address */
+   __dpmi_int( 0x21, &r );
+   psp = ( ( (unsigned long) r.x.bx ) << 4 ) & 0xFFFFF;
+   
+   handles =_farpeekw( _dos_ds, psp + 0x32 );
+   hb_retni( handles );
+#endif
+}
+
+#endif
