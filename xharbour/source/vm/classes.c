@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.108 2004/03/09 10:07:05 andijahja Exp $
+ * $Id: classes.c,v 1.109 2004/03/10 19:16:59 ronpinkas Exp $
  */
 
 /*
@@ -2386,16 +2386,20 @@ HB_FUNC( __OBJGETCLSNAME )
    {
       uiClass = pObject->item.asArray.value->uiClass;
 
-      hb_retc( s_pClasses[ uiClass - 1 ].szName );
+      hb_retcAdoptStatic( s_pClasses[ uiClass - 1 ].szName );
    }
    else
    {
       uiClass = ( USHORT ) hb_parni( 1 );
 
       if( uiClass <= s_uiClasses )
-         hb_retc( s_pClasses[ uiClass - 1 ].szName );
+      {
+         hb_retcAdoptStatic( s_pClasses[ uiClass - 1 ].szName );
+      }
       else
+      {
          hb_retc( "" );
+      }
    }
 }
 
@@ -2810,7 +2814,7 @@ HB_FUNC( __GETMESSAGE )
 
    pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-   hb_retc( ( *pBase )->item.asSymbol.value->szName );
+   hb_retcAdoptStatic( ( *pBase )->item.asSymbol.value->szName );
 }
 
 HB_FUNC( __CLSPARENT )
@@ -2969,12 +2973,9 @@ static HARBOUR hb___msgClsName( void )
    HB_THREAD_STUB
    PHB_ITEM pItemRef = hb_stackSelfItem();
 
-   if( HB_IS_BYREF( pItemRef ) ) // Is it possible?
-   {
-      pItemRef = hb_itemUnRef( pItemRef );
-   }
+   pItemRef = hb_itemUnRef( pItemRef );
 
-   hb_retc( hb_objGetClsName( pItemRef ) );
+   hb_retcAdoptStatic( hb_objGetClsName( pItemRef ) );
 }
 
 
