@@ -1,4 +1,8 @@
 
+/*
+ * $Id:$
+ */
+
 // WHAT32
 
 // System Services
@@ -6,7 +10,14 @@
 /*
  * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
  * with author's permission granted on 27 MAy 2002
-    Last change:  WN   29 May 2002   10:48 pm
+
+   The following Copyright 2003 Ian Anderson <i.anderson@procon.online.de>
+   GetConsoleWindow()
+   SetConsoleTitle()
+   GetProcessWorkingSize()
+   SetProcessWorkingSize()
+   VirtualQuery()      - may not be functional, always seems to return error
+   VirtualLock()       - may not be functional, always seems to return error
  */
 
 
@@ -22,7 +33,7 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 
-
+BOOL PASCAL enable_privilege( LPCTSTR privilege_name );
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI DWORD WINAPI GetFreeSpace(UINT);
@@ -157,7 +168,7 @@ HB_FUNC( MULDIV )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI SystemParametersInfoA( IN UINT uiAction, IN UINT uiParam, IN OUT PVOID pvParam, IN UINT fWinIni);
 
-// note: correct parameters must be passed, as per API requirements 
+// note: correct parameters must be passed, as per API requirements
 
 HB_FUNC( SYSTEMPARAMETERSINFO )
 {
@@ -174,17 +185,17 @@ HB_FUNC( SYSTEMPARAMETERSINFO )
       hb_retl( FALSE );
       return;
    }
-                                                                                
+
    if( SystemParametersInfo( (UINT) hb_parni( 1 ),
                              (UINT) hb_parni( 2 ),
                              cText,
-                             (UINT) hb_parni( 4 ) ) ) 
+                             (UINT) hb_parni( 4 ) ) )
    {
       if( ISBYREF( 3 ) )
       {
         hb_itemPutCRaw( pBuffer, cText, pBuffer->item.asString.length );
         hb_retl( TRUE );
-     }   
+     }
    }
    else
    {
@@ -240,12 +251,44 @@ BOOL SetStdHandle(
                   DWORD nStdHandle,  // input, output, or error device
                   HANDLE hHandle     // handle to be a standard handle
 );
-*/ 
+*/
 
 HB_FUNC ( SETSTDHANDLE )
 {
    hb_retl( SetStdHandle( (DWORD) hb_parnl(1), (HANDLE) hb_parnl(2) ) ) ;
 }
+
+//-----------------------------------------------------------------------------
+/*
+BOOL SetConsoleTitle(LPCSTR szTitle )
+*/
+
+HB_FUNC ( SETCONSOLETITLE )
+{
+   hb_retnl( (LONG) SetConsoleTitle( (LPCSTR) hb_parc(1) ) ) ;
+}
+
+//-----------------------------------------------------------------------------
+/*
+WINBASEAPI HANDLE WINAPI GetConsoleWindow(void);
+Note: The real API is only supported on Windows 2000 and above, so we do a nasty
+      workaround so it works for earlier systems as well
+      1) save the console title text
+      2) set it to something (hopefully) unique
+      3) use FindWindow to find the window handle of the window with our text
+      4) restore the original text
+*/
+
+HB_FUNC ( GETCONSOLEWINDOW )
+{
+   char realtitle[MAX_PATH];
+
+   GetConsoleTitle(realtitle,MAX_PATH);
+   SetConsoleTitle("Finding Handle");
+   hb_retnl( (LONG) FindWindow(NULL,"Finding Handle"));
+   SetConsoleTitle(realtitle);
+}
+
 
 
 //-----------------------------------------------------------------------------
@@ -267,7 +310,7 @@ HB_FUNC( SETTIMER )
    hb_retni( SetTimer( (HWND) hb_parnl( 1 ),
                        (UINT) hb_parni( 2 ),
                        (UINT) hb_parni( 3 ),
-                       ISNIL(4) ? NULL : (TIMERPROC) hb_parnl(4)         
+                       ISNIL(4) ? NULL : (TIMERPROC) hb_parnl(4)
                       ) ) ;
 }
 
@@ -277,7 +320,7 @@ HB_FUNC( SETTIMER )
 
 HB_FUNC( KILLTIMER )
 {
-   
+
    hb_retl( KillTimer( (HWND) hb_parnl( 1 ), (UINT) hb_parni(2) ) ) ;
 
 }
@@ -403,7 +446,7 @@ HB_FUNC( FORMATMESSAGE)
   DWORD nSize,        // maximum size of message buffer
   va_list *Arguments  // pointer to array of message inserts
 );
- 
+
 }
 */
 
@@ -463,7 +506,7 @@ HB_FUNC( FINDRESOURCE )
 {
    hb_retnl( (LONG) FindResourceA( (HMODULE) hb_parnl( 1 ),
                                    (LPCSTR) hb_parc( 2 )  ,
-                                   (LPCSTR) hb_parc( 3 )  
+                                   (LPCSTR) hb_parc( 3 )
                                    ) ) ;
 }
 
@@ -475,7 +518,7 @@ HB_FUNC( FINDRESOURCEEX )
    hb_retnl( (LONG) FindResourceExA( (HMODULE) hb_parnl( 1 ),
                                      (LPCSTR) hb_parc( 2 )  ,
                                      (LPCSTR) hb_parc( 3 )  ,
-                                     (WORD) hb_parni( 4 )              
+                                     (WORD) hb_parni( 4 )
                                      ) ) ;
 }
 
@@ -487,7 +530,7 @@ HB_FUNC( FINDRESOURCEEX )
 HB_FUNC( LOADRESOURCE )
 {
    hb_retnl( (LONG) LoadResource( (HMODULE) hb_parnl( 1 ),
-                                  (HRSRC) hb_parnl( 2 )  
+                                  (HRSRC) hb_parnl( 2 )
                                  ) ) ;
 }
 
@@ -500,17 +543,17 @@ HB_FUNC( LOADRESOURCE )
 //              );
 
 // modified
- 
+
 HB_FUNC( LOADSTRING )
 {
    ULONG iLen = ISNIL(3) ? MAX_PATH : (ULONG) hb_parclen( 3 );
    LPTSTR cText = (char*) hb_xgrab( iLen+1 );
 
    iLen = LoadString( ( ISNIL(1) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl(1) ),
-                      (UINT) hb_parni(2) , 
+                      (UINT) hb_parni(2) ,
                       (LPTSTR) cText ,
                       iLen ) ;
-                     
+
    hb_retclen( cText, iLen );
    hb_xfree( cText );
 }
@@ -522,7 +565,7 @@ HB_FUNC( LOADSTRING )
 HB_FUNC( SIZEOFRESOURCE )
 {
    hb_retnl( (LONG) SizeofResource( (HMODULE) hb_parnl( 1 ),
-                                    (HRSRC) hb_parnl( 2 )  
+                                    (HRSRC) hb_parnl( 2 )
                                     ) ) ;
 }
 
@@ -584,7 +627,7 @@ HB_FUNC( GETMODULEFILENAME )
 
 HB_FUNC( GETMODULEHANDLE )
 {
-   
+
    hb_retnl( (LONG) GetModuleHandleA( (ISNIL(1) ? NULL : (LPCSTR) hb_parc( 1 ) ) ) ) ;
 }
 
@@ -697,7 +740,7 @@ HB_FUNC( GETTICKCOUNT )
 HB_FUNC( GETLOGICALDRIVESTRINGS )
 {
    hb_retnl( (LONG) GetLogicalDriveStrings( (DWORD) hb_parnl( 1 ),
-                                             (LPSTR) hb_parc( 2 ) 
+                                             (LPSTR) hb_parc( 2 )
                                              ) ) ;
 }
 
@@ -894,18 +937,18 @@ HB_FUNC( WINHELP )
       hb_retl( WinHelp( (HWND) hb_parnl( 1 ) ,
                      (LPCSTR) hb_parc( 2 ),
                      (UINT) hb_parni( 3 ) ,
-                     (ULONG) hb_parnl( 4 )              
+                     (ULONG) hb_parnl( 4 )
                    ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-// HWND HtmlHelp(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData); 
+// HWND HtmlHelp(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData);
 
 //
 //  HtmlHelp( hWndCaller,        ;  // Handle of caller window, can be GetDeskTopWindow()
 //            cFullPathAndTopic  )  // C:\Creative.acp\Help\VVouch.htm::default.htm
-//                                  // If topic is not given, default topic will appear 
+//                                  // If topic is not given, default topic will appear
 //
 //  HtmlHelp( GetDeskTopWindow(), 'c:\help\vvouch.chm::de_windo.htm' )
 //
@@ -923,7 +966,7 @@ HB_FUNC(HTMLHELP)
                             (UINT)   ISNIL(3) ? HH_DISPLAY_TOPIC : hb_parni( 3 )  ,
                             (DWORD)  ISNIL(4) ? NULL : hb_parnl( 4 )
                           )
-         ) ;     
+         ) ;
 }
 
 */
@@ -938,7 +981,7 @@ HB_FUNC(HTMLHELP)
                                // pointer to security attributes
   DWORD dwCreationDisposition,  // how to create
   DWORD dwFlagsAndAttributes,  // file attributes
-  HANDLE hTemplateFile         // handle to file with attributes to 
+  HANDLE hTemplateFile         // handle to file with attributes to
                                // copy
 );
 */
@@ -948,7 +991,7 @@ HB_FUNC( CREATEFILE )
 
    SECURITY_ATTRIBUTES *sa ;
 
-   if( ISCHAR( 4 ) ) 
+   if( ISCHAR( 4 ) )
       sa = ( SECURITY_ATTRIBUTES *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
 
    hb_retnl( (LONG) CreateFile( (LPCTSTR) hb_parc(1),
@@ -1048,17 +1091,11 @@ HB_FUNC( WRITEFILE )
 }
 
 
-
-
-
-
-
-
 //-----------------------------------------------------------------------------
 /*
 DWORD GetCurrentProcessId( VOID )
 */
- 
+
 HB_FUNC ( GETCURRENTPROCESSID )
 {
    hb_retnl( (ULONG) GetCurrentProcessId() );
@@ -1068,7 +1105,7 @@ HB_FUNC ( GETCURRENTPROCESSID )
 /*
 DWORD GetCurrentProcess( VOID )
 */
- 
+
 HB_FUNC ( GETCURRENTPROCESS )
 {
    hb_retnl( (LONG) GetCurrentProcess() );
@@ -1078,11 +1115,67 @@ HB_FUNC ( GETCURRENTPROCESS )
 /*
 DWORD GetCurrentThreadId( VOID )
 */
- 
+
 HB_FUNC ( GETCURRENTTHREADID )
 {
    hb_retnl( (DWORD) GetCurrentThreadId() );
 }
+
+/*
+BOOL GetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
+                               PSIZE_T lpMaximumWorkingSetSize );
+NOTE: This function is not supported and returns .F. under Windows 9x
+*/
+
+HB_FUNC ( GETPROCESSWORKINGSETSIZE )
+{
+   DWORD MinimumWorkingSetSize=0;
+   DWORD MaximumWorkingSetSize=0;
+
+   hb_retl(GetProcessWorkingSetSize(ISNIL(1) ? GetCurrentProcess() : (HANDLE) hb_parnl( 1 ),
+                            &MinimumWorkingSetSize, &MaximumWorkingSetSize ));
+   hb_stornl(MinimumWorkingSetSize,2);
+   hb_stornl(MaximumWorkingSetSize,3);
+}
+
+/*
+BOOL SetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
+                               PSIZE_T lpMaximumWorkingSetSize );
+NOTE: This function is not supported and returns .F. under Windows 9x
+      It may also fail if the process does not have right SE_INC_BASE_PRIORITY_NAME on NT/2000
+*/
+
+HB_FUNC ( SETPROCESSWORKINGSETSIZE )
+{
+   hb_retl(SetProcessWorkingSetSize(ISNIL(1) ? GetCurrentProcess() : (HANDLE) hb_parnl( 1 ),
+                   hb_parnl( 2 ), hb_parnl( 3 ) ));
+}
+
+/*
+DWORD VirtualQuery( LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer,  SIZE_T dwLength);
+- may not be functional, always seems to return error
+*/
+HB_FUNC ( VIRTUALQUERY )
+{
+	if (hb_parni(1) >= sizeof(MEMORY_BASIC_INFORMATION))
+	    hb_retl(VirtualQuery((void *) hb_parnl(1), (void *) hb_parnl(2), sizeof(MEMORY_BASIC_INFORMATION)));
+	else
+	{
+		SetLastError(ERROR_INSUFFICIENT_BUFFER);
+		hb_retl(FALSE);
+    }
+}
+
+/*
+BOOL VirtualLock(LPVOID lpAddress, SIZE_T dwSize );
+- may not be functional, always seems to return error
+*/
+
+HB_FUNC ( VIRTUALLOCK )
+{
+   hb_retl(VirtualLock((void *)hb_parnl( 1 ), hb_parni( 2 ) ));
+}
+
 
 //---------------------------------------------------------------------//
 //
@@ -1108,16 +1201,16 @@ HB_FUNC ( FILETIMETOSYSTEMTIME )
 {
    FILETIME   *FileTime  = ( FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
    SYSTEMTIME SystemTime ;
-   
+
    if ( FileTimeToSystemTime( FileTime, &SystemTime ) )
    {
       hb_retl( TRUE ) ;
-      
+
       if ( ISBYREF( 2 ) )
       {
-         hb_storclen( ( char * ) &SystemTime , sizeof( SYSTEMTIME ), 2 ) ; 
+         hb_storclen( ( char * ) &SystemTime , sizeof( SYSTEMTIME ), 2 ) ;
       }
-   }      
+   }
    else
       hb_retl( FALSE ) ;
 }
