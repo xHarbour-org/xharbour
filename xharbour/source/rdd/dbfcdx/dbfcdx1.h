@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.10 2003/11/04 08:31:04 druzus Exp $
+ * $Id: dbfcdx1.h,v 1.11 2003/11/04 18:12:19 ronpinkas Exp $
  */
 
 /*
@@ -130,8 +130,8 @@ typedef struct _SORTSWAPPAGE
    ULONG       keysLeft;
    ULONG       tmpRecNo;  /* to speed up access */
    BYTE        tmpKeyLen;
-   char *      tmpKeyVal;
-   char        page[ 512 ];
+   BYTE *      tmpKeyVal;
+   BYTE        page[ 512 ];
 } SORTSWAPPAGE;
 typedef SORTSWAPPAGE * LPSORTSWAPPAGE;
 
