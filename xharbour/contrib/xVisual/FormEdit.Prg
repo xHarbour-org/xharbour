@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.55 2002/10/07 01:54:24 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.56 2002/10/07 02:19:17 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -45,6 +45,14 @@
 
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL oApp
+
+/*
+   For performance NOT using OS indpendant R/T function,
+   this file only used in win32.
+ */
+#undef CRLF
+#define CRLF Chr(13) + Chr(10)
+
 //----------------------------------------------------------------------------//
 
  CLASS TFormEdit FROM TForm
@@ -371,7 +379,7 @@ METHOD XFMRoot() CLASS TFormEdit
 
    aSize( ::aXFM[ XFM_Datas ], 0 )
 
-   aDiff := __ObjGetValueDiff( Self, ::aBases[1] )
+   aDiff := __ObjGetValueDiff( Self, ::aBases[1] ) //, HB_OO_CLSTP_EXPORTED is default.
    ::nForms--
 
    FOR EACH aVar IN aDiff
@@ -404,13 +412,17 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
       XFMControl := ::aXFM[ XFM_Controls ][ nControl ]
 
-      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
+      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] ) //, HB_OO_CLSTP_EXPORTED is default.
 
       aSize( XFMControl[ 4 ], 0 )
       aAdd( XFMControl[ 4 ], "   CONTROL " + XFMControl[ 1 ] + " FROM " + oControl:ClassName )
 
       FOR EACH aVar IN XFMControl[ 3 ]
-         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
+         IF ValType( aVar[2] ) == 'O'
+            aAdd( XFMControl[ 4 ], ValToPrg( aVar[2], aVar[1], 6 ) )
+         ELSE
+            aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
+         ENDIF
       NEXT
 
       aAdd( XFMControl[ 4 ], "   END CONTROL" )
@@ -426,10 +438,14 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
          nBase := -1
       ENDIF
 
-      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
+      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] ) //, HB_OO_CLSTP_EXPORTED is default.
 
       FOR EACH aVar IN XFMControl[ 3 ]
-         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
+         IF ValType( aVar[2] ) == 'O'
+            aAdd( XFMControl[ 4 ], ValToPrg( aVar[2], aVar[1], 6 ) )
+         ELSE
+            aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
+         ENDIF
       NEXT
 
       aAdd( XFMControl[ 4 ], "   END CONTROL" )
@@ -456,8 +472,13 @@ METHOD XFMReflect() CLASS TFormEdit
    cText += CRLF
 
    FOR EACH aVar IN ::aXFM[ XFM_Datas ]
-      cText += ( "   VAR " + aVar[1] + " INIT " + ValToPrg( aVar[2] ) + CRLF )
+      IF ValType( aVar[2] ) == 'O'
+         ctext += ValToPrg( aVar[2], aVar[1], 6 ) + CRLF
+      ELSE
+         cText += "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
+      ENDIF
    NEXT
+
    cText += CRLF
 
    FOR EACH XFMControl IN ::aXFM[ XFM_Controls ]

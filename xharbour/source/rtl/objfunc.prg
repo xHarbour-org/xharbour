@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.7 2002/10/06 02:19:41 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.8 2002/10/06 22:04:44 ronpinkas Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
 
 RETURN aReturn
 
-FUNCTION __ObjGetValueDiff( oObject, oBase )
+FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
 
    LOCAL aBaseVars, aObjectVars
    LOCAL aReturn
@@ -174,14 +174,18 @@ FUNCTION __ObjGetValueDiff( oObject, oBase )
       oBase := __ClsInst( oObject:ClassH )
    ENDIF
 
-   aBaseVars   := __objGetValueList( oBase  , NIL, HB_OO_CLSTP_EXPORTED )
-   aObjectVars := __objGetValueList( oObject, NIL, HB_OO_CLSTP_EXPORTED )
+   IF nScope == NIL
+      nScope := HB_OO_CLSTP_EXPORTED
+   ENDIF
+
+   aBaseVars   := __objGetValueList( oBase  , NIL, nScope )
+   aObjectVars := __objGetValueList( oObject, NIL, nScope )
 
    aReturn := {}
 
    nVar := 1
    FOR EACH aVar IN aObjectVars
-      IF nVar > Len( aBaseVars ) .OR. aVar[2] != aBaseVars[ nVar ][ 2 ]
+      IF nVar > Len( aBaseVars ) .OR. ( ! ( aVar[2] == aBaseVars[ nVar ][ 2 ] ) )
          AAdd( aReturn, aVar )
       ENDIF
 

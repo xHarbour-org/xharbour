@@ -29,3 +29,7 @@
                         s_oClass:AddMultiData( , HB_QWITH(), 1, { __STR( __CONTROL__ ) }, .F., .F. ) ;;
                         END WITH;;
                         #undef __CONTROL__
+
+#command OBJECT <!object!> IS <!class!> => WITH OBJECT ( :<object> := <class>() )
+
+//#command END OBJECT => END WITH

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.1 2002/01/31 05:57:24 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.2 2002/10/06 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,13 @@
  */
 
 #include "error.ch"
+
+/*
+   For performance NOT using OS indpendant R/T function,
+   this define only used in ValTpPrg() which currently only used in win32.
+ */
+#undef CRLF
+#define CRLF Chr(13) + Chr(10)
 
 //--------------------------------------------------------------//
 FUNCTION CStr( xExp )
@@ -138,48 +145,83 @@ FUNCTION CStrToVal( cExp, cType )
 RETURN NIL
 
 //--------------------------------------------------------------//
-FUNCTION ValToPrg( xExp )
+FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
-   LOCAL cType := ValType( xExp )
+   LOCAL cType := ValType( xVal )
+   LOCAL aVars, aVar, cRet, cPad, nObj
 
    DO CASE
       CASE cType = 'C'
-         IF ! '"' $ xExp
-            RETURN '"' + xExp + '"'
-         ELSEIF ! "'" $ xExp
-            RETURN "'" + xExp + "'"
-         ELSEIF ( ! "[" $ xExp ) .AND. ( ! "]" $ xExp )
-            RETURN "[" + xExp + "]"
+         IF ! '"' $ xVal
+            RETURN '"' + xVal + '"'
+         ELSEIF ! "'" $ xVal
+            RETURN "'" + xVal + "'"
+         ELSEIF ( ! "[" $ xVal ) .AND. ( ! "]" $ xVal )
+            RETURN "[" + xVal + "]"
          ELSE
             __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
          ENDIF
 
       CASE cType = 'D'
-         RETURN "cToD( '" + dToC( xExp ) + "' )"
+         RETURN "cToD( '" + dToC( xVal ) + "' )"
 
       CASE cType = 'L'
-         RETURN IIF( xExp, ".T.", ".F." )
+         RETURN IIF( xVal, ".T.", ".F." )
 
       CASE cType = 'N'
-         RETURN Str( xExp )
+         RETURN Str( xVal )
 
       CASE cType = 'M'
-         RETURN xExp
+         RETURN xVal
+
+      CASE cType = 'A'
+         cRet := "{ "
+
+         FOR EACH aVar IN xVal
+            cRet += ( ValToPrg( aVar ) + ", " )
+         NEXT
+
+         IF cRet[ -2 ] == ','
+            cRet[ -2 ] := ' '
+         ENDIF
+         cRet[ -1 ] := '}'
 
       /*
-      CASE cType = 'A'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
-
       CASE cType = 'B'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
-
-      CASE cType = 'O'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
       */
 
+      CASE cType == 'O'
+         cPad  := sPace( nPad + 3 )
+         aVars := __objGetValueDiff( xVal )
+         cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF + CRLF
+
+         IF aObjs == NIL
+            aObjs := { { xVal, cName } }
+         ELSE
+            aAdd( aObjs, { xVal, cName } )
+         ENDIF
+
+         FOR EACH aVar IN aVars
+            IF ValType( aVar[2] ) == 'O'
+               IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
+                  cRet += cPad + ":" + aVar[1] + " := " + "/* Cyclic into outer property: */ " + aObjs[ nObj ][2] + CRLF
+               ELSE
+                  cRet += ValToPrg( aVar[2], aVar[1], nPad + 3, aObjs ) + CRLF
+               ENDIF
+            ELSE
+               cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
+            ENDIF
+         NEXT
+
+         cRet += CRLF + sPace( nPad ) + "END OBJECT" + CRLF
+
       OTHERWISE
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         return ""
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName(), 1, { xVal, cName, nPad } )
    ENDCASE
 
-RETURN NIL
+   TraceLog( cRet )
+
+RETURN cRet
 //--------------------------------------------------------------//
