@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.15 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapigt.h,v 1.16 2003/12/21 21:31:52 druzus Exp $
  */
 
 /*
@@ -374,6 +374,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define _os2   _OS2
 #define _tpl   _TPL
 #define _QTc   _QTC
+#define _xvt   _XVT
 
 /* names of GT */
 #define HB_GT_DRV_NUL   "nul"
@@ -388,6 +389,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define HB_GT_DRV_OS2   "os2"
 #define HB_GT_DRV_TPL   "tpl"
 #define HB_GT_DRV_QTC   "QTc"
+#define HB_GT_DRV_XVT   "xvt"
 
 
 typedef struct _HB_GT_FUNCS

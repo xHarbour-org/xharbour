@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.16 2003/12/11 14:44:52 jonnymind Exp $
+* $Id: hblog.prg,v 1.17 2003/12/14 01:58:54 ronpinkas Exp $
 */
 
 /*
@@ -420,8 +420,11 @@ CLASS HB_LogConsole FROM HB_LogChannel
    METHOD Open( cName )
    METHOD Close( cName )
 
+   METHOD LogOnVt( BOOL ldo )    INLINE ::lRealConsole := ldo
+
 PROTECTED:
    METHOD Send( nStyle, cMessage, nPriority )
+   DATA lRealConsole    INIT .T.
 
 ENDCLASS
 
@@ -435,7 +438,11 @@ METHOD Open( cName ) CLASS HB_LogConsole
       RETURN .F.
    ENDIF
 
-   OutStd( HB_LogDateStamp(), Time(), "--", cName, "start --", HB_OsNewLine() )
+   IF ::lRealConsole
+      OutStd( HB_LogDateStamp(), Time(), "--", cName, "start --", HB_OSnewLine() )
+   ELSE
+      QOut( HB_LogDateStamp(), Time(), "--", cName, "start --" )
+   ENDIF
    ::lOpened := .T.
 
 RETURN .T.
@@ -446,14 +453,22 @@ METHOD Close( cName ) CLASS HB_LogConsole
       RETURN .F.
    ENDIF
 
-   OutStd( HB_LogDateStamp(), Time(), "--", cName, "end --", HB_OsNewLine() )
+   IF ::lRealConsole
+      OutStd( HB_LogDateStamp(), Time(), "--", cName, "end --", HB_OSnewLine() )
+   ELSE
+      QOut( HB_LogDateStamp(), Time(), "--", cName, "end --" )
+   ENDIF
    ::lOpened := .F.
 
 RETURN .T.
 
 PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogConsole
 
-   OutStd( ::Format( nStyle, cMessage, cName, nPriority ) , HB_OsNewLine() )
+   IF ::lRealConsole
+      OutStd( ::Format( nStyle, cMessage, cName, nPriority ), HB_OSnewLine() )
+   ELSE
+      QOut( ::Format( nStyle, cMessage, cName, nPriority ) )
+   ENDIF
 
 RETURN
 

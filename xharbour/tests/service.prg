@@ -18,7 +18,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.4 2003/11/26 00:05:25 fsgiudice Exp $
+* $Id: service.prg,v 1.5 2003/11/29 00:55:20 jonnymind Exp $
 *
 
 #include "hbserv.ch"
@@ -86,7 +86,7 @@ PROCEDURE Waiter()
 
    WHILE bWait
       ThreadSleep( 1000 )
-      OutStd( str(nCount,3),", " )
+      ? str(nCount,3) 
       // create a segfault after a while..
       IF nCount == 0
          IF bDebugMode

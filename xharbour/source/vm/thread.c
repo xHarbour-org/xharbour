@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.146 2003/12/19 16:14:02 jonnymind Exp $
+* $Id: thread.c,v 1.147 2003/12/28 22:25:35 druzus Exp $
 */
 
 /*
@@ -62,6 +62,7 @@
 #if defined(__GNUC__) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       #include <sys/time.h>
       #include <time.h>
+      #include <errno.h>
 #endif
 
 #include "hbapi.h"
@@ -974,7 +975,6 @@ HB_EXPORT void hb_threadWaitAll()
 HB_EXPORT void hb_threadKillAll()
 {
    HB_STACK *pStack;
-   HB_THREAD_STUB;
 
    hb_threadWaitForIdle();
 
@@ -988,11 +988,9 @@ HB_EXPORT void hb_threadKillAll()
          pStack = pStack->next;
          continue;
       }
-      HB_STACK_UNLOCK
       #ifndef HB_OS_WIN_32
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
-         pthread_join( pStack->th_id, NULL );
       #else
          /* Shell locking the thread */
          HB_CRITICAL_LOCK( hb_cancelMutex );
@@ -1005,10 +1003,11 @@ HB_EXPORT void hb_threadKillAll()
          {
             hb_threadCancel( pStack ); // also unlocks the mutex
          }
-      HB_STACK_LOCK
       #endif
       pStack = pStack->next;
    }
+   hb_threadIdleEnd();
+   hb_threadWaitAll();
 }
 
 /*
@@ -2271,10 +2270,13 @@ void hb_threadSleep( int millisec )
       usleep( millisec * 1000 );
    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       {
-         struct timespec ts;
+         struct timespec ts, trem;
          ts.tv_sec = millisec / 1000;
          ts.tv_nsec = (millisec % 1000) * 1000000;
-         nanosleep( &ts, 0 );
+         while( nanosleep( &ts, &trem ) != 0 && errno == EINTR )
+         {
+            ts = trem;
+         }
       }
    #elif defined(HB_OS_OS2)
       DosSleep( millisec );

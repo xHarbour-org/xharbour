@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2003/01/30 00:46:24 jonnymind Exp $
+# $Id: global.cf,v 1.5 2003/05/16 19:52:04 druzus Exp $
 #
 
 all : first
@@ -10,6 +10,7 @@ HB_GT_LIBS=\
         gtpca \
         gtsln \
         gtstd \
+        gtxvt \
         gtnul \
         
 #jonnymind - EXPERIMENTAL Adding QT lib only if explicitly requested

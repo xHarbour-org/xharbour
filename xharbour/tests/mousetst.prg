@@ -1,5 +1,5 @@
 //
-// $Id: mousetst.prg,v 1.1 2000/06/15 19:34:37 dholm Exp $
+// $Id: mousetst.prg,v 1.1.1.1 2001/12/21 10:45:57 ronpinkas Exp $
 //
 /*
  * Copyright 2000 Alejandro de Garate <alex_degarate@hotmail.com>
@@ -159,7 +159,7 @@ LOCAL cSkip := "", nKey, nPress := 0
    @ nR+10,nC SAY  "≥            mouse  ≥"
    @ nR+11,nC SAY  "¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ"
 
-   IF NUMBUTTONS() == 3
+   IF NUMBUTTONS() >= 3
       @ nR+ 1,nC SAY  "≥ …ÕÕÕª …ÕÕÕª …ÕÕÕª ≥"
       @ nR+ 2,nC SAY  "≥ ∫   ∫ ∫   ∫ ∫   ∫ ≥"
       @ nR+ 3,nC SAY  "≥ ∫   ∫ ∫   ∫ ∫   ∫ ≥"

@@ -1,7 +1,7 @@
 ***********************************************************
 * bkgtest.prg
 *
-* $Id: bkgtest.prg,v 1.3 2003/12/21 23:35:27 fsgiudice Exp $
+* $Id: bkgtest.prg,v 1.4 2003/12/27 02:57:13 fsgiudice Exp $
 *
 * This test demonstrates usage of BACKGROUND functions that are an extension of IDLE functions;
 * this is a variant of idle functions that runs only on idle state (as inkey(0) does)
@@ -25,7 +25,7 @@ PROCEDURE Main()
    nId4 := HB_BackgroundAdd( { @TimerFunc() }, 1000 )
    nId5 := HB_BackgroundAdd( { @Counter1Func() } )
    nId6 := HB_BackgroundAdd( { @Counter2Func() }, nSpeed )
-   nId7 := HB_BackgroundAdd( { @Counter3Func() }, 100 )
+   nId7 := HB_BackgroundAdd( { "Counter3Func" }, 100 )
    HB_BackgroundAdd( { @Ticker() }, 100 )
 
    SET COLOR TO w+/B
