@@ -8,7 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-11-10 01:34 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-12 15:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hvm.h
+    ! There was a missing ";" ... in a declaration.
+
+  * source/rtl/errorsys.prg
+  * source/rtl/traceprg.prg
+    HB_OutDebug() is not to be used automatically. I commented it out while I think
+    if there is a way to make it "aware" of some environmental status.
+
+2003-11-12 14:55 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbhashapi.h
     + Added missing declaration of hb_hashMerge()
   * source/vm/hash.c
@@ -28,7 +37,7 @@
 
   * source/rtl/filesys.c
     ! HB_THREAD_STUB removed when not necessary broken linux compilation.
-    
+
 
 2003-11-12 19:50 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.92 2003/11/11 20:20:52 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.93 2003/11/12 12:11:54 ronpinkas Exp $
  */
 
 /*
@@ -427,7 +427,7 @@ extern HB_EXPORT BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 extern HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
 extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend )
+extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend );
 extern HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 extern HB_EXPORT PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDestNullable ); /* Returns a property */

@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.10 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.11 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 #include "set.ch"
 
 #DEFINE  CRLF HB_OsNewLine()
-#xtranslate Write( <cString> ) => FWrite( FileHandle, <cString> ); HB_OutDebug( <cString> )
+#xtranslate Write( <cString> ) => FWrite( FileHandle, <cString> ) //;HB_OutDebug( <cString> )
 
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )

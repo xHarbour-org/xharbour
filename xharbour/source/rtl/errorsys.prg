@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.24 2003/11/07 18:20:53 jonnymind Exp $
+ * $Id: errorsys.prg,v 1.25 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -452,7 +452,7 @@ STATIC FUNCTION FWriteLine( nh, c )
      Fwrite( nh, c )
      Fwrite( nh, Chr( 13 ) )
      Fwrite( nh, Chr( 10 ) )
-     HB_OutDebug( c + Chr( 13 ) + Chr( 10 ) )
+     //HB_OutDebug( c + Chr( 13 ) + Chr( 10 ) )
 Return nil
 
 STATIC FUNCTION Arguments( oErr )
