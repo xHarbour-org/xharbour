@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.15 2003/03/02 15:22:30 jonnymind Exp $
+ * $Id: hbstack.h,v 1.16 2003/03/08 02:06:44 jonnymind Exp $
  */
 
 /*
@@ -102,7 +102,9 @@ typedef struct
 
 
 #ifndef HB_NO_DEFAULT_STACK_MACROS
+  #ifndef HB_STACK_MACROS
     #define HB_STACK_MACROS
+  #endif
 #endif
 
 extern HB_STACK hb_stack;
