@@ -55,10 +55,7 @@ STATIC PROCEDURE Excel()
 
    oAS:Cells( 1, 1 ):Select()
 
-   oAS:End()
-
    oExcel:Visible := .T.
-   oExcel:End()
 
 RETURN
 
@@ -68,7 +65,7 @@ STATIC PROCEDURE MsWord()
 
    LOCAL oWord, oText
 
-   oWord:=CreateObject( "Word.Application" )
+   oWord := CreateObject( "Word.Application" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Word not avialable." )
@@ -87,9 +84,6 @@ STATIC PROCEDURE MsWord()
    oWord:Visible := .T.
    oWord:WindowState := 1  // Maximize
 
-   oText:End()
-   oWord:End()
-
 RETURN
 
 //--------------------------------------------------------------------
@@ -98,7 +92,7 @@ STATIC PROCEDURE IEXPLORER()
 
    LOCAL oIE
 
-   oIE:=CreateObject( "InternetExplorer.Application" )
+   oIE := CreateObject( "InternetExplorer.Application" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! IExplorer not avialable." )
@@ -108,8 +102,6 @@ STATIC PROCEDURE IEXPLORER()
    oIE:Visible := .T.
 
    oIE:Navigate( "http://www.xharbour.org" )
-
-   oIE:End()
 
 RETURN
 
@@ -131,10 +123,6 @@ STATIC PROCEDURE OUTLOOK()
    oList := oOL:CreateItem( 7 )  // olDistributionListItem
    oList:DLName := "Distribution List"
    oList:Display( .F. )
-
-   oMail:End()
-   oList:End()
-   oOL:End()
 
 RETURN
 

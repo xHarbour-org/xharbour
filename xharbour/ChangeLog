@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.210 2002/05/09 07:25:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.211 2002/05/10 03:34:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-10 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rtl/win32ole.prg
+     + Now allows return parameter to return OLE object.
+     + Added support for SQL NULL.
+     - Removed the need for :End() deinitialization is automated.
+
+   * tests/pp.prg
+     + Added (under #ifdef WIN): EXTERN CreatObject
+
+   * tests/testole.prg
+     - Removed :End() calls.
 
 2002-05-09 20:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/rtl/win32ole.prg

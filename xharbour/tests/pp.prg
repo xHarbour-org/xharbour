@@ -49,6 +49,7 @@
       #ifdef WIN
          #COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "PP for Windows", 0 )
          EXTERN MessageBox
+         EXTERN CreateObject
       #endif
    #endif
 #else
@@ -2096,7 +2097,8 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
 					PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
 					ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
-   BREAK oErr
+   //BREAK oErr
+   __Quit()
 
 RETURN NIL // Unreacable code
 
