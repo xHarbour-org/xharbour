@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbdecode.prg,v 1.1 2004/02/03 08:40:55 andijahja Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ FUNCTION UUDECODE_FILE( cEncodedFile, cOutFile )
 
          IF !lStart
             lStart := .T.
-            IF "begin" IN cEncoded
+            IF "BEGIN" IN Upper( cEncoded )
                IF ValType( cOutFile ) != "C"
                   nAt := RAT( " ", cEncoded )
                   cOutFile := SUBSTR( cEncoded, nAT + 1 )
@@ -146,7 +146,7 @@ FUNCTION UUDECODE_FILE( cEncodedFile, cOutFile )
             ENDIF
          ENDIF
 
-         IF ! ( "end" IN cEncoded )
+         IF ! ( "END" IN Upper( cEncoded ) )
             cDecoded      := HB_UUDECODE( cEncoded )
             nBytesWritten += FWrite( hOut, cDecoded )
          ENDIF
@@ -190,7 +190,7 @@ FUNCTION B64DECODE_FILE( cEncodedFile, cOutFile )
 
          IF !lStart
             lStart := Empty( cEncoded )
-            IF "Content-Type" IN cEncoded
+            IF "CONTENT-TYPE" IN Upper( cEncoded )
                IF ValType( cOutFile ) != "C"
                   nAt := RAT( "=", cEncoded )
                   cOutFile := SUBSTR( cEncoded, nAT + 1 )
@@ -246,7 +246,7 @@ FUNCTION YYDECODE_FILE( cEncodedFile, cOutFile )
          IF !lStart
             lStart := .T.
 
-            IF "=ybegin" IN cEncoded
+            IF "=YBEGIN" IN Upper( cEncoded )
                IF ValType( cOutFile ) != "C"
                   nAt := RAT( "=", cEncoded )
                   cOutFile := SUBSTR( cEncoded, nAT + 1 )
@@ -258,7 +258,7 @@ FUNCTION YYDECODE_FILE( cEncodedFile, cOutFile )
             ENDIF
          ENDIF
 
-         IF ! ( "=yend" IN cEncoded )
+         IF ! ( "=YEND" IN Upper( cEncoded ) )
             cDecoded      := HB_YYDECODE( cEncoded )
             nBytesWritten += FWrite( hOut, cDecoded )
          ENDIF
