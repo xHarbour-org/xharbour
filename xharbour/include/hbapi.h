@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.57 2003/01/29 21:30:25 andijahja Exp $
+ * $Id: hbapi.h,v 1.58 2003/02/10 01:22:31 ronpinkas Exp $
  */
 
 /*
@@ -391,6 +391,7 @@ extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 
 /* dynamic symbol table management */
 extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
+extern PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
 extern PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol ); /* creates a new dynamic symbol based on a local one */
 extern PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
 extern PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */

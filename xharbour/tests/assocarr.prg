@@ -12,20 +12,27 @@ PROCEDURE Main()
     // Literal Syntax.
     aaContact  := { "First" => "John", "Last" => "Doe", "Phone" => "555-1212" }
 
-    // OOP Syntax:
+    // OOP Syntax (NOTE!!! Uses ALL UPPERCASE in OOP Syntax):
     aaEmployee:Contact := aaContact
     aaEmployee:Salary  := aaSalary
 
     TRY
        ? aaContact[ "Hourly" ] // Error! - Does not exist in THIS Array.
     CATCH oErr
-       ? "Caught:", oErr:Description, oErr:Operation
+       ? ProcLine(), "Caught:", oErr:Description, oErr:Operation
+       ?
+    END
+
+    TRY
+       ? aaContact[ "FIRST" ] // Error! - *CASE SENSITIVE* Does not exist in UPPERCASE.
+    CATCH oErr
+       ? ProcLine(), "Caught:", oErr:Description, oErr:Operation
        ?
     END
 
     // Mixed Syntax.
     ? aaEmployee:Contact["First"]
-    ? aaEmployee:Contact:Last
+    ? aaEmployee:Contact["Last"]
     ?
 
     // Keys extraction.

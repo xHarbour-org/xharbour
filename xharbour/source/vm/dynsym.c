@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.5 2002/10/28 20:37:27 mlombardo Exp $
+ * $Id: dynsym.c,v 1.6 2002/11/04 21:28:16 mlombardo Exp $
  */
 
 /*
@@ -212,6 +212,27 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
    return pDynSym;
 }
 
+PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+{
+   PHB_DYNS pDynSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
+
+   //TraceLog( NULL, "Searching: %s\n", szName );
+
+   pDynSym = hb_dynsymFind( szName );
+
+   if( ! pDynSym )       /* Does it exists ? */
+   {
+      //TraceLog( NULL, "Creating: %s\n", szName );
+      pDynSym = hb_dynsymNew( hb_symbolNew( szName ) );   /* Make new symbol */
+   }
+
+   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+
+   return pDynSym;
+}
+
 PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
@@ -363,17 +384,17 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          }
          else if (iLen1 == iLen2)
             bOk = 0;
-         
+
          if (bOk)
             return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
       }
-      
+
       /*
       *  We did not find the symbol, but "nCount" looks closer to the tree search
       *  than "nCountDial", when searching for "nCountDialog". So our best chance
       *  is to cut off szName up to 10 chars and redo the search.
       */
-      
+
       if (iLen1 > 10 && iLen2 < 10)
       {
          USHORT uiFirst = 0;
@@ -381,20 +402,20 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          USHORT uiMiddle = uiLast / 2;
          char szNameLimited[ 10 + 1 ];
          char * pDest = szNameLimited;
-         
+
          iLen1 = 10;
 
          pDest[ iLen1 ] = '\0';
 
          while( iLen1-- )
             *pDest++ = *szName++;
-   
+
          s_uiClosestDynSym = uiMiddle;                  /* Start in the middle      */
-   
+
          while( uiFirst < uiLast )
          {
             int iCmp = strcmp( s_pDynItems[ uiMiddle ].pDynSym->pSymbol->szName, szNameLimited );
-   
+
             if( iCmp == 0 )
             {
                s_uiClosestDynSym = uiMiddle;
@@ -422,7 +443,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
       *  closest ("cAliasNiv"). The best solution in this case is to complete szName
       *  with some trailing chars ( "_" ), and redo the process.
       */
-      
+
       if (iLen1 == 10 && iLen2 < 10)
       {
          USHORT uiFirst = 0;
@@ -431,7 +452,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          USHORT iuCount;
          char szNameExtended[ 10 + 8 ];
          char * pDest = szNameExtended;
-         
+
          pDest[ 17 ] = '\0';
 
          for (iuCount=0;iuCount<17;iuCount++)
@@ -443,11 +464,11 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          }
 
          s_uiClosestDynSym = uiMiddle;                  /* Start in the middle      */
-   
+
          while( uiFirst < uiLast )
          {
             int iCmp = strcmp( s_pDynItems[ uiMiddle ].pDynSym->pSymbol->szName, szNameExtended );
-   
+
             if( iCmp == 0 )
             {
                s_uiClosestDynSym = uiMiddle;
@@ -480,13 +501,13 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
                   break;
                }
             }
-            
+
             if (bOk)
                return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
          }
       }
    }
-   
+
    #endif
 
    return NULL;

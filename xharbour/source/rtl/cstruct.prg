@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.17 2002/11/29 20:09:17 walito Exp $
+ * $Id: cstruct.prg,v 1.18 2003/02/27 06:16:39 ronpinkas Exp $
  */
 
 /*
@@ -254,33 +254,33 @@ Function HB_CStructure( cStructure, nAlign )
 
       Counter := 1
       FOR EACH cMember IN acMembers
-         __clsAddMsg( hClass,       cMember, Counter  , HB_OO_MSG_DATA )
-         __clsAddMsg( hClass, "_" + cMember, Counter++, HB_OO_MSG_DATA )
+         __clsAddMsg( hClass,       cMember, Counter  , HB_OO_MSG_PROPERTY )
+         //__clsAddMsg( hClass, "_" + cMember, Counter++, HB_OO_MSG_DATA )
       NEXT
 
-      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_DATA )
-      __clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
+      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
+      //__clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, nAlign, /*HB_OO_CLSTP_READONLY*/ )
-      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, nAlign, /*HB_OO_CLSTP_READONLY*/ )
+      //__clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, HB_SizeOfCStructure( acTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
-      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( acTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
+      //__clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_DATA )
-      __clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
+      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
+      //__clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
 
-      __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
+      //__clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
 
       //TraceLog( Len( acTypes ), acTypes[1], acTypes )
 
@@ -411,33 +411,33 @@ Function HB_CTypeArrayID( CType, nLen )
 
          acMembers[Counter] := cMember
 
-         __clsAddMsg( hClass,       cMember, Counter, HB_OO_MSG_DATA )
-         __clsAddMsg( hClass, "_" + cMember, Counter, HB_OO_MSG_DATA )
+         __clsAddMsg( hClass,       cMember, Counter, HB_OO_MSG_PROPERTY )
+         //__clsAddMsg( hClass, "_" + cMember, Counter, HB_OO_MSG_DATA )
       NEXT
 
-      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_DATA )
-      __clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
+      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
+      //__clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
-      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
+      //__clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
-      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
+      //__clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_DATA )
-      __clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
+      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
+      //__clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
 
-      __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
+      //__clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
 
       // Sames as s_aClasses[nID][4]
       aFill( aCTypes, CType )

@@ -113,8 +113,8 @@ METHOD SetLink( oObj ) CLASS TFrame
    ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
       hClass := ::ClassH
       nSeq   := __cls_IncData( hClass )
-      __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_EXPORTED )
-      __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_EXPORTED )
+      __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED )
+      //__clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_EXPORTED )
    ENDIF
 
    __ObjSetValueList( self, { { cName, oObj } } )

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.42 2003/03/08 02:06:47 jonnymind Exp $
+ * $Id: classes.c,v 1.43 2003/03/18 22:12:38 ronpinkas Exp $
  */
 
 /*
@@ -473,7 +473,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
       // Allow anyway if all we do is read a property.
       if( pMethod->pMessage->pSymbol->szName[0] != '_' )
       {
-         return TRUE;;
+         return TRUE;
       }
    }
 
@@ -1052,123 +1052,128 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
    }
 }
 
-
-/* ================================================ */
-
-/*
- * __clsAddMsg( <hClass/pObject>, <cMessage>, <pFunction>, <nType>, [xInit], <uiScope>, <lPersistent> )
- *
- * Add a message to the class.
- *
- * <hClass>    Class handle
- * <cMessage>  Message
- * <pFunction> HB_OO_MSG_METHOD    : Pointer to function
- *             HB_OO_MSG_DATA      : Index number in array
- *             HB_OO_MSG_CLASSDATA : Index number in array
- *             HB_OO_MSG_INLINE    : Code block
- *             HB_OO_MSG_SUPER     : Handle of super class
- *
- * <nType>     see HB_OO_MSG_*
- *
- * <xInit>     HB_OO_MSG_DATA      : Optional initializer for DATA
- *             HB_OO_MSG_CLASSDATA : Optional initializer for DATA
- *             HB_OO_MSG_SUPER     : Index number in array (for instance SuperObject)
- *
- * <uiScope>   HB_OO_CLSTP_EXPORTED        1 : default for data and method
- *             HB_OO_CLSTP_PROTECTED       2 : method or data protected
- *             HB_OO_CLSTP_HIDDEN          4 : method or data hidden
- *             HB_OO_CLSTP_CTOR            8 : method constructor
- *             HB_OO_CLSTP_READONLY       16 : data read only
- *             HB_OO_CLSTP_SHARED         32 : (method or) data shared
- *             HB_OO_CLSTP_CLASS          64 : message is the name of a superclass
- *             HB_OO_CLSTP_SUPER         128 : message is herited
- *             HB_OO_CLSTP_CLASSCTOR     256 : Class method constructor
- *             HB_OO_CLSTP_CLASSMETH     512 : Class method
- */
-
-
-HB_FUNC( __CLSADDMSG )
+// Worker function for HB_FUNC( __CLSADDMSG ).
+void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
-   USHORT uiClass = ( USHORT ) hb_parni( 1 );
-   PHB_ITEM pObject;
-   USHORT uiScope = ( USHORT ) ( ISNUM( 6 ) ? hb_parni( 6 ) : HB_OO_CLSTP_EXPORTED );
-   BOOL   bPersistent = hb_parl( 7 );
-
-   if( uiClass == 0 )
-   {
-      pObject = hb_param( 1, HB_IT_ARRAY );
-
-      if( pObject )
-      {
-         uiClass = pObject->item.asArray.value->uiClass;
-      }
-   }
-
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS   pClass   = s_pClasses + ( uiClass - 1 );
-
       PHB_DYNS pMessage ;
-
-      USHORT   uiBucket;
-
-      USHORT   wType    = ( USHORT ) hb_parni( 4 );
-      USHORT   uiAt;
+      USHORT   uiBucket, uiAt;
       PMETHOD  pNewMeth;
 
-      if     (strcmp("+",hb_parc(2)) == 0)
+      if( strcmp( "+", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpPlus" ) ;
-      else if (strcmp("-",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "-", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpMinus") ;
-      else if (strcmp("*",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "*", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpMult" ) ;
-      else if (strcmp("/",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "/", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpDivide") ;
-      else if (strcmp("%",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "%", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpMod"  ) ;
-      else if (strcmp("^",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "^", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpPower") ;
-      else if (strcmp("**",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "**", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpPower"  ) ;
-      else if (strcmp("++",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "++", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpInc"  ) ;
-      else if (strcmp("--",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "--", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpDec"  ) ;
-      else if (strcmp("==",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "==", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpEqual") ;
-      else if (strcmp("=",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "=", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpEqual") ;
-      else if (strcmp("!=",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "!=", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpNotEqual") ;
-      else if (strcmp("<>",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "<>", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpNotEqual") ;
-      else if (strcmp("#",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "#", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpNotEqual") ;
-      else if (strcmp("<",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "<", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpLess" ) ;
-      else if (strcmp("<=",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "<=", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpLessEqual") ;
-      else if (strcmp(">",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ">", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpGreater") ;
-      else if (strcmp(">=",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ">=", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpGreaterEqual") ;
-      else if (strcmp(":=",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ":=", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpAssign") ;
-      else if (strcmp("$",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "$", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpInstring") ;
-      else if (strcmp("!",hb_parc(2)) == 0)
+      }
+      else if (strcmp( "!", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpNot"    ) ;
-      else if (strcmp(".NOT.",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ".NOT.", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpNot"    ) ;
-      else if (strcmp(".AND.",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ".AND.", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpAnd"    ) ;
-      else if (strcmp(".OR.",hb_parc(2)) == 0)
+      }
+      else if (strcmp( ".OR.", szMessage) == 0 )
+      {
          pMessage = hb_dynsymGet( "__OpOr"     ) ;
+      }
       else
-         pMessage = hb_dynsymGet( hb_parc( 2 ) );
+      {
+         if( bCase )
+         {
+            pMessage = hb_dynsymGetCase( szMessage );
+         }
+         else
+         {
+            pMessage = hb_dynsymGet( szMessage );
+         }
+      }
 
-      if( wType == HB_OO_MSG_INLINE && hb_param( 3, HB_IT_BLOCK ) == NULL )
+      if( wType == HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == NULL )
+      {
          hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSADDMSG", 0 );
+      }
 
       if( pClass->uiMethods > ( pClass->uiHashKey * BUCKET /* * 2 / 3 */ ) )
       {
@@ -1217,7 +1222,6 @@ HB_FUNC( __CLSADDMSG )
          pClass->uiMethods++;           /* One more message */
       }
 
-
       pNewMeth->uiSprClass = uiClass  ; /* now used !! */
       pNewMeth->bClsDataInitiated = 0 ; /* reset state */
       pNewMeth->ulCalls = 0;
@@ -1227,37 +1231,37 @@ HB_FUNC( __CLSADDMSG )
 
       /* in case of re-used message */
       if ( pNewMeth->pInitValue )
-       {
-        hb_itemRelease(pNewMeth->pInitValue) ;
-        pNewMeth->pInitValue = 0 ;
-       }
+      {
+         hb_itemRelease(pNewMeth->pInitValue) ;
+         pNewMeth->pInitValue = 0 ;
+      }
 
       switch( wType )
       {
          case HB_OO_MSG_METHOD:
-
-            pNewMeth->pFunction = ( PHB_FUNC ) hb_parnl( 3 );
+            pNewMeth->pFunction = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiData = 0;
             break;
 
          case HB_OO_MSG_DATA:
-
-            pNewMeth->uiData = ( USHORT ) hb_parnl( 3 );
+            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
             pNewMeth->uiScope = uiScope;
 
-            if( pMessage->pSymbol->szName[ 0 ] == '_' )
+            if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
+            {
                pNewMeth->pFunction  = hb___msgSetData;
+            }
             else
             {
-               PHB_ITEM pInit = hb_param( 5, HB_IT_ANY );
-
                pNewMeth->pFunction  = hb___msgGetData;
 
                if( pInit && ! HB_IS_NIL( pInit ) ) /* Initializer found */
                {
                   if( HB_IS_ARRAY( pInit ) )
+                  {
                      pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                  }
                   else
                   {
                      pNewMeth->pInitValue = hb_itemNew( NULL );
@@ -1265,26 +1269,28 @@ HB_FUNC( __CLSADDMSG )
                   }
                }
             }
+
             break;
 
          case HB_OO_MSG_CLASSDATA:
-
-            pNewMeth->uiData  = ( USHORT ) hb_parnl( 3 );
+            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
             pNewMeth->uiDataShared = pNewMeth->uiData ;
 
             pNewMeth->uiScope = uiScope;
 
             if( ( USHORT ) hb_arrayLen( pClass->pClassDatas ) < pNewMeth->uiData )
-              hb_arraySize( pClass->pClassDatas, pNewMeth->uiData );
-
-            if( pMessage->pSymbol->szName[ 0 ] != '_' )
             {
-               PHB_ITEM pInit = hb_param( 5, HB_IT_ANY );
+              hb_arraySize( pClass->pClassDatas, pNewMeth->uiData );
+            }
 
+            if( ! ( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' ) )
+            {
                if( pInit && ! HB_IS_NIL( pInit ) ) /* Initializer found */
                {
                   if( HB_IS_ARRAY( pInit ) )
+                  {
                      pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                  }
                   else
                   {
                      pNewMeth->pInitValue = hb_itemNew( NULL );
@@ -1295,60 +1301,161 @@ HB_FUNC( __CLSADDMSG )
 
             if( ( pNewMeth->uiScope & HB_OO_CLSTP_SHARED ) != HB_OO_CLSTP_SHARED )
             {
-               if( pMessage->pSymbol->szName[ 0 ] == '_' )
+               if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
+               {
                   pNewMeth->pFunction = hb___msgSetClsData;
+               }
                else
+               {
                   pNewMeth->pFunction = hb___msgGetClsData;
-
+               }
             }
             else
             {
-               if( pMessage->pSymbol->szName[ 0 ] == '_' )
+               if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
                 {
                   pNewMeth->pFunction = hb___msgSetShrData;
                   pClass->uiDatasShared++;
                 }
                else
+               {
                   pNewMeth->pFunction = hb___msgGetShrData;
+               }
             }
 
             break;
 
          case HB_OO_MSG_INLINE:
-
             pNewMeth->uiData = ( USHORT ) ( hb_arrayLen( pClass->pInlines ) + 1 );
             pNewMeth->uiScope = uiScope;
             hb_arraySize( pClass->pInlines, pNewMeth->uiData );
-            hb_arraySet( pClass->pInlines, pNewMeth->uiData, hb_param( 3, HB_IT_BLOCK ) );
+            hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) lID_or_FuncPointer_or_BlockPointer );
             pNewMeth->pFunction = hb___msgEvalInline;
             break;
 
          case HB_OO_MSG_VIRTUAL:
-
             pNewMeth->pFunction = hb___msgVirtual;
             break;
 
          case HB_OO_MSG_SUPER:
-
-            pNewMeth->uiData = ( USHORT ) hb_parnl( 3 );
-            pNewMeth->uiSprClass = ( USHORT ) hb_parnl( 5 ); /* store the super handel */
+            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
+            pNewMeth->uiSprClass = ( USHORT ) uiSprClass; /* store the super handel */
             pNewMeth->uiScope = uiScope;
             pNewMeth->pFunction = hb___msgSuper;
             break;
 
          case HB_OO_MSG_ONERROR:
-
-            pClass->pFunError = ( PHB_FUNC ) hb_parnl( 3 );
+            pClass->pFunError = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
             break;
 
          default:
-
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
             break;
       }
    }
 }
 
+/*
+ * __clsAddMsg( <hClass/pObject>, <cMessage>, <pFunction>, <nType>, [xInit], <uiScope>, <lPersistent> )
+ *
+ * Add a message to the class.
+ *
+ * <hClass>    Class handle
+ * <cMessage>  Message
+ * <pFunction> HB_OO_MSG_METHOD    : Pointer to function
+ *             HB_OO_MSG_DATA      : Index number in array
+ *             HB_OO_MSG_CLASSDATA : Index number in array
+ *             HB_OO_MSG_INLINE    : Code block
+ *             HB_OO_MSG_SUPER     : Handle of super class
+ *
+ * <nType>     see HB_OO_MSG_*
+ *
+ * <xInit>     HB_OO_MSG_DATA      : Optional initializer for DATA
+ *             HB_OO_MSG_CLASSDATA : Optional initializer for DATA
+ *             HB_OO_MSG_SUPER     : Index number in array (for instance SuperObject)
+ *
+ * <uiScope>   HB_OO_CLSTP_EXPORTED        1 : default for data and method
+ *             HB_OO_CLSTP_PROTECTED       2 : method or data protected
+ *             HB_OO_CLSTP_HIDDEN          4 : method or data hidden
+ *             HB_OO_CLSTP_CTOR            8 : method constructor
+ *             HB_OO_CLSTP_READONLY       16 : data read only
+ *             HB_OO_CLSTP_SHARED         32 : (method or) data shared
+ *             HB_OO_CLSTP_CLASS          64 : message is the name of a superclass
+ *             HB_OO_CLSTP_SUPER         128 : message is herited
+ *             HB_OO_CLSTP_CLASSCTOR     256 : Class method constructor
+ *             HB_OO_CLSTP_CLASSMETH     512 : Class method
+ */
+HB_FUNC( __CLSADDMSG )
+{
+   USHORT   uiClass, uiScope, wType, uiSprClass;
+   char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN ];
+   long     lID_or_FuncPointer_or_BlockPointer;
+   PHB_ITEM pInit = NULL;
+   BOOL     bPersistent, bCase;
+
+   // 1
+   uiClass = ( USHORT ) hb_parni( 1 );
+   if( uiClass == 0 )
+   {
+      PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
+
+      if( pObject )
+      {
+         uiClass = pObject->item.asArray.value->uiClass;
+      }
+   }
+
+   // 2
+   szMessage = hb_parc( 2 );
+
+   // 3
+   lID_or_FuncPointer_or_BlockPointer = (long) hb_param( 3, HB_IT_BLOCK );
+   if( lID_or_FuncPointer_or_BlockPointer == NULL )
+   {
+      lID_or_FuncPointer_or_BlockPointer = hb_parnl( 3 );
+   }
+
+   // 4
+   wType = ( USHORT ) hb_parni( 4 );
+
+   // 5 Follows below becuase might be using 6, 7 and 8.
+
+   // 6
+   uiScope = ( USHORT ) ( ISNUM( 6 ) ? hb_parni( 6 ) : HB_OO_CLSTP_EXPORTED );
+
+   // 7
+   bPersistent = hb_parl( 7 );
+
+   // 8
+   bCase = hb_parl( 8 );
+
+   // 5
+   switch ( wType )
+   {
+      case HB_OO_MSG_DATA:
+      case HB_OO_MSG_CLASSDATA:
+         pInit = hb_param( 5, HB_IT_ANY );
+         break;
+
+      case HB_OO_MSG_PROPERTY:
+      case HB_OO_MSG_CLASSPROPERTY:
+         wType -= HB_OO_PROPERTY;
+
+         hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, uiSprClass, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
+
+         szAssign[0] = '_';
+         szAssign[1] = '\0';
+         strcat( (char*) szAssign, szMessage );
+         szMessage = (char *) szAssign;
+         break;
+
+      default:
+         uiSprClass = ( USHORT ) hb_parnl( 5 ); /* store the super handel */
+   }
+
+   // Call worker function.
+   hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, uiSprClass, uiScope, bPersistent, pInit, TRUE, bCase );
+}
 
 /*
  * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [ahSuper,aoSuper] )

@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.11 2003/01/27 04:15:58 walito Exp $
+ * $Id: objfunc.prg,v 1.12 2003/01/31 09:08:20 ronpinkas Exp $
  */
 
 /*
@@ -282,8 +282,8 @@ FUNCTION __objAddData( oObject, cSymbol, nScope )
          nScope := HB_OO_CLSTP_EXPORTED
       ENDIF
 
-      __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
-      __clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
+      __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_PROPERTY, NIL, nScope )
+      //__clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
    ENDIF
 
 RETURN oObject

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.868 2003/03/22 17:44:10 lculik Exp $
+ * $Id: ChangeLog,v 1.869 2003/03/23 13:33:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,59 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-24 18:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/dynsym.c
+    + Added: PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+
+  * include/hboo.ch
+    + Added:
+        #define HB_OO_PROPERTY          8
+        #define HB_OO_MSG_PROPERTY      HB_OO_MSG_DATA      + HB_OO_PROPERTY // Auto management of DATA.
+        #define HB_OO_MSG_CLASSPROPERTY HB_OO_MSG_CLASSDATA + HB_OO_PROPERTY // Auto management of CLASSDATA.
+
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + Added C level function hb_clsAddMsg()
+    * Modified HB_FUNC( __CLSADDMSG ) to use worker function hb_clsAddMsg()
+    + Added support for new HB_OO_MSG_PROPERTY and HB_OO_MSG_CLASSPROPERTY.
+    + Added support for 8th paramater <bCase> to allow CASE SENSTIVE Messages.
+    ! Fixed to allow Instance Variables of an Object to be named with a starting '_' (Clipper compatibility)
+
+  * contrib/Whoo/source/TFrame.prg
+  * source/rtl/cstruct.prg
+  * source/rtl/objfunc.prg
+  * source/rtl/tclass.prg
+  * source/rtl/tobject.prg
+    % Optimzed to use new HB_OO_MSG_PROPERTY and HB_OO_MSG_CLASSPROPERTY instead of HB_OO_MSG_DATA and HB_OO_MSG_CLASSDATA.
+    + Added CASE SENSTIVE support to TAssociativeArray() class.
+
+   /*
+      NOTE: Class creation is greatly optimized and should be noticbly faster in applications utilizing many classes such as FWH.
+   */
+
+  * tests/assocarr.prg
+    + Added code an comments to demonstrate CASE SENSITIVE support in Associative Arrays.
+
+  * include/hbsetup.h
+    * Increaded HB_PCODE_VER  to 4 !!!
+
+  /*
+     WARNING!
+     --------
+     This change REQUIRES a CLEAN BUILD!!!
+     This change REQUIRES a CLEAN BUILD of all 3rd libraries!!!
+  */
+
 2003-03-23 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbreadini.prg
     * Line continuation is now the string " ||" (that is, two pipes
       preceded by at least a space). "Void" continuation lines
       (that is, two pipes alone on a line) are NOT allowed.
-    
-    * tests/parseini.ini 
+
+    * tests/parseini.ini
       * Changed to demponstrate the feature
-      
+
 2003-03-22 14:36 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/libct/files.c
     % reformated and added filedelete function

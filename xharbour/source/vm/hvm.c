@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.181 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: hvm.c,v 1.182 2003/03/16 06:00:34 jonnymind Exp $
  */
 
 /*
@@ -2573,7 +2573,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
-   //JC1: do not allow cancellation or idle MT func: thread cleanup procedure 
+   //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
 }
 
@@ -3726,7 +3726,7 @@ static void hb_vmArrayPush( void )
    }
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
    {
-      hb_vmPushSymbol( hb_dynsymGet( pIndex->item.asString.value )->pSymbol );
+      hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
       hb_itemPushForward( pArray );
 
       hb_vmSend( 0 );
@@ -3923,7 +3923,7 @@ static void hb_vmArrayPop( void )
    }
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
    {
-      char szMessage[ HB_SYMBOL_NAME_LEN + 1 ];
+      char szMessage[ HB_SYMBOL_NAME_LEN ];
 
       szMessage[0] = '_';
       szMessage[1] = '\0';
@@ -3935,7 +3935,7 @@ static void hb_vmArrayPop( void )
 
          // Recicle pValue as Message.
          pValue->type = HB_IT_SYMBOL;
-         pValue->item.asSymbol.value = hb_dynsymGet( szMessage )->pSymbol;
+         pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
          pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
 
          if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
@@ -3945,7 +3945,7 @@ static void hb_vmArrayPop( void )
 
          hb_vmSend( 1 );
       #else
-         hb_vmPushSymbol( hb_dynsymGet( szMessage )->pSymbol );
+         hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
          hb_vmPush( pArray );
          hb_vmPush( pValue );
 
@@ -4543,7 +4543,7 @@ void hb_vmSend( USHORT uiParams )
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
 
-   //printf( "Symbol: '%s'\n", pSym->szName );
+   //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
    if( HB_IS_BYREF( pSelf ) )
    {
@@ -4615,7 +4615,9 @@ void hb_vmSend( USHORT uiParams )
 
       HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
+      //TraceLog( NULL, "Doing %i\n", pFunc );
       pFunc();
+      //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 

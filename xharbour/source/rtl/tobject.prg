@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.5 2003/03/09 17:30:37 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.6 2003/03/09 22:55:01 ronpinkas Exp $
  */
 
 /*
@@ -176,104 +176,53 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
       RETURN __errRT_SBASE( EG_NOVARMETHOD, 1005, cDesc, cClass + ":" + cMsg )
    ENDIF
 
-   RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
+RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 
+FUNCTION TAssociativeArray( aInit )
 
-#ifdef HB_USE_ARRAYS
-    FUNCTION TAssociativeArray
+   LOCAL hClass
+   LOCAL  aMember, nSeq := 1
+   LOCAL aKeys := {}
 
-       STATIC s_hClass
+   // Intentionally creating NEW Class for every instance - Don't change!
+   IF ValType( aInit ) == 'A'
+      hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
 
-       IF s_hClass == NIL
-          s_hClass := __clsNew( "TASSOCIATIVEARRAY", 2, 0 )
+      FOR EACH aMember IN aInit
+         __clsAddMsg( hClass, aMember[1], nSeq++, HB_OO_MSG_PROPERTY, aMember[2], HB_OO_CLSTP_EXPORTED, .T., .T. )
+         aAdd( aKeys, aMember[1] )
+      NEXT
+   ELSE
+      hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
+   ENDIF
 
-          __clsAddMsg( s_hClass,   "$Members", 1, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
-          __clsAddMsg( s_hClass,  "_$Members", 1, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+   // Intentionally using DEATCHED Local.
+   __clsAddMsg( hClass, "Keys"     , {|Self, cKey | IIF( cKey == NIL, , aAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
 
-          __clsAddMsg( s_hClass,    "$Values", 2, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
-          __clsAddMsg( s_hClass,   "_$Values", 2, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+   __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
 
-          __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
-       ENDIF
+RETURN __clsInst( hClass )
 
-    RETURN __clsInst( s_hClass )
+STATIC FUNCTION TAssociativeArray_OnError( xParam )
 
-    STATIC FUNCTION TAssociativeArray_OnError( xParam )
+    LOCAL cMsg, cProperty
+    LOCAL hClass, nSeq
 
-        LOCAL cMsg := __GetMessage()
-        LOCAL aMembers := QSelf()[1], aValues := QSelf()[2]
-        LOCAL bAssign := .F.
-        LOCAL nMsg
+    cMsg := __GetMessage()
+    //TraceLog( cMsg )
 
-        IF cMsg[1] == '_'
-           bAssign := .T.
-           cMsg := SubStr( cMsg, 2 )
-        ENDIF
+    IF cMsg[1] == '_'
+       hClass    := QSelf():ClassH
+       nSeq      := __cls_IncData( hClass )
+       cProperty := SubStr( cMsg, 2 )
 
-        nMsg := aScan( aMembers, cMsg, , , .T. )
+       __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T., .T. )
 
-        IF nMsg = 0
-           IF bAssign
-              aAdd( aMembers, cMsg )
-              aAdd( aValues, xParam )
-           ELSE
-              Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
-           ENDIF
-        ELSE
-           IF bAssign
-              aValues[nMsg]:= xParam
-           ELSE
-              RETURN aValues[nMsg]
-           ENDIF
-        ENDIF
+       QSelf():Keys( cProperty )
 
-    RETURN NIL
-#else
-    FUNCTION TAssociativeArray( aInit )
+       QSelf()[ cProperty ] := xParam
+    ELSE
+       Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+    ENDIF
 
-       LOCAL hClass
-       LOCAL  aMember, nSeq := 1
-       LOCAL aKeys := {}
-
-       // Intentionally creating NEW Class for every instance - Don't change!
-       IF ValType( aInit ) == 'A'
-          hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
-
-          FOR EACH aMember IN aInit
-             __clsAddMsg( hClass,       aMember[1], nSeq++, HB_OO_MSG_DATA, aMember[2] )
-             __clsAddMsg( hClass, '_' + aMember[1], nSeq  , HB_OO_MSG_DATA )
-             aAdd( aKeys, aMember[1] )
-          NEXT
-       ELSE
-          hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
-       ENDIF
-
-       // Intentionally using DEATCHED Local.
-       __clsAddMsg( hClass, "Keys"     , {|Self, cKey | IIF( cKey == NIL, , aAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
-
-       __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
-
-    RETURN __clsInst( hClass )
-
-    STATIC FUNCTION TAssociativeArray_OnError( xParam )
-
-        LOCAL cMsg := __GetMessage(), cProperty
-        LOCAL hClass, nSeq
-
-        IF cMsg[1] == '_'
-           hClass    := QSelf():ClassH
-           nSeq      := __cls_IncData( hClass )
-           cProperty := SubStr( cMsg, 2 )
-
-           __clsAddMsg( hClass, cMsg     , nSeq, HB_OO_MSG_DATA )
-           __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_DATA )
-
-           QSelf():Keys( cProperty )
-
-           QSelf()[ cProperty ] := xParam
-        ELSE
-           Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
-        ENDIF
-
-    RETURN NIL
-#endif
+RETURN NIL
