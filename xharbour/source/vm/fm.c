@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.42 2003/08/07 21:33:00 druzus Exp $
+ * $Id: fm.c,v 1.43 2003/08/25 22:25:04 ronpinkas Exp $
  */
 
 /*
@@ -773,9 +773,6 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock )
       {
-         /* Safety Termination. */
-         ( (char *) ( pMemBlock + 1 ) )[ pMemBlock->ulSize - 1 ] = '\0';
-
          HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %lu) %s(%i), \"%s\"",
             ui++,
             (char *) ( pMemBlock + 1 ),
@@ -1084,15 +1081,12 @@ ULONG hb_xquery( USHORT uiMode )
         USHORT ui;
         PHB_MEMINFO pMemBlock;
 
-        printf( "Total %li allocations (%li reallocation), of which %li freed.\n", s_lAllocations, s_lReAllocations, s_lFreed );
-        printf( "--------------------------------------------------------------------------------------\n" );
+        TraceLog( NULL, "Total %li allocations (%li reallocation), of which %li freed.\n", s_lAllocations, s_lReAllocations, s_lFreed );
+        TraceLog( NULL, "--------------------------------------------------------------------------------------\n" );
 
         for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock )
         {
-           /* Safety Termination. */
-           ( (char *) ( pMemBlock + 1 ) )[ pMemBlock->ulSize - 1 ] = '\0';
-
-           printf( "Block %i %p (size %lu) %s(%i), \"%s\"\n",
+           TraceLog( NULL, "Block %i %p (size %lu) %s(%i), \"%s\"\n",
               ui++,
               (char *) ( pMemBlock + 1 ),
               pMemBlock->ulSize,
