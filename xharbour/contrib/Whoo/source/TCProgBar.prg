@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.3 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.4 2002/10/11 22:37:36 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -86,7 +86,6 @@ METHOD SetPosition(n) CLASS TProgressBar
       ::DrawText()
    END
    UpdateWindow( ::handle )
-   view n
 RETURN(self)
 
 METHOD DrawText() CLASS TProgressBar

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TPanel.prg,v 1.9 2002/10/11 03:53:16 what32 Exp $
  */
 
 /*
@@ -39,6 +39,18 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TPanel FROM TForm
+   DATA biSystemMenu EXPORTED INIT .T.
+   DATA biMinimize   EXPORTED INIT .T.
+   DATA biMaximize   EXPORTED INIT .T.
+
+   ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+   
+   ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+
+   ASSIGN biMaximize(l)   INLINE ::SetStyle(WS_MINIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
 
    METHOD New()
 

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TForm.prg,v 1.39 2002/10/11 03:53:16 what32 Exp $
  */
 
 /*
@@ -45,9 +45,34 @@ CLASS TForm FROM TWindow
    DATA WindowMenu   EXPORTED
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
+
    DATA biSystemMenu EXPORTED INIT .T.
    DATA biMinimize   EXPORTED INIT .T.
    DATA biMaximize   EXPORTED INIT .T.
+
+   ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+   
+   ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+
+   ASSIGN biMaximize(l)   INLINE ::SetStyle(WS_MINIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+
+   DATA BorderStyle EXPORTED AS ARRAY INIT {;
+      {"bsDialog",      WS_POPUP+WS_CAPTION+WS_DLGFRAME+WS_SYSMENU,   0 },;
+      {"bsNone",        WS_POPUP,                                     0 },;
+      {"bsSingle",      WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+;
+                        WS_MINIMIZEBOX+WS_MAXIMIZEBOX,                0 },;
+      {"bsSizeable",    WS_OVERLAPPEDWINDOW,                          0 },;
+      {"bsSizeToolWin", WS_OVERLAPPEDWINDOW,           WS_EX_TOOLWINDOW },;
+      {"bsToolWindow",  WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+;
+                        WS_MINIMIZEBOX+WS_MAXIMIZEBOX, WS_EX_TOOLWINDOW } }
+
+   ASSIGN BorderStyle(n) INLINE SetWindowLong( ::handle, GWL_STYLE,   ::BorderStyle[n][2] ),;
+                                SetWindowLong( ::handle, GWL_EXSTYLE, ::BorderStyle[n][3] ),;
+                                ::Style := GetWindowLong( ::handle, GWL_EXSTYLE ),n
+
    METHOD New()
    METHOD Add()
    METHOD Del()

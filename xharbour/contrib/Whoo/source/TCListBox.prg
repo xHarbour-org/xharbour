@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TCListBox.prg,v 1.10 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -120,7 +120,6 @@ METHOD GetSelItems() CLASS TListBox
 
    LOCAL n    := ::GetSelCount()
    LOCAL cBuf := space(n * 4)
-   view n
    SendMessage( ::handle, LB_GETSELITEMS, n, @cBuf)
 
    RETURN( bin2array(cBuf, "int[" + str(n) + "]") )

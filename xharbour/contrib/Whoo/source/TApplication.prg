@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TApplication.prg,v 1.26 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -113,7 +113,6 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
    
    IF oParent:handle == ::handle
       aAdd( ::aForms, oForm )
-      view LEN( ::aForms )   
    ENDIF
    
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
@@ -140,7 +139,6 @@ METHOD RemoveForm( oForm ) CLASS Application
          nRet := 1
       ENDIF
    ENDIF
-view LEN( ::aForms )   
 return(nRet)
 
 *------------------------------------------------------------------------------*

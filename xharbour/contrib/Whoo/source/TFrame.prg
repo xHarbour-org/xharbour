@@ -41,6 +41,15 @@ CLASS TFrame FROM TWindow
    DATA biSystemMenu EXPORTED INIT .T.
    DATA biMinimize   EXPORTED INIT .T.
    DATA biMaximize   EXPORTED INIT .T.
+
+   ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+   
+   ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+
+   ASSIGN biMaximize(l)   INLINE ::SetStyle(WS_MINIMIZEBOX,l),;
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
    METHOD New()
    METHOD Add()
    METHOD SetLink()
