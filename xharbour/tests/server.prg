@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo server program
-* $Id: server.prg,v 1.7 2003/01/14 02:40:40 jonnymind Exp $
+* $Id: server.prg,v 1.8 2003/04/13 23:55:26 jonnymind Exp $
 *
 * Giancarlo Niccolai
 *
@@ -63,7 +63,15 @@ Procedure Main( cPort )
       nResponse := InetSend( s, "Welcome to my server!" + CRLF )
 
       DO WHILE bCont
+         // This timeout ...
+         InetSetTimeout( s, 250 )
+         // ... will trigger this periodic callback,
+         InetSetPeriodCallback( s, { @Progress(), @nTurn, 6, 39 } )
+         // that will be called each TIMEOUT Milliseconds.
          cResponse := InetRecvLine( s, @nResponse )
+         // InetRecvLine won't return until the periodic callback returns .F.,
+         // or the Timelimit has been reached. Timelimit is currently -1, so
+         // InetRecvLine will wait forever.
 
          DO CASE
             CASE InetErrorCode( s ) == 0
