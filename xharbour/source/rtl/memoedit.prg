@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
+ * $Id: memoedit.prg,v 1.4 2002/04/30 04:38:36 walito Exp $
  */
 
 /*
@@ -188,10 +188,15 @@ METHOD HandleUserKey(nKey, nUserKey) CLASS TMemoEditor
          endif
 
       // TOFIX: Not clipper compatible, see teditor.prg
+      if nKey == K_ALT_W
+           super:Edit(nKey)
+      endif
+
       case (nUserKey >= 1 .AND. nUserKey <= 31) .OR. nUserKey == K_ALT_W
          if AScan(aUnHandledKeys, nUserKey) == 0
             super:Edit(nUserKey)
          endif
+
 
       case nUserKey == ME_DATA
          if nKey <= 256 .AND. AScan(aUnHandledKeys, nKey) == 0
