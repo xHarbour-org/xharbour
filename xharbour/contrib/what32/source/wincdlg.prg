@@ -159,17 +159,19 @@ if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
       c:=''
       FOR n:=1 TO LEN(cFile)
           IF SUBSTR(cFile,n,1)==CHR(0)
-             AADD(aFiles,c)
+             AADD(aFiles,cPath+'\'+c)
              c:=''
              LOOP
           END
           c+=SUBSTR(cFile,n,1)
       NEXT
      ELSE
+      /*
       cFile:=cPath
       x:=RAT('\',cFile)
       cPath:=LEFT(cFile,x-1)
-      aFiles:={STRTRAN(STRTRAN(cFile,cPath),'\')}
+      */
+      aFiles:={cPath} //STRTRAN(STRTRAN(cFile,cPath),'\')}
    END
    Return(aFiles)
 else
