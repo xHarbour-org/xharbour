@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.34 2003/03/27 21:00:18 jonnymind Exp $
+ * $Id: dbfntx1.c,v 1.35 2003/04/09 19:02:21 lculik Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static void  hb_ntxIndexFree( LPNTXINDEX pIndex );
 static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex );
          /* Create index from database */
 
-static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, char *szKeyExpr,
+static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, BOOL fTagName, char *szKeyExpr,
          PHB_ITEM pKeyExpr, BYTE bKeyType, USHORT uiKeyLen, USHORT uiKeyDec, char *szForExp,
          PHB_ITEM pForExp, BOOL fAscendKey, BOOL fUnique, BOOL fCustom, BOOL fMemory );
          /* Create Compound Tag with information about index */
@@ -485,9 +485,18 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
          LPKEYINFO pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
 
          strcpy( pKey->key,pTag->topScope->item.asString.value );
+         pTag->CurKeyInfo->Tag = pTag->CurKeyInfo->Xtra = pTag->TagEOF = 0;
          lRecno = ( hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ),
                       pKey, FALSE, TRUE ) <= 0 )? pTag->CurKeyInfo->Xtra:0;
          hb_ntxKeyFree( pKey );
+         if( lRecno )
+         {
+            pPage =  hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
+            pPage->CurKey = hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra );
+            if( pPage->CurKey )
+               strcpy( pTag->CurKeyInfo->key, ( KEYITEM( pPage, pPage->CurKey-1 ) )->key );
+            hb_ntxPageRelease( pTag,pPage );
+         }
       }
       else
       {
@@ -2392,6 +2401,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
 
       return TRUE;
    }
+      return TRUE;
 }
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
@@ -2588,6 +2598,9 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
             hb_vmSend( 0 );
          }
       }
+      else if( pArea->lpdbRelations )
+         SELF_SKIP( ( AREAP ) pArea, 1 );
+
    }
    hb_ntxSortKeyEnd( pTag, &sortInfo );
    if(( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
@@ -2638,6 +2651,9 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
       strcpy( Header.key_expr , pIndex->CompoundTag->KeyExpr );
       if( pIndex->CompoundTag->ForExpr )
          strcpy( Header.for_expr , pIndex->CompoundTag->ForExpr );
+      if( pIndex->CompoundTag->fTagName )
+         strcpy( Header.tag_name , pIndex->CompoundTag->TagName );
+
       Header.unique = pIndex->CompoundTag->UniqueKey;
       Header.descend = !pIndex->CompoundTag->AscendKey;
       Header.custom = pIndex->CompoundTag->Custom;
@@ -2649,7 +2665,7 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
       hb_fsWrite( pIndex->DiskFile,(BYTE*)&Header,16 );
 }
 
-static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, char *szKeyExpr,
+static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, BOOL fTagName, char *szKeyExpr,
     PHB_ITEM pKeyExpr, BYTE bKeyType, USHORT uiKeyLen, USHORT uiKeyDec,
     char *szForExp, PHB_ITEM pForExp, BOOL fAscendKey, BOOL fUnique,
     BOOL fCustom, BOOL fMemory )
@@ -2659,6 +2675,7 @@ static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, char *szKeyExpr,
    pTag = ( LPTAGINFO ) hb_xgrab( sizeof( TAGINFO ) );
    memset( pTag, 0, sizeof( TAGINFO ) );
    pTag->TagName = ITN;
+   pTag->fTagName = fTagName;
    pTag->Owner = PIF;
    if( szKeyExpr )
    {
@@ -2793,8 +2810,19 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *ITN)
    pIndex->NextAvail = Header.next_page;
    pTag->TagBlock = ulPos - 1024;
    pTag->RootBlock = Header.root;
-   pTag->TagName = (char *) hb_xgrab( strlen( ITN ) + 1 );
-   hb_strncpyUpper( pTag->TagName, ITN, strlen( ITN ) );
+   if( Header.tag_name[0] > 20 )
+   {
+      pTag->fTagName = TRUE;
+      pTag->TagName = (char *) hb_xgrab( strlen( Header.tag_name ) + 1 );
+      hb_strncpyUpper( pTag->TagName, Header.tag_name, strlen( Header.tag_name ) );
+   }
+   else
+   {
+      pTag->fTagName = FALSE;
+      pTag->TagName = (char *) hb_xgrab( strlen( ITN ) + 1 );
+      hb_strncpyUpper( pTag->TagName, ITN, strlen( ITN ) );
+   }
+
    pTag->KeyExpr = (char *) hb_xgrab( NTX_MAX_KEY );
    strcpy( pTag->KeyExpr, Header.key_expr );
 
@@ -3603,13 +3631,24 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          hb_itemRelease( pExtInfo.itmResult );
       }
    }
-   szTagName = ( char * ) hb_xgrab( strlen( pFileName->szName ) + 1 );
-   hb_strncpyUpper( szTagName, pFileName->szName, strlen( pFileName->szName ) );
+   if( pOrderInfo->atomBagName )
+   {
+      int iTagNameLen = strlen( pOrderInfo->atomBagName );
+      if( iTagNameLen > 10 )
+         iTagNameLen = 10;
+      szTagName = ( char * ) hb_xgrab( iTagNameLen + 1 );
+      hb_strncpyUpper( szTagName, pOrderInfo->atomBagName, iTagNameLen );
+   }
+   else
+   {
+      szTagName = ( char * ) hb_xgrab( strlen( pFileName->szName ) + 1 );
+      hb_strncpyUpper( szTagName, pFileName->szName, strlen( pFileName->szName ) );
+   }
    hb_xfree( pFileName );
 
    pIndex = hb_ntxIndexNew( pArea );
    pIndex->IndexName = szFileName;
-   pTag = hb_ntxTagNew( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
+   pTag = hb_ntxTagNew( pIndex, szTagName, (pOrderInfo->atomBagName)? 1:0,pOrderInfo->abExpr->item.asString.value,
                         pKeyExp, bType, (USHORT) uiLen, (USHORT) uiDec, (char *) ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->abFor : NULL ),
                         pForExp, pArea->lpdbOrdCondInfo ? !pArea->lpdbOrdCondInfo->fDescending : TRUE,
                         pOrderInfo->fUnique, pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->fCustom : FALSE,
