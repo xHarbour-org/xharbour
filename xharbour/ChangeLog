@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.602 2003/01/10 05:24:10 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.603 2003/01/10 05:40:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -33,6 +33,8 @@
 2003-01-10 02:00 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * source/rdd/dbfntx/dbfntx1.c
     ! fixed positioning bug, reported by Giancarlo Niccolai
+  * source/rdd/dbcmd.c
+    ! fixed bug with INDEX .. FOR, found and fixed by (Charles) Kwon Oh-Jun
 
 2003-01-08 23:48 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c
