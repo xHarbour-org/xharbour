@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3088 2004/06/18 03:42:47 peterrees Exp $
+ * $Id: ChangeLog,v 1.3089 2004/06/18 09:38:11 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-18 12:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/tbrowse.prg
+    * @ 932 changed Len() back to LenVal() Browsing dates was a problem.
+  * include/hbver.h
+    * Refreshed.
 
 2004-06-18 15:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg

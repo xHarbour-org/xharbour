@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.74 2004/06/18 01:58:38 paultucker Exp $
+ * $Id: tbrowse.prg,v 1.75 2004/06/18 09:35:37 vouchcac Exp $
  */
 
 /*
@@ -929,8 +929,10 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
          cType    := Valtype( xRes )
 
          // FSG - 2004/02/27 - Fixed Lenght. It's enough to use transform.
-         nLen     := Len( Transform( xRes, oCol:Picture ) )
-         //nLen := LenVal( xRes, cType, oCol:Picture )
+         //nLen   := Len( Transform( xRes, oCol:Picture ) )
+         // Paul- 2004/06/18 - Unfortunatly, an array browse of Dates doesn't
+         //       work with the above, so back to LenVal() (is the problem transform?)
+         nLen := LenVal( xRes, cType, oCol:Picture )
 
          cHeading := oCol:Heading + ";"
          while ( nL := Len( __StrTkPtr( @cHeading, @nTokenPos, ";" ) ) ) > 0
