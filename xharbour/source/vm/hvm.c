@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.388 2004/05/03 17:29:21 druzus Exp $
+ * $Id: hvm.c,v 1.389 2004/05/08 04:25:14 ronpinkas Exp $
  */
 
 /*
@@ -1032,8 +1032,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   hb_itemReleaseString( pItem1 );
                }
 
-               pItem1->type = HB_IT_LOGICAL;
-               pItem1->item.asLogical.value = l1 & l2;
+               pItem1->type = HB_IT_LONG;
+               pItem1->item.asLong.value = l1 & l2;
 
                hb_stackPop();
             }
@@ -1076,8 +1076,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   hb_itemReleaseString( pItem1 );
                }
 
-               pItem1->type = HB_IT_LOGICAL;
-               pItem1->item.asLogical.value = l1 | l2;
+               pItem1->type = HB_IT_LONG;
+               pItem1->item.asLong.value = l1 | l2;
 
                hb_stackPop();
             }
@@ -1120,8 +1120,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   hb_itemReleaseString( pItem1 );
                }
 
-               pItem1->type = HB_IT_LOGICAL;
-               pItem1->item.asLogical.value = l1 ^ l2;
+               pItem1->type = HB_IT_LONG;
+               pItem1->item.asLong.value = l1 ^ l2;
 
                hb_stackPop();
             }

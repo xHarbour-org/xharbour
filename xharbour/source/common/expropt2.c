@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.4 2003/12/04 09:26:54 druzus Exp $
+ * $Id: expropt2.c,v 1.5 2004/05/08 04:25:12 ronpinkas Exp $
  */
 
 /*
@@ -1119,21 +1119,27 @@ HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL )
          switch( cOp )
          {
             case '&' :
-               pSelf->ExprType = HB_ET_LOGICAL;
-               pSelf->ValType  = HB_EV_LOGICAL;
-               pSelf->value.asLogical = pLeft->value.asNum.lVal & pRight->value.asNum.lVal;
+               pSelf->ExprType = HB_ET_NUMERIC;
+               pSelf->ValType  = HB_EV_NUMERIC;
+               pSelf->value.asNum.NumType = HB_ET_LONG;
+               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal & pRight->value.asNum.lVal;
+               pSelf->value.asNum.bDec = 0;
                break;
 
             case '|' :
-               pSelf->ExprType = HB_ET_LOGICAL;
-               pSelf->ValType  = HB_EV_LOGICAL;
-               pSelf->value.asLogical = pLeft->value.asNum.lVal | pRight->value.asNum.lVal;
+               pSelf->ExprType = HB_ET_NUMERIC;
+               pSelf->ValType  = HB_EV_NUMERIC;
+               pSelf->value.asNum.NumType = HB_ET_LONG;
+               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal | pRight->value.asNum.lVal;
+               pSelf->value.asNum.bDec = 0;
                break;
 
             case '^' :
-               pSelf->ExprType = HB_ET_LOGICAL;
-               pSelf->ValType  = HB_EV_LOGICAL;
-               pSelf->value.asLogical = pLeft->value.asNum.lVal ^ pRight->value.asNum.lVal;
+               pSelf->ExprType = HB_ET_NUMERIC;
+               pSelf->ValType  = HB_EV_NUMERIC;
+               pSelf->value.asNum.NumType = HB_ET_LONG;
+               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal ^ pRight->value.asNum.lVal;
+               pSelf->value.asNum.bDec = 0;
                break;
 
             case '>' :

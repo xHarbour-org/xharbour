@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.148 2004/04/30 01:20:47 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.149 2004/05/06 19:07:24 ronpinkas Exp $
  */
 
 /*
@@ -3377,7 +3377,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxrez, int iContext )
 {
    int lens = 0;
-   char * sZnaki = "+-=><*/$.:#%!^";
+   char * sZnaki = "+-=><*/$.:#%!^&|";
    int State;
    int StBr1 = 0, StBr2 = 0, StBr3 = 0;
    BOOL rez = FALSE;
@@ -3396,7 +3396,6 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, iContext));
 
    //#define DEBUG_EXP
-
    #ifdef DEBUG_EXP
       printf( "\ngetExpReal( %p, '%s', %d, %i, %d )\n", expreal, *ptri, cMarkerType, maxrez, iContext );
    #endif
@@ -3669,7 +3668,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          case STATE_ID:
          case STATE_ID_END:
          {
-            if( ( (ISNAME(**ptri) || **ptri=='\\' || **ptri=='&') && State == STATE_ID_END ) || **ptri==',' )
+            if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
             {
                if( **ptri == ',' )
                {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2890 2004/05/07 23:05:56 peterrees Exp $
+ * $Id: ChangeLog,v 1.2891 2004/05/08 04:24:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 22:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/common/expropt2.c
+  * source/vm/hvm.c
+    ! Fixed AND, OR and XOR bit operators to return numeric.
+
+  * tests/tstbitop.prg
+    * Updated to reflect above correction.
+
+  * source/pp/ppcore.c
+    + Added support for new BIT operators in getExpReal()
 
 2004-05-07 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c

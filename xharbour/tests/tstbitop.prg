@@ -1,45 +1,16 @@
 PROCEDURE Main()
 
-   LOCAL x := 0, y := 0, cMacro := "x"
+   LOCAL x := 8, y := 0, cMacro := "x"
 
-   IF 0 & 0
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
-
-   IF 0 | 0
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
-
-   IF 0 ^^ 0
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
-
+   ? 8 & 0
+   ? 8 | 0
+   ? 8 ^^ 0
    ? 256 >> 8
    ? 256 << 8
 
-   IF x & y
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
-
-   IF x | y
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
-
-   IF x ^^ y
-      ? "Error"
-   ELSE
-      ? "Ok"
-   ENDIF
+   ? x & y
+   ? x | y
+   ? x ^^ y
 
    x := 256
    y := 8
