@@ -1095,7 +1095,11 @@ Static Function DataToSql(xField)
         if cType == "C" .or. cType == "M"
                 result := "'"+ strtran(xField, "'", ' ') + "'"
         elseif cType == "D"
-                result := "'" + StrZero(month(xField),2) + '/' + StrZero(day(xField),2) + '/' + StrZero(Year(xField),4) + "'"
+                if Empty(xfield)
+                        result := 'NULL'
+                else                        
+                        result := "'" + StrZero(month(xField),2) + '/' + StrZero(day(xField),2) + '/' + StrZero(Year(xField),4) + "'"
+                end
         elseif cType == "N"
                 result := str(xField)
         elseif cType == "L"
