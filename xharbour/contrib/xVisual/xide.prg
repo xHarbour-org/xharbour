@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.84 2002/10/14 01:37:47 fsgiudice Exp $
+ * $Id: xide.prg,v 1.85 2002/10/14 04:19:24 what32 Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ FUNCTION Main
 
 
    // splash screen
-   oSplash := TSplash():New( oApp, "xIDE.bmp", 5000 )
+   oSplash := TSplash():New( oApp, "visualxharbour.bmp", 5000 )
 
    WITH OBJECT oApp
       WITH OBJECT :CreateForm( 'MainFrame', MainFrame() )
