@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.1 2004/10/23 12:02:08 druzus Exp $
+ * $Id: calconst.c,v 1.2 2004/10/23 19:26:25 ronpinkas Exp $
  */
 
 /*
@@ -290,7 +290,7 @@ char * NextTokenInConstant( char **pExp )
          i = 2;
 
          // Hex
-         while( i < 31 && ( (*pExp)[0] >= '0' && (*pExp)[0] <= '9' ) || ( (*pExp)[0] >= 'A' && (*pExp)[0] <= 'F' ) )
+         while( i < 31 && ( ( (*pExp)[0] >= '0' && (*pExp)[0] <= '9' ) || ( (*pExp)[0] >= 'A' && (*pExp)[0] <= 'F' ) ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
