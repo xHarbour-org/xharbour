@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.86 2005/02/27 09:30:00 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.86 2005/02/27 07:44:25 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1164,8 +1164,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\scrmark.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\spread.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\untext.obj            + >> hdll.tmp
-!if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\util.obj              + >> hdll.tmp
+!if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\ads0.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp

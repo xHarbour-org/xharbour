@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3884 2005/02/27 14:13:51 andijahja Exp $
+ * $Id: ChangeLog,v 1.3885 2005/02/27 16:50:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-27 09:10 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * hrbdll.bc
+    * Fixed typo (util.obj) was grouped with ADS fils in condition.
 
 2005-02-27 08:50 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * source/compiler/harbour.sly
