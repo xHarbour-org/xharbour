@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.34 2005/02/02 15:54:59 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.35 2005/02/08 14:11:17 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -1269,7 +1269,7 @@ Static Function DataToSql(xField)
 return result           
 
 Static Function ValueToString(xField)
-        Local cType, result := 'NULL'
+        Local cType, result := nil
 
         cType := ValType(xField)
         

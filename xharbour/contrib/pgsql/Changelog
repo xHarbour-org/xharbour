@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.32 2005/02/02 13:47:18 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.33 2005/02/08 14:11:17 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-03-12 12:20 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * xharbour/contrib/pgsql/TPostgres.prg
+    ! Fixed bug with ValueToString, thanks to Marco Aurelio.
+
+2005-03-01 12:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  + xharbour/contrib/pgsql/postgres.c
+    ! Add new function to handle binary escape string/quoted strings  
+    
 2005-02-08 12:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * xharbour/contrib/pgsql/TPostgres.prg
-    ! Fixed bug in Append Method, regarding where clause, thnaks to Marco Aurelio.
+    ! Fixed bug in Append Method, regarding where clause, thanks to Marco Aurelio.
 
 2005-02-02 11:45 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * xharbour/contrib/pgsql/TPostgres.prg

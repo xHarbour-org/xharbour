@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.17 2004/12/15 12:51:17 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.18 2005/01/13 16:06:56 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -430,6 +430,35 @@ HB_FUNC(PQESCAPESTRING)
     hb_retc(dest);
     hb_xfree( (char *) dest);    
 }
+
+
+HB_FUNC(PQESCAPEBYTEA)
+{
+    char *from;
+    char *to;
+    size_t from_length;
+    size_t to_length;
+        
+    from = hb_parcx(1);
+    from_length = strlen(from);
+    to_length = strlen(from) * 5 + 1;
+    
+    to = PQescapeBytea(from, from_length, &to_length);
+    hb_retc(to);
+    PQfreemem(to);
+}
+
+
+HB_FUNC(PQUNESCAPEBYTEA)
+{
+    char *from;
+    size_t to_length;        
+    
+    from = PQunescapeBytea(hb_parcx(1), &to_length);
+    hb_retclen(from, to_length);
+    PQfreemem(from);
+}
+
 
 
 
