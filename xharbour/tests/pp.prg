@@ -79,6 +79,10 @@
       #ifdef SQL
          REQUEST SQLRDD
          REQUEST SR_ODBC
+				 REQUEST SR_MYSQL
+				 #ifdef PGS
+				    REQUEST SR_PGS
+				 #endif
       #endif
    #endif
 
