@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.55 2003/12/04 09:26:54 druzus Exp $
+ * $Id: harbour.c,v 1.56 2003/12/17 03:53:18 ronpinkas Exp $
  */
 
 /*
@@ -1778,7 +1778,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
    {
       int iLen = strlen( szFunName );
-      char *sDecorated = hb_xgrab( iLen + 2 );
+      char *sDecorated = ( char * ) hb_xgrab( iLen + 2 );
 
       strcpy( sDecorated, szFunName );
       szFunName = sDecorated;
