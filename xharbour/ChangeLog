@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1757 2003/11/23 19:34:50 druzus Exp $
+ * $Id: ChangeLog,v 1.1758 2003/11/23 20:23:51 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-24 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/valtype.c
+    * Minor modification on HB_ISMEMO() and HB_ISSTRING() to conform
+      with return values of ValType()
 
 2003-11-23 17:17 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/dbedit.prg

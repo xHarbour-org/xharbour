@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.5 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: valtype.c,v 1.6 2003/11/12 11:28:49 toninhofwi Exp $
  */
 
 /*
@@ -113,12 +113,12 @@ HB_FUNC( HB_ISNIL )
 
 HB_FUNC( HB_ISSTRING )
 {
-  hb_retl( ISCHAR( 1 ) );
+  hb_retl( ISCHAR(1) && hb_param( 1, HB_IT_MEMOFLAG ) == NULL );
 }
 
 HB_FUNC( HB_ISMEMO )
 {
-  hb_retl( ISMEMO( 1 ) );
+  hb_retl( hb_param( 1, HB_IT_MEMOFLAG ) != NULL );
 }
 
 HB_FUNC( HB_ISNUMERIC )
