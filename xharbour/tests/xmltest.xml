@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<!-- author: Giancarlo Niccolai (giancarlo@niccolai.ws) -->
+<!-- Just a test demostratin xharbour XML capabilities. -->
+<!-- $Id$ -->
+<language name="xHarbour" version="1.0"
+   section="Sources"
+   extensions="*.prg;*.ch"
+   mimetype="text/x-xharbour-src">
+
+   <list name="keywords">
+      <item> local </item>
+      a data node here
+      <item> global </item>
+      <alfa> one </alfa>
+      <item_void>
+         <beta/>
+         <gamma name="real"/>
+      </item_void>
+      <autoitem tst="val"/>
+      data of the list element
+   </list>
+</language>
+

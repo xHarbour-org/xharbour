@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.29 2003/05/16 19:52:07 druzus Exp $
+# $Id: Makefile,v 1.30 2003/05/20 00:33:40 lculik Exp $
 #
 
 ROOT = ../../
@@ -53,6 +53,7 @@ C_SOURCES=\
         hbhextonum.c \
         hbffind.c \
         hbsrlraw.c   \
+        hbxml.c      \
         idle.c       \
         inkey.c      \
         is.c         \
