@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1179 2003/06/24 02:17:20 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1180 2003/06/24 03:35:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -20,7 +20,7 @@
          and it's the equivalent of END WITH when no paramater is supplied (in that case it returns that
          poped WITH object.
 
-         This alloews for an elegant  simulation of a temp var in PP translation where before you'd be
+         This allows for an elegant  simulation of a temp var in PP translation where before you'd be
          forced to create a memvar like __1 to store some intermdeiate value for later use in the
          translation. This way is much faster, and avoids possible namespace issues.
        */
