@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.10 2003/01/27 03:37:23 walito Exp $
+ * $Id: alert.prg,v 1.11 2003/11/07 18:20:53 jonnymind Exp $
  */
 
 /*
@@ -345,7 +345,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
                   ENDIF
                NEXT
 
-               IF nChoice == 0
+               IF nChoice > 0
                   lWhile := .F.
                ENDIF
 
