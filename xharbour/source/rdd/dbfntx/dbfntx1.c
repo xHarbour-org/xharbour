@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.77 2004/03/20 23:24:47 druzus Exp $
+ * $Id: dbfntx1.c,v 1.78 2004/03/25 12:13:14 druzus Exp $
  */
 
 /*
@@ -3925,14 +3925,14 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_EXPRESSION:
             hb_itemPutC( pInfo->itmResult , pTag->KeyExpr );
             break;
-         case DBOI_NUMBER:
-            hb_itemPutNI( pInfo->itmResult, pTag->TagRoot );
-            break;
          case DBOI_BAGNAME:
             hb_itemPutC( pInfo->itmResult, pTag->Owner->IndexName );
             break;
          case DBOI_NAME:
             hb_itemPutC( pInfo->itmResult, pTag->TagName );
+            break;
+         case DBOI_NUMBER:
+            hb_itemPutNI( pInfo->itmResult, pTag->TagRoot );
             break;
          case DBOI_KEYCOUNT:
             hb_itemPutNL( pInfo->itmResult, hb_ntxTagKeyCount( pTag ) );
@@ -4031,6 +4031,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_SCOPEBOTTOMCLEAR :
             hb_itemClear( pInfo->itmResult );
             break;
+         case DBOI_NUMBER:
          case DBOI_ORDERCOUNT:
             hb_itemPutNL( pInfo->itmResult, 0 );
             break;
