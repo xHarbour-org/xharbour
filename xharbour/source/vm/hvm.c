@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.61 2002/04/23 05:01:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.62 2002/04/23 05:19:40 ronpinkas Exp $
  */
 
 /*
@@ -278,8 +278,42 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
                              PVOID                        pv);
 #endif
 
-/* application entry point */
+// Initialize ErrorBlock() and __SetHelpK()
+void hb_vmDoInitClip( void )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "CLIPINIT" );
 
+   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
+// Initialize DBFCDX and DBFNTX if linked.
+void hb_vmDoInitRdd( void )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "DBFNTXINIT" );
+
+   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+
+   pDynSym = hb_dynsymFind( "DBFCDXINIT" );
+
+   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
+/* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
    FILE *fpTrace;
@@ -358,6 +392,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     * Static variables have to be initialized before any INIT functions
     * because INIT function can use static variables
     */
+
+   hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
+   hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
    hb_vmDoInitStatics();
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 

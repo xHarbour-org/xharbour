@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.3 2001/06/18 18:04:05 dholm Exp $
+ * $Id: dbfcdx0.prg,v 1.1.1.1 2001/12/21 10:43:06 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 ANNOUNCE DBFCDX
 
-init procedure DBFCDXInit
+procedure DBFCDXInit
 
    REQUEST _DBFCDX
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.164 2002/04/22 23:09:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.165 2002/04/23 05:01:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-23 17:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Corrected hb_vmInit() to excplictly initialize ClipInit, DBFNTX, and DFBCDX.
+      /* No longer relaying on INIT procedures because execution order is not guaranteed.
+
+  * source/rdd/dbfcdx/dbfcdx0.prg
+  * source/rdd/dbfntx/dbfntx0.prg
+  * source/vm/harbinit.prg
+    * Removed INIT qualifier.
 
 2002-04-22 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.c

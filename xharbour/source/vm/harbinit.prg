@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.5 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: harbinit.prg,v 1.1.1.1 2001/12/21 10:40:56 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ PROCEDURE CLIPPER530()
 
 #endif
 
-INIT PROCEDURE ClipInit
+PROCEDURE ClipInit
 
    MEMVAR GetList
 

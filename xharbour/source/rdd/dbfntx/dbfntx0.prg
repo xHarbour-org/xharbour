@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.13 2001/06/18 18:04:05 dholm Exp $
+ * $Id: dbfntx0.prg,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 ANNOUNCE DBFNTX
 
-init procedure DBFNTXInit
+Procedure DBFNTXInit
 
    REQUEST _DBFNTX
 
