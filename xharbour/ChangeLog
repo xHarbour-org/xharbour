@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1153 2003/06/20 18:25:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1154 2003/06/20 19:14:43 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2003-06-20 16:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/odbc/odbc.c
-    ! Fixed: SqlGetData() - completally new and optimized, now you can retrieve any data size
+    ! Fixed: SqlGetData() - completely new and optimized, now you can retrieve any data size
     ! Fixed TYPOs
     + Added New PRG level functions:
         SQLGETINFO()
@@ -21,7 +21,7 @@
         SQLCOMMIT()
         SQLROLLBACK()
   * source/odbc/todbc.prg
-    ! Minor fixes and reformating
+    ! Minor fixes and reformatting
     + Added New Methods:
         METHOD SetCnnOptions( nType, uBuffer )
         METHOD GetCnnOptions( nType )
