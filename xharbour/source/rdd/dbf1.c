@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.44 2003/11/22 03:33:57 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.45 2003/11/23 02:56:43 ronpinkas Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 #include "hbapilng.h"
 #include "hbset.h"
 #include "hbdate.h"
+#include "hbmath.h"
 #include "hbdbsort.h"
 #include "error.ch"
 #include <errno.h>
@@ -493,16 +494,12 @@ static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
    hb_itemRelease( pRecNo );
 }
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
-
 /*
  * Converts EDBF_* error code into EG_* one.
  * This function is common for different DBF based RDD implementation
  * so I don't make it static
  */
-ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
+ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode )
 {
    ERRCODE errEGcode;
 
@@ -560,7 +557,7 @@ ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
+ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
 {
    USHORT uiCount;
    BYTE bByte;
@@ -583,7 +580,7 @@ ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
+void HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
 {
    SHORT iCount;
 
@@ -606,23 +603,23 @@ void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-BOOL hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, USHORT *usPool )
+BOOL HB_EXPORT hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool )
 {
    switch ( bScheme )
    {
       case HB_SET_DBFLOCK_CLIP:
          *ulPos  = FILE_LOCKPOS_CLIP;
-         *usPool = FILE_LOCKPOOL_CLIP;
+         *ulPool = FILE_LOCKPOOL_CLIP;
          break;
 
       case HB_SET_DBFLOCK_CL53:
          *ulPos  = FILE_LOCKPOS_CL53;
-         *usPool = FILE_LOCKPOOL_CL53;
+         *ulPool = FILE_LOCKPOOL_CL53;
          break;
 
       case HB_SET_DBFLOCK_VFP:
          *ulPos  = FILE_LOCKPOS_VFP;
-         *usPool = FILE_LOCKPOOL_VFP;
+         *ulPool = FILE_LOCKPOOL_VFP;
          break;
 
       default:
@@ -636,13 +633,12 @@ BOOL hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, USHORT *usPool )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoolPos )
+BOOL HB_EXPORT hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos )
 {
-   ULONG ulPos, ulSize = 1;
-   USHORT usPool;
+   ULONG ulPos, ulPool, ulSize = 1;
    BOOL fRet = FALSE, fWait;
 
-   if ( !hb_dbfLockExtGetData( bScheme, &ulPos, &usPool ) )
+   if ( !hb_dbfLockExtGetData( bScheme, &ulPos, &ulPool ) )
       return FALSE;
 
    do
@@ -650,23 +646,23 @@ BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoo
       switch ( usMode & FL_MASK )
       {
          case FL_LOCK:
-            if ( usPool )
+            if ( ulPool )
             {
                if ( ( usMode & FLX_SHARED ) != 0 )
-                  *pPoolPos = 1; /* TODO: random value 1<=x<usPool */
+                  *pPoolPos = (ULONG) ( hb_random_num() * ulPool ) + 1;
                else
                {
                   *pPoolPos = 0;
-                  ulSize = usPool;
+                  ulSize = ulPool + 1;
                }
             }
             break;
 
          case FL_UNLOCK:
-            if ( usPool )
+            if ( ulPool )
             {
                if ( ! *pPoolPos )
-                  ulSize = usPool;
+                  ulSize = ulPool + 1;
             }
             break;
 
@@ -680,10 +676,6 @@ BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoo
    } while ( fWait );
    return fRet;
 }
-
-#if defined(HB_EXTERN_C)
-}
-#endif
 
 /*
  * -- DBF METHODS --

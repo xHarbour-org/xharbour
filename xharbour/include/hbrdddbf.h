@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.7 2003/11/20 23:47:36 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.8 2003/11/22 03:02:21 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ extern "C" {
 #define FILE_LOCKPOS_VFP                  0x7ffffffeL
 
 #define FILE_LOCKPOOL_CLIP                0L
-#define FILE_LOCKPOOL_CL53                0x0000ffffL
+#define FILE_LOCKPOOL_CL53                0x00010000L
 #define FILE_LOCKPOOL_VFP                 0L
 
 #ifdef OS_UNIX_COMPATIBLE
@@ -279,15 +279,13 @@ static BOOL    hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 
 #define hb_dbfWhoCares                             NULL
 
-#else
-
-extern ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
-extern void  hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
-extern ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
-extern BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoolPos );
-extern BOOL hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, USHORT *usPool );
-
 #endif /* HB_EXTERNAL_RDDDBF_USE */
+
+extern ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern void  HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
+extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );
+extern BOOL HB_EXPORT hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos );
+extern BOOL HB_EXPORT hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool );
 
 #if defined(HB_EXTERN_C)
 }

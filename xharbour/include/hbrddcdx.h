@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.23 2003/11/20 23:47:36 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.24 2003/11/22 03:02:21 ronpinkas Exp $
  */
 
 /*
@@ -323,7 +323,7 @@ typedef struct _CDXINDEX
    LPCDXLIST freeLst;         /* list of free pages in index file */
    int      lockWrite;        /* number of write lock set */
    int      lockRead;         /* number of read lock set */
-   USHORT   usLockPos;        /* readlock position for CL53 lock scheme */
+   ULONG    ulLockPos;        /* readlock position for CL53 lock scheme */
 #ifndef HB_CDX_DBGCODE_OFF
    BOOL     RdLck;
    BOOL     WrLck;

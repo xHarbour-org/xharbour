@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:59 ronpinkas Exp $
+# $Id: global.cf,v 1.2 2003/05/16 19:52:03 druzus Exp $
 #
 
 ifndef MK
@@ -59,8 +59,8 @@ MV = move
 MD = md
 
 dirbase::
-	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)
+	-if not exist $(HB_ARCHITECTURE)\nul $(MD) $(HB_ARCHITECTURE)
+	-if not exist $(ARCH_DOS)\nul        $(MD) $(ARCH_DOS)
 
 clean::
 	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f

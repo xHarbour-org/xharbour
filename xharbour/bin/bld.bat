@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.24 2003/09/12 20:50:50 paultucker Exp $
+rem $Id: bld.bat,v 1.25 2003/10/02 20:34:36 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -175,8 +175,33 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :A_DOS_DJGPP_NOT
 
-   if "%HB_COMPILER%" == "rsx32"   gcc %1.c -Zrsx32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
-   goto END
+   if not "%HB_COMPILER%" == "rsx32" GOTO A_DOS_RSX32_NOT
+
+      gcc %1.c -Zrsx32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
+      goto END
+
+:A_DOS_RSX32_NOT
+
+   if not "%HB_COMPILER%" == "watcom" goto END
+
+      echo debug all OP osn=DOS4G OP stack=65536 OP CASEEXACT NAME %1.exe > build.tmp
+      echo FILE %1.obj >> build.tmp
+      echo LIB debug.lib >> build.tmp
+      echo LIB vm.lib >> build.tmp
+      echo LIB rtl.lib >> build.tmp
+      echo %_HB_GT_LIB%.lib >> build.tmp
+      echo LIB lang.lib >> build.tmp
+      echo LIB rdd.lib >> build.tmp
+      echo LIB macro.lib >> build.tmp
+      echo LIB pp.lib >> build.tmp
+      echo LIB dbfntx.lib >> build.tmp
+      echo LIB dbfcdx.lib >> build.tmp
+      echo LIB dbfdbt.lib >> build.tmp
+      echo LIB dbffpt.lib >> build.tmp
+      echo LIB common.lib >> build.tmp
+      wlink @build.tmp
+      del build.tmp
+      goto END
 
 :A_W32
 

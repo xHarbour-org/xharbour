@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1755 2003/11/23 03:13:52 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1756 2003/11/23 14:44:32 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-23 20:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! small fix in cl53 locking scheme. The random lock area is
+      0x10001 not 0x10000
+    * the external dbf function prototyped in hbrdddbf.h with extern "C"
+      it should make MSVC happy and we don't have to add 'extern "C"' to
+      source files. If I'm wrong then 'extern "C"' has to be restored in
+      dbf1.c - I cannot check it with MSVC, sorry.
+  * xharbour/bin/bld.bat
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/watcom.cf
+  * xharbour/include/hbfixdj.h
+  * xharbour/source/compiler/gencobj.c
+    ! fixed problem with double "=" in harbour.cfg file
+    * changes by Lorenzo Fiorini for DOS Watcom and DJGPP compilation with
+      my small modification
 
 2003-11-23 15:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * doc/hash.txt

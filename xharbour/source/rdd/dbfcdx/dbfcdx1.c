@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.84 2003/11/15 23:33:16 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.85 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -1156,9 +1156,7 @@ static BOOL hb_cdxIndexLockRead( LPCDXINDEX pIndex )
 #endif
 
    ret = hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType,
-                         FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->usLockPos );
-//   while (! (ret = hb_fsLock( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
-//                              FL_LOCK | FLX_SHARED | FLX_WAIT ) ) );
+                         FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
    if ( !ret )
       /* TODO: change into RT error dbfcdx/1038 */
       hb_errInternal( 9107, "hb_cdxIndexLockRead: lock failure.", "", "" );
@@ -1197,9 +1195,7 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
       pIndex->WrLck = TRUE;
 #endif
       ret = hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType,
-                            FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT, &pIndex->usLockPos );
-//      while (! (ret = hb_fsLock( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
-//                                 FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT ) ) );
+                            FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT, &pIndex->ulLockPos );
    }
    if ( !ret )
       /* TODO: change into RT error dbfcdx/1038 */
@@ -1241,8 +1237,7 @@ static BOOL hb_cdxIndexUnLockRead( LPCDXINDEX pIndex )
          hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error (*)", "", "" );
       pIndex->RdLck = FALSE;
 #endif
-//      if ( !hb_fsLock( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE, FL_UNLOCK ) )
-      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->usLockPos ) )
+      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error.", "", "" );
       }
@@ -1294,8 +1289,7 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
          hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error (*)", "", "" );
       pIndex->WrLck = FALSE;
 #endif
-//      if ( !hb_fsLock( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE, FL_UNLOCK ) )
-      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->usLockPos ) )
+      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error.", "", "" );
       }
@@ -6161,14 +6155,13 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_HPLOCKING:
       case DBOI_LOCKOFFSET:
          {
-            ULONG ulPos;
-            USHORT usPool;
+            ULONG ulPos, ulPool;
 
-            hb_dbfLockExtGetData( pArea->bLockType, &ulPos, &usPool );
+            hb_dbfLockExtGetData( pArea->bLockType, &ulPos, &ulPool );
             if ( uiIndex == DBOI_LOCKOFFSET )
                pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult, ulPos );
             else
-               pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, usPool > 0 );
+               pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, ulPool > 0 );
             break;
          }
 

@@ -1,24 +1,24 @@
 /*
- * $Id: hbfixdj.h,v 1.0 Exp $
+ * $Id: hbfixdj.h,v 1.1 2002/11/13 15:02:42 walito Exp $
  */
 
 
 #ifdef __dj_include_inline_ctype_ha_
 
-#undef isalnum(c)
-#undef isalpha(c)
-#undef iscntrl(c)
-#undef isdigit(c)
-#undef isgraph(c)
-#undef islower(c)
-#undef isprint(c)
-#undef ispunct(c)
-#undef isspace(c)
-#undef isupper(c)
-#undef isxdigit(c)
+#undef isalnum
+#undef isalpha
+#undef iscntrl
+#undef isdigit
+#undef isgraph
+#undef islower
+#undef isprint
+#undef ispunct
+#undef isspace
+#undef isupper
+#undef isxdigit
 
-#undef tolower(c)
-#undef toupper(c)
+#undef tolower
+#undef toupper
 
 #define isalnum(c) (__dj_ctype_flags[(unsigned char)(c)+1] & __dj_ISALNUM)
 #define isalpha(c) (__dj_ctype_flags[(unsigned char)(c)+1] & __dj_ISALPHA)
