@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.21 2004/02/23 00:07:56 peterrees Exp $
+ * $Id: inkey.c,v 1.22 2004/03/05 13:26:03 andijahja Exp $
  */
 
 /*
@@ -99,8 +99,8 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
-static PHB_ITEM s_inKeyBlockBefore = NULL ;
-static PHB_ITEM s_inKeyBlockAfter = NULL ;
+static HB_ITEM s_inKeyBlockBefore;
+static HB_ITEM s_inKeyBlockAfter;
 
 static void hb_inkeyKBfree( void )
 {
@@ -370,16 +370,16 @@ HB_FUNC( INKEY )
   BOOL bContinue = TRUE ;
   USHORT uiPCount = hb_pcount();
   int iKey;
-  if ( s_inKeyBlockBefore )
+  if ( &s_inKeyBlockBefore )
   {
-    hb_vmEvalBlock( s_inKeyBlockBefore );
+    hb_vmEvalBlock( &s_inKeyBlockBefore );
   }
   while ( bContinue )
   {
     iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
-    bContinue = iKey && s_inKeyBlockAfter ;
+    bContinue = iKey && &s_inKeyBlockAfter ;
     if ( bContinue )
     {
       HB_ITEM Key;
@@ -387,7 +387,7 @@ HB_FUNC( INKEY )
 
       Key.type = HB_IT_NIL;
       hb_itemPutNI( &Key, iKey );
-      pReturn = hb_vmEvalBlockV( s_inKeyBlockAfter, 1, &Key );
+      pReturn = hb_vmEvalBlockV( &s_inKeyBlockAfter, 1, &Key );
 
       // set iKey from return value of EvalBlock()
       iKey = hb_itemGetNI( pReturn );
@@ -403,9 +403,10 @@ HB_FUNC( INKEY )
 HB_FUNC( SETINKEYBEFOREBLOCK )
 {
   USHORT uiPCount = hb_pcount();
-  if ( s_inKeyBlockBefore )
+
+  if ( &s_inKeyBlockBefore )
   {
-    hb_itemReturnCopy( s_inKeyBlockBefore );
+    hb_itemReturnCopy( &s_inKeyBlockBefore );
   }
   else
   {
@@ -413,14 +414,14 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
   }
   if ( uiPCount > 0 )
   {
-    if ( s_inKeyBlockBefore )
+    if ( &s_inKeyBlockBefore )
     {
-      hb_itemRelease(s_inKeyBlockBefore) ;
-      s_inKeyBlockBefore= NULL;
+      hb_itemClear(&s_inKeyBlockBefore) ;
     }
     if ( ISBLOCK(1) )
     {
-      s_inKeyBlockBefore = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
+      s_inKeyBlockBefore.type = HB_IT_NIL;
+      hb_itemCopy ( &s_inKeyBlockBefore , hb_param( 1, HB_IT_BLOCK ) );
     }
   }
 }
@@ -428,9 +429,9 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
 HB_FUNC( SETINKEYAFTERBLOCK )
 {
   USHORT uiPCount = hb_pcount();
-  if ( s_inKeyBlockAfter )
+  if ( &s_inKeyBlockAfter )
   {
-    hb_itemReturnCopy( s_inKeyBlockAfter );
+    hb_itemReturnCopy( &s_inKeyBlockAfter );
   }
   else
  {
@@ -438,14 +439,14 @@ HB_FUNC( SETINKEYAFTERBLOCK )
   }
   if ( uiPCount > 0 )
   {
-    if ( s_inKeyBlockAfter )
+    if ( &s_inKeyBlockAfter )
     {
-      hb_itemRelease(s_inKeyBlockAfter) ;
-      s_inKeyBlockAfter= NULL;
+      hb_itemClear(&s_inKeyBlockAfter) ;
     }
     if ( ISBLOCK(1) )
     {
-      s_inKeyBlockAfter = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
+      s_inKeyBlockAfter.type = HB_IT_NIL;
+      hb_itemCopy( &s_inKeyBlockAfter, hb_param( 1, HB_IT_BLOCK ));
     }
   }
 }
