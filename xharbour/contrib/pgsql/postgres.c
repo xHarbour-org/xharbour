@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.10 2004/04/28 20:07:51 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.11 2004/05/02 21:11:33 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -98,13 +98,13 @@ HB_FUNC(PQCONNECT)
 HB_FUNC(PQCLOSE)
 {
     if (hb_parinfo(1))
-        PQfinish(( PGconn * ) hb_parpointer(1));
+        PQfinish(( PGconn * ) hb_parptr(1));
 }
 
 HB_FUNC(PQCLEAR)
 {
     if (hb_parinfo(1))
-        PQclear(( PGresult * ) hb_parpointer(1));
+        PQclear(( PGresult * ) hb_parptr(1));
 }
 
 HB_FUNC(PQEXEC)
@@ -112,7 +112,7 @@ HB_FUNC(PQEXEC)
     PGresult   *res;
 
     if (hb_pcount() == 2)
-        res = PQexec(( PGconn * ) hb_parpointer(1), hb_parc(2));
+        res = PQexec(( PGconn * ) hb_parptr(1), hb_parc(2));
 
     hb_retptr( res );        
 }
@@ -137,7 +137,7 @@ HB_FUNC(PQEXECPARAMS)
         for (i=0;i < n;i++)
             paramvalues[i] = hb_arrayGetCPtr( aParam, i + 1 );
 
-        res = PQexecParams(( PGconn * ) hb_parpointer(1), hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
+        res = PQexecParams(( PGconn * ) hb_parptr(1), hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
 
         hb_xfree(paramvalues);
     }
@@ -151,7 +151,7 @@ HB_FUNC(PQFCOUNT)
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_parpointer(1);
+        res = ( PGresult * ) hb_parptr(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
                 nFields = PQnfields(res);
@@ -167,7 +167,7 @@ HB_FUNC(PQLASTREC)
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_parpointer(1);
+        res = ( PGresult * ) hb_parptr(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
             nRows = PQntuples(res);
@@ -182,7 +182,7 @@ HB_FUNC(PQGETVALUE)
 
     if (hb_pcount() == 3)
     {
-        res = ( PGresult * ) hb_parpointer(1);
+        res = ( PGresult * ) hb_parptr(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
@@ -203,7 +203,7 @@ HB_FUNC(PQGETLENGTH)
 
     if (hb_pcount() == 3)
     {
-        res = ( PGresult * ) hb_parpointer(1);
+        res = ( PGresult * ) hb_parptr(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
@@ -227,7 +227,7 @@ HB_FUNC(PQMETADATA)
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_parpointer(1);
+        res = ( PGresult * ) hb_parptr(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
@@ -370,31 +370,31 @@ HB_FUNC(PQMETADATA)
 HB_FUNC(PQTRANSACTIONSTATUS)
 {
     if (hb_parinfo(1))
-        hb_retni(PQtransactionStatus(( PGconn * ) hb_parpointer(1) ));
+        hb_retni(PQtransactionStatus(( PGconn * ) hb_parptr(1) ));
 }
 
 HB_FUNC(PQERRORMESSAGE)
 {
     if (hb_parinfo(1))
-        hb_retc(PQerrorMessage(( PGconn * ) hb_parpointer(1) ));
+        hb_retc(PQerrorMessage(( PGconn * ) hb_parptr(1) ));
 }
 
 HB_FUNC(PQSTATUS)
 {
     if (hb_parinfo(1))
-        hb_retni(PQstatus(( PGconn * ) hb_parpointer(1) ));
+        hb_retni(PQstatus(( PGconn * ) hb_parptr(1) ));
 }
 
 HB_FUNC(PQRESULTERRORMESSAGE)
 {
     if (hb_parinfo(1))
-        hb_retc(PQresultErrorMessage(( PGresult * ) hb_parpointer(1)));
+        hb_retc(PQresultErrorMessage(( PGresult * ) hb_parptr(1)));
 }
 
 HB_FUNC(PQRESULTSTATUS)
 {
     if (hb_parinfo(1))
-        hb_retni(PQresultStatus(( PGresult * ) hb_parpointer(1) ));
+        hb_retni(PQresultStatus(( PGresult * ) hb_parptr(1) ));
 }
 
 /* Asynchronous functions 

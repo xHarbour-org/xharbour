@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.45 2004/03/30 22:47:23 druzus Exp $
+* $Id: inet.c,v 1.46 2004/04/28 18:31:26 druzus Exp $
 */
 
 /*
@@ -407,7 +407,7 @@ HB_FUNC( INETCREATE )
 
 HB_FUNC( INETCLOSE )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -452,7 +452,7 @@ HB_FUNC( INETDESTROY )
 
 HB_FUNC( INETSTATUS )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -468,7 +468,7 @@ HB_FUNC( INETSTATUS )
 /* Prepared, but still not used; being in wait for comments
 HB_FUNC( INETSTATUSDESC )
 {
-   HB_SOCKET_STRUCT *Socket = hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -489,7 +489,7 @@ HB_FUNC( INETSTATUSDESC )
 
 HB_FUNC( INETERRORCODE )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -503,7 +503,7 @@ HB_FUNC( INETERRORCODE )
 
 HB_FUNC( INETERRORDESC )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -517,7 +517,7 @@ HB_FUNC( INETERRORDESC )
 
 HB_FUNC( INETCLEARERROR )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -532,7 +532,7 @@ HB_FUNC( INETCLEARERROR )
 
 HB_FUNC( INETCOUNT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -546,7 +546,7 @@ HB_FUNC( INETCOUNT )
 
 HB_FUNC( INETADDRESS )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    char *addr;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
@@ -563,7 +563,7 @@ HB_FUNC( INETADDRESS )
 
 HB_FUNC( INETPORT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -579,7 +579,7 @@ HB_FUNC( INETPORT )
 
 HB_FUNC( INETSETTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket != NULL && Socket->sign == HB_SOCKET_SIGN && ISNUM(2) )
    {
@@ -594,7 +594,7 @@ HB_FUNC( INETSETTIMEOUT )
 
 HB_FUNC( INETGETTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -609,7 +609,7 @@ HB_FUNC( INETGETTIMEOUT )
 
 HB_FUNC( INETCLEARTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -623,7 +623,7 @@ HB_FUNC( INETCLEARTIMEOUT )
 
 HB_FUNC( INETSETTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || !ISNUM(2))
    {
@@ -637,7 +637,7 @@ HB_FUNC( INETSETTIMELIMIT )
 
 HB_FUNC( INETGETTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -652,7 +652,7 @@ HB_FUNC( INETGETTIMELIMIT )
 
 HB_FUNC( INETCLEARTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -666,7 +666,7 @@ HB_FUNC( INETCLEARTIMELIMIT )
 
 HB_FUNC( INETSETPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
@@ -688,7 +688,7 @@ HB_FUNC( INETSETPERIODCALLBACK )
 
 HB_FUNC( INETGETPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -709,7 +709,7 @@ HB_FUNC( INETGETPERIODCALLBACK )
 
 HB_FUNC( INETCLEARPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
@@ -730,7 +730,7 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
 
 static void s_inetRecvInternal( char *szFuncName, int iMode )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF );
    char *Buffer;
    int iLen, iMaxLen, iReceived, iBufferLen;
@@ -860,7 +860,7 @@ HB_FUNC( INETRECVALL )
 
 static void s_inetRecvPattern( char *szFuncName, char *szPattern )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    PHB_ITEM pResult     = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pBufferSize = hb_param( 4, HB_IT_NUMERIC );
@@ -1028,7 +1028,7 @@ HB_FUNC( INETRECVLINE )
 
 HB_FUNC( INETRECVENDBLOCK )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    PHB_ITEM pProto;
    HB_ITEM  ProtoOpt;
    PHB_ITEM pResult     = hb_param( 3, HB_IT_BYREF );
@@ -1256,7 +1256,7 @@ HB_FUNC( INETRECVENDBLOCK )
 
 HB_FUNC( INETDATAREADY )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    int iLen;
    fd_set rfds;
    struct timeval tv = {0,0};
@@ -1301,7 +1301,7 @@ HB_FUNC( INETDATAREADY )
 
 static void s_inetSendInternal( char *szFuncName, int iMode )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
    int iLen, iSent, iSend, iBufferLen;
@@ -1500,7 +1500,7 @@ HB_FUNC( INETGETALIAS )
 
 HB_FUNC( INETSERVER )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(2);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(2);
    int iPort;
    int iOpt = 1;
    int iListen;
@@ -1581,7 +1581,7 @@ HB_FUNC( INETSERVER )
 
 HB_FUNC( INETACCEPT )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 1 );
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
    HB_SOCKET_STRUCT *NewSocket;
    HB_SOCKET_T incoming = 0;
    int iError = EAGAIN;
@@ -1678,7 +1678,7 @@ HB_FUNC( INETACCEPT )
 HB_FUNC( INETCONNECT )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer( 3 ) ;
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 3 ) ;
 
    int iPort;
    struct hostent *Host;
@@ -1751,7 +1751,7 @@ HB_FUNC( INETCONNECTIP )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
    int iPort = hb_parni( 2 );
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(3);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(3);
 
    if( pHost == NULL || iPort == 0
          || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
@@ -1907,7 +1907,7 @@ HB_FUNC( INETDGRAM )
 
 HB_FUNC( INETDGRAMSEND )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    char *szAddress = hb_parcx(2);
    int iPort = hb_parni( 3 );
    PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
@@ -1969,7 +1969,7 @@ HB_FUNC( INETDGRAMSEND )
 
 HB_FUNC( INETDGRAMRECV )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
+   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(1);
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
 
    char *Buffer;

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.165 2004/04/04 23:38:01 fsgiudice Exp $
+* $Id: thread.c,v 1.166 2004/04/28 18:31:41 druzus Exp $
 */
 
 /*
@@ -1500,7 +1500,7 @@ HB_FUNC( STARTTHREAD )
 HB_FUNC( STOPTHREAD )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1547,7 +1547,7 @@ HB_FUNC( KILLTHREAD )
    HB_THREAD_STUB
 #endif
 
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1590,7 +1590,7 @@ HB_FUNC( KILLTHREAD )
 HB_FUNC( JOINTHREAD )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1669,7 +1669,7 @@ HB_FUNC( GETCURRENTTHREAD )
 HB_FUNC( GETTHREADID )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread != NULL )
    {
@@ -1701,7 +1701,7 @@ HB_FUNC( GETTHREADID )
 HB_FUNC( GETSYSTEMTHREADID )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread != NULL )
    {
@@ -1738,8 +1738,8 @@ HB_FUNC( ISSAMETHREAD )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   PHB_THREAD_ID pThread1 = (PHB_THREAD_ID) hb_parpointer( 1 );
-   PHB_THREAD_ID pThread2 = (PHB_THREAD_ID) hb_parpointer( 2 );
+   PHB_THREAD_ID pThread1 = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread2 = (PHB_THREAD_ID) hb_parptr( 2 );
 
    if( pThread1 == NULL || pThread1->sign != HB_THREAD_ID_SIGN ||
        ( pThread2 != NULL && pThread2->sign != HB_THREAD_ID_SIGN ) )
@@ -1778,7 +1778,7 @@ HB_FUNC( ISVALIDTHREAD )
 #if defined( HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -2052,7 +2052,7 @@ HB_FUNC( HB_MUTEXLOCK )
    HB_THREAD_STUB
 #endif
 
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -2095,7 +2095,7 @@ HB_FUNC( HB_MUTEXTRYLOCK )
    HB_THREAD_STUB
 #endif
 
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -2131,7 +2131,7 @@ HB_FUNC( HB_MUTEXTRYLOCK )
 */
 HB_FUNC( HB_MUTEXUNLOCK )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -2163,7 +2163,7 @@ static void s_subscribeInternal( int mode )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
    PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
    int iWaitRes;
    ULONG ulWaitTime;
@@ -2259,7 +2259,7 @@ HB_FUNC( SUBSCRIBENOW )
 */
 HB_FUNC( NOTIFY )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
 
    /* Parameter error checking */
@@ -2293,7 +2293,7 @@ HB_FUNC( NOTIFY )
 */
 HB_FUNC( NOTIFYALL )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
    BOOL bClear = FALSE;
    int iWt;

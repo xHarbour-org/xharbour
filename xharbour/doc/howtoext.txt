@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.6 2004/04/28 09:59:38 brianhays Exp $
+$Id: howtoext.txt,v 1.7 2004/04/28 18:21:16 druzus Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -1121,7 +1121,7 @@ your function, to take care of cleanups.
 
 hb_retptrGC() function allows to return a value created with hb_gcAlloc(), so that
 the calling xharbour program receives a HB_IT_POINTER object with custom data
-inside it. hb_parpointer( N ) returns a the pointer object that is associated
+inside it. hb_parptr( N ) returns a the pointer object that is associated
 with the given Nth parameter.
 
 The xharbour program cannot alter the status of the pointer object, but the
@@ -1181,7 +1181,7 @@ HB_FUNC( CREATEMYTYPE )
 
 HB_FUNC( MYTYPESETSTR )
 {
-   MyStruct *my = hb_parpointer( 1 );
+   MyStruct *my = hb_parptr( 1 );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
 
    // check parameters here
@@ -1191,7 +1191,7 @@ HB_FUNC( MYTYPESETSTR )
 
 HB_FUNC( MYTYPEGETSTR )
 {
-   MyStruct *my = hb_parpointer( 1 );
+   MyStruct *my = hb_parptr( 1 );
    // check parameters here
 
    /* Quite useful to copy the data; we don't want a change of
@@ -1244,7 +1244,7 @@ HB_FUNC( CREATEMYTYPE )
 
 HB_FUNC( MYTYPESETSTR )
 {
-   MyStruct *my = hb_parpointer( 1 );
+   MyStruct *my = hb_parptr( 1 );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
 
    if ( my == NULL || my->sign != MYSTRUCT_SIGN )

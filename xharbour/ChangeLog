@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2862 2004/05/02 13:44:04 druzus Exp $
+ * $Id: ChangeLog,v 1.2863 2004/05/02 19:29:19 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-02 23:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/pgsql/postgres.c
+  * xharbour/doc/howtoext.txt
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/thread.c
+    * hb_parpointer() replaced by hb_parptr() - please note that
+      hb_parpointer() is obsolete and will be removed in the future
 
 2004-05-02 21:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/dos/djgpp.cf
