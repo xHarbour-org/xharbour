@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.21 2003/11/21 13:22:35 lculik Exp $
+ * $Id: tgetlist.prg,v 1.22 2003/11/23 01:21:00 likewolf Exp $
  */
 
 /*
@@ -1031,76 +1031,75 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
    IF ( nHotItem := ::Accelerator( nKey, oGetMsg ) ) != 0
       oGet:ExitState := GE_SHORTCUT
       ::nNextGet := nHotItem
+      RETURN SELF
+   ENDIF
 
-   ELSEIF ( !( VALTYPE( oMenu ) == "O" ) )
+   //If this is not an object, we havce nothing more to do
+   IF VALTYPE( oMenu ) == "O"
+      RETURN Self
+   ENDIF
 
-   ELSEIF ( ( nHotItem := oMenu:GetAccel( nKey ) ) != 0 )
+   IF nHotItem := oMenu:GetAccel( nKey ) ) != 0
       ::nMenuID := oMenu:ModalGet( nHotItem, oGetMsg )
       nKey := 0
-
-   ELSEIF ( oMenu:IsShortCut( nKey )  )
+   ELSEIF oMenu:IsShortCut( nKey )
       nKey := 0
+   ENDIF
 
-   endif
-   tracelog(oGUI:ClassName )
-   if nKey == 0
-   elseif ( oTheClass := oGUI:ClassName() ) == "HBRADIOGROUP"
-   tracelog( nKey )
-      if nKey == K_UP
-         oGUI:PrevItem()
-         nKey := 0
-
-      elseif nKey == K_DOWN
-         oGUI:NextItem()
-         nKey := 0
-
-      elseif ( nHotItem := oGUI:GetAccel( nKey ) ) != 0
-         oGUI:Select( nHotItem )
-
-      endif
-
-      if valtype( oGet:VarGet() ) == "N"
-         oGet:VarPut( oGUI:Value )
-      endif
-
-   elseif oTheClass == "CHECKBOX"
-      if nKey == K_SPACE
-         oGUI:Select()
-      endif
-
-   elseif oTheClass == "PUSHBUTTON"
-      if nKey == K_SPACE
-         oGUI:Select( K_SPACE )
-
-      elseif nKey == K_ENTER
-         oGUI:Select()
-         nKey := 0
-
-      endif
-
-   elseif oTheClass == "LISTBOX"
-
-      if nKey == K_UP
-         oGUI:PrevItem()
-         nKey := 0
-      elseif nKey == K_DOWN
-         oGUI:NextItem()
-         nKey := 0
-      elseif nKey == K_SPACE
-         if ! oGUI:DropDown
-         elseif ! oGUI:IsOpen
-            oGUI:Open()
+   if nKey != 0
+      if ( oTheClass := oGUI:ClassName() ) == "HBRADIOGROUP"
+         if nKey == K_UP
+            oGUI:PrevItem()
             nKey := 0
+         elseif nKey == K_DOWN
+            oGUI:NextItem()
+            nKey := 0
+         elseif ( nHotItem := oGUI:GetAccel( nKey ) ) != 0
+            oGUI:Select( nHotItem )
          endif
-      elseif ( nButton := oGUI:FindText( chr(nKey), oGUI:Value+1, .f., .f. )) != 0
-         oGUI:Select( nButton )
-      endif
 
-      if valtype( oGet:VarGet() ) == "N"
-         oGet:VarPut( oGui:Value )
-      endif
+         if valtype( oGet:VarGet() ) == "N"
+            oGet:VarPut( oGUI:Value )
+         endif
 
-   endif
+      elseif oTheClass == "CHECKBOX"
+         if nKey == K_SPACE
+            oGUI:Select()
+         endif
+
+      elseif oTheClass == "PUSHBUTTON"
+         if nKey == K_SPACE
+            oGUI:Select( K_SPACE )
+
+         elseif nKey == K_ENTER
+            oGUI:Select()
+            nKey := 0
+
+         endif
+
+      elseif oTheClass == "LISTBOX"
+
+         if nKey == K_UP
+            oGUI:PrevItem()
+            nKey := 0
+         elseif nKey == K_DOWN
+            oGUI:NextItem()
+            nKey := 0
+         elseif nKey == K_SPACE
+            if ! oGUI:DropDown
+            elseif ! oGUI:IsOpen
+               oGUI:Open()
+               nKey := 0
+            endif
+         elseif ( nButton := oGUI:FindText( chr(nKey), oGUI:Value+1, .f., .f. )) != 0
+            oGUI:Select( nButton )
+         endif
+
+         if valtype( oGet:VarGet() ) == "N"
+            oGet:VarPut( oGui:Value )
+         endif
+      endif
+   ENDIF
 
    Switch nKey
    case K_UP
@@ -1502,23 +1501,26 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
       nMouseRow    := mROW()
       nMouseColumn := mCOL()
 
-      IF ( !( VALTYPE( oMenu ) == "O" ) )
+      IF VALTYPE( oMenu ) != "O"
          nButton := 0
 
-      ELSEIF ( !( oMenu:ClassName() == "TOPBARMENU" ) )
+      ELSEIF oMenu:ClassName() != "TOPBARMENU"
          nButton := 0
 
       ELSEIF ( ( nButton := oMenu:HitTest( nMouseRow, nMouseColumn ) ) != 0 )
          ::nMenuID := oMenu:ModalGet( nHotItem, oGetMsg )
          nButton := 1
-
       ENDIF
 
       IF ( nButton != 0 )
       elseif (nButton := oTB:HitTest( nMouseRow, nMouseColumn ) ) == HTNOWHERE // Changed test:
          if ::HitTest(  nMouseRow, nMouseColumn, oGetMsg ) != 0
-            oGet:ExitState := GE_MOUSEHIT
             ::nLastExitStat := GE_MOUSEHIT
+            IF nKey == K_LDBLCLK
+               oGet:ExitState := GE_ENTER
+            ELSE
+               oGet:ExitState := GE_MOUSEHIT
+            ENDIF
          else
             oGet:ExitState := GE_NOEXIT
 

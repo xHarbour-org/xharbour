@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.28 2004/02/18 21:35:56 druzus Exp $
+ * $Id: gtxvt.c,v 1.29 2004/02/19 23:43:09 jonnymind Exp $
  */
 
 /*
@@ -460,9 +460,10 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    xvt_statusQueryMouseBtns( status, dpy );
    wnd = xvt_windowCreate( dpy, buf, status );
 
-   XMapWindow( wnd->dpy, wnd->window );
    // ok, now we can inform the X manager about our new status:
    xvt_windowSetHints( wnd );
+
+   XMapWindow( wnd->dpy, wnd->window );
 
    // create commonly used color items
    for (irow = 0; irow < 16; irow ++ )
@@ -846,6 +847,10 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
    PXWND_DEF wnd;
    int whiteColor;
    XFontStruct *xfs;
+   XSetWindowAttributes xAttr;
+   Window wndRoot;
+   XWindowAttributes rootAttr;
+
 
    // load the standard font
    xfs = xvt_fontNew( dpy, XVT_DEFAULT_FONT_NAME, XVT_DEFAULT_FONT_WEIGHT,
@@ -869,10 +874,18 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
 
    /* Create the phisical window */
    whiteColor = WhitePixel(dpy, DefaultScreen(dpy));
+   /* Gets root window geometry */
+   wndRoot = XDefaultRootWindow( dpy );
+   XGetWindowAttributes( dpy, wndRoot, &rootAttr );
+
    wnd->window = XCreateSimpleWindow(dpy,
-      DefaultRootWindow(dpy),
-      0, 0, wnd->width, wnd->height,
+      wndRoot,
+      (rootAttr.width - wnd->width)/2, (rootAttr.height - wnd->height)/2,
+      wnd->width, wnd->height,
       0, whiteColor, whiteColor);
+
+   xAttr.win_gravity = CenterGravity;
+   XChangeWindowAttributes( dpy, wnd->window, CWWinGravity, &xAttr );
 
    /* Setfont requires a wnd->gc and wnd->buffer to be in place */
    wnd->gc = XCreateGC( dpy, wnd->window, 0, NULL );
@@ -911,9 +924,17 @@ static void xvt_windowSetHints( PXWND_DEF wnd )
    char **argv;
    int argc;
    int i;
+   Window wndRoot;
+   XWindowAttributes rootAttr;
+
+
+   wndRoot = XDefaultRootWindow( wnd->dpy );
+   XGetWindowAttributes( wnd->dpy, wndRoot, &rootAttr );
 
    //xsize.flags = PWinGravity | PBaseSize | PResizeInc | PMinSize;
-   xsize.flags = PWinGravity | PResizeInc | PMinSize;
+   xsize.flags = USPosition| PWinGravity | PResizeInc | PMinSize;
+   xsize.x = (rootAttr.width - wnd->width)/2;
+   xsize.y = (rootAttr.height - wnd->height)/2;
    xsize.win_gravity = CenterGravity;
    xsize.width_inc = wnd->fontWidth;
    xsize.height_inc = wnd->fontHeight;

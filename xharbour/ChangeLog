@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2335 2004/02/20 09:07:05 paultucker Exp $
+ * $Id: ChangeLog,v 1.2336 2004/02/20 12:52:49 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-20 14:53 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! GT window now appares in the middle of the screen in every WM.
 
 2004-02-20 13:55 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/filesys.c
