@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.113 2004/07/20 02:31:26 peterrees Exp $
+ * $Id: filesys.c,v 1.114 2004/07/22 14:47:45 likewolf Exp $
  */
 
 /*
@@ -189,7 +189,7 @@
    #define HB_FS_SETDRIVE(n) \
    { \
       UINT uiDummy; \
-      _dos_setdrive( ( n ) + 1, uiDummy ); \
+      _dos_setdrive( ( n ) + 1, &uiDummy ); \
    }
 #else
    #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
