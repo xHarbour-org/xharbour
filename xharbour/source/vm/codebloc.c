@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.31 2003/10/16 20:27:49 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.32 2003/10/19 18:05:11 ronpinkas Exp $
  */
 
 /*
@@ -154,10 +154,33 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             // Need to refelct in the local as well.
             if( pLocal != pValue )
             {
+               PHB_ITEM *pItem = hb_stack.pBase - 1;
+
                pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
                pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
                pLocal->item.asMemvar.offset    = 0;
                pLocal->item.asMemvar.value     = hMemvar;
+
+               hb_memvarValueIncRef( pLocal->item.asMemvar.value );
+
+               // Scan the stack for possible additional refrences to the now *detached* value!
+               while( pItem != hb_stack.pItems )
+               {
+                  if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+                  {
+                     if( hb_itemUnRef( *pItem ) == pValue )
+                     {
+                        ( *pItem )->type = HB_IT_BYREF | HB_IT_MEMVAR;
+                        ( *pItem )->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
+                        ( *pItem )->item.asMemvar.offset    = 0;
+                        ( *pItem )->item.asMemvar.value     = hMemvar;
+
+                        hb_memvarValueIncRef( ( *pItem )->item.asMemvar.value );
+                     }
+                  }
+
+                  --pItem;
+               }
             }
          }
          else
