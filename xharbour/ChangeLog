@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.468 2002/10/28 20:36:51 mlombardo Exp $
+ * $Id: ChangeLog,v 1.469 2002/10/28 20:39:36 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-29 23:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/memoedit.prg
+    source/rtl/teditor.prg
+    % CRTL_W key is now an Valid Save key for memoedit Function 
 
 2002-10-26 17:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/dymsym.c

@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.5 2002/06/21 20:33:35 walito Exp $
+ * $Id: teditor.prg,v 1.6 2002/09/04 03:11:25 lculik Exp $
  */
 
 /*
@@ -895,6 +895,15 @@ METHOD Edit(nPassedKey) CLASS HBEditor
       endif
 
          do case
+            case nKey == K_ALT_W .or. nKey == K_CTRL_W
+               /* TOFIX: Not clipper compatible */
+               ::lSaved := .T.
+               ::lExitEdit := .T.
+
+            case nKey == K_ESC
+               ::lSaved := .F.
+               ::lExitEdit := .T.
+
 
             case nKey >= K_SPACE .AND. nKey < 256
                ::lDirty := .T.
@@ -1000,15 +1009,6 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
             case ::MoveCursor(nKey)
                // if it's a movement key ::MoveCursor() handles it
-
-            case nKey == K_ALT_W
-               /* TOFIX: Not clipper compatible */
-               ::lSaved := .T.
-               ::lExitEdit := .T.
-
-            case nKey == K_ESC
-               ::lSaved := .F.
-               ::lExitEdit := .T.
 
             otherwise
                /* NOTE: if you call ::Edit() with a key that is passed to ::KeyboardHook() and then
