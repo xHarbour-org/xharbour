@@ -1,5 +1,5 @@
 /*
- * $Id: terminal.txt,v 1.1.1.1 2001/12/21 10:49:11 ronpinkas Exp $
+ * $Id: terminal.txt,v 1.3 2004/09/16 00:00:00 modalsist Exp $
  */
 
 /*
@@ -222,8 +222,15 @@
  *      <aOptions> Array with available response. Each element should be
  *      Character string. If omitted, default is { "Ok" }.
  *
- *      <cColorNorm> Color string to paint the dialog box with.
- *      If omitted, default color is "W+/R".
+ *      <cColorNorm> The color string to paint the dialog box, message and
+ *      text options.
+ *
+ *      NOTE: In Clipper only the first color string pair is used to paint all
+ *            alert <xMessage>, box and text options into array <aOptions>.
+ *            At xHarbour, if we pass two color string pairs, then the first one
+ *            will be used to paint dialog box and <xMessage>, and the second one
+ *            will be used to paint the text options into array <aOptions>.
+ *            If omitted, default color is "W+/R,W+/B".
  *
  *      <nDelay> Number of seconds to wait to user response before abort.
  *      Default value is 0, that wait forever.
@@ -294,7 +301,7 @@
  *      if HB_C52_UNDOC was define during compilation of source/rtl/alert.prg
  *
  *      <cColorNorm> is a Harbour extension, or at least un-documented
- *      in Clipper 5.2 NG.
+ *      in Clipper 5.2/5.3 NG.
  *
  *      <nDelay> is a Harbour extension.
  *  $FILES$

@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.12 2004/06/30 03:25:57 paultucker Exp $
+ * $Id: alert.prg,v 1.14 2004/09/16 00:00:00 modalsist Exp $
  */
 
 /*
@@ -65,6 +65,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    LOCAL nCount
    LOCAL nLen, sCopy
    LOCAL lWhile
+
+   LOCAL cColorStr,cColorPair1,cColorPair2,cColor11,cColor12,cColor21,cColor22
+   LOCAL nCommaSep,nSlash
 
 #ifdef HB_COMPAT_C53
    LOCAL nMRow, nMCol
@@ -181,12 +184,115 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       aOptions := {}
    ENDIF
 
-   IF !ISCHARACTER( cColorNorm )
-      cColorNorm := "W+/R"
-      cColorHigh := "W+/B"
+   IF !ISCHARACTER( cColorNorm ) .or. EMPTY( cColorNorm )
+      cColorNorm := "W+/R" // first pair color (Box line and Text)
+      cColorHigh := "W+/B" // second pair color (Options buttons)
    ELSE
-      cColorHigh := StrTran( StrTran( iif( At( "/", cColorNorm ) == 0, "N", SubStr( cColorNorm, At( "/", cColorNorm ) + 1 ) ) + "/" +;
-                                      iif( At( "/", cColorNorm ) == 0, cColorNorm, Left( cColorNorm, At( "/", cColorNorm ) - 1 ) ), "+", "" ), "*", "" )
+
+      /* NOTE: Clipper Alert does not handle second color pair properly. 
+               If we inform the second color pair, xHarbour alert will consider it.
+               if we not inform the second color pair, then xHarbour alert will behave 
+               like Clipper.  2004/Sep/16 - Eduardo Fernandes <modalsist> */
+
+      cColor11 := cColor12 := cColor21 := cColor22 := ""
+
+      cColorStr := alltrim( StrTran( cColorNorm," ","") )
+      nCommaSep := At(",",cColorStr)
+
+      if nCommaSep > 0 // exist more than one color pair.
+         cColorPair1 := SubStr( cColorStr, 1, nCommaSep - 1 )
+         cColorPair2 := SubStr( cColorStr, nCommaSep + 1 )
+      else
+         cColorPair1 := cColorStr
+         cColorPair2 := ""
+      endif
+      
+      nSlash := At("/",cColorPair1)
+      
+      if nSlash > 1
+         cColor11 := SubStr( cColorPair1,1,nSlash-1)
+         cColor12 := SubStr( cColorPair1,nSlash+1)
+      else
+         cColor11 := cColorPair1
+         cColor12 := "R"
+      endif
+      
+      if ColorValid(cColor11) .and. ColorValid(cColor12)
+
+        // if color pair is passed in numeric format, then we need to convert for 
+        // letter format to avoid blinking in some circumstances. 
+        if IsDigit( cColor11 )
+           cColor11 := COLORLETTER( cColor11 )
+        endif   
+
+        cColorNorm := cColor11
+
+        if !empty(cColor12) 
+
+            if IsDigit( cColor12 )
+               cColor12 := COLORLETTER( cColor12 )
+            endif   
+
+            cColorNorm := cColor11+"/"+cColor12
+
+        endif   
+
+      else
+         cColor11 := "W+"
+         cColor12 := "R"
+         cColorNorm := cColor11+"/"+cColor12
+      endif
+      
+
+      // if second color pair exist, then xHarbour alert will handle properly. 
+      if !empty( cColorPair2 )
+      
+         nSlash := At("/",cColorPair2)
+      
+         if nSlash > 1
+            cColor21 := SubStr( cColorPair2,1,nSlash-1)
+            cColor22 := SubStr( cColorPair2,nSlash+1)
+         else
+            cColor21 := cColorPair2
+            cColor22 := "B"
+         endif
+
+         if ColorValid(cColor21) .and. ColorValid(cColor22)
+
+            if IsDigit( cColor21 )
+               cColor21 := COLORLETTER( cColor21 )
+            endif   
+
+            cColorHigh := cColor21
+
+            if !empty(cColor22)
+
+                if IsDigit( cColor22 )
+                   cColor22 := COLORLETTER( cColor22 )
+                endif   
+
+                // extracting color attributes from background color.
+                cColor22 := StrTran( cColor22, "+", "" )
+                cColor22 := StrTran( cColor22, "*", "" )
+                cColorHigh := cColor21+"/"+cColor22
+
+            endif   
+
+         else
+            cColorHigh := "W+/B"
+         endif
+         
+      else // if does not exist the second color pair, xHarbour alert will behave like Clipper
+         if empty(cColor11) .or. empty(cColor12)
+            cColor11 := "B"
+            cColor12 := "W+"
+         else   
+            cColor11 := StrTran( cColor11, "+", "" )
+            cColor11 := StrTran( cColor11, "*", "" )
+         endif
+         cColorHigh := cColor12+"/"+cColor11
+      endif
+      
    ENDIF
 
    IF nDelay == NIL
@@ -415,3 +521,103 @@ PROCEDURE __NONOALERT()
 
 #endif
 
+//-----------------------------------//
+// 2004/Setp/15 - Eduardo Fernandes
+// Convert number color format to character color format.
+STATIC FUNCTION COLORLETTER( cColor )
+
+Local nColor
+
+  if !IsCharacter( cColor )
+     cColor:=""
+  endif
+     
+  cColor := StrTran( cColor, " ","")
+  cColor := StrTran( cColor, "*","")
+  cColor := StrTran( cColor, "+","")
+  
+  nColor := Abs( Val( cColor ) )
+  
+
+  if nColor=0
+     cColor:="N"
+  elseif nColor=1
+     cColor:="B"
+  elseif nColor=2
+     cColor:="G"
+  elseif nColor=3
+     cColor:="BG"
+  elseif nColor=4
+     cColor:="R"
+  elseif nColor=5
+     cColor:="RB"
+  elseif nColor=6
+     cColor:="GR"
+  elseif nColor=7
+     cColor:="W"
+  elseif nColor=8
+     cColor:="N+"
+  elseif nColor=9
+     cColor:="B+"
+  elseif nColor=10
+     cColor:="G+"
+  elseif nColor=11
+     cColor:="BG+"
+  elseif nColor=12
+     cColor:="R+"
+  elseif nColor=13
+     cColor:="RB+"
+  elseif nColor=14
+     cColor:="GR+"
+  elseif nColor=15
+     cColor:="W+"
+  else
+     cColor:="W+" // 15 is the max.
+  endif   
+
+RETURN ( cColor )
+
+//-----------------------------------//
+// 2004/Setp/15 - Eduardo Fernandes
+// Test vality of the color string
+STATIC FUNCTION COLORVALID( cColor )
+
+if !IsCharacter( cColor )
+   Return .F.
+endif
+
+cColor := StrTran( cColor, " ","" )
+cColor := StrTran( cColor, "*","" )
+cColor := StrTran( cColor, "+","" )
+cColor := Upper( cColor )
+
+if cColor=="0"  .or.;
+   cColor=="1"  .or.;
+   cColor=="2"  .or.;
+   cColor=="3"  .or.;
+   cColor=="4"  .or.;
+   cColor=="5"  .or.;
+   cColor=="6"  .or.;
+   cColor=="7"  .or.;
+   cColor=="8"  .or.;
+   cColor=="9"  .or.;
+   cColor=="10" .or.;
+   cColor=="11" .or.;
+   cColor=="12" .or.;
+   cColor=="13" .or.;
+   cColor=="14" .or.;
+   cColor=="15" .or.;
+   cColor=="B"  .or.;
+   cColor=="BG" .or.;
+   cColor=="G"  .or.;
+   cColor=="GR" .or.;
+   cColor=="N"  .or.;
+   cColor=="R"  .or.;
+   cColor=="RB" .or.;
+   cColor=="W"  
+
+   Return .T.
+   
+ENDIF
+
+Return .F.   

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3435 2004/09/15 03:52:46 bdj Exp $
+ * $Id: ChangeLog,v 1.3437 2004/09/16 00:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-16 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/alert.prg
+    ! Fix corret color string pairs handle. See alert doc to more details.
+
+  * doc/en/terminal.txt
+    ! Update alert documentation about color string pairs handle.
+
+  * source/clipsamp/environ.c
+    ! Fix a compiler error. Comented /* skip the dot */
 
 2004-09-15 23:20 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
   * source/clipsamp/environ.c
