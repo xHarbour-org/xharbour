@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.6 2002/10/15 01:13:56 what32 Exp $
+ * $Id: xTree.prg,v 1.7 2002/10/16 03:32:06 what32 Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ METHOD OnCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::Add('tree', TreeObj():New( self, 100,  0,  0, 100, 100) )
-   ::Tree:Hint := "This is the Object Tree Window "+"THintWindow"
+
    TVSetImageList(::Tree:handle, hImg, 0 )
 RETURN(nil)
 

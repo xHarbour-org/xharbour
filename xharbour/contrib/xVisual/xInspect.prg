@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.30 2002/10/16 03:32:06 what32 Exp $
+ * $Id: xInspect.prg,v 1.31 2002/10/17 09:59:17 what32 Exp $
  */
 
 /*
@@ -205,6 +205,7 @@ METHOD SetCurSel(n) CLASS ComboInsp
       ::Parent:Browser:RefreshAll()
      else
       ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
+      ::Parent:CurObject:SetFocus()
    endif
 return(super:SetCurSel(n))
 

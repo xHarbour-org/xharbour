@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.11 2002/10/16 03:32:05 what32 Exp $
+ * $Id: TTreeview.prg,v 1.12 2002/10/17 09:59:15 what32 Exp $
  */
 
 /*
@@ -56,7 +56,7 @@ CLASS TTreeView FROM TCustomControl
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_MOUSEMOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
    DATA Name      PROTECTED INIT "SysTreeView32"
 

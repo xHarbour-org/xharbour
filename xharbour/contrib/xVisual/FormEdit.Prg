@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.62 2002/10/16 05:19:52 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.63 2002/10/16 17:56:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -265,7 +265,6 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
         // oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
         // oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
-
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
@@ -341,6 +340,8 @@ METHOD CreateSub()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
 
+   ::oMask:Hint:=" "
+   ::oMask:HintWindow:SetMaxTipWidth(10)
    RETURN( xRet )
 
 *------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.18 2002/10/14 01:37:47 fsgiudice Exp $
+ * $Id: CtrlMask.Prg,v 1.19 2002/10/17 09:59:16 what32 Exp $
  */
 
 /*
@@ -472,7 +472,7 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL hDC
    LOCAL a
    LOCAL aOldSelected:=aClone(::aSelected)
-
+   
    ClientToScreen(::Handle,aPt)
 
    IF Empty(::Cursor)
@@ -488,6 +488,7 @@ METHOD OnLButtonDown( wParam, x, y )
                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
+            view "activated"
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
                ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
                WinSetCursor(LoadCursor(,::aSelected[1,SEL_HOTAREAS,nPos,3]))
@@ -561,8 +562,7 @@ METHOD OnMouseMove( aParam,x,y)
    LOCAL nPos
    LOCAL n
    LOCAL hDC
-   LOCAL a
-
+   LOCAL a,oObj
    IF ::mousedown
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
@@ -604,6 +604,9 @@ METHOD OnMouseMove( aParam,x,y)
                   WinSetCursor(LoadCursor(hThisInstance,"FINGER"))
                ENDIF
                lFound:=.T.
+               oObj:=::Parent:ChildFromHandle(hChild)
+               ::HintWindow:SetTitle(2,"Class: "+oObj:Classname())
+               ::HintWindow:SetText("Object: "+oObj:propname)
                EXIT
             ENDIF
          NEXT
@@ -671,8 +674,10 @@ METHOD OnLButtonUp( wParam, x, y )
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)
       a[SEL_OLDRECT]:=aClone(aRect)
-      oObj:=::Parent:ChildFromHandle(a[SEL_HANDLE])
-      oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1)
+      if a[SEL_HANDLE] == ::Parent:Parent:ObjInsp:CurObject:handle
+         oObj:=::Parent:ChildFromHandle(a[SEL_HANDLE])
+         oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1)
+      endif
    NEXT
 
    IF ::selecting
@@ -730,7 +735,7 @@ METHOD MoveCtrl(hWnd,aPt)
    LOCAL AnchorY
    LOCAL aChild
    LOCAL aOriginal
-
+   local oObj
    FOR EACH aChild IN ::aSelected
 
       AnchorX:=aChild[SEL_ANCHORX]
@@ -786,13 +791,16 @@ METHOD MoveCtrl(hWnd,aPt)
 
    NEXT
 
+
    IF ::nClick==HTCLIENT
       aRect:={Min(aPt[1],::aClickPt[1]),Min(aPt[2],::aClickPt[2]),;
               Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
 
    ENDIF
-
+   ::HintWindow:SetTitle(0,"")
+   ::HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"           "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
    ::aEditRect:=aRect
+
 
    RETURN(aRect)
 
