@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.7 2003/09/11 13:12:05 jonnymind Exp $
+* $Id: hbdict.prg,v 1.8 2003/10/11 13:27:37 lculik Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -25,18 +25,19 @@
 *
 
 PROCEDURE Main( cInput, cOutput )
-   LOCAL aInput, aOutput
-   LOCAL recpos
+   LOCAL aInput, aOutput, aTable
+   LOCAL recpos, nLength
    LOCAL nKey
    LOCAL lModified := .F.
+   LOCAL oBrowse := TBrowseNew( 8, 2, 22, 75 )
+   LOCAL lContinue := .T.
 
-   Save Screen
+   SAVE SCREEN
    SET COLOR TO W+/B
    CLEAR SCREEN
 
-   @0,18 SAY i18n( "X H A R B O U R - Dictionary Editor (preview,2nd)" )
-
-   DisplayMask()
+   @0,0 SAY PadC( ;
+      i18n( "X H A R B O U R - Dictionary Editor (preview, 3rd)" ), MaxCol() )
 
    IF cInput == NIL .or. cOutput == NIL
       Popup( i18n( "Incorrect format" ) )
@@ -75,108 +76,86 @@ PROCEDURE Main( cInput, cOutput )
 
 
    // Informing user
+   nLength := Len( aInput[2] )
+   aTable := aInput[2]
    ShowHeader( aInput[1] )
 
    @6,3 SAY i18n("Saving to: ") + cOutput
-   @3,50 SAY i18n("Press 'S' to save")
-   @4,50 SAY i18n("Press 'E' to edit header")
+   @2,52 SAY i18n("Press 'S' to save")
+   @3,52 SAY i18n("Press 'E' to edit header")
    recpos := 1
 
-   DO WHILE .T.
-      DisplayMask()
-      DrawPos( recpos, aInput[2] )
-      ShowRecord( recpos, aInput[2] )
+   oBrowse:colorSpec := "W+/B, N/BG"
+   oBrowse:ColSep := "Ё"
+   oBrowse:HeadSep := "ям"
+   oBrowse:FootSep := "ом"
+   oBrowse:Border := Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
+      Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 )
+
+   oBrowse:GoTopBlock    = { || recpos := 1 }
+   oBrowse:GoBottomBlock = { || recpos := nLength }
+   oBrowse:SkipBlock     = { | nSkip, nPos |;
+      nPos := recpos,;
+      recpos := If( nSkip > 0, Min( nLength, nPos + nSkip ),;
+      Max( 1, nPos + nSkip )), ;
+      recpos - nPos }
+
+   oBrowse:AddColumn( TBColumnNew( i18n("Index"),  { || recpos } ) )
+
+   oBrowse:AddColumn( TBColumnNew( i18n("Untraslated"),;
+         {|| StringTrim( aTable[ recpos ][1], 30 )} ))
+
+   oBrowse:AddColumn( TBColumnNew( i18n("Translated"),;
+         {|| StringTrim( aTable[ recpos ][2], 30 )} ))
+
+   oBrowse:GetColumn(1):Picture = '99999'
+   oBrowse:GetColumn(2):width = 30
+   oBrowse:GetColumn(3):width = 30
+
+   oBrowse:Configure(3)
+   @23,5 SAY Padc( i18n( "Press enter to edit an entry" ), 70)
+   SET CURSOR OFF
+
+   DO WHILE lContinue
+      oBrowse:ForceStable()
+
       nKey := Inkey(0)
-      IF nKey == K_ESC
-         IF lModified
-            IF( Alert( i18n( "Dictionary modified ! Do you really want to exit?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1 )
-            EXIT
-            ENDIF
-         ELSE
-            EXIT
-         ENDIF
-      ENDIF
 
       SWITCH nKey
-
-         CASE K_LEFT
-         CASE K_UP
-            IF recpos > 1
-               recpos--
+         CASE K_ESC
+            IF .not. lModified .or.;
+                  Alert( i18n( "Dictionary modified ! Do you really want to exit?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1
+               lContinue := .F.
             ENDIF
-         EXIT
-
-         CASE K_CTRL_LEFT
-         CASE K_CTRL_UP
-            IF recpos > 10
-               recpos-= 10
-            ELSE
-               recpos := 1
-            ENDIF
-         EXIT
-
-         CASE K_ALT_LEFT
-         CASE K_ALT_UP
-            IF recpos > 50
-               recpos-= 50
-            ELSE
-               recpos := 1
-            ENDIF
-         EXIT
-
-         CASE K_RIGHT
-         CASE K_DOWN
-            IF recpos < Len ( aInput[2] )
-               recpos++
-            ENDIF
-         EXIT
-
-         CASE K_CTRL_RIGHT
-         CASE K_CTRL_DOWN
-            IF recpos + 10 < Len ( aInput[2] )
-               recpos += 10
-            ELSE
-               recpos := Len( aInput[2] )
-            ENDIF
-         EXIT
-
-         CASE K_ALT_RIGHT
-         CASE K_ALT_DOWN
-            IF recpos + 50 < Len ( aInput[2] )
-               recpos += 50
-            ELSE
-               recpos := Len( aInput[2] )
-            ENDIF
-         EXIT
-
-         CASE K_END
-            recpos := Len( aInput[2] )
-         EXIT
-
-         CASE K_HOME
-            recpos := 1
          EXIT
 
          CASE K_ENTER
-            EditEntry( recpos, aInput[2] )
-            lModified := .T.
+            oBrowse:Configure(3)
+            SET CURSOR ON
+            EditEntry( aTable, recpos )
+            SET CURSOR OFF
+         EXIT
+
+         CASE 's'
+         CASE 'S'
+            SaveTable( cOutput, aInput )
+         EXIT
+
+         CASE 'e'
+         CASE 'E'
+            ReadHeader( aInput[1] )
          EXIT
 
          DEFAULT
-            IF Upper( Chr( nKey ) ) == 'S'
-               IF SaveTable( cOutput, aInput )
-                  lModified := .F.
-               ENDIF
-            ELSEIF Upper( Chr( nKey ) ) == 'E'
-               ReadHeader( aInput[1] )
-               lModified := .T.
-            ENDIF
-
+            oBrowse:ApplyKey( nKey )
       END
-
    ENDDO
 
-   Restore screen
+   SET CURSOR ON
+   SET COLOR TO W/N
+   CLEAR SCREEN
+   @24,0
+   RESTORE SCREEN
 RETURN
 
 PROCEDURE DoQuit()
@@ -186,15 +165,6 @@ PROCEDURE DoQuit()
    QUIT
 RETURN
 
-
-PROCEDURE DisplayMask()
-   MakeBox( 8,4, 13,76 )
-   MakeBox( 15,4, 21,76 )
-   @8,8 SAY " " + i18n("International string") + " "
-   @15,8 SAY " " + i18n("Local language string") + " "
-   @22,12 SAY i18n("Press ENTER to edit entry and then CTRL+W to save it")
-   @23,12 SAY i18n("While editing, press F2 for 'autopadding' feature")
-RETURN
 
 
 PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
@@ -216,39 +186,29 @@ PROCEDURE PopUp( cMessage )
    @10,20 SAY " " +cMessage + " "
 RETURN
 
-PROCEDURE DrawPos( recpos, aTable )
-   @7,60 SAY AllTrim( Str( recpos ) ) +" "+ I18n("of") + " " +  ;
-      AllTrim( Str( Len(aTable ) ) )+"     "
-RETURN
-
-PROCEDURE ShowRecord( nPos, aTable )
-   LOCAL cInter := aTable[nPos][1]
-   LOCAL cLocal := aTable[nPos][2]
-
-   IF cInter != NIL
-      @9,5 SAY ">>"+cInter+"<<"
-   ELSE
-      @9,7 SAY i18n( "<Nothing>" )
-   ENDIF
-
-   IF cLocal != NIL
-      @16,5 SAY ">>"+cLocal+"<<"
-   ELSE
-      @16,7 SAY i18n( "<Not Yet translated>" )
-   ENDIF
-
-RETURN
-
-
-PROCEDURE EditEntry( nPos, aTable )
+PROCEDURE EditEntry( aTable, nPos )
    LOCAL cInput := aTable[nPos][2]
-   LOCAL oEditor
+   LOCAL oEditor, oEdit1
+   LOCAL cScreen
+
+   SAVE SCREEN TO cScreen
+   MakeBoxShadow( 4, 10, 20, 71 )
+   MakeBox( 10, 10, 16, 70 )
+   @17,12 SAY i18n("Press ESC to exit without saving, and CTRL+W to save")
+   @18,12 SAY i18n("Press F2 to save padding to the original text length")
+
+   @4,12 SAY " " + i18n( "International String" ) + " "
+   oEdit1 := HBEditor():New( ">>" + aTable[nPos][1] + "<<",;
+      5, 11, 9 , 69, .F., 55 )
+   oEdit1:RefreshWindow()
+
+   @10,12 SAY " " + i18n( "Local String" ) + " "
 
    IF cInput == NIL
       cInput := ""
    ENDIF
 
-   oEditor := THBDictEdit():New( cInput, 16, 7, 20,73, aTable[ nPos ][1] )
+   oEditor := THBDictEdit():New( cInput, 11, 11, 15, 69, aTable[ nPos ][1] )
 
    oEditor:Edit()
    IF oEditor:lSaved
@@ -258,12 +218,15 @@ PROCEDURE EditEntry( nPos, aTable )
       ENDIF
    ENDIF
 
+   RESTORE SCREEN FROM cScreen
 RETURN
 
+
 FUNCTION SaveTable( cFileName, aTable )
-   LOCAL aHeader
+   LOCAL aHeader, cScreen
    LOCAL lOk := .F.
 
+   SAVE SCREEN TO cScreen
    Popup( i18n( "Saving file" ) )
    @12,12 SAY i18n( "Saving file to " ) + cFileName
 
@@ -285,14 +248,16 @@ FUNCTION SaveTable( cFileName, aTable )
 
    @13,13 SAY i18n( "(Press any key)" )
    Inkey(0)
-   @10,10 clear to 16, 71
+   RESTORE SCREEN FROM cScreen
+
 RETURN lOk
 
 PROCEDURE ReadHeader( aHeader )
    LOCAL GetList := {}
    LOCAL cAuthor, cLanguage, cCode
+   LOCAL cScreen
 
-   SAVE SCREEN
+   SAVE SCREEN TO cScreen
    cAuthor   := padr( aHeader[2], 40 )
    cLanguage := padr( aHeader[3], 40 )
    cCode := padr( aHeader[5], 5 )
@@ -311,7 +276,7 @@ PROCEDURE ReadHeader( aHeader )
       aHeader[5] := AllTrim( cCode )
    ENDIF
 
-   RESTORE SCREEN
+   RESTORE SCREEN FROM cScreen
    ShowHeader( aHeader )
 RETURN
 
@@ -354,6 +319,16 @@ PROCEDURE MergeTables( aInTable, aOutTable )
    NEXT
 
 RETURN
+
+
+FUNCTION StringTrim( cStr, nLen )
+   IF cStr == NIL
+      cStr := i18n( "<Not yet translated>")
+   ENDIF
+   IF Len( cStr ) < nLen
+      RETURN Padr( cStr, nLen )
+   ENDIF
+RETURN Substr( cStr, 1, nLen - 3 ) + "..."
 
 ***************************************************
 * Sorting input
@@ -417,7 +392,7 @@ METHOD KeyboardHook( nKey ) CLASS THBdictEdit
 RETURN nKey
 
 METHOD IdleHook() CLASS THBDictEdit
-#ifndef DJGPP     
+#ifndef DJGPP
    ThreadSleep( 10 ) // release CPU
 #endif
 RETURN Self
