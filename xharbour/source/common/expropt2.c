@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.7 2004/05/14 12:51:35 walito Exp $
+ * $Id: expropt2.c,v 1.8 2004/11/21 21:43:43 druzus Exp $
  */
 
 /*
@@ -230,7 +230,11 @@ HB_EXPR_PTR hb_compExprReduceMult( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
          {
             pSelf->value.asNum.dVal = pLeft->value.asNum.dVal * pRight->value.asNum.dVal;
             pSelf->value.asNum.bWidth = HB_DEFAULT_WIDTH;
-            pSelf->value.asNum.bDec = pLeft->value.asNum.bDec + pRight->value.asNum.bDec;
+            if ( pLeft->value.asNum.bDec == HB_DEFAULT_DECIMALS || 
+                 pRight->value.asNum.bDec == HB_DEFAULT_DECIMALS )
+               pSelf->value.asNum.bDec = HB_DEFAULT_DECIMALS;
+            else
+               pSelf->value.asNum.bDec = pLeft->value.asNum.bDec + pRight->value.asNum.bDec;
             pSelf->value.asNum.NumType = HB_ET_DOUBLE;
 
             break;

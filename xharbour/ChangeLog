@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3855 2005/02/22 07:20:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3856 2005/02/22 11:00:07 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-22 22:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/common/expropt2.c
+    * check for HB_DEFAULT_DECIMALS when reducing mult expression
+      and counting decimal places
 
 2005-02-22 11:52 UTC+0100 Giancarlo Niccolai <gc at niccolai dot ws>
   ! source/tip/ftpcln.prg
