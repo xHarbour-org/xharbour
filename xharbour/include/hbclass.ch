@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.11 2003/10/26 03:34:10 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.12 2003/11/14 01:18:01 ronpinkas Exp $
  */
 
 /*
@@ -187,7 +187,7 @@ DECLARE HBClass ;
      [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
      [ ; #translate Super() : => ::<SuperClass1>: ] ;
      [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate ::Super : => ::<SuperClass1>: ]
+     [ ; #translate : Super : => :<SuperClass1>: ]
 
 #else
 
@@ -212,7 +212,7 @@ DECLARE HBClass ;
      [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
      [ ; #translate Super() : => ::<SuperClass1>: ] ;
      [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate ::Super : => ::<SuperClass1>: ]
+     [ ; #translate : Super : => :<SuperClass1>: ]
 
 #endif /* HB_SHORTNAMES */
 
@@ -242,7 +242,7 @@ DECLARE HBClass ;
      [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
      [ ; #translate Super() : => ::<SuperClass1>: ] ;
      [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate ::Super : => ::<SuperClass1>: ]
+     [ ; #translate : Super : => :<SuperClass1>: ]
 
 #else
 
@@ -265,7 +265,7 @@ DECLARE HBClass ;
      [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
      [ ; #translate Super() : => ::<SuperClass1>: ] ;
      [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate ::Super : => ::<SuperClass1>: ] ;
+     [ ; #translate : Super : => :<SuperClass1>: ] ;
 
 #endif /* HB_SHORTNAMES */
 

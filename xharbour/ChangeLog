@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2171 2004/01/28 22:06:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.2172 2004/01/28 22:36:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-28 15:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    * Minor fix to :super: support when class definition folowed by OOP code.
+
 2004-01-29 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/tget.prg
     ! Fixed bug in get class when using "@9" picture with strings
@@ -43,7 +48,7 @@
   * tests/vidtest.prg
   * tests/regextest.prg
     * Testing using SET GtMode ...
-    
+
 
 2004-01-28 13:10 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * utils/hbmake/hbmake.prg
