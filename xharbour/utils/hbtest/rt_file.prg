@@ -1,5 +1,5 @@
 /*
- * $Id: rt_file.prg,v 1.3 2003/01/16 16:56:34 walito Exp $
+ * $Id: rt_file.prg,v 1.4 2004/04/02 19:45:03 andijahja Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ FUNCTION Main_FILE()
    LOCAL cBuff100 := Space( 100 )
 
    LOCAL fhnd
+   LOCAL fhnd1
 
    nFlags := FC_NORMAL
    fhnd := FCreate( cFileName, nFlags )
@@ -206,9 +207,9 @@ FUNCTION Main_FILE()
    TEST_LINE( TESTFIER( FClose( fhnd ) )                               , 'E: 6      R: .F.'                )
 
    nFlags := FO_EXCLUSIVE
-   fhnd := FOpen( cFileName, nFlags )
-   fhnd := FOpen( cFileName, nFlags )
-
+   fhnd  := FOpen( cFileName, nFlags )
+   TEST_LINE( FError()                                                 , 0 )
+   fhnd1 := FOpen( cFileName, nFlags )
    TEST_LINE( FError()                                                 , 5 )
    FClose( fhnd )
    TEST_LINE( TESTFIER( FErase( "NOT_HERE.$$$" ) )                     , 'E: 2      R: -1'                 )
@@ -219,7 +220,8 @@ FUNCTION Main_FILE()
    TEST_LINE( TESTFIER( File( cFileName ) )                            , "E: 0      R: .T."    )
    TEST_LINE( TESTFIER( File( "NOT_HERE.$$$" ) )                       , "E: 0      R: .F."    )
 
-   FErase("$$FILEIO.TMP")
+   TEST_LINE( FErase( "$$FILEIO.TMP" )                                  , 0 )
+   TEST_LINE( FError()                                                  , 0 )
 
    RETURN NIL
 
