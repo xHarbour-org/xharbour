@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.6 2003/01/02 20:14:09 ronpinkas Exp $
+ * $Id: trace.c,v 1.7 2003/01/02 23:10:13 ronpinkas Exp $
  */
 
 /*
@@ -73,17 +73,17 @@ void hb_traceInit( void )
 
    if( pTraceLog && pTraceLog->pSymbol->pFunPtr )
    {
-        /* Create trace.log for tracing. */
-        fpTrace = fopen( "trace.log", "w" );
+      /* Create trace.log for tracing. */
+      fpTrace = fopen( "trace.log", "w" );
 
-        if( fpTrace )
-        {
-           fclose( fpTrace );
-        }
-        else
-        {
-           hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
-        }
+      if( fpTrace )
+      {
+         fclose( fpTrace );
+      }
+      else
+      {
+         //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+      }
    }
 }
 

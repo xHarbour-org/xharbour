@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.55 2002/07/01 04:34:20 walito Exp $
+ * $Id: tgetlist.prg,v 1.15 2003/01/27 03:57:24 walito Exp $
  */
 
 /*
@@ -630,7 +630,7 @@ METHOD GetPostValidate() CLASS HBGetList
       oGet:UpdateBuffer()
 
       ::ShowScoreBoard()
-      
+
 #ifdef HB_COMPAT_C53
       ::lUpdated := IIF( oGet:changed, .T., lUpdated )
 #else
@@ -726,7 +726,7 @@ METHOD Settle( nPos ) CLASS HBGetList
 #ifdef HB_COMPAT_C53
       if ::nLastExitState != 0
          nExitState := ::nLastExitState
-      elseif ::nNextGet < ::nLastPos 
+      elseif ::nNextGet < ::nLastPos
          nExitState := GE_UP
       else
          nExitState := GE_DOWN
@@ -762,7 +762,7 @@ METHOD Settle( nPos ) CLASS HBGetList
          exit
 
 #ifdef HB_COMPAT_C53
-      case GE_SHORTCUT 
+      case GE_SHORTCUT
          return ::nNextGet
 
       case GE_MOUSEHIT
@@ -1027,7 +1027,7 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
    ELSEIF ( oMenu:IsShortCut( nKey )  )
       nKey := 0
 
-   endif 
+   endif
 
    if nKey == 0
    elseif ( oTheClass := oGUI:ClassName() ) == "RADIOGROUP"
@@ -1331,7 +1331,7 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
 
    endif
 
-   return  lValid 
+   return  lValid
 
 METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
    Local oTB, nKey, lAutoLite, nSaveCursor, nProcessed
@@ -1358,7 +1358,7 @@ METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
 
       if oGet:exitState == GE_NOEXIT  // Added.
          if ::nHitcode == HTCELL
-            //   tracelog('hitcode ',::nHitcode )
+            //TraceLog( 'hitcode ',::nHitcode )
             // Replaces call to TBMouse( oTB, mROW(), mCOL() ):
             oTB:RowPos := oTb:mRowPos
             oTB:ColPos := oTb:mColPos
@@ -1449,7 +1449,7 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
    ENDIF
 
    Switch nKey
-   case K_TAB 
+   case K_TAB
       oGet:ExitState := GE_DOWN
       exit
 
@@ -1460,11 +1460,11 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
    case K_ENTER
       if !oTb:Stable()
          oTb:ForceStable()
-      endif  
+      endif
       oGet:ExitState := GE_ENTER
       exit
 
-   case K_ESC 
+   case K_ESC
       if set( _SET_ESCAPE )
          oGet:ExitState := GE_ESCAPE
       endif
@@ -1548,7 +1548,7 @@ METHOD  HitTest( nMouseRow, nMouseCol, oGetMsg ) CLASS HBGETLIST
          return 0
 
       endif
-      
+
       // Test the next GUI-GET or Get PreValidation:
       lGUI := valtype( ::aGetList[ ::nNextGet ]:Control ) == "O"
 
@@ -1627,7 +1627,7 @@ METHOD Accelerator( nKey, oGetMsg ) CLASS HBGETLIST  // Removed STATIC
                 return 0
 
              endif
-      
+
              // Test the next GUI-GET or Get PreValidation:
              lGUI := valtype( oGet:Control ) == "O"
 

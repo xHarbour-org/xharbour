@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.15 2002/12/21 18:20:39 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.16 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ STATIC FUNCTION DefError( oError )
      Endif
 
      // Show alert box
-     TraceLog( cMessage )
+     //TraceLog( cMessage )
 
      nChoice := 0
      While nChoice == 0
