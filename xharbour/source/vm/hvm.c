@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.241 2003/07/20 19:43:08 jonnymind Exp $
+ * $Id: hvm.c,v 1.242 2003/07/22 01:54:29 ronpinkas Exp $
  */
 
 /*
@@ -6007,29 +6007,25 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    /* store the statics base of function where the codeblock was defined
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.statics = HB_VM_STACK.iStatics;
+
    /* store the number of expected parameters
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
+
    /* store the line number where the codeblock was defined
     */
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
+
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = (char *) hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
-      strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
-      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
-      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
    }
    else
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
-
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
-
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = HB_PCODE_MKUSHORT( &( pCode[ 1 ] ) ) - 5;
 
