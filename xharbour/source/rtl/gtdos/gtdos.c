@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.13 2004/02/06 17:07:29 jonnymind Exp $
+ * $Id: gtdos.c,v 1.14 2004/02/09 18:00:37 druzus Exp $
  */
 
 /*
@@ -1623,7 +1623,7 @@ BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )
    BOOL bIsVesa    = FALSE;
    USHORT bSuccess = FALSE;
 
-   HB_TRACE( HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols) );
+   HB_TRACE( HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", uiRows, uiCols) );
 
    /* Available modes in B&N and color screens */
    if( uiCols == 40 )

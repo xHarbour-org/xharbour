@@ -8,7 +8,7 @@
                                     gian@nccolai.ws
 
 
-$Id: linuxso_howto.txt,v 1.1 2003/07/06 20:01:19 jonnymind Exp $
+$Id: linuxso_howto.txt,v 1.2 2004/02/29 21:50:20 lculik Exp $
 /*  $DOC$
  *  $FUNCNAME$
  *      Using Xharbour library as SO
@@ -20,15 +20,15 @@ $Id: linuxso_howto.txt,v 1.1 2003/07/06 20:01:19 jonnymind Exp $
  *      ABSTRACT
  *      
  *      This document is a short howto that guides the users in building shared object
- *      libraries for GNU/linux, and other unix like systems using ELF relocable code
+ *      libraries for GNU/linux, and other unix like systems using ELF relocatable code
  *      system and GNU gcc compiler.
  *      
  *      Shared libraries, called also shared objects, are useful to the final user
  *      because of many reasons. The main advantage with respect to using a single
- *      monolithic file is that the resulting executable (binary) file is considerably
+ *      monolythic file is that the resulting executable (binary) file is considerably
  *      smaller (often by orders of degree) to a statically linked one. If an application
  *      is composed of a set self-standing programs, this turns out to be a great advantage,
- *      as the complete application can be deliverd and updated with "smaller" media, or
+ *      as the complete application can be delivered and updated with "smaller" media, or
  *      making it available via internet becomes easy.
  *      
  *      In applications that are interactively loaded and unloaded many times, like CGI,
@@ -145,7 +145,7 @@ $Id: linuxso_howto.txt,v 1.1 2003/07/06 20:01:19 jonnymind Exp $
  *      
  *      THANKS
  *      
- *      To Przemyslaw Czerpack, that has created the hb-mkslib.sh script that
+ *      To Przemyslaw Czerpak, that has created the hb-mkslib.sh script that
  *      transforms harbour static libraries in .so files. The bld_solib.sh is
  *      just a wrapper/utility.
  *

@@ -175,7 +175,7 @@ new operators, HAS and LIKE.
    cExp HAS cPatern|RegEx => bFound
    cExp LIKE cPatern|RegEx => bLike
 
-As well as full featued Functions:
+As well as full featured Functions:
 
    HB_Atx( <cRegEx>, <cTargetString> [, lCaseSensitive [, [@]nStart ]
            [, [@]nLen ] ] ] ) => cFoundText
@@ -232,8 +232,8 @@ GLOBAL variables:
 
    GLOBAL <Id1> [,<Id2> [,<IdN>]]
 
-GLOBAL Variables are a new kind of a declared variables. they have PUBLIC like
-visibility, but are faster than even STATICs. GLOBLAS can be referenced from
+GLOBAL Variables are a new kind of a declared variables. They have PUBLIC like
+visibility, but are faster than even STATICs. GLOBALs can be referenced from
 other modules.
 
    Syntax:
@@ -339,7 +339,7 @@ where -1 indexes the LAST Element (or NIL if the Array is empty):
 #[x]uncommand and #[x]untranslate directives:
 ---------------------------------------------
 
-#uncommad and untranslate directives allow the removal of a given rule from
+#uncommand and #untranslate directives allow the removal of a given rule from
 the active rules used by the Pre-Processor. It is very much like the #undefine
 directive.
 

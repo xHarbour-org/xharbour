@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.86 2004/03/02 21:12:48 druzus Exp $
+ * $Id: itemapi.c,v 1.87 2004/03/02 22:42:06 druzus Exp $
  */
 
 /*
@@ -1814,7 +1814,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
 char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPadConv(%p, %p, %p)", pItem, buffer, pulSize));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPadConv(%p, %p, %p)", pItem, pulSize, bFreeReq));
 
    /* to be clipper compatible don't convert HB_IT_BYREF items */
    if( pItem )

@@ -4,7 +4,7 @@
                                  
                              Cross Platform GT system
  
-                                 GT Informations
+                                 GT Information
                                  
                               
                              Giancarlo Niccolai et al.
@@ -26,8 +26,8 @@ About this document
    
 Authors
 -------
-New GT+Graphical system is being developed at Xharbour projects, mainly
-by Giancarlo Niccolai, Przemislaw Czerpack, Pritpal Bedi, Mauricio Abre,
+New GT+Graphical system is being developed at Xharbour project, mainly
+by Giancarlo Niccolai, Przemyslaw Czerpak, Pritpal Bedi, Mauricio Abre,
 Peter Rees and Francesco Saverio Giudice. Individual contributions are
 stated in the various xharbour files.
 

@@ -8,7 +8,7 @@
                                   gian@nccolai.ws
 
 
-$Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
+$Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
 
 
 /*  $DOC$
@@ -53,8 +53,8 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *      localized programs.
  *      
  *      
- *      How do this is accomplished?
- *      ----------------------------
+ *      How is this accomplished?
+ *      -------------------------
  *      
  *      How do we are able to translate a program in any possible language without
  *      having to recompile it, or without having to put a comprhensive prebuilt
@@ -62,7 +62,7 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *      
  *      The thing goes like this: you write down your program as always, without
  *      worryng about writing your application in a specified language. You should
- *      just write your application using plain english, and surround each
+ *      just write your application using plain English, and surround each
  *      static string with the i18n() function call, like this:
  *      
  *      /* Minimal i18n program */
@@ -158,20 +158,20 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *      
  *      As hit files names, you are invited to choose names after the international
  *      language names schemes. It is a 5 character code, having two lowercase letters
- *      indicating the main language, an undersocre and two uppercase letters indicating
+ *      indicating the main language, an underscore and two uppercase letters indicating
  *      the subtype of the language. In example:
  *
- *      British english: en_UK
+ *      British English: en_UK
  *      Italian: it_IT
  *      Swiss Italian: it_CH
  *      French: fr_FR
- *      American english: en_US
- *      japanese: ja_JP  (jp is the nation code, while ja is the language).
+ *      American English: en_US
+ *      Japanese: ja_JP  (jp is the nation code, while ja is the language).
  *      
  *      The "en_US" language code is currently used as "international", or
  *      "no translation". But this may change in the future, so you can develop
- *      applications in i.e. spanish and AFTER that you have built them, you
- *      can traslate them to english.
+ *      applications in i.e. Spanish and AFTER that you have built them, you
+ *      can traslate them to English.
  *      
  *      Anyway, you can select any name you like; you will have to make sure that
  *      your LANG variable will be set to that name (without the hit extension) to
@@ -343,14 +343,14 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *      HB_I18nInitalized() --> lInitialized
  *
  *         Returns true if the I18N has been initalized correctly at startup or
- *         with api functions. This can be useful to take default actions or
+ *         with API functions. This can be useful to take default actions or
  *         to search dictionary files in non standard directories.
  *
  *      HB_I18nSetPath( cPath )
  *
  *         Sets the current languages tables search pat to cpath. No tests is
  *         made to see if cPath is a valid path. The path can be relative,
- *         if it does not begin with a drive specification (windows) or with
+ *         if it does not begin with a drive specification (Windows) or with
  *         a slash, or absolute. Default directory set at program startup is
  *         i18n/
  *
@@ -373,15 +373,15 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *
  *      HB_I18NSetBaseLanguage( cLanguage, cName )
  *
- *         Set the cLanguage as the "untraslated" language. Suppose that
- *         you are writing a program in i.e. italian and using i18n to
- *         translate it in english. The sytem must know that if your
+ *         Set the cLanguage as the "untranslated" language. Suppose that
+ *         you are writing a program in i.e. Italian and using i18n to
+ *         translate it in English. The sytem must know that if your
  *         "language" becomes equal to "it_IT", be it in the LANG environment
  *         variable or be it set in the dynamically in the program,
  *         then you mean "do not translate me: I was written in it_IT".
  *
  *         The default at the startup is "en_US", so if your write your
- *         program in american english, and use i18n to translate it in
+ *         program in American English, and use i18n to translate it in
  *         other languages, you don't have to use this function.
  *
  *         Since the default language is not read from a .hit file, but is
@@ -407,7 +407,7 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *
  *      HB_I18NGetBaseLanguage() --> cLanguage
  *
- *         Retunrs the name of the languagage in which the program has been
+ *         Retunrs the name of the language in which the program has been
  *         written, that is set with HB_I18NSetBaseLanguage().
  *
  *
@@ -416,7 +416,7 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *         Returns the name of the language that the program has been written in.
  *         Generally, this is a descriptive non-internationalized name of the
  *         language, like "Espanol", "Italiano", "English", "Françoise",
- *         "Detusche", "Nihongo" and so on.
+ *         "Deutsche", "Nihongo" and so on.
  *
  *      -------- TODO: functions to access other language members, and
  *               functions to allow i18n lookups on more than one table:
@@ -496,8 +496,8 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *         FUNCTION YET UNTESTED.
  *      
  *         This function gets the two entry table in aTable and sorts it on
- *         ascii acending order of the first element, removing also duplicates
- *         int the table. In other words, it transform a messy hil table in
+ *         ascii ascending order of the first element, removing also duplicates
+ *         in the table. In other words, it transform a messy hil table in
  *         a table suitable to be saved in a HIT.
  *      
  *         NOTE: currently I am doing this with the usual ASort(); this function
@@ -506,12 +506,12 @@ $Id: hbi18n.txt,v 1.3 2003/08/28 01:35:31 jonnymind Exp $
  *      
  *      
  *
- *      Low level api
+ *      Low level API
  *      -------------
  *
- *      Yet undocmuented. refer to source/vm/hbi18n.c file to see what those function
+ *      Yet undocumented. Refer to source/vm/hbi18n.c file to see what those function
  *      are doing; generally they implement low level operations required by higher
- *      level api, and they are all written in C.
+ *      level API, and they are all written in C.
  *
  *
  *

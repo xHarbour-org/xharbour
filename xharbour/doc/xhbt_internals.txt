@@ -1,5 +1,5 @@
      
-                        X H A R B O U R - Mutli Threading Model
+                        X H A R B O U R - Multi Threading Model
 
                           Technical Notes for xHB developers
 
@@ -8,11 +8,11 @@
                                     gian@nccolai.ws
 
 
-$Id: xhbt_internals.txt,v 1.1 2003/03/16 06:00:27 jonnymind Exp $
+$Id: xhbt_internals.txt,v 1.2 2004/02/28 20:37:21 lculik Exp $
 
 /*  $DOC$
  *  $FUNCNAME$
- *      Mutli Threading Model  
+ *      Multi Threading Model  
  *  $CATEGORY$
  *      Xharbour Enhacements
  *  $ONELINER$
