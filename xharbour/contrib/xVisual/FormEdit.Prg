@@ -166,7 +166,6 @@ METHOD CreateControl(aRect)
          oObj:=::Add(cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="ListBox"
          oObj:=::Add(cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
-         view ::CtrlName
       CASE ::CtrlName=="StatusBar"
          IF !("2" $ cName) // only one status bar
            oObj:=::Add(cName, TStatusBar():New( self, cName, 507 ) )
@@ -185,7 +184,7 @@ METHOD CreateControl(aRect)
 
       ENDCASE
       if oObj!=NIL
-         oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName())
+         oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
       endif
    ENDIF
@@ -236,23 +235,12 @@ METHOD CreateSub()
    LOCAL xRet
 
    ::SetGridSize()
-/*
-   ::Parent:WindowMenu:Gray( 101 )
-   ::Parent:WindowMenu:Enable( 102 )
-   ::Parent:WindowMenu:Enable( 103 )
-   ::Parent:WindowMenu:Enable( 104 )
-   ::Parent:WindowMenu:Enable( 105 )
-   ::Parent:WindowMenu:Enable( 106 )
-   ::Parent:WindowMenu:Enable( 107 )
-   ::Parent:WindowMenu:Enable( 108 )
-   ::Parent:WindowMenu:Enable( 109 )
-   ::Parent:WindowMenu:Enable( 110 )
-*/
+
    ::Parent:StdBar:EnableAll()
    
-   ::Parent:ObjInsp:Browser:source:= ACLONE( ::PropList )
-   ::Parent:ObjInsp:Browser:Configure()
-   
+   ::Parent:ObjInsp:InspCombo:AddString(::Name+chr(9)+::ClassName(),self)
+   ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
+
    xRet := super:OnCreate()
 
    ::oMask:=oCtrlMask():New( self )

@@ -471,7 +471,6 @@ METHOD OnLButtonDown( wParam, x, y )
 
    ::mousedown:=.T.
    SetCapture(::Handle)
-view wParam
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
