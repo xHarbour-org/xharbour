@@ -83,6 +83,10 @@ return( super:OnCommand() )
 CLASS SubForm1 FROM TForm
    
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
+                                    ::left    := 0,;
+                                    ::top     := 150,;
+                                    ::width   := 500,;
+                                    ::height  := 200,;
                                     super:New( oParent )
 
    METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0

@@ -10,7 +10,7 @@ CLASS TForm FROM TWindow
    
    METHOD New()
    METHOD Add()
-   
+   METHOD ChildFromHandle( hHandle )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -36,8 +36,13 @@ METHOD Add( cName, oObj ) CLASS TForm
 
 return( oObj )
 
-
-
+METHOD ChildFromHandle( hHandle ) CLASS TForm
+   local n
+   local aList := __objGetValueList( self )
+   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:handle == hHandle} ) )
+      return( aList[n][2] )
+   endif
+return(nil)
 
 //----------------------------------------------------------------------------//
 
@@ -60,3 +65,5 @@ METHOD New( oParent ) CLASS TFrame
 
 return( super:New( oParent ) )
 
+
+//------------------------------------------------------------------------------
