@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.29 2002/10/27 14:41:37 lculik Exp $
+ * $Id: arrays.c,v 1.30 2002/11/14 21:46:18 ronpinkas Exp $
  */
 
 /*
@@ -1101,6 +1101,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 
    for( uiPos = 0; uiPos < uiLen; uiPos++ )
    {
+      ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
       hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
    }
 
@@ -1142,6 +1143,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
    for( uiPos = 0; uiPos < uiPCount; uiPos++ )
    {
+      ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
       hb_itemCopy( pBaseArray->pItems + uiPos, *( pBase + uiPos + 2 ) );
    }
 
