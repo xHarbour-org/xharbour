@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.10 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.11 2004/05/04 16:24:13 mauriliolongo Exp $
  */
 
 /*
@@ -289,6 +289,7 @@ HB_FUNC( HB_ARGV )
 /* Check for command line internal arguments */
 void hb_cmdargProcessVM( void )
 {
+   int iHandles;
    if( hb_cmdargCheck( "INFO" ) )
    {
       {
@@ -319,7 +320,6 @@ void hb_cmdargProcessVM( void )
       hb_verBuildInfo();
    }
 
-   int iHandles;
    iHandles = hb_cmdargNum( "F" );
 
    if ( iHandles > 20 )
