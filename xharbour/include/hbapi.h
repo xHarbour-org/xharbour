@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.44 2002/11/13 00:37:32 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.45 2002/12/16 16:35:14 ronpinkas Exp $
  */
 
 /*
@@ -325,7 +325,7 @@ extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
 extern char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc ); /* returns the method pointer of a object class */
+extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor ); /* returns the method pointer of a object class */
 extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.130 2002/11/25 05:09:01 ronpinkas Exp $
+ * $Id: hvm.c,v 1.131 2002/12/04 23:07:00 likewolf Exp $
  */
 
 /*
@@ -4221,6 +4221,7 @@ void hb_vmSend( USHORT uiParams )
    PHB_BASEARRAY  pSelfBase = NULL;
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
+   BOOL           bConstructor = FALSE;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
 
@@ -4281,7 +4282,7 @@ void hb_vmSend( USHORT uiParams )
    else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
    {
       lPopSuper = FALSE;
-      pFunc     = hb_objGetMthd( pSelf, pSym, TRUE );
+      pFunc     = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor );
       pSelfBase = pSelf->item.asArray.value;
 
       if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
@@ -4351,6 +4352,12 @@ void hb_vmSend( USHORT uiParams )
       if( bProfiler )
       {
          hb_mthAddTime( pMethod, clock() - ulClock );
+      }
+
+      // Constructor must ALWAYS return Self.
+      if( bConstructor )
+      {
+         hb_itemForwardValue( &hb_stack.Return, pSelf );
       }
    }
    else

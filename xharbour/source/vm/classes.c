@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.27 2002/10/06 22:04:44 ronpinkas Exp $
+ * $Id: classes.c,v 1.28 2002/10/18 05:15:55 ronpinkas Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ static void     hb_clsRelease( PCLASS );
        char *   hb_objGetClsName( PHB_ITEM pObject );
        char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
        PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
-       PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc );
+       PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor );
        PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
        ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
 
@@ -839,17 +839,17 @@ char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
  */
 PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
-  return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE ) ;
+  return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL ) ;
 }
 
-PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc )
+PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
    PHB_FUNC pFunction;
    PMETHOD pMethod;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc));
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor));
 
    if( pObject->type == HB_IT_ARRAY )
    {
@@ -881,6 +881,10 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
                pMethod->ulCalls++; /* Profiler */
             }
 
+            if( bConstructor )
+            {
+               *bConstructor = ( pMethod->uiScope & HB_OO_CLSTP_CTOR );
+            }
             return pFunction;
          }
          uiAt++;
@@ -890,6 +894,11 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
    }
 
    s_pMethod = NULL;
+
+   if( bConstructor )
+   {
+      *bConstructor = FALSE;
+   }
 
    /* Default message here */
 
@@ -981,7 +990,7 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 
    if( pDynSym )
    {
-      return ( ULONG ) hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE );
+      return ( ULONG ) hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL );
    }
    else
    {

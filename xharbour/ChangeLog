@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.529 2002/12/16 06:02:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.530 2002/12/16 16:33:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-16 20:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/classes.c
+    * Added 4th optional paramater BOOL *bConstructor to hb_objGetMthd().
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmSend() to always return Self if method is a Constructor.
+
+    /*
+       This was NOT Clipper OOP engines compatible, as I recently found to my surprise that
+       RETURN NIL was ending some METHOD New(...) and it was working perfectly in Clipper [Objects].
+       Same code was naturally breaking in xHarbour. Now I don't consider RETURN of anything other
+       than Self as good practice, but for compatibility, I thought this should be fixed.
+     */
 
 2002-12-16 08:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbapi.h
