@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.14 2005/02/27 05:51:59 ronpinkas Exp $
+ * $Id: simplex.c,v 1.15 2005/02/28 19:28:03 ronpinkas Exp $
  */
 
 /*
@@ -168,6 +168,9 @@ static int  aiReturn[4];
 static unsigned int iRule, iMatched = 0;
 
 static int  iRet;
+
+/* Length of last [sequence of] acOmmit, acNewLine, 1 for acOmmit, or len of sSelf. */
+static unsigned int iLastLen;
 
 /* NewLine Support. */
 static BOOL bNewLine = TRUE, bStart = TRUE;
@@ -393,6 +396,8 @@ static int rulecmp( const void * pLeft, const void * pRight );
                   sSelf[ iSelfLen ] = '\0'; \
                   iRet = aSelfs[i].iToken; \
                   \
+                  iLastLen = iSelfLen; \
+                  \
                   if( iLen ) \
                   { \
                      DEBUG_INFO( printf( "Holding Self >%s<\n", sSelf ) ); \
@@ -581,12 +586,11 @@ int SimpLex_GetNextToken( void )
             /* Not using LEX_CASE() yet (white space)!!! */
             if( acOmmit[(int)chr] )
             {
-               /* Reset. */
-               sSelf[0] = '\0';
+               iLastLen = 1;
 
                while( iSize && acOmmit[(int)(*szBuffer)] )
                {
-                  iSize--; szBuffer++;
+                  iSize--; szBuffer++; iLastLen++;
                }
 
                if( iLen )
@@ -773,9 +777,11 @@ int SimpLex_GetNextToken( void )
             /* NewLine ? */
             if( acNewLine[(int)chr] )
             {
+               iLastLen = 1;
+
                while( iSize && acNewLine[(int)(*szBuffer)] )
                {
-                  iSize--; szBuffer++;
+                  iSize--; szBuffer++; iLastLen++;
                }
                s_szBuffer = szBuffer;
 
@@ -796,9 +802,6 @@ int SimpLex_GetNextToken( void )
                    bIgnoreWords = FALSE;
                    bNewLine = TRUE;
 
-                   /* Reset. */
-                   sSelf[0] = '\0';
-
                    return (int) chr;
                }
             }
@@ -810,6 +813,8 @@ int SimpLex_GetNextToken( void )
                   sToken[ iLen++ ] = chr;
                   sToken[ iLen ] = '\0';
 
+                  iLastToken = iLen;
+
                   s_szBuffer = szBuffer;
 
                   DEBUG_INFO( printf(  "Token: \"%s\" Appended: \'%c\'\n", sToken, chr ) );
@@ -820,6 +825,8 @@ int SimpLex_GetNextToken( void )
             if( acReturn[(int)chr] )
             {
                 s_szBuffer = szBuffer;
+
+                iLastLen = 1;
 
                 if( iLen )
                 {
@@ -842,9 +849,6 @@ int SimpLex_GetNextToken( void )
                        bNewLine = FALSE;
                        NEW_LINE_ACTION();
                     }
-
-                    /* Reset. */
-                    sSelf[0] = '\0';
 
                     DEBUG_INFO( printf(  "Reducing Delimiter: '%c' As: %i\n", chr, acReturn[(int)chr] ) );
                     return acReturn[(int)chr];
@@ -1405,23 +1409,17 @@ void SimpLex_CheckWords( void )
             sKeys2Match = pNextSpacer + 4;
             DEBUG_INFO( printf( "Partial %s Match! [%s] == [%s] - Looking for: [%s]\n", sDesc, sWord2Check, aCheck[i].sWord, sKeys2Match ) );
 
+            // Held Token at this point may only be acOmmit, acReturn, acNewLine, or sSelf.
             if( iHold )
             {
                iHold--;
 
-               if( aiHold[iHold] < 256 )
-               {
-                  iLen = 1;
-               }
-               else if( sSelf[0] )
-               {
-                  iLen = strlen( (char *) sSelf );
-               }
+               iLen = iLastLen;
 
                s_szBuffer -= iLen;
                iSize += iLen;
 
-               DEBUG_INFO( printf( "Rewinded held: %i token [%s] to [%s]\n", iHold, sWord2Check, s_szBuffer ) );
+               DEBUG_INFO( printf( "Rewinded iLen:%i held: %i token [%s] to [%s]\n", iLen, iHold, sWord2Check, s_szBuffer ) );
             }
 
             /* Saving this pointer of the input stream, we might have to get here again. */
@@ -1445,20 +1443,20 @@ void SimpLex_CheckWords( void )
 
             iNextToken = SimpLex_GetNextToken();
 
-            if( iNextToken != 0 && sSelf[0] )
+            if( iNextToken == 0 )
             {
-               sWord2Check = (char *) sSelf;
+               sWord2Check = (char *) sToken;
             }
-            else if( iNextToken > 0 && iNextToken < 256 && iHold == 0 )
+            else if( iLastLen == 1 )
             {
-               sDelimiterString[0] = iNextToken;
+               sDelimiterString[0] = *( s_szBuffer - 1 );
                sDelimiterString[1] = '\0';
 
                sWord2Check = (char *) sDelimiterString;
             }
             else
             {
-               sWord2Check = (char *) sToken;
+               sWord2Check = (char *) sSelf;
             }
 
             DEBUG_INFO( printf( "sToken [%s] sWord2Check [%s] iRet: %i iHold: %i\n", (char *) sToken, (char *) sWord2Check, iRet, iLen ) );

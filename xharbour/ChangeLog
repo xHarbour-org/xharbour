@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3894 2005/03/01 21:23:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.3895 2005/03/02 02:11:45 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-01 20:50 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/simplex.c
+    + Added iLastLen to maintain length of last read buffer when not sToken.
+    * Simplified rewind logic and sWord2Check logic in SimpLex_CheckWords() using new iLastLen
+  * source/compiler/hbslex.c
+    * Touched.
+
 2005-03-02 09:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * makefile.bc
   * make_b32.bat
