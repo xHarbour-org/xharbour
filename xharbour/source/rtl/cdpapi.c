@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.9 2004/01/26 15:00:51 druzus Exp $
+ * $Id: cdpapi.c,v 1.10 2004/01/28 14:45:40 druzus Exp $
  */
 
 /*
@@ -97,7 +97,7 @@ static USHORT uniCodes[NUMBER_OF_CHARS] = {
 
 HB_UNITABLE hb_uniTbl_437 = { CPID_437, NUMBER_OF_CHARS, FALSE, uniCodes };
 
-static HB_CODEPAGE  s_en_codepage = { "EN",CPID_437,UNITB_UNDEF,0,NULL,NULL,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+static HB_CODEPAGE  s_en_codepage = { "EN",CPID_437,UNITB_437,0,NULL,NULL,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 static PHB_CODEPAGE s_cdpList[ HB_CDP_MAX_ ];
 PHB_CODEPAGE s_cdpage = &s_en_codepage;
 

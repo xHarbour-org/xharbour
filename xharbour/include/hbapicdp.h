@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapicdp.h,v 1.7 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
 #define UNITB_8859_2 &hb_uniTbl_8859_2
 #define UNITB_KOI_8  &hb_uniTbl_KOI_8
 #define UNITB_MAZ    &hb_uniTbl_mazovia
-#define UNITB_UNDEF  ((PHB_UNITABLE) (-1))
+#define UNITB_UNDEF  NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
 extern HB_UNITABLE hb_uniTbl_850;

@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.3 2003/05/16 19:52:05 druzus Exp $
+# $Id: bcc32.cf,v 1.4 2003/09/25 02:24:02 paultucker Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -23,16 +23,12 @@ endif
 CC = bcc32
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I$(GRANDP) -I$(HB_INC_COMPILE) -Iinclude
-ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS = -O2 -d -DSIMPLEX
-else
-CFLAGS = -O2 -d
-endif
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
-LD = bcc32
-LDFLAGS = -O2
-LD_OUT = -e
+CFLAGS = -O2 -d
+ifeq ($(HB_LEX),SIMPLEX)
+CFLAGS += -DSIMPLEX
+endif
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
@@ -80,11 +76,42 @@ ifneq ($(LNK_USR_LIB),)
 LINKLIBS += $(foreach lib, $(LNK_USR_LIB), $(lib)$(LIB_EXT))
 endif
 
+# Note: The empty line directly before 'endef' HAVE TO exist!
+# It causes that the 'echo' command is separated by LF
+define link_file
+echo $(file) >> __link__.tmp
+
+endef
+
+define link_exe_file
+echo. > __link__.tmp
+$(foreach file, $^, $(link_file))
+$(foreach file, $(LINKLIBS), $(link_file))
+$(LD) $(LD_OUT)$@ $(LDFLAGS) @__link__.tmp
+endef
+#echo kernel32.lib, user32.lib, winspool.lib, oleaut32.lib, uuid.lib, comctl32.lib >> __link__.tmp
+
+LD = bcc32
 LDFLAGS = $(LINKPATHS)
+LD_OUT = -e
+LD_RULE = $(link_exe_file)
+
+#Note: The empty line below HAVE TO exist!
+define lib_object
+echo -+$(file) &>> __lib__.tmp
+
+endef
+
+define create_library
+$(foreach file, $^, $(lib_object))
+echo ->> __lib__.tmp
+$(AR) $(ARFLAGS) $@ @__lib__.tmp
+endef
 
 AR = tlib
 ARFLAGS = $(A_USR)
-AROBJS = $(foreach file, $^, -+$(file))
-AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS),,
+AR_RULE = $(create_library)
+#AROBJS = $(foreach file, $^, -+$(file))
+#AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS),,
 
 include $(TOP)$(ROOT)config/rules.cf
