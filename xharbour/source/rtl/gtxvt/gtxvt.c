@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.10 2004/01/05 15:24:00 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.11 2004/01/14 23:02:05 jonnymind Exp $
  */
 
 /*
@@ -306,6 +306,7 @@ static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr );
 static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt);
 static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt );
 static void xvt_processMessages( PXWND_DEF wnd );
+static void xvt_appProcess();
 
 static PXVT_STATUS xvt_statusNew( void );
 static int xvt_statusQueryMouseBtns( PXVT_STATUS status, Display *dpy );
@@ -321,22 +322,22 @@ void xvt_cursorPaint( PXWND_DEF wnd );
 
 
 static char *color_refs[] = {
-   "black",
-   "blue",
-   "green",
-   "cyan",
-   "red",
-   "magenta",
-   "brown",
-   "lightgray",
-   "gray",
-   "lightblue",
-   "lightgreen",
-   "lightcyan",
-   "lightred",
-   "lightmagenta",
-   "yellow",
-   "white"
+   "rgb:00/00/00",   /* black         */
+   "rgb:00/00/AA",   /* blue          */
+   "rgb:00/AA/00",   /* green         */
+   "rgb:00/AA/AA",   /* cyan          */
+   "rgb:AA/00/00",   /* red           */
+   "rgb:AA/00/AA",   /* magenta       */
+   "rgb:AA/55/00",   /* brown         */
+   "rgb:AA/AA/AA",   /* light gray    */
+   "rgb:55/55/55",   /* gray          */
+   "rgb:55/55/FF",   /* light blue    */
+   "rgb:55/FF/55",   /* light green   */
+   "rgb:55/FF/FF",   /* light cyan    */
+   "rgb:FF/55/55",   /* light red     */
+   "rgb:FF/55/FF",   /* light magenta */
+   "rgb:FF/FF/55",   /* yellow        */
+   "rgb:FF/FF/FF"    /* white         */
 };
 
 
@@ -363,6 +364,8 @@ static int streamChr[2];
 // cached value of DELETE WINDOW X atom
 Atom s_atom_delwin;
 Atom s_atom_clientprot;
+XPoint s_FillerPts[2][16*16];
+int s_countPoints[2];
 
 /**********************************************************************
 *                                                                     *
@@ -389,6 +392,7 @@ static int s_errorHandler( Display *dpy, XErrorEvent *e )
 
 static void xvt_InitStatics( Display *dpy )
 {
+
    XSetErrorHandler( s_errorHandler );
 
    s_modifiers.bCtrl  = FALSE;
@@ -397,11 +401,13 @@ static void xvt_InitStatics( Display *dpy )
    s_modifiers.bShift = FALSE;
 
    s_atom_delwin = XInternAtom( dpy, "WM_DELETE_WINDOW", 1);
+
 }
 
 /*** Prepare the default window ***/
 static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
 {
+   int icol, irow, icount, istart=1, i;
    Display *dpy;
    PXWND_DEF wnd;
 
@@ -433,6 +439,55 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    XMapWindow( wnd->dpy, wnd->window );
    // ok, now we can inform the X manager about our new status:
    xvt_windowSetHints( wnd );
+
+   // creates the sparse points
+   // sparse points
+
+   icount = 0;
+   istart = 0;
+   for ( irow = 0; irow < wnd->fontHeight; irow += 3)
+   {
+      if ( icount > 0 )
+      {
+         s_FillerPts[0][icount].x = -istart ;
+         istart = 0;
+         s_FillerPts[0][icount].y = 3;
+      }
+
+      icount++;
+
+      for ( icol = istart ; icol < wnd->fontWidth; icol += 3 )
+      {
+         s_FillerPts[0][icount].x = 3;
+         istart+=3;
+         s_FillerPts[0][icount].y = 0;
+         icount++;
+      }
+   }
+   s_countPoints[0] = icount;
+
+   icount = 0;
+   istart = 0;
+   for ( irow = 0; irow < wnd->fontHeight; irow += 2 )
+   {
+      if ( icount > 0 )
+      {
+         s_FillerPts[1][icount].x = -istart ;
+         istart = 0;
+         s_FillerPts[1][icount].y = 2;
+      }
+
+      icount++;
+
+      for ( icol = istart ; icol < wnd->fontWidth; icol += 2 )
+      {
+         s_FillerPts[1][icount].x = 2;
+         istart+=2;
+         s_FillerPts[1][icount].y = 0;
+         icount++;
+      }
+   }
+   s_countPoints[1] = icount;
 
    //we'r done. Now the ball passes to the window managing function
    xvt_processMessages( wnd );
@@ -528,33 +583,10 @@ static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows )
 }
 
 /******************** Marks a buffer area as to be redrawn *********************/
-
 static void xvt_bufferInvalidate( PXVT_BUFFER buf,
    int left, int top, int right, int bottom )
 {
-   USHORT appMsg;
-   fd_set keySet;
-
-   struct timeval timeout = {0,0};
-   FD_ZERO(&keySet);
-   FD_SET(streamFeedback[0], &keySet );
-
-   // See if there is data available
-
-   if ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
-   {
-      read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
-      switch( appMsg )
-      {
-         case XVT_ICM_UPDATE:
-            buf->bInvalid = FALSE;
-            break;
-
-         case XVT_ICM_QUIT:
-            hb_gtHandleClose();
-            break;
-      }
-   }
+   xvt_appProcess();
 
    if ( buf->bInvalid == FALSE ) {
       buf->bInvalid = TRUE;
@@ -574,6 +606,8 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
 
    if ( s_uiDispCount == 0 )
    {
+      USHORT appMsg;
+
       COMMIT_BUFFER( buf );
       appMsg = XVT_ICM_UPDATE;
       write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
@@ -1024,35 +1058,49 @@ static void xvt_windowRepaintColRow( PXWND_DEF wnd,
 }
 
 /********************** Draw text into a window **************************/
-static BOOL xvt_windowDrawText( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT cbString )
+static BOOL xvt_windowDrawText( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT len )
 {
-   int pos;
+   int pos,lastpos;
    USHORT *usString;
    HB_GT_CELLTYPE cell;
 
-   if (cbString > wnd->buffer->cols) // make sure string is not too long
+   if (len > wnd->buffer->cols) // make sure string is not too long
    {
-      cbString = wnd->buffer->cols;
+      len = wnd->buffer->cols;
    }
 
-   XDrawImageString16( wnd->dpy, wnd->window, wnd->gc,
-      col * wnd->fontWidth, row * wnd->fontHeight+wnd->xfs->ascent, (XChar2b *) str, cbString );
-
    /* Draw eventual graphical chars */
-
+   lastpos = 0;
    usString = (USHORT *) str;
-   for ( pos = 0; pos < cbString; pos ++ )
+
+   for ( pos = 0; pos < len; pos ++ )
    {
       #ifdef HB_BIG_ENDIAN
       cell = usString[pos];
-      if ( cell > HB_GTXVT_DBL_LT )
       #else
       cell = 0xFFFF & ((usString[pos] << 8) | (usString[pos]>>8));
-      if ( cell >= HB_GTXVT_DBL_LT )
       #endif
+
+      if ( cell >= HB_GTXVT_DBL_LT )
       {
+         // draw the string up to this position
+         if ( pos > lastpos )
+         {
+            XDrawImageString16( wnd->dpy, wnd->window, wnd->gc,
+               (col+lastpos) * wnd->fontWidth, row * wnd->fontHeight+wnd->xfs->ascent,
+               (XChar2b *) (usString+lastpos), pos+1-lastpos );
+         }
+         // draw the box
          xvt_windowDrawBox( wnd, col + pos, row, cell );
+         lastpos = pos+1;
       }
+   }
+   // last drawn
+   if ( len > lastpos )
+   {
+      XDrawImageString16( wnd->dpy, wnd->window, wnd->gc,
+         (col+lastpos) * wnd->fontWidth, row * wnd->fontHeight+wnd->xfs->ascent,
+         (XChar2b *) (usString+lastpos), len-lastpos );
    }
    return TRUE;
 }
@@ -1075,25 +1123,13 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
       int attr = wnd->buffer->pAttributes[ HB_GT_INDEXOF( wnd->buffer, col, row )  ];
       int fore = attr & 0x000F;
       int back = (attr & 0x00F0)>>4;
-      XPoint pts[16*16];
-      int icol, irow, icount = 0, istart = 1;
-
-      for ( irow = 0; irow < celly;
-            irow += boxchar != HB_GTXVT_FILLER1 ? 2 : 3 )
-      {
-         for ( icol = istart ; icol < cellx;
-               icol += boxchar == HB_GTXVT_FILLER1 ? 2 : 3 )
-         {
-            pts[icount].x = basex + icol;
-            pts[icount].y = basey + irow;
-            icount++;
-         }
-         istart = istart != 1 ? 1 : 2;
-      }
+      XPoint *pts =  boxchar == HB_GTXVT_FILLER2 ? s_FillerPts[1] : s_FillerPts[0];
+      int icount = s_countPoints[ boxchar == HB_GTXVT_FILLER2 ? 1 : 0 ];
+      pts[0].x = basex+1;
+      pts[0].y = basey+1;
 
       if ( boxchar != HB_GTXVT_FILLER3 )
       {
-
          XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
          XSetForeground( wnd->dpy, wnd->gc, color.pixel );
 
@@ -1106,7 +1142,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
 
          // draw in foreground!
          XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
-               pts, icount, CoordModeOrigin );
+              pts, icount, CoordModePrevious );
       }
       else
       {
@@ -1120,7 +1156,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
 
          // draw in background!
          XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
-               pts, icount, CoordModeOrigin );
+               pts, icount, CoordModePrevious );
 
          // reset foreground
          XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
@@ -2414,13 +2450,6 @@ static void xvt_processMessages( PXWND_DEF wnd )
          wnd->status->mouseDblClick2TO--;
       }
 
-      evt.type = 0;
-      while ( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
-      {
-         XNextEvent( wnd->dpy, &evt );
-         xvt_eventManage( wnd, &evt );
-      }
-
       if ( ++count == 10 ) {
          s_cursorState = s_cursorState ? 0: 1;
          xvt_cursorPaint( wnd );
@@ -2430,6 +2459,41 @@ static void xvt_processMessages( PXWND_DEF wnd )
       if ( bUpdate )
       {
          xvt_windowUpdate( wnd );
+      }
+
+      while ( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
+      {
+         XNextEvent( wnd->dpy, &evt );
+         xvt_eventManage( wnd, &evt );
+      }
+   }
+}
+
+
+/** App process is called by both inkey and output aware functions to
+   process pending data.
+*/
+static void xvt_appProcess()
+{
+   USHORT appMsg;
+   fd_set keySet;
+   struct timeval timeout = {0,0};
+
+   FD_ZERO(&keySet);
+   FD_SET(streamFeedback[0], &keySet );
+
+   if ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
+   {
+      read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
+      switch( appMsg )
+      {
+         case XVT_ICM_UPDATE:
+            s_buffer->bInvalid = FALSE;
+            break;
+
+         case XVT_ICM_QUIT:
+            hb_gtHandleClose();
+            break;
       }
    }
 }
@@ -2650,21 +2714,6 @@ int HB_EXPORT hb_xvt_gtGetWindowTitle(PXWND_DEF wnd, char *title, int length)
 
    return( strlen( title ) );
 }
-
-
-
-void HB_EXPORT hb_xvt_gtSetCloseEvent(int iEvent)
-{
-
-}
-
-
-void HB_EXPORT hb_xvt_gtSetShutdownEvent(int iEvent)
-{
-
-}
-
-
 
 
 /**********************************************************************
@@ -3496,6 +3545,8 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
    XVT_INITIALIZE
+
+   xvt_appProcess();
 
    if ( eventmask & ( INKEY_KEYBOARD | HB_INKEY_RAW | HB_INKEY_EXTENDED ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2060 2004/01/15 00:03:11 peterrees Exp $
+ * $Id: ChangeLog,v 1.2061 2004/01/15 00:17:55 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-15 02:29 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Better handling of the dialogs between the two processes.
+    ! Faster drawing of box characters (removed trice repainting)
+    ! Faster drawing of dot fillers (using the idea of Premizlav).
+      (need fixing in case of font change).
+    ! Using Premyslaw's color definitions (they looks more like dos).
 
 2004-01-15 01:11 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/gtwvt/gtwvt.c
