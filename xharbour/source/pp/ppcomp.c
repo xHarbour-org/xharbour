@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.2 2001/12/21 11:36:01 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.3 2003/02/09 00:10:24 ronpinkas Exp $
  */
 
 /*
@@ -93,12 +93,14 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      pFile = hb_comp_files.pLast;
      lens = lContinue = 0;
      ptrOut = sOut;
-     while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE -
+     while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE - 1 -
                   lens, lContinue, ( char * ) pFile->pBuffer, &( pFile->lenBuffer ),
                   &( pFile->iBuffer ) ) ) >= 0 )
      {
         lens += rdlen;
         hb_comp_iLine ++;
+
+        //printf( "Line: %i Len: %i <%s>\n", hb_comp_iLine, lens, s_szLine );
 
         if( lens >= HB_PP_STR_SIZE )
         {
@@ -272,12 +274,17 @@ int hb_pp_ReadRules( void )
   {
      pFile = hb_comp_files.pLast;
      lens = lContinue = 0;
-     while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE -
+     while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE - 1 -
                   lens, lContinue, ( char * ) pFile->pBuffer, &( pFile->lenBuffer ),
                   &( pFile->iBuffer ) ) ) >= 0 )
      {
         lens += rdlen;
         hb_comp_iLine++;
+
+        if( lens >= HB_PP_STR_SIZE )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_BUFFER_OVERFLOW, NULL, NULL );
+        }
 
         if( s_szLine[ lens - 1 ] == ';' )
         {

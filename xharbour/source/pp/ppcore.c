@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.44 2003/02/11 03:08:40 druzus Exp $
+ * $Id: ppcore.c,v 1.45 2003/02/20 01:49:03 ronpinkas Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ static BOOL   IsIdentifier( char *szProspect );
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define MAX_NAME     255
 #define MAX_EXP      2048
-#define PATTERN_SIZE 4096
+#define PATTERN_SIZE HB_PP_STR_SIZE
 
 #define STATE_INIT      0
 #define STATE_NORMAL    1
@@ -2008,9 +2008,9 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
   int isWordInside = 0;
 
-  //printf( "MP: >%s<\nIn: >%s<\n", ptrmp, ptri );
+  HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %i, %i)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
 
-  HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %d, %d)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
+  //printf( "MP: %s\nInput: %s\n", ptrmp, ptri ) ;
 
   s_numBrackets = 0;
   HB_SKIPTABSPACES( ptri );
@@ -2205,6 +2205,8 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
                 return -1;
              }
           }
+
+          //printf( "AFTER Markers MP: %s\nInput: %s\n", ptrmp, ptri ) ;
 
           break;
 
@@ -2426,6 +2428,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
   if( *(exppatt+2) != '2' && *ptrtemp != '\1' && *ptrtemp != ',' && *ptrtemp != '[' && *ptrtemp != ']' && *ptrtemp != '\0' )
   {
+     // Stopper for the expression.
      lenreal = strincpy( expreal, ptrtemp );
 
      if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
@@ -2619,18 +2622,16 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   else                             /*  ---- regular match marker  */
   {
      /* Copying a real expression to 'expreal' */
-     if( !lenreal )
+     if( ! lenreal )
      {
         lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
      }
 
-     /*
-     printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
-     */
+     //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
 
      if( lenreal )
      {
-        SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+        SearnRep( exppatt, expreal, lenreal, ptro, lenres );
      }
      else
      {
@@ -3924,6 +3925,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
   int readed = 0;
   int State = 0;
   char cha, cLast = '\0', symbLast = '\0';
+  BOOL bOK = TRUE;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_RdStr(%p, %s, %d, %d, %s, %p, %p)", handl_i, buffer, maxlen, lDropSpaces, sBuffer, lenBuffer, iBuffer));
 
@@ -3934,9 +3936,11 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
   while(1)
   {
+    //printf( "Max: %i, Readed: %i <%.*s>\n", maxlen, readed, readed, buffer );
+
     if( *iBuffer == *lenBuffer )
     {
-      if( (*lenBuffer = fread(sBuffer,1,HB_PP_BUFF_SIZE,handl_i)) < 1 )
+      if( (*lenBuffer = fread(sBuffer, 1, HB_PP_BUFF_SIZE, handl_i ) ) < 1 )
       {
         sBuffer[0] = '\n';
       }
@@ -3955,6 +3959,11 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
     {
       if( ( ! hb_pp_bInline ) && s_ParseState == STATE_COMMENT && symbLast == ';' )
       {
+        if( readed == maxlen )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_BUFFER_OVERFLOW, NULL, NULL );
+        }
+
         buffer[readed++] = ';';
       }
       break;
@@ -3963,12 +3972,17 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
     {
       if( hb_pp_bInline )
       {
+        if( readed == maxlen )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_BUFFER_OVERFLOW, NULL, NULL );
+        }
+
         buffer[readed++] = cha;
         continue;
       }
     }
 
-    if( maxlen > 0 )
+    if( bOK )
     {
       switch( s_ParseState )
       {
@@ -4035,9 +4049,9 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
               break;
 
             case '&':
-              if( readed>0 && buffer[readed-1] == '&' )
+              if( readed > 0 && buffer[readed-1] == '&' )
               {
-                maxlen = 0;
+                bOK = FALSE;
                 readed--;
               }
               break;
@@ -4045,7 +4059,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
             case '/':
               if( readed>0 && buffer[readed-1] == '/' )
               {
-                maxlen = 0;
+                bOK = FALSE;
                 readed--;
               }
               break;
@@ -4058,7 +4072,8 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
               }
               else if( !State )
               {
-                maxlen = readed = 0;
+                bOK = FALSE;
+                readed = 0;
               }
               break;
           }
@@ -4079,8 +4094,13 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
         lDropSpaces = 0;
       }
 
-      if( readed<maxlen && (!lDropSpaces || readed==0) && s_ParseState != STATE_COMMENT )
+      if( bOK && (! lDropSpaces || readed == 0 ) && s_ParseState != STATE_COMMENT )
       {
+        if( readed == maxlen )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_BUFFER_OVERFLOW, NULL, NULL );
+        }
+
         buffer[readed++]=cha;
       }
     }
@@ -4554,14 +4574,28 @@ static BOOL strincmp( char * ptro, char ** ptri, BOOL lTrunc )
 
 static int strincpy( char * ptro, char * ptri )
 {
-  int lens = 0;
+  int len = 0;
 
   HB_TRACE(HB_TR_DEBUG, ("strincpy(%s, %s)", ptro, ptri));
 
-  for( ; *ptri != ' ' && *ptri != ',' && *ptri != '[' && *ptri != ']' &&
-         *ptri != '\1' && *ptri != '\0'; ptro++, ptri++, lens++ )
-    *ptro = *ptri;
-  return lens;
+  while( *ptri )
+  {
+     if( *ptri == ' ' || *ptri == ',' || *ptri == '[' || *ptri == ']' || *ptri == '\1' )
+     {
+        break;
+     }
+
+     if( len && ( *ptri == '(' || *ptri == ')' ) )
+     {
+        break;
+     }
+
+     *ptro = *ptri;
+
+     ptro++, ptri++, len++;
+  }
+
+  return len;
 }
 
 static int strotrim( char * stroka, BOOL bRule )
