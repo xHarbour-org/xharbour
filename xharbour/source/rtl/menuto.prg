@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.21 2001/05/15 11:46:55 vszakats Exp $
+ * $Id: menuto.prg,v 1.2 2002/03/18 16:01:03 lculik Exp $
  */
 
 /*
@@ -178,7 +178,7 @@ function __MenuTo( bBlock, cVariable )
          do case
          case nKey == 1001
          case nKey == 1002 .OR. nKey == 1006
-            if ( ( nMouseClik := hittest(s_aLevel, mrow(), mcol()) ) > 0 )
+            if ( ( nMouseClik := hittest(s_aLevel[s_nPointer-1], mrow(), mcol()) ) > 0 )
                 n := nMouseClik
             endif
             if ( nKey == 1006 )
@@ -242,9 +242,9 @@ static function HITTEST( aMenu, nMouseRow, nMouseCol )
 
    local nPos, nLen := Len(aMenu)
    for nPos := 1 to nLen
-      if ( nMouseRow != aMenu[ nPos ][ 1 ] )
-      elseif ( nMouseCol < aMenu[ nPos ][ 2 ] )
-      elseif ( nMouseCol < aMenu[ nPos ][ 2 ] + Len(aMenu[ nPos ][ 3 ]) )
+      if ( nMouseRow != aMenu[ nPos , 1 ] )
+      elseif ( nMouseCol < aMenu[ nPos , 2 ] )
+      elseif ( nMouseCol < aMenu[ nPos , 2 ] + Len(aMenu[ nPos , 3 ]) )
          return nPos
       endif
    next
