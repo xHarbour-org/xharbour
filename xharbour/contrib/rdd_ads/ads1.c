@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.18 2003/09/04 16:39:07 iananderson Exp $
+ * $Id: ads1.c,v 1.19 2003/09/21 06:49:21 brianhays Exp $
  */
 
 /*
@@ -1569,10 +1569,19 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_LASTUPDATE:
-         hb_itemPutDL( pItem, hb_dateEncode( pArea->bYear,
-                                             pArea->bMonth,
-                                             pArea->bDay ) );
+      {
+         UNSIGNED8 pucFormat[ 11 ];
+         UNSIGNED16 pusLen = 11;
+         UNSIGNED8 pucDate[ 11 ];
+
+         AdsGetDateFormat  ( pucFormat, &pusLen );
+         AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
+         AdsGetLastTableUpdate( pArea->hTable, (UNSIGNED8*)&pucDate, &pusLen );
+         *(pucDate + 8) = '\0';
+         hb_itemPutDS( pItem, (char *) pucDate );
+         AdsSetDateFormat  ( pucFormat );
          break;
+      }
 
       case DBI_GETRECSIZE:
          hb_itemPutNL( pItem, pArea->uiRecordLen );
@@ -1627,6 +1636,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, ((pArea->iFileType==ADS_ADT) ? ".adm" :
                                 (pArea->iFileType==ADS_CDX) ? ".fpt" : ".dbt") );
          break;
+
       case DBI_DB_VERSION     :   /* HOST driver Version */
       {
          UNSIGNED32 ulMajor;
