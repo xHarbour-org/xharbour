@@ -1,8 +1,13 @@
 #
-# $Id: Makefile,v 1.1 2003/03/04 21:03:58 lculik Exp $
+# $Id: Makefile,v 1.2 2003/03/22 17:22:43 lculik Exp $
 #
 
 ROOT = ../../
+
+PRG_HEADERS = \
+	ct.ch \
+	cterror.ch \
+	ctwin.ch \
 
 C_SOURCES = \
 	addascii.c \
@@ -61,10 +66,10 @@ C_SOURCES = \
 	wordtoch.c \
 
 PRG_SOURCES= \
-   blank.prg  \
+	blank.prg  \
 	color.prg \
 	ct.prg \
-   ctwin.prg \
+	ctwin.prg \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
@@ -74,6 +79,9 @@ PRG_SOURCES= \
 	setlast.prg \
 
 LIBNAME=ct
+ifneq ($(HB_ARCHITECTURE),dos)
+MT_LIBNAME=ctmt
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
-
+include $(TOP)$(ROOT)config/header.cf

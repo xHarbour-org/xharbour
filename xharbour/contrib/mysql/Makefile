@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/03/25 08:24:29 shyblue Exp $
+# $Id: Makefile,v 1.3 2003/03/25 08:34:57 shyblue Exp $
 #
 
 ROOT = ../../
@@ -30,6 +30,9 @@ PRG_SOURCES=\
         tsqlbrw.prg \
 
 LIBNAME=mysql
+ifneq ($(HB_ARCHITECTURE),dos)
+MT_LIBNAME=mysqlmt
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2001/03/23 08:47:32 brianhays Exp $
+# $Id: Makefile,v 1.1 2002/07/11 02:57:52 lculik Exp $
 #
 
 ROOT = ../../
@@ -9,9 +9,16 @@ C_SOURCES=    \
    adsfunc.c  \
    adsmgmnt.c \
 
+PRG_HEADERS=\
+	ads.ch \
+
 PRG_SOURCES=\
 	ads0.prg \
 
 LIBNAME=rddads
+ifneq ($(HB_ARCHITECTURE),dos)
+MT_LIBNAME=rddadsmt
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
+include $(TOP)$(ROOT)config/header.cf
