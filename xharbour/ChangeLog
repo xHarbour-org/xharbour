@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3704 2004/12/29 19:21:26 bdj Exp $
+ * $Id: ChangeLog,v 1.3705 2004/12/30 03:08:52 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-29 23:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/rtl/tget.prg
+    ! Fixed bug that inserted decimal symbol even if picture had no decimal symbol
+      in ::UnTransform().  Reported by Quique
 
 2004-12-29 19:07 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc

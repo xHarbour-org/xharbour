@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.92 2004/08/14 10:06:46 modalsist Exp $
+ * $Id: tget.prg,v 1.92 2004/08/14 15:10:40 modalsist Exp $
  */
 
 /*
@@ -750,8 +750,8 @@ METHOD Untransform( cBuffer ) CLASS Get
                       re-add it. Clipper does it. A little sample is inside ChangeLog
                       for this fix.
       */
-      if ::decPos < Len( cBuffer ) .AND. Empty( cBuffer[ ::decPos ] )
-         cBuffer[ ::decPos ] := iif( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
+      if ::decPos < Len( cBuffer ) .and. Empty( cBuffer[ ::decPos ] ) .and. if( ::lDecRev, "," , "." ) IN ::cPicture
+         cBuffer[ ::decPos ] := if( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
       endif
 
       cBuffer := Space( ::FirstEditable() - 1 ) + ;
