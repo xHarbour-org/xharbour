@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2186 2004/01/30 17:04:58 maurifull Exp $
+ * $Id: ChangeLog,v 1.2187 2004/01/30 18:12:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 15:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Uncommented call to hb_vmSymbolInit_RT() - this call is important to maintain Cllipper compatibility
+      since function refernced by Indedx Files may not be explictly specified in executable.
 
 2004-01-30 10:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

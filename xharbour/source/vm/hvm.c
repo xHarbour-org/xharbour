@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.312 2004/01/29 14:26:00 likewolf Exp $
+ * $Id: hvm.c,v 1.313 2004/01/29 22:16:31 andijahja Exp $
  */
 
 /*
@@ -504,7 +504,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_i18nInit( NULL, NULL);  // try to open default language.
 
    //HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
-   //hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
+   hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
 
    /* Set the language to the default */
 
@@ -5779,7 +5779,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
    s_bDebugging = bDebugPrevState;
    s_ulProcLevel--;
-   
+
    s_iBaseLine = iPresetBase;
 }
 
