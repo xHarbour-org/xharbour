@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.58 2003/11/08 06:17:29 brianhays Exp $
+ * $Id: dbcmd.c,v 1.59 2003/11/10 12:24:57 druzus Exp $
  */
 
 /*
@@ -2337,7 +2337,7 @@ HB_FUNC( DBUNLOCKALL )
 HB_FUNC( DBUSEAREA )
 {
    HB_THREAD_STUB
-   char * szDriver, * szFileName;
+   char * szDriver, * szFileName, * szTempFile;
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -2387,7 +2387,12 @@ HB_FUNC( DBUSEAREA )
       return;
    }
 
-   pFileName = hb_fsFNameSplit( szFileName );
+ /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
+   szTempFile = hb_filecase( hb_strdup( ( char * ) szFileName ) );
+
+   pFileName = hb_fsFNameSplit( szTempFile );
+   
+   hb_xfree( szTempFile );
 
    szAlias[0] = '\0';
 

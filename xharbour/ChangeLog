@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1780 2003/11/26 23:12:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1781 2003/11/27 00:07:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-26 22:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  ! source/rdd/dbcmd.c
+    % Fixed an problem with alias on linux with dbusearea function
+      Set of alias on linux was wrong if no alias was passed
+      on windows data/dbf/test.dbf return test as alias
+      on linux  data\dbf\test.dbf return data\dbf\test as alias
+      this was fixed.
+      Reported by Renato Benedetti       
 
 2003-11-26 22:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   ! utils/hbmake/hbmake.prg
     % minor fix
-
 
 2003-11-27 00:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hash.c
