@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.119 2004/05/03 12:56:50 lculik Exp $
+ * $Id: hbmake.prg,v 1.120 2004/05/26 10:34:49 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1348,7 +1348,7 @@ FUNC CreateMakeFile( cFile )
    @ 02,53 Get lUseXharbourDll CheckBox caption "use Xharbour[.dll|.so]" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
    @ 03,01 SAY "Obj Files Dir" GET cObjDir PICT "@s15" message s_aLangMessages[ 56 ]
    @ 04,01 SAY  s_aLangMessages[ 45 ] GET cAppName  pict "@s15"valid !Empty( cAppName ) message s_aLangMessages[ 57 ]
-   @ 4,53 get s_lasdll CheckBox  Caption "Create dll" style "[o ]" valid asDll(@lUseXharbourDll)
+   @ 4,53 get s_lasdll CheckBox  Caption "Create dll" style "[o ]" 
 
    IF nO == 1
       READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
@@ -1363,7 +1363,9 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ENDIF
-
+ if  s_lasdll
+ lUseXharbourDll:= .t.
+ endif
    lFwh      := "FWH"      IN cGui
    lMiniGui  := "MiniGui"  IN cGui
    lRddAds   := "RddAds"   IN cRdd
