@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.344 2002/08/11 05:03:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.345 2002/08/12 03:21:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-12 23:25 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed seek bug when having an empty scope
+     ! Memo Limit is > 64K now up to 2GB (2^31 or max(long))
+     ! fixed bug in ordNumber()
 
 2002-08-11 20:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
