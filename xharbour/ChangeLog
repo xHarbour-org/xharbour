@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.565 2002/12/31 15:03:19 lculik Exp $
+ * $Id: ChangeLog,v 1.566 2002/12/31 15:09:12 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-31 16:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/vm/thread.c
+    ! On Conectiva Linux More then 1 line inside #if/#elif/#endif must be inside {}
 
 2002-12-31 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/vm/thread.c
