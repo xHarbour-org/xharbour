@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.1 2003/01/29 23:39:33 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.2 2003/02/22 01:30:36 jonnymind Exp $
  */
 
 /*
@@ -55,22 +55,7 @@
 #include <time.h>
 
 /* Providing a prototype */
-double hb_random();
-
-/* Returns a double value between 0 and 1 */
-double hb_random()
-{
-   static int bInit = 0;
-
-   if( bInit == 0 )
-   {
-      srand( (unsigned)time( NULL ) );
-      bInit = 1;
-   }
-
-   return ( (double) rand() ) / (double) RAND_MAX;
-}
-
+double hb_random_num( void );
 
 /*
 * HB_RANDOM
@@ -84,7 +69,7 @@ HB_FUNC( HB_RANDOM )
    double dRnd;
    double dX, dY;
 
-   dRnd = hb_random();
+   dRnd = hb_random_num();
 
    if( ! ISNUM( 1 ) )
    {
@@ -110,3 +95,18 @@ HB_FUNC( HB_RANDOM )
       hb_retnd(  dRnd * (dY - dX ) + dX );
    }
 }
+
+/* Returns a double value between 0 and 1 */
+double hb_random_num()
+{
+   static int bInit = 0;
+
+   if( bInit == 0 )
+   {
+      srand( (unsigned)time( NULL ) );
+      bInit = 1;
+   }
+
+   return ( (double) rand() ) / (double) RAND_MAX;
+}
+
