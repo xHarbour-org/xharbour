@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.132 2004/12/25 11:33:52 ptsarenko Exp $
+# $Id: makefile.bc,v 1.132 2004/12/25 12:09:32 ptsarenko Exp $
 #
 
 #
@@ -576,6 +576,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msggl.obj \
    $(OBJ_DIR)\msghe862.obj \
    $(OBJ_DIR)\msghewin.obj \
+   $(OBJ_DIR)\msghr437.obj \
    $(OBJ_DIR)\msghr852.obj \
    $(OBJ_DIR)\msghr1250.obj \
    $(OBJ_DIR)\msghriso.obj \
@@ -880,6 +881,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpruwin.obj \
    $(OBJ_DIR)\cpsrwin.obj \
    $(OBJ_DIR)\cprukoi.obj \
+   $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cpua866.obj \
@@ -2653,6 +2655,9 @@ $(OBJ_DIR)\msghe862.obj : $(LANG_DIR)\msghe862.c
 $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msghr437.obj : $(LANG_DIR)\msghr437.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -3060,6 +3065,9 @@ $(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cprukoi.obj : $(CODEPAGE_DIR)\cprukoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
