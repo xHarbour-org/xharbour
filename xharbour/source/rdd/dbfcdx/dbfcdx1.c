@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.6 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.87 2002/01/31 11:45:21 horacioroldan Exp $
  */
 
 /*
@@ -4728,7 +4728,8 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
          else
          {
             SELF_GOBOTTOM( ( AREAP ) pArea );
-            return SELF_SKIPRAW( ( AREAP ) pArea, 1 );
+            /* return SELF_SKIPRAW( ( AREAP ) pArea, 1 ); */
+            return SELF_SKIP( ( AREAP ) pArea, 1 );
             /*pArea->fEof = pTag->TagEOF = TRUE; */
          }
       }
