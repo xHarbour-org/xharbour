@@ -18,6 +18,13 @@
 #define  ID_NOTIFYICON   1
 #define  WM_NOTIFYICON   WM_USER+1000
 
+#ifndef BIF_USENEWUI
+#ifndef BIF_NEWDIALOGSTYLE
+#define BIF_NEWDIALOGSTYLE     0x0040   // Use the new dialog layout with the ability to resize
+#endif
+#define BIF_USENEWUI           (BIF_NEWDIALOGSTYLE | BIF_EDITBOX)
+#endif
+
 /*
  *  SelectFolder( cTitle )
  */

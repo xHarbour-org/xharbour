@@ -285,12 +285,12 @@ HB_FUNC ( DRAWTRANSPARENTBITMAP )
    dcImage = CreateCompatibleDC( hDC );
    dcTrans = CreateCompatibleDC( hDC );
    // Select the image into the appropriate dc
-   pOldBitmapImage = SelectObject( dcImage, hBitmap );
+   pOldBitmapImage = (HBITMAP) SelectObject( dcImage, hBitmap );
    GetObject( hBitmap, sizeof( BITMAP ), ( LPVOID ) &bitmap );
    // Create the mask bitmap
    bitmapTrans = CreateBitmap( bitmap.bmWidth, bitmap.bmHeight, 1, 1, NULL);
    // Select the mask bitmap into the appropriate dc
-   pOldBitmapTrans = SelectObject( dcTrans, bitmapTrans );
+   pOldBitmapTrans = (HBITMAP) SelectObject( dcTrans, bitmapTrans );
    // Build mask based on transparent colour
    SetBkColor( dcImage, 0x00FFFFFF );
    BitBlt( dcTrans, 0, 0, bitmap.bmWidth, bitmap.bmHeight, dcImage, 0, 0, SRCCOPY );

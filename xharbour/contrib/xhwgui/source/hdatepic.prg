@@ -1,5 +1,5 @@
 /*
- *$Id: hdatepic.prg,v 1.2 2003/11/14 07:44:12 alkresin Exp $
+ *$Id: hdatepic.prg,v 1.1 2004/02/19 02:35:44 lculik Exp $
  *
  * HWGUI - Harbour Win32 GUI library source code:
  * HDatePicker class
@@ -12,10 +12,12 @@
 #include "HBClass.ch"
 #include "guilib.ch"
 
+#undef  DTN_DATETIMECHANGE
+#undef  NM_KILLFOCUS
+#undef  NM_SETFOCUS
 #define DTN_DATETIMECHANGE    -759
 #define NM_KILLFOCUS          -8
 #define NM_SETFOCUS           -7
-
 
 CLASS HDatePicker INHERIT HControl
 

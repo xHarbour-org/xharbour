@@ -976,6 +976,7 @@ void CALLBACK TimerProc( HWND hWnd, UINT message, UINT idTimer, DWORD dwTime )
 {
 
    PHB_DYNS pSymTest;
+   HB_SYMBOL_UNUSED( message );
    if( ( pSymTest = hb_dynsymFind( "TIMERPROC" ) ) != NULL )
    {
       hb_vmPushSymbol( pSymTest->pSymbol );

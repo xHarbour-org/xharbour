@@ -10,6 +10,8 @@
 #include "HBClass.ch"
 #include "guilib.ch"
 
+#undef  UDS_SETBUDDYINT
+#undef  UDS_ALIGNRIGHT
 #define UDS_SETBUDDYINT     2
 #define UDS_ALIGNRIGHT      4
 

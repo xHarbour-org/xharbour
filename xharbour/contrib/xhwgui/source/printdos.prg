@@ -196,18 +196,18 @@ METHOD End() CLASS PrintDos
 Return Nil
 
 METHOD PrinterFile(fname) CLASS PrintDos
-LOCAL strbuf := Space(PF_BUFFERS) 
-Local han 
+LOCAL strbuf := Space(PF_BUFFERS)
+Local han, nRead
 
    IF !File( fname )
       MsgStop("Error open file "+fname,"Error")
       Return .F.
-   EndIf    
+   EndIf
 
    han := FOPEN( fname, FO_READWRITE + FO_EXCLUSIVE )
 
    IF han <> - 1
-                      
+
          DO while .t.
 
             nRead := fRead(han, @strBuf, PF_BUFFERS)

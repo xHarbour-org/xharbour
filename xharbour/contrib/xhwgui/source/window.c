@@ -217,7 +217,7 @@ HB_FUNC ( HWG_INITCHILDWINDOW )
    wndclass.lpszMenuName  = cMenu ;
    wndclass.lpszClassName = "HWGUI_CHILD" ;
 
-   UnregisterClass("HWGUI_CHILD",hInstance);
+   UnregisterClass("HWGUI_CHILD",(HINSTANCE) hInstance);
    if (!RegisterClass (&wndclass))
    {
          hb_retni( 0 );
@@ -815,7 +815,7 @@ HB_FUNC ( GETCURRENTDIR )
 {
    BYTE pbyBuffer[ _POSIX_PATH_MAX + 1 ];
    GetCurrentDirectory( _POSIX_PATH_MAX, ( char * ) pbyBuffer );
-   hb_retc( pbyBuffer );
+   hb_retc( (char*) pbyBuffer );
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1 2004/02/19 02:54:22 lculik Exp $
+ * $Id: ChangeLog,v 1.2 2004/02/19 12:07:30 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-20 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/xhwgui/source/printdos.prg
+  * contrib/xhwgui/source/htree.prg
+  * contrib/xhwgui/source/htab.prg
+  * contrib/xhwgui/source/hdatepic.prg
+  * contrib/xhwgui/source/hupdown.prg
+  * contrib/xhwgui/source/control.c
+    * fix compiler warnings on defines
+
+  * contrib/xhwgui/source/shellapi.c
+    * define BIF_USENEWUI if not defined
+    * define BIF_NEWDIALOGSTYLE if not defined
+
+  * contrib/xhwgui/source/window.c
+  * contrib/xhwgui/source/draw.c
+  * contrib/xhwgui/source/media_c.c
+    * casting for MSVC
 
 2004-02-19 09:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * source/hcombo.prg

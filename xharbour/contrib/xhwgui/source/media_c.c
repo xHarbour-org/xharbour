@@ -46,7 +46,7 @@ HB_FUNC ( MCISENDSTRING )
    hb_retnl( (LONG) mciSendString( (LPSTR) hb_parc(1), (LPSTR) cBuffer, 127,
                ( ISNIL(3) )? GetActiveWindow() : (HWND)hb_parnl(3) ) );
    if( !ISNIL(2) )
-      hb_storc( cBuffer,2 );
+      hb_storc( (char*) cBuffer,2 );
 }
 
 
