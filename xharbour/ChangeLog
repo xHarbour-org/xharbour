@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1748 2003/11/22 03:33:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1749 2003/11/22 04:34:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-22 01:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.slx
+    + Added reset logic to hb_compFlexNew() incase last parse stoped on error which was recovered by the app.
 
 2003-11-21 20:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
