@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.13 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.14 2003/04/29 23:55:40 ronpinkas Exp $
  */
 
 /*
@@ -178,8 +178,8 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
       nScope := HB_OO_CLSTP_EXPORTED
    ENDIF
 
-   aBaseVars   := __objGetValueList( oBase  , NIL, nScope )
-   aObjectVars := __objGetValueList( oObject, NIL, nScope )
+   aBaseVars   := __clsGetIVarNamesAndValues( oBase, nScope )
+   aObjectVars := __clsGetIVarNamesAndValues( oObject, NIL, nScope )
 
    aReturn := {}
 
@@ -212,8 +212,8 @@ FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
       nScope := HB_OO_CLSTP_EXPORTED
    ENDIF
 
-   aBaseVars   := aSort( __objGetValueList( oBase  , NIL, nScope ), , , {|x, y| x[1] < y[1] } )
-   aObjectVars := aSort( __objGetValueList( oObject, NIL, nScope ), , , {|x, y| x[1] < y[1] } )
+   aBaseVars   := aSort( __clsGetIVarNamesAndValues( oBase  , nScope ), , , {|x, y| x[1] < y[1] } )
+   aObjectVars := aSort( __clsGetIVarNamesAndValues( oObject, nScope ), , , {|x, y| x[1] < y[1] } )
 
    aReturn := {}
 

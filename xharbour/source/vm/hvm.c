@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.245 2003/08/02 05:50:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.246 2003/08/02 10:22:11 druzus Exp $
  */
 
 /*
@@ -1084,8 +1084,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             #ifndef HB_THREAD_SUPPORT
                hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
+
+               if( hb_vm_wWithObjectCounter == HB_MAX_WITH_OBJECTS )
+               {
+                  hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+               }
             #else
                hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
+
+               if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
+               {
+                  hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+               }
             #endif
 
             hb_stackPop();
@@ -1119,6 +1129,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
                hb_stackPop();
                hb_vm_wEnumCollectionCounter++;
+
+               if( hb_vm_wEnumCollectionCounter == HB_MAX_ENUMERATIONS )
+               {
+                  hb_errRT_BASE( EG_ARG, 9002, NULL, "FOR EACH excessive nesting!", 0 );
+               }
             #else
                hb_itemForwardValue( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
                hb_stackPop();
@@ -1131,6 +1146,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
                hb_stackPop();
                HB_VM_STACK.wEnumCollectionCounter++;
+
+               if( HB_VM_STACK.wEnumCollectionCounter == HB_MAX_ENUMERATIONS )
+               {
+                  hb_errRT_BASE( EG_ARG, 9002, NULL, "FOR EACH excessive nesting!", 0 );
+               }
             #endif
 
             w++;
@@ -4879,6 +4899,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
          pAlias->type = HB_IT_NIL;
          break;
+
       #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          /* Alias was evaluated from an expression, (nWorkArea)->field
@@ -4887,6 +4908,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          pAlias->type = HB_IT_NIL;
          break;
      #endif
+
       case HB_IT_SYMBOL:
          /* Alias was specified using alias identifier, for example: al->field
           */
@@ -5176,8 +5198,6 @@ void hb_vmSend( USHORT uiParams )
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
 
-   //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
-
    if( HB_IS_BYREF( pSelf ) )
    {
       pSelf = hb_itemUnRef( pSelf );
@@ -5197,7 +5217,10 @@ void hb_vmSend( USHORT uiParams )
    }
    else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
    {
-      pFunc     = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
+      //TraceLog( NULL, "Object: '%s' Message: '%s'\n", hb_objGetClsName( pSelf ), pSym->szName );
+
+      pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
+
       if( uiParams == 1 && pFunc == hb___msgGetData )
       {
          pFunc = hb___msgSetData;
@@ -5216,9 +5239,22 @@ void hb_vmSend( USHORT uiParams )
          uiClass = pSelfBase->uiClass;
 
          pRealSelf = hb_itemNew( NULL ) ;
-         hb_itemCopy( pRealSelf, pSelf->item.asArray.value->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+
+         //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
+
+         if( pSelfBase )
+         {
+            hb_itemCopy( pRealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+         }
+         else
+         {
+            //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
+            hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
+         }
+
          /* and take back the good pSelfBase */
          pSelfBase = pRealSelf->item.asArray.value;
+
          /* Now I should exchnage it with the current stacked value */
          hb_itemSwap( pSelf, pRealSelf );
          hb_itemRelease( pRealSelf ) ; /* and release the fake one */
@@ -7729,6 +7765,11 @@ HB_FUNC( HB_SETWITH )
       PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
 
       hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), pWith );
+
+      if( hb_vm_wWithObjectCounter == HB_MAX_WITH_OBJECTS )
+      {
+         hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+      }
    }
 #else
    if( hb_pcount() == 0 )
@@ -7740,6 +7781,11 @@ HB_FUNC( HB_SETWITH )
       PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
 
       hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), pWith );
+
+      if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
+      {
+         hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+      }
    }
 #endif
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.53 2003/03/14 13:54:55 jonnymind Exp $
+ * $Id: garbage.c,v 1.54 2003/03/16 06:00:33 jonnymind Exp $
  */
 
 /*
@@ -176,7 +176,7 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       pAlloc->pFunc  = pCleanupFunc;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
-      
+
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       s_uAllocated++;
       hb_gcLink( &s_pCurrBlock, pAlloc );
@@ -211,9 +211,9 @@ void hb_gcFree( void *pBlock )
       if( pAlloc->locked )
       {
          HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p) *LOCKED* %p", pBlock, pAlloc ) );
-         
+
          HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcUnlink( &s_pLockedBlock, pAlloc ) );
-         
+
          HB_GARBAGE_FREE( pAlloc );
       }
       else
@@ -260,7 +260,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          pAlloc = s_pAvailableItems;
          hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
          HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
-   }
+      }
       else
       {
          HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
@@ -289,7 +289,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          memset( pItem, 0, sizeof( HB_ITEM ) );
          pItem->type = HB_IT_NIL;
       }
-      
+
       HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );
       return pItem;
    }
@@ -332,11 +332,11 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       }
 
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
-      
+
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
-      
+
       HB_GARBAGE_FREE( pAlloc );
    }
 
@@ -360,14 +360,14 @@ void * hb_gcLock( void * pBlock )
       if( ! pAlloc->locked )
       {
          HB_CRITICAL_LOCK( hb_garbageAllocMutex );
-         
+
          //hb_gcUnlink( pContextList, pAlloc );
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
 
          hb_gcLink( &s_pLockedBlock, pAlloc );
 
          pAlloc->used = s_uUsedFlag;
-         
+
          HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       }
       ++pAlloc->locked;
@@ -392,13 +392,13 @@ void *hb_gcUnlock( void *pBlock )
          if( --pAlloc->locked == 0 )
          {
             HB_CRITICAL_LOCK( hb_garbageAllocMutex );
-            
+
             hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
             hb_gcLink( &s_pCurrBlock, pAlloc );
 
             pAlloc->used = s_uUsedFlag;
-            
+
             HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          }
       }
@@ -470,7 +470,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
             }
          }
       }
-      
+
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -529,7 +529,7 @@ void hb_gcCollectAll()
          HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
          if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
-            HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );     
+            HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
             return;
          }
          hb_runningStacks.content.asLong--;
@@ -538,7 +538,7 @@ void hb_gcCollectAll()
          s_bCollecting = TRUE;
 
          hb_threadWaitForIdle();
-         
+
          HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
       #endif
    #else

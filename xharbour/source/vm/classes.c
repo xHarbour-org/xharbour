@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.71 2003/06/30 17:08:58 ronpinkas Exp $
+ * $Id: classes.c,v 1.72 2003/07/14 07:49:38 andijahja Exp $
  */
 
 /*
@@ -3256,7 +3256,7 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
          {
             PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
 
-            if( ( pMessage != NULL ) && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
+            if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
             {
                hb_itemPutC( &Property, pMessage->pSymbol->szName );
                hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
@@ -3266,6 +3266,61 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
                hb_arraySetForward( &SubArray, 2, &Value );
 
                hb_arrayAddForward( &Return, &SubArray );
+            }
+         }
+
+         hb_itemReturn( &Return );
+      }
+   }
+}
+
+HB_FUNC( __CLSGETIVARNAMESANDVALUES )
+{
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
+   USHORT uiScope = hb_parni( 2 );
+
+   if( pObject )
+   {
+      USHORT uiClass = pObject->item.asArray.value->uiClass;
+
+      if( uiClass && uiClass <= s_uiClasses )
+      {
+         PCLASS pClass = s_pClasses + ( uiClass - 1 );
+         USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
+         USHORT uiAt;
+
+         HB_ITEM Return;
+         HB_ITEM Property;
+         HB_ITEM Value;
+         HB_ITEM SubArray;
+
+
+         Return.type   = HB_IT_NIL;
+         Property.type = HB_IT_NIL;
+         Value.type    = HB_IT_NIL;
+         SubArray.type = HB_IT_NIL;
+
+         hb_arrayNew( &Return, 0 );
+
+         for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+         {
+            PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
+
+            if( pMessage && pClass->pMethods[ uiAt ].uiData && ( uiScope == 0 || pClass->pMethods[ uiAt ].uiScope & uiScope ) )
+            {
+               if( pClass->pMethods[ uiAt ].pFunction == hb___msgGetData ||
+                   pClass->pMethods[ uiAt ].pFunction == hb___msgGetClsData ||
+                   pClass->pMethods[ uiAt ].pFunction == hb___msgGetShrData )
+               {
+                  hb_itemPutC( &Property, pMessage->pSymbol->szName );
+                  hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
+
+                  hb_arrayNew( &SubArray, 2 );
+                  hb_arraySetForward( &SubArray, 1, &Property );
+                  hb_arraySetForward( &SubArray, 2, &Value );
+
+                  hb_arrayAddForward( &Return, &SubArray );
+               }
             }
          }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1323 2003/08/02 20:40:04 lculik Exp $
+ * $Id: ChangeLog,v 1.1324 2003/08/03 02:47:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-05 03:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstr.prg
+    * Commented leftout TraceLog()
+
+  * source/vm/classes.c
+    + Added: __clsGetIVarNamesAndValues( oObject [, nScope] ) -> Array of sub arrays of Ivar-Name and Value.
+
+  * source/rtl/objfunc.prg
+    ! Fixed __ObjGetValueDiff() and __ObjGetDerivedDiff() to use new __clsGetIVarNamesAndValues()
+      instead of
+
+  * source/vm/garbage.c
+    * Minor formating.
+
+  * source/vm/hvm.c
+    + Added logic to generate an Error if HB_MAX_ENUMERATIONS is reached.
+    + Added logic to generate an Error if HB_MAX_WITH_OBJECTS is reached.
+      /* This may catch a possible GPF. */
 
 2003-08-03 04:47 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
