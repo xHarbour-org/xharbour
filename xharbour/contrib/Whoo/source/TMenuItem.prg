@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.9 2002/11/12 05:38:34 ronpinkas Exp $
+ * $Id: TMenuItem.prg,v 1.10 2002/11/13 00:57:52 ronpinkas Exp $
  */
 
 /*
@@ -342,7 +342,7 @@ METHOD SetParentComponent( Value ) CLASS TMenuItem
       IF Value:IsDerivedFrom( "TMenu" )
          aAdd( Value:Items, Self )
       ELSEIF Value:ClassName == "TMENUITEM"
-         TMenuItem(Value).Add(Self);
+         TMenuItem( Value ):Add( Self )
       ENDIF
    ENDIF
 
@@ -352,7 +352,7 @@ METHOD GetParentMenu() CLASS TMenuItem
 
    LOCAL MenuItem := Self
 
-   WHILE MenuItem:FParent != NIL )
+   WHILE MenuItem:FParent != NIL
       MenuItem := MenuItem:FParent
    ENDDO
 

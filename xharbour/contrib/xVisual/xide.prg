@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.126 2002/11/12 05:38:34 ronpinkas Exp $
+ * $Id: xide.prg,v 1.127 2002/11/13 00:45:53 what32 Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ METHOD MainToolBar() CLASS MainFrame
    // add the TabControl on the Rebarband
 
    WITH OBJECT ToolTabs():Create( MainFrame )
-      :SetParent( MainFrame )
+//      :SetParent( MainFrame )
 
       :AddTab( "StdTab", TabPage():Create( MainFrame:ToolTabs ) )
       :StdTab:Caption := "Standard"

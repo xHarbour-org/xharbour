@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.5 2002/11/12 05:38:34 ronpinkas Exp $
+ * $Id: TCustomForm.prg,v 1.6 2002/11/13 00:57:52 ronpinkas Exp $
  */
 
 /*
@@ -163,6 +163,7 @@ CLASS TCustomForm FROM TScrollingWinControl
 
     METHOD SetWindowMenu( oMenu )
     METHOD RefreshMDIMenu()
+    METHOD SetParent( oParent )
 
 ENDCLASS
 

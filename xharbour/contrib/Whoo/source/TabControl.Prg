@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.31 2002/11/11 23:18:02 what32 Exp $
+ * $Id: TabControl.Prg,v 1.32 2002/11/13 00:45:51 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -139,11 +139,12 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    oPage:Caption := cName
 
 
-   IF (hTab:=TabCtrl_AddItem( ::Handle, oPage:Caption, oPage:ImageIndex ) ) > -1
+   IF ( hTab := TabCtrl_AddItem( ::FHandle, oPage:Caption, oPage:ImageIndex ) ) > -1
    
-      AADD(::Controls,oPage )
+      AADD( ::Controls, oPage )
       __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
       __ObjSetValueList( self, { { cName, oPage } } )
+
    ENDIF
 
    IF Len( ::Controls ) > 1
