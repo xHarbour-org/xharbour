@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.3 2003/01/07 19:35:22 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.4 2003/01/10 05:40:01 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -30,6 +30,7 @@ if "%1" == "CLEAN" goto CLEAN
    IF "%1" == "ST"   make -fmakefile.bc %1 %2 %3 > make_b32.log
    IF "%1" == "BOTH" make -fmakefile.bc %1 %2 %3 > make_b32.log
 
+   IF "%1" == ""     make -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 > make_b32.log
    IF "%1" == "MT"   make -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 > make_b32.log
    IF "%1" == "BOTH" make -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 > make_b32.log
 

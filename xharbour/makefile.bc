@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.21 2003/01/05 06:50:33 ronpinkas Exp $
+# $Id: makefile.bc,v 1.22 2003/01/10 05:40:01 ronpinkas Exp $
 #
 
 #
@@ -86,13 +86,15 @@ OBJ_DIR = obj\b32
 LIB_DIR = lib\b32
 
 !if $d(HB_THREAD_SUPPORT)
-   RTL_OBJ_DIR = $(OBJ_DIR)\mt
-   RDD_OBJ_DIR = $(OBJ_DIR)\mt
    VM_OBJ_DIR = $(OBJ_DIR)\mt
+   RTL_OBJ_DIR = $(OBJ_DIR)\mt
+   NTX_OBJ_DIR = $(OBJ_DIR)\mt
+   CDX_OBJ_DIR = $(OBJ_DIR)\mt
 !else
-   RTL_OBJ_DIR = $(OBJ_DIR)
-   RDD_OBJ_DIR = $(OBJ_DIR)
    VM_OBJ_DIR = $(OBJ_DIR)
+   RTL_OBJ_DIR = $(OBJ_DIR)
+   NTX_OBJ_DIR = $(OBJ_DIR)
+   CDX_OBJ_DIR = $(OBJ_DIR)
 !endif
 
 # This is needed, otherwise the libs may overflow when
@@ -172,9 +174,10 @@ RTL_LIB      = $(LIB_DIR)\rtl.lib
 VM_LIB       = $(LIB_DIR)\vm.lib
 
 !if $d(HB_THREAD_SUPPORT)
-   VM_LIB    = $(LIB_DIR)\vmmt.lib
-   RTL_LIB   = $(LIB_DIR)\rtlmt.lib
-   RDD_LIB   = $(LIB_DIR)\rddmt.lib
+   VM_LIB     = $(LIB_DIR)\vmmt.lib
+   RTL_LIB    = $(LIB_DIR)\rtlmt.lib
+   DBFNTX_LIB = $(LIB_DIR)\dbfntxmt.lib
+   DBFCDX_LIB = $(LIB_DIR)\dbfcdxmt.lib
 !endif
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
@@ -471,39 +474,39 @@ MACRO_LIB_OBJS = \
 #
 
 RDD_LIB_OBJS = \
-   $(RDD_OBJ_DIR)\dbcmd.obj \
-   $(RDD_OBJ_DIR)\workarea.obj \
-   $(RDD_OBJ_DIR)\dbf1.obj \
-   $(RDD_OBJ_DIR)\dbnubs.obj \
-   $(RDD_OBJ_DIR)\delim1.obj \
-   $(RDD_OBJ_DIR)\sdf1.obj \
+   $(OBJ_DIR)\dbcmd.obj \
+   $(OBJ_DIR)\workarea.obj \
+   $(OBJ_DIR)\dbf1.obj \
+   $(OBJ_DIR)\dbnubs.obj \
+   $(OBJ_DIR)\delim1.obj \
+   $(OBJ_DIR)\sdf1.obj \
    \
-   $(RDD_OBJ_DIR)\dbf0.obj \
-   $(RDD_OBJ_DIR)\dbfuncs.obj \
-   $(RDD_OBJ_DIR)\dbtotal.obj \
-   $(RDD_OBJ_DIR)\dblist.obj \
-   $(RDD_OBJ_DIR)\dbsort.obj \
-   $(RDD_OBJ_DIR)\hbdbsort.obj \
-   $(RDD_OBJ_DIR)\dbstrux.obj \
-   $(RDD_OBJ_DIR)\dbupdat.obj \
-   $(RDD_OBJ_DIR)\delim0.obj \
-   $(RDD_OBJ_DIR)\rddord.obj \
-   $(RDD_OBJ_DIR)\rddsys.obj \
-   $(RDD_OBJ_DIR)\sdf0.obj
+   $(OBJ_DIR)\dbf0.obj \
+   $(OBJ_DIR)\dbfuncs.obj \
+   $(OBJ_DIR)\dbtotal.obj \
+   $(OBJ_DIR)\dblist.obj \
+   $(OBJ_DIR)\dbsort.obj \
+   $(OBJ_DIR)\hbdbsort.obj \
+   $(OBJ_DIR)\dbstrux.obj \
+   $(OBJ_DIR)\dbupdat.obj \
+   $(OBJ_DIR)\delim0.obj \
+   $(OBJ_DIR)\rddord.obj \
+   $(OBJ_DIR)\rddsys.obj \
+   $(OBJ_DIR)\sdf0.obj
 
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
 
 DBFNTX_LIB_OBJS = \
-   $(OBJ_DIR)\dbfntx1.obj \
+   $(NTX_OBJ_DIR)\dbfntx1.obj \
    \
-   $(OBJ_DIR)\dbfntx0.obj
+   $(NTX_OBJ_DIR)\dbfntx0.obj
 
 
 DBFCDX_LIB_OBJS = \
-   $(OBJ_DIR)\dbfcdx1.obj \
+   $(CDX_OBJ_DIR)\dbfcdx1.obj \
    \
-   $(OBJ_DIR)\dbfcdx0.obj
+   $(CDX_OBJ_DIR)\dbfcdx0.obj
 
 #
 # PP.LIB rules
@@ -970,108 +973,108 @@ $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
 # RDD.LIB dependencies
 #
 
-$(RDD_OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
+$(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+$(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg
+$(OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbf0.obj : $(RDD_OBJ_DIR)\dbf0.c
+$(OBJ_DIR)\dbf0.obj : $(OBJ_DIR)\dbf0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
+$(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
+$(OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbtotal.obj : $(RDD_OBJ_DIR)\dbtotal.c
+$(OBJ_DIR)\dbtotal.obj : $(OBJ_DIR)\dbtotal.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
+$(OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dblist.obj : $(RDD_OBJ_DIR)\dblist.c
+$(OBJ_DIR)\dblist.obj : $(OBJ_DIR)\dblist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
+$(OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbfuncs.obj : $(RDD_OBJ_DIR)\dbfuncs.c
+$(OBJ_DIR)\dbfuncs.obj : $(OBJ_DIR)\dbfuncs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbsort.c : $(RDD_DIR)\dbsort.prg
+$(OBJ_DIR)\dbsort.c : $(RDD_DIR)\dbsort.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbsort.obj : $(RDD_OBJ_DIR)\dbsort.c
+$(OBJ_DIR)\dbsort.obj : $(OBJ_DIR)\dbsort.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\hbdbsort.obj : $(RDD_DIR)\hbdbsort.c
+$(OBJ_DIR)\hbdbsort.obj : $(RDD_DIR)\hbdbsort.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbnubs.obj : $(RDD_DIR)\dbnubs.c
+$(OBJ_DIR)\dbnubs.obj : $(RDD_DIR)\dbnubs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbstrux.c : $(RDD_DIR)\dbstrux.prg
+$(OBJ_DIR)\dbstrux.c : $(RDD_DIR)\dbstrux.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbstrux.obj : $(RDD_OBJ_DIR)\dbstrux.c
+$(OBJ_DIR)\dbstrux.obj : $(OBJ_DIR)\dbstrux.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\dbupdat.c : $(RDD_DIR)\dbupdat.prg
+$(OBJ_DIR)\dbupdat.c : $(RDD_DIR)\dbupdat.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\dbupdat.obj : $(RDD_OBJ_DIR)\dbupdat.c
+$(OBJ_DIR)\dbupdat.obj : $(OBJ_DIR)\dbupdat.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\sdf0.c : $(RDD_DIR)\sdf0.prg
+$(OBJ_DIR)\sdf0.c : $(RDD_DIR)\sdf0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\sdf0.obj : $(RDD_OBJ_DIR)\sdf0.c
+$(OBJ_DIR)\sdf0.obj : $(OBJ_DIR)\sdf0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\sdf1.obj : $(RDD_DIR)\sdf1.c
+$(OBJ_DIR)\sdf1.obj : $(RDD_DIR)\sdf1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\delim0.c : $(RDD_DIR)\delim0.prg
+$(OBJ_DIR)\delim0.c : $(RDD_DIR)\delim0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\delim0.obj : $(RDD_OBJ_DIR)\delim0.c
+$(OBJ_DIR)\delim0.obj : $(OBJ_DIR)\delim0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\delim1.obj : $(RDD_DIR)\delim1.c
+$(OBJ_DIR)\delim1.obj : $(RDD_DIR)\delim1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\rddord.c : $(RDD_DIR)\rddord.prg
+$(OBJ_DIR)\rddord.c : $(RDD_DIR)\rddord.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\rddord.obj : $(RDD_OBJ_DIR)\rddord.c
+$(OBJ_DIR)\rddord.obj : $(OBJ_DIR)\rddord.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
-$(RDD_OBJ_DIR)\rddsys.c : $(RDD_DIR)\rddsys.prg
+$(OBJ_DIR)\rddsys.c : $(RDD_DIR)\rddsys.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
+$(OBJ_DIR)\rddsys.obj : $(OBJ_DIR)\rddsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
@@ -2276,14 +2279,14 @@ $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
 # DBFNTX.LIB dependencies
 #
 
-$(OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
+$(NTX_OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
+$(NTX_OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(DBFNTX_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
+$(NTX_OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(DBFNTX_LIB) $(ARFLAGS) -+$@,,
 
@@ -2291,14 +2294,14 @@ $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
 # DBFCDX.LIB dependencies
 #
 
-$(OBJ_DIR)\dbfcdx0.c : $(RDD_DIR)\dbfcdx\dbfcdx0.prg
+$(CDX_OBJ_DIR)\dbfcdx0.c : $(RDD_DIR)\dbfcdx\dbfcdx0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
+$(CDX_OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(DBFCDX_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+$(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(DBFCDX_LIB) $(ARFLAGS) -+$@,,
 
