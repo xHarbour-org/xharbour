@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.8 2002/01/06 13:37:33 antoniolinares Exp $
+ * $Id: msges.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
 
       /* Month names */
 
@@ -194,7 +194,7 @@ static HB_LANG s_lang =
 
       /* Texts */
 
-      "YYYY/MM/DD",
+      "DD/MM/YYYY",
       "S",
       "N"
    }
