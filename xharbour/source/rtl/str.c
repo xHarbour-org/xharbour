@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.12 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: str.c,v 1.13 2004/03/29 21:22:53 srobert Exp $
  */
 
 /*
@@ -111,8 +111,9 @@ HB_FUNC( STR )
    if( bValid )
    {
       BOOL bLogical = hb_set.HB_SET_FIXED;
+      char * szResult ;
       hb_set.HB_SET_FIXED = FALSE ;
-      char * szResult = hb_itemStr( pNumber, pWidth, pDec );
+      szResult = hb_itemStr( pNumber, pWidth, pDec );
       hb_set.HB_SET_FIXED = bLogical ;
 
       if( szResult )
