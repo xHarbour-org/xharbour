@@ -1,7 +1,7 @@
 ***********************************************************
 * bkgtest.prg
 *
-* $Id: bkgtest.prg,v 1.1 2003/12/19 01:41:13 fsgiudice Exp $
+* $Id: bkgtest.prg,v 1.2 2003/12/19 03:27:52 fsgiudice Exp $
 *
 * This test demonstrates usage of BACKGROUND functions that are an extension of IDLE functions;
 * this is a variant of idle functions that runs only on idle state (as inkey(0) does)
@@ -16,9 +16,9 @@
 #include "inkey.ch"
 
 PROCEDURE Main()
-   LOCAL nId1, nId2, nId3, nId4, n, lRun := Set( _SET_BACKGROUNDTASKS, .T. )
-   nId1 := HB_IdleAdd( {||idleFunc( 10, "From Block" )} )
-   nId2 := HB_IdleAdd( { @idleFunc(), 11, "FromArray"} )
+   LOCAL nId1, nId2, nId3, nId4, n //, lRun := Set( _SET_BACKGROUNDTASKS, .T. )
+   nId1 := HB_IdleAdd( {||idleFunc( 10, "On Idle - From Block" )} )
+   nId2 := HB_IdleAdd( { @idleFunc(), 11, "On Idle - From Array"} )
    nId3 := HB_BackgroundAdd( { @CheckFunc() } )
    nId4 := HB_BackgroundAdd( { @TimerFunc() } )
    HB_BackgroundAdd( { @Counter1Func() } )
@@ -29,14 +29,40 @@ PROCEDURE Main()
    CLEAR SCREEN
    SET CURSOR OFF
    @1,0 SAY Padc( "X H A R B O U R - Background and Idle Function Test.", MaxCol() )
+
+   DispInfo( "Background Tasks defined but not running." )
+   SecondsSleep( 3 )
+
+   DispInfo( "Now i'll run a single task manually" )
+   SecondsSleep( 3 )
+
+   DispInfo( "Timer in action" )
+   FOR n := 1 TO 1000000
+       HB_BackgroundRun( nId4 )
+   NEXT
    @3,10 SAY "In lines 10 and 11, two different idle functions"
    @4,10 SAY "will make some text to flash."
-   @5,10 SAY "Background functions show timer and check time elapsed."
+   DispInfo( "Now you will see idle functions running until you press any key" )
+   inkey(0)
+
+   DispInfo( "Now manually force to run all background functions" )
+   SecondsSleep( 3 )
+   DispInfo( "Background functions running manually" )
+   FOR n := 1 TO 10000
+       HB_BackgroundRun()
+   NEXT
+   DispInfo( "Now you will see idle functions running until you press any key" )
+   inkey(0)
+
+   DispInfo( "Now i set on background tasks" )
+   SecondsSleep( 3 )
+
+   SET BACKGROUND TASKS ON
+
+   @5,10 SAY "Background functions show timer, counters and check time elapsed."
    @6,10 SAY "After 20 seconds this program will be forcely quitted."
-
-   //@8,10 SAY lRun
-
-   @20,10 SAY "Press ESC key to terminate"
+   DispInfo( "Program in action with active background tasks" )
+   //@20,10 SAY "Press ESC key to terminate"
    //Inkey( 0 )
    @ 18, 10 SAY "Counter: "
    FOR n := 1 TO 5000000
@@ -48,14 +74,22 @@ PROCEDURE Main()
        ENDIF
    NEXT
 
-   SET COLOR TO w/n
-   CLEAR SCREEN
-   @0,0 SAY "Removing " + ValToPrg( HB_IdleDel( nId1 ) )
-   @1,0 SAY "Removing " + ValToPrg( HB_IdleDel( nId2 ) )
-   @2,0 SAY "Done"
-   @4,0
-   SET CURSOR ON
+   //SET COLOR TO w/n
+   //CLEAR SCREEN
+   //@0,0 SAY "Removing " + ValToPrg( HB_IdleDel( nId1 ) )
+   //@1,0 SAY "Removing " + ValToPrg( HB_IdleDel( nId2 ) )
+   //@2,0 SAY "Done"
+   //@4,0
+   //SET CURSOR ON
 
+RETURN
+
+PROCEDURE DispInfo( cMsg )
+  IF cMsg == NIL
+     cMsg := ""
+  ENDIF
+  @ 23, 0 SAY PadC( cMsg, MaxCol() )
+RETURN
 
 PROCEDURE IdleFunc( nRow, cStr )
    @nRow, 10 SAY cStr
@@ -77,7 +111,8 @@ PROCEDURE CheckFunc()
      @ 22, 10 SAY "Seconds Elapsed: " + Str( nSecElapsed )
   ENDIF
   IF nElapsed > 20
-     @ 23, 10 SAY "Time elapsed! Quitting"
+     DispInfo( "Time elapsed! Quitting. Press any key to exit (note idle running meanwhile)" )
+     Inkey(0)
      QUIT
   ELSEIF Int( nElapsed ) % 5 == 0
      // Run forcely idle functions

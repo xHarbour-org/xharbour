@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.301 2003/12/19 10:39:35 ronpinkas Exp $
+ * $Id: hvm.c,v 1.302 2003/12/19 16:14:01 jonnymind Exp $
  */
 
 /*
@@ -338,6 +338,11 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
                              PEXCEPTIONREGISTRATIONRECORD p2,
                              PCONTEXTRECORD               p3,
                              PVOID                        pv);
+#endif
+
+#ifndef HB_THREAD_SUPPORT
+  /* background function counter */
+  static unsigned short s_iBackground = 0;
 #endif
 
 // Initialize ErrorBlock() and __SetHelpK()
@@ -853,7 +858,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       if ( hb_set.HB_SET_BACKGROUNDTASKS )
       {
       #ifndef HB_THREAD_SUPPORT
-         static unsigned short s_iBackground = 0;
          // Run background functions every 5000 vm exec
          if( ++s_iBackground == 5000 )
          {

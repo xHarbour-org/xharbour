@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.106 2003/12/19 16:14:01 jonnymind Exp $
+ * $Id: hbapi.h,v 1.107 2003/12/20 01:15:57 ronpinkas Exp $
  */
 
 /*
@@ -585,11 +585,12 @@ extern ULONG    hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an exe
 extern PHB_ITEM hb_idleDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */
 
 /* Background functions */
-extern void     hb_backgroundRun( void ); /* services a single background routine */
-extern void     hb_backgroundReset( void ); /* services a single idle state */
+extern void     hb_backgroundRunSingle( ULONG ulID ); /* run a single background routine */
+extern void     hb_backgroundRun( void ); /* run all background routines */
+extern void     hb_backgroundReset( void ); /* reset internal counter */
 extern void     hb_backgroundShutDown( void ); /* closes all background tasks */
 extern ULONG    hb_backgroundAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
-extern PHB_ITEM hb_backgroundDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */
+extern PHB_ITEM hb_backgroundDelFunc( ULONG ulID ); /* Deletes a prevuiously added task */
 
 /* misc */
 extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer containing platform version */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1915 2003/12/21 21:13:01 peterrees Exp $
+ * $Id: ChangeLog,v 1.1916 2003/12/21 21:31:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-22 00:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/vm/hvm.c
+    ! Fixed background counter.
+      Moved to global vm level so it will not be cleared on vmExecute() exit.
+      Thanks to Giancarlo Niccolai.
+  * source/rtl/bkgtsks.c
+    on C level
+    + void hb_backgroundRunSingle( void ) - to run a single background task manually
+    on PRG level
+    * HB_BackgroundRun( [ nTaskID ] )     - passing nTaskID returned from HB_BackgroundAdd()
+                                            it is possible to run manually a single task
+                                          - without parameter all tasks will be run
+  * include/hbapi.h
+    + added support for hb_backgroundRunSingle()
+  * tests/bkgtest.prg
+    * Updated with other tests
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+    * updated for new GTWVT written by Peter Rose  (great job Peter)
+      /*
+      for ppl who want test it set:
+      HB_GT_LIB=gtwvt
+      CFLAGS=-W   (plus other flags already present)
+      then you can compile tests with bldtest.bat in tests folder
+      */
 
 2003-12-21 22:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_gnu.bat

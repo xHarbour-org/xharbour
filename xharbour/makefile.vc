@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.80 2003/12/13 17:45:07 paultucker Exp $
+# $Id: makefile.vc,v 1.81 2003/12/19 01:32:39 fsgiudice Exp $
 #
 
 #
@@ -178,6 +178,7 @@ GTNUL_LIB        =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB        =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB        =$(LIB_DIR)\gtstd.lib
 GTWIN_LIB        =$(LIB_DIR)\gtwin.lib
+GTWVT_LIB        =$(LIB_DIR)\gtwvt.lib
 
 HARBOUR_EXE      =$(BIN_DIR)\harbour.exe
 HBPP_EXE         =$(BIN_DIR)\hbpp.exe
@@ -197,7 +198,8 @@ HB_GT_LIBS = \
    $(GTNUL_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
-   $(GTWIN_LIB)
+   $(GTWIN_LIB) \
+   $(GTWVT_LIB)
 
 !ifndef HB_GT_LIB
 # don't indent definitions
@@ -927,6 +929,16 @@ GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\mousewin.obj
 
 #
+# GTWVT.LIB rules
+#
+
+{$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+GTWVT_LIB_OBJS = \
+   $(OBJ_DIR)\gtwvt.obj
+
+#
 # SAMPLES.LIB rules
 #
 {$(SAMPLES_DIR)}.c{$(OBJ_DIR)}.obj:
@@ -1265,6 +1277,9 @@ $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
+   lib /out:$@ $**
+
+$(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)

@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.2 2003/12/19 16:14:01 jonnymind Exp $
+ * $Id: bkgtsks.c,v 1.3 2003/12/19 22:29:09 jonnymind Exp $
  */
 
 /*
@@ -137,6 +137,45 @@ void hb_backgroundRun( void )
    }
 }
 
+/* RUN only one tasks */
+void hb_backgroundRunSingle( ULONG ulID )
+{
+   HB_THREAD_STUB
+   SHORT iTask;
+
+   if( ! s_bIamBackground )
+   {
+      s_bIamBackground = TRUE;
+
+      iTask = 0;
+      while( iTask < s_uiBackgroundMaxTask )
+      {
+         PHB_ITEM pItem = s_pBackgroundTasks[ iTask ];
+
+         if( ( pItem->type == HB_IT_BLOCK &&
+               ulID == ( ULONG ) pItem->item.asBlock.value ) ||
+             ( pItem->type == HB_IT_ARRAY &&
+               ulID == ( ULONG ) pItem->item.asArray.value ) )
+         {
+             if ( HB_IS_BLOCK( pItem ) )
+             {
+                hb_vmEvalBlock( pItem );
+             }
+             else
+             {
+                hb_execFromArray( pItem );
+             }
+         }
+
+         ++iTask;
+         /* Pitem is now NULL */
+         pItem = NULL;
+      }
+
+      s_bIamBackground = FALSE;
+   }
+}
+
 void hb_backgroundReset( void )
 {
    HB_THREAD_STUB
@@ -167,7 +206,18 @@ void hb_backgroundShutDown( void )
 /* forces to run Background functions */
 HB_FUNC( HB_BACKGROUNDRUN )
 {
-   hb_backgroundRun();
+   if ( s_pBackgroundTasks )
+   {
+      if ( hb_parinfo( 1 ) & HB_IT_NUMERIC )
+      {
+         ULONG ulID = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
+         hb_backgroundRunSingle( ulID );
+      }
+      else
+      {
+         hb_backgroundRun();
+      }
+   }
 }
 
 /* call from user code to reset Background state */
