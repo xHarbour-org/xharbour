@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.9 2002/10/09 06:46:59 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.10 2002/11/29 20:12:28 walito Exp $
  */
 
 /*
@@ -164,7 +164,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
 
    LOCAL aBaseVars, aObjectVars
    LOCAL aReturn
-   LOCAL nVar, aVar
+   LOCAL aVar
 
    IF ValType( oObject ) != 'O' .OR. ( oBase != NIL .AND. oObject:ClassH != oBase:ClassH )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
@@ -183,13 +183,10 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
 
    aReturn := {}
 
-   nVar := 1
    FOR EACH aVar IN aObjectVars
-      IF nVar > Len( aBaseVars ) .OR. ( ! ( aVar[2] == aBaseVars[ nVar ][ 2 ] ) )
+      IF HB_EnumIndex() > Len( aBaseVars ) .OR. ( ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] ) )
          AAdd( aReturn, aVar )
       ENDIF
-
-      nVar++
    NEXT
 
 RETURN aReturn
@@ -240,6 +237,21 @@ FUNCTION __objAddData( oObject, cSymbol, nScope )
 
       __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
       __clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
+   ENDIF
+
+RETURN oObject
+
+FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine )
+
+   LOCAL hClass
+
+   IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ELSEIF !__objHasMsg( oObject, cSymbol ) .AND. !__objHasMsg( oObject, "_" + cSymbol )
+      hClass := oObject:ClassH
+
+      __clsAddMsg( hClass,       cSymbol, bInLine, HB_OO_MSG_INLINE, NIL, 1 + 16 )
+      __clsAddMsg( hClass, "_" + cSymbol, bInLine, HB_OO_MSG_INLINE, NIL, 1 )
    ENDIF
 
 RETURN oObject
