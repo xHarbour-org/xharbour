@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/03/04 21:04:38 lculik Exp $
+# $Id: makefile.bc,v 1.2 2003/03/22 17:22:43 lculik Exp $
 #
 
 #
@@ -456,14 +456,14 @@ $(OBJ_DIR)\setlast.obj : $(OBJ_DIR)\setlast.c
 $(OBJ_DIR)\ctwin.c : $(TOOLS_DIR)\ctwin.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\ctwin.obj : $(TOOLS_DIR)\ctwin.prg
+$(OBJ_DIR)\ctwin.obj : $(OBJ_DIR)\ctwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\blank.c : $(TOOLS_DIR)\blank.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\blank.obj : $(TOOLS_DIR)\blank.prg
+$(OBJ_DIR)\blank.obj : $(OBJ_DIR)\blank.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
