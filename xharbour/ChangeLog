@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3755 2005/01/19 21:19:12 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3756 2005/01/19 23:36:16 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -21,8 +21,8 @@
       dbfcdx.c:
         #define HB_CDX_NEW_SORT
       I should done it before when I was rewriting the indexing but
-      sorry I was too lazy. Now I've found a while. Current cost
-      of comparisons is always n*log2(n) and cannot be more improved.
+      sorry I was too lazy. Now I've found a while. Current cost of
+      key comparisons is always n*log2(n) and cannot be more improved.
       Some small optimizations still can be done but the static cost
       for small database will be bigger then ~0.5% as in this case
       so I do not plan to do it in the nearest future.
