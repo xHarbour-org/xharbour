@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.29 2002/09/24 03:26:12 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.30 2002/09/25 18:46:00 ronpinkas Exp $
  */
 
 /*
@@ -1034,143 +1034,222 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   HB_TRACE(HB_TR_DEBUG, ("ConvertPatterns(%s, %d, %s, %d)", mpatt, mlen, rpatt, rlen));
 
   while( *(mpatt+i) != '\0' )
-    {
-      if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
-        {  /* Drag match marker, determine it type */
-          explen = 0; ipos = i; i++; exptype = '0';
-          while( *(mpatt+i) == ' ' || *(mpatt+i) == '\t' ) i++;
-          if( *(mpatt+i) == '*' )        /* Wild match marker */
-            { exptype = '3'; i++; }
-          else if( *(mpatt+i) == '(' )   /* Extended expression match marker */
-            { exptype = '4'; i++; }
-          else if( *(mpatt+i) == '!' )   /* Minimal expression match marker */
-            { exptype = '5'; i++; }
-          ptr = mpatt + i;
-          while( *ptr != '>' )
-          {
-             if( *ptr == '\0' || *ptr == '<' || *ptr == '[' || *ptr == ']' )
-             {
-                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
-                return;
-             }
-             ptr++;
-          }
-          while( *(mpatt+i) != '>' )
-            {
-              if( *(mpatt+i) == ',' )      /* List match marker */
-                {
-                  exptype = '1';
-                  while( *(mpatt+i) != '>' ) i++;
-                  break;
-                }
-              else if( *(mpatt+i) == ':' ) /* Restricted match marker */
-                {
-                  exptype = '2';
-                  *(mpatt+i--) = ' ';
-                  break;
-                }
-              if( *(mpatt+i) != ' ' && *(mpatt+i) != '\t' )
-                *(exppatt+explen++) = *(mpatt+i);
-              i++;
-            }
-          if( exptype == '3' )
-            {
-              if( *(exppatt+explen-1) == '*' ) explen--;
-              else
-                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
-            }
-          else if( exptype == '4' )
-            {
-              if( *(exppatt+explen-1) == ')' ) explen--;
-              else
-                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
-            }
-          else if( exptype == '5' )
-            {
-              if( *(exppatt+explen-1) == '!' ) explen--;
-              else
-                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
-            }
+  {
+     if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
+     {
+        /* Drag match marker, determine it type */
+        explen = 0; ipos = i; i++; exptype = '0';
 
-          rmlen = i - ipos + 1;
-          /* Convert match marker into inner format */
-          lastchar = (lastchar!='Z') ? ( (char) ( (unsigned int)lastchar + 1 ) ):
-                                       'a';
-          expreal[1] = lastchar;
-          expreal[2] = exptype;
-          hb_pp_Stuff( expreal, mpatt+ipos, 4, rmlen, mlen );
-          mlen += 4 - rmlen;
-          i += 4 - rmlen;
-
-          /* Look for appropriate result markers */
-          ptr = rpatt;
-          while( (ifou = hb_strAt( exppatt, explen, ptr, rlen-(ptr-rpatt) )) > 0 )
-            {
-              /* Convert result marker into inner format */
-              ifou --;
-              ptr += ifou;
-              ptrtmp = ptr + 1;
-              rmlen = explen;
-              exptype = '0';
-              do
-              {
-                 ptr--;
-                 rmlen++;
-                 ifou--;
-                 if( *ptr == '<' )
-                    continue;
-                 else if( *ptr == '\"' )
-                    exptype = '2';
-                 else if( *ptr == '(' )
-                    exptype = '3';
-                 else if( *ptr == '{' )
-                    exptype = '4';
-                 else if( *ptr == '.' )
-                    exptype = '5';
-                 else if( *ptr == '-' )
-                    exptype = '6';
-                 else if( *ptr == ' ' || *ptr == '\t' )
-                    continue;
-                 else
-                    ifou = -1;
-              }
-              while( ifou >= 0 && *ptr!='<' && *(ptr-1)!= '\\' );
-              if( ifou >=0 && *ptr=='<' )
-              {
-                 ptr += rmlen++;
-                 while( *ptr != '\0' && *ptr != '>'  && *(ptr-1) != '\\' )
-                 {
-                    if( *ptr != ' ' && *ptr != '\t' && *ptr != '\"' && *ptr != ')' && *ptr != '}' && *ptr != '.' && *ptr != '-' )
-                    {
-                       ifou = -1;
-                       break;
-                    }
-                    rmlen++;
-                    ptr++;
-                 }
-                 if( ifou >=0 && *ptr=='>' )
-                 {
-                    ptr -= rmlen;
-                    ptr++;
-                    if( exptype == '0' && *(ptr-1) == '#' && *(ptr-2) != '\\' )
-                    {
-                       exptype = '1';
-                       ptr--;
-                       rmlen++;
-                    }
-                    expreal[2] = exptype;
-                    hb_pp_Stuff( expreal, ptr, 4, rmlen, rlen );
-                    rlen += 4 - rmlen;
-                 }
-                 else
-                    ptr = ptrtmp;
-              }
-              else
-                 ptr = ptrtmp;
-            }
+        while( *(mpatt+i) == ' ' || *(mpatt+i) == '\t' )
+        {
+           i++;
         }
-      i++;
-    }
+
+        if( *(mpatt+i) == '*' )        /* Wild match marker */
+        {
+           exptype = '3';
+           i++;
+        }
+        else if( *(mpatt+i) == '(' )   /* Extended expression match marker */
+        {
+           exptype = '4';
+           i++;
+        }
+        else if( *(mpatt+i) == '!' )   /* Minimal expression match marker */
+        {
+           exptype = '5';
+           i++;
+        }
+
+        ptr = mpatt + i;
+
+        while( *ptr != '>' )
+        {
+           if( *ptr == '\0' || *ptr == '<' || *ptr == '[' || *ptr == ']' )
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+              return;
+           }
+
+           ptr++;
+        }
+
+        while( *(mpatt+i) != '>' )
+        {
+           if( *(mpatt+i) == ',' )      /* List match marker */
+           {
+              exptype = '1';
+
+              while( *(mpatt+i) != '>' )
+              {
+                 i++;
+              }
+
+              break;
+           }
+           else if( *(mpatt+i) == ':' ) /* Restricted match marker */
+           {
+              exptype = '2';
+              *(mpatt+i--) = ' ';
+
+              break;
+           }
+
+           if( *(mpatt+i) != ' ' && *(mpatt+i) != '\t' )
+           {
+             *(exppatt+explen++) = *(mpatt+i);
+           }
+
+           i++;
+        }
+
+        if( exptype == '3' )
+        {
+           if( *(exppatt+explen-1) == '*' )
+           {
+              explen--;
+           }
+           else
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+           }
+        }
+        else if( exptype == '4' )
+        {
+           if( *(exppatt+explen-1) == ')' )
+           {
+              explen--;
+           }
+           else
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+           }
+        }
+        else if( exptype == '5' )
+        {
+           if( *(exppatt+explen-1) == '!' )
+           {
+              explen--;
+           }
+           else
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+           }
+        }
+
+        rmlen = i - ipos + 1;
+
+        /* Convert match marker into inner format */
+        lastchar = (lastchar!='Z') ? ( (char) ( (unsigned int)lastchar + 1 ) ): 'a';
+
+        expreal[1] = lastchar;
+        expreal[2] = exptype;
+
+        hb_pp_Stuff( expreal, mpatt+ipos, 4, rmlen, mlen );
+
+        mlen += 4 - rmlen;
+        i += 4 - rmlen;
+
+        /* Look for appropriate result markers */
+        ptr = rpatt;
+
+        while( (ifou = hb_strAt( exppatt, explen, ptr, rlen-(ptr-rpatt) )) > 0 )
+        {
+           /* Convert result marker into inner format */
+           ifou --;
+           ptr += ifou;
+           ptrtmp = ptr + 1;
+           rmlen = explen;
+           exptype = '0';
+
+           do
+           {
+              ptr--;
+              rmlen++;
+              ifou--;
+
+              if( *ptr == '<' )
+              {
+                 continue;
+              }
+              else if( *ptr == '\"' )
+              {
+                 exptype = '2';
+              }
+              else if( *ptr == '(' )
+              {
+                 exptype = '3';
+              }
+              else if( *ptr == '{' )
+              {
+                 exptype = '4';
+              }
+              else if( *ptr == '.' )
+              {
+                 exptype = '5';
+              }
+              else if( *ptr == '-' )
+              {
+                 exptype = '6';
+              }
+              else if( *ptr == ' ' || *ptr == '\t' )
+              {
+                 continue;
+              }
+              else
+              {
+                 ifou = -1;
+              }
+           }
+
+           while( ifou >= 0 && *ptr!='<' && *(ptr-1)!= '\\' );
+
+           if( ifou >=0 && *ptr=='<' )
+           {
+              ptr += rmlen++;
+
+              while( *ptr != '\0' && *ptr != '>'  && *(ptr-1) != '\\' )
+              {
+                 if( *ptr != ' ' && *ptr != '\t' && *ptr != '\"' && *ptr != ')' && *ptr != '}' && *ptr != '.' && *ptr != '-' )
+                 {
+                    ifou = -1;
+                    break;
+                 }
+
+                 rmlen++;
+                 ptr++;
+              }
+
+              if( ifou >=0 && *ptr=='>' )
+              {
+                 ptr -= rmlen;
+                 ptr++;
+
+                 if( exptype == '0' && *(ptr-1) == '#' && *(ptr-2) != '\\' )
+                 {
+                    exptype = '1';
+                    ptr--;
+                    rmlen++;
+                 }
+
+                 expreal[2] = exptype;
+                 hb_pp_Stuff( expreal, ptr, 4, rmlen, rlen );
+                 rlen += 4 - rmlen;
+              }
+              else
+              {
+                 ptr = ptrtmp;
+              }
+           }
+           else
+           {
+              ptr = ptrtmp;
+           }
+        }
+     }
+
+     i++;
+  }
 }
 
 static COMMANDS * AddCommand( char * cmdname )
