@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.17 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: macro.c,v 1.18 2003/04/11 17:13:09 ronpinkas Exp $
  */
 
 /*
@@ -313,7 +313,7 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
    {
       if( bCopy )
       {
-         szResult = hb_xgrab( *pulStringLen + 1 );
+         szResult = ( char *) hb_xgrab( *pulStringLen + 1 );
          strncpy( szResult, szString, *pulStringLen );
          szResult[*pulStringLen] = '\0';
          return szResult;
@@ -614,7 +614,7 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
 
       if( bCopy )
       {
-         szString = hb_xgrab( ulLen + 1 );
+         szString = ( char *) hb_xgrab( ulLen + 1 );
          strncpy( szString, pItem->item.asString.value, ulLen );
          szString[ulLen] = '\0';
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.7 2003/04/13 20:40:45 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.8 2003/04/13 21:39:24 jonnymind Exp $
  */
 
 /*
@@ -245,7 +245,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
    {
       case 'C':
          ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
-         if ( ulMaxlen > 0 && ulData > ulMaxlen )
+         if ( ulMaxlen > 0 && ulData > (ULONG) ulMaxlen )
          {
             hb_ret();
          }
@@ -332,7 +332,7 @@ ULONG hb_serialNextRaw( char *cBuf )
          ulNext = 9;
          ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
          // remove class name
-         ulNext += hb_serialNextRaw( ( BYTE *) ( cBuf + 9 )  );
+         ulNext += hb_serialNextRaw( ( char *) ( cBuf + 9 )  );
          ulData = ulNext;
 
          while ( ulCount > 0 )

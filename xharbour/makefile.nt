@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.22 2003/04/09 13:52:06 paultucker Exp $
+# $Id: makefile.nt,v 1.23 2003/04/09 19:47:12 paultucker Exp $
 #
 
 #
@@ -112,7 +112,6 @@ MACRO_DIR    =source\macro
 PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
-RPC_DIR      =source\rtl\uses_mt
 VM_DIR       =source\vm
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
@@ -149,6 +148,10 @@ L_DFLAGS     =$(L_DFLAGSNMT)
 HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
 !endif
 
+!ifdef HB_MT
+HARBOURFLAGS = $(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+!endif
+
 #
 # Macros to access our library names
 #
@@ -170,9 +173,6 @@ RDD_LIB      =$(LIB_DIR)\rdd.lib
 RDDMT_LIB    =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB      =$(LIB_DIR)\rtl.lib
 RTLMT_LIB    =$(LIB_DIR)\rtl$(MT).lib
-!ifdef HB_MT
-RPC_LIB      =$(LIB_DIR)\rpcmt.lib
-!ENDIF
 SAMPLES_LIB  =$(LIB_DIR)\samples.lib
 VM_LIB       =$(LIB_DIR)\vm.lib
 VMMT_LIB     =$(LIB_DIR)\vm$(MT).lib
@@ -253,8 +253,7 @@ LIBLISTMT = \
    $(DBFCDXMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(VMMT_LIB) \
-   $(ODBCMT_LIB) \
-   $(RPC_LIB)
+   $(ODBCMT_LIB)
 
 #
 # macro.lib needs to be listed twice
@@ -471,6 +470,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\tpopup.obj \
    $(OBJ_DIR)$(MT)\traceprg.obj \
    $(OBJ_DIR)$(MT)\treport.obj \
+   $(OBJ_DIR)$(MT)\trpc.obj \
+   $(OBJ_DIR)$(MT)\trpccli.obj \
    $(OBJ_DIR)$(MT)\ttable.obj \
    $(OBJ_DIR)$(MT)\ttextlin.obj \
    $(OBJ_DIR)$(MT)\ttopbar.obj \
@@ -478,25 +479,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj
 
-#
-# RPC.LIB rules
-#
-# only in MT mode
-
-!ifdef HB_MT
-
-{$(RPC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RPC_LIB)2
-
-{$(RPC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-
-RPC_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\trpc.obj \
-   $(OBJ_DIR)$(MT)\trpccli.obj
-
-!endif
 
 #
 # LANG.LIB rules
@@ -837,7 +819,6 @@ TARGETS= \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE)
 
-
 !if ( "$(MK_FLAGS:Y=)"=="A" )
 
 all: \
@@ -879,12 +860,6 @@ $(HBPP_EXE) : \
 $(HBRUN_EXE) : \
    $(HBRUN_DIR)\hbrun.prg \
    $(HBRUN_DIR)\external.prg
-   echo $(LFLAGS)
-   echo $(L_DFLAGS)
-   echo $(L_DFLAGSNMT)
-   echo $(CFLAGS)
-   echo $(C_FLAGS)
-   echo $(C_FLAGSNMT)
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c \
                                       $(OBJ_DIR)\external.c \
@@ -968,7 +943,6 @@ $(HBDOC_EXE) : \
                                       $(OBJ_DIR)\ft_funcs.c \
                       -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(PDFHBDOC) $(GENPDF1)
 
-
 #
 # HBMAKE.EXE rules
 #
@@ -1031,9 +1005,6 @@ $(HARBOUR_EXE) : \
 
 !ifdef HB_MT
 $(RTLMT_LIB) : $(RTL_LIB_OBJS)
-   lib /out:$@ $**
-
-$(RPC_LIB) : $(RPC_LIB_OBJS)
    lib /out:$@ $**
 
 $(PPMT_LIB) : $(PP_LIB_OBJS)
