@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.1 2003/12/29 23:38:57 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.1 2003/12/31 06:59:59 jonnymind Exp $
  */
 
 /*
@@ -135,6 +135,36 @@ typedef USHORT HB_GT_CELLTYPE;
 
 #define HB_GTXVT_SNG_HOR   0xE01A /* Single Horizontal bar */
 #define HB_GTXVT_SNG_VRT   0xE01B /* Single Vertical bar*/
+
+
+
+#define HB_GTXVT_SNG_L_DBL_T 0xE020 /* Single left double top angle*/
+#define HB_GTXVT_SNG_T_DBL_D 0xE021 /* Single top with double junction down */
+#define HB_GTXVT_SNG_R_DBL_T 0xE022 /* Single right double top angle */
+
+#define HB_GTXVT_SNG_L_DBL_B 0xE023 /* Single left double bottom angle*/
+#define HB_GTXVT_SNG_B_DBL_U 0xE024 /* Single bottom double with junction up */
+#define HB_GTXVT_SNG_R_DBL_B 0xE025 /* Single right double bottom angle */
+
+#define HB_GTXVT_SNG_V_DBL_L 0xE026 /* Single Vertical double left junction */
+#define HB_GTXVT_SNG_V_DBL_R 0xE027 /* Single vertical double right junction */
+#define HB_GTXVT_SNG_DBL_CRS 0xE028 /* Single cross (double horiz)*/
+
+
+#define HB_GTXVT_DBL_L_SNG_T 0xE030 /* Double left single top angle*/
+#define HB_GTXVT_DBL_T_SNG_D 0xE031 /* Double top signle junction down */
+#define HB_GTXVT_DBL_R_SNG_T 0xE032 /* Double right single top angle */
+
+#define HB_GTXVT_DBL_L_SNG_B 0xE033 /* Double left single bottom angle*/
+#define HB_GTXVT_DBL_B_SNG_U 0xE034 /* Double bottom single junction up */
+#define HB_GTXVT_DBL_R_SNG_B 0xE035 /* Double right single bottom angle */
+
+#define HB_GTXVT_DBL_V_SNG_L 0xE036 /* Double Vertical single left junction */
+#define HB_GTXVT_DBL_V_SNG_R 0xE037 /* Double vertical single right junction */
+#define HB_GTXVT_DBL_SNG_CRS 0xE038 /* Double cross (single horiz) */
+
+
+
 
 #define HB_GTXVG_FULL      0xE090 /* Full character filler */
 #define HB_GTXVG_FULL_T    0xE091

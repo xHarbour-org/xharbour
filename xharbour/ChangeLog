@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1973 2003/12/31 10:51:01 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1974 2003/12/31 13:37:46 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-01 12:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! Fixed visualization of box characters (they were missing some
+      corners before.
+    + Complete visualization of ALL box characters, including
+      partially double and single chars.
+      
 2003-12-31 14:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/debug/debugger.prg
     * another fix to callstack management

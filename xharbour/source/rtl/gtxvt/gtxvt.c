@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.3 2003/12/31 06:59:59 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.4 2003/12/31 10:51:03 jonnymind Exp $
  */
 
 /*
@@ -301,16 +301,16 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
    { 178, HB_GTXVG_FILLER3},
    { 179, HB_GTXVT_SNG_VRT},
    { 180, HB_GTXVT_SNG_VR},
-   { 181, HB_GTXVT_DBL_VR},
-   { 182, HB_GTXVT_DBL_VR},
-   { 183, HB_GTXVT_DBL_RT},
-   { 184, HB_GTXVT_DBL_RT},
+   { 181, HB_GTXVT_SNG_V_DBL_R},
+   { 182, HB_GTXVT_DBL_V_SNG_R},
+   { 183, HB_GTXVT_SNG_R_DBL_T},
+   { 184, HB_GTXVT_DBL_R_SNG_T},
    { 185, HB_GTXVT_DBL_VR},
    { 186, HB_GTXVT_DBL_VRT},
    { 187, HB_GTXVT_DBL_RT},
    { 188, HB_GTXVT_DBL_RB},
-   { 189, HB_GTXVT_DBL_RB},
-   { 190, HB_GTXVT_DBL_RB},
+   { 189, HB_GTXVT_SNG_R_DBL_B},
+   { 190, HB_GTXVT_DBL_R_SNG_B},
    { 191, HB_GTXVT_SNG_RT},
    { 192, HB_GTXVT_SNG_LB},
    { 193, HB_GTXVT_SNG_BU},
@@ -318,8 +318,8 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
    { 195, HB_GTXVT_SNG_VL},
    { 196, HB_GTXVT_SNG_HOR},
    { 197, HB_GTXVT_SNG_CRS},
-   { 198, HB_GTXVT_DBL_VL},
-   { 199, HB_GTXVT_DBL_VL},
+   { 198, HB_GTXVT_SNG_V_DBL_L},
+   { 199, HB_GTXVT_DBL_V_SNG_L},
    { 200, HB_GTXVT_DBL_LB},
    { 201, HB_GTXVT_DBL_LT},
    { 202, HB_GTXVT_DBL_BU},
@@ -327,16 +327,16 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
    { 204, HB_GTXVT_DBL_VL},
    { 205, HB_GTXVT_DBL_HOR},
    { 206, HB_GTXVT_DBL_CRS},
-   { 207, HB_GTXVT_DBL_BU},
-   { 208, HB_GTXVT_DBL_BU},
-   { 209, HB_GTXVT_DBL_TD},
-   { 210, HB_GTXVT_DBL_TD},
-   { 211, HB_GTXVT_DBL_LB},
-   { 212, HB_GTXVT_DBL_LB},
-   { 213, HB_GTXVT_DBL_LT},
-   { 214, HB_GTXVT_DBL_LT},
-   { 215, HB_GTXVT_DBL_CRS},
-   { 216, HB_GTXVT_DBL_CRS},
+   { 207, HB_GTXVT_DBL_B_SNG_U},
+   { 208, HB_GTXVT_SNG_B_DBL_U},
+   { 209, HB_GTXVT_DBL_T_SNG_D},
+   { 210, HB_GTXVT_SNG_T_DBL_D},
+   { 211, HB_GTXVT_DBL_L_SNG_B},
+   { 212, HB_GTXVT_SNG_L_DBL_B},
+   { 213, HB_GTXVT_SNG_L_DBL_T},
+   { 214, HB_GTXVT_DBL_L_SNG_T},
+   { 215, HB_GTXVT_DBL_SNG_CRS},
+   { 216, HB_GTXVT_SNG_DBL_CRS},
    { 217, HB_GTXVT_SNG_RB},
    { 218, HB_GTXVT_SNG_LT},
    { 219, HB_GTXVG_FULL},
@@ -2206,6 +2206,350 @@ static void    hb_xvt_gtDrawBoxChar( PXWND_DEF wnd, int col, int row, int boxcha
          nsegs = 2;
       break;
 
+      case HB_GTXVT_SNG_L_DBL_T:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2;
+         segs[2].y1 = basey + celly/2-1;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_T_DBL_D:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = basex + cellx/2-1;
+         segs[1].y1 = basey+ celly/2;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = segs[1].y1;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = segs[1].y2;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_R_DBL_T:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx/2+1;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = basey + celly;
+
+         segs[2].x1 = basex + cellx/2-1;
+         segs[2].y1 = basey + celly/2;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_L_DBL_B:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2+1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_B_DBL_U:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = basex + cellx/2-1;
+         segs[1].y1 = basey;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly/2;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_R_DBL_B:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx/2+1;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = basey;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly/2;
+
+         segs[2].x1 = basex + cellx/2-1;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_V_DBL_L:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2-1;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = segs[0].x1;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[1].x2;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_V_DBL_R:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex;
+         segs[1].y1 = basey + celly/2-1;
+         segs[1].x2 = segs[0].x1;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[0].x1;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_SNG_DBL_CRS:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex;
+         segs[1].y1 = basey + celly/2-1;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[1].x2;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+
+      case HB_GTXVT_DBL_L_SNG_T:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex + cellx/2 + 1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = segs[0].x1;
+         segs[2].y1 = segs[0].y1;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[0].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_T_SNG_D:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_R_SNG_T:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx/2+1;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey + celly/2-1;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_L_SNG_B:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex + cellx/2-1;
+         segs[2].y1 = segs[0].y2;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[0].y2;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_B_SNG_U:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2-1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_R_SNG_B:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx/2+1;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x2;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2+1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_V_SNG_L:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = segs[1].x1;
+         segs[2].y1 = basey + celly/2;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_V_SNG_R:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = segs[1].x1;
+         segs[2].y1 = basey + celly/2;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_DBL_SNG_CRS:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex;
+         segs[2].y1 = basey + celly/2;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+
    }
 
 
@@ -2771,7 +3115,7 @@ static PXWND_DEF hb_xvt_gtCreateWindow( Display *dpy )
 
    wnd->gc = XCreateGC( dpy, wnd->window, 0, NULL );
    // Line width 2
-   XSetLineAttributes( dpy, wnd->gc, 1, LineSolid, CapButt, JoinBevel );
+   XSetLineAttributes( dpy, wnd->gc, 1, LineSolid, CapRound, JoinBevel );
    wnd->colors = DefaultColormap( dpy, DefaultScreen( dpy ));
 
    wnd->background = 0x07;
