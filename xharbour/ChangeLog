@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.897 2003/03/29 22:48:30 lculik Exp $
+ * $Id: ChangeLog,v 1.898 2003/03/30 19:35:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-30 18:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg    
+    utils/hbmake/hbmutils.prg
+    * Minor fix under linux
+     
 2003-03-30 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
     * Minor fix to __OBJSENDMSG() (By Jose F. Gimenez)
