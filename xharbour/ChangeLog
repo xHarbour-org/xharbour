@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.382 2002/09/17 06:27:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.383 2002/09/17 18:07:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-17 15:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+    - Commented hb_gcLock/Unlock logic before after calls to hb_vmExecute().
+  * source/vm/hvm.c
+    - Commented hb_gcLock/Unlock logic before after calls to hb_vmExecute().
+    + Added hb_gcLock/Unlock at HB_P_POPGLOBAL.
+    + New functions hb_vmGlobalLock() and hb_vmGlobalUnlock().
+
+  * include/hbapi.h
+    + extern void hb_vmGlobalLock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcLock(...) when needed. */
+    + extern void hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
+
+  * source/vm/garbage.c
+    - Commented hb_vm_pGlobals processing in sweep.
+
+  /*
+     NOTE: C code which directly modify GLOBAL var, should first call hb_vmGlobalUnlock()
+           and after assignment call hb_vmGlobalLock().
+   */
 
 2002-09-17 11:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c

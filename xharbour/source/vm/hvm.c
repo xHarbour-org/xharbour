@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.98 2002/09/17 05:51:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.99 2002/09/17 18:07:53 ronpinkas Exp $
  */
 
 /*
@@ -561,7 +561,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
    LONG lOffset;
    ULONG ulLastOpcode = 0; /* opcodes profiler support */
    ULONG ulPastClock = 0;  /* opcodes profiler support */
-   short iGlobal;
+   //short iGlobal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p)", pCode, pSymbols));
 
@@ -570,9 +570,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
     * macro evaluation belong to a function/procedure where macro
     * compiler was called.
     */
+
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
 
+ /*
    // Unlock module globals so values can be released.
    for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
    {
@@ -585,6 +587,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
       }
    }
+ */
 
    while( pCode[ w ] != HB_P_ENDPROC )
    {
@@ -1070,6 +1073,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
              * NOTE!!! Return!!!
              */
 
+          /*
             // Lock Module Globals, so that GC will not release.
             for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
             {
@@ -1082,6 +1086,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                   hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
                }
             }
+          */
+
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -1484,7 +1490,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
          case HB_P_PUSHGLOBAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBAL") );
-            hb_vmPush( (*hb_vm_pGlobals)[ ( signed char ) pCode[ w + 1 ] ] );
+            hb_vmPush( (*hb_vm_pGlobals)[ pCode[ w + 1 ] ] );
             w += 2;
             break;
 
@@ -1916,11 +1922,38 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          }
 
          case HB_P_POPGLOBAL:
+         {
+            BYTE iGlobal = pCode[ w + 1 ];
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
+
             hb_stackDec();
-            hb_itemForwardValue( (*hb_vm_pGlobals)[ ( signed char ) pCode[ w + 1 ] ], *( hb_stack.pPos ) );
+
+            // So that released var can be claimed by GC.
+            if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+            {
+               hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+            }
+            else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+            {
+               hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+            }
+
+            hb_itemForwardValue( (*hb_vm_pGlobals)[ iGlobal ], *( hb_stack.pPos ) );
+
+            // So that GLOBAL value can NEVER be claimed by GC
+            if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+            {
+               hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+            }
+            else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+            {
+               hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+            }
+
             w += 2;
             break;
+         }
 
          case HB_P_POPLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCAL") );
@@ -2397,6 +2430,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
+ /*
    // Lock Module Globals, so that GC will not release.
    for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
    {
@@ -2409,6 +2443,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
       }
    }
+ */
 }
 
 /* ------------------------------- */
@@ -4092,7 +4127,7 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
-         short iGlobal;
+         //short iGlobal;
 
          if( bProfiler && pSym->pDynSym )
          {
@@ -4104,6 +4139,7 @@ void hb_vmDo( USHORT uiParams )
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
          }
 
+       /*
          // Lock Module Globals, so that GC from callee will not release higher level Globals.
          for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
          {
@@ -4116,11 +4152,13 @@ void hb_vmDo( USHORT uiParams )
                hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
             }
          }
+       */
 
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
          pFunc();
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
+       /*
          // Un-Lock Module Globals, so that GC can release current level Globals.
          for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
          {
@@ -4133,6 +4171,7 @@ void hb_vmDo( USHORT uiParams )
                hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
             }
          }
+       */
 
          if( bProfiler && pSym->pDynSym )
          {
@@ -4292,7 +4331,7 @@ void hb_vmSend( USHORT uiParams )
 
    if( pFunc )
    {
-      short iGlobal;
+      //short iGlobal;
 
       if( bProfiler )
       {
@@ -4304,6 +4343,7 @@ void hb_vmSend( USHORT uiParams )
          HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
       }
 
+    /*
       // Lock Module Globals, so that GC from callee will not release higher level Globals.
       for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
       {
@@ -4316,9 +4356,11 @@ void hb_vmSend( USHORT uiParams )
             hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
          }
       }
+    */
 
       pFunc();
 
+    /*
       // Un-Lock Module Globals, so that GC can release current level Globals.
       for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
       {
@@ -4331,6 +4373,7 @@ void hb_vmSend( USHORT uiParams )
             hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
          }
       }
+    */
 
       if ( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
       {
@@ -5126,6 +5169,30 @@ static void hb_vmPushLocal( SHORT iLocal )
    }
 
    hb_stackPush();
+}
+
+void hb_vmGlobalLock( PHB_ITEM pGlobal )
+{
+   if( pGlobal->type == HB_IT_ARRAY )
+   {
+      hb_gcLock( pGlobal->item.asArray.value );
+   }
+   else if( pGlobal->type == HB_IT_BLOCK )
+   {
+      hb_gcLock( pGlobal->item.asBlock.value );
+   }
+}
+
+void hb_vmGlobalUnlock( PHB_ITEM pGlobal )
+{
+   if( pGlobal->type == HB_IT_ARRAY )
+   {
+      hb_gcUnlock( pGlobal->item.asArray.value );
+   }
+   else if( pGlobal->type == HB_IT_BLOCK )
+   {
+      hb_gcUnlock( pGlobal->item.asBlock.value );
+   }
 }
 
 static void hb_vmPushGlobalByRef( SHORT iGlobal )

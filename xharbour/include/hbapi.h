@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.28 2002/08/09 16:50:54 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.29 2002/09/17 05:51:42 ronpinkas Exp $
  */
 
 /*
@@ -594,6 +594,8 @@ extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditiona
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
+extern void   hb_vmGlobalLock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcLock(...) when needed. */
+extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
 extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
 extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
 extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
