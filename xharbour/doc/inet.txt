@@ -16,7 +16,7 @@ This is just a draft, a survival guide with minimal API instructions
 extracted from the inet.c program comments and from some posting to
 the xharbour newsgroup.
 
-More adequated version will be available soon.
+More adequate version will be available soon.
 
 
 
@@ -28,16 +28,15 @@ XHARBOUR INET API
 Startup / cleanup functions
 ---------------------------
 
-INETINIT() -->NIL
-
+InetInit() -->NIL
   Activates inet support; mainly used for winsock start up at the moment, but
   could be used in the future for many other purpose. Put it at the beginning
   of every program using INET functions.
 
 
-INETCLEANUP() -->NIL
+InetCleanup() -->NIL
   Closes Inet support; mainly used for win32. Put it at the end of any program
-  using Inet functions
+  using Inet functions, just before program exits.
 
 
 InetClose( SOCKET ) --> NUMERIC
@@ -56,6 +55,7 @@ InetClose( SOCKET ) --> NUMERIC
 InetDestroy( SOCKET ) --> Numeric
   Closes AND destroys a socket. After this call, the socket can't be used
   anymore. Returns 0 on success -1 on failure.
+
 
 
 
@@ -96,10 +96,26 @@ InetPort( SOCKET ) --> STRING
 Server Side socket functions
 ----------------------------
 
-InetServer( port ) --> SOCKET
+InetServer( port [, cBindAddr [, nListenLimit]]  ) --> SOCKET
   Creates a server that can accept connections from client on a certain port.
-  TODO: bind on a particular interface / ip address.
-  On error, sets error in the newly returned socket.
+  If the computer on which InetServe is called has more than one logical
+  interface (e.g. one network card, one loopback and one PPP address),
+  cBindAddr can be specified to select only one of this interface to accept 
+  connections for this process. This is useful when a server is present on 
+  two networks, and the service is to be available only in one of them. Also,
+  the same port on other addresses is left free to be used, so you can have
+  different server programs running for different networks but managing
+  the same service. In example, an FTP server available to the internal
+  network could be radically different from an FTP server available for
+  the internet.
+  nListenLimit is an internal parameter and rarely needs to be specified.
+  This is the number of incoming connections accepted by kernel before the
+  kernel has the chance to report them to the application program. If
+  the sockets receives nListenLimit connection before accepting them
+  all, the nListenLimit + 1 connecion will be notified to be "busy" by
+  the kernel. Usually,  a value of 10 (the default) is enough for even
+  heavy duty server.
+  On error, sets error description in the newly returned socket.
 
 InetAccept( SOCKET ) --> SOCKET
   Waits until a connection is available on a socket created with InetServer;
@@ -112,14 +128,31 @@ InetAccept( SOCKET ) --> SOCKET
 Client side socket functions
 ----------------------------
 
-InetConnect( ADDRESS, PORT ) --> SOCKET
-  Connects to a remote server described by ADDRESS (string), that can be in
+InetConnect( cAddress, PORT ) --> SOCKET
+  Connects to a remote server described by cAddress, that can be in
   quad dot notation (e.g. "192.168.1.1") or in DNS name (e.g.
   "www.xharbour.org"), using the desired port.
+  This version of InetConnect uses "gethostbyname" C system call to
+  find the network address of the specified server; this means that
+  this call is an hybrid function doing both a DNS scan and a TCP/IP
+  connection. InetConnect is not thread safe, and the xHarbour
+  program must take care that not two InetConnect functions are
+  called at the same moment from two different threads (or that
+  InetGetHosts is not called in the same moment as InetConnect).
+  On error, the error of the returned socket is set. The error could
+  be due to unavailable name resolving service, host name not valid,
+  host address not reachable and host reachable but port not open.
+
+
+InetConnectIP( cAddress, PORT ) --> SOCKET
+  Connects to a remote server described by cAddress, that can be specified
+  only in quad dot IPV4 notation (e.g. "127.0.0.1"), using the desired port.
+  This version of InetConnect does not use gethostbyname, and thus is thread
+  safe and can be used in combination with InetGetHosts to have a finer
+  timeout control while connecting to a server, and a finer error control.
   On error, the error of the returned socket is set.
 
-
-
+  
 
 Sening and receiving data
 ----------------------------
@@ -205,9 +238,85 @@ InetSendAll( SOCKET, STRING [, nLength ] ) --> NUNERIC
 Utitlity Functions
 ------------------
 
+InetGetHosts( cName ) --> aHosts
+  Returns an array containing all the IP addresses associated with a given
+  host name. The IP addressess returned by this funtions are strings in
+  quad dot notations, eg "192.168.1.1", and can be directly used into
+  InetConnectIP(). cName can be any string: valid DNS names (eg.
+  "www.myserver.com"), locally available names (e.g. "localhost" or
+  windows Network Neighborhood names), or even IP addresses in quad
+  dot notation.
+  NOTE: This function is not thread safe (by desing), and programmers
+  must be sure not to use it at the same time in two different threads,
+  or not to use it together with a InetConnect(). If this kind of situation 
+  should ever arise, you are advised to use a thread MUTEX.
+  On error, and if the server can't be found, the function returns NIL.
+
+
+InetGetAlias( cName ) --> aHosts
+  Returns an array containing the aliases ( CNAME DNS records ) by
+  which the server is currently known. Wether this function is able
+  to have the complete list of alias or not depends on the verbosity
+  of the DNS server.
+
+
 InetCRLF() --> String
   Returns a CRLF sequence used in many internet protocols.
 
   
-  
+
+
+UDP (User Datagram Protocol) Compliant Routines
+-----------------------------------------------
+
+InetDGram( [bBroadcast] ) --> SOCKET
+  Creates a datagram oriented socket that will be able to send data and
+  eventually receive data. Since the socket is not bound, the program can't
+  retrieve the address at wich this socket appares to be, but a second
+  socket receiving a message sent from this one would be able to reply
+  correctly with a datagram that can be read from a non-bound socket.
+  If bBroadcast is set to .T., the routine creates a broadcast capable socket:
+  it will be able to receive and send broacast messages. On most systems this
+  requires special user privileges.
+  Returns the socket, and if an error occours, the socket error message
+  and code are set.
+
+
+InetDGramBind( nPort, [cAddress [, bBroadcast] ] ) --> SOCKET
+  Creates a datagram oriented socket and binds it to a particular port, and
+  eventually to a certain interface if cAddress is given and not NIL.
+  If bBroadcast is set to .T., the routine creates a broadcast capable socket:
+  it will be able to receive and send broacast messages. On most systems this
+  requires special user privileges.
+  Returns the socket, and if an error occours, the socket error message
+  and code are set.
+
+
+InetDGramSend( SOCKET, cAddress, nPort, cBuffer [, nSize ] ) --> NUMERIC
+  Sends a datagram (a fixed lengt data) to a determined ip address (cAddress,
+  to be specified in quad-dot notation) and port. If nSize is not specified,
+  all the data in cBuffer will be sent; if nSize is specified, only
+  the first nSize bytes of cBuffer will be sent.
+  There isn't any guarantee that all the data required to be written is
+  really sent to the socket: the calling program should check for the
+  numeric return and send iteratively the unsent data, up to complete
+  the message.
+  Anyway, the raw datagram is sent and received as once, and any data
+  that less than the system datagram size will be sent and received
+  as a single item.
+  If the socket is created in broadcast mode, the cAddress element
+  can be a broadcast address.
+  Returns -1 on error, or the number of bytes actually sent on success.
+
+InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
+  Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
+  given, or to cBuffer length if not given.
+  There isn't any guarantee that all the data required to be written is
+  really sent to the socket: the calling program should check for the
+  numeric return and send iteratively the unsent data, up to complete
+  the message.
+  Anyway, the raw datagram is sent and received as once, and any data
+  that less than the system datagram size will be sent and received
+  as a single item.
+  Returns -1 on error, or the number of bytes actually read on success.
 

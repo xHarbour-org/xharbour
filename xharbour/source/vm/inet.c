@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.2 2003/01/08 09:04:03 jonnymind Exp $
+* $Id: inet.c,v 1.3 2003/01/08 09:23:24 jonnymind Exp $
 */
 
 /*
@@ -128,11 +128,17 @@ HB_FUNC( INETSERVER )
 
    Socket->remote.sin_family = AF_INET;
    Socket->remote.sin_port = iPort;
-   Socket->remote.sin_addr.s_addr = INADDR_ANY;
 
-   if ( ISNUM( 2 ) )
+   if ( ! ISCHAR( 2 ) ) {
+      Socket->remote.sin_addr.s_addr = INADDR_ANY;
+   }
+   else {
+      Socket->remote.sin_addr.s_addr = inet_addr( hb_parc( 2 ) );
+   }
+
+   if ( ISNUM( 3 ) )
    {
-      iListen = hb_parni( 2 );
+      iListen = hb_parni( 3 );
    }
    else
    {
@@ -534,14 +540,13 @@ HB_FUNC( INETDATAREADY )
    int iLen;
    HB_SOCKET_STRUCT *Socket;
 
-   #if defined( HB_OS_WIN_32 )
+   //#if defined( HB_OS_WIN_32 )
       fd_set rfds;
       struct timeval tv = {0,0};
-      int nRetval;
-   #else
-      char cChar;
-      char *Buffer;
-   #endif
+   //#else
+   //   char cChar;
+   //   char *Buffer;
+   //#endif
 
    if( pSocket == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
    {
@@ -557,34 +562,26 @@ HB_FUNC( INETDATAREADY )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   #if defined( HB_OS_WIN_32 )
+   //#if defined( HB_OS_WIN_32 )
       /* Watch our socket. */
       FD_ZERO(&rfds);
       FD_SET(Socket->com, &rfds);
-      nRetval = select(1, &rfds, NULL, NULL, &tv);
+      iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
       /* Don't rely on the value of tv now! */
 
-      if ( nRetval )
-      {
-         iLen = 1;
-      }
-      else
-      {
-         iLen = 0;
-      }
-   #else
-      if( hb_pcount() == 2 )
-      {
-         iLen = hb_parni(2);
-         Buffer = (char *) hb_xgrab( iLen );
-         iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
-         hb_xfree( (void *) Buffer );
-      }
-      else
-      {
-         iLen = recv( Socket->com, &cChar, 1, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
-      }
-   #endif
+   //#else
+   //   if( hb_pcount() == 2 )
+   //   {
+   //      iLen = hb_parni(2);
+   //      Buffer = (char *) hb_xgrab( iLen );
+   //      iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
+   //      hb_xfree( (void *) Buffer );
+   //   }
+   //   else
+   //   {
+   //      iLen = recv( Socket->com, &cChar, 1, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
+   //   }
+   //#endif
 
    if( iLen < 0 )
    {
@@ -1111,6 +1108,209 @@ HB_FUNC( INETCONNECTIP )
 HB_FUNC( INETCRLF )
 {
    hb_retc( "\r\n" );
+}
+
+
+/***********************************************************
+* Datagram functions
+************************************************************/
+
+HB_FUNC( INETDGRAMBIND )
+{
+   int iPort;
+   int iOpt = 1;
+   HB_SOCKET_STRUCT *Socket;
+
+   /* Parameter error checking */
+   if( ! ISNUM( 1 ) )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   HB_SOCKET_INIT( Socket );
+
+   /* Creates comm socket */
+   #if defined(HB_OS_WIN_32)
+      Socket->com = socket( AF_INET, SOCK_DGRAM, 0 );
+   #else
+      Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
+   #endif
+
+   if( Socket->com == -1 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      Socket->com = 0;
+      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      return;
+   }
+
+   /* Reusable socket; under unix, do not wait it is unused */
+   setsockopt( Socket->com, SOL_SOCKET, SO_REUSEADDR, (const char *) &iOpt, sizeof( iOpt ));
+
+   /* Setting broadcast if needed. */
+   if ( hb_parl( 3 ) ) {
+      iOpt = 1;
+      setsockopt( Socket->com, SOL_SOCKET, SO_BROADCAST, (const char *) &iOpt, sizeof( iOpt ));
+   }
+
+   /* Binding here */
+   iPort  = htons( hb_parni( 1 ) );
+
+   Socket->remote.sin_family = AF_INET;
+   Socket->remote.sin_port = iPort;
+
+   if ( ! ISCHAR( 2 ) ) {
+      Socket->remote.sin_addr.s_addr = INADDR_ANY;
+   }
+   else {
+      Socket->remote.sin_addr.s_addr = inet_addr( hb_parc( 2 ) );
+   }
+   Socket->remote.sin_addr.s_addr = INADDR_ANY;
+
+   if( bind( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) ) )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      HB_INET_CLOSE( Socket->com );
+   }
+
+   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+}
+
+HB_FUNC( INETDGRAM )
+{
+   int iOpt = 1;
+   HB_SOCKET_STRUCT *Socket;
+
+   HB_SOCKET_INIT( Socket );
+
+   /* Creates comm socket */
+   #if defined(HB_OS_WIN_32)
+      Socket->com = socket( AF_INET, SOCK_DGRAM, 0 );
+   #else
+      Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
+   #endif
+
+   if( Socket->com == -1 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      Socket->com = 0;
+      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      return;
+   }
+
+   /* Setting broadcast if needed. */
+   if ( hb_parl( 1 ) ) {
+      iOpt = 1;
+      setsockopt( Socket->com, SOL_SOCKET, SO_BROADCAST, (const char *) &iOpt, sizeof( iOpt ));
+   }
+
+   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+}
+
+HB_FUNC( INETDGRAMSEND )
+{
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAddress = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
+
+   char *Buffer;
+   int iLen;
+   HB_SOCKET_STRUCT *Socket;
+
+   if( pSocket == NULL || pAddress == NULL || ( ! ISNUM(3) ) || pBuffer == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMSEND", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+   Buffer = pBuffer->item.asString.value;
+   Socket->remote.sin_family = AF_INET;
+   Socket->remote.sin_port = htons( hb_parni( 3 ) );
+   Socket->remote.sin_addr.s_addr = inet_addr( pAddress->item.asString.value );
+
+   if ( ISNUM( 5 ) )
+   {
+      iLen = hb_parni( 5 );
+   }
+   else
+   {
+      iLen = pBuffer->item.asString.length;
+   }
+
+   //HB_CRITICAL_INET_LOCK( Socket->Mutex );
+
+   HB_SOCKET_ZERO_ERROR( Socket );
+
+   Socket->count = sendto( Socket->com, Buffer, iLen, 0, 
+         (const struct sockaddr *) &Socket->remote, sizeof( Socket->remote ) );
+
+   if( Socket->count <= 0 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+   }
+
+   hb_retni( Socket->count );
+
+   //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
+}
+
+HB_FUNC( INETDGRAMRECV )
+{
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
+
+   char *Buffer;
+   int iLen;
+
+   #if defined(HB_OS_WIN_32)
+      int iDtLen;
+   #else
+      socklen_t iDtLen;
+   #endif
+
+   HB_SOCKET_STRUCT *Socket;
+
+   if( pSocket == NULL || pBuffer == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMRECV", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+   
+   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+   Buffer = pBuffer->item.asString.value;
+
+   if ( ISNUM( 3 ) )
+   {
+      iLen = hb_parni( 3 );
+   }
+   else
+   {
+      iLen = pBuffer->item.asString.length;
+   }
+
+   //HB_CRITICAL_INET_LOCK( Socket->Mutex );
+
+   HB_SOCKET_ZERO_ERROR( Socket );
+
+   Socket->count = recvfrom( Socket->com, Buffer, iLen, 0,
+         (struct sockaddr *) &Socket->remote, &iDtLen );
+
+   if( Socket->count <= 0 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+   }
+
+   hb_retni( Socket->count );
+
+   //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
 }
 
 #endif
