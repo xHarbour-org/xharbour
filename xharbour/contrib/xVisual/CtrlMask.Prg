@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.33 2002/10/28 23:39:04 ronpinkas Exp $
+ * $Id: CtrlMask.Prg,v 1.34 2002/10/29 15:39:23 what32 Exp $
  */
 
 /*
@@ -495,20 +495,21 @@ METHOD OnLButtonDown( wParam, x, y )
             ENDIF
 
             IF Len( ::aSelected ) == 1 .and. ( nPos := aScan( ::aSelected[ 1, SEL_HOTAREAS ],{|a| ptInRect( a[1], {x,y} ) } ) ) > 0 // <= aHot
+
                ::nClick := ::aSelected[ 1, SEL_HOTAREAS, nPos, 2 ]
-               
                IF wParam !=NIL
                   WinSetCursor( LoadCursor(, ::aSelected[ 1, SEL_HOTAREAS, nPos, 3 ] ) )
-                  ::sizing := .T.
                ENDIF
+               ::sizing := .T.
                
               ELSE
                ::nClick := HTCAPTION
 
                IF wParam !=NIL
                   WinSetCursor( LoadCursor( hThisInstance, "FIST" ) )
-                  ::moving := .T.
                ENDIF
+
+               ::moving := .T.
                
                FOR EACH a IN ::aSelected
                    a[ SEL_ANCHORX ] := x - a[ SEL_OLDRECT, 1 ] // anchor X
@@ -518,6 +519,7 @@ METHOD OnLButtonDown( wParam, x, y )
             ::aEditRect := ::MoveCtrl( ::Handle, { x, y } )
 
             EXIT
+            
          ENDIF
       NEXT
     ELSE
@@ -536,31 +538,28 @@ METHOD OnLButtonDown( wParam, x, y )
                 ShowWindow( a[ SEL_HANDLE ], SW_SHOW ) } )
       NEXT
 
+      
       ::aSelected := {}
       ::nClick    := HTCLIENT
-      
-      IF wParam !=NIL
-         WinSetCursor( LoadCursor(, IDC_SIZEALL ) )
-      ENDIF
-      
-      ::aEditRect := { x, y, x, y }
-      ::selecting := .T.
-      ::aClickPt  := { x, y }
-   ENDIF
 
- //  InvalidateRect(::Handle,,.F.)
- //  RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN)
+      WinSetCursor( LoadCursor(, IDC_SIZEALL ) )
+         
+      ::selecting := .T.
+      ::aEditRect := { x, y, x, y }
+      ::aClickPt  := { x, y }
+      
+   ENDIF
 
    // ToolTips and Inspector selection
    IF lFound
-
       ::ChangeInspector( 0 )
-      IF wParam !=NIL
-         ::HintWindow:Activate(1)
-         ::HintWindow:TrackHint(1)
-         ::lHintActive := .T.
-      ENDIF
+
+      ::HintWindow:Activate(1)
+      ::HintWindow:TrackHint(1)
+      ::lHintActive := .T.
+
    ELSE
+      // Only if MOUSE Click, NOT simulated
       ::ChangeInspector( 1 )
    ENDIF
 
@@ -580,8 +579,10 @@ METHOD OnLButtonDown( wParam, x, y )
 
    ::mousedown := .T.
    SetCapture( ::Handle )
+  
    UpdateWindow( ::Parent:handle )
-
+     
+   
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*
@@ -782,7 +783,8 @@ METHOD OnLButtonUp( wParam, x, y )
    ::mousedown := .F.
    hDC := GetDC( ::Handle )
 
-   IF ( ::moving .OR. ::sizing ) .AND. wParam !=NIL
+
+   IF ( ::moving .OR. ::sizing )
       IF len( ::aSelected ) > 1
          FOR EACH a In ::aSelected
             DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
@@ -791,6 +793,7 @@ METHOD OnLButtonUp( wParam, x, y )
         DrawFocusRect( hDC, ::aEditRect )
       ENDIF
       ::HintWindow:Activate(0)
+
    ENDIF
 
    IF ::moving
@@ -803,6 +806,7 @@ METHOD OnLButtonUp( wParam, x, y )
 
    ::MoveCtrl( , aPt )
    FOR EACH a IN ::aSelected
+
        ShowWindow( a[ SEL_HANDLE ], SW_HIDE )
 
        MoveWindow( a[ SEL_HANDLE ], a[ SEL_NEWRECT, 1 ],a[ SEL_NEWRECT , 2 ],;
@@ -814,10 +818,11 @@ METHOD OnLButtonUp( wParam, x, y )
        RectScreenToClient( ::Handle, aRect )
        a[ SEL_OLDRECT ] := aClone( aRect )
 
-       if ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
+       IF ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
           oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
           oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, .F. )
-       endif
+       ENDIF
+
    NEXT
 
    IF ::selecting
@@ -839,7 +844,7 @@ METHOD OnLButtonUp( wParam, x, y )
             aWRect := GetWindowRect( oObj:Handle )
             aRect  := aClone( aWRect )
             RectScreenToClient( ::Handle, aRect )
-            ::aSelected:={ { oObj:Handle, aclone( aRect ), 0, 0, {}, {} } } // handle,rect,anchorX,anchorY,aHot
+            ::aSelected := { { oObj:Handle, aclone( aRect ), 0, 0, {}, {} } } // handle,rect,anchorX,anchorY,aHot
          ENDIF
       ELSE
          FOR EACH hChild IN ::aSiblings
@@ -858,13 +863,13 @@ METHOD OnLButtonUp( wParam, x, y )
 
    ReleaseDc( ::Handle, hDC )
 
-  // InvalidateRect(::Handle,,.F.)
-  // RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
+   
    IF wParam !=NIL
       ::SetFocus()
    ENDIF
+   
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*
@@ -954,6 +959,7 @@ METHOD GetSiblings()
       ENDIF
       hWnd := GetWindow( hWnd, GW_HWNDNEXT )
    ENDDO
+
    RETURN( ::aSiblings )
 
 *-----------------------------------------------------------------------------*

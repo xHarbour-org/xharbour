@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.52 2002/10/29 02:12:53 what32 Exp $
+ * $Id: xInspect.prg,v 1.53 2002/10/29 15:39:24 what32 Exp $
  */
 
 /*
@@ -189,9 +189,11 @@ METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
          ::Parent:SetBrowserData( oObj, .T. )
       ENDIF
 
-      IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating )
-         FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-         FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+      IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) .AND. ( ! FormEdit:oMask:mousedown )
+         FormEdit:oMask:PostMessage( WM_LBUTTONDOWN, , MAKELONG( ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 ) )
+         FormEdit:oMask:PostMessage( WM_LBUTTONUP,   , MAKELONG( ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 ) )
+//         FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+//         FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
       ENDIF
 
    ENDIF
@@ -222,9 +224,11 @@ METHOD SetCurSel(n) CLASS ComboInsp
 
       IF FormEdit != NIL
       
-         IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) .AND. ! FormEdit:oMask:Creating
-            FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-            FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+         IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) .AND. ( ! FormEdit:oMask:mousedown )
+            FormEdit:oMask:PostMessage( WM_LBUTTONDOWN, , MAKELONG( ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 ) )
+            FormEdit:oMask:PostMessage( WM_LBUTTONUP,   , MAKELONG( ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 ) )
+//            FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+//            FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
          ENDIF
          
       ENDIF
