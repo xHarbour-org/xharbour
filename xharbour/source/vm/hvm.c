@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.311 2004/01/27 17:57:14 ronpinkas Exp $
+ * $Id: hvm.c,v 1.312 2004/01/29 14:26:00 likewolf Exp $
  */
 
 /*
@@ -8212,3 +8212,23 @@ void _hb_froceLinkMain()
    hb_froceLinkMain();
 }
 #endif
+
+HB_FUNC( __VMVARSLIST )
+{
+   HB_FUNCNAME(HB_DBG_VMVARSLIST)();
+}
+
+HB_FUNC( __VMVARSLEN )
+{
+   HB_FUNCNAME(HB_DBG_VMVARSLEN)();
+}
+
+HB_FUNC( __VMVARSGET )
+{
+   HB_FUNCNAME(HB_DBG_VMVARSGET)();
+}
+
+HB_FUNC( __VMVARSSET )
+{
+   HB_FUNCNAME(HB_DBG_VMVARSSET)();
+}
