@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.13 2004/02/25 14:30:07 andijahja Exp $
+ * $Id: zip.c,v 1.14 2004/02/28 03:45:07 andijahja Exp $
  */
 
 /*
@@ -60,24 +60,54 @@ static void ZipCreateArray( PHB_ITEM pParam )
    PHB_ITEM pDirEntry;
    PHB_ITEM pWildFile;
    HB_ITEM Temp;
+   HB_ITEM TempArray;
    int ul, ulLen;
-   char *szEntry;
+   int ulArr, ulLenArr;
 
    FileToZip.type = HB_IT_NIL;
    Temp.type = HB_IT_NIL;
-   pWildFile = hb_fsDirectory(pParam->item.asString.value,NULL,NULL,TRUE);
-   hb_arrayNew( &FileToZip, 0);
-   ulLen = pWildFile->item.asArray.value->ulLen;
+   TempArray.type = HB_IT_NIL;
 
-   for ( ul = 0; ul < ulLen ; ul ++ )
+   hb_arrayNew( &TempArray, 0 );
+
+   if( pParam->type == HB_IT_STRING )
    {
-      pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
-      szEntry = hb_arrayGetC( pDirEntry, 1 );
-      hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
-      hb_xfree( szEntry );
+      hb_arrayAddForward( &TempArray, hb_itemPutC( &Temp, pParam->item.asString.value ) );
+   }
+   else
+   {
+      ulLen = pParam->item.asArray.value->ulLen;
+      for ( ul = 0 ; ul < ulLen ; ul ++ )
+      {
+         char *szArray = hb_arrayGetC( pParam, ul + 1 );
+         hb_arrayAddForward( &TempArray, hb_itemPutC( &Temp, szArray ) );
+         hb_xfree( szArray );
+      }
    }
 
-   hb_itemRelease( pWildFile );
+   ulLenArr = (&TempArray)->item.asArray.value->ulLen;
+
+   hb_arrayNew( &FileToZip, 0 );
+
+   for ( ulArr = 0; ulArr < ulLenArr ; ulArr ++ )
+   {
+      char *szArrEntry = hb_arrayGetC( &TempArray, ulArr + 1 );
+
+      pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
+      ulLen = pWildFile->item.asArray.value->ulLen;
+
+      for ( ul = 0; ul < ulLen ; ul ++ )
+      {
+         char * szEntry;
+         pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
+         szEntry = hb_arrayGetC( pDirEntry, 1 );
+         hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+         hb_xfree( szEntry );
+      }
+
+      hb_itemRelease( pWildFile );
+      hb_xfree( szArrEntry );
+   }
 }
 
 HB_FUNC( HB_ZIPFILE )
@@ -96,14 +126,7 @@ HB_FUNC( HB_ZIPFILE )
 
          iProgress.type = HB_IT_NIL;
 
-         if ( hb_param( 2, HB_IT_STRING ) )
-         {
-            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
-         }
-         else
-         {
-            hb_itemCopy( &FileToZip, pParam );
-         }
+         ZipCreateArray( pParam );
 
          if( pProgress )
          {
@@ -175,14 +198,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
          iProgress.type = HB_IT_NIL;
 
-         if ( hb_param( 2, HB_IT_STRING ) )
-         {
-            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
-         }
-         else
-         {
-            hb_itemCopy( &FileToZip, pParam );
-         }
+         ZipCreateArray( pParam );
 
          if( pProgress )
          {
@@ -223,14 +239,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
          iProgress.type = HB_IT_NIL;
 
-         if ( hb_param( 2, HB_IT_STRING ) )
-         {
-            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
-         }
-         else
-         {
-            hb_itemCopy( &FileToZip, pParam );
-         }
+         ZipCreateArray( pParam );
 
          if( pProgress )
          {

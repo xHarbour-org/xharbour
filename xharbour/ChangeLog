@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2415 2004/02/28 00:39:15 likewolf Exp $
+ * $Id: ChangeLog,v 1.2416 2004/02/28 03:43:57 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-28 14:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+    % more extendedd parameter passings for HB_ZIPFILE*().
+      Examples: HB_ZIPFILE( "my.zip", {"*.prg","*.h","*.c"}, ... )
+      (zip all files matches the wild arguments in array)
+
 2004-02-28 10:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/include/hbzip2.h
   * contrib/hbzlib/zipcomp.cpp
