@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.6 2004/06/30 19:07:10 jabrecer Exp $
+ * $Id: ctwin.prg,v 1.7 2004/06/30 21:59:31 ronpinkas Exp $
  */
 
 /*
@@ -134,16 +134,12 @@ RETURN cRet
 * Date Created: 8/27/03             2:33PM
 *********************************************
 FUNCTION ctw_RESTSCREEN( nT, nL, nB, nR, cScr)
-
-   LOCAL cRet
-
    IF ctw_CURRENT == 0
-     cRet := RESTSCREEN( nT, nL, nB, nR, cScr)
+     RESTSCREEN( nT, nL, nB, nR, cScr)
    ELSE
-     cRet := ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
+     ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
    ENDIF
-
-RETURN cRet
+RETURN Nil
 
 ********************************************
 FUNCTION ctw_SCROLL(nT,nL,nB,nR,nV,nH)
