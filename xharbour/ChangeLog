@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2269 2004/02/12 19:19:10 druzus Exp $
+ * $Id: ChangeLog,v 1.2270 2004/02/12 19:25:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-13 04:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    ! fixes to DBUSEAREAD():
+      * codePageId did not processed (caused GPF with BCC)
+      * unreleased memory block when opening non-existent DBF
+
+    /*
+    BTW, what is this function supposed to serve for ?
+    */
+
 2004-02-13 02:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rdd/dbf1.c
     ! fix unreleased memory block when creating a dbf while a file with

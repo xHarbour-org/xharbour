@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.70 2004/02/04 01:12:01 andijahja Exp $
+ * $Id: dbcmd.c,v 1.71 2004/02/09 18:00:36 druzus Exp $
  */
 
 /*
@@ -4731,7 +4731,9 @@ HB_FUNC( __DBCOPY )
 HB_FUNC( DBUSEAREAD )
 {
    HB_THREAD_STUB
-   char * szDriver, * szFileName;
+   char * szDriver;
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   BYTE * codePageId = (BYTE*) hb_parc(7);
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -4765,8 +4767,10 @@ HB_FUNC( DBUSEAREAD )
    else
       szDriver = s_szDefDriver;
 
-   szFileName = hb_parc( 3 );
-   if( strlen( szFileName ) == 0 )
+   // szFileName = hb_parc( 3 );
+   // if( strlen( hb_parclen(3) ) == 0 )
+   if( hb_parclen(3) == 0 )
+   // if( strlen( szFileName ) == 0 )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
@@ -4801,7 +4805,7 @@ HB_FUNC( DBUSEAREAD )
       return;
    }
 
-   szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   // szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
    strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
 /*   if( !pFileName->szExtension )
    {
@@ -4820,6 +4824,7 @@ HB_FUNC( DBUSEAREAD )
    pInfo.atomAlias = ( BYTE * ) szAlias;
    pInfo.fShared = ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE;
    pInfo.fReadonly = ISLOG( 6 ) ? hb_parl( 6 ) : FALSE;
+   pInfo.cdpId = codePageId;
 
    ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
 
@@ -4827,12 +4832,12 @@ HB_FUNC( DBUSEAREAD )
    if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
    {
       s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      hb_xfree( pInfo.abName );
+      // hb_xfree( pInfo.abName );
       hb_rddReleaseCurrentArea();
       return;
    }
 
-   hb_xfree( szFileName );
+   // hb_xfree( szFileName );
 }
 
 ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
