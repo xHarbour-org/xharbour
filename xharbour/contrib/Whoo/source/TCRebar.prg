@@ -46,14 +46,13 @@ CLASS TRebar FROM TForm
    METHOD New() CONSTRUCTOR
    METHOD AddBand()
    METHOD RebarProc()
-   METHOD OnCreate() INLINE ::OnCreateRebar()
-   METHOD OnCreateRebar()
+   METHOD OnCreate()
 
 ENDCLASS
 
 *------------------------------------------------------------------------------*
 
-METHOD OnCreateRebar() CLASS TRebar
+METHOD OnCreate() CLASS TRebar
 
    ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
                             ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
@@ -87,8 +86,8 @@ METHOD New( oParent ) CLASS TRebar
    ::Name      := REBARCLASSNAME
    ::lRegister := .F.
    ::lControl  := .T.
-   ::WndProc   := ""
-   ::lHaveProc := .T.
+   ::WndProc   := "FormProc"
+   ::lHaveProc := .F.
    ::Caption   := ""
    ::Left      := 0
    ::Top       := 0
@@ -97,7 +96,7 @@ METHOD New( oParent ) CLASS TRebar
    ::ExStyle   := WS_EX_TOOLWINDOW
    ::Style     := WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                   RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
-
+   ::Msgs :={WM_NOTIFY}
    RETURN( self )
 
 *------------------------------------------------------------------------------*

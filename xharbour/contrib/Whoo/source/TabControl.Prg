@@ -41,10 +41,27 @@ IMPORT C STRUCTURE NMHDR
 
 CLASS TTabControl FROM TControl
 
-   DATA nCurSel
-   DATA Cargo
-   DATA ntProc
-   DATA SendTo AS OBJECT
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT    0
+   DATA Top     INIT    0
+   DATA Width   INIT  160
+   DATA Height  INIT  160
+
+   DATA CurSel  INIT    1
+
+   DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP
+   DATA ExStyle INIT  0
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT WC_TABCONTROL
+
+
+   DATA Cargo            PROTECTED
+   DATA SendTo AS OBJECT PROTECTED
+
    METHOD New() CONSTRUCTOR
    METHOD AddTab()
    METHOD InsertTab()
@@ -77,56 +94,33 @@ CLASS TTabControl FROM TControl
    METHOD SetPadding()
    METHOD SetToolTips()
    METHOD SetUnicodeFormat()
-   METHOD TabNotify()
-   METHOD OnCreate()
+   METHOD Notify()
    METHOD OnSize()
    METHOD GetObj()
+
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent, nId, nL, nT, nW, nH, nSel ) CLASS TTabControl
-
-   ::Id      := nId
-   ::ExStyle := 0
-   ::Style   := WS_CHILD + WS_VISIBLE + WS_TABSTOP
-   
-   ::name    := WC_TABCONTROL
-   ::Caption := ""
-   
-   ::Left    := nL
-   ::Top     := nT
-   ::width   := IFNIL(nW,289,nW)
-   ::height  := IFNIL(nH,193,nH)
-   
-   ::lRegister := .F.
-   ::lControl  := .F.
-   ::WndProc   := 'FormProc'
-   
-   ::Controls:= {}
-   ::nCurSel := IF(nSel==NIL,1,nSel)
-
-   ::Msgs    := {WM_SIZE}
+METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTabControl
+   ::id        := nId
+   ::Left      := IFNIL( nLeft,   ::Left,   nLeft  )
+   ::Top       := IFNIL( nTop,    ::Top,    nTop   )
+   ::width     := IFNIL( nWidth,  ::width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*
 
-METHOD OnCreate() CLASS TTabControl
-   ::ntProc := SetProcedure( ::Parent:handle,;
-               {|hWnd,nMsg,nwParam,nlParam|::TabNotify( nMsg,nwParam, nlParam )},{WM_NOTIFY} )
-return( super:OnCreate() )
-
-*-----------------------------------------------------------------------------*
-
-METHOD TabNotify( nMsg,nwParam, nlParam ) CLASS TTabControl
+METHOD Notify( hdr ) CLASS TTabControl
    LOCAL nSel
    nSel:=TabCtrl_GetCurSel( ::handle )+1
-   IF ::nCursel <> nSel
-      ShowWindow(::Controls[::nCurSel]:handle, SW_HIDE)
-      ::nCurSel:=nSel
-      ShowWindow(::Controls[::nCurSel]:handle, SW_SHOW)
+   IF ::Cursel <> nSel
+      ShowWindow(::Controls[::CurSel]:handle, SW_HIDE)
+      ::CurSel:=nSel
+      ShowWindow(::Controls[::CurSel]:handle, SW_SHOW)
    endif
-   return(CallWindowProc( ::ntProc, ::parent:handle,nMsg,nwParam, nlParam ))
+   return(nil)
 
 *-----------------------------------------------------------------------------*
 
@@ -145,17 +139,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    oPage:propname := cName
    if (hTab:=TabCtrl_AddItem(::handle,oPage:Caption,oPage:ImageIndex)) > -1
       AADD(::Controls,oPage )
-//      __objAddData( self, cName )
-
-      IF !ISCHARACTER( cName )
-         __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
-        ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
-         hClass := ::ClassH
-         nSeq   := __cls_IncData( hClass )
-         __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
-         __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
-      ENDIF
-
+      __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
       __ObjSetValueList( self, { { cName, oPage } } )
    ENDIF
    RETURN(hTab)
@@ -177,8 +161,8 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
    Local nCount:=LEN(::Controls)
    if nPos > 0 .and. nPos <= nCount
-      IF nPos <= ::nCurSel     // verify !!!!!
-        ::nCurSel--
+      IF nPos <= ::CurSel     // verify !!!!!
+        ::CurSel--
       ENDIF
       TabCtrl_DeleteItem(nPos-1)
       if isWindow(::Controls[nPos]:handle)
@@ -229,7 +213,7 @@ METHOD Configure(lCreate) CLASS TTabControl
                          aTab[4]-acRect[2]-acRect[4]-4,;
                          .T.)
          if lCreate
-            IF i<>::nCurSel
+            IF i<>::CurSel
                ShowWindow(::Controls[i]:handle,SW_HIDE)
             endif
          endif
@@ -253,7 +237,7 @@ METHOD DeleteAllTabs() CLASS TTabControl
   AEVAL(::Controls,{|hWnd| IF(isWindow(hWnd),DestroyWindow(hWnd),)})
   ::Controls:={}
   ::aDlg:={}
-  ::nCurSel:=0
+  ::CurSel:=0
 
   RETURN(lRet)
 
@@ -399,7 +383,7 @@ METHOD OnSize( nwParam,x , y ) CLASS TTabControl
           ::Configure(.F.)
        endif
    next
-return( super:OnSize() )
+return( nil )
 
 *-----------------------------------------------------------------------------*
 
