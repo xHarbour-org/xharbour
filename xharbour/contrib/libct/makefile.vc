@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.12 2003/11/25 08:31:13 druzus Exp $
+# $Id: makefile.vc,v 1.13 2004/01/04 13:12:46 lculik Exp $
 #
 
 #
@@ -150,6 +150,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\net.obj \
    $(OBJ_DIR)\num1.obj \
    $(OBJ_DIR)\numat.obj \
+   $(OBJ_DIR)\numlohi.obj \
    $(OBJ_DIR)\pad.obj \
    $(OBJ_DIR)\pos1.obj \
    $(OBJ_DIR)\pos2.obj \
