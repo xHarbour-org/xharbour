@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.11 2002/04/15 05:06:44 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.12 2002/04/17 00:35:43 ronpinkas Exp $
  */
 
 /*
@@ -1287,13 +1287,14 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
       case HB_EA_PUSH_PCODE:
          {
             USHORT usCount;
-            BYTE   bPcode = 0;
 
          #if defined( HB_MACRO_SUPPORT )
 
             /* This optimization is not applicable in Macro Compiler. */
 
          #else
+
+            BYTE   bPcode = 0;
 
             if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.50 2002/04/17 01:33:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.51 2002/04/17 01:46:07 ronpinkas Exp $
  */
 
 /*
@@ -3286,7 +3286,7 @@ static void hb_vmArrayPush( void )
 
       hb_stackPop();
 
-      if( lIndex < pArray->item.asString.length )
+      if( (ULONG) lIndex < pArray->item.asString.length )
       {
          if( pArray->item.asString.bStatic )
          {
