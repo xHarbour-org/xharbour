@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.421 2004/09/13 06:42:59 druzus Exp $
+ * $Id: hvm.c,v 1.422 2004/10/18 10:22:26 likewolf Exp $
  */
 
 /*
@@ -105,7 +105,7 @@
    #include "hbapicdp.h"
 #endif
 
-#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
+#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    #include "hbserv.h"
 #endif
 
@@ -736,7 +736,7 @@ int HB_EXPORT hb_vmQuit( void )
 
    hb_i18nExit();
 
-#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
+#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    hb_serviceExit();
 #endif
 

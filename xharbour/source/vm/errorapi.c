@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.47 2004/06/04 13:29:29 mauriliolongo Exp $
+ * $Id: errorapi.c,v 1.48 2004/09/03 01:35:00 druzus Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ static PHB_DYNS s_pDynErrorNew;
 #endif
 
 extern HB_SET_STRUCT hb_set;
-#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
+#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
 #include "hbserv.h"
 // extern BOOL hb_isService(void);
 #endif
@@ -1575,10 +1575,8 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_stackDispCall();
 
-   #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
    #ifdef HB_OS_WIN_32
       MessageBox( NULL, buffer, title, MB_ICONSTOP );
-   #endif
    #endif
 
    /* release console settings */

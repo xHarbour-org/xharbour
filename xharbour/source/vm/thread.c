@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.176 2004/08/27 03:06:44 walito Exp $
+* $Id: thread.c,v 1.177 2004/09/02 03:11:39 walito Exp $
 */
 
 /*
@@ -560,7 +560,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->pCleanUpParam );
    #endif
 
-   // Free only if we are not destroing the main stack
+   // Free only if we are not destroying the main stack
    if ( pStack != &hb_stack )
    {
       while( pStack->pSequence )
@@ -835,7 +835,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
       *hb_dwCurrentStack = (void *) _pStack_;
 
    #else
-      /* The fist that arrives among father and child will set up
+      /* The first that arrives among father and child will set up
          the stack id. */
       _pStack_->th_id = HB_CURRENT_THREAD();
       #ifdef HB_THREAD_TLS_KEYWORD
@@ -875,11 +875,16 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
       hb_threadCancelInternal(); // never returns
       return 0;
    #else
-      /* After this points prevents cancellation, so we can have a clean
-      quit. else, a cancellation request could be issued inside the
+      /* After this point, prevent cancellation, so we can have a clean
+      quit. Otherwise, a cancellation request could be issued inside the
       cleanup pop cycle, causing re-entering in the cleanup functions */
-      pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
-      /* pop cleanup; also calls the cleanup function*/
+      {
+         int oldstate;
+
+         /* The second parameter is not optional in Darwin! */	 
+	 pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, &oldstate );
+      }
+      /* pop cleanup; also calls the cleanup function */
       pthread_cleanup_pop( 1 );
       return NULL;
    #endif
@@ -983,7 +988,12 @@ void hb_threadTerminator( void *pData )
 
 
 #if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
-   pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+   {
+      int oldstate;
+
+      /* The second parameter is not optional in Darwin! */	 
+      pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, &oldstate );
+   }
 #endif
 
    HB_STACK_LOCK;
@@ -1201,7 +1211,7 @@ void hb_threadIdleEnd( void )
 
 /*
    Condition variables needs a special handling to be omomorphic on
-   variuous systems.
+   various systems.
 */
 #if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
 
@@ -1680,7 +1690,7 @@ HB_FUNC( STARTTHREAD )
          child, that is able to reach this line */
       pStack->th_id = th_id;
 
-      /* Under windws, we put the handle after creation */
+      /* Under windows, we put the handle after creation */
 #if defined(HB_OS_WIN_32)
       pStack->th_h = th_h;
       ResumeThread( th_h );

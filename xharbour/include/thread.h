@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.94 2004/08/04 04:28:38 ronpinkas Exp $
+* $Id: thread.h,v 1.95 2004/10/18 10:22:25 likewolf Exp $
 */
 
 /*
@@ -266,6 +266,10 @@ extern PPVOID hb_dwCurrentStack;
    #include <errno.h>
    #define HB_THREAD_T                 pthread_t
 
+#ifdef HB_OS_DARWIN_5
+   #define HB_NO_RECURSIVE_MUTEXES
+#endif
+
 #ifndef HB_NO_RECURSIVE_MUTEXES
 
    #define HB_CRITICAL_T               pthread_mutex_t
@@ -299,54 +303,57 @@ extern PPVOID hb_dwCurrentStack;
 
 #else
 
-   /* Some Unices (e.g., Darwin 5.2.2) don't have recursive mutexes;
+   /* Some Unices (e.g., Darwin 5.5) don't have recursive mutexes;
     * we have to implement them manually. -- Ph.K. */
    typedef struct
    {
-      pthread_mutex_t lock; \
-      HB_THREAD_T owner; \
-      ULONG count; \
+      pthread_mutex_t lock;
+      HB_THREAD_T owner;
+      ULONG count;
    } HB_RECURSIVE_MUTEX_T;
 
    #define HB_CRITICAL_T               HB_RECURSIVE_MUTEX_T
    #define HB_CRITICAL_INIT( x ) \
       { \
-         (x).owner = 0; \
+         pthread_mutex_init( &((x).lock), NULL ); \
+	 (x).owner = 0; \
 	 (x).count = 0; \
-	 pthread_mutex_init( &((x).lock), NULL ); \
       }
-   #define HB_CRITICAL_DESTROY( x )    ( (x).owner == 0 ? pthread_mutex_destroy( &((x).lock) ) : 0 )
+   #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &((x).lock) )
    #define HB_CRITICAL_LOCK( x ) \
       { \
          HB_THREAD_T self = pthread_self(); \
-	 if ( pthread_equal( self, (x).owner ) ) \
+	 if ( pthread_equal( (x).owner, self ) ) \
 	 { \
 	    (x).count++; \
 	 } \
 	 else \
 	 { \
 	    pthread_mutex_lock( &((x).lock) ); \
-	    (x).owner = self; \
-	    (x).count = 1; \
-	 } \
-      }
+            (x).owner = self; \
+         } \
+      }   
    #define HB_CRITICAL_UNLOCK( x ) \
       { \
-         HB_THREAD_T self = pthread_self(); \
-	 if ( pthread_equal( self, (x).owner ) ) \
+	 if ( pthread_equal( (x).owner, pthread_self() ) ) \
 	 { \
-	    if ( --(x).count < 1 ) \
-	    { \
-	       (x).owner = 0; \
-	       pthread_mutex_unlock( &((x).lock) ); \
-	    } \
+            if ( (x).count ) \
+            { \
+               (x).count--; \
+            } \
+            else \
+            { \
+               (x).owner = 0; \
+               pthread_mutex_unlock( &((x).lock) ); \
+            } \
 	 } \
       }
+	 
    #define HB_CRITICAL_TRYLOCK( x ) \
       ( pthread_equal( pthread_self(), (x).owner ) \
         ? ( (x).count++, TRUE ) \
 	: ( ( pthread_mutex_trylock( &((x).lock) ) != EBUSY ) \
-	    ? ( (x).owner = pthread_self(), (x).count = 1, TRUE ) \
+	    ? ( (x).owner = pthread_self(), TRUE ) \
 	    : FALSE ) )
 
 #endif
@@ -589,8 +596,19 @@ typedef struct tag_HB_SHARED_RESOURCE
    HB_COND_DESTROY( pshr.Cond ); \
 }
 
+/* It is said that pthread_cond_wait() should not be used with recursive
+ * mutexes. But it seems to work on systems where recursive mutexes are
+ * implemented. However, on Darwin < 6.x our recursive mutex implementation
+ * blocks everything in this situation. So I try to use non-recursive
+ * mutex here. -- Ph.K. */
+#ifndef HB_NO_RECURSIVE_MUTEXES
 #define HB_SHARED_LOCK( pshr )   HB_CRITICAL_LOCK( (pshr).Mutex )
 #define HB_SHARED_UNLOCK( pshr ) HB_CRITICAL_UNLOCK( (pshr).Mutex )
+#else
+#define HB_SHARED_LOCK( pshr )   pthread_mutex_lock( &((pshr).Mutex.lock) )
+#define HB_SHARED_UNLOCK( pshr ) pthread_mutex_unlock( &((pshr).Mutex.lock) )
+#endif
+
 #define HB_SHARED_SIGNAL( pshr )    HB_COND_SIGNAL( (pshr).Cond )
 #define HB_SHARED_WAIT( pshr )      HB_COND_WAIT( (pshr).Cond, (pshr).Mutex )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.55 2004/09/08 00:17:11 druzus Exp $
+ * $Id: hbdefs.h,v 1.56 2004/09/28 15:32:39 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if ( defined( __GNUC__ ) || defined( __XCC__ ) ) && !defined( HB_OS_BSD )
+#if ( defined( __GNUC__ ) || defined( __XCC__ ) ) && ( !defined( HB_OS_BSD ) || defined( HB_OS_DARWIN ) )
 #include <stdint.h>
 #endif
 
@@ -313,6 +313,19 @@
 #  endif
 #endif
 
+
+#if defined( HB_OS_DARWIN )
+#  if defined( __BIG_ENDIAN__ )
+#    define HB_BIG_ENDIAN
+#  else
+#    define HB_LITTLE_ENDIAN
+#  endif
+#elif defined( HB_OS_BSD )
+#  include <sys/types.h>
+#  define __BYTE_ORDER BYTE_ORDER
+#  define __BIG_ENDIAN BIG_ENDIAN
+#  define __LITTLE_ENDIAN LITTLE_ENDIAN
+#endif
 
 /* try to detect byte order if not explicitly set */
 #if !defined( HB_PDP_ENDIAN ) && !defined( HB_BIG_ENDIAN ) && \

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.13 2004/10/18 10:22:25 likewolf Exp $
+# $Id: gcc.cf,v 1.14 2004/10/31 13:15:45 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -24,25 +24,25 @@ CFLAGS = -fno-common -fsigned-char -Wall -W
 CFLAGS += -Wno-long-double
 
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS += -DSIMPLEX
+  CFLAGS += -DSIMPLEX
 endif
-CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
-CFLAGS += -DHB_BIG_ENDIAN
 
-# The following needs to be enabled for old Darwin versions, e.g. 5.2.2
+CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
+
+# The following is enabled automatically for old Darwin versions, e.g. 5.5
 # CFLAGS += -DHB_NO_RECURSIVE_MUTEXES
 
 ifeq ($(HB_LIBCOMP_MT),)
-# always add thread support if not compiling a lib and using vmmt
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
-endif
+  # always add thread support if not compiling a lib and using vmmt
+  ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+    CFLAGS += -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+  endif
 else
-# Add thread support to lib compilation only if compiling a _mt lib
-ifeq ($(HB_LIBCOMP_MT),YES)
-CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
-HB_MT_FLAGS = -DHB_THREAD_SUPPORT
-endif
+  # Add thread support to lib compilation only if compiling a _mt lib
+  ifeq ($(HB_LIBCOMP_MT),YES)
+    CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
+    HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+  endif
 endif
 
 
@@ -55,16 +55,16 @@ LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+  LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
+  LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 
-# Adding MT libs on need
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
-endif
+  # Adding MT libs on need
+  ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+    LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
+  endif
 
 else
-LINKPATHS += -L$(HB_LIB_COMPILE)
+  LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
@@ -72,76 +72,78 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
-#DBFNTX and DBFCDX are MTzed
-ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
-LINKLIBS += -ldbfcdxmt
-endif
-ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
-LINKLIBS += -ldbfntxmt
-endif
+  #DBFNTX and DBFCDX are MTzed
+  ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+    LINKLIBS += -ldbfcdxmt
+  endif
+  ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+    LINKLIBS += -ldbfntxmt
+  endif
 
-# DBFDBT and DBFFPT are not MTzed
-ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
-LINKLIBS += -ldbfdbt
-endif
-ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH)
-LINKLIBS += -ldbffpt
-endif
+  # DBFDBT and DBFFPT are not MTzed
+  ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+    LINKLIBS += -ldbfdbt
+  endif
+  ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH)
+    LINKLIBS += -ldbffpt
+  endif
 
 else
-ifeq ($(findstring rdd,$(LIBS)),rdd)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
-LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
-endif
+  ifeq ($(findstring rdd,$(LIBS)),rdd)
+    LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+    LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+  endif
 endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
-LINKLIBS += -lgtnul
-endif
+  ifeq ($(HB_MULTI_GT),yes)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+    LINKLIBS += -lgtnul
+  endif
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
+  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+  LINKLIBS += -l$(HB_GT_LIB)
 
-# HB_SCREEN_LIB: empty, or one of ncurses, slang
-ifeq ($(HB_GT_LIB),gtcrs)
-HB_SCREEN_LIB:=ncurses
-else
-ifeq ($(HB_GT_LIB),gtsln)
-HB_SCREEN_LIB:=slang
-endif
-endif
+  # HB_SCREEN_LIB: empty, or one of ncurses, slang
+  ifeq ($(HB_GT_LIB),gtcrs)
+    LINKPATHS += -L/sw/lib
+    HB_SCREEN_LIB:=ncurses
+  else
+    ifeq ($(HB_GT_LIB),gtsln)
+      LINKPATHS += -L/sw/lib
+      HB_SCREEN_LIB:=slang
+    endif
+  endif
 
-ifneq ($(HB_SCREEN_LIB),)
-LINKLIBS += -l$(HB_SCREEN_LIB)
-endif
+  ifneq ($(HB_SCREEN_LIB),)
+    LINKLIBS += -l$(HB_SCREEN_LIB)
+  endif
 
-# In BSD, slang still needs curses :(
-ifeq ($(HB_GT_LIB),gtsln)
-LINKLIBS += -lncurses
-endif
+  # In BSD, slang still needs curses :(
+  ifeq ($(HB_GT_LIB),gtsln)
+    LINKLIBS += -lncurses
+  endif
 
-ifeq ($(HB_GT_LIB),gtxvt)
-LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
-else
-ifeq ($(HB_GT_LIB),gtxwc)
-LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
-endif
-endif
+  ifeq ($(HB_GT_LIB),gtxvt)
+    LINKLIBS += -lX11
+    LINKPATHS += -L/usr/X11R6/lib
+  else
+    ifeq ($(HB_GT_LIB),gtxwc)
+      LINKLIBS += -lX11
+      LINKPATHS +=-L/usr/X11R6/lib
+    endif
+  endif
 
-# HB_GPM_MOUSE: use gpm mouse driver
-# Actually, there is no gpm on BSD.
-ifeq ($(HB_GPM_MOUSE),yes)
-LINKLIBS += -lgpm
-endif
+  # HB_GPM_MOUSE: use gpm mouse driver
+  # Actually, there is no gpm on BSD.
+  ifeq ($(HB_GPM_MOUSE),yes)
+    LINKLIBS += -lgpm
+  endif
 
 endif
 
@@ -157,4 +159,5 @@ LIBTOOL = libtool
 LIBTOOLFLAGS = $(LIBTOOL_USR)
 AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $(^F) || $(RM) $@
 RANLIB = ranlib
+
 include $(TOP)$(ROOT)config/rules.cf

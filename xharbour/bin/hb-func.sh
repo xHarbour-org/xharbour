@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.30 2004/09/21 22:31:11 druzus Exp $
+# $Id: hb-func.sh,v 1.31 2004/10/18 10:22:24 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -26,6 +26,7 @@ get_hbplatform()
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
+    [ "${id}" = "" ] && id=`uname -sr | tr "A-Z" "a-z" | tr -d " "`
     echo -n "${id}"
 }
 
@@ -294,6 +295,7 @@ else
     l="${name}"
     if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
         ext="dylib"
+        LINK_OPT="-bind_at_load -multiply_defined suppress"
     else
         ext="so"
     fi
@@ -433,7 +435,7 @@ EOF
 
 mk_hblibso()
 {
-    local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs
+    local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs full_lib_name full_lib_name_mt linker_options
 
     name=`get_solibname`
     hb_rootdir="${1-.}"
@@ -476,15 +478,16 @@ mk_hblibso()
     if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         full_lib_name="lib${name}.${hb_ver}.dylib"
         full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
+        linker_options="-L/sw/lib -lncurses -lslang"
     else
         full_lib_name="lib${name}-${hb_ver}.so"
         full_lib_name_mt="lib${name}mt-${hb_ver}.so"
     fi
     echo "Making ${full_lib_name}..."
-    $HB_BIN_INSTALL/hb-mkslib ${full_lib_name} $LIBS
+    $HB_BIN_INSTALL/hb-mkslib ${full_lib_name} $LIBS ${linker_options}
     if [ "$HB_MT" = "MT" ]; then
         echo "Making ${full_lib_name_mt}..."
-        $HB_BIN_INSTALL/hb-mkslib ${full_lib_name_mt} $LIBSMT
+        $HB_BIN_INSTALL/hb-mkslib ${full_lib_name_mt} $LIBSMT ${linker_options}
     fi
     for l in ${full_lib_name} ${full_lib_name_mt}
     do

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.10 2004/02/07 11:41:01 druzus Exp $
+ * $Id: gtcrs.h,v 1.11 2004/03/03 21:45:23 likewolf Exp $
  */
 
 /*
@@ -92,6 +92,7 @@ extern PHB_CODEPAGE s_cdpage;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/types.h>

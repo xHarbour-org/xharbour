@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3565 2004/10/31 20:39:12 druzus Exp $
+ * $Id: ChangeLog,v 1.3566 2004/11/01 04:30:11 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-01 08:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_drw.sh
+    * Enabled HB_MULTI_GT, use GTSLN as the default, detect old Darwin versions.
+  * make_tgz.sh
+    + Added support for Darwin and BSD. Added libhtml and libmisc to distribution.
+  * bin/hb-func.sh
+    + Detect unknown platforms in hb_getplatform() using `uname -sr`.
+    + Pass Darwin-specific linker options.
+  * bin/hb-mkslib.sh
+    ! Fixed .dylib building on Darwin (cooperative work with Przemek).
+    + Added support for passing raw linker options on command line.
+  * bin/postinst.sh
+    ! Added -c option to install, otherwise it _moves_ files in Darwin.
+  * config/darwin/gcc.cf
+  * source/rtl/gtcrs/Makefile
+  * source/rtl/gtsln/Makefile
+    * Added some comments and include/library file paths for Fink.
+  * contrib/Makefile
+    ! Cleaned up a little.
+  * contrib/pdflib/Makefile
+    ! Changed resulting library names to pdf and pdfmt from ct and ctmt...
+  * include/hbdefs.h
+    ! _Do_ include stdint.h on Darwin.
+    ! Detect endianness correctly on BSD and Darwin.
+  * include/hbsetup.h
+    * Fixed a typo.
+  * include/thread.h
+    ! Made recursive mutex implementation a little better.
+  * source/ct/files.c
+  * source/rtl/filestat.c
+  * source/rtl/hbserv.c
+  * source/tip/utils.c
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+    ! Tagged places which can't be compiled by Darwin versions < 6.x with
+      #ifdef HB_OS_DARWIN_5 instead of HB_OS_DARWIN.
+  * source/rtl/gtcrs/gtcrs.h
+    ! Added #include <sys/ioctl> for ioctl() call.
+  * source/vm/thread.c
+    ! A couple of fixes for Darwin.
 
 2004-11-01 05:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/mainstd/Makefile

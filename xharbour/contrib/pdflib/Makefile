@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2004/03/04 00:27:39 likewolf Exp $
+# $Id: Makefile,v 1.1 2004/07/26 01:32:09 lculik Exp $
 #
 
 ROOT = ../../
@@ -14,9 +14,9 @@ PRG_SOURCES= \
     pdfhbdocs.prg 
 
 
-LIBNAME=ct
+LIBNAME=pdf
 ifeq ($(HB_MT),MT)
-  MT_LIBNAME=ctmt
+  MT_LIBNAME=pdfmt
 endif
 
 include $(TOP)$(ROOT)config/header.cf

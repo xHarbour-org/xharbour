@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: files.c,v 1.2 2004/10/21 09:44:54 mauriliolongo Exp $
  */
 
 /*
@@ -957,7 +957,7 @@ HB_FUNC( SETFDATI )
             time_t current_time;
 
             current_time = time( NULL );
-#if defined( __DJGPP__ ) || defined( HB_OS_DARWIN )
+#if defined( __DJGPP__ ) || defined( HB_OS_DARWIN_5 )
             new_value = *localtime( &current_time );
 #else
             localtime_r( &current_time, &new_value );

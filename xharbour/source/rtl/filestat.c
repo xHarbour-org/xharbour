@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.6 2004/04/06 01:50:55 druzus Exp $
+ * $Id: filestat.c,v 1.7 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -176,7 +176,7 @@ BOOL hb_fsFileStats(
 #endif
 
       ftime = statbuf.st_mtime;
-#if _POSIX_C_SOURCE >= 199506L
+#if _POSIX_C_SOURCE >= 199506L && !defined( HB_OS_DARWIN_5 )
       ptms = localtime_r( &ftime, &tms );
 #else
       ptms = localtime( &ftime );
@@ -187,7 +187,7 @@ BOOL hb_fsFileStats(
       *lcTime = ptms->tm_hour*3600 + ptms->tm_min * 60 + ptms->tm_sec;
 
       ftime = statbuf.st_atime;
-#if _POSIX_C_SOURCE >= 199506L
+#if _POSIX_C_SOURCE >= 199506L && !defined( HB_OS_DARWIN_5 )
       ptms = localtime_r( &ftime, &tms );
 #else
       ptms = localtime( &ftime );

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: utils.c,v 1.2 2004/09/30 15:32:00 jonnymind Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ HB_FUNC( TIP_TIMESTAMP )
 
    /* init time structure anyway */
    time( &current );
-   #ifdef HB_OS_OS2
+   #if defined( HB_OS_OS2 ) || defined( HB_OS_DARWIN_5 )
    memcpy((void *)&tmTime, (void *)localtime( &current ), sizeof(tmTime));
    #else
    localtime_r( &current , &tmTime );

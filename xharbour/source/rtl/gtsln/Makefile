@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2002/04/16 16:12:18 map Exp $
+# $Id: Makefile,v 1.4 2003/05/16 19:52:11 druzus Exp $
 #
 
 ROOT = ../../../
@@ -18,7 +18,7 @@ include $(TOP)$(ROOT)config/lib.cf
 # for slang header files between different unix distributions
 #TEMPOR := $(CFLAGS)
 CFLAGS := -I/usr/include/slang -I/usr/local/include \
-	  -I/usr/local/include/slang $(CFLAGS)
+	  -I/usr/local/include/slang -I/sw/include $(CFLAGS)
 
 #TEMPOR  := $(LDFLAGS)
 #LDFLAGS := -L/usr/lib/slang -L/usr/local/lib -L/usr/local/lib/slang $(TEMPOR)

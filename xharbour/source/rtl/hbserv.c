@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.20 2004/05/10 10:38:07 mauriliolongo Exp $
+* $Id: hbserv.c,v 1.21 2004/05/28 18:51:22 likewolf Exp $
 */
 
 /*
@@ -60,7 +60,8 @@
 
 #include <stdio.h>
 
-#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN) // dos and Darwin can't compile this module
+#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 ) // DOS and Darwin < 6.x can't compile this module
+
 #if defined( HB_OS_UNIX ) || defined (HARBOUR_GCC_OS2)
 #include <sys/types.h>
 #include <unistd.h>
@@ -964,14 +965,18 @@ HB_FUNC( HB_SIGNALDESC )
       case SIGFPE: switch( iSubSig )
       {
          #if ! defined(HARBOUR_GCC_OS2)
+         #if ! defined( HB_OS_DARWIN )
          case FPE_INTDIV: hb_retc( "Floating point: integer divide by zero"); return;
          case FPE_INTOVF: hb_retc( "Floating point: integer overflow"); return;
+         #endif
          case FPE_FLTDIV: hb_retc( "Floating point: floating point divide by zero"); return;
          case FPE_FLTOVF: hb_retc( "Floating point: floating point overflow"); return;
          case FPE_FLTUND: hb_retc( "Floating point: floating point underflow"); return;
          case FPE_FLTRES: hb_retc( "Floating point: floating point inexact result"); return;
          case FPE_FLTINV: hb_retc( "Floating point: floating point invalid operation"); return;
+         #if ! defined( HB_OS_DARWIN )
          case FPE_FLTSUB: hb_retc( "Floating point: subscript out of range"); return;
+         #endif
          #endif
          default: hb_retc( "Floating point" ); return;
       }

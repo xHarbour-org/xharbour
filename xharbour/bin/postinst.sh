@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.9 2004/09/14 20:15:37 druzus Exp $
+# $Id: postinst.sh,v 1.10 2004/10/18 10:22:24 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -49,7 +49,8 @@ then
         AR="ar -cr"
     fi
     if [ "${HB_ARCHITECTURE}" != "dos" ]; then
-        install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
+	# Without -c some OSes _move_ the file instead of copying it!
+        install -c -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
     [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.21 2004/08/02 20:26:06 likewolf Exp $
+ * $Id: hbsetup.h,v 1.22 2004/09/12 15:37:31 lf_sfnet Exp $
  */
 
 /*
@@ -66,8 +66,8 @@
 #include "hbsetup.ch"
 
 /* ***********************************************************************
- * NOTE: You can select the default language modul used by Harbour, by
- *       defining this to a valid language modul identifier.
+ * NOTE: You can select the default language module used by Harbour by
+ *       defining this to a valid language module identifier.
 */
 
 #ifndef HB_LANG_DEFAULT
