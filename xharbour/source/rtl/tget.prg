@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.14 2002/05/24 16:28:29 walito Exp $
+ * $Id: tget.prg,v 1.15 2002/05/25 23:59:41 walito Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ CLASS Get
    // Protected
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
-   DATA nDispLen, nDispPos, nOldPos
+   DATA nDispLen, nDispPos, nOldPos, lCleanZero
 
    METHOD DeleteAll()
    METHOD IsEditable( nPos )
@@ -198,6 +198,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::TypeOut    := .f.
    ::nDispPos   := 1
    ::nOldPos    := 0
+   ::lCleanZero := .f.
 
    ::Picture    := cPicture
 
@@ -238,14 +239,20 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicFunc := SubStr( ::cPicFunc, 1, nAt - 1 ) + SubStr( ::cPicFunc, nFor )
       endif
 
+      if "Z" $ ::cPicFunc
+         ::lCleanZero := .t.
+      else
+         ::lCleanZero := .f.
+      endif
       ::cPicFunc := StrTran(::cPicFunc, "Z", "")
 
       if ::cPicFunc == "@"
          ::cPicFunc := ""
       endif
    else
-      ::cPicFunc := ""
-      ::cPicMask := cPicture
+      ::cPicFunc   := ""
+      ::cPicMask   := cPicture
+      ::lCleanZero := .f.
    endif
 
    if ::type == "D"
@@ -297,6 +304,15 @@ METHOD ParsePict( cPicture ) CLASS Get
             exit
          endif
       Next
+   endif
+
+   if ::HasFocus
+      if ::type == "N"
+         ::decpos := At( iif( ::lDecRev .or. "E" $ ::cPicFunc, ",", "." ), ;
+                     Transform( 1, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask ) )
+      else
+         ::decpos := NIL
+      endif
    endif
 
 return ::cPicFunc + ' ' + ::cPicMask
@@ -988,7 +1004,8 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       return NIL
    endif
 
-   cBuffer := Transform( xValue, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask )
+   cBuffer := Transform( xValue, if( Empty( ::cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), ::cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + ::cPicMask )
+//   cBuffer := Transform( xValue, if( Empty( ::cPicFunc ), "", ::cPicFunc + ::cPicMask )
 
    if lEdit .and. ::type == "N" .and. ! Empty( ::cPicMask )
       nLen  := Len( cBuffer )
