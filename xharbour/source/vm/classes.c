@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.43 2003/03/18 22:12:38 ronpinkas Exp $
+ * $Id: classes.c,v 1.44 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -817,8 +817,6 @@ USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
 
 char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
 {
-   char * szClassName;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p, %s)", pObject, szName));
 
    if( HB_IS_ARRAY( pObject ) )
@@ -1441,7 +1439,7 @@ HB_FUNC( __CLSADDMSG )
       case HB_OO_MSG_CLASSPROPERTY:
          wType -= HB_OO_PROPERTY;
 
-         hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, uiSprClass, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
+         hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, 0, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
 
          szAssign[0] = '_';
          szAssign[1] = '\0';

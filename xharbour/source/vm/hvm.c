@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.182 2003/03/16 06:00:34 jonnymind Exp $
+ * $Id: hvm.c,v 1.183 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -499,7 +499,7 @@ void HB_EXPORT hb_vmQuit( void )
 
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)", bDoExit));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)"));
 
    if( bQuitting == FALSE )
    {
