@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.32 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: gtsln.c,v 1.1.1.1 2001/12/21 10:42:33 ronpinkas Exp $
  */
 
 /*
@@ -1250,7 +1250,7 @@ static void hb_gt_build_conv_tabs()
 
    if( p && p[ 0 ] != '\0' )
    {
-      unsigned char Pos, Msk;
+      unsigned char Pos, Msk, * s = p;
 
       len = strlen( p );
 
@@ -1276,6 +1276,7 @@ static void hb_gt_build_conv_tabs()
          s_IsNationChar[ Pos ] |= Msk;
          ++p;
       }
+      p = s;
 /*
       for( i=0; i <= ( ( int ) s_convKDeadKeys[ 0 ] ) * 2; i++ )
          fprintf( stderr, "%3d %c\r\n", i, s_convKDeadKeys[ i ] );
