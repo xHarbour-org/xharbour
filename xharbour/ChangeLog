@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2758 2004/04/05 22:25:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.2759 2004/04/05 22:38:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-06 04:01 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/libct/files.c
+    * enable osToHarbourMask() for OS_UNIX_COMPATIBLE
+
+  * xharbour/source/rtl/bkgtsks.c
+    * removed two unnecessary HB_THREAD_STUB
+
+  * xharbour/source/rtl/filestat.c
+  * xharbour/source/rtl/fserror.c
+  * xharbour/source/rtl/fssize.c
+  * xharbour/source/rtl/fstemp.c
+  * xharbour/source/rtl/hbffind.c
+  * xharbour/source/rtl/hboutdbg.c
+    * next file IO and fsError changes
+
+  * xharbour/source/rtl/filesys.c
+    ! hb_fsCreateEx() use now WinAPI,
+    + added convert_create_flags() for WinAPI, 
+    * some next fsError changes
+
+I've tested the changes in Linux and DOS (DJGPP, OpenWatcom) - please
+test it in Windows.
 
 2004-04-05 19:45 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * source/rtl/direct.c

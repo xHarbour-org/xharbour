@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.94 2004/04/05 19:58:00 ronpinkas Exp $
+ * $Id: filesys.c,v 1.95 2004/04/05 22:25:43 andijahja Exp $
  */
 
 /*
@@ -116,6 +116,7 @@
    #include <signal.h>
    #include <sys/types.h>
    #include <sys/wait.h>
+   extern char **environ;
 #endif
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)
@@ -321,9 +322,56 @@ HANDLE DostoWinHandle( FHANDLE fHandle)
         return hHandle;
    }
 }
-#endif
 
-extern char **environ;
+static void convert_create_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
+                                  DWORD *dwMode, DWORD *dwShare, DWORD *dwAttr )
+{
+   if ( fCreate )
+   {
+      *dwMode = GENERIC_READ | GENERIC_WRITE;
+
+      *dwAttr = FILE_ATTRIBUTE_ARCHIVE;
+      if( uiAttr & FC_READONLY )
+         *dwAttr |= FILE_ATTRIBUTE_READONLY;
+      if( uiAttr & FC_HIDDEN )
+         *dwAttr |= FILE_ATTRIBUTE_HIDDEN;
+      if( uiAttr & FC_SYSTEM )
+         *dwAttr |= FILE_ATTRIBUTE_SYSTEM;
+   }
+   else
+   {
+      *dwMode = 0;
+      switch( uiFlags & 3 )
+      {
+         case  FO_READWRITE :
+            *dwMode |= GENERIC_READ | GENERIC_WRITE;
+            break;
+         case FO_WRITE:
+            *dwMode |= GENERIC_WRITE;
+            break;
+         case FO_READ :
+            *dwMode |= GENERIC_READ;
+            break;
+      }
+      *dwAttr = FILE_ATTRIBUTE_NORMAL;
+   }
+   /* shared flags */
+   *dwShare = 0;
+   switch ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
+   {
+      case FO_DENYREAD :
+         *dwShare = FILE_SHARE_WRITE;
+         break;
+      case FO_DENYWRITE :
+         *dwShare = FILE_SHARE_READ;
+         break;
+      case FO_EXCLUSIVE:
+         *dwShare = 0;
+         break;
+   }
+}
+
+#else
 
 /* Convert HARBOUR flags to IO subsystem flags */
 static int convert_open_flags( USHORT uiFlags )
@@ -401,23 +449,6 @@ static int convert_open_flags( USHORT uiFlags )
    return result_flags;
 }
 
-static int convert_seek_flags( USHORT uiFlags )
-{
-   /* by default FS_SET is set */
-   int result_flags = SEEK_SET;
-
-   HB_TRACE(HB_TR_DEBUG, ("convert_seek_flags(%hu)", uiFlags));
-
-   if( uiFlags & FS_RELATIVE )
-      result_flags = SEEK_CUR;
-
-   if( uiFlags & FS_END )
-      result_flags = SEEK_END;
-
-   return result_flags;
-}
-
-#if ( defined(HB_FS_FILE_IO) && !defined(HB_WIN32_IO) )
 static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned * result_pmode )
 {
    HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
@@ -455,7 +486,6 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
-#endif
 
 static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result_flags, unsigned * result_pmode )
 {
@@ -486,6 +516,25 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
 }
 
 #endif
+
+static int convert_seek_flags( USHORT uiFlags )
+{
+   /* by default FS_SET is set */
+   int result_flags = SEEK_SET;
+
+   HB_TRACE(HB_TR_DEBUG, ("convert_seek_flags(%hu)", uiFlags));
+
+   if( uiFlags & FS_RELATIVE )
+      result_flags = SEEK_CUR;
+
+   if( uiFlags & FS_END )
+      result_flags = SEEK_END;
+
+   return result_flags;
+}
+
+#endif
+
 
 /*
  * FILESYS.API FUNCTIONS --
@@ -545,7 +594,6 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       } else
           pbyTmp = NULL;
 
-      errno = 0;
       if( pipe( hPipeHandle ) == 0 ) {
          if( ( pid = fork() ) != -1 ) {
             if( pid != 0 ) {
@@ -726,7 +774,6 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    pid_t pid;
    #endif
 
-   errno = 0;
    if( fhStdin != 0 && pipe( hPipeIn ) != 0 )
    {
       hb_fsSetIOError( FALSE, 0 );
@@ -1250,11 +1297,11 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
       iRetStatus = 0;
    }
 
-   #ifdef ERESTARTSYS
+#ifdef ERESTARTSYS
    if ( iRetStatus < 0 && errno != ERESTARTSYS)
-   #else
+#else
    if ( iRetStatus < 0 )
-   #endif
+#endif
    {
       hb_fsSetIOError( FALSE, 0 );
       iRetStatus = -2;
@@ -1365,7 +1412,10 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    {
       hb_fsSetError( FS_ERROR );
    }
-#elif defined( HB_OS_WIN_32 ) && !defined( HB_WIN32_IO )
+#elif defined( HB_WIN32_IO )
+   bRet = (TerminateProcess( DostoWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
+   hb_fsSetIOError( bRet, 0 );
+#elif defined( HB_OS_WIN_32 )
 {
    HANDLE hProc;
 
@@ -1377,9 +1427,6 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    }
    hb_fsSetIOError( bRet, 0 );
 }
-#elif defined( HB_WIN32_IO )
-   bRet = (TerminateProcess( DostoWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
-   hb_fsSetIOError( bRet, 0 );
 #else
 
    HB_SYMBOL_UNUSED( fhProc );
@@ -1403,68 +1450,24 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined(HB_WIN32_IO)
-
    {
-      DWORD dwFlags = 0;
-      DWORD dwShare = FILE_SHARE_READ | FILE_SHARE_WRITE;
+      DWORD dwMode, dwShare, dwAttr;
       HANDLE hFile;
-      /* read & write flags */
-      switch( uiFlags & 3)
-      {
-      case  FO_READWRITE :
-         dwFlags |= GENERIC_READ | GENERIC_WRITE;
-         break;
 
-      case FO_WRITE:
-         dwFlags |= GENERIC_WRITE;
-         break;
+      convert_create_flags( FALSE, 0, uiFlags, &dwMode, &dwShare, &dwAttr );
 
-      case FO_READ :
-         dwFlags |= GENERIC_READ;
-         break;
-      }
-
-/*      if( uiFlags & FO_READWRITE )
-         dwFlags |= GENERIC_READ | GENERIC_WRITE;
-
-      if( uiFlags & FO_WRITE )
-         dwFlags |= GENERIC_WRITE;
-
-      if( uiFlags & FO_READ )
-         dwFlags |= GENERIC_READ;
-*/
-
-      /* shared flags */
-      switch (uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
-      {
-         case FO_DENYREAD :
-            dwShare = FILE_SHARE_WRITE;
-            break;
-         case FO_DENYWRITE :
-            dwShare = FILE_SHARE_READ;
-            break;
-         case FO_EXCLUSIVE:
-            dwShare = 0;
-            break;
-      }
-
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-
-      hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwFlags,
-                dwShare, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+      hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
+                                     NULL, OPEN_EXISTING, dwAttr, NULL );
 
       hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
 
-      HB_DISABLE_ASYN_CANC
-
-      hFileHandle=HandleToLong(hFile);
+      hFileHandle = HandleToLong(hFile);
    }
-
 #elif defined(_MSC_VER)
-
    {
       int iShare = _SH_DENYNO;
 
@@ -1481,9 +1484,6 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          iShare = _SH_DENYWR;
       }
 
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-
       if( iShare )
       {
          hFileHandle = _sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
@@ -1493,12 +1493,8 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          hFileHandle = _open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
       }
       hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-
-      HB_DISABLE_ASYN_CANC
    }
-
 #elif defined(HB_FS_SOPEN)
-
    {
       int iShare = SH_DENYNO;
 
@@ -1515,9 +1511,6 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          iShare = SH_DENYWR;
       }
 
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-
       if( iShare )
       {
          hFileHandle = sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
@@ -1527,19 +1520,12 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
       }
       hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-
-      HB_DISABLE_ASYN_CANC
    }
-
 #elif defined(HAVE_POSIX_IO)
-
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
    hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
    hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
 
-   HB_DISABLE_ASYN_CANC
 #else
 
    hFileHandle = FS_ERROR;
@@ -1547,6 +1533,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
 #endif
 
+   HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
@@ -1569,45 +1556,29 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
 
 #if defined(HB_WIN32_IO)
-
    {
-      DWORD dwFlags = FILE_ATTRIBUTE_ARCHIVE;
+      DWORD dwMode, dwShare, dwAttr;
       HANDLE hFile;
-      if( uiAttr & FC_READONLY )
-         dwFlags |= FILE_ATTRIBUTE_READONLY;
 
-      if( uiAttr & FC_HIDDEN )
-         dwFlags |= FILE_ATTRIBUTE_HIDDEN;
+      convert_create_flags( TRUE, uiAttr, FO_EXCLUSIVE, &dwMode, &dwShare, &dwAttr );
 
-      if( uiAttr & FC_SYSTEM )
-         dwFlags |= FILE_ATTRIBUTE_SYSTEM;
+      hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
+                                     NULL, CREATE_ALWAYS, dwAttr, NULL );
 
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-
-      hFile = ( HANDLE ) CreateFile( ( char * ) pFilename,
-                    GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-                    dwFlags, NULL );
       hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
 
-      HB_DISABLE_ASYN_CANC
-
-      hFileHandle=HandleToLong(hFile);
+      hFileHandle = HandleToLong(hFile);
    }
-
 #elif defined(HB_FS_FILE_IO)
 
    convert_create_flags( uiAttr, &oflag, &pmode );
 
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
-
    hFileHandle = open( ( char * ) pFilename, oflag, pmode );
    hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-
-   HB_DISABLE_ASYN_CANC
 
 #else
 
@@ -1616,6 +1587,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
 #endif
 
+   HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
@@ -1633,31 +1605,39 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
-   int oflag;
-   unsigned pmode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreateEx(%p, %hu, %hu)", pFilename, uiAttr, uiFlags));
 
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
-
-/* this function doesn't use WinAPI - it will be the source of problem
- * if someone will use it - it has to be fixed, Druzus
- */
-
-#if defined(HB_FS_FILE_IO)
-
-   convert_create_flags_ex( uiAttr, uiFlags, &oflag, &pmode );
-
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
-   errno = 0;
-   hFileHandle = open( ( char * ) pFilename, oflag, pmode );
-   hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
+#if defined( HB_WIN32_IO )
+   {
+      DWORD dwMode, dwShare, dwAttr;
+      HANDLE hFile;
 
-   HB_DISABLE_ASYN_CANC
+      convert_create_flags( TRUE, uiAttr, uiFlags, &dwMode, &dwShare, &dwAttr );
+
+      hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
+                                     NULL, CREATE_ALWAYS, dwAttr, NULL );
+
+      hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
+
+      hFileHandle = HandleToLong(hFile);
+   }
+#elif defined(HB_FS_FILE_IO)
+   {
+      int oflag;
+      unsigned pmode;
+
+      convert_create_flags_ex( uiAttr, uiFlags, &oflag, &pmode );
+
+      hFileHandle = open( ( char * ) pFilename, oflag, pmode );
+      hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
+   }
 #else
 
    hFileHandle = FS_ERROR;
@@ -1665,6 +1645,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
 #endif
 
+   HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
@@ -1680,7 +1661,6 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 #if defined(HB_FS_FILE_IO)
 
    HB_STACK_UNLOCK
-
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
 
@@ -1691,7 +1671,6 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
    #endif
 
    HB_DISABLE_ASYN_CANC
-
    HB_STACK_LOCK
 
 #else
@@ -2071,18 +2050,19 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
       bad side effect if seek fails - it's one of the most serious bug
       I've found so far in filesys.c - ulPos _CANNOT_BE_ static, Druzus */
    ULONG ulPos;
-   USHORT Flags;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", hFileHandle, lOffset, uiFlags));
 
-   Flags = convert_seek_flags( uiFlags );
-
    HB_STACK_UNLOCK
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
+
+#if defined(HB_FS_FILE_IO)
+{
+   USHORT Flags = convert_seek_flags( uiFlags );
 
    #if defined(HB_OS_OS2)
-   {
       APIRET ret
-
       /* This DOS hack creates 2GB file size limit, Druzus */
       if( lOffset < 0 && Flags == SEEK_SET )
       {
@@ -2095,7 +2075,6 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
          /* TODO: what we should do with this error code? Is it DOS compatible? */
          hb_fsSetError(( USHORT ) ret );
       }
-
       if( ret != 0 )
       {
          /* FIXME: it should work if DosSetFilePtr is lseek compatible
@@ -2106,65 +2085,51 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
             ulPos = 0;
          }
       }
-   }
-   #elif defined(HB_FS_FILE_IO)
+   #elif defined(HB_WIN32_IO)
+      /* This DOS hack creates 2GB file size limit, Druzus */
+      if( lOffset < 0 && Flags == SEEK_SET )
+      {
+         ulPos = (ULONG) INVALID_SET_FILE_POINTER;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
+         hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
+      }
 
-      #if defined(HB_WIN32_IO)
-         // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
-
-         /* This DOS hack creates 2GB file size limit, Druzus */
-         if( lOffset < 0 && Flags == SEEK_SET )
-         {
-            ulPos = (ULONG) INVALID_SET_FILE_POINTER;
-            hb_fsSetError( 25 ); /* 'Seek Error' */
-         }
-         else
-         {
-            ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
-            hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
-         }
-
-         if ( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
-         {
-            ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
-         }
-
-         HB_DISABLE_ASYN_CANC
-      #else
-         // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
-
-         /* This DOS hack creates 2GB file size limit, Druzus */
-         if( lOffset < 0 && Flags == SEEK_SET )
-         {
-            ulPos = (ULONG) -1;
-            hb_fsSetError( 25 ); /* 'Seek Error' */
-         }
-         else
-         {
-            ulPos = lseek( hFileHandle, lOffset, Flags );
-            hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
-         }
-
+      if ( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
+      {
+         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
+      }
+   #else
+      /* This DOS hack creates 2GB file size limit, Druzus */
+      if( lOffset < 0 && Flags == SEEK_SET )
+      {
+         ulPos = (ULONG) -1;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ulPos = lseek( hFileHandle, lOffset, Flags );
+         hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
+      }
+      if ( ulPos == (ULONG) -1 )
+      {
+         ulPos = lseek( hFileHandle, 0, SEEK_CUR );
          if ( ulPos == (ULONG) -1 )
          {
-            ulPos = lseek( hFileHandle, 0, SEEK_CUR );
-            if ( ulPos == (ULONG) -1 )
-            {
-               ulPos = 0;
-            }
+            ulPos = 0;
          }
-
-         HB_DISABLE_ASYN_CANC
-      #endif
-
-   #else
-      /* BUG - 25 can be translated to other value */
-      hb_fsSetError( 25 );
-      ulPos = 0;
+      }
    #endif
+}
+#else
+   hb_fsSetError( 25 );
+   ulPos = 0;
+#endif
 
+   HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
    return ulPos;
@@ -2269,7 +2234,6 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
 #elif defined(HB_FS_FILE_IO)
 
-   errno = 0;
    bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
    hb_fsSetIOError( bResult, 0 );
 
@@ -2534,7 +2498,6 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
       int dup_handle;
       BOOL fResult = FALSE;
 
-      errno = 0;
       dup_handle = dup( hFileHandle );
       if( dup_handle != -1 )
       {
@@ -2610,7 +2573,6 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
-   errno = 0;
    bResult = ( chdir( ( char * ) pDirname ) == 0 );
    hb_fsSetIOError( bResult, 0 );
 
@@ -2644,7 +2606,6 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
-   errno = 0;
    bResult = ( rmdir( ( char * ) pDirname ) == 0 );
    hb_fsSetIOError( bResult, 0 );
 
@@ -2766,7 +2727,6 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
    HB_STACK_UNLOCK
 
  #if defined( __WATCOMC__ )
-
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $
+ * $Id: hbffind.c,v 1.24 2004/04/05 14:36:20 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.24 2004/04/05 14:36:20 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -70,7 +70,6 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $" )
 #if defined(HB_OS_DOS)
 
    #if defined(__DJGPP__) || defined(__RSX32__)
-      #include <errno.h>
       #include <sys/param.h>
    #endif
 
@@ -129,8 +128,6 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $" )
 
 #elif defined(HB_OS_WIN_32)
 
-   #include <errno.h>
-
    typedef struct
    {
       HANDLE          hFindFile;
@@ -147,7 +144,6 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $" )
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
-   #include <errno.h>
    #include <dirent.h>
    #include <time.h>
    #include <fnmatch.h>
@@ -647,7 +643,6 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       tzset();
 
-      errno = 0;
       #if !defined(__WATCOMC__)
           bFound = ( findfirst( pszFileName, &info->entry, ( USHORT ) hb_fsAttrToRaw( uiAttr ) ) == 0 );
       #else
@@ -682,7 +677,6 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
     ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
     info = ( PHB_FFIND_INFO ) ffind->info;
 
-    errno = 0;
     if ( uiAttr == HB_FA_LABEL )
     {
       DWORD dwSysFlags;
@@ -872,7 +866,6 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
    }
 #elif defined(HB_OS_WIN_32)
    {
-      errno = 0 ;
       bFound = FALSE;
       if( FindNextFile( info->hFindFile, &info->pFindFileData ) )
       {

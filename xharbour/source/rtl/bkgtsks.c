@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.14 2004/04/05 19:40:32 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.15 2004/04/05 20:29:02 fsgiudice Exp $
  */
 
 /*
@@ -348,7 +348,6 @@ PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID )
 /* Set task as active */
 BOOL hb_backgroundActive( ULONG ulID, BOOL bActive )
 {
-   HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
    BOOL bOldState = FALSE;
 
@@ -366,7 +365,6 @@ BOOL hb_backgroundActive( ULONG ulID, BOOL bActive )
 /* Set task time */
 int hb_backgroundTime( ULONG ulID, int nMillisec )
 {
-   HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
    int nOldState = 0;
 

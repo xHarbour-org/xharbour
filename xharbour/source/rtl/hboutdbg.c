@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: hboutdbg.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -96,11 +96,13 @@ static void debugInit( void )
       pFileName = hb_fsFNameSplit( szDebugName );
    }
 
-   errno = 0;
    iFifoResult = mkfifo( szDebugName, 0666 );
-   if ( iFifoResult == 0 || errno == EEXIST )
+   if ( iFifoResult == -1 )
    {
       iFifoResult = errno;
+   }   
+   if ( iFifoResult == 0 || iFifoResult == EEXIST )
+   {
       if ( strlen( pFileName->szName ) > 20 )
       {
          pFileName->szName[20] = 0;

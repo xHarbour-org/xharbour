@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.9 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: fstemp.c,v 1.10 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -58,8 +58,6 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#include <errno.h>
-
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
 #if !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
 
@@ -86,8 +84,6 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 {
    USHORT nAttemptLeft = 999;
 
-   errno = 0;
-
    while( --nAttemptLeft )
    {
       if( hb_fsTempName( pszName, pszDir, pszPrefix ) )
@@ -110,7 +106,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       }
    }
 
-   hb_fsSetError( (USHORT) FS_ERROR );
+   hb_fsSetIOError( FALSE, 0 );
    return FS_ERROR;
 }
 #else

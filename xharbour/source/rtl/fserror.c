@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.4 2004/04/05 19:33:31 andijahja Exp $
+ * $Id: fserror.c,v 1.5 2004/04/05 22:25:43 andijahja Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ static int hb_errnoToDosError( int ErrCode )
          iResult = 4;   /* Too many open files */
          break;
       case EACCES:
-#ifdef ETXTBSY
+#if defined( ETXTBSY )
       case ETXTBSY:
 #endif
          iResult = 5;   /* Access denied */

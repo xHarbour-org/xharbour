@@ -1,5 +1,5 @@
 /*
- * $Id: fssize.c,v 1.3 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: fssize.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#include <errno.h>
 #if defined( OS_UNIX_COMPATIBLE )
    #include <sys/types.h>
    #include <sys/stat.h>
@@ -65,16 +64,15 @@
 
 ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 {
+   ULONG ulRet = 0;
+
    if( bUseDirEntry )
    {
       struct stat statbuf;
 
       if( stat( ( char * ) pszFileName, &statbuf ) == 0 )
       {
-         errno = 0;
-
-         hb_fsSetError( 0 );
-         return ( ULONG ) statbuf.st_size;
+         ulRet = ( ULONG ) statbuf.st_size;
       }
    }
    else
@@ -83,20 +81,12 @@ ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 
       if( hFileHandle != FS_ERROR )
       {
-         ULONG ulPos;
-
-         ulPos = hb_fsSeek( hFileHandle, 0, SEEK_END );
+         ulRet = hb_fsSeek( hFileHandle, 0, SEEK_END );
          hb_fsClose( hFileHandle );
-
-         errno = 0;
-
-         hb_fsSetError( 0 );
-         return ulPos;
       }
    }
 
-   hb_fsSetError( (USHORT) FS_ERROR );
-   return 0;
+   return ulRet;
 }
 
 #ifdef HB_EXTENSION

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.21 2004/03/19 21:25:33 ronpinkas Exp $
+ * $Id: files.c,v 1.22 2004/04/05 10:03:18 andijahja Exp $
  */
 
 /*
@@ -138,7 +138,7 @@
    #define FA_VOLCOMP      32768   /* M */
 #endif
 
-#if 0
+#if defined( OS_UNIX_COMPATIBLE )
 static USHORT osToHarbourMask(  USHORT usMask  )
 {
    USHORT usRetMask;
