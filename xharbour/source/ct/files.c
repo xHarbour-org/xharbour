@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.4 2004/11/21 21:43:46 druzus Exp $
+ * $Id: files.c,v 1.5 2004/12/15 13:39:34 druzus Exp $
  */
 
 /*
@@ -941,7 +941,7 @@ HB_FUNC( SETFDATI )
             return;
          }
       }
-#elif defined( OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ ) || defined(HB_OS_OS2)
       {
          struct utimbuf buf;
          struct tm new_value;

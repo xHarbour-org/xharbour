@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3679 2004/12/17 10:58:10 aleytys Exp $
+ * $Id: ChangeLog,v 1.3680 2004/12/17 13:15:37 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+
+2004-12-17 17:32 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/ct/files.c
+     ! SetFDaTi() on OS/2, it needed a " || defined(HB_OS_OS2) "
 
 2004-12-17 14:14 UTC+0100 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/vm/hash.c
