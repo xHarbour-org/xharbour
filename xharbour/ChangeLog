@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2058 2004/01/14 22:34:04 andijahja Exp $
+ * $Id: ChangeLog,v 1.2059 2004/01/14 23:02:01 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-15 13:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - redo hb_stack with HB_VM_STACK overwritten
+     - remove
+        WVT_SETCLOSEEVENT(nEventNumber)
+        WVT_SETSHUTDOWNEVENT(nEventNumber)
+        Use new xHarbour wide functions
+  * /include/hbgtwvt.h
+     - remove redundant shutdownEvent & closeEvent defines and variables
 
 2004-01-14 23:53 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapigt.h

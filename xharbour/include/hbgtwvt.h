@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.12 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbgtwvt.h,v 1.11 2004/01/12 13:59:52 andijahja Exp $
  */
 
 /*
@@ -157,8 +157,8 @@ typedef struct global_data
   int       fontWeight;                // Bold level
   int       fontQuality;
   char      fontFace[ LF_FACESIZE ];   // requested font face name LF_FACESIZE #defined in wingdi.h
-  int       closeEvent;                // command to return ( in ReadKey ) on close
-  int       shutdownEvent;             // command to return ( in ReadKey ) on shutdown
+//  int       closeEvent;                // command to return ( in ReadKey ) on close
+//  int       shutdownEvent;             // command to return ( in ReadKey ) on shutdown
   int       LastMenuEvent;             // Last menu item selected
   int       MenuKeyEvent;              // User definable event number for windows menu command
   BOOL      CentreWindow;              // True if window is to be Reset into centre of window
@@ -167,16 +167,16 @@ typedef struct global_data
   BOOL      AltF4Close;                // Can use Alt+F4 to close application
   BOOL      InvalidateWindow;          // Flag for controlling whether to use ScrollWindowEx()
   BOOL      EnableShortCuts;           // Determines whether ALT key enables menu or system menu
-  HPEN      penWhite;                  // White pen to draw GDI elements 
+  HPEN      penWhite;                  // White pen to draw GDI elements
   HPEN      penBlack;                  // Black pen to draw GDI elements
   HPEN      penWhiteDim;               // White dim pen to draw GDI elements
   HPEN      penDarkGray;               // Dark gray pen to draw GDI elements
-  HPEN      currentPen;                // Handle to current pen settable at runtime 
+  HPEN      currentPen;                // Handle to current pen settable at runtime
   HBRUSH    currentBrush;              // Handle to current brush settable by runtime
   HDC       hdc;                       // Handle to Windows Device Context
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
-  PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function  
+  PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
 } GLOBAL_DATA;
 
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );
@@ -189,8 +189,8 @@ DWORD  HB_EXPORT hb_wvt_gtSetWindowIcon( int icon );
 DWORD  HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon );
 int    HB_EXPORT hb_wvt_gtGetWindowTitle( char *title, int length );
 BOOL   HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold, int Quality );
-void   HB_EXPORT hb_wvt_gtSetCloseEvent( int iEvent );
-void   HB_EXPORT hb_wvt_gtSetShutdownEvent( int iEvent );
+//void   HB_EXPORT hb_wvt_gtSetCloseEvent( int iEvent );
+//void   HB_EXPORT hb_wvt_gtSetShutdownEvent( int iEvent );
 HWND   HB_EXPORT hb_wvt_gtGetWindowHandle( void );
 void   HB_EXPORT hb_wvt_gtPostMessage( int message );
 BOOL   HB_EXPORT hb_wvt_gtSetWindowPos( int left, int top );
