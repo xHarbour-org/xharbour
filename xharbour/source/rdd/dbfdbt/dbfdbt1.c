@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.2 2003/09/09 09:47:16 paultucker Exp $
+ * $Id: dbfdbt1.c,v 1.3 2003/09/15 16:39:26 druzus Exp $
  */
 
 /*
@@ -556,7 +556,7 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    BOOL bDeleted;
    PHB_ITEM pError;
-   ERRCODE uiError = SUCCESS, uiErrorG;
+   ERRCODE uiError, uiErrorG;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.51 2003/09/08 12:56:52 druzus Exp $
+ * $Id: dbcmd.c,v 1.52 2003/09/15 16:39:26 druzus Exp $
  */
 
 /*
@@ -2179,15 +2179,6 @@ HB_FUNC( __DBSETFOUND )
    }
 }
 
-HB_FUNC( DBSKIP )
-{
-   HB_THREAD_STUB
-   if( s_pCurrArea )
-      SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
-   else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
-}
-
 HB_FUNC( DBSETFILTER )
 {
    HB_THREAD_STUB
@@ -2212,6 +2203,15 @@ HB_FUNC( DBSETFILTER )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSETFILTER" );
+}
+
+HB_FUNC( DBSKIP )
+{
+   HB_THREAD_STUB
+   if( s_pCurrArea )
+      SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
 }
 
 HB_FUNC( DBSTRUCT )
@@ -2504,6 +2504,30 @@ HB_FUNC( FCOUNT )
    hb_retni( uiFields );
 }
 
+HB_FUNC( FIELDDEC )
+{
+   HB_THREAD_STUB
+
+   if( s_pCurrArea )
+   {
+      USHORT uiIndex;
+
+      if( ( uiIndex = hb_parni( 1 ) ) > 0 )
+      {
+         PHB_ITEM pItem = hb_itemNew( NULL );
+
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_DEC, pItem ) == SUCCESS)
+         {
+            hb_itemRelease( hb_itemReturn( pItem ) );
+            return;
+         }
+         hb_itemRelease( pItem );
+      }
+   }
+
+   hb_retni(0);
+}
+
 HB_FUNC( FIELDGET )
 {
    HB_THREAD_STUB
@@ -2521,6 +2545,30 @@ HB_FUNC( FIELDGET )
    }
 
    hb_itemRelease( hb_itemReturn( pItem ) );
+}
+
+HB_FUNC( FIELDLEN )
+{
+   HB_THREAD_STUB
+
+   if( s_pCurrArea )
+   {
+      USHORT uiIndex;
+
+      if( ( uiIndex = hb_parni( 1 ) ) > 0 )
+      {
+         PHB_ITEM pItem = hb_itemNew( NULL );
+
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_LEN, pItem ) == SUCCESS )
+         {
+            hb_itemRelease( hb_itemReturn( pItem ) );
+            return;
+         }
+         hb_itemRelease( pItem );
+      }
+   }
+
+   hb_retni(0);
 }
 
 HB_FUNC( FIELDNAME )
@@ -2576,16 +2624,12 @@ HB_FUNC( FIELDPOS )
          hb_retni( hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName ) );
 
          hb_xfree( szName );
-      }
-      else
-      {
-         hb_retni( 0 );
+
+         return;
       }
    }
-   else
-   {
-      hb_retni( 0 );
-   }
+
+   hb_retni( 0 );
 }
 
 HB_FUNC( FIELDPUT )
@@ -2604,6 +2648,30 @@ HB_FUNC( FIELDPUT )
          hb_itemReturn( pItem );
       }
    }
+}
+
+HB_FUNC( FIELDTYPE )
+{
+   HB_THREAD_STUB
+
+   if( s_pCurrArea )
+   {
+      USHORT uiIndex;
+
+      if( ( uiIndex = hb_parni( 1 ) ) > 0 )
+      {
+         PHB_ITEM pItem = hb_itemNew( NULL );
+
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_TYPE, pItem ) == SUCCESS )
+         {
+            hb_itemRelease( hb_itemReturn( pItem ) );
+            return;
+         }
+         hb_itemRelease( pItem );
+      }
+   }
+
+   hb_retc("");
 }
 
 HB_FUNC( FLOCK )
@@ -2674,6 +2742,7 @@ HB_FUNC( LASTREC )
 
    if( s_pCurrArea )
       SELF_RECCOUNT( ( AREAP ) s_pCurrArea->pArea, &ulRecCount );
+
    hb_retnl( ulRecCount );
 }
 
@@ -3318,12 +3387,7 @@ HB_FUNC( RDDREGISTER )
 /* Same as LASTREC() */
 HB_FUNC( RECCOUNT )
 {
-   HB_THREAD_STUB
-   ULONG ulRecCount = 0;
-
-   if( s_pCurrArea )
-      SELF_RECCOUNT( ( AREAP ) s_pCurrArea->pArea, &ulRecCount );
-   hb_retnl( ulRecCount );
+   HB_FUNCNAME( LASTREC )();
 }
 
 HB_FUNC( RECNO )
@@ -3474,8 +3538,9 @@ HB_FUNC( RDDSETDEFAULT )
 HB_FUNC( DBSETDRIVER )
 {
    HB_THREAD_STUB
+
    USHORT uiLen;
-   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1];
+   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
 
    hb_rddCheck();
    hb_retc( s_szDefDriver );
@@ -3906,8 +3971,10 @@ HB_FUNC( DBFIELDINFO )
          }
          else
             bDeleteItem = FALSE;
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, hb_itemGetNI( pType ), pInfo );
          hb_itemReturn( pInfo );
+
          if( bDeleteItem )
             hb_itemRelease( pInfo );
          return;
@@ -3927,7 +3994,7 @@ HB_FUNC( DBRECORDINFO )
    if( s_pCurrArea )
    {
       pType = hb_param( 1 , HB_IT_NUMERIC );
-      pRecNo = hb_param( 2 , HB_IT_NUMERIC );
+     pRecNo = hb_param( 2 , HB_IT_NUMERIC );
       if( pType )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
@@ -4314,7 +4381,7 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
 {
   HB_THREAD_STUB
 
-  USHORT   i, f=1;
+  USHORT   i,f;
   PHB_ITEM fieldValue;
 
   fieldValue = hb_itemNew( NULL );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.1 2003/04/14 16:09:13 lculik Exp $
+ * $Id: dbftools.c,v 1.1 2003/08/10 21:52:01 druzus Exp $
  */
 
 /*
@@ -54,6 +54,49 @@
 #include "hbapirdd.h"
 
 extern HB_FUNC( FIELDPOS );
+extern HB_FUNC( FIELDLEN );
+extern HB_FUNC( FIELDDEC );
+
+HB_FUNC( FIELDSIZE )
+{
+   HB_FUNCNAME( FIELDLEN )();
+}
+
+HB_FUNC( FIELDDECI )
+{
+   HB_FUNCNAME( FIELDDEC )();
+}
+
+HB_FUNC( FIELDNUM )
+{
+   HB_FUNCNAME( FIELDPOS )();
+}
+
+HB_FUNC( DBFSIZE )
+{
+   ULONG ulSize = 0;
+   AREAP pArea;
+
+   if( (pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer()) != NULL )
+   {
+      PHB_ITEM pSize = hb_itemNew( NULL );
+      ULONG ulRecSize, ulRecCount;
+
+      SELF_INFO( pArea, DBI_GETHEADERSIZE, pSize );
+      ulSize = hb_itemGetNL( pSize ) + 1;
+      SELF_INFO( pArea, DBI_GETRECSIZE, pSize );
+      ulRecSize = hb_itemGetNL( pSize );
+      SELF_RECCOUNT( pArea, &ulRecCount );
+      ulSize += ulRecCount * ulRecSize;
+      hb_itemRelease( pSize );
+   }
+
+   hb_retnl( ulSize );
+}
+
+/*
+ These are now part of xHarbour rdd, or aren't needed
+ pt
 
 static LPFIELD _hb_get_field( void )
 {
@@ -132,29 +175,5 @@ HB_FUNC( FIELDDECI )
    hb_retni( uiDec );
 }
 
-HB_FUNC( FIELDNUM )
-{
-   HB_FUNCNAME( FIELDPOS )();
-}
+*/
 
-HB_FUNC( DBFSIZE )
-{
-   ULONG ulSize = 0;
-   AREAP pArea;
-
-   if( (pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer()) != NULL )
-   {
-      PHB_ITEM pSize = hb_itemNew( NULL );
-      ULONG ulRecSize, ulRecCount;
-
-      SELF_INFO( pArea, DBI_GETHEADERSIZE, pSize );
-      ulSize = hb_itemGetNL( pSize ) + 1;
-      SELF_INFO( pArea, DBI_GETRECSIZE, pSize );
-      ulRecSize = hb_itemGetNL( pSize );
-      SELF_RECCOUNT( pArea, &ulRecCount );
-      ulSize += ulRecCount * ulRecSize;
-      hb_itemRelease( pSize );
-   }
-
-   hb_retnl( ulSize );
-}

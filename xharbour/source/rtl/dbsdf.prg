@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.5 2003/01/06 20:56:37 mlombardo Exp $
+ * $Id: dbsdf.prg,v 1.6 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -55,12 +55,12 @@
 #include "fileio.ch"
 #include "error.ch"
 
-#define AppendEOL( handle ) FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
-#define AppendEOF( handle ) FWRITE( handle, CHR( 26 ) )
+#define AppendEOL( handle ) FWrite( handle, CHR( 13 ) + CHR( 10 ) )
+#define AppendEOF( handle ) FWrite( handle, CHR( 26 ) )
 #define SkipEOL( handle ) FSEEK( handle, 2, FS_RELATIVE )
 
 PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
-   LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, aStruct, cField
+   LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, cField
    LOCAL lLineEnd
 
    // Process the file name argument.
@@ -71,12 +71,12 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
       .OR. RAT( "\", cFileName ) > index
          // No, the file extension is in a directory name.
          index := 0
-      END IF
-   END IF
+      ENDIF
+   ENDIF
    IF index <= 0
       // No file name extension, so provide the default.
       cFileName += ".txt"
-   END IF
+   ENDIF
 
    // Determine where to start and how many records to process.
    IF nRecord != NIL
@@ -95,17 +95,17 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
       // Followed by the FOR clause or the ALL clause.
       nStart := 0
       nCount := -1
-   END IF
+   ENDIF
    IF EMPTY( bFor )
       // This simplifies the test that determines whether or not to
       // use (i.e., import or export) any given processed record.
       bFor := {||.T.}
-   END IF
+   ENDIF
 
    IF lExport
       // COPY TO SDF
       handle := FCREATE( cFileName )
-      IF handle == -1
+      IF handle == F_ERROR
          oErr := ErrorNew()
          oErr:severity := ES_ERROR
          oErr:genCode := EG_CREATE
@@ -124,15 +124,15 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                GO TOP
             ELSE
                GO (nStart)
-            END IF
-         END IF
+            ENDIF
+         ENDIF
          IF EMPTY( bWhile )
             // This simplifies the looping logic.
             bWhile := {||.T.}
-         END IF
+         ENDIF
          // Process the records to copy SDF.
          WHILE EVAL( bWhile ) .AND. ( nCount == -1 .OR. nCount > 0 ) ;
-         .AND. !BOF() .AND. !EOF()
+          .AND. !BOF() .AND. !EOF()
             IF EVAL( bFor )
                IF EMPTY( aFields )
                   // Process all fields.
@@ -142,24 +142,24 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                ELSE
                   // Process the specified fields.
                   FOR EACH cField IN aFields
-                     ExportFixed( handle, FIELDGET( FIELDPOS( cField ) ) )
+                     ExportFixed( handle, FIELDGET( FieldPos( cField ) ) )
                   NEXT
-               END IF
+               ENDIF
                // Set up for the start of the next record.
                AppendEOL( handle )
-            END IF
+            ENDIF
             IF nCount != -1
                nCount--
-            END IF
+            ENDIF
             SKIP
          END WHILE
          AppendEOF( handle )
-         FCLOSE( handle )
-      END IF
+         FClose( handle )
+      ENDIF
    ELSE
       // APPEND FROM SDF
       handle := FOPEN( cFileName )
-      IF handle == -1
+      IF handle == F_ERROR
          oErr := ErrorNew()
          oErr:severity := ES_ERROR
          oErr:genCode := EG_OPEN
@@ -175,91 +175,88 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
          IF EMPTY( bWhile )
             // This simplifies the looping logic.
             bWhile := {||.T.}
-         END IF
+         ENDIF
          nFileLen := FSEEK( handle,0,FS_END )
          FSEEK( handle,0 )
-         aStruct := DBSTRUCT()
          WHILE FSEEK( handle,0,FS_RELATIVE ) + 1 < nFileLen
             APPEND BLANK
             lLineEnd := .F.
             IF EMPTY( aFields )
                // Process all fields.
                FOR index := 1 TO FCOUNT()
-                  FieldPut( index,ImportFixed( handle,index,aStruct,@lLineEnd ) )
+                  if ! FieldType( index ) == "M"
+                     FieldPut( index, ImportFixed( handle, index, @lLineEnd ) )
+                  Endif
                   IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
                      EXIT
-                  END IF
+                  ENDIF
                NEXT index
             ELSE
                // Process the specified fields.
                FOR EACH cField IN aFields
-                  FieldPut( FIELDPOS( cField ), ImportFixed( handle, FIELDPOS( cField ), aStruct,@lLineEnd ) )
+                  if ! FieldType( index := FieldPos( cField ) ) == "M"
+                     FieldPut( index, ImportFixed( handle, index, @lLineEnd ) )
+                  endif
                   IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
                      EXIT
-                  END IF
+                  ENDIF
                NEXT
-            END IF
+            ENDIF
             // Set up for the start of the next record.
             SkipEOL( handle )
-         END WHILE
-         FCLOSE( handle )
-      END IF
-   END IF
-RETURN
+         ENDDO
+         FClose( handle )
+      ENDIF
+   ENDIF
+Return
 
 STATIC FUNCTION ExportFixed( handle, xField )
    SWITCH VALTYPE( xField )
       CASE "C"
-         FWRITE( handle, xField )
+         FWrite( handle, xField )
          EXIT
       CASE "D"
-         FWRITE( handle, DTOS( xField ) )
+         FWrite( handle, DTOS( xField ) )
          EXIT
       CASE "L"
-         FWRITE( handle, iif( xField, "T", "F" ) )
+         FWrite( handle, iif( xField, "T", "F" ) )
          EXIT
       CASE "N"
-         FWRITE( handle, STR( xField ) )
+         FWrite( handle, STR( xField ) )
          EXIT
       DEFAULT
-         RETURN .F.
+         Return .F.
    END
-RETURN .T.
+Return .T.
 
-STATIC FUNCTION ImportFixed( handle, index, aStruct, lLineEnd )
-   LOCAL cBuffer, nCR, nBytes
+STATIC FUNCTION ImportFixed( handle, index, lLineEnd )
+   LOCAL cBuffer, nCR, nBytes, cType
 
-   cBuffer := Space(aStruct[ index,3 ])
-   nBytes  := FREAD( handle, @cBuffer, aStruct[ index,3 ])
+   if ! Empty( cType := FieldType( index ) )
 
-   nCR   := at( CHR(13), cBuffer )
+      cBuffer := Space( nCr := FieldLen( index ) )
+      nBytes  := FRead( handle, @cBuffer, nCr )
+      nCR     := at( CHR(13), cBuffer )
 
-   IF nCR > 0
-      cBuffer  := SubStr( cBuffer, 1, nCR - 1 )
-      lLineEnd := .T.
-      FSEEK( handle, (nBytes - nCR +1) * -1, FS_RELATIVE )
-   ELSE
-      lLineEnd := .F.
-   END IF
-   
-   SWITCH aStruct[ index,2 ]
-      CASE "N"
-         RETURN VAL( cBuffer )
-      CASE "C"
-         RETURN cBuffer
-      CASE "D"
-         RETURN HB_STOD( cBuffer )
-      CASE "L"
-         RETURN iif( cBuffer == "T",.T.,.F. )
-      DEFAULT
-         IF aStruct[ index, 2 ] == "DOUBLE" .OR.;
-            aStruct[ index, 2 ] == "INTEGER" .OR.;
-            aStruct[ index, 2 ] == "CURDOUBLE" .OR.;
-            aStruct[ index, 2 ] == "AUTOINC"
+      IF ( lLineEnd := (nCR > 0) )
+         cBuffer  := SubStr( cBuffer, 1, nCR - 1 )
+         FSEEK( handle, (nBytes - nCR +1) * -1, FS_RELATIVE )
+      ENDIF
+      
+      Do Case // don't switch()
+         CASE cType == "C"                     /* default return */
+         CASE cType == "N" .or. ;
+              cType == "DOUBLE" .or. ;         /* ADS ADT extensions */
+              cType == "INTEGER" .or. ;
+              cType == "SHORTINT" .or. ;
+              cType == "CURDOUBLE" .or. ;
+              cType == "AUTOINC"
+            Return VAL( cBuffer )
+         CASE "D"
+            Return HB_STOD( cBuffer )
+         CASE "L"
+            Return cBuffer == "T"
+      ENDCASE
+   ENDIF
 
-            RETURN VAL( cBuffer )
-         ENDIF
-   END
-
-RETURN cBuffer
-
+Return cBuffer

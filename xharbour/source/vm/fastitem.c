@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.49 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.50 2003/09/10 06:07:32 ronpinkas Exp $
  */
 
 /*
@@ -64,8 +64,11 @@
 #include "hbset.h"
 
 extern char *hb_vm_sNull;
-
 extern char *hb_vm_acAscii[256];
+
+#ifdef HB_EXTERN_C
+extern "C" {
+#endif
 
 /* Forward decalarations. */
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
@@ -838,3 +841,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
 
    return 0;
 }
+
+#ifdef HB_EXTERN_C
+}
+#endif

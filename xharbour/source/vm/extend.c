@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.26 2003/07/15 00:57:04 jonnymind Exp $
+ * $Id: extend.c,v 1.27 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -82,6 +82,10 @@
 
 /* NOTE: iParam = -1 can be used to access the return value. */
 /* NOTE: iParam = 0 can be used to access the SELF object. */
+
+#ifdef HB_EXTERN_C
+extern "C" {
+#endif
 
 PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
 {
@@ -1125,5 +1129,9 @@ void HB_EXPORT hb_retnlllen( LONGLONG llNumber, int iWidth)
    HB_TRACE(HB_TR_DEBUG, ("hb_retnlllen(%Li, %d)", llNumber, iWidth));
 
    hb_itemPutNLLLen( &(HB_VM_STACK.Return), llNumber, iWidth);
+}
+#endif
+
+#ifdef HB_EXTERN_C
 }
 #endif

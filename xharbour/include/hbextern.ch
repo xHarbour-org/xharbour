@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.8 2003/06/19 02:44:49 druzus Exp $
+ * $Id: hbextern.ch,v 1.9 2003/06/19 22:39:02 druzus Exp $
  */
 
 /*
@@ -166,6 +166,9 @@ EXTERNAL FIELDGET
 EXTERNAL FIELDNAME
 EXTERNAL FIELDPOS
 EXTERNAL FIELDPUT
+EXTERNAL FIELDLEN   /* harbour extension */
+EXTERNAL FIELDDEC   /* harbour extension */
+EXTERNAL FIELDTYPE  /* harbour extension */
 EXTERNAL FIELDWBLOCK
 EXTERNAL FILE
 EXTERNAL FKLABEL

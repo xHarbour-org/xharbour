@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.45 2003/10/01 05:56:30 ronpinkas Exp $
+ * $Id: estack.c,v 1.46 2003/10/01 06:13:22 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,10 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapierr.h"
+
+#ifdef HB_EXTERN_C
+extern "C" {
+#endif
 
 /* ------------------------------- */
 
@@ -539,5 +543,9 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
    }
 
    return XCPT_CONTINUE_SEARCH;          /* Exception not resolved... */
+}
+#endif
+
+#ifdef HB_EXTERN_C
 }
 #endif
