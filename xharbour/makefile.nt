@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.36 2003/06/24 04:34:38 ronpinkas Exp $
+# $Id: makefile.nt,v 1.37 2003/06/24 18:10:45 paultucker Exp $
 #
 
 #
@@ -360,12 +360,12 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
+   $(OBJ_DIR)$(MT)\hbchecksum.obj \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
-   $(OBJ_DIR)$(MT)\hbchecksum.obj \
-   $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
+   $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.59 2003/06/24 08:37:21 andijahja Exp $
+# $Id: makefile.vc,v 1.60 2003/06/24 18:10:45 paultucker Exp $
 #
 
 #
@@ -324,12 +324,12 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
+   $(OBJ_DIR)$(MT)\hbchecksum.obj \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
-   $(OBJ_DIR)$(MT)\hbchecksum.obj \
-   $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
+   $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
@@ -526,7 +526,7 @@ LANG_LIB_OBJS = \
 # CODEPAGE.LIB rules
 #
 
-{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj::
+{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 CODEPAGE_LIB_OBJS = \
@@ -801,7 +801,7 @@ GTDOS_LIB_OBJS = \
 # GTNUL.LIB rules
 #
 
-{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
+{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTNUL_LIB_OBJS = \
