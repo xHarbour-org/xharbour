@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.56 2004/09/30 14:16:29 mlombardo Exp $
+# $Id: Makefile,v 1.57 2004/10/22 12:15:26 paultucker Exp $
 #
 
 ROOT = ../../
@@ -55,6 +55,7 @@ C_SOURCES=\
         hbchksum.c   \
         hbcrc32.c    \
         hbcrypt.c    \
+        hbmd5.c      \
         hboutdbg.c   \
         hbhex2n.c    \
         hbserv.c     \
