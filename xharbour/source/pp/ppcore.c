@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.53 2003/04/03 17:49:21 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.54 2003/04/05 20:00:52 ronpinkas Exp $
  */
 
 /*
@@ -914,7 +914,7 @@ DEFINES * hb_pp_AddDefine( char * defname, char * value )
   {
      char *pTmp;
 
-     stdef->value = hb_xgrab( strlen( value ) + 1 );
+     stdef->value = ( char *) hb_xgrab( strlen( value ) + 1 );
 
      pTmp = stdef->value;
 
