@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.4 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: win32prn.prg,v 1.5 2005/01/19 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -747,7 +747,7 @@ HB_FUNC_STATIC( CREATEFONT )
   int iWeight = (int) hb_parnl(6) ;
   DWORD dwUnderLine = (DWORD) hb_parl(7) ;
   DWORD dwItalic    = (DWORD) hb_parl(8) ;
-  DWORD dwCharSet   = (DWORD) hb_parl(9) ;
+  DWORD dwCharSet   = (DWORD) hb_parnl(9) ;
   iWeight = iWeight > 0 ? iWeight : FW_NORMAL ;
   iHeight = -MulDiv(iHeight, GetDeviceCaps(hDC, LOGPIXELSY), 72);
   if (iDiv )
