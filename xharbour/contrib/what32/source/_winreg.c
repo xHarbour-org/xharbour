@@ -115,7 +115,7 @@ HB_FUNC( REGQUERYVALUEEX )
    if ( lError == ERROR_SUCCESS )
    {
       BYTE *lpData;
-      lpData=malloc( ( int ) lpcbData+1 );
+      lpData=(BYTE*)malloc( ( int ) lpcbData+1 );
       lError= RegQueryValueExA( ( HKEY ) hb_parnl( 1 ) , ( LPTSTR ) hb_parc( 2 ) , NULL , &lpType , ( BYTE* ) lpData , &lpcbData );
 
       if ( lError > 0 )
@@ -124,7 +124,7 @@ HB_FUNC( REGQUERYVALUEEX )
       }
       else
       {
-         hb_storc( ( LPBYTE ) lpData , 5 );
+         hb_storc( ( char *)lpData , 5 );
          hb_retnl( 0 );
       }
 

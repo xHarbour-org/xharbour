@@ -94,7 +94,7 @@ HB_FUNC( GETKEYBOARDSTATE )
    BYTE lpKeyState[256] ;
    
    if ( GetKeyboardState( lpKeyState ))
-     hb_retclen( lpKeyState, 256 ) ;  
+     hb_retclen( ( char *) lpKeyState, 256 ) ;  
 }
 
 

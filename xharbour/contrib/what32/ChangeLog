@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.36 2002/10/17 21:31:06 andy_wos Exp $
+ * $Id: ChangeLog,v 1.37 2002/10/21 01:04:08 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-02 18:00 UTC -0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/wincore.prg
+   * source/_winbmp.C
+   * source/_winclpb.C
+   * source/_windraw.C
+   * source/_wingdi.C
+   * source/_wininet.C
+   * source/_winkbrd.C
+   * source/_winmeta.C
+   * source/_winmisc.C
+   * source/_winmsg.C
+   * source/_winreg.C
+   * source/_winrgn.C
+   * source/_winsock.C
+   * source/_wintree.C
+   + makefile.vc
+   + makefile.nt
+   + make_vc.bat
+     ! changes to allow compilation by MSVC.
+   NOTE - I have no idea at this point if the .lib is useable.
 
 2002-10-21 02:47 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    + include\classex.ch

@@ -276,7 +276,7 @@ HB_FUNC( GETWINMETAFILEBITS )
                                  hb_parni( 2 )               ,
                                  (HDC) hb_parnl( 3 )
                                  ) )
-           hb_retclen( Buffer, nBytes );
+           hb_retclen( ( char *)Buffer, nBytes );
 
        hb_xfree(Buffer);
 

@@ -34,7 +34,7 @@ HB_FUNC( ACCEPT )
    {
       addr = hb_parc(2);
       addrlen = ISNIL(3) ? hb_parni(3) : hb_parclen(2) ;
-      hb_retnl( (LONG) accept( (SOCKET) hb_parnl(1), addr, &addrlen ) ) ;
+      hb_retnl( (LONG) accept( (SOCKET) hb_parnl(1), ( struct sockaddr *) addr, &addrlen ) ) ;
       hb_storclen( addr, addrlen, 2 );
       hb_storni( addrlen, 3);
    }
@@ -50,7 +50,7 @@ HB_FUNC( BIND )
 {
    char *name = (char *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
 
-   hb_retni(( int ) bind( (SOCKET) hb_parnl(1), name, hb_parni( 3 ) ) ) ;
+   hb_retni(( int ) bind( (SOCKET) hb_parnl(1), ( struct sockaddr *) name, hb_parni( 3 ) ) ) ;
 }
 
 
@@ -72,7 +72,7 @@ HB_FUNC( CONNECT )
 {
    char *name = (char *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
 
-   hb_retni( (int ) connect((SOCKET) hb_parnl( 1 ), name, hb_parni( 3 ) ) ) ;
+   hb_retni( (int ) connect((SOCKET) hb_parnl( 1 ), ( struct sockaddr *) name, hb_parni( 3 ) ) ) ;
 }
 
 
@@ -100,7 +100,7 @@ HB_FUNC( GETPEERNAME )
    char *name  = (char *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
    int addrlen = ISNIL(3) ? hb_parni(3) : hb_parclen(2) ;
 
-   hb_retni( (int ) getpeername((SOCKET) hb_parnl( 1 ), name, &addrlen ) ) ;
+   hb_retni( (int ) getpeername((SOCKET) hb_parnl( 1 ), ( struct sockaddr *) name, &addrlen ) ) ;
    hb_storclen( name, addrlen, 2 );
    hb_storni( addrlen, 3);
 }
@@ -116,7 +116,7 @@ HB_FUNC( GETSOCKNAME )
    char *name  = (char *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
    int addrlen = ISNIL(3) ? hb_parni(3) : hb_parclen(2) ;
 
-   hb_retni( (int ) getsockname((SOCKET) hb_parnl( 1 ), name, &addrlen ) ) ;
+   hb_retni( (int ) getsockname((SOCKET) hb_parnl( 1 ), ( struct sockaddr *) name, &addrlen ) ) ;
    hb_storclen( name, addrlen, 2 );
    hb_storni( addrlen, 3);
 }
@@ -230,7 +230,7 @@ HB_FUNC( RECV )
 
 
 //-----------------------------------------------------------------------------
-//  int  recvfrom( IN SOCKET s, OUT char FAR * buf, IN int len, IN int flags, OUT struct sockaddr FAR * from, IN OUT int FAR * fromlen );
+//  int  recvfrom( IN SOCKET s, OUT char FAR * buf, IN int len, IN int flags, OUT ( struct sockaddr *) from, IN OUT int FAR * fromlen );
 
 // syntax: recvfrom( s, @cBuff, nLen, nFlags [, @cSockAddr] [, @nSockAddrLen] )-> nRecv or nErr
 
@@ -242,11 +242,11 @@ HB_FUNC( RECVFROM )
    int  iAddrLen = (ISNIL(6) ? (ISNIL(5) ? 0 : hb_parclen(5) ) : hb_parni(6));
    int  iRet;
 
-   hb_retni(( int ) recvfrom( (SOCKET) hb_parnl( 1 )            ,
+   hb_retni(( int ) recvfrom( (SOCKET) hb_parnl( 1 )  ,
                               buf         ,
                               iBuffLen,
                               hb_parni( 4 ),
-                              from        ,
+                              ( struct sockaddr *)from  ,
                               &iAddrLen
                              ) ) ;
 
@@ -294,11 +294,11 @@ HB_FUNC( SELECT )
                            ) ) ;
 
     if ( ISCHAR( 2 ) && ISBYREF( 2 ) )
-       hb_storclen( readfds, sizeof(fd_set), 2 );
+       hb_storclen( ( char *) readfds, sizeof(fd_set), 2 );
     if ( ISCHAR( 3 ) && ISBYREF( 3 ) )
-       hb_storclen( writefds, sizeof(fd_set), 3 );
+       hb_storclen( ( char *) writefds, sizeof(fd_set), 3 );
     if ( ISCHAR( 4 ) && ISBYREF( 4 ) )
-       hb_storclen( exceptfds, sizeof(fd_set), 4 );
+       hb_storclen( ( char *) exceptfds, sizeof(fd_set), 4 );
 
  }
 
@@ -352,7 +352,7 @@ HB_FUNC( SETSOCKOPT )
    hb_retni( (int ) setsockopt( (SOCKET) hb_parnl( 1 ) ,
                                  hb_parni( 2 ),
                                  hb_parni( 3 ),
-                                 &optval      ,
+                                 (const char *) &optval      ,
                                  sizeof( optval) //hb_parni( 5 )
                                ) ) ;
 }
@@ -387,7 +387,7 @@ HB_FUNC( GETHOSTBYADDR )
                        hb_parni( 3 )
                      ) ;
 
-   hb_retclen( he, sizeof(HOSTENT) ) ;
+   hb_retclen( ( char *)he, sizeof(HOSTENT) ) ;
 }
 
 
@@ -400,7 +400,7 @@ HB_FUNC( GETHOSTBYNAME )
 
    he = gethostbyname( hb_parc( 1 ) ) ;
 
-   hb_retclen( he, sizeof(HOSTENT) ) ;
+   hb_retclen( ( char *)he, sizeof(HOSTENT) ) ;
 
 }
 
@@ -557,7 +557,7 @@ HB_FUNC( WSACANCELBLOCKINGCALL )
 
 HB_FUNC( WSAASYNCGETSERVBYNAME )
 {
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = ( char *) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetServByName( (HWND)         hb_parnl( 1 ),
@@ -585,7 +585,7 @@ HB_FUNC( WSAASYNCGETSERVBYNAME )
 
 HB_FUNC( WSAASYNCGETSERVBYPORT )
 {
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = (char *) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetServByPort( (HWND) hb_parnl( 1 )        ,
@@ -614,7 +614,7 @@ HB_FUNC( WSAASYNCGETSERVBYPORT )
 
 HB_FUNC( WSAASYNCGETPROTOBYNAME )
 {
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = ( char * ) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetProtoByName( (HWND)         hb_parnl( 1 ),
@@ -642,7 +642,7 @@ HB_FUNC( WSAASYNCGETPROTOBYNAME )
 
 HB_FUNC( WSAASYNCGETPROTOBYNUMBER )
 {
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = ( char *) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetProtoByNumber( (HWND)         hb_parnl( 1 ),
@@ -668,7 +668,7 @@ HB_FUNC( WSAASYNCGETPROTOBYNUMBER )
 
 HB_FUNC( WSAASYNCGETHOSTBYNAME )
 {
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = ( char *) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetHostByName( (HWND) hb_parnl( 1 ),
@@ -697,7 +697,7 @@ HB_FUNC( WSAASYNCGETHOSTBYNAME )
 HB_FUNC( WSAASYNCGETHOSTBYADDR )
 {
 
-   char * buf = hb_xgrab( MAXGETHOSTSTRUCT ) ;
+   char * buf = ( char *) hb_xgrab( MAXGETHOSTSTRUCT ) ;
    HANDLE hRet ;
 
    if( ( hRet = WSAAsyncGetHostByAddr( (HWND)         hb_parnl( 1 ) ,

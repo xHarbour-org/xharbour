@@ -120,7 +120,7 @@ HB_FUNC( CREATEPOLYPOLYGONRGN )
    if (ISARRAY( 1 ) && ISARRAY( 2 ) )
    {
        iPolyCount = hb_parinfa(2,0) ;
-       PolyPoints = hb_xgrab( iPolyCount * sizeof( INT ) ) ;
+       PolyPoints = ( INT *) hb_xgrab( iPolyCount * sizeof( INT ) ) ;
 
        for ( i=0 ; i < iPolyCount ; i++ )
        {

@@ -101,7 +101,7 @@ HB_FUNC( D2BIN )
    Buffer = (BYTE *) hb_xgrab( sizeof(double) );
 
    *( (double *) ( Buffer ) ) = ( double ) hb_parnd( 1 );
-   hb_retclen( Buffer, sizeof(double) );
+   hb_retclen( ( char *)Buffer, sizeof(double) );
    hb_xfree(Buffer);
 }
 
@@ -114,7 +114,7 @@ HB_FUNC( F2BIN )
 
    *( ( float *) ( Buffer ) ) = (float) hb_parnd( 1 );
 
-   hb_retclen( Buffer,sizeof(float) ) ;
+   hb_retclen( ( char *)Buffer,sizeof(float) ) ;
    hb_xfree(Buffer);
    
 }
