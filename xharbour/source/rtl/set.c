@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.20 2003/03/07 11:32:04 jonnymind Exp $
+ * $Id: set.c,v 1.21 2003/03/19 08:50:11 ronpinkas Exp $
  */
 
 /*
@@ -516,6 +516,8 @@ HB_FUNC( SET )
             close_text( hb_set.hb_set_althan );
             if( hb_set.HB_SET_ALTFILE && strlen( hb_set.HB_SET_ALTFILE ) > 0 )
                hb_set.hb_set_althan = open_handle( hb_set.HB_SET_ALTFILE, bFlag, ".txt", HB_SET_ALTFILE );
+            else
+               hb_set.hb_set_althan = FS_ERROR;
          }
          break;
       case HB_SET_AUTOPEN    :
@@ -735,6 +737,8 @@ HB_FUNC( SET )
             close_text( hb_set.hb_set_extrahan );
             if( hb_set.HB_SET_EXTRAFILE && strlen( hb_set.HB_SET_EXTRAFILE ) > 0 )
                hb_set.hb_set_extrahan = open_handle( hb_set.HB_SET_EXTRAFILE, bFlag, ".prn", HB_SET_EXTRAFILE );
+            else
+               hb_set.hb_set_extrahan = FS_ERROR;
          }
          break;
       case HB_SET_FIXED      :
