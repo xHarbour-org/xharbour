@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.87 2004/08/06 09:37:20 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.88 2004/08/09 14:07:49 mauriliolongo Exp $
  */
 
 /*
@@ -116,8 +116,9 @@
 
 CLASS TBrowse
 
-   DATA autoLite              // Logical value to control highlighting
-   DATA cargo                 // User-definable variable
+   DATA autoLite                             // Logical value to control highlighting
+   DATA cargo                                // User-definable variable
+   ACCESS ColCount      INLINE ::nColumns    // Number of TBrowse columns
    DATA goBottomBlock         // Code block executed by TBrowse:goBottom()
    DATA goTopBlock            // Code block executed by TBrowse:goTop()
    DATA hitBottom             // Indicates the end of available data
@@ -128,7 +129,6 @@ CLASS TBrowse
    DATA rowPos                // Current cursor row position
    DATA skipBlock             // Code block used to reposition data source
    DATA stable                // Indicates if the TBrowse object is stable
-   DATA aColumns
 
    /* 06/08/2004 - <maurilio.longo@libero.it>
                    next two DATAs should not be public, at least protected
@@ -150,7 +150,7 @@ CLASS TBrowse
                                      ::aColorSpec := Color2Array( cColor ), ::cColorSpec := cColor ) )
    ACCESS colPos              INLINE ::nColPos
    ASSIGN colPos(nColPos)     INLINE ::nColPos := iif( nColPos == nil, ::nColPos, nColPos ),;
-                                     iif(::nColPos < ::leftVisible .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., NIL)
+                                     iif(::nColPos < ::leftVisible .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., ::Moved())
 
    ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
    ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif(::cBorder=="",0,1)
@@ -193,7 +193,6 @@ CLASS TBrowse
    METHOD GetColumn( nColumn )            // Gets a specific TBColumn object
    METHOD SetColumn( nColumn, oCol )      // Replaces one TBColumn object with another
    METHOD ColWidth( nColumn )             // Returns the display width of a particular column
-   METHOD ColCount() INLINE ::nColumns
    METHOD ColorRect()                     // Alters the color of a rectangular group of cells
    METHOD Configure( nMode )              // Reconfigures the internal settings of the TBrowse object
                                           // nMode is an undocumented parameter in CA-Cl*pper
@@ -351,7 +350,6 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cBorder         := ""
 
    ::aColsInfo       := {}
-   ::AColumns        := {}
    ::nVisWidth       := nRight - nLeft + 1
    ::lConfigured     := .f.
    ::aColorSpec      := {}
@@ -657,7 +655,6 @@ METHOD AddColumn( oCol ) CLASS TBrowse
 
    aadd( ::aColsInfo, ::AColInfo( oCol,.t. ) )
 
-   ::aColumns := ::aColsInfo
    ::nColumns++
 
    if ::nColumns == 1
@@ -686,8 +683,6 @@ METHOD InsColumn( nPos, oCol ) CLASS TBrowse
       else
          aIns( ::aColsInfo, nPos, ::AColInfo( oCol ), .t. )
       endif
-
-      ::aColumns := ::aColsInfo
 
       ::nColumns++
 
@@ -766,7 +761,6 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    ::nColumns--
 
    aDel( ::aColsInfo, nPos, .t. )
-   ::aColumns := ::aColsInfo
 
    if ::nColumns < ::nFrozenCols
       ::nFrozenCols := 0
@@ -1266,11 +1260,8 @@ METHOD HowManyCol() CLASS TBrowse
    LOCAL aColsInfo    := ::aColsInfo
    LOCAL colPos       := ::ncolPos
    LOCAL nToAdd       := 0
-   LOCAL nColsVisible, nColsWidth, n, nColumns
+   LOCAL nColsVisible, nColsWidth, n
    LOCAL nLeftCol, tryLeftVisible, saveColsWidth, oErr
-
-   ::aColumns := ::aColsInfo
-   nColumns   := ::nColumns
 
    // They were locals, so now I need to clear them (should fix this)
    //
@@ -1717,8 +1708,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    // I need to set columns width If TBrowse was never displayed before
    //
    if ::lNeverDisplayed
-      //AEVal(::aColumns, {|oCol| ::SetColumnWidth(oCol)} )
-
       // NOTE: It must be before call to ::SetFrozenCols() since this call
       //       tests this iVar value, and I set it to .F. since I'm going to display TBrowse
       //       for first time

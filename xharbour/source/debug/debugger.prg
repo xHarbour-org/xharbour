@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.47 2004/07/09 19:55:04 likewolf Exp $
+ * $Id: debugger.prg,v 1.48 2004/07/22 17:51:01 likewolf Exp $
  */
 
 /*
@@ -217,7 +217,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
       case nMode == HB_DBG_MODULENAME  // called from hvm.c hb_vmModuleName()
         // add a call to the stack but don't try to show the code yet
         cProcName := ProcName( 1 )
-        
+
         if cProcName == "(_INITSTATICS)"
           //module wide static variable
           AADD( __dbgStatics, { strip_path( uParam1 ), {} } )
@@ -245,9 +245,9 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
           return
         endif
 
-	IF s_lExit
-	  RETURN
-	ENDIF
+   IF s_lExit
+     RETURN
+   ENDIF
 
         if s_oDebugger:lCodeblock
           s_oDebugger:lCodeblock := .F.
@@ -383,7 +383,7 @@ CLASS TDebugger
    METHOD LoadCallStack()
 
    METHOD Local()
-   
+
    METHOD Locate( nMode, cValue )
 
    METHOD MonoDisplay()
@@ -563,7 +563,7 @@ METHOD All() CLASS TDebugger
    ::lShowPublics := ::lShowPrivates := ::lShowStatics := ;
    ::lShowLocals := ::lAll := ! ::lAll
 
-   ::RefreshVars()  
+   ::RefreshVars()
 
 return nil
 
@@ -822,10 +822,10 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
    do case
       case nKey == K_UP .OR. nKey == K_F3
            if ::nCommand > 1
-	      ::oGetListCommand:oGet:Assign()
-	      ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
-	      ::nCommand--
-	      cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+         ::oGetListCommand:oGet:Assign()
+         ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+         ::nCommand--
+         cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
               ::oGetListCommand:oGet:VarPut( cCommand )
               ::oGetListCommand:oGet:Buffer := cCommand
               ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
@@ -834,10 +834,10 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
       case nKey == K_DOWN
            if ::nCommand < Len( ::aLastCommands )
-	      ::oGetListCommand:oGet:Assign()
-	      ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
-	      ::nCommand++
-	      cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+         ::oGetListCommand:oGet:Assign()
+         ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+         ::nCommand++
+         cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
               ::oGetListCommand:oGet:VarPut( cCommand )
               ::oGetListCommand:oGet:Buffer := cCommand
               ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
@@ -851,12 +851,12 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            cCommand := Trim( ::oGetListCommand:oGet:VarGet() )
 
            if ! Empty( cCommand )
-	      IF ( n := AScan( ::aLastCommands, cCommand ) ) > 0 .AND. n < Len( ::aLastCommands )
-	        ADel( ::aLastCommands, n, .T. )
-	      ENDIF
-	      ::nCommand := Len( ::aLastCommands )
-	      ::aLastCommands[ ::nCommand ] := cCommand
-	      AAdd( ::aLastCommands, "" )
+         IF ( n := AScan( ::aLastCommands, cCommand ) ) > 0 .AND. n < Len( ::aLastCommands )
+           ADel( ::aLastCommands, n, .T. )
+         ENDIF
+         ::nCommand := Len( ::aLastCommands )
+         ::aLastCommands[ ::nCommand ] := cCommand
+         AAdd( ::aLastCommands, "" )
               ::nCommand := Len( ::aLastCommands )
               ::oWndCommand:ScrollUp( 1 )
               ::DoCommand( cCommand )
@@ -892,7 +892,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
 
    cCommand := ALLTRIM( cCommand )
    aCmnd := { NIL, NIL, NIL }
-   
+
    DO CASE
       CASE Empty( cCommand )
          RETURN ""
@@ -921,9 +921,9 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          cResult := CreateExpression( cParam, aCmnd )
          IF( EMPTY(cResult) )
             //valid syntax
-	    ::RestoreAppState()
+       ::RestoreAppState()
             cResult := GetWatchValue( aCmnd, @lValid )
-	    ::SaveAppState()
+       ::SaveAppState()
             IF( aCmnd[WP_TYPE] == "??" )
                IF( lValid )
                   ::Inspect( aCmnd[WP_EXPR], cResult )
@@ -953,8 +953,8 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
            IF ( n := At( " ", cParam ) ) > 0
               cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
               cParam := Left( cParam, n - 1 )
-	   ELSE
-	      cParam1 := ::cPrgName
+      ELSE
+         cParam1 := ::cPrgName
            ENDIF
            AAdd( ::aBreakPoints, { Val( cParam ), strip_path( cParam1 ) } )
         ELSE
@@ -984,9 +984,9 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
 
      CASE starts( "INPUT", cCommand ) .AND. !Empty( cParam )
         ::DoScript( cParam )
-     
+
      /* TODO: Support LIST BP|WP|TP */
-     
+
      CASE starts( "MONITOR", cCommand )
         cParam := Upper( cParam )
         DO CASE
@@ -1015,7 +1015,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          ELSE
             cResult := "Command error"
          ENDIF
-        
+
       CASE starts( "OPTIONS", cCommand )
          IF ( n := At( " ", cParam ) ) > 0
             cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
@@ -1054,7 +1054,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          SetCursor( SC_NONE )
          ::ShowAppScreen()
          SetCursor( SC_NORMAL )
-	
+
       CASE starts( "PREV", cCommand )
          ::FindPrevious()
 
@@ -1090,7 +1090,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
 
    ENDCASE
 
-   IF ::lActive   
+   IF ::lActive
       DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, ;
                  Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 1 ), ;
                  __DbgColors()[ 2 ] )
@@ -1119,7 +1119,7 @@ METHOD DoScript( cFileName ) CLASS TDebugger
       next
    ENDIF
 
-RETURN NIL   
+RETURN NIL
 
 
 METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
@@ -1296,7 +1296,7 @@ METHOD GotoLine( nLine ) CLASS TDebugger
       SetCursor( SC_SPECIAL1 )
    endif
    SetPos( nRow, nCol )
-   
+
    // Store cursor position to be restored by ::oWndCode:bGotFocus
    ::oWndCode:cargo[ 1 ] := nRow
    ::oWndCode:cargo[ 2 ] := nCol
@@ -1500,7 +1500,7 @@ METHOD HideVars() CLASS TDebugger
       ::oWndCode:cargo[ 1 ] := Row()
       ::oWndCode:cargo[ 2 ] := Col()
    ENDIF
-   
+
    if ::aWindows[ ::nCurrentWindow ] == ::oWndVars
       ::NextWindow()
    ENDIF
@@ -1541,8 +1541,8 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
       READ
       SetCursor( nOldCursor )
 #else
-      uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )     
-#endif 
+      uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )
+#endif
    else
       @ nTop + 1, nLeft + 1 SAY ValToStr( uValue ) COLOR "," + __DbgColors()[ 5 ]
       SetPos( nTop + 1, nLeft + 1 )
@@ -1651,7 +1651,7 @@ RETURN NIL
 
 
 METHOD LoadColors() CLASS TDebugger
-  
+
    LOCAL n
 
    ::oPullDown:LoadColors()
@@ -1665,7 +1665,7 @@ METHOD LoadColors() CLASS TDebugger
          ::aWindows[ n ]:Refresh()
       ENDIF
    next
- 
+
 RETURN NIL
 
 
@@ -1766,7 +1766,7 @@ METHOD Locate( nMode, cValue ) CLASS TDebugger
   ::cSearchString := cValue
 
   lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, nMode )
-   
+
   // Save cursor position to be restored by ::oWndCode:bGotFocus
   ::oWndCode:cargo[ 1 ] := Row()
   ::oWndCode:cargo[ 2 ] := Col()
@@ -1952,12 +1952,12 @@ return nil
 
 METHOD PathForFiles( cPathForFiles ) CLASS TDebugger
 
-   IF cPathForFiles == NIL  
+   IF cPathForFiles == NIL
       cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
    ENDIF
    ::cPathForFiles := cPathForFiles
    ::aPathDirs := PathToArray( ::cPathForFiles )
- 
+
    ::Resume()
 RETURN Self
 
@@ -2074,7 +2074,7 @@ METHOD ResizeWindows( oWindow ) CLASS TDebugger
   IF oWindow2 != NIL
     oWindow2:hide()
   ENDIF
-  
+
   ::oWndCode:Resize( nTop )
   IF ::oWndCode:lFocused
     ::oWndCode:cargo[ 1 ] := Row()
@@ -2375,14 +2375,14 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
 
             ::cPrgName := cPrgName
 
-	    IF !File( cPrgName )
-	       ::oBrwText := NIL
-	       ::oWndCode:Browser := NIL
-	       ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_MODULE ] + ;
-	                              "  File not found" )
+       IF !File( cPrgName )
+          ::oBrwText := NIL
+          ::oWndCode:Browser := NIL
+          ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_MODULE ] + ;
+                                 "  File not found" )
                ::oWndCode:Refresh()
-	       RETURN NIL
-	    ENDIF
+          RETURN NIL
+       ENDIF
 
             if ::oBrwText == nil
                ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
@@ -2535,7 +2535,7 @@ return nil
 
 METHOD Stack() CLASS TDebugger
 
-   ::lShowCallStack := ! ::lShowCallStack  
+   ::lShowCallStack := ! ::lShowCallStack
    ::oPulldown:GetItemByIdent( "CALLSTACK" ):checked := ::lShowCallStack
    if ::lActive
       if ::lShowCallStack
@@ -3242,7 +3242,7 @@ STATIC FUNCTION CreateExpression( cExpr, aWatch )
          DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)," ()") )
             i++
          ENDDO
-          
+
       ELSEIF( c == '.' )    //skip logical values
          i++
          IF( SUBSTR(cExpr,i,1) $ "TtFf" .AND. SUBSTR(cExpr,i+1,1) == '.' )
@@ -3359,7 +3359,7 @@ STATIC FUNCTION IsValidStopLine( cLine )
        c == 'LOCA' .OR.;
        c == 'STAT' .OR.;
        c == 'MEMV' )
-    
+
     RETURN .F.
   ENDIF
 
@@ -3391,7 +3391,7 @@ return nil
 
 static procedure RefreshVarsS( oBrowse )
 
-   local nLen := Len(oBrowse:aColumns)
+   local nLen := oBrowse:ColCount
 
    if ( nLen == 2 )
       oBrowse:dehilite():colpos:=2
@@ -3452,7 +3452,7 @@ RETURN cName + cExt
 #ifdef HB_NO_READDBG
 STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
 
-  LOCAL nOldCursor 
+  LOCAL nOldCursor
   LOCAL uTemp
 
   nOldCursor := SetCursor( SC_NORMAL )
@@ -3466,7 +3466,7 @@ STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
   do while .t.
      @ nTop, nLeft say space( len( uTemp ) )
      @ nTop, nLeft say ""
-     accept to uTemp 
+     accept to uTemp
      if bValid != nil .and. !eval( bValid, uTemp )
         uTemp := uValue
      else

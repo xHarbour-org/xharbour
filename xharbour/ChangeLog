@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3291 2004/08/09 11:20:58 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3292 2004/08/09 14:07:28 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-09 18:58 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    - removed ::aColumns iVar which was not used anymore
+    ! ::ColCount should rise an error if a value is assigned, simulated
+      this with an ACCESS directive without an ASSIGN one
+    ! when ::colpos is set to a new value, if still inside current
+      tbrowse now a ::Moved() is issued, since this is more or less
+      like an "implicit" K_LEFT or K_RIGHT.
+  * source/debug/debugger.prg
+  * source/debug/dbgtarr.prg
+    - removed references to ::aColumns iVar of TBrowse, using ::ColCount now
+    ! found a bug and found a work-around. Read comment inside dbgtarr.prg
+      AddWindows() method. This is a bug of TBrowse but clipper is not
+      able to cope with it either, so a work-around should be enough
+      for now.
 
 2004-08-09 15:54 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg

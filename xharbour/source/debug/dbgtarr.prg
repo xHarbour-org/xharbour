@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.6 2003/06/17 10:51:43 iananderson Exp $
+ * $Id: dbgtarr.prg,v 1.7 2004/05/07 12:16:26 likewolf Exp $
  */
 
 /*
@@ -102,23 +102,40 @@ Local owndsets
    aadd(::aWindows,owndsets)
 
    nWidth := oWndSets:nRight - oWndSets:nLeft - 1
-
    oBrwSets:=TbrowseNew(owndsets:nTop+1, owndsets:nLeft+1, owndsets:nBottom-1, owndsets:nRight-1)
    oBrwSets:autolite:=.f.
    oBrwSets:ColorSpec := __Dbg():ClrModal()
    oBrwSets:Cargo :={ 1,{}} // Actual highligthed row
+   aadd(oBrwSets:Cargo[2],aarray)
+
    oBrwSets:AddColumn( ocol:=     TBColumnNew("", { || ::arrayName+"["+alltrim(str(oBrwSets:cargo[ 1 ],6))+"]"} ) )
    ocol:width:=len(::arrayName+"["+alltrim(str(len(aarray),6))+"]" )
    oCol:DefColor:={1,2}
    nColWidth = oCol:Width
+
    oBrwSets:AddColumn( ocol:=TBColumnNew( "" ,{ || PadR( ValToStr( aArray[oBrwSets:cargo[ 1 ] ] ), nWidth - nColWidth - 1 ) } ) )
-   aadd(oBrwSets:Cargo[2],aarray)
+
+   /* 09/08/2004 - <maurilio.longo@libero.it>
+                   Setting a fixed width like it is done in the next line of code wich I've
+                   commented exploits a bug of current tbrowse, that is, if every column is
+                   narrower than tbrowse but the sum of them is wider tbrowse paints
+                   one above the other if code like the one inside RefreshVarsS() is called.
+                   (That code is used to have current row fully highlighted and not only
+                   current cell). Reproducing this situation on a smaller sample with
+                   clipper causes that only column two is visible after first stabilization.
+
+                   I think tbrowse should trim columns up until the point where at leat
+                   two are visible in the same moment, I leave this fix to tbrowse for
+                   the reader ;)
    oCol:width:=50
+   */
+
    ocol:DefColor:={1,3}
+
    oBrwSets:GOTOPBLOCK := { || oBrwSets:cargo[ 1 ]:= 1 }
    oBrwSets:GoBottomBlock := { || oBrwSets:cargo[ 1 ]:= Len(oBrwSets:cargo[ 2 ][ 1 ])}
    oBrwSets:SKIPBLOCK := { |nPos| ( nPos:= ArrayBrowseSkip(nPos, oBrwSets), oBrwSets:cargo[ 1 ]:= ;
-   oBrwSets:cargo[ 1 ] + nPos,nPos ) }
+                                    oBrwSets:cargo[ 1 ] + nPos,nPos ) }
 
    ::aWindows[::nCurWindow]:bPainted    := { || (oBrwSets:forcestable(),RefreshVarsS(oBrwSets))}
    ::aWindows[::nCurWindow]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ),;
@@ -296,7 +313,7 @@ return nReturn
 
 static procedure RefreshVarsS( oBrowse )
 
-   local nLen := Len(oBrowse:aColumns)
+   local nLen := oBrowse:ColCount
 
    if ( nLen == 2 )
       oBrowse:dehilite():colpos:=2
@@ -307,6 +324,7 @@ static procedure RefreshVarsS( oBrowse )
    endif
    oBrowse:hilite()
    return
+
 static function ArrayBrowseSkip( nPos, oBrwSets,n )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
