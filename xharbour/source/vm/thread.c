@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.44 2003/02/19 10:51:14 jonnymind Exp $
+* $Id: thread.c,v 1.45 2003/02/19 20:20:31 jonnymind Exp $
 */
 
 /*
@@ -78,6 +78,10 @@ HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T hb_threadContextMutex;
 HB_THREAD_CONTEXT *last_context;
 HB_THREAD_T hb_main_thread_id;
+#ifdef HB_OS_WIN_32
+   static HB_CRITICAL_T s_winStartMutex;
+#endif
+
 
 extern HB_CRITICAL_T hb_allocMutex;
 
@@ -261,8 +265,12 @@ void hb_threadInit( void )
 {
    hb_ht_context = NULL;
    HB_CRITICAL_INIT( hb_threadContextMutex );
+   #ifdef HB_OS_WIN_32
+      HB_CRITICAL_INIT( s_winStartMutex );
+   #endif
    last_context = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
+
 }
 
 void hb_threadExit( void )
@@ -285,6 +293,9 @@ void hb_threadExit( void )
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    HB_CRITICAL_DESTROY( hb_threadContextMutex );
+   #ifdef HB_OS_WIN_32
+      HB_CRITICAL_DESTROY( s_winStartMutex );
+   #endif
 }
 
 #ifdef HB_OS_WIN_32
@@ -308,14 +319,19 @@ hb_create_a_thread(
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
 
    #ifndef HB_OS_WIN_32
-      /* Under windows, the context is created by the caller */
+      /* under unix, we can create our context */
       hb_threadCreateContext( tCurrent );
-      //printf( "Created context %p: %ld (%ld)\r\n", test, test->th_id, HB_CURRENT_THREAD() );
-
       /* now that the context has been created,
          it is safe to set async cancellation mode */
       pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
+   #else
+      /* under windows, we must wait for the caller to create our context
+      ( because he must set our handle with full rights in our context ) */
+      HB_CRITICAL_LOCK( s_winStartMutex );
+
+      HB_CRITICAL_UNLOCK( s_winStartMutex );
    #endif
+
 
    if( HB_IS_SYMBOL( pPointer ) )
    {
@@ -527,25 +543,31 @@ HB_FUNC( STARTTHREAD )
 
 #if defined(HB_OS_WIN_32)
    /* creates a thread, but don't start it */
-   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, CREATE_SUSPENDED, &th_id ) ) != NULL )
+   HB_CRITICAL_LOCK( s_winStartMutex );
+   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &th_id ) ) != NULL )
    {
       HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       context->th_h = th_h;
-      /* now the thread can start */
-      //Sleep(500);
-      ResumeThread( th_h );
+      //ResumeThread( th_h );
+      /* Now our thread can start */
+      HB_CRITICAL_UNLOCK( s_winStartMutex );
       hb_retnl( (long) th_id );
+   }
+   else
+   {
+      HB_CRITICAL_UNLOCK( s_winStartMutex );
+      hb_retnl( -1 );
    }
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
    {
       hb_retnl( (long) th_id );
    }
-#endif
    else
    {
       hb_retnl( -1 );
    }
+#endif
 }
 
 HB_FUNC( STOPTHREAD )
