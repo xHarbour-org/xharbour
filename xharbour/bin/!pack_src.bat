@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.7 2003/06/25 01:38:52 lculik Exp $
+rem $Id: !pack_src.bat,v 1.8 2003/06/27 13:53:36 lculik Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -91,6 +91,16 @@ rem SOURCE\RDD
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/*.c
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/*.prg
+
+rem SOURCE\RDD\DBFDBT
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbfdbt/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbfdbt/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbfdbt/*.prg
+
+rem SOURCE\RDD\DBFFPT
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbffpt/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbffpt/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbffpt/*.prg
 
 rem SOURCE\RDD\DBFCDX
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/dbfcdx/Makefile

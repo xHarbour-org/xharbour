@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.63 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: dbfcdx1.c,v 1.64 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -2718,18 +2718,21 @@ static LPCDXKEYINFO hb_cdxPageGetKey( LPCDXPAGEINFO pPage, USHORT uiKey )
 {
    LPCDXKEYINFO pKey;
 
+#ifndef HB_CDX_DBGCODE_OFF
    if ( !pPage )
       hb_cdxErrInternal( "hb_cdxPageGetKey: pPage is NULL" );
+#endif
 
    pKey = pPage->pKeys;
    while ( uiKey-- ) //&& pKey->pNext != NULL )
    {
 #ifndef HB_CDX_DBGCODE_OFF
       if ( pKey == NULL )
+      {
          hb_cdxErrInternal( "hb_cdxPageGetKey: wrong uiKey index." );
+      }
 #endif
       pKey = pKey->pNext;
-      uiKey--;
    }
    return pKey;
 }
@@ -3677,8 +3680,8 @@ static void hb_cdxPageLeafCheckKeys( LPCDXPAGEINFO pPage )
 
       p = last->pNext;
       while ( p )
-         {
-            res = hb_cdxKeyCompare( last, p, cdPage, TRUE);
+      {
+         res = hb_cdxKeyCompare( last, p, cdPage, TRUE );
          if ( res == 0 )
          {
             res = last->Tag - p->Tag;

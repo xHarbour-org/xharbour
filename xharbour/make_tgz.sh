@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.11 2003/08/09 20:45:18 druzus Exp $
+# $Id: make_tgz.sh,v 1.12 2003/08/20 09:14:41 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,7 +14,7 @@ name="xharbour"
 hb_ver="0.82.0"
 hb_lnkso="yes"
 hb_pref="xhb"
-hb_libs="vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"
+hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi

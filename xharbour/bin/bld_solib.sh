@@ -36,7 +36,8 @@ call_mkslib()
 	echo "$(basename $0): Making $HB_LIB_INSTALL/$OUTPUT"
 
 	$HB_BIN_INSTALL/hb-mkslib.sh $OUTPUT \
-		libcommon.a libdbfcdx$HB_MT.a libdbfntx$HB_MT.a libdebug.a \
+		libcommon.a libdbfdbt$HB_MT.a libdbffpt$HB_MT.a \
+		libdbfcdx$HB_MT.a libdbfntx$HB_MT.a libdebug.a \
 		liblang.a libmacro$HB_MT.a libpp$HB_MT.a librdd$HB_MT.a \
 		lib$HB_GT_LIB.a \
 		librtl$HB_MT.a libvm$HB_MT.a  \

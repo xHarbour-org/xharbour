@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.3 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id: dbfntx0.prg,v 1.4 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -60,7 +60,6 @@ PROCEDURE DBFNTXInit
    REQUEST _DBFNTX
 
    rddRegister( "DBF", RDT_FULL )
-   rddRegister( "DBFDBT", RDT_FULL )
    rddRegister( "DBFNTX", RDT_FULL )
 
 return
