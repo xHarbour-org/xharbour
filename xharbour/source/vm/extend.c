@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.5 2002/04/28 03:08:04 ronpinkas Exp $
+ * $Id: extend.c,v 1.6 2002/05/02 00:05:03 ronpinkas Exp $
  */
 
 /*
@@ -543,7 +543,7 @@ void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
    hb_arrayNew( &hb_stack.Return, ulLen );
 }
 
-#undef hb_retc( szText )
+#undef hb_retc
 void HB_EXPORT  hb_retc( char * szText )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retc(%s)", szText));
