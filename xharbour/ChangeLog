@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2501 2004/03/05 22:55:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.2502 2004/03/05 23:14:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-07 00:41 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/rtl/hbini.c
+    ! Reverted latest changes that completely broke the code.
+    
+    /* Even the simplest test wasn't running (and cannot ever 
+       be running under any condition). So, I don't know what
+       the last commiter wanted to achieve, but it was not
+       even in the right path to achieve it.
+       
+       Also, formatting and case was completely mixed up.
+       
+       So, before commiting, at least test and respect previous
+       work.
+    */
+    
 2004-03-05 15:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
     - Removed redundant hb_itemClear() on basic temp items.
