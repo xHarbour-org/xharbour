@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.3 2003/08/27 01:23:21 druzus Exp $
+ * $Id: ctwin.prg,v 1.4 2003/08/27 08:58:20 druzus Exp $
  */
 
 /*
@@ -720,7 +720,7 @@ CLASS TctWIN
  METHOD RestoreFG()
  METHOD SaveFG()
  METHOD Free()
- METHOD AChoice(nT,nL,nB,nT,aMenu,aSel,cUser,nInit,nWRow)
+ METHOD AChoice(nT,nL,nB,nR,aMenu,aSel,cUser,nInit,nWRow)
  METHOD TBrowse(nT,nL,nB,nR,lDB)
 ENDCLASS
 
@@ -807,7 +807,7 @@ METHOD AChoice(nT,nL,nB,nR,aMenu,aSel,cUser,nInit,nWRow) CLASS TctWIN
        nR := ::UsedR
     ENDIF
   ENDIF
-RETURN ACHOICE(nT,nL,nB,nT,aMenu,aSel,cUser,nInit,nWRow)
+RETURN ACHOICE(nT,nL,nB,nR,aMenu,aSel,cUser,nInit,nWRow)
 *********************************************
 METHOD ct__CR() CLASS TctWIN
    SETPOS(ROW(),::UsedL)
