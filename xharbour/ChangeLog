@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3773 2005/01/27 11:49:10 druzus Exp $
+ * $Id: ChangeLog,v 1.3775 2005/01/27 23:30:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-27 23:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils\hbmakee/hbmake.prg
+    ! Minor fix to not show the prg list for selection if an unique prg
+      is in the folder.
 
 2005-01-27 08:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch

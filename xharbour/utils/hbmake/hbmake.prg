@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.139 2005/01/21 16:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.140 2005/01/27 23:25:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.139"
+STATIC s_cHbMakeVersion := "1.140"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -1285,7 +1285,6 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL aOutc        := {}
    LOCAL aSrc         := Directory( "*.prg" )
    LOCAL nLenaSrc     := Len( aSrc )
-   LOCAL nLenaOut
 
    LOCAL lFwh         := .F.
 // LOCAL lxFwh        := .F. 
@@ -1901,34 +1900,38 @@ FUNCTION CreateMakeFile( cFile )
 
    aOutFiles := AClone( aInFiles )
 
+   if Len( aOutFiles ) > 1
 
-   if s_nLang=1
-      s_cMsg := "Selecione os PRGs a compilar"
-   elseif s_nLang=3
-      s_cMsg := "Seleccione los PRG a compilar"
+      if s_nLang=1
+         s_cMsg := "Selecione os PRGs a compilar"
+      elseif s_nLang=3
+         s_cMsg := "Seleccione los PRG a compilar"
+      else
+         s_cMsg := "Select the PRG files to compile"
+      endif
+
+
+      IF nOption !=2 // not create a makefile
+         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cMsg )
+      ELSE
+         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles, {}, .T., s_cMsg )
+      ENDIF
+
+
+      AEval( aOutFiles, { | x, y | aOutFiles[ y ] := Trim( Substr( aOutFiles[ y ], 1, At( ' ', aOutFiles[ y ] ) ) ) } )
+
+      aOutFiles := ASort( aOutFiles )
+
+      @ 22,01 say space(78)
+
+      aSelFiles := GetSelFiles( aInFiles, aOutFiles )
+
+      ASort( aSelFiles )
+
    else
-      s_cMsg := "Select the PRG files to compile"
+       AEval( aOutFiles, { | x, y | aOutFiles[ y ] := Trim( Substr( aOutFiles[ y ], 1, At( ' ', aOutFiles[ y ] ) ) ) } )
+       aSelFiles := aOutFiles
    endif
-
-
-   IF nOption !=2 // not create a makefile
-      pickarry( 11, 15, 20, 64, aInFiles, aOutFiles ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cMsg )
-   ELSE
-      pickarry( 11, 15, 20, 64, aInFiles, aOutFiles, {}, .T., s_cMsg )
-   ENDIF
-
-
-   nLenaOut := Len( aOutFiles )
-
-   AEval( aOutFiles, { | x, y | aOutFiles[ y ] := Trim( Substr( aOutFiles[ y ], 1, At( ' ', aOutFiles[ y ] ) ) ) } )
-
-   aOutFiles := ASort( aOutFiles )
-
-   @ 22,01 say space(78)
-
-   aSelFiles := GetSelFiles( aInFiles, aOutFiles )
-
-   ASort( aSelFiles )
 
 
    if Len( aSelFiles ) = 1
@@ -3162,7 +3165,6 @@ FUNCTION CreateLibMakeFile( cFile )
    LOCAL aOutFiles := {}
    LOCAL aSrc      := Directory( "*.prg" )
    LOCAL nLenaSrc  := Len( aSrc )
-   LOCAL nLenaOut
 
    LOCAL aOutC     := {}
    LOCAL aSrcC     := Directory( "*.c" )
@@ -3594,7 +3596,6 @@ FUNCTION CreateLibMakeFile( cFile )
       pickarry( 10, 15, 19, 64, aInFiles, aOutFiles, {}, .T., s_cMsg )
    ENDIF
 
-   nLenaOut := Len( aOutFiles )
 
    AEval( aOutFiles, { | x, y | aOutFiles[ y ] := Trim( Substr( aOutFiles[ y ], 1, At( ' ', aOutFiles[ y ] ) ) ) } )
    AEval( aOutFiles, { | xItem | IIF( At( '.c', xItem ) > 0 .OR. At( '.C', xItem ) > 0 .OR. At( '.cpp', xItem ) > 0 .OR. At( '.CPP', xItem ) > 0, AAdd( aOutc, xitem ), ) } )
