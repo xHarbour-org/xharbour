@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1891 2003/12/18 10:55:30 druzus Exp $
+ * $Id: ChangeLog,v 1.1892 2003/12/18 11:11:23 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-18 15:35 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/idle.c
+    + Added hb_idleAddFunc() and hb_idleDelFunc() as
+      C callable frontends for HB_IdleAdd() and HB_IdleDel()
+    + Idle functions can now be both codeblocks and
+      executable arrays (that is, array that can be passed
+      to hb_execFromArray()). This allows to dynamically
+      create (or change) idle functions, even from C programs,
+      very easily.
+    ! HB_IdleDel() could possibly have caused GPF. Luckily,
+      it is seldom used.
+
+  + tests/idletest.prg
+    + Added tests for executable array and codeblock idle
+      functions; added a test also for HB_IdleDel
+      (now working).
 
 2003-12-18 12:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/linux/gcc.cf
