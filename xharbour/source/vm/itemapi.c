@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.76 2004/02/12 22:00:26 andijahja Exp $
+ * $Id: itemapi.c,v 1.77 2004/02/14 21:01:19 andijahja Exp $
  */
 
 /*
@@ -1584,7 +1584,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
       if( hb_set.HB_SET_FIXED )
       {
          /* If fixed mode is enabled, always use the default. */
-         iDec = hb_set.HB_SET_DECIMALS;
+         iDec = pDec ? hb_set.HB_SET_DECIMALS : 0;
       }
          /* Otherwise, the maximum is 9. */
 /*
