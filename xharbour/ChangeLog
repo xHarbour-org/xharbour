@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.104 2002/03/11 23:54:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.105 2002/03/12 03:02:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-13 21:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    - Removed 1 stray debug printf().
+
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+    + Added #define HB_COMP_ERR_MISSING_ENDTEXT             52 -> "Missing ENDTEXT"
+
+  * source/compiler/harbour.slx
+    + Added TEXT <TextFunction>, <ResetTextFunction> ... ENDTEXT implementation.
+
+ /*
+    Clipper PP pre-process TEXT [TO FILE <(File)> | TO PRINTER] to:
+
+    [ __TextSave( <(file)> | "PRINTER" ) ; ]
+    TEXT QOut, QQOut | TextRestore */
+
+    As can be seen above, Clipper hardwire TextFunction to QOut(), and ResetTextFunction to either QQOut() or TextRestore()
+
+    Please note that one may code the TEXT command as follows:
+
+    TEXT MyTextFunc, MyResetFunc
+    ...
+    ENDTEXT
+
+    In the above case the PP will not get involved and Clipper will call MyTextFunc() once for each line (until ENDTEXT)
+    passing as a single paramter the given line of text (excluding the CR). Once encountering the ENDTEXT command, it will call
+    MyResetFunc() once without any parameter.
+
+    So Clipper hardwire TEXT in STD.ch simply uses QOut() as the output function and QQOut() as a dummy reset function or
+    TextRestore() as an actual reseting function in the case that echo to FILE or PRINTER was requested.
+
+    xHarbour now is 100% compatible with the above description of the Clipper implemntaion of both PP and Compiler.
+ */
 
 2002-03-11 19:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/set.c

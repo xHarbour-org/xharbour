@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.4 2002/01/31 00:10:00 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.5 2002/03/11 22:38:52 ronpinkas Exp $
  */
 
 /*
@@ -1212,7 +1212,7 @@ _Get_      : GET { pArrayIndexAsList = NULL; }
 
 GetA       : _Get_ GetVarArray { pGetArgList = hb_compExprNewArgList( $2 ); bTrancuateBaseArray = TRUE; } ','
              EmptyExpression { hb_compExprAddListExpr( pGetArgList, ( pBaseArrayName ? pBaseArrayName : $5 ) ); bTrancuateBaseArray = FALSE; pBaseArrayName = NULL; /* Var Name */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; printf( "Picture %p %i\n", $8, $8->ExprType ); /* Picture    */ } ','
+             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
              EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
              EmptyExpression { hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */
                                hb_compExprAddListExpr( pGetArgList, hb_compExprNewArray( pArrayIndexAsList ) ); /* Array with Index Expressions as 6th parameter */

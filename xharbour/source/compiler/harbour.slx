@@ -1,13 +1,13 @@
 /*
- * $Id: harbour.slx,v 1.68 2001/09/05 18:19:20 brianhays Exp $
+ * $Id: harbour.slx,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * Compiler SimpLex rules
  *
  * Copyright 2000 Ron Pinkas <ronpinkas@profit-master.com>
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,12 +50,8 @@
  *
  */
 
-#define NUMERALS_PER_LINE 3000
-
-/*
-#define SHOW_LEX_TOKENS
-#define DEBUG_LEX
-*/
+//#define SHOW_LEX_TOKENS
+//#define DEBUG_LEX
 
 #ifdef DEBUG_LEX
    #undef DEBUG_INFO
@@ -71,12 +67,15 @@
 static int iCloseSquare = 0, iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
 /* Commented 2001-08-29 - Not really needed!
+#define NUMERALS_PER_LINE 3000
 static char *aTexts[ NUMERALS_PER_LINE ];
 int iTexts = 0;
 */
 
 static unsigned char iIdentifier = 0;
 static char *sIdOnHold, *s_sLastBlock = NULL;
+
+static char *sTextFunction, *sTextReset;
 
 char *     hb_comp_SLX_LastBlock( BOOL bReset );
 long       hb_comp_SLX_Hex2L( char* sHex );
@@ -92,41 +91,38 @@ ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 #define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
 
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
-				     LEX_DELIMITER( ',' ) AS_TOKEN( ',' ),
-				     LEX_DELIMITER( '(' ) AS_TOKEN( '(' ),
-				     LEX_DELIMITER( ')' ) AS_TOKEN( ')' ),
-				     LEX_DELIMITER( '[' ) AS_TOKEN( '[' ),
-				     LEX_DELIMITER( ']' ) AS_TOKEN( ']'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '}' ) AS_TOKEN( '}'   + DONT_REDUCE ),
-				     LEX_DELIMITER( ':' ) AS_TOKEN( ':' ),
-				     LEX_DELIMITER( '=' ) AS_TOKEN( '=' ),
-				     LEX_DELIMITER( '#' ) AS_TOKEN( NE1 ),
-				     LEX_DELIMITER( '@' ) AS_TOKEN( '@' ),
-				     LEX_DELIMITER( '<' ) AS_TOKEN( '<'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '>' ) AS_TOKEN( '>'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '!' ) AS_TOKEN( NOT   + DONT_REDUCE ),
-				     LEX_DELIMITER( '{' ) AS_TOKEN( HB_CHK_BLOCK        ),
-				     LEX_DELIMITER( '|' ) AS_TOKEN( '|'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ),
-				     LEX_DELIMITER( '%' ) AS_TOKEN( '%'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '*' ) AS_TOKEN( '*'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '/' ) AS_TOKEN( '/'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '+' ) AS_TOKEN( '+'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '-' ) AS_TOKEN( '-'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '$' ) AS_TOKEN( '$'   + DONT_REDUCE )
-				   };
+                                     LEX_DELIMITER( ',' ) AS_TOKEN( ',' ),
+                                     LEX_DELIMITER( '(' ) AS_TOKEN( '(' ),
+                                     LEX_DELIMITER( ')' ) AS_TOKEN( ')' ),
+                                     LEX_DELIMITER( '[' ) AS_TOKEN( '[' ),
+                                     LEX_DELIMITER( ']' ) AS_TOKEN( ']'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '}' ) AS_TOKEN( '}'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( ':' ) AS_TOKEN( ':' ),
+                                     LEX_DELIMITER( '=' ) AS_TOKEN( '=' ),
+                                     LEX_DELIMITER( '#' ) AS_TOKEN( NE1 ),
+                                     LEX_DELIMITER( '@' ) AS_TOKEN( '@' ),
+                                     LEX_DELIMITER( '<' ) AS_TOKEN( '<'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '>' ) AS_TOKEN( '>'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '!' ) AS_TOKEN( NOT   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '{' ) AS_TOKEN( HB_CHK_BLOCK        ),
+                                     LEX_DELIMITER( '|' ) AS_TOKEN( '|'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ),
+                                     LEX_DELIMITER( '%' ) AS_TOKEN( '%'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '*' ) AS_TOKEN( '*'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '/' ) AS_TOKEN( '/'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '+' ) AS_TOKEN( '+'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '-' ) AS_TOKEN( '-'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '$' ) AS_TOKEN( '$'   + DONT_REDUCE )
+                                   };
 
 /* Custom Intermediate Token needed to be expanded. */
 #define HB_LIT_ACT      LEX_CUSTOM_ACTION - 2
 #define HB_NESTED_LIT   LEX_CUSTOM_ACTION - 3
-#define HB_QOUT_ACT     LEX_CUSTOM_ACTION - 4
-#define HB_RET_QOUT_LIT LEX_CUSTOM_ACTION - 5
 
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("QOUT([") END_WITH("])\n") STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_QOUT_ACT),
                                 START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_NESTED_LIT),
                                 START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_NESTED_LIT),
@@ -172,6 +168,8 @@ SELF_CONTAINED_WORDS_ARE {
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, RETURN, WHILE */
 #define REJECT_OP        707
 
+#define HB_TEXT          708
+
 #define HB_WANTS_VAR     LEX_CUSTOM_ACTION - 512
 #define HB_WANTS_ID      LEX_CUSTOM_ACTION - 1024
 #define HB_WANTS_EOL     LEX_CUSTOM_ACTION - 1536
@@ -206,6 +204,10 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_IDENTIFIER    LEX_CUSTOM_ACTION - 24
 
 #define HB_INLINE        LEX_CUSTOM_ACTION - 25
+
+#define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
+#define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 27
+#define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 28
 
 #define USE_KEYWORDS
 
@@ -251,6 +253,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "STATIC"              ) AS_TOKEN( HB_WANTS_ID  - STATIC           ),
                          LEX_WORD( "STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_STATIC_FUNC   ),
                          LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
+                         LEX_WORD( "TEXT"                ) AS_TOKEN( HB_TEXT          ),
                          LEX_WORD( "WHILE"               ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
                          LEX_WORD( "_HB_CLASS"           ) AS_TOKEN( DECLARE_CLASS    ),
                          LEX_WORD( "_HB_MEMBER"          ) AS_TOKEN( DECLARE_MEMBER   ),
@@ -263,13 +266,13 @@ LANGUAGE_KEY_WORDS_ARE {
 
 /* Words. */
 LANGUAGE_WORDS_ARE {
-                     LEX_WORD( ".F."             		) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
-                     LEX_WORD( ".N."             		) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
-                     LEX_WORD( ".T."             		) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
-                     LEX_WORD( ".Y."             		) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
+                     LEX_WORD( ".F."                            ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
+                     LEX_WORD( ".N."                            ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
+                     LEX_WORD( ".T."                            ) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
+                     LEX_WORD( ".Y."                            ) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
 
-                     LEX_WORD( "AS{WS}ANYTYPE"   		) AS_TOKEN( AS_VARIANT         + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}ARRAY"     		) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ANYTYPE"                  ) AS_TOKEN( AS_VARIANT         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY"                    ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ANYTYPE"   ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ARRAY"     ) AS_TOKEN( AS_ARRAY_ARRAY     + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CHARACTER" ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
@@ -281,31 +284,31 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}OBJECT"    ) AS_TOKEN( AS_OBJECT_ARRAY    + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}STRING"    ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}USUAL"     ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}CHARACTER" 		) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}CLASS"     		) AS_TOKEN( AS_CLASS           + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}CODEBLOCK" 		) AS_TOKEN( AS_BLOCK           + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}DATE"      		) AS_TOKEN( AS_DATE            + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}LOGICAL"   		) AS_TOKEN( AS_LOGICAL         + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}NUMERIC"   		) AS_TOKEN( AS_NUMERIC         + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}OBJECT"    		) AS_TOKEN( AS_OBJECT          + DONT_REDUCE ),
-                     LEX_WORD( "AS{WS}STRING"    		) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CHARACTER"                ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CLASS"                    ) AS_TOKEN( AS_CLASS           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CODEBLOCK"                ) AS_TOKEN( AS_BLOCK           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}DATE"                     ) AS_TOKEN( AS_DATE            + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}LOGICAL"                  ) AS_TOKEN( AS_LOGICAL         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}NUMERIC"                  ) AS_TOKEN( AS_NUMERIC         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}OBJECT"                   ) AS_TOKEN( AS_OBJECT          + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}STRING"                   ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}USUAL"                    ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
 
-                     LEX_WORD( "FIELD"           		) AS_TOKEN( FIELD              ),
+                     LEX_WORD( "FIELD"                          ) AS_TOKEN( FIELD              ),
                      LEX_WORD( "HB_INLINE"                      ) AS_TOKEN( HB_INLINE          ),
-                     LEX_WORD( "IF"              		) AS_TOKEN( IIF                ),
-                     LEX_WORD( "IIF"             		) AS_TOKEN( IIF                ),
-                     LEX_WORD( "IN"              		) AS_TOKEN( HB_IN              ),
+                     LEX_WORD( "IF"                             ) AS_TOKEN( IIF                ),
+                     LEX_WORD( "IIF"                            ) AS_TOKEN( IIF                ),
+                     LEX_WORD( "IN"                             ) AS_TOKEN( HB_IN              ),
                      LEX_WORD( "LINE"                           ) AS_TOKEN( _LINE_             ),
-                     LEX_WORD( "NIL"             		) AS_TOKEN( NIL                + DONT_REDUCE ),
-                     LEX_WORD( "OPTIONAL"        		) AS_TOKEN( OPTIONAL           ),
-                     LEX_WORD( "QSELF"           		) AS_TOKEN( QSELF              ),
-                  /* LEX_WORD( "SELF"            		) AS_TOKEN( SELF               ), */
-                     LEX_WORD( "STEP"            		) AS_TOKEN( HB_STEP            ),
-                     LEX_WORD( "TO"              		) AS_TOKEN( HB_TO              ),
-                     LEX_WORD( "WITH"              		) AS_TOKEN( HB_WITH            ),
-                     LEX_WORD( "_FIELD"          		) AS_TOKEN( FIELD              ),
-                     LEX_WORD( "_GET_"          		) AS_TOKEN( GET                )
+                     LEX_WORD( "NIL"                            ) AS_TOKEN( NIL                + DONT_REDUCE ),
+                     LEX_WORD( "OPTIONAL"                       ) AS_TOKEN( OPTIONAL           ),
+                     LEX_WORD( "QSELF"                          ) AS_TOKEN( QSELF              ),
+                  /* LEX_WORD( "SELF"                           ) AS_TOKEN( SELF               ), */
+                     LEX_WORD( "STEP"                           ) AS_TOKEN( HB_STEP            ),
+                     LEX_WORD( "TO"                             ) AS_TOKEN( HB_TO              ),
+                     LEX_WORD( "WITH"                           ) AS_TOKEN( HB_WITH            ),
+                     LEX_WORD( "_FIELD"                         ) AS_TOKEN( FIELD              ),
+                     LEX_WORD( "_GET_"                          ) AS_TOKEN( GET                )
                    };
 
 /* Intermediate Reductions when still ambigious or need further reductions. */
@@ -316,29 +319,28 @@ LANGUAGE_WORDS_ARE {
 #define _ID_ASSIGN        905
 #define _WHL_ID_CR        906
 #define _WHL_ID_SEMI      907
-#define _QOUT_LIT         908
 
 /* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
 #define _ID_ON_HOLD       913
 
 LANGUAGE_RULES_ARE {
-		    /* Wants any Var. */
+                    /* Wants any Var. */
                     IF_SEQUENCE_IS( WANTS_VAR      , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , MACROVAR    , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , MACROTEXT   , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , '&'         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
-		    /* Wants Identifier. */
+                    /* Wants Identifier. */
                     IF_SEQUENCE_IS( WANTS_ID       , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_ID       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
-		    /* Wants EOL */
+                    /* Wants EOL */
                     IF_SEQUENCE_IS( WANTS_EOL      , '\n'        , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_EOL      , ';'         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_EOL      , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
-		    /* Wants Expression ( DOESN'T WANT OPERATORS ) - At BOL, if followed by operator (other than logicals .t., .f., !) than Identifier else COMMAND. */
+                    /* Wants Expression ( DOESN'T WANT OPERATORS ) - At BOL, if followed by operator (other than logicals .t., .f., !) than Identifier else COMMAND. */
                     IF_SEQUENCE_IS( REJECT_OP      , INC         , '\n'   , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , INC         , ';'    , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , DEC         , '\n'   , 0          ) PASS_THROUGH(),
@@ -363,7 +365,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( REJECT_OP      , WANTS_VAR    , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , HB_IDENTIFIER ),
 
 
-		    /* Complex */
+                    /* Complex */
 
                     IF_SEQUENCE_IS( DOCASE       , '\n'       , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( DOCASE       , ';'        , 0      , 0          ) PASS_THROUGH(),
@@ -378,7 +380,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( DO_WHILE     , 0          , 0      , 0          ) REDUCE_TO( WHILE + DONT_REDUCE, 0             ),
 
 
-		    /* DECLARE as PRIVATE. */
+                    /* DECLARE as PRIVATE. */
                     IF_SEQUENCE_IS( DECLARE     , IDENTIFIER  , '['    , 0          ) REDUCE_TO( PRIVATE    + DONT_REDUCE , _ID_ARRAY     ),
                     IF_SEQUENCE_IS( DECLARE     , IDENTIFIER  , ','    , 0          ) REDUCE_TO( PRIVATE    + DONT_REDUCE , _ID_COMMA     ),
                     IF_SEQUENCE_IS( DECLARE     , IDENTIFIER  , '\n'   , 0          ) REDUCE_TO( PRIVATE    + DONT_REDUCE , _ID_CR        ),
@@ -387,15 +389,15 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( DECLARE     , MACROVAR    , 0      , 0          ) REDUCE_TO( PRIVATE    + DONT_REDUCE , MACROVAR      ),
                     IF_SEQUENCE_IS( DECLARE     , MACROTEXT   , 0      , 0          ) REDUCE_TO( PRIVATE    + DONT_REDUCE , MACROTEXT     ),
 
-		    /* Any other DECLARE IDENTIFIER, must be Strong Type DECLARE. */
+                    /* Any other DECLARE IDENTIFIER, must be Strong Type DECLARE. */
                     IF_SEQUENCE_IS( DECLARE     , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
 
                     IF_SEQUENCE_IS( _ID_ON_HOLD , 0           , 0      , 0          ) REDUCE_TO( HB_ID_ON_HOLD      , 0                   ),
 
-		    /* Any other DECLARE must be Identifier. */
+                    /* Any other DECLARE must be Identifier. */
                     IF_SEQUENCE_IS( DECLARE     , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER      , 0                   ),
 
-		    /* Expnasions from DECLARE ...*/
+                    /* Expnasions from DECLARE ...*/
                     IF_SEQUENCE_IS( _ID_ARRAY   , 0           , 0      , 0          ) REDUCE_TO( IDENTIFIER + DONT_REDUCE , '[' + DONT_REDUCE      ),
                     IF_SEQUENCE_IS( _ID_COMMA   , 0           , 0      , 0          ) REDUCE_TO( IDENTIFIER + DONT_REDUCE , ',' + DONT_REDUCE      ),
                     IF_SEQUENCE_IS( _ID_CR      , 0           , 0      , 0          ) REDUCE_TO( IDENTIFIER + DONT_REDUCE , '\n' + DONT_REDUCE     ),
@@ -403,7 +405,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( _ID_ASSIGN  , 0           , 0      , 0          ) REDUCE_TO( IDENTIFIER + DONT_REDUCE , INASSIGN + DONT_REDUCE ),
 
 
-		    /* This FIELD is NOT at BOL wants only ->. */
+                    /* This FIELD is NOT at BOL wants only ->. */
                     IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
@@ -434,7 +436,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
                     IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
 
-                    IF_SEQUENCE_IS( _QOUT_LIT   , 0           , 0      , 0          ) REDUCE_TO( HB_RET_QOUT_LIT   , 0             )
+                    IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             )
                    };
 
 /* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
@@ -447,7 +449,7 @@ LANGUAGE_RULES_ARE {
 /* Commented 2001-08-29 - Not really needed!
 #undef NEW_LINE_ACTION
    #define NEW_LINE_ACTION() \
-		while( iTexts ) \
+                while( iTexts ) \
                 { \
                    DEBUG_INFO( printf( "Releasing short term Text: %i = %s At: %i\n", iTexts, aTexts[iTexts - 1], aTexts[iTexts - 1] ) ); \
                    iTexts--; \
@@ -471,36 +473,27 @@ LANGUAGE_RULES_ARE {
 
 #undef STREAM_EXCEPTION
    #define STREAM_EXCEPTION( sPair, cChar ) \
-	   if( sTerm[1] == ']' && iCloseSquare ) \
-	   { \
+           if( sTerm[1] == ']' && iCloseSquare ) \
+           { \
               szBuffer -= ( ( strlen( sPair ) - iCloseSquare ) + 1 ); \
-	      sPair[ iCloseSquare - 1 ] = '\0'; \
+              sPair[ iCloseSquare - 1 ] = '\0'; \
               aiHold[ iHold++ ] = HB_LIT_ACT; \
-	   } \
-	   else \
-	   { \
-	      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
+           } \
+           else \
+           { \
+              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
               aiHold[ iHold++ ] = '\n'; \
               yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
               aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ; \
-	   } \
+           } \
 
 #undef STREAM_APPEND
    #define STREAM_APPEND(x) \
-      if( iPairLen == 0 && sStart[1] ) { sPair[ iPairLen++ ] = sStart[1]; } \
+      if( iPairLen == 0 && sStart[0] == '[' && sStart[1] ) { sPair[ iPairLen++ ] = sStart[1]; } \
       if( x == ']' && iCloseSquare == 0 ) { iCloseSquare = iPairLen + 1; } sPair[ iPairLen++ ] = x;
 
 #undef STREAM_OPEN
-   #define STREAM_OPEN( sStarter ) \
-      { \
-         iCloseSquare = 0; \
-	 \
-         if( sStarter[0] == 'Q' ) \
-           bTmp = FALSE /* TODO: hb_pp_bInsideTextBlock */; \
-         else \
-           bTmp = TRUE; \
-      } \
-      if( bTmp )
+   #define STREAM_OPEN( sStarter ) iCloseSquare = 0;
 
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == '}' || iLastToken == WANTS_EOL || iLastToken == WANTS_ID || iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || iLastToken == IIF || iLastToken == PROCREQ )
@@ -565,18 +558,18 @@ int hb_comp_SLX_InterceptAction( int iRet, char *sToken )
       else if( iRet == NUM_LONG )
          printf( "   INTEGER = %il\n", yylval.valLong.lNumber  );
       else if( iRet == NUM_DOUBLE )
-   	 printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  );
+         printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  );
      else if( iRet < 256 )
      {
-   	if( iRet == '\n' || iRet == ';' )
-      	   printf( "***NEW LINE %i\n", hb_comp_iLine - 1  );
-   	else if( iRet == -1 )
-      	   printf( "!!!<EOF>\n" );
-	else
-      	   printf( "   DELIMITER = \"%c\"\n", iRet  );
+        if( iRet == '\n' || iRet == ';' )
+           printf( "***NEW LINE %i\n", hb_comp_iLine - 1  );
+        else if( iRet == -1 )
+           printf( "!!!<EOF>\n" );
+        else
+           printf( "   DELIMITER = \"%c\"\n", iRet  );
      }
      else
-   	printf( "   TOKEN = %i\n", iRet  );
+        printf( "   TOKEN = %i\n", iRet  );
    #endif
 
    return iRet;
@@ -648,7 +641,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       }
       else
       {
-   	 DEBUG_INFO( printf(  "Element \"%s\" is IDENTIFIER\n", yytext ) );
+         DEBUG_INFO( printf(  "Element \"%s\" is IDENTIFIER\n", yytext ) );
 
          if( yyleng > HB_SYMBOL_NAME_LEN )
          {
@@ -667,7 +660,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             iIdentifier++;
             DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
             yylval.string = hb_compIdentifierNew( yytext, TRUE );
-   	    iRet = IDENTIFIER;
+            iRet = IDENTIFIER;
          }
       }
    }
@@ -685,9 +678,9 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       }
       else
       {
-	 printf( "Error SLX0002 Too many numerals in line: %i\n", hb_comp_iLine - 1 );
-	 hb_comp_iErrorCount++;
-	 iTexts = 0;
+         printf( "Error SLX0002 Too many numerals in line: %i\n", hb_comp_iLine - 1 );
+         hb_comp_iErrorCount++;
+         iTexts = 0;
       }
       */
 
@@ -698,24 +691,24 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 
          if( ( double ) SHRT_MIN <= lNumber && lNumber <= ( double ) SHRT_MAX )
          {
-       	    yylval.valInteger.iNumber = lNumber;
-       	    yylval.valInteger.szValue = yytext;
-       	    iRet = NUM_INTEGER;
+            yylval.valInteger.iNumber = lNumber;
+            yylval.valInteger.szValue = yytext;
+            iRet = NUM_INTEGER;
          }
          else if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
          {
-       	    yylval.valLong.lNumber = lNumber;
-       	    yylval.valLong.szValue = yytext;
-       	    iRet = NUM_LONG;
+            yylval.valLong.lNumber = lNumber;
+            yylval.valLong.szValue = yytext;
+            iRet = NUM_LONG;
          }
          else
          {
-       	    /* NOTE: This will never happen */
-       	    yylval.valDouble.dNumber = lNumber;
-       	    yylval.valDouble.bWidth = HB_DEFAULT_WIDTH;
-       	    yylval.valDouble.bDec = 0;
-       	    yylval.valDouble.szValue = yytext;
-       	    iRet = NUM_DOUBLE;
+            /* NOTE: This will never happen */
+            yylval.valDouble.dNumber = lNumber;
+            yylval.valDouble.bWidth = HB_DEFAULT_WIDTH;
+            yylval.valDouble.bDec = 0;
+            yylval.valDouble.szValue = yytext;
+            iRet = NUM_DOUBLE;
          }
       }
       else
@@ -725,36 +718,36 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 
          if( tmpPtr )
          {
-       	    yylval.valDouble.bDec = strlen( tmpPtr + 1 );
-       	    yylval.valDouble.bWidth = yyleng - yylval.valDouble.bDec;
-       	    if( yylval.valDouble.bDec )
-	    {
+            yylval.valDouble.bDec = strlen( tmpPtr + 1 );
+            yylval.valDouble.bWidth = yyleng - yylval.valDouble.bDec;
+            if( yylval.valDouble.bDec )
+            {
                yylval.valDouble.bWidth--;
-	    }
-       	    yylval.valDouble.szValue = yytext;
-       	    iRet = NUM_DOUBLE;
+            }
+            yylval.valDouble.szValue = yytext;
+            iRet = NUM_DOUBLE;
          }
          else
          {
-       	    if( ( double )SHRT_MIN <= yylval.valDouble.dNumber && yylval.valDouble.dNumber <= ( double )SHRT_MAX )
-       	    {
+            if( ( double )SHRT_MIN <= yylval.valDouble.dNumber && yylval.valDouble.dNumber <= ( double )SHRT_MAX )
+            {
                yylval.valInteger.iNumber = ( int ) yylval.valDouble.dNumber;
                yylval.valInteger.szValue = yytext;
                iRet = NUM_INTEGER;
-       	    }
-       	    else if( ( double )LONG_MIN <= yylval.valDouble.dNumber && yylval.valDouble.dNumber <= ( double )LONG_MAX )
-       	    {
+            }
+            else if( ( double )LONG_MIN <= yylval.valDouble.dNumber && yylval.valDouble.dNumber <= ( double )LONG_MAX )
+            {
                yylval.valLong.lNumber = ( long ) yylval.valDouble.dNumber;
                yylval.valLong.szValue = yytext;
                iRet = NUM_LONG;
-       	    }
-       	    else
-       	    {
+            }
+            else
+            {
                yylval.valDouble.bWidth = yyleng + 1;
                yylval.valDouble.bDec = 0;
                yylval.valDouble.szValue = yytext;
                iRet = NUM_DOUBLE;
-       	    }
+            }
          }
       }
 
@@ -786,11 +779,11 @@ long hb_comp_SLX_Hex2L( char* sHex )
 
       if( lVal )
       {
-	 i = 0;
-	 while( i++ < iExp )
-	 {
-	    lVal *= 16;
-	 }
+         i = 0;
+         while( i++ < iExp )
+         {
+            lVal *= 16;
+         }
 
          lSum += lVal;
       }
@@ -803,6 +796,8 @@ long hb_comp_SLX_Hex2L( char* sHex )
 
 int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIgnoreWords, int iLastToken, char *sToken, char *s_szBuffer )
 {
+   extern BOOL hb_pp_bInline;
+
    DEBUG_INFO( printf( "Custom Action for %i\n", x ) );
 
    if( x < HB_WANTS_EXP )
@@ -838,63 +833,63 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
       case HB_SELF :
          aiHold[ (*ptr_iHold)++ ] = ':' + DONT_REDUCE ;
          yylval.string = hb_compIdentifierNew( "SELF", TRUE );
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "HB_SELF, Primary Identifier %s Increased to: %i\n", "SELF", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "HB_SELF, Primary Identifier %s Increased to: %i\n", "SELF", iIdentifier ) );
          return IDENTIFIER;
 
       case HB_CHK_BLOCK :
-	 if( s_sLastBlock == NULL )
-	 {
-	    char *pTmp = (char *) s_szBuffer;
+         if( s_sLastBlock == NULL )
+         {
+            char *pTmp = (char *) s_szBuffer;
 
-	    /* Skip White Space. */
-	    while( *pTmp && ( *pTmp == ' ' || *pTmp == '\t' ) )
-	    {
+            /* Skip White Space. */
+            while( *pTmp && ( *pTmp == ' ' || *pTmp == '\t' ) )
+            {
                pTmp++;
-	    }
+            }
 
-	    if( *pTmp == '|' )
-	    {
-	       unsigned int iBrackets = 1;
-	       char cTmp;
-	       BOOL bMacro = FALSE;
+            if( *pTmp == '|' )
+            {
+               unsigned int iBrackets = 1;
+               char cTmp;
+               BOOL bMacro = FALSE;
 
                pTmp++;
-	       while( *pTmp )
-	       {
-		  if( *pTmp == '}' )
-		  {
-		     iBrackets--;
-		     if( iBrackets == 0 )
-		     {
-		        break;
-		     }
-		  }
-		  else if( *pTmp == '{' )
-		  {
-		     iBrackets++;
-		  }
-		  else if( *pTmp == '&' )
-		  {
-		     bMacro = TRUE;
-		  }
+               while( *pTmp )
+               {
+                  if( *pTmp == '}' )
+                  {
+                     iBrackets--;
+                     if( iBrackets == 0 )
+                     {
+                        break;
+                     }
+                  }
+                  else if( *pTmp == '{' )
+                  {
+                     iBrackets++;
+                  }
+                  else if( *pTmp == '&' )
+                  {
+                     bMacro = TRUE;
+                  }
 
                   pTmp++;
-	       }
+               }
 
-	       if( bMacro )
-	       {
-	          pTmp++;
-	          cTmp = *pTmp;
-	          *pTmp = '\0';
+               if( bMacro )
+               {
+                  pTmp++;
+                  cTmp = *pTmp;
+                  *pTmp = '\0';
 
-	          s_sLastBlock = hb_compIdentifierNew( s_szBuffer - 1, TRUE );
+                  s_sLastBlock = hb_compIdentifierNew( s_szBuffer - 1, TRUE );
 
-	          *pTmp = cTmp;
-	       }
-	    }
-	 }
-	 return '{' + DONT_REDUCE;
+                  *pTmp = cTmp;
+               }
+            }
+         }
+         return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
          yylval.string = hb_compIdentifierNew( sPair, TRUE );
@@ -926,10 +921,10 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
 
       case HB_IN :
          *ptr_bIgnoreWords = FALSE;
-	 if( iLastToken == IDENTIFIER )
-	    { return IN + DONT_REDUCE; }
-	 else
-	 {
+         if( iLastToken == IDENTIFIER )
+            { return IN + DONT_REDUCE; }
+         else
+         {
             yylval.string = hb_compIdentifierNew( "IN", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
@@ -939,8 +934,8 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
       case HB_STEP :
          *ptr_bIgnoreWords = FALSE;
          if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' )
-	    { return STEP + DONT_REDUCE; }
-	 else
+            { return STEP + DONT_REDUCE; }
+         else
          {
             yylval.string = hb_compIdentifierNew( "STEP", TRUE );
             iIdentifier++;
@@ -951,8 +946,8 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
       case HB_TO :
          *ptr_bIgnoreWords = FALSE;
          if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' )
-	    { return TO + DONT_REDUCE; }
-	 else
+            { return TO + DONT_REDUCE; }
+         else
             {
               yylval.string = hb_compIdentifierNew( "TO", TRUE );
               iIdentifier++;
@@ -962,57 +957,43 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
 
       case HB_WITH :
          *ptr_bIgnoreWords = FALSE;
-	 if( iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' )
-	    { return WITH + DONT_REDUCE; }
-	 else
-	 {
+         if( iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' )
+            { return WITH + DONT_REDUCE; }
+         else
+         {
             yylval.string = hb_compIdentifierNew( "WITH", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_WITH, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
             return IDENTIFIER;
-	  }
+          }
 
       case _WITH_ID_CR :
          aiHold[ (*ptr_iHold)++ ] = '\n' + DONT_REDUCE;
          yylval.string = hb_compIdentifierNew( "WITH", TRUE );
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "_WITH_ID_CR, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "_WITH_ID_CR, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
 
       case _WITH_ID_SEMI :
          aiHold[ (*ptr_iHold)++ ] = ';' + DONT_REDUCE;
          yylval.string = hb_compIdentifierNew( "WITH", TRUE );
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "_WITH_ID_SEMI, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "_WITH_ID_SEMI, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_NESTED_LIT :
-	 {
-	    int iPairLen = strlen( sPair );
+         {
+            int iPairLen = strlen( sPair );
 
-	    sPair[ iPairLen ] = sTerm[0];
-	    sPair[ iPairLen + 1 ] = '\0';
+            sPair[ iPairLen ] = sTerm[0];
+            sPair[ iPairLen + 1 ] = '\0';
             yylval.string = hb_compIdentifierNew( sPair, TRUE );
             return LITERAL + DONT_REDUCE ;
-	 }
-
-      case HB_QOUT_ACT :
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "HB_QOUT_ACT, Primary Identifier %s Increased to: %i\n", "QOUT", iIdentifier ) );
-         yylval.string = hb_compIdentifierNew( "QOUT", TRUE );
-         aiHold[ (*ptr_iHold)++ ] = '(' + DONT_REDUCE;
-         aiHold[ (*ptr_iHold)++ ] = IDENTIFIER + DONT_REDUCE;
-         return _QOUT_LIT;
-
-      case HB_RET_QOUT_LIT :
-         yylval.string = hb_compIdentifierNew( sPair, TRUE );
-         aiHold[ (*ptr_iHold)++ ] = '\n' + DONT_REDUCE;
-         aiHold[ (*ptr_iHold)++ ] = ')' + DONT_REDUCE;
-         return LITERAL + DONT_REDUCE ;
+         }
 
       case HB_DO_WHILE_ID :
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "HB_DO_WHILE_ID, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "HB_DO_WHILE_ID, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
          yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
          aiHold[ (*ptr_iHold)++ ] = IDENTIFIER + DONT_REDUCE;
          return DO + DONT_REDUCE;
@@ -1020,187 +1001,266 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
       case HB_DO_WHILE_WITH :
          aiHold[ (*ptr_iHold)++ ] = WITH + DONT_REDUCE;
          yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "HB_DO_WHILE_WITH, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "HB_DO_WHILE_WITH, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
          aiHold[ (*ptr_iHold)++ ] = IDENTIFIER + DONT_REDUCE;
          return DO + DONT_REDUCE;
 
       case HB_DO_CASE_ID :
          yylval.string = hb_compIdentifierNew( "CASE", TRUE );
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "HB_DO_CASE_ID, Primary Identifier %s Increased to: %i\n", "CASE", iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "HB_DO_CASE_ID, Primary Identifier %s Increased to: %i\n", "CASE", iIdentifier ) );
          aiHold[ (*ptr_iHold)++ ] = IDENTIFIER + DONT_REDUCE;
          return DO + DONT_REDUCE;
 
       case HB_MACRO_ERR :
-	 hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, "&", NULL );
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, "&", NULL );
          return  0;
 
       case HB_ID_ON_HOLD :
          yylval.string = sIdOnHold;
-	 iIdentifier++;
-	 DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s - Increased to: %i\n", sIdOnHold, iIdentifier ) );
+         iIdentifier++;
+         DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s - Increased to: %i\n", sIdOnHold, iIdentifier ) );
          return IDENTIFIER;
 
       case HB_INLINE :
 
-	 /* NOTE: hb_compiLineINLINE is being RESET in ppcomp.c - hb_pp_Internal() */
+         /* NOTE: hb_compiLineINLINE is being RESET in ppcomp.c - hb_pp_Internal() */
 
-	 if( hb_comp_iLineINLINE )
-	 {
+         if( hb_comp_iLineINLINE )
+         {
             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, "on the same line", NULL );
-	    iIdentifier++;
-	    return IDENTIFIER + DONT_REDUCE;
-	 }
-	 else
-	 {
-	    #define INLINE_NORMAL 0
-	    #define INLINE_SINGLE_QUOT 1
-	    #define INLINE_DOUBLE_QUOT 2
-	    #define INLINE_COMMENT 3
+            iIdentifier++;
+            return IDENTIFIER + DONT_REDUCE;
+         }
+         else
+         {
+            #define INLINE_NORMAL 0
+            #define INLINE_SINGLE_QUOT 1
+            #define INLINE_DOUBLE_QUOT 2
+            #define INLINE_COMMENT 3
 
-	    char sBuffer[ YY_BUF_SIZE ], *pBuffer, sInlineSym[] = "HB_INLINE_0", cMode = INLINE_NORMAL;
-	    int iSize, iBraces = 0;
-	    extern BOOL hb_pp_bInline;
+            char sBuffer[ YY_BUF_SIZE ], *pBuffer, sInlineSym[] = "HB_INLINE_0", cMode = INLINE_NORMAL;
+            int iSize, iBraces = 0;
             PINLINE pInline;
 
-	    hb_comp_iLineINLINE = hb_comp_iLine;
+            hb_comp_iLineINLINE = hb_comp_iLine;
             hb_pp_bInline = TRUE;
 
-	    sInlineSym[10] = hb_comp_cInlineID++;
+            sInlineSym[10] = hb_comp_cInlineID++;
 
-	    switch( sInlineSym[10] )
-	    {
-	       case '9' + 1 :
-		  sInlineSym[10] = 'A';
-		  break;
+            switch( sInlineSym[10] )
+            {
+               case '9' + 1 :
+                  sInlineSym[10] = 'A';
+                  break;
 
-	       case 'Z' + 1 :
+               case 'Z' + 1 :
                   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, NULL, NULL );
-		  break;
-	    }
+                  break;
+            }
 
             pInline = hb_compInlineAdd( hb_compIdentifierNew( sInlineSym, TRUE ) );
 
-	  DigestInline :
+          DigestInline :
 
             YY_INPUT( (char*) sBuffer, iSize, YY_BUF_SIZE );
-	    if( iSize == 0 )
-	    {
+            if( iSize == 0 )
+            {
                hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_INVALID_INLINE, hb_comp_functions.pLast->szName, NULL );
-	       hb_pp_bInline = FALSE;
-	       return '\n' + DONT_REDUCE;
-	    }
-	    pBuffer = (char*) sBuffer;
+               hb_pp_bInline = FALSE;
+               return '\n' + DONT_REDUCE;
+            }
+            pBuffer = (char*) sBuffer;
 
-	    while( *pBuffer )
-	    {
-	       switch( cMode )
-	       {
-		  case INLINE_NORMAL :
-	             if( *pBuffer == '{' )
-	             {
-	                iBraces++;
-	             }
-	             else if( *pBuffer == '}' && iBraces > 1 )
-	             {
-	                iBraces--;
-	             }
-	             else if( *pBuffer == '}' )
-	             {
-	                hb_pp_bInline = FALSE;
-			break;
-	             }
-	             else if( *pBuffer == '\'' )
-	             {
-		        cMode = INLINE_SINGLE_QUOT;
-	             }
-	             else if( *pBuffer == '"' )
-	             {
-		        cMode = INLINE_DOUBLE_QUOT;
-	             }
-	             else if( *pBuffer == '/' && *(pBuffer+1) == '/' )
-	             {
-		        goto SaveInline;
-	             }
-	             else if( *pBuffer == '/' && *(pBuffer+1) == '*' )
-	             {
-		        pBuffer++;
-		        cMode = INLINE_COMMENT;
-	             }
-		     break;
+            while( *pBuffer )
+            {
+               switch( cMode )
+               {
+                  case INLINE_NORMAL :
+                     if( *pBuffer == '{' )
+                     {
+                        iBraces++;
+                     }
+                     else if( *pBuffer == '}' && iBraces > 1 )
+                     {
+                        iBraces--;
+                     }
+                     else if( *pBuffer == '}' )
+                     {
+                        hb_pp_bInline = FALSE;
+                        break;
+                     }
+                     else if( *pBuffer == '\'' )
+                     {
+                        cMode = INLINE_SINGLE_QUOT;
+                     }
+                     else if( *pBuffer == '"' )
+                     {
+                        cMode = INLINE_DOUBLE_QUOT;
+                     }
+                     else if( *pBuffer == '/' && *(pBuffer+1) == '/' )
+                     {
+                        goto SaveInline;
+                     }
+                     else if( *pBuffer == '/' && *(pBuffer+1) == '*' )
+                     {
+                        pBuffer++;
+                        cMode = INLINE_COMMENT;
+                     }
+                     break;
 
-		  case INLINE_SINGLE_QUOT :
-		     if( *pBuffer == '\\' )
-		     {
-		        pBuffer++;
-		     }
-		     else if( *pBuffer == '\'' )
-		     {
-			cMode = INLINE_NORMAL;
-		     }
-		     break;
+                  case INLINE_SINGLE_QUOT :
+                     if( *pBuffer == '\\' )
+                     {
+                        pBuffer++;
+                     }
+                     else if( *pBuffer == '\'' )
+                     {
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
 
-		  case INLINE_DOUBLE_QUOT :
-		     if( *pBuffer == '\\' )
-		     {
-		        pBuffer++;
-		     }
-		     else if( *pBuffer == '"' )
-		     {
-			cMode = INLINE_NORMAL;
-		     }
-		     break;
+                  case INLINE_DOUBLE_QUOT :
+                     if( *pBuffer == '\\' )
+                     {
+                        pBuffer++;
+                     }
+                     else if( *pBuffer == '"' )
+                     {
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
 
-		  case INLINE_COMMENT :
-		     if( *pBuffer == '*' && *(pBuffer+1) == '/' )
-		     {
-		        pBuffer++;
-			cMode = INLINE_NORMAL;
-		     }
-		     break;
-	       }
+                  case INLINE_COMMENT :
+                     if( *pBuffer == '*' && *(pBuffer+1) == '/' )
+                     {
+                        pBuffer++;
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
+               }
 
                pBuffer++;
-	    }
+            }
 
           SaveInline :
 
-	    if( pInline->pCode == NULL )
-	    {
+            if( pInline->pCode == NULL )
+            {
                pInline->pCode = (unsigned char *) hb_xgrab( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
                strcpy( (char *) pInline->pCode, (char*) sBuffer );
-	    }
-	    else
-	    {
+            }
+            else
+            {
                pInline->pCode = (unsigned char *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
                strcpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer );
-	    }
-	    pInline->lPCodeSize += iSize;
+            }
+            pInline->lPCodeSize += iSize;
 
-	    if( hb_pp_bInline )
-	    {
-	       goto DigestInline;
-	    }
-	    else
-	    {
+            if( hb_pp_bInline )
+            {
+               goto DigestInline;
+            }
+            else
+            {
                if( hb_comp_iLanguage != LANG_C && hb_comp_iLanguage != LANG_OBJ_MODULE )
-	       {
+               {
                   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_REQUIRES_C, NULL, NULL );
                   hb_xfree( ( void * ) pInline->pCode );
                   hb_xfree( ( void * ) pInline->szFileName );
                   hb_xfree( ( void * ) pInline );  /* NOTE: szName will be released by hb_compSymbolKill() */
-	       }
+               }
 
-	       hb_comp_iLinePRG = hb_comp_iLine;
-	       hb_comp_iLine = hb_comp_iLineINLINE;
+               hb_comp_iLinePRG = hb_comp_iLine;
+               hb_comp_iLine = hb_comp_iLineINLINE;
 
                yylval.string = hb_compIdentifierNew( sInlineSym, TRUE );
-	       iIdentifier++;
-	       DEBUG_INFO( printf( "INLINE, Primary Identifier %s Increased to: %i\n", "INLINE", iIdentifier ) );
+               iIdentifier++;
+               DEBUG_INFO( printf( "INLINE, Primary Identifier %s Increased to: %i\n", "INLINE", iIdentifier ) );
                return IDENTIFIER + DONT_REDUCE;
-	    }
-	 }
+            }
+         }
+
+      case HB_TEXT_LINE :
+         aiHold[ 0 ] = HB_NEXT_LINE;
+         aiHold[ 1 ] = '\n' + DONT_REDUCE;
+         aiHold[ 2 ] = ')' + DONT_REDUCE;
+         *ptr_iHold  = 3;
+
+         yylval.string = (char *) sPair;
+         return LITERAL + DONT_REDUCE;
+
+      case HB_TEXT_BLOCK :
+         sTextFunction = hb_compIdentifierNew( yylval.string, TRUE );
+         sTextReset    = hb_compIdentifierNew( sIdOnHold, TRUE );
+         iIdentifier   = 1;
+         //printf( "TextFun: %s Reset %s\n", sTextFunction, sTextReset );
+
+         // Intentionaly fall through to HB_NEXT_LINE below.
+
+      case HB_NEXT_LINE :
+      {
+         int iSize;
+
+         hb_pp_bInline = TRUE;
+
+         YY_INPUT( (char*) sPair, iSize, YY_BUF_SIZE );
+
+         hb_pp_bInline = FALSE;
+
+         if( iSize == 0 )
+         {
+            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MISSING_ENDTEXT, hb_comp_functions.pLast->szName, NULL );
+            return '\n' + DONT_REDUCE;
+         }
+         else
+         {
+            char *pTmp = (char *) sPair;
+
+            while( *pTmp == ' ' || *pTmp == '\t' )
+            {
+               pTmp++;
+            }
+
+            if( toupper( pTmp[0] ) == 'E' &&
+                toupper( pTmp[1] ) == 'N' &&
+                toupper( pTmp[2] ) == 'D' &&
+                toupper( pTmp[3] ) == 'T' &&
+                toupper( pTmp[4] ) == 'E' &&
+                toupper( pTmp[5] ) == 'X' &&
+                toupper( pTmp[6] ) == 'T' )
+            {
+               pTmp += 7;
+
+               while( *pTmp == ' ' || *pTmp == '\t' )
+               {
+                  pTmp++;
+               }
+
+               if( *pTmp == '\n' || *pTmp == ';' )
+               {
+                  aiHold[ 0 ] = '\n';
+                  aiHold[ 1 ] = ')' + DONT_REDUCE;
+                  aiHold[ 2 ] = '(' + DONT_REDUCE;
+                  *ptr_iHold  = 3;
+
+                  yylval.string = sTextReset;
+                  return IDENTIFIER + DONT_REDUCE;
+               }
+            }
+         }
+
+         // Remove the CR.
+         sPair[ iSize - 1 ] = '\0';
+
+         aiHold[ 0 ] = HB_TEXT_LINE;
+         aiHold[ 1 ] = '(' + DONT_REDUCE;
+         *ptr_iHold  = 2;
+
+         yylval.string = sTextFunction;
+         return IDENTIFIER + DONT_REDUCE;
+      }
 
       default:
          printf( "WARNING! No Handler for Custom Action %i\n", x );

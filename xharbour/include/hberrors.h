@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.80 2001/06/14 21:20:43 dholm Exp $
+ * $Id: hberrors.h,v 1.1.1.1 2001/12/21 10:47:19 ronpinkas Exp $
  */
 
 /*
@@ -113,6 +113,7 @@ extern "C" {
 #define HB_COMP_ERR_INVALID_INLINE              49
 #define HB_COMP_ERR_TOOMANY_INLINE              50
 #define HB_COMP_ERR_REQUIRES_C                  51
+#define HB_COMP_ERR_MISSING_ENDTEXT             52
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

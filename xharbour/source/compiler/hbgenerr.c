@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.2 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,8 @@ char * hb_comp_szErrors[] =
    "GET contains complex macro",
    "Unterminated inline block in function: \'%s\'",
    "Too many inline blocks %s",
-   "Inline C requires C output generation, use -gc[n]"
+   "Inline C requires C output generation, use -gc[n]",
+   "Missing ENDTEXT"
 };
 
 /* Table with parse warnings */
