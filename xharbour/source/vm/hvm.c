@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.163 2003/02/22 01:30:37 jonnymind Exp $
+ * $Id: hvm.c,v 1.164 2003/02/22 17:15:51 ronpinkas Exp $
  */
 
 /*
@@ -6672,7 +6672,6 @@ HB_FUNC( HB_QSELF )
             strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&
             pBase != HB_VM_STACK.pItems )
    {
-      lLevel--;
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
