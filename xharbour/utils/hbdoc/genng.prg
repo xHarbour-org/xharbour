@@ -1,5 +1,5 @@
 /*
- * $Id: genng.prg,v 1.1.1.1 2001/12/21 10:45:24 ronpinkas Exp $
+ * $Id: genng.prg,v 1.2 2003/12/29 18:25:56 lculik Exp $
  */
 
 /*
@@ -118,9 +118,6 @@ FUNCTION ProcessiNg()
 
    LOCAL lData         := .F.
    LOCAL lMethod       := .F.
-   LOCAL cBuffEnd
-   LOCAL nPos
-   LOCAL nPosEND
    LOCAL lIsDataLink   := .F.
    LOCAL lIsMethodLink := .F.
 
@@ -953,8 +950,6 @@ RETURN nil
 *+
 FUNCTION GenNgTable( oNgi )
 
-   LOCAL y
-   LOCAL nLen2
    LOCAL x
    LOCAL nMax
    LOCAL nSpace
@@ -963,7 +958,6 @@ FUNCTION GenNgTable( oNgi )
    LOCAL nSpace2
    LOCAL nPos1
    LOCAL nPos2
-   LOCAL LColor
    LOCAL nPos
    LOCAL aLensFItem  := {}
    LOCAL aLensSItem  := {}
@@ -976,7 +970,6 @@ FUNCTION GenNgTable( oNgi )
    LOCAL nSpace4
    LOCAL aLensTItem  := {}
    LOCAL aLensfoItem := {}
-   LOCAL nLen
    FOR X := 1 TO LEN( afitable )
       IF !EMPTY( afiTable[ x ] )
          AADD( aLensFItem, LEN( afiTable[ x ] ) )
@@ -1155,7 +1148,6 @@ FUNCTION ProcNgTable( cBuffer, nNum )
    LOCAL cItem2    := ''
    LOCAL cItem3    := ''
    LOCAL cItem4    := ''
-   LOCAL xtype
    LOCAL nColorpos
    LOCAL cColor
    cBuffer := ALLTRIM( cBuffer )
@@ -1170,7 +1162,7 @@ FUNCTION ProcNgTable( cBuffer, nNum )
       cBuffer   := STRTRAN( cbuffer, "<color:", "" )
       cBuffer   := STRTRAN( cbuffer, ">", "" )
       cBuffer   := STRTRAN( cBuffer, ccolor, '' )
-      nColorpos := ASCAN( aColorTable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nColorpos := ASCAN( aColorTable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       cColor    := aColortable[ nColorPos, 2 ]
    ENDIF
    /*
@@ -1286,7 +1278,6 @@ FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
    LOCAL nColorPos
    LOCAL ccolor      := ''
    LOCAL cReturn     := ''
-   LOCAL ncolorend
    LOCAL nIdentLevel
    LOCAL cOldLine
    LOCAL lEndPar     := .F.
@@ -1335,7 +1326,7 @@ FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
                cbuffer := cReturn
             ENDIF
          ELSE
-            cBuffer := FormatngBuff( cBuffer, cStyle, ongi )
+            cBuffer := FormatngBuff( cBuffer, cStyle )
          ENDIF
       ENDIF
    ENDIF
@@ -1568,7 +1559,7 @@ RETURN nil
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNC checkngcolor( cbuffer, ncolorpos )
+FUNCTION checkngcolor( cbuffer, ncolorpos )
 
    LOCAL ncolorend
    LOCAL nreturn
@@ -1584,7 +1575,7 @@ FUNC checkngcolor( cbuffer, ncolorpos )
       cOldColorString := SUBSTR( cbuffer, ncolorpos )
       nColorend       := AT( ">", cOldColorString )
       cOldColorString := SUBSTR( cOldColorString, 1, nColorEnd )
-      nreturn         := ASCAN( acolortable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nreturn         := ASCAN( acolortable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       IF nreturn > 0
          cReturn := "^a" + acolortable[ nreturn, 2 ]
       ENDIF
@@ -1608,7 +1599,6 @@ FUNC maxelem( a )
    LOCAL tam     := 0
    LOCAL nMax2   := 0
    LOCAL nPos    := 1
-   LOCAL cString
 
    LOCAL nCount
    FOR nCount := 1 TO nSize
@@ -1630,7 +1620,7 @@ RETURN max
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNCTION FormatNgBuff( cBuffer, cStyle, ongi )
+FUNCTION FormatNgBuff( cBuffer, cStyle )
 
    LOCAL cReturn       := ''
    LOCAL cLine         := ''
@@ -1638,7 +1628,7 @@ FUNCTION FormatNgBuff( cBuffer, cStyle, ongi )
    LOCAL cBuffEnd      := ''
    LOCAL lEndBuffer    := .f.
    LOCAL nPos
-   LOCAL nPosend
+
    LOCAL lArgBold      := .f.
    LOCAL LFstTableItem := .t.
    cReturn := cBuffer + ' '
@@ -1738,8 +1728,6 @@ STATIC FUNCTION ReadFromTop( nh )
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
    LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
-   LOCAL nlenpos
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1770,7 +1758,7 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
    LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
-   nPos := ASCAN( xPos, { | x, y | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
+   nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
       cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0

@@ -1,5 +1,5 @@
 /*
- * $Id: genrtf.prg,v 1.3 2003/10/13 03:40:12 lculik Exp $
+ * $Id: genrtf.prg,v 1.4 2003/12/29 18:25:56 lculik Exp $
  */
 
 /*
@@ -134,10 +134,6 @@ FUNCTION ProcessRtf()
    LOCAL lPar
    LOCAL lWrite         := .f.
    LOCAL lWasLine       := .F.
-   LOCAL nPos
-   LOCAL nEpos
-   LOCAL nPosend
-   LOCAL cBuffEnd
    LOCAL lIsDataLink    := .F.
    LOCAL lIsMethodLink  := .F.
    LOCAL cName
@@ -850,7 +846,6 @@ FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
    LOCAL nColorPos
    LOCAL ccolor      := ''
    LOCAL creturn     := ''
-   LOCAL ncolorend
    LOCAL NIDENTLEVEL
    LOCAL coline
    LOCAL lEndPar     := .F.
@@ -902,7 +897,7 @@ FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
             ENDIF
 
          ELSE
-            cBuffer := FormatrtfBuff( cBuffer, cStyle, ortf )
+            cBuffer := FormatrtfBuff( cBuffer, cStyle )
          ENDIF
       ENDIF
    ENDIF
@@ -1025,9 +1020,6 @@ FUNCTION ProcRtfTable( cBuffer )
 
    LOCAL nPos
    LOCAL cItem
-   LOCAL cItem2
-   LOCAL cItem3
-   LOCAL xtype
    LOCAL nColorpos
    LOCAL cColor
    IF AT( "<color:", cBuffer ) > 0
@@ -1040,7 +1032,7 @@ FUNCTION ProcRtfTable( cBuffer )
       cBuffer   := STRTRAN( cbuffer, "<color:", "" )
       cBuffer   := STRTRAN( cbuffer, ">", "" )
       cBuffer   := STRTRAN( cBuffer, ccolor, '' )
-      nColorpos := ASCAN( aColorTable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nColorpos := ASCAN( aColorTable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       cColor    := aColortable[ nColorPos, 2 ]
    ENDIF
    IF !EMPTY( cBuffer )
@@ -1066,17 +1058,10 @@ RETURN Nil
 *+
 FUNCTION GenRtfTable( oRtf )
 
-   LOCAL y
-   LOCAL nLen2
    LOCAL x
-   LOCAL nMax
-   LOCAL nSpace
    LOCAL lCar       := .f.
    LOCAL nMax2
-   LOCAL nSpace2
-   LOCAL nPos1
-   LOCAL nPos2
-   LOCAL LColor
+   LOCAL nPos2 
    LOCAL nPos
    LOCAL aLensFItem := {}
    LOCAL aLensSItem := {}
@@ -1130,7 +1115,7 @@ FUNC checkrtfcolor( cbuffer, ncolorpos )
       cOldColorString := SUBSTR( cbuffer, ncolorpos )
       nColorend       := AT( ">", cOldColorString )
       cOldColorString := SUBSTR( cOldColorString, 1, nColorEnd )
-      nreturn         := ASCAN( acolortable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nreturn         := ASCAN( acolortable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       IF nreturn > 0
          creturn := "\cf" + acolortable[ nreturn, 2 ]
       ENDIF
@@ -1176,17 +1161,14 @@ RETURN max
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNCTION FormatrtfBuff( cBuffer, cStyle, ongi )
+FUNCTION FormatrtfBuff( cBuffer, cStyle )
 
    LOCAL cReturn  := ''
    LOCAL cLine    := ''
    LOCAL cBuffend := ''
-   LOCAL cEnd
-   LOCAL cStart
    LOCAL coline   := ''
    LOCAL lEndBuff := .f.
    LOCAL nPos
-   LOCAL nPosEnd
    LOCAL lArgBold := .f.
    creturn := cBuffer + ' '
    IF AT( '</par>', creturn ) > 0 .OR. EMPTY( cBuffer )
@@ -1289,7 +1271,6 @@ STATIC FUNCTION ReadFromTop( nh )
    LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
    LOCAL NPOS      := 0
-   LOCAL nlenpos
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1320,7 +1301,7 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
    LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
-   nPos := ASCAN( xPos, { | x, y | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
+   nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
       cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0

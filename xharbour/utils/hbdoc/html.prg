@@ -1,5 +1,5 @@
 /*
- * $Id: html.prg,v 1.13 2001/04/15 03:04:00 lculik Exp $
+ * $Id: html.prg,v 1.1.1.1 2001/12/21 10:45:37 ronpinkas Exp $
  */
 
 /*
@@ -255,7 +255,6 @@ RETURN Self
 
 METHOD NewContent( cFile ) CLASS THTML
     
-   Local nCount
    IF Nx > 0
       FCLOSE( NX )
    ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: os2.prg,v 1.10 2001/04/15 03:04:00 lculik Exp $
+ * $Id: os2.prg,v 1.1.1.1 2001/12/21 10:45:38 ronpinkas Exp $
  */
 
 /*
@@ -219,9 +219,6 @@ RETURN Self
 
 METHOD WriteTitle( cTopic, cTitle ,cCategory) CLASS TOs2
 
-   LOCAL cTemp
-   LOCAL nPos
-   LOCAL cWrite
    LOCAL nItem
    Local lHead:=.F.
    LOCAL nrItem,nIItem
@@ -283,7 +280,7 @@ METHOD WriteLink( cLink ) CLASS TOs2
    IF Self:Scanlink( cLink ) == 0
       nItem := ASCAN( Self:aLinkRef, { | a | upper(a[ 1 ]) == upper(cLink) } )                // Again.
    ELSE
-      nItem := ASCAN( Self:aLinkRef, { | a, b | upper(a[ 1 ]) == upper(cLink) } )
+      nItem := ASCAN( Self:aLinkRef, { | a | upper(a[ 1 ]) == upper(cLink) } )
 
    ENDIF
 
@@ -300,9 +297,8 @@ RETURN Self
 METHOD ScanLink( cLink ) CLASS TOs2
 
    LOCAL nItem
-   LOCAL nReturn
 
-   nItem := ASCAN( Self:aLinkRef, { | a, b | Upper(a[ 1 ] )== upper(cLink) } )
+   nItem := ASCAN( Self:aLinkRef, { | a | Upper(a[ 1 ] )== upper(cLink) } )
 
    IF nItem == 0
       AADD( Self:aLinkRef, { upper(cLink), Self:nRef } )
@@ -313,7 +309,6 @@ RETURN nItem
 METHOD ScanRef( cLink ) CLASS TOs2
 
    LOCAL nItem
-   LOCAL nReturn
 
    nItem := ASCAN( Self:aHeadRef, { | a | Upper(a)== upper(cLink) } )
 
@@ -326,7 +321,6 @@ RETURN nItem
 METHOD ScanInd( cLink ) CLASS TOs2
 
    LOCAL nItem
-   LOCAL nReturn
 
    nItem := ASCAN( Self:aIndRef, { | a | Upper(a)== upper(cLink) } )
 
@@ -368,7 +362,6 @@ RETURN cReturn
 
 METHOD WriteJumpTitle( cTitle, cTopic ) CLASS TOs2
 
-   LOCAL cTemp
    LOCAL nPos
    LOCAL cWrite
 
@@ -431,5 +424,3 @@ IF nLen<=230
 ENDIF
 RETURN aLine
 *+ EOF: OS2.PRG
-
-

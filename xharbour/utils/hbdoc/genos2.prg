@@ -1,5 +1,5 @@
 /*
- * $Id: genos2.prg,v 1.14 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genos2.prg,v 1.1.1.1 2001/12/21 10:45:27 ronpinkas Exp $
  */
 
 /*
@@ -134,10 +134,6 @@ FUNCTION ProcessOs2()
    LOCAL oOs2
    LOCAL lData         := .F.
    LOCAL lMethod       := .F.
-   LOCAL nPos
-   LOCAL nEpos
-   LOCAL nPosend
-   LOCAL cBuffEnd
    LOCAL lIsDataLink   := .F.
    LOCAL lIsMethodLink := .F.
 
@@ -736,18 +732,15 @@ RETURN aAlso
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNCTION Formatos2Buff( cBuffer, cStyle, ongi )
+FUNCTION Formatos2Buff( cBuffer, cStyle )
 
    LOCAL cReturn  := ''
    LOCAL cLine    := ''
    LOCAL cBuffend := ''
-   LOCAL cEnd
-   LOCAL cStart
    LOCAL coline   := ''
    LOCAL lEndBuff := .f.
 
    LOCAL nPos
-   LOCAL nPosEnd
    LOCAL lArgBold := .f.
 
    cReturn := cBuffer + ' '
@@ -840,7 +833,7 @@ RETURN cReturn
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNC checkos2color( cbuffer, ncolorpos )
+FUNCTION checkos2color( cbuffer, ncolorpos )
 
    LOCAL ncolorend
    LOCAL nreturn
@@ -856,7 +849,7 @@ FUNC checkos2color( cbuffer, ncolorpos )
       cOldColorString := SUBSTR( cbuffer, ncolorpos )
       nColorend       := AT( ">", cOldColorString )
       cOldColorString := SUBSTR( cOldColorString, 1, nColorEnd )
-      nreturn         := ASCAN( acolortable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nreturn         := ASCAN( acolortable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       IF nreturn > 0
          creturn := + acolortable[ nreturn, 2 ]
       ENDIF
@@ -879,7 +872,6 @@ FUNCTION ProcOs2Table( cBuffer , nNum )
    LOCAL cItem2
    LOCAL cItem3
    LOCAL cItem4
-   LOCAL xtype
    LOCAL nColorpos
    LOCAL cColor
    cBuffer := ALLTRIM( cBuffer )
@@ -892,7 +884,7 @@ FUNCTION ProcOs2Table( cBuffer , nNum )
       cBuffer   := STRTRAN( cbuffer, "<color:", "" )
       cBuffer   := STRTRAN( cbuffer, ">", "" )
       cBuffer   := STRTRAN( cBuffer, ccolor, '' )
-      nColorpos := ASCAN( aColorTable, { | x, y | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
+      nColorpos := ASCAN( aColorTable, { | x | UPPER( x[ 1 ] ) == UPPER( ccolor ) } )
       cColor    := aColortable[ nColorPos, 2 ]
    ENDIF
    IF EMPTY( cBuffer )
@@ -955,7 +947,6 @@ FUNC maxos2elem( a )
    LOCAL tam     := 0
    LOCAL max2    := 0
    LOCAL nPos    := 1
-   LOCAL cString
    LOCAL ncount
    FOR ncount := 1 TO nsize
       tam := LEN( a[ ncount ] )
@@ -974,7 +965,8 @@ RETURN max
 *+
 FUNCTION Genos2Table( oOs2 )
     Local x
-    Local cItem,cItem1,cItem2,cItem3
+    Local cItem,cItem1
+    //Local cItem2,cItem3 // Variables not used in function, it may be deleted? 
 //   oos2:WritePar( "" )
     if nNumTableItems == 2
         citem  := str(maxos2elem(afitable),2)
@@ -1041,7 +1033,6 @@ FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
    LOCAL nColorPos
    LOCAL ccolor      := ''
    LOCAL creturn     := ''
-   LOCAL ncolorend
    LOCAL NIDENTLEVEL
    LOCAL coline
    LOCAL lEndPar     := .F.
@@ -1089,7 +1080,7 @@ FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
             ENDIF
 
          ELSE
-            cBuffer := Formatos2Buff( cBuffer, cStyle, oOs2 )
+            cBuffer := Formatos2Buff( cBuffer, cStyle )
          ENDIF
       ENDIF
    ENDIF
@@ -1285,7 +1276,6 @@ STATIC FUNCTION ReadFromTop( nh )
    LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
    LOCAL NPOS      := 0
-   LOCAL nlenpos
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1316,7 +1306,7 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
    LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
-   nPos := ASCAN( xPos, { | x, y | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
+   nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
       cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0

@@ -1,5 +1,5 @@
 /*
- * $Id: ng.prg,v 1.4 2001/04/15 03:04:00 lculik Exp $
+ * $Id: ng.prg,v 1.1.1.1 2001/12/21 10:45:38 ronpinkas Exp $
  */
 
 /*
@@ -107,9 +107,6 @@ RETURN Self
 
 METHOD WriteTitle( cTopic, cTitle ) CLASS TNortonGuide
 
-   LOCAL cTemp
-   LOCAL nPos
-   LOCAL cWrite
 
    cTopic := HB_OEMTOANSI( cTopic )
 
