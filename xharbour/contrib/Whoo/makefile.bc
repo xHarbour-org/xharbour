@@ -1,7 +1,7 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=c:\bcc55
+BCC_DIR=e:\bcc55
 WHO_DIR=.
 WH_DIR=..\what32
 
@@ -9,7 +9,7 @@ WH_DIR=..\what32
 
 # library
 #
-WHOOLIB    = lib\whoo.lib
+WHOOLIB    = $(LIBDIR)\whoo.lib
 
 WHOOOBJ    = TObject.obj TPersistent.obj TComponent.obj TControl.obj \
              TCustomControl.obj TWinControl.obj TForm.obj \
