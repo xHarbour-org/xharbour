@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.129 2002/11/14 07:59:28 what32 Exp $
+ * $Id: xide.prg,v 1.130 2002/11/15 01:56:37 what32 Exp $
  */
 
 /*
@@ -155,12 +155,10 @@ METHOD MainToolBar() CLASS MainForm
 
    oCB := TCoolBar():Create( MainForm )
    oCB:SetParent( MainForm )
-   oCB:HandleNeeded()
    
     // add the xmake toolbar
    WITH OBJECT TToolBar():Create( MainForm )
       :SetParent( MainForm )
-      :HandleNeeded()
       
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
@@ -196,18 +194,17 @@ METHOD MainToolBar() CLASS MainForm
 
    WITH OBJECT ToolTabs():Create( MainForm )
       :SetParent( MainForm )
-      :HandleNeeded()
       oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Handle, 550, 56, , "", NIL )
 
       oPage := TabPage():Create( MainForm:ToolTabs )
-      oPage:SetParent( MainForm:ToolTabs )
       oPage:Name    := "StdTab"
       oPage:Caption := "Standard"
+      oPage:SetParent( MainForm:ToolTabs )
       
       oPage := TabPage():Create( MainForm:ToolTabs )
-      oPage:SetParent( MainForm:ToolTabs )
       oPage:Name    := "Win32"
       oPage:Caption := "Win32"
+      oPage:SetParent( MainForm:ToolTabs )
 
 //      :AddTab( "Additional" )
 //      :AddTab( "System" )
@@ -225,7 +222,6 @@ METHOD MainToolBar() CLASS MainForm
       :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object StdTools():Create( MainForm:ToolTabs:StdTab )
          :SetParent( MainForm:ToolTabs:StdTab )
-         :HandleNeeded()
          
          :SetStyle( TBSTYLE_CHECKGROUP )
          Application:ProcessMessages()
