@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.117 2004/08/26 16:05:03 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.118 2004/08/27 15:47:34 mauriliolongo Exp $
  */
 
 /*
@@ -3098,7 +3098,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
      }
       else
      {
-         strcat( (char *) pbyBuffer, OS_PATH_DELIMITER_LIST);
+         strcat( (char *) pbyBuffer, OS_PATH_DELIMITER_STRING);
      }
 
       return 0; // if it reaches here, it is right.

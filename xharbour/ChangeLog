@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3386 2004/09/01 09:15:30 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3387 2004/09/01 16:18:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-01 13:37 UTC-0500 Sylvain Robert <s.robert/at/ videotron [dot] ca>
+  * source/rtl/filesys.c
+    ! hb_fscurdirbuffex() return a wrong directory name if the last character of
+      pbyBuffer wasn't in OS_PATH_DELIMITER_LIST. It add OS_PATH_DELIMITER_LIST
+      instead of OS_PATH_DELIMITER_STRING
 
 2004-09-01 18:17 UTC+0200 Giancarlo Niccolai <gc /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
