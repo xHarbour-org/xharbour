@@ -94,6 +94,10 @@ METHOD New( cFile, nMode ) CLASS TStreamFileReader
 
    ::cFile := cFile
 
+   IF nMode == NIL
+      nMode := 2
+   ENDIF
+
    ::Handle := FOpen( cFile, nMode )
    IF ::Handle <= 0
       Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
@@ -154,15 +158,15 @@ ENDCLASS
 
 METHOD New( cFile, nMode ) CLASS TStreamFileWriter
 
-   IF nMode == NIL
-      nMode := 2
-   ENDIF
-
    ::lCanWrite := .T.
 
    ::cFile := cFile
 
    IF File( cFile )
+      IF nMode == NIL
+         nMode := FO_READWRITE
+      ENDIF
+
       ::Handle := FOpen( cFile, nMode )
       IF ::Handle <= 0
          Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
@@ -171,6 +175,10 @@ METHOD New( cFile, nMode ) CLASS TStreamFileWriter
       ::nLength := FSeek( ::Handle, 0, FS_END )
       ::nPosition := ::nLength
    ELSE
+      IF nMode == NIL
+         nMode := FC_NORMAL
+      ENDIF
+
       ::Handle := FCreate( cFile, nMode )
       IF ::Handle <= 0
          Throw( ErrorNew( "Stream", 1004, ProcName(), "Create Error: " + Str( FError() ), HB_aParams() ) )

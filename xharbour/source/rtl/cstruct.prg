@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.35 2004/08/26 08:00:31 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.36 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -621,6 +621,7 @@ RETURN cString
   #include "hbvm.h"
   #include "hbapierr.h"
   #include "hbstack.h"
+  #include "hbapiitm.h"
 
   static PHB_DYNS s_pVALUE;
 

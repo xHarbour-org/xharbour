@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.4 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: macroslx.c,v 1.5 2004/03/20 12:01:25 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 #include "hberrors.h"
 #include "hbdefs.h"
 
-#define MAX_STREAM                               2048 /* Max length of in-line LITERAL */
+#define MAX_STREAM                              16384 /* Max length of in-line LITERAL */
 #define MAX_STREAM_STARTER                          2
 #define MAX_STREAM_TERMINATOR                       2
 #define MAX_STREAM_EXCLUSIONS                       2

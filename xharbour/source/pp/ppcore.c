@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.189 2004/11/05 04:37:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.190 2004/11/21 21:43:48 druzus Exp $
  */
 
 /*
@@ -7208,7 +7208,7 @@ void CloseInclude( void )
 
       while( i > hb_pp_aiOuterIfLevel[ hb_comp_files.iFiles - 1 ] )
       {
-         printf( "\r%s(%i) Warning P0001  Suspectious unclosed #if* directive.\n", hb_comp_files.pLast->szFileName, hb_pp_aiLastIf[ --i ] );
+         printf( "\r%s(%i) Warning P0001  Suspictious unclosed #if* directive.\n", hb_comp_files.pLast->szFileName, hb_pp_aiLastIf[ --i ] );
          iOffset++;
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.18 2004/06/12 01:31:04 ronpinkas Exp $
+ * $Id: macro.slx,v 1.19 2004/11/21 21:43:47 druzus Exp $
  */
 
 /*
@@ -351,7 +351,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
    BOOL fDbl;
-   
+
    fDbl = hb_compStrToNum( szNum, plVal, pdVal, piDec, piWidth );
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }

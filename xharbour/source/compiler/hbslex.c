@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.4 2003/03/22 00:08:04 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.5 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 #include "hbcomp.h"
@@ -8,7 +8,7 @@
 #include "hberrors.h"
 #include "hbdefs.h"
 
-#define MAX_STREAM                               2048 /* Max length of in-line LITERAL */
+#define MAX_STREAM                              16384 /* Max length of in-line LITERAL */
 #define MAX_STREAM_STARTER                          7 /* "QOUT([" */
 #define MAX_STREAM_TERMINATOR                       4 /* "])\n"   */
 #define MAX_STREAM_EXCLUSIONS                       2
