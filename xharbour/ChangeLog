@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.120 2002/03/17 23:29:24 lculik Exp $
+ * $Id: ChangeLog,v 1.121 2002/03/18 04:57:07 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-03-18 12:56 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+   * source/rtl/menuto.prg
+     * Added mouse capabilities
+
 2002-03-18 01:48 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbfcdx/dbfcdx1.c
      + added compatibility with Clipper 5.3 (FlexFile) memo headers
      bug reported by Walter Negro.
 
-2002-03-1720:25 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+2002-03-17 20:25 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
   * source/rtl/listbox.org
     source/rtl/radiobtn.prg
     source/rtl/radiogpr.prg
