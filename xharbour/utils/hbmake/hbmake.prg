@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.71 2003/06/05 17:19:40 lculik Exp $
+ * $Id: hbmake.prg,v 1.72 2003/06/07 19:34:59 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1786,7 +1786,7 @@ FUNC CreateMakeFile( cFile )
       ELSEIF lMiniGui
          fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lHwGui
-         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib promisc.lib hwg_ghtm.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE

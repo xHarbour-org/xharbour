@@ -463,7 +463,7 @@ Method WriteMakeFile() CLASS THBMAKE
 
         ELSEIF ::lHwgui
 
-            Fwrite( ::nLinkHandle, "LIBFILES = hwgui.lib promisc.lib hwg_ghtm.lib " + cDefBccLibs + CRLF )
+            Fwrite( ::nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + cDefBccLibs + CRLF )
 
 
         ELSEIF ::lCw
