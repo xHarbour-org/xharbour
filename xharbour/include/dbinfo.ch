@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.8 2004/12/01 00:15:41 peterrees Exp $
+ * $Id: dbinfo.ch,v 1.9 2005/01/28 03:29:31 druzus Exp $
  */
 
 /*
@@ -97,6 +97,8 @@
 #define DBOI_KEYSINCLUDED         50  /* Number of keys in the index order */
 /* key numbers and counts */
 #define DBOI_KEYGOTO              DBOI_POSITION
+#define DBOI_KEYGOTORAW           DBOI_KEYNORAW
+#define DBOI_KEYNO                DBOI_POSITION
 #define DBOI_KEYNORAW             51  /* The key number disregarding filters  */
 #define DBOI_KEYCOUNTRAW          52  /* The key count disregarding filter    */
 

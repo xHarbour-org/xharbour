@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3789 2005/02/01 20:41:06 druzus Exp $
+ * $Id: ChangeLog,v 1.3790 2005/02/02 01:13:24 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-04 02:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/dbinfo.ch
+    + added DBOI_KEYGOTORAW as synonym of DBOI_KEYNORAW
+      and DBOI_KEYNO as synonym of DBOI_POSITION to reduce
+      the confusion caused by the fact that we were using
+      optional parameter to DBOI_POSITION for ordKeyGoto()
+      (Too many times I had to check in RDD internals what
+      DBOI_* has to be used ;-))
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * optional disabling DELETED() and logical position optimization
+      in ordKey{Count,Goto,Pos}() functions.
 
 2005-02-01 23:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/memvars.c
