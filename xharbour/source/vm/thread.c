@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.135 2003/12/06 15:33:39 jonnymind Exp $
+* $Id: thread.c,v 1.137 2003/12/06 17:40:53 jonnymind Exp $
 */
 
 /*
@@ -729,14 +729,11 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 #ifdef HB_OS_WIN_32
    TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
 #else
-   /* wait for the father to be done */
+   /* The fist that arrives among father and child will set up
+      the stack id. */
    _pStack_->th_id = HB_CURRENT_THREAD();
-   _pStack_->th_vm_id = hb_threadUniqueId();
    pthread_setspecific( hb_pkCurrentStack, Cargo );
    pthread_cleanup_push( hb_threadTerminator, NULL );
-
-   HB_SHARED_SIGNAL( hb_runningStacks );
-
 #endif
 
 
@@ -1336,6 +1333,7 @@ HB_FUNC( STARTTHREAD )
 
    hb_runningStacks.content.asLong++;
    pStack->bInUse = TRUE;
+   pStack->th_vm_id = hb_threadUniqueId();
    hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
@@ -1345,33 +1343,20 @@ HB_FUNC( STARTTHREAD )
       if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (unsigned int *) &th_id) ) != 0L )
 //   #endif
 #else
-   pStack->th_vm_id = 0;
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void *) pStack ) == 0 )
 #endif
    {
+      /* under linux, this will be set by the first thread, father or
+         child, that is able to reach this line */
+      pStack->th_id = th_id;
+
       /* Under windws, we put the handle after creation */
 #if defined(HB_OS_WIN_32)
-      pStack->th_id = th_id;
       pStack->th_h = th_h;
       ResumeThread( th_h );
-#else
-   #if 0
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      HB_SHARED_SIGNAL( hb_runningStacks );
-
-      /* Wait until the child is ready */
-      while (pStack->th_vm_id == 0 )
-      {
-         HB_SHARED_WAIT( hb_runningStacks );
-      }
-
-      /* regain control of our stack */
-      HB_STACK_LOCK;
-      #endif
 #endif
 
-      pThread->threadId = pStack->th_id;
+      pThread->threadId = th_id;
       pThread->bReady = TRUE;
       pThread->pStack = pStack;
       hb_retptr( pThread );
