@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.51 2004/08/19 13:11:27 likewolf Exp $
+ * $Id: debugger.prg,v 1.52 2004/10/04 21:52:58 likewolf Exp $
  */
 
 /*
@@ -333,7 +333,7 @@ CLASS TDebugger
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
-   DATA   nAppTypeAhead
+   DATA   nAppFileCase, nAppTypeAhead
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -2124,6 +2124,7 @@ return nil
 
 
 METHOD RestoreAppState() CLASS TDebugger
+  Set( _SET_FILECASE, ::nAppFileCase )
   Set( _SET_TYPEAHEAD, ::nAppTypeAhead )
   SetLastKey( ::nAppLastKey )
   SetInkeyAfterBlock( ::bAppInkeyAfter )
@@ -2164,6 +2165,7 @@ return nil
 
 
 METHOD SaveAppState() CLASS TDebugger
+  ::nAppFileCase := Set( _SET_FILECASE, 0 )
   ::nAppTypeAhead := Set( _SET_TYPEAHEAD, 16 )
   ::nAppLastKey := LastKey()
   ::bAppInkeyAfter := SetInkeyAfterBlock( NIL )
@@ -2782,7 +2784,7 @@ METHOD ViewSets() CLASS TDebugger
    local n := 1
    local nWidth := oWndSets:nRight - oWndSets:nLeft - 1
    local oCol
-   oBrwSets:Cargo :={ 1,{}} // Actual highligthed row
+   oBrwSets:Cargo :={ 1,{}} // Actual highlighted row
    oBrwSets:autolite:=.f.
    oBrwSets:ColorSpec := ::ClrModal()
    oBrwSets:GOTOPBLOCK := { || oBrwSets:cargo[ 1 ]:= 1 }
