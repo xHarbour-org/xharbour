@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.19 2002/03/05 20:25:34 antoniolinares Exp $
+ * $Id: persist.prg,v 1.6 2002/03/06 03:52:09 ronpinkas Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ return .T.
 METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
    local oNew := &( ::ClassName() + "()" ):CreateNew()
-   local aProperties, n, uValue, uNewValue, cObject, cType
+   local aProperties, uValue, uNewValue, cObject, cType, xProperties
 
    static nIndent := -3
 
@@ -130,9 +130,10 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
    aProperties := __ClsGetProperties( ::ClassH )
 
-   for n := 1 to Len( aProperties )
-      uValue := __objSendMsg( Self, aProperties[ n ] )
-      uNewValue := __objSendMsg( oNew, aProperties[ n ] )
+//   n := 1
+   FOR EACH xProperties IN aProperties
+      uValue := __objSendMsg( Self, xProperties )
+      uNewValue := __objSendMsg( oNew, xProperties )
       cType  := ValType( uValue )
 
       if cType != ValType( uNewValue ) .OR. ! uValue == uNewValue
@@ -140,32 +141,35 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
          do case
             case cType == "A"
                  nIndent += 3
-                 cObject += ArrayToText( uValue, aProperties[ n ], nIndent )
+                 cObject += ArrayToText( uValue, xProperties, nIndent )
                  nIndent -= 3
-                 if n < Len( aProperties )
+//                 if n < Len( aProperties )
+                 if HB_EnumIndex() < Len( aProperties )
                     cObject += HB_OsNewLine()
                  endif
 
             case cType == "O"
                  if __objDerivedFrom( uValue, "HBPERSISTENT" )
-                    cObject += uValue:SaveToText( aProperties[ n ] )
+                    cObject += uValue:SaveToText( xProperties )
                  endif
-                 if n < Len( aProperties )
+//                 if n < Len( aProperties )
+                 if HB_EnumIndex() < Len( aProperties )
                     cObject += HB_OsNewLine()
                  endif
 
             otherwise
-                 if n == 1
+                 if HB_EnumIndex() == 1
                     cObject += HB_OsNewLine()
                  endif
                  cObject += Space( nIndent ) + "   ::" + ;
-                            aProperties[ n ] + " = " + ValToText( uValue ) + ;
+                            xProperties + " = " + ValToText( uValue ) + ;
                             HB_OsNewLine()
          endcase
 
       endif
 
-   next
+//      n++
+   NEXT
 
    cObject += HB_OsNewLine() + Space( nIndent ) + "ENDOBJECT" + HB_OsNewLine()
    nIndent -= 3
@@ -176,34 +180,35 @@ static function ArrayToText( aArray, cName, nIndent )
 
    local cArray := HB_OsNewLine() + Space( nIndent ) + "ARRAY ::" + cName + ;
                    " LEN " + AllTrim( Str( Len( aArray ) ) ) + HB_OsNewLine()
-   local n, uValue, cType
+   local uValue, cType
 
-   for n := 1 to Len( aArray )
-      uValue := aArray[ n ]
+//   n := 1
+   FOR EACH uValue IN aArray
       cType  := ValType( uValue )
 
       do case
          case cType == "A"
               nIndent += 3
               cArray += ArrayToText( uValue, cName + "[ " + ;
-                        AllTrim( Str( n ) ) + " ]", nIndent ) + HB_OsNewLine()
+                        AllTrim( Str( HB_EnumIndex() ) ) + " ]", nIndent ) + HB_OsNewLine()
               nIndent -= 3
 
          case cType == "O"
               if __objDerivedFrom( uValue, "HBPERSISTENT" )
-                 cArray += uValue:SaveToText( cName + "[ " + AllTrim( Str( n ) ) + ;
+                 cArray += uValue:SaveToText( cName + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + ;
                            " ]" )
               endif
 
          otherwise
-              if n == 1
+              if HB_EnumIndex() == 1
                  cArray += HB_OsNewLine()
               endif
               cArray += Space( nIndent ) + "   ::" + cName + ;
-                        + "[ " + AllTrim( Str( n ) ) + " ]" + " = " + ;
+                        + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + " ]" + " = " + ;
                         ValToText( uValue ) + HB_OsNewLine()
       endcase
-   next
+//      n++
+   NEXT
 
    cArray += HB_OsNewLine() + Space( nIndent ) + "ENDARRAY" + HB_OsNewLine()
 
