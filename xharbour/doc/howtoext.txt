@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.4 2004/02/24 18:20:36 jonnymind Exp $
+$Id: howtoext.txt,v 1.5 2004/03/07 14:42:22 likewolf Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -151,11 +151,11 @@ Follow those rules:
          source/common - shared files by compiler, macro and run time
                          libraries in general
          source/rdd    - rdd abstract (driver independent) database functions
-         source/vm     - virtual machine related sources: variables, functions, 
+         source/vm     - virtual machine related sources: variables, functions,
 classes,                         memory, program flow and execution management
          source/rtl    - runtime function library and Graphic Terminals (GT)
 
-      10) File names should always be lower case, and possibly in the 8.3 
+      10) File names should always be lower case, and possibly in the 8.3
 format.
       11) When new functionality is created, always create a small, self
           contained sample in tests directory to demonstrate it, or add some
@@ -245,8 +245,8 @@ This is a well written extension function prolog:
 HB_FUNC( MYFUNC )
 {
    PHB_ITEM pName   = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pAge    = hb_param( 2, HB_IT_NUMERIC );  // if nil must default to 
-18   PHB_ITEM pResult = hb_param( 3, HB_IT_BYREF );    // may be NIL
+   PHB_ITEM pAge    = hb_param( 2, HB_IT_NUMERIC );  // if nil must default to 18
+   PHB_ITEM pResult = hb_param( 3, HB_IT_BYREF );    // may be NIL
 
    USHORT usTempVar;  // parameters are over here.
    HB_ITEM hbMyInternalItem;
@@ -294,7 +294,7 @@ HB_FUNC( MYFUNC )
    PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC );
    USHORT usParams = hb_pcount();
 
-   if ( pName == NULL || ( usParam > 1 && pAge == NULL ) )
+   if ( pName == NULL || ( usParams > 1 && pAge == NULL ) )
    {
       // signal error
    }
@@ -307,6 +307,33 @@ not a numeric variable, then we report the misuse of the function.
 It's a common behavior to ignore eventual other parameters; i.e. if the above
 function had three or more parameters, they should simply be ignored, and
 the system should not report any error.
+
+One more situation is when an optional parameter is not the last parameter,
+so hb_count() is not viable for determining if an arg was passed in
+(a NIL parameter is a valid ITEM and the pItem will not be NULL).
+In general, any time a parameter may be of two or more types (in this case
+NIL or another type) you should access it with HB_IT_ANY:
+
+  PHB_ITEM pItem = hb_param( n, HB_IT_ANY );
+
+This will return any kind of item, including NIL if the user passed nil in that
+position. In this way, you may check for the item to have certain meanings
+or others:
+
+if ( pItem == NULL || HB_IS_NIL( pItem ) {
+        // the parameter list was shorter than the requested position,
+        // or NIL was passed in. Probably want to set a default here.
+
+} else if ( HB_IS_STRING( pItem ) ) {
+        // was a string, behave as needed
+
+} else if ( HB_IS_NUMERIC( pItem ) ) {
+        // was a number or date or single char, behave as needed.
+        // (use HB_IS_NUMBER( pItem ) for numbers only)
+}
+else {
+        // not any valid parameter; raise an error
+}
 
 
 Parameter error signaling
@@ -608,16 +635,16 @@ there are three kind of return functions: flat returns, supported returns
 and deep returns.
 
 Flat returns functions are those one returning numeric, date or logical data:
-hb_retn*(), hb_retd*() and hb_retl(). They just return an xharbour 
-representation of numbers, dates or logical entities into the VM, and translates 
-more or less into a simple data copy inside the HB_VM_STACK.Return convenience 
+hb_retn*(), hb_retd*() and hb_retl(). They just return an xharbour
+representation of numbers, dates or logical entities into the VM, and translates
+more or less into a simple data copy inside the HB_VM_STACK.Return convenience
 item.
 Supported returns are a set of hb_ret functions using their parameter to create
 a new item, that is then referenced by the virtual machine return. In this
 class, you can find hb_reta( ulLen ), hb_retc( szText ) and
-hb_retclen( szText, ulLen ). hb_reta returns a newly created array that has 
-ulLenelements, all of them set to NIL. hb_retc and hb_retclen return a text, 
-creating a new string and copying the passed data into it. They can be used to 
+hb_retclen( szText, ulLen ). hb_reta returns a newly created array that has
+ulLenelements, all of them set to NIL. hb_retc and hb_retclen return a text,
+creating a new string and copying the passed data into it. They can be used to
 return data that you may wish to copy in the virtual machine: in example
 
    hb_retc( "a text" );
@@ -633,8 +660,8 @@ HB_FUNC( CAUSINGLEAK )
    hb_retc( szData ); // MEMORY LEAK. szData is not returned, only a copy of it is.
 }
 
-Deep return functions are meant to store in the VM some deep value you may have 
-producedin the processing logic. They store string and/or pointer values.
+Deep return functions are meant to store in the VM some deep value you may have
+produced in the processing logic. They store string and/or pointer values.
 
 Deep return string functions are the following:
    hb_retcAdopt( szText )
@@ -660,12 +687,12 @@ The static version of hb_retcAdopt function family acts as their non-static
 homologue, but they mark the string object as "static"; this means that Xharbour
 virtual machine will never try to free the object, even if the string is item
 is discarded. It's supposed that the calling program wishes this specific memory
-location to remain valid for all the program lifetime, or anyhow for a longer 
+location to remain valid for all the program lifetime, or anyhow for a longer
 timethan the returned value lifespan.
 
-The function hb_retptr() is provided to create user-defined atomic objects; 
-objects that are stored inside an xharbour variable (in this case, objects that 
-are returned as a variable) and that the XHarbour program can't manipulate 
+The function hb_retptr() is provided to create user-defined atomic objects;
+objects that are stored inside an xharbour variable (in this case, objects that
+are returned as a variable) and that the XHarbour program can't manipulate
 directly. We'll see this function in a separate section.
 
 
@@ -676,12 +703,12 @@ directly. We'll see this function in a separate section.
                usage of xharbour memory management and item interface
                =======================================================
 
-Memory management in xharbour is simple, but it can get tricky if not well 
-understood. So we'll introduce some general concept before entering into the 
+Memory management in xharbour is simple, but it can get tricky if not well
+understood. So we'll introduce some general concept before entering into the
 details.
 Xharbour api provides two kind of dynamic memory abstractions: collectable and
-unmanaged. Collectable memory is employed for items, and for the vast majority 
-ofitem values. Unmanaged memory is at disposal of extensions to just have 
+unmanaged. Collectable memory is employed for items, and for the vast majority
+ofitem values. Unmanaged memory is at disposal of extensions to just have
 dynamicheap memory allocation handy; it's also used by some internal functions.
 
 Xharbour API works with two levels of item allocation hierarchy: flat items and
@@ -693,17 +720,17 @@ oysters containing something, and what matters is that something inside.
 
 Namely, the flat items are the ones of NIL type, any numeric type, dates and
 logical. Objects, arrays, hashes and pointers are deep items; each of them
-contains a "value", that can be accessed with api functions or querying directly 
+contains a "value", that can be accessed with api functions or querying directly
 the HB_ITEM structure: hbItem.item.asXXXX.value.
 
-All the "shells", all the items that are created and managed by the virtual 
-machineare allocated using collectable memory; so are all deep contents, that 
+All the "shells", all the items that are created and managed by the virtual
+machineare allocated using collectable memory; so are all deep contents, that
 is, all the values.
 
 Strings are an hybrid having both some data in the basic item structure and a
-pointer to a value that is allocated using unmanaged memory. By carefully 
-recording string usage, in a process called reference counting, is possible to 
-automatically get rid of unused string, but this "special" case for string is 
+pointer to a value that is allocated using unmanaged memory. By carefully
+recording string usage, in a process called reference counting, is possible to
+automatically get rid of unused string, but this "special" case for string is
 inefficient and may be changed in the future.
 
 
@@ -722,25 +749,25 @@ If HB_FM_STATISTICS are enabled, passing data that has not been allocated with
 hb_xgrab will cause a critical error and close the application.
 
 void *hb_xrealloc( void *data, ULONG ulBytes ) resizes the allocated memory;
-if successful, the new memory location where the data is relocated is returned, 
-on failure, the function causes a critical error and the application is 
+if successful, the new memory location where the data is relocated is returned,
+on failure, the function causes a critical error and the application is
 terminated.
-XHarbour virtual machine records the usage of xgrabbed memory, and issues a 
-warning at the end of the application if the some memory has not been freed; this 
+XHarbour virtual machine records the usage of xgrabbed memory, and issues a
+warning at the end of the application if the some memory has not been freed; this
 helps to track memory usage and prevent memory leaks.
 
-Even if the activity of this functions is recorded, they provide "unmanaged" 
-memory: the caller is the sole responsible for allocating and de-allocating 
-memory via these functions. XHarbour does not helps in keeping track of this 
-memory, so the developer must always be able to determine the exact moment in 
-which the unmanaged memory is not useful anymore. When this happens, the memory 
+Even if the activity of this functions is recorded, they provide "unmanaged"
+memory: the caller is the sole responsible for allocating and de-allocating
+memory via these functions. XHarbour does not helps in keeping track of this
+memory, so the developer must always be able to determine the exact moment in
+which the unmanaged memory is not useful anymore. When this happens, the memory
 must be released.
-Unmanaged memory must have a determined lifespan: an application should create 
-it only if it exactly knows when it will be destroyed. This can be in the same 
-function that creates it, or in a particular moment of the program, i.e. at the 
+Unmanaged memory must have a determined lifespan: an application should create
+it only if it exactly knows when it will be destroyed. This can be in the same
+function that creates it, or in a particular moment of the program, i.e. at the
 end.
-At the moment, xgrab() can provide also memory that may be stored inside strings 
-with hb_itemPutCPtr() or returned via hb_retcAdopt* function family, but this may 
+At the moment, xgrab() can provide also memory that may be stored inside strings
+with hb_itemPutCPtr() or returned via hb_retcAdopt* function family, but this may
 be changed in future.
 
 
@@ -749,54 +776,54 @@ Collectable memory
 
 Collectable memory is subject to be collected in the case of the Virtual Machine
 garbage collector detects it's not anymore used by any active item. Collectable
-memory, or item memory, must be bound to an xharbour item, i.e. a LOCAL 
-variable, a MEMVAR, the return value of a function, or it will be collected, that 
-is destroyed. It's possible for the developer to instruct the GC not to collect 
-some of this memory allocations by "locking" it; memory used as deep item values, 
-that are pointers, arrays and hashes, is automatically excluded from garbage 
+memory, or item memory, must be bound to an xharbour item, i.e. a LOCAL
+variable, a MEMVAR, the return value of a function, or it will be collected, that
+is destroyed. It's possible for the developer to instruct the GC not to collect
+some of this memory allocations by "locking" it; memory used as deep item values,
+that are pointers, arrays and hashes, is automatically excluded from garbage
 collecting, as long as there is some item referencing them.
 
 Strings have a "collectable" shell, but their value is currently allocated using
-uncollectable memory, and their shell is partially holding some meaningful data, 
+uncollectable memory, and their shell is partially holding some meaningful data,
 asthe string length.
 
-There are mainly two function set that deal with collectable memory: 
-hb_itemNew() and hb_itemRelease() create and destroy an item, the shell that may 
-host a deep value or the flat data. hb_gcAlloc() and hb_gcFree() are meant to 
-allocate memory for the values, both those values that are used in standard deep 
+There are mainly two function set that deal with collectable memory:
+hb_itemNew() and hb_itemRelease() create and destroy an item, the shell that may
+host a deep value or the flat data. hb_gcAlloc() and hb_gcFree() are meant to
+allocate memory for the values, both those values that are used in standard deep
 item types, as array and hashes, or in custom item pointers.
 
-About hb_itemNew() and hb_itemRelease(), they are mainly used by the VM itself: 
-they are used in creating stack items, memvars, globals and static variables, and 
-there is very little reason for the extension library to use them; also, 
-hb_gcAlloc() is primarily meant for system objects, and is useable just by 
+About hb_itemNew() and hb_itemRelease(), they are mainly used by the VM itself:
+they are used in creating stack items, memvars, globals and static variables, and
+there is very little reason for the extension library to use them; also,
+hb_gcAlloc() is primarily meant for system objects, and is useable just by
 extensions willing to provide user-defined opaque objects.
 
 
 Using items in extensions
 =========================
 
-The most interesting usage of the item API for the purposes of the xharbour 
-extension writer, is the ability to create complex objects, work on them and 
-eventually return them or a copy of them. In example, having at disposal one of 
-the best variable array library around, it's pleasurable to be able to create an 
-xharbour array from C extension routines to store i.e. a set of log entries 
-coming from the xharbour code, and eventually provide access to those entries to 
+The most interesting usage of the item API for the purposes of the xharbour
+extension writer, is the ability to create complex objects, work on them and
+eventually return them or a copy of them. In example, having at disposal one of
+the best variable array library around, it's pleasurable to be able to create an
+xharbour array from C extension routines to store i.e. a set of log entries
+coming from the xharbour code, and eventually provide access to those entries to
 the xharbour functions.
-Also, a set of values retrieved in the system, as the system time, may be stored 
-in an xharbour array inside an extension function, and then sent to the VM or 
+Also, a set of values retrieved in the system, as the system time, may be stored
+in an xharbour array inside an extension function, and then sent to the VM or
 stored locally for later usage.
 
 With a minimum care, this is quite easy.
 
 How to create an item?
 
-Usually, you'll want to have a small quantity of memory allocated in static data 
-or in the stack, that can be used as an item shell. Before changing the item 
-content, it's necessary to transform it in a NIL object; random initialization 
-value may cause unpredictable results, as all API function that can modify an 
-item will try to clean the previous existing data before. If we have a random 
-initial item type, the API will be fooled. So, before using any object that has 
+Usually, you'll want to have a small quantity of memory allocated in static data
+or in the stack, that can be used as an item shell. Before changing the item
+content, it's necessary to transform it in a NIL object; random initialization
+value may cause unpredictable results, as all API function that can modify an
+item will try to clean the previous existing data before. If we have a random
+initial item type, the API will be fooled. So, before using any object that has
 been statically allocated use:
 
    HB_ITEM hbItem;
@@ -912,7 +939,7 @@ memory allocation for the item shell itself:
    // declare we are not interested in the object anymore.
    hb_itemRelease( pItem );
 
-hb_itemRelease does two things: deletes the shell and signals the GC that the 
+hb_itemRelease does two things: deletes the shell and signals the GC that the
 valuemay be susceptible of collection.
 
 IMPORTANT: all the items must be released before hb_vmQuit() is called, that is,
@@ -932,13 +959,13 @@ hb_itemCopy() stores an item and its value in a locally provided item;
 hb_itemReturn() moves the value from our locally provided shell to the VM return
 item. hb_itemReturnCopy() does the same, but our local shell is left unaltered.
 
-Any of these functions will act on the shell, but will leave the value 
-untouched. If a flat object is copied with hb_itemCopy, a change on the original 
-flat shell would not be reflected in the copy, but if a deep object is copied, 
+Any of these functions will act on the shell, but will leave the value
+untouched. If a flat object is copied with hb_itemCopy, a change on the original
+flat shell would not be reflected in the copy, but if a deep object is copied,
 both the separate shells share the same deep value.
 
 To create fully independent clones of the items, it's necessary to rely on the
-specific item functions, i.e. hb_arrayClone, hb_hashClone; to deep-clone a 
+specific item functions, i.e. hb_arrayClone, hb_hashClone; to deep-clone a
 string it's just enough to call
 
       hb_itemPutC( pNewString, hb_itemGetCPtr( pOldString ) );
@@ -947,7 +974,7 @@ as hb_itemPutC and hb_itemGetC and their family creates always a copy of the
 passed data, as for hb_retc and family.
 
 hb_*Ptr() always return a raw pointer, and never copy data; in example,
-hb_arrayGetItemPtr( pArray, nItem ); will give you a pointer to the nth item 
+hb_arrayGetItemPtr( pArray, nItem ); will give you a pointer to the nth item
 itself. hb_itemPutCPtr( pItem, cstr, nLength ) is the equivalent of hb_retc*Adopt
 family; will store an already allocated cstr.
 
@@ -977,8 +1004,8 @@ HB_FUNC( RETURNINGARRAY )
 
 
 Now we suppose that the calling program passes an item to the extended library;
-it is necessary to store it somewhere; the extended library example also 
-provides the calling program with a reference to it, or with a brand new item 
+it is necessary to store it somewhere; the extended library example also
+provides the calling program with a reference to it, or with a brand new item
 copied from the original, these are the steps to take:
 
    PHB_ITEM pArray == NULL;
@@ -1072,7 +1099,7 @@ contents in the target object and empties the original shell.
    }
 
 NOTE: in the latter example, hb_itemCopy may have been used instead of
-hb_itemForwardValue, but hb_itemForwardValue is sensibly faster and in the case 
+hb_itemForwardValue, but hb_itemForwardValue is sensibly faster and in the case
 of a statically allocated hb_item, it spares the call to hb_itemRelease.
 
 
@@ -1082,8 +1109,8 @@ of a statically allocated hb_item, it spares the call to hb_itemRelease.
                           Writing your own opaque objects
                ======================================================
 
-Probably, the most intriguing feature of collectable memory management is the 
-ability to be collected automatically when there's no more need of it. The 
+Probably, the most intriguing feature of collectable memory management is the
+ability to be collected automatically when there's no more need of it. The
 hb_gcAlloc() function allows to allocate memory and to define a function that
 will be called when that memory will be collected. This allows the user to
 cleanly free deep memory that his own data structure may need, close handles,

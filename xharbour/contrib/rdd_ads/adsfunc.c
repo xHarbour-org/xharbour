@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.35 2004/04/02 00:32:57 druzus Exp $
+ * $Id: adsfunc.c,v 1.36 2004/04/15 08:17:11 brianhays Exp $
  */
 
 /*
@@ -482,54 +482,66 @@ HB_FUNC( ADSFILE2BLOB )
 
 HB_FUNC( ADSKEYNO )
 {
-   ADSAREAP pArea;
+   ADSAREAP   pArea;
    UNSIGNED8* ordName;
-   UNSIGNED8 ordNum;
-   UNSIGNED32 pulKey;
-   ADSHANDLE hIndex;
+   UNSIGNED8  ordNum;
+   UNSIGNED32 pulKey = 0L;
+   ADSHANDLE  hIndex = 0;
    UNSIGNED16 usFilterOption = ADS_IGNOREFILTERS;
+
+   PHB_ITEM   pxOrder = hb_param( 1, HB_IT_ANY );
+   /* 2nd parameter: unsupported Bag Name. */
+   PHB_ITEM   pFilterOption = hb_param( 3, HB_IT_NUMERIC );
+
+   /* if arg 1 or 3 is bad, toss error */
+   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder ) && !HB_IS_NIL( pxOrder )  ) ||
+        ( pFilterOption != NULL && !HB_IS_NUMBER( pFilterOption ) ) )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYNO" );
+      return;
+   }
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
-      if( hb_pcount() > 2 )             /* 2nd parameter: unsupported Bag Name */
+      if( pFilterOption )
       {
-         if( ISNUM( 3 ) )
+         usFilterOption = hb_itemGetNI( pFilterOption );
+      }
+
+      /* get an Index Handle */
+      if( pxOrder == NULL || HB_IS_NIL( pxOrder ) )             /* didn't pass it in; use current */
+      {
+         hIndex = pArea->hOrdCurrent;
+      }
+      else if( HB_IS_NUMBER( pxOrder ) )
+      {
+         ordNum = (UNSIGNED8) hb_itemGetNI( pxOrder );
+         if( ordNum > 0 )               /* otherwise leave hIndex at 0 */
          {
-            usFilterOption = hb_parni( 3 );
+            AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
+         }
+      }
+      else         /* must be number or nil since checked above */
+      {
+         if( pxOrder->item.asString.length == 0 )          /* passed "" */
+         {
+            hIndex = pArea->hOrdCurrent;
          }
          else
          {
-            hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYNO" );
-            return;
+            ordName = (UNSIGNED8*) pxOrder->item.asString.value;
+            AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
       }
 
-      if( hb_pcount() > 0 )
+      if( hIndex == 0 )                 /* no index selected */
       {
-         if( ISNUM( 1 ) )
-         {
-            ordNum = hb_parni( 1 );
-            AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
-         }
-         else
-         {
-            ordName = (UNSIGNED8*)hb_parcx( 1 );
-            AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
-         }
-         AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
+         AdsGetRecordNum( pArea->hTable, usFilterOption, &pulKey );
       }
       else
       {
-         if( pArea->hOrdCurrent != 0 )
-         {
-            hIndex = pArea->hOrdCurrent;
-            AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
-         }
-         else
-         {
-            AdsGetRecordNum( pArea->hTable, usFilterOption, &pulKey );
-         }
+         AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
       }
 
       hb_retnl( pulKey );
@@ -545,58 +557,68 @@ HB_FUNC( ADSKEYCOUNT )
    ADSAREAP   pArea;
    UNSIGNED8* ordName;
    UNSIGNED8  ordNum;
-   UNSIGNED32 pulKey;
-   ADSHANDLE  hIndex;
+   UNSIGNED32 pulKey = 0L;
+   ADSHANDLE  hIndex = 0;
    UNSIGNED16 usFilterOption = ADS_IGNOREFILTERS;
-   UNSIGNED8  pucScope[ ADS_MAX_KEY_LENGTH+1 ];
-   UNSIGNED8  pucFilter[HARBOUR_MAX_RDD_FILTER_LENGTH+1];
-   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH+1;
+   UNSIGNED8  pucScope[ADS_MAX_KEY_LENGTH + 1];
+   UNSIGNED8  pucFilter[HARBOUR_MAX_RDD_FILTER_LENGTH + 1];
+   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH + 1;
+
+   PHB_ITEM   pxOrder = hb_param( 1, HB_IT_ANY );
+   /* 2nd parameter: unsupported Bag Name. */
+   PHB_ITEM   pFilterOption = hb_param( 3, HB_IT_NUMERIC );
+
+   /* if arg 1 or 3 is bad, toss error */
+   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder ) && !HB_IS_NIL( pxOrder )  ) ||
+        ( pFilterOption != NULL && !HB_IS_NUMBER( pFilterOption ) ) )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYCOUNT" );
+      return;
+   }
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
-      if( ISNUM( 1 ) )
+      if( pFilterOption )
       {
-         ordNum = hb_parni( 1 );
-         AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
-      }
-      else if( ISCHAR( 1 ) )
-      {
-         ordName = (UNSIGNED8*)hb_parcx( 1 );
-         AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
-      }
-      else if( !ISNIL( 1 ) )
-      {
-         hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYCOUNT" );
-         return;
-      }
-      else
-      {
-         hIndex = (pArea->hOrdCurrent == 0) ? pArea->hTable : pArea->hOrdCurrent;
+         usFilterOption = hb_itemGetNI( pFilterOption );
       }
 
-      if( hb_pcount() > 2 )             /* 2nd parameter: unsupported Bag Name */
+      /* get an Index Handle */
+      if( pxOrder == NULL )             /* didn't pass it in; use current */
       {
-         if( ISNUM( 3 ) )
+         hIndex = pArea->hOrdCurrent;
+      }
+      else if( HB_IS_NUMBER( pxOrder ) )
+      {
+         ordNum = (UNSIGNED8) hb_itemGetNI( pxOrder );
+         if( ordNum > 0 )               /* otherwise leave hIndex at 0 */
          {
-            usFilterOption = hb_parni( 3 );
+            AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
+         }
+      }
+      else         /* must be number or nil since checked above */
+      {
+         if( pxOrder->item.asString.length == 0 )          /* passed "" */
+         {
+            hIndex = pArea->hOrdCurrent;
          }
          else
          {
-            hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYCOUNT" );
-            return;
+            ordName = (UNSIGNED8*) pxOrder->item.asString.value;
+            AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
-
       }
 
-      pulKey = 0L;
+      hIndex = ( hIndex == 0 ) ? pArea->hTable : hIndex;
+
       if( usFilterOption == ADS_IGNOREFILTERS )
       {
          AdsGetRecordCount( hIndex, ADS_IGNOREFILTERS, &pulKey );
       }
       else            /* ads scope handling is flawed; do our own */
       {               /* One more optimization would be to check if there's a fully optimized AOF available so don't walk ours */
-         AdsGetScope  ( hIndex, ADS_BOTTOM, pucScope, &pusBufLen);
+         AdsGetScope( hIndex, ADS_BOTTOM, pucScope, &pusBufLen );
          if( pusBufLen )                /* had a scope */
          {
             AdsGetAOF( pArea->hTable, pucFilter, &pusBufLen );
@@ -608,7 +630,7 @@ HB_FUNC( ADSKEYCOUNT )
             {
                AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS,
                      (UNSIGNED32 *)&(pArea->ulRecNo) );
-               AdsGotoTop  ( hIndex );
+               AdsGotoTop( hIndex );
                AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
 
                while( AdsSkip ( hIndex, 1 ) != AE_NO_CURRENT_RECORD && !pArea->fEof )
@@ -624,11 +646,10 @@ HB_FUNC( ADSKEYCOUNT )
                AdsGetRecordCount( hIndex, usFilterOption, &pulKey );
             }
          }
-         else                           /*  no scope set */
+         else                           /* no scope set */
          {
-            AdsGetRecordCount  ( hIndex, usFilterOption, &pulKey);
+            AdsGetRecordCount( hIndex, usFilterOption, &pulKey );
          }
-
       }
 
       hb_retnl( pulKey );
@@ -638,6 +659,7 @@ HB_FUNC( ADSKEYCOUNT )
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSKEYCOUNT" );
    }
 }
+
 
 HB_FUNC( ADSADDCUSTOMKEY )
 {
@@ -1400,14 +1422,32 @@ HB_FUNC( ADSREFRESHRECORD )
 
 HB_FUNC( ADSCOPYTABLE )
 {
-   ADSAREAP pArea;
+   // lSuccess := AdsCopyTable( cTargetFile [, nAdsFilterOption ] )
+
+   ADSAREAP   pArea;
+   UNSIGNED32 ulRetVal;
+   UNSIGNED16 usFilterOption = ADS_RESPECTFILTERS;
+   ADSHANDLE  hIndex ;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
       if( ISCHAR( 1 ) )
       {
-         AdsCopyTable( pArea->hTable, ADS_RESPECTFILTERS, (UNSIGNED8 *) hb_parcx( 1 ) );
+         if( ISNUM( 2 ) )
+         {
+            usFilterOption = (UNSIGNED16) hb_parni( 2 );
+         }
+
+         // If an index is active copy table in indexed order
+         hIndex = ( pArea->hOrdCurrent ) ? pArea->hOrdCurrent : pArea->hTable ;
+         ulRetVal = AdsCopyTable( hIndex, ADS_RESPECTFILTERS, (UNSIGNED8 *) hb_parcx( 1 ) );
+
+         if( ulRetVal == AE_SUCCESS )
+         {
+            hb_retl( 1 );
+            return;
+         }
       }
       else
       {
@@ -1419,6 +1459,7 @@ HB_FUNC( ADSCOPYTABLE )
    {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "  ADSCOPYTABLE" );
    }
+   hb_retl( 0 );
 
 }
 

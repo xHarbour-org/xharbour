@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.382 2004/04/21 03:32:53 ronpinkas Exp $
+ * $Id: hvm.c,v 1.383 2004/04/23 22:52:07 ronpinkas Exp $
  */
 
 /*
@@ -791,7 +791,7 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("\nAfter Statics\n" );
 
    #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-      HB_TRACE( HB_TR_INFO, ("QuitOle" ) );
+      HB_TRACE( HB_TR_INFO, ("Quit Ole" ) );
       Win32_OleUnInitialize();
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.40 2004/04/10 13:42:13 snaiperis Exp $
+ * $Id: ads1.c,v 1.41 2004/04/17 19:52:34 brianhays Exp $
  */
 
 /*
@@ -2951,6 +2951,10 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                         (UNSIGNED32 *)&(pArea->ulRecNo) );
                   AdsGotoTop  ( phIndex );
                   AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+                  if ( !pArea->fEof )
+                  {
+                     pul32++;           // count first key!
+                  }
 
                   while ( AdsSkip( phIndex, 1 ) != AE_NO_CURRENT_RECORD && !pArea->fEof )
                   {

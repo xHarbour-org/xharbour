@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2840 2004/04/27 22:03:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2841 2004/04/27 22:33:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 02:55 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+
+  * contrib/rdd_ads/ads1.c
+    *  dbOrderInfo(DBOI_KEYCOUNT) was off by 1 if both filter and scope were set.
+
+  * contrib/rdd_ads/adsfunc.c
+    * fixed arg checking in adsKeyNo and adsKeyCount (thanks to Luis for his help!)
+    * Borrowed Randy Portnoff's updated ADSCOPYTABLE from Harbour, reformatted:
+      2004-04-27 12:57 UTC-0500 Randy Portnoff <randy@palmasdev.com>
+      * contrib/rdd_ads/adsfunc.c
+      Changes to ADSCOPYTABLE as follows:
+      + added logical return value
+      + added second optional param for ADS filter option
+      + Now uses default index order if set
+
+  * source/vm/hvm.c
+    * minor typo in trace text
+  * doc/howtoext.txt
+    * minor fixes; also added paragraph re use of HB_IT_ANY for
+      parameter checking of optional parameters
 
 2004-04-27 15:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * hrbdll.bc
