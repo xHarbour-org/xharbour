@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3702 2004/12/28 22:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3703 2004/12/29 09:05:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-29 09:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  ! utils/hbmake/hbmake.prg
+  ! utils/hbmake/hbmutils.prg
+  ! utils/hbmake/pickarry.prg
+    Fixed to respect the presence of hbct.lib and hbtip.lib if ct.lib and
+    tip.lib still not exist on xharbour/lib directory. 
 
 2004-12-28 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/gtwvt/gtwvt.c
@@ -144,16 +151,6 @@
   * contrib/Whoo/source//TApplication.prg
     ! added parameter in the hb_idleState() call
 
-2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
-  * utils/hbmake/tmake.prg
-  * utils/hbmake/radios.prg
-  * utils/hbmake/hbmake.prg
-  * utils/hbmake/pickarry.prg
-  * utils/hbmake/hbmutils.prg
-    Changed to remember marked external libs.
-
-2004-12-25 18:17 UTC+0100 Patrick Mast <patrick@xHarbour.com>
-  + Added Croatien code page 437 (DOS) on bhalf of Vladimir Miholic.
 
 2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/tmake.prg

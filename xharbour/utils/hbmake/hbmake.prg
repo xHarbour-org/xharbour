@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.135 2004/12/24 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.136 2004/12/28 23:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.135"
+STATIC s_cHbMakeVersion := "1.136"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -1367,6 +1367,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cExtraLibs   :=""
    LOCAL cTempLibs    := ""
    LOCAL aTempLibs
+
    #IFdef HBM_USE_DEPENDS
    LOCAL cIncl              := ""
    LOCAL lScanIncludes      := .F.
@@ -1374,12 +1375,16 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lScanInclRecursive := .F.
    LOCAL cExcludeExts       := PadR(".ch",40)
    #ENDIF
+
    #ifndef __PLATFORM__Windows
        LOCAL lHashhso := File("/usr/lib/libxharbour.so")
        LOCAL lusexhb := FILE("/usr/bin/xhb-build")
    #ELSE
        LOCAL lusexhb := .F.
    #ENDIF
+
+   LOCAL cHarbourLibDir := GetHarbourDir()+iif(s_lLinux,"/lib","\lib")
+
 
    IF nLenaSrc == 0 .and. !s_lRecurse
       IF s_nLang=1 // PT-BR
@@ -1814,7 +1819,8 @@ FUNCTION CreateMakeFile( cFile )
    IF s_lExternalLib
 
 //    aLibs := GetLibs( s_lGcc, GetMakeDir() + '\lib' )
-      aLibs := GetLibs( s_lGcc, GetHarbourDir() + '\lib' )
+//      aLibs := GetLibs( s_lGcc, GetHarbourDir() + '\lib' )
+      aLibs := GetLibs( s_lGcc, cHarbourLibDir )
 
       if len(aLibs)=0
          alert("aLibs is empty")
@@ -2102,6 +2108,20 @@ FUNCTION CreateMakeFile( cFile )
       cDefLibGccLibsMt += " -lrddads -ladsloc "
       cExtraLibs += " -lrddads -ladsloc "
    ENDIF
+
+
+//   if !file(GetHarbourDir()+"\lib\ct.lib")
+   if !file(cHarbourLibDir+"\ct.lib")
+      cDefBccLibs   := StrTran( cDefBccLibs  , "ct.lib","hbct.lib")
+      cDefBccLibsMt := StrTran( cDefBccLibsMt, "ctmt.lib","hbctmt.lib")
+   endif
+
+// if !file(GetHarbourDir()+"\lib\tip.lib")
+   if !file(cHarbourLibDir+"\tip.lib")
+      cDefBccLibs   := StrTran( cDefBccLibs  , "tip.lib","hbtip.lib")
+      cDefBccLibsMt := StrTran( cDefBccLibsMt, "tipmt.lib","hbtipmt.lib")
+   endif
+
 
 
    // if external libs was selected...

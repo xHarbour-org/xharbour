@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.37 2004/12/25 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.39 2004/12/28 23:15:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -494,57 +494,77 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
 *--------------------------------------
 
    LOCAL cSuffix := IIF( lGCC, ".a", ".lib" )
-
-   LOCAL aDefLib := { 'lang'   + cSuffix, ;
-                      'vm'     + cSuffix, ;
-                      'rtl'    + cSuffix, ;
-                      'rdd'    + cSuffix, ;
-                      'macro'  + cSuffix, ;
-                      'pp'     + cSuffix, ;
-                      'dbfntx' + cSuffix, ;
-                      'dbfcdx' + cSuffix, ;
-                      'dbfdbt' + cSuffix, ;
-                      'dbffpt' + cSuffix, ;
-                      'common' + cSuffix, ;
-                      'gtwin'  + cSuffix, ;
-                      'debug'  + cSuffix, ;
-                      'gtpca'  + cSuffix, ;
-                      'gtdos'  + cSuffix, ;
-                      'gtsln'  + cSuffix, ;
-                      'gtstd'  + cSuffix, ;
-                      'ziparchive' + cSuffix, ;
-                      'hbzip'  + cSuffix, ;
-                      'rddads' + cSuffix, ;
-                      'ace32'  + cSuffix, ;
-                      'libnf'  + cSuffix, ;
-                      'html'   + cSuffix, ;
-                      'libgt'  + cSuffix, ;
-                      'libmisc' + cSuffix, ;
-                      'mysql'  + cSuffix, ;
-                      'hbpg'   + cSuffix, ;
-                      'libmysql'    + cSuffix, ;
-                      'mysqlclient' + cSuffix, ;
-                      'samples' + cSuffix, ;
-                      'pdflib' + cSuffix, ;
-                      'nulsys' + cSuffix, ;
-                      'gtcgi' + cSuffix, ;
-                      'vmmt' + cSuffix, ;
-                      'rtlmt' + cSuffix, ;
-                      'rddmt' + cSuffix, ;
-                      'ppmt' + cSuffix, ;
-                      'dbfntxmt' + cSuffix, ;
-                      'dbfcdxmt' + cSuffix, ;
-                      'macromt' + cSuffix,;
-                      'codepage' + cSuffix,;
-                      'gtnul' + cSuffix,;
-                      'ct'+cSuffix,;
-                      'tip'+cSuffix }
-
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
    LOCAL nPos
    LOCAL nCount
    LOCAL cItem
+   LOCAL aDefLib := {}
+
+
+   aadd(aDefLib,'ace32'+ cSuffix)
+   aadd(aDefLib,'bcc640'+ cSuffix)
+   aadd(aDefLib,'bcc640mt'+ cSuffix)
+   aadd(aDefLib,'codepage'+ cSuffix)
+   aadd(aDefLib,'common'+ cSuffix)
+   aadd(aDefLib,'ct'+cSuffix)
+   aadd(aDefLib,'ctmt'+cSuffix)
+   aadd(aDefLib,'dbfdbt'+ cSuffix)
+   aadd(aDefLib,'dbfdbtmt'+ cSuffix)
+   aadd(aDefLib,'dbfcdx'+ cSuffix)
+   aadd(aDefLib,'dbfcdxmt'+ cSuffix)
+   aadd(aDefLib,'dbffpt'+ cSuffix)
+   aadd(aDefLib,'dbffptmt'+ cSuffix)
+   aadd(aDefLib,'dbfntx'+ cSuffix)
+   aadd(aDefLib,'dbfntxmt'+ cSuffix)
+   aadd(aDefLib,'debug'+ cSuffix)
+   aadd(aDefLib,'gtcgi'+ cSuffix)
+   aadd(aDefLib,'gtdos'+ cSuffix)
+   aadd(aDefLib,'gtpca'+ cSuffix)
+   aadd(aDefLib,'gtnul'+ cSuffix)
+   aadd(aDefLib,'gtsln'+ cSuffix)
+   aadd(aDefLib,'gtstd'+ cSuffix)
+   aadd(aDefLib,'gtwin'+ cSuffix)
+   aadd(aDefLib,'gtwvt'+ cSuffix)
+   aadd(aDefLib,'hbct'+cSuffix)
+   aadd(aDefLib,'hbctmt'+cSuffix)
+   aadd(aDefLib,'hbodbc'+ cSuffix)
+   aadd(aDefLib,'hbodbcmt'+ cSuffix)
+   aadd(aDefLib,'hbpg'+ cSuffix)
+   aadd(aDefLib,'hbtip'+cSuffix)
+   aadd(aDefLib,'hbtipmt'+cSuffix)
+   aadd(aDefLib,'hbzip'+ cSuffix)
+   aadd(aDefLib,'html'+ cSuffix)
+   aadd(aDefLib,'lang'+ cSuffix)
+   aadd(aDefLib,'libmisc'+ cSuffix)
+   aadd(aDefLib,'libnf'+ cSuffix)
+   aadd(aDefLib,'libgt'+ cSuffix)
+   aadd(aDefLib,'libmysql'+ cSuffix)
+   aadd(aDefLib,'macro'+ cSuffix)
+   aadd(aDefLib,'macromt'+ cSuffix)
+   aadd(aDefLib,'mysql'+ cSuffix)
+   aadd(aDefLib,'mysqlclient'+ cSuffix)
+   aadd(aDefLib,'nulsys'+ cSuffix)
+   aadd(aDefLib,'pdflib'+ cSuffix)
+   aadd(aDefLib,'optcon'+ cSuffix)
+   aadd(aDefLib,'optconmt'+ cSuffix)
+   aadd(aDefLib,'optgui'+ cSuffix)
+   aadd(aDefLib,'optguimt'+ cSuffix)
+   aadd(aDefLib,'pp'+ cSuffix)
+   aadd(aDefLib,'ppmt'+ cSuffix)
+   aadd(aDefLib,'rdd'+ cSuffix)
+   aadd(aDefLib,'rddads'+ cSuffix)
+   aadd(aDefLib,'rddmt'+ cSuffix)
+   aadd(aDefLib,'rtl'+ cSuffix)
+   aadd(aDefLib,'rtlmt'+ cSuffix)
+   aadd(aDefLib,'samples'+ cSuffix)
+   aadd(aDefLib,'samplesmt'+ cSuffix)
+   aadd(aDefLib,'tip'+cSuffix)
+   aadd(aDefLib,'tipmt'+cSuffix)
+   aadd(aDefLib,'vm'+ cSuffix)
+   aadd(aDefLib,'vmmt'+ cSuffix)
+   aadd(aDefLib,'ziparchive'+ cSuffix)
+
 
    IF lGcc
       AEval( aLibs, { | x, y | cItem := x[1], IIF( Left( cItem, 3 ) == "lib", aLibs[ y, 1 ] := SubStr( cItem, 4 ), ) } )

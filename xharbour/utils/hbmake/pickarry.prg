@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.9 2004/12/24 00:00:00 modalsist Exp $
+ * $Id: pickarry.prg,v 1.9 2004/12/25 23:52:18 modalsist Exp $
  */
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -54,6 +54,8 @@ STATIC lAdd := .F.
 STATIC cMarkChar := '*' // 'û' // character showed when <F5> is pressed to select prgs/libs.
 
 #include "common.ch"
+#include "achoice.ch"
+
 
 FUNCTION PICKARRY( T, L, b, r, IN_ARRAY, OUT_ARRAY, aDefault, lAllowAll, cTitle, lLib )
 
@@ -128,6 +130,7 @@ DEFAULT lLib to .F.
          ENDIF
       NEXT
    ENDIF
+
 
    WHILE nChoice != 0
 
@@ -210,29 +213,32 @@ RETURN Len( NEW_ARRAY )
 *--------------------
 FUNCTION Keys( MODE )
 *--------------------
-LOCAL RETVAL := 2
+LOCAL RETVAL := AC_CONT
 LOCAL THEKEY := Lastkey()
 
-   IF MODE = 1
+   IF MODE = AC_HITTOP 
       KEYBOARD Chr( 30 )
-   ELSEIF MODE = 2
+
+   ELSEIF MODE = AC_HITBOTTOM
       KEYBOARD Chr( 31 )
-   ELSEIF MODE = 3
+
+   ELSEIF MODE = AC_EXCEPT 
+
       IF THEKEY = 32
-         RETVAL := 1
+         RETVAL := AC_SELECT
       ELSEIF THEKEY == -4 //F5
          lAdd := !lAdd
-         RETVAL := 1
+         RETVAL := AC_SELECT
       ELSEIF THEKEY = 27
-         RETVAL := 0
+         RETVAL := AC_ABORT 
       ELSEIF THEKEY = 13 .AND. SOMEITEMS < 1
-//       RETVAL := 1
-         RETVAL := 0
-         KEYBOARD Chr( 13 )
+         RETVAL := AC_ABORT 
+         KEYBOARD CHR( 13 )
       ELSEIF THEKEY = 13
-         KEYBOARD Chr( 24 )
-         RETVAL := 0
+         KEYBOARD CHR( 24 )
+         RETVAL := AC_ABORT
       ENDIF
+
    ENDIF
 
 RETURN ( RETVAL )
