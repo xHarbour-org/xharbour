@@ -6,8 +6,8 @@
 
 TODO:
 
-- correct grid painting - 0,0 align
-- add asymetric grid ( x <> y )
+- correct grid painting - 0,0 align <- done
+- add asymetric grid ( x <> y )     <- done
 - add lSnap flag
 - revise (improve) snapping
 - revise min size protection for controls
@@ -19,7 +19,7 @@ TODO:
 - tooltip with position coords
 - add UNDO ( only last operation as in Delphi ).
 - direct text editing ( on char ? pass keystrokes to selected control ?)
-- Use methods instead of calls
+- Use methods instead of API calls
 - menu editor
 - parent form must disable processing commands in editor mode.
 - improve visibility of the selection rectangle
@@ -322,11 +322,15 @@ METHOD OnPaint(hDC)
       SetTextColor(hDC,RGB(0,0,0))
       SetBkColor(hDC,RGB(255,255,255))
       IF ::mousedown
+         //view SetROP2(hDC, R2_NOTXORPEN)
+         //hBrush:=GetStockObject(DKGRAY_BRUSH)
          IF len(::aSelected) > 1
             FOR EACH a In ::aSelected
+               //FrameRect(hDC,a[6],hBrush)
                DrawFocusRect(hDC,a[6])
             NEXT
          ELSE
+           // FrameRect(hDC,::aEditRect,hBrush)
             DrawFocusRect(hDC,::aEditRect)
          ENDIF
       ELSE
@@ -432,16 +436,22 @@ METHOD OnMouseMove( aParam,x,y)
    LOCAL n
    LOCAL hDC
    LOCAL a
+   //LOCAL hBrush
 
    IF ::mousedown
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(0,0,0))
       SetBkColor(hDC,RGB(255,255,255))
+     // hBrush:=GetStockObject(DKGRAY_BRUSH)
+     // view SetROP2(hDC, R2_NOTXORPEN)
+     // SetBkMode(hDC,TRANSPARENT)
       IF len(::aSelected) > 1
          FOR EACH a In ::aSelected
+           // FrameRect(hDC,a[6],hBrush)
             DrawFocusRect(hDC,a[6])
          NEXT
       ELSE
+        //FrameRect(hDC,::aEditRect,hBrush)
         DrawFocusRect(hDC,::aEditRect)
       ENDIF
      // ::aOriginal:=aclone(::aEditRect)
@@ -449,11 +459,13 @@ METHOD OnMouseMove( aParam,x,y)
       IF len(::aSelected) > 1
          ::MoveCtrl(::Handle,aPt)
          FOR EACH a In ::aSelected
+          // FrameRect(hDC,a[6],hBrush)
            DrawFocusRect(hDC,a[6])
          NEXT
       ELSE
-       ::aEditRect:=::MoveCtrl(::Handle,aPt)
-        DrawFocusRect(hDC,::aEditRect)
+         ::aEditRect:=::MoveCtrl(::Handle,aPt)
+         //FrameRect(hDC,::aEditRect,hBrush)
+         DrawFocusRect(hDC,::aEditRect)
       ENDIF
       ReleaseDc(::Handle,hDC)
 
