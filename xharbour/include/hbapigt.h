@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.6 2003/05/16 19:52:06 druzus Exp $
+ * $Id: hbapigt.h,v 1.7 2003/05/21 09:35:35 druzus Exp $
  */
 
 /*
@@ -324,9 +324,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
    User can choose GT on runtime by //GT:<gtname> switch [druzus] */
 
 #if ! defined(HB_GT_NAME)
-#undef HB_MULTI_GT
-#define HB_GT_FUNC(x)   HB_GT_FUNC_(x)
-#define HB_GT_FUNC_(x)  hb_##x
+#  undef HB_MULTI_GT
 #endif
 
 #ifdef HB_MULTI_GT
@@ -506,6 +504,9 @@ extern int    HB_GT_FUNC( mouse_CountButton( void ) );
 extern void   HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ) );
 extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) );
 
+#else
+#  define HB_GT_FUNC(x)   HB_GT_FUNC_(x)
+#  define HB_GT_FUNC_(x)  hb_##x
 #endif  /* HB_MULTI_GT */
 
 
