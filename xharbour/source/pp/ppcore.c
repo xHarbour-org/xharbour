@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.122 2004/01/19 17:47:55 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.123 2004/01/20 00:20:03 ronpinkas Exp $
  */
 
 /*
@@ -2969,7 +2969,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
         lenreal = hb_pp_NextToken( &pDummy, sStopper );
         expreal[lenreal] = '\0';
 
-        //printf( "*** Stoper: >%.*s<\n", lenreal, expreal );
+        //printf( "*** ExpReal: >%s<, Len: %i Stoper: >%s<\n", expreal, lenreal, sStopper );
      }
 
      if( lenreal && (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
@@ -5268,7 +5268,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               lPos++;
               continue;
            }
-           else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+           else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) && szSub[lSubPos] != '[' )
            {
               State = STATE_BRACKET;
               kolSquare++;
