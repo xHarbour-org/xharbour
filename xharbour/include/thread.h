@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.20 2003/01/02 03:31:02 jonnymind Exp $
+* $Id: thread.h,v 1.21 2003/01/14 23:47:27 jonnymind Exp $
 */
 
 /*
@@ -59,6 +59,8 @@
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapierr.h"
+
+#ifdef HB_THREAD_SUPPORT
 
 #if defined( HB_OS_WIN_32 )
    #ifndef _WIN32_WINNT
@@ -257,4 +259,5 @@ void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
 extern void hb_threadForbid( HB_FORBID_MUTEX * );
 extern void hb_threadAllow( HB_FORBID_MUTEX * );
 
+#endif
 #endif
