@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.38 2002/10/23 14:55:19 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.39 2002/10/23 23:42:39 ronpinkas Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ METHOD OnCommand( nwParam ) CLASS StringList
            oApp:MainFrame:ObjInsp:CurObject:Items:Text := {}
            FOR n := 1 TO nLines
                cText := I2Bin( 100 ) + Space( 200 )
-               SendDlgItemMessage( ::handle, 103, EM_GETLINE, n - 1, cText )
+               SendDlgItemMessage( ::handle, 103, EM_GETLINE, n - 1, @cText )
                cText := StrTran( cText, Chr(10), '' )
                cText := StrTran( cText, Chr(13), '' )
                oApp:MainFrame:ObjInsp:CurObject:Items:Add( AllTrim( cText ) )

@@ -146,26 +146,24 @@ HB_FUNC ( SENDDLGITEMMESSAGE )
 {
   char *cText ;
 
-  if( ISBYREF(5) )
-  {
-     //cText = hb_strdup( hb_parc(5) ) ;
-     cText = (char*) hb_xgrab( hb_parcsiz(5) );
-     hb_xmemcpy( cText, hb_parc(5), hb_parcsiz(5) );
-  }
+   //cText = hb_strdup( hb_parc(5) ) ;
+   cText = (char*) hb_xgrab( hb_parcsiz(5) );
+   hb_xmemcpy( cText, hb_parc(5), hb_parcsiz(5) );
 
    hb_retnl( (LONG) SendDlgItemMessage( (HWND) hb_parnl( 1 ) ,
                                         (int)  hb_parni( 2 ) ,
                                         (UINT) hb_parni( 3 ) ,
                                         (ISNIL(4) ? 0 : (WPARAM) hb_parnl( 4 ))   ,
-                                        (ISNIL(5) ? 0 : ( ISBYREF(5)? (LPARAM) (LPSTR) cText : ( ISCHAR(5) ? (LPARAM)(LPSTR) hb_parc(5) : (LPARAM) hb_parnl( 5 ))))
-                               )
+                                        (ISNIL(5) ? 0 : ISCHAR(5) ? cText : (LPARAM) hb_parnl( 5 ))
+                                      )
             );
 
   if( ISBYREF( 5 ) )
   {
      hb_storclen( cText, hb_parcsiz( 5 ), 5 ) ;
-     hb_xfree( cText );
   }
+
+  hb_xfree( cText );
 
 /*
    hb_retnl( SendDlgItemMessage( (HWND) hb_parnl(1) ,     // handle of dialog box
