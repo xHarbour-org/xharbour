@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2484 2004/03/04 09:31:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2485 2004/03/04 13:44:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 15:09 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/vm/hbini.prg
+    ! Fixed problems when write an INI file.
+
 2004-03-04 20:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/zip.c
     ! minor fix in creating array of files when skleton is not passed during
@@ -773,7 +778,6 @@ contrib/hbzlib/zip.c
 2004-02-26 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/vm/classes.c
     ! Fixed compiling errors when using array owners management.
-
 
    * include/hbvmpub.h
      in structure struString changes

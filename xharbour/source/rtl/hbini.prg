@@ -1,14 +1,14 @@
 /*
-* $Id: hbreadini.prg,v 1.9 2003/11/14 19:46:20 jonnymind Exp $
+* $Id: hbini.prg,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
 */
 
 /*
 * xHarbour Project source code:
 * HB_ReadIni - Reading .ini files
-* 
+*
 * Copyright 2002 Giancarlo Niccolai [gian@niccolai.ws]
 * www - http://www.xharbour.org
-* 
+*
 * This small procedure reads a .ini file into an associative array in
 * the standard .ini format:
 *    ; A line starting with a ';' is a comment
@@ -83,10 +83,12 @@
 GLOBAL cLineComment := ";"
 GLOBAL cHalfLineComment := "#"
 
+
 PROCEDURE HB_SetIniComment( cLc, cHlc )
    cLineComment := cLc
    cHalfLineComment := cHlc
 RETURN
+
 
 FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens )
    LOCAL hIni := Hash()
@@ -242,54 +244,65 @@ RETURN aIni
 
 
 
-FUNCTION HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
-   LOCAL nFileId
-   LOCAL cSection, hCurrentSection
-   LOCAL cNewLine := HB_OSNewLine()
+function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
 
-   IF ValType( cFileName ) != "C"
-      nFileId := cFileName
-   ELSE
-      nFileId := Fcreate( cFileName )
-      IF nFileId <= 0
-         RETURN .F.
-      ENDIF
-   ENDIF
+   local nFileId := 0
+   local cSection
+   local hCurrentSection
+   local cNewLine := HB_OSNewLine()
 
-   IF .not. Empty( cCommentBegin )
-      Fwrite( nFileId, cCommentBegin + cNewLine )
-   ENDIF
+   if !HB_IsString( cFileName )
 
-   // Writing MAIN section
-   hCurrentSection := hIni[ "MAIN" ]
-      HEval( hCurrentSection, ;
-         { | cKey, xVal |  FWrite( nFileId, cKey + " = " + ValToPrg( cKey ) + cNewLine ) };
-      )
+      nFileId = cFileName
 
-   FOR EACH cSection IN HGetKeys( hIni )
-      IF cSection == "MAIN"
-         LOOP
-      ENDIF
+   else
 
-      hCurrentSection := hIni[ cSection ]
-      IF Fwrite( nFileId, cNewLine + "[" + cSection + "]" + cNewLine ) <= 0
-         RETURN .F.
-      ENDIF
+      nFileId = FCreate( cFileName )
 
-      HEval( hCurrentSection, ;
-         { | cKey, xVal |  FWrite( nFileId, cKey + " = " + ValToPrg( cKey )+ cNewLine ) };
-      )
-   NEXT
+      if nFileId <= 0
+         return .f.
+      endif
 
-   IF .not. Empty( cCommentEnd )
-      IF Fwrite( nFileId, cCommentEnd + cNewLine ) <= 0
-         RETURN .F.
-      ENDIF
-   ENDIF
+   endif
 
-   IF ValType( cFileName ) == "C"
-      Fclose( nFileId )
-   ENDIF
+   if !Empty( cCommentBegin )
+      FWrite( nFileId, cCommentBegin + cNewLine )
+   endif
 
-RETURN .T.
+   hCurrentSection = hIni[ "MAIN" ]
+
+   HEval( hCurrentSection, ;
+          { | cKey, xVal |  FWrite( nFileId, cKey + "=" + cKey + cNewLine ) };
+        )
+
+   for each cSection in hIni:Keys
+
+       if cSection == "MAIN"
+          loop
+       endif
+
+       hCurrentSection = hIni[ cSection ]
+
+       if FWrite( nFileId, cNewLine + "[" + cSection + "]" + cNewLine ) <= 0
+          return .f.
+       endif
+
+       HEval( hCurrentSection, ;
+              { | cKey, xVal |  FWrite( nFileId, cKey + "=" + xVal + cNewLine ) };
+            )
+
+   next
+
+   if !Empty( cCommentEnd )
+      if FWrite( nFileId, cCommentEnd + cNewLine ) <= 0
+         return .f.
+      endif
+   endif
+
+   if nFileId > 0
+      FClose( nFileId )
+   endif
+
+return .t.
+
 
