@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1636 2003/10/28 20:02:03 peterrees Exp $
+ * $Id: ChangeLog,v 1.1637 2003/10/29 16:35:00 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-30 15:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Added '.' as a continuation token in 2nd phase of NextExp().
 
 2003-10-29 14:28 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   - include/struct.ch
