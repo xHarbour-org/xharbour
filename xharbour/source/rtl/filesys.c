@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.123 2004/10/18 10:22:25 likewolf Exp $
+ * $Id: filesys.c,v 1.124 2004/11/02 14:40:03 mauriliolongo Exp $
  */
 
 /*
@@ -334,7 +334,8 @@
       }
    #endif
 
-   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || defined(__USE_INLINE__) )
+   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || ! defined( HandleToLong ) || defined(__USE_INLINE__) )
+
       __inline void * LongToHandle( const long h )
       {
           return((void *) (INT_PTR) h );

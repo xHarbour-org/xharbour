@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3586 2004/11/05 04:37:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3587 2004/11/07 21:12:48 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-07 13:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/filesys.c
+    * change to allow HandleToLong to work with SDK installed.
 
 2004-11-07 15:09 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/set.c
