@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.14 2003/06/08 14:05:31 jonnymind Exp $
+   $Id: xwt.ch,v 1.15 2003/07/20 20:47:33 xthefull Exp $
 
    Definitions
 */
@@ -175,7 +175,45 @@
 #xcommand DEFINE LAYOUT <oLayout> [ MODE <nMode>] [ SIZE <nWidth>,<nHeigth> ];
                                   [ PADDING <nPadding>] [BORDER <nBorder> ];
                                   [ OF <oParent> ] ;
-=> <oLayout> := XWTLayout():New( <nMode>, <nWidth>, <nHeigth>, <nPadding>, <nBorder>, <oParent> )
+=> <oLayout> := XWTLayout():New( <nMode>, <nWidth>, <nHeigth>, <nPadding>, <nBorder>,  <oParent> )
+
+
+// Button ----------------------------------------------------------------------
+#xcommand DEFINE BUTTON <oBtn> [ TEXT <cText> ] [ MOVE <x>,<y> ][ OF <oParent> ];
+          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent> )
+
+#xcommand @ <x>,<y> BUTTON <oBtn> [ TEXT <cText>] [ OF <oParent> ];
+          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent>)
+
+// Label -------------------------------------------------------------------------
+#xcommand DEFINE LABEL <oLabel> [ TEXT <cText> ] [ MOVE <x>,<y> ] [ OF <oParent> ];
+          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>)
+
+#xcommand @ <x>,<y> LABEL <oLabel> [ TEXT <cText> ] [ OF <oParent> ];
+          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>)
+
+// TextBox -------------------------------------------------------------------------
+#xcommand DEFINE TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [MOVE <x>,<y>] [ OF <oParent> ];
+          => [ <oTextBox> := ] XWTTextBox():New( <cText>, <x>, <y>, <oParent> )
+
+#xcommand @ <x>,<y> TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ];
+          => [ <oTextBox> := ] XWTTextBox():New( <cText>, <x>, <y>, <oParent> )
+
+// Checkbox ---------------------------------------------------------------------------
+#xcommand DEFINE CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>];
+                          [ MOVE <x>,<y>] [ OF <oParent> ];
+                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+
+#xcommand @ <x>,<y> CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ];
+                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+
+// ToggleButton ---------------------------------------------------------------------------
+#xcommand DEFINE TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>];
+                          [ MOVE <x>,<y>] [ OF <oParent> ];
+                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+
+#xcommand @ <x>,<y> TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ];
+                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
 
 
 #endif
