@@ -78,20 +78,9 @@ METHOD Add( cName, oObj, lCreate ) CLASS TForm
 
    oObj:propname := cName
 
-//   __objAddData( self, cName )
-   
-//-------------------------------------------------------------------------------------   
-   IF !ISCHARACTER( cName )
-      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
-     ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
-      hClass := ::ClassH
-      nSeq   := __cls_IncData( hClass )
-      __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
-      __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
-   ENDIF
-//-------------------------------------------------------------------------------------
-
+   __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
    __ObjSetValueList( self, { { cName, oObj } } )
+
    IF lCreate
       oObj:Create()
    endif

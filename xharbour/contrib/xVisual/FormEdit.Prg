@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.51 2002/10/06 08:15:58 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.52 2002/10/06 21:24:04 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -81,7 +81,7 @@ GLOBAL EXTERNAL oApp
    METHOD Add()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-   METHOD OnMove()           INLINE ::Parent:ObjInsp:SetBrowserData( self ),NIL
+   METHOD OnMove()           INLINE ::Parent:ObjInsp:SetBrowserData( self,1 ),NIL
 
    METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
@@ -131,7 +131,7 @@ METHOD OnSize(nFlag,Width,Height)
       ::oMask:Move(aRect[1],aRect[2],aRect[3],aRect[4],.T.)
       ::oMask:Refresh()
    ENDIF
-   ::Parent:ObjInsp:SetBrowserData( self )
+   ::Parent:ObjInsp:SetBrowserData( self,1 )
 
    RETURN(NIL)
 
@@ -235,8 +235,8 @@ METHOD CreateControl(aRect)
       ENDCASE
 
       if oObj!=NIL
-         oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
-         oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
+         oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1 )})
+         oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1 )})
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
@@ -474,8 +474,6 @@ METHOD XFMReflect() CLASS TFormEdit
    NEXT
 
    oApp:MainFrame:ObjEdit:QuickEdit:SetText( cText )
-
-   //OutputDebugString( cText )
 
 RETURN Self
 

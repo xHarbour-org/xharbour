@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.20 2002/10/06 03:25:11 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.21 2002/10/06 08:15:59 ronpinkas Exp $
  */
 
 /*
@@ -76,16 +76,18 @@ CLASS ObjInspect FROM TForm
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
-METHOD SetBrowserData( oObj ) CLASS ObjInspect
 
-   ::CurObject := oObj
-
-   ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
-
-   aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
-   aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
-
-   ::Browser:RefreshAll()
+METHOD SetBrowserData( oObj, nState ) CLASS ObjInspect
+   DEFAULT nState TO 0
+   IF nState == 0
+      ::CurObject := oObj
+   ENDIF
+   IF oObj:handle == ::CurObject:handle .OR. nState == 0
+      ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
+      aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
+      aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
+      ::Browser:RefreshAll()
+   endif
 
    IF oObj:ClassName == "TFORMEDIT"
       oObj:XFMRoot()
@@ -94,6 +96,8 @@ METHOD SetBrowserData( oObj ) CLASS ObjInspect
    ENDIF
 
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
   local oCol1, oCol2
