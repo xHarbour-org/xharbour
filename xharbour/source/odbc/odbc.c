@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.9 2003/09/29 14:56:49 mlombardo Exp $
+ * $Id: odbc.c,v 1.10 2003/10/13 03:37:28 lculik Exp $
  */
 
 /*
@@ -84,7 +84,7 @@
 #include "hbapiitm.h"
 #include "hbdefs.h"
 
-#if !defined( __DJGPP__) && !defined(HB_OS_OS2)
+#if !defined(HB_OS_DOS) && !defined(HB_OS_OS2)
 
 #if defined(HB_OS_WIN_32)
    #include <windows.h>

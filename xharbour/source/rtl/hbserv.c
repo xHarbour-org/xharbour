@@ -1,5 +1,5 @@
 /*
-* $Id: hbservice.c,v 1.5 2003/10/20 02:39:29 jonnymind Exp $
+* $Id: hbserv.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
 */
 
 /*
@@ -50,7 +50,6 @@
 *
 */
 
-#if !defined(__DJGPP__) // djgpp can't compile this module
 #include "hbserv.ch"
 
 #include "hbapi.h"
@@ -61,6 +60,7 @@
 #include "hbvm.h"
 #include <stdio.h>
 
+#if !defined(HB_OS_DOS) // dos can't compile this module
 #if defined( HB_OS_UNIX )
 #include <sys/types.h>
 #include <unistd.h>

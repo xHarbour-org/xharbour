@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdebug.c,v 1.7 2003/11/12 23:56:55 jonnymind Exp $
+ * $Id: hboutdbg.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -206,8 +206,7 @@ HB_FUNC( HB_OUTDEBUG )
          }
       }
    }
-   #elif defined(__DJGPP__)
-   #else
+   #elif defined(HB_OS_WIN32)
 
    if( ISCHAR(1) )
    {
