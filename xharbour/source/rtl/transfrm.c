@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.34 2004/03/18 12:32:29 andijahja Exp $
+ * $Id: transfrm.c,v 1.35 2004/06/17 07:07:57 guerra000 Exp $
  */
 
 /*
@@ -93,6 +93,7 @@
 #define PF_NUMDATE    0x0400   /* Internal flag. Ignore decimal dot */
 #define PF_WIDTH      0x0800   /* @S */
 #define PF_PARNEGWOS  0x1000   /* @) Similar to PF_PARNEG but without leading spaces */
+#define PF_NUMBERS    0x2000   /* @9 */
 
 extern char *hb_vm_acAscii[256];
 
@@ -141,9 +142,16 @@ HB_FUNC( TRANSFORM )
             switch( toupper( *szPic ) )
             {
                case '9':
-                  bDone = TRUE;
-                  continue; //force exit without manipulating szPic and ulPicLen
-
+                  if( ulPicLen == 1 || strchr( szPic, ' ' ) != NULL || strchr( szPic, HB_CHAR_HT ) != NULL )
+                  {
+                     uiPicFlags |= PF_NUMBERS;
+                     break;
+                  }
+                  else
+                  {
+                     bDone = TRUE;
+                     continue; //force exit without manipulating szPic and ulPicLen
+                  }
                case HB_CHAR_HT:
                case ' ':
                   bDone = TRUE;      /* End of function string */
@@ -221,39 +229,19 @@ HB_FUNC( TRANSFORM )
          BOOL bAnyPic = FALSE;
          BOOL bFound  = FALSE;
 
-         /* ================================================================= */
-         /* HACKS !                                                           */
-         /* To solve Transform ( "1234567890", "@9" )                         */
-         /* ================================================================= */
+         // @9 works only if there's no another mask
+         if( uiPicFlags & PF_NUMBERS && ulPicLen == 0 )
          {
-            char * szTmp = pPic->item.asString.value;
-
-            if ( *szTmp == '@' && *szPic == '9' )
+            // @D (@E with @R, too) means date format instead
+            if( ! ( uiPicFlags & PF_DATE || uiPicFlags & PF_BRITISH ) )
+            if( ! ( ( uiPicFlags & PF_DATE ) ||
+              ( ( uiPicFlags & PF_BRITISH ) && ( uiPicFlags & PF_REMAIN ) ) ) )
             {
-               ULONG ii;
-
-               if ( strchr( szTmp, 'D' ) == NULL )
-               {
-                  if( strchr( "REBCSLXZ", szTmp[1] ) == NULL )
-                  {
-                     szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
-
-                     hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
-
-                     for ( ii = 0; ii < ulExpLen; ii ++ )
-                     {
-                        szPicNew[ ii ] = '9';
-                     }
-
-                     szPic = szPicNew;
-                     ulPicLen = strlen( szPic );
-                  }
-               }
-               else
-               {
-                  uiPicFlags |= PF_DATE;
-                  uiPicFlags |= PF_NUMDATE;
-               }
+               szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
+               hb_xmemset( szPicNew, '9', ulExpLen );
+               szPicNew[ ulExpLen ] = '\0';
+               szPic = szPicNew;
+               ulPicLen = ulExpLen;
             }
          }
 
@@ -546,37 +534,24 @@ HB_FUNC( TRANSFORM )
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
-         /* ================================================================= */
-         /* HACKS !                                                           */
-         /* To solve Transform ( 1234567890, "@9" )                           */
-         /* ================================================================= */
-         if ( *pPic->item.asString.value == '@' && pPic->item.asString.value[1] == '9' &&
-              (int) (pPic->item.asString.length - 1) < iOrigWidth )
+         // @9 works only if there's no another mask
+         if( uiPicFlags & PF_NUMBERS && ulPicLen == 0 )
          {
-            int ii, ulExpLen = pPic->item.asString.length;
-
-            szPic = pPic->item.asString.value;
-
-            if ( strchr( szPic , 'D' ) == NULL )
+            // @D (@E with @R, too) means date format instead
+            if( ! ( uiPicFlags & PF_DATE || uiPicFlags & PF_BRITISH ) )
+            if( ! ( ( uiPicFlags & PF_DATE ) ||
+              ( ( uiPicFlags & PF_BRITISH ) && ( uiPicFlags & PF_REMAIN ) ) ) )
             {
-               szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
-
-               hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
-
-               szPic[0] = '@';
-
-               for ( ii = 1; ii < ulExpLen; ii ++ )
-               {
-                  szPicNew[ ii ] = '9';
-               }
-
+               int iSize = iOrigWidth + iOrigDec + ( iOrigDec == 0 ? 0 : 1 ) ;
+               szPicNew = (char*) hb_xgrab( iSize + 1 );
+               hb_xmemset( szPicNew, '9', iSize );
+               szPicNew[ iSize ] = '\0';
                szPic = szPicNew;
-               ulPicLen = strlen( szPic );
-            }
-            else
-            {
-               uiPicFlags |= PF_DATE;
-               uiPicFlags |= PF_NUMDATE;
+               ulPicLen = iSize;
+               if( iOrigDec != 0 )
+               {
+                  szPicNew[ iSize - iOrigDec - 1 ] = '.';
+               }
             }
          }
 
@@ -838,7 +813,9 @@ HB_FUNC( TRANSFORM )
          }
 
          if ( szPicNew )
+         {
             hb_xfree ( szPicNew );
+         }
       }
 
       /* ======================================================= */
