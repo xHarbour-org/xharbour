@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_gnu.cmd,v 1.1.1.1 2001/12/21 10:40:33 ronpinkas Exp $
+rem $Id: make_gnu.cmd,v 1.2 2003/12/21 21:31:52 druzus Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -86,6 +86,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=include\
    echo       - gtpca (PC ANSI console)    (for all architectures)
    echo       - gtcrs (Curses console)     (for linux, w32 architectures)
    echo       - gtsln (Slang console)      (for linux, w32 architectures)
+   echo       - gtxvt (XWindow console)    (for linux architecture)
    echo.
    echo   - Use these optional envvars to configure the make process
    echo     when using the 'all' command:

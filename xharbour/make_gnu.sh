@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.6 2003/06/23 17:41:15 druzus Exp $
+# $Id: make_gnu.sh,v 1.7 2003/12/21 21:31:52 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -89,6 +89,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - gtpca (PC ANSI console)    (for all architectures)"
    echo "      - gtcrs (Curses console)     (for linux, w32 architectures)"
    echo "      - gtsln (Slang console)      (for linux, w32 architectures)"
+   echo "      - gtxvt (XWindow console)    (for linux architecture)"
    echo
    echo "  - Use these optional envvars to configure the make process"
    echo "    when using the 'all' command:"
