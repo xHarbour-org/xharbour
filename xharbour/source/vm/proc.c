@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.14 2003/09/10 06:07:33 ronpinkas Exp $
+ * $Id: proc.c,v 1.15 2003/09/11 17:59:02 druzus Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
             {
                PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
 
-               if( pClass->pModuleSymbols )
+               if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
                {
                   strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
                }
@@ -228,7 +228,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          {
             PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( pSelf->item.asBlock.value->pSymbols );
 
-            if( pBlockModuleSymbols )
+            if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
             {
                strcpy( szModuleName, pBlockModuleSymbols->szModuleName );
             }
