@@ -474,7 +474,11 @@ METHOD Refresh(lQuery) CLASS TPQquery
                 cType := aTemp[ i, 2 ]
                 nSize := aTemp[ i, 3 ]
                 nDec  := aTemp[ i, 4 ]
-        
+  
+                if nSize == 0 .and. PQlastrec(res) >= 1
+                    nSize := PQgetLength(res, 1, i)                
+                endif                    
+                
                 if 'char' $ cType 
                     cType := 'C'
         
