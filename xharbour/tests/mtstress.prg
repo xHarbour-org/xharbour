@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.3 2003/08/01 11:36:05 jonnymind Exp $
+* $Id: mtstress.prg,v 1.4 2003/08/01 12:16:51 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -21,6 +21,7 @@ PROCEDURE Main()
 
    CLEAR SCREEN
    @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
+   @3,5 SAY "WARNING: This should crash near the end; it is normal, don't worry"
 
    nStart := Seconds()
 
