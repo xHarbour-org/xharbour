@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2678 2004/03/29 21:20:57 srobert Exp $
+ * $Id: ChangeLog,v 1.2679 2004/03/30 01:56:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-29 23:33 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/inkey.c
+    ! Fixed for treat strings with one byte in character type instead
+      of numeric in __KEYBOARD().
+
 2004-03-30 09:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rdd/dbf1.c
     ! small modification to hb_dbfOpen() to launch error only when hb_fsError()

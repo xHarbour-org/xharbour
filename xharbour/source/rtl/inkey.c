@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.26 2004/03/11 04:22:27 ronpinkas Exp $
+ * $Id: inkey.c,v 1.27 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -455,14 +455,6 @@ HB_FUNC( __KEYBOARD )
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
    hb_inkeyReset( FALSE );
 
-#if defined( HB_EXTENSION )
-   if( ISNUM( 1 ) )
-   {
-      hb_inkeyPut( hb_parni(1) );
-      return;
-   }
-#endif
-
    if( ISCHAR( 1 ) )
    {
       ULONG size = hb_parclen( 1 );
@@ -548,6 +540,15 @@ HB_FUNC( __KEYBOARD )
          }
       }
    }
+#if defined( HB_EXTENSION )
+   else
+   {
+      if( ISNUM( 1 ) )
+      {
+         hb_inkeyPut( hb_parni(1) );
+      }
+   }
+#endif
 }
 
 void HB_EXPORT hb_inkeyPut( int ch )
