@@ -1,13 +1,17 @@
 /*
- * $Id: screen2.prg,v 1.1 2002/05/04 16:37:31 mbirdyg Exp $
+ * $Id: screen2.prg,v 1.1 2003/03/04 21:04:52 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
- *   CT3 video functions (screen-like functions): - SCREENMIX()
- * 
+ *   CT3 video functions (screen-like functions):
+ *
+ * SCREENMIX()
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>:
  * www - http://www.harbour-project.org
+ *
+ * SAYSCREEN()
+ * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,3 +91,51 @@ FUNCTION SCREENMIX( c, a, row, col )
 
    RETURN ""
 
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SAYSCREEN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SAYSCREEN( <cString>, [<nRow>], [<nCol>] ) -> <cEmptyString>
+ *  $ARGUMENTS$
+ *      <cString> - the string to output. Although undocumented, can be NIL.
+ *      <nRow> - row number, defaults to cursor row.
+ *      <nCol> - column number, defaults to cursor column.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Outputs a string at specified coordinates without changing character
+ *      attributes.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen2.prg, library is libct.
+ *  $SEEALSO$
+ *      SCREENMIX()
+ *  $END$
+ */
+
+FUNCTION SAYSCREEN( cStr, nRow, nCol )
+   LOCAL cBuf
+   LOCAL nRight
+   LOCAL i
+   
+   DEFAULT cStr TO ""
+   DEFAULT nRow TO Row()
+   DEFAULT nCol TO Col()
+   
+   nRight := Min( nCol + Len( cStr ), MaxCol() )
+   cBuf := SaveScreen( nRow, nCol, nRow, nRight )
+   FOR i := 1 TO nRight - nCol
+     cBuf[ i * 2 - 1 ] := cStr[ i ]
+   NEXT
+   RestScreen( nRow, nCol, nRow, nRight, cBuf )
+RETURN ""

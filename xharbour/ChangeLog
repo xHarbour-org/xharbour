@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2926 2004/05/12 02:40:10 modalsist Exp $
+ * $Id: ChangeLog,v 1.2927 2004/05/12 04:32:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-12 16:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/screen2.prg
+    + Added SAYSCREEN(). Thanks to Valery Belorustcev.
 
 2004-05-11 21:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbdefs.h
@@ -157,6 +161,7 @@
       sed?), but the good solution is that of eventually add a SET TERMINATOR
       or something the like.
 
+>>>>>>> 1.2927
 2004-05-11 14:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/ctmisc.prg
     ! Fixed CENTER() to accept NIL value as the first parameter.
