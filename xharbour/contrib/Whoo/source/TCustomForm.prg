@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.2 2002/11/08 04:46:51 ronpinkas Exp $
+ * $Id: TCustomForm.prg,v 1.3 2002/11/11 18:43:31 what32 Exp $
  */
 
 /*
@@ -111,29 +111,6 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY Visible                    WRITE SetVisible     DEFAULT FALSE
     PROPERTY Width                      //stored IsFormSizeStored;
     PROPERTY WindowMenu                 //: TMenuItem;
-    PROPERTY OnActivate                 //: TNotifyEvent;
-    PROPERTY OnCanResize                //stored IsForm;
-    PROPERTY OnClick                    //stored IsForm;
-    PROPERTY OnClose                    //: TCloseEvent;
-    PROPERTY OnCloseQuery               //: TCloseQueryEvent;
-    PROPERTY OnCreate                   //: TNotifyEvent;
-    PROPERTY OnDblClick                 //stored IsForm;
-    PROPERTY OnDestroy                  //: TNotifyEvent;
-    PROPERTY OnDeactivate               //: TNotifyEvent;
-    PROPERTY OnDragDrop                 //stored IsForm;
-    PROPERTY OnDragOver                 //stored IsForm;
-    PROPERTY OnHelp                     //: THelpEvent;
-    PROPERTY OnHide                     //: TNotifyEvent;
-    PROPERTY OnKeyDown                  //stored IsForm;
-    PROPERTY OnKeyPress                 //stored IsForm;
-    PROPERTY OnKeyUp                    //stored IsForm;
-    PROPERTY OnMouseDown                //stored IsForm;
-    PROPERTY OnMouseMove                //stored IsForm;
-    PROPERTY OnMouseUp                  //stored IsForm;
-    PROPERTY OnPaint                    //: TNotifyEvent;
-    PROPERTY OnResize                   //stored IsForm;
-    PROPERTY OnShortCut                 //: TShortCutEvent;
-    PROPERTY OnShow                     //: TNotifyEvent;
 /*
   PUBLIC:
     METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;

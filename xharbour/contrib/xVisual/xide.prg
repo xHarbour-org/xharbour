@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.121 2002/11/08 06:07:52 what32 Exp $
+ * $Id: xide.prg,v 1.122 2002/11/11 18:43:56 what32 Exp $
  */
 
 /*
@@ -58,6 +58,8 @@ FUNCTION Main
 
    WITH OBJECT Application
       WITH OBJECT :CreateForm( MainFrame(), @MainFrame )
+         
+         :OnCloseQuery := {|o| IIF( o:MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 ) }
 
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
@@ -91,7 +93,6 @@ CLASS MainFrame FROM TFrame
                                    ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
                                    ::Super:Create( oParent )
 
-   METHOD OnCloseQuery() INLINE IIF( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 )
    METHOD MainMenu()
    METHOD MainToolBar()
    METHOD MainStatusBar()
@@ -115,7 +116,7 @@ METHOD MainMenu() CLASS MainFrame
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Editor"
    oMenuItem:Command := 101
-   oMenuItem:OnClick := {||Application:CreateForm( @FormEdit, TFormEdit(), MainFrame ) }
+   oMenuItem:OnClick := {||Application:CreateForm( TFormEdit(), @FormEdit ) }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( oPopup )
@@ -161,7 +162,7 @@ METHOD MainToolBar() CLASS MainFrame
       
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
-      oTb:OnClick := {|o| MessageBox( MainFrame:handle, o:name ) }
+      oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
       
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"

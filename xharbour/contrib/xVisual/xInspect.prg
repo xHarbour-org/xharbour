@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.61 2002/11/09 06:15:27 what32 Exp $
+ * $Id: xInspect.prg,v 1.62 2002/11/11 18:43:55 what32 Exp $
  */
 
 /*
@@ -185,15 +185,24 @@ return(self)
 
 CLASS ComboInsp FROM TComboBox
    METHOD DrawItem()
-   METHOD OnClick()
    METHOD AddString()
    METHOD SetCurSel()
    METHOD DelObject()
+   METHOD MyOnClick()
+   METHOD Create()
 ENDCLASS
 
 //---------------------------------------------------------------------------------
 
-METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
+METHOD Create( oParent ) CLASS ComboInsp
+
+   ::Super:Create( oParent )
+   ::OnClick := HB_ObjMsgPtr( Self, "MyOnClick" )
+
+RETURN Self
+
+//---------------------------------------------------------------------------------
+METHOD MyOnClick(nwParam,nlParam) CLASS ComboInsp
    LOCAL oObj
 
    IF HiWord( nwParam ) == CBN_SELCHANGE
@@ -455,14 +464,14 @@ CLASS StringList FROM TPanel
    METHOD New(oParent) INLINE ::resname := "StringList",;
                               ::Modal   := .T.,;
                               Super:New( oParent )
-   METHOD OnCommand()
-   METHOD OnCreate()
+   METHOD WMCommand()
+   METHOD WMCreate()
 
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------
 
-METHOD OnCreate() CLASS StringList
+METHOD WMCreate() CLASS StringList
 
    LOCAL cText := "", cItem
 
@@ -480,7 +489,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------
 
-METHOD OnCommand( nwParam ) CLASS StringList
+METHOD WMCommand( nwParam ) CLASS StringList
    local n, cText, nPtr
    static nLines
 

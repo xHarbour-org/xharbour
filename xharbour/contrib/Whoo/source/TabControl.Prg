@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.29 2002/11/08 06:07:40 what32 Exp $
+ * $Id: TabControl.Prg,v 1.30 2002/11/11 18:43:32 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -99,7 +99,7 @@ CLASS TTabControl FROM TCustomControl
    METHOD SetToolTips()
    METHOD SetUnicodeFormat()
    METHOD Notify()
-   METHOD OnSize()
+   METHOD WMSize()
    METHOD GetObj()
 
 ENDCLASS
@@ -384,7 +384,7 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
 
 *-----------------------------------------------------------------------------*
 
-METHOD OnSize( nwParam,x , y ) CLASS TTabControl
+METHOD WMSize( nwParam,x , y ) CLASS TTabControl
 
    LOCAL n, aRect, oCtrl
 
@@ -406,7 +406,7 @@ return(nil)
 CLASS TabPage FROM TPanel
    DATA ImageIndex
    METHOD Create() CONSTRUCTOR
-   METHOD OnCommand()
+   METHOD WMCommand()
 ENDCLASS
 
 METHOD Create( oParent ) CLASS TabPage
@@ -421,7 +421,7 @@ METHOD Create( oParent ) CLASS TabPage
    ::Super:Create( oParent )
 return( Self )
 
-METHOD OnCommand(nwParam,nlParam) CLASS TabPage
+METHOD WMCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL
       RETURN(::Parent:SendTo:SendMessage( WM_COMMAND, nwParam, nlParam ))
    ENDIF

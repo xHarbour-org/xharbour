@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.17 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TTreeview.prg,v 1.18 2002/11/07 20:05:56 what32 Exp $
  */
 
 /*
@@ -79,17 +79,6 @@ CLASS TTreeView FROM TCustomControl
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-/*
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTreeView
-
-   ::id        := nId
-   ::Left      := IFNIL( nLeft,   ::Left,   nLeft  )
-   ::Top       := IFNIL( nTop,    ::Top,    nTop   )
-   ::width     := IFNIL( nWidth,  ::width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
-return( super:New( oParent ) )
-*/
-//----------------------------------------------------------------------------//
 
 METHOD Add( cPrompt, nImage, cargo ) CLASS TTreeView
    local oItem
@@ -139,14 +128,16 @@ return nil
 //----------------------------------------------------------------------------//
 
 METHOD Notify( hdr, nlParam ) CLASS TTreeView
-   local oItem
+
+   LOCAL oItem
+   
    DO CASE
       CASE Hdr:code == TVN_BEGINDRAG
       CASE Hdr:code == TVN_BEGINLABELEDIT
       CASE Hdr:code == TVN_BEGINRDRAG
       CASE Hdr:code == TVN_DELETEITEM
            oItem := FindItem( ::Items, TVGetSelected( ::handle ) )
-           Return( ::OnDelete( oItem ) )
+           ::OnDelete( oItem )
       
       CASE Hdr:code == TVN_ENDLABELEDIT
       CASE Hdr:code == TVN_GETDISPINFO
@@ -156,11 +147,11 @@ METHOD Notify( hdr, nlParam ) CLASS TTreeView
       CASE Hdr:code == TVN_KEYDOWN
       CASE Hdr:code == TVN_SELCHANGED
            oItem := FindItem( ::Items, TVGetSelected( ::handle ) )
-           Return( ::OnChange( oItem ) )
+           ::OnChange( oItem )
 
       CASE Hdr:code == TVN_SELCHANGING
       CASE Hdr:code == TVN_SETDISPINFO
       CASE Hdr:code == TVN_SINGLEEXPAND
       CASE Hdr:code == TVS_EDITLABELS
    ENDCASE
-return(0)
+RETURN NIL

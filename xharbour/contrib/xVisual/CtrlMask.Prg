@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.39 2002/11/08 03:24:32 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.40 2002/11/08 05:45:10 what32 Exp $
  */
 
 /*
@@ -123,12 +123,15 @@ CLASS oCtrlMask FROM TWinControl
    METHOD Refresh()
    METHOD ChangeInspector()
    METHOD IsFocused()
+   METHOD Add() INLINE Self
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
 METHOD Create( oParent ) CLASS oCtrlMask
 
+   ::Super:Create( oParent )
+   
    ::Fleft      := 0
    ::Ftop       := 0
    ::Fwidth     := oParent:Fwidth
@@ -158,7 +161,7 @@ METHOD Create( oParent ) CLASS oCtrlMask
    ::aSelected := {}
    ::aClickPt  := {}
 
-RETURN( super:Create( oParent ) )
+RETURN Self
 
 
 *-----------------------------------------------------------------------------*

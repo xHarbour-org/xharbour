@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.27 2002/11/07 23:01:31 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.28 2002/11/11 18:43:30 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -214,32 +214,20 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
    LOCAL hMenu,rc,aRect, nRet
    LOCAL n,x
    LOCAL hic
-
+   LOCAL xAction
+   
    DO CASE
+
    CASE nMsg==WM_COMMAND
+
        IF (n:=ASCAN(::aButtons,{|btn| btn:oStruct:idCommand==nwParam})) > 0
-          if ::aButtons[n]:Action != NIL
-             if valtype(::aButtons[n]:Action) == "B"
-                EVAL( ::aButtons[n]:Action,::aButtons[n] )
-               else
-                HB_Exec( ::aButtons[n]:Action,,::aButtons[n])
-             endif
-          endif
-          
-          VIEW nwParam
-          
-          IF __ClsMsgAssigned( self, "OnClick" )
-             nRet := ::aButtons[n]:OnClick( nwParam, nlParam )
-          ELSEIF ::aButtons[n]:OnClick != NIL
-             IF ValType( ::aButtons[n]:OnClick ) == "B"
-                nRet := EVAL( ::aButtons[n]:OnClick, ::aButtons[n] )
-             ELSE
-                nRet := HB_Exec( ::aButtons[n]:OnClick, , ::aButtons[n] )
-             ENDIF
-          ENDIF
-            
-          IF nRet!=nil
-             return(nRet)
+       
+          xAction := IIF( ::aButtons[n]:Action == NIL, ::aButtons[n]:OnClick, ::aButtons[n]:Action )
+
+          IF ValType( xAction ) == "B"
+             EVAL( xAction, ::aButtons[n] )
+          ELSEIF ValType( xAction ) == "N"
+             HB_Exec( xAction, ::aButtons[n] )
           ENDIF
 
        ENDIF

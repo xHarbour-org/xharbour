@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.85 2002/11/08 05:45:10 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.86 2002/11/11 18:43:55 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -89,30 +89,30 @@ GLOBAL EXTERNAL ObjEdit
                                     ::xGrid    := 8          ,;
                                     ::yGrid    := 8          ,;
                                     ::GridColor:=RGB(0,0,0) ,;
+                                    ::OnCloseQuery := {|| MainFrame:StdBar:Disable(),;
+                                                          ObjInspect:ComboBox1:DelObject( HB_QSELF() ),;
+                                                          NIL },;
                                     ::XFMTop(),;
-                                    super:Create( oParent ) ,;
+                                    ::Super:Create( oParent ) ,;
                                     ::GetHandle(),;
                                     Self
 
 
    METHOD AddControl()
-   METHOD OnCreate()         INLINE ::CreateSub()
-   METHOD OnSize()
-   METHOD OnMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
 
-   METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
-   METHOD TileGrid(hDC)
+   METHOD WMCreate()
+   METHOD WMSize()
+   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
+   METHOD WMPaint()
+   METHOD WMDestroy()
+
    METHOD OnMenuCommand(oItem)
+
    METHOD CreateControl(aRect)
-   METHOD CreateSub()
    METHOD GetUniquePropName()
-   METHOD OnDestroy()
    METHOD SetControl( oObj )
    METHOD SetGridSize(x,y)
-   METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
-                                    ::Parent:StdBar:Disable(),;
-                                    ObjInspect:ComboBox1:DelObject( self ),;
-                                    super:OnCloseQuery()
+
    METHOD XFMTop()
    METHOD XFMRoot()
    METHOD XFMControl( cName, oControl, lDelete )
@@ -141,7 +141,7 @@ RETURN oCtrl
 
 //----------------------------------------------------------------------------//
 
-METHOD OnSize( nFlag, Width, Height)
+METHOD WMSize( nFlag, Width, Height)
 
    LOCAL aRect
 
@@ -157,13 +157,13 @@ METHOD OnSize( nFlag, Width, Height)
 
 //----------------------------------------------------------------------------//
 
-METHOD OnDestroy()
+METHOD WMDestroy()
 
    IF !Empty(::hBmpGrid)
       DeleteObject(::hBmpGrid)
    ENDIF
 
-   RETURN(Super:OnDestroy())
+   RETURN(Super:WMDestroy())
 
 //----------------------------------------------------------------------------//
 
@@ -284,8 +284,8 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       ENDIF
    ENDIF
 
-   ::Parent:StdBar:ToolButton1:Click()
-   ::Parent:Win32Bar:ToolButton1:Click()
+   MainFrame:StdBar:ToolButton1:Click()
+   MainFrame:Win32Bar:ToolButton1:Click()
 
 RETURN oObj
 
@@ -353,7 +353,7 @@ METHOD SetGridSize(x,y)
 
 //----------------------------------------------------------------------------//
 
-METHOD CreateSub()
+METHOD WMCreate()
 
    LOCAL oBtn
    LOCAL xRet
@@ -361,36 +361,37 @@ METHOD CreateSub()
 
    ::SetGridSize()
 
-   ::Parent:StdBar:Enable()
-   ::Parent:Win32Bar:Enable()
+   MainFrame:StdBar:Enable()
+   MainFrame:Win32Bar:Enable()
 
    ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
    oTree     := ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
    oTree:Select()
 
 
-   xRet := super:OnCreate()
+   xRet := super:WMCreate()
 
    ::oMask:=oCtrlMask():Create( self )
    ::oMask:GetHandle()
+   
    ::oMask:GetSiblings()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
 
-   ::oMask:Hint:=""
-   ::oMask:HintWindow:SetMaxTipWidth(10)
+//   ::oMask:Hint:=""
+//   ::oMask:HintWindow:SetMaxTipWidth(10)
    RETURN( xRet )
 
 *------------------------------------------------------------------------------
 
-METHOD TileGrid(hDC)
+METHOD WMPaint( hDC )
 
-   LOCAL hMemDC := CreateCompatibleDC(hDC)
-   LOCAL i:=0
-   LOCAL j:=0
-   LOCAL hOldBmp := SelectObject(hMemDC,::hBmpGrid)
+   LOCAL hMemDC  := CreateCompatibleDC(hDC)
+   LOCAL i       := 0
+   LOCAL j       := 0
+   LOCAL hOldBmp := SelectObject( hMemDC, ::hBmpGrid )
 
-   SetTextColor(hDC,::GridColor)
+   SetTextColor( hDC, ::GridColor )
    DO WHILE j < ::FHeight
       i:=0
       DO WHILE i < ::FWidth

@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.6 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TSplash.prg,v 1.7 2002/11/09 03:18:16 what32 Exp $
  */
 
 /*
@@ -37,11 +37,11 @@ GLOBAL EXTERNAL Application
 CLASS TSplash FROM TForm
    DATA bitmap
    METHOD Create() CONSTRUCTOR
-   METHOD OnPaint( hDC )  INLINE DrawBitmap( hDC, ::bitmap ), 0
-   METHOD OnDestroy()     INLINE DeleteObject(::bitmap),NIL
-   METHOD OnTimer( n )    INLINE IIF( n==1,::Destroy(),)
-   METHOD OnLButtonDown() INLINE ::Destroy()
-   METHOD OnRButtonDown() INLINE ::Destroy()
+   METHOD WMPaint( hDC )  INLINE DrawBitmap( hDC, ::bitmap ), 0
+   METHOD WMDestroy()     INLINE DeleteObject(::bitmap),NIL
+   METHOD WMTimer( n )    INLINE IIF( n==1,::Destroy(),)
+   METHOD WMLButtonDown() INLINE ::Destroy()
+   METHOD WMRButtonDown() INLINE ::Destroy()
 ENDCLASS
 
 METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash

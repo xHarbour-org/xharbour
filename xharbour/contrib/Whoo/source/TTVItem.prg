@@ -1,5 +1,5 @@
 /*
- * $Id: TTVItem.prg,v 1.6 2002/10/16 03:32:05 what32 Exp $
+ * $Id: TTVItem.prg,v 1.7 2002/10/28 12:03:52 what32 Exp $
  */
 
 /*
@@ -38,11 +38,11 @@
 //----------------------------------------------------------------------------//
 
 CLASS TTVItem
-   DATA   handle
-   DATA   Items
-   DATA   Tree
-   DATA   Cargo
-   DATA   Caption
+   DATA handle
+   DATA Items
+   DATA Tree
+   DATA Cargo
+   DATA Caption
    METHOD New() CONSTRUCTOR
    METHOD Add()
    METHOD Expand() INLINE SendMessage( ::Tree:handle, TVM_EXPAND, TVE_EXPAND, ::handle )

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.18 2002/11/07 23:01:38 what32 Exp $
+ * $Id: xTree.prg,v 1.19 2002/11/08 05:45:10 what32 Exp $
  */
 
 /*
@@ -42,13 +42,14 @@ CLASS ObjTree FROM TForm
    DATA oTree PROTECTED
    
    METHOD Create()
-   METHOD OnCreate()
-   METHOD OnCloseQuery() INLINE 0
-   METHOD OnSize(n,x,y)  INLINE IIF( ! ::oTree == NIL, ::oTree:Move( , , x, y, .t. ), ), NIL
+   METHOD WMCreate()
+   METHOD WMSize(n,x,y)  INLINE IIF( ! ::oTree == NIL, ::oTree:Move( , , x, y, .t. ), ), NIL
 
 ENDCLASS
 
 METHOD Create( oParent ) CLASS ObjTree
+
+   ::Super:Create( oParent )
 
    ::FCaption := 'Object Tree'
    ::Name     := "ObjTree"
@@ -57,15 +58,11 @@ METHOD Create( oParent ) CLASS ObjTree
    ::FWidth   := 200
    ::FHeight  := 150
    ::ExStyle  := WS_EX_TOOLWINDOW
-
-   super:Create( oParent )
-
    ::GetHandle()
-
 RETURN( Self )
 
 
-METHOD OnCreate() CLASS ObjTree
+METHOD WMCreate() CLASS ObjTree
 
    LOCAL o,hImg,hBmp
    

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.18 2002/11/08 05:45:03 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.19 2002/11/11 18:43:28 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -231,34 +231,36 @@ CLASS TWBrowse FROM TWinControl
    METHOD GoToPos()
    METHOD Kill()
 
-   METHOD OnPaint( hDC ) INLINE ::drawheader(),;
+   METHOD WMPaint( hDC ) INLINE ::drawheader(),;
                                 ::drawdata( hDC ),;
                                 self
 
-   METHOD OnGetDlgCode() INLINE DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
-   METHOD OnDestroy()    INLINE ::Kill(), NIL
-   METHOD OnSetFocus()   INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
-   METHOD OnKillFocus()  INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
-   METHOD OnEraseBkGnd() INLINE 0
-   METHOD OnSize()       INLINE ::RefreshAll(), NIL
-   METHOD OnNotify()
-   METHOD OnSysColorChange()
+   METHOD WMGetDlgCode() INLINE DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
+   METHOD WMDestroy()    INLINE ::Kill(), NIL
+   METHOD WMSetFocus()   INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
+   METHOD WMKillFocus()  INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
+   METHOD WMEraseBkGnd() INLINE 0
+   METHOD WMSize()       INLINE ::RefreshAll(), NIL
+   METHOD WMNotify()
+   METHOD WMSysColorChange()
+
+   METHOD WMKeyDown()
+   METHOD WMLButtonDown()
+   METHOD WMLButtonDblClk()
+   METHOD WMChar()
+   METHOD WMVScroll()
+   METHOD WMHScroll()
+
+   METHOD OnHeadClick()
+   METHOD OnChange()
+   METHOD OnHeadDblClick()
+   METHOD OnItemChanged()
 
    METHOD OnBeginTrack()
    METHOD OnEndTrack()
    METHOD OnBeginDrag()
    METHOD OnEndDrag()
    METHOD OnTracking()
-   METHOD OnItemChanged()
-   METHOD OnChange()
-   METHOD OnHeadClick()
-   METHOD OnHeadDblClick()
-   METHOD OnKeyDown()
-   METHOD OnLButtonDown()
-   METHOD OnLButtonDblClk()
-   METHOD OnChar()
-   METHOD OnVScroll()
-   METHOD OnHScroll()
 
    METHOD GoUp()
    METHOD GoDown()
@@ -1127,7 +1129,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnNotify( hdr, nlParam ) CLASS TWBrowse
+METHOD WMNotify( hdr, nlParam ) CLASS TWBrowse
    local c, a, hi
    LOCAL nmHdr IS NMHEADER
    
@@ -1139,7 +1141,7 @@ METHOD OnNotify( hdr, nlParam ) CLASS TWBrowse
          ENDIF
       CASE hdr:code == HDN_TRACK
          nmHdr:Pointer(nlParam)
-         ::OnTracking(nmHdr)
+         ::WMTracking(nmHdr)
 
       CASE hdr:code == HDN_ENDTRACK
          nmHdr:Pointer(nlParam)
@@ -1916,7 +1918,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnKeyDown( nwParam, nlParam)  CLASS TWBrowse
+METHOD WMKeyDown( nwParam, nlParam)  CLASS TWBrowse
    LOCAL lShift,h
    SetFocus(::handle)
    IF ValType(::bOnKey) # 'B' .OR. !eval(::bOnKey,self,nwParam,nlParam)
@@ -1957,7 +1959,7 @@ RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDown(nwParam,xPos,yPos) CLASS TWBrowse
+METHOD WMLButtonDown(nwParam,xPos,yPos) CLASS TWBrowse
 
    LOCAL nClickLine:=Ceiling((yPos-::HeadHeight) /::ItemHeight)
    LOCAL nClickCol:=aScan(::ColWidths,{|x| x-::ColWidths[::LeftVisible]>xPos})-1
@@ -2003,7 +2005,7 @@ RETURN(.F.)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDblClk() CLASS TWBrowse
+METHOD WMLButtonDblClk() CLASS TWBrowse
    IF (::ColPos>0 .AND. ::ColPos<=::ColCount) .AND. ;
       (::ColPos>=::LeftVisible .AND. ::ColPos<=::RightVisible)
       IF ValType(::bOnDblClick)=='B'
@@ -2019,7 +2021,7 @@ RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnChar(nwParam) CLASS TWBrowse
+METHOD WMChar(nwParam) CLASS TWBrowse
    local nAlign, key := nwParam
    IF ( nwParam < 32 .OR. nwParam > 128 )
       RETURN( NIL )
@@ -2238,7 +2240,7 @@ RETURN(NIL)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnSysColorChange() CLASS TWBrowse
+METHOD WMSysColorChange() CLASS TWBrowse
    IF ::wantSysColor
       ::FgColor       := GetSysColor( COLOR_WINDOWTEXT )
       ::BgColor       := GetSysColor( COLOR_WINDOW )
@@ -2251,7 +2253,7 @@ RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnVScroll(nwParam, nlParam) CLASS TWBrowse
+METHOD WMVScroll(nwParam, nlParam) CLASS TWBrowse
    LOCAL oldrow
    local nCode,nPos,hSBar
    nCode := loword(nwParam)
@@ -2294,7 +2296,7 @@ RETURN(0)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD OnHScroll(nwParam, nlParam) CLASS TWBrowse
+METHOD WMHScroll(nwParam, nlParam) CLASS TWBrowse
    LOCAL nCol
    local nCode,nPos,hSBar
    nCode := loword(nwParam)
