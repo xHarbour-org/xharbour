@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.47 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.49 2003/06/28 22:20:42 horacioroldan Exp $
  */
 
 /*
@@ -7583,8 +7583,10 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
       pIndexTmp->pNext = pIndex;
    }
    */
+	
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
-
+	szFileName =  hb_filecase( hb_strdup( szFileName ) ) ;
+	   HB_TRACE(HB_TR_ALWAYS, ("cdxOrderListAdd(%s)",szFileName ));
    if( strlen( szFileName ) == 0 )
    {
       /* hb_cdxOrderListClear( (CDXAREAP) pArea ); */
@@ -7601,6 +7603,7 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
       pFileName = hb_fsFNameSplit( szFileName );
       if( !pFileName->szExtension )
       {
+		
          pExtInfo.itmResult = hb_itemPutC( NULL, "" );
          SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo );
          strcat( szFileName, pExtInfo.itmResult->item.asString.value );
@@ -7663,6 +7666,7 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
    do
    {
       pIndex->hFile = FS_ERROR;
+
       if( szFileNameDbfPath )
          pIndex->hFile = hb_spOpen( ( BYTE * ) szFileNameDbfPath, uiFlags );
 

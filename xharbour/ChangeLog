@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1250 2003/07/15 00:57:02 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1251 2003/07/15 09:15:25 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-15 09:06 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+   * source/rdd/dbfntx/dbfntx1.c
+	  source/rdd/dbfcdx/dbfcdx1.c
+	  ! Fixed an bug when processing filenames of index file under linux (related to the filecase of paramaters) 
+	   
 2003-07-15 10:20 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * include/hbset.h
      * only define HB_OS_WIN_32_USED when not defined yet.
