@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3626 2004/11/25 05:11:07 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3627 2004/11/25 15:31:39 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-25 14:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * include/gfx.ch
+    + GFX_SETCLIP constant for setting clip region
+    + gfxSetClip() translate
+  * source/rtl/gtalleg/gtalleg.c
+    + GFX_SETCLIP implementation
+    + gfx API ability to get buffered under dispBegin()/dispEnd()
 
 2004-11-25 16:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
