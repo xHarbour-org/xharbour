@@ -8,7 +8,7 @@
                                gian@nccolai.ws
 
 
-$Id: hbxml.txt,v 1.4 2003/11/23 14:44:35 jonnymind Exp $
+$Id: hbxml.txt,v 1.5 2004/02/22 16:56:40 jonnymind Exp $
 
 
 STATUS OF THE LIBRARY
@@ -438,6 +438,13 @@ Writes an XML string representation of current node and all its children to
 an open file handle. See TXMLDocument:Write() for a description of the nStyle
 parameter.
 
+
+
+ITERATORS
+=========
+
+Iterators are a very handy way to navigate through an XML document or
+through an XML subtree.
 
 UTILITY FUNCTIONS
 =================

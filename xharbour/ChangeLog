@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2724 2004/04/02 18:46:06 srobert Exp $
+ * $Id: ChangeLog,v 1.2725 2004/04/02 19:44:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 23:45 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/filesys.c
+    ! Under windows with X__WIN__ on, hb_fsOpenProcess was failing
+      if the file was not found in the path, but was available
+      in the relative path.
+
+  * source/rtl/hbxml.c
+    % Changed memory deallocation strategy (great speedup).
+
+  * tests/xmltest.prg
+    * Fix doc strings.
+
+  + tests/xmliter.prg
+    + Added a test for xml iterators; they were in (in fact,
+      they are internally used by XmlDocument class for
+      findfirst/findnext operations) but documentation is
+      missing; I will commit docs ASAP but this test helps
+      to understand.
+
 2004-04-03 02:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbtest/rt_file.prg
     + add routine to test FError() upon "Access denied"

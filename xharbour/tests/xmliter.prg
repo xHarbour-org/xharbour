@@ -1,10 +1,10 @@
 ************************************************************
-* xmltest.prg
+* xmliter.prg
 * $Id: xmltest.prg,v 1.6 2004/03/23 18:09:29 jonnymind Exp $
 *
-* Test for XML routines of Xharbour rtl (MXML/HBXML)
+* Test for XML ITERATOR routines of Xharbour rtl (MXML/HBXML)
 *
-* USAGE:  xmltext <cFileName> <cNode> <cAttrib> <cValue> <cData>
+* USAGE:  xmliter <cFileName> <cNode> <cAttrib> <cValue> <cData>
 *   cFileName: the XML to parse (defaults to xmltest.xml)
 *   cNode: if you want to test regex match on node name
 *   cNode: if you want to test if a node has an attribute
@@ -20,12 +20,12 @@
 
 PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
    LOCAL hFile, cXml
-   LOCAL xmlDoc, xmlNode
+   LOCAL xmlDoc, xmlIter , xmlNode
 
    SET EXACT OFF
 
    CLEAR SCREEN
-   @1,15 SAY "X H A R B O U R - XML Test "
+   @1,15 SAY "X H A R B O U R - XML ITERATOR test "
 
    IF cFileName == NIL
       cFileName := "xmltest.xml"
@@ -70,20 +70,12 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
       RETURN
    ENDIF
 
-   ? "XML Dump beginning here"
    ? "-----------------------"
+   ? "Navigating all nodes with a base iterator"
    ? ""
 
-   cXml := xmlDoc:ToString( HBXML_STYLE_INDENT + HBXML_STYLE_THREESPACES )
-   ? cXml
-   ? "--- Press any key for next test"
-   Inkey(0)
-
-   ? "-----------------------"
-   ? "Navigating all nodes"
-   ? ""
-
-   xmlNode := xmlDoc:oRoot:oChild
+   xmlIter := TXmlIterator():New( xmlDoc:oRoot )
+   xmlNode := xmlIter:Find()
    DO WHILE xmlNode != NIL
       cXml := xmlNode:Path()
       IF cXml == NIL
@@ -93,17 +85,18 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
       ? Alltrim( Str( xmlNode:nType ) ), ", ", xmlNode:cName, ", ", ;
             ValToPrg( xmlNode:aAttributes ), ", ", xmlNode:cData, ": ", cXml
 
-      xmlNode := xmlNode:NextInTree()
+      xmlNode := xmlIter:Next()
    ENDDO
 
    IF cNode != NIL .or. cAttrib != NIL .or. cValue != NIL .or. cData != NIL
       Inkey( 0 )
       ? ""
       ? "-----------------"
-      ? "Searching for node named", cNode, ",", cAttrib, "=", cValue,;
-            " with data having", cData
+      ? "Iterator - Navigating all nodes", cNode, ",", cAttrib, "=", cValue,;
+            " with data having ", cData
       ? ""
 
+      xmlIter := TXmlIteratorRegex():New( xmlDoc:oRoot )
       IF cNode != NIL
          cNode := HB_RegexComp( cNode )
       ENDIF
@@ -116,12 +109,11 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
       IF cData != NIL
          cData := HB_RegexComp( cData )
       ENDIF
-      xmlNode := xmlDoc:FindFirstRegex( cNode, cAttrib, cValue, cData )
+      xmlNode := xmlIter:Find( cNode, cAttrib, cValue, cData )
       WHILE xmlNode != NIL
          ? "Found node ", xmlNode:Path() , ValToPrg( xmlNode:ToArray() )
-         xmlNode := xmlDoc:FindNext()
+         xmlNode := xmlIter:Next()
       ENDDO
-
    ENDIF
 
    ? ""

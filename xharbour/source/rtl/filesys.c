@@ -1096,7 +1096,11 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       memcpy( cmdName, pFilename, ulSize );
       cmdName[ulSize+1] = 0;
       // find the command in the path
-      SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart );
+      if ( ! SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart ) )
+      {
+         strcpy( fullCommand, cmdName );
+      }
+
    }
 
    if ( *pos && *pos != '\\')
@@ -1670,17 +1674,8 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_TEST_CANCEL_ENABLE_ASYN
 
    errno = 0;
-   #if defined(_MSC_VER)
-   _doserrno = 0;
-   #endif
-
    hFileHandle = open( ( char * ) pFilename, oflag, pmode );
-
-   #if defined(_MSC_VER)
-   hb_fsSetError( _doserrno != 0 ? ( USHORT ) _doserrno : errno ) ;
-   #else
    hb_fsSetError( errno );
-   #endif
 
    HB_DISABLE_ASYN_CANC
 
