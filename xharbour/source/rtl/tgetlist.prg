@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.18 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.19 2003/09/13 20:37:30 walito Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ METHOD SetFocus() CLASS HBGetList
 METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
 
    local oGet := ::oGet, nKey, nRow, nCol, nCursor
+   local lDelEnd := .F. // Flag to reset Get when postblock return .F.
 
    if ::nLastExitState == GE_SHORTCUT .OR.;
       ::nLastExitState == GE_MOUSEHIT .OR.;
@@ -206,7 +207,7 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
             setCursor( iif( ::nSaveCursor == SC_NONE, SC_NORMAL, ::nSaveCursor ) )
             nKey := INKEY( 0 )
             setCursor( SC_NONE )
-            ::GetApplyKey( nKey, oMenu, oGetMsg )
+            ::GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd )
             oGetMsg:Show( oGet )
          end
 
@@ -214,6 +215,8 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
          elseif   ::nLastExitState == GE_MOUSEHIT
          elseif ! ::GetPostValidate( oGet, oGetMsg )
             oGet:ExitState := GE_NOEXIT
+            // postblock returns .F., set flag to reset get
+            lDelEnd := .T.
          endif
       end
 
@@ -234,6 +237,7 @@ return Self
 METHOD Reader() CLASS HBGetList
 
    local oGet := ::oGet
+   local lDelEnd := .F.
 
    if ::GetPreValidate()
 
@@ -253,10 +257,11 @@ METHOD Reader() CLASS HBGetList
          endif
 
          while oGet:exitState == GE_NOEXIT
-            ::GetApplyKey( Inkey( 0 ) )
+            ::GetApplyKey( Inkey( 0 ), lDelEnd )
          end
 
          if ! ::GetPostValidate()
+            lDelEnd := .T.
             oGet:ExitState := GE_NOEXIT
          endif
       end
@@ -269,7 +274,7 @@ return Self
 
 
 #ifdef HB_COMPAT_C53
-METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
+METHOD GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd ) CLASS HBGetList
 
    local oGet := ::oGet
    local cKey
@@ -303,7 +308,7 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
 
 #else
 
-METHOD GetApplyKey( nKey ) CLASS HBGetList
+METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
 
    local cKey, bKeyBlock, oGet := ::oGet
 
@@ -481,8 +486,11 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
       Default
 
          if nKey >= 32 .and. nKey <= 255
+            // clear buffer and get window when postblock returns .F.
+            if lDelEnd
+               oGet:DelEnd()
+            endif
             cKey := Chr( nKey )
-
             if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," )
                oGet:ToDecPos()
             else
@@ -629,11 +637,12 @@ METHOD GetPostValidate() CLASS HBGetList
 #else
       lValid := Eval( oGet:PostBlock, oGet )
 #endif
+
       SetPos( oGet:Row, oGet:Col )
 
       if ValType( xValue ) != ValType( oGet:VarGet() ) .or.;
            oGet:VarGet() != xValue
-         oGet:VarPut( oGet:VarGet() )
+           oGet:VarPut( oGet:VarGet() )
       endif
       oGet:UpdateBuffer()
 
@@ -1652,4 +1661,5 @@ METHOD Accelerator( nKey, oGetMsg ) CLASS HBGETLIST  // Removed STATIC
    return  0
 
 #endif
+
 
