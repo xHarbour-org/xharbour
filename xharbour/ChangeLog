@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1198 2003/06/28 22:21:26 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.1199 2003/06/29 04:42:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-30 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    * Minor correction on inconsistent linkage for hb_vmPushLongConst()
+      ( was declared public while prototype is a static function )
+
 2003-06-29 09:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
     + Add guards to hb_xfree() calls in function hb_vmReleaseLocalSymbols()

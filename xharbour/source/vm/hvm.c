@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.221 2003/06/26 03:58:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.222 2003/06/29 04:32:52 andijahja Exp $
  */
 
 /*
@@ -5403,7 +5403,7 @@ void hb_vmPushLong( long lNumber )
    hb_stackPush();
 }
 
-void hb_vmPushLongConst( long lNumber )
+static void hb_vmPushLongConst( long lNumber )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLongConst(%ld)", lNumber));
