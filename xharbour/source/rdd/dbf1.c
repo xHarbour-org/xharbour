@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.102 2002/01/28 11:14:50 alkresin Exp $
+ * $Id: dbf1.c,v 1.4 2002/01/29 04:38:12 ronpinkas Exp $
  */
 
 /*
@@ -703,7 +703,9 @@ ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
    else /* Out of space */
    {
       pArea->ulRecNo = pArea->ulRecCount + 1;
-      pArea->fBof = pArea->fEof = pArea->fValidBuffer = TRUE;
+      /* pArea->fBof = pArea->fEof = pArea->fValidBuffer = TRUE; */
+      pArea->fBof = (pArea->ulRecCount == 0);
+      pArea->fEof = pArea->fValidBuffer = TRUE;
       pArea->fPositioned = pArea->fDeleted = FALSE;
 
       /* Clear buffer */
