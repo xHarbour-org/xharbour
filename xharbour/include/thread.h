@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.59 2003/09/14 18:07:23 jonnymind Exp $
+* $Id: thread.h,v 1.60 2003/10/18 01:15:18 jonnymind Exp $
 */
 
 /*
@@ -88,9 +88,9 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       CRITICAL_SECTION mtxUnblockLock;
       int nWaitersGone;
       int nWaitersBlocked;
-      int nWaitersToUnblock;   
+      int nWaitersToUnblock;
    } HB_WINCOND_T, *PHB_WINCOND_T;
-   
+
    #define HB_THREAD_T                 DWORD
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
@@ -116,6 +116,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    typedef void ( * HB_IDLE_FUNC )( void );
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
+   #define HB_SAME_THREAD(x, y)        (x == y)
 
    /* Guard for cancellation requets */
    extern HB_CRITICAL_T hb_cancelMutex;
@@ -147,19 +148,8 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
 
    #define HB_CLEANUP_PUSH(X,Y)
-   /*{ \
-      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = X;\
-      HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount++ ] = (void *)Y;\
-   }*/
-
    #define HB_CLEANUP_POP
-   /* HB_VM_STACK.iCleanCount--; */
-
    #define HB_CLEANUP_POP_EXEC
-   /*{\
-      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
-      HB_VM_STACK.iCleanCount--;\
-   }*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -244,11 +234,12 @@ extern "C" {
    #define HB_CLEANUP_PUSH(x, y )      pthread_cleanup_push( x, (void *)&(y) )
    #define HB_CLEANUP_POP              pthread_cleanup_pop(0)
    #define HB_CLEANUP_POP_EXEC         pthread_cleanup_pop(1)
+   #define HB_SAME_THREAD(x,y)         pthread_equal( x, y )
 
    #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
-   #define HB_TEST_CANCEL_ENABLE_ASYN
-   #define HB_TEST_CANCEL
+   #define HB_TEST_CANCEL_ENABLE_ASYN  pthread_testcancel()
+   #define HB_TEST_CANCEL              pthread_testcancel()
 
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )

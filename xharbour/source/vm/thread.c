@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.107 2003/10/18 01:15:19 jonnymind Exp $
+* $Id: thread.c,v 1.108 2003/10/18 02:38:45 jonnymind Exp $
 */
 
 /*
@@ -107,7 +107,7 @@ static HB_CRITICAL_T s_mtxTryLock;
 BOOL hb_critical_trylock( HB_CRITICAL_T *lpMutex )
 {
    HB_CRITICAL_LOCK( s_mtxTryLock );
-   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
+   if ( HB_SAME_THREAD( lpMutex->Locker, HB_CURRENT_THREAD()) )
    {
       lpMutex->nCount++;
       HB_CRITICAL_UNLOCK( s_mtxTryLock );
@@ -471,7 +471,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
    HB_CRITICAL_LOCK( hb_threadStackMutex );
 
-   if( last_stack && last_stack->th_id == id )
+   if( last_stack && HB_SAME_THREAD( last_stack->th_id,id ))
    {
       p = last_stack;
    }
@@ -479,7 +479,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
       p = hb_ht_stack;
 
-      while( p && p->th_id != id )
+      while( p && ! HB_SAME_THREAD( p->th_id, id) )
       {
          p = p->next;
       }
@@ -502,7 +502,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 
    HB_CRITICAL_LOCK( hb_threadStackMutex );
 
-   if( last_stack && last_stack->th_id == id )
+   if( last_stack && HB_SAME_THREAD( last_stack->th_id, id) )
    {
       p = last_stack;
    }
@@ -510,7 +510,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 
       p = hb_ht_stack;
 
-      while( p && p->th_id != id )
+      while( p && HB_SAME_THREAD( p->th_id, id) )
       {
          p = p->next;
       }
@@ -655,111 +655,6 @@ HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
    return p;
 }
 
-#if 0
-/* should be called by the only thread running */
-
-void hb_threadSuspendAll()
-{
-   HB_THREAD_T th_id = HB_CURRENT_THREAD();
-   HB_STACK *pStack = hb_ht_stack;
-
-   while ( pStack != NULL )
-   {
-      if ( pStack->th_id != th_id )
-      {
-         SuspendThread( pStack->th_h );
-      }
-      pStack = pStack->next;
-   }
-}
-
-void hb_threadResumeAll()
-{
-   HB_THREAD_T th_id = HB_CURRENT_THREAD();
-   HB_STACK *pStack = hb_ht_stack;
-
-   while ( pStack != NULL )
-   {
-      if ( pStack->th_id != th_id )
-      {
-         ResumeThread( pStack->th_h );
-      }
-      pStack = pStack->next;
-   }
-}
-
-HB_EXPORT void hb_threadCallIdle()
-{
-   HB_IDLE_FUNC_LIST *pIdle;
-   HB_MUTEX_LOCK( hb_idleQueueRes.Mutex );
-
-   pIdle = (HB_IDLE_FUNC_LIST *)hb_idleQueueRes.content.asPointer;
-   while( pIdle != NULL )
-   {
-      pIdle->func();
-      pIdle = pIdle->next;
-   }
-
-   /* Begin to signal waiting threads */
-   pIdle = (HB_IDLE_FUNC_LIST*)hb_idleQueueRes.content.asPointer;
-   if ( pIdle != NULL )
-   {
-      HB_COND_SIGNAL( hb_idleQueueRes.Cond );
-      hb_idleQueueRes.content.asPointer = (void *) pIdle->next;
-      hb_xfree( pIdle );
-   }
-
-   HB_MUTEX_UNLOCK( hb_idleQueueRes.Mutex );
-}
-
-void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
-{
-   HB_IDLE_FUNC_LIST *pIdle, *pBeg;
-
-   /* Executes immediately if no other thread is running */
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-   if ( hb_runningStacks.content.asLong == 1 )
-   {
-      pFunc();
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
-      return;
-   }
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
-
-   pIdle = (HB_IDLE_FUNC_LIST *) hb_xgrab( sizeof( HB_IDLE_FUNC_LIST ) );
-   pIdle->func = pFunc;
-   pIdle->next = NULL;
-
-   HB_MUTEX_LOCK( hb_idleQueueRes.Mutex );
-
-   if ( hb_idleQueueRes.content.asPointer == NULL )
-   {
-      hb_idleQueueRes.content.asPointer = (void *) pIdle;
-   }
-   else
-   {
-      pBeg = (HB_IDLE_FUNC_LIST*)hb_idleQueueRes.content.asPointer;
-      while( pBeg->next != NULL )
-      {
-         pBeg = pBeg->next;
-      }
-      pBeg->next = pIdle;
-   }
-   HB_COND_WAIT( hb_idleQueueRes.Cond, hb_idleQueueRes.Mutex );
-
-   /* Continue to signal waiting threaeds */
-   pIdle = (HB_IDLE_FUNC_LIST *)hb_idleQueueRes.content.asPointer;
-   if ( pIdle != NULL )
-   {
-      HB_COND_SIGNAL( hb_idleQueueRes.Cond );
-      hb_idleQueueRes.content.asPointer = (void *) pIdle->next;
-      hb_xfree( pIdle );
-   }
-
-   HB_MUTEX_UNLOCK( hb_idleQueueRes.Mutex );
-}
-#endif
-
 #ifdef HB_OS_WIN_32
 void hb_threadCancelInternal( )
 {
@@ -844,7 +739,7 @@ void hb_threadTerminator( void *pData )
    pMtx = hb_ht_mutex;
    while( pMtx != NULL )
    {
-      if ( pMtx->locker == _pStack_->th_id )
+      if ( HB_SAME_THREAD( pMtx->locker, _pStack_->th_id) )
       {
          hb_mutexForceUnlock( pMtx );
       }
@@ -864,9 +759,12 @@ void hb_threadTerminator( void *pData )
 void hb_mutexForceUnlock( void *mtx )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
+
+   while ( Mutex->lock_count > 0 ) {
+      HB_MUTEX_UNLOCK( Mutex->mutex );
+      Mutex->lock_count --;
+   }
    Mutex->locker = 0;
-   Mutex->lock_count = 0;
-   HB_MUTEX_UNLOCK( Mutex->mutex );
 }
 
 void hb_rawMutexForceUnlock( void * mtx )
@@ -1327,7 +1225,7 @@ HB_FUNC( MUTEXLOCK )
 
    /* Cannot be interrupted now */
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
-   if( Mutex->locker == HB_CURRENT_THREAD() )
+   if( HB_SAME_THREAD(Mutex->locker,HB_CURRENT_THREAD()) )
    {
       Mutex->lock_count ++;
    }
@@ -1364,7 +1262,7 @@ HB_FUNC( MUTEXUNLOCK )
    //HB_CRITICAL_LOCK( hb_mutexMutex );
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
 
-   if( Mutex->locker == HB_CURRENT_THREAD() )
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD()) )
    {
       Mutex->lock_count --;
 
@@ -1404,14 +1302,14 @@ HB_FUNC( SUBSCRIBE )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
 
-   if( Mutex->locker != HB_CURRENT_THREAD() )
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD()) )
    {
-      islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
+      islocked = 1;
    }
    else
    {
-      islocked = 1;
+      islocked = 0;
+      HB_MUTEX_LOCK( Mutex->mutex );
    }
 
    Mutex->locker = 0;
@@ -1442,19 +1340,6 @@ HB_FUNC( SUBSCRIBE )
       }
    }
 
-   // Prepare return value
-   Mutex->lock_count = lc;
-
-   if( ! islocked )
-   {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
-   }
-   else
-   {
-      Mutex->locker = HB_CURRENT_THREAD();
-      Mutex->locker = 0;
-   }
-
    if ( iWaitRes == 0 )
    {
       if ( pStatus )
@@ -1476,6 +1361,19 @@ HB_FUNC( SUBSCRIBE )
       }
       hb_ret();
    }
+
+   // Prepare return value
+   Mutex->lock_count = lc;
+
+   if( ! islocked )
+   {
+      HB_MUTEX_UNLOCK( Mutex->mutex );
+   }
+   else
+   {
+      Mutex->locker = HB_CURRENT_THREAD();
+   }
+
 }
 
 /*JC1: this will always be called when cancellation is delayed */
@@ -1501,14 +1399,14 @@ HB_FUNC( SUBSCRIBENOW )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
 
-   if( Mutex->locker != HB_CURRENT_THREAD() )
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
    {
-      islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
+      islocked = 1;
    }
    else
    {
-      islocked = 1;
+      islocked = 0;
+      HB_MUTEX_LOCK( Mutex->mutex );
    }
 
    Mutex->locker = 0;
@@ -1545,19 +1443,6 @@ HB_FUNC( SUBSCRIBENOW )
       }
    }
 
-   /* Prepare return value */
-   Mutex->lock_count = lc;
-
-   if( ! islocked )
-   {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
-      Mutex->locker = 0;
-   }
-   else
-   {
-      Mutex->locker = HB_CURRENT_THREAD();
-   }
-
    if ( iWaitRes == 0 )
    {
       if ( pStatus )
@@ -1579,6 +1464,20 @@ HB_FUNC( SUBSCRIBENOW )
       }
       hb_ret();
    }
+
+   /* Prepare return value */
+   Mutex->lock_count = lc;
+
+   if( ! islocked )
+   {
+      HB_MUTEX_UNLOCK( Mutex->mutex );
+      Mutex->locker = 0;
+   }
+   else
+   {
+      Mutex->locker = HB_CURRENT_THREAD();
+   }
+
 }
 
 
@@ -1659,6 +1558,23 @@ HB_FUNC( THREADGETCURRENTINTERNAL )
    hb_retnl( (long) HB_VM_STACK.th_vm_id );
 }
 
+HB_FUNC( THREADISSAME )
+{
+   HB_THREAD_STUB
+
+   if ( ISNUM(1) && ISNUM(2) )
+   {
+      hb_retl( HB_SAME_THREAD( hb_parnl(1), hb_parnl(2)));
+   }
+   else if ( ISNUM(1) )
+   {
+      hb_retl( HB_SAME_THREAD( HB_CURRENT_THREAD(), hb_parnl(2)));
+   }
+   else {
+      hb_retl( FALSE);
+   }
+}
+
 HB_EXPORT void hb_threadWaitAll()
 {
    HB_THREAD_STUB
@@ -1699,7 +1615,8 @@ HB_EXPORT void hb_threadKillAll()
    pStack = hb_ht_stack;
    while( pStack )
    {
-      if ( pStack->th_id == hb_main_thread_id || pStack->th_id == HB_CURRENT_THREAD() )
+      if ( HB_SAME_THREAD( pStack->th_id, hb_main_thread_id )
+          || HB_SAME_THREAD( pStack->th_id, HB_CURRENT_THREAD()) )
       {
          pStack = pStack->next;
          continue;
