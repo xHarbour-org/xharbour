@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1094 2003/06/01 22:36:38 lculik Exp $
+ * $Id: ChangeLog,v 1.1095 2003/06/03 04:08:48 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-03 12:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  * source/rdd/dbcmd.c
+    ! fixed problem that was causing GPF with DbCreate()/DBUseArea() functions(added an new paramter for specifing the codepage)
+  * source/pp/pptable.c
+    ! Added CODEPAGE support to USE and CREATE commands
+  * utils/hbmake/hbmake.prg
+    ! Added support for linking xharbour.so when requested
 
 2003-06-03 05:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/vm/classes.c
