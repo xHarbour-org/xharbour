@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.123 2004/06/17 23:33:43 modalsist Exp $
+ * $Id: hbmake.prg,v 1.124 2004/08/03 10:36:05 paultucker Exp $
  */
 /*
  * Harbour Project source code:
@@ -58,6 +58,11 @@
 
 
 #translate DateDiff(<x>,<y>) => (<x>-<y>)
+
+#Define HBM_USE_DEPENDS    // Set this to have section #DEPENDS parsed like RMake, Ath 2004-06
+                           // An extra parameter is added to FileIsNewer() to have it check the INCLUDE paths also
+                           // Interactive mode asks whether sources should be scanned for dependencies (#include, set procedure to, set proc to
+
 /*
       Beginning Static Variables Table
 
@@ -72,9 +77,13 @@ STATIC s_aBuildOrder   := {}
 STATIC s_aCommands     := {}
 STATIC s_aMacros       := {}
 STATIC s_aPrgs         := {}
+#IfDef HBM_USE_DEPENDS
+STATIC s_aDepends      := {}
+#Endif
 STATIC s_aCs           := {}
 STATIC s_aObjs         := {}
 STATIC s_aObjsc        := {}
+STATIC s_aSrcPaths     := {}
 STATIC s_lEof          := .F.
 STATIC s_aRes          := {}
 STATIC s_nLinkHandle
@@ -101,8 +110,8 @@ STATIC s_cDefLang
 STATIC s_cLog          := ""
 STATIC s_nLang         := 0
 STATIC s_lMt           := .F.
-STATIC s_cUserDef      := "                                        "   
-STATIC s_cUserInclude  := "                                        "   
+STATIC s_cUserDef      := "                                        "
+STATIC s_cUserInclude  := "                                        "
 STATIC s_lxFwh         := .F.
 STATIC s_nFilesToAdd   := 5
 STATIC s_nWarningLevel := 0
@@ -173,7 +182,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       s_lLinux := .t.
       s_lBcc   := .f.
    ENDIF
-   
+
    IF Len( aFile ) > 1
       IF s_nLang=1
          Alert("Arquivo definido mais que uma vez.")
@@ -261,10 +270,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    ENDIF
 
    setpos(9,0)
-   Outstd( s_cLinkComm )
+   Outstd( s_cLinkComm + CRLF )
    __RUN( (s_cLinkComm) )
 
-   IF s_lCompress .AND. !s_lLibrary 
+   IF s_lCompress .AND. !s_lLibrary
       setpos(9,0)
       __Run( " upx -9 "+ (s_cAppName) )
    ENDIF
@@ -289,6 +298,9 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL lMacrosec   := .f.
    LOCAL lBuildSec   := .f.
    LOCAL lComSec     := .f.
+#IfDef HBM_USE_DEPENDS
+   LOCAL lDepSec     := .f.
+#Endif
    LOCAL aTemp1      := {}
    LOCAL cCfg        := ""
    LOCAL lCfgFound   := .F.
@@ -339,14 +351,28 @@ FUNCTION ParseMakeFile( cFile )
          lMacroSec := .T.
          lBuildSec := .f.
          lComSec   := .f.
+#IfDef HBM_USE_DEPENDS
+         lDepSec   := .f.
+#Endif
       ELSEIF  cBuild IN cBuffer
          lMacroSec := .f.
          lBuildSec := .T.
          lComSec   := .f.
+#IfDef HBM_USE_DEPENDS
+         lDepSec   := .f.
+#Endif
       ELSEIF  cCom IN  cBuffer
          lBuildSec := .f.
          lComSec   := .t.
          lMacroSec := .f.
+#IfDef HBM_USE_DEPENDS
+         lDepSec   := .f.
+      ELSEIF  cDep IN  cBuffer
+         lBuildSec := .f.
+         lComSec   := .f.
+         lMacroSec := .f.
+         lDepSec   := .t.
+#Endif
       ELSE
          ? "Invalid Make File"
          fClose( s_nHandle )
@@ -576,13 +602,29 @@ FUNCTION ParseMakeFile( cFile )
 
       ENDIF
 
+#IfDef HBM_USE_DEPENDS
+      IF lDepSec
+
+         IF ! Empty( cTemp )
+            SetDependencies( cTemp )
+         ENDIF
+
+      ENDIF
+#Endif
+
       IF cTemp = "#BUILD"
          cBuffer := cTemp
       ELSEIF cTemp == "#COMMANDS"
          cbuffer := cTemp
+#IfDef HBM_USE_DEPENDS
+      ELSEIF cTemp == "#DEPENDS"
+         cbuffer := cTemp
+#Endif
       ENDIF
 
    ENDDO
+
+   FT_FUse()     // Close the opened file & release memory
 
    IF s_lExtended .AND. ! lCfgFound
 
@@ -657,6 +699,30 @@ FUNCTION Setcommands( cTemp )
    aAdd( s_aCommands, { cTemp, cRead } )
 
 RETURN NIL
+
+#IfDef HBM_USE_DEPENDS
+FUNCTION SetDependencies( cTemp )
+
+   LOCAL nPos
+   LOCAL nCount       := 0
+   LOCAL aTempMacros  := {}
+   LOCAL aLocalMacros := {}
+   LOCAL cTmp         := ""
+
+   aTempMacros := ListAsArray2( ReplaceMacros(cTemp), " " )
+
+   IF Len( aTempMacros ) > 1
+      cTmp := aTempMacros[ 1 ]
+      IF Right(cTmp,1) == ":"
+         cTmp := Left(cTmp,Len(cTmp) - 1)
+      ENDIF
+      aTempMacros := ADel( aTempMacros , 1)
+      ASize(aTempMacros,Len(aTempMacros) - 1)
+      AAdd( s_aDepends, { cTmp, AClone( aTempMacros ) } )
+   ENDIF
+
+RETURN NIL
+#Endif
 
 FUNCTION Findmacro( cMacro, cRead )
 
@@ -968,7 +1034,7 @@ FUNCTION CompileFiles()
                      cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " "," >>"+ (s_cLog))
 
                      @  4, 16 SAY s_aCs[ nFiles ]
-                     GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
+                     GaugeUpdate( aGauge, nFile / Len( s_aCs ) )   // Changed s_aPrgs to s_aCs, Ath 2004-06-08
                      nFile ++
                      //                            Outstd( cComm )
                      setpos(9,0)
@@ -1238,7 +1304,14 @@ FUNC CreateMakeFile( cFile )
    Local cTemp
    LOCAL cExtraLibs :=""
    Local cTempLibs := ""
-   Local aTempLibs 
+   Local aTempLibs
+   #IFdef HBM_USE_DEPENDS
+   LOCAL cIncl              := ""
+   LOCAL lScanIncludes      := .f.
+   // Provisions for recursive scanning
+   LOCAL lScanInclRecursive := .f.
+   LOCAL cExcludeExts       := PadR(".ch",40)
+   #ENDIF
    #ifndef __PLATFORM__Windows
        Local lHashhso := File("/usr/lib/libxharbour.so")
        LOCAL lusexhb := FILE("/usr/bin/xhb-build")
@@ -1348,7 +1421,7 @@ FUNC CreateMakeFile( cFile )
    @ 02,53 Get lUseXharbourDll CheckBox caption "use Xharbour[.dll|.so]" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
    @ 03,01 SAY "Obj Files Dir" GET cObjDir PICT "@s15" message s_aLangMessages[ 56 ]
    @ 04,01 SAY  s_aLangMessages[ 45 ] GET cAppName  pict "@s15"valid !Empty( cAppName ) message s_aLangMessages[ 57 ]
-   @ 4,53 get s_lasdll CheckBox  Caption "Create dll" style "[o ]" 
+   @ 4,53 get s_lasdll CheckBox  Caption "Create dll" style "[o ]"
 
    IF nO == 1
       READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
@@ -1363,9 +1436,9 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ENDIF
-   if  s_lasdll
-      lUseXharbourDll:= .t.
-   endif
+ if  s_lasdll
+ lUseXharbourDll:= .t.
+ endif
    lFwh      := "FWH"      IN cGui
    lMiniGui  := "MiniGui"  IN cGui
    lRddAds   := "RddAds"   IN cRdd
@@ -1400,7 +1473,7 @@ FUNC CreateMakeFile( cFile )
    ENDIF
    IF nO == 1
       cResName := PadR(alltrim(cResName)+iIF(!empty(cResName)," ","")+alltrim(cAllRes),50," ")
-   ENDIF 
+   ENDIF
 
 //   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
 //   @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
@@ -1625,10 +1698,10 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
       READ
-      
+
       if lastkey()=27
          exit
-      endif 
+      endif
 
       IF !file(ALLTRIM(cTopFile))
          IF s_nLang=1 // PT
@@ -1643,6 +1716,15 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    END
+
+#IFdef HBM_USE_DEPENDS
+   Attention( "HBMake options", 16 )
+   @ 17, 01 GET lScanIncludes checkbox      caption "Create #DEPENDS from #include" style "[o ]"
+   // Provisions for recursive scanning
+   @ 17, 40 GET lScanInclRecursive checkbox caption "Scan recursive" style "[o ]" when lScanIncludes
+   @ 18, 01 SAY "EXCLuding these extensions :" GET cExcludeExts WHEN lScanIncludes
+   READ
+#ENDIF
 
    // Selecting External Libs.
    IF s_lExternalLib
@@ -1718,7 +1800,7 @@ FUNC CreateMakeFile( cFile )
    fWrite( s_nLinkHandle, "USERDEFINE = " + s_cUserDef + CRLF )
 
    fWrite( s_nLinkHandle, "USERINCLUDE = " + s_cUserInclude + CRLF )
-   
+
    IF lFwh
       fWrite( s_nLinkHandle, "FWH = " + cfwhpath + CRLF )
       lGui := .T.
@@ -1920,17 +2002,17 @@ FUNC CreateMakeFile( cFile )
 
          aEval( aLibsOut, { | cLib | cLibs += " " + cLib } )
 	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
-	 
-	 if nPos >0 
+
+	 if nPos >0
         cLibs += " libmysql.lib"
-	 endif 
+	 endif
 
      nPos := aScan( aLibsOut, { | z | At( "hbpg", Lower( z ) ) > 0 } )
-	 
-	 if nPos >0 
+
+	 if nPos >0
         cLibs += " libpq.lib"
         cLibs := strtran(cLibs,"hbpg","hbpg")
-	 endif 
+	 endif
 
          IF ! s_lMt
             cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
@@ -1952,19 +2034,19 @@ FUNC CreateMakeFile( cFile )
          aEval( aLibsOut, { | cLib | iif( Len(aTempLibs :=ListAsArray2( cLib, " ") )> 0 ,cLibs += SetthisLibs(AtempLibs) ,cLibs += " -l" + Strtran( cLib, '.a', "" ))} )
 
  	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
-	 
-	 if nPos >0 
+
+	 if nPos >0
 	    cLibs += " -lmysqlclient"
 	 endif
      nPos := aScan( aLibsOut, { | z | At( "hbpg", Lower( z ) ) > 0 } )
-	 
-	 if nPos >0 
+
+	 if nPos >0
         cLibs += " -lpq"
-	 endif 
+	 endif
 
 
          cExtraLibs := cLibs
-	 
+
          IF cOs == "Linux"
 
             IF ! s_lMt
@@ -2100,6 +2182,41 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, ".autodepend" + CRLF )
    ENDIF
 
+#IFdef HBM_USE_DEPENDS
+   fWrite( s_nLinkHandle, " " + CRLF )
+   fWrite( s_nLinkHandle, "#DEPENDS" + CRLF )
+
+   IF lScanIncludes
+      // Clipper/(x)Harbour sources: .prg
+      IF Len( s_aPrgs ) = Len( s_aObjs )
+         Attention("Scanning .PRG sources...",19)
+         FOR nPos := 1 to Len(s_aPrgs)
+            cIncl := ScanInclude( s_aPrgs[ nPos ], lScanInclRecursive, cExcludeExts )
+            // Only add in list if dependencies exist
+            IF ! Empty(cIncl)
+               fWrite( s_nLinkHandle, s_aObjs[ nPos ] + ': ' + Alltrim( cIncl ) + CRLF, "" )
+            ENDIF
+         NEXT
+      ENDIF
+
+      // C-sources: .c
+      IF Len( s_aCs ) = Len( s_aObjsc )
+         Attention("Scanning .C sources...",19)
+         FOR nPos := 1 to Len(s_aCs)
+            cIncl := ScanInclude( s_aCs[ nPos ], lScanInclRecursive, cExcludeExts )
+            // Only add in list if dependencies exist
+            IF ! Empty(cIncl)
+               fWrite( s_nLinkHandle, s_aObjsc[ nPos ] + ': ' + Alltrim( cIncl ) + CRLF, "" )
+            ENDIF
+         NEXT
+      ENDIF
+
+      // Cleanup message
+      @ 19, 1 say Space(MaxCol() - 2)
+   ENDIF
+
+#ENDIF
+
    fWrite( s_nLinkHandle, " " + CRLF )
    fWrite( s_nLinkHandle, "#COMMANDS" + CRLF )
 
@@ -2149,14 +2266,14 @@ FUNC CreateMakeFile( cFile )
    ENDIF
 
    IF s_nLang == 1 .OR. s_nLang == 3
-      @ 19,5 Say "Compilar app ? (S/N) " get cBuild PICT "!" Valid cBuild $"NS"
+      @ 20,5 Say "Compilar app ? (S/N) " get cBuild PICT "!" Valid cBuild $"NS"
    ELSE // English
-      @ 19,5 Say "Build app ? (Y/N) " get cBuild PICT "!" Valid cBuild $"YN"
+      @ 20,5 Say "Build app ? (Y/N) " get cBuild PICT "!" Valid cBuild $"YN"
    ENDIF
 
    READ
 
-   IF cBuild == "S" .OR. cBuild == "Y" 
+   IF cBuild == "S" .OR. cBuild == "Y"
       ResetInternalVars()
       SetColor("W/N,N/W")
       Clear
@@ -2169,6 +2286,138 @@ FUNC CreateMakeFile( cFile )
 
 
 RETURN NIL
+
+#IfDef HBM_USE_DEPENDS
+FUNCTION ScanInclude( cFile, lRecursive, cExclExtent, aFiles)   // Search for #Include & Set Procedure To & Set Proc To
+
+   LOCAL cFileList := ""
+   LOCAL nHandle   := -1
+   LOCAL lEof      := .f.
+   LOCAL cTemp     := ""
+   LOCAL cBuffer   := ""
+   LOCAL aQuotes   := {{'"','"'},{"'","'"},{"[","]"},{"<",">"}}
+   LOCAL cQuote    := ""
+   LOCAL cQuoteA   := ""
+   LOCAL cInclude  := ""
+   LOCAL lPrg      := .f.
+   Local lC        := .f.
+   LOCAL lCh       := .f.
+   LOCAL cPath     := ""
+   LOCAL cFnam     := ""
+   LOCAL cExt      := ""
+   LOCAL cDrive    := ""
+   LOCAL cContinue := ""
+
+   DEFAULT lRecursive  TO .f.
+   DEFAULT cExclExtent TO ""    // specify extensions to exclude like ".ch.def" etc., including the dot
+   DEFAULT aFiles      TO {}
+
+   IF File(cFile)
+       HB_FNAMESPLIT( cFile, @cPath, @cFnam, @cExt, @cDrive )
+       lPrg := (Lower(cExt) == ".prg")
+       lC := (Lower(cExt) == ".c")
+       lCh := (Lower(cExt) == ".ch")
+       cContinue := IIF(lPrg,";",IIF(lC,"\",""))
+
+       nHandle := FOpen(cFile)
+       IF nHandle > 0
+           // Provisions for recursive scanning
+           // Add current file to list, making it by default the first in the list
+           IF AT("WINDOWS" ,Upper( Os() ) ) > 0
+               IF AScan(aFiles, {| x | Lower( x ) == Lower( cFnam + cExt ) } ) = 0       // Case IN-sensitive!
+                   AAdd(aFiles,  cFnam + cExt)
+               ENDIF
+           ELSE
+               IF AScan(aFiles, cFnam + cExt ) = 0       // Case Sensitive!
+                   AAdd(aFiles,  cFnam + cExt)
+               ENDIF
+           ENDIF
+
+           lEof := (HB_FReadLine(nHandle,@cTemp,{chr(13)+chr(10), chr(10)}) = -1)
+           cTemp := LTrim( cTemp )
+           // Loop reading file
+           WHILE !lEof
+               IF lPrg .OR. lC      // Check for line-continuation
+                   WHILE Right(cTemp, 1 ) == cContinue
+
+                       cTemp := Left( cTemp , Len( cTemp ) - 1)
+                       IF !lEof
+                          lEof := (HB_FReadLine(nHandle,@cBuffer,{chr(13)+chr(10), chr(10)}) = -1)
+                          cTemp += LTrim( cBuffer)
+                       ENDIF
+
+                   ENDDO
+               ENDIF
+               // Dependencies
+               IF Upper(Left( cTemp ,8)) == "#INCLUDE"
+                   cTemp := AllTrim(SubStr( cTemp, 9))
+               Else
+                   IF lPrg .and. Upper(Left( cTemp, 16)) == "SET PROCEDURE TO"
+                       cTemp := AllTrim(SubStr( cTemp, 17))
+                   ELSE
+                       IF lPrg .and. Upper(Left( cTemp, 11)) == "SET PROC TO"  // Alternative
+                           cTemp := AllTrim(SubStr( cTemp, 12))
+                       ELSE
+                           cTemp := ""
+                       ENDIF
+                   ENDIF
+               Endif
+               // Something Ok?
+               IF Len(cTemp) > 0
+                  cQuote := Left( cTemp, 1)
+                  cQuoteA := ""
+                  AEval(aQuotes,{| x |Iif(x[1] == cQuote,cQuoteA := x[2],)})     // Determine closing quote
+                  IF cQuoteA == ""
+                      cInclude := AllTrim(Left(cTemp, At(" ", cTemp + " ") - 1)) // Handle set procedure to, not using quotes
+                  ELSE
+                      cTemp := SubStr(cTemp, 2)
+                      cInclude := AllTrim(Left(cTemp, At(cQuoteA, cTemp) - 1))   // Find closing quote
+                  ENDIF
+                  IF Len(cInclude) > 0 .and. Len(Alltrim(cExclExtent)) > 0
+                      HB_FNAMESPLIT( cInclude, @cPath, @cFnam, @cExt, @cDrive )
+                      IF lPrg .AND. Len(cExt) = 0
+                          cInclude := cInclude + ".prg"        // Handle set procedure to, using default extension
+                      ENDIF
+                      IF AT(Lower(cExt), Lower(cExclExtent)) > 0
+                          cInclude := ""
+                      ENDIF
+                  ENDIF
+                  IF Len(cInclude) > 0
+                      // Still Ok, add to list?
+                      IF AT("WINDOWS" ,Upper( Os() ) ) > 0
+                          IF AScan(aFiles, {| x | Lower( x ) == Lower( cInclude ) } ) = 0       // Case IN-sensitive!
+                              AAdd(aFiles, (cInclude) )
+                              // recursive scanning
+                              IF lRecursive
+                                  ScanInclude(FileInIncludePath(cInclude), lRecursive, cExclExtent, aFiles )
+                              ENDIF
+                          ENDIF
+                      ELSE
+                          IF AScan(aFiles, cInclude ) = 0       // Case Sensitive!
+                              AAdd(aFiles, (cInclude) )
+                              // recursive scanning
+                              IF lRecursive
+                                  ScanInclude(FileInIncludePath(cInclude), lRecursive, cExclExtent, aFiles )
+                              ENDIF
+                          ENDIF
+                      ENDIF
+                  ENDIF
+               ENDIF
+               IF !lEof
+                   lEof := (HB_FReadLine(nHandle,@cTemp,{chr(13)+chr(10), chr(10)}) = -1)
+                   cTemp := LTrim( cTemp)
+               ENDIF
+           ENDDO
+           FClose(nHandle)
+       ENDIF
+   ENDIF
+   // Return results, a space-separated list of filenames, unsorted
+   IF Len(aFiles) > 1   // Skip generation of list if only main source (1) was added, caller knows what to do
+       AEval(aFiles,{| x | cFileList := cFileList + " " + x } )
+   ENDIF
+
+RETURN cFileList
+#Endif
 
 FUNCTION CompileUpdatedFiles()
 
@@ -2187,6 +2436,11 @@ FUNCTION CompileUpdatedFiles()
    LOCAL cPrg        := ""
    LOCAL nFiles
    LOCAL nFile       := 1
+   LOCAL lNewer      := .f.
+#IfDef HBM_USE_DEPENDS
+   LOCAL nPos1       := 0
+   LOCAL cDepSrc     := ""
+#Endif
    LOCAL aGauge      := GaugeNew( 5, 5, 7, 40, "W/B", "W+/B", '²' )
 
    @ 4,5 SAY "Compiling :"
@@ -2207,7 +2461,17 @@ FUNCTION CompileUpdatedFiles()
                nPos    := aScan( s_aCs, { | x | x := Substr( x, Rat( IIF( s_lGcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xItem ) ) } )
                nObjPos := aScan( s_aObjs, { | x | x := Substr( x, Rat( IIF( s_lGcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xItem ) ) } )
 
-               IF Fileisnewer( s_aPrgs[ nFiles ], s_aObjs[ nObjPos ] )
+#IfDef HBM_USE_DEPENDS
+               lNewer := .f.
+               nPos1 := aScan( s_aDepends, { | x |lower(x[1]) == lower( s_aObjs[ npos ] )})
+               IF nPos1 > 0
+                  FOR EACH cDepSrc in s_aDepends[ nPos1 , 2 ]
+                      lNewer := lNewer .OR. Fileisnewer( cDepSrc, s_aObjs[ npos ], .t. )
+                  NEXT
+               ENDIF
+#Endif
+
+               IF lNewer .or. Fileisnewer( s_aPrgs[ nFiles ], s_aObjs[ nObjPos ] )
 
                   IF nPos > 0
                      aAdd( aCtocompile, s_aCs[ nPos ] )
@@ -2311,14 +2575,23 @@ FUNCTION CompileUpdatedFiles()
                xItem := Substr( s_aCs[ nFiles ], Rat( IIF( s_lGcc, '/', '\' ), s_aCs[ nFiles ] ) + 1 )
                nPos  := aScan( s_aObjsc, { | x | x := Substr( x, Rat( IIF( s_lGcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xitem, At( ".", xitem ) ) } )
 
-               IF Fileisnewer( s_aCs[ nFiles ], s_aObjsc[ nPos ] )
+#IfDef HBM_USE_DEPENDS
+               lNewer := .f.
+               nPos1 := aScan( s_aDepends, { | x |lower(x[1]) == lower( s_aObjs[ npos ] )})
+               IF nPos1 > 0
+                  FOR EACH cDepSrc in s_aDepends[ nPos1 , 2 ]
+                      lNewer := lNewer .OR. Fileisnewer( cDepSrc, s_aObjs[ npos ], .t. )
+                  NEXT
+               ENDIF
+#Endif
+               IF lNewer .or. Fileisnewer( s_aCs[ nFiles ], s_aObjsc[ nPos ] )
 
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
                      cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY s_aCs[ nFiles ]
-                     GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
+                     GaugeUpdate( aGauge, nFile / Len( s_aCs ) )  // changed s_aPrgs to s_aCs Ath 2004-06-08
                      nFile ++
                      //                            Outstd( cComm )
                      //                            Outstd( Hb_OsNewLine() )
@@ -2372,7 +2645,17 @@ FUNCTION CompileUpdatedFiles()
                xItem := Substr( cPrg, Rat( IIF( s_lGcc, '/', '\' ), cPrg ) + 1 )
                nPos  := aScan( s_aObjs, { | x | x := Substr( x, Rat( IIF( s_lGcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
-               IF !empty( cPrg ) .AND. Fileisnewer( cPrg, s_aObjs[ npos ] )
+#IfDef HBM_USE_DEPENDS
+               lNewer := .f.
+               nPos1 := aScan( s_aDepends, { | x |lower(x[1]) == lower( s_aObjs[ npos ] )})
+               IF nPos1 > 0
+                  FOR EACH cDepSrc in s_aDepends[ nPos1 , 2 ]
+                      lNewer := lNewer .OR. Fileisnewer( cDepSrc, s_aObjs[ npos ], .t. )
+                  NEXT
+               ENDIF
+#Endif
+
+               IF !empty( cPrg ) .AND. (lNewer .OR. Fileisnewer( cPrg, s_aObjs[ npos ] ))
 
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
@@ -2380,6 +2663,7 @@ FUNCTION CompileUpdatedFiles()
                      cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
+                     nFile ++     // moved from outside 'FOR EACH', Ath 2004-06-08
 
                      setpos(9,0)
                      __RUN( (cComm) )
@@ -2401,7 +2685,7 @@ FUNCTION CompileUpdatedFiles()
 
             NEXT
 
-            nFile ++
+            // nFile ++    // removed, useless, Ath 2004-06-08
 
          ENDIF
 
@@ -2434,9 +2718,17 @@ FUNCTION CompileUpdatedFiles()
 
 RETURN NIL
 
-FUNCTION Fileisnewer( cFile, as )
+FUNCTION Fileisnewer( cFile, as, lInclude )
 
-   LOCAL nCount := 0
+   LOCAL nCount    := 0
+   LOCAL cSrcPath  := ""
+
+   DEFAULT lInclude TO .f.
+
+   // Check all paths in INCLUDE environment variable, if requested
+   IF lInclude
+       cFile := FileInIncludePath(cFile)
+   ENDIF
 
    IF ! s_lExtended
 
@@ -2465,6 +2757,28 @@ FUNCTION Fileisnewer( cFile, as )
    ENDIF
 
 RETURN s_aDir[ 2 ]
+
+FUNCTION FileInIncludePath(cFile)
+
+    LOCAL cFilePath := ""
+    LOCAL cSrcPath  := ""
+
+    IF Len(s_aSrcPaths) = 0
+        s_aSrcPaths := ListAsArray2( GetEnv( "INCLUDE" ) , HB_OSPATHLISTSEPARATOR() )
+    ENDIF
+    IF ! File(cFile)
+        FOR EACH cSrcPath IN s_aSrcPaths
+            IF Len(cSrcPath) > 0 .and. Right(cSrcPath,1) <> HB_OSPATHSEPARATOR()
+                cSrcPath := cSrcPath + HB_OSPATHSEPARATOR()
+            ENDIF
+            IF File(cSrcPath + cFile)
+                cFile := cSrcPath + cFile
+                EXIT
+            ENDIF
+        NEXT
+    ENDIF
+
+RETURN cFile
 
 FUNC CreateLibMakeFile( cFile )
 
