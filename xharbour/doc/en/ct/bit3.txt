@@ -1,0 +1,261 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMANDX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMANDX( <nSignificativeBits>, <nLONG1|cHexLONG1>, <nLONG2|cHexLONG2>
+ *              [, ..<nLONGn|cHexLONGn>) -> <nLONGAND>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *  $RETURNS$
+ *      NUMANDX() join all designated parameters with the logical "AND" and
+ *           return the result.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMAND() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used. If MSB of the result is ON the number is considerate
+ *      a negative number.
+ *      In other words, if <nSignificativeBits> = 16, nResult return a number
+ *      between -32768 and 32767; if <nSignificativeBits> = 8, nResult return
+ *      a number between -128 and 127.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMANDX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMORX(), NUMXORX(), NUMNOTX(), NUMROLX(), NUMMIRRX()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMORX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMORX( <nSignificativeBits>, <nLONG1|cHexLONG>1, <nLONG2|cHexLONG2>
+ *             [, ..<nLONGn|cHexLONGn>) -> <nLONGOR>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *  $RETURNS$
+ *      NUMORX() join all designated parameters with the logical "OR" and
+ *           return the result.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMOR() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used. If MSB of the result is ON the number is considerate
+ *      a negative number.
+ *      In other words, if <nSignificativeBits> = 16, nResult return a number
+ *      between -32768 and 32767; if <nSignificativeBits> = 8, nResult return
+ *      a number between -128 and 127.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMORX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMOR(), NUMANDX(), NUMXORX(), NUMNOTX(), NUMROLX(), NUMMIRRX()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMXORX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMXORX( <nSignificativeBits>, <nLONG1|cHexLONG1>, <nLONG2|cHexLONG2> )
+ *              -> <nLONGXOR>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *  $RETURNS$
+ *      NUMXORX() join all designated parameters with the logical "XOR" and
+ *           return the result.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMXOR() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used. If MSB of the result is ON the number is considerate
+ *      a negative number.
+ *      In other words, if <nSignificativeBits> = 16, nResult return a number
+ *      between -32768 and 32767; if <nSignificativeBits> = 8, nResult return
+ *      a number between -128 and 127.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMXORX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMXOR(), NUMANDX(), NUMORX(), NUMNOTX(), NUMROLX(), NUMMIRRX()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMNOTX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMNOTX( <nSignificativeBits>, <nLONG|cHexLONG> ) -> <nLONGNOT>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *  $RETURNS$
+ *      NUMNOTX() return the negated binary value of the nLONG parameter.
+ *           The 0 bits become 1, and 1 bits become 0.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMNOT() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used. If MSB of the result is ON the number is considerate
+ *      a negative number.
+ *      In other words, if <nSignificativeBits> = 16, nResult return a number
+ *      between -32768 and 32767; if <nSignificativeBits> = 8, nResult return
+ *      a number between -128 and 127.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMNOTX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMNOT(), NUMANDX(), NUMORX(), NUMXORX(), NUMROLX(), NUMMIRRX()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMROLX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMROLX( <nSignificativeBits>, <nLONG|cHexLONG>, <nWORD|cHexWORD> )
+ *            -> <nLONGROL>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *      <nWORD | cHexWORD>  Designate a number of rotations in the range of
+ *           1 to <nSignificativeBits>; as either numeric or hexadecimal.
+ *
+ *  $RETURNS$
+ *      NUMROLX() return the rotation result.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMROL() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used. When the high bit rotates it is not just moved out to
+ *      the left, it is also moved in on the right.
+ *      The not rotated bits is not moved.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMROLX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMROL(), NUMANDX(), NUMORX(), NUMXORX(), NUMNOTX(), NUMMIRRX()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMMIRRX()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMMIRRX( <nSignificativeBits>, <nNumber|cHexNum> ) -> <nResult>
+ *  $ARGUMENTS$
+ *      <SignificativeBits> Designate a number in the range of 0 to 32,
+ *           indicating the LSB of nLONGx|cHexLONGx that will be used.
+ *
+ *      <nLONG | cHexLONG>  Designate either decimal or hexadecimal
+ *           number string.
+ *
+ *  $RETURNS$
+ *      NUMMIRR() returns a value by which the bit opposite the first
+ *           parameter is mirrored.
+ *
+ *  $DESCRIPTION$
+ *      This function is similar to NUMMIRR() function with a significative
+ *      change. The first parameter indicate the quantity of lower bits of
+ *      nLONG are used.
+ *      When you mirror bit, bit 1 interchanges with bit <nSignificativeBits>,
+ *      bit 2 with bit <nSignificativeBits> - 1, etc..
+ *      The not mirrored bits is not moved.
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMMIRRX() is a new function in the CT3-library for Harbour.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit3.c, library is libct.
+ *  $SEEALSO$
+ *      NUMMIRR(), NUMANDX(), NUMORX(), NUMXORX(), NUMNOTX(), NUMROLX()
+ *  $END$
+ */

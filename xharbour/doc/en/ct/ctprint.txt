@@ -1,0 +1,77 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTSTAT()
+ *  $CATEGORY$
+ *      CT3 printer functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      PRINTSTAT ([<nPrinter>]) -> nState
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      DOS
+ *  $FILES$
+ *      Source is print.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTREADY()
+ *  $CATEGORY$
+ *      CT3 printer functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      PRINTREADY ([<nPrinter>]) -> lPrinterReady
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      DOS
+ *  $FILES$
+ *      Source is print.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTSEND()
+ *  $CATEGORY$
+ *      CT3 printer functions
+ *  $ONELINER$
+ *      Sends characters to printer
+ *  $SYNTAX$
+ *      PRINTSEND(<cCharacter|nCharacter>, <nPrinter>) -> nRemaining
+ *  $ARGUMENTS$
+ *      <cCharacter|nCharacter> Code for an individual character from 0 to 255
+ *                              or a string.
+ *      <nPrinter> The printer port where output is done.
+ *  $RETURNS$
+ *      Returns the number of characters that could not be sent to printer.
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      DOS
+ *  $FILES$
+ *      Source is print.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */

@@ -1,0 +1,66 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CHARPACK()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *      Compresses (packs) a string
+ *  $SYNTAX$
+ *      CHARPACK(<cString>, [<nMethod>]) --> cPackedString
+ *  $ARGUMENTS$
+ *      <cString> is a character string to be packed.
+ *      <nMethod> is a number designating which pack algorithm to use. The
+ *                default value is 0.
+ *  $RETURNS$
+ *      The compressed character string.
+ *  $DESCRIPTION$
+ *      CHARPACK() compresses (packs) character strings. Two different pack
+ *      methods supported are:
+ *              0 Modified RLE (Run Length Encoding)
+ *              1 Bit-oriented algorithm (not implemented yet)
+ *  $EXAMPLES$
+ *      ? CHARUNPACK(CHARPACK(REPLICATE("*",100)))
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is pack.c, library is libct.
+ *  $SEEALSO$
+ *      CHARUNPACK()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CHARUNPACK()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *      Uncompresses (unpacks) a string
+ *  $SYNTAX$
+ *      CHARUNPACK(<cPackedString>) --> cUnpackedString
+ *  $ARGUMENTS$
+ *      <cPackedString> is a character string to be unpacked.
+ *  $RETURNS$
+ *      The uncompressed character string.
+ *  $DESCRIPTION$
+ *      CHARUNPACK() uncompresses (unpacks) character strings previously
+ *      compressed with CHARPACK().
+ *  $EXAMPLES$
+ *      ? CHARUNPACK(CHARPACK(REPLICATE("*",100)))
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is pack.c, library is libct.
+ *  $SEEALSO$
+ *      CHARPACK()
+ *  $END$
+ */

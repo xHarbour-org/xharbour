@@ -1,0 +1,75 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CLEARBIT()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CLEARBIT( <nLONG|cHexLONG>, <nBitPos1>[,...<nBitPos32>] ) -> <nNewValue>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit2.c, library is libct.
+ *  $SEEALSO$
+ *      SETBIT(), ISBIT()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETBIT()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SETBIT( <nLONG|cHexLONG>, <nBitPos1>[,...<nBitPos32>] ) -> <nNewValue>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit2.c, library is libct.
+ *  $SEEALSO$
+ *      CLEARBIT(), ISBIT()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ISBIT()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      ISBIT( <nLONG|cHexLONG>, <nBitPos> ) -> <lSet>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit2.c, library is libct.
+ *  $SEEALSO$
+ *      CLEARBIT(), SETBIT()
+ *  $END$
+ */

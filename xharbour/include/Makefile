@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.16 2004/04/20 08:26:57 lf_sfnet Exp $
+# $Id: Makefile,v 1.17 2004/08/02 12:37:13 druzus Exp $
 #
 
 ROOT = ../
@@ -58,6 +58,11 @@ C_HEADERS=\
     local.h      \
 	regex.h      \
 	thread.h     \
+	classes.h    \
+	ct.h         \
+	ctmath.h     \
+	ctset.h      \
+	ctstr.h      \
 
 PRG_HEADERS=\
 	achoice.ch   \
@@ -107,6 +112,8 @@ PRG_HEADERS=\
 	hblog.ch     \
 	math.ch      \
 	tbrowse.ch   \
+	tip.ch       \
+	wvtwin.ch    \
 
 API_HEADERS=\
 	error.api    \
@@ -120,4 +127,3 @@ API_HEADERS=\
 	vm.api       \
 
 include $(TOP)$(ROOT)config/header.cf
-

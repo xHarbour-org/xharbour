@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3337 2004/08/25 02:01:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3338 2004/08/25 02:40:25 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-25 19:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  + source/ct/*
+  + doc/en/ct/*
+    * copied contrib/libct/* but strfile.prg and fcopy.prg
+    * separated $DOC$..$END$ embedded doc sections and moved to 
+    * doc/en/ct, renamed files to .txt and changed some names
+    * to avoid conflicts with /doc/en files
+    * updated gnu Makefile ( please update other makefiles )
+  + tests/cttest/*
+    * copied contrib/tip/tests
+  * source/rtl/Makefile
+    * added ct dir
+  + include/ct*
+  * include/Makefile
+    * added ct include files
+    * added some missed include files
+  * source/tip/Makefile
+    * remove install includes
+  * utils/hbdoc/genasc.prg
+    * fixed some errors generating /txt and /doc
+  * utils/hbdoc/hbdoc.prg
+  + utils/hbdoc/teeasc.prg
+    * added /tee mode to separate $DOC$..$END$ and source
 
 2004-08-24 23:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/readline.c

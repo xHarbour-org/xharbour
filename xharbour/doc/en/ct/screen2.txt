@@ -1,0 +1,54 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SCREENMIX()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SCREENMIX (<cCharString>, <cAttributeString>, [<nRow>], [<nCol>]) -> <cEmptyString>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen2.prg, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SAYSCREEN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SAYSCREEN( <cString>, [<nRow>], [<nCol>] ) -> <cEmptyString>
+ *  $ARGUMENTS$
+ *      <cString> - the string to output. Although undocumented, can be NIL.
+ *      <nRow> - row number, defaults to cursor row.
+ *      <nCol> - column number, defaults to cursor column.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Outputs a string at specified coordinates without changing character
+ *      attributes.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen2.prg, library is libct.
+ *  $SEEALSO$
+ *      SCREENMIX()
+ *  $END$
+ */

@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.6 2004/03/17 01:29:30 lculik Exp $
+ * $Id: hbdoc.prg,v 1.7 2004/03/17 21:34:50 lculik Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2004/03/17 01:29:30 $
- * Revision..: $Revision: 1.6 $
+ * Date......: $Date: 2004/03/17 21:34:50 $
+ * Revision..: $Revision: 1.7 $
  * Log file..: $Logfile:     $
  *
  *
@@ -133,6 +133,7 @@ MEMVAR aDocwwwInfo
 MEMVAR aLinkInfo
 MEMVAR aAuthorList
 MEMVAR lAscii
+MEMVAR lTee
 MEMVAR lContinuous
 MEMVAR lAuthor
 MEMVAR lRtf
@@ -193,6 +194,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    PUBLIC lWww        := .F.
    PUBLIC lChm        := .F.
    PUBLIC lNorton     := .F.
+   PUBLIC lTee        := .F.
    PUBLIC aWWW        := {}
    PUBLIC aResult:={}
    PUBLIC lTroff      := .f.
@@ -217,6 +219,8 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
          IF ( cFlags := UPPER( RIGHT( cFlags, 3 ) ) ) == "TXT"
             lAscii      := .T.
             lContinuous := .F.
+         ELSEIF cFlags = "TEE"
+            lTee    := .T.
          ELSEIF cFlags = "HPC"
             lNorton := .T.
          ELSEIF cFlags = "NGI"
@@ -324,6 +328,17 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       IF EMPTY( DIRECTORY( "ipf.*", "D" ) )
          FT_MKDIR( "ipf" )
       ENDIF
+   ELSEIF lAscii
+      IF EMPTY( DIRECTORY( "txt.*", "D" ) )
+         FT_MKDIR( "txt" )
+      ENDIF
+   ELSEIF lTee
+      IF EMPTY( DIRECTORY( "teesrcs.*", "D" ) )
+         FT_MKDIR( "teesrcs" )
+      ENDIF
+      IF EMPTY( DIRECTORY( "teedocs.*", "D" ) )
+         FT_MKDIR( "teedocs" )
+      ENDIF
    ENDIF
    if lNgi .or. lRtf
    cCompiler := fill_Link_info( cLinkName )
@@ -346,6 +361,8 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
             IF lAscii
                ASCIIFiles()
+            ELSEIF lTee
+               TeeFiles()
             ELSEIF lNorton
                ProcessFiles()
             ELSEIF lRtf

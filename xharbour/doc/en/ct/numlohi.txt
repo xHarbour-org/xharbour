@@ -1,0 +1,59 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMLOW()
+ *  $CATEGORY$
+ *      CT3 numeric functions
+ *  $ONELINER$
+ *      Gets the lower value byte of a number
+ *  $SYNTAX$
+ *      NUMLOW(<xNumber>) --> nByte
+ *  $ARGUMENTS$
+ *      <xNumber> is either a decimal number or a hexadecimal string of digits.
+ *  $RETURNS$
+ *      A numeric value which is the lower value byte of the input number.
+ *  $DESCRIPTION$
+ *      NUMLOW() will return the low byte of the input number.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is numlohi.c, library is libct.
+ *  $SEEALSO$
+ *      NUMHIGH()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMHIGH()
+ *  $CATEGORY$
+ *      CT3 numeric functions
+ *  $ONELINER$
+ *      Gets the higher value byte of the lower value word of a number
+ *  $SYNTAX$
+ *      NUMHIGH(<xNumber>) --> nByte
+ *  $ARGUMENTS$
+ *      <xNumber> is either a decimal number or a hexadecimal string of digits.
+ *  $RETURNS$
+ *      A numeric value which is the higher value byte of the lower value word
+ *      of the input number.
+ *  $DESCRIPTION$
+ *      NUMHIGH() will return the high byte of the low word of the input number.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is numlohi.c, library is libct.
+ *  $SEEALSO$
+ *      NUMLOW()
+ *  $END$
+ */

@@ -1,0 +1,36 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SCREENATTR()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SCREENATTR ( [<nRow>],[<nColumn>] ) -> <nAttr>
+ *  $ARGUMENTS$
+ *   <nRow>     Designates the line from which to determine the attribute.
+ *              The default is the cursor line.
+ *
+ *   <nColumn>  Designates the column from which to determine the
+ *              attribute.  The default is the cursor column.
+ *
+ *  $RETURNS$
+ *      SCREENATTR() returns the attribute at the designated position.
+ *
+ *  $DESCRIPTION$
+ *      SCREENATTR() returns the current screen attribute at <nRow> and
+ *      <nColumn>.  You can query targeted attributes this way and save them
+ *      to use later, or process them later with INVERTATTR().
+ *
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen1.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */

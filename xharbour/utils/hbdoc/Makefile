@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.24 2000/08/09 10:05:20 lculik Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:45:37 ronpinkas Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -14,10 +14,11 @@ PRG_SOURCES=\
 	gentrf.prg \
 	genng.prg \
 	genhtm.prg \
-    genchm.prg \
+	genchm.prg \
 	genrtf.prg \
 	genhpc.prg \
 	genasc.prg \
+	teeasc.prg \
 	html.prg \
 	ng.prg \
 	os2.prg \

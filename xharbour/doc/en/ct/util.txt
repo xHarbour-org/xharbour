@@ -1,0 +1,146 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      DEFAULT()
+ *  $CATEGORY$
+ *      LIBCT MemVar functions
+ *  $ONELINER$
+ *      Assign a default value to a NIL argument.
+ *  $SYNTAX$
+ *      Default( @<uVar>, <uDefault> ) ---> NIL
+ *  $ARGUMENTS$
+ *      <uVar> The variable to which the default value will be assigned.
+ *      <uVar> must be passed by reference to the Default() function.
+ * 
+ *      <uDefault> The default value to assign.
+ *  $RETURNS$
+ *      NIL
+ *  $DESCRIPTION$
+ *      Default() assigns <uDefault> to <uVar> IF <uVar> is equal to NIL.
+ *      It is functionally equivalent to either of these code samples:
+ *
+ *      IF uVar == NIL
+ *         uVar := uDefault
+ *      ENDIF
+ *
+ *      IF IsNil(uVar)
+ *   		uVar := uDefault
+ *      ENDIF
+ *  $EXAMPLES$
+ *      Function Test( Arg1, Arg2 ... )
+ *      Default(@Arg1,1)
+ *      Default(@Arg2,"A")
+ *  $TESTS$
+ *      See examples
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Visual Objects compatible.
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is util.prg, library is libct.lib
+ *  $SEEALSO$
+ *      DEFAULT TO COMMAND
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ISDIR()
+ *  $CATEGORY$
+ *      LIBCT Directory management
+ *  $ONELINER$
+ *      VerIFy IF a directory exist.
+ *  $SYNTAX$
+ *      IsDir( <cDirectory> ) ---> lSuccess
+ *  $ARGUMENTS$
+ *      <cDirectory> The directory name to verIFy.
+ *  $RETURNS$
+ *      True IF <cDirectory> exist, otherwise false.
+ *  $DESCRIPTION$
+ *  $STATUS$
+ *      Ready
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is util.prg, library is libct.lib
+ *  $SEEALSO$
+ *      DirName(),CurDir(),DirMake(),DirChange()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OCCURS()
+ *  $CATEGORY$
+ *      LIBCT String functions
+ *  $ONELINER$
+ *      Return the number of times that a substring occurs in a string.
+ *  $SYNTAX$
+ *      Occurs( <cSearch> , <cTarget> ) ---> nTimes
+ *  $ARGUMENTS$
+ *      <cSearch> The substring for which to search.
+ *      <cTarget> The string in which to search.  (To specIFy an offset, use Occurs3()).
+ *  $RETURNS$
+ *      The number of times that <cSearch> appears in <cTarget>.
+ *  $DESCRIPTION$
+ *      Occurs() is case-sensitive.
+ *  $EXAMPLES$
+ *      This example shows typical use of Occurs():
+ *  LOCAL cSearch,cTarget
+ *      cSearch := "any"
+ *      cTarget := "Anything goes anyway anytime."
+ *      ? Occurs(cSearch, cTarget) // 2
+ *      ? Occurs("any","ANY any")   // 1
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Visual Objects compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is util.prg, library is libct.lib
+ *  $SEEALSO$
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *        WHATWIN()
+ *  $CATEGORY$
+ *      LIBCT System information
+ *  $ONELINER$
+ *      VerIFy Windows type operational system.
+ *  $SYNTAX$
+ *		WhatWin() -> nWindowsType
+ *  $ARGUMENTS$
+ *		Nome.
+ *  $RETURNS$
+ *		A number indicating the Windows type.
+ *  $DESCRIPTION$
+ *		WhatWin() is a system function based in OS() function.
+ *  $EXAMPLES$
+ *      IF WhatWin() = 1
+ *			? "This is Windows 95"
+ *      ELSEIF WhatWin() = 2
+ *			? "This is Windows 98"
+ *      ELSEIF WhatWin() = 3
+ *			? "This is Windows ME"
+ *      ELSEIF WhatWin() = 4
+ *			? "This is Windows NT"
+ *      ELSEIF WhatWin() = 5
+ *			? "This is Windows 2000"
+ *      ELSEIF WhatWin() = 6
+ *			? "This is Windows XP"
+ *      ELSE
+ *       ? "This is unknow Windows system"
+ *      ENDIF
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is new in xHarbour.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is util.prg, library is libct.lib
+ *  $SEEALSO$
+ *  $END$
+ */

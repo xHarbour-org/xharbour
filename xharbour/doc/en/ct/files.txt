@@ -1,0 +1,60 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETFDATI()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *      Sets file date and time
+ *  $SYNTAX$
+ *      SETFDATI(<cFilename>, [<dDate>], [<cTime>]) --> lDone
+ *  $ARGUMENTS$
+ *      <cFilename> is the name of the file whose date/time are to be changed.
+ *      <dDate> is the date to set. The default value is the current date.
+ *      <cTime> is the time to set. The default value is the current time.
+ *  $RETURNS$
+ *      .T. if the date/time was changed.
+ *  $DESCRIPTION$
+ *      SETFDATI() allows to set a file's date and time. Time is specified as a
+ *      character string in "hh:mm:ss" format.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      UNIX, Windows, DJGPP
+ *  $FILES$
+ *      Source is files.c, library is libct.
+ *  $SEEALSO$
+ *      FILEDATE(), FILETIME()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      FILESMAX()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *      Gets maximum number of file handles
+ *  $SYNTAX$
+ *      FILESMAX() --> nFiles
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      Returns the maximum number of file handles that can be open by
+ *      application.
+ *  $DESCRIPTION$
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      This function is xHarbour libct contrib
+ *  $PLATFORMS$
+ *      DJGPP
+ *  $FILES$
+ *      Source is files.c, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */

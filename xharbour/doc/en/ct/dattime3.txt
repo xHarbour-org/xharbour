@@ -1,0 +1,249 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SHOWTIME()
+ *  $CATEGORY$
+ *      LibCT Date and Time Functions
+ *  $ONELINER$
+ *      Continuously displays the time at desired screen position
+ *  $SYNTAX$
+ *      SHOWTIME([<nRow>], [<nColumn>], [<lMode>],
+ *               [<cAttr|nAttr>], [<l12/24>], [<lAM/PM>]) --> cNull
+ *  $ARGUMENTS$
+ *      <nRow>  Designates the row where the time is displayed.  The default
+ *      is the cursor row.
+ *
+ *      <nColumn>  Designates the column where the time is displayed.  The
+ *      default is the cursor column. The maximum column is calculated by
+ *      FUNCTION if it´s exceed showtime string length.
+ *
+ *      <lMode>  Designates whether seconds are to appear in the time
+ *      display (.F.), or not (.T.).  The default is display seconds (.F.).
+ *
+ *      <cAttr|nAttr>  Designates to the screen attribute to use for the
+ *      time display.  Strings in the form "NN/NN" or "CC/CC" (e.g., "0/7" or
+ *      "B/GR") are possible.  The default is the setting for SetColor().
+ *
+ *      <l12/24>  By designating this parameter as .T., a 12-hour display is
+ *      selected.  The default is a 24-hour display (.F.).
+ *
+ *      <lAM/PM>  If you have a 12-hour display, you may want to switch on
+ *      an am/pm display.  When you specify this parameter as .T., an "a" or "p"
+ *      (as in DOS), appears to reflect the time.  The default is no display
+ *      (.F.).
+ *
+ *      A call in ShowTime() without parameters uninstalls the time display.
+ *
+ *  $RETURNS$
+ *      SHOWTIME() always RETURNs a null string.
+ *  $DESCRIPTION$
+ *      This FUNCTION permits you to constantly display the time in any screen
+ *      position desired. SHOWTIME() is interrupt controlled and has the ability
+ *      to display the time in either "hh:mm:ss" or "hh:mm" format.  A 12- or 24-
+ *      hour display can be selected, with or without an am/pm display.
+ *
+ *      Warning!  SHOWTIME() works with the interrupt system.  Before
+ *      leaving your xHarbour application, you must uninstall SHOWTIME() , so
+ *      that the interrupt vectors can be restored.  Otherwise, the system will
+ *      be unstable and will eventually crash.  Simultaneous use of the
+ *      accompanying Extended Drivers Modules automatically restores the
+ *      interrupt vectors in use.
+ *
+ *      Specify the screen attribute as either a numeric or a string
+ *      in "NN/NN" form.  If no attribute is specified, the value for CLEARA
+ *      applies (see Introduction Video FUNCTIONs).
+ *  $EXAMPLES$
+ *      Display a clock in row 0, column 70, with no seconds display
+ *      and the standard attribute.  When a display is shown in row 0, switch
+ *      SCOREBOARD off!
+ *
+ *      SET SCOREBOARD OFF
+ *      SHOWTIME(0, 70, .T.)      //  Turn on clock
+ *         *...
+ *         *...
+ *      SHOWTIME()               //  Uninstall clock
+ *
+ *      Show a 12-hour display. Hide seconds and show am/pm on the lowest row.
+ *      Show white numbers on a blue background:
+ *
+ *      SHOWTIME(24, 70, .T., "W/B" , .T., .T. )
+ *
+ *  $TESTS$
+ *      SHOWTIME(24, 70, .F., "W/B" , .F. , .F. )  -> 13:45:30
+ *      SHOWTIME(24, 70, .F., "W/B" , .F. , .T. )  -> 13:45:30
+ *      SHOWTIME(24, 70, .F., "W/B" , .T. , .F. )  ->  1:45:30
+ *      SHOWTIME(24, 70, .F., "W/B" , .T. , .T. )  ->  1:45:30p
+ *      SHOWTIME(24, 70, .T., "W/B" , .F. , .F. )  -> 13:45
+ *      SHOWTIME(24, 70, .T., "W/B" , .F. , .T. )  -> 13:45
+ *      SHOWTIME(24, 70, .T., "W/B" , .T. , .F. )  ->  1:45
+ *      SHOWTIME(24, 70, .T., "W/B" , .T. , .T. )  ->  1:45p
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Clipper Tools compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is dattime3.prg, library is libct.
+ *  $SEEALSO$
+ *      TIME()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETDATE()
+ *  $CATEGORY$
+ *      LibCT Date and Time Functions
+ *  $ONELINER$
+ *      Sets the system date
+ *  $SYNTAX$
+ *      SETDATE(<dDate>, [<lMode>]) --> lSet
+ *  $ARGUMENTS$
+ *      <dDate>  Designates which date to use to set the system date.
+ *
+ *      <lMode>  Designates whether the date should also be set in the CMOS-
+ *      RAM of an AT.  The default is do not write (.F.). Note that in Windows
+ *      plataform this adjust is automatic, therefore this parameter is without
+ *      efect.
+ *  $RETURNS$
+ *      SETDATE() RETURNs .T. when the date is successfully set.
+ *  $DESCRIPTION$
+ *      When you use this FUNCTION to set the system date from within your
+ *      xHarbour application, all files acquire this date with each write
+ *      procedure.
+ *  $EXAMPLES$
+ *      Set the system date in each case; but the hardware clock only
+ *      on an AT:
+ *
+ *      dNewDate  :=  CTOD("07/30/91")
+ *      IF ISAT()
+ *         SETDATE(dNewDate, .T.)
+ *      ELSE
+ *         SETDATE(dNewDate)
+ *      ENDIF
+ *
+ *      Or, more compactly:
+ *
+ *      SETDATE(dNewDate, ISAT())
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Clipper Tools compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is dattime3.prg, library is libct.
+ *  $SEEALSO$
+ *      SETTIME()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETTIME()
+ *  $CATEGORY$
+ *      LibCT Date and Time Functions
+ *  $ONELINER$
+ *      Sets the system clock
+ *  $SYNTAX$
+ *      SETTIME(<cTime>, [<lMode>]) --> lSet
+ *  $ARGUMENTS$
+ *      <cTime>  Designates a character string that contains the time that
+ *      is to become the system time.
+ *
+ *      <lMode>  Designates whether the time should also be set in the
+ *      CMOS-RAM of an AT.  The default is do not write to CMOS-RAM. Note that in
+ *      Windows plataform this adjust is automatic, therefore this parameter is
+ *      without efect.
+ *  $RETURNS$
+ *      The FUNCTION RETURNs .T. when the time is set successfully.
+ *  $DESCRIPTION$
+ *      When you use this FUNCTION to convert the time into the system time from
+ *      within your xHarbour application, all files acquire this time with
+ *      each write procedure.
+ *  $EXAMPLES$
+ *      Set the system time in each case; but the hardware clock only
+ *      on an AT:
+ *
+ *      cNewTime  :=  "10:20:00"
+ *      IF ISAT()
+ *        SETTIME(cNewTime, .T.)
+ *      ELSE
+ *        SETTIME(cNewTime)
+ *      ENDIF
+ *
+ *      Or, more compactly:
+ *
+ *      SETTIME(cNewTime, ISAT())
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Clipper Tools compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is dattime3.prg, library is libct.
+ *  $SEEALSO$
+ *      SETDATE(),TIMEVALID()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      TIMEVALID()
+ *  $CATEGORY$
+ *      LibCT Date and Time Functions
+ *  $ONELINER$
+ *      Determines whether a specIFied time is valid
+ *  $SYNTAX$
+ *      TIMEVALID(<cTime>) --> lValid
+ *  $ARGUMENTS$
+ *      <cTime>  Designates a character string that contains the time to
+ *      test.
+ *  $RETURNS$
+ *      TIMEVALID() RETURNs .T. when <cTime> is a valid time; or .F. when
+ *      <cTime> is an invalid time.
+ *  $DESCRIPTION$
+ *      With input that requires time manipulation, writing your own UDF to
+ *      check time inputs was unavoidable up to now.  TIMEVALID() permits
+ *      Complete checking of a time designation.  You can use this FUNCTION
+ *      effectively with a VALID clause within a READ mask.
+ *
+ *      Note
+ *
+ *      Note the format for time designations.  There must always be
+ *      two digits for hours, minutes, seconds, and hundredths; otherwise,
+ *      the time it is regarded as invalid.  Valid examples are "12",
+ *      "12:59", "12:59:59", and "12:59:59:99".  By contrast, invalid
+ *      examples are "24", "12:60", or "12:1", and/or "12:".  IF you work
+ *      with time strings that are not completely filled and that you need to
+ *      check with TIMEVALID(), then they must be TRIMmed prior to the use of
+ *      TIMEVALID() (see following Examples).
+ *  $EXAMPLES$
+ *      Using the VALID clause with TRIM, all valid times are
+ *      accepted, even IF no seconds or minutes are specIFied:
+ *
+ *      cBegin  :=  SPACE(11)
+ *      @ 5, 10 SAY "Please input time for beginning work:";
+ *      GET cBegin VALID TIMEVALID(TRIM(cBegin))
+ *      READ
+ *
+ *      Using a VALID clause without TRIM, hours and minutes must be
+ *      specified, so that TIMEVALID() can confirm a valid time:
+ *
+ *      cBegin  :=  SPACE(5)
+ *      @ 5, 10 SAY "Please input time for beginning work:";
+ *      GET cBegin VALID TIMEVALID(cBegin)
+ *      READ
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      This function is CA-Clipper Tools compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is dattime3.prg, library is libct.
+ *  $SEEALSO$
+ *      SETTIME()
+ *  $END$
+ */

@@ -1,0 +1,165 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMAND()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise logical AND operation on 16-bit numbers
+ *  $SYNTAX$
+ *      NUMAND( <nWORD1|cHexWORD1>, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>)
+ *            -> <nWordAND>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMAND() is compatible with CT3's NUMAND().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMOR(), NUMXOR(), NUMNOT(), NUMROL(), NUMMIRR()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMOR()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise logical OR operation on 16-bit numbers
+ *  $SYNTAX$
+ *      NUMOR( <nWORD1|cHexWORD>1, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>)
+ *           -> <nWordOR>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMOR() is compatible with CT3's NUMOR().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMXOR(), NUMNOT(), NUMROL(), NUMMIRR()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMXOR()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise logical XOR operation on 16-bit numbers
+ *  $SYNTAX$
+ *      NUMXOR( <nWORD1|cHexWORD1>, <nWORD2|cHexWORD2> ) -> <nWordXOR>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMXOR() is compatible with CT3's NUMXOR().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMOR(), NUMNOT(), NUMROL(), NUMMIRR()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMNOT()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise logical NOT operation on 16-bit numbers
+ *  $SYNTAX$
+ *      NUMNOT( <nWORD|cHexWORD> ) -> <nWordNOT>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMNOT() is compatible with CT3's NUMNOT().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMOR(), NUMXOR(), NUMROL(), NUMMIRR()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMROL()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise ROL (rotate left) operation on 16-bit numbers
+ *  $SYNTAX$
+ *      NUMROL( <nWORD1|cHexWORD1>, <nWORD1|cHexWORD1>[, <lLowByte>] )
+ *            -> <nWordROL>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMROL() is compatible with CT3's NUMROL().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMOR(), NUMXOR(), NUMNOT(), NUMMIRR()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMMIRR()
+ *  $CATEGORY$
+ *      CT3 number and bit manipulation functions
+ *  $ONELINER$
+ *      Bitwise mirror operation on 8-bit and 16-bit numbers
+ *  $SYNTAX$
+ *      NUMMIRR( <nNumber|cHexNum>[, <l8/16bit>] ) -> <nResult>
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      NUMMIRR() is compatible with CT3's NUMMIRR().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is bit1.c, library is libct.
+ *  $SEEALSO$
+ *      NUMAND(), NUMOR(), NUMXOR(), NUMNOT(), NUMROL()
+ *  $END$
+ */

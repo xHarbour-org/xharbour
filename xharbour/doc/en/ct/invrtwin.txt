@@ -1,0 +1,26 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INVERTWIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *      INVERTWIN() is compatible with CT3's INVERTWIN().
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is invrtwin.prg, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */

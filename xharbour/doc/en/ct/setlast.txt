@@ -1,0 +1,27 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETLASTKEY()
+ *  $CATEGORY$
+ *      CT3 Set Status functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SETLASTKEY( <nKeyValue> ) -> <cNull>
+ *  $ARGUMENTS$
+ *      <nKeyValue> Designates the character code passed to LASTKEY().
+ *  $RETURNS$
+ *      SETLASTKEY() always returns a null string.
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is setlast.prg, library is libct.
+ *  $SEEALSO$
+ *      LASTKEY()
+ *  $END$
+ */

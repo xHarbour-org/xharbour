@@ -1,0 +1,49 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      WAITPERIOD()
+ *  $CATEGORY$
+ *      LIBCT date and time functions
+ *  $ONELINER$
+ *      Pauses a specified time in increments of 1/100 seconds
+ *  $SYNTAX$
+ *      WAITPERIOD([<nDelay>]) --> lNotElapsed
+ *  $ARGUMENTS$
+ *      <nDelay>  Designates the waiting period at initialization in
+ *      1/100ths of seconds.  Values from 1 to 8, 640, 000 (one day) are
+ *      possible.
+ *  $RETURNS$
+ *      WAITPERIOD() returns .T. , if the time span designated at initialization
+ *      has not elapsed.
+ *  $DESCRIPTION$
+ *      This function sets a time span for a xHarbour DO WHILE loop to run.
+ *      The function must initialize prior to the loop, since you must specify
+ *      the <nDelay> parameter in 1/100th seconds.  Subsequently, the function
+ *      can be implemented without a parameter for additional loop conditions.
+ *      It returns .T., as long as the designated time span has not yet run out.
+ *
+ *      Note
+ *
+ *      The function notes the status of the internal timer at
+ *      initialization.  From that point on, the initialization should always
+ *      precede the respective DO WHILE; otherwise, the time delay is
+ *      incorrect.  The passing of midnight (the time resets to the 0 value)
+ *      is taken into account.
+ *  $EXAMPLES$
+ *      Run a loop for 5 seconds:
+ *
+ *      WAITPERIOD(500)               // Initialization, 5 seconds
+ *      DO WHILE <cond1> .AND. <cond2> .AND. WAITPERIOD()
+ *        *...
+ *      ENDDO
+ *  $TESTS$
+ *  $STATUS$
+ *      Ready
+ *  $COMPLIANCE$
+ *      WAITPERIOD() is Clipper Tools compatible.
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      Source is settime.prg, library is libct.
+ *  $SEEALSO$
+ *  $END$
+ */
