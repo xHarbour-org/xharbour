@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.89 2004/08/21 15:23:03 paultucker Exp $
+ * $Id: dbf1.c,v 1.90 2004/09/01 01:13:59 druzus Exp $
  */
 
 /*
@@ -1707,7 +1707,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
             hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
-            hb_errPutFlags( pError, EF_CANRETRY );
+            hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
       }

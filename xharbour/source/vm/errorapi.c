@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.46 2004/05/27 22:44:13 mlombardo Exp $
+ * $Id: errorapi.c,v 1.47 2004/06/04 13:29:29 mauriliolongo Exp $
  */
 
 /*
@@ -1483,12 +1483,32 @@ USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, char * szDescr
    return uiAction;
 }
 
-USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation )
+USHORT HB_EXPORT hb_errRT_DBCMD_Ext( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiFlags )
 {
    USHORT uiAction;
    PHB_ITEM pError;
 
-   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
+   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, uiFlags );
+
+   uiAction = hb_errLaunch( pError );
+
+   hb_itemRelease( pError );
+
+   return uiAction;
+}
+
+USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation )
+{
+   USHORT uiAction;
+   USHORT uiFlags;
+   PHB_ITEM pError;
+
+   if ( ulGenCode == EG_NOTABLE )
+      uiFlags = EF_CANDEFAULT;
+   else
+      uiFlags = EF_NONE;
+   
+   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, uiFlags );
 
    uiAction = hb_errLaunch( pError );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.155 2004/08/29 00:26:23 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.156 2004/09/01 19:30:48 druzus Exp $
  */
 
 /*
@@ -381,7 +381,7 @@ static void hb_cdxErrInternal( char * szMsg )
    hb_errInternal( 9201, szMsg ? szMsg : "hb_cdxErrInternal: data integrity error.", "", "" );
 }
 
-static ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiFlags )
+static ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiOsCode, USHORT uiFlags )
 {
    PHB_ITEM pError;
    ERRCODE iRet;
@@ -389,6 +389,7 @@ static ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode
    pError = hb_errNew();
    hb_errPutGenCode( pError, uiGenCode );
    hb_errPutSubCode( pError, uiSubCode );
+   hb_errPutOsCode( pError, uiOsCode );
    hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
    if ( filename )
       hb_errPutFileName( pError, filename );
@@ -697,8 +698,10 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, USHORT uiType )
 #endif
       }
    }
+   else if ( pItem )
+      hb_itemClear( pItem );
    else
-      pItem = hb_itemNew( pItem );
+      pItem = hb_itemNew( NULL );
 
    return pItem;
 }
@@ -1275,10 +1278,10 @@ static BOOL hb_cdxIndexLockRead( LPCDXINDEX pIndex )
 #endif
 
    ret = hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType,
-                         FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
+                            FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
    if ( !ret )
-      /* TODO: change into RT error dbfcdx/1038 */
-      hb_errInternal( 9107, "hb_cdxIndexLockRead: lock failure.", "", "" );
+      hb_cdxErrorRT( pIndex->pArea, EG_LOCK, EDBF_LOCK, pIndex->szFileName, hb_fsError(), 0 );
+
    if ( ret )
    {
       pIndex->lockRead++;
@@ -1314,11 +1317,10 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
       pIndex->WrLck = TRUE;
 #endif
       ret = hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType,
-                            FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT, &pIndex->ulLockPos );
+                               FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT, &pIndex->ulLockPos );
    }
    if ( !ret )
-      /* TODO: change into RT error dbfcdx/1038 */
-      hb_errInternal( 9107, "hb_cdxIndexLockWrite: lock failure.", "", "" );
+      hb_cdxErrorRT( pIndex->pArea, EG_LOCK, EDBF_LOCK, pIndex->szFileName, hb_fsError(), 0 );
 
    if ( ret )
    {
@@ -5803,7 +5805,7 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
 
    if ( ! pTag )
    {
-      hb_cdxErrorRT( pArea, EG_NOORDER, 1201, NULL, EF_CANDEFAULT );
+      hb_cdxErrorRT( pArea, EG_NOORDER, 1201, NULL, 0, EF_CANDEFAULT );
       return FAILURE;
    }
    else
@@ -6492,9 +6494,18 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
          *szSpFile = '\0';
       if ( hFile == FS_ERROR )
          bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, *szSpFile ? (char *) szSpFile : szFileName,
-                                   EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
+                                   hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
       else
+      {
+         if ( hb_fsSeek( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) )
+         {
+            hb_fsClose( hFile );
+            hFile = FS_ERROR;
+            hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
+                           *szSpFile ? (char *) szSpFile : szFileName, hb_fsError(), EF_CANDEFAULT );
+         }
          bRetry = FALSE;
+      }
 
    } while ( bRetry );
 
@@ -6599,12 +6610,12 @@ static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea )
 
    if ( pArea->fShared )
    {
-      hb_cdxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pArea->szDataFileName, 0 );
+      hb_cdxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pArea->szDataFileName, 0, 0 );
       return FAILURE;
    }
    if ( pArea->fReadonly )
    {
-      hb_cdxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pArea->szDataFileName, 0 );
+      hb_cdxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pArea->szDataFileName, 0, 0 );
       return FAILURE;
    }
 
@@ -6722,6 +6733,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          if ( pExpMacro != NULL )
             hb_macroDelete( pExpMacro );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+         hb_cdxErrorRT( pArea, EG_DATATYPE, 1026, NULL, 0, 0 );
          /* TODO: !!! runtime error ? */
          hb_itemRelease( pResult );
          return FAILURE;
@@ -6733,7 +6745,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       if ( pExpMacro != NULL )
          hb_macroDelete( pExpMacro );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-      hb_cdxErrorRT( pArea, EG_DATAWIDTH, 1026, NULL, 0 );
+      hb_cdxErrorRT( pArea, EG_DATAWIDTH, 1026, NULL, 0, 0 );
       return FAILURE;
    }
    /* Check conditional expression */
@@ -6871,21 +6883,32 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    if ( !fOpenedIndex )
    {
       FHANDLE hFile;
+      BOOL bRetry;
 
       if ( !fNewFile )
          fNewFile = ! hb_spFile( ( BYTE * ) szFileName, szSpFile );
 
-      if ( fNewFile )
+      do
       {
-         /* TODO: no API to take real file name with path */
-         hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
-      }
-      else
-      {
-         strcpy( szFileName, ( char * ) szSpFile );
-         hFile = hb_spOpen( ( BYTE * ) szFileName,
-               FO_READWRITE | ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) );
-      }
+         if ( fNewFile )
+         {
+            /* TODO: no API to take real file name with path */
+            hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
+         }
+         else
+         {
+            strcpy( szFileName, ( char * ) szSpFile );
+            hFile = hb_spOpen( ( BYTE * ) szFileName,
+                               FO_READWRITE | ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) );
+         }
+         if ( hFile == FS_ERROR )
+            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
+                                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
+         else
+            bRetry = FALSE;
+
+      } while ( bRetry );
+
       if ( hFile == FS_ERROR )
       {
          hb_xfree( szFileName );
@@ -6899,7 +6922,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          if ( pForMacro != NULL )
             hb_macroDelete( pForMacro );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-         /* TODO: !!! runtime error ? */
          return FAILURE;
       }
 
@@ -7409,7 +7431,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             }
             else
             {
-               hb_cdxErrorRT( pArea, 0, 1052, "", 0 );
+               hb_cdxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
             }
          }
          break;
@@ -7438,7 +7460,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             }
             else
             {
-               hb_cdxErrorRT( pArea, 0, 1052, "", 0 );
+               hb_cdxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
             }
          }
          break;

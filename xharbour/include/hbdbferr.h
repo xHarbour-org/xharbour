@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbferr.h,v 1.1 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbdbferr.h,v 1.2 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -58,6 +58,7 @@ HB_EXTERN_BEGIN
 /* DBF errors */
 #define EDBF_OPEN_DBF                              1001
 #define EDBF_CREATE_DBF                            1004
+#define EDBF_CREATE                                1006
 #define EDBF_READ                                  1010
 #define EDBF_WRITE                                 1011
 #define EDBF_CORRUPT                               1012

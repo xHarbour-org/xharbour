@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.65 2004/08/31 07:05:26 mauriliolongo Exp $
+ * $Id: gtwin.c,v 1.66 2004/08/31 12:57:17 vouchcac Exp $
  */
 
 /*
@@ -87,6 +87,11 @@
 #include "hbvm.h"
 #include "inkey.ch"
 
+#ifndef HB_CDP_SUPPORT_OFF
+#include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
+
 #include <string.h>
 #include <time.h>
 //#include <io.h>
@@ -164,6 +169,10 @@ static DWORD        s_cNumRead;   /* Ok to use DWORD here, because this is speci
 static DWORD        s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
 static WORD         s_wRepeated = 0;  /* number of times the event (key) was repeated */
 static INPUT_RECORD s_irInBuf[ INPUT_BUFFER_LEN ];
+static BYTE         s_charTransRev[ 256 ];
+static BYTE         s_charTrans[ 256 ];
+static BYTE         s_keyTrans[ 256 ];
+
 int    s_mouseLast;  /* Last mouse button to be pressed                     */
 
 extern int hb_mouse_iCol;
@@ -543,6 +552,7 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
     OSVERSIONINFO osv;
+    int i;
 
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -568,6 +578,14 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     s_cNumIndex = 0;
     s_uiDispCount = 0;
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
+
+    for ( i = 0; i < 256; i++ )
+    {
+        s_charTransRev[ i ] = ( BYTE ) i;
+        s_charTrans[ i ] = ( BYTE ) i;
+        s_keyTrans[ i ] = ( BYTE ) i;
+    }
+
 
     /* Add Ctrl+Break handler [vszakats] */
     SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
@@ -829,7 +847,7 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
             }
             while( i-- )
             {
-                s_pCharInfoScreen[j].Char.AsciiChar = ( CHAR ) *pbyStr++;
+                s_pCharInfoScreen[j].Char.AsciiChar = ( CHAR ) s_charTrans[ *pbyStr++ ];
                 s_pCharInfoScreen[j].Attributes = ( WORD )( byAttr & 0xFF );
                 ++j;
             }
@@ -870,7 +888,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byCh
             }
             while( i-- )
             {
-                s_pCharInfoScreen[j].Char.AsciiChar = ( CHAR ) byChar;
+                s_pCharInfoScreen[j].Char.AsciiChar = ( CHAR ) s_charTrans[ byChar ];
                 s_pCharInfoScreen[j].Attributes = ( WORD )( byAttr & 0xFF );
                 ++j;
             }
@@ -909,7 +927,7 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
             i = y * s_csbi.dwSize.X;
             for( x = usLeft; x <= usRight; x++ )
             {
-                *(pbyDst++) = (BYTE) s_pCharInfoScreen[i+x].Char.AsciiChar;
+                *(pbyDst++) = s_charTransRev[ (BYTE) s_pCharInfoScreen[i+x].Char.AsciiChar ];
                 *(pbyDst++) = (BYTE) s_pCharInfoScreen[i+x].Attributes;
             }
         }
@@ -940,8 +958,8 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
                 i = y * s_csbi.dwSize.X;
                 for( x = usLeft; x <= usRight; x++ )
                 {
-                    s_pCharInfoScreen[i+x].Char.AsciiChar = ( CHAR ) *(pbySrc++);
-                    s_pCharInfoScreen[i+x].Attributes = ( WORD ) *(pbySrc++);
+                    s_pCharInfoScreen[i+x].Char.AsciiChar = ( CHAR ) s_charTrans[ *pbySrc++ ];
+                    s_pCharInfoScreen[i+x].Attributes = ( WORD ) *pbySrc++;
                 }
             }
         }
@@ -1146,7 +1164,7 @@ static void HB_GT_FUNC(gt_xPutch( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE 
     {
         int i = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
 
-        s_pCharInfoScreen[i].Char.AsciiChar = ( CHAR ) byChar;
+        s_pCharInfoScreen[i].Char.AsciiChar = ( CHAR ) s_charTrans[ byChar ];
         s_pCharInfoScreen[i].Attributes = ( WORD )( byAttr & 0xFF );
 
         HB_GT_FUNC(gt_xUpdtSet( usRow, usCol, usRow, usCol ));
@@ -1699,6 +1717,10 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                    ch = clipKey->key;
                 }
              }
+             if ( ch > 0 && ch < 256 )
+             {
+                ch = s_keyTrans[ ch ];
+             }
           }
        }
        else if( b_MouseEnable &&
@@ -1937,6 +1959,91 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     }
 }
 
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
+{
+   int i;
+
+   HB_SYMBOL_UNUSED( bBox );
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = s_cdpage->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] = 
+                         ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] = 
+                         ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTransRev[ s_charTrans[ i ] ] = ( BYTE ) i;
+   }
+
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
+{
+   int i;
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_keyTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = s_cdpage->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] = 
+                        ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] = 
+                        ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+}
+
 /* ************************** Clipboard support ********************************** */
 
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
@@ -2156,10 +2263,10 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
-    gt_funcs->info                  = HB_GT_FUNC( gt_info );
     /* extended GT functions */
-//    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
-//    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
+    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );

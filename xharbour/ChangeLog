@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3391 2004/09/02 03:15:20 walito Exp $
+ * $Id: ChangeLog,v 1.3392 2004/09/02 08:01:44 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 03:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdbferr.h
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/vm/errorapi.c
+   * replaced some internal errors with RT ones and fixed some
+     RT errors to be Clipper compatible.
+     I tested some different Clipper functions and each time
+     DBCMD error was called with EG_NOTABLE Clipper gives
+     "DEFAULT" action - so I made the same. If I'm wrong
+     please fix me - Brian?
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+   * added HB_SETTERMCP(), HB_SETDISPCP(), HB_SETKEYCP()
+     They work for one country CDP - but for the translations
+     between different countries (last Lorenzo problem we will
+     need UNICODE translation not the letters only). I'll try
+     to resolve this problem soon.
 
 2004-09-02 10:00 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/teditor.prg

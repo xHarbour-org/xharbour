@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.125 2004/08/19 00:51:46 druzus Exp $
+ * $Id: dbcmd.c,v 1.126 2004/08/23 15:40:03 druzus Exp $
  */
 
 /*
@@ -1600,9 +1600,6 @@ HB_FUNC( DBCREATE )
    {
       hb_rddReleaseCurrentArea();
       hb_rddSelectWorkAreaNumber( uiPrevArea );
-      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
