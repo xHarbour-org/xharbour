@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.24 2004/07/15 03:22:00 vouchcac Exp $
+ * $Id: _winsys.c,v 1.25 2004/08/16 12:51:51 mauriliolongo Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -35,7 +35,9 @@
 
 #include <shlobj.h>
 #include <windows.h>
+#ifndef __MINGW32__
 #include <htmlhelp.h>
+#endif
 
 #include "hbapi.h"
 #include "hbvm.h"

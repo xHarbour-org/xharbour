@@ -51,6 +51,8 @@ linking the VMGUI library code into it.
 #include "stdlib.h"
 #include <time.h>
 
+#ifndef __MINGW32__
+
 //------------------------------------------------------------------
 #include <stdio.h>
 //#include <stdlib.h>
@@ -181,4 +183,4 @@ RESULT DynaCall(int Flags, DWORD lpFunction,
     return Res;
 }
 
-
+#endif

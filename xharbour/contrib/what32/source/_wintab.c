@@ -1,8 +1,9 @@
 #define _WIN32_WINNT   0x0400
 
+#ifndef __MINGW32__
+
 #include <windows.h>
 #include <shlobj.h>
-//#include <commctrl.h>
 
 #include "item.api"
 #include "hbapi.h"
@@ -353,3 +354,5 @@ HB_FUNC( TABCTRL_GETUNICODEFORMAT )
 }
 
 //---------------------------------------------------------------------------//
+
+#endif

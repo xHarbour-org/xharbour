@@ -4,11 +4,11 @@
 
 #define HB_OS_WIN_32_USED
 #define _WIN32_WINNT   0x0400
+#define _WIN32_IE      0x0500
 
 #include <windows.h>
 #include <commctrl.h>
 #include "hbapi.h"
-#include "commctrl.h"
 
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
@@ -219,7 +219,11 @@ HB_FUNC( IMAGELIST_BEGINDRAG )
 }
 
 //-----------------------------------------------------------------------------
- WINCOMMCTRLAPI void WINAPI ImageList_EndDrag(void);
+#ifndef __MINGW32__
+WINCOMMCTRLAPI void WINAPI ImageList_EndDrag(void);
+#else
+WINAPI void ImageList_EndDrag(void);
+#endif
 
 HB_FUNC( IMAGELIST_ENDDRAG )
 {
@@ -347,11 +351,11 @@ HB_FUNC( IMAGELIST_MERGE )
 //-----------------------------------------------------------------------------
 // WINCOMMCTRLAPI HIMAGELIST  WINAPI ImageList_Duplicate(HIMAGELIST himl);
 
+#ifndef __MINGW32__
+
 HB_FUNC( IMAGELIST_DUPLICATE )
 {
    hb_retnl( (LONG) ImageList_Duplicate((HIMAGELIST) hb_parnl( 1 )));
 }
 
-
-
-
+#endif

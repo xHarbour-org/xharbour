@@ -9,10 +9,11 @@
 
 
 #define _WIN32_WINNT   0x0400
+#define _WIN32_IE      0x0500
 
 #include <windows.h>
 #include <shlobj.h>
-//#include <commctrl.h>
+#include <commctrl.h>
 
 #include <commdlg.h>
 #include "hbapi.h"
