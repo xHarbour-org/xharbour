@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.41 2004/05/10 00:58:46 lculik Exp $
+ * $Id: pptable.c,v 1.42 2004/05/19 23:46:41 peterrees Exp $
  */
 
 /*
@@ -260,7 +260,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___101 = {0,"@","\1A00, \1B00 GET \1C00 \16\1D10\17 RANGE \1E00, \1F00 \16\1G10\17",
        "@ \1A00, \1B00 GET \1C00 \16\1D00\17 VALID {|_1| RangeCheck(_1,, \1E00, \1F00)} \16\1G00\17",&sC___100 };
    static COMMANDS sC___102 = {0,"@","\1A00, \1B00 GET \1C00 \16\1D10\17 COLOR \1E00 \16\1F10\17",
-       "@ \1A00, \1B00 GET \1C00 \16\1D00\17 SEND colorDisp(\1E00) \16\1F00\17",&sC___101 };
+       "@ \1A00, \1B00 GET \1C00 \16\1D00\17 SEND colorSpec := \1E00 \16\1F00\17",&sC___101 };
    static COMMANDS sC___103 = {0,"READ","SAVE","ReadModal(GetList)",&sC___102 };
    static COMMANDS sC___104 = {0,"READ","","ReadModal(GetList) ; GetList := {}",&sC___103 };
    static COMMANDS sC___105 = {0,"CLEAR","GETS","ReadKill(.T.) ; GetList := {}",&sC___104 };
