@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.75 2004/03/21 21:48:49 druzus Exp $
+ * $Id: filesys.c,v 1.76 2004/03/23 12:43:00 andijahja Exp $
  */
 
 /*
@@ -311,7 +311,7 @@ static USHORT s_uiOsErrorLast = 0;
    #define LARGE_MAX ( UINT_MAX - 1L )
 #endif
 
-#ifdef __WIN32__ 
+#ifdef __WIN32__
    #if defined(X__WIN32__)
        extern int WintoDosError(DWORD dwError);
        HANDLE DostoWinHandle( FHANDLE fHandle);
@@ -529,7 +529,6 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
-   HB_THREAD_STUB
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -1611,11 +1610,13 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
-   // int oflag;
-   // unsigned pmode;
+
+   #if defined(HB_FS_FILE_IO)
+      int oflag;
+      unsigned pmode;
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
-
 
    pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 

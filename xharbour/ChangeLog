@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2634 2004/03/23 18:07:57 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2635 2004/03/23 18:09:27 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-23 12:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/filesys.c
+    ! Fixed compilation under #if defined(HB_FS_FILE_IO)
+
+  * source/rtl/win32ole.prg
+    ! Fixed support of VT_BOOL to utilize VARIANT_TRUE and VARIANT_FALSE
+
 2004-03-23 19:23 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * include/hbxml.h
   * source/rtl/hbxml.c
@@ -15,7 +22,7 @@
     + Added node causing error recording
     ! Using self growing strings to record infinite length node and attribute names and
       attribute values.
-  
+
   * source/rtl/txml.prg
     + Added node causing error recording.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.50 2004/03/22 03:16:00 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.51 2004/03/22 03:31:20 ronpinkas Exp $
  */
 
 /*
@@ -1020,8 +1020,8 @@ RETURN uObj
                 }
                 else
                 {
-                   pArgs[ n ].n1.n2.vt   = VT_BOOL;
-                   pArgs[ n ].n1.n2.n3.boolVal = hb_parl( nArg );
+                   pArgs[ n ].n1.n2.vt = VT_BOOL;
+                   pArgs[ n ].n1.n2.n3.boolVal = hb_parl( nArg ) ? VARIANT_TRUE : VARIANT_FALSE;
                 }
                 break;
 
@@ -1315,7 +1315,7 @@ RETURN uObj
           break;
 
         case VT_BOOL:
-          hb_retl( RetVal.n1.n2.n3.boolVal );
+          hb_retl( RetVal.n1.n2.n3.boolVal == VARIANT_TRUE ? 1 :0 );
           break;
 
         case VT_DISPATCH:
