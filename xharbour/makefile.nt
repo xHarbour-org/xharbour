@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.124 2005/03/06 19:21:34 paultucker Exp $
+# $Id: makefile.nt,v 1.125 2005/03/09 13:11:11 paultucker Exp $
 #
 
 #
@@ -325,14 +325,6 @@ LIBS = \
 
 LIBS2 = \
    $(LIBS) \
-   user32.lib \
-   winspool.lib \
-   ole32.lib \
-   oleaut32.lib \
-   advapi32.lib
-
-LIBS3 = \
-   $(LIBLISTMT) \
    user32.lib \
    winspool.lib \
    ole32.lib \
@@ -856,7 +848,7 @@ PP_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -1233,8 +1225,8 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fcopy.obj \
    $(OBJ_DIR)$(MT)\getinfo.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
-   $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\invrtwin.obj \
+   $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \
    $(OBJ_DIR)$(MT)\screen3.obj \

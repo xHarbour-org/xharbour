@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.145 2005/02/13 17:53:37 paultucker Exp $
+# $Id: makefile.vc,v 1.146 2005/03/06 19:21:35 paultucker Exp $
 #
 
 #
@@ -191,6 +191,9 @@ GTWIN_LIB        =$(LIB_DIR)\gtwin.lib
 GTWVT_LIB        =$(LIB_DIR)\gtwvt.lib
 !ifdef HB_GTALLEG
 GTALLEG_LIB      =$(LIB_DIR)\gtalleg.lib
+!endif
+!ifdef HB_MT
+HBTESTMT_EXE     =$(BIN_DIR)\hbtestmt.exe
 !endif
 
 HARBOUR_EXE      =$(BIN_DIR)\harbour.exe
@@ -1115,7 +1118,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\bit1.obj \
    $(OBJ_DIR)$(MT)\bit2.obj \
    $(OBJ_DIR)$(MT)\bit3.obj \
-   $(OBJ_DIR)$(MT)\blank.obj \
    $(OBJ_DIR)$(MT)\charevod.obj \
    $(OBJ_DIR)$(MT)\charlist.obj \
    $(OBJ_DIR)$(MT)\charmirr.obj \
@@ -1144,7 +1146,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\files.obj \
    $(OBJ_DIR)$(MT)\finan.obj \
    $(OBJ_DIR)$(MT)\ftoc.obj \
-   $(OBJ_DIR)$(MT)\getsecrt.obj \
    $(OBJ_DIR)$(MT)\justify.obj \
    $(OBJ_DIR)$(MT)\keyset.obj \
    $(OBJ_DIR)$(MT)\lton.obj \
@@ -1193,8 +1194,8 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \
    $(OBJ_DIR)$(MT)\screen3.obj \
-   $(OBJ_DIR)$(MT)\setkeys.obj \
    $(OBJ_DIR)$(MT)\scrmark.obj \
+   $(OBJ_DIR)$(MT)\setkeys.obj \
    $(OBJ_DIR)$(MT)\spread.obj \
    $(OBJ_DIR)$(MT)\untext.obj \
    $(OBJ_DIR)$(MT)\util.obj
@@ -1229,6 +1230,7 @@ TARGETS= \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
+   $(HBTESTMT_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
    $(XBSCRIPT_EXE)
@@ -1317,6 +1319,40 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
                        -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB)
+
+#
+# HBTESTMT.EXE rules
+#
+!ifdef HB_MT
+
+$(HBTESTMT_EXE) : \
+   $(HBTEST_DIR)\hbtest.prg \
+   $(HBTEST_DIR)\rt_array.prg \
+   $(HBTEST_DIR)\rt_date.prg \
+   $(HBTEST_DIR)\rt_file.prg \
+   $(HBTEST_DIR)\rt_hvm.prg \
+   $(HBTEST_DIR)\rt_hvma.prg \
+   $(HBTEST_DIR)\rt_math.prg \
+   $(HBTEST_DIR)\rt_misc.prg \
+   $(HBTEST_DIR)\rt_ccall.prg \
+   $(HBTEST_DIR)\rt_str.prg \
+   $(HBTEST_DIR)\rt_stra.prg \
+   $(HBTEST_DIR)\rt_trans.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbtest.c \
+                                      $(OBJ_DIR)$(MT)\rt_array.c \
+                                      $(OBJ_DIR)$(MT)\rt_date.c \
+                                      $(OBJ_DIR)$(MT)\rt_file.c \
+                                      $(OBJ_DIR)$(MT)\rt_hvm.c \
+                                      $(OBJ_DIR)$(MT)\rt_hvma.c \
+                                      $(OBJ_DIR)$(MT)\rt_math.c \
+                                      $(OBJ_DIR)$(MT)\rt_misc.c \
+                                      $(OBJ_DIR)$(MT)\rt_ccall.c \
+                                      $(OBJ_DIR)$(MT)\rt_str.c \
+                                      $(OBJ_DIR)$(MT)\rt_stra.c \
+                                      $(OBJ_DIR)$(MT)\rt_trans.c \
+                       -o $(HBTESTMT_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2) $(EXTRALIB)
+!endif
 
 #
 # HBDOC.EXE rules
