@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.8 2002/03/22 15:35:51 walito Exp $
+ * $Id: tget.prg,v 1.9 2002/03/22 19:44:15 walito Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "getexit.ch"
 #include "inkey.ch"
 #include "button.ch"
+
 /* TODO: :posInBuffer( <nRow>, <nCol> ) --> nPos
          Determines a position within the edit buffer based on screen
          coordinates.
@@ -247,6 +248,10 @@ METHOD ParsePict( cPicture ) CLASS Get
       ::cPicMask := cPicture
    endif
 
+   if ::type == "D"
+      ::cPicMask := LTrim( ::cPicMask )
+   endif
+
    // Comprobar si tiene la , y el . cambiado (Solo en Xbase++)
 
    ::lDecRev := "," $ Transform( 1.1, "9.9" )
@@ -395,6 +400,7 @@ return Self
 METHOD SetFocus() CLASS Get
 
    local lWasNil := ::buffer == NIL
+   local nFor
 
    ::hasfocus   := .t.
    ::rejected   := .f.
@@ -406,8 +412,19 @@ METHOD SetFocus() CLASS Get
    ::changed    := .f.
    ::clear      := ( "K" $ ::cPicFunc .or. ::type == "N")
    ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
-   ::pos        := 1
+   ::pos        := 0
    ::lEdit      := .f.
+
+   for nFor := 1 to ::nMaxLen
+      if ::IsEditable( nFor )
+         ::pos := nFor
+         exit
+      endif
+   next
+
+   if ::pos = 0
+      ::TypeOut = .t.
+   endif
 
    if ::type == "N"
       ::decpos := At( iif( ::lDecRev .or. "E" $ ::cPicFunc, ",", "." ), ::buffer )
@@ -501,14 +518,14 @@ METHOD Untransform( cBuffer ) CLASS Get
 
    case ::type == "N"
       if "E" $ ::cPicFunc .or. ::lDecRev
-         cBuffer := StrTran( cBuffer, ".", "" )
+         cBuffer := StrTran( cBuffer, ".", " " )
          cBuffer := StrTran( cBuffer, ",", "." )
       else
-         cBuffer := StrTran( cBuffer, ",", "" )
+         cBuffer := StrTran( cBuffer, ",", " " )
       endif
 
       for nFor := 1 to ::nMaxLen
-         if !::IsEditable( nFor )
+         if !::IsEditable( nFor ) .and. SubStr( cBuffer, nFor, 1 ) != "."
             cBuffer := Left( cBuffer, nFor-1 ) + " " + SubStr( cBuffer, nFor+1 )
          endif
       next
@@ -965,7 +982,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       return NIL
    endif
 
-   cBuffer := Transform( xValue, AllTrim( ::cPicFunc + " " + ::cPicMask ) )
+   cBuffer := Transform( xValue, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask )
 
    if lEdit .and. ::type == "N" .and. ! Empty( ::cPicMask )
       nLen  := Len( cBuffer )
