@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.88 2004/02/23 10:01:43 andijahja Exp $
+ * $Id: arrays.c,v 1.89 2004/02/25 15:10:50 lculik Exp $
  */
 
 /*
@@ -904,6 +904,12 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
+         // Might be Char type, switch to Numeric context if the Array first element is Numeric.
+         if( HB_IS_NUMERIC( pValue ) && HB_IS_NUMERIC( pItems ) )
+         {
+            goto NumericContext;
+         }
+
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
             PHB_ITEM pItem = pItems + ulStart;
@@ -932,17 +938,20 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_NUMERIC( pValue ) )
       {
-         double dValue = hb_itemGetND( pValue );
-
-         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+         NumericContext:
          {
-            PHB_ITEM pItem = pItems + ulStart;
+            double dValue = hb_itemGetND( pValue );
 
-            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
-
-            if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               return ulStart + 1;
+               PHB_ITEM pItem = pItems + ulStart;
+
+               HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
+               if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+               {
+                  return ulStart + 1;
+               }
             }
          }
       }

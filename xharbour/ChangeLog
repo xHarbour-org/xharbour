@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2422 2004/02/29 00:42:04 paultucker Exp $
+ * $Id: ChangeLog,v 1.2423 2004/02/29 02:59:01 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-28 23:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    - Removed no longer needed logic in PrevSquare();
+
+  * source/vm/arrays.c
+    ! Fixed support of Char Subtype (numeric context) in hb_arrayScan()
+
 2004-02-29 10:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/zip.c
     + add additional parameter to not include certain files in created zip.
@@ -68,32 +76,32 @@
 
 2004-02-28 19:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtp/memoedit.prg
-    % Enhanced to accept missing parameters of 
+    % Enhanced to accept missing parameters of
       MemoEdit( ..., nTextBufferRow, nTextBufferCol, nWindowRow, nWindowCol )
       in HBMemoEditor() class.
     * Reformatting and logical ordering of the code.
 
   * xharbour/source/rtp/teditor.prg
-    % Enhanced to accept missing ( until now ) parameters of 
+    % Enhanced to accept missing ( until now ) parameters of
       MemoEdit( ..., nTextBufferRow, nTextBufferCol, nWindowRow, nWindowCol )
     * Splitting the methods in small manageable parts for proper
       readability and maintainability. Only two methods are split, viz.,
       MoveCursor() and Edit(), along the lines of tBrowse().
     * Reforatting and logical ordering of the code.
 
-    /*  Now you can pass above parameters the same way as in Clipper and 
-        MemoEdit() acts accordingly. I have made extensive debugging and have 
+    /*  Now you can pass above parameters the same way as in Clipper and
+        MemoEdit() acts accordingly. I have made extensive debugging and have
         not found any bug yet. But in case..., I have kept the original
-        code at the bottom of .prg. 
+        code at the bottom of .prg.
 
-        Also I have not touched the original code in any way except in 
-        method New() where above missing parameters ( until now ) are 
+        Also I have not touched the original code in any way except in
+        method New() where above missing parameters ( until now ) are
         initialized and set properly.
 
-        Moreover, I have kept in mind that someone might been using 
-        HbEditor() class at its own, so it does not break the code anyway. 
+        Moreover, I have kept in mind that someone might been using
+        HbEditor() class at its own, so it does not break the code anyway.
 
-        As I am still looking for 100% compatibility with Clipper, let me 
+        As I am still looking for 100% compatibility with Clipper, let me
         know the known issues which are still pending.
      */
 

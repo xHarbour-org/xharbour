@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.128 2004/02/15 21:58:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.129 2004/02/19 04:22:59 ronpinkas Exp $
  */
 
 /*
@@ -5415,49 +5415,23 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
 
 static char * PrevSquare( char * ptr, char * bound, int * kolmark )
 {
-   int State = STATE_NORMAL;
-
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("PrevSquare(%s, %s, %p, %i)", ptr, bound, kolmark, ( kolmark ? *kolmark: 0 )));
-
-   /*
-    TODO: Have to add support for Extended Literal Strings.
-    Note that this loop scans from Left to Right!!!
-   */
 
    while( ptr > bound )
    {
-      if( State == STATE_QUOTE1 )
+      if( *ptr == '\1' && kolmark )
       {
-         if( *ptr == '\'' )  State = STATE_NORMAL;
+         (*kolmark)++;
       }
-      else if( State == STATE_QUOTE2 )
+      else if( ( *ptr == '\16' || *ptr == '\17' ) )
       {
-         if( *ptr == '\"' )  State = STATE_NORMAL;
-      }
-      else
-      {
-         if( *ptr == '\"' && *(ptr-1) != '\\' )
-         {
-            State = STATE_QUOTE2;
-         }
-         else if( *ptr == '\'' && *(ptr-1) != '\\' )
-         {
-            State = STATE_QUOTE1;
-         }
-         else if( kolmark && *ptr == '\1' )
-         {
-            (*kolmark)++;
-         }
-         else if( ( *ptr == '\16' || *ptr == '\17' ) )
-         {
-            break;
-         }
+         break;
       }
 
       ptr--;
    }
 
-   return ( *ptr == '\16' && State == STATE_NORMAL ) ? ptr : NULL;
+   return ( *ptr == '\16' ) ? ptr : NULL;
 }
 
 void hb_pp_Stuff( char *ptri, char * ptro, int len1, int len2, int lenres )
