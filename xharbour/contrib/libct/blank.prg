@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: blank.prg,v 1.1 2003/03/22 17:22:43 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ FUNCTION BLANK( xItem, lClean)
 
    SWITCH cType
    CASE "D"
-      xRet := "  /  /  "
+      xRet := CTOD( "" )
       EXIT
    CASE "L"
       xRet := .F. 
