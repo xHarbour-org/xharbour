@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.90 2004/08/14 09:54:43 mauriliolongo Exp $
+ * $Id: tget.prg,v 1.92 2004/08/14 10:06:46 modalsist Exp $
  */
 
 /*
@@ -309,12 +309,10 @@ METHOD ParsePict( cPicture ) CLASS Get
    endif
 
    if ::type == "D"
-      /* 12/08/2004 - <maurilio.longo@libero.it>
-                      for clipper compatibility, see ChangeLog, I'm not sure
-                      this is the correct place for this fix
-      */
-      ::cPicMask := StrTran( ::cPicMask, "X", Space(1) )
-      ::cPicMask := LTrim( ::cPicMask )
+      // ::cPicMask := LTrim( ::cPicMask )
+      // avoid user date picture to force default date picture in
+      // accordance with set date format. See below.
+      ::cPicMask := ""
    endif
 
    // Comprobar si tiene la , y el . cambiado (Solo en Xbase++)

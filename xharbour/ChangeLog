@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3307 2004/08/14 09:54:41 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3309 2004/08/14 12:00:00 modalsit Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-14 12:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! Small correction to avoid user date picture mask. This force default
+      date picture in accordance with set date format. See line 312.
 
 2004-08-14 12:04 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tget.prg
