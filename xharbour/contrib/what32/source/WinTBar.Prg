@@ -106,6 +106,8 @@ method disable
 method enable
 method disableall
 method enableall
+method CheckButton
+method IsButtonChecked
 ENDCLASS
 
 
@@ -396,4 +398,11 @@ method enableall()
 AEVAL(::aButtons,{|btn| ::enable(btn:idCommand)})
 return(self)
 
+method CheckButton(nBtn,lFlag)
+DEFAULT lFlag TO !::IsButtonChecked(nBtn)
+SendMessage(::hWnd,TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
+RETURN(SELF)
+
+method IsButtonChecked(nBtn)
+RETURN(IIF(SendMessage(::hWnd,TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.))
 

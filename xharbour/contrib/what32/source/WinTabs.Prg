@@ -2,8 +2,8 @@
 #include "hbclass.ch"
 #Include 'debug.ch'
 #Include "tabctrl.ch"
-#Include "..\include\wintypes.ch"
-#Include "..\include\cstruct.ch"
+#Include "wintypes.ch"
+#Include "cstruct.ch"
 #Include "winGdi.ch"
 
 
@@ -202,6 +202,7 @@ METHOD Configure()
    LOCAL i
    LOCAL aPt
    LOCAL bBlock
+   view aTab
    IF LEN(::Tabs) > 0
       acRect:=TabCtrl_GetItemRect(::hTab,0)
       FOR i:=1 TO LEN(::Tabs)-1
@@ -225,7 +226,7 @@ METHOD Configure()
        //  bBlock:=IF(valtype(::Procs[i])== "B", ::Procs[i], {|| _TempPageProc()} )
          hCtrl:=CreatePage(::Dlgs[i],::hParent,::Procs, i )
          ::Tabs[i]:=hCtrl
-         MoveWindow(hCtrl,acRect[1]+4,acRect[2]+acRect[4]+4,aTab[3]-8,aTab[4]-acRect[2]-acRect[4]-2,.F.)
+         MoveWindow(hCtrl,acRect[1]+4,acRect[2]+acRect[4]+4,aTab[3]-8,aTab[4]-acRect[2]-acRect[4]-1,.F.)
          IF i<>::nCurSel
             ShowWindow(hCtrl,SW_HIDE)
          ENDIF
