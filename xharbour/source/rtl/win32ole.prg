@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.22 2003/03/28 00:51:21 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.23 2003/05/26 05:58:54 paultucker Exp $
  */
 
 /*
@@ -290,7 +290,7 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uP
 
       IF nParams >= 2
          IF HB_ISBYREF( @uParam1 )
-            OleRefFlags[6] = 'Y'
+            OleRefFlags[1] = 'Y'
          ENDIF
 
          SetOleRefFlags( OleRefFlags )
