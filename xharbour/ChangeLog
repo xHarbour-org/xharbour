@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1560 2003/10/07 00:44:36 paultucker Exp $
+ * $Id: ChangeLog,v 1.1561 2003/10/07 12:41:47 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-07 15:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/set.c
+    * Modified set_logical() to receive a 2nd param (the default value).
+    * Modified all calls (except 3) to pass the current value as the new default value.
+      /* Can someone please review the 3 cases where I didn't know what is the correct value, and correct it? */
 
 2003-10-07 08:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/strcase.c
