@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.120 2004/10/22 02:40:32 ronpinkas Exp $
+# $Id: makefile.vc,v 1.121 2004/10/22 11:55:51 paultucker Exp $
 #
 
 #
@@ -598,7 +598,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc1250.obj   \
    $(OBJ_DIR)\uc1251.obj   \
    $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc437.obj    \
    $(OBJ_DIR)\uc850.obj    \
    $(OBJ_DIR)\uc852.obj    \
    $(OBJ_DIR)\uc866.obj    \

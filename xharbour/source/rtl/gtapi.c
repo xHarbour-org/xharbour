@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.32 2004/08/16 12:51:51 mauriliolongo Exp $
+ * $Id: gtapi.c,v 1.33 2004/09/08 00:17:11 druzus Exp $
  */
 
 /*
@@ -828,17 +828,18 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetPos(%hd, %hd)", iRow, iCol));
 
    /* Validate the new cursor position */
-   if( s_Width <= 0|| (iRow >= 0 && iRow < s_Height &&
-       iCol >= 0 && iCol < s_Width) )
+   if( s_Width <= 0 || (iRow >= 0 && iRow < s_Height &&
+                        iCol >= 0 && iCol < s_Width) )
    {
       hb_gt_SetPos( iRow, iCol, HB_GT_SET_POS_BEFORE );
 
       /* If cursor was out bounds, now enable it */
       if( s_Width > 0 && ( s_iRow < 0 || s_iRow >= s_Height ||
-          					   s_iCol < 0 || s_iCol >= s_Width) )
+                           s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
-   else {
+   else
+   {
       hb_gt_SetCursorStyle( SC_NONE ); /* Disable cursor if out of bounds */
    }
 
@@ -857,13 +858,13 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
 
    /* Validate the new cursor position */
    if( s_Width <= 0|| (iRow >= 0 && iRow < s_Height &&
-       iCol >= 0 && iCol < s_Width) )
+                       iCol >= 0 && iCol < s_Width) )
    {
       hb_gt_SetPos( iRow, iCol, iMethod );
 
       /* If cursor was out bounds, now enable it */
       if( s_Width > 0 && ( s_iRow < 0 || s_iRow >= s_Height ||
-          					   s_iCol < 0 || s_iCol >= s_Width) )
+                           s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
    else {
@@ -972,7 +973,8 @@ USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
       s_Width = uiCols;
       return 0;
    }
-   else return 1;
+
+   return 1;
 }
 
 /* NOTE: This is a compatibility function.
@@ -994,7 +996,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
 
    /* Display the text if the cursor is on screen */
    if( s_Width <= 0 || ( s_iCol >= 0 && s_iCol < s_Width &&
-       s_iRow >= 0 && s_iRow < s_Height ) )
+                         s_iRow >= 0 && s_iRow < s_Height ) )
    {
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( s_iRow, s_iCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
@@ -1155,8 +1157,8 @@ USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHO
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScroll(%hu, %hu, %hu, %hu, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, iRows, iCols));
 
    /* Complete scroll? */
-   if ( uiTop == 0 && uiLeft == 0 && uiBottom >= s_Height -1 && uiRight >= s_Width -1 &&
-         iRows == 0 )
+   if ( uiTop == 0 && uiLeft == 0 && uiBottom >= s_Height -1 &&
+        uiRight >= s_Width -1 && iRows == 0 )
    {
       /* Destroy objects */
       hb_gtClearGobjects();
@@ -1211,6 +1213,7 @@ char HB_EXPORT * hb_gtVersion( int iType )
 
    return hb_gt_Version( iType );
 }
+
 /* prepare the terminal for system call */
 USHORT HB_EXPORT hb_gtSuspend( void )
 {

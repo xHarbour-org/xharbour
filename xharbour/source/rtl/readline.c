@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.11 2004/06/29 22:14:13 ronpinkas Exp $
+ * $Id: readline.c,v 1.12 2004/08/25 02:40:25 mlombardo Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int
             else
             {
                pBuff[ lOffset + lRead ] = '\0';
-               *puiBuffLen = lOffset + lRead;
+               *puiBuffLen = ( USHORT ) lOffset + lRead;
             }
 
             *bEOF = 1;

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.18 2004/10/12 12:28:50 lculik Exp $
+# $Id: makefile.wc,v 1.19 2004/10/22 11:55:51 paultucker Exp $
 #
 
 #
@@ -873,7 +873,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc1250.obj   \
    $(OBJ_DIR)\uc1251.obj   \
    $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc437.obj    \
    $(OBJ_DIR)\uc850.obj    \
    $(OBJ_DIR)\uc852.obj    \
    $(OBJ_DIR)\uc866.obj    \
@@ -2728,9 +2727,6 @@ $(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\uc437.obj : $(CODEPAGE_DIR)\uc437.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c

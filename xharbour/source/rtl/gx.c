@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.15 2004/08/02 01:46:13 maurifull Exp $
+ * $Id: gx.c,v 1.16 2004/08/06 02:25:37 maurifull Exp $
  */
 
 /*
@@ -246,32 +246,33 @@ HB_FUNC( GTINFO )
    {
       /* Parameter void * still unused, for future developement. */
       char *param = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
+
       hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), TRUE,
-            hb_itemGetNI( pSet ), param ) ) );
+                hb_itemGetNI( pSet ), param ) ) );
    }
 
 }
 
 HB_FUNC( GFXPRIMITIVE )
 {
-PHB_ITEM pType   = hb_param( 1, HB_IT_NUMERIC );
-PHB_ITEM pTop    = hb_param( 2, HB_IT_NUMERIC );
-PHB_ITEM pLeft   = hb_param( 3, HB_IT_NUMERIC );
-PHB_ITEM pBottom = hb_param( 4, HB_IT_NUMERIC );
-PHB_ITEM pRight  = hb_param( 5, HB_IT_NUMERIC );
-PHB_ITEM pColor  = hb_param( 6, HB_IT_NUMERIC );
+   PHB_ITEM pType   = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pTop    = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pLeft   = hb_param( 3, HB_IT_NUMERIC );
+   PHB_ITEM pBottom = hb_param( 4, HB_IT_NUMERIC );
+   PHB_ITEM pRight  = hb_param( 5, HB_IT_NUMERIC );
+   PHB_ITEM pColor  = hb_param( 6, HB_IT_NUMERIC );
 
-  hb_retni( HB_GT_FUNC( gt_gfxPrimitive( hb_itemGetNI(pType), hb_itemGetNI(pTop), hb_itemGetNI(pLeft), hb_itemGetNI(pBottom), hb_itemGetNI(pRight), hb_itemGetNI(pColor) ) ) );
+   hb_retni( HB_GT_FUNC( gt_gfxPrimitive( hb_itemGetNI(pType), hb_itemGetNI(pTop), hb_itemGetNI(pLeft), hb_itemGetNI(pBottom), hb_itemGetNI(pRight), hb_itemGetNI(pColor) ) ) );
 }
 
 HB_FUNC( GFXTEXT )
 {
-PHB_ITEM pTop    = hb_param( 1, HB_IT_NUMERIC );
-PHB_ITEM pLeft   = hb_param( 2, HB_IT_NUMERIC );
-char *cText      = hb_parc(3);
-PHB_ITEM pColor  = hb_param( 4, HB_IT_NUMERIC );
-PHB_ITEM pSize   = hb_param( 5, HB_IT_NUMERIC );
-PHB_ITEM pWidth  = hb_param( 6, HB_IT_NUMERIC );
+   PHB_ITEM pTop    = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pLeft   = hb_param( 2, HB_IT_NUMERIC );
+   char *cText      = hb_parc(3);
+   PHB_ITEM pColor  = hb_param( 4, HB_IT_NUMERIC );
+   PHB_ITEM pSize   = hb_param( 5, HB_IT_NUMERIC );
+   PHB_ITEM pWidth  = hb_param( 6, HB_IT_NUMERIC );
 
-  HB_GT_FUNC( gt_gfxText( hb_itemGetNI(pTop), hb_itemGetNI(pLeft), cText, hb_itemGetNI(pColor), hb_itemGetNI(pSize), hb_itemGetNI(pWidth) ) );
+   HB_GT_FUNC( gt_gfxText( hb_itemGetNI(pTop), hb_itemGetNI(pLeft), cText, hb_itemGetNI(pColor), hb_itemGetNI(pSize), hb_itemGetNI(pWidth) ) );
 }
