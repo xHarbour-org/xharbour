@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.46 2002/10/06 02:50:59 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.47 2002/10/06 03:03:04 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -455,7 +455,11 @@ METHOD XFMReflect() CLASS TFormEdit
       FOR EACH cLine IN XFMControl[ 4 ]
          cText += ( cLine + CRLF )
       NEXT
+
+      cText += CRLF
    NEXT
+
+   cText += CRLF
 
    FOR EACH cLine IN ::aXFM[ XFM_EndClass ]
       cText += ( cLine + CRLF )
