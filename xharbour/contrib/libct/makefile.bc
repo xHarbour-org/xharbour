@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.7 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.bc,v 1.8 2003/11/04 00:25:33 lculik Exp $
 #
 
 #
@@ -485,10 +485,10 @@ $(OBJ_DIR)\blank.obj : $(OBJ_DIR)\blank.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\strcopy.c : $(TOOLS_DIR)\strcopy.prg
+$(OBJ_DIR)\strfile.c : $(TOOLS_DIR)\strfile.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\strcopy.obj : $(OBJ_DIR)\strcopy.c
+$(OBJ_DIR)\strfile.obj : $(OBJ_DIR)\strfile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
