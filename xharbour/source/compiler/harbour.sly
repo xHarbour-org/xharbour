@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.75 2004/11/21 21:43:45 druzus Exp $
+ * $Id: harbour.sly,v 1.76 2005/02/27 16:51:01 ronpinkas Exp $
  */
 
 /*
@@ -3022,7 +3022,7 @@ static void hb_compLoopExit( void )
          pLast = pLast->pNext;
       }
 
-      if( pLast->wSeqCounter != hb_comp_wSeqCounter )
+      if( pLast->wSeqCounter != hb_comp_wSeqCounter && pLast->wSeqCounter != (USHORT) -1 )
       {
          /* Attempt to LOOP from BEGIN/END sequence
          * Current SEQUENCE counter is different then at the beginning of loop
