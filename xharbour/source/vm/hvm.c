@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.380 2004/04/14 15:06:07 lf_sfnet Exp $
+ * $Id: hvm.c,v 1.381 2004/04/21 01:29:29 andijahja Exp $
  */
 
 /*
@@ -769,25 +769,8 @@ int HB_EXPORT hb_vmQuit( void )
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
       // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
-      //hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
       //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
-      USHORT uCount;
-
-      for ( uCount = 0; uCount < s_aGlobals.item.asArray.value->ulLen; uCount ++ )
-      {
-         PHB_ITEM pGlobal = hb_arrayGetItemPtr( &s_aGlobals, uCount + 1 );
-
-         if( HB_IS_BYREF( pGlobal ) )
-         {
-            pGlobal = hb_itemUnRef( pGlobal );
-         }
-
-         if( HB_IS_COMPLEX( pGlobal ) )
-         {
-            hb_itemClear( pGlobal );
-         }
-      }
-
       hb_arrayRelease( &s_aGlobals );
       s_aGlobals.type = HB_IT_NIL;
       //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2812 2004/04/21 01:28:53 andijahja Exp $
+ * $Id: ChangeLog,v 1.2813 2004/04/21 01:36:14 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-20 20:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    - Removed recent fix in hb_vmQuit()
+    * Uncommented line (mistakenly commented) in hb_vmQuit() whch caused memory leaks related to Globals.
+
 2004-04-20 19:45 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * utils/hbmake/hbmake.prg
     ! is mt was selected is not now adding cw32mt.lib on script
@@ -32,7 +38,7 @@
     * Numerous small fixes especially for memoedit() with WordWrap ON. Now it follows
       Clipper behavior more alike.
 
-    * Introduced mouse support. Currently Left Button Up, Mouse Scroll Forward and 
+    * Introduced mouse support. Currently Left Button Up, Mouse Scroll Forward and
       Mouse Scroll Backward is supported. Clicked position of mouse is made current.
       Forward and Backward movement of mouse scroll causes memoedit() to go up or down
       by one row.
@@ -60,7 +66,7 @@
 
 2004-04-20 10:20 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwin/gtwin.c
-    fixed the read of F1 
+    fixed the read of F1
   - include/hbinkey.ch deleted
   * include/Makefile hbinkey.ch deleted please check others makefiles
 
