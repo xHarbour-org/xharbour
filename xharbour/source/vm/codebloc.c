@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.45 2004/04/28 22:24:52 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.46 2004/04/30 16:11:04 ronpinkas Exp $
  */
 
 /*
@@ -114,7 +114,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
        */
       USHORT ui = 1;
       PHB_ITEM pLocal;
-      HB_HANDLE hMemvar;
 
       /* Create a table that will store the values of local variables
        * accessed in a codeblock
@@ -134,39 +133,12 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
          pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable ) );
          pLocalPosTable++;
 
-         if( ! HB_IS_MEMVAR( pLocal ) )
-         {
-            /* Change the value only if this variable is not referenced
-             * by another codeblock yet.
-             * In this case we have to copy the current value to a global memory
-             * pool so it can be shared by codeblocks
-             */
-
-            hMemvar = hb_memvarValueNew( pLocal, FALSE );
-
-            pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
-            pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
-            pLocal->item.asMemvar.offset    = 0;
-            pLocal->item.asMemvar.value     = hMemvar;
-
-            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
-            hb_memvarValueIncRef( pLocal->item.asMemvar.value );
-         }
-         else
-         {
-            /* This variable is already detached (by another codeblock)
-             * - copy the reference to a value
-             */
-            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
-            //TraceLog( NULL, "Already detached: %i\n", pLocal->type );
-
-            /* Increment the reference counter so this value will not be
-             * released if other codeblock will be deleted
-             */
-            hb_memvarValueIncRef( pLocal->item.asMemvar.value );
-            //TraceLog( NULL, "Detach: %p to %p\n", pLocal, pCBlock->pLocals + ui );
-         }
-
+         pLocal = hb_memvarDetachLocal( pLocal );
+         memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+         /* Increment the reference counter so this value will not be
+          * released if other codeblock will be deleted
+          */
+         hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          ++ui;
       }
    }

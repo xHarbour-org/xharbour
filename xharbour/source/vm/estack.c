@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.67 2004/11/21 21:44:26 druzus Exp $
+ * $Id: estack.c,v 1.68 2004/12/02 03:26:20 druzus Exp $
  */
 
 /*
@@ -432,11 +432,14 @@ HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void )
    return * ( HB_VM_STACK.pBase + 1 );
 }
 
-#undef hb_stackReturn
-PHB_ITEM HB_EXPORT hb_stackReturn( void )
+#undef hb_stackReturnItem
+HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void )
 {
-   return ( &(HB_VM_STACK.Return ) );
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackReturnItem()"));
+
+   return &( HB_VM_STACK.Return );
 }
+
 
 /* NOTE: DEBUG function */
 void hb_stackDispLocal( void )

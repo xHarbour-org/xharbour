@@ -1,5 +1,5 @@
 /*
- * $Id: cdpslwin.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpslwin.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -86,8 +86,9 @@
 
 static HB_CODEPAGE s_codepage = { "SLWIN",
     CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
-    "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWZŽXY","abcèdðefghijklmnopqrsštuvwzžxy",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWZŽXY",
+    "abcèdðefghijklmnopqrsštuvwzžxy",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( SLWIN );
 

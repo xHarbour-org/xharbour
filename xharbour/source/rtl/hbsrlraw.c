@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.24 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: hbsrlraw.c,v 1.25 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -151,7 +151,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
                   pItem->item.asMemvar.value;
-      pItem = &pValue->item;
+      pItem = pValue->pVarItem;
    }
 
    switch( pItem->type )

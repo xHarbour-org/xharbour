@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.97 2004/11/02 23:07:48 paultucker Exp $
+* $Id: thread.h,v 1.98 2004/12/01 00:50:58 peterrees Exp $
 */
 
 /*
@@ -491,7 +491,6 @@ typedef struct tag_HB_STACK
    ULONG globalTableSize;
    ULONG globalFirstFree;
    ULONG globalLastFree;
-   ULONG globalFreeCnt;
    HB_VALUE_PTR globalTable;
 
    /* Pointers to hMemvar for thread aware dynsyms */

@@ -1,5 +1,5 @@
 /*
- * $Id: cpuawin.c,v 1.1 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: cpuawin.c,v 1.1 2004/12/19 11:34:10 ptsarenko Exp $
  */
 
 /*
@@ -60,8 +60,9 @@
 
 static HB_CODEPAGE s_codepage = { "UA1251",
     CPID_1251,UNITB_1251,36,
-    "ÀÁÂÃÄÅ¨×ÆÇÈ²¯ÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞ‗","אבגדהו¸÷זחט³¿יךכלםמןנסעףפץצקרשתûü‎‏ÿ",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ÀÁÂÃÄÅ¨×ÆÇÈ²¯ÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞ‗",
+    "אבגדהו¸÷זחט³¿יךכלםמןנסעףפץצקרשתûü‎‏ÿ",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( UA1251 );
 

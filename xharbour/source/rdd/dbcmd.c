@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.137 2004/12/16 22:36:13 druzus Exp $
+ * $Id: dbcmd.c,v 1.138 2004/12/28 06:39:20 druzus Exp $
  */
 
 /*
@@ -1417,7 +1417,7 @@ HB_FUNC( DBCREATE )
    szFileName[0] = szFileName[_POSIX_PATH_MAX] = '\0';
    if ( ISCHAR( 1 ) )
    {
-      strncpy( szFileName, hb_parcx( 1 ), _POSIX_PATH_MAX );
+      strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
    }
    pStruct = hb_param( 2 , HB_IT_ARRAY );
 
@@ -2161,7 +2161,7 @@ HB_FUNC( DBSELECTAREA )
 
    if( ISCHAR( 1 ) )
    {
-      char *szAlias = hb_parcx( 1 );
+      char *szAlias = hb_parc( 1 );
       USHORT ulLen = strlen( szAlias );
 
       if( ulLen >= 1 && szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
@@ -2366,7 +2366,7 @@ HB_FUNC( DBUSEAREA )
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   BYTE * codePageId = (BYTE*) hb_parcx(7);
+   BYTE * codePageId = (BYTE*) hb_parc(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    AREAP pArea;
@@ -2390,7 +2390,7 @@ HB_FUNC( DBUSEAREA )
       szDriver = s_szDefDriver;
    }
 
-   if( ! ISCHAR(3) || ( strlen( hb_parcx( 3 ) ) == 0 ) )
+   if( hb_parclen( 3 ) == 0 )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
@@ -2407,7 +2407,7 @@ HB_FUNC( DBUSEAREA )
 
    if( ISCHAR(4) )
    {
-      strncat( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
    if( strlen( szAlias ) == 0 )
@@ -2555,7 +2555,7 @@ HB_FUNC( FIELDDEC )
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_DEC, &Item ) == SUCCESS)
          {
-            hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
+            hb_itemForwardValue( hb_stackReturnItem(), &Item );
             return;
          }
       }
@@ -2581,7 +2581,7 @@ HB_FUNC( FIELDGET )
          SELF_GETVALUE( pArea, uiField, &Item );
    }
 
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
+   hb_itemForwardValue( hb_stackReturnItem(), &Item );
 }
 
 HB_FUNC( FIELDLEN )
@@ -2598,7 +2598,7 @@ HB_FUNC( FIELDLEN )
          Item.type = HB_IT_NIL;
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_LEN, &Item ) == SUCCESS )
          {
-            hb_itemForwardValue( &(HB_VM_STACK.Return), &Item );
+            hb_itemForwardValue( hb_stackReturnItem(), &Item );
             return;
          }
       }
@@ -2693,7 +2693,7 @@ HB_FUNC( FIELDTYPE )
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_TYPE, &Item ) == SUCCESS )
          {
-            hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
+            hb_itemForwardValue( hb_stackReturnItem(), &Item );
             return;
          }
       }
@@ -2744,7 +2744,7 @@ HB_FUNC( HEADER )
       HB_ITEM RecSize;
       RecSize.type = HB_IT_NIL;
       SELF_INFO( pArea, DBI_GETHEADERSIZE, &RecSize );
-      hb_itemForwardValue( &(HB_VM_STACK).Return, &RecSize );
+      hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
    }
 }
 
@@ -2805,9 +2805,9 @@ HB_FUNC( LUPDATE )
    AREAP pArea = HB_CURRENT_WA;
 
    if( !pArea )
-      hb_itemPutDS( &(HB_VM_STACK.Return), "" );
+      hb_itemPutDS( hb_stackReturnItem(), "" );
    else
-      SELF_INFO( pArea, DBI_LASTUPDATE, &(HB_VM_STACK.Return) );
+      SELF_INFO( pArea, DBI_LASTUPDATE, hb_stackReturnItem() );
 }
 
 HB_FUNC( NETERR )
@@ -2890,7 +2890,6 @@ HB_FUNC( ORDCONDSET )
 {
    HB_THREAD_STUB
    LPDBORDERCONDINFO lpdbOrdCondInfo;
-   char * szFor;
    ULONG ulLen;
    PHB_ITEM pItem;
    AREAP pArea = HB_CURRENT_WA;
@@ -2898,12 +2897,11 @@ HB_FUNC( ORDCONDSET )
    if( pArea )
    {
       lpdbOrdCondInfo = ( LPDBORDERCONDINFO ) hb_xgrab( sizeof( DBORDERCONDINFO ) );
-      szFor = hb_parcx( 1 );
-      /* ulLen = strlen( szFor ); */
-      if( ISCHAR(1) && ( ( ulLen = strlen( szFor ) ) > 0 ) )
+      ulLen = hb_parclen( 1 );
+      if( ulLen > 0 )
       {
          lpdbOrdCondInfo->abFor = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         strcpy( ( char * ) lpdbOrdCondInfo->abFor, szFor );
+         strcpy( ( char * ) lpdbOrdCondInfo->abFor, hb_parc( 1 ) );
       }
       else
       {
@@ -2913,7 +2911,7 @@ HB_FUNC( ORDCONDSET )
       if( ISCHAR( 17 ) && ( ulLen = hb_parclen( 17 ) ) > 0 )
       {
          lpdbOrdCondInfo->abWhile = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parcx( 17 ) );
+         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
       }
       else
       {
@@ -3498,13 +3496,13 @@ HB_FUNC( RDDLIST )
    Name.type = HB_IT_NIL;
 
    hb_rddCheck();
-   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+   hb_arrayNew( hb_stackReturnItem(), 0 );
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
    for ( uiCount = 0; uiCount < s_uiRddMax; uiCount++ )
    {
       if( ( uiType == 0 ) || ( s_RddList[ uiCount ]->uiType == uiType ) )
       {
-         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutC( &Name, s_RddList[ uiCount ]->szName ) );
+         hb_arrayAddForward( hb_stackReturnItem(), hb_itemPutC( &Name, s_RddList[ uiCount ]->szName ) );
       }
    }
 }
@@ -3542,7 +3540,7 @@ HB_FUNC( RDDREGISTER )
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
 
-      hb_strncpyUpper( szDriver, hb_parcx( 1 ), uiLen );
+      hb_strncpyUpper( szDriver, hb_parc( 1 ), uiLen );
       /*
        * hb_rddRegister returns:
        *
@@ -3586,7 +3584,7 @@ HB_FUNC( RECSIZE )
    {
       RecSize.type = HB_IT_NIL;
       SELF_INFO( pArea, DBI_GETRECSIZE, &RecSize );
-      hb_itemForwardValue( &(HB_VM_STACK).Return, &RecSize );
+      hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
    }
    else
       hb_retni( 0 );
@@ -3614,27 +3612,27 @@ HB_FUNC( RLOCK )
 HB_FUNC( SELECT )
 {
    HB_THREAD_STUB
-   char * szAlias;
-   ULONG ulLen;
-
-   szAlias = hb_parcx( 1 );
-   ulLen = strlen( szAlias );
-
    if( hb_parinfo( 0 ) == 0 )
    {
       hb_retni( hb_rddGetCurrentWorkAreaNumber() );
    }
-   else if( ulLen == 0 || ! ISCHAR( 1 ) )
-   {
-      hb_retni( 0 );
-   }
-   else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
-   {
-      hb_retni( toupper( szAlias[ 0 ] ) - 'A' + 1 );
-   }
    else
    {
-      hb_retni( hb_rddSelect( szAlias ) );
+      char * szAlias = hb_parc( 1 );
+      ULONG ulLen = szAlias ? strlen( szAlias ) : 0;
+
+      if( ulLen == 0 )
+      {
+         hb_retni( 0 );
+      }
+      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
+      {
+         hb_retni( toupper( szAlias[ 0 ] ) - 'A' + 1 );
+      }
+      else
+      {
+         hb_retni( hb_rddSelect( szAlias ) );
+      }
    }
 }
 
@@ -3665,7 +3663,7 @@ HB_FUNC( __RDDSETDEFAULT )
       {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
-      hb_strncpyUpper( s_szDefDriver, hb_parcx( 1 ), uiLen );
+      hb_strncpyUpper( s_szDefDriver, hb_parc( 1 ), uiLen );
    }
 }
 
@@ -3687,7 +3685,7 @@ HB_FUNC( RDDSETDEFAULT )
       {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
-      hb_strncpyUpper( szNewDriver, hb_parcx( 1 ), uiLen );
+      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
       if( ! hb_rddFindNode( szNewDriver, NULL ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "RDDSETDEFAULT" );
@@ -3715,7 +3713,7 @@ HB_FUNC( DBSETDRIVER )
       {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
-      hb_strncpyUpper( szNewDriver, hb_parcx( 1 ), uiLen );
+      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
       if( !hb_rddFindNode( szNewDriver, NULL ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBSETDRIVER" );
@@ -3754,7 +3752,7 @@ HB_FUNC( ORDSCOPE )
          if ( ISNIL( 2 ) )
             hb_itemPutL( &ScopeValue, TRUE );
       }
-      hb_itemForwardValue( &(HB_VM_STACK).Return, &ScopeValue );
+      hb_itemForwardValue( hb_stackReturnItem(), &ScopeValue );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSCOPE" );
@@ -4027,7 +4025,7 @@ HB_FUNC( DBINFO )
             hb_itemCopy( &Temp, pInfo );
          }
          SELF_INFO( pArea, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
+         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
@@ -4103,7 +4101,7 @@ HB_FUNC( DBFIELDINFO )
          }
 
          SELF_FIELDINFO( pArea, uiIndex, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
+         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
@@ -4132,7 +4130,7 @@ HB_FUNC( DBRECORDINFO )
             hb_itemCopy( &Temp, pInfo );
          }
          SELF_RECINFO( pArea, pRecNo, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
+         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );
@@ -4213,7 +4211,7 @@ HB_FUNC( DBDROP )
   char      *szDriver;
 
   if ( ISCHAR( 2 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parcx( 2 );
+    szDriver = hb_parc( 2 );
   else
     szDriver = s_szDefDriver;
 
@@ -4243,7 +4241,7 @@ HB_FUNC( DBEXISTS )
   char * szDriver;
 
   if ( ISCHAR( 3 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parcx( 3 );
+    szDriver = hb_parc( 3 );
   else
     szDriver = s_szDefDriver;
 
@@ -4643,7 +4641,7 @@ HB_FUNC( __DBAPP )
 {
   if( ISCHAR( 1 ) )
   {
-    rddMoveRecords(  hb_parcx( 1 ),                /* File From */
+    rddMoveRecords(  hb_parcx( 1 ),               /* File From */
                      NULL,                        /* TO current area */
                      hb_param( 2, HB_IT_ARRAY ),  /* Fields */
                      hb_param( 3, HB_IT_BLOCK ),  /* For */
@@ -4651,7 +4649,7 @@ HB_FUNC( __DBAPP )
                      hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
                      hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
                      hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     ISCHAR( 8 ) ? hb_parcx( 8 ) : NULL ); /* RDD */
+                     hb_parc( 8 ) );              /* RDD */
   }
 }
 
@@ -4660,14 +4658,14 @@ HB_FUNC( __DBCOPY )
   if( ISCHAR( 1 ) )
   {
     rddMoveRecords(  NULL,                        /* fro CURRENT Area */
-                     hb_parcx( 1 ),                /* To File */
+                     hb_parcx( 1 ),               /* To File */
                      hb_param( 2, HB_IT_ARRAY ),  /* Fields */
                      hb_param( 3, HB_IT_BLOCK ),  /* For */
                      hb_param( 4, HB_IT_BLOCK ),  /* While */
                      hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
                      hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
                      hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     ISCHAR( 8 ) ? hb_parcx( 8 ) : NULL ); /* RDD */
+                     hb_parc( 8 ) );              /* RDD */
   }
 }
 
@@ -4679,7 +4677,7 @@ HB_FUNC( DBUSEAREAD )
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   BYTE * codePageId = (BYTE*) hb_parcx(7);
+   BYTE * codePageId = (BYTE*) hb_parc(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    AREAP pArea;
@@ -4704,7 +4702,7 @@ HB_FUNC( DBUSEAREAD )
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
 
-      hb_strncpyUpper( szDriverBuffer, hb_parcx( 2 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), uiLen );
       szDriver = szDriverBuffer;
    }
    else
@@ -5070,7 +5068,7 @@ static BOOL hb___Eval( PHB_ITEM pItem )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pItem );
       hb_vmDo( 0 );
-      return (&HB_VM_STACK.Return)->item.asLogical.value ;
+      return hb_stackReturnItem()->item.asLogical.value ;
    }
    return TRUE;
 }

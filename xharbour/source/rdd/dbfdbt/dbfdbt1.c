@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.13 2004/11/21 21:43:53 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.6 2004/12/28 09:29:28 druzus Exp $
  */
 
 /*
@@ -66,9 +66,6 @@
 #endif
 
 #define __PRG_SOURCE__ __FILE__
-#ifndef __XHARBOUR__
-#  define HB_VM_STACK hb_stack
-#endif
 #ifdef HB_PCODE_VER
 #  undef HB_PRG_PCODE_VER
 #  define HB_PRG_PCODE_VER HB_PCODE_VER

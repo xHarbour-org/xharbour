@@ -1,5 +1,5 @@
 /*
- * $Id: CPHR437.C,v 1.1 2004/12/27 09:02:55 patrickmast Exp $
+ * $Id: cphr437.c,v 1.1 2004/12/27 10:59:10 lf_sfnet Exp $
  */
 
 /*
@@ -85,8 +85,9 @@
 
 static HB_CODEPAGE s_codepage = { "HR437",
     CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
-    "ABC]^D\EFGHIJKLMNOPQRS[TUVWZ@XY","abc}~d|efghijklmnopqrs{tuvwz`xy",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABC]^D\EFGHIJKLMNOPQRS[TUVWZ@XY",
+    "abc}~d|efghijklmnopqrs{tuvwz`xy",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( HR437 );
 

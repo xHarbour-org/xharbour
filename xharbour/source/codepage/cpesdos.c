@@ -1,5 +1,5 @@
 /*
- * $Id: cdpesdos.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpesdos.c,v 1.1 2004/11/21 21:43:41 druzus Exp $
  */
 
 /*
@@ -86,8 +86,9 @@
 
 static HB_CODEPAGE s_codepage = { "ES",
     CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
-    "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
+    "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ",
+    "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( ES );
 

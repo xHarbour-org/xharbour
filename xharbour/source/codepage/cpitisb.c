@@ -1,5 +1,5 @@
 /*
- * $Id: cpitisb.c,v 1.2 2004/11/22 21:45:56 druzus Exp $
+ * $Id: cpitisb.c,v 1.3 2004/12/21 13:51:49 mauriliolongo Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static HB_CODEPAGE s_codepage = { "ITISB",
     CPID_8859_1B, UNITB_8859_1B, NUMBER_OF_CHARACTERS,
     "AàáBCDEèéFGHIìíJKLMNOòóPQRSTUùúVWXYZ",
     "aàábcdeèéfghiìíjklmnoòópqrstuùúvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( ITISB );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpgewin.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpgewin.c,v 1.1 2004/11/21 21:43:41 druzus Exp $
  */
 
 /*
@@ -86,8 +86,9 @@
 
 static HB_CODEPAGE s_codepage = { "DEWIN",
     CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
-    "AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ","aäbcdefghijklmnoöpqrsßtuüvwxyz",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ",
+    "aäbcdefghijklmnoöpqrsßtuüvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( DEWIN );
 

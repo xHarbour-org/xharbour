@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cpit850.c,v 1.1 2004/12/28 06:39:19 druzus Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static HB_CODEPAGE s_codepage = { "IT850",
     CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
     "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
     "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( IT850 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.106 2004/12/15 13:39:35 druzus Exp $
+ * $Id: itemapi.c,v 1.107 2004/12/28 07:16:15 druzus Exp $
  */
 
 /*
@@ -1163,7 +1163,7 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
          HB_VALUE_PTR pValue;
 
          pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset + pItem->item.asMemvar.value;
-         pItem = &pValue->item;
+         pItem = pValue->pVarItem;
       }
       else
       {

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_browse.c,v 1.2 2003/11/26 22:58:45 jonnymind Exp $
+   $Id: xwt_gtk_browse.c,v 1.3 2004/08/08 11:24:05 lf_sfnet Exp $
 
    GTK interface - browse widget
 */
@@ -325,7 +325,7 @@ tbcol_list_get_value (GtkTreeModel *tree_model,
 
       hb_vmDo( 3 );
    }
-   pItem = hb_stackReturn();
+   pItem = hb_stackReturnItem();
 
    switch( pItem->type )
    {

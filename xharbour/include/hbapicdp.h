@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.15 2004/12/19 11:34:06 ptsarenko Exp $
+ * $Id: hbapicdp.h,v 1.16 2004/12/28 06:39:18 druzus Exp $
  */
 
 /*
@@ -102,6 +102,7 @@ typedef struct _HB_CODEPAGE
    BOOL           lAccEqual;
    BOOL           lAccInterleave;
    BOOL           lSort;
+   BOOL           lChClone;
    BYTE *         s_chars;
    BYTE *         s_upper;
    BYTE *         s_lower;

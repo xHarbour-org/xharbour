@@ -1,5 +1,5 @@
 /*
- * $Id: cdphr852.c,v 1.2 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cphr852.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -87,8 +87,9 @@
 
 static HB_CODEPAGE s_codepage = { "HR852",
     CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
-    "ABCè¨D—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcÜüd–efghijklmnopqrsÁtuvwzßxy",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABCè¨D—EFGHIJKLMNOPQRSÊTUVWZ¶XY",
+    "abcÜüd–efghijklmnopqrsÁtuvwzßxy",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( HR852 );
 

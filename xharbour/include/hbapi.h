@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.150 2004/12/11 00:43:02 druzus Exp $
+ * $Id: hbapi.h,v 1.151 2004/12/28 06:39:18 druzus Exp $
  */
 
 /*
@@ -166,9 +166,9 @@ HB_EXTERN_BEGIN
 
 typedef struct _HB_VALUE
 {
-   HB_ITEM   item;
-   ULONG     counter;
-   HB_HANDLE hPrevMemvar;
+   PHB_ITEM    pVarItem;
+   HB_COUNTER  counter;
+   HB_HANDLE   hPrevMemvar;
 } HB_VALUE, * PHB_VALUE, * HB_VALUE_PTR;
 
 typedef struct _HB_NESTED_CLONED
@@ -319,9 +319,6 @@ extern LONGLONG HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric pa
     #define hb_retnll( llNumber )                hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )     hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
 
-   /* JC1: this helps to insolate thread independant libraries */
-   #define hb_stackReturn()                       (&(HB_VM_STACK.Return))
-
 #else
    /* JC1: including thread anyways, because it defines some void macros when not in MT */
    #include "thread.h"
@@ -360,8 +357,6 @@ extern LONGLONG HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric pa
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
 #endif
 
-   /* JC1: this helps to insolate thread independant libraries */
-   extern PHB_ITEM HB_EXPORT hb_stackReturn( void );
 #endif
 
 extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
@@ -587,6 +582,7 @@ extern char   * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen );
 extern void     hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue );
 extern int      hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
 HB_EXPORT       PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
+extern          PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a local variable from the eval stack */
 
 /* console I/O subsystem */
 extern void     hb_conInit( void ); /* initialize the console API system */

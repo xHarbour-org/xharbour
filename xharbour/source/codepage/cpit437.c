@@ -1,5 +1,5 @@
 /*
- * $Id: cpdos437.c,v 1.2 2004/12/21 14:44:31 mauriliolongo Exp $
+ * $Id: cpit437.c,v 1.1 2004/12/28 06:39:19 druzus Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ static HB_CODEPAGE s_codepage = { "IT437",
     CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
     "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
     "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( IT437 );
 

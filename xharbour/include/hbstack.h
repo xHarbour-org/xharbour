@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.24 2004/12/02 03:26:19 druzus Exp $
+ * $Id: hbstack.h,v 1.25 2004/12/11 00:43:03 druzus Exp $
  */
 
 /*
@@ -123,6 +123,7 @@ typedef struct
    #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
+   #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
 
    #define hb_stackDec( )              do { \
                                           HB_THREAD_STUB \
@@ -156,6 +157,7 @@ typedef struct
    extern HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void );
    extern HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void );
    extern HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos );
+   extern HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void );
 
    extern void        HB_EXPORT hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern void        HB_EXPORT hb_stackPop( void );        /* pops an item from the stack */

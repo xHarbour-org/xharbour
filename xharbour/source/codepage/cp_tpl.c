@@ -1,5 +1,5 @@
 /*
- * $Id: cdp_tpl.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cp_tpl.c,v 1.1 2004/11/21 21:43:41 druzus Exp $
  */
 
 /*
@@ -85,8 +85,9 @@
 
 static HB_CODEPAGE s_codepage = { "EN",
     CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "abcdefghijklmnopqrstuvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( EN );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdprukoi.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cprukoi.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -60,8 +60,9 @@
 
 static HB_CODEPAGE s_codepage = { "RUKOI8",
     CPID_KOI_8,UNITB_KOI_8,32,
-    "бвчздецъйклмнопртуфхжигюыэящшьас","БВЧЗДЕЦЪЙКЛМНОПРТУФХЖИГЮЫЭЯЩШЬАС",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    "бвчздецъйклмнопртуфхжигюыэящшьас",
+    "БВЧЗДЕЦЪЙКЛМНОПРТУФХЖИГЮЫЭЯЩШЬАС",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( RUKOI8 );
 

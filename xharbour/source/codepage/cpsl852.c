@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsl852.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpsl852.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -86,8 +86,9 @@
 
 static HB_CODEPAGE s_codepage = { "SL852",
     CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
-    "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcüd–efghijklmnopqrsÁtuvwzßxy",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWZ¶XY",
+    "abcüd–efghijklmnopqrsÁtuvwzßxy",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( SL852 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cpuakoi.c,v 1.1 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: cpuakoi.c,v 1.1 2004/12/19 11:34:10 ptsarenko Exp $
  */
 
 /*
@@ -60,8 +60,9 @@
 
 static HB_CODEPAGE s_codepage = { "UAKOI8",
     CPID_KOI_8,UNITB_KOI_8,36,
-    "бвчздеіґцъй¶·клмнопртуфхжигюыэящшьас","БВЧЗДЕЈ¤ЦЪЙ¦§КЛМНОПРТУФХЖИГЮЫЭЯЩШЬАС",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    "бвчздеіґцъй¶·клмнопртуфхжигюыэящшьас",
+    "БВЧЗДЕЈ¤ЦЪЙ¦§КЛМНОПРТУФХЖИГЮЫЭЯЩШЬАС",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( UAKOI8 );
 

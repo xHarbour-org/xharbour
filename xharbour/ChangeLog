@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3706 2004/12/30 07:23:02 kaddath Exp $
+ * $Id: ChangeLog,v 1.3707 2004/12/30 08:25:12 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,73 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-31 12:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/codepage/cp_tpl.c
+  * xharbour/source/codepage/cpeldos.c
+  * xharbour/source/codepage/cpelwin.c
+  * xharbour/source/codepage/cpesdos.c
+  * xharbour/source/codepage/cpesmwin.c
+  * xharbour/source/codepage/cpeswin.c
+  * xharbour/source/codepage/cpgedos.c
+  * xharbour/source/codepage/cpgewin.c
+  * xharbour/source/codepage/cphr1250.c
+  * xharbour/source/codepage/cphr437.c
+  * xharbour/source/codepage/cphr852.c
+  * xharbour/source/codepage/cpit437.c
+  * xharbour/source/codepage/cpit850.c
+  * xharbour/source/codepage/cpitisb.c
+  * xharbour/source/codepage/cpitiso.c
+  * xharbour/source/codepage/cpltwin.c
+  * xharbour/source/codepage/cppl852.c
+  * xharbour/source/codepage/cppliso.c
+  * xharbour/source/codepage/cpplmaz.c
+  * xharbour/source/codepage/cpplwin.c
+  * xharbour/source/codepage/cppt850.c
+  * xharbour/source/codepage/cpptiso.c
+  * xharbour/source/codepage/cpru866.c
+  * xharbour/source/codepage/cprukoi.c
+  * xharbour/source/codepage/cpruwin.c
+  * xharbour/source/codepage/cpsl852.c
+  * xharbour/source/codepage/cpsliso.c
+  * xharbour/source/codepage/cpslwin.c
+  * xharbour/source/codepage/cpsrwin.c
+  * xharbour/source/codepage/cpua866.c
+  * xharbour/source/codepage/cpuakoi.c
+  * xharbour/source/codepage/cpuawin.c
+  * xharbour/source/rtl/cdpapi.c
+    * fix memory leak reported for accented and multi byte CPs
+
+  * xharbour/source/rtl/filesys.c
+    * cleaned unnecessary initialization
+
+  * xharbour/include/hbapi.h
+  * xharbour/include/thread.h
+  * xharbour/source/rtl/hbsrlraw.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/memvars.c
+  * xharbour/source/vm/codebloc.c
+    ! fixed possible GPF in memvar managment
+    * changed the memvar recycle algorithm to eliminate linear scan
+      of memvar table
+
+  * xharbour/include/hbstack.h
+  * xharbour/source/vm/estack.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_browse.c
+    + added hb_stackReturnItem()
+    - removed hb_stackReturn()
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * use hb_stackReturnItem() instead of direct stack accessing
+
+  * xharbour/source/rdd/workarea.c
+    ! fixed possible restoring of scopes in scoped relations after
+      'SET RELATION TO'
 
 2004-12-30 14:35 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/inkey.c

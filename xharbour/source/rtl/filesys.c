@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.126 2004/11/21 21:44:18 druzus Exp $
+ * $Id: filesys.c,v 1.127 2004/12/20 16:48:44 mlombardo Exp $
  */
 
 /*
@@ -519,7 +519,7 @@ static int convert_open_flags( USHORT uiFlags )
 
 static unsigned convert_pmode_flags( USHORT uiFlags )
 {
-   unsigned result_pmode = 0;
+   unsigned result_pmode;
 
    HB_TRACE(HB_TR_DEBUG, ("convert_pmode_flags(%hu)", uiFlags));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cpua866.c,v 1.1 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: cpua866.c,v 1.1 2004/12/19 11:34:09 ptsarenko Exp $
  */
 
 /*
@@ -60,8 +60,9 @@
 
 static HB_CODEPAGE s_codepage = { "UA866",
     CPID_866,UNITB_866,36,
-    "€‚ƒ„…πς†‡Iτ‰‹‘’“”•–—™›"," ΅Ά£¤¥ρσ¦§¨iυ©ª«¬­®―ΰαβγδεζηθικλμνξο",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    "€‚ƒ„…πς†‡Iτ‰‹‘’“”•–—™›",
+    " ΅Ά£¤¥ρσ¦§¨iυ©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( UA866 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpptiso.c,v 1.5 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpptiso.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -87,8 +87,9 @@
 
 static HB_CODEPAGE s_codepage = { "PTISO",
     CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
-    "AÁÀÂÃÄBCÇDEÉÈÊFGHIÍÌÎÏJKLMNÑOÓÒÔÕÖPQRSTUÚÙÛÜVWXYZ","aáàâãäbcçdeéèêfghiíìîïjklmnñoóòôõöpqrstuúùûüvwxyz",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "AÁÀÂÃÄBCÇDEÉÈÊFGHIÍÌÎÏJKLMNÑOÓÒÔÕÖPQRSTUÚÙÛÜVWXYZ",
+    "aáàâãäbcçdeéèêfghiíìîïjklmnñoóòôõöpqrstuúùûüvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( PTISO );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpru866.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpru866.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -60,8 +60,9 @@
 
 static HB_CODEPAGE s_codepage = { "RU866",
     CPID_866,UNITB_866,32,
-    "€‚ƒ„…†‡‰‹‘’“”•–—™›"," ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    "€‚ƒ„…†‡‰‹‘’“”•–—™›",
+    " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( RU866 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.89 2004/12/02 03:26:37 druzus Exp $
+ * $Id: memvars.c,v 1.90 2004/12/15 13:39:36 druzus Exp $
  */
 
 /*
@@ -103,7 +103,6 @@ static ULONG s_privateStackBase = 0;
 static ULONG s_globalTableSize = 0;
 static ULONG s_globalFirstFree = 0;
 static ULONG s_globalLastFree  = 0;
-static ULONG s_globalFreeCnt   = 0;
 static HB_VALUE_PTR s_globalTable = NULL;
 
 #else
@@ -116,7 +115,6 @@ static HB_VALUE_PTR s_globalTable = NULL;
 #define  s_globalTableSize   (HB_VM_STACK.globalTableSize)
 #define  s_globalFirstFree   (HB_VM_STACK.globalFirstFree)
 #define  s_globalLastFree    (HB_VM_STACK.globalLastFree)
-#define  s_globalFreeCnt     (HB_VM_STACK.globalFreeCnt)
 #define  s_globalTable       (HB_VM_STACK.globalTable)
 
 PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
@@ -155,20 +153,12 @@ extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call a
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
 {
-   ULONG ulPos;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsInit()"));
 
    s_globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    s_globalTableSize = TABLE_INITHB_VALUE;
-   s_globalFreeCnt   = 0;
-   s_globalFirstFree = s_globalLastFree = 1;
-
-   for( ulPos = s_globalFirstFree; ulPos < s_globalTableSize; ulPos++ )
-   {
-      s_globalTable[ ulPos ].item.type = HB_IT_NIL;
-      s_globalTable[ ulPos ].counter = 0;
-   }
+   s_globalFirstFree = 0;
+   s_globalLastFree  = 1;
 
    s_privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    s_privateStackSize = TABLE_INITHB_VALUE;
@@ -181,13 +171,9 @@ void hb_memvarsInit( void )
 void hb_memvarsRelease( void )
 {
    HB_THREAD_STUB
-   ULONG ulCnt;
+   ULONG ulCnt = s_globalLastFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
-
-   ulCnt = s_globalLastFree;
-
-   //TraceLog( NULL, "memvarsRelease()\n" );
 
    if( s_globalTable )
    {
@@ -204,20 +190,21 @@ void hb_memvarsRelease( void )
          {
             if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
             {
-               if( HB_IS_STRING( &s_globalTable[ ulCnt ].item ) )
+               if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
                {
-                  hb_itemReleaseString( &s_globalTable[ ulCnt ].item );
+                  hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
                }
             }
-            else if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            else if( HB_IS_COMPLEX( s_globalTable[ ulCnt ].pVarItem ) )
             {
-               hb_itemClear( &s_globalTable[ ulCnt ].item );
+               hb_itemClear( s_globalTable[ ulCnt ].pVarItem );
             }
             else
             {
-               s_globalTable[ ulCnt ].item.type = HB_IT_NIL;
+               s_globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
             }
 
+            hb_xfree( s_globalTable[ ulCnt ].pVarItem );
             s_globalTable[ ulCnt ].counter = 0;
          }
       }
@@ -242,8 +229,8 @@ void hb_memvarsInit( HB_STACK *pStack )
    pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize = TABLE_INITHB_VALUE;
-   pStack->globalFreeCnt   = 0;
-   pStack->globalFirstFree = pStack->globalLastFree = 1;
+   pStack->globalFirstFree = 0;
+   pStack->globalLastFree  = 1;
 
    pStack->privateStackSize = TABLE_INITHB_VALUE;
    pStack->privateStackCnt  = pStack->privateStackBase = 0;
@@ -268,22 +255,22 @@ void hb_memvarsRelease( HB_STACK *pStack )
          {
             if( pStack->globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
             {
-               if( HB_IS_STRING( &pStack->globalTable[ ulCnt ].item ) )
+               if( HB_IS_STRING( pStack->globalTable[ ulCnt ].pVarItem ) )
                {
-                  hb_itemReleaseString( &pStack->globalTable[ ulCnt ].item );
+                  hb_itemReleaseString( pStack->globalTable[ ulCnt ].pVarItem );
                }
             }
-            else if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
+            else if( HB_IS_COMPLEX( pStack->globalTable[ ulCnt ].pVarItem ) )
             {
-               hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
+               hb_itemClearMT( pStack->globalTable[ ulCnt ].pVarItem, pStack );
             }
             else
             {
-               pStack->globalTable[ ulCnt ].item.type = HB_IT_NIL;
+               pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
             }
          }
-
-          pStack->globalTable[ ulCnt ].counter = 0;
+         pStack->globalTable[ ulCnt ].counter = 0;
+         hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
       }
 
       hb_xfree( pStack->globalTable );
@@ -336,56 +323,33 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueNew(%p, %d)", pSource, (int) bTrueMemvar));
 
-   if( s_globalFreeCnt )
+   if( s_globalFirstFree )
    {
-      /* There are holes in the table
-         * Get a first available hole
-         */
+      /* There are holes in the table - get a first available hole
+       */
       hValue = s_globalFirstFree;
-      --s_globalFreeCnt;
-
-      /* Now find the next hole
-         */
-      if( s_globalFreeCnt )
-      {
-         ++s_globalFirstFree;
-
-         while( s_globalTable[ s_globalFirstFree ].counter )
-         {
-            ++s_globalFirstFree;
-         }
-      }
-      else
-      {
-         /* No more holes
-            */
-         s_globalFirstFree = s_globalLastFree;
-      }
+      s_globalFirstFree = s_globalTable[ hValue ].hPrevMemvar;
    }
    else
    {
       /* Allocate the value from the end of table
-         */
-      if( s_globalFirstFree < s_globalTableSize )
+       */
+      if( s_globalLastFree < s_globalTableSize )
       {
-         hValue = s_globalFirstFree;
-         s_globalFirstFree = ++s_globalLastFree;
+         hValue = s_globalLastFree++;
       }
       else
       {
-        ULONG ulPos;
-
-        #ifndef HB_ARRAY_USE_COUNTER
-           HB_VALUE_PTR pOldValues = s_globalTable;
-           ULONG ulValues = s_globalTableSize;
-        #endif
+         #ifndef HB_ARRAY_USE_COUNTER
+            HB_VALUE_PTR pOldValues = s_globalTable;
+            ULONG ulPos, ulValues = s_globalTableSize;
+         #endif
 
          /* No more free values in the table - expand the table
-            */
+          */
          hValue = s_globalTableSize;
-         s_globalFirstFree = s_globalLastFree = s_globalTableSize + 1;
+         s_globalLastFree = s_globalTableSize + 1;
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
-
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
 
          #ifndef HB_ARRAY_USE_COUNTER
@@ -404,39 +368,33 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
                }
             }
          #endif
-
-         for( ulPos = s_globalFirstFree; ulPos < s_globalTableSize; ulPos++ )
-         {
-            s_globalTable[ ulPos ].item.type = HB_IT_NIL;
-            s_globalTable[ ulPos ].counter = 0;
-         }
       }
    }
 
    pValue = s_globalTable + hValue;
-
+   pValue->pVarItem = ( HB_ITEM_PTR ) hb_xgrab( sizeof( HB_ITEM ) );
    pValue->counter = 1;
-   pValue->item.type = HB_IT_NIL;
+   pValue->pVarItem->type = HB_IT_NIL;
 
    if( pSource )
    {
       if( bTrueMemvar )
       {
-         hb_itemCopy( &pValue->item, pSource );
+         hb_itemCopy( pValue->pVarItem, pSource );
       }
       else
       {
-         memcpy( &pValue->item, pSource, sizeof(HB_ITEM) );
+         memcpy( pValue->pVarItem, pSource, sizeof(HB_ITEM) );
 
          #ifndef HB_ARRAY_USE_COUNTER
             if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
             {
-               //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, &pValue->item );
-               hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
+               //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, pValue->pVarItem );
+               hb_arrayResetHolder( pSource->item.asArray.value, pSource, pValue->pVarItem );
             }
             else if( pSource->type == HB_IT_BYREF && pSource->item.asRefer.offset == 0 )
             {
-               hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, pSource, &pValue->item );
+               hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, pSource, pValue->pVarItem );
             }
          #endif
       }
@@ -448,13 +406,53 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    }
    else
    {
-      pValue->hPrevMemvar = ( HB_HANDLE ) -1;    /* detached variable */
+      pValue->hPrevMemvar = ( HB_HANDLE ) - 1;    /* detached variable */
    }
 
    HB_TRACE(HB_TR_INFO, ("hb_memvarValueNew: memvar item created with handle %i", hValue));
 
    return hValue;
 }
+
+/* Detach local variable (swap current value with a memvar handle)
+*/
+PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarDetachLocal(%p, %d)", pLocal, pLocal->type ));
+
+   /* This code is only for Harbour memvar management */
+#if 0   
+   if( HB_IS_BYREF( pLocal ) && ! HB_IS_MEMVAR( pLocal ) )
+   {
+      HB_ITEM_PTR pItem = pLocal;
+
+      do
+      {
+         pLocal = hb_itemUnRefOnce( pLocal );
+      }
+      while( HB_IS_BYREF( pLocal ) && ! HB_IS_MEMVAR( pLocal ) && ( pLocal != pItem ) );
+   }
+#endif
+
+   /* Change the value only if this variable is not referenced
+    * by another codeblock yet.
+    * In this case we have to copy the current value to a global memory
+    * pool so it can be shared by codeblocks
+    */
+   if ( ! HB_IS_MEMVAR( pLocal ) )
+   {
+      HB_HANDLE hMemvar = hb_memvarValueNew( pLocal, FALSE );
+
+      pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
+      pLocal->item.asMemvar.itemsbase = &s_globalTable;
+      pLocal->item.asMemvar.offset    = 0;
+      pLocal->item.asMemvar.value     = hMemvar;
+   }
+   return pLocal;
+}
+
 
 /*
  * This function pushes passed dynamic symbol that belongs to PRIVATE variable
@@ -471,7 +469,6 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
 
    /* Allocate the value from the end of table
     */
-
    if( s_privateStackCnt == s_privateStackSize )
    {
       /* No more free values in the table - expand the table
@@ -495,7 +492,6 @@ ULONG hb_memvarGetPrivatesBase( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetPrivatesBase()"));
 
    s_privateStackBase = s_privateStackCnt;
-
    return ulBase;
 }
 
@@ -507,8 +503,7 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
 {
    HB_THREAD_STUB
 
-   HB_HANDLE hVar;
-   HB_HANDLE hOldValue;
+   HB_HANDLE hVar, hOldValue;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarSetPrivatesBase(%lu)", ulBase));
 
@@ -548,59 +543,37 @@ void hb_memvarValueIncRef( HB_HANDLE hValue )
 #ifndef HB_THREAD_SUPPORT
 static void hb_memvarRecycle( HB_HANDLE hValue )
 {
-   if( s_globalFirstFree > hValue )
-   {
-      if( ( s_globalLastFree - hValue ) == 1 )
-         s_globalFirstFree = s_globalLastFree = hValue;     /* last item */
-      else
-      {
-         s_globalFirstFree = hValue;
-         ++s_globalFreeCnt;             /* middle item */
-      }
-   }
-   else if( ( s_globalLastFree - hValue ) == 1 )
-   {
-      s_globalLastFree = hValue;         /* last item */
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarRecycle(%lu)", hValue));
 
-      if( s_globalLastFree == s_globalFirstFree )
-      {
-         s_globalFreeCnt = 0;
-      }
+   if( s_globalFirstFree )
+   {
+      s_globalTable[ hValue ].hPrevMemvar = s_globalFirstFree;
+      s_globalFirstFree = hValue;
    }
    else
    {
-      ++s_globalFreeCnt;
-   }
+      /* first free value in the list */
+      s_globalFirstFree = hValue;
+      s_globalTable[ hValue ].hPrevMemvar = 0;
+   }      
 }
 
 #else
 static void hb_memvarRecycleMT( HB_HANDLE hValue, HB_STACK *pStack )
 {
-   if( pStack->globalFirstFree > hValue )
-   {
-      if( ( pStack->globalLastFree - hValue ) == 1 )
-      {
-         pStack->globalFirstFree = pStack->globalLastFree = hValue;     /* last item */
-      }
-      else
-      {
-         pStack->globalFirstFree = hValue;
-         ++pStack->globalFreeCnt;             /* middle item */
-      }
-   }
-   else if( ( pStack->globalLastFree - hValue ) == 1 )
-   {
-      pStack->globalLastFree = hValue;         /* last item */
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarRecycleMT(%lu)", hValue));
 
-      if( pStack->globalLastFree == pStack->globalFirstFree )
-      {
-         pStack->globalFreeCnt = 0;
-      }
+   if( pStack->globalFirstFree )
+   {
+      pStack->globalTable[ hValue ].hPrevMemvar = pStack->globalFirstFree;
+      pStack->globalFirstFree = hValue;
    }
    else
    {
-      ++pStack->globalFreeCnt;
-   }
+      /* first free value in the list */
+      pStack->globalFirstFree = hValue;
+      pStack->globalTable[ hValue ].hPrevMemvar = 0;
+   }      
 }
 #endif
 
@@ -632,14 +605,11 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
       */
       if( --( pValue->counter ) == 0 )
       {
-         if( HB_IS_COMPLEX( &( pValue->item ) ) )
+         if( HB_IS_COMPLEX( pValue->pVarItem ) )
          {
-            hb_itemClear( &( pValue->item ) );
+            hb_itemClear( pValue->pVarItem );
          }
-         else
-         {
-            ( &pValue->item )->type = HB_IT_NIL;
-         }
+         hb_xfree( pValue->pVarItem );
 
          #ifndef HB_THREAD_SUPPORT
             hb_memvarRecycle( hValue );
@@ -667,15 +637,11 @@ void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack )
    {
       if( --pValue->counter == 0 )
       {
-         if( HB_IS_COMPLEX( &pValue->item ) )
+         if( HB_IS_COMPLEX( pValue->pVarItem ) )
          {
-            hb_itemClearMT( &pValue->item, pStack );
+            hb_itemClearMT( pValue->pVarItem, pStack );
          }
-         else
-         {
-            ( &pValue->item )->type = HB_IT_NIL;
-         }
-
+         hb_xfree( pValue->pVarItem );
          hb_memvarRecycleMT( hValue, pStack );
 
          HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
@@ -698,7 +664,9 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   // Might be called from hb_gcAll() after hb_memvarsRelease() if HB_FM_STATISTICS defined.
+   /* Might be called from hb_gcAll() after hb_memvarsRelease()
+    * if HB_FM_STATISTICS defined.
+    */
    if( s_globalTable == NULL )
    {
       return;
@@ -718,23 +686,21 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    if( pValue->counter > 0 )
    {
-   	  if( --pValue->counter == 0 )
-   	  {
-   	     if( HB_IS_STRING( &pValue->item ) )
-   	     {
-   	        hb_itemReleaseString( &pValue->item );
-   	     }
+   	if( --pValue->counter == 0 )
+   	{
+         if( HB_IS_STRING( pValue->pVarItem ) )
+         {
+            hb_itemReleaseString( pValue->pVarItem );
+         }
+         hb_xfree( pValue->pVarItem );
+   	   #ifndef HB_THREAD_SUPPORT
+   	      hb_memvarRecycle( hValue );
+   	   #else
+   	      hb_memvarRecycleMT( hValue, &HB_VM_STACK );
+   	   #endif
 
-         pValue->item.type = HB_IT_NIL;
-
-   	     #ifndef HB_THREAD_SUPPORT
-   	        hb_memvarRecycle( hValue );
-   	     #else
-   	        hb_memvarRecycleMT( hValue, &HB_VM_STACK );
-   	     #endif
-
-   	     HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
-   	  }
+   	   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
+   	}
    }
 }
 
@@ -767,9 +733,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       if( pDyn->hMemvar )
       {
          /* value is already created */
-         HB_ITEM_PTR pSetItem;
-
-         pSetItem = &s_globalTable[ pDyn->hMemvar ].item;
+         HB_ITEM_PTR pSetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          // JC1: the variable we have now can't be destroyed in the meanwhile.
          // It could be changed, but this is a race condition that must be
@@ -802,7 +766,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       }
 
       /* Remove MEMOFLAG if exists (assignment from field). */
-      s_globalTable[ pDyn->hMemvar ].item.type &= ~HB_IT_MEMOFLAG;
+      s_globalTable[ pDyn->hMemvar ].pVarItem->type &= ~HB_IT_MEMOFLAG;
    }
    else
    {
@@ -833,7 +797,7 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
       {
          /* value is already created
           */
-         HB_ITEM_PTR pGetItem = &s_globalTable[ pDyn->hMemvar ].item;
+         HB_ITEM_PTR pGetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          if( HB_IS_BYREF( pGetItem ) )
          {
@@ -907,7 +871,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
       {
          PHB_ITEM pReference;
 
-         pReference = &s_globalTable[ pDyn->hMemvar ].item;
+         pReference = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          if( HB_IS_BYREF( pReference ) )
          {
@@ -1021,7 +985,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
       {
          /* variable contains some data
           */
-         HB_ITEM_PTR pItem = &s_globalTable[ pDynVar->hMemvar ].item;
+         HB_ITEM_PTR pItem = s_globalTable[ pDynVar->hMemvar ].pVarItem;
          hb_dynsymUnlock();
 
          if( HB_IS_BYREF( pItem ) )
@@ -1116,18 +1080,18 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
          {
             /* new PUBLIC variable - initialize it to .F.
              */
-            s_globalTable[ pDynVar->hMemvar ].item.type = HB_IT_LOGICAL;
+            s_globalTable[ pDynVar->hMemvar ].pVarItem->type = HB_IT_LOGICAL;
 
             /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized */
             /*       to .T., this is normal Clipper behaviour. [vszakats] */
 
             if( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 || strcmp( pDynVar->pSymbol->szName, "CLIPPER" ) == 0 )
             {
-               s_globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = TRUE;
+               s_globalTable[ pDynVar->hMemvar ].pVarItem->item.asLogical.value = TRUE;
             }
             else
             {
-               s_globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = FALSE;
+               s_globalTable[ pDynVar->hMemvar ].pVarItem->item.asLogical.value = FALSE;
             }
          }
       }
@@ -1185,7 +1149,7 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
                s_globalTable[ pDynVar->hMemvar ].counter = 0;
                */
 
-               pRef = &s_globalTable[ pDynVar->hMemvar ].item;
+               pRef = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
                if( HB_IS_COMPLEX( pRef ) )
                {
@@ -1245,7 +1209,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
       {
          PHB_ITEM pRef;
 
-         pRef = &s_globalTable[ pDynVar->hMemvar ].item;
+         pRef = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
          if( bInclude )
          {
@@ -1483,8 +1447,8 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
 
          if( struPub.bFound )
          {
-            pValue =&s_globalTable[ struPub.pDynSym->hMemvar ].item;
-            *pszName =struPub.pDynSym->pSymbol->szName;
+            pValue = s_globalTable[ struPub.pDynSym->hMemvar ].pVarItem;
+            *pszName = struPub.pDynSym->pSymbol->szName;
          }
       }
       else
@@ -1492,7 +1456,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
          if( ( ULONG ) iPos < s_privateStackCnt )
          {
             HB_DYNS_PTR pDynSym = s_privateStack[ iPos ];
-            pValue =&s_globalTable[ pDynSym->hMemvar ].item;
+            pValue = s_globalTable[ pDynSym->hMemvar ].pVarItem;
             *pszName = pDynSym->pSymbol->szName;
          }
       }
@@ -1984,7 +1948,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
       PHB_ITEM pItem;
 
-      pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
+      pItem = s_globalTable[ pDynSymbol->hMemvar ].pVarItem;
 
       /* Process it if it matches the passed mask */
       if( bIncludeMask ? bMatch : ! bMatch )
@@ -2360,7 +2324,7 @@ void hb_memvarsIsMemvarRef( void *pData )
          */
          if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
-            hb_gcItemRef( &(pStack->globalTable[ ulCnt ].item) );
+            hb_gcItemRef( pStack->globalTable[ ulCnt ].pVarItem );
          }
       }
    }
@@ -2383,7 +2347,7 @@ void hb_memvarsIsMemvarRef( void )
          */
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
-            hb_gcItemRef( &s_globalTable[ ulCnt ].item );
+            hb_gcItemRef( s_globalTable[ ulCnt ].pVarItem );
          }
       }
    }
@@ -2423,7 +2387,7 @@ HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
 
    if( hMemvar && hMemvar < s_globalTableSize )
    {
-      return &s_globalTable[ hMemvar ].item;
+      return s_globalTable[ hMemvar ].pVarItem;
    }
    else
    {
@@ -2437,7 +2401,7 @@ static HB_DYNS_FUNC( hb_GetSymbolInfo )
   if( pDynSymbol->hMemvar )
   {
     PHB_ITEM pArray = ( ( PHB_ITEM ) Cargo );
-    PHB_ITEM pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
+    PHB_ITEM pItem = s_globalTable[ pDynSymbol->hMemvar ].pVarItem;
     HB_ITEM SubItems;
 
     SubItems.type = HB_IT_NIL;

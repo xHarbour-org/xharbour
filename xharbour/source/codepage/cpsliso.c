@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsliso.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpsliso.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -86,8 +86,9 @@
 
 static HB_CODEPAGE s_codepage = { "SLISO",
     CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
-    "ABCÈÆDÐEFGHIJKLMNOPQRS©TUVWZ®XY","abcèdðefghijklmnopqrs¹tuvwz¾xy",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "ABCÈÆDÐEFGHIJKLMNOPQRS©TUVWZ®XY",
+    "abcèdðefghijklmnopqrs¹tuvwz¾xy",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( SLISO );
 

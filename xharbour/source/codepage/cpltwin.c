@@ -1,5 +1,5 @@
 /*
- * $Id: cdpltwin.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpltwin.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -87,8 +87,9 @@
 
 static HB_CODEPAGE s_codepage = { "LT",
     CPID_1257,UNITB_1257,NUMBER_OF_CHARACTERS,
-    "AÀBCÈDEÆËFGHIÁYJKLMNOPQRSÐTUØÛVWXZÞ","aàbcèdeæëfghiáyjklmnopqrsðtuøûvwxzþ",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+    "AÀBCÈDEÆËFGHIÁYJKLMNOPQRSÐTUØÛVWXZÞ",
+    "aàbcèdeæëfghiáyjklmnopqrsðtuøûvwxzþ",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( LT );
 
