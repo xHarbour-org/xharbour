@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.6 2003/04/13 12:35:17 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.7 2003/04/13 20:40:45 jonnymind Exp $
  */
 
 /*
@@ -329,13 +329,19 @@ ULONG hb_serialNextRaw( char *cBuf )
       return ulData;
 
       case 'O':
-         ulData = ulNext = 9;
+         ulNext = 9;
          ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
          // remove class name
-         ulNext += hb_getlen8( ( BYTE * ) (cBuf + ulNext) );
+         ulNext += hb_serialNextRaw( ( BYTE *) ( cBuf + 9 )  );
+         ulData = ulNext;
 
          while ( ulCount > 0 )
          {
+            // remove property name
+            cBuf += ulNext;
+            ulNext = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
+            // remove property value
             cBuf += ulNext;
             ulNext = hb_serialNextRaw( cBuf );
             ulData += ulNext;

@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.1 2003/02/16 00:00:19 jonnymind Exp $
+* $Id: serialize.prg,v 1.2 2003/04/13 20:40:45 jonnymind Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -58,6 +58,7 @@ Procedure MAIN()
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 20 )
    cTmp += HB_Serialize( AClass():New("A parameter") )
+   cTmp += HB_Serialize( "Last String, closing test" )
 
    /* now we deserialize */
    cSerial := HB_DeserialBegin( cTmp )
@@ -71,7 +72,7 @@ Procedure MAIN()
          CASE ValType( cTmp ) == "O"
             cTmp:aMethod()
          OTHERWISE
-            ? cTmp
+            ? "*", cTmp
       ENDCASE
 
       cTmp := HB_DeserialNext( cSerial )

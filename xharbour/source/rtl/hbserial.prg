@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.4 2003/04/13 12:35:17 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.5 2003/04/13 20:40:45 jonnymind Exp $
  */
 
 /*
@@ -70,6 +70,8 @@ FUNCTION HB_Serialize( oObject )
          cSerial += HB_SerializeSimple( oObject:ClassName )
 
          FOR EACH oElem in aProperties
+            // saves name and content
+            cSerial += HB_Serialize( oElem )
             cSerial += HB_Serialize( __objSendMsg( oObject, oElem ) )
          NEXT
 
@@ -119,19 +121,19 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             RETURN NIL
          ENDIF
          oObject := __ClsInst( nClassId )
-         aProperties := __ClassSelPersistent( nClassId )
 
-         IF Len( aProperties ) != nLen
-            // todo: RISE AN ERROR
-            RETURN NIL
-         ENDIF
-
-         FOR EACH oElem in aProperties
+         DO WHILE nLen > 0
+            // retreives name
+            oElem := HB_DeserializeSimple( cSerial, 128 )
+            cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
+            // then the value
             oVal := HB_Deserialize( cSerial, nMaxLen )
+
             __objSendMsg( oObject, "_" + oElem, oVal )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
-         NEXT
-         ? "cSerial :", cSerial
+
+            nLen--
+         ENDDO
       EXIT
 
       DEFAULT

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.949 2003/04/13 13:19:54 jonnymind Exp $
+ * $Id: ChangeLog,v 1.950 2003/04/13 20:40:38 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-13 23:32 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  ! source/rtl/hbserial.prg
+    + Added property names to the serialized data to allow object
+      deserialization even with classes compiled or built in
+      different ways from the originals.
+
+  ! source/rtl/hbsrlraw.c
+    ! Fixed HB_SerialNext on objects
+
+  * tests/serialize.prg
+    + Added a little more test
 
 2003-04-13 22:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/classes.c
