@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.21 2003/06/24 03:35:04 ronpinkas Exp $
+ * $Id: pptable.c,v 1.22 2003/06/26 03:58:08 ronpinkas Exp $
  */
 
 /*
@@ -458,16 +458,18 @@ void hb_pp_Table( void )
        "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___257 };
    static COMMANDS sC___259 = {0,"@","\1A00,\1B00 GET \1C00 [PICTURE \1D00] [VALID \1E00] [WHEN \1F00] [CAPTION \1G00] [MESSAGE \1H00] [SEND \1I00]",
        "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) [; ATail(GetList):Caption := \1G00] [; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1] [; ATail(GetList):message := \1H00] [; ATail(GetList):\1I00] ; ATail(GetList):Display()",&sC___259 };
-
-   hb_pp_topCommand = &sC___259;
-#else
-   hb_pp_topCommand = &sC___252;
 #endif
 
    static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___02 };
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
+
+#if defined( HB_COMPAT_C53 )
+   hb_pp_topCommand = &sC___259;
+#else
+   hb_pp_topCommand = &sC___252;
+#endif
 
    hb_pp_topDefine = &sD___58;
    hb_pp_topTranslate = &sT___04;
