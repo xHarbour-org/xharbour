@@ -324,7 +324,7 @@ BOOL THarbourPrinter_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBuffe
    unsigned long needed, returned, a;
    PRINTER_INFO_5 buffer[ MAX_PRINTERS ];
 
-   EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, MAX_PRINTERS*sizeof( PRINTER_INFO_5 ), &needed,&returned ) ;
+   EnumPrinters( PRINTER_ENUM_SHARED | PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, MAX_PRINTERS*sizeof( PRINTER_INFO_5 ), &needed,&returned ) ;
                              
    for( a = 0 ; a < returned ; a++ )
    {
