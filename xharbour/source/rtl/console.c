@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.36 2003/10/22 20:37:28 peterrees Exp $
+ * $Id: console.c,v 1.37 2003/10/28 19:55:05 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -486,7 +486,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       iCol += hb_set.HB_SET_MARGIN;
 
       if (iRow < s_uiPRow) {
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "x0C", 1 );
+         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C", 1 );
          s_uiPRow = s_uiPCol = 0;
       }
       for ( ; s_uiPRow < iRow ; s_uiPRow++ ) {
