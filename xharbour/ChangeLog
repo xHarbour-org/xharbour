@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1275 2003/07/22 09:40:42 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1276 2003/07/22 11:35:09 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,9 +13,10 @@
   * source/rtl/hblog.prg
   * source/rtl/hbloginet.prg
   * include/hblog.ch
+  * tests/logtest.prg
     ! Fixed name clashes in hblog.ch.
     * Grammar declaration of INIT LOG is a little more strict
-    
+
 2003-07-22 06:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ads1.c
   * contrib/rdd_ads/adsfunc.c
