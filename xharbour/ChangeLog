@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.874 2003/03/26 19:34:28 iananderson Exp $
+ * $Id: ChangeLog,v 1.875 2003/03/26 20:39:56 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-26 12:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed missing length reset in HB_P_LOCALADDINT and HB_P_ADDINT.
+
 2003-03-26 20:32 UTC+0000 Ian Anderson <i.anderson@procon-online.de>
   * source/rtl/tget.prg
-    * Clipper compatibility fix to isEditable - Clipper 5.2e allows you to use 
+    * Clipper compatibility fix to isEditable - Clipper 5.2e allows you to use
       Picture 'Y' on a variable which has been initialized with 'Y' or 'N' as
       well as one which has been initialized with .T. or .F. This works now.
-      
+
 2003-03-26 19:30 UTC+0000 Ian Anderson <i.anderson@procon-online.de>
   * source/rtl/memoedit.prg
     * Fix minor bug - UserFunction can now map the escape key to CTRL-W successfully

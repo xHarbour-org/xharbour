@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.183 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: hvm.c,v 1.184 2003/03/25 04:31:23 ronpinkas Exp $
  */
 
 /*
@@ -1701,16 +1701,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             if( pLocal->type & HB_IT_DOUBLE )
             {
                pLocal->item.asDouble.value = dNewVal;
+               pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
             }
             else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
             {
                pLocal->type = HB_IT_INTEGER;
                pLocal->item.asInteger.value = ( int ) dNewVal;
+               pLocal->item.asInteger.length = 10;
             }
             else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
             {
                pLocal->type = HB_IT_LONG;
                pLocal->item.asLong.value = ( long ) dNewVal;
+               pLocal->item.asLong.length = 10;
             }
             else
             {
@@ -1823,16 +1826,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             if( pTop->type & HB_IT_DOUBLE )
             {
                pTop->item.asDouble.value = dNewVal;
+               pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
             }
             else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
             {
                pTop->type = HB_IT_INTEGER;
                pTop->item.asInteger.value = ( int ) dNewVal;
+               pTop->item.asInteger.length = 10;
             }
             else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
             {
                pTop->type = HB_IT_LONG;
                pTop->item.asLong.value = ( long ) dNewVal;
+               pTop->item.asLong.length = 10;
             }
             else
             {
