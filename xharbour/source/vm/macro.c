@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.28 2003/08/20 23:17:38 ronpinkas Exp $
+ * $Id: macro.c,v 1.29 2003/11/30 10:02:48 druzus Exp $
  */
 
 /*
@@ -502,7 +502,6 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
  */
 void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 {
-
    HB_TRACE(HB_TR_DEBUG, ("hb_macroGetValue(%p)", pItem));
 
    if( hb_macroCheckParam( pItem ) )
