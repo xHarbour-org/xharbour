@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.6 2004/04/06 01:50:55 druzus Exp $
+ * $Id: fserror.c,v 1.7 2004/04/08 10:25:34 andijahja Exp $
  */
 
 /*
@@ -152,9 +152,6 @@ static int hb_WinToDosError( ULONG ulError )
    switch ( ulError )
    {
       case ERROR_ALREADY_EXISTS:
-#if defined(__BORLANDC__) || defined(__WATCOMC__)
-      case ERROR_SHARING_VIOLATION:
-#endif
          iResult = 5;
          break;
       case ERROR_FILE_NOT_FOUND:
