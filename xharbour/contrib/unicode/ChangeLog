@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2004/02/02 21:21:21 andijahja Exp $
+ * $Id: ChangeLog,v 1.9 2004/02/03 02:05:40 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-03 15:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   + contrib/unicode/hbdecode.prg
+     + added the following file decoding functions:
+       + UUDECODE_FILE()
+       + B64DECODE_FILE()
+       + YYDECODE_FILE()
+
+   * contrib/unicode/make_b32.bat
+   * contrib/unicode/makefile.bc
+   * contrib/unicode/makefile.vc
+     + add hbdecode.obj file dependency
+
 2004-02-03 09:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * contrib/unicode/hbencode.c
      + Add option to manually configure line length of encoded file (default is 128)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.3 2004/01/17 22:01:02 andijahja Exp $
+# $Id: makefile.vc,v 1.4 2004/02/02 10:12:40 andijahja Exp $
 #
 
 #
@@ -45,7 +45,8 @@ HBCC_LIB_OBJS = \
    $(OBJ_DIR)\hbcrc32.obj \
    $(OBJ_DIR)\hbcrpt32.obj \
    $(OBJ_DIR)\hbcrpt128.obj \
-   $(OBJ_DIR)\hbencode.obj
+   $(OBJ_DIR)\hbencode.obj \
+   $(OBJ_DIR)\hbdecode.obj
 
 #
 # Our default target
@@ -56,6 +57,8 @@ all: $(HBCC_LIB)
 CLEAN:
    -@if exist $(OBJ_DIR)\hbcc.c        del $(OBJ_DIR)\hbcc.c
    -@if exist $(OBJ_DIR)\hbcc.obj      del $(OBJ_DIR)\hbcc.obj
+   -@if exist $(OBJ_DIR)\hbdecode.c    del $(OBJ_DIR)\hbdecode.c
+   -@if exist $(OBJ_DIR)\hbdecode.obj  del $(OBJ_DIR)\hbdecode.obj
    -@if exist $(OBJ_DIR)\hbencode.obj  del $(OBJ_DIR)\hbencode.obj
    -@if exist $(OBJ_DIR)\hbc7.obj      del $(OBJ_DIR)\hbc7.obj
    -@if exist $(OBJ_DIR)\hbcu.obj      del $(OBJ_DIR)\hbcu.obj
@@ -80,6 +83,10 @@ $(HBCC_LIB) : $(HBCC_LIB_OBJS)
 #
 
 $(OBJ_DIR)\hbcc.obj : hbcc.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\hbdecode.obj : hbdecode.prg
     $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
     $(CC) $(CLIBFLAGS) -Fo$@ $*.c
 
