@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.7 2002/09/17 18:07:53 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.8 2002/09/17 22:28:48 ronpinkas Exp $
  */
 
 /*
@@ -73,12 +73,12 @@ extern short hb_vm_iGlobals;
 HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             USHORT uiLocals,
             USHORT * pLocalPosTable,
-            PHB_SYMB pSymbols )
+            PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_CODEBLOCK_PTR pCBlock;
 
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
@@ -173,7 +173,9 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
          }
       }
       else
+      {
          pCBlock->pLocals = NULL;
+      }
    }
 
    /*
@@ -187,8 +189,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    pCBlock->pSymbols  = pSymbols;
    pCBlock->ulCounter = 1;
 
-   pCBlock->pGlobals  = hb_vm_pGlobals;
-   pCBlock->iGlobals  = hb_vm_iGlobals;
+   pCBlock->pGlobals  = pGlobals;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -219,8 +220,7 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    pCBlock->pSymbols  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
    pCBlock->ulCounter = 1;
 
-   pCBlock->pGlobals  = hb_vm_pGlobals;
-   pCBlock->iGlobals  = hb_vm_iGlobals;
+   pCBlock->pGlobals  = NULL;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -316,9 +316,11 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 {
    int iStatics = hb_stack.iStatics;
+   /*
    PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;
    short      Saved_iGlobals = hb_vm_iGlobals;
-   //short iGlobal;
+   short iGlobal;
+   */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockEvaluate(%p)", pItem));
 
@@ -337,16 +339,19 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
    }
  */
 
+   /*
    hb_vm_pGlobals = pItem->item.asBlock.value->pGlobals;
    hb_vm_iGlobals = pItem->item.asBlock.value->iGlobals;
+   */
 
    hb_stack.iStatics = pItem->item.asBlock.statics;
-   hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols );
+   hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols, pItem->item.asBlock.value->pGlobals );
    hb_stack.iStatics = iStatics;
 
+   /*
    hb_vm_pGlobals = Saved_pGlobals;
    hb_vm_iGlobals = Saved_iGlobals;
-
+   */
  /*
    // Un-Lock Module Globals, so that GC can release current level Globals.
    for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )

@@ -1,11 +1,51 @@
 /*
- * $Id: ChangeLog,v 1.384 2002/09/17 22:28:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.385 2002/09/18 03:00:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2002-09-18 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    + Added HB_ITEM related definitions (moved from hbapi.h, which calls hbvmpub.h)
+    - Removed iGlobals memeber from _HB_CODEBLOCK
+    * Changed defintion of hb_vmExecute() to accept 3rd paramater PHB_ITEM** pGlobals.
+
+  * include/hbapi.h
+    - Moved HB_ITEM related definitions to hbvmpub.h
+
+  * include/hbsetup.h
+    * Increased #define HB_PCODE_VER to 2
+
+  * include/hbvm.h
+    * Changed defintion of hb_vmExecute() to accept 3rd paramater PHB_ITEM** pGlobals.
+
+  * source/vm/codebloc.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    * Changed all calls to hb_vmExecute() to pass the correct pGlobal as 3rd parameter.
+    - Removed hb_vmpGlobals and related logic.
+
+  * source/vm/maindllp.c
+    * Changed defintion of hb_vmExecute() to accept 3rd paramater PHB_ITEM** pGlobals.
+
+  * source/compiler/genc.c
+    * Changed generation of PCODE to pass &pGlobals as 3rd parameter to hb_vmExecute().
+
+  * source/rtl/win32ole.prg
+    - Commented unused variable.
+
+  * tests/global1.prg
+  * tests/global2.prg
+    * Modified to test use of passing a Global in block to a module where the global is NOT declared.
+    * Modified to test use of passing a Global by refernce to a module where the global is NOT declared and being modified.
+
+/*
+   WARNING!!! All PRG files MUST be recompiled!!!
+              Users of FWH, must use the supplied MAKE5HX.bat to recompile FiveHX.lib!!!
 */
 
 2002-09-17 19:59 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

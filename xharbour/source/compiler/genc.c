@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.19 2002/09/18 02:29:05 ronpinkas Exp $
+ * $Id: genc.c,v 1.20 2002/09/18 03:00:49 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,6 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
    PVAR pGlobal, pDelete;
-   short iGlobals;
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
@@ -240,8 +239,6 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       {
          fprintf( yyc, "\n#include \"hbapi.h\"\n\n" );
 
-         iGlobals       = 0;
-
          pGlobal = hb_comp_pGlobals;
          while( pGlobal )
          {
@@ -254,24 +251,20 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
                fprintf( yyc, "extern HB_ITEM %s;\n", pGlobal->szName );
             }
             pGlobal = pGlobal->pNext;
-            iGlobals++;
          }
 
-         fprintf( yyc, "\nstatic PHB_ITEM pGlobals[] = {\n" );
+         fprintf( yyc, "\nstatic const PHB_ITEM pConstantGlobals[] = {\n" );
 
          pGlobal = hb_comp_pGlobals;
          while( pGlobal )
          {
-            fprintf( yyc, "                                &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
+            fprintf( yyc, "                                             &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
 
             pGlobal = pGlobal->pNext;
          }
 
-         fprintf( yyc, "                             };\n"
-                       "static PHB_ITEM *pLiveStorage = pGlobals;\n"
-                       "\n"
-                       "extern PHB_ITEM **hb_vm_pGlobals;\n"
-                       "extern short hb_vm_iGlobals;\n\n" );
+         fprintf( yyc, "                                           };\n"
+                       "static PHB_ITEM *pGlobals = pConstantGlobals;\n\n" );
       }
 
       /* Generate functions data
@@ -332,25 +325,8 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          }
 
          fprintf( yyc, "   };\n\n" );
-
-         if( hb_comp_pGlobals )
-         {
-            fprintf( yyc, "   PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;\n"
-                          "   short      Saved_iGlobals = hb_vm_iGlobals;\n"
-                          "\n"
-                          "   hb_vm_pGlobals = (PHB_ITEM **) &pLiveStorage;\n"
-                          "   hb_vm_iGlobals = %i;\n\n", iGlobals );
-         }
-
-         fprintf( yyc, "   hb_vmExecute( pcode, symbols );\n\n" );
-
-         if( hb_comp_pGlobals )
-         {
-            fprintf( yyc, "   hb_vm_pGlobals = Saved_pGlobals;\n"
-                          "   hb_vm_iGlobals = Saved_iGlobals;\n" );
-         }
-
-         fprintf( yyc, "}\n\n" );
+         fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+         fprintf( yyc,  "}\n\n" );
 
          pFunc = pFunc->pNext;
       }

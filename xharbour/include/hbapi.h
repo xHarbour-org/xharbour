@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.29 2002/09/17 05:51:42 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.30 2002/09/17 22:28:48 ronpinkas Exp $
  */
 
 /*
@@ -122,148 +122,6 @@ extern "C" {
 #define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->asArray.value->uiClass != 0 )
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL ) /* Not available in CA-Cl*pper. */
-
-/* forward declarations */
-struct _HB_CODEBLOCK;
-struct _HB_BASEARRAY;
-struct _HB_ITEM;
-struct _HB_VALUE;
-
-/* Internal structures that holds data */
-struct hb_struArray
-{
-   struct _HB_BASEARRAY * value;
-};
-
-struct hb_struBlock
-{
-   LONG statics;
-   USHORT lineno;
-   USHORT paramcnt;
-   struct _HB_CODEBLOCK * value;
-};
-
-struct hb_struDate
-{
-   long value;
-};
-
-/* this definition signals that number of decimal places for double value
- * was not specified at compile time (the value is a result of optimization
- * performed by the compiler)
- */
-#define HB_DEFAULT_WIDTH     255
-#define HB_DEFAULT_DECIMALS  255
-
-struct hb_struDouble
-{
-   USHORT length;
-   USHORT decimal;
-   double value;
-};
-
-struct hb_struInteger
-{
-   USHORT length;
-   int value;
-};
-
-struct hb_struLogical
-{
-   BOOL value;
-};
-
-struct hb_struLong
-{
-   USHORT length;
-   long value;
-};
-
-struct hb_struMemvar
-{
-   struct _HB_VALUE ** itemsbase;
-   LONG offset;
-   LONG value;
-};
-
-struct hb_struPointer
-{
-   void * value;
-   BOOL collect;
-};
-
-struct hb_struRefer
-{
-   union {
-      struct _HB_CODEBLOCK * block;    /* codeblock */
-      struct _HB_ITEM ** itemsbase;    /* static variables */
-      struct _HB_ITEM ** *itemsbasePtr; /* local variables */
-   } BasePtr;
-   LONG offset;    /* 0 for static variables */
-   LONG value;
-};
-
-struct hb_struString
-{
-   ULONG           length;
-   char            *value;
-   BOOL            bStatic;
-   USHORT          *puiHolders; /* number of holders of this string */
-   //BOOL            bChar; // Using length == 1 instead.
-   //struct _HB_ITEM *pOrigin;  // Compiler pushes BYREF instead, when var[...] := x
-};
-
-struct hb_struSymbol
-{
-   LONG stackbase;
-   USHORT lineno;
-   USHORT paramcnt;
-   PHB_SYMB value;
-};
-
-/* items hold at the virtual machine stack */
-typedef struct _HB_ITEM
-{
-   USHORT type;
-   union
-   {
-      struct hb_struArray   asArray;
-      struct hb_struBlock   asBlock;
-      struct hb_struDate    asDate;
-      struct hb_struDouble  asDouble;
-      struct hb_struInteger asInteger;
-      struct hb_struLogical asLogical;
-      struct hb_struLong    asLong;
-      struct hb_struMemvar  asMemvar;
-      struct hb_struPointer asPointer;
-      struct hb_struRefer   asRefer;
-      struct hb_struString  asString;
-      struct hb_struSymbol  asSymbol;
-   } item;
-} HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
-
-typedef struct _HB_BASEARRAY
-{
-   PHB_ITEM pItems;       /* pointer to the array items */
-   ULONG    ulLen;        /* number of items in the array */
-   USHORT   uiHolders;    /* number of holders of this array */
-   USHORT   uiClass;      /* offset to the classes base if it is an object */
-   USHORT   uiPrevCls;    /* for fixing after access super */
-   USHORT * puiClsTree;   /* remember array of super called ID Tree  */
-} HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
-
-/* internal structure for codeblocks */
-typedef struct _HB_CODEBLOCK
-{
-   BYTE     *pCode;       /* codeblock pcode */
-   PHB_ITEM pLocals;      /* table with referenced local variables */
-   USHORT   uiLocals;     /* number of referenced local variables */
-   PHB_SYMB pSymbols;     /* codeblocks symbols */
-   ULONG    ulCounter;    /* numer of references to this codeblock */
-   BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
-   PHB_ITEM **pGlobals;
-   short    iGlobals;
-} HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 typedef struct _HB_VALUE
 {
@@ -484,7 +342,7 @@ extern void     hb_cmdargProcessVM( void ); /* Check for command line internal a
 extern PHB_SYMB hb_symbolNew( char * szName ); /* create a new symbol */
 
 /* Codeblock management */
-extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols ); /* create a code-block */
+extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
 extern HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
 extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */
@@ -592,6 +450,7 @@ extern void   hb_gcCollect( void ); /* checks if a single memory block can be re
 extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
 extern void   hb_vmGlobalLock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcLock(...) when needed. */

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.8 2002/03/20 22:07:15 ronpinkas Exp $
+ * $Id: macro.c,v 1.9 2002/03/26 05:45:07 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ void hb_macroRun( HB_MACRO_PTR pMacro )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroRun(%p)", pMacro));
 
-   hb_vmExecute( pMacro->pCodeInfo->pCode, NULL );
+   hb_vmExecute( pMacro->pCodeInfo->pCode, NULL, NULL );
 }
 
 /* evaluate a macro-cmpiled code and discard it

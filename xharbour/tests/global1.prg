@@ -1,20 +1,20 @@
-GLOBAL MyGlobal1
+GLOBAL MyGlobal1, MyGlobal3 := 77
 GLOBAL EXTERNAL MyGlobal2
 
 Procedure Global1()
 
-   ? "In Global1() Before assignment:", MyGlobal1, MyGlobal2
+   ? "In Global1() Before assignment:", MyGlobal1, MyGlobal2, MyGlobal3
 
    MyGlobal1 := ProcName()
    MyGlobal2 := ProcName()
 
-   Global2()
+   Global2( {|| MyGlobal3 }, @MyGlobal3 )
 
-   ? "In Global1() After Global2():", MyGlobal1, MyGlobal2
+   ? "In Global1() After Global2():", MyGlobal1, MyGlobal2, MyGlobal3
 
    MyCFunc()
 
-   ? "In Global1() After MyCFun():", MyGlobal1, MyGlobal2
+   ? "In Global1() After MyCFun():", MyGlobal1, MyGlobal2, MyGlobal3
 
 Return
 

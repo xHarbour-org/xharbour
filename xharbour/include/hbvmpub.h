@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.22 2001/12/26 09:09:57 davep Exp $
+ * $Id: hbvmpub.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -89,6 +89,146 @@ typedef struct _HB_DYNS
    ULONG     ulRecurse;    /* profiler support */
 } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
 
+/* forward declarations */
+struct _HB_CODEBLOCK;
+struct _HB_BASEARRAY;
+struct _HB_ITEM;
+struct _HB_VALUE;
+
+/* Internal structures that holds data */
+struct hb_struArray
+{
+   struct _HB_BASEARRAY * value;
+};
+
+struct hb_struBlock
+{
+   LONG statics;
+   USHORT lineno;
+   USHORT paramcnt;
+   struct _HB_CODEBLOCK * value;
+};
+
+struct hb_struDate
+{
+   long value;
+};
+
+/* this definition signals that number of decimal places for double value
+ * was not specified at compile time (the value is a result of optimization
+ * performed by the compiler)
+ */
+#define HB_DEFAULT_WIDTH     255
+#define HB_DEFAULT_DECIMALS  255
+
+struct hb_struDouble
+{
+   USHORT length;
+   USHORT decimal;
+   double value;
+};
+
+struct hb_struInteger
+{
+   USHORT length;
+   int value;
+};
+
+struct hb_struLogical
+{
+   BOOL value;
+};
+
+struct hb_struLong
+{
+   USHORT length;
+   long value;
+};
+
+struct hb_struMemvar
+{
+   struct _HB_VALUE ** itemsbase;
+   LONG offset;
+   LONG value;
+};
+
+struct hb_struPointer
+{
+   void * value;
+   BOOL collect;
+};
+
+struct hb_struRefer
+{
+   union {
+      struct _HB_CODEBLOCK * block;    /* codeblock */
+      struct _HB_ITEM ** itemsbase;    /* static variables */
+      struct _HB_ITEM ** *itemsbasePtr; /* local variables */
+   } BasePtr;
+   LONG offset;    /* 0 for static variables */
+   LONG value;
+};
+
+struct hb_struString
+{
+   ULONG           length;
+   char            *value;
+   BOOL            bStatic;
+   USHORT          *puiHolders; /* number of holders of this string */
+};
+
+struct hb_struSymbol
+{
+   LONG stackbase;
+   USHORT lineno;
+   USHORT paramcnt;
+   PHB_SYMB value;
+};
+
+/* items hold at the virtual machine stack */
+typedef struct _HB_ITEM
+{
+   USHORT type;
+   union
+   {
+      struct hb_struArray   asArray;
+      struct hb_struBlock   asBlock;
+      struct hb_struDate    asDate;
+      struct hb_struDouble  asDouble;
+      struct hb_struInteger asInteger;
+      struct hb_struLogical asLogical;
+      struct hb_struLong    asLong;
+      struct hb_struMemvar  asMemvar;
+      struct hb_struPointer asPointer;
+      struct hb_struRefer   asRefer;
+      struct hb_struString  asString;
+      struct hb_struSymbol  asSymbol;
+   } item;
+} HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
+
+typedef struct _HB_BASEARRAY
+{
+   PHB_ITEM pItems;       /* pointer to the array items */
+   ULONG    ulLen;        /* number of items in the array */
+   USHORT   uiHolders;    /* number of holders of this array */
+   USHORT   uiClass;      /* offset to the classes base if it is an object */
+   USHORT   uiPrevCls;    /* for fixing after access super */
+   USHORT * puiClsTree;   /* remember array of super called ID Tree  */
+} HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
+
+/* internal structure for codeblocks */
+typedef struct _HB_CODEBLOCK
+{
+   BYTE     *pCode;       /* codeblock pcode */
+   PHB_ITEM pLocals;      /* table with referenced local variables */
+   USHORT   uiLocals;     /* number of referenced local variables */
+   PHB_SYMB pSymbols;     /* codeblocks symbols */
+   ULONG    ulCounter;    /* numer of references to this codeblock */
+   BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
+   PHB_ITEM **pGlobals;
+} HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
+
+
 #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
 typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
 
@@ -102,7 +242,7 @@ typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
 #define HB_FS_MESSAGE  ( ( HB_SYMBOLSCOPE ) 0x20 )
 #define HB_FS_MEMVAR   ( ( HB_SYMBOLSCOPE ) 0x80 )
 
-extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols );  /* invokes the virtual machine */
+extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 
 #if defined(HB_EXTERN_C)
 }

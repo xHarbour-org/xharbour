@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.10 2001/12/31 07:36:26 andijahja Exp $
+ * $Id: maindllp.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -99,12 +99,12 @@ void hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleSymbols )
     *    may we issue an error ? */
 }
 
-void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
+void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **pGlobals )
 {
    FARPROC pExecute = GetProcAddress( GetModuleHandle( NULL ), "_hb_vmExecute" );
 
    if( pExecute )
-      ( ( VM_DLL_EXECUTE ) pExecute ) ( pCode, pSymbols );
+      ( ( VM_DLL_EXECUTE ) pExecute ) ( pCode, pSymbols, pGlobals );
 
    /* else
     *    may we issue an error ? */
