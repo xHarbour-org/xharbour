@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.5 2002/12/20 20:20:34 ronpinkas Exp $
+* $Id: inet.h,v 1.6 2002/12/20 23:19:35 jonnymind Exp $
 */
 
 /*
@@ -63,13 +63,6 @@
 
     #define HB_INET_CLOSE( x )    closesocket( x )
 
-    #define SHUT_RDWR    2
-
-    #define MSG_NOSIGNAL 0x4000 /* Do not generate SIGPIPE.  */
-    #define MSG_DONTWAIT 0x40   /* Nonblocking IO.  */
-    #define MSG_WAITALL  0x100  /* Wait for a full request.  */
-    //#define MSG_PEEK     0x02   /* Peek at incoming messages.  */ Already defined (different value).
-
     extern char *hstrerror( int i );
 #else
     #define HB_SOCKET_T int
@@ -79,9 +72,10 @@
     #include <netdb.h>
     extern int h_errno;
     #define HB_INET_CLOSE( x )    close( x )
+    #include <errno.h>
 #endif
 
-#include <errno.h>
+#define HB_SENDRECV_BUFFER_SIZE         2048
 
 typedef struct tag_HB_SOCKET_STRUCT
 {
@@ -92,8 +86,17 @@ typedef struct tag_HB_SOCKET_STRUCT
     ULONG count;
 } HB_SOCKET_STRUCT;
 
-#define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = 0
-#define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+#define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
+
+#if defined( HB_OS_WIN_32 )
+    #define HB_SOCKET_SET_ERROR( s ) \
+        s->errorCode = WSAGetLastError(); \
+        s->errorDesc = strerror( s->errorCode );\
+        WSASetLastError( 0 );
+#else
+    #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+#endif
+
 #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
 #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
 
@@ -107,25 +110,17 @@ typedef struct tag_HB_SOCKET_STRUCT
 
 #define HB_SOCKET_FREE( s ) hb_xfree( s )
 
-#ifndef SHUT_RDWR
-    #define SHUT_RDWR   2
-#endif
-
 #ifndef MSG_NOSIGNAL
-    #define MSG_NOSIGNAL  0x4000
+    #define MSG_NOSIGNAL  0
 #endif
 
 #ifndef MSG_DONTWAIT
-    #define MSG_DONTWAIT    0x40
+    /* #define MSG_DONTWAIT	0x80 */
+    #define MSG_DONTWAIT	0
 #endif
 
 #ifndef MSG_WAITALL
-    #define MSG_WAITALL 0x100
+    #define MSG_WAITALL 0
 #endif
-
-#ifndef MSG_PEEK
-    #define MSG_PEEK 0x02
-#endif
-
 
 #endif
