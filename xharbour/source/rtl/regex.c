@@ -6053,7 +6053,8 @@ return match_block.errorcode;
 /* Begin of maketables.c */
 
 //#include "internal.h" // Replaced with (composit) #include "regex.h" above!
-#include "pcreposix.h"
+
+//#include "pcreposix.h"
 /* Begin of pcreposix.c */
 
 //#include "stdlib.h" // Ron Pinkas - redundant!
