@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.10 2004/08/27 07:53:50 paultucker Exp $
+# $Id: makefile.wc,v 1.11 2004/08/27 14:43:21 paultucker Exp $
 #
 
 #
@@ -158,7 +158,7 @@ HARBOURFLAGS= $(HARBOURFLAGS) $(HB_MT_FLAGS)
 
 COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
-CT_LIB         = $(LIB_DIR)\ct.lib
+CT_LIB         = $(LIB_DIR)\hbct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
 DBFDBT_LIB     = $(LIB_DIR)\dbfdbt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib

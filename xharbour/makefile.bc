@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.107 2004/08/27 12:15:00 modalsist Exp $
+# $Id: makefile.bc,v 1.107 2004/08/27 15:29:25 modalsist Exp $
 #
 
 #
@@ -200,7 +200,7 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 
 COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
-CT_LIB         = $(LIB_DIR)\libct.lib
+CT_LIB         = $(LIB_DIR)\hbct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
 DBFDBT_LIB     = $(LIB_DIR)\dbfdbt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.16 2004/08/27 12:15:00 modalsist Exp $
+rem $Id: make_b32.bat,v 1.16 2004/08/27 15:29:25 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -81,6 +81,7 @@ rem   if exist lib\*.lib     del lib\*.lib
    if exist lib\hbodbcmt.lib   del lib\hbodbcmt.lib
    if exist lib\lang.lib       del lib\lang.lib
    if exist lib\libct.lib      del lib\libct.lib
+   if exist lib\hbct.lib       del lib\hbct.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
    if exist lib\nulsys.lib     del lib\nulsys.lib

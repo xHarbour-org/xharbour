@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.57 2004/08/27 07:53:50 paultucker Exp $
+# $Id: hrbdll.bc,v 1.58 2004/08/27 14:43:20 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1033,7 +1033,6 @@ $(HARBOUR_DLL)  : \
   echo. ,                                + >> hdll.tmp
   echo. cw32.lib                         + >> hdll.tmp
   echo. import32.lib                     + >> hdll.tmp
-  echo. mpr.lib                          + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
   ILINK32 -aa -Tpd -Gn @hdll.tmp
 
