@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.90 2004/02/12 07:37:57 andijahja Exp $
+# $Id: makefile.vc,v 1.91 2004/02/15 03:12:49 andijahja Exp $
 #
 
 #
@@ -310,9 +310,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\accept.obj \
    $(OBJ_DIR)$(MT)\ampm.obj \
    $(OBJ_DIR)$(MT)\at.obj \
-   $(OBJ_DIR)$(MT)\bkgtsks.obj \
    $(OBJ_DIR)$(MT)\binnum.obj \
    $(OBJ_DIR)$(MT)\binnumx.obj \
+   $(OBJ_DIR)$(MT)\bkgtsks.obj \
    $(OBJ_DIR)$(MT)\box.obj \
    $(OBJ_DIR)$(MT)\cdpapi.obj \
    $(OBJ_DIR)$(MT)\chrasc.obj \
@@ -373,12 +373,12 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\memoline.obj \
    $(OBJ_DIR)$(MT)\minmax.obj \
    $(OBJ_DIR)$(MT)\mlcount.obj \
-   $(OBJ_DIR)$(MT)\mlpos.obj \
    $(OBJ_DIR)$(MT)\mlctopos.obj \
-   $(OBJ_DIR)$(MT)\mpostolc.obj \
+   $(OBJ_DIR)$(MT)\mlpos.obj \
    $(OBJ_DIR)$(MT)\mod.obj \
    $(OBJ_DIR)$(MT)\mouseapi.obj \
    $(OBJ_DIR)$(MT)\mousex.obj \
+   $(OBJ_DIR)$(MT)\mpostolc.obj \
    $(OBJ_DIR)$(MT)\mtran.obj \
    $(OBJ_DIR)$(MT)\natmsg.obj \
    $(OBJ_DIR)$(MT)\net.obj \
@@ -449,8 +449,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\color53.obj \
    $(OBJ_DIR)$(MT)\cstr.obj \
    $(OBJ_DIR)$(MT)\cstruct.obj \
-   $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbdelim.obj \
+   $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \
