@@ -1,5 +1,5 @@
 /*
- * $Id: hashapi.h,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hashapi.h,v 1.2 2004/02/22 04:24:43 jonnymind Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #define HB_HASHAPI_H_
 
 #include "hbsetup.h"
-
+HB_EXTERN_BEGIN
 #define  HB_HASH_ALLOC_BLOCK  16
 
 PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem );
@@ -101,6 +101,6 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage );
       ___it_temp_.type= HB_IT_NIL;\
       hb_hashRemove( pHash, hb_itemPutC( &___it_temp_, czKey ) );\
    }
-
+HB_EXTERN_END
 #endif
 
