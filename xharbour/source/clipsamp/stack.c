@@ -1,5 +1,5 @@
 /*
- * $Id: stack.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: stack.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -57,10 +57,13 @@
 */
 HB_FUNC( STACKNEW )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( 0 );   /* Create array */
+   HB_ITEM Return;
 
-   hb_itemReturn( pReturn );
-   hb_itemRelease( pReturn );
+   Return.type = HB_IT_NIL;
+
+   hb_arrayNew( &Return, 0 );   /* Create array */
+
+   hb_itemReturn( &Return );
 }
 
 /*  StackPush( <aStack>, <xValue> ) --> <aStack>
@@ -80,18 +83,19 @@ HB_FUNC( STACKPOP )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
    LONG ulLen = hb_arrayLen( pArray );
-   PHB_ITEM pLast = hb_itemNew( NULL );
+   HB_ITEM Last;
+
+   Last.type = HB_IT_NIL;
 
    if( ulLen )
    {
-      hb_arrayLast( pArray, pLast );
+      hb_arrayLast( pArray, &Last );
       hb_arrayDel( pArray, ulLen );
       --ulLen;
       hb_arraySize( pArray, HB_MAX( ulLen, 0 ) );
    }
 
-   hb_itemReturn( pLast );
-   hb_itemRelease( pLast );
+   hb_itemReturn( &Last );
 }
 
 /* StackIsEmpty( <aStack> ) --> <lEmpty>
@@ -109,10 +113,11 @@ HB_FUNC( STACKISEMPTY )
 HB_FUNC( STACKTOP )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pLast = hb_itemNew( NULL );
+   HB_ITEM Last;
 
-   hb_arrayLast( pArray, pLast );
+   Last.type = HB_IT_NIL;
 
-   hb_itemReturn( pLast );
-   hb_itemRelease( pLast );
+   hb_arrayLast( pArray, &Last );
+
+   hb_itemReturn( &Last );
 }

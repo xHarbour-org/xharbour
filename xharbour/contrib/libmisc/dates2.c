@@ -1,5 +1,5 @@
 /*
- * $Id: dates2.c,v 1.3 2001/06/14 21:20:43 dholm Exp $
+ * $Id: dates2.c,v 1.1 2003/04/14 16:09:12 lculik Exp $
  */
 
 /*
@@ -136,32 +136,37 @@ long hb_woy( long lYear, long lMonth, long lDay, BOOL bISO )
 
 HB_FUNC( AMONTHS )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( 12 );    /* Create array */
+   HB_ITEM Return, Tmp;
    int i;
+
+   Tmp.type = HB_IT_NIL;
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, 0 );
 
    for( i = 0; i < 12; i++ )
    {
-      PHB_ITEM pString = hb_itemPutC( NULL, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + i ) );
-      hb_itemArrayPut( pReturn, i+1, pString );
-      hb_itemRelease( pString );
+      hb_arrayAddForward( &Return, hb_itemPutC( &Tmp, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + i ) ) );
    }
-   hb_itemReturn( pReturn );
-   hb_itemRelease( pReturn );
+
+   hb_itemReturn( &Return );
 }
 
 HB_FUNC( ADAYS )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( 7 );    /* Create array */
+   HB_ITEM Return, Tmp;
    int i;
+
+   Tmp.type = HB_IT_NIL;
+   Return.type = HB_IT_NIL;
+
+   hb_arrayNew( &Return, 0 );
 
    for( i = 0; i < 7; i++ )
    {
-      PHB_ITEM pString = hb_itemPutC( NULL, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + i ) );
-      hb_itemArrayPut( pReturn, i + 1, pString );
-      hb_itemRelease( pString );
+      hb_arrayAddForward( &Return, hb_itemPutC( &Tmp, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + i ) ));
    }
-   hb_itemReturn( pReturn );
-   hb_itemRelease( pReturn );
+
+   hb_itemReturn( &Return );
 }
 
 HB_FUNC( ISLEAPYEAR )

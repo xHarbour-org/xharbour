@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: date.c,v 1.2 2003/12/04 09:26:53 druzus Exp $
  */
 
 /*
@@ -184,31 +184,32 @@ HB_FUNC( ADDMONTH )
 */
 HB_FUNC( DATEASARRAY )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( 3 );     /* Create array */
+   HB_ITEM Return;
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, 0 );     /* Create array */
 
    if( pDate )
    {
-      PHB_ITEM pItem;
+      HB_ITEM Item;
       LONG lYear, lMonth, lDay;
+
+      Item.type = HB_IT_NIL;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 
-      pItem = hb_itemPutNL( NULL, lYear );
-      hb_itemArrayPut( pReturn, 1, pItem );
-      hb_itemRelease( pItem );
+      hb_itemPutNL( &Item, lYear );
+      hb_arrayAddForward( &Return, &Item );
 
-      pItem = hb_itemPutNL( NULL, lMonth );
-      hb_itemArrayPut( pReturn, 2, pItem );
-      hb_itemRelease( pItem );
+      hb_itemPutNL( &Item, lMonth );
+      hb_arrayAddForward( &Return, &Item );
 
-      pItem = hb_itemPutNL( NULL, lDay );
-      hb_itemArrayPut( pReturn, 3, pItem );
-      hb_itemRelease( pItem );
+      hb_itemPutNL( &Item, lDay );
+      hb_arrayAddForward( &Return, &Item );
    }
 
-   hb_itemReturn( pReturn );
-   hb_itemRelease( pReturn );
+   hb_itemReturn( &Return );
 }
 
 /* ARRAYASDATE( { <Year>, <Month>, <Day> } ) --> <dDate>
