@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.23 2004/01/31 05:51:27 likewolf Exp $
+ * $Id: debugger.prg,v 1.24 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -398,7 +398,7 @@ CLASS TDebugger
    METHOD Stack()
    METHOD Static()
 
-   METHOD Step() INLINE ::RestoreAppStatus(), ::Exit()
+   METHOD Step()
 
    METHOD TabWidth() INLINE ;
           ::nTabWidth := ::InputBox( "Tab width", ::nTabWidth )
@@ -406,7 +406,7 @@ CLASS TDebugger
    METHOD ToggleBreakPoint()
 
    METHOD Trace() INLINE ::lTrace := .t., ::nProcLevel := Len( ::aCallStack ),;
-                         __Keyboard( Chr( 255 ) ) //forces a Step()
+                         ::Step() //forces a Step()
 
    METHOD ToCursor()
    METHOD NextRoutine()
@@ -1074,7 +1074,9 @@ METHOD HandleEvent() CLASS TDebugger
       if HB_DBG_INVOKEDEBUG()  //NextKey() == K_ALT_D
          ::lAnimate := .f.
       else
-         KEYBOARD Chr( 255 ) // Forces a Step(). Only 0-255 range is supported
+         ::Step()
+         RETURN nil
+         //KEYBOARD Chr( 255 ) // Forces a Step(). Only 0-255 range is supported
       endif
    endif
 
@@ -1184,11 +1186,11 @@ METHOD HandleEvent() CLASS TDebugger
               ::ToCursor()
    
          case nKey == K_F8 .or. nKey == 255
-              // we are starting to run again so reset to the deepest call if
+/*              // we are starting to run again so reset to the deepest call if
               // displaying stack
               if ! ::oBrwStack == nil
                  ::oBrwStack:GoTop()
-              endif
+              endif*/
               ::Step()
 
          case nKey == K_F9
@@ -2839,6 +2841,18 @@ METHOD ResizeWindows( oWindow ) CLASS TDebugger
 RETURN self
 
 
+METHOD Step() CLASS TDebugger
+  // we are starting to run again so reset to the deepest call if
+  // displaying stack
+  if ! ::oBrwStack == nil
+    ::oBrwStack:GoTop()
+  endif
+  ::RestoreAppStatus()
+  ::Exit()
+RETURN
+
+
+
 STATIC FUNCTION CreateExpression( cExpr, aWatch )
    LOCAL nLen
    LOCAL i,j
@@ -3123,3 +3137,5 @@ static function PathToArray( cList )
    endif
 
 return aList
+
+
