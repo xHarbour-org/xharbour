@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.3 2002/11/29 20:13:35 walito Exp $
+ * $Id: pushbtn.prg,v 1.4 2003/02/20 15:51:09 lculik Exp $
  */
 
 /*
@@ -78,9 +78,9 @@ CLASS HBPushButton
    METHOD SetFocus()
    METHOD New( nRow, nCol, cCaption )
    ACCESS ColorSpec INLINE ::GetColor()
-   ASSIGN ColorSpec( xColor ) INLINE IIF(( xColor != Nil, ::GetColor( xColor ), )
+   ASSIGN ColorSpec( xColor ) INLINE IIF( xColor != Nil, ::GetColor( xColor ), )
    ACCESS Style INLINE ::GetStyle()
-   ASSIGN Style( cStyle ) INLINE IIF(( cStyle != Nil, ::GetStyle( cStyle ), )
+   ASSIGN Style( cStyle ) INLINE IIF( cStyle != Nil, ::GetStyle( cStyle ), )
 
    Hidden:
 
