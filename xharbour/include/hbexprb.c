@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.5 2002/01/21 20:51:42 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.6 2002/01/23 16:48:31 ronpinkas Exp $
  */
 
 /*
@@ -3133,15 +3133,31 @@ static HB_EXPR_FUNC( hb_compExprUsePlus )
 
           #else
 
+            HB_EXPR_PTR pValue = NULL;
             short iIncrement;
 
             if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
                 pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
             {
+               pValue = pSelf->value.asOperator.pLeft;
                iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+            }
+            else if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pLeft->value.asNum.NumType == HB_ET_LONG &&
+                     pSelf->value.asOperator.pLeft->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pLeft->value.asNum.lVal <= 32767 )
+            {
+               pValue = pSelf->value.asOperator.pRight;
+               iIncrement = ( short ) pSelf->value.asOperator.pLeft->value.asNum.lVal;
+            }
 
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-               hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+            if( pValue )
+            {
+               HB_EXPR_USE( pValue, HB_EA_PUSH_PCODE );
+
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement )
+               {
+                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
 
                break;
             }

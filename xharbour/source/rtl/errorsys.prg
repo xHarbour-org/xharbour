@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.29 2001/04/19 01:13:25 dholm Exp $
+ * $Id: errorsys.prg,v 1.1.1.1 2001/12/21 10:41:33 ronpinkas Exp $
  */
 
 /*
@@ -48,13 +48,21 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 2001 Ron Pinkas <ron@profit-master.com>
+ *    TraceLog()
+ *    xToStr()
  */
 
 #include "common.ch"
 #include "error.ch"
 
-PROCEDURE ErrorSys
+#define  CRLF HB_OsNewLine()
 
+PROCEDURE ErrorSys
    ErrorBlock( { | oError | DefError( oError ) } )
 
    RETURN
@@ -189,3 +197,83 @@ STATIC FUNCTION ErrorMessage( oError )
    ENDCASE
 
    RETURN cMessage
+
+//--------------------------------------------------------------//
+INIT PROCEDURE InitTrace()
+
+   LOCAL FileHandle
+
+   FileHandle := FCreate( "Trace.Log" )
+   FClose(FileHandle)
+
+RETURN
+
+//--------------------------------------------------------------//
+FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
+
+   LOCAL FileHandle, ProcName, Counter := 1, aEntries
+
+   aEntries := {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15}
+
+   FileHandle := FOpen( 'Trace.Log', 1 )
+
+   FSeek( FileHandle, 0, 2 )
+
+   FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+
+   DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
+      FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
+   ENDDO
+
+   FOR Counter := 1 to PCount()
+      FWrite( FileHandle, '>>>' + xToStr( aEntries[Counter] ) + '<<<' + CRLF )
+   NEXT
+
+   FWrite( FileHandle, CRLF )
+
+   FClose(FileHandle)
+
+RETURN .T.
+
+//--------------------------------------------------------------//
+FUNCTION xToStr( xExp )
+
+   LOCAL cType
+
+   IF xExp == NIL
+      RETURN 'NIL'
+   ENDIF
+
+   cType := ValType( xExp )
+
+   DO CASE
+      CASE cType = 'C'
+         RETURN xExp
+
+      CASE cType = 'D'
+         RETURN dToc( xExp )
+
+      CASE cType = 'L'
+         RETURN IIF( xExp, '.T.', '.F.' )
+
+      CASE cType = 'N'
+         RETURN Str( xExp )
+
+      CASE cType = 'M'
+         RETURN xExp
+
+      CASE cType = 'A'
+         RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
+
+      CASE cType = 'B'
+         RETURN '{|| Block }'
+
+      CASE cType = 'O'
+         RETURN "{ Object }"
+
+      OTHERWISE
+         RETURN "Type: " + cType
+   ENDCASE
+
+RETURN ""
+
