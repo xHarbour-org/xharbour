@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.22 2003/10/08 06:54:39 peterrees Exp $
+ * $Id: isprint.c,v 1.23 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -312,9 +312,10 @@ DWORD hb_printerIsReadyn( char * pszPrinterName )
   DWORD dwPrinter= -1;
   HANDLE hPrinter;
 
-  if (*pszPrinterName && OpenPrinter( pszPrinterName, &hPrinter, NULL ))
+  if (*pszPrinterName && OpenPrinter( pszPrinterName, &hPrinter, NULL )) {
     dwPrinter =  IsPrinterErrorn( hPrinter );
     CloseHandle(hPrinter) ;
+  }
   return dwPrinter;
 }
 
