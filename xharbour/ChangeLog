@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.825 2003/03/10 23:21:50 jonnymind Exp $
+ * $Id: ChangeLog,v 1.826 2003/03/11 06:37:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-11 11:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + tests/assocspd.prg
+    + Added sample comparing Array Syntax of AA, against OOP Syntax of AA, as well as normal Objects.
 
 2003-03-10 22:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
