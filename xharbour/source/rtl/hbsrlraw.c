@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.10 2003/04/20 22:46:09 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.11 2003/05/17 18:04:28 jonnymind Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 * HB_CreateLen8( nLen ) --> returns the bytes containing the code
 */
 
-void hb_createlen8( BYTE *ret, ULONG uRet )
+void hb_createlen8( BYTE *ret, ULONGLONG uRet )
 {
    int i;
    for( i = 7; i >= 0; i -- )
@@ -104,7 +104,7 @@ ULONG hb_getlen8( BYTE *cStr )
 
    for (i = 7; i >=0; i-- )
    {
-      ulRet += ((ULONG) cStr[i]) * lFact;
+      ulRet += (( ULONGLONG) cStr[i]) * lFact;
       lFact *= 256l;
    }
    return ulRet;
@@ -189,6 +189,17 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet[1] = (BYTE)'L';
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
       break;
+      
+#ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LONGLONG:
+         ulRet = 10;
+         cRet = (BYTE *) hb_xgrab( ulRet );
+         cRet[0] = (BYTE)'N';
+         cRet[1] = (BYTE)'X';
+         hb_createlen8( cRet + 2, pItem->item.asLongLong.value );
+      break;
+#endif
+
 
       case HB_IT_DOUBLE:
          ulRet = 2 + sizeof( double );
@@ -283,6 +294,13 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
             ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnl( (long) ulData );
          }
+#ifndef HB_LONG_DOUBLE_OFF
+         else if( cBuf[1] == 'X' )
+         {
+            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
+            hb_retnll( (LONGLONG) ulData );
+         }
+#endif
          else
          {
             hb_retnd( *((double *) (cBuf +2) ) );
@@ -318,7 +336,7 @@ ULONG hb_serialNextRaw( char *cBuf )
       return 2;
 
       case 'N':
-         if( cBuf[1] == 'I' || cBuf[1] == 'L' )
+         if( cBuf[1] == 'I' || cBuf[1] == 'X' || cBuf[1] == 'L' )
          {
             return 10;
          }

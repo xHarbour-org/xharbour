@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.71 2003/07/06 17:15:40 lculik Exp $
+ * $Id: hbapi.h,v 1.72 2003/07/07 03:28:15 lculik Exp $
  */
 
 /*
@@ -74,8 +74,8 @@ extern "C" {
 #define HB_IT_INTEGER   ( ( USHORT ) 0x0002 )
 #define HB_IT_LONG      ( ( USHORT ) 0x0008 )
 #define HB_IT_DOUBLE    ( ( USHORT ) 0x0010 )
-#define HB_IT_LONGLONG  ( ( USHORT ) 0x0015 )
 #define HB_IT_DATE      ( ( USHORT ) 0x0020 )
+#define HB_IT_LONGLONG  ( ( USHORT ) 0x0040 )
 #define HB_IT_LOGICAL   ( ( USHORT ) 0x0080 )
 #define HB_IT_SYMBOL    ( ( USHORT ) 0x0100 )
 #define HB_IT_ALIAS     ( ( USHORT ) 0x0200 )
@@ -264,8 +264,8 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
    #ifndef HB_LONG_DOUBLE_OFF
-    #define hb_retnld( dNumber )                  hb_itemPutNLD( &HB_VM_STACK.Return, (dNumber) )
-    #define hb_retnldlen( dNumber, iWidth, iDec ) hb_itemPutNLDLen( &HB_VM_STACK.Return, (dNumber), (iWidth), (iDec) )
+    #define hb_retnll( dNumber )                  hb_itemPutNLL( &HB_VM_STACK.Return, (dNumber) )
+    #define hb_retnlllen( dNumber, iWidth, iDec ) hb_itemPutNLLLen( &HB_VM_STACK.Return, (dNumber), (iWidth), (iDec) )
 
    #endif
 
