@@ -1,5 +1,5 @@
 /*
- * $Id: wvtmenu.prg,v 1.1 2004/06/11 01:56:41 peterrees Exp $
+ * $Id: wvtmenu.prg,v 1.1 2005/01/22 16:14:00 lf_sfnet Exp $
  */
 
 /*
@@ -80,6 +80,8 @@ FUNCTION Main()
 
 INIT FUNCTION AppSetup()
   LOCAL nWidth
+  WVT_Core()
+  WVT_Utils()
   SetShutDownEvent(2048)
   SetKey(2048, { || ReShutDown()} )
   SetCloseEvent(2049)

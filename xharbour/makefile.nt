@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.119 2005/01/14 20:00:00 ptsarenko Exp $
+# $Id: makefile.nt,v 1.119 2005/01/14 19:22:10 ptsarenko Exp $
 #
 
 #
@@ -1069,12 +1069,7 @@ GTWIN_LIB_OBJS = \
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)\gtwvt2
 
 GTWVT_LIB_OBJS = \
-   $(OBJ_DIR)\gtwvt.obj \
-   \
-   $(OBJ_DIR)\wvtcore.obj \
-   $(OBJ_DIR)\wvtutils.obj \
-   $(OBJ_DIR)\wvtclass.obj \
-   $(OBJ_DIR)\wvtpaint.obj
+   $(OBJ_DIR)\gtwvt.obj
 
 #
 # SAMPLES.LIB rules

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.142 2005/01/22 11:32:05 druzus Exp $
+ * $Id: gtwvt.c,v 1.143 2005/01/22 15:21:09 lf_sfnet Exp $
  */
 
 /*
@@ -2355,6 +2355,12 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_NCMOUSEMOVE:
     {
        hb_wvt_gtMouseEvent( hWnd, message, wParam, lParam );
+       return( 0 );
+    }
+    case WM_ENTERIDLE:
+    {
+       // FSG - 12/05/2004 - Signal than i'm on idle
+       hb_idleState( FALSE );
        return( 0 );
     }
 /*

@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-01-22 19:35 UTC+0100 Francesco Saverio Giudice <info@fsgiudice>
+  * xharbour/contrib/gtwvt/makefile.bc
+    * fixed wvtcore.c compilation
+    - removed gtwvt.c (it is already in core, not needed here)
+
+  * xharbour/contrib/gtwvt/wvtcore.c
+    + WVT_CORE function
+      needed to start WVT core from applications
+
+  * xharbour/contrib/gtwvt/wvtutils.c
+    + WVT_UTILS function
+      needed to start WVT utils from applications
+
+  * xharbour/contrib/gtwvt/samples/bldwvt.bat
+    + Added HB_USER_LIBS env var to add gtwvt.lib that contains WVT extensions
+
+  + xharbour/contrib/gtwvt/samples/test.dbf
+    Needed from wvtgui.prg and wvtmenu.prg
+
+  * xharbour/contrib/gtwvt/samples/wvtgui.prg
+  * xharbour/contrib/gtwvt/samples/wvtmenu.prg
+    + Added explicit calls to WVT_CORE() and WVT_UTILS() at start to
+      activate WVT extentions
+
 2004-05-14 18:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   + xharbour/sourc/rtl/gtwvt/wvtcore.c
     Contains all GUI primitive functions.
@@ -17,9 +41,9 @@
 
   * xharbour/sourc/rtl/gtwvt/gtwvt.c
     Break the code in smaller logical chunks and distributed them in
-    multiple files. This file now contains core GT functionality and 
+    multiple files. This file now contains core GT functionality and
     rest of functions are distributed in above files.
-  
+
   * xharbour/include/hbgtwvt.h
     Some prototype rotation from static to extern.
 
@@ -30,7 +54,7 @@
     Added above files.
 
   /*
-     The management of GTWVT was becoming more and more complex due to 
+     The management of GTWVT was becoming more and more complex due to
      everything being put in single file. Moreover, as I am about to add
      Wvt*Classes to make WVT OOP instead of function oriented, I felt the
      need to give it a proper code placement.
@@ -422,15 +446,15 @@
 2004-01-26 14:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + Wvt_Minimize()
-      Minimizes the application window. Useful when application is engaged in 
+      Minimizes the application window. Useful when application is engaged in
       long uninterrupted tasks.
 
     + Wvt_Maximize()
       Maximizes, I mean, restores to normal position the previously minimized
       application window.
-     
+
     + Wvt_SetOnTop()
-      Forces the application window to be as the TOPMOST window. Useful when a 
+      Forces the application window to be as the TOPMOST window. Useful when a
       compulsory input is required, or, where developer wants that no other window
       is allowed to operlap application window.
 
@@ -439,14 +463,14 @@
       window on the Desktop can be brought in focus overlapping application window.
 
     + Wvt_SaveScreen( nTop, nLeft, nBottom, nRight )
-      Saves the designated rectangle in an array with three elelments, viz., 
+      Saves the designated rectangle in an array with three elelments, viz.,
       { nWidth, nHeight, hBitmap }. The bitmap image of the rectanle is retained
-      in memory until Wvt_RestScreen() is called. So it is important that 
+      in memory until Wvt_RestScreen() is called. So it is important that
       Wvt_RestScreen() must be called when current program returns.
 
     + Wvt_RestScreen( nTop, nLeft, nBottom, nRight, aSavedScreen )
       Flushes the bitmap referenced in <aSavedScreen> onto the designated rectangle.
-      This function must be called after Wvt_SaveScreen() just not to exhaust 
+      This function must be called after Wvt_SaveScreen() just not to exhaust
       GDI resources of Windows.
 
     ! Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrientation, nFormat, nAlign, ;

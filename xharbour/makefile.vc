@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.141 2005/01/14 20:00:00 ptsarenko Exp $
+# $Id: makefile.vc,v 1.141 2005/01/14 19:22:11 ptsarenko Exp $
 #
 
 #
@@ -1032,12 +1032,7 @@ GTWIN_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
 
 GTWVT_LIB_OBJS = \
-   $(OBJ_DIR)\gtwvt.obj \
-   \
-   $(OBJ_DIR)\wvtcore.obj \
-   $(OBJ_DIR)\wvtutils.obj \
-   $(OBJ_DIR)\wvtclass.obj \
-   $(OBJ_DIR)\wvtpaint.obj
+   $(OBJ_DIR)\gtwvt.obj
 
 #
 # SAMPLES.LIB rules

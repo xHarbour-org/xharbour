@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2003/11/08 06:17:29 brianhays Exp $
+# $Id: makefile.bc,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -11,8 +11,7 @@ OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
 
 $(LIB_DIR)\gtwvt.lib :   \
-   $(OBJ_DIR)\gtwvt.obj    \
-   $(OBJ_DIR)\wvtcore.c   \
+   $(OBJ_DIR)\wvtcore.obj  \
    $(OBJ_DIR)\wvtutils.obj \
    $(OBJ_DIR)\wvtpaint.obj \
    $(OBJ_DIR)\wvtclass.obj \
@@ -23,7 +22,6 @@ $(OBJ_DIR)\wvtclass.obj : $(OBJ_DIR)\wvtclass.c
 $(OBJ_DIR)\wvtpaint.c   : wvtpaint.prg
 $(OBJ_DIR)\wvtpaint.obj : $(OBJ_DIR)\wvtpaint.c
 
-$(OBJ_DIR)\gtwvt.obj    : gtwvt.c
 $(OBJ_DIR)\wvtcore.obj  : wvtcore.c
 $(OBJ_DIR)\wvtutils.obj : wvtutils.c
 

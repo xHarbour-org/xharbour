@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.10 2004/08/30 14:10:20 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
  */
 
 /*
@@ -100,6 +100,13 @@ static void hb_wvt_DrawToolButtonDown( HDC hdc, int iTop, int iLeft, int iBottom
 void HB_EXPORT hb_wvt_wvtCore( void )
 {
    _s = hb_wvt_gtGetGlobalData();
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CORE )
+{
+   hb_wvt_wvtCore();
 }
 
 //-------------------------------------------------------------------//

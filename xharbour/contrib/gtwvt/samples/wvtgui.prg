@@ -145,6 +145,9 @@ PROCEDURE Main( cDSN )
    LOCAL oMenu   := CreateMainMenu()
    LOCAL nConxn
 
+   WVT_Core()
+   WVT_Utils()
+
    SET DATE BRITISH
 
    #ifdef __SQL__

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.82 2005/01/14 20:00:00 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.82 2005/01/14 19:22:09 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -586,9 +586,7 @@ HARBOUR_DLL_OBJS = \
 #
 !if $(HB_GT_LIB) == gtwvt
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
-  $(OBJ_DIR)\gtwvt.obj \
-  $(OBJ_DIR)\wvtcore.obj \
-  $(OBJ_DIR)\wvtutils.obj
+  $(OBJ_DIR)\gtwvt.obj
 !else
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwin.obj \
@@ -992,8 +990,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
 !if $(HB_GT_LIB) == gtwvt
   echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\wvtcore.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\wvtutils.obj          + >> hdll.tmp
 !else
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
@@ -2411,12 +2407,6 @@ $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
 !if $(HB_GT_LIB) == gtwvt
 
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\wvtcore.obj : $(RTL_DIR)\gtwvt\wvtcore.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\wvtutils.obj : $(RTL_DIR)\gtwvt\wvtutils.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 !else

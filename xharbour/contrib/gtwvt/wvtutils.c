@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.21 2005/01/21 18:41:40 druzus Exp $
+ * $Id: wvtutils.c,v 1.1 2005/01/22 15:21:12 lf_sfnet Exp $
  */
 
 /*
@@ -105,6 +105,13 @@ HB_EXTERN_END
 void HB_EXPORT hb_wvt_wvtUtils( void )
 {
    _s = hb_wvt_gtGetGlobalData();
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_UTILS )
+{
+   hb_wvt_wvtUtils();
 }
 
 //-------------------------------------------------------------------//
@@ -610,7 +617,7 @@ HB_FUNC( WVT_SETICON )
 {
    if ( ISNUM( 1 ) || ISCHAR( 2 ) )
    {
-      hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ), hb_parcx( 2 ) ) ) ;   	
+      hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ), hb_parcx( 2 ) ) ) ;
    }
    else
    {

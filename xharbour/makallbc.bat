@@ -1,7 +1,7 @@
 @echo off
-rem 
-rem $Id: makallbc.bat,v 1.12 2004/08/27 05:42:13 paultucker Exp $
-rem 
+rem
+rem $Id: makallbc.bat,v 1.13 2004/11/21 16:26:11 bdj Exp $
+rem
 
 echo create system files
 call make_b32 %1
@@ -143,6 +143,12 @@ if errorlevel 1 goto end
 :gtwvw
 echo gtwvw
 cd contrib\gtwvw
+call make_b32.bat %1
+cd ..\..
+
+:gtwvt
+echo gtwvt
+cd contrib\gtwvt
 call make_b32.bat %1
 cd ..\..
 
