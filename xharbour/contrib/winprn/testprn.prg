@@ -4,6 +4,11 @@
 FUNCTION Main()
   LOCAL nPrn:=1
   LOCAL aPrn:= GetPrinters()
+  CLS
+  IF EMPTY(aPrn)
+    Alert("No printers installed - Cannot continue")
+    QUIT
+  ENDIF
   DO WHILE !EMPTY(nPrn)
     CLS
     @ 0,0 SAY 'TPRINT() Class test program. Choose a printer to test'

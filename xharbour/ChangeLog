@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2536 2004/03/10 02:54:42 andijahja Exp $
+ * $Id: ChangeLog,v 1.2537 2004/03/10 03:12:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-10 16:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/winprn/testprn.prg
+    - trap error condition if no printers installed
+
 2004-03-10 10:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/dbdelim.prg
     ! forget to pass cSeparator to FPARSEEX()
