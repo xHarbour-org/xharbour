@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipString.h $
 // $Archive: /ZipArchive_STL/ZipString.h $
-// $Date: 2003/08/25 18:38:32 $ $Author: lculik $
+// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -252,10 +252,14 @@ public:
 	{
 		return Compare(lpsz) != 0;
 	}
+	#if __GNUC__ >=3 
+	#else
 	bool operator == (LPCTSTR lpsz)
 	{
 		return Compare(lpsz) == 0;
 	}
+	#endif
+	
 	int Find( TCHAR ch, int nStart = 0) const
 	{
 		return (int) find(ch, nStart);
