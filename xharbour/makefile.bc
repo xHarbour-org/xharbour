@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.10 2002/05/02 22:28:58 ronpinkas Exp $
+# $Id: makefile.bc,v 1.11 2002/05/18 13:19:26 lculik Exp $
 #
 
 #
@@ -2742,6 +2742,6 @@ $(OBJ_DIR)\prb_stak.c : $(HBMAKE_DIR)\prb_stak.prg
 $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\hbmlang.obj : $(OBJ_DIR)\hbmlang.c
+$(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 

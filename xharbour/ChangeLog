@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.223 2002/05/18 11:40:31 map Exp $
+ * $Id: ChangeLog,v 1.224 2002/05/18 13:19:26 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-05-19 21:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    * Fixed an minor bug
+  * source/rtl/tprint.cpp
+    source/rtl/tprinter.cpp
+    include/tprint.hpp
+    * Mijor formatting.
+    * Fixed compilation warning 
+
 2002-05-18 10:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * makefile.bc
     makefile.vc

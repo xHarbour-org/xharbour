@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.13 2002/05/14 00:45:15 lculik Exp $
+ * $Id: hbmake.prg,v 1.14 2002/05/18 13:19:29 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -3409,7 +3409,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
     cParam := Strtran( cParam, "-r", "-R" )
     cParam := Strtran( cParam, "-l", "-L" )
 
-   If AT( "-EX" , cParam ) >0 .or. AT( "-EXL" , cParam )  >0
+   If AT( "-EX" , cParam ) >0 .or. AT( "-ELX" , cParam )  >0
 
        lEditMode:=.T.
 
