@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.11 2003/09/11 13:23:30 mlombardo Exp $
+ * $Id: hbi18n.c,v 1.12 2003/11/03 05:16:58 jonnymind Exp $
  */
 
 /*
@@ -772,7 +772,7 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
    // Supposing that the user strings are compiled in englis;
    // this default can be changed later
    strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
-   strncpy( s_base_language_name, HB_INTERNATIONAL_NAME, HB_I18N_NAMELEN - 1 );
+   strcpy( s_base_language_name, HB_INTERNATIONAL_NAME );
 
    if ( language == NULL )
    {

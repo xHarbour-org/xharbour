@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2178 2004/01/29 21:43:13 andijahja Exp $
+ * $Id: ChangeLog,v 1.2179 2004/01/29 22:20:59 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 00:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hbi18n.c
+  * source/compiler/harbour.c
+    ! Default International language name was not correctly saved into the HIL
+      table.
+
+  * source/rtl/teditor.prg
+    ! Wraping when space was hit was done even if wordwrapping was off (and
+      Wrap column was set to 0, causing soft newlines everywhere).
+
 2004-01-30 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/hvm.c
     + add wrappers (some 3rd-party-libs still use these ones) for :

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.63 2004/01/28 07:04:28 andijahja Exp $
+ * $Id: harbour.c,v 1.64 2004/01/28 07:34:06 likewolf Exp $
  */
 
 /*
@@ -4636,9 +4636,9 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             // and write header
             sprintf( head.signature, "\3HIL" );
             sprintf( head.author, "The xharbour group" );
-            sprintf( head.language, "International" );
-            sprintf( head.language_int, "International" );
-            sprintf( head.language_code, HB_INTERNATIONAL_NAME );
+            sprintf( head.language, HB_INTERNATIONAL_NAME );
+            sprintf( head.language_int, HB_INTERNATIONAL_NAME );
+            sprintf( head.language_code, HB_INTERNATIONAL_CODE );
             head.entries = -1; // unknown
             fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
          }

@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.14 2004/01/06 23:54:46 peterrees Exp $
+/* $Id: teditor.prg,v 1.15 2004/01/20 03:20:06 lculik Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1340,8 +1340,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                exit
 
             case K_SPACE
-	      // Space is a very tricky key, and requires its own routine to avoid array errors in Getparagraph()
-
+              // Space is a very tricky key, and requires its own routine to avoid array errors in Getparagraph()
               ::lDirty := .T.
               nLastLine =  ::nRow
               if !(::nRow=::naTextLen .or. ::aText[::nRow]:lSoftCR = .F.)  // not the last line, not a HardCR
@@ -1358,19 +1357,19 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
                   ::RefreshLine()
                   ::SplitLine(::nRow)
-                  if nLastLine =  ::nRow .or. ::lInsert
-		      ::lRightScroll := .F.
+                  if nLastLine = ::nRow .or. ::lInsert
+                      ::lRightScroll := .F.
                       ::MoveCursor(K_RIGHT)
-		      ::lRightScroll := .T.
+                      ::lRightScroll := .T.
                   endif
-              else      					// The last line or a HardCR line
-                  if ::nCol >= ::nWordWrapCol      		// if at wordwrap of Hard CR line
+              else   // The last line or a HardCR line
+                  if ::lWordWrap .and. ::nCol >= ::nWordWrapCol  // if at wordwrap of Hard CR line
                       ::aText[::nRow]:lSoftCR = .T.		// wrap by adding a line and move down, merge CR status
                       ::InsertLine("", .F. , ::nRow +1 )
                       ::MoveCursor(K_DOWN)
                       ::RefreshLine()
 
-                  else						// Not at wordwrap of line
+                  else // Not at wordwrap of line
                      if Empty( substr(::aText[::nRow]:cText, ::nCol) )  // if spaces already exist, move over them to EOL
                         ::lRightScroll := .F.
                         ::MoveCursor(K_RIGHT)
