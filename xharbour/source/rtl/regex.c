@@ -64,6 +64,8 @@ restrictions:
  *
  */
 
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapi.h"
@@ -81,7 +83,7 @@ DFTABLES is defined. */
 #include "regex.h"
 #endif
 
-
+#define HB
 
 /*************************************************
 *           Create PCRE character tables         *
@@ -6345,6 +6347,9 @@ else
 
 HB_FUNC( HB_ATX )
 {
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
    #define REGEX_MAX_GROUPS 16
    regex_t re;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
@@ -6429,6 +6434,8 @@ HB_FUNC( HB_ATX )
  */
 BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 {
+   HB_THREAD_STUB
+
    #ifndef REGEX_MAX_GROUPS
       #define REGEX_MAX_GROUPS 16
    #endif
@@ -6437,7 +6444,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    regex_t *pReg;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-   int i;
+   int i, iMatches;
    int iMaxMatch = REGEX_MAX_GROUPS;
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
@@ -6506,16 +6513,31 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       {
          case 0: // Wants Results
          {
-            PHB_ITEM pMatch;
-
-            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
-
-            i = 0;
-            while ( aMatches[i].rm_eo > -1 )
+            // Count sucessful matches
+            for ( i = 0; i < iMaxMatch; i ++ )
             {
-               pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
-               hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
-               i++;
+               if ( aMatches[i].rm_eo != -1 )
+               {
+                  iMatches = i;
+               }
+            }
+
+            iMatches++;
+            hb_arrayNew( &(HB_VM_STACK.Return), iMatches );
+
+            for ( i = 0; i < iMatches; i++ )
+            {
+               if (aMatches[i].rm_eo > -1 )
+               {
+                  hb_itemPutCL(
+                     hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ),
+                     pString->item.asString.value + aMatches[i].rm_so,
+                     aMatches[i].rm_eo - aMatches[i].rm_so );
+               }
+               else
+               {
+                  hb_itemPutCL( hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ), "",0 );
+               }
             }
 
            return TRUE;
@@ -6554,31 +6576,51 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          case 4: // Wants Results AND positions
          {
-            PHB_ITEM pMatch;
             PHB_ITEM aSingleMatch;
 
-            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+            // Count sucessful matches
+            for ( i = 0; i < iMaxMatch; i ++ )
+            {
+               if ( aMatches[i].rm_eo != -1 )
+               {
+                  iMatches = i;
+               }
+            }
 
-            i = 0;
-            while ( aMatches[i].rm_eo > -1 )
+            iMatches++;
+            hb_arrayNew( &(HB_VM_STACK.Return), iMatches );
+
+            for ( i = 0; i < iMatches; i++ )
             {
                aSingleMatch = hb_itemNew( NULL );
-               hb_arrayNew( aSingleMatch, 0 );
 
-               // Matched string
-               pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
-               hb_arrayAddForward( aSingleMatch, pMatch );
+               if ( aMatches[i].rm_eo != -1 )
+               {
+                  hb_arrayNew( aSingleMatch, 3 );
 
-               // begin of match
-               pMatch = hb_itemPutNI( NULL, aMatches[i].rm_so );
-               hb_arrayAddForward( aSingleMatch, pMatch );
+                  //matched string
+                  hb_itemPutCL(
+                     hb_arrayGetItemPtr( aSingleMatch, 1 ),
+                     pString->item.asString.value + aMatches[i].rm_so,
+                     aMatches[i].rm_eo - aMatches[i].rm_so );
 
-               // End of match
-               pMatch = hb_itemPutNI( NULL, aMatches[i].rm_eo );
-               hb_arrayAddForward( aSingleMatch, pMatch );
+                  // begin of match
+                  hb_itemPutNI(
+                     hb_arrayGetItemPtr( aSingleMatch, 2 ),
+                     aMatches[i].rm_so );
 
-               hb_arrayAddForward( &(HB_VM_STACK.Return), aSingleMatch );
-               i++;
+                  // End of match
+                  hb_itemPutNI(
+                     hb_arrayGetItemPtr( aSingleMatch, 3 ),
+                     aMatches[i].rm_eo );
+               }
+               else {
+                  hb_itemPutCL( hb_arrayGetItemPtr( aSingleMatch, 1 ), "", 0 );
+                  hb_itemPutNI( hb_arrayGetItemPtr( aSingleMatch, 2 ), 0 );
+                  hb_itemPutNI( hb_arrayGetItemPtr( aSingleMatch, 3 ), 0 );
+               }
+
+               hb_itemArrayPut( &(HB_VM_STACK.Return), i + 1, aSingleMatch );
             }
             return TRUE;
 
@@ -6614,6 +6656,9 @@ HB_FUNC( HB_REGEXATX )
 // Returns just .T. if match found or .F. otherwise.
 HB_FUNC( HB_REGEXMATCH )
 {
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
    hb_retl ( hb_regex( 2, NULL, NULL ) );
 }
 
@@ -6625,6 +6670,10 @@ HB_FUNC( HB_REGEXSPLIT )
 
 HB_FUNC( HB_REGEXCOMP )
 {
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+
    regex_t re;
    char *cRegex;
    int CFlags = REG_EXTENDED;
