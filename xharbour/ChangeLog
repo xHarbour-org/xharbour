@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.12 2002/01/03 04:16:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.13 2002/01/03 06:28:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-01-03 08:00 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * updated the date
+   * utils/hbmake/hbmutils.prg
+    * Reupdaload again, the function Getlibs() is in this module
+
 
 2002-01-02 22:22 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/classes.c
@@ -95,6 +101,7 @@
    * utils/hbmake/hbmutils.prg
     * Sinc with harbour
 
+>>>>>>> 1.13
 2002-01-01 20:29 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/fastitem.c
   * xharbour/source/vm/itemapi.c
