@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.1 2004/01/04 13:12:46 lculik Exp $
+ * $Id: net.c,v 1.2 2004/01/04 23:15:52 ronpinkas Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -97,20 +97,20 @@
 
 static BOOL hb_IsNetShared(LPSTR szLocalDevice )
 {
-	char szRemoteDevice[80] ;
-	DWORD dwResult ;
-	DWORD cchBuff = sizeof(szRemoteDevice) ;
+   char szRemoteDevice[80] ;
+   DWORD dwResult ;
+   DWORD cchBuff = sizeof(szRemoteDevice) ;
 
-	dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff) ;
+   dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff) ;
 
-    if ( dwResult == NO_ERROR )
-    {
-       return TRUE;
-    }
- 	else
-    {
-       return FALSE;
-    }
+   if ( dwResult == NO_ERROR )
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
 }
 
 /*  $DOC$
@@ -156,20 +156,12 @@ static BOOL hb_IsNetShared(LPSTR szLocalDevice )
 
 HB_FUNC ( NETCANCEL )
 {
-	DWORD dwResult;
-    char *cDevice = (char *)hb_parc (1);
+   DWORD dwResult;
+   char *cDevice = (char *)hb_parc (1);
 
-	dwResult = WNetCancelConnection( cDevice , TRUE ) ; // FALSE = fail if exist open files or print jobs.
-												        // TRUE = force cancel connection even if exist
-														//        open files or print jobs.
-	if ( dwResult == NO_ERROR )
-		{
-		hb_retl( TRUE ) ;
-		}
-	else
-		{
-		hb_retl( FALSE ) ;
-		}
+   dwResult = WNetCancelConnection( cDevice , TRUE ) ; // FALSE = fail if exist open files or print jobs.
+                                                                                                       // TRUE = force cancel connection even if exist														//        open files or print jobs.
+   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
 }
 
 /*  $DOC$
@@ -215,9 +207,9 @@ HB_FUNC ( NETCANCEL )
 
 HB_FUNC ( NETPRINTER )
 {
-	char *cPrn = hb_set.HB_SET_PRINTFILE ;  // query default local printer port.
+   char *cPrn = hb_set.HB_SET_PRINTFILE ;  // query default local printer port.
 
-    hb_retl( hb_IsNetShared( cPrn ) );
+   hb_retl( hb_IsNetShared( cPrn ) );
 }
 
 /*  $DOC$
@@ -262,14 +254,13 @@ HB_FUNC ( NETPRINTER )
 
 HB_FUNC ( NETDISK )
 {
-	char *cDrive = (char *)hb_parc (1);
+   char *cDrive = ( char *) hb_parc( 1 );
+   if ( strstr( cDrive, ":" ) == NULL )
+   {
+      strcat( cDrive, ":" ) ;
+   }
 
-	if ( strstr(cDrive,":") == NULL )
-		{
-		strcat(cDrive,":");
-		}
-
-    hb_retl( hb_IsNetShared( cDrive ) );
+   hb_retl( hb_IsNetShared( cDrive ) );
 }
 
 /*  $DOC$
@@ -341,33 +332,27 @@ HB_FUNC ( NETDISK )
 HB_FUNC ( NETREDIR )
 {
 
-	DWORD dwResult;
-    char *cLocalDev = hb_parc(1);
-    char *cSharedRes = hb_parc(2);
-    char *cPassword = hb_parc(3);
+   DWORD dwResult;
+   char *cLocalDev  = hb_parc( 1 );
+   char *cSharedRes = hb_parc( 2 );
+   char *cPassword  = hb_parc( 3 );
 
-	if ( strstr(cLocalDev,":") == NULL )
-		{
-		strcat(cLocalDev,":");
-		}
+   if ( strstr( cLocalDev, ":" ) == NULL )
+   {
+   strcat( cLocalDev, ":" );
+   }
 
-    if ( hb_pcount() == 3 && ISCHAR(3) )
-    	{
-		dwResult = WNetAddConnection( cSharedRes , cPassword , cLocalDev ) ;
-	    }
-	else
-    	{
-		dwResult = WNetAddConnection( cSharedRes , NULL , cLocalDev ) ;
-	    }
+   if ( hb_pcount() == 3 && ISCHAR( 3 ) )
+   {
+      dwResult = WNetAddConnection( cSharedRes , cPassword , cLocalDev ) ;
+   }
+   else
+   {
+      dwResult = WNetAddConnection( cSharedRes , NULL , cLocalDev ) ;
+   }
 
-	if ( dwResult == NO_ERROR )
-		{
-		hb_retl( TRUE ) ;
-		}
-	else
-		{
-		hb_retl( FALSE ) ;
-		}
+   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
+
 }
 
 /*  $DOC$
@@ -415,21 +400,14 @@ HB_FUNC ( NETREDIR )
 
 HB_FUNC ( NETRMTNAME )
 {
-	char szRemoteDevice[80];
-	char *szLocalDevice = (char *)hb_parc (1) ;
-	DWORD dwResult;
-	DWORD cchBuff = sizeof(szRemoteDevice);
+   char szRemoteDevice[ 80 ];
+   char *szLocalDevice = ( char * )hb_parc ( 1 ) ;
+   DWORD dwResult;
+   DWORD cchBuff = sizeof( szRemoteDevice );
 
-	dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff);
+   dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff);
 
-    if ( dwResult == NO_ERROR )
-		{
-		hb_retc( szRemoteDevice ) ;
-        }
- 	else
-		{
-		hb_retc( "" ) ;
- 	    }
+   hb_retc( dwResult == NO_ERROR ? szRemoteDevice : "" ) ;
 }
 
 /*  $DOC$
@@ -476,30 +454,23 @@ HB_FUNC ( NETRMTNAME )
 
 HB_FUNC ( NETWORK )
 {
-	DWORD dwResult;
-	char szProviderName[80];
-	DWORD cchBuff = sizeof(szProviderName);
+   DWORD dwResult;
+   char szProviderName[80];
+   DWORD cchBuff = sizeof(szProviderName);
 
-	dwResult = WNetGetProviderName( WNNC_NET_MSNET , (LPSTR) szProviderName , &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_MSNET , (LPSTR) szProviderName , &cchBuff);
 
-	if ( dwResult != NO_ERROR )
-   		{
-		dwResult = WNetGetProviderName( WNNC_NET_LANMAN , (LPSTR) szProviderName , &cchBuff);
+   if ( dwResult != NO_ERROR )
+   {
+      dwResult = WNetGetProviderName( WNNC_NET_LANMAN , (LPSTR) szProviderName , &cchBuff);
 
-		if ( dwResult != NO_ERROR )
-			{
-			dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
-			}
-  		}
+      if ( dwResult != NO_ERROR )
+      {
+         dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
+      }
+   }
 
-	if ( dwResult == NO_ERROR )
-		{
-		hb_retl( TRUE ) ;
-		}
-	else
-		{
-		hb_retl( FALSE ) ;
-		}
+   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE ); 
 }
 /*  $DOC$
  *  $FUNCNAME$
@@ -549,20 +520,13 @@ HB_FUNC ( NETWORK )
 
 HB_FUNC ( NNETWORK )
 {
-	DWORD dwResult;
-	char szProviderName[80];
-	DWORD cchBuff = sizeof(szProviderName);
+   DWORD dwResult;
+   char szProviderName[80];
+   DWORD cchBuff = sizeof(szProviderName);
 
-	dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
 
-	if ( dwResult == NO_ERROR )
-		{
-		hb_retl( TRUE ) ;
-		}
-	else
-		{
-		hb_retl( FALSE ) ;
-		}
+   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
 }
 
 #endif
