@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.25 2002/10/11 03:10:38 what32 Exp $
+ * $Id: xInspect.prg,v 1.26 2002/10/11 03:27:24 what32 Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ METHOD OnCreate() CLASS ObjInspect
 
 //------------------------------------------------------------------------ sets the browser
   aHeads:= { { "Property", 85,},;
-             { "Value",    81, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
+             { "Value",    80, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
 
   aProp := { {"",""} }  // initial data
 
