@@ -36,28 +36,28 @@ HB_FUNC( PEEKW )
 
 HB_FUNC( PEEKL )
 {
-   hb_retnl( * (LPDWORD) hb_parnl(1) ) ;
+   hb_retnl( * (LPDWORD) hb_parnl( 1 ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
 HB_FUNC( PEEKB )
 {
-   hb_retnl( * ( LPBYTE ) hb_parnl( 2 ) );
+   hb_retni( * ( LPBYTE ) hb_parnl( 1 ) );
 }
 
 //-----------------------------------------------------------------------------
 
 HB_FUNC( POKEW )
 {
-   * ( LPWORD ) hb_parnl(1) = (WORD) hb_parni( 2 ) ;
+   * ( LPWORD ) hb_parnl( 1 ) = (WORD) hb_parni( 2 ) ;
 }
 
 //-----------------------------------------------------------------------------
 
 HB_FUNC( POKEL )
 {
-   * ( LPLONG ) hb_parnl(1) = (DWORD) hb_parnl( 2 ) ;
+   * ( LPLONG ) hb_parnl( 1 ) = (DWORD) hb_parnl( 2 ) ;
 }
 
 
@@ -65,7 +65,7 @@ HB_FUNC( POKEL )
 
 HB_FUNC( POKEB )
 {
-   * ( LPBYTE ) hb_parnl( 2 ) = hb_parni( 3 ) ;
+   * ( LPBYTE ) hb_parnl( 1 ) = hb_parni( 2 ) ;
 }
 
 
