@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.7 2005/03/16 21:10:00 modalsist Exp $
+ * $Id: disk.c,v 1.7 2005/03/17 00:42:13 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -292,7 +292,7 @@ if ( !ct_getsafety() )
 }
 
 /*
- GetVolInfo() is a new function. It returns the volume name of a Floppy, CD, 
+ GetVolInfo() is a new function. It returns the volume name of a Floppy, CD,
  Hard-disk or network drive.
  Sintax is: GetVolInfo("x:\")
  Note that the trailing backslash is required.
@@ -300,49 +300,50 @@ if ( !ct_getsafety() )
 */
 HB_FUNC( GETVOLINFO )
 {
-    int iretval;
-    char * sDrive="";
-    char * sVolName[255];
-
-    strncat( sDrive, (char*) hb_parcx(1), 3 );
-    strcat( sDrive, "\0" );
-
 #if defined(HB_OS_WIN_32)
+    int iretval;
+    char * sDrive = hb_parcx(1);
+    char sVolName[255];
 
+    if ( sDrive[0] == 0 )
+    {
+       sDrive = NULL;
+    }
     iretval = GetVolumeInformation( sDrive,
-                                   (char*) &sVolName,
-                                   256,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   NULL,
-                                   0 );
-#endif
-    if ( iretval!=0 )
-      hb_retc( (char *) sVolName );
-    else  
-      hb_retc("");
+                                    sVolName,
+                                    256,
+                                    NULL,
+                                    NULL,
+                                    NULL,
+                                    NULL,
+                                    0 );
 
+    if ( iretval!=0 )
+       hb_retc( sVolName );
+    else
+       hb_retc("");
+#endif
 }
 
 /*
- * VolSerial() function returns the volume serial number of an drive letter like 
- * floppy, Hard-disk, CD or mapped network drive. The return value is a dword 
+ * VolSerial() function returns the volume serial number of an drive letter like
+ * floppy, Hard-disk, CD or mapped network drive. The return value is a dword
  * type. If the drive is not available, volserial() returns -1.
  * To convert in the hex format, call hb_numtohex() function. Example:
  * hb_numtohex( volserial("c:\")). See volser.prg in xharbour\tests\ct folder.
  */
+
 HB_FUNC( VOLSERIAL )
 {
-    int retval=0;
-    char * sDrive="";
+#if defined(HB_OS_WIN_32)
+    int retval;
+    char * sDrive = hb_parcx(1);
     DWORD dSerial;
 
-    strncat( sDrive, (char*) hb_parcx(1), 3 );
-    strcat( sDrive, "\0" );
-
-#if defined(HB_OS_WIN_32)
-
+    if ( sDrive[0] == 0 )
+    {
+       sDrive = NULL;
+    }
     retval = GetVolumeInformation( sDrive,     // RootPathName
                                    NULL,       // VolumeName
                                    0,          // VolumeNameSize
@@ -351,14 +352,10 @@ HB_FUNC( VOLSERIAL )
                                    NULL,       // FileSystemFlags
                                    NULL,       // FileSystemName
                                    0 );        // FileSystemSize
-#endif
-    if ( retval!=0 )
-    {
-      hb_retnd( dSerial );
-    }  
-    else
-    {  
-      hb_retni( -1 );
-    }  
-}
 
+    if ( retval!=0 )
+       hb_retnd( dSerial );
+    else
+       hb_retni(-1);
+#endif
+}
