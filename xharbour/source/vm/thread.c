@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.11 2002/12/21 14:35:37 jonnymind Exp $
+* $Id: thread.c,v 1.12 2002/12/21 18:20:39 ronpinkas Exp $
 */
 
 /*
@@ -297,7 +297,7 @@ void hb_threadExit( void )
     {
         #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
             pthread_cancel( hb_ht_context->th_id );
-            pthread_join( th, 0 );
+            pthread_join( hb_ht_context->th_id, 0 );
             hb_destroyContextFromHandle( hb_ht_context->th_id );
         #else
             TerminateThread( hb_ht_context->th_h, 0);
