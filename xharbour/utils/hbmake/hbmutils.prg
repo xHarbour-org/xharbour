@@ -1,406 +1,477 @@
+
 #include "common.ch"
 #ifndef __HARBOUR__
-#include 'hbclip.ch'
+    #include 'hbclip.ch'
 #else
-DECLARE extenprg( cExt AS STRING, nType AS NUMERIC ) AS STRING
-declare exten( cExt as string, nType as numeric ) as string
-DECLARE GetSourceFiles( lSubdir as logical ) as ARRAY
-DECLARE GetDirs( cPat as USUAL ) as Array
-DECLARE GetBccDir() as String
-DECLARE GetVccDir() as String
-DECLARE GetMakeDir() as String
-DECLARE HB_ARGV( n as numeric ) as string
-declare hbmake_filedate( c as String ) as string
-declare listasArray2( cString as String, cSep as String ) as Array
+    DECLARE ExtenPrg( cExt AS STRING, nType AS NUMERIC ) AS STRING
+    DECLARE Exten( cExt as string, nType as numeric ) as string
+    DECLARE GetSourceFiles( lSubDir as logical ) as ARRAY
+    DECLARE GetDirs( cPat as USUAL ) as Array
+    DECLARE GetBccDir() as String
+    DECLARE GetVccDir() as String
+    DECLARE GetMakeDir() as String
+    DECLARE HB_ARGV( n as numeric ) as string
+    DECLARE HbMake_FileDate( c as String ) as string
+    DECLARE ListAsArray2( cString as String, cSep as String ) as Array
 #endif
-Function GetSourceFiles( lSubdir ,lGcc, cOs )
-
-     Local adirs AS ARRAY
-     Local aRet AS ARRAY := {}
-     Local lLinux    := At( 'linux', lower(cOs )) > 0 .or. lGcc
-     Local cdir as String := If( !llinux, '\' + Curdir() + '\', '/' + Curdir() + '/' )
-     Local aStru     := { cDir }
-     Local aData AS ARRAY
-     Local nCounter as numeric := 0
-     Local nArrayLen as numeric
-     Local nDatalen as numeric
-     Local y as numeric
-     Local cItem as String
-     Local cext
-     Local cpath
-     Local cdrive
-     Local nPos
-     Local xItem
-     local ccc,ddd
-     Local nLen
-     Local cFile
-     Default lSubdir To .t.
-     
-
-
-     While ++ nCounter <= Len( aStru )
-       If !Empty( adirs := GetDirs( astru[ nCounter ] ,lgcc) )   // There are elements!
-          Aeval( aDirs, { | xItem | Aadd( aStru, xItem ) } )
-       Endif
-     Enddo
-     aDirs := {}
-
-     Asort( aStru )
-     nArrayLen := Len( aStru )
-
-     For nCounter := 1 To nArrayLen
-         
-             
-        If Len( aData := DIR_MULTI(aStru[ nCounter ]+"*.prg |"+aStru[ nCounter ]+"*.c |"+aStru[ nCounter ]+"*.cpp" ) ) != 0
-           
-           nDataLen := Len( aData )
-           
-           For y := 1 To nDataLen
-              If At( '.PRG', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.C', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.CPP', Upper( adata[ y, 1 ] ) ) > 0
-                 If lSubdir
-                  nLen:=At(" ",aData[ y, 1 ])+1
-
-                    Aadd( aRet, Strtran( astru[ nCounter ], cDir, '' ) +  aData[ y, 1 ] + ;
-                          Str( aData[ y, 2 ], 8 ) + '  ' + ;
-                          Dtoc( aData[ y, 3 ] ) + '  ' + ;
-                          aData[ y, 4 ] )
-                 Elseif !lsubdir .and. At( If( lLinux, "/", "\" ), Strtran( astru[ nCounter ], cDir, '' ) ) == 0
-                    Aadd( aRet, Pad( aData[ y, 1 ],18) + ;
-                          Str( aData[ y, 2 ], 8 ) + '  ' + ;
-                          Dtoc( aData[ y, 3 ] ) + '  ' + ;
-                          aData[ y, 4 ] )
-                 Endif
-              Endif
-           Next
-        Endif
-     Next
-
-//     For nCounter := 1 To Len( aret )
-     For each cFile in aRet
-//        xItem := Substr( aret[ nCounter ], Rat( If( llinux, "/", '\' ), aret[ nCounter ] ) + 1 )
-        xItem := Substr( cFile, Rat( If( llinux, "/", '\' ), cFile ) + 1 )
-        nPos := Ascan( astru, { | x | x := Substr( x, Rat( If( llinux, "/", '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xitem, At( ".", xitem ) ) } )
-        If nPos > 0
-           Adel( astru, nPos )
-           Asize( astru, Len( astru ) - 1 )
-        Endif
-
-     Next
-//     For nCounter := 1 To Len( aStru )
-//        hb_FNAMESPLIT( Left( astru[ nCounter ], At( ' ', astru[ nCounter ] ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
-      For each cFile in aStru
-          hb_FNAMESPLIT( Left( cFile , At( ' ', cFile ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
-        If ( cExt == '.C' ) .or. ( cExt == ".c" ) .or. ( cExt == '.CPP' ) .or. ( cExt == ".cpp" )
-           Aadd( aret, cFile )
-        Endif
-     Next
-
-Return aRet
-
-Function extenprg( cExt, nType )
-
-     Local aext AS ARRAY := { "C", "c" }
-     Local nPos AS NUMERIC
-     Local cTemp AS String := ""
-     nPos := Ascan( aext, { | a | a == cExt } )
-     If nPos > 0
-        If nTYpe == 1
-           cTemp := Strtran( cExt, aExt[ nPos ], 'prg' )
-        Elseif ntype == 2
-           cTemp := Strtran( cExt, aExt[ nPos ], 'prG' )
-        Elseif ntype == 3
-           cTemp := Strtran( cExt, aExt[ nPos ], 'pRg' )
-        Elseif ntype == 4
-           cTemp := Strtran( cExt, aExt[ nPos ], 'Prg' )
-        Elseif ntype == 5
-           cTemp := Strtran( cExt, aExt[ nPos ], 'PRg' )
-        Elseif ntype == 6
-           cTemp := Strtran( cExt, aExt[ nPos ], 'PrG' )
-        Elseif ntype == 7
-           cTemp := Strtran( cExt, aExt[ nPos ], 'PRG' )
-
-        Endif
-     Endif
-Return ctemp
-
-Static Function GetDirs( cPattern ,lGcc)
-
-     Local aDir   := {}
-     Local lLinux := At( 'linux', lower(Os()) ) > 0 .or. lgcc
-     
-     
-     Aeval( Directory( cPattern + if(lLinux,"*","*.*"), "D" ), ;
-            { | xItem | If( xItem[ 5 ] = "D" .and. ;
-            ( xItem[ 1 ] != "." .and. xItem[ 1 ] != ".." ), ;
-            ( Aadd( aDir, cPattern + xItem[ 1 ] + If( llinux, "/", '\' ) ), ;
-             ), "" ) } )
-
-Return ( aDir )
-
-Function GetBccDir()
-
-     Local cPath := ''
-     Local cEnv  := Gete( "PATH" )
-     Local aEnv  := listasarray2( cEnv, ";" )
-     Local nPos
-     Local  cCurEnv := ""
-
-     For EACH cCurEnv In aEnv 
-        If File( cCurEnv + '\bcc32.exe' ) .or. File( Upper( cCurEnv ) + '\BCC32.EXE' )
-           cPath := cCurEnv
-           cPath := Left( cPath, Rat( '\', cPath ) - 1 )
-           Exit
-        Endif
-     Next
-
-Return cPath
-Function GetVccDir()
-
-     Local cPath AS STRING := ''
-     Local cEnv AS STRING := Gete( "PATH" )
-     Local aEnv as array of string := listasarray2( cEnv, ";" )
-     Local nPos as numeric
-     Local  cCurEnv := ""
-
-     For each cCurEnv In aEnv 
-        If File( cCurEnv + '\cl.exe' ) .or. File( Upper( cCurEnv ) + '\cl.EXE' )
-           cPath := cCurEnv
-           cPath := Left( cPath, Rat( '\', cPath ) - 1 )
-           Exit
-        Endif
-     Next
-
-Return cPath
-
-Function exten( cExt, nType )
-
-     Local aext as array := { 'C', 'c' ,"CPP","cpp"}
-     Local nPos as numeric
-     Local cTemp as string := ""
-     nPos := Ascan( aext, { | a | a == cExt } )
-     If nPos > 0
-        If nTYpe == 1
-           cTemp := Strtran( cExt, aExt[ nPos ], 'o' )
-        Elseif ntype == 2
-           cTemp := Strtran( cExt, aExt[ nPos ], 'obj' )
-        Endif
-     Endif
-Return ctemp
-Function ListAsArray2( cList, cDelimiter )
-
-     Local nPos as numeric
-     Local aList as array := {}              // Define an empty array
-
-     If cDelimiter = NIL
-        cDelimiter := ","
-     Endif
-     //
-     Do While ( nPos := At( cDelimiter, cList ) ) != 0
-       Aadd( aList, Alltrim( Substr( cList, 1, nPos - 1 ) ) )                   // Add a new element
-       cList := Substr( cList, nPos + 1 )
-     Enddo
-     Aadd( aList, Alltrim( cList ) )    // Add final element
-     //
-Return aList        // Return the array
-
-Function GetMakeDir()
-
-     Local cPath := ""
-     Local cExe  := HB_ARGV( 0 )
-    
-     cExe:=strtran(cExe,"/","\")
-     cPath := Left( cexe, Rat( "\", cexe ) - 1 )
-     cPath := Left( cPath, Rat( "\", cPath ) - 1 )
-
-Return cPath
-
-Function GetSourceDirMacros()
-
-     Local adirs AS ARRAY
-     Local lLinux := At( 'linux', lower(Os()) ) > 0
-     Local cdir as String := If( llinux, '/' + Curdir() + '/', '\' + Curdir() + '\' )
-     Local aStru  := { cDir }
-
-     Local nCounter as numeric := 0
-     Local amacros as Array := {}
-     While ++ nCounter <= Len( aStru )
-       If !Empty( adirs := GetDirs( astru[ nCounter ] ,lLinux) )   // There are elements!
-          Aeval( aDirs, { | xItem | Aadd( aStru, xItem ) } )
-       Endif
-     Enddo
-     For nCounter := 1 To Len( aStru )
-        Aadd( amacros, { "SRC" + Strzero( nCounter, 2, 0 ), Strtran( astru[ nCounter ], cDir, '' ), .f. } )
-     Next
-Return amacros
 
-Function hbmake_filedate( cFileName )
-
-     Local aFiles := Directory( cFileName )
-
-Return If( Len( aFiles ) == 1, aFiles[ 1, 3 ], Ctod( '' ) )
-
-Function hbmake_filetime( cFileName )
-
-     Local aFiles := Directory( cFileName )
-
-Return If( Len( aFiles ) == 1, aFiles[ 1, 4 ], '' )
-
-Function TD2JUL( CTIME, DDATE )
-
-Return DDATE - Ctod( '01/01/1900' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
-
-Function TTOS( CTIME )
-
-Return ( Val( Substr( CTIME, 7, 2 ) ) ) + ;
-         ( Val( Substr( CTIME, 4, 2 ) ) * 60 ) + ;
-         ( Val( Substr( CTIME, 1, 2 ) ) * 3600 )
-
-Function PRB_INT( SOMENUMBER, length, NUM_DECIMALS )
-
-     Local NEGATIVE   := ( SOMENUMBER < 0 )
-     Local SOMESTRING
-     Local dotat
-
-     Default NUM_DECIMALS To 0
-     Default length To 19
-
-     If NEGATIVE
-        SOMENUMBER := Abs( SOMENUMBER )
-     Endif
-
-     SOMENUMBER += .0000000000000005
-
-     SOMESTRING := Alltrim( Str( SOMENUMBER ) )
-
-     dotat := At( '.', somestring )
-
-     Do Case
-         Case NUM_DECIMALS == 0
-             If dotat > 0
-                somestring := Left( somestring, dotat - 1 )
-             Endif
-         Case NUM_DECIMALS > 0
-             If dotat > 0
-                somestring := Left( somestring, dotat + num_decimals )
-             Endif
-     Endcase
-
-     If NEGATIVE
-        SOMESTRING := '-' + SOMESTRING
-     Endif
-
-Return Val( SOMESTRING )
-Function exte( cExt, nType )
-
-     Local aext  := { 'prg', 'prG', 'pRg', 'Prg', 'PRg', 'PrG', 'PRG' }
-     Local nPos
-     Local cTemp := ""
-     nPos := Ascan( aext, { | a | a == cExt } )
-     If nPos > 0
-        If nTYpe == 1
-           cTemp := Strtran( cExt, aExt[ nPos ], 'c' )
-        Elseif ntype == 2
-           cTemp := Strtran( cExt, aExt[ nPos ], 'obj' )
-        Elseif ntype == 3
-           cTemp := Strtran( cExt, aExt[ nPos ], 'o' )
-
-        Endif
-     Endif
-Return ctemp
-Procedure ATTENTION( CSTRING, NLINENUM, CCOLOR )
-
-     Local COLDCOLOR
-
-     Default NLINENUM To 24
-     Default CCOLOR To 'GR+/R'
-
-     COLDCOLOR := Setcolor( CCOLOR )
-
-     CSTRING := '  ' + Alltrim( CSTRING ) + '  '
-
-     Devpos( NLINENUM, c( CSTRING ) )
-
-     Devout( CSTRING )
-
-     Setcolor( COLDCOLOR )
-
-Return
-
-Function c( CSTRING )
-
-Return Max( ( Maxcol() / 2 ) - Int( Len( CSTRING ) / 2 ), 0 )
-
-Function ReadLN( leof )
-
-     Local cBuffer := ""
-     cBuffer := FT_FREADLN()
-     cBuffer := Strtran( cBuffer, Chr( 13 ), '' )
-     cBuffer := Strtran( cBuffer, Chr( 10 ), '' )
-     FT_FSKIP( 1 )
-     leof := ft_FEOF()
-Return cBuffer
-
-Function GetinstaledLibs( clibs, lGcc )
-      
-     Local adeflib     := { 'lang' + If( lgcc, '.a', '.lib' ), 'vm' + If( lgcc, '.a', '.lib' ), 'rtl' + If( lgcc, '.a', '.lib' ), 'rdd' + If( lgcc, '.a', '.lib' ), 'macro' + If( lgcc, '.a', '.lib' ), 'pp' + If( lgcc, '.a', '.lib' ), 'dbfntx' + If( lgcc, '.a', '.lib' ), 'dbfcdx' + If( lgcc, '.a', '.lib' ), 'common' + If( lgcc, '.a', '.lib' ), 'gtwin' + If( lgcc, '.a', '.lib' ), 'debug' + If( lgcc, '.a', '.lib' ), 'gtpca' + If( lgcc, '.a', '.lib' ), 'gtdos' + If( lgcc, '.a', '.lib' ), 'gtsln' + If( lgcc, '.a', '.lib' ), 'gtstd' + If( lgcc, '.a', '.lib' ),'ziparchive' + If( lgcc, '.a', '.lib' ), 'rddads' + If( lgcc, '.a', '.lib' ), 'ace32' + If( lgcc, '.a', '.lib' ), 'libnf' + If( lgcc, '.a', '.lib' ), 'libct' + If( lgcc, '.a', '.lib' ), 'htmllib' + If( lgcc, '.a', '.lib' ), 'libgt' + If( lgcc, '.a', '.lib' ), 'libmisc' + If( lgcc, '.a', '.lib' ), 'mysql' + If( lgcc, '.a', '.lib' ), 'libmysql' + If( lgcc, '.a', '.lib' ), 'mysqlclient' + If( lgcc, '.a', '.lib' ), 'samples' + If( lgcc, '.a', '.lib' ), 'pdflib'                           + If( lgcc, '.a', '.lib' ), 'nulsys' + If( lgcc, '.a', '.lib' ), 'gtcgi' + If( lgcc, '.a', '.lib' ) ,'vmmt' + If( lgcc, '.a', '.lib' ), 'rtlmt' + If( lgcc, '.a', '.lib' ), 'rddmt' + If( lgcc, '.a', '.lib' ) ,'ppmt' + If( lgcc, '.a', '.lib' ), 'dbfntxmt' + If( lgcc, '.a', '.lib' ), 'dbfcdxmt' + If( lgcc, '.a', '.lib' )}
-     Local aReturnLibs := {}
-     Local aLibs       := Directory( clibs )
-     Local nPos
-     Local nCount
-     Local citem
-     if lgcc
-        aeval(aLibs,{|x,y| citem:=x[1] ,if(left(citem,3)=="lib", alibs[y,1]:=substr(cItem,4),)})
-    endif
-      
-     For ncount := 1 To Len( alibs )
-
-        citem := Lower( alibs[ ncount, 1 ] )
-
-        npos  := Ascan( adeflib, { | a | Lower( a ) == citem } )
-        If npos == 0
-           Aadd( aReturnLibs, alibs[ ncount, 1 ] )
-        Endif
-     Next
-    
-Return aReturnLibs
-
-Function Getlibs( lgcc ,cDir)
-     Local lLinux:=at('linux',lower(os()))>0
-     Local cEnv:=Getenv("HB_LIB_INSTALL")
-     Local ainstaledlibs := Getinstaledlibs( If( !llinux, if(!lgcc, cDir+"\*.lib",cDir+"\*.a") , cEnv+'/*.a' ),lGcc )
-     Local aLibsDesc     := { { "Harbour Ct3 library - Libct", 'ct' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Misc library - Libmisc", 'misc' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour html library - Htmllib", 'html' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Nanfor library - Libnf", 'nf' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Gt library - Libgt", 'nf' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Zip library ", 'ziparchive' + If( lgcc, '.a', '.lib' ) +if(lLinux ,' stdc++.a z.a',' ') }, ;
-                          { "Harbour Hbole library Hbole", 'hbole' + If( lgcc, '.a', '.lib' ) + ' ole2' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Mysql library - MySql", 'mysql' + If( lgcc, '.a', '.lib' ) + ' libmysql' + If( lgcc, '.a', '.lib' ) + ' mysqlclient' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Samples library - Samples", 'samples' + If( lgcc, '.a', '.lib' ) } }
-     Aeval( ainstaledlibs, { | x | Aadd( aLibsDesc, { "User - " + x +" Library", x } ) } )
-Return aLibsDesc
+FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
+
+   LOCAL aDirs 
+   LOCAL aRet      := {}
+   LOCAL lLinux    := AT( 'linux', LOWER( cOs ) ) > 0 .OR. lGcc
+   LOCAL cDir      := IIF( ! lLinux, '\' + CURDIR() + '\', '/' + CURDIR() + '/' )
+   LOCAL aStru     := { cDir }
+   LOCAL aData
+   LOCAL nCounter  := 0
+   LOCAL nArrayLen 
+   LOCAL nDatalen 
+   LOCAL y 
+   LOCAL cItem 
+   LOCAL cExt
+   LOCAL cPath
+   LOCAL cDrive
+   LOCAL nPos
+   LOCAL xItem
+   LOCAL nLen
+   LOCAL cFile
+   DEFAULT lSubDir TO .t.
+
+   WHILE ++ nCounter <= LEN( aStru )
+
+      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lGcc ) )                  // There are elements! 
+         AEVAL( aDirs, { | xItem | AADD( aStru, xItem ) } )
+      ENDIF
+
+   ENDDO
+
+   aDirs := {}
+
+   ASORT( aStru )
+   nArrayLen := LEN( aStru )
+
+   FOR nCounter := 1 TO nArrayLen
+
+      IF LEN( aData := DIR_MULTI( aStru[ nCounter ] + "*.prg |" + aStru[ nCounter ] + "*.c |" + aStru[ nCounter ] + "*.cpp" ) ) != 0
+
+         nDataLen := LEN( aData )
+
+         FOR y := 1 TO nDataLen
+            IF AT( '.PRG', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.C', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.CPP', UPPER( aData[ y, 1 ] ) ) > 0
+
+               IF lSubDir
+
+                  nLen := AT( " ", aData[ y, 1 ] ) + 1
+
+                  AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) + aData[ y, 1 ] + ;
+                        STR( aData[ y, 2 ], 8 ) + '  ' + ;
+                        DTOC( aData[ y, 3 ] ) + '  ' + ;
+                        aData[ y, 4 ] )
+
+               ELSEIF ! lSubDir .AND. AT( IIF( lLinux, "/", "\" ), STRTRAN( aStru[ nCounter ], cDir, '' ) ) == 0
+
+                  AADD( aRet, PAD( aData[ y, 1 ], 18 ) + ;
+                        STR( aData[ y, 2 ], 8 ) + '  ' + ;
+                        DTOC( aData[ y, 3 ] ) + '  ' + ;
+                        aData[ y, 4 ] )
+
+               ENDIF
+
+            ENDIF
+
+         NEXT
+
+      ENDIF
+
+   NEXT
+
+   //     For nCounter := 1 To Len( aRet )
+   FOR EACH cFile IN aRet
+
+      xItem := SUBSTR( cFile, RAT( IIF( lLinux, "/", '\' ), cFile ) + 1 )
+      nPos  := ASCAN( aStru, { | x | x := SUBSTR( x, RAT( IIF( lLinux, "/", '\' ), x ) + 1 ), LEFT( x, AT( ".", x ) ) == LEFT( xitem, AT( ".", xitem ) ) } )
+
+      IF nPos > 0
+         ADEL( aStru, nPos )
+         ASIZE( aStru, LEN( aStru ) - 1 )
+      ENDIF
+
+   NEXT
+
+   FOR EACH cFile IN aStru
+
+      HB_FNAMESPLIT( LEFT( cFile, AT( ' ', cFile ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
+
+      IF ( cExt == '.C' ) .OR. ( cExt == ".c" ) .OR. ( cExt == '.CPP' ) .OR. ( cExt == ".cpp" )
+         AADD( aRet, cFile )
+      ENDIF
+
+   NEXT
+
+RETURN aRet
+
+FUNCTION ExtenPrg( cExt, nType )
+
+   LOCAL aExt   := { "C", "c" }
+   LOCAL nPos 
+   LOCAL cTemp  := ""
+
+   nPos := ASCAN( aExt, { | a | a == cExt } )
+
+   IF nPos > 0
+      SWITCH nType 
+      CASE 1
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'prg' )
+         EXIT
+      CASE  2
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'prG' )
+         EXIT
+      CASE  3
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'pRg' )
+         EXIT
+      CASE  4
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'Prg' )
+         EXIT
+      CASE  5
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'PRg' )
+         EXIT
+      CASE  6
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'PrG' )
+         EXIT
+      CASE  7
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'PRG' )
+         EXIT
+      END
+   ENDIF
+
+RETURN cTemp
+
+STATIC FUNCTION GetDirs( cPattern, lGcc )
+
+   LOCAL aDir   := {}
+   LOCAL lLinux := AT( 'linux', LOWER( OS() ) ) > 0 .OR. lGcc
+
+   AEVAL( DIRECTORY( cPattern + IIF( lLinux, "*", "*.*" ), "D" ), ;
+          { | xItem | IIF( xItem[ 5 ] = "D" .AND. ;
+          ( xItem[ 1 ] != "." .AND. xItem[ 1 ] != ".." ), ;
+          ( AADD( aDir, cPattern + xItem[ 1 ] + IIF( lLinux, "/", '\' ) ), ;
+          ), "" ) } )
+
+RETURN ( aDir )
+
+FUNCTION GetBccDir()
+
+   LOCAL cPath   := ''
+   LOCAL cEnv    := GETE( "PATH" )
+   LOCAL aEnv    := ListAsArray2( cEnv, ";" )
+   LOCAL nPos
+   LOCAL cCurEnv := ""
+
+   FOR EACH cCurEnv IN aEnv
+
+      IF FILE( cCurEnv + '\bcc32.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\BCC32.EXE' )
+         cPath := cCurEnv
+         cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
+         EXIT
+      ENDIF
+
+   NEXT
+
+RETURN cPath
+
+FUNCTION GetVccDir()
+
+   LOCAL cPath   := ''
+   LOCAL cEnv    := GETE( "PATH" )
+   LOCAL aEnv    := ListAsArray2( cEnv, ";" )
+   LOCAL nPos 
+   LOCAL cCurEnv := ""
+
+   FOR EACH cCurEnv IN aEnv
+
+      IF FILE( cCurEnv + '\cl.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\cl.EXE' )
+         cPath := cCurEnv
+         cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
+         EXIT
+      ENDIF
+
+   NEXT
+
+RETURN cPath
+
+FUNCTION Exten( cExt, nType )
+
+   LOCAL aExt    := { 'C', 'c', "CPP", "cpp" }
+   LOCAL nPos 
+   LOCAL cTemp   := ""
+
+   nPos := ASCAN( aExt, { | a | a == cExt } )
+   IF nPos > 0
+
+      SWITCH  nType
+      CASE 1
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'o' )
+         EXIT
+
+      CASE 2
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'obj' )
+         EXIT
+
+      END
+
+   ENDIF
+
+RETURN cTemp
+
+FUNCTION ListAsArray2( cList, cDelimiter )
+
+   LOCAL nPos 
+   LOCAL aList  := {}              // Define an empty array
+
+   IF cDelimiter = NIL
+      cDelimiter := ","
+   ENDIF
+   //
+   DO WHILE ( nPos := AT( cDelimiter, cList ) ) != 0
+      AADD( aList, ALLTRIM( SUBSTR( cList, 1, nPos - 1 ) ) )                    // Add a new element
+      cList := SUBSTR( cList, nPos + 1 )
+
+   ENDDO
+   AADD( aList, ALLTRIM( cList ) )      // Add final element
+   //
+RETURN aList        // Return the array
+
+FUNCTION GetMakeDir()
+
+   LOCAL cPath := ""
+   LOCAL cExe  := HB_ARGV( 0 )
+
+   cExe  := STRTRAN( cExe, "/", "\" )
+   cPath := LEFT( cexe, RAT( "\", cexe ) - 1 )
+   cPath := LEFT( cPath, RAT( "\", cPath ) - 1 )
+
+RETURN cPath
+
+FUNCTION GetSourceDirMacros()
+
+   LOCAL aDirs 
+   LOCAL lLinux    := AT( 'linux', LOWER( OS() ) ) > 0
+   LOCAL cDir      := IIF( lLinux, '/' + CURDIR() + '/', '\' + CURDIR() + '\' )
+   LOCAL aStru     := { cDir }
+
+   LOCAL nCounter  := 0
+   LOCAL aMacros   := {}
+
+   WHILE ++ nCounter <= LEN( aStru )
+
+      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lLinux ) )                // There are elements! 
+         AEVAL( aDirs, { | xItem | AADD( aStru, xItem ) } )
+      ENDIF
+
+   ENDDO
+
+   FOR nCounter := 1 TO LEN( aStru )
+      AADD( aMacros, { "SRC" + STRZERO( nCounter, 2, 0 ), STRTRAN( aStru[ nCounter ], cDir, '' ), .f. } )
+   NEXT
+
+RETURN aMacros
+
+FUNCTION HbMake_FileDate( cFileName )
+
+   LOCAL aFiles := DIRECTORY( cFileName )
+
+RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 3 ], CTOD( '' ) )
+
+FUNCTION HbMake_FileTime( cFileName )
+
+   LOCAL aFiles := DIRECTORY( cFileName )
+
+RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 4 ], '' )
+
+FUNCTION TD2JUL( CTIME, DDATE )
+
+RETURN DDATE - CTOD( '01/01/1900' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
+
+FUNCTION TTOS( CTIME )
+
+RETURN ( VAL( SUBSTR( CTIME, 7, 2 ) ) ) + ;
+         ( VAL( SUBSTR( CTIME, 4, 2 ) ) * 60 ) + ;
+         ( VAL( SUBSTR( CTIME, 1, 2 ) ) * 3600 )
+
+FUNCTION PRB_INT( SOMENUMBER, length, NUM_DECIMALS )
+
+   LOCAL NEGATIVE   := ( SOMENUMBER < 0 )
+   LOCAL SOMESTRING
+   LOCAL dotat
+
+   DEFAULT NUM_DECIMALS TO 0
+   DEFAULT length TO 19
+
+   IF NEGATIVE
+      SOMENUMBER := ABS( SOMENUMBER )
+   ENDIF
+
+   SOMENUMBER += .0000000000000005
+
+   SOMESTRING := ALLTRIM( STR( SOMENUMBER ) )
+
+   dotat := AT( '.', somestring )
+
+   DO CASE
+      CASE NUM_DECIMALS == 0
+         IF dotat > 0
+            somestring := LEFT( somestring, dotat - 1 )
+         ENDIF
+
+      CASE NUM_DECIMALS > 0
+         IF dotat > 0
+            somestring := LEFT( somestring, dotat + num_decimals )
+         ENDIF
+
+   ENDCASE
+
+   IF NEGATIVE
+      SOMESTRING := '-' + SOMESTRING
+   ENDIF
+
+RETURN VAL( SOMESTRING )
+
+FUNCTION Exte( cExt, nType )
+
+   LOCAL aExt  := { 'prg', 'prG', 'pRg', 'Prg', 'PRg', 'PrG', 'PRG' }
+   LOCAL nPos
+   LOCAL cTemp := ""
+
+   nPos := ASCAN( aExt, { | a | a == cExt } )
+   IF nPos > 0
+      IF nType == 1
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'c' )
+      ELSEIF nType == 2
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'obj' )
+      ELSEIF nType == 3
+         cTemp := STRTRAN( cExt, aExt[ nPos ], 'o' )
+      ENDIF
+
+   ENDIF
+
+RETURN cTemp
+
+PROCEDURE ATTENTION( CSTRING, NLINENUM, CCOLOR )
+
+   LOCAL COLDCOLOR
+
+   DEFAULT NLINENUM TO 24
+   DEFAULT CCOLOR TO 'GR+/R'
+
+   COLDCOLOR := SETCOLOR( CCOLOR )
+
+   CSTRING := '  ' + ALLTRIM( CSTRING ) + '  '
+
+   DEVPOS( NLINENUM, c( CSTRING ) )
+
+   DEVOUT( CSTRING )
+
+   SETCOLOR( COLDCOLOR )
+
+RETURN
+
+FUNCTION c( CSTRING )
+
+RETURN MAX( ( MAXCOL() / 2 ) - INT( LEN( CSTRING ) / 2 ), 0 )
+
+FUNCTION ReadLN( lEof )
+
+   LOCAL cBuffer := ""
+   cBuffer := FT_FREADLN()
+   cBuffer := STRTRAN( cBuffer, CHR( 13 ), '' )
+   cBuffer := STRTRAN( cBuffer, CHR( 10 ), '' )
+   FT_FSKIP( 1 )
+   lEof := ft_FEOF()
+
+RETURN cBuffer
+
+FUNCTION GetinstaledLibs( clibs, lGcc )
+
+   LOCAL aDefLib     := { 'lang' + IIF( lGcc, '.a', '.lib' ), 'vm' + IIF( lGcc, '.a', '.lib' ), 'rtl' + IIF( lGcc, '.a', '.lib' ), ;
+    'rdd' + IIF( lGcc, '.a', '.lib' ), 'macro' + IIF( lGcc, '.a', '.lib' ), 'pp' + IIF( lGcc, '.a', '.lib' ), 'dbfntx' + IIF( lGcc, '.a', '.lib' ), ;
+    'dbfcdx' + IIF( lGcc, '.a', '.lib' ), 'common' + IIF( lGcc, '.a', '.lib' ), 'gtwin' + IIF( lGcc, '.a', '.lib' ), 'debug' + IIF( lGcc, '.a', '.lib' ), ;
+    'gtpca' + IIF( lGcc, '.a', '.lib' ), 'gtdos' + IIF( lGcc, '.a', '.lib' ), 'gtsln' + IIF( lGcc, '.a', '.lib' ), 'gtstd' + IIF( lGcc, '.a', '.lib' ), ;
+    'ziparchive' + IIF( lGcc, '.a', '.lib' ), 'rddads' + IIF( lGcc, '.a', '.lib' ), 'ace32' + IIF( lGcc, '.a', '.lib' ), 'libnf' + IIF( lGcc, '.a', '.lib' ), ;
+    'libct' + IIF( lGcc, '.a', '.lib' ), 'html' + IIF( lGcc, '.a', '.lib' ), 'libgt' + IIF( lGcc, '.a', '.lib' ), 'libmisc' + IIF( lGcc, '.a', '.lib' ), ;
+    'mysql' + IIF( lGcc, '.a', '.lib' ), 'libmysql' + IIF( lGcc, '.a', '.lib' ), 'mysqlclient' + IIF( lGcc, '.a', '.lib' ), 'samples' + IIF( lGcc, '.a', '.lib' ), ;
+    'pdflib' + IIF( lGcc, '.a', '.lib' ), 'nulsys' + IIF( lGcc, '.a', '.lib' ), 'gtcgi' + IIF( lGcc, '.a', '.lib' ), 'vmmt' + IIF( lGcc, '.a', '.lib' ), ;
+    'rtlmt' + IIF( lGcc, '.a', '.lib' ), 'rddmt' + IIF( lGcc, '.a', '.lib' ), 'ppmt' + IIF( lGcc, '.a', '.lib' ), 'dbfntxmt' + IIF( lGcc, '.a', '.lib' ), ;
+    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ) }
+   LOCAL aReturnLibs := {}
+   LOCAL aLibs       := DIRECTORY( clibs )
+   LOCAL nPos
+   LOCAL nCount
+   LOCAL cItem
+
+   IF lGcc
+      AEVAL( aLibs, { | x, y | cItem := x[ 1 ], IIF( LEFT( cItem, 3 ) == "lib", aLibs[ y, 1 ] := SUBSTR( cItem, 4 ), ) } )
+   ENDIF
+
+   FOR nCount := 1 TO LEN( aLibs )
+
+      cItem := LOWER( aLibs[ nCount, 1 ] )
+
+      nPos := ASCAN( aDefLib, { | a | LOWER( a ) == cItem } )
+      IF nPos == 0
+         AADD( aReturnLibs, aLibs[ nCount, 1 ] )
+      ENDIF
+
+   NEXT
+
+RETURN aReturnLibs
+
+FUNCTION Getlibs( lGcc, cDir )
+
+   LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
+   LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
+   LOCAL ainstaledlibs := Getinstaledlibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ), cEnv + '/*.a' ), lGcc )
+   LOCAL aLibsDesc     := { { "Harbour Ct3 library - Libct", 'ct' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Misc library - Libmisc", 'misc' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour html library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Nanfor library - Libnf", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Gt library - Libgt", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Zip library ", 'ziparchive' + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
+                        { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' ) + ' libmysql' + IIF( lGcc, '.a', '.lib' ) + ' mysqlclient' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Samples library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) } }
+
+   AEVAL( ainstaledlibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
+
+RETURN aLibsDesc
+
+FUNCTION DIR_MULTI( cFileMaskList, cAttr )
+
+   LOCAL aList := ListAsArray2( cFileMaskList, "|" )
+
+   AEVAL( aList, { | tmp, tmp1 | aList[ tmp1 ] := DIRECTORY( tmp, cAttr ) } )
+
+RETURN ArrayAJoin( alist )
+
+FUNCTION ArrayAJoin( aArray )
+
+   LOCAL tmp
+   LOCAL nLenArray := LEN( aArray )
+   LOCAL nLen
+   LOCAL nPos      := LEN( aArray[ 1 ] ) + 1
+
+   nLen := 0
+
+   FOR tmp := 1 TO nLenArray
+      nLen += LEN( aArray[ tmp ] )
+   NEXT
+
+   ASIZE( aArray[ 1 ], nLen )
+
+   FOR tmp := 2 TO nLenArray
+      ACOPY( aArray[ tmp ], aArray[ 1 ],,, nPos )
+      nPos += LEN( aArray[ tmp ] )
+   NEXT
+
+RETURN aArray[ 1 ]
 
 *+ EOF: HBMUTILS.PRG
-FUNCTION DIR_MULTI( cFileMaskList, cAttr )
-   LOCAL aList := ListasArray2( cFileMaskList, "|" )
-   AEval( aList, {|tmp, tmp1| aList[ tmp1 ] := DIRECTORY( tmp, cAttr ) })
-   RETURN ArrayAJoin(alist)
-FUNCTION ArrayAJoin( array )
-     LOCAL tmp
-     LOCAL nLenArray := Len( array )
-     LOCAL nLen
-     LOCAL nPos := Len( array[ 1 ] ) + 1
-
-     nLen := 0
-     FOR tmp := 1 TO nLenArray
-          nLen += Len( array[ tmp ] )
-     NEXT
-
-     ASize( array[ 1 ], nLen )
-
-     FOR tmp := 2 TO nLenArray
-          ACopy( array[ tmp ], array[ 1 ], , , nPos )
-          nPos += Len( array[ tmp ] )
-     NEXT
-
-     RETURN array[ 1 ]
