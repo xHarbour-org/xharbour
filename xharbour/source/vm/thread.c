@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.51 2003/02/26 05:36:11 jonnymind Exp $
+* $Id: thread.c,v 1.52 2003/02/26 06:14:00 jonnymind Exp $
 */
 
 /*
@@ -350,19 +350,24 @@ hb_create_a_thread(
    USHORT uiParam;
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
    HB_THREAD_T tCurrent = HB_CURRENT_THREAD();
-   PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
+   PHB_ITEM pPointer;
    PHB_ITEM pItem, *pPos;
    HB_THREAD_CONTEXT *pContext;
    HB_STACK *pStack;
-      
+
+   // This mutex prevents us from starting before our context is ready
+   // AND prevents the thread to be killed before he is done with the
+   // stack   
+   
    #ifndef HB_OS_WIN_32
-      pContext = hb_threadCreateContext( tCurrent );
-      /* now that the context has been created,
-         it is safe to set async cancellation mode */
       pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
-   #else
-      pContext = pt->context;
    #endif
+
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+
+   pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
+
+   pContext = pt->context;
    
    pStack = pContext->stack;
    pPos = pStack->pPos;
@@ -411,9 +416,6 @@ hb_create_a_thread(
    }
    pStack->pPos = pPos;
    
-   
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-   hb_threadLinkContext( pContext );
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    
    if( pt->bIsMethod )
@@ -427,16 +429,21 @@ hb_create_a_thread(
    
    HB_CRITICAL_LOCK( hb_threadContextMutex );
    pContext = hb_threadUnlinkContext( tCurrent );
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   hb_threadDestroyContext( pContext );
    
    hb_itemRelease( pt->pArgs );
+   
+   HB_CRITICAL_LOCK( hb_allocMutex );
    free( pt );
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
 
    #ifdef HB_OS_WIN_32
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       return 0;
    #else
       /* now we can detach this thread */
-      pthread_detach( HB_CURRENT_THREAD() );
+      pthread_detach( tCurrent );
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       return NULL;
    #endif
 }
@@ -609,18 +616,23 @@ HB_FUNC( STARTTHREAD )
       /* Under windws, we put the handle after creation */
       HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       context->th_h = th_h;
-      pt->context = context;
+      hb_threadLinkContext( context );
       ResumeThread( th_h );
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
    {
+      HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id )
+      hb_threadLinkContext( context );
 #endif
+      pt->context = context;
       hb_retnl( (long) th_id );
    }
    else
    {
       hb_retnl( -1 );
    }
+   //notice that the child thread won't be able to proceed until we
+   // release this mutex.
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 }
 
@@ -634,10 +646,6 @@ HB_FUNC( STOPTHREAD )
    th = (HB_THREAD_T) hb_parnl( 1 );
    pMutex = hb_param( 2, HB_IT_STRING );
 
-   /* Forbid the higher level mutex. This operation must be done
-      when this thread is alone. */
-   HB_CRITICAL_LOCK( hb_garbageMutex );
-   
    /* Forbid alteration of the stack in the meanwhile */
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
@@ -653,6 +661,8 @@ HB_FUNC( STOPTHREAD )
 
    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       pthread_cancel( th );
+      pthread_detach( th );
+      
       /* Notify mutex before to join */
       if( pMutex != NULL )
       {
@@ -688,11 +698,8 @@ HB_FUNC( STOPTHREAD )
    #endif
 
    context = hb_threadUnlinkContext( th );
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-   
    hb_threadDestroyContext( context );
-   
-   HB_CRITICAL_UNLOCK( hb_garbageMutex );
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );   
 
 }
 
@@ -711,12 +718,13 @@ HB_FUNC( KILLTHREAD )
 
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
-
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       return;
    }
 
    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       pthread_cancel( th );
+      pthread_detach( th );
    #else
       context = hb_threadGetContext( th );
       TerminateThread( context->th_h, 0);
@@ -731,28 +739,23 @@ HB_FUNC( CLEARTHREAD )
    HB_THREAD_T th;
    HB_THREAD_CONTEXT *pContext;
 
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
 
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "CLEARTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
-
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       return;
    }
 
    th = (HB_THREAD_T) hb_parnl( 1 );
    
-   HB_CRITICAL_LOCK( hb_garbageMutex );
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
    pContext = hb_threadUnlinkContext( th );
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-   
    hb_threadDestroyContext( pContext );
-   
-   HB_CRITICAL_LOCK( hb_garbageMutex );
-
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 }
 
 HB_FUNC( JOINTHREAD )
@@ -764,10 +767,14 @@ HB_FUNC( JOINTHREAD )
 
    if( ! ISNUM( 1 ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
+      PHB_ITEM pArgs;
+      
+      HB_CRITICAL_LOCK( hb_threadContextMutex );
+      pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
+      HB_CRITICAL_LOCK( hb_threadContextMutex );
 
       return;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.44 2003/02/26 05:36:11 jonnymind Exp $
+ * $Id: garbage.c,v 1.45 2003/02/26 06:14:00 jonnymind Exp $
  */
 
 /*
@@ -523,6 +523,7 @@ void hb_gcCollectAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
 
+
    /*JC1: in MT, GC collecting is not just -locked-: if a second thread
    wants to collect while another is doing collection, it will just wait
    for the first to finish and then return. Double garbage collecting is
@@ -530,6 +531,7 @@ void hb_gcCollectAll( void )
    */
    #ifdef HB_THREAD_SUPPORT
       BOOL bWait = FALSE;
+      HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
       /* Even if not locked, a read only non-critical variable here
       should not be a problem */
@@ -562,6 +564,7 @@ void hb_gcCollectAll( void )
       }
 
    #else
+      HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
       if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
       {
          return;
@@ -576,13 +579,9 @@ void hb_gcCollectAll( void )
       HB_CRITICAL_UNLOCK( hb_garbageMutex );
       return;
    }
-   
-   /* By hypotesis, only one thread will be granted the right to be here; 
-   so cheching for consistency of s_pCurrBlock further is useless.*/
    HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
-      
-   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
-   
+   /* By hypotesis, only one thread will be granted the right to be here; 
+   so cheching for consistency of s_pCurrBlock further is useless.*/   
    
    /* Now that we are rightful owner of the GC process, we must
    * forbid all other threads from acting into the objects that
@@ -766,10 +765,7 @@ void hb_gcCollectAll( void )
       HB_CRITICAL_LOCK( s_GawMutex );
       s_bGarbageAtWork = FALSE;
       HB_CRITICAL_UNLOCK( s_GawMutex );
-      
-      /* Now free all the global object mutexes mutexes */
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-      
+         
       HB_CRITICAL_UNLOCK( hb_garbageMutex );
    #endif
 
