@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.408 2004/06/29 22:14:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.409 2004/07/03 03:34:54 ronpinkas Exp $
  */
 
 /*
@@ -8850,6 +8850,10 @@ HB_FUNC( HB_RESTOREBLOCK )
 }
 
 HB_FUNC( HB_NOMOUSE )
+{
+}
+
+HB_FUNC( HB_NOSTARTUPWINDOW )
 {
 }
 

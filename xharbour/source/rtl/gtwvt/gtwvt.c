@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.113 2004/07/15 03:22:01 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.114 2004/07/21 11:07:24 vouchcac Exp $
  */
 
 /*
@@ -191,7 +191,8 @@ static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static void    hb_wvt_gtCreateToolTipWindow( void );
-static void    hb_wvt_gtPaintRect( int iLeft, int iTop, int iRight, int iBottom );
+
+static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
 
 //-------------------------------------------------------------------//
 //
@@ -1713,86 +1714,6 @@ static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtPaintRect( int iLeft, int iTop, int iRight, int iBottom )
-{
-      PAINTSTRUCT ps;
-      HDC         hdc = _s.hdc;
-      USHORT      irow;
-      RECT        updateRect, rcRect;
-
-      updateRect.left   = iLeft;
-      updateRect.top    = iTop;
-      updateRect.right  = iRight;
-      updateRect.bottom = iBottom;
-
-//      hdc = BeginPaint( _s.hWnd, &ps );
-      SelectObject( hdc, _s.hFont );
-
-      if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
-      {
-        rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
-        _s.rowStart = max( 0      , rcRect.top      );
-        _s.rowStop  = min( _s.ROWS, rcRect.bottom   );
-        _s.colStart = max( 0      , rcRect.left     );
-        _s.colStop  = min( _s.COLS, rcRect.right    );
-
-        for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
-        {
-          USHORT icol, index, startIndex, startCol, len;
-          BYTE   oldAttrib, attrib;
-
-          icol       = _s.colStart;
-          index      = hb_wvt_gtGetIndexForTextBuffer( icol, irow );
-          startIndex = index;
-          startCol   = icol;
-          len        = 0;
-          oldAttrib  = *( _s.pAttributes+index );
-
-          while ( icol < _s.colStop )
-          {
-            if ( index >= _s.BUFFERSIZE )
-            {
-              break;
-            }
-            attrib = *( _s.pAttributes+index );
-            if ( attrib != oldAttrib )
-            {
-              hb_wvt_gtSetColors( hdc, oldAttrib );
-              hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
-              oldAttrib  = attrib;
-              startIndex = index;
-              startCol   = icol;
-              len        = 0;
-            }
-            icol++;
-            len++;
-            index++;
-          }
-          hb_wvt_gtSetColors( hdc, oldAttrib );
-          hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
-        }
-        _s.rowStop -= 1;
-        _s.colStop -= 1;
-      }
-/*
-      if ( hb_gt_gobjects != NULL )
-      {
-         s_wvt_paintGraphicObjects( hdc, &updateRect );
-      }
-*/
-//      EndPaint( _s.hWnd, &ps );
-
-      if ( _s.pSymWVT_PAINT )
-      {
-         hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
-         hb_vmPushNil();
-         hb_vmDo( 0 );
-         hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
-      }
-}
-
-//-------------------------------------------------------------------//
-
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
@@ -1821,6 +1742,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       HDC         hdc;
       USHORT      irow;
       RECT        updateRect, rcRect;
+      // BOOL        bSame;
+      int         iAdjust;
 
       GetUpdateRect( hWnd, &updateRect, FALSE );
       /* WARNING!!!
@@ -1840,11 +1763,20 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         // i.e. redraw any 'cell' partially covered...
         rcRect = hb_wvt_gtGetColRowFromXYRect( updateRect );
 
-        _s.rowStart = max( 0      , rcRect.top    - 0 );
-        _s.rowStop  = min( _s.ROWS, rcRect.bottom + 1 );
-        _s.colStart = max( 0      , rcRect.left   - 0 );
-        _s.colStop  = min( _s.COLS, rcRect.right  + 1 );
+        // bSame = ( updateRect.bottom % _s.PTEXTSIZE.y == 0 && ( updateRect.bottom - updateRect.top ) % _s.PTEXTSIZE.y == 0 );
+        iAdjust = ( ( ( updateRect.bottom - updateRect.top ) % _s.PTEXTSIZE.y == 0 ) ? 0 : 1 );
 
+        _s.rowStart = max( 0      , rcRect.top    - 0 );
+        _s.rowStop  = min( _s.ROWS, rcRect.bottom + iAdjust );
+        _s.colStart = max( 0      , rcRect.left   - 0 );
+        _s.colStop  = min( _s.COLS, rcRect.right  + iAdjust );
+/*
+        TraceLog( NULL, "updateRect:  %i %i %i %i  ViaWVT: %i  ROWCOL:  %i %i %i %i  StartEnd %i %i %i %i \n",
+           updateRect.top, updateRect.left, updateRect.bottom, updateRect.right,
+           iAdjust,
+           rcRect.top, rcRect.left, rcRect.bottom, rcRect.right,
+           _s.rowStart, _s.colStart, _s.rowStop, _s.colStop );
+*/
         for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
@@ -1885,8 +1817,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
         }
         //  Update for real values for Wvt_GetPaintRect()
-        _s.rowStop  -= 1;
-        _s.colStop  -= 1;
+        _s.rowStop  -= 1 ;
+        _s.colStop  -= 1 ;
       }
 
       if ( hb_gt_gobjects != NULL )
@@ -2395,15 +2327,15 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                   TEXT( "XHARBOUR_WVT" ), MB_ICONERROR );
   }
 
-
-  // If you wish to show window the way you want
-  // compile gtwvt.c with -D__WIN_NOSHOW_STARTUP__
+  // If you wish to show window the way you want, put somewhere in your application
+  // ANNOUNCE HB_NOSTARTUPWINDOW
   // If so compiled, then you need to issue Wvt_ShowWindow( SW_RESTORE )
-  // Somewhere in your code.
+  // at the point you desire in your code.
   //
-  #if defined( __WIN_NOSHOW_STARTUP__ )
+  if ( hb_dynsymFind( "HB_NOSTARTUPWINDOW" ) != NULL )
+  {
      iCmdShow = SW_HIDE;
-  #endif
+  }
 
   ShowWindow( hWnd, iCmdShow );
   UpdateWindow( hWnd );
@@ -2473,6 +2405,7 @@ static void hb_wvt_gtCreateToolTipWindow( void )
 static DWORD hb_wvt_gtProcessMessages( void )
 {
   MSG msg;
+
   /* See if we have some graphic object to draw */
   if ( hb_gt_gobjects == NULL )
   {
@@ -2486,11 +2419,13 @@ static DWORD hb_wvt_gtProcessMessages( void )
 
   while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
   {
-    TranslateMessage( &msg );
-    DispatchMessage( &msg );
+     if ( _s.hDlgModeless == 0 || ! IsDialogMessage( _s.hDlgModeless, &msg ) )
+     {
+        TranslateMessage( &msg );
+        DispatchMessage( &msg );
+     }
   }
   return( msg.wParam );
-
 }
 
 //-------------------------------------------------------------------//
@@ -2806,12 +2741,10 @@ static void hv_wvt_gtDoInvalidateRect( void )
 {
   if ( HB_GT_FUNC( gt_DispCount() ) <= 0 && ( _s.RectInvalid.left != -1 ) )
   {
-     // InvalidateRect( _s.hWnd, &_s.RectInvalid, TRUE );
+    // InvalidateRect( _s.hWnd, &_s.RectInvalid, TRUE );
     InvalidateRect( _s.hWnd, &_s.RectInvalid, FALSE );
     _s.RectInvalid.left = -1 ;
     hb_wvt_gtProcessMessages();
-
-    // hb_wvt_gtPaintRect( _s.RectInvalid.left, _s.RectInvalid.top, _s.RectInvalid.right, _s.RectInvalid.bottom );
   }
 }
 
@@ -2952,6 +2885,7 @@ static void gt_hbInitStatics( void )
       _s.hMSImg32 = h;
     }
   }
+  _s.hDlgModeless     = NULL;
 }
 
 //-------------------------------------------------------------------//
@@ -4198,6 +4132,72 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #endif
 
 #endif  /* HB_MULTI_GT */
+
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//
+//       Modeless Dialog Implementation, Only ONE at any Time
+//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
+static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+   switch( message )
+   {
+      case WM_COMMAND:
+         switch( LOWORD( wParam ) )
+         {
+            case IDOK:
+            {
+               DestroyWindow( hDlg );
+               _s.hDlgModeless = NULL;
+            }
+            return TRUE;
+
+            case IDCANCEL:
+            {
+               DestroyWindow( hDlg );
+               _s.hDlgModeless = NULL;
+            }
+            return FALSE;
+         }
+         break;
+
+      case WM_CLOSE:
+      {
+         DestroyWindow( hDlg );
+         _s.hDlgModeless = NULL;
+         break;
+      }
+   }
+   return FALSE;
+}
+
+//-------------------------------------------------------------------//
+
+HB_EXPORT HWND hb_wvt_gtCreateDialog( char * pszDlgResource, BOOL bOnTop )
+{
+   HWND hDlg;
+   HWND hwnd = bOnTop ? _s.hWnd : NULL;
+
+   if ( _s.hDlgModeless )
+   {
+      DestroyWindow( _s.hDlgModeless );
+      _s.hDlgModeless = NULL;
+   }
+
+   hDlg = CreateDialog( hb_hInstance, pszDlgResource, hwnd, hb_wvt_gtDlgProcModeless );
+
+   if ( hDlg )
+   {
+      _s.hDlgModeless = hDlg;
+   }
+
+   return hDlg;
+}
 
 //-------------------------------------------------------------------//
 

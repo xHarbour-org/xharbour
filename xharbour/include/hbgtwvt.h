@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.24 2004/06/05 09:56:26 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.25 2004/06/12 18:55:08 bdj Exp $
  */
 
 /*
@@ -225,6 +225,7 @@ typedef struct global_data
   BOOL      bToolTipActive;            // Flag to set whether tooltip is active or not
   HINSTANCE hMSImg32;                  // Handle to the loaded library msimg32.dll
   wvtGradientFill pfnGF;               // Pointer to Address of the GradientFill function in MSImg32.dll
+  HWND      hDlgModeless;              // Handle to a modeless dialog
 } GLOBAL_DATA;
 
 typedef GLOBAL_DATA * LPGLOBAL_DATA;
@@ -261,6 +262,8 @@ BOOL   HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPictur
 BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
+
+HWND   HB_EXPORT hb_wvt_gtCreateDialogModeless( char * pszDlgResource, BOOL bOnTop );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.8 2004/07/01 13:18:38 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.9 2004/07/21 11:07:24 vouchcac Exp $
  */
 
 /*
@@ -178,7 +178,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
 
    for( i = 0 ; i < 16 ; i++ )
    {
-     crCustClr[ i ] = ( ISARRAY( 3 ) ? hb_parnl( 3, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+     crCustClr[ i ] = ( ISARRAY( 3 ) ? ( COLORREF ) hb_parnl( 3, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
    }
 
    cc.lStructSize   = sizeof( CHOOSECOLOR ) ;
@@ -1170,3 +1170,11 @@ HB_FUNC( WVT_DELETEOBJECT )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CREATEDIALOG )
+{
+   hb_retnl( ( ULONG ) hb_wvt_gtCreateDialog( hb_parc( 1 ), hb_parl( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.7 2004/07/01 13:18:38 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.8 2004/07/21 11:07:24 vouchcac Exp $
  */
 
 /*
@@ -450,7 +450,6 @@ HB_FUNC( WVT_DRAWLINE )
    int iBottom = ( _s->PTEXTSIZE.y * ( hb_parni( 3 ) + 1 ) ) - 1 + hb_parni( 11,3 );
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 11,4 );
 
-   POINT    xy;
    int      iOrient, iFormat, iAlign, iStyle, iThick;
    int      x, y, iOffset;
    COLORREF cr;
@@ -1837,7 +1836,7 @@ HB_FUNC( WVT_DRAWPROGRESSBAR )
    int      iRight   = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
    int      iPercent,  iBarUpto, iDirection;
    BOOL     bVertical, bImage;
-   COLORREF crBkColor, crBarColor;
+   COLORREF crBarColor;
    HBRUSH   hBrush;
    LOGBRUSH lb;
    RECT     rc;
@@ -1892,7 +1891,7 @@ HB_FUNC( WVT_DRAWPROGRESSBAR )
    }
    else
    {
-      crBarColor  = ISNIL( 8 ) ? hb_wvt_gtGetColorData(  0 ) : hb_parnl( 8 );
+      crBarColor  = ISNIL( 8 ) ? hb_wvt_gtGetColorData(  0 ) : ( COLORREF ) hb_parnl( 8 );
 
       lb.lbStyle  = BS_SOLID;
       lb.lbColor  = crBarColor;
