@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.66 2003/08/22 21:16:16 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.67 2003/10/10 04:19:49 ronpinkas Exp $
  */
 
 /*
@@ -3484,7 +3484,7 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
              * are compared since the result is always TRUE regardless
              * of EXACT setting.
              */
-            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_STRING && pSelf->value.asOperator.pLeft->ExprType == HB_ET_STRING )
+            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_STRING && pSelf->value.asOperator.pRight->ExprType == HB_ET_STRING )
             {
                 if( ( pSelf->value.asOperator.pLeft->ulLength | pSelf->value.asOperator.pRight->ulLength ) == 0 )
                 {
