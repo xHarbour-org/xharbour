@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.30 2003/03/07 11:32:04 jonnymind Exp $
+ * $Id: filesys.c,v 1.31 2003/04/13 09:29:58 jonnymind Exp $
  */
 
 /*
@@ -397,19 +397,32 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
    /* by default FC_NORMAL is set */
 
    *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
-   *result_pmode = S_IRWXU | S_IRWXG | S_IRWXO;
-
-   if( uiFlags & FC_READONLY )
+   //JC1: sorry, but at least under unix is more sensible to
+   // create files without the X attribute
+   if( uiFlags & FC_HIDDEN )
    {
       *result_pmode = S_IRUSR;
-      HB_TRACE(HB_TR_INFO, ("convert_create_flags: S_IRUSR"));
+   }
+   else
+   {
+      *result_pmode = S_IRUSR | S_IRGRP |  S_IROTH;
    }
 
-   if( uiFlags & FC_HIDDEN )
-      *result_flags |= 0;
+   if( !( uiFlags & FC_READONLY) )
+   {
+      if( *result_pmode & S_IRUSR )  *result_pmode |= S_IWUSR;
+      if( *result_pmode & S_IRGRP )  *result_pmode |= S_IWGRP;
+      if( *result_pmode & S_IROTH )  *result_pmode |= S_IWOTH;
+   }
 
+
+   // JC1: give executable attribute where read is available
    if( uiFlags & FC_SYSTEM )
-      *result_flags |= 0;
+   {
+      if( *result_pmode & S_IRUSR )  *result_pmode |= S_IXUSR;
+      if( *result_pmode & S_IRGRP )  *result_pmode |= S_IXGRP;
+      if( *result_pmode & S_IROTH )  *result_pmode |= S_IXOTH;
+   }
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
@@ -496,6 +509,9 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    FHANDLE hFileHandle;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
+
+   //JC1: Defaulting hFileHandle so compilers are happy (and code is more solid)
+   hFileHandle = FS_ERROR;
 
 #if defined(OS_UNIX_COMPATIBLE)
    {
