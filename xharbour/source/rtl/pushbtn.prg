@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.1.1.1 2001/12/21 10:41:47 ronpinkas Exp $
+ * $Id: pushbtn.prg,v 1.2 2002/03/17 23:27:28 lculik Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ METHOD GetColor(xColor)  CLASS HBPushButton
 
 METHOD GetStyle(cStyle)  CLASS HBPushButton
    if ( !( ISNIL( cStyle ) ) )
-      ::curStyle := iif( Valtype(cStyle)=="C" .and. LTrim(Str(Len(cStyle))) $ "0ù2ù8",cStyle,)
+      ::curStyle := iif( Valtype(cStyle)=="C" .and. LTrim(Str(Len(cStyle))) IN "0ù2ù8",cStyle,)
 
    endif
    return ::curStyle

@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.1.1.1 2001/12/21 10:42:13 ronpinkas Exp $
+ * $Id: treport.prg,v 1.2 2002/11/13 04:33:40 walito Exp $
  */
 
 /*
@@ -769,10 +769,10 @@ METHOD ExecuteReport() CLASS HBReportForm
       nMaxLines := 1
       FOR EACH aReport IN ::aReportdata[RPT_COLUMNS]
 
-         IF aReport[RCT_TYPE] $ "M"
+         IF aReport[RCT_TYPE] == "M"
             nMaxLines := MAX(XMLCOUNT(EVAL(aReport[RCT_EXP]),;
                          aReport[RCT_WIDTH]), nMaxLines)
-         ELSEIF aReport[RCT_TYPE] $ "C"
+         ELSEIF aReport[RCT_TYPE] == "C"
             nMaxLines := MAX( XMLCOUNT( STRTRAN( EVAL( aReport[RCT_EXP]),;
                          ";", CHR(13)+CHR(10)),;
                          aReport[RCT_WIDTH]), nMaxLines)
@@ -788,10 +788,10 @@ METHOD ExecuteReport() CLASS HBReportForm
       FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
          FOR nLine := 1 TO nMaxLines
             // Check to see if it's a memo or character
-            IF aReport[RCT_TYPE] $ "CM"
+            IF aReport[RCT_TYPE] IN "CM"
                //  Load the current line of the current column into cLine
                //  with multi-lines per record ";"- method
-               IF aReport[RCT_TYPE] $ "C"
+               IF aReport[RCT_TYPE] == "C"
                   cLine := XMEMOLINE( TRIM( STRTRAN( EVAL(aReport[RCT_EXP]),;
                              ";", CHR(13)+CHR(10)) ),;
                              aReport[RCT_WIDTH], nLine )
@@ -929,7 +929,7 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
    // Open the report file
    nFrmHandle := FOPEN( cFrmFile )
 
-   IF ( !EMPTY( nFileError := FERROR() ) ) .AND. !( "\" $ cFrmFile .OR. ":" $ cFrmFile )
+   IF ( !EMPTY( nFileError := FERROR() ) ) .AND. !( "\" IN cFrmFile .OR. ":" IN cFrmFile )
 
       // Search through default path; attempt to open report file
       cDefPath := SET( _SET_DEFAULT ) + ";" + SET( _SET_PATH )
@@ -1030,11 +1030,11 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
       // Line spacing
       // Spacing is 1, 2, or 3
       aReport[ RPT_SPACING ] := iif(SUBSTR(cParamsBuff, ;
-       DBL_SPACE_OFFSET, 1) $ "YyTt", 2, 1)
+       DBL_SPACE_OFFSET, 1) IN "YyTt", 2, 1)
 
       // Summary report flag
       aReport[ RPT_SUMMARY ] := iif(SUBSTR(cParamsBuff, ;
-       SUMMARY_RPT_OFFSET, 1) $ "YyTt", .T., .F.)
+       SUMMARY_RPT_OFFSET, 1) IN "YyTt", .T., .F.)
 
       // Process report eject and plain attributes option byte
       cOptionByte := ASC(SUBSTR(cParamsBuff, OPTION_OFFSET, 1))
@@ -1096,7 +1096,7 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
 
          // Page eject after group
          aReport[ RPT_GROUPS ][1][ RGT_AEJECT ] := iif(SUBSTR(cParamsBuff, ;
-         PE_OFFSET, 1) $ "YyTt", .T., .F.)
+         PE_OFFSET, 1) IN "YyTt", .T., .F.)
 
       ENDIF
 
@@ -1293,7 +1293,7 @@ METHOD GetColumn( cFieldsBuffer, nOffset ) CLASS HBReportForm
 
    // Total column?
    aColumn[ RCT_TOTAL ] := iif(SUBSTR(cFieldsBuffer, nOffset + ;
-    FIELD_TOTALS_OFFSET, 1) $ "YyTt", .T., .F.)
+    FIELD_TOTALS_OFFSET, 1) IN "YyTt", .T., .F.)
 
    // Decimals width
    aColumn[ RCT_DECIMALS ] := BIN2W(SUBSTR(cFieldsBuffer, nOffset + ;

@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.4 2002/03/17 23:27:28 lculik Exp $
+ * $Id: listbox.prg,v 1.5 2002/11/13 20:38:25 walito Exp $
  */
 
 /*
@@ -253,7 +253,7 @@ Return ::xBottom
 Method ADDITEM( cText, xValue ) Class HBListBox
 
      If ( !( Ischaracter( cText ) ) )
-     Elseif ( Valtype( xValue ) $ "CUN" )
+     Elseif ( Valtype( xValue ) IN "CUN" )
         Aadd( ::aItems, { cText, xValue } )
         ::iTemCount ++
         If ( ::iTemCount == 1 .and. ISOBJECT( ( ::Topitem := 1, ::nTopItem := 1, ::vScroll ) ) )
@@ -551,7 +551,7 @@ Method SELECTS( nPosition ) Class HBListBox
      Do Case
          Case ( xType := Valtype( nPosition ) ) == "C"
              nPos := Self:finddata( nPosition )
-             If ( !( Valtype( ::buffer ) $ "CU" ) )
+             If ( !( Valtype( ::buffer ) IN "CU" ) )
                 ::buffer := nPos
              Elseif ( ::value == 0 )
                 ::buffer := nPosition
@@ -568,7 +568,7 @@ Method SELECTS( nPosition ) Class HBListBox
              Return ::value
          Otherwise
              nPos := nPosition
-             If ( Valtype( ::buffer ) $ "NU" )
+             If ( Valtype( ::buffer ) IN "NU" )
                 ::buffer := nPos
              Elseif ( nPos == 0 )
                 ::buffer := ""

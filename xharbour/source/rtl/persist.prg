@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.6 2002/03/06 03:52:09 ronpinkas Exp $
+ * $Id: persist.prg,v 1.7 2002/11/13 04:17:10 walito Exp $
  */
 
 /*
@@ -221,9 +221,9 @@ static function ValToText( uValue )
 
    do case
       case cType == "C"
-           if cQuote $ uValue
+           if cQuote IN uValue
               cQuote := "'"
-              if cQuote $ uValue
+              if cQuote IN uValue
                  cText := "["+ uValue + "]"
               else
                  cText := cQuote + uValue + cQuote

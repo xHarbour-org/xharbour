@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.15 2002/08/05 18:04:23 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.16 2002/10/06 08:15:59 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ Function __ActiveStructure( cStructure, nAlign )
    IF PCount() == 2
       cStructure := Upper( cStructure )
 
-      IF aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) > 0
+      IF aScan( s_aClasses, { | aClassInfo | aClassInfo[1] == cStructure } ) > 0
          /* In most cases we can simply ignore the reduefinition, by returning a FAKED Structure Array!
          oErr := ErrorNew()
          oErr:Args := { cStructure, nAlign }
@@ -123,7 +123,7 @@ Function HB_CStructureID( cStructure, lInplace )
 
    cStructure := Upper( cStructure )
 
-Return aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
+Return aScan( s_aClasses, { | aClassInfo | aClassInfo[1] == cStructure } ) + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
 
 //---------------------------------------------------------------------------//
 Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAlign )
@@ -211,7 +211,7 @@ Function HB_CStructure( cStructure, nAlign )
    LOCAL oErr
 
    cStructure := Upper( cStructure )
-   nID        := aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } )
+   nID        := aScan( s_aClasses, { | aClassInfo | aClassInfo[1] == cStructure } )
 
    IF nID == 0
       oErr := ErrorNew()

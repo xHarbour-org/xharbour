@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.11 2002/05/16 20:06:27 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.12 2002/05/22 15:24:55 ronpinkas Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ STATIC FUNCTION LogError( oerr )
           cVarName  := Left( nMemWidth, At( Chr( 0 ), nMemWidth ) - 1 )
           cVarType  := Substr( nMemWidth, 12, 1 )
           cVarRec   := Bin2w( Right( nMemWidth, 2 ) )
-          nMemCount := If( cVarType $ Chr( 195 ) + Chr( 204 ), 14 + cVarRec, 22 )
+          nMemCount := If( cVarType IN Chr( 195 ) + Chr( 204 ), 14 + cVarRec, 22 )
           Fseek( nMemHandle, nMemCount, 1 )
           cTemp  := Left( cVarName + Space( 10 ), 10 )
           cTemp  += " TYPE " + Type( cVarName )

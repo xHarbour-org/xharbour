@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.6 2002/09/04 03:11:26 lculik Exp $
+ * $Id: memoedit.prg,v 1.7 2002/10/30 02:09:37 lculik Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ METHOD Edit() CLASS TMemoEditor
          endif
 
          // Is it a configurable key ?
-         if AScan(aConfigurableKeys, nKey) > 0
+         if nKey IN aConfigurableKeys
             nUserKey := ::xDo(iif(::lDirty, ME_UNKEYX, ME_UNKEY))
             ::HandleUserKey(nKey, nUserKey)
 
@@ -183,20 +183,20 @@ METHOD HandleUserKey(nKey, nUserKey) CLASS TMemoEditor
       // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
       case nUserKey == ME_DEFAULT
          // HBEditor is not able to handle keys with a value higher than 256
-         if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W) .AND. AScan(aUnHandledKeys, nKey) == 0
+         if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W) .AND. !(nKey IN aUnHandledKeys)
             super:Edit(nKey)
          endif
 
       // TOFIX: Not clipper compatible, see teditor.prg
 
       case (nUserKey >= 1 .AND. nUserKey <= 31) .OR. nUserKey == K_ALT_W .or.nUserKey == K_CTRL_W
-         if AScan(aUnHandledKeys, nUserKey) == 0
+         if !(nUserKey IN aUnHandledKeys)
             super:Edit(nUserKey)
          endif
 
 
       case nUserKey == ME_DATA
-         if nKey <= 256 .AND. AScan(aUnHandledKeys, nKey) == 0
+         if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
             super:Edit(nKey)
          endif
 

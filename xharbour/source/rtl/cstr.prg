@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.4 2002/10/25 03:06:08 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.5 2002/10/25 21:29:12 ronpinkas Exp $
  */
 
 /*
@@ -152,11 +152,11 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    DO CASE
       CASE cType = 'C'
-         IF ! '"' $ xVal
+         IF ! '"' IN xVal
             RETURN '"' + xVal + '"'
-         ELSEIF ! "'" $ xVal
+         ELSEIF ! "'" IN xVal
             RETURN "'" + xVal + "'"
-         ELSEIF ( ! "[" $ xVal ) .AND. ( ! "]" $ xVal )
+         ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
             RETURN "[" + xVal + "]"
          ELSE
             __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )

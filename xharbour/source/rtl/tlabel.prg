@@ -1,5 +1,5 @@
 /*
- * $Id: tlabel.prg,v 1.1.1.1 2001/12/21 10:42:00 ronpinkas Exp $
+ * $Id: tlabel.prg,v 1.2 2002/11/13 04:31:27 walito Exp $
  */
 
 /*
@@ -379,7 +379,7 @@ METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
    // Open the label file
    nHandle := FOPEN( cLblFile )
 
-   IF ( ! EMPTY( nFileError := FERROR() ) ) .AND. !( "\" $ cLblFile .OR. ":" $ cLblFile )
+   IF ( ! EMPTY( nFileError := FERROR() ) ) .AND. !( "\" IN cLblFile .OR. ":" IN cLblFile )
 
       // Search through default path; attempt to open label file
       cDefPath := SET( _SET_DEFAULT )

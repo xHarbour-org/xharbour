@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.3 2002/07/30 06:59:58 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.4 2002/11/13 04:28:29 walito Exp $
  */
 
 /*
@@ -295,7 +295,7 @@ STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
    IF ! lNoInit .AND. cType != NIL .AND. xInit == NIL
       IF Upper( Left( cType, 1 ) ) == "L"
          xInit := .F.
-      ELSEIF Upper( Left( cType, 1 ) ) $ "NI"   /* Numeric Int */
+      ELSEIF Upper( Left( cType, 1 ) ) IN "NI"   /* Numeric Int */
          xInit := 0
       ENDIF
    ENDIF
@@ -344,7 +344,7 @@ STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
    IF ! lNoInit .AND. cType != NIL .AND. xInit == NIL
       IF Upper( Left( cType, 1 ) ) == "L"
          xInit := .F.
-      ELSEIF Upper( Left( cType, 1 ) ) $ "NI"  /* Numeric Int */
+      ELSEIF Upper( Left( cType, 1 ) ) IN "NI"  /* Numeric Int */
          xInit := 0
       ENDIF
    ENDIF

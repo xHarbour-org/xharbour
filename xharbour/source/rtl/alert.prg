@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.6 2002/11/09 07:49:36 ronpinkas Exp $
+ * $Id: alert.prg,v 1.7 2002/11/13 04:13:14 walito Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    ELSE
 
       DO CASE
-      CASE ValType( xMessage ) $ "CM" /* Do nothing, just speed up things */
+      CASE ValType( xMessage ) IN "CM" /* Do nothing, just speed up things */
       CASE ValType( xMessage ) == "N" ; xMessage := LTrim( Str( xMessage ) )
       CASE ValType( xMessage ) == "D" ; xMessage := DToC( xMessage )
       CASE ValType( xMessage ) == "L" ; xMessage := iif( xMessage, ".T.", ".F." )
@@ -136,7 +136,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
          IF ( nLen := Len( xMessage ) ) > 58
             FOR nPos := 58 TO 1 STEP -1
-               IF xMessage[nPos] $ " " + Chr( 9 )
+               IF xMessage[nPos] IN ( " " + Chr( 9 ) )
                   EXIT
                ENDIF
             NEXT
@@ -259,7 +259,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             nChoice := 0
             EXIT
 
-         CASE aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } ) > 0
+         CASE Upper( Chr( nKey ) ) IN aHotkey
 
             nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
             EXIT
@@ -364,9 +364,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
             nDelay := 0
 
-         CASE ( nEval:=aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } ) ) > 0
+         CASE Upper( Chr( nKey ) ) IN aHotkey
 
-            nChoice := nEval
+            nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
             EXIT
 
          ENDCASE

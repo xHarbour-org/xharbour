@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.8 2002/11/07 05:03:26 walito Exp $
+ * $Id: achoice.prg,v 1.9 2002/11/13 04:10:24 walito Exp $
  */
 
 /*
@@ -50,7 +50,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    ColorSelect( CLR_STANDARD )
 
-   lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) $ "CB"
+   lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) IN "CB"
 
 
    DEFAULT nTop       TO 0                 // The topmost row of the window
@@ -75,7 +75,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    nNumRows := nBottom - nTop + 1
 
 
-   IF VALTYPE( xSelect ) $ "A"
+   IF VALTYPE( xSelect ) == "A"
       alSelect := xSelect
    ELSE
       alSelect := ARRAY( LEN( acItems ) )

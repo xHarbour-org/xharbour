@@ -1,5 +1,5 @@
 /* 
- * $Id: devoutp.prg,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
+ * $Id: devoutp.prg,v 1.2 2002/04/24 03:54:42 walito Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 PROCEDURE DevOutPict( xValue, cPicture, cColor )
 
-   if Valtype( xValue ) $ "CMNDL"
+   if Valtype( xValue ) IN "CMNDL"
 
       DevOut( Transform( xValue, cPicture ), cColor )
 

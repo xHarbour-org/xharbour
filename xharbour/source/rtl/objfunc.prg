@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.8 2002/10/06 22:04:44 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.9 2002/10/09 06:46:59 ronpinkas Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
    aReturn := {}
 
    FOR EACH cVar IN aVars
-      IF AScan( aExcept, { | cElement | cElement == cVar } ) == 0
+      IF !( cVar IN aExcept )
          AAdd( aReturn, { cVar, __objSendMsg( oObject, cVar ) } )
       ENDIF
    NEXT
