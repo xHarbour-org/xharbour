@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: ctnet.c,v 1.1 2004/08/27 05:46:07 paultucker Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -135,11 +135,11 @@ HB_FUNC ( NETPRINTER )
 
 HB_FUNC ( NETDISK )
 {
-   char *cDrive = ( char *) hb_parcx( 1 );
-   if ( strstr( cDrive, ":" ) == NULL )
-   {
-      strcat( cDrive, ":" ) ;
-   }
+   char cDrive[3];
+
+   strncpy( cDrive, hb_parcx( 1 ), 1 );
+   cDrive[1] = ':';
+   cDrive[2] = '\0';
 
    hb_retl( hb_IsNetShared( cDrive ) );
 }
@@ -149,22 +149,21 @@ HB_FUNC ( NETREDIR )
 {
 
    DWORD dwResult;
-   char *cLocalDev  = hb_parcx( 1 );
    char *cSharedRes = hb_parcx( 2 );
    char *cPassword  = hb_parcx( 3 );
+   char cLocalDev[3];
 
-   if ( strstr( cLocalDev, ":" ) == NULL )
-   {
-   strcat( cLocalDev, ":" );
-   }
+   strncpy( cLocalDev, hb_parcx( 1 ), 1 );
+   cLocalDev[1] = ':';
+   cLocalDev[2] = '\0';
 
    if ( hb_pcount() == 3 && ISCHAR( 3 ) )
    {
-      dwResult = WNetAddConnection( cSharedRes , cPassword , cLocalDev ) ;
+      dwResult = WNetAddConnection( cSharedRes, cPassword, cLocalDev ) ;
    }
    else
    {
-      dwResult = WNetAddConnection( cSharedRes , NULL , cLocalDev ) ;
+      dwResult = WNetAddConnection( cSharedRes, NULL, cLocalDev ) ;
    }
 
    hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
@@ -179,7 +178,7 @@ HB_FUNC ( NETRMTNAME )
    DWORD dwResult;
    DWORD cchBuff = sizeof( szRemoteDevice );
 
-   dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff);
+   dwResult = WNetGetConnection( (LPSTR) szLocalDevice, (LPSTR) szRemoteDevice, &cchBuff);
 
    hb_retc( dwResult == NO_ERROR ? szRemoteDevice : "" ) ;
 }
@@ -191,15 +190,15 @@ HB_FUNC ( NETWORK )
    char szProviderName[80];
    DWORD cchBuff = sizeof(szProviderName);
 
-   dwResult = WNetGetProviderName( WNNC_NET_MSNET , (LPSTR) szProviderName , &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_MSNET, (LPSTR) szProviderName, &cchBuff);
 
    if ( dwResult != NO_ERROR )
    {
-      dwResult = WNetGetProviderName( WNNC_NET_LANMAN , (LPSTR) szProviderName , &cchBuff);
+      dwResult = WNetGetProviderName( WNNC_NET_LANMAN, (LPSTR) szProviderName, &cchBuff);
 
       if ( dwResult != NO_ERROR )
       {
-         dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
+         dwResult = WNetGetProviderName( WNNC_NET_NETWARE, (LPSTR) szProviderName, &cchBuff);
       }
    }
 
@@ -213,7 +212,7 @@ HB_FUNC ( NNETWORK )
    char szProviderName[80];
    DWORD cchBuff = sizeof(szProviderName);
 
-   dwResult = WNetGetProviderName( WNNC_NET_NETWARE , (LPSTR) szProviderName , &cchBuff);
+   dwResult = WNetGetProviderName( WNNC_NET_NETWARE, (LPSTR) szProviderName, &cchBuff);
 
    hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
 }

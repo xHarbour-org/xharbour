@@ -1,5 +1,5 @@
-﻿/*
- * $Id: ChangeLog,v 1.3381 2004/08/31 08:38:20 likewolf Exp $
+/*
+ * $Id: ChangeLog,v 1.3382 2004/08/31 13:03:21 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-31 11:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/ct/ctnet.c
+    * correction to netdisk and netredir - Don't concatenate onto hb_parc pointer!
 
 2004-08-31 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/gtwin/gtwin.c
