@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.174 2004/10/20 03:14:41 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.175 2004/10/20 22:40:50 ronpinkas Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ char * hb_pp_szErrors[] =
    "Can\'t open #include file: \'%s\'; %s",
    "#else does not match #ifdef",
    "#endif does not match #ifdef",
-   "Bad filename in #include",
+   "Bad filename in #include '%s'",
    "#define without parameters",
    "Missing => in #directive \'%s\' [%s]'",
    "Error in pattern definition \'%s\'",
@@ -869,7 +869,7 @@ int hb_pp_ParseDirective( char * sLine )
 
         if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
         {
-           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine, NULL );
         }
 
         cDelimChar = *sLine;
@@ -887,7 +887,7 @@ int hb_pp_ParseDirective( char * sLine )
         while( *(sLine+i) != '\0' && *(sLine+i) != cDelimChar ) i++;
         if( *(sLine+i) != cDelimChar )
         {
-           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine - 1, NULL );
         }
         *(sLine+i) = '\0';
 
