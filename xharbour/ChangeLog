@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2352 2004/02/21 05:45:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2353 2004/02/21 06:09:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-21 10:02 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/vm/errorapi.c
+    * some "spaces" around
+
+  * source/vm/hbi18n.c
+    ! fixed memory leaks.
+
+  * source/vm/hvm.c
+    * Added some tracelogs in hb_vmQuit()
+
+  * source/vm/memvars.c
+    * Added tracelogs in MT functions
+
+  * source/vm/thread.c
+    * Added tracelogs in MT functions
+    ! fixed some memory leaks in main thread's stack.
 
 2004-02-20 22:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hash.c

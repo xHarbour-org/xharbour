@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.12 2003/11/03 05:16:58 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.13 2004/01/29 23:24:13 jonnymind Exp $
  */
 
 /*
@@ -324,6 +324,7 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
       {
          hb_arrayAddForward( pTable, pRow );
       }
+      hb_itemRelease( pRow );
    }
 
    return pTable;
@@ -418,7 +419,7 @@ BOOL hb_i18n_load_language( char *language )
       strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
       if ( s_i18n_table != NULL )
       {
-         hb_arrayRelease( s_i18n_table );
+         hb_itemRelease( s_i18n_table );
       }
       s_i18n_table = pTable;
       hb_gcLock( s_i18n_table ); // avoid releasing it
@@ -483,6 +484,9 @@ HB_FUNC( HB_I18NLOADTABLE )
          hb_arraySetForward( pRet, 1, pHeader );
          hb_arraySetForward( pRet, 2, pTable );
          hb_itemReturn( pRet );
+         hb_itemRelease( pRet );
+         hb_itemRelease( pHeader );
+         hb_itemRelease( pTable );
       }
       else
       {
@@ -813,6 +817,7 @@ void hb_i18nExit( void )
 {
    if( s_i18n_table != NULL )
    {
+      hb_gcUnlock( s_i18n_table );
       hb_itemRelease( s_i18n_table );
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.330 2004/02/21 05:45:46 ronpinkas Exp $
+ * $Id: hvm.c,v 1.331 2004/02/21 06:09:26 ronpinkas Exp $
  */
 
 /*
@@ -775,9 +775,9 @@ int HB_EXPORT hb_vmQuit( void )
 
    if( s_aStatics.type == HB_IT_ARRAY )
    {
-      //TraceLog( NULL, "Releasing s_aStatics: %p\n", &s_aStatics );
+      HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
       hb_arrayRelease( &s_aStatics );
-      //TraceLog( NULL, "   Released s_aStatics: %p\n", &s_aStatics );
+      HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
 

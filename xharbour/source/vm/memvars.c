@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.56 2004/02/20 18:27:36 ronpinkas Exp $
+ * $Id: memvars.c,v 1.57 2004/02/20 22:34:01 ronpinkas Exp $
  */
 
 /*
@@ -219,6 +219,7 @@ void hb_memvarsRelease( void )
 
 void hb_memvarsInit( HB_STACK *pStack )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear(%p)", pStack));
    pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize = TABLE_INITHB_VALUE;
@@ -236,7 +237,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
 {
    ULONG ulCnt;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear(%p)", pStack));
 
    ulCnt = pStack->globalLastFree;
 
@@ -2308,7 +2309,6 @@ static HB_DYNS_FUNC( hb_GetSymbolInfo )
 
 HB_FUNC( __MVSYMBOLINFO )
 {
-  HB_THREAD_STUB
   PHB_ITEM pArray = hb_itemArrayNew( 0 );
   hb_dynsymEval( hb_GetSymbolInfo, ( void * ) pArray );
   hb_itemReturn( pArray);

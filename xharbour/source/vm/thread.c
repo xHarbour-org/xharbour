@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.154 2004/02/15 21:58:47 ronpinkas Exp $
+* $Id: thread.c,v 1.155 2004/02/20 00:22:41 ronpinkas Exp $
 */
 
 /*
@@ -268,7 +268,9 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
    HB_STACK *tc;
 
-   tc = (HB_STACK *) hb_xgrab( sizeof( HB_STACK));
+   HB_TRACE(HB_TR_DEBUG, ("hb_threadCreateStack(...)"));
+
+   tc = (HB_STACK *) hb_xgrab( sizeof( HB_STACK ) );
    hb_threadSetupStack( tc, th );
 
    return tc;
@@ -281,6 +283,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 {
    int i;
    ULONG uCount;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_threadSetupStack(%p, ...)", tc));
 
    tc->th_id = th;
    tc->uiIdleInspect = 0;
@@ -385,9 +389,12 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
    PHB_ITEM pItem, *pPos;
    USHORT uiParam = 1;
 
+   HB_TRACE(HB_TR_DEBUG, ("hb_threadFillStack(%p, %p)", pStack, pArgs));
+
    pPos = pStack->pPos;
 
    pPointer = hb_arrayGetItemPtr( pArgs, 1 );
+
 
    if( HB_IS_SYMBOL( pPointer ) )
    {
@@ -446,6 +453,9 @@ HB_STACK *hb_threadLinkStack( HB_STACK *tc )
 {
    HB_STACK *p;
 
+   HB_TRACE(HB_TR_DEBUG, ("hb_threadLinkStack(%p)", tc));
+
+
    p = hb_ht_stack;
 
    while( p->next )
@@ -469,6 +479,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    LONG i;
    PHB_ITEM *pPos;
 
+   HB_TRACE(HB_TR_DEBUG, ("hb_threadDestroyStack(%p)", pStack));
+
    /* Free each element of the stack */
    if( pStack != &hb_stack )
    {
@@ -489,14 +501,9 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    /* Error handler is never allocated; it resides in the stack, or
       is owned by callers. */
-   if( pStack->errorBlock && pStack->errorBlock->type != HB_IT_NIL )
+   if( pStack->errorBlock )
    {
-      // Harbour should remove the error handler of the main stack
-      // from PRG level or around that.
-      if( pStack != &hb_stack )
-      {
-         hb_itemClear( pStack->errorBlock );
-      }
+      hb_itemRelease( pStack->errorBlock );
    }
 
    /* Free each element of the stack */
@@ -507,15 +514,14 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    /* Free the stack */
 
    hb_xfree( pStack->pItems );
+   if ( pStack->aTryCatchHandlerStack )
+   {
+      hb_itemRelease( pStack->aTryCatchHandlerStack );
+   }
 
    // releases this thread's memvars
-
    if( pStack != &hb_stack )
    {
-      if ( pStack->aTryCatchHandlerStack &&  pStack->aTryCatchHandlerStack->type != HB_IT_NIL )
-      {
-         hb_itemClear( pStack->aTryCatchHandlerStack );
-      }
       // Main thread should have them removed before arriving here.
       hb_memvarsRelease( pStack );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.34 2004/02/20 12:52:52 druzus Exp $
+ * $Id: errorapi.c,v 1.35 2004/02/20 22:34:00 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,7 @@ void HB_EXPORT hb_errExit( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_errExit()"));
 
    #ifndef HB_THREAD_SUPPORT
-      if( s_errorBlock && s_errorBlock->type )
+      if( s_errorBlock )
       {
          hb_itemRelease( s_errorBlock );
       }
