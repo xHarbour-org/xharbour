@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.73 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.74 2002/05/20 22:37:40 ronpinkas Exp $
  */
 
 /*
@@ -5459,7 +5459,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    {
       char sTemp[256];
 
-      sprintf( sTemp, "HVM version %i is incompatible with '%s' PCODE version %i\n", HB_PCODE_VER, sModule, iPCodeVer );
+      sprintf( (char *) sTemp, "HVM version %i is incompatible with '%s' PCODE version %i\n", HB_PCODE_VER, sModule, iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV, sTemp, NULL, NULL );
    }
