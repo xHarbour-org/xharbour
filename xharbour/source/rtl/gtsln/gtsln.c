@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.22 2004/05/25 20:27:23 druzus Exp $
+ * $Id: gtsln.c,v 1.23 2004/06/04 00:18:09 druzus Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ static void hb_sln_colorTrans( void )
        * we make a small trick with XOR 7 to make default colors
        * the same.
        */
-      clr = ( i ^ 0x07 );
+      clr = ( bg << 4 ) | ( fg ^ 0x07 );
       SLtt_set_color( clr, ( char * ) NULL, s_colorNames[ fg ], s_colorNames[ bg ] );
       s_colorTab[ i ] = SLSMG_BUILD_CHAR( 0, clr );
    }
@@ -171,25 +171,44 @@ static void hb_sln_colorTrans( void )
 static void hb_sln_setSingleBox( void )
 {
    /* convert all box chars into Clipper _B_SINBLE */
-   s_outputTab[ 205 ] = s_outputTab[ 196 ];
    s_outputTab[ 186 ] = s_outputTab[ 179 ];
-   s_outputTab[ 201 ] = s_outputTab[ 218 ];
-   s_outputTab[ 214 ] = s_outputTab[ 218 ];
-   s_outputTab[ 213 ] = s_outputTab[ 218 ];
-   s_outputTab[ 187 ] = s_outputTab[ 191 ];
+   s_outputTab[ 205 ] = s_outputTab[ 196 ];
+
+   s_outputTab[ 181 ] = s_outputTab[ 180 ];
+   s_outputTab[ 182 ] = s_outputTab[ 180 ];
+   s_outputTab[ 185 ] = s_outputTab[ 180 ];
+
    s_outputTab[ 183 ] = s_outputTab[ 191 ];
    s_outputTab[ 184 ] = s_outputTab[ 191 ];
+   s_outputTab[ 187 ] = s_outputTab[ 191 ];
+
    s_outputTab[ 200 ] = s_outputTab[ 192 ];
    s_outputTab[ 211 ] = s_outputTab[ 192 ];
    s_outputTab[ 212 ] = s_outputTab[ 192 ];
+
+   s_outputTab[ 202 ] = s_outputTab[ 193 ];
+   s_outputTab[ 207 ] = s_outputTab[ 193 ];
+   s_outputTab[ 208 ] = s_outputTab[ 193 ];
+
+   s_outputTab[ 203 ] = s_outputTab[ 194 ];
+   s_outputTab[ 209 ] = s_outputTab[ 194 ];
+   s_outputTab[ 210 ] = s_outputTab[ 194 ];
+
+   s_outputTab[ 198 ] = s_outputTab[ 195 ];
+   s_outputTab[ 199 ] = s_outputTab[ 195 ];
+   s_outputTab[ 204 ] = s_outputTab[ 195 ];
+
+   s_outputTab[ 206 ] = s_outputTab[ 197 ];
+   s_outputTab[ 215 ] = s_outputTab[ 197 ];
+   s_outputTab[ 216 ] = s_outputTab[ 197 ];
+
    s_outputTab[ 188 ] = s_outputTab[ 217 ];
    s_outputTab[ 189 ] = s_outputTab[ 217 ];
    s_outputTab[ 190 ] = s_outputTab[ 217 ];
-   s_outputTab[ 185 ] = s_outputTab[ 118 ];
-   s_outputTab[ 204 ] = s_outputTab[ 195 ];
-   s_outputTab[ 203 ] = s_outputTab[ 194 ];
-   s_outputTab[ 202 ] = s_outputTab[ 193 ];
-   s_outputTab[ 206 ] = s_outputTab[ 197 ];
+
+   s_outputTab[ 201 ] = s_outputTab[ 218 ];
+   s_outputTab[ 213 ] = s_outputTab[ 218 ];
+   s_outputTab[ 214 ] = s_outputTab[ 218 ];
 }
 
 /* *********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.6 2003/05/21 09:35:37 druzus Exp $
+ * $Id: gtsln.h,v 1.7 2004/06/04 00:18:10 druzus Exp $
  */
 
 /*
@@ -73,7 +73,12 @@
 extern PHB_CODEPAGE s_cdpage;
 #endif
 
-#if UTF8 && SLANG_VERSION >= 10409
+/*
+ * It's a hack to detect UTF-8 patched version of slang, you may
+ * need to modified it for your slang version because UTF-8 patches
+ * are still unoficial
+ */
+#if UTF8 && SLSMG_HLINE_CHAR_TERM
     #define HB_SLN_UTF8
 #endif
 
