@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.60 2003/09/30 03:06:29 lculik Exp $
+ * $Id: tget.prg,v 1.61 2003/11/07 04:17:17 maurifull Exp $
  */
 
 /*
@@ -347,7 +347,8 @@ METHOD ParsePict( cPicture ) CLASS Get
       Next
    endif
 
-   if ::HasFocus
+   if ::HasFocus  // TODO: Delete this line if the "if ::hasfocus" in ::Picture
+                  //       is correct.
       if ::type == "N"
          ::decpos := At( iif( ::lDecRev .or. "E" IN ::cPicFunc, ",", "." ), ;
                      Transform( 1, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask ) )
@@ -1603,7 +1604,10 @@ METHOD Picture( cPicture ) CLASS Get
       ::nDispLen := NIL
 
       ::cPicture := cPicture
-      ::ParsePict( cPicture )
+
+      if ::HasFocus
+         ::ParsePict( cPicture )
+      endif
 
 //      ::buffer  := ::PutMask( )
 //      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
