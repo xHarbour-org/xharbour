@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/05/16 19:52:06 druzus Exp $
+# $Id: Makefile,v 1.4 2003/11/30 10:02:46 druzus Exp $
 #
 
 ROOT = ../
@@ -37,6 +37,14 @@ DIRS=\
 	clipsamp \
 	odbc \
 
+ifneq ($(HB_ARCHITECTURE),dos)
+
+DIRS+=\
+	tip \
+
 endif
+
+endif
+
 
 include $(ROOT)config/dir.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3275 2004/08/05 00:51:06 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3276 2004/08/05 09:19:49 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-05 14:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  + source/tip/*
+    * copied contrib/tip/*, added copyright headers, changed file names
+    * to 8.3, updated gnu Makefile ( please update other makefiles )
+  + tests/tiptest/*
+    * copied contrib/tip/tests, changed file names to 8.3
+  * source/rtl/Makefile
+    * added tip dir for HB_ARCHITECTURE <> dos
+  * config/global.cf
+    * added @ to for to avoid echo
 
 2004-08-05 02:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * xdiff.txt

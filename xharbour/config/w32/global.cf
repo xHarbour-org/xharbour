@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.11 2003/12/23 00:49:08 druzus Exp $
+# $Id: global.cf,v 1.12 2004/08/04 12:34:07 mauriliolongo Exp $
 #
 
 ifndef MK
@@ -47,10 +47,10 @@ MD = md
 RANLIB = ranlib
 
 dirbase::
-	-for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\. $(MD) %%d
+	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\. $(MD) %%d
 
 dirbase_mt::
-	-for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %%d\. $(MD) %%d
+	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %%d\. $(MD) %%d
 
 clean::
 	-@for %%f in ($(ARCH_DOS)\*.* $(ARCH_DOS)_mt\*.* *.bak *.obj *.o *.tds) do $(RM) %%f
