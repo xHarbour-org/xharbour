@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.67 2004/03/22 23:39:56 andijahja Exp $
+ * $Id: genc.c,v 1.68 2004/03/22 23:49:01 andijahja Exp $
  */
 
 /*
@@ -174,7 +174,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
    }
 
    fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n", HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   fprintf( yyc, " * Generated C source code from <%s>\n */\n\n", hb_comp_PrgFileName );
+   /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
+   fprintf( yyc, " * Generated C source code from %s%s%s\n */\n\n", "<", hb_comp_PrgFileName, ">" );
 
    if( hb_comp_iFunctionCnt )
    {

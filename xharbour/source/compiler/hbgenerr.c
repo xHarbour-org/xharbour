@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.14 2003/10/05 18:55:36 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.15 2004/02/18 10:50:44 andijahja Exp $
  */
 
 /*
@@ -138,13 +138,27 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
    int iLine = hb_comp_iLine - 1;
 
    if( cPrefix != 'F' && hb_comp_bError )
+   {
       return;
+   }
 
-  if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
-    printf( "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+   if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
+   {
+      printf( "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+   }
 
    printf( "Error %c%04i  ", cPrefix, iError );
-   printf( szErrors[ iError - 1 ], szError1, szError2 );
+
+   if( cPrefix == 'F' && iError == HB_PP_ERR_UNKNOWN_RESULTMARKER )
+   {
+      /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
+      printf("Unknown result marker %s%s%s in #directive", "<", szError1, ">", szError2 );
+   }
+   else
+   {
+      printf( szErrors[ iError - 1 ], szError1, szError2 );
+   }
+
    printf( "\n" );
 
    hb_comp_iErrorCount++;
@@ -152,7 +166,9 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
 
    /* fatal error - exit immediately */
    if( cPrefix == 'F' )
+   {
       exit( EXIT_FAILURE );
+   }
 }
 
 void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2)

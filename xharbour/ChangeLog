@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2640 2004/03/24 03:19:51 lculik Exp $
+ * $Id: ChangeLog,v 1.2641 2004/03/24 08:01:49 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-24 15:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/compiler/genc.c
+   * source/compiler/hbgenerr.c
+     ! minor correction on formatted-printing for some compiler(s) which
+       cannot perform: [s][f]printf("<%s>",string) correctly. :-).
+     /*
+       Test program:
+       .---
+       | proc main()
+       | X()
+       |
+       | #pragma begindump
+       | #include "hbapi.h"
+       | HB_FUNC( X ){printf("<%s>\n","Hello");}
+       | #pragma enddump
+       `---
+     */
 
 2004-03-24 00:15 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c
