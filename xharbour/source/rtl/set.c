@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.46 2004/04/08 13:26:53 druzus Exp $
+ * $Id: set.c,v 1.47 2004/04/20 14:33:23 jacekp Exp $
  */
 
 /*
@@ -258,7 +258,7 @@ static void close_binary( FHANDLE handle )
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( hb_set.hb_set_winprinter && ( hb_set.hb_set_printhan == handle ) && s_PrintFileName[0] )
       {
-         hb_PrintFileRaw( (BYTE *) s_PrinterName, (BYTE *) s_PrintFileName, 
+         hb_PrintFileRaw( (BYTE *) s_PrinterName, (BYTE *) s_PrintFileName,
                           (BYTE *) ( hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName ) ) ;
          hb_fsDelete( (BYTE *) s_PrintFileName );
       }
@@ -1254,13 +1254,32 @@ HB_FUNC( SET )
             }
          }
          break;
-/*
       case HB_SET_PRINTERJOB    :
-         if( hb_set.HB_SET_PRINTERJOB ) hb_retc( hb_set.HB_SET_PRINTERJOB );
-         else hb_retc( NULL );
-         if( args > 1 ) hb_set.HB_SET_PRINTERJOB = set_string( pArg2, hb_set.HB_SET_PRINTERJOB);
+         if ( hb_set.hb_set_printerjob )
+         {
+           hb_retc( hb_set.hb_set_printerjob );
+         }
+         else
+         {
+           hb_retc( "" ) ;
+         }
+         if ( args > 1 && ISCHAR( 2 ) )
+         {
+           ULONG ulLength = hb_parclen( 2 ) ;
+           if ( hb_set.hb_set_printerjob )
+           {
+              hb_xfree( hb_set.hb_set_printerjob ) ;
+              hb_set.hb_set_printerjob = NULL ;
+           }
+
+           if ( ulLength > 0 )
+           {
+             ulLength++ ;    // Add on space for '\0'
+             hb_set.hb_set_printerjob = hb_xgrab( ulLength ) ;
+             memcpy( hb_set.hb_set_printerjob, hb_parc( 2 ), ulLength ) ;
+           }
+         }
          break;
-  */
       case HB_SET_FILECASE :
          hb_retni( hb_set.HB_SET_FILECASE );
          if( args > 1 )

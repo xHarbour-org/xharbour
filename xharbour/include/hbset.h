@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.23 2004/03/31 09:19:54 andijahja Exp $
+ * $Id: hbset.h,v 1.24 2004/04/20 14:33:08 jacekp Exp $
  */
 
 /*
@@ -135,7 +135,8 @@ typedef enum
    HB_SET_BACKGROUNDTASKS = 111,
    HB_SET_TRIMFILENAME    = 112,
    HB_SET_GTMODE          = 113,
-   HB_SET_BACKGROUNDTICK  = 114
+   HB_SET_BACKGROUNDTICK  = 114,
+   HB_SET_PRINTERJOB      = 115
 } HB_set_enum;
 
 typedef struct

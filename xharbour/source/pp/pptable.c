@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.40 2004/04/30 03:50:48 ronpinkas Exp $
+ * $Id: pptable.c,v 1.41 2004/05/10 00:58:46 lculik Exp $
  */
 
 /*
@@ -134,6 +134,7 @@ void hb_pp_Table( void )
    static DEFINES sD___63 = {"_SET_TRIMFILENAME",NULL,-1,"112", &sD___62 };
    static DEFINES sD___64 = {"_SET_GTMODE",NULL,-1,"113", &sD___63 };
    static DEFINES sD___65 = {"_SET_BACKGROUNDTICK",NULL,-1,"114", &sD___64 };
+   static DEFINES sD___66 = {"_SET_PRINTERJOB",NULL,-1,"115", &sD___65 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -506,6 +507,6 @@ void hb_pp_Table( void )
    hb_pp_topCommand = &sC___256;
 #endif
 
-   hb_pp_topDefine = &sD___65;
+   hb_pp_topDefine = &sD___66;
    hb_pp_topTranslate = &sT___04;
 }
