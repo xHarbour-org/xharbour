@@ -1,0 +1,1 @@
+bld_b32 test 1class 2class
