@@ -35,10 +35,10 @@ GLOBAL EXTERNAL hThisInstance
   // METHOD OnEraseBkgnd()
    METHOD OnSize()
 
-   METHOD OnCommand(nwParam) INLINE ::SubCommands( nwParam )
+   METHOD OnMenuCommand(oItem) //INLINE ::SubCommands( nwParam )
    METHOD CreateSub()
    METHOD DrawGrid()
-   METHOD SubCommands()
+   //METHOD SubCommands()
 
 
  END CLASS
@@ -50,6 +50,8 @@ METHOD Add( cName, oObj )
    LOCAL oCtrl:=Super:Add( cName, oObj )
 
    aAdd( ::aCtrl, oCtrl)
+   ::oMask:GetSiblings()
+   ::oMask:SetFocus()
 
    RETURN(oCtrl)
 
@@ -72,13 +74,29 @@ METHOD OnSize(nFlag,Width,Height)
 
 //----------------------------------------------------------------------------//
 
-METHOD SubCommands( nwParam )
+METHOD OnMenuCommand(oItem)
 
-   IF nwParam == 500 
-      ::MsgBox( 'HI FROM TBUTTON')
-   ENDIF
+   //view oItem:Id
 
-   RETURN(0)
+   DO CASE
+   CASE oItem:Text=="Button"
+     ::Add('Button1',        TButton():New(   self, 'Button1',      500,   0,  0, 200, 100 ) )
+   CASE oItem:Text=="Edit"
+      ::Add('TestEdit',      TEdit():New(     self, 'Edit1',        501, 210,  0, 200,  20 ) )
+   CASE oItem:Text=="ComboBox"
+       ::Add('ComboBox1',    TComboBox():New( self, 'ComboBox1',    502, 210, 30, 200, 100 ) )
+   CASE oItem:Text=="CheckBox"
+       ::Add('CheckBox1',    TCheck():New(    self, 'CheckBox1',    505, 210,105, 200,  20 ) )
+   CASE oItem:Text=="RadioButton"
+       ::Add('RadioButton1', TRadio():New(    self, 'RadioButton1', 504, 210, 80, 200,  20 ) )
+   CASE oItem:Text=="ListBox"
+       ::Add('ListBox1',     TListBox():New(  self, 'ListBox1',     506, 210,  20,200,200 ) )
+   CASE oItem:Text=="Label"
+       ::Add('Label1',       TStatic():New(   self, 'Label1',       503, 210, 55, 200,  20 ) )
+
+   ENDCASE
+
+   RETURN(NIL)
 
 //----------------------------------------------------------------------------//
 
@@ -92,19 +110,10 @@ METHOD CreateSub()
 
    ::WindowMenu:AddPopup( 'popup 1' )
    
-      ::WindowMenu:Popup:AddItem( 'item 100', 100, {|| ::MsgBox( 'HI FROM SUBFORM1')})
+      ::WindowMenu:Popup:AddItem( 'item 100', 100, {|| ::MsgBox( 'HI FROM EDITOR')})
       ::WindowMenu:Popup:AddItem( 'item 101', 101)
       
    ::SetWindowMenu()
-
-   ::Add('TestButton',  TButton():New( self, 'OOPS',                       500,   0,  0, 200, 100 ) ) 
-   ::Add('TestEdit',      TEdit():New( self, 'This is an edit control',    501, 210,  0, 200,  20 ) )
-   ::Add('TestCombo', TComboBox():New( self, 'This is a ComboBox control', 502, 210, 30, 200, 100 ) )
-   ::Add('TestText',    TStatic():New( self, 'This is a Static control',   503, 210, 55, 200,  20 ) )
-   ::Add('TestRadio',    TRadio():New( self, 'This is a &Radio Button',     504, 210, 80, 200,  20 ) )
-   ::Add('TestCheck',    TCheck():New( self, 'This is a &Check Button',     505, 210,105, 200,  20 ) )
-
-   ::TestButton:SetFocus()
 
 
    xRet := super:OnCreate()
@@ -116,27 +125,6 @@ METHOD CreateSub()
    ::oMask:SetFocus()
 
    RETURN( xRet )
-
-/*
-//----------------------------------------------------------------------------//
-
-METHOD OnEraseBkgnd(hDC)
-
-   LOCAL aRect:=GetClientRect(::Handle)
-   LOCAL i,j
-   LOCAL nColor:=rgb(0,0,0)
-   //LOCAL nRet:=super:OnEraseBkgnd(hDC)
-   FillRect(hDC,aRect,::color)
-   for i:=0 to aRect[3] step 3
-      for j:=0 to aRect[4] step 9
-         setpixel(hDC,i,j,nColor)
-      next
-   next
-
-    view "in meth"
-
- RETURN(0) //nRet)
-*/
 
 //----------------------------------------------------------------------------//
 

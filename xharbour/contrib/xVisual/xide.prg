@@ -25,10 +25,21 @@ FUNCTION Main
          :WindowMenu := TMenu():New()
 
          WITH OBJECT :WindowMenu
-            :AddPopup('popup 1')
+            :AddPopup('File')
 
             WITH OBJECT :Popup
                :AddItem( 'Editor'  , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
+
+               :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'CombBox'    , 104, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'Label'      , 105, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'RadioButton', 106, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'CheckBox'   , 107, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+
+
+
             END
          END
 
