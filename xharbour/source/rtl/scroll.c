@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.2 2003/09/22 18:30:40 ronpinkas Exp $
+ * $Id: scroll.c,v 1.3 2003/09/22 19:03:32 ronpinkas Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( SCROLL )
       iLeft = iMaxCol;
    }
 
-   pBottom = hb_parni( 3 );
+   pBottom = hb_param( 3, HB_IT_NUMERIC );
    if( pBottom )
    {
       iBottom = hb_parni( 3 );
@@ -105,9 +105,10 @@ HB_FUNC( SCROLL )
       iBottom = iMaxRow;
    }
 
-   pRight = hb_parni( 4 );
+   pRight = hb_param( 4, HB_IT_NUMERIC );
    if( pRight )
    {
+      iRight = hb_parni( 4 );
       if( iRight <= iLeft )
       {
          return;
