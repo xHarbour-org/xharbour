@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.90 2003/08/28 16:59:51 lculik Exp $
+ * $Id: hbmake.prg,v 1.91 2003/08/29 14:28:21 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -326,7 +326,7 @@ FUNCTION ParseMakeFile( cFile )
 
       ENDIF
 
-   #ifndef __PLATFORM__Windows
+/*   #ifndef __PLATFORM__Windows
    IF AT("OBJCFILES", cTemp) >0
       ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
       cTemp := ct +" hbtemp.o" +" $(OBC)"
@@ -339,7 +339,7 @@ FUNCTION ParseMakeFile( cFile )
          cTemp := ct +" hbtemp.c" +" $(CF)"
       ENDIF
    #ENDIF
-
+*/
       aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
 
       IF lmacrosec
@@ -1198,8 +1198,16 @@ FUNC CreateMakeFile( cFile )
    Local nO
    Local lNew := .F.
    LOCAL oMake
-   Local cAllRes := ""
+   Local cAllRes := "" 
    Local cTemp
+   LOCAL cExtraLibs :=""
+   #ifndef __PLATFORM__Windows
+       Local lHashhso := File("/usr/lib/libxharbour.so")
+       LOCAL lusexhb := FILE("/usr/bin/xhb-build")
+
+   #else
+       LOCAL lusexhb := .F.
+   #endif
 
    IF  File( cFile )
       nO := Alert( "The makefile " + cFile +" Exist ",{ "Create new" , "Edit" } )
@@ -1729,6 +1737,7 @@ cResname += cAllRes
       cDefLibGccLibs   += " -lrddads -ladsloc "
       cDefBccLibsMt    += " rddads.lib ace32.lib"
       cDefLibGccLibsMt += " -lrddads -ladsloc "
+      cExtraLibs += " -lrddads -ladsloc "
    ENDIF
 
    IF Len( aLibsOut ) > 0 .AND. lExternalLib
@@ -1775,7 +1784,7 @@ cResname += cAllRes
          ENDIF
 
          aEval( aLibsOut, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" ) } )
-
+         cExtraLibs := cLibs
          IF cOs == "Linux"
 
             IF ! lMt
@@ -1853,7 +1862,7 @@ cResname += cAllRes
    ELSEIF s_lGcc
 
       IF cOs == "Linux"
-         fWrite( s_nLinkHandle, "LIBFILES = -Wl,--start-group " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + cSystemLibs  + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = " + IIF(lusexhb, cExtraLibs , "-Wl,--start-group " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + cSystemLibs ) + CRLF )
       ELSEIF cOs == "OS/2"
          fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSE
@@ -1895,9 +1904,9 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = $(CFLAG2)" + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static") + "-gtcrs", "$(CFLAG2)") + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LINKER = gcc" + CRLF )
+      fWrite( s_nLinkHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
       fWrite( s_nLinkHandle, "ALLOBJ = $(OBJFILES) " + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN) " + CRLF )
