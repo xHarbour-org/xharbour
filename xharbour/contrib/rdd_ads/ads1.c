@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.124 2002/12/17 18:52:51 brianhays Exp $
+ * $Id: ads1.c,v 1.4 2003/01/06 16:57:05 horacioroldan Exp $
  */
 
 /*
@@ -950,12 +950,22 @@ static ERRCODE adsDeleteRec( ADSAREAP pArea )
 static ERRCODE adsDeleted( ADSAREAP pArea, BOOL * pDeleted )
 {
    UNSIGNED16  bDeleted;
+   BOOL bEof;
+   ERRCODE reterr;
 
    HB_TRACE(HB_TR_DEBUG, ("adsDeleted(%p, %p)", pArea, pDeleted));
 
-   AdsIsRecordDeleted  ( pArea->hTable, &bDeleted);
-   *pDeleted = (BOOL) bDeleted;
-   return SUCCESS;
+   reterr = adsEof( pArea, &bEof );
+   if( ! bEof )
+   {
+      AdsIsRecordDeleted  ( pArea->hTable, &bDeleted);
+      *pDeleted = (BOOL) bDeleted;
+   }
+   else
+   {
+      *pDeleted = FALSE;
+   }
+   return reterr;
 }
 
 static ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
