@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.8 2003/02/22 05:54:57 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.9 2003/03/16 06:18:12 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -12,11 +12,12 @@
 *
 
 PROCEDURE Main()
-
    LOCAL i
    LOCAL Mutex := CreateMutex()
    LOCAL Thread4Handle, MonitorHandle
    LOCAL bKill := .F.
+
+   SET OUTPUT SAFETY ON
 
    set color to w+/b
    CLEAR SCREEN
@@ -43,7 +44,7 @@ PROCEDURE Main()
 
       IF i == 100
          StopThread( Thread4Handle )
-         @ 14, 27 SAY "(Killed 4th. Thread!)"
+         @ 14, 27 SAY "(Killed 4th. Thread!)" 
       ENDIF
 
       ThreadSleep( 30 )
@@ -54,7 +55,7 @@ PROCEDURE Main()
    NEXT
 
    IF bKill
-      @ 17, 10 SAY 'Killing all threads on user requests      '
+      @17, 10 SAY 'Killing all threads on user requests      '
       KillAllThreads()
    ELSE
       @ 17, 10 SAY 'Cycle over, stopping Monitor     '
@@ -75,13 +76,11 @@ PROCEDURE ThreadFunc( nRow, cName, nMax, Mutex )
 
    FOR i := 0 TO nMax
       @ nRow, 10 SAY cName + Str( i, 4 )
-
       WaitForThis( nRow ) // calling a proc inside a thread
    NEXT
 
    Notify( Mutex, cName )
    @ nRow, 10 SAY cName + ': DONE '+ space(20)
-
 RETURN
 
 PROCEDURE WaitForThis( nRow )
@@ -103,7 +102,7 @@ PROCEDURE MonitorFunc( Mutex )
       IF cName != NIL
          @ 6, 26 SAY cName
       ELSE
-         @ 6, 26 SAY "waiting ...           "
+         @ 6, 26 SAY "waiting ...           " 
       ENDIF
 
       ThreadSleep( 1500 )

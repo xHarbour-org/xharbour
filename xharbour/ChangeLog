@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1592 2003/10/14 15:25:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1593 2003/10/16 20:27:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-18 03:10 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * include/hbset.h
+   * include/set.ch
+   * source/rtl/console.c
+   * source/rtl/set.c
+   * source/pp/pptable.c
+      ! @ ..SAY syntax now is expanded in just one DevOut[PICT]() instruction,
+         resulting in faster code and ability to control MT cursor + string output
+         sequence
+      + Added command SET OUTPUT SAFETY [ON]/[OFF] (defaults to on); when turned on
+        CONSOLE (devout & companions) operations are mutexed out. When turned off,
+        this safety is disable allowing faster rewrite and more resistance to
+        async cancelation. Usually, you will want to have that turned on. Command is
+        compiled also in ST, but has effect only in MT. 
+        WARNING: Changing safety status when threads are started has undefined 
+         results.
+
+        TODO: implement it in SAY..GET
+
+   * include/hbapi.h
+   * include/thread.h
+   * source/vm/garbage.c
+   * source/vm/thread.c
+      ! WOW!!! With the Terekhof algorithm, conditions are handled almost alike
+        pthreads on windows, and this allows to drop the cumbersome idle subscription
+        system I've been forced to adopt under windows for GC. Now, windows and
+        unix GC are the same, using the elegant condition check + idle fence
+        algorithm, and also many other aspects are converging.    
+
+   * tests/mtcomplex.prg
+   * tests/mtgc.prg
+   * tests/mtstress.prg
+      + Added proper SET OUTPUT SAFETY.
+      % more tests
 
 2003-10-16 13:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c

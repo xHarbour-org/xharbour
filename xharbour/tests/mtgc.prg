@@ -8,7 +8,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.13 2003/03/14 11:22:33 jonnymind Exp $
+* $Id: mtgc.prg,v 1.14 2003/05/26 15:46:31 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -25,6 +25,7 @@
 PROCEDURE Main()
   LOCAL nStart;
 
+  SET OUTPUT SAFETY OFF
   set color to w+/b
   CLEAR SCREEN
   @2,15 SAY "X H A R B O U R - Multithreading / Garbage collecting test"

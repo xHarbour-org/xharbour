@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.31 2003/10/09 18:48:29 peterrees Exp $
+ * $Id: console.c,v 1.32 2003/10/10 00:03:59 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -80,18 +80,23 @@
 #include "thread.h"
 
 #if  defined( HB_THREAD_SUPPORT )
+   #include "hbset.h"
    /* WARNING: Output is a cancellation point. NEVER cross non optimized stack access,
    or calls to hb_param* / hb_ret* family functions with this macros. This macros
    are inner shell locks. */
    #define HB_CONSOLE_SAFE_LOCK\
+      if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
          HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_outputMutex );\
          HB_STACK_UNLOCK;\
-         HB_CRITICAL_LOCK( hb_outputMutex );
+         HB_CRITICAL_LOCK( hb_outputMutex );\
+      }
 
    #define HB_CONSOLE_SAFE_UNLOCK \
+      if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
          HB_CRITICAL_UNLOCK( hb_outputMutex );\
          HB_CLEANUP_POP;\
-         HB_STACK_LOCK;
+         HB_STACK_LOCK;\
+      }
 
 #else
    #define HB_CONSOLE_SAFE_LOCK
@@ -571,6 +576,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    }
    HB_CONSOLE_SAFE_UNLOCK
 }
+
 
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.4 2003/03/19 13:30:46 jonnymind Exp $
+ * $Id: set.ch,v 1.5 2003/07/30 20:45:40 andijahja Exp $
  */
 
 /*
@@ -123,8 +123,9 @@
 #define _SET_DIRCASE      106 /* Harbour extension */
 #define _SET_DIRSEPARATOR 107 /* Harbour extension */
 #define _SET_ERRORLOOP    108 /* Harbour extension */
+#define _SET_OUTPUTSAFETY 109 /* Harbour extension */
 
 #define HB_SET_BASE       100
-#define HB_SET_COUNT      8
+#define HB_SET_COUNT      9
 
 #endif /* _SET_CH */

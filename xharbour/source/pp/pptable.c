@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.27 2003/08/27 08:58:21 druzus Exp $
+ * $Id: pptable.c,v 1.28 2003/09/09 01:32:27 druzus Exp $
  */
 
 /*
@@ -128,6 +128,7 @@ void hb_pp_Table( void )
    static DEFINES sD___57 = {"_SET_DIRCASE",NULL,-1,"106", &sD___56 };
    static DEFINES sD___58 = {"_SET_DIRSEPARATOR",NULL,-1,"107", &sD___57 };
    static DEFINES sD___59 = {"_SET_ERRORLOOP",NULL,-1,"108", &sD___58 };
+   static DEFINES sD___60 = {"_SET_OUTPUTSAFETY",NULL,-1,"109", &sD___56 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -211,9 +212,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___77 = {0,"@","\1A00, \1B00 TO \1C00, \1D00 [COLOR \1E00]",
        "DispBox( \1A00, \1B00, \1C00, \1D00, 1 [, \1E00 ] )",&sC___76 };
    static COMMANDS sC___78 = {0,"@","\1A00, \1B00 SAY \1C00 [PICTURE \1D00] [COLOR \1E00]",
-       "DevPos( \1A00, \1B00 ) ; DevOutPict( \1C00, \1D00 [, \1E00] )",&sC___77 };
+       "DevOutPict( \1C00, \1D00, \1E00,\1A00, \1B00  )",&sC___77 };
    static COMMANDS sC___79 = {0,"@","\1A00, \1B00 SAY \1C00 [COLOR \1D00]",
-       "DevPos( \1A00, \1B00 ) ; DevOut( \1C00 [, \1D00] )",&sC___78 };
+       "DevOut( \1C00, \1D00, \1A00, \1B00 )",&sC___78 };
    /* This hack breaks compatibility with some proper Clipper code
       If someone wants to use it then should put it in your own .ch file */
    /*
@@ -478,7 +479,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___268 = {0,"SET","AUTORDER TO","Set( _SET_AUTORDER, 0 )",&sC___267 };
    static COMMANDS sC___269 = {0,"SET","STRICTREAD \1A20 ON,OFF,&>","Set(_SET_STRICTREAD,\1A30 )",&sC___268 };
    static COMMANDS sC___270 = {0,"SET","STRICTREAD (\1A00)","Set(_SET_STRICTREAD,\1A00 )",&sC___269 };
+   static COMMANDS sC___271 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___270 };
 #endif
+
 
    static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
@@ -486,11 +489,13 @@ void hb_pp_Table( void )
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___270;
+   hb_pp_topCommand = &sC___271;
 #else
    hb_pp_topCommand = &sC___254;
 #endif
 
-   hb_pp_topDefine = &sD___59;
+   hb_pp_topDefine = &sD___60;
    hb_pp_topTranslate = &sT___04;
+
+
 }

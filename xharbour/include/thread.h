@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.58 2003/09/10 06:07:30 ronpinkas Exp $
+* $Id: thread.h,v 1.59 2003/09/14 18:07:23 jonnymind Exp $
 */
 
 /*
@@ -81,6 +81,16 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
    #include <windows.h>
 
+   typedef struct tag_HB_WINCOND_T
+   {
+      HANDLE semBlockLock;
+      HANDLE semBlockQueue;
+      CRITICAL_SECTION mtxUnblockLock;
+      int nWaitersGone;
+      int nWaitersBlocked;
+      int nWaitersToUnblock;   
+   } HB_WINCOND_T, *PHB_WINCOND_T;
+   
    #define HB_THREAD_T                 DWORD
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
@@ -96,12 +106,12 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
    #define HB_MUTEX_UNLOCK( x )        ReleaseSemaphore( x, 1, NULL )
 
-   #define HB_COND_T                   HANDLE
-   #define HB_COND_INIT( x )           x = CreateEvent( NULL,FALSE, FALSE, NULL )
-   #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
-   #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t, FALSE )
-   #define HB_COND_SIGNAL( x )         SetEvent( x )
-   #define HB_COND_DESTROY( x )        CloseHandle( x )
+   #define HB_COND_T                   HB_WINCOND_T
+   #define HB_COND_INIT( x )           hb_threadCondInit( &(x) )
+   #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), y, INFINITE )
+   #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), y, t )
+   #define HB_COND_SIGNAL( x )         hb_threadCondSignal( &(x) )
+   #define HB_COND_DESTROY( x )        hb_threadCondDestroy( &(x) )
 
    typedef void ( * HB_IDLE_FUNC )( void );
 
@@ -159,21 +169,21 @@ extern "C" {
 }
 #endif
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
-
+/*
    #define HB_STACK_LOCK \
    {\
-      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
       if( ! HB_VM_STACK.bInUse ) \
       {\
          hb_runningStacks.content.asLong++;\
          HB_VM_STACK.bInUse = TRUE;\
       }\
-      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
    }
 
    #define HB_STACK_UNLOCK \
    {\
-      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
       if( HB_VM_STACK.bInUse ) \
       {\
          HB_VM_STACK.bInUse = FALSE;\
@@ -182,7 +192,7 @@ extern "C" {
             hb_threadCallIdle();\
          }\
       }\
-      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
    }
 
    typedef struct tag_HB_IDLE_FUNC_LIST
@@ -190,7 +200,7 @@ extern "C" {
       HB_IDLE_FUNC func;
       struct tag_HB_IDLE_FUNC_LIST *next;
    } HB_IDLE_FUNC_LIST;
-
+*/
 #else
 
    #include <pthread.h>
@@ -243,37 +253,38 @@ extern "C" {
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )
 
-   /* Context using management */
-   #define HB_STACK_LOCK \
-   {\
-      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-      if( ! HB_VM_STACK.bInUse ) \
-      {\
-         while ( hb_runningStacks.aux ) \
-         {\
-            HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-         }\
-         hb_runningStacks.content.asLong++;\
-         HB_VM_STACK.bInUse = TRUE;\
-         HB_COND_SIGNAL( hb_runningStacks.Cond );\
-      }\
-      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   }
-
-   #define HB_STACK_UNLOCK \
-   {\
-      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-      if( HB_VM_STACK.bInUse ) \
-      {\
-         hb_runningStacks.content.asLong--;\
-         HB_VM_STACK.bInUse = FALSE;\
-         HB_COND_SIGNAL( hb_runningStacks.Cond );\
-      }\
-      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   }
-
-   extern void hb_threadWaitForIdle( void );
 #endif
+
+/* Context using management */
+#define HB_STACK_LOCK \
+{\
+   HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
+   if( ! HB_VM_STACK.bInUse ) \
+   {\
+      while ( hb_runningStacks.aux ) \
+      {\
+         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
+      }\
+      hb_runningStacks.content.asLong++;\
+      HB_VM_STACK.bInUse = TRUE;\
+      HB_COND_SIGNAL( hb_runningStacks.Cond );\
+   }\
+   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
+}
+
+#define HB_STACK_UNLOCK \
+{\
+   HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
+   if( HB_VM_STACK.bInUse ) \
+   {\
+      hb_runningStacks.content.asLong--;\
+      HB_VM_STACK.bInUse = FALSE;\
+      HB_COND_SIGNAL( hb_runningStacks.Cond );\
+   }\
+   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
+}
+
+extern void hb_threadWaitForIdle( void );
 
 /**********************************************************/
 /*
@@ -418,7 +429,7 @@ typedef struct tag_HB_MUTEX_STRUCT {
 
 typedef struct tag_HB_SHARED_RESOURCE
 {
-   HB_CRITICAL_T Mutex;  /* mutex is used to read or write safely */
+   HB_MUTEX_T Mutex;  /* mutex is used to read or write safely */
    union {              /* data that can be read or written */
       volatile long asLong;
       volatile void *asPointer;
@@ -429,7 +440,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #define HB_SHARED_INIT( pshr, data ) \
 { \
-   HB_CRITICAL_INIT( pshr.Mutex );\
+   HB_MUTEX_INIT( pshr.Mutex );\
    HB_COND_INIT( pshr.Cond ); \
    pshr.aux = 0;\
    pshr.content.asLong = data;\
@@ -437,7 +448,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #define HB_SHARED_DESTROY( pshr ) \
 { \
-   HB_CRITICAL_DESTROY( pshr.Mutex );\
+   HB_MUTEX_DESTROY( pshr.Mutex );\
    HB_COND_DESTROY( pshr.Cond ); \
 }
 
@@ -453,17 +464,17 @@ typedef struct tag_HB_SHARED_RESOURCE
 /*   TraceLog( "mtgc.log", "FILE %s(%d): BEGINWAIT: %d   THID: %d\r\n", __FILE__, __LINE__, pshr.content.asLong, HB_CURRENT_THREAD() ); */
 #define HB_SET_SHARED( pshr, pMode, pValue ) \
 {\
-   HB_CRITICAL_LOCK( pshr.Mutex );\
+   HB_MUTEX_LOCK( pshr.Mutex );\
    pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
    HB_COND_SIGNAL( pshr.Cond );\
-   HB_CRITICAL_UNLOCK( pshr.Mutex );\
+   HB_MUTEX_UNLOCK( pshr.Mutex );\
 }
 
 /* Lightweight macro for condition check */
 #define HB_WAIT_SHARED( pshr, cond, pData, pMode, pValue ) \
 {\
    HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, pshr.Mutex );\
-   HB_CRITICAL_LOCK( pshr.Mutex );\
+   HB_MUTEX_LOCK( pshr.Mutex );\
    while ( 1 ) \
    {\
       if ( (cond == HB_COND_EQUAL && (long) pData == pshr.content.asLong) ||\
@@ -475,7 +486,7 @@ typedef struct tag_HB_SHARED_RESOURCE
    }\
    pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
    HB_COND_SIGNAL( pshr.Cond );\
-   HB_CRITICAL_UNLOCK( pshr.Mutex );\
+   HB_MUTEX_UNLOCK( pshr.Mutex );\
    HB_CLEANUP_POP;\
 }
 
@@ -640,6 +651,12 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    void hb_threadSubscribeIdle( HB_IDLE_FUNC );
    void hb_threadCallIdle( void );
    void hb_threadCancelInternal( void );
+
+   BOOL hb_threadCondInit( HB_WINCOND_T *cond );
+   void hb_threadCondDestroy( HB_WINCOND_T *cond );
+   void hb_threadCondSignal( HB_WINCOND_T *cond );
+   BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout );
+
 #endif
 
 

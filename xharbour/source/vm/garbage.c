@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.55 2003/08/05 10:20:51 ronpinkas Exp $
+ * $Id: garbage.c,v 1.56 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -500,11 +500,11 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 void hb_gcCollect( void )
 {
    /* TODO: decrease the amount of time spend collecting */
-   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
+   /*#if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
       hb_threadSubscribeIdle( hb_gcCollectAll );
-   #else
+   #else*/
       hb_gcCollectAll();
-   #endif
+   //#endif
 }
 
 /* Check all memory blocks if they can be released
@@ -512,24 +512,24 @@ void hb_gcCollect( void )
 void hb_gcCollectAll()
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
-   #if defined(HB_THREAD_SUPPORT) && ! defined( HB_OS_WIN_32 )
+   //#if defined(HB_THREAD_SUPPORT) && ! defined( HB_OS_WIN_32 )
       HB_THREAD_STUB
-   #endif
+   //#endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
-      #ifdef HB_OS_WIN_32
+   /*   #ifdef HB_OS_WIN_32
          if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
             return;
          }
-      #else
-         HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
+      #else*/
+         HB_MUTEX_LOCK( hb_runningStacks.Mutex );
          if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
-            HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
+            HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
             return;
          }
          hb_runningStacks.content.asLong--;
@@ -539,8 +539,8 @@ void hb_gcCollectAll()
 
          hb_threadWaitForIdle();
 
-         HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
-      #endif
+         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+      //#endif
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
@@ -736,7 +736,7 @@ void hb_gcCollectAll()
    /* Unblocks all threads */
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
 
-   #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_WIN_32 )
+   #if defined( HB_THREAD_SUPPORT ) //&& ! defined( HB_OS_WIN_32 )
       hb_runningStacks.aux = 0;
       // this will also signal the changed situation.
       HB_STACK_LOCK
@@ -873,10 +873,10 @@ HB_FUNC( HB_GCALL )
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
 
-   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
+   /*#if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
       hb_threadSubscribeIdle( hb_gcCollectAll );
-   #else
+   #else*/
       hb_gcCollectAll();
-   #endif
+   //#endif
 }
 

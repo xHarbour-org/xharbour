@@ -1,5 +1,5 @@
 /*
- * $Id: devoutp.prg,v 1.3 2002/11/29 20:10:03 walito Exp $
+ * $Id: devoutp.prg,v 1.4 2002/12/18 13:43:56 ronpinkas Exp $
  */
 
 /*
@@ -57,4 +57,3 @@ PROCEDURE DevOutPict( xValue, cPicture, cColor, nRow, nCol )
    ENDIF
 
 RETURN
-

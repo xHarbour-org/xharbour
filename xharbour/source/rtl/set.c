@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.32 2003/10/09 18:48:29 peterrees Exp $
+ * $Id: set.c,v 1.33 2003/10/09 20:45:56 paultucker Exp $
  */
 
 /*
@@ -1326,6 +1326,12 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_OUTPUTSAFETY:         
+         hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
+         break;
+               
+                  
+
       default                :
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1429,6 +1435,9 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DIRSEPARATOR = '\\';
 #endif
    hb_set.HB_SET_ERRORLOOP = 8;
+
+/* JC1: Set for output thread safety */
+   hb_set.HB_SET_OUTPUTSAFETY = TRUE;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.10 2003/07/15 09:15:33 andijahja Exp $
+ * $Id: hbset.h,v 1.11 2003/07/30 20:45:40 andijahja Exp $
  */
 
 /*
@@ -135,8 +135,8 @@ typedef enum
    HB_SET_FILECASE      = 105,
    HB_SET_DIRCASE       = 106,
    HB_SET_DIRSEPARATOR  = 107,
-   HB_SET_ERRORLOOP     = 108
-
+   HB_SET_ERRORLOOP     = 108,
+   HB_SET_OUTPUTSAFETY  = 109
 
 } HB_set_enum;
 
@@ -205,6 +205,10 @@ typedef struct
    int     HB_SET_DIRCASE;
    char    HB_SET_DIRSEPARATOR;
    int     HB_SET_ERRORLOOP;
+
+#ifdef HB_THREAD_SUPPORT
+   BOOL    HB_SET_OUTPUTSAFETY;
+#endif
 
 } HB_SET_STRUCT;
 

@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.6 2003/08/07 05:54:12 jonnymind Exp $
+* $Id: mtstress.prg,v 1.7 2003/09/12 02:09:34 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -18,6 +18,7 @@ PROCEDURE Main()
    LOCAL nStart;
 
    SET COLOR to w+/b
+   SET OUTPUT SAFETY ON
 
    CLEAR SCREEN
    @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
@@ -64,7 +65,7 @@ PROCEDURE Stress( nId, nRow )
       aData := Array(Fcount())
       aFields(aData)
       GOTO Int( HB_Random( 1, Reccount() ) )
-      FOR nCount := 1 TO 10000
+      FOR nCount := 1 TO 100
          // this is to test if separate threads are able not to
          // change other areas or file pointers
          Select &nId
@@ -82,8 +83,8 @@ PROCEDURE Stress( nId, nRow )
    //Step 1: foreach test
 
    @nRow,5 SAY Space( 80 )
-   aData := Array( 10000 )
-   FOR nCount := 1 TO 10000
+   aData := Array( 100 )
+   FOR nCount := 1 TO 100
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
           Alltrim( Str( nCount ) )

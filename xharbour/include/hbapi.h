@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.85 2003/10/05 05:25:07 paultucker Exp $
+ * $Id: hbapi.h,v 1.86 2003/10/08 13:07:24 paultucker Exp $
  */
 
 /*
@@ -581,8 +581,6 @@ BOOL hb_execFromArray( PHB_ITEM pFirst );
    #define HB_I_( x ) x
 #endif
  /* LONGLONG support */
-
-
 
 
 #if defined(HB_EXTERN_C)
