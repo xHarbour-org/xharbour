@@ -1,0 +1,47 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      UNTEXTWIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      UNTEXTWIN(<nTopLine>, <nLeftColumn>, <nBottomLine>, <nRightColumn>,
+ *                <cReplacementCharacter|nReplacementCharacter>,
+ *                [<cInitialCharacter|nInitialCharacter>],
+ *                [<cEndCharacter|nEndCharacter>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nTopLine>  Designates the line for the upper-left corner of the
+ *     area.
+ *   <nLeftColumn>  Designates the column for the upper-left corner of
+ *     the area.
+ *   <nBottomLine>  Designates the line for the bottom-right corner of
+ *     the area.
+ *   <nRightColumn>  Designates the line for the bottom-right column of
+ *     the area.
+ *   <cReplacementCharacter|nReplacementCharacter>  Replaces each
+ *     character within the window, with the exception of those within the
+ *     range of <cInitialCharacter|nInitialCharacter> and
+ *   <cEndCharacter|nEndCharacter>.
+ *   <cInitialCharacter|nInitialCharacter>  Designates the beginning of
+ *     the bracketed area.  The character can be number in the range of 0 to
+ *     255, or the character string type.  The default value is 176.
+ *   <cEndCharacter|nEndCharacter>  Designates the end of the bracketed
+ *     area.  The character can be number in the range of 0 to 255 or the
+ *     character string type.  The default value is 223.
+ *  $RETURNS$
+ *      Returns a null string.
+ *  $DESCRIPTION$
+ *      Replaces an area of characters from a region of the screen
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is untext.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

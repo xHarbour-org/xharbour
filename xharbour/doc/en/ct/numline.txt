@@ -1,0 +1,29 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMLINE()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMLINE(<cString>,[<nLineLength>]) --> nNumber
+ *  $ARGUMENTS$
+ *   <cString>  Designates the character string that is processed.
+ *   <nLineLength>  Designates the length of an output line. The default
+ *      value is 80 characters.
+ *  $RETURNS$
+ *      Returns the number of lines required for text output.
+ *  $DESCRIPTION$
+ *      Determines the number of lines required for string output
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is numline.c, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

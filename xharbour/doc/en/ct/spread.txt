@@ -1,0 +1,67 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      EXPAND()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      EXPAND(<cString>,[<nNumber>],[<cChar|nChar>]) --> cString
+ *  $ARGUMENTS$
+ *   <cString>  Designates the string that is processed.
+ *   <nNumber>  Designates the number of the <cChar|nChar>
+ *     characters that are inserted between each character in the <cString>.
+ *     The default value is one character.
+ *   <cChar|nChar>  Designates the character that is inserted
+ *     between each character in <cString>. The default value is a space,
+ *     CHR(32).
+ *  $RETURNS$
+ *      The processed <cString> is returned.
+ *  $DESCRIPTION$
+ *      Expands a string by inserting characters
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is spread.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CHARSPREAD()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CHARSPREAD(<cString>,<nLength>, [<cChar|nChar>]) --> cString
+ *  $ARGUMENTS$
+ *   <cString>  Designates a character string that is expanded with
+ *     spaces or <cChar>|<nChar> characters to <nLength> length.
+ *   <nLength>  Designates the length of the return string.
+ *   <cChar|nChar>  Designates the fill character and token
+ *     delimiter.  It can be a numeric value or a character.  If it is a
+ *     numeric value, it must be between 0 and 255.  The default value is a
+ *     space CHR(32).
+ *  $RETURNS$
+ *      Returns the expanded string.
+ *  $DESCRIPTION$
+ *      Expands a string at the tokens
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is spread.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

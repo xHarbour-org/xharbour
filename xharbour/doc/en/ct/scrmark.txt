@@ -1,0 +1,43 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SCREENMARK()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SCREENMARK(<cSearchString>, <cAttr|nAttr>, <lUpperLower>,
+ *                 [<lAll>], [<cForwardDelimiter>],
+ *                 [<cTrailingDelimiter>]) --> lFound
+ *  $ARGUMENTS$
+ *   <cSearchString>  Designates the character string to search for in
+ *     screen memory.
+ *   <cAttr|nAttr>  Designates the new color attribute to use in the
+ *     sequence located in screen memory. Can be specified as a numeric or in
+ *     the manner required under CA-Clipper.
+ *   <lUpperLower>  Designates whether the function is case sensitive
+ *     (.T.) or not (.F.).
+ *   <lAll>  Designates whether to mark each occurrence (.T.) or only the
+ *     first (.F.).  The default marks only the first (.F.).
+ *   <cForwardDelimiter>  This optional parameter designates which
+ *     character preceding the <cSearchString> to use as a delimiter.  The
+ *     default is no delimiter considered.
+ *   <cTrailingDelimiter>  This optional parameter designates which
+ *     character after the <cSearchString> to use as a delimiter. The default
+ *     is no delimiter considered.
+ *  $RETURNS$
+ *      Returns a .T. when it locates the designated string at least once.
+ *  $DESCRIPTION$
+ *      Searches for a string on the screen and marks it with an attribute
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is scrmark.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

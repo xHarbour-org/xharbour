@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.28 2004/11/29 23:30:00 ptsarenko Exp $
+# $Id: makefile.wc,v 1.29 2004/11/30 22:00:00 ptsarenko Exp $
 #
 
 #
@@ -2692,7 +2692,7 @@ $(OBJ_DIR)\wvtutils.obj : $(RTL_DIR)\gtwvt\wvtutils.c
 $(OBJ_DIR)\wvtclass.c : $(RTL_DIR)\gtwvt\wvtclass.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\wvtclass.obj : $(OBJ_DIR)\wvtutils.c
+$(OBJ_DIR)\wvtclass.obj : $(OBJ_DIR)\wvtclass.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\wvtpaint.c : $(RTL_DIR)\gtwvt\wvtpaint.prg

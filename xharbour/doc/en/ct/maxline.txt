@@ -1,0 +1,27 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      MAXLINE()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      MAXLINE(<cString>) --> nLength
+ *  $ARGUMENTS$
+ *      <cString>  Designates the string that is processed.
+ *  $RETURNS$
+ *      Returns the maximum line length necessary to display the
+ *  $DESCRIPTION$
+ *      Finds the longest line within a string
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is maxline.c, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3639 2004/11/30 04:54:47 paultucker Exp $
+ * $Id: ChangeLog,v 1.3641 2004/11/30 22:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-30 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * makefile.wc
+    ! Fixed rules for source/rtl/gtwvt/wvtclass.prg
+  * dll_w32.bat
+    * Corrected env variables
+    * wmake output redirected to dll_w32.log
+  * hrbdll.wc
+    ! Fixed some rules
+
+  + doc/en/ct/maxline.txt
+  + doc/en/ct/numcount.txt
+  + doc/en/ct/numline.txt
+  + doc/en/ct/scrmark.txt
+  + doc/en/ct/spread.txt
+  + doc/en/ct/untext.txt
+    + Added documentation for CT functions
 
 2004-11-30 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg

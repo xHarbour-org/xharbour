@@ -1,0 +1,33 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NUMCOUNT()
+ *  $CATEGORY$
+ *      CT3 numeric functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      NUMCOUNT([<nIncrement|nStartValue>,[<lMode>]]) --> nNewCounterValue
+ *  $ARGUMENTS$
+ *   <nIncrement|nStartValue>  Designates the incremental value for the
+ *     internal counter or a new starting value.
+ *   <lMode>  Designates whether <nIncrement|nStartValue> is a new
+ *     starting value (.T.) or an increment (.F.).  The default is increment
+ *     (.F.).
+ *     () Without parameters, the current counter value is returned.
+ *  $RETURNS$
+ *      When called without parameters, this function returns the current
+ *      counter value; otherwise, it always returns the new counter value.
+ *  $DESCRIPTION$
+ *      Uses the internal CA-Clipper Tools counter
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is numcount.c, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
