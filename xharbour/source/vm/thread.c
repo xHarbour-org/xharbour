@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.117 2003/11/12 15:04:59 jonnymind Exp $
+* $Id: thread.c,v 1.118 2003/11/26 05:44:04 jonnymind Exp $
 */
 
 /*
@@ -1159,13 +1159,27 @@ HB_FUNC( JOINTHREAD )
 
 }
 
+static void hb_threadMutexFinalize( void *pData )
+{
+
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *)  pData;
+
+   hb_threadUnlinkMutex( Mutex );
+
+   HB_MUTEX_DESTROY( Mutex->mutex );
+   HB_COND_DESTROY( Mutex->cond );
+   hb_arrayRelease( Mutex->aEventObjects );
+
+   hb_gcFree( Mutex );
+}
+
 /*JC1: this will always be called when cancellation is delayed */
 HB_FUNC( CREATEMUTEX )
 {
    HB_THREAD_STUB
    HB_MUTEX_STRUCT *mt;
 
-   mt = (HB_MUTEX_STRUCT *) hb_xgrab( sizeof( HB_MUTEX_STRUCT ) );
+   mt = (HB_MUTEX_STRUCT *) hb_gcAllocPointer( sizeof( HB_MUTEX_STRUCT ) );
 
    HB_MUTEX_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
@@ -1174,41 +1188,14 @@ HB_FUNC( CREATEMUTEX )
    mt->waiting = 0;
    mt->locker = 0;
    mt->aEventObjects = hb_itemArrayNew( 0 );
+   hb_gcLock( mt->aEventObjects );
    mt->next = 0;
 
    hb_threadLinkMutex( mt );
 
-   hb_retptr( mt );
+   hb_retptrfin( mt, hb_threadMutexFinalize );
 }
 
-/*JC1: this will always be called when cancellation is delayed */
-HB_FUNC( DESTROYMUTEX )
-{
-   HB_THREAD_STUB
-
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
-
-   if( pMutex == NULL )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
-      hb_itemRelease( pArgs );
-
-      return;
-   }
-
-   Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asPointer.value;
-
-   hb_threadUnlinkMutex( Mutex );
-
-   HB_MUTEX_DESTROY( Mutex->mutex );
-   HB_COND_DESTROY( Mutex->cond );
-   hb_arrayRelease( Mutex->aEventObjects );
-   hb_itemClear( pMutex );
-   hb_xfree( Mutex );
-}
 
 /*JC1: this will always be called when cancellation is delayed */
 HB_FUNC( MUTEXLOCK )
@@ -1595,7 +1582,7 @@ HB_EXPORT void hb_threadWaitAll()
    {
       hb_runningStacks.content.asLong--;
       HB_VM_STACK.bInUse = FALSE;
-      HB_COND_SIGNAL( hb_runningStacks.Cond );   
+      HB_COND_SIGNAL( hb_runningStacks.Cond );
    }
 
    while ( hb_ht_stack->next != NULL )
@@ -1730,7 +1717,7 @@ void hb_threadWaitForIdle( void )
    }
 
    hb_runningStacks.content.asLong --;
-   
+
    HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
    /* wait until the road is clear (only WE are running) */
    while ( hb_runningStacks.content.asLong != 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.19 2003/11/15 21:26:43 jonnymind Exp $
+ * $Id: hbvmpub.h,v 1.20 2003/11/23 03:13:53 jonnymind Exp $
  */
 
 /*
@@ -164,10 +164,17 @@
        LONG value;
     };
 
+    /* Pointer utility functions */
+    #define HB_FINALIZER_FUNC_( hbfunc )\
+         void hbfunc( void * )
+    typedef HB_FINALIZER_FUNC_( HB_FINALIZER_FUNC );
+    typedef HB_FINALIZER_FUNC *PHB_FINALIZER_FUNC;
+
     struct hb_struPointer
     {
        void * value;
        BOOL collect;
+       PHB_FINALIZER_FUNC fFinalizer;
     };
 
     struct hb_struRefer
@@ -262,7 +269,6 @@
        PHB_ITEM pKeys;
        PHB_ITEM pValues;      /* pointer to the array items */
        ULONG    ulLen;        /* number of items in the array */
-       USHORT   uiHolders;    /* number of holders of this array */
        ULONG    ulAllocated;  /* items allocated in keys and values */
        PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
        BOOL     bCase;        /* Case sensitivity */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.95 2003/11/12 16:05:00 jonnymind Exp $
+ * $Id: hbapi.h,v 1.96 2003/11/26 05:44:04 jonnymind Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ extern "C" {
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
 #define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
 #define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
-#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
+#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_POINTER( p )|| HB_IS_HASH( p )) )
 #define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
@@ -177,6 +177,7 @@ extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
 
 extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+void * hb_gcAllocPointer( ULONG ulSize ); /* Function specific to alloc HB_IT_POINTER held (and GC susceptible) values */
 extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
 extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
 extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
@@ -263,6 +264,7 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
+    #define hb_retptrfin( voidPtr, fFin )        hb_itemPutPtrFinalizer( &HB_VM_STACK.Return, (voidPtr), (fFin) )
    #ifndef HB_LONG_LONG_OFF
     #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
@@ -301,6 +303,7 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
+    extern void  HB_EXPORT  hb_retptrfin( void *voidPtr, PHB_FINALIZER_FUNC pf ); /* returns a pointer to an allocated memory, collected by GC and finalized with a custom function */
    #ifndef HB_LONG_LONG_OFF
     extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */

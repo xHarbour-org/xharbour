@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1772 2003/11/26 09:55:00 druzus Exp $
+ * $Id: ChangeLog,v 1.1773 2003/11/26 09:56:46 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-26 14:43 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * include/hbvmpub.h
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/garbage.c
+    + Added support for garbage assisted pointer deep memory management
+
+  * source/vm/thread.c
+    * Using new GC assisted pointer support
+
+  * source/vm/hash.c
+    * Successful experiment of GC-olny item cleaning.
+
+  * source/vm/errorapi.c
+    ! Ops, forgot that we have 2 idle inspector: GC and error ALERT messages... Fixed.
+
 
 2003-11-26 10:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/dos/global.cf

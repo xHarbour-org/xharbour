@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.13 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: hash.c,v 1.14 2003/11/24 15:15:26 lf_sfnet Exp $
  */
 
 /*
@@ -293,8 +293,6 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
       hb_itemClear( pItem );
    }
 
-   pBaseHash->uiHolders = 1;
-
    pBaseHash->ulLen = 0;
    pBaseHash->ulTotalLen = 0;
    pBaseHash->uiLevel = 0;
@@ -407,7 +405,6 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
             pNewBase = hbSubHash.item.asHash.value;
             pNewBase->bCase = pPageBase->bCase;
             pNewBase->bAutoAdd = pPageBase->bAutoAdd;
-            pNewBase->uiHolders = 1;
             pNewBase->fOrder = pPageBase->fOrder;
             pNewBase->uiLevel = pPageBase->uiLevel;
             pNewBase->ulPageSize = pPageBase->ulPageSize;

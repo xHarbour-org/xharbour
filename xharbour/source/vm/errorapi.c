@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.24 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.25 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -279,10 +279,6 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
          HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
          return 0; /* Meaningless here */
       }
-      /* Remove ourselves from running stacks */
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      HB_COND_SIGNAL( hb_runningStacks.Cond );
 
       /* Force idle fencing */
       old_bIdleFence = hb_bIdleFence;
@@ -352,9 +348,10 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
             /* no more unstoppable thread */
             HB_VM_STACK.uiIdleInspecting--;
+            HB_VM_STACK.bInUse=TRUE;
             hb_runningStacks.aux = 0;
             // this will also signal the changed situation.
-            HB_STACK_LOCK
+            HB_COND_SIGNAL( hb_runningStacks.Cond );
          #endif
 
          exit( hb_vmQuit() );
@@ -421,9 +418,10 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       {
          /* no more unstoppable thread */
          HB_VM_STACK.uiIdleInspecting--;
+         HB_VM_STACK.bInUse = TRUE;
          hb_runningStacks.aux = 0;
          // this will also signal the changed situation.
-         HB_STACK_LOCK
+         HB_COND_SIGNAL( hb_runningStacks.Cond );
       }
    #endif
 
@@ -463,11 +461,6 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
          return NULL; /* Meaningless here */
       }
-      /* Remove ourselves from running stacks */
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      HB_COND_SIGNAL( hb_runningStacks.Cond );
-
       /* Force idle fencing */
       old_bIdleFence = hb_bIdleFence;
       hb_bIdleFence = TRUE;
@@ -539,7 +532,8 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             HB_VM_STACK.uiIdleInspecting--;
             hb_runningStacks.aux = 0;
             // this will also signal the changed situation.
-            HB_STACK_LOCK
+            HB_VM_STACK.bInUse = TRUE;
+            HB_COND_SIGNAL( hb_runningStacks.Cond );
          #endif
 
          exit( hb_vmQuit() );
@@ -577,7 +571,8 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          HB_VM_STACK.uiIdleInspecting--;
          hb_runningStacks.aux = 0;
          // this will also signal the changed situation.
-         HB_STACK_LOCK
+         HB_VM_STACK.bInUse = TRUE;
+         HB_COND_SIGNAL( hb_runningStacks.Cond );
       }
    #endif
 
