@@ -1,12 +1,17 @@
 /*
- * $Id: tstchbx.prg,v 1.1.1.1 2001/12/21 10:46:33 ronpinkas Exp $
+ * $Id: tstchbx.prg,v 1.2 2003/09/19 17:05:49 ronpinkas Exp $
  */
+
+#include "inkey.ch"
+
 function Main
    Local lx :=.f.
    local ly :=.f.
    Local citem:="Windows NT/2000"
    Local aitems[4]
    LOCAL GetList := {}
+
+   SET EVENTMASK TO INKEY_ALL
 
    aitems[1]:=RADIOBUTTO( 3,3,"&Windows NT/2000")
    aitems[2]:=RADIOBUTTO( 4,3,"W&indows 9x")
@@ -18,9 +23,9 @@ function Main
 
    @ 2,2,7,40 GET citem radiogroup aitems color 'w/b+,r/b,g/b+' MESSAGE "Select Your Os"
    @ 8, 3  SAY "Married"
-   @ 8, 12 GET lx CHECKBOX color 'w/b+,w/b,w+/r,w/g+' MESSAGE "Is You Married?"
+   @ 8, 12 GET lx CHECKBOX color 'w/b+,w/b,w+/r,w/g+' MESSAGE "Are You Married?"
    @ 9, 3  SAY "Singer"
-   @ 9, 12 Get ly CHECKBOX color 'w/b+,w/b,w+/r,w/g+' MESSAGE "Are You a  Singer"
+   @ 9, 12 Get ly CHECKBOX color 'w/b+,w/b,w+/r,w/g+' MESSAGE "Are You a Singer"
 
    READ MSG AT maxrow(), 0, maxcol() MSG Color "w/b+"
 

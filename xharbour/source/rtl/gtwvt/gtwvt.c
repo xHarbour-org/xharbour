@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.70 2004/02/14 01:29:43 andijahja Exp $
+ * $Id: gtwvt.c,v 1.71 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -2813,7 +2813,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
 
       case WM_MBUTTONDOWN:
-        keyCode = K_RBUTTONUP;
+        keyCode = K_MBUTTONDOWN;
         break;
 
       case WM_MBUTTONUP:

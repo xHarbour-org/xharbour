@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.3 2003/02/20 02:33:16 lculik Exp $
+ * $Id: checkbox.prg,v 1.4 2003/11/21 13:22:35 lculik Exp $
  */
 
 /*
@@ -156,24 +156,28 @@ METHOD KillFocus() CLASS HBCHECKBOX
 RETURN Self
 
 METHOD HitTest( Arg1, Arg2 ) CLASS HBCHECKBOX
-
    LOCAL Local1
    LOCAL Local2
+
    IF ( Arg1 != ::Row )
    ELSEIF ( Arg2 < ::Col )
    ELSEIF ( Arg2 < ::Col + 3 )
       RETURN - 2049
    ENDIF
-   Local2 := Len( ::Caption )
-   IF ( ( Local1 := At( "&", ::Caption ) ) == 0 )
-   ELSEIF ( Local1 < Local2 )
-      Local2 --
+   
+   IF HB_IsString( ::Caption )
+      Local2 :=  Len( ::Caption )
+      IF ( Local1 := At( "&", ::Caption ) ) == 0
+      ELSEIF ( Local1 < Local2 )
+         Local2 --
+      ENDIF
+      IF Arg1 != ::Caprow
+      ELSEIF Arg2 < ::CapCol
+      ELSEIF Arg2 < ::CapCol + Local2
+         RETURN - 1025
+      ENDIF
    ENDIF
-   IF ( Arg1 != ::Caprow )
-   ELSEIF ( Arg2 < ::CapCol )
-   ELSEIF ( Arg2 < ::CapCol + Local2 )
-      RETURN - 1025
-   ENDIF
+
 RETURN 0
 
 METHOD Display() CLASS HBCHECKBOX
