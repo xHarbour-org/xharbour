@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.205 2002/10/04 10:41:14 alkresin Exp $
+ * $Id: dbcmd.c,v 1.17 2002/10/12 00:38:26 horacioroldan Exp $
  */
 
 /*
@@ -681,13 +681,17 @@ ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
    if( pSymAlias->pDynSym->hArea )
+   {
       bResult = hb_rddSelectWorkAreaNumber( pSymAlias->pDynSym->hArea );
+   }
    else
    {
       szName = pSymAlias->pDynSym->pSymbol->szName;
 
       if( strlen( szName ) == 1 && toupper( szName[ 0 ] ) >= 'A' && toupper( szName[ 0 ] ) <= 'K' )
+      {
          bResult = hb_rddSelectWorkAreaNumber( toupper( szName[ 0 ] ) - 'A' + 1 );
+      }
       else
       {
          /*
@@ -704,16 +708,21 @@ ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
          while( uiAction == E_RETRY )
          {
             uiAction = hb_errLaunch( pError );
+
             if( uiAction == E_RETRY )
+            {
                if( pSymAlias->pDynSym->hArea )
                {
                   bResult = hb_rddSelectWorkAreaNumber( pSymAlias->pDynSym->hArea );
                   uiAction = E_DEFAULT;
                }
+            }
          }
+
          hb_errRelease( pError );
       }
    }
+
    return bResult;
 }
 

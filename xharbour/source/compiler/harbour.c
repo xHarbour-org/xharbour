@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.22 2002/09/23 17:50:44 ronpinkas Exp $
+ * $Id: harbour.c,v 1.23 2002/10/09 20:42:58 ronpinkas Exp $
  */
 
 /*
@@ -657,7 +657,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
                if( ! pSym )
+               {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+               }
 
                pSym->cScope |= VS_MEMVAR;
 
@@ -701,7 +703,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             {
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
                if( ! pSym )
+               {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+               }
 
                pSym->cScope |= VS_MEMVAR;
 
@@ -743,7 +747,10 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             {
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
                if( ! pSym )
+               {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+               }
+
                pSym->cScope |= VS_MEMVAR;
             }
 
@@ -1490,7 +1497,7 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos )
       pSym = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
 
       pSym->szName = szSymbolName;
-      pSym->cScope = 0;
+      pSym->cScope = HB_FS_PUBLIC;
       pSym->cType = hb_comp_cVarType;
       pSym->pNext = NULL;
 
@@ -1666,6 +1673,7 @@ PINLINE hb_compInlineAdd( char * szFunName )
       {
          pSym = hb_compSymbolAdd( szFunName, NULL );
       }
+
       if( pSym )
       {
          pSym->cScope |= HB_FS_STATIC;
@@ -1703,7 +1711,9 @@ void hb_compAnnounce( char * szFunName )
        * have to be a public symbol - check if existing symbol is public
        */
       if( pFunc->cScope & HB_FS_STATIC )
+      {
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_FUNC_ANNOUNCE, szFunName, NULL );
+      }
    }
    else
    {
@@ -1808,7 +1818,7 @@ PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL pSym )
 
 void hb_compGenBreak( void )
 {
-   hb_compGenPushSymbol( hb_strdup("BREAK"), 1 );
+   hb_compGenPushSymbol( hb_strdup("BREAK"), TRUE, FALSE );
    hb_compGenPushNil();
 }
 
@@ -2714,7 +2724,9 @@ void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNCTION pF
        * where the codeblock is defined
        */
       while( pFunc->pOwner )
+      {
          pFunc = pFunc->pOwner;
+      }
    }
 
    pField = hb_compVariableFind( pFunc->pFields, wVar );
@@ -2724,12 +2736,17 @@ void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNCTION pF
        * Push alias symbol before the field symbol
        */
       if( bPCode == HB_P_POPFIELD )
+      {
          bPCode = HB_P_POPALIASEDFIELD;
+      }
       else if( bPCode == HB_P_PUSHFIELD )
+      {
          bPCode = HB_P_PUSHALIASEDFIELD;
+      }
 
-      hb_compGenPushSymbol( hb_strdup( pField->szAlias ), 0 );
+      hb_compGenPushSymbol( hb_strdup( pField->szAlias ), FALSE, TRUE );
    }
+
    hb_compGenVarPCode( bPCode, szVarName );
 }
 
@@ -2746,7 +2763,9 @@ void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
     */
    pSym = hb_compSymbolFind( szVarName, &wVar );
    if( ! pSym )
+   {
       pSym = hb_compSymbolAdd( szVarName, &wVar );
+   }
    pSym->cScope |= VS_MEMVAR;
 
    if( bPCode == HB_P_PUSHALIASEDFIELD && wVar <= 255 )
@@ -2763,7 +2782,9 @@ void hb_compGenMessage( char * szMsgName )       /* sends a message to an object
    PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym );
 
    if( ! pSym )  /* the symbol was not found on the symbol table */
+   {
       pSym = hb_compSymbolAdd( szMsgName, &wSym );
+   }
    pSym->cScope |= HB_FS_MESSAGE;
    hb_compGenPCode3( HB_P_MESSAGE, HB_LOBYTE( wSym ), HB_HIBYTE( wSym ), ( BOOL ) 1 );
 }
@@ -2950,14 +2971,16 @@ void hb_compGenPopAliasedVar( char * szVarName,
             {  /* field variable */
                iCmp = strncmp( szAlias, "FIELD", 4 );
                if( iCmp == 0 )
+               {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
+               }
                if( iCmp == 0 )
                {  /* FIELD-> */
                   hb_compGenVarPCode( HB_P_POPFIELD, szVarName );
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_strdup( szAlias ), 0 );
+                  hb_compGenPushSymbol( hb_strdup( szAlias ), FALSE, TRUE );
                   hb_compGenVarPCode( HB_P_POPALIASEDFIELD, szVarName );
                }
             }
@@ -3231,14 +3254,16 @@ void hb_compGenPushAliasedVar( char * szVarName,
             {  /* field variable */
                iCmp = strncmp( szAlias, "FIELD", 4 );
                if( iCmp == 0 )
+               {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
+               }
                if( iCmp == 0 )
                {  /* FIELD-> */
                   hb_compGenVarPCode( HB_P_PUSHFIELD, szVarName );
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_strdup( szAlias ), 0 );
+                  hb_compGenPushSymbol( hb_strdup( szAlias ), FALSE, TRUE );
                   hb_compGenVarPCode( HB_P_PUSHALIASEDFIELD, szVarName );
                }
             }
@@ -3251,11 +3276,13 @@ void hb_compGenPushAliasedVar( char * szVarName,
       }
    }
    else
+   {
       /* Alias is already placed on stack
        * NOTE: An alias will be determined at runtime then we cannot decide
        * here if passed name is either a field or a memvar
        */
       hb_compGenVarPCode( HB_P_PUSHALIASEDVAR, szVarName );
+   }
 }
 
 void hb_compGenPushLogical( int iTrueFalse ) /* pushes a logical value on the virtual machine stack */
@@ -3292,10 +3319,12 @@ void hb_compGenPushFunCall( char * szFunName )
    {
       /* Abbreviated function name was used - change it for whole name
        */
-      hb_compGenPushSymbol( hb_compIdentifierNew( szFunction, TRUE ), 1 );
+      hb_compGenPushSymbol( hb_compIdentifierNew( szFunction, TRUE ), TRUE, FALSE );
    }
    else
-      hb_compGenPushSymbol( szFunName, 1 );
+   {
+      hb_compGenPushSymbol( szFunName, TRUE, FALSE );
+   }
 }
 
 /* generates the pcode to push a long number on the virtual machine stack */
@@ -3364,28 +3393,42 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
-void hb_compGenPushSymbol( char * szSymbolName, int iIsFunction )
+void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
 {
+   PCOMSYMBOL pSym;
    USHORT wSym;
 
-   if( ! hb_compSymbolFind( szSymbolName, &wSym ) )  /* the symbol was not found on the symbol table */
+   if( ( pSym = hb_compSymbolFind( szSymbolName, &wSym ) ) != NULL )  /* the symbol was found on the symbol table */
    {
-      hb_compSymbolAdd( szSymbolName, &wSym );
-      if( iIsFunction )
+      if( bFunction && ! hb_compFunCallFind( szSymbolName ) )
+      {
          hb_compFunCallAdd( szSymbolName );
+      }
+
+      if( bAlias )
+      {
+         pSym->cScope |= HB_FS_PUBLIC;
+      }
    }
    else
    {
-      if( iIsFunction && ! hb_compFunCallFind( szSymbolName ) )
+      hb_compSymbolAdd( szSymbolName, &wSym );
+
+      if( bFunction )
+      {
          hb_compFunCallAdd( szSymbolName );
+      }
    }
 
    if( wSym > 255 )
+   {
       hb_compGenPCode3( HB_P_PUSHSYM, HB_LOBYTE( wSym ), HB_HIBYTE( wSym ), ( BOOL ) 1 );
+   }
    else
+   {
       hb_compGenPCode2( HB_P_PUSHSYMNEAR, ( BYTE ) wSym, ( BOOL ) 1 );
+   }
 }
-
 
 static void hb_compCheckDuplVars( PVAR pVar, char * szVarName )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.24 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: genc.c,v 1.25 2002/09/23 17:50:44 ronpinkas Exp $
  */
 
 /*
@@ -213,19 +213,41 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
             fprintf( yyc, "{ \"%s\", ", pSym->szName );
 
             if( pSym->cScope & HB_FS_STATIC )
+            {
                fprintf( yyc, "HB_FS_STATIC" );
 
+               if( pSym->cScope & HB_FS_PUBLIC )
+               {
+                  fprintf( yyc, " | HB_FS_PUBLIC" );
+               }
+            }
             else if( pSym->cScope & HB_FS_INIT )
+            {
                fprintf( yyc, "HB_FS_INIT" );
 
+               if( pSym->cScope & HB_FS_PUBLIC )
+               {
+                  fprintf( yyc, " | HB_FS_PUBLIC" );
+               }
+            }
             else if( pSym->cScope & HB_FS_EXIT )
+            {
                fprintf( yyc, "HB_FS_EXIT" );
 
+               if( pSym->cScope & HB_FS_PUBLIC )
+               {
+                  fprintf( yyc, " | HB_FS_PUBLIC" );
+               }
+            }
             else
+            {
                fprintf( yyc, "HB_FS_PUBLIC" );
+            }
 
             if( pSym->cScope & VS_MEMVAR )
+            {
                fprintf( yyc, " | HB_FS_MEMVAR" );
+            }
 
             if( ( pSym->cScope != HB_FS_MESSAGE ) && ( pSym->cScope & HB_FS_MESSAGE ) ) /* only for non public symbols */
                fprintf( yyc, " | HB_FS_MESSAGE" );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.4 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.5 2002/09/21 05:21:06 ronpinkas Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ typedef struct _HB_CODEBLOCK
 typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
 
 /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
-#define HB_FS_PUBLIC   ( ( HB_SYMBOLSCOPE ) 0x00 )
+#define HB_FS_PUBLIC   ( ( HB_SYMBOLSCOPE ) 0x01 )
 #define HB_FS_STATIC   ( ( HB_SYMBOLSCOPE ) 0x02 )
 #define HB_FS_FIRST    ( ( HB_SYMBOLSCOPE ) 0x04 )
 #define HB_FS_INIT     ( ( HB_SYMBOLSCOPE ) 0x08 )

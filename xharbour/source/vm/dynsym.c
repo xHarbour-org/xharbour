@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.2 2002/07/24 02:58:43 ronpinkas Exp $
  */
 
 /*
@@ -102,9 +102,10 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymNew(%p)", pSymbol));
 
    pDynSym = hb_dynsymFind( pSymbol->szName ); /* Find position */
+
    if( pDynSym )            /* If name exists */
    {
-      if( ! ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INIT | HB_FS_EXIT ) ) ) /* only for HB_FS_PUBLIC */
+      if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
       {
          if( ( ! pDynSym->pFunPtr ) && pSymbol->pFunPtr ) /* The DynSym existed */
          {
@@ -115,13 +116,17 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
             pDynSym->ulRecurse = 0;
          }
       }
+
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
+
       return pDynSym;                /* Return pointer to DynSym */
    }
 
    if( s_uiDynSymbols == 0 )   /* Do we have any symbols ? */
+   {
       pDynSym = s_pDynItems[ 0 ].pDynSym;     /* Point to first symbol */
                             /* *<1>* Remember we already got this one */
+   }
    else
    {                        /* We want more symbols ! */
       s_pDynItems = ( PDYNHB_ITEM ) hb_xrealloc( s_pDynItems, ( s_uiDynSymbols + 1 ) * sizeof( DYNHB_ITEM ) );
@@ -131,9 +136,12 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
          USHORT uiPos;
 
          for( uiPos = 0; uiPos < ( s_uiDynSymbols - s_uiClosestDynSym ); uiPos++ )
-            memcpy( &s_pDynItems[ s_uiDynSymbols - uiPos ],
-                    &s_pDynItems[ s_uiDynSymbols - uiPos - 1 ], sizeof( DYNHB_ITEM ) );
-      }                                     /* Insert element in array */
+         {
+             /* Insert element in array */
+            memcpy( &s_pDynItems[ s_uiDynSymbols - uiPos ], &s_pDynItems[ s_uiDynSymbols - uiPos - 1 ], sizeof( DYNHB_ITEM ) );
+         }
+      }
+
       pDynSym = ( PHB_DYNS ) hb_xgrab( sizeof( HB_DYNS ) );
       s_pDynItems[ s_uiClosestDynSym ].pDynSym = pDynSym;    /* Enter DynSym */
    }
@@ -146,11 +154,14 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
    pDynSym->ulTime  = 0; /* profiler support */
    pDynSym->ulRecurse = 0;
 
-   if( ! ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INIT | HB_FS_EXIT ) ) ) /* only for HB_FS_PUBLIC */
+   if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
    {
       if( pDynSym->pFunPtr != pSymbol->pFunPtr ) /* it contains a function pointer */
+      {
          pDynSym->pFunPtr = pSymbol->pFunPtr;    /* place the function at DynSym */
+      }
    }
+
    pSymbol->pDynSym = pDynSym;                /* place a pointer to DynSym */
 
    return pDynSym;

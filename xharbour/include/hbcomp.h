@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.4 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.5 2002/09/16 05:34:01 ronpinkas Exp $
  */
 
 /*
@@ -346,7 +346,7 @@ extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical val
 extern void hb_compGenPushLong( long lNumber );          /* Pushes a long number on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
 extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
-extern void hb_compGenPushSymbol( char * szSymbolName, int iIsFunction ); /* Pushes a symbol on to the Virtual machine stack */
+extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias ); /* Pushes a symbol on to the Virtual machine stack */
 extern void hb_compGenPushAliasedVar( char *, BOOL, char *, long );
 extern void hb_compGenPopAliasedVar( char *, BOOL, char *, long );
 extern void hb_compGenPushFunRef( char * );

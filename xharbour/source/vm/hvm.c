@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.114 2002/10/09 20:43:00 ronpinkas Exp $
+ * $Id: hvm.c,v 1.115 2002/10/10 16:44:59 ronpinkas Exp $
  */
 
 /*
@@ -5602,10 +5602,14 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
       hSymScope = ( pModuleSymbols + ui )->cScope;
       pNewSymbols->hScope |= hSymScope;
       if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
-            s_pSymStart = pModuleSymbols + ui;  /* first public defined symbol to start execution */
+      {
+         s_pSymStart = pModuleSymbols + ui;  /* first public defined symbol to start execution */
+      }
 
-      if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) )
+      if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) )
+      {
          hb_dynsymNew( pModuleSymbols + ui );
+      }
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.434 2002/10/12 00:40:51 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.435 2002/10/13 02:22:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-13 11:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    * Changed #define HB_FS_PUBLIC to: ( ( HB_SYMBOLSCOPE ) 0x01 )
+
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    * Added 3rd paramater bAlias to to void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias );
+
+  * include/hbexprb.c
+  * include/hbmacro.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.sly
+  * source/vm/macro.c
+    + Added 3rd paramater to all calls to hb_compGenPushSymbol()
+
+  * source/vm/dynsym.c
+  * source/vm/hvm.c
+    * Fixed hb_vmProcessSymbols() to correctly support HB_FS_PUBLIC flag.
+
+  * source/rdd/dbcmd.c
+    * Formating.
 
 2002-10-12 22:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * contrib/hbzlib/*

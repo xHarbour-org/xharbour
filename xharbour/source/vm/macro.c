@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.9 2002/03/26 05:45:07 ronpinkas Exp $
+ * $Id: macro.c,v 1.10 2002/09/19 01:57:43 ronpinkas Exp $
  */
 
 /*
@@ -1116,11 +1116,13 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
-void hb_compGenPushSymbol( char * szSymbolName, int isFunction, HB_MACRO_DECL )
+void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_MACRO_DECL )
 {
    HB_DYNS_PTR pSym;
 
-   HB_SYMBOL_UNUSED( isFunction );
+   HB_SYMBOL_UNUSED( bFunction );
+   HB_SYMBOL_UNUSED( bAlias );
+
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
       /* we are determining the type of expression (called from TYPE() function)
@@ -1247,7 +1249,7 @@ void hb_compGenPopAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( szAlias, 0, HB_MACRO_PARAM );
+                  hb_compGenPushSymbol( szAlias, FALSE, TRUE, HB_MACRO_PARAM );
                   hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, HB_MACRO_PARAM );
                }
             }
@@ -1362,7 +1364,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( szAlias, 0, HB_MACRO_PARAM );
+                  hb_compGenPushSymbol( szAlias, FALSE, TRUE, HB_MACRO_PARAM );
                   hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, HB_MACRO_PARAM );
                }
             }
@@ -1412,12 +1414,12 @@ void hb_compGenPushFunCall( char * szFunName, HB_MACRO_DECL )
    {
       /* Abbreviated function name was used - change it for whole name
        */
-      hb_compGenPushSymbol( szFunction, 0, HB_MACRO_PARAM );
+      hb_compGenPushSymbol( szFunction, FALSE, FALSE, HB_MACRO_PARAM );
    }
    else
    {
       HB_MACRO_DATA->status |= HB_MACRO_UDF; /* this is used in hb_macroGetType */
-      hb_compGenPushSymbol( szFunName, 0, HB_MACRO_PARAM );
+      hb_compGenPushSymbol( szFunName, FALSE, FALSE, HB_MACRO_PARAM );
    }
 }
 
