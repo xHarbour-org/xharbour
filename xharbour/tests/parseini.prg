@@ -1,7 +1,7 @@
 ******************************************************************
 * parseini.prg
 *
-* $Id: parseini.prg,v 1.2 2003/03/19 13:30:47 jonnymind Exp $
+* $Id: parseini.prg,v 1.3 2003/11/14 19:46:20 jonnymind Exp $
 * Test for Ini file reading/writing
 *
 * Giancarlo Niccolai
@@ -29,7 +29,7 @@ PROCEDURE Main( cName )
    @nRow, 0
 
    ? "Content of " + cName
-   
+
    IF Empty( aIni )
       ? "Not a valid .ini file!"
    ELSE
@@ -43,7 +43,7 @@ PROCEDURE Main( cName )
          NEXT
       NEXT
    ENDIF
-   
+
    ?
    ? "Adding section 'Added', with key NEW = new"
    aIni[ "Added" ] := Hash()
@@ -56,6 +56,54 @@ PROCEDURE Main( cName )
       ? "Can't write file"
    ENDIF
    ?
-   ? "Press any key to end"
+   ? "Press any key to next text."
    Inkey(0)
+   ?
+   ? "REPEATING TESTS WITHOUT AUTOMATIC MAIN SECTION"
+
+   aIni := HB_ReadIni( cName, /*default case*/ , /*Default key indicators */ , .F. )
+
+   @nRow, 0
+
+   ? "Content of " + cName
+
+   IF Empty( aIni )
+      ? "Not a valid .ini file!"
+   ELSE
+      FOR EACH cSection IN aIni:Keys
+         /* Now (without automatic main), toplevel options may be in the root hash */
+         aSect := aIni[ cSection ]
+
+         IF HB_IsHash( aSect )
+            /* It's a section */
+            ?
+            ? "Section [" + cSection + "]"
+
+            FOR EACH cKey IN aSect:Keys
+               ? cKey + " = " + aSect[ cKey ]
+            NEXT
+         ELSE
+            /* It's a toplevel option */
+            ? "TOPLEVEL option:", cSection + " = " + aSect
+         ENDIF
+      NEXT
+   ENDIF
+
+   ?
+   ? "Adding section 'Added', with key NEW = new"
+   aIni[ "Added" ] := Hash()
+   aIni[ "Added" ][ "NEW" ] := "new"
+
+   ? "Writing output to parseini_out1.ini"
+   IF HB_WriteIni( "parseini_out1.ini", aIni,;
+         "#Generated file without main auto section; don't touch", "#End of file",;
+         .F. )
+      ? "File written"
+   ELSE
+      ? "Can't write file"
+   ENDIF
+   ?
+   ? "Press any key to next text."
+   Inkey(0)
+
 RETURN

@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.6 2004/09/08 02:50:16 ronpinkas Exp $
+* $Id: hbini.prg,v 1.7 2004/09/08 02:52:48 ronpinkas Exp $
 */
 
 /*
@@ -90,14 +90,20 @@ PROCEDURE HB_SetIniComment( cLc, cHlc )
 RETURN
 
 
-FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSplitters )
+FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
    LOCAL hIni := Hash()
 
-   hIni[ "MAIN" ] := Hash()
+   IF bAutoMain == NIL
+      bAutoMain := .T.
+   END
 
-RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSplitters )
+   IF bAutoMain
+      hIni[ "MAIN" ] := Hash()
+   END
 
-STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters )
+RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
+
+STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters, bAutoMain )
    LOCAL aFiles
    LOCAL cFile, nLen
    LOCAL aKeyVal, hCurrentSection
@@ -141,7 +147,11 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters )
    Fclose( fHandle )
 
    /* Always begin with the MAIN section */
-   hCurrentSection := aIni[ "MAIN" ]
+   IF bAutoMain
+      hCurrentSection := aIni[ "MAIN" ]
+   ELSE
+      hCurrentSection := aIni
+   END
 
    cLine := ""
    DO WHILE Len( cData ) > 0
@@ -203,7 +213,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters )
          IF Len( aKeyVal[2] ) == 0
             LOOP
          ENDIF
-          HB_ReadIni2( aIni, AllTrim(aKeyVal[2]), bKeyCaseSens )
+         HB_ReadIni2( aIni, AllTrim(aKeyVal[2]), bKeyCaseSens, cSplitters, bAutoMain )
          cLine := ""
          LOOP
       ENDIF
@@ -246,65 +256,83 @@ RETURN aIni
 
 
 
-function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
+function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd, bAutoMain )
 
    local nFileId := 0
    local cSection
    local hCurrentSection
    local cNewLine := HB_OSNewLine()
 
-   if !HB_IsString( cFileName )
+   IF bAutoMain == NIL
+      bAutoMain := .T.
+   END
 
+   IF !HB_IsString( cFileName )
       nFileId = cFileName
-
-   else
-
+   ELSE
       nFileId = FCreate( cFileName )
+      IF nFileId <= 0
+         RETURN .f.
+      ENDIF
+   ENDIF
 
-      if nFileId <= 0
-         return .f.
-      endif
-
-   endif
-
-   if !Empty( cCommentBegin )
+   IF !Empty( cCommentBegin )
       FWrite( nFileId, cCommentBegin + cNewLine )
-   endif
+   ENDIF
 
-   hCurrentSection = hIni[ "MAIN" ]
+   // Write toplevel section
 
-   HEval( hCurrentSection, ;
-          { | cKey, xVal |  FWrite( nFileId, Cstr(cKey) + "=" + CStr(xVal) + cNewLine ) };
-        )
+   IF bAutoMain
+      // When automain is on, write the main section
+      hCurrentSection = hIni[ "MAIN" ]
 
-   for each cSection in hIni:Keys
+      HEval( hCurrentSection, ;
+            { | cKey, xVal |  FWrite( nFileId, Cstr(cKey) + " = " + CStr(xVal) + cNewLine ) };
+         )
+   ELSE
+      // When automain is off, just write all the toplevel variables.
+      HEval( hIni, ;
+            { | cKey, xVal | ;
+                 IIF( .not. HB_IsHash( xVal ),;
+                 FWrite( nFileId, Cstr(cKey) + " = " + CStr(xVal) + cNewLine ), /* nothing */ ) };
+         )
+   ENDIF
 
-       if cSection == "MAIN"
-          loop
-       endif
 
-       hCurrentSection = hIni[ cSection ]
+   FOR EACH cSection IN hIni:Keys
 
-       if FWrite( nFileId, cNewLine + "[" + CStr(cSection) + "]" + cNewLine ) <= 0
-          return .f.
-       endif
+      // Avoid re-processing main section
+      IF bAutoMain
+         // When automain is on, skip section named MAIN
+         IF cSection == "MAIN"
+            LOOP
+         ENDIF
+          hCurrentSection = hIni[ cSection ]
+      ELSE
+         // When automain is off, skip all the toplevel variables.
+         hCurrentSection = hIni[ cSection ]
+         IF .not. HB_IsHash( hCurrentSection )
+            LOOP
+         END
+      ENDIF
+
+       IF FWrite( nFileId, cNewLine + "[" + CStr(cSection) + "]" + cNewLine ) <= 0
+          RETURN .f.
+       ENDIF
 
        HEval( hCurrentSection, ;
               { | cKey, xVal |  FWrite( nFileId, CStr(cKey) + "=" + CStr(xVal) + cNewLine ) };
             )
+   NEXT
 
-   next
+   IF !Empty( cCommentEnd )
+      IF FWrite( nFileId, cCommentEnd + cNewLine ) <= 0
+         RETURN .f.
+      ENDIF
+   ENDIF
 
-   if !Empty( cCommentEnd )
-      if FWrite( nFileId, cCommentEnd + cNewLine ) <= 0
-         return .f.
-      endif
-   endif
-
-   if nFileId > 0
+   IF nFileId > 0
       FClose( nFileId )
-   endif
+   ENDIF
 
-return .t.
-
-
+RETURN .t.

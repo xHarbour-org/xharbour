@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3466 2004/09/26 11:55:17 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3467 2004/09/26 12:36:16 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-09-26 16:47 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
+  * source/rtl/hbini.prg
+    + Added an extra bool parameter to ReadIni that, if set to .F.,
+      allows to put the main options directly in the root of the
+      returned hash, instead of adding a "MAIN" section for them.
+    + Added an extra bool parameter to WriteIni that, if set to .F.,
+      allows to put the main options directly in the root of the
+      hash to be written, and doesn't treat "MAIN" as a special
+      section.
+
+  * tests/parseini.prg
+    + Tests for new features.
 
 2004-09-26 14:33 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/vm/inet.c
