@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1950 2003/12/27 12:10:29 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1961 2003/12/29 23:38:55 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,7 @@
 
 2003-12-30 00:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapigt.h
+  * config/linux/global.cf
   + source/rtl/gtxvt/Makefile
   + source/rtl/gtxvt/gtxvt.c
     + Added GTXVT: Xwindows virtual terminal for unices
