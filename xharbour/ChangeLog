@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2421 2004/02/28 23:05:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.2422 2004/02/29 00:42:04 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-29 10:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+    + add additional parameter to not include certain files in created zip.
+
+    /*
+    Example:
+    HB_ZIPFILE( "my.zip","*.*",,,,,,,,"*.exe")
+    (zip all files excluding those match *.exe skleton)
+
+    HB_ZIPFILE( "my.zip","*.*",,,,,,,,{"*.exe","*.dll"})
+    (zip all files excluding those match *.exe and *.dll skletons)
+
+    HB_ZIPFILE( "my.zip","*.*",,,,,,,,{"a*.exe","a*.dll"})
+    (zip all files excluding those match a*.exe and a*.dll skletons)
+
+    For other syntax, please refer to the program file (zip.c)
+
+    We may as well create a ZIP class. I have to admit that the syntaxes
+    look cumbersome :)
+    */
 
 2004-02-28 19:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbrddfpt.h
