@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.104 2004/07/02 13:00:59 paultucker Exp $
+# $Id: makefile.vc,v 1.105 2004/07/02 13:02:59 paultucker Exp $
 #
 
 #
@@ -100,7 +100,7 @@ HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
 HBPP_DIR     =utils\hbpp
 HBMAKE_DIR   =utils\hbmake
-XBSCRIPT_DIR =utils\hbmake
+XBSCRIPT_DIR =utils\xbscript
 ODBC_DIR     =source\odbc
 SAMPLES_DIR  =source\clipsamp
 
@@ -253,7 +253,7 @@ LIBLIST = \
    $(VM_LIB) \
    $(VM_LIB_OPT_CON) \
    $(VM_LIB_OPT_GUI) \
-   $(DLL_MAIN_LIB) \   
+   $(DLL_MAIN_LIB) \
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
@@ -1214,7 +1214,7 @@ $(XBSCRIPT_EXE) : \
    $(XBSCRIPT_DIR)\XBSCRIPT.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\XBSCRIPT.c \
-                      -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+                       -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 
 #
 # HARBOUR.EXE rules
