@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.48 2003/10/09 20:45:54 paultucker Exp $
+# $Id: makefile.nt,v 1.49 2003/10/10 13:33:48 paultucker Exp $
 #
 
 #
@@ -727,6 +727,7 @@ DBFDBT_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
