@@ -1,4 +1,611 @@
-Just a placeholder
-Something meaningful here in the next days
 
-(C) Giancarlo Niccolai
+
+                    X H A R B O U R  -  eXtended Windowing Toolkit
+
+                                 Giancarlo Niccolai
+
+
+$Id$
+
+
+ABSTRACT
+========
+
+XWT (extended windowing toolkit) is an abstract, portable, multiplatform
+windowing toolkit.
+
+XWT is mainly a layer on which widget libraries lies to provide a standardized
+and common GUI programming interface for xHarbour programs. The abstract layer
+is designed to match the following criteria:
+
+1) Portable: the abstract level of the windowing api ensures a common
+programming interface under very different graphic rendering subsystems, as
+XWindows, MacOSX, OS2 and Windows. Also, the interface for that subsystem
+can be implemented using middle level widgets or windowing APIs, like i.e.
+QT, wxWindows or GTK.
+
+2) Easy to use: the API is meant to be easily used-by-hand, without any other
+instrument like i.e. graphical GUI designers. Of course, logical GUI
+definitions (like XML definitions or designer produced widget set) can also
+be used, but API is still programmer-friendly.
+
+3) Object orientation: XWT API is basically object oriented, as all the modern
+windowing api.
+
+4) Event driven: xHarbour programs will receive events from every meaningful
+GUI state change, i.e. menu selection or command button pressure. Callbacks
+to handle the events can be dynamically configured at runtime, adding or
+removing event listeners on the fly; even listeners can be standard XBASE
+functions or methods bound to specific classes or objects.
+
+5) Easy driver programming: the programming interface toward the lower system
+driver (be it a middle level interface to widget APIs, or a lower level
+windowing subsystem programming) has a very small interface, which is
+built upon a restricted set of interface functions. This functions can be
+incrementally written, and features still not implemented can be safely
+ignored. So, it is possible to have workable drivers also if they are still
+under developement.
+
+
+
+
+STATUS
+======
+
+Currently, XWT is under heavy developement, and many features are subject to
+swift and radical changes.
+
+
+
+BASIC CONCEPTS
+==============
+
+XWT API is organized into three layers:
+
+- PRG interface is the class and function set available to the final xHarbour
+program.
+
+- INTERNAL interface is a C implementation that carries the messages between
+the PRG interface and the lower DRIVER level.
+
+- DRIVER interface is a set of function that each driver must implement, and
+has the role to present the XWT commands and objects to the lower system API;
+the lower system api can be both a system level API (as the Windows WINAPI or
+the XWindows XLIB) or a widget API (as GTK, QT, xyWindows or whatever else).
+
+XWT is built around the concept of "flexible" widgets. Each element of the PRG
+API is considered a subclass of XwtWidget, excluding a few elemets as the
+Message Box.
+XwtWidget itself is an abstract class, that should never be instantiated by
+the final program, but that can be used by programs to develop new widgets.
+
+The PRG interface dialogs with the DRIVER with a limited set of functions,
+divided into generic and specific ones. Generic functions are XWT_Init(),
+XWT_Quit() and XWT_Main() functions. They are translated by the INTERNAL
+interface into xwt_drv_init(), xwt_drv_quit() and xwt_drw_main(). We'll
+discuss them later.
+
+DRIVER level widgets representation are created and managed with widget
+specific functions. There are three kind of "logical" objects that are
+shared among the XWT PRG and DRIVER levels:
+
+- Widget types: they are a standardized set of logical widget types
+(possibly expanded by the final PRG application) that are known by
+the PRG and DRIVER levels, and are defined as numeric IDs. They are
+found in "xwt.ch", and are named as XWT_TYPE_*
+
+- Event types: they are represent as numeric IDs. There is also an
+"event" object in the XWT PRG layer, but we'll discuss it later.
+
+- Property types: again, they are represented as numeric ID defined in
+xwt.ch
+
+* NOTICE: Since all this global definitions are in xwt.ch, this file must be
+  includedby both the PRG applications willing to use XWT and the DRIVER
+  levelimplementation programs.
+
+
+
+INTERNAL DRIVER LEVEL API
+=========================
+
+
+  Raw widgets and creation
+  ------------------------
+
+Each XwtWidget incorporates a member called oRawWidget, holding a pointer to
+a DRIVER specific object. It is responsibility of the driver to define
+structures or objects useful to hold the state of the underlying system
+level API. This "raw widget" is created by the driver, reimplementing the
+following function defined in xwt_api.h
+
+PXWT_WIDGET xwt_drv_create( PHB_ITEM pSelf, int xwt_type );
+
+PXWT_WIDGET is a pointer to the raw widget structure, while pSelf is a
+PHB_ITEM pointing to the object that requested the creation of the raw widget,
+while the xwt_type is one of the types defined in xwt.ch, or an application
+defined type. The driver must here switch() on the xwt_type and create a
+metastructure that can be later used to reference the widget; if the widget
+type is not recognized or still not implemented, the routine can return NULL.
+
+The widget structure is defined as follows:
+
+typedef struct tag_xwt_widget
+{
+   // type is at disposal of drivers to interpret widget data correctly
+   int type;
+
+   void (*destructor)(void *data);
+   void *(*get_main_widget)( void *data );
+   void *(*get_top_widget)( void *data );
+
+   // pointer to raw widget data that is known by virtual functions
+   void *widget_data;
+} XWT_WIDGET, *PXWT_WIDGET;
+
+All the elements of XWT_WIDGET are managed by the DRIVER level functions,
+and are at disposal of the driver implementation. We'll discuss this structure
+afterwards.
+
+* NOTICE: the PRG level function XWT_create( oSelf, nInt ) --> pointer acts as
+  a bridge between the xHarbour code and the lowere level driver. XWT classes
+  calls this function to create the lower level widget, and this function
+  calls the xwt_drv_create() after cleaning up the parameters.
+
+
+  Example of widget creation
+  --------------------------
+
+At prg level, a New() method for a non-abstract widget should be instantiated
+as follows:
+
+METHOD New( cId, nPosX, nPosY ) class MyNiceWidget
+   ::Super:New()
+
+   ::oRawWidget := XWT_Create( Self, XWT_TYPE_MyNiceWidget )
+   IF .not. ::oRawWidget
+      // signal error
+   ENDIF
+
+   // settin properties here: explained below
+   ::cId := cId
+   XWT_SetProperty( ::oRawWidget, XWT_TYPE_POSITION, nPosX, nPosY )
+RETURN Self
+
+
+  Accessing widgets: property calls
+  ---------------------------------
+
+XWT widgets are meant to be "flexible". An xwt widget could incorporate
+several lower level widgets, or be a derivation or a combination of them.
+Accessing data or managing lower widget status is responsibilit of the DRIVER
+level. To request the DRIVER level to act on the widgets, the XWT INTERNAL
+level calls the following functions:
+
+BOOL xwt_drv_set_property( PXWT_WIDGET wSelf, PXWT_PROPERTY prop );
+BOOL xwt_drv_get_property( PXWT_WIDGET wSelf, PXWT_PROPERTY prop );
+
+PXWT_PROPERTY being a pointer to the following structure:
+
+typedef struct tag_xwt_property
+{
+   int type;
+   union {
+      int number;
+      XWT_POSITION position;
+      XWT_SIZE size;
+      XWT_RECT rect;
+      BOOL setting;
+      PXWT_WIDGET widget;
+      const char *text;
+      void *data;
+   } value;
+} XWT_PROPERTY, *PXWT_PROPERTY;
+
+
+The "type" member is one of the XWT_PROP_* define in xwt.ch. The "value"
+member will be of a kind that depends on property type, and could also be
+unused.
+
+The XWT_POSITION, XWT_SIZE and XWT_RECT structures are just commodity
+structures defined as follows:
+
+typedef struct tag_xwt_position
+{
+   int x;
+   int y;
+} XWT_POSITION, *PXWT_POSITION;
+
+typedef struct tag_xwt_size
+{
+   int width;
+   int height;
+} XWT_SIZE, *PXWT_SIZE;
+
+typedef struct tag_xwt_rect
+{
+   int x;
+   int y;
+   int width;
+   int height;
+} XWT_RECT, *PXWT_RECT;
+
+The PRG Level function XWT_SetProperty() will take care to translate a
+parameter list into a correctly filled XWT_PROPERTY structure, and then pass
+it to the DRIVER level. The implementation of xwt_drv_set_property() is then
+responsible to do something sensible with the request to set the property to a
+certain value, interpreting also the content of the "value" field.
+
+If the request is sucessfully processed, the function will return TRUE. If the
+driver cannot fulfil the request, both because the property is meaningless if
+applied to the passed widget, or because the property setting is still not
+implemented, it will return FALSE.
+
+* TODO: An error system helping to understand why a set_property call has
+  failed.
+
+The xwt_drv_get_property() function has the same meaning, but it set the
+values inside the property structure, instead of reading them. As above, the
+function can return FALSE if it is not able to set the property value, be it
+because the property is meaningless for the widget, because of an underlying
+widget api error or because of an incomplete implementation.
+
+The PRG LEVEL function XWT_GetProperty() works as XWT_SetProperty, but it
+receives parameters passed byref, that are then filled by the INTERNAL level
+on sucessful return of xwt_drv_get_property().
+
+  Example of property usage
+  -------------------------
+
+A typical implementation of DRIVER level get/set property functon for the
+"text" property can be:
+
+// BEGIN
+
+#include "xwt_api.h"
+#include "xwt.ch"
+...
+
+BOOL xwt_drv_set_property( PXWT_WIDGET wSelf, PXWT_PROPERTY prop )
+{
+   switch( prop->type )
+   {
+   ...
+      case XWT_PROP_TEXT:
+         switch( wSelf->type )
+         {
+            ...
+            case XWT_TYPE_TEXTBOX:
+               SetText( (HANDLE) wSelf->widget_data, prop->value.text );
+            return TRUE;
+            ...
+         }
+
+      // We have not found an adequate widget for set text
+      return FALSE;
+   }
+
+   // We have not implemented that property at all
+   return FALSE;
+}
+
+BOOL xwt_drv_get_property( PXWT_WIDGET wSelf, PXWT_PROPERTY prop )
+{
+   switch( prop->type )
+   {
+   ...
+      case XWT_PROP_TEXT:
+         switch( wSelf->type )
+         {
+            ...
+            case XWT_TYPE_TEXTBOX:
+               prop->value.text = GetText( (HANDLE) wSelf->widget_data );
+            return TRUE;
+            ...
+         }
+
+      // We have not found an adequate widget for get text
+      return FALSE;
+   }
+
+   // We have not implemented that property at all
+   return FALSE;
+}
+
+// END
+
+A typical call from inside a PRG LEVEL widget can be:
+
+METHOD SetText( cText ) CLASS MyTextBox
+   IF .not. XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
+      ? "Cannot set text into my text box!"
+      RETURN FALSE
+   ENDIF
+RETURN TRUE
+
+METHOD GetText() CLASS MyTextBox
+   LOCAL cText
+
+   IF .not. XWT_GetProperty( ::oRawWidget, XWT_PROP_TEXT, @cText )
+      ? "Cannot get text from my text box!"
+      RETURN NIL
+   ENDIF
+
+RETURN cText
+
+* NOTICE: Pointer based property (text and data) must be considered as owned
+  by the driver and thus never being mangled directly at INTERNAL or PRG
+  level.
+
+* NOTICE: oRawWidget is a public member. Properties can be set or read also
+  by the final PRG directly by calling i.e.
+
+    XWT_SetProperty( oWidget:oRawWidget, XWT_PROP_TEXT, "Hello world" );
+
+  This could change in the future, as the ownership of basic widget data
+  (text, preferred size and position, etc.) is still under evaluation.
+
+
+  Widget Hierarcy: Adding and removing widgets to widgets
+  -------------------------------------------------------
+
+XWT has an abstract class at PRG Level called XwtContainer: it holds an array
+of owned widgets that are "logically" inside a parent widget. Also, each
+widget has an oOwner member, that is filled with the current parent of the
+widget, if it has any.
+
+This logical ownership structure must be often (if not always) known by the
+DRIVER level, that has to tell the underlying widgeting library about
+ownership relationships.
+
+Ownership could be often handled "on the fly" by the driver, by simply i.e.
+propagating property settings to the objects stored in the aChildren member of
+the parent object, but when those automatic mechanisms are already
+implemented, it is far better to reflect the logical widget ownership
+structure into the phisical layer.
+
+This is done by calling the XWT_Add( oParent::oRawWidget, oChild::oRawWidget )
+and XWT_Remove(oParent::oRawWidget, oChild::oRawWidget ) at PRG level. This
+calls are translated into:
+
+BOOL xwt_drv_add( PXWT_WIDGET wSelf, PXWT_WIDGET wChild );
+BOOL xwt_drv_remove( PXWT_WIDGET wSelf, PXWT_WIDGET wChild );
+
+That must be handled by the driver function, that should return FALSE if
+adding/removing the child widget to the parent one is not possible, or TRUE
+otherwise.
+
+
+  Destroying widgets
+  ------------------
+
+Once the widget is not needed anymore, it must be destroyed. Since the widget
+can be used later by the driver, or the PRG level widget can be used in
+several ways by the PRG program, a direct call to XwtWidget:Destroy() is in
+order. This will be transalted into a call to XWT_Destroy( Self:oRawWidget )
+and the INTERNAL layer will translate it into
+
+BOOL xwt_drv_destroy( PXWT_WIDGET wSelf );
+
+This is to give the dirver the change to free any memory it can have allocated
+to handle the low level widget, and to tell the underlying system that the
+widget is going to be destroyed. The driver is also responsible to free the
+wSelf XWT_WIDGET pointer, and this is a minimal operation that any driver must
+care about.
+
+Destruction of container is done by calling the Destroy() method of each
+child, and then the Destroy() of the container. This gives the chance to
+cleanly remove/destroy the widgets also if they are owned by other low level
+widgets. In fact, most widget libraries have already an internal system that
+destroys all the child widgets of a container, but this mechanism cannot be
+relied upon as the XWT DRIVER layer could have something to say about it...
+So, each child is cleanly destroyed, and the self-destruction mechanism of
+lower level container widget system, if present, is never used.
+
+A typical widget destruction routine is the following:
+
+BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
+{
+   Hide( (HANDLE) wWidget->widget_data );
+   CloseHandle( (HANDLE) wWidget->widget_data );
+   if( wWidget->destructor != NULL )   {
+      wWidget->destructor( wWidget->widget_data );
+   }
+   hb_xfree( wWidget );
+   return TRUE;
+}
+
+(It is just a fantasy example); If the widget data is complex and can vary
+from widget to widget, and if it must be allocated by the driver level, then
+the specific xwt_drv_create() implementation can set a specific destructor
+routine to simplify the job of the xwt_drv_destroy() routine. A switch() based
+on the widget type can work pretty the same way, but this method is more
+elegant.
+
+* NOTICE: the raw widget data MUST be freed by the driver, as it could use a
+  function of his own to allocate XWT_WIDGET strtucture.
+
+
+
+
+THE EVENT SYSTEM
+================
+
+Events are the way that are used by the DRIVER level to communicate with the
+XWT PRG, or with the final application, that something meaningful happened.
+Sometimes, events are generated directly by the PRG level.
+
+Event is a xHarbour class defined as:
+
+CLASS XWTEvent
+   DATA nType
+   DATA oSender
+   DATA aParams
+
+   Method New( nType, oEmitter, aParams)
+ENDCLASS
+
+The event type is one of the XWT_E_* define in the xwt.ch file. oSender is the
+widget sending the event, while the parameters are packed in an array that can
+have length 0 if the event has no paramenter.
+
+Each widget has three core methods that are meant to manage the event
+system:
+
+   oWidget:addListener( xFunction )  or
+   oWidget:addListener( oListener, xMethod )
+   oWidget:addEventListener( iEventType, xFunction ) or
+   oWidget:addEventListener( iEventType, oListener, xMethod )
+   oWidget:RiseEvent( oEvent ) --> bManaged
+
+A listener function has this prototype:
+
+   ListenerFunction( oEvent ) --> bManaged
+
+A listener object, receiving the event in a method has the following
+prototype:
+
+   oListener:Method( oEvent ) --> bManaged
+
+
+  Rising Events
+  -------------
+
+RiseEvent will call all the registered listener (first to last), providing
+them with the received event, untill all the listeners are called or until a
+listener returns TRUE, signaling that the event has been managed and should
+not be forwarded further. A listener can also alter the event, or rise a new
+event, and then return FALSE, so that the event will be sent to other
+listener.
+
+If all the registered listener return FALSE, or if the object rising
+the event hasn't any listener, the event is then passed to the owner, if
+present, by calling ::oOwner:RiseEvent( oEvent ).
+
+RiseEvent returns TRUE if any listener or the owner's RiseEvent has returned
+TRUE, or FALSE otherwise.
+
+* TODO: a variable that inibiths propagation of the event to the owner.
+
+At final application level, RiseEvent can be called directly, or by using the
+utility function XWT_FastRiseEvent( oSender, iType, xParam1 ... xParamN ),
+that will produce an event object only if the event is really sent to an owner
+or processed by some listener, thus sparing useless creation and destruction
+of the event object and parameters array.
+
+* NOTICE: the parameters stored in the parameters array might also differ
+  depending on the widget rising the events. I.e. a button does not signals
+  where the mouse has clicked  it, while "sensible" image does.
+
+
+  Listening to events
+  -------------------
+
+AddListener() and addEventListener() are methods that allow any kind of
+callable item to be used as event notification listeners.
+
+* TODO: InsertListener() to allow placing an event listener at any given
+  position, i.e. before already registered listeners.
+
+The difference among the two is that the latter method, AddEventListener(),
+has an integer as the first parameter that is the XWT_E_* event type that will
+cause that listener to be called. A listener registered with AddListener()
+will be called each time an event is risen by the target object, while
+AddEventListener will call only those functions that are registered fot that
+specific event type. A callable item can be registered any time to the same
+object, so it is possible to have a listener for more than one event type, but
+not for all, by calling AddEventListener() several time.
+
+Callable items that can be registered are:
+
+- Codeblocks
+- Function names (stored in a string)
+- Function references ( e.g. @MyListener() )
+- Objects followed by a method name (stored in a string)
+- Objects followed by a method pointer, obtained by
+   HB_ObjMsgPtr( Object, "MtdName" )
+
+Examples:
+
+   MyButton:AddListener( @ManageButtonEvents() )
+   MyButton:AddEventListener( XWT_E_CLICKED, MyButton, "MethodIamClicked" )
+
+Althoug function and method names can give greater flexibility, and the
+ability to create specific listeners at runtime, they are far less efficient
+than the compile time @() and HB_ObjMsgPtr() counterparts, so use them
+cautiously.
+
+A listener can be registered to more than one widgets; the Event::oSender item
+allows to understand which object generated the event, as Event::iType allows
+to understand what kind of event is passed to the listener.
+
+  Removing Listeners
+  ------------------
+
+Removing a listener can be done simply by calling
+
+   oWidget::RemoveListener( xCallable [, xMethod ] )
+
+All the listening items will be removed at once, even if registered more than
+one time. It is necessary to remove a listener using the same xCallable (and
+eventually xMethod) used to register it. E.g., calling AddListener( "Func" )
+and RemovedListener( @Func() ) won't work
+
+
+  Rising events from within the DRIVER layer
+  ------------------------------------------
+
+When something interesting happens inside the DRIVER, it should rise an event
+to advertise the situation up to the PRG layer. An utility function stored in
+xwt_api.c helps in this duty:
+
+   int xwt_rise_event( PHB_ITEM pObject, int EventType, int argc, ... );
+
+pObject is the object sending the event, EventType is one of the XWT_E_*
+macros stored in xwt.ch, and argc is the number of parameters passed in the
+event parameter array. Those parameters must be PHB_ITEM created by the
+function calling xwt_rise_event(); they can be both in the stack or
+dynamically allocated.
+
+One counter-intuitive thing is that also the pObject must be created by the
+calling function. In fact, xHarbour stores the REAL object inside the
+item.asArray.value element of the xHarbour object. The PHB_ITEM that the PRG
+layer could pass down to the driver i.e. during widget creation is just a
+SHELL for the real object, a shell that can be discarded and destroyed soon
+after the return of the function that is willing to register a call back.
+
+So, if you need to store an object for i.e. rising an event from it in a later
+moment, you must record its asArray value, not the object itself: you must
+record the real object, not its shell.
+
+Here is a tipical code to record an object and later rise an event to it:
+
+PXWT_WIDGET xwt_MyDriver_createTextbox( PHB_ITEM pSelf )
+{
+   PXWT_WIDGET xwtData;
+   MyTextboxStruct *MyTextbox = (allocating a new MyTextbox structure here );
+
+   MyTextbox->owner = pSelf->item.asArray.value;
+   MyTextbox->Handle = ( creating a valid textbox widget here );
+   xwtData->widget_data = MyTextbox;
+   xwtData->type = XWT_TYPE_TEXTBOX;
+
+   return xwtData;
+}
+
+static void box_changed( PXWT_WIDGET wSelf )
+{
+   HB_ITEM String;
+   HB_ITEM Self;
+   MyTextboxStruct *MyTextbox = (MyTextboxStruct *) wSelf->widget_data;
+
+   Self.type = HB_IT_ARRAY;
+   Self.item.asArray.value = MyTextbox->owner;
+
+   hb_itemPutC( &String, GetText( MyTextbox->Handle ) );
+   xwt_rise_event( &Self, XWT_E_CHANGED, 1, &String );
+}
+
+xwt_rise_event will create the event object and then call the RiseEvent method
+only if this is meaningful for the target object.
+
