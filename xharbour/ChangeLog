@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3947 2005/03/17 00:41:16 modalsist Exp $
+ * $Id: ChangeLog,v 1.3948 2005/03/17 00:55:15 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-16 18:05 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/pp/ppcore.c
+    * Corrected md_strAt() to ignore ',' inside {....}, <Array>[...], and (...)
+      /* Needed after recent removal of [] state. */
 
 2005-03-17 01:45 UTC-0100 Ath <Ath1 at sourceforg.net>
   * tests/tiptest/base64.prg
@@ -18,7 +23,7 @@
     + added volserial() function.
   * xharbour/tests/cttest/volser.prg
     + added test of volserial ct function.
-      ps: this is my last post before beta 1.4 release. 
+      ps: this is my last post before beta 1.4 release.
 
 2005-03-16 16:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/w32/xcc.cf

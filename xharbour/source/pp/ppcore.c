@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.200 2005/03/10 23:19:39 andijahja Exp $
+ * $Id: ppcore.c,v 1.201 2005/03/15 18:02:51 ronpinkas Exp $
  */
 
 /*
@@ -6338,9 +6338,23 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            }
         }
 
-        if( ( !lSubPos ) && checkPrth &&
-          ( ( (kolPrth > 1) || (kolPrth == 1 && *(szText+lPos) != '(') || (kolPrth == 0 && *(szText+lPos) == ')') )
-            || ( (kolFig > 1) || (kolFig == 1 && *(szText+lPos) != '{') || (kolFig == 0 && *(szText+lPos) == '}') ) ) )
+        if( checkPrth && lSubLen == 1 && szSub[0] == ',' )
+        {
+           if( kolPrth || kolSquare || kolFig )
+           {
+              cLastChar = *(szText+lPos);
+              lPos++;
+              continue;
+           }
+        }
+
+        // Above section is NOT enough, do NOT remeove this if() and do NOT uncomment the commented line.
+        if( lSubPos == 0 && checkPrth &&
+          (
+            ( kolPrth   > 1 || ( kolPrth   == 1 && *( szText + lPos ) != '(' ) || ( kolPrth   == 0 && *( szText + lPos ) == ')' ) ) ||
+         /* ( kolSquare > 1 || ( kolSquare == 1 && *( szText + lPos ) != '[' ) || ( kolSquare == 0 && *( szText + lPos ) == ']' ) ) || */
+            ( kolFig    > 1 || ( kolFig    == 1 && *( szText + lPos ) != '{' ) || ( kolFig    == 0 && *( szText + lPos ) == '}' ) ) )
+          )
         {
            cLastChar = *(szText+lPos);
            lPos++;
