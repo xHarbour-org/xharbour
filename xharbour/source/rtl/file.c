@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.16 2004/03/03 20:34:52 andijahja Exp $
+ * $Id: file.c,v 1.17 2004/07/21 21:50:33 peterrees Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbset.h"
+
 BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
@@ -77,7 +78,7 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
        {
           bResult = TRUE;
        }
-       else if ( strchr( pFilename, '*' ) || strchr( pFilename, '?' ) ) // Clipper compatibility
+       else if ( strchr( ( const char *) pFilename, '*' ) || strchr( ( const char *) pFilename, '?' ) ) // Clipper compatibility
        {                                                                // FindFirst may have found a directory first
        	 while( !bResult && hb_fsFindNext( ffind ) )
        	 {
