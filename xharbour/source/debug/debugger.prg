@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.6 2003/04/01 22:30:37 iananderson Exp $
+ * $Id: debugger.prg,v 1.7 2003/04/09 20:57:05 lculik Exp $
  */
 
 /*
@@ -623,7 +623,7 @@ METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
    local lPrevScore := Set( _SET_SCOREBOARD, .f. )
    local lPrevExit  := Set( _SET_EXIT, .t. )
    local cColor     := PadR( '"' + ::aColors[ nColor ] + '"',;
-                             oBrwColors:aColumns[ 2 ]:Width )
+                             oBrwColors:aColumns[ 2,1 ]:Width )
 
    oBrwColors:RefreshCurrent()
    oBrwColors:ForceStable()
@@ -652,7 +652,7 @@ METHOD EditSet( nSet, oBrwSets ) CLASS TDebugger
    local GetList    := {}
    local lPrevScore := Set( _SET_SCOREBOARD, .f. )
    local lPrevExit  := Set( _SET_EXIT, .t. )
-   local cSet       := PadR( ValToStr( Set( nSet ) ), oBrwSets:aColumns[ 2 ]:Width )
+   local cSet       := PadR( ValToStr( Set( nSet ) ), oBrwSets:aColumns[ 2,1 ]:Width )
 
    oBrwSets:RefreshCurrent()
    oBrwSets:ForceStable()
@@ -1177,6 +1177,15 @@ METHOD ShowVars() CLASS TDebugger
                                                              Len( ::aVars ) ),;
                                If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
 
+      nWidth := ::oWndVars:nWidth() - 1
+      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
+         ::oWndVars:nWidth() - 5 ), "" ) } ) )
+      AAdd(::oBrwVars:Cargo[2],::avars)
+      oCol:DefColor:={2,1}
+      if Len( ::aVars ) > 0
+         ::oBrwVars:ForceStable()
+      endif
 
       ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::obrwVars:ForceStable(),RefreshVarsS(::oBrwVars) ),) }
 
@@ -1188,15 +1197,6 @@ METHOD ShowVars() CLASS TDebugger
       , iif( nKey == K_END, ::oBrwVars:GoBottom(), nil ) ;
       , iif( nKey == K_ENTER, ::EditVar( ::oBrwVars:Cargo[1] ), nil ), ::oBrwVars:ForceStable() ) }
 
-      nWidth := ::oWndVars:nWidth() - 1
-      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
-         ::oWndVars:nWidth() - 5 ), "" ) } ) )
-      AAdd(::oBrwVars:Cargo[2],::avars)
-      oCol:DefColor:={2,1}
-      if Len( ::aVars ) > 0
-         ::oBrwVars:ForceStable()
-      endif
    else
       ::LoadVars()
 
