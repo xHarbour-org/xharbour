@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.64 2004/01/21 23:08:46 walito Exp $
+ * $Id: itemapi.c,v 1.65 2004/01/21 23:39:58 walito Exp $
  */
 
 /*
@@ -1547,7 +1547,8 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
 #ifndef HB_LONG_LONG_OFF
                case HB_IT_LONGLONG:
-                  iBytes = sprintf( szResult, "%*I64i", iWidth, pNumber->item.asLongLong.value );
+                  iBytes = sprintf( szResult, "%*Ld", iWidth, pNumber->item.asLongLong.value );
+		  
                   break;
 #endif
 
@@ -1703,7 +1704,7 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
       #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         sprintf( buffer, "%I64d", hb_itemGetNLL( pItem ) );
+         sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
          szText = buffer;
          *pulSize = strlen( szText );
       }
@@ -1799,8 +1800,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLL( PHB_ITEM pItem, LONGLONG llNumber )
    pItem->type = HB_IT_LONGLONG;
    pItem->item.asLongLong.length = 20;
    pItem->item.asLongLong.value = llNumber;
-
-
+  
    return pItem;
 }
 

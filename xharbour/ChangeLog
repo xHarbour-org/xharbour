@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2159 2004/01/27 17:57:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2160 2004/01/27 21:18:59 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-27 19:35 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  * source/vm/itemapi.c
+    ! fixes to hb_itemStr and  hb_itemString (mask for sprintf I64d on linux
+     give  functions like directory return an ******* insted of numeric)
+
 2004-01-28 10:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/file.c
     * hb_fsFile() update to fail on Win32 for a directory. Fixes FILE()
