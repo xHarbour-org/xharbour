@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.310 2002/07/17 12:11:11 walito Exp $
+ * $Id: ChangeLog,v 1.311 2002/07/17 15:08:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-17 08:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/idle.c
+    + Added missing hb_itemRelease() based on suggestion from Niko Mikkila.
+  * tests/testidle.prg
+    * Minor revisions
 
 2002-07-17 08:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

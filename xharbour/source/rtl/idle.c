@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.1.1.1 2001/12/21 10:41:36 ronpinkas Exp $
+ * $Id: idle.c,v 1.2 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -267,6 +267,7 @@ HB_FUNC( HB_IDLEDEL )
          if( ulID == ( ULONG ) pItem->item.asBlock.value )
          {
              hb_itemReturn( pItem ); /* return a codeblock */
+             hb_itemRelease( pItem );
 
              --s_uiIdleMaxTask;
              if( s_uiIdleMaxTask )

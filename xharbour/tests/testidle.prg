@@ -2,11 +2,13 @@
 
 PROCEDURE MAIN()
 
+   LOCAL nID
+
    CLS
 
    ? "DEFAULT IDLEREPEAT =", SET( _SET_IDLEREPEAT )
    ?
-   ? "Idle Block should be displayed multiple times until key or 10 seconds elapsed!"
+   ? "Idle Block should be displayed multiple times until key or 2 seconds elapsed!"
    ? "Press any key to begin..."
    ?
    Inkey(0)
@@ -16,15 +18,17 @@ PROCEDURE MAIN()
 
    SET( _SET_IDLEREPEAT, .F. )
 
-   HB_IDLEADD( {|| QOut( "Idle Block2" ) } )
+   nID := HB_IDLEADD( {|| QOut( "Idle Block2" ) } )
 
    CLS
-   ? "Idle Block & Block-2 should display ONCE! while waitning for key or 10 seconds elapsed!"
+   ? "Idle Block & Block-2 should display ONCE! while waitning for key or 2 seconds elapsed!"
    ?
    Inkey( 2 )
 
+   HB_IDLEDEL( nID)
+
    ?
-   ? "Again - Idle Block & Block-2 should display ONCE! while waitning for key or 10 seconds elapsed!"
+   ? "Idle Block but NO Block-2 should display ONCE! while waitning for key or 2 seconds elapsed!"
    ?
    Inkey( 2 )
    ?
