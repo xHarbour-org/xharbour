@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.39 2003/01/30 13:18:17 lculik Exp $
+ * $Id: tget.prg,v 1.40 2003/02/25 03:44:36 walito Exp $
  */
 
 /*
@@ -1010,7 +1010,7 @@ METHOD IsEditable( nPos ) CLASS Get
 
    Switch ::type
    case "C"
-      return cChar IN "!ANX9#"
+      return cChar IN "!ANXY9#"
    case "N"
       return cChar IN "9#$*"
    case "D"
