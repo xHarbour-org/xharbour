@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2002/01/23 16:48:31 ronpinkas Exp $
+# $Id: Makefile,v 1.5 2002/12/18 16:32:07 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -22,9 +22,11 @@ C_SOURCES=\
 	classes.c    \
 	cmdarg.c     \
 	debug.c      \
+        do.c         \
 	dynlibhb.c   \
 	dynsym.c     \
 	codebloc.c   \
+        errorapi.c   \
 	estack.c     \
 	eval.c       \
 	evalhb.c     \
@@ -32,6 +34,7 @@ C_SOURCES=\
 	fm.c         \
 	garbage.c    \
 	hvm.c        \
+        inet.c       \
 	initexit.c   \
 	initsymb.c   \
 	itemapi.c    \

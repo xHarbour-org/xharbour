@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.40 2002/12/07 02:54:53 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.41 2003/01/05 02:39:45 mlombardo Exp $
  */
 
 /*
@@ -1658,6 +1658,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         if( pLen == NULL )
                         {
                            pLen = hb_compExprNewLong( pString->ulLength );
+                           pStart->pNext = pLen;
                         }
 
                         // Optimization only possible if BOTH nStart and nLen are numerics.
@@ -1702,19 +1703,20 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                            memcpy( sSubStr, pString->value.asString.string + pStart->value.asNum.lVal - 1, pLen->value.asNum.lVal );
                            sSubStr[ pLen->value.asNum.lVal ] = '\0';
 
-                           #if defined( HB_MACRO_SUPPORT )
-                              hb_xfree( pString->value.asString.string );
-                           #endif
+                           pReduced = hb_compExprNew( HB_ET_STRING );
+                           pReduced->ValType = HB_EV_STRING;
 
-                           pString->value.asString.string = sSubStr;
-                           pString->ulLength = pLen->value.asNum.lVal;
-                           pString->value.asString.dealloc = TRUE;
+                           pReduced->value.asString.string = sSubStr;
+                           pReduced->ulLength = pLen->value.asNum.lVal;
+                           pReduced->value.asString.dealloc = TRUE;
 
-                           // Skipping over the first paramter, being used by the optimization.
-                           pSelf->value.asFunCall.pParms->value.asList.pExprList = pStart;
-                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                           // Delete the pre-optimization components.
+                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
 
-                           pSelf = pString;
+                          //pSelf = pReduced;
+                          memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                          HB_XFREE( pReduced );
                         }
                      }
                      // SubStr( Str, n, 1 ) => Str[n]
@@ -1794,12 +1796,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          {
             USHORT usCount;
 
-         #if defined( HB_MACRO_SUPPORT )
-
-            /* This optimization is not applicable in Macro Compiler. */
-
-         #else
-
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
                BYTE   bPcode = 0;
@@ -1816,7 +1812,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                }
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_ENUMINDEX" ) == 0 )
                {
-                   hb_compGenPCode1( HB_P_ENUMINDEX );
+                   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENUMINDEX );
 
                    break;
                }
@@ -1825,7 +1821,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                {
                   usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
-                  if( usCount == 2 )
+                  if( usCount >= 2 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
                      HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
@@ -1839,14 +1835,13 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         }
                         HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
 
-                        hb_compGenPCode3( bPcode, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+                        HB_EXPR_GENPCODE3( hb_compGenPCode3, bPcode, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
 
                         break;
                      }
                   }
                }
             }
-         #endif
 
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
@@ -2338,20 +2333,22 @@ static HB_EXPR_FUNC( hb_compExprUseVariable )
 
 static HB_EXPR_FUNC( hb_compExprUseSend )
 {
-   USHORT iVar;
    switch( iMessage )
    {
       case HB_EA_REDUCE:
          {
             #ifdef HB_MACRO_SUPPORT
 
-               iVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol, HB_MACRO_PARAM );
 
-               if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE && iVar == 0 )
+               if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE )
                {
-                  /* Change VARIABLE to MEMVAR->VARIABLE
-                  */
-                  pSelf->value.asMessage.pObject = hb_compExprNewAliasVar( hb_compExprNewAlias("MEMVAR"), pSelf->value.asMessage.pObject );
+                  USHORT usVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol, HB_MACRO_PARAM );
+
+                  if( usVar == 0 )
+                  {
+                     // Change VARIABLE to MEMVAR->VARIABLE
+                     pSelf->value.asMessage.pObject = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_strdup( "MEMVAR" ) ), pSelf->value.asMessage.pObject );
+                  }
                }
             #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.52 2002/12/30 06:52:58 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.53 2002/12/30 19:43:59 ronpinkas Exp $
  */
 
 /*
@@ -233,12 +233,16 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     #define hb_ret()                             hb_itemClear( &HB_VM_STACK.Return )
     #define hb_reta( ulLen )                     hb_arrayNew( &HB_VM_STACK.Return, (ulLen) )
     #define hb_retc( szText )                    hb_itemPutC( &HB_VM_STACK.Return, (szText) )
-    #define hb_retcAdopt( szText )               hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), strlen( szText ) )
-    #define hb_retcStatic( szText )              hb_itemPutCConst( &HB_VM_STACK.Return, (szText) )
     #define hb_retclen( szText, ulLen )          hb_itemPutCL( &HB_VM_STACK.Return, (szText), (ulLen) )
-    #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), (ulLen) )
-    #define hb_retclenAdoptRaw( szText, ulLen )  hb_itemPutCRaw( &HB_VM_STACK.Return, (szText), (ulLen) )
-    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &HB_VM_STACK.Return, (szText) )
+
+    #define hb_retcAdopt( szText )                    hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), strlen( szText ) )
+    #define hb_retclenAdopt( szText, ulLen )          hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), (ulLen) )
+    #define hb_retclenAdoptRaw( szText, ulLen )       hb_itemPutCRaw( &HB_VM_STACK.Return, (szText), (ulLen) )
+    #define hb_retclenAdoptRawStatic( szText, ulLen ) hb_itemPutCRawStatic( &HB_VM_STACK.Return, (szText), (ulLen) )
+
+    #define hb_retcStatic( szText )              hb_itemPutCStatic( &HB_VM_STACK.Return, (szText) )
+    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLStatic( &HB_VM_STACK.Return, (szText), (ulLen) )
+
     #define hb_retds( szDate )                   hb_itemPutDS( &HB_VM_STACK.Return, (szDate) )
     #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &HB_VM_STACK.Return, (lYear), (lMonth), (lDay) )
     #define hb_retdl( lJulian )                  hb_itemPutDL( &HB_VM_STACK.Return, (lJulian) )
@@ -256,12 +260,16 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
     extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */
     extern void  HB_EXPORT  hb_retc( char * szText );   /* returns a string */
-    extern void  HB_EXPORT  hb_retcAdopt( char * szText );
-    extern void  HB_EXPORT  hb_retcStatic( char * szText );
     extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
+
+    extern void  HB_EXPORT  hb_retcAdopt( char * szText );
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retclenAdoptRawStatic( char * szText, ULONG ulLen );
+
+    extern void  HB_EXPORT  hb_retcStatic( char * szText );
     extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
+
     extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
     extern void  HB_EXPORT  hb_retdl( long lJulian );   /* returns a long value as a julian date */

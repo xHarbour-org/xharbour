@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.146 2003/01/02 09:05:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.147 2003/01/02 20:14:09 ronpinkas Exp $
  */
 
 /*
@@ -390,8 +390,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_conInit();    /* initialize Console */
    HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
    hb_memvarsInit();
-   HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
-   hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
+
+   //HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
+   //hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
 
    /* Set the language to the default */
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.26 2002/12/20 20:20:32 ronpinkas Exp $
+# $Id: makefile.vc,v 1.27 2002/12/24 00:46:05 lculik Exp $
 #
 
 #
@@ -255,9 +255,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\direct.obj \
    $(OBJ_DIR)\diskspac.obj \
    $(OBJ_DIR)\disksphb.obj \
-   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\empty.obj \
-   $(OBJ_DIR)\errorapi.obj \
    $(OBJ_DIR)\file.obj \
    $(OBJ_DIR)\filehb.obj \
    $(OBJ_DIR)\filesys.obj \
@@ -272,7 +270,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\idle.obj \
-   $(OBJ_DIR)\inet.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
    $(OBJ_DIR)\isprint.obj \
@@ -628,7 +625,9 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
    $(OBJ_DIR)\debug.obj \
+   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\dynsym.obj \
+   $(OBJ_DIR)\errorapi.obj \
    $(OBJ_DIR)\estack.obj \
    $(OBJ_DIR)\eval.obj \
    $(OBJ_DIR)\evalhb.obj \
@@ -636,6 +635,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\fm.obj \
    $(OBJ_DIR)\garbage.obj \
    $(OBJ_DIR)\hvm.obj \
+   $(OBJ_DIR)\inet.obj \
    $(OBJ_DIR)\initexit.obj \
    $(OBJ_DIR)\initsymb.obj \
    $(OBJ_DIR)\itemapi.obj \

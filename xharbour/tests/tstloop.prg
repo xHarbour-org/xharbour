@@ -1,6 +1,7 @@
 Procedure Main()
 
-   LOCAL Counter, nStart, nEnd, nVar := 0, nOther
+   LOCAL nStart, nTemp, Counter, nEnd, nVar := 0, nOther
+   LOCAL cVar, cTemp
 
    nStart := Seconds()
    nTemp := Seconds()
@@ -41,6 +42,26 @@ Procedure Main()
    NEXT
    ? nVar, nOther
    ? ":= += Loops:", Seconds() - nTemp
+   ?
+
+   nTemp := Seconds()
+   FOR Counter := 1 TO 1000000
+      cTemp := "Hello"
+      cVar := SubStr( cTemp, 3, 1 )
+   NEXT
+   ? cTemp, cVar
+   ? "SubStr Loops:", Seconds() - nTemp
+   ?
+
+   nTemp := Seconds()
+   nVar := 0
+   WHILE .T.
+      IF nVar++ == 1000000
+         EXIT
+      ENDIF
+   END 
+   ? nVar
+   ? "++ While Loops:", Seconds() - nTemp
    ?
 
    nTemp := Seconds()

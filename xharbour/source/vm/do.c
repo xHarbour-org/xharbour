@@ -1,12 +1,12 @@
 /*
- * $Id: oemansi.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: do.c,v 1.3 2002/12/19 18:15:34 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * OEM <-> ANSI string conversion functions (Win32 specific, Xbase++ ext.)
+ * DO command/function
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 1999 Ryszard Glab <rglab@imid.med.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,80 +50,77 @@
  *
  */
 
-/* NOTE: These are Win32 specific, for other platforms it will return the
-         passed parameter unchanged. */
-
-#define HB_OS_WIN_32_USED
-
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
+#include "hbapierr.h"
+#include "hbvm.h"
 #include "hbstack.h"
 
-#ifdef HB_EXTENSION
+/* NOTE: DO() as a function is a Harbour extension. [vszakats] */
 
-HB_FUNC( HB_ANSITOOEM )
+HB_FUNC( DO )
 {
-   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
-   if( pString )
-#if defined(HB_OS_WIN_32)
+   if( HB_IS_STRING( pItem ) )
    {
-      DWORD ulLen = hb_itemGetCLen( pString );
-      char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );
+      PHB_DYNS pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pItem ) );
 
-      CharToOemBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
+      if( pDynSym )
+      {
+         USHORT uiPCount = hb_pcount();
+         USHORT uiParam;
 
-      hb_retclenAdopt( pszDst, ulLen );
+         hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_vmPushNil();
+
+         for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
+         {
+            hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+         }
+
+         hb_vmDo( uiPCount - 1 );
+      }
+      else
+      {
+         PHB_ITEM pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
+
+         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pItem ), 1, pArgsArray );
+         hb_itemRelease( pArgsArray );
+      }
    }
-#else
-      hb_itemReturnCopy( pString );
-#endif
+   else if( HB_IS_BLOCK( pItem ) )
+   {
+      USHORT uiPCount = hb_pcount();
+      USHORT uiParam;
+
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pItem );
+      for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
+         hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+      hb_vmSend( uiPCount - 1 );
+   }
+   else if( HB_IS_SYMBOL( pItem ) )
+   {
+      USHORT uiPCount = hb_pcount();
+      USHORT uiParam;
+
+      hb_vmPushSymbol( pItem->item.asSymbol.value );
+      hb_vmPushNil();
+
+      for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
+      {
+         hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+      }
+
+      hb_vmDo( uiPCount - 1 );
+   }
    else
    {
-      hb_retc( "" );
+      PHB_ITEM pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
+
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DO", 1, pArgsArray );
+      hb_itemRelease( pArgsArray );
    }
 }
 
-HB_FUNC( HB_OEMTOANSI )
-{
-   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
-
-   if( pString )
-#if defined(HB_OS_WIN_32)
-   {
-      DWORD ulLen = hb_itemGetCLen( pString );
-      char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );
-
-      OemToCharBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
-
-      hb_retclenAdopt( pszDst, ulLen );
-   }
-#else
-      hb_itemReturnCopy( pString );
-#endif
-   else
-   {
-      hb_retc( "" );
-   }
-}
-
-#endif
-
-#ifdef HB_COMPAT_XPP
-
-/* NOTE: Xbase++ compatible function */
-
-HB_FUNC( CONVTOOEMCP )
-{
-   HB_FUNCNAME( HB_ANSITOOEM )();
-}
-
-/* NOTE: Xbase++ compatible function */
-
-HB_FUNC( CONVTOANSICP )
-{
-   HB_FUNCNAME( HB_OEMTOANSI )();
-}
-
-#endif

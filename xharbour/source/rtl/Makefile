@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.10 2002/12/19 22:25:25 jonnymind Exp $
+# $Id: Makefile,v 1.11 2002/12/24 00:42:47 lculik Exp $
 #
 
 ROOT = ../../
@@ -30,9 +30,7 @@ C_SOURCES=\
 	direct.c     \
 	diskspac.c   \
 	disksphb.c   \
-	do.c         \
 	empty.c      \
-	errorapi.c   \
 	file.c       \
 	filehb.c     \
 	filesys.c    \
@@ -47,7 +45,6 @@ C_SOURCES=\
 	gx.c         \
 	hardcr.c     \
 	idle.c       \
-	inet.c       \
 	inkey.c      \
 	is.c         \
 	isprint.c    \

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.14 2002/09/21 05:21:06 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.15 2002/10/25 07:57:21 andijahja Exp $
  */
 
 /*
@@ -115,6 +115,7 @@ extern PHB_ITEM HB_EXPORT hb_itemPutPtr       ( PHB_ITEM pItem, void * pValue );
 extern PHB_ITEM HB_EXPORT hb_itemPutPtrGC     ( PHB_ITEM pItem, void * pValue );
 extern BOOL     HB_EXPORT hb_itemRelease      ( PHB_ITEM pItem );
 extern PHB_ITEM HB_EXPORT hb_itemReturn       ( PHB_ITEM pItem );
+extern PHB_ITEM HB_EXPORT hb_itemReturnCopy   ( PHB_ITEM pItem );
 extern ULONG    HB_EXPORT hb_itemSize         ( PHB_ITEM pItem );
 extern USHORT   HB_EXPORT hb_itemType         ( PHB_ITEM pItem );
 extern char     HB_EXPORT * hb_itemTypeStr      ( PHB_ITEM pItem );

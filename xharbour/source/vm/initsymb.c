@@ -1,5 +1,5 @@
 /*
- * $Id: initsymb.c,v 1.1.1.1 2001/12/21 10:40:57 ronpinkas Exp $
+ * $Id: initsymb.c,v 1.2 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,8 @@
  *
  */
 
+#if 0 // Why should we force inclusion of teh RTL Symbols???
+
 #include "hbapi.h"
 #include "hbvm.h"
 
@@ -96,6 +98,7 @@ extern HB_FUNC( PROW );
 extern HB_FUNC( RECCOUNT );
 extern HB_FUNC( RECNO );
 extern HB_FUNC( REPLICATE );
+extern HB_FUNC( RIGHT );
 extern HB_FUNC( RLOCK );
 extern HB_FUNC( ROUND );
 extern HB_FUNC( ROW );
@@ -161,6 +164,7 @@ static HB_SYMB symbols[] = {
    { "RECCOUNT"  , HB_FS_PUBLIC, HB_FUNCNAME( RECCOUNT )   , NULL },
    { "RECNO"     , HB_FS_PUBLIC, HB_FUNCNAME( RECNO )      , NULL },
    { "REPLICATE" , HB_FS_PUBLIC, HB_FUNCNAME( REPLICATE )  , NULL },
+   { "RIGHT"     , HB_FS_PUBLIC, HB_FUNCNAME( REPLICATE )  , NULL },
    { "RLOCK"     , HB_FS_PUBLIC, HB_FUNCNAME( RLOCK )      , NULL },
    { "ROUND"     , HB_FS_PUBLIC, HB_FUNCNAME( ROUND )      , NULL },
    { "ROW"       , HB_FS_PUBLIC, HB_FUNCNAME( ROW )        , NULL },
@@ -193,3 +197,4 @@ void hb_vmSymbolInit_RT( void )
    hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PCODE_VER );
 }
 
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: memofile.c,v 1.4 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -96,16 +96,22 @@ HB_FUNC( MEMOREAD )
 
             hb_fsClose( fhnd );
 
-            hb_itemPutCPtr( &(HB_VM_STACK.Return), ( char * ) pbyBuffer, ulSize );
+            hb_retclenAdopt( ( char * ) pbyBuffer, ulSize );
          }
          else
+         {
             hb_retc( "" );
+         }
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 
 HB_FUNC( MEMOWRIT )

@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.6 2002/05/06 02:52:07 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.7 2002/12/19 18:15:34 ronpinkas Exp $
  */
 
 /*
@@ -70,25 +70,7 @@ HB_FUNC( CHR )
                can be divided by 256 but it's not zero, in this case it
                will return an empty string instead of a Chr(0). [vszakats] */
 
-
-      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-      {
-         if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
-         {
-            hb_itemReleaseString( &(HB_VM_STACK.Return) );
-         }
-         else
-         {
-            hb_itemFastClear( &(HB_VM_STACK.Return) );
-         }
-      }
-
-      /* Believe it or not, clipper does this! */
-      ( &(HB_VM_STACK.Return) )->item.asString.value   = hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ];
-      ( &(HB_VM_STACK.Return) )->item.asString.length  = 1;
-      ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
-      //( &(HB_VM_STACK.Return) )->item.asString.bChar   = TRUE;
-      ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+      hb_retclenStatic( hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ], 1 );
    }
    else
    {

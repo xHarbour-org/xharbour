@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.19 2002/12/20 19:41:41 ronpinkas Exp $
+# $Id: makefile.bc,v 1.20 2002/12/24 00:42:47 lculik Exp $
 #
 
 #
@@ -236,9 +236,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\direct.obj \
    $(OBJ_DIR)\diskspac.obj \
    $(OBJ_DIR)\disksphb.obj \
-   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\empty.obj \
-   $(OBJ_DIR)\errorapi.obj \
    $(OBJ_DIR)\file.obj \
    $(OBJ_DIR)\filehb.obj \
    $(OBJ_DIR)\filesys.obj \
@@ -253,7 +251,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\idle.obj \
-   $(OBJ_DIR)\inet.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
    $(OBJ_DIR)\isprint.obj \
@@ -543,8 +540,10 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
    $(OBJ_DIR)\debug.obj \
+   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\dynlibhb.obj \
    $(OBJ_DIR)\dynsym.obj \
+   $(OBJ_DIR)\errorapi.obj \
    $(OBJ_DIR)\estack.obj \
    $(OBJ_DIR)\eval.obj \
    $(OBJ_DIR)\evalhb.obj \
@@ -552,6 +551,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\fm.obj \
    $(OBJ_DIR)\garbage.obj \
    $(OBJ_DIR)\hvm.obj \
+   $(OBJ_DIR)\inet.obj \
    $(OBJ_DIR)\initexit.obj \
    $(OBJ_DIR)\initsymb.obj \
    $(OBJ_DIR)\itemapi.obj \
@@ -1090,11 +1090,19 @@ $(OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
+$(OBJ_DIR)\do.obj : $(VM_DIR)\do.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
+
 $(OBJ_DIR)\dynlibhb.obj : $(VM_DIR)\dynlibhb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dynsym.obj : $(VM_DIR)\dynsym.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\errorapi.obj : $(VM_DIR)\errorapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
@@ -1130,6 +1138,10 @@ $(OBJ_DIR)\harbinit.obj : $(OBJ_DIR)\harbinit.c
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\inet.obj : $(VM_DIR)\inet.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
@@ -1383,10 +1395,6 @@ $(OBJ_DIR)\dircmd.obj : $(OBJ_DIR)\dircmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\do.obj : $(RTL_DIR)\do.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
 $(OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -1395,10 +1403,6 @@ $(OBJ_DIR)\dummy.obj : $(OBJ_DIR)\dummy.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\errorapi.obj : $(RTL_DIR)\errorapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
@@ -1485,10 +1489,6 @@ $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\inet.obj : $(RTL_DIR)\inet.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**

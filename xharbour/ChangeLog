@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.583 2003/01/04 13:14:07 jonnymind Exp $
+ * $Id: ChangeLog,v 1.584 2003/01/05 02:39:36 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,55 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-04 22:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Corrected typos related to hb_retcStatic() and hb_reclenStatic()
+
+  * include/hbapiitm.h
+  * source/vm/fastitem.c
+    + Added hb_itemReturnCopy();
+    + Added hb_retclenAdoptRawStatic()
+
+  * source/rtl/chrasc.c
+  * source/rtl/left.c
+  * source/rtl/memofile.c
+  * source/rtl/oemansi.c
+  * source/rtl/setkey.c
+  * source/rtl/str.c
+  * source/rtl/transfrm.c
+    * Removed direct access to HB_VM_STACK.
+
+  - source/rtl/do.c
+  - source/rtl/errorapi.c
+  - source/rtl/inet.c
+  + source/vm/do.c
+  + source/vm/errorapi.c
+  + source/vm/inet.c
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * source/rtl/makefile.bc
+  * source/vm/makefile.bc
+    -+ Moved HB_VM_STACK (THREAD) dependant modules to VM.
+
+  * source/vm/initsymb.c
+    + Added missing Right()
+
+  * source/vm/hvm.c
+    - Commented out call to hb_vmSymbolInit() // I belive this to be redandant.
+
+  * include/hbexprb.c
+    * Minor corrections to recent fix of macro optimizations of NonLocalVar:AnyMessage
+    * Minor correction to optimization of SubStr()
+    * Made Left(), Right() and HB_EnumIndex() optimizations avialable at macro compiler too.
+
+  * tests/tstloop.prg
+    + Added WHILE .T. test
+
 2003-01-05 02:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * include\hbexprb.c
     ! Changes in hb_compExprUseSend() optimizer to transform anyvar:anymessage
-      into memvar->anyvar:anymessage during macro compilation (Cl*pper 
+      into memvar->anyvar:anymessage during macro compilation (Cl*pper
       compatibility)
 
 2003-01-04 14:09 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>

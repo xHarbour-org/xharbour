@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.5 2002/07/23 17:44:03 ronpinkas Exp $
+ * $Id: str.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -123,11 +123,11 @@ HB_FUNC( HB_POINTER2STRING )
    {
       if( pLen )
       {
-         hb_itemPutCRawStatic( &(HB_VM_STACK.Return), (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+         hb_retclenAdoptRawStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
       }
       else
       {
-         hb_itemPutCStatic( &(HB_VM_STACK.Return), (char *) hb_itemGetNL( pPointer ) );
+         hb_retcStatic( (char *) hb_itemGetNL( pPointer ) );
       }
    }
    else
