@@ -2874,34 +2874,39 @@ static LPCDXTAG hb_cdxIndexAddTag( LPCDXINDEX pIndex, char * szTagName, char * s
                                PHB_ITEM pKeyItem, BYTE bType, USHORT uiLen, char * szForExp,
                                PHB_ITEM pForItem, BOOL bAscending, BOOL bUnique, BOOL bCustom )
 {
-   LPCDXTAG pTag, pLastTag;
+   LPCDXTAG pTag, pTagTmp, pLastTag;
    LPCDXKEYINFO pKey;
-
-   hb_cdxTagTagOpen( pIndex->pCompound, 0 );
-   pKey = hb_cdxKeyNew();
-   pKey = hb_cdxKeyPutC( pKey, szTagName, CDX_MAX_TAG_NAME_LEN );
-   pTag = pIndex->TagList;
-   pLastTag = NULL;
-   while( pTag != NULL )
-   {
-      if( hb_stricmp( pTag->szName, szTagName ) == 0 )
-      {
-         pKey->Tag = pTag->TagBlock;
-         if( hb_cdxTagKeyFind( pIndex->pCompound, pKey ) > 0 )
-            hb_cdxPageDeleteKey( pIndex->pCompound->RootPage );
-         if( pLastTag == NULL )
-            pIndex->TagList = pTag->pNext;
-         else
-            pLastTag->pNext = pTag->pNext;
-         hb_cdxTagFree( pTag );
-         break;
-      }
-      pLastTag = pTag;
-      pTag = pTag->pNext;
-   }
 
    /* Create new tag an add to tag list */
    pTag = hb_cdxTagNew( pIndex, szTagName, -1 );
+
+   hb_cdxTagIndexTagNew( pTag, szKeyExp, pKeyItem, bType, uiLen, szForExp,
+                         pForItem, bAscending, bUnique, bCustom );
+
+   /* Delete previous tag an new one add to tag list */
+   hb_cdxTagTagOpen( pIndex->pCompound, 0 );
+   pKey = hb_cdxKeyNew();
+   pKey = hb_cdxKeyPutC( pKey, szTagName, CDX_MAX_TAG_NAME_LEN );
+   pTagTmp = pIndex->TagList;
+   pLastTag = NULL;
+   while( pTagTmp != NULL )
+   {
+      if( hb_stricmp( pTagTmp->szName, szTagName ) == 0 )
+      {
+         pKey->Tag = pTagTmp->TagBlock;
+         if( hb_cdxTagKeyFind( pIndex->pCompound, pKey ) > 0 )
+            hb_cdxPageDeleteKey( pIndex->pCompound->RootPage );
+         if( pLastTag == NULL )
+            pIndex->TagList = pTagTmp->pNext;
+         else
+            pLastTag->pNext = pTagTmp->pNext;
+         hb_cdxTagFree( pTagTmp );
+         break;
+      }
+      pLastTag = pTagTmp;
+      pTagTmp = pTagTmp->pNext;
+   }
+
    if( pIndex->TagList == NULL )
       pIndex->TagList = pTag;
    else
@@ -2911,8 +2916,7 @@ static LPCDXTAG hb_cdxIndexAddTag( LPCDXINDEX pIndex, char * szTagName, char * s
          pLastTag = pLastTag->pNext;
       pLastTag->pNext = pTag;
    }
-   hb_cdxTagIndexTagNew( pTag, szKeyExp, pKeyItem, bType, uiLen, szForExp,
-                         pForItem, bAscending, bUnique, bCustom );
+
    pKey = hb_cdxKeyPutC( pKey, pTag->szName, CDX_MAX_TAG_NAME_LEN );
    pKey->Tag = pTag->TagBlock;
    hb_cdxTagKeyAdd( pIndex->pCompound, pKey );
@@ -3571,8 +3575,8 @@ static int hb_cdxSortSwapBuildIndex( LPSORTINFO pSort )
       {
          if ( pKeyPrevVal ) {
             if ( nKeyPrevLen == nKeyLen ) {
-               if (! hb_cdxKeyValCompare( pSort->CurTag, (char *) pKeyPrevVal, nKeyPrevLen,
-                     (char *) pKeyVal, nKeyLen, NULL, TRUE ) )
+               if (! hb_cdxKeyValCompare( pSort->CurTag, (char *) pKeyPrevVal, (BYTE) nKeyPrevLen,
+                     (char *) pKeyVal, (BYTE) nKeyLen, NULL, TRUE ) )
                {
                   continue;
                }
@@ -4463,9 +4467,9 @@ static ERRCODE cdxError( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
    return iRet;
 }
 
-static ERRCODE hb_cdxOrdListClear( CDXAREAP pArea, int iComplete )
+static ERRCODE hb_cdxOrdListClear( CDXAREAP pArea, int iComplete, LPCDXINDEX pKeepIndex )
 {
-   LPCDXINDEX pIndex;
+   LPCDXINDEX pIndex, pLastIndex, pNextIndex;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrdListClear(%p, %i)", pArea, iComplete));
    /* Commit changes first */
@@ -4481,7 +4485,7 @@ static ERRCODE hb_cdxOrdListClear( CDXAREAP pArea, int iComplete )
          hb_xfree( pFileNameDbf );
          hb_xfree( pFileNameCdx );
       }
-
+      /*
       if ( iComplete ) {
          while( pArea->lpIndexes )
          {
@@ -4500,6 +4504,35 @@ static ERRCODE hb_cdxOrdListClear( CDXAREAP pArea, int iComplete )
             pIndex = pMasterIndex->pNext;
             pMasterIndex->pNext = pIndex->pNext;
             hb_cdxIndexFree( pIndex );
+         }
+      }
+      */
+      if ( iComplete ) {
+         pLastIndex = NULL;
+         pNextIndex = pArea->lpIndexes;
+      }
+      else
+      {
+         pLastIndex = pArea->lpIndexes;
+         pNextIndex = pLastIndex->pNext;
+      }
+      while( pNextIndex )
+      {
+         pIndex = pNextIndex;
+         pNextIndex = pNextIndex->pNext;
+         if ( pKeepIndex && ( pKeepIndex == pIndex ) ) {
+            pLastIndex = pIndex;
+         }
+         else
+         {
+            hb_cdxIndexFree( pIndex );
+            if ( pLastIndex ) {
+               pLastIndex->pNext = pNextIndex;
+            }
+            else
+            {
+               pArea->lpIndexes = pNextIndex;
+            }
          }
       }
    }
@@ -5538,7 +5571,7 @@ ERRCODE hb_cdxClose( CDXAREAP pArea )
 
    /* Close all index */
    /* SELF_ORDLSTCLEAR( ( AREAP ) pArea ); */
-   hb_cdxOrdListClear( pArea, 1 );
+   hb_cdxOrdListClear( pArea, 1, NULL );
 
    /* uiError = SUPER_CLOSE( ( AREAP ) pArea ); */
 
@@ -5821,7 +5854,10 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
    if( strlen( szFileName ) == 0 )
    {
       /* hb_cdxOrderListClear( (CDXAREAP) pArea ); */
-      hb_cdxOrdListClear( (CDXAREAP) pArea, 1 );
+      /*
+       * TOTEST: this line doens't seem needed
+       *
+       * hb_cdxOrdListClear( (CDXAREAP) pArea, 1 ); */
       hb_xfree( szFileName );
       hb_cdxIndexFree( pIndex );
       return FAILURE;
@@ -5935,7 +5971,7 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
    if( pIndex->hFile == FS_ERROR )
    {
       /* hb_cdxOrderListClear( (CDXAREAP)  pArea ); */
-      hb_cdxOrdListClear( (CDXAREAP)  pArea, 1 );
+      hb_cdxOrdListClear( (CDXAREAP)  pArea, 1, NULL );
       if( szFileNameDbfPath != NULL )
          hb_xfree( szFileNameDbfPath );
       hb_xfree( szFileName );
@@ -6063,7 +6099,7 @@ extern ERRCODE hb_cdxOrderListClear( CDXAREAP pArea )
    }
    pArea->lpIndexes = NULL;
    */
-   hb_cdxOrdListClear( pArea, 0 );
+   hb_cdxOrdListClear( pArea, 0, NULL );
    pArea->uiTag = 0;
    return SUCCESS;
 }
@@ -6168,14 +6204,14 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
    PHB_ITEM pExpr, pKeyExp, pForExp, pResult, pError;
    HB_MACRO_PTR pExpMacro, pForMacro;
    USHORT uiType, uiLen, uiCount;
-   char * szFileName, * szTagName;
+   char * szFileName, * szCpndTagName, * szTagName;
    PHB_FNAME pFileName;
    DBORDERINFO pExtInfo;
    LPCDXINDEX pIndex;
    LPCDXTAG pTag, pLastTag;
    DBFHEADER pHeader;
    BYTE bType;
-   BOOL bNewFile;
+   BOOL bNewFile, bOpenedIndex;
    AREAP pArea = (AREAP) pAreaCdx;
 #ifdef __XHARBOUR__
    BYTE aFile[ _POSIX_PATH_MAX + 3 + 10 ];
@@ -6379,135 +6415,167 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
       }
    }
    szTagName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
+   szCpndTagName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
+   hb_strncpyUpper( szCpndTagName, pFileName->szName, CDX_MAXTAGNAMELEN );
    hb_strncpyUpper( szTagName, pFileName->szName, CDX_MAXTAGNAMELEN );
    hb_xfree( pFileName );
-
-
-   if( !pArea->lpdbOrdCondInfo || ( pArea->lpdbOrdCondInfo->fAll &&
-                                    !pArea->lpdbOrdCondInfo->fAdditive ) )
-      hb_cdxOrdListClear( (CDXAREAP) pArea, 0 );
-
-   if( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
-      pAreaCdx->uiTag = 0;
-
-   // pIndex = hb_cdxFindBag( pAreaCdx, szFileName );
-
-   /* TOFIX: Do not close all indexes */
-   hb_cdxOrdListClear( (CDXAREAP) pArea, 1 );
-
-   pIndex = hb_cdxIndexNew( pArea );
-   pAreaCdx->lpIndexes = pIndex;
-
-   /* New file? */
-   /* if( !hb_spFile( ( BYTE * ) szFileName ) ) */
-#ifdef __XHARBOUR__
-   if( !hb_spFile( ( BYTE * ) szFileName, aFile ) )
-#else
-   if( !hb_spFile( ( BYTE * ) szFileName ) )
-#endif
-   {
-      pIndex->hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
-      bNewFile = TRUE;
-      pIndex->fShared   = pAreaCdx->fShared;
-      pIndex->fReadonly = FALSE;
-   }
-   else
-   {
-      pIndex->hFile = hb_spOpen( ( BYTE * ) szFileName, FO_READWRITE |
-                                    ( pAreaCdx->fShared ?
-                                      FO_DENYNONE : FO_EXCLUSIVE ) );
-      bNewFile = FALSE;
-      pIndex->fShared   = pAreaCdx->fShared;
-      pIndex->fReadonly = FALSE;
-   }
-
-   if( pIndex->hFile == FS_ERROR )
-   {
-      /* hb_cdxOrderListClear( (CDXAREAP)  pArea ); */
-      hb_cdxOrdListClear( (CDXAREAP) pArea, 1 );
-      hb_xfree( szFileName );
-      hb_xfree( szTagName );
-      hb_itemRelease( pKeyExp );
-      if( pForExp != NULL )
-         hb_itemRelease( pForExp );
-      if( pExpMacro != NULL )
-         hb_macroDelete( pExpMacro );
-      if( pForMacro != NULL )
-         hb_macroDelete( pForMacro );
-      return FAILURE;
-   }
-   pIndex->szFileName = ( char * ) hb_xgrab( strlen( szFileName ) + 1 );
-   strcpy( pIndex->szFileName, szFileName);
-
-   /* Corrupted? */
-   if( !bNewFile )
-   {
-      bNewFile = ( hb_fsSeek( pIndex->hFile, 0, FS_END ) <= CDX_PAGELEN );
-      hb_fsSeek( pIndex->hFile, 0, FS_SET );
-   }
-
-   hb_cdxIndexLockWrite( pIndex, NULL );
-
-   if( bNewFile )
-   {
-      pIndex->NextAvail = 0;
-      pIndex->pCompound = hb_cdxTagNew( pIndex, szTagName, -1 );
-      pIndex->pCompound->OptFlags = 0xE0;
-      hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C', 10, NULL, NULL,
-                            TRUE, FALSE, FALSE );
-      hb_cdxTagTagOpen( pIndex->pCompound, 0 );
-   }
-   else
-   {
-      pIndex->pCompound = hb_cdxTagNew( pIndex, szTagName, 0 );
-      pIndex->pCompound->OptFlags = 0xE0;
-      hb_cdxIndexResetAvailPage( pIndex );
-      hb_cdxTagTagOpen( pIndex->pCompound, 0 );
-      while( !pIndex->pCompound->TagEOF )
-      {
-         pTag = hb_cdxTagNew( pIndex,
-                              pIndex->pCompound->CurKeyInfo->Value,
-                              pIndex->pCompound->CurKeyInfo->Tag );
-         if( pIndex->TagList == NULL )
-            pIndex->TagList = pTag;
-         else
-         {
-            pLastTag = pIndex->TagList;
-            while( pLastTag->pNext )
-               pLastTag = pLastTag->pNext;
-            pLastTag->pNext = pTag;
-         }
-         hb_cdxTagKeyRead( pIndex->pCompound, NEXT_RECORD );
-      }
-      if ( pIndex->TagList != NULL ) {
-         pIndex->TagList = hb_cdxReorderTagList(pIndex->TagList);
-      }
-   }
-
-   /* Update DBF header */
-   if( !pAreaCdx->fHasTags )
-   {
-      pFileName = hb_fsFNameSplit( pAreaCdx->szDataFileName );
-      hb_strncpyUpper( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
-      hb_xfree( pFileName );
-      hb_fsSeek( pAreaCdx->hDataFile, 0, FS_SET );
-      if( strcmp( szFileName, szTagName ) == 0 && hb_fsRead( pAreaCdx->hDataFile,
-          ( BYTE * ) &pHeader, sizeof( DBFHEADER ) ) == sizeof( DBFHEADER ) )
-      {
-         pHeader.bHasTags = 1;
-         hb_fsSeek( pAreaCdx->hDataFile, 0, FS_SET );
-         hb_fsWrite( pAreaCdx->hDataFile, ( BYTE * ) &pHeader, sizeof( DBFHEADER ) );
-      }
-   }
-
-   hb_xfree( szFileName );
-
    if ( pOrderInfo->atomBagName && ( strlen(( const char * ) pOrderInfo->atomBagName) > 0 ) )
       hb_strncpyUpper( szTagName, ( const char * ) pOrderInfo->atomBagName, CDX_MAXTAGNAMELEN );
    uiCount = strlen( szTagName );
    while( uiCount > 0 && szTagName[ uiCount - 1 ] == ' ' )
       uiCount--;
    szTagName[ uiCount ] = 0;
+
+
+   if( !pArea->lpdbOrdCondInfo || ( pArea->lpdbOrdCondInfo->fAll &&
+                                    !pArea->lpdbOrdCondInfo->fAdditive ) )
+      hb_cdxOrdListClear( (CDXAREAP) pArea, 0, NULL );
+
+   if( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
+      pAreaCdx->uiTag = 0;
+
+   pIndex = hb_cdxFindBag( pAreaCdx, szFileName );
+   bOpenedIndex = pIndex ? 1 : 0;
+
+   /* TOFIX: Do not close all indexes */
+   // hb_cdxOrdListClear( (CDXAREAP) pArea, 1 );
+
+   if ( !bOpenedIndex )
+   {
+      pIndex = hb_cdxIndexNew( pArea );
+
+      /* pAreaCdx->lpIndexes = pIndex; */
+
+      /* New file? */
+      /* if( !hb_spFile( ( BYTE * ) szFileName ) ) */
+   #ifdef __XHARBOUR__
+      if( !hb_spFile( ( BYTE * ) szFileName, aFile ) )
+   #else
+      if( !hb_spFile( ( BYTE * ) szFileName ) )
+   #endif
+      {
+         pIndex->hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
+         bNewFile = TRUE;
+         pIndex->fShared   = pAreaCdx->fShared;
+         pIndex->fReadonly = FALSE;
+      }
+      else
+      {
+         pIndex->hFile = hb_spOpen( ( BYTE * ) szFileName, FO_READWRITE |
+                                       ( pAreaCdx->fShared ?
+                                       FO_DENYNONE : FO_EXCLUSIVE ) );
+         bNewFile = FALSE;
+         pIndex->fShared   = pAreaCdx->fShared;
+         pIndex->fReadonly = FALSE;
+      }
+
+      if( pIndex->hFile == FS_ERROR )
+      {
+         /* hb_cdxOrderListClear( (CDXAREAP)  pArea ); */
+         /* hb_cdxOrdListClear( (CDXAREAP) pArea, 1 ); */
+         hb_cdxIndexFree( pIndex );
+         hb_xfree( szFileName );
+         hb_xfree( szTagName );
+         hb_xfree( szCpndTagName );
+         hb_itemRelease( pKeyExp );
+         if( pForExp != NULL )
+            hb_itemRelease( pForExp );
+         if( pExpMacro != NULL )
+            hb_macroDelete( pExpMacro );
+         if( pForMacro != NULL )
+            hb_macroDelete( pForMacro );
+         return FAILURE;
+      }
+      pIndex->szFileName = ( char * ) hb_xgrab( strlen( szFileName ) + 1 );
+      strcpy( pIndex->szFileName, szFileName);
+
+      /* Corrupted? */
+      if( !bNewFile )
+      {
+         bNewFile = ( hb_fsSeek( pIndex->hFile, 0, FS_END ) <= CDX_PAGELEN );
+         hb_fsSeek( pIndex->hFile, 0, FS_SET );
+      }
+
+      hb_cdxIndexLockWrite( pIndex, NULL );
+
+      if( bNewFile )
+      {
+         pIndex->NextAvail = 0;
+         pIndex->pCompound = hb_cdxTagNew( pIndex, szCpndTagName, -1 );
+         pIndex->pCompound->OptFlags = 0xE0;
+         hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C', 10, NULL, NULL,
+                              TRUE, FALSE, FALSE );
+         hb_cdxTagTagOpen( pIndex->pCompound, 0 );
+      }
+      else
+      {
+         pIndex->pCompound = hb_cdxTagNew( pIndex, szCpndTagName, 0 );
+         pIndex->pCompound->OptFlags = 0xE0;
+         hb_cdxIndexResetAvailPage( pIndex );
+
+         /* Delete new tag if exist */
+         hb_cdxTagTagOpen( pIndex->pCompound, 0 );
+         while( !pIndex->pCompound->TagEOF )
+         {
+            if( hb_stricmp( pIndex->pCompound->CurKeyInfo->Value, szTagName ) == 0 )
+            {
+               hb_cdxPageDeleteKey( pIndex->pCompound->RootPage );
+               break;
+            }
+            hb_cdxTagKeyRead( pIndex->pCompound, NEXT_RECORD );
+         }
+
+         hb_cdxTagTagOpen( pIndex->pCompound, 0 );
+         while( !pIndex->pCompound->TagEOF )
+         {
+            pTag = hb_cdxTagNew( pIndex,
+                                 pIndex->pCompound->CurKeyInfo->Value,
+                                 pIndex->pCompound->CurKeyInfo->Tag );
+            if( pIndex->TagList == NULL )
+               pIndex->TagList = pTag;
+            else
+            {
+               pLastTag = pIndex->TagList;
+               while( pLastTag->pNext )
+                  pLastTag = pLastTag->pNext;
+               pLastTag->pNext = pTag;
+            }
+            hb_cdxTagKeyRead( pIndex->pCompound, NEXT_RECORD );
+         }
+         if ( pIndex->TagList != NULL ) {
+            pIndex->TagList = hb_cdxReorderTagList(pIndex->TagList);
+         }
+      }
+
+      /* Update DBF header */
+      if( !pAreaCdx->fHasTags )
+      {
+         pFileName = hb_fsFNameSplit( pAreaCdx->szDataFileName );
+         hb_strncpyUpper( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
+         hb_xfree( pFileName );
+         hb_fsSeek( pAreaCdx->hDataFile, 0, FS_SET );
+         if( strcmp( szFileName, szCpndTagName ) == 0 && hb_fsRead( pAreaCdx->hDataFile,
+            ( BYTE * ) &pHeader, sizeof( DBFHEADER ) ) == sizeof( DBFHEADER ) )
+         {
+            pAreaCdx->fHasTags = pHeader.bHasTags = 1;
+            hb_fsSeek( pAreaCdx->hDataFile, 0, FS_SET );
+            hb_fsWrite( pAreaCdx->hDataFile, ( BYTE * ) &pHeader, sizeof( DBFHEADER ) );
+         }
+      }
+   } /* if ( !bOpenedIndex ) */
+   else
+   {
+      hb_cdxIndexLockWrite( pIndex, NULL );
+   }
+   hb_xfree( szFileName );
+   /*
+   if ( pOrderInfo->atomBagName && ( strlen(( const char * ) pOrderInfo->atomBagName) > 0 ) )
+      hb_strncpyUpper( szTagName, ( const char * ) pOrderInfo->atomBagName, CDX_MAXTAGNAMELEN );
+   uiCount = strlen( szTagName );
+   while( uiCount > 0 && szTagName[ uiCount - 1 ] == ' ' )
+      uiCount--;
+   szTagName[ uiCount ] = 0;
+    */
    pTag = hb_cdxIndexAddTag( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
                       pKeyExp, bType, uiLen, ( char * ) ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->abFor :
                       NULL ), pForExp,
@@ -6515,6 +6583,25 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
                       ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->fCustom : FALSE ) );
 
    hb_xfree( szTagName );
+   hb_xfree( szCpndTagName );
+   if ( !bOpenedIndex )
+   {
+      if ( pAreaCdx->lpIndexes == NULL) {
+         pAreaCdx->lpIndexes = pIndex;
+      }
+      else
+      {
+         LPCDXINDEX pIndexTmp;
+         pIndexTmp = pAreaCdx->lpIndexes;
+         while ( pIndexTmp->pNext ) {
+            pIndexTmp = pIndexTmp->pNext;
+         }
+         pIndexTmp->pNext = pIndex;
+      }
+   }
+   if( pArea->lpdbOrdCondInfo && ( !pArea->lpdbOrdCondInfo->fAll &&
+                                   !pArea->lpdbOrdCondInfo->fAdditive ) )
+      hb_cdxOrdListClear( (CDXAREAP) pArea, 0, pIndex );
 
    hb_cdxIndexUnLockWrite( pIndex, NULL );
    pAreaCdx->uiTag = hb_cdxGetTagNumber(pAreaCdx, pTag);
@@ -6864,7 +6951,6 @@ ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInf
       /*-------------------
        * TODO:
        * CUSTOM: allow changing an index into custom
-       * KEYADD, KEYDEL: use the optional value as key
        * */
       case DBOI_CUSTOM :
          hb_itemPutL( pOrderInfo->itmResult, pTag->Custom );
