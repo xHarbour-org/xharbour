@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/11/28 18:00:00 ptsarenko Exp $
+# $Id: Makefile,v 1.3 2004/11/28 15:29:31 ptsarenko Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -68,12 +68,13 @@ PRG_SOURCES=\
 	csetref.prg \
 	datetime.prg \
 	expomant.prg \
-        fdati.prg \
+	expandts.prg \
+	fdati.prg \
 	finan.prg \
 	math.prg \
 	num1.prg \
 	numtoken.prg \
-        pack.prg \
+	pack.prg \
 	rangerem.prg \
 	rangerepl.prg \
 	setatlik.prg \
@@ -88,7 +89,7 @@ PRG_SOURCES=\
 	trig.prg \
 	valpos.prg \
 	video.prg \
-   wmove.prg \
+	wmove.prg \
 	wordone.prg \
 	wordonly.prg \
 	wordrepl.prg \
