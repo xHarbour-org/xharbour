@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.4 2003/02/27 18:05:49 lculik Exp $
+ * $Id: zip.c,v 1.5 2003/09/12 20:10:13 paultucker Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ HB_FUNC( HB_ZIPWITHPASSWORD )
    hb_retl( hb_IsPassWord( hb_parc( 1 ) ) );
 }
 
-HB_FUNC( HB_GETUNZIPFILE )
+HB_FUNC( HB_GETFILECOUNT )
 {
    int iRet = 0;
 

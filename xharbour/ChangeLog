@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1464 2003/09/13 22:01:21 lculik Exp $
+ * $Id: ChangeLog,v 1.1465 2003/09/13 22:49:08 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-14 04:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * test/testzip.prg
+    * changed so that gauges always show up in the same order.
+  * include/hbcompress.h
+    * put all function decls together.
+    * localized __cplusplus check.
+  * source/rtl/gtwin/gtwin.c
+    * changed cursor size back to 25 from 12.
+    * if you want to change the cursor management, let's chat first.
+  * contrib/hbzlib/zip.c
+    * changed name of HB_GETUNZIPFILE to HB_GETFILECOUNT
+  * contrib/hbzlib/zipmemfile.cpp
+    * removed hb_api.h - I can't see that it does anything.
 
 2003-09-13 19:00 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
   * tests/testzip.prg

@@ -1,11 +1,12 @@
 //
-// $Id: testzip.prg,v 1.1 2003/09/12 22:20:56 paultucker Exp $
+// $Id: testzip.prg,v 1.2 2003/09/13 22:46:02 lculik Exp $
 //
 
 // Requires samples.lib for gauge support
 //
 
 #include "common.ch"
+#include "setcurs.ch"
 
 proc Main()
 Local aFiles, aGauge, nLen, aDir
@@ -21,33 +22,43 @@ Local aGaugeFile
 
    // something here may not be clipper compatible
    ?;?;?
+   ?
+   ?;?;?
 
-   aGauge := GaugeNew( row()-2, 5, row(),74 , "W/B", "W+/B" ,'²')
+   aGauge := GaugeNew( row()-6, 5, row()-4,74 , "W/B", "W+/B" ,'²')
    GaugeDisplay( aGauge )
 
-   aGaugeFile := GaugeNew( 12, 5, 14,74 , "W/B", "W+/B" ,'²')
+   aGaugeFile := GaugeNew( row()+2, 5, row()+4,74 , "W/B", "W+/B" ,'²')
    GaugeDisplay( aGaugeFile )
-
 
    aDir   := Directory( "*.prg" )
    aFiles := {}
    Aeval( aDir, {|a| aadd( aFiles, a[1]) })
    nLen   := Len(afiles)
 
+   set cursor off
+
    ZipCreate("test3.zip", aFiles, 8, ;
-              {|cFile,nPos| GaugeUpdate(aGauge,nPos/nLen) },,'hello',,,{|nPos,nCur| GaugeUpdate(aGaugeFile,nPos/nCur)})
+              {|cFile,nPos| GaugeUpdate(aGauge,nPos/nLen) },,'hello',,,;
+              {|nPos,nCur| GaugeUpdate(aGaugeFile,nPos/nCur)})
+
+   set cursor on
 
    ? str( nlen ) +" files were added to the zip"
 
+   // method 1
    aFiles :=  hb_GetFilesInZip( "test3.zip" )
    if aFiles != NIL
       ? str( Len( aFiles ) ) + " files are in the zip"
    endif
+   // or simpler, method 2
+   ? str( hb_GetFileCount("test3.zip" ) ) + " files using alternate method"
 
-   ? "TEST1.ZIP has " + iif(hb_ZipWithPassword("TEST1.ZIP"),"a","no" )+ " password"
-   ? "test3.zip has " + iif(hb_ZipWithPassword("test3.zip"),"a","no" )+ " password"
+   HasPassword( "TEST1.ZIP" )
+   HasPassword( "test3.zip" )
 
-function ZipCreate( cFile, uContents, nLevel, bUpdate, lOverwrite, password, lPath, lDrive, bFileUpdate)
+function ZipCreate(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
+                   lPath, lDrive, bFileUpdate)
    Local lRet
 
    Default lPath to .t.
@@ -56,8 +67,15 @@ function ZipCreate( cFile, uContents, nLevel, bUpdate, lOverwrite, password, lPa
 
    ferase(cFile)
 
-   IF ( lRet := HB_ZIPFILE( cFile, uContents, nLevel, bUpdate, lOverwrite, password ,lPath ,lDrive , bFileUpdate) )
+   IF ( lRet := HB_ZIPFILE( cFile, uContents, nLevel, bUpdate, lOverwrite, password, lPath, lDrive, bFileUpdate) )
       ? cFile + " was successfully created"
    ENDIF
+
+Return lRet
+
+Function HasPassword( cFile )
+   Local lRet
+
+   ? cFile + " has " + iif(lRet := hb_ZipWithPassword(cFile),"a","no" )+ " password"
 
 Return lRet
