@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.6 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: disk.c,v 1.7 2004/07/20 12:15:26 paultucker Exp $
  */
 /*
  * xHarbour Project source code:
@@ -342,7 +342,7 @@ HB_FUNC ( DRIVETYPE )
 {
    #if defined(HB_OS_WIN_32)
       unsigned int uiType;
-      char * pDrive = (char *) xgrab( hb_parclen( 1 )+2 );
+      char * pDrive = (char *) hb_xgrab( hb_parclen( 1 )+2 );
       strcpy( pDrive, (char *) hb_parcx(1) );
 
       if ( strstr( pDrive, ":" ) == NULL )
