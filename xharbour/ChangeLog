@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2404 2004/02/25 15:42:26 lculik Exp $
+ * $Id: ChangeLog,v 1.2405 2004/02/25 16:07:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-25 14:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rdd/dbcmd.c
+    ! Fix behavior of DbSetFilter(), with out parameters clear filter.
+      Reported by Cesar Lozada
+ 
 2004-02-25 13:10 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/vm/hvm.c
-   !minor typo fix on line 5004
+    !minor typo fix on line 5004
 
 2004-02-25 12:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/rtl/trim.c
