@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.11 2002/10/14 07:19:27 brianhays Exp $
+ * $Id: rddads.h,v 1.3 2003/01/06 16:57:07 horacioroldan Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapirdd.h"
 #include "ace.h"
 
+#define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
 /*
 *  ADS WORKAREA
 *  --------
