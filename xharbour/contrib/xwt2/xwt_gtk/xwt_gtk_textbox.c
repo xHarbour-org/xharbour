@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_textbox.c,v 1.2 2004/05/20 15:41:38 jonnymind Exp $
 
    Text box - basic input field
 */
@@ -131,6 +131,11 @@ BOOL xwt_gtk_createTextbox( PXWT_WIDGET xwtData )
 
    widget = (PXWT_GTK_IDWID) hb_xgrab( sizeof( XWT_GTK_IDWID ) );
    widget->INH( nId ) = 0;
+   widget->INH( fgColor ) = NULL;       
+   widget->INH( bgColor ) = NULL;          
+   widget->INH( textColor ) = NULL;          
+   widget->INH( baseColor ) = NULL;          
+
    widget->INH( top_widget ) = xwt_gtk_base_topwidget;
    widget->INH( main_widget ) = box;
    strcpy( widget->szEventName, "changed" );

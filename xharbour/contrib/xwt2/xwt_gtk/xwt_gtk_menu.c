@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menu.c,v 1.2 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_menu.c,v 1.1 2004/05/17 09:27:11 jonnymind Exp $
 
    Menu management
 */
@@ -100,6 +100,11 @@ BOOL xwt_gtk_createMenu( PXWT_WIDGET xwtData )
    
    widget = (PXWT_GTK_MENU) hb_xgrab( sizeof( XWT_GTK_MENU) );
    widget->INH(nId) = 0;
+   widget->INH( fgColor ) = NULL;       
+   widget->INH( bgColor ) = NULL;          
+   widget->INH( textColor ) = NULL;          
+   widget->INH( baseColor ) = NULL;          
+
    widget->INH(main_widget) = menu;
    widget->INH(top_widget) = menu_topwidget;
    widget->bar_item = bar_menu_item;

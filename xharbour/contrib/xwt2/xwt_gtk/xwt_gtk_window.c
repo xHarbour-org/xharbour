@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_window.c,v 1.4 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_window.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    GTK interface - Window widget specifics
 */
@@ -167,6 +167,11 @@ BOOL xwt_gtk_createWindow( PXWT_WIDGET xwtData )
    wnd->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
    g_object_ref( G_OBJECT(wnd->window));
    wnd->INH( nId ) = 0;
+   wnd->INH( fgColor ) = NULL;       
+   wnd->INH( bgColor ) = NULL;          
+   wnd->INH( textColor ) = NULL;          
+   wnd->INH( baseColor ) = NULL;          
+
    wnd->INH(main_widget) = gtk_table_new( 1, 1, TRUE );
    wnd->INH(top_widget) = xwt_gtk_window_topwidget;
    gtk_container_add( GTK_CONTAINER(wnd->window), wnd->INH(main_widget) );

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textarea.c,v 1.1 2004/05/20 15:41:38 jonnymind Exp $
+   $Id: xwt_gtk_textarea.c,v 1.2 2004/05/21 12:21:34 jonnymind Exp $
 
    Text Area - Advanced editor
 */
@@ -363,6 +363,10 @@ BOOL xwt_gtk_createTextarea( PXWT_WIDGET xwtData )
    widget->INH( main_widget ) = view;
    widget->INH( top_widget ) = xwt_gtk_textarea_topwidget;
    widget->INH( nId ) = 0;
+   widget->INH( fgColor ) = NULL;       
+   widget->INH( bgColor ) = NULL;          
+   widget->INH( textColor ) = NULL;          
+   widget->INH( baseColor ) = NULL;          
 
    xwtData->widget_data = widget;
    xwtData->destroy = xwt_gtk_textarea_destroy;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_base.c,v 1.3 2004/05/21 12:21:34 jonnymind Exp $
+   $Id: xwt_gtk_base.c,v 1.4 2004/05/24 22:53:00 lculik Exp $
 
    GTK Base widget for XWT system.
 */
@@ -450,6 +450,7 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    
      GdkColor color;
      wSelf->fgColor = hb_itemGetCPtr( pValue ) ;
+     if (wSelf->fgColor) {
      gdk_color_parse (wSelf->fgColor, &color);
      switch( widget->type )
      {
@@ -465,6 +466,11 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 	       break;
       }	
 
+     }
+     else
+     { 
+        ret = FALSE ; 
+     }
    }
    
    else if ( strcmp( prop, "bgcolor" ) == 0 )
@@ -472,6 +478,8 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    
      GdkColor color;
      wSelf->bgColor = hb_itemGetCPtr( pValue ) ;
+     if ( wSelf->bgColor )
+     {
      gdk_color_parse (wSelf->bgColor, &color);
 //     widget_set_color(GTK_LABEL(wMain), &color,2 );
      switch( widget->type )
@@ -480,20 +488,26 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-      	       widget_set_color(wTop, &color,1);
+      	       widget_set_color(wTop, &color,2);
 	       break;
             case XWT_TYPE_BUTTON:	    
 	    case XWT_TYPE_LABEL:	    
       	       widget_set_color(wMain, &color,2);
 	       break;
       }	
-
+}
+     else
+     { 
+        ret = FALSE ; 
+     }
    }
 
    else if ( strcmp( prop, "textcolor" ) == 0 )
    {
       GdkColor color;
       wSelf->textColor = hb_itemGetCPtr( pValue ) ;
+      if ( wSelf->textColor )
+      {
       gdk_color_parse (wSelf->textColor, &color);
 
 //      widget_set_color(GTK_LABEL(wMain), &color,4 );
@@ -503,7 +517,7 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-      	       widget_set_color(wTop, &color,1);
+      	       widget_set_color(wTop, &color,4);
 	       break;
             case XWT_TYPE_BUTTON:	    	    
 	    case XWT_TYPE_LABEL:	    
@@ -511,11 +525,17 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 	       break;
       }	
 
+}
+     else
+     { 
+        ret = FALSE ; 
+     }
    }
    else if ( strcmp( prop, "basecolor" ) == 0 )
    {
       GdkColor color;
       wSelf->baseColor = hb_itemGetCPtr( pValue ) ;
+      if (wSelf->baseColor){
       gdk_color_parse (wSelf->baseColor, &color);
 
 //      widget_set_color(GTK_LABEL(wMain), &color,3 );
@@ -525,13 +545,18 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-      	       widget_set_color(wTop, &color,1);
+      	       widget_set_color(wTop, &color,3);
 	       break;
             case XWT_TYPE_BUTTON:	    
 	    case XWT_TYPE_LABEL:	    
       	       widget_set_color(wMain, &color,3);
 	       break;
       }	
+}
+     else
+     { 
+        ret = FALSE ; 
+     }      
 
    }
 

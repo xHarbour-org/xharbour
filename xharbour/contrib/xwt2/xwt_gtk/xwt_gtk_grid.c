@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_grid.c,v 1.1 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk_grid.c,v 1.2 2004/05/20 15:41:38 jonnymind Exp $
 
    Grid - a col/row layout adapter
 */
@@ -159,6 +159,11 @@ BOOL xwt_gtk_createGrid( PXWT_WIDGET xwtData )
    grid->INH(INH(INH(main_widget))) = gtk_table_new( 1, 1, FALSE );
    g_object_ref( G_OBJECT( grid->INH(INH(INH(main_widget))) ) );
    grid->INH(INH(INH(nId))) = 0;
+   grid->INH(INH(INH( fgColor ) ) )= NULL;       
+   grid->INH(INH(INH( bgColor ) ) )= NULL;          
+   grid->INH(INH(INH( textColor ) ) )= NULL;          
+   grid->INH(INH(INH( baseColor ) ) )= NULL;          
+
    grid->INH(INH(align)) = NULL;
    grid->INH(INH(iHAlign)) = XWT_ALIGN_CENTER;
    grid->INH(INH(iVAlign)) = XWT_ALIGN_TOP;

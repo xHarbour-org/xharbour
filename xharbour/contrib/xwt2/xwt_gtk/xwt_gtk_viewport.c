@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.1 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk_viewport.c,v 1.2 2004/05/21 12:21:34 jonnymind Exp $
 
    Viewport - an infinite scroller container & drawing area
 */
@@ -138,6 +138,11 @@ BOOL xwt_gtk_createViewPort( PXWT_WIDGET xwtData )
    viewport->INH(main_widget) = gtk_scrolled_window_new( NULL, NULL );
    g_object_ref( G_OBJECT(viewport->INH(main_widget)) );
    viewport->INH(nId) = 0;
+   viewport->INH( fgColor ) = NULL;       
+   viewport->INH( bgColor ) = NULL;          
+   viewport->INH( textColor ) = NULL;          
+   viewport->INH( baseColor ) = NULL;          
+
    viewport->INH(top_widget) = xwt_gtk_base_topwidget;
 
    viewport->connect = xwt_gtk_viewport_connect;

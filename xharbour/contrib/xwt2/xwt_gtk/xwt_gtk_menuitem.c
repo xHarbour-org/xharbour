@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menuitem.c,v 1.4 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_menuitem.c,v 1.1 2004/05/17 09:27:11 jonnymind Exp $
 
    Menu item managemetn
 */
@@ -236,6 +236,11 @@ BOOL xwt_gtk_createMenuItem( PXWT_WIDGET xwtData )
    menuitem->INH(INH(main_widget)) = gtk_menu_item_new ();
    menuitem->INH(INH(top_widget)) = xwt_gtk_base_topwidget;
    menuitem->INH(INH(nId)) = 0;
+   menuitem->INH( INH( fgColor ) )= NULL;       
+   menuitem->INH( INH( bgColor ) )= NULL;          
+   menuitem->INH( INH( textColor ) ) = NULL;          
+   menuitem->INH( INH( baseColor ) ) = NULL;          
+
    strncpy( menuitem->INH(szEventName), "menu", 5);
    
    g_object_ref( G_OBJECT(menuitem->INH(INH(main_widget))));

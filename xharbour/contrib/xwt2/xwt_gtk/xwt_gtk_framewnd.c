@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -122,7 +122,12 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
    g_object_ref( G_OBJECT(frame->INH(window)));
    frame->vbox = gtk_vbox_new(FALSE, 0);
    gtk_container_add( GTK_CONTAINER(frame->INH(window)), frame->vbox );
-   frame->INH(INH(nId)) = 0;
+   frame->INH( INH(nId)) = 0;
+   frame->INH( INH( fgColor ) ) = NULL;       
+   frame->INH( INH( bgColor ) ) = NULL;          
+   frame->INH( INH( textColor ) ) = NULL;          
+   frame->INH( INH( baseColor ) ) = NULL;          
+
    frame->INH(INH(top_widget)) = xwt_gtk_window_topwidget;
    frame->INH(connect) = xwt_gtk_window_connect;
    frame->INH(disconnect) = xwt_gtk_window_disconnect;
