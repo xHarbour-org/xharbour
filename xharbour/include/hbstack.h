@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.6 2002/12/18 13:43:55 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.7 2002/12/19 18:15:34 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ typedef struct
    char     szDate[ 9 ];  /* last returned date from _pards() yyyymmdd format */
 } HB_STACK;
 
-#ifndef HB_NO_DEFAULT_THREADS
+#if !defined(HB_NO_DEFAULT_THREADS) && !defined(HB_OS_DOS)
    #define HB_THREAD_SUPPORT
 #endif
 
