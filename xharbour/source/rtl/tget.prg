@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.43 2003/04/09 19:04:14 walito Exp $
+ * $Id: tget.prg,v 1.44 2003/04/10 14:07:22 lculik Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::nLastExitState := 0
    ::Minus      := .f.
    ::Name       := cVarName
-   ::Original   := ::VarGet()
+   //::Original   := ::VarGet()
    ::Pos        := NIL
    ::PostBlock  := NIL
    ::PreBlock   := NIL
@@ -204,7 +204,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Rejected   := .f.
    ::Row        := nRow
    ::SubScript  := NIL
-   ::Type       := ValType( ::Original )
+   //::Type       := ValType( ::Original )
    ::TypeOut    := .f.
    ::nDispPos   := 1
    ::nOldPos    := 0
@@ -212,7 +212,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
    ::lMinusPrinted := .f.
 
-   ::Picture    := cPicture
+   ::cPicture    := cPicture
    #ifdef HB_COMPAT_C53
    ::Caption    := ""
    ::CapRow     := 0
@@ -360,40 +360,46 @@ return Self
 
 METHOD Display( lForced ) CLASS Get
 
-   local nOldCursor := SetCursor( SC_NONE )
-   local xBuffer := ::buffer
+   LOCAL nOldCursor := SetCursor( SC_NONE )
+   LOCAL xBuffer
+
+   IF ::buffer == NIL
+      ::buffer := ::PutMask( ::VarGet(), .f. )
+   ENDIF
+
+   xBuffer := ::buffer
 
    DEFAULT lForced TO .t.
 
    HBConsoleLock()
 
-   if !::lMinusPrinted .and. !Empty( ::DecPos ) .and. ::minus .and. substr( xBuffer, ::DecPos-1, 1 ) == "0"
-      xBuffer := substr( xBuffer, 1, ::DecPos-2 ) + "-." + substr( xBuffer, ::DecPos+1 )
-   endif
+   IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
+      xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
+   ENDIF
 
-   if ::HasScroll() .and. ::Pos != NIL
-      if ::nDispLen > 8
+   IF::HasScroll() .and. ::Pos != NIL
+      IF::nDispLen > 8
          ::nDispPos := Max( 1, Min( ::Pos - ::nDispLen + 4, ::nMaxLen - ::nDispLen + 1 ) )
-      else
+      ELSE
          ::nDispPos := Max( 1, Min( ::Pos - int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
-      endif
-   endif
+      ENDIF
+   ENDIF
 
-   if xbuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
+   IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
-                 Substr( xbuffer, ::nDispPos, ::nDispLen ), ;
+                 Substr( xBuffer, ::nDispPos, ::nDispLen ), ;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
-      if !(::cDelimit == NIL)
+      IF ! ( ::cDelimit == NIL )
          DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
          DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
-      endif
-   endif
+      ENDIF
+   ENDIF
 
    ::nOldPos := ::nDispPos
 
-   if ::Pos != NIL
+   IF ::Pos != NIL
       SetPos( ::Row, ::Col + ::Pos - ::nDispPos + if( ::cDelimit == NIL, 0, 1 ) )
-   endif
+   ENDIF
 
    SetCursor( nOldCursor )
 
@@ -1170,12 +1176,20 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    local cChar
    local cBuffer
-   local cPicFunc := ::cPicFunc
-   local cMask    := ::cPicMask
+   local cPicFunc
+   local cMask
 
    local nFor
    local nAt
    local nNoEditable := 0
+
+   IF ::Type == NIL
+      ::Type := ValType( ::VarGet() )
+      ::Picture := ::cPicture
+   ENDIF
+
+   cPicFunc := ::cPicFunc
+   cMask    := ::cPicMask
 
    DEFAULT xValue TO ::VarGet()
    DEFAULT lEdit  TO ::HasFocus
