@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.707 2003/02/12 10:35:16 jonnymind Exp $
+ * $Id: ChangeLog,v 1.709 2003/02/12 11:23:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-12 11:30 UTC-0200 Luiz Rafale Culik <culikr@uol.com.br>
+  * source/common/hbffind.c
+   ! minor Format
+   + Support for open watcom
+  * config/dos/watcom.cf
+  + config/w32/watcom.cf
+    ! Proper ajusted to work with Open watcom
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+    % Optimized the Code by replacing At( Exp, Source ) > 0  with Exp IN Source
+      Replace IF with Swtich Case Where Possible
+      Replace For n:=1 to Len(Array) with FOR EACH info IN Array when Possible
+      Source Code Totally Reformated
 
 2003-02-12 12:20 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
   ! config/linux/gcc.cf
