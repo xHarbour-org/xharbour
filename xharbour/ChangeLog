@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3588 2004/11/08 18:50:11 paultucker Exp $
+ * $Id: ChangeLog,v 1.3589 2004/11/08 18:58:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -15,7 +15,7 @@
 
 2004-11-07 13:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/filesys.c
-    * change to allow HandleToLong to work with SDK installed.
+    * change to allow HandleToLong to work when SDK not installed.
 
 2004-11-07 15:09 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/set.c
