@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2754 2004/04/05 14:36:18 druzus Exp $
+ * $Id: ChangeLog,v 1.2755 2004/04/05 19:33:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-05 21:50 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
+  * source/rtl/bkgtsks.c
+    * fixed assignment of first task. Code cleaned.
+  * hrbdll.bc
+  * hrbdll.vc
+    + Added source/rtl/fserror.c
+
 2004-04-06 02:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/filesys.c
     ! unbalance parenthesis in line 282

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.33 2004/02/20 02:29:13 likewolf Exp $
+# $Id: hrbdll.vc,v 1.34 2004/03/16 11:37:13 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -111,6 +111,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\filehb.obj \
   $(OBJ_DIR)\filestat.obj \
   $(OBJ_DIR)\filesys.obj \
+  $(OBJ_DIR)\fserror.obj \
   $(OBJ_DIR)\fkmax.obj \
   $(OBJ_DIR)\fnsplit.obj \
   $(OBJ_DIR)\fparse.obj \
@@ -984,6 +985,9 @@ $(OBJ_DIR)\getsys.obj : $(OBJ_DIR)\getsys.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\filesys.obj : $(RTL_DIR)\filesys.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\fserror.obj : $(RTL_DIR)\fserror.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\file.obj : $(RTL_DIR)\file.c

@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.12 2004/04/04 23:38:00 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.13 2004/04/05 02:29:31 druzus Exp $
  */
 
 /*
@@ -155,21 +155,14 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
             }
          }
       }
-      s_pBackgroundTasks = ( PHB_BACKGROUNDTASK * ) hb_xrealloc( s_pBackgroundTasks, sizeof( HB_BACKGROUNDTASK ) * s_uiBackgroundMaxTask );
-      s_pBackgroundTasks[ s_uiBackgroundMaxTask ] = pBkgTask;
+      s_pBackgroundTasks = ( PHB_BACKGROUNDTASK * ) hb_xrealloc( s_pBackgroundTasks, sizeof( HB_BACKGROUNDTASK ) * (s_uiBackgroundMaxTask ));
    }
+   s_pBackgroundTasks[ s_uiBackgroundMaxTask ] = pBkgTask;
    ++s_uiBackgroundMaxTask;
 
-   return pBkgTask->ulTaskID;
+   //TraceLog( NULL, "BackGroung ID %u\n",  s_ulBackgroundID );
 
-   //if ( HB_IS_ARRAY( pBlock ) )
-   //{
-   //   return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
-   //}
-   //else
-   //{
-   //   return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
-   //}
+   return pBkgTask->ulTaskID;
 
 }
 
@@ -261,7 +254,7 @@ void hb_backgroundReset( void )
    }
 }
 
-/* close all active background task on program exit */
+/* close all active background tasks on program exit */
 void hb_backgroundShutDown( void )
 {
    HB_THREAD_STUB
@@ -339,23 +332,12 @@ PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID )
       iTask = 0;
       while( iTask < s_uiBackgroundMaxTask )
       {
-         //PHB_ITEM pItem;
          pBkgTask = s_pBackgroundTasks[ iTask ];
-         //pItem = pBkgTask->pTask;
-
-         //if( ( pItem->type == HB_IT_BLOCK &&
-         //      ulID == ( ULONG ) pItem->item.asBlock.value ) ||
-         //    ( pItem->type == HB_IT_ARRAY &&
-         //      ulID == ( ULONG ) pItem->item.asArray.value ) )
 
          if( ulID == pBkgTask->ulTaskID )
          {
              return pBkgTask;
          }
-         //else
-         //{
-         //    return NULL;
-         //}
 
          ++iTask;
       }
