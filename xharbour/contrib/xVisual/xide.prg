@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.112 2002/11/02 02:48:58 ronpinkas Exp $
+ * $Id: xide.prg,v 1.113 2002/11/07 20:05:58 what32 Exp $
  */
 
 /*
@@ -53,7 +53,7 @@ FUNCTION Main
    oSplash := TSplash():Create( oApp, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT oApp
-      WITH OBJECT :CreateForm( @MainFrame, MainFrame():Create( oApp ) )
+      WITH OBJECT :CreateForm( MainFrame(), @MainFrame )
 
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
@@ -102,7 +102,7 @@ METHOD MainMenu() CLASS MainFrame
    WITH OBJECT ::WindowMenu
       :AddPopup('&Test')
       WITH OBJECT :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
+         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ) } )
          :AddItem( 'Open', 102, {|| OpenProject():Create() } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
@@ -172,8 +172,14 @@ METHOD MainToolBar() CLASS MainFrame
       //:Add( TRebar():Create( MainFrame:ToolTabs:StdTab ) )
       //:Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
+         :FWidth := :Parent:Width
+         :FHeight:= :Parent:Height
+         
          :GetHandle()
          :Show( SW_SHOW )
+         
+         view :Parent:Width, :Parent:Height, :Width, :Height
+         
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
