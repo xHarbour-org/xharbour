@@ -1,0 +1,17 @@
+/*
+ * $Id: ChangeLog,v 1.7 2002/10/16 21:16:56 fsgiudice Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2002-10-16 23:11 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + ChangeLog
+    + Begin this changelog file
+
+  * xide.prg
+    * modified Splash timer from 5 to 3 seconds
+    
