@@ -289,6 +289,8 @@ HB_FUNC( SHQUERYRECYCLEBIN )
 // check the prototype
 
 
+#if(WINVER >= 0x0500)
+
 HB_FUNC( SHEMPTYRECYCLEBIN )
 {
    hb_retnl(  SHEmptyRecycleBin( (HWND) hb_parnl( 1 ) ,
@@ -297,7 +299,7 @@ HB_FUNC( SHEMPTYRECYCLEBIN )
                                 ) ) ;
 }
 
-
+#endif
 
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(BOOL) Shell_NotifyIconA(DWORD dwMessage, PNOTIFYICONDATAA lpData);
@@ -374,6 +376,7 @@ HB_FUNC( SHGETNEWLINKINFO )
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(BOOL) SHInvokePrinterCommandA(HWND hwnd, UINT uAction, LPCSTR lpBuf1, LPCSTR lpBuf2, BOOL fModal);
 
+#if(WINVER >= 0x0500)
 
 HB_FUNC( SHINVOKEPRINTERCOMMAND )
 {
@@ -385,6 +388,7 @@ HB_FUNC( SHINVOKEPRINTERCOMMAND )
                                    ) ) ;
 }
 
+#endif
 
 //-----------------------------------------------------------------------------
 // SHSTDAPI SHLoadNonloadedIconOverlayIdentifiers(void);

@@ -564,6 +564,7 @@ HB_FUNC( PAINTDESKTOP )
 
 // WINUSERAPI DWORD WINAPI GetGuiResources( IN HANDLE hProcess, IN DWORD uiFlags);
 
+#if(WINVER >= 0x0500)
 
 HB_FUNC( GETGUIRESOURCES )
 {
@@ -572,7 +573,7 @@ HB_FUNC( GETGUIRESOURCES )
                                    ) ) ;
 }
 
-
+#endif
 
 //-----------------------------------------------------------------------------
 // WINGDIAPI BOOL WINAPI PtVisible(IN HDC, IN int, IN int);

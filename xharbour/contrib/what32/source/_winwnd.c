@@ -1,10 +1,5 @@
 
 
-/*
- * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
- * with author's permission granted on 27 MAy 2002
-   Last change:  WN   29 May 2002   10:59 pm
- */
 
 
 #define HB_OS_WIN_32_USED
@@ -24,6 +19,7 @@ extern PHB_ITEM Size2Array( SIZE *siz  );
 extern void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint);
 extern void Rect2ArrayEx( RECT *pt  , PHB_ITEM aRect);
 extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
+
 //-----------------------------------------------------------------------------
 
 HB_FUNC ( ISICONIC )
@@ -230,12 +226,12 @@ HB_FUNC ( REDRAWWINDOW )
 
    bRectOk = ( ISARRAY(2) && Array2Rect( hb_param(2,HB_IT_ARRAY), &rc ) ) ;
 
-   RedrawWindow(
-    (HWND) hb_parnl( 1 ),                     // handle of window
-     bRectOk ? &rc : NULL                     ,   // address of structure with update rectangle
-     ISNIL( 3 ) ? NULL : (HRGN) hb_parnl( 3 ) ,   // handle of update region
-    hb_parni( 4 )                           // array of redraw flags
-   );
+   hb_retl( RedrawWindow(
+                          (HWND) hb_parnl( 1 )                     ,   // handle of window
+                          bRectOk ? &rc : NULL                     ,   // address of structure with update rectangle
+                          ISNIL( 3 ) ? NULL : (HRGN) hb_parnl( 3 ) ,   // handle of update region
+                          hb_parni( 4 )                                // array of redraw flags
+                         ) );
 
 }
 
@@ -889,6 +885,9 @@ HB_FUNC( REMOVEPROP )
 //-----------------------------------------------------------------------------
 // WINUSERAPI int WINAPI EnumPropsExA( IN HWND hWnd, IN PROPENUMPROCEXA lpEnumFunc, IN LPARAM lParam);
 
+
+//T.B.D.
+
 /*
 
 HB_FUNC( ENUMPROPSEX )
@@ -904,6 +903,7 @@ HB_FUNC( ENUMPROPSEX )
 }
 
 */
+
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI int WINAPI EnumPropsA( IN HWND hWnd, IN PROPENUMPROCA lpEnumFunc);
@@ -932,7 +932,6 @@ if ADJUSTWINDOWRECT(@arect,2,.f.)
 endif
 */
 
-
 HB_FUNC( ADJUSTWINDOWRECT )
 {
    RECT lpRect  ;
@@ -954,8 +953,6 @@ HB_FUNC( ADJUSTWINDOWRECT )
          hb_retl(FALSE);
 
 }
-
-
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI AdjustWindowRectEx( IN OUT LPRECT lpRect, IN DWORD dwStyle, IN BOOL bMenu, IN DWORD dwExStyle);
@@ -1028,6 +1025,7 @@ HB_FUNC( SETCLASSLONGPTR )
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetWindowInfo( IN HWND hwnd, OUT PWINDOWINFO pwi );
+
 #if (WINVER >= 0X0500)
 
 HB_FUNC( GETWINDOWINFO )
@@ -1044,6 +1042,7 @@ HB_FUNC( GETWINDOWINFO )
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetTitleBarInfo( IN HWND hwnd, OUT PTITLEBARINFO pti );
+
 #if (WINVER >= 0X0500)
 
 HB_FUNC( GETTITLEBARINFO )
@@ -1056,8 +1055,11 @@ HB_FUNC( GETTITLEBARINFO )
 }
 
 #endif
+
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI EnumChildWindows( IN HWND hWndParent, IN WNDENUMPROC lpEnumFunc, IN LPARAM lParam);
+
+//T.B.D
 
 /*
 
@@ -1109,6 +1111,7 @@ HB_FUNC( REALGETWINDOWCLASS )
 //-----------------------------------------------------------------------------
 // WINUSERAPI HWND WINAPI RealChildWindowFromPoint( IN HWND hwndParent, IN POINT ptParentClientCoords );
 //SYNTAX REALCHILDWINDOWFROMPOINT(nWnd, aPoint) ->nWnd
+
 #if (WINVER >= 0X0500)
 
 HB_FUNC( REALCHILDWINDOWFROMPOINT )
@@ -1201,6 +1204,7 @@ HB_FUNC( CREATEMDICLIENT )
   hb_retnl((LONG)hwndClient);
 }
 
+//-----------------------------------------------------------------------------
 
 // sets a member of the MINMAXINFO  structure
 
@@ -1247,11 +1251,15 @@ AllowSetForegroundWindow( ASFW_ANY or GetCurrentProcessId() )
 );
 */
 
+#if(WINVER >= 0x0500)
+
+
 HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 {
    hb_retl( AllowSetForegroundWindow ( (DWORD) hb_parnl( 1 ) ) );
 }
 
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1260,8 +1268,12 @@ BOOL LockSetForegroundWindow( UINT uLockCode
 );
 */
 
+#if (WINVER >= 0X0500)
+
 HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
 {
    hb_retl( LockSetForegroundWindow( (UINT) hb_parnl( 1 ) ) );
 }
+
+#endif
 

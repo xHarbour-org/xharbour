@@ -375,11 +375,15 @@ HB_FUNC( INSENDMESSAGE )
 // WINUSERAPI DWORD WINAPI InSendMessageEx( IN LPVOID lpReserved);
 
 
+#if(WINVER >= 0x0500)
+
 HB_FUNC( INSENDMESSAGEEX )
 {
 
    hb_retnl( (LONG) InSendMessageEx( NULL ) ) ; // param reserved must be NULL
 }
+
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -498,12 +502,14 @@ HB_FUNC( REGISTERDEVICENOTIFICATION )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI UnregisterDeviceNotification( IN HDEVNOTIFY Handle );
 
+#if(WINVER >= 0x0500)
 
 HB_FUNC( UNREGISTERDEVICENOTIFICATION )
 {
    hb_retl( UnregisterDeviceNotification( (HDEVNOTIFY) hb_parnl( 1 ) ) ) ;
 }
 
+#endif
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI AttachThreadInput( IN DWORD idAttach, IN DWORD idAttachTo, IN BOOL fAttach);

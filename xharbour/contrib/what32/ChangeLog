@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.18 2002/09/24 03:59:22 andy_wos Exp $
+ * $Id: ChangeLog,v 1.19 2002/09/25 06:51:32 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-25 16:50 UCT+1000 AJ Wos <andrwos@aust1.net>
+   * _WinShell.c
+     * conditional compilation added to 
+       SHEmptyRecycleBin(), SHInvokePrinterCommand()
+   * _WinWnd.c
+     * conditional compilation added to 
+       AllowSetForegroundWindow(), AnimateWindow()
+       LockSetForegroundWindow()
+   * _WinMsg.c
+     * conditional compilation added to
+       UnregisterDeviceNotification(),InSendMessageEx()   
+   * _WinClpb.c
+     * conditional compilation added to 
+       GetClipboardSequencNumber()
+   * _WinGdi
+     * conditional compilation added to 
+       GetGuiResources()
+   
+   All above #if(WINVER >= 0x0500)
+   
+   Use /DWINVER=xxx compiler option to control compilation of 
+   the above functions    
+   
 2002-09-25 16:50 UCT+1000 AJ Wos <andrwos@aust1.net>
    * _WinMisc.c 
      * CreateMutex() bug fixed

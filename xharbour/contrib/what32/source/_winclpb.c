@@ -89,12 +89,14 @@ HB_FUNC( GETPRIORITYCLIPBOARDFORMAT )
 //-----------------------------------------------------------------------------
 // WINUSERAPI DWORD WINAPI GetClipboardSequenceNumber( VOID);
 
+#if(WINVER >= 0x0500)
 
 HB_FUNC( GETCLIPBOARDSEQUENCENUMBER )
 {
    hb_retnl( (LONG) GetClipboardSequenceNumber(  ) ) ;
 }
 
+#endif
 
 //-------------------------------------------------------------------------------
 
