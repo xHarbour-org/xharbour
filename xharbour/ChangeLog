@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.941 2003/04/10 17:02:50 lculik Exp $
+ * $Id: ChangeLog,v 1.942 2003/04/11 17:12:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-13 05:20:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/compiler/genc.c
+    ! Line number in error message did not conform with that in PRG file
+      when there are in-line-C codes in the PRG file. Fixed.
 
 2003-04-11 10:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/macro.c
