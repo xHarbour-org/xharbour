@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.24 2002/08/31 14:34:27 lculik Exp $
+ * $Id: tget.prg,v 1.25 2002/09/01 00:47:19 lculik Exp $
  */
 
 /*
@@ -206,7 +206,9 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
 
    ::Picture    := cPicture
-
+   #ifdef HB_COMPAT_C53
+   ::Caption    := ""
+   #endif
 return Self
 
 //---------------------------------------------------------------------------//
