@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.1 2002/01/06 06:43:22 andijahja Exp $
+# $Id: hrbdll.bc,v 1.3 2002/05/25 18:28:07 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -203,6 +203,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\browdbx.obj \
   $(OBJ_DIR)\browse.obj \
   $(OBJ_DIR)\checkbox.obj \
+  $(OBJ_DIR)\cstr.obj \
   $(OBJ_DIR)\dbedit.obj \
   $(OBJ_DIR)\devoutp.obj \
   $(OBJ_DIR)\dircmd.obj \
@@ -509,6 +510,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\browdbx.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\browse.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\checkbox.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cstr.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\dbedit.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\devoutp.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dircmd.obj            + >> hdll.tmp
@@ -708,6 +710,12 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cstr.c : $(RDD_DIR)\cstr.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg

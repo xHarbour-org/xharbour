@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.1 2002/01/07 04:07:09 andijahja Exp $
+# $Id: hrbdll.vc,v 1.2 2002/05/25 16:22:11 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -207,6 +207,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\browdbx.obj \
   $(OBJ_DIR)\browse.obj \
   $(OBJ_DIR)\checkbox.obj \
+  $(OBJ_DIR)\cstr.obj \
   $(OBJ_DIR)\dbedit.obj \
   $(OBJ_DIR)\devoutp.obj \
   $(OBJ_DIR)\dircmd.obj \
@@ -1453,3 +1454,8 @@ $(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
 $(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\cstr.c : $(RDD_DIR)\cstr.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
