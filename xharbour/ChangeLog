@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2656 2004/03/25 21:23:38 peterrees Exp $
+ * $Id: ChangeLog,v 1.2657 2004/03/25 21:54:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-25 16:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/dynsym.c
+    ! Fixed GPF trap related to item.asSymbol.value->pDynSym possibly being (PHB_DYNS) 1.
+    /* I belive this to be the last one of this kind. :-) */
 
 2004-03-25 14:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

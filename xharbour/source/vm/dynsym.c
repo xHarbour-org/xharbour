@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.14 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: dynsym.c,v 1.15 2004/03/18 04:05:27 ronpinkas Exp $
  */
 
 /*
@@ -260,7 +260,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
    {
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
@@ -292,7 +292,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
    if( ! pDynSym )       /* Does it exists ? */
    {
       //TraceLog( NULL, "Creating: %s\n", szName );
-      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
