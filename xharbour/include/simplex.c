@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.8 2004/03/31 02:16:43 druzus Exp $
+ * $Id: simplex.c,v 1.9 2004/04/01 22:00:41 druzus Exp $
  */
 
 /*
@@ -652,11 +652,17 @@ int SimpLex_GetNextToken( void )
                   {
                      if( iSize <= 0 || iPairLen >= MAX_STREAM )
                      {
+                        int iRet = iPairToken;
+
+                        sPair[ iPairLen ] = '\0';
+
                         STREAM_EXCEPTION( sPair, '\0' );
 
+                        /* Reset */
+                        iPairToken = 0;
                         s_szBuffer = szBuffer;
 
-                        return iPairToken;
+                        return iRet;
                      }
 
                      /* Next Character. */
@@ -716,36 +722,43 @@ int SimpLex_GetNextToken( void )
                      /* Check if exception. */
                      IF_ABORT_PAIR( chrPair )
                      {
+                        int iRet = iPairToken;
+
                         sPair[ iPairLen ] = '\0';
 
-                        /* Resetting. */
-                        iPairToken = 0;
+                        STREAM_EXCEPTION( sPair, chrPair );
 
                         /* Last charcter read. */
                         chr = chrPair;
 
-                        STREAM_EXCEPTION( sPair, chrPair );
-
+                        /* Resetting. */
+                        iPairToken = 0;
                         s_szBuffer = szBuffer;
 
-                        return iPairToken;
+                        return iRet;
                      }
                      else
                      {
                         STREAM_APPEND( chrPair );
                      }
                   }
+
+                  /* EOF */
+
+                  sPair[ iPairLen ] = '\0';
+
+                  STREAM_EXCEPTION( sPair, NULL );
                }
 
-               /* Resetting. */
-               iPairToken = 0;
+               {
+                  int iRet = iPairToken;
 
-               /* EOF */
-               STREAM_EXCEPTION( sPair, NULL );
+                  /* Resetting. */
+                  iPairToken = 0;
+                  s_szBuffer = szBuffer;
 
-               s_szBuffer = szBuffer;
-
-               return iPairToken;
+                  return iRet;
+               }
             }
             /* End Pairs. */
 

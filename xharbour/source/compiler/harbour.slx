@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.50 2004/05/08 04:25:13 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.51 2004/05/08 17:40:43 ronpinkas Exp $
  */
 
 /*
@@ -521,12 +521,14 @@ LANGUAGE_RULES_ARE {
 #undef CUSTOM_ACTION
    #define CUSTOM_ACTION(x) hb_comp_SLX_CustomAction( x )
 
+/* See implementation of STREAM_APPEND below!
 #undef STREAM_EXCEPTION
    #define STREAM_EXCEPTION( sPair, cChar ) \
               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
               aiHold[ iHold++ ] = '\n'; \
               yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
               aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ;
+*/
 
 #undef STREAM_APPEND
    #define STREAM_APPEND(x) \
@@ -618,10 +620,12 @@ LANGUAGE_RULES_ARE {
          } \
          else \
          { \
-            szBuffer --; \
+            szBuffer--; \
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
+            yylval.string = hb_compIdentifierNew( szBuffer, TRUE ); \
             iSize = 0; \
+            iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
          } \
       }
@@ -685,7 +689,7 @@ static int hb_comp_SLX_InterceptAction( int iRet )
      else if( iRet == NUM_DOUBLE )  { printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  ); }
      else if( iRet < 256 )
      {
-        if( iRet == '\n' || iRet == ';' ) { printf( "***NEW LINE %i\n", hb_comp_iLine - 1  ); }
+        if( iRet == '\n' || iRet == ';' ) { printf( "***END LINE %i\n", hb_comp_iLine - 1  ); }
         else if( iRet == -1 )             { printf( "!!!<EOF>\n" ); }
         else                              { printf( "   DELIMITER = \"%c\"\n", iRet  ); }
      }

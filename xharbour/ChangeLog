@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2900 2004/05/08 20:32:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2901 2004/05/08 22:06:59 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-08 19:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/simplex.c
+    * Minor revisions.
+
+  * source/compiler/harbour.slx
+    ! Fixed GPF Trap related to unterminated string error.
+
 2004-05-09 23:33 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h
     * new macros HB_{GET|PUT}_{LE|BE}_UINT{24|64} to retrieve/store
-      24 and 64 bit integers in endian independent way 
+      24 and 64 bit integers in endian independent way
 
   * xharbour/source/rdd/rddord.prg
     + ORDWILDSEEK(cPatern, [lCont]) added (rather to illustrate posibilities)
