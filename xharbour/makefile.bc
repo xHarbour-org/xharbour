@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.34 2003/03/03 13:44:25 lculik Exp $
+# $Id: makefile.bc,v 1.35 2003/03/18 15:02:35 jonnymind Exp $
 #
 
 #
@@ -546,7 +546,7 @@ DBFCDX_LIB_OBJS = \
 PP_LIB_OBJS = \
    $(PP_OBJ_DIR)\ppcore.obj \
    $(PP_OBJ_DIR)\ppcomp.obj \
-   $(PP_OBJ_DIR)\pplib.obj \
+   $(RTL_OBJ_DIR)\pplib.obj \
    $(PP_OBJ_DIR)\pptable.obj \
    $(PP_OBJ_DIR)\pragma.obj
 
@@ -896,7 +896,7 @@ $(PP_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
-$(PP_OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
+$(RTL_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 

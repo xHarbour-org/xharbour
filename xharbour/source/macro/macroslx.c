@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.9 2001/04/12 18:24:40 dholm Exp $
+ * $Id: macroslx.c,v 1.1.1.1 2001/12/21 10:43:27 ronpinkas Exp $
  */
 
 /*
@@ -79,4 +79,4 @@
 #define SLX_RULES "../macro/macro.slx"
 
 /* this is relative to position of macroslx.c in harbour source tree */
-#include "../compiler/simplex.c"
+#include "../../include/simplex.c"
