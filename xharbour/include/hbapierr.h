@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapierr.h,v 1.7 2004/03/31 09:19:53 andijahja Exp $
  */
 
 /*
@@ -130,6 +130,7 @@ extern PHB_ITEM HB_EXPORT hb_errPutSubSystem      ( PHB_ITEM pError, char * szSu
 extern PHB_ITEM HB_EXPORT hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
 extern PHB_ITEM HB_EXPORT hb_errPutProcName       ( PHB_ITEM pError, char * szProcname );
 extern PHB_ITEM HB_EXPORT hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
+extern void     HB_EXPORT hb_errRelease           ( PHB_ITEM pError );
 
 #ifdef HB_THREAD_SUPPORT
 extern PHB_ITEM HB_EXPORT hb_errPutRunningThreads ( PHB_ITEM pError, UINT uiCount );

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.93 2004/04/08 13:26:55 druzus Exp $
+ * $Id: itemapi.c,v 1.94 2004/04/14 20:59:11 andijahja Exp $
  */
 
 /*
@@ -1398,7 +1398,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 /* TODO: look if finite()/_finite() or isinf()/_isinf and isnan()/_isnan
    does exist for your compiler and add this to the check below */
 
-#if defined(__RSXNT__) || defined(__EMX__)
+#if defined(__RSXNT__) || defined(__EMX__) || defined( __XCC__ )
 #  define HB_FINITE_DBL(d)    ( isfinite(d)!=0 )
 #elif defined(__WATCOMC__) || defined(__BORLANDC__) || defined(_MSC_VER)
 #  define HB_FINITE_DBL(d)    ( _finite(d)!=0 )

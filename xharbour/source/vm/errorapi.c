@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.43 2004/04/01 09:35:37 andijahja Exp $
+ * $Id: errorapi.c,v 1.44 2004/04/01 22:00:43 druzus Exp $
  */
 
 /*
@@ -1569,4 +1569,9 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
    }
 
    exit( EXIT_FAILURE );
+}
+
+void HB_EXPORT hb_errRelease( PHB_ITEM pError )
+{
+   hb_itemRelease( pError );
 }
