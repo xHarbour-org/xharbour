@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.4 2003/12/29 01:26:30 fsgiudice Exp $
+ * $Id: set.txt,v 1.5 2004/07/23 04:23:04 lculik Exp $
  */
 
 /*
@@ -1373,23 +1373,60 @@
  *  $CATEGORY$
  *      Command
  *  $ONELINER$
- *      Toggle The lock scheme
+ *      Toggles the lock scheme
  *  $SYNTAX$
  *      SET DBFLOCKSCHEME 0 | 1 | 2 | 3
  *  $ARGUMENTS$
- *      0 1 2 3 the type of locking scheme to use
+ *      The type of locking scheme to use.
+ *      #define DBFLOCK_DEFAULT    0
+ *      #define DBFLOCK_CLIP       1
+ *      #define DBFLOCK_CL53       2
+ *      #define DBFLOCK_VFP        3
  *  $DESCRIPTION$
- *  This command affect how file wil be locked  the default value of 0 means default locking scheme
- *  An Value of 1 means clip compatible lock
- *  An value of 2 means clipper 5.3 lock  and an value of  3 means visual fox pro lock
+ *      This command affects how a database file will be locked.
+ *      The default locking scheme is 0.
+ *
+ *      The DBFLOCKSCHEME command needs to be set before opening a
+ *      database file. Different locking schemes can be set for each
+ *      work area, but remember that one file should never be accessed
+ *      with different locks at the same time. Always use UNLOCK to
+ *      release all locks before changing the locking scheme for a
+ *      database file.
+ *
+ *      Setting the locking scheme to 1 will lock the database files
+ *      like CA-Clipper 5.2 does. If you want to use CA-Clipper 5.3's
+ *      locking scheme, set DBFLOCKSCHEME to 2. This will emulate shared
+ *      locks using exclusive locks. Visual FoxPro's locking scheme can be
+ *      set with DBFLOCKSCHEME TO 3.
+ *
+ *      Locking schemes for a open database file can be checked with
+ *      dbinfo(DBI_LOCKSCHEME).
+ *  $EXAMPLES$
+ *  #define DBFLOCK_CL53       2
+ *  REQUEST DBFCDX
+ *
+ *  Function Main()
+ *    Local aStruct := { { "FIELD1", "C", 30, 0 }, ;
+ *                       { "FIELD2", "N", 10, 2 }}
+ *    RddSetDefault("DBFCDX")
+ *    SET DBFLOCKSCHEME TO DBFLOCK_CL53
+ *    DbCreate( "test", aStruct, "DBFCDX")
+ *    USE Test SHARED
+ *    APPEND BLANK
+ *    IF !NETERR()
+ *       FIELD1->"This is a test"
+ *       FIELD2->100
+ *       "Append operation completed"
+ *       COMMIT
+ *    ELSE
+ *       ? "Append operation failed"
+ *    ENDIF
+ *    RETU NIL
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This command is an xHarbour extension.
+ *      This command is a xHarbour extension.
  *  $SEEALSO$
- *      Set()
+ *      Set(), dbInfo()
  *  $END$
  */
-
-
-
