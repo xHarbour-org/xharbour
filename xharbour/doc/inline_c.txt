@@ -1,112 +1,113 @@
 Here is a summary of findings, limitations, and specifications with regard to inline C (HB_INLINE()), and inplace C (#pragma BEGINDUMP) support: 
 
-                   
-                               HB_INLINE()
-                               -----------
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_INLINE()                  
+ *  $CATEGORY$
+ *      Xharbour Enhacements
+ *  $ONELINER$
+ *      Summary of findings, limitations, and specifications with regard to inline C (HB_INLINE())
+ *  $DESCRIPTION$
+ *      Overview:
+ *
+ *      PP -> Lexer - Integration.
+ *
+ *      In order to fully appreciate the scope of what can be achieved, it is important to understand, the relationship between the above components, and their respective responsibilities.
 
-Overview:
----------
+ *      PP Starts with trying to get a full line of code (look for next NewLine). In that process it does the following (partial non sorted list):
 
-  PP -> Lexer - Integration.
+ *      1. Ignore all other characters, while reading strings.
+ *      2. Strip Multi-Line Comments (/**/).
+ *      3. Strip full line Comments (*).
+ *      4. Strip inline comments (//) and (&&) (note && is a C token!!!)
+ *      5. Combines lines that end with semi-colon (;) with the immediate next line (note (;) is a C line terminator.
+ *      6. Parses result line for #PRAGMAs, #INCLUDEs, #DEFINEs, #[x]TRANSLATEs, and #[x]COMMANDS.
+ *      7. Converts [] strings to "" or '' strings if possible, and '' strings to "" strings if possible (note in C [], '', and "" have different meanings).
+ *      8. Finally it transfers a *complete* [processed], line at a time, to the Lexer.
+ *
+ *      Limitations:
 
-In order to fully appreciate the scope of what can be achieved, it is important to understand, the relationship between the above components, and their respective responsibilities.
-
-PP Starts with trying to get a full line of code (look for next NewLine). In that process it does the following (partial non sorted list):
-
-   1. Ignore all other characters, while reading strings.
-   2. Strip Multi-Line Comments (/**/).
-   3. Strip full line Comments (*).
-   4. Strip inline comments (//) and (&&) (note && is a C token!!!)
-   5. Combines lines that end with semi-colon (;) with the immediate next line (note (;) is a C line terminator.
-   6. Parses result line for #PRAGMAs, #INCLUDEs, #DEFINEs, #[x]TRANSLATEs, and #[x]COMMANDS.
-   7. Converts [] strings to "" or '' strings if possible, and '' strings to "" strings if possible (note in C [], '', and "" have different meanings).
-   8. Finally it transfers a *complete* [processed], line at a time, to the Lexer.
-
-Limitations:
-------------
-
-The inline syntax consists of an inline Place Holder (HB_INLINE()), which is treated just like any other Harbour Function Call, where the actual body of code (C code) that this call will execute, follows on subsequent lines in the form of a valid C syntax. It is important to note that this in essence define a multi language syntax, the Harbour syntax (HB_INLINE([...]) and the actual c body code, which has to conform to C syntax.
-
-In order to allow the inclusion of C syntax, all Harbour PP logic (as described above) must be suspended, other than looking for next NewLine character.
-
-Since the C syntax portion, requires that PP logic is suspended, and since PP transfers full line at a time, we are restricted of using C syntax and Harbour syntax, on the *same* source line.
- 
-Please note the HB_INLINE([...]) (the inline Place Holder) component of the inline syntax, is considered Harbour syntax, in effect a Harbour expression, and can be used as any other legal Harbour Expression.
-
-The C body component of the syntax falls under C syntax, and thus can *not* be placed on the same line with the HB_INLINE(), nor can it share the same source line, with *any* other Harbour syntax.
-
-Only ONE HB_INLINE() Place Holder is allowed per ONE Harbour source line.
-
-Usage of this feature is restricted to using Harbour with the [default]-gc[n] compiler switch. Compiling such code, with any other output option, will be reported as a Compilation Error.
-
-Syntax:
--------
-
-... HB_INLINE( [[@]xPar1 [, [@]xParN] ] ) ...
-[.]
-{ /* Any C code excluding usage of macros with non balanced '{' and '}' */ }
-
-The ... ... represents any valid Harbour syntax where the HB_INLINE(...) is a valid expression.
-
-The transition from Harbour to C occurs when encountering the FIRST NewLine token, at the end of an Harbour syntax line, containing the HB_INLINE() Place Holder. The transition from C back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line of C containing a terminating balanced '}' token.
-
-There may be any number of lines in such C block. Any legal C syntax including #directives, and any number of nested balanced {} is allowed.
-
-Can/Can not:
-------------
-
-1. Inline C block, can utilize PRG Variables passed as parameters, using standard Harbour Extend and API systems.
-
-2. Inline C block, can manipulate PRG Variables passed by reference, using standard Harbour Extend and API systems.
-
-3. The return value of an inline C block ,is represented by its HB_INLINE(...) Place Holder, and can be directly assigned to any Harbour variable.
-
-4. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly returned as the return value of a Harbour level function.
-
-5. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly passed as a parameter to another function.
-
-6. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly involved in any valid Harbour expression manipulation.
-
-7. Only ONE HB_INLINE([...]) allowed per Harbour source line.
-
-8. C Source code must be confined within complete source lines, starting and ending with NewLine characters.
-
-Misc:
------
-
-#include of support extend system headers is automatically managed.
-
-C Syntax errors and warnings, are reported with the correct PRG source file name, and line number.
-
-                    
-                               #PRAGMA BEGINDUMP
-                               -----------------
-
-The proposed implementation for the inplace C*, offers the ability to include any C* code, verbatim into the generated compiled Harbour code.
-
-Limitations:
-------------
-
-Developer has to worry about any interface between Harbour Code and such provided code.
-
-No #include files are automatically inserted.
-
-Syntax:
--------
-
-#PRAGMA BEGINDUMP
-...
-[#PRAGMA ENDDUMP]|EOF
-
-The transition from Harbour to C* occurs when encountering the FIRST NewLine token, at the end of the #pragme BEGINDUMP directive line. The transition from C* back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line containing a #pragma STOPDUMP directive, or at the EOF.
-
-There may be any number of lines in such C* block. Any legal C* syntax including #directives, and any number of nested balanced {} is allowed.
-
-Misc:
------
-
-C* Syntax errors and warnings, are reported with the correct PRG source file name, and line number.
-
-No parsing of the C* code is being performed, and thus MACROS of unbalanced '{}' are allowed.
-
-* This implementation is actually language independent, and will allow inclusion of any code compatible with the generated output format.
+ *      The inline syntax consists of an inline Place Holder (HB_INLINE()), which is treated just like any other Harbour Function Call, where the actual body of code (C code) that this call will execute, follows on subsequent lines in the form of a valid C syntax. It is important to note that this in essence define a multi language syntax, the Harbour syntax (HB_INLINE([...]) and the actual c body code, which has to conform to C syntax.
+ *      
+ *      In order to allow the inclusion of C syntax, all Harbour PP logic (as described above) must be suspended, other than looking for next NewLine character.
+ *      
+ *      Since the C syntax portion, requires that PP logic is suspended, and since PP transfers full line at a time, we are restricted of using C syntax and Harbour syntax, on the *same* source line.
+ *       
+ *      Please note the HB_INLINE([...]) (the inline Place Holder) component of the inline syntax, is considered Harbour syntax, in effect a Harbour expression, and can be used as any other legal Harbour Expression.
+ *      
+ *      The C body component of the syntax falls under C syntax, and thus can *not* be placed on the same line with the HB_INLINE(), nor can it share the same source line, with *any* other Harbour syntax.
+ *      
+ *      Only ONE HB_INLINE() Place Holder is allowed per ONE Harbour source line.
+ *
+ *      Usage of this feature is restricted to using Harbour with the [default]-gc[n] compiler switch. Compiling such code, with any other output option, will be reported as a Compilation Error.
+ *      
+ *      Syntax:
+ *
+ *      ... HB_INLINE( [[@]xPar1 [, [@]xParN] ] ) ...
+ *      [.]
+ *      { /* Any C code excluding usage of macros with non balanced '{' and '}' */ }
+ *      
+ *      The ... ... represents any valid Harbour syntax where the HB_INLINE(...) is a valid expression.
+ *      
+ *      The transition from Harbour to C occurs when encountering the FIRST NewLine token, at the end of an Harbour syntax line, containing the HB_INLINE() Place Holder. The transition from C back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line of C containing a terminating balanced '}' token.
+ *      
+ *      There may be any number of lines in such C block. Any legal C syntax including #directives, and any number of nested balanced {} is allowed.
+ *      
+ *      Can/Can not:
+ *      ------------
+ *      
+ *      1. Inline C block, can utilize PRG Variables passed as parameters, using standard Harbour Extend and API systems.
+ *      
+ *      2. Inline C block, can manipulate PRG Variables passed by reference, using standard Harbour Extend and API systems.
+ *      
+ *      3. The return value of an inline C block ,is represented by its HB_INLINE(...) Place Holder, and can be directly assigned to any Harbour variable.
+ *      
+ *      4. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly returned as the return value of a Harbour level function.
+ *      
+ *      5. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly passed as a parameter to another function.
+ *      
+ *      6. The return value of an inline C block , represented by its HB_INLINE(...) Place Holder, can be directly involved in any valid Harbour expression manipulation.
+ *      
+ *      7. Only ONE HB_INLINE([...]) allowed per Harbour source line.
+ *      
+ *      8. C Source code must be confined within complete source lines, starting and ending with NewLine characters.
+ *      
+ *      Misc:     
+ *      
+ *      #include of support extend system headers is automatically managed.
+ *      
+ *      C Syntax errors and warnings, are reported with the correct PRG source file name, and line number.
+ *      
+ *                          
+ *                                     #PRAGMA BEGINDUMP
+ *      
+ *      
+ *      The proposed implementation for the inplace C*, offers the ability to include any C* code, verbatim into the generated compiled Harbour code.
+ *      
+ *      Limitations:
+ *      
+ *      Developer has to worry about any interface between Harbour Code and such provided code.
+ *      
+ *      No #include files are automatically inserted.
+ *      
+ *      Syntax:
+ *      
+ *      
+ *      #PRAGMA BEGINDUMP
+ *      ...
+ *      [#PRAGMA ENDDUMP]|EOF
+ *      
+ *      The transition from Harbour to C* occurs when encountering the FIRST NewLine token, at the end of the #pragme BEGINDUMP directive line. The transition from C* back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line containing a #pragma STOPDUMP directive, or at the EOF.
+ *      
+ *      There may be any number of lines in such C* block. Any legal C* syntax including #directives, and any number of nested balanced {} is allowed.
+ *      
+ *      Misc:
+ *      
+ *      
+ *      C* Syntax errors and warnings, are reported with the correct PRG source file name, and line number.
+ *       
+ *      No parsing of the C* code is being performed, and thus MACROS of unbalanced '{}' are allowed.
+ *      
+ *       This implementation is actually language independent, and will allow inclusion of any code compatible with the generated output format.
+ *  $END$
+ */
