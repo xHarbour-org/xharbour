@@ -149,7 +149,7 @@
  *      ENDIF
  *
  *      aExtract := hb_GetFilesInZip( "TEST2.ZIP" )  // extract all files in zip
- *      IF HB_ZIPFILE( "TEST2.ZIP", {|cFile| qout( cFile ) },,, ".\", aExtract )
+ *      IF HB_UNZIPFILE( "TEST2.ZIP", {|cFile| qout( cFile ) },,, ".\", aExtract )
  *         qout("File was successfully extracted")
  *      ENDIF
  *      Return Nil
@@ -386,7 +386,7 @@
  *
  *      hb_setdiskzip( {|nDisk| Alert( "Please insert disk no " + Str( nDisk, 3 ) ) } )
  *
- *      IF HB_ZIPFILE( "a:\TEST.ZIP", "TEST.PRG" )
+ *      IF HB_ZIPFILEBYPKSPAN( "a:\TEST.ZIP", "TEST.PRG" )
  *         qout( "File was successfully created" )
  *      ENDIF
  *
@@ -603,7 +603,7 @@
  * $RETURNS$
  *     <NIL>            This function always returns NIL.
  * $DESCRIPTION$
- *     This function set the size of the internal buffers for read/write/extract
+ *     This function set the size of the internal buffers for write/extract/read
  *     operation
  *
  *     If the size of the buffer is smaller then the default, the function

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3180 2004/07/21 22:09:20 maurifull Exp $
+ * $Id: ChangeLog,v 1.3181 2004/07/21 23:03:41 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-21 20:12 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+   * doc/en/zipnew.txt
+     ! fixed text in hb_SetBuffer().  Original text said params correspond to
+       read/write/extract but should actually say write/extract/read (refer to
+       contrib/hbzlib/zipnew.cpp, hb_SetZipBuff() function).  Other minor
+       typo fixes.
 
 2004-07-22 00:52 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/include/hbapi.h
