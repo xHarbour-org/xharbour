@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.6 2003/08/12 04:53:41 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.7 2003/09/12 20:10:13 paultucker Exp $
  */
 
 /*
@@ -56,7 +56,6 @@ extern PHB_ITEM pArray;
 PHB_ITEM pDiskStatus = NULL;
 PHB_ITEM pProgressInfo = NULL;
 extern PHB_ITEM pChangeDiskBlock;
-int iTotal = 0;
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,10 +172,6 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 
             try
             {
-               if ( uiPos ==  hb_arrayLen( pArray ) )
-               {
-                  iTotal += dwSize;
-               }
 
                #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) )  && defined( HB_USE_DRIVE_ADD )
                   if ( bDrive && !bAdded  )
@@ -196,14 +191,6 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
                   szZip.AddNewFile( szDummy, iCompLevel, false, CZipArchive::zipsmSafeSmart, 65536 );
                }
 
-               if ( uiPos ==  hb_arrayLen( pArray ) )
-               {
-                  iTotal -= dwSize;
-               }
-               else
-               {
-                  iTotal += dwSize;
-               }
             }
             catch( ... ){}
          }
@@ -228,9 +215,11 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
    }
 
    return ( int ) bReturn;
+   
+
 }
 
-int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, PHB_ITEM pDiskBlock, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
+int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    uLong uiCount;
    const char *szDummy;
@@ -246,10 +235,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
    szZip.SetSpanCallback( &span );
 
-   if ( pDiskBlock  != NULL )
-   {
-      pDiskStatus = pDiskBlock;
-   }
 
    if ( iSpanSize  == 0 )
    {
@@ -317,15 +302,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
             try
             {
-//               if ( szPassWord != NULL )
-//               {
-//                  szZip.SetPassword( szPassWord );
-//               }
-
-               if ( uiPos ==  hb_arrayLen( pArray ) )
-               {
-                  iTotal += dwSize;
-               }
 
                #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) ) && defined( HB_USE_DRIVE_ADD )
                   if ( bDrive && !bAdded  )
@@ -345,14 +321,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
                   szZip.AddNewFile( szDummy, iCompLevel, false, CZipArchive::zipsmSafeSmart, 65536 );
                }
 
-               if ( uiPos ==  hb_arrayLen( pArray ) )
-               {
-                  iTotal -= dwSize;
-               }
-               else
-               {
-                  iTotal += dwSize;
-               }
             }
             catch( ... ){}
          }
@@ -371,8 +339,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
    catch( ... ){}
 
-
-   pDiskStatus = NULL   ;
 
    if ( pProgressInfo )
    {
@@ -451,10 +417,6 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
 
          if ( dwSize != (DWORD) -1 )
          {
-//            if ( szPassWord )
-//            {
-//               szZip.SetPassword( szPassWord );
-//            }
 
             if( pBlock  != NULL )
             {
@@ -497,7 +459,6 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
                }
             }
 
-            iTotal += dwSize;
 
          }
       }
@@ -523,7 +484,7 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
    return ( int ) bReturn;
 }
 
-int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, PHB_ITEM pDiskBlock, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
+int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
    DWORD dwSize;
    BOOL bAdded     = FALSE;
@@ -536,10 +497,6 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
 
    szZip.SetSpanCallback( &span );
 
-   if ( pDiskBlock  != NULL )
-   {
-      pDiskStatus = pDiskBlock;
-   }
 
    if ( iSpanSize  == 0 )
    {
@@ -632,7 +589,6 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
             }
          }
 
-         iTotal += dwSize;
       }
       catch( ... ){}
    }
@@ -649,7 +605,6 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
 
    catch( ... ){}
 
-   pDiskStatus = NULL   ;
 
    if ( pProgressInfo )
    {

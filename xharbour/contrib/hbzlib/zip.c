@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.6 2003/09/14 09:27:24 paultucker Exp $
+ * $Id: zip.c,v 1.7 2003/09/30 14:03:43 paultucker Exp $
  */
 
 /*
@@ -142,11 +142,10 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
-                                 hb_param( 7, HB_IT_BLOCK ),
-                                 ISNUM( 8 ) ? hb_parni( 8 ) : 0,
+                                 ISNUM( 7 ) ? hb_parni( 7 ) : 0,
+                                 ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                                 ISLOG( 10 ) ? hb_parl( 10 ) : 0,
-                                 hb_itemParam( 11 ) );
+                                 hb_itemParam( 10 ) );
       }
       else if( ISARRAY( 2 ) )
       {
@@ -156,11 +155,10 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                               hb_param( 4, HB_IT_BLOCK ),
                               ISLOG( 5 ) ? hb_parl( 5 ) : 0,
                               ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
-                              hb_param( 7, HB_IT_BLOCK ),
-                              ISNUM( 8 ) ? hb_parni( 8 ) : 0,
+                              ISNUM( 7 ) ? hb_parni( 7 ) : 0,
+                              ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                               ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                              ISLOG( 10 ) ? hb_parl( 10 ) : 0,
-                              hb_itemParam( 11 ) );
+                              hb_itemParam( 10 ) );
       }
    }
 
@@ -241,7 +239,6 @@ HB_FUNC( HB_UNZIPFILE )
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
-                             hb_param( 6, HB_IT_BLOCK ),
                              hb_itemParam( 7 ) );
       }
    }
@@ -353,4 +350,9 @@ HB_FUNC( TRANSFERFROMZIP )
    hb_retl( hb_TransferFilesFromzip( hb_parc( 1 ),
                                      hb_parc( 2 ),
                                      hb_param( 3, HB_IT_ARRAY ) ) );
+}
+
+HB_FUNC(SETZIPREADONLY)
+{
+   hb_SetZipReadOnly( hb_parl( 1 ) );
 }
