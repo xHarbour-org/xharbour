@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3176 2004/07/21 11:18:08 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3177 2004/07/21 11:34:20 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,24 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-21 13:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    - Defed out hb_compSequenceFinish() - this optimization did not take into account Jump Optimizatios
+      and thus created a GPF trap. Adding a "rewind" of Jump Data is more complex than might seemed to be.
+
 2004-07-21 17:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * GTWVT - Needed Approach
-    Now if GtWvt.lib is compiled with -D__WVT_NOSHOW_STARTUP__, 
+    Now if GtWvt.lib is compiled with -D__WVT_NOSHOW_STARTUP__,
     then the appln window is not visible until Wvt_ShowWindow( SW_RESTORE )
     is called. This has been necessary to avoid black window being visible
-    prior to setting the fonts and size desired. 
-    Moreover, there may be a need ( sometimes ) that appln window 
+    prior to setting the fonts and size desired.
+    Moreover, there may be a need ( sometimes ) that appln window
     should not be visible until desired.
 
 2004-07-21 16:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/inkey.ch
     + #define K_NCMOUSEMOVE  1016
       Posted to WindProc when mouse hovers on Non-Client area of a Window.
-      
+
   * xharbour/include/wvtwin.ch
     + #define SW_* constants
       These constants contol Windows current state and can be used
-      as Wvt_ShowWindow( SW_HIDE ) ( SW_RESTORE ) etc. 
+      as Wvt_ShowWindow( SW_HIDE ) ( SW_RESTORE ) etc.
 
   * xharbour/source/rtl/gtwvt/gtwvt.c
   * xharbour/source/rtl/gtwvt/wvtcore.c
@@ -36,7 +42,7 @@
     optimizations, code formatting.
 
   * xharbour/tests/wvtgui.prg
-    Updated to use Wvt_ShowWindow().   
+    Updated to use Wvt_ShowWindow().
 
 2004-07-20 13:45 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/cstr.prg

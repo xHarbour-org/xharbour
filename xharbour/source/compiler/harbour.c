@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.82 2004/05/30 20:44:10 ronpinkas Exp $
+ * $Id: harbour.c,v 1.83 2004/06/04 19:22:56 ronpinkas Exp $
  */
 
 /*
@@ -4445,18 +4445,24 @@ ULONG hb_compSequenceEnd( void )
 /* Remove unnecessary opcodes in case there were no executable statements
  * beetwen BEGIN and RECOVER sequence
  */
-void hb_compSequenceFinish( ULONG ulStartPos, int bUsualStmts )
-{
-   if( ! hb_comp_bDebugInfo ) /* only if no debugger info is required */
-   {
-      if( ! bUsualStmts )
-      {
-         hb_comp_functions.pLast->lPCodePos = ulStartPos - 1; /* remove also HB_P_SEQBEGIN */
-         hb_comp_ulLastLinePos = ulStartPos - 5;
-      }
-   }
-}
 
+/*
+  Commented out because we also have to "rewind" Jump Optimizations data, and that is
+  far more complex then it seems to be. :-(
+*/
+#if 0
+    void hb_compSequenceFinish( ULONG ulStartPos, int bUsualStmts )
+    {
+       if( ! hb_comp_bDebugInfo ) /* only if no debugger info is required */
+       {
+          if( ! bUsualStmts )
+          {
+             hb_comp_functions.pLast->lPCodePos = ulStartPos - 1; /* remove also HB_P_SEQBEGIN */
+             hb_comp_ulLastLinePos = ulStartPos - 5;
+          }
+       }
+    }
+#endif
 
 /* Set the name of an alias for the list of previously declared FIELDs
  *

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.68 2004/05/24 07:34:01 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.69 2004/05/28 22:20:21 ronpinkas Exp $
  */
 
 /*
@@ -2488,7 +2488,7 @@ BeginSeq   : BEGINSEQ {
                    --hb_comp_wSeqCounter;  /* RECOVER is also considered as end of sequence */
                 }
 
-                hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
+                //hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
                 hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                 s_iControlLevel--;
              }
@@ -2564,7 +2564,7 @@ Try          : TRY
                      --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
                   }
 
-                  hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
+                  //hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
 
                   hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
