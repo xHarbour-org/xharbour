@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.37 2004/06/06 19:31:46 bdj Exp $
+ * $Id: gtxvt.c,v 1.38 2004/06/09 06:22:15 bdj Exp $
  */
 
 /*
@@ -2420,7 +2420,6 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
             evt->xexpose.x / wnd->fontWidth, evt->xexpose.y / wnd->fontHeight,
             (evt->xexpose.x + evt->xexpose.width) / wnd->fontWidth,
             (evt->xexpose.y + evt->xexpose.height) / wnd->fontHeight);
-
       break;
 
       case KeyPress:
@@ -2457,6 +2456,15 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
 
       case MappingNotify:
          XRefreshKeyboardMapping( &evt->xmapping );
+      break;
+
+      // always clear mapping (both x and internal) when regaining focus
+      case FocusIn:
+         XRefreshKeyboardMapping( &evt->xmapping );
+         s_modifiers.bCtrl  = FALSE;
+         s_modifiers.bAlt   = FALSE;
+         s_modifiers.bAltGr = FALSE;
+         s_modifiers.bShift = FALSE;
       break;
 
       case MotionNotify:

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.9 2004/02/06 17:07:31 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.10 2004/02/19 23:43:09 jonnymind Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ typedef struct tag_ICM_UPDATE
 /********************************************************************/
 /* X-server wise defaults */
 /* Standard event mask */
-#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | StructureNotifyMask )
+#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | StructureNotifyMask | FocusChangeMask )
 /* Class of the window name */
 #define XVT_CLASS_NAME  "xHBapp"
 /********************************************************************/
@@ -311,7 +311,7 @@ typedef struct tag_x_wnddef
    XFontStruct *xfs;
    int fontHeight;
    int fontWidth;
-   
+
    // useful flags;
    USHORT usFlags;
 
