@@ -10,100 +10,44 @@
 #define __ACE_INCLUDED__
 
 
-#if defined( ADS_LINUX )
-   #include "unixutils.h"
+#if defined( unix )
+   #ifndef ADS_LINUX
+   #define ADS_LINUX
+   #endif
+#endif
 
+#if defined( ADS_LINUX )
+   /* #include "unixutils.h" */
+
+
+   #define ADS_PATH_DELIMITER    '/'
    #ifdef ASANLM
       #define delay(x) AdsSleep(x)
    #endif
 #endif
 
+
 #if defined( ADS_LINUX ) && defined( ACE )
-   #include <semaphore.h>
+   /* This makes the callback functions compile in linux */
+   #define WINAPI   /* nothing */
+   #define FARPROC  void*
+   #define HWND     void*
+#endif  // ADS_LINUX && ACE
 
-   /*
-    * The Semaphore and thread functions were abstracted in case we port
-    * to another flavor of linux and need to tweak things a bit. If that
-    * ever happens this section can be moved outside of the ADS_LINUX block.
-    */
-   #define ADS_UNIX_SEM                sem_t
-   #define ADS_UNIX_THREAD             pthread_t
-   #define CreateUnixThread(w,x,y,z)   pthread_create(w,x,y,z)
-   #define GetUnixThreadID             pthread_self
 
-   #if defined( ACE )
-      #define CRITICAL_SECTION               ADS_UNIX_SEM
-
-      #define EnterCriticalSection(x)
-      #define LeaveCriticalSection(x)
-      #define InitializeCriticalSection(x)   sem_init( x, 0, 1 );
-      #define DeleteCriticalSection(x)       sem_destroy(x);
-      #define Sleep(x)                       AdsSleep(x)
-
-      #define GetThreadID()   pthread_self()
-
-      /* This makes the callback functions compile in linux */
-      #define WINAPI   /* nothing */
-      #define FARPROC  void*
-      #define HWND int
-
-      #define _open        open
-      #define _close       close
-      #define _unlink      unlink
-      #define _O_BINARY     0
-      #define O_BINARY      0
-      #define _O_RDWR       0
-      #define _O_CREAT      0
-      #define _O_TRUNC      0
-      #define _O_RDONLY     0
-      #define _S_IREAD      0
-      #define _S_IWRITE     0
-      #define _SH_DENYNO    0
-      #define _sopen open
-      #define sopen open
-      #define ERROR_ACCESS_DENIED         5
-      #define ERROR_FILE_NOT_FOUND        2
-      #define DeleteFile(x)               unlink(x)
-
-      #define GetLastError()              (errno)
-
-      #define IsBadCodePtr( x )     FALSE
-
-      #define MessageBox(w,x,y,z)
-      #define MB_OK                 0
-
-      #define WaitForSetupRISync()
-      #define ReleaseSetupRISync()
-
-      #define GetPrivateProfileInt(w,x,y,z)           69
-      #define GetPrivateProfileString(u,v,w,x,y,z)    69
-      #define WritePrivateProfileString(w,x,y,z)      69
-      #define GetProfileString(u,w,x,y,z)             69
-
-      #define AnsiUpper(x)        strupr(x)
-      #define AnsiLower(x)        strlwr(x)
-
-      #define GetComputerName( x, y )   strcpy( (char*)x, "ys" )
-
-      #define HBITMAP      void
-      #define LPSTR        char*
-      #define UINT         UNSIGNED32
-      #define WN_SUCCESS   0
-
-      #define wsprintf sprintf
-   #endif // ACE
-#endif  // ADS_LINUX || ACE
-
-#ifdef ADS_LINUX
+#if defined(ADS_LINUX) || defined(__GNUC__)
    #pragma pack( 1 )
 #else
    #pragma pack( push, 1 )
 #endif
 
 /* This forces a warning for single equals in if statements */
-#ifdef WIN32
-   // 16-bit compiler doesn't seem to like this
+#if defined( WIN32 ) && !defined( ADS_LINUX )
+   /* 16-bit compiler doesn't seem to like this */
+   /* MingWin reports "warning: ignoring pragma: )" */
    #pragma warning( error : 4706 )
+
+   #define ADS_PATH_DELIMITER    '\\'
 #endif
 
 /* added to get access() prototype */
@@ -135,7 +79,7 @@
 
 #if defined( ASANLM ) || defined( ADS_LINUX ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE )
    #define ENTRYPOINT
-#elif defined( WIN32 ) && !defined( __BORLANDC__ )
+#elif defined( WIN32 ) && !defined( __BORLANDC__ ) && ! defined( __GNUC__ )
    #define ENTRYPOINT _declspec( dllexport ) WINAPI
 #else
    #define ENTRYPOINT _export WINAPI
@@ -161,6 +105,9 @@
 /* options for connecting to Advantage servers - can be ORed together */
 #define ADS_INC_USERCOUNT        0x00000001
 #define ADS_STORED_PROC_CONN     0x00000002
+#define ADS_COMPRESS_ALWAYS      0x00000004
+#define ADS_COMPRESS_NEVER       0x00000008
+#define ADS_COMPRESS_INTERNET    0x0000000C
 
 /* options for opening tables - can be ORed together */
 #define ADS_EXCLUSIVE            0x00000001
@@ -422,6 +369,9 @@
 #define AE_NOT_MEMBER_OF_GROUP          5156
 #define AE_ALREADY_MEMBER_OF_GROUP      5157
 #define AE_INVALID_OBJECT_RIGHT         5158
+#define AE_INVALID_OBJECT_PERMISSION    5158    /* Note that this is same as above. The word
+                                                 * permission is more commonly used.
+                                                 */
 #define AE_CANNOT_OPEN_DATABASE_TABLE   5159
 #define AE_INVALID_CONSTRAINT           5160
 #define AE_NOT_ADMINISTRATOR            5161
@@ -431,7 +381,8 @@
 #define AE_NO_STORED_PROC_EXEC_RIGHTS   5165
 #define AE_DD_UNSUPPORTED_DEPLOYMENT    5166
 #define AE_INFO_AUTO_CREATION_OCCURRED  5168
-
+#define AE_INFO_COPY_MADE_BY_CLIENT     5169
+#define AE_DATABASE_REQUIRE_NEW_SERVER  5170
 
 /* Available OEM Languages (for Clipper compatibility) */
 #define ADS_LANG_USA          "USA"
@@ -783,6 +734,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_RELATION_OBJECT       2
 #define ADS_DD_INDEX_FILE_OBJECT     3
 #define ADS_DD_FIELD_OBJECT          4
+#define ADS_DD_COLUMN_OBJECT         4
 #define ADS_DD_INDEX_OBJECT          5
 #define ADS_DD_VIEW_OBJECT           6
 #define ADS_DD_VIEW_OR_TABLE_OBJECT  7  /* Used in AdsFindFirst/NextTable */
@@ -909,6 +861,14 @@ typedef struct _ADD_FIELD_DESC_
 /* User group Properties 1201 - 1299 */
 /* None at this moment. */
 /* Also object rights properties 1001 - 1099 */
+
+/* Supported permissions in the data dictionary */
+#define ADS_PERMISSION_READ         1
+#define ADS_PERMISSION_UPDATE       2
+#define ADS_PERMISSION_INSERT       3
+#define ADS_PERMISSION_DELETE       4
+#define ADS_PERMISSION_EXECUTE      5
+#define ADS_PERMISSION_INHERIT      6
 
 
 
@@ -1043,16 +1003,16 @@ UNSIGNED32 ENTRYPOINT AdsConnect60( UNSIGNED8  *pucServerPath,
 UNSIGNED32 ENTRYPOINT AdsContinue( ADSHANDLE    hTable,
                                    UNSIGNED16   *pbFound );
 
-UNSIGNED32 ENTRYPOINT AdsConvertTable( ADSHANDLE   hTable,
+UNSIGNED32 ENTRYPOINT AdsConvertTable( ADSHANDLE   hObj,
                                        UNSIGNED16  usFilterOption,
                                        UNSIGNED8   *pucFile,
                                        UNSIGNED16  usTableType );
 
-UNSIGNED32 ENTRYPOINT AdsCopyTable( ADSHANDLE   hTable,
+UNSIGNED32 ENTRYPOINT AdsCopyTable( ADSHANDLE   hObj,
                                     UNSIGNED16  usFilterOption,
                                     UNSIGNED8   *pucFile );
 
-UNSIGNED32 ENTRYPOINT AdsCopyTableContents( ADSHANDLE    hTableFrom,
+UNSIGNED32 ENTRYPOINT AdsCopyTableContents( ADSHANDLE    hObj,
                                             ADSHANDLE    hTableTo,
                                             UNSIGNED16   usFilterOption );
 
@@ -1168,6 +1128,29 @@ UNSIGNED32 ENTRYPOINT AdsDDGetRefIntegrityProperty( ADSHANDLE  hObject,
                                                     UNSIGNED16 usPropertyID,
                                                     UNSIGNED8  *pucProperty,
                                                     UNSIGNED16 *pusPropertyLen );
+
+UNSIGNED32 ENTRYPOINT AdsDDGetPermissions( ADSHANDLE  hDBConn,
+                                           UNSIGNED8  *pucGrantee,
+                                           UNSIGNED16 usObjectType,
+                                           UNSIGNED8  *pucObjectName,
+                                           UNSIGNED8  *pucParentName,
+                                           UNSIGNED16 usGetInherited,
+                                           UNSIGNED8  *pucPermissions,
+                                           UNSIGNED16 *pusBufferLen );
+
+UNSIGNED32 ENTRYPOINT AdsDDGrantPermission( ADSHANDLE  hAdminConn,
+                                            UNSIGNED16 usObjectType,
+                                            UNSIGNED8  *pucObjectName,
+                                            UNSIGNED8  *pucParentName,
+                                            UNSIGNED8  *pucGrantee,
+                                            UNSIGNED16 usPermission );
+
+UNSIGNED32 ENTRYPOINT AdsDDRevokePermission( ADSHANDLE  hAdminConn,
+                                             UNSIGNED16 usObjectType,
+                                             UNSIGNED8  *pucObjectName,
+                                             UNSIGNED8  *pucParentName,
+                                             UNSIGNED8  *pucGrantee,
+                                             UNSIGNED16 usPermission );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetDatabaseProperty( ADSHANDLE  hDictionary,
                                         UNSIGNED16 usPropertyID,
@@ -2277,13 +2260,12 @@ UNSIGNED32 ENTRYPOINT AdsDDDeployDatabase( UNSIGNED8 *pucDestination,
                                            UNSIGNED16 usBackupFiles,
                                            UNSIGNED32 ulOptions );
 
-
 #ifdef __cplusplus
    }  /* extern "C" */
 #endif
 
 
-#ifdef ADS_LINUX
+#if defined(ADS_LINUX) || defined(__GNUC__)
    #pragma pack()
 #else
    #pragma pack( pop )
