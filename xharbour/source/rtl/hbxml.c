@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.15 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: hbxml.c,v 1.16 2004/03/23 18:09:29 jonnymind Exp $
  */
 
 /*
@@ -96,8 +96,8 @@ static void hbxml_set_doc_status( MXML_REFIL *ref, PHB_ITEM doc, PHB_ITEM pNode,
    hb_objSendMsg( doc, "_OERRORNODE", 1 , pNode );
    
    // ref->status is often used as an error marker even if the error wasn't from i/o
-   ref->status = status;
-   ref->error = error;
+   ref->status = (MXML_STATUS) status;
+   ref->error = (MXML_ERROR_CODE) error;
    fflush( stdout );
 }
 
@@ -1162,7 +1162,7 @@ static int mxml_node_read_closing( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
    int iLen;
    
    hb_objSendMsg( pNode,"CNAME", 0 );
-   iLen = HB_VM_STACK.Return.item.asString.value+1;
+   iLen = (int) ( HB_VM_STACK.Return.item.asString.value+1 );
    buf = (char *) MXML_ALLOCATOR( iLen );
    
    
@@ -1329,7 +1329,7 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
       mxml_node_read_closing( ref, pNode, doc );
       if ( ref->status != MXML_STATUS_OK )
       {
-         return iStatus;
+         return ( (MXML_STATUS) iStatus );
       }
                
       //checking for data nodes

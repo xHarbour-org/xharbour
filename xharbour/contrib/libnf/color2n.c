@@ -1,5 +1,5 @@
 /*
- * $Id: color2n.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: color2n.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static int _ftColor2I( char * cColor )
     // copy the Clipper string to buffer, check for attributes, and
     // make lower case
 
-    while ( ( cFore[ i ] = cColor[ i ] ) != NULL )
+    while ( ( cFore[ i ] = cColor[ i ] ) != 0 )
     {
        // check for a blink attrib
 
@@ -107,12 +107,12 @@ static int _ftColor2I( char * cColor )
 
     // check for the background color
 
-    while ( cColor[ iBack++ ] != '/' && cColor[ iBack ] != NULL );
+    while ( cColor[ iBack++ ] != '/' && cColor[ iBack ] != 0 );
 
     if ( cColor[--iBack ] == '/' )
     {
        cBack = cFore + iBack + 1;
-       cFore[ iBack ] = NULL;
+       cFore[ iBack ] = 0;
     }
 
     // calculate and return the value
