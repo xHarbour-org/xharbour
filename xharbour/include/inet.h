@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.20 2003/07/23 12:35:57 druzus Exp $
+* $Id: inet.h,v 1.21 2003/11/11 20:20:53 ronpinkas Exp $
 */
 
 /*
@@ -56,6 +56,8 @@
    #include "hbvm.h"
    #include "hbapierr.h"
 
+   #define  HB_SOCKET_SIGN   0xF0123A42
+
    #if defined( HB_OS_DOS )
        #define HB_NO_DEFAULT_INET
    #else
@@ -91,6 +93,7 @@
 
       typedef struct tag_HB_SOCKET_STRUCT
       {
+          ULONG sign;
           HB_SOCKET_T com;
           char *errorDesc;
           int errorCode;
@@ -99,15 +102,7 @@
           int timeout;
           int timelimit;
           PHB_ITEM caPeriodic;
-          /* HB_CRITICAL_T Mutex;*/
       } HB_SOCKET_STRUCT;
-
-      typedef struct tag_HB_INET_CARGO
-      {
-          HB_SOCKET_STRUCT *Socket;
-          HB_SOCKET_STRUCT *NewSocket;
-          void * Cargo;
-      } HB_INET_CARGO;
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 
@@ -117,38 +112,24 @@
               s->errorDesc = strerror( s->errorCode );\
               WSASetLastError( 0 );
 
-/*
-          #define HB_CRITICAL_INET_INIT( x )       TraceLogPointer( NULL, "Init %p\n", &(x) ); InitializeCriticalSection( &(x) )
-          #define HB_CRITICAL_INET_DESTROY( x )    TraceLogPointer( NULL, "Destroy %p\n", &(x) ); DeleteCriticalSection( &(x) )
-          #define HB_CRITICAL_INET_LOCK( x )       TraceLogPointer( NULL, "Lock %p\n", &(x) ); EnterCriticalSection( &(x) )
-          #define HB_CRITICAL_INET_UNLOCK( x )     TraceLogPointer( NULL, "Unlock %p\n", &(x) ); LeaveCriticalSection( &(x) )
-*/
       #else
           #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
-/*
-          #define HB_CRITICAL_INET_INIT( x )       pthread_mutex_init( &(x), NULL )
-          #define HB_CRITICAL_INET_DESTROY( x )    pthread_mutex_destroy( &(x) )
-          #define HB_CRITICAL_INET_LOCK( x )       pthread_mutex_lock( &(x) )
-          #define HB_CRITICAL_INET_UNLOCK( x )     pthread_mutex_unlock( &(x) )
-*/
       #endif
 
       #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
       #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
 
       #define HB_SOCKET_INIT( s ) \
-          {\
-             s = ( HB_SOCKET_STRUCT *) hb_xgrab( sizeof( HB_SOCKET_STRUCT ) );\
-             HB_SOCKET_ZERO_ERROR( s );\
-             s->com = 0;\
-             s->count = 0;\
-             s->timeout = -1;\
-             s->timelimit = -1;\
-             s->caPeriodic = NULL;\
-             /*HB_CRITICAL_INET_INIT( s->Mutex );*/\
-          }
-
-      #define HB_SOCKET_FREE( s ) /*HB_CRITICAL_INET_DESTROY( s->Mutex )*/
+      {\
+         s = ( HB_SOCKET_STRUCT *) hb_gcAlloc( sizeof( HB_SOCKET_STRUCT ), hb_inetSocketFinalize );\
+         HB_SOCKET_ZERO_ERROR( s );\
+         s->sign = HB_SOCKET_SIGN;\
+         s->com = 0;\
+         s->count = 0;\
+         s->timeout = -1;\
+         s->timelimit = -1;\
+         s->caPeriodic = NULL;\
+      }
 
       #ifndef MSG_NOSIGNAL
           #define MSG_NOSIGNAL  0

@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo server program
-* $Id: server.prg,v 1.8 2003/04/13 23:55:26 jonnymind Exp $
+* $Id: server.prg,v 1.9 2003/04/20 23:07:13 jonnymind Exp $
 *
 * Giancarlo Niccolai
 *
@@ -89,20 +89,16 @@ Procedure Main( cPort )
                @ 8, 5 SAY space(70)
                @ 9, 5 SAY space(70)
                @ 9, 5 SAY "Press a key to continue"
-               InetDestroy( s )
                Inkey( 0 )
                EXIT
 
          END CASE
 
          IF Inkey() != 0
-            InetDestroy( s )
             bCont := .f.
          ENDIF
       ENDDO
    ENDDO
-
-   InetDestroy( Socket )
 
    InetCleanup()
 

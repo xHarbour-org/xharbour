@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+* $Id: hblognet.prg,v 1.2 2003/11/27 17:57:50 jonnymind Exp $
 */
 
 /*
@@ -273,14 +273,14 @@ METHOD Close( cName ) CLASS HB_LogInetPort
    JoinThread( ::nThread )
 #endif
 
-   InetDestroy( ::skIn )
+   InetClose( ::skIn )
 
    // we now are sure that incoming thread index is not used.
 
    DO WHILE  Len( ::aListeners ) > 0
       sk := ATail( ::aListeners )
       ASize( ::aListeners, Len( ::aListeners ) - 1 )
-      InetDestroy( sk )
+      InetClose( sk )
    ENDDO
 
    InetCleanup()

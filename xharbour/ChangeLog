@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1788 2003/11/27 23:39:11 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1789 2003/11/28 10:38:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-28 17:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/inet.c
+  * include/inet.h
+    ! Inet Socket objects are now returned in their own encapsualted
+      pointer. A GC finalization routine takes care to destroy, and
+      eventually even close, unused sockets.
+    ! Code rearranged to minimize common code (recv/recvall,
+      send/sendall).
+    ! Error messages for parameter checking faulire reviewed.
+    ! Checks also against user fault in passing wrong items.
+
+  * source/rtl/hblognet.prg
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+  * tests/client.prg
+  * tests/inetto.prg
+  * tests/rpcserver.prg
+  * tests/server.prg
+  * tests/udpclient.prg
+  * tests/udpserver.prg
+    - Removed InetDestroy() or changed with InetClose
+      where necessary.
 
 2003-11-28 11:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/mainwin.c

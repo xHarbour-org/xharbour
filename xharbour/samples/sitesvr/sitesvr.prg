@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.8 2003/04/14 21:10:58 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.9 2003/11/03 06:07:06 jonnymind Exp $
  */
 
 ***********************************************************
@@ -87,7 +87,7 @@ PROCEDURE Main( cPort)
 
    // wait for accepting thread to be terminated
    WaitForThreads()
-   InetDestroy( Socket )
+   InetClose( Socket )
    InetCleanup()
    DestroyMutex( MutexDB )
    DestroyMutex( MutexCount )
@@ -157,7 +157,6 @@ PROCEDURE AcceptIncoming( Socket )
          StartThread( @ServeClient(), com )
          HB_GcAll( .T. )
       ELSE
-         //InetDestroy( Com )
          ? "Catched error ", InetErrorCode( Socket ), InetErrorDesc( Socket )
          //EXIT
       ENDIF
@@ -185,7 +184,6 @@ PROCEDURE ServeClient( Socket )
    *** First of all, we must take the request of the user
    cRequest := InetRecvLine( Socket, @nLength )
    IF nLength < 0
-      InetDestroy( Socket )
       MutexLock( MutexCount )
       g_nUserCount--
       MutexUnlock( MutexCount )
@@ -213,7 +211,6 @@ PROCEDURE ServeClient( Socket )
          ENDIF
       ELSE
          *** invalid
-         InetDestroy( Socket )
          MutexLock( MutexCount )
          g_nUserCount--
          MutexUnlock( MutexCount )
@@ -226,7 +223,6 @@ PROCEDURE ServeClient( Socket )
       *** cPostData is autoAllocated
       cPostData := Space( nContLen )
       IF InetRecvAll( Socket, @cPostData, nContLen ) <= 0
-         InetDestroy( Socket )
          MutexLock( MutexCount )
          g_nUserCount--
          MutexUnlock( MutexCount )
@@ -237,7 +233,7 @@ PROCEDURE ServeClient( Socket )
    *** Now we process the request:
    ProcessRequest( Socket, @cRequest, @aFields, cPostData )
 
-   InetDestroy( Socket )
+   InetClose( Socket )
    MutexLock( MutexCount )
    g_nUserCount--
    MutexUnlock( MutexCount )

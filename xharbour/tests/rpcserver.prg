@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.7 2003/04/17 21:22:23 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.8 2003/09/23 15:16:21 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -15,7 +15,6 @@
 #include "hbclass.ch"
 
 PROCEDURE Main()
-   LOCAL oProc, params
    LOCAL oSv
 
    CLEAR SCREEN
@@ -64,39 +63,41 @@ FUNCTION CheckSum( cData, oClient )
 
 RETURN Str(nSum, 10)
 
-PROCEDURE Scanf( oServer )
-   @8, 10 say "Function scanning from " + InetAddress( oServer:skUDP )+ "         "
+FUNCTION Scanf( oServer )
+   @8, 10 SAY "Function scanning from " + InetAddress( oServer:skUDP )+ "         "
 RETURN .T.
 
-PROCEDURE Scans( oServer )
-   @9, 10 say "Server scanning from " + InetAddress( oServer:skUDP )+ "         "
+FUNCTION Scans( oServer )
+   @9, 10 SAY "Server scanning from " + InetAddress( oServer:skUDP )+ "         "
 RETURN .T.
 
 
-PROCEDURE Connecting( oClient )
-   @10, 10 say "Serving connection from " + InetAddress( oClient:skRemote )
+FUNCTION Connecting( oClient )
+   @10, 10 SAY "Serving connection from " + InetAddress( oClient:skRemote )
 RETURN .T.
 
-PROCEDURE Entering( oClient )
-   @11, 10 say "Client " + oClient:cUserID  + " has entered         "
+FUNCTION Entering( oClient )
+   @11, 10 SAY "Client " + oClient:cUserID  + " has entered         "
 RETURN .T.
 
-PROCEDURE Exiting( oClient )
-   @12, 10 say "Client " + oClient:cUserID  + " has logged out         "
+FUNCTION Exiting( oClient )
+   @12, 10 SAY "Client " + oClient:cUserID  + " has logged out         "
 RETURN .T.
 
-PROCEDURE Terminating( oClient )
+FUNCTION Terminating( oClient )
    IF .not. Empty( oClient:cUserID )
-      @13, 10 say "Client " + oClient:cUserID  + " has terminated operations         "
+      @13, 10 SAY "Client " + oClient:cUserID  + " has terminated operations         "
    ELSE
-      @13, 10 say "A client failed authentication                              "
+      @13, 10 SAY "A client failed authentication                              "
    ENDIF
 RETURN .T.
 
-PROCEDURE FuncError( oServer, cFunc, nError )
-   ? "ERROR in function call: ", nError, cFunc
-RETURN
+FUNCTION FuncError( oServer, cFunc, nError )
+   ? "ERROR in function call: ", InetAddress( oServer:skTCP ), nError, cFunc
+RETURN .T.
 
-PROCEDURE HaveEncryptionKey( cUserId )
+/* This function receives also a parameter: the userid for which the
+key is requested */
+FUNCTION HaveEncryptionKey()
 RETURN "A nice key to be used by servers"
 

@@ -63,7 +63,6 @@ Procedure Main( cPort )
    Inkey(0)
 
    InetClose( Socket )
-   InetDestroy( Socket )
 
    InetCleanup()
 

@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.21 2003/09/23 15:16:21 jonnymind Exp $
+ * $Id: trpc.prg,v 1.22 2003/11/27 17:57:50 jonnymind Exp $
  */
 
 /*
@@ -449,10 +449,7 @@ METHOD Destroy() CLASS tRPCServeCon
       MutexLock( ::mtxBusy )
    ENDIF
 
-   IF ::skRemote != NIL
-      InetDestroy( ::skRemote )
-      ::skRemote := NIL
-   ENDIF
+   ::skRemote := NIL
    MutexUnlock( ::mtxBusy )
 RETURN .T.
 
@@ -1383,13 +1380,12 @@ METHOD Stop() CLASS tRPCService
    FOR EACH oElem IN ::aServing
       KillThread( oElem:thSelf )
       JoinThread( oElem:thSelf )
-      InetDestroy( oElem:skRemote )
    NEXT
    ASize( ::aServing, 0 )
 
    // now destroy all the allocated resources
-   InetDestroy( ::skServer )
-   InetDestroy( ::skUdp )
+   ::skServer := NIL
+   ::skUdp := NIL
 
    MutexUnlock( ::mtxBusy )
 

@@ -5,7 +5,7 @@
 *
 * Contributed by Giancarlo Niccolai and Charles Kwon
 *
-* $Id: inetto.prg,v 1.7 2003/01/27 21:44:49 jonnymind Exp $
+* $Id: inetto.prg,v 1.8 2003/01/31 19:37:39 jonnymind Exp $
 *
 
 * This array contain the socket control objects that
@@ -187,7 +187,7 @@ FUNCTION ControlThread( nTimeout )
          IF aTicket[ 3 ] == 0 .and. aTicket[ 4 ] + nTimeout < Seconds()
             StopThread( aTicket[ 2 ] )
             aTicket[ 3 ] := -1
-            InetDestroy( aTicket[1] )
+            aTicket[ 1 ] := NIL // removes the socket
          ENDIF
 
          /* A complete app could have more status/timeout relations */

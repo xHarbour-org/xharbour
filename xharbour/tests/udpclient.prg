@@ -33,7 +33,6 @@ PROCEDURE Main( cAddress, cPort )
    IF InetErrorCode( Socket ) != 0
        ? "Can't connect with " + cAddress +": " + InetErrorDesc( Socket )
        Inkey(0)
-       InetDestroy( Socket )
        return
    ENDIF
 
@@ -83,7 +82,6 @@ PROCEDURE Main( cAddress, cPort )
    END CASE
 
    InetClose( Socket )
-   InetDestroy( Socket )
 
    @6, 2 SAY "Program done: Press a key to continue"
    Inkey( 0 )

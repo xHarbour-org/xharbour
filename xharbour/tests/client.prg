@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo client program
-* $Id: client.prg,v 1.9 2003/01/14 02:40:40 jonnymind Exp $
+* $Id: client.prg,v 1.10 2003/01/14 23:46:42 jonnymind Exp $
 *
 * Giancarlo Niccolai
 *
@@ -42,7 +42,6 @@ PROCEDURE Main( cAddress, cPort )
        @7,5 SAY "Can't connect with " + cAddress +": " + InetErrorDesc( Socket )
        @8,5 SAY "Press a key to terminate the program"
        Inkey(0)
-       InetDestroy( Socket )
        RETURN
    ENDIF
 
@@ -67,7 +66,7 @@ PROCEDURE Main( cAddress, cPort )
 
    WaitForThreads()
 
-   InetDestroy( Socket )
+   InetClose( Socket )
    InetCleanup()
 
 RETURN

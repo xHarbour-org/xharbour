@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.33 2003/09/03 23:50:09 mlombardo Exp $
+* $Id: inet.c,v 1.34 2003/11/11 20:20:55 ronpinkas Exp $
 */
 
 /*
@@ -321,6 +321,39 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
    return Socket->errorCode == 0;
 }
 
+
+HB_GARBAGE_FUNC( hb_inetSocketFinalize )
+{
+   HB_SOCKET_STRUCT *Socket = ( HB_SOCKET_STRUCT *) Cargo;
+
+   if ( Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errInternal( HB_EI_MEMCORRUPT,
+         "hb_inetSocketFinalize: Corrupted socket item at 0x%p",
+         (char *) Socket, NULL );
+      return;
+   }
+
+   if ( Socket->com > 0 )
+   {
+      #if defined( HB_OS_WIN_32 )
+         shutdown( Socket->com, SD_BOTH );
+      #elif defined(HB_OS_OS2)
+         shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
+      #else
+         shutdown( Socket->com, SHUT_RDWR );
+      #endif
+
+      HB_INET_CLOSE( Socket->com );
+   }
+
+   if ( Socket->caPeriodic != NULL )
+   {
+      hb_arrayRelease( Socket->caPeriodic );
+      Socket->caPeriodic = NULL;
+   }
+}
+
 /*****************************************************
 * Socket Initialization
 ***/
@@ -367,23 +400,18 @@ HB_FUNC( INETCREATE )
       Socket->timeout = hb_parni(1);
    }
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   hb_retptr( Socket );
 }
 
 HB_FUNC( INETCLOSE )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-   HB_SOCKET_STRUCT *Socket;
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLOSE", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLOSE", 1, hb_paramError(1) );
       return;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    if( Socket->com )
    {
@@ -401,7 +429,6 @@ HB_FUNC( INETCLOSE )
       #ifdef HB_OS_LINUX
          kill( 0, HB_INET_LINUX_INTERRUPT );
       #endif
-      hb_retni( 0 );
    }
    else
    {
@@ -410,43 +437,11 @@ HB_FUNC( INETCLOSE )
 }
 
 
+/* Kept for backward compatibility */
+
 HB_FUNC( INETDESTROY )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDESTROY", 1, pArgs );
-      hb_itemRelease( pArgs );
-      return;
-   }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
-   if ( Socket->com > 0 )
-   {
-      #if defined( HB_OS_WIN_32 )
-          shutdown( Socket->com, SD_BOTH );
-      #elif defined(HB_OS_OS2)
-         shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-      #else
-          shutdown( Socket->com, SHUT_RDWR );
-      #endif
-
-      HB_INET_CLOSE( Socket->com );
-   }
-
-   if ( Socket->caPeriodic != NULL )
-   {
-      hb_arrayRelease( Socket->caPeriodic );
-      Socket->caPeriodic = NULL;
-   }
-   HB_SOCKET_FREE( Socket );
-
-   hb_ret();
 }
 
 /************************************************
@@ -455,119 +450,109 @@ HB_FUNC( INETDESTROY )
 
 HB_FUNC( INETSTATUS )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORCODE", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSTATUS", 1,
+          hb_paramError( 1 ) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
-   hb_retni( Socket->com == 0 ? -1 : 0 );
+   /* TODO: hb_retni( Socket->status ); */
+   hb_retni( Socket->com == 0 ? -1 : 1 );
 }
 
+/* Prepared, but still not used; being in wait for comments
+HB_FUNC( INETSTATUSDESC )
+{
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
+
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSTATUS", 1,
+          hb_paramError( 1 ) );
+      return;
+   }
+
+   switch ( Socket->status )
+   {
+      case 0: hb_retc( "Connection not opened" ); return;
+      case 1: hb_retc( "Connection alive" ); return;
+      case 2: hb_retc( "Last operation error" ); return;
+      case 3: hb_retc( "Last operation timeout" ); return;
+   }
+}
+*/
 
 HB_FUNC( INETERRORCODE )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORCODE", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORCODE", 1,
+         hb_paramError(1) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
    hb_retni( Socket->errorCode );
-
 }
 
 HB_FUNC( INETERRORDESC )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORDESC", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORDESC", 1,
+         hb_paramError(1) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
    hb_retc( Socket->errorDesc );
-
 }
 
 HB_FUNC( INETCLEARERROR )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETERRORDESC", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARERROR", 1,
+         hb_paramError( 1 ) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
    HB_SOCKET_ZERO_ERROR( Socket );
-
 }
+
 
 HB_FUNC( INETCOUNT )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCOUNT", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCOUNT", 1,
+         hb_paramError(1) );
       return;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    hb_retni( Socket->count );
 }
 
 HB_FUNC( INETADDRESS )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-
-   HB_SOCKET_STRUCT *Socket;
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
    char *addr;
 
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETADDRESS", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETADDRESS", 1,
+         hb_paramError( 1 ) );
       return;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    addr = inet_ntoa( Socket->remote.sin_addr );
 
@@ -576,224 +561,185 @@ HB_FUNC( INETADDRESS )
 
 HB_FUNC( INETPORT )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   HB_SOCKET_STRUCT *Socket;
-   int iPort;
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETPORT", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETPORT", 1,
+         hb_paramError( 1 ) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
-   iPort = ntohs( Socket->remote.sin_port );
-
-   hb_retni( iPort );
+   hb_retni( ntohs( Socket->remote.sin_port ) );
 }
 
 
 HB_FUNC( INETSETTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL && ISNUM( 2 ) )
+   if( Socket != NULL && Socket->sign == HB_SOCKET_SIGN && ISNUM(2) )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
       Socket->timeout = hb_parni(2);
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, nTimeout)"
-         , "INETSETTIMEOUT", 0 );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETTIMEOUT", 2,
+         hb_paramError(1), hb_paramError(2) );
    }
 }
 
 HB_FUNC( INETGETTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      hb_retni( Socket->timeout );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETTIMEOUT", 1,
+         hb_paramError(1) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
-         , "INETGETTIMEOUT", 0 );
-   }
+
+   hb_retni( Socket->timeout );
 }
 
 
 HB_FUNC( INETCLEARTIMEOUT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      Socket->timeout = -1;
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARTIMEOUT", 1,
+         hb_paramError(1) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
-         , "INETCLEARTIMEOUT", 0 );
-   }
+
+   Socket->timeout = -1;
 }
 
 HB_FUNC( INETSETTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL && ISNUM( 2 ) )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || !ISNUM(2))
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      Socket->timelimit = hb_parni(2);
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETTIMELIMIT", 2,
+         hb_paramError(1), hb_paramError(2) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, nTimeout)"
-         , "INETSETTIMELIMIT", 0 );
-   }
+
+   Socket->timelimit = hb_parnl(2);
 }
 
 HB_FUNC( INETGETTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      hb_retni( Socket->timelimit );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETTIMELIMIT", 1,
+        hb_paramError(1) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket )"
-         , "INETGETTIMELIMIT", 0 );
-   }
+
+   hb_retni( Socket->timelimit );
 }
 
 
 HB_FUNC( INETCLEARTIMELIMIT )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      Socket->timeout = -1;
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARTIMELIMIT", 1,
+         hb_paramError(1) );
+      return;
    }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
-         , "INETCLEARTIMELIMIT", 0 );
-   }
+
+   Socket->timelimit = -1;
 }
 
 HB_FUNC( INETSETPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
    PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
 
-   if ( pSocket != NULL || pArray == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      if ( Socket->caPeriodic != NULL )
-      {
-         hb_arrayRelease( Socket->caPeriodic );
-      }
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSETPERIODCALLBACK", 2,
+         hb_paramError(1), hb_paramError(2) );
+      return;
+   }
 
-      Socket->caPeriodic  = hb_arrayClone( pArray, NULL );
-   }
-   else
+   if ( Socket->caPeriodic != NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, execArray )"
-         , "INETSETPERIODCALLBACK", 0 );
+      hb_arrayRelease( Socket->caPeriodic );
    }
+
+   Socket->caPeriodic  = hb_arrayClone( pArray, NULL );
+   hb_gcLock( Socket->caPeriodic );
 }
 
 
 HB_FUNC( INETGETPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      if (  Socket->caPeriodic == NULL )
-      {
-         hb_ret();
-      }
-      else {
-         HB_VM_STACK.Return.type = HB_IT_ARRAY;
-         HB_VM_STACK.Return.item.asArray.value =
-               Socket->caPeriodic->item.asArray.value;
-      }
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETPERIODCALLBACK", 1,
+         hb_paramError(1) );
+      return;
+   }
+
+   if (  Socket->caPeriodic == NULL )
+   {
+      hb_ret();
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket )"
-         , "INETGETPERIODCALLBACK", 0 );
+      hb_itemReturnCopy( Socket->caPeriodic );
    }
 }
 
 HB_FUNC( INETCLEARPERIODCALLBACK )
 {
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
 
-   if ( pSocket != NULL  )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-      if ( Socket->caPeriodic != NULL )
-      {
-         hb_arrayRelease( Socket->caPeriodic );
-         Socket->caPeriodic = NULL;
-      }
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCLEARPERIODCALLBACK", 1,
+         hb_paramError(1) );
    }
-   else
+
+   if ( Socket->caPeriodic != NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
-         , "INETCLEARPERIODCALLBACK", 0 );
+      hb_arrayRelease( Socket->caPeriodic );
+      Socket->caPeriodic = NULL;
    }
 }
 
-/**********************************
+/********************************************************************
 * TCP receive and send functions
 ***/
 
-HB_FUNC( INETRECV )
+static void s_inetRecvInternal( char *szFuncName, int iMode )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF ); // hb_param() calls hb_itemUnref()!
-
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
+   PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF );
    char *Buffer;
-   int iLen, iMaxLen;
-   HB_SOCKET_STRUCT *Socket;
+   int iLen, iMaxLen, iReceived, iBufferLen;
    int iTimeElapsed = 0;
 
-   if( pSocket == NULL || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECV", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 2,
+         hb_paramError(1), hb_paramError(2) );
       return;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    if( ISNIL( 3 ) )
    {
@@ -806,90 +752,7 @@ HB_FUNC( INETRECV )
       if( (signed int) pBuffer->item.asString.length < iMaxLen )
       {
          /* Should we issue a runtime error? */
-         HB_SOCKET_SET_ERROR2( Socket, -1, "Passed buffer is smaller than specified requested length!" );
-         hb_retni( -1 );
-         return;
-      }
-   }
-
-   Buffer = pBuffer->item.asString.value;
-
-about_select:
-   HB_STACK_UNLOCK;
-   HB_TEST_CANCEL_ENABLE_ASYN;
-   HB_SOCKET_ZERO_ERROR( Socket );
-   if( hb_selectReadSocket( Socket ) )
-   {
-      iLen = recv( Socket->com, Buffer, iMaxLen, MSG_NOSIGNAL  );
-      HB_DISABLE_ASYN_CANC;
-      HB_STACK_LOCK;
-   }
-   else
-   {
-      HB_DISABLE_ASYN_CANC;
-      HB_STACK_LOCK;
-      iTimeElapsed += Socket->timeout;
-
-      if ( Socket->caPeriodic != NULL )
-      {
-         hb_execFromArray( Socket->caPeriodic );
-         // do we continue?
-         if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
-            (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
-         {
-            goto about_select;
-         }
-      }
-
-      HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
-      hb_retni( 0 );
-      return;
-   }
-
-   if ( iLen == 0 )
-   {
-      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
-   }
-   if ( iLen < 0 )
-   {
-      HB_SOCKET_SET_ERROR( Socket );
-   }
-   hb_retni( iLen );
-}
-
-HB_FUNC( INETRECVALL )
-{
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF ); // hb_param() calls hb_itemUnref()!
-   int iTimeElapsed;
-   char *Buffer;
-   int iLen, iMax, iReceived, iBufferLen;
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL || pBuffer == NULL )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVALL", 1, pArgs );
-      hb_itemRelease( pArgs );
-      return;
-   }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
-   if( ISNIL( 3 ) )
-   {
-      iMax = pBuffer->item.asString.length;
-   }
-   else
-   {
-      iMax = hb_parni( 3 );
-
-      if( (int) ( pBuffer->item.asString.length ) < iMax )
-      {
-         /* Should we issue a runtime error? */
-         HB_SOCKET_SET_ERROR2( Socket, -1, "Passed buffer is smaller than specified requested length" );
-         hb_retni( -1 );
-         return;
+         hb_xrealloc(pBuffer->item.asString.value, iMaxLen );
       }
    }
 
@@ -900,7 +763,14 @@ HB_FUNC( INETRECVALL )
 
    do
    {
-      iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMax-iReceived ? iMax-iReceived : HB_SENDRECV_BUFFER_SIZE;
+      if ( iMode == 1 )
+      {
+         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMaxLen-iReceived ?
+               iMaxLen-iReceived : HB_SENDRECV_BUFFER_SIZE;
+      }
+      else {
+         iBufferLen = iMaxLen;
+      }
 
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
@@ -914,6 +784,13 @@ HB_FUNC( INETRECVALL )
          {
             iReceived += iLen;
          }
+
+         /* Called from InetRecv()? */
+         if ( iMode == 0 )
+         {
+            break;
+         }
+
       }
       else
       {
@@ -922,48 +799,66 @@ HB_FUNC( INETRECVALL )
          HB_STACK_LOCK;
          iTimeElapsed += Socket->timeout;
 
+         /* if we have a caPeriodic, timeLimit is our REAL timeout */
          if ( Socket->caPeriodic != NULL )
          {
             hb_execFromArray( Socket->caPeriodic );
             // do we continue?
-            if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
-               (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
+            if ( ! hb_itemGetL( &HB_VM_STACK.Return ) ||
+               (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
             {
-               iLen = 1;
-               continue;
+               HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
+               hb_retni( iReceived );
+               return;
             }
+
+            /* Declare success to continue loop */
+            iLen = 1;
          }
-
-         HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
-         hb_retni( iReceived );
-         return;
+         else /* the timeout has gone, and we have no recovery routine */
+         {
+            HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
+            hb_retni( iReceived );
+            return;
+         }
       }
-
    }
-   while( iReceived < iMax && iLen > 0 );
+   while( iReceived < iMaxLen && iLen > 0 );
 
    Socket->count = iReceived;
 
-   if ( iLen > 0 )
+   if ( iLen == 0 )
    {
-      hb_retni( iReceived );
+      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
+      hb_retni( iLen );
    }
-   else if( iLen == 0 )
+   if ( iLen < 0 )
    {
-      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" )
-      hb_retni( iReceived );
+      HB_SOCKET_SET_ERROR( Socket );
+      hb_retni( iLen );
    }
    else
    {
-      HB_SOCKET_SET_ERROR( Socket );
-      hb_retni( -1 );
+      hb_retni( iReceived );
    }
 }
 
 
-HB_FUNC( INETRECVLINE )
+HB_FUNC( INETRECV )
 {
-   PHB_ITEM pSocket     = hb_param( 1, HB_IT_STRING );
+   s_inetRecvInternal( "INETRECV", 0 );
+}
+
+
+HB_FUNC( INETRECVALL )
+{
+   s_inetRecvInternal( "INETRECVALL", 1 );
+}
+
+
+static void s_inetRecvPattern( char *szFuncName, char *szPattern )
+{
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
    PHB_ITEM pResult     = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pBufferSize = hb_param( 4, HB_IT_NUMERIC );
@@ -973,14 +868,14 @@ HB_FUNC( INETRECVLINE )
    int iAllocated, iBufferSize, iMax;
    int iLen = 0;
    int iPos = 0, iTimeElapsed;
+   ULONG ulPatPos;
 
-   HB_SOCKET_STRUCT *Socket;
 
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVLINE", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 4,
+         hb_paramError(1), hb_paramError(2),
+         hb_paramError(3), hb_paramError(4) );
       return;
    }
 
@@ -1002,14 +897,13 @@ HB_FUNC( INETRECVLINE )
       iMax = 0;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
    HB_SOCKET_ZERO_ERROR( Socket );
 
    Buffer = (char *) hb_xgrab( iBufferSize );
    iAllocated = iBufferSize;
    iTimeElapsed = 0;
 
+   ulPatPos = 0;
    do
    {
       if( iPos == iAllocated - 1 )
@@ -1043,14 +937,24 @@ HB_FUNC( INETRECVLINE )
             }
          }
 
+         /* this signals timeout */
          iLen = -2;
       }
 
       if( iLen > 0 )
       {
-         if ( cChar == '\n' && iPos && Buffer[ iPos - 1 ] == '\r' )
+         /* verify endsequence recognition automata status */
+         if ( cChar == szPattern[ ulPatPos ] )
          {
-            break;
+            ulPatPos ++;
+            if ( ! szPattern[ ulPatPos ] )
+            {
+               break;
+            }
+         }
+         else
+         {
+            ulPatPos = 0;
          }
 
          Buffer[ iPos++ ] = cChar;
@@ -1101,7 +1005,7 @@ HB_FUNC( INETRECVLINE )
       }
       else
       {
-         HB_SOCKET_SET_ERROR2( Socket, -2, "Buffer overrun" );
+         HB_SOCKET_SET_ERROR2( Socket, -3, "Buffer overrun" );
 
          if( pResult )
          {
@@ -1114,10 +1018,15 @@ HB_FUNC( INETRECVLINE )
    }
 }
 
+HB_FUNC( INETRECVLINE )
+{
+   s_inetRecvPattern( "INETRECVLINE", "\r\n");
+}
+
 
 HB_FUNC( INETRECVENDBLOCK )
 {
-   PHB_ITEM pSocket     = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
    PHB_ITEM pProto, pProtoOpt;
    PHB_ITEM pResult     = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 4, HB_IT_NUMERIC );
@@ -1137,13 +1046,12 @@ HB_FUNC( INETRECVENDBLOCK )
    int ifindproto = 0;
    BOOL bProtoFound;
 
-   HB_SOCKET_STRUCT *Socket;
 
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN  )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVENDBLOCK", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVENDBLOCK", 5,
+         hb_paramError(1), hb_paramError(2),
+         hb_paramError(3), hb_paramError(4), hb_paramError(5) );
       return;
    }
 
@@ -1156,9 +1064,9 @@ HB_FUNC( INETRECVENDBLOCK )
 
          if( iprotos <= 0 )
          {
-            PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-            hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVENDBLOCK", 1, pArgs );
-            hb_itemRelease( pArgs );
+            hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVENDBLOCK", 5,
+               hb_paramError(1), hb_paramError(2),
+               hb_paramError(3), hb_paramError(4), hb_paramError(5) );
             return;
          }
 
@@ -1209,8 +1117,6 @@ HB_FUNC( INETRECVENDBLOCK )
    {
       iMax = 0;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -1346,22 +1252,18 @@ HB_FUNC( INETRECVENDBLOCK )
 
 HB_FUNC( INETDATAREADY )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
    int iLen;
-   HB_SOCKET_STRUCT *Socket;
-
    fd_set rfds;
    struct timeval tv = {0,0};
 
-   if( pSocket == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN ||
+      ( hb_pcount() == 2 && ! ISNUM(2)) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDATAREADY", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDATAREADY", 2,
+         hb_paramError(1), hb_paramError(2) );
       return;
    }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -1390,85 +1292,23 @@ HB_FUNC( INETDATAREADY )
    }
 
    hb_retni( iLen );
-
 }
 
 
-HB_FUNC( INETSEND )
+static void s_inetSendInternal( char *szFuncName, int iMode )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING ), pBuffer = hb_param( 2, HB_IT_STRING );
-
-   char *Buffer;
-   int iLen;
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL || pBuffer == NULL )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSEND", 1, pArgs );
-      hb_itemRelease( pArgs );
-      return;
-   }
-
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-
-   Buffer = pBuffer->item.asString.value;
-
-   if ( ISNUM( 3 ) )
-   {
-      iLen = hb_parni( 3 );
-   }
-   else
-   {
-      iLen = pBuffer->item.asString.length;
-   }
-
-   HB_SOCKET_ZERO_ERROR( Socket );
-
-   HB_STACK_UNLOCK;
-   HB_TEST_CANCEL_ENABLE_ASYN;
-
-   Socket->count = 0;
-
-   if( hb_selectWriteSocket( Socket ) )
-   {
-      Socket->count = send( Socket->com, Buffer, iLen, MSG_NOSIGNAL );
-   }
-
-   HB_DISABLE_ASYN_CANC;
-   HB_STACK_LOCK;
-
-   hb_retni( Socket->count );
-
-   if( Socket->count == 0 )
-   {
-      HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
-   }
-
-   if( Socket->count < 0 )
-   {
-      Socket->count = 0;
-      HB_SOCKET_SET_ERROR( Socket );
-   }
-}
-
-HB_FUNC( INETSENDALL )
-{
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING ), pBuffer = hb_param( 2, HB_IT_STRING );
-
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
+   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
    int iLen, iSent, iSend, iBufferLen;
-   HB_SOCKET_STRUCT *Socket;
 
-   if( pSocket == NULL || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSEND", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 3,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
    Buffer = pBuffer->item.asString.value;
 
    if( ISNUM( 3 ) )
@@ -1490,7 +1330,15 @@ HB_FUNC( INETSENDALL )
    iLen = 0;
    while( iSent < iSend )
    {
-      iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ? iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
+      if ( iMode == 1 )
+      {
+         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ?
+               iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
+      }
+      else
+      {
+         iBufferLen = iSend;
+      }
 
       iLen = 0;
       if( hb_selectWriteSocket( Socket ) )
@@ -1511,13 +1359,16 @@ HB_FUNC( INETSENDALL )
          HB_SOCKET_SET_ERROR( Socket );
          break;
       }
+
+      if ( iMode == 0 )
+      {
+         break;
+      }
    }
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
    Socket->count = iSent;
-
-   //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
 
    if ( iLen > 0 )
    {
@@ -1527,6 +1378,16 @@ HB_FUNC( INETSENDALL )
    {
       hb_retni( -1 );
    }
+}
+
+HB_FUNC( INETSEND )
+{
+   s_inetSendInternal( "INETSEND", 0 );
+}
+
+HB_FUNC( INETSENDALL )
+{
+   s_inetSendInternal( "INETSENDALL", 1 );
 }
 
 
@@ -1628,24 +1489,21 @@ HB_FUNC( INETGETALIAS )
 
 HB_FUNC( INETSERVER )
 {
+   HB_SOCKET_STRUCT *Socket = hb_parptr(2);
    int iPort;
    int iOpt = 1;
-   HB_SOCKET_STRUCT *Socket;
-   PHB_ITEM pSocket = hb_param( 2, HB_IT_STRING );
    int iListen;
 
    /* Parameter error checking */
-   if( ! ISNUM( 1 ) )
+   if( ! ISNUM( 1 ) || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSERVER", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETSERVER", 2,
+         hb_paramError(1), hb_paramError(2) );
       return;
    }
 
-   if ( pSocket != NULL )
+   if ( Socket != NULL )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
@@ -1664,7 +1522,7 @@ HB_FUNC( INETSERVER )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      hb_retptr( Socket );
       return;
    }
 
@@ -1706,41 +1564,14 @@ HB_FUNC( INETSERVER )
       HB_INET_CLOSE( Socket->com );
    }
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   hb_retptr( Socket );
 }
 
-
-#if 0
-#ifdef HB_THREAD_SUPPORT
-HB_GARBAGE_FUNC( acceptBlockingDestructor )
-{
-   HB_THREAD_CONTEXT *pContext = (HB_THREAD_CONTEXT *) Cargo;
-   HB_INET_CARGO *inetCargo = (HB_INET_CARGO *) ( pContext->Cargo );
-
-   if( inetCargo )
-   {
-      //HB_CRITICAL_INET_UNLOCK( inetCargo->Socket->Mutex );
-
-      if( inetCargo->NewSocket )
-      {
-         //TraceLogPointer( NULL, "free %p\n", inetCargo->NewSocket );
-         hb_xfree( (void *) ( inetCargo->NewSocket ) );
-      }
-
-      //TraceLogPointer( NULL, "free %p\n", inetCargo );
-      hb_xfree( inetCargo );
-
-      pContext->Cargo       = NULL;
-      pContext->pDestructor = NULL;
-   }
-}
-#endif
-#endif
 
 HB_FUNC( INETACCEPT )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-   HB_SOCKET_STRUCT *Socket, *NewSocket;
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 1 );
+   HB_SOCKET_STRUCT *NewSocket;
    HB_SOCKET_T incoming = 0;
    int iError = EAGAIN;
    struct sockaddr_in si_remote;
@@ -1751,17 +1582,14 @@ HB_FUNC( INETACCEPT )
       unsigned int Len;
    #endif
 
-   Len = sizeof( struct sockaddr_in );
-
-   if( pSocket == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETACCEPT", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETACCEPT", 1,
+         hb_paramError(1) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+   Len = sizeof( struct sockaddr_in );
 
    /*
    * Accept can (and should) be asynchronously stopped by closing the
@@ -1826,7 +1654,7 @@ HB_FUNC( INETACCEPT )
       memcpy( &NewSocket->remote, &si_remote, Len );
       NewSocket->com = incoming;
       hb_socketSetNonBlocking( NewSocket );
-      hb_retclenAdoptRaw( (char *) NewSocket, sizeof( HB_SOCKET_STRUCT ) );
+      hb_retptr( NewSocket );
    }
 
 }
@@ -1839,23 +1667,21 @@ HB_FUNC( INETACCEPT )
 HB_FUNC( INETCONNECT )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pSocket = hb_param( 3, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr( 3 ) ;
 
-   HB_SOCKET_STRUCT *Socket;
    int iPort;
    struct hostent *Host;
 
-   if( pHost == NULL || !ISNUM(2) )
+   if( pHost == NULL || !ISNUM(2)
+         || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECT", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECT", 3,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
-   if ( pSocket != NULL )
+   if ( Socket != NULL )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
@@ -1884,6 +1710,7 @@ HB_FUNC( INETCONNECT )
    #else
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
    #endif
+
    if( Socket->com == -1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
@@ -1905,36 +1732,26 @@ HB_FUNC( INETCONNECT )
    HB_STACK_LOCK;
 
 ret:
-   if ( pSocket == NULL )
-   {
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
-   }
-   else
-   {
-      hb_ret();
-   }
+   hb_retptr( Socket );
 }
 
 
 HB_FUNC( INETCONNECTIP )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pSocket = hb_param( 3, HB_IT_STRING );
+   int iPort = hb_parni( 2 );
+   HB_SOCKET_STRUCT *Socket = hb_parptr(3);
 
-   HB_SOCKET_STRUCT *Socket;
-   int iPort;
-
-   if( pHost == NULL || ! ISNUM( 2 ) )
+   if( pHost == NULL || iPort == 0
+         || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECT", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECTIP", 3,
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
       return;
    }
 
-   if ( pSocket != NULL )
+   if ( Socket != NULL )
    {
-      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
@@ -1955,7 +1772,7 @@ HB_FUNC( INETCONNECTIP )
       goto ret;
    }
 
-   iPort = htons( hb_parni( 2 ) );
+   iPort = htons( iPort );
 
    Socket->remote.sin_family = AF_INET;
    Socket->remote.sin_port= iPort;
@@ -1970,14 +1787,7 @@ HB_FUNC( INETCONNECTIP )
    HB_STACK_LOCK;
 
 ret:
-   if ( pSocket == NULL )
-   {
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
-   }
-   else
-   {
-      hb_ret();
-   }
+   hb_retptr( Socket );
 }
 
 /***********************************************************
@@ -1986,16 +1796,15 @@ ret:
 
 HB_FUNC( INETDGRAMBIND )
 {
-   int iPort;
+   int iPort = hb_parni(1);
    int iOpt = 1;
    HB_SOCKET_STRUCT *Socket;
 
    /* Parameter error checking */
-   if( ! ISNUM( 1 ) )
+   if( iPort == 0 )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 1,
+         hb_paramError( 1 ) );
       return;
    }
 
@@ -2012,7 +1821,7 @@ HB_FUNC( INETDGRAMBIND )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      hb_retptr( Socket );
       return;
    }
 
@@ -2029,7 +1838,7 @@ HB_FUNC( INETDGRAMBIND )
    hb_socketSetNonBlocking( Socket );
 
    /* Binding here */
-   iPort  = htons( hb_parni( 1 ) );
+   iPort  = htons( iPort );
 
    Socket->remote.sin_family = AF_INET;
    Socket->remote.sin_port = iPort;
@@ -2048,7 +1857,7 @@ HB_FUNC( INETDGRAMBIND )
       HB_INET_CLOSE( Socket->com );
    }
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   hb_retptr( Socket );
 }
 
 HB_FUNC( INETDGRAM )
@@ -2069,7 +1878,7 @@ HB_FUNC( INETDGRAM )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      hb_retptr( Socket );
       return;
    }
 
@@ -2081,33 +1890,32 @@ HB_FUNC( INETDGRAM )
    /* we'll be using non blocking sockets in all functions */
    hb_socketSetNonBlocking( Socket );
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   hb_retptr( Socket );
 }
 
 
 HB_FUNC( INETDGRAMSEND )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pAddress = hb_param( 2, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
+   char *szAddress = hb_parc(2);
+   int iPort = hb_parni( 3 );
    PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
-
-   char *Buffer;
    int iLen;
-   HB_SOCKET_STRUCT *Socket;
+   char *szBuffer ;
 
-   if( pSocket == NULL || pAddress == NULL || ( ! ISNUM(3) ) || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN ||
+       szAddress == NULL || iPort == 0 || pBuffer == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMSEND", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMSEND", 5,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3),
+         hb_paramError(4), hb_paramError(5) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
-   Buffer = pBuffer->item.asString.value;
    Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port = htons( hb_parni( 3 ) );
-   Socket->remote.sin_addr.s_addr = inet_addr( pAddress->item.asString.value );
+   Socket->remote.sin_port = htons( iPort );
+   Socket->remote.sin_addr.s_addr = inet_addr( szAddress );
+   szBuffer = pBuffer->item.asString.value;
 
    if ( ISNUM( 5 ) )
    {
@@ -2126,7 +1934,7 @@ HB_FUNC( INETDGRAMSEND )
 
    if( hb_selectWriteSocket( Socket ) )
    {
-      Socket->count = sendto( Socket->com, Buffer, iLen, 0,
+      Socket->count = sendto( Socket->com, szBuffer, iLen, 0,
             (const struct sockaddr *) &Socket->remote, sizeof( Socket->remote ) );
    }
 
@@ -2150,7 +1958,7 @@ HB_FUNC( INETDGRAMSEND )
 
 HB_FUNC( INETDGRAMRECV )
 {
-   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   HB_SOCKET_STRUCT *Socket = hb_parptr(1);
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
 
    char *Buffer;
@@ -2163,17 +1971,13 @@ HB_FUNC( INETDGRAMRECV )
       socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );
    #endif
 
-   HB_SOCKET_STRUCT *Socket;
-
-   if( pSocket == NULL || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMRECV", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMRECV", 3,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
-   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
    Buffer = pBuffer->item.asString.value;
 
    if ( ISNUM( 3 ) )

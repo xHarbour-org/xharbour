@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.22 2003/09/23 15:16:21 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.23 2003/11/27 17:57:50 jonnymind Exp $
  */
 
 /*
@@ -225,12 +225,6 @@ METHOD Destroy() CLASS tRPCClient
    MutexLock( ::mtxBusy )
 #endif
       ::Disconnect()
-      IF .not. Empty( ::skTcp )
-         InetDestroy( ::skTcp )
-      ENDIF
-      IF .not. Empty( ::skUdp )
-         InetDestroy( ::skUdp )
-      ENDIF
       IF ::thUdpAccept > 0
          #ifdef HB_THREAD_SUPPORT
          KillThread( ::thUdpAccept )
@@ -296,7 +290,6 @@ METHOD CheckServer( cRemote )
          nLen := HB_GetLen8( substr( cData, 8, 8 ) )
          nLen := InetRecvAll( skRemote, @cData2, nLen )
          IF InetErrorCode( skRemote ) == 0
-            InetDestroy( skRemote )
             cData := Substr( cData + cData2, 7 )
             cData2 := HB_Deserialize( cData )
             ::aServers := { {InetAddress( skRemote ), cData2} }
@@ -304,7 +297,6 @@ METHOD CheckServer( cRemote )
          ENDIF
       ENDIF
    ENDIF
-   InetDestroy( skRemote )
 RETURN .F.
 
 METHOD ScanFunctions(cFunc, cSerial ) CLASS tRPCClient
@@ -489,7 +481,6 @@ METHOD Connect( cServer, cUserId, cPassword ) CLASS tRPCClient
       ENDIF
    ENDIF
 
-   InetDestroy( ::skTcp )
    ::skTcp := NIL
    ::nStatus := RPC_STATUS_NONE
 RETURN .F.
@@ -565,7 +556,7 @@ METHOD Disconnect() CLASS tRPCClient
       #endif
       ::nStatus :=  RPC_STATUS_NONE
       InetSendAll( ::skTcp, "XHBR92" )
-      InetDestroy( ::skTcp )
+      InetClose( ::skTcp )
       #ifdef HB_THREAD_SUPPORT
          MutexUnlock( ::mtxBusy )
       #endif
