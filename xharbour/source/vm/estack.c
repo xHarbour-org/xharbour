@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.6 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: estack.c,v 1.7 2002/01/21 20:51:42 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 /* ------------------------------- */
@@ -78,7 +79,9 @@ void hb_stackPop( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
    if( --hb_stack.pPos < hb_stack.pItems )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 
    if( HB_IS_COMPLEX( *hb_stack.pPos ) )
    {
@@ -202,7 +205,40 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
    while( hb_stack.pPos > hb_stack.pBase )
-      hb_stackPop();
+   {
+      //hb_stackPop();
+
+      if( --hb_stack.pPos < hb_stack.pItems )
+      {
+         hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+      }
+
+      if( HB_IS_ARRAY( *hb_stack.pPos ) )
+      {
+         if( ( ( *hb_stack.pPos )->item.asArray.value )->uiHolders == 0 || --( ( ( *hb_stack.pPos )->item.asArray.value )->uiHolders ) == 0 )
+         {
+            hb_arrayRelease( *hb_stack.pPos );
+         }
+         #if 0
+         else
+         {
+            FILE *pfTrace = fopen( "trace.log" , "a+" );
+
+            fprintf( pfTrace, "\nHolders: %i Cyclic: %i", ( *hb_stack.pPos )->item.asArray.value->uiHolders, hb_itemArrayCyclicCount( *hb_stack.pPos ) );
+
+            fclose( pfTrace );
+         }
+         #endif
+      }
+      else if( HB_IS_COMPLEX( *hb_stack.pPos ) )
+      {
+         hb_itemClear( *hb_stack.pPos );
+      }
+      else
+      {
+         ( *hb_stack.pPos )->type = HB_IT_NIL;
+      }
+   }
 
    hb_stack.pBase = hb_stack.pItems + pStack->lBaseItem;
    hb_stack.iStatics = pStack->iStatics;

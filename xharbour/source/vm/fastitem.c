@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.16 2002/01/27 05:23:32 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.17 2002/01/29 08:35:25 ronpinkas Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ void hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
+      if( ( pItem->item.asArray.value )->uiHolders == 0 || --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
       {
          hb_arrayRelease( pItem );
       }
@@ -321,7 +321,9 @@ void hb_itemFastClear( PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
+      //printf( "\nFastClear Array %p uiHolders: %i Cyclic: %i", pItem, ( pItem->item.asArray.value )->uiHolders, hb_itemArrayCyclicCount( pItem ) );
+
+      if( ( pItem->item.asArray.value )->uiHolders == 0 || --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
       {
          hb_arrayRelease( pItem );
       }
@@ -404,4 +406,142 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
    ( &hb_stack.Return )->item.asString.bStatic = FALSE;
    ( &hb_stack.Return )->item.asString.value = szText;
    ( &hb_stack.Return )->item.asString.length = ulLen;
+}
+
+HB_FUNC( ARRAYCYCLICCOUNT )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+
+   if( pArray )
+   {
+      hb_retnl( (long) hb_itemArrayCyclicCount( pArray ) );
+   }
+   else
+   {
+      hb_retni( 0 );
+   }
+}
+
+USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray )
+{
+   HB_SCANNED_ARRAYS ScannedList;
+
+   ScannedList.pScannedBaseArray = NULL;
+   ScannedList.pNext             = NULL;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemArrayCyclicCount(%p)", pArray ) );
+
+   return hb_itemArrayCyclicCountWorker( pArray->item.asArray.value, &ScannedList, pArray->item.asArray.value );
+}
+
+USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray )
+{
+   ULONG ulScanLen = pScanBaseArray->ulLen;
+   ULONG ulCount;
+   PHB_SCANNED_ARRAYS pScanned;
+   BOOL bTop;
+   USHORT uiCyclicCount = 0;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemArrayCyclicCountWorker(%p, %p %p)", pScanBaseArray, pScannedList, pTopBaseArray ) );
+
+   if( pScanBaseArray == pTopBaseArray )
+   {
+      bTop = TRUE;
+   }
+   else
+   {
+      bTop = FALSE;
+
+      if( pScannedList->pScannedBaseArray == NULL )
+      {
+         pScanned = pScannedList;
+      }
+      else
+      {
+         pScanned = pScannedList;
+
+         while( pScanned->pNext )
+         {
+            pScanned = pScanned->pNext;
+         }
+
+         pScanned->pNext = ( PHB_SCANNED_ARRAYS ) hb_xgrab( sizeof( HB_SCANNED_ARRAYS ) );
+         pScanned = pScanned->pNext;
+      }
+
+      pScanned->pScannedBaseArray = pScanBaseArray;
+      pScanned->pNext = NULL;
+   }
+
+   for( ulCount = 0; ulCount < ulScanLen; ulCount++ )
+   {
+      PHB_ITEM pItem = pScanBaseArray->pItems + ulCount;
+
+      if( pItem->type == HB_IT_ARRAY )
+      {
+         if( pItem->item.asArray.value == pTopBaseArray )
+         {
+            uiCyclicCount++;
+            if( uiCyclicCount == pTopBaseArray->uiHolders )
+            {
+               return uiCyclicCount;
+            }
+
+            continue;
+         }
+
+         if( pScannedList->pScannedBaseArray )
+         {
+            pScanned = pScannedList;
+            do
+            {
+               if( pScanned->pScannedBaseArray == pItem->item.asArray.value )
+               {
+                  break;
+               }
+
+               pScanned = pScanned->pNext;
+
+            } while( pScanned );
+         }
+         else
+         {
+            pScanned = NULL;
+         }
+
+         /* Not scanned yet. */
+         if( pScanned == NULL )
+         {
+            uiCyclicCount += hb_itemArrayCyclicCountWorker( pItem->item.asArray.value, pScannedList, pTopBaseArray );
+
+            if( uiCyclicCount > pTopBaseArray->uiHolders )
+            {
+               printf( "\nLogic Error!" );
+               exit( 1 );
+            }
+            else if( uiCyclicCount == pTopBaseArray->uiHolders )
+            {
+               return uiCyclicCount;
+            }
+         }
+      }
+   }
+
+   /* Top Level - Release the created list. */
+   if( bTop )
+   {
+      if( pScannedList->pScannedBaseArray )
+      {
+         pScannedList = pScannedList->pNext;
+
+         while( pScannedList )
+         {
+            pScanned     = pScannedList;
+            pScannedList = pScannedList->pNext;
+            hb_xfree( pScanned );
+         }
+      }
+   }
+
+   return uiCyclicCount;
 }

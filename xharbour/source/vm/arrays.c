@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.11 2002/02/01 01:05:58 ronpinkas Exp $
+ * $Id: arrays.c,v 1.12 2002/02/01 01:10:14 ronpinkas Exp $
  */
 
 /*
@@ -701,7 +701,14 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
              * allocated by the GC, its just a portion of the
              * pItems chunk, which will be released as one piece.
              * --------------------------------------------------*/
-            if( HB_IS_COMPLEX( pItem ) )
+            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
+            {
+               fprintf( stderr, "\nError Nested Release!" );
+               exit(1);
+               ++pItem;
+               continue;
+            }
+            else if( HB_IS_COMPLEX( pItem ) )
             {
                hb_itemClear( pItem );
             }
@@ -1045,6 +1052,10 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          if( HB_IS_STRING( pItem ) && ! pItem->item.asString.bStatic )
          {
             hb_itemReleaseString( pItem );
+         }
+         else if( HB_IS_MEMVAR( pItem ) )
+         {
+            hb_memvarValueDecRef( pItem->item.asMemvar.value );
          }
 
          ++pItem;

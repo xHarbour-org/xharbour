@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.73 2002/02/01 01:16:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.74 2002/02/01 03:48:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-02-01 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
+    + Added USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
+    + Added HB_FUNC( ARRAYCYCLICCOUNT )
+  * source/vm/arrays.c
+    * Added test of memvar in hb_arrayReleaseGarbage.
+  * source/vm/estack.c
+    * Trace added.
 
 2002-01-31 19:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/garbage.c
