@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.3 2001/12/21 15:31:33 vszakats Exp $
+ * $Id: file.c,v 1.1 2001/12/21 22:00:49 ronpinkas Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-BOOL hb_fsFile( BYTE * pFilename )
+BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.1.1.1 2001/12/21 10:41:25 ronpinkas Exp $
+ * $Id: dates.c,v 1.2 2002/07/03 21:44:08 walito Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
 #include "hbapi.h"
 #include "hbdate.h"
 
-long hb_dateEncode( long lYear, long lMonth, long lDay )
+long HB_EXPORT hb_dateEncode( long lYear, long lMonth, long lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%ld, %ld, %ld)", lYear, lMonth, lDay));
 
@@ -108,7 +108,7 @@ long hb_dateEncode( long lYear, long lMonth, long lDay )
    return 0;
 }
 
-void hb_dateDecode( long lJulian, long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateDecode( long lJulian, long * plYear, long * plMonth, long * plDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDecode(%ld, %p, %p, %p)", lJulian, plYear, plMonth, plDay));
 
@@ -136,7 +136,7 @@ void hb_dateDecode( long lJulian, long * plYear, long * plMonth, long * plDay )
    }
 }
 
-void hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay )
+void HB_EXPORT hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrPut(%p, %ld, %ld, %ld)", szDate, lYear, lMonth, lDay));
 
@@ -157,7 +157,7 @@ void hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay )
       memset( szDate, ' ', 8 );
 }
 
-void hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * plDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%s, %p, %p, %p)", szDate, plYear, plMonth, plDay));
 
@@ -183,7 +183,7 @@ void hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * p
 /* This function always closes the date with a zero byte, so it needs a
    9 character long buffer. */
 
-char * hb_dateDecStr( char * szDate, long lJulian )
+char * HB_EXPORT hb_dateDecStr( char * szDate, long lJulian )
 {
    long lYear, lMonth, lDay;
 
@@ -196,7 +196,7 @@ char * hb_dateDecStr( char * szDate, long lJulian )
    return szDate;
 }
 
-long hb_dateEncStr( char * szDate )
+long HB_EXPORT hb_dateEncStr( char * szDate )
 {
    long lYear, lMonth, lDay;
 
@@ -209,7 +209,7 @@ long hb_dateEncStr( char * szDate )
 
 /* NOTE: szFormattedDate must be an at least 11 chars wide buffer */
 
-char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat )
+char * HB_EXPORT hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat )
 {
    /*
     * NOTE: szFormattedDate must point to a buffer of at least 11 bytes.
@@ -381,7 +381,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
    return szFormattedDate;
 }
 
-long hb_dateDOW( long lYear, long lMonth, long lDay )
+long HB_EXPORT hb_dateDOW( long lYear, long lMonth, long lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDOW(%ld, %ld, %ld)", lYear, lMonth, lDay));
 
@@ -397,7 +397,7 @@ long hb_dateDOW( long lYear, long lMonth, long lDay )
             lYear + lYear / 4 - lYear / 100 + lYear / 400 + 6 ) % 7 + 1;
 }
 
-void hb_dateToday( long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateToday( long * plYear, long * plMonth, long * plDay )
 {
 #if defined(HB_OS_WIN_32)
    {
@@ -425,7 +425,7 @@ void hb_dateToday( long * plYear, long * plMonth, long * plDay )
 
 /* NOTE: The passed buffer must be at least 9 chars long */
 
-void hb_dateTimeStr( char * pszTime )
+void HB_EXPORT hb_dateTimeStr( char * pszTime )
 {
 #if defined(HB_OS_WIN_32)
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.11 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: hbdate.h,v 1.1.1.1 2001/12/21 10:47:18 ronpinkas Exp $
  */
 
 /*
@@ -59,19 +59,19 @@
 extern "C" {
 #endif
 
-extern double   hb_dateSeconds( void );
-extern void     hb_dateToday( long * plYear, long * plMonth, long * plDay );
-extern void     hb_dateTimeStr( char * pszTime );
-extern char *   hb_dateCMonth( int iMonth );
-extern char *   hb_dateCDOW( int iDay );
-extern long     hb_dateDOW( long lYear, long lMonth, long lDay );
-extern char *   hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
-extern long     hb_dateEncode( long lYear, long lMonth, long lDay );
-extern void     hb_dateDecode( long julian, long * plYear, long * plMonth, long * plDay );
-extern void     hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay );
-extern void     hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * plDay );
-extern char *   hb_dateDecStr( char * szDate, long lJulian );
-extern long     hb_dateEncStr( char * szDate );
+extern double   HB_EXPORT hb_dateSeconds( void );
+extern void     HB_EXPORT hb_dateToday( long * plYear, long * plMonth, long * plDay );
+extern void     HB_EXPORT hb_dateTimeStr( char * pszTime );
+extern char *   HB_EXPORT hb_dateCMonth( int iMonth );
+extern char *   HB_EXPORT hb_dateCDOW( int iDay );
+extern long     HB_EXPORT hb_dateDOW( long lYear, long lMonth, long lDay );
+extern char *   HB_EXPORT hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
+extern long     HB_EXPORT hb_dateEncode( long lYear, long lMonth, long lDay );
+extern void     HB_EXPORT hb_dateDecode( long julian, long * plYear, long * plMonth, long * plDay );
+extern void     HB_EXPORT hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay );
+extern void     HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * plDay );
+extern char *   HB_EXPORT hb_dateDecStr( char * szDate, long lJulian );
+extern long     HB_EXPORT hb_dateEncStr( char * szDate );
 
 #if defined(HB_EXTERN_C)
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.15 2002/01/06 09:17:59 vszakats Exp $
+ * $Id: hbapilng.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -89,21 +89,21 @@ typedef struct _HB_LANG
 
 /* Supported language list management */
 
-extern BOOL     hb_langRegister         ( PHB_LANG lang );
-extern BOOL     hb_langDeRegister       ( char * pszID );
-extern PHB_LANG hb_langFind             ( char * pszID );
+extern BOOL     HB_EXPORT hb_langRegister         ( PHB_LANG lang );
+extern BOOL     HB_EXPORT hb_langDeRegister       ( char * pszID );
+extern PHB_LANG HB_EXPORT hb_langFind             ( char * pszID );
 
 /* Default language selection and data query */
 
-extern PHB_LANG hb_langSelect           ( PHB_LANG lang );
-extern char *   hb_langSelectID         ( char * pszID );
-extern char *   hb_langDGetItem         ( int iIndex );
-extern char *   hb_langID               ( void );
-extern char *   hb_langName             ( void );
+extern PHB_LANG HB_EXPORT hb_langSelect           ( PHB_LANG lang );
+extern char *   HB_EXPORT hb_langSelectID         ( char * pszID );
+extern char *   HB_EXPORT hb_langDGetItem         ( int iIndex );
+extern char *   HB_EXPORT hb_langID               ( void );
+extern char *   HB_EXPORT hb_langName             ( void );
 
 /* Compatibility interface */
 
-extern char *   hb_langDGetErrorDesc    ( ULONG ulIndex );
+extern char *   HB_EXPORT hb_langDGetErrorDesc    ( ULONG ulIndex );
 
 #if defined(HB_EXTERN_C)
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.13 2001/12/15 10:37:24 vszakats Exp $
+ * $Id: fstemp.c,v 1.2 2002/08/27 20:16:10 horacioroldan Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
 
-FHANDLE hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
+FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
 {
    USHORT nAttemptLeft = 999;
 

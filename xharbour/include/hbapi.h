@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.41 2002/10/15 17:02:25 mlombardo Exp $
+ * $Id: hbapi.h,v 1.42 2002/10/25 00:49:14 ronpinkas Exp $
  */
 
 /*
@@ -241,7 +241,7 @@ extern void    HB_EXPORT * hb_xgrab( ULONG ulSize );                 /* allocate
 extern void    HB_EXPORT   hb_xfree( void * pMem );                  /* frees memory */
 extern void    HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
 extern ULONG   HB_EXPORT hb_xsize( void * pMem );                  /* returns the size of an allocated memory block */
-extern ULONG    hb_xquery( USHORT uiMode );               /* Query different types of memory information */
+extern ULONG   HB_EXPORT hb_xquery( USHORT uiMode );               /* Query different types of memory information */
 
 #if UINT_MAX == ULONG_MAX
    /* NOTE: memcpy/memset can work with ULONG data blocks */
@@ -263,31 +263,31 @@ extern BOOL     HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pItemVal
 extern BOOL     HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex ); /* insert a nil item into an array, without changing the length */
 extern BOOL     HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex ); /* delete an array item, without changing length */
 extern BOOL     HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen ); /* sets the array total length */
-extern BOOL     hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult ); /* retrieve last item in an array */
-extern BOOL     hb_arrayRelease( PHB_ITEM pArray ); /* releases an array - don't call it - use ItemRelease() !!! */
+extern BOOL     HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult ); /* retrieve last item in an array */
+extern BOOL     HB_EXPORT hb_arrayRelease( PHB_ITEM pArray ); /* releases an array - don't call it - use ItemRelease() !!! */
 extern BOOL     HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element */
 extern BOOL     HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item */
 extern BOOL     HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item by ref */
-extern PHB_ITEM hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex ); /* returns pointer to specified element of the array */
-extern ULONG    hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen ); /* copy a string into an array item */
-extern char *   hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
-extern char *   hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
-extern ULONG    hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
-extern BOOL     hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
-extern int      hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
-extern long     hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long numeric value contained on an array element */
-extern double   hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
-extern char *   hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
-extern long     hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a long integer */
-extern USHORT   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
-extern void     hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
-extern ULONG    hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount ); /* scan an array for a given item, or until code-block item returns TRUE */
-extern BOOL     hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
-extern BOOL     hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart, ULONG * pulCount, ULONG * pulTarget ); /* copy items from one array to another */
-extern PHB_ITEM hb_arrayClone( PHB_ITEM pArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */
-extern BOOL     hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock ); /* sorts an array item */
-extern PHB_ITEM hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
-extern PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
+extern PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex ); /* returns pointer to specified element of the array */
+extern ULONG    HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen ); /* copy a string into an array item */
+extern char *   HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
+extern char *   HB_EXPORT hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
+extern ULONG    HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
+extern BOOL     HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
+extern int      HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
+extern long     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long numeric value contained on an array element */
+extern double   HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
+extern char *   HB_EXPORT hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
+extern long     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a long integer */
+extern USHORT   HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
+extern void     HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
+extern ULONG    HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount ); /* scan an array for a given item, or until code-block item returns TRUE */
+extern BOOL     HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
+extern BOOL     HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart, ULONG * pulCount, ULONG * pulTarget ); /* copy items from one array to another */
+extern PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */
+extern BOOL     HB_EXPORT hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock ); /* sorts an array item */
+extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
+extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
 
 /* string management */
 
@@ -296,24 +296,24 @@ extern PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an
                           ( c ) == HB_CHAR_LF || \
                           ( c ) == HB_CHAR_CR )
 
-extern int      hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
-extern int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
-extern char *   hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
-extern char *   hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
-extern BOOL     hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
-extern BOOL     hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
-extern void     hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
-extern ULONG    hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */
-extern char *   hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
-extern char *   hb_strUpperCopy( char * szText, ULONG ulLen );
-extern char *   hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
-extern char *   hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
-extern char *   hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
-extern double   hb_strVal( const char * szText, ULONG ulLen ); /* return the numeric value of a character string representation of a number */
-extern char *   hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
-extern ULONG    hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
+extern int      HB_EXPORT hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
+extern int      HB_EXPORT hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
+extern char *   HB_EXPORT hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
+extern char *   HB_EXPORT hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
+extern BOOL     HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
+extern BOOL     HB_EXPORT hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
+extern void     HB_EXPORT hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
+extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */
+extern char *   HB_EXPORT hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
+extern char *   HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen );
+extern char *   HB_EXPORT hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
+extern char *   HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
+extern char *   HB_EXPORT hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
+extern double   HB_EXPORT hb_strVal( const char * szText, ULONG ulLen ); /* return the numeric value of a character string representation of a number */
+extern char *   HB_EXPORT hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
+extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 
-extern double   hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
+extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 
 /* class management */
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
@@ -328,15 +328,15 @@ extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TR
 extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 
 /* dynamic symbol table management */
-extern PHB_DYNS hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
-extern PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol ); /* creates a new dynamic symbol based on a local one */
-extern PHB_DYNS hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
-extern PHB_DYNS hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
-extern void     hb_dynsymLog( void );             /* displays all dynamic symbols */
-extern void     hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
-extern USHORT   hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
-extern PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
-extern PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
+extern PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol ); /* creates a new dynamic symbol based on a local one */
+extern PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
+extern PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
+extern void     HB_EXPORT hb_dynsymLog( void );             /* displays all dynamic symbols */
+extern void     HB_EXPORT hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
+extern USHORT   HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
+extern PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
 
 /* Command line and environment argument management */
 extern void HB_EXPORT hb_cmdargInit( int argc, char * argv[] ); /* initialize command line argument API's */
@@ -349,7 +349,7 @@ extern int      hb_cmdargNum( const char * pszName ); /* Returns the numeric val
 extern void     hb_cmdargProcessVM( void ); /* Check for command line internal arguments */
 
 /* Symbol management */
-extern PHB_SYMB hb_symbolNew( char * szName ); /* create a new symbol */
+extern PHB_SYMB HB_EXPORT hb_symbolNew( char * szName ); /* create a new symbol */
 
 /* Codeblock management */
 extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.17 2002/08/01 00:33:15 lculik Exp $
+ * $Id: filesys.c,v 1.18 2002/08/27 20:16:10 horacioroldan Exp $
  */
 
 /*
@@ -434,7 +434,7 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
  * FILESYS.API FUNCTIONS --
  */
 
-FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
+FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
    FHANDLE hFileHandle;
 
@@ -494,7 +494,7 @@ FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    return hFileHandle;
 }
 
-FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
+FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 {
    FHANDLE hFileHandle;
 
@@ -595,7 +595,7 @@ FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    return hFileHandle;
 }
 
-FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
+FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
    FHANDLE hFileHandle;
    int oflag;
@@ -660,7 +660,7 @@ FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
          [vszakats]
  */
 
-FHANDLE hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
+FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
 {
    FHANDLE hFileHandle;
    int oflag;
@@ -693,7 +693,7 @@ FHANDLE hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
    return hFileHandle;
 }
 
-void    hb_fsClose( FHANDLE hFileHandle )
+void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsClose(%p)", hFileHandle));
 
@@ -720,7 +720,7 @@ void    hb_fsClose( FHANDLE hFileHandle )
       s_uiErrorLast = 6;
 }
 
-void    hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
+void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetDevMode(%p, %hu)", hFileHandle, uiDevMode));
 
@@ -762,7 +762,7 @@ void    hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 
 }
 
-USHORT  hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
+USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 {
    USHORT uiRead;
 
@@ -800,7 +800,7 @@ USHORT  hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    return uiRead;
 }
 
-USHORT  hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
+USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 {
    USHORT uiWritten;
 
@@ -847,7 +847,7 @@ USHORT  hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    return uiWritten;
 }
 
-ULONG   hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
+ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 {
    ULONG ulRead;
 
@@ -920,7 +920,7 @@ ULONG   hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
    return ulRead;
 }
 
-ULONG   hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
+ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 {
    ULONG ulWritten;
 
@@ -1005,7 +1005,7 @@ ULONG   hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
    return ulWritten;
 }
 
-ULONG   hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
+ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 {
    ULONG ulPos;
    USHORT Flags;
@@ -1102,7 +1102,7 @@ ULONG   hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    return ulPos;
 }
 
-ULONG   hb_fsTell( FHANDLE hFileHandle )
+ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
 {
    ULONG ulPos;
 
@@ -1131,21 +1131,21 @@ ULONG   hb_fsTell( FHANDLE hFileHandle )
    return ulPos;
 }
 
-USHORT  hb_fsError( void )
+USHORT  HB_EXPORT hb_fsError( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
 
    return s_uiErrorLast;
 }
 
-void    hb_fsSetError( USHORT uiError )
+void    HB_EXPORT hb_fsSetError( USHORT uiError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
 
    s_uiErrorLast = uiError;
 }
 
-BOOL hb_fsDelete( BYTE * pFilename )
+BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 {
    BOOL bResult;
 
@@ -1188,7 +1188,7 @@ BOOL hb_fsDelete( BYTE * pFilename )
    return bResult;
 }
 
-BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
+BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 {
    BOOL bResult;
 
@@ -1224,7 +1224,7 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
    return bResult;
 }
 
-BOOL    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
+BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
                       ULONG ulLength, USHORT uiMode )
 {
    BOOL bResult;
@@ -1385,7 +1385,7 @@ BOOL    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    return bResult;
 }
 
-void    hb_fsCommit( FHANDLE hFileHandle )
+void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", hFileHandle));
 
@@ -1445,7 +1445,7 @@ void    hb_fsCommit( FHANDLE hFileHandle )
 #endif
 }
 
-BOOL    hb_fsMkDir( BYTE * pDirname )
+BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 {
    BOOL bResult;
 
@@ -1478,7 +1478,7 @@ BOOL    hb_fsMkDir( BYTE * pDirname )
    return bResult;
 }
 
-BOOL    hb_fsChDir( BYTE * pDirname )
+BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 {
    BOOL bResult;
 
@@ -1505,7 +1505,7 @@ BOOL    hb_fsChDir( BYTE * pDirname )
    return bResult;
 }
 
-BOOL    hb_fsRmDir( BYTE * pDirname )
+BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 {
    BOOL bResult;
 
@@ -1535,7 +1535,7 @@ BOOL    hb_fsRmDir( BYTE * pDirname )
 /* NOTE: This is not thread safe function, it's there for compatibility. */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 
-BYTE *  hb_fsCurDir( USHORT uiDrive )
+BYTE * HB_EXPORT   hb_fsCurDir( USHORT uiDrive )
 {
    static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
 
@@ -1549,7 +1549,7 @@ BYTE *  hb_fsCurDir( USHORT uiDrive )
 /* NOTE: Thread safe version of hb_fsCurDir() */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 
-USHORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
@@ -1611,7 +1611,7 @@ USHORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 
 /* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
 
-USHORT  hb_fsChDrv( BYTE nDrive )
+USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
    USHORT uiResult;
 
@@ -1681,7 +1681,7 @@ USHORT  hb_fsChDrv( BYTE nDrive )
           the drive before checking. hb_fsIsDrv only returns TRUE
           if there is a disk in the drive. */
 
-USHORT  hb_fsIsDrv( BYTE nDrive )
+USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
    USHORT uiResult;
 
@@ -1744,7 +1744,7 @@ USHORT  hb_fsIsDrv( BYTE nDrive )
    return uiResult;
 }
 
-BOOL    hb_fsIsDevice( FHANDLE hFileHandle )
+BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 {
    BOOL bResult;
 
@@ -1769,7 +1769,7 @@ BOOL    hb_fsIsDevice( FHANDLE hFileHandle )
 
 /* NOTE: 0=A:, 1=B:, 2=C:, 3=D:, ... */
 
-BYTE    hb_fsCurDrv( void )
+BYTE   HB_EXPORT  hb_fsCurDrv( void )
 {
    USHORT uiResult;
 
@@ -1824,7 +1824,7 @@ BYTE    hb_fsCurDrv( void )
 
 /* TODO: Implement hb_fsExtOpen */
 
-FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
+FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
                       USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
@@ -1840,7 +1840,7 @@ FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    return s_uiErrorLast;
 }
 
-BOOL hb_fsEof( FHANDLE hFileHandle )
+BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 {
 #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(OS_UNIX_COMPATIBLE)
    long curPos = lseek( hFileHandle, 0L, SEEK_CUR );
@@ -1860,7 +1860,7 @@ BOOL hb_fsEof( FHANDLE hFileHandle )
 #endif
 }
 
-USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 

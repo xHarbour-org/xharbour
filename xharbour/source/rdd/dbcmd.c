@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.17 2002/10/12 00:38:26 horacioroldan Exp $
+ * $Id: dbcmd.c,v 1.18 2002/10/13 18:06:30 ronpinkas Exp $
  */
 
 /*
@@ -428,7 +428,7 @@ static void hb_rddSelectFirstAvailable( void )
  * pSuperTable - a current table in a RDDNODE
  * szDrvName - a driver name that will be inherited
 */
-ERRCODE hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName )
+ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName )
 {
    char * szSuperName;
    LPRDDNODE pRddNode;
@@ -476,7 +476,7 @@ ERRCODE hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTa
  * Closes and releases the current WorkArea preparing it
  * to be used with a new database.
  */
-void hb_rddReleaseCurrentArea( void )
+void  HB_EXPORT hb_rddReleaseCurrentArea( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddReleaseCurrentArea()"));
    SELF_CLOSE( ( AREAP ) s_pCurrArea->pArea );
@@ -503,7 +503,7 @@ void hb_rddReleaseCurrentArea( void )
 /*
  * Prepares a new WorkArea node.
  */
-LPAREANODE hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
+LPAREANODE  HB_EXPORT hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 {
    LPAREANODE pCurrArea;
    USHORT uiSize;
@@ -546,7 +546,7 @@ LPAREANODE hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 /*
  * Insert the new WorkArea node
  */
-USHORT hb_rddInsertAreaNode( char *szDriver )
+USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 {
    USHORT uiRddID;
    LPRDDNODE pRddNode;
@@ -614,7 +614,7 @@ static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
 
 
 
-ERRCODE hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
+ERRCODE  HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
 {
    LPAREANODE pAreaNode;
 
@@ -638,7 +638,7 @@ ERRCODE hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
 /*
  * Return the current WorkArea number.
  */
-int  hb_rddGetCurrentWorkAreaNumber( void )
+int   HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaNumber()"));
 
@@ -648,7 +648,7 @@ int  hb_rddGetCurrentWorkAreaNumber( void )
 /*
  * Select a WorkArea by the number.
  */
-ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
 {
    LPAREANODE pAreaNode;
 
@@ -673,7 +673,7 @@ ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 /*
  * Select a WorkArea by the symbol name.
  */
-ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
    ERRCODE bResult;
    char * szName;
@@ -729,7 +729,7 @@ ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 /*
  * Select a WorkArea by the name.
  */
-ERRCODE hb_rddSelectWorkAreaAlias( char * szName )
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
 {
    ERRCODE bResult;
    ULONG ulLen;
@@ -783,7 +783,7 @@ ERRCODE hb_rddSelectWorkAreaAlias( char * szName )
 /*
  *  Function for getting current workarea pointer
  */
-void * hb_rddGetCurrentWorkAreaPointer( void )
+void *  HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaPointer()"));
 
@@ -793,7 +793,7 @@ void * hb_rddGetCurrentWorkAreaPointer( void )
 /*
  * Obtain the current value of a field.
  */
-ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE  HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE bSuccess;
    USHORT uiAction;
@@ -830,7 +830,7 @@ ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Assign a value to a field.
  */
-ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE  HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE bSuccess;
    USHORT uiAction;
@@ -867,7 +867,7 @@ ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Assign a value to a field.
  */
-ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE  HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    LPFIELD pField;
    USHORT uiField;
@@ -895,7 +895,7 @@ ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Obtain the current value of a field.
  */
-ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+ERRCODE  HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    LPFIELD pField;
    USHORT uiField;
@@ -923,7 +923,7 @@ ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Shutdown the RDD system.
  */
-void hb_rddShutDown( void )
+void  HB_EXPORT hb_rddShutDown( void )
 {
    LPRDDNODE pRddNode;
 
@@ -3813,4 +3813,103 @@ HB_FUNC( __DBCOPY )
                      hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
                      ISCHAR( 8 ) ? hb_parc( 8 ) : NULL ); /* RDD */
   }
+}
+HB_FUNC( DBUSEAREAD )
+{
+   char * szDriver, * szFileName;
+   USHORT uiLen;
+   DBOPENINFO pInfo;
+   PHB_FNAME pFileName;
+   PHB_ITEM pFileExt;
+   char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+
+   s_bNetError = FALSE;
+
+   /* New area? */
+   if( hb_parl( 1 ) )
+      hb_rddSelectFirstAvailable();
+   else if( s_pCurrArea )                 /* If current WorkArea is in use then close it */
+      hb_rddReleaseCurrentArea();
+
+   hb_rddCheck();
+   uiLen = ( USHORT ) hb_parclen( 2 );
+   if( uiLen > 0 )
+   {
+      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+
+      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), uiLen );
+      szDriver = szDriverBuffer;
+   }
+   else
+      szDriver = s_szDefDriver;
+
+   szFileName = hb_parc( 3 );
+   if( strlen( szFileName ) == 0 )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
+      return;
+   }
+
+   pFileName = hb_fsFNameSplit( szFileName );
+   strncpy( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   if( strlen( szAlias ) == 0 )
+      strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   uiLen = strlen( szAlias );
+   if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+   {
+      hb_xfree( pFileName );
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+      return;
+   }
+   if( uiLen == 1 )
+   {
+      /* Alias with a single letter. Only are valid 'L' and > 'M' */
+      if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
+      {
+         hb_xfree( pFileName );
+         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+         return;
+      }
+   }
+
+   /* Create a new WorkArea node */
+   if( !hb_rddInsertAreaNode( szDriver ) )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREA" );
+      return;
+   }
+
+   szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+/*   if( !pFileName->szExtension )
+   {
+      pFileExt = hb_itemPutC( NULL, "" );
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
+      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
+               strlen( szFileName ) );
+      hb_itemRelease( pFileExt );
+   }
+   */
+   hb_xfree( pFileName );
+
+   /* Fill pInfo structure */
+   pInfo.uiArea = s_uiCurrArea;
+   pInfo.abName = ( BYTE * ) szFileName;
+   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.fShared = ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE;
+   pInfo.fReadonly = ISLOG( 6 ) ? hb_parl( 6 ) : FALSE;
+
+   ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
+
+   /* Open file */
+   if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
+   {
+      s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
+      hb_xfree( pInfo.abName );
+      hb_rddReleaseCurrentArea();
+      return;
+   }
+   hb_xfree( szFileName );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.465 2002/10/25 08:02:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.466 2002/10/26 14:31:23 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-10-27 11:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbapierr.h
+    include/hbapirdd.d
+    include/hbapi.h
+    include/hbvm.h
+    include/hbtrace.h
+    include/hbdate.h
+    include/hbapilng.h
+    include/hbapifs.h
+    include/hbstack.h
+    include/hbset.h
+    source/rdd/dbcmd.c
+    source/vm/dymsym.c
+    source/vm/arrays.c
+    source/vm/hvm.c
+    source/common/hbtrace.c
+    source/common/hbstr.c
+    source/common/hbffind.c
+    source/rtl/strcase.c
+    source/rtl/errorsys.c
+    source/rtl/datec.c
+    source/rtl/dates.c
+    source/rtl/langapi.c
+    source/rtl/val.c
+    source/rtl/trim.c
+    source/rtl/file.c
+    source/rtl/filesys.c
+    source/rtl/fstemp.c
+    Added HB_EXPORT to missing function,(This is to fix problem when liking the xharbour dll with an static library, Example rddads.lib)
+
 2002-10-26 11:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * hrbdll.bc
     ! added missing depencencie pragma.c

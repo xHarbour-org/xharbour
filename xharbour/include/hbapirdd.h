@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.4 2002/08/07 20:58:22 horacioroldan Exp $
+ * $Id: hbapirdd.h,v 1.5 2002/10/12 00:38:25 horacioroldan Exp $
  */
 
 /*
@@ -68,18 +68,18 @@ extern "C" {
 
 /* RDD virtual machine integration functions */
 
-extern USHORT hb_rddInsertAreaNode( char *szDriver );
-extern USHORT  hb_rddGetCurrentFieldPos( char * szName );
-extern int     hb_rddGetCurrentWorkAreaNumber( void );
-void *         hb_rddGetCurrentWorkAreaPointer( void );
-extern ERRCODE hb_rddSelectWorkAreaAlias( char * szAlias );
-extern ERRCODE hb_rddSelectWorkAreaNumber( int iArea );
-extern ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
-extern ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern void    hb_rddShutDown( void );
+extern USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver );
+extern USHORT  HB_EXPORT hb_rddGetCurrentFieldPos( char * szName );
+extern int     HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void );
+void *         HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void );
+extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias );
+extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea );
+extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
+extern ERRCODE HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern ERRCODE HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern void    HB_EXPORT hb_rddShutDown( void );
 
 
 
@@ -1163,13 +1163,13 @@ typedef RDDNODE * LPRDDNODE;
  *  PROTOTYPES
  *  ----------
  */
-extern ERRCODE hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
-extern ERRCODE hb_rddDisinherit( BYTE * drvName );
-extern USHORT  hb_rddExtendType( USHORT fieldType );
-extern USHORT  hb_rddFieldType( USHORT extendType );
+extern ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
+extern ERRCODE HB_EXPORT hb_rddDisinherit( BYTE * drvName );
+extern USHORT  HB_EXPORT hb_rddExtendType( USHORT fieldType );
+extern USHORT  HB_EXPORT hb_rddFieldType( USHORT extendType );
 
 typedef short (* WACALLBACK )( AREA *, int );
-extern ERRCODE hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
+extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
 
 #if defined(HB_EXTERN_C)
 }

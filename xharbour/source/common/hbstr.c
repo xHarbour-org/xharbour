@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.2 2002/03/06 06:21:14 ronpinkas Exp $
+ * $Id: hbstr.c,v 1.3 2002/10/25 03:06:08 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 
 #include "hbapi.h"
 
-ULONG hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strAt(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
 
@@ -99,7 +99,7 @@ ULONG hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG u
       return 0;
 }
 
-char * hb_strupr( char * pszText )
+char * HB_EXPORT hb_strupr( char * pszText )
 {
    char * pszPos;
 
@@ -124,7 +124,7 @@ char * HB_EXPORT hb_strdup( const char * pszText )
    return pszDup;
 }
 
-int hb_stricmp( const char * s1, const char * s2 )
+int HB_EXPORT hb_stricmp( const char * s1, const char * s2 )
 {
    int rc = 0;
    ULONG l1;

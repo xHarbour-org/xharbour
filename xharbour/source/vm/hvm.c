@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.122 2002/10/22 20:04:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.123 2002/10/24 17:59:27 ronpinkas Exp $
  */
 
 /*
@@ -4441,7 +4441,7 @@ HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
  *for example:
  * retVal = hb_vmEvalBlockV( pBlock, 2, pParam1, pParam2 );
 */
-HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
+HB_ITEM_PTR HB_EXPORT hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 {
    va_list va;
    ULONG i;

@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
+ * $Id: val.c,v 1.2 2002/02/19 03:11:17 walito Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include "hbapierr.h"
 
 /* returns the numeric value of a character string representation of a number */
-double hb_strVal( const char * szText, ULONG ulLen )
+double HB_EXPORT hb_strVal( const char * szText, ULONG ulLen )
 {
    long double ldValue = 0.0;
    ULONG ulPos;

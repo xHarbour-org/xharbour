@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.4 2002/01/04 21:26:08 andijahja Exp $
+ * $Id: strcase.c,v 1.5 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbapierr.h"
 
 /* converts szText to lower case. Does not create a new string! */
-char * hb_strLower( char * szText, ULONG ulLen )
+char * HB_EXPORT hb_strLower( char * szText, ULONG ulLen )
 {
    ULONG i;
 
@@ -70,7 +70,7 @@ char * hb_strLower( char * szText, ULONG ulLen )
    return szText;
 }
 
-char * hb_strLowerCopy( char * szText, ULONG ulLen )
+char * HB_EXPORT hb_strLowerCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -86,7 +86,7 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
    return szCopy;
 }
 
-char * hb_strUpperCopy( char * szText, ULONG ulLen )
+char * HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen )
 {
    char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
@@ -103,7 +103,7 @@ char * hb_strUpperCopy( char * szText, ULONG ulLen )
 }
 
 /* converts szText to upper case. Does not create a new string! */
-char * hb_strUpper( char * szText, ULONG ulLen )
+char * HB_EXPORT hb_strUpper( char * szText, ULONG ulLen )
 {
    ULONG i;
 
@@ -117,7 +117,7 @@ char * hb_strUpper( char * szText, ULONG ulLen )
 
 /* This function copies and converts szText to upper case.
  */
-char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
+char * HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyUpper(%p, %s, %lu)", pDest, pSource, ulLen));
 

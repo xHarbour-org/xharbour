@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.2 2002/07/24 02:58:43 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.3 2002/10/13 18:06:30 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
 /* closest symbol.  */
 static USHORT      s_uiClosestDynSym = 0; /* TOFIX: This solution is not thread safe. */
 
-void hb_dynsymLog( void )
+void HB_EXPORT hb_dynsymLog( void )
 {
    USHORT uiPos;
 
@@ -79,7 +79,7 @@ void hb_dynsymLog( void )
    }
 }
 
-PHB_SYMB hb_symbolNew( char * szName )      /* Create a new symbol */
+PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
 {
    PHB_SYMB pSymbol;
 
@@ -95,7 +95,7 @@ PHB_SYMB hb_symbolNew( char * szName )      /* Create a new symbol */
    return pSymbol;
 }
 
-PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
+PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
 {
    PHB_DYNS pDynSym;
 
@@ -167,7 +167,7 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
    return pDynSym;
 }
 
-PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
+PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
 {
    PHB_DYNS pDynSym;
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
@@ -212,7 +212,7 @@ PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol if not fou
    return pDynSym;
 }
 
-PHB_DYNS hb_dynsymFindName( char * szName )  /* finds a symbol */
+PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
 
@@ -252,7 +252,7 @@ PHB_DYNS hb_dynsymFindName( char * szName )  /* finds a symbol */
    return hb_dynsymFind( szUprName );
 }
 
-PHB_DYNS hb_dynsymFind( char * szName )
+PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
 
@@ -320,7 +320,7 @@ PHB_DYNS hb_dynsymFind( char * szName )
    return NULL;
 }
 
-USHORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
+USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
    BOOL bCont = TRUE;
    USHORT uiPos;
@@ -335,7 +335,7 @@ USHORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
    return uiPos;
 }
 
-void hb_dynsymRelease( void )
+void HB_EXPORT hb_dynsymRelease( void )
 {
    USHORT uiPos;
 
@@ -356,7 +356,7 @@ void hb_dynsymRelease( void )
    hb_xfree( s_pDynItems );
 }
 
-PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc )
+PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 {
    USHORT uiPos;
 
@@ -374,7 +374,7 @@ PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 }
 
 // NOT TESTED YET!!!
-PHB_DYNS hb_dynsymPos( USHORT uiPos )
+PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 {
    if( uiPos < s_uiDynSymbols )
    {
