@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.352 2004/03/08 11:13:19 andijahja Exp $
+ * $Id: hvm.c,v 1.353 2004/03/08 22:15:36 andijahja Exp $
  */
 
 /*
@@ -7990,16 +7990,22 @@ void HB_EXPORT hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
 
    HB_ITEM_PTR pTop = ( * HB_VM_STACK.pPos );
    short iGlobal;
+   USHORT uiPrevLen = ( USHORT ) (&s_aGlobals)->item.asArray.value->ulLen;
+   USHORT uiAdd = 0;
+   USHORT ulLen;
+
+   ulLen = iGlobals + uiPrevLen;
+   hb_arraySize( &s_aGlobals, ulLen );
 
    pTop->type = HB_IT_BYREF;
 
-   for ( iGlobal = 0; iGlobal < iGlobals; iGlobal++ )
+   for ( iGlobal = uiPrevLen + 1; iGlobal <= ulLen; iGlobal++ )
    {
-      pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
+      pTop->item.asRefer.value = ++ uiAdd; // To offset the -1 below.
       pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
       pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
-      hb_arrayAdd( &s_aGlobals, pTop );
+      hb_arraySet( &s_aGlobals, iGlobal, pTop );
       //printf( "*** Added %i ***\n", iGlobal );
    }
 

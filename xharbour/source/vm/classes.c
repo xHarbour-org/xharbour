@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.106 2004/03/07 00:01:19 andijahja Exp $
+ * $Id: classes.c,v 1.107 2004/03/08 22:15:36 andijahja Exp $
  */
 
 /*
@@ -1790,6 +1790,11 @@ HB_FUNC( __CLSNEW )
          }
          else
          {
+            USHORT uiNew, uiAdd = 0;
+            HB_ITEM Tmp;
+
+            Tmp.type = HB_IT_NIL;
+
             /* Ok add now the previous len to the offset */
             nLenClsDatas  = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
             nLenInlines   = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
@@ -1797,13 +1802,16 @@ HB_FUNC( __CLSNEW )
 
             /* ClassDatas */
             pClsAnyTmp = hb_arrayClone( pSprCls->pClassDatas, NULL );
+
             nLen = ( USHORT ) pClsAnyTmp->item.asArray.value->ulLen;
-            for( ui = 1; ui <= nLen; ui++ )
+            ui   = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
+            hb_arraySize( pNewCls->pClassDatas, ui + nLen );
+            nLen += ui;
+
+            for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
             {
-                HB_ITEM Tmp;
-                Tmp.type = HB_IT_NIL;
-                hb_arrayGet( pClsAnyTmp, ui, &Tmp );
-                hb_arrayAddForward( pNewCls->pClassDatas, &Tmp );
+               hb_arrayGet( pClsAnyTmp, ++ uiAdd, &Tmp );
+               hb_arraySetForward( pNewCls->pClassDatas, uiNew, &Tmp );
             }
 
             hb_itemRelease( pClsAnyTmp );
@@ -1813,14 +1821,16 @@ HB_FUNC( __CLSNEW )
 
             /* Inlines */
             pClsAnyTmp = hb_arrayClone( pSprCls->pInlines, NULL );
-            nLen = ( USHORT ) pClsAnyTmp->item.asArray.value->ulLen;
+            ui = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
+            nLen = ( USHORT ) (pClsAnyTmp)->item.asArray.value->ulLen;
+            hb_arraySize( pNewCls->pInlines, ui + nLen );
+            nLen += ui;
+            uiAdd = 0;
 
-            for( ui = 1; ui <= nLen; ui++ )
+            for( uiNew = ui + 1; uiNew <= nLen; uiNew ++ )
             {
-                HB_ITEM Tmp;
-                Tmp.type = HB_IT_NIL;
-                hb_arrayGet( pClsAnyTmp, ui, &Tmp );
-                hb_arrayAddForward( pNewCls->pInlines, &Tmp );
+               hb_arrayGet( pClsAnyTmp, ++ uiAdd, &Tmp );
+               hb_arraySetForward( pNewCls->pInlines, uiNew, &Tmp );
             }
 
             hb_itemRelease( pClsAnyTmp );
@@ -1900,8 +1910,6 @@ HB_FUNC( __CLSNEW )
 
                         if( pSprCls->pMethods[ ui ].pInitValue )
                         {
-                           PHB_ITEM pInitValue;
-
                            if( HB_IS_ARRAY( pSprCls->pMethods[ ui ].pInitValue ) )
                            {
                               pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_arrayClone( pSprCls->pMethods[ ui ].pInitValue, NULL );
@@ -1912,7 +1920,7 @@ HB_FUNC( __CLSNEW )
                            }
                            else
                            {
-                              pInitValue = hb_itemNew( NULL );
+                              PHB_ITEM pInitValue = hb_itemNew( NULL );
 
                               hb_itemCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
                               pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = pInitValue;

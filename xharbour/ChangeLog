@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2529 2004/03/09 01:00:56 likewolf Exp $
+ * $Id: ChangeLog,v 1.2530 2004/03/09 05:06:52 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-09 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/hvm.c     -> hb_vmRegisterGlobals()
+  * source/vm/classes.c -> __CLSNEW()
+    ! optimization of functions by using hb_arraySet[Forward]() instead of
+      hb_arrayAdd[Forward]() since the first one is more efficient, ie. only
+      resize array once before itteration.
+
+  * source/rtl/fparse.c
+    % minor optimization.
 
 2004-03-09 06:12 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/gtwvt/gtwvt.c

@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.4 2004/03/02 12:58:14 andijahja Exp $
+ * $Id: fparse.c,v 1.5 2004/03/07 21:42:52 andijahja Exp $
  */
 
 /*
@@ -160,33 +160,6 @@ static BOOL file_read ( FILE *stream, char *string, int *iCharCount )
          *iCharCount = cnbr;
          string [MAX_READ] = '\0';
          return (TRUE);
-      }
-   }
-}
-
-//----------------------------------------------------------------------------//
-static BOOL char_count ( FILE *stream, ULONG *ulCharCount )
-{
-   int ch;
-   int num_char = 0;
-
-   for (;;)
-   {
-      ch = fgetc ( stream );
-
-      if ( ch == '\n' )
-      {
-         *ulCharCount = num_char;
-         return TRUE;
-      }
-      else if ( ( ch != ' ') && ( ch != 9 ) )
-      {
-         num_char ++ ;
-      }
-
-      if ( ( ch == EOF ) ||  ( ch == 26 ) )
-      {
-         return FALSE;
       }
    }
 }
@@ -387,6 +360,7 @@ HB_FUNC( FCHARCOUNT )
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    ULONG ulCharCount = 0;
    ULONG ulResult = 0;
+   int ch;
 
    /* file parameter correctly passed */
    if ( !pSrc )
@@ -412,9 +386,18 @@ HB_FUNC( FCHARCOUNT )
    }
 
    /* read the file until EOF */
-   while ( char_count( inFile, &ulCharCount ) )
+   while ( ( ch = fgetc ( inFile ) ) != EOF )
    {
-      ulResult += ulCharCount;
+      switch ( ch )
+      {
+        case '\n'  :
+        case '\r'  :
+        case ' '   :
+        case '\tab':
+           break;
+        default:
+           ulResult ++;
+      }
    }
 
    /* return number of characters */
