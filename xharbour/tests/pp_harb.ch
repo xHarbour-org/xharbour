@@ -51,8 +51,10 @@ CLASS  TInterpreter
    METHOD LoadClass()        INLINE PP_LoadClass()
    METHOD LoadFiveWin()      INLINE PP_LoadFw()
 
+#ifdef WIN
    METHOD ScriptSiteAddGlobal( cName, pDisp )
    METHOD ScriptSiteAutomateGlobals()
+#endif
 
 ENDCLASS
 
@@ -100,6 +102,7 @@ METHOD Compile() CLASS  TInterpreter
 RETURN nProcId > 0
 
 //----------------------------------------------------------------------------//
+#ifdef WIN
 METHOD ScriptSiteAddGlobal( cName, pDisp ) CLASS  TInterpreter
 
    LOCAL oGlobal := TOleAuto():New( pDisp, cName )
@@ -126,6 +129,8 @@ METHOD ScriptSiteAutomateGlobals() CLASS  TInterpreter
    NEXT
 
 RETURN .T.
+
+#endif
 
 //----------------------------------------------------------------------------//
 
@@ -773,6 +778,7 @@ HB_FUNC( DROPEXTRATRAILINGWS )
 //----------------------------------------------------------------------------//
 
 #ifdef WIN
+
 FUNCTION Alert( cMsg, aOptions )
 
 RETURN MessageBox( 0, cMsg, "XBScript", 0 );

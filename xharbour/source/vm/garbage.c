@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.8 2002/01/21 09:11:57 ronpinkas Exp $
+ * $Id: garbage.c,v 1.9 2002/02/01 03:48:59 ronpinkas Exp $
  */
 
 /*
@@ -64,11 +64,11 @@
  */
 typedef struct HB_GARBAGE_
 {
-  struct HB_GARBAGE_ *pNext;  /* next memory block */
-  struct HB_GARBAGE_ *pPrev;  /* previous memory block */
-  HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
-  USHORT locked;              /* locking counter */
-  USHORT used;                /* used/unused block */
+   struct HB_GARBAGE_ *pNext;  /* next memory block */
+   struct HB_GARBAGE_ *pPrev;  /* previous memory block */
+   HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
+   USHORT locked;              /* locking counter */
+   USHORT used;                /* used/unused block */
 } HB_GARBAGE, *HB_GARBAGE_PTR;
 
 /* status of memory block */
@@ -173,20 +173,17 @@ void hb_gcFree( void *pBlock )
       if( pAlloc->locked )
       {
          hb_gcUnlink( &s_pLockedBlock, pAlloc );
+         HB_GARBAGE_FREE( pAlloc );
       }
       else
       {
-         if( s_bCollecting )
+         // Might already be marked for deletion.
+         if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
-            HB_TRACE( HB_TR_DEBUG, ( "Release Requested from Cleanup Function, %p", pAlloc ) );
-            pAlloc->used |= HB_GC_DELETE;
-            return;
+            hb_gcUnlink( &s_pCurrBlock, pAlloc );
+            HB_GARBAGE_FREE( pAlloc );
          }
-
-         hb_gcUnlink( &s_pCurrBlock, pAlloc );
       }
-
-      HB_GARBAGE_FREE( pAlloc );
    }
    else
    {
@@ -196,19 +193,10 @@ void hb_gcFree( void *pBlock )
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
 {
-   /* Only needed when collecting garbage. */
-   if( s_bCollecting )
-   {
-      if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
-      {
-         HB_TRACE( HB_TR_INFO, ( "Garbage Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
-
-         hb_itemReleaseString( (HB_ITEM_PTR) Cargo );
-
-         //( (HB_ITEM_PTR) Cargo )->item.asString.value = NULL;
-         ( (HB_ITEM_PTR) Cargo )->type    = HB_IT_NIL;
-      }
-   }
+   /* Item was already released in hb_gcGripDrop() - then we have nothing
+    * to do here
+    */
+   HB_SYMBOL_UNUSED( Cargo );
 }
 
 HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.38 2002/02/04 22:33:32 mafact Exp $
+ * $Id: hvm.c,v 1.39 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -418,6 +418,7 @@ void HB_EXPORT hb_vmQuit( void )
    hb_memvarsRelease();    /* clear all PUBLIC variables */
 
    /* release all known garbage */
+   //hb_gcCollectAll();
    hb_gcReleaseAll();
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
