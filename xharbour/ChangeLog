@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1449 2003/09/11 14:57:46 lculik Exp $
+ * $Id: ChangeLog,v 1.1450 2003/09/11 17:27:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-11 21:57 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+    + PLD distro added
+    - removed Luiz hack for bug in Conectiva Linux RPM - it breaks
+      compilation from non root account.
+    + added other hack :-) for buggy RPM which should resolve this
+      problem. Please test.
+
+  * xharbour/make_tgz.sh
+    + PLD distro added
+  * xharbour/xharbour.spec
+    + PLD distro added
+
+  * xharbour/xhbgtmk.sh
+    * slang_devel removed from necessary dependences, GTSLN won't
+      compile on new RH with its slang-devel so we shouldn't make
+      people to install it. It doesn't disable GTSLN compilation
+      if proper sland-devel exists in a system
+
+  * xharbour/source/vm/proc.c
+    * strcat replaced by strncpy to eliminate GPF in my system
+      when called from hb_arrayResetHolder()
 
 2003-09-11 10:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
