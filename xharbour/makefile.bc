@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.92 2004/04/25 11:26:01 andijahja Exp $
+# $Id: makefile.bc,v 1.93 2004/05/09 23:40:01 druzus Exp $
 #
 
 #
@@ -534,7 +534,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\txml.obj \
    $(RTL_OBJ_DIR)\typefile.obj \
    $(RTL_OBJ_DIR)\wait.obj \
-   $(RTL_OBJ_DIR)\win32ole.obj
+   $(RTL_OBJ_DIR)\win32ole.obj \
+   $(RTL_OBJ_DIR)\stream.obj
 
 #
 # LANG.LIB rules
@@ -2349,6 +2350,12 @@ $(RTL_OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\win32ole.obj : $(RTL_OBJ_DIR)\win32ole.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\stream.obj : $(RTL_OBJ_DIR)\stream.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\word.obj : $(RTL_DIR)\word.c

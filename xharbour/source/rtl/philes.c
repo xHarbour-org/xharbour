@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.20 2004/04/17 22:42:30 andijahja Exp $
+ * $Id: philes.c,v 1.21 2004/05/04 17:03:31 jonnymind Exp $
  */
 
 /*
@@ -104,30 +104,39 @@ HB_FUNC( HB_FCREATE )
 
 #endif
 
+/*
+  xHarbour extension allows for a 4th optional parameter indicating
+  offset into buffer.
+ */
 HB_FUNC( FREAD )
 {
    ULONG ulRead;
 
    if( ISNUM( 1 ) && ISCHAR( 2 ) && ISBYREF( 2 ) && ISNUM( 3 ) )
    {
-      ulRead = hb_parnl( 3 );
+      ULONG ulOffset = hb_parnl( 4 );
 
+      ulRead = hb_parnl( 3 );
       /* NOTE: CA-Clipper determines the maximum size by calling _parcsiz()
                instead of _parclen(), this means that the maximum read length
                will be one more than the length of the passed buffer, because
                the terminating zero could be used if needed. [vszakats] */
 
-      if( ulRead <= hb_parcsiz( 2 ) )
+      if( ulOffset + ulRead <= hb_parcsiz( 2 ) )
+      {
          /* NOTE: Warning, the read buffer will be directly modified,
                   this is normal here ! [vszakats] */
-         ulRead = hb_fsReadLarge( hb_parnl( 1 ),
-                                  ( BYTE * ) hb_parcx( 2 ),
-                                  ulRead );
+         ulRead = hb_fsReadLarge( hb_parnl( 1 ), ( BYTE * ) hb_parcx( 2 ) + ulOffset, ulRead );
+      }
       else
+      {
          ulRead = 0;
+      }
    }
    else
+   {
       ulRead = 0;
+   }
 
    hb_retnl( ulRead );
 }
@@ -135,11 +144,15 @@ HB_FUNC( FREAD )
 HB_FUNC( FWRITE )
 {
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
-      hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ),
-                                 ( BYTE * ) hb_parcx( 2 ),
-                                 ISNUM( 3 ) ? (ULONG) hb_parnl( 3 ) : hb_parclen( 2 ) ) );
+   {
+      ULONG ulOffset = hb_parnl( 4 );
+
+      hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ), ( BYTE * ) hb_parcx( 2 ) + ulOffset, ISNUM( 3 ) ? (ULONG) hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
+   }
    else
+   {
       hb_retnl( 0 );
+   }
 }
 
 HB_FUNC( FERROR )
@@ -420,7 +433,7 @@ HB_FUNC( HB_OPENPROCESS )
       {
          hb_itemPutNL( pErr, fhErr );
       }
-      
+
       if ( pProcID != NULL )
       {
          hb_itemPutNL( pProcID, (LONG) pid );

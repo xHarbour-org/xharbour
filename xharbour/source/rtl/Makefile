@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.51 2004/04/05 02:29:31 druzus Exp $
+# $Id: Makefile,v 1.52 2004/05/09 23:40:05 druzus Exp $
 #
 
 ROOT = ../../
@@ -213,6 +213,7 @@ PRG_SOURCES=\
         typefile.prg \
         wait.prg     \
         win32ole.prg \
+        stream.prg \
 
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=rtlmt

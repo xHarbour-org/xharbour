@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.48 2004/04/27 22:33:29 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.49 2004/05/09 23:40:01 druzus Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -402,6 +402,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cstruct.obj \
   $(OBJ_DIR)\win32ole.obj \
   $(OBJ_DIR)\traceprg.obj \
+  $(OBJ_DIR)\stream.obj \
   $(OBJ_DIR)\cdpesdos.obj \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
@@ -820,6 +821,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\stream.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
   echo. c0d32w.obj,                      + >> hdll.tmp
@@ -2105,6 +2107,12 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\stream.obj : $(OBJ_DIR)\stream.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
