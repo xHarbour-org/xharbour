@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.77 2004/06/22 03:01:54 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.78 2004/06/30 01:40:23 guerra000 Exp $
  */
 
 /*
@@ -1016,6 +1016,7 @@ METHOD GoBottom() CLASS TBrowse
 
    //   Last read record is first record inside TBrowse
    ::nLastRetrieved := 1
+   ::nRecsToSkip := nToTop
    ::RefreshAll()
 
    Return Self
