@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2402 2004/02/25 14:29:54 andijahja Exp $
+ * $Id: ChangeLog,v 1.2403 2004/02/25 15:33:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-25 12:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/trim.c
+    same fix as bellow
+
 2004-02-25 12:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/vm/arrays.c
   * source/vm/debug.c
@@ -15,7 +19,9 @@
   * source/vm/hvm.c
   * source/vm/memvars.c
     !minor fix due my last changes
-  
+      pItem->item.asString.puiHolders =  (USHORT*) hb_xgrab( sizeof( USHORT ) ) ; to 
+    pitem->item.asString.puiHolders =  (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   
 2004-02-25 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
 contrib/hbzlib/zip.c
   * contrib/hbzlib/zipcomp.cpp
