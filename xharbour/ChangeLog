@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3027 2004/06/04 19:22:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3028 2004/06/04 19:23:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,7 +13,7 @@
   * source/compiler/exproptb.c
   * source/compiler/harbour.c
     ! Fixed ambigious var detection of array variable to check MEMVAR declarations.
-    ! Fixed ambigious var detection to support -es switch.
+    ! Fixed ambigious var detection of array variable to support -es switch.
 
 2004-06-04 11:12 UTC-0800 Luis Krause Mantilla
   * contrib/rdd_ads/ads1.c
