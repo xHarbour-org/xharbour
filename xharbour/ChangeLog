@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2232 2004/02/06 18:12:36 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2233 2004/02/07 03:11:12 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-07 00:21 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
+  * source/rdd/dbf1.c
+    ! Now it's possible to open DBF files from Visual FoxPro 6 (only with
+      standard field types).
 
 2004-02-07 10:12 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/genc.c
