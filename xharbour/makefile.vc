@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.82 2003/12/21 23:35:26 fsgiudice Exp $
+# $Id: makefile.vc,v 1.83 2004/01/04 04:26:24 ronpinkas Exp $
 #
 
 #
@@ -1024,7 +1024,7 @@ CLEAN:
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
@@ -1036,7 +1036,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
                                         $(OBJ_DIR)$(MT)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2) $(EXTRALIB)
 
 #
 # HBTEST.EXE rules
@@ -1066,7 +1066,7 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_str.c \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
-                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) ole32.lib oleaut32.lib
+                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB) ole32.lib oleaut32.lib
 
 #
 # HBDOC.EXE rules
@@ -1114,7 +1114,7 @@ $(HBDOC_EXE) : \
                                       $(OBJ_DIR)\fclass1.c \
                                       $(OBJ_DIR)\ffile1.c \
                                       $(OBJ_DIR)\ft_funcs.c \
-                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(PDFHBDOC) $(GENPDF1)
+                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB) $(PDFHBDOC) $(GENPDF1)
 
 #
 # HBMAKE.EXE rules
@@ -1145,7 +1145,8 @@ $(HBMAKE_EXE) : \
                                       $(OBJ_DIR)\pickfile.c \
                                       $(OBJ_DIR)\prb_stak.c \
                                       $(HBMAKE_DIR)\hbmlang.c \
-                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2)
+                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+
 
 #
 # HARBOUR.EXE rules
