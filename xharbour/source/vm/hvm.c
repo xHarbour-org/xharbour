@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.323 2004/02/15 20:21:39 andijahja Exp $
+ * $Id: hvm.c,v 1.324 2004/02/20 00:22:41 ronpinkas Exp $
  */
 
 /*
@@ -5467,14 +5467,14 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
 
-   hb_stackOldFrame( &sStackState );
-
-   HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
-
    if( s_bDebugging )
    {
       hb_vmDebuggerEndProc();
    }
+
+   hb_stackOldFrame( &sStackState );
+
+   HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
 
    s_bDebugging = bDebugPrevState;
    s_ulProcLevel--;
@@ -5777,14 +5777,14 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmSend()"));
 
-   hb_stackOldFrame( &sStackState );
-
-   HB_TRACE(HB_TR_DEBUG, ("Restored Stack hb_vmSend()"));
-
    if( s_bDebugging )
    {
       hb_vmDebuggerEndProc();
    }
+
+   hb_stackOldFrame( &sStackState );
+
+   HB_TRACE(HB_TR_DEBUG, ("Restored Stack hb_vmSend()"));
 
    s_bDebugging = bDebugPrevState;
    s_ulProcLevel--;

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.91 2004/02/15 03:12:49 andijahja Exp $
+# $Id: makefile.vc,v 1.92 2004/02/16 06:32:01 paultucker Exp $
 #
 
 #
@@ -762,6 +762,7 @@ PP_LIB_OBJS = \
 
 DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgaltd.obj \
+   $(OBJ_DIR)\dbgbrwsr.obj \
    $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\dbgmenu.obj \
    $(OBJ_DIR)\dbgtarr.obj \

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.4 2003/06/17 10:55:37 iananderson Exp $
+ * $Id: dbgtwin.prg,v 1.5 2004/01/29 14:25:59 likewolf Exp $
  */
 
 /*
@@ -85,9 +85,11 @@ CLASS TDbWindow  // Debugger windows and dialogs
    METHOD LButtonDown( nMRow, nMCol )
    METHOD LDblClick( nMRow, nMCol )
    METHOD LoadColors()
+
    METHOD Move()
    METHOD KeyPressed( nKey )
    METHOD Refresh()
+   METHOD Resize()
 
 ENDCLASS
 
@@ -103,6 +105,7 @@ METHOD New( nTop, nLeft, nBottom, nRight, cCaption, cColor ) CLASS TDbWindow
    ::cColor   := cColor
    ::lShadow  := .f.
    ::lVisible := .f.
+   ::lFocused := .f.
 
 return Self
 
@@ -166,10 +169,6 @@ METHOD SetFocus( lOnOff ) CLASS TDbWindow
       Eval( ::bPainted, Self )
    endif
 
-   IF( ::Browser != NIL )
-      ::Browser:RefreshAll()
-   ENDIF
-
    DispEnd()
 
    if lOnOff .and. ::bGotFocus != nil
@@ -195,17 +194,13 @@ METHOD Refresh() CLASS TDbWindow
       Eval( ::bPainted, Self )
    endif
    
-   IF( ::Browser != NIL )
-      ::Browser:RefreshAll()
-   ENDIF
- 
    DispEnd()
 
 return nil
 
 METHOD Show( lFocused ) CLASS TDbWindow
 
-   DEFAULT lFocused TO .f.
+   DEFAULT lFocused TO ::lFocused
 
    ::cBackImage := SaveScreen( ::nTop, ::nLeft, ::nBottom + iif( ::lShadow, 1, 0 ),;
                               ::nRight + iif( ::lShadow, 2, 0 ) )
@@ -345,3 +340,32 @@ METHOD LoadColors() CLASS TDbWindow
    ENDIF
 
 RETURN nil
+
+METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS TDbWindow
+  LOCAL lShow
+
+  IF lShow:=::lVisible
+    ::Hide()
+  ENDIF
+  IF nTop != NIL
+    ::nTop := nTop
+  ENDIF
+  IF nBottom != NIL
+    ::nBottom := nBottom
+  ENDIF
+  IF nLeft != NIL
+    ::nLeft := nLeft
+  ENDIF
+  IF nRight != NIL
+    ::nRight := nRight
+  ENDIF
+
+  IF ::Browser != NIL
+    ::Browser:Resize( ::nTop+1, ::nLeft+1, ::nBottom-1, ::nRight-1 )
+  ENDIF
+
+  IF lShow
+    ::Show( ::lFocused )
+  ENDIF
+
+RETURN self

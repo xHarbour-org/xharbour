@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.41 2004/02/11 22:43:46 paultucker Exp $
+# $Id: hrbdll.bc,v 1.42 2004/02/16 06:55:52 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -390,6 +390,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbgtobj.obj \
   $(OBJ_DIR)\tbrwtext.obj \
   $(OBJ_DIR)\dbgwa.obj \
+  $(OBJ_DIR)\dbgbrwsr.obj \
   $(OBJ_DIR)\maindllh.obj \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\tprinter.obj \
@@ -808,6 +809,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbgtobj.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\tbrwtext.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgwa.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbgbrwsr.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
@@ -2027,6 +2029,12 @@ $(OBJ_DIR)\dbgwa.c : $(DEBUG_DIR)\dbgwa.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\dbgbrwsr.c : $(DEBUG_DIR)\dbgbrwsr.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbgbrwsr.obj : $(OBJ_DIR)\dbgbrwsr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg

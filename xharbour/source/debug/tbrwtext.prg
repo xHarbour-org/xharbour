@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.3 2003/06/17 11:12:31 iananderson Exp $
+ * $Id: tbrwtext.prg,v 1.4 2004/01/29 14:25:59 likewolf Exp $
  */
 
 /*
@@ -87,6 +87,7 @@ CLASS TBrwText FROM HBEditor
    METHOD   PageDown()
    METHOD   RefreshAll()
    METHOD   RefreshCurrent()
+   METHOD   ForceStable() INLINE NIL
 
    METHOD   GotoLine(n)                      // Moves active line cursor, that is it hilights last executed line of code
 
