@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.24 2005/01/15 11:12:20 druzus Exp $
+# $Id: mingw32.cf,v 1.25 2005/01/15 15:10:09 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -143,14 +143,16 @@ LDFLAGS = -mno-cygwin
 AR = $(CCPREFIX)ar
 ARFLAGS = $(A_USR)
 
-ifeq ($(SHLVL),) # COMMAND.COM - length of command line is limited
-AR_RULE = $(create_library)
-LD_RULE = $(link_exe_file)
-else
 AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || $(RM) $@
 # our libs have a lot of cross referenced now and we have to group them
 # until we won't have cleaned them
 LINKLIBS = $(LINKPATHS) -Wl,--start-group $(LDLIBS) -Wl,--end-group $(SYSLIBS)
+
+ifeq ($(SHLVL),) # COMMAND.COM - length of command line is limited
+ifneq ($(OS),Windows_NT)
+AR_RULE = $(create_library)
+LD_RULE = $(link_exe_file)
+endif
 endif
 
 include $(TOP)$(ROOT)config/rules.cf

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.29 2004/10/31 13:15:46 druzus Exp $
+# $Id: gcc.cf,v 1.30 2004/12/04 22:37:46 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -98,7 +98,12 @@ ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
-
+ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
+ifneq ($(HB_DEFAULT_GT),)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)
+LINKLIBS += -l$(HB_DEFAULT_GT)
+endif
+endif
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
 
