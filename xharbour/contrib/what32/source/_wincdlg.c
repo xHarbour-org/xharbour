@@ -37,7 +37,7 @@ HB_FUNC( COMMDLGEXTENDEDERROR )
 
 //---------------------------------------------------------------------
 
-//Syntax: ChooseFont( cf:value) -> structure buffer, or NIL 
+//Syntax: ChooseFont( cf:value) -> structure buffer, or NIL
 
 HB_FUNC(CHOOSEFONT)
 {
@@ -45,8 +45,8 @@ HB_FUNC(CHOOSEFONT)
 
   cf->lStructSize = sizeof(CHOOSEFONT);
 
-  if (ChooseFont( cf ) ) 
-      hb_retclen( (char *) cf, sizeof( CHOOSEFONT )) ; 
+  if (ChooseFont( cf ) )
+      hb_retclen( (char *) cf, sizeof( CHOOSEFONT )) ;
 }
 
 //----------------------------------------------------------------------------
@@ -189,30 +189,33 @@ HB_FUNC ( CHOOSECOLOR )
 
 HB_FUNC ( _GETOPENFILENAME )
 {
-    OPENFILENAME ofn;
-    char *szFileName =(char*) hb_xgrab( hb_parcsiz(2));
-    strcpy( szFileName, hb_parc( 2 ) );
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.hInstance       = GetModuleHandle(NULL)  ;
-    ofn.lStructSize     = sizeof(ofn);
-    ofn.hwndOwner       = (ISNIL  (1) ? GetActiveWindow() : (HWND) hb_parnl(1));
-    ofn.lpstrTitle      = hb_parc (3);
-    ofn.lpstrFilter     = hb_parc (4);
-    ofn.Flags           = (ISNIL  (5) ? OFN_EXPLORER : hb_parnl(5) );
-    ofn.lpstrInitialDir = hb_parc (6);
-    ofn.lpstrDefExt     = hb_parc (7);
-    ofn.nFilterIndex    = hb_parni(8);
-    ofn.lpstrFile       = szFileName;
-    ofn.nMaxFile        = hb_parcsiz(2);
-    if(GetOpenFileName(&ofn))
-     {
-      hb_stornl(ofn.nFilterIndex , 8 );
+   OPENFILENAME ofn;
+   char *szFileName =(char*) hb_xgrab( hb_parcsiz(2));
+
+   strcpy( szFileName, hb_parc( 2 ) );
+
+   ZeroMemory( &ofn, sizeof(ofn) );
+   ofn.hInstance       = GetModuleHandle(NULL)  ;
+   ofn.lStructSize     = sizeof(ofn);
+   ofn.hwndOwner       = (ISNIL  (1) ? GetActiveWindow() : (HWND) hb_parnl(1));
+   ofn.lpstrTitle      = hb_parc (3);
+   ofn.lpstrFilter     = hb_parc (4);
+   ofn.Flags           = (ISNIL  (5) ? OFN_EXPLORER : hb_parnl(5) );
+   ofn.lpstrInitialDir = hb_parc (6);
+   ofn.lpstrDefExt     = hb_parc (7);
+   ofn.nFilterIndex    = hb_parni(8);
+   ofn.lpstrFile       = szFileName;
+   ofn.nMaxFile        = hb_parcsiz(2);
+
+   if( GetOpenFileName( &ofn ) )
+   {
+      hb_stornl( ofn.nFilterIndex, 8 );
       hb_storclen( szFileName, hb_parcsiz(2), 2 ) ;
       hb_xfree( szFileName );
-      hb_retclen(( char * ) ofn.lpstrFile, hb_parcsiz(2)); 
-     }
-    else
-     {
+      hb_retc( ( char * ) ofn.lpstrFile );
+   }
+   else
+   {
       hb_retc( "" );
    }
 }
@@ -257,23 +260,23 @@ HB_FUNC ( _GETSAVEFILENAME )
 //SYNTAX: SHBrowseForFolder([<hWnd>],[<cTitle>],<nFlags>,[<nFolderType>])
 
 HB_FUNC( SHBROWSEFORFOLDER )
-{ 
+{
    HWND hwnd = ISNIL   (1)  ? GetActiveWindow() : (HWND) hb_parnl(1);
-   BROWSEINFO BrowseInfo; 
+   BROWSEINFO BrowseInfo;
    char *lpBuffer = (char*) hb_xgrab( MAX_PATH + 1 );
    LPITEMIDLIST pidlBrowse;
-   
+
    SHGetSpecialFolderLocation(hwnd, ISNIL(4) ? CSIDL_DRIVES : hb_parni(4), &pidlBrowse) ;
-   BrowseInfo.hwndOwner = hwnd; 
-   BrowseInfo.pidlRoot = pidlBrowse; 
-   BrowseInfo.pszDisplayName = lpBuffer; 
+   BrowseInfo.hwndOwner = hwnd;
+   BrowseInfo.pidlRoot = pidlBrowse;
+   BrowseInfo.pszDisplayName = lpBuffer;
    BrowseInfo.lpszTitle = ISNIL (2) ?  "Select a Folder" : hb_parc(2);
-   BrowseInfo.ulFlags = hb_parni(3); 
+   BrowseInfo.ulFlags = hb_parni(3);
    BrowseInfo.lpfn = NULL;
-   BrowseInfo.lParam = 1; 
+   BrowseInfo.lParam = 1;
    BrowseInfo.iImage = 0;
-   pidlBrowse = SHBrowseForFolder(&BrowseInfo); 
-   
+   pidlBrowse = SHBrowseForFolder(&BrowseInfo);
+
    if ( pidlBrowse )
    {
      SHGetPathFromIDList(pidlBrowse,lpBuffer);
@@ -283,6 +286,6 @@ HB_FUNC( SHBROWSEFORFOLDER )
    {
      hb_retc( "" );
    }
-   
+
    hb_xfree( lpBuffer);
-} 
+}

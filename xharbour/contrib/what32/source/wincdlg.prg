@@ -119,66 +119,80 @@ nFlags:   OFN_* values default to OFN_EXPLORER
 cInitDir: Initial directory
 cDefExt:  Default Extension i.e. 'DBF'
 nIndex:   Index position of types
- 
+
 Returns:  If OFN_ALLOWMULTISELECT
               Array of files selected
           else
               FileName.
           endif
- 
+
 
 */
 
-FUNCTION GetOpenFileName( hWnd, cPath, cTitle, aFilter, nFlags, cIniDir, cDefExt, nIndex )
-local aFiles,cRet,cFile,n,x,c:=''
-IF aFilter==nil
-   aFilter:={}
-END
-IF ValType( aFilter ) == "A"
-   FOR n:=1 TO LEN(aFilter)
-       c+=aFilter[n][1]+chr(0)+aFilter[n][2]+chr(0)
-   NEXT
-ENDIF
-if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
-   cFile:=space(32000)
-  ELSE
-   cFile:=padr(trim(cPath),255,chr(0))
-END
-cRet:=_GetOpenFileName(hWnd, @cFile, cTitle, c, nFlags, cIniDir, cDefExt, @nIndex)
-if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
-   n:=AT(CHR(0)+CHR(0),cFile)
-   cFile:=LEFT(cFile,n)
-   aFiles:={}
-   IF n==0 // no double chr(0) user must have pressed cancel
-      RETURN(aFiles)
-   END
-   x:=AT(CHR(0),cFile) // fist null
-   cPath:=LEFT(cFile,x)
-   
-   cFile:=STRTRAN(cFile,cPath)
-   IF !EMPTY(cFile) // user selected more than 1 file
-      c:=''
-      FOR n:=1 TO LEN(cFile)
-          IF SUBSTR(cFile,n,1)==CHR(0)
-             AADD(aFiles,STRTRAN(cPath,CHR(0) )+'\'+c)
-             c:=''
-             LOOP
-          END
-          c+=SUBSTR(cFile,n,1)
+FUNCTION GetOpenFileName( hWnd, cPath, cTitle, aaFilters, nFlags, cIniDir, cDefExt, nIndex )
+
+   LOCAL aFiles, cRet, cFile, x, aFilter, cFilter := "", cItem, nAt, cChar
+
+   IF cPath == NIL
+      cPath := ""
+   ENDIF
+
+   IF ValType( aaFilters ) == "A"
+      FOR EACH aFilter IN aaFilters
+          cFilter += aFilter[1] + Chr(0) + aFilter[2] + Chr(0)
       NEXT
-     ELSE
-      /*
-      cFile:=cPath
-      x:=RAT('\',cFile)
-      cPath:=LEFT(cFile,x-1)
-      */
-      aFiles:={STRTRAN(cPath,CHR(0) )} //STRTRAN(STRTRAN(cFile,cPath),'\')}
-   END
-   Return(aFiles)
-else
-  cRet:=left(cRet,at(chr(0),cRet)-1)
-end
-Return(cRet)
+   ENDIF
+
+   IF AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
+      cFile := Space( 32000 )
+   ELSE
+      cFile := Padr( Trim( cPath ), 256, Chr(0) )
+   ENDIF
+
+   cRet := _GetOpenFileName( hWnd, @cFile, cTitle, cFilter, nFlags, cIniDir, cDefExt, @nIndex )
+
+   IF AND( nFlags, OFN_ALLOWMULTISELECT ) > 0
+      nAt := At( Chr(0) + Chr(0), cFile )
+
+      cFile := Left( cFile, nAt )
+      aFiles := {}
+
+      IF nAt == 0 // no double chr(0) user must have pressed cancel
+         RETURN( aFiles )
+      ENDIF
+
+      x := At( Chr(0), cFile ) // fist null
+      cPath := Left( cFile, x )
+
+      cFile := StrTran( cFile, cPath, "" )
+
+      IF ! Empty(cFile) // user selected more than 1 file
+         cItem := ""
+
+         FOR EACH cChar IN cFile
+             IF cChar == 0
+                aAdd( aFiles, StrTran( cPath, Chr(0), "" ) + '\' + cItem )
+                cItem := ""
+                LOOP
+             ENDIF
+
+             cItem += cChar
+         NEXT
+      ELSE
+         /*
+         cFile:=cPath
+         x:=RAT('\',cFile)
+         cPath:=LEFT(cFile,x-1)
+         */
+         aFiles := { StrTran( cPath, CHR(0), "" ) } //STRTRAN(STRTRAN(cFile,cPath),'\')}
+      ENDIF
+
+      Return( aFiles )
+   ELSE
+     //cRet := Left( cRet, At( chr(0), cRet ) -1 )
+   ENDIF
+
+RETURN cRet
 
 
 
@@ -186,7 +200,7 @@ Return(cRet)
 
 /*
 GetSaveFileName( hWnd, cFile, cTitle, aFilter, nFlags, cInitDir, cDefExt, nIndex)
- 
+
 hWnd:     Handle to parent window
 cFile:    (optional) Default FileName
 cTitle:   Window Title
@@ -195,7 +209,7 @@ nFlags:   OFN_* values default to OFN_EXPLORER
 cInitDir: Initial directory
 cDefExt:  Default Extension i.e. 'DBF'
 nIndex:   Index position of types
- 
+
 Returns:  FileName.
 */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TOpenDialog.prg,v 1.2 2002/11/01 08:15:25 what32 Exp $
+ * $Id: TOpenDialog.prg,v 1.3 2003/01/09 08:21:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -53,10 +53,9 @@ CLASS TOpenDialog FROM TCommonDialog
 ENDCLASS
 
 METHOD Execute() CLASS TOpenDialog
-   local cPath, x, n, c
 
-   ::Filename := GetOpenFileName( GetActiveWindow(), ::Title, ::Filter, ::Options, ::InitialDir, ::DefaultExt, ::FilterIndex )
-   
+   ::FileName := GetOpenFileName( GetActiveWindow(), ,::Title, ::Filter, ::Options, ::InitialDir, ::DefaultExt, ::FilterIndex )
+
    IF ValType( ::FileName ) == "A"
       ::Files    := ::FileName
       ::FileName := NIL
