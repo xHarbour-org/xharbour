@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.26 2004/07/13 14:34:23 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.27 2004/08/26 13:25:14 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -488,8 +488,8 @@ ENDCLASS
 
 METHOD New( pDB, cQuery, lallCols, cSchema, res ) CLASS TPQquery
     ::pDB      := pDB
-    ::cQuery   := RemoveSpaces(cQuery)
     ::lClosed  := .T.    
+    ::cQuery   := cQuery
     ::lallCols := lallCols
     ::Schema   := cSchema
     
@@ -1232,13 +1232,6 @@ METHOD FieldDec( nField ) CLASS TPQrow
         result := ::aStruct[nField, 4]    
     end
 RETURN result
-
-
-Static Function RemoveSpaces( cQuery )
-    Do While AT("  ", cQuery) != 0
-        cQuery := Strtran(cQuery, "  ", " ")
-    end
-Return cQuery
 
 
 Static Function DataToSql(xField)

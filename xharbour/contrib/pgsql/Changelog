@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.27 2004/09/29 22:34:23 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.28 2004/09/29 22:38:43 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-14 10:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  - xharbour/contrib/pgsql/TPostgres.prg
+    ! Removed function removespaces. It's not necessary remove unused spaces in query.
 
 2004-09-29 18:30 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   + xharbour/contrib/pgsql/postgres.c
