@@ -1,7 +1,8 @@
-/*
+/********************************************************
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
+ * $Id$
  */
 #include "gtinfo.ch"
 
@@ -14,13 +15,15 @@ Local nOp
      ?
      Quit
    End
+
    SetColor("w+/b,b/w")
-   Cls
-   @ 3, 5 Say "Desktop Resolution: " + ;
-              AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
-	      AllTrim(Str(GTInfo(GTI_DESKTOPHEIGHT))) + "x" + ;
-	      AllTrim(Str(GTInfo(GTI_DESKTOPDEPTH))) + "bpp   "
+
    While .T.
+      CLEAR SCREEN
+      @ 3, 5 Say "Desktop Resolution: " + ;
+               AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
+            AllTrim(Str(GTInfo(GTI_DESKTOPHEIGHT))) + "x" + ;
+            AllTrim(Str(GTInfo(GTI_DESKTOPDEPTH))) + "bpp   "
       @ 2, 5 Say "Current GT Resolution: " + ;
                  AllTrim(Str(GTInfo(GTI_SCREENWIDTH))) + "x" + ;
 		 AllTrim(Str(GTInfo(GTI_SCREENHEIGHT))) + "x" + ;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.27 2004/02/13 18:25:23 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.28 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -278,7 +278,7 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS stat );
 static PXVT_BUFFER xvt_bufferNew( USHORT col, USHORT row, USHORT bkg );
 static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows );
 static void xvt_bufferInvalidate( PXVT_BUFFER buf,int left, int top, int right, int bottom );
-static void xvt_bufferClear( PXVT_BUFFER buf, HB_GT_CELLTYPE chr, HB_GT_CELLTYPE bkg );
+//static void xvt_bufferClear( PXVT_BUFFER buf, HB_GT_CELLTYPE chr, HB_GT_CELLTYPE bkg );
 static void xvt_bufferClearRange(
    PXVT_BUFFER buf, HB_GT_CELLTYPE chr, HB_GT_CELLTYPE bkg,
    int x1, int y1, int x2, int y2 );
@@ -379,9 +379,13 @@ static HB_GT_GOBJECT *s_gLastObj = NULL;
 
 PXWND_DEF s_wnd = NULL;
 
-/**** TO BE REMOVED ****/
+/*** Current clipboard buffer **/
 static char *s_clipboard = NULL;
 static int s_clipsize = 0;
+
+/** Font request cache **/
+static int s_fontReqSize = XVT_DEFAULT_FONT_HEIGHT;
+static int s_fontReqWidth = XVT_DEFAULT_FONT_WIDTH;
 
 /**********************************************************************
 *                                                                     *
@@ -690,7 +694,7 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
 }
 
 /******************** Clears the whole buffer *******************************/
-
+/*
 static void xvt_bufferClear( PXVT_BUFFER buf, HB_GT_CELLTYPE chr, HB_GT_CELLTYPE bkg )
 {
    int i;
@@ -713,7 +717,7 @@ static void xvt_bufferClear( PXVT_BUFFER buf, HB_GT_CELLTYPE chr, HB_GT_CELLTYPE
    buf->rInvalid.x1 = buf->rInvalid.y1 = 0;
    buf->rInvalid.x2 = buf->cols;
    buf->rInvalid.x2 = buf->rows;
-}
+}*/
 
 /******************** Clears a part of the buffer *******************************/
 
@@ -2777,7 +2781,6 @@ static void xvt_processMessages( PXWND_DEF wnd )
             case XVT_ICM_SETSELECTION:
             {
                ULONG nlen;
-               unsigned char *data;
 
                // read data from application
                read( streamUpdate[0], &nlen, sizeof( nlen ) );
@@ -2824,6 +2827,26 @@ static void xvt_processMessages( PXWND_DEF wnd )
                   pgObj->data[ pgObj->data_len ] = 0;
                }
                hb_gtAddGobject( pgObj );
+            break;
+
+            case XVT_ICM_FONTSIZE:
+            {
+               XFontStruct *xfs;
+               USHORT usData;
+
+               read( streamUpdate[0], &usData, sizeof( usData ) );
+               s_fontReqWidth = (int) usData;
+               read( streamUpdate[0], &usData, sizeof( usData ) );
+               s_fontReqSize = (int) usData;
+
+               xfs = xvt_fontNew( wnd->dpy, XVT_DEFAULT_FONT_NAME,
+                  XVT_DEFAULT_FONT_WEIGHT,
+                  s_fontReqSize, NULL );
+               if ( xfs )
+               {
+                  xvt_windowSetFont( wnd, xfs );
+               }
+            }
             break;
 
             case XVT_ICM_QUIT:
@@ -4357,19 +4380,93 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          return -1;
 
       case GTI_FONTSIZE:
-         return -1;
+         if ( s_wnd != 0 )
+         {
+            iOldValue =  s_wnd->fontHeight;
+         }
+         // else, use our local image.
+         else
+         {
+            iOldValue = s_fontReqSize;
+         }
+
+         if ( bUpdate )
+         {
+            //send requst to change width
+            if ( s_wnd != 0 || s_childPid != 0 )
+            {
+               s_fontReqSize = iParam;
+
+               appMsg = XVT_ICM_FONTSIZE;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               appMsg = (USHORT) s_fontReqWidth;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               appMsg = (USHORT) s_fontReqSize;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+            }
+         }
+      return iOldValue;
 
       case GTI_FONTWIDTH:
-         return -1;
+         if ( s_wnd != 0 )
+         {
+            iOldValue =  s_wnd->fontWidth;
+         }
+         // else, use our local image.
+         else
+         {
+            iOldValue = s_fontReqWidth;
+         }
 
-      case GTI_DESKTOPWIDTH:
-         return -1;
-
-      case GTI_DESKTOPHEIGHT:
-         return -1;
+         if ( bUpdate )
+         {
+            s_fontReqWidth = iParam;
+         }
+      return iOldValue;
 
       case GTI_DESKTOPDEPTH:
          return -1;
+
+      case GTI_DESKTOPWIDTH:
+      case GTI_DESKTOPHEIGHT:
+      case GTI_DESKTOPCOLS:
+      case GTI_DESKTOPROWS:
+      {
+         Display *dpy;
+         Window wnd;
+         XWindowAttributes wndAttr;
+
+         dpy = XOpenDisplay( NULL );
+         if ( dpy )
+         {
+            wnd = XDefaultRootWindow( dpy );
+            if ( wnd )
+            {
+               XGetWindowAttributes( dpy, wnd, &wndAttr );
+               switch( iMsgType )
+               {
+                  case GTI_DESKTOPWIDTH:
+                     return wndAttr.width;
+                  case GTI_DESKTOPHEIGHT:
+                     return wndAttr.height;
+                  case GTI_DESKTOPCOLS:
+                     return wndAttr.width / s_fontReqWidth;
+                  case GTI_DESKTOPROWS:
+                     return wndAttr.height / s_fontReqSize;
+               }
+            }
+         }
+      }
+      return -1;
+
+      case GTI_INPUTFD:
+         return fileno( stdin );
+
+      case GTI_OUTPUTFD:
+         return fileno( stdout );
+
+      case GTI_ERRORFD:
+         return fileno( stderr );
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;
@@ -4469,3 +4566,4 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 
 /* *********************************************************************** */
+

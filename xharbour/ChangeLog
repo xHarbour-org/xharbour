@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2326 2004/02/19 18:15:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.2327 2004/02/19 20:51:53 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-20 00:47 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    + better support for GTInfo(); font setting needs still some finetuning.
+
+  * tests/gtinfo.prg
+    * better layout
+
 2004-02-20 03:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/itemapi.c
     * minor changes to hb_itemStr() for Clipper compatibility

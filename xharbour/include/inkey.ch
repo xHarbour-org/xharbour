@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.3 2004/02/07 19:29:47 vouchcac Exp $
+ * $Id: inkey.ch,v 1.4 2004/02/13 16:52:26 jonnymind Exp $
  */
 
 /*
@@ -91,6 +91,8 @@
 #define K_MWFORWARD             1014   // Mouse Wheel Forward
 #define K_MWBACKWARD            1015   // Mouse Wheel Backward
 
+#define K_MINMOUSE              1001
+#define K_MAXMOUSE              1015
 
 /* Harbour extension - this marks that multi-characters keycode will be
    returned - call INKEY() until ZERO will be returned

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.8 2004/01/25 19:15:53 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.9 2004/02/06 17:07:31 jonnymind Exp $
  */
 
 /*
@@ -137,6 +137,7 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_ICM_CLEAROBJECTS  11    // Graphical objects deleted
 #define XVT_ICM_SETSELECTION  20    // Set X selection.
 #define XVT_ICM_GETSELECTION  21    // Set X selection.
+#define XVT_ICM_FONTSIZE      30    // font size
 #define XVT_ICM_BEGIN         50
 #define XVT_ICM_QUIT          100   // App requests message loop to quit
 

@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.17 2004/02/15 11:57:49 lculik Exp $
+/* $Id: teditor.prg,v 1.18 2004/02/17 02:36:47 ronpinkas Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -113,6 +113,11 @@ CLASS HBEditor
    DATA  nMarkLen
    DATA  nOrigCursor    INIT SetCursor()  // Save to restore original cursor format on exit
 
+   DATA  nSelColStart   INIT -1
+   DATA  nSelColEnd     INIT -1
+   DATA  nSelRowStart   INIT -1
+   DATA  nSelRowEnd     INIT -1
+
    METHOD New(cString, nTop, nLeft, nBottom,;            // Converts a string to an array of strings splitting input string at EOL boundaries
               nRight, lEditMode, nLineLength, nTabSize)
 
@@ -152,6 +157,7 @@ CLASS HBEditor
    METHOD Row() INLINE ::nPhysRow                        // Same as clipper ones, returns ::nPhysRow value
    METHOD Col() INLINE ::nPhysCol                        // Same as clipper ones, returns ::nPhysCol value
 
+   METHOD SelectedText( cText )                          // Retunrs selected test if cText == NIL, or change it to cText
 ENDCLASS
 
 
