@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.117 2002/01/15 17:41:13 alkresin Exp $
+ * $Id: ppcore.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -399,6 +399,7 @@ void hb_pp_Init( void )
       */
       sprintf( szResult, "%05d", ( usHarbour ? usHarbour : 1 ) );
       hb_pp_AddDefine( "__HARBOUR__", szResult );
+      hb_pp_AddDefine( "__XHARBOUR__", szResult );
    }
 
    {

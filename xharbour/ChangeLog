@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.41 2002/01/23 03:42:04 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.42 2002/01/23 16:48:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-23 15:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added support for __XHARBOUR__ auto defined.
+
+  * source/vm/hvm.c
+    * Added logic in hb_vmDo() to detect ill-behaved calls to hb_vmDo(), which were suppose to call hb_vmSend() instead.
+      /* This can only happen in 3rd party tools internals, like FWH, etc. */
+
+  * tests/pp_harb.ch
+    + Added _#ifdef __XHARBOUR__ to protect against xHarbour fastapi reliance, when compiled by other compilers.
+
+  * tests/tstloop.prg
+    + Added Left( @cVarByRef ) test.
 
 2002-01-23 08:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/Makefile

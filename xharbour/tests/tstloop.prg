@@ -60,6 +60,15 @@ Procedure Main()
    ?
 
    nTemp := Seconds()
+   cTemp := "This is some line of text about nothing what so ever - just a simple test..."
+   FOR Counter := 1000000 TO 1 STEP -1
+      cVar := Left( @cTemp, 5 )
+   NEXT
+   ? "'" + cVar + "'"
+   ? "Left(@) Loops:", Seconds() - nTemp
+   ?
+
+   nTemp := Seconds()
    FOR Counter := 1000000 TO 1 STEP -1
       TestProc( cVar )
    NEXT

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.21 2002/01/23 03:10:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.22 2002/01/23 16:48:31 ronpinkas Exp $
  */
 
 /*
@@ -3304,6 +3304,12 @@ void hb_vmDo( USHORT uiParams )
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
+   }
+
+   if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
+   {
+      hb_vmSend( uiParams );
+      return;
    }
 
    if( bProfiler )
