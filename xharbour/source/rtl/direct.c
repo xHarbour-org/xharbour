@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.30 2004/03/03 07:06:38 ronpinkas Exp $
+ * $Id: direct.c,v 1.31 2004/03/03 07:27:41 ronpinkas Exp $
  */
 
 /*
@@ -190,17 +190,9 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      HB_ITEM Filename;
-      HB_ITEM Size;
-      HB_ITEM Date;
-      HB_ITEM Time;
-      HB_ITEM Attr;
+      HB_ITEM Tmp;
 
-      Filename.type = HB_IT_NIL ;
-      Size.type = HB_IT_NIL ;
-      Date.type = HB_IT_NIL ;
-      Time.type = HB_IT_NIL ;
-      Attr.type = HB_IT_NIL ;
+      Tmp.type = HB_IT_NIL ;
 
       do
       {
@@ -218,23 +210,23 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
             if ( bFullPath )
             {
                char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Filename, szFullName ) );
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, szFullName ) );
                hb_xfree( szFullName );
             }
             else
             {
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Filename, ffind->szName ) );
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szName ) );
             }
 
          #ifndef HB_LONG_LONG_OFF
-            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Size, ffind->size ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Tmp, ffind->size ) );
          #else
-            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Size, ffind->size ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Tmp, ffind->size ) );
          #endif
 
-            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Date, ffind->lDate ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Time, ffind->szTime ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Attr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Tmp, ffind->lDate ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szTime ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
             bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
@@ -261,13 +253,9 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    }
 }
 
-static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, BOOL bMatchCase )
+static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
-   // Arbitary value which should be enough
-   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
-
-   Wild2RegEx( szFName, sRegEx, bMatchCase );
 
    for ( ui = 0; ui < uiLen; ui ++ )
    {
@@ -284,7 +272,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
             SubDir.type = HB_IT_NIL;
             hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
 
-            hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, bMatchCase );
+            hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, sRegEx );
 
             hb_xfree( szSubdir );
             hb_itemClear( &SubDir );
@@ -319,6 +307,10 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    char cCurDsk;
    BYTE *pCurDir;
    HB_ITEM Dir;
+   // Arbitary value which should be enough
+   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+
+   Wild2RegEx( szFName, sRegEx, bMatchCase );
 
    if( s_bTop )
    {
@@ -336,7 +328,7 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
 
    hb_arrayNew( pResult, 0 );
-   hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, bMatchCase );
+   hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, sRegEx );
 
    hb_itemClear( &Dir );
 

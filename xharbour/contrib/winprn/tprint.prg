@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.9 2004/02/29 20:44:46 peterrees Exp $
+ * $Id: tprint.prg,v 1.10 2004/03/02 12:58:14 andijahja Exp $
  */
 
 /*
@@ -896,25 +896,17 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray)
 {
-    HB_ITEM SubItems, FontName, Fixed, TrueType, CharSet;
+    HB_ITEM SubItems, Tmp;
+
     SubItems.type = HB_IT_NIL;
-    FontName.type = HB_IT_NIL;
-    Fixed.type = HB_IT_NIL;
-    TrueType.type = HB_IT_NIL;
-    CharSet.type = HB_IT_NIL;
+    Tmp.type = HB_IT_NIL;
 
     hb_arrayNew( &SubItems, 4 );
-    hb_arraySetForward( &SubItems, 1 ,hb_itemPutC(  &FontName, lplf->lfFaceName) ) ;
-    hb_arraySetForward( &SubItems, 2 ,hb_itemPutL(  &Fixed   , lplf->lfPitchAndFamily & FIXED_PITCH  ) ) ;
-    hb_arraySetForward( &SubItems, 3 ,hb_itemPutL(  &TrueType, FontType & TRUETYPE_FONTTYPE) ) ;
-    hb_arraySetForward( &SubItems, 4 ,hb_itemPutNL( &CharSet , lpntm->tmCharSet) ) ;
+    hb_arraySetForward( &SubItems, 1 ,hb_itemPutC(  &Tmp, lplf->lfFaceName) ) ;
+    hb_arraySetForward( &SubItems, 2 ,hb_itemPutL(  &Tmp   , lplf->lfPitchAndFamily & FIXED_PITCH  ) ) ;
+    hb_arraySetForward( &SubItems, 3 ,hb_itemPutL(  &Tmp, FontType & TRUETYPE_FONTTYPE) ) ;
+    hb_arraySetForward( &SubItems, 4 ,hb_itemPutNL( &Tmp , lpntm->tmCharSet) ) ;
     hb_arrayAddForward((PHB_ITEM) pArray , &SubItems);
-
-    hb_itemClear( &SubItems );
-    hb_itemClear( &FontName );
-    hb_itemClear( &Fixed );
-    hb_itemClear( &TrueType );
-    hb_itemClear( &CharSet );
 
     return(TRUE);
 }
@@ -930,7 +922,6 @@ HB_FUNC_STATIC( ENUMFONTS )
     hb_arrayNew( &Array, 0 );
     EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) &Array);
     hb_itemReturn( &Array) ;
-    hb_itemClear( &Array) ;
     Result = TRUE ;
   }
   if (!Result)
