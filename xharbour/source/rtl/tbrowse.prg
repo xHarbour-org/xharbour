@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.44 2003/08/08 22:31:51 walito Exp $
+ * $Id: tbrowse.prg,v 1.45 2003/10/04 14:20:58 walito Exp $
  */
 
 /*
@@ -586,9 +586,7 @@ METHOD Configure( nMode ) CLASS TBrowse
 #endif
 
    //   Flag that browser has been configured properly
-   if !::lNeverDisplayed
-      ::lConfigured := .t.
-   endif
+   ::lConfigured := .t.
 
 return Self
 
@@ -1543,7 +1541,10 @@ METHOD Stabilize() CLASS TBrowse
 
    // Configure the browse if not configured . Pritpal Bedi
    //
-   if !::lConfigured
+   if !::lConfigured .or. ::lNeverDisplayed
+      if ::lNeverDisplayed
+         ::configure()
+      endif
       ::configure( 2 )
    endif
 
@@ -1917,7 +1918,10 @@ METHOD ForceStabilize() CLASS TBrowse
 
    // Configure the browse if not configured . Pritpal Bedi
    //
-   if !::lConfigured
+   if !::lConfigured .or. ::lNeverDisplayed
+      if ::lNeverDisplayed
+         ::configure()
+      endif
       ::configure( 2 )
    endif
 
