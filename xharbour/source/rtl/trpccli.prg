@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.16 2003/04/18 18:30:53 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.17 2003/04/20 22:46:09 jonnymind Exp $
  */
 
 /*
@@ -94,13 +94,16 @@ CLASS tRPCClient
    METHOD CallAgain()            INLINE ::TCPAccept()
    METHOD StopAsyncCall()
 
+   METHOD SetPeriodCallback()
+   METHOD ClearPeriodCallback()
+
 
    /* Accessors */
    METHOD SetEncryption( cKey )
    METHOD IsEncrypted()             INLINE ::cCryptKey != NIL
    METHOD GetStatus()               INLINE ::nStatus
-   METHOD SetTimeout( nTime )       INLINE ::nTimeout := nTime
-   METHOD GetTimenout()             INLINE ::nTimeout
+   METHOD SetTimeout( nTime )
+   METHOD GetTimeout()
    METHOD GetResult()               INLINE ::oResult
    METHOD FoundServers()            INLINE Len( ::aServers ) != 0
    METHOD FoundFunctions()          INLINE Len( ::aFunctions ) != 0
@@ -142,6 +145,8 @@ HIDDEN:
 
    /* Timeout system */
    DATA nTimeout        INIT -1
+   DATA nTimeLimit      INIT -1
+   DATA caPerCall
 
    DATA nUdpTimeBegin   INIT 0
    DATA thUdpAccept     INIT -1
@@ -198,7 +203,7 @@ METHOD New( cNetwork ) CLASS tRPCClient
 
    ::nUdpPort := 1139
    ::nTcpPort := 1140
-   ::nTimeOut := -1
+
 
    ::skTcp := InetCreate()
    ::skUdp := InetDGram( .T. )
@@ -305,7 +310,6 @@ METHOD StartScan()
       ::StopScan()
    ENDIF
 
-   ::nTimeout := ::nTimeOut
    ::nUDPTimeBegin := INT( Seconds() * 1000 )
 
    // in async mode, just launch the listener
@@ -437,13 +441,6 @@ RETURN .T.
 
 METHOD Connect( cServer, cUserId, cPassword ) CLASS tRPCClient
    LOCAL cAuth, cReply := Space(8)
-
-   ::nStatus := RPC_STATUS_CONNECTING // connecting
-   IF .not. Empty( ::nTimeout )
-      ::skTcp := InetCreate( ::nTimeout )
-   ELSE
-      ::skTcp := InetCreate( )
-   ENDIF
 
    InetConnect( cServer, ::nTcpPort, ::skTcp  )
 
@@ -658,6 +655,90 @@ METHOD Call( ... ) CLASS tRPCClient
 RETURN ::oResult
 
 
+METHOD SetPeriodCallback( ... ) CLASS tRPCClient
+   LOCAL caCalling
+   LOCAL nCount
+
+   IF Pcount() < 3
+      //TODO set an error
+      RETURN .F.
+   ENDIF
+
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
+   ::nTimeout := HB_PValue( 1 )
+   ::nTimeLimit := HB_PValue( 2 )
+
+   caCalling := HB_PValue( 3 )
+   IF ValType( caCalling ) != "A"
+      caCalling := Array( Pcount() -2 )
+      FOR nCount := 3 TO Pcount()
+         caCalling[nCount - 2] :=  HB_PValue( nCount )
+      NEXT
+   ENDIF
+   ::caPerCall := caCalling
+
+   IF ::skTCP != NIL
+      InetSetTimeout( ::skTCP, ::nTimeout )
+      InetSetTimeLimit( ::skTCP, ::nTimeLimit )
+      InetSetPeriodCallback( ::skTCP, caCalling )
+   ENDIF
+
+   #ifdef HB_THREAD_SUPPORT
+   MutexUnlock( ::mtxBusy )
+   #endif
+
+RETURN .T.
+
+
+METHOD ClearPeriodCallback() CLASS tRPCClient
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
+
+   ::nTimeout := -1
+   ::nTimeLimit := -1
+   ::caPerCall := NIL
+
+   IF ::skTCP != NIL
+      InetClearTimeout( ::skTCP )
+      InetClearTimeLimit( ::skTCP )
+      InetClearPeriodCallback( ::skTCP )
+   ENDIF
+
+   #ifdef HB_THREAD_SUPPORT
+   MutexUnlock( ::mtxBusy )
+   #endif
+RETURN .T.
+
+
+METHOD SetTimeout( nTime ) CLASS tRPCClient
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
+
+   ::nTimeout := nTime
+   InetSetTimeout( ::skTCP, ::nTimeout )
+
+   #ifdef HB_THREAD_SUPPORT
+   MutexUnlock( ::mtxBusy )
+   #endif
+RETURN .T.
+
+
+METHOD GetTimeout()
+   LOCAL nRet
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
+   nRet := ::nTimeout
+   #ifdef HB_THREAD_SUPPORT
+   MutexUnlock( ::mtxBusy )
+   #endif
+RETURN nRet
+
+
 METHOD StopAsyncCall() CLASS tRPCClient
 
 #ifdef HB_THREAD_SUPPORT
@@ -734,7 +815,8 @@ RETURN ( InetErrorCode( ::skTCP ) == 0 )
 
 METHOD TCPAccept() CLASS tRPCClient
    LOCAL nTime := 0
-   LOCAL cCode
+   LOCAL cCode, bContinue
+   LOCAL nTimeLimit
 
    // TcpAccept can also be called standalone, without the
    // support of call(). So, we must set the waiting state.
@@ -744,23 +826,18 @@ METHOD TCPAccept() CLASS tRPCClient
 
    ::nErrorCode := 0
    ::nStatus := RPC_STATUS_WAITING
+   bContinue := IIF( ::caPerCall != NIL, .T., .F. )
 
    #ifdef HB_THREAD_SUPPORT
    MutexUnlock( ::mtxBusy )
    #endif
 
-   // set default socket timeout
-   IF ::nTimeout >= 0
-      InetSetTimeout( ::skTCP, ::nTimeout )
-   ELSE
-      InetClearTimeout( ::skTCP )
-   ENDIF
-
    cCode := Space(6)
    ::nTCPTimeBegin := INT( Seconds() * 1000 )
+   nTimeLimit = Max( ::nTimeout, ::nTimeLimit )
 
    DO WHILE .T.
-      IF InetRecvAll( ::skTCP, @cCode, 6 ) < 0
+      IF InetRecvAll( ::skTCP, @cCode, 6 ) <= 0
          EXIT
       ENDIF
 
@@ -768,11 +845,11 @@ METHOD TCPAccept() CLASS tRPCClient
          EXIT
       ENDIF
 
-      IF ::nTimeout >= 0
+      IF nTimeLimit >= 0
          nTime := Int( Seconds() * 1000 )
          // a little tollerance must be added for double roundings
          // in the double INT() functions
-         IF nTime - ::nTCPTimeBegin >= ::nTimeout - 5
+         IF nTime - ::nTCPTimeBegin >= nTimeLimit - 5
             EXIT
          ENDIF
       ENDIF
@@ -782,24 +859,15 @@ METHOD TCPAccept() CLASS tRPCClient
    MutexLock( ::mtxBusy )
    #endif
 
-   // TIMED OUT?
-   // Then the call() will return NIL
-   IF InetErrorCode( ::skTCP ) != -1 .and.;
-                   nTime - ::nTCPTimeBegin < ::nTimeout - 5
+   // NOT waiting anymore
+   ::nStatus := RPC_STATUS_LOGGED
+   ::thTcpAccept := -1
 
+   IF ::caPerCall == NIL .and. InetErrorCode( ::skTCP ) != -1 .and.;
+                   nTime - nTimeLimit < nTimeLimit - 5
       IF InetErrorCode( ::skTCP ) != 0
          ::nStatus := RPC_STATUS_ERROR
-         InetDestroy( ::skTCP )
-         ::skTCP := NIL
-      ELSE
-         // Receival completed
-         ::nStatus := RPC_STATUS_LOGGED
-         // signal that this thread is no longer active.
-         ::thTcpAccept := -1
       ENDIF
-   ELSE
-      // NOT waiting anymore
-      ::nStatus := RPC_STATUS_LOGGED
    ENDIF
 
    #ifdef HB_THREAD_SUPPORT

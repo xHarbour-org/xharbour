@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.60 2003/04/01 00:42:08 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.61 2003/04/08 18:19:18 jonnymind Exp $
  */
 
 /*
@@ -521,6 +521,9 @@ extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer cont
 extern char * hb_verCompiler( void ); /* retrieves a newly allocated buffer containing compiler version */
 extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */
 extern void   hb_verBuildInfo( void ); /* display harbour, compiler, and platform versions to standard console */
+
+/* Executable array execution */
+extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );
 
 /* environment variables access */
 /* WARNING: This returned pointer must be freed if not NULL using hb_xfree( ( void * ) ptr ); */
