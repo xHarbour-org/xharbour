@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.6 2003/12/28 22:25:33 druzus Exp $
+# $Id: djgpp.cf,v 1.7 2004/01/05 18:59:27 lf_sfnet Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -48,12 +48,12 @@ endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
 endif
 
 # NOTE: The empty line directly before 'endef' HAVE TO exist!

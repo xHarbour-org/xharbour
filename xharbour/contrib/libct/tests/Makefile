@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/03/25 15:32:51 mbirdyg Exp $
+# $Id: Makefile,v 1.2 2004/02/01 22:52:07 likewolf Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -86,6 +86,7 @@ PRG_SOURCES=\
 	tokenupp.prg \
 	trig.prg \
 	valpos.prg \
+	video.prg \
 	wordone.prg \
 	wordonly.prg \
 	wordrepl.prg \

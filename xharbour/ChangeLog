@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2475 2004/03/03 22:26:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.2476 2004/03/04 00:02:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 03:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * config/dos/djgpp.cf
+    ! Fixed GTNUL link order.
+  * contrib/libct/Makefile
+  + contrib/libct/video.c
+  + contrib/libct/include/ctvideo.ch
+  * contrib/libct/tests/Makefile
+  + contrib/libct/tests/video.prg
+    + Added CHARPIX(), SETFONT(), VGAPALETTE(), VIDEOTYPE()
+      (DJGPP versions only), appropriate header and test.
+
 2004-03-04 07:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     ! ignore the "V" argument even it is passed in DirectoryRecurse() since

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2004/02/01 11:36:59 lculik Exp $
+# $Id: Makefile,v 1.18 2004/02/01 22:52:07 likewolf Exp $
 #
 
 ROOT = ../../
@@ -7,6 +7,7 @@ ROOT = ../../
 PRG_HEADERS = \
 	include/ct.ch \
 	include/cterror.ch \
+        include/ctvideo.ch \
 	include/ctwin.ch \
 
 C_SOURCES = \
@@ -37,7 +38,7 @@ C_SOURCES = \
 	ctchksum.c \
 	ctcrypt.c \
 	dbftools.c \
-    disk.c \
+	disk.c \
 	exponent.c \
 	files.c \
 	finan.c \
@@ -61,13 +62,14 @@ C_SOURCES = \
 	remove.c \
 	replace.c \
 	screen1.c \
-    settime.c \
+	settime.c \
 	strdiff.c \
 	strswap.c \
 	tab.c \
 	token1.c \
 	token2.c \
 	trig.c \
+        video.c \
 	wordrepl.c \
 	wordtoch.c \
 
@@ -79,15 +81,15 @@ PRG_SOURCES= \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
-    dattime3.prg \
-    diskutil.prg \
+	dattime3.prg \
+	diskutil.prg \
 	fcopy.prg \
 	invrtwin.prg \
 	numconv.prg \
 	strfile.prg \
 	screen2.prg \
 	time.prg \
-    util.prg 
+	util.prg 
 
 
 LIBNAME=ct
