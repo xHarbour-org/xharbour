@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.67 2003/11/28 20:39:14 jonnymind Exp $
+ * $Id: garbage.c,v 1.68 2003/12/03 11:16:08 jonnymind Exp $
  */
 
 /*
@@ -528,7 +528,6 @@ void hb_gcCollect( void )
 void hb_gcCollectAll()
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
-   HB_THREAD_STUB
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
@@ -542,16 +541,7 @@ void hb_gcCollectAll()
       }
       HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
-      HB_SHARED_LOCK( hb_runningStacks );
-      
       hb_threadWaitForIdle();
-
-      /* We are now idle inspectors. Currently, this is useless for
-         GC, as it does not runs VM code, but it may turn useful in the
-         future */
-      HB_VM_STACK.uiIdleInspecting++;
-
-      HB_SHARED_UNLOCK( hb_runningStacks );
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
@@ -749,16 +739,12 @@ void hb_gcCollectAll()
 
    /* Step 5: garbage requests will be now allowed again. */
    s_bCollecting = FALSE;
-   
+
    /* Step 6: release all the locks on the scanned objects */
    /* Put itself back on machine execution count */
-   
+
    #if defined( HB_THREAD_SUPPORT )
-      HB_VM_STACK.uiIdleInspecting--;
-      hb_runningStacks.aux = 0;
-      HB_VM_STACK.bInUse = TRUE;
-      // this will also signal the changed situation.
-      HB_SHARED_SIGNAL( hb_runningStacks );
+      hb_threadIdleEnd();
    #endif
 
 }

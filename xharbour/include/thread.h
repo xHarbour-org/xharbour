@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.69 2003/11/28 21:21:07 jonnymind Exp $
+* $Id: thread.h,v 1.70 2003/12/05 18:04:39 jonnymind Exp $
 */
 
 /*
@@ -270,10 +270,6 @@ typedef struct tag_HB_STACK
    /* Flag to signal that the context is in use */
    BOOL bInUse; /* this must be used with the guard of a global resource */
 
-   /* Flag to signal that this thread is idle inspecting. When idle inspecting,
-      a thread must be granted not to lock/unlock its stack. */
-   UINT uiIdleInspecting;
-
    /* MT error handler, one for thread! */
    struct HB_ERROR_INFO_ *errorHandler;
    /* Codeblock for error handling */
@@ -437,7 +433,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 #define HB_STACK_LOCK \
 {\
    HB_SHARED_LOCK( hb_runningStacks );\
-   if( ! HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
+   if( ! HB_VM_STACK.bInUse ) \
    {\
       while ( hb_runningStacks.aux ) \
       {\
@@ -452,7 +448,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 #define HB_STACK_UNLOCK \
 {\
    HB_SHARED_LOCK( hb_runningStacks );\
-   if( HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
+   if( HB_VM_STACK.bInUse ) \
    {\
       hb_runningStacks.content.asLong--;\
       HB_VM_STACK.bInUse = FALSE;\
@@ -528,6 +524,7 @@ extern HB_STACK *last_stack;
 extern HB_STACK *hb_ht_stack;
 extern HB_MUTEX_STRUCT *hb_ht_mutex;
 extern HB_THREAD_T hb_main_thread_id;
+extern BOOL hb_threadIsInspector;
 
 extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
 extern void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th );
@@ -549,6 +546,7 @@ extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
 extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
 extern void hb_threadTerminator( void *pData );
 extern void hb_threadWaitForIdle( void );
+extern void hb_threadIdleEnd( void );
 
 /* External functions used by thread as helper */
 extern void hb_memvarsInit( HB_STACK * );

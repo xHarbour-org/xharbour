@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1825 2003/12/05 05:47:12 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1826 2003/12/05 18:04:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-06 16:23 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+  * source/vm/dynsym.c
+    + Added reentrant dynsym functions for threading
+
+  * source/vm/errorapi.c
+  * source/vm/garbage.c
+  * source/vm/thread.c
+  * include/thread.h
+    % Idle inspection mechanism has been cleaned. Now an idle inspector has
+      just to call hb_threadWaitForIdle() to become an inspector, and
+      hb_threadInspectEnd() to release other threads.
+    + Added prg level idle inspection functions:
+      ThreadInspect() --> wait/become idle inspector
+      ThreadInspectEnd() --> allow other threads to go
+      ThreadIsInspector() --> lIamAnInspector
+      This function are defined (but doing nothing) also for ST.
+    % removed element uiIdleInspecting: after some time carrying it around,
+      it demonstrated is usefulness.
+    ! VERY IMPORTANT FIX: Thread startup sequence has been secured, so that
+      the newborn thread's stack is locked against inspection even before
+      the new thread is started.
+
+  * source/rtl/console.c
+    % removed unsed thread stubs under linux
 
 2003-12-05 19:04 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/thread.h

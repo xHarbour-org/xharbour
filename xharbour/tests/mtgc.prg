@@ -8,7 +8,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.16 2003/10/18 14:13:33 jonnymind Exp $
+* $Id: mtgc.prg,v 1.17 2003/11/26 05:44:04 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -69,6 +69,7 @@ PROCEDURE Main( cDisplay )
   CLEAR SCREEN
   ThreadIdleFence( .F. )
   @1,15 SAY "X H A R B O U R - Multithreading / Garbage collecting test"
+  @2,15 SAY "   (You'll see screen gliggerings; don't worry, it's OK)"
   @4,20 SAY "TEST 2 - Test without idle fence"
 
   nStart := Seconds()
@@ -93,6 +94,7 @@ PROCEDURE Main( cDisplay )
   @ 17, 2 SAY "Threads Time:" + Str( Seconds() - nStart )
   @ 18, 2 SAY "Program terminated - Press a key to continue"
   Inkey(0)
+  @ 19, 0
 
 RETURN
 

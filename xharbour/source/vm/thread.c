@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.133 2003/12/05 04:52:25 ronpinkas Exp $
+* $Id: thread.c,v 1.134 2003/12/05 18:04:40 jonnymind Exp $
 */
 
 /*
@@ -131,6 +131,7 @@ HB_EXPORT HB_CRITICAL_T hb_dynsymMutex;
 HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
 
 BOOL hb_bIdleFence;
+BOOL hb_bThreadIsInspector;
 
 
 /**************************************************************/
@@ -264,7 +265,6 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    #ifdef HB_OS_WIN_32
    tc->th_vm_id = hb_threadUniqueId();
    #endif
-   tc->uiIdleInspecting = 0;
 
    tc->next = NULL;
 
@@ -727,6 +727,8 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    volatile HB_STACK *_pStack_ = (HB_STACK *) Cargo;
    PHB_DYNS pExecSym;
 
+   /* thread stack is locked since creation */
+
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
 #ifdef HB_OS_WIN_32
@@ -744,8 +746,6 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 
    pthread_cleanup_push( hb_threadTerminator, NULL );
 #endif
-
-   HB_STACK_LOCK
 
    // call errorsys() to initialize errorblock
    pExecSym = hb_dynsymFind( "ERRORSYS" );
@@ -1010,15 +1010,9 @@ void hb_threadResetAux( void *ptr )
 */
 void hb_threadWaitForIdle( void )
 {
-   #ifdef HB_OS_WIN_32
    HB_THREAD_STUB
-   #endif
 
-   /* Are we already idle inspectors ? */
-   /*if ( HB_VM_STACK.uiIdleInspecting )
-   {
-      return;
-   }*/
+   HB_SHARED_LOCK( hb_runningStacks );
 
    /* Do we have to set an idle fence? */
    if ( hb_bIdleFence )
@@ -1030,6 +1024,7 @@ void hb_threadWaitForIdle( void )
    hb_runningStacks.content.asLong --;
 
    HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
+   HB_VM_STACK.bInUse = FALSE;
    /* wait until the road is clear (only WE are running) */
    while ( hb_runningStacks.content.asLong != 0 )
    {
@@ -1040,10 +1035,30 @@ void hb_threadWaitForIdle( void )
    /* And also prevents other idle inspectors to go */
    hb_runningStacks.content.asLong ++;
 
+   /* Is is useful for debugger */
+   hb_bThreadIsInspector = TRUE;
+
    // no need to signal, no one must be awaken
    HB_CLEANUP_POP;
+
+   HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
+/* Thread idle end must be called to drop an idle inspecting status;
+   NEVER call this when the thread is not an idle inspector. */
+void hb_threadIdleEnd( void )
+{
+   HB_THREAD_STUB
+
+   /* Is is useful for debugger */
+   hb_bThreadIsInspector = FALSE;
+
+   hb_runningStacks.aux = 0;
+
+   HB_VM_STACK.bInUse = TRUE;
+   // this will also signal the changed situation.
+   HB_SHARED_SIGNAL( hb_runningStacks );
+}
 
 /*
    Condition variables needs a special handling to be omomorphic on
@@ -1325,11 +1340,21 @@ HB_FUNC( STARTTHREAD )
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
 
-   /* Forbid usage of stack before that VM takes care of it */
+   /* Forbid usage of stack before that new thread's VM takes care of it */
+   HB_SHARED_LOCK( hb_runningStacks );
+   pStack->bInUse = TRUE;
+   hb_runningStacks.content.asLong ++;
+   HB_SHARED_UNLOCK( hb_runningStacks );
+
    hb_threadFillStack( pStack, pArgs );
 
+   /* we can be inspected now, but we are sure that our child thread
+      stack cannot */
    HB_STACK_UNLOCK;
+
    HB_CRITICAL_LOCK( hb_threadStackMutex );
+
+   hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
 /*   #ifndef __BORLANDC__
@@ -1354,7 +1379,6 @@ HB_FUNC( STARTTHREAD )
          HB_COND_WAIT( hb_threadStackCond, hb_threadStackMutex );
       }
 #endif
-      hb_threadLinkStack( pStack );
 
       pThread->threadId = pStack->th_id;
       pThread->bReady = TRUE;
@@ -1715,6 +1739,7 @@ HB_FUNC( THREADIDLEFENCE )
 
    HB_SHARED_UNLOCK( hb_runningStacks );
 }
+
 
 /*
    Function used by the error recovery routine to get the
@@ -2267,3 +2292,33 @@ HB_FUNC( SECONDSSLEEP )
    hb_threadSleep( sleep );
 }
 
+/* Become thread inspector */
+HB_FUNC( THREADINSPECT )
+{
+   #ifdef HB_THREAD_SUPPORT
+   hb_threadWaitForIdle();
+   #endif
+}
+
+/* Drop status of thread inspecting, and restart other threads */
+HB_FUNC( THREADINSPECTEND )
+{
+   #ifdef HB_THREAD_SUPPORT
+   hb_threadIdleEnd();
+   #endif
+}
+
+HB_FUNC( THREADISINSPECTOR )
+{
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+
+   #ifdef HB_THREAD_SUPPORT
+   /* This is atomically changed by idle inspectors; there is no need
+      to lock it as non-idle-inspectors can only read it */
+   hb_retl( hb_bThreadIsInspector );
+   #else
+   hb_retl( TRUE ); // always inspecting
+   #endif
+}

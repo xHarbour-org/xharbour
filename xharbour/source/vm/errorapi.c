@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.26 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: errorapi.c,v 1.27 2003/11/27 17:57:50 jonnymind Exp $
  */
 
 /*
@@ -272,23 +272,20 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
-      HB_SHARED_LOCK( hb_runningStacks );
       /* Don't run on quit request */
       if ( hb_vm_bQuitRequest  )
       {
-         HB_SHARED_UNLOCK( hb_runningStacks );
          return 0; /* Meaningless here */
       }
 
-      /* Force idle fencing */
+      /* Force idle fencing (should be locked, but race conditions
+         are not a problem in this case) */
       old_bIdleFence = hb_bIdleFence;
       hb_bIdleFence = TRUE;
-      hb_threadWaitForIdle();
-      hb_bIdleFence = old_bIdleFence;
 
-      /* Make this thread the only one VM thread running */
-      HB_VM_STACK.uiIdleInspecting++;
-      HB_SHARED_UNLOCK( hb_runningStacks );
+      hb_threadWaitForIdle();
+
+      hb_bIdleFence = old_bIdleFence;
    #endif
 
    if( pError )
@@ -345,13 +342,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
             hb_set.HB_SET_OUTPUTSAFETY = FALSE;
-
-            /* no more unstoppable thread */
-            HB_VM_STACK.uiIdleInspecting--;
-            HB_VM_STACK.bInUse=TRUE;
-            hb_runningStacks.aux = 0;
-            // this will also signal the changed situation.
-            HB_SHARED_SIGNAL( hb_runningStacks );
+            hb_threadIdleEnd();
          #endif
 
          exit( hb_vmQuit() );
@@ -416,12 +407,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
    #if defined( HB_THREAD_SUPPORT )
       if( usRequest != HB_QUIT_REQUESTED )
       {
-         /* no more unstoppable thread */
-         HB_VM_STACK.uiIdleInspecting--;
-         HB_VM_STACK.bInUse = TRUE;
-         hb_runningStacks.aux = 0;
-         // this will also signal the changed situation.
-         HB_SHARED_SIGNAL( hb_runningStacks );
+         hb_threadIdleEnd();
       }
    #endif
 
@@ -454,11 +440,9 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
-      HB_SHARED_LOCK( hb_runningStacks );
       /* Don't run on quit request */
       if ( hb_vm_bQuitRequest  )
       {
-         HB_SHARED_UNLOCK( hb_runningStacks );
          return NULL; /* Meaningless here */
       }
       /* Force idle fencing */
@@ -466,9 +450,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       hb_bIdleFence = TRUE;
       hb_threadWaitForIdle();
       hb_bIdleFence = old_bIdleFence;
-      HB_VM_STACK.uiIdleInspecting++;
 
-      HB_SHARED_UNLOCK( hb_runningStacks );
    #endif
 
    if( pError )
@@ -527,13 +509,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             /* We are going to quit now, so we don't want to have mutexes
                blocking our output */
             hb_set.HB_SET_OUTPUTSAFETY = FALSE;
-
-            /* no more unstoppable thread */
-            HB_VM_STACK.uiIdleInspecting--;
-            hb_runningStacks.aux = 0;
-            // this will also signal the changed situation.
-            HB_VM_STACK.bInUse = TRUE;
-            HB_SHARED_SIGNAL( hb_runningStacks );
+            hb_threadIdleEnd();
          #endif
 
          exit( hb_vmQuit() );
@@ -567,12 +543,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    #if defined( HB_THREAD_SUPPORT )
       if( usRequest != HB_QUIT_REQUESTED )
       {
-         /* no more unstoppable thread */
-         HB_VM_STACK.uiIdleInspecting--;
-         hb_runningStacks.aux = 0;
-         // this will also signal the changed situation.
-         HB_VM_STACK.bInUse = TRUE;
-         HB_SHARED_SIGNAL( hb_runningStacks );
+         hb_threadIdleEnd();
       }
    #endif
 

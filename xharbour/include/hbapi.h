@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.100 2003/11/26 23:01:21 jonnymind Exp $
+ * $Id: hbapi.h,v 1.101 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -444,6 +444,17 @@ extern HB_EXPORT void     hb_dynsymRelease( void );         /* releases the memo
 extern HB_EXPORT USHORT   hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
 extern HB_EXPORT PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
 extern HB_EXPORT PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+
+/* JC1: reentrant function support for dynsym where locking is unapplicable. */
+#ifdef HB_THREAD_SUPPORT
+PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols,
+      PHB_DYNS pDest );
+PHB_DYNS HB_EXPORT hb_dynsymGet_r( char * szName, PHB_DYNS pDest );
+PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( char * szName, PHB_DYNS pDest );
+PHB_DYNS HB_EXPORT hb_dynsymFind_r( char * szName, PHB_DYNS pDest );
+PHB_DYNS HB_EXPORT hb_dynsymFindName_r( char * szName, PHB_DYNS pDest );
+PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction_r( PHB_FUNC pFunc, PHB_DYNS pDest );
+#endif
 
 /* Command line and environment argument management */
 extern void HB_EXPORT hb_cmdargInit( int argc, char * argv[] ); /* initialize command line argument API's */

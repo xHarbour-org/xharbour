@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.10 2003/07/16 13:46:55 andijahja Exp $
+ * $Id: dynsym.c,v 1.11 2003/12/05 18:04:40 jonnymind Exp $
  */
 
 /*
@@ -748,7 +748,7 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
       hb_retnl( 0L );
    }
 
-   hb_dynsymLock();
+   hb_dynsymUnlock();
 }
 
 HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure pointer,
@@ -802,3 +802,118 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 }
 
 #endif
+
+/* JC1: Reentrant functions */
+#ifdef HB_THREAD_SUPPORT
+
+PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols,
+      PHB_DYNS pDest )
+{
+   PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymNew( pSymbol, pModuleSymbols );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+
+PHB_DYNS HB_EXPORT hb_dynsymGet_r( char * szName, PHB_DYNS pDest )
+{
+   PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymGet( szName );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( char * szName, PHB_DYNS pDest )
+{
+   PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymGetCase( szName );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymFind_r( char * szName, PHB_DYNS pDest )
+{
+PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymFind( szName );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymFindName_r( char * szName, PHB_DYNS pDest )
+{
+   PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymFindName( szName );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction_r( PHB_FUNC pFunc, PHB_DYNS pDest )
+{
+   PHB_DYNS pRet;
+
+   hb_dynsymLock();
+
+   pRet = hb_dynsymFindFromFunction( pFunc );
+   if ( pRet )
+   {
+      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
+      hb_dynsymUnlock();
+      return pDest;
+   }
+
+   hb_dynsymUnlock();
+   return NULL;
+}
+
+#endif //HB_THREAD_SUPPORT
