@@ -1,10 +1,10 @@
 /*
- * $Id$
+ * $Id: fserror.c,v 1.1 2004/04/05 11:22:59 druzus Exp $
  */
 
 /*
  * xHarbour Project source code:
- * 
+ *
  *
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
  * www - http://www.xharbour.org
@@ -90,7 +90,9 @@ static int hb_errnoToDosError( int ErrCode )
          iResult = 4;   /* Too many open files */
          break;
       case EACCES:
-      case ETXTBSY:
+      #if defined( HB_OS_UNIX )
+         case ETXTBSY:
+      #endif
          iResult = 5;   /* Access denied */
          break;
       case EBADF:
