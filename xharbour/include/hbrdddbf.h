@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.12 2003/12/12 15:04:38 jonnymind Exp $
+ * $Id: hbrdddbf.h,v 1.13 2004/01/28 14:45:40 druzus Exp $
  */
 
 /*
@@ -284,12 +284,12 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea );
 
 #define hb_dbfExit                         NULL
 static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable );
-static BOOL    hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 
 #define hb_dbfWhoCares                             NULL
 
 #endif /* HB_EXTERNAL_RDDDBF_USE */
 
+extern BOOL HB_EXPORT  hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 extern ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
 extern void  HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );

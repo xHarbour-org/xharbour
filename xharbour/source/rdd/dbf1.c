@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.66 2004/03/18 21:34:54 druzus Exp $
+ * $Id: dbf1.c,v 1.67 2004/03/21 15:55:04 druzus Exp $
  */
 
 /*
@@ -2784,7 +2784,7 @@ static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable )
 }
 
 /* returns 1 if exists, 0 else */
-BOOL hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
+BOOL HB_EXPORT hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 {
   char szFileName[ _POSIX_PATH_MAX + 1 ];
   BYTE * pBuffer;

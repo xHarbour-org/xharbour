@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.5 2003/11/11 20:20:53 ronpinkas Exp $
+ * $Id: simplex.c,v 1.6 2003/11/30 10:02:46 druzus Exp $
  */
 
 /*
@@ -863,6 +863,10 @@ int SimpLex_GetNextToken( void )
             }
         }
     }
+
+#ifdef NEED_DUMMY_RETURN
+    return 0;  /* Some dumb compilers complain without this */
+#endif
 }
 
 int SimpLex_CheckToken( void )

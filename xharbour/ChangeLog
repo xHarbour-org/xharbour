@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2629 2004/03/22 17:58:27 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2630 2004/03/22 23:32:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-23 09:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/simplex.c
+    ! add dummy return value in function SimpLex_GetNextToken()
+
+  * include/hbrdddbf.h
+  * source/rdd/dbf1.c
+    ! fix inconsistent linkage for hb_dbfExists() to be in accordance with
+      that declared in source/rdd/dbf1.c (It's a public function)
+
+  * source/rtl/hbcomprs.c
+    + add dummy return value for some dumb compiler(s)
+
 2004-03-23 06:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/genc.c
     ! fix to support prg file names containing: !$%')-@{} (Clipper compatible)
