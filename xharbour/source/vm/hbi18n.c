@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.13 2004/01/29 23:24:13 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.14 2004/02/21 08:58:25 jonnymind Exp $
  */
 
 /*
@@ -269,8 +269,10 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
 
    for ( i = 1; count == -1 || i <= count; i ++ )
    {
-      PHB_ITEM pRow = hb_itemNew( NULL );
-      hb_arrayNew( pRow, 2 );
+      HB_ITEM ArrRow;
+
+      ArrRow.type = HB_IT_NIL;
+      hb_arrayNew( &ArrRow, 2 );
 
       for ( j = 1; j <= 2 ; j ++ )
       {
@@ -289,28 +291,26 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
                if ( nRead != nStrLen || str[nStrLen-1] != 0 )
                {
                   hb_xfree( str );
-                  hb_arrayRelease( pRow );
-                  hb_arrayRelease( pTable );
+                  hb_itemClear( &ArrRow );
+                  hb_itemRelease( pTable );
                   return NULL;
                }
                else
                {
-                  // the trailing zero is here, but should not be
-                  // included in output
-                  hb_itemPutCRaw( hb_arrayGetItemPtr( pRow, j ), str, nStrLen-1 );
+                  hb_itemPutCRaw( hb_arrayGetItemPtr( &ArrRow, j ), str, nStrLen - 1 );
                }
             }
          }
          // correct file termination upon unknown size request?
          else if( nRead == 0 && count < 0 )
          {
-            hb_arrayRelease( pRow );
+            hb_itemClear( &ArrRow );
             return pTable;
          }
          else
          {
-            hb_arrayRelease( pRow );
-            hb_arrayRelease( pTable );
+            hb_itemClear( &ArrRow );
+            hb_itemRelease( pTable );
             return NULL;
          }
       }
@@ -318,13 +318,12 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
       // saves our row here
       if ( count > 0 )
       {
-         hb_arraySetForward( pTable, i,  pRow );
+         hb_arraySetForward( pTable, i,  &ArrRow );
       }
       else
       {
-         hb_arrayAddForward( pTable, pRow );
+         hb_arrayAddForward( pTable, &ArrRow);
       }
-      hb_itemRelease( pRow );
    }
 
    return pTable;
@@ -452,7 +451,7 @@ HB_FUNC( HB_I18NLOADTABLE )
    PHB_ITEM pParam = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pHeader;
    PHB_ITEM pTable;
-   PHB_ITEM pRet;
+   HB_ITEM ArrRet;
    int handle;
 
    if ( pParam == NULL ||
@@ -479,20 +478,18 @@ HB_FUNC( HB_I18NLOADTABLE )
       pTable = hb_i18n_read_table( handle, hb_arrayGetNI( pHeader, 6 ) );
       if ( pTable != NULL )
       {
-         pRet = hb_itemNew(NULL);
-         hb_arrayNew( pRet, 2 );
-         hb_arraySetForward( pRet, 1, pHeader );
-         hb_arraySetForward( pRet, 2, pTable );
-         hb_itemReturn( pRet );
-         hb_itemRelease( pRet );
-         hb_itemRelease( pHeader );
+         ArrRet.type = HB_IT_NIL;
+         hb_arrayNew( &ArrRet, 2 );
+         hb_arraySetForward( &ArrRet, 1, pHeader );
+         hb_arraySetForward( &ArrRet, 2, pTable );
+         hb_itemReturn( &ArrRet );
          hb_itemRelease( pTable );
       }
       else
       {
-         hb_itemRelease( pHeader );
          hb_ret();
       }
+      hb_itemRelease( pHeader );
    }
    else
    {
@@ -513,7 +510,7 @@ HB_FUNC( HB_I18NSORTTABLE )
 {
    PHB_ITEM pTable = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pTemp;
-   PHB_ITEM pResult;
+   HB_ITEM ArrResult;
    char *key;
    ULONG i, pos;
 
@@ -532,10 +529,10 @@ HB_FUNC( HB_I18NSORTTABLE )
    }
 
    // Creating a table wide as the target
-   pResult = hb_itemNew( NULL );
-   hb_arrayNew( pResult, hb_arrayLen( pTable ) );
+   ArrResult.type = HB_IT_NIL;
+   hb_arrayNew( &ArrResult, hb_arrayLen( pTable ) );
    // setting first element
-   hb_arraySet( pResult, 1, hb_arrayGetItemPtr( pTable, 1 ));
+   hb_arraySet( &ArrResult, 1, hb_arrayGetItemPtr( pTable, 1 ));
    //TODO: Use fixed len table and do quicksort algo.
 
    for( i = 2; i <= hb_arrayLen( pTable ) ; i ++ )
@@ -553,12 +550,12 @@ HB_FUNC( HB_I18NSORTTABLE )
       }
       if ( pos <= i )
       {
-         hb_arrayIns( pResult, pos );
+         hb_arrayIns( &ArrResult, pos );
       }
-      hb_arraySet( pResult, pos, pTemp );
+      hb_arraySet( &ArrResult, pos, pTemp );
    }
 
-   hb_itemReturn( pResult );
+   hb_itemReturn( &ArrResult );
 }
 
 /**
@@ -695,7 +692,7 @@ HB_FUNC( HB_I18NSETLANGUAGE )
    {
       if ( s_i18n_table != NULL )
       {
-         hb_arrayRelease( s_i18n_table );
+         hb_itemRelease( s_i18n_table );
          s_i18n_table = NULL;
          strncpy( s_current_language, s_base_language , HB_I18N_CODELEN );
          strncpy( s_current_language_name, s_base_language_name,
