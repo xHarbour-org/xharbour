@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.7 2003/11/23 22:33:33 andijahja Exp $
+ * $Id: valtype.c,v 1.8 2003/12/21 03:21:45 walito Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ HB_FUNC( HB_ISMEMO )
 
 HB_FUNC( HB_ISNUMERIC )
 {
-  hb_retl( ISNUM( 1 ) );
+  hb_retl( HB_IS_NUMBER( hb_param( 1, HB_IT_ANY ) ) );
 }
 
 HB_FUNC( HB_ISLOGICAL )
