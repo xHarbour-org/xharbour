@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.26 2004/07/28 19:48:49 maurifull Exp $
+ * $Id: gtalleg.c,v 1.27 2004/07/30 22:14:14 maurifull Exp $
  */
 
 /*
@@ -1794,6 +1794,10 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
          return al_desktop_color_depth();
 
       case GTI_KBDSHIFTS:
+         if ( al_keyboard_needs_poll() )
+         {
+            al_poll_keyboard();
+         }
          iOldValue = al_key_shifts;
 	 if ( bUpdate )
          {
@@ -1802,7 +1806,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
          return iOldValue;
 
       case GTI_WINTITLE:
-         if ( b Update )
+         if ( bUpdate )
          {
             al_set_window_title( (char *) vpParam );
             return 1;

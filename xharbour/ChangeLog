@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3244 2004/07/30 18:23:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3245 2004/07/30 22:14:11 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-30 21:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+    + Hacks to allow new GTI_KBDSHIFTS code compile under stable 4.x Allegro branches
+  * source/rtl/gtalleg/gtalleg.c
+    ! Poll keyboard when necessary to get GTI_KBDSHIFTS key states
 
 2004-07-30 19:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * include/gtinfo.ch

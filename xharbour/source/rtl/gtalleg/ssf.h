@@ -1,11 +1,13 @@
 /*
- * $Id: ssf.h,v 1.7 2004/02/01 00:35:42 maurifull Exp $
+ * $Id: ssf.h,v 1.8 2004/02/06 03:36:50 maurifull Exp $
  */
 
 /*
  *
  * This file was conceived while I was developing an allegro based gt
  * (gtAlleg) for xHarbour, so it is brought under the same license terms.
+ *
+ * Mauricio Abre
  *
  */
 
@@ -141,11 +143,13 @@
 #define al_set_window_title set_window_title
 #define al_text_mode text_mode
 #define al_make_color makecol
+#define al_key_shifts key_shifts
 #define al_install_keyboard install_keyboard
 #define al_keyboard_needs_poll keyboard_needs_poll
 #define al_poll_keyboard poll_keyboard
 #define al_key_pressed keypressed
 #define al_read_key readkey
+#define al_set_keyboard_leds set_leds
 #define al_install_mouse install_mouse
 #define al_show_mouse show_mouse
 #define al_mouse_needs_poll mouse_needs_poll
