@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.70 2002/01/06 12:31:09 andijahja Exp $
+ * $Id: hbdefs.h,v 1.3 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -186,6 +186,9 @@
 
 #if ! defined(__HARBOUR__)
    #define __HARBOUR__
+#endif
+#if ! defined(__XHARBOUR__)
+   #define __XHARBOUR__
 #endif
 
 typedef HARBOUR ( * PHB_FUNC )( void );
