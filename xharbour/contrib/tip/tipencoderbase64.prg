@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderbase64.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
+* $Id: tipencoderbase64.prg,v 1.2 2003/12/01 00:19:39 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -42,7 +42,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
    int nPos = 0, nPosRet = 0;
    int nPosBlock = 0, nLineCount = 0;
    ULONG nFinalLen;
-   char cElem, cElem1;
+   unsigned char cElem, cElem1;
    BOOL bExcept;
 
    if ( ! cData )
@@ -75,7 +75,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
 
    while ( nPos < nLen )
    {
-      cElem = cData[ nPos ];
+      cElem = (unsigned char) cData[ nPos ];
       // NOT using trailing 0 here as some buggy 3dparty func
       // will create strings without trailing 0.
 
@@ -87,12 +87,12 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
             cElem = cElem >> 2;
             break;
          case 2:
-            cElem1 = nPos < nLen -1 ? cData[ nPos + 1] : 0;
+            cElem1 = nPos < nLen -1 ? (unsigned char) cData[ nPos + 1] : 0;
             cElem = ((cElem & 0x3) << 4) | cElem1 >> 4;
             nPos++;
             break;
          case 3:
-            cElem1 = nPos < nLen -1 ? cData[ nPos + 1] : 0;
+            cElem1 = nPos < nLen -1 ? (unsigned char) cData[ nPos + 1] : 0;
             cElem = ((cElem & 0xF) << 2) | cElem1 >> 6;
             nPos++;
             break;
@@ -167,10 +167,10 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
 HB_FUNC( TIPENCODERBASE64_DECODE )
 {
    char *cData = hb_parc(1);
-   char *cRet;
+   unsigned char *cRet;
    int nLen = hb_parclen(1);
    int nPos = 0, nPosRet = 0, nPosBlock = 0;
-   char cElem;
+   unsigned char cElem;
 
    if ( ! cData )
    {
@@ -186,7 +186,7 @@ HB_FUNC( TIPENCODERBASE64_DECODE )
 
 
    // we know exactly the renturned length.
-   cRet = (char *) hb_xgrab( (nLen / 4 + 1) * 3 );
+   cRet = (unsigned char *) hb_xgrab( (nLen / 4 + 1) * 3 );
 
    while ( nPos < nLen )
    {
@@ -256,8 +256,8 @@ HB_FUNC( TIPENCODERBASE64_DECODE )
 
    /* this function also adds a zero */
    /* hopefully reduce the size of cRet */
-   cRet = (char *) hb_xrealloc( cRet, nPosRet + 1 );
-   hb_retclenAdopt( cRet, nPosRet );
+   cRet = (unsigned char *) hb_xrealloc( cRet, nPosRet + 1 );
+   hb_retclenAdopt( (char *)cRet, nPosRet );
 }
 #pragma ENDDUMP
 

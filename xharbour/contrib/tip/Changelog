@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.21 2003/12/03 15:07:05 jonnymind Exp $
+ * $Id: Changelog,v 1.22 2003/12/06 15:10:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-07 15:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipencoderbase64.prg
+    ! Must used unsigned char instead of char to encode binary
+      data.
+  * tipencoderqp.prg
+    ! The same; also, newline at the end is now added only if
+      needed to break a line.
+
 2003-12-06 13:10 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * tipmail.prg
     !fixed method to string when sending email with attach
-	 
 
 2003-12-03 15:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tiputils.c

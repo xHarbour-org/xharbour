@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderbase64.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
+* $Id: tipencoderqp.prg,v 1.1 2003/12/01 00:19:39 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -33,7 +33,7 @@ HB_FUNC( TIPENCODERQP_ENCODE )
    char *cData = hb_parc(1);
    int nLen = hb_parclen(1);
    char *cRet;
-   char cElem;
+   unsigned char cElem;
    int nVal, iLineLen = 0;
    int nPosRet = 0, nPos = 0;
 
@@ -54,7 +54,7 @@ HB_FUNC( TIPENCODERQP_ENCODE )
    // last +3 is trailing \r\n\0
    while ( nPos < nLen )
    {
-      cElem = cData[ nPos ];
+      cElem = (unsigned char) cData[ nPos ];
 
       // We chose not to encode spaces and tab here.
       // cElem is signed and ranges from -126 to +127.
@@ -62,15 +62,15 @@ HB_FUNC( TIPENCODERQP_ENCODE )
       if ( (cElem >=33 && cElem <= 60) || cElem >= 62 ||
          cElem == 9 || cElem == 32 )
       {
-         cRet[nPosRet++] = cElem;
+         cRet[nPosRet++] = (char) cElem;
          iLineLen++;
       }
       else
       {
          cRet[nPosRet++] = '=';
-         nVal = ((unsigned char)cElem) >> 4;
+         nVal = cElem >> 4;
          cRet[nPosRet++] = (char) (nVal < 10 ? '0' + nVal : 'A' + nVal - 10);
-         nVal = ((unsigned char)cElem) & 0x0f;
+         nVal = cElem & 0x0f;
          cRet[nPosRet++] = (char) (nVal < 10 ? '0' + nVal : 'A' + nVal - 10);
          iLineLen+=3;
       }
@@ -87,14 +87,14 @@ HB_FUNC( TIPENCODERQP_ENCODE )
    }
 
    /* Securing last line trailing space, if needed */
-   cElem = cRet[nPosRet - 1];
+   cElem = (unsigned char) cRet[nPosRet - 1];
    if ( cElem == 9 || cElem == 32 )
    {
       cRet[nPosRet++] = '=';
+      cRet[nPosRet++] = '\r';
+      cRet[nPosRet++] = '\n';
    }
    /* Adding canonical new line for RFC2045 blocks */
-   cRet[nPosRet++] = '\r';
-   cRet[nPosRet++] = '\n';
 
    /* this function also adds a zero */
    cRet = (char *) hb_xrealloc( cRet, nPosRet + 1 );
@@ -110,7 +110,7 @@ HB_FUNC( TIPENCODERQP_DECODE )
    int nLen = hb_parclen(1);
    char *cRet;
    int nPos = 0, nPosRet = 0, nVal;
-   char cElem, cCipher;
+   unsigned char cElem, cCipher;
 
    if ( ! cData )
    {
@@ -130,13 +130,13 @@ HB_FUNC( TIPENCODERQP_DECODE )
 
    while ( nPos < nLen )
    {
-      cElem = cData[ nPos ];
+      cElem = (unsigned char) cData[ nPos ];
 
       if ( cElem == '=' )
       {
          if ( nPos < nLen - 2 )
          {
-            cCipher = cData[ ++nPos ];
+            cCipher = (unsigned char) cData[ ++nPos ];
             //soft line break
             if ( cCipher == '\r' )
             {
@@ -149,7 +149,7 @@ HB_FUNC( TIPENCODERQP_DECODE )
                      cCipher - '0';
                nVal *= 16;
 
-               cCipher = cData[ ++nPos ];
+               cCipher = (unsigned char) cData[ ++nPos ];
                nVal += cCipher >= 'A' && cCipher <= 'F' ? cCipher - 'A' + 10 :
                      cCipher - '0';
 
@@ -167,7 +167,7 @@ HB_FUNC( TIPENCODERQP_DECODE )
       }
       else
       {
-         cRet[ nPosRet++ ] = cElem;
+         cRet[ nPosRet++ ] = (char) cElem;
       }
 
       nPos ++;
