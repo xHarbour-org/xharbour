@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.112 2002/12/30 19:56:32 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.38 2003/01/17 19:57:53 horacioroldan Exp $
  */
 
 /*
@@ -6224,6 +6224,7 @@ extern ERRCODE hb_cdxOrderListClear( CDXAREAP pArea )
 ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    LPCDXTAG pTag;
+   BOOL bFound;
 
    HB_TRACE(HB_TR_DEBUG, ("cdxOrderListFocus(%p, %p)", pArea, pOrderInfo));
    /*
@@ -6248,7 +6249,11 @@ ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
       /* if( pArea->lpIndexes->uiTag ) */
       if( pArea->uiTag )
-          SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
+      {
+         bFound = pArea->fFound;
+         SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
+         pArea->fFound = bFound;
+      }
    }
 
    return SUCCESS;
