@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2004/11/01 05:38:11 likewolf Exp $
+# $Id: Makefile,v 1.6 2004/11/21 21:44:22 druzus Exp $
 #
 
 ROOT = ../../../
@@ -17,7 +17,7 @@ include $(TOP)$(ROOT)config/lib.cf
 # a workaround of a problem with different include directories 
 # for slang header files between different unix distributions
 CFLAGS := -I/usr/include/slang -I/usr/local/include \
-          -I/usr/local/include/slang -I/sw/include $(CFLAGS)
+          -I/usr/local/include/slang -I/sw/include -I/opt/local/include $(CFLAGS)
 
 #LDFLAGS := -L/usr/lib/slang -L/usr/local/lib -L/usr/local/lib/slang $(LDFLAGS)
 

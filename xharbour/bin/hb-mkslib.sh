@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.10 2005/01/30 06:45:44 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.11 2005/02/12 19:54:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -111,7 +111,7 @@ if [ "${SLIB_EXT}" = ".dylib" ]; then
     ld -r -o "${FULLNAME}.o" $OBJLST && \
     ${CCPREFIX}gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
         -compatibility_version ${MAJOR}.${MINOR} -current_version ${VERSION} \
-        -flat_namespace -undefined warning -multiply_defined suppress \
+        -flat_namespace -undefined warning -multiply_defined suppress -single_module \
         -o "${FULLNAME}" "${FULLNAME}.o" ${linker_options} && \
     cd "${dir}" && \
     mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}" && \

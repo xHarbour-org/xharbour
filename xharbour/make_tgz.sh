@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.43 2005/02/12 19:54:01 druzus Exp $
+# $Id: make_tgz.sh,v 1.44 2005/02/26 15:28:00 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -77,9 +77,16 @@ if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 # default lib dir name
 HB_LIBDIRNAME="lib"
 
+ETC="/etc"
+
 # Select the platform-specific installation prefix and ownership
 HB_INSTALL_OWNER=root
 case "$HB_ARCHITECTURE" in
+    darwin)
+        [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
+        HB_INSTALL_GROUP=wheel
+	ETC="/private/etc"
+	;;
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && HB_LIBDIRNAME="lib64"
@@ -208,10 +215,10 @@ strip -S `find $HB_LIB_INSTALL -type f`
 
 if [ "${hb_sysdir}" = "yes" ]; then
 
-mkdir -p $HB_INST_PREF/etc/harbour
-$INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
+mkdir -p $HB_INST_PREF$ETC/harbour
+$INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF$ETC/harbour/hb-charmap.def
 
-cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
+cat > $HB_INST_PREF$ETC/harbour.cfg <<EOF
 CC=${CCPREFIX}gcc
 CFLAGS=-c -I$_DEFAULT_INC_DIR -O3
 VERBOSE=YES
@@ -224,7 +231,7 @@ fi
 if [ "${hb_lnkso}" = yes ]
 then
     case $HB_ARCHITECTURE in
-        darwin)     ADD_LIBS="$ADD_LIBS -lncurses -L/sw/lib" ;;
+        darwin)     ADD_LIBS="$ADD_LIBS -lncurses -L/opt/local/lib -L/sw/lib" ;;
         dos|w32)    ADD_LIBS="" ;;
         *)          ADD_LIBS="$ADD_LIBS -lncurses" ;;
     esac 
@@ -267,6 +274,8 @@ if [ -n "${hb_instfile}" ]; then
    else
       DO_LDCONFIG=""
    fi
+   # In the generated script use tar instead of $TAR because we can't be sure
+   # if $TAR exists in the installation environment
    cat > "${hb_instfile}" <<EOF
 #!/bin/sh
 if [ "\$1" = "--extract" ]; then
@@ -282,7 +291,7 @@ read ASK
 if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
     exit 1
 fi
-(sed -e '1,/^HB_INST_EOF\$/ d' "\$0" | gzip -cd | $TAR xvf - -C /) ${DO_LDCONFIG}
+(sed -e '1,/^HB_INST_EOF\$/ d' "\$0" | gzip -cd | tar xvpf - -C /) ${DO_LDCONFIG}
 exit \$?
 HB_INST_EOF
 EOF

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.50 2005/02/19 21:23:02 likewolf Exp $
+# $Id: hb-func.sh,v 1.51 2005/02/26 15:28:04 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -279,7 +279,7 @@ CC_OPT=""
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
     if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
-        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/sw/lib"
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/sw/lib -L/opt/local/lib"
     elif [ "\${HB_ARCHITECTURE}" = "bsd" ]; then
         SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/local/lib"
     fi
@@ -542,7 +542,7 @@ mk_hblibso()
     if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         full_lib_name="lib${name}.${hb_ver}.dylib"
         full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
-        linker_options="-L/sw/lib $linker_options"
+        linker_options="-L/sw/lib -L/opt/local/lib $linker_options"
     elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
         full_lib_name="${name}.dll"
         full_lib_name_mt="${name}mt.dll"

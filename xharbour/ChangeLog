@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3934 2005/03/10 23:40:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.3935 2005/03/11 21:59:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-13 15:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_drw.sh
+    - Removed unneeded parts.
+  * make_tgz.sh
+    ! Fixed the installer to use /private/etc instead of /etc on Darwin.
+    ! Use DarwinPorts when available on Darwin.
+  * bin/hb-func.sh
+  * config/darwin/gcc.cf
+  * source/rtl/gtsln/Makefile
+    ! Use DarwinPorts when available on Darwin.
+  * bin/hb-mkslib.sh
+    ! Use -single_module on Darwin.
+    
 2005-03-12 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.c
     ! pragma begindump only required to be closed by pragma enddump
