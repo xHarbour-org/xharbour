@@ -198,7 +198,7 @@
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is strfile.c, library is hbbct.
+ *      Source is strfile.c, library is hbct.
  *  $SEEALSO$
  *      SCREENFILE()
  *  $END$

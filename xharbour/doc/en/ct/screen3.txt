@@ -1,0 +1,431 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CHARWIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CHARWIN (<nTop>, <nLeft>, <nBottom>, <nRight>, [<cNewChar|nNewChar>],
+ *               [<cOldChar|nOldChar>]) --> <cEmptyString>
+ *  $ARGUMENTS$
+ *    <nTop> - top row number, default 0
+ *    <nLeft> - left column number, default 0
+ *    <nBottom> - top row number, default MaxRow()
+ *    <nRight> - right column number, default MaxCol()
+ *    <cNewChar|nNewChar> - new character for the screen area,
+ *          as a numeric value in the range of 0 to
+ *          255 or as a character string, default value is the CLEARB.
+ *    <cOldChar|nOldChar> - character to exchange. Specify the parameter
+ *          as a numeric in the range of 0 to 255
+ *          or as a character string.  The default is to exchange all characters.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Exchanges particular characters in a screen area.
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CLEARSLOW()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CLEARSLOW(<nDelay>, [<nTopline>], [<nLeftcolumn>],
+ *        [<nBottomline>], [<nRightcolumn>],
+ *        [<cCharacter|nCharacter>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nDelay>  Designates the time delay in milliseconds for the
+ *     individual steps in the delete procedure.  The value is in the range of
+ *     1 to 65535.
+ *   <nTopline>  Designates the line for the top-left corner of the area.
+ *     The default value is the topmost line.
+ *   <nLeftcolumn>  Designates the column for the top-left corner of the
+ *     area.  The default value is the leftmost column.
+ *   <nBottomline>  Designates the line for the bottom-right corner of
+ *     the area.  The default value is the bottommost line.
+ *   <nRightcolumn>  Designates the column for the bottom-right corner of
+ *     the area.  The default value is the rightmost column.
+ *   <cCharacter|nCharacter>  Designates the character to use to clear
+ *     the screen.  The character can be numeric in the range of 0 to 255 or a
+ *     character string.  The default is the character set using SETCLEARB().
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Deletes a screen area from the outside in with a delay
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      COLORWIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      COLORWIN([<nTopLine>], [<nLeftCol>], [<nBottomLine>], [<nRightCol>],
+ *               [<cNewAttr|nNewAttr>], [<cOldAttr|nOldAttr>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nTopLine>  Designates the topmost line to begin processing.  The
+ *     default is the cursor line.
+ *   <nLeftCol>  Designates the leftmost column to begin processing.  The
+ *     default is the cursor column.
+ *   <nBottomLine>  Designates the bottommost line that is processed.
+ *     The default is the last screen line or window line.
+ *   <nRightCol>  Designates the rightmost column to clear.  The default
+ *     is the right screen border or window border.
+ *   <cNewAttr|nNewAttr>  Designates the new attribute to replace the old
+ *     one.  The default is the standard attribute CLEARA.
+ *   <cOldAttr|nOldAttr>  Designates the old character to exchange.  The
+ *     default is "exchange all attributes".
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Exchanges particular attributes in a screen area
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      COLORREPL()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      COLORREPL([<cNewAttr|nNewAttr>], [<cOldAttr|nOldAttr>]) --> cNull
+ *  $ARGUMENTS$
+ *   <cNewAttr|nNewAttr>  Designates the new attribute.  The default is
+ *     CLEARA.
+ *   <cOldAttr|InOldAttr>  Designates the old attribute to exchange.  The
+ *     default is all existing attributes.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Exchanges particular screen attributes
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SAYSPREAD()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SAYSPREAD(<cCharacterstring>, [<nDelay>], [<nLine>],
+ *                [<nColumn>]) --> cNull
+ *  $ARGUMENTS$
+ *   <cCharacterstring>  Designates the string to output with the spread
+ *     effect.
+ *   <nDelay>  Designates a time delay in milliseconds.  The default
+ *     value is 4.
+ *   <nLine>  Designates the line from which the output begins.  The
+ *     default is the cursor line.
+ *   <nColumn>  Designates the column from which the output begins.  The
+ *     default is the cursor column.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Displays screen output with "spread" effect
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SAYMOVIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SAYMOVEIN(<cCharacterstring>, [<nDelay>],
+ *                [<nLine>], [<nColumn>], [<lDirection>])  --> cNull
+ *  $ARGUMENTS$
+ *   <cCharacterstring>  Designates the string to be output with the
+ *     "move in" effect.
+ *   <nDelay>  Designates a time delay in milliseconds. The default
+ *     value is 4.
+ *   <nLine>  Designates the line where the result is output. The
+ *     default is the cursor line.
+ *   <nColumn>  Designates the column where the result is output. The
+ *     default is the cursor column.
+ *   <lDirection>  Designates the direction that the characters are moved
+ *     onto the screen.  If you omit this parameter or designate it as .F., the
+ *     movement is from the left.  If you designate it as .T., the movement is
+ *     from the right onto the screen.  The default is movement from the left
+ *     (.F.).
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Displays screen output with a "move in" effect
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SAYDOWN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SAYDOWN(<cCharacterstring>, [<nDelay>], [<nLine>],
+ *              [<nColumn>]) --> cNull
+ *  $ARGUMENTS$
+ *   <cCharacterstring>  Designates vertical output for the string.
+ *   <nDelay>  Designates that the time delay is set in milliseconds.
+ *     The default value is 4.
+ *   <nLine>  Designates from which line to begin the output. The
+ *     default is the cursor line.
+ *   <nColumn>  Designates from which column to begin the output. The
+ *     default is the cursor column.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Displays screen output downward and vertically
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SCREENSTR()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SCREENSTR ([<nRow>], [<nColumn>], [<nCharCount>]) --> cCharacterstring
+ *  $ARGUMENTS$
+ *   <nRow>  Designates the first line to read.  The default is the
+ *     cursor line.
+ *   <nColumn>  Designates the first column to read.  The default is the
+ *     cursor column.
+ *   <nCharCount>  Designates how many characters to read.  The default
+ *     is to the end of the window or screen area.
+ *  $RETURNS$
+ *      Returns the character string that contains all of the bytes
+ *      read from the screen.
+ *  $DESCRIPTION$
+ *      Reads a string, including attributes, from the screen
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      STRSCREEN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      STRSCREEN(<cCharacterstring>, [<nRow>], [<nColumn>]) --> cNull
+ *  $ARGUMENTS$
+ *   <cCharacterstring>  Designates the character string to display.
+ *   <nRow>  Designates the starting line for the output.  The default is
+ *     the cursor line.
+ *   <nColumn>  Designates the starting column for output.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Displays a string with characters and attributes on the screen
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CLEAREOL()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CLEAREOL([<nRow>], [<nColumn>], [<cAttr|nAttr>],
+ *               [<cCharacter|nCharacter>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nRow>  Designates the line to be erased.  The default is the cursor
+ *     line.
+ *   <nColumn >  Designates the column where the erasure is to begin.
+ *     The default is the cursor column.
+ *   <cAttrn|nAttr>  Designates the attribute used to clear.  The
+ *     default is CLEARA.
+ *   <cCharacter|nCharacter>  Designates the character used to clear.
+ *     The default is CLEARB.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Clears from the cursor position to the end of line
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CLWIN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CLWIN([<nTopLine>], [<nLeftCol>], [<nBottomLine>],
+ *        [<nRightColumn>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nTopLine>  Designates the topmost line where clearing should begin.
+ *     The default is the cursor line.
+ *   <nLeftCol>  Designates the leftmost column where erasure should
+ *     begin.  The default is the cursor column.
+ *   <nBottomLine>  Designates the bottommost line to clear.  The default
+ *     is the last screen line or window line.
+ *   <nRightColumn>  Designates the rightmost column to clear.  The
+ *     default is the right screen border or window border.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Clears character and attribute from a screen area
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CLEOL()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CLEOL([<nRow>], [<nColumn>]) --> cNull
+ *  $ARGUMENTS$
+ *   <nRow>  Designates the line to clear.  The default is the cursor
+ *     line.
+ *   <nColumn>  Designates the column from which to clear.  The default
+ *     is the cursor column.
+ *  $RETURNS$
+ *      Returns an empty string.
+ *  $DESCRIPTION$
+ *      Clears characters and attributes to the end of a line
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is screen3.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

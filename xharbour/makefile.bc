@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.124 2004/11/28 18:00:00 ptsarenko Exp $
+# $Id: makefile.bc,v 1.125 2004/11/29 23:30:00 ptsarenko Exp $
 #
 
 #
@@ -926,9 +926,13 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\ftoc.obj \
    $(CT_OBJ_DIR)\justify.obj \
    $(CT_OBJ_DIR)\keyset.obj \
+   $(CT_OBJ_DIR)\lton.obj \
+   $(CT_OBJ_DIR)\maxline.obj \
    $(CT_OBJ_DIR)\misc1.obj \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
+   $(CT_OBJ_DIR)\numcount.obj \
+   $(CT_OBJ_DIR)\numline.obj \
    $(CT_OBJ_DIR)\numlohi.obj \
    $(CT_OBJ_DIR)\pack.obj \
    $(CT_OBJ_DIR)\pos1.obj \
@@ -963,8 +967,13 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\fcopy.obj \
    $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\invrtwin.obj \
+   $(CT_OBJ_DIR)\like.obj \
    $(CT_OBJ_DIR)\numconv.obj \
    $(CT_OBJ_DIR)\screen2.obj \
+   $(CT_OBJ_DIR)\screen3.obj \
+   $(CT_OBJ_DIR)\scrmark.obj \
+   $(CT_OBJ_DIR)\spread.obj \
+   $(CT_OBJ_DIR)\untext.obj \
    $(CT_OBJ_DIR)\cttime.obj \
    $(CT_OBJ_DIR)\util.obj
 
@@ -3287,6 +3296,12 @@ $(CT_OBJ_DIR)\justify.obj : $(CT_DIR)\justify.c
 $(CT_OBJ_DIR)\keyset.obj : $(CT_DIR)\keyset.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(CT_OBJ_DIR)\lton.obj : $(CT_DIR)\lton.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\maxline.obj : $(CT_DIR)\maxline.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(CT_OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -3294,6 +3309,12 @@ $(CT_OBJ_DIR)\num1.obj : $(CT_DIR)\num1.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\numat.obj : $(CT_DIR)\numat.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\numcount.obj : $(CT_DIR)\numcount.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\numline.obj : $(CT_DIR)\numline.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
@@ -3440,6 +3461,12 @@ $(CT_OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
 $(CT_OBJ_DIR)\invrtwin.obj : $(CT_OBJ_DIR)\invrtwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(CT_OBJ_DIR)\like.c : $(CT_DIR)\like.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\like.obj : $(CT_OBJ_DIR)\like.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(CT_OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -3450,6 +3477,30 @@ $(CT_OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(CT_OBJ_DIR)\screen2.obj : $(CT_OBJ_DIR)\screen2.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\screen3.obj : $(CT_OBJ_DIR)\screen3.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\scrmark.c : $(CT_DIR)\scrmark.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\scrmark.obj : $(CT_OBJ_DIR)\scrmark.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\spread.obj : $(CT_OBJ_DIR)\spread.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\untext.obj : $(CT_OBJ_DIR)\untext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\util.c : $(CT_DIR)\util.prg

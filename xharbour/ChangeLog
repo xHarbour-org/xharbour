@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3637 2004/11/28 18:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3638 2004/11/29 23:30:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-29 23:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  + source/ct/like.prg
+    + added: LIKE() function
+  + source/ct/lton.c
+    + added: LTON() function
+  + source/ct/maxline.c
+    + added: MAXLINE() function
+  + source/ct/numcount.c
+    + added: NUMCOUNT() function
+  + source/ct/numline.c
+    + added: NUMLINE() function
+  + source/ct/screen3.prg
+    + added: CHARWIN(), CLEARSLOW(), COLORWIN(), COLORREPL(),
+             SAYSPREAD(), SAYMOVIN(), SAYDOWN(),
+             SCREENSTR(), STRSCREEN(),
+             CLEAREOL(), CLWIN(), CLEOL() functions
+  + source/ct/scrmark.prg
+    + added: SCREENMARK() function
+  + source/ct/spread.prg
+    + added: EXPAND(), CHARSPREAD() functions
+  + source/ct/untext.prg
+    + added: UNTEXTWIN() function
+
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * source/ct/Makefile
+    + Added support for new ct modules
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+    + Added support for new ct modules
+    + Added support for source/ct/setclear.c
+  * makefile.wc
+    + Added support for new ct modules
+    * Corrected support for source/ct/pack.c
+
+  + doc/en/ct/like.txt
+  + doc/en/ct/lton.txt
+  + doc/en/ct/screen3.txt
+    + Added documentation for CT functions
+  * doc/en/ct/strfile.txt
+    * Minor corrections.
 
 2004-11-28 23:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   + source/ct/strfile.c

@@ -1,0 +1,28 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      LTON()
+ *  $CATEGORY$
+ *      CT3 numeric functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      LTON([<lValue>]) --> nLogicalValue
+ *  $ARGUMENTS$
+ *     <lValue>  Designates the logical expression to convert.  The default
+ *     value is .F..
+ *  $RETURNS$
+ *      If you designate a .T., LTON() returns a 1; with .F., it returns a 0.
+ *  $DESCRIPTION$
+ *      Converts a logical value into a numeric value
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is lton.c, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */

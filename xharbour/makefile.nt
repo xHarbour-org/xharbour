@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.108 2004/11/28 18:00:00 ptsarenko Exp $
+# $Id: makefile.nt,v 1.109 2004/11/29 23:30:00 ptsarenko Exp $
 #
 
 #
@@ -1158,9 +1158,13 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ftoc.obj \
    $(OBJ_DIR)$(MT)\justify.obj \
    $(OBJ_DIR)$(MT)\keyset.obj \
+   $(OBJ_DIR)$(MT)\lton.obj \
+   $(OBJ_DIR)$(MT)\maxline.obj \
    $(OBJ_DIR)$(MT)\misc1.obj \
    $(OBJ_DIR)$(MT)\num1.obj \
    $(OBJ_DIR)$(MT)\numat.obj \
+   $(OBJ_DIR)$(MT)\numcount.obj \
+   $(OBJ_DIR)$(MT)\numline.obj \
    $(OBJ_DIR)$(MT)\numlohi.obj \
    $(OBJ_DIR)$(MT)\pack.obj \
    $(OBJ_DIR)$(MT)\pos1.obj \
@@ -1195,9 +1199,14 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\diskutil.obj \
    $(OBJ_DIR)$(MT)\fcopy.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
+   $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\invrtwin.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \
+   $(OBJ_DIR)$(MT)\screen3.obj \
+   $(OBJ_DIR)$(MT)\scrmark.obj \
+   $(OBJ_DIR)$(MT)\spread.obj \
+   $(OBJ_DIR)$(MT)\untext.obj \
    $(OBJ_DIR)$(MT)\util.obj
 
 #

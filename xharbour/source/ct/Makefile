@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2004/11/28 18:00:00 ptsarenko Exp $
+# $Id: Makefile,v 1.12 2004/11/29 23:30:00 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -43,9 +43,13 @@ C_SOURCES = \
    ftoc.c \
    justify.c \
    keyset.c \
+   lton.c \
+   maxline.c \
    misc1.c \
    num1.c \
    numat.c \
+   numcount.c \
+   numline.c \
    numlohi.c \
    pack.c \
    pos1.c \
@@ -83,8 +87,13 @@ PRG_SOURCES= \
    fcopy.prg \
    getsecrt.prg \
    invrtwin.prg \
+   like.prg \
    numconv.prg \
    screen2.prg \
+   screen3.prg \
+   scrmark.prg \
+   spread.prg \
+   untext.prg \
    util.prg
 
 LIBNAME=hbct

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.54 2004/11/28 18:00:00 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.55 2004/11/29 23:30:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -552,9 +552,13 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ftoc.obj \
   $(OBJ_DIR)\justify.obj \
   $(OBJ_DIR)\keyset.obj \
+  $(OBJ_DIR)\lton.obj \
+  $(OBJ_DIR)\maxline.obj \
   $(OBJ_DIR)\misc1.obj \
   $(OBJ_DIR)\num1.obj \
   $(OBJ_DIR)\numat.obj \
+  $(OBJ_DIR)\numcount.obj \
+  $(OBJ_DIR)\numline.obj \
   $(OBJ_DIR)\numlohi.obj \
   $(OBJ_DIR)\pos1.obj \
   $(OBJ_DIR)\pos2.obj \
@@ -565,6 +569,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\remove.obj \
   $(OBJ_DIR)\replace.obj \
   $(OBJ_DIR)\screen1.obj \
+  $(OBJ_DIR)\setclear.obj \
   $(OBJ_DIR)\settime.obj \
   $(OBJ_DIR)\strdiff.obj \
   $(OBJ_DIR)\strfile.obj \
@@ -587,8 +592,13 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
   $(OBJ_DIR)\invrtwin.obj \
+  $(OBJ_DIR)\like.obj \
   $(OBJ_DIR)\numconv.obj \
   $(OBJ_DIR)\screen2.obj \
+  $(OBJ_DIR)\screen3.obj \
+  $(OBJ_DIR)\scrmark.obj \
+  $(OBJ_DIR)\spread.obj \
+  $(OBJ_DIR)\untext.obj \
   $(OBJ_DIR)\util.obj \
 #
 # pplib
@@ -2167,6 +2177,12 @@ $(OBJ_DIR)\justify.obj : $(CT_DIR)\justify.c
 $(OBJ_DIR)\keyset.obj : $(CT_DIR)\keyset.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\lton.obj : $(CT_DIR)\lton.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\maxline.obj : $(CT_DIR)\maxline.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
@@ -2174,6 +2190,12 @@ $(OBJ_DIR)\num1.obj : $(CT_DIR)\num1.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\numat.obj : $(CT_DIR)\numat.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\numcount.obj : $(CT_DIR)\numcount.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\numline.obj : $(CT_DIR)\numline.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
@@ -2204,6 +2226,9 @@ $(OBJ_DIR)\replace.obj : $(CT_DIR)\replace.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\screen1.obj : $(CT_DIR)\screen1.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
@@ -2305,6 +2330,12 @@ $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
 $(OBJ_DIR)\invrtwin.obj : $(OBJ_DIR)\invrtwin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\like.c : $(CT_DIR)\like.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\like.obj : $(OBJ_DIR)\like.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -2315,6 +2346,30 @@ $(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\screen3.obj : $(OBJ_DIR)\screen3.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\scrmark.c : $(CT_DIR)\scrmark.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\scrmark.obj : $(OBJ_DIR)\scrmark.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\spread.obj : $(OBJ_DIR)\spread.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\untext.obj : $(OBJ_DIR)\untext.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg

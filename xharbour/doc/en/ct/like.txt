@@ -1,0 +1,31 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      LIKE()
+ *  $CATEGORY$
+ *      CT3 string functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      LIKE(<cString1>,<cString2>) --> lEqual
+ *  $ARGUMENTS$
+ *   <cString1>  Designates the wildcard string for comparison.  All
+ *     wildcards must be in this character string.
+ *   <cString2>  Designates the string to compare to <cString1>.
+ *   <nNewFileAttr> - a file attribute for a new file
+ *  $RETURNS$
+ *      LIKE() returns .T. when, after taking wildcards into account, both
+ *      character strings are equal.
+ *  $DESCRIPTION$
+ *      Compares character strings using wildcard characters
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is like.prg, library is hbct.
+ *  $SEEALSO$
+ *  $END$
+ */
