@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.5 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: genc.c,v 1.6 2002/01/30 04:10:04 ronpinkas Exp $
  */
 
 /*
@@ -1955,6 +1955,15 @@ static HB_GENC_FUNC( hb_p_substr )
    return 5;
 }
 
+static HB_GENC_FUNC( hb_p_lineoffset )
+{
+   fprintf( cargo->yyc, "\tHB_P_LINEOFFSET, %i,",
+            pFunc->pCode[ lPCodePos + 1 ] );
+
+   fprintf( cargo->yyc, "\n" );
+   return 2;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -2093,7 +2102,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_left,
    hb_p_right,
    hb_p_substr,
-   hb_p_dummy
+   hb_p_dummy,
+   hb_p_lineoffset
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.39 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: hvm.c,v 1.40 2002/03/08 03:57:18 ronpinkas Exp $
  */
 
 /*
@@ -771,13 +771,30 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_LINE:
-            HB_TRACE(HB_TR_INFO, ("Opcode: HB_P_LINE: %s (%i)", (hb_stackBaseItem())->item.asSymbol.value->szName, (hb_stackBaseItem())->item.asSymbol.lineno));
-
             (hb_stackBaseItem())->item.asSymbol.lineno = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
             if( s_bDebugging && s_bDebugShowLines )
-               hb_vmDebuggerShowLine( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
+            {
+               hb_vmDebuggerShowLine( (hb_stackBaseItem())->item.asSymbol.lineno );
+            }
             w += 3;
+
+            HB_TRACE(HB_TR_INFO, ("Opcode: HB_P_LINE: %s (%i)", (hb_stackBaseItem())->item.asSymbol.value->szName, (hb_stackBaseItem())->item.asSymbol.lineno));
+
             break;
+
+         case HB_P_LINEOFFSET:
+            (hb_stackBaseItem())->item.asSymbol.lineno += (signed char) pCode[ w + 1 ];
+
+            if( s_bDebugging && s_bDebugShowLines )
+            {
+               hb_vmDebuggerShowLine( (hb_stackBaseItem())->item.asSymbol.lineno );
+            }
+            w += 2;
+
+            HB_TRACE(HB_TR_INFO, ("Opcode: HB_P_LINEOFFSET: %s (%i)", (hb_stackBaseItem())->item.asSymbol.value->szName, (hb_stackBaseItem())->item.asSymbol.lineno));
+
+            break;
+
 
          case HB_P_PARAMETER:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PARAMETER") );

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.195 2002/01/02 01:54:42 andijahja Exp $
+ * $Id: harbour.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -88,18 +88,18 @@ SYMBOLS        hb_comp_symbols;
 PCOMDECLARED   hb_comp_pFirstDeclared;
 PCOMDECLARED   hb_comp_pLastDeclared;
 PCOMDECLARED   hb_comp_pReleaseDeclared;
-               
+
 PCOMCLASS      hb_comp_pFirstClass;
 PCOMCLASS      hb_comp_pLastClass;
 PCOMCLASS      hb_comp_pReleaseClass;
 char *         hb_comp_szFromClass;
 PCOMDECLARED   hb_comp_pLastMethod;
-               
+
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
 PFUNCTION      hb_comp_pInitFunc;
 PHB_FNAME      hb_comp_pFileName = NULL;
-               
+
 BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
 FILE *         hb_comp_yyppo = NULL;                      /* output .ppo file */
 BOOL           hb_comp_bStartProc = TRUE;                 /* holds if we need to create the starting procedure */
@@ -145,6 +145,8 @@ INLINES        hb_comp_inlines;
 /* various compatibility flags (-k switch) */
 ULONG          hb_comp_Supported;
 
+int hb_comp_iLastLine = 0;
+int hb_comp_ulLastOffsetPos = 0;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
@@ -940,7 +942,7 @@ void hb_compDeclaredInit( void )
    _DECL s_006 = { "ADEL"            , 'A', 2 , (BYTE*)"AN"                                                   , NULL     , NULL , &s_005};
    _DECL s_007 = { "ADIR"            , 'N', 6 , (BYTE*)"\x9d\x9b\x9b\x9b\x9b\x9b"                             , NULL     , NULL , &s_006};
    _DECL s_008 = { "AEVAL"           , 'A', 4 , (BYTE*)"AB\xa8\xa8"                                           , NULL     , NULL , &s_007};
-   _DECL s_009 = { "AFIELDS"         , 'N', 4 , (BYTE*)"A\x9b\x9b\x9b"                                        , NULL     , NULL , &s_008};           
+   _DECL s_009 = { "AFIELDS"         , 'N', 4 , (BYTE*)"A\x9b\x9b\x9b"                                        , NULL     , NULL , &s_008};
    _DECL s_010 = { "AFILL"           , 'A', 4 , (BYTE*)"A \xa8\xa8"                                           , NULL     , NULL , &s_009};
    _DECL s_011 = { "AINS"            , 'A', 2 , (BYTE*)"AN"                                                   , NULL     , NULL , &s_010};
    _DECL s_012 = { "ALERT"           , 'N', 4 , (BYTE*)"C\x9b\x9d\xa8"                                        , NULL     , NULL , &s_011};
@@ -2426,17 +2428,49 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 {
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
    {
-      if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 ) || hb_comp_bDebugInfo )
+      int iOffset = hb_comp_iLine - hb_comp_iLastLine;
+
+      if( iOffset > -129 && iOffset < 128 )
       {
+         if( hb_comp_iLastLine == 0 )
+         {
+            hb_comp_iLastLine = 1;
+
+            // Skip Line Number - using goto to avoid complex conditions for resetting hb_comp_iLastLine!
+            goto AfterLineNo;
+         }
+         else if( iOffset )
+         {
+            if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
+            {
+               hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
+               hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
+            }
+            else
+            {
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] += iOffset;
+            }
+         }
+      }
+      else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 ) || hb_comp_bDebugInfo )
+      {
+         int iLine = hb_comp_iLine - 1;
+
          hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
-         hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( hb_comp_iLine-1 ), HB_HIBYTE( hb_comp_iLine-1 ), ( BOOL ) 0 );
+         hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
       else
       {
-         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( hb_comp_iLine-1 );
-         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( hb_comp_iLine-1 );
+         int iLine = hb_comp_iLine - 1;
+
+         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
+         hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
       }
    }
+
+   hb_comp_iLastLine = hb_comp_iLine;
+
+ AfterLineNo :
 
    if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
    {
@@ -3565,11 +3599,11 @@ void hb_compSequenceFinish( ULONG ulStartPos, int bUsualStmts )
 void hb_compFieldSetAlias( char * szAlias, int iField )
 {
    PVAR pVar;
-   
+
    pVar = hb_comp_functions.pLast->pFields;
    while( iField-- && pVar )
       pVar = pVar->pNext;
-   
+
    while( pVar )
    {
       pVar->szAlias = szAlias;
