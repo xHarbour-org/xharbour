@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.92 2004/03/04 09:31:09 ronpinkas Exp $
+ * $Id: arrays.c,v 1.93 2004/03/05 05:06:53 ronpinkas Exp $
  */
 
 /*
@@ -1131,7 +1131,10 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       #ifdef HB_ARRAY_USE_COUNTER
          FakedObject.item.asArray.value->uiHolders = 0;
       #else
-         hb_arrayReleaseHolder( pBaseArray, (void *) &FakedObject );
+	     // Avoid infinite recursion - we know this is the only pOwner
+         //hb_arrayReleaseHolder( pBaseArray, (void *) &FakedObject );
+         hb_xfree( (void *) pBaseArray->pOwners );
+         pBaseArray->pOwners = NULL;
       #endif
    }
 

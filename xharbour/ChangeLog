@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2498 2004/03/05 15:45:42 lculik Exp $
+ * $Id: ChangeLog,v 1.2499 2004/03/05 21:46:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-05 14:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added logic to Reset FOR EACH and WITH OBJECT on BREAK if END SEQUENCE is in current procedure.
+    + Added logic to Release all FOR EACH if maximum nesting nesting exhausted incase error was handled.
+    + Added logic to Release all WITH OBJECT if maximum nesting nesting exhausted incase error was handled.
+    + Added logic to test for hb_vm_wWithObjectCounter == 0, incase error was handled, and no object is in scope any longer.
+    + Added logic to test for hb_vm_wEnumCollectionCounter == 0, incase error was handled, and no collection is in scope any longer.
+    + Added logic to refernce FOR EACH, and WITH OBJECT items in hb_vmIsLocalRef()
+
+  * source/vm/thread.c
+    + Added logic to refernce FOR EACH, and WITH OBJECT items in hb_threadIsLocalRef()
+
+  * source/vm/arrayshb.c
+    ! Fixed infinite recursion in Owners Build related to new hb_clsFinalize()
+
 2004-03-06 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/readline.c
     % out usage hb_itemNew(NULL)

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.157 2004/02/22 07:36:19 jonnymind Exp $
+* $Id: thread.c,v 1.158 2004/02/23 08:31:57 andijahja Exp $
 */
 
 /*
@@ -483,14 +483,14 @@ void hb_threadDestroyStack( HB_STACK *pStack )
             hb_itemClear( *pPos );
          }
       }
-      
+
       /* Free each element of the stack */
       for( i = 0; i < pStack->wItems; i++ )
       {
          hb_xfree( pStack->pItems[ i ] );
       }
       /* Free the stack */
-   
+
       hb_xfree( pStack->pItems );
    }
 
@@ -637,8 +637,8 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
    {
       p = last_stack;
    }
-   else {
-
+   else
+   {
       p = hb_ht_stack;
 
       while( p && ! HB_SAME_THREAD( p->th_id, id) )
@@ -666,6 +666,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 void hb_threadIsLocalRef( void )
 {
    HB_STACK *pStack;
+   int i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
@@ -673,7 +674,6 @@ void hb_threadIsLocalRef( void )
 
    while( pStack )
    {
-
       if( pStack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
       {
          hb_gcItemRef( &(pStack->Return) );
@@ -691,6 +691,24 @@ void hb_threadIsLocalRef( void )
             }
 
             --pItem;
+         }
+      }
+
+      // FOR EACH Enumerations.
+      for( i = 0; i < pStack->wEnumCollectionCounter; i++ )
+      {
+         if( ( &( pStack->aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+         {
+            hb_gcItemRef( &( pStack->aEnumCollection[ i ] ) );
+         }
+      }
+
+      // WITH OBJECT
+      for( i = 0; i < pStack->wWithObjectCounter; i++ )
+      {
+         if( ( &( pStack->aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+         {
+            hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }
       }
 
@@ -1005,7 +1023,7 @@ HB_EXPORT void hb_threadKillAll()
          else
          {
             HB_MUTEX_STRUCT *pMtx;
-            
+
             /* This is a subset of terminateThread: as this routine is
                an idle inspector, many of the cares in terminateThread may
                NOT be applied. */
@@ -1287,7 +1305,7 @@ HB_GARBAGE_FUNC( hb_threadThreadIdFinalize )
          (char *) ThreadID, NULL );
       return;
    }
-   
+
    hb_gcFree( ThreadID );
 }
 /*
