@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.8 2002/04/28 20:18:39 lculik Exp $
+# $Id: makefile.bc,v 1.9 2002/04/28 20:25:15 lculik Exp $
 #
 
 #
@@ -127,8 +127,8 @@ HBMAKE_DIR   = utils\hbmake
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS) 
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS) 
+CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
+CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG = -v $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -381,7 +381,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
    $(OBJ_DIR)\typefile.obj \
-   $(OBJ_DIR)\wait.obj
+   $(OBJ_DIR)\wait.obj \
+   $(OBJ_DIR)\win32ole.obj
 
 #
 # LANG.LIB rules
@@ -1996,6 +1997,13 @@ $(OBJ_DIR)\wait.c : $(RTL_DIR)\wait.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\wait.obj : $(OBJ_DIR)\wait.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

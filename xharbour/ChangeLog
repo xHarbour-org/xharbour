@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.195 2002/05/02 18:23:08 map Exp $
+ * $Id: ChangeLog,v 1.196 2002/05/02 18:36:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-02 15:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   + source/rtl/win32ole.prg
+     + New self contained COM Interface - based on José F. Giménez original work.
+       /* New improvements include improved compatibility and support for parameters
+          passed by refernce to COM Servers. */
+
+   * makefile.bc
+   * makefile.vc
+     + Added support for new win32ole module.
 
 2002-05-02 11:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
