@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.46 2001/11/06 08:22:37 lculik Exp $
+ * $Id: gtwin.c,v 1.1.1.1 2001/12/21 10:42:28 ronpinkas Exp $
  */
 
 /*
@@ -412,6 +412,15 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
                #ifdef HB_DEBUG_KEYBOARD
                   fprintf( stdout, "0" );
                #endif
+               if( wChar == 27 )
+               {
+                  /* Fix for escape key problem with some international
+                     keyboards and/or international versions of Windows */
+                  if( dwState & SHIFT_PRESSED )
+                     ch = 0;
+                  else
+                     ch = 27;
+               }
                if( ( ( ch == 0 || ch == -32 || ch == -16 ) && ( dwState & ( SHIFT_PRESSED | LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
                || ( ( dwState & ( ENHANCED_KEY | LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED ) ) ) )
                {
