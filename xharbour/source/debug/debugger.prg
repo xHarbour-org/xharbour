@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.43 2004/06/04 14:06:21 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.44 2004/06/06 22:46:44 likewolf Exp $
  */
 
 /*
@@ -839,8 +839,10 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            cCommand := ::oGetListCommand:oGet:VarGet()
 
            if ! Empty( cCommand )
-              AAdd( ::aLastCommands, cCommand )
-              ::nCommand++
+	      IF ATail( ::aLastCommands ) != cCommand
+                AAdd( ::aLastCommands, cCommand )
+              ENDIF
+              ::nCommand := Len( ::aLastCommands )
               ::oWndCommand:ScrollUp( 1 )
               ::DoCommand( cCommand )
            endif

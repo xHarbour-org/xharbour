@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.47 2004/05/12 18:50:51 mauriliolongo Exp $
+ * $Id: hbdefs.h,v 1.48 2004/05/22 15:38:29 likewolf Exp $
  */
 
 /*
@@ -131,6 +131,10 @@
       #define HB_DOS_INT86 _int86
       #define HB_DOS_INT86X _int86x
       #define HB_XREGS x
+   #elif defined( __DJGPP__ )
+      #define HB_DOS_INT86 int86
+      #define HB_DOS_INT86X int86x
+      #define HB_XREGS w
    #else
       #define HB_DOS_INT86 int86
       #define HB_DOS_INT86X int86x

@@ -1,5 +1,5 @@
 /*
- * $Id: mousedos.c,v 1.2 2003/05/16 19:52:09 druzus Exp $
+ * $Id: mousedos.c,v 1.3 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -155,8 +155,8 @@ void hb_mouse_SetPos( int iRow, int iCol )
       union REGS regs;
 
       regs.HB_XREGS.ax = 4;
-      regs.HB_XREGS.cx = iRow * 8;
-      regs.HB_XREGS.dx = iCol * 8;
+      regs.HB_XREGS.dx = iRow * 8;
+      regs.HB_XREGS.cx = iCol * 8;
       HB_DOS_INT86( 0x33, &regs, &regs );
    }
 }
@@ -181,15 +181,12 @@ int hb_mouse_CountButton( void )
 {
    if( s_bPresent )
    {
-      union REGS regs;
-
-      regs.HB_XREGS.ax = 3;
-      HB_DOS_INT86( 0x33, &regs, &regs );
-
-      return regs.HB_XREGS.bx;
+      return s_iButtons;
    }
    else
+   {
       return 0;
+   }
 }
 
 void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )

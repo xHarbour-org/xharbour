@@ -1,5 +1,5 @@
 /*
- * $Id: video.c,v 1.1 2004/03/04 00:27:39 likewolf Exp $
+ * $Id: video.c,v 1.2 2004/03/18 03:43:08 ronpinkas Exp $
  *
  * xHarbour Project source code:
  *
@@ -158,7 +158,7 @@ HB_FUNC( SETFONT )
    {
       __dpmi_regs r;
 
-      r.x.ax = 0x1100; /* Load user-defined text-mode display font */
+      r.x.ax = 0x1110; /* Load user-defined text-mode display font */
       r.h.bl = area - 1;
       r.h.bh = height;
       r.x.cx = count;
@@ -211,9 +211,6 @@ HB_FUNC( SETFONT )
  *  $END$
  */
 
-#define UPCASE(c) ((c) & 0x5F)
-
-
 HB_FUNC( VGAPALETTE )
 {
    char *color_string;
@@ -237,22 +234,30 @@ HB_FUNC( VGAPALETTE )
       color_string = hb_parcx( 1 );
       for ( s = color_string; *s; s++ )
       {
-         switch ( UPCASE( *s ) )
+         switch ( *s )
          {
-          case 'N': attr |= 0; break;
-          case 'B': attr |= 1; break;
-          case 'G': attr |= 2; break;
-          case 'R': attr |= 4; break;
-          case 'W': attr |= 7; break;
-          case '+': attr |= 8; break;
-          case 'U':
-          case 'I':
-          case 'X':
-            /* these seem to be used only in mono */
-            break;
-          default:
-            hb_retl( FALSE );
-            return;
+            case 'N':
+	    case 'n': attr |= 0; break;
+            case 'B':
+	    case 'b': attr |= 1; break;
+	    case 'G':
+	    case 'g': attr |= 2; break;
+            case 'R':
+	    case 'r': attr |= 4; break;
+            case 'W':
+	    case 'w': attr |= 7; break;
+            case '+': attr |= 8; break;
+            case 'U':
+	    case 'u':
+            case 'I':
+	    case 'i':
+            case 'X':
+	    case 'x':
+               /* these seem to be used only in mono */
+               break;
+            default:
+               hb_retl( FALSE );
+               return;
          }
       }
    } else {
