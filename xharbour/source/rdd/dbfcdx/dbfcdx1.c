@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.75 2003/11/05 03:32:48 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.76 2003/11/06 19:20:00 druzus Exp $
  */
 
 /*
@@ -1769,7 +1769,7 @@ static int hb_cdxPageLeafAddKey( LPCDXPAGE pPage, LPCDXKEY pKey )
    }
    else
    {
-      pPage->pKeyBuf = hb_xrealloc( pPage->pKeyBuf, ( pPage->iKeys + 1 ) * iLen );
+      pPage->pKeyBuf = (BYTE*) hb_xrealloc( pPage->pKeyBuf, ( pPage->iKeys + 1 ) * iLen );
    }
 
 #ifndef HB_CDX_DBGCODE_OFF
@@ -2582,7 +2582,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, SHORT iChildRet )
 
    if ( iKeys > 0 )
    {
-      pPtr = pKeyPool = hb_xgrab( iKeys * iLen );
+      pPtr = pKeyPool = (BYTE*) hb_xgrab( iKeys * iLen );
       for ( i = 0; i < iBlncKeys; i++ )
       {
          if ( childs[i]->iKeys > 0 )
@@ -7176,7 +7176,7 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
       memset( pSort->NodeList[ Lvl ]->cdxu.External.ExtData, 0,
               sizeof( pSort->NodeList[ Lvl ]->cdxu.External.ExtData ) );
       pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace = CDX_EXTERNAL_SPACE;
-      hb_cdxSortKeyPut( pSort->LastKey, "", 0, 0, ( pSort->CurTag->uiType == 'C' ) );
+      hb_cdxSortKeyPut( pSort->LastKey, (BYTE*) "", 0, 0, ( pSort->CurTag->uiType == 'C' ) );
    }
    ct = ( USHORT ) ( pSort->CurTag->uiLen - Value->length );
    cd = hb_cdxSortKeyFindDup( Value, pSort->LastKey );
