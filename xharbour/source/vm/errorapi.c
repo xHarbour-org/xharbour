@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.44 2004/04/01 22:00:43 druzus Exp $
+ * $Id: errorapi.c,v 1.45 2004/04/16 04:41:38 ronpinkas Exp $
  */
 
 /*
@@ -1550,12 +1550,9 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
    hb_stackDispCall();
 
    #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
-   if (!hb_isService())     /* We don't want a server side app showing message boxes */
-   {
-      #ifdef HB_OS_WIN_32
-         MessageBox( NULL, buffer, title, MB_ICONSTOP );
-      #endif
-   }
+   #ifdef HB_OS_WIN_32
+      MessageBox( NULL, buffer, title, MB_ICONSTOP );
+   #endif
    #endif
 
    /* release console settings */

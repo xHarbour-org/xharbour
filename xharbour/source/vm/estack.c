@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.63 2004/04/20 14:33:23 jacekp Exp $
+ * $Id: estack.c,v 1.64 2004/04/28 18:31:16 druzus Exp $
  */
 
 /*
@@ -561,10 +561,7 @@ WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * Ex
    }
    while( pBase != HB_VM_STACK.pItems );
 
-   if (!hb_isService())  /* We don't want a server side app showing message boxes */
-   {
-      MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
-   }
+   MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
 
    return EXCEPTION_EXECUTE_HANDLER; /* EXCEPTION_CONTINUE_SEARCH; */
 }
