@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.29 2003/05/26 14:05:33 paultucker Exp $
+# $Id: makefile.nt,v 1.30 2003/05/26 21:00:37 paultucker Exp $
 #
 
 #
@@ -173,6 +173,7 @@ DBFNTXMT_LIB =$(LIB_DIR)\dbfntx$(MT).lib
 DEBUG_LIB    =$(LIB_DIR)\debug.lib
 LANG_LIB     =$(LIB_DIR)\lang.lib
 MACRO_LIB    =$(LIB_DIR)\macro.lib
+MACROMT_LIB  =$(LIB_DIR)\macro$(MT).lib
 NULSYS_LIB   =$(LIB_DIR)\nulsys.lib
 ODBC_LIB     =$(LIB_DIR)\hbodbc.lib
 ODBCMT_LIB   =$(LIB_DIR)\hbodbc$(MT).lib
@@ -246,7 +247,6 @@ LIBLIST = \
    $(COMMON_LIB) \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
-   $(MACRO_LIB) \
    $(PP_LIB) \
    $(LANG_LIB) \
    $(RDD_LIB) \
@@ -254,12 +254,14 @@ LIBLIST = \
    $(DBFNTX_LIB) \
    $(NULSYS_LIB) \
    $(VM_LIB) \
+   $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
    $(ODBC_LIB)
 
 !ifdef HB_MT
 LIBLISTMT = \
+   $(MACROMT_LIB) \
    $(RTLMT_LIB) \
    $(PPMT_LIB) \
    $(RDDMT_LIB) \
@@ -274,8 +276,7 @@ LIBLISTMT = \
 #
 
 LIBS = \
-   $(LIBLIST) \
-   $(MACRO_LIB)
+   $(LIBLIST)
 
 #
 # programs that require user32.lib (for OemToAnsi)
@@ -1075,6 +1076,9 @@ $(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
 $(VMMT_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
 
+$(MACROMT_LIB) : $(MACRO_LIB_OBJS)
+   lib /out:$@ $**
+
 $(ODBCMT_LIB) : $(ODBC_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1156,13 +1160,13 @@ $(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
 # MACRO.LIB dependencies
 #
 
-$(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
+$(OBJ_DIR)$(MT)\macroy.c : $(MACRO_DIR)\macro.y
    bison -p hb_comp -d --no-line $** -o$@
 
-$(OBJ_DIR)\macroy.obj : $(OBJ_DIR)\macroy.c
+$(OBJ_DIR)$(MT)\macroy.obj : $(OBJ_DIR)$(MT)\macroy.c
    $(CC) $(CLIBFLAGS) -W3 -Fo$@  $**
 
-$(OBJ_DIR)\macroslx.obj : $(MACRO_DIR)\macroslx.c
+$(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
    -$(DEL) $(OBJ_DIR)\unistd.h
