@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.493 2002/11/13 20:48:42 walito Exp $
+ * $Id: ChangeLog,v 1.494 2002/11/14 08:05:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-14 12:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * config/dos/djgpp.cf
+    + Add the math library to compilation.
 
 2002-11-14 00:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
