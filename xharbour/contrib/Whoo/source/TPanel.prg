@@ -3,6 +3,7 @@
 
 #include "hbclass.ch"
 #include "windows.ch"
+#include "what32.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -21,16 +22,16 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TPanel
    
-   super:New( oParent )
-   ::WndProc   := 'FormProc'
-   ::Msgs      := -1
+   ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
+   ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
-   ::Style     := WS_OVERLAPPEDWINDOW
+   ::Style     := IFNIL(::Style,WS_OVERLAPPEDWINDOW,::Style)
    ::FormType  := RCF_DIALOG
-   ::lRegister := .f.
+   ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
    ::lControl  := .F.
-   ::Modal     := .T.
-   
-   RETURN( self )
+   ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
+   ::Modal     := IFNIL(::Modal,.F.,::Modal)
+
+   RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*

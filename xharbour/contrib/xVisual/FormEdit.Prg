@@ -32,9 +32,9 @@ GLOBAL EXTERNAL hThisInstance
                                     ::Editing := .F.        ,;
                                     ::aCtrl   := {}         ,;
                                     ::left    := 200        ,;
-                                    ::top     := 130        ,;
+                                    ::top     := 125        ,;
                                     ::width   := 600        ,;
-                                    ::height  := 350        ,;
+                                    ::height  := 400        ,;
                                     ::xGrid   := 8          ,;
                                     ::yGrid   := 8          ,;
                                     ::GridColor:=RGB(0,0,0) ,;

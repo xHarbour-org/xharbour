@@ -12,12 +12,12 @@ static oApp
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
-   local oTool, oRebar, n, oSplash, oTab
+   local n, oTool, oSplash
    LOCAL hImg1,hImg2,hBmp,aStdTab
    
    oApp := Application():Initialize()
 
-   oSplash := Splash():New( oApp, "visual_xharbour.bmp", 5000 )
+   oSplash := TSplash():New( oApp, "visual_xharbour.bmp", 5000 )
 
    WITH OBJECT oApp
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
@@ -116,9 +116,9 @@ FUNCTION Main
             :SetPanelText( 0, "What32 API StatusBar" )
             :SetPanelText( 2, "Enjoy" )
          END
-         
       END
-      
+      :CreateForm( 'ObjTree', ObjTree():New( oApp ) )
+      :CreateForm( 'ObjInsp', ObjInspect():New( oApp ) )
       :Run()
   END
 RETURN( nil)
@@ -140,39 +140,27 @@ ENDCLASS
 
 //----------------------------------------------------------------------------------------------
 
-
-CLASS Splash FROM TForm
-   DATA bitmap
-   METHOD New()           CONSTRUCTOR
-   METHOD OnPaint( hDC )  INLINE DrawBitmap(hDC,::bitmap),0
-   METHOD OnDestroy()     INLINE DeleteObject(::bitmap),NIL
-   METHOD OnTimer(n)      INLINE if( n==1,::Destroy(),)
-   METHOD OnLButtonDown() INLINE ::Destroy()
-   METHOD OnRButtonDown() INLINE ::Destroy()
+CLASS ObjTree FROM TForm
+   METHOD New( oParent ) INLINE ::Caption := 'Object Tree',;
+                                ::left    := 0,;
+                                ::top     := 125,;
+                                ::width   := 200,;
+                                ::height  := 150,;
+                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + DS_MODALFRAME,;
+                                super:new( oParent )
 ENDCLASS
 
-METHOD New( oParent, cFile, nTimeOut ) CLASS Splash
-   local aRect,abRect
-   super:new( oParent )
-   DEFAULT nTimeOut TO 2000
-   aRect := GetWindowRect(GetDesktopWindow())
-   
-   ::bitmap:= LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
-   abRect  := GetBitmapSize( ::bitmap )
-   
-   ::width := abRect[1]
-   ::height:= abRect[2]
-   ::left  := (aRect[3]/2)-(::width/2)
-   ::top   := (aRect[4]/2)-(::height/2)
-   ::style := WS_POPUP + WS_BORDER
-   ::ExStyle:= WS_EX_TOPMOST
-   ::Create()
-   UpdateWindow( ::handle)
-   SetTimer( ::handle, 1, nTimeOut )
-return( self )
+//----------------------------------------------------------------------------------------------
 
+CLASS ObjInspect FROM TForm
+   METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
+                                ::left    := 0,;
+                                ::top     := 275,;
+                                ::width   := 200,;
+                                ::height  := 250,;
+                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + DS_MODALFRAME,;
+                                super:new( oParent )
+ENDCLASS
 
-FUNCTION TestMsg(o)
-MessageBox(,o:name)
-return(nil)
+//----------------------------------------------------------------------------------------------
 

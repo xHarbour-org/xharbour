@@ -26,17 +26,16 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TForm
-super:New( oParent )
-   ::WndProc   := 'FormProc'
-   ::Msgs      := -1
+   ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
+   ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
-   ::Style     := WS_OVERLAPPEDWINDOW
-   ::FormType  := RCF_WINDOW
-   ::lRegister := .T.
+   ::Style     := IFNIL(::Style,WS_OVERLAPPEDWINDOW,::Style)
+   ::FormType  := IFNIL(::FormType,RCF_WINDOW,::FormType)
+   ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
    ::lControl  := .F.
-   ::ExStyle   := 0
+   ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
 
-   RETURN( SELF )
+   RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
