@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.62 2004/09/06 20:01:02 druzus Exp $
+# $Id: xharbour.spec,v 1.63 2004/09/14 20:15:33 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,6 +12,7 @@
 
 ######################################################################
 # Conditional build:
+# --with static      - link all binaries with static libs
 # --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
@@ -56,10 +57,10 @@
 %define releasen 0
 %define prefix   /usr
 %define hb_pref  xhb
-%define hb_lnkso yes
+%define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
-%define hb_arch  export HB_ARCHITECTURE=linux
+%define hb_lflag export L_USR=%{?_with_static:-static}
 %define hb_mt    export HB_MT=MT
 %define hb_mgt   export HB_MULTI_GT=yes
 %define hb_gt    export HB_GT_LIB=gtcrs
@@ -69,11 +70,10 @@
 %define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
 %define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
-%define hb_plat  export HB_PLAT=%{platform}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
-%define hb_cmrc  export HB_COMMERCE=yes
+%define hb_cmrc  export HB_COMMERCE=no
 %define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_plat} ; %{hb_opt} ; %{hb_cmrc}
+%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -362,7 +362,7 @@ fi
 [ "%{?_with_allegro:1}" ]  || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
 
 # check if we should rebuild tools with shared libs
-if [ "%{hb_lnkso}" = yes ]
+if [ "%{!?_with_static:1}" ]
 then
     unset HB_GTALLEG
     export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11}"

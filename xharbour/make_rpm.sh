@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.19 2004/08/29 00:26:20 druzus Exp $
+# $Id: make_rpm.sh,v 1.20 2004/09/06 20:01:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,6 +12,7 @@
 
 ######################################################################
 # Conditional build:
+# --with static      - link all binaries with static libs
 # --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
@@ -21,6 +22,7 @@
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT
 # --without gpm      - build GTSLN and GTCRS without GPM support
+# --without gtsln    - do not build GTSLN
 ######################################################################
 
 test_reqrpm()
