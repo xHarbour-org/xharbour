@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.1 2003/06/20 17:32:42 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.2 2003/06/21 06:59:23 jonnymind Exp $
  */
 
 /*
@@ -61,7 +61,9 @@
 
 #include <fcntl.h>
 #include <errno.h>
-#ifndef HB_OS_WIN32
+#include <io.h>
+
+#ifndef HB_OS_WIN_32
    #include <unistd.h>
 #endif
 
@@ -99,7 +101,7 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
       // get the table row
       PHB_ITEM pRow = hb_arrayGetItemPtr( pTable, iPoint );
 
-      #ifdef HB_OS_WIN32
+      #ifdef HB_OS_WIN_32
          iRes = stricmp( hb_arrayGetC( pRow, 1), cInt );
       #else
          iRes = strcasecmp( hb_arrayGetC( pRow, 1), cInt );
@@ -120,7 +122,11 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
             // essendo matematica intera, iPoint è per difetto, ed ha
             // già esaminato il punto lower
             pRow = hb_arrayGetItemPtr( pTable, iHigher );
+            #ifdef HB_OS_WIN_32
+            if ( stricmp( hb_arrayGetC( pRow, 1), cInt ) == 0 )
+            #else
             if ( strcasecmp( hb_arrayGetC( pRow, 1), cInt ) == 0 )
+            #endif
             {
                return hb_arrayGetItemPtr( pRow, 2 );
             }
@@ -291,7 +297,6 @@ PHB_ITEM hb_i18n_read_table( int handle, int count )
                if ( nRead != nStrLen || str[nStrLen-1] != 0 )
                {
                   hb_xfree( str );
-                  count = 0; // force exit from main loop
                   hb_arrayRelease( pRow );
                   hb_arrayRelease( pTable );
                   return NULL;
@@ -340,7 +345,7 @@ BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable )
 {
    char szStrLen[9];
    int nStrLen;
-   int i,j;
+   ULONG i,j;
 
    for ( i = 1; i <= hb_arrayLen( pTable ) ; i ++ )
    {
@@ -394,7 +399,11 @@ BOOL hb_i18n_load_language( char *language )
    PHB_ITEM pTable;
 
    path = hb_i18n_build_table_filename( NULL, language );
-   handle = open( path, O_RDONLY ); // on error will fail on next op
+   #ifdef HB_OS_WIN_32
+      handle = open( path, O_RDONLY | _O_BINARY ); // on error will fail on next op
+   #else
+      handle = open( path, O_RDONLY  ); // on error will fail on next op
+   #endif
    hb_xfree( path );
 
    nRead = read( handle, &header, sizeof( header ) );
@@ -466,7 +475,11 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = open( hb_itemGetC( pParam ), O_RDONLY );
+      #ifdef HB_OS_WIN_32
+         handle = open( hb_itemGetC( pParam ), O_RDONLY | _O_BINARY );
+      #else
+         handle = open( hb_itemGetC( pParam ), O_RDONLY );
+      #endif
    }
    else
    {
@@ -512,7 +525,7 @@ HB_FUNC( HB_I18NSORTTABLE )
    PHB_ITEM pTemp;
    PHB_ITEM pResult;
    char *key;
-   int i, pos;
+   ULONG i, pos;
 
    if ( pTable == NULL )
    {
@@ -586,7 +599,12 @@ HB_FUNC( HB_I18NSAVETABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = open( hb_itemGetC( pParam ), O_WRONLY | O_CREAT );
+      #ifdef HB_OS_WIN_32
+         handle = open( hb_itemGetC( pParam ), O_WRONLY | O_CREAT | _O_BINARY );
+      #else
+         handle = open( hb_itemGetC( pParam ), O_WRONLY | O_CREAT );
+      #endif
+      
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
          hb_retl( FALSE );
@@ -732,8 +750,14 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
       return TRUE;
    }
 
-   s_default_i18n_dir = HB_DEFAULT_I18N_PATH;
-
+   if ( i18n_dir == NULL )
+   {
+      s_default_i18n_dir = HB_DEFAULT_I18N_PATH;
+   }
+   else
+   {
+      s_default_i18n_dir = i18n_dir;
+   }
    // if i18n_dir is null, default will be used by this func
    if (! hb_i18n_load_language( language ) )
    {
