@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.61 2004/07/06 04:35:05 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.62 2004/07/08 07:38:22 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-14 16:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/_winsys.c
+    + OemToChar()
+    + CharToOem()
+    ! OemToAnsi()
+    ! AnsiToOem()
+      Changed the way the return buffer was being used, was a buggy one, 
+      overwriting the memory somewhere.      
 
 2004-07-08 04:39 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
   * source/WinTBar.Prg
