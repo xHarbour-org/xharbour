@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1051 2003/05/26 02:44:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1052 2003/05/26 05:58:49 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -25,7 +25,7 @@
     * cast at 7357
     * change ulLine to uLine in hb_vmRequestCancel (ron caught this)
   * source/vm/thread.c
-    - th_h (unused) at 1597 (ron caught this too)
+    - th_h (unused) at 1658 
   * make_vc.bat
     * display the name of the makefile being used.
   * makefile.nt

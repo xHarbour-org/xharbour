@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.76 2003/05/16 19:52:12 druzus Exp $
+* $Id: thread.c,v 1.77 2003/05/25 17:03:19 jonnymind Exp $
 */
 
 /*
@@ -1654,9 +1654,6 @@ void hb_threadWaitAll()
 void hb_threadKillAll()
 {
    HB_STACK *pStack;
-   #ifdef HB_OS_WIN_32
-      HANDLE th_h;
-   #endif
 
    /* DO NOT destroy main thread stack */
    pStack = hb_ht_stack;
