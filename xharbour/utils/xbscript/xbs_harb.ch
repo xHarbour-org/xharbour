@@ -170,7 +170,7 @@
          nProcID := -1
 
          IF ! ::bWantsErrorObject
-	    ::cText := ""
+            ::cText := ""
             Eval( bErrHandler, oError )
          ENDIF
 

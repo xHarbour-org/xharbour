@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.68 2005/02/21 17:08:37 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.69 2005/02/24 10:44:08 andijahja Exp $
  */
 
 /*
@@ -326,7 +326,7 @@ RETURN xRet
 
   static PHB_ITEM *aPrgParams = NULL;
 
-  static BSTR wMember;
+  static BSTR bstrMessage;
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
 
@@ -354,10 +354,10 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  static BSTR AnsiToWide( LPSTR cString )
+  static LPWSTR AnsiToWide( LPSTR cString )
   {
      UINT uLen;
-     BSTR wString;
+     LPWSTR wString;
 
      uLen  = strlen( cString ) + 1;
 
@@ -377,6 +377,35 @@ RETURN xRet
      //wprintf( L"\nWide: '%s'\n", wString );
 
      return wString;
+  }
+
+  static BSTR AnsiToBSTR( LPSTR cString )
+  {
+     UINT uLen;
+     LPWSTR wString;
+     BSTR   bstrString;
+
+     uLen  = strlen( cString ) + 1;
+
+     if( uLen > 1 )
+     {
+        wString = ( BSTR ) hb_xgrab( uLen * 2 );
+        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
+     }
+     else
+     {
+        // *** This is a speculation about L"" - need to be verified.
+        wString = (BSTR) hb_xgrab( 2 );
+        wString[0] = L'\0';
+     }
+
+     //printf( "\nAnsi: '%s'\n", cString );
+     //wprintf( L"\nWide: '%s'\n", wString );
+
+     bstrString = SysAllocString( wString );
+     hb_xfree( wString );
+
+     return bstrString;
   }
 
   //---------------------------------------------------------------------------//
@@ -412,7 +441,7 @@ RETURN xRet
      VARIANTARG * pArgs = NULL;
      PHB_ITEM uParam;
      int n, nArgs, nArg;
-     BSTR wString;
+     BSTR bstrString;
      BOOL bByRef;
 
      nArgs = hb_pcount();
@@ -461,19 +490,16 @@ RETURN xRet
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   wString = AnsiToWide( hb_parcx( nArg ) );
+                   bstrString = AnsiToBSTR( hb_parcx( nArg ) );
                    hb_itemReleaseString( uParam );
-                   uParam->item.asString.value = (char *) SysAllocString( wString );
-                   hb_xfree( wString );
+                   uParam->item.asString.value = (char *) bstrString;
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
                 }
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   wString = AnsiToWide( hb_parcx( nArg ) );
-                   pArgs[ n ].n1.n2.n3.bstrVal = SysAllocString( wString );
-                   hb_xfree( wString );
+                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToBSTR( hb_parcx( nArg ) );
                 }
                 break;
 
@@ -665,12 +691,6 @@ RETURN xRet
                    sString = WideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
                    SysFreeString( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
-                   // The item should NOT be cleared because we released the value above.
-                   aPrgParams[ n ]->type = HB_IT_NIL;
-
-                   // The Arg should NOT be cleared because we released the value above.
-                   pDispParams->rgvarg[ n ].n1.n2.vt = VT_EMPTY;
-
                    hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
                    break;
 
@@ -760,6 +780,8 @@ RETURN xRet
            {
               switch( pDispParams->rgvarg[ n ].n1.n2.vt )
               {
+                 case VT_BSTR:
+
                  case VT_DISPATCH:
                    //TraceLog( NULL, "***NOT REF*** Dispatch %p\n", pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                    // Can'r CLEAR this Variant.
@@ -1153,23 +1175,23 @@ RETURN xRet
 
   HB_FUNC_STATIC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
-     BSTR wCLSID;
+     BSTR bstrClassID;
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
      IDispatch *pDisp;
 
-     wCLSID = AnsiToWide( hb_parcx( 1 ) );
+     bstrClassID = AnsiToBSTR( hb_parcx( 1 ) );
 
      if( hb_parcx( 1 )[ 0 ] == '{' )
      {
-        s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
+        s_nOleError = CLSIDFromString( bstrClassID, (LPCLSID) &ClassID );
      }
      else
      {
-        s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
+        s_nOleError = CLSIDFromProgID( bstrClassID, (LPCLSID) &ClassID );
      }
 
-     hb_xfree( wCLSID );
+     SysFreeString( bstrClassID );
 
      //TraceLog( NULL, "Result: %i\n", s_nOleError );
 
@@ -1177,9 +1199,9 @@ RETURN xRet
      {
         if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           wCLSID = AnsiToWide( hb_parcx( 2 ) );
-           s_nOleError = CLSIDFromString( wCLSID, &iid );
-           hb_xfree( wCLSID );
+           bstrClassID = AnsiToBSTR( hb_parcx( 2 ) );
+           s_nOleError = CLSIDFromString( bstrClassID, &iid );
+           SysFreeString( bstrClassID );
         }
         else
         {
@@ -1204,7 +1226,7 @@ RETURN xRet
 
   HB_FUNC_STATIC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
-     BSTR wCLSID;
+     BSTR bstrClassID;
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
      IUnknown *pUnk = NULL;
@@ -1215,29 +1237,29 @@ RETURN xRet
 
      if( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
      {
-        wCLSID = AnsiToWide( hb_parcx( 1 ) );
+        bstrClassID = AnsiToBSTR( hb_parcx( 1 ) );
 
         if( hb_parcx( 1 )[ 0 ] == '{' )
         {
-           s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
+           s_nOleError = CLSIDFromString( bstrClassID, (LPCLSID) &ClassID );
         }
         else
         {
-           s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
+           s_nOleError = CLSIDFromProgID( bstrClassID, (LPCLSID) &ClassID );
         }
 
         //s_nOleError = ProgIDFromCLSID( &ClassID, &pOleStr );
         //wprintf( L"Result %i ProgID: '%s'\n", s_nOleError, pOleStr );
 
-        hb_xfree( wCLSID );
+        SysFreeString( bstrClassID );
 
         if( hb_pcount() == 2 )
         {
            if( hb_parcx( 2 )[ 0 ] == '{' )
            {
-              wCLSID = AnsiToWide( hb_parcx( 2 ) );
-              s_nOleError = CLSIDFromString( wCLSID, &iid );
-              hb_xfree( wCLSID );
+              bstrClassID = AnsiToBSTR( hb_parcx( 2 ) );
+              s_nOleError = CLSIDFromString( bstrClassID, &iid );
+              SysFreeString( bstrClassID );
            }
            else
            {
@@ -1365,9 +1387,9 @@ RETURN xRet
 
      if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
-        wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
-        hb_xfree( wMember );
+        bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
+        SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, s_nOleError );
      }
      else
@@ -1378,9 +1400,9 @@ RETURN xRet
      if( s_nOleError != S_OK )
      {
         // Try again without removing the assign prefix (_).
-        wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
-        hb_xfree( wMember );
+        bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
+        SysFreeString( bstrMessage );
         //TraceLog( NULL, "2. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, s_nOleError );
      }
 
