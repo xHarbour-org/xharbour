@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.22 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.23 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -1208,6 +1208,8 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                || dNumber == s_dInfinity || dNumber == -s_dInfinity || _finite(dNumber)==0
             #elif defined(__DJGPP__)
                || !finite( dNumber ) || dNumber == s_dInfinity || dNumber == -s_dInfinity
+            #elif defined(__linux__)
+               || dNumber == s_dInfinity || dNumber == -s_dInfinity || finite(dNumber)==0
             #else
                || dNumber == s_dInfinity || dNumber == -s_dInfinity
             #endif

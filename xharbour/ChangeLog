@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.406 2002/09/27 20:51:48 map Exp $
+ * $Id: ChangeLog,v 1.407 2002/09/28 05:17:07 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-28 09:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/vm/itemapi.c
+    * Fixed GPF when NaN values were converted to string (under linux)
 
 2002-09-28 02:10 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbfcdx/dbfcdx1.c
