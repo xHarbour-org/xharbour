@@ -37,7 +37,7 @@ PROCEDURE MAIN()
    oHLay:SetFill( .T. )
    oHLay:SetExpand( .T. )
 
-   DEFINE BUTTON oButton TEXT "Hello" OF oHLay
+   DEFINE BUTTON oButton TEXT "Hello" OF oHLay FONT "Courier" COLOR "#90CF02"  BGCOLOR "#A38103"  TEXTCOLOR "#DD0000"
    oButton:AddListener( @DumpEvent() )
 
    oHLay:SetBox( .T.,"Horiz Box" )
@@ -51,13 +51,13 @@ PROCEDURE MAIN()
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
 
    @ 10,40  TEXTBOX oOtherBox VAR "Another box" OF oPane
-   @ 10,75  CHECKBOX        TEXT "CkBox 1" VAR .T. OF oPane
-   @ 110,75 CHECKBOX oCheck TEXT "CkBox 2" VAR .F. OF oPane
-   @ 010,105 TOGGLEBUTTON   TEXT "Button Toggle 1" VAR .T. OF oPane
-   @ 120,105 TOGGLEBUTTON   TEXT "Button Toggle 2" VAR .F. OF oPane
+   @ 10,75  CHECKBOX        TEXT "CkBox 1" VAR .T. OF oPane FONT "Sans" COLOR "#09FC20"  BGCOLOR "#3A1803"  TEXTCOLOR "#112233"
+   @ 110,75 CHECKBOX oCheck TEXT "CkBox 2" VAR .F. OF oPane FONT "Courier" COLOR "#222222"  BGCOLOR "#A38103"  TEXTCOLOR "#FF3400"
+   @ 010,105 TOGGLEBUTTON   TEXT "Button Toggle 1" VAR .T. OF oPane FONT "Clean" COLOR "#334455"  BGCOLOR "#66CFAA"  TEXTCOLOR "#FF0000"
+   @ 120,105 TOGGLEBUTTON   TEXT "Button Toggle 2" VAR .F. OF oPane FONT "Helvetica" COLOR "#556677"  BGCOLOR "#44FFCC"  TEXTCOLOR "#DD0000"
 
    // add a button to query the status.
-   @10,135 BUTTON oButton TEXT "Click to Query pane status"  OF oPane
+   @10,135 BUTTON oButton TEXT "Click to Query pane status"  OF oPane FONT "Helvetica" COLOR "#556677"  BGCOLOR "#44FFCC"  TEXTCOLOR "#DD0000"
    oButton:AddEventListener( XWT_E_CLICKED, @PaneStatus() )
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.28 2003/08/27 20:58:34 lculik Exp $
+ * $Id: Changelog,v 1.29 2003/08/29 02:09:24 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-29 15:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  *include/xwtcmd.ch
+   Changed TOGGLEBUTTON and CHECKBOX commands to handle color/font
+  * src/checkbox.prg
+    src/togglebutton.prg
+    ! Added support for color/fonts
+  * src/xwt_gtk/xwt_gtk.c
+    ! minor update
+  * test/xwt_test.prg
+    * now togglebuttons and checkbox has diferent colors
+   Please note this is an work in progress    
+
 
 2003-08-28 23:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *src/button.prg 

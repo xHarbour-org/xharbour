@@ -3,7 +3,7 @@
 
    (C) 2003 Rafa Carmona ( Thefull )
 
-   $Id: togglebutton.prg,v 1.1 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: togglebutton.prg,v 1.2 2003/07/22 16:04:11 xthefull Exp $
 
    Widget class - basic widget & event management
 */
@@ -17,7 +17,12 @@ CLASS XWTToggleButton FROM XWTWidget
    METHOD GetStatus()
 ENDCLASS
 
-METHOD New( cText, bStatus, nX, nY, oParent ) CLASS XWTToggleButton
+METHOD New( cText, bStatus, nX, nY, oParent,cFont, nFontSize , cColor , cBgColor ,cBaseClr, cTxtClr ) CLASS XWTToggleButton
+   Local cFontString :=""
+   Local cColorText  :=""
+   Local aColor
+   Local c
+
    ::Super:New()
    ::nWidgetType := XWT_TYPE_TOGGLEBUTTON
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_TOGGLEBUTTON )
@@ -29,6 +34,86 @@ METHOD New( cText, bStatus, nX, nY, oParent ) CLASS XWTToggleButton
    IF ValType( bStatus ) == "L" .and. bStatus
       XWT_SetProperty( ::oRawWidget, XWT_PROP_STATUS, 1 )
    ENDIF
+
+   IF !Empty( cColor )
+      IF "," in cColor // is an RGB String so Convert
+
+      aColor := HB_aTokens( cColor ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+         
+      ELSE
+         cColorText := cColor
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+   ENDIF
+
+   IF !Empty( cBgColor )
+   cColorText := ""
+      IF "," in cBgColor // is an RGB String so Convert
+
+      aColor := HB_aTokens( cBgColor ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+         
+      ELSE
+         cColorText := cBgColor
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_BGCOLOR,  cColorText )
+   ENDIF
+
+   IF !Empty( cBaseClr )
+   cColorText := ""
+      IF "," in cBaseClr // is an RGB String so Convert
+
+      aColor := HB_aTokens(  cBaseClr ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+         
+      ELSE
+         cColorText :=  cBaseClr
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_BASECOLOR,  cColorText )
+   ENDIF
+
+   IF !Empty( cTxtClr )
+   cColorText := ""
+      IF "," in cTxtClr // is an RGB String so Convert
+
+      aColor := HB_aTokens(  cTxtClr ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+         
+      ELSE
+         cColorText :=  cTxtClr
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXTCOLOR,  cColorText )
+   ENDIF
+  
+   IF Valtype( cFont )  == "C" 
+      cFontString += cFont
+      IF Valtype( nFontSize ) == "N"
+         cFontString += " "+ Str(nFontSize,2,0)
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
+   ENDIF
+
+  IF Valtype( nFontSize ) == "N"
+     cFontString :=  Str( nFontSize ,2 )
+     XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
+  ENDIF
 
    IF ValType( nX ) == "N" .and. ValType( nY ) == "N"
       ::Move( nX, nY )

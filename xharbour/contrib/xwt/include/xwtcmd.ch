@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.3 2003/08/27 20:53:44 lculik Exp $
+   $Id: xwtcmd.ch,v 1.4 2003/08/29 02:07:07 lculik Exp $
 
    Definitions
 */
@@ -45,19 +45,19 @@
 
 // Checkbox ---------------------------------------------------------------------------
 #xcommand DEFINE CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>];
-                          [ MOVE <x>,<y>] [ OF <oParent> ];
-                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+                          [ MOVE <x>,<y>] [ OF <oParent> ]  [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>] ;
+                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> , <(cFont)>,<nSize>,<(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
-#xcommand @ <x>,<y> CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ];
-                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+#xcommand @ <x>,<y> CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ]  [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>] ;
+                  => [<oCheck> := ] XWTCheckbox():New( <cText>,<lStatus>,<x>,<y>,<oParent> , <(cFont)>,<nSize>,<(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
 // ToggleButton ---------------------------------------------------------------------------
 #xcommand DEFINE TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>];
-                          [ MOVE <x>,<y>] [ OF <oParent> ];
-                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+                          [ MOVE <x>,<y>] [ OF <oParent> ]  [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>] ;
+                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> , <(cFont)>,<nSize>,<(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
-#xcommand @ <x>,<y> TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ];
-                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
+#xcommand @ <x>,<y> TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ]  [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>] ;
+                  => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> , <(cFont)>,<nSize>,<(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
 // Splitter --------------------------------------------------------------------------------
 #xcommand DEFINE SPLITTER  [<oSplitter>] [ MODE <nMode> ][ FIRSTWIDGET <oFirstWidget> ][SECONDWIDGET <oSecondWidget>];
