@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.48 2004/07/22 17:51:01 likewolf Exp $
+ * $Id: debugger.prg,v 1.49 2004/08/09 17:10:06 mauriliolongo Exp $
  */
 
 /*
@@ -71,6 +71,20 @@
 
 
 #define  NTRIM(x)    (ALLTRIM(STR(x)))
+
+
+/* A macro to compare filenames on different platforms.
+ * What to do on OS/2? */
+#ifdef __PLATFORM__Windows
+#define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
+#else
+#ifdef __PLATFORM__DOS
+#define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
+#else
+#define FILENAME_EQUAL(s1, s2) ( s1 == s2 )
+#endif
+#endif
+
 
 /* Information structure stored in DATA aCallStack */
 #define CSTACK_FUNCTION    1  //function name
@@ -177,7 +191,8 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
 
         IF s_oDebugger:lToCursor
           IF ( s_oDebugger:aToCursor[1] == uParam1 .AND. ;
-               s_oDebugger:aToCursor[2] == s_oDebugger:aCallStack[1][ CSTACK_MODULE ] )
+               FILENAME_EQUAL( s_oDebugger:aToCursor[2], ;
+                               s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) )
             s_oDebugger:lToCursor := .F.
           ELSE
             s_oDebugger:lToCursor := ( !s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
@@ -921,9 +936,9 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          cResult := CreateExpression( cParam, aCmnd )
          IF( EMPTY(cResult) )
             //valid syntax
-       ::RestoreAppState()
+            ::RestoreAppState()
             cResult := GetWatchValue( aCmnd, @lValid )
-       ::SaveAppState()
+            ::SaveAppState()
             IF( aCmnd[WP_TYPE] == "??" )
                IF( lValid )
                   ::Inspect( aCmnd[WP_EXPR], cResult )
@@ -953,8 +968,8 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
            IF ( n := At( " ", cParam ) ) > 0
               cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
               cParam := Left( cParam, n - 1 )
-      ELSE
-         cParam1 := ::cPrgName
+           ELSE
+              cParam1 := ::cPrgName
            ENDIF
            AAdd( ::aBreakPoints, { Val( cParam ), strip_path( cParam1 ) } )
         ELSE
@@ -1612,7 +1627,8 @@ return nil
 
 
 METHOD IsBreakPoint( nLine, cPrgName ) CLASS TDebugger
-return AScan( ::aBreakPoints, { | aBreak | (aBreak[ 1 ] == nLine) .AND. (aBreak [ 2 ] == cPrgName) } ) != 0
+RETURN AScan( ::aBreakPoints, {|aBreak| aBreak[ 1 ] == nLine ;
+                                        .AND. FILENAME_EQUAL( aBreak[ 2 ], cPrgName ) } ) != 0
 
 
 METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
@@ -1705,7 +1721,7 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       if ::lShowStatics
          if Type( "__DbgStatics" ) == "A"
             cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
-            n := ASCAN( __dbgStatics, {|a| a[1]==cName} )
+            n := ASCAN( __dbgStatics, {|a| FILENAME_EQUAL( a[1], cName ) } )
             IF ( n > 0 )
                aVars := __DbgStatics[ n ][ 2 ]
                for m := 1 to Len( aVars )
@@ -1845,7 +1861,8 @@ METHOD Open() CLASS TDebugger
 
    cFileName:= ALLTRIM( cFileName )
 
-   if !EMPTY(cFileName) .AND. (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
+   IF ( !Empty( cFileName ) ;
+        .AND. ( ValType( ::cPrgName ) == 'U' .OR. !FILENAME_EQUAL( cFileName, ::cPrgName ) ) )
       if ! File( cFileName ) .and. ! Empty( ::cPathForFiles )
          cFileName := ::LocatePrgPath( cFileName )
          if Empty( cFileName )
@@ -1999,13 +2016,14 @@ return nil
 
 // check for breakpoints in the current file and display them
 METHOD RedisplayBreakPoints() CLASS TDebugger
-   local n
-   for n := 1 to Len( ::aBreakpoints )
-      if ::aBreakpoints[ n ] [ 2 ] == strip_path( ::cPrgName )
-        ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ] [ 1 ], .T.)
-      Endif
-   next
-return nil
+  LOCAL n
+  
+  FOR n := 1 TO Len( ::aBreakpoints )
+    IF FILENAME_EQUAL( ::aBreakpoints[ n ][ 2 ], strip_path( ::cPrgName ) )
+      ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ][ 1 ], .T.)
+    ENDIF
+  NEXT
+RETURN NIL
 
 
 METHOD RefreshVars() CLASS TDebugger
@@ -2367,7 +2385,8 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
 
       if ! empty( cPrgName )
 
-         if ( strip_path( cPrgName ) != strip_path( ::cPrgName ) .OR. ::oBrwText == NIL )
+         if ( !FILENAME_EQUAL( strip_path( cPrgName ), strip_path( ::cPrgName ) ) ;
+              .OR. ::oBrwText == NIL )
 
             if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
                cPrgName := ::LocatePrgPath( cPrgName )
@@ -2375,14 +2394,14 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
 
             ::cPrgName := cPrgName
 
-       IF !File( cPrgName )
-          ::oBrwText := NIL
-          ::oWndCode:Browser := NIL
-          ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_MODULE ] + ;
-                                 "  File not found" )
+            IF !File( cPrgName )
+               ::oBrwText := NIL
+               ::oWndCode:Browser := NIL
+               ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_MODULE ] + ;
+                                     "  File not found" )
                ::oWndCode:Refresh()
-          RETURN NIL
-       ENDIF
+               RETURN NIL
+            ENDIF
 
             if ::oBrwText == nil
                ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
@@ -2549,13 +2568,12 @@ return nil
 
 
 METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
-   // always treat filename as lower case - we need it consistent for comparisons
    LOCAL nPos:=RAT( ":", cModuleName )
    LOCAL aEntry := { ;
      IIF(::lCodeBlock,"(b)","")+SubStr( cModuleName, nPos + 1 ),;    //function name
      {},;   //local vars
      nil,;  //line no, nil means that no line number is stored yet
-     lower( strip_path( LEFT( cModuleName, nPos - 1 ) ) ),; // and the module name
+     strip_path( LEFT( cModuleName, nPos - 1 ) ),; // and the module name
      {}, ;  // static vars
      nProcLevel }
 
@@ -3293,6 +3311,7 @@ STATIC FUNCTION CreateExpression( cExpr, aWatch )
 
 RETURN cRet
 
+
 STATIC FUNCTION IsIdentChar( cChar, cSeeAlso )
 
    IF( ISALPHA(cChar) .OR. ISDIGIT(cChar) .OR. cChar == '_' )
@@ -3300,6 +3319,7 @@ STATIC FUNCTION IsIdentChar( cChar, cSeeAlso )
    ENDIF
 
 RETURN IIF(cSeeAlso!=NIL, cChar $ cSeeAlso, .F. )
+
 
 STATIC PROCEDURE StripUntil( pcLine, i, cChar )
   LOCAL j, n
@@ -3315,6 +3335,7 @@ STATIC PROCEDURE StripUntil( pcLine, i, cChar )
   ENDIF
 
 RETURN
+
 
 STATIC FUNCTION IsValidStopLine( cLine )
   LOCAL i, c, c2
@@ -3372,9 +3393,11 @@ return iif( ! s_oDebugger:lMonoDisplay, s_oDebugger:aColors,;
            { "W+/N", "W+/N", "N/W", "N/W", "N/W", "N/W", "W+/N",;
              "N/W", "W+/W", "W/N", "W+/N" } )
 
+
 function __Dbg()
 
 return s_oDebugger
+
 
 static function myColors( oBrowse, aColColors )
    local i
@@ -3388,6 +3411,7 @@ static function myColors( oBrowse, aColColors )
    oBrowse:colpos := nColPos
 
 return nil
+
 
 static procedure RefreshVarsS( oBrowse )
 
@@ -3403,6 +3427,7 @@ static procedure RefreshVarsS( oBrowse )
    oBrowse:hilite()
 
 return
+
 
 static function ArrayBrowseSkip( nPos, oBrwSets, n )
 
@@ -3476,5 +3501,5 @@ STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
 
   setCursor( nOldCursor )
 
-  RETURN uTemp
+RETURN uTemp
 #endif
