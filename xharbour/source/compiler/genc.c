@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: genc.c,v 1.4 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -1861,8 +1861,8 @@ static HB_GENC_FUNC( hb_p_localnearsetstr )
 {
 
    ULONG ulStart = lPCodePos;
-   USHORT wLen = pFunc->pCode[ lPCodePos + 2 ] +
-                 pFunc->pCode[ lPCodePos + 3 ] * 256;
+   USHORT uLen   = pFunc->pCode[ lPCodePos + 2 ] +
+                   pFunc->pCode[ lPCodePos + 3 ] * 256;
 
    fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETSTR, %i, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -1871,16 +1871,16 @@ static HB_GENC_FUNC( hb_p_localnearsetstr )
 
    if( cargo->bVerbose )
    {
-         fprintf( cargo->yyc, "\t/* %i */", wLen );
+      fprintf( cargo->yyc, "\t/* %i */", uLen );
    }
 
    lPCodePos += 4;
 
-   if( wLen > 0 )
+   if( uLen > 0 )
    {
       fprintf( cargo->yyc, "\n\t" );
 
-      while( wLen-- )
+      while( uLen-- )
       {
          BYTE uchr = ( BYTE ) pFunc->pCode[ lPCodePos++ ];
          /*

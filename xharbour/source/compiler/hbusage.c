@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.41 2002/01/08 08:59:52 patrickmast Exp $
+ * $Id: hbusage.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -180,7 +180,6 @@ void hb_compPrintCredits( void )
  */
 void hb_compPrintLogo( void )
 {
-   printf( "Harbour Compiler Alpha build %d.%d (%s)\n",
-      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   printf( "Copyright 1999-2002, http://www.harbour-project.org/\n" );
+   printf( "xHarbour Compiler build %d.%d.%d (%s)\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   printf( "Copyright 1999-2002, http://www.xharbour.org http://www.harbour-project.org/\n" );
 }

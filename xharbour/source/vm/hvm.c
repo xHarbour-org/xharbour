@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.31 2002/01/27 09:01:57 ronpinkas Exp $
+ * $Id: hvm.c,v 1.32 2002/01/27 10:34:18 ronpinkas Exp $
  */
 
 /*
@@ -1087,17 +1087,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTR") );
          {
             USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
-            char *sString = ( char * ) ( pCode ) + w + 3;
 
-            /* uiSize guranteed to not be 0 (or HB_P_PUSHSTRSHORT would be used!) */
-            if( sString[uiSize - 1] == '\0' )
-            {
-               hb_itemPushStaticString( sString, ( ULONG )( uiSize - 1 ) );
-            }
-            else
-            {
-               hb_vmPushString( sString, ( ULONG )( uiSize ) );
-            }
+            hb_itemPushStaticString( ( char * ) ( pCode ) + w + 3, ( ULONG )( uiSize - 1 ) );
+
             w += ( 3 + uiSize );
             break;
          }
@@ -1106,16 +1098,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTRSHORT") );
          {
             BYTE uiSize = pCode[ w + 1 ];
-            char *sString = ( char * ) ( pCode ) + w + 2;
 
-            if( uiSize && sString[uiSize - 1] == '\0' )
-            {
-               hb_itemPushStaticString( sString, ( ULONG ) ( uiSize - 1 ) );
-            }
-            else
-            {
-               hb_vmPushString( sString, ( ULONG ) uiSize );
-            }
+            hb_itemPushStaticString( ( char * ) ( pCode ) + w + 2, ( ULONG ) ( uiSize - 1 ) );
 
             w += ( 2 + uiSize );
             break;
@@ -1301,8 +1285,28 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
          case HB_P_LOCALNEARSETSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
-            /* TODO. */
+         {
+            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            USHORT uiSize = pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 );
+
+            if( HB_IS_BYREF( pLocal ) )
+            {
+               pLocal = hb_itemUnRef( pLocal );
+            }
+
+            if( HB_IS_COMPLEX( pLocal ) )
+            {
+               hb_itemClear( pLocal );
+            }
+
+            pLocal->type = HB_IT_STRING;
+            pLocal->item.asString.bStatic = TRUE;
+            pLocal->item.asString.value = ( char * ) ( pCode ) + w + 4 ;
+            pLocal->item.asString.length = ( ULONG ) ( uiSize - 1 );
+
+            w += ( 4 + uiSize );
             break;
+         }
 
          case HB_P_ADDINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );

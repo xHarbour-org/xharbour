@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.23 2002/01/08 08:59:52 patrickmast Exp $
+ * $Id: hbver.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -430,8 +430,7 @@ char * hb_verHarbour( void )
 
    pszVersion = ( char * ) hb_xgrab( 80 );
 
-   sprintf( pszVersion, "Harbour Alpha build %d.%d Intl. (%s)",
-      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   sprintf( pszVersion, "xHarbour build %d.%d.%d Intl. (%s)", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
 
    return pszVersion;
 }

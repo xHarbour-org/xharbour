@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.6 2002/01/23 16:48:31 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.7 2002/01/26 20:16:18 ronpinkas Exp $
  */
 
 /*
@@ -2001,19 +2001,34 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
 
              #else
 
-               short iNewVal, iLocal;
+               short iLocal;
 
                if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
                    pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                {
-                  iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-
                   if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
                   {
-                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), ( BOOL ) 0 );
+                     short iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), FALSE );
                      HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
-                     return pSelf;;
+                     return pSelf;
+                  }
+               }
+               else if( pSelf->value.asOperator.pRight->ExprType == HB_ET_STRING  && pSelf->value.asOperator.pRight->ulLength <= 65535 )
+               {
+                  if( 0 && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  {
+                     unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 ) ;
+
+                     hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+
+                     hb_compGenPCodeN( pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+
+                     HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+                     return pSelf;
                   }
                }
 
@@ -2053,18 +2068,31 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
 
              #else
 
-               short iNewVal, iLocal;
+               short iLocal;
 
                if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
                    pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                {
-                  iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+                  short iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
                   if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
                   {
-                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), ( BOOL ) 0 );
+                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), FALSE );
 
-                     return pSelf;;
+                     return pSelf;
+                  }
+               }
+               else if( pSelf->value.asOperator.pRight->ExprType == HB_ET_STRING  && pSelf->value.asOperator.pRight->ulLength <= 65535 )
+               {
+                  if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  {
+                     unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 );
+
+                     hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+
+                     hb_compGenPCodeN( pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+
+                     return pSelf;
                   }
                }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.3 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -248,6 +248,13 @@ static HB_FIX_FUNC( hb_p_staticname )
    return (USHORT) (lPCodePos - ulStart + 1) ;
 }
 
+static HB_FIX_FUNC( hb_p_localnearsetstr )
+{
+   HB_SYMBOL_UNUSED( cargo );
+   return 4 + pFunc->pCode[ lPCodePos + 2 ] +
+              pFunc->pCode[ lPCodePos + 3 ] * 256;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -382,7 +389,7 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_MACROLISTEND,         */
    NULL,                       /* HB_P_LOCALNEARADDINT,      */
    NULL,                       /* HB_P_LOCALNEARSETINT,      */
-   NULL,                       /* HB_P_LOCALNEARSETSTR,      */
+   hb_p_localnearsetstr,       /* HB_P_LOCALNEARSETSTR,      */
    NULL,                       /* HB_P_ADDINT,               */
    NULL,                       /* HB_P_LEFT,                 */
    NULL,                       /* HB_P_RIGHT,                */
