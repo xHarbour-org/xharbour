@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1842 2003/12/10 00:41:36 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1843 2003/12/10 18:30:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2003-12-10 10:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/dbcmd.c
-    - Removed redundant error processing in DBSELECTAREA
+    - Removed redundant error processing in HB_FUNC( DBSELECTAREA )
 
   * source/rtl/errorsys.prg
     * Minor optimizations
