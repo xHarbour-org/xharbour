@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: net.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 #include "hbapi.h"
 #include "hbfast.h"
 
-#if defined(HB_OS_OS2) && defined(__GNUC__)
+#if defined(HB_OS_OS2) || defined(__GNUC__)
 
    #include "hb_io.h"
 
@@ -93,10 +93,11 @@
 
 HB_FUNC( NETNAME )
 {
-#if defined(HB_OS_OS2) && defined(__GNUC__)
+#if defined(HB_OS_OS2) || defined(__GNUC__)
 
    {
       char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
+
       pszValue[ 0 ] = '\0';
 
       gethostname( pszValue, MAXGETHOSTNAME );
