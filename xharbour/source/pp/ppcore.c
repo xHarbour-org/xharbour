@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.68 2003/05/09 18:44:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.69 2003/05/12 20:49:55 ronpinkas Exp $
  */
 
 /*
@@ -2963,9 +2963,6 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             }
             else if( IsInStr( **ptri, sZnaki ) )
             {
-               // Must terminate macro if any.
-               bMacro = FALSE;
-
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
                {
@@ -2981,6 +2978,8 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                   {
                      *expreal++ = **ptri;
                   }
+
+                  bMacro = FALSE;
                   (*ptri)++;
                   lens++;
                   continue;
@@ -2991,6 +2990,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                {
                   State = STATE_EXPRES;
                }
+
+               // Must terminate macro if any.
+               bMacro = FALSE;
             }
             else if( **ptri == '(' )
             {

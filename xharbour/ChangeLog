@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1033 2003/05/17 18:24:58 druzus Exp $
+ * $Id: ChangeLog,v 1.1034 2003/05/19 12:46:22 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-19 11:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Minor fix to recent fix regarding operators as Macro terminator in getExpReal().
 
 2003-05-19 14:45 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/gtcrs/gtcrs.c
@@ -56,7 +60,7 @@
       xharbour-static (static libs for developers who want to produce static
       binaries). xharbour rpm has additional tools 'xhbcmp', 'xhlnk', 'xhbmk'
       See README.RPM for detailed description.
-    
+
   + xharbour/make_rpm.sh
     + simple script which automaticaly packs the CVS tree and builds
       RPMs
