@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.5 2003/02/11 03:44:28 paultucker Exp $
+rem $Id: make_vc.bat,v 1.6 2003/04/04 17:21:14 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -20,7 +20,7 @@ if "%1"=="/?" set rem=echo.
 %rem% versions of the harbour programs will be placed into the bin directory.
 %rem% CLEAN, delete targets.
 %rem% /A clean, then compile all - In addition, this will compile standard
-%rem%    libs as well as Multi-Threaded libs.  If you set hb_mt=[anything]
+%rem%    libs as well as Multi-Threaded libs.  If you set HB_MT=MT
 %rem%    prior to executing this batch file, then the Multi-Threaded versions
 %rem%    of the programs will be active in the bin dir - otherwise, it will
 %rem%    be the standard versions.
@@ -65,17 +65,10 @@ if "%hb_mt%"=="" set hb_mt=xyzzy
 if "%hb_mt%"=="xyzzy" set hb_mt=
    if errorlevel 1 goto BUILD_ERR
 
-
 :BUILD_OK
 
+   copy bin\vc%HB_MT%\*.exe bin > nul
    copy lib\vc\*.lib lib > nul
-
-if not "HB_MT"=="" goto MT
-   copy bin\vc\*.exe bin > nul
-   goto EXIT
-
-:MT
-   copy bin\vcmt\*.exe bin > nul
    goto EXIT
 
 :BUILD_ERR

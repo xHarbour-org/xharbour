@@ -1,5 +1,5 @@
 /*                                
- * $Id: ChangeLog,v 1.912 2003/04/04 19:11:25 walito Exp $
+ * $Id: ChangeLog,v 1.913 2003/04/04 19:42:59 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-04 18:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * make_vc.bat
+    * Correction: HB_MT should be set to MT or not at all.
+  * bin/bld.bat
+    + /nodefaultlib for msvc.
+  * makefile.nt
+  * makefile.vc
+    * Corrected use of LDFLAGS
 
 2003-04-04 16:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source\rtl\tbrowse.prg
@@ -26,7 +35,7 @@
   * makefile.nt
   * makefile.vc
   * make_vc.bat
-    * If you set HB_MT=<anything>, enables Multi-Thread support.
+    * If you set HB_MT=MT, enables Multi-Thread support.
     * If you need dbfntx.lib as well as dbfntxMT.lib (for example), then
     * you'll have to make_vc once without hb_mt set and once with.
     * additionally, make_vc /a will still create all targets.
