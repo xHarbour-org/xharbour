@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.45 2004/06/19 12:27:00 modalsist Exp $
+/* $Id: teditor.prg,v 1.45 2004/06/19 15:30:43 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -122,7 +122,6 @@ CLASS HBEditor
    DATA  nNumCols       INIT 1      // How many columns / rows can be displayed inside editor window
    DATA  nNumRows       INIT 1
 
-   DATA  lInsert        INIT .F.    // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
    DATA  nTabWidth      INIT 5      // Size of Tab chars
    DATA  lEditAllow     INIT .T.    // Are changes to text allowed?
    DATA  lSaved         INIT .F.    // True if user exited editor with K_CTRL_W
@@ -142,6 +141,12 @@ CLASS HBEditor
    DATA  ProcLine        INIT 0
 
    DATA  nCurrentCursor  INIT SetCursor()
+
+   // Class DATA can be faster, but since the user can change directly
+   // READINSERT(), ::lInsert must check in it.
+   // DATA  lInsert        INIT .F.              // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
+   METHOD lInsert()              BLOCK { | Self | Set( _SET_INSERT ) }
+   METHOD _lInsert( lInsert )    BLOCK { | Self, lInsert | IF( ISLOGICAL( lInsert ), Set( _SET_INSERT, lInsert ), Set( _SET_INSERT ) ) }
 
    METHOD  New( cString, nTop, nLeft, nBottom,;             // Converts a string to an array of strings splitting input string at EOL boundaries
                nRight, lEditMode, nLineLength, nTabSize, nTextRow, nTextCol, nWndRow, nWndCol )
@@ -273,7 +278,9 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    // set correct insert state
    if ::lEditAllow
-      ::InsertState( ReadInsert() )
+      // Force to redraw INS message
+      ::InsertState( ! SET( _SET_INSERT ) )
+      ::InsertState( ! SET( _SET_INSERT ) )
    endif
 
    // No need to save
@@ -1155,7 +1162,7 @@ METHOD K_Return() CLASS HBEditor
             if ::nCol > ::LineLen( ::nRow )
                ::AddLine( "", .F. )
             else
-               ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow )
+               ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
             endif
          ELSEIF ::aText[ ::nRow ]:lSoftCR
             ::aText[ ::nRow + 1 ]:cText := Substr( ::aText[ ::nRow ]:cText, ::nCol ) +" "+ ::aText[ ::nRow + 1 ]:cText
@@ -1235,7 +1242,7 @@ return Self
 //
 METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
 
-   IF nRow >= ::naTextLen
+   IF nRow > ::naTextLen
       AAdd( ::aText, HBTextLine():New( cLine, lSoftCR ) )
    ELSE
       AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
@@ -1639,13 +1646,16 @@ return ::nPhysRow
 //
 METHOD InsertState( lInsState ) CLASS HBEditor
 
-   IF ISLOGICAL( lInsState )
+   IF ISLOGICAL( lInsState ) .and. ::lInsert != lInsState
       ::lInsert := lInsState
+
+      // Redundant, but useful if ::lInsert is used as class DATA
       SET( _SET_INSERT, lInsState )
-      if ::lInsert
+
+      if lInsState
          Setcursor( 1 )
       else
-      Setcursor( 2 )
+         Setcursor( 2 )
       endif
    ENDIF
 
