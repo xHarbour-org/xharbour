@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.25 2002/10/23 01:50:30 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.26 2002/10/25 03:06:09 ronpinkas Exp $
  */
 
 /*
@@ -285,7 +285,7 @@ void HB_EXPORT hb_itemSetCMemo( PHB_ITEM pItem )
 
 /* NOTE: The caller should free the pointer if it's not NULL. [vszakats] */
 
-char * HB_EXPORT hb_itemGetC( PHB_ITEM pItem )
+char HB_EXPORT * hb_itemGetC( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetC(%p)", pItem));
 
@@ -306,7 +306,7 @@ char * HB_EXPORT hb_itemGetC( PHB_ITEM pItem )
 /* NOTE: Caller should not modify the buffer returned by this function.
          [vszakats] */
 
-char * HB_EXPORT hb_itemGetCPtr( PHB_ITEM pItem )
+char HB_EXPORT * hb_itemGetCPtr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetCPtr(%p)", pItem));
 
@@ -377,7 +377,7 @@ BOOL HB_EXPORT hb_itemFreeC( char * szText )
          The correct buffer size is 9 bytes: char szDate[ 9 ]
          [vszakats] */
 
-char * HB_EXPORT hb_itemGetDS( PHB_ITEM pItem, char * szDate )
+char HB_EXPORT * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDS(%p, %s)", szDate));
 
@@ -514,7 +514,7 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
    return 0;
 }
 
-void * HB_EXPORT hb_itemGetPtr( PHB_ITEM pItem )
+void HB_EXPORT * hb_itemGetPtr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetPtr(%p)", pItem));
 
@@ -963,7 +963,7 @@ USHORT HB_EXPORT hb_itemType( PHB_ITEM pItem )
    }
 }
 
-char * HB_EXPORT hb_itemTypeStr( PHB_ITEM pItem )
+char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemTypeStr(%p)", pItem));
 
@@ -1199,7 +1199,7 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
          buffer, but ONLY if the return value is not a NULL pointer! (If a NULL
          pointer is returned, then there was a conversion error.)
 */
-char * HB_EXPORT hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
+char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 {
    char * szResult = NULL;
 
@@ -1421,7 +1421,7 @@ char * HB_EXPORT hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          As a side effect the caller should never modify the returned buffer
          since it may point to a constant value. [vszakats] */
 
-char * HB_EXPORT hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
+char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 {
    char * buffer;
 
@@ -1491,7 +1491,7 @@ char * HB_EXPORT hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
    being padded. If date, convert to string using hb_dateFormat(). If numeric,
    convert to unpadded string. Return pointer to string and set string length */
 
-char * HB_EXPORT hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize )
+char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize )
 {
    char * szText;
 
