@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1787 2003/11/27 21:44:52 likewolf Exp $
+ * $Id: ChangeLog,v 1.1788 2003/11/27 23:39:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-28 11:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/mainwin.c
+    + hb_hPrevInstance variable was not used... funny, as it is declared.
+      Now it records WinMain() hPrevInstance.
 
 2003-11-28 00:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/thread.c

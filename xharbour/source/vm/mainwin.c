@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.4 2003/07/05 07:51:55 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.5 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -76,10 +76,10 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
-   HB_SYMBOL_UNUSED( hPrevInstance );
    HB_SYMBOL_UNUSED( iCmdShow );
 
    hb_hInstance = hInstance;
+   hb_hPrevInstance = hPrevInstance;
    hb_iCmdShow = iCmdShow;
 
    GetModuleFileName( hInstance, szAppName, 249 );
