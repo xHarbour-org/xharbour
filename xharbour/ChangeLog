@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.716 2003/02/14 17:13:30 jonnymind Exp $
+ * $Id: ChangeLog,v 1.717 2003/02/14 21:28:00 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-02-15 00:01 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/mysql/mysql.prg
+    ! Fixed Eof() in method GetRow() from TMySQLQuery
+    % changed Set(4) to Lower( Set( 4 ) )
+    Eof() Bug reported by Rafael Letocart
 
 2003-02-14 19:10 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/zipnew.cpp
