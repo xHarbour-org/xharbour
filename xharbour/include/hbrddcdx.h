@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.26 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.27 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
@@ -456,7 +456,7 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip );
 #define hb_cdxFieldDisplay                         NULL
 #define hb_cdxFieldInfo                            NULL
 #define hb_cdxFieldName                            NULL
-#define hb_cdxFlush                                NULL
+static ERRCODE hb_cdxFlush( CDXAREAP pArea );
 #define hb_cdxGetRec                               NULL
 #define hb_cdxGetValue                             NULL
 #define hb_cdxGetVarLen                            NULL

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2571 2004/03/14 16:50:09 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2572 2004/03/14 17:26:41 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,89 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-15 13:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! some small synchronizations with Harbour and fixed some bugs:
+      tag name just after "index on ...", setting BOF()/EOF() flags
+      in SKIP(), SKIP() when BOF() is set, etc. Still SEEK doesn't
+      respect filters()
+
+  * xharbour/source/rdd/workarea.c
+    * some small optimizations in dbeval()
+
+  * xharbour/include/hbapi.h
+    * optimized version of HB_IS_COMPLEX() - now disabled
+
+  * xharbour/include/hbrddcdx.h
+    + force flushing index on commit()
+
+  * xharbour/include/dbinfo.ch
+    + new DBORDERINFO() params: DBOI_SKIPEVAL, DBOI_SKIPEVALBACK,
+      DBOI_SKIPREGEX, DBOI_SKIPREGEXBACK for poor index skipping
+      until evaluated code block or regular expression doesn't
+      return TRUE. Code block receive two parameters index key
+      and record number. The above is enough to implement WILDSEEK()
+      or any other even much more powerful functions on .prg level
+      if someone have a while I'll be thankfull.
+      How to use it:
+        /* standard version */
+        cBLock:={|key,rec|rec%501==0 .and. "Z"$key .and. !deleted()}
+        dbgotop()
+        while !eof()
+           if eval( cBlock, ordkeyval(), recno() )
+              qout( ordkeyval(), recno() )
+           endif
+           dbskip()
+        enddo
+
+        /* much faster optimized version */
+        dbgotop()
+        while !eof()
+           if eval( cBlock, ordkeyval(), recno() )
+              qout( ordkeyval(), recno() )
+           endif
+           dborderinfo(DBOI_SKIPEVAL,,,cBLock)
+        enddo
+        /* remember that in cBlock you can use fields in area or deleted()
+           flag but as far as you don't evaluate it then DBF file in not
+           read. So it's very important to put them at the end of expression,
+           this version:
+           cBLock:={|key,rec|!deleted() .and. rec%501==0 .and. "Z"$key}
+           will be less efficient because deleted() will force to read
+           the record on each block evaluation when it the previous one
+           it was only if rec%501==0 and "Z"$key was TRUE. */
+
+        /* regular expresion version */
+        cRegex:=".*1001[A-N].*"
+        cRegex:=HB_REGEXCOMP(cRegex)
+        dbgotop()
+        while !eof()
+           if ordkeyval() HAS cRegEx
+              qout( ordkeyval(), recno() )
+           endif
+           dborderinfo(DBOI_SKIPREGEX,,,cRegex)
+        enddo
+        
+        for more test and time comparision please try:
+        xharbour/tests/skipeval.prg
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + force flushing index on commit()
+    + new DBORDERINFO() params: DBOI_SKIPEVAL, DBOI_SKIPEVALBACK,
+      DBOI_SKIPREGEX, DBOI_SKIPREGEXBACK for poor index skipping
+    ! fixed bug in SKIP(-1) with BOF() flag set - it was DBGOTOP()
+      not real backward skipping.
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.h
+    * removed some commented definitions
+
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    * changed default terminal charset for Linux and chars in
+      range (128-255)
+
+  + xharbour/tests/skipeval.prg
+    * small program to demonstrate SKIPEVAL/SKIPREGEX()
 
 2004-03-14 23:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.12 2003/11/05 03:32:48 druzus Exp $
+ * $Id: dbfcdx1.h,v 1.13 2003/12/24 10:21:34 ronpinkas Exp $
  */
 
 /*
@@ -50,20 +50,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-/*
-#define CDX_MAX_TAG_NAME_LEN            10
-
-#define CDX_MAX_REC_NUM                 0x7FFFFFFFL
-#define CDX_IGNORE_REC_NUM              -1
-#define PAGE_ROOT                       1
-#define PAGE_NODE                       2
-#define PAGE_LEAF                       3
-#define TOP_RECORD                      1
-#define BTTM_RECORD                     2
-#define PREV_RECORD                     3
-#define NEXT_RECORD                     4
-*/
 
 #define CDX_INTERNAL_SPACE              500
 #define CDX_EXTERNAL_SPACE              488

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.19 2004/02/23 10:01:40 andijahja Exp $
+ * $Id: workarea.c,v 1.20 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -706,24 +706,19 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 
    if( !pEvalInfo->dbsci.lNext || lNext > 0 )
    {
+      bFor = TRUE;
       while( !pArea->fEof )
       {
-
-        if( pEvalInfo->dbsci.itmCobWhile )
-        {
-            bWhile = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) );
-            if( !bWhile )
+         if( pEvalInfo->dbsci.itmCobWhile )
+         {
+            if ( ! hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) ) )
                break;
          }
-         else
-            bWhile = TRUE;
 
          if( pEvalInfo->dbsci.itmCobFor )
             bFor = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) );
-         else
-            bFor = TRUE;
 
-         if( bFor && bWhile )
+         if( bFor )
             hb_vmEvalBlock( pEvalInfo->itmBlock );
 
          if( pEvalInfo->dbsci.lNext && --lNext < 1 )

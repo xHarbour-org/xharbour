@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.1 2002/12/23 20:04:15 lculik Exp $
+ * $Id: dbinfo.ch,v 1.2 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -109,6 +109,13 @@
 #define DBOI_AUTOOPEN             62  /* Flag for automatically opening structural indexes      */
 #define DBOI_AUTOORDER            63  /* When a structural index is opened, the order to be set */
 #define DBOI_AUTOSHARE            64  /* When a network is detected, open the index shared, otherwise open exclusively   */
+
+/* xHarbour extensions */
+#define DBOI_SKIPEVAL            100  /* skip while code block doesn't return TRUE */
+#define DBOI_SKIPEVALBACK        101  /* skip backward while code block doesn't return TRUE */
+#define DBOI_SKIPREGEX           102  /* skip while regular expression on index key doesn't return TRUE */
+#define DBOI_SKIPREGEXBACK       103  /* skip backward while regular expression on index key doesn't return TRUE */
+
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

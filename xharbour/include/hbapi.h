@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.122 2004/02/22 20:37:39 andijahja Exp $
+ * $Id: hbapi.h,v 1.123 2004/02/22 22:16:21 andijahja Exp $
  */
 
 /*
@@ -89,6 +89,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE | HB_IT_LONGLONG ) )
 #define HB_IT_NUMERINT  ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_LONGLONG ) )
 #define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
+#define HB_IT_COMPLEX   ( ( USHORT ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH ) )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
 #define HB_IS_BYREF( p )   ( ( p )->type & HB_IT_BYREF )
@@ -102,7 +103,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_LOGICAL( p ) HB_IS_OF_TYPE( p, HB_IT_LOGICAL )
 #define HB_IS_LONG( p )    HB_IS_OF_TYPE( p, HB_IT_LONG )
 #define HB_IS_NUMERIC( p ) ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
-#define HB_IS_NUMBER( p ) ( ( p )->type & HB_IT_NUMERIC )
+#define HB_IS_NUMBER( p )  ( ( p )->type & HB_IT_NUMERIC )
 #define HB_IS_NUMBER_INT( p ) ( ( p )->type & HB_IT_NUMERINT )
 #define HB_IS_OBJECT( p )  ( HB_IS_OF_TYPE( p, HB_IT_OBJECT ) && ( p )->item.asArray.value->uiClass != 0 )
 #define HB_IS_STRING( p )  ( ( ( p )->type & ~( HB_IT_BYREF | HB_IT_MEMOFLAG ) ) == HB_IT_STRING )
@@ -113,7 +114,9 @@ HB_EXTERN_BEGIN
 #define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
 #define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
 #define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
-#define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
+/* Optimized version */
+/* #define HB_IS_COMPLEX( p ) ( ( p )->type & HB_IT_COMPLEX ) */
+#define HB_IS_SIMPLE( p )  ( ! HB_IS_COMPLEX( p ) )
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
 #define ISCHAR( n )        ( hb_param( n, HB_IT_STRING ) != NULL )
