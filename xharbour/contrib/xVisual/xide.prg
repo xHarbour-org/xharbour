@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.109 2002/10/31 04:09:00 what32 Exp $
+ * $Id: xide.prg,v 1.110 2002/10/31 08:19:03 what32 Exp $
  */
 
 /*
@@ -260,7 +260,6 @@ ENDCLASS
 
 CLASS OpenProject FROM TOpenDialog
    METHOD Create() INLINE ::Filter     := { {"xIde Files (*.prg)","*.prg"} },;
-                          ::handle     := MainFrame:handle,;
                           ::Title      := "Open Project",;
                           ::InitialDir := GetModuleFileName(),;
                           ::FileName   := space( 255 ),;
