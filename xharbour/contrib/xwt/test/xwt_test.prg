@@ -1,23 +1,27 @@
 #include "xwt.ch"
 #include "xwtcmd.ch"
 
+
+
 GLOBAL oFileSel
 GLOBAL oOtherBox
 
 #xcommand ? <data,...> => OutStd( <data>, HB_OSNewLine() )
 
 PROCEDURE MAIN()
-   LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
-   LOCAL oMenuSec, oTextbox, oLabel, oViewPort, oPane
+   LOCAL oWindow, oButton
+   LOCAL oTextbox, oLabel, oViewPort, oPane
    LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
-   LOCAL oGrid, obtnStatus
-   LOCAL oList, oCheck
+   LOCAL oGrid
+   LOCAL oList, oCheck, aInputs, oInput, oRadioPanel
 
    XwtInit()
 
    /*** Window creation ****/
    oWindow:= XwtFrameWindow():New("Hola Mundo. Thefull desde Linux")
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
+   oWindow:SetMenuBar( BuildMenu() )
+
 
    /*** Splitter panes layout( our new main widget) ***/
    DEFINE LAYOUT oVLay  MODE XWT_LM_VERT PADDING 5 BORDER 2
@@ -118,23 +122,7 @@ PROCEDURE MAIN()
    oList:SetColumnEditable( 0 )
    oVLay:Add( oList )
 
-   /***** MENU design *****/
-
-   MENU oMenu PROMPT "File"
-        MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
-        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5
-
-        MENU oMenuSec PROMPT "SubMenu" OF oMenu
-             MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec FONT "Sans" SIZE 60
-             MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec FONT "Clean" SIZE 14
-
-        MENUITEM PROMPT "QUIT"  ID 99 ACTION @FileEvent() OF oMenu SIZE 40
-
-   MENU oMenuHelp PROMPT "Help"
-        MENUITEM PROMPT "About" ACTION @FileEvent() OF oMenuHelp  FONT "Helvetica" SIZE 8
-        MENUITEM PROMPT "Help"  ACTION @FileEvent() OF oMenuHelp  FONT "Courier" SIZE 10
-   
-   oWindow:SetMenuBar( { oMenu, oMenuHelp } )
+   //oWindow:SetMenuBar( BuildMenu() )
 
    /*** Showing window ***/
    oWindow:Resize( 200, 200 )
@@ -177,7 +165,8 @@ RETURN .F.
 FUNCTION FileEvent( oEvent )
    //Filesel can't be local!
    //Local oFileSel
-
+   Local cFileName
+   
 ?  "Menu activated: ", oEvent:oSender:nId
    IF oEvent:oSender:nId == 1
       oFileSel := XWTFileSel():New( "Open file" )
@@ -227,4 +216,38 @@ FUNCTION PaneStatus( oEvent )
       ENDIF
    NEXT
    ? ""
+RETURN .T.
+
+/***************************************************************/
+// Example Contructor the design menus
+/***************************************************************/
+FUNCTION BuildMenu()
+   Local oMenu,oMenuItem,oMenuSec,oMenuHelp
+
+   MENU oMenu PROMPT "File"
+        MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
+        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5
+
+        MENU oMenuSec PROMPT "SubMenu" OF oMenu
+             MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec FONT "Sans" SIZE 60
+             MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec FONT "Clean" SIZE 14
+
+        MENUITEM PROMPT "QUIT"  ID 99 ACTION @FileEvent() OF oMenu SIZE 40
+
+   MENU oMenuHelp PROMPT "Help"
+        MENUITEM PROMPT "About" ACTION {||About() } OF oMenuHelp  FONT "Helvetica" SIZE 18
+        MENUITEM PROMPT "Help"  ACTION {|o|FileEvent(o) } OF oMenuHelp  FONT "Courier" SIZE 10
+
+RETURN( { oMenu, oMenuHelp }  )
+
+
+/***************************************************************/
+// Example Multiples lines the test in MsgBox
+/***************************************************************/
+FUNCTION About(  )
+
+   XWT_MsgBox( "XWT. eXtended Windowing Toolkit"+HB_OSNewLine()+;
+               "(c) Giancarlo Nicolai"+HB_OSNewLine()+;
+	       "Help desenvoluped by Luiz Culik and Rafa Carmona" ,  XWT_MSGBOX_OK , XWT_MSGBOX_INFO)
+
 RETURN .T.

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.33 2003/08/31 19:02:17 xthefull Exp $
+ * $Id: Changelog,v 1.34 2003/08/31 19:09:46 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-08-31 21:49 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * test/xwt_test.prg
+    * The construction the menus from function BuildMenu()
+    * Example the +1 line the text in XWTMsgBox (Call from option menu About)
+
+
 2003-08-31 21:05 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   ! src/widget.prg
     + Implementation method SetColor()
-    
+
   *Changed in prgs for support method SetColor()
     src/label.prg
     src/togglebutton.prg
@@ -29,7 +35,7 @@
     ! minor fixes
   * test/xwt_test.prg
     * now Radiobuttons  and checkbox has diferent colors
-   Please note this is an work in progress    
+   Please note this is an work in progress
 
 2003-08-30 11:59 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/xwtcmd.ch
