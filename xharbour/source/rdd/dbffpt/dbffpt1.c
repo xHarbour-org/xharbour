@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.28 2004/09/03 16:08:26 druzus Exp $
+ * $Id: dbffpt1.c,v 1.29 2004/11/13 04:30:00 druzus Exp $
  */
 
 /*
@@ -398,7 +398,7 @@ static BOOL hb_fptFileUnLock( FPTAREAP pArea )
                                     block[4] (block number) (little endian)
                                  signature1[12] has to be cutted down to
                                  10 bytes. The last 2 bytes becomes the
-                                 number of entries in freeblock list (max 82)
+                                 number of entries in free block list (max 82)
 
  Method 2.
    FPTHEADER->flexDir[4]         is a little endian offset to page
@@ -406,27 +406,27 @@ static BOOL hb_fptFileUnLock( FPTAREAP pArea )
                                     type[4] = 1000 (big endian)
                                     size[4] = 1010 (big endian)
                                  then
-                                    nItem[2] numeber of item (little endian)
+                                    nItem[2] number of item (little endian)
                                  then 1008 bytes with free blocks list
                                  (max 126 entries) in format:
-                                    offset[4]   (litle endian)
-                                    size[4]     (litle endian)
-                                 nItem is allways odd and after read we have
+                                    offset[4]   (little endian)
+                                    size[4]     (little endian)
+                                 nItem is always odd and after read we have
                                  to recalculate it:
                                     nItem = ( nItem - 3 ) / 4
 		if FPTHEADER->flexDir = 0 then we can create it by allocating
-            two 1024 bytes pages ofr flexRev and flexDir page.
+            two 1024 bytes pages for flexRev and flexDir page.
                FPTHEADER->flexRev[4] 1024 bytes in next free block
                FPTHEADER->flexDir[4] next 1024 bytes
             flexRev page is copy of flexDir page but the items are stored
             in reversed form size[4] first then offset[4]
-               size[4]     (litle endian)
-               offset[4]   (litle endian)
-            before writting GC pages (dir and rev, both has to be synced)
+               size[4]     (little endian)
+               offset[4]   (little endian)
+            before writing GC pages (dir and rev, both has to be synced)
             we should first sort the entries moving the shortest blocks
-            to the begining so when we where looking for free block we
-            can scan the list from the begining finding the first one
-            large enough. unused bytes in GC pgae should be fill with 0xAD
+            to the beginning so when we where looking for free block we
+            can scan the list from the beginning finding the first one
+            large enough. unused bytes in GC page should be filled with 0xAD
             when we free fpt block we should set in its header:
                type[4] = 1001 (big endian)
                size[4] = rest of block size (block size - 8) (big endian)
@@ -435,6 +435,23 @@ static BOOL hb_fptFileUnLock( FPTAREAP pArea )
    documentation for that and don't have time for farther hacking
    binary files to find the algorithm. If you have any documentation
    about it, please send it to me.
+   OK. I've found a while for analyzing the FPT file created by Clipper
+   and I think I know this structure. It's a tree. The node type
+   is marked in the first two bytes of GC page encoded as bit field with
+   the number of items 2 - means branch node, 3-leaf node. The value in
+   GC node is calculated as:
+      ( nItem << 2 ) | FPTGCNODE_TYPE
+   Each item in branch node has 12 bytes and inside them 3 32bit little
+   endian values in pages sorted by offset the are:
+      offset,size,subpage
+   and in pages sorted by size:
+      size,offset,subpage
+   size and offset is the biggest (the last one) value in subpage(s)
+   and subpage is offset of subpage int the file.
+   All values in GC pages are in bytes not blocks - it creates the
+   FPT file size limit 2^32 - if they will be in blocks then the
+   the FPT file size will be limited by 2^32*block_size
+   It's time to implement it ;-)
  */
 
 /*
@@ -2321,38 +2338,42 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    pArea->uiMemoBlockSize = 0;
    memset( &fptHeader, 0, sizeof( FPTHEADER ) );
-   hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-   if ( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( FPTHEADER ) ) >= 512 )
+   if( hb_fptFileLockEx( pArea, TRUE ) )
    {
-      pArea->uiMemoBlockSize = HB_GET_BE_UINT16( fptHeader.blockSize );
-      pArea->bMemoType = 0;
-      /* Check for compatibility with Harbour memo headers */
-      if ( memcmp( fptHeader.signature1, "Harbour", 7 ) == 0 )
+      hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
+      if ( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( FPTHEADER ) ) >= 512 )
       {
-         /* hack for detecting old harbour FPT files without FLEX support */
-         if ( HB_GET_BE_UINT32( fptHeader.signature2 ) == FPTIT_TEXT )
-            pArea->bMemoType = MEMO_FPT_SIXHB;
-         else
-            pArea->bMemoType = MEMO_FPT_HB;
+         pArea->uiMemoBlockSize = HB_GET_BE_UINT16( fptHeader.blockSize );
+         pArea->bMemoType = 0;
+         /* Check for compatibility with Harbour memo headers */
+         if ( memcmp( fptHeader.signature1, "Harbour", 7 ) == 0 )
+         {
+            /* hack for detecting old harbour FPT files without FLEX support */
+            if ( HB_GET_BE_UINT32( fptHeader.signature2 ) == FPTIT_TEXT )
+               pArea->bMemoType = MEMO_FPT_SIXHB;
+            else
+               pArea->bMemoType = MEMO_FPT_HB;
+         }
+         /* Check for compatibility with SIX memo headers */
+         else if ( memcmp( fptHeader.signature1, "SIxMemo", 7 ) == 0 )
+         {
+            pArea->bMemoType = MEMO_FPT_SIX;
+         }
+         /* Check for compatibility with CLIP (www.itk.ru) memo headers */
+         else if( memcmp( fptHeader.signature1, "Made by CLIP", 12 ) == 0 )
+         {
+            pArea->bMemoType = MEMO_FPT_CLIP;
+         }
+         /* Check for compatibility with Clipper 5.3/FlexFile3 malformed memo headers */
+         if ( pArea->bMemoType != MEMO_FPT_SIX &&
+              memcmp( fptHeader.signature2, "FlexFile3\003", 10) == 0 )
+         {
+            pArea->bMemoType = MEMO_FPT_FLEX;
+            if ( pArea->uiMemoBlockSize == 0 )
+               pArea->uiMemoBlockSize = HB_GET_LE_UINT16( fptHeader.flexSize );
+         }
       }
-      /* Check for compatibility with SIX memo headers */
-      else if ( memcmp( fptHeader.signature1, "SIxMemo", 7 ) == 0 )
-      {
-         pArea->bMemoType = MEMO_FPT_SIX;
-      }
-      /* Check for compatibility with CLIP (www.itk.ru) memo headers */
-      else if( memcmp( fptHeader.signature1, "Made by CLIP", 12 ) == 0 )
-      {
-         pArea->bMemoType = MEMO_FPT_CLIP;
-      }
-      /* Check for compatibility with Clipper 5.3/FlexFile3 malformed memo headers */
-      if ( pArea->bMemoType != MEMO_FPT_SIX &&
-           memcmp( fptHeader.signature2, "FlexFile3\003", 10) == 0 )
-      {
-         pArea->bMemoType = MEMO_FPT_FLEX;
-         if ( pArea->uiMemoBlockSize == 0 )
-            pArea->uiMemoBlockSize = HB_GET_LE_UINT16( fptHeader.flexSize );
-      }
+      hb_fptFileUnLock( pArea );
    }
 
    if ( pArea->uiMemoBlockSize == 0 )
