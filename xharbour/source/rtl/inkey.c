@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.30 2004/04/01 22:00:42 druzus Exp $
+ * $Id: inkey.c,v 1.31 2004/04/14 15:06:07 lf_sfnet Exp $
  */
 
 /*
@@ -81,7 +81,6 @@
 #include "hbapigt.h"
 #include "hbvm.h"
 #include "hbset.h"
-#include "hbinkey.ch"
 #include "inkey.ch"
 
 #include <time.h>
