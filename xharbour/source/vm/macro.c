@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.46 2004/05/12 02:25:30 druzus Exp $
+ * $Id: macro.c,v 1.47 2004/06/09 06:26:51 ronpinkas Exp $
  */
 
 /*
@@ -245,9 +245,7 @@ static void hb_macroSyntaxError( HB_MACRO_PTR pMacro )
    }
    else
    {
-      PHB_ITEM  pItem;
-
-      // Using Stack to avoid reported memory leak if the Error System will QUIT the app.
+      /* Using Stack to avoid reported memory leak if the Error System will QUIT the app. */
       hb_vmPushString( pMacro->string, pMacro->length );
 
       hb_macroDelete( pMacro );

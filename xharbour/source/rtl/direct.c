@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.48 2004/05/06 19:07:25 ronpinkas Exp $
+ * $Id: direct.c,v 1.49 2004/06/08 18:06:05 lculik Exp $
  */
 
 /*
@@ -104,12 +104,6 @@
 #include "directry.ch"
 
 extern char *hb_vm_acAscii[256];
-
-#if defined( HB_OS_UNIX )
-   #define HB_DIR_ALL_FILES_MASK        "*"
-#else
-   #define HB_DIR_ALL_FILES_MASK        "*.*"
-#endif
 
 static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
 {
@@ -231,7 +225,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    }
    else
    {
-      szDirSpec = (BYTE *) HB_DIR_ALL_FILES_MASK;
+      szDirSpec = (BYTE *) OS_FILE_MASK;
    }
 
    if( bDirOnly || bFullPath )
@@ -315,7 +309,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
-            char *szSubdir = hb_xstrcpy( NULL, szEntry, OS_PATH_DELIMITER_STRING, HB_DIR_ALL_FILES_MASK, NULL );
+            char *szSubdir = hb_xstrcpy( NULL, szEntry, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
             HB_ITEM SubDir;
 
             SubDir.type = HB_IT_NIL;
@@ -408,15 +402,12 @@ HB_FUNC( DIRECTORYRECURSE )
    PHB_ITEM pAttribute = hb_param( 2, HB_IT_STRING );
    BOOL bMatchCase = hb_parl( 3 );
    char *szRecurse = NULL;
-   char szDrive[1];
    PHB_FNAME fDirSpec;
    HB_ITEM Dir;
    char *szFName = NULL;
-   #if defined( HB_OS_UNIX )
-   BOOL bAddDrive = FALSE;
-   #else
+#if defined( OS_HAS_DRIVE_LETTER )
    BOOL bAddDrive = TRUE;
-   #endif
+#endif
    char *szAttributes;
    
    Dir.type = HB_IT_NIL;
@@ -442,9 +433,10 @@ HB_FUNC( DIRECTORYRECURSE )
 
       if( ( fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value ) ) != NULL )
       {
-         #if !defined( HB_OS_UNIX )
+#if defined( OS_HAS_DRIVE_LETTER )
          if( fDirSpec->szDrive == NULL )
          {
+            char szDrive[1];
             szDrive[ 0 ] = ( char ) ( hb_fsCurDrv() + 'A' );
             fDirSpec->szDrive = hb_vm_acAscii[(int)(unsigned char)szDrive[0]];
          }
@@ -452,8 +444,7 @@ HB_FUNC( DIRECTORYRECURSE )
          {
             bAddDrive = FALSE;
          }
-         #endif
-
+#endif
          if( fDirSpec->szPath == NULL )
          {
             #if defined( HB_OS_UNIX )
@@ -463,13 +454,18 @@ HB_FUNC( DIRECTORYRECURSE )
             #endif
          }
 
+#if defined( OS_HAS_DRIVE_LETTER )
          if( bAddDrive )
          {
-            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, ":\\", fDirSpec->szPath, "\\", HB_DIR_ALL_FILES_MASK, NULL );
+            char *szDrvDelim[ 1 ];
+            szDrvDelim[ 0 ] = OS_DRIVE_DELIMITER;
+            szDrvDelim[ 1 ] = '\0';
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, szDrvDelim, OS_PATH_DELIMITER_STRING, fDirSpec->szPath, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
          }
          else
+#endif
          {
-            szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, HB_DIR_ALL_FILES_MASK, NULL );
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, OS_FILE_MASK, NULL );
          }
 
          szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );

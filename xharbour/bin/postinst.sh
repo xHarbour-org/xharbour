@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.6 2004/05/28 18:51:21 likewolf Exp $
+# $Id: postinst.sh,v 1.7 2004/05/29 21:49:25 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -53,11 +53,11 @@ then
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
     rm -f fm.o
     ${MAKE} -r fm.o
-    ar -r ${HB_LIB_INSTALL}/libfm.a fm.o
+    ar -cr ${HB_LIB_INSTALL}/libfm.a fm.o
     rm -f fm.o
     if [ "${HB_MT}" = "MT" ]; then
         ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
-        ar -r ${HB_LIB_INSTALL}/libfmmt.a fm.o
+        ar -cr ${HB_LIB_INSTALL}/libfmmt.a fm.o
         rm -f fm.o
     fi
     )
