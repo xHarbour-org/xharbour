@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.10 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: hbextern.ch,v 1.11 2004/01/29 14:26:00 likewolf Exp $
  */
 
 /*
@@ -673,6 +673,8 @@ EXTERNAL HB_GT_VERSION
 //EXTERNAL HB_SETTERMCP
 
 EXTERNAL SECONDSCPU
+
+EXTERNAL HB_REGEXCOMP, HB_REGEX, HB_REGEXMATCH, HB_REGEXSPLIT, HB_REGEXATX
 
 #endif /* HB_EXTENSION */
 
