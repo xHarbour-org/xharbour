@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.4 2001/12/15 11:29:03 vszakats Exp $
+ * $Id: dynlibhb.c,v 1.5 2001/12/22 10:21:37 antoniolinares Exp $
  */
 
 /*
@@ -61,6 +61,10 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
+#if defined(HB_OS_WIN_32)
+   extern HMODULE _hInstance;
+#endif
+
 HB_FUNC( LIBLOAD )
 {
 #if defined(HB_OS_WIN_32)
@@ -113,3 +117,21 @@ HB_FUNC( HB_LIBDO )
    }
 }
 
+
+/* It returns TRUE if this function is called from the main app (EXE)
+ * and FALSE if it is called from a dynamic library (DLL)
+ * -please update the mentioned extensions for other OS-
+ */
+
+BOOL hb_StartApp( void )
+{
+#if defined(HB_OS_WIN_32)
+   {
+      return ( BOOL ) ( _hInstance == GetModuleHandle( NULL ) );
+   }
+#else
+   {
+      return TRUE;  /* Warning: this must be changed for other OS */
+   }
+#endif
+}

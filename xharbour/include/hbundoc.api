@@ -1,5 +1,5 @@
 /*
- * $Id: hbundoc.api,v 1.6 2001/12/05 13:06:02 antoniolinares Exp $
+ * $Id: hbundoc.api,v 1.7 2001/12/23 09:19:10 vszakats Exp $
  */
 
 /*
@@ -67,6 +67,11 @@
 
 #define _cEval0         hb_evalBlock0
 #define _cEval1         hb_evalBlock1
+
+/* Undocumented CA-Cl*pper misc functions */
+
+#define _getGrip        hb_gcGripGet
+#define _getDrop        hb_gcGripDrop
 
 /* Undocumented CA-Cl*pper TSupport API */
 

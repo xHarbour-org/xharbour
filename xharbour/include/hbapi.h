@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.77 2001/12/20 10:29:26 antoniolinares Exp $
+ * $Id: hbapi.h,v 1.78 2001/12/23 09:19:10 vszakats Exp $
  */
 
 /*
@@ -545,12 +545,10 @@ extern char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewS
 /* garbage collector */
 #define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
 typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
-typedef HB_GARBAGE_FUNC_ *HB_GARBAGE_FUNC_PTR;
+typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
 
 extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
-extern void hb_gcGripDrop( HB_ITEM_PTR pItem );
-#define _getGrip hb_gcGripGet
-#define _getDrop hb_gcGripDrop
+extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
 
 extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
 extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
@@ -579,7 +577,7 @@ extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer conta
 extern void   hb_verBuildInfo( void ); /* display harbour, compiler, and platform versions to standard console */
 
 /* environment variables access */
-/* WARNING: This returned pointer must be freed using hb_xfree( ( void * ) ptr ); */
+/* WARNING: This returned pointer must be freed if not NULL using hb_xfree( ( void * ) ptr ); */
 extern char * hb_getenv( const char * name );
 
 /* Version tracking related things */
