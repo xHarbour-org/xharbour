@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.29 2004/07/16 22:58:07 lculik Exp $
+ * $Id: runner.c,v 1.30 2004/08/01 17:11:37 mlombardo Exp $
  */
 
 /*
@@ -128,15 +128,15 @@ typedef struct
                                                    FindSymbol               */
 HB_EXTERN_BEGIN
 HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+HB_EXPORT PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize );
+HB_EXPORT PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
+HB_EXPORT void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
+HB_EXPORT void hb_hrbUnLoad( PHRB_BODY pHrbBody );
+HB_EXPORT void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
+HB_EXPORT void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 HB_EXTERN_END
 
-PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize );
-PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
-void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
-void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 static ULONG     hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded );
-void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
-void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 
 static int       hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset );
 static char *    hb_hrbReadId( char * szBody, BOOL bUseFM, ULONG ulBodySize, ULONG * ulBodyOffset );

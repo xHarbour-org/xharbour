@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.126 2004/07/27 18:04:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.127 2004/07/28 22:28:35 ronpinkas Exp $
  */
 
 /*
@@ -4320,7 +4320,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
    }
 }
 
-PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
+HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 {
    USHORT uiClass;
 

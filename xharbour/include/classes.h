@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.13 2004/07/26 10:38:07 ronpinkas Exp $
+ * $Id: classes.h,v 1.14 2004/07/28 22:28:34 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ extern USHORT hb_cls_uiArrayClass, hb_cls_uiBlockClass, hb_cls_uiCharacterClass,
        hb_cls_uiLogicalClass, hb_cls_uiNilClass, hb_cls_uiNumericClass, hb_cls_uiPointerClass;
 
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
-extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
+extern HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
 
 extern HB_EXPORT PCLASS hb_clsClassesArray( void );
 extern HB_EXPORT USHORT hb_clsMaxClasses( void );
