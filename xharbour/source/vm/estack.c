@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.54 2003/12/05 04:11:48 jonnymind Exp $
+ * $Id: estack.c,v 1.55 2003/12/10 18:30:23 ronpinkas Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 #include "hbfast.h"
 #include "hbapierr.h"
 
+extern BOOL hb_isService(void);
 
 HB_EXTERN_BEGIN
 
@@ -552,9 +553,10 @@ WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * Ex
    }
    while( pBase != HB_VM_STACK.pItems );
 
-   #ifndef HB_RUN_AS_SERVICE
+   if (!hb_isService())  /* We don't want a server side app showing message boxes */
+   {
       MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
-   #endif
+   }
 
    return EXCEPTION_EXECUTE_HANDLER; /* EXCEPTION_CONTINUE_SEARCH; */
 }

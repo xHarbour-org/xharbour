@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1849 2003/12/11 10:59:26 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1850 2003/12/11 11:07:27 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 08:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/hbserv.c
+     * declare hb_isService() as HB_EXPORT
+  * source/vm/errorapi.c
+  * source/vm/estack.c
+     * code clean up to replace HB_RUN_AS_SERVICE with hb_isService()
 
 2003-12-11 16:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   + \contrib\what32\source\_winserial.c
@@ -37,7 +44,7 @@
     HB_FUNC( WAITCOMMEVENT )
 
     All functions are working perfectly except TransmitCommError(). I feel I am not handelling
-    the cast ( cChar ) properly or may be my tests are not upto the mark. 
+    the cast ( cChar ) properly or may be my tests are not upto the mark.
     Someone please correct it if I am wrong.
 
 2003-12-11 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
@@ -48,7 +55,7 @@
   * source/rtl/file.c
     ! Fixed clipper behavior on File function.
 	   On clipper file(Directory) return false while in linux was returning true
-		 
+
 2003-12-11 16:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/filesys.c
     * translate EBADF as 6 for MSVC for Clipper compatibility.

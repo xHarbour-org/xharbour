@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.4 2003/11/26 20:16:07 likewolf Exp $
+* $Id: hbserv.c,v 1.5 2003/12/03 13:01:23 mauriliolongo Exp $
 */
 
 /*
@@ -745,23 +745,22 @@ HB_FUNC( HB_STARTSERVICE )
 
 /**
 * Returns true if the current program is a service, that is if HB_StartService() has
+* Been called. C version useful for internal api
+*/
+
+HB_EXPORT BOOL hb_isService()
+{
+   return sb_isService;
+}
+
+/**
+* Returns true if the current program is a service, that is if HB_StartService() has
 * Been called.
 */
 HB_FUNC( HB_ISSERVICE )
 {
    hb_retl( sb_isService );
 }
-
-/**
-* Returns true if the current program is a service, that is if HB_StartService() has
-* Been called. C version useful for internal api
-*/
-
-BOOL hb_isService()
-{
-   return sb_isService;
-}
-
 
 /**
 * This is -at least- an helper functions that implements the main loop for
