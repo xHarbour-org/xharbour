@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.16 2004/01/15 19:38:57 peterrees Exp $
+ * $Id: inkey.c,v 1.17 2004/01/21 23:48:57 peterrees Exp $
  */
 
 /*
@@ -59,6 +59,9 @@
  *
  * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
  *    hb_setInkeyLast()
+ *
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ *    SETLASTKEY()
  *
  * Copyright 2004 Peter Rees <peter@rees.co.nz>
  *    SETINKEYBEFOREBLOCK()
@@ -559,6 +562,15 @@ HB_FUNC( NEXTKEY )
 HB_FUNC( LASTKEY )
 {
    hb_retni( hb_inkeyTranslate( s_inkeyLast, ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
+}
+
+HB_FUNC( SETLASTKEY )
+{
+  if( ISNUM(1) )
+  {
+    hb_setInkeyLast( hb_parni(1) );
+  }
+  hb_retc( "" );
 }
 
 int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )
