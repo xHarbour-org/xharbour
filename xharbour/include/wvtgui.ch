@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.4 2004/01/03 20:51:47 fsgiudice Exp $
+ * $Id: wvtgui.ch,v 1.1 2004/01/17 02:36:21 fsgiudice Exp $
  */
 
 /*
