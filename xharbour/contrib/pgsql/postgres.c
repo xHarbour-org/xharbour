@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.11 2004/05/02 21:11:33 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.12 2004/05/02 21:48:52 druzus Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -55,6 +55,7 @@
 #include <hbapi.h>
 #include <hbapifs.h>
 #include <hbapiitm.h>
+#include <hbfast.h>
 #include "libpq-fe.h"
 
 #define _CLIPDEFS_H
@@ -89,7 +90,7 @@ HB_FUNC(PQCONNECT)
 
     if (hb_pcount() == 5)
         sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
-                                           hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), (int) hb_parni(5) );
+                                           hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), (int) hb_parni(5) );
 
     conn = PQconnectdb(conninfo);
     hb_retptr( conn );
@@ -112,7 +113,7 @@ HB_FUNC(PQEXEC)
     PGresult   *res;
 
     if (hb_pcount() == 2)
-        res = PQexec(( PGconn * ) hb_parptr(1), hb_parc(2));
+        res = PQexec(( PGconn * ) hb_parptr(1), hb_parcx(2));
 
     hb_retptr( res );        
 }
@@ -137,7 +138,7 @@ HB_FUNC(PQEXECPARAMS)
         for (i=0;i < n;i++)
             paramvalues[i] = hb_arrayGetCPtr( aParam, i + 1 );
 
-        res = PQexecParams(( PGconn * ) hb_parptr(1), hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
+        res = PQexecParams(( PGconn * ) hb_parptr(1), hb_parcx(2), n, NULL, paramvalues, NULL, NULL, 1);
 
         hb_xfree(paramvalues);
     }
@@ -221,9 +222,13 @@ HB_FUNC(PQMETADATA)
     PGresult   *res;
     int         nFields, i;
     
-    PHB_ITEM aTemp;
-    PHB_ITEM aNew;
-    PHB_ITEM temp;
+    HB_ITEM aTemp;
+    HB_ITEM aNew;
+    HB_ITEM temp;
+
+    aTemp.type = HB_IT_NIL;
+    aNew.type = HB_IT_NIL;
+    temp.type = HB_IT_NIL;
 
     if (hb_parinfo(1))
     {
@@ -233,7 +238,7 @@ HB_FUNC(PQMETADATA)
         {
             nFields = PQnfields(res);
 
-            aNew = hb_itemArrayNew( nFields );
+            hb_arrayNew( &aNew, 0 );
 
             for (i=0; i < nFields; i++ )
             {
@@ -331,38 +336,30 @@ HB_FUNC(PQMETADATA)
                                 break;                                
                 }
                 
-                aTemp = hb_itemArrayNew( 6 );
+                hb_arrayNew( &aTemp, 6 );
+                
+                hb_itemPutC( &temp, PQfname( res, i ) );
+                hb_arraySetForward( &aTemp, 1, &temp );
+                
+                hb_itemPutC( &temp, buf );
+                hb_arraySetForward( &aTemp, 2, &temp);
 
-                temp = hb_itemPutC( NULL, PQfname( res, i ) );
-                hb_itemArrayPut( aTemp, 1, temp);
-                hb_itemRelease( temp );
-        
-                temp = hb_itemPutC( NULL, buf );
-                hb_itemArrayPut( aTemp, 2, temp);
-                hb_itemRelease( temp );
+                hb_itemPutNI( &temp, length );
+                hb_arraySetForward( &aTemp, 3, &temp);
 
-                temp = hb_itemPutNI( NULL, length );
-                hb_itemArrayPut( aTemp, 3, temp);
-                hb_itemRelease( temp );
+                hb_itemPutNI( &temp, decimal );
+                hb_arraySetForward( &aTemp, 4, &temp);
 
-                temp = hb_itemPutNI( NULL, decimal );
-                hb_itemArrayPut( aTemp, 4, temp);
-                hb_itemRelease( temp );
+                hb_itemPutNL( &temp, PQftable( res, i ) );
+                hb_arraySetForward( &aTemp, 5, &temp);
 
-                temp = hb_itemPutNL( NULL, PQftable( res, i ) );
-                hb_itemArrayPut( aTemp, 5, temp);
-                hb_itemRelease( temp );
+                hb_itemPutNI( &temp, PQftablecol( res, i ) );
+                hb_arraySetForward( &aTemp, 6, &temp);
 
-                temp = hb_itemPutNI( NULL, PQftablecol( res, i ) );
-                hb_itemArrayPut( aTemp, 6, temp);
-                hb_itemRelease( temp );
-       
-                hb_itemArrayPut( aNew, i+1, aTemp );
-                hb_itemRelease( aTemp );
+                hb_arrayAddForward(&aNew, &aTemp);
             }
 
-            hb_itemReturn(aNew);
-            hb_itemRelease(aNew);
+            hb_itemForwardValue( &(HB_VM_STACK).Return, &aNew);
         }
     }
 }
@@ -410,7 +407,7 @@ HB_FUNC(PQSENDQUERY)
     int res = 0;        
 
     if (hb_pcount() == 2)
-        res = PQsendQuery(( PGconn * ) hb_parpointer(1), hb_parc(2));
+        res = PQsendQuery(( PGconn * ) hb_parptr(1), hb_parcx(2));
 
     hb_retl( res );        
 }
@@ -420,7 +417,7 @@ HB_FUNC(PQGETRESULT)
     PGresult   *res;
 
     if (hb_parinfo(1))
-        res = PQgetResult(( PGconn * ) hb_parpointer(1));
+        res = PQgetResult(( PGconn * ) hb_parptr(1));
 
     /* when null, no more result to catch */
     if (res)
@@ -432,7 +429,7 @@ HB_FUNC(PQCONSUMEINPUT)
     int res = 0;        
 
     if (hb_parinfo(1))
-        res = PQconsumeInput(( PGconn * ) hb_parpointer(1));
+        res = PQconsumeInput(( PGconn * ) hb_parptr(1));
 
     hb_retl( res );        
 }
@@ -442,7 +439,7 @@ HB_FUNC(PQISBUSY)
     int res = 0;        
 
     if (hb_parinfo(1))
-        res = PQisBusy(( PGconn * ) hb_parpointer(1));
+        res = PQisBusy(( PGconn * ) hb_parptr(1));
 
     hb_retl( res );        
 }
@@ -452,7 +449,7 @@ HB_FUNC(PQREQUESTCANCEL)
     int res = 0;        
 
     if (hb_parinfo(1))
-        res = PQrequestCancel(( PGconn * ) hb_parpointer(1));
+        res = PQrequestCancel(( PGconn * ) hb_parptr(1));
 
     hb_retl( res );        
 }
