@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.100 2004/02/22 04:24:43 jonnymind Exp $
+ * $Id: classes.c,v 1.101 2004/02/24 17:27:18 ronpinkas Exp $
  */
 
 /*
@@ -2088,7 +2088,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                         #ifdef HB_ARRAY_USE_COUNTER
                            pInit->item.asBlock.value->pSelfBase->uiHolders++;
                         #else
-                           hb_arrayRegisterHolder( ( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
+                           hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
                         #endif
                      }
                   }
@@ -2127,7 +2127,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                      #ifdef HB_ARRAY_USE_COUNTER
                         pInitValue->item.asBlock.value->pSelfBase->uiHolders++;
                      #else
-                        hb_arrayRegisterHolder( ( pInitValue->item.asBlock.value->pSelfBase, (void *) pInitValue );
+                        hb_arrayRegisterHolder( pInitValue->item.asBlock.value->pSelfBase, (void *) pInitValue );
                      #endif
                   }
                }
@@ -2168,7 +2168,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                         #ifdef HB_ARRAY_USE_COUNTER
                            pInit->item.asBlock.value->pSelfBase->uiHolders++;
                         #else
-                           hb_arrayRegisterHolder( ( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
+                           hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
                         #endif
                      }
                   }
