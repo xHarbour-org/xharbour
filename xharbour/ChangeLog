@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2874 2004/05/04 17:03:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2875 2004/05/04 18:38:57 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-05 12:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/filesys.c
+     + added HB_OPENPROCESS, HB_PROCESSVALUE and HB_CLOSEPROCESS to OS/2 xHarbour
 
 2004-05-04 11:36 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * source/vm/cmdarg.c
@@ -18,7 +22,7 @@
   * source/rtl/filesys.c
   * include/hbapifs.h
     + Added sixth optional parameter to HB_OPENPROCESS that may hold the process
-      ID number in return. 
+      ID number in return.
       Not a real "fix", but it's a vital information to many application and
       it has been missing for too much time.
 

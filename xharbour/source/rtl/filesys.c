@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.102 2004/05/04 16:43:52 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.103 2004/05/04 17:03:31 jonnymind Exp $
  */
 
 /*
@@ -176,6 +176,11 @@
    #endif
 #endif
 
+#ifdef HB_OS_OS2
+   #include <sys\signal.h>
+   #include <sys\process.h>
+   #include <sys\wait.h>
+#endif
 
 #ifndef O_BINARY
    #define O_BINARY     0       /* O_BINARY not defined on Linux */
@@ -755,7 +760,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )",
       pFilename, fhStdin, fhStdout, fhStderr));
 
-#if defined(OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO) )
+#if defined(OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO) ) || defined (HB_OS_OS2)
 {
 #ifndef MAXFD
    #define MAXFD       1024
@@ -777,6 +782,11 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    {
       hb_fsSetIOError( FALSE, 0 );
       return (FHANDLE) -1;
+   #ifdef HB_OS_OS2
+   } else {
+      setmode( hPipeIn[0], O_BINARY );
+      setmode( hPipeIn[1], O_BINARY );
+   #endif
    }
 
    if( fhStdout != 0 && pipe( hPipeOut ) != 0 )
@@ -788,6 +798,11 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          close( hPipeIn[1] );
       }
       return (FHANDLE) -1;
+   #ifdef HB_OS_OS2
+   } else {
+      setmode( hPipeOut[0], O_BINARY );
+      setmode( hPipeOut[1], O_BINARY );
+   #endif
    }
 
 
@@ -809,12 +824,17 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
                close( hPipeOut[1] );
             }
             return (FHANDLE) -1;
+         #ifdef HB_OS_OS2
+         } else {
+            setmode( hPipeErr[0], O_BINARY );
+            setmode( hPipeErr[1], O_BINARY );
+         #endif
          }
       }
    }
 
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    {
       int oldstdin, oldstdout, oldstderr;
       int iFlags;
@@ -864,7 +884,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       argv = s_argvize( command, size );
       argv[size] = 0;
 
-      #if defined(__BORLANDC__) || defined(__WATCOMC__)
+      #if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__GNUC__)
       iFlags = P_NOWAIT;
       pid = spawnvp( iFlags, argv[0], argv );
       #else
@@ -872,7 +892,11 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       pid = _spawnvp( iFlags, argv[0], argv );
       #endif
 
+      #ifdef HB_OS_OS2
+      *ProcessID = (ULONG) pid;
+      #else
       *ProcessID = (DWORD) pid;
+      #endif
       hb_xfree( command );
       hb_xfree( argv );
 
@@ -1277,7 +1301,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 
    hb_fsSetError( 0 );
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_OS2)
 {
    int iStatus;
 
@@ -1403,7 +1427,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    BOOL bRet = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_OS2)
    if ( fhProc > 0 )
    {
       int iSignal = bGentle ? SIGTERM : SIGKILL;
