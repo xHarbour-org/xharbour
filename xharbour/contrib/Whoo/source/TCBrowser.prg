@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.19 2002/11/11 18:43:28 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.20 2002/11/11 23:18:02 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -302,6 +302,8 @@ METHOD Create( oParent ) CLASS TWBrowse
    ::Msgs      := -1
    ::WndProc   := "FormProc"
 
+   ::Super:Create( oParent )
+
    ::wantHiliteAll   := .F.
    ::wantRowSep      := .T.
    ::wantColSep      := .T.
@@ -396,7 +398,7 @@ METHOD Create( oParent ) CLASS TWBrowse
       next
    END
 */
-return(super:Create( oParent ))
+return( Self )
 
 
 //---------------------------------------------------------------------------------------------
@@ -683,7 +685,7 @@ METHOD RefreshAll(lNoDraw) CLASS TWBrowse
             NEXT
          ENDIF
         ELSEIF ::wantHeading
-         ::hWndHeader:=Header_Create(WS_CHILD+WS_VISIBLE+HDS_BUTTONS+HDS_DRAGDROP, 0, 0,  ::Width, ::HeadHeight,::handle,100)
+         ::hWndHeader:=Header_Create(WS_CHILD+WS_VISIBLE+HDS_BUTTONS+HDS_DRAGDROP, 0, 0,  ::FWidth, ::HeadHeight,::handle,100)
          SendMessage(::hWndHeader,WM_SETFONT,IF(::HeadFont==NIL,::Font,::HeadFont),0)
          IF ::ImageList<>NIL
             Header_SetImageList(::hWndHeader,::ImageList)
@@ -966,10 +968,10 @@ METHOD drawdata(hDC,nRow,nCol,nRowStop) CLASS TWBrowse
    BEGIN SEQUENCE
       FOR i:=nRowStart TO nRowEnd
          t:=::nDataTop+(i-1)*::ItemHeight
-         b:=MIN(::Height,t+::ItemHeight-1)
+         b:=MIN(::FHeight,t+::ItemHeight-1)
          FOR j:=nColStart TO nColEnd
             l:=::ColWidths[j]-::ColWidths[::LeftVisible]
-            r:=MIN(::Width,::ColWidths[j+1]-::ColWidths[::LeftVisible]-1)
+            r:=MIN(::FWidth,::ColWidths[j+1]-::ColWidths[::LeftVisible]-1)
             isHilite:= ::Hilited .AND. (i==::RowPos) .AND. (::wantHiliteAll .OR. j==::ColPos)
             SetBkColor(hDC,IF(isHilite,IF(lHasFocus,::HiliteBgColor,::HiliteNoFocus),IF(::aBgColors[i,j]==NIL,::BgColor,::aBgColors[i,j])))
             SetTextColor(hDC,IF(isHilite,::HiliteColor,IF(::aFgColors[i,j]==NIL,::FgColor,::aFgColors[i,j])))
@@ -1064,7 +1066,7 @@ RETURN(self)
 METHOD drawheader() CLASS TWBrowse
    IF IsWindow(::hWndHeader)
       MoveWindow(::hWndHeader,-::ColWidths[::LeftVisible],0,;
-                 ::Width+::ColWidths[::LeftVisible],::HeadHeight,.T.)
+                 ::FWidth+::ColWidths[::LeftVisible],::HeadHeight,.T.)
       RedrawWindow(::hWndHeader,,,RDW_NOERASE+RDW_UPDATENOW)
    ENDIF
 RETURN(self)
@@ -1227,7 +1229,7 @@ METHOD OnBeginTrack(hdr) CLASS TWBrowse
       ScreenToClient(::handle,aMouse)
       ::xTrack:=aMouse[1]
       ::xTrackOffset:=::xTrack-xColPos
-      aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::Height}
+      aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::FHeight}
       InvertRect(hDC,aRect)
       ReleaseDC(::handle,hDC)
       RETURN(.T.)
@@ -1525,13 +1527,13 @@ METHOD OnTracking() CLASS TWBrowse
    IF ::lResizing
       hDC:=GetDC(::handle)
       IF ::xTrack-::xTrackOffset >=0
-         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::Height}
+         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::FHeight}
          InvertRect(hDC,aRect)
       ENDIF
       ScreenToClient(::handle,aMouse)
       ::xTrack:=aMouse[1]
       IF ::xTrack-::xTrackOffset >= 0
-         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::Height}
+         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::FHeight}
          InvertRect(hDC,aRect)
       ENDIF
       ReleaseDC(::handle,hDC)
@@ -1567,7 +1569,7 @@ METHOD OnEndTrack() CLASS TWBrowse
       ::lResizing:=.F.
       IF ::xTrack-::xTrackOffset >=0
          hDC:=GetDC(::handle)
-         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::Height}
+         aRect:={::xTrack-1-::xTrackOffset,::HeadHeight,::xTrack+1-::xTrackOffset,::FHeight}
          InvertRect(hDC,aRect)
          ReleaseDC(::handle,hDC)
          RETURN(.T.)

@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.26 2002/11/08 06:07:40 what32 Exp $
+ * $Id: TCRebar.prg,v 1.27 2002/11/11 18:43:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -63,7 +63,7 @@ CLASS TCoolBar FROM TCustomControl
    DATA WinClass    PROTECTED INIT REBARCLASSNAME
    DATA ControlName PROTECTED INIT "CoolBar"
 
-   METHOD Create() CONSTRUCTOR
+   METHOD CreateWnd()
    METHOD AddBand()
    METHOD CoolBarProc()
    METHOD Delete()
@@ -110,16 +110,14 @@ METHOD CoolBarProc(nMsg,nwParam,nlParam) CLASS TCoolBar
 
 *------------------------------------------------------------------------------*
 
-METHOD Create( oParent ) CLASS TCoolBar
+METHOD CreateWnd() CLASS TCoolBar
+   ::Super:CreateWnd()
 
-   ::Super:Create( oParent )
-
-   ::FHeight := 20
-   ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
+   ::nrProc := SetProcedure( ::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam|;
                             ::CoolBarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
    ::CoolBarProc( WM_SIZE,0,0)
    
-RETURN( self )
+RETURN NIL
 
 *------------------------------------------------------------------------------*
 

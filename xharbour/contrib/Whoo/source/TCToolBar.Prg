@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.30 2002/11/12 00:51:40 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.31 2002/11/12 01:55:27 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -169,7 +169,9 @@ METHOD Create( oParent ) CLASS TToolBar
    ::Created := .F.
    ::aBitmaps:={}
    ::aMenus  :={}
-   ::GetHandle()
+
+   ::CreateHandle()
+
    RETURN( Self )
 
 *-----------------------------------------------------------------------------*
@@ -201,19 +203,22 @@ METHOD AddMenu(nId,aMenuItems)
 *-----------------------------------------------------------------------------*
 
 METHOD CreateWnd() CLASS TToolBar
+
    LOCAL cButtons:=""
    LOCAL cStrings:=""
    LOCAL tbb IS TBBUTTON
    LOCAL i
-   IF ISNIL(::hBMInst) .AND. ISNIL(::nBMId)
+
+   IF ISNIL( ::hBMInst ) .AND. ISNIL( ::nBMId )
       ::hBMInst:=HINST_COMMCTRL
       ::nBMId  :=IDB_STD_LARGE_COLOR
    ENDIF
-   ::Fhandle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
+   ::FHandle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
-   ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
+   ::ntProc := SetProcedure(::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
    ::Created:=.T.
+
 return( self )
 
 
@@ -390,5 +395,4 @@ METHOD SetStyle( n ) CLASS ToolButton
 
    tbb:fsStyle := n
    SendMessage( ::Parent:Handle, TB_SETBUTTONINFO, ::Id,  tbb:value )
-   Application:ProcessMessages()
 RETURN Self

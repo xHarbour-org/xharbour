@@ -94,7 +94,6 @@ METHOD Add( oObj ) CLASS TFrame
       NEXT
 
       oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
-      view oObj:Name
    ENDIF
 
    ::SetLink( oObj )

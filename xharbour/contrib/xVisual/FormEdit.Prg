@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.89 2002/11/12 05:38:34 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.90 2002/11/13 00:45:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -46,7 +46,7 @@
 
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL Application
-GLOBAL EXTERNAL MainFrame
+GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL FormEdit
 
 GLOBAL EXTERNAL ObjTree
@@ -136,7 +136,7 @@ METHOD Create( oParent ) CLASS TFormEdit
    ::xGrid    := 8
    ::yGrid    := 8
    ::GridColor:=RGB(0,0,0)
-   ::OnCloseQuery := {|| MainFrame:StdBar:Disable(), ObjInspect:ComboBox1:DelObject( HB_QSELF() ), NIL }
+   ::OnCloseQuery := {|| MainForm:StdBar:Disable(), ObjInspect:ComboBox1:DelObject( HB_QSELF() ), NIL }
    ::XFMTop()
 
 RETURN Self
@@ -285,8 +285,8 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       ENDIF
    ENDIF
 
-   MainFrame:StdBar:ToolButton1:Click()
-   MainFrame:Win32Bar:ToolButton1:Click()
+   MainForm:StdBar:ToolButton1:Click()
+   MainForm:Win32Bar:ToolButton1:Click()
 
 RETURN oObj
 
@@ -362,8 +362,8 @@ METHOD WMCreate() CLASS TFormEdit
 /*
    ::SetGridSize()
 
-   MainFrame:StdBar:Enable()
-   MainFrame:Win32Bar:Enable()
+   MainForm:StdBar:Enable()
+   MainForm:Win32Bar:Enable()
 
    ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
    oTree     := ObjTree:TreeView1:Add( ::Name,, ::Fhandle )

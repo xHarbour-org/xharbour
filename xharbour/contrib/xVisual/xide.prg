@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.127 2002/11/13 00:45:53 what32 Exp $
+ * $Id: xide.prg,v 1.128 2002/11/13 02:14:01 what32 Exp $
  */
 
 /*
@@ -39,7 +39,7 @@
 #include "cstruct.ch"
 
 GLOBAL EXTERNAL Application
-GLOBAL MainFrame
+GLOBAL MainForm
 GLOBAL FormEdit
 
 GLOBAL ObjTree
@@ -57,8 +57,8 @@ FUNCTION Main
    oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT Application
-      WITH OBJECT :CreateForm( MainFrame(), @MainFrame )
-
+      WITH OBJECT :CreateForm( MainForm(), @MainForm )
+         
          :OnCloseQuery := {|o| IIF( o:MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 ) }
 
          :SetStyle( WS_THICKFRAME, .F. )
@@ -69,30 +69,30 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-         ObjTree    := ObjTree():Create( MainFrame )
-         ObjInspect := ObjInspect():Create( MainFrame )
-         ObjEdit    := ObjEdit():Create( MainFrame )
+         ObjTree    := ObjTree():Create( MainForm )
+//         ObjInspect := ObjInspect():Create( MainForm )
+//         ObjEdit    := ObjEdit():Create( MainForm )
          // focus to main Frame
          :SetFocus()
 
       END
+      MainForm:Update()
       :Run()
   END
 RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
 
-CLASS MainFrame FROM TFrame
-   METHOD Create( oOwner ) INLINE  ::FCaption  := 'xHarbour xIde',;
+CLASS MainForm FROM TForm
+
+   METHOD Create( oOwner ) INLINE  ::Super:Create( oOwner ),;
+                                   ::FCaption  := "xHarbour xIde",;
                                    ::FLeft     := 0,;
                                    ::FTop      := 0,;
                                    ::FWidth    := GetWindowRect( GetDesktopWindow() )[3],;
                                    ::FHeight   := 131,;
-                                   ::ExStyle   := WS_EX_APPWINDOW,;
-                                   ::FrameWnd  := .T.,;
                                    ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
-                                   ::Super:Create( oOwner )
-
+                                   Self
    METHOD MainMenu()
    METHOD MainToolBar()
    METHOD MainStatusBar()
@@ -100,17 +100,15 @@ ENDCLASS
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainMenu() CLASS MainFrame
+METHOD MainMenu() CLASS MainForm
 
    LOCAL oPopup, oMenuItem
 
    ::WindowMenu := TMainMenu():Create( Self ) //TMenu():New()
-   view ::WindowMenu
 
    oPopup := TMenuItem():Create( ::WindowMenu )
    oPopup:Caption := "File"
 
-   view oPopup
    oPopup:AppendTo( ::WindowMenu:Handle )
 
    oMenuItem := TMenuItem():Create( oPopup )
@@ -132,16 +130,16 @@ METHOD MainMenu() CLASS MainFrame
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Exit"
    oMenuItem:Command := 200
-   oMenuItem:OnClick := {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)}
+   oMenuItem:OnClick := {||MainForm:PostMessage(WM_SYSCOMMAND,SC_CLOSE)}
    oMenuItem:AppendTo( oPopup:Handle )
 
    //With Object ::WindowMenu
    //   :AddPopup('&Test')
    //   With Object :Popup
-   //      :AddItem( 'Editor', 101, {||Application:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
+   //      :AddItem( 'Editor', 101, {||Application:CreateForm( @FormEdit, TFormEdit(), MainForm ) } )
    //      :AddItem( 'Open', 102, {|| OpenProject():Create() } )
    //      :AddSeparator()
-   //      :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
+   //      :AddItem( 'Exit'  , 200, {||MainForm:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
    //   end
    //end
    //::SetWindowMenu()
@@ -150,16 +148,18 @@ return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainToolBar() CLASS MainFrame
+METHOD MainToolBar() CLASS MainForm
 
    LOCAL n, oTool, oSplash
-   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb
+   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb, oCB
 
-   TCoolBar():Create( MainFrame )
-
+   oCB := TCoolBar():Create( MainForm )
+   oCB:SetParent( MainForm )
+   
     // add the xmake toolbar
-   WITH OBJECT TToolBar():Create( MainFrame )
-
+   WITH OBJECT TToolBar():Create( MainForm )
+      :SetParent( MainForm )
+      
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
       oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
@@ -188,17 +188,20 @@ METHOD MainToolBar() CLASS MainFrame
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    END
+//   ::CoolBar1:CreateHandle()
+   oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , 0/*::ToolBar1:handle*/, 200, 52, 200, "", NIL )
 
-   ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
    // add the TabControl on the Rebarband
 
-   WITH OBJECT ToolTabs():Create( MainFrame )
-//      :SetParent( MainFrame )
+/*
 
-      :AddTab( "StdTab", TabPage():Create( MainFrame:ToolTabs ) )
+
+   WITH OBJECT ToolTabs():Create( MainForm )
+      
+      :AddTab( "StdTab", TabPage():Create( MainForm:ToolTabs ) )
       :StdTab:Caption := "Standard"
 
-      :AddTab( "Win32", TabPage():Create( MainFrame:ToolTabs ) )
+      :AddTab( "Win32", TabPage():Create( MainForm:ToolTabs ) )
       :Win32:Caption := "Win32"
 
       :AddTab( "Additional" )
@@ -207,25 +210,23 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Dialogs" )
       :AddTab( "Samples" )
       :AddTab( "Activex" )
-
-//      :Configure()
+      
    END
-
    ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
+
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
-      TCoolBar():Create( MainFrame:ToolTabs:StdTab )
+      TCoolBar():Create( MainForm:ToolTabs:StdTab )
       :CoolBar1:SetStyle( WS_BORDER, .F. )
-      With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
-         Application:ProcessMessages()
+      With Object StdTools():Create( MainForm:ToolTabs:StdTab )
          :SetStyle( TBSTYLE_CHECKGROUP )
 
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                           'RadioGroup', 'Panel', 'ActionList' }
          FOR n :=0 TO 16
-             oTool := ToolButton():Create( MainFrame:ToolTabs:StdTab:StdTools )
+             oTool := ToolButton():Create( MainForm:ToolTabs:StdTab:StdTools )
              oTool:OnClick:= {|oItem| FormEdit:OnMenuCommand( oItem ) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              oTool:Hint   := aStdTab[ n +1 ]
@@ -247,9 +248,9 @@ METHOD MainToolBar() CLASS MainFrame
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
-      TCoolBar():Create( MainFrame:ToolTabs:Win32 )
+      TCoolBar():Create( MainForm:ToolTabs:Win32 )
       :CoolBar1:SetStyle( WS_BORDER, .F. )
-      With Object :Add( WinTools():Create( ::ToolTabs:Win32 ) )
+      With Object WinTools():Create( ::ToolTabs:Win32 )
          :SetStyle( TBSTYLE_CHECKGROUP )
 
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'CoolBar', ;
@@ -282,12 +283,12 @@ METHOD MainToolBar() CLASS MainFrame
 
    ::ToolTabs:Win32:WinTools:Name := "Win32Bar"
    ::SetLink( ::ToolTabs:Win32:WinTools )
-
+*/
 return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainStatusBar() CLASS MainFrame
+METHOD MainStatusBar() CLASS MainForm
 
    TStatusBar():Create( Self )
 
@@ -509,7 +510,7 @@ int XFMParse( char *sText )
    // Save result into pForm - we will use it multiple times below.
    hb_itemForwardValue( pForm, &hb_stack.Return );
 
-   //Application:CreateForm( @FormEdit, TFormEdit(), MainFrame )
+   //Application:CreateForm( @FormEdit, TFormEdit(), MainForm )
    hb_vmPushSymbol( pCreateForm->pSymbol );
    hb_vmPush( &APPLICATION );
    // See below alternative to pushing REF.
@@ -517,7 +518,7 @@ int XFMParse( char *sText )
    //hb_stackPush();
    hb_vmPushNil();
    hb_vmPush( pForm );
-   hb_vmPush( &MAINFRAME );
+   hb_vmPush( &MAINFORM );
    hb_vmSend( 3 );
 
    // Instead of pushing @FormEdit

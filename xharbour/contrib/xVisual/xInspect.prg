@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.64 2002/11/12 00:51:47 what32 Exp $
+ * $Id: xInspect.prg,v 1.65 2002/11/13 00:45:53 what32 Exp $
  */
 
 /*
@@ -38,7 +38,7 @@
 
 GLOBAL EXTERNAL Application
 GLOBAL EXTERNAL FormEdit
-GLOBAL EXTERNAL MainFrame
+GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL ObjInspect
 GLOBAL EXTERNAL ObjTree
 GLOBAL InspTabs
@@ -105,7 +105,7 @@ METHOD Create( oParent ) CLASS ObjInspect
    // Object Inspector Window
 
    ::Super:Create( oParent )
-   ::SetParent( MainFrame )
+   ::SetParent( MainForm )
 
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
@@ -137,7 +137,6 @@ METHOD Create( oParent ) CLASS ObjInspect
    
    // Browser
    ::Browser:=InspectBrowser():Create( InspTabs:Properties )
-   ::Browser:SetParent( InspTabs:Properties )
 return( Self )
 
 //----------------------------------------------------------------------------------------------
@@ -356,7 +355,8 @@ METHOD Create( oParent ) CLASS InspectBrowser
 
    ::Source := aProp
 
-   super:Create( oParent )
+   ::Super:Create( oParent )
+   ::SetParent( MainForm )
 
    ::FLeft  := 0
    ::FTop   := 0
@@ -381,11 +381,11 @@ METHOD Create( oParent ) CLASS InspectBrowser
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    
-   ::SetParent( MainFrame )
    
    ::Font          := oParent:Font
-   
-   ::GetHandle()
+
+      
+   ::CreateHandle()
    
 RETURN self
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.32 2002/11/13 00:45:51 what32 Exp $
+ * $Id: TabControl.Prg,v 1.33 2002/11/13 02:13:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -37,6 +37,7 @@
 #include "error.ch"
 
 // move that structure to WinStruc.ch
+GLOBAL EXTERNAL Application
 
 IMPORT C STRUCTURE NMHDR
 
@@ -101,7 +102,6 @@ CLASS TTabControl FROM TCustomControl
    METHOD Notify()
    METHOD WMSize()
    METHOD GetObj()
-
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -110,9 +110,9 @@ METHOD Notify( hdr ) CLASS TTabControl
    LOCAL nSel
    nSel:=TabCtrl_GetCurSel( ::handle )+1
    IF ::Cursel <> nSel
-      ShowWindow(::Controls[::CurSel]:handle, SW_HIDE)
-      ::CurSel:=nSel
-      ShowWindow(::Controls[::CurSel]:handle, SW_SHOW)
+      ShowWindow( ::Controls[::CurSel]:handle, SW_HIDE )
+      ::CurSel := nSel
+      ShowWindow( ::Controls[::CurSel]:handle, SW_SHOW )
    endif
    return(nil)
 
@@ -128,8 +128,6 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    endif
    
    DEFAULT oPage TO TabPage():Create( self )
-
-   oPage:SetParent( Self )
    
    if cRes != NIL
       oPage:resname := cRes
@@ -140,7 +138,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
 
 
    IF ( hTab := TabCtrl_AddItem( ::FHandle, oPage:Caption, oPage:ImageIndex ) ) > -1
-   
+ 
       AADD( ::Controls, oPage )
       __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
       __ObjSetValueList( self, { { cName, oPage } } )
@@ -148,7 +146,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    ENDIF
 
    IF Len( ::Controls ) > 1
-      ShowWindow(oPage:handle,SW_HIDE)
+      oPage:Hide()
    ENDIF
 
    RETURN(hTab)
@@ -187,7 +185,7 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
 METHOD Configure() CLASS TTabControl
 
-   LOCAL aTab //:=GetClientRect(::FHandle)
+   LOCAL aTab //:=GetClientRect(::Handle)
    local acRect:={0,0,0,0}
    LOCAL aTemp
    LOCAL aWnd:={}
@@ -216,7 +214,11 @@ METHOD Configure() CLASS TTabControl
 
    FOR i:=1 TO LEN(::Controls)
       IF ::Controls[i]!=NIL
-
+         
+         IF ::Controls[i]:FHandle == NIL
+            ::Controls[i]:CreateHandle()
+         ENDIF
+         
          ::Controls[i]:FLeft   := acRect[1]
          ::Controls[i]:FTop    := acRect[2]+acRect[4]
          ::Controls[i]:FWidth  := aTab[3]-6
@@ -410,16 +412,21 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS TabPage
 
-   ::Super:Create( oParent )
-
    ::FLeft    := 0
    ::FTop     := 0
    ::FWidth   := 10
    ::FHeight  := 10
    ::style    := WS_CHILD + WS_VISIBLE
+   ::ExStyle  := WS_EX_TRANSPARENT
    ::modal    := .F.
    ::resname  := NIL
    ::ImageIndex := 0
+   ::Parent := oParent
+   
+   ::Super:Create( oParent )
+
+   Application:ProcessMessages()
+   ::Update()
    
 return( Self )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.46 2002/11/12 05:38:33 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.47 2002/11/13 00:45:50 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -116,8 +116,6 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
 
    LOCAL aVars, aVar
 
-   TraceLog( oForm, oForm:Name )
-
    oForm:Create( Self )
 
    //oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
@@ -138,9 +136,7 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    
    IF ::FMainForm == NIL
       ::FMainForm := oForm
-   ELSE
-      TraceLog( ::FMainForm )
-      oForm:SetParent( ::FMainForm )
+      ::FMainForm:HandleNeeded()
    ENDIF
 
    oTarget := oForm

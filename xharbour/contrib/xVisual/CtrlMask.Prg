@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.41 2002/11/11 23:18:06 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.42 2002/11/13 00:45:53 what32 Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ TODO:
 
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL FormEdit
-GLOBAL EXTERNAL MainFrame
+GLOBAL EXTERNAL MainForm
 
 GLOBAL EXTERNAL ObjTree
 GLOBAL EXTERNAL ObjInspect

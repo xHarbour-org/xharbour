@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.9 2002/11/08 01:36:01 what32 Exp $
+ * $Id: xPad.prg,v 1.10 2002/11/08 03:24:32 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -29,6 +29,7 @@
  *
  */
 
+GLOBAL EXTERNAL MainForm
 
 // to do
 // add undo 10 or so levels
@@ -198,6 +199,8 @@ ENDCLASS
 //---------------------------------------------------------------------------------------------
 METHOD Create( oParent ) CLASS ObjEdit
 
+   ::Super:Create( oParent )
+
    ::FCaption := 'Source Editor'
    ::Fleft    := 100
    ::Ftop     := 100
@@ -205,10 +208,9 @@ METHOD Create( oParent ) CLASS ObjEdit
    ::Fheight  := 300
    ::Name     := "ObjEdit"
    ::Style    := WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_THICKFRAME
-   super:Create( oParent )
-
-   ::GetHandle()
-
+   
+   ::CreateHandle()
+   
    ::SourceEdit := oEdit():New( ::FHandle )
    ResetProcedure( ::FHandle )
    ::SourceEdit:configure()

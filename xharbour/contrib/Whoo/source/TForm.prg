@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.57 2002/11/11 18:43:31 what32 Exp $
+ * $Id: TForm.prg,v 1.58 2002/11/13 00:45:50 what32 Exp $
  */
 
 /*
@@ -117,10 +117,10 @@ RETURN(c)
 
 *-----------------------------------------------------------------------------*
 
-METHOD Create( oParent ) CLASS TForm
+METHOD Create( oOwner ) CLASS TForm
 
-   ::Super:Create( oParent )
-   
+   ::Super:Create( oOwner )
+
    ::WndProc   := IFNIL( ::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL( ::Msgs,-1,::Msgs)
    ::FrameWnd  := IFNIL( ::FrameWnd,.F.,::FrameWnd)
@@ -130,7 +130,7 @@ METHOD Create( oParent ) CLASS TForm
    ::lControl  := .F.
    ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
    ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )   
-   
+
 RETURN Self
 
 *-----------------------------------------------------------------------------*

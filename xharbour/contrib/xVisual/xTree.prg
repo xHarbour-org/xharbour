@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.20 2002/11/11 23:18:06 what32 Exp $
+ * $Id: xTree.prg,v 1.21 2002/11/12 00:51:47 what32 Exp $
  */
 
 /*
@@ -33,6 +33,7 @@
 #include "debug.ch"
 #include "TreeView.ch"
 
+GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL FormEdit
 GLOBAL EXTERNAL ObjInspect
 
@@ -49,7 +50,9 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS ObjTree
 
-   ::FCaption := 'Object Tree'
+   ::Super:Create( oParent )
+
+   ::FCaption := "Object Tree"
    ::Name     := "ObjTree"
    ::FLeft    := 0
    ::FTop     := 125
@@ -57,9 +60,8 @@ METHOD Create( oParent ) CLASS ObjTree
    ::FHeight  := 150
    ::ExStyle  := WS_EX_TOOLWINDOW
 
-   ::Super:Create( oParent )
+   ::SetParent( MainForm )
 
-   ::GetHandle()
 RETURN( Self )
 
 
@@ -73,20 +75,15 @@ METHOD WMCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::oTree := TreeObj():Create( self )
-   
-   ::oTree:Width := ::FWidth
-   ::oTree:Height:= ::FHeight
-   
-   ::Add( ::oTree )
 
-   ::oTree:FWidth := 100
-   ::oTree:FHeight:= 100
+   ::oTree:FWidth := ::FWidth
+   ::oTree:FHeight:= ::FHeight
 
-   ::oTree:Show( SW_SHOW )
+   ::oTree:SetParent( Self )
 
-   TVSetImageList(::oTree:Handle, hImg, 0 )
+   TVSetImageList( ::oTree:FHandle, hImg, 0 )
 
-RETURN( Self )
+RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------
 
