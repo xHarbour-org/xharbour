@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.415 2004/08/17 20:59:53 ronpinkas Exp $
+ * $Id: hvm.c,v 1.416 2004/08/19 00:00:55 peterrees Exp $
  */
 
 /*
@@ -8477,7 +8477,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
        // WITH OBJECT
        for( i = 0; i < hb_vm_wWithObjectCounter; i++ )
        {
-          if( ( &( hb_vm_aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+          if( ( &( hb_vm_aWithObject[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
           {
              hb_gcItemRef( &( hb_vm_aWithObject[ i ] ) );
           }
