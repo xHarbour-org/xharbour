@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1353 2003/08/18 12:13:45 druzus Exp $
+ * $Id: ChangeLog,v 1.1354 2003/08/18 17:38:45 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2003-08-18 19:28 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/hbi18n.c
-    + Added function HB_HScan to scan a hash for a given value;
+    + Added function HB_HFIND to scan a hash for a given value;
       It is just a wrapper of the function that scans the I18N
       table. When this version will be out, I'll move this in
       a separate file and I'll add a little more support for
