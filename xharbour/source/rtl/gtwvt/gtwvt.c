@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.23 2004/01/06 19:32:01 andijahja Exp $
+ * $Id: gtwvt.c,v 1.24 2004/01/06 23:18:43 peterrees Exp $
  */
 
 /*
@@ -179,11 +179,11 @@ typedef struct global_data
   BOOL      AltF4Close;                // Can use Alt+F4 to close application
   BOOL      InvalidateWindow;          // Flag for controlling whether to use ScrollWindowEx()
   BOOL      EnableShortCuts;           // Determines whether ALT key enables menu or system menu
-  HPEN      penWhite;
-  HPEN      penBlack;
-  HPEN      penWhiteDim;
-  HPEN      penDarkGray;
-  HDC       hdc;
+  HPEN      penWhite;                  // White Pen to dwar GUI elements
+  HPEN      penBlack;                  // Black Pen to dwar GUI elements
+  HPEN      penWhiteDim;               // Dim White Pen to dwar GUI elements
+  HPEN      penDarkGray;               // DarkGray Pen to dwar GUI elements
+  HDC       hdc;                       // Handle to Device Context of the Window to Draw GUI elements
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
 } GLOBAL_DATA;
 
@@ -3342,29 +3342,25 @@ HB_FUNC( WVT_DRAWBOXGET )
 {
    POINT xy;
    POINT yz;
-   HDC   hdc;
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    yz = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ) + hb_parni( 3 ), hb_parni( 1 ) + 1 );
 
-   hdc = GetDC( _s.hWnd );
+   SelectObject( _s.hdc, _s.penBlack );
 
-   SelectObject( hdc, _s.penBlack );
+   MoveToEx( _s.hdc, xy.x-1, xy.y-1, NULL );        // Top Inner
+   LineTo( _s.hdc, yz.x-2, xy.y-1 );
 
-   MoveToEx( hdc, xy.x-1, xy.y-1, NULL );
-   LineTo( hdc, yz.x-2, xy.y-1 );
+   MoveToEx( _s.hdc, xy.x-1, xy.y-1, NULL );        // Left Inner
+   LineTo( _s.hdc, xy.x-1, yz.y-2 );
 
-   MoveToEx( hdc, xy.x-1, xy.y-1, NULL );
-   LineTo( hdc, xy.x-1, yz.y-2 );
+   SelectObject( _s.hdc, _s.penDarkGray );
 
-   SelectObject( hdc, _s.penDarkGray );
-   MoveToEx( hdc, xy.x-2, xy.y-2, NULL );
-   LineTo( hdc, yz.x-1, xy.y-2 );
+   MoveToEx( _s.hdc, xy.x-2, xy.y-2, NULL );        // Top Outer
+   LineTo( _s.hdc, yz.x-1, xy.y-2 );
 
-   MoveToEx( hdc, xy.x-2, xy.y-2, NULL );
-   LineTo( hdc, xy.x-2, yz.y-1 );
-
-   ReleaseDC( _s.hWnd, hdc );
+   MoveToEx( _s.hdc, xy.x-2, xy.y-2, NULL );        // Top Inner
+   LineTo( _s.hdc, xy.x-2, yz.y-1 );
 
    hb_retl( TRUE );
 }
