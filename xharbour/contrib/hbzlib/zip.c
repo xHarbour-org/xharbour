@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.23 2004/03/02 00:31:04 andijahja Exp $
+ * $Id: zip.c,v 1.24 2004/03/02 12:58:13 andijahja Exp $
  */
 
 /*
@@ -67,6 +67,8 @@ static HB_ITEM FileAttribs;
 #define FA_ARCH            32   /* A */
 #define FA_NORMAL         128
 
+extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+
 static void ResetAttribs()
 {
    ULONG ulAtt, ulZipLen = FileToZip.item.asArray.value->ulLen;
@@ -93,6 +95,9 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    HB_ITEM Temp;
    BOOL bOkAdd;
    int ulLen = ZipArray.item.asArray.value->ulLen;
+   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+
+   Wild2RegEx( szSkleton, sRegEx, FALSE );
 
    Temp.type = HB_IT_NIL;
 
@@ -104,7 +109,7 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
 
       if ( szSkleton )
       {
-         bOkAdd = hb_strMatchRegExp( (const char *) szEntry, (const char *) szSkleton );
+         bOkAdd = hb_strMatchRegExp( (const char *) szEntry, (const char *) sRegEx );
       }
 
       if ( bOkAdd )
@@ -167,7 +172,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
          return;
       }
 
-      if ( strchr( pExclude->item.asString.value, '*') != NULL )
+      if ( strchr( pExclude->item.asString.value, '*') != NULL || strchr( pExclude->item.asString.value, '?' ) != NULL )
       {
          HB_ITEM WildFile;
          PHB_ITEM pDirEntry;
@@ -220,7 +225,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
          if( szExclude )
          {
-            if ( strchr( szExclude, '*') != NULL )
+            if ( strchr( szExclude, '*' ) != NULL || strchr( szExclude, '?' ) != NULL )
             {
                int uiW, uiWLen;
                char *szEntry;
@@ -288,7 +293,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
 
       if ( szArrEntry )
       {
-         if ( strchr( szArrEntry, '*') != NULL )
+         if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
             hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
             ulLen = WildFile.item.asArray.value->ulLen;

@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-04 04:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+    ! wild argument "?" is ignored. Fixed.
+
 2004-03-04 03:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/file.c
     ! fix hb_fsIsdirectory() function whereby ffind is used after it closed.
