@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.72 2004/03/30 01:56:57 andijahja Exp $
+ * $Id: dbf1.c,v 1.73 2004/03/30 05:55:36 druzus Exp $
  */
 
 /*
@@ -1024,17 +1024,6 @@ static ERRCODE hb_dbfFlush( DBFAREAP pArea )
    uiError = SELF_GOCOLD( ( AREAP ) pArea );
    if( pArea->fUpdateHeader )
    {
-      /* Exclusive mode */
-      /* Update record count */
-      if( !pArea->fShared ) /* this is always TRUE */
-      {
-         /* Seek to logical eof and write eof mark */
-         hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen +
-                    pArea->uiRecordLen * pArea->ulRecCount, FS_SET );
-         hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
-         hb_fsWrite( pArea->hDataFile, NULL, 0 );
-         pArea->fDataFlush = TRUE;
-      }
       SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
 
@@ -1449,13 +1438,6 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
       /* Update header */
       if( pArea->fUpdateHeader )
       {
-         /* Exclusive mode */
-         /* Seek to logical eof and write eof mark */
-         hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen +
-                    pArea->uiRecordLen * pArea->ulRecCount, FS_SET );
-         hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
-         hb_fsWrite( pArea->hDataFile, NULL, 0 );
-         pArea->fDataFlush = TRUE;
          SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
    }
@@ -2127,8 +2109,6 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       ulUserEvery = 1;
    }
 
-   /* Force write new header */
-   pArea->fUpdateHeader = TRUE;
    ulRecOut = ulEvery = 0;
    ulRecIn = 1;
    while ( ulRecIn <= pArea->ulRecCount )
@@ -2171,7 +2151,12 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       hb_vmDo( 0 );
    }
 
-   pArea->ulRecCount = ulRecOut;
+   if ( pArea->ulRecCount != ulRecOut )
+   {
+      pArea->ulRecCount = ulRecOut;
+      /* Force write new header */
+      pArea->fUpdateHeader = TRUE;
+   }
    return hb_dbfGoTo( pArea, 1 );
 }
 
@@ -2354,9 +2339,9 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   hb_dbfGoTo( pArea, 0 );
    pArea->fUpdateHeader = TRUE;
    pArea->ulRecCount = 0;
+   hb_dbfGoTo( pArea, 0 );
 
    /* Zap memo file */
    if( pArea->fHasMemo )
@@ -2786,6 +2771,15 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
          fLck = TRUE;
       }
       pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
+   }
+   else
+   {
+      /* Exclusive mode */
+      /* Seek to logical eof and write eof mark */
+      hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen +
+                 pArea->uiRecordLen * pArea->ulRecCount, FS_SET );
+      hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
+      hb_fsWrite( pArea->hDataFile, NULL, 0 );
    }
 
    HB_PUT_LE_ULONG( dbfHeader.ulRecCount, pArea->ulRecCount );

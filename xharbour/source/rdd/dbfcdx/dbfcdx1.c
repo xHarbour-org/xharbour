@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.120 2004/03/25 12:13:13 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.121 2004/03/30 05:55:36 druzus Exp $
  */
 
 /*
@@ -5772,7 +5772,7 @@ static ERRCODE hb_cdxSysName( CDXAREAP pArea, BYTE * pBuffer )
 /* ( DBENTRYP_V )     hb_cdxPack */
 static ERRCODE hb_cdxPack( CDXAREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("nb_cdxPack(%p)", pArea ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxPack(%p)", pArea ));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
