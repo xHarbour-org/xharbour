@@ -60,7 +60,7 @@ PROCEDURE dodata()
       FIELD NAME today  TYPE DATE      LEN  8 DEC 0 OF oTable
       FIELD NAME pay    TYPE LOGICAL   LEN  1 DEC 0 OF oTable
 
-      BUILD TABLE o
+      BUILD TABLE oTable
 
    ENDIF
 

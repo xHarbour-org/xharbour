@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.3 2003/02/03 05:27:20 walito Exp $
+ * $Id: ttable.prg,v 1.4 2003/07/24 11:02:19 toninhofwi Exp $
  */
 
 /*
@@ -471,8 +471,8 @@ FUNCTION TableNew( cDBF, cALIAS, cOrderBag, cDRIVER, ;
       oDB := saTables[ nPos, 2 ]
 
    ELSE
-      o := Table():New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
-                      lNET, cPATH, lNEW, lREADONLY )
+      o := HBTable():New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
+                          lNET, cPATH, lNEW, lREADONLY )
       IF o:Open()
          oDB := o:FldInit()
       ENDIF
@@ -498,13 +498,13 @@ RETURN oDB
 
 /****
 *
-*     CLASS oField()
+*     CLASS HBField()
 *
 *
 *
 */
 
-CLASS oField
+CLASS HBField
 
    DATA Alias INIT ALIAS()
    DATA Name INIT ""
@@ -522,13 +522,13 @@ ENDCLASS
 
 /****
 *
-*     CLASS Record()
+*     CLASS HBRecord()
 *
 *
 *
 */
 
-CLASS RECORD
+CLASS HBRecord
 
    DATA Buffer INIT {}
    DATA Alias INIT ALIAS()
@@ -542,7 +542,7 @@ CLASS RECORD
 ENDCLASS
 
 
-METHOD NEW( cAlias ) CLASS RECORD
+METHOD NEW( cAlias ) CLASS HBRecord
 
    LOCAL i
    LOCAL oFld
@@ -559,7 +559,7 @@ METHOD NEW( cAlias ) CLASS RECORD
 
    FOR EACH aItem in ::aFields
       i          := HB_EnumIndex()
-      oFld       := oField()
+      oFld       := HBField()
       oFld:order := i
       oFld:Name  := ( ::alias )->( FIELDNAME( i ) )
       oFld:Type  := aStruc[ i, 2 ]
@@ -572,7 +572,7 @@ METHOD NEW( cAlias ) CLASS RECORD
 RETURN Self
 
 
-PROCEDURE GET() CLASS RECORD
+PROCEDURE GET() CLASS HBRecord
 
    LOCAL xField
 
@@ -584,7 +584,7 @@ PROCEDURE GET() CLASS RECORD
 RETURN 
 
 
-PROCEDURE Put() CLASS RECORD
+PROCEDURE Put() CLASS HBRecord
 
    LOCAL xField
 
@@ -599,7 +599,7 @@ RETURN
 
 /****
 *
-*     CLASS Table()
+*     CLASS HBTable
 *
 *
 *
@@ -622,7 +622,7 @@ RETURN
    //
    //ORDER Management
    //
-CLASS Table
+CLASS HBTable
 
    DATA Buffer INIT {}                  // 1
    DATA Alias INIT ALIAS()              // 2
@@ -789,7 +789,7 @@ ENDCLASS
    //---------------------
 
 METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
-               lNET, cPATH, lNEW, lREADONLY ) CLASS Table
+               lNET, cPATH, lNEW, lREADONLY ) CLASS HBTable
    DEFAULT lNET TO .F.
    DEFAULT lNEW TO .T.
    DEFAULT lREADONLY TO .F.
@@ -815,7 +815,7 @@ METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
 RETURN Self
 
 
-METHOD OPEN() CLASS Table
+METHOD OPEN() CLASS HBTable
 
    LOCAL lSuccess := .T.
 
@@ -846,7 +846,7 @@ METHOD OPEN() CLASS Table
 RETURN ( lSuccess )
 
 
-PROCEDURE DBMove( nDirection ) CLASS Table
+PROCEDURE DBMove( nDirection ) CLASS HBTable
 
    LOCAL nRec := ( ::Alias )->( RECNO() )
    DEFAULT nDirection TO 0
@@ -876,7 +876,7 @@ RETURN
 // -->
 // -->
 
-METHOD FldInit() CLASS Table
+METHOD FldInit() CLASS HBTable
 
    LOCAL i
    LOCAL bBlock
@@ -899,7 +899,7 @@ METHOD FldInit() CLASS Table
 
    // --> create new oObject class from this one...
 
-   adb := hbclass():new( ::alias, __CLS_PARAM( "table" ) )
+   adb := hbclass():new( ::alias, __CLS_PARAM( "hbtable" ) )
 
    FOR i := 1 TO FCOUNT()
       adb:AddData( ( ::Alias )->( FIELDNAME( i ) ),,, nScope )
@@ -926,6 +926,7 @@ METHOD FldInit() CLASS Table
    oNew:Buffer      := ::buffer
 
    SELECT( oNew:Alias )
+
    oNew:Area := SELECT()
 
    oNew:Read()
@@ -946,7 +947,7 @@ METHOD FldInit() CLASS Table
 RETURN oNew
 
 
-PROCEDURE READ( lKeepBuffer ) CLASS Table
+PROCEDURE READ( lKeepBuffer ) CLASS HBTable
 
    LOCAL i
    LOCAL nSel   := SELECT( ::Alias )
@@ -976,7 +977,7 @@ PROCEDURE READ( lKeepBuffer ) CLASS Table
 RETURN 
 
 
-PROCEDURE ReadBlank( lKeepBuffer ) CLASS Table
+PROCEDURE ReadBlank( lKeepBuffer ) CLASS HBTable
 
    LOCAL i
    LOCAL nSel   := SELECT( ::Alias )
@@ -1008,7 +1009,7 @@ PROCEDURE ReadBlank( lKeepBuffer ) CLASS Table
 RETURN 
 
 
-METHOD Write( lKeepBuffer ) CLASS Table
+METHOD Write( lKeepBuffer ) CLASS HBTable
 
    LOCAL i
    LOCAL aOldBuffer := ARRAY( ( ::Alias )->( FCOUNT() ) )
@@ -1054,7 +1055,7 @@ METHOD Write( lKeepBuffer ) CLASS Table
 RETURN ( .T. )
 
 
-METHOD BUFWrite( aBuffer ) CLASS Table
+METHOD BUFWrite( aBuffer ) CLASS HBTable
 
    LOCAL aOldBuffer := ARRAY( ( ::Alias )->( FCOUNT() ) )
    LOCAL nSel       := SELECT( ::Alias )
@@ -1113,7 +1114,7 @@ METHOD __oTDelete( lKeepBuffer )        // ::Delete()
 RETURN ( lRet )
 
 
-METHOD SetMonitor( lOnOff ) CLASS Table
+METHOD SetMonitor( lOnOff ) CLASS HBTable
 
    LOCAL lTemp := ::lMonitor
    ::lMonitor := !( ::lMonitor )
@@ -1123,7 +1124,7 @@ RETURN lTemp
 //   Transaction control subsystem...
 //
 
-METHOD Undo( nBuffer, nLevel ) CLASS Table
+METHOD Undo( nBuffer, nLevel ) CLASS HBTable
 
    LOCAL i
    LOCAL nLen
@@ -1260,14 +1261,14 @@ RETURN ( lRet )
 METHOD AddOrder( cTag, cKey, cLabel, ;
                     cFor, cWhile, ;
                     lUnique, ;
-                    bEval, nInterval, cOrderFile ) CLASS Table
+                    bEval, nInterval, cOrderFile ) CLASS HBTable
    LOCAL oOrd
    DEFAULT cOrderFile TO ::cOrderBag
 
-   oOrd := oOrder():New( cTag, cKey, cLabel, ;
-                       cFor, cWhile, ;
-                       lUnique, ;
-                       bEval, nInterval )
+   oOrd := HBOrder():New( cTag, cKey, cLabel, ;
+                          cFor, cWhile, ;
+                          lUnique, ;
+                          bEval, nInterval )
 
    oOrd:oTable    := Self
    oOrd:cOrderBag := ::cOrderBag
@@ -1277,7 +1278,7 @@ METHOD AddOrder( cTag, cKey, cLabel, ;
 RETURN oOrd
 
 
-METHOD Reindex() CLASS Table
+METHOD Reindex() CLASS HBTable
 
    LOCAL i
    LOCAL lRet := .F.
@@ -1326,7 +1327,7 @@ METHOD Reindex() CLASS Table
 RETURN ( lRet )
 
 
-METHOD FastReindex() CLASS Table
+METHOD FastReindex() CLASS HBTable
 
    LOCAL i
    LOCAL lRet := .F.
@@ -1372,7 +1373,7 @@ METHOD FastReindex() CLASS Table
 RETURN ( lRet )
 
 
-METHOD GetOrder( xOrder ) CLASS Table
+METHOD GetOrder( xOrder ) CLASS HBTable
 
    LOCAL nPos  := 0
    LOCAL xType := VALTYPE( xOrder )
@@ -1392,7 +1393,7 @@ METHOD GetOrder( xOrder ) CLASS Table
 RETURN ::aOrders[ nPos ]                // returns oOrder
 
 
-METHOD SetOrder( xTag ) CLASS Table
+METHOD SetOrder( xTag ) CLASS HBTable
 
    LOCAL xType   := VALTYPE( xTag )
    LOCAL nOldOrd := ( ::Alias )->( ORDSETFOCUS() )
@@ -1417,7 +1418,7 @@ METHOD SetOrder( xTag ) CLASS Table
 RETURN nOldOrd
 
 
-METHOD GetOrderLabels() CLASS Table
+METHOD GetOrderLabels() CLASS HBTable
 
    LOCAL aRet := {}
    IF !EMPTY( ::aOrders )
@@ -1429,7 +1430,7 @@ RETURN aRet
 // Relation Methods
 //
 
-PROCEDURE AddChild( oChild, cKey ) CLASS Table                 // ::addChild()
+PROCEDURE AddChild( oChild, cKey ) CLASS HBTable                 // ::addChild()
 
    AADD( ::aChildren, { oChild, cKey } )
    oChild:oParent := Self
@@ -1449,7 +1450,7 @@ RETURN ( LEFT( cFileName, IF( nLeft == 0, ;
          nLeft - 1 ) ) )
 
 
-METHOD CreateTable( cFile ) CLASS Table
+METHOD CreateTable( cFile ) CLASS HBTable
 
    ::cDbf := cFile
    IF LEN( ::aStruc ) > 0
@@ -1459,19 +1460,19 @@ METHOD CreateTable( cFile ) CLASS Table
 RETURN Self
 
 
-PROCEDURE AddField( f, t, l, d ) CLASS Table
+PROCEDURE AddField( f, t, l, d ) CLASS HBTable
 
    AADD( ::aStruc, { f, t, l, d } )
 RETURN 
 
 
-PROCEDURE Gentable() CLASS Table
+PROCEDURE Gentable() CLASS HBTable
 
    DBCREATE( ::cDbf, ::aStruc, ::Driver )
 RETURN 
 
 
-CLASS oOrder
+CLASS HBOrder
 
    DATA oTable
    DATA cOrderBag
@@ -1501,7 +1502,7 @@ CLASS oOrder
 
 ENDCLASS
 
-METHOD New( cTag, cKey, cLabel, cFor, cWhile, lUnique, bEval, nInterval, cOrderBag ) CLASS oOrder
+METHOD New( cTag, cKey, cLabel, cFor, cWhile, lUnique, bEval, nInterval, cOrderBag ) CLASS HBOrder
 
    DEFAULT cKey TO ".T."
    DEFAULT lUnique TO .F.
@@ -1524,7 +1525,7 @@ METHOD New( cTag, cKey, cLabel, cFor, cWhile, lUnique, bEval, nInterval, cOrderB
 RETURN Self
 
 
-PROCEDURE Create() CLASS oOrder
+PROCEDURE Create() CLASS HBOrder
 
    DEFAULT ::cOrderBag TO ::oTable:cOrderBag
    //? "<<<",::alias, ::cOrderBag

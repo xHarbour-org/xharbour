@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.ch,v 1.1 2002/12/24 00:42:47 lculik Exp $
+ * $Id: ttable.ch,v 1.2 2003/07/24 11:02:19 toninhofwi Exp $
  */
 
 /*
@@ -107,7 +107,7 @@
                  [<lnew: NEW>]          ;
                  [<lrdonly: READONLY>]  ;
                  =>;
-                 <oTable> := TableNew(              ;
+                 <oTable> := TableNew(                  ;
                                           <(cFileDBF)>, ;
                                           <"cAlias">,   ;
                                           <(cFileIDX)>, ;
@@ -186,7 +186,7 @@
 #xtranslate CSY_TYPE Memo    =>  "M"
 #xtranslate CSY_TYPE Logical    => "L"
 #xtranslate CSY_TYPE Auto    => "A"
-#xcommand CREATE DATABASE <o> FILE <file> => <o>:=Table():CreateTable(<(file)>);#define _TABLE_ <o>
+#xcommand CREATE DATABASE <o> FILE <file> => <o>:=HBTable():CreateTable(<(file)>);#define _TABLE_ <o>
 #xTranslate FIELD [ <oFld> ]                        ;
                 [ NAME <(cName)> ]                  ;
                 [ TYPE <cType> ]                    ;
