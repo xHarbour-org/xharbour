@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.6 2002/03/17 00:10:12 ronpinkas Exp $
+ * $Id: tget.prg,v 1.7 2002/03/17 23:27:28 lculik Exp $
  */
 
 /*
@@ -506,12 +506,23 @@ METHOD Untransform( cBuffer ) CLASS Get
       else
          cBuffer := StrTran( cBuffer, ",", "" )
       endif
+
+      for nFor := 1 to ::nMaxLen
+         if !::IsEditable( nFor )
+            cBuffer := Left( cBuffer, nFor-1 ) + " " + SubStr( cBuffer, nFor+1 )
+         endif
+      next
+
       cBuffer := StrTran( cBuffer, "$", "" )
       cBuffer := StrTran( cBuffer, "*", "" )
       cBuffer := StrTran( cBuffer, "-", "" )
       cBuffer := StrTran( cBuffer, "(", "" )
       cBuffer := StrTran( cBuffer, ")", "" )
-      cBuffer := AllTrim( cBuffer )
+
+      cBuffer := StrTran( cBuffer, " ", "" ) // It replace left, right 
+                                             // and medium spaces.
+                                             // Don't replace for Alltrim()
+
       xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
       if ::minus
          xValue := -xValue
@@ -1239,10 +1250,10 @@ return ::bBlock
 
 METHOD HitTest(mrow,mcol) CLASS GET
         if ::row != mrow
-		return HTNOWHERE
+           return HTNOWHERE
         endif
         if mcol >= ::col .and. mrow <= ::col+::ndispLen
-		return HTCLIENT
+           return HTCLIENT
         endif
 return HTNOWHERE
 
