@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.34 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: gtcrs.c,v 1.1.1.1 2001/12/21 10:42:42 ronpinkas Exp $
  */
 
 /*
