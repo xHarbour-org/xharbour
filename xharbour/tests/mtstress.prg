@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.8 2003/10/18 01:15:19 jonnymind Exp $
+* $Id: mtstress.prg,v 1.9 2003/11/26 23:52:54 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -23,7 +23,7 @@ PROCEDURE Main( cShow )
 
    CLEAR SCREEN
    @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
-
+   @3,9 SAY "(You'll seen screen glittering: don't worry, its normal)"
    IF cShow != NIL
       bShow := .F.
    ELSE
@@ -64,7 +64,7 @@ PROCEDURE Stress( nId, nRow )
    cRndVal := "ABCDEFGHILMNOPQRSTUVZ"
 
    // Step 40: database test
-
+#ifdef TESTING
    @nRow,5 SAY Space( 80 )
    IF File( "test.dbf" )
       Select &nId
@@ -91,7 +91,7 @@ PROCEDURE Stress( nId, nRow )
       NEXT
       USE
    ENDIF
-
+#endif
    //Step 1: foreach test
 
    @nRow,5 SAY Space( 80 )
