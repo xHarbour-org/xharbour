@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.35 2002/10/18 05:15:55 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.36 2002/11/12 17:24:14 ronpinkas Exp $
  */
 
 /*
@@ -1415,7 +1415,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   if( pReduced->ExprType == HB_ET_STRING )
                   {
                      ULONG i;
-                     char *sCopy = hb_xgrab( pReduced->ulLength + 1 );
+                     char *sCopy = (char *) hb_xgrab( pReduced->ulLength + 1 );
 
                      memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
                      pReduced->value.asString.string = sCopy;
