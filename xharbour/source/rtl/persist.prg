@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.17 2003/12/23 19:31:27 peterrees Exp $
+ * $Id: persist.prg,v 1.18 2004/01/06 21:11:40 peterrees Exp $
  */
 
 /*
@@ -96,29 +96,21 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
    IF lIgnoreBadIVars == nil
       lIgnoreBadIVars := .f.
    ENDIF
-
-
+   aLines := ArrayFromLFString(cObjectText)
+   nLines := LEN(aLines)
    IF LEFT(cObjectText, LEN(cVersion2)) == cVersion2
-      aLines := ArrayFromLFString(cObjectText)
-      nLines := LEN(aLines)
       nLine  := 2
    ELSE
-      aLines:= {}
-      nLines := MLCount( cObjectText, 254 )
-      DO WHILE nLine <= nLines
-         cLine := LTrim( MemoLine( cObjectText, 254, nLine ) )
+      FOR nLine := 1 TO nLines
+         cLine := LTRIM(aLines[nLine])
          IF cLine[1] == ':'
             nAt := At( '=', cLine )
             IF nAt > 1
               cLine[ nAt - 1] := ':'
             ENDIF
+            aLines[nLine]:= cLine
          ENDIF
-
-         AADD(aLines,cLine + HB_OsNewLine())
-
-         nLine++
-      ENDDO
-      nLines := LEN(aLines)
+      NEXT nLine
       nLine  := 1
    ENDIF
 
@@ -131,7 +123,6 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       ENDIF
 
       //TraceLog( cLine )
-
       DO CASE
          CASE Left( cLine, 2 ) == "::"
             cLine := "oObject" + SubStr( cLine, 2 )
@@ -149,7 +140,6 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
             cLine = SubStr( cLine, 8 )
             cLine := "oObject" + cLine
             cLine := StrTran( cLine, " LEN ", " := Array( " ) + ")"
-
             //TraceLog( cLine )
             &( cLine )
 
