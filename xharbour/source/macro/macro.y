@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.12 2004/01/19 20:57:13 ronpinkas Exp $
+ * $Id: macro.y,v 1.13 2004/02/24 04:45:20 ronpinkas Exp $
  */
 
 /*
@@ -230,6 +230,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <asExpr>  ArrayIndex IndexList
 %type <asExpr>  FieldAlias FieldVarAlias
 %type <asExpr>  PostOp
+%type <asExpr>  WithData WithMethod
 
 %%
 
@@ -467,6 +468,8 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             | MacroExpr     ArrayIndex    { $$ = $2; }
             | ObjectData    ArrayIndex    { $$ = $2; }
             | ObjectMethod  ArrayIndex    { $$ = $2; }
+            | WithData      ArrayIndex    { $$ = $2; }
+            | WithMethod    ArrayIndex    { $$ = $2; }
             | FunCall       ArrayIndex    { $$ = $2; }
             | IfInline      ArrayIndex    { $$ = $2; }
             | PareExpList   ArrayIndex    { $$ = $2; }
@@ -547,7 +550,14 @@ ObjectData  : NumValue ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 )
             | VariableAt ':' IDENTIFIER      { $$ = hb_compExprNewSend( $1, $3 ); }
             | ObjectMethod ':' IDENTIFIER    { $$ = hb_compExprNewSend( $1, $3 ); }
             | ObjectData ':' IDENTIFIER      { $$ = hb_compExprNewSend( $1, $3 ); }
+            | WithMethod ':' IDENTIFIER      { $$ = hb_compExprNewSend( $1, $3 ); }
+            | WithData ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 ); }
             ;
+
+WithData    : ':' IDENTIFIER                 {
+                                                $$ = hb_compExprNewWithSend( $2 );
+                                             }
+           ;
 
 /* Object's method
  */
@@ -560,6 +570,11 @@ ObjectMethod : ObjectData '(' ArgList ')'    {
                                                }
                                              }
             ;
+
+WithMethod   : WithData '(' ArgList ')'  {
+                                           $$ = hb_compExprNewWithMethodCall( $1, $3 );
+                                         }
+             ;
 
 SimpleExpression :
              NumValue
@@ -579,6 +594,8 @@ SimpleExpression :
            | IfInline                         { $$ = $1; }
            | ObjectData                       { $$ = $1; }
            | ObjectMethod                     { $$ = $1; }
+           | WithData                         { $$ = $1; }
+           | WithMethod                       { $$ = $1; }
            | AliasExpr                        { $$ = $1; }
            | ExprAssign                       { $$ = $1; }
            | ExprOperEq                       { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
@@ -646,6 +663,8 @@ ExprPostOp  : NumValue     PostOp %prec POST  { $$ = $2; }
             | FunCall      PostOp %prec POST  { $$ = $2; }
             | ObjectData   PostOp %prec POST  { $$ = $2; }
             | ObjectMethod PostOp %prec POST  { $$ = $2; }
+            | WithData     PostOp %prec POST  { $$ = $2; }
+            | WithMethod   PostOp %prec POST  { $$ = $2; }
             ;
 
 ExprPreOp   : INC Expression  %prec PRE      { $$ = hb_compExprNewPreInc( $2 ); }
@@ -676,6 +695,8 @@ ExprAssign  : NumValue     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $
             | FunCall      INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | ObjectData   INASSIGN Expression   { HB_MACRO_IFENABLED( $$, hb_compExprAssign( $1, $3 ), HB_SM_HARBOUR ); }
             | ObjectMethod INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | WithData     INASSIGN Expression   { HB_MACRO_IFENABLED( $$, hb_compExprAssign( $1, $3 ), HB_SM_HARBOUR ); }
+            | WithMethod   INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             ;
 
 ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -697,6 +718,8 @@ ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | FunCall      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -718,6 +741,8 @@ ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb
             | FunCall      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -739,6 +764,8 @@ ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | FunCall      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -760,6 +787,8 @@ ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | FunCall      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -781,6 +810,8 @@ ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | FunCall      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -802,6 +833,8 @@ ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | FunCall      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectData   EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ObjectMethod EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithData     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | WithMethod   EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprOperEq  : ExprPlusEq      { $$ = $1; }

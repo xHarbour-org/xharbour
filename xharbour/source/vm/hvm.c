@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.398 2004/05/17 01:51:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.399 2004/05/18 15:05:44 ronpinkas Exp $
  */
 
 /*
@@ -1965,8 +1965,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-            goto Done;
-            //return;
+            return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
@@ -3607,8 +3606,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
-
- Done:
 
    // Reset FOR EACH.
    while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
@@ -8611,41 +8608,6 @@ HB_FUNC( HB_QWITH )
    }
 }
 
-HB_FUNC( HB_SETWITH )
-{
-   HB_THREAD_STUB
-
-   if( hb_pcount() == 0 )
-   {
-      if( hb_vm_wWithObjectCounter )
-      {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
-      }
-      else
-      {
-         hb_itemClear( &(HB_VM_STACK.Return) );
-      }
-   }
-   else
-   {
-      PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
-
-      hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), pWith );
-
-      if( hb_vm_wWithObjectCounter == HB_MAX_WITH_OBJECTS )
-      {
-         hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
-
-         // Release ALL WITH OBJECT.
-         while( hb_vm_wWithObjectCounter )
-         {
-            --hb_vm_wWithObjectCounter;
-            hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-         }
-      }
-   }
-}
-
 HB_FUNC( HB_QSELF )
 {
    HB_THREAD_STUB
@@ -8808,7 +8770,16 @@ HB_FUNC( HB_RESTOREBLOCK )
    }
 }
 
-HB_FUNC( HB_NOMOUSE ){}
+HB_FUNC( HB_NOMOUSE )
+{
+}
+
+HB_FUNC( HB_WITHOBJECTCOUNTER )
+{
+   HB_THREAD_STUB
+
+   hb_retnl( hb_vm_wWithObjectCounter ) ;
+}
 
 #if defined(HB_OS_WIN_32) && defined(__WATCOMC__) && !defined(__EXPORT__)
 extern void HB_EXPORT hb_forceLinkMain( void );

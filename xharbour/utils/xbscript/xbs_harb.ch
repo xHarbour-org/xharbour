@@ -817,7 +817,7 @@
         aAdd( aCommRules, { 'CLS' ,  , .T. } )
         aAdd( aCommRules, { 'CLEAR' , { {    0,   0, 'SCREEN', NIL, NIL } } , .T. } )
         aAdd( aCommRules, { '?' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
-        aAdd( aCommRules, { '??' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
+        aAdd( aCommRules, { '?' , { {    0,   0, '?', NIL, NIL }, {    1,   1, NIL, 'A', NIL } } , .F. } )
         aAdd( aCommRules, { 'READ' ,  , .T. } )
         aAdd( aCommRules, { 'SAVE' , { {    0,   0, 'SCREEN', NIL, NIL }, {    1,   1, 'TO', '<', NIL } } , .T. } )
         aAdd( aCommRules, { 'RESTORE' , { {    0,   0, 'SCREEN', NIL, NIL }, {    1,   1, 'FROM', '<', NIL } } , .T. } )
@@ -2478,171 +2478,181 @@
             hb_retclen_buffer( pString, i );
          #endif
       }
-
-      #ifdef __XHARBOUR__
-         #ifdef AX
-            #include <windows.h>
-         #endif
-
-         #include "hbpcode.h"
-
-         typedef union
-         {
-            BYTE *   pAsmData;                           /* The assembler bytes      */
-            PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
-                                                            function                 */
-         } ASM_CALL, * PASM_CALL;
-
-         typedef struct
-         {
-            int iID;
-            PASM_CALL pAsm;
-            BYTE *pcode;
-            PHB_DYNS pDyn;
-         } DYN_PROC;
-
-         HB_EXTERN_BEGIN
-         extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
-         HB_EXTERN_END
-
-         static DYN_PROC *s_pDynList;
-         static int s_iDyn = 0;
-
-         HB_FUNC_STATIC( PP_GENDYNPROCEDURE )
-         {
-            char *sFunctionName = hb_parcx( 1 );
-            short int iID = hb_parni( 2 );
-            static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
-
-            PASM_CALL pDynFunc;
-            PHB_DYNS pDynSym;
-
-            /*
-            int i;
-
-            for( i = 0; i < s_iDyn; i++ )
-            {
-               if( s_pDynList[i].iID == iID && strcmp( s_pDynList[i].pDyn->pSymbol->szName, sFunctionName ) == 0 )
-               {
-                  hb_retl( 0 );
-                  return;
-               }
-            }
-            */
-
-            #ifdef AX
-               TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s'\n", sFunctionName );
-            #endif
-
-            BYTE *pcode = (BYTE *) hb_xgrab( 31 );
-
-            pcode[ 0] = HB_P_SFRAME;
-            pcode[ 1] = HB_LOBYTE( iLastSym );
-            pcode[ 2] = HB_HIBYTE( iLastSym );
-
-            pcode[ 3] = HB_P_PUSHNIL;
-
-            pcode[ 4] = HB_P_POPSTATIC;
-            pcode[ 5] = 28;
-            pcode[ 6] = 0;                 /* S_XRET */
-
-            pcode[ 7] = HB_P_PUSHSYMNEAR;
-            pcode[ 8] = 30;               /* HB_APARAMS */
-
-            pcode[ 9] = HB_P_PUSHNIL;
-
-            pcode[10] = HB_P_FUNCTIONSHORT;
-            pcode[11] =  0;
-
-            pcode[12] = HB_P_POPSTATIC;
-            pcode[13] = 36;
-            pcode[14] = 0;                /* S_APARAMS */
-
-            pcode[15] = HB_P_PUSHSYMNEAR;
-            pcode[16] = 32;               /* PP_EXECPROCEDURE */
-
-            pcode[17] = HB_P_PUSHNIL;
-
-            pcode[18] = HB_P_PUSHSTATIC;
-            pcode[19] = 27;
-            pcode[20] = 0;                 /* S_APROCEDURES */
-
-            pcode[21] = HB_P_PUSHINT;
-            pcode[22] = HB_LOBYTE( iID );
-            pcode[23] = HB_HIBYTE( iID );
-
-            pcode[24] =  HB_P_DOSHORT;
-            pcode[25] =  2;
-
-            pcode[26] = HB_P_PUSHSTATIC;
-            pcode[27] = 28;
-            pcode[28] = 0;                 /* S_XRET */
-
-            pcode[29] =  HB_P_RETVALUE;
-
-            pcode[30] = HB_P_ENDPROC;
-
-            pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
-
-            pDynSym = hb_dynsymGet( sFunctionName );
-            pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
-
-            if( s_iDyn == 0 )
-            {
-               s_pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) );
-
-               s_pDynList[0].iID   = iID;
-               s_pDynList[0].pAsm  = pDynFunc;
-               s_pDynList[0].pcode = pcode;
-               s_pDynList[0].pDyn  = pDynSym;
-            }
-            else
-            {
-               s_pDynList = (DYN_PROC *) hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
-
-               s_pDynList[s_iDyn].iID   = iID;
-               s_pDynList[s_iDyn].pAsm  = pDynFunc;
-               s_pDynList[s_iDyn].pcode = pcode;
-               s_pDynList[s_iDyn].pDyn  = pDynSym;
-            }
-
-            s_iDyn++;
-
-            hb_retl( 1 );
-         }
-
-         HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
-         {
-            int i;
-
-            for( i = 0; i < s_iDyn; i++ )
-            {
-               #ifdef AX
-                  TraceLog( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
-                                 s_pDynList[i].pAsm,
-                                 s_pDynList[i].pcode,
-                                 s_pDynList[i].pDyn->pSymbol->value.pFunPtr );
-               #endif
-
-               hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
-               hb_xfree( (void *) ( s_pDynList[i].pcode ) );
-               hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->value.pFunPtr ) );
-
-               s_pDynList[i].pDyn->pSymbol->value.pFunPtr = NULL;
-            }
-
-            if( s_iDyn )
-            {
-               s_iDyn = 0;
-               hb_xfree( (void *) s_pDynList );
-            }
-         }
-      #endif
     #pragma ENDDUMP
 
-  #endif
+  #endif // #ifdef USE_C_BOOST
+
+  //----------------------------------------------------------------------------//
+
+  #pragma BEGINDUMP
+
+    #ifdef __XHARBOUR__
+       #ifdef AX
+          #include <windows.h>
+       #endif
+
+       #include "hbpcode.h"
+
+       typedef union
+       {
+          BYTE *   pAsmData;                           /* The assembler bytes      */
+          PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
+                                                          function                 */
+       } ASM_CALL, * PASM_CALL;
+
+       typedef struct
+       {
+          int iID;
+          PASM_CALL pAsm;
+          BYTE *pcode;
+          PHB_DYNS pDyn;
+       } DYN_PROC;
+
+       HB_EXTERN_BEGIN
+       extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+       HB_EXTERN_END
+
+       static DYN_PROC *s_pDynList;
+       static int s_iDyn = 0;
+
+       //---------------------------------------------------------------------------//
+       HB_FUNC_STATIC( PP_GENDYNPROCEDURE )
+       {
+          char *sFunctionName = hb_parcx( 1 );
+          short int iID = hb_parni( 2 );
+          static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
+
+          PASM_CALL pDynFunc;
+          PHB_DYNS pDynSym;
+
+          /*
+          int i;
+
+          for( i = 0; i < s_iDyn; i++ )
+          {
+             if( s_pDynList[i].iID == iID && strcmp( s_pDynList[i].pDyn->pSymbol->szName, sFunctionName ) == 0 )
+             {
+                hb_retl( 0 );
+                return;
+             }
+          }
+          */
+
+          #ifdef AX
+             TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s'\n", sFunctionName );
+          #endif
+
+          BYTE *pcode = (BYTE *) hb_xgrab( 31 );
+
+          pcode[ 0] = HB_P_SFRAME;
+          pcode[ 1] = HB_LOBYTE( iLastSym );
+          pcode[ 2] = HB_HIBYTE( iLastSym );
+
+          pcode[ 3] = HB_P_PUSHNIL;
+
+          pcode[ 4] = HB_P_POPSTATIC;
+          pcode[ 5] = 28;
+          pcode[ 6] = 0;                 /* S_XRET */
+
+          pcode[ 7] = HB_P_PUSHSYMNEAR;
+          pcode[ 8] = 30;               /* HB_APARAMS */
+
+          pcode[ 9] = HB_P_PUSHNIL;
+
+          pcode[10] = HB_P_FUNCTIONSHORT;
+          pcode[11] =  0;
+
+          pcode[12] = HB_P_POPSTATIC;
+          pcode[13] = 36;
+          pcode[14] = 0;                /* S_APARAMS */
+
+          pcode[15] = HB_P_PUSHSYMNEAR;
+          pcode[16] = 32;               /* PP_EXECPROCEDURE */
+
+          pcode[17] = HB_P_PUSHNIL;
+
+          pcode[18] = HB_P_PUSHSTATIC;
+          pcode[19] = 27;
+          pcode[20] = 0;                 /* S_APROCEDURES */
+
+          pcode[21] = HB_P_PUSHINT;
+          pcode[22] = HB_LOBYTE( iID );
+          pcode[23] = HB_HIBYTE( iID );
+
+          pcode[24] =  HB_P_DOSHORT;
+          pcode[25] =  2;
+
+          pcode[26] = HB_P_PUSHSTATIC;
+          pcode[27] = 28;
+          pcode[28] = 0;                 /* S_XRET */
+
+          pcode[29] =  HB_P_RETVALUE;
+
+          pcode[30] = HB_P_ENDPROC;
+
+          pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
+
+          pDynSym = hb_dynsymGet( sFunctionName );
+          pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
+
+          if( s_iDyn == 0 )
+          {
+             s_pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) );
+
+             s_pDynList[0].iID   = iID;
+             s_pDynList[0].pAsm  = pDynFunc;
+             s_pDynList[0].pcode = pcode;
+             s_pDynList[0].pDyn  = pDynSym;
+          }
+          else
+          {
+             s_pDynList = (DYN_PROC *) hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
+
+             s_pDynList[s_iDyn].iID   = iID;
+             s_pDynList[s_iDyn].pAsm  = pDynFunc;
+             s_pDynList[s_iDyn].pcode = pcode;
+             s_pDynList[s_iDyn].pDyn  = pDynSym;
+          }
+
+          s_iDyn++;
+
+          hb_retl( 1 );
+       }
+
+       //---------------------------------------------------------------------------//
+       HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
+       {
+          int i;
+
+          for( i = 0; i < s_iDyn; i++ )
+          {
+             #ifdef AX
+                TraceLog( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
+                               s_pDynList[i].pAsm,
+                               s_pDynList[i].pcode,
+                               s_pDynList[i].pDyn->pSymbol->value.pFunPtr );
+             #endif
+
+             hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
+             hb_xfree( (void *) ( s_pDynList[i].pcode ) );
+             hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->value.pFunPtr ) );
+
+             s_pDynList[i].pDyn->pSymbol->value.pFunPtr = NULL;
+          }
+
+          if( s_iDyn )
+          {
+             s_iDyn = 0;
+             hb_xfree( (void *) s_pDynList );
+          }
+       }
+       //---------------------------------------------------------------------------//
+
+    #endif
+
+  #pragma ENDDUMP
+
   //---------------------------------------------------------------------------//
 
 #endif
 //--------------------------------------------------------------//
-

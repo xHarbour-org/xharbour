@@ -21,7 +21,7 @@
  * their web site at http://www.gnu.org/).
  *
  * Please note: You are NOT allowed to include any portions of the source
- * files (xbscript.prg, xbs_harb.ch, rp_run.src, and rp_dot.src) into 
+ * files (xbscript.prg, xbs_harb.ch, rp_run.src, and rp_dot.src) into
  * any propriatary (non GPL) application, except if you purchase an alternate
  * Typical Retail License (TRL).
  *
@@ -88,6 +88,7 @@
 
       EXTERN CreateObject
       EXTERN GetActiveObject
+      EXTERN HB_QWith
 
       #ifdef SQL
          REQUEST SQLRDD
@@ -249,6 +250,8 @@
    #DEFINE __CLIPPER__
 
    #translate At( <find>, <where>, <from> ) => IIF( ( M->__AT__  := At( <find>, SubStr( <where>, <from> ) ) ) == 0, 0, <from> + M->__AT__ - 1 )
+
+   #xtranslate ErrorNew( <init,...> ) => ErrorNewX( <init> )
 
    #ifndef CRLF
       #DEFINE  CRLF Chr(13) + Chr(10)
@@ -418,8 +421,8 @@ STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
 STATIC s_bExternalRecovery
-STATIC s_anForEachEnumerationIndex := {}, s_nForEachIndex := 0
-STATIC s_aForEachEnumerations := {}, s_anForEachEnumerator := {}, s_anForEachStartingBlock := {}
+STATIC s_anEnumIndex := {}, s_nForEachIndex := 0
+STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := {}
 
 #xtranslate Stringify( [<x>] ) => #<x>
 
@@ -928,11 +931,23 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
                s_lReturnRequested := .F.
                EXIT
             ELSE
-               s_nForEachIndex := aSequence[ Len( aSequence ) ]
-               aSize( s_aForEachEnumerations, s_nForEachIndex )
-               aSize( s_anForEachEnumerationIndex, s_nForEachIndex )
-               aSize( s_anForEachEnumerator, s_nForEachIndex )
-               aSize( s_anForEachStartingBlock, s_nForEachIndex )
+               IF s_lTrying
+                  s_nForEachIndex := aSequence[ Len( aSequence ) ][1]
+                  s_lTrying := aSequence[ Len( aSequence ) ][2]
+
+                  #ifdef __XHARBOUR__
+                     WHILE HB_WithObjectCounter() > aSequence[ Len( aSequence ) ][3]
+                        HB_SetWith()
+                     END
+                  #endif
+
+                  aSize( aSequence, Len( aSequence ) - 1 )
+
+                  aSize( s_aEnumerations, s_nForEachIndex )
+                  aSize( s_anEnumIndex, s_nForEachIndex )
+                  aSize( s_anEnumerator, s_nForEachIndex )
+                  aSize( s_anForEachStartingBlock, s_nForEachIndex )
+               ENDIF
 
                IF Len( anRecover ) > 0
                   IF ! Empty( acRecover[ Len( acRecover ) ] )
@@ -957,7 +972,11 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          aAdd( acRecover, aCode[1][1] ) // Catcher Var
          aAdd( anRecover, aCode[1][2] ) // Recovery Address
-         aAdd( aSequence, s_nForEachIndex )
+         #ifdef __XHARBOUR__
+            aAdd( aSequence, { s_nForEachIndex, s_lTrying, HB_WithObjectCounter() } )
+         #else
+            aAdd( aSequence, { s_nForEachIndex, s_lTrying, 0 } )
+         #endif
 
          s_lTrying := .T.
 
@@ -973,7 +992,11 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          aAdd( acRecover, aCode[1][1] ) // Catcher Var
          aAdd( anRecover, aCode[1][2] ) // Recovery Address
-         aAdd( aSequence, s_nForEachIndex )
+         #ifdef __XHARBOUR__
+            aAdd( aSequence, { s_nForEachIndex, s_lTrying, HB_WithObjectCounter() } )
+         #else
+            aAdd( aSequence, { s_nForEachIndex, s_lTrying, 0 } )
+         #endif
 
       ELSEIF OpCode == PP_OP_ENDBEGIN
 
@@ -985,30 +1008,30 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          s_nForEachIndex++
 
-         aAdd( s_aForEachEnumerations, &( aCode[1][1] ) )
-         aAdd( s_anForEachEnumerationIndex, 1 )
-         aAdd( s_anForEachEnumerator, aCode[1][2] )
+         aAdd( s_aEnumerations, &( aCode[1][1] ) )
+         aAdd( s_anEnumIndex, 1 )
+         aAdd( s_anEnumerator, aCode[1][2] )
          aAdd( s_anForEachStartingBlock, nBlock )
 
-         IF Len( s_aForEachEnumerations[ s_nForEachIndex ] ) > 1
-            &( s_anForEachEnumerator[ s_nForEachIndex ] ) := s_aForEachEnumerations[ s_nForEachIndex ][1]
+         IF Len( s_aEnumerations[ s_nForEachIndex ] ) > 1
+            &( s_anEnumerator[ s_nForEachIndex ] ) := s_aEnumerations[ s_nForEachIndex ][1]
          ELSE
             nBlock := aCode[1][3]
          ENDIF
 
       ELSEIF OpCode == PP_OP_ENDFOREACH .OR. OpCode == PP_OP_LOOPFOREACH
 
-         s_anForEachEnumerationIndex[ s_nForEachIndex ] := s_anForEachEnumerationIndex[ s_nForEachIndex ] + 1
+         s_anEnumIndex[ s_nForEachIndex ] := s_anEnumIndex[ s_nForEachIndex ] + 1
 
-         IF Len( s_aForEachEnumerations[ s_nForEachIndex ] ) >= s_anForEachEnumerationIndex[ s_nForEachIndex ]
-            &( s_anForEachEnumerator[ s_nForEachIndex ] ) := s_aForEachEnumerations[ s_nForEachIndex ][ s_anForEachEnumerationIndex[ s_nForEachIndex ] ]
+         IF Len( s_aEnumerations[ s_nForEachIndex ] ) >= s_anEnumIndex[ s_nForEachIndex ]
+            &( s_anEnumerator[ s_nForEachIndex ] ) := s_aEnumerations[ s_nForEachIndex ][ s_anEnumIndex[ s_nForEachIndex ] ]
             // Loop back.
             nBlock := s_anForEachStartingBlock[ s_nForEachIndex ]
          ELSE
             s_nForEachIndex--
-            aSize( s_aForEachEnumerations, s_nForEachIndex )
-            aSize( s_anForEachEnumerationIndex, s_nForEachIndex )
-            aSize( s_anForEachEnumerator, s_nForEachIndex )
+            aSize( s_aEnumerations, s_nForEachIndex )
+            aSize( s_anEnumIndex, s_nForEachIndex )
+            aSize( s_anEnumerator, s_nForEachIndex )
             aSize( s_anForEachStartingBlock, s_nForEachIndex )
          ENDIF
 
@@ -1079,9 +1102,9 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    ENDIF
 
    s_nForEachIndex := nForEachIndex
-   aSize( s_aForEachEnumerations, s_nForEachIndex )
-   aSize( s_anForEachEnumerationIndex, s_nForEachIndex )
-   aSize( s_anForEachEnumerator, s_nForEachIndex )
+   aSize( s_aEnumerations, s_nForEachIndex )
+   aSize( s_anEnumIndex, s_nForEachIndex )
+   aSize( s_anEnumerator, s_nForEachIndex )
    aSize( s_anForEachStartingBlock, s_nForEachIndex )
 
    IF lRecover
@@ -1613,6 +1636,13 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      aSize( s_aLoopJumps, s_nCompLoop )
                      s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "W" } // Address of line to later place conditional Jump instruction into.
 
+                  ELSEIF sBlock = "PP__WITHOBJECT"
+                     s_nFlowId++
+                     aSize( s_acFlowType, s_nFlowId )
+                     s_acFlowType[ s_nFlowId ] := "O"
+
+                     sBlock := "HB_SetWith(" + SubStr( sBlock, 16 ) + ")"
+
                   ELSEIF sBlock = "PP__LOOP"
 
                      IF s_nCompLoop == 0
@@ -1823,6 +1853,10 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                            s_nCompLoop--
 
                            aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_ENDBEGIN, nLine } ) // Register Recovery Address and Catch Var.
+
+                        ELSEIF s_acFlowType[ s_nFlowId ] == "O"
+
+                           aAdd( aProcedures[ nProcId ][2], { 0, &( "{|| HB_SetWith() }" ), nLine } ) // Reset
 
                         ELSE
 
@@ -2141,6 +2175,7 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
       s_sModule := sPresetModule
    RECOVER USING oError
+      //TraceLog( oError:Operations, oError:Description )
       Eval( bErrHandler, oError )
    END
 
@@ -2217,9 +2252,11 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   oErr:ProcName   := PP_ProcName()
-   oErr:ProcLine   := PP_ProcLine()
-   oErr:ModuleName := s_sFile
+   #ifdef __XHARBOUR__
+      oErr:ProcName   := PP_ProcName()
+      oErr:ProcLine   := PP_ProcLine()
+      oErr:ModuleName := s_sFile
+   #endif
 
    oRecover := oErr
 
@@ -2261,9 +2298,11 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       ENDIF
    ENDIF
 
-   oRecover:ProcName   := PP_ProcName()
-   oRecover:ProcLine   := PP_ProcLine()
-   oRecover:ModuleName := s_sFile
+   #ifdef __XHARBOUR__
+      oRecover:ProcName   := PP_ProcName()
+      oRecover:ProcLine   := PP_ProcLine()
+      oRecover:ModuleName := s_sFile
+   #endif
 
    IF s_bExternalRecovery != NIL
       s_xRet := Eval( s_bExternalRecovery, oRecover )
@@ -2275,7 +2314,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       RETURN s_xRet
    ENDIF
 
-   //TraceLog()
+   //TraceLog( oErr:Description )
    Break( oRecover )
 
 RETURN NIL // Unreacable code
@@ -4885,7 +4924,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
          BREAK
 
-      ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$"
+      ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$~"
 
          sReturn := s1
 
@@ -4893,8 +4932,8 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
       ELSE
 
-         //TraceLog( "Unexpected case: " + sLine )
-         Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unexpected case], { sLine } ) )
+         TraceLog( "Unexpected case: ", sLine )
+         Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Next-Token], [Unexpected case], { sLine } ) )
          sReturn := sLine
 
       ENDIF
@@ -7974,7 +8013,7 @@ STATIC FUNCTION InitRules()
   aAdd( aCommRules, { 'SET' , { {    1,   0, 'CURSOR', ':', { 'ON', 'OFF', '&' } } } , .F. } )
   aAdd( aCommRules, { 'SET' , { {    0,   0, 'CURSOR', NIL, NIL }, {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
   aAdd( aCommRules, { '?' , { {    1,   1, NIL, 'A', NIL } } , .F. } )
-  aAdd( aCommRules, { '?' , { {    1,   1, '?', 'A', NIL } } , .F. } )
+  aAdd( aCommRules, { '?' , { {    0,   0, '?', NIL, NIL }, {    1,   1, NIL, 'A', NIL } } , .F. } )
   aAdd( aCommRules, { 'EJECT' ,  , .F. } )
   aAdd( aCommRules, { 'TEXT' ,  , .F. } )
   aAdd( aCommRules, { 'TEXT' , { {    0,   0, 'TO', NIL, NIL }, {    1,   0, 'FILE', '(', NIL } } , .F. } )
@@ -9085,7 +9124,12 @@ STATIC FUNCTION InitRunRules()
    aAdd( aTransRules, { 'ADDMETHOD' , { {    1,   0, '(', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    2,   0, '@', '!', NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL }, {    3,   0, ',', '<', NIL }, {    4,   0, ',', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { ':' , { {    0,   0, ':', NIL, NIL } } , .F. } )
    aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
-   aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+
+   #ifndef __HARBOUR__
+      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   #endif
+
    aAdd( aTransRules, { 'PROCNAME' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'PROCLINE' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'HB_ENUMINDEX' , { {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
@@ -9120,6 +9164,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'BEGIN' , { {    0,   0, 'SEQUENCE', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'BREAK' , { {    1,   1, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'RECOVER' , { {    1,   1, 'USING', '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'WITH' , { {    1,   0, 'OBJECT', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '(', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'PRG', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'INIT' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'EXIT' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
@@ -9162,7 +9207,12 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { { {   0, 'AddInLine( ' }, {   0,   1 }, {   0, ', {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| PP_QSelf(Self), PP_ExecMethod( ' }, {   0,   2 }, {   0, ', p1,p2,p3,p4,p5,p6,p7,p8,p9 ) }, ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ' )' } }, { -1,  1, -1,  3, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL }  } )
    aAdd( aTransResults, { { {   0, 'Self:' } }, { -1} ,  } )
    aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
-   aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
+
+   #ifndef __HARBOUR__
+      aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
+      aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
+   #endif
+
    aAdd( aTransResults, { { {   0, 'PP_ProcName( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_EnumIndex()' } }, { -1} ,  } )
@@ -9197,6 +9247,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP__BEGIN' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__RECOVER ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__WITHOBJECT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg" )' } }, { -1,  2, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_INIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_EXIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
@@ -9230,8 +9281,11 @@ STATIC FUNCTION InitDotRules()
 
    /* Translates */
    aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
-   aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-   aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+
+   #ifndef __HARBOUR__
+      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+   #endif
 
    /* Commands */
    aAdd( aCommRules, { 'CLS' ,  , .F. } )
@@ -9258,8 +9312,11 @@ STATIC FUNCTION InitDotResults()
 
    /* Translates Results*/
    aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
-   aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
-   aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
+
+   #ifndef __HARBOUR__
+      aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
+      aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
+   #endif
 
    /* Commands Results*/
    aAdd( aCommResults, { { {   0, 'Scroll( 2, 0, MaxRow() - 1, MaxCol() ) ; SetPos( 2, 0 )' } }, { -1} ,  } )
@@ -9681,7 +9738,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    LOCAL nProc, nProcs, xRet
    LOCAL oError, bErrHandler := ErrorBlock()
-   LOCAL aProcedure
+   LOCAL aProc
 
    IF ValType( aParams ) == 'A'
       s_aParams := aParams
@@ -9706,8 +9763,8 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       // Incase of nested execution.
       PP_ReleaseDynProcedures()
 
-      FOR EACH aProcedure IN aProcedures
-          PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
+      FOR EACH aProc IN aProcedures
+          PP_GenDynProcedure( aProc[1], HB_EnumIndex() )
       NEXT
    #endif
 
@@ -9821,7 +9878,23 @@ FUNCTION PP_Version()
 //--------------------------------------------------------------//
 FUNCTION PP_EnumIndex()
 
-RETURN s_anForEachEnumerationIndex[ s_nForEachIndex ]
+RETURN s_anEnumIndex[ s_nForEachIndex ]
+
+//--------------------------------------------------------------//
+#ifdef __CLIPPER__
+
+FUNCTION ErrorNewX(  SubSystem, SubCode, Operation, Description, Args, ModuleName )
+
+   LOCAL oError := ErrorNew()
+
+   oError:SubSystem := SubSystem
+   oError:SubCode := SubCode
+   oError:Operation := Operation
+   oError:Description := Description
+   oError:Args := Args
+
+RETURN oError
+#endif
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__

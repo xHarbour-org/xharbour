@@ -8,7 +8,7 @@
  * xBaseScript Project source code:
  * Pre-Processor / Dot prompt environment / Script Interpreter
  *
- * Copyright 2000-2001 Ron Pinkas <ron@profit-master.com>
+ * Copyright 2000-2001 Ron Pinkas <ron@xharbour.com>
  * www - http://www.xBaseScript.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,7 +53,9 @@
 //#COMMAND BROWSE => Browse( 1, 0, MaxRow() - 1, MaxCol() )
 
 #TRANSLATE _GET_( <var>, <varname>, [<pic>], [<valid>], [<when>] ) => __GET( MEMVARBLOCK(<varname>), <varname>, <pic>, <valid>, <when> )
-#TRANSLATE __GET( <parlist,...>):Display() => __GET(<parlist>)
+#ifndef __HARBOUR__
+   #TRANSLATE __GET( <parlist,...>):Display() => __GET(<parlist>)
+#endif
 
 //#COMMAND EXTERNAL <!file1!> [, <!fileN!> ] => PP_ProcessFile( <file1> ) [; PP_ProcessFile( <fileN> ) ]
 #COMMAND EXTERNAL <!file1!> [, <fileN> ] =>
@@ -93,6 +95,8 @@
 #COMMAND BEGIN SEQUENCE                                  => PP__BEGIN
 #COMMAND BREAK [<exp>]                                   => PP_Break( <exp> )
 #COMMAND RECOVER [USING <idVar>]                         => PP__RECOVER <idVar>
+
+#COMMAND WITH OBJECT <withobject>                        => PP__WITHOBJECT <withobject>
 
 #COMMAND DO <(file)>.prg => PP_Run( #<file> + ".prg" )
 

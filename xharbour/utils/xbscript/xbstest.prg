@@ -1,11 +1,11 @@
 PROCEDURE Main
 
-   MEMVAR cName
+   MEMVAR cName, Counter
 
    FIELD first
 
    LOCAL   cLocal
-   PRIVATE cName := "Private"
+   PRIVATE cName := "Private", Counter
 
    CLEAR SCREEN
 
@@ -17,7 +17,7 @@ PROCEDURE Main
 
    ? cName
 
-   USE test
+   USE ..\..\tests\test
    IF ! File( "test" + IndexExt() )
       INDEX on FIELD->First TO First
    ELSE
@@ -45,16 +45,20 @@ PROCEDURE Main
         ? "Err"
    ENDCASE
 
-   FOR Counter = 1 TO 10
+   FOR Counter := 1 TO 10
      ? Counter
      IF Counter == 1
-        Counter++
+        #ifdef __HARBOUR__
+           Counter++
+        #else
+           Counter := Counter + 1
+        #endif
         LOOP
      ENDIF
 
      IF Counter == 6
-        EXIT  
-     ENDIF 
+        EXIT
+     ENDIF
    NEXT
 
    REPLACE First WITH "From PP"

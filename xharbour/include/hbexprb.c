@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.75 2004/03/20 23:24:46 druzus Exp $
+ * $Id: hbexprb.c,v 1.76 2004/05/08 04:25:09 ronpinkas Exp $
  */
 
 /*
@@ -1850,8 +1850,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                // Right( Str, 1 ) => Str[-1]
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
                {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
                   if( usCount == 2 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
@@ -1876,9 +1874,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                // aTail( Array ) => Array[-1]
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ATAIL" ) == 0 )
                {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
-                  if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType != HB_ET_NONE )
+                  if( usCount == 1 )
                   {
                      HB_EXPR_PTR pArray = pSelf->value.asFunCall.pParms->value.asList.pExprList;
 
@@ -1914,7 +1910,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                #ifndef HB_MACRO_SUPPORT
                else if( hb_comp_bI18n && strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "I18N" ) == 0 )
                {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
                   HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
 
                   if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
@@ -1938,7 +1933,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
       case HB_EA_PUSH_PCODE:
          {
-            USHORT usCount;
+            USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+            if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+            {
+               --usCount;
+            }
 
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
@@ -1960,11 +1960,23 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                    break;
                }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
+               {
+                   if( usCount )
+                   {
+                      HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_WITHOBJECT );
+                   }
+                   else
+                   {
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENDWITHOBJECT );
+                   }
+
+                   break;
+               }
 
                if( bPcode )
                {
-                  usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
                   if( usCount >= 2 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
@@ -1990,40 +2002,26 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 
-            if( pSelf->value.asFunCall.pParms )
+            if( usCount )
             {
-               /* NOTE: pParms will be NULL in 'DO procname' (if there is
-                * no WITH keyword)
-                */
-               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
-               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               if( HB_SUPPORT_XBASE )
                {
-                  --usCount;
-               }
+                  /* check if &macro is used as a function call argument */
+                  HB_EXPR_PTR pExpr = pSelf->value.asFunCall.pParms->value.asList.pExprList;
 
-               if( usCount )
-               {
-                  if( HB_SUPPORT_XBASE )
+                  while( pExpr )
                   {
-                     /* check if &macro is used as a function call argument */
-                     HB_EXPR_PTR pExpr = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                     while( pExpr )
+                     if( pExpr->ExprType == HB_ET_MACRO && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                      {
-                        if( pExpr->ExprType == HB_ET_MACRO && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
-                        {
-                           pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;
-                           pExpr->value.asMacro.pFunCall = pSelf;
-                        }
-                        pExpr = pExpr->pNext;
+                        pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;
+                        pExpr->value.asMacro.pFunCall = pSelf;
                      }
+
+                     pExpr = pExpr->pNext;
                   }
-                  HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_PUSH_PCODE );
                }
-            }
-            else
-            {
-               usCount = 0;
+
+               HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_PUSH_PCODE );
             }
 
             if( usCount > 255 )
@@ -2035,6 +2033,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_FUNCTIONSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
             }
          }
+
          break;
 
       case HB_EA_POP_PCODE:
@@ -2043,7 +2042,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
          {
-            USHORT usCount;
+            USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+            if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+            {
+               --usCount;
+            }
 
          #if defined( HB_MACRO_SUPPORT )
 
@@ -2074,6 +2078,20 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      break;
                   }
                }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
+               {
+                   if( usCount )
+                   {
+                      HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_WITHOBJECT );
+                   }
+                   else
+                   {
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENDWITHOBJECT );
+                   }
+
+                   break;
+               }
             }
 
          #endif
@@ -2081,39 +2099,39 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 
-            if( pSelf->value.asFunCall.pParms )
+            if( usCount )
             {
-               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
-                  --usCount;
-               if( usCount )
+               if( HB_SUPPORT_XBASE )
                {
-                  if( HB_SUPPORT_XBASE )
+                  HB_EXPR_PTR pExpr = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+
+                  /* check if &macro is used as a function call argument */
+                  while( pExpr )
                   {
-                     HB_EXPR_PTR pExpr = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                     /* check if &macro is used as a function call argument */
-                     while( pExpr )
+                     if( pExpr->ExprType == HB_ET_MACRO  && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                      {
-                        if( pExpr->ExprType == HB_ET_MACRO  && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
-                        {
-                            /* &macro was passed - handle it differently then in a normal statement */
-                            pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;
-                            pExpr->value.asMacro.pFunCall = pSelf;
-                        }
-                        pExpr = pExpr->pNext;
+                         /* &macro was passed - handle it differently then in a normal statement */
+                         pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;
+                         pExpr->value.asMacro.pFunCall = pSelf;
                      }
+
+                     pExpr = pExpr->pNext;
                   }
-                  HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_PUSH_PCODE );
                }
+
+               HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_PUSH_PCODE );
             }
-            else
-               usCount = 0;
 
             if( usCount > 255 )
+            {
                HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_DO, HB_LOBYTE( usCount ), HB_HIBYTE( usCount ), ( BOOL ) 1 );
+            }
             else
+            {
                HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_DOSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
+            }
          }
+
          break;
 
       case HB_EA_DELETE:
@@ -2126,6 +2144,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
          }
+
          break;
    }
 

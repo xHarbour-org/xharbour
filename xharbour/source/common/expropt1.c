@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.11 2004/02/29 22:10:30 likewolf Exp $
+ * $Id: expropt1.c,v 1.12 2004/05/08 04:25:12 ronpinkas Exp $
  */
 
 /*
@@ -505,11 +505,26 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewWithSend( HB_EXPR_PTR pMessage )
+HB_EXPR_PTR hb_compExprNewWithSend( char *szMessage )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%s)", pMessage->value.asSymbol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%s)", szMessage));
+
+   pExpr = hb_compExprNew( HB_ET_WITHSEND );
+   pExpr->value.asMessage.pObject   = NULL;
+   pExpr->value.asMessage.pParms    = NULL;
+   pExpr->value.asMessage.szMessage = szMessage;
+   pExpr->value.asMessage.pMacroMessage = NULL;
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR pMessage )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSendExp(%s)", pMessage->value.asSymbol));
 
    pExpr = hb_compExprNew( HB_ET_WITHSEND );
    pExpr->value.asMessage.pObject   = NULL;
@@ -986,11 +1001,15 @@ ULONG hb_compExprListLen( HB_EXPR_PTR pExpr )
 {
    ULONG ulLen = 0;
 
-   pExpr = pExpr->value.asList.pExprList;
-   while( pExpr )
+   if( pExpr )
    {
-      pExpr = pExpr->pNext;
-      ++ulLen;
+      pExpr = pExpr->value.asList.pExprList;
+
+      while( pExpr )
+      {
+         pExpr = pExpr->pNext;
+         ++ulLen;
+      }
    }
 
    return ulLen;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2978 2004/05/23 09:43:33 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2979 2004/05/23 22:10:31 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-24 00:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+
+  * include/hbexprop.h
+  * source/common/expropt1.c
+    + New HB_EXPR_PTR hb_compExprNewWithSend( char * );
+
+  * include/hbexprop.h
+  * source/compiler/harbour.sly
+  * source/common/expropt1.c
+    * Renamed hb_compExprNewWithSend() -> hb_compExprNewWithSendExp()
+
+  * source/macro/macro.y
+    + Added support for ':" ( WITH OBJECT specifier)
+
+  * include/hbexprb.c
+    % Optimized redundant usCount in HB_EXPR_FUNC( hb_compExprUseFunCall )
+    + Added optimization of HB_SetWith( <oWith> ) to HB_P_WITHOBJECT
+    + Added optimization of HB_SetWith() to HB_P_ENDWITHOBJECT
+
+  * source/macro/macrob.c
+  * source/compiler/exproptb.c
+    * Touched to forced recompilation of hbexprb.c
+
+  * source/vm/hvm.c
+    - Removed no longer needed HB_SetWith()
+    + Added HB_FUNC( HB_WITHOBJECTCOUNTER )
+
+  * tests/with.prg
+    + Added tests for usage of WITH OBJECT specifier in Macros.
+
+  * utils/xbscript/xbs_harb.ch
+    * Some cleanup related to USE_C_BOOST
+
+  * utils/xbscript/rp_run.src
+  * utils/xbscript/xbscript.prg
+    + Added support for WITH OBJECT <oWith> syntax.
+    * Guarded __GET tranlations with #ifndef __HARBOUR__
+    ! Fixed built-in rule for ?? -> QQOut() (was masking ? -> QOut())
+    ! Fixed to compile and execute under Clipper
+
+  * utils/xbscript/xbstest.prg
+    *  Corrected to support xbScript for Clipper
 
 2004-05-23 23:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rdd/dbcmd.c
@@ -40,10 +83,10 @@
 2004-05-22 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/sourc/rtl/gtwvt/gtwvt.c
   * xharbour/sourc/rtl/gtwvt/wvtcore.c
-  * xharbour/sourc/rtl/gtwvt/wvtutils.c 
+  * xharbour/sourc/rtl/gtwvt/wvtutils.c
   * xharbour/include/hbgtwvt.h
-    Few functions additions mostly for GDI pimitives and few optimizations. 
-   
+    Few functions additions mostly for GDI pimitives and few optimizations.
+
 2004-05-22 01:20 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/hbzlib/zip.c
     ! minor fix to hb_zipfile() Problem reported by Jose Quintas

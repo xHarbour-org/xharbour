@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.66 2004/05/11 01:22:40 druzus Exp $
+ * $Id: harbour.sly,v 1.67 2004/05/12 02:25:24 druzus Exp $
  */
 
 /*
@@ -961,7 +961,7 @@ WithData    : ':' SendId                 {
                                                }
                                             }
 
-                                            $$ = hb_compExprNewWithSend( $2 );
+                                            $$ = hb_compExprNewWithSendExp( $2 );
                                          }
            ;
 

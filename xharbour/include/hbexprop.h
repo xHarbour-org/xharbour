@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.10 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbexprop.h,v 1.11 2004/05/08 04:25:09 ronpinkas Exp $
  */
 
 /*
@@ -364,7 +364,8 @@ HB_EXPR_PTR hb_compExprNewFunCallArg( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR, char * );
 HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewWithSend( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewWithSend( char * );
+HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewWithMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewList( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewArgList( HB_EXPR_PTR );
