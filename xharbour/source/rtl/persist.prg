@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.15 2003/12/23 00:44:11 peterrees Exp $
+ * $Id: persist.prg,v 1.16 2003/12/23 18:14:57 peterrees Exp $
  */
 
 /*
@@ -327,13 +327,16 @@ RETURN cText
 
 
 STATIC FUNCTION ReplaceCRLFInString(cText)
-  LOCAL cCR:= CHR(13), cLF:= CHR(10), cQuote
-  cQuote:= cText[1]
+  LOCAL cCR:= CHR(13), cLF:= CHR(10), cQuoteOpen, cQuoteClose
+  cQuoteClose:= cQuoteOpen:= cText[1]
+  IF cQuoteOpen='['
+    cQuoteClose:= ']'
+  ENDIF
   IF cCR $ cText
-    cText:= STRTRAN(cText, cCR, cQuote+"+CHR(13)+"+cQuote)
+    cText:= STRTRAN(cText, cCR, cQuoteClose+"+CHR(13)+"+cQuoteOpen)
   ENDIF
   IF cLF $ cText
-    cText:= STRTRAN(cText, cLF, cQuote+"+CHR(10)+"+cQuote)
+    cText:= STRTRAN(cText, cLF, cQuoteClose+"+CHR(10)+"+cQuoteOpen)
   ENDIF
   RETURN(cText)
 
