@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.14 2003/01/28 02:25:20 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.15 2003/02/07 19:18:15 what32 Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY DefaultMonitor             TYPE TDefaultMonitor DEFAULT dmActiveForm
 
     PROPERTY Menu READ FMenu WRITE SetMenu DEFAULT TMainMenu()
-    
+
     DATA ClientHandle //              AS NUMERIC //: HWND;
     DATA FormStyle //                 TYPE TFormStyle      DEFAULT fsNormal
 //    PROPERTY Height                     //stored IsFormSizeStored;
@@ -127,7 +127,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY ActiveOleControl                   //: TWinControl;
     PROPERTY BorderStyle                TYPE TFormBorderStyle DEFAULT bsSizeable
     PROPERTY Canvas                     //: TCanvas;
-    PROPERTY Caption                    //stored IsForm;
+    //PROPERTY Caption                    //stored IsForm;
     PROPERTY Color                      //nodefault;
     PROPERTY Designer                   //: IDesignerHook;
     PROPERTY DropTarget                 AS LOGICAL //: Boolean;
@@ -151,9 +151,9 @@ METHOD SetMenu( Value )
   LOCAL I, oForm
 
   IF Value != NIL
-  
+
      FOR EACH oForm IN Application:aForms
-     
+
        IF ( oForm:Menu = Value) .AND. ( oForm != Self )
           //raise EInvalidOperation.CreateFmt(sDuplicateMenus, [Value.Name]);
        ENDIF
@@ -164,12 +164,12 @@ METHOD SetMenu( Value )
         ::FMenu:WindowHandle := ::Handle
      ENDIF
 
-     IF Value != NIL 
+     IF Value != NIL
         Value:FreeNotification( Self )
      ENDIF
-  
+
 //     IF Value != NIL .AND. ::BorderStyle != bsDialog
-   
+
 //        IF ! ( ::Menu:AutoMerge .OR. ( ::FormStyle == fsMDIChild ))
 
            IF ::HandleAllocated
@@ -181,16 +181,16 @@ METHOD SetMenu( Value )
            ENDIF
 
 //        ELSEIF ::FormStyle != fsMDIChild
-//           IF ::HandleAllocated 
+//           IF ::HandleAllocated
 //              SetMenu( ::Handle, 0 )
 //           ENDIF
 //        ENDIF
 //     ENDIF
 
 
-   ELSEIF ::HandleAllocated 
+   ELSEIF ::HandleAllocated
       SetMenu( ::Handle, 0)
-//      IF ::Active 
+//      IF ::Active
 //         ::MergeMenu( TRUE )
 //      ENDIF
       ::RefreshMDIMenu()

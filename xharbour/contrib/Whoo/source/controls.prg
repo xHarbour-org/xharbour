@@ -1,5 +1,5 @@
 /*
- * $Id: TControl.prg,v 1.55 2003/03/07 15:17:39 what32 Exp $
+ * $Id: controls.prg,v 1.1 2003/07/01 08:17:45 ronpinkas Exp $
  */
 
 /*
@@ -496,7 +496,7 @@ CLASS TWinControl FROM TControl
    METHOD SetWindowFocus()      INLINE ::SetFocus()
    METHOD WindowRect()          INLINE GetWindowRect( ::FHandle )
    METHOD ClientRect()
-   METHOD SetText(cText)        INLINE ::FCaption := cText, IIF( ::FHandle != NIL, SetWindowText( ::handle, cText ), )
+   METHOD SetText(cText)        INLINE TraceLog( ::ClassName, ::FHandle, cText ), ::FCaption := cText, IIF( ::FHandle != NIL, SetWindowText( ::FHandle, cText ), )
 
    METHOD BringToTop()          INLINE BringWindowToTop( ::handle )
    METHOD ScreenToClient( aPt)  INLINE ScreenToClient( ::handle, @aPt )

@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.63 2003/02/07 19:18:16 what32 Exp $
+ * $Id: TForm.prg,v 1.64 2003/03/07 15:17:39 what32 Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ METHOD Create( oOwner ) CLASS TForm
    ::lRegister := IFNIL( ::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
-   ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )   
+   ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )
 
 RETURN Self
 
@@ -158,8 +158,8 @@ METHOD Add( oObj ) CLASS TForm
       oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
    ENDIF
 
-   IF oObj:FCaption == NIL
-      oObj:FCaption := oObj:Name
+   IF oObj:Caption == NIL
+      oObj:Caption := oObj:Name
    ENDIF
 
    oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
