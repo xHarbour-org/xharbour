@@ -114,7 +114,7 @@ METHOD New( nExStyle, cName, nStyle, nTop, nLeft, nWidth, nHeight, oParent, lPix
     ASSIGN ::nHeight      WITH nHeight              DEFAULT CW_USEDEFAULT
     ASSIGN ::oParent      WITH oParent
     ASSIGN ::nMenu        WITH 0
-    ASSIGN ::lPixel       WITH lPixel               DEFAULT FALSE
+    ASSIGN ::lPixel       WITH lPixel               DEFAULT TRUE
 
     //::oFont := TFont():New( "MS Sans Serif", 8 )
     ::oFont := TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
@@ -395,7 +395,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TPanel
               nRet := DLGC_HASSETSEL + DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
 
          CASE nMsg == WM_CHAR
-          	  nRet = ::OnChar(wParam, lParam)
+              nRet = ::OnChar(wParam, lParam)
 
       ENDCASE
 

@@ -343,8 +343,8 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
       *p++ = HIWORD( WG_GetObjectDataLong( pItem, "NSTYLE" ) );
       if (lPixel)
       {
-         *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NLEFT" ) ); // x
-         *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NTOP" ) ); // y
+         *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NLEFT" ) ); // x
+         *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NTOP" ) ); // y
          *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pItem, "NWIDTH" ) ); // cx
          *p++ = WG_Pixel2DialogY( WG_GetObjectDataInteger( pItem, "NHEIGHT" ) ); // cy
       }
