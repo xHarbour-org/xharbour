@@ -97,11 +97,6 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    int ulLen = ZipArray.item.asArray.value->ulLen;
    char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
 
-   if ( szSkleton == NULL )
-   {
-      szSkleton = "*.*";
-   }
-
    Wild2RegEx( szSkleton, sRegEx, FALSE );
 
    Temp.type = HB_IT_NIL;
@@ -602,7 +597,7 @@ HB_FUNC( HB_UNZIPFILE )
       }
       else
       {
-         UnzipCreateArray( szZipFileName, (char*) NULL, 1 );
+         UnzipCreateArray( szZipFileName, "*.*", 1 );
       }
 
       if ( UnzipFiles.item.asArray.value->ulLen > 0 )
