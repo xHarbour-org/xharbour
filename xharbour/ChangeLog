@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.536 2002/12/19 18:15:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.537 2002/12/20 08:39:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-20 01:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/thread.h
+    - Temporarily commented out SignalObjectAndWait() because it's not avialable on all Win32s.
+  * source/rtl/console.c
+    * Modified all HB_MUTEX*() to HB_CRITICAL*()
 
 2002-12-20 00:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/thread.h
