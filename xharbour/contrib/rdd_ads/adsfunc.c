@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.49 2002/01/25 08:29:46 brianhays Exp $
+ * $Id: adsfunc.c,v 1.1 2002/07/11 02:57:52 lculik Exp $
  */
 
 /*
@@ -1258,18 +1258,4 @@ HB_FUNC( ADSCOPYTABLESTRUCTURE )
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "  ADSCOPYTABLESTRUCTURE" );
 
 }
-HB_FUNC(ADSADDTABLE)
-{
-    UNSIGNED32 ulRetVal;
-    UNSIGNED8 *pTableName=hb_parc( 1 );
-    UNSIGNED8 *pTableFileName =hb_parc( 2 );
-    UNSIGNED8 *pTableIndexFileName =hb_parc( 3 );
-    ulRetVal= AdsDDAddTable( adsConnectHandle,
-                                     pTableName,
-                                     pTableFileName,                
-                                     adsFileType,
-                                     adsCharType,
-                                     pTableIndexFileName,
-                                     NULL);
-   return ulRetVal;
-}
+
