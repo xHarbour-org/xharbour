@@ -304,6 +304,8 @@
 
         cName := Upper( cName )
 
+	//TraceLog( cName, ::aCompiledProcs )
+
      RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
 
     //----------------------------------------------------------------------------//
@@ -2595,7 +2597,7 @@
                 pcode[11] =  0;
 
                 pcode[12] = HB_P_POPSTATIC;
-                pcode[13] = 36;
+                pcode[13] = 37;
                 pcode[14] = 0;                /* S_APARAMS */
 
                 pcode[15] = HB_P_PUSHSYMNEAR;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.412 2004/07/28 22:28:36 ronpinkas Exp $
+ * $Id: hvm.c,v 1.413 2004/07/29 23:55:59 ronpinkas Exp $
  */
 
 /*
@@ -129,10 +129,10 @@
 
    extern void Win32_OleInitialize( void );
    extern void Win32_OleUnInitialize( void );
-#endif
 
-/* DEBUG only*/
-/*#include <windows.h>*/
+   /* DEBUG only*/
+   #include <windows.h>
+#endif
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -767,11 +767,27 @@ int HB_EXPORT hb_vmQuit( void )
    if( s_aStatics.type == HB_IT_ARRAY )
    {
       HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
+	  //#define DEBUG_STATICS
+	  #ifdef DEBUG_STATICS
+	  {
+		 ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
+		 ULONG ulIndex;
+		 char sBuffer[128];
+
+		 for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
+		 {
+			sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
+			OutputDebugString( sBuffer );
+		 }
+	  }
+	  #endif
+
       hb_arrayRelease( &s_aStatics );
       s_aStatics.type = HB_IT_NIL;
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
+   OutputDebugString("\nAfter Statics\n" );
 
    #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
       HB_TRACE( HB_TR_INFO, ("Quit Ole" ) );

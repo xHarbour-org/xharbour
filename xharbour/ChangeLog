@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3313 2004/08/17 09:58:12 druzus Exp $
+ * $Id: ChangeLog,v 1.3314 2004/08/17 17:03:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-17 12:27 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/vm/estack.c
+    ! Fixed hb_stackDispCall() to correctly report hb_vmQuit() when called after the stack has been cleared.
+  * source/vm/hvm.c
+    + Added debug code guarded by #ifdef DEBUG_STATICS
+  * utils/xbscript/xbs_harb.ch
+    * Minor revisions
 
 2004-08-17 10:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/regex.c

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.64 2004/04/28 18:31:16 druzus Exp $
+ * $Id: estack.c,v 1.65 2004/05/27 22:44:13 mlombardo Exp $
  */
 
 /*
@@ -491,10 +491,20 @@ void hb_stackDispLocal( void )
 
 void hb_stackDispCall( void )
 {
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   PHB_ITEM *pBase;
    char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispCall()"));
+
+   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+   {
+      sprintf( buffer, "Called from hb_vmQuit()" );
+      hb_conOutErr( buffer, 0 );
+      hb_conOutErr( hb_conNewLine(), 0 );
+	  return;
+   }
+
+   pBase = HB_VM_STACK.pBase;
 
    if( HB_IS_ARRAY( *( pBase + 1 ) ) )
    {
