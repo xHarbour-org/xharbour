@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3145 2004/07/13 05:30:14 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3146 2004/07/13 17:25:11 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-23 04:35 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/teditor.prg
+    ! Fixed K_RETURN functionality inserting bottom lines.
+    * ::lInsert translated from DATA to METHOD for set/get READINSERT().
+      Required for programs where direct modify READINSERT().
 
 2004-07-13 13:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt
