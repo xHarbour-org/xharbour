@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.110 2002/10/31 08:19:03 what32 Exp $
+ * $Id: xide.prg,v 1.111 2002/11/01 08:15:27 what32 Exp $
  */
 
 /*
@@ -284,8 +284,10 @@ ENDCLASS
 #include "hbvm.h"
 #include "hbfast.h"
 
-#define SKIP_SPACE() { while( *sText == ' ' || *sText == '\t' ) sText++; }
+#define SKIP_SPACE(p) { while( *p == ' ' || *p == '\t' ) p++; }
 #define SKIP_EOL() { while( *sText == '\n' || *sText == '\r' ) sText++; }
+
+#define XFM_MAX_EXP 1024
 
 int XFMParse( char *sText );
 
@@ -364,12 +366,12 @@ HB_FUNC( XFMOPEN )
 
 int XFMParse( char *sText )
 {
-   char sClass[64], sFromClass[64], sVar[64], sExp[64], *pTemp, *pEnd[16], sAssign[64], sTemp[256];
+   char sClass[64], sFromClass[64], sVar[64], sExp[XFM_MAX_EXP], *pTemp, *pTerm, *pEnd[16], sAssign[64], sTemp[256];
    int i, iEnd = 0, iLen;
    static PHB_DYNS pCreateForm = NULL;
    static PHB_DYNS pTFormEdit = NULL;
    PHB_DYNS pClassSym;
-   HB_ITEM Exp, Control, Object, Name;
+   HB_ITEM Exp, Control, Object, Name, Element;
    PHB_ITEM pForm;
    MSG msg ;
 
@@ -377,6 +379,7 @@ int XFMParse( char *sText )
    Control.type = HB_IT_NIL;
    Object.type = HB_IT_NIL;
    Name.type = HB_IT_NIL;
+   Element.type = HB_IT_NIL;
 
    if( pCreateForm == NULL )
    {
@@ -404,7 +407,7 @@ int XFMParse( char *sText )
    }
    sText += 5;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -416,7 +419,7 @@ int XFMParse( char *sText )
    OutputDebugString( "Class: " );
    OutputDebugString( (char *) sClass );
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    if( strncmp( sText, "FROM", 4 ) )
    {
@@ -424,7 +427,7 @@ int XFMParse( char *sText )
    }
    sText += 4;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -477,11 +480,11 @@ int XFMParse( char *sText )
    }
    pEnd[ iEnd++ ][0] = '\0';
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    SKIP_EOL();
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
  Vars:
 
@@ -491,7 +494,7 @@ int XFMParse( char *sText )
    }
    sText += 4;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -503,7 +506,7 @@ int XFMParse( char *sText )
    OutputDebugString( "Var: " );
    OutputDebugString( (char *) sVar );
 
-   SKIP_SPACE()
+   SKIP_SPACE( sText )
 
    if( strncmp( sText, "INIT", 4 ) )
    {
@@ -511,10 +514,10 @@ int XFMParse( char *sText )
    }
    sText += 4;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
-   while( i < 64 && *sText && *sText != '\n' )
+   while( i < XFM_MAX_EXP && *sText && *sText != '\n' )
    {
      sExp[i++] = *sText++;
    }
@@ -543,6 +546,84 @@ int XFMParse( char *sText )
 
       case '{' :
         hb_arrayNew( &Exp, 0 );
+        pTemp = (char *) sExp + 1;
+
+        SKIP_SPACE( pTemp );
+
+        while( *pTemp && *pTemp != '}' )
+        {
+           switch( pTemp[0] )
+           {
+              case '.' :
+                Element.type = HB_IT_LOGICAL;
+                Element.item.asLogical.value = pTemp[1] == 'T' ? TRUE : FALSE;
+                pTemp += 3;
+                break;
+
+              case '"' :
+                pTemp++;
+                pTerm = strchr( pTemp, '"' );
+
+                if( pTerm )
+                {
+                   pTerm[0] = '\0';
+                   hb_itemPutC( &Element, pTemp );
+                   pTemp = pTerm + 1;
+                }
+                else
+                {
+                   return 0;
+                }
+
+                break;
+
+              default :
+                pTerm = strpbrk( pTemp, ", " );
+                if( pTerm )
+                {
+                   if( pTerm[0] == ',' )
+                   {
+                      pTerm[0] = '\0';
+
+                      Element.type = HB_IT_LONG;
+                      Element.item.asLong.value = atol( pTemp );
+
+                      pTerm[0] = ',';
+                   }
+                   else
+                   {
+                      pTerm[0] = '\0';
+
+                      Element.type = HB_IT_LONG;
+                      Element.item.asLong.value = atol( pTemp );
+                   }
+
+                   pTemp = pTerm;
+                }
+                else
+                {
+                   return 0;
+                }
+
+                break;
+           }
+
+           SKIP_SPACE( pTemp );
+
+           if( pTemp[0] == ',' )
+           {
+              pTemp++;
+              SKIP_SPACE( pTemp );
+           }
+           else if( pTemp[0] != '}' )
+           {
+              return 0;
+           }
+
+           hb_arrayAddForward( &Exp, &Element );
+           SKIP_SPACE( pTemp );
+        }
+
         break;
 
       default :
@@ -582,7 +663,7 @@ int XFMParse( char *sText )
 
    SKIP_EOL();
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    goto Vars;
 
@@ -594,7 +675,7 @@ int XFMParse( char *sText )
    }
    sText += 7;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -606,7 +687,7 @@ int XFMParse( char *sText )
    OutputDebugString( "Control: " );
    OutputDebugString( (char *) sClass );
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    if( strncmp( sText, "FROM", 4 ) )
    {
@@ -614,7 +695,7 @@ int XFMParse( char *sText )
    }
    sText += 4;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -652,11 +733,11 @@ int XFMParse( char *sText )
    }
    pEnd[ iEnd++ ][0] = '\0';
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    SKIP_EOL();
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
  Properties:
 
@@ -723,7 +804,7 @@ int XFMParse( char *sText )
 
             SKIP_EOL();
 
-            SKIP_SPACE();
+            SKIP_SPACE( sText );
          }
 
          if( *sText == ':' )
@@ -744,7 +825,7 @@ int XFMParse( char *sText )
 
       sText += 6;
 
-      SKIP_SPACE();
+      SKIP_SPACE( sText );
 
       i = 0;
       while( isalnum( *sText ) )
@@ -756,7 +837,7 @@ int XFMParse( char *sText )
       OutputDebugString( "Object: " );
       OutputDebugString( (char *) sClass );
 
-      SKIP_SPACE();
+      SKIP_SPACE( sText );
 
       if( strncmp( sText, "IS", 2 ) )
       {
@@ -764,7 +845,7 @@ int XFMParse( char *sText )
       }
       sText += 2;
 
-      SKIP_SPACE();
+      SKIP_SPACE( sText );
 
       i = 0;
       while( isalnum( *sText ) )
@@ -799,18 +880,18 @@ int XFMParse( char *sText )
 
       pEnd[ iEnd++ ][0] = '\0';
 
-      SKIP_SPACE();
+      SKIP_SPACE( sText );
 
       SKIP_EOL();
 
-      SKIP_SPACE();
+      SKIP_SPACE( sText );
 
       goto Properties;
    }
 
    sText += 1;
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    i = 0;
    while( isalnum( *sText ) )
@@ -824,7 +905,7 @@ int XFMParse( char *sText )
       return 1;
    }
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    if( strncmp( sText, ":=", 2 ) )
    {
@@ -832,7 +913,7 @@ int XFMParse( char *sText )
       {
          sText++;
 
-         SKIP_SPACE();
+         SKIP_SPACE( sText );
 
          if( *sText == '"' )
          {
@@ -850,7 +931,7 @@ int XFMParse( char *sText )
             OutputDebugString( "Event: " );
             OutputDebugString( (char *) sVar );
 
-            SKIP_SPACE();
+            SKIP_SPACE( sText );
 
             if( *sText != ',' )
             {
@@ -858,7 +939,7 @@ int XFMParse( char *sText )
             }
             sText++;
 
-            SKIP_SPACE()
+            SKIP_SPACE( sText )
 
             if( strncmp( sText, "{ ||", 4 ) )
             {
@@ -866,7 +947,7 @@ int XFMParse( char *sText )
             }
             sText += 4;
 
-            SKIP_SPACE();
+            SKIP_SPACE( sText );
 
             i = 0;
             while( isalnum( *sText ) || *sText == '_' )
@@ -887,7 +968,7 @@ int XFMParse( char *sText )
 
             SKIP_EOL();
 
-            SKIP_SPACE();
+            SKIP_SPACE( sText );
 
             goto Properties;
          }
@@ -900,10 +981,10 @@ int XFMParse( char *sText )
 
    sText += 2;
 
-   SKIP_SPACE()
+   SKIP_SPACE( sText )
 
    i = 0;
-   while( i < 64 && *sText && *sText != '\n' )
+   while( i < XFM_MAX_EXP && *sText && *sText != '\n' )
    {
      sExp[i++] = *sText++;
    }
@@ -932,6 +1013,86 @@ int XFMParse( char *sText )
 
       case '{' :
         hb_arrayNew( &Exp, 0 );
+
+        pTemp = (char *) sExp + 1;
+
+        SKIP_SPACE( pTemp );
+
+        while( *pTemp && *pTemp != '}' )
+        {
+           switch( pTemp[0] )
+           {
+              case '.' :
+                Element.type = HB_IT_LOGICAL;
+                Element.item.asLogical.value = pTemp[1] == 'T' ? TRUE : FALSE;
+                pTemp += 3;
+                break;
+
+              case '"' :
+                pTemp++;
+                pTerm = strchr( pTemp, '"' );
+
+                if( pTerm )
+                {
+                   pTerm[0] = '\0';
+                   hb_itemPutC( &Element, pTemp );
+                   pTemp = pTerm + 1;
+                }
+                else
+                {
+                   return 0;
+                }
+
+                break;
+
+              default :
+                pTerm = strpbrk( pTemp, ", " );
+
+                if( pTerm )
+                {
+                   if( pTerm[0] == ',' )
+                   {
+                      pTerm[0] = '\0';
+
+                      Element.type = HB_IT_LONG;
+                      Element.item.asLong.value = atol( pTemp );
+
+                      pTerm[0] = ',';
+                   }
+                   else
+                   {
+                      pTerm[0] = '\0';
+
+                      Element.type = HB_IT_LONG;
+                      Element.item.asLong.value = atol( pTemp );
+                   }
+
+                   pTemp = pTerm;
+                }
+                else
+                {
+                   return 0;
+                }
+
+                break;
+           }
+
+           SKIP_SPACE( pTemp );
+
+           if( pTemp[0] == ',' )
+           {
+              pTemp++;
+              SKIP_SPACE( pTemp );
+           }
+           else if( pTemp[0] != '}' )
+           {
+              return 0;
+           }
+
+           hb_arrayAddForward( &Exp, &Element );
+           SKIP_SPACE( pTemp );
+        }
+
         break;
 
       default :
@@ -971,7 +1132,7 @@ int XFMParse( char *sText )
 
    SKIP_EOL();
 
-   SKIP_SPACE();
+   SKIP_SPACE( sText );
 
    goto Properties;
 }
