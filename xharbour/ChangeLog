@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2961 2004/05/20 13:54:16 druzus Exp $
+ * $Id: ChangeLog,v 1.2962 2004/05/20 14:13:43 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-20 11:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Fixed Blockify to NOT process an already CodeBlock <exp>.
+    + Added logic to check each <exp> in list instead of just first <exp> if bStrict is .F. (-FIX switch used)
 
 2004-05-20 10:09 UTC-0400 Sylvain Robert (s.robert/at/videotron.ca)
   * xharbour/contrib/tip/tiputils.c

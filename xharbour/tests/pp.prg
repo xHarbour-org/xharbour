@@ -6085,15 +6085,33 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
         CASE aResults[2][Counter] == 5
            IF ValType( xValue ) == 'A'
               nMatches := Len( xValue )
-              FOR nMatch := 1 TO nMatches
-                 sResult += "{||" + xValue[nMatch] + '}'
-                 IF nMatch < nMatches
-                    sResult += ', '
-                 ENDIF
-              NEXT
+
+              IF bStrict .AND. Left( xValue[1], 1 ) == '{' .AND. Left( LTrim( SubStr( xValue[1], 2 ) ), 1 ) == '|'
+                 FOR nMatch := 1 TO nMatches
+                    sResult += xValue[nMatch]
+                    IF nMatch < nMatches
+                       sResult += ', '
+                    ENDIF
+                 NEXT
+              ELSE
+                 FOR nMatch := 1 TO nMatches
+                    IF Left( xValue[nMatch], 1 ) == '{' .AND. Left( LTrim( SubStr( xValue[nMatch], 2 ) ), 1 ) == '|'
+                       sResult += xValue[nMatch]
+                    ELSE
+                       sResult += "{|| " + xValue[nMatch] + '}'
+                    ENDIF
+                    IF nMatch < nMatches
+                       sResult += ', '
+                    ENDIF
+                 NEXT
+              ENDIF
            ELSE
               IF xValue != NIL
-                 sResult += "{||" + xValue + '}'
+                 IF Left( xValue, 1 ) == '{' .AND. Left( LTrim( SubStr( xValue, 2 ) ), 1 ) == '|'
+                    sResult += xValue
+                 ELSE
+                    sResult += "{|| " + xValue + '}'
+                 ENDIF
               ENDIF
            ENDIF
 
