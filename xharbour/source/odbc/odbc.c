@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.24 2004/12/28 06:39:20 druzus Exp $
+ * $Id: odbc.c,v 1.25 2005/02/15 21:06:02 andijahja Exp $
  */
 
 /*
@@ -209,13 +209,13 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
    lInitBuff  = lLen;
    wType      = ( hb_parni( 3 ) ? hb_parni( 3 ) : SQL_BINARY );
 
-   do
+   wResult = ! SQL_NO_DATA;
+   while( wResult != SQL_NO_DATA )
    {
       wResult    = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, &lLen );
       if( wResult == SQL_SUCCESS && iReallocs == 0 )
       {
          hb_storclen( ( LPSTR ) bBuffer, ( ULONG ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
-         hb_xfree( ( PTR ) bBuffer );
          break;
       }
       else if ( wResult == SQL_SUCCESS_WITH_INFO && iReallocs == 0 )
@@ -232,7 +232,6 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
          else
          {
             hb_storclen( ( LPSTR ) bBuffer, ( ULONG ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
-            hb_xfree( ( PTR ) bBuffer );
             break;
          }
          iReallocs++;
@@ -241,8 +240,6 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       {
          strcat( (char*) bOut, (char *) bBuffer );
          hb_storclen( ( LPSTR ) bOut, ( ULONG ) ( lLen + lInitBuff - 1 ), 5 );
-         hb_xfree( ( PTR ) bBuffer );
-         hb_xfree( ( PTR ) bOut );
          wResult = SQL_SUCCESS;
          break;
       }
@@ -251,7 +248,11 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
          break;
       }
    }
-   while(wResult != SQL_NO_DATA);
+   hb_xfree( ( PTR ) bBuffer );
+   if( bOut )
+   {
+      hb_xfree( ( PTR ) bOut );
+   }
    hb_retni( wResult );
 }
 
