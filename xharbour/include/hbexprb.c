@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.26 2002/06/19 21:52:48 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.27 2002/07/11 00:13:10 ronpinkas Exp $
  */
 
 /*
@@ -1364,11 +1364,17 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   if( usCount == 3 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                     HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+                     HB_EXPR_PTR pStart  = pString->pNext;
                      HB_EXPR_PTR pLen    = pStart->pNext;
 
                      if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
                      {
+                        // Delete the pre-optimization components.
+                        // Skipping the first 2 elements of the list, as they are used by the optimization.
+                        pSelf->value.asFunCall.pParms->value.asList.pExprList = pLen;
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
                         pSelf->value.asList.pIndex    = pStart;
@@ -1387,6 +1393,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                      if( pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 )
                      {
+                        // Delete the pre-optimization components.
+                        // Skipping the first 2 elements of the list, as they are used by the optimization.
+                        pSelf->value.asFunCall.pParms->value.asList.pExprList = NULL;
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
                         pStart->value.asNum.lVal      = -1;
@@ -1402,6 +1414,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType != HB_ET_NONE )
                   {
                      HB_EXPR_PTR pArray = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+
+                     // Delete the pre-optimization components.
+                     // Skipping the first element of the list, as it's used by the optimization.
+                     pSelf->value.asFunCall.pParms->value.asList.pExprList = NULL;
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
 
                      pSelf->ExprType = HB_ET_ARRAYAT;
                      pSelf->value.asList.pExprList = pArray;

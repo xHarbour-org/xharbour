@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.317 2002/07/23 07:22:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.318 2002/07/23 17:44:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-23 11:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed memory leak in macro compiler related to optimizations of SubStr(), Right(), and aTail().
 
 2002-07-23 10:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/cstruct.prg
