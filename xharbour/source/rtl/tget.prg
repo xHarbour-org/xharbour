@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.15 2002/05/25 23:59:41 walito Exp $
+ * $Id: tget.prg,v 1.16 2002/06/05 15:36:22 walito Exp $
  */
 
 /*
@@ -123,7 +123,7 @@ CLASS Get
    METHOD SetFocus()
    METHOD Undo()
    METHOD UnTransform()
-   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask(), ::Assign():Display(), Self
+   METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask( ), ::Assign():Display(), Self
 
    METHOD VarGet()
    METHOD VarPut(xValue, lReFormat)
@@ -153,7 +153,7 @@ CLASS Get
    // Protected
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
-   DATA nDispLen, nDispPos, nOldPos, lCleanZero
+   DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit
 
    METHOD DeleteAll()
    METHOD IsEditable( nPos )
@@ -199,6 +199,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::nDispPos   := 1
    ::nOldPos    := 0
    ::lCleanZero := .f.
+   ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
 
    ::Picture    := cPicture
 
@@ -342,15 +343,19 @@ METHOD Display( lForced ) CLASS Get
    endif
 
    if ::buffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
-      DispOutAt( ::Row, ::Col,;
+      DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  Substr( ::buffer, ::nDispPos, ::nDispLen ), ;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
+      if !(::cDelimit == NIL)
+         DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
+         DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
+      endif
    endif
 
    ::nOldPos := ::nDispPos
 
    if ::Pos != NIL
-      SetPos( ::Row, ::Col + ::Pos - ::nDispPos  )
+      SetPos( ::Row, ::Col + ::Pos - ::nDispPos + if( ::cDelimit == NIL, 0, 1 ) )
    endif
 
    SetCursor( nOldCursor )
@@ -481,7 +486,7 @@ METHOD KillFocus() CLASS Get
    ::Assign()
 
    ::hasfocus := .f.
-   ::buffer   := ::PutMask()
+   ::buffer   := ::PutMask( )
    ::pos      := NIL
 
    ::Display()
@@ -539,6 +544,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       xValue := cBuffer
 
    case ::type == "N"
+
       if "E" $ ::cPicFunc .or. ::lDecRev
          cBuffer := StrTran( cBuffer, ".", " " )
          cBuffer := StrTran( cBuffer, ",", "." )
@@ -1298,7 +1304,7 @@ METHOD HitTest(mrow,mcol) CLASS GET
         if ::row != mrow
            return HTNOWHERE
         endif
-        if mcol >= ::col .and. mrow <= ::col+::ndispLen
+        if mcol >= ::col .and. mrow <= ::col+::ndispLen+if( ::cDelimit == NIL, 0, 2 )
            return HTCLIENT
         endif
 return HTNOWHERE
