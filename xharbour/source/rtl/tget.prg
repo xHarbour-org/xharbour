@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.33 2002/12/17 16:04:51 walito Exp $
+ * $Id: tget.prg,v 1.34 2003/01/14 23:45:31 jonnymind Exp $
  */
 
 /*
@@ -117,14 +117,14 @@ CLASS Get
    METHOD Block( bBlock )         SETGET  // Replace to DATA Block
    METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
    METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
-   METHOD Display()
+   METHOD Display( lForced )
    METHOD ColorDisp( cColorSpec ) INLINE ::ColorSpec := cColorSpec, ::Display(), Self
    METHOD KillFocus()
    METHOD ParsePict( cPicture )
    METHOD Reset()
    METHOD SetFocus()
    METHOD Undo()
-   METHOD UnTransform()
+   METHOD UnTransform( cBuffer )
    METHOD UpdateBuffer() INLINE  ::buffer := ::PutMask( ), if(::lEdit, ::Assign(),), ::Display(), Self
 
    METHOD VarGet()
@@ -141,7 +141,7 @@ CLASS Get
    METHOD WordLeft()
    METHOD WordRight()
 
-   METHOD BackSpace()
+   METHOD BackSpace( lDisplay )
    MESSAGE Delete() METHOD _Delete()
    METHOD DelEnd()
    METHOD DelLeft()
@@ -183,7 +183,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::HasFocus   := .f.
    ::lEdit      := .f.
    ::BadDate    := .f.
-   ::Block      := bVarBlock
+   ::bBlock     := bVarBlock
    ::Changed    := .f.
    ::Clear      := .f.
    ::Col        := nCol
@@ -390,7 +390,7 @@ METHOD Display( lForced ) CLASS Get
    endif
 
    SetCursor( nOldCursor )
-   
+
    HBConsoleUnlock()
 
 return Self
@@ -530,8 +530,8 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
 
    DEFAULT lReFormat TO .t.
 
-   if ::block != nil
-      Eval( ::block, xValue )
+   if ::bBlock != nil
+      Eval( ::bBlock, xValue )
       if lReFormat
          if !::hasfocus
             ::Original := xValue
@@ -548,7 +548,7 @@ return xValue
 
 METHOD VarGet() CLASS Get
 
-return IIF( ValType( ::Block ) == 'B', Eval( ::Block ), NIL )
+return IIF( ValType( ::bBlock ) == 'B', Eval( ::bBlock ), NIL )
 
 //---------------------------------------------------------------------------//
 
