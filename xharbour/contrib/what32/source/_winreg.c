@@ -161,37 +161,78 @@ HB_FUNC( REGENUMKEYEX )
       }
 }
 
+
 HB_FUNC( REGSETVALUEEX )
 {
-   if ( RegSetValueExA( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , NULL , hb_parnl( 4 ) , ( BYTE * const ) hb_parc( 5 ) , ( strlen( hb_parc( 5 ) ) + 1 ) ) == ERROR_SUCCESS )
-   {
-      hb_retnl( 0 );
-   }
-   else
-   {
-      hb_retnl(-1);
-   }
+       
+   hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , NULL , hb_parnl( 4 ) , ( BYTE * const ) hb_parc( 5 ) , ( strlen( hb_parc( 5 ) ) + 1 ) )  ) ;
+
 }
 
 HB_FUNC( REGCREATEKEY )
 {
    HKEY hKey;
+   LONG nErr; 
 
-   if ( RegCreateKey( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , &hKey ) == ERROR_SUCCESS )
+   nErr = RegCreateKey( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , &hKey );
+   if ( nErr == ERROR_SUCCESS )
    {
       hb_stornl( PtrToLong( hKey ) , 3 );
-      hb_retnl( 0 );
    }
-   else
-   {
-      hb_retnl( -1 );
-   }
+   hb_retnl( nErr );
+   
+}
+
+//-------------------------------------------------------
+/*
+LONG RegCreateKeyEx(
+  HKEY hKey,                // handle to an open key
+  LPCTSTR lpSubKey,         // address of subkey name
+  DWORD Reserved,           // reserved
+  LPTSTR lpClass,           // address of class string
+  DWORD dwOptions,          // special options flag
+  REGSAM samDesired,        // desired security access
+  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                            // address of key security structure
+  PHKEY phkResult,          // address of buffer for opened handle
+  LPDWORD lpdwDisposition   // address of disposition value buffer
+);
+ 
+*/
+
+HB_FUNC( REGCREATEKEYEX )
+{
+ 
+  HKEY hkResult ;
+  DWORD dwDisposition ;  
+  LONG nErr ;
+  SECURITY_ATTRIBUTES *sa ;
+ 
+  if (ISCHAR(7)) 
+       sa = (SECURITY_ATTRIBUTES *) hb_param(7, HB_IT_STRING)->item.asString.value;
+  
+  nErr = RegCreateKeyEx( (HKEY)    hb_parnl( 1 ) , 
+                         (LPCSTR)  hb_parc( 2 )  ,  
+                         (DWORD)   0             ,
+                         (LPSTR)   hb_parc( 4 )  , 
+                         (DWORD)   hb_parnl( 5 ) ,
+                         (DWORD)   hb_parnl( 6 ) ,
+                         sa                      , 
+                         &hkResult               ,                            
+                         &dwDisposition )        ;
+
+  if ( nErr == ERROR_SUCCESS )
+  {
+    hb_stornl( (LONG) hkResult, 8 ) ;
+    hb_stornl( (LONG) dwDisposition, 9 ) ;
+  }
+  hb_retnl( nErr ) ;
+
 }
 
 
 HB_FUNC( REGDELETEKEY )
 {
-   LPCTSTR cName = hb_parc( 2 );
 	
    if ( RegDeleteKeyA( ( HKEY ) hb_parnl( 1 ), ( LPCTSTR ) hb_parc( 2 ) ) == ERROR_SUCCESS )
      {
