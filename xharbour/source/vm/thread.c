@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.31 2003/01/02 04:51:31 jonnymind Exp $
+* $Id: thread.c,v 1.32 2003/01/12 22:50:21 jonnymind Exp $
 */
 
 /*
@@ -1067,7 +1067,7 @@ HB_FUNC( THREADSLEEP )
 
 HB_FUNC( THREADGETCURRENT )
 {
-   hb_retnl( (long) HB_CURRENT_THREAD() );
+   hb_retnl( (long) HB_CURRENT_THREAD_HANDLE() );
 }
 
 HB_FUNC( WAITFORTHREADS )
