@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2411 2004/02/27 14:40:35 paultucker Exp $
+ * $Id: ChangeLog,v 1.2412 2004/02/27 16:00:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,29 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-27 23:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    ! minor correction on previous changes when skleton passed is "*.*"
+
 2004-02-27 23:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * source/rtl/direct.c
-     ! allow Directory() to receive third parameter as logical so that
-       Directory() will only returns directory names. Default is FALSE.
-       Example: Directory("C:\Windows\*.*",,.T.)
+  * source/rtl/direct.c
+    ! allow Directory() to receive third parameter as logical so that
+      Directory() will only returns directory names. Default is FALSE.
+      Example: Directory("C:\Windows\*.*",,.T.)
 
-     ! allow Directory() to receive fourth parameter as logical so that
-       Directory() will return file/directory names with full-path.
-       Default is FALSE.
-       Example: Directory("C:\Windows\*.*",,,.T.)
+    ! allow Directory() to receive fourth parameter as logical so that
+      Directory() will return file/directory names with full-path.
+      Default is FALSE.
+      Example: Directory("C:\Windows\*.*",,,.T.)
 
-       NOTE: These are xHarbour extensions.
+      NOTE: These are xHarbour extensions.
 
-   + tests/dirtest2.prg
-     ! test program for extended directory() function
+  + tests/dirtest2.prg
+    ! test program for extended directory() function
 
-   * source/rdd/dbcmd.c
-     ! fix memory leak upon succesful operation of:
-       "append from foo (no file extension)".
+  * source/rdd/dbcmd.c
+    ! fix memory leak upon succesful operation of:
+      "append from foo (no file extension)".
 
-   * source/rdd/dbf1.c
-     ! rearrange program logic to reduce memory leak upon failure in:
-       "append from noexist".
+  * source/rdd/dbf1.c
+    ! rearrange program logic to reduce memory leak upon failure in:
+      "append from noexist".
 
 2004-02-27 09:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbrddfpt.h

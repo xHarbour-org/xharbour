@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.14 2004/02/23 08:31:56 andijahja Exp $
+ * $Id: direct.c,v 1.15 2004/02/27 16:01:11 andijahja Exp $
  */
 
 /*
@@ -241,7 +241,7 @@ HB_FUNC( DIRECTORY )
 
             if ( bFullPath )
             {
-               char *szFullName = hb_xstrcpy(NULL,(char*)fDirSpec->szPath,ffind->szName,NULL);
+               char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
                hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, szFullName ) );
                hb_xfree( szFullName );
             }
