@@ -16,7 +16,6 @@ FUNCTION Main
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
 
          :SetBkBrush( COLOR_APPWORKSPACE+1 )
-
          :WindowMenu := TMenu():New()
 
          WITH OBJECT :WindowMenu
@@ -42,7 +41,6 @@ FUNCTION Main
          :SetWindowMenu()
       END
 
-      :MainFrame:PostMessage( WM_COMMAND, 200 )
       :Run()
   END
 
@@ -81,7 +79,8 @@ RETURN( nil)
 
 CLASS MainFrame FROM TFrame
 
-   METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm', super:new( oParent )
+   METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm',;
+                                      super:new( oParent )
 
    METHOD OnClose()            INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
                                       PostQuitMessage(0)
@@ -95,9 +94,11 @@ ENDCLASS
 
 CLASS SubForm1 FROM TForm
 
-   METHOD New( oParent )       INLINE ::Caption := 'SubForm1 from TForm', super:new( oParent )
+   METHOD New( oParent )       INLINE ::Caption := 'SubForm1 from TForm',;
+                                      ::Style   := WS_POPUP+WS_CAPTION+WS_SYSMENU,;
+                                      super:new( oParent )
 
-   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnPaint( hDC )       INLINE OutputDebugString('painting'), DrawGrid( ::handle, hDC, 3 ),0
 
 ENDCLASS
 
