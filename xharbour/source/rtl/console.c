@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.34 2003/10/18 02:38:45 jonnymind Exp $
+ * $Id: console.c,v 1.35 2003/10/19 00:17:35 jonnymind Exp $
  */
 /*
  * Harbour Project source code:
@@ -452,7 +452,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 
    if( ( ( hb_stricmp(hb_set.HB_SET_DEVICE, "PRINTER" ) == 0) || hb_set.HB_SET_PRINTER ) && hb_set.hb_set_printhan != FS_ERROR ) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D\x0C", 2 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
@@ -480,43 +480,29 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
 
-   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )){
-      USHORT uiCount;
-      USHORT uiProw = ( USHORT ) iRow;
-      USHORT uiPcol = ( USHORT ) iCol;
+   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
 
-      if( uiProw < s_uiPRow ) {
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+      iCol += hb_set.HB_SET_MARGIN;
+
+      if ( iCol < s_uiPCol) {
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+        s_uiPCol = 0 ;
+        s_uiPRow++ ;
+      }
+      if (iRow < s_uiPRow) {
+         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D\x0C", 2 );
          s_uiPRow = s_uiPCol = 0;
       }
-
-      for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ ) {
+      for ( ; s_uiPRow < iRow ; s_uiPRow++ )
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
-      if( uiProw > s_uiPRow )
-      {
-         s_uiPCol = 0;
-      }
-
-      uiPcol += hb_set.HB_SET_MARGIN;
-
-      if( ( uiProw == s_uiPRow ) && ( uiPcol < s_uiPCol ) ) {
-        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
-        s_uiPCol = 0;
-      }
-
-      for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
+      for ( ; s_uiPCol < iCol ; s_uiPCol++)
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
-      }
-
-      s_uiPRow = uiProw;
-      s_uiPCol = uiPcol;
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
-   else
-   {
+   else {
       hb_gtSetPos( iRow, iCol );
    }
 
