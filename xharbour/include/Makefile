@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2003/06/24 19:56:54 druzus Exp $
+# $Id: Makefile,v 1.10 2003/07/18 18:06:49 jonnymind Exp $
 #
 
 ROOT = ../
@@ -65,7 +65,6 @@ PRG_HEADERS=\
 	hbcommon.ch  \
 	hbcompress.ch\
 	hbextern.ch  \
-	hbgetcmt.ch  \
 	hbinkey.ch   \
 	hblang.ch    \
 	hbmacro.ch   \
