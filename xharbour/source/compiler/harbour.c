@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.7 2002/03/10 18:41:54 ronpinkas Exp $
+ * $Id: harbour.c,v 1.8 2002/03/17 00:50:02 ronpinkas Exp $
  */
 
 /*
@@ -1688,6 +1688,19 @@ void hb_compGenBreak( void )
 {
    hb_compGenPushSymbol( hb_strdup("BREAK"), 1 );
    hb_compGenPushNil();
+}
+
+void hb_compGenWithObject( HB_EXPR_PTR pObject )
+{
+   hb_compExprDelete( hb_compExprGenPush( pObject ) );
+   hb_compGenPCode1( HB_P_WITHOBJECT );
+   hb_comp_wWithObjCounter++;
+}
+
+void hb_compGenEndWithObject( void )
+{
+   hb_compGenPCode1( HB_P_ENDWITHOBJECT );
+   hb_comp_wWithObjCounter--;
 }
 
 void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */

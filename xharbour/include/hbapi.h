@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.14 2002/04/17 20:36:19 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.15 2002/04/18 00:56:51 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,7 @@ extern "C" {
 #endif
 
 #define HB_MAX_MACRO_ARGS 16
+#define HB_MAX_WITH_OBJECTS 16
 
 /* items types and type checking macros */
 #define HB_IT_NIL       ( ( USHORT ) 0x0000 )

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.8 2002/03/10 18:41:54 ronpinkas Exp $
+ * $Id: genc.c,v 1.9 2002/03/17 00:10:12 ronpinkas Exp $
  */
 
 /*
@@ -2011,6 +2011,38 @@ static HB_GENC_FUNC( hb_p_baseline )
    return 3;
 }
 
+static HB_GENC_FUNC( hb_p_withobject )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_WITHOBJECT,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_sendwith )
+{
+   fprintf( cargo->yyc, "\tHB_P_SENDWITH, %i, %i,\n",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ] );
+   return 3;
+}
+
+static HB_GENC_FUNC( hb_p_sendwithshort )
+{
+   fprintf( cargo->yyc, "\tHB_P_SENDWITHSHORT, %i,\n", pFunc->pCode[ lPCodePos + 1 ] );
+   return 2;
+}
+
+static HB_GENC_FUNC( hb_p_endwithobject )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_ENDWITHOBJECT,\n" );
+   return 1;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -2151,7 +2183,11 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_substr,
    hb_p_dummy,
    hb_p_baseline,
-   hb_p_lineoffset
+   hb_p_lineoffset,
+   hb_p_withobject,
+   hb_p_sendwith,
+   hb_p_sendwithshort,
+   hb_p_endwithobject
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

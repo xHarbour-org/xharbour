@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.7 2001/07/21 15:25:12 rglab Exp $
+ * $Id: expropt1.c,v 1.1.1.1 2001/12/21 10:44:30 ronpinkas Exp $
  */
 
 /*
@@ -429,7 +429,7 @@ HB_EXPR_PTR hb_compExprNewAliasExpr( HB_EXPR_PTR pAlias, HB_EXPR_PTR pExpList )
    pExpr->value.asAlias.pAlias    = pAlias;
    pExpr->value.asAlias.pExpList  = pExpList;
    pExpr->value.asAlias.pVar      = NULL;
-   
+
    if( pAlias->ExprType == HB_ET_MACRO )
    {
        /* Is it a special case &variable->( expressionList ) */
@@ -452,7 +452,21 @@ HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR pObject, char * szMessage )
    pExpr = hb_compExprNew( HB_ET_SEND );
    pExpr->value.asMessage.szMessage = szMessage;
    pExpr->value.asMessage.pObject   = pObject;
-   pExpr->value.asMessage.pParms     = NULL;
+   pExpr->value.asMessage.pParms    = NULL;
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewWithSend( char * szMessage )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%p, %s)", szMessage));
+
+   pExpr = hb_compExprNew( HB_ET_WITHSEND );
+   pExpr->value.asMessage.szMessage = szMessage;
+   pExpr->value.asMessage.pObject   = NULL;
+   pExpr->value.asMessage.pParms    = NULL;
 
    return pExpr;
 }
@@ -469,6 +483,13 @@ HB_EXPR_PTR hb_compExprNewMethodCall( HB_EXPR_PTR pObject, HB_EXPR_PTR pArgList 
    pObject->value.asMessage.pParms = pArgList;
 
    return pObject;
+}
+
+HB_EXPR_PTR hb_compExprNewWithMethodCall( HB_EXPR_PTR pWithMessage, HB_EXPR_PTR pArgList )
+{
+   pWithMessage->value.asMessage.pParms = pArgList;
+
+   return pWithMessage;
 }
 
 /* Creates a list - all elements will be used

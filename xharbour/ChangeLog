@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.161 2002/04/18 05:33:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.162 2002/04/18 17:10:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-20 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + #define HB_MAX_WITH_OBJECTS 16
+
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    + void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for WITH OBJECT <obj> statement */
+    + void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
+
+  * include/hberrors.h
+    + #define HB_COMP_ERR_UNMATCHED_WITHOBJECT        54
+  * source/compiler/hbgenerr.c
+    + "WITH Message [%s] with no WITH OBJECT in sight."
+
+  * include/hbexprop.h
+  * source/common/expropt1.c
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for: WITH OBJECT <obj> ; :WithProperty; :WithMethod([...]); END syntax
+      /* Nested WITH OBJECT are supported up to HB_MAX_WITH_OBJECTS levels. */
+
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * include/hbpcode.h
+  * source/vm/hvm.c
+    + Added support for new: HB_P_WITHOBJECT, HB_P_SENDWITH, HB_P_SENDWITHSHORT, HB_P_ENDWITHOBJECT
+
+  /*
+     The new WITH OBJECT syntax produce smaller ans slightly faster executables.
+  */
 
 2002-04-18 10:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/chrasc.c

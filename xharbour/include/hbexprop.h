@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.15 2001/07/23 11:13:06 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.1.1.1 2001/12/21 10:47:20 ronpinkas Exp $
  */
 
 /*
@@ -131,6 +131,7 @@ typedef enum
    HB_ET_ALIASVAR,
    HB_ET_ALIASEXPR,
    HB_ET_SEND,
+   HB_ET_WITHSEND,
    HB_ET_FUNNAME,
    HB_ET_ALIAS,
    HB_ET_RTVAR,      /* PRIVATE or PUBLIC declaration of variable */
@@ -345,6 +346,8 @@ HB_EXPR_PTR hb_compExprNewCodeblockExpr( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewFunCallArg( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR, char * );
 HB_EXPR_PTR hb_compExprNewMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewWithSend( char * );
+HB_EXPR_PTR hb_compExprNewWithMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewList( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewArgList( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprAddListExpr( HB_EXPR_PTR, HB_EXPR_PTR );

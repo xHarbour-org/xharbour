@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.4 2002/04/17 02:47:12 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.5 2002/04/17 21:19:56 ronpinkas Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ static BYTE s_PrecedTable[] = {
    HB_ET_NIL,                 /*   HB_ET_ALIASVAR,    */
    HB_ET_NIL,                 /*   HB_ET_ALIASEXPR,   */
    HB_ET_NIL,                 /*   HB_ET_SEND,        */
+   HB_ET_NIL,                 /*   HB_ET_WITHSEND,    */
    HB_ET_NIL,                 /*   HB_ET_FUNNAME,     */
    HB_ET_NIL,                 /*   HB_ET_ALIAS,       */
    HB_ET_NIL,                 /*   HB_ET_RTVARIABLE,  */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.77 2002/01/02 02:00:21 andijahja Exp $
+ * $Id: hbcomp.h,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -298,6 +298,8 @@ extern PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * );
 extern void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType );
 
 extern void hb_compGenBreak( void );  /* generate code for BREAK statement */
+extern void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for WITH OBJECT <obj> statement */
+extern void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
 
 extern void hb_compExternGen( void ); /* generates the symbols for the EXTERN names */
 extern void hb_compExternAdd( char * szExternName ); /* defines a new extern name */
@@ -462,9 +464,9 @@ extern BOOL           hb_comp_bDontGenLineNum;
 extern FILES          hb_comp_files;
 extern int            hb_comp_iStaticCnt;
 extern int            hb_comp_iErrorCount;
-                      
+
 extern char *         hb_comp_szAnnounce;
-                      
+
 extern PHB_FNAME      hb_comp_pOutPath;
 extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
@@ -475,13 +477,14 @@ extern BOOL           hb_comp_bFileVersionInfo;
 extern BOOL           hb_comp_bLogo;
 extern BOOL           hb_comp_bSyntaxCheckOnly;
 extern int            hb_comp_iLanguage;
-                      
+
 extern USHORT         hb_comp_wSeqCounter;
 extern USHORT         hb_comp_wForCounter;
 extern USHORT         hb_comp_wIfCounter;
 extern USHORT         hb_comp_wWhileCounter;
 extern USHORT         hb_comp_wCaseCounter;
-                      
+extern USHORT         hb_comp_wWithObjCounter;
+
 extern char *         hb_comp_szDeclaredFun;
 
 extern char *         hb_comp_szLastMethod;

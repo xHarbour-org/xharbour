@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.13 2002/04/17 02:58:21 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.14 2002/04/17 21:19:56 ronpinkas Exp $
  */
 
 /*
@@ -139,6 +139,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall );
 static HB_EXPR_FUNC( hb_compExprUseAliasVar );
 static HB_EXPR_FUNC( hb_compExprUseAliasExpr );
 static HB_EXPR_FUNC( hb_compExprUseSend );
+static HB_EXPR_FUNC( hb_compExprUseWithSend );
 static HB_EXPR_FUNC( hb_compExprUseFunName );
 static HB_EXPR_FUNC( hb_compExprUseAlias );
 static HB_EXPR_FUNC( hb_compExprUseRTVariable );
@@ -193,6 +194,7 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseAliasVar,
    hb_compExprUseAliasExpr,
    hb_compExprUseSend,
+   hb_compExprUseWithSend,
    hb_compExprUseFunName,
    hb_compExprUseAlias,
    hb_compExprUseRTVariable,
@@ -1929,6 +1931,114 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
    return pSelf;
 }
 
+static HB_EXPR_FUNC( hb_compExprUseWithSend )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         {
+            //pSelf->value.asMessage.pObject = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_REDUCE ), HB_MACRO_PARAM );
+
+            if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
+            {
+               pSelf->value.asMessage.pParms = HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_REDUCE );
+            }
+         }
+         break;
+
+      case HB_EA_ARRAY_AT:
+      case HB_EA_ARRAY_INDEX:
+      case HB_EA_LVALUE:
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         {
+            if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
+            {
+               int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
+
+               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+               //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+
+               /* NOTE: if method with no parameters is called then the list
+                * of parameters contain only one expression of type HB_ET_NONE
+                * There is no need to push this parameter
+                */
+               if( iParms == 1 && pSelf->value.asMessage.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
+                  --iParms;
+               }
+
+               if( iParms )
+               {
+                  HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
+               }
+
+               if( iParms > 255 )
+               {
+                  HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_SENDWITH, HB_LOBYTE( iParms ), HB_HIBYTE( iParms ), ( BOOL ) 1 );
+               }
+               else
+               {
+                  HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, ( BYTE ) iParms, ( BOOL ) 1 );
+               }
+            }
+            else
+            {
+               /* acces to instance variable */
+               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+               //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+               HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 0, ( BOOL ) 1 );
+            }
+         }
+         break;
+
+      case HB_EA_POP_PCODE:
+         {
+            /* NOTE: This is an exception from the rule - this leaves
+             *    the return value on the stack
+             */
+            HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
+            //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+            HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
+         }
+         break;
+
+      case HB_EA_PUSH_POP:
+      case HB_EA_STATEMENT:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         if( ! pSelf->value.asMessage.pParms )  /* Is it a method call ? */
+         {
+            /* instance variable */
+            /* QUESTION: This warning can be misleading if nested messages
+             * are used, e.g. a:b():c - should we generate it ?
+             */
+            hb_compWarnMeaningless( pSelf );
+         }
+
+      case HB_EA_DELETE:
+#if defined( HB_MACRO_SUPPORT )
+         {
+            //HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pObject );
+
+            if( pSelf->value.asMessage.pParms )
+            {
+               HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
+            }
+
+            HB_XFREE( pSelf->value.asMessage.szMessage );
+         }
+#endif
+         break;
+   }
+   return pSelf;
+}
+
 static HB_EXPR_FUNC( hb_compExprUsePostInc )
 {
    switch( iMessage )
@@ -2022,7 +2132,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
          {
             /* NOTE: assigment to an object instance variable needs special handling
              */
-            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
             {
                HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
                pObj->value.asMessage.pParms = pSelf->value.asOperator.pRight;
@@ -2089,7 +2199,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
          {
             /* NOTE: assigment to an object instance variable needs special handling
              */
-            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
             {
                HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
                pObj->value.asMessage.pParms = pSelf->value.asOperator.pRight;
@@ -2767,7 +2877,7 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
             /* '=' used standalone in a statement - assign a value
              * it assigns a value and removes it from the stack
              * */
-            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
             {
                /* Send messages are implemented as function calls
                 */

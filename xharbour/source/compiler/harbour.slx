@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.3 2002/03/14 19:14:16 ronpinkas Exp $
  */
 
 /*
@@ -165,7 +165,7 @@ SELF_CONTAINED_WORDS_ARE {
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
 #define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, MEMVAR, PARAMETERS, PROCEDURE, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER */
-#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, RETURN, WHILE */
+#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, RETURN, WHILE, WITHOBJ */
 #define REJECT_OP        707
 
 #define HB_TEXT          708
@@ -255,6 +255,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
                          LEX_WORD( "TEXT"                ) AS_TOKEN( HB_TEXT          ),
                          LEX_WORD( "WHILE"               ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
+                         LEX_WORD( "WITH{WS}OBJECT"      ) AS_TOKEN( HB_WANTS_EXP - WITHOBJ          ),
                          LEX_WORD( "_HB_CLASS"           ) AS_TOKEN( DECLARE_CLASS    ),
                          LEX_WORD( "_HB_MEMBER"          ) AS_TOKEN( DECLARE_MEMBER   ),
                          LEX_WORD( "_PROCREQ_"           ) AS_TOKEN( PROCREQ          )

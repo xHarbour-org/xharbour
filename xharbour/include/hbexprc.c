@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.5 2002/01/30 19:02:41 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.6 2002/03/11 22:38:52 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
 {
    /* NOTE: an object instance variable needs special handling
     */
-   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
@@ -200,7 +200,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
 {
    /* NOTE: an object instance variable needs special handling
     */
-   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
@@ -281,7 +281,7 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 {
    /* NOTE: an object instance variable needs special handling
     */
-   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
@@ -326,7 +326,7 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
 {
    /* NOTE: an object instance variable needs special handling
     */
-   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       /* push current value - it will be a result of whole expression */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
@@ -359,7 +359,7 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 {
    /* NOTE: an object instance variable needs special handling
     */
-   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+   if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       HB_EXPR_PCODE2( hb_compExprPushPreOp, pSelf, bOper );
       /* pop the value from the stack */
