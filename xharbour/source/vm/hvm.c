@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.342 2004/03/02 17:31:28 druzus Exp $
+ * $Id: hvm.c,v 1.343 2004/03/02 18:15:09 ronpinkas Exp $
  */
 
 /*
@@ -355,7 +355,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 #ifndef HB_THREAD_SUPPORT
   /* background function counter */
-  static USHORT s_iBackground = 0;
+  static ULONG s_ulBackground = 0;
 #endif
 
 // Initialize ErrorBlock() and __SetHelpK()
@@ -851,6 +851,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
 
+   #ifndef HB_THREAD_SUPPORT
+      ULONG ulBGMaxExecutions;
+   #endif
+
    #ifndef HB_NO_PROFILER
       ULONG ulLastOpcode = 0; /* opcodes profiler support */
       ULONG ulPastClock = 0;  /* opcodes profiler support */
@@ -921,11 +925,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       if ( hb_set.HB_SET_BACKGROUNDTASKS )
       {
       #ifndef HB_THREAD_SUPPORT
-         // Run background functions every 1000 vm exec
-         if( ++s_iBackground == 1000 )
+         ulBGMaxExecutions = ( hb_set.HB_SET_BGTASKPCODES ? hb_set.HB_SET_BGTASKPCODES : 1000 );
+         if( ulBGMaxExecutions < (++s_ulBackground) )
          {
             hb_backgroundRun();
-            s_iBackground = 0;
+            s_ulBackground = 0;
          }
       #else
          // Run background functions every unlock period

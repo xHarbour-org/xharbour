@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.9 2004/01/16 11:36:50 lculik Exp $
+ * $Id: set.ch,v 1.10 2004/01/28 16:42:18 jonnymind Exp $
  */
 
 /*
@@ -128,8 +128,9 @@
 #define _SET_BACKGROUNDTASKS 111 /* Harbour extension */
 #define _SET_TRIMFILENAME    112 /* Harbour extension */
 #define _SET_GTMODE          113 /* Harbour extension */
+#define _SET_BGTASKPCODES    114 /* Harbour extension */
 
 #define HB_SET_BASE        100
-#define HB_SET_COUNT       14
+#define HB_SET_COUNT       15
 
 #endif /* _SET_CH */

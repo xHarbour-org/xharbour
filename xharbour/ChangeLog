@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2456 2004/03/03 01:33:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2457 2004/03/03 01:38:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-03 00:25 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * include/hbset.h
+  * include/set.ch
+    + Added HB_SET_BGTASKPCODES to set up # of pCodes executed before
+      check for Task execution (Only applies to ST applications)
+  * source/rtl/set.c
+    + Added support to HB_SET_BGTASKPCODES
+    + Added set_numberul() to handle LONG SET Parameters
+  * source/pptable.c
+    + Added support to HB_SET_BGTASKPCODES
+    ! Fixed HB_SET_TRIMFILENAME enum constant
+    ! Fixed hb_pp_topCommand if not defined HB_COMPAT_C53
+  * source/vm/hvm.c
+    + Added support to HB_SET_BGTASKPCODES
+  + tests/bkgtst2.prg
+    + Added sample to demonstrate HB_SET_BGTASKPCODES
 
 2004-03-02 17:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/regex.c

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.41 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: set.c,v 1.42 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -165,6 +165,20 @@ static int set_number( PHB_ITEM pItem, int iOldValue )
    else
    {
       return iOldValue;
+   }
+}
+
+static int set_numberul( PHB_ITEM pItem, ULONG ulOldValue )
+{
+   HB_TRACE(HB_TR_DEBUG, ("set_number(%p, %d)", pItem, ulOldValue));
+
+   if( HB_IS_NUMERIC( pItem ) )
+   {
+      return (ULONG)hb_itemGetNL( pItem );
+   }
+   else
+   {
+      return ulOldValue;
    }
 }
 
@@ -1387,6 +1401,21 @@ HB_FUNC( SET )
          if( args > 1 )
          {
             hb_set.HB_SET_TRIMFILENAME = set_logical( pArg2, hb_set.HB_SET_TRIMFILENAME );
+         }
+         break;
+
+      case HB_SET_BGTASKPCODES:
+         hb_retnl( hb_set.HB_SET_BGTASKPCODES );
+         if( args > 1 )
+         {
+            if( set_numberul( pArg2, hb_set.HB_SET_BGTASKPCODES ) < 0 )
+            {
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            }
+            else
+            {
+               hb_set.HB_SET_BGTASKPCODES = set_numberul( pArg2, hb_set.HB_SET_BGTASKPCODES );
+            }
          }
          break;
 
