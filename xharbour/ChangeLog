@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2832 2004/04/25 23:50:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.2833 2004/04/26 09:32:04 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-25 14:20 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/odbc/odbc.c
+    * added SqlPrepare, SqlExecute, SqlExecuteScalar
+  + source/odbc/hdo_odbc.prg
+    * simpler and hopefully faster object layer over odbc.c
+
 2004-04-26 16:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     ! remove __XCC__ defines

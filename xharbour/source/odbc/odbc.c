@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.15 2004/03/18 03:56:08 ronpinkas Exp $
+ * $Id: odbc.c,v 1.16 2004/03/28 15:12:02 likewolf Exp $
  */
 
 /*
@@ -425,4 +425,42 @@ HB_FUNC( SETNUMLEN )  /* SETNUMLEN( nValue, nSize, nDecimals ) ==> nValue (nSize
    hb_retnlen( hb_parnd( 1 ), hb_parnl( 2 ), hb_parnl( 3 ) );
 }
 
+HB_FUNC( SQLPREPARE )  /* HB_SQLPREPARE( hStmt, cStatement ) --> nRetCode */
+{
+   hb_retni( SQLPrepare( ( HSTMT ) hb_parnl( 1 ), (unsigned char*) hb_parcx( 2 ), SQL_NTS ) );
+}
+
+HB_FUNC( SQLEXECUTE )  /* HB_SQLEXECUTE( hStmt ) --> nRetCode */
+{
+   hb_retni( SQLExecute( ( HSTMT ) hb_parnl( 1 ) ) );
+}
+
+HB_FUNC( SQLEXECUTESCALAR )
+{
+   HSTMT hStmt;
+   SDWORD lLen;
+   BYTE bBuffer[ 255+1 ];
+   SWORD wResult;
+
+   wResult = SQLAllocStmt( ( HDBC ) hb_parnl( 2 ), &hStmt );
+
+   if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
+   { 
+      wResult = SQLExecDirect( ( HSTMT ) hStmt, (unsigned char*) hb_parcx( 1 ), SQL_NTS );
+      if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
+      {
+         wResult = SQLFetch( ( HSTMT ) hStmt ); 
+         if( wResult != SQL_NO_DATA )
+         {
+            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, lLen, &lLen );            
+            hb_storc( (char *)bBuffer, 3 );            
+         }   
+      }   
+   }  
+
+   hb_retni( wResult );
+   
+   SQLFreeStmt( ( HSTMT ) hStmt, 0 );
+   
+}
 #endif
