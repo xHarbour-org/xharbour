@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.20 2002/11/29 08:59:57 what32 Exp $
+ * $Id: dbcmd.c,v 1.21 2002/12/19 18:15:34 ronpinkas Exp $
  */
 
 /*
@@ -787,7 +787,7 @@ void *  HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaPointer()"));
 
-   return s_pCurrArea->pArea;
+   return ( s_pCurrArea )? s_pCurrArea->pArea:NULL;
 }
 
 /*
