@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.30 2004/03/17 02:29:01 druzus Exp $
+ * $Id: errorsys.prg,v 1.31 2004/03/28 16:02:38 likewolf Exp $
  */
 
 /*
@@ -107,7 +107,10 @@ STATIC FUNCTION DefError( oError )
         cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
      Endif
 
-     cMessage += " Arguments: (" + Arguments( oError ) + ")"
+
+     If ValType( oError:Args ) == "A"
+       cMessage += " Arguments: (" + Arguments( oError ) + ")"
+     Endif
 
      // Build buttons
 
