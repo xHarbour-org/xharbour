@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.786 2003/02/27 22:01:49 lculik Exp $
+ * $Id: ChangeLog,v 1.787 2003/02/28 10:01:27 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-28 02:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/hbpcode.h
+  * source/common/expropt1.c
+  * source/compiler/genc.c
+  * source/compiler/hbpcode.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/vm/hvm.c
+    + Adde support for new operators HAS and LIKE.
+
+    /*
+      Syntax: cExp HAS  cRegEx|CompiledRegEx => bMatch
+              cExp LIKE cRegEx|CompiledRegEx => bLike
+
+      HAS will return .T. if cExp contains a match to the specified Regular Expression.
+      LIKE will return .T. if all of its text is a match to the specified Regular Expression.
+    */
+
+  * source/rtl/regex.c
+    + Added low level worker function hb_regex().
+    - Removed work logic from HB_REGEX() and HB_REGEXMATCH() and modified them as wrappers to hb_regex().
+    % Few optimizations.
+
+  * xdiff.txt
+    * Updated with new operators HAS and LIKE.
+
+  + tests/has_like.prg
+    + Added small test of new HAS and LIKE operators.
+
 2003-02-28 06:55 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rdd/dbfcdx/dbfcdx1.c
-    ! Fixed hb_cdxSeek() to respond to null queries (dbSeek( "" )) in the 
-      same way as Clipper do : Found() ==> .T. and pointing to the first 
+    ! Fixed hb_cdxSeek() to respond to null queries (dbSeek( "" )) in the
+      same way as Clipper do : Found() ==> .T. and pointing to the first
       logical record in the table.
 
 2003-02-26 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>

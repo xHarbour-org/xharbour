@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.12 2002/10/17 04:41:29 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.13 2002/12/04 06:24:06 ronpinkas Exp $
  */
 
 /*
@@ -118,7 +118,9 @@ static BYTE s_PrecedTable[] = {
    HB_EO_EQUAL,               /*   HB_EO_LE,          */
    HB_EO_EQUAL,               /*   HB_EO_GE,          */
    HB_EO_EQUAL,               /*   HB_EO_NE,          */
-   HB_EO_EQUAL,               /*   HB_EO_IN,          */
+   HB_EO_IN,                  /*   HB_EO_IN,          */
+   HB_EO_MATCH,               /*   HB_EO_MATCH,       */
+   HB_EO_LIKE,                /*   HB_EO_LIKE,        */
    HB_EO_PLUS,                /*   HB_EO_PLUS,        addition */
    HB_EO_PLUS,                /*   HB_EO_MINUS,       */
    HB_EO_MULT,                /*   HB_EO_MULT,        multiple */

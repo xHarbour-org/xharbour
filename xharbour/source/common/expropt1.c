@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.3 2002/07/25 18:20:20 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.4 2002/12/04 06:24:07 ronpinkas Exp $
  */
 
 /*
@@ -759,6 +759,22 @@ HB_EXPR_PTR hb_compExprNewAnd( HB_EXPR_PTR pLeftExpr )
 HB_EXPR_PTR hb_compExprNewOr( HB_EXPR_PTR pLeftExpr )
 {
    HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_OR );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewMatch( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_MATCH );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewLike( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_LIKE );
    pExpr->value.asOperator.pLeft = pLeftExpr;
    pExpr->value.asOperator.pRight = NULL;
    return pExpr;

@@ -6401,24 +6401,23 @@ HB_FUNC( HB_ATX )
     {
        hb_stornl( 0, 4 );
     }
+
     if( hb_pcount() > 4 )
     {
        hb_stornl( 0, 5 );
     }
-
-    hb_ret();
 }
 
-HB_FUNC( REGCOMP )
-{
-}
-
-/* Giancarlo niccoali added perl like subgroup matching */
-#include "hbapierr.h"
-HB_FUNC( HB_REGEX )
+/*
+ *  This is a worker function may be called by PRG Wrappers HB_REGEX and HB_REGEXMATCH
+ *  in such case paramaters ara on the HB_BM_STACK, or it may be called directly by the
+ *  HVM when executing the HB_P_MATCH and HB_P_LIKE operator. In such case the operands
+ *  are passed directly.
+ */
+BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 {
    #ifndef REGEX_MAX_GROUPS
-   #define REGEX_MAX_GROUPS 16
+      #define REGEX_MAX_GROUPS 16
    #endif
 
    regex_t re;
@@ -6426,19 +6425,20 @@ HB_FUNC( HB_REGEX )
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
    int i;
-   PHB_ITEM aRet, pMatch; /* Array where the matched groups will be returned */
 
-   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
+
+   if( pRegEx == NULL )
+   {
+      pRegEx = hb_param( 1, HB_IT_STRING );
+      pString = hb_param( 2, HB_IT_STRING );
+   }
 
    if( pRegEx == NULL || pString == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
-         NULL,
-         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
-      return;
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type", NULL, 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
+      return FALSE;
    }
 
    /* now check if it is a precompiled regex */
@@ -6453,15 +6453,17 @@ HB_FUNC( HB_REGEX )
       {
          CFlags |= REG_ICASE;
       }
+
       if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
       {
          CFlags |= REG_NEWLINE;
       }
+
       if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
       {
-         hb_ret();
-         return;
+         return FALSE;
       }
+
       pReg = &re;
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
@@ -6469,24 +6471,49 @@ HB_FUNC( HB_REGEX )
    aMatches[0].rm_so = 0;
    if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
    {
-      aRet = hb_itemArrayNew( 0 );
-      i = 0;
-      while ( aMatches[i].rm_eo > 0 )
+      // Wants Results
+      if( cRequest == 0 )
       {
-         pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so,
-            aMatches[i].rm_eo - aMatches[i].rm_so );
-         hb_arrayAdd( aRet, pMatch );
-         hb_itemRelease( pMatch );
-         i++;
+         PHB_ITEM pMatch;
+
+         hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+
+         i = 0;
+         while ( aMatches[i].rm_eo > 0 )
+         {
+            pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+            hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
+            i++;
+         }
+      }
+      else
+      {
+         // HB_P_LIKE
+         if( cRequest == 1 )
+         {
+            // Matched entry must be same length as the searched string.
+            return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
+         }
       }
 
-      hb_itemRelease( hb_itemReturn( aRet ) );
-      return;
+      // HB_P_MATCH
+      return TRUE;
    }
 
-   hb_ret();
+   return FALSE;
 }
 
+// Returns array of Match + Sub-Matches.
+HB_FUNC( HB_REGEX )
+{
+   hb_regex( 0, NULL, NULL );
+}
+
+// Returns just .T. if match found or .F. otherwise.
+HB_FUNC( HB_REGEXMATCH )
+{
+   hb_regex( 2, NULL, NULL );
+}
 
 HB_FUNC( HB_REGEXCOMP )
 {
@@ -6510,6 +6537,7 @@ HB_FUNC( HB_REGEXCOMP )
    {
       CFlags |= REG_ICASE;
    }
+
    if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
    {
       CFlags |= REG_NEWLINE;
@@ -6522,71 +6550,4 @@ HB_FUNC( HB_REGEXCOMP )
       memcpy( cRegex + 3, &re, sizeof( re ) );
       hb_retclenAdoptRaw( cRegex, sizeof( re ) + 3 );
    }
-   else
-   {
-      hb_ret();
-   }
-}
-
-/**********
-* Returns just true or false on match
-***********/
-
-HB_FUNC( HB_REGEXMATCH )
-{
-   #ifndef REGEX_MAX_GROUPS
-   #define REGEX_MAX_GROUPS 16
-   #endif
-
-   regex_t re;
-   regex_t *pReg;
-   regmatch_t aMatches[REGEX_MAX_GROUPS];
-   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-
-   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
-   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
-
-   if( pRegEx == NULL || pString == NULL )
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
-         NULL,
-         2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
-      return;
-   }
-
-   /* now check if it is a precompiled regex */
-   if ( memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
-   {
-      pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
-      aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
-   }
-   else
-   {
-      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
-      {
-         CFlags |= REG_ICASE;
-      }
-      if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
-      {
-         CFlags |= REG_NEWLINE;
-      }
-      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
-      {
-         hb_retl( FALSE );
-         return;
-      }
-      pReg = &re;
-      aMatches[0].rm_eo = pRegEx->item.asString.length;
-   }
-
-   aMatches[0].rm_so = 0;
-   if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
-   {
-      hb_retl( TRUE );
-      return;
-   }
-
-   hb_retl( FALSE );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.44 2003/02/17 08:03:21 andijahja Exp $
+ * $Id: hbexprb.c,v 1.45 2003/02/20 01:49:03 ronpinkas Exp $
  */
 
 /*
@@ -173,6 +173,8 @@ static HB_EXPR_FUNC( hb_compExprUseLE );
 static HB_EXPR_FUNC( hb_compExprUseGE );
 static HB_EXPR_FUNC( hb_compExprUseNE );
 static HB_EXPR_FUNC( hb_compExprUseIN );
+static HB_EXPR_FUNC( hb_compExprUseLike );
+static HB_EXPR_FUNC( hb_compExprUseMatch );
 static HB_EXPR_FUNC( hb_compExprUseNegate );
 
 HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
@@ -221,6 +223,8 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseGE,
    hb_compExprUseNE,
    hb_compExprUseIN,
+   hb_compExprUseLike,
+   hb_compExprUseMatch,
    hb_compExprUsePlus,      /* addition */
    hb_compExprUseMinus,
    hb_compExprUseMult,      /* multiple */
@@ -3754,6 +3758,126 @@ static HB_EXPR_FUNC( hb_compExprUseIN )
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_INSTRING );
+         }
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         if( HB_SUPPORT_HARBOUR )
+         {
+            /* NOTE: This will not generate a runtime error if incompatible
+             * data type is used
+             */
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_POP );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_POP );
+         }
+         else
+         {
+            HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         }
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseLike )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         {
+            pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+            pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         }
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         {
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_LIKE );
+         }
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         if( HB_SUPPORT_HARBOUR )
+         {
+            /* NOTE: This will not generate a runtime error if incompatible
+             * data type is used
+             */
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_POP );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_POP );
+         }
+         else
+         {
+            HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         }
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseMatch )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         {
+            pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+            pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         }
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         {
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MATCH );
          }
          break;
 

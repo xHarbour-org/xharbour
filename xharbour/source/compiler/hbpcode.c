@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.15 2003/01/21 04:56:18 likewolf Exp $
+ * $Id: hbpcode.c,v 1.16 2003/01/24 09:52:43 ronpinkas Exp $
  */
 
 /*
@@ -189,8 +189,10 @@ static BYTE s_pcode_len[] = {
    2,        /* HB_P_PUSHGLOBAL,           */
    2,        /* HB_P_POPGLOBAL,            */
    2,        /* HB_P_PUSHGLOBALREF,        */
-   1,        /* HB_P_ENUMINDEX             */
-   1 + sizeof( long ) /* HB_P_SWITCHCASE            */
+   1,        /* HB_P_ENUMINDEX,            */
+   1 + sizeof( long ), /* HB_P_SWITCHCASE, */
+   1,        /* HB_P_LIKE,                 */
+   1         /* HB_P_MATCH                 */
 };
 
 static PVAR hb_compPrivateFind( char * szPrivateName )

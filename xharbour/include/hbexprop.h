@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.2 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.3 2002/12/04 06:24:06 ronpinkas Exp $
  */
 
 /*
@@ -157,6 +157,8 @@ typedef enum
    HB_EO_GE,
    HB_EO_NE,
    HB_EO_IN,
+   HB_EO_LIKE,
+   HB_EO_MATCH,
    HB_EO_PLUS,       /* addition */
    HB_EO_MINUS,
    HB_EO_MULT,       /* multiple */
@@ -319,6 +321,8 @@ HB_EXPR_PTR hb_compExprNewLE( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewGT( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewGE( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewIN( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewLike( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewMatch( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewPlus( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewMinus( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewMult( HB_EXPR_PTR );

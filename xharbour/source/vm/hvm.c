@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.166 2003/02/25 08:07:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.167 2003/02/26 05:36:11 jonnymind Exp $
  */
 
 /*
@@ -217,6 +217,8 @@ static void    hb_vmReleaseLocalSymbols( void );  /* releases the memory of the 
 
 extern void * hb_mthRequested( void ); /* profiler from classes.c */
 extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
+
+extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 
 BOOL hb_bProfiler = FALSE; /* profiler status is off */
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
@@ -778,6 +780,44 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vmInstringOrArray();
             w++;
             break;
+
+         case HB_P_LIKE:
+         {
+            PHB_ITEM pResult = hb_stackItemFromTop( -2 );
+            BOOL bLike;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LIKE") );
+
+            bLike = hb_regex( 1, hb_stackItemFromTop( -1 ), hb_stackItemFromTop( -2 ) );
+
+            hb_stackPop();
+
+            hb_itemClear( pResult );
+            pResult->type = HB_IT_LOGICAL;
+            pResult->item.asLogical.value = bLike;
+
+            w++;
+            break;
+         }
+
+         case HB_P_MATCH:
+         {
+            PHB_ITEM pResult = hb_stackItemFromTop( -2 );
+            BOOL bMatch;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_MATCH") );
+
+            bMatch = hb_regex( 2, hb_stackItemFromTop( -1 ), hb_stackItemFromTop( -2 ) );
+
+            hb_stackPop();
+
+            hb_itemClear( pResult );
+            pResult->type = HB_IT_LOGICAL;
+            pResult->item.asLogical.value = bMatch;
+
+            w++;
+            break;
+         }
 
          case HB_P_FORTEST:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FORTEST") );
@@ -3970,7 +4010,7 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
       hb_stackPush();
    }
-   
+
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
 }
@@ -4027,7 +4067,7 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
          hb_vmArrayNew( hb_arrayGetItemPtr( pArray, ulElements-- ), uiDimension );
       }
    }
-   
+
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
 }
@@ -4814,7 +4854,7 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
 
    s_uiStatics = uiStatics; /* We need s_uiStatics for processing hb_vmStaticName() */
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-   
+
 }
 
 static void hb_vmEndBlock( void )

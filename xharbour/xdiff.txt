@@ -51,6 +51,10 @@ Syntax:
 
    StartThread ( @MyThreadFunc() [, xParam1 [,xParamN ] ] )
 
+Syntax:
+
+CRITICAL [STATIC] FUNCTION|PROCEDURE( [xParam1 [, xParamN ] ] )
+
 NOTE: MT Application must link against the MT versions of the Libraries, i.e.
       vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib, and dbfcdxmt.lib.
 
@@ -67,10 +71,22 @@ Perl-5 compatible RegEx:
 
 xHarbour includes PCRE which is a full feature, Perl 5 compatible, Regular
 Expression engine. Full feature Search & Replace classes are currently under
-construction, but you may already use the full power of RegEx searches, with:
+construction, but you may already use the full power of RegEx searches,
+new operators, HAS and LIKE.
+
+   cExp HAS cPatern|RegEx => bFound
+   cExp LIKE cPatern|RegEx => bLike
+
+As well as full featued Functions:
 
    HB_Atx( <cRegEx>, <cTargetString> [, lCaseSensitive [, [@]nStart ]
            [, [@]nLen ] ] ] ) => cFoundText
+
+   RegexComp( cPattern, [bCaseSens [, bNewLine]] ) --> REGEX
+
+   HB_Regex( cPattern, cString, [bCaseSens, [, bNewLine]] ) --> aMatches
+
+   HB_RegexMatch( cPattern, cString, [bCaseSens, [, bNewLine]] ) --> bFound
 
 TRY syntax:
 -----------
