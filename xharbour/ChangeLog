@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2103 2004/01/20 03:20:04 lculik Exp $
+ * $Id: ChangeLog,v 1.2104 2004/01/20 03:49:22 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-21 13:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  + /contrib/winprn - new (basic) Windows GDI printing class & test program
+     + tprint.prg
+     + testprn.prg
+     + makefile
+     * Possible standard Windows printing for GDI mode
+     *   - Uploaded for review and discussion regarding inclusion in
+     *     base RTL
+     *  Note: makefile is for BCC55
 
 2003-01-20 0:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/gtwin/gtwin.c
