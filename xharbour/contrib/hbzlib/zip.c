@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.24 2004/03/02 12:58:13 andijahja Exp $
+ * $Id: zip.c,v 1.25 2004/03/03 21:11:22 andijahja Exp $
  */
 
 /*
@@ -96,6 +96,11 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    BOOL bOkAdd;
    int ulLen = ZipArray.item.asArray.value->ulLen;
    char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+
+   if ( szSkleton == NULL )
+   {
+      szSkleton = "*.*";
+   }
 
    Wild2RegEx( szSkleton, sRegEx, FALSE );
 
