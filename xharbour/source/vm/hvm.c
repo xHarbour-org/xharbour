@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.441 2005/02/26 15:16:50 andijahja Exp $
+ * $Id: hvm.c,v 1.442 2005/03/04 17:18:33 druzus Exp $
  */
 
 /*
@@ -9299,6 +9299,15 @@ HB_FUNC( __VMVARSSET )
    HB_FUNCNAME(HB_DBG_VMVARSSET)();
 }
 
+HB_FUNC( HB_MULTITHREAD )
+{
+   HB_THREAD_STUB
+#if defined(HB_THREAD_SUPPORT)
+   hb_retl( TRUE );
+#else
+   hb_retl( FALSE );
+#endif
+}
 
 #undef HB_FORCE_LINK_MAIN
 

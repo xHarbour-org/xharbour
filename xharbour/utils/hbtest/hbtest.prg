@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.8 2004/11/21 21:44:30 druzus Exp $
+ * $Id: hbtest.prg,v 1.9 2005/02/17 12:22:31 andijahja Exp $
  */
 
 /*
@@ -245,6 +245,7 @@ STATIC FUNCTION TEST_BEGIN( cParam )
                     "      Version: " + Version() + HB_OSNewLine() )
 #ifdef __HARBOUR__
    FWrite( s_nFhnd, "     Compiler: " + HB_Compiler() + HB_OSNewLine() )
+   FWrite( s_nFhnd, " Multi Thread: " + iif(HB_MultiThread(),"ON","OFF") + HB_OSNewLine() )
 #endif
    FWrite( s_nFhnd, "           OS: " + OS() + HB_OSNewLine() +;
                     "   Date, Time: " + DToC( Date() ) + " " + Time() + HB_OSNewLine() +;
