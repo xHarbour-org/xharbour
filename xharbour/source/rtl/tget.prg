@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.49 2003/05/12 04:50:58 walito Exp $
+ * $Id: tget.prg,v 1.50 2003/05/16 20:03:36 walito Exp $
  */
 
 /*
@@ -1294,7 +1294,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       endif
    endif
 
-   If ::type == "D" .and. ::BadDate
+   If ::type == "D" .and. ::BadDate .and. ::Buffer != nil
       cBuffer := ::Buffer
    Endif
 
