@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.34 2002/11/09 00:50:08 lculik Exp $
+ * $Id: hbmake.prg,v 1.35 2002/12/15 23:41:31 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1891,11 +1891,11 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + CRLF )
 
         Fwrite( nLinkHandle, "RFLAGS = " + CRLF )
-        Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( lFWH, " -aa", IF( lMiniGui , " -aa" , " -ap" )) +if(lMinigui," -I$(MINIGUI)\lib" , "" ) + CRLF )
+        Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( lFWH, " -aa", IF( lMiniGui , " -aa" , " -ap" )) +if(lMinigui," -L$(MINIGUI)\lib" , "" ) + CRLF )
         Fwrite( nLinkHandle, "IFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "LINKER = ilink32" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
-        Fwrite( nLinkHandle, "ALLOBJ = " + If( lFwh, "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
+        Fwrite( nLinkHandle, "ALLOBJ = " + If( (lFwh .or. lMinigui), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
         Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib cw32.lib" + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
@@ -2160,7 +2160,7 @@ FUNCTION CompUpdatedfiles()
                             cComm += " >> Test.out"
                         @ 4,16 Say acs[nFiles]
                         GaugeUpdate(aGauge,nFile/Len( aprgs ))
-
+                       nFile++
 //                            Outstd( cComm )
 //                            Outstd( hb_osnewline() )
 
@@ -2185,7 +2185,7 @@ FUNCTION CompUpdatedfiles()
                     ENDIF
 
                 NEXT
-nFile++
+//nFile++
             ENDIF
             GaugeDisplay( aGauge )
 
