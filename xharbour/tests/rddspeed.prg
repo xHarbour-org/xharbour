@@ -1,6 +1,14 @@
-#define TST_NUM
+//#define TST_NUM
 //#define TST_DAT
 //#define TST_CHR
+
+#ifndef TST_NUM
+  #ifndef TST_DAT
+    #ifndef TST_CHR
+      #define TST_CHR
+    #endif
+  #endif
+#endif
 
 #define TST_SILENT
 
@@ -84,11 +92,7 @@ rddSetDefault(rdd)
   ", repeated: " + ntrim( nRepeat ) + ;
   ", modulo: " + ntrim( nModulo )
 
-if lReUse
-  use (cFi)
-  set Index To (cFi)
-  set Order To "tg1"
-else
+if !lReUse
   aeval(directory("./"+cFi+".??x"),{|x|ferase(x[1])})
   ferase("./"+cFi+".dbf")
 
@@ -98,6 +102,10 @@ else
   use (cFi)
   if !lLateInd
     index on FTST tag tg1 to (cFi)
+    close
+    use (cFi)
+    set Index To (cFi)
+    set Order To "tg1"
   endif
   for n:=1 to nLoops
     dbappend()
@@ -124,9 +132,14 @@ else
       index on FTST tag tg1 to (cFi)
 #endif
     endif
+    dbcommit()
     ?? seconds() - tm, "sec."
   endif
+  close
 endif
+use (cFi)
+set Index To (cFi)
+set Order To "tg1"
 
 testskip()
 testrskip()
@@ -192,13 +205,13 @@ enddo
 return nil
 
 function testseek()
-local tm, s, n
+local tm, x, n
 ? padr("testing seek...", 30)
 tm := seconds()
 for n:=1 to nLoops
-  if !dbseek(dbval(n))
-    ? "seek faild: "+dspval(dbval(n))
-  elseif ordkeyval()!=dbval(n)
+  if !dbseek(x:=dbval(n))
+    ? "seek faild: "+dspval(x)
+  elseif ordkeyval()!=x .or. FTST!=x
     ? " ordkeyval="+dspval(ordkeyval())+", dbval="+dspval(dbval(n))
   endif
 next
