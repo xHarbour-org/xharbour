@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.63 2004/08/30 11:50:02 paultucker Exp $
+ * $Id: gtwin.c,v 1.64 2004/08/30 16:51:21 mauriliolongo Exp $
  */
 
 /*
@@ -998,7 +998,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
         BYTE * fpBlank = ( BYTE * ) hb_xgrab( iLength );
         BYTE * fpBuff = ( BYTE * ) hb_xgrab( iLength * 2 );
 
-        memset( fpBlank, 0xFF, iLength );
+        memset( fpBlank, ' ', iLength );
 
         iColOld = iColNew = usLeft;
         iColSize = iLength -1;

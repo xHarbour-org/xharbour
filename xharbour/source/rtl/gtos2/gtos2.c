@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.13 2004/08/30 16:51:20 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.14 2004/08/30 17:08:30 mauriliolongo Exp $
  */
 
 /*
@@ -550,7 +550,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
          BYTE * fpBlank = ( BYTE * ) hb_xgrab( iLength );
          BYTE * fpBuff = ( BYTE * ) hb_xgrab( iLength * 2 );
 
-         memset( fpBlank, 0xFF, iLength );
+         memset( fpBlank, ' ', iLength );
 
          iColOld = iColNew = usLeft;
          if( iCols >= 0 )
