@@ -1,12 +1,14 @@
 /*
- * $Id: whatsnew.txt,v 1.33 2001/12/15 12:58:05 vszakats Exp $
+ * $Id: whatsnew.txt,v 1.1.1.1 2001/12/21 10:48:08 ronpinkas Exp $
  */
 
 ----------------------------------------------------------------------
 
-Version 0.38 Build 38 (2001-12-15)
-
-(see http://www.harbour-project.org)
+xHarbour 0.93 (Bug Freeze at 2004-03-10 )
+- General optimization as a whole in xHarbour functions which is aimed to speed boost.
+- Uncounted bug fixes
+- Extension of some xHarbour functions
+- Bug fixes in compiler in relation with illegal characters and C output.
 
 Version 0.37 Build 37 (2001-06-26)
 
