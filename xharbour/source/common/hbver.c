@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbver.c,v 1.3 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -435,6 +435,20 @@ char * hb_verHarbour( void )
    return pszVersion;
 }
 
+char * hb_verPCode( void )
+{
+   char * pszVersion;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_verPCode()"));
+
+   pszVersion = ( char * ) hb_xgrab( 32 );
+
+   sprintf( pszVersion, "PCode Version: %d", HB_PCODE_VER );
+
+   return pszVersion;
+
+}
+
 void hb_verBuildInfo( void )
 {
    hb_conOutErr( "Harbour Build Info", 0 );
@@ -445,6 +459,13 @@ void hb_verBuildInfo( void )
    {
       char * pszVersion = hb_verHarbour();
       hb_conOutErr( "Version: ", 0 );
+      hb_conOutErr( pszVersion, 0 );
+      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_xfree( pszVersion );
+   }
+
+   {
+      char * pszVersion = hb_verPCode();
       hb_conOutErr( pszVersion, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_xfree( pszVersion );

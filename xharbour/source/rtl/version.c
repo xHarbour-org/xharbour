@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: version.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -82,3 +82,8 @@ HB_FUNC( VERSION )
    hb_retcAdopt( pszVersion );
 }
 
+HB_FUNC( HB_PCODE )
+{
+   char * pszPCodeVersion = hb_verPCode();
+   hb_retcAdopt( pszPCodeVersion );
+}
