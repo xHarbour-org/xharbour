@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.59 2004/03/18 23:07:32 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.60 2004/03/21 16:48:01 vouchcac Exp $
  */
 
 /*
@@ -2264,7 +2264,6 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    LOCAL nWidth    := aColsInfo[ o_Width     ]
    LOCAL nLen      := aColsInfo[ o_WidthCell ]
    LOCAL ftmp      := Eval( oCol:block )
-//   LOCAL nCol
 
    // NOTE: When nColor is used as an array index we need to increment
    // it by one since CLR_STANDARD is 0
@@ -2292,52 +2291,27 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    Switch aColsInfo[ o_Type ]
    case "C"
    case "M"
-/*
-      nCol := Col()
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
-      DispOut( Space( nWidth - nLen ), cColor )
-*/
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "N"
-/*
-      if nWidth > nLen
-         DispOut( Space( nWidth - nLen ), cColor )
-      endif
-      nCol := Col()
-      DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
-      nCol := Col()
-*/
       DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "D"
-/*
-      nCol := Col()
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
-      DispOut( Space( nWidth - nLen ), cColor )
-*/
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "L"
-/*
-      DispOut( Space( Int( nWidth / 2 ) ) )
-      nCol := Col()
-      DispOut( iif( ftmp, "T", "F" ), cColor )
-      DispOut( Space( nWidth - Int( nWidth / 2 ) - 1 ), cColor )
-*/
       DispOut( padc( iif( ftmp, "T", "F" ),nWidth ), cColor )
       exit
 
    default
-//      nCol := Col()
       DispOut( Space( nWidth ), cColor )
 
    end
 
-   Return nil // nCol
+   Return nil
 
 //-------------------------------------------------------------------//
 
