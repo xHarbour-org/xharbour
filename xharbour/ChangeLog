@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.773 2003/02/24 23:51:48 jonnymind Exp $
+ * $Id: ChangeLog,v 1.774 2003/02/25 04:12:30 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-25 00:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Modified HB_QSelf() to skip over any Block evaluation level, and count only NON Blocks as a Procedure Level.
+
+  * source/vm/classes.c
+    - Removed incorrect void hb_clsScope().
+    + Added newly written BOOL hb_clsValidScope() implementing Classy compatible Scope Validation.
+    * Modified hb_objGetMthd() to check return value of hb_clsValidScope() and use dummy function if invalid scope.
+
+  + tests/tstscope.prg
+    + Added test of new Scope Logic
 
 2003-02-25 00:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
@@ -34,9 +46,9 @@
 
 2003-02-24 07:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/estack.c
-    ! Too much lock caused deadlocks in windows that were not 
+    ! Too much lock caused deadlocks in windows that were not
       present in linux... Resuming previous version
-      
+
 
 2003-02-24 06:00 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbcrypt.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.164 2003/02/22 17:15:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.165 2003/02/23 21:03:15 jonnymind Exp $
  */
 
 /*
@@ -6661,16 +6661,7 @@ HB_FUNC( HB_QSELF )
    // Outer function level.
    pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-   while( lLevel > 0 && pBase != HB_VM_STACK.pItems )
-   {
-      lLevel--;
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-   }
-
-   // Outer while in Block.
-   while( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
-            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&
-            pBase != HB_VM_STACK.pItems )
+   while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || lLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.31 2003/02/19 10:51:14 jonnymind Exp $
+ * $Id: classes.c,v 1.32 2003/02/24 03:50:24 ronpinkas Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ static PHB_DYNS s_msgClsParent = NULL;
 /* All functions contained in classes.c */
 
 static PHB_ITEM hb_clsInst( USHORT uiClass );
-static void     hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod );
+static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod );
 static BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
@@ -472,185 +472,164 @@ void hb_clsIsClassRef( void )
    }
 }
 
-static void hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod )
+static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 {
-   HB_THREAD_STUB
-
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   PHB_ITEM pCaller;
-   LONG iLevel = 1;
-   BOOL bRetVal = FALSE ;
    USHORT uiScope = pMethod->uiScope;
-   PHB_DYNS pMessage = pMethod->pMessage;
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
-   char * szCallerNameMsg;
-   char * szCallerNameObject;
-   char * szSelfNameMsg;
-   char * szSelfNameObject;    /* debug */
-   char * szSelfNameRealClass;
 
-   if ( (( uiScope & HB_OO_CLSTP_PROTECTED ) ) ||
-        (( uiScope & HB_OO_CLSTP_HIDDEN )    ) ||
-        (( uiScope & HB_OO_CLSTP_READONLY )  )
-      )
-    {
+   //printf( "Method: '%s' Scope: %i\n\r", pMethod->pMessage->pSymbol->szName,uiScope );
 
-      szSelfNameObject    = hb_objGetClsName( pObject );  /* debug */
-      szSelfNameMsg       = pMessage->pSymbol->szName  ;
-      szSelfNameRealClass = hb_objGetRealClsName( pObject, pMessage->pSymbol->szName );
+   if( uiScope & HB_OO_CLSTP_READONLY )
+   {
+      // Allow anyway if all we do is read a property.
+      if( ( pMethod->pFunction == hb___msgGetData ) || ( pMethod->pFunction == hb___msgGetClsData ) || ( pMethod->pFunction == hb___msgGetShrData ) )
+      {
+         return TRUE;;
+      }
+   }
 
-      while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
-        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   if( ( uiScope & HB_OO_CLSTP_PROTECTED ) || ( uiScope & HB_OO_CLSTP_HIDDEN ) )
+   {
+      HB_THREAD_STUB
 
-      szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
+      PHB_ITEM * pBase = HB_VM_STACK.pBase;
+      PHB_ITEM pCaller;
 
-      /* Is it an inline ? if so back one more ... */
-      if ( ( strcmp( szCallerNameMsg, "__EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
-       {
-        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-        szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
-       }
+      // Outer function level.
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-      /* Is it an eval ? if so back another one more ... */
-      if ( ( strcmp( szCallerNameMsg, "EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
-       {
-        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-        szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
-       }
+      // Outer while in Inline, Eval() or aEval().
+      while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) &&
+               pBase != HB_VM_STACK.pItems )
+      {
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      }
 
-      /* Is it an Aeval ? if so back another one more ... */
-      if ( ( strcmp( szCallerNameMsg, "AEVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
-       {
-        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-        szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
-       }
+      pCaller = *( pBase + 1 );
 
-      if( iLevel == -1 )
-       {
-        /* Now get the callers ...  */
-        pCaller = * (pBase+1 ) ;
-        szCallerNameObject    = hb_objGetRealClsName( pCaller, szCallerNameMsg ) ;
+      if( HB_IS_OBJECT( pCaller ) )
+      {
+         char *szClassOfMethod;
 
-        strcpy( szName, szCallerNameObject );
-        strcat( szName, ":" );
-        strcat( szName, szCallerNameMsg );
-        strcat( szName, ">" );
-        strcat( szName, szSelfNameRealClass );
-        strcat( szName, ">" );
-        strcat( szName, szSelfNameObject );
-        strcat( szName, ":" );
-        strcat( szName, szSelfNameMsg );
-
-        /*strcpy( szName, szSelfNameRealClass ); */
-        /*strcat( szName, ":" );                 */
-        /*strcat( szName, szSelfNameMsg );       */
-
-        if ( uiScope & HB_OO_CLSTP_PROTECTED )
+         // This is an Inherited Method
+         if( uiScope & HB_OO_CLSTP_SUPER )
          {
-         if( ( *( pBase+1 ) )->type == HB_IT_ARRAY )  /* is the sender an object  */
-           {
-             /* Trying to access a protected Msg from outside the object ... */
-             if ( strcmp( szCallerNameObject, szSelfNameRealClass ) != 0 )
-               hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (protected 1)", szName, 0 );
-           }
-          else
-           {
-            /* If called from a function ... protected violation !  */
-            hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (protected 0)", szName, 0 );
-           }
-         }
-
-        if ( uiScope & HB_OO_CLSTP_HIDDEN )
-         {
-          if( ( *( pBase+1 ) )->type == HB_IT_ARRAY )  /* is the sender an object  */
-           {
-             /* Trying to access a protected Msg from outside the object ... */
-             if ( strcmp( szCallerNameObject, szSelfNameRealClass ) != 0 )
-               hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (Hidden 1)", szName, 0 );
-             else
-              {
-               /* Now as it is an hidden Msg, it can only be called from */
-               /* a method of its original class */
-               if (! (hb_objGetRealClsName( pCaller, szCallerNameMsg) == szSelfNameRealClass)  )
-                 hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (Hidden 2)", szName, 0 );
-              }
-           }
-          else
-           {
-            /* If called from a function ... Hidden violation ! */
-            hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (Hidden 0)", szName, 0 );
-           }
-         }
-
-         if ( uiScope & HB_OO_CLSTP_READONLY )
-          {
-           if(
-              ( pMethod->pFunction == hb___msgSetData    ) ||
-              ( pMethod->pFunction == hb___msgSetClsData ) ||
-              ( pMethod->pFunction == hb___msgSetShrData )
-             )
-             bRetVal = TRUE;
-
-           if (bRetVal)
+            // HIDDEN Method can't be called from subclass.
+            if( uiScope & HB_OO_CLSTP_HIDDEN )
             {
-             if( ( *( pBase+1 ) )->type == HB_IT_ARRAY )  /* is the sender an object  */
-              {
-               /* Trying to assign a RO Msg from outside the object ... */
-               if ( strcmp( szCallerNameObject, szSelfNameRealClass ) != 0 )
-                hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (ReadOnly)", szName, 0 );
-               else
-                {
-#ifdef HB_CLS_ENFORCERO  /* Not enabled by default */
-                         /* can only be called from a Constructor */
-                         /* ok Now is it a CTOR ? */
-
-                 PMETHOD pCallerMethod ;
-
-                 PHB_DYNS pCallerMsg = hb_dynsymGet( szCallerNameMsg );
-
-                 pCallerMethod = hb_objGetpMethod( pCaller, pCallerMsg->pSymbol );
-
-                 if ( pCallerMethod )
-                   {
-                     if ( ! (pCallerMethod->uiScope & HB_OO_CLSTP_CTOR) )
-                       hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (ReadOnly)", szName, 0 );
-                   }
-#endif
-                }
-              }
-             else
-              {
-               /* If called from a function ... ReadOnly violation ! */
-               hb_errRT_BASE( EG_NOMETHOD, 1004, "Scope violation (ReadOnly 0)", szName, 0 );
-              }
+               goto ScopeError;
             }
-          }
+
+            szClassOfMethod = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
+            //printf( "Defined in: %s\n", szClassOfMethod );
+         }
+         else
+         {
+            if( pCaller->item.asArray.value->uiClass == pObject->item.asArray.value->uiClass )
+            {
+               // Caller is same class as the object, and this is NOT an inhertided Method, so all scopes allowed.
+               return TRUE;;
+            }
+            else
+            {
+               // This is NON Inherted Method, and Caller is NOT Derived!.
+               goto ScopeError;
+            }
+         }
+
+         // If we got here, this MUST be a Derived NON HIDDEN Message, thus a Derived PROTECTED Method.
+
+         // Derived class is allowed if scope is PROTECTED, but NOT if ALSO READONLY.
+         if( uiScope & HB_OO_CLSTP_READONLY )
+         {
+            // This is PROTECTED and READONLY Method, NOT allowed in a Derived Caller!
+            goto ScopeError;
+         }
+         else
+         {
+            PCLASS pClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
+            USHORT uiAt, uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+
+            for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+            {
+               if( ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
+               {
+                  if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMethod ) == 0 )
+                  {
+                     // Derived class - allow access to PROTECTED.
+                     return TRUE;;
+                  }
+               }
+            }
+         }
+      }
+
+      ScopeError:
+        {
+           //HB_ITEM pMessage;
+           char szScope[ 32 ];
+
+           //pMessage.type = HB_IT_STRING;
+           //pMessage.item.asString.value = pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 );
+           //pMessage.item.asString.bStatic = TRUE;
+
+           szScope[0] = '\0';
+
+           //strcat( szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ) );
+           strcat( szScope, "Scope Violation <" );
+
+           if( uiScope & HB_OO_CLSTP_HIDDEN )
+           {
+              strcat( szScope, "HIDDEN+" );
+           }
+
+           if( uiScope & HB_OO_CLSTP_PROTECTED )
+           {
+              strcat( szScope, "PROTECTED+" );
+           }
+
+           if( uiScope & HB_OO_CLSTP_READONLY )
+           {
+              strcat( szScope, "READONLY+" );
+           }
+
+           szScope[ strlen( szScope ) - 1 ] = '>';
+
+           // All else is not allowed.
+           hb_errRT_BASE( EG_NOMETHOD, 1004, szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ), 1, pObject );
+
+           return FALSE;
         }
-    }
+   }
+
+   return TRUE;
 }
+
 
 BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
 {
-  USHORT uiAt, uiLimit;
+   USHORT uiAt, uiLimit;
 
-  if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass && uiClass <= s_uiClasses )
    {
-    PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
 
-    uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+      uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
 
-    if( strcmp( pClass->szName, szParentName ) == 0 )
-      return TRUE;
+      if( strcmp( pClass->szName, szParentName ) == 0 )
+      {
+         return TRUE;
+      }
 
-    for( uiAt = 0; uiAt < uiLimit; uiAt++)
-    {
-       if( ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
-       {
-          if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szParentName ) == 0 )
-             return TRUE;
-       }
-    }
-
+      for( uiAt = 0; uiAt < uiLimit; uiAt++)
+      {
+         if( ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
+         {
+            if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szParentName ) == 0 )
+            {
+               return TRUE;
+            }
+         }
+      }
    }
 
    return FALSE;
@@ -672,11 +651,14 @@ char * hb_objGetClsName( PHB_ITEM pObject )
 
    if( HB_IS_ARRAY( pObject ) )
    {
-      if( ! pObject->item.asArray.value->uiClass )
-         szClassName = "ARRAY";
+      if( pObject->item.asArray.value->uiClass )
+      {
+         szClassName = ( s_pClasses + pObject->item.asArray.value->uiClass - 1 )->szName;
+      }
       else
-         szClassName =
-            ( s_pClasses + pObject->item.asArray.value->uiClass - 1 )->szName;
+      {
+         szClassName = "ARRAY";
+      }
    }
    else                                         /* built in types */
    {
@@ -894,7 +876,11 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
             pMethod = pClass->pMethods + uiAt;
             pFunction = pMethod->pFunction;
 
-            hb_clsScope( pObject, pMethod );
+            if( ! hb_clsValidScope( pObject, pMethod ) )
+            {
+               // Force NO execution incase error was bypassed.
+               pFunction = hb___msgVirtual;
+            }
 
             (HB_VM_STACK.pMethod) = pMethod ;
 
@@ -907,11 +893,16 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
             {
                *bConstructor = ( pMethod->uiScope & HB_OO_CLSTP_CTOR );
             }
+
             return pFunction;
          }
+
          uiAt++;
+
          if( uiAt == uiMask )
+         {
             uiAt = 0;
+         }
       }
    }
 
@@ -2333,7 +2324,9 @@ HB_FUNC( __EVAL )
       hb_vmSend( ( USHORT ) uiPCount );     /* Self is also an argument */
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );
+   }
 
    hb_itemRelease( pObject );
 
@@ -2385,20 +2378,26 @@ static HARBOUR hb___msgClsParent( void )
    pItemParam = hb_stackItemFromBase( 1 );
 
    if( HB_IS_OBJECT( pItemParam ) )
+   {
       szParentName = hb_objGetClsName( pItemParam );
+   }
    else if( HB_IS_STRING( pItemParam ) )
-     {
+   {
       szParentName = hb_itemGetC( pItemParam );
-      lClass=TRUE;
-     }
+      lClass = TRUE;
+   }
 
    for( i = 0; szParentName[ i ] != '\0'; i++ )
+   {
       szParentName[ i ] = ( char ) toupper( szParentName[ i ] );
+   }
 
    hb_retl( hb_clsIsParent( uiClass , szParentName ) );
 
-   if (lClass)
-    hb_itemFreeC( szParentName );
+   if( lClass )
+   {
+      hb_itemFreeC( szParentName );
+   }
 }
 
 
@@ -2551,7 +2550,9 @@ static HARBOUR hb___msgEval( void )
       hb_vmSend( ( USHORT ) uiPCount );                       /* Self is also an argument */
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );
+   }
 }
 
 /*
