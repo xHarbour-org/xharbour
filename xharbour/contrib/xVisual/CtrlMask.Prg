@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.30 2002/10/28 12:04:18 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.31 2002/10/28 13:29:05 what32 Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ CLASS oCtrlMask FROM TWinControl
    METHOD Refresh()
    METHOD ChangeInspector()
    METHOD OnUserMsg()
+   METHOD IsFocused()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -445,6 +446,17 @@ METHOD Refresh()
 
    RETURN( NIL )
 
+METHOD IsFocused( hChild )
+   LOCAL a
+   IF Empty( ::Cursor )
+      FOR EACH a IN ::aSelected
+          if a[ SEL_HANDLE ] == hChild
+             RETURN( .T. )
+          endif
+      NEXT
+   ENDIF
+RETURN( .F. )
+
 *-----------------------------------------------------------------------------*
 
 // client area coordinates
@@ -461,6 +473,7 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL a
    LOCAL aOldSelected := aClone( ::aSelected )
    local Item
+   
    ClientToScreen( ::Handle, aPt )
 
    IF Empty( ::Cursor )
@@ -528,10 +541,11 @@ METHOD OnLButtonDown( wParam, x, y )
 
    // ToolTips and Inspector selection
    IF lFound
+      ::SendMessage( WM_USER + 1, 0 )
+
       ::HintWindow:Activate(1)
       ::HintWindow:TrackHint(1)
       ::lHintActive := .T.
-      ::PostMessage( WM_USER + 1, 0 )
      ELSE
       ::PostMessage( WM_USER + 1, 1 )
    ENDIF
@@ -785,7 +799,7 @@ METHOD OnLButtonUp( wParam, x, y )
       
        if ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
           oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1 )
+          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1, .F. )
        endif
 
    NEXT
@@ -834,7 +848,7 @@ METHOD OnLButtonUp( wParam, x, y )
   // RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
-   ::SetFocus()
+//   ::SetFocus()
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.46 2002/10/28 12:04:18 what32 Exp $
+ * $Id: xInspect.prg,v 1.47 2002/10/28 13:29:05 what32 Exp $
  */
 
 /*
@@ -37,6 +37,7 @@
 #include "accel.ch"
 
 GLOBAL EXTERNAL oApp
+GLOBAL EXTERNAL FormEdit
 
 CLASS ObjInspect FROM TForm
 
@@ -173,6 +174,12 @@ METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
    if hiword(nwParam)==CBN_SELCHANGE
       oObj := ::Parent:Objects[::GetCurSel()+1]
       ::Parent:SetBrowserData( oObj )
+
+      IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ).and.!FormEdit:oMask:Creating
+         FormEdit:oMask:OnLButtonDown(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+         FormEdit:oMask:OnLButtonUp(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+      ENDIF
+
    endif
 return(0)
 
@@ -190,7 +197,12 @@ METHOD SetCurSel(n) CLASS ComboInsp
       ::Parent:Browser:RefreshAll()
      else
       ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
-//      ::Parent:CurObject:SetFocus()
+      if FormEdit != NIL
+         IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ).and.!FormEdit:oMask:Creating
+            FormEdit:oMask:OnLButtonDown(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+            FormEdit:oMask:OnLButtonUp(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+         ENDIF
+      ENDIF
    endif
 return(super:SetCurSel(n))
 

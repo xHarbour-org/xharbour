@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.10 2002/10/27 01:29:26 what32 Exp $
+ * $Id: xTree.prg,v 1.11 2002/10/28 12:04:19 what32 Exp $
  */
 
 /*
@@ -33,6 +33,7 @@
 #include "debug.ch"
 #include "TreeView.ch"
 
+GLOBAL EXTERNAL FormEdit
 
 CLASS ObjTree FROM TForm
    VAR TreeRoot AS OBJECT
