@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.36 2004/10/23 23:35:05 oh1 Exp $
+ * $Id: hbapigt.h,v 1.37 2004/10/25 17:30:04 ronpinkas Exp $
  */
 
 /*
@@ -435,6 +435,7 @@ extern void   hb_gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP );
 extern void HB_EXPORT hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize );
 extern void HB_EXPORT hb_gt_SetClipboard( char *szData, ULONG ulSize );
 extern ULONG HB_EXPORT hb_gt_GetClipboardSize( void );
+extern void HB_EXPORT hb_gt_ProcessMessages( void );
 
 /* Keyboard related declarations */
 
@@ -509,6 +510,8 @@ extern void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize );
 extern void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize );
 extern ULONG HB_EXPORT hb_gtGetClipboardSize( void );
 extern void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize );
+
+extern void HB_EXPORT hb_gtProcessMessages( void );
 
 /*
    GT information query or update. msgType determines the kind of information
@@ -633,6 +636,7 @@ typedef struct _HB_GT_FUNCS
     void    (* GetClipboard) ( char *, ULONG * );
     void    (* SetClipboard) ( char *, ULONG );
     ULONG   (* GetClipboardSize) ( void );
+    void    (* ProcessMessages) ( void );
 
     /* GT CLIPBOARD functions */
     void    (* SetDispCP) ( char *, char *, BOOL );
@@ -719,6 +723,8 @@ extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBo
 extern void HB_EXPORT HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) );
 extern void HB_EXPORT HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) );
 extern ULONG HB_EXPORT HB_GT_FUNC( gt_GetClipboardSize( void ) );
+
+extern void HB_EXPORT HB_GT_FUNC( gt_ProcessMessages( void ) );
 
 /* Gt to driver communication */
 /*

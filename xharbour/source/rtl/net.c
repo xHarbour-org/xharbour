@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.7 2003/12/20 11:12:04 lf_sfnet Exp $
+ * $Id: net.c,v 1.8 2004/05/04 16:43:52 mauriliolongo Exp $
  */
 
 /*
@@ -97,6 +97,10 @@
 
 HB_FUNC( NETNAME )
 {
+   BOOL bGetUser;
+  
+   bGetUser = ( hb_parnl(1) == 1 );
+   
 #if defined(HB_OS_OS2) || defined(OS_UNIX_COMPATIBLE)
 
    {
@@ -154,7 +158,14 @@ HB_FUNC( NETNAME )
 
       pszValue[ 0 ] = '\0';
 
+      if( bGetUser ) 
+      {
+         GetUserName( pszValue, &ulLen );
+      }
+      else
+      {   
       GetComputerName( pszValue, &ulLen );
+      }    
 
       hb_retcAdopt( pszValue );
    }

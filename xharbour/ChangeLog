@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3612 2004/11/23 04:25:43 druzus Exp $
+ * $Id: ChangeLog,v 1.3613 2004/11/23 15:51:49 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-23 18:05 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * source/odbc/Makefile
+  - source/odbc/hdo_odbc.prg
+    * removed hdo_odbc.prg
+  * source/rdd/dbcmd.c
+    * removed __dbSqlXXX code
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+  * source/rtl/gx.c
+  * source/rtl/gtnul/gtnul.c
+    * added function GTPROCESSMESSAGES() to the gt system.
+  * include/hbgtwvt.ch
+  * source/rtl/gtwvt/wvtutils.c
+  * source/rtl/gtwvt/gtwvt.c
+    * added support for named icons in the resources
+  * source/rtl/net.c
+    * added support for NETNAME(1) = user name in Windows.
 
 2004-11-23 16:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg

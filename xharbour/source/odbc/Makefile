@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/03/29 22:38:10 lculik Exp $
+# $Id: Makefile,v 1.2 2004/04/26 12:29:45 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -9,8 +9,7 @@ C_SOURCES=\
 
 PRG_SOURCES=\
 	todbc.prg\
-	browodbc.prg\
-	hdo_odbc.prg
+	browodbc.prg
 
 LIBNAME=hbodbc
 

@@ -298,13 +298,14 @@ int HB_EXPORT hb_gtExtendedKeySupport()
 
 /****************************************************************************/
 /* Why this redundancy ??? */
-/* This is documented API function and cannot be disabled */
+#if 0
 int HB_EXPORT hb_gtReadKey( HB_inkey_enum eventmask )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtReadKey(%d)", (int) eventmask));
 
    return hb_gt_ReadKey( eventmask );
 }
+#endif
 
 /****************************************************************************/
 void HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
@@ -1975,6 +1976,12 @@ void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize )
 ULONG HB_EXPORT hb_gtGetClipboardSize( void )
 {
    return hb_gt_GetClipboardSize();
+}
+
+void HB_EXPORT hb_gtProcessMessages( void )
+{
+   hb_gt_ProcessMessages();
+   return ;
 }
 
 /****************************************************************************/

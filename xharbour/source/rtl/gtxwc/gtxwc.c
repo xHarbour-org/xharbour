@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.4 2004/10/24 09:44:49 oh1 Exp $
+ * $Id: gtxwc.c,v 1.5 2004/11/21 21:44:23 druzus Exp $
  */
 
 /*
@@ -418,6 +418,7 @@ typedef struct tag_x_wnddef
 static void hb_xvt_gtProcessMessages( PXWND_DEF wnd );
 static void hb_xvt_gtInitialize( PXWND_DEF wnd );
 static void hb_xvt_gtInvalidatePts( PXWND_DEF wnd, int left, int top, int right, int bottom );
+static void hb_xvt_gtSetWindowTitle( PXWND_DEF wnd, char * title );
 
 /************************ globals ********************************/
 
@@ -4112,6 +4113,12 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          iRet = s_iStdErr;
          break;
 
+      case GTI_WINTITLE:
+         {
+            hb_xvt_gtSetWindowTitle( s_wnd, (char *) vpParam );
+            return 1;   
+         }
+
       case GTI_VIEWMAXWIDTH:
          iRet = _GetScreenWidth();
          break;
@@ -4127,6 +4134,19 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
 /* *********************************************************************** */
 // Exported functions for API calls
+
+void hb_xvt_gtSetWindowTitle( PXWND_DEF wnd, char * title )
+{
+   if ( wnd->szTitle )
+      hb_xfree( wnd->szTitle );
+
+   if ( title )
+      wnd->szTitle = hb_strdup( title );
+   else
+      wnd->szTitle = NULL;
+
+   wnd->fDspTitle = TRUE;
+}
 
 /*
 BOOL HB_EXPORT hb_xvt_gtSetMenuKeyEvent(int iMenuKeyEvent)

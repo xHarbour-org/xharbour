@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.30 2004/09/15 03:52:49 bdj Exp $
+ * $Id: hbgtwvt.h,v 1.31 2004/09/28 03:25:07 vouchcac Exp $
  */
 
 /*
@@ -253,7 +253,7 @@ void   HB_EXPORT hb_wvt_gtResetWindow( void );
 BOOL   HB_EXPORT hb_wvt_gtSetCodePage( int iCodePage );
 int    HB_EXPORT hb_wvt_gtGetLastMenuEvent( void );
 void   HB_EXPORT hb_wvt_gtSetWindowTitle( char * title );
-DWORD  HB_EXPORT hb_wvt_gtSetWindowIcon( int icon );
+DWORD  HB_EXPORT hb_wvt_gtSetWindowIcon( int icon, char *lpicon );
 DWORD  HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon );
 int    HB_EXPORT hb_wvt_gtGetWindowTitle( char *title, int length );
 BOOL   HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold, int Quality );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.25 2004/09/08 00:17:13 druzus Exp $
+ * $Id: gtnul.c,v 1.26 2004/10/22 11:26:45 paultucker Exp $
  */
 
 /*
@@ -660,6 +660,11 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    return s_clipsize;
 }
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
    HB_SYMBOL_UNUSED( bUpdate );
@@ -1045,6 +1050,11 @@ ULONG hb_gt_GetClipboardSize( void )
    return GT_FUNCS.GetClipboardSize();
 }
 
+void hb_gt_ProcessMessages( void )
+{
+   GT_FUNCS.ProcessMessages();
+   return; 
+}
 
 /* ********************************************************************** */
 
@@ -1162,6 +1172,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.134 2004/10/22 11:26:47 paultucker Exp $
+ * $Id: gtwvt.c,v 1.135 2004/10/24 09:43:45 oh1 Exp $
  */
 
 /*
@@ -3363,9 +3363,19 @@ void HB_EXPORT hb_wvt_gtSetWindowTitle( char * title )
 
 //-------------------------------------------------------------------//
 
-DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon )
+DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon, char *lpIconName )
 {
-  HICON hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
+  HICON hIcon;
+ 
+  if( lpIconName == NULL )
+{
+   hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
+  }
+  else
+  {
+    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, lpIconName );     
+  }
+  
   if ( hIcon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM )hIcon ); // Set Title Bar ICON
@@ -4026,7 +4036,8 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
          return (long) hb_wvt_gtSetWindowIconFromFile( (char *) vpParam  );
 
       case GTI_ICONRES:
-         return (long) hb_wvt_gtSetWindowIcon( iParam );
+         return (long) hb_wvt_gtSetWindowIcon( iParam, (char *) vpParam );      
+         
 
       case GTI_VIEWMAXWIDTH:
          return _GetScreenWidth();

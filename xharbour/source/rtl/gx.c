@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.17 2004/10/22 14:29:06 paultucker Exp $
+ * $Id: gx.c,v 1.18 2004/10/28 04:33:25 paultucker Exp $
  */
 
 /*
@@ -233,6 +233,12 @@ HB_FUNC( GTGETCLIPBOARDSIZE )
 HB_FUNC( GTPASTECLIPBOARD )
 {
    hb_gtPasteFromClipboard( hb_parnl(1) );
+}
+
+HB_FUNC( GTPROCESSMESSAGES )
+{
+   hb_gtProcessMessages();
+   hb_ret();
 }
 
 /************************************************************************************/
