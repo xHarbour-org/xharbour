@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.15 2004/02/03 15:19:41 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.16 2004/02/03 22:12:50 ronpinkas Exp $
  */
 
 /*
@@ -181,6 +181,10 @@ typedef struct global_data
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
   PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
   PHB_DYNS  pSymWVT_MOUSE;             // Stores pointer to WVT_MOUSE function
+  int       rowStart;
+  int       rowStop;
+  int       colStart;
+  int       colStop;    
 } GLOBAL_DATA;
 
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );

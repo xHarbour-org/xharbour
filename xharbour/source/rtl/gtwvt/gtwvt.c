@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.86 2004/03/29 03:42:40 peterrees Exp $
+ * $Id: gtwvt.c,v 1.87 2004/03/31 04:40:23 peterrees Exp $
  */
 
 /*
@@ -1642,7 +1642,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       HDC         hdc;
       USHORT      irow;
       RECT        updateRect, rcRect;
-      int         colStart, colStop, rowStart, rowStop;
+//      int         colStart, colStop, rowStart, rowStop;
 
       GetUpdateRect( hWnd, &updateRect, FALSE );
       /* WARNING!!!
@@ -1661,17 +1661,23 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         // need to account for truncation in conversion
         // i.e. redraw any 'cell' partially covered...
         rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
+/*
         rowStart = max( 0, rcRect.top-1 );
         rowStop  = min( _s.ROWS, rcRect.bottom+1 );
         colStart = max( 0, rcRect.left -1 );
         colStop  = min( _s.COLS, rcRect.right+1 );
+*/
+        _s.rowStart = max( 0, rcRect.top-1 );
+        _s.rowStop  = min( _s.ROWS, rcRect.bottom+1 );
+        _s.colStart = max( 0, rcRect.left -1 );
+        _s.colStop  = min( _s.COLS, rcRect.right+1 );
 
-        for ( irow = rowStart; irow < rowStop; irow++ )
+        for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
           BYTE   oldAttrib, attrib;
 
-          icol       = colStart;
+          icol       = _s.colStart;
           index      = hb_wvt_gtGetIndexForTextBuffer( icol, irow );
           startIndex = index;
           startCol   = icol;
@@ -1682,7 +1688,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           * so buffer up text with same attrib, and output it
           * then do next section with same attrib, etc
           */
-          while ( icol < colStop )
+          while ( icol < _s.colStop )
           {
             if ( index >= _s.BUFFERSIZE )
             {
@@ -1721,11 +1727,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         {
           hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
           hb_vmPushNil();
-          hb_vmPushLong( ( SHORT ) rowStart );
-          hb_vmPushLong( ( SHORT ) colStart );
-          hb_vmPushLong( ( SHORT ) rowStop  );
-          hb_vmPushLong( ( SHORT ) colStop  );
+/*
+          hb_vmPushLong( ( SHORT ) _s.rowStart );
+          hb_vmPushLong( ( SHORT ) _s.colStart );
+          hb_vmPushLong( ( SHORT ) _s.rowStop  );
+          hb_vmPushLong( ( SHORT ) _s.colStop  );
           hb_vmDo( 4 );
+*/
+          hb_vmDo( 0 );
           hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
       }
@@ -2663,6 +2672,10 @@ static void gt_hbInitStatics( void )
   _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS" ) ;
   _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
   _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE" ) ;
+  _s.rowStart         = 0;
+  _s.rowStop          = 0;
+  _s.colStart         = 0;
+  _s.colStop          = 0; 
 }
 
 //-------------------------------------------------------------------//
@@ -4174,10 +4187,10 @@ HB_FUNC( WVT_GETFONTINFO )
 
    hb_arrayNew( &info, 7 );
 
-   hb_arraySetForward( &info, 1, hb_itemPutC( &temp, _s.fontFace ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNL( &temp, _s.fontHeight ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, _s.fontWidth ) );
-   hb_arraySetForward( &info, 4, hb_itemPutNL( &temp, _s.fontWeight ) );
+   hb_arraySetForward( &info, 1, hb_itemPutC(  &temp, _s.fontFace    ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNL( &temp, _s.fontHeight  ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, _s.fontWidth   ) );
+   hb_arraySetForward( &info, 4, hb_itemPutNL( &temp, _s.fontWeight  ) );
    hb_arraySetForward( &info, 5, hb_itemPutNL( &temp, _s.fontQuality ) );
    hb_arraySetForward( &info, 6, hb_itemPutNL( &temp, _s.PTEXTSIZE.y ) );
    hb_arraySetForward( &info, 7, hb_itemPutNL( &temp, _s.PTEXTSIZE.x ) );
@@ -5300,3 +5313,25 @@ HB_FUNC( WVT_SETMOUSEPOS )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETPAINTRECT )
+{
+   HB_ITEM  info;
+   HB_ITEM  temp;
+
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
+
+   hb_arrayNew( &info, 4 );
+
+   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, _s.rowStart ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, _s.colStart ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, _s.rowStop  ) );
+   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, _s.colStop  ) );
+
+   hb_itemReturn( &info );
+}
+
+//-------------------------------------------------------------------//
+
+
