@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.5 2002/01/05 19:28:48 lculik Exp $
+ * $Id: philes.c,v 1.6 2002/08/01 00:33:15 lculik Exp $
  */
 
 /*
@@ -241,6 +241,12 @@ HB_FUNC( CURDIRX )
    hb_retcAdopt( ( char * ) pbyBuffer );
 
    hb_fsSetError( uiErrorOld );
+}
+
+/** Added by Giancarlo Niccolai */
+HB_FUNC( HB_OSPATHSEPARATOR )
+{
+   hb_retc( OS_PATH_DELIMITER_LIST );
 }
 
 #endif
