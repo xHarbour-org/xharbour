@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.26 2005/02/08 18:35:07 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.27 2005/02/10 23:08:00 ronpinkas Exp $
  */
 
 /*
@@ -253,9 +253,9 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
-     ; #untranslate Super() : ;
-     ; #untranslate Super : ;
-     ; #untranslate : Super : ;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -281,9 +281,9 @@ DECLARE HBClass ;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
-     ; #untranslate Super() : ;
-     ; #untranslate Super : ;
-     ; #untranslate : Super : ;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -314,9 +314,9 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
-     ; #untranslate Super() : ;
-     ; #untranslate Super : ;
-     ; #untranslate : Super : ;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -339,9 +339,9 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
-     ; #untranslate Super() : ;
-     ; #untranslate Super : ;
-     ; #untranslate : Super : ;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -365,9 +365,9 @@ DECLARE HBClass ;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
-     ; #untranslate Super() : ;
-     ; #untranslate Super : ;
-     ; #untranslate : Super : ;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
