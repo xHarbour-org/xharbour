@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.4 2002/11/13 04:18:15 walito Exp $
+ * $Id: profiler.prg,v 1.5 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -107,7 +107,7 @@
 #include "inkey.ch"
 
 Function Main()
-Local oProfile := HBProfile():new()
+Local oProfile := HBProfile():new() // New() is a default method in the class system that calls :init() to initialize the object
 Local n
 
    // Turn on profiling.
@@ -146,6 +146,7 @@ Local n
    @ 2, 0 Say "  Total Calls: " + str( oProfile:totalCalls() )
    @ 3, 0 Say "  Total Ticks: " + str( oProfile:totalTicks() )
    @ 4, 0 Say "Total Seconds: " + str( oProfile:totalSeconds() )
+   @ 6, 0 Say ""
 
 Return( NIL )
 
@@ -208,9 +209,10 @@ Local nKey
 
          // And so on.... (not really necessary for this test)
 
-      EndCase
+      End
 
    EndDo
+   set cursor on
 
 Return( NIL )
 
@@ -421,7 +423,7 @@ Local xMember
                // Add it to the profile.
                aadd( ::aProfile, HBProfileMethod():new( cClass + ":" + xMember, __GetMsgPrf( n, xMember ) ) )
             EndIf
-            
+
          NEXT
 
       EndIf
@@ -446,7 +448,7 @@ Local lProfile  := __setProfiler( .F. )
    ::gatherFunctions()
 
    // Gather method calls
-   ::gatherMethods()   
+   ::gatherMethods()
 
    __setProfiler( lProfile )
 
@@ -566,7 +568,7 @@ Local lProfile := __setProfiler( .F. )
    // Gather functions and methods.
    ::super:gather()
 
-   // Also gather opcodes.   
+   // Also gather opcodes.
    ::gatherOPCodes()
 
    __setProfiler( lProfile )

@@ -1,5 +1,5 @@
 /*
- * $Id: testprof.prg,v 1.5 2001/09/11 10:40:23 davep Exp $
+ * $Id: testprof.prg,v 1.1.1.1 2001/12/21 10:46:32 ronpinkas Exp $
  */
 
 /* Test code for the harbour profiler API and the profile reporting classes */
@@ -52,6 +52,7 @@ Local n
    @ 2, 0 Say "  Total Calls: " + str( oProfile:totalCalls() )
    @ 3, 0 Say "  Total Ticks: " + str( oProfile:totalTicks() )
    @ 4, 0 Say "Total Seconds: " + str( oProfile:totalSeconds() )
+   @ 6, 0 Say ""
 
 Return( NIL )
 
@@ -77,38 +78,39 @@ Local lBrowsing := .T.
 Local nKey
 
    Do While lBrowsing
-   
+
       oBrowse:forceStable()
-      
+
       nKey := inkey( 0 )
-      
+
       Do Case
-      
+
          Case nKey == K_ESC
 	    lBrowsing := .F.
-	    
+
 	 Case nKey == K_DOWN
 	    oBrowse:down()
-	    
+
 	 Case nKey == K_UP
 	    oBrowse:up()
-	    
+
 	 Case nKey == K_LEFT
 	    oBrowse:left()
-	    
+
 	 Case nKey == K_RIGHT
 	    oBrowse:right()
-	    
+
 	 Case nKey == K_PGDN
 	    oBrowse:pageDown()
-	    
+
 	 Case nKey == K_PGUP
 	    oBrowse:pageUp()
-	    
+
 	 // And so on.... (not really necessary for this test)
-	    
+
       EndCase
-      
+
    EndDo
+   set cursor on
 
 Return( NIL )
