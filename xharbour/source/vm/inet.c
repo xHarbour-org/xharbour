@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.50 2004/10/22 20:37:13 likewolf Exp $
+* $Id: inet.c,v 1.51 2004/12/09 13:47:46 mauriliolongo Exp $
 */
 
 /*
@@ -365,7 +365,7 @@ HB_GARBAGE_FUNC( hb_inetSocketFinalize )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-      #else
+      #elif !defined(__WATCOMC__)
          shutdown( Socket->com, SHUT_RDWR );
       #endif
 
@@ -444,7 +444,7 @@ HB_FUNC( INETCLOSE )
          shutdown( Socket->com, SD_BOTH );
       #elif defined(HB_OS_OS2)
          shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
-      #else
+      #elif !defined(__WATCOMC__)
          shutdown( Socket->com, SHUT_RDWR );
       #endif
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.35 2004/12/15 13:39:30 druzus Exp $
+# $Id: make_tgz.sh,v 1.36 2005/01/09 20:39:46 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -22,28 +22,41 @@ hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
 hb_pref="xhb"
 hb_contrib=""
+hb_sysdir="yes"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-    hb_arch=`uname -s | tr -d "[-]" | tr "[:upper:]" "[:lower:]" 2>/dev/null`
-    case "$hb_arch" in
-        *windows*) hb_arch="w32" ;;
-        *dos)      hb_arch="dos" ;;
-        *bsd)      hb_arch="bsd" ;;
-    esac
-    export HB_ARCHITECTURE="$hb_arch"
+    if [ "$OSTYPE" = "msdosdjgpp" ]; then
+        hb_arch="dos"
+    else
+        hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
+        case "$hb_arch" in
+            *windows*) hb_arch="w32" ;;
+            *dos)      hb_arch="dos" ;;
+            *bsd)      hb_arch="bsd" ;;
+        esac
+        export HB_ARCHITECTURE="$hb_arch"
+    fi
 fi
 
 if [ -z "$HB_COMPILER" ]; then
     case "$HB_ARCHITECTURE" in
-        w32) hb_comp="mingw32" ;;
-        dos) hb_comp="djgpp" ;;
-        *)   hb_comp="gcc" ;;
+        w32) HB_COMPILER="mingw32" ;;
+        dos) HB_COMPILER="djgpp" ;;
+        *)   HB_COMPILER="gcc" ;;
     esac
-    export HB_COMPILER="$hb_comp"
+    export HB_COMPILER
 fi
 
-if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtcrs; fi
+if [ -z "$HB_GT_LIB" ]; then
+    case "$HB_ARCHITECTURE" in
+        w32) HB_GT_LIB="gtwin" ;;
+        dos) HB_GT_LIB="gtdos" ;;
+        *)   HB_GT_LIB="gtcrs" ;;
+    esac
+    export HB_GT_LIB
+fi
+
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
@@ -58,6 +71,11 @@ case "$HB_ARCHITECTURE" in
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
+        ;;
+    dos)
+        [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/${name}"
+        HB_INSTALL_GROUP=root
+        hb_sysdir="no"
         ;;
     *)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
@@ -81,10 +99,22 @@ case "$HB_ARCHITECTURE" in
     darwin) hb_contrib="htmllib libmisc libnf" ;;
 esac
 
+if [ -z "$HB_GPM_MOUSE" ]; then
+    if [ "$HB_ARCHITECTURE" = "linux" ] && \
+       ( [ -f /usr/include/gpm.h ] || [ -f /usr/local/include/gpm.h ]); then
+        HB_GPM_MOUSE=yes
+    else
+        HB_GPM_MOUSE=no
+    fi
+    export HB_GPM_MOUSE
+fi
+
 # Set other platform-specific build options
 case "$HB_ARCHITECTURE" in
     linux)
-        export HB_GPM_MOUSE=yes
+        ;;
+    dos)
+        hb_lnkso="no"
         ;;
     darwin)
         # Autodetect old Darwin versions and set appropriate build options
@@ -104,9 +134,15 @@ then
    export HB_WITHOUT_GTSLN=yes
 fi
 
-export HB_BIN_INSTALL="$HB_INSTALL_PREFIX/bin"
-export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include/${name}"
-export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME/${name}"
+if [ "${hb_sysdir}" = "yes" ]; then
+    export HB_BIN_INSTALL="$HB_INSTALL_PREFIX/bin"
+    export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include/${name}"
+    export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME/${name}"
+else
+    export HB_BIN_INSTALL="$HB_INSTALL_PREFIX/bin"
+    export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include"
+    export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME"
+fi
 
 # build
 umask 022
@@ -146,6 +182,8 @@ strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim, but don't try to strip symlinks.
 strip -S `find $HB_LIB_INSTALL -type f`
 
+if [ "${hb_sysdir}" = "yes" ]; then
+
 mkdir -p $HB_INST_PREF/etc/harbour
 $INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
 
@@ -155,6 +193,8 @@ CFLAGS=-c -I$_DEFAULT_INC_DIR -O3
 VERBOSE=YES
 DELTMP=YES
 EOF
+
+fi
 
 # check if we should rebuild tools with shared libs
 if [ "${hb_lnkso}" = yes ]

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.128 2004/12/31 11:56:10 druzus Exp $
+ * $Id: filesys.c,v 1.129 2005/01/09 22:48:25 guerra000 Exp $
  */
 
 /*
@@ -127,7 +127,8 @@
    #endif
 #endif
 
-#if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)
+#if ( defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || \
+      defined(__MINGW32__) || defined(__WATCOMC__) ) && !defined( HB_OS_UNIX )
    #include <sys/stat.h>
    #include <share.h>
    #include <fcntl.h>
@@ -153,7 +154,7 @@
    #if !defined(HAVE_POSIX_IO)
       #define HAVE_POSIX_IO
    #endif
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined( HB_OS_UNIX )
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -316,7 +317,9 @@
    #define HB_FS_SOPEN
 #endif
 
-#if ( defined(HAVE_POSIX_IO) && ( defined(HB_OS_OS2) || defined(HB_OS_DOS) || defined(HB_OS_WIN_32) ) && ! defined(__CYGWIN__) ) || defined(__MINGW32__)
+#if defined(HAVE_POSIX_IO) && \
+    ( defined(HB_OS_OS2) || defined(HB_OS_DOS) || defined(HB_OS_WIN_32) ) && \
+    ! defined(__CYGWIN__)
 /* These platforms and/or compilers have common drive letter support */
    #define HB_FS_DRIVE_LETTER
 #endif
@@ -634,7 +637,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       //JC1: unlocking the stack to allow cancelation points
       HB_STACK_UNLOCK;
 
-      ulLen = strlen( pFilename );
+      ulLen = strlen( ( char * ) pFilename );
       if( pMode && ( *pMode == 'r' || *pMode == 'w' ) )
          bRead = ( *pMode == 'r' );
       else
@@ -654,7 +657,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       }
       if( pFilename[ ulLen - 1 ] == '|' )
       {
-          pbyTmp = hb_strdup( pFilename );
+          pbyTmp = hb_strdup( ( char * ) pFilename );
           pbyTmp[--ulLen] = 0;
           pFilename = pbyTmp;
       } else
@@ -1029,7 +1032,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    #ifndef HB_OS_WIN_32
    else
    {
-      command = hb_xgrab( strlen(pFilename) + 2 );
+      command = ( char * ) hb_xgrab( strlen( pFilename ) + 2 );
       size = s_parametrize( command, pFilename );
       argv = s_argvize( command, size );
       argv[size] = NULL;
@@ -2366,7 +2369,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       lseek( hFileHandle, ulOldPos, SEEK_SET );
       HB_DISABLE_ASYN_CANC
    }
-#elif defined(__GNUC__) && defined(HB_OS_UNIX)
+#elif defined( HB_OS_UNIX )
    {
       /* TODO: check for append locks (SEEK_END)
        */
@@ -2775,11 +2778,13 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 
 #elif defined(HAVE_POSIX_IO) || defined(__MINGW32__)
 
-   #if defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__MINGW32__)
+#  if ! defined(HB_OS_UNIX) && \
+      ( defined(__WATCOMC__) || defined(__BORLANDC__) || \
+        defined(__IBMCPP__) || defined(__MINGW32__) )
       bResult = ( mkdir( ( char * ) pDirname ) == 0 );
-   #else
+#  else
       bResult = ( mkdir( ( char * ) pDirname, S_IRWXU | S_IRWXG | S_IRWXO ) == 0 );
-   #endif
+#  endif
    hb_fsSetIOError( bResult, 0 );
 
 #else
@@ -3104,7 +3109,7 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
 
-#if defined( HB_FS_DRIVE_LETTER ) || defined( __WATCOMC__ )
+#if defined( HB_FS_DRIVE_LETTER )
 
    HB_FS_GETDRIVE( uiResult );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.8 2004/11/01 05:38:10 likewolf Exp $
+ * $Id: filestat.c,v 1.9 2004/11/21 21:44:18 druzus Exp $
  */
 
 /*
@@ -188,7 +188,7 @@ static BOOL hb_fsFileStats(
                ptms->tm_mon + 1, ptms->tm_mday );
       *lmTime = ptms->tm_hour*3600 + ptms->tm_min * 60 + ptms->tm_sec;
 
-      hb_fsAttrDecode( ushbAttr, pszAttr );
+      hb_fsAttrDecode( ushbAttr, ( char * ) pszAttr );
 
       fResult = TRUE;
    }

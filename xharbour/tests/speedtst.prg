@@ -1,5 +1,5 @@
 /*
- * $Id: speedtst.prg,v 1.3 2004/10/29 01:28:59 ronpinkas Exp $
+ * $Id: speedtst.prg,v 1.4 2004/10/30 22:41:35 druzus Exp $
  */
 
 #define ARR_LEN 16
@@ -37,7 +37,7 @@
 #command ? <xx,...> => outstd(<xx>, EOL)
 
 #ifdef NO_ASSOC_TEST
-  #undef ASSOC_ARRAY
+    #undef ASSOC_ARRAY
 #endif
 
 function main()
@@ -52,8 +52,8 @@ local i, j, t, c, n, d, bc, tn, total, totalr, aa,;
     local aAssoc := ASSOC_ARRAY
 #endif
 private M_C := dtos(date()),;
-   M_N := 112345.67,;
-   M_D := date()
+        M_N := 112345.67,;
+        M_D := date()
 
 #ifndef __CLIP__
 //#ifdef __XHARBOUR__
@@ -89,9 +89,9 @@ next
 tn:=secondscpu()-t
 ? "empty loops overhead =", tn
 #ifdef REAL_TIME
-  ? "real time -> seconds()"
+    ? "real time -> seconds()"
 #else
-  ? "CPU usage -> secondsCPU()"
+    ? "CPU usage -> secondsCPU()"
 #endif
 ? ""
 
@@ -453,32 +453,32 @@ return space(50000)
 #ifdef FlagShip
     function fs_seconds()
     LOCAL_DOUBLE nret := 0
-#Cinline
-{
-    #include <sys/time.h>
-    struct timeval tv;
-    struct timezone tz;
-    if( !gettimeofday(&tv, NULL) )
-        nret = (double) tv.tv_sec + (double) (tv.tv_usec) / 1000000;
+    #Cinline
+    {
+        #include <sys/time.h>
+        struct timeval tv;
+        struct timezone tz;
+        if( !gettimeofday(&tv, NULL) )
+            nret = (double) tv.tv_sec + (double) (tv.tv_usec) / 1000000;
 /*
-        nret = (double) (tv.tv_sec - tz.tz_minuteswest * 60 ) % 86400 +
-          (double) tv.tv_usec / 1000000;
+            nret = (double) (tv.tv_sec - tz.tz_minuteswest * 60 ) % 86400 +
+                   (double) tv.tv_usec / 1000000;
 */
-}
-#endCinline
+    }
+    #endCinline
     return ( nret )
 
     #ifndef FlagShip5
-   FUNCTION cursesinit()
-   CALL fgsIoctl2
-#Cinline
-{
-   #include <fcntl.h>
-   int arg;
-   if ((arg = fcntl(0, F_GETFL, 0)) != -1)
-       fcntl(0, F_SETFL, arg | O_NONBLOCK);
-}
-#endCinline
-   return nil
+        FUNCTION cursesinit()
+        CALL fgsIoctl2
+        #Cinline
+        {
+            #include <fcntl.h>
+            int arg;
+            if ((arg = fcntl(0, F_GETFL, 0)) != -1)
+                fcntl(0, F_SETFL, arg | O_NONBLOCK);
+        }
+        #endCinline
+        return nil
     #endif
 #endif

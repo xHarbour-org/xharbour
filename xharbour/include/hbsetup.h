@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.28 2004/11/21 21:43:39 druzus Exp $
+ * $Id: hbsetup.h,v 1.29 2004/12/10 03:43:34 mlombardo Exp $
  */
 
 /*
@@ -240,33 +240,21 @@
 /* ***********************************************************************
  * Operating system specific definitions
  */
-#if defined(__GNUC__)
-   /* The GNU C compiler is used */
-   #if defined(__DJGPP__) || defined(__EMX__) || defined(_Windows) || defined(_WIN32) || defined(__RSXNT__)
-      /* The DJGPP port of GNU C is used - for DOS platform */
-      #define OS_DOS_COMPATIBLE
-      #define OS_PATH_LIST_SEPARATOR    ';'
-      #define OS_PATH_DELIMITER         '\\'
-      #define OS_PATH_DELIMITER_STRING  "\\"
-      #define OS_PATH_DELIMITER_LIST    "\\/:"
-      #define OS_DRIVE_DELIMITER        ':'
-      #define OS_FILE_MASK              "*.*"
-      #define OS_HAS_DRIVE_LETTER
-      #define OS_OPT_DELIMITER_LIST     "/-"
-      #define OS_EOL_LEN                2  /* # of bytes in End of Line marker */
-   #else
-      #define HOST_OS_UNIX_COMPATIBLE
-      #define OS_UNIX_COMPATIBLE
-      #define OS_PATH_LIST_SEPARATOR    ':'
-      #define OS_PATH_DELIMITER         '/'
-      #define OS_PATH_DELIMITER_STRING  "/"
-      #define OS_PATH_DELIMITER_LIST    "/"
-      #define OS_FILE_MASK              "*"
-      #undef  OS_DRIVE_DELIMITER
-      #undef  OS_HAS_DRIVE_LETTER
-      #define OS_OPT_DELIMITER_LIST     "-"
-      #define OS_EOL_LEN                1
-   #endif
+#if ( defined(__GNUC__) && \
+      ! ( defined(__DJGPP__) || defined(__EMX__) || defined(__RSXNT__) || \
+          defined(_Windows) || defined(_WIN32) ) ) || \
+    ( defined(__WATCOMC__) && defined(__LINUX__) )
+   #define HOST_OS_UNIX_COMPATIBLE
+   #define OS_UNIX_COMPATIBLE
+   #define OS_PATH_LIST_SEPARATOR    ':'
+   #define OS_PATH_DELIMITER         '/'
+   #define OS_PATH_DELIMITER_STRING  "/"
+   #define OS_PATH_DELIMITER_LIST    "/"
+   #define OS_FILE_MASK              "*"
+   #undef  OS_DRIVE_DELIMITER
+   #undef  OS_HAS_DRIVE_LETTER
+   #define OS_OPT_DELIMITER_LIST     "-"
+   #define OS_EOL_LEN                1
 #else
    /* we are assuming here the DOS compatible OS */
    #define OS_DOS_COMPATIBLE
@@ -296,6 +284,8 @@
       #define HB_OS_OS2
    #elif defined(__NT__) || defined(__WINDOWS_386__) || defined(__WINDOWS__)
       #define HB_OS_WIN_32
+   #elif defined(__LINUX__)
+      #define HB_OS_LINUX
    #elif defined(__386__)
       #define HB_OS_DOS
       #define HB_OS_DOS_32

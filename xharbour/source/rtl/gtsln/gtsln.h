@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.9 2004/10/18 10:22:26 likewolf Exp $
+ * $Id: gtsln.h,v 1.10 2004/12/28 07:16:14 druzus Exp $
  */
 
 /*
@@ -57,23 +57,24 @@
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_NAME	SLN
 
-#ifdef HB_OS_DARWIN
+#include "hbapigt.h"
+#include "hbapifs.h"
+#include "inkey.ch"
+
+#ifndef HB_CDP_SUPPORT_OFF
+#include "hbapicdp.h"
+#endif
+
+#if defined(HB_OS_DARWIN) || ( defined(HB_OS_LINUX) && defined(__WATCOMC__) )
 #define REAL_UNIX_SYSTEM /* this is for slang.h to include some defs */
 #endif
 #include <slang.h>
 
-#include "hbapigt.h"
-#include "hbapifs.h"
-#include "inkey.ch"
 #include <unistd.h>
 #include <signal.h>
 
 #ifndef HB_OS_DARWIN
 #include <time.h>
-#endif
-
-#ifndef HB_CDP_SUPPORT_OFF
-#include "hbapicdp.h"
 #endif
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.27 2004/11/21 21:44:19 druzus Exp $
+ * $Id: hbffind.c,v 1.28 2004/11/22 00:16:06 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.27 2004/11/21 21:44:19 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.28 2004/11/22 00:16:06 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -146,7 +146,9 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.27 2004/11/21 21:44:19 druzus Exp $" )
    #include <fcntl.h>
    #include <dirent.h>
    #include <time.h>
+#if !defined( __WATCOMC__ )
    #include <fnmatch.h>
+#endif
    typedef struct
    {
       DIR *           dir;
@@ -787,7 +789,11 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       {
          while( ( info->entry = readdir( info->dir ) ) != NULL )
          {
+#if defined( __WATCOMC__ )
+            if ( hb_strMatchWild( info->entry->d_name, info->pattern ) )
+#else
             if ( fnmatch( info->pattern, info->entry->d_name, FNM_PERIOD | FNM_PATHNAME ) == 0 )
+#endif
             {
                bFound=TRUE;
                break;
@@ -870,7 +876,11 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
       bFound=FALSE;
       while( ( info->entry = readdir( info->dir ) ) != NULL )
       {
-         if( fnmatch( info->pattern, info->entry->d_name, FNM_PERIOD|FNM_PATHNAME ) == 0 )
+#if defined( __WATCOMC__ )
+         if ( hb_strMatchWild( info->entry->d_name, info->pattern ) )
+#else
+         if( fnmatch( info->pattern, info->entry->d_name, FNM_PERIOD | FNM_PATHNAME ) == 0 )
+#endif
          {
             bFound=TRUE;
             break;

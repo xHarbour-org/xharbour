@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.33 2004/12/15 13:39:34 druzus Exp $
+ * $Id: gtsln.c,v 1.34 2004/12/28 07:16:14 druzus Exp $
  */
 
 /*
@@ -127,7 +127,7 @@ extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
 /* A definition is a list of pairs of chars. The first char in each pair is  */
 /* an ASCII key, which should be pressed *after* a "DeadKey" was pressed to  */
 /* get the nation char, a second in that pair is a corresponding nation char */
-static unsigned char *hb_NationCharsEnvName = "HRBNATIONCHARS";
+static char * hb_NationCharsEnvName = "HRBNATIONCHARS";
 
 /* *********************************************************************** */
 
@@ -230,7 +230,7 @@ static void hb_sln_setACSCtrans( void )
    if( ( p = SLtt_Graphics_Char_Pairs ) )
    {
       SLsmg_Char_Type SLch;
-      int i, len = strlen( p );
+      int i, len = strlen( ( char * ) p );
 
       for( i = 0; i < len; i += 2 )
       {
@@ -1360,7 +1360,7 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
         //int SaveColor = SLsmg_get_color();
         //SLtt_set_alt_char_set( 1 );
         SLsmg_set_color( ( int )( ( unsigned char )( hb_gtCurrentColor() - 7 ) ) );
-        SLsmg_write_nchars( pbyStr, ulLen );
+        SLsmg_write_nchars( ( char * ) pbyStr, ulLen );
         SLsmg_refresh();
         //SLtt_set_alt_char_set( 0 );
         //SLsmg_set_color( SaveColor );
@@ -1379,7 +1379,7 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
         SLang_TT_Write_FD = s_iStdErr;
         //SLtt_set_alt_char_set( 1 );
         SLsmg_set_color( ( int )( ( unsigned char )( hb_gtCurrentColor() - 7 ) ) );
-        SLsmg_write_nchars( pbyStr, ulLen );
+        SLsmg_write_nchars( ( char * ) pbyStr, ulLen );
         SLsmg_refresh();
         SLang_TT_Write_FD = Save_SLang_TT_Write_FD;
         //SLtt_set_alt_char_set( 0 );

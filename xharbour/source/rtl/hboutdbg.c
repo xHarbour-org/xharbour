@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: hboutdbg.c,v 1.8 2004/04/06 01:50:55 druzus Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #include <hbmath.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.8 2004/05/04 16:43:52 mauriliolongo Exp $
+ * $Id: net.c,v 1.9 2004/11/23 17:04:22 lf_sfnet Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 #include "hbapi.h"
 #include "hbfast.h"
 
-#if defined(HB_OS_OS2) || defined(__GNUC__)
+#if defined(HB_OS_OS2) || defined(OS_UNIX_COMPATIBLE) || defined(__GNUC__)
 
    #include "hb_io.h"
 
@@ -104,12 +104,13 @@ HB_FUNC( NETNAME )
 #if defined(HB_OS_OS2) || defined(OS_UNIX_COMPATIBLE)
 
    {
+#if defined(__WATCOMC__)
+      char * pszValue = hb_getenv( "HOSTNAME" );
+#else
       char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
-
       pszValue[ 0 ] = '\0';
-
       gethostname( pszValue, MAXGETHOSTNAME );
-
+#endif
       hb_retcAdopt( pszValue );
    }
 

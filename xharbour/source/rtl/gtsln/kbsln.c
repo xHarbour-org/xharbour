@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.13 2004/05/25 20:27:23 druzus Exp $
+ * $Id: kbsln.c,v 1.14 2004/06/04 00:18:10 druzus Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ extern BOOL hb_gt_sln_bScreen_Size_Changed;
 
 /* DeadKey definition's ENVVAR name. This EnvVar contains */
 /* an ASCII value of a key, which serves as a DeadKey */
-unsigned char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
+char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
 
 /* a table for Keys work with a Dead key. The first
    element contains a number of defined keys */
@@ -239,7 +239,7 @@ int HB_GT_FUNC(gt_Init_Terminal( int phase ))
  
         if( p && p[ 0 ] != '\0' )
         {
-            int len = strlen( p );
+            int len = strlen( ( char * ) p );
             if( len > 0 )
                 hb_DeadKey = ( int ) *p;
         }

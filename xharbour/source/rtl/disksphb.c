@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.4 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: disksphb.c,v 1.5 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -62,13 +62,17 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 
-#if defined( HB_OS_BSD )
-   #include <sys/param.h>
-   #include <sys/mount.h>
+#if defined(HB_OS_BSD)
+#  include <sys/param.h>
+#  include <sys/mount.h>
 #elif defined(HB_OS_SUNOS)
-   #include <sys/statvfs.h>
-#elif defined( HB_OS_UNIX )
-   #include <sys/vfs.h>
+#  include <sys/statvfs.h>
+#elif defined(HB_OS_UNIX)
+#  if defined(__WATCOMC__)
+#     include <sys/stat.h>
+#  else
+#     include <sys/vfs.h>
+#  endif
 #endif
 
 #ifdef HB_EXTENSION
@@ -306,7 +310,7 @@ HB_FUNC( HB_DISKSPACE )
       }
    }
 
-#elif defined(HB_OS_UNIX)
+#elif defined(HB_OS_UNIX) && !defined(__WATCOMC__)
 
    {
 #if defined(HB_OS_SUNOS)

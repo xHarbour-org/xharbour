@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.17 2004/10/22 11:26:45 paultucker Exp $
+ * $Id: gtpca.c,v 1.18 2004/11/25 01:54:13 guerra000 Exp $
  */
 
 /*
@@ -60,22 +60,14 @@
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_NAME	PCA
 
-#if defined(__GNUC__) && ! defined(__MINGW32__)
-   #include <unistd.h>
-   #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(__EMX__)
-      #include <io.h>
-   #endif
-#else
-   #include <io.h>
-#endif
+#include "hbapigt.h"
+#include "hbapifs.h"
+#include "hb_io.h"
+#include "hbset.h"
+#include "inkey.ch"
 
 #include <ctype.h>
 #include <string.h>
-
-#include "hbapigt.h"
-#include "hbapifs.h"
-#include "hbset.h"
-#include "inkey.ch"
 
 static USHORT s_usRow, s_usCol, s_usMaxRow, s_usMaxCol;
 static int s_iFilenoStdin, s_iFilenoStdout, s_iFilenoStderr;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.52 2004/11/25 04:48:46 guerra000 Exp $
+ * $Id: gtcrs.c,v 1.53 2004/12/28 07:16:13 druzus Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ typedef struct InOutBase {
    int is_color;
    unsigned int disp_count;
 
-   unsigned char *acsc, *beep, *flash, *civis, *cnorm, *cvvis;
+   char *acsc, *beep, *flash, *civis, *cnorm, *cvvis;
 
    int is_mouse;
    int mButtons;
@@ -545,15 +545,15 @@ static int add_efds( InOutBase * ioBase, int fd, int mode,
       if ( ioBase->efds_size <= ioBase->efds_no )
       {
          if ( ioBase->event_fds == NULL )
-            ioBase->event_fds =
+            ioBase->event_fds = ( evtFD ** )
                hb_xgrab( ( ioBase->efds_size += 10 ) * sizeof( evtFD * ) );
          else
-            ioBase->event_fds =
+            ioBase->event_fds = ( evtFD ** )
                hb_xrealloc( ioBase->event_fds,
                             ( ioBase->efds_size += 10 ) * sizeof( evtFD * ) );
       }
 
-      pefd = hb_xgrab( sizeof( evtFD ) );
+      pefd = ( evtFD * ) hb_xgrab( sizeof( evtFD ) );
       pefd->fd = fd;
       pefd->mode = mode;
       pefd->data = data;
@@ -892,7 +892,7 @@ static void write_ttyseq( InOutBase * ioBase, char *seq )
       write( ioBase->base_outfd, seq, strlen( seq ) );
 }
 
-static int addKeyMap( InOutBase * ioBase, int nKey, const unsigned char *cdesc )
+static int addKeyMap( InOutBase * ioBase, int nKey, const char *cdesc )
 {
    int ret = K_UNDEF, i = 0, c;
    struct keyTab **ptr;
@@ -930,19 +930,19 @@ static int addKeyMap( InOutBase * ioBase, int nKey, const unsigned char *cdesc )
    return ret;
 }
 
-static int removeKeyMap( InOutBase * ioBase, unsigned char *cdesc )
+static int removeKeyMap( InOutBase * ioBase, const char *cdesc )
 {
    int ret = K_UNDEF, i = 0, c;
    struct keyTab **ptr;
 
-   c = cdesc[i++];
+   c = ( unsigned char ) cdesc[i++];
    ptr = &ioBase->pKeyTab;
 
    while ( c && *ptr != NULL )
    {
       if ( ( *ptr )->ch == c )
       {
-         c = cdesc[i++];
+         c = ( unsigned char ) cdesc[i++];
          if ( !c )
          {
             ret = ( *ptr )->key;
@@ -1361,7 +1361,7 @@ static void gt_outstd( InOutBase * ioBase, unsigned const char *str, int len )
 
 static void gt_outerr( InOutBase * ioBase, const char *str, int len )
 {
-   gt_outstr( ioBase, ioBase->stderrfd, str, len );
+   gt_outstr( ioBase, ioBase->stderrfd, ( unsigned char * ) str, len );
 }
 
 static char *tiGetS( char *capname )
@@ -1777,7 +1777,7 @@ void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char *kdst )
    if ( ksrc && kdst )
    {
       if ( ioBase->in_transtbl == NULL )
-         ioBase->in_transtbl = hb_xgrab( 256 );
+         ioBase->in_transtbl = ( unsigned char * ) hb_xgrab( 256 );
 
       memset( ioBase->in_transtbl, 0, 256 );
 
@@ -1792,8 +1792,7 @@ void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char *kdst )
    }
 }
 
-void setDispTrans( InOutBase * ioBase, unsigned char *src, unsigned char *dst,
-                   int box )
+void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
 {
    unsigned char c, d;
    int i, aSet = 0;
@@ -1839,7 +1838,7 @@ void setDispTrans( InOutBase * ioBase, unsigned char *src, unsigned char *dst,
       {
          if ( ioBase->out_transtbl == NULL )
          {
-            ioBase->out_transtbl = hb_xgrab( 256 );
+            ioBase->out_transtbl = ( unsigned char * ) hb_xgrab( 256 );
             memset( ioBase->out_transtbl, 0, 256 );
          }
          ioBase->out_transtbl[i] = ch & A_CHARTEXT;
@@ -1847,9 +1846,9 @@ void setDispTrans( InOutBase * ioBase, unsigned char *src, unsigned char *dst,
    }
    if ( aSet )
    {
-      for ( i = 0; i < 256 && ( c = src[i] ); i++ )
+      for ( i = 0; i < 256 && ( c = ( unsigned char ) src[i] ); i++ )
       {
-         d = dst[i];
+         d = ( unsigned char ) dst[i];
          ioBase->std_chmap[c] = d | A_NORMAL;
          if ( box )
             ioBase->box_chmap[c] = d | A_NORMAL;
@@ -1857,7 +1856,7 @@ void setDispTrans( InOutBase * ioBase, unsigned char *src, unsigned char *dst,
          {
             if ( ioBase->out_transtbl == NULL )
             {
-               ioBase->out_transtbl = hb_xgrab( 256 );
+               ioBase->out_transtbl = ( unsigned char * )hb_xgrab( 256 );
                memset( ioBase->out_transtbl, 0, 256 );
             }
             ioBase->out_transtbl[c] = d;
@@ -1875,8 +1874,8 @@ static InOutBase *create_ioBase( char *term, int infd, int outfd, int errfd,
    unsigned int i, n;
    char buf[256], *ptr, *crsterm = NULL;
 
-   ioBase = hb_xgrab( sizeof( *ioBase ) );
-   memset( ioBase, 0, sizeof( *ioBase ) );
+   ioBase = ( InOutBase * ) hb_xgrab( sizeof( InOutBase ) );
+   memset( ioBase, 0, sizeof( InOutBase ) );
 
    if ( !term || !*term )
       term = getenv( "HB_TERM" );
@@ -1976,7 +1975,7 @@ static InOutBase *create_ioBase( char *term, int infd, int outfd, int errfd,
       ioBase->cvvis = ioBase->cnorm;
    ioBase->acsc = tiGetS( "acsc" );
 
-   ioBase->charmap = hb_xgrab( 256 * sizeof( int ) );
+   ioBase->charmap = ( int * ) hb_xgrab( 256 * sizeof( int ) );
    HB_GT_FUNC( gt_chrmapinit( ioBase->charmap, term ) );
    setDispTrans( ioBase, NULL, NULL, 0 );
 
@@ -2251,12 +2250,11 @@ static int add_new_ioBase( InOutBase * ioBase )
    if ( !add )
    {
       if ( s_ioBaseTab == NULL )
-         s_ioBaseTab =
-            hb_xgrab( ( s_iSize_ioBaseTab += 10 ) * sizeof( InOutBase * ) );
+         s_ioBaseTab = ( InOutBase ** ) hb_xgrab(
+                        ( s_iSize_ioBaseTab += 10 ) * sizeof( InOutBase * ) );
       else
-         s_ioBaseTab = hb_xrealloc( s_ioBaseTab,
-                                    ( s_iSize_ioBaseTab +=
-                                      10 ) * sizeof( InOutBase * ) );
+         s_ioBaseTab = ( InOutBase ** ) hb_xrealloc( s_ioBaseTab,
+                        ( s_iSize_ioBaseTab += 10 ) * sizeof( InOutBase * ) );
       s_ioBaseTab[i] = ioBase;
       for ( n = i + 1; n < s_iSize_ioBaseTab; n++ )
          s_ioBaseTab[n] = NULL;
@@ -2594,7 +2592,7 @@ void HB_GT_FUNC( gt_OutErr( BYTE * pbyStr, ULONG ulLen ) )
          HB_GT_FUNC( gt_DispEnd() );
       }
       else
-         gt_outerr( s_ioBase, pbyStr, ulLen );
+         gt_outerr( s_ioBase, ( char * ) pbyStr, ulLen );
    }
    else
       hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
@@ -3436,16 +3434,15 @@ void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
       {
          if ( cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
          {
-            char *pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
-            char *pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
+            char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
+            char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
             strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
             strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
             strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
             strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
 
-            setDispTrans( s_ioBase, ( unsigned char * ) pszHostLetters,
-                          ( unsigned char * ) pszTermLetters, bBox ? 1 : 0 );
+            setDispTrans( s_ioBase, pszHostLetters, pszTermLetters, bBox ? 1 : 0 );
 
             hb_xfree( pszHostLetters );
             hb_xfree( pszTermLetters );
@@ -3477,8 +3474,8 @@ void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
       if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
            cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
       {
-         char *pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
-         char *pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
+         char *pszHostLetters = ( char * ) hb_xgrab( cdpHost->nChars * 2 + 1 );
+         char *pszTermLetters = ( char * ) hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
          strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
          strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );

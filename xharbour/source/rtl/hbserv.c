@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.21 2004/05/28 18:51:22 likewolf Exp $
+* $Id: hbserv.c,v 1.22 2004/11/01 05:38:10 likewolf Exp $
 */
 
 /*
@@ -137,7 +137,7 @@ static S_TUPLE s_sigTable[] = {
    {0 , 0, 0}
 };
 
-#if defined( HARBOUR_GCC_OS2 )
+#if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
 static void s_signalHandler( int sig )
 #else
 static void s_signalHandler( int sig, siginfo_t *info, void *v )
@@ -153,7 +153,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    Ret.type = HB_IT_NIL;
    ExecArray.type = HB_IT_NIL;
 
-   #if !defined( HARBOUR_GCC_OS2 )
+   #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
    HB_SYMBOL_UNUSED(v);
    #endif
 
@@ -187,25 +187,25 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
 
          // the third parameter is an array:
 
-         #if defined( HARBOUR_GCC_OS2 )
+         #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
          hb_arrayNew( &Ret, 1 );
-	 #elif defined( HB_OS_BSD )
-	 hb_arrayNew( &Ret, info ? 6 : 1 );
+         #elif defined( HB_OS_BSD )
+         hb_arrayNew( &Ret, info ? 6 : 1 );
          #else
          hb_arrayNew( &Ret, 6 );
          #endif
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSIGNAL), sig );
-         #if !defined( HARBOUR_GCC_OS2 )
-	 #if defined( HB_OS_BSD )
-	 if (info)
-	 #endif
-	 {
+         #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
+         #if defined( HB_OS_BSD )
+         if (info)
+         #endif
+         {
             hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), info->si_code );
             hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR), info->si_errno );
             hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (void *) info->si_addr );
             hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), info->si_pid );
             hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID), info->si_uid );
-	 }
+         }
          #endif
          hb_itemForwardValue( hb_arrayGetItemPtr( &ExecArray, 3), &Ret );
 
@@ -607,7 +607,7 @@ static void s_serviceSetHBSig( void )
       pthread_sigmask( SIG_SETMASK, &blockall, NULL );
    #endif
 
-   #ifdef HARBOUR_GCC_OS2
+   #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
    act.sa_handler = s_signalHandler;
    #else
    // using more descriptive sa_action instead of sa_handler
@@ -938,17 +938,16 @@ HB_FUNC( HB_SIGNALDESC )
    {
       case SIGSEGV: switch( iSubSig )
       {
-         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2)
+         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
          case SEGV_MAPERR: hb_retc( "Segmentation fault: address not mapped to object"); return;
          case SEGV_ACCERR: hb_retc( "Segmentation fault: invalid permissions for mapped object"); return;
          #endif
          default: hb_retc("Segmentation fault"); return;
       }
-      break;
 
       case SIGILL: switch( iSubSig )
       {
-         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2)
+         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
          case ILL_ILLOPC: hb_retc( "Illegal operation: illegal opcode"); return;
          case ILL_ILLOPN: hb_retc( "Illegal operation: illegal operand"); return;
          case ILL_ILLADR: hb_retc( "Illegal operation: illegal addressing mode"); return;
@@ -960,11 +959,10 @@ HB_FUNC( HB_SIGNALDESC )
          #endif
          default: hb_retc( "Illegal operation" ); return;
       }
-      break;
 
       case SIGFPE: switch( iSubSig )
       {
-         #if ! defined(HARBOUR_GCC_OS2)
+         #if ! defined(HARBOUR_GCC_OS2) && ! defined( __WATCOMC__ )
          #if ! defined( HB_OS_DARWIN )
          case FPE_INTDIV: hb_retc( "Floating point: integer divide by zero"); return;
          case FPE_INTOVF: hb_retc( "Floating point: integer overflow"); return;
@@ -980,7 +978,6 @@ HB_FUNC( HB_SIGNALDESC )
          #endif
          default: hb_retc( "Floating point" ); return;
       }
-      break;
 
       case SIGQUIT:
          hb_retc( "Quit" );

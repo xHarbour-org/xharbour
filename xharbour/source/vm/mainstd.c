@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.4 2003/11/22 01:41:10 ronpinkas Exp $
+ * $Id: mainstd.c,v 1.5 2004/04/02 22:38:32 andijahja Exp $
  */
 
 /*
@@ -77,4 +77,9 @@ char ** __crt0_glob_function( char * _arg )
    return 0;
 }
 #endif
+
+#if defined(HB_OS_LINUX) && defined(__WATCOMC__)
+void HB_EXPORT hb_forceLinkMainStd( void ) {}
+#endif
+
 HB_EXTERN_END

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.15 2004/12/11 00:43:04 druzus Exp $
+ * $Id: gtcrs.h,v 1.16 2004/12/28 07:16:13 druzus Exp $
  */
 
 /*
@@ -103,7 +103,7 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <time.h>
-#if defined( HB_OS_LINUX ) || defined( HB_OS_BSD )
+#if ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) ) && !defined(__WATCOMC__)
 # if defined( HB_OS_LINUX )
 #  include <pty.h>  /* for openpty and forkpty */
 # elif defined( HB_OS_DARWIN )

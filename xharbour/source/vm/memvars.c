@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.93 2005/01/04 05:25:38 walito Exp $
+ * $Id: memvars.c,v 1.94 2005/01/05 05:23:29 walito Exp $
  */
 
 /*
@@ -340,34 +340,12 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       }
       else
       {
-         #ifndef HB_ARRAY_USE_COUNTER
-            HB_VALUE_PTR pOldValues = s_globalTable;
-            ULONG ulPos, ulValues = s_globalTableSize;
-         #endif
-
          /* No more free values in the table - expand the table
           */
          hValue = s_globalTableSize;
          s_globalLastFree = s_globalTableSize + 1;
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
-
-         #ifndef HB_ARRAY_USE_COUNTER
-            if( s_globalTable != pOldValues )
-            {
-               for( ulPos = 0; ulPos < ulValues; ulPos++ )
-               {
-                  if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY && ( s_globalTable + ulPos )->item.item.asArray.value )
-                  {
-                     hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
-                  }
-                  else if( ( s_globalTable + ulPos )->item.type == HB_IT_BYREF && ( s_globalTable + ulPos )->item.item.asRefer.offset == 0 )
-                  {
-                     hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asRefer.BasePtr.pBaseArray, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
-                  }
-               }
-            }
-         #endif
       }
    }
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.40 2005/01/09 06:08:23 likewolf Exp $
+# $Id: hb-func.sh,v 1.41 2005/01/09 20:39:52 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -26,7 +26,7 @@ get_hbplatform()
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
-    [ "${id}" = "" ] && id=`uname -sr | tr "[:upper:]" "[:lower:]" | tr -d " "`
+    [ "${id}" = "" ] && id=`uname -sr | tr '[A-Z]' '[a-z]' | tr -d " "`
     echo -n "${id}"
 }
 
@@ -236,13 +236,13 @@ HB_GT_STAT=""
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
 if [ "\${HB_MG}" != "yes" ]; then
     if [ "\${HB_STATIC}" = "yes" ] || [ "\${HB_STATIC}" = "full" ]; then
-        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr "[:upper:]" "[:lower:]"\`
+        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr '[A-Z]' '[a-z]'\`
     fi
     HB_GT_REQ=""
 else
-    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr "[:lower:]" "[:upper:]"\`
+    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr '[a-z]' '[A-Z]'\`
 fi
-HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr "[:lower:]" "[:upper:]"\`
+HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
 # set environment variables
 export HB_ARCHITECTURE="${HB_ARCHITECTURE}"

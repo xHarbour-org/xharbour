@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.181 2004/12/13 13:08:18 walito Exp $
+* $Id: thread.c,v 1.182 2004/12/14 00:15:41 druzus Exp $
 */
 
 /*
@@ -54,17 +54,6 @@
 /* JC1: Now including all this files to make threadsleep available in ST */
 #define HB_THREAD_OPTIMIZE_STACK
 
-#if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
-   #include <stdlib.h>
-   #include <unistd.h>    /* We need usleep() in Darwin */
-#endif
-
-#if defined(__GNUC__) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      #include <sys/time.h>
-      #include <time.h>
-      #include <errno.h>
-#endif
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -72,10 +61,21 @@
 #include "hbstack.h"
 #include "classes.h"
 
+#if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
+   #include <stdlib.h>
+   #include <unistd.h>    /* We need usleep() in Darwin */
+#endif
+
+#if defined(HB_OS_UNIX) || \
+    (defined(__GNUC__) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)))
+      #include <sys/time.h>
+      #include <time.h>
+      #include <errno.h>
+#endif
+
 #if defined(HB_OS_OS2)
    #include <stdlib.h>
 #endif
-
 
 #ifdef HB_OS_WIN_32
    #include <windows.h>

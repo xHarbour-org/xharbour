@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.13 2005/01/09 06:08:17 likewolf Exp $
+# $Id: make_gnu.sh,v 1.14 2005/01/09 20:39:46 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,9 +19,10 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     if [ "$OSTYPE" = "msdosdjgpp" ]; then
         hb_arch="dos"
     else
-        hb_arch=`uname -s | tr -d "[-]" | tr "[:upper:]" "[:lower:]" 2>/dev/null`
+        hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
             *windows*) hb_arch="w32" ;;
+            *dos)      hb_arch="dos" ;;
             *bsd)      hb_arch="bsd" ;;
         esac
     fi
@@ -30,39 +31,48 @@ fi
 
 if [ -z "$HB_COMPILER" ]; then
     case "$HB_ARCHITECTURE" in
-        w32) hb_comp="mingw32" ;;
-        dos) hb_comp="djgpp" ;;
-        *)   hb_comp="gcc" ;;
+        w32) HB_COMPILER="mingw32" ;;
+        dos) HB_COMPILER="djgpp" ;;
+        *)   HB_COMPILER="gcc" ;;
     esac
-    export HB_COMPILER="$hb_comp"
-fi
-
-if [ -z "$HB_GPM_MOUSE" ]; then
-    case "$HB_ARCHITECTURE" in
-        linux) hb_gpm="yes" ;;
-        *)     hb_gpm="no" ;;
-    esac
-    export HB_GPM_MOUSE="$hb_gpm"
+    export HB_COMPILER
 fi
 
 if [ -z "$HB_GT_LIB" ]; then
     case "$HB_ARCHITECTURE" in
-        dos) hb_gt="gtdos" ;;
-        os2) hb_gt="gtos2" ;;
-        w32) hb_gt="gtwin" ;;
-        *)   hb_gt="gtstd" ;;
+        w32) HB_GT_LIB="gtwin" ;;
+        dos) HB_GT_LIB="gtdos" ;;
+        os2) HB_GT_LIB="gtos2" ;;
+        *)   HB_GT_LIB="gtstd" ;;
     esac
-    export HB_GT_LIB="$hb_gt"
+    export HB_GT_LIB
 fi
 
-if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
+if [ -z "$HB_GPM_MOUSE" ]; then
+    if [ "$HB_ARCHITECTURE" = "linux" ] && \
+       ( [ -f /usr/include/gpm.h ] || [ -f /usr/local/include/gpm.h ]); then
+        HB_GPM_MOUSE=yes
+    else
+        HB_GPM_MOUSE=no
+    fi
+    export HB_GPM_MOUSE
+fi
 
 if [ -z "$HB_MT" ]; then
     case "$HB_ARCHITECTURE" in
-        dos) hb_mt="" ;;
-        *)   hb_mt="MT" ;;
+        dos) HB_MT="" ;;
+        *)   HB_MT="MT" ;;
     esac
-    export HB_MT="$hb_mt"
+    export HB_MT
+fi
+
+if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
+if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
+
+if [ "$HB_COMMERCE" = yes ]
+then
+   export HB_GPM_MOUSE=no
+   export HB_WITHOUT_GTSLN=yes
 fi
 
 # export PRG_USR=

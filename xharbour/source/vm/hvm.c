@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.430 2005/01/03 16:59:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.431 2005/01/05 05:23:28 walito Exp $
  */
 
 /*
@@ -8997,15 +8997,6 @@ HB_FUNC( HB_WITHOBJECTCOUNTER )
    hb_retnl( hb_vm_wWithObjectCounter ) ;
 }
 
-#if defined(HB_OS_WIN_32) && \
-    ( defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
-extern void HB_EXPORT hb_forceLinkMain( void );
-void _hb_forceLinkMain()
-{
-   hb_forceLinkMain();
-}
-#endif
-
 HB_FUNC( __VMVARSLIST )
 {
    HB_FUNCNAME(HB_DBG_VMVARSLIST)();
@@ -9025,3 +9016,27 @@ HB_FUNC( __VMVARSSET )
 {
    HB_FUNCNAME(HB_DBG_VMVARSSET)();
 }
+
+
+#undef HB_FORCE_LINK_MAIN
+
+#if defined(HB_OS_WIN_32) && !defined(__EXPORT__) && \
+    ( defined(__WATCOMC__) || defined(__MINGW32__) )
+
+#  define HB_FORCE_LINK_MAIN  hb_forceLinkMainWin
+
+#elif defined(HB_OS_LINUX) && defined(__WATCOMC__)
+
+#  define HB_FORCE_LINK_MAIN  hb_forceLinkMainStd
+
+#endif
+
+#ifdef HB_FORCE_LINK_MAIN
+HB_EXTERN_BEGIN
+extern void HB_EXPORT HB_FORCE_LINK_MAIN( void );
+HB_EXTERN_END
+void _hb_forceLinkMain()
+{
+   HB_FORCE_LINK_MAIN();
+}
+#endif

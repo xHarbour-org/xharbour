@@ -22,7 +22,7 @@ static BOOL s_IsWindowsNt( void )
    return FALSE;
 }
 
-#elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
+#elif ( defined( HB_OS_UNIX ) || defined( HB_OS_LINUX ) ) && !defined( __WATCOMC__ )
 
 #include <syslog.h>
 
@@ -46,7 +46,7 @@ HB_FUNC( HB_SYSLOGOPEN )
          s_RegHandle = NULL;
          hb_retl( FALSE );
       #endif
-   #elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
+   #elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
       openlog( hb_parcx(1), LOG_NDELAY | LOG_NOWAIT | LOG_PID, LOG_USER );
       hb_retl( TRUE );
    #else
@@ -70,7 +70,7 @@ HB_FUNC( HB_SYSLOGCLOSE )
       #else
          hb_retl( FALSE );
       #endif
-   #elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
+   #elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
       closelog();
       hb_retl( TRUE );
    #else
@@ -120,7 +120,7 @@ HB_FUNC( HB_SYSLOGMESSAGE )
       #else
          hb_retl( FALSE );
       #endif
-   #elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
+   #elif defined( HB_OS_UNIX ) && !defined( __WATCOMC__ )
       int logval;
 
       switch( hb_parni(2) )

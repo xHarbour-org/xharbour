@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3725 2005/01/09 23:19:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3726 2005/01/10 00:20:06 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-10 19:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+  * xharbour/make_gnu.sh
+    * set HB_GPM_MOUSE=yes only for Linux and exist /usr/include/gpm.h
+      or /usr/local/include/gpm.h
+    * changed tr params to '[A-Z]' / '[a-z]' - it the tr is not broken
+      it has to work even without regular expressions
+
+  * xharbour/make_tgz.sh
+    * synced with make_gnu.sh modifications
+
+  * xharbour/make_rpm.sh
+  * xharbour/xhbgtmk.sh
+  * xharbour/xharbour.spec
+    + added --without gpl (set automatically when HB_COMMERCE=yes)
+    + added make to build dependences
+    + set --without X11 when there is no XFree86-devel (xorg-x11-devel)
+
+  + xharbour/config/linux/owatcom.cf
+    + added support for OpenWatcom Linux build
+
+  * xharbour/include/hb_io.h
+  * xharbour/include/hbsetup.h
+  * xharbour/source/rtl/diskspac.c
+  * xharbour/source/rtl/disksphb.c
+  * xharbour/source/rtl/filestat.c
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/fstemp.c
+  * xharbour/source/rtl/hbffind.c
+  * xharbour/source/rtl/hboutdbg.c
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/hbsyslog.c
+  * xharbour/source/rtl/net.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtsln/kbsln.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/mainstd.c
+  * xharbour/source/vm/mainwin.c
+  * xharbour/source/vm/memvars.c
+  * xharbour/source/vm/thread.c
+    + changed to support OpenWatcom on Linux - it's working and I can
+      build xHarbour with OW but in fact still many C functions are
+      missing in OW - I had to make some minor fixes and implement
+      some most important functions in OpenWatcom to make it working
+      with xHarbour so it cannot be build with CVS OW version yet.
+
+  * xharbour/tests/speedtst.prg
+    * formatting
 
 2005-01-09 18:13 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/dbedit.prg
