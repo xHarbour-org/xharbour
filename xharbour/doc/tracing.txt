@@ -1,11 +1,37 @@
 /*
- * $Id: tracing.txt,v 1.1.1.1 2001/12/21 10:48:03 ronpinkas Exp $
+ * $Id: tracing.txt,v 1.2 2002/07/14 16:33:42 walito Exp $
  */
 
 INTRODUCTION
 ============
 
 This file explains how to enable tracing in Harbour.
+
+XHARBOUR TRACING EXTENSION
+============================
+First be aware that, if you are temporarily debugging
+or tracing values in C code, you can bypass
+the rest of this discussion by just using the TraceLog() function.
+It's defined in rtl\trace.c, and is not dependent on the various
+settings that HB_TRACE uses.
+
+   void TraceLog( const char * sFile, const char * sTraceMsg, ... )
+
+ First parameter:  NULL to default to "trace.log", or a file name.
+ Second parameter: a format string, followed by variable args for it.
+
+ADDITIONAL TOOL
+============================
+Once the tracing decribed below is turned on, you can call this
+in a PRG to trace PRG-level function calls:
+
+    __TRACEPRGCALLS( <lOnOff> ) --> <lOldValue>
+
+  It turns on|off tracing of PRG-level function and method calls.
+  The symbol name is written just before it's called.
+  This is very useful when debugging GPFs as it
+  will trace all PRG-level calls up until the crash.
+  Uses HB_TRACE so traces are in line with any C-level traces.
 
 
 TRACING

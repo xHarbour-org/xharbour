@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1097 2003/06/03 22:41:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1098 2003/06/03 23:34:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,14 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-05-03 20:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+2003-06-04 21:40 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * source/rtl/memoline.c
+      * Fixed problem with source string starting with CRLF
+  * doc/tracing.txt
+      * Added docs for TraceLog() and __TRACEPRGCALLS( <lOnOff> ) --> <lOldValue>
+  * source/common/trace.c
+      * reverted last changes to HB_TRACE support.
+
+2003-06-03 20:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+
   * source/rdd/dbfcdx/dbfcdx1.c
+
     ! minor fix to hb_cdxWriteDBHeader() and hb_cdxReadDBHeader() functions by adding the codepage support
+
   * include/hbdbf.h
     ! minor fix to DBFHEADER Structure
   ! utils/hbmake/hbmake.prg
     ! removed gtnul linkage
-        
+
 2003-06-03 23:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
     ! Fixed bug with expansion of NON repeatable Marker into Repeatable Residual group.

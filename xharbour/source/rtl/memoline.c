@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: memoline.c,v 1.4 2003/05/26 18:09:43 mlombardo Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ HB_FUNC( MEMOLINE )
    ULONG  ulPos        = 0;
    ULONG  ulLineBegin;
    ULONG  ulLineEnd;
+   BOOL   bEmptyLine   = FALSE;
 
    if( ulLineLength < 4 || ulLineLength > 254 )
       ulLineLength = 79;
@@ -97,6 +98,9 @@ HB_FUNC( MEMOLINE )
             {
                ulLineBegin = ulPos + 1;
                ulLineEnd   = 0;
+            }else
+            {
+               bEmptyLine = (ulLineEnd == ulLineBegin);
             }
             break;
 
@@ -159,7 +163,7 @@ HB_FUNC( MEMOLINE )
 
       memset( pszLine, ' ', ulLineLength );
 
-      if ( ulLineEnd >= ulLineBegin && ulLen > 0 )
+      if ( !bEmptyLine && ulLineEnd >= ulLineBegin && ulLen > 0 )
       {
          for( ulPos = 0; ulPos <= ( ulLineEnd - ulLineBegin ); ulPos++ )
          {
