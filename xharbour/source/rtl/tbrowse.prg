@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.61 2004/03/21 17:00:34 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.62 2004/03/23 17:24:43 vouchcac Exp $
  */
 
 /*
@@ -145,10 +145,10 @@ CLASS TBrowse
    ACCESS border              INLINE ::cBorder
    ASSIGN border( cBorder )   INLINE ::SetBorder( cBorder )
    ACCESS colorSpec           INLINE ::cColorSpec   // Color table for the TBrowse display
-   ASSIGN colorSpec(cColor)   INLINE ::cColorSpec := if( empty( cColor ), ::cColorSpec, cColor ),  ;
-                                     ::lConfigured := .f., ::aColorSpec := Color2Array( ::cColorSpec ), ::cColorSpec
+   ASSIGN colorSpec(cColor)   INLINE if( empty( cColor ), ::cColorSpec, ( ::lConfigured := .f., ;
+                                     ::aColorSpec := Color2Array( cColor ), ::cColorSpec := cColor ) )
    ACCESS colPos              INLINE ::nColPos
-   ASSIGN colPos(nColPos)     INLINE ::nColPos    := ncolPos, ::lConfigured := .f., ::nColPos
+   ASSIGN colPos(nColPos)     INLINE ::lConfigured := .f., ::nColPos := if( nColPos == nil, ::nColPos, nColPos )
 
    ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
    ASSIGN nBottom( nBottom )  INLINE ::nwBottom := nBottom - iif(::cBorder=="",0,1), ::lConfigured := .f.
@@ -160,11 +160,11 @@ CLASS TBrowse
    ASSIGN nTop( nTop )        INLINE ::nwTop    := nTop    + iif(::cBorder=="",0,1), ::lConfigured := .f.
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
-   ASSIGN colSep( cColSep )   INLINE ::cColSep  := cColSep,  ::lConfigured := .f., ::cColSep
+   ASSIGN colSep( cColSep )   INLINE ::lConfigured := .f., ::cColSep  := cColSep
    ACCESS footSep INLINE ::cFootSep       // Footing separator character
-   ASSIGN footSep( cFootSep ) INLINE ::cFootSep := cFootSep, ::lConfigured := .f., ::cFootSep
+   ASSIGN footSep( cFootSep ) INLINE ::lConfigured := .f., ::cFootSep := cFootSep
    ACCESS headSep INLINE ::cHeadSep       // Head separator character
-   ASSIGN headSep( cHeadSep ) INLINE ::cHeadSep := cHeadSep, ::lConfigured := .f., ::cHeadSep
+   ASSIGN headSep( cHeadSep ) INLINE ::lConfigured := .f., ::cHeadSep := cHeadSep
 
    ACCESS freeze INLINE ::nFrozenCols     // Number of columns to freeze/frozen
    ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols

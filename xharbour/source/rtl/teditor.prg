@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.22 2004/03/01 09:37:30 vouchcac Exp $
+/* $Id: teditor.prg,v 1.23 2004/03/10 10:02:28 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -277,8 +277,8 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    ::nFirstRow := max( 1, nTextRow - nWndRow )
    ::nFirstCol := max( 1, nTextCol - nWndCol )
-   ::nRow      := nTextRow
-   ::nCol      := nTextCol + 1
+   ::nRow      := max( nTextRow, 1 )
+   ::nCol      := max( nTextCol, 1 )
 
    // Empty area of screen which will hold editor window
    Scroll( nTop, nLeft, nBottom, nRight )
@@ -848,7 +848,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             case K_PGDN
                ::PageDown()
                exit
- 
+
             case K_CTRL_PGDN
                ::GoBottom()
                exit
