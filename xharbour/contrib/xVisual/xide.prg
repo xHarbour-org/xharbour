@@ -64,7 +64,7 @@ METHOD MainMenu() CLASS MainFrame
    With Object ::WindowMenu
       :AddPopup('&Test')
       With Object :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
+         :AddItem( 'Editor', 101, {||oApp:CreateForm( 'Form1', TFormEdit(),oApp:MainFrame ) } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
@@ -133,7 +133,7 @@ METHOD MainToolBar() CLASS MainFrame
                                 'RadioGroup', 'Panel', 'ActionList' }
                for n:=0 to 16
                    oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
-                   oTool:Action := {|oItem| oApp:SubForm:OnMenuCommand(oItem) }
+                   oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
                    oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
                    :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
                next
