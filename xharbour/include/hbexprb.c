@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.64 2003/08/21 02:01:24 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.65 2003/08/22 20:44:08 ronpinkas Exp $
  */
 
 /*
@@ -1779,6 +1779,26 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      // SubStr( Str, n, 1 ) => Str[n]
                      else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
                      {
+                        if( pString->ExprType == HB_ET_VARIABLE )
+                        {
+                           #if defined( HB_MACRO_SUPPORT )
+                              if( hb_compLocalVarGetPos( pString->value.asSymbol, HB_MACRO_PARAM ) == 0 )
+                              {
+                                 // do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
+                                 goto PostOptimization;
+                              }
+                           #else
+                              if( hb_compLocalGetPos( pString->value.asSymbol ) == 0 &&
+                                  hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pLast ) == 0 &&
+                                  hb_compVariableGetPos( hb_comp_pGlobals, pString->value.asSymbol ) == 0 &&
+                                  ( hb_comp_bStartProc == TRUE || hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pFirst ) == 0 ) )
+                              {
+                                 // do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
+                                 goto PostOptimization;
+                              }
+                           #endif
+                        }
+
                         // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.
                         pSelf->value.asFunCall.pParms->value.asList.pExprList = pLen;
@@ -1788,6 +1808,9 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
                         pSelf->value.asList.pIndex    = pStart;
+
+                        PostOptimization :
+                        ;
                      }
                   }
                }
