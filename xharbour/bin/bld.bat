@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.25 2003/10/02 20:34:36 paultucker Exp $
+rem $Id: bld.bat,v 1.26 2003/11/23 19:34:53 druzus Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -62,7 +62,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    echo         - bcc16   (Borland C++ 3.x, 4.x, 5.0x, DOS 16-bit)
    echo         - djgpp   (Delorie GNU C, DOS 32-bit)
    echo         - rxs32   (EMX/RSXNT/DOS GNU C, DOS 32-bit)
-   echo         - watcom  (Watcom C++ 9.x, 10.x, 11.x, DOS 32-bit)
+   echo         - watcom  (OpenWatcom, DOS 32-bit)
    echo       - When HB_ARCHITECTURE=w32
    echo         - bcc32   (Borland C++ 4.x, 5.x, Windows 32-bit)
    echo         - gcc     (Cygnus/Cygwin GNU C, Windows 32-bit)
@@ -70,6 +70,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    echo         - rxsnt   (EMX/RSXNT/Win32 GNU C, Windows 32-bit)
    echo         - icc     (IBM Visual Age C++, Windows 32-bit)
    echo         - msvc    (Microsoft Visual C++, Windows 32-bit)
+   echo         - watcom  (OpenWatcom, Windows 32-bit)
    echo       - When HB_ARCHITECTURE=linux
    echo         - gcc     (GNU C, 32-bit)
    echo       - When HB_ARCHITECTURE=os2
@@ -109,11 +110,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :COMPILE
 
-   %HB_BIN_INSTALL%\harbour %1.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
-   IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' SET HB_2nd_prg=%2.c
    IF '%2'=='' SET HB_2nd_prg=
-   IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%3'=='' SET HB_3rd_prg=%3.c
    IF '%3'=='' SET HB_3rd_prg=
 
@@ -184,12 +185,13 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if not "%HB_COMPILER%" == "watcom" goto END
 
-      echo debug all OP osn=DOS4G OP stack=65536 OP CASEEXACT NAME %1.exe > build.tmp
+      wpp386 -j -w3 -d2 -5s -5r -fp5 -oxehtz -zq -zt0 -bt=DOS %1.c -fo=%1.obj
+      echo debug all OP osn=DOS OP stack=65536 OP CASEEXACT OP stub=cwstub.exe NAME %1.exe > build.tmp
       echo FILE %1.obj >> build.tmp
       echo LIB debug.lib >> build.tmp
       echo LIB vm.lib >> build.tmp
       echo LIB rtl.lib >> build.tmp
-      echo %_HB_GT_LIB%.lib >> build.tmp
+      echo LIB %_HB_GT_LIB%.lib >> build.tmp
       echo LIB lang.lib >> build.tmp
       echo LIB rdd.lib >> build.tmp
       echo LIB macro.lib >> build.tmp
@@ -216,11 +218,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640.lib %HB_LIBLIST%
    if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%
    if "%HB_COMPILER%" == "gcc"     gcc %1.c -o%1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
-   if "%HB_COMPILER%" == "mingw32" gcc %1.c -o%1.exe %CFLAGS% -mno-cygwin -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd%HB_MT% -lrtl%HB_MT% -lvm%HB_MT% -lmacro -lpp%HB_MT% -ldbfdbt%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lcommon -luser32 -lwinspool -lole32 -loleaut32 -luuid
+   if "%HB_COMPILER%" == "mingw32" gcc %1.c -o%1.exe %CFLAGS% -mno-cygwin %HB_INC_TEMP% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %HB_LIB_TEMP% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd%HB_MT% -lrtl%HB_MT% -lvm%HB_MT% -lmacro -lpp%HB_MT% -ldbfdbt%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lcommon -luser32 -lwinspool -lole32 -loleaut32 -luuid
    if "%HB_COMPILER%" == "rsxnt"   gcc %1.c -Zwin32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
 
 :C_MSVC
-   if not "%HB_COMPILER%" == "msvc"  goto END
+   if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
    if "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfdbt%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\samples.lib %HB_LIB_INSTALL%\hbzip.lib %ADS_LIBS%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\samples.lib %HB_LIB_INSTALL%\hbzip.lib msvcrt.lib %ADS_LIBS%
@@ -236,6 +238,32 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    @echo Ignore LNK4033 warning
    set LDFLAGS=
 
+:C_WATCOM
+   if not "%HB_COMPILER%" == "watcom"  goto end
+
+   wpp386 -j -w3 -d2 -5s -5r -fp5 -oxehtz -zq -zt0 -mf -bt=NT %1.c -fo=%1.obj
+   echo debug all OP osn=NT OP stack=65536 OP CASEEXACT NAME %1.exe > build.tmp
+   echo FILE %1.obj >> build.tmp
+   echo LIB debug.lib >> build.tmp
+   echo LIB vm.lib >> build.tmp
+   echo LIB rtl.lib >> build.tmp
+   echo LIB %_HB_GT_LIB%.lib >> build.tmp
+   echo LIB lang.lib >> build.tmp
+   echo LIB macro.lib >> build.tmp
+   echo LIB pp.lib >> build.tmp
+   echo LIB dbfntx.lib >> build.tmp
+   echo LIB dbfcdx.lib >> build.tmp
+   echo LIB dbfdbt.lib >> build.tmp
+   echo LIB dbffpt.lib >> build.tmp
+   echo LIB rdd.lib >> build.tmp
+   echo LIB common.lib >> build.tmp
+   echo LIB kernel32.lib >> build.tmp
+   echo LIB user32.lib >> build.tmp
+   echo LIB winspool.lib >> build.tmp
+   echo LIB oleaut32.lib >> build.tmp
+   echo LIB uuid.lib >> build.tmp
+   wlink @build.tmp
+   del build.tmp
    goto END
 
 :A_OS2
