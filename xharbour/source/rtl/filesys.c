@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.91 2004/04/05 11:21:38 druzus Exp $
+ * $Id: filesys.c,v 1.92 2004/04/05 14:36:20 druzus Exp $
  */
 
 /*
@@ -279,7 +279,7 @@
 
 #if defined(HB_WIN32_IO)
    #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 )
-      #if defined(__USE_INLINE__) )
+      #if defined(__USE_INLINE__)
          __inline void * LongToHandle( const long h )
          {
              return((void *) (INT_PTR) h );

@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.2 2004/04/05 13:12:18 srobert Exp $
+ * $Id: fserror.c,v 1.3 2004/04/05 14:36:20 druzus Exp $
  */
 
 /*
@@ -82,10 +82,14 @@ static int hb_errnoToDosError( int ErrCode )
       case ENOENT:
          iResult = 2;   /* File not found */
          break;
+#if defined( ENOTDIR )
       case ENOTDIR:
          iResult = 3;   /* Path not found */
          break;
+#endif
+#if defined( ENFILE )
       case ENFILE:
+#endif
       case EMFILE:
          iResult = 4;   /* Too many open files */
          break;
@@ -101,18 +105,24 @@ static int hb_errnoToDosError( int ErrCode )
       case ENOMEM:
          iResult = 8;   /* Insufficient memory */
          break;
+#if defined( EFAULT )
       case EFAULT:
          iResult = 9;   /* Invalid memory block address */
          break;
+#endif
       case EINVAL:
          iResult = 13;  /* Invalid data */
          break;
+#if defined( EROFS )
       case EROFS:
          iResult = 19;  /* Attempt to write on write-protected diskette */
          break;
+#endif
+#if defined( ESPIPE )
       case ESPIPE:
          iResult = 25;  /* Seek error */
          break;
+#endif
       case EPIPE:
          iResult = 29;  /* Write fault */
          break;

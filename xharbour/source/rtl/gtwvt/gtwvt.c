@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.87 2004/03/31 04:40:23 peterrees Exp $
+ * $Id: gtwvt.c,v 1.88 2004/03/31 05:20:44 vouchcac Exp $
  */
 
 /*
@@ -123,6 +123,7 @@ static int K_Ctrl[] = {
 //
 //                  private functions declaration
 //
+HB_EXTERN_BEGIN
 static void    gt_hbInitStatics( void );
 static HWND    hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow );
 static BOOL    hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row );
@@ -176,7 +177,6 @@ static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPAR
 //
 // mouse initialization was made in cmdarg.c
 //
-extern BOOL    b_MouseEnable;
 
 // set in mainwin.c
 //
@@ -192,6 +192,10 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 /* last updated GT object */
 HB_GT_GOBJECT *last_gobject;
+
+HB_EXTERN_END
+
+extern BOOL    b_MouseEnable;
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -1426,7 +1430,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
 }
 
 //-------------------------------------------------------------------//
-
+#if 0
 static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidth )
 {
   HDC        hdc;
@@ -1451,7 +1455,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
 
   return( ( width <= maxWidth ) && ( height <= maxHeight ) );
 }
-
+#endif
 //-------------------------------------------------------------------//
 
 static void hb_wvt_gtResetWindowSize( HWND hWnd )
