@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3743 2005/01/14 06:16:47 bdj Exp $
+ * $Id: ChangeLog,v 1.3745 2005/01/14 20:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-01-14 20:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  - source/ct/datetime.prg
+  + source/ct/alt/datetime.prg
+  + source/ct/datetime.c
+    * all functions rewritten in C. The clipper behavior of
+      bo* amd eo* date functions is different from documentations:
+      if parameter is empty it's not default to system date, the
+      same behavior now is in harbour
+  + source/ct/alt/dattime2.prg
+  * source/ct/dattime2.prg
+    * some functions rewrittem in C for better perfomance
+  * tests/cttest/datetime.prg
+    * fixes with logical variables
+  * source/ct/Makefile
+    makefile.bc
+    makefile.vc
+    makefile.nt
+    hrbdll.bc
+    hrbdll.vc
+    hrbdll.wc
+    * updated makefiles
+  * makefile.wc
+    * updated for datetime.c and commented !if $(HB_LEX) == SIMPLEX
+      This operator doesn't recognised under OpenWatcom 1.3
+    
 2005-01-14 13:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples/cbtest1.prg
-  + contrib/gtwvw/samples/cbtest6.prg
+  + contrib/gtwvw/samples/cbtest2.prg
     * Samples on how to use GTWVW combobox.
 
 2005-01-14 11:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>

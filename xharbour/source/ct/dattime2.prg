@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.2 2005/01/13 23:00:00 ptsarenko Exp $
+ * $Id: dattime2.prg,v 1.3 2005/01/14 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -21,6 +21,7 @@
  *
  * Copyright 2002 Alan Secker <alansecker@globalnet.co.uk>
  * Copyright 2003 Martin Vogel <vogel@inttec.de>: Enhancements, internationalization, documentation headers
+ * Copyright 2005 Pavel Tsarenko <tpe2@mail.ru>: some functons rewritten in C
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -69,90 +70,7 @@
 #include "hblang.ch"
 
 
-
-FUNCTION addmonth ( ddate, nmth )
-local nDay
-// local ndays
-// local sev
-// local dnew
-// local dEnd
-// local nOldday
-local nMonth
-local nYear
-local nLDOM
-
-//   if nmth > 70 
-//      return ctod ("  /  /    ")
-//   endif
-//
-//   nOldday := day (ddate)
-//   ndays   := nmth * 30
-//
-//   dnew    := ddate + ndays
-//
-//   nMonth  := month ( dnew )
-//   nNyear  := year  ( dnew )
-//
-//   dEnd    := ctod (str (nOldday) + "/" + str(nMonth) + "/" + str (nNyear))
-//
-//   return dEnd  
-
-   if !(valtype (ddate) $ "DN")
-      return ctod("")
-   endif
-
-   if valtype (ddate) == "N"
-      nmth := ddate
-      ddate := date()
-   endif
-
-   nmth = int (nmth)
-
-   nDay = day (ddate)
-   nMonth = month (ddate)
-   nYear = year (ddate)
-
-   nMonth += nmth
-
-   if nMonth <= 0
-      do while nMonth <= 0
-	 nMonth += 12
-	 nYear--
-      enddo
-   endif
-
-   if nMonth > 12
-      do while nMonth > 12
-	 nMonth -= 12
-	 nYear++
-      enddo
-   endif
-
-   // correction for different end of months
-   if nDay > (nLDOM := lastdayom (nMonth))
-     nDay := nLDOM
-   endif
-
-   ddate := stod (strzero (nYear, 4) + strzero (nMonth, 2) + strzero (nDay, 2))
-   return (ddate)
-
-  
-
 FUNCTION ctodow ( cDow )
-//local cWeek  := "SUNMONTUEWEDTHUFRISAT "
-//local nWk    := len (cWeek)
-//local cMatch := left (upper ( Alltrim (cDow)), 3)
-//local n 
-//local nDay   := 0
-//
-//   for n = 1 to nWk step 3
-//        if RTRIM (substr (cWeek, n, 3)) == cMatch
-//           nDay := INT (((n-1) / 3) + 1)
-//           exit
-//        endif
-//   next
-//
-//   return nDay
 
 local nOrdinal := 0
 local bExact
@@ -166,8 +84,8 @@ local bExact
 
   do while nOrdinal < 7
      if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_DAY + nOrdinal))) = cDow
-	set (_SET_EXACT, bExact)
-	return (nOrdinal+1)
+        set (_SET_EXACT, bExact)
+        return (nOrdinal+1)
      endif
      nOrdinal++
   enddo
@@ -205,8 +123,8 @@ local bExact
 
   do while nOrdinal < 12
      if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_MONTH + nOrdinal))) = cDom
-	set (_SET_EXACT, bExact)
-	return (nOrdinal+1)
+        set (_SET_EXACT, bExact)
+        return (nOrdinal+1)
      endif
      nOrdinal++
   enddo
@@ -217,9 +135,6 @@ local bExact
 
 FUNCTION dmy ( ddate, lmode )
 
-//local nMonth  := month (dDate)
-//local nDay    :=   day (dDate)
-//local nYear   :=  year (dDate)
 local nMonth, nDay, nYear 
 
 local cPeriod := ""
@@ -245,137 +160,10 @@ local lSetCentury := __SETCENTURY()
 
    cDate := ltrim ( str ( nDay )) + cPeriod + " " + cMonth + " " + ;
             ltrim ( cYear )
-//            ltrim ( str ( nYear ))
    return cDate
 
 
-#pragma BEGINDUMP
-
-#include "hbapi.h"
-#include "hbdate.h"
-
-
-HB_FUNC( DOY )
-{
-   int iYear, iMonth, iDay;
-   LONG lFirst, lCurrent;
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-
-   if( pDate )
-   {
-      lCurrent = pDate->item.asDate.value;
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-   }
-   else
-   {
-      hb_dateToday( &iYear, &iMonth, &iDay );
-      lCurrent = hb_dateEncode(iYear, iMonth, iDay);
-   }
-
-   lFirst = hb_dateEncode(iYear, 1, 1);
-
-   hb_retnl( lCurrent - lFirst + 1);
-}
-
-HB_FUNC( ISLEAP )
-{
-   int iYear, iMonth, iDay;
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-
-   if( pDate && pDate->item.asDate.value )
-   {
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-   }
-   else
-   {
-      hb_dateToday( &iYear, &iMonth, &iDay );
-   }
-
-   hb_retl( ( ( iYear % 4 == 0 && iYear % 100 != 0 ) || iYear % 400 == 0 ) );
-}
-
-
-HB_FUNC( DAYSTOMONTH )
-{
-   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
-   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
-   int iMonthes[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-
-   hb_retni( (iMonth < 1 && iMonth > 12) ? 0 : iMonthes[iMonth - 1] +
-              ((bLeap && iMonth > 2) ? 1 : 0) );
-}
-
-HB_FUNC( DAYSINMONTH )
-{
-   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
-   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
-
-   if( iMonth == 2)
-   {
-      hb_retni( bLeap ? 29 : 28 );
-   }
-   else if(iMonth == 4 || iMonth == 6 || iMonth == 9 || iMonth == 11)
-   {
-      hb_retni( 30 );
-   }
-   else
-   {
-      hb_retni( 31 );
-   }
-
-}
-
-HB_FUNC( QUARTER )
-{
-   int iYear, iMonth, iDay;
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-
-   if( pDate && pDate->item.asDate.value )
-   {
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-   }
-   else
-   {
-      hb_dateToday( &iYear, &iMonth, &iDay );
-   }
-
-   hb_retni( (iMonth+2) / 3);
-}
-
-
-#pragma ENDDUMP
-
    
-FUNCTION lastdayom ( xDate )
-
-local nMonth := 0
-local nDays  := 0
-local lleap  := .F.
-
-     do case
-        case empty ( xDate)
-             nMonth := month ( date() )
-
-        case valtype ( xDate ) == "D"
-             nMonth  := month (xdate)
-             lleap := isleap ( xdate)
-
-        case valtype (xDate ) == "N"
-             if xdate > 12
-                nmonth := 0
-             else
-                nMonth := xDate
-             endif
-     endcase
-
-     if nmonth != 0
-        ndays := daysInmonth ( nMonth, lleap )
-     endif
-
-     return ndays
-
- 
-
 FUNCTION mdy ( dDate )
 
 local nMonth
@@ -402,121 +190,259 @@ local cYear
    cDate := cMonth + " " + ;
             ltrim ( str ( nDay )) + " " + ;
             ltrim ( cYear )
-   //            ltrim ( str ( nYear ))
    
    return cDate
 
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbdate.h"
+
+BOOL ct_isleap(int iYear)
+{
+   return ( ( iYear % 4 == 0 && iYear % 100 != 0 ) || iYear % 400 == 0 );
+}
+
+int ct_daysinmonth(int iMonth, BOOL bLeap)
+{
+   if( iMonth == 2)
+   {
+      return( bLeap ? 29 : 28 );
+   }
+   else if( iMonth == 4 || iMonth == 6 || iMonth == 9 || iMonth == 11 )
+   {
+      return( 30 );
+   }
+   else
+   {
+      return( 31 );
+   }
+}
+
+int ct_daystomonth(int iMonth, BOOL bLeap)
+{
+   int iMonthes[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+   return( (iMonth < 1 && iMonth > 12) ? 0 : iMonthes[iMonth - 1] +
+           ((bLeap && iMonth > 2) ? 1 : 0) );
+}
+
+LONG ct_doy( LONG lDate )
+{
+   int iYear, iMonth, iDay;
+   LONG lFirst;
+
+   hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+   lFirst = hb_dateEncode(iYear, 1, 1);
+   return( lDate - lFirst + 1 );
+}
+
+HB_FUNC( ADDMONTH )
+{
+   int iYear, iMonth, iDay, iNum, iDays;
+
+   if( ISDATE( 1 ) )
+   {
+      PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      iNum = hb_parni( 2 );
+   }
+   else if( ISNUM(1) )
+   {
+      iNum = hb_parni( 1 );
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_retdl( 0 );
+      return;
+   }
+
+   iMonth += iNum;
+   while( iMonth <= 0)
+   {
+      iMonth += 12;
+      iYear --;
+   }
+   while( iMonth > 12)
+   {
+      iMonth -= 12;
+      iYear ++;
+   }
+
+   iDays = ct_daysinmonth( iMonth, ct_isleap( iYear ) );
+   if( iDay > iDays )
+   {
+      iDay = iDays;
+   }
+
+   hb_retd( iYear, iMonth, iDay);
+}
+
+HB_FUNC( DOY )
+{
+   LONG lDate;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate )
+   {
+      lDate = pDate->item.asDate.value;
+   }
+   else
+   {
+      int iYear, iMonth, iDay;
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+
+   hb_retnl( ct_doy(lDate) );
+}
+
+HB_FUNC( ISLEAP )
+{
+   int iYear, iMonth, iDay;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate && pDate->item.asDate.value )
+   {
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+
+   hb_retl( ct_isleap( iYear ) );
+}
 
 
-FUNCTION ntocdow ( nDay )
-   
-local cDay := ""
-   
-   if nDay >= 1 .AND. nDay <= 7
-     cDay := hb_langmessage (HB_LANG_ITEM_BASE_DAY + (nDay-1))
-   endif
+HB_FUNC( DAYSTOMONTH )
+{
+   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
+   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
 
-   return cDay
+   hb_retni( ct_daystomonth(iMonth, bLeap) );
+}
 
+HB_FUNC( DAYSINMONTH )
+{
+   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
+   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
 
+   hb_retni( ct_daysinmonth( iMonth, bLeap) );
 
-FUNCTION ntocmonth ( nMonthNum )
-   
-local cMonth := ""
-   
-   if nMonthNum >= 1 .AND. nMonthNum <= 12
-     cMonth := hb_langmessage (HB_LANG_ITEM_BASE_MONTH + (nMonthNum-1))
-   endif
+}
 
-//  do case
-//     case nMonthNum == 1
-//          cMonth := "January"
-//     case nMonthNum == 2
-//          cMonth := "February"
-//     case nMonthNum == 3
-//          cMonth := "March"
-//     case nMonthNum == 4
-//          cMonth := "April"
-//     case nMonthNum == 5
-//          cMonth := "May"
-//     case nMonthNum == 6
-//          cMonth := "June"
-//     case nMonthNum == 7
-//          cMonth := "July"
-//     case nMonthNum == 8
-//          cMonth := "August"
-//     case nMonthNum == 9
-//          cMonth := "September"
-//     case nMonthNum == 10
-//          cMonth := "October"
-//    case nMonthNum == 11
-//          cMonth := "November"
-//     case nMonthNum == 12
-//          cMonth := "December"
-//  endcase
+HB_FUNC( QUARTER )
+{
+   int iYear, iMonth, iDay;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
-    return cMonth
+   if( pDate )
+   {
+      if( pDate->item.asDate.value )
+      {
+         hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      }
+      else
+      {
+         hb_retni(0);
+         return;
+      }
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
 
+   hb_retni( (iMonth+2) / 3);
+}
 
+HB_FUNC( LASTDAYOM )
+{
+   BOOL bLeap = 0;
+   int iYear, iMonth, iDay;
 
-FUNCTION week ( dDate, lSWN )
+   if ( ISDATE(1) )
+   {
+      PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+      LONG lDate = pDate->item.asDate.value;
+      if( lDate )
+      {
+         hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      }
+      else
+      {
+         hb_dateToday( &iYear, &iMonth, &iDay );
+      }
+      bLeap = ct_isleap( iYear );
+   }
+   else if( ISNUM(1) )
+   {
+      iMonth = hb_parni(1);
+   }
+   else
+   {
+      iMonth = 0;
+   }
 
-local nMonth
-local nDays
-local nDay
-local nYear
-local nWeek
-local nPart
-local dDate2
-// local nleap
+   hb_retni( (iMonth && (iMonth <= 12) ? ct_daysinmonth(iMonth, bLeap) : 0) );
 
-//       do case
-//	  case valtype (dDate) == "D" .and. empty ( dDate)
-//             return nDays
-//	     
-//	  case empty (dDate)
-//             dDate := date()
-//       endcase
+}
 
-     if valtype (dDate) == "D" .and. empty (dDate)
-	return 0
-     endif
+HB_FUNC( NTOCDOW )
+{
+   hb_retc( hb_dateCDOW( hb_parni(1) ) );
+}
 
-     if empty (dDate)
-	dDate := date()
-     endif
+HB_FUNC( NTOCMONTH )
+{
+   hb_retc( hb_dateCMonth( hb_parni(1) ) );
+}
 
-     nMonth  := month (dDate)
-     nDay    :=   day (dDate)
-     nYear   :=  year (dDate)
+HB_FUNC( WEEK )
+{
+   int iYear, iMonth, iDay, iWeek;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = 0;
+   BOOL bSWN  = ( ISLOG(2) ? hb_parl(2) : 0);
 
-     if valtype (lSWN) != "L"
-	lSWN := .F.
-     endif
+   if( ISDATE(1) )
+   {
+      lDate = pDate->item.asDate.value;
+      if( ! lDate )
+      {
+         hb_retni( 0 );
+         return;
+      }
+   }
 
-     if lSWN
-       // simple week number
+   if( lDate )
+   {
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
 
-       //     nleap := if (isleap (dDate), 1, nleap)
-       //     ndays := daystomonth ( nMonth, nleap ) + nday
-       nDays := daystomonth ( nMonth, isleap (dDate)) + nDay
-       
-       nPart := nDays % 7
-       nWeek := INT (nDays / 7)
-       
-       nWeek := INT (if ( nPart > 0, ++ nWeek, nWeek))
+   if( bSWN )
+   {
+      int iDays = ct_daystomonth( iMonth, ct_isleap( iYear )) + iDay;
+      int iPart = (iDays % 7);
 
-     else
-	// ISO8601 week number
-	dDate2 := dDate + 3 - ((dow(dDate)+5) % 7)
-	nWeek := 1 + int ((dDate2 - boy (dDate2)) / 7) 
-	
-     endif
+      iWeek = iDays / 7;
+      if( iPart > 0 ) iWeek ++;
+   }
+   else
+   {
+      LONG lDate2 = lDate + 3 - ((hb_dateDOW( iYear, iMonth, iDay ) + 5) % 7);
 
-     return nWeek
+      iWeek = (ct_doy(lDate2) + 1) / 7 + 1;
+   }
 
+   hb_retni( iWeek );
+}
 
-
-
-
-
+#pragma ENDDUMP

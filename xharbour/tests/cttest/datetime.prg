@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.prg,v 1.1 2003/03/04 21:06:07 lculik Exp $
+ * $Id: datetime.prg,v 1.2 2004/08/25 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -475,9 +475,7 @@ local lleap   := FALSE
               loop
       endcase
 
-     if cLeap == "Y"
-         lleap := TRUE
-      endif
+      lleap := ( Upper(cLeap) == "Y" )
       
       nKey := lastkey()
    
@@ -543,9 +541,7 @@ do while c
    if nKey == K_ESC
       c := FALSE
    else
-      if cLeap == "Y"
-         lLeap := .T.
-      endif 
+      lleap := ( Upper(cLeap) == "Y" )
    
       @ 11, 10 say "The day number is " +  ;
                              ltrim (str ( daystomonth ( nMonth, lLeap )))
@@ -603,7 +599,7 @@ local nKey
       if nKey == K_ESC
          c := FALSE
       else
-         if (cMode == "Y", lMode := .T., lMode := .F.)
+         if (Upper(cMode) == "Y", lMode := .T., lMode := .F.)
    
          @ 12, 10 say "The date string returned is " + ;
                            ltrim (dmy ( ddate, lmode ))

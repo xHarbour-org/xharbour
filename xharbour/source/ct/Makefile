@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.14 2004/12/10 03:10:24 mlombardo Exp $
+# $Id: Makefile,v 1.16 2005/01/14 11:01:58 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -35,6 +35,7 @@ C_SOURCES = \
    ctset.c \
    ctstr.c \
    ctwin.c \
+   datetime.c \
    dbftools.c \
    disk.c \
    exponent.c \
@@ -80,7 +81,6 @@ PRG_SOURCES= \
    ct.prg \
    ctmisc.prg \
    cttime.prg \
-   datetime.prg \
    dattime2.prg \
    dattime3.prg \
    diskutil.prg \

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.117 2004/12/28 06:39:00 druzus Exp $
+# $Id: makefile.nt,v 1.119 2005/01/14 20:00:00 ptsarenko Exp $
 #
 
 #
@@ -1174,6 +1174,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ctset.obj \
    $(OBJ_DIR)$(MT)\ctstr.obj \
    $(OBJ_DIR)$(MT)\ctwin.obj \
+   $(OBJ_DIR)$(MT)\datetime.obj \
    $(OBJ_DIR)$(MT)\dbftools.obj \
    $(OBJ_DIR)$(MT)\disk.obj \
    $(OBJ_DIR)$(MT)\exponent.obj \
@@ -1217,7 +1218,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ct.obj \
    $(OBJ_DIR)$(MT)\ctmisc.obj \
    $(OBJ_DIR)$(MT)\cttime.obj \
-   $(OBJ_DIR)$(MT)\datetime.obj \
    $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dattime3.obj \
    $(OBJ_DIR)$(MT)\diskutil.obj \

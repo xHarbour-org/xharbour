@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.61 2004/12/25 12:09:31 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.63 2005/01/14 20:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -565,6 +565,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctpad.obj \
   $(OBJ_DIR)\ctset.obj \
   $(OBJ_DIR)\ctstr.obj \
+  $(OBJ_DIR)\datetime.obj \
   $(OBJ_DIR)\dbftools.obj \
   $(OBJ_DIR)\disk.obj \
   $(OBJ_DIR)\exponent.obj \
@@ -607,7 +608,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctmisc.obj \
   $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
-  $(OBJ_DIR)\datetime.obj \
   $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
@@ -2206,6 +2206,9 @@ $(OBJ_DIR)\ctset.obj : $(CT_DIR)\ctset.c
 $(OBJ_DIR)\ctstr.obj : $(CT_DIR)\ctstr.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
@@ -2345,12 +2348,6 @@ $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\datetime.c : $(CT_DIR)\datetime.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\datetime.obj : $(OBJ_DIR)\datetime.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.80 2004/12/25 17:24:38 patrickmast Exp $
+# $Id: hrbdll.bc,v 1.82 2005/01/14 20:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -514,6 +514,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctpad.obj \
   $(OBJ_DIR)\ctset.obj \
   $(OBJ_DIR)\ctstr.obj \
+  $(OBJ_DIR)\datetime.obj \
   $(OBJ_DIR)\dbftools.obj \
   $(OBJ_DIR)\disk.obj \
   $(OBJ_DIR)\exponent.obj \
@@ -556,7 +557,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctmisc.obj \
   $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
-  $(OBJ_DIR)\datetime.obj \
   $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
@@ -1062,6 +1062,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ctpad.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ctset.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ctstr.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\datetime.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbftools.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\disk.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\exponent.obj          + >> hdll.tmp
@@ -1104,7 +1105,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ctmisc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cttime.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ctwin.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\datetime.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dattime2.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dattime3.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\diskutil.obj          + >> hdll.tmp
@@ -2798,6 +2798,9 @@ $(OBJ_DIR)\ctset.obj : $(CT_DIR)\ctset.c
 $(OBJ_DIR)\ctstr.obj : $(CT_DIR)\ctstr.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2937,12 +2940,6 @@ $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\datetime.c : $(CT_DIR)\datetime.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\datetime.obj : $(OBJ_DIR)\datetime.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg

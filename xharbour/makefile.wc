@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.37 2004/12/28 06:39:01 druzus Exp $
+# $Id: makefile.wc,v 1.39 2005/01/14 20:00:00 ptsarenko Exp $
 #
 
 #
@@ -142,9 +142,9 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -dSIMPLEX -dHB_THREAD_SUPPORT -dHB_GUI
 CLIBFLAGS = -bm -dHB_THREAD_SUPPORT $(CLIBFLAGS)
 !endif
 
-!if $(HB_LEX) == SIMPLEX
+#!if $(HB_LEX) == SIMPLEX
 CLIBFLAGS = $(CLIBFLAGS) -dSIMPLEX
-!endif
+#!endif
 
 !ifdef HB_DOC_PDF
 HARBOURFLAGS = $(HARBOURFLAGS) -dPDF
