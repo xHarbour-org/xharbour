@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.1.1.1 2001/12/21 10:41:59 ronpinkas Exp $
+ * $Id: terror.prg,v 1.2 2002/12/08 20:10:50 ronpinkas Exp $
  */
 
 /*
@@ -114,4 +114,6 @@ PROCEDURE HB_ResetTry()
 
 RETURN
 
+FUNCTION Throw( oErr )
 
+RETURN Eval( ErrorBlock(), oErr )

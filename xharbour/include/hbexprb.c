@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.46 2003/02/28 10:37:19 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.47 2003/03/07 23:14:09 ronpinkas Exp $
  */
 
 /*
@@ -344,7 +344,11 @@ static HB_EXPR_FUNC( hb_compExprUseString )
          #endif
          break;
       case HB_EA_ARRAY_INDEX:
-         hb_compErrorIndex( pSelf );     /* string cannot be used as index element */
+         #ifdef HB_C52_STRICT
+            hb_compErrorIndex( pSelf );     /* string cannot be used as index element */
+         #else
+            // xHarbour supports Associative Arrays.
+         #endif
          break;
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );

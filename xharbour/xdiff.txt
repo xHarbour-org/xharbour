@@ -5,6 +5,29 @@ input.
 As it stands at this point, xHarbour offers many Syntax extensions over Harbour
 and Clipper, including:
 
+Associative Arrays:
+-------------------
+
+Associative Arrays are like LITE Objects. Properties may be added on the fly
+without any declaration, much like new PRIVATE or PUBLIC can be created by
+simply assigning a value.
+
+Associative Arrays, may use Objects Syntax (':' operator) or Array Index Syntax
+('[]' operator) with the Property Name as the INDEX.
+
+New Property will automatically be created upon first assignment.
+
+   Syntax:
+   -------
+
+   <lValue> := TAssociativeArray()
+
+    <AA>[ "<NewProperty>" ] := <xValue>
+    <AA>:<NewProperty> := <xValue>
+
+    <AA>[ "<Property>" ]
+    <AA>:<Property>
+
 SWITCH syntax:
 -----------
 

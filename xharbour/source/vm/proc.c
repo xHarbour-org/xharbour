@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.4 2003/03/07 03:04:47 ronpinkas Exp $
+ * $Id: proc.c,v 1.5 2003/03/07 05:32:43 ronpinkas Exp $
  */
 
 /*
@@ -147,7 +147,15 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 
       if( uLine )
       {
-         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
+         if( strcmp( "THROW", ( *pBase )->item.asSymbol.value->szName ) == 0 )
+         {
+            *uLine = 0;
+         }
+         else if( HB_IS_OBJECT( *( pBase + 1 ) ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( *( pBase + 1 ) ) ) == 0 )
+         {
+            *uLine = 0;
+         }
+         else if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
          {
             *uLine = ( *( pBase + 1) )->item.asBlock.value->lineno;
          }

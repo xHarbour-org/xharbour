@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.14 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: tobject.prg,v 1.1.1.1 2001/12/21 10:42:08 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ FUNCTION HBObject()
       s_oClass:AddInline( "ISDERIVEDFROM"  , {| Self, xPar1 | __ObjDerivedFrom( Self, xPar1 ) }, nScope )
       /* Class(y) */
       s_oClass:AddInline( "ISKINDOF"       , {| Self, xPar1 | __ObjDerivedFrom( Self, xPar1 ) }, nScope )
-                                    
+
       s_oClass:AddMethod( "NEW"  , @HBObject_New()  , nScope )
       s_oClass:AddMethod( "INIT" , @HBObject_Init() , nScope )
 
@@ -178,4 +178,50 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
 
    RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 
+
+FUNCTION TAssociativeArray
+
+   STATIC s_hClass
+
+   IF s_hClass == NIL
+      s_hClass := __clsNew( "TASSOCIATIVEARRAY", 1, 0 )
+
+      __clsAddMsg( s_hClass,   "$Members", 1, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
+      __clsAddMsg( s_hClass,  "_$Members", 1, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+
+      __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
+   ENDIF
+
+RETURN __clsInst( s_hClass )
+
+STATIC FUNCTION TAssociativeArray_OnError( xParam )
+
+    LOCAL cMsg := __GetMessage()
+    LOCAL aMembers := QSelf()[1]
+    LOCAL bAssign := .F.
+    LOCAL nMsg
+
+    IF cMsg[1] == '_'
+       bAssign := .T.
+       cMsg := SubStr( cMsg, 2 )
+    ENDIF
+
+    nMsg := aScan( aMembers, {|aMembers| aMembers[1] == cMsg } )
+
+    IF nMsg = 0
+       IF bAssign
+          aAdd( aMembers, { cMsg, xParam } )
+       ELSE
+          //Throw( ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+          Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+       ENDIF
+    ELSE
+       IF bAssign
+          aMembers[nMsg][2] := xParam
+       ELSE
+          RETURN aMembers[nMsg][2]
+       ENDIF
+    ENDIF
+
+RETURN NIL
 

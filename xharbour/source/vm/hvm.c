@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.174 2003/03/07 06:06:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.175 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -2488,7 +2488,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 */
                s_uiActionRequest = 0;
             }
-            else 
+            else
             {
                HB_STACK_UNLOCK;
                break;
@@ -2522,7 +2522,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    /* No cancellation here */
    HB_STACK_LOCK;
-   
+
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    if( pSymbols )
@@ -2546,7 +2546,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
-   
+
    HB_STACK_UNLOCK;
 }
 
@@ -3697,6 +3697,21 @@ static void hb_vmArrayPush( void )
       lIndex = ( long ) pIndex->item.asString.value[0];
       bStrIndex = TRUE;
    }
+   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+   {
+      hb_vmPushSymbol( hb_dynsymGet( pIndex->item.asString.value )->pSymbol );
+      hb_itemPushForward( pArray );
+
+      hb_vmSend( 0 );
+
+      // Pop pIndex.
+      hb_stackPop();
+
+      // Recycle pArray.
+      hb_itemForwardValue( pArray, &(HB_VM_STACK.Return ) );
+
+      return;
+   }
  #endif
    else
    {
@@ -3874,13 +3889,58 @@ static void hb_vmArrayPop( void )
    {
       lIndex = ( long ) pIndex->item.asDouble.value;
    }
+ #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
       lIndex = ( long ) pIndex->item.asString.value[0];
    }
+   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+   {
+      char szMessage[ HB_SYMBOL_NAME_LEN + 1 ];
+      HB_SYMB Sym;
+
+      szMessage[0] = '_';
+      szMessage[1] = '\0';
+      strcat( szMessage, pIndex->item.asString.value );
+      // Optimized - recycling the paramaters.
+      #if 1
+         // Swap - pIndex no longer needed.
+         hb_itemForwardValue( pIndex, pValue );
+
+         // Recicle pValue as Message.
+         pValue->type = HB_IT_SYMBOL;
+         pValue->item.asSymbol.value = hb_dynsymGet( szMessage )->pSymbol;
+         pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
+
+         if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
+         {
+            hb_itemCopy( hb_stackItemFromTop( -2 ), pArray );
+         }
+
+         hb_vmSend( 1 );
+      #else
+         hb_vmPushSymbol( hb_dynsymGet( szMessage )->pSymbol );
+         hb_vmPush( pArray );
+         hb_vmPush( pValue );
+
+         hb_vmSend( 1 );
+
+         hb_stackPop();
+         hb_stackPop();
+         hb_stackPop();
+      #endif
+
+      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
+      {
+         hb_itemClear( &(HB_VM_STACK.Return) );
+      }
+
+      return;
+   }
+ #endif
    else
    {
-      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
       return;
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.817 2003/03/08 04:26:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.818 2003/03/08 13:37:46 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-08 14:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * source/vm/hvm.c
+  * source/rtl/tobject.prg
+  * source/vm/proc.c
+    + Added support for Associative Arrays.
+
+  * source/vm/break.c
+    - Removed Throw()
+  * source/rtl/terror.prg
+    + Added corrected Throw()
+
+  * xdiff.txt
+    * Updated.
+
+  + tests/assocarr.prg
+    + Sample of new Associative Arrays.
+
+  /*
+     NOTE: Associative Arrays are like LITE Objects. Properties may be added on the fly
+           without any declaration, much like new PRIVATE or PUBLIC can be created by
+           simply assigning a value.
+
+           Associative Arrays, may use Objects Syntax (':' operator) or Array Index Syntax
+           ('[]' operator) with the Property Name as the INDEX.
+
+  */
 
 2003-03-08 15:00 UTC+0300 Phil Krylov <phil@mail.ru>
   * source/rdd/dbfntx/dbfntx1.c

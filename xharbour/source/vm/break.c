@@ -1,5 +1,5 @@
 /*
- * $Id: break.c,v 1.1.1.1 2001/12/21 10:40:46 ronpinkas Exp $
+ * $Id: break.c,v 1.2 2002/12/08 20:10:50 ronpinkas Exp $
  */
 
 /*
@@ -62,9 +62,3 @@ HB_FUNC( BREAK )
 {
    hb_vmRequestBreak( hb_param( 1, HB_IT_ANY ) );
 }
-
-HB_FUNC( THROW )
-{
-   hb_vmRequestBreak( hb_param( 1, HB_IT_ANY ) );
-}
-
