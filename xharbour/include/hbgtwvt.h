@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.23 2004/05/22 11:59:42 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.24 2004/06/05 09:56:26 vouchcac Exp $
  */
 
 /*
@@ -283,6 +283,10 @@ void   HB_EXPORT hb_wvt_wvtUtils( void );
 
 #ifndef IDC_HAND
    #define IDC_HAND MAKEINTRESOURCE(32649)
+#endif
+
+#ifndef GRADIENT_FILL_RECT_H
+   #define GRADIENT_FILL_RECT_H 0x00
 #endif
 
 //-------------------------------------------------------------------//

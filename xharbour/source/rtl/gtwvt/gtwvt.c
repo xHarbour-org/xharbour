@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.109 2004/06/06 18:33:24 bdj Exp $
+ * $Id: gtwvt.c,v 1.110 2004/06/09 06:24:00 bdj Exp $
  */
 
 /*
@@ -1460,7 +1460,7 @@ static void hb_wvt_gtCreateObjects( void )
    _s.diagonalBrush = CreateBrushIndirect( &lb );
 
    lb.lbStyle      = BS_SOLID;
-   lb.lbColor      = NULL;  // RGB( 0,0,0 );
+   lb.lbColor      = 0; // NULL;  // RGB( 0,0,0 );
    lb.lbHatch      = 0;
    _s.solidBrush = CreateBrushIndirect( &lb );
 
