@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.10 2003/12/23 16:21:40 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.11 2003/12/23 21:01:40 maurifull Exp $
  */
 
 /*
@@ -127,7 +127,7 @@ typedef struct global_data
   BOOL      FixedFont;                 // TRUE if current font is a fixed font
   int       FixedSize[WVT_MAX_COLS];   // buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
   USHORT    ROWS;                      // number of displayable rows in window
-  USHORT    COLS;                      // number of displayable columns in window  
+  USHORT    COLS;                      // number of displayable columns in window
   COLORREF  foreground;                // forground colour
   COLORREF  background;                // background colour
 
@@ -558,7 +558,9 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
 void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
 {
   USHORT irow, icol, index;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
+
+  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, (int) attr));
+
   for ( irow = rowStart; irow <=rowStop; irow++)
   {
     index = hb_wvt_gtGetIndexForTextBuffer(colStart, irow);
@@ -689,8 +691,10 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 {
   BOOL bResult= FALSE;
-  HFONT hFont
+  HFONT hFont;
+
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
+
   if (row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS)
   {
     hFont = hb_wvt_gtGetFont(_s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage);
