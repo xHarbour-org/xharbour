@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.ch,v 1.2 2004/08/02 19:17:25 ronpinkas Exp $
+ * $Id: gfx.ch,v 1.3 2004/08/02 21:05:49 lf_sfnet Exp $
  *
  */
 
@@ -54,7 +54,7 @@
 
 /*
  * WARNING: this file is also included in C code, so don't add xHarbour specific stuff,
- * or protect it under #ifndef's
+ * or protect it under #ifdef __XHARBOUR__
  *
  */
 
@@ -80,18 +80,18 @@
 #define GFX_RELEASESCREEN   2  // Release a previouly 'aquired' screen
 #define GFX_MAKECOLOR       3  // Calculate gfx color number based on RGBA values
 /* Functions that affect drawing mode */
-#define GFX_DRAWINGMODE    10
+#define GFX_DRAWINGMODE    20
 /* Drawing primitives */
-#define GFX_GETPIXEL       21
-#define GFX_PUTPIXEL       22
-#define GFX_LINE           23
-#define GFX_RECT           24
-#define GFX_FILLEDRECT     25
-#define GFX_CIRCLE         26
-#define GFX_FILLEDCIRCLE   27
-#define GFX_ELLIPSE        28
-#define GFX_FILLEDELLIPSE  29
-#define GFX_FLOODFILL      30
+#define GFX_GETPIXEL       50
+#define GFX_PUTPIXEL       51
+#define GFX_LINE           52
+#define GFX_RECT           53
+#define GFX_FILLEDRECT     54
+#define GFX_CIRCLE         55
+#define GFX_FILLEDCIRCLE   56
+#define GFX_ELLIPSE        57
+#define GFX_FILLEDELLIPSE  58
+#define GFX_FLOODFILL      59
 
 /* Drawing mode constants */
 #define GFX_MODE_SOLID      1  // Solid mode, no translucency, no patterned primitives

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.58 2004/06/17 22:14:39 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.59 2004/08/02 01:46:16 maurifull Exp $
  */
 
 /*
@@ -1962,6 +1962,16 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
   HB_SYMBOL_UNUSED( iColor );
 
   return 0;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
 }
 
 /* ******** Graphics API end ******** */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.32 2004/06/29 03:58:27 guerra000 Exp $
+ * $Id: hbapigt.h,v 1.33 2004/08/02 01:46:12 maurifull Exp $
  */
 
 /*
@@ -451,7 +451,8 @@ extern void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize );
 extern int  hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
 
 /* Graphics API */
-extern int hb_gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor );
+extern int  hb_gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor );
+extern void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth );
 
 /* for compilation with multi GT drivers
    User can choose GT on runtime by //GT:<gtname> switch [druzus] */
@@ -595,6 +596,7 @@ typedef struct _HB_GT_FUNCS
 
     /* Graphics API */
     int     (* gfxPrimitive) (int, int, int, int, int, int);
+    void    (* gfxText) ( int, int, char *, int, int, int );
 } HB_GT_FUNCS, * PHB_GT_FUNCS;
 
 typedef struct _HB_GT_INIT
@@ -686,7 +688,8 @@ extern void HB_GT_FUNC( gt_update( int status ) );
 extern int  HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam ));
 
 /* Graphics API */
-extern int HB_GT_FUNC( gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor ));
+extern int HB_GT_FUNC( gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) );
+extern void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) );
 
 #else
 #  define HB_GT_FUNC(x)   HB_GT_FUNC_(x)

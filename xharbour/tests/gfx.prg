@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gfx.prg,v 1.1 2004/08/02 01:46:17 maurifull Exp $
  *
  */
 
@@ -48,7 +48,7 @@ Local nTop, nLeft, nHeight, nWidth, nColor, nSec := Seconds()
     nWidth := Int(hb_Random(251))
     nColor := gfxMakeColor(Int(hb_Random(32, 256)), Int(hb_Random(32, 256)), Int(hb_Random(32, 256)))
 
-    Switch Int(hb_Random(1, 8))
+    Switch Int(hb_Random(1, 9))
       Case 1
         gfxLine(nTop, nLeft, nTop + nHeight, nLeft + nWidth, nColor)
         Exit
@@ -73,6 +73,13 @@ Local nTop, nLeft, nHeight, nWidth, nColor, nSec := Seconds()
       Case 7
         nTop += nHeight
         gfxFilledEllipse(nTop, nLeft, nHeight, nWidth, nColor)
+        Exit
+      Case 8
+        nHeight %= 64
+        If nHeight % 2 == 1
+          nHeight++
+        End
+        gfxText(nTop, nLeft, "Hello", nColor, nHeight)
         Exit
     End
     If Seconds() - nSec > 3

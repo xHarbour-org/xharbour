@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.122 2004/07/29 15:14:39 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.123 2004/08/02 01:46:16 maurifull Exp $
  */
 
 /*
@@ -4172,6 +4172,16 @@ int           iRet = 0;
   }
 
   return iRet;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
 }
 
 /* ******** Graphics API end ******** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.28 2004/07/31 00:34:53 maurifull Exp $
+ * $Id: gtalleg.c,v 1.29 2004/08/02 01:46:13 maurifull Exp $
  */
 
 /*
@@ -2010,6 +2010,24 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
   return 0;
 }
 
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+
+   HB_SYMBOL_UNUSED( iWidth );
+
+   if ( iSize )
+   {
+      ssfSetFontSize( ssfDefaultFont, (unsigned short) iSize);
+   }
+   
+   ssfDrawText( al_screen, ssfDefaultFont, cBuf, iLeft, iTop, iColor );
+
+   if ( iSize )
+   {
+      ssfSetFontSize( ssfDefaultFont, s_byFontSize );
+   }
+}
+
 /* ******** Graphics API end ******** */
 
 /* ************************** Clipboard support ********************************** */
@@ -2102,6 +2120,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 
    /* Graphics API */
    gt_funcs->gfxPrimitive       = HB_GT_FUNC( gt_gfxPrimitive );
+   gt_funcs->gfxText            = HB_GT_FUNC( gt_gfxText );
 }
 
 static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))

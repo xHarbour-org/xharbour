@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.22 2004/04/01 22:00:42 druzus Exp $
+ * $Id: gtnul.c,v 1.23 2004/08/02 01:46:14 maurifull Exp $
  */
 
 /*
@@ -683,6 +683,16 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
   return 0;
 }
 
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
+}
+
 /* ******** Graphics API end ******** */
 
 /* ********************************************************************** */
@@ -940,6 +950,11 @@ int hb_gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight,
    return GT_FUNCS.gfxPrimitive( iType, iTop, iLeft, iBottom, iRight, iColor );
 }
 
+void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth )
+{
+   GT_FUNCS.gfxText( iTop, iLeft, cBuf, iColor, iSize, iWidth );
+}
+
 /* ********************************************************************** */
 
 void hb_mouse_Init( void )
@@ -1137,6 +1152,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
+    gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
 }
 
 /* ********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.18 2004/08/02 01:46:14 maurifull Exp $
+ * $Id: gtdos.c,v 1.19 2004/08/02 20:11:14 lf_sfnet Exp $
  */
 
 /*
@@ -1793,7 +1793,15 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
   return 0;
 }
 
-/* ******** Graphics API end ******** */
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
+}
 
 /* ******** Graphics API end ******** */
 

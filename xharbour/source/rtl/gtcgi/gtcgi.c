@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.15 2004/03/23 12:43:00 andijahja Exp $
+ * $Id: gtcgi.c,v 1.16 2004/08/02 01:46:13 maurifull Exp $
  */
 
 /*
@@ -688,6 +688,16 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
   HB_SYMBOL_UNUSED( iColor );
 
   return 0;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
 }
 
 /* ******** Graphics API end ******** */
