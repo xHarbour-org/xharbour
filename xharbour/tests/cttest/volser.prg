@@ -9,15 +9,12 @@ Local cDrive,nSerial,cHex
 
 cls
 
-cDrive := "C:"
+cDrive := "C:\"
 
-@10,5 say "Enter a drive letter to query serial number : " get cDrive pict "!!!"
+@10,5 say "Enter a drive letter to query serial number : " get cDrive
 read
 
 // note that the trailing backslash is required.
-// ex: ("C:\").
-
-cDrive += "\"
 
 nSerial := VolSerial( cDrive )
 

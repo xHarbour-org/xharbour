@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3958 2005/03/18 05:24:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3960 2005/03/18 10:34:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-18 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com>
+  * xharbour/ct/disk.c
+    * Minor fix in volume function line 269, changed: 
+    * strnpy( sRootBuf, fname->szPath, 2) to strnpy( sRootBuf, fname->szPath, 3) 
+    * to add trailing backslash.
+
+  * xharbour/tests/cttests/volget.prg, volset.prg, volser.prg
+    * Minor changes in these tests to work properly with recent changes.
 
 2005-03-18 08:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c

@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.8 2005/03/17 13:54:08 andijahja Exp $
+ * $Id: disk.c,v 1.10 2005/03/18 09:47:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -229,19 +229,20 @@ HB_FUNC( NUMDISKL )
 
 
 /*
-Volume() depends of the CSETSAFETY() setting and, if is true, does not overwrite an 
-existing label. 
-Syntax is: Volume("x:test") or Volume("x:\test"), where "x" is the
-any drive letter and "test" will be the new volume name. 
-Note:
-1) if the drive letter is not suplied, then the current drive will 
-   be used to change voloume name.
-2) if Volume("x:") or Volume("x:\") then the volume name of the drive
-   "x:" will be erased.
-3) if Volume("") or Volume() then the volume name of the current drive 
-   will be erased.
-
-*/
+ * Volume() depends of the CSETSAFETY() setting and, if is true, does not
+ * overwrite an existing label. 
+ *
+ * Syntax is: Volume("x:test") or Volume("x:\test"), where "x" is the
+ * any drive letter and "test" will be the new volume name. 
+ *
+ * Notes:
+ * 1) if the drive letter is not suplied, then the current drive will 
+ *    be used to change voloume name.
+ * 2) if Volume("x:") or Volume("x:\") then the volume name of the drive
+ *    "x:" will be erased.
+ * 3) if Volume("") or Volume() then the volume name of the current drive 
+ *   will be erased.
+ */
 
 extern BOOL ct_getsafety( void );  // this function is in ct/strfile.c
 
@@ -265,7 +266,7 @@ if ( !ct_getsafety() )
      {
         if( fname->szPath )
         {
-         strncpy( sRootBuf, fname->szPath, 2 ); // truncate in 2 positions: trailing backslash isn't needed.
+         strncpy( sRootBuf, fname->szPath, 3 );
          sRoot = sRootBuf;
         }
         if( fname->szName )
@@ -290,12 +291,11 @@ if ( !ct_getsafety() )
 }
 
 /*
- GetVolInfo() is a new function. It returns the volume name of a Floppy, CD,
- Hard-disk or network drive.
- Sintax is: GetVolInfo("x:\")
- Note that the trailing backslash is required.
- In the near future, this function will be increased to return serial number also.
-*/
+ * GetVolInfo() is a new function. It returns the volume name of a Floppy, CD,
+ * Hard-disk or mapped network drive.
+ * Sintax is: GetVolInfo("x:\")
+ * Note that the trailing backslash is required.
+ */
 HB_FUNC( GETVOLINFO )
 {
 #if defined(HB_OS_WIN_32)
@@ -327,8 +327,13 @@ HB_FUNC( GETVOLINFO )
  * VolSerial() function returns the volume serial number of an drive letter like
  * floppy, Hard-disk, CD or mapped network drive. The return value is a dword
  * type. If the drive is not available, volserial() returns -1.
- * To convert in the hex format, call hb_numtohex() function. Example:
- * hb_numtohex( volserial("c:\")). See volser.prg in xharbour\tests\ct folder.
+ *
+ * Sintax is: VolSerial("x:\")
+ * Note that the trailing backslash is required.
+ *
+ * To convert in the hex format, call hb_numtohex() function. 
+ * Example: hb_numtohex( volserial("c:\")). 
+ * See volser.prg in xharbour\tests\cttest folder.
  */
 
 HB_FUNC( VOLSERIAL )

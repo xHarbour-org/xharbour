@@ -9,14 +9,13 @@ Local cDrive
 
 cls
 
-cDrive := "c"
+cDrive := "C:\"
 
-@10,5 say "Enter a drive letter to query volume : " get cDrive pict "!"
+@10,5 say "Enter a drive letter to query volume : " get cDrive 
 read
 
 // note that trainling backslash is required.
-
-@12,5 say "The volume of drive <"+upper(cDrive)+":> is "+GetVolInfo( cDrive+":\" )
+@12,5 say "The volume of drive <"+upper(cDrive)+":> is "+GetVolInfo( cDrive )
  
 return nil
 
