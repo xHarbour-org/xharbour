@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.14 2003/12/28 22:25:35 druzus Exp $
+# $Id: Makefile,v 1.15 2004/08/02 21:05:49 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -66,6 +66,8 @@ endif
 LIBNAME=vm
 
 DIRS=mainstd \
+	  optcon \
+	  optgui
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf

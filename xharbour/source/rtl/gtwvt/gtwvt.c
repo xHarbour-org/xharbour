@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.123 2004/08/02 01:46:16 maurifull Exp $
+ * $Id: gtwvt.c,v 1.124 2004/08/06 02:25:55 maurifull Exp $
  */
 
 /*
@@ -1976,7 +1976,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           }
           else if ( bCtrl && wParam == VK_TAB ) // K_CTRL_TAB
           {
-            hb_wvt_gtAddCharToInputQueue( K_CTRL_TAB );
+             if ( bShift ) 
+             {
+                hb_wvt_gtAddCharToInputQueue( K_CTRL_SH_TAB );
+             }
+             else
+             {
+                hb_wvt_gtAddCharToInputQueue( K_CTRL_TAB );
+             }   
           }
           else if ( iScanCode == 70 ) // Ctrl_Break key OR Scroll Lock Key
           {
