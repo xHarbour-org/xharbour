@@ -1,11 +1,11 @@
 /*
- * $Id: diskutil.prg,v 1.3 2005/01/04 23:13:00 modalsist Exp $
+ * $Id: diskutil.prg,v 1.4 2005/01/05 11:56:55 modalsist Exp $
  */
 /*
- * xHarbour Project source code:
- * LibCT Disk, File and Directory management.
- * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
- * www - http://www.xharbour.org
+ * xHarbour Project source code.
+ * CT Disk, File and Directory management.
+ * Copyright 2004-2005 Eduardo Fernandes <modalsist@yahoo.com.br>
+ * www.xharbour.org
  *
  * DiskFormat()  - Format disk. See notes.
  * DiskFree()    - Return disk free available space.
@@ -323,11 +323,13 @@ Local nRet := 0
 RETURN ( nRet )
 
 
-*------------------------------
-FUNCTION FileValid( cFileName )
-*------------------------------
+*--------------------------------------------------------------
+FUNCTION FileValid( cFileName, nMaxName, nMaxExt, lWithoutExt )
+*--------------------------------------------------------------
 /*
-This function return the MS-DOS valid file name (8x3)
+This function return by default, the MS-DOS valid file name (8x3) or an other
+format defined by user in accordance with <nMaxName> and <nMaxExt> values. 
+nMaxName, nMaxExt and lWithoutExt are xHarbour extensions.
 */
 
  Local lRet  := .T.
@@ -339,8 +341,37 @@ This function return the MS-DOS valid file name (8x3)
  Local nFileLen := 0
  
  default cFileName to ""
+ default nMaxName  to 8     
+ default nMaxExt   to 3     
+ default lWithoutExt to .T.
 
 
+ if !IsCharacter(cFileName) .or. Empty(cFileName)
+    Return .F.
+ endif
+
+ if !IsNumber(nMaxName)
+    nMaxName := 8
+ endif
+
+ if !IsNumber(nMaxExt)
+    nMaxExt := 3
+ endif
+
+ if !IsLogical(lWithoutExt)
+    lWithoutExt := .T.
+ endif
+
+ if nMaxName <= 0
+    Return .F.
+ endif   
+
+ if nMaxExt <= 0
+    nMaxExt := 0
+    lWithoutExt := .T.
+ endif   
+
+ 
  for i := 0 to 255
     if (i>=0  .and. i<=32) .or.;
        i=34 .or.;
@@ -348,47 +379,58 @@ This function return the MS-DOS valid file name (8x3)
        (i>=46 .and. i<=47) .or.;
        (i>=58 .and. i<=63) .or.;
        (i>=91 .and. i<=93) .or.;
-       (i>=123 .and. i<=125) .or.;
-       (i=127)
+        i=124 .or. i=127
 
        cInvalid += chr(i)
 
     endif   
  next
 
+ cFileName := Rtrim(cFileName)
+ 
  nDecimalPoint := At(".",cFileName)
- nFileLen      := Len(cFileName)
+ nFileLen      := Len( cFileName )
 
-if nFileLen=0 .or. nFileLen > 12
+if nFileLen=0 .or. nFileLen > (nMaxName+nMaxExt+1)
    lRet := .F.
-elseif nDecimalPoint > 9
+elseif nDecimalPoint > (nMaxName+1)
    lRet := .F.
-elseif nDecimalPoint > 0 .and. nDecimalPoint < 10
+elseif nDecimalPoint > 0 .and. nMaxExt = 0
+   lRet := .F.
+elseif nDecimalPoint > 0 .and. nDecimalPoint <= (nMaxName+1)
    cName := SubStr(cFileName,1, nDecimalPoint-1 )
    cExt  := SubStr(cFileName,nDecimalPoint+1 )
-   if empty(cName)
+   if empty(cName) .or. ( !lWithoutExt .and. empty(cExt) )
       lRet := .F.
    endif   
-elseif nDecimalPoint=0 .and. nFileLen > 8
-   lRet:=.F.
-elseif nDecimalPoint=0 .and. nFileLen < 9
+elseif nDecimalPoint=0 .and. !lWithoutExt
+   lRet := .F.
+elseif nDecimalPoint=0 .and. nFileLen > nMaxName
+   lRet := .F.
+elseif nDecimalPoint=0 .and. nFileLen <= nMaxName
    cName := cFileName
 endif   
 
 if lRet
+
  if !empty(cName)
-   if Len(cName)>8
-      lRet:=.F.
+   if Len(cName) > nMaxName
+      lRet := .F.
    endif   
  else
-    lRet:= .F.
+    lRet := .F.
  endif
 
- if lRet .and. !empty(cExt)
-   if Len(cExt)>3
-      lRet:=.F.
-   endif   
+ if lRet .and. ( empty(cExt) .and. !lWithoutExt )
+    lRet := .F.
  endif
+ 
+ if lRet .and. !empty(cExt)
+    if Len(cExt) > nMaxExt
+       lRet := .F.
+    endif   
+ endif
+
 endif
 
 if lRet
@@ -401,12 +443,12 @@ if lRet
    next
 
    if lRet .and. !empty(cExt)
-    for i := 1 to Len(cExt)
-       if SubStr(cExt,i,1) IN cInvalid
-          lRet := .F.
-          exit
-       endif
-    next
+      for i := 1 to Len(cExt)
+          if SubStr(cExt,i,1) IN cInvalid
+             lRet := .F.
+             exit
+          endif
+      next
    endif
 
 endif

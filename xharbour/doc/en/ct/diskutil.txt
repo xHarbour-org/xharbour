@@ -2,7 +2,7 @@
  *  $FUNCNAME$
  *		DISKFORMAT()
  *  $CATEGORY$
- *      HBCT Disk management
+ *      CT Disk management
  *  $ONELINER$
  *		Format a floppy disk drive in command prompt mode. Call the DOS Format command.
  *  $SYNTAX$
@@ -51,16 +51,13 @@
  *		DiskFormat("B","Test") --> Format disk "B" with "Teste" label.
  *		DiskFormat("A","",.T.) --> Quick format the disk "A" without a label.
  *      DiskFormat("B",,,720) --> Full format the disk "A" with 720 K bytes.
- *  $TESTS$
- *		See examples.
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is not compatible with CA-Clipper Tools DiskFormat() FUNCTION.
+ *      DiskFormat is not all compatible with Clipper Tools.
  *  $PLATFORMS$
  *      DOS/WINDOWS
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *      DRIVETYPE(),FLOPPYTYPE()
  *  $END$
@@ -69,7 +66,7 @@
  *  $FUNCNAME$
  *		DISKFREE()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *      Determine the space available on a floppy or hard disk.
  *  $SYNTAX$
@@ -98,15 +95,13 @@
  *      IF DISKFREE("A") < Required
  *         ? "Insufficient disk space for copying!"
  *      ENDIF
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Diskfree is Clipper Tools compatible.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *		DISKTOTAL()
  *  $END$
@@ -115,7 +110,7 @@
  *  $FUNCNAME$
  *		DISKREADY()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *		Tests to see if a disk drive is ready.
  *  $SYNTAX$
@@ -160,15 +155,13 @@
  *      *...
  *      ENDDO
  *      DO Copy                        // Call copy procedure
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Diskready is Clipper Tools compatible.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *		DISKREADYW()
  *  $END$
@@ -177,7 +170,7 @@
  *  $FUNCNAME$
  *		DISKREADYW()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *		Queries whether you can write to a drive.
  *  $SYNTAX$
@@ -245,15 +238,13 @@
  *      ELSE
  *            ? "Disk drive not ready!"
  *      ENDIF
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      DiskreadyW() is Clipper Tools compatible.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *		DISKREADY()
  *  $END$
@@ -262,7 +253,7 @@
  *  $FUNCNAME$
  *		DISKTOTAL()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *		Determines the total capacity of a floppy or hard disk.
  *  $SYNTAX$
@@ -292,15 +283,13 @@
  *      IF DISKTOTAL("A") < nRequired
  *         ? "Error! Insufficient disk capacity!"
  *      ENDIF
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Disktotal() is Clipper Tools compatible.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *		DISKFREE()
  *  $END$
@@ -309,7 +298,7 @@
  *  $FUNCNAME$
  *		DISKUSED()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *		Determines the used space on a floppy or hard disk.
  *  $SYNTAX$
@@ -335,15 +324,13 @@
  *      Determine used space to a disk:
  *
  *      DISKUSED("A") --> nBytes
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Diskused is Clipper Tools compatible.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *      DISKTOTAL(),DISKFREE()
  *  $END$
@@ -352,7 +339,7 @@
  *  $FUNCNAME$
  *		FILEDELETE()
  *  $CATEGORY$
- *      HBCT File management
+ *      CT File management
  *  $ONELINER$
  *		Deletes file(s) by name and attribute
  *  $SYNTAX$
@@ -395,15 +382,13 @@
  *      ELSE
  *         ? "No files found."
  *      ENDIF
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Filedelete is Clipper Tools compatible.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is "diskutil.prg". Library is "libct.lib".
+ *      Library is ct.lib.
+ *      Source is xharbour/source/ct/diskutil.prg.
  *  $SEEALSO$
  *		DELETEFILE()
  *  $END$
@@ -412,13 +397,17 @@
  *  $FUNCNAME$
  *		FILEVALID()
  *  $CATEGORY$
- *		HBCT File management
+ *		CT File management
  *  $ONELINER$
  *		Tests whether a string has a valid file name
  *  $SYNTAX$
- *		FILEVALID(<cFileName>) --> lValid
+ *		FILEVALID(<cFileName>, <nMaxName>, <nMaxExt>, <lWithoutExt>) --> lValid
  *  $ARGUMENTS$
- *		<cFileName>  Designates the file name you want to test for validity.
+ *		<cFileName>   Designates the file name you want to test for validity.
+ *		<nMaxName>    Designates the max file name len. The default is 8.
+ *		<nMaxExt>     Designates the max file extension len. The default is 3.
+ *		<lWithoutExt> Allow file name without extension. The default is .T.
+ *                    Note: if <nMaxExt> is zero then <lWithoutExt> will be set to .T.
  *  $RETURNS$
  *      FILEVALID() RETURNs .T. when the designated name is valid.
  *  $DESCRIPTION$
@@ -438,15 +427,14 @@
  *         ACCEPT "Target_File  " TO cVar
  *         cFileName  := TOKEN(cVar, "\:")      // Last token
  *      ENDDO
- *  $TESTS$
- *  $STATUS$
- *    Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      FileValid() is Clipper Tools compliant if used only with first parameter.
+ *		Note: <nMaxName>, <nMaxExt> and <lWithoutExt> parameters are xHarbour extensions.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *		TOKEN()
  *  $END$
@@ -455,7 +443,7 @@
  *  $FUNCNAME$
  *		FLOPPYTYPE()
  *  $CATEGORY$
- *		HBCT Disk management
+ *		CT Disk management
  *  $ONELINER$
  *		Determines the exact type of floppy drive
  *  $SYNTAX$
@@ -502,11 +490,12 @@
  *  $STATUS$
  *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      FloppyType is Clipper Tools compatible.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib.
+ *      Source is xharbour/source/ct/diskutil.prg
  *  $SEEALSO$
  *      DISKTYPE(),DRIVETYPE()
  *  $END$
@@ -515,7 +504,7 @@
  *  $FUNCNAME$
  *		RENAMEFILE()
  *  $CATEGORY$
- *		HBCT File management
+ *		CT File management
  *  $ONELINER$
  *		Fault tolerant renaming of a file.
  *  $SYNTAX$
@@ -560,15 +549,13 @@
  *      cFileName   := TOKEN(cFSpecOld, ":\")      // last token
  *      cFSpecNew   := BEFOREATNUM(cFileName, cFSpecOld) + "TEST.NEW"
  *      RENAMEFILE(cFSpecOld, cFSpecNew)
- *  $TESTS$
- *  $STATUS$
- *      Ready
  *  $COMPLIANCE$
- *      This FUNCTION is CA-Clipper Tools compatible.
+ *      Renamefile is Clipper Tools compatible.
  *  $PLATFORMS$
  *      All
  *  $FILES$
- *      Source is diskutil.prg, library is libct.
+ *      Library is ct.lib
+ *      Source is xharbour/source/ct/diskutil.prg.
  *  $SEEALSO$
  *		DELETEFILE()
  *  $END$

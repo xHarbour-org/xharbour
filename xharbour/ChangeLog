@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3715 2005/01/05 01:43:11 modalsist Exp $
+ * $Id: ChangeLog,v 1.3717 2005/01/05 15:55:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-05 15:55 UTC-300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/diskutil.prg
+  * doc/en/ct/diskutil.txt
+    ! Fixed and extended FileValid() function. Updated diskutil.txt.
+      New format is  FILEVALID( <cFileName>, <nMaxName>, <nMaxExt>,;
+                                <lWithoutExt>) --> lValid
+      where:
+      <cFileName>   Designates the file name you want to test for validity.
+      <nMaxName>    Designates the max file name len. The default is 8.
+      <nMaxExt>     Designates the max file extension len. The default is 3.
+      <lWithoutExt> Allow file name without extension. The default is .T.
+      These 3 last parameters are xHarbour extension.
 
 2005-01-05 02:20 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/memvars.c
