@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.878 2003/03/27 03:02:56 jonnymind Exp $
+ * $Id: ChangeLog,v 1.879 2003/03/27 07:44:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-27 13:56 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbreadini.prg
+    + Added function HB_SetIniComment( cLc, cHlc ) --> NIL, where cLc is
+      the "Line comment", valid only if it is the first non blank
+      character on a line, and cHlc is the "half line comment", vaild
+      wherever it's found (thus in the middle of a line).
+      Defaults are ";" for the line comment and "#" for the half line
+      comment; call HB_SetIniComment( "", ";" ) to have Microsoft like
+      ini comment style.
+  
 2003-03-26 23:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   + include/classes.h
     + Added header file with classes support structure.
