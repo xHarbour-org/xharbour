@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.34 2003/02/05 04:53:54 dholm Exp $
+# $Id: makefile.bc,v 1.1 2003/03/04 21:04:38 lculik Exp $
 #
 
 #
@@ -154,6 +154,8 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
    $(OBJ_DIR)\setlast.obj \
+   $(OBJ_DIR)\ctwin.obj \
+   $(OBJ_DIR)\blank.obj \
 
 #
 # Our default target
@@ -450,3 +452,18 @@ $(OBJ_DIR)\setlast.c : $(TOOLS_DIR)\setlast.prg
 $(OBJ_DIR)\setlast.obj : $(OBJ_DIR)\setlast.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\ctwin.c : $(TOOLS_DIR)\ctwin.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ctwin.obj : $(TOOLS_DIR)\ctwin.prg
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\blank.c : $(TOOLS_DIR)\blank.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\blank.obj : $(TOOLS_DIR)\blank.prg
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+

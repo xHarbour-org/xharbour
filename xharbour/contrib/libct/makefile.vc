@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.30 2003/01/19 23:25:15 mbirdyg Exp $
+# $Id: makefile.vc,v 1.1 2003/03/04 21:04:38 lculik Exp $
 #
 
 #
@@ -164,8 +164,10 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\wordrepl.obj \
    $(OBJ_DIR)\wordtoch.obj \
    \
+   $(OBJ_DIR)\blank.obj \
    $(OBJ_DIR)\color.obj \
    $(OBJ_DIR)\ct.obj \
+   $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\ctmisc.obj \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \

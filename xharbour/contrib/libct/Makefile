@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.31 2003/01/19 23:25:13 mbirdyg Exp $
+# $Id: Makefile,v 1.1 2003/03/04 21:03:58 lculik Exp $
 #
 
 ROOT = ../../
@@ -61,8 +61,10 @@ C_SOURCES = \
 	wordtoch.c \
 
 PRG_SOURCES= \
+   blank.prg  \
 	color.prg \
 	ct.prg \
+   ctwin.prg \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
