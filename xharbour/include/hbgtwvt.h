@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.28 2004/07/29 15:13:58 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.29 2004/08/30 14:10:10 vouchcac Exp $
  */
 
 /*
@@ -229,6 +229,7 @@ typedef struct global_data
   HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
   PHB_DYNS  pSymDlgProcModeless[ WVT_DLGML_MAX ]; // Holds Modeless Dialog Procedure Address
   PHB_ITEM  pFunc[ WVT_DLGML_MAX ];    // Function pointer for WndProc
+  HB_ITEM   cbFunc[ WVT_DLGML_MAX ];    //codeblock for WndProc
   int       iType[ WVT_DLGML_MAX ];    // Type of Function Pointers - Function 1, Block 2, Method 3
   BOOL      bGui;
   HDC       hGuiDC;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.129 2004/09/13 11:12:02 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.130 2004/09/13 14:34:21 paultucker Exp $
  */
 
 /*
@@ -1664,7 +1664,7 @@ static int hb_wvt_key_ansi_to_oem( int c )
    sprintf( pszAnsi, "%c", c );
    CharToOemBuff( ( LPCSTR ) pszAnsi, ( LPTSTR ) pszOem, 1 );
    c = (BYTE) * pszOem;
-   
+
    return c;
 }
 
@@ -2170,7 +2170,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
               hb_wvt_gtAddCharToInputQueue( K_ESC );
               break;
             default:
-              if( _s.CodePage == OEM_CHARSET ) 
+              if( _s.CodePage == OEM_CHARSET )
               {
                  c = hb_wvt_key_ansi_to_oem( c );
               }
@@ -3646,7 +3646,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
    HGLOBAL hglb;
    LPTSTR  lptstr;
    LPTSTR  lptstrOem;
-   
+
    if ( ! IsClipboardFormatAvailable( CF_TEXT ) )
    {
      *pulMaxSize = 0;
@@ -3677,7 +3677,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
          {
             return;
          }
-         
+
          if( _s.CodePage == OEM_CHARSET )
          {
             lptstrOem = ( char* ) hb_xgrab( *pulMaxSize );
@@ -3739,14 +3739,14 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    {
       lptstrAnsi = ( char* ) hb_xgrab( ulSize+1 );
       OemToCharBuff( ( LPCSTR ) szData, ( LPTSTR ) lptstrAnsi, ulSize + 1 );
-      memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );      
+      memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );
       hb_xfree( lptstrAnsi );
    }
    else
    {
-      memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );      
-   }   
-   
+      memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
+   }
+
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
 
    GlobalUnlock( hglbCopy );
@@ -3813,10 +3813,10 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
       case GTI_FONTNAME:
          if ( bUpdate )
          {
-            strcpy( _s.fontFace, (char *) vpParam );           
+            strcpy( _s.fontFace, (char *) vpParam );
          }
          return ( int ) TRUE;
-         
+
       case GTI_FONTSIZE:
          iOldValue = ( int ) _s.PTEXTSIZE.y;
          if ( bUpdate )
@@ -4312,6 +4312,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
          case 2:  // Block
          {
+            /*
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pFunc );
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -4320,6 +4321,34 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmFunction( 4 );
             bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            */
+
+            /* eval the codeblock */
+            if (_s.pFunc[ iIndex ]->type == HB_IT_BLOCK)
+            {
+              HB_ITEM hihDlg, himessage, hiwParam, hilParam;
+              PHB_ITEM pReturn;
+
+              hihDlg.type = HB_IT_NIL;
+              hb_itemPutNL( &hihDlg, (ULONG) hDlg );
+
+              himessage.type = HB_IT_NIL;
+              hb_itemPutNL( &himessage, (ULONG) message );
+
+              hiwParam.type = HB_IT_NIL;
+              hb_itemPutNL( &hiwParam, (ULONG) wParam );
+
+              hilParam.type = HB_IT_NIL;
+              hb_itemPutNL( &hilParam, (ULONG) lParam );
+
+              pReturn = hb_vmEvalBlockV( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              bReturn = hb_itemGetNL( pReturn );
+            }
+            else
+            {
+              //internal error: missing codeblock
+            }
+
 
             break;
          }
@@ -4361,6 +4390,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          if ( _s.pFunc[ iIndex ] != NULL && _s.iType[ iIndex ] == 2 )
          {
             HB_ITEM_UNLOCK( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
+            hb_itemClear( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
          }
          _s.hDlgModeless[ iIndex ] = NULL;
          _s.pSymDlgProcModeless[ iIndex ] = NULL;

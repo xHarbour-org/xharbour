@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3433 2004/09/14 12:26:07 srobert Exp $
+ * $Id: ChangeLog,v 1.3434 2004/09/14 20:15:09 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-15 11:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * include/hbgtwvt.h
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwvt/wvtutils.c
+    ! Fix support for codeblock as dialog's wndproc.
+      (Pritpal, pls check if it works as you expected.)
 
 2004-09-14 22:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/Makefile

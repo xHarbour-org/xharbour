@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.14 2004/09/09 11:48:40 lf_sfnet Exp $
+ * $Id: wvtutils.c,v 1.16 2004/09/13 17:20:55 lf_sfnet Exp $
  */
 
 /*
@@ -1216,12 +1216,26 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    int      iType;
    int      iResource = hb_parni( 4 );
 
+   /* check if we still have room for a new dialog */
+   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+   {
+      if ( _s->hDlgModeless[ iIndex ] == NULL )
+      {
+         break;
+      }
+   }
+
+   if ( iIndex >= WVT_DLGML_MAX )
+   {
+      /* no more room */
+      hb_retnl( (ULONG) NULL );
+      return;
+   }
+
    if ( HB_IS_BLOCK( pFirst ) )
    {
-      // This code does not work //
-      //
-      pFunc = ( PHB_ITEM ) HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
-      pFirst->item.asBlock.value->ulCounter++;
+      /* pFunc is pointing to stored code block (later) */
+      pFunc = ( PHB_ITEM ) &(_s->cbFunc[ iIndex ]);
       iType = 2;
    }
    else if( pFirst->type == HB_IT_STRING )
@@ -1236,15 +1250,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       iType = 1;
    }
 
-   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
-   {
-      if ( _s->hDlgModeless[ iIndex ] == NULL )
-      {
-         break;
-      }
-   }
-
-   if ( iIndex < WVT_DLGML_MAX )
+   //if ( iIndex < WVT_DLGML_MAX )
    {
       if ( ISNUM( 3 ) )
       {
@@ -1290,8 +1296,16 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       if ( hDlg )
       {
          _s->hDlgModeless[ iIndex ] = hDlg;
+
          if ( pFunc )
          {
+            /* if codeblock, store the codeblock and lock it there */
+            if (HB_IS_BLOCK( pFirst ))
+            {
+               hb_itemCopy( &(_s->cbFunc[ iIndex ]), (PHB_ITEM) pFirst);
+               HB_ITEM_LOCK( &(_s->cbFunc[ iIndex ]));
+            }
+
             _s->pFunc[ iIndex ] = pFunc;
             _s->iType[ iIndex ] = iType;
          }
