@@ -1,5 +1,5 @@
 //
-// $Id: testzip.prg,v 1.3 2003/09/14 09:27:23 paultucker Exp $
+// $Id: testzip.prg,v 1.4 2003/09/14 15:23:45 paultucker Exp $
 //
 
 // Requires samples.lib for gauge support
@@ -10,6 +10,7 @@
 
 proc Main()
 Local aFiles, aGauge, nLen, aDir
+Local aSaveFiles
 Local aGaugeFile
 
    ZipCreate( "TEST.ZIP", "testzip.prg" )
@@ -36,6 +37,13 @@ Local aGaugeFile
    Aeval( aDir, {|a| aadd( aFiles, a[1]) })
    nLen   := Len(afiles)
 
+   /* lets add an new bigger files on this example*/
+   aDir   := Directory( "*.map" )
+   Aeval( aDir, {|a| aadd( aFiles, a[1]) })
+
+   // Lets save aFile  Array for later usage
+   aSaveFiles := aFiles
+
    set cursor off
 
    ZipCreate("test3.zip", aFiles, 8, ;
@@ -57,6 +65,27 @@ Local aGaugeFile
    ZipHasPassword( "TEST1.ZIP" )
    ZipHasPassword( "test3.zip" )
 
+   //ok, now we create an file on an floppy
+   ? "Put an formatted Floppy/Zip disk on Drive and press an key"
+   Inkey( 0 )
+   Cls
+   ?;?;?
+   ?
+   ?;?;?
+
+   aGauge := GaugeNew( row()-6, 5, row()-4,74 , "W/B", "W+/B" ,'²')
+   GaugeDisplay( aGauge )
+
+   aGaugeFile := GaugeNew( row()+2, 5, row()+4,74 , "W/B", "W+/B" ,'²')
+   GaugeDisplay( aGaugeFile )
+
+   HB_SETDISKZIP( { | x |  Alert( "Please insert disk no " + Str( x , 3 ) ) } )
+
+   ZipCreateToFloppy("test4.zip", aSaveFiles, 9, ;
+              {|cFile,nPos| GaugeUpdate(aGauge,nPos/nLen) },,'hello',,,;
+              {|nPos,nCur| GaugeUpdate(aGaugeFile,nPos/nCur)})
+
+
 function ZipCreate(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
                    lPath, lDrive, bFileUpdate)
    Local lRet
@@ -70,6 +99,21 @@ function ZipCreate(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
    ENDIF
 
 Return lRet
+
+function ZipCreateToFloppy(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
+                   lPath, lDrive, bFileUpdate)
+   Local lRet
+
+   Default lOverwrite to .t.
+   Default lPath to .t.
+
+   IF ( lRet :=  HB_ZIPFILEBYPKSPAN ( "a:\" + cFile, uContents, nLevel, bUpdate, lOverwrite,;
+                            password, lPath, lDrive, bFileUpdate) )
+      ? cFile + " was successfully created"
+   ENDIF
+
+Return lRet
+
 
 Function ZipHasPassword( cFile )
    Local lRet
