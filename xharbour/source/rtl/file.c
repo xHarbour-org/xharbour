@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.13 2004/01/23 10:38:57 andijahja Exp $
+ * $Id: file.c,v 1.14 2004/01/27 21:18:20 peterrees Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 
    pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
-   iFileName = strlen(pFilename ) ;
+   iFileName = strlen( (char*) pFilename ) ;
 
    if ( iFileName && pFilename[iFileName-1] != OS_PATH_DELIMITER ) // A directory cannot possibly be a FILE
    {                                                               // so only do this is the last char is not
@@ -96,7 +96,7 @@ BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
 
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
 
-   iFileName = strlen(pFilename ) ;
+   iFileName = strlen( (char*) pFilename ) ;
 
    if ( iFileName )
    {
