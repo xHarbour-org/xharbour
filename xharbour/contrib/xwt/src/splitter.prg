@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.2 2003/04/08 18:21:47 jonnymind Exp $
+   $Id: splitter.prg,v 1.1 2003/04/22 19:03:34 jonnymind Exp $
 
    Splitter - a container with two resizable area;
    It is not really implemented as a container (in fact is a
@@ -97,16 +97,16 @@ RETURN .F.
 
 
 METHOD SetShrinkFirst( bMode ) CLASS XWTSplitter
-RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_FIRSTSRHINK, bMode )
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_FIRSTSHRINK, bMode )
 
 METHOD SetShrinkSecond( bMode ) CLASS XWTSplitter
-RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_SECSRHINK, bMode )
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_SECSHRINK, bMode )
 
 
 METHOD GetShrinkFirst() CLASS XWTSplitter
    LOCAL bMode
 
-   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_FIRSTSRHINK, @bMode )
+   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_FIRSTSHRINK, @bMode )
       RETURN bMode
    ENDIF
 
@@ -116,7 +116,7 @@ RETURN .F.
 METHOD GetShrinkSecond() CLASS XWTSplitter
    LOCAL bMode
 
-   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_SECSRHINK, @bMode )
+   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_SECSHRINK, @bMode )
       RETURN bMode
    ENDIF
 

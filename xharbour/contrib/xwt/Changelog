@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.12 2003/04/21 06:57:26 jonnymind Exp $
+ * $Id: Changelog,v 1.13 2003/04/22 19:02:53 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * src/splitter.prg
+    ! Fixed a mispelled macro.
+ 
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
    * src/xwt_gtk/xwt_gtk_grid.c
      ! One of the struct member was not set to null during creation,
