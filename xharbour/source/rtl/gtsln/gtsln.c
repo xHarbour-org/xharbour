@@ -56,7 +56,7 @@
 
 #include "gtsln.h"
 
-/* missing defines in previous versions of Slang - this can not work ! */
+/* missing defines in previous versions of Slang - this may not work ok ! */
 #if SLANG_VERSION < 10400
     typedef unsigned short SLsmg_Char_Type;
     #define SLSMG_EXTRACT_CHAR( x ) ( ( x ) & 0xFF )
@@ -129,7 +129,7 @@ static char * s_colorNames[] =
     "blue"          ,
     "green"         ,
     "cyan"          ,
-    "red"               ,
+    "red"           ,
     "magenta"       ,
     "brown"         ,
     "lightgray"     ,
@@ -138,8 +138,8 @@ static char * s_colorNames[] =
     "brightgreen"   ,
     "brightcyan"    ,
     "brightred"     ,
-    "brightmagenta",
-    "yellow"            ,
+    "brightmagenta" ,
+    "yellow"        ,
     "white"
 };
 
@@ -187,9 +187,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
             keyboard subsystem for the first time */
         if( hb_gt_Init_Terminal( 0 ) )
         {
-	    /* fix an OutStd()/OutErr() output */
-	    if( !isatty( iFilenoStdout ) )
-    		SLang_TT_Write_FD = SLang_TT_Read_FD;
+            /* fix an OutStd()/OutErr() output */
+            if( !isatty( iFilenoStdout ) )
+                SLang_TT_Write_FD = SLang_TT_Read_FD;
 
             /* initialize a screen handling subsytem */
             if( SLsmg_init_smg() != -1 )
@@ -218,7 +218,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
                 SLtt_Blink_Mode = 0;
                 SLtt_Use_Blink_For_ACS = 0;
                 SLsmg_Display_Eight_Bit = 128;
-		SLsmg_Newline_Behavior = SLSMG_NEWLINE_SCROLLS;
+                SLsmg_Newline_Behavior = SLSMG_NEWLINE_SCROLLS;
 
                 /* initialize conversion tables */
                 hb_gt_build_conv_tabs();
@@ -226,9 +226,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
                 /* ensure we are in a normal chars set */
                 SLtt_set_alt_char_set( 0 );
 
-		/* set the normal Slang color */
-		SLsmg_set_color( 0 );
-		
+                /* set the normal Slang color */
+                SLsmg_set_color( 0 );
+        
                 /* NOTE: due to a work of a Slang library which does not
                    prepare its internal screen buffer properly, a screen
                    must be cleared before normal work. This is not
@@ -608,7 +608,6 @@ void hb_gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight
         pBuf += Cols;
         ++uiTop;
     }
-
     hb_gt_SetPos( usSavRow, usSavCol, HB_GT_SET_POS_AFTER );
 }
 
@@ -886,12 +885,11 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     /* a box drawing hack */
     s_bUse_Alt_Char_Hack = TRUE;
 
-    if( Left >= 0 || Left < hb_gt_GetScreenWidth()
-    || Right >= 0 || Right < hb_gt_GetScreenWidth()
-    || Top >= 0 || Top < hb_gt_GetScreenHeight()
-    || Bottom >= 0 || Bottom < hb_gt_GetScreenHeight() )
+    if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  || 
+        ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  || 
+        ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  || 
+        ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
     {
-
         /* Ensure that box is drawn from top left to bottom right. */
         if( Top > Bottom )
         {
@@ -908,7 +906,7 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
         /* Draw the box or line as specified */
         Height = Bottom - Top + 1;
-        Width    = Right - Left + 1;
+        Width  = Right - Left + 1;
 
         hb_gt_DispBegin();
 
@@ -978,7 +976,6 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             if( Right < hb_gt_GetScreenWidth() && Bottom < hb_gt_GetScreenHeight() )
                 hb_gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ); /* Bottom right corner */
         }
-        hb_gt_DispEnd();
 
         /* NOTE : enable this if problems with cursor positioning occur */
         /* SLsmg_gotorc( uiTop + 1, uiLeft + 1 ); */
@@ -1013,9 +1010,9 @@ USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE by
 {
     USHORT ret = 1;
     BOOL SaveUseAltChar = s_bUse_Alt_Char_Hack;
+
     if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
     {
-
         /* a box drawing hack */
         s_bUse_Alt_Char_Hack = TRUE;
 
@@ -1039,6 +1036,7 @@ USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE by
 
         ret = 0;
     }
+
     return ret;
 }
 
@@ -1072,6 +1070,7 @@ USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byA
             uRow = Bottom;
             Bottom = Top;
         }
+
         while( uRow <= Bottom )
             hb_gt_xPutch( uRow++, Col, byAttr, byChar );
 
@@ -1099,7 +1098,7 @@ void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
         //SLsmg_set_color( SaveColor );
     }
     else
-	hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+        hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
@@ -1108,16 +1107,17 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
 {
     if( isatty( s_iStdErr ) )
     {
-	int Save_SLang_TT_Write_FD = SLang_TT_Write_FD;
-	SLang_TT_Write_FD = s_iStdErr;
-	//SLtt_set_alt_char_set( 1 );
-	SLsmg_write_nchars( pbyStr, ulLen );
-	SLang_TT_Write_FD = Save_SLang_TT_Write_FD;
-	SLsmg_refresh();
-	//SLtt_set_alt_char_set( 0 );
+        int Save_SLang_TT_Write_FD = SLang_TT_Write_FD;
+        SLang_TT_Write_FD = s_iStdErr;
+        //SLtt_set_alt_char_set( 1 );
+        SLsmg_set_color( ( int )( ( unsigned char )( hb_gtCurrentColor() - 7 ) ) );
+        SLsmg_write_nchars( pbyStr, ulLen );
+        SLsmg_refresh();
+        SLang_TT_Write_FD = Save_SLang_TT_Write_FD;
+        //SLtt_set_alt_char_set( 0 );
     }
     else
-	hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
+        hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
@@ -1255,23 +1255,23 @@ static void hb_gt_build_conv_tabs()
                 case SLSMG_BULLET_CHAR  :   s_convHighChars[    ] = SLch; break;
 */
                 case SLSMG_DIAMOND_CHAR :   s_convHighChars[ 04 ] = SLch;
-                                                    break;
+                                                break;
                 case SLSMG_LARROW_CHAR  :   s_convHighChars[ 17 ] = SLch;
-                                                    s_convHighChars[ 27 ] = SLch;
-                                                    break;
+                                            s_convHighChars[ 27 ] = SLch;
+                                                break;
                 case SLSMG_RARROW_CHAR  :   s_convHighChars[ 16 ] = SLch;
-                                                    s_convHighChars[ 26 ] = SLch;
-                                                    break;
+                                            s_convHighChars[ 26 ] = SLch;
+                                                break;
                 case SLSMG_DARROW_CHAR  :   s_convHighChars[ 25 ] = SLch;
-                                                    s_convHighChars[ 31 ] = SLch;
-                                                    break;
+                                            s_convHighChars[ 31 ] = SLch;
+                                                break;
                 case SLSMG_UARROW_CHAR  :   s_convHighChars[ 24 ] = SLch;
-                                                    s_convHighChars[ 30 ] = SLch;
-                                                    break;
+                                            s_convHighChars[ 30 ] = SLch;
+                                                break;
                 case SLSMG_BOARD_CHAR   :   s_convHighChars[ 178 ] = SLch;
-                                                    break;
+                                                break;
                 case SLSMG_BLOCK_CHAR   :   s_convHighChars[ 219 ] = SLch;
-                                                    break;
+                                                break;
             }
 
             ++p;
@@ -1332,9 +1332,12 @@ static void hb_gt_build_conv_tabs()
 
             Pos = ( unsigned char ) ( ( *p & 0x7F ) >> 3 );
             Msk = ( unsigned char ) ( 1 << ( *p & 0x07 ) );
+
             s_IsNationChar[ Pos ] |= Msk;
+
             ++p;
         }
+
         p = s;
 /*
         for( i=0; i <= ( ( int ) s_convKDeadKeys[ 0 ] ) * 2; i++ )

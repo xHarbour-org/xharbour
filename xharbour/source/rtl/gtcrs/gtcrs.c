@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.2 2002/03/30 19:23:30 map Exp $
+ * $Id: gtcrs.c,v 1.3 2002/09/20 19:18:17 map Exp $
  */
 
 /*
@@ -637,10 +637,10 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( Left >= 0 || Left < hb_gt_GetScreenWidth()
-   || Right >= 0 || Right < hb_gt_GetScreenWidth()
-   || Top >= 0 || Top < hb_gt_GetScreenHeight()
-   || Bottom >= 0 || Bottom < hb_gt_GetScreenHeight() )
+   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  || 
+       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  || 
+       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  || 
+       ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
    {
 
       /* Ensure that box is drawn from top left to bottom right. */

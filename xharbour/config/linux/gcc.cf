@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+# $Id: gcc.cf,v 1.3 2002/04/16 16:12:18 map Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -9,7 +9,7 @@ EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = gcc
+CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(HB_INC_COMPILE)
