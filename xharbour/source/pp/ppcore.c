@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.84 2003/10/23 09:01:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.85 2003/10/23 19:49:59 uid30952 Exp $
  */
 
 /*
@@ -1322,17 +1322,21 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   char exppatt[ MAX_NAME ], expreal[ 5 ] = "\1  0";
   char lastchar = '@', exptype;
   char * ptr, * ptrtmp;
+  unsigned int uiOpenBrackets = 0;
 
   HB_TRACE(HB_TR_DEBUG, ("ConvertPatterns(%s, %d, %s, %d)", mpatt, mlen, rpatt, rlen));
+
 
   while( *(mpatt+i) != '\0' )
   {
      if( *(mpatt+i) == '[' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
+        uiOpenBrackets++;
         mpatt[i] = '\16';
      }
-     else if( *(mpatt+i) == ']' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
+     else if( *(mpatt+i) == ']' && ( i == 0 || *(mpatt+i-1) != '\\' ) && uiOpenBrackets )
      {
+        uiOpenBrackets--;
         mpatt[i] = '\17';
      }
      else if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
@@ -1563,15 +1567,18 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      i++;
   }
 
+  uiOpenBrackets = 0;
   i = 0;
   while( rpatt[i] != '\0' )
   {
      if( rpatt[i] == '[' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
      {
+        uiOpenBrackets++;
         rpatt[i] = '\16';
      }
-     else if( rpatt[i] == ']' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
+     else if( rpatt[i] == ']' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) && uiOpenBrackets )
      {
+        uiOpenBrackets--;
         rpatt[i] = '\17';
      }
 
