@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.11 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id: listbox.prg,v 1.12 2003/09/19 01:10:35 lculik Exp $
  */
 
 /*
@@ -950,7 +950,7 @@ Method HITTEST( nMouseRow, nMouseCol ) Class HBListBox
          CASE Empty( ::caption )
          CASE nMouseRow != ::caprow
          CASE nMouseCol < ::capcol
-         CASE nMouseCol < ::capcol + __caplengt( ::caption )
+         CASE nMouseCol < ::capcol + __CAPLENGTH( ::caption )
              RETURN - 1025
      ENDCASE
 
@@ -1146,7 +1146,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ;
         IF ( ISCHARACTER( Arg7 ) )
            oScroll:capcol := NIL
            oScroll:caption := Arg7
-           oScroll:capcol  := Arg2 - __caplengt( Arg7 )
+           oScroll:capcol  := Arg2 - __CAPLENGTH( Arg7 )
         ENDIF
 
         IF arg9 != nil
