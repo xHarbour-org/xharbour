@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.154 2003/01/24 09:52:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.155 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -624,7 +624,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #endif
 
 #ifndef HB_GUI
-      if( hb_set.HB_SET_CANCEL )
+      if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
       {
          static unsigned short s_iCancel = 0;
 
@@ -636,7 +636,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                case HB_K_ALT_C:           /* Check for extended Alt+C */
                case K_ALT_C:              /* Check for normal Alt+C */
+               case HB_BREAK_FLAG:
                   hb_vmRequestCancel();/* Request cancellation */
+                  break;
+               case HB_K_ALT_D:           /* Check for extended Alt+C */
+               case K_ALT_D:              /* Check for normal Alt+C */
+                  hb_vmRequestDebug();/* Request cancellation */
+                  break;
             }
          }
       }
