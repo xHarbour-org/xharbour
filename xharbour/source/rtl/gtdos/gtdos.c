@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.3 2002/09/27 20:51:49 map Exp $
+ * $Id: gtdos.c,v 1.4 2002/10/22 02:11:47 paultucker Exp $
  */
 
 /*
@@ -137,6 +137,18 @@ static void hb_gt_GetCursorSize( char * start, char * end );
    static char FAR * scrnPtr;
    static char FAR * scrnStealth = NULL;
    static char FAR * hb_gt_ScreenAddress( void );
+   static int    scrnVirtual = FALSE;
+   static USHORT scrnWidth = 0;
+   static USHORT scrnHeight = 0;
+   static SHORT  scrnPosRow = -1;
+   static SHORT  scrnPosCol = -1;
+#else
+   static char * scrnPtr = NULL;
+   static int    scrnVirtual = FALSE;
+   static USHORT scrnWidth = 0;
+   static USHORT scrnHeight = 0;
+   static SHORT  scrnPosRow = -1;
+   static SHORT  scrnPosCol = -1;
 #endif
 
 static BOOL s_bBreak; /* Used to signal Ctrl+Break to hb_inkeyPoll() */
@@ -244,9 +256,12 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    /* */
 
+   scrnVirtual = FALSE;
 #if !defined(__DJGPP__)
    scrnStealth = ( char * ) -1;
    scrnPtr = hb_gt_ScreenAddress();
+#else
+   scrnPtr = NULL;
 #endif
 
    hb_mouse_Init();
@@ -489,6 +504,13 @@ char FAR * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
 
    return scrnPtr + ( cRow * hb_gt_GetScreenWidth() * 2 ) + ( cCol * 2 );
 }
+#else
+char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_ScreenPtr(%hu, %hu)", cRow, cCol));
+
+   return scrnPtr + ( cRow * hb_gt_GetScreenWidth() * 2 ) + ( cCol * 2 );
+}
 #endif
 
 static char hb_gt_GetScreenMode( void )
@@ -509,12 +531,19 @@ USHORT hb_gt_GetScreenWidth( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
 
 #if defined(__WATCOMC__) && defined(__386__)
-   return ( USHORT ) *( ( char * ) 0x044A );
+   if( scrnWidth == 0 )
+     scrnWidth = ( USHORT ) *( ( char * ) 0x044A );
+/*   return ( USHORT ) *( ( char * ) 0x044A ); */
 #elif defined(__DJGPP__)
-   return ( USHORT ) _farpeekb( 0x0040, 0x004A );
+   if( scrnWidth == 0 )
+     scrnWidth = ( USHORT ) _farpeekb( 0x0040, 0x004A );
+/*   return ( USHORT ) _farpeekb( 0x0040, 0x004A ); */
 #else
-   return ( USHORT ) *( ( char FAR * ) MK_FP( 0x0040, 0x004A ) );
+   if( scrnWidth == 0 )
+     scrnWidth = ( USHORT ) *( ( char FAR * ) MK_FP( 0x0040, 0x004A ) );
+/*   return ( USHORT ) *( ( char FAR * ) MK_FP( 0x0040, 0x004A ) ); */
 #endif
+   return scrnWidth;
 }
 
 USHORT hb_gt_GetScreenHeight( void )
@@ -522,12 +551,19 @@ USHORT hb_gt_GetScreenHeight( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeigth()"));
 
 #if defined(__WATCOMC__) && defined(__386__)
-   return ( USHORT ) ( char ) ( *( ( char * ) 0x0484 ) + 1 );
+   if( scrnHeight == 0 )
+     scrnHeight = ( USHORT ) ( char ) ( *( ( char * ) 0x0484 ) + 1 );
+/*   return ( USHORT ) ( char ) ( *( ( char * ) 0x0484 ) + 1 ); */
 #elif defined(__DJGPP__)
-   return ( USHORT ) _farpeekb( 0x0040, 0x0084 ) + 1;
+   if( scrnHeight == 0 )
+     scrnHeight = ( USHORT ) _farpeekb( 0x0040, 0x0084 ) + 1;
+/*   return ( USHORT ) _farpeekb( 0x0040, 0x0084 ) + 1; */
 #else
-   return ( USHORT ) ( ( char ) ( *( ( char FAR * ) MK_FP( 0x0040, 0x0084 ) ) + 1 ) );
+   if( scrnHeight == 0 )
+     scrnHeight = ( USHORT ) ( ( char ) ( *( ( char FAR * ) MK_FP( 0x0040, 0x0084 ) ) + 1 ) );
+/*   return ( USHORT ) ( ( char ) ( *( ( char FAR * ) MK_FP( 0x0040, 0x0084 ) ) + 1 ) ); */
 #endif
+   return scrnHeight;
 }
 
 void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
@@ -538,11 +574,19 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
 
    HB_SYMBOL_UNUSED( iMethod );
 
-   regs.h.ah = 0x02;
-   regs.h.bh = 0;
-   regs.h.dh = ( BYTE ) iRow;
-   regs.h.dl = ( BYTE ) iCol;
-   HB_DOS_INT86( 0x10, &regs, &regs );
+   if( scrnVirtual )
+   {
+      scrnPosRow = iRow;
+      scrnPosCol = iCol;
+   }
+   else
+   {
+      regs.h.ah = 0x02;
+      regs.h.bh = 0;
+      regs.h.dh = ( BYTE ) iRow;
+      regs.h.dl = ( BYTE ) iCol;
+      HB_DOS_INT86( 0x10, &regs, &regs );
+   }
 }
 
 static void hb_gt_SetCursorSize( char start, char end )
@@ -637,14 +681,32 @@ static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
 
 #if defined(__DJGPP__TEXT)
    {
-     short ch_attr;
-     gettext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
-     *ch = ch_attr >> 8;
-     *attr = ch_attr & 0xFF;
+     if( scrnVirtual )
+     {
+        char *p;
+        p = hb_gt_ScreenPtr( cRow, cCol );
+        *ch = *p;
+        *attr = *( p + 1 );
+     }
+     else
+     {
+        short ch_attr;
+        gettext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
+        *ch = ch_attr >> 8;
+        *attr = ch_attr & 0xFF;
+     }
    }
 #elif defined(__DJGPP__)
    {
-      ScreenGetChar( (int *)ch, (int *)attr, cCol, cRow );
+     if( scrnVirtual )
+     {
+        char *p;
+        p = hb_gt_ScreenPtr( cRow, cCol );
+        *ch = *p;
+        *attr = *( p + 1 );
+     }
+     else
+        ScreenGetChar( (int *)ch, (int *)attr, cCol, cRow );
    }
 #else
    {
@@ -662,13 +724,31 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
 
 #if defined(__DJGPP__TEXT)
    {
-     long ch_attr;
-     ch_attr = ( ch << 8 ) | attr;
-     puttext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
+     if( scrnVirtual )
+     {
+        char *p;
+        p          = hb_gt_ScreenPtr( cRow, cCol );
+        *p         = ch;
+        *( p + 1 ) = attr;
+     }
+     else
+     {
+        long ch_attr;
+        ch_attr = ( ch << 8 ) | attr;
+        puttext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
+     }
    }
 #elif defined(__DJGPP__)
    {
-      ScreenPutChar( ch, attr, cCol, cRow );
+     if( scrnVirtual )
+     {
+        char *p;
+        p          = hb_gt_ScreenPtr( cRow, cCol );
+        *p         = ch;
+        *( p + 1 ) = attr;
+     }
+     else
+        ScreenPutChar( ch, attr, cCol, cRow );
    }
 #else
    {
@@ -685,48 +765,72 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
 #if defined(__DJGPP__TEXT)
    {
      int i;
-     int bottom, left, right, top;
-     int width;
-     BYTE * ch_attr;
-     BYTE * ptr;
 
-     i = ( int ) len;
-     left = cCol;
-     top = cRow;
-     width = hb_gt_GetScreenWidth();
-     ptr = ch_attr = hb_xgrab( i * 2 );
-     while( i-- )
-       {
-         *ptr++ = *str++;
-         *ptr++ = attr;
-       }
-     i = len - 1; /* We want end position, not next cursor position */
-     right = left;
-     bottom = top;
-     if( right + i > width - 1 )
-       {
-         /*
-          * Calculate end row position and the remainder size for the
-          * end column adjust.
-          */
-         bottom += ( i / width );
-         i = i % width;
-       }
-     right += i;
-     if( right > width - 1 )
-       {
-         /* Column movement overflows into next row */
-         bottom++;
-         right -= width;
-       }
-     puttext( left + 1, top + 1, right + 1, bottom + 1, ch_attr );
-     hb_xfree( ch_attr );
+     if( scrnVirtual )
+     {
+        for( i=0; i<len; i++ )
+        {
+          char *p;
+          p          = hb_gt_ScreenPtr( cRow, cCol++ );
+          *p         = str[ i ];
+          *( p + 1 ) = attr;
+        }
+     else
+     {
+        int bottom, left, right, top;
+        int width;
+        BYTE * ch_attr;
+        BYTE * ptr;
+
+        i = ( int ) len;
+        left = cCol;
+        top = cRow;
+        width = hb_gt_GetScreenWidth();
+        ptr = ch_attr = hb_xgrab( i * 2 );
+        while( i-- )
+          {
+             *ptr++ = *str++;
+             *ptr++ = attr;
+          }
+        i = len - 1; /* We want end position, not next cursor position */
+        right = left;
+        bottom = top;
+        if( right + i > width - 1 )
+          {
+            /*
+             * Calculate end row position and the remainder size for the
+             * end column adjust.
+             */
+            bottom += ( i / width );
+            i = i % width;
+          }
+        right += i;
+        if( right > width - 1 )
+          {
+            /* Column movement overflows into next row */
+            bottom++;
+            right -= width;
+          }
+        puttext( left + 1, top + 1, right + 1, bottom + 1, ch_attr );
+        hb_xfree( ch_attr );
+     }
    }
 #elif defined(__DJGPP__)
    {
       int i;
+
       for( i=0; i<len; i++ )
-         ScreenPutChar( str[ i ], attr, cCol++, cRow );
+      {
+        if( scrnVirtual )
+        {
+           char *p;
+           p          = hb_gt_ScreenPtr( cRow, cCol++ );
+           *p         = str[ i ];
+           *( p + 1 ) = attr;
+        }
+        else
+           ScreenPutChar( str[ i ], attr, cCol++, cRow );
+      }
    }
 #else
    {
@@ -753,7 +857,21 @@ void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 
 #if defined(__DJGPP__TEXT) || defined(__DJGPP__)
    {
-     gettext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, dest );
+     if( scrnVirtual )
+     {
+        USHORT x, y;
+
+        for( y = usTop; y <= usBottom; y++ )
+          {
+            for( x = usLeft; x <= usRight; x++ )
+              {
+                hb_gt_xGetXY( y, x, dest + 1, dest );
+                dest += 2;
+              }
+          }
+     }
+     else
+        gettext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, dest );
    }
 #else
    {
@@ -777,7 +895,21 @@ void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 
 #if defined(__DJGPP__TEXT) || defined(__DJGPP__)
    {
-     puttext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, srce );
+     if( scrnVirtual )
+     {
+        USHORT x, y;
+
+        for( y = usTop; y <= usBottom; y++ )
+          {
+            for( x = usLeft; x <= usRight; x++ )
+              {
+                hb_gt_xPutch( y, x, *( srce + 1 ), *srce );
+                srce += 2;
+              }
+          }
+     }
+     else
+        puttext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, srce );
    }
 #else
    {
@@ -820,11 +952,18 @@ SHORT hb_gt_Col( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Col()"));
 
-   regs.h.ah = 0x03;
-   regs.h.bh = 0;
-   HB_DOS_INT86( 0x10, &regs, &regs );
+   if( scrnVirtual )
+   {
+      return scrnPosCol;
+   }
+   else
+   {
+      regs.h.ah = 0x03;
+      regs.h.bh = 0;
+      HB_DOS_INT86( 0x10, &regs, &regs );
 
-   return regs.h.dl;
+      return regs.h.dl;
+   }
 }
 
 SHORT hb_gt_Row( void )
@@ -833,11 +972,18 @@ SHORT hb_gt_Row( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Row()"));
 
-   regs.h.ah = 0x03;
-   regs.h.bh = 0;
-   HB_DOS_INT86( 0x10, &regs, &regs );
+   if( scrnVirtual )
+   {
+      return scrnPosRow;
+   }
+   else
+   {
+      regs.h.ah = 0x03;
+      regs.h.bh = 0;
+      HB_DOS_INT86( 0x10, &regs, &regs );
 
-   return regs.h.dh;
+      return regs.h.dh;
+   }
 }
 
 void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz )
@@ -848,7 +994,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
    *  with C++ compilers
    */
    SHORT usRow, usCol;
-   UINT uiSize;   /* gtRectSize returns int */
+   int uiSize;   /* gtRectSize returns int */
    int iLength = ( usRight - usLeft ) + 1;
    int iCount, iColOld, iColNew, iColSize;
 
@@ -924,6 +1070,22 @@ void hb_gt_DispBegin( void )
          scrnPtr = ( char FAR * ) hb_xgrab( nSize );
       scrnStealth = ptr;
       memcpy( ( void * ) scrnPtr, ( void * ) ptr, nSize );
+      hb_gtGetPos( &scrnPosRow, &scrnPosCol );
+
+   }
+#else
+   if( ++s_uiDispCount == 1 )
+   {
+      ULONG nSize;
+
+      nSize = hb_gt_GetScreenWidth() * hb_gt_GetScreenHeight() * 2;
+
+      hb_gtGetPos( &scrnPosRow, &scrnPosCol );
+
+      scrnPtr = ( char * ) hb_xgrab( nSize );
+      ScreenRetrieve( ( void * ) scrnPtr );
+     
+      scrnVirtual = TRUE;
    }
 #endif
 }
@@ -945,6 +1107,22 @@ void hb_gt_DispEnd( void )
       scrnPtr = scrnStealth;
       scrnStealth = ptr;
       memcpy( ( void * ) scrnPtr, ( void * )ptr, nSize );
+      hb_gt_SetPos( scrnPosRow, scrnPosCol, 0 );
+   }
+#else
+   if( --s_uiDispCount == 0 )
+   {
+      ULONG nSize;
+
+      nSize = hb_gt_GetScreenWidth() * hb_gt_GetScreenHeight() * 2;
+
+      ScreenUpdate( ( void * ) scrnPtr );
+/*      dosmemput( ( void * ) scrnPtr, nSize, hb_gt_ScreenAddress() * 16 );*/
+
+      scrnVirtual = FALSE;
+      hb_xfree( scrnPtr );
+
+      hb_gt_SetPos( scrnPosRow, scrnPosCol, 0 );
    }
 #endif
 }
@@ -1039,48 +1217,70 @@ void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULON
 
 #if defined(__DJGPP__TEXT)
    {
-     int i;
-     int bottom, left, right, top;
-     int width;
-     BYTE * ch_attr;
-     BYTE * ptr;
+     if( scrnVirtual )
+     {
+        while( nLength-- )
+        {
+           char *p;
+           p          = hb_gt_ScreenPtr( uiRow, uiCol++ );
+           *p         = byChar;
+           *( p + 1 ) = byAttr;
+        }
+     else
+     {
+        int i;
+        int bottom, left, right, top;
+        int width;
+        BYTE * ch_attr;
+        BYTE * ptr;
 
-     i = ( int ) nLength;
-     left = cCol;
-     top = cRow;
-     width = hb_gt_GetScreenWidth();
-     ptr = ch_attr = hb_xgrab( i * 2 );
-     while( i-- )
-       {
-         *ptr++ = byChar;
-         *ptr++ = byAttr;
-       }
-     i = nLength - 1; /* We want end position, not next cursor position */
-     right = left;
-     bottom = top;
-     if( right + i > width - 1 )
-       {
-         /*
-          * Calculate end row position and the remainder size for the
-          * end column adjust.
-          */
-         bottom += ( i / width );
-         i = i % width;
-       }
-     right += i;
-     if( right > width - 1 )
-       {
-         /* Column movement overflows into next row */
-         bottom++;
-         right -= width;
-       }
-     puttext( left + 1, top + 1, right + 1, bottom + 1, ch_attr );
-     hb_xfree( ch_attr );
+        i = ( int ) nLength;
+        left = cCol;
+        top = cRow;
+        width = hb_gt_GetScreenWidth();
+        ptr = ch_attr = hb_xgrab( i * 2 );
+        while( i-- )
+          {
+            *ptr++ = byChar;
+            *ptr++ = byAttr;
+          }
+        i = nLength - 1; /* We want end position, not next cursor position */
+        right = left;
+        bottom = top;
+        if( right + i > width - 1 )
+          {
+            /*
+             * Calculate end row position and the remainder size for the
+             * end column adjust.
+             */
+            bottom += ( i / width );
+            i = i % width;
+          }
+        right += i;
+        if( right > width - 1 )
+          {
+            /* Column movement overflows into next row */
+            bottom++;
+            right -= width;
+          }
+        puttext( left + 1, top + 1, right + 1, bottom + 1, ch_attr );
+        hb_xfree( ch_attr );
+     }
    }
 #elif defined(__DJGPP__)
    {
       while( nLength-- )
-         ScreenPutChar( byChar, byAttr, uiCol++, uiRow );
+      {
+         if( scrnVirtual )
+         {
+            char *p;
+            p          = hb_gt_ScreenPtr( uiRow, uiCol++ );
+            *p         = byChar;
+            *( p + 1 ) = byAttr;
+         }
+         else
+            ScreenPutChar( byChar, byAttr, uiCol++, uiRow );
+      }
    }
 #else
    {
