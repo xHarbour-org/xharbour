@@ -15,14 +15,14 @@
 #ifndef _WINGDI_
  //P_O_Push
 #define _WINGDI_
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 
 #ifndef WINVER
   #define WINVER   1280   // version 5.0
 #endif // WINVER
 
 #ifndef NOGDI
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 #ifndef NORASTEROPS
 
 
@@ -516,7 +516,7 @@
 #endif
 
 #ifndef NOMETAFILE
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 // Clipboard Metafile Picture Structure
 
 
@@ -551,7 +551,7 @@
 #define NTM_DSIG               2097152
 
 #endif // NOTEXTMETRIC
-  
+
     
 #ifndef _PALETTEENTRY_DEFINED
 #define _PALETTEENTRY_DEFINED
@@ -1378,7 +1378,7 @@
 
 
 #ifndef NOTEXTMETRIC
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 //  GetGlyphOutline constants
 
 #define GGO_METRICS        0
@@ -1478,7 +1478,7 @@
 
 #ifdef STRICT
 #if !defined(NOTEXTMETRIC)
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 
 // mode selections for the device mode function
 #define DM_UPDATE           1

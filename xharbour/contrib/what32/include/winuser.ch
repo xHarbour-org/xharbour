@@ -15,7 +15,7 @@
 #ifndef _WINUSER_
  //P_O_Push
 #define _WINUSER_
-
+#endif // added to avoid Warning P0001  Suspectious unclosed #if* directive.
 
 //
 // Define API decoration for direct importing of DLL references.
