@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.69 2004/02/18 21:35:56 druzus Exp $
+ * $Id: filesys.c,v 1.70 2004/02/20 12:52:52 druzus Exp $
  */
 
 /*
@@ -2602,23 +2602,28 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 #if defined(HB_OS_WIN_32)
    {
       BOOL bStatus;
+
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
+
       #if defined(X__WIN32__)
          bStatus = FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) );
       #else
-         bStatus = FlushFileBuffers( ( HANDLE ) hFileHandle );
+         hb_fsSetError( _commit( hFileHandle ) );
       #endif
+
       HB_DISABLE_ASYN_CANC
 
-      if ( ! bStatus )
-      {
-         hb_fsSetError( ( USHORT ) GetLastError());
-      }
-      else
-      {
-         hb_fsSetError( 0 );
-      }
+      #if defined(X__WIN32__)
+        if( ! bStatus )
+        {
+           hb_fsSetError( ( USHORT ) GetLastError());
+        }
+        else
+        {
+           hb_fsSetError( 0 );
+        }
+      #endif
    }
 
 #elif defined(HB_OS_OS2)

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2558 2004/03/11 13:43:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.2559 2004/03/11 13:56:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-11 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/filesys.c
+    ! Fixed NON X__WIN32__ branch under HB_OS_WIN_32 of hb_fsCommit() to use _commit()
+      instead of FlushFileBuffers()
+
+    /* Compilation tested under MSVC and BCC - please test and revise others as needed. */
+
 2004-03-11 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/transfrm.c
     ! remove recent hack, it is very destructive :-(
