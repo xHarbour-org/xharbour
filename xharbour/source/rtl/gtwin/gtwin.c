@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.85 2005/02/24 10:44:09 andijahja Exp $
+ * $Id: gtwin.c,v 1.86 2005/02/27 11:56:06 andijahja Exp $
  */
 
 /*
@@ -160,6 +160,7 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static HANDLE s_HInput  = INVALID_HANDLE_VALUE;
 static HANDLE s_HOutput = INVALID_HANDLE_VALUE;
+static DWORD  s_dwmode;
 static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
                                   s_origCsbi; /* to restore screen mode on exit */
 
@@ -1434,14 +1435,31 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
-    return TRUE;
+
+   GetConsoleMode( s_HInput, &s_dwmode );
+   if( b_MouseEnable )
+   {
+      SetConsoleMode( s_HInput, s_dwmode & ~ENABLE_MOUSE_INPUT );
+   }
+   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
+
+   return TRUE;
 }
 
 /* *********************************************************************** */
 
 BOOL HB_GT_FUNC(gt_Resume())
 {
-    return TRUE;
+   if( b_MouseEnable )
+   {
+/*      HB_GT_FUNC(mouse_Init()); */
+   }
+
+   SetConsoleMode( s_HInput, s_dwmode );
+   HB_GT_FUNC(gt_xSetCursorStyle());
+   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
+
+   return TRUE;
 }
 
 /* *********************************************************************** */
