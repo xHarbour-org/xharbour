@@ -502,4 +502,17 @@ FUNCTION ListAsArray2( cList, cDelimiter )
    //
 RETURN aList        // Return the array
 
+FUNCTION CreateLink()
+    LOCAL nHandle := FCreate("hbtemp.c")
+    
+    FWrite( nHandle, '#include "hbapi.h"' + HB_OsNewLine())
+    FWrite( nHandle, 'extern HB_FUNC( HB_GT_CRS );' + HB_OsNewLine())
+    FWrite( nHandle, 'void hb_lnk_ForceLink_build( void )' + HB_OsNewLine())
+    FWrite( nHandle, '{' + HB_OsNewLine())
+    FWrite( nHandle, '   HB_FUNCNAME( HB_GT_CRS )();' + HB_OsNewLine())
+    FWrite( nHandle, '}' + HB_OsNewLine())
+    FClose( nHandle )
+    
+
+RETURN NIL    
 *+ EOF: HBMUTILS.PRG
