@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.10 2002/03/25 21:55:56 walito Exp $
+ * $Id: tget.prg,v 1.12 2002/04/17 18:17:10 walito Exp $
  */
 
 /*
@@ -563,7 +563,7 @@ return xValue
 
 METHOD overstrike( cChar ) CLASS Get
 
-   if ::type == "N" .and. ! ::lEdit
+   if ::type == "N" .and. ! ::lEdit .and. ::Clear
       ::pos := 1
    endif
 
@@ -574,8 +574,8 @@ METHOD overstrike( cChar ) CLASS Get
    endif
 
    if ! ::lEdit
-      ::buffer := ::PutMask( ::VarGet(), .t. )
       ::lEdit  := .t.
+      ::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
 
@@ -617,7 +617,7 @@ METHOD Insert( cChar ) CLASS Get
    local n
    local nMaxLen := ::nMaxLen
 
-   if ::type == "N" .and. ! ::lEdit
+   if ::type == "N" .and. ! ::lEdit .and. ::Clear
       ::pos := 1
    endif
 
@@ -628,8 +628,8 @@ METHOD Insert( cChar ) CLASS Get
    endif
 
    if ! ::lEdit
-      ::buffer := ::PutMask( ::VarGet(), .t. )
       ::lEdit  := .t.
+      ::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
    do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxLen
@@ -858,9 +858,9 @@ METHOD ToDecPos() CLASS Get
    endif
 
    ::Clear  := .f.
+   ::lEdit  := .t.
    ::buffer := ::PutMask( ::UnTransform(), .f. )
    ::pos    := ::DecPos + 1
-   ::lEdit  := .t.
 
    ::Display( .t. )
 
@@ -998,7 +998,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
             cBuffer := SubStr( cBuffer, 1, nFor - 1 ) + cChar + SubStr( cBuffer, nFor + 1 )
          endif
       next
-      if Empty(xValue)
+      if ::lEdit .and. Empty(xValue)
          cBuffer := StrTran(cBuffer, "0", " ")
       endif
       if ::lDecRev
@@ -1034,6 +1034,7 @@ METHOD _Delete( lDisplay ) CLASS Get
 
    DEFAULT lDisplay TO .t.
 
+   ::Clear := .f.
    ::lEdit := .t.
 
    if ::lPicComplex
