@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.8 2002/11/08 04:46:51 ronpinkas Exp $
+ * $Id: TMenuItem.prg,v 1.9 2002/11/12 05:38:34 ronpinkas Exp $
  */
 
 /*
@@ -84,6 +84,9 @@ CLASS TMenuItem FROM TComponent
    METHOD SetVisible()
    METHOD SetImageIndex()
    METHOD SetCaption( Value )
+
+   METHOD GetParentMenu()
+   METHOD SetParentComponent( Value )
 
 ENDCLASS
 
@@ -328,3 +331,29 @@ METHOD SetCaption( Value ) CLASS TMenuItem
    ENDIF
 
 Return NIL
+
+METHOD SetParentComponent( Value ) CLASS TMenuItem
+
+   IF ::FParent != NIL
+      ::FParent:Remove( Self )
+   ENDIF
+
+   IF Value != NIL
+      IF Value:IsDerivedFrom( "TMenu" )
+         aAdd( Value:Items, Self )
+      ELSEIF Value:ClassName == "TMENUITEM"
+         TMenuItem(Value).Add(Self);
+      ENDIF
+   ENDIF
+
+RETURN NIL
+
+METHOD GetParentMenu() CLASS TMenuItem
+
+   LOCAL MenuItem := Self
+
+   WHILE MenuItem:FParent != NIL )
+      MenuItem := MenuItem:FParent
+   ENDDO
+
+RETURN MenuItem:FMenu

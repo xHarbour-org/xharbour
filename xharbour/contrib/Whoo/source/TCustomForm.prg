@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.4 2002/11/11 23:18:02 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.5 2002/11/12 05:38:34 ronpinkas Exp $
  */
 
 /*
@@ -207,4 +207,19 @@ METHOD RefreshMDIMenu() CLASS TCustomForm
 
 Return NIL
 
+METHOD SetParent( oParent ) CLASS TCustomForm
+
+   IF ( ! ::Parent == oParent) .AND. ( ! oParent == Self )
+      IF ::Parent == NIL
+         ::DestroyHandle()
+      ENDIF
+
+      ::Super:SetParent( oParent )
+
+      IF ::Parent == NIL
+         ::UpdateControlState()
+      ENDIF
+   ENDIF
+
+RETURN NIL
 
