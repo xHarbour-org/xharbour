@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3300 2004/08/11 20:09:29 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3301 2004/08/11 21:55:55 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-12 03:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tget.prg
+    ! fixed an incompatibility with clipper, a get on a date value
+      with picture "XXXXXXXX" was not editable. See example.
+
+    /*
+    	function main()
+
+   			LOCAL ncValore := CToD("")
+   			LOCAL cPicture := "XXXXXXXX"
+   			LOCAL aGet := { GetNew( 1 , 1 ,;
+            				      { |x| Iif( pCount() == 0 , ncValore , ncValore := x ) } , , cPicture ) }
+
+   			ReadModal(aGet)
+
+		return
+    */
 
 2004-08-11 23:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg

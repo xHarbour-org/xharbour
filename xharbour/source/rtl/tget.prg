@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.87 2004/08/05 15:20:53 kaddath Exp $
+ * $Id: tget.prg,v 1.88 2004/08/08 20:59:35 mauriliolongo Exp $
  */
 
 /*
@@ -309,6 +309,11 @@ METHOD ParsePict( cPicture ) CLASS Get
    endif
 
    if ::type == "D"
+      /* 12/08/2004 - <maurilio.longo@libero.it>
+                      for clipper compatibility, see ChangeLog, I'm not sure
+                      this is the correct place for this fix
+      */
+      ::cPicMask := StrTran( ::cPicMask, "X", Space(1) )
       ::cPicMask := LTrim( ::cPicMask )
    endif
 
@@ -556,7 +561,7 @@ METHOD SetFocus() CLASS Get
       ::buffer     := ::PutMask( xVarGet, .f. )
       ::changed    := .f.
       ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
-//      ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
+      //::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
       ::pos        := 0
       ::lEdit      := .f.
 
@@ -1148,7 +1153,7 @@ METHOD IsEditable( nPos ) CLASS Get
    case "N"
       return cChar IN "9#$*"
    case "D"
-      return cChar == "9"
+      return cChar IN "9"
    case "L"
       return cChar IN "LY"
    end
