@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.70 2004/02/20 22:01:35 what32 Exp $
+ * $Id: tget.prg,v 1.71 2004/03/27 17:50:05 guerra000 Exp $
  */
 
 /*
@@ -1007,7 +1007,7 @@ return Self
 
 METHOD WordLeft() CLASS Get
 
-   local nPos
+   local nPos, nFirstEditable
 
    if ! ::hasfocus
       return Self
@@ -1016,18 +1016,20 @@ METHOD WordLeft() CLASS Get
    ::TypeOut := .f.
    ::Clear   := .f.
 
-   if ::pos == ::FirstEditable( )
+   nFirstEditable := ::FirstEditable()
+
+   if ::pos == nFirstEditable
       ::TypeOut := .t.
       return Self
    endif
 
    nPos := ::Pos
 
-   do while nPos > 1 .and. SubStr( ::buffer, nPos - 1, 1 ) == " "
+   do while nPos > nFirstEditable .and. ( SubStr( ::buffer, nPos - 1, 1 ) == " " .or. ! ::IsEditable( nPos - 1 ) )
       nPos--
    enddo
 
-   do while nPos > 1 .and. ! SubStr( ::buffer, nPos - 1, 1 ) == " "
+   do while nPos > nFirstEditable .and. ! ( SubStr( ::buffer, nPos - 1, 1 ) == " " .or. ! ::IsEditable( nPos - 1 ) )
       nPos--
    enddo
 
@@ -1041,7 +1043,7 @@ return Self
 
 METHOD WordRight() CLASS Get
 
-   local nPos
+   local nPos, nLastEditable
 
    if ! ::hasfocus
       return Self
@@ -1050,18 +1052,20 @@ METHOD WordRight() CLASS Get
    ::TypeOut := .f.
    ::Clear   := .f.
 
-   if ::pos == ::nMaxEdit
+   nLastEditable := ::LastEditable()
+
+   if ::pos == nLastEditable
       ::TypeOut := .t.
       return Self
    endif
 
    nPos := ::Pos
 
-   do while nPos < ::nMaxEdit .and. ! SubStr( ::buffer, nPos, 1 ) == " "
+   do while nPos < nLastEditable .and. ! ( SubStr( ::buffer, nPos, 1 ) == " " .or. ! ::IsEditable( nPos ) )
       nPos++
    enddo
 
-   do while nPos < ::nMaxEdit .and. SubStr( ::buffer, nPos, 1 ) == " "
+   do while nPos < nLastEditable .and. ( SubStr( ::buffer, nPos, 1 ) == " " .or. ! ::IsEditable( nPos ) )
       nPos++
    enddo
 
@@ -1526,30 +1530,16 @@ METHOD DelWordLeft() CLASS Get
       return Self
    endif
 
-   if !( SubStr( ::buffer, ::Pos, 1 ) == " " )
-      if SubStr( ::buffer, ::Pos - 1 , 1 ) == " "
-         ::BackSpace( .f. )
-      else
-         ::WordRight()
-         ::Left()
-      endif
-   endif
-
-   if SubStr( ::buffer, ::Pos, 1 ) == " "
-      ::Delete( .f. )
-   endif
-
-   do while ::Pos > 1 .and. !( SubStr( ::buffer, ::Pos - 1, 1 ) == " " )
-      ::BackSpace( .f. )
-   Enddo
-
-   ::Display()
+   ::WordLeft()
+   ::DelWordRight()
 
 return Self
 
 //---------------------------------------------------------------------------//
 
 METHOD DelWordRight() CLASS Get
+
+   local nCount, nPos
 
    if ! ::hasfocus
       return Self
@@ -1563,13 +1553,22 @@ METHOD DelWordRight() CLASS Get
       return Self
    endif
 
-   do while ::Pos <= ::nMaxEdit .and. !( SubStr( ::buffer, ::Pos, 1 ) == " " )
-      ::Delete( .f. )
-   Enddo
+   // Counts how many characters must be deleted
+   nPos := ::Pos
+   nCount := 0
+   do while nPos <= ::nMaxEdit .and. ! SubStr( ::buffer, nPos, 1 ) == " " .and. ::IsEditable( nPos )
+      nPos++
+      nCount++
+   enddo
+   do while nPos <= ::nMaxEdit .and. SubStr( ::buffer, nPos, 1 ) == " " .and. ::IsEditable( nPos )
+      nPos++
+      nCount++
+   enddo
 
-   if ::Pos <= ::nMaxEdit
+   do while nCount > 0
       ::Delete( .f. )
-   endif
+      nCount--
+   Enddo
 
    ::Display()
 
