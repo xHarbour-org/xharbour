@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
+ * $Id: binnum.c,v 1.2 2002/11/29 08:59:58 what32 Exp $
  */
 
 /*
@@ -78,23 +78,34 @@ HB_FUNC( BIN2L )
       //ULONG ulLen = hb_itemGetCLen( pItem );
 
       // Seems more efficent to me, but NOT sure if has any pltaform dependant issues.
-      if( pBin->item.asString.length > 3 )
+      if( pBin->item.asString.length > 2 ) // Ok to take advantage of Termination char 0 :-)
       {
          hb_retnl( *(long *) ( pBin->item.asString.value ) );
-         
+
          return;
       }
-         
+      else
+      {
+         unsigned char Temp[4];
+
+         Temp[0] = Temp[1] = Temp[2] = Temp[3] = '\0';
+
+         memcpy( (void *) Temp, (void *) pBin->item.asString.value, pBin->item.asString.length );
+
+         hb_retnl( *(long *) ( Temp ) );
+
+         return;
+      }
 
       /*
       hb_retnl( HB_MKLONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                            ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,
                            ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,
                            ( ulLen >= 4 ) ? ( BYTE ) pszString[ 3 ] : 0 ) );
-      */                     
+      */
    }
-   
-   
+
+
    hb_retnl( 0 );
 }
 
