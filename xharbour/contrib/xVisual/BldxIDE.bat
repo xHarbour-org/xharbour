@@ -1,1 +1,1 @@
-bld_b32 xide ctrlmask
+bld_b32 xide formedit ctrlmask

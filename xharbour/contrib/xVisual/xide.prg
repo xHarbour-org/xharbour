@@ -3,6 +3,9 @@
 #include "common.ch"
 #include "hbclass.ch"
 #include "debug.ch"
+#include "what32.ch"
+#Include "toolbar.ch"
+#Include "winlview.ch"
 
 static oApp
 
@@ -10,13 +13,13 @@ static oApp
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
-
+   local oTool, oRebar
+   LOCAL hImg,hBmp
+   
    oApp := Application():Initialize()
-
    WITH OBJECT oApp
 
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
-
          :SetBkBrush( COLOR_APPWORKSPACE+1 )
          :WindowMenu := TMenu():New()
 
@@ -24,25 +27,38 @@ FUNCTION Main
             :AddPopup('popup 1')
 
             WITH OBJECT :Popup
-               :AddItem( 'item 100', 100, {||MessageBox( GetActiveWindow(),'HI FROM THE MAIN CLASS')})
-               :AddItem( 'item 101', 101)
-//               :AddItem( 'Editor', 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
-               :AddItem( 'item 102', 102)
-               :AddItem( 'item 103', 103)
-            END
-
-            :AddPopup('popup 2')
-
-            WITH OBJECT :Popup
-               :AddItem( 'item 200', 200, {||oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainFrame ) } )
-               :AddItem( 'item 201', 201)
-               :AddItem( 'item 202', 202)
-               :AddItem( 'item 203', 203, {||oApp:SubForm1:SetProcedure()} )
+               :AddItem( 'Editor'  , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
             END
          END
 
          :SetWindowMenu()
       END
+
+//----------------------------------------------------------------------------------------------
+//   UNDER CONSTRUCTION
+//----------------------------------------------------------------------------------------------
+
+      hImg := ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
+      hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+      ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
+
+      :MainFrame:Add('Rebar', TRebar():New( :MainFrame ) )
+      
+      
+      :MainFrame:Rebar:Add( 'Tools', TToolBar():New( :MainFrame:Rebar, 444, 14, , , 32, 32, 24, 24 ) )
+      :MainFrame:Rebar:Tools:AddButton( 0, 10,,,,  ,,'New Project' )
+
+      SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETIMAGELIST, 0, hImg )
+      SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETBUTTONSIZE, 0, MAKELONG( 26, 26 ) )
+
+      :MainFrame:Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :MainFrame:Rebar:Tools:handle, 110, 26, 150 , "", NIL )
+
+//----------------------------------------------------------------------------------------------
+
+      :MainFrame:Add('Status',  TStatusBar():New( :MainFrame, 'StatusBar', 1001 ) ) 
+      :MainFrame:Status:SetPanels( { 150,380,480,580,-1 } )
+      :MainFrame:Status:SetPanelText( 0, "What32 API StatusBar" )
+      :MainFrame:Status:SetPanelText( 2, "Enjoy" )
 
       :Run()
   END
@@ -53,31 +69,17 @@ RETURN( nil)
 
 CLASS MainFrame FROM TFrame
    
-   METHOD New( oParent ) INLINE ::Caption := 'Main Form from TFrame',;
+   METHOD New( oParent ) INLINE ::Caption := 'xHarbour xIde',;
                                 ::left    := 0,;
                                 ::top     := 0,;
-                                ::width   := 200,;
+                                ::width   := GetWindowRect(GetDesktopWindow())[3],;
                                 ::height  := 100,;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
                                     PostQuitMessage(0), 0 )
 
-   METHOD OnCommand( nwParam, nlParam ) INLINE ::MainCommands( nwParam, nlParam )
-   METHOD MainCommands()
 ENDCLASS
-
-//----------------------------------
-
-METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
-   local oForm
-   do case
-      case nwParam == 101
-           oForm := SubForm1():New( self )
-           oForm:Create()
-   endcase
-return( super:OnCommand() )
-
 
 //-------------------------------------------------------------------------------------------
 
@@ -90,13 +92,11 @@ CLASS SubForm1 FROM TPanel
                                     ::height  := 200,;
                                     super:New( oParent )
 
-   METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()         INLINE ::CreateSub()
 
    METHOD OnCommand(nwParam) INLINE ::SubCommands( nwParam )
 
    METHOD CreateSub()
-   METHOD DrawGrid()
    METHOD SubCommands()
 ENDCLASS
 
@@ -124,74 +124,17 @@ METHOD CreateSub() CLASS SubForm1
    ::SetWindowMenu()
 
 
+   ::Add('Status',   TStatusBar():New( self, 'StatusBar', 1000 ) ) 
+
    ::Add('TestButton',  TButton():New( self, 'This is a BUTTON',           500,   0,  0, 200, 100 ) ) 
    ::Add('TestEdit',      TEdit():New( self, 'This is an edit control',    501, 210,  0, 200,  20 ) )
-   ::Add('TestCombo', TComboBox():New( self, 'This is a ComboBox control', 502, 210, 30, 200, 100 ) )
+   ::Add('TestCombo', TComboBox():New( self, 502, 210, 30, 200, 100 ) )
    ::Add('TestText',    TStatic():New( self, 'This is a Static control',   503, 210, 55, 200,  20 ) )
    ::Add('TestRadio',    TRadio():New( self, 'This is a Radio Button',     504, 210, 80, 200,  20 ) )
    ::Add('TestCheck',    TCheck():New( self, 'This is a Check Button',     505, 210,105, 200,  20 ) )
 
    ::TestButton:SetFocus()
 
-//   oMask:=oCtrlMask():New( ::TestButton )
-//   ::Add('mask', oMask)
 
 return( super:OnCreate() )
-
-//----------------------------------
-
-METHOD DrawGrid(hDC,nGran) CLASS SubForm1
-
-   local aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
-
-   DEFAULT nGran TO 3
-
-   DO CASE
-      CASE nGran == 1
-          hBmp := CreateBitmap( 8, 8, 1, 1,;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) )
-      CASE nGran == 2
-           hBmp := CreateBitmap( 8, 8, 1, 1,;
-                          Chr(255)+chr(0) +;
-                          Chr(187)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(187)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) )
-      CASE nGran == 3
-           hBmp := CreateBitmap( 8, 8, 1, 1, ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(251)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0))
-   ENDCASE
-
-   hBrush    := CreatePatternBrush( hBmp )
-   hPen      := CreatePen( PS_NULL, 0, 0 )
-   hOldBrush := SelectObject( hDC, hBrush )
-   hOldPen   := SelectObject( hDC, hPen )
-   aRect     := GetClientRect( ::handle )
-
-   SetTextColor( hDC, rgb( 0, 0, 0 ) )
-   SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
-   Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-   SelectObject( hDC, hOldBrush )
-   SelectObject( hDC, hOldPen )
-   DeleteObject( hBrush )
-   DeleteObject( hBmp )
-   DeleteObject( hPen )
-return(0)
 

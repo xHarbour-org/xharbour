@@ -13,7 +13,7 @@ pragma pack(4)
 
 
 
-CLASS TRebar FROM TControl
+CLASS TRebar FROM TForm
    VAR nrProc
    VAR rect
    METHOD New() CONSTRUCTOR
@@ -24,9 +24,9 @@ CLASS TRebar FROM TControl
 ENDCLASS
 
 METHOD OnCreateRebar() CLASS TRebar
-   ::nrProc := SetProcedure(::Parent:handle,;
-                            {|hWnd, nMsg,nwParam,nlParam|;
-                             ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
+   ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
+                            ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
+   ::RebarProc(WM_SIZE,0,0)
 return(super:OnCreate())
 
 METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
@@ -40,6 +40,7 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
 
 METHOD New( oParent ) CLASS TRebar
+   super:new( oParent )
    ::Name      := REBARCLASSNAME
    ::id        := 1
    ::lRegister := .F.
@@ -55,30 +56,21 @@ METHOD New( oParent ) CLASS TRebar
    ::ExStyle   := WS_EX_TOOLWINDOW
    ::Style     := WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                   RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
-return( super:new( oParent ) )
+return( self )
 
 METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
-
    LOCAL rbBand IS REBARBANDINFO
    LOCAL aRect:=GetWindowRect(hChild)
-
    rbBand:Reset()
-
-   // Initialize structure members that most bands will share.
-   rbBand:cbSize = rbBand:sizeof()  // Required
-
-   rbBand:fMask  = IFNIL(nMask,RBBIM_TEXT +; //RBBIM_BACKGROUND +;
-                               RBBIM_STYLE +RBBIM_CHILDSIZE+;
-                               RBBIM_SIZE+RBBIM_CHILD,nMask)
-
-   rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT/*+RBBS_CHILDEDGE*/,nStyle)// + RBBS_FIXEDBMP
+   rbBand:cbSize     := rbBand:sizeof()
+   rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE +RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
+   rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT,nStyle)
    rbBand:hwndChild  := IFNIL(hChild,0,hChild)
    rbBand:cxMinChild := IFNIL(cxMin,aRect[3]-aRect[1],cxMin)
    rbBand:cyMinChild := IFNIL(cyMin,aRect[4]-aRect[2],cyMin)
    rbBand:cx         := IFNIL(cx,GetClientRect(::hParent)[3],cx)
    rbBand:lpText     := IFNIL(cText,"Test",cText)
-   rbBand:hbmBack    := IFNIL(hBmp,0,hBmp) //LoadBitmap(hInstance(), "IDB_BACKGRND"),hBmp)
-
-   RETURN ( ::SendMessage( RB_INSERTBAND, -1, rbBand:value ) <> 0 )
+   rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
+return( ::SendMessage( RB_INSERTBAND, -1, rbBand:value ) <> 0 )
 
 
