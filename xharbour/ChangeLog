@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3814 2005/02/14 06:00:08 paultucker Exp $
+ * $Id: ChangeLog,v 1.3815 2005/02/14 06:07:20 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-02-14 20:35 UTC+0200 Mindaugas Kavaliauskas <dbtopas at dbtopas.lt>
+  * source/vm/hvm.c
+  * tests/tstbitop.c
+   + extended functionality of bit operators: &, | and ^^.
+     Now both arguments can be numeric or string type.
+     Availible syntax:   
+         cString operator cMask => cResult
+         cString operator nMask => cResult
+         nValue operator cString => nResult
+         nValue1 operator nValue2 => nResult
+   
 2005-02-14 00:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/hbzlib/zipplatformcomm.cpp
    * cast so compiler selects a compare method.
