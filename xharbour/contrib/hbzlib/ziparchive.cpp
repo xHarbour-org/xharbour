@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2003/01/05 10:05:31 $ $Author: what32 $
+// $Date: 2003/01/15 18:57:05 $ $Author: what32 $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -16,10 +16,10 @@
 
 
 #include "stdafx.h"
-#include "ZipArchive.h"
+#include "ziparchive.h"
 // #include "ZipPathComponent.h"
-#include "ZipPlatform.h"
-#include "ZipCompatibility.h"
+#include "zipplatform.h"
+#include "zipcompatibility.h"
 
 #include <time.h>
 

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPathComponent.cpp $
 // $Archive: /ZipArchive_Linux/ZipPathComponent.cpp $
-// $Date: 02-01-19 17:28 $ $Author: Tadeusz Dracz $
+// $Date: 2002/10/13 02:15:07 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "ZipPathComponent.h"
+#include "zippathcomponent.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFile.cpp $
 // $Archive: /ZipArchive_STL/ZipFile.cpp $
-// $Date: 02-03-23 14:05 $ $Author: Tadeusz Dracz $
+// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,9 +15,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "ZipFile.h"
-#include "ZipException.h"
-#include "ZipPlatform.h"
+#include "zipfile.h"
+#include "zipexception.h"
+#include "zipplatform.h"
 
 #include <fcntl.h>
 

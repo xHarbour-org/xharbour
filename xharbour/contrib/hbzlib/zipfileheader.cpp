@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFileHeader.cpp $
 // $Archive: /ZipArchive_STL/ZipFileHeader.cpp $
-// $Date: 02-04-01 2:15 $ $Author: Tadeusz Dracz $
+// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -16,11 +16,11 @@
 
 
 #include "stdafx.h"
-#include "ZipFileHeader.h"
-#include "ZipAutoBuffer.h"
-#include "ZipArchive.h"
-#include "ZipPlatform.h"
-#include "ZipCompatibility.h"
+#include "zipfileheader.h"
+#include "zipautobuffer.h"
+#include "ziparchive.h"
+#include "zipplatform.h"
+#include "zipcompatibility.h"
 #include <time.h>
 
 #define FILEHEADERSIZE	46

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipCompatibility.cpp $
 // $Archive: /ZipArchive/ZipCompatibility.cpp $
-// $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
+// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,11 +15,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "ZipCompatibility.h"
-#include "ZipPlatform.h"
-#include "ZipException.h"
-#include "ZipAutoBuffer.h"
-#include "ZipFileHeader.h"
+#include "zipcompatibility.h"
+#include "zipplatform.h"
+#include "zipexception.h"
+#include "zipautobuffer.h"
+#include "zipfileheader.h"
 enum iInternalAttr
 {
 	attROnly	= 0x01,	
