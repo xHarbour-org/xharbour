@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.38 2004/10/25 17:06:30 guerra000 Exp $
+ * $Id: gtapi.c,v 1.40 2004/10/26 00:10:00 oh1 Exp $
  */
 
 /*
@@ -196,7 +196,10 @@ static SHORT        ct_MRStep = 2;     // Move Rows Step
 static SHORT        ct_MCStep = 5;     // Move Columns Step
 
 static SHORT        ct_ClearA  = 7;    // Windows Clear Attribute
-static SHORT        ct_ClearB  = ' ';  // Windows Clear Char - Clipper uses 255 but we cannot not all platform/character set uses 255 as blank char
+static SHORT        ct_ClearB  = ' ';  // Windows Clear Char
+        // Clipper uses 255
+        // but we cannot not all platform/character set uses 255 as blank char
+
 static SHORT        ct_ShadowA = -1;   // Windows Shadow Attribute
 static UINT         ct_CSize   = 2;    // Windows Buffer One Char Size
 
@@ -218,7 +221,7 @@ static void hb_ctWSDisp( HB_CT_WND * wnd );
 /****************************************************************************/
 void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 {
-   SHORT iTmpRow, iTmpCol;
+//   SHORT iTmpRow, iTmpCol;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtInit()"));
 
@@ -237,8 +240,10 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    hb_gtSetColorStr( hb_set.HB_SET_COLOR );
 
-   iTmpRow = s_iRow = hb_gt_Row();
-   iTmpCol = s_iCol = hb_gt_Col();
+//   iTmpRow = s_iRow = hb_gt_Row();
+//   iTmpCol = s_iCol = hb_gt_Col();
+   s_iRow = hb_gt_Row();
+   s_iCol = hb_gt_Col();
    s_ScNone = FALSE;
    s_uiPreCount = 0;
    s_uiPreCNest = 0;
@@ -246,8 +251,9 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
    s_Width = hb_gt_GetScreenWidth();
 
    hb_ctInit();
+
    // Restores the "original" cursor position
-   hb_gtSetPos( iTmpRow, iTmpCol );
+//   hb_gtSetPos( iTmpRow, iTmpCol );
 
    /* This should be called after s_iRow/s_iCol initialization. */
    hb_gtSetCursor( SC_NORMAL );
@@ -2077,7 +2083,10 @@ static void hb_ctInit( void )
       ct_MCStep = 5;     // Move Columns Step
 
       ct_ClearA  = 7;    // Windows Clear Attribute
-      ct_ClearB  = ' ';  // Windows Clear Char - Clipper uses 255 but we cannot not all platform/character set uses 255 as blank char
+      ct_ClearB  = ' ';  // Windows Clear Char
+        // Clipper uses 255
+        // but we cannot not all platform/character set uses 255 as blank char
+
       ct_ShadowA = -1;   // Windows Shadow Attribute
 
       ct_NCur = -1;
@@ -2618,7 +2627,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                             BOOL lDel )
 {
    HB_CT_WND * wnd;
-   SHORT       i, j, iRow = 0, iCol = 0;
+   SHORT       i, j;
 
    if( FRow < ct_BFRow )
    {
@@ -2646,12 +2655,12 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 
    if( FRow < ct_BFRow )
    {
-      FRow = ct_BFRow; // iRow = 1;
+      FRow = ct_BFRow;
    }
 
    if( FCol < ct_BFCol )
    {
-      FCol = ct_BFCol; // iCol = 1;
+      FCol = ct_BFCol;
    }
 
    if( LRow < FRow || LCol < FCol )
@@ -2659,16 +2668,13 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       return -1;
    }
 
-//   if( s_iRow > FRow ) iRow = 1;
-//   if( s_iCol > FCol ) iCol = 1;
-
    wnd = hb_ctWNew( FRow, FCol, LRow, LCol );
-   wnd->iRow = iRow;
-   wnd->iCol = iCol;
 
    if( ct_WMax == 0 )
    {
       wnd->s_pColor = s_pColor;
+      wnd->iRow = s_iRow;
+      wnd->iCol = s_iCol;
    }
    else
    {
@@ -2697,7 +2703,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       for( j = 0; j < ct_WCur->WNRow; j++ )
          hb_gtRepChar( j, 0, ct_ClearB, ct_WCur->WNCol );
 
-      hb_gtSetPos( iRow, iCol );
+      hb_gtSetPos( 0, 0 );
    }
 
    hb_ctWSDisp( ct_WCur );
