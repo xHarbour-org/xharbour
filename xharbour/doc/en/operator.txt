@@ -1,0 +1,160 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      @
+ *  $CATEGORY$
+ *      Operator
+ *  $ONELINER$
+ *      Pass-by-reference
+ *  $SYNTAX$
+ *      @<Var>
+ *  $ARGUMENTS$
+ *      <Var> is any valid CA-Clipper variable identifier, other than a
+ *      database field or an array element, to pass by reference.  Database
+ *      fields and array elements can only be passed by value.
+ *  $RETURNS$
+ *      An modified valur on <var>
+ *  $DESCRIPTION$
+ *      The pass-by-reference operator (@) passes variables by reference to
+ *      functions or procedures invoked with function-calling syntax.  It is a
+ *      unary prefix operator whose operand may be any variable name.
+ *
+ *      Passing a variable by reference means that a reference to the value of
+ *      the argument is passed instead of a copy of the value.  The receiving
+ *      parameter then refers to the same location in memory as the argument.
+ *      If the called routine changes the value of the receiving parameter, it
+ *      also changes the argument passed from the calling routine.
+ *
+ *      Passing a variable by value means that the argument is evaluated and its
+ *      value is copied to the receiving parameter.  Changes to a receiving
+ *      parameter are local to the called routine and lost when the routine
+ *      terminates.  The default method of passing arguments is by value for all
+ *      data types including references to arrays and objects.
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+ *         Local cName := ""
+ *         GetName( @cName)
+ *         GetName( @cName)
+ *         ? cName
+ *      RETURN NIL
+ *      FUNCTION GetName( cName )
+ *         cName := "Test"
+ *      RETURN NIL   
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Operator is full clipper compatible
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      AND,OR,NOT
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      AND
+ *  $CATEGORY$
+ *      Operator
+ *  $ONELINER$
+ *      Logical AND
+ *  $SYNTAX$
+ *      <lCondition1> .AND. <lCondition2>
+ *  $ARGUMENTS$
+ *      <lCondition1> and <lCondition2> are logical expressions to AND.
+ *  $RETURNS$
+ *      Return True or False Depending on Arguments Result
+ *  $DESCRIPTION$
+ *    The .AND. operator is a binary logical operator that executes a logical
+ *    AND operation using the following modified Boolean rules:
+ *
+ *    .  Returns true (.T.) if both <lCondition1> and <lCondition2>
+ *       evaluate to true (.T.)
+ *
+ *    .  Returns false (.F.) if either <lCondition1> and <lCondition2>
+ *       evaluate to false (.F.)
+ *  $EXAMPLES$
+ *    .  This example shows .AND. results using different operands:
+ *
+ *       ? .T. .AND. .T.            // Result: .T.
+ *       ? .T. .AND. .F.            // Result: .F.
+ *       ? .F. .AND. .T.            // Result: .F.   (shortcut)
+ *       ? .F. .AND. .F.            // Result: .F.   (shortcut)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Operator is full clipper compatible
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      @,OR,NOT
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NOT
+ *  $CATEGORY$
+ *      Operator
+ *  $ONELINER$
+ *      Logical NOT
+ *  $SYNTAX$
+ *      ! <lCondition>
+ *      .NOT. <lCondition>
+ *  $ARGUMENTS$
+ *      <lCondition> is a logical expression to not.
+ *  $RETURNS$
+ *      Return the <lCondition> expression inverted
+ *  $DESCRIPTION$
+ *      The not (!) operator is a unary logical operator that returns the
+ *      logical inverse of <lCondition>.
+ *  $EXAMPLES$
+ *      ? ! (.T.)               // Result: .F.
+ *      ? ! 1 > 2               // Result: .T.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Operator is full clipper compatible
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      @,OR,AND
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OR
+ *  $CATEGORY$
+ *      Operator
+ *  $ONELINER$
+ *      Logical OR
+ *  $SYNTAX$
+ *      <lCondition1> .OR. <lCondition2>
+ *  $ARGUMENTS$
+ *      <lCondition1> and <lCondition2> are logical expressions.
+ *  $DESCRIPTION$
+ *      The .OR. operator is a binary logical operator that executes a logical
+ *      OR operation using the following modified Boolean rules:
+ *
+ *      .  Returns true (.T.) if either <lCondition1> or <lCondition2>
+ *         evaluates to true (.T.)
+ *
+ *      .  Returns false (.F.) if both <lCondition1> and <lCondition2>
+ *         evaluates to false (.F.)
+ *  $EXAMPLES$
+ *      ? .T. .OR. .T.            // Result: .T.   (shortcut)
+ *      ? .T. .OR. .F.            // Result: .T.   (shortcut)
+ *      ? .F. .OR. .T.            // Result: .T.
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Operator is full clipper compatible
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      @,AND,NOT
+ *  $END$
+ */
