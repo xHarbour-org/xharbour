@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.21 2005/02/14 21:14:01 druzus Exp $
+ * $Id: hbrddntx.h,v 1.22 2005/02/28 02:12:31 druzus Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ typedef struct _TAGINFO
    BOOL       TagChanged;
    BOOL       TagBOF;
    BOOL       TagEOF;
-//   BOOL       NewRoot;
+   BOOL       NewRoot;
    BOOL       Memory;
    BYTE       KeyType;
    BYTE       OptFlags;

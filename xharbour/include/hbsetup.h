@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.31 2005/01/12 16:36:21 druzus Exp $
+ * $Id: hbsetup.h,v 1.32 2005/02/26 19:28:55 likewolf Exp $
  */
 
 /*
@@ -318,6 +318,24 @@
 #ifndef HB_OS_WIN_32
    #if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) || defined(_WINDOWS_) || defined(__WINDOWS_386__) || defined(__WIN32__) || defined(_MSC_VER) || defined(__CYGWIN__)
       #define HB_OS_WIN_32
+   #endif
+#endif
+
+#ifndef HB_OS_LINUX
+   #if defined(linux) || defined(__linux) || defined(__linux__)
+      #define HB_OS_LINUX
+   #endif
+#endif
+
+#ifndef HB_OS_SUNOS
+   #if defined(sun) || defined(__sun)
+      #define HB_OS_SUNOS
+   #endif
+#endif
+
+#ifndef HB_OS_HPUX
+   #if defined(__hpux)
+      #define HB_OS_HPUX
    #endif
 #endif
 
