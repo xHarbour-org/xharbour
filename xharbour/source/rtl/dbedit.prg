@@ -1,12 +1,12 @@
 /*
- * $Id: dbedit.prg,v 1.7 2003/05/15 01:52:30 andijahja Exp $
+ * $Id: dbedit.prg,v 2.0 2003/07/01 05:13:35 maurifull Exp $
  */
 
 /*
  * Harbour Project source code:
  * DBEDIT() function
  *
- * Copyright 1999 {list of individual authors and e-mail addresses}
+ * Copyright 2003 Mauricio Abre <maurifull@datafull.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,326 +50,232 @@
  *
  */
 
-#include "common.ch"
+/* NOTE: This is a total rewrite with all features previous dbedit() had
+ *       plus a few more.
+ *       It works with or w/o 5.3 extensions
+ *       + Using 5.3 extensions gives mouse event handling :)
+ *       + Features previous dbedit() had are:
+ *         - User func can be a codeblock
+ *         - No coords = full screen
+ *         - No columns = fill with db structure
+ *       + New features in this version:
+ *         - Heading/footing separator is single line instead of double line
+ *           (see below in the code)
+ *         - Columns are movable via K_CTRL_UP / K_CTRL_DOWN
+ *         - A column can be an array of 2 items
+ *           In this case, the second is the codeblock to do coloring :)
+ *         - Userfunc is called with a third parameter, the actual TBRowse object
+ *           This is very useful, it increases A LOT the power of dbedit()
+ *         - UserFunc is also called once with nMode == -1 (initialization)
+ *           Prior to begin browsing
+ *
+ * DBEdit() is no more deprecated :)
+ * Have fun
+ *                      Mauricio
+ *
+ */
+
 #include "dbedit.ch"
 #include "inkey.ch"
+#include "button.ch"
 #include "setcurs.ch"
-
-#define HB_DBEMPTY() ( LastRec() == 0 .OR. ( ( Eof() .OR. RecNo() == LastRec() + 1 ) .AND. Bof() ) )
-
-/* NOTE: Extension: Harbour supports codeblocks as the xUserFunc parameter
-         [vszakats] */
-/* NOTE: Clipper is buggy and will throw an error if the number of
-         columns is zero. (Check: dbEdit(0,0,20,20,{})) [vszakats] */
-/* NOTE: Clipper will throw an error if there's no database open [vszakats] */
-/* NOTE: The NG says that the return value is NIL, but it's not. [vszakats] */
-/* NOTE: There's an undocumented result code in Clipper (3), which is not
-         supported in Harbour. [vszakats] */
-/* NOTE: Harbour is multithreading ready/reentrant, Clipper is not.
-         [vszakats] */
-
-FUNCTION dbEdit(;
-      nTop,;
-      nLeft,;
-      nBottom,;
-      nRight,;
-      acColumns,;
-      xUserFunc,;
-      xColumnSayPictures,;
-      xColumnHeaders,;
-      xHeadingSeparators,;
-      xColumnSeparators,;
-      xFootingSeparators,;
-      xColumnFootings )
-
-   LOCAL oBrowse
-   LOCAL nKey
-   LOCAL bAction
-   LOCAL lNeedIdle
-
-   LOCAL nOldCursor
-
-   LOCAL nPos
-   LOCAL nColCount
-   LOCAL oColumn
-   LOCAL nAliasPos
-   LOCAL cAlias
-   LOCAL cFieldName
-   LOCAL cHeading
-   LOCAL cBlock
-   LOCAL bBlock
-   LOCAL aSubArray
-   LOCAL lWhile
-
-   IF !Used()
-      RETURN .F.
-   ENDIF
-
-   /* ------------------------------------------------------ */
-   /* Set up the environment, evaluate the passed parameters */
-   /* ------------------------------------------------------ */
-
-   IF !ISNUMBER( nTop ) .OR. nTop < 0
-      nTop := 0
-   ENDIF
-   IF !ISNUMBER( nLeft ) .OR. nLeft < 0
-      nLeft := 0
-   ENDIF
-   IF !ISNUMBER( nBottom ) .OR. nBottom > MaxRow() .OR. nBottom < nTop
-      nBottom := MaxRow()
-   ENDIF
-   IF !ISNUMBER( nRight ) .OR. nRight > MaxCol() .OR. nRight < nLeft
-      nRight := MaxCol()
-   ENDIF
-
-   oBrowse := TBrowseDB( nTop, nLeft, nBottom, nRight )
-
-   oBrowse:SkipBlock := {| nRecs | dbSkipper( nRecs ) }
-   oBrowse:HeadSep   := iif( ISCHARACTER( xHeadingSeparators ), xHeadingSeparators, Chr( 205 ) + Chr( 209 ) + Chr( 205 ) )
-   oBrowse:ColSep    := iif( ISCHARACTER( xColumnSeparators ), xColumnSeparators, " " + Chr( 179 ) + " " )
-   oBrowse:FootSep   := iif( ISCHARACTER( xFootingSeparators ), xFootingSeparators, "" )
-   oBrowse:AutoLite  := .F. /* Set to .F. just like in CA-Cl*pper. [vszakats] */
-
-   // Calculate the number of columns
-
-   IF ISARRAY( acColumns )
-      nColCount := Len( acColumns )
-      aSubArray:=acColumns[nColCount] // See if is an Array of Array
-
-     IF ISARRAY( aSubArray )
-        nColCount := Len( aSubArray )
-      nPos := 1
-      DO WHILE nPos <= nColCount .AND. ISCHARACTER( aSubArray[ nPos ] ) .AND. !Empty( aSubArray[ nPos ] )
-         nPos++
-      ENDDO
-      nColCount := nPos - 1
-
-      IF nColCount == 0
-         RETURN .F.
-      ENDIF
-      acColumns:=aSubArray
-      else
-      nPos := 1
-      DO WHILE nPos <= nColCount .AND. ISCHARACTER( acColumns[ nPos ] ) .AND. !Empty( acColumns[ nPos ] )
-         nPos++
-      ENDDO
-      nColCount := nPos - 1
-
-      IF nColCount == 0
-         RETURN .F.
-      ENDIF
-
-      endif
-   ELSE
-      nColCount := FCount()
-   ENDIF
-
-   // Generate the TBrowse columns
-   FOR nPos := 1 TO nColCount
-
-      /* 09/02/2002 <maurilio.longo@libero.it>
-         NOTE: I've removed all code which was here trying to guess content of acColumns[nPos], it
-               was not needed and it was not working.
-               Clipper dbEdit() requires fully qualified field names if there are columns from more than
-               one file or throws an error
-               Clipper dbEdit() is not able to change field values
-
-         EXAMPLE: a.dbf has a single field named a
-                  b.dbf has a single field named b
-
-                  use a alias "filea" new
-                  use b alias "fileb" new
-
-                  aF := { "field->a", "field->b" }
-                  dbEdit(,,,, aF)
-
-                  throws an error with Clipper 5.2
-      */
-
-      // Column Header
-      IF ISARRAY( acColumns )
-         IF ( nAliasPos := At( "->", acColumns[ nPos ] ) ) > 0
-            cAlias := SubStr( acColumns[ nPos ], 1, nAliasPos - 1 )
-            cFieldName := SubStr( acColumns[ nPos ], nAliasPos + 2 )
-            cHeading := cAlias + "->;" + cFieldName
-         ELSE
-            cHeading := acColumns[ nPos ]
-         ENDIF
-      ELSE
-         cHeading := FieldName( nPos )
-      ENDIF
-
-      IF ISARRAY( acColumns )
-         bBlock := &( "{||" + acColumns[ nPos ] + "}" )
-      ELSE
-         bBlock := FieldBlock( FieldName( nPos ) )
-      ENDIF
-
-      IF ValType(Eval(bBlock)) == "M"
-         bBlock := {|| "  <Memo>  " }
-      ENDIF
-
-      IF ISARRAY( xColumnHeaders ) .AND. Len( xColumnHeaders ) >= nPos .AND. ISCHARACTER( xColumnHeaders[ nPos ] )
-         cHeading := xColumnHeaders[ nPos ]
-      ELSEIF ISCHARACTER( xColumnHeaders )
-         cHeading := xColumnHeaders
-      ENDIF
-
-      oColumn := TBColumnNew( cHeading, bBlock )
-
-      IF ISARRAY( xColumnSayPictures ) .AND. nPos <= Len( xColumnSayPictures ) .AND. ISCHARACTER( xColumnSayPictures[ nPos ] ) .AND. !Empty( xColumnSayPictures[ nPos ] )
-         oColumn:Picture := xColumnSayPictures[ nPos ]
-      ELSEIF ISCHARACTER( xColumnSayPictures ) .AND. !Empty( xColumnSayPictures )
-         oColumn:Picture := xColumnSayPictures
-      ENDIF
-
-      IF ISARRAY( xColumnFootings ) .AND. nPos <= Len( xColumnFootings ) .AND. ISCHARACTER( xColumnFootings[ nPos ] )
-         oColumn:Footing := xColumnFootings[ nPos ]
-      ELSEIF ISCHARACTER( xColumnFootings )
-         oColumn:Footing := xColumnFootings
-      ENDIF
-
-      IF ISARRAY( xHeadingSeparators ) .AND. nPos <= Len( xHeadingSeparators ) .AND. ISCHARACTER( xHeadingSeparators[ nPos ] )
-         oColumn:HeadSep := xHeadingSeparators[ nPos ]
-      ENDIF
-
-      IF ISARRAY( xColumnSeparators ) .AND. nPos <= Len( xColumnSeparators ) .AND. ISCHARACTER( xColumnSeparators[ nPos ] )
-         oColumn:ColSep := xColumnSeparators[ nPos ]
-      ENDIF
-
-      IF ISARRAY( xFootingSeparators ) .AND. nPos <= Len( xFootingSeparators ) .AND. ISCHARACTER( xFootingSeparators[ nPos ] )
-         oColumn:FootSep := xFootingSeparators[ nPos ]
-      ENDIF
-
-      oBrowse:AddColumn( oColumn )
-
-   NEXT
-
-   /* --------------------------- */
-   /* Go into the processing loop */
-   /* --------------------------- */
-
-   IF Eof()
-      dbGoBottom()
-   ENDIF
-
-   nOldCursor := SetCursor( SC_NONE )
-   lNeedIdle  := .T.
-   nKey       := 0
-
-   lWhile := .T.
-   DO WHILE lWhile
-
-      DO WHILE !oBrowse:Stabilize() .AND. NextKey() == 0
-      ENDDO
-
-      nKey := InKey()   // it should set nKey although lNeedIdle is true
-
-      IF lNeedIdle .OR. nKey == 0
-
-         IF lNeedIdle
-            IF !dbEditCallUser( oBrowse, xUserFunc, nKey, @lNeedIdle )
-               oBrowse:forceStable()
-               EXIT
-            ENDIF
-            oBrowse:forceStable()
-         ENDIF
-
-         IF lNeedIdle
-            LOOP
-         ENDIF
-
-         oBrowse:Hilite()
-         nKey := InKey( 0 )
-         oBrowse:DeHilite()
-
-         IF ( bAction := SetKey( nKey ) ) != NIL
-            Eval( bAction, ProcName( 1 ), ProcLine( 1 ), "" )
-            LOOP
-         ENDIF
-
-      ENDIF
-
-      SWITCH nKey
-         CASE K_DOWN       ; oBrowse:Down() ; exit
-         CASE K_UP         ; oBrowse:Up() ; exit
-         CASE K_PGDN       ; oBrowse:PageDown() ; exit
-         CASE K_PGUP       ; oBrowse:PageUp() ; exit
-         CASE K_CTRL_PGUP  ; oBrowse:GoTop() ; exit
-         CASE K_CTRL_PGDN  ; oBrowse:GoBottom() ; exit
-         CASE K_RIGHT      ; oBrowse:Right() ; exit
-         CASE K_LEFT       ; oBrowse:Left() ; exit
-         CASE K_HOME       ; oBrowse:Home() ; exit
-         CASE K_END        ; oBrowse:End() ; exit
-         CASE K_CTRL_LEFT  ; oBrowse:PanLeft() ; exit
-         CASE K_CTRL_RIGHT ; oBrowse:PanRight() ; exit
-         CASE K_CTRL_HOME  ; oBrowse:PanHome() ; exit
-         CASE K_CTRL_END   ; oBrowse:PanEnd() ; exit
-         DEFAULT
-            IF !dbEditCallUser( oBrowse, xUserFunc, nKey, @lNeedIdle )
-               lWhile := .F.
-//               EXIT
-            ENDIF
-      END
-   ENDDO
-
-   SetCursor( nOldCursor )
-
-   RETURN .T.
-
-STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey, lNeedIdle )
-   LOCAL nMode
-   LOCAL nResult
-   LOCAL nPrevRecNo
-
-   DO CASE
-   CASE nKey != 0           ; nMode := DE_EXCEPT
-   CASE HB_DBEMPTY()        ; nMode := DE_EMPTY
-   CASE oBrowse:hitBottom() ; nMode := DE_HITBOTTOM
-   CASE oBrowse:hitTop()    ; nMode := DE_HITTOP
-   OTHERWISE                ; nMode := DE_IDLE
-   ENDCASE
-
-   oBrowse:forceStable()
-
-   nPrevRecNo := RecNo()
-
-   IF ( ISCHARACTER( xUserFunc ) .AND. !Empty( xUserFunc ) ) .OR. ISBLOCK( xUserFunc )
-      nResult := Do( xUserFunc, nMode, oBrowse:ColPos() )
-   ELSE
-      nResult := iif( nKey == K_ENTER .OR. nKey == K_ESC, DE_ABORT, DE_CONT )
-   ENDIF
-
-   IF Eof() .AND. !HB_DBEMPTY()
-      dbSkip( -1 )
-   ENDIF
-
-   IF nResult == DE_REFRESH .OR. nPrevRecNo != RecNo()
-
-      lNeedIdle := .T.
-
-      IF nResult != DE_ABORT
-
-         IF Set( _SET_DELETED ) .AND. Deleted() .OR. !Empty( dbFilter() ) .AND. ! &( dbFilter() )
-            dbSkip( 1 )
-         ENDIF
-
-         IF Eof()
-            dbGoBottom()
-         ENDIF
-
-         nPrevRecNo := RecNo()
-
-         oBrowse:RefreshAll():forceStable()
-         DO WHILE nPrevRecNo != RecNo()
-            oBrowse:Up():forceStable()
-         ENDDO
-
-      ENDIF
-
-   ELSE
-      oBrowse:Refreshcurrent()
-      lNeedIdle := .F.
-   ENDIF
-
-   RETURN nResult != DE_ABORT
+#include "hbsetup.ch"
+
+Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot)
+Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
+
+  IIf(Empty(nTop), nTop := 0, .T.)
+  IIf(Empty(nLeft), nLeft := 0, .T.)
+  IIf(Empty(nBottom), nBottom := MaxRow(), .T.)
+  IIf(Empty(nRight), nRight := MaxCol(), .T.)
+
+  If Empty(aCols)
+    // If no database in use, do nothing
+    If !Used()
+      Return .F.
+    End
+    aCols := Array(FCount())
+    For i := 1 To Len(aCols)
+      aCols[i] := FieldName(i)
+    Next
+    xHdr := aCols
+  End
+  IIf(Empty(xHdr), xHdr := "", .T.)
+  IIf(Empty(xFoot), xFoot := "", .T.)
+  // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
+  //       this is because most codepages (unicode too) don't have DOUBLE line chars
+  //       so the output is ugly with them
+  IIf(ValType(xHSep) == 'U', xHSep := Chr(194) + Chr(196), .T.)
+  IIf(ValType(xCSep) == 'U', xCSep := Chr(179), .T.)
+  IIf(ValType(xFSep) == 'U' .And. !Empty(xFoot), xFSep := Chr(193) + Chr(196), .T.)
+
+  oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
+  If ValType(xHSep) == 'C'
+    oTBR:headSep := xHSep
+  End
+  If ValType(xFSep) == 'C'
+    oTBR:footSep := xFSep
+  End
+  If ValType(xCSep) == 'C'
+    oTBR:colSep := xCSep
+  End
+
+  nCrs := SetCursor(SC_NONE)
+#ifdef HB_COMPAT_C53
+  // EXTENSION: Move columns inside dbedit :)
+  oTBR:setKey(K_CTRL_UP, {|| _MoveCol(oTBR, K_CTRL_UP), 0})
+  oTBR:setKey(K_CTRL_DOWN, {|| _MoveCol(oTBR, K_CTRL_DOWN), 0})
+#endif
+
+  For i := 1 To Len(aCols)
+    bFun := IIf(ValType(aCols[i]) == 'C', &("{||" + aCols[i] + '}'),  &("{||" + aCols[i,1] + '}'))
+    If ValType(Eval(bFun)) == 'M'
+      bFun := {|| "  <Memo>  "}
+    End
+
+    oTBC := TBColumnNew(IIf(ValType(xHdr) == 'C', xHdr, xHdr[i]), bFun)
+
+    If ValType(aCols[i])=='A'
+      oTBC:colorBlock := aCols[i,2]
+    End
+    If ValType(xCSep) == 'A'
+      oTBC:colSep := xCSep[i]
+    End
+    If ValType(xHSep) == 'A'
+      oTBC:headSep := xHSep[i]
+    End
+    If ValType(xFSep) == 'A'
+      oTBC:footSep := xFSep[i]
+    End
+    If ValType(xFoot) == 'A'
+      oTBC:footing := xFoot[i]
+    ElseIf ValType(xFoot) == 'C'
+      oTBC:footing := xFoot
+    End
+
+    oTBR:addColumn(oTBC)
+  Next
+
+  IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(ValType(xFunc) == 'B', xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
+
+  // EXTENSION: Initialization call
+  nRet := Eval(bFun, -1, oTBR:colPos, oTBR)
+
+  If LastRec() == 0
+    nRet := Eval(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+  End
+
+  While nRet != 0
+    If nRet == 2
+      oTBR:refreshAll()
+      oTBR:invalidate()
+    End
+    If oTBR:hitTop
+      nRet := Eval(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+    ElseIf oTBR:hitBottom
+      nRet := Eval(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+    End
+    oTBR:forceStable()
+    nRet := Eval(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    nKey := Inkey(0)
+
+#ifdef HB_COMPAT_C53
+    // xHarbour with 5.3 extensions code
+    If ValType(oTBR:SetKey(nKey)) == 'B'
+      IIf(oTBR:applyKey(nKey) == -1, nRet := 0, .T.)
+      Loop
+    End
+#endif
+
+    If ValType(SetKey(nKey)) == 'B'
+      Eval(SetKey(nKey), ProcName(1), ProcLine(1), "")
+      Loop
+    End
+
+#ifdef HB_COMPAT_C53
+    // got a key exception
+    nRet := Eval(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+#else
+    // xHarbour without 5.3 extensions code
+    Switch nKey
+      Case K_DOWN
+        oTBR:down()
+        Exit
+      Case K_UP
+        oTBR:up()
+        Exit
+      Case K_LEFT
+        oTBR:left()
+        Exit
+      Case K_RIGHT
+        oTBR:right()
+        Exit
+      Case K_PGDN
+        oTBR:pageDown()
+        Exit
+      Case K_PGUP
+        oTBR:pageUp()
+        Exit
+      Case K_CTRL_PGUP
+        oTBR:goTop()
+        Exit
+      Case K_CTRL_PGDN
+        oTBR:goBottom()
+        Exit
+      Case K_HOME
+        oTBR:home()
+        Exit
+      Case K_END
+        oTBR:end()
+        Exit
+      Case K_CTRL_HOME
+        oTBR:panHome()
+        Exit
+      Case K_CTRL_END
+        oTBR:panEnd()
+        Exit
+      Case K_CTRL_LEFT
+        oTBR:panLeft()
+        Exit
+      Case K_CTRL_RIGHT
+        oTBR:panRight()
+        Exit
+      // EXTENSION: Move columns inside dbedit :)
+      Case K_CTRL_UP
+      Case K_CTRL_DOWN
+        _MoveCol(oTBR, nKey)
+        Exit
+      Default
+       // got a key exception
+       nRet := Eval(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+    End
+#endif
+
+    // userfunc could delete recs...
+    If LastRec() == 0
+      nRet := Eval(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+    End
+  End
+
+  SetCursor(nCrs)
+Return .T.
+
+Static Function _MoveCol(oTBR, nKey)
+Local oTB1, oTB2
+
+  If nKey == K_CTRL_DOWN .And. oTBR:colPos<oTBR:colCount
+    oTB1 := oTBR:getColumn(oTBR:colPos)
+    oTB2 := oTBR:getColumn(oTBR:colPos+1)
+    oTBR:setColumn(oTBR:colPos, oTB2)
+    oTBR:SetColumn(oTBR:colPos+1, oTB1)
+    oTBR:colPos++
+    oTBR:invalidate()
+  ElseIf nKey == K_CTRL_UP .And. oTBR:colPos>1
+    oTB1 := oTBR:getColumn(oTBR:colPos)
+    oTB2 := oTBR:getColumn(oTBR:colPos-1)
+    oTBR:setColumn(oTBR:colPos, oTB2)
+    oTBR:SetColumn(oTBR:colPos-1, oTB1)
+    oTBR:colPos--
+    oTBR:invalidate()
+  End
+Return Nil
