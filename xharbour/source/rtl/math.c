@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.1.1.1 2001/12/21 10:42:17 ronpinkas Exp $
+ * $Id: math.c,v 1.2 2002/04/29 01:27:27 ronpinkas Exp $
  */
 
 /*
@@ -341,22 +341,12 @@ HB_FUNC( EXP )
 {
    if( ISNUM( 1 ) )
    {
-#if defined(HB_MATH_HANDLER)
-      double dResult = exp( hb_parnd( 1 ) );
-
-      if( s_internal_math_error )
-      {
-         hb_errRT_BASE_SubstR( s_internal_math_error, 1096, NULL, "EXP", 1, hb_paramError( 1 ) );
-         s_internal_math_error = 0;
-      }
-      else
-         hb_retnd( dResult );
-#else
       hb_retnd( exp( hb_parnd( 1 ) ) );
-#endif
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1096, NULL, "EXP", 1, hb_paramError( 1 ) );
+   }
 }
 
 HB_FUNC( LOG )
@@ -385,22 +375,12 @@ HB_FUNC( SQRT )
 {
    if( ISNUM( 1 ) )
    {
-#if defined(HB_MATH_HANDLER)
-      double dResult = sqrt( hb_parnd( 1 ) );
-
-      if( s_internal_math_error )
-      {
-         hb_errRT_BASE_SubstR( s_internal_math_error, 1097, NULL, "SQRT", 1, hb_paramError( 1 ) );
-         s_internal_math_error = 0;
-      }
-      else
-         hb_retnd( dResult );
-#else
       double dNumber = hb_parnd( 1 );
 
       hb_retnd( dNumber > 0 ? sqrt( dNumber ) : 0 ); /* Clipper doesn't error! */
-#endif
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1097, NULL, "SQRT", 1, hb_paramError( 1 ) );
+   }
 }
