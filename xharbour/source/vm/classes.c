@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.95 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: classes.c,v 1.96 2004/02/14 21:01:18 andijahja Exp $
  */
 
 /*
@@ -2461,6 +2461,32 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
    return &(HB_VM_STACK.Return);
 }
 
+PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
+{
+   HB_THREAD_STUB
+
+   hb_vmPushSymbol( pSymbol );
+   hb_vmPush( pObj );
+
+   if( ulArg )
+   {
+      ULONG i;
+      va_list ap;
+
+      va_start( ap, ulArg );
+
+      for( i = 0; i < ulArg; i++ )
+      {
+         hb_vmPush( va_arg( ap, PHB_ITEM ) );
+      }
+
+      va_end( ap );
+   }
+
+   hb_vmSend( (USHORT) ulArg );
+
+   return &(HB_VM_STACK.Return);
+}
 
 /*
  * <xRet> = __objSendMsg( <oObj>, <cSymbol>, <xArg,..>
