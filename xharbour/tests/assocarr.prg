@@ -28,6 +28,7 @@ PROCEDURE Main()
     ? aaEmployee:Contact:Last
     ?
 
+    // Keys extraction.
     FOR EACH xProperty IN aaEmployee:Keys
 
        IF aaEmployee[ xProperty ]:ClassName == "TASSOCIATIVEARRAY"
