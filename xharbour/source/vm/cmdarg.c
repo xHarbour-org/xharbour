@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.6 2003/06/24 04:34:39 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.7 2003/06/26 12:37:09 druzus Exp $
  */
 
 /*
@@ -64,8 +64,6 @@
 /* Command line argument management */
 static int     s_argc = 0;
 static char ** s_argv = NULL;
-
-static char * hb_cmdargGet( const char * pszName, BOOL bRetValue );
 
 void HB_EXPORT hb_cmdargInit( int argc, char * argv[] )
 {
@@ -180,7 +178,6 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
             if( bRetValue )
             {
                char * pszPos = pszEnvVar + strlen( pszName );
-               char * pszRetVal;
 
                ULONG ulLen; /* NOTE: Use this variable as a workaround for MSC 8 internal error. [vszakats] */
 
@@ -190,14 +187,12 @@ static char * hb_cmdargGet( const char * pszName, BOOL bRetValue )
 
                ulLen = pszEnd - pszPos;
 
-               pszRetVal = ( char * ) hb_xgrab( ulLen + 1 );
-               strncpy( pszRetVal, pszPos, ulLen );
-               pszRetVal[ ulLen ] = '\0';
-
-               return pszRetVal;
+               pszEnvVar = ( char * ) hb_xgrab( ulLen + 1 );
+               strncpy( pszEnvVar, pszPos, ulLen );
+               pszEnvVar[ ulLen ] = '\0';
             }
-            else
-               return pszEnvVar;
+            hb_xfree( ( void * ) tmp );
+            return pszEnvVar;
          }
 
          /* Step to the next switch */
