@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.29 2002/10/13 11:16:30 what32 Exp $
+ * $Id: xInspect.prg,v 1.30 2002/10/16 03:32:06 what32 Exp $
  */
 
 /*
@@ -151,8 +151,6 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
       
       ::Browser:source[::Browser:RecPos][2]:= cText
       ::Browser:RefreshCurrent()
-      ::CurObject:SetFocus()
-      SetFocus( ::Browser:hWnd)
 
 
 //------------------------------------- XFM UPDATE ---------------------------------------
@@ -160,9 +158,10 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
          ::CurObject:XFMRoot()
       ELSE
          ::CurObject:Parent:XFMControl( , ::CurObject, .F. )
+         ::CurObject:Parent:oMask:Refresh()
       ENDIF
 //----------------------------------------------------------------------------------------
-
+      SetFocus(::Browser:hWnd)
    endif
 
    IF nKey==VK_UP .OR. nKey==VK_DOWN

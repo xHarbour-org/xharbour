@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.14 2002/10/13 11:16:29 what32 Exp $
+ * $Id: TCButton.prg,v 1.15 2002/10/14 01:36:54 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,10 +36,11 @@
 CLASS TButton FROM TCustomControl
 
 //   DATA Caption INIT  "Button"
-   DATA Left    INIT   0
-   DATA Top     INIT   0
-   DATA Width   INIT  80
-   DATA Height  INIT  24
+   DATA xxLeft    PROTECTED INIT   0
+   DATA xxTop     PROTECTED INIT   0
+   DATA xxWidth   PROTECTED INIT  80
+   DATA xxHeight  PROTECTED INIT  24
+   
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+BS_PUSHBUTTON
 
    DATA lRegister PROTECTED INIT .F.

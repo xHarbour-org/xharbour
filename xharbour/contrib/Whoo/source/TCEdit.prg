@@ -1,5 +1,5 @@
 /*
- * $Id: TCEdit.prg,v 1.13 2002/10/13 11:16:29 what32 Exp $
+ * $Id: TCEdit.prg,v 1.14 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -37,13 +37,15 @@
 CLASS TEdit FROM TCustomControl
 
 //   DATA Caption INIT "Edit"
-   DATA Left    INIT 0
-   DATA Top     INIT 0
-   DATA Width   INIT 80
-   DATA Height  INIT 20
+
+   DATA xxLeft   PROTECTED INIT 0
+   DATA xxTop    PROTECTED INIT 0
+   DATA xxWidth  PROTECTED INIT 80
+   DATA xxHeight PROTECTED INIT 20
 
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+ES_AUTOHSCROLL + ;
                       ES_AUTOVSCROLL+ES_LEFT+ES_WANTRETURN+ES_MULTILINE
+
    DATA ExStyle INIT  WS_EX_CLIENTEDGE
 
    DATA lRegister PROTECTED INIT .F.

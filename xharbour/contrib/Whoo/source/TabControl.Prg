@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.18 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TabControl.Prg,v 1.19 2002/10/14 04:19:23 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -45,11 +45,11 @@ IMPORT C STRUCTURE NMHDR
 //CLASS TTabControl FROM TWinControl
 CLASS TTabControl FROM TCustomControl
 
-   DATA Caption PROTECTED INIT ""
-   DATA Left    INIT    0
-   DATA Top     INIT    0
-   DATA Width   INIT  160
-   DATA Height  INIT  160
+   DATA Caption  PROTECTED INIT ""
+   DATA xxLeft   PROTECTED  INIT    0
+   DATA xxTop    PROTECTED  INIT    0
+   DATA xxWidth  PROTECTED  INIT  160
+   DATA xxHeight PROTECTED  INIT  160
 
    DATA CurSel  INIT    1
 
@@ -210,11 +210,13 @@ METHOD Configure(lCreate) CLASS TTabControl
          IF lCreate
             ::Controls[i]:Create()
          endif
+
          ::Controls[i]:Move( acRect[1],;
                          acRect[2]+acRect[4],;
                          aTab[3]-6,;
                          aTab[4]-acRect[2]-acRect[4]-4,;
                          .T.)
+
          if lCreate
             IF i<>::CurSel
                ShowWindow(::Controls[i]:handle,SW_HIDE)
@@ -407,6 +409,8 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, cRes, nImgPos ) CLASS TabPage
    super:new( oParent )
+   ::Left    := 0
+   ::Top     := 0
    ::width   := 10
    ::height  := 10
    ::style   := WS_CHILD + WS_VISIBLE

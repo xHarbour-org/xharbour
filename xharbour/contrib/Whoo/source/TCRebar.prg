@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.18 2002/10/16 05:19:51 what32 Exp $
+ * $Id: TCRebar.prg,v 1.19 2002/10/16 17:56:54 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -44,10 +44,10 @@ pragma pack(4)
 CLASS TRebar FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
-   DATA Left    INIT    0
-   DATA Top     INIT    0
-   DATA Width   INIT  200
-   DATA Height  INIT  100
+   DATA xxLeft   PROTECTED  INIT    0
+   DATA xxTop    PROTECTED  INIT    0
+   DATA xxWidth  PROTECTED  INIT  200
+   DATA xxHeight PROTECTED  INIT  100
 
    DATA Style   INIT  WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                       /*RBS_VARHEIGHT+*/RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP

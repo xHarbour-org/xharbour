@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.9 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TPanel.prg,v 1.10 2002/10/12 09:40:53 what32 Exp $
  */
 
 /*
@@ -42,7 +42,11 @@ CLASS TPanel FROM TForm
    DATA biSystemMenu EXPORTED INIT .T.
    DATA biMinimize   EXPORTED INIT .T.
    DATA biMaximize   EXPORTED INIT .T.
-
+   
+   DATA Left INIT 0
+   DATA Top  INIT 0
+   DATA Width INIT 10
+   DATA Height INIT 10
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
    

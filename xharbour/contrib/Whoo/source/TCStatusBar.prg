@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.12 2002/10/13 11:16:29 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.13 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -39,10 +39,10 @@
 CLASS TStatusBar FROM TCustomControl
 
 //   DATA Caption INIT  "StatusBar"
-   DATA Left    INIT   0
-   DATA Top     INIT   0
-   DATA Width   INIT   0
-   DATA Height  INIT   0
+   DATA xxLeft   PROTECTED  INIT   0
+   DATA xxTop    PROTECTED  INIT   0
+   DATA xxWidth  PROTECTED  INIT   0
+   DATA xxHeight PROTECTED  INIT   0
 
    DATA Style   INIT  WS_CHILD + WS_VISIBLE
 

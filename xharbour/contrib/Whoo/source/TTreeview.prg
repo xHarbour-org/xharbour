@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.10 2002/10/14 04:19:23 what32 Exp $
+ * $Id: TTreeview.prg,v 1.11 2002/10/16 03:32:05 what32 Exp $
  */
 
 /*
@@ -46,10 +46,10 @@ CLASS TTreeView FROM TCustomControl
    DATA bChanged  PROTECTED
 
    DATA Caption PROTECTED INIT ""
-   DATA Left    INIT    0
-   DATA Top     INIT    0
-   DATA Width   INIT  160
-   DATA Height  INIT  160
+   DATA xxLeft   PROTECTED  INIT    0
+   DATA xxTop    PROTECTED  INIT    0
+   DATA xxWidth  PROTECTED  INIT  160
+   DATA xxHeight PROTECTED  INIT  160
 
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT
    DATA ExStyle INIT  WS_EX_CLIENTEDGE

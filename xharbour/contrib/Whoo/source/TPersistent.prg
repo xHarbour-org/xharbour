@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: TPersistent.prg,v 1.3 2002/10/16 21:17:00 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,14 +33,14 @@
 
 CLASS TPersistent FROM TObject
 
-    METHOD New() CONSTRUCTOR
+   METHOD New() CONSTRUCTOR
 
-    METHOD Assign                   VIRTUAL
-	METHOD AssignTo                 VIRTUAL   // PROTECTED
-	METHOD DefineProperties         VIRTUAL   // PROTECTED
-	METHOD Destroy                  VIRTUAL
-	METHOD GetNamePath              VIRTUAL
-	METHOD GetOwner                 INLINE NIL PROTECTED
+   METHOD Assign                   VIRTUAL
+   METHOD AssignTo                 VIRTUAL   // PROTECTED
+   METHOD DefineProperties         VIRTUAL   // PROTECTED
+   METHOD Destroy                  VIRTUAL
+   METHOD GetNamePath              VIRTUAL
+   METHOD GetOwner                 INLINE NIL PROTECTED
 
 ENDCLASS
 

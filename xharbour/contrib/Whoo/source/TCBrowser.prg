@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.3 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.4 2002/10/12 09:40:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -109,8 +109,6 @@ METHOD EditCell(limit,bEndBlock,xStyle,lAsNumber,aColor,FirstKey) CLASS TCBrowse
             xStyle:=0
          ENDIF
          
-         VIEW ValType(cText)=="A"
-
          IF cText==NIL
             RETURN(NIL)
          ELSEIF ValType(cText)=="A"

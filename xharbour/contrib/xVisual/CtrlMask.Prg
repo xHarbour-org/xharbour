@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.17 2002/10/07 03:56:05 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.18 2002/10/14 01:37:47 fsgiudice Exp $
  */
 
 /*
@@ -663,8 +663,10 @@ METHOD OnLButtonUp( wParam, x, y )
    ::MoveCtrl( ,aPt)
    FOR EACH a IN ::aSelected
       ShowWindow(a[SEL_HANDLE],SW_HIDE)
+
       MoveWindow(a[SEL_HANDLE],a[SEL_NEWRECT,1],a[SEL_NEWRECT,2],;
                  a[SEL_NEWRECT,3]-a[SEL_NEWRECT,1],a[SEL_NEWRECT,4]-a[SEL_NEWRECT,2],.T. )
+
       ShowWindow(a[SEL_HANDLE],SW_SHOW)
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)

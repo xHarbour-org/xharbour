@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.11 2002/10/12 09:40:53 what32 Exp $
+ * $Id: TCListBox.prg,v 1.12 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,11 +43,10 @@ IMPORT C STRUCTURE RECT
 
 CLASS TListBox FROM TCustomControl
 
-   DATA Caption PROTECTED INIT ""
-   DATA Left    INIT    0
-   DATA Top     INIT    0
-   DATA Width   INIT  160
-   DATA Height  INIT  160
+   DATA xxLeft    PROTECTED INIT    0
+   DATA xxTop     PROTECTED INIT    0
+   DATA xxWidth   PROTECTED INIT  160
+   DATA xxHeight  PROTECTED INIT  160
 
    DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP + LBS_STANDARD
    DATA ExStyle INIT  WS_EX_CLIENTEDGE

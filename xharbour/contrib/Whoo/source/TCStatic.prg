@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatic.prg,v 1.13 2002/10/13 11:16:29 what32 Exp $
+ * $Id: TCStatic.prg,v 1.14 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,10 +36,10 @@
 CLASS TStatic FROM TCustomControl
 
 //   DATA Caption INIT  "StaticText"
-   DATA Left    INIT   0
-   DATA Top     INIT   0
-   DATA Width   INIT  80
-   DATA Height  INIT  16
+   DATA xxLeft   PROTECTED  INIT   0
+   DATA xxTop    PROTECTED  INIT   0
+   DATA xxWidth  PROTECTED  INIT  80
+   DATA xxHeight PROTECTED  INIT  16
 
    DATA Style   INIT  WS_CHILD + WS_VISIBLE + SS_LEFT
 

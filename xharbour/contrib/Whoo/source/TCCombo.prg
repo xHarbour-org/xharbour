@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.18 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TCCombo.prg,v 1.19 2002/10/14 04:19:23 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -41,10 +41,11 @@
 CLASS TComboBox FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
-   DATA Left    INIT   0
-   DATA Top     INIT   0
-   DATA Width   INIT  80
-   DATA Height  INIT  20
+   DATA xxLeft   PROTECTED  INIT   0
+   DATA xxTop    PROTECTED  INIT   0
+   DATA xxWidth  PROTECTED  INIT  80
+   DATA xxHeight PROTECTED  INIT  20
+   
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+CBS_DROPDOWNLIST+WS_VSCROLL+CBS_HASSTRINGS
 
    DATA lRegister PROTECTED INIT .F.
