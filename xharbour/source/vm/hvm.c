@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.219 2003/06/23 20:31:39 jonnymind Exp $
+ * $Id: hvm.c,v 1.220 2003/06/24 03:35:05 ronpinkas Exp $
  */
 
 /*
@@ -1301,9 +1301,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
                else if( s_uiActionRequest != HB_BREAK_REQUESTED )
                {
-                  hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "No instance variable", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
+                  /*
+                   hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "No instance variable", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
+                   *
+                   (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
+                  */
 
-                  (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
+                  hb_vmSend( 0 );
+
+                  // Thread Safety.
+                  hb_stackPush();
+                  hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
+
+                  w++;
+                  break;
                }
             }
             else

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1188 2003/06/25 13:42:27 paultucker Exp $
+ * $Id: ChangeLog,v 1.1189 2003/06/26 01:29:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-25 20:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/pptable.c
+    + Added Clipper 5.3 GET support (burned-in hbgetcmt.ch)
+
+  * source/vm/hvm.c
+    ! Fixed support for HB_P_IVARREF for virtual instance variables implemented as methods.
 
 2003-06-25 18:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbmath.h
