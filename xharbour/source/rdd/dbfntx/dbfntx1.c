@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.41 2003/05/25 22:03:34 lculik Exp $
+ * $Id: dbfntx1.c,v 1.42 2003/05/31 22:26:54 lculik Exp $
  */
 
 /*
@@ -4041,6 +4041,7 @@ static ERRCODE ntxOrderListClear( NTXAREAP pArea )
 static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    LPTAGINFO pTag;
+   BOOL bFound;
 
    HB_TRACE(HB_TR_DEBUG, ("ntxOrderListFocus(%p, %p)", pArea, pOrderInfo));
 
@@ -4050,7 +4051,9 @@ static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    {
       if( hb_itemType( pOrderInfo->itmOrder ) != HB_IT_STRING &&
                   hb_itemGetNI( pOrderInfo->itmOrder ) == 0 )
+      {
          pArea->lpCurTag = NULL;
+      }
       else
       {
          pTag = ntxFindIndex( pArea, pOrderInfo->itmOrder );
@@ -4059,6 +4062,7 @@ static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       }
    }
 
+   SUPER_SKIPRAW( ( AREAP ) pArea, 0);
    return SUCCESS;
 }
 
