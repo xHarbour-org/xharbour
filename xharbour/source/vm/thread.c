@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.26 2002/12/30 08:17:15 ronpinkas Exp $
+* $Id: thread.c,v 1.27 2002/12/31 07:15:44 jonnymind Exp $
 */
 
 /*
@@ -60,10 +60,11 @@
    #include <unistd.h>    /* We need usleep() in Darwin */
 #else
    #include <malloc.h>
-   #ifdef HB_OS_UNIX
+#endif
+
+#if defined(__GNUC__) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       #include <sys/time.h>
       #include <time.h>
-   #endif
 #endif
 
 #include "hbapi.h"
