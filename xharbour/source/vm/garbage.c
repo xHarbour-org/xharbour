@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: garbage.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
  */
 
 /*
@@ -86,6 +86,9 @@ static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 /* marks if block releasing is requested during garbage collecting */
 static BOOL s_bCollecting = FALSE;
 
+/* Signify ReleaseAll Processing is in taking place. */
+static BOOL s_bReleaseAll = FALSE;
+
 /* flag for used/unused blocks - the meaning of the HB_GC_USED_FLAG bit
  * is reversed on every collecting attempt
  */
@@ -155,17 +158,16 @@ void hb_gcFree( void *pBlock )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
+   if( s_bReleaseAll )
+   {
+      HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
+      return;
+   }
+
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
       --pAlloc;
-
-      if( s_bCollecting && pAlloc->pFunc == hb_gcGripRelease )
-      {
-         HB_TRACE( HB_TR_DEBUG, ( "Nested Free, %p", pAlloc ) );
-         pAlloc->used |= HB_GC_DELETE;
-         return;
-      }
 
       if( pAlloc->locked )
       {
@@ -173,6 +175,13 @@ void hb_gcFree( void *pBlock )
       }
       else
       {
+         if( s_bCollecting )
+         {
+            HB_TRACE( HB_TR_DEBUG, ( "Release Requested from Cleanup Function, %p", pAlloc ) );
+            pAlloc->used |= HB_GC_DELETE;
+            return;
+         }
+
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
       }
 
@@ -186,22 +195,17 @@ void hb_gcFree( void *pBlock )
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
 {
+   /* Only needed when collecting garbage. */
    if( s_bCollecting )
    {
       if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
       {
-         HB_TRACE( HB_TR_INFO, ( "Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
+         HB_TRACE( HB_TR_INFO, ( "Garbage Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
 
          hb_xfree( ( (HB_ITEM_PTR) Cargo )->item.asString.value );
          ( (HB_ITEM_PTR) Cargo )->item.asString.value = NULL;
          ( (HB_ITEM_PTR) Cargo )->type = HB_IT_NIL;
       }
-      /*
-      else
-      {
-         HB_TRACE( HB_TR_INFO, ( "Item %p type:%i", ( (HB_ITEM_PTR) Cargo ), ( (HB_ITEM_PTR) Cargo )->type ) );
-      }
-      */
    }
 }
 
@@ -241,12 +245,20 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
+
+   if( s_bReleaseAll )
+   {
+      HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
+      return;
+   }
+
    if( pItem )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem;
       --pAlloc;
 
-      HB_TRACE( HB_TR_INFO, ( "Drop %p", pItem ) );
+      HB_TRACE( HB_TR_INFO, ( "Drop %p %p", pItem, pAlloc ) );
 
       hb_itemClear( pItem );    /* clear value stored in this item */
 
@@ -305,7 +317,9 @@ void *hb_gcUnlock( void *pBlock )
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    if( HB_IS_BYREF( pItem ) )
+   {
       pItem = hb_itemUnRef( pItem );
+   }
 
    if( HB_IS_ARRAY( pItem ) )
    {
@@ -363,7 +377,7 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   if( s_pCurrBlock && !s_bCollecting )
+   if( s_pCurrBlock && ! s_bCollecting )
    {
       HB_GARBAGE_PTR pAlloc, pDelete;
 
@@ -395,17 +409,17 @@ void hb_gcCollectAll( void )
                hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
             }
             pAlloc = pAlloc->pNext;
+
          } while ( s_pLockedBlock != pAlloc );
       }
 
-      /* Step 3 - finalize */
-      /* Release all blocks that are still marked as unused */
+      /* Step 3 - Call Cleanup Functions */
       pAlloc = s_pCurrBlock;
       do
       {
          if( s_pCurrBlock->used == s_uUsedFlag )
          {
-           /* call a cleanup function */
+           /* call the cleanup function */
            s_pCurrBlock->used |= HB_GC_DELETE;
            if( s_pCurrBlock->pFunc )
            {
@@ -413,14 +427,9 @@ void hb_gcCollectAll( void )
            }
          }
 
-         /* The cleanup function might have resulted in the release of the current block. */
-         if( s_pCurrBlock )
-         {
-            s_pCurrBlock = s_pCurrBlock->pNext;
-         }
-
       } while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
 
+      /* Step 4 - Release all blocks that are still marked as unused */
       pAlloc = s_pCurrBlock;
       do
       {
@@ -477,6 +486,7 @@ void hb_gcReleaseAll( void )
 
    HB_TRACE( HB_TR_INFO, ( "Release All" ) );
 
+   s_bReleaseAll = TRUE;
    s_bCollecting = TRUE;
 
    if( s_pLockedBlock )
@@ -484,18 +494,14 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pLockedBlock;
       do
       {
-         /* call a cleanup function */
+         /* call the cleanup function */
          if( s_pLockedBlock->pFunc )
          {
-            HB_TRACE( HB_TR_INFO, ( "Cleanup, Locked %p", s_pLockedBlock ) );
+            HB_TRACE( HB_TR_INFO, ( "Cleanup for Locked, %p", s_pLockedBlock ) );
             ( s_pLockedBlock->pFunc )( ( void *)( s_pLockedBlock + 1 ) );
          }
 
-         /* The cleanup function might have resulted in the release of the current block. */
-         if( s_pLockedBlock )
-         {
-            s_pLockedBlock = s_pLockedBlock->pNext;
-         }
+         s_pLockedBlock = s_pLockedBlock->pNext;
 
       } while ( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
 
@@ -505,6 +511,7 @@ void hb_gcReleaseAll( void )
          pDelete = s_pLockedBlock;
          hb_gcUnlink( &s_pLockedBlock, s_pLockedBlock );
          HB_GARBAGE_FREE( pDelete );
+
       } while ( s_pLockedBlock );
    }
 
@@ -513,7 +520,7 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pCurrBlock;
       do
       {
-         /* call a cleanup function */
+         /* call the cleanup function */
          if( s_pCurrBlock->pFunc )
          {
             HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
@@ -521,27 +528,24 @@ void hb_gcReleaseAll( void )
             HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
          }
 
-         /* The cleanup function might have resulted in the release of the current block. */
-         if( s_pCurrBlock )
-         {
-            s_pCurrBlock = s_pCurrBlock->pNext;
-         }
+         s_pCurrBlock = s_pCurrBlock->pNext;
 
       } while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
 
-      while( s_pCurrBlock )
+      do
       {
          HB_TRACE( HB_TR_INFO, ( "Release %p", s_pCurrBlock ) );
          pDelete = s_pCurrBlock;
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
          HB_GARBAGE_FREE( pDelete );
-      }
+
+      } while( s_pCurrBlock );
    }
 
    s_bCollecting = FALSE;
+   s_bReleaseAll = FALSE;
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
-
 }
 
 /* service a single garbage collector step

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.5 2002/01/02 04:40:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.6 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -396,7 +396,6 @@ void HB_EXPORT hb_vmQuit( void )
 
    /* release all known garbage */
    hb_gcReleaseAll();
-   /* hb_gcCollectAll(); */
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
    hb_stackFree();
