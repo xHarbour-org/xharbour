@@ -23,6 +23,45 @@
 
 #ifdef __HARBOUR__
 
+  #ifdef __XHARBOUR__
+     #pragma BEGINDUMP
+        #define __XHARBOUR__
+     #pragma ENDDUMP
+  #endif
+
+  #pragma BEGINDUMP
+
+      #include "hbapi.h"
+      #include "hbstack.h"
+      #include "hbapierr.h"
+      #include "hbapiitm.h"
+      #include "hbvm.h"
+      #include "hbdate.h"
+      #include "hboo.ch"
+
+      #ifdef __XHARBOUR__
+        #include "hbfast.h"
+      #endif
+
+
+     static char *s_OleRefFlags = NULL;
+
+     HB_FUNC( SETOLEREFFLAGS )
+     {
+        if( s_OleRefFlags )
+        {
+           hb_xfree( s_OleRefFlags );
+           s_OleRefFlags = NULL;
+        }
+
+        if( hb_pcount() )
+        {
+           s_OleRefFlags = hb_strdup( hb_stackItemFromBase( 1 )->item.asString.value );
+        }
+     }
+
+  #pragma ENDDUMP
+
   #include "hbclass.ch"
 
   //----------------------------------------------------------------------------//
@@ -148,16 +187,6 @@
     #pragma BEGINDUMP
 
       #include <ctype.h>
-      #include "hbapi.h"
-      #include "hbstack.h"
-      #include "hbapierr.h"
-      #include "hbapiitm.h"
-      #include "hbvm.h"
-      #include "hboo.ch"
-
-      #ifdef __XHARBOUR__
-        #include "hbfast.h"
-      #endif
 
       static BOOL s_bArrayPrefix = FALSE;
 
@@ -453,8 +482,9 @@
          }
          else
          {
-            printf( "\nUnexpected case: %s\n", sLine );
-            getchar();
+            // Todo Generic Error.
+            //printf( "\nUnexpected case: %s\n", sLine );
+            //getchar();
             sReturn[0] = sLine[0];
             sReturn[1] = '\0';
          }
@@ -839,23 +869,71 @@
 
     METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
 
-       LOCAL uObj
+       LOCAL uObj, nParams := PCount(), Counter
+       LOCAL OleRefFlags := Space( nParams - 1 )
 
-       IF uParam6 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-       ELSEIF uParam5 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1, uParam2, uParam3, uParam4, uParam5 )
-       ELSEIF uParam4 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1, uParam2, uParam3, uParam4 )
-       ELSEIF uParam3 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1, uParam2, uParam3 )
-       ELSEIF uParam2 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1, uParam2 )
-       ELSEIF uParam1 != NIL
-          uObj := OLEInvoke( ::hObj, cMethod, uParam1 )
-       ELSE
-          uObj := OLEInvoke( ::hObj, cMethod )
+       IF ProcName( 1 ) != "TOLEAUTO:" + cMethod
+          TraceLog()
+
+          IF nParams >= 7
+             IF HB_ISBYREF( @uParam6 )
+                OleRefFlags[6] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 6
+             IF HB_ISBYREF( @uParam5 )
+                OleRefFlags[5] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 5
+             IF HB_ISBYREF( @uParam4 )
+                OleRefFlags[4] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 4
+             IF HB_ISBYREF( @uParam3 )
+                OleRefFlags[3] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 3
+             IF HB_ISBYREF( @uParam2 )
+                OleRefFlags[2] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 2
+             IF HB_ISBYREF( @uParam1 )
+                OleRefFlags[6] = 'Y'
+             ENDIF
+          ENDIF
+
+          SetOleRefFlags( OleRefFlags )
        ENDIF
+
+       IF nParams == 7
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+       ELSEIF nParams == 6
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+       ELSEIF nParams == 5
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4 )
+       ELSEIF nParams == 4
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3 )
+       ELSEIF nParams == 3
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2 )
+       ELSEIF nParams == 2
+          uObj := OLEInvoke( ::hObj, cMethod, @uParam1 )
+       ELSEIF nParams == 1
+          uObj := OLEInvoke( ::hObj, cMethod )
+       ELSE
+          Alert( "TOleAuto:Invoke() - Unsupported number of parameter!" )
+          RETURN NIL
+       ENDIF
+
+       SetOleRefFlags()
 
        IF OleIsObject()
           RETURN TOleAuto():New( uObj )
@@ -872,20 +950,23 @@
 
     METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
 
-       LOCAL uObj
+       LOCAL uObj, nParams := PCount()
 
-       IF uParam6 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-       ELSEIF uParam5 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4, uParam5 )
-       ELSEIF uParam4 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4 )
-       ELSEIF uParam3 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3 )
-       ELSEIF uParam2 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1, uParam2 )
-       ELSEIF uParam1 != NIL
-          OLESetProperty( ::hObj, cProperty, uParam1 )
+       IF nParams == 7
+          OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+       ELSEIF nParams == 6
+          OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+       ELSEIF nParams == 5
+          OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4 )
+       ELSEIF nParams == 4
+          OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3 )
+       ELSEIF nParams == 3
+          OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2 )
+       ELSEIF nParams == 2
+          OLESetProperty( ::hObj, cProperty, @uParam1 )
+       ELSE
+          Alert( "TOleAuto:Set() - Unsupported number of parameter!" )
+          RETURN NIL
        ENDIF
 
        IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
@@ -900,22 +981,25 @@
 
     METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
 
-       LOCAL uObj
+       LOCAL uObj, nParams := PCount()
 
-       IF uParam6 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-       ELSEIF uParam5 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4, uParam5 )
-       ELSEIF uParam4 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3, uParam4 )
-       ELSEIF uParam3 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1, uParam2, uParam3 )
-       ELSEIF uParam2 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1, uParam2 )
-       ELSEIF uParam1 != NIL
-          uObj := OLEGetProperty( ::hObj, cProperty, uParam1 )
-       ELSE
+       IF nParams == 7
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+       ELSEIF nParams == 6
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+       ELSEIF nParams == 5
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4 )
+       ELSEIF nParams == 4
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3 )
+       ELSEIF nParams == 3
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2 )
+       ELSEIF nParams == 2
+          uObj := OLEGetProperty( ::hObj, cProperty, @uParam1 )
+       ELSEIF nParams == 1
           uObj := OLEGetProperty( ::hObj, cProperty )
+       ELSE
+          Alert( "TOleAuto:Get() - Unsupported number of parameter!" )
+          RETURN NIL
        ENDIF
 
        IF OleIsObject()
@@ -934,17 +1018,76 @@
        LOCAL bPresetShowException := ::bShowException
        LOCAL uObj
        LOCAL cError
-
-       //TraceLog( cMsg, PCount() )
+       LOCAL nParams := PCount(), OleRefFlags := Space( nParams )
 
        IF LEFT( cMsg, 1 ) == '_'
-          ::Set( SUBS( cMsg, 2 ), uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
+          ::Set( SUBS( cMsg, 2 ), @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
        ELSE
-          ::bShowException := .F.
-          uObj := ::Invoke( cMsg, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-          IF Ole2TxtError() != "S_OK"
-             uObj := ::Get( cMsg, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
+          IF nParams >= 6
+             IF HB_ISBYREF( @uParam6 )
+                OleRefFlags[6] = 'Y'
+             ENDIF
           ENDIF
+
+          IF nParams >= 5
+             IF HB_ISBYREF( @uParam5 )
+                OleRefFlags[5] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 4
+             IF HB_ISBYREF( @uParam4 )
+                OleRefFlags[4] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 3
+             IF HB_ISBYREF( @uParam3 )
+                OleRefFlags[3] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 2
+             IF HB_ISBYREF( @uParam2 )
+                OleRefFlags[2] = 'Y'
+             ENDIF
+          ENDIF
+
+          IF nParams >= 1
+             IF HB_ISBYREF( @uParam1 )
+                OleRefFlags[1] = 'Y'
+             ENDIF
+          ENDIF
+
+          ::bShowException := .F.
+
+          TraceLog( OleRefFlags )
+
+          SetOleRefFlags( OleRefFlags )
+
+          IF nParams == 6
+             uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+          ELSEIF nParams == 5
+             uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+          ELSEIF nParams == 4
+             uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+          ELSEIF nParams == 3
+             uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3 )
+          ELSEIF nParams == 2
+             uObj := ::Invoke( cMsg, @uParam1, @uParam2 )
+          ELSEIF nParams == 1
+             uObj := ::Invoke( cMsg, @uParam1 )
+          ELSE
+             uObj := ::Invoke( cMsg )
+          ENDIF
+
+          // Reset in :Invoke()
+          //SetOleRefFlags()
+
+          IF Ole2TxtError() != "S_OK"
+             uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+          ENDIF
+
           ::bShowException := bPresetShowException
        ENDIF
 
@@ -973,16 +1116,17 @@
       #include <ShlObj.h>
 
       #include <ctype.h>
-      #include "hbapi.h"
-      #include "hbstack.h"
-      #include "hbapierr.h"
-      #include "hbapiitm.h"
-      #include "hbvm.h"
-      #include "hboo.ch"
-      #include "HBdate.h"
 
       #undef  WORD
       #define WORD  unsigned short
+
+      /*
+      typedef struct _PRG_PARAM
+      {
+         BOOL bRef;
+         PHB_ITEM pItem;
+      } PRG_PARAM, *PPRG_PARAM;
+      */
 
       // -----------------------------------------------------------------------
 
@@ -993,6 +1137,8 @@
       static HRESULT nOleError = 0;
 
       static int nInitialized = 0;
+
+      static PHB_ITEM *aPrgParams = NULL;
 
       //---------------------------------------------------------------------------//
 
@@ -1018,30 +1164,49 @@
 
       //---------------------------------------------------------------------------//
 
-      static LPSTR AnsiToWide( LPSTR cAnsi )
+      static BSTR AnsiToWide( LPSTR cString )
       {
-         WORD wLen;
-         LPSTR cString;
+         UINT uLen;
+         BSTR wString;
 
-         wLen  = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cAnsi, -1, 0, 0 );
-         cString = ( char * ) hb_xgrab( wLen * 2 );
-         MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cAnsi, -1, ( LPWSTR ) cString, wLen );
+         uLen  = strlen( cString );
 
-         return ( cString );
+         if( uLen )
+         {
+            wString = ( BSTR ) hb_xgrab( ( uLen + 1 ) * 2 );
+         }
+         else
+         {
+           return NULL;
+         }
+
+         MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen + 1, wString, uLen + 1 );
+
+         //printf( "\nAnsi: '%s'\n", cString );
+         //wprintf( L"\nWide: '%s'\n", wString );
+
+         return ( wString );
       }
 
       //---------------------------------------------------------------------------//
 
-      static LPSTR WideToAnsi( LPSTR cWide )
+      static LPSTR WideToAnsi( BSTR wString )
       {
-         WORD wLen;
+         UINT uLen;
          LPSTR cString = NULL;
 
-         wLen = WideCharToMultiByte( CP_ACP, 0, ( LPWSTR ) cWide, -1, cString, 0, NULL, NULL );
-         cString = (char *) hb_xgrab( wLen );
-         WideCharToMultiByte( CP_ACP, 0, ( LPWSTR ) cWide, -1, cString, wLen, NULL, NULL );
+         uLen = SysStringLen( wString );
 
-         return ( cString );
+         if( uLen )
+         {
+            cString = (char *) hb_xgrab( uLen + 1 );
+            WideCharToMultiByte( CP_ACP, 0, wString, uLen + 1, cString, uLen + 1, NULL, NULL );
+         }
+
+         //wprintf( L"\nWide: '%s'\n", wString );
+         //printf( "\nAnsi: '%s'\n", cString );
+
+         return cString;
       }
 
       //---------------------------------------------------------------------------//
@@ -1050,23 +1215,34 @@
       {
          VARIANTARG * pArgs = NULL;
          PHB_ITEM uParam;
-         int n, nArgs, nArg;
-         LPSTR cString;
+         int n, nArgs, nArg, nParam;
+         BSTR wString;
+         BOOL bByRef;
 
          nArgs = hb_pcount() - 2;
 
          if( nArgs > 0 )
          {
             pArgs = ( VARIANTARG * ) hb_xgrab( sizeof( VARIANTARG ) * nArgs );
+            aPrgParams = ( PHB_ITEM * ) hb_xgrab( sizeof( PHB_ITEM ) * nArgs );
+
+            //printf( "Args: %i\n", nArgs );
 
             for( n = 0; n < nArgs; n++ )
             {
                // Pramateres processed in reveresed order.
                nArg = nArgs + 2 - n;
+               nParam = nArgs - n;
+
+               bByRef = s_OleRefFlags && s_OleRefFlags[ nParam - 1 ] == 'Y';
+
+               //printf( "N: %i Arg: %i Type: %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, bByRef );
 
                VariantInit( &( pArgs[ n ] ) );
 
-               uParam = hb_param( nArg, 0xFFFF );
+               uParam = hb_param( nArg, HB_IT_ANY );
+
+               aPrgParams[ n ] = uParam;
 
                switch( uParam->type )
                {
@@ -1076,32 +1252,81 @@
 
                   case HB_IT_STRING:
                   case HB_IT_MEMO:
-                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                    cString = AnsiToWide( hb_parc( nArg ) );
-                    pArgs[ n ].n1.n2.n3.bstrVal = SysAllocString( (const unsigned short *) cString );
-                    hb_xfree( cString );
+                    if( bByRef )
+                    {
+                       wString = AnsiToWide( hb_parc( nArg ) );
+                       hb_itemReleaseString( uParam );
+                       uParam->item.asString.value = (char *) SysAllocString( wString );
+                       hb_xfree( wString );
+                       pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
+                       pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
+                    }
+                    else
+                    {
+                       pArgs[ n ].n1.n2.vt   = VT_BSTR;
+                       wString = AnsiToWide( hb_parc( nArg ) );
+                       pArgs[ n ].n1.n2.n3.bstrVal = SysAllocString( wString );
+                       hb_xfree( wString );
+                    }
                     break;
 
                   case HB_IT_LOGICAL:
-                    pArgs[ n ].n1.n2.vt   = VT_BOOL;
-                    pArgs[ n ].n1.n2.n3.boolVal = hb_parl( nArg );
+                    if( bByRef )
+                    {
+                       pArgs[ n ].n1.n2.vt = VT_BYREF | VT_BOOL;
+                       pArgs[ n ].n1.n2.n3.pboolVal = (short *) &( uParam->item.asLogical.value ) ;
+                       uParam->type = HB_IT_LONG;
+                    }
+                    else
+                    {
+                       pArgs[ n ].n1.n2.vt   = VT_BOOL;
+                       pArgs[ n ].n1.n2.n3.boolVal = hb_parl( nArg );
+                    }
                     break;
 
                   case HB_IT_INTEGER:
                   case HB_IT_LONG:
                   case HB_IT_NUMERIC:
-                    pArgs[ n ].n1.n2.vt   = VT_I4;
-                    pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
+                    if( bByRef )
+                    {
+                       pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
+                       pArgs[ n ].n1.n2.n3.plVal = &( uParam->item.asLong.value ) ;
+                       uParam->type = HB_IT_LONG;
+                    }
+                    else
+                    {
+                       pArgs[ n ].n1.n2.vt = VT_I4;
+                       pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
+                    }
                     break;
 
                   case HB_IT_DOUBLE:
-                    pArgs[ n ].n1.n2.vt   = VT_R8;
-                    pArgs[ n ].n1.n2.n3.dblVal = hb_parnd( nArg );
+                    if( bByRef )
+                    {
+                       pArgs[ n ].n1.n2.vt = VT_BYREF | VT_R8;
+                       pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
+                       uParam->type = HB_IT_DOUBLE;
+                    }
+                    else
+                    {
+                       pArgs[ n ].n1.n2.vt   = VT_R8;
+                       pArgs[ n ].n1.n2.n3.dblVal = hb_parnd( nArg );
+                    }
                     break;
 
                   case HB_IT_DATE:
-                    pArgs[ n ].n1.n2.vt   = VT_DATE;
-                    pArgs[ n ].n1.n2.n3.dblVal = DateToDbl( hb_pards( nArg ) );
+                    if( bByRef )
+                    {
+                       pArgs[ n ].n1.n2.vt = VT_BYREF | VT_DATE;
+                       uParam->item.asDouble.value = DateToDbl( hb_pards( nArg ) );
+                       pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
+                       uParam->type = HB_IT_DOUBLE;
+                    }
+                    else
+                    {
+                       pArgs[ n ].n1.n2.vt   = VT_DATE;
+                       pArgs[ n ].n1.n2.n3.dblVal = DateToDbl( hb_pards( nArg ) );
+                    }
                     break;
 
                   case HB_IT_OBJECT:
@@ -1139,16 +1364,92 @@
 
       static void FreeParams(DISPPARAMS * dParams)
       {
-         int n;
+         int n, nParam;
+         char *sString;
 
          if( dParams->cArgs > 0 )
          {
             for( n = 0; n < ( int ) dParams->cArgs; n++ )
             {
-               VariantClear( &(dParams->rgvarg[ n ]) );
+               #if 1
+
+               nParam = dParams->cArgs - n;
+
+               //printf( "*** N: %i, Param: %i\n", n, nParam );
+
+               if( s_OleRefFlags && s_OleRefFlags[ nParam - 1 ] == 'Y' )
+               {
+                  switch( dParams->rgvarg[ n ].n1.n2.vt )
+                  {
+                     case VT_BYREF | VT_BSTR:
+                       //printf( "String\n" );
+                       sString = WideToAnsi( *( dParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
+                       SysFreeString( *( dParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
+
+                       // The item should NOT be cleared because we released the value above.
+                       aPrgParams[ n ]->type = HB_IT_NIL;
+
+                       hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
+                       break;
+
+                     // Already using the PHB_ITEM allocated value
+                     /*
+                     case VT_BYREF | VT_BOOL:
+                       printf( "Logical\n" );
+                       ( aPrgParams[ n ] )->type = HB_IT_LOGICAL;
+                       ( aPrgParams[ n ] )->item.asLogical.value = dParams->rgvarg[ n ].n1.n2.n3.boolVal ;
+                       break;
+
+                     case VT_BYREF | VT_DISPATCH:
+                       printf( "Dispatch\n" );
+                       hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
+                       break;
+
+                     case VT_BYREF | VT_I2:
+                       printf( "Int %i\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                       hb_itemPutNI( aPrgParams[ n ], ( int ) dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                       break;
+
+                     case VT_BYREF | VT_I4:
+                       printf( "Long %ld\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                       hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                       break;
+
+                     case VT_BYREF | VT_R8:
+                       printf( "Double\n" );
+                       hb_itemPutND( aPrgParams[ n ],  dParams->rgvarg[ n ].n1.n2.n3.dblVal );
+                       break;
+                     */
+
+                     case VT_BYREF | VT_DATE:
+                       //printf( "Date\n" );
+                       hb_itemPutDS( aPrgParams[ n ], DblToDate( *( dParams->rgvarg[ n ].n1.n2.n3.pdblVal ) ) );
+                       break;
+
+                     /*
+                     case VT_BYREF | VT_EMPTY:
+                       printf( "Nil\n" );
+                       hb_itemClear( aPrgParams[ n ] );
+                       break;
+                     */
+
+                     default:
+                       //printf( "*** Other %i***\n", dParams->rgvarg[ n ].n1.n2.vt );
+                       ;
+                  }
+               }
+               #endif
+
+               VariantClear( &(dParams->rgvarg[ n ] ) );
             }
 
             hb_xfree( ( LPVOID ) dParams->rgvarg );
+
+            if( aPrgParams )
+            {
+               hb_xfree( ( LPVOID ) aPrgParams );
+               aPrgParams = NULL;
+            }
          }
       }
 
@@ -1161,9 +1462,8 @@
          switch( RetVal.n1.n2.vt )
          {
             case VT_BSTR:
-              cString = WideToAnsi( ( LPSTR ) RetVal.n1.n2.n3.bstrVal );
-              hb_retc( cString );
-              hb_xfree( cString );
+              cString = WideToAnsi( RetVal.n1.n2.n3.bstrVal );
+              hb_retcAdopt( cString );
               break;
 
             case VT_BOOL:
@@ -1210,7 +1510,7 @@
 
       HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
       {
-         LPSTR cCLSID;
+         BSTR wCLSID;
          GUID ClassID, iid;
          /*REFIID*/ struct _GUID *riid = (struct _GUID *) &IID_IDispatch;
          IDispatch * pDisp = NULL;
@@ -1226,26 +1526,26 @@
          {
             nInitialized++;
 
-            cCLSID = AnsiToWide( hb_parc( 1 ) );
+            wCLSID = AnsiToWide( hb_parc( 1 ) );
 
             if ( hb_parc( 1 )[ 0 ] == '{' )
             {
-               nOleError = CLSIDFromString( ( LPOLESTR ) cCLSID, &ClassID );
+               nOleError = CLSIDFromString( wCLSID, &ClassID );
             }
             else
             {
-               nOleError = CLSIDFromProgID( ( LPCOLESTR ) cCLSID, &ClassID );
+               nOleError = CLSIDFromProgID( wCLSID, &ClassID );
             }
 
-            hb_xfree( cCLSID );
+            hb_xfree( wCLSID );
 
             if ( hb_pcount() == 2 )
             {
                if ( hb_parc( 2 )[ 0 ] == '{' )
                {
-                  cCLSID = AnsiToWide( hb_parc( 2 ) );
-                  nOleError = CLSIDFromString( ( LPOLESTR ) cCLSID, &iid );
-                  hb_xfree( cCLSID );
+                  wCLSID = AnsiToWide( hb_parc( 2 ) );
+                  nOleError = CLSIDFromString( wCLSID, &iid );
+                  hb_xfree( wCLSID );
                }
                else
                {
@@ -1273,8 +1573,8 @@
          {
             LPSTR source, description;
 
-            source = WideToAnsi( (char *) excep.bstrSource );
-            description = WideToAnsi( (char *) excep.bstrDescription );
+            source = WideToAnsi( excep.bstrSource );
+            description = WideToAnsi( excep.bstrDescription );
             MessageBox( NULL, description, source, MB_ICONHAND );
             hb_xfree( source );
             hb_xfree( description );
@@ -1286,7 +1586,7 @@
       HARBOUR HB_FUN_OLEINVOKE() // (hOleObject, szMethodName, uParams...)
       {
          IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
-         LPSTR cMember;
+         BSTR wMember;
          DISPID lDispID;
          DISPPARAMS dParams;
          UINT uArgErr;
@@ -1294,9 +1594,9 @@
          VariantInit( &RetVal );
          memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-         cMember = AnsiToWide( hb_parc( 2 ) );
-         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &cMember, 1, LOCALE_USER_DEFAULT, &lDispID );
-         hb_xfree( cMember );
+         wMember = AnsiToWide( hb_parc( 2 ) );
+         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+         hb_xfree( wMember );
 
          if( nOleError == S_OK )
          {
@@ -1318,10 +1618,10 @@
 
       //---------------------------------------------------------------------------//
 
-      HARBOUR HB_FUN_OLESETPROPERTY() // (hOleObject, cPropName, uValue, uParams...)
+      HARBOUR HB_FUN_OLESETPROPERTY() // (hOleObject, cPropName, uParams...)
       {
          IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
-         LPSTR cMember;
+         BSTR wMember;
          DISPID lDispID, lPropPut = DISPID_PROPERTYPUT;
          DISPPARAMS dParams;
          UINT uArgErr;
@@ -1329,9 +1629,9 @@
          VariantInit( &RetVal );
          memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-         cMember = AnsiToWide( hb_parc( 2 ) );
-         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &cMember, 1, LOCALE_USER_DEFAULT, &lDispID );
-         hb_xfree( cMember );
+         wMember = AnsiToWide( hb_parc( 2 ) );
+         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+         hb_xfree( wMember );
 
          if( nOleError == S_OK )
          {
@@ -1360,7 +1660,7 @@
       HB_FUNC( OLEGETPROPERTY )  // (hOleObject, cPropName, uParams...)
       {
          IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
-         LPSTR cMember;
+         BSTR wMember;
          DISPID lDispID;
          DISPPARAMS dParams;
          UINT uArgErr;
@@ -1368,9 +1668,9 @@
          VariantInit( &RetVal );
          memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-         cMember = AnsiToWide( hb_parc( 2 ) );
-         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &cMember, 1, LOCALE_USER_DEFAULT, &lDispID );
-         hb_xfree( cMember );
+         wMember = AnsiToWide( hb_parc( 2 ) );
+         nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+         hb_xfree( wMember );
 
          if( nOleError == S_OK )
          {
@@ -1399,15 +1699,15 @@
          IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
          IUnknown * ppvObject = NULL;
          GUID iid;
-         LPSTR ciid;
+         BSTR wiid;
 
          nOleError = S_OK;
 
          if( hb_parc( 2 )[ 0 ] == '{' )
          {
-            ciid = AnsiToWide( hb_parc( 2 ) );
-            nOleError = CLSIDFromString( ( LPOLESTR ) ciid, &iid );
-            hb_xfree( ciid );
+            wiid = AnsiToWide( hb_parc( 2 ) );
+            nOleError = CLSIDFromString( wiid, &iid );
+            hb_xfree( wiid );
          }
          else
          {
