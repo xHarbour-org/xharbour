@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.5 2003/12/21 02:56:15 walito Exp $
+ * $Id: mysql.c,v 1.6 2004/02/25 00:16:42 peterrees Exp $
  */
 
 /*
@@ -152,30 +152,29 @@ HB_FUNC(SQLFREER) // void mysql_free_result(MYSQL_RES *)
 HB_FUNC(SQLFETCHR) // MYSQL_ROW *mysql_fetch_row(MYSQL_RES *)
 {
    MYSQL_RES *mresult = (MYSQL_RES *)_parnl(1);
-   int i, num_fields = mysql_num_fields(mresult);
+   UINT ui, uiNumFields = mysql_num_fields(mresult);
+   ULONG *pulFieldLengths ;
    MYSQL_ROW mrow;
    HB_ITEM itRow, itTemp;
    itRow.type = HB_IT_NIL ;
    itTemp.type = HB_IT_NIL ;
 
-   hb_arrayNew( &itRow, num_fields );
-
+   hb_arrayNew( &itRow, uiNumFields );
    mrow = mysql_fetch_row(mresult);
-
-   if ( mrow  != NULL )
+   pulFieldLengths = mysql_fetch_lengths( mresult ) ;
+   if ( mrow  )
    {
-     for (i = 0; i < num_fields; i++)
+     for (ui = 0; ui < uiNumFields; ui++)
      {
-       /* if field is not empty */
-       if (mrow[i] != NULL)
+       if ( mrow[ ui ] == NULL )
        {
-         hb_itemPutC(&itTemp, mrow[i]);
+         hb_itemPutC( &itTemp , "" );  // if field is NULL
        }
-       else
+       else  // Put the actual data in
        {
-         hb_itemPutC(&itTemp, "");
+         hb_itemPutCL( &itTemp, mrow[ ui ], pulFieldLengths[ ui ] );
        }
-       hb_arraySetForward(&itRow, i+1, &itTemp);
+       hb_arraySetForward( &itRow, ui+1, &itTemp );
      }
    }
    hb_itemReturn(&itRow);
@@ -338,49 +337,82 @@ long filelength( int handle )
 }
 #endif
 
-char *filetoBuff(char *f,char *s)
-{
-
-   int i;
-   int fh = hb_fsOpen( ( BYTE * ) s , 2 );
-   i = hb_fsReadLarge( fh , ( BYTE * ) f , filelength( fh ) );
-   f[ i ] = '\0';
-   hb_fsClose( fh );
-   return f   ;
-}
 
 HB_FUNC(DATATOSQL)
 {
-   const char *from;
-   int iSize;
-   char *buffer;
-   from=hb_parc(1);
+   char *FromBuffer ;
+   int iSize, iFromSize ;
+   char *ToBuffer;
+   BOOL bResult = FALSE ;
    iSize= hb_parclen(1) ;
+   iFromSize = iSize ;
 
-   buffer=(char*)hb_xgrab((iSize*2)+1);
-   iSize = mysql_escape_string(buffer,from,iSize);
-   hb_retclenAdopt((char*)buffer,iSize) ;
-
+   if ( iSize )
+   {
+     FromBuffer = hb_parc( 1 ) ;
+     ToBuffer = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
+     if ( ToBuffer )
+     {
+       if ISNUM(2)
+       {
+         iSize = mysql_real_escape_string( (MYSQL *) hb_parnl(2), ToBuffer, FromBuffer, iSize);
+       }
+       else
+       {
+         iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize );
+       }
+       hb_retclenAdopt( ( char *) ToBuffer, iSize ) ;
+       bResult = TRUE ;
+     }
+   }
+   if ( !bResult )
+   {
+     // Should we raise a runtime error here????? or just return the original string
+     hb_retclen( (char *) FromBuffer, iFromSize ) ;
+   }
 }
 
 HB_FUNC(FILETOSQLBINARY)
 {
+   BOOL bResult = FALSE ;
    char *szFile=hb_parc(1);
-   const char *from;
-   int fh;
-   int iSize;
-   int iLen;
-   char *buffer;
+   int fHandle, iSize;
+   char *ToBuffer;
    char *FromBuffer;
-   fh=hb_fsOpen((BYTE*)szFile,2);
-   iSize=filelength(fh);
-   iLen=(iSize*2);
-   FromBuffer=(char*)hb_xgrab(iSize+1);
-   hb_fsClose(fh);
-   from=(char*)filetoBuff(FromBuffer,szFile);
-   buffer=(char*)hb_xgrab(iLen+1);
-   iSize = mysql_escape_string(buffer,from,iSize);
-   hb_retclenAdopt((char*)buffer, iSize);
-
-   hb_xfree(FromBuffer);
+   if ( szFile && hb_parclen(1) )
+   {
+     fHandle    = hb_fsOpen(( BYTE *) szFile,2);
+     if ( fHandle > 0 )
+     {
+       iSize      = filelength( fHandle );
+       FromBuffer = ( char *) hb_xgrab( iSize );
+       if ( FromBuffer )
+       {
+         iSize      = hb_fsReadLarge( fHandle , ( BYTE * ) FromBuffer , iSize );
+         if ( iSize )
+         {
+           ToBuffer   = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
+           if ( ToBuffer )
+           {
+             if ISNUM(2)
+             {
+               iSize = mysql_real_escape_string( (MYSQL *) hb_parnl(2), ToBuffer, FromBuffer, iSize);
+             }
+             else
+             {
+               iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize);
+             }
+             hb_retclenAdopt( ( char *) ToBuffer, iSize);
+             bResult = TRUE ;
+           }
+         }
+         hb_xfree( FromBuffer );
+       }
+       hb_fsClose( fHandle );
+     }
+   }
+   if ( !bResult )
+   {
+     hb_retc( "" ) ;
+   }
 }

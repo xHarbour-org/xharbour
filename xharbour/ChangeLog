@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2485 2004/03/04 13:44:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.2486 2004/03/04 18:03:12 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-05 10:57 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/mysql/mysql.c
+    ! HB_FUNC(SQLFETCHR) fix to use hb_itemPutCL() not hb_itemPutC()
+        ( previously truncated data containing embedded CHR(0) i.e. binary data )
+    - HB_FUNC(DATATOSQL) & HB_FUNC(FILETOSQLBINARY) optimised, added error checking
+                and option to use mysql_real_escape_string() by passing second
+                parameter ( (MYSQL *) )
 
 2004-03-04 15:09 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/vm/hbini.prg
