@@ -40,6 +40,21 @@ IMPORT C STRUCTURE RECT
 
 CLASS TListBox FROM TControl
 
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT    0
+   DATA Top     INIT    0
+   DATA Width   INIT  160
+   DATA Height  INIT  160
+
+   DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP + LBS_STANDARD
+   DATA ExStyle INIT  WS_EX_CLIENTEDGE
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "listbox"
+
    ACCESS CurSel INLINE ::GetCurSel()
 
    METHOD New() CONSTRUCTOR
@@ -64,18 +79,11 @@ ENDCLASS
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
    
-   ::Name      := 'listbox'
    ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Left      := nLeft
    ::Top       := nTop
-   ::width     := IFNIL( nWidth,  IFNIL( ::width,  160, ::width) , nWidth )
-   ::Height    := IFNIL( nHeight, IFNIL( ::height, 160, ::height), nHeight)
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + LBS_STANDARD
-   ::ExStyle   := WS_EX_CLIENTEDGE
+   ::width     := IFNIL( nWidth,  ::width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
    
    RETURN( super:new( oParent ) )
 

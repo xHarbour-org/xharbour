@@ -113,9 +113,6 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
 
          WITH OBJECT aVar[2]
             :Name      := WinClass( :ClassName )
-            :WndProc   := "FormProc"
-            :lRegister := .F.
-            :lControl  := .T.
             :Parent    := oForm
             :Instance  := oForm:Instance
             :Create()

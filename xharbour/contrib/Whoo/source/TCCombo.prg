@@ -35,6 +35,20 @@
 *------------------------------------------------------------------------------*
 
 CLASS TComboBox FROM TControl
+
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT   0
+   DATA Top     INIT   0
+   DATA Width   INIT  80
+   DATA Height  INIT  20
+   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+CBS_DROPDOWNLIST+WS_VSCROLL+CBS_HASSTRINGS
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_COMMAND}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT 'combobox'
+
    METHOD New() CONSTRUCTOR
    METHOD AddString( cText )        INLINE ::SendMessage( CB_ADDSTRING, 0, cText)
    METHOD InsertString(cText,nLine) INLINE ::SendMessage( CB_INSERTSTRING, nLine, cText )
@@ -51,15 +65,11 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight) CLASS TComboBox
+
    ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_MEASUREITEM,WM_COMMAND,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Left      := nLeft
    ::Top       := nTop
-   ::Width     := IFNIL( nWidth , IFNIL( ::width , 80, ::width ), nWidth )
-   ::Height    := IFNIL( nHeight, IFNIL( ::height, 20, ::height), nHeight)
-   ::Name      := 'combobox'
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS
+   ::Width     := IFNIL( nWidth , ::width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
+
    RETURN( super:new( oParent ) )

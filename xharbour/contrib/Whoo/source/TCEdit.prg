@@ -33,6 +33,22 @@
 
 CLASS TEdit FROM TControl
 
+   DATA Caption INIT "Edit"
+   DATA Left    INIT 0
+   DATA Top     INIT 0
+   DATA Width   INIT 80
+   DATA Height  INIT 20
+
+   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+ES_AUTOHSCROLL + ;
+                      ES_AUTOVSCROLL+ES_LEFT+ES_WANTRETURN+ES_MULTILINE
+   DATA ExStyle INIT  WS_EX_CLIENTEDGE
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "edit"
+
    METHOD New() CONSTRUCTOR
 
 ENDCLASS
@@ -41,20 +57,12 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TEdit
 
-   ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
+   ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
-   ::Width     := IFNIL( nWidth , IFNIL( ::Width , 80, ::Width ), nWidth )
-   ::Height    := IFNIL( nHeight, IFNIL( ::height, 20, ::height), nHeight)
-   ::Name      := 'edit'
-   ::ExStyle   := WS_EX_CLIENTEDGE
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + ES_AUTOHSCROLL + ;
-                  ES_AUTOVSCROLL + ES_LEFT + ES_WANTRETURN + ES_MULTILINE
+   ::Width     := IFNIL( nWidth , ::Width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
 
    RETURN( super:new( oParent ) )
 

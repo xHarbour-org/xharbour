@@ -32,6 +32,20 @@
 
 CLASS TGroupBox FROM TControl
 
+   DATA Caption INIT "GroupBox"
+   DATA Left    INIT 0
+   DATA Top     INIT 0
+   DATA Width   INIT 185
+   DATA Height  INIT 105
+
+   DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_GROUPBOX
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "button"
+
    METHOD New() CONSTRUCTOR
 
 ENDCLASS
@@ -40,22 +54,13 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TGroupBox
 
-   ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
+   ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
-   ::Width     := IFNIL( nWidth , IFNIL( ::width , 185, ::width ), nWidth )
-   ::Height    := IFNIL( nHeight, IFNIL( ::height, 105, ::height), nHeight)
-   ::Name      := 'button'
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_GROUPBOX
+   ::Width     := IFNIL( nWidth , ::width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
 
    RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*
-
-FUNCTION GroupBox( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight )
-return( TGroupBox():New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) )

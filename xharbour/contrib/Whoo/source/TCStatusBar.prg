@@ -35,7 +35,22 @@
 
 CLASS TStatusBar FROM TControl
 
-   DATA rect
+   DATA Caption INIT  "StatusBar"
+   DATA Left    INIT   0
+   DATA Top     INIT   0
+   DATA Width   INIT   0
+   DATA Height  INIT   0
+
+   DATA Style   INIT  WS_CHILD + WS_VISIBLE
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "msctls_statusbar32"
+
+
+   DATA rect PROTECTED
    
    METHOD New() CONSTRUCTOR
    METHOD Create() INLINE ::handle := CreateStatusBar( ::Style, ::Caption, ::Parent:handle, ::Id  )
@@ -53,17 +68,7 @@ ENDCLASS
 METHOD New( oParent, cCaption, nId ) CLASS TStatusBar
 
    ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
-   ::Left      := 0
-   ::Top       := 0
-   ::Width     := 0
-   ::Height    := 0
-   ::Name      := 'msctls_statusbar32'
-   ::ExStyle   := 0
    ::Style     := WS_CHILD + WS_VISIBLE
 
    RETURN( super:new( oParent ) )

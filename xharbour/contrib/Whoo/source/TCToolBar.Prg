@@ -74,15 +74,15 @@ typedef struct {;
 
 CLASS TToolbar FROM TControl
 
-   DATA abuttons
-   DATA aBitmaps
-   DATA hParent
-   DATA Created
-   DATA hBmp
-   DATA ntProc
-   DATA nBtn HIDDEN
-   DATA aMenus
-   VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp
+   DATA abuttons PROTECTED
+   DATA aBitmaps PROTECTED
+   DATA hParent  PROTECTED 
+   DATA Created  PROTECTED
+   DATA hBmp     PROTECTED
+   DATA ntProc   PROTECTED
+   DATA nBtn     PROTECTED HIDDEN
+   DATA aMenus   PROTECTED
+   VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp PROTECTED
 
    METHOD New() CONSTRUCTOR
 
