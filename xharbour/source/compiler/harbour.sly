@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.57 2003/12/04 09:26:54 druzus Exp $
+ * $Id: harbour.sly,v 1.58 2004/01/27 09:56:09 likewolf Exp $
  */
 
 /*
@@ -448,8 +448,8 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                      ExtVarList
                     { hb_compRTVariableGen( "__MVPRIVATE" ); hb_comp_cVarType = ' '; hb_comp_iVarScope = VS_NONE; } Crlf
 
-           | EXIT      { hb_comp_bDontGenLineNum = TRUE; hb_compLoopExit(); } CrlfStmnt { hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
-           | LOOP      { hb_comp_bDontGenLineNum = TRUE; hb_compLoopLoop(); } CrlfStmnt { hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
+           | EXIT      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopExit(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
+           | LOOP      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopLoop(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
            | EXTERN ExtList Crlf
            | ANNOUNCE IdentName {
                if( hb_comp_szAnnounce == NULL )
@@ -1987,7 +1987,7 @@ Cases      : CASE { hb_compLinePush(); } Expression Crlf
                }
            ;
 
-Otherwise  : OTHERWISE Crlf
+Otherwise  : OTHERWISE { hb_compLinePushIfDebugger(); } Crlf
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                }

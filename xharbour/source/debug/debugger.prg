@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.18 2003/12/31 13:37:50 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.19 2004/01/27 09:56:10 likewolf Exp $
  */
 
 /*
@@ -136,10 +136,27 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
           ENDIF
         endif
         
+        IF s_oDebugger:lToCursor 
+          IF ( (s_oDebugger:aToCursor[1] == uParam1 .AND. ;
+                s_oDebugger:aToCursor[2] == s_oDebugger:aCallStack[1][ CSTACK_MODULE ]) ;
+               .OR. InvokeDebug() )
+            s_oDebugger:lToCursor := .F.
+          ELSE
+            RETURN
+          ENDIF
+        ENDIF
+        
         if s_oDebugger:lGo
           s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] )
         endif
         
+        IF s_oDebugger:lCodeblock
+          IF !s_oDebugger:lCBTrace
+            s_oDebugger:lCodeblock := .F.
+            RETURN
+          ENDIF
+        ENDIF
+     
         s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1  
         if !s_oDebugger:lGo .or. InvokeDebug()
           s_oDebugger:lGo := .F.
@@ -159,7 +176,11 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         cProcName := ProcName( 1 )
         nVarIndex := uParam1
         cVarName  := IIF(valtype(uParam2)=='C',uParam2,'NIL')
-        /*
+
+        IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, CSTACK_LOCALS ])=='A'
+          AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ], { cVarName, nVarIndex, "Local", cProcName } )
+        endif
+
         if s_oDebugger:lShowLocals
           if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
             { | aVar | aVar[ 1 ] == cVarName } ) ) != 0
@@ -167,14 +188,10 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
           else
             AAdd( s_oDebugger:aVars, { cVarName, nVarIndex, "Local", cProcName } )
           endif
+          if s_oDebugger:oBrwVars != nil
+            s_oDebugger:oBrwVars:RefreshAll()
+          endif
         endif
-        */      
-        IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, CSTACK_LOCALS ])=='A'
-          AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ], { cVarName, nVarIndex, "Local", cProcName } )
-        endif
-        //      if s_oDebugger:oBrwVars != nil
-        //         s_oDebugger:oBrwVars:RefreshAll()
-        //      endif
 
       case nMode == HB_DBG_STATICNAME
         nVarIndex := uParam1
@@ -192,7 +209,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, CSTACK_STATICS ])=='A'
           AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_STATICS ], { cVarName, nVarIndex, "Static" } )
         endif
-        /*
+
         if s_oDebugger:lShowStatics
           if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
             { | aVar | aVar[ 1 ] == cVarName } ) ) != 0
@@ -204,7 +221,6 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
             s_oDebugger:oBrwVars:RefreshAll()
           endif
         endif
-        */
         
       case nMode == HB_DBG_ENDPROC   // called from hvm.c hb_vmDebuggerEndProc()
         if Empty( ProcName( 1 ) ) // ending (_INITSTATICS)
@@ -241,6 +257,9 @@ CLASS TDebugger
    DATA   nTraceLevel   //procedure level where TRACE was requested
    DATA   lCodeblock INIT .F.
    DATA   lActive INIT .F.
+   DATA   lCBTrace INIT .T.   //stores if codeblock tracing is allowed
+   DATA   lToCursor INIT .F.
+   DATA   aToCursor
    
    METHOD New()
    METHOD Activate()
@@ -265,7 +284,7 @@ CLASS TDebugger
    METHOD EditVar( nVar )
    METHOD EndProc()
    METHOD Exit() INLINE ::lEnd := .t.
-   METHOD Go() INLINE ::RestoreAppStatus(), ::lGo := .t., DispEnd(), ::Exit()
+   METHOD Go() INLINE ::RestoreAppStatus(), ::lGo := .t., ::Exit()
    METHOD GoToLine( nLine )
    METHOD HandleEvent()
    METHOD Hide()
@@ -323,6 +342,8 @@ CLASS TDebugger
    METHOD Trace() INLINE ::lTrace := .t., ::nTraceLevel := Len( ::aCallStack ),;
                          __Keyboard( Chr( 255 ) ) //forces a Step()
 
+   METHOD ToCursor()
+   METHOD CodeblockTrace() INLINE ::lCBTrace := ! ::lCBTrace
    METHOD ViewSets()
    METHOD WndVarsLButtonDown( nMRow, nMCol )
    METHOD LineNumbers()          // Toggles numbering of source code lines
@@ -409,13 +430,13 @@ return Self
 METHOD Activate() CLASS TDebugger
 
   ::SaveAppStatus()
-  ::loadVars()
   IF ! ::lActive
     ::lActive := .T.
     ::Show()
     if ::lShowCallStack
       ::ShowCallStack()
     endif
+    ::loadVars()
     ::ShowVars()
     //::RestoreAppStatus()
   ENDIF
@@ -1022,12 +1043,12 @@ METHOD HandleEvent() CLASS TDebugger
 
          case nKey == K_RBUTTONDOWN
 
-         case nKey == K_ESC
+         /*case nKey == K_ESC
               ::RestoreAppStatus()
               s_oDebugger := nil
               s_lExit := .T.
               DispEnd()
-              ::Exit()
+              ::Exit()*/
 
          case nKey == K_UP .or. nKey == K_DOWN .or. nKey == K_HOME .or. ;
               nKey == K_END .or. nKey == K_ENTER .or. nKey == K_PGDN .or. nKey == K_PGUP
@@ -1051,6 +1072,9 @@ METHOD HandleEvent() CLASS TDebugger
          case nKey == K_F6
               ::ShowWorkAreas()
 
+         case nKey == K_F7
+              ::ToCursor()
+   
          case nKey == K_F8 .or. nKey == 255
               // we are starting to run again so reset to the deepest call if
               // displaying stack
@@ -1863,6 +1887,7 @@ return nil
 
 METHOD SaveAppStatus() CLASS TDebugger
 
+   DispBegin()
    ::cAppImage  := SaveScreen()
    ::nAppRow    := Row()
    ::nAppCol    := Col()
@@ -1976,21 +2001,29 @@ return nil
 // Toggle a breakpoint at the cursor position in the currently viewed file
 // which may be different from the file in which execution was broken
 METHOD ToggleBreakPoint() CLASS TDebugger
-   // look for a breakpoint which matches both line number and program name
-   local nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == ;
-                       ::oBrwText:nRow ;
-                       .AND. aBreak [ 2 ] == ::cPrgName} ) // it was nLine
+  // look for a breakpoint which matches both line number and program name
+  local nAt
+  LOCAL cLine
 
-   if nAt == 0
+  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
+  IF ::oBrwText:lLineNumbers
+    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
+  ENDIF
+  IF IsValidStopLine( cLine )
+    nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == ::oBrwText:nRow ;
+                                    .AND. aBreak [ 2 ] == ::cPrgName} ) // it was nLine
+
+    if nAt == 0
       AAdd( ::aBreakPoints, { ::oBrwText:nRow, ::cPrgName } )     // it was nLine
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .T.)
-   else
+    else
       ADel( ::aBreakPoints, nAt )
       ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .F.)
-   endif
+    endif
 
-   ::oBrwText:RefreshCurrent()
+    ::oBrwText:RefreshCurrent()
+  ENDIF
 
 return nil
 
@@ -2259,7 +2292,87 @@ METHOD LocatePrgPath( cPrgName ) CLASS TDebugger
        endif
    next i
 
-   return cRetPrgName
+return cRetPrgName
+
+
+METHOD ToCursor() CLASS TDebugger
+  LOCAL cLine
+  
+  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
+  IF ::oBrwText:lLineNumbers
+    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
+  ENDIF
+  IF IsValidStopLine( cLine )
+    ::aToCursor := { ::oBrwText:nRow, ::cPrgName }
+    ::RestoreAppStatus()
+    ::lToCursor := .t.
+    ::Exit()
+  ENDIF
+  
+RETURN self
+
+STATIC PROCEDURE StripUntil( pcLine, i, cChar )
+  LOCAL j, n
+  LOCAL nLen:=LEN(pcLine)
+  
+  n := LEN(cChar)
+  j := i+n
+  DO WHILE j<=nLen .AND. SUBSTR(pcLine, j, n) != cChar
+    j++
+  ENDDO
+  IF j <= nLen
+    pcLine := LEFT( pcLine, i-1 ) + SUBSTR(pcLine, j+n)
+  ENDIF
+
+RETURN
+
+STATIC FUNCTION IsValidStopLine( cLine )
+  LOCAL i, c, c2
+
+  cLine := UPPER( ALLTRIM( cLine ) )
+  i := 1
+  DO WHILE i <= LEN(cLine)
+    c := SUBSTR( cLine, i, 1 )
+    c2 := SUBSTR( cLine, i, 2 )
+    DO CASE
+      CASE c == '"'
+        StripUntil( @cLine, i, c )
+        
+      CASE c == "'"
+        StripUntil( @cLine, i, c )
+        
+      CASE c == "["
+        StripUntil( @cLine, i, "]" )
+        
+      CASE c2 == "//"
+        cLine := LEFT( cLine, i-1 )
+        
+      CASE c2 == "/*"
+        StripUntil( @cLine, i, "*/" )
+
+      OTHERWISE
+        i++      
+    ENDCASE
+  ENDDO
+  
+  cLine := ALLTRIM( cLine )
+  IF EMPTY(cLine)
+    RETURN .F.
+  ENDIF
+
+  IF ( cLine = 'FUNC' .OR.;
+       cLine = 'PROC' .OR.;
+       cLine = 'NEXT' .OR.;
+       cLine = 'END'  .OR.;
+       cLine = 'ELSE' .OR.;
+       cLine = 'LOCA' .OR.;
+       cLine = 'STAT' .OR.;
+       cLine = 'MEMV' )
+    RETURN .F.
+  ENDIF
+
+RETURN .T.
+
 
 function __DbgColors()
 
