@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.28 2004/02/22 04:24:44 jonnymind Exp $
+ * $Id: hash.c,v 1.29 2004/02/25 03:31:59 mlombardo Exp $
  */
 
 /*
@@ -1352,7 +1352,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushNumber( ( double ) ( ulElem + 1 ), 0 );
+                  hb_vmPushNumInt( ulElem + 1 );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )
@@ -1398,7 +1398,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushNumber( ( double ) ( ulElem ), 0 );
+                  hb_vmPushNumInt( ulElem );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )

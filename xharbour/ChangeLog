@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2596 2004/03/18 13:52:16 lculik Exp $
+ * $Id: ChangeLog,v 1.2597 2004/03/18 14:24:26 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-18 15:46 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * xharbour/source/vm/array.c
+  * xharbour/source/vm/hash.c 
+    ! using hb_vmPushNumInt instead of hb_vmPushNumber; ULONG to double
+      conversion may loose significant digits for long arrays.
 
 2004-03-18 15:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbdefs.h
