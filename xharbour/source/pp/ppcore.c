@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.137 2004/03/08 04:19:22 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.138 2004/03/08 14:57:34 ronpinkas Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ static int    WorkTranslate( char *, char *, COMMANDS *, int * );
 static int    CommandStuff( char *, char *, char *, int *, BOOL, BOOL, char * );
 static int    RemoveNotInstanciated( char * );
 static int    WorkMarkers( char **, char **, char *, int *, BOOL );
-static int    getExpReal( char *, char **, char, int, BOOL );
+static int    getExpReal( char *, char **, char, int, int iContext );
 static BOOL   isExpres( char *, char );
 static BOOL   TestOptional( char *, char * );
 static BOOL   CheckOptional( char *, char *, char *, int *, BOOL, BOOL );
@@ -3052,7 +3052,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      /* Copying a real expression to 'expreal' */
      if( !lenreal )
      {
-        lenreal = getExpReal( expreal, ptri, '5', maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '5', maxlenreal, 0 );
      }
 
      //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
@@ -3068,7 +3068,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   }
   else if( *(exppatt+2) == '4' )       /*  ----  extended match marker  */
   {
-     if( !lenreal ) lenreal = getExpReal( expreal, ptri, '4', maxlenreal, FALSE );
+     if( !lenreal ) lenreal = getExpReal( expreal, ptri, '4', maxlenreal, 0 );
      {
         SearnRep( exppatt,expreal,lenreal,ptro,lenres);
      }
@@ -3104,7 +3104,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
            {
               rezrestr = 1;
               /*  (*ptri)++; */
-              lenreal = getExpReal( expreal, ptri, '2', maxlenreal, FALSE );
+              lenreal = getExpReal( expreal, ptri, '2', maxlenreal, 0 );
               SearnRep( exppatt,expreal,lenreal,ptro,lenres);
               break;
            }
@@ -3149,7 +3149,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      if( !lenreal )
      {
-        lenreal = getExpReal( expreal, ptri, '1', maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '1', maxlenreal, 0 );
 
         #if 0
            printf( "List Len: %i Exp: %s\n", lenreal, expreal );
@@ -3171,7 +3171,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      if( ! lenreal )
      {
         //printf( "Getting >%s<\n", *ptri );
-        lenreal = getExpReal( expreal, ptri, '0', maxlenreal, FALSE );
+        lenreal = getExpReal( expreal, ptri, '0', maxlenreal, 0 );
      }
 
      //printf("Len: %i Pat: >%s< Exp: >%s<\n", lenreal, exppatt, expreal );
@@ -3189,7 +3189,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   return 1;
 }
 
-static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxrez, BOOL bStrict )
+static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxrez, int iContext )
 {
    int lens = 0;
    char * sZnaki = "+-=><*/$.:#%!^";
@@ -3208,12 +3208,12 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    char cLastChar = '\0';
    /* Ron Pinkas end 2000-06-17 */
 
-   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, bStrict));
+   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, iContext));
 
    //#define DEBUG_EXP
 
    #ifdef DEBUG_EXP
-      printf( "\ngetExpReal( %p, '%s', %d, %i, %d )\n", expreal, *ptri, cMarkerType, maxrez, bStrict );
+      printf( "\ngetExpReal( %p, '%s', %d, %i, %d )\n", expreal, *ptri, cMarkerType, maxrez, iContext );
    #endif
 
    HB_SKIPTABSPACES( *ptri );
@@ -3503,7 +3503,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      State = STATE_EXPRES;
                   }
                }
-               else if( State == STATE_ID_END && toupper( (*ptri)[0] ) == 'A' && toupper( (*ptri)[1] ) == 'S' && (*ptri)[2] == ' ' && cMarkerType == '1' )
+               else if( iContext == 1 && State == STATE_ID_END && cMarkerType == '1' && toupper( (*ptri)[0] ) == 'A' && toupper( (*ptri)[1] ) == 'S' && (*ptri)[2] == ' ' )
                {
                   //HACK! Accept AS <type> postfix for <Param,...> Matchers
                   *expreal++ = **ptri; //'A'
@@ -3940,7 +3940,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    }
 
    /* Ron Pinkas added 2000-06-21 */
-   if( bStrict )
+   //if( iContext == 1 )
    {
       if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3 || State == STATE_QUOTE4 ||
           State == STATE_BRACKET || StBr1 || StBr2 || StBr3  )
@@ -3975,7 +3975,7 @@ static BOOL isExpres( char * stroka, char cMarkerType )
   //printf( "isExp: >%s<\n", stroka );
 
   l1 = strlen( stroka );
-  l2 = getExpReal( NULL, &stroka, cMarkerType, HB_PP_STR_SIZE, TRUE );
+  l2 = getExpReal( NULL, &stroka, cMarkerType, HB_PP_STR_SIZE, 1 );
 
   //printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
 
