@@ -1,0 +1,17 @@
+WoopGUI - A Win32 OOP GUI Library for Harbour
+
+This project want to realize a Win32 GUI OOP oriented library based on Harbour. 
+
+Based on ideas and some code from Harbour, MiniGUI by Roberto Lopez, HGF (Harbour GUI framework)
+by Antonio Linares and Alexander Kresin, HWGUI by Alexander Kresin and BCX by Kevin Diggins.
+
+Thanks to all of them !!
+
+The goal of this project is to give the basis for a more complex project that give the 
+possibility to realize applications under a strong and stable environment.
+
+Obviusly this project is the first step and the result will be a single library.
+
+About technical reference the only product necessary is Harbour as compiler.
+
+Francesco Saverio Giudice <fsgiudice@iow.it>

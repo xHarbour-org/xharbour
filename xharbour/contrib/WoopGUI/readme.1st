@@ -1,0 +1,7 @@
+
+To make this library simply set correct path in makefile.b32
+and run make without parameters ;-)
+
+or: make -fmakefile.b32
+
+Francesco Saverio Giudice <info@fsgiudice.com>

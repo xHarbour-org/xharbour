@@ -1,0 +1,67 @@
+/*
+*-----------------------------------------------------------------------------
+* WoopGUI for Harbour - Win32 OOP GUI library source code
+* Copyright 2002 Francesco Saverio Giudice <info@fsgiudice.com>
+*
+* WoopGUI Class TREE
+*
+* Updated to version 1.03
+*
+*/
+
+
+   WoopGUI
+     |
+     +--- TApplication
+     |
+     +--- TWindowDef
+     |
+     +--- TWindow         (This must not be used directly)
+     |       |
+     |       +--- TFrame
+     |       |
+     |       +--- TDialog
+     |       |
+     |       +--- TControl
+     |       |       |
+     |       |       +--- TButton
+     |       |       |       |
+     |       |       |       +--- T3StateButton
+     |       |       |       |
+     |       |       |       +--- TCheckBox
+     |       |       |       |
+     |       |       |       +--- TGroupBox
+     |       |       |       |
+     |       |       |       +--- TPushButton
+     |       |       |       |
+     |       |       |       +--- TRadioButton
+     |       |       |               |
+     |       |       |               +--- TRadioGroup
+     |       |       |
+     |       |       +--- TComboBox
+     |       |       |       |
+     |       |       |       +--- TSimpleComboBox
+     |       |       |       |
+     |       |       |       +--- TDropDownComboBox
+     |       |       |       |
+     |       |       |       +--- TDropListComboBox
+     |       |       |
+     |       |       +--- TStatic  
+     |       |               |
+     |       |               +--- TStaticText    
+     |       |
+     |       +--- TStatusBar
+     |       |
+     |       +--- TToolTip
+     |
+     +--- TMenu
+     |       |
+     |       +--- TMenuBar
+     |       |
+     |       +--- TMenuPopup
+     |
+     +--- TMenuItem
+     |
+     +--- TFont
+     |
+     

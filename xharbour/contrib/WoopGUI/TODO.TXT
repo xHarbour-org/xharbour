@@ -1,0 +1,20 @@
+TO DO THINGS LIST
+-----------------
+
+- Check windows destroy sequence
+
+
+
+
+- edit controls
+- list controls
+- Scroll Bars
+- Get values from controls
+- Bitmaps
+- Font and text for all controls
+- Date & Time picker control
+- Progress bar control
+-
+
+AND MUCH MORE !!!
+
