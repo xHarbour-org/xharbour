@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.17 2002/01/29 06:54:16 brianhays Exp $
+ * $Id: persist.prg,v 1.4 2002/01/29 07:19:50 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ ENDCLASS
 
 METHOD LoadFromText( cObjectText ) CLASS HBPersistent
 
-   local nLines := MLCount( cObjectText )
+   local nLines := MLCount( cObjectText, 254 )
    local nLine  := 1, cLine, cToken
    local lStart := .t., aArray
    private oSelf
