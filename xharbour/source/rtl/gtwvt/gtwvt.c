@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.101 2004/05/10 11:30:37 druzus Exp $
+ * $Id: gtwvt.c,v 1.102 2004/05/11 17:56:02 vouchcac Exp $
  */
 
 /*
@@ -76,6 +76,10 @@
 */
 
 #define HB_OS_WIN_32_USED
+
+#ifndef _WIN32_IE
+   #define _WIN32_IE 0x0400
+#endif
 
 #include "hbgtwvt.h"
 
@@ -6083,7 +6087,7 @@ static void hb_wvt_gtCreateToolTipWindow( void )
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           NULL,
                           ( HMENU ) NULL,
-                          hb_hInstance,
+                          (HINSTANCE) hb_hInstance,
                           NULL );
 
    SetWindowPos( hwndTT,
@@ -6100,7 +6104,7 @@ static void hb_wvt_gtCreateToolTipWindow( void )
    ti.uFlags    = TTF_SUBCLASS;
    ti.hwnd      = _s.hWnd;
    ti.uId       = 100000;
-   ti.hinst     = hb_hInstance;
+   ti.hinst     = (HINSTANCE) hb_hInstance;
    ti.lpszText  = "";
    ti.rect.left = ti.rect.top = ti.rect.bottom = ti.rect.right = 0;
 
