@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.46 2003/02/10 02:17:23 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.47 2003/02/12 13:23:49 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -337,7 +337,7 @@ FUNCTION ParseMakeFile( cFile )
 
                      IF aTemp[ 1 ] == "ALLOBJ" .AND. ! lMt
 
-                        IF At( 'hvm', Lower( aTemp[ 2 ] ) ) ==  0 .AND. ! lLinux
+                        IF At( 'hvm', Lower( aTemp[ 2 ] ) ) ==  0 .AND. ! lLinux  .and. ! s_lLibrary
                            aTemp[ 2 ] += IIF( ! lMt .AND. ! lGui, " $(BHC)\lib\hvm.obj", ;
                               IIF( lMt .AND. ! lGui, " $(BHC)\lib\hvmmt.obj", ;
                               IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
@@ -1044,12 +1044,13 @@ FUNC CreateMakeFile( cFile )
    LOCAL lSupressline := .f.
    LOCAL nPos
    LOCAL cDefHarOpts  := ""
+   LOCAL nWarningLevel :=0
 
    LOCAL lCompMod         := .f.
    LOCAL x
    LOCAL lGenppo          := .f.
    LOCAL getlist          := {}
-   LOCAL cTopFile         := ""
+   LOCAL cTopFile         := Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
@@ -1107,21 +1108,23 @@ FUNC CreateMakeFile( cFile )
    ENDIF
 
    @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
-   Attention( s_aLangMessages[ 31 ], 6 )
+   @  6, 1  SAY  s_aLangMessages[ 45 ] GET cTopFile VALID ! Empty( cTopFile )
+   Attention( s_aLangMessages[ 31 ], 7 )
 
-   @  7,  1 GET lautomemvar checkbox caption s_aLangMessages[ 32 ] style "[o ]"
-   @  7, 40 GET lvarismemvar checkbox caption s_aLangMessages[ 33 ] style "[o ]"
-   @  8,  1 GET lDebug checkbox caption s_aLangMessages[ 34 ] style "[o ]"
-   @  8, 40 GET lSupressline checkbox caption s_aLangMessages[ 35 ] style "[o ]"
-   @  9,  1 GET lGenppo checkbox caption s_aLangMessages[ 36 ] style "[o ]"
-   @  9, 40 GET lCompMod checkbox caption s_aLangMessages[ 37 ] style "[o ]"
-   @ 10,  1 SAY s_aLangMessages[ 38 ]                                            GET cUserDef     PICT "@s15"
-   @ 10, 40 SAY s_aLangMessages[ 39 ]                                            GET cUserInclude PICT "@s15"
-   @ 11,  1 GET lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[o ]"
-   @ 11, 40 GET lXFwh checkbox caption "Xharbour FWH" style "[o ]"
-   @ 12,  1 SAY "Resource file Name"                                           GET CResName
+   @  8,  1 GET lautomemvar checkbox caption s_aLangMessages[ 32 ] style "[o ]"
+   @  8, 40 GET lvarismemvar checkbox caption s_aLangMessages[ 33 ] style "[o ]"
+   @  9,  1 GET lDebug checkbox caption s_aLangMessages[ 34 ] style "[o ]"
+   @  9, 40 GET lSupressline checkbox caption s_aLangMessages[ 35 ] style "[o ]"
+   @ 10,  1 GET lGenppo checkbox caption s_aLangMessages[ 36 ] style "[o ]"
+   @ 10, 40 GET lCompMod checkbox caption s_aLangMessages[ 37 ] style "[o ]"
+   @ 11,  1 SAY s_aLangMessages[ 38 ]                                            GET cUserDef     PICT "@s15"
+   @ 11, 40 SAY s_aLangMessages[ 39 ]                                            GET cUserInclude PICT "@s15"
+   @ 12,  1 GET lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[o ]"
+   @ 12, 40 GET lXFwh checkbox caption "Xharbour FWH" style "[o ]"
+   @ 13,  1 SAY "Resource file Name"                                           GET CResName
    @ 13,  1 SAY s_aLangMessages[ 43 ]                                            GET nFilestoAdd  PICT "99"   VALID nFilestoAdd > 0
    @ 14,  1 GET lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
+   @ 14, 40 SAY s_aLangMessages[ 46 ] GET nWarningLevel Pict "9"
    READ
 
    IF ! Empty( cUserDef )
@@ -1178,6 +1181,7 @@ FUNC CreateMakeFile( cFile )
       cDefHarOpts += " -v "
    ENDIF
 
+
    IF ldebug
       cDefHarOpts      += " -b "
       cDefBccLibs      += " debug.lib "
@@ -1200,6 +1204,10 @@ FUNC CreateMakeFile( cFile )
 
    IF lCompmod
       cDefHarOpts += " -m "
+   ENDIF
+
+   IF nWarningLevel > 0
+      cDefHarOpts += " -w" + Str( nWarningLevel, 1 )
    ENDIF
 
    IF s_lBcc
@@ -1269,18 +1277,6 @@ FUNC CreateMakeFile( cFile )
    aSelFiles := GetSelFiles( aIn, aOut )
 
    aSort( aSelFiles )
-   IF Len( aOut ) == 1
-      cTopFile := aOut[ 1 ]
-   ELSE
-      Attention( 'Select the TOP MODULE of your executable', 22 )
-
-      IF ! s_lRecurse
-         cTopFile := PickAFile( aSelFiles )
-      ELSE
-         cTopFile := PickAFile( aSelFiles )
-      ENDIF
-
-   ENDIF
 
    IF lExternalLib
       aLibs := Getlibs( s_lGcc, GetMakeDir() + '\lib' )
@@ -1297,25 +1293,6 @@ FUNC CreateMakeFile( cFile )
    s_aPrgs := aClone( aout )
 
    s_aObjs := aClone( aout )
-   x     := aScan( s_aObjs, { | x | Lower( x ) == Lower( cTopFile ) } )
-
-   IF x > 0
-      aDel( s_aObjs, x )
-      aSize( s_aObjs, Len( s_aObjs ) - 1 )
-      aSize( s_aObjs, Len( s_aObjs ) + 1 )
-      Ains( s_aObjs, 1 )
-      s_aObjs[ 1 ] := cTopFile
-   ENDIF
-
-   x := aScan( s_aPrgs, { | x | Lower( x ) == Lower( cTopFile ) } )
-
-   IF x > 0
-      aDel( s_aPrgs, x )
-      aSize( s_aPrgs, Len( s_aPrgs ) - 1 )
-      aSize( s_aPrgs, Len( s_aPrgs ) + 1 )
-      Ains( s_aPrgs, 1 )
-      s_aPrgs[ 1 ] := cTopFile
-   ENDIF
 
    aEval( s_aObjs, { | xItem, x | hb_FNAMESPLIT( xiTem, @cPath, @cTest, @cExt, @cDrive ), cext := Substr( cExt, 2 ), IIF( ! s_lGcc, s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 2 ), s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 3 ) ) } )
    s_aCs := aClone( aoutc )
@@ -1401,25 +1378,15 @@ FUNC CreateMakeFile( cFile )
    IF s_lGcc
 
       IF  "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux"
-         hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
-         cExt := Substr( cExt, 2 )
-         fWrite( s_nLinkHandle, "PROJECT = " + IIF( Isupper( cExt ), Strtran( cTopfile, ".PRG", "" ), Strtran( cTopfile, ".prg", "" ) ) + " $(PR) " + CRLF )
-         cExt := Lower( cExt )
+         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + " $(PR) " + CRLF )
       ELSE
-         hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
-         cExt := Substr( cExt, 2 )
-         cExt := Lower( cExt )
-         fWrite( s_nLinkHandle, "PROJECT = " + IIF( Isupper( cExt ), cTest + "." + Strtran( cExt, "PRG", "EXE" ), cTest + "." + Strtran( cExt, "prg", "exe" ) ) + " $(PR) " + CRLF )
+         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + ".exe"   + " $(PR) " + CRLF )
       ENDIF
 
    ELSE
-      hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
-      cExt := Substr( cExt, 2 )
-      fWrite( s_nLinkHandle, "PROJECT = " + IIF( Isupper( cExt ), cTest + "." + Strtran( cExt, "PRG", "exe" ), cTest + "." + Strtran( cExt, "prg", "exe" ) ) + " $(PR) " + CRLF )
+      fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + ".exe"  + " $(PR) " + CRLF )
    ENDIF
 
-   hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
-   cExt := Substr( cExt, 2 )
 
    IF ! s_lExtended
       fWrite( s_nLinkHandle, "OBJFILES = " )
@@ -1427,17 +1394,15 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aObjs ) < 1
          fWrite( s_nLinkHandle, + " $(OB) " + CRLF )
       ELSE
-         aEval( s_aObjs, { | x, i | IIF( ( i <> Len( s_aObjs ) .AND. x <> cTopfile ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+         aEval( s_aObjs, { | x, i | IIF( ( i <> Len( s_aObjs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
       ENDIF
 
-      hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
-      cExt := Substr( cExt, 2 )
       fWrite( s_nLinkHandle, "CFILES =" )
 
       IF Len( s_aCs ) < 1
          fWrite( s_nLinkHandle, + " $(CF)" + CRLF )
       ELSE
-         aEval( s_aCs, { | x, i | IIF( ( i <> Len( s_aCs ) .AND. x <> cTopfile ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(CF) " + CRLF ) ) } )
+         aEval( s_aCs, { | x, i | IIF( ( i <> Len( s_aCs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(CF) " + CRLF ) ) } )
       ENDIF
 
       fWrite( s_nLinkHandle, "PRGFILE =" )
@@ -1454,7 +1419,7 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aObjs ) < 1
          fWrite( s_nLinkHandle, + " $(OB) " + CRLF )
       ELSE
-         aEval( s_aObjs, { | x, i | nWriteFiles ++, IIF( ( i <> Len( s_aObjs ) .AND. x <> cTopfile ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+         aEval( s_aObjs, { | x, i | nWriteFiles ++, IIF( ( i <> Len( s_aObjs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
       ENDIF
 
       nWriteFiles := 0
@@ -1470,9 +1435,9 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "OBJCFILES =" )
 
       IF Len( s_aObjsc ) < 1
-         fWrite( s_nLinkHandle, + " $(OB) " + CRLF )
+         fWrite( s_nLinkHandle, + " $(OBC) " + CRLF )
       ELSE
-         aEval( s_aObjsc, { | x, i | nWriteFiles ++, IIF( i <> Len( s_aObjsc ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+         aEval( s_aObjsc, { | x, i | nWriteFiles ++, IIF( i <> Len( s_aObjsc ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OBC) " + CRLF ) ) } )
       ENDIF
 
       nWriteFiles := 0
@@ -1601,7 +1566,7 @@ FUNC CreateMakeFile( cFile )
 
    IF s_lBcc
       fWrite( s_nLinkHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui, " -aa", " -ap" ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib", "" ) + CRLF )
@@ -1614,10 +1579,10 @@ FUNC CreateMakeFile( cFile )
               IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
               " $(BHC)\lib\hvmguimt.obj" ) ) ) + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib cw32.lib" + CRLF )
+      fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       fWrite( s_nLinkHandle, ".autodepend" + CRLF )
    ELSEIF s_lVcc
-      fWrite( s_nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 =  -c" + CRLF )
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" + CRLF )
@@ -1628,7 +1593,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
-      fWrite( s_nLinkHandle, "CFLAG1 = " + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 = " + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L $(HB_LIB_INSTALL)", " -L $(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
@@ -1834,7 +1799,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += "  Test.out"
+                     cComm += " > Test.out"
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -3115,6 +3080,9 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Warning level /w" )
       aAdd( aLang, "Numbers of source files per line on makefile" )
       aAdd( aLang, "Use Multi Thread Library" )
+      aAdd( aLang, "Executable file name" )
+      aAdd( aLang, "Warning Level /w" )
+
    ELSEIF cLang == "ES"
       aAdd( aLang, "Harbour Make Utility  -  Programa Make de Harbour" )
       aAdd( aLang, "Sintaxis:  hbmake cArchivo [opciones]" )
@@ -3160,6 +3128,9 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "N¡vel de Aviso do compilador /w" )
       aAdd( aLang, "Numeros de fontes por linha no makefile" )
       aAdd( aLang, "Use a libreria Multi Thread" )
+      aAdd( aLang, "Nome Executavel" )
+      aAdd( aLang, "Nivel Warning /w" )
+
    ELSEIF cLang == "PT"
       aAdd( aLang, "Harbour Make Utility  -  Programa Make do Harbour" )
       aAdd( aLang, "Sintaxis:  hbmake cArquivo [op‡äes]" )
@@ -3205,6 +3176,8 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "N¡vel de Aviso do compilador /w" )
       aAdd( aLang, "Numeros de fontes por linha no makefile" )
       aAdd( aLang, "Use a Biblioteca Multi Thread" )
+      aAdd( aLang, "Nome Executavel" )
+      aAdd( aLang, "Nivel Warning /w" )
    ENDIF
 
 RETURN aLang
