@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.8 2004/02/09 12:11:30 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.9 2004/02/14 16:37:52 lculik Exp $
  */
 
 /*
@@ -371,7 +371,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             hb_arraySet( pTempArray, Crc32, pItem );
             hb_itemRelease( pItem );
 
-            pItem = hb_itemPutD( NULL, ( long ) ( fh.m_uModDate >> 9 ) +1980,( long )( ( fh.m_uModDate & ~0xFE00 ) >> 5 ), ( long )fh.m_uModDate & ~0xFFE0 );
+            pItem = hb_itemPutD( NULL, ( LONG ) ( fh.m_uModDate >> 9 ) +1980,( LONG )( ( fh.m_uModDate & ~0xFE00 ) >> 5 ), ( LONG )fh.m_uModDate & ~0xFFE0 );
 
             hb_arraySet( pTempArray, Date, pItem );
             hb_itemRelease( pItem );
