@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1951 2003/12/28 22:25:33 druzus Exp $
+ * $Id: ChangeLog,v 1.1952 2003/12/29 01:26:30 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-29 14:26 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + added K_LDBLCLK & K_RDBLCLK support
+   + Turn off K_MOUSEMOVE handling by default ( see hbgtwvt.h )
+  * include/hbgtwvt.h
+   + added extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+   *     - allows mouse movement events to be handled
 
 2003-12-29 02:25 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   + doc/en/bkgtsks.txt
