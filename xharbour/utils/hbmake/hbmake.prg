@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.53 2003/03/20 16:07:50 patrickmast Exp $
+ * $Id: hbmake.prg,v 1.54 2003/03/24 23:25:14 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1033,8 +1033,8 @@ FUNC CreateMakeFile( cFile )
    LOCAL lMiniGui     := .f.
    LOCAL lRddAds      := .f.
    LOCAL lMt          := .F.
-   LOCAL cOs          := "Win32"
-   LOCAL cCompiler    := "BCC"
+   LOCAL cOs          := IIF( "LINUX" IN UPPER( OS() ), "Linux", "Win32")
+   LOCAL cCompiler    := IIF( "LINUX" IN UPPER( OS() ), "GCC","BCC")
    LOCAL cfwhpath     := Space( 200 )
    LOCAL ccwpath      := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
@@ -1083,6 +1083,8 @@ FUNC CreateMakeFile( cFile )
    LOCAL nFilestoAdd  := 0
    LOCAL lGui         := .F.
    LOCAL cBuild       := " "
+   Local aUserDefs
+   Local cCurrentDef  := ""
 
    s_nLinkHandle := Fcreate( cFile )
    WriteMakeFileHeader()
@@ -1131,7 +1133,12 @@ FUNC CreateMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      cDefHarOpts += " -D" + Alltrim( cUserDef ) + " "
+      aUserDefs := ListasArray(Alltrim( cUserDef ), ";")
+
+      FOR EACH cCurrentDef in aUserDefs
+         cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "
+      NEXT
+
    ENDIF
 
    IF ! Empty( cUserInclude )
@@ -2025,8 +2032,8 @@ FUNC CreateLibMakeFile( cFile )
 
    LOCAL aOutC     := {}
    LOCAL aSrcC     := Directory( "*.c" )
-   LOCAL cOs       := "Win32"
-   LOCAL cCompiler := "BCC"
+   LOCAL cOs       := IIF( "LINUX" IN UPPER( OS() ), "Linux", "Win32")
+   LOCAL cCompiler := IIF( "LINUX" IN UPPER( OS() ), "GCC","BCC")
    LOCAL cFwhPath  := Left( cfile, At( '.', cfile ) - 1 ) + Space( 40 )
 
    LOCAL lAutomemvar     := .f.
@@ -2051,6 +2058,9 @@ FUNC CreateLibMakeFile( cFile )
    LOCAL cUserdef        := Space( 40 )
    LOCAL cUserInclude    := Space( 40 )
    LOCAL nWriteFiles     := 0
+   Local aUserDefs
+   Local cCurrentDef     := ""
+
 
    s_nLinkHandle := Fcreate( cFile )
    WriteMakeFileHeader()
@@ -2085,7 +2095,11 @@ FUNC CreateLibMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      cDefHarOpts += " -D" + Alltrim( cUserDef ) + " "
+      aUserDefs := ListasArray(Alltrim( cUserDef ), ";")
+
+      FOR EACH cCurrentDef in aUserDefs
+         cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "
+      NEXT
    ENDIF
 
    IF ! Empty( cUserInclude )
