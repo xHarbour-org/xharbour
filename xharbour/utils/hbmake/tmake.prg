@@ -1,4 +1,3 @@
-
 #include "hbclass.ch"
 #include "common.ch"
 
@@ -17,35 +16,35 @@ Data  aPrgs          Init  {}
 Data  aCs            Init  {}
 Data  aObjs          Init  {}
 Data  aObjsc         Init  {}
-
 Data  aRes           Init  {}
 Data  nLinkHandle 
 Data  cLinker        Init  "makefile.tmp"
 Data  cLinkcomm      Init  ''
-DATA lCompress       init .F.
-Data  lBcc           Init  .T.
-Data  lGcc           Init  .F.
-Data  lVcc           Init  .F.
-Data  lForce         Init  .F.
-Data  lLinux         Init  .F.
-Data  szProject      Init  ""
-Data  lLibrary       Init  .F.
-Data  lIgnoreErrors  Init  .F.
-Data  lExtended      Init  .T.
-Data  lOs2           Init  .F.
-Data  lRecurse       Init  .F.
+Data  lCompress      Init .F.
+Data  lBcc           Init .T.
+Data  lGcc           Init .F.
+Data  lVcc           Init .F.
+Data  lForce         Init .F.
+Data  lLinux         Init .F.
+Data  szProject      Init ""
+Data  lLibrary       Init .F.
+Data  lIgnoreErrors  Init .F.
+Data  lExtended      Init .T.
+Data  lOs2           Init .F.
+Data  lRecurse       Init .F.
 Data  aDir
-Data  lEditMode      Init  .F.
+Data  lEditMode      Init .F.
 Data  aDir
-Data  aLangMessages  init  {}
+Data  aLangMessages  init {}
 Data  cDefLang
-data  lFwh           init .F.
-data  lCw            init .F.
+Data  lFwh           init .F.
+Data  lxFwh          init .F.
+Data  lCw            init .F.
 Data  lmini          init .F.
 Data  lHwgui         init .F.
 Data  lWhoo          init .F.
-data  lRddAds        init .F.
-DAta  lMediator      init .F.
+Data  lRddAds        init .F.
+Data  lMediator      init .F.
 Data  cMakefile      init ""
 Data  lExternalLib   init .F.
 Data  cObj           init ""
@@ -64,6 +63,11 @@ Data  cAppLibName    init ""
 Data  cOs            init ""
 Data  cTopfile       init ""
 Data  aOut           init {}
+Data  cFilesToAdd    init 5
+Data  lMT            init .F.
+Data  cWarningLevel  init 0
+Data  cTopModule     init "" 
+
 Method New()
 method Reset()
 Method WriteMakeFileHeader()
@@ -82,6 +86,7 @@ Method New() Class tHbmake
    ::cUserInclude   := Space( 200 )
    ::cFMC           := Space( 200 )
    ::cAppLibName    := Space( 20 )
+   ::cTopModule     := Space( 20 )
 return self
 
 method Reset() class THbmake
@@ -1041,6 +1046,10 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                     ::cAppLibName :=strtran(::cAppLibName ,".lib","")
                 ENDIF
 
+                IF aTemp[ 1 ] == "LIBFILES"
+                   ::lRddAds :=  "rddads" in aTemp[ 2 ]
+                ENDIF
+
                 IF aTemp[ 1 ] == "C4W"
                    ::cFMC:= aTemp[2]
                    ::lCw :=.t.
@@ -1074,6 +1083,26 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
 
                 IF aTemp[ 1 ] == "COMPRESS"
                    ::lCompress := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "EXTERNALLIB"
+                   ::lExternalLib := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "XFWH"
+                   ::lxFwh := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "FILESTOADD"
+                   ::cFilesToAdd := Val( aTemp[ 2 ] )
+                endif
+
+                IF aTemp[ 1 ] == "MT"
+                   ::lMt := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "WARNINGLEVEL"
+                   ::cWarningLevel := Val( aTemp[ 2 ] )
                 endif
 
 
@@ -1179,14 +1208,19 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                      aTemp[ 2 ] := strtran(aTemp[ 2 ],"-b","")
                      aTemp[ 2 ] := strtran(aTemp[ 2 ],"-l","")
                      aTemp[ 2 ] := Alltrim( aTemp[ 2 ] )
-                     ::cUserdef:=substr(aTemp[ 2 ],1,at("-I",aTemp[ 2 ])-1)
-                     ::cUserdef:=strtran(::cUserdef,"-D","")
-                     ::cUserInclude:=substr(aTemp[ 2 ],at("-I",aTemp[ 2 ]))
-                     ::cUserInclude:=strtran(::cUserInclude,"-I","")
-
-
                 endif
                   
+                IF aTemp[ 1 ] == "USERDEFINE"
+                   ::cUserDef := aTemp[ 2 ]
+                endif
+           
+                IF aTemp[ 1 ] == "USERINCLUDE"
+                   ::cUserInclude := aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "TOPMODULE"
+                   ::cTopModule := aTemp[ 2 ]
+                endif
 
             
 
