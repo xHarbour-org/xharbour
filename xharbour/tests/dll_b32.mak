@@ -1,31 +1,35 @@
 OBJDIR       = .
-CAEXE        = $(PRGFILE).exe
-COBJFLAGS    = -DHB_FM_STATISTICS_OFF -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -a8 -O2 -OS -5 -6 -c -tWM -I$(HRB_DIR)\INCLUDE -L$(BCC_DIR)\LIB -d -w3
-HARBOURFLAGS = -n -i$(HRB_DIR)\include -dHARBOUR -w1 -d__GLOBAL__
-CC           = $(BCC_DIR)\bin\bcc32.exe
-BRC_EXE      = $(BCC_DIR)\bin\brc32.exe
-ILINK_EXE    = $(BCC_DIR)\bin\ilink32.exe
-COMPILER     = $(HRB_DIR)\bin\harbour.exe
-HARBOURLIB   = $(HRB_DIR)\lib\
+APPEXE       = $(PRGFILE).exe
+COBJFLAGS    = -DHB_FM_STATISTICS_OFF -O2 -OS -6 -c -tW -I$(HRB_DIR)\INCLUDE -d -w3
+HARBOURFLAGS = -n -i$(HRB_DIR)\include;c:\borland\bcc55\include;c:\curl\include\curl -w1
+INCLUDEDIR   = $(HRB_DIR)\include
+CC           = $(COMPILERDIR)\bin\bcc32.exe
+ILINK_EXE    = $(COMPILERDIR)\bin\ilink32.exe
+COMPILER     = $(HRB_DIR)\bin\55\harbour.exe
+HARBOURLIB   = $(HRB_DIR)\lib\55
+MAINWIN      = $(HRB_DIR)\SOURCE\VM\MAINWIN.C
 
-$(CAEXE) : $(OBJDIR)\$(PRGFILE).obj \
-           $(OBJDIR)\mainwin.obj \
-           $(HARBOURLIB)\hbdll_bc.lib
+$(APPEXE) : $(OBJDIR)\$(PRGFILE).obj \
+            $(OBJDIR)\mainwin.obj \
+            $(HARBOURLIB)\harbour.lib
 
    echo $(OBJDIR)\$(PRGFILE).obj + > b32.bc
    echo $(OBJDIR)\mainwin.obj + >> b32.bc
-   echo $(BCC_DIR)\lib\c0w32.obj, + >> b32.bc
-   echo $(CAEXE),, + >> b32.bc
-   echo $(HARBOURLIB)\hbdll_bc.lib + >> b32.bc
-   echo $(BCC_DIR)\lib\cw32.lib + >> b32.bc
-   echo $(BCC_DIR)\lib\import32.lib, >> b32.bc
+   echo $(COMPILERDIR)\lib\c0w32.obj, + >> b32.bc
+   echo $(APPEXE),, + >> b32.bc
+   echo $(HARBOURLIB)\harbour.lib + >> b32.bc
+   echo $(COMPILERDIR)\lib\ws2_32.lib + >> b32.bc
+   echo $(COMPILERDIR)\lib\cw32.lib + >> b32.bc
+   echo $(COMPILERDIR)\lib\cw32.lib + >> b32.bc
+   echo $(COMPILERDIR)\lib\import32.lib, >> b32.bc
    @$(ILINK_EXE) -ap -Tpe -Gn @b32.bc
-   
-$(OBJDIR)\$(PRGFILE).c : $(PRGFILE).prg
+   @delbat
+
+$(OBJDIR)\$(PRGFILE).c : hnews.ch $(PRGFILE).prg
    $(COMPILER) $(HARBOURFLAGS) $** -o$@
 
 $(OBJDIR)\$(PRGFILE).obj : $(OBJDIR)\$(PRGFILE).c
    $(CC) $(COBJFLAGS) -o$@ $**
 
-$(OBJDIR)\mainwin.obj : $(HRB_DIR)\source\vm\mainwin.c
+$(OBJDIR)\mainwin.obj : $(MAINWIN)
    $(CC) $(COBJFLAGS) -o$@ $**

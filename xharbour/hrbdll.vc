@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.12 2003/06/25 13:42:28 paultucker Exp $
+# $Id: hrbdll.vc,v 1.13 2003/07/08 20:19:30 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -126,6 +126,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hbffind.obj \
   $(OBJ_DIR)\hbhextonum.obj \
+  $(OBJ_DIR)\hbsyslog.obj \
+  $(OBJ_DIR)\hblog.obj \
+  $(OBJ_DIR)\hboutdebug.obj \
   $(OBJ_DIR)\hbrandom.obj \
   $(OBJ_DIR)\hbsrlraw.obj \
   $(OBJ_DIR)\hbxml.obj \
@@ -1683,4 +1686,16 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hblog.obj : $(OBJ_DIR)\hblog.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.18 2003/06/25 13:42:28 paultucker Exp $
+# $Id: hrbdll.bc,v 1.19 2003/07/08 20:19:30 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -79,6 +79,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\binnum.obj \
   $(OBJ_DIR)\binnumx.obj \
   $(OBJ_DIR)\box.obj \
+  $(OBJ_DIR)\cdpapi.obj \
   $(OBJ_DIR)\chrasc.obj \
   $(OBJ_DIR)\colorind.obj \
   $(OBJ_DIR)\console.obj \
@@ -114,6 +115,20 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hardcr.obj \
   $(OBJ_DIR)\hbbitfield.obj \
   $(OBJ_DIR)\hbffind.obj \
+  $(OBJ_DIR)\hbi18n.obj \
+  $(OBJ_DIR)\hboutdebug.obj \
+  $(OBJ_DIR)\hbrandom.obj \
+  $(OBJ_DIR)\hbserial.obj \
+  $(OBJ_DIR)\hbsrlraw.obj \
+  $(OBJ_DIR)\hbsyslog.obj \
+  $(OBJ_DIR)\hbxml.obj \
+  $(OBJ_DIR)\hbhextonum.obj \
+  $(OBJ_DIR)\hbchecksum.obj \
+  $(OBJ_DIR)\hbcompress.obj \
+  $(OBJ_DIR)\hbcrc32.obj \
+  $(OBJ_DIR)\hbcrypt.obj \
+  $(OBJ_DIR)\hblog.obj \
+  $(OBJ_DIR)\txml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
   $(OBJ_DIR)\is.obj \
@@ -293,6 +308,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\sdf0.obj \
   $(OBJ_DIR)\hbfsapi.obj \
   $(OBJ_DIR)\hbgete.obj \
+  $(OBJ_DIR)\hbreadini.obj \
   $(OBJ_DIR)\hbstr.obj \
   $(OBJ_DIR)\hbtrace.obj \
   $(OBJ_DIR)\hbver.obj \
@@ -369,16 +385,16 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpesdos.obj \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
-   $(OBJ_DIR)\cdpgewin.obj \
-   $(OBJ_DIR)\cdppt850.obj \
-   $(OBJ_DIR)\cdpptiso.obj \
-   $(OBJ_DIR)\cdppl852.obj \
-   $(OBJ_DIR)\cdppliso.obj \
-   $(OBJ_DIR)\cdpplmaz.obj \
-   $(OBJ_DIR)\cdpru866.obj \
-   $(OBJ_DIR)\cdpruwin.obj \
-   $(OBJ_DIR)\cdpsrwin.obj \
-   $(OBJ_DIR)\cdprukoi.obj \
+  $(OBJ_DIR)\cdpgewin.obj \
+  $(OBJ_DIR)\cdppt850.obj \
+  $(OBJ_DIR)\cdpptiso.obj \
+  $(OBJ_DIR)\cdppl852.obj \
+  $(OBJ_DIR)\cdppliso.obj \
+  $(OBJ_DIR)\cdpplmaz.obj \
+  $(OBJ_DIR)\cdpru866.obj \
+  $(OBJ_DIR)\cdpruwin.obj \
+  $(OBJ_DIR)\cdpsrwin.obj \
+  $(OBJ_DIR)\cdprukoi.obj \
 #
 #  Pp
 #
@@ -387,8 +403,6 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\pplib.obj \
    $(OBJ_DIR)\pptable.obj \
    $(OBJ_DIR)\pragma.obj \
-
-
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -410,11 +424,7 @@ $(HARBOUR_DLL)  : \
 # ³ HARBOUR_DLL linking ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßß
-<<<<<<< hrbdll.bc
-  echo. $(OBJ_DIR)\abs.obj               + >> hdll.tmp
-=======
   echo. $(OBJ_DIR)\abs.obj               + > hdll.tmp
->>>>>>> 1.15
   echo. $(OBJ_DIR)\accept.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ampm.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\at.obj                + >> hdll.tmp
@@ -422,10 +432,24 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\binnumx.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\box.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\chrasc.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpapi.obj		     + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpapi.obj		      + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpesdos.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpeswin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpgedos.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpgewin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdppt850.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpptiso.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdppl852.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdppliso.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpplmaz.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpru866.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpruwin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpsrwin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdprukoi.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\colorind.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\console.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\copyfile.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cstruct.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\datec.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dates.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dateshb.obj           + >> hdll.tmp
@@ -457,6 +481,20 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbbitfield.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbi18n.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hboutdebug.obj        + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbrandom.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbserial.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbsrlraw.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbsyslog.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbchecksum.obj        + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbhextonum.obj        + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbxml.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\hblog.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbcompress.obj        + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbcrc32.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbcrypt.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\txml.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\idle.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\inkey.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\is.obj                + >> hdll.tmp
@@ -586,7 +624,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tmenuitm.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tobject.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\tpopup.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\traceprg.obj	     + >> hdll.tmp
+  echo. $(OBJ_DIR)\traceprg.obj	      + >> hdll.tmp
   echo. $(OBJ_DIR)\treport.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\ttextlin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\ttopbar.obj           + >> hdll.tmp
@@ -643,6 +681,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\sdf0.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\hbfsapi.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbgete.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbreadini.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\hbstr.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\hbtrace.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbver.obj             + >> hdll.tmp
@@ -1192,6 +1231,51 @@ $(OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbserial.obj : $(OBJ_DIR)\hbserial.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbreadini.obj : $(OBJ_DIR)\hbreadini.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbreadini.c : $(RTL_DIR)\hbreadini.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\txml.obj : $(OBJ_DIR)\txml.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\txml.c : $(RTL_DIR)\txml.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hblog.obj : $(OBJ_DIR)\hblog.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -1873,9 +1957,6 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
 
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-<<<<<<< hrbdll.bc
-
-=======
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -1916,47 +1997,14 @@ $(OBJ_DIR)\cdpsrwin.obj : $(CODEPAGE_DIR)\cdpsrwin.c
 $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-#
-# SAMPLES.LIB dependencies
-#
-
-$(OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
-   $(CC) -c $(CLIBFLAGS) -o$@ $**
-
-$(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
+$(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
+$(OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
    $(CC) $(CLIBFLAGS) -DZLIB_DLL;WIN32 -o$@ $**
 
-$(RTL_OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
+$(OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
+$(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
->>>>>>> 1.15

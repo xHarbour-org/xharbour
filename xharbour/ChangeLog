@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1414 2003/09/04 16:56:16 iananderson Exp $
+ * $Id: ChangeLog,v 1.1415 2003/09/04 19:27:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-09-05 04:50 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * hrbdll.bc
+   * hrbdll.vc
+     ! Updated to the most recent library contents
+   + include/hrbdll.h
+     ! files needed to be included when creating an application with harbour.dll
+
+   * tests/dll_b32.mak
+   * tests/dll_b32.bat
+     ! Minor updates
+
+   + tests/testdll.prg
+     * sample program containing PRG and C level calls to harbour.dll
+
+   /*
+     The long outstanding issue of "unresolved _hb_stack" is now overcome.
+     Creation of harbour.dll can now use macro calls for speed and we can
+     now use an external C program to access extend functions, hb_ret*.
+   */
 
 2003-09-04 12:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbexprc.c
