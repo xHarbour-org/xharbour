@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3770 2005/01/26 02:29:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3771 2005/01/26 21:29:39 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-26 22:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/filesys.c
+    + add support for hb_fsLockLarge() and hb_fsSeekLarge() on Windows,
+      many thanks to Enrico Maria Giordano for his code.
+
+  * xharbour/source/rtl/philes.c
+    * changed FSEEK() internals to use hb_fsSeekLarge() instead of hb_fsSeek()
 
 2005-01-26 19:30 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
   * source/rtl/teditor.prg

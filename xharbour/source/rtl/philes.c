@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.24 2004/05/17 04:30:30 guerra000 Exp $
+ * $Id: philes.c,v 1.25 2004/08/27 15:47:35 mauriliolongo Exp $
  */
 
 /*
@@ -207,9 +207,9 @@ HB_FUNC( FRENAME )
 HB_FUNC( FSEEK )
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_retnl( hb_fsSeek( hb_parnl( 1 ),
-                           hb_parnl( 2 ),
-                           ISNUM( 3 ) ? hb_parni( 3 ) : FS_SET ) );
+      hb_retnint( hb_fsSeekLarge( hb_parnl( 1 ),
+                                  hb_parnint( 2 ),
+                                  ISNUM( 3 ) ? hb_parni( 3 ) : FS_SET ) );
    else
       hb_retnl( 0 );
 }

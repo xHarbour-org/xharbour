@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.135 2005/01/21 18:41:38 druzus Exp $
+ * $Id: filesys.c,v 1.136 2005/01/25 10:47:52 druzus Exp $
  */
 
 /*
@@ -2436,8 +2436,81 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsLockLarge(%p, %" PFHL "u, %" PFHL "u, %hu)", hFileHandle, ulStart, ulLength, uiMode));
 
-#if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
-    defined(__USE_LARGEFILE64)
+#if defined(HB_WIN32_IO)
+   {
+      HB_THREAD_STUB
+
+      DWORD dwOffsetLo = ( DWORD ) ( ulStart & 0xFFFFFFFF ),
+            dwOffsetHi = ( DWORD ) ( ulStart >> 32 ),
+            dwLengthLo = ( DWORD ) ( ulLength & 0xFFFFFFFF ),
+            dwLengthHi = ( DWORD ) ( ulLength >> 32 )
+
+      static BOOL s_bInit = 0, s_bWinNt ;
+
+      if ( !s_bInit )
+      {
+         s_bInit = TRUE ;
+         s_bWinNt = hb_iswinnt() ;
+      }
+
+      HB_STACK_UNLOCK
+      HB_TEST_CANCEL_ENABLE_ASYN
+
+      switch( uiMode & FL_MASK )
+      {
+         case FL_LOCK:
+            if ( s_bWinNt )
+            {
+               OVERLAPPED sOlap ;
+               DWORD dwFlags ;
+
+               dwFlags = ( ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK ) |
+                         ( ( uiMode & FLX_WAIT ) ? 0 : LOCKFILE_FAIL_IMMEDIATELY )
+
+               memset( &sOlap, 0, sizeof( OVERLAPPED ) );
+               sOlap.Offset = dwOffsetLo;
+               sOlap.OffsetHigh = dwOffsetHi;
+
+               bResult = LockFileEx( DostoWinHandle( hFileHandle ), dwFlags, 0,
+                                     dwLengthLo, dwLengthHi, &sOlap );
+            }
+            else
+            {
+               bResult = LockFile( DostoWinHandle( hFileHandle ),
+                                   dwOffsetLo, dwOffsetHi,
+                                   dwLengthLo, dwLengthHi );
+            }
+            break;
+
+         case FL_UNLOCK:
+            if ( s_bWinNt )
+            {
+               OVERLAPPED sOlap ;
+
+               memset( &sOlap, 0, sizeof( OVERLAPPED ) );
+               sOlap.Offset = dwOffsetLo;
+               sOlap.OffsetHigh = dwOffsetHi;
+
+               bResult = UnlockFileEx( DostoWinHandle( hFileHandle ), 0,
+                                       dwLengthLo, dwLengthHi, &sOlap );
+            }
+            else
+            {
+               bResult = UnlockFile( DostoWinHandle( hFileHandle ),
+                                     dwOffsetLo, dwOffsetHi,
+                                     dwLengthLo, dwLengthHi );
+            }
+            break;
+
+         default:
+            bResult = FALSE;
+      }
+      hb_fsSetIOError( bResult, 0 );
+
+      HB_DISABLE_ASYN_CANC
+      HB_STACK_LOCK
+   }
+#elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64 functions on 32bit
@@ -2597,8 +2670,44 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeekLarge(%p, %" PFHL "u, %hu)", hFileHandle, llOffset, uiFlags));
 
-#if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
-    defined(__USE_LARGEFILE64)
+#if defined(HB_WIN32_IO)
+   {
+      HB_THREAD_STUB
+
+      USHORT Flags = convert_seek_flags( uiFlags );
+
+      ULONG ulOffsetLow  = ( ULONG ) ( llOffset & ULONG_MAX ),
+            ulOffsetHigh = ( ULONG ) ( llOffset >> 32 );
+
+      HB_STACK_UNLOCK
+      HB_TEST_CANCEL_ENABLE_ASYN
+
+      if( llOffset < 0 && Flags == SEEK_SET )
+      {
+         llPos = ( HB_FOFFSET ) INVALID_SET_FILE_POINTER;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
+                                       ulOffsetLow, &ulOffsetHigh,
+                                       ( DWORD ) Flags );
+         llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
+         hb_fsSetIOError( llPos != ( HB_FOFFSET ) INVALID_SET_FILE_POINTER, 0 );
+      }
+
+      if ( llPos == ( HB_FOFFSET ) INVALID_SET_FILE_POINTER )
+      {
+         ulOffsetHigh = 0
+         ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
+                                       0, &ulOffsetHigh, SEEK_CUR );
+         llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
+      }
+
+      HB_DISABLE_ASYN_CANC
+      HB_STACK_LOCK
+   }
+#elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64 functions on 32bit
@@ -2612,8 +2721,16 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       HB_STACK_UNLOCK
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      llPos = lseek64( hFileHandle, llOffset, Flags );
-      hb_fsSetIOError( llPos != (HB_FOFFSET) -1, 0 );
+      if( llOffset < 0 && Flags == SEEK_SET )
+      {
+         llPos = (HB_FOFFSET) -1;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         llPos = lseek64( hFileHandle, llOffset, Flags );
+         hb_fsSetIOError( llPos != (HB_FOFFSET) -1, 0 );
+      }
 
       if ( llPos == (HB_FOFFSET) -1 )
       {
