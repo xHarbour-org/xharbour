@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.14 2002/04/17 17:16:09 lculik Exp $
+ * $Id: filesys.c,v 1.15 2002/07/02 13:24:09 lculik Exp $
  */
 
 /*
@@ -179,8 +179,9 @@
    #define S_IEXEC      0x0040  /* owner may execute <directory search> */
 #endif
 
+
 #ifndef S_IRWXU
-   #define S_IRWXU      0x01C0  /* RWE permissions mask for owner */
+   #define S_IRWXU      (S_IRUSR | S_IWUSR | S_IXUSR)
 #endif
 
 #ifndef S_IRUSR
@@ -1432,7 +1433,7 @@ BOOL    hb_fsMkDir( BYTE * pDirname )
    errno = 0;
 
    #if !defined(__WATCOMC__) && !defined(__BORLANDC__) && !defined(__IBMCPP__) && !defined(__MINGW32__)
-      bResult = ( mkdir( ( char * ) pDirname, S_IWUSR | S_IRUSR | S_IXUSR ) == 0 );
+      bResult = ( mkdir( ( char * ) pDirname, S_IRWXU | S_IRWXG | S_IRWXO ) == 0 );
    #else
       bResult = ( mkdir( ( char * ) pDirname ) == 0 );
    #endif
