@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.498 2002/11/18 00:38:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.499 2002/11/18 14:49:51 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-19 11:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl\tbrowse.prg
+    ! Heavily optimized code to match the speed of Clipper. A few 
+      Properies are deleted and some new are created. Code for 
+      :forceStable() method is contributed by Sandeep ( Thanks ).
+      Though a few issues are still left to match the Clipper 
+      behaviour, but hope soon I will get a solution for them as well.
 
 2002-11-18 15:45 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
   * source/vm/arrays.c
