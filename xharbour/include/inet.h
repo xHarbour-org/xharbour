@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.11 2002/12/24 06:42:21 ronpinkas Exp $
+* $Id: inet.h,v 1.12 2002/12/27 22:34:37 jonnymind Exp $
 */
 
 /*
@@ -63,6 +63,11 @@
          #define HB_SOCKET_T SOCKET
          #include <winsock.h>
          #include <windows.h>
+
+         /* JC1: Defined sd_both where not available (is in winsock2.h) */
+         #ifndef SD_BOTH
+            #define SD_BOTH         0x02
+         #endif
 
          #define HB_INET_CLOSE( x )    closesocket( x )
 

@@ -37,8 +37,7 @@ PROCEDURE Main()
 
    @ 13, 10 SAY 'Cycle over, stopping Monitor     '
 
-   *StopThread( MonitorHandle, Mutex )
-   StopThread( MonitorHandle )
+   StopThread( MonitorHandle, Mutex )
    WaitforThreads()
    DestroyMutex( Mutex )
    @ 14, 10 SAY 'Program over     '
