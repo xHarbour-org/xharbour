@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.59 2003/04/07 06:48:49 paultucker Exp $
+ * $Id: ppcore.c,v 1.60 2003/04/09 00:59:30 ronpinkas Exp $
  */
 
 /*
@@ -2359,6 +2359,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   *(ptro + *lenres) = '\0';
 
   //printf( "%s\n", ptro );
+  strotrim( ptro, ptro[0] == '#' ); // Removing excess spaces.
   *lenres = RemoveSlash( ptro );   /* Removing '\', '[' and ']' from result string */
   //printf( "%s\n", ptro );
 
