@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.171 2004/10/05 22:30:41 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.172 2004/10/06 01:35:19 ronpinkas Exp $
  */
 
 /*
@@ -3844,7 +3844,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   // Prefix ONLY when lens == 0 (2) oterwise MUST be a postfix.
                   if( lens == 2 )
                   {
-                     while( **ptri == ' ' )
+                     while( **ptri == ' ' && lens < maxrez )
                      {
                         if( expreal )
                         {
@@ -3948,7 +3948,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
 
                            // grab while digits
-                           while( isdigit((int) **ptri ) )
+                           while( isdigit((int) **ptri ) && lens < maxrez )
                            {
                               //printf( "Grabing: %c\n", **ptri );
 
@@ -4202,7 +4202,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
                else
                {
-                  while( **ptri == ' ' )
+                  while( **ptri == ' ' && lens < maxrez )
                   {
                      if( expreal )
                      {
@@ -4230,7 +4230,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   (*ptri)++;
                   lens++;
                }
-               while( **ptri == ' ' );
+               while( **ptri == ' ' && lens < maxrez );
 
                //printf( "After ws: '%c'\n", **ptri );
 
