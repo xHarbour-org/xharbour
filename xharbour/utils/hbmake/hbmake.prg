@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbmake.prg,v 1.42 2003/01/27 12:31:38 lculik Exp $
+ * $Id: hbmake.prg,v 1.43 2003/01/28 12:15:48 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1015,7 +1015,7 @@ FUNCTION Compfiles()
                             ENDIF
 
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " 2> Test.out"
+                            cComm += "  Test.out"
                         @ 4,16 Say acs[nFiles]
                         GaugeUpdate(aGauge,nFile/Len( aprgs ))
                         nFile++
@@ -2203,7 +2203,7 @@ FUNCTION CompUpdatedfiles()
 
                             cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " 2> Test.out"
+                            cComm += "  Test.out"
                         @ 4,16 Say acs[nFiles]
                         GaugeUpdate(aGauge,nFile/Len( aprgs ))
                        nFile++
