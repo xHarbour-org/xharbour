@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.11 2004/08/27 14:43:20 paultucker Exp $
+# $Id: hrbdll.wc,v 1.12 2004/09/06 19:25:43 mlombardo Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -400,6 +400,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\win32ole.obj \
   $(OBJ_DIR)\traceprg.obj \
   $(OBJ_DIR)\cdpesdos.obj \
+  $(OBJ_DIR)\cdpesmwin.obj \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
   $(OBJ_DIR)\cdpgewin.obj \
@@ -1838,6 +1839,9 @@ $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\cdpesmwin.obj : $(CODEPAGE_DIR)\cdpesmwin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cdpeswin.obj : $(CODEPAGE_DIR)\cdpeswin.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.59 2004/08/29 01:46:11 paultucker Exp $
+# $Id: hrbdll.bc,v 1.60 2004/09/06 19:25:43 mlombardo Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -404,6 +404,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\traceprg.obj \
   $(OBJ_DIR)\stream.obj \
   $(OBJ_DIR)\cdpesdos.obj \
+  $(OBJ_DIR)\cdpesmwin.obj \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
   $(OBJ_DIR)\cdpgewin.obj \
@@ -586,6 +587,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\chrasc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpapi.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpesdos.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpesmwin.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpeswin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpgedos.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpgewin.obj          + >> hdll.tmp
@@ -2336,6 +2338,9 @@ $(OBJ_DIR)\stream.obj : $(OBJ_DIR)\stream.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdpesmwin.obj : $(CODEPAGE_DIR)\cdpesmwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpeswin.obj : $(CODEPAGE_DIR)\cdpeswin.c
