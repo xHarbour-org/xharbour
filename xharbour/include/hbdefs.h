@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.52 2004/08/02 19:17:26 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.53 2004/08/04 20:39:38 lf_sfnet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined( __GNUC__ ) || defined( __XCC__ )
+#if ( defined( __GNUC__ ) || defined( __XCC__ ) ) && !defined( HB_OS_BSD )
 #include <stdint.h>
 #endif
 
