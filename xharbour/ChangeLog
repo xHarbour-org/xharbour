@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.895 2003/03/29 21:23:15 lculik Exp $
+ * $Id: ChangeLog,v 1.896 2003/03/29 21:28:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-29 20:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * makefile.bc
+    makefile.vc
+    source/Makefile
+    ! updated to Build the new samples.lib and hbodbc.lib
+  + Source/clipsamp/environ.c
+  + Source/clipsamp/date.c
+  + Source/clipsamp/dbf.c
+  + Source/clipsamp/gauge.c
+  + Source/clipsamp/num.c
+  + Source/clipsamp/stack.c
+  + Source/clipsamp/status.c
+  + Source/clipsamp/time.c
+  + Source/clipsamp/Makefile
+    ! Source code to Build Clipper compatible samples.lib
+  + Source/odbc/odbc.c
+  + Source/odbc/todbc.prg
+  + Source/odbc/sql.ch
+  + Source/odbc/Makefile
+  + Source/odbc/browodbc.prg
+    ! Source code to Build hbodbc.lib library for odbc acess
 
 2003-03-29 13:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

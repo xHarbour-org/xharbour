@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.36 2003/03/21 00:06:23 ronpinkas Exp $
+# $Id: makefile.bc,v 1.37 2003/03/21 21:33:40 ronpinkas Exp $
 #
 
 #
@@ -128,6 +128,9 @@ PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
 VM_DIR       = source\vm
+ODBC_DIR     = source\odbc
+SAMPLES_DIR  = source\clipsamp
+
 HBRUN_DIR    = utils\hbrun
 HBTEST_DIR   = utils\hbtest
 HBDOC_DIR    = utils\hbdoc
@@ -188,6 +191,8 @@ PP_LIB         = $(LIB_DIR)\pp.lib
 RDD_LIB        = $(LIB_DIR)\rdd.lib
 RTL_LIB        = $(LIB_DIR)\rtl.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
+ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
+SAMPLES_LIB    = $(LIB_DIR)\samples.lib
 
 !if $d(HB_THREAD_SUPPORT)
    VM_LIB     = $(LIB_DIR)\vmmt.lib
@@ -196,6 +201,7 @@ VM_LIB         = $(LIB_DIR)\vm.lib
    DBFNTX_LIB = $(LIB_DIR)\dbfntxmt.lib
    DBFCDX_LIB = $(LIB_DIR)\dbfcdxmt.lib
    PP_LIB     = $(LIB_DIR)\ppmt.lib
+   ODBC_LIB   = $(LIB_DIR)\hbodbcmt.lib
 !endif
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
@@ -771,6 +777,21 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\radios.obj \
    $(OBJ_DIR)\hbmlang.obj
 
+SAMPLES_LIB_OBJS =  \
+   $(OBJ_DIR)\environ.obj \
+   $(OBJ_DIR)\date.obj   \
+   $(OBJ_DIR)\dbf.obj    \
+   $(OBJ_DIR)\gauge.obj  \
+   $(OBJ_DIR)\num.obj    \
+   $(OBJ_DIR)\stack.obj   \
+   $(OBJ_DIR)\status.obj \
+   $(OBJ_DIR)\time.obj
+
+   ODBC_LIB_OBJS =       \
+      $(OBJ_DIR)\odbc.obj \
+      $(OBJ_DIR)\todbc.obj
+
+
 #
 # Our default target
 #
@@ -789,6 +810,8 @@ all: \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
    $(HB_GT_LIBS) \
+   $(SAMPLES_LIB) \
+   $(ODBC_LIB) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
@@ -819,7 +842,8 @@ $(GTDOS_LIB)  : $(GTDOS_LIB_OBJS)
 $(GTPCA_LIB)  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)  : $(GTWIN_LIB_OBJS)
-
+$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+$(ODBC_LIB)    : $(ODBC_LIB_OBJS)
 #
 # HVM*.OBJ dependencies
 #
@@ -2556,6 +2580,59 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(GTWIN_LIB) $(ARFLAGS) -+$@,,
+
+#
+# SAMPLES.LIB dependencies
+#
+
+$(OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
+
+#
+# HBODBC.lib dependencies
+#
+
+$(OBJ_DIR)\odbc.obj  : $(ODBC_DIR)\odbc.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(ODBC_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\todbc.c   : $(ODBC_DIR)\todbc.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
+   $(CC) -c $(CLIBFLAGS) -o$@ $**
+   tlib $(ODBC_LIB) $(ARFLAGS) -+$@,,
+
+
 
 #
 # HBPP.EXE dependencies
