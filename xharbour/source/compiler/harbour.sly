@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.26 2002/11/24 05:30:32 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.27 2002/11/24 17:50:36 ronpinkas Exp $
  */
 
 /*
@@ -781,6 +781,17 @@ ArgList    : Argument                     { $$ = hb_compExprNewArgList( $1 ); }
 
 Argument   : EmptyExpression                    { $$ = $1; }
            | '@' IdentName                      { $$ = hb_compExprNewVarRef( $2 ); }
+           | '@' IdentName ALIASOP IdentName    {
+                                                  if( ( $2[ 0 ] == 'M' && $2[ 1 ] == '\0' ) || strncmp( $2, "MEMVAR", 4 > strlen($2) ? 4 : strlen( $2) ) == 0 )
+                                                  {
+                                                     $$ = hb_compExprNewMemVarRef( $4 );
+                                                  }
+                                                  else
+                                                  {
+                                                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, $4, NULL );
+                                                     $$ = hb_compExprNewMemVarRef( $4 );
+                                                  }
+                                                }
            | '@' IdentName '(' DummyArgList ')' { $$ = hb_compExprNewFunRef( $2 ); }
            ;
 

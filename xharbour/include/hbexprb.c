@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.36 2002/11/12 17:24:14 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.37 2002/11/13 00:37:32 ronpinkas Exp $
  */
 
 /*
@@ -129,6 +129,7 @@ static HB_EXPR_FUNC( hb_compExprUseLogical );
 static HB_EXPR_FUNC( hb_compExprUseSelf );
 static HB_EXPR_FUNC( hb_compExprUseArray );
 static HB_EXPR_FUNC( hb_compExprUseVarRef );
+static HB_EXPR_FUNC( hb_compExprUseMemVarRef );
 static HB_EXPR_FUNC( hb_compExprUseFunRef );
 static HB_EXPR_FUNC( hb_compExprUseIIF );
 static HB_EXPR_FUNC( hb_compExprUseList );
@@ -184,6 +185,7 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseSelf,
    hb_compExprUseArray,
    hb_compExprUseVarRef,
+   hb_compExprUseMemVarRef,
    hb_compExprUseFunRef,
    hb_compExprUseIIF,
    hb_compExprUseList,
@@ -652,6 +654,39 @@ static HB_EXPR_FUNC( hb_compExprUseVarRef )
          break;
       case HB_EA_PUSH_PCODE:
          HB_EXPR_PCODE1( hb_compGenPushVarRef, pSelf->value.asSymbol );
+         break;
+      case HB_EA_POP_PCODE:
+         break;
+      case HB_EA_PUSH_POP:
+      case HB_EA_STATEMENT:
+         hb_compWarnMeaningless( pSelf );
+      case HB_EA_DELETE:
+         #if defined( HB_MACRO_SUPPORT )
+             HB_XFREE( pSelf->value.asSymbol );
+         #endif
+         break;
+   }
+   return pSelf;
+}
+
+/* actions for HB_ET_VARREF expression
+ */
+static HB_EXPR_FUNC( hb_compExprUseMemVarRef )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         break;
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+      case HB_EA_ARRAY_INDEX:
+         break;
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_PCODE1( hb_compGenPushMemVarRef, pSelf->value.asSymbol );
          break;
       case HB_EA_POP_PCODE:
          break;

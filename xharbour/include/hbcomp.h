@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.7 2002/11/24 05:30:32 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.8 2002/11/24 17:50:36 ronpinkas Exp $
  */
 
 /*
@@ -354,6 +354,7 @@ extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec ); /* P
 extern void hb_compGenPushFunCall( char * );             /* generates the pcode to push function's call */
 extern void hb_compGenPushVar( char * szVarName );        /* generates the pcode to push a variable value to the virtual machine stack */
 extern void hb_compGenPushVarRef( char * szVarName );    /* generates the pcode to push a variable by reference to the virtual machine stack */
+extern void hb_compGenPushMemVarRef( char * szVarName );    /* generates the pcode to push a memvar variable by reference to the virtual machine stack */
 extern void hb_compGenPushInteger( int iNumber );        /* Pushes a integer number on the virtual machine stack */
 extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical value on the virtual machine stack */
 extern void hb_compGenPushLong( long lNumber );          /* Pushes a long number on the virtual machine stack */

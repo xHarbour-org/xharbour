@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.1.1.1 2001/12/21 10:47:20 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.2 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ typedef enum
    HB_ET_SELF,
    HB_ET_ARRAY,
    HB_ET_VARREF,
+   HB_ET_MEMVARREF,
    HB_ET_FUNREF,
    HB_ET_IIF,
    HB_ET_LIST,
@@ -341,6 +342,7 @@ HB_EXPR_PTR hb_compExprNewOr( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewNot( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewNegate( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewVarRef( char * );
+HB_EXPR_PTR hb_compExprNewMemVarRef( char * );
 HB_EXPR_PTR hb_compExprNewFunRef( char * );
 HB_EXPR_PTR hb_compExprNewCodeblockExpr( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewFunCallArg( HB_EXPR_PTR, HB_EXPR_PTR );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.1.1.1 2001/12/21 10:47:52 ronpinkas Exp $
+ * $Id: hbmacro.h,v 1.2 2002/10/13 18:06:28 ronpinkas Exp $
  */
 
 /*
@@ -144,6 +144,7 @@ extern void hb_compGenPopAliasedVar( char * szVarName,
                                      long lWorkarea, HB_BISON_PTR pMacro );
 extern void hb_compGenPushVar( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushVarRef( char * szVarName, HB_BISON_PTR pMacro );
+extern void hb_compGenPushMemVarRef( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushAliasedVar( char * szVarName,
                                       BOOL bPushAliasValue,
                                       char * szAlias,

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.508 2002/11/29 20:30:47 walito Exp $
+ * $Id: ChangeLog,v 1.509 2002/12/01 04:03:47 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-03 22:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * include/hbmacro.h
+  * source/compiler/harbour.c
+  * source/vm/macro.c
+    + Added void hb_compGenPushMemVarRef( char * szVarName );
+
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * source/common/expropt1.c
+    + Added support for new HB_ET_MEMVARREF.
+
+  * source/compiler/harbour.sly
+    + Added support for @M|MEMV[AR]->SomeVar as function argument.
 
 2002-12-01 0:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/debug/dbgtarr.prg
@@ -45,11 +61,11 @@
     ! Minor optimization.
   * source/rdd/dbcmd.c
     ! Fixed __dbLocate NOT respecting WHILE clause.
-    * Formatting.  
+    * Formatting.
 
 2002-11-27 02:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source\rdd\workarea.c
-    ! Fixed hb_waRelEval() - When the current order is zero, relation works 
+    ! Fixed hb_waRelEval() - When the current order is zero, relation works
       by GOTO istead of SEEK, as Cl*pper does
 
 2002-11-24 21:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

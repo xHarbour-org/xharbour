@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.26 2002/11/24 17:50:36 ronpinkas Exp $
+ * $Id: harbour.c,v 1.27 2002/11/25 18:42:15 ronpinkas Exp $
  */
 
 /*
@@ -3245,6 +3245,11 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
        */
       hb_compGenVariablePCode( HB_P_PUSHMEMVARREF, szVarName );
    }
+}
+
+void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push a variable by reference to the virtual machine stack */
+{
+   hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
 }
 
  /* generates the pcode to push an aliased variable value to the virtual

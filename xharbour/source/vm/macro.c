@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.13 2002/10/17 00:48:07 ronpinkas Exp $
+ * $Id: macro.c,v 1.14 2002/10/22 22:48:40 ronpinkas Exp $
  */
 
 /*
@@ -1327,6 +1327,12 @@ void hb_compGenPushVarRef( char * szVarName, HB_MACRO_DECL )
       hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
       hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
+}
+
+void hb_compGenPushMemVarRef( char * szVarName, HB_MACRO_DECL )
+{
+   hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
+   hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
 }
 
  /* generates the pcode to push an aliased variable value to the virtual
