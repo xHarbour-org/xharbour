@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.49 2003/11/06 07:34:02 ronpinkas Exp $
+ * $Id: estack.c,v 1.50 2003/11/07 10:03:11 jonnymind Exp $
  */
 
 /*
@@ -265,6 +265,7 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
+   int iLocal;
    PHB_ITEM pDetached;
 
    HB_THREAD_STUB
@@ -273,20 +274,20 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    {
       --HB_VM_STACK.pPos;
 
-      if( HB_IS_BYREF( *HB_VM_STACK.pPos ) && HB_IS_MEMVAR( *HB_VM_STACK.pPos ) )
+      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 1;
+
+      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt && HB_IS_MEMVAR( *HB_VM_STACK.pPos ) )
       {
+         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, (*HB_VM_STACK.pPos)->type );
+
          pDetached = hb_itemUnRefOnce( *HB_VM_STACK.pPos );
 
-         //printf( "Type: %i\n", pDetached->type );
+         //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
 
          if( HB_IS_BYREF( pDetached ) )
          {
             hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
-            //printf( "Severed Detached Local: %i Type: %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase - 1, pDetached->type );
-         }
-         else
-         {
-            //hb_itemClear( pDetached );
+            //printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
          }
 
          hb_itemClear( *HB_VM_STACK.pPos );
