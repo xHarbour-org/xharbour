@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.4 2002/10/27 14:41:37 lculik Exp $
+ * $Id: dynsym.c,v 1.5 2002/10/28 20:37:27 mlombardo Exp $
  */
 
 /*
@@ -322,7 +322,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
    /*
    *  (c) 2002, Marcelo Lombardo <lombardo@uol.com.br>
    *  This is an emulation workaround for the symbol table limited to 10 chars,
-   *  Since the build flag -DHB_SYMBOL_NAME_LEN=10 is not an option anymore.
+   *  since the build flag -DHB_SYMBOL_NAME_LEN=10 is not an option anymore.
    */
 
    if (s_uiClosestDynSym < s_uiDynSymbols)
@@ -333,9 +333,8 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
       USHORT uiPos;
 
       /*
-      *  Let's check the closer symbol found
-      *  This code compares each char in the smallest symbol name to the largest symbol name, if both are
-      *  greater than 10 chars long.
+      *  Let's check the closer symbol found. This code compares each char in the smallest symbol
+      *  name to the largest symbol name, if both are larger than 10.
       */
 
       if (iLen1 >= 10 && iLen2 >= 10 && (!(iLen1 == iLen2 && iLen1 == 10)))
@@ -363,20 +362,16 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             }
          }
          else if (iLen1 == iLen2)
-         {
             bOk = 0;
-         }
          
          if (bOk)
-         {
             return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
-         }
       }
       
       /*
-      *  We did not find the symbol, but :
-      *  "nCount" looks closer to the tree search than "nCountDial", for instance.
-      *  So our last chance is to cut off szName up to 10 chars and redo the search.
+      *  We did not find the symbol, but "nCount" looks closer to the tree search
+      *  than "nCountDial", when searching for "nCountDialog". So our best chance
+      *  is to cut off szName up to 10 chars and redo the search.
       */
       
       if (iLen1 > 10 && iLen2 < 10)
@@ -390,10 +385,9 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          iLen1 = 10;
 
          pDest[ iLen1 ] = '\0';
+
          while( iLen1-- )
-         {
             *pDest++ = *szName++;
-         }
    
          s_uiClosestDynSym = uiMiddle;                  /* Start in the middle      */
    
@@ -418,7 +412,78 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             }
             uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
          }
+      }
+
+      /*
+      *  In other hand, if szName has 10 chars and the Symbol table contains a similar
+      *  entry, s_uiClosestDynSym may be wrong.
+      *  For instance, if we search for "cAliasRela", but in the symbol table we have
+      *  "cAliasRelac" and "cAliasNiv", the tree schema returns the wrong entry as the
+      *  closest ("cAliasNiv"). The best solution in this case is to complete szName
+      *  with some trailing chars ( "_" ), and redo the process.
+      */
       
+      if (iLen1 == 10 && iLen2 < 10)
+      {
+         USHORT uiFirst = 0;
+         USHORT uiLast = s_uiDynSymbols;
+         USHORT uiMiddle = uiLast / 2;
+         USHORT iuCount;
+         char szNameExtended[ 10 + 8 ];
+         char * pDest = szNameExtended;
+         
+         pDest[ 17 ] = '\0';
+
+         for (iuCount=0;iuCount<17;iuCount++)
+         {
+            if (iuCount<10)
+               pDest[iuCount] = szName[iuCount];
+            else
+               pDest[iuCount] = '_';
+         }
+
+         s_uiClosestDynSym = uiMiddle;                  /* Start in the middle      */
+   
+         while( uiFirst < uiLast )
+         {
+            int iCmp = strcmp( s_pDynItems[ uiMiddle ].pDynSym->pSymbol->szName, szNameExtended );
+   
+            if( iCmp == 0 )
+            {
+               s_uiClosestDynSym = uiMiddle;
+               return s_pDynItems[ uiMiddle ].pDynSym;
+            }
+            else if( iCmp < 0 )
+            {
+               uiLast = uiMiddle;
+               s_uiClosestDynSym = uiMiddle;
+            }
+            else /* if( iCmp > 0 ) */
+            {
+               uiFirst = uiMiddle + 1;
+               s_uiClosestDynSym = uiFirst;
+            }
+            uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
+         }
+
+         iLen1 = strlen( szName );
+         iLen2 = strlen( s_pDynItems[ s_uiClosestDynSym ].pDynSym->pSymbol->szName );
+         bOk  = 1;
+
+         if (iLen2 > 10)
+         {
+            for( uiPos = 0; uiPos < iLen1; uiPos++ )
+            {
+               if (szName[uiPos] != s_pDynItems[ s_uiClosestDynSym ].pDynSym->pSymbol->szName[uiPos])
+               {
+                  bOk = 0;
+                  break;
+               }
+            }
+            
+            if (bOk)
+               return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+         }
       }
    }
    

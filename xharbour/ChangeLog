@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.474 2002/11/04 12:25:13 mlombardo Exp $
+ * $Id: ChangeLog,v 1.475 2002/11/04 12:29:34 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-04 19:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/dynsym.c
+    ! Fixed workaround for Symbol Table lenght limited to 10 chars and
+    ! Source code comments improved
+
+2002-11-04 09:20 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/macro/macro.y
+    + added support for If() function in macro execution with optional 3th 
+      parameter, as Cl*pper does : if(<lCondition>,<uResult1> [,<uResult2>])
 
 2002-11-04 09:20 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/macro/macro.y
