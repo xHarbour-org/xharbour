@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1126 2003/06/17 00:54:30 druzus Exp $
+ * $Id: ChangeLog,v 1.1127 2003/06/17 10:16:08 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-17 12:30 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
+  * source/debug/dbgmenu.prg
+    + Change menu entries so help is active
+  * source/debug/dbgtarr.prg
+    * Take fixes from harbour relating to editing array variables
+  * source/debug/dbgtmenu.prg
+    * sync with harbour
+  * source/debug/dbgtwin.prg
+    * sync with harbour
+  * source/debug/dbgwa.prg
+    * correct display of workarea index key and filter
+    * sync with harbour
+  * source/debug/debugger.prg
+    * space now not required after ? or ?? command (Clipper compatibility)
+    * removed tracelogs
+    * added a couple of safety checks
+    * sync with Harbour
+  * source/debug/tbrwtext.prg
+    * sync with Harbour  
+ 
 2003-06-17 12:11 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/regex.c
     ! Minor fix in error reporting (really minor :-)
