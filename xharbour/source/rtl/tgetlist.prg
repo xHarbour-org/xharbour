@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.10 2002/06/07 15:14:07 walito Exp $
+ * $Id: tgetlist.prg,v 1.11 2002/06/14 17:29:41 walito Exp $
  */
 
 /*
@@ -68,6 +68,7 @@
 #include "inkey.ch"
 #include "setcurs.ch"
 #include "button.ch"
+#include "tbrowse.ch"
 
 #define SCORE_ROW       0
 #define SCORE_COL       60
@@ -111,12 +112,12 @@ CLASS HBGetList
    METHOD ShowScoreBoard()
    METHOD ReadUpdated( lUpdated )
    METHOD ReadVar( cNewVarName )
-   METHOD ReadExit( lNew ) INLINE Set( _SET_EXIT, lNew )
+   METHOD ReadExit( lNew ) INLINE IF( ISLOGICAL(lNew), Set( _SET_EXIT, lNew ), Set( _SET_EXIT ) )
    METHOD SetFocus()
    METHOD Updated() INLINE ::lUpdated
 #ifdef HB_COMPAT_C53
 
-   METHOD GUIReader(oget,getsys,a,b)
+   METHOD GUIReader(oGet,getsys,a,b)
    METHOD GUIApplyKey( oGUI, nKey )
    METHOD GUIPreValidate( oGUI )
    METHOD GUIPostValidate( oGUI )
