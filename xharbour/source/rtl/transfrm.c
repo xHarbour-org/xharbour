@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.24 2003/07/22 18:24:09 toninhofwi Exp $
+ * $Id: transfrm.c,v 1.25 2004/01/15 18:18:15 ronpinkas Exp $
  */
 
 /*
@@ -140,11 +140,11 @@ HB_FUNC( TRANSFORM )
          {
             switch( toupper( *szPic ) )
             {
-               case HB_CHAR_HT:
                case '9':
                   bDone = TRUE;
                   continue; //force exit without manipulating szPic and ulPicLen
 
+               case HB_CHAR_HT:
                case ' ':
                   bDone = TRUE;      /* End of function string */
                   break;

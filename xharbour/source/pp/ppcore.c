@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.110 2004/01/11 07:32:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.111 2004/01/15 19:19:26 ronpinkas Exp $
  */
 
 /*
@@ -3119,10 +3119,31 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
    if( cMarkerType == '4' && strchr( "&(", ( *ptri )[0] ) == NULL )
    {
+      char *pExp = expreal;
+
       hb_pp_NextToken( ptri, expreal );
 
       lens = strlen( expreal );
       expreal += lens;
+
+      while( **ptri && strchr( "./\\", **ptri ) )
+      {
+         expreal[0] = **ptri;
+         expreal[1] = '\0';
+         expreal++;
+         (*ptri)++;
+         lens++;
+
+         if( **ptri == '\0' )
+         {
+            break;
+         }
+
+         hb_pp_NextToken( ptri, expreal );
+
+         lens += strlen( expreal );
+         expreal += lens;
+      }
 
       goto Done;
    }

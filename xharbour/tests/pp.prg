@@ -4857,13 +4857,20 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      CASE cType == '('
         s1 := Left( sLine, 1 )
-        IF ! ( s1 $ "&(" )
 
+        IF ! ( s1 $ "&(" )
            sExp  := NextToken( @sLine )
+
+           WHILE SubStr( sLine, 1, 1 ) $ ".\/"
+              sExp += SubStr( sLine, 1, 1 )
+              sLine := SubStr( sLine, 2 )
+              sExp  += NextToken( @sLine )
+           ENDDO
+
            sExp  += ExtractLeadingWS( @sLine )
 
-            //? "EXP <(>: " + sExp
-            RETURN sExp
+           //? "EXP <(>: " + sExp
+           RETURN sExp
         ENDIF
 
      CASE cType == '!'
