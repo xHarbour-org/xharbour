@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.4 2003/02/07 14:50:08 jonnymind Exp $
+ * $Id: inkey.c,v 1.5 2003/02/07 18:18:24 ronpinkas Exp $
  */
 
 /*
@@ -91,6 +91,11 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
+
+#if defined( HB_OS_WIN_32_USED )
+   extern bCapsLockOn;
+   extern bShiftPressed;
+#endif
 
 static void hb_inkeyKBfree( void )
 {
@@ -336,10 +341,105 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
 HB_FUNC( INKEY )
 {
    USHORT uiPCount = hb_pcount();
-
-   hb_retni( hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
+   int iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
-                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK ) );
+                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
+
+#if defined( HB_OS_WIN_32_USED )
+   if ( bCapsLockOn )
+   {
+      if ( bShiftPressed )
+      {
+         switch( iKey ) {
+            case 96:
+               iKey = 126;
+               break;
+            case 49:
+               iKey = 33;
+               break;
+            case 50:
+               iKey = 64;
+               break;
+            case 51:
+               iKey = 35;
+               break;
+            case 52:
+               iKey = 36;
+               break;
+            case 53:
+               iKey = 37;
+               break;
+            case 54:
+               iKey = 94;
+               break;
+            case 55:
+               iKey = 38;
+               break;
+            case 56:
+               iKey = 42;
+               break;
+            case 57:
+               iKey = 40;
+               break;
+            case 48:
+               iKey = 41;
+               break;
+            case 45:
+               iKey = 95;
+               break;
+            case 61:
+               iKey = 43;
+               break;
+         }
+      }
+      else
+      {
+         switch( iKey ) {
+            case 126:
+               iKey = 96;
+               break;
+            case 33:
+               iKey = 49;
+               break;
+            case 64:
+               iKey = 50;
+               break;
+            case 35:
+               iKey = 51;
+               break;
+            case 36:
+               iKey = 52;
+               break;
+            case 37:
+               iKey = 53;
+               break;
+            case 94:
+               iKey = 54;
+               break;
+            case 38:
+               iKey = 55;
+               break;
+            case 42:
+               iKey = 56;
+               break;
+            case 40:
+               iKey = 57;
+               break;
+            case 41:
+               iKey = 48;
+               break;
+            case 95:
+               iKey = 45;
+               break;
+            case 43:
+               iKey = 61;
+               break;
+         }
+      }
+   }
+#endif
+
+   hb_retni( iKey );
 }
 
 HB_FUNC( __KEYBOARD )

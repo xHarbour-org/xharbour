@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.17 2003/06/23 02:49:30 andijahja Exp $
+ * $Id: gtwin.c,v 1.18 2003/06/30 17:08:58 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,6 @@
 #define HB_GT_NAME	WIN
 
 /* TODO: include any standard headers here */
-
 /* *********************************************************************** */
 
 #define HB_OS_WIN_32_USED
@@ -101,6 +100,8 @@
  To disable mouse, initialization was made in cmdarg.c
 */
 extern BOOL b_MouseEnable;
+BOOL bCapsLockOn = FALSE;
+BOOL bShiftPressed = FALSE;
 
 /* *********************************************************************** */
 
@@ -1288,6 +1289,10 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 if( dwState & SHIFT_PRESSED ) fprintf( stdout, " SH" );
                 fprintf( stdout, " " );
              #endif
+
+             bCapsLockOn = ( dwState & CAPSLOCK_ON );
+             bShiftPressed = ( dwState & SHIFT_PRESSED );
+
              if( ch == 224 )
              {
                 /* Strip extended key lead-in codes */
@@ -1515,7 +1520,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
        if ( s_wRepeated == 0 )
           s_cNumIndex++;
     }
-
     return ch;
 }
 
