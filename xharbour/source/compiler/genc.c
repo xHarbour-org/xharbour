@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.53 2003/12/14 06:40:31 andijahja Exp $
+ * $Id: genc.c,v 1.54 2003/12/14 21:23:36 andijahja Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
    BOOL bCritical = FALSE;
 
-   int  iSymOffset, iStarupOffset;
+   int  iSymOffset, iStartupOffset;
 
    if( ! pFileName->szExtension )
    {
@@ -181,12 +181,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            fprintf( yyc, "HB_FUNC_INIT( %s );\n", pFunc->szName );
+            pFunc->szName[ strlen( pFunc->szName ) - 1 ] = '_';
+            fprintf( yyc, "HB_FUNC_INIT( _%s );\n", pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            fprintf( yyc, "HB_FUNC_EXIT( %s );\n", pFunc->szName );
+            pFunc->szName[ strlen( pFunc->szName ) - 1 ] = '_';
+            fprintf( yyc, "HB_FUNC_EXIT( _%s );\n", pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
@@ -279,7 +281,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
 
       iSymOffset = 0;
-      iStarupOffset = -1;
+      iStartupOffset = -1;
 
       while( pSym )
       {
@@ -309,7 +311,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          }
          else
          {
-            fprintf( yyc, "{ \"%s\", ", pSym->szName );
+            if( pSym->cScope & HB_FS_INIT || pSym->cScope & HB_FS_EXIT )
+            {
+               pSym->szName[ strlen( pSym->szName ) - 1 ] = '$';
+               fprintf( yyc, "{ \"%s\", ", pSym->szName );
+               pSym->szName[ strlen( pSym->szName ) - 1 ] = '_';
+            }
+            else
+            {
+               fprintf( yyc, "{ \"%s\", ", pSym->szName );
+            }
 
             if( pSym->cScope & HB_FS_STATIC )
             {
@@ -357,14 +368,21 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
             {
                fprintf( yyc, " | HB_FS_FIRST" );
 
-               iStarupOffset = iSymOffset;
+               iStartupOffset = iSymOffset;
             }
 
             /* specify the function address if it is a defined function or an
                external called function */
             if( hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
             {
-               fprintf( yyc, ", HB_FUNCNAME( %s ), (PHB_DYNS) 1 }", pSym->szName );
+               if( pSym->cScope & HB_FS_INIT || pSym->cScope & HB_FS_EXIT )
+               {
+                  fprintf( yyc, ", HB_FUNCNAME( _%s ), (PHB_DYNS) 1 }", pSym->szName );
+               }
+               else
+               {
+                  fprintf( yyc, ", HB_FUNCNAME( %s ), (PHB_DYNS) 1 }", pSym->szName );
+               }
             }
             else if( hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
             {
@@ -408,12 +426,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName );
 
-      if( hb_comp_bExplicitStartProc && iStarupOffset >= 0 )
+      if( hb_comp_bExplicitStartProc && iStartupOffset >= 0 )
       {
          fprintf( yyc, "extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );\n" );
          fprintf( yyc, "void hb_InitExplicitStartup( void )\n" );
          fprintf( yyc, "{\n" );
-         fprintf( yyc, "   hb_vmExplicitStartup( symbols + %i );\n", iStarupOffset );
+         fprintf( yyc, "   hb_vmExplicitStartup( symbols + %i );\n", iStartupOffset );
          fprintf( yyc, "}\n" );
 
          fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
@@ -481,7 +499,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       {
          // The pCode Table is Written Here
         if ( hb_comp_iGenVarList )
+        {
            fprintf( hb_comp_pCodeList, "[%s]\n", pFunc->szName );
+        }
 
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
@@ -507,12 +527,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            fprintf( yyc, "HB_FUNC_INIT( %s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_INIT( _%s )", pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            fprintf( yyc, "HB_FUNC_EXIT( %s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_EXIT( _%s )", pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
@@ -1603,9 +1623,8 @@ static HB_GENC_FUNC( hb_p_pushblock )
    while( wVar-- )
    {
       w = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos ] ) );
-      fprintf( cargo->yyc, "\t%i, %i,",
-               pFunc->pCode[ lPCodePos ],
-               pFunc->pCode[ lPCodePos + 1 ] );
+      fprintf( cargo->yyc, "\t%i, %i,", pFunc->pCode[ lPCodePos ], pFunc->pCode[ lPCodePos + 1 ] );
+
       /* NOTE:
          * When a codeblock is used to initialize a static variable
          * the names of local variables cannot be determined
@@ -1613,10 +1632,17 @@ static HB_GENC_FUNC( hb_p_pushblock )
          * in which function was defined this local variable
          */
       if( ( pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) != ( HB_FS_INIT | HB_FS_EXIT ) )
-         if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %s */", hb_compLocalVariableFind( pFunc, w )->szName );
+      {
+         if( cargo->bVerbose )
+         {
+            fprintf( cargo->yyc, "\t/* %s */", hb_compLocalVariableFind( pFunc, w )->szName );
+         }
+      }
+
       fprintf( cargo->yyc, "\n" );
       lPCodePos += 2;
    }
+
    return (USHORT) (lPCodePos - ulStart);
 }
 

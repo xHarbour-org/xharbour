@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.54 2003/12/01 23:50:12 druzus Exp $
+ * $Id: harbour.c,v 1.55 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -1775,16 +1775,34 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
+   if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
+   {
+      int iLen = strlen( szFunName );
+      char *sDecorated = hb_xgrab( iLen + 2 );
+
+      strcpy( sDecorated, szFunName );
+      szFunName = sDecorated;
+
+      szFunName[ iLen ] = '$';
+      szFunName[ iLen + 1 ] = '\0';
+
+      szFunName = hb_compIdentifierNew( szFunName, FALSE );
+   }
+
    pFunc = hb_compFunctionFind( szFunName );
+
    if( pFunc )
    {
       /* The name of a function/procedure is already defined */
       if( ( pFunc != hb_comp_functions.pFirst ) || hb_comp_bStartProc )
+      {
          /* it is not a starting procedure that was automatically created */
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_FUNC_DUPL, szFunName, NULL );
+      }
    }
 
    szFunction = hb_compReservedName( szFunName );
+
    if( szFunction && !( hb_comp_functions.iCount==0 && !hb_comp_bStartProc ) )
    {
       /* We are ignoring it when it is the name of PRG file and we are
@@ -1796,12 +1814,17 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    hb_comp_iFunctionCnt++;
 
    pSym = hb_compSymbolFind( szFunName, NULL );
+
    if( ! pSym )
+   {
       /* there is not a symbol on the symbol table for this function name */
       pSym = hb_compSymbolAdd( szFunName, NULL );
+   }
 
    if( pSym && cScope != HB_FS_PUBLIC )
+   {
       pSym->cScope |= cScope; /* we may have a non public function and a object message */
+   }
 
    pFunc = hb_compFunctionNew( szFunName, cScope );
    pFunc->bFlags |= iType;
@@ -2081,16 +2104,23 @@ PFUNCTION hb_compFunctionFind( char * szFunctionName ) /* returns a previously d
 
    while( pFunc )
    {
-      if( ! strcmp( pFunc->szName, szFunctionName ) )
-         return pFunc;
-      else
+      if( strcmp( pFunc->szName, szFunctionName ) )
       {
          if( pFunc->pNext )
+         {
             pFunc = pFunc->pNext;
+         }
          else
+         {
             return NULL;
+         }
+      }
+      else
+      {
+         return pFunc;
       }
    }
+
    return NULL;
 }
 

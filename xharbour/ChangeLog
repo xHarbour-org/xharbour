@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1885 2003/12/15 22:41:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1886 2003/12/15 23:15:24 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-16 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    ! Fixed INIT/EXIT Procedures to be more Clipper compatible
+      Don't conflict with other symbols of same name, and use $ as suffix like in Clipper.
+
 2003-12-16 12:15 UTC+1200 Peter Rees <peter@rees.co.nz>
   * source/vm/mainwin.c
     *fixed to make sure terminating '\0' is on final parameter
-
 
 2003-12-15 14:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   + source/codepage/CDPHR1250.C
