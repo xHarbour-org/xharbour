@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.10 2003/06/06 06:45:09 druzus Exp $
+ * $Id: hbexprc.c,v 1.11 2003/09/04 19:27:08 ronpinkas Exp $
  */
 
 /*
@@ -424,6 +424,37 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    }
    else
    {
+    #if defined( HB_MACRO_SUPPORT )
+
+       /* This optimization is not applicable in Macro Compiler. */
+
+    #else
+
+      if( bOper == HB_P_INC || bOper == HB_P_DEC )
+      {
+         short iIncrement, iLocal;
+
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            {
+               if( bOper == HB_P_DEC )
+               {
+                  iIncrement = -1;
+               }
+               else
+               {
+                  iIncrement = 1;
+               }
+
+               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+               return;
+            }
+         }
+      }
+    #endif
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -461,6 +492,37 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
    }
    else
    {
+    #if defined( HB_MACRO_SUPPORT )
+
+       /* This optimization is not applicable in Macro Compiler. */
+
+    #else
+
+      if( bOper == HB_P_INC || bOper == HB_P_DEC )
+      {
+         short iIncrement, iLocal;
+
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            {
+               if( bOper == HB_P_DEC )
+               {
+                  iIncrement = -1;
+               }
+               else
+               {
+                  iIncrement = 1;
+               }
+
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+               return;
+            }
+         }
+      }
+    #endif
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -495,6 +557,37 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    }
    else
    {
+    #if defined( HB_MACRO_SUPPORT )
+
+       /* This optimization is not applicable in Macro Compiler. */
+
+    #else
+
+      if( bOper == HB_P_INC || bOper == HB_P_DEC )
+      {
+         short iIncrement, iLocal;
+
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            {
+               if( bOper == HB_P_DEC )
+               {
+                  iIncrement = -1;
+               }
+               else
+               {
+                  iIncrement = 1;
+               }
+
+               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+               return;
+            }
+         }
+      }
+    #endif
+
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
