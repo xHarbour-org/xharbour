@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.2 2003/02/03 21:26:53 walito Exp $
+ * $Id: tmysql.prg,v 1.3 2003/02/14 21:10:59 lculik Exp $
  */
 
 /*
@@ -465,7 +465,7 @@ return ::nCurRow - nOldRow
 METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
 
    local cType, xField
-   local cDateFormat := set(4)
+   local cDateFormat := Lower( Set( 4 ) )
 
    default loRow to ::loRow
    default nRow  to ::nCurRow
@@ -486,7 +486,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
             ::lEof    := .t.
             ::nCurRow := ::nNumRows + 1
          endif
-         if nRow > 0 .and. nRow <= ::nNumRows
+         if nRow > 0 .and. nRow <= ::nNumRows - 1
             ::lBof    := .f.
             ::lEof    := .f.
             ::nCurRow := nRow
@@ -1495,7 +1495,7 @@ return aStruct
 static function ClipValue2SQL(Value, cType)
 
    local cValue := ""
-   local cDateFormat := set(4)
+   local cDateFormat := Lower( Set( 4 ) )
 
    Default cType to ValType( Value )
 
