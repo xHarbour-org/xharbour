@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.83 2004/07/22 08:28:17 druzus Exp $
+ * $Id: dbf1.c,v 1.84 2004/07/27 13:19:35 druzus Exp $
  */
 
 /*
@@ -911,7 +911,8 @@ static ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
 
    pArea->fTop = pArea->fBottom = FALSE;
 
-   if( lToSkip == 0 || hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr )
+   if( lToSkip == 0 || hb_set.HB_SET_DELETED ||
+       pArea->dbfi.itmCobExpr || pArea->dbfi.fFilter )
       return SUPER_SKIP( ( AREAP ) pArea, lToSkip );
 
    uiError = SELF_SKIPRAW( ( AREAP ) pArea, lToSkip );

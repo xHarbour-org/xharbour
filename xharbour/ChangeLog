@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3225 2004/07/28 02:46:03 peterrees Exp $
+ * $Id: ChangeLog,v 1.3226 2004/07/28 19:48:45 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-28 22:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+    ! set and properly respect pArea->dbfi.fFilter flag even when
+      pArea->dbfi.itmCobExpr is NULL
 
 2004-07-28 15:20 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gx.c

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.24 2004/03/31 03:18:32 druzus Exp $
+ * $Id: workarea.c,v 1.25 2004/05/08 22:07:09 druzus Exp $
  */
 
 /*
@@ -999,6 +999,7 @@ ERRCODE hb_waClearFilter( AREAP pArea )
       hb_itemRelease( pArea->dbfi.abFilterText );
       pArea->dbfi.abFilterText = NULL;
    }
+   pArea->dbfi.fFilter = FALSE;
 
    return SUCCESS;
 }
@@ -1077,9 +1078,11 @@ ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
    {
       pArea->dbfi.itmCobExpr = hb_itemNew( pFilterInfo->itmCobExpr );
    }
-
    if( pFilterInfo->abFilterText )
+   {
       pArea->dbfi.abFilterText = hb_itemNew( pFilterInfo->abFilterText );
+   }
+   pArea->dbfi.fFilter = TRUE;
 
    return SUCCESS;
 }
