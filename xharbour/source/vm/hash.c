@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.3 2003/11/10 01:48:29 jonnymind Exp $
+ * $Id: hash.c,v 1.4 2003/11/11 20:20:55 ronpinkas Exp $
  */
 
 /*
@@ -190,8 +190,8 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
 
    pBaseHash->ulLen = 0;
    pBaseHash->ulAllocated = HB_HASH_ALLOC_BLOCK;
-   pBaseHash->pValues = hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
-   pBaseHash->pKeys = hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
+   pBaseHash->pValues = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
+   pBaseHash->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
    pBaseHash->fOrder = s_hashOrderComplex;
    pBaseHash->bCase = TRUE;
 
@@ -370,7 +370,7 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
 {
    ULONG ulLen;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashRemove(%p, %p)", pHash, pKey ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashRemove(%p, %lo)", pHash, ulPos ));
 
    if( HB_IS_HASH( pHash ) )
    {
@@ -487,7 +487,7 @@ BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem 
 
 BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashGet(%p, %lu, %p) Base: %p Items: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pItems));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashGet(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues));
 
    if( HB_IS_HASH( pHash ) && ulIndex > 0 && ulIndex <= pHash->item.asHash.value->ulLen )
    {
@@ -520,7 +520,7 @@ BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 
 BOOL HB_EXPORT hb_hashGetByRef( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashGetByRef(%p, %lu, %p) Base: %p Items: %p", phash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pItems));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashGetByRef(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues ));
 
    if( HB_IS_COMPLEX( pItem ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.82 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: classes.c,v 1.83 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -2414,7 +2414,7 @@ PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDest )
 {
    PHB_DYNS pMsgSym;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_objGetPropValue(%p, %s)", pObject, szProp));
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetPropValue(%p, %s, %p)", pObj, szProp, pDest));
 
    pMsgSym = hb_dynsymFindName( szProp );
 
