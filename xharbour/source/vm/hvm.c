@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.260 2003/09/10 06:07:32 ronpinkas Exp $
+ * $Id: hvm.c,v 1.261 2003/09/11 06:56:41 ronpinkas Exp $
  */
 
 /*
@@ -2629,7 +2629,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
 
             /* memvars.c 417 */
+            #ifdef HB_THREAD_SUPPORT
+            {
+            char *szName = (pSymbols + uiParams)->szName;
+            char *szNewName = (char *) hb_xgrab( strlen( szName) + 14 );
+            sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
+            pDyn = hb_dynsymFindName( szNewName );
+            hb_xfree( szNewName );
+            }
+            #else
             pDyn = ( PHB_DYNS ) (pSymbols + uiParams)->pDynSym;
+            #endif
 
             if( pDyn && pDyn->hMemvar )
             {

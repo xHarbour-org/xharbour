@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.5 2003/08/07 00:18:50 jonnymind Exp $
+* $Id: mtstress.prg,v 1.6 2003/08/07 05:54:12 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -48,7 +48,7 @@ PROCEDURE Stress( nId, nRow )
    LOCAL nCount
    LOCAL cRndVal
    LOCAL oTest
-   PRIVATE cRnd
+   PRIVATE cRnd, var1
    //PRIVATE cMemVal
 
    nRow += nId - 1
@@ -117,7 +117,7 @@ PROCEDURE Stress( nId, nRow )
    END
 
    // Step 3: private test
-/*
+
    @nRow,5 SAY Space( 80 )
 
    m->cMemVal := "XXX"
@@ -152,7 +152,7 @@ PROCEDURE Stress( nId, nRow )
        Alltrim( Str( nCount ) ) + ": "+ m->cRndMem
    NEXT
 
-*/
+
 RETURN
 
 
