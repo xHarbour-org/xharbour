@@ -3,51 +3,38 @@ Type=xMake
 
 [Info]
 Type=Executable
-Architecture=Windows (bcc32)
-Include=
+Architecture=BorlandWin
+Include=%HB_INSTALL%\contrib\what32\include
 Define=
 Params=
+Final Path=
 
-[Project]
-Target=C:\XHARBOUR\CONTRIB\XVISUAL\BIN\XIDE.EXE
-Run=
-%HOME%\xIde.Exe
-Run=%HOME%\bin\xIde.Exe
-
-[Version]
-Type=xMake
-
-[Info]
-Type=Executable
-Architecture=Windows (bcc32)
-Include=%HB_INSTALL%\contrib\what32\include;%HB_INSTALL%\contrib\WHOO\include
-Define=
-Params=
+[xMake]
+Show Defaults=No
 
 [Files]
-%C_LIB_INSTALL%\C0W32.OBJ=1,.T.
-%HOME%\xide.prg=2,.F.
-%HOME%\xTree.prg=3,.F.
-%HOME%\xInspect.prg=4,.F.
-%HOME%\CtrlMask.Prg=5,.F.
-%HOME%\FormEdit.Prg=6,.F.
-%HOME%\xPad.prg=7,.F.
-%HOME%\edcolor.c=8,.F.
-%C_LIB_INSTALL%\ws2_32.LIB=9,.F.
-%HB_INSTALL%\contrib\Whoo\lib\whoo.lib=10,.F.
-%HB_INSTALL%\contrib\what32\lib\what32.lib=11,.F.
-%HB_LIB_INSTALL%\RTL.LIB=12,.T.
-%HB_LIB_INSTALL%\VM.LIB=13,.T.
-%HB_LIB_INSTALL%\GTWIN.LIB=14,.T.
-%HB_LIB_INSTALL%\LANG.LIB=15,.T.
-%HB_LIB_INSTALL%\MACRO.LIB=16,.T.
-%HB_LIB_INSTALL%\RDD.LIB=17,.T.
-%HB_LIB_INSTALL%\DBFNTX.LIB=18,.T.
-%HB_LIB_INSTALL%\DBFCDX.LIB=19,.T.
-%HB_LIB_INSTALL%\DEBUG.LIB=20,.T.
-%HB_LIB_INSTALL%\COMMON.LIB=21,.T.
-%HB_LIB_INSTALL%\PP.LIB=22,.T.
-%C_LIB_INSTALL%\CW32.LIB=23,.T.
-%C_LIB_INSTALL%\IMPORT32.LIB=24,.T.
-%HB_INSTALL%\contrib\xVisual\xide.res=25,.F.
+%HB_INSTALL%\contrib\xVisual\xide.prg=1,.F.
+%HB_INSTALL%\contrib\xVisual\xTree.prg=2,.F.
+%HB_INSTALL%\contrib\xVisual\FormEdit.Prg=3,.F.
+%HB_INSTALL%\contrib\xVisual\CtrlMask.Prg=4,.F.
+%HB_INSTALL%\contrib\xVisual\xPad.prg=5,.F.
+%HB_INSTALL%\contrib\xVisual\edcolor.c=6,.F.
+%HB_INSTALL%\contrib\xVisual\xInspect.prg=7,.F.
+%HB_INSTALL%\contrib\what32\lib\what32.lib=8,.F.
+%HB_INSTALL%\contrib\Whoo\lib\Whoo.Lib=9,.F.
+%C_LIB_INSTALL%\C0W32.OBJ=10,.T.
+%HB_LIB_INSTALL%\rtl.lib=11,.T.
+%HB_LIB_INSTALL%\vm.lib=12,.T.
+%HB_LIB_INSTALL%\gtwin.lib=13,.T.
+%HB_LIB_INSTALL%\lang.lib=14,.T.
+%HB_LIB_INSTALL%\macro.lib=15,.T.
+%HB_LIB_INSTALL%\rdd.lib=16,.T.
+%HB_LIB_INSTALL%\dbfntx.lib=17,.T.
+%HB_LIB_INSTALL%\dbfcdx.lib=18,.T.
+%HB_LIB_INSTALL%\debug.lib=19,.T.
+%HB_LIB_INSTALL%\common.lib=20,.T.
+%HB_LIB_INSTALL%\pp.lib=21,.T.
+%C_LIB_INSTALL%\CW32.LIB=22,.T.
+%C_LIB_INSTALL%\IMPORT32.LIB=23,.T.
+%HB_INSTALL%\contrib\xVisual\Xide.res=24,.F.
 

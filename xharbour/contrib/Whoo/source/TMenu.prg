@@ -195,7 +195,7 @@ METHOD GetHandle() CLASS TMenu
       lpMenuInfo:dwStyle := MNS_NOTIFYBYPOS
       
       hMenu := ::FItems:GetHandle()
-      SetMenuInfo( hMenu, lpMenuInfo:value )
+      view hMenu, SetMenuInfo( hMenu, lpMenuInfo:value )
    ENDIF
 RETURN hMenu
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.17 2002/11/15 01:56:35 what32 Exp $
+ * $Id: TPanel.prg,v 1.18 2003/01/09 08:21:53 what32 Exp $
  */
 
 /*
@@ -30,6 +30,7 @@
 #include "hbclass.ch"
 #include "winuser.ch"
 #include "what32.ch"
+#include "classex.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -44,7 +45,8 @@ CLASS TPanel FROM TForm
    DATA FTop    INIT  0
    DATA FWidth  INIT 10
    DATA FHeight INIT 10
-
+   
+   PROPERTY Menu READ FMenu
 //-------------------------------------------------------------------------------------------
    ACCESS biSystemMenu    INLINE AND( ::Style, WS_SYSMENU ) # 0
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;

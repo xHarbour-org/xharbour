@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.23 2002/11/18 06:24:19 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.24 2003/01/09 08:21:02 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -83,6 +83,7 @@ CLASS TWBrowse FROM TWinControl
    DATA ExStyle   INIT WS_EX_CLIENTEDGE
    DATA lRegister PROTECTED INIT .T.
    DATA FrameWnd  PROTECTED INIT .F.
+   DATA Menu
 
    DATA nDataTop           PROTECTED // data display area top coordinate (usually == headHeight)
    DATA nDataLeft          PROTECTED // data display area left coordinate ( usually 0 )

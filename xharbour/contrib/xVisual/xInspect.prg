@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.72 2002/12/31 08:17:13 what32 Exp $
+ * $Id: xInspect.prg,v 1.73 2003/01/09 08:22:37 what32 Exp $
  */
 
 /*
@@ -370,7 +370,7 @@ CLASS InspectBrowser FROM TWBrowse
    DATA oCtrl
    METHOD Create() CONSTRUCTOR
    METHOD SetColControl()
-   METHOD OnCommand()
+   METHOD WMCommand()
 
 ENDCLASS
 
@@ -419,7 +419,7 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
    if y == 2
 
       IF ::oCtrl != NIL
-         ::oCtrl:Destroy()
+         ::oCtrl:DestroyWindowHandle()
          ::oCtrl := NIL
       ENDIF
 
@@ -464,7 +464,7 @@ RETURN self
 
 //-------------------------------------------------------------------------------------------
 
-METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
+METHOD WMCommand(nwParam,nlParam) CLASS InspectBrowser
    LOCAL oList
 
    IF ::oCtrl != NIL .AND. nlParam == ::oCtrl:handle
@@ -480,15 +480,15 @@ METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
          CASE ::oCtrl:ClassName() == "TBUTTON"
               DO CASE
                  CASE HiWord(nwParam) == BN_KILLFOCUS
-                      ::oCtrl:Destroy()
+                      ::oCtrl:DestroyWindowHandle()
                       ::oCtrl := NIL
 
                  CASE HiWord(nwParam)==BN_CLICKED
-                      ::oCtrl:Destroy()
+                      ::oCtrl:DestroyWindowHandle()
                       ::oCtrl := NIL
 
-                      oList := StringList():New(self)
-                      oList:Create()
+                      oList := StringList():Create(self)
+                      oList:SetParent( self )
               ENDCASE
       ENDCASE
 
@@ -501,18 +501,17 @@ RETURN nil
 CLASS StringList FROM TPanel
 
    VAR nEProc PROTECTED
-   METHOD New(oParent) INLINE ::resname := "StringList",;
+   METHOD Create(oParent) INLINE ::resname := "StringList",;
                               ::Modal   := .T.,;
-                              Super:New( oParent )
+                              Super:Create( oParent )
    METHOD WMCommand()
-   METHOD WMCreate()
+   METHOD WMInitDialog()
 
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------
 
-METHOD WMCreate() CLASS StringList
-
+METHOD WMInitDialog() CLASS StringList
    LOCAL cText := "", cItem
 
    FOR EACH cItem IN ObjInspect:CurObject:Items:Strings

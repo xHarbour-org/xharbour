@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.24 2002/11/19 03:47:35 what32 Exp $
+ * $Id: TCListBox.prg,v 1.25 2003/01/09 08:21:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -37,7 +37,7 @@
 IMPORT C STRUCTURE RECT
 
 *------------------------------------------------------------------------------*
-
+/*
 CLASS TListBox FROM TCustomListBox
    METHOD Create()
 ENDCLASS
@@ -45,9 +45,10 @@ ENDCLASS
 METHOD Create( oOwner ) CLASS TListBox
    ::Super:Create( oOwner )
 RETURN Self
+*/
 //--------------------------------------------------------------------------------------------------------------
 
-CLASS TCustomListBox FROM TCustomControl
+CLASS TListBox FROM TCustomControl
 
    DATA FCaption PROTECTED INIT ""
 
@@ -91,7 +92,7 @@ ENDCLASS
 
 *------------------------------------------------------------------------------*
 
-METHOD GetString(nLine) CLASS TCustomListBox
+METHOD GetString(nLine) CLASS TListBox
 
    LOCAL nLen
    LOCAL cBuf
@@ -103,7 +104,7 @@ METHOD GetString(nLine) CLASS TCustomListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD GetItemRect( nLine) CLASS TCustomListBox
+METHOD GetItemRect( nLine) CLASS TListBox
 
    LOCAL rc IS RECT
    LOCAL cRect := space(16)
@@ -115,7 +116,7 @@ METHOD GetItemRect( nLine) CLASS TCustomListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD GetSelItems() CLASS TCustomListBox
+METHOD GetSelItems() CLASS TListBox
 
    LOCAL n    := ::GetSelCount()
    LOCAL cBuf := space(n * 4)
@@ -125,7 +126,7 @@ METHOD GetSelItems() CLASS TCustomListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD Create( oOwner ) CLASS TCustomListBox
+METHOD Create( oOwner ) CLASS TListBox
 
    ::Super:Create( oOwner )
    ::FItems := TListBoxStrings()

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.99 2002/11/20 06:03:14 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.100 2003/01/09 08:22:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -61,7 +61,8 @@ GLOBAL EXTERNAL InspTree
    this file only used in win32.
  */
 #undef CRLF
-#define CRLF Chr(13) + Chr(10)
+
+#define CRLF CHR(13) + CHR(10)
 
 //----------------------------------------------------------------------------//
 
@@ -275,7 +276,6 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       ENDCASE
 
       IF oObj != NIL
-
          IF ::CtrlName == "CoolBar"
             aRect[1] := 0
             aRect[2] := 0
