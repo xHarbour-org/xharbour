@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.33 2003/02/26 06:45:30 ronpinkas Exp $
+ * $Id: genc.c,v 1.34 2003/02/28 10:37:20 ronpinkas Exp $
  */
 
 /*
@@ -2379,6 +2379,15 @@ static HB_GENC_FUNC( hb_p_match )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_pushmacroref )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_PUSHMACROREF,\n" );
+   return 1;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -2533,7 +2542,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_enumindex,
    hb_p_switchcase,
    hb_p_like,
-   hb_p_match
+   hb_p_match,
+   hb_p_pushmacroref
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

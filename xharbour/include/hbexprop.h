@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.3 2002/12/04 06:24:06 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.4 2003/02/28 10:37:19 ronpinkas Exp $
  */
 
 /*
@@ -95,14 +95,15 @@ typedef enum
 
 /* additional definitions used to distinguish macro expressions
  */
-#define  HB_ET_MACRO_VAR      0   /* &variable */
-#define  HB_ET_MACRO_SYMBOL   1   /* &fimcall() */
-#define  HB_ET_MACRO_ALIASED  2   /* &alias->&variable */
-#define  HB_ET_MACRO_EXPR     4   /* &( expr ) */
-#define  HB_ET_MACRO_ARGLIST  8   /* &variable used as a function call argument */
-#define  HB_ET_MACRO_LIST    16   /* &variable used as in literal arrays or parentesised expressions. */
-#define  HB_ET_MACRO_INDEX   32   /* &variable used as arrays index. */
-#define  HB_ET_MACRO_PARE    64   /* &variable used as arrays index. */
+#define  HB_ET_MACRO_VAR       0   /* &variable */
+#define  HB_ET_MACRO_SYMBOL    1   /* &fimcall() */
+#define  HB_ET_MACRO_ALIASED   2   /* &alias->&variable */
+#define  HB_ET_MACRO_EXPR      4   /* &( expr ) */
+#define  HB_ET_MACRO_ARGLIST   8   /* &variable used as a function call argument */
+#define  HB_ET_MACRO_LIST     16   /* &variable used as in literal arrays or parentesised expressions. */
+#define  HB_ET_MACRO_INDEX    32   /* &variable used as arrays index. */
+#define  HB_ET_MACRO_PARE     64   /* &variable used as arrays index. */
+#define  HB_ET_MACRO_VAR_REF 128   /* @&variable */
 
 /* types of expressions
  * NOTE: the order of these definition is important - change it carefully

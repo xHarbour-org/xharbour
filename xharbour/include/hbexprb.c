@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.47 2003/03/07 23:14:09 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.48 2003/03/08 22:59:13 ronpinkas Exp $
  */
 
 /*
@@ -1238,9 +1238,16 @@ static HB_EXPR_FUNC( hb_compExprUseMacro )
             }
             /* compile & run - leave a result on the eval stack
              */
-            if( pSelf->value.asMacro.SubType == HB_ET_MACRO_SYMBOL )
+            if( pSelf->value.asMacro.SubType == HB_ET_MACRO_SYMBOL || pSelf->value.asMacro.SubType == HB_ET_MACRO_VAR_REF )
+            {
                HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROSYMBOL );
 
+               if( pSelf->value.asMacro.SubType == HB_ET_MACRO_VAR_REF )
+               {
+                  HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHMACROREF );
+                  break;
+               }
+            }
             else if( pSelf->value.asMacro.SubType != HB_ET_MACRO_ALIASED )
             {
                if( pSelf->value.asMacro.SubType & HB_ET_MACRO_ARGLIST )
@@ -1879,7 +1886,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_EXPR_PTR pExpr = pSelf->value.asFunCall.pParms->value.asList.pExprList;
                      while( pExpr )
                      {
-                        if( pExpr->ExprType == HB_ET_MACRO )
+                        if( pExpr->ExprType == HB_ET_MACRO && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                         {
                            pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;
                            pExpr->value.asMacro.pFunCall = pSelf;
@@ -1952,7 +1959,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      /* check if &macro is used as a function call argument */
                      while( pExpr )
                      {
-                        if( pExpr->ExprType == HB_ET_MACRO )
+                        if( pExpr->ExprType == HB_ET_MACRO  && pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                         {
                             /* &macro was passed - handle it differently then in a normal statement */
                             pExpr->value.asMacro.SubType |= HB_ET_MACRO_ARGLIST;

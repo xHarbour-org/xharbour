@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.176 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.177 2003/03/10 23:22:04 jonnymind Exp $
  */
 
 /*
@@ -1996,6 +1996,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w += 3;
             break;
 
+         case HB_P_PUSHMACROREF:
+         {
+            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+            PHB_SYMB pSym = pTop->item.asSymbol.value;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHMEMVARREF") );
+
+            hb_memvarGetRefer( pTop, pSym );
+            w++;
+            break;
+         }
+
          case HB_P_PUSHVARIABLE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHVARIABLE") );
             /* Push a value of variable of unknown type onto the eval stack
@@ -3904,7 +3916,6 @@ static void hb_vmArrayPop( void )
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
    {
       char szMessage[ HB_SYMBOL_NAME_LEN + 1 ];
-      HB_SYMB Sym;
 
       szMessage[0] = '_';
       szMessage[1] = '\0';

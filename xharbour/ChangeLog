@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.832 2003/03/13 02:43:09 jonnymind Exp $
+ * $Id: ChangeLog,v 1.833 2003/03/13 02:59:37 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-13 16:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/hbpcode.h
+  * source/compiler/exproptb.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_PUSHMACROREF
+
+  /*
+     Syntax @&<macro> and @&<macro>.<suffix> is now suported
+     as argument to function calls.
+   */
+
+  + tests/macroref.prg
+    + Added test of passing macro by reference.
+
 2003-03-13 03:58 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * thread.h
     ! fixed linux compilation
-    
+
 2003-03-13 03:50 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * thread.h
   * thread.c

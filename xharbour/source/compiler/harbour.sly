@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.37 2003/03/04 02:55:14 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.38 2003/03/07 23:14:10 ronpinkas Exp $
  */
 
 /*
@@ -805,6 +805,8 @@ Argument   : EmptyExpression                    { $$ = $1; }
                                                      $$ = hb_compExprNewMemVarRef( $4 );
                                                   }
                                                 }
+           | '@' MACROVAR                       { $$ = hb_compExprNewMacro( NULL, '&', $2 ); $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF; }
+           | '@' MACROTEXT                      { $$ = hb_compExprNewMacro( NULL, 0, $2 ); $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF; }
            | '@' IdentName '(' DummyArgList ')' { $$ = hb_compExprNewFunRef( $2 ); }
            ;
 
