@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.13 2003/02/03 20:19:07 jonnymind Exp $
+* $Id: inet.c,v 1.14 2003/02/07 10:28:40 jonnymind Exp $
 */
 
 /*
@@ -648,7 +648,7 @@ HB_FUNC( INETRECVALL )
    char *Buffer;
    int iLen, iMax, iReceived, iBufferLen;
    HB_SOCKET_STRUCT *Socket;
-
+   
    if( pSocket == NULL || pBuffer == NULL )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
@@ -1201,7 +1201,7 @@ HB_FUNC( INETGETHOSTS )
    Host = hb_getHosts( pHost->item.asString.value, NULL );
 
    aHosts = hb_itemArrayNew( 0 );
-   
+
    if( Host == NULL )
    {
       hb_itemRelease( hb_itemReturn( aHosts ) );
@@ -1378,6 +1378,8 @@ HB_FUNC( INETACCEPT )
 {
    PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
    HB_SOCKET_STRUCT *Socket, *NewSocket;
+   HB_SOCKET_T incoming;
+   struct sockaddr_in si_remote;
 
    #if defined(HB_OS_WIN_32)
       int Len;
@@ -1404,22 +1406,6 @@ HB_FUNC( INETACCEPT )
    * returned socket.
    */
 
-   HB_SOCKET_INIT( NewSocket );
-
-   //#define HB_PROTECT_BLOCKING
-   #if defined(HB_PROTECT_BLOCKING) && defined(HB_THREAD_SUPPORT)
-      if( hb_ht_context )
-      {
-         HB_INET_CARGO *inetCargo = (HB_INET_CARGO *) hb_xgrab( sizeof( HB_INET_CARGO ) );
-
-         inetCargo->Socket    = Socket;
-         inetCargo->NewSocket = NewSocket;
-
-         hb_threadGetCurrentContext()->Cargo = (void *) inetCargo;
-         hb_threadGetCurrentContext()->pDestructor = acceptBlockingDestructor;
-      }
-   #endif
-
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -1428,34 +1414,22 @@ HB_FUNC( INETACCEPT )
    {
       /* On error (e.g. async connection closed) , com will be -1 and
          errno == 22 (invalid argument ) */
-      NewSocket->com = accept( Socket->com, (struct sockaddr *) &NewSocket->remote, &Len );
+      incoming = accept( Socket->com, (struct sockaddr *) &si_remote, &Len );
+      /* this prevents unreleased memory to be generated in accept */
+      HB_SOCKET_INIT( NewSocket );
+      if( incoming > 0 )
+      {
+         memcpy( &NewSocket->remote, &si_remote, Len );
+      }
+      NewSocket->com = incoming;
    }
    /* Timeout expired */
    else
    {
+      HB_SOCKET_INIT( NewSocket );
       NewSocket->com = 0;
       HB_SOCKET_SET_ERROR2( NewSocket, -1, "Timeout" );
    }
-
-
-  #if defined(HB_PROTECT_BLOCKING) && defined(HB_THREAD_SUPPORT)
-      if( hb_ht_context )
-      {
-         HB_THREAD_CONTEXT *pContext = hb_threadGetCurrentContext();
-
-         if( pContext )
-         {
-            HB_INET_CARGO *inetCargo = (HB_INET_CARGO *) ( pContext->Cargo );
-
-            if( inetCargo )
-            {
-               inetCargo->Cargo = NULL;
-               pContext->pDestructor = NULL;
-               hb_xfree( inetCargo );
-            }
-         }
-      }
-   #endif
 
    if( NewSocket->com == -1 )
    {
@@ -1464,7 +1438,7 @@ HB_FUNC( INETACCEPT )
    }
    else {
       /* we'll be using only nonblocking sockets */
-      hb_socketSetNonBlocking( Socket );
+      hb_socketSetNonBlocking( NewSocket );
    }
 
    hb_retclenAdoptRaw( (char *) NewSocket, sizeof( HB_SOCKET_STRUCT ) );
@@ -1803,7 +1777,7 @@ HB_FUNC( INETDGRAMRECV )
    iLen = -2;
    if( hb_selectReadSocket( Socket ) )
    {
-      iLen = recvfrom( Socket->com, Buffer, iLen, 0,
+      iLen = recvfrom( Socket->com, Buffer, iMaxLen, 0,
             (struct sockaddr *) &Socket->remote, &iDtLen );
    }
 

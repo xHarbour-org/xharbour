@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.2 2003/01/12 22:30:07 fsgiudice Exp $
+ * $Id: sitesvr.prg,v 1.3 2003/01/15 20:23:26 jonnymind Exp $
  */
 
 ***********************************************************
@@ -63,22 +63,29 @@ PROCEDURE Main( cPort)
 
    hView   := StartThread( @ViewUpdate(), Socket )
    hAccept := StartThread( @AcceptIncoming(), Socket )
+   ThreadSleep(200)
 
    DO WHILE .T.
       cCommand := Space( 50 )
+      HBConsoleLock()
 
       @ 5, 5 SAY "Enter Command      : " GET cCommand
+      HBConsoleUnlock()
       READ
 
       cCommand := Trim( cCommand )
 
       IF Upper( cCommand ) == "QUIT"
          StopThread( hView )
+         // closing the socket will release the accept() request
+         InetClose( Socket )
          StopThread( hAccept )
          EXIT
       ENDIF
    ENDDO
 
+   // wait for accepting thread to be terminated
+   WaitForThreads()
    InetDestroy( Socket )
    InetCleanup()
    DestroyMutex( MutexDB )
@@ -135,7 +142,6 @@ PROCEDURE AcceptIncoming( Socket )
    TraceLog( Socket )
 
    DO WHILE .T.
-      * Saving cursor status before screen update
       Com := InetAccept( Socket )
 
       IF InetErrorCode( Com ) == 0
@@ -311,6 +317,7 @@ FUNCTION ProcessFileRequest( cRequest )
             LOOP
          ENDIF
       ENDIF
+
 
       *** do the seek: current location + the name of the child
       SEEK Str( nLocId ) + "-" + cLocName

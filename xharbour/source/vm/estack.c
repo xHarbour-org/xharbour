@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.23 2003/01/14 23:45:37 jonnymind Exp $
+ * $Id: estack.c,v 1.24 2003/02/01 12:45:36 jonnymind Exp $
  */
 
 /*
@@ -72,13 +72,14 @@ HB_STACK hb_stack;
 HB_STACK *hb_stackGetCurrentStack( void )
 {
    // Most common first.
-   if( hb_ht_context == NULL || HB_CURRENT_THREAD() == hb_main_thread_id )
+   HB_THREAD_T th = HB_CURRENT_THREAD();
+   if( hb_ht_context == NULL || th == hb_main_thread_id )
    {
       return &hb_stack;
    }
    else
    {
-      return hb_threadGetContext( HB_CURRENT_THREAD() )->stack;
+      return hb_threadGetContext( th )->stack;
    }
 }
 
@@ -154,7 +155,7 @@ void hb_stackPush( void )
    LONG CurrIndex;   /* index of current top item */
    LONG TopIndex;    /* index of the topmost possible item */
    LONG i;
-   
+
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPush()"));
@@ -283,11 +284,9 @@ LONG HB_EXPORT hb_stackBaseOffset( void )
  is just a waste of time. For this reason, we reset the standard
  HB_VM_STACK.
 **/
-#undef HB_VM_STACK
 #if defined( HB_THREAD_SUPPORT )
+   #undef HB_VM_STACK
    #define HB_VM_STACK (* hb_stackGetCurrentStack() )
-#else
-   #define HB_VM_STACK hb_stack
 #endif
 
 #undef hb_stackItem

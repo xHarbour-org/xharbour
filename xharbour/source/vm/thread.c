@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.41 2003/02/01 12:45:36 jonnymind Exp $
+* $Id: thread.c,v 1.42 2003/02/01 15:08:26 jonnymind Exp $
 */
 
 /*
@@ -209,6 +209,7 @@ HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
 
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
+
    if( last_context && last_context->th_id == id )
    {
       p = last_context;
@@ -231,7 +232,7 @@ HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
          char errdat[64];
 
          sprintf( errdat, "Context not found for Thread %ld",  (long) id );
-         hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetCurrentContext", 0 );
+         hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetContext", 0 );
       }
 
    }
@@ -514,6 +515,7 @@ HB_FUNC( STARTTHREAD )
       HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       context->th_h = th_h;
       /* now the thread can start */
+      //Sleep(500);
       ResumeThread( th_h );
       hb_retnl( (long) th_id );
    }
@@ -639,7 +641,6 @@ HB_FUNC( CLEARTHREAD )
 HB_FUNC( JOINTHREAD )
 {
    HB_THREAD_T  th;
-   int result;
 #ifdef HB_OS_WIN_32
    HB_THREAD_CONTEXT *context;
 #endif
@@ -657,10 +658,10 @@ HB_FUNC( JOINTHREAD )
    th = (HB_THREAD_T) hb_parnl( 1 );
 
    #if ! defined( HB_OS_WIN_32 )
-      result = pthread_join( th, 0 );
+      pthread_join( th, 0 );
    #else
       context = hb_threadGetContext( th );
-      result = (int) WaitForSingleObject( context->th_h, INFINITE );
+      WaitForSingleObject( context->th_h, INFINITE );
    #endif
 }
 
