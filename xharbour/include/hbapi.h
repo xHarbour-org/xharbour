@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.103 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: hbapi.h,v 1.104 2003/12/07 13:35:02 jonnymind Exp $
  */
 
 /*
@@ -508,6 +508,7 @@ extern void     hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue );
 extern char   * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen );
 extern void     hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue );
 extern int      hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
+HB_EXPORT       PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
 
 /* console I/O subsystem */
 extern void     hb_conInit( void ); /* initialize the console API system */

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.74 2003/12/15 02:35:37 jonnymind Exp $
+* $Id: thread.h,v 1.75 2003/12/15 06:08:46 jonnymind Exp $
 */
 
 /*
@@ -617,7 +617,11 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    #define HB_CLEANUP_POP_EXEC
 
    #define HB_THREAD_STUB
-   #define HB_VM_STACK hb_stack
+
+   #ifndef HB_VM_STACK
+      #define HB_VM_STACK hb_stack
+   #endif
+
    #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
    #define HB_TEST_CANCEL_ENABLE_ASYN

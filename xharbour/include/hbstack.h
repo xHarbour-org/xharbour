@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.19 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.20 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -98,6 +98,7 @@ typedef struct
 } HB_STACK;
 #endif
 
+HB_EXPORT HB_STACK hb_GetStack( void );
 
 #ifndef HB_NO_DEFAULT_STACK_MACROS
   #ifndef HB_STACK_MACROS

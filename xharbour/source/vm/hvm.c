@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.298 2003/12/19 01:32:39 fsgiudice Exp $
+ * $Id: hvm.c,v 1.299 2003/12/19 03:27:52 fsgiudice Exp $
  */
 
 /*
@@ -4159,16 +4159,13 @@ static void hb_vmInstringOrArray( void )
 
       hb_vmPushLogical( bResult );
    }
-   else if( HB_IS_HASH( pItem2 ) &&
-      ( HB_IS_ORDERABLE( pItem1 ) ||
-         ( HB_IS_HASH( pItem1 ) && hb_hashLen( pItem1 ) == 1) )
-      )
+   else if( HB_IS_HASH( pItem2 ) && ( HB_IS_ORDERABLE( pItem1 ) || ( HB_IS_HASH( pItem1 ) && hb_hashLen( pItem1 ) == 1) ) )
    {
       ULONG ulPos;
 
-      if ( HB_IS_HASH( pItem1 ) ) // length 1 by hypotesis
+      if( HB_IS_HASH( pItem1 ) ) // length 1 by hypotesis
       {
-         if ( hb_hashScan( pItem2, pItem1->item.asHash.value->pKeys, &ulPos ) )
+         if( hb_hashScan( pItem2, pItem1->item.asHash.value->pKeys, &ulPos ) )
          {
             HB_ITEM hbV1;
             PHB_ITEM pV2 = hb_hashGetValueAt( pItem2, ulPos );

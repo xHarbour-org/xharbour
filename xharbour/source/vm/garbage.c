@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.68 2003/12/03 11:16:08 jonnymind Exp $
+ * $Id: garbage.c,v 1.69 2003/12/06 15:33:39 jonnymind Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 }
 
 /* allocates a memory block */
-void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
+HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
@@ -196,7 +196,7 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 }
 
 /* release a memory block allocated with hb_gcAlloc() */
-void hb_gcFree( void *pBlock )
+HB_EXPORT void hb_gcFree( void *pBlock )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
@@ -252,7 +252,7 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
 * (generally locking the data set of pOrigin)
 ****/
 
-HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
+HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
@@ -303,7 +303,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 }
 
 
-void hb_gcGripDrop( HB_ITEM_PTR pItem )
+HB_EXPORT void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
@@ -343,7 +343,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 /* Lock a memory pointer so it will not be released if stored
    outside of harbour variables
 */
-void * hb_gcLock( void * pBlock )
+HB_EXPORT void * hb_gcLock( void * pBlock )
 {
    if( pBlock )
    {
@@ -372,7 +372,7 @@ void * hb_gcLock( void * pBlock )
 /* Unlock a memory pointer so it can be released if there is no
    references inside of harbour variables
 */
-void *hb_gcUnlock( void *pBlock )
+HB_EXPORT void *hb_gcUnlock( void *pBlock )
 {
 
    if( pBlock )
@@ -517,7 +517,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
 }
 
-void hb_gcCollect( void )
+HB_EXPORT void hb_gcCollect( void )
 {
    /* TODO: decrease the amount of time spend collecting */
    hb_gcCollectAll();
@@ -525,7 +525,7 @@ void hb_gcCollect( void )
 
 /* Check all memory blocks if they can be released
 */
-void hb_gcCollectAll()
+HB_EXPORT void hb_gcCollectAll()
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.47 2003/12/07 01:25:51 jonnymind Exp $
+ * $Id: memvars.c,v 1.48 2003/12/15 02:35:37 jonnymind Exp $
  */
 
 /*
@@ -1830,7 +1830,7 @@ HB_FUNC( __MVPUT )
 
       hb_dynsymLock();
       pDynVar = hb_memvarFindSymbol( pName );
-      
+
       if( pDynVar )
       {
          /* variable was declared somwhere - assign a new value
@@ -2274,7 +2274,7 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
    }
 }
 
-PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
+HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
 {
    HB_THREAD_STUB
 
