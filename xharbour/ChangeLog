@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2345 2004/02/20 22:33:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2346 2004/02/21 00:26:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-21 08:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/hvm.c
+    ! changes to make return type Clipper compatible if parameter passed
+      is of a memo type.
+
+      /*
+      I am not sure if I am bringing a Clipper "bug" here.
+      */
+
 2004-02-21 07:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/trim.c
     ! changes to make return type Clipper compatible
