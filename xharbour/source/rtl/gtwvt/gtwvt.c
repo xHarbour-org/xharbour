@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.48 2004/01/15 13:27:19 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.49 2004/01/15 14:58:28 vouchcac Exp $
  */
 
 /*
@@ -1808,10 +1808,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
     case WM_CHAR:
     {
+      BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
       int c = ( int )wParam;
       if ( !bIgnoreWM_SYSCHAR )
       {
-        if ( c >= 1 && c<= 26 )  // K_CTRL_A - Z
+        if ( bCtrl && ( c >= 1 && c<= 26 ) )  // K_CTRL_A - Z
         {
           hb_wvt_gtAddCharToInputQueue( K_Ctrl[c-1]  );
         }

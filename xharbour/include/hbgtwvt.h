@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.11 2004/01/12 13:59:52 andijahja Exp $
+ * $Id: hbgtwvt.h,v 1.12 2004/01/15 00:02:28 peterrees Exp $
  */
 
 /*
@@ -85,9 +85,9 @@
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
    #include <ole2.h>
    #include <ocidl.h>
+   #include <olectl.h>
 
    #if defined(_MSC_VER)
-      #include <olectl.h>
       #include <conio.h>
    #endif
 #else
