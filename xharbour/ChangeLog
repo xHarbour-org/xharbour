@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3062 2004/06/12 01:30:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3063 2004/06/12 01:42:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-11 19:15 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/teditor.prg
+    -> Restored to revision 1.34
+    ! Re-applied fix related to passing ProcName() and ProcLine() by Vicente Guerra
+    + Readded DATA nCurrentCursor (used by Debugger )
+
+  * source/rtl/memoedit.prg
+    -> Restored to revision 1.18
+    ! Re-added fix related to passing ProcName() and ProcLine() by Vicente Guerra
+
+  * include/hbver.h
+    * Refreshed.
 
 2004-06-11 18:40 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * bin/!pack_bin.bat
