@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.366 2004/03/26 05:17:27 ronpinkas Exp $
+ * $Id: hvm.c,v 1.367 2004/03/30 18:37:29 ronpinkas Exp $
  */
 
 /*
@@ -110,6 +110,14 @@
    #include "hbpp.h"
 #endif
 
+#ifndef HB_CDP_SUPPORT_OFF
+   #include "hbapicdp.h"
+#endif
+
+#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
+   #include "hbserv.h"
+#endif
+
 #ifdef HB_VM_REQUESTS
    HB_VM_REQUESTS
 #endif
@@ -206,13 +214,13 @@ static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* create
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
 static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a LONG constant (pcode) */
-HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
-#ifndef HB_LONG_LONG_OFF
-   HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a LONGLONG (pcode) */
-   HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
-#else
-   HB_EXPORT void    hb_vmPushNumInt( LONG lNumber );
-#endif
+// HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
+// #ifndef HB_LONG_LONG_OFF
+//    HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a LONGLONG (pcode) */
+//    HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
+// #else
+//    HB_EXPORT void    hb_vmPushNumInt( LONG lNumber );
+// #endif
 static void    hb_vmPushStatic( USHORT uiStatic );     /* pushes the containts of a static onto the stack */
 static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by refrence onto the stack */
 static void    hb_vmPushVariable( PHB_SYMB pVarSymb ); /* pushes undeclared variable */
@@ -232,14 +240,11 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 /* misc */
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
-HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
+// HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
 static void    hb_itemReleaseStringX( PHB_ITEM pItem );
 
-#ifndef HB_CDP_SUPPORT_OFF
-   extern void hb_cdpReleaseAll( void );
-#endif
 
-extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
+// extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 
 extern HARBOUR  hb___msgGetClsData( void );
 extern HARBOUR  hb___msgSetClsData( void );

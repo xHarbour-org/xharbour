@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.130 2004/03/29 18:04:00 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.131 2004/03/31 02:16:43 druzus Exp $
  */
 
 /*
@@ -681,6 +681,19 @@ BOOL hb_execFromArray( PHB_ITEM pFirst );
    #define HB_I_( x ) x
 #endif
  /* LONGLONG support */
+
+/* PP Functions */
+ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen );
+
+/* Misc */
+char HB_EXPORT *hb_strLowerCopy( char * szText, ULONG ulLen );
+#ifndef HB_LONG_LONG_OFF
+LONGLONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow );
+#else
+LONG     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow );
+#endif
+int HB_EXPORT Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
 
 HB_EXTERN_END
 

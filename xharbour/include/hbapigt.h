@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.28 2004/02/06 17:07:27 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.29 2004/03/11 04:22:27 ronpinkas Exp $
  */
 
 /*
@@ -271,6 +271,7 @@ extern USHORT HB_EXPORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
 extern int    HB_EXPORT hb_gtCurrentColor( void );
+extern int    HB_EXPORT hb_gtIndexedColor( int idx );
 extern char   HB_EXPORT * hb_gtVersion( void );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
 #define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.40 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.41 2004/03/30 18:37:29 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,8 @@ static PHB_DYNS s_pDynErrorNew;
 
 extern HB_SET_STRUCT hb_set;
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
-extern BOOL hb_isService(void);
+#include "hbserv.h"
+// extern BOOL hb_isService(void);
 #endif
 extern HB_FUNC( ERRORNEW );
 

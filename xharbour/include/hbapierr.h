@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.5 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: hbapierr.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ extern PHB_ITEM HB_EXPORT hb_errPutDescription    ( PHB_ITEM pError, char * szDe
 extern PHB_ITEM HB_EXPORT hb_errPutFileName       ( PHB_ITEM pError, char * szFileName );
 extern PHB_ITEM HB_EXPORT hb_errPutFlags          ( PHB_ITEM pError, USHORT uiFlags );
 extern PHB_ITEM HB_EXPORT hb_errPutGenCode        ( PHB_ITEM pError, USHORT uiGenCode );
+extern PHB_ITEM HB_EXPORT hb_errPutModuleName     ( PHB_ITEM pError, char * szModuleName );
 extern PHB_ITEM HB_EXPORT hb_errPutOperation      ( PHB_ITEM pError, char * szOperation );
 extern PHB_ITEM HB_EXPORT hb_errPutOsCode         ( PHB_ITEM pError, USHORT uiOsCode );
 extern PHB_ITEM HB_EXPORT hb_errPutSeverity       ( PHB_ITEM pError, USHORT uiSeverity );

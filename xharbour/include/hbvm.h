@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.16 2004/02/14 22:11:51 andijahja Exp $
+ * $Id: hbvm.h,v 1.17 2004/03/17 02:29:00 druzus Exp $
  */
 
 /*
@@ -109,6 +109,13 @@ HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_PO
 #else
    HB_EXPORT extern void hb_vmPushNumInt( LONG lNumber );
 #endif
+
+HB_EXPORT extern void hb_vmDoExitFunctions( void );
+HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );
+HB_EXPORT extern void hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
+HB_EXPORT extern void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
+HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
+HB_EXPORT extern void hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
 
 HB_EXTERN_END
 

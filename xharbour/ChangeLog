@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2695 2004/03/31 05:32:28 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2696 2004/03/31 08:13:49 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-31 04:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+  * source/vm/runner.c
+  * source/rtl/direct.c
+  * source/rtl/memvars.c
+    - remove in-file function declarations
+
+  * include/hbserv.h
+    ! function protos put in extern "C"
+
+  * include/hbapcdp.h
+    + function declaration: hb_cdpReleaseAll()
+
+  * include/hbapigt.h
+    + function declaration: hb_gtIndexedColor()
+
+  * include/hbapi.h
+    + function declaration: hb_strAtSkipStrings(), hb_strLowerCopy(),
+      Wild2RegEx(), hb_regex()
+
+  * include/hbapierr.h
+    + function declaration: hb_errPutModuleName()
+
+  * include/hbset.h
+    - correction on declaration of HB_SET_STRUCT hb_set.
+      (AFAIK, a structure can never be exported with __cdeclspec storage)
+
+  * include/hbvm.h
+    + Function declarations: hb_vmDoExitFunctions(), hb_vmLastModule(),
+      hb_vmProcessSymbols(), hb_vmPushNumType(), hb_vmSymbols(),
+      hb_vmProcessDllSymbols()
 
 2004-03-31 10:21 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/debug/dbgtwin.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.21 2004/02/14 21:01:19 andijahja Exp $
+ * $Id: runner.c,v 1.22 2004/03/18 04:05:28 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
 #include "hbpcode.h"
 #include "hb_io.h"
 
-extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
+// extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
 /* TOFIX: Change this assembler hack to something standard and portable */
@@ -126,12 +126,14 @@ typedef struct
 
 #define SYM_NOT_FOUND 0xFFFFFFFF                /* Symbol not found.
                                                    FindSymbol               */
+HB_EXTERN_BEGIN
+HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+HB_EXTERN_END
 
 PHRB_BODY hb_hrbLoad( char* szHrb );
 void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 static ULONG     hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded );
-HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
 static void      hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
 static void      hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 

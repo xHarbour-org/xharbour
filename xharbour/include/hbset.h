@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.21 2004/03/03 03:31:17 mlombardo Exp $
+ * $Id: hbset.h,v 1.22 2004/03/03 19:37:51 mlombardo Exp $
  */
 
 /*
@@ -231,7 +231,8 @@ typedef struct
 #define HB_SET_DBFLOCK_CL53       2
 #define HB_SET_DBFLOCK_VFP        3
 
-extern HB_EXPORT HB_SET_STRUCT hb_set;
+// extern HB_EXPORT HB_SET_STRUCT hb_set;
+extern HB_SET_STRUCT hb_set;
 
 extern void hb_setInitialize( void );
 extern void hb_setRelease( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.44 2004/03/23 12:43:00 andijahja Exp $
+ * $Id: direct.c,v 1.45 2004/03/28 15:12:02 likewolf Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ extern char *hb_vm_acAscii[256];
    #define HB_DIR_ALL_FILES_MASK        "*.*"
 #endif
 
-extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+// extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
 static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
 {
