@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.46 2005/02/11 23:01:10 likewolf Exp $
+# $Id: hb-func.sh,v 1.47 2005/02/12 19:54:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -154,7 +154,7 @@ export HB_COMPILER="${HB_COMPILER}"
 [ -z "\${HB_LIB_INSTALL}" ] && export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
 
 # be sure that ${name} binaries are in your path
-export PATH="\${HB_BIN_INSTALL}${hb_path_separator}\${PATH}"
+export PATH="\${HB_BIN_INSTALL}${hb_path_separator}${CCPATH}\${PATH}"
 
 
 if [ \$# = 0 ]; then

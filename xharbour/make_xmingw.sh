@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.3 2005/01/27 11:49:15 druzus Exp $
+# $Id: make_xmingw.sh,v 1.4 2005/01/30 06:45:42 druzus Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -38,7 +38,8 @@ else
     echo "Please add your platform to the $0 script."
     exit 1
 fi
-PATH="$MINGW_PREFIX/bin:$MINGW_PREFIX/$TARGET/bin:$PATH"
+CCPATH="$MINGW_PREFIX/bin:$MINGW_PREFIX/$TARGET/bin:"
+PATH="$CCPATH$PATH"
 
 if which harbour &> /dev/null; then
     rm -f -r /tmp/harbour.exe
@@ -49,7 +50,7 @@ else
     exit 1
 fi
 
-export PATH CCPREFIX
+export PATH CCPATH CCPREFIX
 
 case "$1" in
     tgz|gnu)
