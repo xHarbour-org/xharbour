@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.813 2003/03/07 23:14:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.814 2003/03/07 23:31:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-07 22:30 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+  * source/rdd/dbstrux.prg
+     ! fixed alias bug in dbCreate, "copy structure",
+       "copy structure extended" and "create from"
+  * source/rdd/dbf1.c
+     ! fixed GPF regarding bad use of memo file name
 
 2003-03-07 15:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/transfrm.c
