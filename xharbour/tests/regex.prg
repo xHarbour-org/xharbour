@@ -1,5 +1,5 @@
 * regex.prg
-* $Id: random.prg,v 1.1 2003/01/29 23:39:10 jonnymind Exp $
+* $Id: regex.prg,v 1.1 2003/02/05 18:19:55 jonnymind Exp $
 * Test for regular expression functions
 *
 * Giancarlo Niccolai
@@ -8,7 +8,7 @@
 PROCEDURE Main()
    LOCAL regex
    LOCAL aMatch
-   LOCAL cStr, nRow := 5
+   LOCAL cStr, nRow := 3, nCol
    LOCAL aSource := { ;
       "First date to match: 2001-3-21", ;
       "2002-12/2", ;
@@ -51,7 +51,23 @@ PROCEDURE Main()
       @ nRow, 10 SAY "Found (Before: <<" + aMatch[2] + ">>, After: <<" + aMatch[3] + ">>)"
    ENDIF
 
+   nRow+=2
+
+   cStr := "A str; with: separators :; here "
+   @nRow, 5 SAY "Split test; splitting '" + cStr + "' by ':|;'"
+   nRow++
+   aMatch := HB_RegexSplit( ":|;", cStr )
+   IF Empty( aMatch )
+      @nRow, 10 SAY "Test failed"
+   ELSE
+      nCol := 10
+      FOR EACH cStr in aMatch
+         @nRow, nCol SAY cStr + "/"
+         nCol += Len( cStr ) +1
+      NEXT
+   ENDIF
+
    @nRow + 1, 1
-   @20, 25 SAY "Press a key to continue"
+   @23, 25 SAY "Press a key to continue"
    Inkey( 0 )
 RETURN

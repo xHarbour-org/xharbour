@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.848 2003/03/17 20:17:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.849 2003/03/18 00:38:57 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-18 12:21 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    + Added function
+         HB_RegexSplit( cRegEx, cStr [, bCaseInsens [, bMultiLine,
+            [, nMax] ] ] ) --> aSplit
+      This splits cStr (using cRegEx as a token) into aSplits. Each part of
+      cStr that is separed by a string matching cRegEx is separated and put
+      into a different element of aSplit.
+      If nMax is given, a maximum of nMax elements are returned in the array,
+      so you can have HB_RegexSplit( "=", "A test = A=B=C",,,2 ) that will
+      return the array [ "A test ", " A=B=C" ].
+
+      If cRegEx cannot be matched in cStr, HB_RegexSplit will return NIL.
+
+  * tests/regex.prg
+    + Added a test for HB_RegexSplit()
+
 
 2003-03-18 01:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c

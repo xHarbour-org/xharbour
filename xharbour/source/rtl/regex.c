@@ -6476,33 +6476,57 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    aMatches[0].rm_so = 0;
    if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
    {
-      // Wants Results
-      if( cRequest == 0 )
+      switch ( cRequest )
       {
-         PHB_ITEM pMatch;
-
-         hb_arrayNew( &(HB_VM_STACK.Return), 0 );
-
-         i = 0;
-         while ( aMatches[i].rm_eo > 0 )
+         case 0: // Wants Results
          {
-            pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+            PHB_ITEM pMatch;
+
+            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+
+            i = 0;
+            while ( aMatches[i].rm_eo > 0 )
+            {
+               pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+               hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
+               i++;
+            }
+         }
+         return TRUE;
+
+         case 1: // HB_P_LIKE
+         return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
+
+         case 2: // HB_P_MATCH
+         return TRUE;
+
+         case 3: // Split
+         {
+            PHB_ITEM pMatch;
+            char *str = pString->item.asString.value;
+            int iMax = hb_parni( 5 );
+            int iCount = 1;
+
+            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+
+            do
+            {
+               pMatch = hb_itemPutCL( NULL, str, aMatches[0].rm_so );
+               hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
+               str += aMatches[ 0 ].rm_eo;
+               iCount++;
+            }
+            while ( *str && (iMax == 0 | iMax > iCount) && 
+                  regexec( pReg, str, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 );
+
+            /* last match must be done also in case that str is empty; this would
+               mean an empty split field at the end of the string */
+            pMatch = hb_itemPutCL( NULL, str, strlen( str ) );
             hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
-            i++;
          }
-      }
-      else
-      {
-         // HB_P_LIKE
-         if( cRequest == 1 )
-         {
-            // Matched entry must be same length as the searched string.
-            return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
-         }
-      }
+         return TRUE;
 
-      // HB_P_MATCH
-      return TRUE;
+      }
    }
 
    return FALSE;
@@ -6518,6 +6542,12 @@ HB_FUNC( HB_REGEX )
 HB_FUNC( HB_REGEXMATCH )
 {
    hb_retl ( hb_regex( 2, NULL, NULL ) );
+}
+
+// Splits the string in an array of matched expressions
+HB_FUNC( HB_REGEXSPLIT )
+{
+   hb_regex( 3, NULL, NULL );
 }
 
 HB_FUNC( HB_REGEXCOMP )
