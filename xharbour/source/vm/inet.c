@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.9 2003/01/17 12:28:34 likewolf Exp $
+* $Id: inet.c,v 1.10 2003/01/28 10:40:12 jonnymind Exp $
 */
 
 /*
@@ -605,7 +605,6 @@ HB_FUNC( INETRECV )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   iLen = 0;
    if( hb_selectReadSocket( Socket ) )
    {
       iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_WAITALL );
