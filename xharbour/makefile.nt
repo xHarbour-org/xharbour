@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.40 2003/06/24 22:10:54 paultucker Exp $
+# $Id: makefile.nt,v 1.41 2003/07/08 20:19:30 andijahja Exp $
 #
 
 #
@@ -367,8 +367,11 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
+   $(OBJ_DIR)$(MT)\hblog.obj \
+   $(OBJ_DIR)$(MT)\hbloginet.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
+   $(OBJ_DIR)$(MT)\hbsyslog.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
    $(OBJ_DIR)$(MT)\inkey.obj \
