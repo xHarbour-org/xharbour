@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2583 2004/03/16 15:07:24 andijahja Exp $
+ * $Id: ChangeLog,v 1.2584 2004/03/16 16:04:01 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-16 14:35 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc/odbc.c
+    ! Fixed SQLEXECDIR() to support SQL commands containing a chr(0) byte
+      inside strings
+
 2004-03-16 23:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     ! optimized by removing usage of hb_itemNew(NULL)

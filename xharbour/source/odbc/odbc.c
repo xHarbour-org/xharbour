@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.12 2003/12/04 09:26:54 druzus Exp $
+ * $Id: odbc.c,v 1.13 2004/03/03 13:20:55 lf_sfnet Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ HB_FUNC( SQLFREESTM ) /* HB_SQLFREESTMT( hStmt, nType ) --> nRetCode */
 
 HB_FUNC( SQLEXECDIR )  /* HB_SQLEXECDIRECT( hStmt, cStatement ) --> nRetCode */
 {
-   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (unsigned char*) hb_parc( 2 ), SQL_NTS ) );
+   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (unsigned char*) hb_parc( 2 ), hb_parclen( 2 ) ) );
 }
 
 HB_FUNC( SQLFETCH )   /* HB_SQLFETCH( hStmt ) --> nRetCode */
