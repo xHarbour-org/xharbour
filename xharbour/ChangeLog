@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2599 2004/03/18 21:34:50 druzus Exp $
+ * $Id: ChangeLog,v 1.2600 2004/03/18 21:46:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-19 00:10 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/bkgtsks.c
+    * fixed memory leak in hb_backgroundDelFunc()
+  * source/rtl/tbrowse.prg
+    * fixed lenght on Column Width using Transform instead Type
+    * fixed header alignment (that are aligned from bottom to top)
+    * minor text formatting
 
 2004-03-18 22:55 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/bsd/gcc.cf
@@ -28,7 +36,7 @@
 
 2004-03-18 15:46 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * xharbour/source/vm/array.c
-  * xharbour/source/vm/hash.c 
+  * xharbour/source/vm/hash.c
     ! using hb_vmPushNumInt instead of hb_vmPushNumber; ULONG to double
       conversion may loose significant digits for long arrays.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.57 2004/03/15 16:52:32 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.58 2004/03/16 08:32:49 vouchcac Exp $
  */
 
 /*
@@ -651,7 +651,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
 //
 //   Inserts a column object in a browse
 //
-METHOD InsColumn( nPos, oCol )
+METHOD InsColumn( nPos, oCol ) CLASS TBrowse
 
    if 0 < nPos .AND. nPos <= ::nColumns
       ::Moved()
@@ -674,7 +674,7 @@ METHOD InsColumn( nPos, oCol )
 //
 //   Gets a specific TBColumn object
 //
-METHOD GetColumn( nColumn )
+METHOD GetColumn( nColumn ) CLASS TBrowse
 
    Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, o_Obj ], NIL )
 
@@ -682,7 +682,7 @@ METHOD GetColumn( nColumn )
 //
 //   Replaces one TBColumn object with another
 //
-METHOD SetColumn( nColumn, oCol )
+METHOD SetColumn( nColumn, oCol ) CLASS TBrowse
 
    LOCAL oOldCol
 
@@ -760,7 +760,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
 //
 //   Returns the display width of a particular column
 //
-METHOD ColWidth( nColumn )
+METHOD ColWidth( nColumn ) CLASS TBrowse
 
    Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, o_Width ], NIL )
 
@@ -894,13 +894,19 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
    // if oCol has :Width property set I use it
    //
    if oCol:Width <> nil
+
       nWidth := Min( oCol:Width, ::nVisWidth )
 
    else
+
       if ISBLOCK( oCol:block )
 
-         cType    := Valtype( xRes := Eval( oCol:block ) )
-         nLen     := LenVal( xRes, cType, oCol:Picture )
+         xRes     := Eval( oCol:block )
+         cType    := Valtype( xRes )
+
+         // FSG - 2004/02/27 - Fixed Lenght. It's enough to use transform.
+         nLen     := Len( Transform( xRes, oCol:Picture ) )
+         //nLen := LenVal( xRes, cType, oCol:Picture )
 
          cHeading := oCol:Heading + ";"
          while ( nL := Len( __StrTkPtr( @cHeading, @nTokenPos, ";" ) ) ) > 0
@@ -913,6 +919,7 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
          while ( nL := Len( __StrTkPtr( @cFooting, @nTokenPos, ";" ) ) ) > 0
             nFootWidth := Max( nFootWidth, nL )
          enddo
+
       endif
 
       nWidth := Min( Max( nHeadWidth, Max( nFootWidth, nLen ) ), ::nVisWidth )
@@ -2439,6 +2446,7 @@ METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) CLASS TBrowse
    Local n, cS
    Local nCol := Col()
    Local nRow := Row()
+   LOCAL nTokens
 
    // Do I have to write an header or a footer?
    //
@@ -2451,12 +2459,14 @@ METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) CLASS TBrowse
       else
          // __StrToken needs that even last token be ended with token separator
          //
-         cS := cStr + ";"
+         // Headers are aligned from bottom to top - FSG - 2004/02/27
+         nTokens      := __StrTokenCount( cStr, ";" )
+         cStr := Replicate( ";", ::nHeaderHeight - nTokens + 1 ) + cStr
+         cS := cStr
 
          for n := ::nHeaderHeight to 1 step -1
             DevPos( nRow + n - 1, nCol )
             DispOut( PadR( __StrToken( @cS, n, ";" ), nPadLen ), cColor )
-
          next
 
          DevPos( nRow, nCol + nPadLen )
@@ -2492,7 +2502,7 @@ METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) CLASS TBrowse
 
 //---------------------------------------------------------------------//
 
-METHOD SetBorder( cBorder )
+METHOD SetBorder( cBorder ) CLASS TBrowse
 
    if ISCHARACTER( cBorder ) .AND.;
       ( Len( cBorder ) == 0 .or. Len( cBorder ) == 8 )

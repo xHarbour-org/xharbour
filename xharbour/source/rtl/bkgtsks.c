@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.6 2003/12/27 12:10:32 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.7 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -278,6 +278,7 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
 
       {
          --s_uiBackgroundMaxTask;
+         hb_itemRelease( pItem );
          hb_xfree( pBkgTask );
 
          if( s_uiBackgroundMaxTask )
