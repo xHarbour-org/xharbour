@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.15 2002/06/21 19:18:28 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.16 2002/07/23 01:36:43 ronpinkas Exp $
  */
 
 /*
@@ -490,7 +490,7 @@ HB_FUNC( HB_ATOKENS )
       PHB_ITEM pArray = &hb_stack.Return;
       PHB_ITEM pToken = hb_itemNew( NULL );
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
-      size_t i, iOffset = 0, iIndex = 1;
+      size_t i, iOffset = 0;
 
       hb_arrayNew( pArray, 0 );
 
@@ -501,7 +501,6 @@ HB_FUNC( HB_ATOKENS )
             hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, i - iOffset ) );
 
             iOffset = i + 1;
-            iIndex++;
          }
       }
       if( iOffset < pLine->item.asString.length )
@@ -610,8 +609,6 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
                if( HB_IS_OBJECT( pStructure ) )
                {
-                  unsigned int uiSize;
-
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
                   uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );
@@ -821,8 +818,6 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
                if( HB_IS_OBJECT( pStructure ) )
                {
-                  unsigned int uiSize;
-
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
                   uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );
@@ -1277,8 +1272,6 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign )
 
                if( HB_IS_OBJECT( pStructure ) )
                {
-                  unsigned int uiSize;
-
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
                   uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.14 2002/06/13 22:46:04 ronpinkas Exp $
+ * $Id: classes.c,v 1.15 2002/07/24 02:58:43 ronpinkas Exp $
  */
 
 /*
@@ -1842,7 +1842,7 @@ void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
          va_end( ap );
       }
 
-      hb_vmSend( ulArg );
+      hb_vmSend( (USHORT) ulArg );
    }
    else
    {
