@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.1 2003/09/25 05:55:07 paultucker Exp $
+REM $Id: dll_b32.bat,v 1.2 2003/09/25 23:29:55 paultucker Exp $
 REM
 REM ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 REM ³ This is a batch file to create harbour.dll ³Û
@@ -10,8 +10,6 @@ REM  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 if not exist obj\dll\b32 md obj\dll\b32
 if not exist lib\b32 md lib\b32
-
-IF '%BCC_DIR%'=='' SET BCC_DIR=e:\bcc55
 
 :BUILD
 
@@ -23,9 +21,9 @@ IF '%BCC_DIR%'=='' SET BCC_DIR=e:\bcc55
 :BUILD_OK
 
 if exist hdll.tmp del hdll.tmp
-if exist lib\b32\harbour.dll implib lib\hbdll_bc.lib lib\b32\harbour.dll >nul
-if exist lib\b32\harbour.dll copy lib\b32\harbour.dll tests >nul
-if exist lib\b32\harbour.dll copy lib\b32\harbour.dll lib >nul
+if exist lib\b32\harbour.dll implib lib\b32\harbour.lib lib\b32\harbour.dll > nul
+if exist lib\b32\harbour.dll copy lib\b32\harbour.dll lib > nul
+if exist lib\b32\harbour.lib copy lib\b32\harbour.lib lib > nul
 
 goto EXIT
 

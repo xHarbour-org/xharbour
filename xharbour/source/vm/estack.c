@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.43 2003/09/24 04:40:43 ronpinkas Exp $
+ * $Id: estack.c,v 1.44 2003/09/30 20:35:07 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 
 /* ------------------------------- */
 
-HB_STACK hb_stack;
+HB_EXPORT HB_STACK hb_stack;
 
 /* ------------------------------- */
 

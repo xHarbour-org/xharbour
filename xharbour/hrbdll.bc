@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.25 2003/09/25 02:02:31 paultucker Exp $
+# $Id: hrbdll.bc,v 1.26 2003/09/25 23:29:55 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -13,7 +13,7 @@
 # BIN_DIR is defined in dll_55.bat, please adjust accordingly
 
 HARBOUR_EXE = bin\harbour.exe
-CC          = $(BCC_DIR)\bin\bcc32
+CC          = bcc32
 
 # 旼컴컴컴컴컴컴컴컴커
 # � source directory 넴
@@ -771,7 +771,7 @@ $(HARBOUR_DLL)  : \
   echo. $(BCC_DIR)\lib\cw32.lib          + >> hdll.tmp
   echo. $(BCC_DIR)\lib\import32.lib      + >> hdll.tmp
   echo. $(BCC_DIR)\lib\uuid.lib            >> hdll.tmp
-  $(BCC_DIR)\bin\ILINK32 -aa -Tpd -Gn @hdll.tmp
+  ILINK32 -aa -Tpd -Gn @hdll.tmp
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
 # � object file creation 넴

@@ -1,13 +1,13 @@
 OBJDIR       = .
 APPEXE       = $(PRGFILE).exe
-COBJFLAGS    = -DHB_FM_STATISTICS_OFF -O2 -OS -6 -c -tW -I$(HRB_DIR)\INCLUDE -d -w3
-HARBOURFLAGS = -n -i$(HRB_DIR)\include;c:\borland\bcc55\include;c:\curl\include\curl -w1
-INCLUDEDIR   = $(HRB_DIR)\include
-CC           = $(COMPILERDIR)\bin\bcc32.exe
-ILINK_EXE    = $(COMPILERDIR)\bin\ilink32.exe
-COMPILER     = $(HRB_DIR)\bin\55\harbour.exe
-HARBOURLIB   = $(HRB_DIR)\lib\55
-MAINWIN      = $(HRB_DIR)\SOURCE\VM\MAINWIN.C
+COBJFLAGS    = -DHB_FM_STATISTICS_OFF -O2 -OS -6 -c -tW -I..\INCLUDE -d -w3
+HARBOURFLAGS = -n -i..\include -w1
+INCLUDEDIR   = ..\include
+CC           = bcc32.exe
+ILINK_EXE    = ilink32.exe
+COMPILER     = ..\bin\b32\harbour.exe
+HARBOURLIB   = ..\lib\b32
+MAINWIN      = ..\SOURCE\VM\MAINWIN.C
 
 $(APPEXE) : $(OBJDIR)\$(PRGFILE).obj \
             $(OBJDIR)\mainwin.obj \
@@ -15,12 +15,12 @@ $(APPEXE) : $(OBJDIR)\$(PRGFILE).obj \
 
    echo $(OBJDIR)\$(PRGFILE).obj + > b32.bc
    echo $(OBJDIR)\mainwin.obj + >> b32.bc
-   echo $(COMPILERDIR)\lib\c0w32.obj, + >> b32.bc
+   echo c0w32.obj, + >> b32.bc
    echo $(APPEXE),, + >> b32.bc
    echo $(HARBOURLIB)\harbour.lib + >> b32.bc
-   echo $(COMPILERDIR)\lib\ws2_32.lib + >> b32.bc
-   echo $(COMPILERDIR)\lib\cw32.lib + >> b32.bc
-   echo $(COMPILERDIR)\lib\import32.lib, >> b32.bc
+   echo ws2_32.lib + >> b32.bc
+   echo cw32.lib + >> b32.bc
+   echo import32.lib, >> b32.bc
    @$(ILINK_EXE) -ap -Tpe -Gn @b32.bc
 
 $(OBJDIR)\$(PRGFILE).c : $(PRGFILE).prg
