@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.49 2003/09/27 17:25:51 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.50 2003/09/30 17:30:27 ronpinkas Exp $
  */
 
 /*
@@ -2658,26 +2658,47 @@ void yyerror( char * s )
 
    if( yytext[ 0 ] == '\n' )
    {
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<eol>" );
+      if( yychar == 0 )
+      {
+         if( s_iControlLevel )
+         {
+            char LineAsString[32];
+
+            sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 );
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
+         }
+         else
+         {
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<end of line>" );
+         }
+      }
+      else
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<end of line>" );
+      }
    }
    else
    {
-       if( hb_comp_wForCounter == 0 && ( yychar == NEXT || yychar == LOOP ) )
-       {
-          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
-       }
-       else if( yychar == EXIT && hb_comp_wForCounter == 0 && hb_comp_wSwitchCounter == 0 )
-       {
-          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
-       }
-       else if( yychar == ENDDO && hb_comp_wWhileCounter == 0 )
-       {
-          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
-       }
-       else if( yychar == ENDCASE && hb_comp_wCaseCounter == 0 )
-       {
-          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
-       }
+      if( hb_comp_wForCounter == 0 && ( yychar == NEXT || yychar == LOOP ) )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NEXTFOR, NULL, NULL );
+      }
+      else if( yychar == EXIT && hb_comp_wForCounter == 0 && hb_comp_wSwitchCounter == 0 )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, yytext, NULL );
+      }
+      else if( yychar == ENDDO && hb_comp_wWhileCounter == 0 )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDDO, NULL, NULL );
+      }
+      else if( yychar == ENDCASE && hb_comp_wCaseCounter == 0 )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDCASE, NULL, NULL );
+      }
+      else if( yychar == ENDIF && hb_comp_wIfCounter == 0 )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ENDIF, NULL, NULL );
+      }
 
       if( s_iControlLevel )
       {
@@ -2689,7 +2710,9 @@ void yyerror( char * s )
             }
             else
             {
-               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, "", NULL );
+               char LineAsString[32];
+               sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 );
+               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL );
             }
          }
          else
