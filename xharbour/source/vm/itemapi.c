@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.103 2004/11/13 18:36:41 paultucker Exp $
+ * $Id: itemapi.c,v 1.104 2004/11/21 21:44:29 druzus Exp $
  */
 
 /*
@@ -569,7 +569,7 @@ LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
             return ( LONG ) pItem->item.asInteger.value;
 
          case HB_IT_DOUBLE:
-#ifdef __GCC__
+#ifdef __GNUC__
             return ( LONG ) ( ULONG ) pItem->item.asDouble.value;
 #else
             return ( LONG ) pItem->item.asDouble.value;
@@ -1848,7 +1848,7 @@ LONGLONG HB_EXPORT hb_itemGetNLL( PHB_ITEM pItem )
       switch( pItem->type )
       {
          case HB_IT_DOUBLE:
-#ifdef __GCC__
+#ifdef __GNUC__
             return ( LONGLONG ) ( ULONGLONG ) pItem->item.asDouble.value;
 #else
             return ( LONGLONG ) pItem->item.asDouble.value;
@@ -1985,7 +1985,7 @@ HB_LONG HB_EXPORT hb_itemGetNInt( PHB_ITEM pItem )
       switch( pItem->type )
       {
          case HB_IT_DOUBLE:
-#ifdef __GCC__
+#ifdef __GNUC__
             return ( HB_LONG ) ( HB_ULONG ) pItem->item.asDouble.value;
 #else
             return ( HB_LONG ) pItem->item.asDouble.value;

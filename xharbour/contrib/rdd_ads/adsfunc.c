@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.45 2004/11/21 21:43:34 druzus Exp $
+ * $Id: adsfunc.c,v 1.46 2004/12/12 06:04:17 brianhays Exp $
  */
 
 /*
@@ -948,10 +948,7 @@ HB_FUNC( ADSISRECORDINAOF )
 HB_FUNC( ADSISRECORDVALID )             // Does current record match any current filter?
 {
    ADSAREAP pArea;
-   UNSIGNED32 ulRecordNumber = 0;       /* 0 for current record */
-   UNSIGNED16 bIsInAOF = 0;
-   UNSIGNED32 ulRetVal;
-   BOOL bReturn = 0;
+   BOOL bReturn = FALSE;
    PHB_ITEM pResult;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
@@ -959,25 +956,24 @@ HB_FUNC( ADSISRECORDVALID )             // Does current record match any current
    {
       if( pArea->fEof )
       {
-         hb_retl( 0 );
+         hb_retl( FALSE );
          return;
       }
       if( ! pArea->dbfi.itmCobExpr )
       {
-         hb_retl( 1 );
+         hb_retl( TRUE );
          return;
       }
 
       pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
-      if( HB_IS_LOGICAL( pResult ) && hb_itemGetL( pResult ) )
-      {
-         bReturn = 1;
-      }
+      bReturn = HB_IS_LOGICAL( pResult ) && hb_itemGetL( pResult );
    }
-   //   else
-   //   {
-   //      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISRECORDVALID" );
-   //   }
+/*
+   else
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISRECORDVALID" );
+   }
+*/
    hb_retl( bReturn );
 }
 

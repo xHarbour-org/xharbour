@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.45 2004/08/17 09:50:44 alexstrickland Exp $
+ * $Id: extend.c,v 1.46 2004/11/21 21:44:26 druzus Exp $
  */
 
 /*
@@ -559,7 +559,7 @@ LONG  HB_EXPORT hb_parnl( int iParam, ... )
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-#ifdef __GCC_
+#ifdef __GNUC__
          return ( LONG ) ( ULONG ) pItem->item.asDouble.value;
 #else
          return ( LONG ) pItem->item.asDouble.value;
@@ -618,7 +618,7 @@ HB_LONG  HB_EXPORT hb_parnint( int iParam, ... )
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-#ifdef __GCC_
+#ifdef __GNUC__
          return ( HB_LONG ) ( HB_ULONG ) pItem->item.asDouble.value;
 #else
          return ( HB_LONG ) pItem->item.asDouble.value;
@@ -1268,7 +1268,7 @@ LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-#ifdef __GCC_
+#ifdef __GNUC__
          return ( LONGLONG ) ( ULONGLONG ) pItem->item.asDouble.value;
 #else
          return ( LONGLONG ) pItem->item.asDouble.value;

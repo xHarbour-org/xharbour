@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.18 2004/12/01 10:55:13 lf_sfnet Exp $
+ * $Id: idle.c,v 1.19 2004/12/01 20:02:51 peterrees Exp $
  */
 
 /*
@@ -114,11 +114,16 @@ BOOL hb_vm_bCollectGarbage = TRUE;
 
 static void hb_releaseCPU( BOOL bIndefinite )
 {
+#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_WIN_32) || defined(__CYGWIN__)
    BOOL bIdleWaitNoCpu = ( s_iIdleWaitNoCpu && bIndefinite && !s_uiIdleMaxTask ) ;   /* Only if No idle tasks */
+#else
+   HB_SYMBOL_UNUSED( bIndefinite );
+#endif
    HB_TRACE(HB_TR_DEBUG, ("releaseCPU()"));
 
    /* TODO: Add code to release time slices on all platforms */
 #ifdef HB_THREAD_SUPPORT
+
    hb_threadSleep( s_uiIdleSleepMsec, bIdleWaitNoCpu );
 
 #else

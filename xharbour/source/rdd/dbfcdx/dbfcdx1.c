@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.168 2004/11/21 21:43:51 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.169 2004/12/01 00:16:31 peterrees Exp $
  */
 
 /*
@@ -4861,14 +4861,14 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
    char szName[ CDX_MAXTAGNAMELEN + 1 ];
 
    szName[ 0 ] = '\0';
-   if ( HB_IS_NUMBER( pTagItem ) )
-   {
-      uiFind = hb_itemGetNI( pTagItem );
-   }
-   else if ( HB_IS_STRING( pTagItem ) )
+   if ( HB_IS_STRING( pTagItem ) )
    {
       hb_strncpyUpperTrim( szName, pTagItem->item.asString.value,
                   HB_MIN( pTagItem->item.asString.length, CDX_MAXTAGNAMELEN ) );
+   }
+   else if ( HB_IS_NUMERIC( pTagItem ) )
+   {
+      uiFind = hb_itemGetNI( pTagItem );
    }
    pIndex = pArea->lpIndexes;
 
@@ -4976,11 +4976,11 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag )
 /*
  * skip to next unique key
  */
-static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
+static ERRCODE hb_cdxDBOISkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
 {
    ERRCODE retval;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipUnique(%p, %p, %i)", pArea, pTag, fForward));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipUnique(%p, %p, %i)", pArea, pTag, fForward));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -5093,7 +5093,7 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 {
    BOOL fFound = FALSE, fFirst = TRUE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipEval(%p, %p, %i, %p)", pArea, pTag, fForward, pEval));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipEval(%p, %p, %i, %p)", pArea, pTag, fForward, pEval));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
@@ -5186,7 +5186,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    BOOL fFound = FALSE, fFirst = TRUE;
    char *szPattern = hb_itemGetCPtr( pWildItm );
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipWild(%p, %p, %i, %p)", pArea, pTag, fForward, pWildItm));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipWild(%p, %p, %i, %p)", pArea, pTag, fForward, pWildItm));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
@@ -5283,7 +5283,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    char *szMask = hb_itemGetCPtr( pRegExItm );
    BOOL fFree = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipRegEx(%p, %p, %i, %s)", pArea, pTag, fForward, szMask));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %s)", pArea, pTag, fForward, szMask));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
@@ -7184,7 +7184,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_SKIPUNIQUE:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                        hb_cdxSkipUnique( pArea, pTag,
+                        hb_cdxDBOISkipUnique( pArea, pTag,
                            hb_itemGetNI( pOrderInfo->itmNewVal ) >= 0 ) == SUCCESS );
          break;
 

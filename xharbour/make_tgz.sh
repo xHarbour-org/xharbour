@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.32 2004/11/04 00:26:12 druzus Exp $
+# $Id: make_tgz.sh,v 1.33 2004/11/26 14:33:10 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,25 +21,42 @@ hb_archfile="${name}-${hb_ver}${hb_platform}.bin.tar.gz"
 hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
 hb_pref="xhb"
+hb_contrib=""
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-    export HB_ARCHITECTURE=`uname -s | tr A-Z a-z`
-    case "$HB_ARCHITECTURE" in
-        *bsd) export HB_ARCHITECTURE="bsd" ;;
+    hb_arch=`uname -s | tr "[A-Z]" "[a-z]" 2>/dev/null`
+    case "$hb_arch" in
+        *windows*) hb_arch="w32" ;;
+        *dos)      hb_arch="dos" ;;
+        *bsd)      hb_arch="bsd" ;;
     esac
+    export HB_ARCHITECTURE="$hb_arch"
 fi
-if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
+
+if [ -z "$HB_COMPILER" ]; then
+    case "$HB_ARCHITECTURE" in
+        w32) hb_comp="mingw32" ;;
+        dos) hb_comp="djgpp" ;;
+        *)   hb_comp="gcc" ;;
+    esac
+    export HB_COMPILER="$hb_comp"
+fi
+
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtcrs; fi
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
+
+# default lib dir name
+HB_LIBDIRNAME="lib"
 
 # Select the platform-specific installation prefix and ownership
 HB_INSTALL_OWNER=root
 case "$HB_ARCHITECTURE" in
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
+        [ -d "$HB_INSTALL_PREFIX/lib64" ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
         ;;
     *)
@@ -53,7 +70,7 @@ INSTALL=install
 MAKE=make
 TAR=tar
 case "$HB_ARCHITECTURE" in
-    darwin) TAR=gtar INSTALL="install -c" ;;
+    darwin) TAR=gtar; INSTALL="install -c" ;;
     bsd)    MAKE=gmake ;;
 esac
 
@@ -72,8 +89,12 @@ case "$HB_ARCHITECTURE" in
     darwin)
         # Autodetect old Darwin versions and set appropriate build options
         if [ `uname -r | sed "s/\..*//g"` -lt 6 ]; then
-	    export HB_NCURSES_FINK=yes
-	fi
+            export HB_NCURSES_FINK=yes
+        fi
+        [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
+        ;;
+    *)
+        [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
         ;;
 esac
 
@@ -85,7 +106,7 @@ fi
 
 export HB_BIN_INSTALL="$HB_INSTALL_PREFIX/bin"
 export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include/${name}"
-export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/lib/${name}"
+export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME/${name}"
 
 # build
 umask 022
@@ -123,12 +144,9 @@ done
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim, but don't try to strip symlinks.
-for F in `find $HB_LIB_INSTALL -type f`; do
-    strip -S $F
-done
+strip -S `find $HB_LIB_INSTALL -type f`
 
 mkdir -p $HB_INST_PREF/etc/harbour
-
 $INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
 
 cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
@@ -141,17 +159,18 @@ EOF
 # check if we should rebuild tools with shared libs
 if [ "${hb_lnkso}" = yes ]
 then
+    ADD_LIBS=""
     case $HB_ARCHITECTURE in
-        linux)  [ "${HB_GPM_MOUSE}" = yes ] && ADD_LIBS="-lgpm" ;;
-        darwin) ADD_LIBS="-L/sw/lib" ;;
+        linux)  [ "${HB_GPM_MOUSE}" = yes ] && ADD_LIBS="$ADD_LIBS -lgpm" ;;
+        darwin) ADD_LIBS="$ADD_LIBS -L/sw/lib" ;;
     esac 
-    if [ "${HB_WITHOUT_GTSLN}" != yes ]; then
-        GTSLN_ADD_LIB="-lslang"
-    fi
-    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS} -lncurses ${GTSLN_ADD_LIB} -L/usr/X11R6/lib -lX11"
+    [ "${HB_WITHOUT_GTSLN}" != yes ] && ADD_LIBS="$ADD_LIBS -lslang"
+    [ "${HB_WITHOUT_X11}" != yes ] && ADD_LIBS="$ADD_LIBS -L/usr/X11R6/$HB_LIBDIRNAME -lX11"
+
+    export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses ${ADD_LIBS}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
 
-    for utl in hb$MAKE hbrun hbpp hbdoc hbtest hbdict xbscript
+    for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
     do
         (cd "utils/${utl}"
          rm -fR "./${HB_ARCHITECTURE}"
@@ -161,6 +180,7 @@ then
 fi
 ln -s xbscript ${HB_BIN_INSTALL}/pprun
 ln -s xbscript ${HB_BIN_INSTALL}/xprompt
+
 
 $TAR -czvf "${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"

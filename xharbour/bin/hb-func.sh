@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.36 2004/12/02 03:26:19 druzus Exp $
+# $Id: hb-func.sh,v 1.37 2004/12/04 22:37:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -26,7 +26,7 @@ get_hbplatform()
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
-    [ "${id}" = "" ] && id=`uname -sr | tr "A-Z" "a-z" | tr -d " "`
+    [ "${id}" = "" ] && id=`uname -sr | tr "[A-Z]" "[a-z]" | tr -d " "`
     echo -n "${id}"
 }
 

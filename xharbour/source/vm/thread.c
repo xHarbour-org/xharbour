@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.180 2004/12/12 06:45:55 walito Exp $
+* $Id: thread.c,v 1.181 2004/12/13 13:08:18 walito Exp $
 */
 
 /*
@@ -2623,6 +2623,10 @@ void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu )
    HB_THREAD_STUB
 
    HB_STACK_UNLOCK;
+
+#if !defined(HB_OS_WIN_32)
+    HB_SYMBOL_UNUSED( bIdleWaitNoCpu );
+#endif
 
    #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
       usleep( millisec * 1000 );

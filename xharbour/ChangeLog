@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3671 2004/12/12 06:52:31 walito Exp $
+ * $Id: ChangeLog,v 1.3672 2004/12/13 13:10:07 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-14 01:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_gnu.sh
+  * xharbour/make_tgz.sh
+    + added platform autodetection if HB_ARCHITECTURE not set
+      and choosing the preferred compiler if HB_COMPILER not set
+    + added new platforms (Darwin, SunOS, BSD, HPUX) for info
+      descriptions - I do not want to decide if this should be
+      also added for make_gnu.bat, make_gnu.cmd because these
+      files cannot be used for this platforms.
+      Now make_bsd.sh, make_drw.sh, make_hp.sh, make_mingw.sh are
+      redundant - we should decide if they should be kept in CVS
+      or removed. Probably some modifications for MINGW and
+      HPUX will be necessary.
+
+  * harbour/make_tgz.sh
+    + added platform autodetection if HB_ARCHITECTURE not set
+      and choosing the preferred compiler if HB_COMPILER not set
+
+  * xharbour/bin/hb-func.sh
+    * some small modification for 'tr' versions which need []
+      for character range definition
+
+  * xharbour/include/hbdefs.h
+    * minor modification of typo in commented code
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * minor cleaning and casting
+
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/itemapi.c
+    * fixed some minor typos in GCC hack
 
 2004-12-13 10:10 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/thread.c

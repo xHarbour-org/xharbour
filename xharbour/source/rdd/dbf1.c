@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.99 2004/12/02 03:26:20 druzus Exp $
+ * $Id: dbf1.c,v 1.100 2004/12/11 00:43:03 druzus Exp $
  */
 
 /*
@@ -1183,22 +1183,22 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          switch ( pField->uiLen )
          {
             case 1:
-               hb_itemPutNIntLen( pItem, ( signed char ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ], 4 );
+               hb_itemPutNILen( pItem, ( signed char ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ], 4 );
                break;
             case 2:
-               hb_itemPutNIntLen( pItem, HB_GET_LE_INT16( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 6 );
+               hb_itemPutNILen( pItem, ( int ) HB_GET_LE_INT16( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 6 );
                break;
             case 3:
-               hb_itemPutNIntLen( pItem, HB_GET_LE_INT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
+               hb_itemPutNIntLen( pItem, ( HB_LONG ) HB_GET_LE_INT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
                break;
             case 4:
-               hb_itemPutNIntLen( pItem, HB_GET_LE_INT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
+               hb_itemPutNIntLen( pItem, ( HB_LONG ) HB_GET_LE_INT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
                break;
             case 8:
 #ifndef HB_LONG_LONG_OFF
-               hb_itemPutNIntLen( pItem, HB_GET_LE_INT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 20 );
+               hb_itemPutNIntLen( pItem, ( HB_LONG ) HB_GET_LE_INT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 20 );
 #else
-               hb_itemPutNLen( pItem, HB_GET_LE_INT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 20, 0 );
+               hb_itemPutNLen( pItem, ( double ) HB_GET_LE_INT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 20, 0 );
 #endif
                break;
             default:

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.59 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbdefs.h,v 1.60 2004/12/11 00:43:03 druzus Exp $
  */
 
 /*
@@ -583,7 +583,7 @@ typedef long HB_PTRDIFF;
 #endif
 
 #if !defined( HB_STRICT_ALIGNMENT )
-#  define   HB_PUT_PTR( p, v )      do { *( void ** ) ( p ) = ( void * ) ( v ); } while( 0 )
+#  define   HB_PUT_PTR( p, v )      do { *( void ** ) ( p ) = ( void * ) ( v ); } while ( 0 )
 #  define   HB_GET_PTR( p )         ( *( void ** ) ( p ) )
 #else
 #  define   HB_PUT_PTR( p, v )      HB_PUT_LONG( p, v )
@@ -768,7 +768,7 @@ typedef long HB_PTRDIFF;
             ( ( UINT32 * ) ( d ) )[ 0 ] ^= 0xFFFFFFFFL; \
             ( ( UINT32 * ) ( d ) )[ 1 ] ^= 0xFFFFFFFFL; \
          } } while ( 0 )
-   #define HB_DBL2ORD( d, o )       di { \
+   #define HB_DBL2ORD( d, o )       do { \
          *( double * )( o ) = *( double * )( d ); \
          if ( *( double * )( o ) >= 0.0 ) { \
             ( ( BYTE * ) ( o ) )[ 0 ] ^= 0x80; \
