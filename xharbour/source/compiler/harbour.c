@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.75 2004/03/17 08:29:44 ronpinkas Exp $
+ * $Id: harbour.c,v 1.76 2004/04/03 21:14:21 andijahja Exp $
  */
 
 /*
@@ -332,25 +332,20 @@ int main( int argc, char * argv[] )
          if( argv[ i ][ 0 ] == '@' )
          {
             iStatus = hb_compProcessRSPFile( argv[ i ], argc, argv );
-
-            if( iStatus == EXIT_SUCCESS && ! bAnyFiles )
-            {
-               bAnyFiles = TRUE;
-            }
          }
          else
          {
-            if( ! bAnyFiles )
-            {
-               bAnyFiles = TRUE;
-            }
-
             if( i > 1 )
             {
                hb_pp_Init();
             }
 
             iStatus = hb_compCompile( argv[ i ], argc, argv );
+         }
+
+         if( ! bAnyFiles )
+         {
+            bAnyFiles = TRUE;
          }
 
          if( iStatus != EXIT_SUCCESS )
@@ -718,7 +713,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
        * declaration
       */
       if( !( hb_comp_iVarScope == VS_PRIVATE || hb_comp_iVarScope == VS_PUBLIC ) )
+      {
          hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
+      }
    }
    else
    {
@@ -771,7 +768,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          /* add this variable to the list of MEMVAR variables
           */
          if( ! pFunc->pMemvars )
+         {
             pFunc->pMemvars = pVar;
+         }
          else
          {
             pLastVar = pFunc->pMemvars;
@@ -823,7 +822,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                {
                   if( strcmp( pMemVar->szName, pVar->szName ) == 0 )
                   {
-                      break;
+                     break;
                   }
                   else
                   {
@@ -836,7 +835,9 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                {
                   /* add this variable to the list of PRIVATE variables. */
                   if( ! pFunc->pPrivates )
+                  {
                      pFunc->pPrivates = pVar;
+                  }
                   else
                   {
                      pLastVar = pFunc->pPrivates;
@@ -2377,7 +2378,9 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
    {
       /* we are in a function/procedure -we don't need any tricks */
       if( pFunc->pOwner )
+      {
          pFunc =pFunc->pOwner;
+      }
       iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
    }
    else
@@ -3711,6 +3714,22 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
 void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push a variable by reference to the virtual machine stack */
 {
    hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
+}
+
+static BOOL hb_compVarFind( char * szVarName )
+{
+   PFUNCTION pFunc = hb_comp_functions.pFirst;
+
+   while( pFunc )
+   {
+      if( hb_compMemvarGetPos( szVarName, pFunc ) > 0 )
+      {
+         return TRUE;
+      }
+      pFunc = pFunc->pNext;
+   }
+
+   return FALSE;
 }
 
  /* generates the pcode to push an aliased variable value to the virtual
@@ -5437,6 +5456,8 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
    BOOL bFirstChar = FALSE;
    char *szFileRSP = (char*) hb_xgrab( strlen( szRspName ) );
 
+   hb_xmemset( szFileRSP, '\0', strlen( szRspName ) );
+
    for ( i = 1; i < (int) strlen( szRspName ); i ++ )
    {
       szFileRSP[ i - 1 ] = szRspName[ i ];
@@ -5447,6 +5468,7 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
 
    if ( !inFile )
    {
+      printf( "Cannot open input file: %s\n", szFileRSP );
       iStatus = EXIT_FAILURE;
    }
    else
@@ -5459,15 +5481,17 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
       {
          if ( ch == '\n')
          {
+            if( iProcess > 1 )
+            {
+               hb_pp_Init();
+            }
+
             iStatus = hb_compCompile( szFile, argc, argv );
 
             if( iStatus != EXIT_SUCCESS )
             {
                break;
             }
-
-            if( iProcess > 1 )
-               hb_pp_Init();
 
             iProcess ++;
 
