@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2814 2004/04/21 03:32:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2815 2004/04/21 07:48:28 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -59,6 +59,50 @@
 2004-04-20 16:47 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
     ! Fixed a typo that caused wrong source output. Thanks to Teo Fonrouge.
+
+2004-04-20 16:34 UTC+0200 Jacek Potempa (Jacek.Potempa@otc.pl)
+  Added HB_EXPORT specifiers to allow service access from outside of harbour.dll
+  to following functions:
+
+  * include\hbapiitm.h
+  * source\vm\eval.c
+      extern PHB_ITEM HB_EXPORT hb_evalLaunch   ( )
+      extern BOOL     HB_EXPORT hb_evalNew      ( )
+      extern BOOL     HB_EXPORT hb_evalPutParam ( )
+      extern BOOL     HB_EXPORT hb_evalRelease  ( )
+      extern PHB_ITEM HB_EXPORT hb_itemDo       ( )
+      extern PHB_ITEM HB_EXPORT hb_itemDoC      ( )
+
+
+  * include\hbapi.c
+  * source\vm\macro.c
+      extern void   HB_EXPORT hb_macroGetValue( )
+      extern void   HB_EXPORT hb_macroSetValue( )
+      extern void   HB_EXPORT hb_macroTextValue( )
+      extern void   HB_EXPORT hb_macroPushSymbol( )
+      extern void   HB_EXPORT hb_macroRun( )
+      extern HB_MACRO_PTR HB_EXPORT hb_macroCompile( )
+      extern void   HB_EXPORT hb_macroDelete( )
+      extern char   HB_EXPORT * hb_macroTextSubst( )
+      extern BOOL   HB_EXPORT hb_macroIsIdent( )
+      extern void   HB_EXPORT hb_macroPopAliasedValue( )
+      extern void   HB_EXPORT hb_macroPushAliasedValue( )
+      extern char   HB_EXPORT * hb_macroGetType( )
+      extern char   HB_EXPORT * hb_macroExpandString( )
+
+  * include\hbstack.h
+  * source\vm\estack.c
+      extern void    HB_EXPORT hb_stackDec( )
+      extern void    HB_EXPORT hb_stackPush( )
+      extern void    HB_EXPORT hb_stackPop( )
+
+
+  * include\hbset.h
+  * source\rtl\set.c
+
+      Added
+      HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void );
+      function needed for access to hb_set struct from outside of harbour.dll
 
 2004-04-20 13:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/rtl/inkey.c
