@@ -962,31 +962,29 @@ RETURN result
 METHOD GetBlankRow() CLASS TPQquery
     Local result, aRow := {}, aOld := {}, i
     
-    if ! ::lError       
-        ASize(aRow, ::nFields)
-        ASize(aOld, ::nFields)
+    ASize(aRow, ::nFields)
+    ASize(aOld, ::nFields)
     
-        For i := 1 to ::nFields
-            if ::aStruct[i, 2] == 'C'
-                aRow[i] := ''
-                aOld[i] := ''
-            elseif ::aStruct[i, 2] == 'N'
-                aRow[i] := 0
-                aOld[i] := 0
-            elseif ::aStruct[i, 2] == 'L'
-                aRow[i] := .F.
-                aOld[i] := .F.
-            elseif ::aStruct[i, 2] == 'D'
-                aRow[i] := CtoD('')
-                aOld[i] := CtoD('')
-            elseif ::aStruct[i, 2] == 'M'
-                aRow[i] := ''
-                aOld[i] := ''
-            end                                
-        Next
+    For i := 1 to ::nFields
+        if ::aStruct[i, 2] == 'C'
+            aRow[i] := ''
+            aOld[i] := ''
+        elseif ::aStruct[i, 2] == 'N'
+            aRow[i] := 0
+            aOld[i] := 0
+        elseif ::aStruct[i, 2] == 'L'
+            aRow[i] := .F.
+            aOld[i] := .F.
+        elseif ::aStruct[i, 2] == 'D'
+            aRow[i] := CtoD('')
+            aOld[i] := CtoD('')
+        elseif ::aStruct[i, 2] == 'M'
+            aRow[i] := ''
+            aOld[i] := ''
+        end                                
+    Next
     
-        result := TPQRow():New( aRow, aOld, ::aStruct )
-    end            
+    result := TPQRow():New( aRow, aOld, ::aStruct )
 RETURN result
 
 
