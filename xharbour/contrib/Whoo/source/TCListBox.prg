@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.19 2002/10/31 08:18:20 what32 Exp $
+ * $Id: TCListBox.prg,v 1.20 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -64,15 +64,15 @@ CLASS TCustomListBox FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
-   PROPERTY Items INIT TListBoxStrings() READ FItems WRITE SetItems
-   
+   PROPERTY Items DEFAULT TListBoxStrings() READ FItems WRITE SetItems
+
    ACCESS CurSel  INLINE ::GetCurSel()
 
    DATA WinClass    PROTECTED INIT "listbox"
    DATA ControlName PROTECTED INIT "ListBox"
 
    METHOD New() CONSTRUCTOR
-   
+
    METHOD GetString()
    METHOD GetItemRect()
    METHOD GetSelItems()
@@ -140,20 +140,20 @@ METHOD GetSelItems() CLASS TCustomListBox
 *------------------------------------------------------------------------------*
 
 METHOD Create() CLASS TCustomListBox
-   
+
    LOCAL cStr
-   
+
    Super:Create()
-   
+
    ::FItems := TListBoxStrings()
    ::FItems:ListBox := Self
-   
+
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 
 METHOD SetItems( Value )
-  
+
   ::Items := Value
 
 RETURN Self
@@ -162,16 +162,16 @@ RETURN Self
 
 
 CLASS TListBoxStrings FROM TStrings
-   
+
    DATA ListBox PROTECTED
-   
+
    METHOD Add()
    METHOD GetCount()
    METHOD Clear()     INLINE  ::Strings := {}, ::ListBox:SendMessage( LB_RESETCONTENT, 0, 0 )
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------------------
-   
+
 METHOD GetCount() CLASS TListBoxStrings
 RETURN ::ListBox:GetCount()
 

@@ -10,9 +10,12 @@ WH_DIR=..\what32
 #
 WHOOLIB    = $(LIBDIR)\whoo.lib
 
-WHOOOBJ    = TObject.obj TPersistent.obj TComponent.obj TControl.obj \
+WHOOOBJ    = TypeDef.obj \
+             TObject.obj TPersistent.obj TComponent.obj TControl.obj \
              TCustomControl.obj TWinControl.obj TForm.obj \
+             TScrollingWinControl.obj TCustomForm.obj TCustomFrame.obj \
              TApplication.obj \
+             TBasicActionLink.obj TActionLink.obj TMenuActionLink.obj TMainMenu.obj \
              TMenu.obj TPopup.obj TMenuItem.obj TrackMenu.obj \
              TCButton.obj TCEdit.obj TCCheck.obj TCCombo.obj TCRadio.obj \
              TCStatic.obj TFrame.obj TPanel.obj TCListBox.obj TCStatusBar.obj \
