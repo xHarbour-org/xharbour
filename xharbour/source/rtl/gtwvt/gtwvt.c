@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.55 2004/01/17 23:17:29 andijahja Exp $
+ * $Id: gtwvt.c,v 1.56 2004/01/19 20:49:33 vouchcac Exp $
  */
 
 /*
@@ -2639,6 +2639,9 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
   POINT xy, colrow ;
   SHORT keyCode;
 
+  HB_SYMBOL_UNUSED( hWnd );
+  HB_SYMBOL_UNUSED( wParam );
+
   if ( !b_MouseEnable )
   {
     return;
@@ -4246,9 +4249,9 @@ HB_FUNC( WVT_DRAWBUTTON )
    RECT     rc;
    int      iTop, iLeft, iBottom, iRight;
    int      iAlign, oldTextAlign, oldBkMode;
-   int      iTextHeight, iTextWidth;
+   int      iTextHeight /*, iTextWidth */ ;
    int      iImageWidth, iImageHeight;
-   COLORREF oldBkColor, oldTextColor;
+   COLORREF /* oldBkColor, */ oldTextColor;
    LOGBRUSH lb;
    HBRUSH   hBrush;
 
@@ -4257,7 +4260,7 @@ HB_FUNC( WVT_DRAWBUTTON )
    int      iFormat   = ISNIL(  7 ) ? 0 : hb_parni( 7 );
    COLORREF textColor = ISNIL(  8 ) ? _COLORS[ 0 ] : ( COLORREF ) hb_parnl( 8 ) ;
    COLORREF bkColor   = ISNIL(  9 ) ? _COLORS[ 7 ] : ( COLORREF ) hb_parnl( 9 ) ;
-   int      iImageAt  = ISNIL( 10 ) ? 0 : hb_parni( 10 );
+   // int      iImageAt  = ISNIL( 10 ) ? 0 : hb_parni( 10 );
 
    xy         = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    iTop       = xy.y;
@@ -4302,7 +4305,7 @@ HB_FUNC( WVT_DRAWBUTTON )
       ( HFONT ) SelectObject( _s.hdc, GetStockObject( DEFAULT_GUI_FONT ) );
 
       GetTextExtentPoint32( _s.hdc, hb_parc( 5 ), strlen( hb_parc( 5 ) ), &sz );
-      iTextWidth   = sz.cx;
+      // iTextWidth   = sz.cx;
       iTextHeight  = sz.cy;
 
       xy.x = iLeft + ( ( iRight - iLeft + 1 ) / 2 ) ;
