@@ -1,7 +1,9 @@
 //
-// $Id: inifiles.prg,v 1.2 2001/09/10 22:04:29 vszakats Exp $
+// $Id: inifiles.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
 //
 #define CRLF (Chr(13) + Chr(10))
+
+#xtranslate Default( <x>, <y> ) => IIF( <x> == NIL, <y>, <x> )
 
 function Main(cFilename, cSection)
    local oIni := TIniFile():New(Default( cFilename, 'harbour.ini' ) )
