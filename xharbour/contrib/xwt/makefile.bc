@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.6 2003/10/09 23:18:32 jonnymind Exp $
+# $Id: makefile.bc,v 1.7 2003/10/10 13:33:52 paultucker Exp $
 #
 
 #
@@ -162,6 +162,8 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\window.obj \
    \
    $(OBJ_DIR)\xwt_win.obj \
+   $(OBJ_DIR)\xwt_win_menu.obj \
+   $(OBJ_DIR)\xwt_win_menuitem.obj \
    $(OBJ_DIR)\xwt_win_framewnd.obj \
    $(OBJ_DIR)\xwt_win_msgbox.obj
 
@@ -357,6 +359,12 @@ $(OBJ_DIR)\window.obj : $(OBJ_DIR)\window.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\xwt_win.obj : $(SRC_DIR)\xwt_win\xwt_win.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\xwt_win_menu.obj : $(SRC_DIR)\xwt_win\xwt_win_menu.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\xwt_win_menuitem.obj : $(SRC_DIR)\xwt_win\xwt_win_menuitem.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\xwt_win_framewnd.obj : $(SRC_DIR)\xwt_win\xwt_win_framewnd.c

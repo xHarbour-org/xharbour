@@ -1,10 +1,9 @@
-
 /*
    XWT_WIN - xHarbour Windowing Toolkit/ MS-Windows interface
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.2 2003/10/10 13:33:52 paultucker Exp $
+   $Id: xwt_win.c,v 1.3 2003/10/13 11:54:08 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -14,19 +13,33 @@
 #include <xwt_win.h>
 #include <xwt_api.h>
 
-HB_EXPORT extern HANDLE hb_hInstance;
-HB_EXPORT extern HANDLE hb_hPrevInstance;
-HB_EXPORT extern int    hb_iCmdShow;
-
-
 BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
    HWND hWnd = ( HWND ) wWidget->get_top_widget( wWidget->widget_data );
 
    switch( prop->type ) {
       case XWT_PROP_TEXT:
-         // todo: check widget
-         SetWindowText( hWnd, prop->value.text );
+         switch( wWidget->type ) {
+            case XWT_TYPE_MENU:  
+            case XWT_TYPE_MENUITEM:
+            {
+               char *p;
+               //XWT_WIN_MAKESELF( wWidget );
+               //hb_objSendMsg( widget, "ACHILDREN",0 );
+               PXWT_WIN_MENUDATA menuData = (PXWT_WIN_MENUDATA) wWidget->widget_data;
+               menuData->szLabel = (LPSTR) hb_xgrab( strlen( prop->value.text ) +1);
+               p = menuData->szLabel;
+               strcpy( p, prop->value.text );
+               while (*p) {
+                  if ( *p == '_' ) *p = '&';
+                  p++;
+               }
+            }
+            return TRUE;
+            
+            default:
+               SetWindowText( hWnd, prop->value.text );
+         }
       return TRUE;
       
       case XWT_PROP_SIZE:
@@ -84,8 +97,24 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
                ShowWindow( hWnd, SW_MINIMIZE );
             return TRUE;
          }
-
       return FALSE;
+      
+      case XWT_PROP_SETMENUBAR:
+         if ( wWidget->type == XWT_TYPE_FRAME )
+         {
+            xwt_win_setMenuBar( wWidget, (PHB_ITEM) prop->value.data );
+            return TRUE;
+         }
+      return FALSE;
+
+      case XWT_PROP_RSTMENUBAR:
+         if ( wWidget->type == XWT_TYPE_FRAME )
+         {
+            xwt_win_resetMenuBar( wWidget );
+            return TRUE;
+         }
+      return FALSE;
+
    }
    
    return FALSE;
@@ -98,12 +127,24 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
    switch( prop->type ) {
       case XWT_PROP_TEXT:
-         // todo: check widget
-         prop->value.string.iLength = GetWindowTextLength( hWnd );
-         if ( prop->value.string.iLength > 0 )  {
-            prop->value.string.text = (char *) hb_xgrab( prop->value.string.iLength+1 );
-            GetWindowText( hWnd, prop->value.string.text, prop->value.string.iLength );
+         switch( wWidget->type ) {
+            case XWT_TYPE_MENU:  
+            case XWT_TYPE_MENUITEM:
+            {
+               //XWT_WIN_MAKESELF( wWidget );
+               //hb_objSendMsg( widget, "ACHILDREN",0 );
+               PXWT_WIN_MENUDATA menuData = (PXWT_WIN_MENUDATA) wWidget->widget_data;
+               prop->value.text = menuData->szLabel;
+            }
             return TRUE;
+            
+            default:
+               prop->value.string.iLength = GetWindowTextLength( hWnd );
+               if ( prop->value.string.iLength > 0 )  {
+                  prop->value.string.text = (char *) hb_xgrab( prop->value.string.iLength+1 );
+                  GetWindowText( hWnd, prop->value.string.text, prop->value.string.iLength );
+                  return TRUE;
+               }
          }
       return FALSE;
       
@@ -142,6 +183,8 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
    {
       //case XWT_TYPE_WINDOW:  return xwt_win_createWindow( xwtData );
       case XWT_TYPE_FRAME:   return xwt_win_createFrameWindow( xwtData );
+      case XWT_TYPE_MENU:    return xwt_win_createMenu( xwtData );
+      case XWT_TYPE_MENUITEM: return xwt_win_createMenuItem( xwtData );
    }
    return FALSE;
 
@@ -149,14 +192,22 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
 
 BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
 {
-   HWND wSelf = (HWND) wWidget->get_top_widget( wWidget->widget_data );
-   SetWindowLong( wSelf, GWL_USERDATA, 0 );
-   DestroyWindow( wSelf );
-   if( wWidget->destructor != NULL )
+   /* menus are handled differently in WINDOWS */
+   if ( wWidget->type == XWT_TYPE_MENU )
    {
-      wWidget->destructor( wWidget->widget_data );
+      DestroyMenu( wWidget->widget_data );
    }
-   hb_xfree( wWidget );
+   else {
+      HWND wSelf = (HWND) wWidget->get_top_widget( wWidget->widget_data );
+      SetWindowLong( wSelf, GWL_USERDATA, 0 );
+      DestroyWindow( wSelf );
+      if( wWidget->destructor != NULL )
+      {
+         wWidget->destructor( wWidget->widget_data );
+      }
+      hb_xfree( wWidget );
+   }
+   
    return TRUE;
 }
 
@@ -250,9 +301,25 @@ void *xwt_win_get_topwidget_neuter( void *data )
    return win->hMain;
 }
 
-void xwt_win_free_wnd( void *wnd )
+void * xwt_win_get_neuter( void *data )
 {
-   PXWT_WIN_DATA self = (PXWT_WIN_DATA) wnd;
-   CloseHandle( self->hMain );
+   return data;
+}
+
+void xwt_win_delete_menu( void *data )
+{
+   PXWT_WIN_MENUDATA self = (PXWT_WIN_MENUDATA) data;
+   
+   if ( self->szLabel != NULL) 
+   {
+      hb_xfree( self->szLabel );
+   }
+   
+   if ( self->hBitmap != NULL )
+   {
+      CloseHandle( self->hBitmap );
+      self->hBitmap = NULL;
+   }
+   
    hb_xfree( self );
 }
