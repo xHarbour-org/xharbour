@@ -63,6 +63,8 @@
 #include "hbdbsort.h"
 #include "error.ch"
 
+#include <errno.h>
+
 /* DJGPP can sprintf a float that is almost 320 digits long */
 #define HB_MAX_DOUBLE_LENGTH 320
 
@@ -1736,6 +1738,14 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             hb_errPutSubCode( pError, EDBF_OPEN_DBF );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
             hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
+            /*
+             * Temporary fix for neterr() support and Clipper compatibility,
+             * should be revised with a better solution.
+             */
+            if ( hb_fsError() == EACCES )
+               hb_errPutOsCode( pError, 32 );
+            else
+               hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
