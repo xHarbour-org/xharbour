@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.27 2004/05/09 23:40:06 druzus Exp $
+ * $Id: runner.c,v 1.28 2004/05/20 01:43:03 ronpinkas Exp $
  */
 
 /*
@@ -268,7 +268,7 @@ HB_FUNC( __HRBUNLOAD )
 
 HB_FUNC( __HRBGETFU )
 {
-   if( hb_pcount() > 1 && ISNUM( 1 ) && ISCHAR( 2 ) )
+   if( hb_pcount() > 1 && ISPOINTER( 1 ) && ISCHAR( 2 ) )
    {
       PHRB_BODY pHrbBody = (PHRB_BODY) hb_parptr( 1 );
       ULONG ulPos = 0;
