@@ -43,7 +43,7 @@
      DATA cName                INIT ""
      DATA nID                  INIT 0
 
-     METHOD New()              INLINE ( Self )
+     METHOD New()              INLINE ( ::InitStdRules(), CompileDefine( "__HARBOUR__" ), Self )
 
      METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
      METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
