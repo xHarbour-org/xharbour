@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.68 2002/11/17 09:03:45 what32 Exp $
+ * $Id: xInspect.prg,v 1.69 2002/11/18 06:24:20 what32 Exp $
  */
 
 /*
@@ -44,6 +44,7 @@ GLOBAL EXTERNAL ObjTree
 GLOBAL InspTabs
 GLOBAL InspCombo
 GLOBAL InspBrowse
+
 CLASS ObjInspect FROM TForm
 
    DATA Browser   AS OBJECT PROTECTED
@@ -205,12 +206,14 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 CLASS ComboInsp FROM TComboBox
+
    METHOD DrawItem()
    METHOD AddString()
    METHOD SetCurSel()
    METHOD DelObject()
    METHOD MyOnClick()
    METHOD Create()
+
 ENDCLASS
 
 //---------------------------------------------------------------------------------
@@ -260,8 +263,8 @@ METHOD SetCurSel(n) CLASS ComboInsp
    LOCAL oObj
 
    IF n < 0
-      ObjInspect:Browser:source := { "", "" }
-      ObjInspect:Browser:RefreshAll()
+      InspBrowse:source := { "", "" }
+      InspBrowse:RefreshAll()
    ELSE
       oObj := ObjInspect:Objects[ n + 1 ]
 
@@ -288,12 +291,14 @@ RETURN Super:SetCurSel( n )
 //---------------------------------------------------------------------------------
 
 METHOD DelObject( oObj ) CLASS ComboInsp
+
    LOCAL n,x,y
-   IF ( n:= aScan( ObjInspect:Objects, {|o|o:handle == oObj:handle} ))>0
+
+   IF ( n:= aScan( ObjInspect:Objects, {|o|o:FHandle == oObj:FHandle} ))>0
 
       FOR x:=1 to Len( ObjTree:TreeView1:Items)
 
-          IF( y:=aScan( ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
+          IF( y := aScan( ObjTree:TreeView1:Items[x]:Items, {|o| o:cargo == oObj:FHandle } ) ) > 0
              ObjTree:TreeView1:Items[x]:Items[y]:Delete()
              EXIT
           ENDIF

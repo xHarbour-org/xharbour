@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.97 2002/11/19 20:23:20 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.98 2002/11/19 21:00:22 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -70,6 +70,8 @@ CLASS TFormEdit FROM TForm
    CLASSDATA nForms  PROTECTED INIT 0
    CLASSDATA aBases  PROTECTED INIT {0}
 
+   DATA MouseDown    PROTECTED INIT .F.
+
    DATA oMask        PROTECTED
    DATA Editing      PROTECTED
    DATA aCtrl        PROTECTED
@@ -87,7 +89,8 @@ CLASS TFormEdit FROM TForm
 
    METHOD WMCreate()
    METHOD WMSize()
-   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .T. ), NIL
+   METHOD WMMoving()
+   METHOD WMNCLButtonUp() INLINE Alert("oops")
    METHOD WMPaint()
    METHOD WMDestroy()
 
@@ -100,7 +103,7 @@ CLASS TFormEdit FROM TForm
 
    METHOD XFMTop()
    METHOD XFMRoot()
-   METHOD XFMControl( cName, oControl, lDelete )
+   METHOD XFMControl() // cName, oControl, lDelete )
    METHOD XFMReflect()
    METHOD XFMTrace()
 
@@ -134,6 +137,11 @@ METHOD Create( oParent ) CLASS TFormEdit
 
 RETURN Self
 
+METHOD WMMoving( x, y ) CLASS TFormEdit
+
+   ObjInspect:SetBrowserData( Self, .F. )
+
+RETURN Self
 //----------------------------------------------------------------------------//
 METHOD WMCreate() CLASS TFormEdit 
 
@@ -183,7 +191,7 @@ METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit
       ObjInspect:SetBrowserData( Self, .T. )
    ENDIF
 
-RETURN 0
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 
@@ -440,7 +448,7 @@ RETURN Self
 METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
    LOCAL nControl, nBase, aVar, XFMControl
-
+   
    IF cName == NIL
       nControl := aScan( ::aXFM[ XFM_Controls ], { |XFM| XFM[2] == oControl } )
 

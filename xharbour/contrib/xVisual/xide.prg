@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.133 2002/11/18 06:24:20 what32 Exp $
+ * $Id: xide.prg,v 1.134 2002/11/19 21:00:25 what32 Exp $
  */
 
 /*
@@ -50,11 +50,11 @@ GLOBAL ObjEdit
 
 FUNCTION Main
    local oSplash
-
+   
    Application():Initialize()
 
    // splash screen
-//   oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
+   oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT Application
       WITH OBJECT :CreateForm( MainForm(), @MainForm )

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.45 2002/11/18 06:24:20 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.46 2002/11/19 08:00:03 what32 Exp $
  */
 
 /*
@@ -209,6 +209,7 @@ METHOD WMKeyDown( wParam, lParam )
      LOCAL t := 0
      LOCAL b := 0
      LOCAL r := 0
+
 
      cKbd   := GetKeyboardState()
      lShift := ( cKbd[ VK_SHIFT + 1 ]   < 0  )

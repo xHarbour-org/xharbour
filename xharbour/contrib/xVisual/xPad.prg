@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.12 2002/11/15 01:56:37 what32 Exp $
+ * $Id: xPad.prg,v 1.13 2002/11/19 08:00:04 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -147,7 +147,8 @@ Static aGlobals:={}
 static aUserKeys:=;
 { ;
    {112,.f.,.f.,{|o| o:ShowHelp() } },;  // F1
-   {112,.f.,.t.,{|o| o:Copy() } },;  // Ctrl-F1
+   { 67,.f.,.t.,{|o| o:Copy() } },;  // Ctrl-C
+   { 86,.f.,.t.,{|o| o:Paste() } },;  // Ctrl-V
    {113,.f.,.f.,{|o| if(o:isBlockOn,(o:toupper(),.f.),.t.)}},;    // F2
    {114,.f.,.f.,{|o| if(o:isBlockOn,(o:tolower(),.f.),.t.)}},;    // F3
    { 77,.f.,.t.,{|o| o:findmatch()}},;                            // Ctrl-M
