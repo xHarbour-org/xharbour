@@ -1220,9 +1220,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    {
       // This code does not work //
       //
-#ifndef __WATCOMC__
-      pFunc = (PHB_ITEM) HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
-#endif      
+      pFunc = ( PHB_ITEM ) HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
       pFirst->item.asBlock.value->ulCounter++;
       iType = 2;
    }
