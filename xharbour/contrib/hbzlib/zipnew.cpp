@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.7 2004/02/09 02:18:17 lculik Exp $
+ * $Id: zipnew.cpp,v 1.8 2004/02/09 12:11:30 andijahja Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ class SpanActionCallback : public CZipActionCallback
 
 int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
-   uLong uiCount;
+   ULONG ulCount;
 
    const char *szDummy;
 
@@ -160,29 +160,21 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
       szZip.SetCallback( &spanac );
    }
 
-   for( uiCount = 1;( uiCount <= hb_arrayLen( pArray ) ); uiCount++ )
+   for( ulCount = 1;( ulCount <= hb_arrayLen( pArray ) ); ulCount++ )
    {
-      szDummy = ( char * )hb_arrayGetCPtr( pArray, uiCount );
+      szDummy = ( char * )hb_arrayGetCPtr( pArray, ulCount );
       bAdded = FALSE;    
 
       if( pBlock  !=  NULL )
       {
-         PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, uiCount ) );
-         PHB_ITEM pFilePos = hb_itemPutNI( NULL, uiCount );
+         PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, ulCount ) );
+         PHB_ITEM pFilePos = hb_itemPutNI( NULL, ulCount );
          hb_vmEvalBlockV( pBlock, 2, pFileName, pFilePos );
          hb_itemRelease( pFileName );
          hb_itemRelease( pFilePos );
       }
       try
       {
-
-/*         #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) )  && defined( HB_USE_DRIVE_ADD )
-            if ( bDrive && !bAdded )
-            {
-               szZip.AddNewFileDrv( szDummy, iCompLevel, true, CZipArchive::zipsmSafeSmart, 65536 );
-               bAdded = true;
-            }
-         #endif*/
 
          if ( bPath && !bAdded )
          {
@@ -226,7 +218,7 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 {
    int iNumberOfFiles;
-   int uiCount;
+   ULONG ulCount;
    int iOMode = hb_CheckSpanMode( szFile );
    bool iReturn = true;
 
@@ -269,11 +261,11 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
       time_t theTime;
       tm *SzTime;
 
-      for( uiCount = 0 ; uiCount < iNumberOfFiles ; uiCount++ )
+      for( ulCount = 0 ; ulCount < ( ULONG )iNumberOfFiles ; ulCount++ )
       {
          CZipFileHeader fh;
          PHB_ITEM pItem;
-         szZip.GetFileInfo( fh, ( WORD )uiCount );
+         szZip.GetFileInfo( fh, ( WORD )ulCount );
 
          if ( iMode )
          {
@@ -297,13 +289,13 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             hb_itemRelease( pItem );
 
             #if defined( __WIN32__ )
-               szAttr[ 0 ] = uAttr & FILE_ATTRIBUTE_READONLY ? _T( 'r' ) : _T( '-' );
-               szAttr[ 1 ] = uAttr & FILE_ATTRIBUTE_HIDDEN ? _T( 'h' ) : _T( '-' );
-               szAttr[ 2 ] = uAttr & FILE_ATTRIBUTE_SYSTEM ? _T( 's' ) : _T( 'w' );
-               szAttr[ 3 ] = ( uAttr & FILE_ATTRIBUTE_DIRECTORY ) ? _T( 'D' ) : uAttr & FILE_ATTRIBUTE_ARCHIVE ? _T( 'a' ): _T( '-' );
+               szAttr[ 0 ] = uAttr & FILE_ATTRIBUTE_READONLY ? ( char ) _T( 'r' ) : ( char ) _T( '-' );
+               szAttr[ 1 ] = uAttr & FILE_ATTRIBUTE_HIDDEN ? ( char ) _T( 'h' ) : ( char ) _T( '-' );
+               szAttr[ 2 ] = uAttr & FILE_ATTRIBUTE_SYSTEM ? ( char ) _T( 's' ) : ( char ) _T( 'w' );
+               szAttr[ 3 ] = ( uAttr & FILE_ATTRIBUTE_DIRECTORY ) ? ( char ) _T( 'D' ) : uAttr & FILE_ATTRIBUTE_ARCHIVE ? ( char ) _T( 'a' ): ( char ) _T( '-' );
             #endif
 
-            szAttr[ 4 ] = fh.IsEncrypted( ) ? _T( '*' ) : _T( ' ' );
+            szAttr[ 4 ] = fh.IsEncrypted( ) ? ( char ) _T( '*' ) : ( char ) _T( ' ' );
 
             if ( fh.m_uUncomprSize>0 )
             {
@@ -347,7 +339,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             if ( iMeth == Z_DEFLATED )
             {
-               uInt iLevel = ( uInt )( ( fh.m_uFlag & 0x6 ) / 2 );
+               UINT iLevel = ( UINT )( ( fh.m_uFlag & 0x6 ) / 2 );
 
                switch( iLevel )
                {
@@ -373,7 +365,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             hb_arraySet( pTempArray, Method, pItem );
             hb_itemRelease( pItem );
 
-            sprintf( szCRC, "%8.8lx\n", ( uLong )fh.m_uCrc32 );
+            sprintf( szCRC, "%8.8lx\n", ( ULONG )fh.m_uCrc32 );
 
             pItem = hb_itemPutCL( NULL, szCRC, 8 );
             hb_arraySet( pTempArray, Crc32, pItem );
@@ -402,7 +394,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             pItem = hb_itemPutCL( NULL, szAttr, 5 );
             hb_arraySet( pTempArray, Attr, pItem );
             hb_itemRelease( pItem );
-            hb_arraySet( pArray, uiCount+1, pTempArray );
+            hb_arraySet( pArray, ulCount+1, pTempArray );
             hb_itemRelease( pTempArray );
 
          }
@@ -412,7 +404,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             CZipString szTempString = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
             pItem = hb_itemPutC( NULL, ( char * ) szFileNameInZip );
-            hb_arraySet( pArray, uiCount+1, pItem );
+            hb_arraySet( pArray, ulCount+1, pItem );
             hb_itemRelease( pItem );
          }
       }
@@ -430,22 +422,22 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
 char *hb___CheckFile( char * szFile )
 {
-   int uiCount, uiLen;
-   int uiDot_Found = 0;
+   ULONG ulCount, ulLen;
+   int ulDot_Found = 0;
 
-   uiLen = strlen( szFile );
+   ulLen = strlen( szFile );
 
    /* TODO: This needs to be fixed!  */
 
-   for ( uiCount = 0;uiCount<uiLen;uiCount++ )
+   for ( ulCount = 0;ulCount<ulLen;ulCount++ )
    {
-      if ( szFile[ uiCount ] == '.' )
+      if ( szFile[ ulCount ] == '.' )
       {
-         uiDot_Found = 1;
+         ulDot_Found = 1;
       }
    }
 
-   if ( uiDot_Found == 0 )
+   if ( ulDot_Found == 0 )
    {
       strcat( szFile, ".zip" );
    }
@@ -678,7 +670,7 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
-   int uiCount = 0;
+   ULONG ulCount = 0;
    int iMode;
    BOOL bChange = FALSE;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
@@ -742,13 +734,13 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
          szZip.SetRootPath(szPath);
       }
-      for ( uiCount = 0 ; uiCount < ( int ) szZip.GetCount( ) ; uiCount ++ )
+      for ( ulCount = 0 ; ulCount < ( ULONG ) szZip.GetCount( ) ; ulCount ++ )
       {
          CZipFileHeader fh;
          const char *  szFileNameInZip;
          CZipString szTempString;
 
-         szZip.GetFileInfo( fh, ( WORD )uiCount );
+         szZip.GetFileInfo( fh, ( WORD )ulCount );
          PHB_FNAME pOut;
          szTempString    = ( LPCTSTR )fh.GetFileName( );
          szFileNameInZip = ( const char * )szTempString;
@@ -776,7 +768,7 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
          if( pBlock  !=  NULL )
          {
             PHB_ITEM pFileName = hb_itemPutC( NULL, ( char * )szFileNameInZip );
-            PHB_ITEM pFilePos = hb_itemPutNI( NULL, uiCount );
+            PHB_ITEM pFilePos = hb_itemPutNI( NULL, ulCount );
             hb_vmEvalBlockV( pBlock, 2, pFileName, pFilePos );
             hb_itemRelease( pFileName );
             hb_itemRelease( pFilePos );
@@ -788,12 +780,12 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
             if ( !HB_IS_BLOCK( pProgress ) )
             {
 //               szZip.SetPassword( szPassWord );
-               szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+               szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
             }
             else
             {
 //               szZip.SetPassword( szPassWord );
-               szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+               szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
             }
          }
 
@@ -824,7 +816,7 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
-   int uiCount;
+   ULONG ulCount;
    int iMode;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );   
 
@@ -871,11 +863,11 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       szZip.SetPassword( szPassWord );
    }
 
-   uiCount = szZip.FindFile( ( LPCTSTR )szFiletoExtract, false );
+   ulCount = szZip.FindFile( ( LPCTSTR )szFiletoExtract, false );
 
-   if ( uiCount == -1 )
+   if ( ulCount == ( ULONG )-1 )
    {
-      uiCount = szZip.FindFile( ( LPCTSTR )szFiletoExtract, true );
+      ulCount = szZip.FindFile( ( LPCTSTR )szFiletoExtract, true );
    }
 
    if ( pbyBuffer )
@@ -892,14 +884,14 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       szZip.SetRootPath(szPath);
    }
 
-   if ( uiCount >= 0 )
+   if ( ulCount >= 0 )
    {
       CZipFileHeader fh;
       const char *  szFileNameInZip;
       PHB_FNAME pOut;
       CZipString szTempString;
 
-      szZip.GetFileInfo( fh, ( WORD )uiCount );
+      szZip.GetFileInfo( fh, ( WORD )ulCount );
       szTempString  = ( LPCTSTR )fh.GetFileName( );
 
 
@@ -920,12 +912,12 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
          if ( !HB_IS_BLOCK( pProgress ) )
          {
 //            szZip.SetPassword( szPassWord );
-            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
          }
          else
          {
 //            szZip.SetPassword( szPassWord );
-            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
          }
       }
       catch ( CZipException& e ) { }
@@ -957,7 +949,7 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 int hb_DeleteOne( char *szFile, char *szFiletoDelete )
 {
    bool iReturn = true;
-   int uiCount;
+   ULONG ulCount;
 
    CZipArchive szZip;
 
@@ -978,21 +970,21 @@ int hb_DeleteOne( char *szFile, char *szFiletoDelete )
 
    catch ( CZipException &e )    {}
 
-   uiCount = szZip.FindFile( ( LPCTSTR )szFiletoDelete, false );
+   ulCount = szZip.FindFile( ( LPCTSTR )szFiletoDelete, false );
 
-   if ( uiCount == -1 )
+   if ( ulCount == ( ULONG ) -1 )
    {
-      uiCount = szZip.FindFile( ( LPCTSTR )szFiletoDelete, true );
+      ulCount = szZip.FindFile( ( LPCTSTR )szFiletoDelete, true );
    }
 
-   if ( uiCount >= 0 )
+   if ( ulCount >= 0 )
    {
       CZipFileHeader fh;
-      szZip.GetFileInfo( fh, ( WORD )uiCount );
+      szZip.GetFileInfo( fh, ( WORD )ulCount );
 
       try
       {
-         szZip.DeleteFile( ( WORD )uiCount );
+         szZip.DeleteFile( ( WORD )ulCount );
       }
 
       catch ( ... )
@@ -1014,7 +1006,7 @@ int hb_DeleteOne( char *szFile, char *szFiletoDelete )
 int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
 {
    bool iReturn = true;
-   int uiCount;
+   ULONG ulCount;
    CZipArchive szZip;
    CZipStringArray  aFiles;
 
@@ -1037,9 +1029,9 @@ int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
 
    if ( iReturn )
    {
-      for ( uiCount = 1 ; ( uiCount <=  ( int ) hb_arrayLen( pArray ) ) ; uiCount ++ )
+      for ( ulCount = 1 ; ( ulCount <=  ( ULONG ) hb_arrayLen( pArray ) ) ; ulCount ++ )
       {
-         const char *szDummy = ( char * )hb_arrayGetCPtr( pArray, uiCount );
+         const char *szDummy = ( char * )hb_arrayGetCPtr( pArray, ulCount );
          aFiles.Add( szDummy );
       }
 
@@ -1061,7 +1053,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
-   int uiCount;
+   ULONG ulCount;
    int iCause;
    int iMode = hb_CheckSpanMode( szFile );
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
@@ -1128,20 +1120,20 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       for ( iCause = 1 ; ( iCause <=  ( int ) hb_arrayLen( pSelArray ) ) ; iCause ++ )
       {
          lpFiletoExtract = hb_arrayGetC( pSelArray, iCause );
-         uiCount = szZip.FindFile( ( LPCTSTR )lpFiletoExtract, false );
+         ulCount = szZip.FindFile( ( LPCTSTR )lpFiletoExtract, false );
 
-         if ( uiCount == -1 )
+         if ( ulCount == (ULONG ) -1 )
          {
-            uiCount = szZip.FindFile( ( LPCTSTR )lpFiletoExtract, true );
+            ulCount = szZip.FindFile( ( LPCTSTR )lpFiletoExtract, true );
          }
 
-         if ( uiCount >= 0 )
+         if ( ulCount >= 0 )
          {
             CZipFileHeader fh;
             const char *  szFileNameInZip;
             CZipString szTempString;
             PHB_FNAME pOut;
-            szZip.GetFileInfo( fh, ( WORD )uiCount );
+            szZip.GetFileInfo( fh, ( WORD )ulCount );
             szTempString  = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
             pOut = hb_fsFNameSplit( ( char * ) szFileNameInZip );
@@ -1170,12 +1162,12 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                if ( !HB_IS_BLOCK( pProgress ) )
                {
 //                  szZip.SetPassword( szPassWord );
-                  szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+                  szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
                }
                else
                {
 //                  szZip.SetPassword( szPassWord );
-                  szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+                  szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
                }
             }
 
@@ -1294,7 +1286,7 @@ const char * hb_GetZipComment( char *szFile )
 
 }
 
-int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, char *szPath, int uiCount, PHB_ITEM pProgress )
+int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, char *szPath, ULONG ulCount, PHB_ITEM pProgress )
 {
    bool bWithPath = lWithPath?true:FALSE;
    bool iReturn = true;
@@ -1306,7 +1298,7 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    SpanActionCallback spanac;
 
    
-   uiCount--;
+   ulCount--;
 
    szZip.SetSpanCallback( &span );
 
@@ -1340,7 +1332,7 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
       szZip.SetCallback( &spanac );
    }
 
-   if ( uiCount >= 0 )
+   if ( ulCount >= 0 )
    {
       CZipFileHeader fh;
       const char *  szFileNameInZip;
@@ -1351,7 +1343,7 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
          szZip.SetPassword( szPassWord );
       }
 
-      szZip.GetFileInfo( fh, ( WORD )uiCount );
+      szZip.GetFileInfo( fh, ( WORD )ulCount );
       szTempString  = ( LPCTSTR )fh.GetFileName( );
 
       szFileNameInZip = ( const char * )szTempString;
@@ -1369,12 +1361,12 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
          if ( !HB_IS_BLOCK( pProgress ) )
          {
 //            szZip.SetPassword( szPassWord );
-            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
          }
          else
          {
 //            szZip.SetPassword( szPassWord );
-            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
          }
       }
 
@@ -1399,7 +1391,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
-   int uiCount;
+   ULONG ulCount;
    int iCause;
    int iMode = hb_CheckSpanMode( szFile );
 
@@ -1446,14 +1438,14 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
 
       for ( iCause = 0;( iCause<=  ( int )hb_arrayLen( pSelArray ) ) ; iCause++ )
       {
-         uiCount =  hb_arrayGetNI( pSelArray, iCause ) - 1;
+         ulCount =  hb_arrayGetNI( pSelArray, iCause ) - 1;
 
-         if ( uiCount >= 0 )
+         if ( ulCount >= 0 )
          {
             CZipFileHeader fh;
             const char *  szFileNameInZip;
             CZipString szTempString;
-            szZip.GetFileInfo( fh, ( WORD )uiCount );
+            szZip.GetFileInfo( fh, ( WORD )ulCount );
             szTempString  = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
 
@@ -1470,12 +1462,12 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
                if ( !HB_IS_BLOCK( pProgress ) )
                {
 //                  szZip.SetPassword( szPassWord );
-                  szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+                  szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
                }
                else
                {
 //                  szZip.SetPassword( szPassWord );
-                  szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+                  szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
                }
             }
 
@@ -1505,7 +1497,7 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
    CZipArchive szZDest;
    CZipStringArray aFiles;
    const char *szDummy;
-   int uiCount;
+   ULONG ulCount;
    BOOL bReturn  = TRUE;
    BOOL bReturn1 = TRUE;
 
@@ -1545,9 +1537,9 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
 
    if ( bReturn && bReturn1 )
    {
-      for ( uiCount = 1 ; ( uiCount <=  ( int ) hb_arrayLen( pArray ) ) ; uiCount++ )
+      for ( ulCount = 1 ; ( ulCount <=  ( ULONG ) hb_arrayLen( pArray ) ) ; ulCount++ )
       {
-         szDummy = ( char * )hb_arrayGetCPtr( pArray, uiCount );
+         szDummy = ( char * )hb_arrayGetCPtr( pArray, ulCount );
          aFiles.Add( szDummy );
       }
 
@@ -1567,13 +1559,13 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
 }
 
 
-int hb_DeleteOneIndex( char *szFile, int uiCount )
+int hb_DeleteOneIndex( char *szFile, ULONG ulCount )
 {
    bool iReturn = true;
 
    CZipArchive szZip;
 
-   uiCount--;
+   ulCount--;
 
    try
    {
@@ -1592,14 +1584,14 @@ int hb_DeleteOneIndex( char *szFile, int uiCount )
 
    catch ( CZipException &e )   {}
 
-   if ( uiCount >= 0 )
+   if ( ulCount >= 0 )
    {
       CZipFileHeader fh;
-      szZip.GetFileInfo( fh, ( WORD )uiCount );
+      szZip.GetFileInfo( fh, ( WORD )ulCount );
 
       try
       {
-         szZip.DeleteFile( ( WORD )uiCount );
+         szZip.DeleteFile( ( WORD )ulCount );
       }
 
       catch( ... )

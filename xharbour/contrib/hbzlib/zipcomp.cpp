@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.7 2003/09/12 20:10:13 paultucker Exp $
+ * $Id: zipcomp.cpp,v 1.8 2003/11/22 21:15:04 lculik Exp $
  */
 
 /*
@@ -98,8 +98,7 @@ class SpanActionCallbackc : public CZipActionCallback
 
 int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
-   uLong uiCount;
-   uLong uiPos;
+   ULONG ulCount;
    const char *szDummy ;
    BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
    BOOL bAdded     = FALSE;
@@ -151,19 +150,18 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
          szZip.SetCallback( &spanac );
       }
 
-      for ( uiCount = 1; ( uiCount <= hb_arrayLen( pArray ) ) ;uiCount++ )
+      for ( ulCount = 1; ( ulCount <= hb_arrayLen( pArray ) ) ;ulCount++ )
       {
-         szDummy = ( char * ) hb_arrayGetCPtr( pArray, uiCount ) ;
+         szDummy = ( char * ) hb_arrayGetCPtr( pArray, ulCount ) ;
          dwSize  = GetCurrentFileSize( szDummy );
-         uiPos   = uiCount;
          bAdded  = FALSE;
 
          if( dwSize != (DWORD) -1 )
          {
             if( pBlock != NULL )
             {
-               PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, uiCount ) );
-               PHB_ITEM pFilePos  = hb_itemPutNI( NULL, uiCount );
+               PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, ulCount ) );
+               PHB_ITEM pFilePos  = hb_itemPutNI( NULL, ulCount );
 
                hb_vmEvalBlockV( pBlock, 2, pFileName, pFilePos  );
                hb_itemRelease( pFileName );
@@ -172,14 +170,6 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 
             try
             {
-
-               #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) )  && defined( HB_USE_DRIVE_ADD )
-                  if ( bDrive && !bAdded  )
-                  {
-                     szZip.AddNewFileDrv( szDummy, iCompLevel, true, CZipArchive::zipsmSafeSmart, 65536 );
-                     bAdded = TRUE;
-                  }
-               #endif
 
                if ( bPath && !bAdded  )
                {
@@ -221,9 +211,8 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 
 int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, int iSpanSize, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
 {
-   uLong uiCount;
+   ULONG ulCount;
    const char *szDummy;
-   uLong uiPos;
    DWORD dwSize;
    BOOL bAdded     = FALSE;
    BOOL bReturn    = TRUE;
@@ -281,19 +270,19 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
          szZip.SetCallback( &spanac );
       }
 
-      for ( uiCount = 1;( uiCount<= hb_arrayLen( pArray ) ) ;uiCount++ )
+      for ( ulCount = 1;( ulCount<= hb_arrayLen( pArray ) ) ;ulCount++ )
       {
-         szDummy     = ( char * )hb_arrayGetCPtr( pArray, uiCount ) ;
+         szDummy     = ( char * )hb_arrayGetCPtr( pArray, ulCount ) ;
          dwSize      = GetCurrentFileSize( szDummy );
-         uiPos       = uiCount;
+
          bAdded      = FALSE;
 
          if( dwSize != (DWORD) -1 )
          {
             if( pBlock != NULL )
             {
-               PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, uiCount ) );
-               PHB_ITEM pFilePos  = hb_itemPutNI( NULL, uiCount );
+               PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, ulCount ) );
+               PHB_ITEM pFilePos  = hb_itemPutNI( NULL, ulCount );
 
                hb_vmEvalBlockV( pBlock, 2, pFileName, pFilePos  );
                hb_itemRelease( pFileName );
@@ -302,14 +291,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
             try
             {
-
-               #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) ) && defined( HB_USE_DRIVE_ADD )
-                  if ( bDrive && !bAdded  )
-                  {
-                     szZip.AddNewFileDrv( szDummy, iCompLevel, true, CZipArchive::zipsmSafeSmart, 65536 );
-                     bAdded = TRUE;
-                  }
-               #endif
 
                if ( bPath && !bAdded  )
                {
