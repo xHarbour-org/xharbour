@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.50 2003/09/06 20:42:58 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.51 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -339,6 +339,72 @@ static void hb_rddCloseAll( void )
 }
 
 /*
+ * Find a WorkArea by the alias.
+ */
+static USHORT hb_rddSelect( char * szAlias )
+{
+   PHB_DYNS pSymAlias;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelect(%s)", szAlias));
+
+   pSymAlias = hb_dynsymFindName( szAlias );
+   if( pSymAlias && pSymAlias->hArea )
+      return ( USHORT ) pSymAlias->hArea;
+   else
+      return 0;
+}
+
+/*
+ * Return the next free WorkArea for later use.
+ */
+static void hb_rddSelectFirstAvailable( void )
+{
+   HB_THREAD_STUB
+   LPAREANODE pAreaNode;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectFirstAvailable()"));
+
+   s_uiCurrArea = 1;
+   LOCK_AREA
+   pAreaNode = s_pWorkAreas;
+   while( pAreaNode )
+   {
+      if( ( ( AREAP ) pAreaNode->pArea )->uiArea > s_uiCurrArea )
+         break;
+      else if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
+         s_uiCurrArea++;
+      pAreaNode = pAreaNode->pNext;
+   }
+   UNLOCK_AREA
+   s_pCurrArea = NULL;   /* Selected WorkArea must be created */
+}
+
+/*
+ * Return the first free WorkArea number
+ */
+static USHORT hb_rddFindFirstFreeAreaNum( void )
+{
+   LPAREANODE pAreaNode;
+   USHORT uiFreeAreaNum;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFirstFreeAreaNum()"));
+
+   uiFreeAreaNum = 1;
+   LOCK_AREA
+   pAreaNode = s_pWorkAreas;
+   while( pAreaNode )
+   {
+      if( ( ( AREAP ) pAreaNode->pArea )->uiArea > uiFreeAreaNum )
+         break;
+      else if( ( ( AREAP ) pAreaNode->pArea )->uiArea == uiFreeAreaNum )
+         uiFreeAreaNum++;
+      pAreaNode = pAreaNode->pNext;
+   }
+   UNLOCK_AREA
+	return uiFreeAreaNum;
+}
+
+/*
  * Find a RDD node.
  */
 static LPRDDNODE hb_rddFindNode( char * szDriver, USHORT * uiIndex )
@@ -365,6 +431,7 @@ static LPRDDNODE hb_rddFindNode( char * szDriver, USHORT * uiIndex )
       * uiIndex = 0;
    return NULL;
 }
+
 
 /*
  * Register a RDD driver.
@@ -420,74 +487,6 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    }
    return 0;                           /* Ok */
 }
-
-/*
- * Find a WorkArea by the alias.
- */
-static USHORT hb_rddSelect( char * szAlias )
-{
-   PHB_DYNS pSymAlias;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelect(%s)", szAlias));
-
-   pSymAlias = hb_dynsymFindName( szAlias );
-   if( pSymAlias && pSymAlias->hArea )
-      return ( USHORT ) pSymAlias->hArea;
-   else
-      return 0;
-}
-
-/*
- * Return the next free WorkArea for later use.
- */
-static void hb_rddSelectFirstAvailable( void )
-{
-   HB_THREAD_STUB
-   LPAREANODE pAreaNode;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectFirstAvailable()"));
-
-   s_uiCurrArea = 1;
-   LOCK_AREA
-   pAreaNode = s_pWorkAreas;
-   while( pAreaNode )
-   {
-      if( ( ( AREAP ) pAreaNode->pArea )->uiArea > s_uiCurrArea )
-         break;
-      else if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
-         s_uiCurrArea++;
-      pAreaNode = pAreaNode->pNext;
-   }
-   UNLOCK_AREA
-   s_pCurrArea = NULL;   /* Selected WorkArea must be created */
-}
-
-
-/*
- * Return the first free WorkArea number
- */
-static USHORT hb_rddFindFirstFreeAreaNum( void )
-{
-   LPAREANODE pAreaNode;
-   USHORT uiFreeAreaNum;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFirstFreeAreaNum()"));
-
-   uiFreeAreaNum = 1;
-   LOCK_AREA
-   pAreaNode = s_pWorkAreas;
-   while( pAreaNode )
-   {
-      if( ( ( AREAP ) pAreaNode->pArea )->uiArea > uiFreeAreaNum )
-         break;
-      else if( ( ( AREAP ) pAreaNode->pArea )->uiArea == uiFreeAreaNum )
-         uiFreeAreaNum++;
-      pAreaNode = pAreaNode->pNext;
-   }
-   UNLOCK_AREA
-	return uiFreeAreaNum;
-}
-
 
 /*
  * pTable - a table in new RDDNODE that will be filled

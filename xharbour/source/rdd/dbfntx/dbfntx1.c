@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.61 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbfntx1.c,v 1.62 2003/09/10 01:03:58 druzus Exp $
  */
 
 /*
@@ -268,7 +268,7 @@ static void commonError( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
    return;
 }
 
-static void hb_IncString( char* s, int slen )
+static void hb_IncString( NTXAREAP pArea, char* s, int slen )
 {
    char *ptr;
    unsigned int nsymb;
@@ -278,7 +278,23 @@ static void hb_IncString( char* s, int slen )
       nsymb = (unsigned int) *ptr;
       if( nsymb < 255 )
       {
-         *ptr = (char) ++nsymb;
+         unsigned int n1, i;
+         if( pArea->cdPage->lSort && ( n1 = (unsigned int)pArea->cdPage->s_chars[ nsymb ] ) != 0 )
+         {
+            n1 ++;
+            for( i=0; i<255; i++ )
+            {
+               if( n1 == (unsigned int)pArea->cdPage->s_chars[ i ] )
+               {
+                  *ptr = (char) i;
+                  break;
+               }
+            }
+            if( i >= 255 )
+               *ptr = (char) ++nsymb;
+         }
+         else
+            *ptr = (char) ++nsymb;
          break;
       }
    }
@@ -434,25 +450,24 @@ static ULONG hb_ntxTagKeyNo( LPTAGINFO pTag )
       hb_ntxGetCurrentKey( pTag,pKey );
       seekRes = hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ), pKey, (int)pTag->KeyLength, FALSE, FALSE );
       hb_ntxKeyFree( pKey );
-      if( seekRes )
+      if( !seekRes )
       {
-         return 0;
-      }
-      ulKeyNo = 1;
-      for( i=0;i<=pTag->stackLevel;i++ )
-      {
-         pPage = hb_ntxPageLoad( pTag,pTag->stack[i].page );
-         ulKeyNo += pTag->stack[i].ikey;
-         if( pTag->stackLevel )
-            pTag->stack[i].ikey --;
-         for( j=0;j<=pTag->stack[i].ikey;j++ )
+         ulKeyNo = 1;
+         for( i=0;i<=pTag->stackLevel;i++ )
          {
-            p = KEYITEM( pPage, j );
-            if( p->page )
-               hb__ntxTagKeyCount( pTag, hb_ntxPageLoad( pTag,p->page ),
-                                       &ulKeyNo );
+            pPage = hb_ntxPageLoad( pTag,pTag->stack[i].page );
+            ulKeyNo += pTag->stack[i].ikey;
+            if( pTag->stackLevel )
+               pTag->stack[i].ikey --;
+            for( j=0;j<=pTag->stack[i].ikey;j++ )
+            {
+               p = KEYITEM( pPage, j );
+               if( p->page )
+                  hb__ntxTagKeyCount( pTag, hb_ntxPageLoad( pTag,p->page ),
+                                          &ulKeyNo );
+            }
+            hb_ntxPageRelease( pTag,pPage );
          }
-         hb_ntxPageRelease( pTag,pPage );
       }
    }
 
@@ -3050,29 +3065,21 @@ static ERRCODE ntxGoBottom( NTXAREAP pArea )
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
    if ( !pArea->lpCurTag || !pArea->lpNtxTag )
-     SUPER_GOBOTTOM( ( AREAP ) pArea );
+      SUPER_GOBOTTOM( ( AREAP ) pArea );
    else
    {
-     LPTAGINFO pTag;
+      LPTAGINFO pTag;
 
-     pTag = pArea->lpCurTag;
-     if( pTag->bottomScope )
-     {
-        ntxSeek( pArea, 1, pTag->bottomScope, 1 );
-        if (! pArea->fEof )
-        {
-           SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
-        }
-     }
-     else
-     {
-        hb_ntxTagKeyGoTo( pTag, BTTM_RECORD, NULL );
-        SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
-     }
-   }
-   {
-      ERRCODE errCode = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-      return errCode;
+      pTag = pArea->lpCurTag;
+      if( pTag->bottomScope )
+      {
+         ntxSeek( pArea, 0, pTag->bottomScope, 1 );
+         if ( pArea->fEof )
+            return SUCCESS;
+      }
+      else
+         hb_ntxTagKeyGoTo( pTag, BTTM_RECORD, NULL );
+      SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
    }
    return SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
 }
@@ -3194,7 +3201,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         LONG lRecnoLast;
 
         pArea->fEof = pArea->fBof = FALSE;
-        hb_IncString( pKey2->key,keylen );
+        hb_IncString( pArea, pKey2->key, keylen );
         lRecnoLast = hb_ntxTagKeyFind( pTag, pKey2, keylen, &result );
         if( lRecnoLast > 0 )
         {
@@ -3235,12 +3242,18 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
            if ( lRecno > 0 && !result && bSoftSeek && !pTag->TagEOF )
            {
               retvalue = SELF_GOTO( ( AREAP ) pArea, lRecno );
+              if( pTag->bottomScope )
+              {
+                 hb_ntxGetCurrentKey( pTag, pTag->CurKeyInfo );
+                 if( !hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
+                 {
+                    pArea->fEof = pTag->TagEOF = TRUE;
+                 }
+              }
            }
         }
      }
-     if( retvalue == 0xFFFF ||
-         !hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) ||
-         !hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
+     if ( retvalue == 0xFFFF )
      {
         retvalue = hb_ntxGoEof( pArea );
      }
@@ -3289,7 +3302,10 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
           }
           pArea->ulRecNo = ulRecNo;
           if ( !pTag->TagEOF )
-            SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+          {
+            if( pTag->CurKeyInfo->Tag )
+               SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+          }
           else
           {
             hb_ntxGoEof( pArea );
@@ -3323,7 +3339,8 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
        pArea->ulRecNo = ulRecNo;
        if ( !pTag->TagBOF )
        {
-         SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+         if( pTag->CurKeyInfo->Tag )
+            SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
        }
        else
        {
@@ -4387,11 +4404,13 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
    USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   * uiCount = RDDFUNCSCOUNT;
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
    if( pTable )
    {
       SHORT iRet;
+
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
       iRet = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFDBT" );
       if ( iRet == FAILURE )
          iRet = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFFPT" );

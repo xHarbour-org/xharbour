@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.65 2003/09/08 19:18:45 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.66 2003/09/10 01:03:58 druzus Exp $
  */
 
 /*
@@ -5918,7 +5918,6 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
    USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   * uiCount = RDDFUNCSCOUNT;
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
 
    HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
@@ -5932,6 +5931,10 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
    {
       SHORT iRet;
 
+      if ( uiCount )
+      {
+         * uiCount = RDDFUNCSCOUNT;
+      }
       iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
       if ( iRet == FAILURE )
          iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.39 2003/09/10 00:29:53 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.40 2003/09/10 21:35:46 druzus Exp $
  */
 
 /*
@@ -763,10 +763,12 @@ static ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
    }
 
    /* Update Bof and Eof flags */
+   /*
    if( lToSkip < 0 )
       pArea->fEof = FALSE;
    else if( lToSkip > 0 )
       pArea->fBof = FALSE;
+   */
    return uiError;
 }
 

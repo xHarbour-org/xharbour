@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.1 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.2 2003/09/09 09:47:16 paultucker Exp $
  */
 
 /*
@@ -229,13 +229,16 @@ HB_FUNC( DBFDBT_GETFUNCTABLE )
    USHORT * uiCount;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   * uiCount = RDDFUNCSCOUNT;
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
 
    HB_TRACE(HB_TR_DEBUG, ("DBFDBT_GETFUNCTABLE(%i, %p)", uiCount, pTable));
 
    if( pTable )
+   {
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
       hb_retni( hb_rddInherit( pTable, &dbtTable, &dbtSuper, ( BYTE * ) "DBF" ) );
+   }
    else
       hb_retni( FAILURE );
 }
