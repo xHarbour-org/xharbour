@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3086 2004/06/18 01:21:53 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3087 2004/06/18 01:58:31 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-06-18 15:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/mysql/mysql.c
+    - rename filelength() to getfilelength()
+    - change HB_FUNC(DATATOSQL) & FILETOSQLBINARY() iSize to use ULONG to avoid casting
 
 2004-06-17 22:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/tbrowse.prg
@@ -30,9 +34,9 @@
   * include/hbclass.ch
     ! Add syntax for Visual Objects compatibility.
     Note: See line 351, 373 and 378 for changes.
-    
+
   * utils/hbmake/hbmake.prg
-    ! Fixed to not ask by the main prg if only one prg is selected. 
+    ! Fixed to not ask by the main prg if only one prg is selected.
 
 2004-06-17 15:10 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/gtapi.c

@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.9 2004/03/18 03:53:14 ronpinkas Exp $
+ * $Id: mysql.c,v 1.10 2004/06/17 22:10:17 peterrees Exp $
  */
 
 /*
@@ -330,20 +330,18 @@ HB_FUNC(SQLSRVINFO)
    hb_retc((char *) mysql_get_server_info( (MYSQL *)_parnl(1) ) );
 }
 
-//#ifdef __GNUC__
-long filelength( int handle )
+ULONG getfilelength( int handle )
 {
-    long nEnd = hb_fsSeek( handle, 0 , 2 );
-    long nStart = hb_fsSeek( handle , 0 , 0 );
-    return nEnd - nStart;
+    ULONG nEnd = hb_fsSeek( handle, 0 , 2 );
+    ULONG nStart = hb_fsSeek( handle , 0 , 0 );
+    return ( nEnd - nStart ) ;
 }
-//#endif
 
 
 HB_FUNC(DATATOSQL)
 {
    char *FromBuffer ;
-   int iSize, iFromSize ;
+   ULONG iSize, iFromSize ;
    char *ToBuffer;
    BOOL bResult = FALSE ;
    iSize= hb_parclen(1) ;
@@ -378,7 +376,8 @@ HB_FUNC(FILETOSQLBINARY)
 {
    BOOL bResult = FALSE ;
    char *szFile=hb_parcx(1);
-   int fHandle, iSize;
+   int fHandle;
+   ULONG iSize;
    char *ToBuffer;
    char *FromBuffer;
    if ( szFile && hb_parclen(1) )
@@ -386,7 +385,7 @@ HB_FUNC(FILETOSQLBINARY)
      fHandle    = hb_fsOpen(( BYTE *) szFile,2);
      if ( fHandle > 0 )
      {
-       iSize      = filelength( fHandle );
+       iSize      = getfilelength( fHandle );
        if ( iSize > 0 )
        {
          FromBuffer = ( char *) hb_xgrab( iSize );
