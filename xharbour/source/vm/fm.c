@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.21 2003/02/19 20:20:31 jonnymind Exp $
+ * $Id: fm.c,v 1.22 2003/02/20 12:21:11 jonnymind Exp $
  */
 
 /*
@@ -242,7 +242,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
       HB_CRITICAL_UNLOCK( hb_allocMutex );
    #endif
 
-   return pMem
+   return pMem;
  #endif
 }
 
