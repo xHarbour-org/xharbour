@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.38 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: arrayshb.c,v 1.39 2004/02/20 19:05:39 ronpinkas Exp $
  */
 
 /*
@@ -1547,12 +1547,12 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
          {
             HB_ITEM ID;
             PHB_ITEM pStructure;
+            UINT uiNestedSize /*, uiNestedAlign */ ;
 
             ID.type = HB_IT_NIL;
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
-            UINT uiNestedSize /*, uiNestedAlign */ ;
 
             if( ! HB_IS_OBJECT( pStructure ) )
             {

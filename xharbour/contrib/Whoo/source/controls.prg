@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.2 2003/10/19 06:45:43 ronpinkas Exp $
+ * $Id: controls.prg,v 1.3 2004/02/15 23:56:44 ronpinkas Exp $
  */
 
 /*
@@ -575,7 +575,7 @@ CLASS TWinControl FROM TControl
    METHOD WMInitMenuPopup()     VIRTUAL
    METHOD WMKillFocus()         VIRTUAL
    METHOD WMLButtonDown()       VIRTUAL
-   METHOD WMLButtonUp()         VIRTUAL
+   METHOD WMLButtonUp( nwParam, nlParam1, nlParam2 ) INLINE IIF( __ClsMsgAssigned( Self, "Click" ), ::Click( nwParam, nlParam1, nlParam2 ), NIL )//VIRTUAL
    METHOD WMLButtonDblClk()     VIRTUAL
    METHOD WMMButtonDown()       VIRTUAL
    METHOD WMMButtonUp()         VIRTUAL
@@ -942,13 +942,7 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
            nRet := ::WMLButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
 
       CASE nMsg == WM_LBUTTONUP
-           //nRet := ::WMLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
-           //REVIEW!!!
-           IF ValType( ::OnClick ) == "B"
-              nRet := EVAL( ::OnClick, Self )
-           ELSEIF ValType( ::OnClick ) == "N"
-              nRet := HB_Exec( ::OnClick, Self )
-           ENDIF
+           nRet := ::WMLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
 
       CASE nMsg == WM_LBUTTONDBLCLK
            nRet := ::WMLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
@@ -1033,6 +1027,7 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
               ENDIF
            ENDIF
+
       CASE nMsg == WM_TIMER
            nRet := ::WMTimer( nwParam, nlParam )
 
