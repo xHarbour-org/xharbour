@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2939 2004/05/15 19:18:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.2939 2004/05/15 22:35:04 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-16 16:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvm.h
+    + New structure HB_SEQUENCE
+  * source/vm/thread.c
+  * include/thread.h
+    + Added member pSequence to HB_STACK structure.
+  * source/vm/hvm.c
+    % Greatly simplified and optimized <BEGIN SEQUENCE [RECOVEr USING] END> management.
+    ! Fixed support of <FOR EACH>, and <WITH OBJECT> in <BEGIN SEQUENCE> blocks.
+
+  * tests/pp.prg
+    + Added logic to detect and set GTWVT.
 
 2004-05-15 18:35 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * source/rtl/memoedit.prg
@@ -19,7 +32,7 @@
     * Restored correct cursor style in overstrike/insert mode.
 
     * Changed "LineLen" method name to "LLen" to turn more clean and easy
-      codification. Removed INLINE declaration.  
+      codification. Removed INLINE declaration.
 
     * Minor revision in cursor position management after text left scroll,
       especially in insert mode. Better behaviour in insert mode, but still
@@ -27,7 +40,7 @@
 
     ! Fixed word-wrap control in teditor.prg through <nLineLength> parameter
       from memoedit.
-     
+
     ! Fixed bug that was word wrap lines improperly in debugger. Reported by
       Teo Fonrouge.
 
@@ -49,9 +62,9 @@
 
   * xharbour/sourc/rtl/gtwvt/gtwvt.c
     Break the code in smaller logical chunks and distributed them in
-    multiple files. This file now contains core GT functionality and 
+    multiple files. This file now contains core GT functionality and
     rest of functions are distributed in above files.
-  
+
   * xharbour/include/hbgtwvt.h
     Some prototype rotation from static to extern.
 
@@ -62,7 +75,7 @@
     Added above files.
 
   /*
-     The management of GTWVT was becoming more and more complex due to 
+     The management of GTWVT was becoming more and more complex due to
      everything being put in single file. Moreover, as I am about to add
      Wvt*Classes to make WVT OOP instead of function oriented, I felt the
      need to give it a proper code placement.

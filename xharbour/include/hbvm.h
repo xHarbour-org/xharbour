@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.19 2004/04/13 09:44:37 jacekp Exp $
+ * $Id: hbvm.h,v 1.20 2004/04/13 21:06:30 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,16 @@
 #define HB_VM_H_
 
 #include "hbapi.h"
+
+typedef struct _HB_SEQUENCE
+{
+   BOOL bCanRecover;
+   LONG lBase;
+   LONG lRecover;
+   ULONG wEnumCollectionCounter;
+   ULONG wWithObjectCounter;
+   struct _HB_SEQUENCE *pPrev;
+} HB_SEQUENCE, *PHB_SEQUENCE;
 
 HB_EXTERN_BEGIN
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.83 2004/04/04 23:38:00 fsgiudice Exp $
+* $Id: thread.h,v 1.84 2004/05/10 10:38:04 mauriliolongo Exp $
 */
 
 /*
@@ -329,6 +329,7 @@ extern PPVOID hb_dwCurrentStack;
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;
 struct _AREA;
+struct _HB_SEQUENCE;
 
 typedef struct tag_HB_STACK
 {
@@ -392,6 +393,8 @@ typedef struct tag_HB_STACK
    int iExtraElements;
    int iExtraIndex;
 
+   /* BEGIN SEQUENCE [RECOVER] END*/
+   struct _HB_SEQUENCE *pSequence;
 
    /* FS api error system */
    USHORT uiErrorLast;

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.168 2004/05/09 21:13:49 druzus Exp $
+* $Id: thread.c,v 1.169 2004/05/10 10:38:07 mauriliolongo Exp $
 */
 
 /*
@@ -360,6 +360,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->awEnumIndex[ uCount ] = 0;
    }
    tc->wEnumCollectionCounter = 0;
+
+   tc->pSequence = NULL;
 
    /* Dynsym Thread Specific table. */
    tc->uiClosestDynSym = 0;

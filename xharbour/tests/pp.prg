@@ -8763,11 +8763,38 @@ STATIC FUNCTION InitClsResults()
 
 RETURN .T.
 
-#ifndef __XHARBOUR__
+#ifdef __XHARBOUR__
+
 //--------------------------------------------------------------//
 INIT PROCEDURE PPInit
 
-   local FileHandle
+   LOCAL nScreenWidth
+
+   IF Type( "HB_GT_WVT()" ) == "UI"
+      nScreenWidth := &( "Wvt_GetScreenWidth()" )
+
+      DO CASE
+         CASE nScreenWidth >= 1024
+            &( "Wvt_SetFont" )( 'Terminal', 20, 10 )
+         CASE nScreenWidth >= 800
+            &( "Wvt_SetFont" )( 'System', 16, 8, 600, 2 )
+         OTHERWISE
+            &(" Wvt_SetFont" )( 'Terminal', 12, 6 )
+      ENDCASE
+
+      &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
+      //SetMode( 25, 80 )
+   ENDIF
+
+RETURN
+//--------------------------------------------------------------//
+
+#else
+
+//--------------------------------------------------------------//
+INIT PROCEDURE PPInit
+
+   LOCAL FileHandle
 
    FileHandle := FCreate('Trace.Log')
    FClose(FileHandle)
@@ -8850,6 +8877,8 @@ FUNCTION CStr( xExp )
    ENDCASE
 
 RETURN ""
+
+//--------------------------------------------------------------//
 
 #endif
 

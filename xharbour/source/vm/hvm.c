@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.394 2004/05/11 01:22:41 druzus Exp $
+ * $Id: hvm.c,v 1.395 2004/05/12 02:51:58 druzus Exp $
  */
 
 /*
@@ -278,14 +278,8 @@ static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
 static BOOL     s_bDebugShowLines;  /* update source code line on the debugger display */
 static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invoked */
 
-#define  HB_RECOVER_STATE     -1
-#define  HB_RECOVER_BASE      -2
-#define  HB_RECOVER_ADDRESS   -3
-#define  HB_RECOVER_VALUE     -4
-
 /* Stores level of procedures call stack */
 static ULONG    s_ulProcLevel = 0;
-
 
 char *hb_vm_sNull = "";
 
@@ -315,32 +309,28 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
    ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
-   USHORT   hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
+   ULONG    hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
+
+   PHB_SEQUENCE hb_vm_pSequence;
+
    /* Request for some action - stop processing of opcodes
    */
    static USHORT   s_uiActionRequest;
-
-   /* Stores the position on the stack of current SEQUENCE envelope or 0 if no
-   * SEQUENCE is active
-   */
-   static LONG     s_lRecoverBase;
-
 #else
    #define hb_vm_aWithObject  (HB_VM_STACK.aWithObject)
    #define hb_vm_wWithObjectCounter (HB_VM_STACK.wWithObjectCounter)
    #define hb_vm_bWithObject (HB_VM_STACK.bWithObject)
-
-   #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
-   #define s_lRecoverBase     (HB_VM_STACK.lRecoverBase)
 
    #define hb_vm_aEnumCollection (HB_VM_STACK.aEnumCollection)
    #define hb_vm_apEnumVar (HB_VM_STACK.apEnumVar)
    #define hb_vm_awEnumIndex (HB_VM_STACK.awEnumIndex)
    #define hb_vm_wEnumCollectionCounter (HB_VM_STACK.wEnumCollectionCounter)
 
+   #define hb_vm_pSequence (HB_VM_STACK.pSequence)
+   #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
+
    /* static, for now */
    BOOL hb_vm_bQuitRequest = FALSE;
-
 #endif
 
 static int s_iBaseLine;
@@ -442,9 +432,10 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_bDebugging = FALSE;
    s_bDebugShowLines = FALSE;
    s_bDebuggerIsWorking = FALSE;
+
    #ifndef HB_THREAD_SUPPORT
-   s_lRecoverBase = 0;
-   s_uiActionRequest = 0;
+      hb_vm_pSequence = NULL;
+      s_uiActionRequest = 0;
    #endif
 
 #ifndef HB_THREAD_SUPPORT
@@ -866,8 +857,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
    LONG lOffset;
-   USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
-   USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
+   ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
+   ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
 
    #ifndef HB_THREAD_SUPPORT
       ULONG ulBGMaxExecutions;
@@ -1972,6 +1963,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SEQBEGIN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQBEGIN") );
+
+         {
+            PHB_SEQUENCE pSequence = hb_xgrab( sizeof( HB_SEQUENCE ) );
+
             /*
              * Create the SEQUENCE envelope
              * [ break return value      ]  -4
@@ -1980,295 +1975,373 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * [ current recovery state  ]  -1
              * [                         ] <- new recover base
              */
+
             /*
              * 1) clear the storage for value returned by BREAK statement
              */
             ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
             hb_stackPush();
+
             /*
              * 2) store the address of RECOVER or END opcode
              */
             ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
 
             lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-            if( lOffset > 8388607L )
-               lOffset = ( lOffset - 16777216 );
 
-            ( * HB_VM_STACK.pPos )->item.asLong.value = w + lOffset;
-            hb_stackPush();
+            if( lOffset > 8388607L )
+            {
+               lOffset -= 16777216;
+            }
+
+            pSequence->lRecover = w + lOffset;
+
             /*
              * 3) store current RECOVER base
              */
-            ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
-            ( * HB_VM_STACK.pPos )->item.asLong.value = s_lRecoverBase;
-            hb_stackPush();
+            pSequence->lBase = hb_stackTopOffset();
+
             /*
              * 4) store current bCanRecover flag - in a case of nested sequences
              * in the same procedure/function
              */
-            ( * HB_VM_STACK.pPos )->type = HB_IT_LOGICAL;
-            ( * HB_VM_STACK.pPos )->item.asLogical.value = bCanRecover;
-            hb_stackPush();
-            /*
-             * set new recover base
-             */
-            s_lRecoverBase = hb_stackTopOffset();
+            pSequence->bCanRecover = bCanRecover;
+
             /*
              * we are now inside a valid SEQUENCE envelope
              */
             bCanRecover = TRUE;
+
+            pSequence->wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
+            pSequence->wWithObjectCounter     = hb_vm_wWithObjectCounter;
+
+            pSequence->pPrev = hb_vm_pSequence;
+            hb_vm_pSequence = pSequence;
+
             w += 4;
             break;
+         }
 
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQEND") );
+
+         {
+            PHB_SEQUENCE pFree = hb_vm_pSequence;
+
             /*
              * Remove the SEQUENCE envelope
              * This is executed either at the end of sequence or as the
              * response to the break statement if there is no RECOVER clause
              */
+
             /*
-             * 4) Restore previous recovery state
+             * Restore previous recovery state
              */
-            hb_stackDec();
-            bCanRecover = ( * HB_VM_STACK.pPos )->item.asLogical.value;
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-            /*
-             * 3) Restore previous RECOVER base
-             */
-            hb_stackDec();
-            s_lRecoverBase = ( * HB_VM_STACK.pPos )->item.asLong.value;
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-            /*
-             * 2) Remove RECOVER address
-             */
-            hb_stackDec();
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-            /* 1) Discard the value returned by BREAK statement - there
+            bCanRecover = hb_vm_pSequence->bCanRecover;
+
+            /* Discard the value returned by BREAK statement - there
              * was no RECOVER clause or there was no BREAK statement
              */
             hb_stackPop();
+
             /*
-             * skip outside of SEQUENCE structure
+             * skip over RECOVER section, if any.
              */
             lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
+
             if( lOffset > 8388607L )
-               lOffset = ( lOffset - 16777216 );
+            {
+               lOffset -= 16777216;
+            }
+
+            hb_vm_pSequence = hb_vm_pSequence->pPrev;
+            hb_xfree( pFree );
 
             w += lOffset;
             break;
+         }
 
          case HB_P_SEQRECOVER:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQRECOVER") );
+
+         {
+            PHB_SEQUENCE pFree = hb_vm_pSequence;
+
             /*
              * Execute the RECOVER code
              */
+
             /*
-             * 4) Restore previous recovery state
+             * Restore previous recovery state
              */
-            hb_stackDec();
-            bCanRecover = ( * HB_VM_STACK.pPos )->item.asLogical.value;
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
+            bCanRecover = hb_vm_pSequence->bCanRecover;
+
             /*
-             * 3) Restore previous RECOVER base
-             */
-            hb_stackDec();
-            s_lRecoverBase = ( * HB_VM_STACK.pPos )->item.asLong.value;
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-            /*
-             * 2) Remove RECOVER address
-             */
-            hb_stackDec();
-            ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
-            /*
-             * 1) Leave the value returned from BREAK  - it will be popped
+             * Leave the value returned from BREAK  - it will be popped
              * in next executed opcode
              */
+
+            hb_vm_pSequence = hb_vm_pSequence->pPrev;
+            hb_xfree( pFree );
+
             w++;
             break;
+         }
 
          /* Jumps */
 
          case HB_P_JUMPNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPNEAR") );
+
             lOffset = pCode[ w + 1 ];
             if( lOffset > 127 )
+            {
                lOffset -= 256 ;
+            }
+
             w += lOffset;
             break;
 
          case HB_P_JUMP:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMP") );
+
             lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             if( lOffset > SHRT_MAX )
+            {
                lOffset -= 65536;
+            }
+
             w += lOffset;
             break;
 
          case HB_P_JUMPFAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFAR") );
+
             lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
             if( lOffset > 8388607L )
+            {
                lOffset -= 16777216L;
+            }
+
             w += lOffset;
             break;
 
          case HB_P_JUMPFALSENEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSENEAR") );
+
             if( ! hb_vmPopLogical() )
             {
                lOffset = pCode[ w + 1 ];
+
                if( lOffset > 127 )
+               {
                   lOffset -= 256;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 2;
+            }
+
             break;
 
          case HB_P_JUMPFALSE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSE") );
+
             if( ! hb_vmPopLogical() )
             {
                lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+
                if( lOffset > SHRT_MAX )
+               {
                   lOffset -= 65536;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 3;
+            }
+
             break;
 
          case HB_P_JUMPFALSEFAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSEFAR") );
+
             if( ! hb_vmPopLogical() )
             {
                lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
+
                if( lOffset > 8388607L )
+               {
                   lOffset -= 16777216L;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 4;
+            }
+
             break;
 
          case HB_P_JUMPTRUENEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUENEAR") );
+
             if( hb_vmPopLogical() )
             {
                lOffset = pCode[ w + 1 ];
+
                if( lOffset > 127 )
+               {
                   lOffset -= 256;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 2;
+            }
+
             break;
 
          case HB_P_JUMPTRUE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUE") );
+
             if( hb_vmPopLogical() )
             {
                lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+
                if( lOffset > SHRT_MAX )
+               {
                   lOffset -= 65536;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 3;
+            }
+
             break;
 
          case HB_P_JUMPTRUEFAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUEFAR") );
+
             if( hb_vmPopLogical() )
             {
                lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
+
                if( lOffset > 8388607L )
+               {
                   lOffset -= 16777216L;
+               }
 
                w += lOffset;
             }
             else
+            {
                w += 4;
+            }
+
             break;
 
          /* Push */
 
          case HB_P_TRUE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_TRUE") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_LOGICAL;
             ( * HB_VM_STACK.pPos )->item.asLogical.value = TRUE;
             hb_stackPush();
+
             w++;
             break;
 
          case HB_P_FALSE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FALSE") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_LOGICAL;
             ( * HB_VM_STACK.pPos )->item.asLogical.value = FALSE;
             hb_stackPush();
+
             w++;
             break;
 
          case HB_P_ONE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ONE") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
             ( * HB_VM_STACK.pPos )->item.asInteger.value = 1;
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
+
             w++;
             break;
 
          case HB_P_ZERO:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ZERO") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
             ( * HB_VM_STACK.pPos )->item.asInteger.value = 0;
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
+
             w++;
             break;
 
          case HB_P_PUSHNIL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHNIL") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
             hb_stackPush();
+
             w++;
             break;
 
          case HB_P_PUSHBYTE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBYTE") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
             ( * HB_VM_STACK.pPos )->item.asInteger.value = ( char ) pCode[ w + 1 ];
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
+
             w += 2;
             break;
 
          case HB_P_PUSHINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHINT") );
+
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
             ( * HB_VM_STACK.pPos )->item.asInteger.value = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
+
             w += 1 + sizeof( SHORT );
             break;
 
          case HB_P_PUSHLONG:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONG") );
+
             hb_vmPushLongConst( HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
+
             w += 1 + sizeof( LONG );
             break;
 
          case HB_P_PUSHDOUBLE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHDOUBLE") );
+
             hb_vmPushDoubleConst( HB_PCODE_MKDOUBLE( &pCode[ w + 1 ] ),
                                   ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) ],
                                   ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) + sizeof( BYTE ) ] );
+
             w += 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE );
             break;
 
@@ -3444,7 +3517,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             if( bCanRecover )
             {
                 // Reset FOR EACH.
-                while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
+                while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
                 {
                    hb_vm_wEnumCollectionCounter--;
                    hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
@@ -3453,7 +3526,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 }
 
                 // Reset WITH OBJECT.
-                while( hb_vm_wWithObjectCounter > wWithObjectCounter )
+                while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
                 {
                    --hb_vm_wWithObjectCounter;
                    hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
@@ -3463,14 +3536,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 * There is the BEGIN/END sequence deifined in current
                 * procedure/function - use it to continue opcodes execution
                 */
+
                /*
                 * remove all items placed on the stack after BEGIN code
                 */
-               hb_stackRemove( s_lRecoverBase );
-               /*
-                * reload the address of recovery code
-                */
-               w = ( hb_stackItem( s_lRecoverBase + HB_RECOVER_ADDRESS ) )->item.asLong.value;
+               hb_stackRemove( hb_vm_pSequence->lBase );
+               w = hb_vm_pSequence->lRecover;
+
                /*
                 * leave the SEQUENCE envelope on the stack - it will
                 * be popped either in RECOVER or END opcode
@@ -8073,11 +8145,11 @@ void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
 
    //printf( "Recover %i\n", s_lRecoverBase );
 
-   if( s_lRecoverBase )
+   if( hb_vm_pSequence && hb_vm_pSequence->lBase )
    {
       if( pItem )
       {
-         hb_itemCopy( hb_stackItem( s_lRecoverBase + HB_RECOVER_VALUE ), pItem );
+         hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->lBase - 1 ), pItem );
       }
 
       s_uiActionRequest = HB_BREAK_REQUESTED;
