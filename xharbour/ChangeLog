@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1203 2003/06/30 23:06:26 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1204 2003/07/01 01:41:35 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-01 02:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source\lang\msges.c
+  * source\lang\msgeswin.c
+    ! Corrected date format.
+  * source/rtl/dbedit.prg
+    ! Behavior more compatible with Cli**er.
+      Now, the user function is called to report idle state correctly.
+  * source/vm/fastitem.c
+    ! Fix name of function in HB_TRACE_STEALTH().
 
 2003-07-01 03:40 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   + doc/hbi18n.txt
@@ -25,6 +35,9 @@
   * tests/xmltest.xml
     ! added test for escapes.
 
+2003-06-30 19:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include\hbapi.h
+    ! Corrected bug in macro HB_ISOBJECT()
 
 2003-07-01 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
