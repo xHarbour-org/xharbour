@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2004/09/12 15:37:33 lf_sfnet Exp $
+# $Id: Makefile,v 1.3 2004/11/01 04:30:15 druzus Exp $
 #
 
 vpath %.c ../
@@ -10,6 +10,10 @@ C_SOURCES=\
 	hvm.c \
 	fm.c \
 	classes.c \
+
+ifeq ($(HB_MT),MT)
+   MT_LIBNAME=optguimt
+endif
 
 LIBNAME=optgui
 
