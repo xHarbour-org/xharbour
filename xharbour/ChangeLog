@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-12-15 21:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2002-12-15 21:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * config/c.cf
     config/rules.cf
     * Added rules to compile .cpp files
