@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.30 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: classes.c,v 1.31 2003/02/19 10:51:14 jonnymind Exp $
  */
 
 /*
@@ -893,7 +893,9 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
          {
             pMethod = pClass->pMethods + uiAt;
             pFunction = pMethod->pFunction;
-            /*hb_clsScope( pObject, pMethod );*/  /* debug */
+
+            hb_clsScope( pObject, pMethod );
+
             (HB_VM_STACK.pMethod) = pMethod ;
 
             if( hb_bProfiler )
@@ -1341,7 +1343,7 @@ HB_FUNC( __CLSNEW )
    USHORT nLenInlines = 0;
    USHORT nLenDatas = 0;
    USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
-   
+
    HB_THREAD_STUB
 
    HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_itemParam(4) ) ) );
@@ -2431,7 +2433,7 @@ static HARBOUR hb___msgClsSel( void )
    USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
    PHB_ITEM pReturn = hb_itemNew( NULL );
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
-   
+
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {
       PHB_ITEM pItemRef = hb_itemUnRef( pSelf ); // Is it possible?
