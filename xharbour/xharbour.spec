@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.17 2003/07/23 22:09:30 druzus Exp $
+# $Id: xharbour.spec,v 1.18 2003/07/31 18:56:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -308,9 +308,9 @@ HB_STATIC="no"
 HB_MT=""
 HB_GT="%{hb_gt}"
 
-
 HB_GT_REQ=""
 HB_FM_REQ=""
+HB_MAIN_FUNC=""
 _TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
 
 ## parse params
@@ -334,6 +334,7 @@ while [ \$n -lt \${#P[@]} ]; do
 	-gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
 	-fmstat)     HB_FM_REQ="STAT" ;;
 	-nofmstat)   HB_FM_REQ="NOSTAT" ;;
+	-main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
 	-*)          p="\${v}" ;;
 	*)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -355,6 +356,7 @@ fi
 
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
 HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
 
 # set environment variables
 %{hb_cc}
@@ -405,7 +407,10 @@ hb_cc()
 
 hb_link()
 {
-    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
+    if [ -z "\${HB_MAIN_FUNC}" ] && [ -f "\${FOUTO}" ]; then
+	HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
+    fi
+    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
 	hb_lnk_request > \${_TMP_FILE_} && \\
 	gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
@@ -441,13 +446,24 @@ hb_lnk_request()
 	echo "}"
     fi
     gt="\${HB_GT_REQ%% *}"
-    if [ -n "\$gt" ]; then
+    if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
 	echo "#include \\"hbinit.h\\""
 	echo "extern char * s_defaultGT;"
+	echo "extern char * s_pszLinkedMain;"
 	echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
-	echo "   s_defaultGT = \\"\$gt\\";"
+	if [ -n "\$gt" ]; then
+	    echo "   s_defaultGT = \\"\$gt\\";"
+	fi
+	if [ -n "\${HB_MAIN_FUNC}" ]; then
+	    echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"
+	fi
 	echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
     fi
+}
+
+hb_lnk_main()
+{
+    (nm \$1 -g -n --defined-only|sed -e 's/^[0-9a-fA-F]* T HB_FUN_//'|head -1)2>/dev/null
 }
 
 hb_cleanup()
@@ -528,11 +544,11 @@ fi
 # Create a README file for people using this RPM.
 cat > doc/%{readme} <<EOF
 This RPM distribution of %{dname} includes extra commands to make compiling
-and linking with harbour a little easier. There are a compiler and linker
-wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk"
+and linking with harbour a little easier. There are compiler and linker
+wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk".
 
-"%{hb_pref}cc" is a wrapper to harbour compiler only. It only sets environment
-variables. The result of its work is an C file.
+"%{hb_pref}cc" is a wrapper to the harbour compiler only. It only sets environment
+variables. The result of its work is a C file.
 
 Use "%{hb_pref}cmp" exactly as you would use the harbour compiler itself.
 The main difference with %{hb_pref}cmp is that it results in an object file,
@@ -541,28 +557,29 @@ ensures that the harbour include directory is seen by the harbour compiler.
 
 "%{hb_pref}lnk" simply takes a list of object files and links them together
 with the harbour virtual machine and run-time library to produce an
-executable. The executable will be given basename of the first object
-file if not directly set by "-o" command line switch
+executable. The executable will be given the basename of the first object
+file if not directly set by the "-o" command line switch.
 
-"%{hb_pref}mk" try to produce executable from your .prg file. It's a simple
-equivalent of cl.bat from CA-Clipper distribution.
+"%{hb_pref}mk" tries to produce an executable from your .prg file. It's a simple
+equivalent of cl.bat from the CA-Clipper distribution.
 
-all this scripts accept command line switches:
+All these scripts accept command line switches:
 -o<outputfilename>      # output file name
 -static                 # link with static %{dname} libs
 -fullstatic             # link with all static libs
 -shared                 # link with shared libs (default)
 -mt                     # link with multi-thread libs
 -gt<hbgt>               # link with <hbgt> GT driver, can be repeated to
-                        # link with more GTs. The first one will be default
-                        # on runtime
--fmstat                 # link with memory statistic lib
--nofmstat               # do not link with memory statistic lib
+                        # link with more GTs. The first one will be
+                        #      the default at runtime
+-fmstat                 # link with the memory statistics lib
+-nofmstat               # do not link with the memory statistics lib (default)
+-main=<main_func>	# set the name of main program function/procedure
 
-link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and has no effect
-in "%{hb_pref}cc" and "%{hb_pref}cmp"
-To save compatibility with older rpm distribution "gharbour" can be used
-as synonym of "%{hb_pref}cmp" and "harbor-link" as synonym of "%{hb_pref}lnk"
+Link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and have no effect
+in "%{hb_pref}cc" and "%{hb_pref}cmp".
+To save compatibility with older rpm distributions, "gharbour" can be used
+as a synonym of "%{hb_pref}cmp", and "harbour-link" as synonym of "%{hb_pref}lnk"
 
 An example compile/link session looks like:
 ----------------------------------------------------------------------

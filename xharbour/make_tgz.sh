@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.5 2003/07/23 12:35:56 druzus Exp $
+# $Id: make_tgz.sh,v 1.6 2003/07/31 18:56:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -136,9 +136,9 @@ HB_STATIC="no"
 HB_MT=""
 HB_GT="${HB_GT_LIB#gt}"
 
-
 HB_GT_REQ=""
 HB_FM_REQ=""
+HB_MAIN_FUNC=""
 _TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
 
 ## parse params
@@ -162,6 +162,7 @@ while [ \$n -lt \${#P[@]} ]; do
 	-gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
 	-fmstat)     HB_FM_REQ="STAT" ;;
 	-nofmstat)   HB_FM_REQ="NOSTAT" ;;
+	-main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
 	-*)          p="\${v}" ;;
 	*)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -183,6 +184,7 @@ fi
 
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
 HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
 
 # set environment variables
 export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
@@ -233,7 +235,10 @@ hb_cc()
 
 hb_link()
 {
-    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
+    if [ -z "\${HB_MAIN_FUNC}" ] && [ -f "\${FOUTO}" ]; then
+	HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
+    fi
+    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
 	hb_lnk_request > \${_TMP_FILE_} && \\
 	gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
@@ -269,13 +274,24 @@ hb_lnk_request()
 	echo "}"
     fi
     gt="\${HB_GT_REQ%% *}"
-    if [ -n "\$gt" ]; then
+    if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
 	echo "#include \\"hbinit.h\\""
 	echo "extern char * s_defaultGT;"
+	echo "extern char * s_pszLinkedMain;"
 	echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
-	echo "   s_defaultGT = \\"\$gt\\";"
+	if [ -n "\$gt" ]; then
+	    echo "   s_defaultGT = \\"\$gt\\";"
+	fi
+	if [ -n "\${HB_MAIN_FUNC}" ]; then
+	    echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"
+	fi
 	echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
     fi
+}
+
+hb_lnk_main()
+{
+    (nm \$1 -g -n --defined-only|sed -e 's/^[0-9a-fA-F]* T HB_FUN_//'|head -1)2>/dev/null
 }
 
 hb_cleanup()

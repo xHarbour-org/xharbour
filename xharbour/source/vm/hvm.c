@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.242 2003/07/22 01:54:29 ronpinkas Exp $
+ * $Id: hvm.c,v 1.243 2003/07/22 16:47:22 ronpinkas Exp $
  */
 
 /*
@@ -227,6 +227,10 @@ extern void hb_clsSetModule( USHORT uiClass );
    ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
 
    extern void hb_mthAddTime( PMETHOD, ULONG ); /* profiler from classes.c */
+#endif
+
+#ifdef HARBOUR_START_PROCEDURE
+   char *s_pszLinkedMain = NULL; /* name of starup function set by linker */
 #endif
 
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
@@ -486,7 +490,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 #ifdef HARBOUR_START_PROCEDURE
       else
       {
-         pDynSym = hb_dynsymFind( HARBOUR_START_PROCEDURE );
+         if( s_pszLinkedMain )
+            pDynSym = hb_dynsymFind( s_pszLinkedMain );
+
+         if( ! ( pDynSym && pDynSym->pSymbol->pFunPtr ) )
+            pDynSym = hb_dynsymFind( HARBOUR_START_PROCEDURE );
 
          if( pDynSym && pDynSym->pSymbol->pFunPtr )
             s_pSymStart = pDynSym->pSymbol;
