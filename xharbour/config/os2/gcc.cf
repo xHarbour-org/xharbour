@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.3 2003/09/25 02:24:02 paultucker Exp $
+# $Id: gcc.cf,v 1.4 2003/12/03 13:01:19 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,9 +12,11 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE) 
-#We're on OS/2 (and proud of this ;))
-CFLAGS = -DHB_OS_OS2 -Wall -O2 
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+# 26/03/2004 - <maurilio.longo@libero.it>
+# added -DTCPV40HDRS to compile with GCC 3.2.2 on OS/2 v4.0 with mixed 16/32 bit tcp/ip stack
+# to be removed if compiled on a tcp/ip stack >= 4.1 (eComStation, for example)
+CFLAGS = -DHB_OS_OS2 -Wall -O2 -DTCPV40HDRS
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
@@ -37,7 +39,7 @@ LD = gcc
 LD_OUT = -o $(SPACE)
 
 #ifeq ($(HB_MT),MT)
-#LDFLAGS += -Zmt 
+#LDFLAGS += -Zmt
 #else
 #LDFLAGS =
 #endif
@@ -95,7 +97,8 @@ endif
 endif
 
 #LINKLIBS += -Wl,-)
-LDFLAGS += $(LINKPATHS)
+# statical linking with GCC 3.2.2 libc as not require its presence on user system
+LDFLAGS += $(LINKPATHS) -static -s
 
 ifeq ($(C_MAIN),)
 ifeq ($(HB_GT_LIB),os2pm)

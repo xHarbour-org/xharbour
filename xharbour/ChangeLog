@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2868 2004/05/03 23:55:29 peterrees Exp $
+ * $Id: ChangeLog,v 1.2869 2004/05/04 03:22:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-04 17:55 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * config/os2/gcc.cf
+    * switched to gcc version 3.2.2 (Innotek Build 2004-02-23 14:15), so I had to add -DTCPV40HDRS to
+      compile using 16/32 bit tcp stack as available on OS/2 v4.x
+    + addes -static -s to LD flags to build .exe files which don't require Innotek LIBC .dll, since
+      this is a compiler suite (xHarbour, I mean) I create .exe files which run as they are without any other
+      prerequisite. (This makes it possible to use a GCC compiled harbour.exe to emit C code which gets compiled
+      by a different C compiler, let's say watcom for OS/2)
+  * config/os2/global.cf
+    + addef an ifndef MF on top of it to stop clean rule redefinition, without this clean was executed 4
+      times for each make clean invocation
 
 2004-05-03 20:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
