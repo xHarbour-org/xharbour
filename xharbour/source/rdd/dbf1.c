@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.58 2004/02/09 18:00:36 druzus Exp $
+ * $Id: dbf1.c,v 1.59 2004/02/12 19:25:32 andijahja Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
 { "DBF_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBF_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( dbf1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbf1__InitSymbols
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
@@ -98,8 +98,6 @@ HB_INIT_SYMBOLS_END( dbf1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_dbf1__InitSymbols = dbf1__InitSymbols;
    #pragma data_seg()
-#elif ! defined(__GNUC__)
-   #pragma startup dbf1__InitSymbols
 #endif
 
 static RDDFUNCS dbfSuper;

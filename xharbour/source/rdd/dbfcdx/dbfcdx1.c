@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.99 2004/02/03 19:02:29 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.100 2004/02/14 22:57:15 druzus Exp $
  */
 
 /*
@@ -311,7 +311,7 @@ HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFCDX_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbfcdx1__InitSymbols
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
@@ -322,8 +322,6 @@ HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_dbfcdx1__InitSymbols = dbfcdx1__InitSymbols;
    #pragma data_seg()
-#elif ! defined(__GNUC__)
-   #pragma startup dbfcdx1__InitSymbols
 #endif
 
 #ifdef HB_CDX_DSPDBG_INFO

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.70 2004/02/14 01:29:41 andijahja Exp $
+ * $Id: dbfntx1.c,v 1.71 2004/02/17 18:16:55 druzus Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
 { "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFNTX_GETFUNCTABLE) , 0 }
 HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbfntx1__InitSymbols
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
@@ -163,8 +163,6 @@ HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_dbfntx1__InitSymbols = dbfntx1__InitSymbols;
    #pragma data_seg()
-#elif ! defined(__GNUC__)
-   #pragma startup dbfntx1__InitSymbols
 #endif
 
 static RDDFUNCS ntxSuper;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.8 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbinit.h,v 1.9 2004/02/03 00:43:25 ronpinkas Exp $
  */
 
 /*
@@ -211,6 +211,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define _HB_CALL_ON_STARTUP_END( func ) return 1; } \
       static int static_int_##func = func();
 
+#endif
+
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+   #define HB_PRAGMA_STARTUP
 #endif
 
 HB_EXTERN_END

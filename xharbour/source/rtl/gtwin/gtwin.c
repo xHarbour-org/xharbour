@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.45 2004/02/14 01:45:11 andijahja Exp $
+ * $Id: gtwin.c,v 1.46 2004/02/16 12:28:45 andijahja Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
     case SC_NORMAL:
     default:
         cci.bVisible = TRUE;
-        cci.dwSize = 12;  /* this was 12, but when used in full screen dos window
+        cci.dwSize = 25;  /* this was 12, but when used in full screen dos window
                              cursor state is erratic  - doesn't turn off, etc.
 			     09-10-2002 druzus: I hope now it's OK.
 			     09-14-2003 ptucker:Not really....
@@ -2055,25 +2055,28 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 
 /* ********************************************************************** */
-
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) && (! defined(__BORLANDC__)) )
-   #pragma startup HB_GT_FUNC(_gt_Init_)
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_Init_
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
+   #pragma data_seg()
 #endif
 
-#if defined(__BORLANDC__)
-   HB_CALL_ON_STARTUP_BEGIN( startup_function__gtwin )
-      hb_gtRegister( &gtInit );
-   HB_CALL_ON_STARTUP_END( startup_function__gtwin )
-   #pragma startup startup_function__gtwin
-#endif
 #endif  /* HB_MULTI_GT */
 
 /* *********************************************************************** */

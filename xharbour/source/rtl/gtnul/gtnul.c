@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.19 2004/02/07 11:41:01 druzus Exp $
+ * $Id: gtnul.c,v 1.20 2004/02/07 21:20:36 andijahja Exp $
  */
 
 /*
@@ -145,6 +145,7 @@ BOOL HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit )
    int iPos;
 
    if( gtInit )
+   {
       if ( hb_gtFindPos( gtInit->id ) == -1 )
          for( iPos = 0; iPos < HB_GT_MAX_; iPos++ )
             if( !s_gtInit[ iPos ] )
@@ -152,6 +153,7 @@ BOOL HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit )
                s_gtInit[ iPos ] = gtInit;
                return TRUE;
             }
+   }
 
    return FALSE;
 }
@@ -1132,18 +1134,21 @@ static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) && (! defined(__BORLANDC__)) )
-   #pragma startup HB_GT_FUNC(_gt_Init_)
-#endif
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
-#if defined(__BORLANDC__)
-   HB_CALL_ON_STARTUP_BEGIN( startup_function__gtnul )
-      hb_gtRegister( &gtInit );
-   HB_CALL_ON_STARTUP_END( startup_function__gtnul )
-   #pragma startup startup_function__gtnul
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_Init_
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
+   #pragma data_seg()
 #endif
 
 #endif  /* HB_MULTI_GT */
