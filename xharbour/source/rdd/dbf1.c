@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.73 2004/03/30 05:55:36 druzus Exp $
+ * $Id: dbf1.c,v 1.74 2004/03/30 16:43:37 druzus Exp $
  */
 
 /*
@@ -1520,6 +1520,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pError = hb_errNew();
             hb_errPutGenCode( pError, EG_CREATE );
             hb_errPutSubCode( pError, EDBF_CREATE_DBF );
+            hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
             hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
             hb_errPutFlags( pError, EF_CANRETRY );
