@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.30 2002/10/13 18:06:28 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.31 2002/10/17 00:48:07 ronpinkas Exp $
  */
 
 /*
@@ -1353,13 +1353,233 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                pSelf->value.asFunCall.pParms = HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_REDUCE );
             }
 
+      /* TODO:
+               LEN() (also done by Clipper)
+               ASC() (not done by Clipper)
+               EMPTY() (not done by Clipper)
+               SPACE()
+               REPLICATE()
+       */
+
          #ifndef HB_C52_STRICT
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
-               {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+               HB_EXPR_PTR pName = pSelf->value.asFunCall.pFunName;
+               HB_EXPR_PTR pParms = pSelf->value.asFunCall.pParms;
+               HB_EXPR_PTR pReduced;
+               USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
+               if( usCount == 1 && pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
+                  --usCount;
+               }
+
+               #ifndef HB_MACRO_SUPPORT
+                  hb_compFunCallCheck( pName->value.asSymbol, usCount );
+               #endif
+
+               if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && usCount == 2 )
+               {
+                  HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
+                  HB_EXPR_PTR pText = pSub->pNext, HB_EA_REDUCE;
+
+                  if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
+                  {
+                     if( pSub->value.asString.string[0] == '\0' )
+                     {
+                        pReduced = hb_compExprNewLong( 1 );
+                     }
+                     else
+                     {
+                        pReduced = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
+                     }
+
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     pSelf = pReduced;
+                  }
+               }
+               else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && usCount == 1 )
+               {
+                  HB_EXPR_PTR pText = pParms->value.asList.pExprList;
+
+                  if( pText->ExprType == HB_ET_STRING )
+                  {
+                     ULONG i;
+
+                     for ( i = 0; i < pText->ulLength; i++ )
+                     {
+                        pText->value.asString.string[i] = toupper( pText->value.asString.string[i] );
+                     }
+
+                     pParms->value.asList.pExprList = NULL;
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+
+                     pSelf = pText;
+                  }
+               }
+               else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && usCount )
+               {
+                  /* try to change it into a string */
+                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+
+                  if( pArg->ExprType == HB_ET_NUMERIC )
+                  {
+                     /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
+                              CHR() cases where the passed parameter is a constant which
+                              can be divided by 256 but it's not zero, in this case it
+                              will return an empty string instead of a Chr(0). [vszakats] */
+
+                     pReduced = hb_compExprNew( HB_ET_STRING );
+                     pReduced->ValType = HB_EV_STRING;
+
+                     if( pArg->value.asNum.NumType == HB_ET_LONG )
+                     {
+                        if( ( pArg->value.asNum.lVal % 256 ) == 0 && pArg->value.asNum.lVal != 0 )
+                        {
+                           pReduced->value.asString.string = ( char * ) HB_XGRAB( 1 );
+                           pReduced->value.asString.string[ 0 ] = '\0';
+                           pReduced->value.asString.dealloc = TRUE;
+                           pReduced->ulLength = 0;
+                        }
+                        else
+                        {
+                           pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
+                           pReduced->value.asString.string[ 0 ] = ( pArg->value.asNum.lVal % 256 );
+                           pReduced->value.asString.string[ 1 ] = '\0';
+                           pReduced->value.asString.dealloc = TRUE;
+                           pReduced->ulLength = 1;
+                        }
+                     }
+                     else
+                     {
+                        pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
+                        pReduced->value.asString.string[ 0 ] = ( ( long ) pArg->value.asNum.dVal % 256 );
+                        pReduced->value.asString.string[ 1 ] = '\0';
+                        pReduced->value.asString.dealloc = TRUE;
+                        pReduced->ulLength = 1;
+                     }
+
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+
+                     pSelf = pReduced;
+                  }
+               }
+               else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && usCount )
+               {
+                  HB_EXPR_PTR pBlock = pParms->value.asList.pExprList;
+                  HB_EXPR_PTR pArgs = pBlock->pNext;
+
+                  pBlock->pNext = NULL;
+
+                  pReduced = hb_compExprNew( HB_ET_SEND );
+                  pReduced->value.asMessage.szMessage = hb_strdup( pName->value.asSymbol );
+                  pReduced->value.asMessage.pObject   = pBlock;
+                  pReduced->value.asMessage.pParms    = pParms;
+                  pReduced->value.asMessage.pParms->value.asList.pExprList = pArgs;
+
+                  /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
+                  //pReduced = hb_compExprNewMethodCall( hb_compExprNewSend( pBlock, pName->value.asSymbol ), pArgs );
+
+                  /* Not using:
+                        HB_EXPR_PCODE1( hb_compExprDelete, pName );
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     because we adopt their content - release container only!
+                  */
+
+                  pSelf->value.asFunCall.pParms = NULL;
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+
+                  pSelf = pReduced;
+               }
+               else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
+                   (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && usCount >= 10) )
+               {
+                  HB_EXPR_PTR pArray = pParms->value.asList.pExprList->pNext;
+
+                  if( pArray->ExprType == HB_ET_ARRAY )
+                  {
+                     HB_EXPR_PTR pElem = pArray->value.asList.pExprList;
+                     HB_EXPR_PTR pPrev = NULL, pNext;
+
+                     while( pElem )
+                     {
+                        /* The {|| &cMacro } block is now &( "{||" + cMacro + "}" ) due to early macro expansion in compiler. */
+                        if( pElem->ExprType == HB_ET_MACRO )
+                        {
+                           HB_EXPR_PTR pMacro = pElem->value.asMacro.pExprList;
+
+                           if( pMacro &&
+                               pMacro->ExprType == HB_EO_PLUS &&
+                               pMacro->value.asOperator.pLeft->ExprType == HB_EO_PLUS &&
+                               pMacro->value.asOperator.pLeft->value.asOperator.pRight->ExprType == HB_ET_VARIABLE
+                             )
+                           {
+                              /* Saving the next array element so the list can be relinked after we substitute the macro block. */
+                              pNext = pElem->pNext;
+
+                              /* Instead we only want the macro variable, {|| &cMacro } -> &( "{||" + cMacro + "}" ) -> cMacro */
+                              hb_compExprClear( pElem );
+                              pElem = pMacro->value.asOperator.pLeft->value.asOperator.pRight;
+                              if( pPrev )
+                              {
+                                 /* Previous element should point to the new element. */
+                                 pPrev->pNext = pElem;
+                              }
+                              else
+                              {
+                                 /* Top of array should point to the new first element. */
+                                 pArray->value.asList.pExprList = pElem;
+                              }
+                              pElem->pNext = pNext;
+                           }
+                        }
+                        /* Search for {|| &(cMacro) }. */
+                        else if( pElem->ExprType == HB_ET_CODEBLOCK )
+                        {
+                           HB_EXPR_PTR pBlock = pElem->value.asList.pExprList;
+
+                           /* Search for macros {|| &cMacro }. */
+                           if( pBlock->ExprType == HB_ET_MACRO )
+                           {
+                              /* Saving the next array element so the list can be relinked after we substitute the macro block. */
+                              pNext = pElem->pNext;
+
+                              /* Instead we only want the core expression. */
+                              hb_compExprClear( pElem );
+                              if( pBlock->value.asMacro.pExprList ) /* &( exp ) -> exp */
+                              {
+                                 pElem = pBlock->value.asMacro.pExprList;
+                              }
+                              else if( pBlock->value.asMacro.cMacroOp ) /* simple macro in Flex build {|| &cMacro}, because harbour.y does not support early macros yet*/
+                              {
+                                 pElem = hb_compExprNewVar( pBlock->value.asMacro.szMacro );
+                              }
+                              else /* {|| &cMacro.suffix } -> cMacro + "suffix" */
+                              {
+                                 pElem = hb_compExprNewString( pBlock->value.asMacro.szMacro );
+                              }
+
+                              if( pPrev )
+                              {
+                                 /* Previous element should point to the new element. */
+                                 pPrev->pNext = pElem;
+                              }
+                              else
+                              {
+                                 /* Top of array should point to the new first element. */
+                                 pArray->value.asList.pExprList = pElem;
+                              }
+                              pElem->pNext = pNext;
+                           }
+                        }
+
+                        pPrev = pElem;
+                        pElem = pElem->pNext;
+                     }
+                  }
+               }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
+               {
                   if( usCount > 1 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;

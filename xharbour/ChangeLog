@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.447 2002/10/16 05:42:09 andijahja Exp $
+ * $Id: ChangeLog,v 1.448 2002/10/17 00:48:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-16 21:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+    ! Fixed long standing TODO: Move Function optimizations from hb_compExprNewFunCall() to hb_compExprUseFunCall()
+      /* This fixed few GPFs resulting from recent optimizations. */
 
 2002-10-16 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c
