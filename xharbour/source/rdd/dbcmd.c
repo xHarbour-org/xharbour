@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.124 2004/08/02 12:37:13 druzus Exp $
+ * $Id: dbcmd.c,v 1.125 2004/08/19 00:51:46 druzus Exp $
  */
 
 /*
@@ -3357,7 +3357,7 @@ HB_FUNC( ORDCOUNT )
    {
       pOrderInfo.itmOrder = NULL;
       pOrderInfo.atomBagName = hb_param( 1, HB_IT_STRING );
-      pOrderInfo.itmResult = hb_itemPutNI( NULL, FALSE );
+      pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
       SELF_ORDINFO( pArea, DBOI_ORDERCOUNT, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
       hb_itemRelease( pOrderInfo.itmResult );

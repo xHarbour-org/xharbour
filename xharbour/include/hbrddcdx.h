@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.33 2004/07/27 13:19:34 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.34 2004/08/09 23:58:45 druzus Exp $
  */
 
 /*
@@ -69,9 +69,12 @@ HB_EXTERN_BEGIN
 #define CDX_MAXKEY                                  240
 #define CDX_MAXTAGNAMELEN                            10
 #define CDX_PAGELEN                                 512
-#define CDX_INT_FREESPACE                           500
-#define CDX_EXT_FREESPACE                           488
+#define CDX_HEADERLEN                              1024
+#define CDX_HEADERPAGES   ((CDX_HEADERLEN+CDX_PAGELEN-1)/CDX_PAGELEN)
+#define CDX_INT_FREESPACE              (CDX_PAGELEN-12) /* 500 */
+#define CDX_EXT_FREESPACE              (CDX_PAGELEN-24) /* 488 */
 #define CDX_DUMMYNODE                       0xFFFFFFFFL
+
 //#define CDX_LOCKOFFSET                      0x7FFFFFFEL
 //#define CDX_LOCKSIZE                                 1L
 #define CDX_STACKSIZE                                64
@@ -165,7 +168,7 @@ typedef struct _CDXTAGHEADER
    BYTE     forExpLen[ 2 ];   /* length of filter expression */
    BYTE     keyExpPos[ 2 ];   /* offset of key expression */
    BYTE     keyExpLen[ 2 ];   /* length of key expression */
-   BYTE     keyExpPool[ CDX_PAGELEN ];
+   BYTE     keyExpPool[ CDX_HEADERLEN - 512 ];
 } CDXTAGHEADER;
 typedef CDXTAGHEADER * LPCDXTAGHEADER;
 

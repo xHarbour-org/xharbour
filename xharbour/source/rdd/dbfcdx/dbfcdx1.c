@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.152 2004/08/10 20:21:03 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.153 2004/08/19 00:51:47 druzus Exp $
  */
 
 /*
@@ -867,11 +867,11 @@ static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
    do
    {
       j = n;
-      if ( strncmp( &szKeyExpr[ n ], "FIELD", 5 ) )
+      if ( strncmp( &szKeyExpr[ n ], "FIELD", 5 ) == 0 )
          i = 5;
-      else if ( strncmp( &szKeyExpr[ n ], "_FIELD", 6 ) )
+      else if ( strncmp( &szKeyExpr[ n ], "_FIELD", 6 ) == 0 )
          i = 6;
-      else if ( l > 0 && strncmp( &szKeyExpr[ n ], szAlias, l ) )
+      else if ( l > 0 && strncmp( &szKeyExpr[ n ], szAlias, l ) == 0 )
          i = l;
       else
          i = 0;
@@ -1079,7 +1079,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
    }
    else
    {
-      int iCnt = (bHeader ? 2 : 1 );
+      int iCnt = ( bHeader ? CDX_HEADERPAGES : 1 );
 
       if ( pIndex->nextAvail != CDX_DUMMYNODE )
          ulPos = pIndex->nextAvail;
@@ -1112,7 +1112,7 @@ static void hb_cdxIndexPutAvailPage( LPCDXINDEX pIndex, ULONG ulPos, BOOL bHeade
 {
    if ( ulPos != 0 && ulPos != CDX_DUMMYNODE )
    {
-      int iCnt = (bHeader ? 2 : 1 );
+      int iCnt = ( bHeader ? CDX_HEADERPAGES : 1 );
       LPCDXLIST pLst;
 
       if ( pIndex->fReadonly )
