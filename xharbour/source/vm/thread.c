@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.175 2004/06/04 13:29:28 mauriliolongo Exp $
+* $Id: thread.c,v 1.176 2004/08/27 03:06:44 walito Exp $
 */
 
 /*
@@ -751,6 +751,7 @@ void hb_threadIsLocalRef( void )
             hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }
       }
+      
       // stack memvars:
       hb_memvarsIsMemvarRef( pStack );
 
@@ -2333,7 +2334,7 @@ HB_FUNC( HB_MUTEXTRYLOCK )
       {
          Mutex->locker = HB_CURRENT_THREAD();
          Mutex->lock_count = 1;
-         hb_retl( FALSE );
+         hb_retl( TRUE );
       }
       HB_CRITICAL_UNLOCK( Mutex->mutex );
    }
