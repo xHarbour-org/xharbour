@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.64 2005/02/23 22:33:47 andijahja Exp $
+ * $Id: hbdefs.h,v 1.65 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -388,18 +388,21 @@
 #define HB_LIM_INT32(l)       ( INT32_MIN <= (l) && (l) <= INT32_MAX )
 #define HB_LIM_INT64(l)       ( INT64_MIN <= (l) && (l) <= INT64_MAX )
 
-#if defined(__DMC__)
-#if HB_LONG_MAX > 10000000000LL
-#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000LL ) ) ? 20 : 10 )
+/*
+ * It's a hack for MSC which doesn't support LL suffix for LONGLONG
+ * numeric constant. This suffix is necessary for some compilers -
+ * without it they cut the number to LONG
+ */
+#if ( defined( _MSC_VER ) || defined( __BORLANDC__ ) ) && !defined(__DMC__)
+#  define HB_LL( num )           num
 #else
-#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
+#  define HB_LL( num )           num##LL
 #endif
-#else
-#if HB_LONG_MAX > 10000000000
+
+#if HB_LONG_MAX > HB_LL( 10000000000 )
 #  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000 ) ) ? 20 : 10 )
 #else
 #  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
-#endif
 #endif
 
 #if HB_INT_MIN <= -1000000000
@@ -407,14 +410,12 @@
 #else
 #  define HB_INT_LENGTH( i )  10
 #endif
+
 /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
 /* This comment is from hb_vmNeg() - if it's true only in this case then
    the limit should be changed and this function fixed */
-#if defined(__DMC__)
-#   define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
-#else
-#   define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
-#endif
+
+#define HB_DBL_LENGTH( d ) ( ( (d) >= 10000000000.0 || (d) <= -999999999.0 ) ? 20 : 10 )
 
 /* uncomment this if you need strict Clipper compatibility */
 /* #define PCODE_LONG_LIM(l)     HB_LIM_INT32( l ) */
@@ -526,16 +527,6 @@ typedef long HB_PTRDIFF;
                                                ( ( ( UINT32 ) ( w ) & 0x00FF0000 ) >>  8 ) | \
                                                ( ( ( UINT32 ) ( w ) & 0xFF000000 ) >> 24 ) ) )
 
-/*
- * It's a hack for MSC which doesn't support LL suffix for LONGLONG
- * numeric constant. This suffix is necessary for some compilers -
- * without it they cut the number to LONG
- */
-#if defined( _MSC_VER ) || defined( __BORLANDC__ )
-#  define HB_LL( num )           ((LONGLONG)num)
-#else
-#  define HB_LL( num )           num##LL
-#endif
 
 #ifndef PFLL
 #  if defined( __BORLANDC__ ) || defined( _MSC_VER )

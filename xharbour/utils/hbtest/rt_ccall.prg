@@ -1,5 +1,5 @@
 /*
- * $Id: rt_ccall.prg,v 1.6 2004/11/21 21:44:30 druzus Exp $
+ * $Id: rt_ccall.prg,v 1.7 2005/02/24 10:44:15 andijahja Exp $
  */
 
 /*
@@ -102,11 +102,7 @@ PROCEDURE Main_CCall()
    HB_FUNC( EXTEND_02 )
    {
 #if !defined( HB_LONG_LONG_OFF )
-#if defined(__DMC__)
-      hb_stornint( HB_LL(5000000000LL), 1, -1 );
-#else
       hb_stornint( HB_LL(5000000000), 1, -1 );
-#endif
 #else
       hb_stornd( 5000000000.0, 1, -1 );
 #endif

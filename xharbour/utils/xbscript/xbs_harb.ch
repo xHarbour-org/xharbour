@@ -1805,7 +1805,9 @@
              }
              else if( strchr( "\"'", cChar ) )
              {
-                while( ( nAt < nLen ) && ( sLine[++nAt] != cChar ) );
+                while( ( nAt < nLen ) && ( sLine[++nAt] != cChar ) )
+                {
+                }
 
                 continue; // No need to record cLastChar
              }
@@ -1813,7 +1815,9 @@
              {
                 if( ! ( isalnum( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
                 {
-                   while( nAt < nLen && sLine[++nAt] != ']' );
+                   while( nAt < nLen && sLine[++nAt] != ']' )
+                   {
+                   }
                 }
                 cLastChar = ']';
 

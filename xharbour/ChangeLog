@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3878 2005/02/26 20:41:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.3879 2005/02/27 05:51:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-27 14:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbdefs.h
+  * utils/hbtest/rt_ccall.prg
+    * simplification of LL number representation.
+
+  * utils/xbscript/xbs_harb.ch
+    * single-liners to be in accordance with xHarbour coding style
 
 2005-02-26 21:49 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * include/simplex.c
