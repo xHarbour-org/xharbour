@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: dateshb.c,v 1.3 2003/09/13 20:42:32 walito Exp $
  */
 
 /*
@@ -66,6 +66,9 @@
  *
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  *    HB_STOD()
+ *
+ * Copyright 2004 Giancarlo niccolai <gc -at- niccolai -dot- ws>
+ *    TIMEOFDAY()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -284,6 +287,27 @@ HB_FUNC( TIME )
    hb_dateTimeStr( szResult );
    hb_retclen( szResult, 8 );
 }
+
+#if defined( HB_EXTENSION )
+HB_FUNC( TIMEOFDAY )
+{
+   char szResult[ 9 ];
+   int iSeconds = hb_parni(1);
+
+   if ( iSeconds <= 0 )
+   {
+      hb_dateTimeStr( szResult );
+   }
+   else
+   {
+      iSeconds %= 3600*24;
+      sprintf( szResult, "%02d:%02d:%02d",
+         iSeconds/3600 , (iSeconds % 3600)/60, iSeconds % 60 );
+   }
+   hb_retclen( szResult, 8 );
+}
+#endif
+
 
 HB_FUNC( DATE )
 {

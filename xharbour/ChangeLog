@@ -1,5 +1,5 @@
-﻿/*
- * $Id: ChangeLog,v 1.2260 2004/02/11 04:02:53 druzus Exp $
+/*
+ * $Id: ChangeLog,v 1.2261 2004/02/11 10:54:49 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,42 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-11 16:11 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/Makefile
+  + source/rtl/filestat.c
+    + Added function FileStats() that retrevies advanced statistics
+      from file AND directories:
+      FileStats( cName, [@cAttrib], [@nSize], [@dCreated], [@nTimeC],
+         [@dAccessed], [@nTimeA] ) --> lExists
+
+      cName: filename or directory specification, both relative or abs.
+      cAttrib: Character (clipper-like) attribute specification(*)
+      nSize: Size of file; LONGLONG if enabled in compilation
+      dCreated, nTimeC: Creation time, if available, or modifcation time.
+      dAccessed, nTimeA: Last Access time.
+      Times are in seconds from midnight.
+
+      /*
+         Waiting for timestamp variable...
+         (*) Uses a slightly different version of UNIX translated
+         attrchars. Added some character to get SYMLINKS, FIFO,
+         and the like.
+      */
+
+
+  * source/rtl/dateshb.c
+    + Added function TimeOfDay( [nSeconds] ): without parameter, it returns
+      exactly as Time(); with parameters, it formats the seconds as it
+      were passed into Time() function.
+
+  + tests/filestat.prg
+    + Added a test for filestats.
+
 2004-02-11 08:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
    * contrib/htmllib/edit.prg
      contrib/htmllib/oframe.prg
      contrib/htmllib/ohtm.prg
-     contrib/htmllib/include/default.ch 
+     contrib/htmllib/include/default.ch
      contrib/htmllib/include/html.ch 
      ! minor fix to some method on this classes since it was not matching the def on html.ch
  

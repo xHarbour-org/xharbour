@@ -1,10 +1,11 @@
 ***********************************************************
 * gtclose.prg
-* $Id: gtclose.prg,v 1.1 2004/01/14 23:06:08 jonnymind Exp $
+* $Id: gtclose.prg,v 1.2 2004/01/15 00:17:56 fsgiudice Exp $
 * Test for gt close callback and handler.
 *
 * Giancarlo Niccolai
 *
+
 #include "inkey.ch"
 
 PROCEDURE Main()
