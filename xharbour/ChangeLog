@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2707 2004/04/01 11:44:54 druzus Exp $
+ * $Id: ChangeLog,v 1.2708 2004/04/01 16:10:40 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2004-04-01 11:20 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
-  * source/rtl\dbedit.prg
+  * source/rtl/dbedit.prg
     ! Raise a runtime error DBCMD/2001 if no database in use
       ( same as clipper )
 
