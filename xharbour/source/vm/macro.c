@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.7 2002/03/19 02:48:32 ronpinkas Exp $
+ * $Id: macro.c,v 1.8 2002/03/20 22:07:15 ronpinkas Exp $
  */
 
 /*
@@ -1200,15 +1200,10 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      if( hb_rddGetCurrentFieldPos( szVarName ) )
-      {
-         hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
-      }
-      else
-      {
-         hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-         hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-      }
+      /* Clipper always uses MEMVAR as oppose to FIELD or VARIABLE
+         when assigning into ambigious variable in Macro Compiler. */
+      hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
+      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 

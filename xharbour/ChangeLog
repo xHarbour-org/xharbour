@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.133 2002/03/25 21:57:48 walito Exp $
+ * $Id: ChangeLog,v 1.134 2002/03/26 05:06:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-25 21:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+   * Clipper always uses MEMVAR as oppose to FIELD or VARIABLE
+     when assigning into ambigious variable in Macro Compiler.
 
 2002-03-25 21:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/spfiles.c
