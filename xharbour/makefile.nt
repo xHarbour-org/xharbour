@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.76 2004/05/09 23:40:02 druzus Exp $
+# $Id: makefile.nt,v 1.77 2004/05/11 16:29:48 ronpinkas Exp $
 #
 
 #
@@ -1009,8 +1009,16 @@ GTWIN_LIB_OBJS = \
 {$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
+{$(RTL_DIR)\wvtcore}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(RTL_DIR)\wvtutils}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
 GTWVT_LIB_OBJS = \
-   $(OBJ_DIR)\gtwvt.obj
+   $(OBJ_DIR)\gtwvt.obj \
+   $(OBJ_DIR)\wvtcore.obj \
+   $(OBJ_DIR)\wvtutils.obj
 
 #
 # SAMPLES.LIB rules

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.20 2004/04/30 11:48:59 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.21 2004/05/11 17:58:02 vouchcac Exp $
  */
 
 /*
@@ -144,7 +144,6 @@
 
 typedef struct global_data
 {
-
   POINT     PTEXTSIZE;                 // size of the fixed width font
   BOOL      FixedFont;                 // TRUE if current font is a fixed font
   int       FixedSize[ WVT_MAX_COLS ]; // buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
@@ -196,6 +195,7 @@ typedef struct global_data
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
   PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
   PHB_DYNS  pSymWVT_MOUSE;             // Stores pointer to WVT_MOUSE function
+  PHB_DYNS  pSymWVT_TIMER;             // Stores pointer to WVT_TIMER function
   int       rowStart;                  // Holds nTop    of last WM_PAINT rectangle returned by Wvt_GrtPaintRect()
   int       rowStop;                   // Holds nBottom of last WM_PAINT rectangle
   int       colStart;                  // Holds nLeft   of last WM_PAINT rectangle
@@ -209,8 +209,11 @@ typedef struct global_data
   BOOL      bToolTipActive;            // Flag to set whether tooltip is active or not
 } GLOBAL_DATA;
 
+typedef GLOBAL_DATA * LPGLOBAL_DATA;
+
 //-------------------------------------------------------------------//
 
+POINT  HB_EXPORT hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row );
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );
 BOOL   HB_EXPORT hb_wvt_gtSetCentreWindow( BOOL bCentre, BOOL bPaint );
 void   HB_EXPORT hb_wvt_gtResetWindow( void );
@@ -234,10 +237,36 @@ BOOL   HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * imag
 BOOL   HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
 BOOL   HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
 BOOL   HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
+void   HB_EXPORT hb_wvt_gtAddCharToInputQueue( int data );
+IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image );
+BOOL   HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
+BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
+COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
+BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 
 //-------------------------------------------------------------------//
+
+#ifndef WM_MOUSEWHEEL
+   #define WM_MOUSEWHEEL 0x020A
 #endif
+
+#ifndef INVALID_FILE_SIZE
+   #define INVALID_FILE_SIZE (DWORD)0xFFFFFFFF
+#endif
+
+#ifndef CC_ANYCOLOR
+   #define CC_ANYCOLOR 0x00000100
+#endif
+
+#ifndef IDC_HAND
+   #define IDC_HAND MAKEINTRESOURCE(32649)
+#endif
+
+//-------------------------------------------------------------------//
+
+#endif
+
 //-------------------------------------------------------------------//
 
