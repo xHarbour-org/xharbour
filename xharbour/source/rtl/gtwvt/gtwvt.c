@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.84 2004/03/18 04:04:55 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.86 2004/03/29 03:42:40 peterrees Exp $
  */
 
 /*
@@ -118,13 +118,6 @@ static int K_Ctrl[] = {
   K_CTRL_Q, K_CTRL_R, K_CTRL_S, K_CTRL_T, K_CTRL_U, K_CTRL_V, K_CTRL_W, K_CTRL_X,
   K_CTRL_Y, K_CTRL_Z
   };
-
-/*
-static int _Alt_Num[] = {
-  K_ALT_0, K_ALT_1, K_ALT_2, K_ALT_3, K_ALT_4, K_ALT_5, K_ALT_6, K_ALT_7,
-  K_ALT_8, K_ALT_9
-  };
-*/
 
 //-------------------------------------------------------------------//
 //
@@ -1946,7 +1939,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       int c = ( int )wParam;
       if ( !bIgnoreWM_SYSCHAR )
       {
-printf("\nScancode = %d", iScanCode ) ;
         if ( bCtrl && ( c >= 1 && c<= 26 ) )  // K_CTRL_A - Z
         {
           hb_wvt_gtAddCharToInputQueue( K_Ctrl[c-1]  );
