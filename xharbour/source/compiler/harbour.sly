@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.61 2004/03/17 08:29:44 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.62 2004/03/18 02:12:04 ronpinkas Exp $
  */
 
 /*
@@ -1956,6 +1956,8 @@ DoCaseStart : DOCASE {
                         {
                            s_iLastControlLine = hb_comp_iLine;
                         }
+                        
+                        hb_compLinePushIfDebugger();
                      }
               Crlf
             ;

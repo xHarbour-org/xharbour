@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-31 18:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.sly
+    + Generate line number information for the debugger for DO CASE statement
+      (borrowed from Harbour, by Ryszard Glab).
+  * source/debug/debugger.prg
+    + Show line number information when source file can't be found
+      (borrowed from Harbour, by Ryszard Glab).
+
 2004-03-31 15:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/vm/macro.c
     ! Fixed hb_compMemvarGenPCode(), hb_compGenPopVar(),

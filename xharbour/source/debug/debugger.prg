@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.29 2004/03/21 12:20:04 likewolf Exp $
+ * $Id: debugger.prg,v 1.30 2004/03/30 09:29:55 mauriliolongo Exp $
  */
 
 /*
@@ -1413,7 +1413,7 @@ METHOD LoadCallStack() CLASS TDebugger
       //a procedure with debug info
       ::aProcStack[i-nDebugLevel+1] := ::aCallStack[ nPos ]
     ELSE
-      ::aProcStack[i-nDebugLevel+1] := { PROCNAME( i ), ,,,, nLevel }
+      ::aProcStack[i-nDebugLevel+1] := { PROCNAME( i )+"("+NTRIM(PROCLINE(i))+")", ,,,, nLevel }
     ENDIF
   NEXT
 
