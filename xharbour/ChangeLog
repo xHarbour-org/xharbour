@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3724 2005/01/09 22:48:23 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3725 2005/01/09 23:19:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-09 18:13 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/dbedit.prg
+    ! Fixed for use "default" headers (the same field list) when
+      headers aren't specified.
+    * Using a local variable instead of multiple calls to HB_EnumIndex().
 
 2005-01-09 15:18 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/codepage/cphr437.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.23 2004/08/27 15:47:34 mauriliolongo Exp $
+ * $Id: dbedit.prg,v 1.24 2004/11/09 20:04:21 guerra000 Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
 #translate SETIFNIL(<x>,<v>) => Do Case; Case HB_ISNIL(<x>); <x>:=<v>; End
 
 Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot, xPre, xPost)
-Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
+Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs, cHdr, nIndex
 
   SetIfEmpty(nTop, 0)
   SetIfEmpty(nLeft, 0)
@@ -101,16 +101,14 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
     // If no database in use, do nothing
     // For clipper compatibility we must call Errorsys() with error 2001 !
     If !Used()
-//      Return .F.
-    Throw( ErrorNew( "DBCMD", 2001, ProcName(), "Workarea not in use" ) )
+//       Return .F.
+       Throw( ErrorNew( "DBCMD", 2001, ProcName(), "Workarea not in use" ) )
     End
     aCols := Array(FCount())
     For Each i In aCols
       i := FieldName(HB_EnumIndex())
     Next
-    xHdr := aCols
   End
-  SetIfEmpty(xHdr, "")
   SetIfEmpty(xFoot, "")
 
   If HB_ISBLOCK(xPre)
@@ -152,6 +150,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
 
   For Each i In aCols
     If !Empty( i )
+       nIndex :=HB_EnumIndex()
        If HB_ISARRAY(i)
          bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
        Else
@@ -161,48 +160,54 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
          bFun := {|| "  <Memo>  "}
        End
 
-       If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[HB_EnumIndex()])  // handle empty column headers
-         IIf(HB_ISSTRING(i), xHdr[HB_EnumIndex()] := i, "<block>")
+       cHdr := i
+       If HB_ISSTRING( xHdr )
+          cHdr := xHdr
+       ElseIf HB_ISARRAY( xHdr ) .and. Len( xHdr ) >= nIndex .and. xHdr[ nIndex ] != NIL // handle empty column headers
+          cHdr := xHdr[ nIndex ]
+       End
+       If HB_ISBLOCK( cHdr )
+          cHdr := "<block>"
        End
 
-       oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[HB_EnumIndex()]), bFun)
+       oTBC := TBColumnNew( cHdr, bFun )
 
-       If HB_ISARRAY(i)
+       If HB_ISARRAY( i )
          oTBC:colorBlock := i[2]
        End
-       If HB_ISARRAY(xCSep)
-         oTBC:colSep := xCSep[HB_EnumIndex()]
+       If HB_ISARRAY( xCSep )
+         oTBC:colSep := xCSep[ nIndex ]
        End
-       If HB_ISARRAY(xHSep)
-         oTBC:headSep := xHSep[HB_EnumIndex()]
+       If HB_ISARRAY( xHSep )
+         oTBC:headSep := xHSep[ nIndex ]
        End
-       If HB_ISARRAY(xFSep)
-         oTBC:footSep := xFSep[HB_EnumIndex()]
+       If HB_ISARRAY( xFSep )
+         oTBC:footSep := xFSep[ nIndex ]
        End
-       If HB_ISARRAY(xFoot)
-         oTBC:footing := xFoot[HB_EnumIndex()]
+       If HB_ISARRAY( xFoot )
+         oTBC:footing := xFoot[ nIndex ]
        ElseIf HB_ISSTRING(xFoot)
          oTBC:footing := xFoot
        End
-       If HB_ISARRAY(xPict)
-         oTBC:picture := xPict[HB_EnumIndex()]
-       ElseIf HB_ISSTRING(xPict)
+       If HB_ISARRAY( xPict )
+         oTBC:picture := xPict[ nIndex ]
+       ElseIf HB_ISSTRING( xPict )
          oTBC:picture := xPict
        End
-       If HB_ISARRAY(xPre)
-         If HB_ISLOGICAL(xPre[HB_EnumIndex()])
-           xPre[HB_EnumIndex()] := IIf(xPre[HB_EnumIndex()], {|| .T.}, {|| .F.})
+       If HB_ISARRAY( xPre )
+         If HB_ISLOGICAL( xPre[ nIndex ] )
+           xPre[ nIndex ] := IIf( xPre[ nIndex ], {|| .T.}, {|| .F.} )
          End
-         oTBC:preBlock := xPre[HB_EnumIndex()]
+         oTBC:preBlock := xPre[ nIndex ]
        End
-       If HB_ISARRAY(xPost)
-         If HB_ISLOGICAL(xPost[HB_EnumIndex()])
-           xPost[HB_EnumIndex()] := IIf(xPost[HB_EnumIndex()], {|| .T.}, {|| .F.})
+       If HB_ISARRAY( xPost )
+         If HB_ISLOGICAL( xPost[ nIndex ] )
+           xPost[ nIndex ] := IIf( xPost[ nIndex ], {|| .T.}, {|| .F.} )
          End
-         oTBC:postBlock := xPost[HB_EnumIndex()]
+         oTBC:postBlock := xPost[ nIndex ]
        End
 
-       oTBR:addColumn(oTBC)
+       oTBR:addColumn( oTBC )
     EndIf
   Next
 
