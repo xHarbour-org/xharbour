@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbmake.prg,v 1.44 2003/02/02 14:53:48 lculik Exp $
+ * $Id: hbmake.prg,v 1.45 2003/02/09 23:35:03 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -381,7 +381,7 @@ FUNCTION ParseMakfi( cFile )
                                  endif
                                  if at('fivehc.lib',lower(alibx))>0 .or. at('minigui.lib',lower(alibx))>0
                                     lGui := .T.
-                                 endif                                    
+                                 endif
                              next
                             endif
                             if aTemp[1] == "ALLOBJ" .and. !lmt
@@ -392,7 +392,7 @@ FUNCTION ParseMakfi( cFile )
                                             " $(BHC)\lib\hvmguimt.obj")))
                                 endif
                             endif
-                                          
+
                             Aadd( amacros, { aTemp[ 1 ], Replacemacros( atemp[ 2 ] ) } )
 
                         ENDIF
@@ -814,10 +814,10 @@ FUNCTION Compfiles()
     LOCAL cOrder := ""
     Local nFile := 1
     Local aGauge := GaugeNew( 5, 5, 7,40 , "W/B", "W+/B" ,'²')
-          
+
     @ 4, 5 Say "Compiling :"
 //    FOR nCount := 1 TO Len( aOrder )
-      For EACH cOrder in aOrder 
+      For EACH cOrder in aOrder
 
         IF !lExtended
 
@@ -843,7 +843,7 @@ FUNCTION Compfiles()
 
                 ENDIF
 
-                FOR EACH cPrg in aPrgs 
+                FOR EACH cPrg in aPrgs
 
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), ;
                                      cPrg ) + 1 )
@@ -1076,7 +1076,7 @@ FUNCTION Compfiles()
     nFile:=1
 //                FOR nFiles := 1 TO Len( aprgs )
                 FOR EACH cPrg In aprgs
-            
+
                       @ 4,16 Say space(50)
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), ;
                                      cPrg ) + 1 )
@@ -1134,7 +1134,7 @@ FUNCTION Compfiles()
             IF nPos > 0
 
                 cComm := aCommands[ nPos, 2 ]
-                cold  := ccomm 
+                cold  := ccomm
             ENDIF
 
             FOR nFiles := 1 TO Len( aRes )
@@ -1289,12 +1289,12 @@ FUNC crtmakfile( cFile )
     Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
     @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
     ATTENTION( aLangMessages[ 27 ] , 0 )
-    @  1,  1 SAY aLangMessages[ 28 ] 
-    @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }   VALID !Empty( cos )              
-    @  1, 23 SAY aLangMessages[ 29 ] 
-    @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID !Empty( cCompiler )        
-    @  1, 48 SAY aLangMessages[ 30 ] 
-    @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32"   style "[o ]"           
+    @  1,  1 SAY aLangMessages[ 28 ]
+    @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }   VALID !Empty( cos )
+    @  1, 23 SAY aLangMessages[ 29 ]
+    @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID !Empty( cCompiler )
+    @  1, 48 SAY aLangMessages[ 30 ]
+    @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32"   style "[o ]"
     @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32"              style "[o ]"
     @  3, 64 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
     @  4, 64 Get lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
@@ -1310,17 +1310,17 @@ FUNC crtmakfile( cFile )
         @  5,  1 SAY "C4H path" GET ccwpath  Pict "@s20"
 
     ELSEIF lMiniGui
-            
+
         @  5,  1 SAY "MinuGui path" GET  cMiniPath Pict "@s20"
 
 
     ENDIF
 
-    @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15" 
+    @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
     ATTENTION( aLangMessages[ 31 ] , 6 )
 
     @  7,  1 GET lautomemvar checkbox caption aLangMessages[ 32 ]  style "[o ]"
-    @  7, 40 GET lvarismemvar checkbox caption aLangMessages[ 33 ] style "[o ]" 
+    @  7, 40 GET lvarismemvar checkbox caption aLangMessages[ 33 ] style "[o ]"
     @  8,  1 GET lDebug checkbox caption  aLangMessages[ 34 ]      style "[o ]"
     @  8, 40 GET lSupressline checkbox caption aLangMessages[ 35 ] style "[o ]"
     @  9,  1 GET lGenppo checkbox caption aLangMessages[ 36 ]      style "[o ]"
@@ -1543,7 +1543,7 @@ FUNC crtmakfile( cFile )
               cTopFile := pickaFile(aSelFiles)
 
         ELSE
-            cTopFile := pickafile( aSelFiles )            
+            cTopFile := pickafile( aSelFiles )
 
         ENDIF
 
@@ -1621,7 +1621,7 @@ FUNC crtmakfile( cFile )
 
     ENDIF
     Fwrite( nLinkHandle, "GUI = " + if(lFwh .or. lCw .or. lMinigui,"YES","NO") + CRLF )
-    Fwrite( nLinkHandle, "MT = "  + if(lMt,"YES","NO") + CRLF )    
+    Fwrite( nLinkHandle, "MT = "  + if(lMt,"YES","NO") + CRLF )
 
     FOR x := 1 TO Len( amacros )
 
@@ -1812,12 +1812,12 @@ FUNC crtmakfile( cFile )
         ENDIF
 
     ENDIF
-    CResName :=lower(CResName ) 
+
+    CResName :=lower(CResName )
     Fwrite( nLinkHandle, "RESFILES = "+ CResName  + CRLF )
     Fwrite( nLinkHandle, "RESDEPEN = "+ strtran(CResName,".rc",".res")  + CRLF )
 
     IF lRddads
-
         cDefBccLibs += " rddads.lib ace32.lib"
         cDeflibGccLibs += " -lrddads -ladsloc "
         cDefBccLibsmt += " rddads.lib ace32.lib"
@@ -1825,72 +1825,75 @@ FUNC crtmakfile( cFile )
     ENDIF
 
     IF Len( alibsout ) > 0 .and. lExternalLib
+       IF lvcc .or. lbcc
 
-        IF lvcc .or. lbcc
-	  IF !lMt	
+          IF !lMt
             cOldLib := cDefBccLibs
-	  ELSE
-	    cOldLib := cDefBccLibsMt
-	  endif          
-            nPos    := Ascan( aLibsout, { | z | At( "html", Lower( z ) ) > 0 } )
+          ELSE
+            cOldLib := cDefBccLibsMt
+          ENDIF
 
-            IF npos > 0
+          nPos    := Ascan( aLibsout, { | z | At( "html", Lower( z ) ) > 0 } )
 
-                cHtmlLib += aLibsout[ npos ]
-                Adel( alibsout, nPos )
-                Asize( alibsout, Len( alibsout ) - 1 )
+          IF npos > 0
 
-            ENDIF
+              cHtmlLib += aLibsout[ npos ]
+              Adel( alibsout, nPos )
+              Asize( alibsout, Len( alibsout ) - 1 )
 
-            Aeval( alibsout, { | cLib | cLibs += " " + cLib } )
-            if !lMt
-    	        cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
-	    else
-	       cDefBccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
-	    endif
-        ENDIF
+          ENDIF
 
-        IF lGcc
+          Aeval( alibsout, { | cLib | cLibs += " " + cLib } )
 
-            nPos := Ascan( aLibsout, { | z | At( "html", Lower( z ) ) > 0 } )
+          if !lMt
+             cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+          else
+             cDefBccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+          endif
 
-            IF npos > 0
+       ENDIF
 
-                cHtmlLib += "-l" + Strtran( aLibsout[ npos ], '.a', "" )
-                Adel( alibsout, nPos )
-                Asize( alibsout, Len( alibsout ) - 1 )
+       IF lGcc
+          nPos := Ascan( aLibsout, { | z | At( "html", Lower( z ) ) > 0 } )
 
-            ENDIF
+          IF npos > 0
 
-            Aeval( alibsout, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" ) } )
+              cHtmlLib += "-l" + Strtran( aLibsout[ npos ], '.a', "" )
+              Adel( alibsout, nPos )
+              Asize( alibsout, Len( alibsout ) - 1 )
 
-            IF cOs == "Linux"
-		if !lMt
-            	    cOldLib        := " " + cDeflibGccLibs
-            	    cDeflibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
-		else
-		     cOldLib        := " " + cDeflibGccLibsmt
-            	    cDeflibGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
-		endif
+          ENDIF
 
-            ELSEIF cOs == "OS/2"
-		if !lMt
-            	    cOldLib     := " " + cgcclibsos2
-            	    cgcclibsos2 := cHtmlLib + " " + cOldLib + " " + cLibs
-		else
-		    cOldLib     := " " + cgcclibsos2mt
-            	    cgcclibsos2mt := cHtmlLib + " " + cOldLib + " " + cLibs
-		endif
-            ELSE
-		if !lmt
-            
-		else
-		    cOldLib     := " " + cDefGccLibsmt
-            	    cDefGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
-		endif
-            ENDIF
+          Aeval( alibsout, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" ) } )
 
-        ENDIF
+          IF cOs == "Linux"
+
+             if !lMt
+                cOldLib        := " " + cDeflibGccLibs
+                cDeflibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+             else
+                cOldLib        := " " + cDeflibGccLibsmt
+                cDeflibGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+             endif
+
+          ELSEIF cOs == "OS/2"
+
+             if !lMt
+                cOldLib     := " " + cgcclibsos2
+                cgcclibsos2 := cHtmlLib + " " + cOldLib + " " + cLibs
+             else
+                cOldLib     := " " + cgcclibsos2mt
+                cgcclibsos2mt := cHtmlLib + " " + cOldLib + " " + cLibs
+             endif
+          ELSE
+
+             if lmt
+                cOldLib     := " " + cDefGccLibsmt
+                cDefGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+             endif
+          ENDIF
+
+       ENDIF
 
     ENDIF
 
@@ -2067,11 +2070,11 @@ FUNCTION CompUpdatedfiles()
     Local cPrg := ""
     Local nFiles,nFile:=1
     Local aGauge := GaugeNew( 5, 5, 7,40 , "W/B", "W+/B" ,'²')
-          
+
     @ 4, 5 Say "Compiling :"
 
 //    FOR nCount := 1 TO Len( aOrder )
-      FOR EACH cOrder in  aOrder 
+      FOR EACH cOrder in  aOrder
         IF !lextended
 
             IF cOrder == "$(CFILES)"
@@ -2281,7 +2284,7 @@ FUNCTION CompUpdatedfiles()
                 ENDIF
 nFile:=1
 //                FOR nFiles := 1 TO Len( aprgs )
-                  FOR EACH cPrg IN aprgs 
+                  FOR EACH cPrg IN aprgs
                   @ 4,16 Say space(50)
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), cPrg ) + 1 )
                     nPos  := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
@@ -2333,7 +2336,7 @@ nFile:=1
             IF nPos > 0
 
                 cComm := aCommands[ nPos, 2 ]
-                cOld  := ccomm 
+                cOld  := ccomm
             ENDIF
 
             FOR nFiles := 1 TO Len( aRes )
@@ -2440,27 +2443,27 @@ FUNC crtlibmakfile( cFile )
     @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
     ATTENTION( aLangMessages[ 27 ], 0 )
 
-    @  1,  1 SAY "Select Os"                                      
-    @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }           
-    @  1, 23 SAY "Select C Compiler"                              
+    @  1,  1 SAY "Select Os"
+    @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }
+    @  1, 23 SAY "Select C Compiler"
     @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" }
 
     READ
 
     SET CURSOR ON
 
-    @  4,  1 SAY "Library name with our extention" GET cfwhpath PICT "@s15"       
+    @  4,  1 SAY "Library name with our extention" GET cfwhpath PICT "@s15"
     @  4, 40 SAY "Obj Files Dir"                   GET cObjDir  PICT "@s15"
 
     ATTENTION( "Harbour Options", 5 )
 
-    @  6,  1 GET lautomemvar checkbox caption "Automatic memvar declaration"                                         
-    @  6, 40 GET lvarismemvar checkbox caption "Variables are assumed M->"                                           
-    @  7,  1 GET lDebug checkbox caption "Debug info"                                                                
-    @  7, 40 GET lSupressline checkbox caption "Suppress line number information"                                    
-    @  8,  1 GET lGenppo checkbox caption "Generate pre-processed output"                                            
-    @  8, 40 GET lCompMod checkbox caption "compile module only"                                                     
-    @  9,  1 SAY "User Defines "                                                  GET cUserDef     PICT "@s15"       
+    @  6,  1 GET lautomemvar checkbox caption "Automatic memvar declaration"
+    @  6, 40 GET lvarismemvar checkbox caption "Variables are assumed M->"
+    @  7,  1 GET lDebug checkbox caption "Debug info"
+    @  7, 40 GET lSupressline checkbox caption "Suppress line number information"
+    @  8,  1 GET lGenppo checkbox caption "Generate pre-processed output"
+    @  8, 40 GET lCompMod checkbox caption "compile module only"
+    @  9,  1 SAY "User Defines "                                                  GET cUserDef     PICT "@s15"
     @  9, 40 SAY "User include Path"                                              GET cUserInclude PICT "@s15"
     @ 10,  1 GET lInstallLibrary checkbox caption "Install Library to xharbour Lib Directory"
     READ
@@ -2527,7 +2530,7 @@ FUNC crtlibmakfile( cFile )
     Aeval( amacros, { | x, y | cItem := Substr( x[ 2 ], 1, Len( x[ 2 ] ) ), If( At( citem, cTest ) > 0, ( amacros[ y, 1 ] := 'OBJ', amacros[ y, 2 ] := cObjDir ), ) } )
 
     IF lAutomemvar
-     
+
         cDefHarOpts += " -a "
 
     ENDIF
@@ -3772,7 +3775,7 @@ FUNCTION WriteMakeFileHeader()
     Fwrite( nLinkHandle, "BHC = $(HMAKEDIR)" + CRLF )
     Fwrite( nLinkHandle, "!endif" + CRLF )
     Fwrite( nLinkHandle, " " + CRLF )
-    Fwrite( nLinkHandle, "RECURSE="+if(lRecurse," YES "," NO ") + CRLF )    
+    Fwrite( nLinkHandle, "RECURSE="+if(lRecurse," YES "," NO ") + CRLF )
     Fwrite( nLinkHandle, " " + CRLF )
 RETURN nil
 
