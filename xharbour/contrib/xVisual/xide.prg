@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.96 2002/10/26 09:27:04 ronpinkas Exp $
+ * $Id: xide.prg,v 1.98 2002/10/27 01:29:26 what32 Exp $
  */
 
 /*
@@ -241,6 +241,7 @@ return(self)
 #include "hbapierr.h"
 #include "hbapiitm.h"
 #include "hbvm.h"
+#include "hbfast.h"
 
 #define SKIP_SPACE() { while( *sText == ' ' || *sText == '\t' ) sText++; }
 #define SKIP_EOL() { while( *sText == '\n' || *sText == '\r' ) sText++; }
@@ -312,19 +313,20 @@ HB_FUNC( XFMOPEN )
 
 int XFMParse( char *sText )
 {
-   char sClass[64], sFromClass[64], sVar[64], sExp[64], *pTemp, *pEnd[16];
+   char sClass[64], sFromClass[64], sVar[64], sExp[64], *pTemp, *pEnd[16], sAssign[64], sTemp[256];
    int i, iEnd = 0;
    static PHB_DYNS pCreateForm = NULL;
    static PHB_DYNS pTFormEdit = NULL;
+   HB_ITEM Exp;
 
    if( pCreateForm == NULL )
    {
-      pCreateForm = hb_dynsymFind( "CreateForm" );
+      pCreateForm = hb_dynsymFind( "CREATEFORM" );
    }
 
    if( pTFormEdit == NULL )
    {
-      pTFormEdit = hb_dynsymFind( "TFormEdit" );
+      pTFormEdit = hb_dynsymFind( "TFORMEDIT" );
    }
 
    //OutputDebugString( sText );
@@ -376,21 +378,25 @@ int XFMParse( char *sText )
    OutputDebugString( sFromClass );
    OutputDebugString( "\n" );
 
-   /*
    //TFormEdit()
    hb_vmPushSymbol( pTFormEdit->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
 
-   //oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame
+   //oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame )
    hb_vmPushSymbol( pCreateForm->pSymbol );
    hb_vmPush( &OAPP );
+   // See below alternative to pushing REF.
+   //memcpy( ( * hb_stack.pPos ), &FORMEDIT, sizeof( HB_ITEM ) );
+   //hb_stackPush();
    hb_vmPushNil();
-   hb_vmPush( &MAINFRAME );
    hb_vmPush( &hb_stack.Return );
    hb_itemClear( &hb_stack.Return );
+   hb_vmPush( &MAINFRAME );
    hb_vmSend( 3 );
-   */
+
+   // Instead of pushing @FormEdit
+   hb_itemForwardValue( &FORMEDIT, &hb_stack.Return );
 
    pEnd[ iEnd ] = strstr( sText, "END CLASS" );
    if( pEnd[ iEnd ] == NULL )
@@ -450,6 +456,40 @@ int XFMParse( char *sText )
    OutputDebugString( " = " );
    OutputDebugString( (char *) sExp );
    OutputDebugString( "\n" );
+
+   sAssign[0] = '_';
+   sAssign[1] = '\0';
+   strcat( (char *) sAssign, (char *) sVar );
+
+   switch( sExp[0] )
+   {
+      case '.' :
+        Exp.type = HB_IT_LOGICAL;
+        Exp.item.asLogical.value = sExp[1] == 'T' ? TRUE : FALSE;
+        break;
+
+      case '"' :
+        Exp.type = HB_IT_STRING;
+        sExp[ strlen( sVar ) - 1] = '\0';
+        Exp.item.asString.value = (char *) sExp + 1;
+        Exp.item.asString.bStatic = TRUE;
+        break;
+
+      default :
+        Exp.type = HB_IT_LONG;
+        Exp.item.asLong.value = atol( sExp );
+        break;
+   }
+
+   OutputDebugString( "Assign: " );
+   OutputDebugString( sAssign );
+   OutputDebugString( " Type: " );
+
+   sprintf( (char *) sTemp, "%i\n", Exp.type );
+   OutputDebugString( sTemp );
+
+   hb_objSendMsg( &FORMEDIT, sAssign, 1, &Exp );
+   hb_itemClear( &hb_stack.Return );
 
    SKIP_EOL();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.70 2002/10/26 08:57:48 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.71 2002/10/27 01:29:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -120,7 +120,7 @@ GLOBAL EXTERNAL FormEdit
 METHOD Add( cName, oObj )
 
    LOCAL oCtrl
-   
+
    oObj:Name := cName
    oCtrl := Super:Add( oObj )
 
@@ -535,7 +535,7 @@ METHOD XFMReflect() CLASS TFormEdit
       cText += ( cLine + CRLF )
    NEXT
 
-   TraceLog( cText )
+   //TraceLog( cText )
 
    MainFrame:ObjEdit:SourceEdit:SetText( cText )
 
