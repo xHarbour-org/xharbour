@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3903 2005/03/03 20:28:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3904 2005/03/04 02:25:11 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-04 18:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbinit.h
+    * cleaned and added #error for redundant macro settings to force
+      cleaning the build environment on user side
+  * xharbour/source/vm/hvm.c
+    ! fixed bad typo which could cause double to integer conversion
+      when default number of decimals was set to 0. F.e. after SET FIXED TO 0
 
 2005-03-03 18:15 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/make_b32.bat

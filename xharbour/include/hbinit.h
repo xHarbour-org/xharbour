@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.14 2005/02/27 11:56:01 andijahja Exp $
+ * $Id: hbinit.h,v 1.15 2005/02/28 02:12:30 druzus Exp $
  */
 
 /*
@@ -59,7 +59,6 @@ HB_EXTERN_BEGIN
 
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
-
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -75,6 +74,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_END( func ) }
 
 #elif defined(__GNUC__)
+
+   #if defined(HB_PRAGMA_STARTUP) || defined(HB_MSC_STARTUP)
+      #error Wrong macros set for startup code - clean your make/env settings.
+   #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
@@ -92,8 +95,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
 #elif defined(HB_STATIC_STARTUP) || defined(__cplusplus)
 
-   #if !defined(HB_STATIC_STARTUP)
-      #define HB_STATIC_STARTUP
+   #if defined(HB_PRAGMA_STARTUP) || defined(HB_MSC_STARTUP)
+      #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -120,6 +123,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
 #elif defined(HB_PRAGMA_STARTUP) || \
       defined(__BORLANDC__) || defined(__LCC__) || defined(__POCC__)
+
+   #if defined(HB_MSC_STARTUP)
+      #error Wrong macros set for startup code - clean your make/env settings.
+   #endif
 
    #if !defined(HB_PRAGMA_STARTUP)
       #define HB_PRAGMA_STARTUP
@@ -158,15 +165,9 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static int func( void ) {
+      static void func( void ) {
 
-   /* this allows any macros to be preprocessed first
-      so that token pasting is handled correctly */
-   #define HB_CALL_ON_STARTUP_END( func ) \
-          _HB_CALL_ON_STARTUP_END( func )
-
-   #define _HB_CALL_ON_STARTUP_END( func ) return 0; } \
-      static int static_int_##func = func();
+   #define HB_CALL_ON_STARTUP_END( func ) }
 
 #else
    #error Unknown initialization method.

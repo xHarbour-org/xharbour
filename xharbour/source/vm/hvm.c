@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.440 2005/02/24 10:44:13 andijahja Exp $
+ * $Id: hvm.c,v 1.441 2005/02/26 15:16:50 andijahja Exp $
  */
 
 /*
@@ -3787,7 +3787,7 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem2->type;
+      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem1->type;
       double dNumber2 = hb_vmPopDouble( &iDec2 );
       double dNumber1 = hb_vmPopDouble( &iDec1 );
 
