@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.4 2001/06/18 18:04:05 dholm Exp $
+ * $Id: nulsys.prg,v 1.5 2003/07/23 20:58:31 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_FUNC( DBRELATION ) { hb_retc( NULL ); }
 
 HB_FUNC( DBRSELECT ) { hb_retni( 0 ); }
 
-HB_FUNC( ORDNAME ) { hb_parc( NULL ); }
+HB_FUNC( ORDNAME ) { hb_retc( NULL ); }
 
 HB_FUNC( INDEXORD ) { hb_parni(1); }
 
@@ -122,7 +122,7 @@ HB_FUNC( DELETED ) { hb_retl( FALSE ); }
 
 HB_FUNC( BOF ) { hb_retl( FALSE ); }
 
-HB_FUNC( FIELDNAME ) { hb_parc( NULL ); }
+HB_FUNC( FIELDNAME ) { hb_retc( NULL ); }
 
 HB_FUNC( RECCOUNT ) { hb_parni( 0 ); }
 

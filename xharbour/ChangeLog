@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1298 2003/07/26 08:01:36 brianhays Exp $
+ * $Id: ChangeLog,v 1.1299 2003/07/26 16:35:03 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,14 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-26 18:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/nulsys/nulsys.prg
+    ! Fixed few typos.
+
 2003-07-26 13:00 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/ttable.prg
   * include/ttable.ch
   * tests/tsttable.prg
     ! Changed object table to hbtable, ofield to hbfield and orecord to hbrecord
       to prevent GPF if user have a table() function defined.
-      
-      /* 
+
+      /*
          We have GPF instead stack error if call recursively a function:
          procedure test()
             test()
