@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3293 2004/08/09 17:09:48 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3294 2004/08/09 21:10:35 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-10 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed bug caused by compressing trailing spaces. Now xHarbour
+      can use duplicate trailing spaces of previous key in the current
+      one bt default - the same is done by CL53 (I've check it) but can
+      cause troubles for some other CDX implementation - (they should be
+      fixed IMHO). Anyhow if someone need the old behavior please comment
+      '#define HB_CDX_PACKTRAIL` in dbfcdx1.c - the indexing will not
+      duplicate trailing spaces in such way.
 
 2004-08-10 01:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/token1.c

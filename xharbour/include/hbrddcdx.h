@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.32 2004/05/20 13:53:32 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.33 2004/07/27 13:19:34 druzus Exp $
  */
 
 /*
@@ -385,6 +385,9 @@ typedef struct
    LPCDXPAGE NodeList[ CDX_STACKSIZE ];   /* Stack of pages */
    BYTE     pLastKey[ CDX_MAXKEY ]; /* last key val */
    ULONG    ulLastRec;
+#ifndef HB_CDX_PACKTRAIL
+   int      iLastTrl;         /* last key trailing spaces */
+#endif
 } CDXSORTINFO;
 typedef CDXSORTINFO * LPCDXSORTINFO;
 
