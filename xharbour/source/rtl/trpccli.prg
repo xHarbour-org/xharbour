@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.14 2003/04/16 22:08:13 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.15 2003/04/17 21:22:23 jonnymind Exp $
  */
 
 /*
@@ -102,6 +102,14 @@ CLASS tRPCClient
    METHOD GetResult()               INLINE ::oResult
    METHOD FoundServers()            INLINE Len( ::aServers ) != 0
    METHOD FoundFunctions()          INLINE Len( ::aFunctions ) != 0
+
+   METHOD HasError()                INLINE IIF( Empty( ::skTCP ), .F., InetErrorCode( ::skTCP ) > 0 )
+   METHOD GetErrorCode()            INLINE IIF( Empty( ::skTCP ), 0, InetErrorCode( ::skTCP ) )
+   METHOD GetErrorDesc()            INLINE IIF( Empty( ::skTCP ), "", InetErrorDesc( ::skTCP ) )
+
+   METHOD UdpHasError()             INLINE IIF( Empty( ::skUDP ), .F., InetErrorCode( ::skUDP ) > 0 )
+   METHOD UdpGetErrorCode()         INLINE IIF( Empty( ::skUDP ), 0, InetErrorCode( ::skUDP ) )
+   METHOD UdpGetErrorDesc()         INLINE IIF( Empty( ::skUDP ), "", InetErrorDesc( ::skUDP ) )
    /* Used to retreive data from scans */
    METHOD GetFunctionName( xId )
    METHOD GetServerName( xId )

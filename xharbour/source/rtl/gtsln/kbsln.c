@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.5 2002/04/16 16:12:18 map Exp $
+ * $Id: kbsln.c,v 1.6 2002/11/20 01:34:16 lculik Exp $
  */
 
 /*
@@ -288,15 +288,15 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 {
     static int InDeadState = FALSE;
     unsigned int ch, tmp, kbdflags;
- 
+
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
- 
+
     /* HB_SYMBOL_UNUSED( eventmask ); */
- 
+
     /* user AbortKey break */
     if( SLKeyBoard_Quit == 1 )
         return( HB_BREAK_FLAG );
- 
+
     /* has screen size changed ? */
     if( hb_gt_sln_bScreen_Size_Changed )
     {
@@ -312,7 +312,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
     /* if no pending chars */
     if( 0 == SLang_input_pending( 0 ) )
         return( hb_mouse_Inkey( eventmask ) );
-        
+
 #if HB_GT_KBD_MODIF_MASK
     kbdflags = hb_gt_try_get_Kbd_State();
 #else
@@ -346,7 +346,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
     /* unrecognized character */
     if( ch == SL_KEY_ERR )
         return( 0 );
-        
+
     /* Dead key handling */
     if( InDeadState )
     {
@@ -372,7 +372,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
     /* any special key ? */
     if( ( tmp = ( ch | ( kbdflags << 16 ) ) ) > 256 )
     {
-        if( ( tmp == SL_KEY_MOU ) ) 
+        if( ( tmp == SL_KEY_MOU ) )
         {
             if( ( eventmask & MOUSE_ALL_EVENTS_MASK ) != 0 )
                 return( hb_mouse_Inkey( eventmask ) );
@@ -388,7 +388,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
                     return( tmp );
             }
         }
-        
+
         if( ( eventmask & INKEY_RAW ) == 0 )
         {
             tmp = hb_gt_FindKeyTranslation( tmp );
@@ -404,6 +404,13 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
         return( tmp );
     }
 
+#ifdef __linux__
+   /* for Linux console xterm and rxvt*/
+   if( ch == 0x7f )
+   {
+      ch = K_BS;
+   }
+#endif
     /* standard ASCII key */
     return( ch );
 }
@@ -414,7 +421,7 @@ static int hb_gt_try_get_Kbd_State()
 {
 #if defined(__linux__)
     unsigned char modifiers = 6;
- 
+
     if( ioctl( 0, TIOCLINUX, &modifiers ) < 0 )
         return 0;
  

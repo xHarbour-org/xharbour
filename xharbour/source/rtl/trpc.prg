@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.15 2003/04/16 22:08:12 jonnymind Exp $
+ * $Id: trpc.prg,v 1.16 2003/04/17 21:22:23 jonnymind Exp $
  */
 
 /*
@@ -240,7 +240,7 @@ METHOD New( cFname, cSerial, nAuthLevel, oExec, oMeth ) CLASS tRPCFunction
    ::cReturn := IIF( Len( aFuncDef ) == 4, aFuncDef[4], aFuncDef[5] )
 
    // analyze parameter list
-   IF Trim( cParam ) != ""
+   IF Len( Trim( cParam ) ) > 0
       aParams := HB_RegexSplit( ",", cParam )
       ::aParameters := {}
       FOR EACH cParam IN aParams
@@ -388,6 +388,8 @@ CLASS tRPCServeCon
    METHOD Run()
 
    /* Utilty */
+   METHOD SendProgress( nProgress, aData )
+
 HIDDEN:
    /* Is this connection encrypted? */
    DATA bEncrypted
@@ -407,7 +409,6 @@ HIDDEN:
    METHOD LaunchChallenge( cUserid, cPassword )
    METHOD LaunchFunction( cFuncName, aParms, nMode, aItems )
    METHOD SendResult( oRet )
-   METHOD SendProgress( nProgress, aData )
 
    METHOD Encrypt(cDataIn)
    METHOD Decrypt(cDataIn)
@@ -1230,13 +1231,19 @@ RETURN .T.
 METHOD Accept() CLASS tRPCService
    LOCAL skIn
 
+   ? "Starting accept"
+   ? ""
    DO WHILE .T.
       skIn := InetAccept( ::skServer )
       // todo: better sync
+      ? "STATUS:", InetStatus( ::skServer )
+      ? ""
       IF InetStatus( ::skServer ) < 0
          EXIT
       ENDIF
       IF skIn != NIL
+         ? "Starting service"
+         ? ""
          ::StartService( skIn )
       ENDIF
    ENDDO
