@@ -1,9 +1,12 @@
-
+/*
+ * $Id:  Exp $
+ */
 /*
  * xHarbour Project source code:
  *
  * Whoo.lib TPersistent CLASS
  *
+ * Copyright 2002 Francesco Saverio Giudice [info@fsgiudice.com]
  * Copyright 2002 Augusto Infante [augusto@2vias.com.ar]
  * www - http://www.xharbour.org
  *
