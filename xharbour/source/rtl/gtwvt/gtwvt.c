@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.104 2004/05/14 12:33:58 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.105 2004/05/22 11:59:43 vouchcac Exp $
  */
 
 /*
@@ -2794,7 +2794,7 @@ static void gt_hbInitStatics( void )
   _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS"  ) ;
   _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
   _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE"     ) ;
-  _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_TIMER"     ) ;
+  _s.pSymWVT_TIMER    = hb_dynsymFind( "WVT_TIMER"     ) ;
   _s.rowStart         = 0;
   _s.rowStop          = 0;
   _s.colStart         = 0;
