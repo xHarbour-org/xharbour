@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.35 2003/12/05 04:52:25 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.36 2003/12/10 18:30:23 ronpinkas Exp $
  */
 
 /*
@@ -1551,12 +1551,12 @@ RETURN uObj
 
         if( dParams.rgvarg[0].n1.n2.vt == VT_DISPATCH )
         {
-           wFlags = DISPATCH_PROPERTYPUTREF | DISPATCH_METHOD;
+           wFlags = DISPATCH_PROPERTYPUTREF;// | DISPATCH_METHOD;
            //TraceLog( NULL, "SetProperty '%s' BYREF\n", hb_parc(2) );
         }
         else
         {
-           wFlags = DISPATCH_PROPERTYPUT | DISPATCH_METHOD;
+           wFlags = DISPATCH_PROPERTYPUT;// | DISPATCH_METHOD;
         }
 
         //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parc(2), dParams.cArgs );

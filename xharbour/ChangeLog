@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1983 2004/01/03 20:51:47 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1984 2004/01/04 01:11:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-03 19:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/cmdcheck.c
+    ! Fixed -gc default to -gc2 instead of -gc3
+    (BTW Andi, -gc3 generates a GPF with sample like testole.prg)
+
+  * source/rtl/win32ole.prg
+    * Removed | DISPATCH_METHOD from wFlags in HB_FUNC( OLESETPROPERTY )
 
 2004-01-04 02:05 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbapigt.h

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.11 2003/09/05 01:15:34 jonnymind Exp $
+ * $Id: cmdcheck.c,v 1.12 2003/10/06 21:31:35 ronpinkas Exp $
  */
 
 /*
@@ -573,11 +573,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                       switch( *( s + 2 ) )
                       {
                          case '\0':
-
-                         case '3':
-                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
-                            hb_comp_iGenVarList = TRUE;
-                            break;
+                           // Intentionally fall through to '2'.
 
                          case '2':
                             hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
@@ -589,6 +585,11 @@ void hb_compChkEnvironVar( char * szSwitch )
 
                          case '0':
                             hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
+                            break;
+
+                         case '3':
+                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+                            hb_comp_iGenVarList = TRUE;
                             break;
 
                          default:
