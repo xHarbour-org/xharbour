@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.1.1.1 2001/12/21 10:47:25 ronpinkas Exp $
+ * $Id: hbtrace.h,v 1.2 2002/03/17 06:46:34 ronpinkas Exp $
  */
 
 /*
@@ -81,6 +81,26 @@ extern void TraceLog( const char * sFile, const char * sTraceMsg );
  * If we compiled without specifying a -DHB_TR_LEVEL, use the value
  * for HB_TR_DEFAULT.
  */
+
+#ifdef HB_TR_LEVEL_ALWAYS
+#define HB_TR_LEVEL     HB_TR_ALWAYS
+#endif
+#ifdef HB_TR_LEVEL_FATAL
+#define HB_TR_LEVEL     HB_TR_FATAL
+#endif
+#ifdef HB_TR_LEVEL_ERROR
+#define HB_TR_LEVEL     HB_TR_ERROR
+#endif
+#ifdef HB_TR_LEVEL_WARNING
+#define HB_TR_LEVEL     HB_TR_WARNING
+#endif
+#ifdef HB_TR_LEVEL_INFO
+#define HB_TR_LEVEL     HB_TR_INFO
+#endif
+#ifdef HB_TR_LEVEL_DEBUG
+#define HB_TR_LEVEL     HB_TR_DEBUG
+#endif
+
 #ifndef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_DEFAULT
 #endif
