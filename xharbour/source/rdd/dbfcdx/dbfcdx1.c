@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.111 2004/03/15 22:37:45 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.112 2004/03/16 14:39:23 druzus Exp $
  */
 
 /*
@@ -4727,7 +4727,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
             {
                if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                   break;
-               fFound = hb_strMatchWild( pTag->CurKey->val, szPattern );
+               fFound = hb_strMatchWild( (char const*)pTag->CurKey->val, szPattern );
                if ( fFound )
                   break;
                hb_cdxTagKeyRead( pTag, NEXT_RECORD );
@@ -4752,7 +4752,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          {
             if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                break;
-            fFound = hb_strMatchWild( pTag->CurKey->val, szPattern );
+            fFound = hb_strMatchWild( (char const*)pTag->CurKey->val, szPattern );
             if ( fFound )
                break;
             hb_cdxTagKeyRead( pTag, PREV_RECORD );

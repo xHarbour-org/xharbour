@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.46 2004/03/10 19:16:53 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.47 2004/03/12 18:20:09 ronpinkas Exp $
  */
 
 /*
@@ -119,6 +119,10 @@ RETURN TOleAuto():GetActiveObject( cString )
    #ifdef __MINGW32__
       // Missing in oleauto.h
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
+   #endif
+
+   #if defined(__MINGW32__) || defined(__WATCOMC__)
+      #define HB_LONG_LONG_OFF
    #endif
 
    static HRESULT  s_nOleError;

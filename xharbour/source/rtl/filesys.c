@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.70 2004/02/20 12:52:52 druzus Exp $
+ * $Id: filesys.c,v 1.71 2004/03/11 22:03:23 ronpinkas Exp $
  */
 
 /*
@@ -310,7 +310,7 @@ static USHORT s_uiOsErrorLast = 0;
    #define LARGE_MAX ( UINT_MAX - 1L )
 #endif
 
-#ifdef __WIN32__
+#ifdef __WIN32__ 
    #if defined(X__WIN32__)
        extern int WintoDosError(DWORD dwError);
        HANDLE DostoWinHandle( FHANDLE fHandle);
@@ -2606,10 +2606,14 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      #if defined(X__WIN32__)
+      #if defined(X__WIN32__) 
          bStatus = FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) );
       #else
-         hb_fsSetError( _commit( hFileHandle ) );
+         #if defined(__WATCOMC__) 
+            hb_fsSetError( FlushFileBuffers( ( HANDLE ) hFileHandle ) );
+         #else
+            hb_fsSetError( _commit( hFileHandle ) );
+         #endif    
       #endif
 
       HB_DISABLE_ASYN_CANC

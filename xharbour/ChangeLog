@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2584 2004/03/16 16:04:01 andijahja Exp $
+ * $Id: ChangeLog,v 1.2585 2004/03/16 17:38:15 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-16 22:29 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/Makefile
+    ! removed dbdelim.prg not more nedded.
+  * source/rtl/win32ole.prg
+    ! disabled LONG LONG support to build with mingw32 and openwatcom w32 
+  * source/rtl/filesys.c
+    ! restored support for openwatcom w32
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! added casts for openwatcom w32
+  These are simply hacks to finish the build. Real solutions are needed.
 
 2004-03-16 14:35 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/odbc/odbc.c
