@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.62 2004/01/16 11:41:20 lculik Exp $
+ * $Id: filesys.c,v 1.64 2004/01/17 17:52:59 lculik Exp $
  */
 
 /*
@@ -1596,7 +1596,6 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    FHANDLE hFileHandle;
    int oflag;
    unsigned pmode;
-   char * szFile ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
@@ -3432,9 +3431,9 @@ char HB_EXPORT * hb_fileTrim( BYTE * szFile)  /* Caller must free the buffer ret
    char * szFileTrim ;
    ULONG ulPos;
    szFileTrim = (char * ) hb_xgrab( 255 );
-   ulPos =  hb_strRTrimLen( szFile, strlen( szFile ), FALSE );
-   szFile = hb_strLTrim( szFile, &ulPos );
-   strncpy( szFileTrim, szFile, ulPos );
+   ulPos =  hb_strRTrimLen( (char*) szFile, strlen( (char*) szFile ), FALSE );
+   szFile = (BYTE*) hb_strLTrim( (char*) szFile, &ulPos );
+   strncpy( (char*) szFileTrim, (char*) szFile, ulPos );
    szFileTrim[ulPos]  = '\0';
 
    return szFileTrim;

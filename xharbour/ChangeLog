@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2087 2004/01/17 17:50:34 lculik Exp $
+ * $Id: ChangeLog,v 1.2088 2004/01/17 21:54:03 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-18 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filesys.c
+    ! type castings
+
+  * source/rtl/tget.prg
+    ! .. get x pic "9x9x" not working. Fixed.
+
+  + source/rtl/gtcgi/cgiread.c
+    ! PRG level functions for CGIREAD() and CGIWRITE() to fix certain CGI
+      problems for Win32 - there seems to be no stdin binary reads so
+      while trying to upload a binary file through a CGI webform, you get
+      broken file and even when sending text data you get wrong bytecount
+      due to \r\n -> \n translation (ANY Win32 C compiler treats stdin/stdout
+      as having "terminal" flag).
+      Credits to: "Dmitry V. Korzhov" <dk@april26.spb.ru>
 
 2004-01-17 22:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/gtwvt/gtwvt.c
