@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.100 2005/04/01 16:20:27 druzus Exp $
+ * $Id: dbfntx1.c,v 1.101 2005/04/05 00:32:09 druzus Exp $
  */
 
 /*
@@ -1206,7 +1206,7 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *szTagName )
 
    usType = HB_GET_LE_UINT16( Header.type );
 
-   if ( usType & ~NTX_FLAG_MASK )
+   if ( ( usType & ~NTX_FLAG_MASK ) || Header.key_expr[0] < 0x20 )
       return FAILURE;
 
    if( SELF_COMPILE( ( AREAP ) pIndex->Owner, Header.key_expr ) == FAILURE )
@@ -1214,7 +1214,7 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *szTagName )
    pKeyExp = pIndex->Owner->valResult;
    pIndex->Owner->valResult = NULL;
 
-   if( usType & NTX_FLAG_FORITEM && Header.for_expr[0] >= 20 )
+   if( usType & NTX_FLAG_FORITEM && Header.for_expr[0] >= 0x20 )
    {
       if( SELF_COMPILE( ( AREAP ) pIndex->Owner, Header.for_expr ) == FAILURE )
       {

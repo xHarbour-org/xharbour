@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.33 2005/02/28 02:12:31 druzus Exp $
+ * $Id: hbsetup.h,v 1.34 2005/03/30 21:29:18 andijahja Exp $
  */
 
 /*
@@ -386,8 +386,15 @@
    #if ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
       #define snprintf(s, len, args...) sprintf( (s), ##args )
    #endif
+#elif defined(__XCC__)
+   #if !defined(isascii)
+      #define isascii(c)   ((unsigned)(c)<=0x7f)
+   #endif
+   #if !defined(NEED_DUMMY_RETURN)
+      #define NEED_DUMMY_RETURN
+   #endif
 #else
-   #if ( defined( _MSC_VER ) && !defined(__XCC__) ) || defined( __DMC__ )
+   #if defined(_MSC_VER)
       #define snprintf _snprintf
    #endif
 #endif

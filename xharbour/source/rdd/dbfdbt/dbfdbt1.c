@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.19 2005/02/28 10:17:31 andijahja Exp $
+ * $Id: dbfdbt1.c,v 1.20 2005/03/31 03:57:11 druzus Exp $
  */
 
 /*
@@ -317,6 +317,7 @@ static ULONG hb_dbtGetMemoLen( DBTAREAP pArea, USHORT uiIndex )
 {
    ULONG ulBlock;
    BYTE pBlock[ DBT_BLOCKSIZE ];
+   USHORT uiLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtGetMemoLen(%p, %hu)", pArea, uiIndex));
 
@@ -328,12 +329,12 @@ static ULONG hb_dbtGetMemoLen( DBTAREAP pArea, USHORT uiIndex )
    do
    {
       uiIndex = 0;
-      if ( hb_fsRead( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE ) == DBT_BLOCKSIZE )
-      {
-         while( uiIndex < DBT_BLOCKSIZE && pBlock[ uiIndex ] != 0x1A )
-            uiIndex++;
-         ulBlock += uiIndex;
-      }
+      uiLen = hb_fsRead( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE );
+      if ( uiLen == ( USHORT ) FS_ERROR )
+         break;
+      while( uiIndex < uiLen && pBlock[ uiIndex ] != 0x1A )
+         uiIndex++;
+      ulBlock += uiIndex;
    } while( uiIndex == DBT_BLOCKSIZE );
    return ulBlock;
 }

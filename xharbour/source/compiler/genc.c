@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.93 2005/04/02 01:10:12 andijahja Exp $
+ * $Id: genc.c,v 1.94 2005/04/02 21:13:47 andijahja Exp $
  */
 
 /*
@@ -270,12 +270,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            fprintf( yyc, "HB_FUNC_INIT( %.*s );\n", strlen( pFunc->szName ) - 1, pFunc->szName );
+            fprintf( yyc, "HB_FUNC_INIT( %.*s );\n", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            fprintf( yyc, "HB_FUNC_EXIT( %.*s );\n", strlen( pFunc->szName ) - 1, pFunc->szName );
+            fprintf( yyc, "HB_FUNC_EXIT( %.*s );\n", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
@@ -507,11 +507,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                if( pSym->cScope & HB_FS_INIT )
                {
-                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", ( int ) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else if( pSym->cScope & HB_FS_EXIT )
                {
-                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", ( int ) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else
                {
@@ -662,12 +662,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            fprintf( yyc, "HB_FUNC_INIT( %.*s )", strlen( pFunc->szName ) - 1, pFunc->szName );
+            fprintf( yyc, "HB_FUNC_INIT( %.*s )", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            fprintf( yyc, "HB_FUNC_EXIT( %.*s )", strlen( pFunc->szName ) - 1, pFunc->szName );
+            fprintf( yyc, "HB_FUNC_EXIT( %.*s )", ( int ) strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else

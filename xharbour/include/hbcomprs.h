@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.h,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbcomprs.h,v 1.2 2004/04/28 18:22:07 druzus Exp $
  */
 
 /*
@@ -127,7 +127,9 @@
 
 /* Old Borland C incorrectly complains about missing returns: */
 #if defined(__BORLANDC__) && (__BORLANDC__ < 0x500)
-#  define NEED_DUMMY_RETURN
+#  if !defined(NEED_DUMMY_RETURN)
+#    define NEED_DUMMY_RETURN
+#  endif
 #endif
 
 

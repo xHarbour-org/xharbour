@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4006 2005/04/05 13:42:20 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4007 2005/04/05 13:52:25 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-06 00:20 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * updated version number
+
+  * xharbour/include/hbcomprs.h
+  * xharbour/include/hbsetup.h
+    * some minor cleanups for XCC
+
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/compiler/genc.c
+    * casting
+  
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * minor modification in detecting bad expressions
+
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    ! accept not full memo block - it's necessary for Clipper compatibility.
 
 2005-04-05 16:50 UTC+0300 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
   * xharbour/config/w32/gcc.cf
