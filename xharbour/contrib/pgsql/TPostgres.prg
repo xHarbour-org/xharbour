@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.17 2004/04/30 18:23:06 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.22 2004/05/19 14:32:07 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -100,7 +100,7 @@ METHOD New( cHost, cDatabase, cUser, cPass, nPort, Schema ) CLASS TPQserver
         endif
         PQclear(res)
     endif                
-
+    
 RETURN self
 
 METHOD SetSchema( cSchema ) CLASS TPQserver
@@ -814,6 +814,7 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
     Local cType
     Local nSize
     Local tmp
+    Local cDateFmt
 
     if ISCHARACTER(nField)
         nField := ::Fieldpos(nField)
@@ -838,11 +839,14 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
         
         elseif cType == "D"
             if ! ISNIL(result)
-                tmp := SET (_SET_DATEFORMAT)   
+                tmp := 'yyyy-mm-dd'   
                 tmp := strtran( tmp, 'dd', substr(result, 9, 2) )
                 tmp := strtran( tmp, 'mm', substr(result, 6, 2) )
                 tmp := strtran( tmp, 'yyyy', left(result, 4) )
+
+                cDateFmt := Set(_SET_DATEFORMAT, 'yyy-mm-dd')
                 result := CtoD(tmp)
+                Set(_SET_DATEFORMAT, cDateFmt)
             else
                 result := CtoD('')
             end
