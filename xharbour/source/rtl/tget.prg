@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.12 2002/04/17 18:17:10 walito Exp $
+ * $Id: tget.prg,v 1.13 2002/05/23 16:51:24 walito Exp $
  */
 
 /*
@@ -428,7 +428,13 @@ METHOD SetFocus() CLASS Get
 
    if ::type == "N"
       ::decpos := At( iif( ::lDecRev .or. "E" $ ::cPicFunc, ",", "." ), ::buffer )
-      ::minus  := ( "-" $ ::buffer .or. "(" $ ::buffer )
+
+      for nFor := 1 to ::nMaxLen
+         if ::IsEditable( nFor )
+            ::minus := ( Substr( ::buffer, nFor, 1 ) $ "-(" )
+         endif
+      next
+//      ::minus  := ( "-" $ ::buffer .or. "(" $ ::buffer )
    else
       ::decpos := NIL
       ::minus  := .f.
