@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.42 2004/10/27 04:17:24 bdj Exp $
+ * $Id: gtapi.c,v 1.43 2004/10/27 06:22:10 guerra000 Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ static SHORT        ct_WMax  = 0;      // Size of ct_Wind[]
 static HB_CT_WND *  ct_WCur  = NULL;   // Current Window Description
 static SHORT        ct_NCur  = -1;     // Current Window Number
 static SHORT *      ct_Stac  = 0;      // Table of Windows Stack
-static SHORT        ct_SMax  = 0;      // Size of ct_Stack[]
+static SHORT        ct_SMax  = 0;      // Size of ct_Stac[]
 
 static BOOL         ct_MMode = TRUE;   // Windows Interactive Movement Mode
 static BOOL         ct_MFRow = FALSE;  // Move After Screen Top
@@ -195,8 +195,8 @@ static BOOL         ct_MLCol = FALSE;  // Move After Screen Right
 static SHORT        ct_MRStep = 2;     // Move Rows Step
 static SHORT        ct_MCStep = 5;     // Move Columns Step
 
-static SHORT        ct_ClearA  = 7;    // Windows Clear Attribute
-static SHORT        ct_ClearB  = ' ';  // Windows Clear Char
+static SHORT        ct_ClearA = 7;     // Windows Clear Attribute
+static SHORT        ct_ClearB = ' ';   // Windows Clear Char
         // Clipper uses 255
         // but we cannot not all platform/character set uses 255 as blank char
 
@@ -311,14 +311,11 @@ void HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtAdjustPos()"));
 
-   if( isatty( iHandle ) && hb_gt_AdjustPos( ( BYTE * ) pStr, ulLen ) )
+   if( isatty( iHandle ) && hb_gt_AdjustPos( ( BYTE* ) pStr, ulLen ) )
    {
       /* Adjust the console cursor position to match the device driver */
       s_iRow = hb_gt_Row();
       s_iCol = hb_gt_Col();
-
-      ct_WCur->iRow = s_iRow - ct_UFRow;
-      ct_WCur->iCol = s_iCol - ct_UFCol;
    }
 }
 
@@ -367,7 +364,7 @@ USHORT HB_EXPORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
    szBox[ tmp ] = '\0';
 
-   if( s_Width > 1 )                        // CT3 version
+   if( s_Width > 0 && ct_WMax > 0 )         // CT3 new version
    {
       if( Bottom < ct_UFRow ) Bottom = ct_ULRow + 1;
       if( Right  < ct_UFCol ) Right  = ct_ULCol + 1;
@@ -509,13 +506,13 @@ USHORT HB_EXPORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
 {
    USHORT Ret;
 
-   Ret = hb_gtBox( Top, Left, Bottom, Right, ( BYTE * ) _B_DOUBLE );
+   Ret = hb_gtBox( Top, Left, Bottom, Right, ( BYTE* ) _B_DOUBLE );
 
 /* //--- Old version ----//
    if( Top != Bottom )
    {
       if( Left != Right )
-         Ret = hb_gt_BoxD( Top, Left, Bottom, Right, ( BYTE * ) _B_DOUBLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_BoxD( Top, Left, Bottom, Right, ( BYTE* ) _B_DOUBLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       else
          Ret = hb_gt_VertLine( Left, Top, Bottom, (BYTE) HB_B_DOUBLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
    }
@@ -533,14 +530,14 @@ USHORT HB_EXPORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
 {
    USHORT Ret;
 
-   Ret = hb_gtBox( Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE );
+   Ret = hb_gtBox( Top, Left, Bottom, Right, ( BYTE* ) _B_SINGLE );
 
 /* //--- Old version ----//
    if( Top != Bottom )
    {
       if( Left != Right )
       {
-         Ret = hb_gt_BoxS( Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_BoxS( Top, Left, Bottom, Right, ( BYTE* ) _B_SINGLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       }
       else
       {
@@ -1046,7 +1043,7 @@ USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetPos(%p, %p)", piRow, piCol));
 
-   if( !s_ScNone )
+   if( s_Width <= 0 || !s_ScNone )
    {
       /* Only return the actual cursor position if the current
          cursor position was not previously set out of bounds. */
@@ -1054,8 +1051,8 @@ USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol )
       s_iCol = hb_gt_Col();
    }
 
-   *piRow = ct_WCur->iRow = s_iRow - ct_UFRow;
-   *piCol = ct_WCur->iCol = s_iCol - ct_UFCol;
+   *piRow = s_iRow - ct_UFRow;
+   *piCol = s_iCol - ct_UFCol;
 
    return 0;
 }
@@ -1092,15 +1089,8 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
       s_ScNone = TRUE;
    }
 
-   s_iRow          = iRow;
-   s_iCol          = iCol;
-
-   if (ct_WCur != NULL) /* bdj: ct_WCur may == NULL during init */
-   {
-      ct_WCur->iRow   = s_iRow - ct_UFRow;
-      ct_WCur->iCol   = s_iCol - ct_UFCol;
-      ct_WCur->ScNone = s_ScNone;
-   }
+   s_iRow = iRow;
+   s_iCol = iCol;
 
    return 0;
 }
@@ -1137,11 +1127,8 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
       s_ScNone = TRUE;
    }
 
-   s_iRow          = iRow;
-   s_iCol          = iCol;
-   ct_WCur->iRow   = s_iRow - ct_UFRow;
-   ct_WCur->iCol   = s_iCol - ct_UFCol;
-   ct_WCur->ScNone = s_ScNone;
+   s_iRow = iRow;
+   s_iCol = iCol;
 
    return 0;
 }
@@ -1159,7 +1146,7 @@ USHORT HB_EXPORT hb_gtMaxCol( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtMaxCol()"));
 
-   return ct_ULCol - ct_UFCol;
+   return s_Width > 0 ? ct_ULCol - ct_UFCol: 0;
 }
 
 /****************************************************************************/
@@ -1187,7 +1174,7 @@ USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRepChar(%hu, %hu, %d, %hu)", uiRow, uiCol, (int) byChar, uiCount));
 
-   if( s_Width > 1 )
+   if( s_Width > 0 )
    {
       uiRow += ct_UFRow;
       uiCol += ct_UFCol;
@@ -1220,7 +1207,7 @@ USHORT HB_EXPORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
    uiBottom += ct_UFRow;
    uiRight  += ct_UFCol;
 
-   hb_gt_PutText( uiTop, uiLeft, uiBottom, uiRight, ( BYTE * ) pScrBuff );
+   hb_gt_PutText( uiTop, uiLeft, uiBottom, uiRight, ( BYTE* ) pScrBuff );
 
    return 0;
 }
@@ -1236,7 +1223,7 @@ USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
    uiBottom += ct_UFRow;
    uiRight  += ct_UFCol;
 
-   hb_gt_GetText( uiTop, uiLeft, uiBottom, uiRight, ( BYTE * ) pScrBuff );
+   hb_gt_GetText( uiTop, uiLeft, uiBottom, uiRight, ( BYTE* ) pScrBuff );
 
    return 0;
 }
@@ -1277,7 +1264,7 @@ USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetMode(%hu, %hu)", uiRows, uiCols));
 
-   if (ct_SMax<=1 && hb_gt_SetMode( uiRows, uiCols ))
+   if ( ct_SMax <= 1 && hb_gt_SetMode( uiRows, uiCols ) )
    {
       s_Height = uiRows;
       s_Width  = uiCols;
@@ -1350,7 +1337,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
                           HB_GT_SET_POS_AFTER );
 
       /* Test End of line */
-      if ( ct_WNCol > 0 && s_iCol > ct_ULCol )
+      if ( s_Width > 0 && s_iCol > ct_ULCol )
       {
          if ( s_iRow < ct_ULRow )
             hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
@@ -1411,7 +1398,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
                           HB_GT_SET_POS_AFTER );
 
       /* Test End of line */
-      if ( s_Width > 1 && s_iCol > ct_ULCol )
+      if ( s_Width > 0 && s_iCol > ct_ULCol )
       {
          if ( s_iRow < ct_ULRow )
             hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
@@ -2028,30 +2015,30 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
 /* New CT3 Windows API functions                                                */
 /****************************************************************************/
 /*
-  hb_ctGetClearA()  - Get the default attribute for screen/window clear
-  hb_ctGetClearB()  - Get the default character for screen/window clear
-  hb_ctMaxCol()     - Get the highest column number for screen/window
-  hb_ctMaxRow()     - Get the highest row number for screen/window
-  hb_ctSetClearA()  - Set the default attribute for screen/window clear
-  hb_ctSetClearB()  - Set the default character for screen/window clear
+  hb_ctGetClearA()   - Get the default attribute for screen/window clear
+  hb_ctGetClearB()   - Get the default character for screen/window clear
+  hb_ctMaxCol()      - Get the highest column number for screen/window
+  hb_ctMaxRow()      - Get the highest row number for screen/window
+  hb_ctSetClearA()   - Set the default attribute for screen/window clear
+  hb_ctSetClearB()   - Set the default character for screen/window clear
   hb_ctSetCurColor() - Set current color
-  hb_ctSetPos()     - Move the cursor to a new position
-  hb_ctWAClose()    - Close all windows
-  hb_ctWBoard()     - Allocates screen area for windows
-  hb_ctWCenter()    - Returns a window to the visible area, or centers it
-  hb_ctWClose()     - Close the active window
-  hb_ctWCurrent()   - Get the current windows info
-  hb_ctWFormat()    - Set the usable area within a window
-  hb_ctWFree()      - Free HB_CT_WND Table
-  hb_ctWMode()      - Set the screen border overstep mode
-  hb_ctWMove()      - Moves a window
-  hb_ctWNew()       - Create new HB_CT_WND Table
-  hb_ctWNum()       - Get the highest windows handle
-  hb_ctWOpen()      - Opens a new window
-  hb_ctWSelect()    - Activate Window
-  hb_ctWSetMove()   - Set the interactive movement mode
-  hb_ctWSetShadow() - Set the window shadow color
-  hb_ctWStep()      - Set the step width of interactive window movement
+  hb_ctSetPos()      - Move the cursor to a new position
+  hb_ctWAClose()     - Close all windows
+  hb_ctWBoard()      - Allocates screen area for windows
+  hb_ctWCenter()     - Returns a window to the visible area, or centers it
+  hb_ctWClose()      - Close the active window
+  hb_ctWCurrent()    - Get the current windows info
+  hb_ctWFormat()     - Set the usable area within a window
+  hb_ctWFree()       - Free HB_CT_WND Table
+  hb_ctWMode()       - Set the screen border overstep mode
+  hb_ctWMove()       - Moves a window
+  hb_ctWNew()        - Create new HB_CT_WND Table
+  hb_ctWNum()        - Get the highest windows handle
+  hb_ctWOpen()       - Opens a new window
+  hb_ctWSelect()     - Activate Window
+  hb_ctWSetMove()    - Set the interactive movement mode
+  hb_ctWSetShadow()  - Set the window shadow color
+  hb_ctWStep()       - Set the step width of interactive window movement
 
    Static functions:
 
@@ -2166,11 +2153,10 @@ static void hb_ctSARest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                                 + iCol - FCol ) + 1;
 
             hb_gt_SetAttribute( iRow, iCol, iRow, iCol,
-                                * ( ( BYTE * ) uiAddr2 ) );
+                                * ( ( BYTE* ) uiAddr2 ) );
          }
       }
    }
-
 }
 /****************************************************************************/
 /* Save Window Screen Area */
@@ -2191,7 +2177,7 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
        LRow <= ct_BLRow && LCol <= ct_BLCol)
    {
-      hb_gt_GetText( FRow, FCol, LRow, LCol, ( BYTE * ) *uiAddr );
+      hb_gt_GetText( FRow, FCol, LRow, LCol, ( BYTE* ) *uiAddr );
    }
    else
    {
@@ -2208,11 +2194,10 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                       ct_CSize * ( ( iRow - FRow ) * ( LCol - FCol + 1 )
                                    + FCol2 - FCol );
 
-            hb_gt_GetText( iRow, FCol2, iRow, LCol2, ( BYTE * ) uiAddr2 );
+            hb_gt_GetText( iRow, FCol2, iRow, LCol2, ( BYTE* ) uiAddr2 );
          }
       }
    }
-
 }
 /****************************************************************************/
 /* Restore Window Screen Area */
@@ -2227,7 +2212,7 @@ static void hb_ctSCRest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
        LRow <= ct_BLRow && LCol <= ct_BLCol)
    {
-      hb_gt_PutText( FRow, FCol, LRow, LCol, ( BYTE * ) uiAddr );
+      hb_gt_PutText( FRow, FCol, LRow, LCol, ( BYTE* ) uiAddr );
    }
    else
    {
@@ -2244,7 +2229,7 @@ static void hb_ctSCRest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                       ct_CSize * ( ( iRow - FRow ) * ( LCol - FCol + 1 )
                                    + FCol2 - FCol );
 
-            hb_gt_PutText( iRow, FCol2, iRow, LCol2, ( BYTE * ) uiAddr2 );
+            hb_gt_PutText( iRow, FCol2, iRow, LCol2, ( BYTE* ) uiAddr2 );
          }
       }
    }
@@ -2437,12 +2422,12 @@ SHORT HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol )
 /* Allocates screen area for windows */
 SHORT HB_EXPORT hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol )
 {
-   if( ct_SMax > 1 ) return -1;
+   if( ct_WMax < 1 || ct_SMax > 1 ) return -1;
 
-   if( FRow < 0 )            FRow = 0;
-   if( FCol < 0 )            FCol = 0;
-   if( LRow > s_Height - 1 ) LRow = s_Height - 1;
-   if( LCol > s_Width - 1 )  LCol = s_Width - 1;
+   FRow = HB_MAX( 0, HB_MIN( FRow, s_Height - 1 ) );
+   FCol = HB_MAX( 0, HB_MIN( FCol, s_Width - 1  ) );
+   LRow = HB_MAX( 0, HB_MIN( LRow, s_Height - 1 ) );
+   LCol = HB_MAX( 0, HB_MIN( LCol, s_Width - 1  ) );
 
    if( LRow < FRow || LCol < FCol ) return -1;
 
@@ -2573,9 +2558,9 @@ SHORT HB_EXPORT hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol )
       ct_WCur->ULRow = ct_ULRow = LRow;
       ct_WCur->UFCol = ct_UFCol = FCol;
       ct_WCur->ULCol = ct_ULCol = LCol;
-   }
 
-   hb_gtSetPos( ct_WCur->iRow, ct_WCur->iCol );
+      hb_gtSetPos( ct_WCur->iRow, ct_WCur->iCol );
+   }
 
    return ct_NCur;
 }
@@ -2595,8 +2580,6 @@ void HB_EXPORT hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol )
 /* Moves a window */
 SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
 {
-   SHORT iRow, iCol;
-
    if( FRow < ct_BFRow && !ct_MFRow ) FRow = ct_BFRow;
    if( FCol < ct_BFCol && !ct_MFCol ) FCol = ct_BFCol;
 
@@ -2615,11 +2598,11 @@ SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
    {
       hb_gtDispBegin();
 
+      ct_WCur->iRow = s_iRow - ct_UFRow;
+      ct_WCur->iCol = s_iCol - ct_UFCol;
+
       hb_ctWFSave( ct_WCur );
       hb_ctWBRest( ct_WCur );
-
-      ct_WCur->iRow = iRow = s_iRow - ct_UFRow;
-      ct_WCur->iCol = iCol = s_iCol - ct_UFCol;
 
       ct_WCur->UFRow = ct_UFRow = ct_UFRow + FRow - ct_WFRow;
       ct_WCur->UFCol = ct_UFCol = ct_UFCol + FCol - ct_WFCol;
@@ -2635,7 +2618,7 @@ SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
       hb_ctWFRest( ct_WCur );
       hb_ctWSDisp( ct_WCur );
 
-      hb_gtSetPos( iRow, iCol );
+      hb_gtSetPos( ct_WCur->iRow, ct_WCur->iCol );
 
       hb_gtDispEnd();
    }
@@ -2691,7 +2674,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    }
    else
    {
-      wnd->s_pColor = ( int * ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
+      wnd->s_pColor = ( int* ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
       memcpy( wnd->s_pColor, s_pColor, s_uiColorCount );
    }
    wnd->s_uiCursorStyle = s_uiCursorStyle;
@@ -2701,7 +2684,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       if ( ct_Wind[ i ] == NULL ) break;
    if ( i >= ct_WMax)
    {
-      ct_Wind = ( HB_CT_WND ** ) hb_xrealloc( ct_Wind,
+      ct_Wind = ( HB_CT_WND** ) hb_xrealloc( ct_Wind,
                                     ( ct_WMax + 1 ) * sizeof( HB_CT_WND* ) );
       i = ct_WMax;
       ct_WMax++;
@@ -2753,13 +2736,11 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
 
       if( i >= ct_SMax )                              // New Window
       {
-         ct_Stac = ( SHORT * ) hb_xrealloc( ct_Stac, ( ct_SMax + 1 ) * sizeof( SHORT ) );
+         ct_Stac = ( SHORT* ) hb_xrealloc( ct_Stac, ( ct_SMax + 1 ) * sizeof( SHORT ) );
          ct_Stac[ ct_SMax ] = iwnd;
-         // i = ct_SMax;  // This assign is never used...
          ct_SMax++;
 
          if( iwnd > 0 ) hb_ctWBSave( ct_Wind[ iwnd ] );
-
       }
       else if ( iwnd == 0 )                           // Window_X -> Window_0
       {
