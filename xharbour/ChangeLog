@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1402 2003/09/03 00:42:20 andijahja Exp $
+ * $Id: ChangeLog,v 1.1403 2003/09/03 01:17:40 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-02 18:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    ! Fixed memory leak related to Array Owner management. This also eliminate warning generation to Trace.log file
+
 2003-09-03 08:05 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/common/reserved.c
      + Add option to omit reserved words by adding -DHB_RESERVED_OFF (default is ON)

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.28 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: memvars.c,v 1.29 2003/08/25 22:25:04 ronpinkas Exp $
  */
 
 /*
@@ -318,12 +318,28 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       }
       else
       {
+        #ifndef HB_ARRAY_USE_COUNTER
+           HB_VALUE_PTR pOldValues = s_globalTable;
+           ULONG ulPos, ulValues = s_globalTableSize;
+        #endif
+
          /* No more free values in the table - expand the table
             */
          hValue = s_globalTableSize;
          s_globalFirstFree = s_globalLastFree = s_globalTableSize + 1;
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
+
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
+
+         #ifndef HB_ARRAY_USE_COUNTER
+            for( ulPos = 0; ulPos < ulValues; ulPos++ )
+            {
+               if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY )
+               {
+                  hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
+               }
+            }
+         #endif
       }
    }
 
