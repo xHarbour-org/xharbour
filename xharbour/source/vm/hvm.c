@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.431 2005/01/05 05:23:28 walito Exp $
+ * $Id: hvm.c,v 1.432 2005/01/10 18:45:39 druzus Exp $
  */
 
 /*
@@ -941,9 +941,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    LONG w = 0;
    BOOL bCanRecover = FALSE;
+   BYTE curPCode;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
+#ifndef HB_GUI
+   static unsigned short uiPolls = 1;
+#endif
 
    #ifndef HB_THREAD_SUPPORT
       ULONG ulBGMaxExecutions;
@@ -974,7 +978,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
    #endif
 
-   while( pCode[ w ] != HB_P_ENDPROC )
+   while( ( curPCode = pCode[ w ] ) != HB_P_ENDPROC )
    {
 
       #ifndef HB_NO_PROFILER
@@ -984,17 +988,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
             ulPastClock = ulActualClock;
-            ulLastOpcode = pCode[ w ];
+            ulLastOpcode = curPCode;
             hb_ulOpcodesCalls[ ulLastOpcode ]++;
          }
       #endif
 
 #ifndef HB_GUI
-      if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
+      if( ! --uiPolls )
       {
-         static USHORT s_iCancel = 0;
-
-         if( ++s_iCancel == 65535 )
+         if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
          {
             int ch = hb_gt_ReadKey( hb_set.HB_SET_EVENTMASK );
 
@@ -1032,7 +1034,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       #endif
       }
 
-      switch( pCode[ w ] )
+      switch( curPCode )
       {
          /* Operators ( mathematical / character / misc ) */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3768 2005/01/23 14:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3768 2005/01/23 12:14:24 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-25 11:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/filesys.c
+    * open/create files with O_LARGEFILE flag (for LFS on 32-bit Linux)
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfcdx/dbfntx1.c
+    * for DBF files use hb_fsSeekLarge() instead of hb_fsSeek() and
+      HB_FOFFSET instead of ULONG to address file offset
+
+  * xharbour/include/hbset.h
+    + added 'extern HB_SET_STRUCT *hb_set_ptr;'
+
+  * xharbour/include/hbstack.h
+    + added 'extern HB_STACK * hb_stack_ptr;'
+
+  * xharbour/include/thread.h
+    + added commented declaration of HB_VM_STACK declaration which uses
+      *hb_stack_ptr instead of hb_stack
+
+  * xharbour/source/vm/estack.c
+    + added 'HB_STACK * hb_stack_ptr = &hb_stack;'
+
+  * xharbour/source/rtl/set.c
+    + added 'HB_SET_STRUCT * hb_set_ptr = &hb_set;'
+
+  * xharbour/source/vm/hvm.c
+    * two small tricks but gives noticable speed-up on PCODE evaluation
+      (about 3-4% in speedtst)
 
 2005-01-23 14:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   + source/codepage/cphu852.c

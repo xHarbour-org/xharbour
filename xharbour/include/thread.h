@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.98 2004/12/01 00:50:58 peterrees Exp $
+* $Id: thread.h,v 1.99 2004/12/31 11:55:49 druzus Exp $
 */
 
 /*
@@ -814,6 +814,8 @@ void hb_threadCancelInternal( void );
 
    #ifndef HB_VM_STACK
       #define HB_VM_STACK hb_stack
+      /* This version eliminates the problem with DLL linking */
+      /* #define HB_VM_STACK (*hb_stack_ptr) */
    #endif
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.37 2004/09/21 22:31:12 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.38 2005/01/19 23:36:33 druzus Exp $
  */
 
 /*
@@ -360,11 +360,11 @@ typedef CDXINDEX * LPCDXINDEX;
 /* for index creation */
 typedef struct
 {
-   ULONG    nOffset;    /* offset in temporary file */
-   ULONG    ulKeys;     /* number of keys in page */
-   ULONG    ulKeyBuf;   /* number of keys in memory buffer */
-   ULONG    ulCurKey;   /* current key in memory buffer */
-   BYTE *   pKeyPool;   /* memory buffer */
+   HB_FOFFSET  nOffset;    /* offset in temporary file */
+   ULONG       ulKeys;     /* number of keys in page */
+   ULONG       ulKeyBuf;   /* number of keys in memory buffer */
+   ULONG       ulCurKey;   /* current key in memory buffer */
+   BYTE *      pKeyPool;   /* memory buffer */
 } CDXSWAPPAGE;
 typedef CDXSWAPPAGE * LPCDXSWAPPAGE;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.176 2005/01/22 11:32:04 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.177 2005/01/23 11:23:33 druzus Exp $
  */
 
 /*
@@ -7885,7 +7885,7 @@ static void hb_cdxSortWritePage( LPCDXSORTINFO pSort )
       pSort->szTempFileName = hb_strdup( ( char * ) szName );
    }
    pSort->pSwapPage[ pSort->ulCurPage ].ulKeys = pSort->ulKeys;
-   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeek( pSort->hTempFile, 0, SEEK_END );
+   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeekLarge( pSort->hTempFile, 0, SEEK_END );
    if ( hb_fsWriteLarge( pSort->hTempFile, pSort->pKeyPool, ulSize ) != ulSize )
    {
       hb_errInternal( 9999, "hb_cdxSortWritePage: Write error in temporary file.", "", "" );
@@ -7904,7 +7904,7 @@ static void hb_cdxSortGetPageKey( LPCDXSORTINFO pSort, ULONG ulPage,
       ULONG ulKeys = HB_MIN( pSort->ulPgKeys, pSort->pSwapPage[ ulPage ].ulKeys );
       ULONG ulSize = ulKeys * ( iLen + 4 );
 
-      if ( hb_fsSeek( pSort->hTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
+      if ( hb_fsSeekLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
            hb_fsReadLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize )
       {
          hb_errInternal( 9999, "hb_cdxSortGetPageKey: Read error from temporary file.", "", "" );
@@ -8385,9 +8385,10 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                else
                   iRec = ulRecCount - ulRecNo + 1;
 
-               hb_fsSeek( pArea->hDataFile,
-                          pArea->uiHeaderLen + ( ulRecNo - 1 ) * pArea->uiRecordLen,
-                          FS_SET );
+               hb_fsSeekLarge( pArea->hDataFile,
+                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
+                               ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.90 2005/01/22 11:32:05 druzus Exp $
+ * $Id: dbfntx1.c,v 1.91 2005/01/23 11:23:34 druzus Exp $
  */
 
 /*
@@ -2465,8 +2465,10 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, SHORT* numRecinBuf,
       if( *numRecinBuf == 0 )
       {
          ULONG ulBufLen = pArea->uiRecordLen  * 10;
-         hb_fsSeek( pArea->hDataFile,
-             pArea->uiHeaderLen + pArea->uiRecordLen * ( ulRecNo - 1 ), FS_SET );
+         hb_fsSeekLarge( pArea->hDataFile,
+                         ( HB_FOFFSET ) pArea->uiHeaderLen + 
+			 ( HB_FOFFSET ) pArea->uiRecordLen * 
+			 ( HB_FOFFSET ) ( ulRecNo - 1 ), FS_SET );
          hb_fsReadLarge( pArea->hDataFile, readBuffer, ulBufLen );
       }
       pArea->pRecord = readBuffer + (*numRecinBuf) * pArea->uiRecordLen;

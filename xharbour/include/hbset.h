@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.28 2004/08/10 01:25:14 druzus Exp $
+ * $Id: hbset.h,v 1.29 2004/09/06 19:25:52 mlombardo Exp $
  */
 
 /*
@@ -241,6 +241,7 @@ typedef struct
 
 // extern HB_EXPORT HB_SET_STRUCT hb_set;
 extern HB_SET_STRUCT hb_set;
+extern HB_SET_STRUCT *hb_set_ptr;
 
 HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void );
 extern void hb_setInitialize( void );

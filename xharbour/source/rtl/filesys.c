@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.134 2005/01/20 23:12:17 druzus Exp $
+ * $Id: filesys.c,v 1.135 2005/01/21 18:41:38 druzus Exp $
  */
 
 /*
@@ -235,6 +235,10 @@
    #define O_BINARY     0       /* O_BINARY not defined on Linux */
 #endif
 
+#ifndef O_LARGEFILE
+   #define O_LARGEFILE  0       /* O_LARGEFILE is used for LFS in 32-bit Linux */
+#endif
+
 #ifndef S_IEXEC
    #define S_IEXEC      0x0040  /* owner may execute <directory search> */
 #endif
@@ -428,8 +432,8 @@ static int convert_open_flags( USHORT uiFlags )
 
    HB_TRACE(HB_TR_DEBUG, ("convert_open_flags(%hu)", uiFlags));
 
-   result_flags |= O_BINARY;
-   HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_BINARY\n"));
+   result_flags |= O_BINARY | O_LARGEFILE;
+   HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_BINARY | O_LARGEFILE\n"));
 
 #if defined(HB_FS_SOPEN)
    if( ( uiFlags & ( FO_WRITE | FO_READWRITE ) ) == FO_READ )
@@ -559,7 +563,8 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
 {
    HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
 
-   *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
+   /* by default FC_NORMAL is set */
+   *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR | O_LARGEFILE;
    *result_pmode = convert_pmode_flags( uiFlags );
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
@@ -569,14 +574,8 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
 {
    HB_TRACE(HB_TR_DEBUG, ("convert_create_flags_ex(%hu, %hu, %p, %p)", uiAttr, uiFlags, result_flags, result_pmode));
 
-   /* by default FC_NORMAL is set */
-
-   /* *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR; */
-   *result_flags = convert_open_flags( uiFlags ) | O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
-   if ( uiFlags & FO_EXCL )
-      *result_flags |= O_EXCL;
-
-   *result_pmode = convert_pmode_flags( uiAttr );
+   convert_create_flags( uiAttr, result_flags, result_pmode );
+   *result_flags |= convert_open_flags( uiFlags );
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }

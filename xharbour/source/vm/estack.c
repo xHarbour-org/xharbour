@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.68 2004/12/02 03:26:20 druzus Exp $
+ * $Id: estack.c,v 1.69 2004/12/31 11:56:11 druzus Exp $
  */
 
 /*
@@ -69,6 +69,7 @@ HB_EXTERN_BEGIN
 /* ------------------------------- */
 
 HB_STACK hb_stack;
+HB_STACK * hb_stack_ptr = &hb_stack;
 
 HB_EXPORT HB_STACK hb_GetStack( void )
 {
