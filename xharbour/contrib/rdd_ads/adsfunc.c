@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.37 2004/04/28 09:59:37 brianhays Exp $
+ * $Id: adsfunc.c,v 1.38 2004/05/24 08:23:03 brianhays Exp $
  */
 
 /*
@@ -568,7 +568,7 @@ HB_FUNC( ADSKEYCOUNT )
    /* 2nd parameter: unsupported Bag Name. */
    PHB_ITEM   pFilterOption = hb_param( 3, HB_IT_NUMERIC );
 
-   if ( HB_IS_NIL( pxOrder ) )
+   if ( pxOrder != NULL && HB_IS_NIL( pxOrder ) )
    {
       pxOrder = NULL;                   // simplifies arg checks below
    }

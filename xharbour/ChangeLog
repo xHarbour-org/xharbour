@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2998 2004/05/27 23:58:10 druzus Exp $
+ * $Id: ChangeLog,v 1.2999 2004/05/28 01:50:04 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-28 12:50 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/adsfunc.c
+    * fixed adsKeyCount arg handling bug when called like adsKeyCount()
+
 2004-05-27 22:50 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * source/rtl/tget.prg
     ! minor fix on buildgetcolor function
-
 
 2004-05-28 01:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
