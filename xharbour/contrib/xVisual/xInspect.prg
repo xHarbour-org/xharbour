@@ -63,15 +63,16 @@ METHOD OnCreate() CLASS ObjInspect
                                                  ::InspTabs:Properties:ClientRect()[3],;
                                                  ::InspTabs:Properties:ClientRect()[4],,WS_EX_CLIENTEDGE )
   ::Browser:wantHScroll:=.F.
-  oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,94)
-  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,70)
+  oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,85)
+  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,80)
   oCol1:VertAlign   :=TA_CENTER
   oCol2:VertAlign   :=TA_CENTER
   ::Browser:addColumn(oCol1)
   ::Browser:addColumn(oCol2)
   ::Browser:HeadFont  :=GetMessageFont()
   ::Browser:Font      :=GetMessageFont()
-  ::Browser:HeadHeight:=20
+  ::Browser:HeadHeight:=0
+  ::Browser:BgColor   := GetSysColor(COLOR_BTNFACE)
   ::Browser:bKillBlock:={|| DeleteObject(::Browser:Font),DeleteObject(::Browser:HeadFont)}
   ::Browser:configure()
 
