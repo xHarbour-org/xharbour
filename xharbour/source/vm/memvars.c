@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.85 2004/08/04 14:48:11 druzus Exp $
+ * $Id: memvars.c,v 1.86 2004/08/17 17:03:38 ronpinkas Exp $
  */
 
 /*
@@ -906,6 +906,12 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
          pReference = &s_globalTable[ pDyn->hMemvar ].item;
 
+         if( HB_IS_BYREF( pReference ) )
+         {
+            hb_itemCopy( pItem, pReference );
+            return;
+         }
+
          if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
          {
             char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
@@ -925,11 +931,14 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
          //TraceLog( NULL, "Ref to %s (%i) type: %i counter: %i\n", pMemvarSymb->szName, pDyn->hMemvar, pReference->type, s_globalTable[ pDyn->hMemvar ].counter );
 
+         hb_itemClear( pItem );
+
          /* value is already created */
          pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
          pItem->item.asMemvar.offset = 0;
          pItem->item.asMemvar.value = pDyn->hMemvar;
          pItem->item.asMemvar.itemsbase = &s_globalTable;
+
          s_globalTable[ pDyn->hMemvar ].counter++;
       }
       else

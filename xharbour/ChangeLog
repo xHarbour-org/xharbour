@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3502 2004/10/20 03:13:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3503 2004/10/20 19:36:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-20 13:17 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/vm/memvars.c
+    ! Fixed hb_memvarGetRefer() when the source is already a BYREF.
+    ! Fixed possible memory leak in hb_memvarGetRefer()
 
 2004-10-20 21:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/utils/hbpp/hbpp.c
