@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.2 2003/10/10 13:33:52 paultucker Exp $
+# $Id: makefile.vc,v 1.3 2004/05/21 11:09:37 srobert Exp $
 #
 
 #
@@ -50,9 +50,19 @@
 MK_FILE      = makefile.vc
 MK_FLAGS     = $(MAKEFLAGS: =)
 
-OBJ_DIR     = ..\..\obj\vc
-LIB_DIR     = ..\..\lib\vc
+#!ifdef HB_MT
+#MT           =MT
+#HB_MT        =-MT -DHB_THREAD_SUPPORT
+#!else
+#!ifdef MT
+#!undef MT
+#!endif
+#!endif
+
 BIN_DIR     = ..\..\bin
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = ..\..\obj\vc
+#OBJ_DIR     = $(OBJ_DIR)$(MT)
 
 #
 # Directory macros. These should never have to change.
@@ -66,7 +76,7 @@ TOOLS_DIR    = .
 #
 
 AS             = masm
-CFLAGS         = -I$(INCLUDE_DIR) -Ic:\mysql\include -TP -W3 -nologo -DHB_OS_WIN_32_USED $(C_USR) $(CFLAGS)
+CFLAGS         = -Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -Ic:\mysql\include -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32_USED $(C_USR) $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG = -Zi $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)

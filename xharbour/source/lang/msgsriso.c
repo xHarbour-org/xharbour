@@ -1,5 +1,5 @@
 /*
- * $Id: msgsriso.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: msgsriso.c,v 1.5 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Srpski",                   /* Name (in native language) */
       "SR",                       /* RFC ID */
       "ISO-8859-2",               /* Codepage */
-      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",     /* Version */
+      "$Revision: 1.5 $ $Date: 2005/02/28 10:17:30 $",     /* Version */
 
       /* Month names */
 
@@ -188,6 +188,16 @@ HB_LANG_ANNOUNCE( SRISO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_SRISO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_SRISO )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_SRISO
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_SRISO = hb_lang_Init_SRISO;
+   #pragma data_seg()
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.15 2005/02/28 02:12:30 druzus Exp $
+ * $Id: hbinit.h,v 1.16 2005/03/04 17:18:33 druzus Exp $
  */
 
 /*
@@ -70,7 +70,9 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
       }
 
-   #define HB_CALL_ON_STARTUP_BEGIN( func ) func( void ) {
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      func( void ) {
+
    #define HB_CALL_ON_STARTUP_END( func ) }
 
 #elif defined(__GNUC__)
@@ -118,7 +120,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_END( func ) \
           _HB_CALL_ON_STARTUP_END( func )
 
-   #define _HB_CALL_ON_STARTUP_END( func ) return 0; } \
+   #define _HB_CALL_ON_STARTUP_END( func ) \
+      return 0; } \
       static int static_int_##func = func();
 
 #elif defined(HB_PRAGMA_STARTUP) || \
@@ -148,6 +151,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
 #elif defined(HB_MSC_STARTUP) || defined(_MSC_VER)
 
+   /* This section is used for MSC in C mode. C++ mode will
+      use HB_STATIC_STARTUP above.
+   */
+
    #if !defined(HB_MSC_STARTUP)
       #define HB_MSC_STARTUP
    #endif
@@ -165,9 +172,15 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static void func( void ) {
+      static int func( void ) {
 
-   #define HB_CALL_ON_STARTUP_END( func ) }
+   #define HB_CALL_ON_STARTUP_END( func ) \
+         return 0; \
+      }
+
+   /*  After each '_END' simbol, additional 'hooks' are required See the C
+       output of a generated prg for example
+   */
 
 #else
    #error Unknown initialization method.

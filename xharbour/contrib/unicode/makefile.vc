@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2004/02/02 10:12:40 andijahja Exp $
+# $Id: makefile.vc,v 1.5 2004/02/03 08:40:55 andijahja Exp $
 #
 
 #
@@ -8,9 +8,19 @@
 
 INCLUDE_DIR = ..\..\include;include
 
+#!ifdef HB_MT
+#MT           =MT
+#HB_MT        =-MT -DHB_THREAD_SUPPORT
+#!else
+#!ifdef MT
+#!undef MT
+#!endif
+#!endif
+
 BIN_DIR     = ..\..\bin
 LIB_DIR     = ..\..\lib\vc
 OBJ_DIR     = ..\..\obj\vc
+#OBJ_DIR     = $(OBJ_DIR)$(MT)
 INCLUDE_DIR = ..\..\include
 
 #
@@ -18,7 +28,7 @@ INCLUDE_DIR = ..\..\include
 #
 
 CC = cl
-C_FLAGS = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DWIN32 $(C_USR) $(CFLAGS)
+C_FLAGS = -Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
 CLIBFLAGS = $(C_FLAGS) -c
 CLIBFLAGSDEBUG = $(CLIBFLAGS) -Zi
 

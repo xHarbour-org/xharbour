@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.84 2005/02/27 11:56:02 andijahja Exp $
+ * $Id: genc.c,v 1.85 2005/03/06 05:50:32 andijahja Exp $
  */
 
 /*
@@ -519,18 +519,32 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
          fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
-         fprintf( yyc, "#elif defined(_MSC_VER)\n" );
-         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitExplicitStartup = hb_InitExplicitStartup;\n" );
-         fprintf( yyc, "#endif\n\n" );
+         fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
+                       "   #if _MSC_VER >= 1010\n"
+                       "      #pragma data_seg( \".CRT$XIY\" )\n"
+                       "      #pragma comment( linker, \"/Merge:.CRT=.data\" )\n"
+                       "   #else\n"
+                       "      #pragma data_seg( \"XIY\" )\n"
+                       "   #endif\n"
+                       "   static HB_$INITSYM hb_auto_InitExplicitStartup = hb_InitExplicitStartup;\n"
+                       "   #pragma data_seg()\n"
+                       "#endif\n\n" );
       }
 
       if( bCritical )
       {
          fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
          fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
-         fprintf( yyc, "#elif defined(_MSC_VER)\n" );
-         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", hb_comp_FileAsSymbol );
-         fprintf( yyc, "#endif\n\n" );
+         fprintf( yyc, "#elif defined(HB_MSC_STARTUP)\n"
+                       "   #if _MSC_VER >= 1010\n"
+                       "      #pragma data_seg( \".CRT$XIY\" )\n"
+                       "      #pragma comment( linker, \"/Merge:.CRT=.data\" )\n"
+                       "   #else\n"
+                       "      #pragma data_seg( \"XIY\" )\n"
+                       "   #endif\n"
+                       "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n"
+                       "   #pragma data_seg()\n"
+                       "#endif\n\n", hb_comp_FileAsSymbol );
       }
 
       if( hb_comp_pGlobals )

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.9 2003/10/10 13:33:52 paultucker Exp $
+# $Id: makefile.vc,v 1.10 2003/11/16 02:22:52 ronpinkas Exp $
 #
 
 # File:     makefile.vc
@@ -9,6 +9,15 @@
 #
 # Makefile : Builds Whoo for msvc in non batch mode
 
+!ifdef HB_MT
+MT           =MT
+HB_MT        =-MT -DHB_THREAD_SUPPORT
+!else
+!ifdef MT
+!undef MT
+!endif
+!endif
+
 # Global paths
 #
 HBR_DIR  =..\..
@@ -17,6 +26,7 @@ WH_DIR   =..\what32
 
 LIB_DIR  =..\..\lib\vc
 OBJ_DIR  =obj\vc
+#OBJ_DIR  =$(OBJ_DIR)$(MT)
 
 SRCDIR   =source
 
@@ -38,7 +48,7 @@ hbcflags =-n -w -es2 -q0 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
-C_FLAGS   =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -c -nologo -DHB_API_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include $(CFLAGS)
+C_FLAGS   =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -c -nologo -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_API_MACROS -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include $(CFLAGS)
 
 #-- RESOURCE COMPILER ---
 rc       =rc

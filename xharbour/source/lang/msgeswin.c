@@ -1,5 +1,5 @@
 /*
- * $Id: msgeswin.c,v 1.3 2003/07/01 05:09:44 walito Exp $
+ * $Id: msgeswin.c,v 1.4 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Español ANSI",              /* Name (in native language) */
       "ESWIN",                     /* RFC ID */
       "ANSI",                      /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/07/01 05:09:44 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
 
       /* Month names */
 
@@ -206,6 +206,16 @@ HB_LANG_ANNOUNCE( ESWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ESWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_ESWIN )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_ESWIN
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_ESWIN = hb_lang_Init_ESWIN;
+   #pragma data_seg()
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: msgfr.c,v 1.6 2004/07/22 20:18:39 kaddath Exp $
+ * $Id: msgfr.c,v 1.7 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "fran‡ais",                  /* Name (in native language) */
       "FR",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.6 $ $Date: 2004/07/22 20:18:39 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,17 @@ HB_LANG_ANNOUNCE( FR );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_FR )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_FR )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_FR
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_FR = hb_lang_Init_FR;
+   #pragma data_seg()
 #endif
 

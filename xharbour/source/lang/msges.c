@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.8 2003/07/01 05:09:44 walito Exp $
+ * $Id: msges.c,v 1.9 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2003/07/01 05:09:44 $",         /* Version */
+      "$Revision: 1.9 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,17 @@ HB_LANG_ANNOUNCE( ES );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ES )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_ES )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_ES
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_ES = hb_lang_Init_ES;
+   #pragma data_seg()
 #endif
 

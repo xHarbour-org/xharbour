@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3912 2005/03/06 05:50:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.3913 2005/03/06 06:27:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,125 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-06 14:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+  * makefile.nt
+  * hrbdll.vc
+  * makefile.vc
+  * contrib\design\makefile.vc
+  * contrib\hbzlib\makefile.vc
+  * contrib\htmllib\makefile.vc
+  * contrib\Internet\makefile.vc
+  * contrib\libmisc\makefile.vc
+  * contrib\libnf\makefile.vc
+  * contrib\mysql\makefile.vc
+  * contrib\rdd_ads\makefile.vc
+  * contrib\unicode\makefile.vc
+  * contrib\what32\makefile.vc
+  * contrib\Whoo\makefile.vc
+  * contrib\WoopGUI\makefile.vc
+  * contrib\xwt\makefile.vc
+  * source\rtl\gtalleg\makefile.vc
+  * makefile.nt
+  * contrib\what32\makefile.nt
+  * contrib\Whoo\makefile.nt
+  * contrib\WoopGUI\makefile.nt
+  * contrib\xwt\makefile.nt
+    * correct defines, compiler options and output dir in some cases.
+
+  * source/codepage/cpeldos.c
+  * source/codepage/cpelwin.c
+  * source/codepage/cpesdos.c
+  * source/codepage/cpesmwin.c
+  * source/codepage/cpeswin.c
+  * source/codepage/cpgedos.c
+  * source/codepage/cpgewin.c
+  * source/codepage/cphr1250.c
+  * source/codepage/cphr437.c
+  * source/codepage/cphr852.c
+  * source/codepage/cphu852.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cpit437.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpltwin.c
+  * source/codepage/cppl852.c
+  * source/codepage/cppliso.c
+  * source/codepage/cpplmaz.c
+  * source/codepage/cpplwin.c
+  * source/codepage/cppt850.c
+  * source/codepage/cpptiso.c
+  * source/codepage/cpru866.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruwin.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpua866.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpuawin.c
+  * source/codepage/cp_tpl.c
+  * source/lang/msgbgwin.c
+  * source/lang/msgby866.c
+  * source/lang/msgbywin.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr1250.c
+  * source/lang/msghr437.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgltwin.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/lang/msg_tpl.c
+    * Startup code changes.
+  * include/hbinit.h
+    * minor formatting. Added comment to MSC section.
+  * source/compiler/genc.c
+    * all msc startup code is the same now.
+
 2005-03-06 13:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/errorsys.prg
   * include/hbapi.h

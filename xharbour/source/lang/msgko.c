@@ -1,5 +1,5 @@
 /*
- * $Id: msgko.c,v 1.5 2004/01/25 21:48:51 andijahja Exp $
+ * $Id: msgko.c,v 1.6 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "ÇÑ±¹¾î",                    /* Name (in native language) */
       "KO",                        /* RFC ID */
       "949",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2004/01/25 21:48:51 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
 
       /* Month names */
 
@@ -205,6 +205,16 @@ HB_LANG_ANNOUNCE( KO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_KO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_KO )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_KO
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_KO = hb_lang_Init_KO;
+   #pragma data_seg()
 #endif

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.11 2003/12/11 11:07:29 vouchcac Exp $
+# $Id: makefile.vc,v 1.12 2004/12/12 02:21:52 marcosgambeta Exp $
 #
 
 # File:     makefile.vc
@@ -9,6 +9,15 @@
 #
 # Makefile : Builds What32 for msvc in non batch mode
 
+!ifdef HB_MT
+MT           =MT
+HB_MT        =-MT -DHB_THREAD_SUPPORT
+!else
+!ifdef MT
+!undef MT
+!endif
+!endif
+
 # Global paths
 #
 HBR_DIR =..\..
@@ -16,6 +25,7 @@ WH_DIR  =.
 
 LIB_DIR =..\..\lib\vc
 OBJ_DIR =obj\vc
+#OBJ_DIR =$(OBJ_DIR)$(MT)
 
 OUTDIR  =build
 SRCDIR  =source
@@ -39,7 +49,7 @@ hbcflags =-n -w -es2 -q0 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
-C_FLAGS   =-c -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -DHB_OS_WIN_32 -DHB_API_MACROS -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include -DHB_API_MACROS -DHB_FM_STATISTICS_OFF $(C_USR) $(CFLAGS)
+C_FLAGS   =-c -Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_API_MACROS -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include $(C_USR) $(CFLAGS)
 
 #-- RESOURCE COMPILER ---
 rc       =rc

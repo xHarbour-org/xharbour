@@ -1,5 +1,5 @@
 /*
- * $Id: cpitisb.c,v 1.4 2004/12/31 11:55:50 druzus Exp $
+ * $Id: cpitisb.c,v 1.5 2005/02/28 10:17:29 andijahja Exp $
  */
 
 /*
@@ -95,6 +95,16 @@ HB_CODEPAGE_ANNOUNCE( ITISB );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITISB )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITISB )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_ITISB
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ITISB = hb_codepage_Init_ITISB;
+   #pragma data_seg()
 #endif

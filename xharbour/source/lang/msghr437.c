@@ -1,5 +1,5 @@
 /*
- * $Id: msghr437.c,v 1.1 2004/12/27 10:59:11 lf_sfnet Exp $
+ * $Id: msghr437.c,v 1.2 2005/02/28 10:17:30 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.1 $ $Date: 2004/12/27 10:59:11 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,17 @@ HB_LANG_ANNOUNCE( HR437 );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_HR437 )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_HR437 )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_HR437
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_HR437 = hb_lang_Init_HR437;
+   #pragma data_seg()
 #endif
 

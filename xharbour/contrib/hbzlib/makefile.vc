@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2003/09/23 04:52:34 paultucker Exp $
+# $Id: makefile.vc,v 1.5 2004/02/04 17:30:25 ronpinkas Exp $
 #
 
 !IF "$(OS)" == "Windows_NT"
@@ -25,8 +25,8 @@ CLEAN :
     @if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
-         /DWIN32 /DNDEBUG /D_MBCS /D_LIB\
+CPP_PROJ=-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 /nologo /GX /ML /I "..\..\include" /Iinclude\
+         /DWIN32 /D_WIN32 /DNDEBUG /D_MBCS /D_LIB\
          /Fp"$(INTDIR)\hbzip.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
          /FD /c $(CFLAGS)
 

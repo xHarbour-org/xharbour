@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2003/10/09 05:31:55 paultucker Exp $
+# $Id: makefile.vc,v 1.5 2003/10/10 13:33:52 paultucker Exp $
 #
 
 #
@@ -86,7 +86,7 @@ XWT_DIR      =$(SOURCE_DIR)\xwt_mfc # ??
 #
 
 AS           =ML
-C_FLAGS      =-G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -I$(XWT_DIR) -I..\..\include -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGS      =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -I$(XWT_DIR) -I..\..\include -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -i..\..\include -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE

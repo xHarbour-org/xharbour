@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.67 2005/02/22 04:35:32 paultucker Exp $
+# $Id: hrbdll.vc,v 1.68 2005/03/03 14:16:45 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -86,7 +86,7 @@ XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogtyb2p /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogt2yb1p /Gs /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__
 MAINFLAGS     = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
 HARBOUR_CMD   = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD        = $(CC) $(CLIBFLAGS) /Fo$@ $**

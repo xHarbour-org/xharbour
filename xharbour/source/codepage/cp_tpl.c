@@ -1,5 +1,5 @@
 /*
- * $Id: cp_tpl.c,v 1.2 2004/12/31 11:55:49 druzus Exp $
+ * $Id: cp_tpl.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
  */
 
 /*
@@ -94,6 +94,16 @@ HB_CODEPAGE_ANNOUNCE( EN );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_EN
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_EN = hb_codepage_Init_EN;
+   #pragma data_seg()
 #endif
