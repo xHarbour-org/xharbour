@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.81 2003/07/04 16:21:28 jonnymind Exp $
+* $Id: thread.c,v 1.82 2003/07/07 01:49:16 jonnymind Exp $
 */
 
 /*
@@ -162,7 +162,7 @@ HB_SHARED_RESOURCE hb_runningStacks;
 
 BOOL hb_bIdleFence;
 
-static UINT hb_threadUniqueId()
+static UINT hb_threadUniqueId( void )
 {
    volatile UINT uiRet;
    HB_CRITICAL_LOCK( s_thread_unique_id_mutex );
