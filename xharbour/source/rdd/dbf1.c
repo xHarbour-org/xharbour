@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.69 2004/03/25 12:13:13 druzus Exp $
+ * $Id: dbf1.c,v 1.70 2004/03/25 18:50:08 druzus Exp $
  */
 
 /*
@@ -2793,14 +2793,30 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
 
 static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable )
 {
-  BYTE   * pBuffer;
-  char szFileName[ _POSIX_PATH_MAX + 1 ];
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p)", pItemTable));
 
-  pBuffer = (BYTE *) pItemTable->item.asString.value;
-  strcpy( (char *) szFileName, (char *) pBuffer );
-  if ( !strchr( szFileName, '.' ))
-    strcat( szFileName, DBF_TABLEEXT );
-  return hb_fsDelete( (BYTE *) szFileName );
+   if ( pItemTable && HB_IS_STRING( pItemTable ) )
+   {
+      BYTE * pBuffer;
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      ULONG ulLen;
+
+      pBuffer = (BYTE *) pItemTable->item.asString.value;
+      szFileName[ _POSIX_PATH_MAX ] = '\0';
+      strncpy( (char *) szFileName, (char *) pBuffer, _POSIX_PATH_MAX );
+      ulLen = strlen( szFileName );
+      if ( ulLen > 0 )
+      {
+         PHB_FNAME pFileName = hb_fsFNameSplit( szFileName );
+         if ( !pFileName->szExtension )
+         {
+            strncat( szFileName, DBF_TABLEEXT, _POSIX_PATH_MAX - ulLen );
+         }
+         hb_xfree( pFileName );
+         return hb_fsDelete( (BYTE *) szFileName ) ? SUCCESS : FAILURE;
+      }
+   }
+   return FAILURE;
 }
 
 /* returns 1 if exists, 0 else */

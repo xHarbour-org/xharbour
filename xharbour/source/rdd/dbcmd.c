@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.98 2004/03/20 22:12:07 paultucker Exp $
+ * $Id: dbcmd.c,v 1.99 2004/03/21 15:55:04 druzus Exp $
  */
 
 /*
@@ -341,10 +341,9 @@ static void hb_rddCloseAll( void )
          if ( isFinish )
          {
             SELF_RELEASE( ( AREAP ) pCurrArea->pArea );
-            pCurrArea->pArea = NULL;
             hb_xfree( pCurrArea );
          }
-         else if( pCurrArea->pArea )
+         else
          {
             if( ( ( AREAP ) pCurrArea->pArea )->uiParents )
             {
@@ -1398,16 +1397,20 @@ HB_FUNC( DBCOMMIT )
 HB_FUNC( DBCOMMITALL )
 {
    HB_THREAD_STUB
-   LPAREANODE pAreaNode = s_pCurrArea;
+   LPAREANODE pAreaNode = s_pCurrArea, pCurrArea;
+   USHORT uiArea = s_uiCurrArea;
 
    LOCK_AREA
-   s_pCurrArea = s_pWorkAreas;
-   while( s_pCurrArea )
+   pCurrArea = s_pWorkAreas;
+   while( pCurrArea )
    {
+      s_pCurrArea = pCurrArea;
+      s_uiCurrArea = ( ( AREAP ) s_pCurrArea->pArea )->uiArea;
       SELF_FLUSH( ( AREAP ) s_pCurrArea->pArea );
-      s_pCurrArea = s_pCurrArea->pNext;
+      pCurrArea = pCurrArea->pNext;
    }
    UNLOCK_AREA
+   s_uiCurrArea = uiArea;
    s_pCurrArea = pAreaNode;
 }
 
@@ -2418,17 +2421,21 @@ HB_FUNC( DBUNLOCK )
 HB_FUNC( DBUNLOCKALL )
 {
    HB_THREAD_STUB
-   LPAREANODE pTempArea = s_pCurrArea;
+   LPAREANODE pAreaNode = s_pCurrArea, pCurrArea;
+   USHORT uiArea = s_uiCurrArea;
 
    LOCK_AREA
-   s_pCurrArea = s_pWorkAreas;
-   while( s_pCurrArea )
+   pCurrArea = s_pWorkAreas;
+   while( pCurrArea )
    {
+      s_pCurrArea = pCurrArea;
+      s_uiCurrArea = ( ( AREAP ) s_pCurrArea->pArea )->uiArea;
       SELF_UNLOCK( ( AREAP ) s_pCurrArea->pArea, 0 );
-      s_pCurrArea = s_pCurrArea->pNext;
+      pCurrArea = pCurrArea->pNext;
    }
    UNLOCK_AREA
-   s_pCurrArea = pTempArea;
+   s_uiCurrArea = uiArea;
+   s_pCurrArea = pAreaNode;
 }
 
 HB_FUNC( DBUSEAREA )
