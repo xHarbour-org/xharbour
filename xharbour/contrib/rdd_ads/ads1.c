@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.8 2003/05/25 21:50:48 lculik Exp $
+ * $Id: ads1.c,v 1.9 2003/05/26 00:27:50 ronpinkas Exp $
  */
 
 /*
@@ -1614,9 +1614,9 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
          AdsGetVersion( &ulMajor, &ulMinor, &ucLetter, ucDesc, &usDescLen);
 
-         sprintf(ucVersion, "%s, v%ld.%ld%c", ucDesc, ulMajor, ulMinor, ucLetter);
+         sprintf(( char *) ucVersion, "%s, v%ld.%ld%c", ucDesc, ulMajor, ulMinor, ucLetter);
 
-         hb_itemPutC( pItem, ucVersion );
+         hb_itemPutC( pItem, ( char *) ucVersion );
          break;
       }
 
