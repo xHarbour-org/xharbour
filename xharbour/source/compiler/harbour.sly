@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.74 2004/10/30 18:17:10 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.75 2004/11/21 21:43:45 druzus Exp $
  */
 
 /*
@@ -2118,9 +2118,18 @@ EndSwitch  : END
            ;
 
 SwitchBegin : SWITCH Expression {
+                                   USHORT wSeqCounter = hb_comp_wSeqCounter;
+
                                    hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0;
                                    hb_compExprGenPush( $2 );
+
+                                   // Disallow EXIT flag.
+                                   hb_comp_wSeqCounter = (USHORT) -1;
+
                                    hb_compLoopStart();
+
+                                   // Reset
+                                   hb_comp_wSeqCounter = wSeqCounter;
 
                                    if( s_iControlLevel++ == 0 )
                                    {
@@ -2935,7 +2944,7 @@ static void hb_compLoopLoop( void )
    }
    else
    {
-      PTR_LOOPEXIT pLast, pLoop;
+      PTR_LOOPEXIT pLast, pLoop, pLastNonSwitch = NULL;
 
       pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
 
@@ -2943,8 +2952,31 @@ static void hb_compLoopLoop( void )
       pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
 
       pLast = hb_comp_pLoops;
+      if( pLast->wSeqCounter != (USHORT) -1 )
+      {
+         pLastNonSwitch = pLast;
+      }
+
       while( pLast->pNext )
+      {
          pLast = pLast->pNext;
+         if( pLast->wSeqCounter != (USHORT) -1 )
+         {
+            pLastNonSwitch = pLast;
+         }
+      }
+
+      if( pLast->wSeqCounter == (USHORT) -1 )
+      {
+         if( pLastNonSwitch )
+         {
+            pLast = pLastNonSwitch;
+         }
+         else
+         {
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
+         }
+      }
 
       if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
