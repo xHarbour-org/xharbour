@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1330 2003/08/07 00:18:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1331 2003/08/07 05:54:04 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-07 14:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rdd/dbf1.c
+    ! Fix dbfPutValue to become compatible with clipper when with error occur( Reported by Marcos Gambeta)
 
 2003-08-03 07:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbmxml.prg

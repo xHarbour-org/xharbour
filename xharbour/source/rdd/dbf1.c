@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.33 2003/07/05 13:10:14 lculik Exp $
+ * $Id: dbf1.c,v 1.34 2003/07/05 22:11:09 lculik Exp $
  */
 
 /*
@@ -1360,6 +1360,7 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( uiError == EDBF_DATAWIDTH ?
                                                           EG_DATAWIDTH : EG_DATATYPE ) );
       hb_errPutSubCode( pError, uiError );
+      hb_errPutFlags( pError, EF_CANDEFAULT );
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_errRelease( pError );
       return FAILURE;
