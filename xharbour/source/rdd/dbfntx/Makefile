@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/01/10 16:13:05 jonnymind Exp $
 #
 
 ROOT = ../../../
@@ -11,10 +11,9 @@ PRG_SOURCES=\
 	dbfntx0.prg \
 
 ifeq ($(HB_MT),MT)
-LIBNAME=dbfntxmt
-ARCH_SUFFIX=_mt
-else
-LIBNAME=dbfntx
+   LIBNAME=dbfntxmt
 endif
+
+LIBNAME=dbfntx
 
 include $(TOP)$(ROOT)config/lib.cf

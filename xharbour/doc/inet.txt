@@ -38,6 +38,11 @@ InetCleanup() -->NIL
   Closes Inet support; mainly used for win32. Put it at the end of any program
   using Inet functions, just before program exits.
 
+InetCreate() --> SOCKET
+  Creates the raw data of the socket, that can be passed to an asynchronoys
+  connection function (InetConnect or InetConnectIP). This will prevent the
+  connection function to allocate some data that could be never used on
+  certain case, i.e. an asynchronously detected timeout.
 
 InetClose( SOCKET ) --> NUMERIC
   Closes the socket, notifiying both ends of the communication pipe that the
@@ -129,30 +134,40 @@ Client side socket functions
 ----------------------------
 
 InetConnect( cAddress, PORT ) --> SOCKET
+InetConnect( cAddress, PORT, SOCKET ) --> NIL
   Connects to a remote server described by cAddress, that can be in
   quad dot notation (e.g. "192.168.1.1") or in DNS name (e.g.
   "www.xharbour.org"), using the desired port.
-  This version of InetConnect uses "gethostbyname" C system call to
+  InetConnect uses "gethostbyname" C system call to
   find the network address of the specified server; this means that
   this call is an hybrid function doing both a DNS scan and a TCP/IP
   connection. InetConnect is not thread safe, and the xHarbour
-  program must take care that not two InetConnect functions are
+  program must take care that two InetConnect functions are never
   called at the same moment from two different threads (or that
-  InetGetHosts is not called in the same moment as InetConnect).
+  InetGetHosts is not called in the same moment as an InetConnect).
+  The second version of this functions accepts a pre-built socket
+  as parameter. This allows to kill asyncronously a thread waiting
+  for InetConnect to connect, and then cleaning up the leftover
+  socket data.
   On error, the error of the returned socket is set. The error could
   be due to unavailable name resolving service, host name not valid,
   host address not reachable and host reachable but port not open.
 
 
 InetConnectIP( cAddress, PORT ) --> SOCKET
+InetConnect( cAddress, PORT, SOCKET ) --> NIL
   Connects to a remote server described by cAddress, that can be specified
   only in quad dot IPV4 notation (e.g. "127.0.0.1"), using the desired port.
   This version of InetConnect does not use gethostbyname, and thus is thread
   safe and can be used in combination with InetGetHosts to have a finer
   timeout control while connecting to a server, and a finer error control.
+  The second version of this functions accepts a pre-built socket
+  as parameter. This allows to kill asyncronously a thread waiting
+  for InetConnectIP to connect, and then cleaning up the leftover
+  socket data.
   On error, the error of the returned socket is set.
 
-  
+
 
 Sening and receiving data
 ----------------------------
@@ -168,7 +183,7 @@ InetRecv( SOCKET, @cString [, nAmount] ) --> NUMERIC
   received until premature end of communications are returned.
   Notice that there is no guarantee that all the available bytes will be
   read before the function returns, in fact, InetRecv returns as soon it
-  is able to fill cString with one bytes or more. To block the current
+  is able to fill cString with one or more bytes. To block the current
   process until the whole cString is filled (or nAmuount bytes are read),
   use the InetRecvALL().
   RETURNS the number of the characters read from the SOCKET.
@@ -206,14 +221,14 @@ InetRecvLine( SOCKET [, @nResult, [, nMaxLength [, nBufSize]]] ) --> STRING
 
 InetDataReady( SOCKET [, nMillisecs] ) --> NUMERIC
   Verifies if some data is available to be read in the socket without blocking
-  execution of the caller. If nMillisecs is not given, the functions returns 
-  immediately 1 if there is some data to be read, 0 if there isn't any data and 
+  execution of the caller. If nMillisecs is not given, the functions returns
+  immediately 1 if there is some data to be read, 0 if there isn't any data and
   -1 in case of error. If nMillisecs is given, the functon will wait up to that
   amount of milliseconds for data to be available; if some data arrives in the
   meanwhile, the wait is immediately interrupted.
   The next InetRecv() function will read all the available data (up to the
   reqired lenght) without blocking.
-  On error, InetErrorCode and InetErrorDesc can be use to determine what kind 
+  On error, InetErrorCode and InetErrorDesc can be use to determine what kind
   of error happend.
 
 

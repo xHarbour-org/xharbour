@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2003/01/05 06:50:36 ronpinkas Exp $
+# $Id: Makefile,v 1.7 2003/01/10 16:13:07 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -22,11 +22,11 @@ C_SOURCES=\
 	classes.c    \
 	cmdarg.c     \
 	debug.c      \
-        do.c         \
+	do.c         \
 	dynlibhb.c   \
 	dynsym.c     \
 	codebloc.c   \
-        errorapi.c   \
+	errorapi.c   \
 	estack.c     \
 	eval.c       \
 	evalhb.c     \
@@ -53,10 +53,9 @@ PRG_SOURCES=\
 	harbinit.prg \
 
 ifeq ($(HB_MT),MT)
-LIBNAME=vmmt
-ARCH_SUFFIX=_mt
-else
-LIBNAME=vm
+   MT_LIBNAME=vmmt
 endif
+
+LIBNAME=vm
 
 include $(TOP)$(ROOT)config/lib.cf

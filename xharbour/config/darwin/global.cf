@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
+# $Id: global.cf,v 1.1 2002/12/04 23:06:46 likewolf Exp $
 #
 
 all : first
@@ -28,6 +28,13 @@ dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
 	 [ -d $(ARCH) ] || $(MD) $(ARCH)
 
+dirbase_mt::
+	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
+	 [ -d $(ARCH)_mp ] || $(MD) $(ARCH)_mp
+
 clean::
 	-$(RD) $(ARCH_DIR)
+	-$(RD) $(ARCH_DIR)_mf
+
+
 

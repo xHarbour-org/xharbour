@@ -1,5 +1,5 @@
 #
-# $Id: lib.cf,v 1.11 2000/02/14 16:19:50 vszel Exp $
+# $Id: lib.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -10,6 +10,7 @@ include $(TOP)$(ROOT)config/c.cf
 include $(TOP)$(ROOT)config/prg.cf
 
 LIB_NAME := $(LIB_PREF)$(LIBNAME)$(LIB_EXT)
+MT_LIB_NAME := $(LIB_PREF)$(MT_LIBNAME)$(LIB_EXT)
 
 LIB_ARCH := $(notdir $(ARCH_DIR))
 ifeq ($(LIB_ARCH),)
@@ -22,16 +23,31 @@ endif
 
 ALL_OBJS = $(ALL_C_OBJS) $(ALL_PRG_OBJS)
 
+#main configurable rule
+ifeq ($(MT_LIBNAME),)
 first:: dirbase descend
+else
+first:: dirbase dirbase_mt descend descend_mt
+endif
 
 descend :
-	@$(MK) -C $(ARCH_DIR) -f $(GRANDP)Makefile 'TOP=$(GRANDP)' $(LIB_NAME)
+	@$(MK) -C $(ARCH_DIR) -f $(GRANDP)Makefile 'TOP=$(GRANDP)' 'HB_LIBCOMP_MT=NO' $(LIB_NAME)
+
+descend_mt:
+	@$(MK) -C $(ARCH_DIR)_mt -f $(GRANDP)Makefile 'TOP=$(GRANDP)' 'HB_LIBCOMP_MT=YES' $(MT_LIB_NAME)
 
 $(LIB_NAME) : $(ALL_OBJS)
 	$(AR_RULE)
 
+$(MT_LIB_NAME) : $(ALL_OBJS)
+	$(AR_RULE)
 
+ifeq ($(MT_LIBNAME),)
 INSTALL_OBJS = $(LIB_ARCH)
+else
+INSTALL_OBJS = $(LIB_ARCH) $(ARCH)_mt/$(MT_LIB_NAME)
+endif
+
 INSTALL_DIR = $(HB_LIB_INSTALL)
 
 include $(TOP)$(ROOT)config/install.cf

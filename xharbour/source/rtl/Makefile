@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.12 2003/01/05 06:50:35 ronpinkas Exp $
+# $Id: Makefile,v 1.13 2003/01/10 16:13:07 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -171,7 +171,7 @@ PRG_SOURCES=\
 	tmenuitm.prg \
 	tobject.prg  \
 	tpopup.prg   \
-        traceprg.prg \
+	traceprg.prg \
 	treport.prg  \
    ttable.prg   \
 	ttextlin.prg \
@@ -180,14 +180,8 @@ PRG_SOURCES=\
 	wait.prg     \
         win32ole.prg \
 
-
-ifeq ($(HB_MT),MT)
-LIBNAME=rtlmt
-ARCH_SUFFIX=_mt
-else
+MT_LIBNAME=rtlmt
 LIBNAME=rtl
-endif
-
 
 # The list of all valid GT drivers is defined in config/<arch>/global.cf.
 DIRS=$(HB_GT_LIBS)

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.6 2003/01/10 16:13:04 jonnymind Exp $
+# $Id: gcc.cf,v 1.7 2003/01/10 22:41:47 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -19,8 +19,16 @@ else
 CFLAGS = -Wall -g
 endif
 
-ifeq ($(HB_MT),MT)
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 CFLAGS+= -DHB_THREAD_SUPPORT
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CFLAGS+= -DHB_THREAD_SUPPORT
+endif
 endif
 
 LD = gcc
@@ -78,6 +86,7 @@ ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
 
+#it never hurts if MT is enabled.
 ifeq ($(HB_MT),MT)
 LINKLIBS += -lpthread
 endif

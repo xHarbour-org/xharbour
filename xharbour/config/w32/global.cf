@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2003/01/10 22:17:58 jonnymind Exp $
+# $Id: global.cf,v 1.5 2003/01/10 22:41:53 jonnymind Exp $
 #
 
 all : first
@@ -46,19 +46,26 @@ dirbase::
 	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
 	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)
 
+dirbase_mt::
+	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
+	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)_mt
+
 clean::
 	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f
 	-for %%f in ($(ARCH_DOS)\*.*) do $(RM) %%f
+	-for %f in ($(ARCH_DOS)_mt\*.*) do $(RM) %f
+	-for %%f in ($(ARCH_DOS)_mt\*.*) do $(RM) %%f
 	-if exist *.bak $(RM) *.bak
 	-if exist *.obj $(RM) *.obj
 	-if exist core $(RM) core
 	-if exist *.o $(RM) *.o
 	-if exist *.tds $(RM) *.tds
 	-$(RD) $(ARCH_DOS)
+	-$(RD) $(ARCH_DOS)_mt
 	-$(RD) $(HB_ARCHITECTURE)
 else  # bash
 
-ARCH_DIR = $(ARCH)$(ARCH_SUFFIX)/
+ARCH_DIR = $(ARCH)
 MK = $(MAKE)
 
 RM = rm -f
@@ -74,6 +81,10 @@ RANLIB = ranlib
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
 	 [ -d $(ARCH_DIR) ] || $(MD) $(ARCH_DIR)
+
+dirbase_mt::
+	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
+	 [ -d $(ARCH_DIR)_mt ] || $(MD) $(ARCH_DIR)_mt
 
 clean::
 	-$(RD) $(ARCH)

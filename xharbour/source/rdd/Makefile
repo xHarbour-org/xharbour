@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2002/08/28 00:33:05 lculik Exp $
+# $Id: Makefile,v 1.3 2003/01/10 16:13:05 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -27,11 +27,10 @@ PRG_SOURCES=\
 	rddsys.prg \
  
 ifeq ($(HB_MT),MT)
-LIBNAME=rddmt
-ARCH_SUFFIX=_mt
-else
-LIBNAME=rdd
+   MT_LIBNAME=rddmt
 endif
+
+LIBNAME=rdd
 
 
 # The list of all valid DB drivers is defined in config/global.cf.

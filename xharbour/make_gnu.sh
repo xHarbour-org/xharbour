@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.2 2002/04/16 16:12:18 map Exp $
+# $Id: make_gnu.sh,v 1.3 2003/01/10 16:12:59 jonnymind Exp $
 #
 
 # ---------------------------------------------------------------
@@ -99,30 +99,6 @@ else
 
    # ---------------------------------------------------------------
    # Start the GNU make system
-   HB_MT_OLD=$HB_MT
-
-   case $1 in
-   both|BOTH)
-      export HB_MT=MT
-      shift
-      make $*
-      export HB_MT=
-      make $*
-   ;;
-   mt|MT)
-      export HB_MT=MT
-      shift
-      make $*
-   ;;
-   st|ST)
-      export HB_MT=
-      shift
-      make $*
-   ;;
-   *)
-      export HB_MT=
-      make $*
-
-   esac
-   export HB_MT=$HB_MT_OLD
+   export HB_MT=MT
+   make $*
 fi

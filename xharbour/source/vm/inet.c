@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.4 2003/01/08 19:22:25 jonnymind Exp $
+* $Id: inet.c,v 1.5 2003/01/09 22:53:16 jonnymind Exp $
 */
 
 /*
@@ -86,6 +86,13 @@ HB_FUNC( INETCLEANUP )
          WSACleanup();
       #endif
    }
+}
+
+HB_FUNC( INETCREATE )
+{
+   HB_SOCKET_STRUCT *Socket;
+   HB_SOCKET_INIT( Socket );
+   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
 }
 
 HB_FUNC( INETSERVER )
@@ -902,6 +909,7 @@ HB_FUNC( INETPORT )
 HB_FUNC( INETCONNECT )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pSocket = hb_param( 3, HB_IT_STRING );
 
    HB_SOCKET_STRUCT *Socket;
    int iPort;
@@ -916,22 +924,14 @@ HB_FUNC( INETCONNECT )
       return;
    }
 
-   HB_SOCKET_INIT( Socket );
-
-   /* Creates comm socket */
-   #if defined(HB_OS_WIN_32)
-      Socket->com = socket( AF_INET, SOCK_STREAM, 0);
-   #else
-      Socket->com = socket( PF_INET, SOCK_STREAM, 0);
-   #endif
-
-   setsockopt( Socket->com, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
-
-   if( Socket->com == -1 )
+   if ( pSocket != NULL )
    {
-      HB_SOCKET_SET_ERROR( Socket );
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
-      return;
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      HB_SOCKET_ZERO_ERROR( Socket );
+   }
+   else
+   {
+      HB_SOCKET_INIT( Socket );
    }
 
    Host = gethostbyname( pHost->item.asString.value );
@@ -945,8 +945,30 @@ HB_FUNC( INETCONNECT )
          HB_SOCKET_SET_ERROR2( Socket, h_errno, (char *) hstrerror( h_errno ) );
       #endif
 
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      if ( pSocket != NULL )
+      {
+         hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      }
 
+      return;
+   }
+
+   /* Creates comm socket */
+   #if defined(HB_OS_WIN_32)
+      Socket->com = socket( AF_INET, SOCK_STREAM, 0);
+   #else
+      Socket->com = socket( PF_INET, SOCK_STREAM, 0);
+   #endif
+
+   setsockopt( Socket->com, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
+
+   if( Socket->com == -1 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      if ( pSocket != NULL )
+      {
+         hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      }
       return;
    }
 
@@ -961,7 +983,10 @@ HB_FUNC( INETCONNECT )
       HB_SOCKET_SET_ERROR( Socket );
    }
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   if ( pSocket != NULL )
+   {
+      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   }
 }
 
 HB_FUNC( INETGETHOSTS )
@@ -1043,6 +1068,7 @@ HB_FUNC( INETGETALIAS )
 HB_FUNC( INETCONNECTIP )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pSocket = hb_param( 3, HB_IT_STRING );
 
    HB_SOCKET_STRUCT *Socket;
    int iPort;
@@ -1056,7 +1082,15 @@ HB_FUNC( INETCONNECTIP )
       return;
    }
 
-   HB_SOCKET_INIT( Socket );
+   if ( pSocket != NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      HB_SOCKET_ZERO_ERROR( Socket );
+   }
+   else
+   {
+      HB_SOCKET_INIT( Socket );
+   }
 
    /* Creates comm socket */
    #if defined(HB_OS_WIN_32)
@@ -1070,7 +1104,10 @@ HB_FUNC( INETCONNECTIP )
    if( Socket->com == -1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
-      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      if ( pSocket != NULL )
+      {
+         hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      }
       return;
    }
 
@@ -1085,7 +1122,10 @@ HB_FUNC( INETCONNECTIP )
       HB_SOCKET_SET_ERROR( Socket );
    }
 
-   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   if ( pSocket != NULL )
+   {
+      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+   }
 }
 
 HB_FUNC( INETCRLF )

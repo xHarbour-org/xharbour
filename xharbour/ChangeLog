@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.620 2003/01/12 20:32:11 lculik Exp $
+ * $Id: ChangeLog,v 1.621 2003/01/12 22:29:59 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-12 23:45 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/Makefile
+  * source/rdd/dbfntx/Makefile
+  * source/rdd/dbfcdx/Makefile
+  * source/rdd/Makefile
+  * source/pp/Makefile
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+  * config/linux/gcc.cf
+  * config/linux/global.cf
+  * config/darwin/gcc.cf
+  * config/darwin/global.cf
+  * config/lib.cf
+  * make_gnu.sh
+  * make_mingw.sh
+    * Now HB_MT=MT compilation is actived by default; both the MT libs
+      and the non MT libs are compiled. Single makefiles in libraries
+      must just declare also MT_LIBFILE=xxxmt to have the make process
+      to compile and link the lib in a different ARCH_mt dir with
+      -DHB_THREAD_SUPPORT active.
+      Please, someone test and check the darwin making.
+
+  * source/vm/thread.c
+    + Added the ThreadGetCurrent() function to allow a thread to
+      signal it's ID to other threads.
+
+  * source/vm/inet.c
+    + Added InetCreate() to pre-create Socket objects
+    + InetConnect() and InetConnectIP have now an optional parameter
+      (a precreated socket); this allows to kill the connection
+      and clear the socket object.
+
+  * doc/inet.txt
+    * Docs recflect latest changes
+
+  * tests/inetto.prg
+    * Now it has a complete example of asynchronous timeout and connection
+      status control.
+
 2003-01-12 23:27 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * samples/sitesrv/bldsrv.bat
   * samples/sitesrv/sitesrv.prg

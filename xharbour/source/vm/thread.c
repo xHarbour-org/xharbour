@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.30 2003/01/02 03:31:02 jonnymind Exp $
+* $Id: thread.c,v 1.31 2003/01/02 04:51:31 jonnymind Exp $
 */
 
 /*
@@ -1063,6 +1063,11 @@ HB_FUNC( THREADSLEEP )
    #else
       Sleep( hb_parni( 1 ) );
    #endif
+}
+
+HB_FUNC( THREADGETCURRENT )
+{
+   hb_retnl( (long) HB_CURRENT_THREAD() );
 }
 
 HB_FUNC( WAITFORTHREADS )
