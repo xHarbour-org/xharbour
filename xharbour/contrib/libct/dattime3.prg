@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.1 2004/02/01 11:36:59 lculik Exp $
+ * $Id: dattime3.prg,v 1.3 2004/06/19 10:30:00 modalsist Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ STATIC aH_Timers := {}, nHandle, lHandle
  *  $FUNCNAME$
  *      SHOWTIME()
  *  $CATEGORY$
- *      LIBCT date and time FUNCTIONs
+ *      LibCT Date and Time Functions
  *  $ONELINER$
  *      Continuously displays the time at desired screen position
  *  $SYNTAX$
@@ -104,7 +104,7 @@ STATIC aH_Timers := {}, nHandle, lHandle
  *      hour display can be selected, with or without an am/pm display.
  *
  *      Warning!  SHOWTIME() works with the interrupt system.  Before
- *      leaving your CA-Clipper application, you must uninstall SHOWTIME() , so
+ *      leaving your xHarbour application, you must uninstall SHOWTIME() , so
  *      that the interrupt vectors can be restored.  Otherwise, the system will
  *      be unstable and will eventually crash.  Simultaneous use of the
  *      accompanying Extended Drivers Modules automatically restores the
@@ -141,7 +141,7 @@ STATIC aH_Timers := {}, nHandle, lHandle
  *  $STATUS$
  *      Ready
  *  $COMPLIANCE$
- *      SHOWTIME() is Clipper Tools compatible.
+ *      This function is CA-Clipper Tools compatible.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$
@@ -202,16 +202,11 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
          nCol := 0
       ENDIF
 
-      nColMax := IIF(lHideSeconds,75,72) - IIF(lAmPm,1,0)
+      nColMax := maxcol() - iif(lHideSeconds,4,7) - iif(lAmPm,1,0)
 
-      IF nCol > nColMax
-         nCol := nColMax
-      ENDIF
-
-      IF nRow > 24
-         nRow := 24
-      ENDIF
-
+      nCol := Min( ncol, nColMax )
+      nRow := Min( nRow, maxrow() )
+      
       hb_ShowTimeEvent( "ShowTime", .T., { || hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm ) }, 100 )
 
    ENDIF
@@ -351,7 +346,7 @@ RETURN cNext
  *  $FUNCNAME$
  *      SETDATE()
  *  $CATEGORY$
- *      LIBCT date and time FUNCTIONs
+ *      LibCT Date and Time Functions
  *  $ONELINER$
  *      Sets the system date
  *  $SYNTAX$
@@ -367,7 +362,7 @@ RETURN cNext
  *      SETDATE() RETURNs .T. when the date is successfully set.
  *  $DESCRIPTION$
  *      When you use this FUNCTION to set the system date from within your
- *      CA-Clipper application, all files acquire this date with each write
+ *      xHarbour application, all files acquire this date with each write
  *      procedure.
  *  $EXAMPLES$
  *      Set the system date in each case; but the hardware clock only
@@ -387,7 +382,7 @@ RETURN cNext
  *  $STATUS$
  *      Ready
  *  $COMPLIANCE$
- *      SETDATE() is CT3´s compatible.
+ *      This function is CA-Clipper Tools compatible.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$
@@ -419,7 +414,7 @@ RETURN lRet
  *  $FUNCNAME$
  *      SETTIME()
  *  $CATEGORY$
- *      LIBCT date and time FUNCTIONs
+ *      LibCT Date and Time Functions
  *  $ONELINER$
  *      Sets the system clock
  *  $SYNTAX$
@@ -436,7 +431,7 @@ RETURN lRet
  *      The FUNCTION RETURNs .T. when the time is set successfully.
  *  $DESCRIPTION$
  *      When you use this FUNCTION to convert the time into the system time from
- *      within your CA-Clipper application, all files acquire this time with
+ *      within your xHarbour application, all files acquire this time with
  *      each write procedure.
  *  $EXAMPLES$
  *      Set the system time in each case; but the hardware clock only
@@ -456,7 +451,7 @@ RETURN lRet
  *  $STATUS$
  *      Ready
  *  $COMPLIANCE$
- *      SETTIME() is CT3´s compatible.
+ *      This function is CA-Clipper Tools compatible.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$
@@ -487,7 +482,7 @@ RETURN lRet
  *  $FUNCNAME$
  *      TIMEVALID()
  *  $CATEGORY$
- *      LIBCT date and time FUNCTIONs
+ *      LibCT Date and Time Functions
  *  $ONELINER$
  *      Determines whether a specIFied time is valid
  *  $SYNTAX$
@@ -534,7 +529,7 @@ RETURN lRet
  *  $STATUS$
  *      Ready
  *  $COMPLIANCE$
- *      TIMETVALID() is CT3´s compatible.
+ *      This function is CA-Clipper Tools compatible.
  *  $PLATFORMS$
  *      Windows
  *  $FILES$
