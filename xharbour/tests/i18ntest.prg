@@ -1,6 +1,6 @@
 ************************************************************
 * i18ntest.prg
-* $Id: i18ntest.prg,v 1.3 2003/06/24 02:17:21 fsgiudice Exp $
+* $Id: i18ntest.prg,v 1.4 2004/08/19 16:21:38 kaddath Exp $
 *
 * Test for internationalization system
 *
@@ -12,7 +12,7 @@
 Procedure MAIN()
    LOCAL nChoice, nLangs
    LOCAL aLanguages
-   LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR", "es_MX" }
+   LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR", "es_MX", "pl_PL" }
 
    SET COLOR TO W+/B
    SetMode( 25, 80 )
@@ -25,6 +25,7 @@ Procedure MAIN()
          i18n( "Italian" ), ;
          i18n( "French" ), ;
          i18n( "Spanish" ), ;
+         i18n( "Polish" ), ;
          i18n( "Quit" ) }
 
       CLEAR SCREEN
@@ -37,8 +38,8 @@ Procedure MAIN()
       @9,10 SAY i18n( "Test mixing" + e"\tescaped\t")
 
       @12,10 SAY i18n( "Select Language: " )
-      MakeBox( 12,40, 20, 55 )
-      nChoice := Achoice(13, 41, 19, 54, aLanguages,,, ;
+      MakeBox( 12,40, 13+len(aLanguages), 55 )
+      nChoice := Achoice(13, 41, 12+len(aLanguages), 54, aLanguages,,, ;
          Ascan( aLangCodes, { |x| x == HB_I18NGetLanguage() } ) )
 
       IF nChoice > 0 .and. nChoice < nLangs
