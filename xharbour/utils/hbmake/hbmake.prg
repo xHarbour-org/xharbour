@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.48 2003/02/23 22:15:41 lculik Exp $
+ * $Id: hbmake.prg,v 1.49 2003/02/23 23:27:08 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1050,7 +1050,8 @@ FUNC CreateMakeFile( cFile )
    LOCAL x
    LOCAL lGenppo          := .f.
    LOCAL getlist          := {}
-   LOCAL cTopFile         := Space( 50 )
+   LOCAL cTopFile         := ""
+   LOCAL cAppName         := Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
@@ -1108,7 +1109,7 @@ FUNC CreateMakeFile( cFile )
    ENDIF
 
    @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
-   @  6, 1  SAY  s_aLangMessages[ 45 ] GET cTopFile VALID ! Empty( cTopFile )
+   @  6, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
    Attention( s_aLangMessages[ 31 ], 7 )
 
    @  8,  1 GET lautomemvar checkbox caption s_aLangMessages[ 32 ] style "[o ]"
@@ -1278,6 +1279,19 @@ FUNC CreateMakeFile( cFile )
 
    aSort( aSelFiles )
 
+   IF Len( aOut ) == 1
+      cTopFile := aOut[ 1 ]
+   ELSE
+      Attention( 'Select the TOP MODULE of your executable', 22 )
+
+      IF ! s_lRecurse
+         cTopFile := PickAFile( aSelFiles )
+      ELSE
+         cTopFile := PickAFile( aSelFiles )
+      ENDIF
+
+   ENDIF
+
    IF lExternalLib
       aLibs := Getlibs( s_lGcc, GetMakeDir() + '\lib' )
       Attention( 'Spacebar to select, Enter to continue process', 22 )
@@ -1293,6 +1307,26 @@ FUNC CreateMakeFile( cFile )
    s_aPrgs := aClone( aout )
 
    s_aObjs := aClone( aout )
+
+   x     := aScan( s_aObjs, { | x | Lower( x ) == Lower( cTopFile ) } )
+
+   IF x > 0
+      aDel( s_aObjs, x )
+      aSize( s_aObjs, Len( s_aObjs ) - 1 )
+      aSize( s_aObjs, Len( s_aObjs ) + 1 )
+      Ains( s_aObjs, 1 )
+      s_aObjs[ 1 ] := cTopFile
+   ENDIF
+
+   x := aScan( s_aPrgs, { | x | Lower( x ) == Lower( cTopFile ) } )
+
+   IF x > 0
+      aDel( s_aPrgs, x )
+      aSize( s_aPrgs, Len( s_aPrgs ) - 1 )
+      aSize( s_aPrgs, Len( s_aPrgs ) + 1 )
+      Ains( s_aPrgs, 1 )
+      s_aPrgs[ 1 ] := cTopFile
+   ENDIF
 
    aEval( s_aObjs, { | xItem, x | hb_FNAMESPLIT( xiTem, @cPath, @cTest, @cExt, @cDrive ), cext := Substr( cExt, 2 ), IIF( ! s_lGcc, s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 2 ), s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 3 ) ) } )
    s_aCs := aClone( aoutc )
@@ -1378,13 +1412,13 @@ FUNC CreateMakeFile( cFile )
    IF s_lGcc
 
       IF  "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux"
-         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + " $(PR) " + CRLF )
+         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + " $(PR) " + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + ".exe"   + " $(PR) " + CRLF )
+         fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + ".exe"   + " $(PR) " + CRLF )
       ENDIF
 
    ELSE
-      fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cTopFile ) ) + ".exe"  + " $(PR) " + CRLF )
+      fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + ".exe"  + " $(PR) " + CRLF )
    ENDIF
 
 
@@ -1394,7 +1428,7 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aObjs ) < 1
          fWrite( s_nLinkHandle, + " $(OB) " + CRLF )
       ELSE
-         aEval( s_aObjs, { | x, i | IIF( ( i <> Len( s_aObjs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+         aEval( s_aObjs, { | x, i | IIF( ( i <> Len( s_aObjs ) .AND. x <> cTopfile  ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
       ENDIF
 
       fWrite( s_nLinkHandle, "CFILES =" )
@@ -1402,7 +1436,7 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aCs ) < 1
          fWrite( s_nLinkHandle, + " $(CF)" + CRLF )
       ELSE
-         aEval( s_aCs, { | x, i | IIF( ( i <> Len( s_aCs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(CF) " + CRLF ) ) } )
+         aEval( s_aCs, { | x, i | IIF( ( i <> Len( s_aCs ) .AND. x <> cTopfile  ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(CF) " + CRLF ) ) } )
       ENDIF
 
       fWrite( s_nLinkHandle, "PRGFILE =" )
@@ -1410,7 +1444,7 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aPrgs ) < 1
          fWrite( s_nLinkHandle, + " $(PS)" + CRLF )
       ELSE
-         aEval( s_aPrgs, { | x, i | IIF( i <> Len( s_aPrgs ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
+         aEval( s_aPrgs, { | x, i | IIF( i <> Len( s_aPrgs) .AND. x <> cTopfile , fWrite( s_nLinkHandle, ' ' + Alltrim( x ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
       ENDIF
 
    ELSE
@@ -1419,7 +1453,7 @@ FUNC CreateMakeFile( cFile )
       IF Len( s_aObjs ) < 1
          fWrite( s_nLinkHandle, + " $(OB) " + CRLF )
       ELSE
-         aEval( s_aObjs, { | x, i | nWriteFiles ++, IIF( ( i <> Len( s_aObjs ) ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+         aEval( s_aObjs, { | x, i | nWriteFiles ++, IIF( ( i <> Len( s_aObjs ) .AND. x <> cTopfile  ), fWrite( s_nLinkHandle, ' ' + Alltrim( x ) + IIF( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), fWrite( s_nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
       ENDIF
 
       nWriteFiles := 0
