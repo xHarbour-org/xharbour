@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.3 2003/12/11 09:26:55 peterrees Exp $
+ * $Id: gtwvt.c,v 1.4 2003/12/22 01:18:59 peterrees Exp $
  */
 
 /*
@@ -558,10 +558,10 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowSto
 {
   USHORT irow, icol, index;
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
-  for ( irow = rowStart; irow <rowStop; irow++)
+  for ( irow = rowStart; irow <=rowStop; irow++)
   {
     index = hb_wvt_gtGetIndexForTextBuffer(colStart, irow);
-    for (icol = colStart; icol < colStop; icol++)
+    for (icol = colStart; icol <= colStop; icol++)
     {
       if (index >= _s.BUFFERSIZE)
       {
