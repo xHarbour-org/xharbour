@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.49 2003/06/28 22:20:42 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.50 2003/07/15 12:31:38 lculik Exp $
  */
 
 /*
@@ -7586,7 +7586,7 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
 	
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
 	szFileName =  hb_filecase( hb_strdup( szFileName ) ) ;
-	   HB_TRACE(HB_TR_ALWAYS, ("cdxOrderListAdd(%s)",szFileName ));
+
    if( strlen( szFileName ) == 0 )
    {
       /* hb_cdxOrderListClear( (CDXAREAP) pArea ); */
