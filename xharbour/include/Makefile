@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2003/11/22 13:21:45 likewolf Exp $
+# $Id: Makefile,v 1.12 2003/11/24 15:15:25 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -17,13 +17,18 @@ C_HEADERS=\
 	hbapicdp.h   \
 	hbapirdd.h   \
 	hbcomp.h     \
+	hbcomprs.h   \
 	hbdate.h     \
 	hbdbf.h      \
+	hbdbferr.h   \
 	hbdbsort.h   \
 	hbdefs.h     \
 	hberrors.h   \
 	hbexprop.h   \
+	hbfixdj.h    \
 	hbhash.h     \
+	hashapi.h    \
+	hbi18n.h     \
 	hbinit.h     \
 	hbmacro.h    \
 	hbmath.h     \
@@ -32,7 +37,9 @@ C_HEADERS=\
 	hbpp.h       \
 	hbrddcdx.h   \
 	hbrdddbf.h   \
+	hbrdddbt.h   \
 	hbrdddel.h   \
+	hbrddfpt.h   \
 	hbrddntx.h   \
 	hbrddsdf.h   \
 	hbrddwrk.h   \
@@ -40,16 +47,21 @@ C_HEADERS=\
 	hbsetup.h    \
 	hbstack.h    \
 	hbtrace.h    \
+	hbtypes.h    \
 	hbver.h      \
 	hbvm.h       \
 	hbvmpub.h    \
+	hbxml.h      \
 	hb_io.h      \
+	hrbdll.h     \
 	inet.h       \
+	regex.h      \
 	thread.h     \
 
 PRG_HEADERS=\
 	achoice.ch   \
 	assert.ch    \
+	assocarr.ch  \
 	box.ch       \
 	button.ch    \
 	color.ch     \
@@ -63,16 +75,19 @@ PRG_HEADERS=\
 	getexit.ch   \
 	hbclass.ch   \
 	hbcommon.ch  \
-	hbcomprs.ch\
+	hbcomprs.ch  \
 	hbextern.ch  \
 	hbinkey.ch   \
 	hblang.ch    \
+	hblogdef.ch  \
 	hbmacro.ch   \
 	hbmemory.ch  \
 	hbmemvar.ch  \
 	hboo.ch      \
 	hbpers.ch    \
 	hbsetup.ch   \
+	hbserv.ch    \
+	hbstruct.ch  \
 	inkey.ch     \
 	memoedit.ch  \
 	ord.ch       \

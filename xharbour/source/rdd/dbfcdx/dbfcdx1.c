@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.86 2003/11/23 19:34:55 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.87 2003/11/24 23:51:29 druzus Exp $
  */
 
 /*
@@ -1428,6 +1428,13 @@ static BYTE * hb_cdxPageGetKeyVal( LPCDXPAGE pPage, SHORT iKey )
             memcpy( &pPage->bufKeyVal[ iDup ],
                     &pPage->node.extNode.keyPool[ pPage->bufKeyPos ], iTmp );
          }
+#ifndef HB_CDX_DBGCODE_OFF
+         else if ( iTmp < 0 )
+         {
+            printf("\r\npPage->Page=%lx, iLen=%d, iDup=%d, iTrl=%d", pPage->Page, iLen, iDup, iTrl); fflush(stdout);
+            hb_cdxErrInternal( "hb_cdxPageGetKeyVal: index corrupted." );
+         }
+#endif
          if ( iTrl > 0 && ( iTmp = pPage->bufKeyLen - iLen + iTrl ) > 0 )
             memset( &pPage->bufKeyVal[ iLen - iTrl ], bTrail, iTmp );
          pPage->bufKeyLen = iLen - iTrl;
@@ -1515,7 +1522,7 @@ static void hb_cdxPageCheckKeys( LPCDXPAGE pPage )
                     i, pPage->iKeys, K, ulRecPrev, ulRec );fflush(stdout);
             printf( "\r\npbValPrev=[%s] pbVal=[%s], [%d], pPage->pKeyBuf=%p, pPage->iCurKey=%d",
                     pbValPrev, pbVal, memcmp( pbValPrev, pbVal, iLen ),
-		    pPage->pKeyBuf, pPage->iCurKey );fflush(stdout);
+                    pPage->pKeyBuf, pPage->iCurKey );fflush(stdout);
             hb_cdxErrInternal( "hb_cdxPageCheckKeys: index corrupted." );
          }
       }
@@ -1616,15 +1623,22 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
    {
       iDup = pSrc[ iNum + 4 ];
       iTrl = pSrc[ iNum + 5 ];
-      HB_PUT_LE_USHORT( pRecPos + bReq - 2,
+      HB_PUT_LE_USHORT( &pRecPos[ bReq - 2 ],
                ( iTrl << bShift ) | ( iDup << ( bShift - pPage->DCBits ) ) );
       HB_PUT_LE_ULONG( pRecPos, ( HB_GET_LE_ULONG( pRecPos ) & RNMask ) |
-                                HB_GET_LE_ULONG( pSrc + iNum ) );
+                                HB_GET_LE_ULONG( &pSrc[ iNum ] ) );
       if ( ( iTmp = iNum - iTrl - iDup ) > 0 )
       {
          pKeyPos -= iTmp;
          memcpy( pKeyPos, &pSrc[ iDup ], iTmp );
       }
+//#ifndef HB_CDX_DBGCODE_OFF
+      else if ( iTmp < 0 )
+      {
+         printf("\r\npPage->Page=%lx, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iNum, iDup, iTrl); fflush(stdout);
+         hb_cdxErrInternal( "hb_cdxPageLeafEncode: index corrupted." );
+      }
+//#endif
       pRecPos += bReq;
       pSrc += iLen;
    }
@@ -1690,8 +1704,8 @@ static void hb_cdxPageLeafDecode( LPCDXPAGE pPage, BYTE * pKeyBuf )
 #ifndef HB_CDX_DBGCODE_OFF
       else if ( iTmp < 0 )
       {
-          printf("\r\npPage->Page=%lx, iLen=%d, bDup=%d, bTrl=%d", pPage->Page, iLen, bDup, bTrl); fflush(stdout);
-	  hb_cdxErrInternal( "hb_cdxPageLeafDecode: page is not a leaf." );
+         printf("\r\npPage->Page=%lx, iLen=%d, bDup=%d, bTrl=%d", pPage->Page, iLen, bDup, bTrl); fflush(stdout);
+         hb_cdxErrInternal( "hb_cdxPageLeafDecode: index corrupted." );
       }
 #endif
       if ( bTrl != 0 )
@@ -2289,7 +2303,7 @@ static void hb_cdxPageGetChild( LPCDXPAGE pPage )
       pPage->Child = hb_cdxPageNew( pPage->TagParent, pPage, ulPage );
 }
 
-static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, SHORT iChildRet )
+static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
 {
    LPCDXPAGE childs[ CDX_BALANCE_LEAFPAGES + 2 ], lpTmpPage;
    SHORT iChKeys[ CDX_BALANCE_LEAFPAGES + 2 ],
@@ -2534,7 +2548,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, SHORT iChildRet )
                childs[i] = lpTmpPage;
                if ( iFirstKey + i >= pPage->iKeys )
                   iRet |= NODE_NEWLASTKEY;
-#if 1
+#if 0
 #ifndef HB_CDX_DBGCODE_OFF
                childs[i]->iKeys = 0;
                if ( childs[i]->pKeyBuf )
@@ -2589,7 +2603,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, SHORT iChildRet )
          childs[i]->fBufChanged = FALSE;
       }
       hb_cdxPageCalcLeafSpace( childs[i], pPtr, iKeys );
-      if ( i == iSkip && !childs[i]->fChanged &&
+      if ( i == iSkip && i < iBlncKeys && !childs[i]->fChanged &&
            childs[i]->iKeys == iChKeys[i] &&
            childs[i]->iFree == iChFree[i] )
       {
@@ -2709,7 +2723,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, SHORT iChildRet )
    return iRet;
 }
 
-static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, SHORT iChildRet )
+static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
 {
    LPCDXPAGE childs[ CDX_BALANCE_INTPAGES + 2 ], lpTmpPage;
    SHORT iFirstKey, iBlncKeys = CDX_BALANCE_INTPAGES;
