@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.9 2002/03/22 19:44:15 walito Exp $
+ * $Id: tget.prg,v 1.10 2002/03/25 21:55:56 walito Exp $
  */
 
 /*
@@ -536,7 +536,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       cBuffer := StrTran( cBuffer, "(", "" )
       cBuffer := StrTran( cBuffer, ")", "" )
 
-      cBuffer := StrTran( cBuffer, " ", "" ) // It replace left, right 
+      cBuffer := StrTran( cBuffer, " ", "" ) // It replace left, right
                                              // and medium spaces.
                                              // Don't replace for Alltrim()
 
@@ -1078,7 +1078,7 @@ METHOD DeleteAll() CLASS Get
    case ::type == "N"
       xValue := 0
    case ::type == "D"
-      xValue := DToC( "" )
+      xValue := CToD( "" )
    case ::type == "L"
       xValue := .f.
    endcase
