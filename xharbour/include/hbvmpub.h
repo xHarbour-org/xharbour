@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.12 2003/07/06 16:41:35 lculik Exp $
+ * $Id: hbvmpub.h,v 1.13 2003/07/06 17:00:38 lculik Exp $
  */
 
 /*
@@ -191,7 +191,7 @@
    struct hb_struLDouble
    {
       USHORT length;
-      long long value;
+      LONGLONG value;
    };
 #endif
 

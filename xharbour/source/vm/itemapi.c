@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.41 2003/07/06 16:42:35 lculik Exp $
+ * $Id: itemapi.c,v 1.42 2003/07/06 16:59:45 lculik Exp $
  */
 
 /*
@@ -1688,7 +1688,7 @@ PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )
    return pResult;
 }
 #ifndef HB_LONG_DOUBLE_OFF
-long long HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
+LONGLONG HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetND(%p)", pItem));
 
@@ -1700,22 +1700,22 @@ long long HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
             return pItem->item.asLDouble.value;
 
          case HB_IT_DOUBLE:
-            return ( long long ) pItem->item.asDouble.value;
+            return ( LONGLONG ) pItem->item.asDouble.value;
 
          case HB_IT_INTEGER:
-            return ( long long ) pItem->item.asInteger.value;
+            return ( LONGLONG ) pItem->item.asInteger.value;
 
          case HB_IT_LONG:
-            return ( long long ) pItem->item.asLong.value;
+            return ( LONGLONG ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-            return ( long long ) pItem->item.asDate.value;
+            return ( LONGLONG ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
-            return ( long long ) pItem->item.asLogical.value;
+            return ( LONGLONG ) pItem->item.asLogical.value;
 
          case HB_IT_STRING:
-            return ( long long ) pItem->item.asString.value[0];
+            return ( LONGLONG ) pItem->item.asString.value[0];
       }
    }
 
@@ -1723,7 +1723,7 @@ long long HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
 }
 
 
-PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long long dNumber )
+PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, LONGLONG dNumber )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutND(%p, %lf)", pItem, dNumber));
 
@@ -1748,7 +1748,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long long dNumber )
 
    return pItem;
 }
-PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, long long dNumber, int iWidth)
+PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, LONGLONG dNumber, int iWidth)
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLDLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth, iDec));
 
@@ -1767,29 +1767,15 @@ PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, long long dNumber, int iWid
 
    if( iWidth <= 0 || iWidth > 99 )
    {
-      #if defined (__BORLANDC__)
-      /* Borland C compiled app crashes if a "NaN" double is compared with another double [martin vogel] */
-      if (_isnan (dNumber))
-      {
          iWidth = 20;
-      }
-      else
-      #endif
-
-      iWidth = ( dNumber >= 10000000000000000.0 || dNumber <= -1000000000000000.0 ) ? 30 : 10;
-   }
-
-   if( iDec < 0 )
-   {
-      iDec = hb_set.HB_SET_DECIMALS;
    }
 
    pItem->type = HB_IT_LDOUBLE;
    pItem->item.asLDouble.length = iWidth;
    pItem->item.asLDouble.decimal = iDec;
    pItem->item.asLDouble.value = dNumber;
-   
-
+ 
    return pItem;
+
 }
 #endif

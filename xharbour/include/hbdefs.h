@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.8 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: hbdefs.h,v 1.9 2003/04/04 17:21:21 paultucker Exp $
  */
 
 /*
@@ -326,4 +326,11 @@ typedef BYTE HB_ATTR;
 #define HB_CHAR_SOFT1           ( ( char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
 
+#if !defined( LONGLONG)
+#if defined(__GNUC__)
+  typedef long long LONGLONG;
+#else
+  typedef __int64 LONGLONG;
+#endif
+#endif
 #endif /* HB_DEFS_H_ */

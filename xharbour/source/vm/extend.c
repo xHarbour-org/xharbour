@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.20 2003/07/06 16:42:35 lculik Exp $
+ * $Id: extend.c,v 1.21 2003/07/06 16:59:44 lculik Exp $
  */
 
 /*
@@ -1002,7 +1002,7 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
    }
 }
 #ifndef HB_LONG_DOUBLE_OFF
-void HB_EXPORT hb_stornld( long long dNumber, int iParam, ... )
+void HB_EXPORT hb_stornld( LONGLONG dNumber, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stornld(%lf, %d, ...)", dNumber, iParam));
 
@@ -1032,8 +1032,8 @@ void HB_EXPORT hb_stornld( long long dNumber, int iParam, ... )
    }
 }
 
-/* long long support */
-long long  HB_EXPORT hb_parnld( int iParam, ... )
+/* LONGLONG support */
+LONGLONG  HB_EXPORT hb_parnld( int iParam, ... )
 {
    HB_THREAD_STUB
    
@@ -1054,19 +1054,19 @@ long long  HB_EXPORT hb_parnld( int iParam, ... )
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-         return ( long long ) pItem->item.asDouble.value;
+         return ( LONGLONG ) pItem->item.asDouble.value;
       }
       else if( HB_IS_INTEGER( pItem ) )
       {
-         return ( long long ) pItem->item.asInteger.value;
+         return ( LONGLONG ) pItem->item.asInteger.value;
       }
       else if( HB_IS_LONG( pItem ) )
       {
-         return ( long long ) pItem->item.asLong.value;
+         return ( LONGLONG ) pItem->item.asLong.value;
       }
       else if( HB_IS_LOGICAL( pItem ) )
       {
-         return ( long long ) pItem->item.asLogical.value;
+         return ( LONGLONG ) pItem->item.asLogical.value;
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -1085,7 +1085,7 @@ long long  HB_EXPORT hb_parnld( int iParam, ... )
 }
 
 #undef hb_retnldlen
-void HB_EXPORT hb_retnldlen( long long dNumber, int iWidth)
+void HB_EXPORT hb_retnldlen( LONGLONG dNumber, int iWidth)
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retndlen(%lf, %d, %d)", dNumber, iWidth));
 

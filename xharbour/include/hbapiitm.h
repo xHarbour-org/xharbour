@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.18 2003/07/06 16:41:35 lculik Exp $
+ * $Id: hbapiitm.h,v 1.19 2003/07/06 17:00:38 lculik Exp $
  */
 
 /*
@@ -120,11 +120,11 @@ extern ULONG    HB_EXPORT hb_itemSize         ( PHB_ITEM pItem );
 extern USHORT   HB_EXPORT hb_itemType         ( PHB_ITEM pItem );
 extern char     HB_EXPORT * hb_itemTypeStr      ( PHB_ITEM pItem );
 
-/* long long supports */
+/* LONGLONG supports */
 #ifndef HB_LONG_DOUBLE_OFF
-extern long long   HB_EXPORT hb_itemGetNLD        ( PHB_ITEM pItem );
-extern PHB_ITEM      HB_EXPORT hb_itemPutNLD        ( PHB_ITEM pItem, long long dNumber );
-extern PHB_ITEM      HB_EXPORT hb_itemPutNLDLen     ( PHB_ITEM pItem, long long dNumber, int iWidth);
+extern LONGLONG   HB_EXPORT hb_itemGetNLD        ( PHB_ITEM pItem );
+extern PHB_ITEM      HB_EXPORT hb_itemPutNLD        ( PHB_ITEM pItem, LONGLONG dNumber );
+extern PHB_ITEM      HB_EXPORT hb_itemPutNLDLen     ( PHB_ITEM pItem, LONGLONG dNumber, int iWidth);
 #endif
 
 /* Non Clipper compliant internal API */

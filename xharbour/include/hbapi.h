@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.69 2003/07/05 18:18:02 lculik Exp $
+ * $Id: hbapi.h,v 1.70 2003/07/06 16:41:35 lculik Exp $
  */
 
 /*
@@ -217,7 +217,7 @@ extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the gen
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
 #ifndef HB_LONG_DOUBLE_OFF
-extern long long   HB_EXPORT hb_parnld( int iParam, ... ); /* retrieve a numeric parameter as a double */
+extern LONGLONG   HB_EXPORT hb_parnld( int iParam, ... ); /* retrieve a numeric parameter as a double */
 #endif
 
 #define hb_retc_buffer( szText )                   hb_retcAdopt( (szText) )
@@ -300,8 +300,8 @@ extern long long   HB_EXPORT hb_parnld( int iParam, ... ); /* retrieve a numeric
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
    #ifndef HB_LONG_DOUBLE_OFF
-   extern void  HB_EXPORT  hb_retnld( long long dNumber ); /* returns a double */
-   extern void  HB_EXPORT  hb_retnldlen( long long dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+   extern void  HB_EXPORT  hb_retnld( LONGLONG dNumber ); /* returns a double */
+   extern void  HB_EXPORT  hb_retnldlen( LONGLONG dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
 
    #endif
 #endif
@@ -313,10 +313,10 @@ extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
-extern void  HB_EXPORT  hb_stornld(long long dValue, int iParam, ... ); /* stores a double on a variable by reference */
+extern void  HB_EXPORT  hb_stornld(LONGLONG dValue, int iParam, ... ); /* stores a double on a variable by reference */
 
 #ifndef HB_LONG_DOUBLE_OFF
-extern void  HB_EXPORT  hb_stornld( long long dValue, int iParam, ... ); /* stores a double on a variable by reference */
+extern void  HB_EXPORT  hb_stornld( LONGLONG dValue, int iParam, ... ); /* stores a double on a variable by reference */
 #endif
 extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern void    HB_EXPORT hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
@@ -376,7 +376,7 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and 
 extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Creates and returns GC-LOCKED an Array of Generic Parameters for specified base symbol. */
 
 #ifndef HB_LONG_DOUBLE_OFF
-extern long long   HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
+extern LONGLONG   HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
 #endif
 
 /* string management */
@@ -569,7 +569,7 @@ extern char * hb_getenv( const char * name );
 #ifndef HB_I_
    #define HB_I_( x ) x
 #endif
- /* long long support */
+ /* LONGLONG support */
 
 
 
