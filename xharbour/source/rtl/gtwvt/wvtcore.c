@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.4 2004/06/06 11:33:21 lf_sfnet Exp $
+ * $Id: wvtcore.c,v 1.5 2004/06/11 14:02:30 vouchcac Exp $
  */
 
 /*
@@ -1831,7 +1831,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
 
    int iAlignHorz   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
    int iAlignVert   = ( ISNIL( 8 ) ? 0 : hb_parni( 8 ) );
-   int iAlignH, iAlignV;
+   int iAlignH ;
 
    COLORREF oldTextColor, oldBkColor;
    HFONT    oldFont;
@@ -1857,25 +1857,6 @@ HB_FUNC( WVT_DRAWTEXTBOX )
       break;
    }
 
-   switch ( iAlignVert )
-   {
-      case 1:
-      {
-         iAlignV = DT_TOP;
-      }
-      break;
-      case 2:
-      {
-         iAlignV = DT_VCENTER;
-      }
-      break;
-      case 3:
-      {
-         iAlignV = DT_BOTTOM;
-      }
-      break;
-   }
-
    rc.top       = iTop;
    rc.left      = iLeft;
    rc.bottom    = iBottom;
@@ -1894,6 +1875,51 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    SetBkMode( _s->hdc, oldBkMode );
    SetTextAlign( _s->hdc, oldTextAlign );
    SelectObject( _s->hdc, oldFont );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETCURSORPOS )
+ {
+    POINT    xy;
+    HB_ITEM  info;
+    HB_ITEM  temp;
+
+    GetCursorPos( &xy );
+
+    info.type = HB_IT_NIL;
+    temp.type = HB_IT_NIL;
+
+    hb_arrayNew( &info, 2 );
+
+    hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, xy.x ) );
+    hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, xy.y ) );
+
+    hb_itemReturn( &info );
+ }
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_TRACKPOPUPMENU )
+{
+   POINT xy;
+
+   GetCursorPos( &xy );
+
+   hb_retnl( TrackPopupMenu( ( HMENU ) hb_parnl( 1 ) ,
+                     TPM_CENTERALIGN | TPM_RETURNCMD ,
+                                                xy.x ,
+                                                xy.y ,
+                                                   0 ,
+                                            _s->hWnd ,
+                                                NULL ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETMENU )
+{
+   hb_retnl( ( ULONG ) GetMenu( _s->hWnd ) );
 }
 
 //-------------------------------------------------------------------//

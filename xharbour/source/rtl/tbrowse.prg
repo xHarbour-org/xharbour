@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.75 2004/06/18 09:35:37 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.76 2004/06/18 16:48:20 paultucker Exp $
  */
 
 /*
@@ -630,10 +630,12 @@ METHOD Configure( nMode ) CLASS TBrowse
 //
 //-------------------------------------------------------------------//
 
-METHOD AColInfo( oCol ) CLASS Tbrowse
+METHOD AColInfo( oCol,lAdd ) CLASS Tbrowse
    LOCAL aCol
 
-   if HB_ISOBJECT( oCol ) .and. ( valtype( oCol:block ) == 'B' )
+   DEFAULT lAdd TO .f.
+
+   if !( lAdd ) .and. HB_ISOBJECT( oCol ) .and. ( valtype( oCol:block ) == 'B' )
       aCol := { oCol, valtype( Eval( oCol:block )), ::SetColumnWidth( oCol ),;
                 '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
    else
@@ -650,7 +652,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
 
    ::Moved()
 
-   aadd( ::aColsInfo, ::AColInfo( oCol ) )
+   aadd( ::aColsInfo, ::AColInfo( oCol,.t. ) )
 
    ::aColumns := ::aColsInfo
    ::nColumns++
