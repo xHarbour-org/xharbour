@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.68 2004/03/23 02:18:04 andijahja Exp $
+ * $Id: dbf1.c,v 1.69 2004/03/25 12:13:13 druzus Exp $
  */
 
 /*
@@ -1461,17 +1461,25 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    }
 
    /* Close the data file */
-   if( pArea->hDataFile != FS_ERROR && pArea->fDataFlush )
+   if( pArea->hDataFile != FS_ERROR )
    {
-      hb_fsCommit( pArea->hDataFile );
+      if ( pArea->fDataFlush )
+      {
+         hb_fsCommit( pArea->hDataFile );
+         pArea->fDataFlush = FALSE;
+      }
       hb_fsClose( pArea->hDataFile );
       pArea->hDataFile = FS_ERROR;
    }
 
    /* Close the memo file */
-   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR && pArea->fMemoFlush )
+   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
    {
-      hb_fsCommit( pArea->hMemoFile );
+      if ( pArea->fMemoFlush )
+      {
+         hb_fsCommit( pArea->hMemoFile );
+         pArea->fMemoFlush = FALSE;
+      }
       hb_fsClose( pArea->hMemoFile );
       pArea->hMemoFile = FS_ERROR;
    }

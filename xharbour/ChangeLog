@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2651 2004/03/25 13:15:44 lculik Exp $
+ * $Id: ChangeLog,v 1.2652 2004/03/25 16:02:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-25 20:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbf1.c
+   ! fixed bug I introduce with my last commit. The DBF was not closed
+     if there was no changes in it.
 
 2004-03-25 08:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
