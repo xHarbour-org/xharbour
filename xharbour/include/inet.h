@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.7 2002/12/21 16:59:21 jonnymind Exp $
+* $Id: inet.h,v 1.8 2002/12/21 22:40:43 likewolf Exp $
 */
 
 /*
@@ -55,6 +55,12 @@
 #include "hbdefs.h"
 #include "hbvm.h"
 #include "hbapierr.h"
+
+#if defined( HB_OS_DOS )
+
+    #define HB_NO_DEFAULT_INET
+
+#else
 
 #if defined( HB_OS_WIN_32 )
     #define HB_SOCKET_T SOCKET
@@ -127,3 +133,6 @@ typedef struct tag_HB_SOCKET_STRUCT
 #endif
 
 #endif
+
+#endif
+
