@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.2 2002/08/27 20:16:10 horacioroldan Exp $
+ * $Id: fstemp.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 #include <errno.h>
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
+#ifndef HB_OS_LINUX
 
 static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * pszPrefix )
 {
@@ -108,6 +109,47 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
    hb_fsSetError( FS_ERROR );
    return FS_ERROR;
 }
+#else
+
+#include "hbset.h"
+
+FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
+{
+   /* less attemps */
+   USHORT nAttemptLeft = 99;
+   FHANDLE fd;
+
+   pszName[0] = '\0';
+   
+   if ( pszDir != NULL && pszDir[0] != '\0' )
+   {
+      int len;
+      strcpy(pszName, pszDir );
+      len = strlen( pszName );
+      pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
+      pszName[ len + 1 ] = '\0';
+   }
+   
+   if ( pszPrefix != NULL )
+   {
+      strcat(pszName, pszPrefix );
+   }
+   
+   strcat(pszName, "XXXXXX" );
+   
+   while( --nAttemptLeft ) 
+   {
+      if( (fd = (FHANDLE) mkstemp( pszName ) ) != -1 )
+      {
+         return fd;
+      }
+   }
+ 
+   hb_fsSetError( FS_ERROR );
+   return FS_ERROR;
+}
+
+#endif
 
 #ifdef HB_EXTENSION
 

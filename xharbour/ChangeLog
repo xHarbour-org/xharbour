@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.809 2003/03/07 10:35:53 likewolf Exp $
+ * $Id: ChangeLog,v 1.810 2003/03/07 11:31:55 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-07 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/fstemp.c
+    ! In linux, tmpname() issues a warining at link time. Usage of mkstemp()
+      is FORCED instead (is also a MUCH MORE safe function, avoiding races
+      and guess-the-temp-name vunlerability attacks).
+      I am using it only on LINUX, but other UNIXes programmers might want
+      to extend it's usage also on their systems.
+      Also, that warning prevented scrips from detecting that link has
+      been completed sucessfully.
+    
 
 2003-03-07 12:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/file.c
