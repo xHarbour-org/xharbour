@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.5 2003/07/07 03:33:06 lculik Exp $
+ * $Id: direct.c,v 1.6 2003/07/13 18:11:57 walito Exp $
  */
 
 /*
@@ -132,6 +132,7 @@ HB_FUNC( DIRECTORY )
 
    uiMask = HB_FA_ARCHIVE
           | HB_FA_READONLY
+          | HB_FA_NORMAL
           | HB_FA_DEVICE
           | HB_FA_TEMPORARY
           | HB_FA_SPARSE
@@ -164,7 +165,7 @@ HB_FUNC( DIRECTORY )
          if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
                 ( ( uiMask & HB_FA_SYSTEM    ) == 0 && ( ffind->attr & HB_FA_SYSTEM    ) != 0 ) ||
                 ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
-                ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ) )
+                ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
          {
             PHB_ITEM pSubarray = hb_itemArrayNew( F_LEN );
             char buffer[ 32 ];

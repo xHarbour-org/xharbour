@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.6 2003/09/09 02:08:01 paultucker Exp $
+ * $Id: hbffind.c,v 1.7 2003/11/27 21:44:54 likewolf Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.6 2003/09/09 02:08:01 paultucker Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.7 2003/11/27 21:44:54 likewolf Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -136,6 +136,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.6 2003/09/09 02:08:01 paultucker Exp $" )
       HANDLE          hFindFile;
       WIN32_FIND_DATA pFindFileData;
       DWORD           dwAttr;
+      DWORD           dwExAttr;
       char            szVolInfo[MAX_PATH];
       FILETIME        fFileTime;
 
@@ -220,6 +221,8 @@ FILETIME GetOldesFile( const char * szPath)
    hb_xfree(szf);
    return ftLastWriteTime;
 }
+
+
 
 #endif
 
@@ -751,17 +754,18 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
 
 
+
       if( info->hFindFile != INVALID_HANDLE_VALUE )
       {
+
          if( info->dwAttr == 0 ||
            ( info->pFindFileData.dwFileAttributes == 0 ) ||
-           ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_NORMAL ) ||
-           ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY ) ||
+           ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
            ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
          {
             bFound = TRUE;
          }
-         else if ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY  ||
+         else if ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY  ||
            ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
          {
             bFound = TRUE;
@@ -774,8 +778,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
             {
                if( info->dwAttr == 0 ||
                  ( info->pFindFileData.dwFileAttributes == 0 ) ||
-                 ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_NORMAL )  ||
-                 ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY ) ||
+                 ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL )  ||
                  ( info->dwAttr & info->pFindFileData.dwFileAttributes ) )
                {
                   bFound = TRUE;
@@ -929,10 +932,13 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
 
       while( FindNextFile( info->hFindFile, &info->pFindFileData ) )
       {
+
          if( info->dwAttr == 0 ||
              ( info->pFindFileData.dwFileAttributes == 0 ) ||
-             ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_NORMAL ) ||
-             ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY) ||
+             ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
+             ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ) ||
+             ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM ) ||
+             ( info->pFindFileData.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY ) ||
              ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
          {
             bFound = TRUE;
