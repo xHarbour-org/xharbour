@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.12 2004/11/29 23:30:00 ptsarenko Exp $
+# $Id: Makefile,v 1.12 2004/11/29 22:11:31 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -85,6 +85,7 @@ PRG_SOURCES= \
    dattime3.prg \
    diskutil.prg \
    fcopy.prg \
+   getinfo.prg \
    getsecrt.prg \
    invrtwin.prg \
    like.prg \
