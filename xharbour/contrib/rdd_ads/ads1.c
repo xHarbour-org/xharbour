@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.5 2003/04/21 20:01:38 walito Exp $
+ * $Id: ads1.c,v 1.6 2003/05/08 10:48:10 lculik Exp $
  */
 
 /*
@@ -490,13 +490,21 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
    {        /* if it was at eof, and another station or handle added a record, it needs to GoTo or AtEof stays True. */
       AdsRefreshRecord(pArea->hTable);
    }
-   else if( ulRecNo > 0  && ulRecNo <= pArea->ulRecCount )
+   else if( ulRecNo > 0  && ulRecNo <= pArea->ulRecCount && pArea->iFileType < 3 )
    {
       pArea->ulRecNo = ulRecNo;
       pArea->fBof = pArea->fEof = FALSE;
       ulRetVal = AdsGotoRecord( pArea->hTable, ulRecNo );
       /* hb_adsCheckBofEof( pArea );        // bh: GoTo should never do the skipfilter that may happen in hb_adsCheckBofEof */
    }
+   else if( ulRecNo > 0  && pArea->iFileType == 3  )
+   {
+      pArea->ulRecNo = ulRecNo;
+      pArea->fBof = pArea->fEof = FALSE;
+      ulRetVal = AdsGotoRecord( pArea->hTable, ulRecNo );
+      /* hb_adsCheckBofEof( pArea );        // bh: GoTo should never do the skipfilter that may happen in hb_adsCheckBofEof */
+   }
+
    else /* GoTo Phantom record */
    {
       ulRecNo = 0;

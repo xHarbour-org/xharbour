@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1041 2003/05/23 09:00:30 lculik Exp $
+ * $Id: ChangeLog,v 1.1042 2003/05/23 09:17:24 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-23 06:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  *contrib/rdd_ads/ads1.c
+    * Fixed problem on adsGoTo() method when using ADT files
 
 2003-05-23 11:12 UTC+010 Ian Anderson <i.anderson@procon-online.de>
   * contrib\rdd_ads\ace.h
