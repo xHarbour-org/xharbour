@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.13 2003/07/06 17:00:38 lculik Exp $
+ * $Id: hbvmpub.h,v 1.14 2003/07/06 17:15:40 lculik Exp $
  */
 
 /*
@@ -188,7 +188,7 @@
     };
 
    #ifndef HB_LONG_DOUBLE_OFF
-   struct hb_struLDouble
+   struct hb_struLongLong
    {
       USHORT length;
       LONGLONG value;
@@ -206,7 +206,7 @@
           struct hb_struDate    asDate;
           struct hb_struDouble  asDouble;
           #ifndef HB_LONG_DOUBLE_OFF
-          struct hb_struLDouble asLDouble;
+          struct hb_struLongLong asLongLong;
           #endif
           struct hb_struInteger asInteger;
           struct hb_struLogical asLogical;

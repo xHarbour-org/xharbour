@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.21 2003/07/06 16:59:44 lculik Exp $
+ * $Id: extend.c,v 1.22 2003/07/06 17:18:44 lculik Exp $
  */
 
 /*
@@ -1002,9 +1002,9 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
    }
 }
 #ifndef HB_LONG_DOUBLE_OFF
-void HB_EXPORT hb_stornld( LONGLONG dNumber, int iParam, ... )
+void HB_EXPORT hb_stornll( LONGLONG dNumber, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornld(%lf, %d, ...)", dNumber, iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_stornll(%lf, %d, ...)", dNumber, iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -1019,7 +1019,7 @@ void HB_EXPORT hb_stornld( LONGLONG dNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutNLD( NULL, dNumber );
+         PHB_ITEM pItemNew = hb_itemPutNLL( NULL, dNumber );
          va_start( va, iParam );
          hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
          va_end( va );
@@ -1027,17 +1027,17 @@ void HB_EXPORT hb_stornld( LONGLONG dNumber, int iParam, ... )
       }
       else if( bByRef || iParam == -1 )
       {
-        hb_itemPutNLD( pItem, dNumber );
+        hb_itemPutNLL( pItem, dNumber );
       }
    }
 }
 
 /* LONGLONG support */
-LONGLONG  HB_EXPORT hb_parnld( int iParam, ... )
+LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
 {
    HB_THREAD_STUB
    
-   HB_TRACE(HB_TR_DEBUG, ("hb_parnld(%d, ...)", iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_parnll(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -1048,9 +1048,9 @@ LONGLONG  HB_EXPORT hb_parnld( int iParam, ... )
          pItem = hb_itemUnRef( pItem );
       }
 
-      if( HB_IS_LDOUBLE( pItem ) )
+      if( HB_IS_LONGLONG( pItem ) )
       {
-         return pItem->item.asLDouble.value;
+         return pItem->item.asLongLong.value;
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
@@ -1077,18 +1077,18 @@ LONGLONG  HB_EXPORT hb_parnld( int iParam, ... )
          ulArrayIndex = va_arg( va, ULONG );
          va_end( va );
 
-         return hb_arrayGetNLD( pItem, ulArrayIndex );
+         return hb_arrayGetNLL( pItem, ulArrayIndex );
       }
    }
 
    return 0;
 }
 
-#undef hb_retnldlen
-void HB_EXPORT hb_retnldlen( LONGLONG dNumber, int iWidth)
+#undef hb_retnlllen
+void HB_EXPORT hb_retnlllen( LONGLONG dNumber, int iWidth)
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retndlen(%lf, %d, %d)", dNumber, iWidth));
+   HB_TRACE(HB_TR_DEBUG, ("hb_retnlllen(%lf, %d, %d)", dNumber, iWidth));
 
-   hb_itemPutNLDLen( &(HB_VM_STACK.Return), dNumber, iWidth);
+   hb_itemPutNLLLen( &(HB_VM_STACK.Return), dNumber, iWidth);
 }
 #endif
