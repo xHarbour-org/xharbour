@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.22 2003/11/03 20:09:24 brianhays Exp $
+ * $Id: adsfunc.c,v 1.23 2003/11/08 06:17:29 brianhays Exp $
  */
 
 /*
@@ -194,6 +194,38 @@ HB_FUNC( ADSISSERVERLOADED )
    }
    hb_retnl( pusConnectType );
 } */
+
+
+HB_FUNC( ADSGETSERVERTIME )
+{
+
+   UNSIGNED32 ulRetVal ;
+   UNSIGNED8 pucDateBuf[ 16 ];
+   UNSIGNED8 pucTimeBuf[ 16 ];
+
+   UNSIGNED16 pusDateBufLen = 16;
+   UNSIGNED16 pusTimeBufLen = 16;
+
+   SIGNED32 plTime = 0;
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : adsConnectHandle;
+
+   ulRetVal = AdsGetServerTime( hConnect, pucDateBuf, &pusDateBufLen, &plTime, pucTimeBuf, &pusTimeBufLen );
+
+   if( ulRetVal == AE_SUCCESS )
+   {
+      hb_reta( 3 ) ;
+      hb_storc( (char * )pucDateBuf, -1, 1 );
+      hb_storc( (char *) pucTimeBuf, -1, 2 );
+      hb_stornl( plTime, -1, 3 );
+   } else
+   {
+      AdsShowError( (UNSIGNED8 *) "AdsGetServerTime error:" );
+      hb_ret();
+   }
+}
+
+//----------------------------------------------------------------------------//
 
 HB_FUNC( ADSISTABLELOCKED )
 {
@@ -1526,6 +1558,37 @@ HB_FUNC( ADSGETLASTERROR )
    hb_retnl( ulLastErr );
 }
 
+HB_FUNC( ADSGETNUMOPENTABLES )
+{
+   UNSIGNED16 pusNum = 0;
+
+   AdsGetNumOpenTables( &pusNum ) ;
+   hb_retnl( pusNum );
+}
+
+HB_FUNC( ADSSHOWERROR )
+{
+   char * pucTitle;
+   if( ISCHAR( 1 ) )
+   {
+      pucTitle = (UNSIGNED8*) hb_parc( 1 );
+   }
+   AdsShowError( pucTitle );
+}
+
+HB_FUNC( ADSGETNUMACTIVELINKS )
+{
+   UNSIGNED16 pusNumLinks = 0;
+
+   if( adsConnectHandle )
+   {
+      AdsGetNumActiveLinks( adsConnectHandle, &pusNumLinks );
+   }
+   hb_retnl( pusNumLinks );
+}
+
+
+
 
 HB_FUNC( ADSBEGINTRANSACTION )
 {
@@ -1970,6 +2033,68 @@ HB_FUNC( ADSTESTLOGIN )
    {
       hb_retl( 0 ) ;
    }
+}
+
+HB_FUNC( ADSRESTRUCTURETABLE )
+{
+
+   // call:
+   // AdsRestructureTable( cTable, cAddFields, cDeleteFields, cChangeFields )
+
+   //UNSIGNED32  AdsRestructureTable( ADSHANDLE hConnect,UNSIGNED8 *pucName,
+   //   UNSIGNED8 *pucAlias,UNSIGNED16 usTableType,UNSIGNED16 usCharType,
+   //   UNSIGNED16 usLockType,UNSIGNED16 usCheckRights,UNSIGNED8
+   //   *pucAddFields,UNSIGNED8 *pucDeleteFields,UNSIGNED8 *pucChangeFields );
+   //adsFileType ADS_DEFAULT, ADS_ADT, ADS_NTX and ADS_CDX
+
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pTableName      = hb_parc( 1 );
+   UNSIGNED8 *pucAddFields    = hb_parc( 2 );
+   UNSIGNED8 *pucDeleteFields = hb_parc( 3 );
+   UNSIGNED8 *pucChangeFields = hb_parc( 4 );
+
+
+   ulRetVal =  AdsRestructureTable( adsConnectHandle, pTableName, NULL,
+                  adsFileType, adsCharType, adsLockType,
+                  adsRights,
+                  pucAddFields,
+                  pucDeleteFields,
+                  pucChangeFields );
+
+
+   hb_retl( (long) ulRetVal );
+
+}
+
+HB_FUNC( ADSCOPYTABLECONTENTS )
+{
+   ADSAREAP pArea;
+   ADSAREAP pDest;
+   UNSIGNED32 ulRetVal;
+   char * szAlias = hb_parc(1);
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer(); // Source
+   if( pArea )
+   {
+      if( hb_rddSelectWorkAreaAlias(szAlias) == SUCCESS)
+      {
+         pDest=(ADSAREAP) hb_rddGetCurrentWorkAreaPointer(); // Destination
+         if (pDest)
+         {
+            ulRetVal = AdsCopyTableContents(pArea->hTable,
+                                            pDest->hTable,
+                                            ADS_IGNOREFILTERS);
+            if (ulRetVal == AE_SUCCESS )
+                hb_retl(1);
+              else
+                hb_retl(0);
+         }
+      }
+      else
+         hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCOPYTABLECONTENTS" );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, " ADSCOPYTABLECONTENTS" );
 }
 
 #endif   /* ADS_REQUIRE_VERSION6  */

@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.3 2003/01/06 16:57:07 horacioroldan Exp $
+ * $Id: rddads.h,v 1.4 2003/05/26 11:10:01 lculik Exp $
  */
 
 /*
@@ -118,3 +118,14 @@ typedef struct _ADSAREA_
 } ADSAREA;
 
 typedef ADSAREA * ADSAREAP;
+
+UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
+                                       UNSIGNED8  *pucFldName,
+                                       UNSIGNED8  *pucBuf,
+                                       UNSIGNED32 ulLen );
+
+UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
+                                       UNSIGNED8  *pucFldName,
+                                       UNSIGNED8  *pucBuf,
+                                       UNSIGNED32 *pulLen );
+
