@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1159 2003/06/21 06:59:21 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1160 2003/06/21 07:17:54 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-21 00:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/classes.h
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + Added support #ifndef HB_NO_PROFILER guard for Profiler code.
+      /* HB_NO_PROFILER should be defined if you want to EXCLUDE Profiler,
+         eitherway required functions will be present (just empty). */
+
 2003-06-21 09:15 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * source/vm/hbi18n.c
-    ! Fixed compilation under windows 
+    ! Fixed compilation under windows
 
 2003-06-21 08:58 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * include/hberrors.h

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.67 2003/06/18 22:54:57 ronpinkas Exp $
+ * $Id: classes.c,v 1.68 2003/06/19 20:50:33 andijahja Exp $
  */
 
 /*
@@ -162,7 +162,9 @@
 #define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
-extern BOOL hb_bProfiler; /* profiler activity status */
+#ifndef HB_NO_PROFILER
+   extern BOOL hb_bProfiler; /* profiler activity status */
+#endif
 
 static PCLASS   s_pClasses     = NULL;
 static USHORT   s_uiClasses    = 0;
@@ -1056,10 +1058,12 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
 
             (HB_VM_STACK.pMethod) = pMethod ;
 
-            if( hb_bProfiler )
-            {
-               pMethod->ulCalls++; /* Profiler */
-            }
+            #ifndef HB_NO_PROFILER
+               if( hb_bProfiler )
+               {
+                  pMethod->ulCalls++; /* Profiler */
+               }
+            #endif
 
             if( bConstructor )
             {
@@ -3135,44 +3139,47 @@ HB_FUNC( __CLS_PAR00 )
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {
-   HB_THREAD_STUB
-   PCLASS pClass  = s_pClasses + ( hb_parnl( 1 ) - 1 );
-   char * cMsg    = hb_parc( 2 );
-   USHORT uiAt    = ( USHORT ) ( MsgToNum( cMsg, pClass->uiHashKey ) * BUCKET );
-   USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
-   USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
-   PMETHOD pMethod;
+   #ifndef HB_NO_PROFILER
+      HB_THREAD_STUB
 
-   hb_reta( 2 );
-   hb_stornl( 0, -1, 1 );
-   hb_stornl( 0, -1, 2 );
+      PCLASS pClass  = s_pClasses + ( hb_parnl( 1 ) - 1 );
+      char * cMsg    = hb_parc( 2 );
+      USHORT uiAt    = ( USHORT ) ( MsgToNum( cMsg, pClass->uiHashKey ) * BUCKET );
+      USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+      USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
+      PMETHOD pMethod;
 
-   while( uiAt != uiLimit )
-   {
-      if( ! strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, cMsg ) )
+      hb_reta( 2 );
+      hb_stornl( 0, -1, 1 );
+      hb_stornl( 0, -1, 2 );
+
+      while( uiAt != uiLimit )
       {
-         pMethod = pClass->pMethods + uiAt;
-         hb_stornl( pMethod->ulCalls, -1, 1 );
-         hb_stornl( pMethod->ulTime, -1, 2 );
-         return;
+         if( ! strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, cMsg ) )
+         {
+            pMethod = pClass->pMethods + uiAt;
+            hb_stornl( pMethod->ulCalls, -1, 1 );
+            hb_stornl( pMethod->ulTime, -1, 2 );
+            return;
+         }
+         uiAt++;
+
+         if( uiAt == uiMask )
+         {
+            uiAt = 0;
+         }
       }
-      uiAt++;
-      if( uiAt == uiMask )
-         uiAt = 0;
-   }
+   #endif
 }
 
-/* profiler: It provides to the HVM the just requested method pointer */
-void * hb_mthRequested( void )
+void hb_mthAddTime( PMETHOD pMethod, ULONG ulClockTicks )
 {
-   HB_THREAD_STUB
-   return ( void * ) (HB_VM_STACK.pMethod);
-}
-
-void hb_mthAddTime( void * pMethod, ULONG ulClockTicks )
-{
-   if( pMethod != NULL )
-      ( ( PMETHOD ) pMethod )->ulTime += ulClockTicks;
+   #ifndef HB_NO_PROFILER
+      if( pMethod != NULL )
+      {
+         pMethod->ulTime += ulClockTicks;
+      }
+   #endif
 }
 
 /* __ClsGetProperties( nClassHandle ) --> aPropertiesNames

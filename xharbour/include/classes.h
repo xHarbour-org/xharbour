@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.3 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: classes.h,v 1.4 2003/06/18 19:28:58 ronpinkas Exp $
  */
 
 /*
@@ -101,7 +101,6 @@ PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
 
 void *   hb_mthRequested( void );
-void     hb_mthAddTime( void * pMethod, ULONG ulClockTicks );
 
 #if defined(HB_EXTERN_C)
 }

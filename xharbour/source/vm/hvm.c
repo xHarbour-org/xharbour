@@ -95,7 +95,6 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
-#include "hbi18n.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -197,10 +196,8 @@ static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs I
 static void    hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
 static void    hb_vmReleaseLocalSymbols( void );  /* releases the memory of the local symbols linked list */
 
-extern void * hb_mthRequested( void ); /* profiler from classes.c */
-extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
 #ifndef HB_CDP_SUPPORT_OFF
-extern void hb_cdpReleaseAll( void );
+   extern void hb_cdpReleaseAll( void );
 #endif
 
 extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
@@ -214,9 +211,13 @@ extern HARBOUR  hb___msgSetData( void );
 extern PCLASS   hb_clsClassesArray( void );
 extern void hb_clsSetModule( USHORT uiClass );
 
-BOOL hb_bProfiler = FALSE; /* profiler status is off */
-ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
-ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
+#ifndef HB_NO_PROFILER
+   BOOL hb_bProfiler = FALSE; /* profiler status is off */
+   ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
+   ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
+
+   extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
+#endif
 
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
 
@@ -411,22 +412,21 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    #define HB_LANG_SELECT_DEFAULT_( id ) hb_langSelectID( #id )
    HB_LANG_SELECT_DEFAULT( HB_LANG_DEFAULT );
 
-   /* a good point to put i18n initialization */
-   hb_i18nInit( NULL, NULL );
-
    /* Check for some internal switches */
    hb_cmdargProcessVM();
 
-   /* Initialize opcodes profiler support arrays */
-   {
-      ULONG ul;
-
-      for( ul = 0; ul < HB_P_LAST_PCODE; ul++ )
+   #ifndef HB_NO_PROFILER
+      /* Initialize opcodes profiler support arrays */
       {
-         hb_ulOpcodesCalls[ ul ] = 0;
-         hb_ulOpcodesTime[ ul ] = 0;
+         ULONG ul;
+
+         for( ul = 0; ul < HB_P_LAST_PCODE; ul++ )
+         {
+            hb_ulOpcodesCalls[ ul ] = 0;
+            hb_ulOpcodesTime[ ul ] = 0;
+         }
       }
-   }
+   #endif
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
@@ -539,8 +539,6 @@ void HB_EXPORT hb_vmQuit( void )
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    //printf( "After ExitFunctions\n" );
 
-   hb_i18nExit();
-
    /* release all known items stored in subsystems */
    hb_rddShutDown();
    //printf( "After RDD\n" );
@@ -637,10 +635,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
    LONG lOffset;
-   ULONG ulLastOpcode = 0; /* opcodes profiler support */
-   ULONG ulPastClock = 0;  /* opcodes profiler support */
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
+
+   #ifndef HB_NO_PROFILER
+      ULONG ulLastOpcode = 0; /* opcodes profiler support */
+      ULONG ulPastClock = 0;  /* opcodes profiler support */
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
@@ -653,21 +654,27 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
 
-   if( hb_bProfiler )
-      ulPastClock = ( ULONG ) clock();
+   #ifndef HB_NO_PROFILER
+      if( hb_bProfiler )
+      {
+         ulPastClock = ( ULONG ) clock();
+      }
+   #endif
 
    while( pCode[ w ] != HB_P_ENDPROC )
    {
 
-      if( hb_bProfiler )
-      {
-         ULONG ulActualClock = ( ULONG ) clock();
+      #ifndef HB_NO_PROFILER
+         if( hb_bProfiler )
+         {
+            ULONG ulActualClock = ( ULONG ) clock();
 
-         hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
-         ulPastClock = ulActualClock;
-         ulLastOpcode = pCode[ w ];
-         hb_ulOpcodesCalls[ ulLastOpcode ]++;
-      }
+            hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
+            ulPastClock = ulActualClock;
+            ulLastOpcode = pCode[ w ];
+            hb_ulOpcodesCalls[ ulLastOpcode ]++;
+         }
+      #endif
 
 #ifndef HB_GUI
       if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
@@ -4625,8 +4632,11 @@ void hb_vmDo( USHORT uiParams )
    PHB_FUNC pFunc;
    BOOL     bDebugPrevState;
    ULONG    ulClock = 0;
-   BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
    int      iPresetBase = s_iBaseLine;
+
+   #ifndef HB_NO_PROFILER
+      BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
@@ -4644,12 +4654,12 @@ void hb_vmDo( USHORT uiParams )
       return;
    }
 
-   if( bProfiler )
-   {
-      ulClock = ( ULONG ) clock();
-   }
-
-   //hb_inkeyPoll();           /* Poll the console keyboard */
+   #ifndef HB_NO_PROFILER
+      if( bProfiler )
+      {
+         ulClock = ( ULONG ) clock();
+      }
+   #endif
 
    HB_TRACE( HB_TR_INFO, ( "StackNewFrame %hu", uiParams ) );
 
@@ -4667,10 +4677,12 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
-         if( bProfiler && pSym->pDynSym )
-         {
-            pSym->pDynSym->ulRecurse++;
-         }
+         #ifndef HB_NO_PROFILER
+            if( bProfiler && pSym->pDynSym )
+            {
+               pSym->pDynSym->ulRecurse++;
+            }
+         #endif
 
          if ( hb_bTracePrgCalls )
          {
@@ -4687,17 +4699,19 @@ void hb_vmDo( USHORT uiParams )
 
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
-         if( bProfiler && pSym->pDynSym )
-         {
-            pSym->pDynSym->ulCalls++;                   /* profiler support */
-
-            /* Time spent has to be added only inside topmost call of a recursive function */
-            if( pSym->pDynSym->ulRecurse == 1 )
+         #ifndef HB_NO_PROFILER
+            if( bProfiler && pSym->pDynSym )
             {
-               pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
+               pSym->pDynSym->ulCalls++;                   /* profiler support */
+
+               /* Time spent has to be added only inside topmost call of a recursive function */
+               if( pSym->pDynSym->ulRecurse == 1 )
+               {
+                  pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
+               }
+               pSym->pDynSym->ulRecurse--;
             }
-            pSym->pDynSym->ulRecurse--;
-         }
+         #endif
       }
       else
       {
@@ -4744,12 +4758,15 @@ void hb_vmSend( USHORT uiParams )
    PHB_FUNC       pFunc = NULL;
    BOOL           bDebugPrevState;
    ULONG          ulClock = 0;
-   void           *pMethod = NULL;
-   BOOL           bProfiler = hb_bProfiler; /* because profiler state may change */
+   PMETHOD        pMethod = NULL;
    PHB_BASEARRAY  pSelfBase = NULL;
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
    BOOL           bConstructor = FALSE;
+
+   #ifndef HB_NO_PROFILER
+      BOOL        bProfiler = hb_bProfiler; /* because profiler state may change */
+   #endif
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
 
@@ -4769,10 +4786,12 @@ void hb_vmSend( USHORT uiParams )
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
    }
 
-   if( bProfiler )
-   {
-      ulClock = ( ULONG ) clock();
-   }
+   #ifndef HB_NO_PROFILER
+      if( bProfiler )
+      {
+         ulClock = ( ULONG ) clock();
+      }
+   #endif
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );   /* procedure name */
    pSym = pItem->item.asSymbol.value;
@@ -4853,10 +4872,12 @@ void hb_vmSend( USHORT uiParams )
 
    if( pFunc )
    {
-      if( bProfiler )
-      {
-         pMethod = hb_mthRequested();
-      }
+      #ifndef HB_NO_PROFILER
+         if( bProfiler )
+         {
+            pMethod = HB_VM_STACK.pMethod;
+         }
+      #endif
 
       if ( hb_bTracePrgCalls )
       {
@@ -4888,10 +4909,12 @@ void hb_vmSend( USHORT uiParams )
          }
       }
 
-      if( bProfiler )
-      {
-         hb_mthAddTime( pMethod, clock() - ulClock );
-      }
+      #ifndef HB_NO_PROFILER
+         if( bProfiler )
+         {
+            hb_mthAddTime( pMethod, clock() - ulClock );
+         }
+      #endif
 
       // Constructor must ALWAYS return Self.
       if( bConstructor )
@@ -6861,12 +6884,15 @@ HB_FUNC( __VMVARGLIST )
  * $End$ */
 HB_FUNC( __SETPROFILER )
 {
-   HB_THREAD_STUB
-   BOOL bOldValue = hb_bProfiler;
+   #ifndef HB_NO_PROFILER
+      HB_THREAD_STUB
 
-   hb_bProfiler = hb_parl( 1 );
+      BOOL bOldValue = hb_bProfiler;
 
-   hb_retl( bOldValue );
+      hb_bProfiler = hb_parl( 1 );
+
+      hb_retl( bOldValue );
+   #endif
 }
 
 /* $Doc$
@@ -7293,22 +7319,25 @@ HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
    hb_retnl( HB_P_LAST_PCODE - 1 );
 }
 
-HB_FUNC( __OPGETPRF ) /* profiler: It returns an array with an opcode called and
-                         consumed times { nTimes, nTime },
-                         given the opcode index */
+/* profiler: It returns an array with an opcode called and
+   consumed times { nTimes, nTime }, given the opcode index */
+HB_FUNC( __OPGETPRF )
 {
-   HB_THREAD_STUB
-   ULONG ulOpcode = hb_parnl( 1 );
+   #ifndef HB_NO_PROFILER
+      HB_THREAD_STUB
 
-   hb_reta( 2 );
-   hb_stornl( 0, -1, 1 );
-   hb_stornl( 0, -1, 2 );
+      ULONG ulOpcode = hb_parnl( 1 );
 
-   if( ulOpcode < HB_P_LAST_PCODE )
-   {
-      hb_stornl( hb_ulOpcodesCalls[ ulOpcode ], -1, 1 );
-      hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
-   }
+      hb_reta( 2 );
+      hb_stornl( 0, -1, 1 );
+      hb_stornl( 0, -1, 2 );
+
+      if( ulOpcode < HB_P_LAST_PCODE )
+      {
+         hb_stornl( hb_ulOpcodesCalls[ ulOpcode ], -1, 1 );
+         hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
+      }
+   #endif
 }
 
 HB_FUNC( HB_SAVEBLOCK )
