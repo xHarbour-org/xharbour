@@ -14,22 +14,30 @@
 *      HB_StartService( .T. )
 * only if you are using gtcgi
 *
+* Call with cMode == "debug" to create a segfault at count 0
+*
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.3 2003/10/20 02:39:29 jonnymind Exp $
+* $Id: service.prg,v 1.4 2003/11/26 00:05:25 fsgiudice Exp $
 *
 
 #include "hbserv.ch"
 #include "hblog.ch"
-GLOBAL bWait
+GLOBAL bWait, bDebugMode
 
 
-PROCEDURE Main()
+PROCEDURE Main( cMode )
    LOCAL nTime := 10, nStart
 
    // put it on a file: windows console could be detached!
    INIT LOG ON CONSOLE();
    FILE(HB_LOG_ALL, "service.log", 10, 10)
+
+   IF cMode != NIL .and. cMode == "debug"
+      bDebugMode := .T.
+   ELSE
+      bDebugMode := .F.
+   ENDIF
 
    bWait := .T.
    HB_PushSignalHandler( HB_SIGNAL_ALL, "Handle" )
@@ -39,6 +47,8 @@ PROCEDURE Main()
    //Service can be started before or after pushing handler.
    HB_StartService( .F. )
 
+
+#ifdef HB_THREAD_SUPPORT
    StartThread( @waiter() )
    SecondsSleep( 0.5 )
    ? "Main thread is waiting"
@@ -48,6 +58,9 @@ PROCEDURE Main()
       HB_ServiceLoop()
       SecondsSleep( 0.5 )
    ENDDO
+#else
+   Waiter()
+#endif
 
    LOG "Main thread terminated"
    CLOSE LOG
@@ -69,19 +82,21 @@ Function Handle( nSignal, aParams )
 RETURN HB_SERVICE_HANDLED
 
 PROCEDURE Waiter()
-   LOCAL nCount := 10
+   LOCAL nCount := 15
 
    WHILE bWait
       ThreadSleep( 1000 )
       OutStd( str(nCount,3),", " )
       // create a segfault after a while..
       IF nCount == 0
-         #ifdef DEBUG
-         HB_ServiceGenerateFault()
-         // notice, under linux the segfault address is not the program
-         // address that caused the fault, but is the address of the
-         // offended memory ( in our example 0x0).
-         #endif
+         IF bDebugMode
+            HB_ServiceGenerateFault()
+            // notice, under linux the segfault address is not the program
+            // address that caused the fault, but is the address of the
+            // offended memory ( in our example 0x0).
+         ELSE
+            bWait := .F.
+         ENDIF
       ENDIF
       nCount--
    ENDDO
@@ -89,7 +104,10 @@ PROCEDURE Waiter()
 RETURN
 
 PROCEDURE Teller(nSignal, aParams)
-   ? "Thread: ", ThreadGetCurrent(), ThreadGetCurrentInternal()
+   #ifdef HB_THREAD_SUPPORT
+   ? "VM Thread    ", GetThreadId()
+   ? "System Thread", GetSystemThreadId()
+   #endif
    ? "Handled: ", nSignal
    ? "Syserror: ", aParams[1], aParams[2], HB_SignalDesc( aParams[1], aParams[2] )
    ?
