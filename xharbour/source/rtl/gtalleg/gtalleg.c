@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.14 2004/02/01 23:40:49 jonnymind Exp $
+ * $Id: gtalleg.c,v 1.15 2004/02/02 14:45:54 lf_sfnet Exp $
  */
 
 /*
@@ -1676,7 +1676,9 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return (int) TRUE;
 
       case GTI_SCREENWIDTH:
-         iOldValue = AL_SCREEN_W;
+         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
+	 {
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
          if ( bUpdate && iParam > 0 )
          {
             s_usGFXWidth = (USHORT) iParam;
@@ -1686,7 +1688,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return iOldValue;
 
       case GTI_SCREENHEIGHT:
-         iOldValue = AL_SCREEN_H;
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontHeight * s_usScrHeight : AL_SCREEN_H );
          if ( bUpdate && iParam > 0 )
          {
             s_usGFXHeight = (USHORT) iParam;
@@ -1696,7 +1698,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return iOldValue;
 
       case GTI_SCREENDEPTH:
-         iOldValue = al_bitmap_color_depth( al_screen );
+         iOldValue = ( s_pbyScrBuffer == NULL ? al_desktop_color_depth() : al_bitmap_color_depth( al_screen ) );
          if ( bUpdate &&
                (( iParam == 8 ) || ( iParam == 15 ) ||
                 ( iParam == 16 ) || ( iParam == 24 ) || ( iParam == 32 ) )
@@ -1835,96 +1837,3 @@ int _mangled_main( int argc, char * argv[] )
    return hb_vmQuit();
 }
 void *_mangled_main_address = _mangled_main;
-
-/*
- * GTInfo() implementation
- *
- */
- /*
-HB_FUNC( GTINFO )
-{
-   int iWidth, iHeight;
-   int iInfo = hb_itemGetNI( hb_param( 1, HB_IT_NUMERIC ) );
-
-   switch ( iInfo )
-   {
-      case GTI_ISGRAPHIC:
-         hb_retl( TRUE );
-	 break;
-      case GTI_SCREENWIDTH:
-         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
-	 {
-	    hb_retni( s_byFontWidth * s_usScrWidth );
-	 } else
-	 {
-            hb_retni( AL_SCREEN_W );
-	 }
-	 iWidth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
-	 if ( iWidth > 0 )
-	 {
-	    s_usGFXWidth = (USHORT) iWidth;
-//            lClearInit = ( s_pbyScrBuffer == NULL );
-//            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
-	 }
-	 break;
-      case GTI_SCREENHEIGHT:
-         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
-	 {
-	    hb_retni( s_byFontSize * s_usScrHeight );
-	 } else
-	 {
-            hb_retni( AL_SCREEN_H );
-	 }
-	 iHeight = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
-	 if ( iHeight > 0 )
-	 {
-	    s_usGFXHeight = (USHORT) iHeight;
-	    lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
-	 }
-	 break;
-      case GTI_SCREENDEPTH:
-         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
-	 {
-	    hb_retni( al_get_desktop_depth() );
-	 } else
-	 {
-            hb_retni( al_bitmap_color_depth( al_screen ) );
-	 }
-	 int iDepth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
-	 if ( ( iDepth == 8 ) || ( iDepth == 15 ) || ( iDepth == 16 ) || ( iDepth == 24 ) || ( iDepth == 32 ) )
-	 {
-	    al_set_color_depth( iDepth );
-	    lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
-	 }
-	 break;
-      case GTI_FONTSIZE:
-         hb_retni( s_byFontSize );
-	 int iSize = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
-	 if ( iSize > 0 && iSize < 256 )
-	 {
-	    s_byFontSize = (char) iSize;
-	    s_byFontWidth = s_byFontSize / 2;
-	    lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
-	 }
-	 break;
-      case GTI_FONTWIDTH:
-         hb_retni( s_byFontWidth );
-	 break;
-      case GTI_DESKTOPWIDTH:
-	 al_get_desktop_resolution( &iWidth, &iHeight );
-         hb_retni( iWidth );
-	 break;
-      case GTI_DESKTOPHEIGHT:
-	 al_get_desktop_resolution( &iWidth, &iHeight );
-         hb_retni( iHeight );
-	 break;
-      case GTI_DESKTOPDEPTH:
-         hb_retni( al_desktop_color_depth() );
-	 break;
-   }
-}
-
-*/
