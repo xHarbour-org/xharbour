@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-18 14:18 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_drw.sh
+  * bin/hb-func.sh
+  * bin/hb-mkslib.sh
+  * bin/postinst.sh
+  * config/darwin/gcc.cf
+  * include/thread.h
+  * source/rtl/filesys.c
+  * source/rtl/gtsln/gtsln.h
+    ! Updates for building on Darwin.
+  * source/vm/hbi18n.c
+  * source/vm/hvm.c
+    * A couple of typos fixed.
+  * source/tip/base64x.c
+    ! Changed non-standard #include "malloc.h" to #include <stdlib.h>
+
 2004-10-15 12:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/ct/disk.c
     - fix HB_FUNC( DRIVETYPE ) to allow space for trailing '\0' in call
@@ -46,10 +63,6 @@
     makefile.nt
     source/ct/Makefile
     ! updated to add getsecrt.prg
-
-2004-09-02 10:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
-   * source/tip/base64x.c
-     ! Changed non-standard #include "malloc.h" to #include <stdlib.h>
 
 2004-10-05 19:03 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
