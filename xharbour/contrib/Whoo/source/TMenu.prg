@@ -132,8 +132,8 @@ RETURN NIL
 METHOD Create( oParent ) CLASS TMenu
 
   ::FItems := TMenuItem():Create( Self )
-  ::FItems:FOnChange := HB_ObjMsgPtr( Self, "MenuChanged" )
-  ::FItems:FMenu := Self
+//  ::FItems:OnChange := HB_ObjMsgPtr( Self, "MenuChanged" )
+//  ::FItems:FMenu := Self
 
   //::FImageChangeLink := TChangeLink():Create
   //::FImageChangeLink:OnChange := HB_ObjMsgPtr( Self, "ImageListChange" )
@@ -216,7 +216,7 @@ METHOD DeployMenu() CLASS TMenu
       IF menuItem:Caption != NIL
          MenuItem:AppendTo( ::Handle )
          FOR EACH SubMenu IN MenuItem:aItems
-            SubMenu:AppendTo( SubMenu:Owner:FHandle )
+            SubMenu:AppendTo( SubMenu:Owner:Handle )
          NEXT
       ENDIF
    NEXT
