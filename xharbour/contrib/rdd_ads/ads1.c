@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.42 2004/04/28 09:59:37 brianhays Exp $
+ * $Id: ads1.c,v 1.43 2004/04/28 18:19:18 druzus Exp $
  */
 
 /*
@@ -2353,7 +2353,8 @@ static ERRCODE adsOrderListClear( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListClear(%p)", pArea));
 
-   AdsCloseAllIndexes  ( pArea->hTable );
+   AdsFlushFileBuffers(pArea->hTable);
+   AdsCloseAllIndexes( pArea->hTable );
    pArea->hOrdCurrent = 0;
    return SUCCESS;
 }
