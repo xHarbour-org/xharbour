@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.0 2004/01/07 15:32:50 modalsist Exp $
+ * $Id: dattime3.prg,v 1.1 2004/02/01 11:36:59 lculik Exp $
  */
 
 /*
@@ -147,14 +147,13 @@ STATIC aH_Timers := {}, nHandle, lHandle
  *  $FILES$
  *      Source is dattime3.prg, library is libct.
  *  $SEEALSO$
- *		TIME()
+ *      TIME()
  *  $END$
  */
 ***************************************************************************
 FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 ***************************************************************************
-
-Local nColMax
+   Local nColMax
 
    IF valtype(nRow)=="U" .and.;
       valtype(nCol)=="U" .and.;
@@ -217,16 +216,17 @@ Local nColMax
 
    ENDIF
 
-RETURN ("")
+RETURN ""
 
 
 STATIC FUNCTION hb_ShowTimeOff()
-// supplementary showtime FUNCTION 
+// supplementary showtime FUNCTION
    hb_ShowTimeEvent( "*", .F. )
+
 RETURN NIL
 
 STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm )
-// supplementary showtime FUNCTION 
+// supplementary showtime FUNCTION
    Local cTime := ""
    Local cShowTime := ""
    Local cHour := ""
@@ -237,7 +237,7 @@ STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve ,
       cShowTime := IIF(!lHideSeconds,time(),substr(time(),1,5))
 
       IF lTwelve
-   
+
          cHour := Substr(cShowTime,1,2)
          cAmPm := IIF(val(cHour)>11,"p","a")
 
@@ -246,7 +246,7 @@ STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve ,
          ENDIF
 
          cShowTime := cHour + Substr(cShowTime,3)+IIF(lAmPm,cAmPm,"")
-   
+
       ENDIF
 
       @ nRow, nCol say + cShowTime color cColor
@@ -257,7 +257,7 @@ STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve ,
 RETURN NIL
 
 STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
-// supplementary showtime FUNCTION 
+// supplementary showtime FUNCTION
    Local nHD,nHPos
 
    IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
@@ -309,6 +309,7 @@ RETURN lHandle
 STATIC FUNCTION hb_ShowTime_Eval_Event( )
    Local nI, nC := Col(), nR := Row()
    STATIC nCont := 0
+
    nCont ++
    For nI := 1 To Len( aH_Timers )
       aH_Timers[ nI ][ 2 ] := .F.   // will not re-excuted during the execution.
@@ -322,6 +323,7 @@ STATIC FUNCTION hb_ShowTime_Eval_Event( )
    Next
 
    DevPos( nR, nC )
+
 RETURN NIL
 
 STATIC FUNCTION hb_ShowTimeProxExc( nTime )
@@ -397,25 +399,21 @@ RETURN cNext
 *********************************
 FUNCTION SetDate( dDate , lMode )
 *********************************
-   Local lRETURN,nYear,nMonth,nDay,nDoW
-
-   lRETURN := .F.
+   Local nYear,nMonth,nDay,nDoW,lRet := .F.
 
    IF valtype( lMode ) != "L"
       lMode := .F.
    ENDIF
 
-   IF valtype ( dDate ) != "D"
-      RETURN ( lRETURN )
-   ELSE
+   IF valtype ( dDate ) == "D"
       nYear   := Year(dDate)
       nMonth  := Month(dDate)
       nDay    := Day(dDate)
       nDoW    := DOW(dDate)
-      lRETURN  := SetNewDate( nYear , nMonth , nDay , nDoW , lMode )
+      lRet    := SetNewDate( nYear , nMonth , nDay , nDoW , lMode )
    ENDIF
 
-RETURN ( lRETURN )
+RETURN lRet
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -468,26 +466,22 @@ RETURN ( lRETURN )
  *  $END$
  */
 *********************************
-FUNCTION SetTime( cTime , lMode )
+FUNCTION SetTime( cTime, lMode )
 *********************************
-   Local nNewHour,nNewMin,nNewSec,lRETURN
-
-   lRETURN := .F.
+   Local nNewHour,nNewMin,nNewSec,lRet := .F.
 
    IF valtype( lMode ) != "L"
       lMode := .F.
    ENDIF
 
-   IF !TimeValid( cTime )
-      RETURN (lRETURN)
-   ELSE
+   IF TimeValid( cTime )
       nNewHour := Val( Substr(cTime,1,2))
       nNewMin  := Val( Substr(cTime,4,2))
       nNewSec  := Val( Substr(cTime,7,2))
-      lRETURN  := SetNewTime( nNewHour , nNewMin , nNewSec , lMode )
+      lRet  := SetNewTime( nNewHour , nNewMin , nNewSec , lMode )
    ENDIF
 
-RETURN (lRETURN)
+RETURN lRet
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -553,7 +547,6 @@ RETURN (lRETURN)
 ***************************
 FUNCTION TimeValid( cTime )
 ***************************
-
    Local nHour,nMin,nSec
    Local cHour,cMin,cSec
 
@@ -566,7 +559,7 @@ FUNCTION TimeValid( cTime )
    cSec  := IIF(Len(cTime)=8,Substr(cTime,7,2),"")
 
    IF empty( cHour ) .or. empty( cMin ) .or. Len( cMin ) < 2
-      RETURN ( .F. )
+      RETURN .F.
    ENDIF
 
    nHour := Val( cHour )
@@ -576,11 +569,9 @@ FUNCTION TimeValid( cTime )
    IF nHour >= 0 .and. nHour <= 23
       IF nMin >= 0 .and. nMin <= 59
          IF nSec >= 0 .and. nSec <= 59
-            RETURN (.T.)
+            RETURN .T.
          ENDIF
       ENDIF
    ENDIF
 
-RETURN (.F.)
-
-
+RETURN .F.
