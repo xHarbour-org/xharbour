@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.25 2003/08/25 20:48:12 lculik Exp $
+ * $Id: Changelog,v 1.26 2003/08/27 02:48:23 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-27 18:03 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * src/xwt_gtk/xwt_gtk_image.c
+  * src/xwt_gtk/xwt_gtk_layout.c
+  * src/xwt_gtk/xwt_gtk_viewport.c
+  * src/xwt_gtk/xwt_gtk_window.c
+  * src/xwt_gtk/xwt_gtk_label.c
+    ! minor fix for compiler GNU C version >= 3
+
 
 2003-08-26 23:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *include/xwt.ch
@@ -16,15 +25,15 @@
       command define label/ @label enhaced to accept font name, fontsize and color
   *src/label.prg
     ! Enhaced to accept font/fontsize and color parameter
-  *src/xwt_api.c 
+  *src/xwt_api.c
     ! Changed XWT_SET_PROPERTY/XWT_GET_PROPERTY to handle the font/color properties
-  *src/xwt_gtk/xwt_gtk.c 
+  *src/xwt_gtk/xwt_gtk.c
     ! xtw_drv_set_property changes to properly handle font/color properties
   * test/xwt_test.prg
     ! changes to Define labels to show other font/sizes
    Please note this is an work in progress
 
-     
+
 2003-08-25 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * src/xwt_gtk/xwt_gtk_image.c
   * src/xwt_gtk/xwt_gtk_layout.c
@@ -35,7 +44,7 @@
 2003-07-23 12:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/xwtcmd.ch
     * Removed commands from xtw.ch and created this new one
- 
+
   * src/xwt_gtk/xwt_gtk.c
   * src/xwt_gtk/xwt_gtk.h
   * src/xwt_gtk/xwt_gtk_button.c

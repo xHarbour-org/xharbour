@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.5 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_layout.c,v 1.6 2003/07/23 15:58:10 lculik Exp $
 
    Layout - Horizontal or vertical layout manager
 */
@@ -19,18 +19,19 @@ BOOL xwt_gtk_createLayout( PXWT_WIDGET xwtData )
 
    gtkLayout = ( PXWT_GTK_LAYOUT ) hb_xgrab( sizeof( XWT_GTK_LAYOUT ) );
    gtkLayout->iMode = -1; // still undefined
-   #if __GNUC__ > 3
-   gtkLayout->frame = NULL; // no frame for now
-   gtkLayout->align = NULL; // no frame for now
-   gtkLayout->iHAlign = XWT_ALIGN_CENTER; // no frame for now
-   gtkLayout->iVAlign = XWT_ALIGN_TOP; // no frame for now
-   #else
+
+   #if __GNUC__ <3
    gtkLayout->a.a.frame = NULL; // no frame for now
    gtkLayout->a.a.a.align = NULL; // no frame for now
    gtkLayout->a.a.a.iHAlign = XWT_ALIGN_CENTER; // no frame for now
    gtkLayout->a.a.a.iVAlign = XWT_ALIGN_TOP; // no frame for now
-
+   #else
+   gtkLayout->frame = NULL; // no frame for now
+   gtkLayout->align = NULL; // no frame for now
+   gtkLayout->iHAlign = XWT_ALIGN_CENTER; // no frame for now
+   gtkLayout->iVAlign = XWT_ALIGN_TOP; // no frame for now
    #endif
+
    #if __GNUC__ < 3
    gtkLayout->a.a.a.a.main_widget = NULL; // still not available
    #else

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_image.c,v 1.3 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_image.c,v 1.4 2003/07/23 15:58:10 lculik Exp $
 
    GTK interface - Clickable image widget
 */
@@ -70,9 +70,9 @@ BOOL xwt_gtk_createImage( PXWT_WIDGET xwtData )
    imgdata->a.a.iVAlign = XWT_ALIGN_CENTER;
    imgdata->a.a.iHAlign = XWT_ALIGN_CENTER;
    #else
-   imgdata->a.align = imgdata->a.evt_window = NULL;
-   imgdata->a.iVAlign = XWT_ALIGN_CENTER;
-   imgdata->a.iHAlign = XWT_ALIGN_CENTER;
+   imgdata->align = imgdata->evt_window = NULL;
+   imgdata->iVAlign = XWT_ALIGN_CENTER;
+   imgdata->iHAlign = XWT_ALIGN_CENTER;
 
    #endif
    xwt_gtk_set_alignment( (PXWT_GTK_ALIGN) imgdata );

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.3 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_label.c,v 1.4 2003/07/23 15:58:10 lculik Exp $
 
    Label - Basic text label to draw on the screen
 */
@@ -20,7 +20,7 @@ BOOL xwt_gtk_createLabel( PXWT_WIDGET xwtData )
    gtk_widget_show( label );
 
    sens = (PXWT_GTK_SENSIBLE) hb_xgrab( sizeof( XWT_GTK_SENSIBLE ) );
-   #ifdef __GNUC__
+   #if __GNUC__ <3
    sens->a.a.main_widget = label;
    #else
    sens->main_widget = label;

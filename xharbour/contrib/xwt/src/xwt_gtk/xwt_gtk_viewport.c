@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
+   $Id: xwt_gtk_viewport.c,v 1.3 2003/07/23 15:58:10 lculik Exp $
 
    Viewport - an infinite scroller container & drawing area
 */
@@ -38,7 +38,7 @@ BOOL xwt_gtk_createViewPort( PXWT_WIDGET xwtData )
    PXWT_GTK_WND viewport;
 
    viewport = (PXWT_GTK_WND) hb_xgrab( sizeof( XWT_GTK_WND ) );
-   #ifdef __GNUC__ <3
+   #if __GNUC__ <3
    viewport->a.main_widget = NULL;
    #else
    viewport->main_widget = NULL;
