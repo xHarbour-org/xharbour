@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1424 2003/09/08 02:42:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1425 2003/09/08 12:56:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-09-08 18:20 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
+   * contrib/rdd_ads/adsfunc.c
+     + New functions related to Advantage Data Dictionary - ADSREINDEX()
+     ! Fixed some compilation errors when building with ADS_REQUIRE_VERSION6
+     
 2003-09-08 14:46 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/Makefile
   * xharbour/contrib/libct/bit1.c
