@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.12 2004/05/17 09:51:06 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.13 2004/06/09 12:50:00 likewolf Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
 
    ::lLineNumbers := lLineNumbers
 
-   Super:New("", nTop, nLeft, nBottom, nRight, .T., -1)
+   Super:New("", nTop, nLeft, nBottom, nRight, .F., -1)
    Super:SetColor(cColor)
 
    /* A hack to enforce cursor setting */
