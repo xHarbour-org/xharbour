@@ -189,6 +189,34 @@ HB_FUNC( REGCREATEKEY )
 }
 
 
+HB_FUNC( REGDELETEKEY )
+{
+   LPCTSTR cName = hb_parc( 2 );
+	
+   if ( RegDeleteKeyA( ( HKEY ) hb_parnl( 1 ), ( LPCTSTR ) hb_parc( 2 ) ) == ERROR_SUCCESS )
+     {
+        hb_retnl( 0 );
+     }
+     else
+     {
+        hb_retnl( -1 );
+     }
+}
+
+//  For strange reasons this function is not working properly
+//  May be I am missing something. Pritpal Bedi.
+
+HB_FUNC ( REGDELETEVALUE )
+{ 
+   if ( RegDeleteValue( ( HKEY ) hb_parnl( 1 ), hb_parc( 2 ) ) == ERROR_SUCCESS )
+     {
+        hb_retnl( 0 );
+     }
+     else
+     {
+        hb_retnl( -1 );
+     }
+}
 
 
 

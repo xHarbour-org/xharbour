@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.46 2002/12/19 18:32:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.47 2002/12/28 22:12:55 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-29 17:00 UTC+05:30 Pritpal Bedi <vouch32@vouchcac.com>
+   * contrib/what32/source/_winreg.c
+     + RegDeleteKey()
+       Deletes a specified key from the Windows Registry Database.
+     + RegDeleteValue()
+       Deletes value for a name for a specified key.
+       ( Please someone take care as this function is not deleting 
+         the value as all the parameters are according to WinApi 
+         documentation. )
 
 2002-12-28 20:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * include/import.ch
