@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.24 2004/02/16 00:39:25 brianhays Exp $
+ * $Id: adsfunc.c,v 1.25 2004/02/16 04:02:13 brianhays Exp $
  */
 
 /*
@@ -1571,9 +1571,9 @@ HB_FUNC( ADSSHOWERROR )
    char * pucTitle;
    if( ISCHAR( 1 ) )
    {
-      pucTitle = (UNSIGNED8*) hb_parc( 1 );
+      pucTitle = (char *) hb_parc( 1 );
    }
-   AdsShowError( pucTitle );
+   AdsShowError( (BYTE *)pucTitle );
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.26 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: ads1.c,v 1.28 2004/02/16 04:02:13 brianhays Exp $
  */
 
 /*
@@ -3054,8 +3054,6 @@ static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
             }
             case ADS_DATE:
             {
-               double nValue;
-
                if ( pArea->iFileType == ADS_NTX )
                {
                   hb_itemPutDS( pItem, (char*) pucScope );
