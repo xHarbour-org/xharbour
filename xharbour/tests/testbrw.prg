@@ -1,5 +1,5 @@
 /*
- * $Id: testbrw.prg,v 1.7 2001/08/11 11:24:06 lculik Exp $
+ * $Id: testbrw.prg,v 1.1.1.1 2001/12/21 10:46:30 ronpinkas Exp $
  */
 
 // Harbour Class TBrowse and TBColumn sample
@@ -8,6 +8,7 @@
 
 function Main()
 
+   local linit   := .F., i
    local oBrowse := TBrowseNew( 5, 5, 16, 30 )
    local aTest0  := { "This", "is", "a", "browse", "on", "an", "array", "test", "with", "a", "long", "data" }
    local aTest1  := { 1, 2, 3, 4, 5, 6, 7, 8, 10000, -1000, 54, 456342 }
@@ -51,6 +52,7 @@ function Main()
    Alert( oBrowse:ClassName() )
    Alert( oBrowse:GetColumn( 1 ):ClassName() )
 
+   oBrowse:RowPos = 5
    oBrowse:Freeze = 1
    nCursor := SetCursor( 0 )
    cColor := SetColor( "W+/B" )
@@ -67,8 +69,9 @@ endif
 enddo
 #else
 While !lEnd
+      dispbegin()
       oBrowse:ForceStable()
-
+      dispend()
       nKey = InKey( 0 )
 
       do case
@@ -125,7 +128,7 @@ While !lEnd
               DevPos( nTmpRow, nTmpCol )
 
       endcase
-      
+
    end
 #endif
    DevPos( nRow, nCol )

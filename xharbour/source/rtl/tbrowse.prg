@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.46 2003/10/19 04:05:26 walito Exp $
+ * $Id: tbrowse.prg,v 1.47 2003/10/24 04:46:57 walito Exp $
  */
 
 /*
@@ -115,6 +115,7 @@
 
 CLASS TBrowse
 
+   DATA lInitRow              // Logical value to control initial rowpos
    DATA autoLite              // Logical value to control highlighting
    DATA cargo                 // User-definable variable
    DATA goBottomBlock         // Code block executed by TBrowse:goBottom()
@@ -190,6 +191,7 @@ CLASS TBrowse
                                           // nMode is an undocumented parameter in CA-Cl*pper
    METHOD DeHilite()                      // Dehighlights the current cell
    METHOD ForceStable()                   // Performs a full stabilization
+   METHOD _ForceStable()                  // Performs a full stabilization
    METHOD ForceStabilize()                // Identical to Stabilize but usable with ForceStable()
    METHOD Hilite()                        // Highlights the current cell
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
@@ -294,7 +296,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::nwRight         := nRight
 
    ::rowCount        := nBottom - nTop + 1
-
+   ::lInitRow        := .F.
    ::nRowData        := nTop
    ::lDispBegin      := .F.
    ::AutoLite        := .T.
@@ -1454,6 +1456,31 @@ return Self
 
 METHOD ForceStable() CLASS TBrowse
 
+   // This is a hack to force TBrowse honors initial rowpos
+   // This may be a very dirty approach
+
+   local i, nInitRow
+
+   If !::lInitRow
+      nInitRow  := ::RowPos
+      If nInitRow != 1
+         for i := 1 to nInitRow - 1
+            ::Down()
+            ::_ForceStable()
+         next
+      else
+         ::_Forcestable()
+      Endif
+   else
+      ::_Forcestable()
+   Endif
+
+   ::lInitRow := .T.
+
+   Return self
+
+METHOD _ForceStable() CLASS TBrowse
+
    // If ForceStable() is called after movement of data source
    // (in simple words, the record pointer is moved) where the
    // movement was not effected by TBrowse (e.g user set scope)
@@ -1473,7 +1500,6 @@ METHOD ForceStable() CLASS TBrowse
                           // cursor row is one
 
          nAvail := Eval( ::SkipBlock, 0 - ::RowPos - 1 )
-
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
          // available.  If there are exact number of records
@@ -1497,14 +1523,18 @@ METHOD ForceStable() CLASS TBrowse
 
    EndIf
 
+
    If lReset   // So repositioning was required !
+
+      // OK Here
 
       // nNewRowPos and nLastRetrieved have to be updated
       // as we will entering phase 2 of stabilization
 
-      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
-                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
-      ::Moved()
+     // ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
+     //            If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
+
+     // ::Moved()
 
       // To ensure phase 1 is skipped
       ::nRecsToSkip := 0
@@ -2779,6 +2809,3 @@ return cList
 function TBrowseNew( nTop, nLeft, nBottom, nRight )
 
 return TBrowse():New( nTop, nLeft, nBottom, nRight )
-
-//-------------------------------------------------------------------//
-
