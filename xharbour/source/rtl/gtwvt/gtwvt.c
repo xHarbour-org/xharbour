@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.77 2004/03/03 13:20:55 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.78 2004/03/09 05:06:53 fsgiudice Exp $
  */
 
 /*
@@ -1650,7 +1650,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       HDC         hdc;
       USHORT      irow;
       RECT        updateRect, rcRect;
-
+      int         colStart, colStop, rowStart, rowStop;
 
       GetUpdateRect( hWnd, &updateRect, FALSE );
       /* WARNING!!!
@@ -1666,8 +1666,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
        */
       if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
       {
-        int colStart, colStop, rowStart, rowStop;
-
         // need to account for truncation in conversion
         // i.e. redraw any 'cell' partially covered...
         rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
@@ -1730,10 +1728,10 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         {
           hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
           hb_vmPushNil();
-          hb_vmPushLong( ( LONG ) hWnd    );
-          hb_vmPushLong( ( LONG ) message );
-          hb_vmPushLong( ( LONG ) wParam  );
-          hb_vmPushLong( ( LONG ) lParam  );
+          hb_vmPushLong( ( SHORT ) rowStart );
+          hb_vmPushLong( ( SHORT ) colStart );
+          hb_vmPushLong( ( SHORT ) rowStop  );
+          hb_vmPushLong( ( SHORT ) colStop  );
           hb_vmDo( 4 );
           hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
@@ -2996,16 +2994,18 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon )
 
 DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
 {
-  HICON hIcon = (HICON) LoadImage( ( HINSTANCE ) hb_hInstance, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
+  HICON hIcon = (HICON) LoadImage( ( HINSTANCE ) NULL, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
 
   if ( hIcon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM ) hIcon ); // Set Title Bar ICON
     SendMessage( _s.hWnd, WM_SETICON, ICON_BIG  , ( LPARAM ) hIcon ); // Set Task List Icon
 
-    DeleteObject( hIcon );
+//    DeleteObject( hIcon );
+//    DestroyIcon( hIcon ); 
   }
   return( ( DWORD ) hIcon ) ;
+  return; 
 }
 
 //-------------------------------------------------------------------//
