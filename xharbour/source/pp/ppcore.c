@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.91 2003/10/31 04:28:13 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.92 2003/11/01 06:00:54 ronpinkas Exp $
  */
 
 /*
@@ -2621,7 +2621,7 @@ static int RemoveSlash( char * stroka, BOOL bRemoveBrackets )
   int lenres = strlen( stroka );
   char cLastChar = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("RemoveSlash(%s, %i)", stroka, bREmoveBrackets));
+  HB_TRACE(HB_TR_DEBUG, ("RemoveSlash(%s, %i)", stroka, bRemoveBrackets));
 
   while( *ptr != '\0' )
   {
