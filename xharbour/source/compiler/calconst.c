@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: calconst.c,v 1.1 2004/10/23 12:02:08 druzus Exp $
  */
 
 /*
@@ -43,7 +43,11 @@ static int Precedence( PBIOP Exp );
 static double Reduce( PBIOP Exp );
 double CalcConstant( char **pExp );
 
+#define VALUE( sToken ) ( (sToken)[0] == '0' && (sToken)[1] == 'x' ? (double) strtol( sToken, NULL, 0 ) : atof( sToken ) )
+
 #ifdef STAND_ALONE
+  #define hb_compGenError( aArray, cType, sMsg, sInfo, sMore ) printf( "Parse Error: >%s<\n", sInfo )
+
   int main( char argc, char *argv[] )
   {
      double dExp;
@@ -65,6 +69,9 @@ double CalcConstant( char **pExp );
 #else
    #include "hbpp.h"
    #include "hbcomp.h"
+
+   #define malloc( p ) hb_xgrab( p )
+   #define free( p )   hb_xfree( p )
 #endif
 
 double CalcConstant( char **pExp )
@@ -110,11 +117,11 @@ double CalcConstant( char **pExp )
       if( bNot )
       {
          bNot = 0;
-         Exp->Left = ! atof( sToken );
+         Exp->Left = ! VALUE( sToken );
       }
       else
       {
-         Exp->Left = atof( sToken );
+         Exp->Left = VALUE( sToken );
       }
    }
 
@@ -248,6 +255,8 @@ char * NextTokenInConstant( char **pExp )
 {
    static char sToken[32];
 
+   //printf( "Process: >%s<\n", *pExp );
+
    sToken[0] = '\0';
 
    if( *pExp[0] == '\0' )
@@ -271,6 +280,25 @@ char * NextTokenInConstant( char **pExp )
    else
    {
       int i = 0;
+
+      if( (*pExp)[0] == '0' && (*pExp)[1] == 'x' )
+      {
+         sToken[0] = (*pExp)[0];
+         sToken[1] = (*pExp)[1];
+         (*pExp) += 2;
+
+         i = 2;
+
+         // Hex
+         while( i < 31 && ( (*pExp)[0] >= '0' && (*pExp)[0] <= '9' ) || ( (*pExp)[0] >= 'A' && (*pExp)[0] <= 'F' ) )
+         {
+            sToken[i++] = (*pExp)[0];
+            (*pExp)++;
+         }
+
+         sToken[i] = '\0';
+         return sToken;
+      }
 
       // Number
       while( i < 31 && (*pExp)[0] >= '0' && (*pExp)[0] <= '9' )
