@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.6 2003/09/02 22:59:37 andijahja Exp $
+ * $Id: inkey.c,v 1.7 2003/09/03 00:42:21 andijahja Exp $
  */
 
 /*
@@ -345,7 +345,7 @@ HB_FUNC( INKEY )
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
 
-#if ( defined( __WIN32__) || defined( HB_OS_WIN_32_USED ) )
+#if ( defined( __WIN32__ ) || defined( HB_OS_WIN_32_USED ) )
    if ( bCapsLockOn )
    {
       if ( bShiftPressed )
@@ -390,6 +390,30 @@ HB_FUNC( INKEY )
             case 61:
                iKey = 43;
                break;
+           case 91:
+               iKey = 123;
+               break;
+           case 93:
+               iKey = 125;
+               break;
+           case 92:
+               iKey = 124;
+               break;
+           case 59:
+               iKey = 58;
+               break;
+           case 39:
+               iKey = 34;
+               break;
+           case 44:
+               iKey = 60;
+               break;
+           case 46:
+               iKey = 62;
+               break;
+           case 47:
+               iKey = 63;
+               break;
          }
       }
       else
@@ -433,6 +457,30 @@ HB_FUNC( INKEY )
                break;
             case 43:
                iKey = 61;
+               break;
+           case 123:
+               iKey = 91;
+               break;
+           case 125:
+               iKey = 93;
+               break;
+           case 124:
+               iKey = 92;
+               break;
+           case 58:
+               iKey = 59;
+               break;
+           case 34:
+               iKey = 39;
+               break;
+           case 60:
+               iKey = 44;
+               break;
+           case 62:
+               iKey = 46;
+               break;
+           case 63:
+               iKey = 47;
                break;
          }
       }
