@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.14 2004/09/30 14:15:49 mlombardo Exp $
+# $Id: hrbdll.wc,v 1.15 2004/10/22 11:55:52 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -1883,9 +1883,6 @@ $(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\uc437.obj : $(CODEPAGE_DIR)\uc437.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
