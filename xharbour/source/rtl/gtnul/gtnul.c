@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: gtnul.c,v 1.1 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -107,15 +107,25 @@ static int hb_gtFindPos( char * pszID )
 
    if( pszID )
    {
-      if( strcmp( pszID, "null" ) == 0 )
+      if( hb_stricmp( pszID, "null" ) == 0 )
          pszID = s_initGT;
 
       for( iPos = 0; iPos < HB_GT_MAX_ && s_gtInit[ iPos ]; iPos++ )
-         if( strcmp( s_gtInit[ iPos ]->id, pszID ) == 0 ||
-             ( strncmp(pszID, "gt", 2) == 0 &&
-               strcmp( s_gtInit[ iPos ]->id, pszID + 2 ) == 0 ) )
+         if( hb_stricmp( s_gtInit[ iPos ]->id, pszID ) == 0 ||
+             ( hb_strnicmp(pszID, "gt", 2) == 0 &&
+               hb_stricmp( s_gtInit[ iPos ]->id, pszID + 2 ) == 0 ) )
             return iPos;
    }
+   return -1;
+}
+
+static int hb_gtFindNoNul()
+{
+   int iPos;
+
+   for( iPos = 0; iPos < HB_GT_MAX_ && s_gtInit[ iPos ]; iPos++ )
+      if( hb_stricmp( s_gtInit[ iPos ]->id, s_initGT ) != 0 )
+         return iPos;
    return -1;
 }
 
@@ -591,6 +601,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    if ( iPos == -1 )
       iPos = hb_gtFindPos( s_defaultGT );
+
+   if ( iPos == -1 )
+      iPos = hb_gtFindNoNul();
 
    if ( iPos != -1 )
    {
