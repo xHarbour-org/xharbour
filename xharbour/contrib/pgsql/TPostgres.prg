@@ -239,8 +239,9 @@ METHOD TableStruct( cTable ) CLASS TPQserver
                 
             elseif 'decimal' $ cType .or. 'numeric' $ cType
                 cType := 'N'
-                nSize := val(nSize)
                 nDec  := val(nDec)
+                // Postgres don't store ".", but .dbf does, it can cause data width problem
+                nSize := val(nSize) + iif( ! Empty(nDec), 1, 0 )
 
             elseif 'real' $ cType 
                 cType := 'N'
@@ -498,6 +499,11 @@ METHOD Refresh(lQuery) CLASS TPQquery
                 
                 elseif 'decimal' $ cType .or. 'numeric' $ cType
                     cType := 'N'
+                    
+                    // Postgres don't store ".", but .dbf does, it can cause data width problem
+                    if ! Empty(nDec)
+                        nSize++
+                    endif                        
         
                 elseif 'real' $ cType 
                     cType := 'N'
@@ -511,7 +517,7 @@ METHOD Refresh(lQuery) CLASS TPQquery
                 
                 elseif 'money' $ cType               
                     cType := 'N'
-                    nSize := 9
+                    nSize := 10
                     nDec  := 2
                 
                 elseif 'timestamp' $ cType               
