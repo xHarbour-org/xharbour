@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-16 15:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpc.prg
+    ! Fixed an error in compressed/async function execution (prototype was wrong)
+
+  * source/rtl/trpccli.prg
+    ! Fixed various errors in compressed/async function call.
+
+  * tests/rpcclient.prg
+    ! Added a compressed and asynchronous function call test
+
+  * tests/rpcserver.prg
+    ! AEstetics upgrades (server name and function progress)
+      Server has been tested with three clients working at the same time
+      in both windows and linux environment, and seems to be stable.
+
+
 2003-02-16 14:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/trpc.prg
     ! Fixes to thread termination signaling

@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id$
+* $Id: rpcclient.prg,v 1.1 2003/02/16 03:03:45 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -25,6 +25,8 @@ GLOBAL lComplete
 PROCEDURE Main( cNetwork )
    LOCAL oRpc, aElem, cFname
    LOCAL oResult, nPos
+   LOCAL cBase, nCount
+   LOCAL nSum, nNumber
 
    CLEAR SCREEN
 
@@ -111,6 +113,38 @@ PROCEDURE Main( cNetwork )
          @nRow, 10 SAY "Result of " + cFname +": " + oResult
       ENDIF
       nRow ++
+
+      // tryng again asyncrhonous mode, and now autmoatic compression feature
+      oRpc:lAsyncMode := .T.
+      lComplete := .F.
+      // again, notice that this handler are called also if the mode is sync,
+      // but they are almost essential in async mode.
+      oRpc:bOnFunctionProgress := {|x,y| Progress( x, y ) }
+      oRpc:bOnFunctionReturn := { |x| FuncComplete( x ) }
+
+      // now building a 512 lengt string, that will be compresed
+      cBase := ""
+      nSum := 0
+      FOR nCount := 1 TO 512
+         nNumber := Int( asc( "a" ) + HB_Random(4) )
+         cBase += chr( nNumber )
+         nSum += nNumber
+      NEXT
+      @nRow, 5 SAY "Async/compressed call test (expecting result: " + AllTrim( Str(nSum))+")"
+      nRow ++
+
+      // do not give timeout this time, it is not necessary: you can call "disconnect"
+      // asyncrhonously
+      oResult := oRpc:Call( cFname, { cBase } )
+      nPos := 28
+      @nRow, 20 SAY "Waiting"
+      DO WHILE .not. lComplete
+         @nRow, nPos SAY "."
+         nPos++
+         ThreadSleep( 100 )
+      ENDDO
+
+
    ELSE
       @nRow, 10 SAY "Can't Connect with  " + oRpc:aFunctions[1][2]
       nRow++
@@ -122,14 +156,39 @@ PROCEDURE Main( cNetwork )
    Inkey( 0 )
 RETURN
 
+
+/* Callback called when the system intercepts a function available on a server */
 FUNCTION FoundFunction( aElem )
    @nRow, 10 SAY "Func " + aElem[3] + " (from "+ aElem[2] + " at " + aElem[1] +")"
    nRow ++
    // returning .F. would terminate the search
 RETURN .T.
 
+/* Called when a scan (server or function) has been completed */
 FUNCTION ScanComplete()
    lComplete := .T.
    @nRow, 10 SAY "Scan function complete"
    nRow ++
 RETURN .T.
+
+
+/* Called when the Remote Procedures signals a significant progress. Also called when
+   server starts the RPC (with oData == NIL and nProgressInd == 0 ) */
+FUNCTION Progress( nProgressInd, oData )
+   IF Empty( oData )
+      @nRow,5 SAY AllTrim( Str( nProgressInd ) ) +"%"
+   ELSE
+      // oData can be anything, but we know our test function returns just a string
+      @nRow, 5 SAY AllTrim( Str( nProgressInd ) ) +"% (" + AllTrim( oData ) + ")"
+   ENDIF
+RETURN .T.
+
+/* Called when function is complete */
+FUNCTION FuncComplete( oResult  )
+      // oResult can be anything, but we know our test function returns just a string
+      lComplete := .T.
+      nRow++
+      @nRow, 10 SAY "Function complete, result: " + oResult
+      nRow++
+RETURN .T.
+

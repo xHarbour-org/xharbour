@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.1 2003/02/16 00:00:17 jonnymind Exp $
+ * $Id: trpc.prg,v 1.2 2003/02/16 03:03:41 jonnymind Exp $
  */
 
 /*
@@ -576,10 +576,6 @@ METHOD LaunchFunction( skIn, cData, nAuthLevel ) CLASS tRPCService
       RETURN .F.
    ENDIF
 
-   // at this point, all the preliminary steps have been undertaken
-   // signal that function is running
-   InetSendAll( skIn, "XHBR33" + HB_Serialize( 0.0 ) )
-
    IF InetErrorCode( skIn ) == 0
       // for now, just run it
       oRet := oFunc:Run( aParam, skIn )
@@ -604,8 +600,9 @@ METHOD LaunchFunction( skIn, cData, nAuthLevel ) CLASS tRPCService
 RETURN .T.
 
 
-METHOD GetFunctionComp( skIn, cData, nAuthLevel ) CLASS tRPCService
+METHOD GetFunctionComp( skIn, nAuthLevel ) CLASS tRPCService
    LOCAL cLength := Space(8), cOrigLen := Space(8), nLen, nOrigLen
+   LOCAL cData
    LOCAL lBreak := .T.
 
    IF InetRecvAll( skIn, @cOrigLen, 8 ) == 8

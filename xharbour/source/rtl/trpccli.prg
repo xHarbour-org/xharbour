@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.2 2003/02/16 03:03:41 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.3 2003/02/16 13:04:43 jonnymind Exp $
  */
 
 /*
@@ -151,8 +151,12 @@ RETURN Self
 METHOD Destroy() CLASS tRPCClient
 
    MutexLock( ::mtxBusy )
-      InetDestroy( ::skTcp )
-      InetDestroy( ::skUdp )
+      IF .not. Empty( ::skTcp )
+         InetDestroy( ::skTcp )
+      ENDIF
+      IF .not. Empty( ::skUdp )
+         InetDestroy( ::skUdp )
+      ENDIF
       IF ::thUdpAccept > 0
          StopThread( ::thUdpAccept )
          ::thUdpAccept := -1

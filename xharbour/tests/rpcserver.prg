@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id$
+* $Id: rpcserver.prg,v 1.1 2003/02/16 03:03:45 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -28,6 +28,7 @@ PROCEDURE Main()
    // Auth level is 1 (anyone that has logged in)
    oProc := tRPCFunctionTest():New( "Checksum","20030215.A", "C:10", { "C:0" }, 1  )
    oSv := tRPCService():New()
+   oSv:cServerName := "CksumTest"
    oSv:Add( oProc )
 
    // server is starting
@@ -38,13 +39,19 @@ PROCEDURE Main()
    oSv:Stop()
 RETURN
 
+
 CLASS tRpcFunctionTest from tRpcFunction
    // You just need to overrun the RUN method
-   Method Run( aParams )
+   Method Run( aParams, skRemote )
+   // the socket is needed only if you want to give a progress indicator
 ENDCLASS
 
-METHOD Run( aParams ) class tRpcFunctionTest
+
+METHOD Run( aParams, skRemote ) class tRpcFunctionTest
    LOCAL nSum, i
+
+   // signal that function is starting (not necessary, just for test)
+   ::SendProgress( skRemote, 0 )
 
    IF .not. ::CheckTypes( aParams )
       RETURN NIL
@@ -53,6 +60,12 @@ METHOD Run( aParams ) class tRpcFunctionTest
    nSum := 0
    FOR i := 1 to Len( aParams[1] )
       nSum += asc(aParams[1][i])
+      // signal a progress each 50 characters
+      IF i % 50 == 0
+         ::SendProgress( skRemote, i / Len( aParams[1] ) * 100, Str(nSum, 10 ) )
+         // simulate some burdensome operation
+         ThreadSleep( 200 )
+      ENDIF
    NEXT
 
 RETURN Str(nSum, 10)
