@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2916 2004/05/10 15:19:26 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2917 2004/05/10 20:38:05 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-05-11 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/hvm.c
+    ! minor correction on function __TRACEPRGCALLS for MT compilation.
+
 2004-05-11 08:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwin/mousewin.c
     - HB_GT_FUNC(mouse_IsButtonPressed( int iButton ) - copy code from gtwvt.c

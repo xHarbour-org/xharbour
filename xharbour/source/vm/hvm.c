@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.391 2004/05/09 05:22:48 ronpinkas Exp $
+ * $Id: hvm.c,v 1.392 2004/05/09 21:13:49 druzus Exp $
  */
 
 /*
@@ -8375,15 +8375,15 @@ HB_FUNC( __SETPROFILER )
  * $End$ */
 HB_FUNC( __TRACEPRGCALLS )
 {
-   #ifndef HB_NO_TRACE
       HB_THREAD_STUB
-
+   #ifndef HB_NO_TRACE
       BOOL bOldValue = hb_bTracePrgCalls;
 
       hb_bTracePrgCalls = hb_parl( 1 );
 
       hb_retl( bOldValue );
    #else
+
       hb_retl( 0 );
    #endif
 }
