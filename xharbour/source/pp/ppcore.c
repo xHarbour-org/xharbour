@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.196 2005/03/02 17:39:13 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.197 2005/03/08 22:35:14 ronpinkas Exp $
  */
 
 /*
@@ -5825,7 +5825,7 @@ static void pp_rQuotes( char * expreal, char * sQuotes )
 int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, char * sBuffer, int * lenBuffer, int * iBuffer, int State )
 {
   int readed = 0;
-  char cha, cLast = '\0', symbLast = '\0';
+  char cha, cLast = '\0';
   BOOL bOK = TRUE;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_RdStr(%p, %s, %d, %d, %s, %p, %p, %i)", handl_i, buffer, maxlen, lDropSpaces, sBuffer, lenBuffer, iBuffer, State));
@@ -5859,7 +5859,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
     if( cha == '\n' )
     {
-      if( ( ! hb_pp_bInline ) && s_ParseState == STATE_COMMENT && symbLast == ';' )
+      if( ( ! hb_pp_bInline ) && s_ParseState == STATE_COMMENT )
       {
         if( readed == maxlen )
         {
@@ -5896,11 +5896,6 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
           }
 
           cLast = cha;
-
-          if( cha != ' ' && cha != '\t' )
-          {
-             symbLast = cha;
-          }
           break;
 
         case STATE_QUOTE1: if(cha=='\'')
@@ -6062,7 +6057,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
   buffer[readed]='\0';
 
   #if 0
-     printf( "%s\n", buffer );
+     printf( "Readed <%s>\n", buffer );
   #endif
 
   return readed;
