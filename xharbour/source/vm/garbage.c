@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.14 2002/03/15 23:34:46 ronpinkas Exp $
+ * $Id: garbage.c,v 1.15 2002/03/19 19:44:16 ronpinkas Exp $
  */
 
 /*
@@ -364,7 +364,25 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       pItem = hb_itemUnRef( pItem );
    }
 
-   if( HB_IS_ARRAY( pItem ) )
+   if( HB_IS_POINTER( pItem ) )
+   {
+      HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asPointer.value;
+      --pAlloc;
+
+      /* check if this memory was allocated by a hb_gcAlloc() */
+      if ( pItem->item.asPointer.collect )
+      {
+         /* Check this memory only if it was not checked yet */
+         if( pAlloc->used == s_uUsedFlag )
+         {
+            /* mark this memory as used so it will be no re-checked from
+             * other references
+             */
+            pAlloc->used ^= HB_GC_USED_FLAG;
+         }
+      }
+   }
+   else if( HB_IS_ARRAY( pItem ) )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asArray.value;
       --pAlloc;
