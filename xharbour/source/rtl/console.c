@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.8 2002/06/13 22:15:38 lculik Exp $
+ * $Id: console.c,v 1.9 2002/07/30 01:06:39 lculik Exp $
  */
 
 /*
@@ -131,8 +131,10 @@ void hb_conInit( void )
    s_bInit = TRUE;
 
    hb_gtInit( s_iFilenoStdin, s_iFilenoStdout, s_iFilenoStderr );
+
    s_originalMaxRow = hb_gtMaxRow(); /* Save the original */
    s_originalMaxCol = hb_gtMaxCol(); /* screen size */
+
    hb_setkeyInit();  /* April White, May 6, 2000 */
 }
 
@@ -196,8 +198,6 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 /* Output an item to STDOUT */
 void hb_conOutStd( char * pStr, ULONG ulLen )
 {
-   USHORT uiErrorOld;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutStd(%s, %lu)", pStr, ulLen));
 
    if( ulLen == 0 )
@@ -206,9 +206,7 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
    if( s_bInit )
       hb_gtPreExt();
 
-   uiErrorOld = hb_fsError(); /* Save current user file error code */
-   hb_fsWriteLarge( s_iFilenoStdout, ( BYTE * ) pStr, ulLen );
-   hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+   hb_gt_OutStd( ( BYTE * ) pStr, ulLen );
 
    if( s_bInit )
    {
@@ -220,8 +218,6 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
 /* Output an item to STDERR */
 void hb_conOutErr( char * pStr, ULONG ulLen )
 {
-   USHORT uiErrorOld;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 
    if( ulLen == 0 )
@@ -230,9 +226,7 @@ void hb_conOutErr( char * pStr, ULONG ulLen )
    if( s_bInit )
       hb_gtPreExt();
 
-   uiErrorOld = hb_fsError(); /* Save current user file error code */
-   hb_fsWriteLarge( s_iFilenoStderr, ( BYTE * ) pStr, ulLen );
-   hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+   hb_gt_OutErr( ( BYTE * ) pStr, ulLen );
 
    if( s_bInit )
    {

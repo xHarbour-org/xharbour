@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
+ * $Id: gtsln.h,v 1.3 2002/04/16 16:12:18 map Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 
 #include <slang.h>
 #include "hbapigt.h"
+#include "hbapifs.h"
 #include "inkey.ch"
 #include <unistd.h>
 

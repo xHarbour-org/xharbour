@@ -1,5 +1,5 @@
 /*
- * $Id: keytrans.c,v 1.7 2001/07/10 16:35:53 dholm Exp $
+ * $Id: keytrans.c,v 1.1.1.1 2001/12/21 10:42:30 ronpinkas Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ static int hb_gt_FindKeyTranslation( int SlangKey )
 
 int hb_gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey )
 {
-   int i;
+   int i, Found = 0;
 
    if ( ( SlangKey >= KeyTranslationTable[ 0 ][ 0 ] ) &&
         ( SlangKey <= KeyTranslationTable[ KeyTranslationTableSize - 1 ][ 0 ] ) )
@@ -456,11 +456,12 @@ int hb_gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey )
       {
          if ( SlangKey == KeyTranslationTable[ i ][ 0 ] )
             KeyTranslationTable[ i ][ 1 ] = ClipKey;
+	    Found = 1;
             /* we don't break here because SlangKey can be defined more than once */
       }
    }
 
-   return( i < KeyTranslationTableSize );
+   return( Found );
 }
 
 /* ************************************************************************* */

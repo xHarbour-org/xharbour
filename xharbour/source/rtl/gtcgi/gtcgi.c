@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.7 2001/08/22 16:48:26 dholm Exp $
+ * $Id: gtcgi.c,v 1.1.1.1 2001/12/21 10:42:44 ronpinkas Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 
 #include "hbapifs.h"
 #include "hbapigt.h"
+#include "hbapifs.h"
 
 static SHORT  s_iRow;
 static SHORT  s_iCol;
@@ -67,6 +68,8 @@ static int    s_iFilenoStdout;
 static USHORT s_uiDispCount;
 static char * s_szCrLf;
 static ULONG  s_ulCrLf;
+
+static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
@@ -89,6 +92,11 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_szCrLf = hb_conNewLine();
    s_ulCrLf = strlen( s_szCrLf );
    
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
+    
    hb_mouse_Init();
 }
 
@@ -587,4 +595,14 @@ BOOL hb_gt_Suspend()
 BOOL hb_gt_Resume()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }

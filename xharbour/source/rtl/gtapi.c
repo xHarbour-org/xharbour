@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.1.1.1 2001/12/21 10:42:15 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.2 2002/01/23 02:32:08 ronpinkas Exp $
  */
 
 /*
@@ -1124,4 +1124,14 @@ USHORT hb_gtResume( void )
       return( -1 );
 
    return( 0 );
+}
+
+int hb_gtIndexedColor( int idx )
+{
+    return( s_pColor[ idx ] );
+}
+
+int hb_gtCurrentColor()
+{
+    return( s_pColor[ s_uiColorIndex ] );
 }

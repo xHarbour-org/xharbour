@@ -1,5 +1,5 @@
 /*
- * $Id: gtstd.c,v 1.29 2001/12/15 11:22:29 vszakats Exp $
+ * $Id: gtstd.c,v 1.1.1.1 2001/12/21 10:42:29 ronpinkas Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ static USHORT s_uiMaxCol;
 static USHORT s_uiCursorStyle;
 static BOOL   s_bBlink;
 static int    s_iFilenoStdout;
+static int    s_iFilenoStderr;
 static USHORT s_uiDispCount;
 static BYTE * s_szCrLf;
 static ULONG  s_ulCrLf;
@@ -104,7 +105,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
    HB_SYMBOL_UNUSED( iFilenoStdin );
-   HB_SYMBOL_UNUSED( iFilenoStderr );
+   //HB_SYMBOL_UNUSED( iFilenoStderr );
 
 #if defined( OS_UNIX_COMPATIBLE )
    {
@@ -143,6 +144,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_uiCursorStyle = SC_NORMAL;
    s_bBlink = FALSE;
    s_iFilenoStdout = iFilenoStdout;
+   s_iFilenoStderr = iFilenoStderr;
    hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
 
    s_szCrLf = (BYTE *) hb_conNewLine();
@@ -775,4 +777,12 @@ BOOL hb_gt_Resume()
    return TRUE;
 }
 
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iFilenoStdout, ( BYTE * ) pbyStr, ulLen );
+}
 
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iFilenoStderr, ( BYTE * ) pbyStr, ulLen );
+}

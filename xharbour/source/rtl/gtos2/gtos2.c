@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.35 2001/08/22 16:48:26 dholm Exp $
+ * $Id: gtos2.c,v 1.1.1.1 2001/12/21 10:42:37 ronpinkas Exp $
  */
 
 /*
@@ -94,6 +94,7 @@
 
 #include "hbapierr.h"
 #include "hbapigt.h"
+#include "hbapifs.h"
 #include "inkey.ch"
 
 /* convert 16:16 address to 0:32 */
@@ -142,12 +143,18 @@ static USHORT s_usOldCodePage;
    use this static which contains active mode info */
 static VIOMODEINFO s_vi;
 
+static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
    APIRET rc;           /* return code from DosXXX api call */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
+
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 
    s_vi.cb = sizeof( VIOMODEINFO );
    VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
@@ -1128,4 +1135,14 @@ BOOL hb_gt_Suspend()
 BOOL hb_gt_Resume()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.21 2001/08/22 16:48:26 dholm Exp $
+ * $Id: gtpca.c,v 1.1.1.1 2001/12/21 10:42:35 ronpinkas Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 #include <string.h>
 
 #include "hbapigt.h"
+#include "hbapifs.h"
 #include "hbset.h"
 #include "inkey.ch"
 
@@ -670,4 +671,14 @@ BOOL hb_gt_Suspend()
 BOOL hb_gt_Resume()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iFilenoStdout, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iFilenoStderr, ( BYTE * ) pbyStr, ulLen );
 }

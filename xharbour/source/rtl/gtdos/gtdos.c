@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.31 2001/08/22 16:48:26 dholm Exp $
+ * $Id: gtdos.c,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
 
 #include "hbapi.h"
 #include "hbapigt.h"
+#include "hbapifs.h"
 #include "hbset.h" /* For Ctrl+Break handling */
 #include "hbvm.h" /* For Ctrl+Break handling */
 #include "inkey.ch"
@@ -141,6 +142,8 @@ static void hb_gt_GetCursorSize( char * start, char * end );
 static BOOL s_bBreak; /* Used to signal Ctrl+Break to hb_inkeyPoll() */
 static USHORT s_uiDispCount;
 
+static int s_iStdIn, s_iStdOut, s_iStdErr;
+
 #if defined(__RSX32__)
 
 static int kbhit( void )
@@ -193,9 +196,16 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
+   /*
    HB_SYMBOL_UNUSED( iFilenoStdin );
    HB_SYMBOL_UNUSED( iFilenoStdout );
    HB_SYMBOL_UNUSED( iFilenoStderr );
+   */
+   
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 
    s_bBreak = FALSE;
    s_uiDispCount = 0;
@@ -1505,4 +1515,14 @@ BOOL hb_gt_Suspend()
 BOOL hb_gt_Resume()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }

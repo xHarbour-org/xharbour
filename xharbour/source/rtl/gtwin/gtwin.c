@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.2 2002/06/06 14:33:21 walito Exp $
+ * $Id: gtwin.c,v 1.3 2002/06/07 15:19:23 walito Exp $
  */
 
 /*
@@ -82,6 +82,7 @@
 #define HB_OS_WIN_32_USED
 
 #include <hbapigt.h>
+#include <hbapifs.h>
 #include <hbset.h> /* For Ctrl+Break handling */
 #include <hbvm.h> /* For Ctrl+Break handling */
 #include <hbinkey.ch>
@@ -144,6 +145,8 @@ static int          s_mouseLast;  /* Last mouse button to be pressed            
 extern int hb_mouse_iCol;
 extern int hb_mouse_iRow;
 
+static int s_iStdIn, s_iStdOut, s_iStdErr;
+
 static BOOL WINAPI hb_gt_CtrlHandler( DWORD dwCtrlType )
 {
    BOOL bHandled;
@@ -175,9 +178,16 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init(): %d, %d, %d", iFilenoStdin, iFilenoStdout, iFilenoStderr));
 
+   /*
    HB_SYMBOL_UNUSED( iFilenoStdin );
    HB_SYMBOL_UNUSED( iFilenoStdout );
    HB_SYMBOL_UNUSED( iFilenoStderr );
+   */
+
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 
 #if 0
    s_HOsave     =
@@ -1388,4 +1398,14 @@ BOOL hb_gt_Suspend()
 BOOL hb_gt_Resume()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }

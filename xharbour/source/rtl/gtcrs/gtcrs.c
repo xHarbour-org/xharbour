@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.1.1.1 2001/12/21 10:42:42 ronpinkas Exp $
+ * $Id: gtcrs.c,v 1.2 2002/03/30 19:23:30 map Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #include <unistd.h>
 
 #include "hbapigt.h"
+#include "hbapifs.h"
 #include "hbinit.h"
 
 /* static data
@@ -68,6 +69,8 @@ static unsigned s_attribmap_table[ 256 ]; /* mapping from DOS style attributes *
 static BOOL s_under_xterm;
 static int s_alternate_char_set;
 static char s_xTermBox[ 10 ] = "lqkxjqmx ";
+
+static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 extern void hb_gt_keyboard_Init( void );
 extern void hb_gt_keyboard_Exit( void );
@@ -163,6 +166,11 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
    s_uiDispCount = 0;
+
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 
    hb_gt_terminal_Init();
    /* Mouse sub-sytem have to be initialized after ncurses initialization */
@@ -830,4 +838,14 @@ BOOL hb_gt_PreExt()
 BOOL hb_gt_PostExt()
 {
    return TRUE;
+}
+
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.7 2002/07/03 15:50:40 lculik Exp $
+ * $Id: gtsln.c,v 1.8 2002/08/06 17:45:26 map Exp $
  */
 
 /*
@@ -80,6 +80,7 @@
     */
 #endif
 #endif
+int SLsmg_get_color();
 
 //#include <unistd.h>
 #include <signal.h>
@@ -94,8 +95,7 @@
 extern unsigned char s_convKDeadKeys[];
 extern int hb_gt_Init_Terminal( int phase );
 
-/* standard output */
-/* static int s_iFilenoStdout; */
+static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 /* to convert characters displayed */
 static void hb_gt_build_conv_tabs();
@@ -166,7 +166,15 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-    /* s_iFilenoStdout = iFilenoStdout; */
+    /* stdin && stdout && stderr */
+    s_iStdIn  = iFilenoStdin;
+    s_iStdOut = iFilenoStdout;
+    s_iStdErr = iFilenoStderr;
+    
+    /* Slang file descriptors */
+    SLang_TT_Read_FD  = -1;
+    SLang_TT_Write_FD = -1;
+
     s_uiDispCount = 0;
 
     /* read a terminal descripion from a terminfo database */
@@ -179,6 +187,10 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
             keyboard subsystem for the first time */
         if( hb_gt_Init_Terminal( 0 ) )
         {
+	    /* fix an OutStd()/OutErr() output */
+	    if( !isatty( iFilenoStdout ) )
+    		SLang_TT_Write_FD = SLang_TT_Read_FD;
+
             /* initialize a screen handling subsytem */
             if( SLsmg_init_smg() != -1 )
             {
@@ -205,7 +217,8 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
                    This is incompatible with Clipper. */
                 SLtt_Blink_Mode = 0;
                 SLtt_Use_Blink_For_ACS = 0;
-                SLsmg_Display_Eight_Bit = 160;
+                SLsmg_Display_Eight_Bit = 128;
+		SLsmg_Newline_Behavior = SLSMG_NEWLINE_SCROLLS;
 
                 /* initialize conversion tables */
                 hb_gt_build_conv_tabs();
@@ -213,6 +226,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
                 /* ensure we are in a normal chars set */
                 SLtt_set_alt_char_set( 0 );
 
+		/* set the normal Slang color */
+		SLsmg_set_color( 0 );
+		
                 /* NOTE: due to a work of a Slang library which does not
                    prepare its internal screen buffer properly, a screen
                    must be cleared before normal work. This is not
@@ -328,6 +344,7 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
 
 BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
 {
+#if 0
     ULONG ulCount;
     USHORT row = SLsmg_get_row();
     USHORT col = SLsmg_get_column();
@@ -379,7 +396,7 @@ BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
     }
 
     hb_gt_SetPos( row, col, HB_GT_SET_POS_AFTER );
-
+#endif
     return TRUE;
 }
 
@@ -1069,6 +1086,42 @@ USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byA
 
 /* *********************************************************************** */
 
+void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+{
+    if( isatty( s_iStdOut ) )
+    {
+        //int SaveColor = SLsmg_get_color();
+        //SLtt_set_alt_char_set( 1 );
+        SLsmg_set_color( ( int )( ( unsigned char )( hb_gtCurrentColor() - 7 ) ) );
+        SLsmg_write_nchars( pbyStr, ulLen );
+        SLsmg_refresh();
+        //SLtt_set_alt_char_set( 0 );
+        //SLsmg_set_color( SaveColor );
+    }
+    else
+	hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+/* *********************************************************************** */
+
+void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+{
+    if( isatty( s_iStdErr ) )
+    {
+	int Save_SLang_TT_Write_FD = SLang_TT_Write_FD;
+	SLang_TT_Write_FD = s_iStdErr;
+	//SLtt_set_alt_char_set( 1 );
+	SLsmg_write_nchars( pbyStr, ulLen );
+	SLang_TT_Write_FD = Save_SLang_TT_Write_FD;
+	SLsmg_refresh();
+	//SLtt_set_alt_char_set( 0 );
+    }
+    else
+	hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
+}
+
+/* *********************************************************************** */
+
 /* NOTE: these two are for prepare Slang to temporary
    finish its work. They should be called from run.c. */
 
@@ -1190,11 +1243,11 @@ static void hb_gt_build_conv_tabs()
                 case SLSMG_LLCORN_CHAR  :   s_convHighChars[ 192 ] = SLch; break;
                 case SLSMG_LRCORN_CHAR  :   s_convHighChars[ 217 ] = SLch; break;
                 case SLSMG_CKBRD_CHAR   :   s_convHighChars[ 176 ] = SLch; break;
-                case SLSMG_RTEE_CHAR        :   s_convHighChars[ 180 ] = SLch; break;
-                case SLSMG_LTEE_CHAR        :   s_convHighChars[ 195 ] = SLch; break;
-                case SLSMG_UTEE_CHAR        :   s_convHighChars[ 194 ] = SLch; break;
-                case SLSMG_DTEE_CHAR        :   s_convHighChars[ 193 ] = SLch; break;
-                case SLSMG_PLUS_CHAR        :   s_convHighChars[ 197 ] = SLch; break;
+                case SLSMG_RTEE_CHAR    :   s_convHighChars[ 180 ] = SLch; break;
+                case SLSMG_LTEE_CHAR    :   s_convHighChars[ 195 ] = SLch; break;
+                case SLSMG_UTEE_CHAR    :   s_convHighChars[ 194 ] = SLch; break;
+                case SLSMG_DTEE_CHAR    :   s_convHighChars[ 193 ] = SLch; break;
+                case SLSMG_PLUS_CHAR    :   s_convHighChars[ 197 ] = SLch; break;
 
 /*
                 case SLSMG_DEGREE_CHAR; :   s_convHighChars[    ] = SLch; break;
