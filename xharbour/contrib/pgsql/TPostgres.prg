@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.31 2004/12/15 13:12:28 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.32 2004/12/15 13:15:24 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -84,6 +84,7 @@ CLASS TPQServer
     METHOD   CreateTable( cTable, aStruct )
     METHOD   DeleteTable( cTable  )
 
+    DESTRUCTOR Destroy
 ENDCLASS
 
 
@@ -484,6 +485,8 @@ CLASS TPQQuery
     METHOD   FieldGet( nField, nRow )
     METHOD   GetRow( nRow )   
     METHOD   GetBlankRow()  
+    
+    DESTRUCTOR Destroy
 ENDCLASS
 
 
