@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.188 2005/02/27 11:56:03 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.189 2005/02/28 02:12:31 druzus Exp $
  */
 
 /*
@@ -7145,9 +7145,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                                     !pArea->lpdbOrdCondInfo->fAdditive ) )
    {
 #ifdef HB_CDX_CLIP_AUTOPEN
-      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, NULL );
+      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, pIndex );
 #else
-      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, NULL );
+      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, pIndex );
 #endif
    }
    hb_cdxIndexUnLockWrite( pIndex );

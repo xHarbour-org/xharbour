@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.80 2004/04/03 01:51:03 ronpinkas Exp $
+ * $Id: garbage.c,v 1.81 2004/04/03 11:47:11 jonnymind Exp $
  */
 
 /*
@@ -518,6 +518,13 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
             hb_gcItemRef( &pCBlock->pLocals[ ui ] );
             ++ui;
          }
+         if( pCBlock->pSelfBase )
+         {
+            HB_ITEM FakedItem;
+            FakedItem.type = HB_IT_ARRAY;
+            FakedItem.item.asArray.value = pCBlock->pSelfBase;
+            hb_gcItemRef( &FakedItem );
+         }
       }
    }
    /* all other data types don't need the GC */
@@ -541,7 +548,7 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
       HB_CRITICAL_LOCK( hb_garbageAllocMutex );
-      if ( s_pCurrBlock == 0 || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
+      if ( s_pCurrBlock == NULL || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
       {
          HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          return;
@@ -658,13 +665,6 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
             (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
 
             hb_gcItemRef( &FakedItem );
-
-            if( (&FakedItem)->item.asBlock.value->pSelfBase )
-            {
-               (&FakedItem)->type = HB_IT_ARRAY;
-               (&FakedItem)->item.asArray.value = (&FakedItem)->item.asBlock.value->pSelfBase;
-               hb_gcItemRef( &FakedItem );
-            }
          }
 
          pAlloc = pAlloc->pNext;
