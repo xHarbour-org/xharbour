@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.11 2003/06/24 08:37:21 andijahja Exp $
+rem $Id: make_b32.bat,v 1.12 2003/07/24 04:11:44 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -63,6 +63,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\*.obj     del lib\*.obj
    if exist lib\b32\*.lib del lib\b32\*.lib
    if exist lib\b32\*.bak del lib\b32\*.bak
+   if exist lib\b32\*.obj del lib\b32\*.obj
 
    if exist obj\b32\*.obj del obj\b32\*.obj
    if exist obj\b32\*.c   del obj\b32\*.c

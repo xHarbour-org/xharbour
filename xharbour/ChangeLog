@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1296 2003/07/25 01:57:57 druzus Exp $
+ * $Id: ChangeLog,v 1.1297 2003/07/25 21:27:29 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-26 00:57 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+   * make_b32.bat
+      * added this to clean up any hvm*.obj files that may be left
+            from earlier versions:
+         if exist lib\b32\*.obj del lib\b32\*.obj
 
 2003-07-25 22:18 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/gtcrs/gtcrs.c
@@ -66,7 +72,7 @@
 2003-07-24 04:08 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
     + Added hbooutdebug.c
-  
+
   * source/rtl/hbrandom.c
     ! Forgot to include the header with the new prototype of hb_random_num()
 
