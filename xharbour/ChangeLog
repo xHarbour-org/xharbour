@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2649 2004/03/25 09:38:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2650 2004/03/25 12:13:11 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-25 10:30 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
+  * source/rtl/ttopbar.prg
+    ! minor fix to additem method(fixes an bug reported by Guillermo Varona
+  
 2004-03-25 13:22 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddcdx.h
   * xharbour/include/hbrdddbf.h

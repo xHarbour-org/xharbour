@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.3 2003/01/27 04:03:12 walito Exp $
+ * $Id: ttopbar.prg,v 1.4 2003/01/31 21:03:36 walito Exp $
  */
 
 /*
@@ -195,8 +195,11 @@ METHOD AddItem( oItem ) CLASS TopBarMenu
    LOCAL oLast
 
    ::itemCount++
+   IF ::itemCount == 1
+      oItem:column := ::left
+   ENDIF
 
-   if ::itemCount > 1
+   IF ::itemCount > 1
       oLast := ATail( ::aItems )
       oItem:column := oLast:column + Len( StrTran( oLast:caption, "&", "" ) ) + 2
    endif
