@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.118 2004/08/27 15:47:34 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.119 2004/09/01 17:15:13 srobert Exp $
  */
 
 /*
@@ -2339,18 +2339,56 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
 
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
-   switch( uiMode & FL_MASK )
    {
-      case FL_LOCK:
-         bResult = LockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
-         break;
+     static BOOL s_bInit = 0, s_bWinNt ;
+     if ( !s_bInit )
+     {
+        s_bInit = TRUE ;
+        s_bWinNt = hb_iswinnt() ;
 
-      case FL_UNLOCK:
-         bResult = UnlockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
-         break;
+     }
+     switch( uiMode & FL_MASK )
+     {
+        case FL_LOCK:
+        {
+           if ( s_bWinNt )
+           {
+              OVERLAPPED sOlap ;
+              DWORD dwFlags ;
+              memset( &sOlap, 0, sizeof( OVERLAPPED ) ) ;
+              sOlap.Offset = ( ULONG ) ulStart ;
+              dwFlags = ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK ;
+              if ( !( uiMode & FLX_WAIT ) )
+              {
+                 dwFlags |= LOCKFILE_FAIL_IMMEDIATELY ;
+              }
+              bResult = LockFileEx( DostoWinHandle( hFileHandle ), dwFlags, 0, ulLength, 0, &sOlap );
+           }
+           else
+           {
+               bResult = LockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+           }
+           break;
+        }
+        case FL_UNLOCK:
+        {
+           if ( s_bWinNt )
+           {
+              OVERLAPPED sOlap ;
+              memset( &sOlap, 0, sizeof( OVERLAPPED ) ) ;
+              sOlap.Offset = ( ULONG ) ulStart ;
+              bResult = UnlockFileEx( DostoWinHandle( hFileHandle ), 0, ulLength,0, &sOlap );
+           }
+           else
+           {
+              bResult = UnlockFile( DostoWinHandle( hFileHandle ), ulStart, 0, ulLength,0 );
+           }
+           break;
 
-      default:
-         bResult = FALSE;
+        }
+        default:
+           bResult = FALSE;
+     }
    }
    hb_fsSetIOError( bResult, 0 );
    HB_DISABLE_ASYN_CANC
