@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3452 2004/09/21 02:52:32 druzus Exp $
+ * $Id: ChangeLog,v 1.3453 2004/09/21 03:12:21 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-20 20:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/strcase.c
+  * source/common/hbstr.c
+    -+ Moved hb_strncat() from strcase.c to common/hbstr.c (because used in common/hbfsapi.c
+    ! Fixed GPF trap in hb_strncat() by setting numll terminator at <ulLen - 1> instead of <ulLen>
+      /* If this is not the desired behaviour then all calling code must be verified to allocate ulLen + 1 */
 
 2004-09-21 04:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddcdx.h
