@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.89 2005/03/31 03:16:10 druzus Exp $
+ * $Id: genc.c,v 1.90 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -94,8 +94,6 @@ extern char *hb_Command_Line;
 */
 FILE *hb_comp_pCodeList = NULL;
 
-extern BOOL hb_comp_Failure;
-
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
@@ -145,8 +143,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
    if( ! yyc )
    {
-      hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNTERMINATED_COMMENTS, NULL, NULL );
-      hb_comp_Failure = TRUE;
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
       return;
    }
 
@@ -730,13 +727,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       if ( pInline && pInline->pCode )
       {
          hb_compGenCInLine( yyc );
-         if( hb_comp_Failure )
-         {
-            fclose( yyc );
-            remove( szFileName );
-            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNTERMINATED_COMMENTS, NULL, NULL );
-            return;
-         }
       }
    }
    else
@@ -855,14 +845,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pTemp = pStatSymFirst;
          while( pTemp )
          {
-            /*
-               We force HB_FS_PUBLIC | HB_FS_STATIC here otherwise static
-               function cannot be called by program even it is inside the
-               module. Perhaps must be corrected one time.
-            */
-            fprintf( yyc, "{ \"%s\", HB_FS_STATIC",pTemp->szName);
-
-            fprintf( yyc, ", {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }",pTemp->szName);
+            fprintf( yyc, "{ \"%s\", HB_FS_STATIC, {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pTemp->szName, pTemp->szName );
 
             pTemp = pTemp->pNext;
 
@@ -886,14 +869,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       if ( pInline && pInline->pCode )
       {
          hb_compGenCInLine( yyc );
-         if( hb_comp_Failure )
-         {
-            /* Error, we erase the C file produced */
-            fclose( yyc );
-            remove( szFileName );
-            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNTERMINATED_COMMENTS, NULL, NULL );
-            return;
-         }
       }
       else
       {
@@ -1103,22 +1078,22 @@ static void hb_compGenCAddExtern( int iOption, FILE *yyc, BOOL bSymFIRST )
 
          if ( iOption == 1 )
          {
-            fprintf( yyc, "{ \"%s\", HB_FS_PUBLIC",pTemp->szName );
+            fprintf( yyc, "{ \"%s\", HB_FS_PUBLIC", pTemp->szName );
          }
          else if ( iOption == 2 )
          {
-            fprintf( yyc, "{ \"%s\",HB_FS_STATIC",pTemp->szName );
+            fprintf( yyc, "{ \"%s\", HB_FS_STATIC", pTemp->szName );
          }
          else
          {
-            fprintf( yyc, "{ \"%s\", HB_FS_PUBLIC",pTemp->szName );
+            fprintf( yyc, "{ \"%s\", HB_FS_PUBLIC", pTemp->szName );
             if ( ( pTemp->pNext == NULL ) && ( !bSymFIRST ) &&  ( ! hb_comp_bNoStartUp ) )
             {
                fprintf( yyc, " | HB_FS_FIRST" );
             }
          }
 
-         fprintf( yyc, ", {HB_FUNCNAME( %s )},",pTemp->szName );
+         fprintf( yyc, ", {HB_FUNCNAME( %s )},", pTemp->szName );
 
          if ( iOption == 1 )
          {
@@ -1217,24 +1192,20 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
    PSSYMLIST pStatSymLast = NULL;
    int ulLen = strlen( statSymName );
 
-   if ( iOption < 3 ) // It is not HB_FUNCNAME
-   {
-      pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
-   }
-
    while( ulLen && HB_ISSPACE( statSymName[ ulLen - 1 ] ) )
    {
       ulLen--;
    }
 
-   if ( iOption < 3 ) // It is not HB_FUNCNAME
+   if ( iOption < 3 )      // It is not HB_FUNCNAME
    {
+      pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
       statSymName[ ulLen ] = '\0';
       pStatSymLast->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
       strcpy( pStatSymLast->szName, statSymName );
    }
 
-   if( iOption == 1 ) // HB_FUNC_STATIC
+   if( iOption == 1 )      // HB_FUNC_STATIC
    {
       pStatSymLast->pNext = pStatSymFirst ? pStatSymFirst : NULL ;
       pStatSymFirst = pStatSymLast;
@@ -1253,77 +1224,76 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
 /*
   Parsing in-line-c codes to extract function names
 */
-static void hb_compGenCCheckInLineStatic( char *str )
+static void hb_compGenCCheckInLineStatic( char *sInline )
 {
-   char *szStrip = hb_stripOutComments( str );
    char *szTmp, *szTmp2;
-   int iLen = strlen( szStrip );
+   int iLen = strlen( sInline );
    int iOption;
 
-   while( ( szStrip = strstr( szStrip, "HB_FUNC" ) ) != NULL )
+   while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
-      szStrip += 7;
+      sInline += 7;
       iOption = 2;
 
       /* If it is a PHB_FUNC then skip it */
-      if ( iLen > 8 && *(szStrip - 8 ) == 'P' )
+      if ( iLen > 8 && *(sInline - 8 ) == 'P' )
       {
          continue;
       }
       /* If it is a HB_FUNCNAME, we want it for externs */
-      else if ( szStrip[0] == 'N' &&
-                szStrip[1] == 'A' &&
-                szStrip[2] == 'M' &&
-                szStrip[3] == 'E' )
+      else if ( sInline[0] == 'N' &&
+                sInline[1] == 'A' &&
+                sInline[2] == 'M' &&
+                sInline[3] == 'E' )
       {
          iOption = 3;
-         szStrip += 4;
+         sInline += 4;
       }
       /* If it is a HB_FUNC_PTR then skip it */
-      else if ( szStrip[0] == '_' &&
-                szStrip[1] == 'P' &&
-                szStrip[2] == 'T' &&
-                szStrip[3] == 'R' )
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'P' &&
+                sInline[2] == 'T' &&
+                sInline[3] == 'R' )
       {
-         szStrip += 4;
+         sInline += 4;
          continue;
       }
       /* If it is a HB_FUNC_EXTERN then skip it */
-      else if ( szStrip[0] == '_' &&
-                szStrip[1] == 'E' &&
-                szStrip[2] == 'X' &&
-                szStrip[3] == 'T' &&
-                szStrip[4] == 'E' &&
-                szStrip[5] == 'R' &&
-                szStrip[6] == 'N' )
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'E' &&
+                sInline[2] == 'X' &&
+                sInline[3] == 'T' &&
+                sInline[4] == 'E' &&
+                sInline[5] == 'R' &&
+                sInline[6] == 'N' )
       {
-         szStrip += 7;
+         sInline += 7;
          continue;
       }
       /* If it is a HB_FUNC_EXEC then skip it */
-      else if ( szStrip[0] == '_' &&
-                szStrip[1] == 'E' &&
-                szStrip[2] == 'X' &&
-                szStrip[3] == 'E' &&
-                szStrip[4] == 'C' )
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'E' &&
+                sInline[2] == 'X' &&
+                sInline[3] == 'E' &&
+                sInline[4] == 'C' )
       {
-         szStrip += 5;
+         sInline += 5;
          continue;
       }
       /* If it is a HB_FUNC_STATIC we want it */
-      else if ( szStrip[0] == '_' &&
-                szStrip[1] == 'S' &&
-                szStrip[2] == 'T' &&
-                szStrip[3] == 'A' &&
-                szStrip[4] == 'T' &&
-                szStrip[5] == 'I' &&
-                szStrip[6] == 'C' )
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'S' &&
+                sInline[2] == 'T' &&
+                sInline[3] == 'A' &&
+                sInline[4] == 'T' &&
+                sInline[5] == 'I' &&
+                sInline[6] == 'C' )
       {
          iOption = 1;
-         szStrip += 7;
+         sInline += 7;
       }
 
-      szTmp = strchr( szStrip, '(' );
+      szTmp = strchr( sInline, '(' );
       if( szTmp == NULL )
       {
          continue;
@@ -1345,12 +1315,7 @@ static void hb_compGenCCheckInLineStatic( char *str )
       hb_compCStatSymList( szTmp, iOption );
       *szTmp2 = ')';
 
-      szStrip = szTmp2 + 1;
-   }
-
-   if ( szStrip )
-   {
-      hb_xfree( szStrip );
+      sInline = szTmp2 + 1;
    }
 }
 
@@ -1360,22 +1325,17 @@ static void hb_compGenCCheckInLineStatic( char *str )
 static void hb_compGenCInLineSymbol()
 {
    PINLINE pInline = hb_comp_inlines.pFirst;
-   char *sInline;
 
    while( pInline )
    {
-      sInline = (char*) hb_xgrab( strlen( (char*) pInline->pCode ) + 1 );
-      strcpy( sInline, (char*) pInline->pCode );
-      hb_compGenCCheckInLineStatic( sInline );
-
-      hb_xmemset( sInline, '\0', strlen( (char*) pInline->pCode ) + 1 );
-      strcpy( sInline, (char*) pInline->pCode );
-
-      hb_comParseLine( sInline, FALSE );
-
-      pInline = pInline->pNext;
-
-      hb_xfree( sInline );
+      char *sInline = hb_stripOutComments( (char*) pInline->pCode );
+      if( sInline )
+      {
+         hb_compGenCCheckInLineStatic( sInline );
+         hb_comParseLine( sInline, FALSE );
+         pInline = pInline->pNext;
+         hb_xfree( sInline );
+      }
    }
 }
 
@@ -1412,10 +1372,6 @@ static void hb_compGenCInLine( FILE *yyc )
 
       /* parse for REQUEST before writing */
       pszInLine = hb_comParseLine( (char*) pInline->pCode, TRUE );
-      if( hb_comp_Failure )
-      {
-         break;
-      }
       fprintf( yyc, "%s", pszInLine );
       hb_xfree( pszInLine );
       pInline = pInline->pNext;
@@ -1463,11 +1419,6 @@ static char* hb_comParseLine( char *sz, BOOL bRetSz )
     {
        /* parse line here */
        bExtern = hb_compNewLine( szInLine, bRetSz ) ;
-
-       if( hb_comp_Failure )
-       {
-          break;
-       }
 
        if ( bRetSz )
        {
@@ -1544,49 +1495,17 @@ static BOOL hb_compNewLine( char * sz, BOOL bRetSz )
 
             if ( !bRetSz )
             {
-               szExtern = hb_comExternSplit( (char*) sz, &iExtern );
+               szExtern = hb_comExternSplit( sz, &iExtern );
 
-               for (iToken = 0; szExtern [iToken]; iToken++)
+               for (iToken = 0; szExtern [ iToken ]; iToken++)
                {
-                  int i = hb_strAt( "/*", 2, szExtern [iToken], strlen(szExtern [iToken]) );
-                  int j = hb_strAt( "*/", 2, szExtern [iToken], strlen(szExtern [iToken]) );
-                  int t = hb_strAt( "//", 2, szExtern [iToken], strlen(szExtern [iToken]) );
-
-                  if( t )
+		  int ulLen = strlen( szExtern[ iToken ] );
+                  while( ulLen && HB_ISSPACE( szExtern[ iToken ][ ulLen - 1 ] ) )
                   {
-                     int ulLen;
-
-                     szExtern[iToken][t - 1] = 0;
-                     ulLen = strlen( szExtern[iToken] );
-
-                     while( ulLen && HB_ISSPACE( szExtern[iToken][ ulLen - 1 ] ) )
-                     {
-                        ulLen--;
-                     }
-
-                     szExtern[iToken][ ulLen ] = 0;
+                     ulLen--;
                   }
-
-                  if( i && j )
-                  {
-                     int ulLen;
-                     szExtern [iToken][i - 1] = 0;
-                     ulLen = strlen( szExtern[iToken] );
-
-                     while( ulLen && HB_ISSPACE( szExtern[iToken][ulLen - 1] ) )
-                     {
-                        ulLen--;
-                     }
-                     szExtern [iToken][ulLen] = 0;
-                  }
-
-                  if( i && !j )
-                  {
-                     hb_comp_Failure = TRUE;
-                     break;
-                  }
-
-                  hb_compRequestList( szExtern [iToken] );
+                  szExtern[ iToken ][ ulLen ] = 0;
+                  hb_compRequestList( szExtern [ iToken ] );
                }
 
                szExtern--;

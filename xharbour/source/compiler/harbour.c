@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.98 2005/03/31 03:16:11 druzus Exp $
+ * $Id: harbour.c,v 1.100 2005/03/31 19:52:24 andijahja Exp $
  */
 
 /*
@@ -232,11 +232,6 @@ int            hb_comp_iHidden = 0;
 
 static BOOL hb_comp_bExternal   = FALSE;
 */
-
-/*
-  Force compiler to exit upon error when generating C code
-*/
-BOOL hb_comp_Failure = FALSE;
 
 /* Limit the warning that stop compilation into ambiguous reference only so
    that warnings on uninitialized locals would not stop compilation when
@@ -5396,10 +5391,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
 
-               if ( hb_comp_Failure )
-	       {
-                  iStatus = EXIT_FAILURE;
-	       }
             }
          }
          else

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.14 2005/03/18 22:35:31 andijahja Exp $
+ * $Id: hbstr.c,v 1.16 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -804,6 +804,8 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
       int uu = 0;
       char *last;
 
+      hb_xmemset( szOut, 0, ui + 1 );
+
       for ( i = 0; i < ui; i ++ )
       {
          if ( buffer[ i ] == '/' )
@@ -814,6 +816,7 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
                {
                   if ( buffer [ i ] == '*' && buffer [ i + 1 ] == '/' )
 	          {
+		     i += 2;
                      break;
 	          }
                }
@@ -829,13 +832,9 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
                }
             }
          }
-         else
-         {
-            szOut[ uu ++ ] = buffer[ i ];
-         }
-      }
 
-      szOut[ uu ] = 0;
+         szOut[ uu ++ ] = buffer[ i ];
+      }
 
       /* trim left */
       while ( HB_ISSPACE( *szOut ) )
@@ -855,7 +854,6 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
       }
 
       *last = 0;
-
       return( szOut );
    }
    else
