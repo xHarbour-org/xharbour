@@ -2,7 +2,7 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id$
+ * $Id: gtinfo.prg,v 1.3 2004/02/19 23:43:10 jonnymind Exp $
  */
 #include "gtinfo.ch"
 
@@ -11,7 +11,8 @@ Local nOp
 
    If GTInfo(GTI_ISGRAPHIC) == 0
      ?
-     ? "This test is intended to run under graphics capable gts only"
+     ? "You are using a non graphics capable gt:"
+     ? hb_gt_Version()
      ?
      Quit
    End
@@ -20,6 +21,7 @@ Local nOp
 
    While .T.
       CLEAR SCREEN
+      gtInfo(GTI_WINTITLE, "gtInfo() api demonstration program")
       @ 3, 5 Say "Desktop Resolution: " + ;
                AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
             AllTrim(Str(GTInfo(GTI_DESKTOPHEIGHT))) + "x" + ;

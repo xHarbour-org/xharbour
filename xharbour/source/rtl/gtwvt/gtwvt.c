@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.118 2004/07/24 00:59:11 peterrees Exp $
+ * $Id: gtwvt.c,v 1.119 2004/07/27 16:56:15 lf_sfnet Exp $
  */
 
 /*
@@ -3808,8 +3808,6 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 {
    int iOldValue;
 
-   HB_SYMBOL_UNUSED( vpParam );
-
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
@@ -4004,7 +4002,7 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
       case GTI_WINTITLE:
          {
             hb_wvt_gtSetWindowTitle( (char *) vpParam );
-            return 0;
+            return 1;
          }   
 
       case GTI_CODEPAGE:

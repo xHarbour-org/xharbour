@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.12 2004/05/25 20:27:22 druzus Exp $
+ * $Id: gx.c,v 1.13 2004/06/28 14:16:34 jonnymind Exp $
  */
 
 /*
@@ -237,7 +237,7 @@ HB_FUNC( GTINFO )
    }
 
    /* Is it a query? */
-   if ( pSet == NULL )
+   if ( pSet == NULL && !ISCHAR(2) )
    {
       /* Parameter void * still unused, for future developement. */
       hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), FALSE, 0, NULL ) ) );
@@ -245,7 +245,7 @@ HB_FUNC( GTINFO )
    else
    {
       /* Parameter void * still unused, for future developement. */
-      char *param = hb_parc(3);
+      char *param = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
       hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), TRUE,
             hb_itemGetNI( pSet ), param ) ) );
    }

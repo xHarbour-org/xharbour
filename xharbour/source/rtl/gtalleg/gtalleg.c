@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.24 2004/05/08 19:32:52 maurifull Exp $
+ * $Id: gtalleg.c,v 1.25 2004/07/21 22:09:22 maurifull Exp $
  */
 
 /*
@@ -1693,12 +1693,10 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
    int iOldValue = 0;
    int iWidth, iHeight;
 
-   HB_SYMBOL_UNUSED( vpParam );
-
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) TRUE;
+         return (int) TRUE;
 
       case GTI_SCREENWIDTH:
          iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
@@ -1745,7 +1743,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return iOldValue;
 
       case GTI_FONTWIDTH:
-      return s_byFontWidth;
+         return s_byFontWidth;
 
       case GTI_DESKTOPWIDTH:
          al_get_desktop_resolution( &iWidth, &iHeight );
@@ -1756,7 +1754,13 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return iHeight;
 
       case GTI_DESKTOPDEPTH:
-      return al_desktop_color_depth();
+         return al_desktop_color_depth();
+
+      case GTI_WINTITLE:
+      {
+         al_set_window_title( (char *) vpParam );
+         return 1;
+      }
    }
 
    // DEFAULT: there's something wrong if we are here.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3224 2004/07/27 22:35:24 kaddath Exp $
+ * $Id: ChangeLog,v 1.3225 2004/07/28 02:46:03 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-28 15:20 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gx.c
+    ! Fixed gtInfo() bug when using string param
+  * source/rtl/gtwvt/gtwvt.c
+    ! Small fix to GTI_WINTITLE implementation
+  * source/rtl/gtalleg/gtalleg.c
+    + GTI_WINTITLE implementation
+  * tests/gtinfo.prg
+    * Better info when it quits for non gfx GTs
+    + GTI_WINTITLE sample
+
 2004-07-28 14:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/fstemp.c
     - altered Linux/BSD version of hb_fsCreateTemp() to search GETENV( "TMPDIR" )
