@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.70 2002/05/09 07:25:33 ronpinkas Exp $
+ * $Id: hvm.c,v 1.71 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -5417,7 +5417,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    int iPCodeVer = 0, iLen;
    char *sModule;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols, lModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
 
    va_start( ap, pModuleSymbols );
       uiModuleSymbols = va_arg( ap, USHORT );
