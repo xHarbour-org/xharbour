@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1620 2003/10/23 01:32:37 peterrees Exp $
+ * $Id: ChangeLog,v 1.1621 2003/10/23 09:01:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-23 03:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+    * Corrected to comply with new more Clipper compatible handling of dynamically generated #directives.
 
 2003-10-23 01:59 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
@@ -21,7 +25,7 @@
     * Corrected to comply with new more Clipper compatible handling of dynamically generated #directives.
 
   * tests/pp.prg
-    ! Fixed PP_PreProLine to keep as one unit dynamically generated #directive followed by NON #directive
+    ! Fixed PP_PreProLine() to keep as one unit dynamically generated #directive followed by NON #directive
     * Refreshed InitClsRules() + InitClsResults() and InitRunRules() + InitRunResults().
 
   * tests/ppclass.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.9 2002/07/24 18:41:31 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.10 2003/06/24 03:35:04 ronpinkas Exp $
  */
 
 /*
@@ -85,9 +85,9 @@
    // Exclude from C compilation
    #ifdef _SET_CH
       #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
-               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
                INIT PROCEDURE __INIT_<stru>; ;
-                  __ActiveStructure( #<stru>, <align> )
+                  __ActiveStructure( #<stru>, <align> ) ; ;
+               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
 
       // <elem> instead of <!elem!> to allow ElemName[n] syntax.
       #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
@@ -112,7 +112,7 @@
                RETURN
 
       #command IMPORT C STRUCTURE <!stru!> => ;
-               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} );
+               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
 
       //----------------------------- C Syntax support ---------------------------------//
       /* NOTES:
@@ -125,11 +125,11 @@
       #define __PACK 8
 
       #xcommand typedef struct [<!tag!>] { [<elem>] } <!stru!> [, <*synon*>] => ;
-                #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ) ; ;
                 INIT PROCEDURE __INIT_<stru>; ;
                    HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
                    __ClsSetModule( __ActiveStructure() ); ;
-                RETURN
+                RETURN; ;
+                #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
 
       #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>
       #xcommand pragma pack() => #undef __PACK; #define __PACK 8
