@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1144 2003/06/19 19:09:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1145 2003/06/19 20:50:32 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-19 10:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbapigt.h
+  * xharbour/include/hbextern.ch
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtnul/gtext.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/tests/dspchr.prg
+    + Two new functions HB_SETKEYCP( <cTermCP> [,<cHostCP>] ) and
+      HB_SETTERMCP(<cTermCP> [,<cHostCP>] [,<lBoxChar>]) added.
+      HB_SETKEYCP() if for input key translation, HB_SETTERMCP()
+      sets both input (HB_SETKEYCP()) and output (HB_SETDISPCP())
+      translation. Now anyone who wants to ports his console apps from
+      Windows/DOS with its local code page to *nix with GTCRS and iso
+      standards only have to add two functions at the beginning of the
+      program: HB_SETCODEPAGE(<cWinCP>); HB_SETTERMCP(<cIsoCP>,.t.)
+      All translation should be done automatically.
+        eg. for Polish:
+	    HB_SETCODEPAGE("PLMAZ")
+	    HB_SETTERMCP("PLISO",.t.)
+        sets translation between Polish Mazovia code page to ISO-8859-2.
+	The programmer don't have to change anything more in his source
+	code.
+
+  * xharbour/source/codepage/Makefile
+  * xharbour/source/codepage/cdprukoi.c
+  + xharbour/source/codepage/cdpsl852.c
+  + xharbour/source/codepage/cdpsliso.c
+  + xharbour/source/codepage/cdpslwin.c
+    + new codepages and fixes borrowd from Harbour.
+
 2003-06-20 03:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
   * source/vm/classes.c

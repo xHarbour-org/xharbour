@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.9 2003/05/28 11:59:05 druzus Exp $
+ * $Id: hbapigt.h,v 1.10 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -275,6 +275,7 @@ extern void   hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen );
 
 /* Private interface for extended GT functions listed below */
 extern void   hb_gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox );
+extern void   hb_gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP );
 
 /* Keyboard related declarations */
 
@@ -442,6 +443,7 @@ typedef struct _HB_GT_FUNCS
     void    (* mouse_GetBounds) ( int *, int *, int *, int * );
     /* extended GT functions */
     void    (* SetDispCP) ( char *, char *, BOOL );
+    void    (* SetKeyCP) ( char *, char * );
 } HB_GT_FUNCS, * PHB_GT_FUNCS;
 
 typedef struct _HB_GT_INIT
@@ -497,6 +499,7 @@ extern void   HB_GT_FUNC( gt_OutStd( BYTE * pbyStr, ULONG ulLen ) );
 extern void   HB_GT_FUNC( gt_OutErr( BYTE * pbyStr, ULONG ulLen ) );
 
 extern void   HB_GT_FUNC( gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ) );
+extern void   HB_GT_FUNC( gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ) );
 
 extern void   HB_GT_FUNC( mouse_Init( void ) );
 extern void   HB_GT_FUNC( mouse_Exit( void ) ) ;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.13 2003/06/15 13:11:58 druzus Exp $
+ * $Id: gtcrs.c,v 1.14 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -877,25 +877,6 @@ static void removeAllKeyMap(struct keyTab **ptr)
     *ptr = NULL;
 }
 
-void setKeyTrans(InOutBase *ioBase, unsigned char *ksrc, unsigned char *kdst )
-{
-    unsigned char n, c;
-
-    if (ksrc && kdst) {
-	if (ioBase->in_transtbl == NULL)
-	    ioBase->in_transtbl = hb_xgrab(256);
-
-	memset(ioBase->in_transtbl, 0, 256);
-
-	for (n=0; n<256 && (c = ksrc[n]); n++)
-	    *(ioBase->in_transtbl+c) = kdst[n];
-
-    } else if (ioBase->in_transtbl != NULL) {
-	hb_xfree(ioBase->in_transtbl);
-	ioBase->in_transtbl = NULL;
-    }
-}
-
 static int getMouseKey(mouseEvent *mEvt)
 {
     int nKey = 0;
@@ -1560,6 +1541,25 @@ static int gt_setsize(InOutBase *ioBase, int rows, int cols)
     }
 
     return ret;
+}
+
+void setKeyTrans(InOutBase *ioBase, unsigned char *ksrc, unsigned char *kdst )
+{
+    unsigned char n, c;
+
+    if (ksrc && kdst) {
+	if (ioBase->in_transtbl == NULL)
+	    ioBase->in_transtbl = hb_xgrab(256);
+
+	memset(ioBase->in_transtbl, 0, 256);
+
+	for (n=0; n<256 && (c = ksrc[n]); n++)
+	    ioBase->in_transtbl[c] = kdst[n];
+
+    } else if (ioBase->in_transtbl != NULL) {
+	hb_xfree(ioBase->in_transtbl);
+	ioBase->in_transtbl = NULL;
+    }
 }
 
 void setDispTrans(InOutBase *ioBase, unsigned char *src, unsigned char *dst, int box )
@@ -3019,8 +3019,10 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ))
         if ( !pszHostCDP )
             pszHostCDP = pszTermCDP;
     }
+    if ( !pszTermCDP || !*pszTermCDP )
+        pszTermCDP = pszHostCDP;
 
-    if ( pszTermCDP && pszHostCDP )
+    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
     {
         PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
                      cdpHost = hb_cdpFind( pszHostCDP );
@@ -3038,6 +3040,46 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ))
             setDispTrans( s_ioBase, (unsigned char *) pszHostLetters,
                                     (unsigned char *) pszTermLetters,
 				    bBox ? 1 : 0 );
+
+            hb_xfree( pszHostLetters );
+            hb_xfree( pszTermLetters );
+	}
+    }
+#else
+    HB_SYMBOL_UNUSED( pszTermCDP );
+    HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
+{
+#ifndef HB_CDP_SUPPORT_OFF
+    if ( !pszHostCDP || !*pszHostCDP )
+    {
+        pszHostCDP = s_cdpage->id;
+        if ( !pszHostCDP )
+            pszHostCDP = pszTermCDP;
+    }
+
+    if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+    {
+        PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                     cdpHost = hb_cdpFind( pszHostCDP );
+        if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+             cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+        {
+            char * pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
+            char * pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
+
+            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
+            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
+            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
+            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+
+            setKeyTrans( s_ioBase, (unsigned char *) pszTermLetters,
+                                   (unsigned char *) pszHostLetters );
 
             hb_xfree( pszHostLetters );
             hb_xfree( pszTermLetters );
@@ -3143,6 +3185,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     /* extended GT functions */
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
+    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
 }
 
 /* ********************************************************************** */

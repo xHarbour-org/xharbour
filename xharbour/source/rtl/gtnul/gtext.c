@@ -1,10 +1,11 @@
 /*
- * $Id$
+ * $Id: gtext.c,v 1.1 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * SETDISPCP() extended GT functions
+ * HB_SETDISPCP(), HB_SETKEYCP(), HB_SETTERMCP()
+ * extended GT functions
  *
  * Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
  * www - http://www.harbour-project.org
@@ -65,6 +66,30 @@ HB_FUNC( HB_SETDISPCP )
          hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
       else
          hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
+   }
+   hb_ret();  /* return NIL */
+}
+
+HB_FUNC( HB_SETKEYCP )
+{
+   if ( ISCHAR(1) )
+   {
+      hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
+   }
+   hb_ret();  /* return NIL */
+}
+
+HB_FUNC( HB_SETTERMCP )
+{
+   if ( ISCHAR(1) )
+   {
+      if ( hb_pcount() == 2 && ISLOG(2) )
+         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
+      else
+      {
+         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
+         hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
+      }
    }
    hb_ret();  /* return NIL */
 }

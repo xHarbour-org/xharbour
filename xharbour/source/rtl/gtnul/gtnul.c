@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.7 2003/06/15 13:11:58 druzus Exp $
+ * $Id: gtnul.c,v 1.8 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -507,6 +507,16 @@ void HB_GT_FUNC(gt_SetDispCP(char * pszTermCDP, char * pszHostCDP, BOOL bBox))
 
 /* ********************************************************************** */
 
+void HB_GT_FUNC(gt_SetKeyCP(char * pszTermCDP, char * pszHostCDP))
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetDispCP(%p, %p)", pszTermCDP, pszHostCDP));
+
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+}
+
+/* ********************************************************************** */
+
 void HB_GT_FUNC(mouse_Init( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Init()"));
@@ -825,6 +835,14 @@ void hb_gt_SetDispCP(char * pszTermCDP, char * pszHostCDP, BOOL bBox)
 {
    GT_FUNCS.SetDispCP( pszTermCDP, pszHostCDP, bBox );
 }
+
+/* ********************************************************************** */
+
+void hb_gt_SetKeyCP(char * pszTermCDP, char * pszHostCDP)
+{
+   GT_FUNCS.SetKeyCP( pszTermCDP, pszHostCDP );
+}
+
 /* ********************************************************************** */
 
 void hb_mouse_Init( void )
@@ -933,6 +951,7 @@ static HB_GT_FUNCS GT_FUNCS = {
     ReadKey:                HB_GT_FUNC( gt_ReadKey ),
 
     SetDispCP:              HB_GT_FUNC( gt_SetDispCP );
+    SetKeyCP:               HB_GT_FUNC( gt_SetKeyCP );
 
     mouse_Init:             HB_GT_FUNC( mouse_Init ),
     mouse_Exit:             HB_GT_FUNC( mouse_Exit ),
@@ -997,6 +1016,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 
     /* extended GT functions */
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
+    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
 }
 
 /* ********************************************************************** */

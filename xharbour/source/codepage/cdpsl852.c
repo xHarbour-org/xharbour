@@ -1,13 +1,14 @@
 /*
- * $Id: cdprukoi.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
+ * $Id: cdpsl852.c,v 1.1 2003/06/16 17:19:15 alkresin Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module (RUKOI-8)
+ * National Collation Support Module ( SL852 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,24 +51,49 @@
  *
  */
 
-/* Language name: Russian */
-/* ISO language code (2 chars): RU */
-/* Codepage: KOI-8 */
+/* Language name: Slovenian */
+/* ISO language code (2 chars): SL */
+/* Codepage: 852 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "RUKOI8",32,
-    "·‚˜Á‰Âˆ˙ÈÍÎÏÌÓÔÚÛÙıÊË„˛˚˝ˇ˘¯¸‡Ò","¡¬◊«ƒ≈÷⁄… ÀÃÕŒœ–“”‘’∆»√ﬁ€›ﬂŸÿ‹¿—",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
+                                       alphabet, two-as-one aren't considered
+                                       here, accented - are considered. */
+#define IS_LATIN               1    /* Should be 1, if the national alphabet
+                                       is based on Latin */
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+                                       has the same weight as appropriate
+                                       unaccented. */
+#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+                                       sort after their unaccented counterparts
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
+                                       ( interleaving ) */
 
-HB_CODEPAGE_ANNOUNCE( RUKOI8 );
+/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
+   accented characters with the symbol '~' before each of them, for example:
+      a~Ä
+   If there is two-character sequence, which is considered as one, it should
+   be marked with '.' before and after it, for example:
+      ... h.ch.i ...
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RUKOI8 )
+   The Upper case string and the Lower case string should be absolutely the
+   same excepting the characters case, of course.
+ */
+
+static HB_CODEPAGE s_codepage = { "SL852",NUMBER_OF_CHARACTERS,
+    "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcüd–efghijklmnopqrsÁtuvwzßxy",
+    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+
+HB_CODEPAGE_ANNOUNCE( SL852 );
+
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SL852 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_RUKOI8 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_SL852 )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_codepage_Init_RUKOI8
+   #pragma startup hb_codepage_Init_SL852
 #endif
 
