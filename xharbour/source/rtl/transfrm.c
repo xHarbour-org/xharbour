@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.12 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.13 2003/01/19 23:15:25 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,6 @@ HB_FUNC( TRANSFORM )
 {
    PHB_ITEM pValue = hb_param( 1, HB_IT_ANY ); /* Input parameter */
    PHB_ITEM pPic = hb_param( 2, HB_IT_STRING ); /* Picture string */
-
    BOOL bError = FALSE;
 
    if( pPic && hb_itemGetCLen( pPic ) > 0 )
@@ -808,7 +807,11 @@ HB_FUNC( TRANSFORM )
    }
    else if( pPic || ISNIL( 2 ) ) /* Picture is an empty string or NIL */
    {
-      if( HB_IS_STRING( pValue ) )
+      if( ISNIL( 1 ) )
+      {
+        hb_retc("");
+      }
+      else if( HB_IS_STRING( pValue ) )
       {
          hb_itemReturnCopy( pValue );
       }
@@ -836,7 +839,9 @@ HB_FUNC( TRANSFORM )
          hb_retc( hb_itemGetL( pValue ) ? "T" : "F" );
       }
       else
+      {
          bError = TRUE;
+      }
    }
    else
       bError = TRUE;
