@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.16 2003/12/03 11:48:37 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.17 2003/12/30 11:52:45 lf_sfnet Exp $
  */
 
 /*
@@ -129,16 +129,14 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
 
            if s_oDebugger != nil
               if PCount() == 3 // called from hvm.c hb_vmLocalName() and hb_vmStaticName()
-                 if cProcName == "__EVAL" .OR. cProcName == "EVAL" .OR. ;
-                    cProcPrec == "AEVAL" .OR. cProcPrec == "DBEVAL"
-                    if !s_oDebugger:lCodeblock
-                       ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
-                       AIns( s_oDebugger:aCallStack, 1 )
-                       // nil means no line number stored yet
-                       s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil, nil }
-                       s_oDebugger:lCodeblock := .T.
-                    endif
+
+                 if !empty( cProcName ) .AND. ( "(b)" $ cProcName ) .AND. ascan( s_oDebugger:aCallStack, { | aProc | aProc[1] == cProcName } ) == 0
+                    ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
+                    AIns( s_oDebugger:aCallStack, 1 )
+                    // nil means no line number stored yet
+                    s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil, nil }
                  endif
+
                  if uParam3 == 1 // in-function static variable
                     cStaticName  := uParam2
                     nStaticIndex := uParam1
@@ -199,12 +197,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
             return
          endif
          if s_oDebugger != nil
-            if s_oDebugger:lCodeblock 
-               s_oDebugger:lCodeblock := .F.
-            else
-               s_oDebugger:EndProc()
-               s_oDebugger:LoadVars()
-            endif
+            s_oDebugger:EndProc()
+            s_oDebugger:LoadVars()
          endif
    endcase
 
@@ -904,7 +898,7 @@ return nil
 
 METHOD EndProc() CLASS TDebugger
 
-   if Len( ::aCallStack ) > 0
+   if Len( ::aCallStack ) > 0 
       ADel( ::aCallStack, 1 )
       ASize( ::aCallStack, Len( ::aCallStack ) - 1 )
       if ::oBrwStack != nil .and. ! ::lTrace
@@ -1507,25 +1501,29 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
       if ::oWndStack != nil
          ::oBrwStack:RefreshAll()
       endif
-       
-      if cPrgName != ::cPrgName
-         if ! File( cPrgName ) .and. ! Empty( ::cPathForFiles )
-            cPrgName := ::LocatePrgPath( cPrgName )
+
+      if !empty( cPrgName ) 
+         if ( cPrgName != ::cPrgName )
+            if !empty( cPrgName ) .and. ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
+               cPrgName := ::LocatePrgPath( cPrgName )
+            endif
+            ::cPrgName := cPrgName
+            ::oBrwText := nil
+            ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+                         ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
+                         __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+                         __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
+            
+            ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
+            ::oWndCode:SetCaption( ::cPrgName )
+            ::oWndCode:Refresh()			// to force the window caption to update
          endif
-         ::cPrgName := cPrgName
-         ::oBrwText := nil
-         ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
-                      ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
-                      __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                      __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
-         
-         ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
-         ::oWndCode:SetCaption( ::cPrgName )
-         ::oWndCode:Refresh()			// to force the window caption to update
+         ::GoToLine( nLine )
       endif
-      ::GoToLine( nLine )
+
    endif
-return nil
+
+   return nil
 
 METHOD Open() CLASS TDebugger
 
