@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.69 2004/02/09 18:38:26 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.70 2004/02/09 18:57:19 ronpinkas Exp $
  */
 
 /*
@@ -1355,12 +1355,24 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
    if( HB_IS_DOUBLE( pNumber ) )
    {
-      /* added infinity check for Borland C [martin vogel] */
       double dNumber = hb_itemGetND( pNumber );
 
-#if !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD ) && \
-    !defined(__RSXNT__) && !defined(__EMX__) && \
-    !defined(__WATCOMC__) && !defined( __DJGPP__ )
+/* TODO: look if finite()/_finite() or isinf()/_isinf and isnan()/_isnan
+   does exist for your compiler and add this to the check below */
+
+#if defined(__RSXNT__) || defined(__EMX__)
+#  define HB_FINITE_DBL(d)    ( isfinite(d)==0 )
+#elif defined(__WATCOMC__) || defined(__BORLANDC__)
+#  define HB_FINITE_DBL(d)    ( _finite(d)==0 )
+#elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) \
+      defined( __LCC__ )
+#  define HB_FINITE_DBL(d)    ( finite(d)==0 )
+#else
+      /* added infinity check for Borland C [martin vogel] */
+      /* Borland C 5.5 has _finite() function, if it's necessary
+         we can reenable this code for older DOS BCC versions
+         Now this code is for generic C compilers undefined above
+         [druzus] */
       static BOOL s_bInfinityInit = FALSE;
       static double s_dInfinity = 0;
 
@@ -1373,34 +1385,19 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          hb_mathSetHandler (fOldMathHandler);
          s_bInfinityInit = TRUE;
       }
+#  define HB_FINITE_DBL(d)    ( (d) == s_dInfinity || (d) == -s_dInfinity )
 #endif
 
-      #if defined(__MINGW32__)
-         snprintf( szResult, iSize + 1, "%f", dNumber );
-      #endif
+   /* I would like to know why finite() function is not use for MinGW instead
+      of this hack with snprintf and "#IND" if there are some important reasons
+      for the code below reenable it and please add description WHY? [druzus] */
+   /*
+   #elif defined(__MINGW32__)
+      || dNumber == s_dInfinity || dNumber == -s_dInfinity || 
+         ( snprintf( szResult, iSize + 1, "%f", dNumber ) > 0 && strstr( szResult, "#IND" ) )
+   */
 
-      /* TODO: look if isinf()/_isinf or finite()/_finite() does exist for your compiler and add this to the check
-         below [martin vogel] */
-      if( pNumber->item.asDouble.length == 99
-      #if defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) || defined( __DJGPP__ )
-         || finite(dNumber) == 0
-      #elif defined(__WATCOMC__)
-         || _finite(dNumber)==0
-      #elif defined(__RSXNT__) || defined(__EMX__)
-         || !isfinite( dNumber )
-      #elif defined(__BORLANDC__)
-         /* No more checks for Borland C, which returns 0 for log( 0 ),
-            and is therefore unable to test for infinity */
-         /* log(0) returning 0 seems to be a side effect of using a custom math error handler that
-            always sets the return value to 0.0, switching this off, see above, yields -INF for log(0);
-            additionally one can use _finite() to check for infinity [martin vogel] */
-         || dNumber == s_dInfinity || dNumber == -s_dInfinity || _finite(dNumber)==0
-      #elif defined(__MINGW32__)
-         || dNumber == s_dInfinity || dNumber == -s_dInfinity || strstr( szResult, "#IND" )
-      #else
-         || dNumber == s_dInfinity || dNumber == -s_dInfinity
-      #endif
-      )
+      if( pNumber->item.asDouble.length == 99 || HB_FINITE_DBL( dNumber ) )
       {
          /* Numeric overflow */
          iBytes = iSize + 1;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2252 2004/02/09 18:38:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2253 2004/02/09 19:15:00 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 22:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/itemapi.c
+   * removed redundant code for infinit check. For all C compilers
+     we are using which support finite() or isinf()/isnan() we should
+     define proper HB_FINITE_DBL macro - it will be faster and will
+     recognize other "bad" double values. Now MSVC is not supported
+     and use old code
 
 2004-02-09 16:12 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rtl/readline.c
