@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.17 2002/05/23 20:12:05 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.18 2002/08/31 01:30:34 ronpinkas Exp $
  */
 
 /*
@@ -1825,7 +1825,7 @@ Otherwise  : OTHERWISE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_COD
 
 DoWhile    : WhileBegin Expression Crlf
                {
-                  if( $2->ValType = HB_EV_LOGICAL && $2->value.asLogical )
+                  if( $2->ValType == HB_EV_LOGICAL && $2->value.asLogical )
                   {
                      hb_compExprDelete( $2 );
                      $<lNumber>$ = -1;
