@@ -1,5 +1,5 @@
 /*
- * $Id: pack.c,v 1.2 2004/02/10 02:02:12 druzus Exp $
+ * $Id: pack.c,v 1.3 2004/02/10 13:16:18 andijahja Exp $
  *
  * xHarbour Project source code:
  * CT3 CHARPACK() and CHARUNPACK() functions.
@@ -50,8 +50,6 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
-#include <stdio.h>
 
 #include "hbapi.h"
 
@@ -126,16 +124,16 @@ HB_FUNC( CHARPACK )
 }
 
 
-static unsigned char *buf_append(char *buf, unsigned *buf_size, unsigned count,
+static unsigned char *buf_append(unsigned char *buf, unsigned *buf_size, unsigned count,
                                  unsigned char c, unsigned *buf_len)
 {
    if (*buf_len + count > *buf_size) {
       *buf_size = HB_MAX(*buf_len + count, *buf_size + 32768);
-      buf = (char *) hb_xrealloc(buf, *buf_size);
+      buf = (unsigned char *) hb_xrealloc(buf, *buf_size);
    }
    memset(buf + *buf_len, c, count);
    *buf_len += count;
-   return (unsigned char*) buf;
+   return buf;
 }
 
 /*  $DOC$
@@ -195,7 +193,7 @@ HB_FUNC( CHARUNPACK )
             hb_retclen((char *) in, len);
             return;
          }
-         out = buf_append((char *) out, &buf_size, in[i + 1], in[i + 2], &out_len);
+         out = buf_append(out, &buf_size, in[i + 1], in[i + 2], &out_len);
       }
       hb_retclen((char *) out, out_len);
       hb_xfree(out);
