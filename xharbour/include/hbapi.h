@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.65 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.66 2003/06/23 22:43:19 ronpinkas Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ extern "C" {
 #define ISMEMO( n )        ( hb_param( n, HB_IT_MEMO ) != NULL )
 #define ISBYREF( n )       ( hb_parinfo( n ) & HB_IT_BYREF ) /* NOTE: Intentionally using a different method */
 #define ISARRAY( n )       ( hb_param( n, HB_IT_ARRAY ) != NULL )
-#define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->asArray.value->uiClass != 0 )
+#define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->item.asArray.value->uiClass != 0 )
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL ) /* Not available in CA-Cl*pper. */
 
