@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.172 2003/03/07 05:32:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.173 2003/03/07 05:59:46 ronpinkas Exp $
  */
 
 /*
@@ -655,6 +655,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                case K_ALT_D:              /* Check for normal Alt+C */
                   hb_vmRequestDebug();/* Request cancellation */
                   break;
+               default:
+                  hb_inkeyPut( ch );
             }
          }
       }
