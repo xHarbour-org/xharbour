@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.21 2002/10/06 08:15:59 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.22 2002/10/06 21:39:31 what32 Exp $
  */
 
 /*
@@ -158,6 +158,7 @@ METHOD SaveVar(cText,nwParam) CLASS ObjInspect
       case cType == 'L'
            cText:= IIF( cText == ".T.",.T.,.F.)
    endcase
+
    if __objSendMsg( ::CurObject, cVar ) != cText
       __objSendMsg( ::CurObject, "_"+cVar, cText )
       ::Browser:source[::Browser:RecPos][2]:= cText
@@ -165,7 +166,15 @@ METHOD SaveVar(cText,nwParam) CLASS ObjInspect
       ::CurObject:Update()
       ::CurObject:SetFocus()
       SetFocus( ::Browser:hWnd)
+
+      IF ::CurObject:ClassName == "TFORMEDIT"
+         ::CurObject:XFMRoot()
+      ELSE
+         ::CurObject:Parent:XFMControl( , ::CurObject, .F. )
+      ENDIF
+
    endif
+
    IF nwParam==VK_UP .OR. nwParam==VK_DOWN
       ::Browser:RefreshCurrent()
       PostMessage( ::Browser:hWnd, WM_KEYDOWN, nwParam, 0 )

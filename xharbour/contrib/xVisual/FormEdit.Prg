@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.53 2002/10/06 21:39:31 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.54 2002/10/06 22:24:57 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -410,7 +410,7 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
       aAdd( XFMControl[ 4 ], "   CONTROL " + XFMControl[ 1 ] + " FROM " + oControl:ClassName )
 
       FOR EACH aVar IN XFMControl[ 3 ]
-         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + CStr( aVar[2] ) )
+         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
       NEXT
 
       aAdd( XFMControl[ 4 ], "   END CONTROL" )
