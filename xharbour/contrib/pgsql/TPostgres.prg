@@ -701,7 +701,7 @@ METHOD Delete(oRow) CLASS TPQquery
         Next                        
 
         if ! (cWhere == '')
-            res := PQexecParams( ::pDB, 'DELETE FROM ' + ::Schema + '. ' + ::Tablename + ' WHERE ' + cWhere, aParams)    
+            res := PQexecParams( ::pDB, 'DELETE FROM ' + ::Schema + '.' + ::Tablename + ' WHERE ' + cWhere, aParams)    
             result := PQresultstatus(res) == PGRES_COMMAND_OK            
             PQclear(res)
         end            
@@ -721,7 +721,7 @@ METHOD Append( oRow ) CLASS TPQquery
     ::SetKey()
         
     if ! Empty(::Tablename)
-        cQuery := 'INSERT INTO ' + ::Schema + '. ' + ::Tablename + '('
+        cQuery := 'INSERT INTO ' + ::Schema + '.' + ::Tablename + '('
         For i := 1 to oRow:FCount()
             if ::lallCols .or. oRow:changed(i)
                 lChanged := .t.
@@ -778,7 +778,7 @@ METHOD Update(oRow) CLASS TPQquery
             end
         Next                        
                 
-        cQuery := 'UPDATE ' + ::Schema + '. ' + ::Tablename + ' SET '
+        cQuery := 'UPDATE ' + ::Schema + '.' + ::Tablename + ' SET '
         For i := 1 to oRow:FCount()
             if ::lallcols .or. oRow:Changed(i)
                 lChanged := .t.
@@ -1018,7 +1018,7 @@ CLASS TPQRow
    METHOD   FieldLen( nField )             
    METHOD   FieldDec( nField )             
    METHOD   FieldType( nField ) 
-   METHOD   Changed( nField )   INLINE ! (::aRow[nField] == ::aOld[nField])              
+   METHOD   Changed( nField )     INLINE ! (::aRow[nField] == ::aOld[nField])              
    METHOD   FieldGetOld( nField ) INLINE ::aOld[nField]
 ENDCLASS
 
