@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.259 2002/06/05 15:38:12 walito Exp $
+ * $Id: ChangeLog,v 1.260 2002/06/05 22:39:37 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-06 11:36 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtwin/gtwin.c
+    ! Fixed Esc key translation problem that only occurred in some
+      international versions of Windows.
+      by David G. Holm and minor fix by Walter Negro.
 
 2002-06-05 19:38 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/compiler/gencobj.c
