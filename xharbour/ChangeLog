@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1162 2003/06/21 15:04:29 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1163 2003/06/21 22:08:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-21 00:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/getsys.prg
+  * source/rtl/listbox.prg
+  * source/rtl/mssgline.prg
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+    ! Clipper compabtibility fixes.
+
+  * source/rtl/traceprg.prg
+    + Added ProcFile() support.
+
 2003-06-22 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/harbour.c
     ! Allow harbour.exe to generate C source file from PRG file despite of

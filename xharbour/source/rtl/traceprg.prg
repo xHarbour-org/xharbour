@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.8 2003/05/29 22:33:30 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.9 2003/06/19 04:55:54 ronpinkas Exp $
  */
 
 /*
@@ -71,14 +71,14 @@ FUNCTION TraceLog( ... )
    FSeek( FileHandle, 0, 2 )
 
    IF nLevel > 0
-      FWrite( FileHandle, '[' + ProcName( 1 ) + '] (' + Str( Procline(1), 5 ) + ')' )
+      FWrite( FileHandle, '[' + ProcFile(1) + "->" + ProcName( 1 ) + '] (' + Str( Procline(1), 5 ) + ')' )
    ENDIF
 
    IF nLevel > 1 .AND. ! ( ProcName( 2 ) == '' )
       FWrite( FileHandle,  ' Called from: '  + CRLF )
       nLevel := 1
       DO WHILE ! ( ( ProcName := ProcName( ++nLevel ) ) == '' )
-         FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( nLevel ), 5 ) + ')' + CRLF )
+         FWrite( FileHandle, space(30) + ProcFile( nLevel ) + "->" + ProcName + '(' + Str( Procline( nLevel ), 5 ) + ')' + CRLF )
       ENDDO
    ELSE
       FWrite( FileHandle,  CRLF )

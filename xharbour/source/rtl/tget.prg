@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.50 2003/05/16 20:03:36 walito Exp $
+ * $Id: tget.prg,v 1.51 2003/06/20 20:58:53 walito Exp $
  */
 
 /*
@@ -1209,6 +1209,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    DEFAULT xValue TO ::VarGet()
    DEFAULT lEdit  TO ::HasFocus
+   DEFAULT cMask  TO ""
 
    if xValue == NIL .OR. ValType( xValue ) IN "AB"
       ::nMaxLen := 0

@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.9 2003/04/26 16:26:26 lculik Exp $
+ * $Id: listbox.prg,v 1.10 2003/05/01 14:25:23 lculik Exp $
  */
 
 /*
@@ -187,7 +187,7 @@ Method New( nTop, nLeft, nBottom, nRigth, lDrop )
 
      ::sBlock    := Nil
      ::nCursor   := Nil
-     ::Style     := chr(31)
+     ::Style     := Chr( 240 )
      ::TextValue := ""
 
      ::Topitem  := 0
@@ -1020,8 +1020,9 @@ Method SETFOCUS() Class HBListBox
      IF ( !::hasfocus )
         ::nCursor  := Setcursor( 0 )
         ::hasfocus := .T.
+
         Dispbegin()
-        SELF:display()
+           ::display()
         Dispend()
 
         IF ( ISBLOCK( ::fblock ) )

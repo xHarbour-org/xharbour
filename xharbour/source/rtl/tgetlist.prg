@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.16 2003/02/04 23:43:44 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.17 2003/03/06 21:02:22 walito Exp $
  */
 
 /*
@@ -190,6 +190,10 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
       oGet:SetFocus()
 
       while oGet:ExitState == GE_NOEXIT .and. !::lKillRead
+         IF oGet:Buffer == ""
+            oGet:ExitState := GE_ENTER
+         ENDIF
+
          if oGet:typeOut
             oGet:ExitState := GE_ENTER
          endif
@@ -236,6 +240,10 @@ METHOD Reader() CLASS HBGetList
       oGet:SetFocus()
 
       while oGet:ExitState == GE_NOEXIT
+         IF oGet:Buffer == ""
+            oGet:ExitState := GE_ENTER
+         ENDIF
+
          if oGet:typeOut
             oGet:ExitState := GE_ENTER
          endif
@@ -1015,11 +1023,12 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
       endif
    endif
 
-   if ( nHotItem := ::Accelerator( nKey, oGetMsg ) ) != 0
+   IF ( nHotItem := ::Accelerator( nKey, oGetMsg ) ) != 0
       oGet:ExitState := GE_SHORTCUT
       ::nNextGet := nHotItem
 
    ELSEIF ( !( VALTYPE( oMenu ) == "O" ) )
+
    ELSEIF ( ( nHotItem := oMenu:GetAccel( nKey ) ) != 0 )
       ::nMenuID := oMenu:ModalGet( nHotItem, oGetMsg )
       nKey := 0
@@ -1064,29 +1073,25 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
       endif
 
    elseif oTheClass == "LISTBOX"
+
       if nKey == K_UP
          oGUI:PrevItem()
          nKey := 0
-
       elseif nKey == K_DOWN
          oGUI:NextItem()
          nKey := 0
-
       elseif nKey == K_SPACE
          if ! oGUI:DropDown
          elseif ! oGUI:IsOpen
             oGUI:Open()
             nKey := 0
          endif
-
       elseif ( nButton := oGUI:FindText( chr(nKey), oGUI:Value+1, .f., .f. )) != 0
          oGUI:Select( nButton )
-
       endif
 
       if valtype( oGet:VarGet() ) == "N"
          oGet:VarPut( oGui:Value )
-
       endif
 
    endif

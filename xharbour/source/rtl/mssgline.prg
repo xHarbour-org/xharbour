@@ -1,5 +1,5 @@
 /*
- * $Id: MssgLine.prg,v 1.0 2002/08/24 17:52:39 Exp $
+ * $Id: mssgline.prg,v 1.1 2003/01/27 04:13:51 walito Exp $
  */
 
 /*
@@ -119,7 +119,14 @@ return Self
 ***/
 METHOD Show( cMsg ) CLASS MssgLine
 
-   local nRow := row(), nCol := col()
+   local nRow, nCol
+
+   IF ::Right == NIL
+      RETURN Self
+   ENDIF
+
+   nRow := row()
+   nCol := col()
 
    @ ::row, ::left SAY PadC( cMsg, ::right - ::left + 1 ) COLOR ::Color
 

@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.9 2003/01/14 23:45:31 jonnymind Exp $
+ * $Id: getsys.prg,v 1.10 2003/01/27 03:57:24 walito Exp $
  */
 
 /*
@@ -136,8 +136,8 @@ FUNCTION ReadModal( GetList, nPos )
 */
 
       IF ISBLOCK( oGetList:oGet:Reader )
-#ifdef HB_COMPAT_C53
 
+#ifdef HB_COMPAT_C53
          Eval( oGetList:oGet:Reader, oGetList:oGet ,oGetlist, oMenu, oGetMsg )
       ELSE
          oGetList:Reader( oMenu, oGetMsg )
@@ -179,16 +179,16 @@ PROCEDURE GetReader( oGet )
    RETURN
 
 FUNCTION GetActive( oGet )
-   
+
    STATIC oDefaultGet
-   
+
    LOCAL oGetList := __GetListActive()
 
    IF oGetList == NIL
       IF PCount() >= 1
-         oDefaultGet := oGet  
-      ENDIF   
-      
+         oDefaultGet := oGet
+      ENDIF
+
       RETURN oDefaultGet
    ELSE
       IF PCount() >= 1
@@ -244,7 +244,7 @@ FUNCTION GetPostValidate( oGet )
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-      
+
       RETURN oGetList:GetPostValidate()
    ENDIF
 
@@ -350,7 +350,7 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
    ENDIF
 
    IF Set( _SET_SCOREBOARD )
-      
+
       cMessage := Left( NationMsg( _GET_RANGE_FROM ) + LTrim( Transform( xLow, "" ) ) + ;
                         NationMsg( _GET_RANGE_TO ) + LTrim( Transform( xHigh, "" ) ), MaxCol() )
 
@@ -377,7 +377,7 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
 #ifdef HB_COMPAT_C53
 
 PROCEDURE GUIReader( oGet, oGetlist, oMenu, oGetMsg )
- 
+
    oGetlist:GuiReader( oGet, oMenu, oGetMsg )
 
    RETURN
@@ -414,7 +414,7 @@ FUNCTION GuiGetPostValidate( oGet, oGui, oGetMsg )
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-      
+
       RETURN oGetList:GuiGetPostValidate( oGui, oGetMsg )
    ENDIF
 
@@ -436,7 +436,7 @@ PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  oGetMsg )
       ENDIF
       oGetList:Tbapplykey( oGet, oTB, nKey, oGetMsg )
    ENDIF
-   RETURN 
+   RETURN
 
 FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    LOCAL oGetList := __GetListActive()
