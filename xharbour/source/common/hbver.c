@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.26 2005/03/06 20:53:50 andijahja Exp $
+ * $Id: hbver.c,v 1.27 2005/03/09 05:35:23 andijahja Exp $
  */
 
 /*
@@ -528,17 +528,23 @@ char * hb_verCompiler( void )
       #else
          szName = "Open Watcom C++16";
       #endif
+      iVerMajor = __WATCOM_CPLUSPLUS__ / 100;
+      iVerMinor = __WATCOM_CPLUSPLUS__ % 100;
    #else
       #if defined( HB_OS_WIN_32 )
          szName = "Open Watcom C32";
       #else
          szName = "Open Watcom C16";
       #endif
+      iVerMajor = __WATCOMC__ / 100;
+      iVerMinor = __WATCOMC__ % 100;
    #endif
 
-   iVerMajor = __WATCOMC__ / 100;
-   iVerMinor = __WATCOMC__ % 100;
-   iVerPatch = 0;
+   #if defined( __WATCOM_REVISION__ )
+      iVerPatch = __WATCOM_REVISION__;
+   #else
+      iVerPatch = 0;
+   #endif
 
 #elif defined(__GNUC__)
 
