@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.38 2002/12/31 07:15:44 jonnymind Exp $
+ * $Id: garbage.c,v 1.39 2003/01/01 18:17:55 jonnymind Exp $
  */
 
 /*
@@ -115,6 +115,9 @@ static ULONG s_uAllocated = 0;
    //HB_FORBID_MUTEX hb_gcCollectionForbid;
    static HB_CRITICAL_T s_CriticalMutex;
    HB_CRITICAL_T hb_gcCollectionMutex;
+   /* JC1: signal that GC is being used now */
+   static BOOL s_bGarbageAtWork = FALSE;
+   static HB_CRITICAL_T s_GawMutex;
 #endif
 
 /* Forward declaration.*/
@@ -523,14 +526,47 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
-   {
-      return;
-   }
 
    #ifdef HB_THREAD_SUPPORT
+      BOOL bWait = FALSE;
+      /*JC1: in MT, GC collecting is not just -locked-: if a second thread
+      wants to collect while another is doing collection, it will just wait
+      for the first to finish and then return. Double garbage collecting is
+      TO BE AVOIDED
+      */
 
+      /* ensure that noone is writing GAW now */
+      HB_CRITICAL_LOCK( s_GawMutex );
+      if( s_bGarbageAtWork )
+      {
+         bWait = TRUE;
+      }
+      HB_CRITICAL_UNLOCK( s_GawMutex );
+
+      /* Lock if first thread, sync if others */
       HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+
+      /* return harmlessy if Garbage was at work when function begun */
+      if(bWait)
+      {
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+         return;
+      }
+
+      /* Write safely GAW */
+      HB_CRITICAL_LOCK( s_GawMutex );
+      s_bGarbageAtWork = TRUE;
+      HB_CRITICAL_UNLOCK( s_GawMutex );
+   #endif
+
+   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+   {
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+      #endif
+
+      return;
+   }
 
       /*
       HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );
@@ -560,8 +596,6 @@ void hb_gcCollectAll( void )
 
       HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
       */
-   #endif
-
 
    //printf(  "Collecting...\n" );
 
@@ -733,6 +767,9 @@ void hb_gcCollectAll( void )
    }
 
    #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( s_GawMutex );
+      s_bGarbageAtWork = FALSE;
+      HB_CRITICAL_UNLOCK( s_GawMutex );
       HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    #endif
 
@@ -834,6 +871,7 @@ void hb_gcInit( void )
 {
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenInit( &hb_gcCollectionForbid );
+      HB_CRITICAL_INIT( s_GawMutex );
       HB_CRITICAL_INIT( s_CriticalMutex );
       HB_CRITICAL_INIT( hb_gcCollectionMutex );
    #endif
@@ -843,6 +881,7 @@ void hb_gcExit( void )
 {
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenDestroy( &hb_gcCollectionForbid );
+      HB_CRITICAL_DESTROY( s_GawMutex );
       HB_CRITICAL_DESTROY( s_CriticalMutex );
       HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
    #endif
