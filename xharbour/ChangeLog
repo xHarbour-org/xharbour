@@ -1,5 +1,5 @@
-/*
- * $Id: ChangeLog,v 1.3380 2004/08/31 07:05:15 mauriliolongo Exp $
+﻿/*
+ * $Id: ChangeLog,v 1.3381 2004/08/31 08:38:20 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-31 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/gtwin/gtwin.c
+  * xharbour/source/gtwvt/gtwvt.c
+    Commented out IsClipBoardFormatAvailable() because of a peculiar
+    problem where if some other application copied some bitmap on
+    the clipboard, xharbour application then ceased all clipboard
+    operations. The only way to come out of this situation was to 
+    copy some text on the clipboard by some other application.
+    Thanks Gale for pointing out this anomaly.
 
 2004-08-31 12:36 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbdefs.h
