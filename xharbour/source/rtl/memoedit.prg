@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.25 2004/08/05 12:30:36 mauriliolongo Exp $
+ * $Id: memoedit.prg,v 1.26 2004/09/01 09:15:33 mauriliolongo Exp $
  */
 
 /*
@@ -193,9 +193,7 @@ return Self
 METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
-   //
-   local aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
-                             K_CTRL_U, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12 }
+   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
 
 
    /* 05/08/2004 - <maurilio.longo@libero.it>
@@ -208,10 +206,10 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
       // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
       //
       case ME_DEFAULT
-         // HBEditor is not able to handle keys with a value higher than 256
+         // HBEditor is not able to handle keys with a value higher than 256 or lower than 1
          //
-         if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W ) .AND.;
-            !( nKey IN aUnHandledKeys )
+         if ( nKey > 0 .AND. nKey <= 256 .OR. nKey IN { K_ALT_W, K_CTRL_W } ) .AND.;
+            ! ( nKey IN aUnHandledKeys )
 
             super:Edit( nKey )
 
@@ -253,7 +251,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
       case K_CTRL_PGUP
       case K_ALT_W
       case K_CTRL_W
-         if !( nUserKey IN aUnHandledKeys )
+         if ! ( nUserKey IN aUnHandledKeys )
 
             super:Edit( nUserKey )
 
@@ -261,7 +259,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          exit
 
       case ME_DATA
-         if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
+         if nKey > 0 .AND. nKey <= 256 .AND. ! ( nKey IN aUnHandledKeys )
 
             super:Edit( nKey )
 

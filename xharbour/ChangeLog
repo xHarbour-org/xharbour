@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3406 2004/09/06 00:23:49 peterrees Exp $
+ * $Id: ChangeLog,v 1.3407 2004/09/06 13:29:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-06 16:58 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/memoedit.prg
+     ! fix to stop infinite recursive calls on un-handled keys,
+       ::HandleUserKey() calls super:Edit() only for keys > 0 .and. <= 256
 
 2004-08-06 15:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
