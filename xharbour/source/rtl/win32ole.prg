@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.4 2002/05/03 00:46:25 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.5 2002/05/03 07:38:45 ronpinkas Exp $
  */
 
 /*
@@ -820,7 +820,7 @@ RETURN uObj
   {
      BSTR wCLSID;
      IID ClassID, iid;
-     LPIID riid;
+     LPIID riid = (LPIID) &IID_IDispatch;
      IDispatch * pDisp = NULL;
 
      nOleError = S_OK;
