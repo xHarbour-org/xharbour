@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.49 2005/02/27 09:30:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.50 2005/02/27 15:00:00 ptsarenko Exp $
  */
 
 /*
@@ -866,7 +866,7 @@ HB_FUNC( ADSGETAOF )
          {
             if( adsOEM )
             {
-               hb_ansioem( pucFilter2, pusLen );
+               hb_ansioem( (char *) pucFilter2, pusLen );
             }
             hb_retc( (char *) pucFilter2 );
          }
@@ -876,7 +876,7 @@ HB_FUNC( ADSGETAOF )
       {
          if( adsOEM )
          {
-            hb_ansioem( pucFilter, pusLen );
+            hb_ansioem( (char *) pucFilter, pusLen );
          }
          hb_retc( (char *) pucFilter );
       }
@@ -1092,7 +1092,7 @@ HB_FUNC( ADSGETFILTER )
          {
             if( adsOEM )
             {
-               hb_ansioem( pucFilter2, pusLen );
+               hb_ansioem( (char *) pucFilter2, pusLen );
             }
             hb_retc( (char *) pucFilter2 );
          }
@@ -1106,7 +1106,7 @@ HB_FUNC( ADSGETFILTER )
       {
          if( adsOEM )
          {
-            hb_ansioem( pucFilter, pusLen );
+            hb_ansioem( (char *) pucFilter, pusLen );
          }
          hb_retc( (char *) pucFilter );
       }
