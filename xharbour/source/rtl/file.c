@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.6 2003/03/07 11:32:03 jonnymind Exp $
+ * $Id: file.c,v 1.7 2003/12/11 10:51:07 lculik Exp $
  */
 
 /*
@@ -50,35 +50,57 @@
  *
  */
 
+/*
+* hb_fsIsDirectory( BYTE * pFilename ) -- determine if a given file is a directory
+*     Copyright 2004 Giancarlo Niccolai
+*/
+
 #include "hbapi.h"
 #include "hbapifs.h"
 BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
+   BOOL bResult = FALSE;
 
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
 
    if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
    {
-	
-	#ifdef HB_OS_LINUX
-	   if (( ffind->attr & HB_FA_DIRECTORY ) == 16 )
-		{
-         hb_fsFindClose( ffind );	
-         hb_xfree(pFilename);
-         hb_fsSetError( 0 );	
-		   return FALSE;
-		}
-	#endif		
       hb_fsFindClose( ffind );
-      hb_xfree(pFilename);
-      hb_fsSetError( 0 );
-      return TRUE;
-   }
-   else {
-      hb_xfree(pFilename);
-      hb_fsSetError( 0 );
-      return FALSE;
+   #ifdef HB_OS_LINUX
+      if (( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY )
+      {
+         bResult = TRUE;
       }
+   #else
+      bResult = TRUE;
+   #endif
+   }
+
+   hb_xfree(pFilename);
+   hb_fsSetError( 0 );
+
+   return bResult;
 }
 
+BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
+{
+   PHB_FFIND ffind;
+   BOOL bResult = FALSE;
+
+   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
+
+   if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
+   {
+      hb_fsFindClose( ffind );
+      if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
+      {
+         bResult = TRUE;
+      }
+   }
+
+   hb_xfree(pFilename);
+   hb_fsSetError( 0 );
+
+   return bResult;
+}

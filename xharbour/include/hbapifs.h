@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.23 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapifs.h,v 1.24 2003/12/02 12:25:55 lculik Exp $
  */
 
 /*
@@ -123,6 +123,7 @@ extern BOOL     HB_EXPORT hb_fsEof        ( FHANDLE hFileHandle ); /* determine 
 extern USHORT   HB_EXPORT hb_fsError      ( void ); /* retrieve file system error */
 extern USHORT   HB_EXPORT hb_fsOsError    ( void ); /* retrieve system dependant file system error */
 extern BOOL     HB_EXPORT hb_fsFile       ( BYTE * pszFileName ); /* determine if a file exists */
+extern BOOL     HB_EXPORT hb_fsIsDirectory( BYTE * pFilename ); /* Determine if given name is a directory */
 extern ULONG    HB_EXPORT hb_fsFSize      ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
 extern FHANDLE  HB_EXPORT hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,
                                   USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */

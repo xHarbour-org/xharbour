@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2009 2004/01/07 02:08:51 peterrees Exp $
+ * $Id: ChangeLog,v 1.2010 2004/01/07 06:44:58 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-07 12:54 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapifs.h
+  * source/rtl/filehb.c
+  * source/rtl/file.c
+    + Added function IsDirectory() with backend hb_fsIsDirectory() to
+      tell if a given path is an existing directory.
 
 2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c

@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.3 2002/03/16 00:34:13 ronpinkas Exp $
+ * $Id: filehb.c,v 1.4 2002/03/16 01:27:06 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,11 @@
  *
  */
 
+/*
+* IsDirectory( cPath ) -- determine if a given file is a directory
+* Copyright 2004 Giancarlo Niccolai
+*/
+
 #include "hbapi.h"
 #include "hbapifs.h"
 
@@ -61,4 +66,11 @@ HB_FUNC( FILE )
    PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
 
    hb_retl( ( pFile && pFile->item.asString.length < _POSIX_PATH_MAX ) ? hb_spFile( ( BYTE * ) pFile->item.asString.value, NULL ) : FALSE );
+}
+
+HB_FUNC( ISDIRECTORY )
+{
+   PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
+
+   hb_retl( ( pFile && pFile->item.asString.length < _POSIX_PATH_MAX ) ? hb_fsIsDirectory( ( BYTE * ) pFile->item.asString.value ) : FALSE );
 }
