@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3128 2004/07/01 18:44:42 jabrecer Exp $
+ * $Id: ChangeLog,v 1.3129 2004/07/01 23:26:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-01 20:12 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * ./ERRATA
+    * Updated references from Harbour to xHarbour, and removed the
+      "solved" issue.
+  - ./ERRATA
+    - Since this file has never been used, this file is removed for
+      avoid a bad image with "things which the developers don't attend".
 
 2004-07-01 16:25 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/vm/classes.c
