@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.14 2004/02/09 18:00:37 druzus Exp $
+ * $Id: gtdos.c,v 1.15 2004/03/07 14:42:22 likewolf Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ static void hb_gt_SetCursorSize( char start, char end );
 static void hb_gt_GetCursorSize( char * start, char * end );
 
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 #if defined(__WATCOMC__)
    #if defined(__386__)
@@ -775,7 +775,7 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
 
 #if defined(__DJGPP__TEXT)
    {
-     int i;
+     ULONG i;
 
      if( scrnVirtual )
      {
@@ -793,11 +793,11 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
         BYTE * ch_attr;
         BYTE * ptr;
 
-        i = ( int ) len;
+        i = len;
         left = cCol;
         top = cRow;
         width = hb_gt_GetScreenWidth();
-        ptr = ch_attr = hb_xgrab( i * 2 );
+        ptr = ch_attr = hb_xgrab( i << 1 );
         while( i-- )
           {
              *ptr++ = *str++;
@@ -828,7 +828,7 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
    }
 #elif defined(__DJGPP__)
    {
-      int i;
+      ULONG i;
 
       for( i=0; i<len; i++ )
       {

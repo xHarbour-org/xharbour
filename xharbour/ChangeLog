@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2861 2004/05/02 12:00:32 druzus Exp $
+ * $Id: ChangeLog,v 1.2862 2004/05/02 13:44:04 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-02 21:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/dos/djgpp.cf
+    * use -Wl,--start-group / -Wl,--end-group switches to resolve problem
+      with cross references between RTL and other libraries
+
+  * xharbour/contrib/libct/settime.c
+    * implement WAITPERIOD in the way I understand its description
+      not as MILLISEC synonym
+    * removed stime from DJGPP build
+
+  * xharbour/source/rtl/gtdos/gtdos.c
+    * cleaned some warnings
 
 2004-05-02 15:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

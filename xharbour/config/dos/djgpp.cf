@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.8 2004/03/04 00:27:39 likewolf Exp $
+# $Id: djgpp.cf,v 1.9 2004/04/03 00:49:17 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -82,7 +82,9 @@ define link_exe_file
 echo. $(LDFLAGS) $(L_USR) $(LD_OUT)$@ > __link__.tmp
 $(foreach file, $^, $(link_file))
 $(foreach file, $(LINKPATHS), $(link_file))
+echo. -Wl,--start-group >> __link__.tmp
 $(foreach file, $(LINKLIBS), $(link_file))
+echo. -Wl,--end-group >> __link__.tmp
 echo. $(LDLIBS) >> __link__.tmp
 -$(LD) @__link__.tmp
 endef

@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.3 2004/04/28 23:04:43 lculik Exp $
+ * $Id: settime.c,v 1.4 2004/04/30 19:42:23 druzus Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -56,15 +56,16 @@
  */
 
 #include "hbapi.h"
+#include "hbdate.h"
 
 #if defined(HB_OS_WIN_32)
-
 #include <windows.h>
 #include <winbase.h>
 #define HB_OS_WIN_32_USED
 #endif
+
+#define _SVID_SOURCE
 #if defined( OS_UNIX_COMPATIBLE )
-   #define _SVID_SOURCE
    #if defined( HB_OS_BSD )
       #include <sys/time.h>
    #else
@@ -131,7 +132,7 @@ HB_FUNC ( SETNEWTIME )
 
    hb_retl ( SetLocalTime(&st) );
 }   
-#elif defined( OS_UNIX_COMPATIBLE ) || defined(__DJGPP__)
+#elif defined( OS_UNIX_COMPATIBLE )
 {
    LONG lNewHour,lNewMin,lNewSec;
    time_t tm;
@@ -197,14 +198,22 @@ HB_FUNC ( SETNEWTIME )
  *  $END$
  */
 
+static double dTimeSet = 0;
+static double dTimeCounter = 0;
+
 HB_FUNC ( WAITPERIOD )
 {
+   double d = hb_dateSeconds();
 
-   ULONG dwWait = hb_parnl( 1 ) ;
-#if defined(HB_OS_WIN_32)
-   Sleep( dwWait * 10 );
-#else
-   sleep(dwWait *10);
-#endif   
-   hb_retl( FALSE );
+   if ( hb_pcount() > 0 )
+   {
+      dTimeSet = d;
+      dTimeCounter = hb_parnd( 1 ) / 100.0;
+   }
+
+   if ( d < dTimeSet )
+   {
+      d += 86400.0;
+   }
+   hb_retl( d < dTimeSet );
 }
