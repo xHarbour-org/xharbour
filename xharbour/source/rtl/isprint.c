@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.19 2003/06/05 02:23:45 lculik Exp $
+ * $Id: isprint.c,v 1.20 2003/08/06 13:50:22 lculik Exp $
  */
 
 /*
@@ -575,8 +575,8 @@ HB_FUNC(GETPRINTERS)
 
     unsigned char *buffer;
     unsigned char *xpbuffer;
-    unsigned long needed = 0 , returned ,needed1 = 0 , returned1, a ,b;
-    BOOL res;
+    unsigned long needed = 0 , returned=0 ,needed1 = 0 , returned1 = 0, a = 0 ,b = 0 ;
+    BOOL res = FALSE;
     OSVERSIONINFO osv;
     osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     GetVersionEx(&osv);

@@ -82,6 +82,7 @@ HANDLE THarbourPrinter_hPrinter( void )
 void THarbourPrinter_SetDevice( LPTSTR szDevice )
 {
    MyDeviceName = szDevice;
+   IsOpenDevice = FALSE;
 }
 
 void THarbourPrinter_SetJobName( LPTSTR szJobName )
