@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.12 2004/11/01 05:38:10 likewolf Exp $
+ * $Id: gtcrs.h,v 1.13 2004/11/21 21:44:21 druzus Exp $
  */
 
 /*
@@ -77,6 +77,9 @@ extern PHB_CODEPAGE s_cdpage;
    extern int tigetnum(char *);
    extern char *tigetstr(char *);
 #else
+#  if defined( HB_OS_HPUX )
+#     define _XOPEN_SOURCE_EXTENDED
+#  endif
 #  include <curses.h>
 #  if defined( HB_OS_SUNOS )
 #     include <term.h>

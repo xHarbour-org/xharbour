@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3663 2004/12/09 13:47:45 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3664 2004/12/10 03:09:41 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-12-10 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * include/hbsetup.h
+    + Added support for HP-UX 11.xx 64 bits
+  * make_gnu.sh
+    + Fixed default install folder to self (Unix fans, pls don't kill me :-)
+  * source/rtl/gtcrs/gtcrs.h
+    + Added support for HP-UX 11.xx 64 bits
+  + config/hpux/dir.cf
+  + config/hpux/gcc.cf
+  + config/hpux/global.cf
+  + config/hpux/install.cf
+    + Added support for HP-UX 11.xx 64 bits
+  + make_hp.sh
+    + Added handy hpux setup file
+
 2004-12-10 00:10 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * makefile.bc
   * makefile.nt
   * makefile.vc
   * makefile.wc
-  * source\ct\Makefile
-  * source\tip\Makefile
+  * source/ct/Makefile
+  * source/tip/Makefile
     ! Libs renamed from hbtip to tip and from hbct to ct
 
 2004-12-09 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>

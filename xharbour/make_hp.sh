@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/sh
 #
 # $Id: make_gnu.sh,v 1.8 2003/12/30 22:59:12 druzus Exp $
 #
@@ -14,12 +14,12 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
+if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=hpux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
-if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
+if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=no; fi
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
-if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
+if [ -z "$HB_MT" ]; then export HB_MT=no; fi
 
 # export PRG_USR=
 # export C_USR=
