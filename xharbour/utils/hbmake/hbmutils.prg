@@ -13,11 +13,11 @@ DECLARE HB_ARGV( n as numeric ) as string
 declare hbmake_filedate( c as String ) as string
 declare listasArray2( cString as String, cSep as String ) as Array
 #endif
-Function GetSourceFiles( lSubdir )
+Function GetSourceFiles( lSubdir ,lGcc, cOs )
 
      Local adirs AS ARRAY
      Local aRet AS ARRAY := {}
-     Local lLinux    := At( 'linux', lower(Os() )) > 0
+     Local lLinux    := At( 'linux', lower(cOs )) > 0 .or. lGcc
      Local cdir as String := If( !llinux, '\' + Curdir() + '\', '/' + Curdir() + '/' )
      Local aStru     := { cDir }
      Local aData AS ARRAY
@@ -35,10 +35,11 @@ Function GetSourceFiles( lSubdir )
      Local nLen
      Local cFile
      Default lSubdir To .t.
+     
 
 
      While ++ nCounter <= Len( aStru )
-       If !Empty( adirs := GetDirs( astru[ nCounter ] ) )   // There are elements!
+       If !Empty( adirs := GetDirs( astru[ nCounter ] ,lgcc) )   // There are elements!
           Aeval( aDirs, { | xItem | Aadd( aStru, xItem ) } )
        Endif
      Enddo
@@ -122,10 +123,12 @@ Function extenprg( cExt, nType )
      Endif
 Return ctemp
 
-Static Function GetDirs( cPattern )
+Static Function GetDirs( cPattern ,lGcc)
 
      Local aDir   := {}
-     Local lLinux := At( 'linux', lower(Os()) ) > 0
+     Local lLinux := At( 'linux', lower(Os()) ) > 0 .or. lgcc
+     
+
      
      Aeval( Directory( cPattern + if(lLinux,"*","*."), "D" ), ;
             { | xItem | If( xItem[ 5 ] = "D" .and. ;
@@ -222,7 +225,7 @@ Function GetSourceDirMacros()
      Local nCounter as numeric := 0
      Local amacros as Array := {}
      While ++ nCounter <= Len( aStru )
-       If !Empty( adirs := GetDirs( astru[ nCounter ] ) )   // There are elements!
+       If !Empty( adirs := GetDirs( astru[ nCounter ] ,lLinux) )   // There are elements!
           Aeval( aDirs, { | xItem | Aadd( aStru, xItem ) } )
        Endif
      Enddo
