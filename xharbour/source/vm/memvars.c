@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.12 2002/04/01 21:09:17 ronpinkas Exp $
+ * $Id: memvars.c,v 1.13 2002/07/05 19:53:30 ronpinkas Exp $
  */
 
 /*
@@ -1483,6 +1483,17 @@ static HB_DYNS_FUNC( hb_memvarSave )
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
             hb_fsWrite( fhnd, ( BYTE * ) hb_itemGetCPtr( pItem ), uiLength );
          }
+         else if( HB_IS_DATE( pItem ) )
+         {
+            double dNumber = ( double ) hb_itemGetDL( pItem );
+
+            buffer[ 11 ] = 'D' + 128;
+            buffer[ 16 ] = 1;
+            buffer[ 17 ] = 0;
+
+            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
+         }
          else if( HB_IS_NUMERIC( pItem ) )
          {
             double dNumber = hb_itemGetND( pItem );
@@ -1500,17 +1511,6 @@ static HB_DYNS_FUNC( hb_memvarSave )
             buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
 #endif
             buffer[ 17 ] = ( BYTE ) iDec;
-
-            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
-         }
-         else if( HB_IS_DATE( pItem ) )
-         {
-            double dNumber = ( double ) hb_itemGetDL( pItem );
-
-            buffer[ 11 ] = 'D' + 128;
-            buffer[ 16 ] = 1;
-            buffer[ 17 ] = 0;
 
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
             hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
