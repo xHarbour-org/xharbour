@@ -141,6 +141,11 @@ local aGetsParam := ;
 aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
 aadd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
 aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
+aadd( aBlocks, {|| Wvt_DrawLine( maxrow()-1,0,maxrow()-1,maxcol() ) })
+aadd( aBlocks, {|| Wvt_SetBrush( 0, rgb( 32,255,100 ) ) } )
+aadd( aBlocks, {|| Wvt_DrawEllipse( 6,50,10,58 ) } )
+aadd( aBlocks, {|| Wvt_SetBrush( 2, rgb( 255,255,100 ),1 ) } )
+aadd( aBlocks, {|| Wvt_DrawRectangle( 11, 50, 13, 58 ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
 aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.34 2004/01/09 14:32:21 paultucker Exp $
+ * $Id: gtwvt.c,v 1.35 2004/01/10 08:01:22 vouchcac Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ static void    hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr
 static USHORT  hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row );
 static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow );
 static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
-static void    hb_wvt_gtCreatePens( void );
+static void    hb_wvt_gtCreateObjects( void );
 
 //-------------------------------------------------------------------//
 //
@@ -216,7 +216,7 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     hb_wvt_gtSetWindowTitle( pFileName->szName );
     hb_xfree( pFileName );
 
-    hb_wvt_gtCreatePens();
+    hb_wvt_gtCreateObjects();
     _s.hdc = GetDC( _s.hWnd );
 
     if( b_MouseEnable )
@@ -237,6 +237,9 @@ void HB_GT_FUNC( gt_Exit( void ) )
       DeleteObject( _s.penWhiteDim );
       DeleteObject( _s.penBlack );
       DeleteObject( _s.penDarkGray );
+      DeleteObject( _s.currentPen );
+      DeleteObject( _s.currentBrush );
+      
       ReleaseDC( _s.hWnd, _s.hdc );
 
       DestroyWindow( _s.hWnd );
@@ -1335,12 +1338,22 @@ void HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtCreatePens( void )
+static void hb_wvt_gtCreateObjects( void )
 {
-   _s.penWhite    = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
-   _s.penBlack    = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
-   _s.penWhiteDim = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 215,215,215 ) );
-   _s.penDarkGray = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
+   LOGBRUSH lb;
+      
+   _s.penWhite     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
+   _s.penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
+   _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 215,215,215 ) );
+   _s.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
+   
+   _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );   
+   
+   lb.lbStyle      = BS_NULL;
+   lb.lbColor      = RGB( 198,198,198 );
+   lb.lbHatch      = NULL;
+   
+   _s.currentBrush = CreateBrushIndirect( &lb );
 }
 
 //-------------------------------------------------------------------//
@@ -3582,6 +3595,145 @@ HB_FUNC( WVT_DRAWLINE )
    LineTo( _s.hdc, iRight, iTop+1 );
 
    hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWELLIPSE )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y;
+   iLeft   = xy.x;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y-1;
+   iRight  = xy.x-1;
+
+   SelectObject( _s.hdc, _s.currentBrush );
+   SelectObject( _s.hdc, _s.currentPen );
+   
+   hb_retl( Ellipse( _s.hdc, iLeft, iTop, iRight, iBottom ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWRECTANGLE )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y;
+   iLeft   = xy.x;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y-1;
+   iRight  = xy.x-1;
+
+   SelectObject( _s.hdc, _s.currentBrush );
+   SelectObject( _s.hdc, _s.currentPen );
+   
+   hb_retl( Rectangle( _s.hdc, iLeft, iTop, iRight, iBottom ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWROUNDRECT )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight, iWd, iHt;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y;
+   iLeft   = xy.x;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y-1;
+   iRight  = xy.x-1;
+
+   iWd     = ISNIL( 6 ) ? 0 : hb_parni( 6 );
+   iHt     = ISNIL( 5 ) ? 0 : hb_parni( 5 );
+
+   SelectObject( _s.hdc, _s.currentBrush );
+   SelectObject( _s.hdc, _s.currentPen );
+   
+   hb_retl( RoundRect( _s.hdc, iLeft, iTop, iRight, iBottom, iWd, iHt ) );
+}
+
+//-------------------------------------------------------------------//
+//
+//   Wvt_SetPen( nPenStyle, nWidth, nColor )
+//
+HB_FUNC( WVT_SETPEN )
+{
+   int      iPenWidth, iPenStyle;
+   COLORREF crColor;
+   HPEN     hPen;
+   
+   if ( ISNIL( 1 ) );
+   { 
+      hb_retl( FALSE );
+   }
+
+   iPenStyle = hb_parni( 1 ) ;   
+   iPenWidth = ISNIL( 2 ) ? 0 : hb_parni( 2 );
+   crColor   = ISNIL( 3 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 3 );
+   
+   hPen      = CreatePen( iPenStyle, iPenWidth, crColor );
+
+   if ( hPen )
+   {
+      if ( _s.currentPen )
+      {
+         DeleteObject( _s.currentPen );
+      }
+      _s.currentPen = hPen;
+
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
+//-------------------------------------------------------------------//
+//
+//   Wvt_SetBrush( nStyle, nColor, [ nHatch ] )
+//
+HB_FUNC( WVT_SETBRUSH )
+{
+   HBRUSH   hBrush;
+	LOGBRUSH lb;
+	
+   if ( ISNIL( 1 ) )
+   {
+      hb_retl( FALSE );
+   }
+   
+   lb.lbStyle = hb_parnl( 1 );
+   lb.lbColor = ISNIL( 2 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 2 ) ;
+   lb.lbHatch = ISNIL( 3 ) ? NULL : hb_parnl( 3 );
+   
+   hBrush     = CreateBrushIndirect( &lb );
+   
+   if ( hBrush )
+   {
+      if ( _s.currentBrush )
+      {
+         DeleteObject( _s.currentBrush );
+      }
+      _s.currentBrush = hBrush;
+      
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
 }
 
 //-------------------------------------------------------------------//

@@ -119,11 +119,13 @@ typedef struct global_data
   BOOL      AltF4Close;                // Can use Alt+F4 to close application
   BOOL      InvalidateWindow;          // Flag for controlling whether to use ScrollWindowEx()
   BOOL      EnableShortCuts;           // Determines whether ALT key enables menu or system menu
-  HPEN      penWhite;
-  HPEN      penBlack;
-  HPEN      penWhiteDim;
-  HPEN      penDarkGray;
-  HDC       hdc;
+  HPEN      penWhite;                  // White pen to draw GDI elements 
+  HPEN      penBlack;                  // Black pen to draw GDI elements
+  HPEN      penWhiteDim;               // White dim pen to draw GDI elements
+  HPEN      penDarkGray;               // Dark gray pen to draw GDI elements
+  HPEN      currentPen;                // Handle to current pen settable at runtime 
+  HBRUSH    currentBrush;              // Handle to current brush settable by runtime
+  HDC       hdc;                       // Handle to Windows Device Context
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
 } GLOBAL_DATA;
 

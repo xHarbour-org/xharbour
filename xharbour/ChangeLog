@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2028 2004/01/10 10:21:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2029 2004/01/10 10:45:12 ignacioortiz Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + New members in GLOBAL_DATA _s : currentPen, currentBrush
+
+     + Wvt_SetPen( nPenStyle, nWidth, nColor )
+       Sets the _s.currentPen with handle to Pen created with above parameters.
+
+     + Wvt_SetBrush( nBrushStyle, nColor, [ nHatch ] )
+       Sets the _s.currentBrush with handle to Brush created with above parameters.
+
+       _s.currentPen and _s.currentBrush will be used to draw following GUI elements.
+
+     + Wvt_DrawRectangle( nTop, nLeft, nBottom, nRight )
+       Rectangle thus drawan will be inside the above parameters.
+
+     + Wvt_DrawRoundRect( nTop, nLeft, nBottom, nRight, nPixelsRoundHeight, nPixelsRoundWidth )
+       Rectangle thus drawan will be inside the above parameters. The corners will be rounded
+       honouring  nPixelsRoundHeight, nPixelsRoundWidth.
+
+     + Wvt_DrawEllipse( nTop, nLeft, nBottom, nRight )
+       Draws a circle inside the above parameters.
+
+   * xharbour/include/hbgtwvt.h
+     + Members to GLOBAL_DATA _s : currentPen, currentBrush
+
+   * xharbour/tests/wvtgui.prg
+     * Enhanced to support new functions.
 
 2004-01-10 11:45 UTC+0100 Ignacio Ortiz <iozuniga@ozs.com>
   * source/vm/extend.c
