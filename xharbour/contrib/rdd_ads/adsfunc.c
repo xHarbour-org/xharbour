@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.16 2003/09/04 16:40:16 iananderson Exp $
+ * $Id: adsfunc.c,v 1.17 2003/09/08 16:15:49 iananderson Exp $
  */
 
 /*
@@ -743,7 +743,11 @@ HB_FUNC( ADSSETAOF )
    UNSIGNED32 ulRetVal;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
-   if( pArea && ISCHAR(1) )
+   if( ! ISCHAR(1) )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSSETAOF" );
+   }
+   else if( pArea )
    {
       pucFilter = hb_parc( 1 );
       if( hb_pcount() > 1 )
