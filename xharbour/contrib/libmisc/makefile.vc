@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.8 2001/06/21 05:13:06 ronpinkas Exp $
+# $Id: makefile.vc,v 1.1 2003/04/14 16:09:13 lculik Exp $
 #
 
 #
@@ -111,7 +111,6 @@ LIBLIST = \
 
 TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\dates2.obj \
-   $(OBJ_DIR)\dbftools.obj \
    $(OBJ_DIR)\hb_f.obj \
    $(OBJ_DIR)\mathx.obj \
    $(OBJ_DIR)\strfmt.obj \
@@ -134,7 +133,6 @@ all: \
 
 CLEAN:
    -@if exist $(OBJ_DIR)\dates2.obj del $(OBJ_DIR)\dates2.obj
-   -@if exist $(OBJ_DIR)\dbftools.obj del $(OBJ_DIR)\dbftools.obj
    -@if exist $(OBJ_DIR)\hb_f.obj del $(OBJ_DIR)\hb_f.obj
    -@if exist $(OBJ_DIR)\mathx.obj del $(OBJ_DIR)\mathx.obj
    -@if exist $(OBJ_DIR)\strfmt.obj del $(OBJ_DIR)\strfmt.obj

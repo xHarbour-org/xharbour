@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1406 2003/09/03 12:51:35 paultucker Exp $
+ * $Id: ChangeLog,v 1.1407 2003/09/03 13:42:58 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,6 +10,8 @@
 2003-09-03 09:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/libmisc/makefile.vc
     - dbftools.c since it's now in libct
+  * contrib/libct/makefile.vc
+    + dbftools.c
 
 2003-09-03 08:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc

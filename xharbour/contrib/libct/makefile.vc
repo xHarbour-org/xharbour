@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.3 2003/03/29 19:16:40 paultucker Exp $
+# $Id: makefile.vc,v 1.4 2003/08/18 12:13:46 druzus Exp $
 #
 
 #
@@ -136,6 +136,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\ctstr.obj \
    $(OBJ_DIR)\ctchksum.obj \
    $(OBJ_DIR)\ctcrypt.obj \
+   $(OBJ_DIR)\dbftools.obj \
    $(OBJ_DIR)\exponent.obj \
    $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
@@ -213,6 +214,7 @@ CLEAN:
    -@if exist $(OBJ_DIR)\ctstr.* del $(OBJ_DIR)\ctstr.*
    -@if exist $(OBJ_DIR)\ctchksum.* del $(OBJ_DIR)\ctchksum.*
    -@if exist $(OBJ_DIR)\ctcrypt.* del $(OBJ_DIR)\ctcrypt.*
+   -@if exist $(OBJ_DIR)\dbftools.* del $(OBJ_DIR)\dbftools.*
    -@if exist $(OBJ_DIR)\exponent.* del $(OBJ_DIR)\exponent.*
    -@if exist $(OBJ_DIR)\files.* del $(OBJ_DIR)\files.*
    -@if exist $(OBJ_DIR)\finan.* del $(OBJ_DIR)\finan.*
