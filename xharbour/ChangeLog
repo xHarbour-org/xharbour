@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1813 2003/12/03 11:48:36 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1814 2003/12/03 13:01:05 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-12-03 14:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * xharbour/source/rtl/hboutdbg.c
+     ! fixed error from last commit, I'm sorry
 
 2003-12-03 13:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * xharbour/config/os2/gcc.cf
