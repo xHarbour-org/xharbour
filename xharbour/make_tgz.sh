@@ -1,0 +1,294 @@
+#!/bin/sh
+#
+# $Id$
+#
+
+# ---------------------------------------------------------------
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# simple script to build binaries .tgz from xHarbour sources
+#
+# See doc/license.txt for licensing terms.
+# ---------------------------------------------------------------
+
+name="xharbour"
+hb_lnkso="yes"
+hb_pref="xhb"
+hb_libs="vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug"
+export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
+if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
+if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
+if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtcrs; fi
+if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
+if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
+
+export HB_BIN_INSTALL="/usr/bin"
+export HB_INC_INSTALL="/usr/include/${name}"
+export HB_LIB_INSTALL="/usr/lib/${name}"
+
+umask 022
+make clean
+make
+
+
+if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
+HB_INST_PREF="$TMPDIR/xHarbour.bin.$$"
+rm -fR "${HB_INST_PREF}"
+
+_DEFAULT_BIN_DIR=$HB_BIN_INSTALL
+_DEFAULT_INC_DIR=$HB_INC_INSTALL
+_DEFAULT_LIB_DIR=$HB_LIB_INSTALL
+export HB_BIN_INSTALL="$HB_INST_PREF/$HB_BIN_INSTALL"
+export HB_INC_INSTALL="$HB_INST_PREF/$HB_INC_INSTALL"
+export HB_LIB_INSTALL="$HB_INST_PREF/$HB_LIB_INSTALL"
+
+mkdir -p $HB_BIN_INSTALL
+mkdir -p $HB_INC_INSTALL
+mkdir -p $HB_LIB_INSTALL
+make -i install
+
+install -m755 bin/hb-mkslib.sh $HB_BIN_INSTALL/hb-mkslib
+hb_libs="vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug"
+
+pushd $HB_LIB_INSTALL
+LIBS=""
+LIBSMT=""
+for l in ${hb_libs}
+do
+    ls="lib${l}.a"
+    if [ -f lib${l}mt.a ]
+    then
+	lm="lib${l}mt.a"
+    else
+	lm="${ls}"
+    fi
+    if [ -f $ls ]
+    then
+	LIBS="$LIBS $ls"
+    fi
+    if [ -f $lm ]
+    then
+	LIBSMT="$LIBSMT $lm"
+    fi
+done
+$HB_BIN_INSTALL/hb-mkslib lib${name}.so $LIBS
+[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt.so $LIBSMT
+cd ..
+for l in lib${name}.so lib${name}mt.so
+do
+    [ -f ${name}/$l ] && ln -s ${name}/$l $l
+done
+#export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
+popd
+
+# Add a harbour compiler wrapper.
+cat > $HB_BIN_INSTALL/${hb_pref}-build <<EOF
+#!/bin/bash
+
+if [ \$# == 0 ]; then
+    echo "syntax: \$0 [<options,...>] <file>[.prg|.o]"
+    exit 1
+elif [ "\$*" == "mk-links" ]; then
+    DIR="\${0%/*}"
+    NAME="\${0##*/}"
+    if [ "\${DIR}" != "\${NAME}" ]; then
+	for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
+	    ln -sf "\${NAME}" "\${DIR}/\${n}"
+	done
+    fi
+    exit
+fi
+
+## default parameters
+HB_STATIC="no"
+HB_MT=""
+HB_GT="${HB_GT_LIB#gt}"
+
+
+HB_GT_REQ=""
+_TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
+
+## parse params
+P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""
+while [ \$n -lt \${#P[@]} ]; do
+    v=\${P[\$n]}; p=""
+    case "\$v" in
+	-o*)
+	    d="\${v#-o}"; p="\${v}"
+	    if [ -d "\${d}" ]; then
+		DIROUT="\${d%/}"
+	    elif [ -d "\${d%/*}" ]; then
+		DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
+	    elif [ -n "\${d}" ]; then
+		FILEOUT="\${d}"; p="-o\${d%.*}"
+	    fi ;;
+	-static)    HB_STATIC="yes" ;;
+	-shared)    HB_STATIC="no" ;;
+	-mt)        HB_MT="MT" ;;
+	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-*)         p="\${v}" ;;
+	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
+    esac
+    [ -n "\$p" ] && PP[\$n]="\$p"
+    n=\$[\$n + 1]
+done
+P=( "\${PP[@]}" )
+
+case "\${HB_MT}" in
+    [Mm][Tt]|[Yy][Ee][Ss]|1)	HB_MT="MT";;
+    *)	HB_MT="";;
+esac
+
+SYSTEM_LIBS="-lm -lncurses -lslang -lgpm"
+# use pthread system library for MT programs
+if [ "\${HB_MT}" = "MT" ]; then
+    SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
+fi
+
+[ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
+HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+
+# set environment variables
+export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
+export HB_COMPILER="${HB_COMPILER}"
+export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
+export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
+export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
+
+# be sure that ${name} binaries are in your path
+export PATH="\${HB_BIN_INSTALL}:\${PATH}"
+
+HB_PATHS="-I\${HB_INC_INSTALL}"
+GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
+
+if [ "\${HB_STATIC}" = "yes" ]; then
+    HARBOUR_LIBS=""
+    for l in ${hb_libs}
+    do
+	[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+	[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    done
+    HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+else
+    if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib${name}mt.so" ]; then
+	HARBOUR_LIBS="-l${name}mt"
+    else
+	HARBOUR_LIBS="-l${name}"
+    fi
+fi
+
+FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
+FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
+FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
+FOUTE="\${FOUTE%.[oc]}"
+
+hb_cc()
+{
+    harbour "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
+}
+
+hb_link()
+{
+    if [ -n "\${HB_GT_REQ}" ]; then
+	hb_gt_request \${HB_GT_REQ} > \${_TMP_FILE_} && \\
+	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+    else
+	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+    fi
+}
+
+hb_cmp()
+{
+    hb_cc "\$@" && \\
+    gcc -g -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
+    rm -f "\${FOUTC}"
+}
+
+hb_gt_request()
+{
+    echo "#include \\"hbapi.h\\""
+    if [ "\${HB_STATIC}" = "yes" ]; then
+	for gt in "\$@"; do
+	    echo "extern HB_FUNC( HB_GT_\${gt} );"
+	done
+	echo "void hb_gt_ForceLink_build( void )"
+	echo "{"
+	for gt in "\$@"; do
+	    echo "HB_FUNCNAME( HB_GT_\${gt} )();"
+	done
+	echo "}"
+    fi
+    if [ -n "\$1" ]; then
+	echo "#include \\"hbinit.h\\""
+	echo "extern char * s_defaultGT;"
+	echo "HB_CALL_ON_STARTUP_BEGIN( hb_gt_SetDefault_build )"
+	echo "   s_defaultGT = \\"\$1\\";"
+	echo "HB_CALL_ON_STARTUP_END( hb_gt_SetDefault_build )"
+    fi
+}
+
+hb_cleanup()
+{
+    rm -f "\${_TMP_FILE_}"
+}
+
+trap hb_cleanup EXIT &>/dev/null
+
+## get basename
+HB="\${0##*/}"
+
+case "\${HB}" in
+    *cc)
+	hb_cc "\${P[@]}"
+	;;
+    *cmp|gharbour)
+	hb_cmp "\${P[@]}"
+	;;
+    *lnk|harbour-link)
+	hb_link "\${P[@]}"
+	;;
+    *mk)
+	hb_cmp "\${P[@]}" && \\
+	hb_link "\${FOUTO}" && \\
+	strip "\${FOUTE}" && \\
+	rm -f "\${FOUTO}"
+	;;
+esac
+EOF
+chmod 755 $HB_BIN_INSTALL/${hb_pref}-build
+$HB_BIN_INSTALL/${hb_pref}-build mk-links
+
+mkdir -p $HB_INST_PREF/etc/harbour
+install -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
+cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
+CC=gcc
+CFLAGS=-c -I$_DEFAULT_INC_DIR -O2
+VERBOSE=YES
+DELTMP=YES
+EOF
+
+# Create PP
+pushd tests
+$HB_BIN_INSTALL/xhbmk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
+install -m755 -s pp $HB_BIN_INSTALL/pp
+ln -s pp $HB_BIN_INSTALL/pprun
+install -m644 rp_dot.ch $HB_INC_INSTALL/
+popd
+
+# check if we should rebuild tools with shared libs
+if [ "${hb_lnkso}" = yes ]
+then
+    export L_USR="-L${HB_LIB_INSTALL} -lxharbour -lncurses -lslang -lgpm"
+
+    for utl in hbmake hbrun hbpp hbdoc
+    do
+	pushd utils/${utl}
+	rm -fR "./${HB_ARCHITECTURE}"
+	make install
+	strip ${HB_BIN_INSTALL}/${utl}
+	popd
+    done
+fi
+
+tar -czvf xharbour.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
+rm -fR "${HB_INST_PREF}"

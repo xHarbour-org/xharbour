@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.14 2003/06/19 00:07:59 druzus Exp $
+ * $Id: gtcrs.c,v 1.15 2003/06/19 22:39:02 druzus Exp $
  */
 
 /*
@@ -1185,14 +1185,31 @@ static void gt_ttyrestore(InOutBase *ioBase)
 	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
 }
 
-static void gt_outstd(InOutBase *ioBase, const char *str, int len)
+static void gt_outstr(InOutBase *ioBase, int fd, const unsigned char *str, int len)
 {
-    write(ioBase->stdoutfd, str, len);
+    unsigned char *buf = (unsigned char *) hb_xgrab(len), c;
+    int i;
+    
+    for ( i = 0; i < len; ++i )
+    {
+	c = str[i];
+	if ( ioBase->out_transtbl[c] )
+	    buf[i] = ioBase->out_transtbl[c];
+	else
+	    buf[i] = c ? c : ' ';
+    }
+    write(fd, buf, len);
+    hb_xfree(buf);
+}
+
+static void gt_outstd(InOutBase *ioBase, unsigned const char *str, int len)
+{
+    gt_outstr(ioBase, ioBase->stdoutfd, str, len);
 }
 
 static void gt_outerr(InOutBase *ioBase, const char *str, int len)
 {
-    write(ioBase->stderrfd, str, len);
+    gt_outstr(ioBase, ioBase->stderrfd, str, len);
 }
 
 static char* tiGetS(char *capname)

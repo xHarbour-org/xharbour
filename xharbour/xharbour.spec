@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.7 2003/06/03 04:08:49 druzus Exp $
+# $Id: xharbour.spec,v 1.8 2003/06/06 06:45:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -188,7 +188,7 @@ strip $HB_BIN_INSTALL/*
 # Keep the size of the libraries to a minimim.
 strip --strip-debug $HB_LIB_INSTALL/*
 
-install bin/hb-mkslib.sh $HB_BIN_INSTALL/hb-mkslib
+install -m755 bin/hb-mkslib.sh $HB_BIN_INSTALL/hb-mkslib
 
 pushd $HB_LIB_INSTALL
 LIBS=""
@@ -399,7 +399,7 @@ chmod 755 $HB_BIN_INSTALL/%{hb_pref}-build
 $HB_BIN_INSTALL/%{hb_pref}-build mk-links
 
 mkdir -p $RPM_BUILD_ROOT/etc/{harbour,profile.d}
-install source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
+install -m644 source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
 cat > $RPM_BUILD_ROOT/etc/harbour.cfg <<EOF
 CC=gcc
 CFLAGS=-c -I$_DEFAULT_INC_DIR -O2
@@ -422,9 +422,9 @@ EOF
 # Create PP
 pushd tests
 $HB_BIN_INSTALL/xhbmk pp -n -w -D_DEFAULT_INC_DIR=\"$_DEFAULT_INC_DIR\"
-install -s pp $HB_BIN_INSTALL/pp
+install -m755 -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
-install rp_dot.ch $HB_INC_INSTALL/
+install -m644 rp_dot.ch $HB_INC_INSTALL/
 popd
 
 # check if we should rebuild tools with shared libs
@@ -432,7 +432,7 @@ if [ "%{hb_lnkso}" = yes ]
 then
     export L_USR="-L${HB_LIB_INSTALL} -lxharbour -lncurses -lslang -lgpm"
 
-    for utl in hbmake hbrun hbpp
+    for utl in hbmake hbrun hbpp hbdoc
     do
 	pushd utils/${utl}
 	rm -fR "./${HB_ARCHITECTURE}"

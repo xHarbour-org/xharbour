@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.4 2003/01/12 22:50:13 jonnymind Exp $
+# $Id: make_gnu.sh,v 1.5 2003/05/16 19:40:49 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,6 +19,7 @@ if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
 if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
+if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
 
 # export PRG_USR=
 # export C_USR=
@@ -31,23 +32,23 @@ if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=lib/; fi
 if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=include/; fi
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-   echo Error: HB_ARCHITECTURE is not set.
+   echo "Error: HB_ARCHITECTURE is not set."
 fi
 if [ -z "$HB_COMPILER" ]; then
-   echo Error: HB_COMPILER is not set.
+   echo "Error: HB_COMPILER is not set."
 fi
 
 if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
 
    echo
-   echo Usage: make_gnu.sh [command]
+   echo "Usage: make_gnu.sh [command]"
    echo
-   echo The following commands are supported:
+   echo "The following commands are supported:"
    echo "  - all (default)"
    echo "  - clean"
    echo "  - install"
    echo
-   echo Notes:
+   echo "Notes:"
    echo
    echo "  - HB_ARCHITECTURE and HB_COMPILER envvars must be set."
    echo "    The following values are currently supported:"
@@ -100,7 +101,6 @@ else
 
    # ---------------------------------------------------------------
    # Start the GNU make system
-   export HB_MT=MT
    make $*
 
    if [ "$*" = "clean" ]; then
