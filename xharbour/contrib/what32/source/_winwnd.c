@@ -1263,6 +1263,10 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 */
 
 
+#ifndef ASFW_ANY
+  #define ASFW_ANY    ((DWORD)-1)
+#endif
+
 HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 {
 HINSTANCE h = LoadLibraryEx( "user32.dll",NULL,NULL);
