@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
+ * $Id: memoedit.prg,v 1.2 2002/04/26 16:00:48 lculik Exp $
  */
 
 /*
@@ -107,6 +107,12 @@ METHOD Edit() CLASS TMemoEditor
    local bKeyBlock
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
+    nKey := Inkey(0)
+       if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
+          eval( bKeyBlock )
+          return Self
+       endif
+
    if ::lEditAllow .AND. ISCHARACTER(::xUserFunction)
 
       while ! ::lExitEdit
@@ -116,11 +122,6 @@ METHOD Edit() CLASS TMemoEditor
          if NextKey() == 0
             ::IdleHook()
          endif
-         nKey := Inkey(0)
-       if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
-          eval( bKeyBlock )
-          return Self
-       endif
 
          // Is it a configurable key ?
          if AScan(aConfigurableKeys, nKey) > 0
