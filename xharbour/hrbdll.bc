@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.12 2003/03/22 07:58:43 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.13 2003/04/18 23:34:15 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1675,6 +1675,9 @@ $(OBJ_DIR)\msgruwin.obj : $(LANG_DIR)\msgruwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\msgsr852.obj : $(LANG_DIR)\msgsr852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.bc,v 1.1 2001/12/25 16:51:58 lculik Exp $
+# $Id: makefile.bc,v 1.1 2003/02/23 23:15:17 lculik Exp $
 #
 
 #
@@ -62,7 +62,7 @@ CFLAGS = -O2 $(CFLAGS)
 
 INCLUDE_DIR  = ..\..\include;include
 TOOLS_DIR    = .
-TOOLS1_DIR    = examples
+TOOLS1_DIR    = .
 #
 # C compiler definition and C flags. These should never have to change.
 #

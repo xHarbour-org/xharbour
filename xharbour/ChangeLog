@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1046 2003/05/25 17:03:15 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1047 2003/05/25 17:09:34 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-25 18:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  * contrib/rdd_ads/ads1.c
+    + Added support for DBINFO(DBI_DB_VERSION), DBINFO(DBI_RDD_VERSION)
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Minor fix
+  * source/rdd/dbf1.c
+    * DBI_FILEHANDLE and DBI_MEMOHANDLE added to dbInfo()
+     All changes above borrow from harbour
+  * hrbdll.bc
+    * Added missing MSGSRWIN.C to dep files Reported by Lupano Piero <lupano_piero@inwind.it>
+  * dll_55.bat
+    * Added error redirection to MAKE_DLL55.LOG, Change provided by Lupano Piero <lupano_piero@inwind.it>
+  * contrib/htmllib/makefile.bc
+    *  Minor fix to makefile provided by Lupano Piero <lupano_piero@inwind.it>
+
 
 2003-05-25 19:08 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/fm.c
