@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.63 2002/10/16 17:56:57 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.64 2002/10/17 17:16:46 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -273,6 +273,9 @@ METHOD CreateControl(aRect)
          ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
          ::Parent:ObjTree:Tree:Expand()
 
+         oObj:Hint:=oObj:propname
+         oObj:HintWindow:SetMaxTipWidth(10)
+
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 150, .T. )
@@ -340,8 +343,6 @@ METHOD CreateSub()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
 
-   ::oMask:Hint:=" "
-   ::oMask:HintWindow:SetMaxTipWidth(10)
    RETURN( xRet )
 
 *------------------------------------------------------------------------------

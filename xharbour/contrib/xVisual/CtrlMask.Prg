@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.19 2002/10/17 09:59:16 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.20 2002/10/17 17:16:46 what32 Exp $
  */
 
 /*
@@ -563,6 +563,8 @@ METHOD OnMouseMove( aParam,x,y)
    LOCAL n
    LOCAL hDC
    LOCAL a,oObj
+   static oLastObj
+   
    IF ::mousedown
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
@@ -605,12 +607,23 @@ METHOD OnMouseMove( aParam,x,y)
                ENDIF
                lFound:=.T.
                oObj:=::Parent:ChildFromHandle(hChild)
-               ::HintWindow:SetTitle(2,"Class: "+oObj:Classname())
-               ::HintWindow:SetText("Object: "+oObj:propname)
+               oObj:HintWindow:SetInitial(3000)
+               if oLastObj != NIL
+                  if oLastObj:handle != oObj:handle
+                     oLastObj:HintWindow:TrackHint(0)
+                  endif
+                  oObj:HintWindow:TrackHint(1)
+               ENDIF
+               oObj:HintWindow:SetTitle(2,"Class: "+oObj:Classname())
+               oObj:HintWindow:SetText("Object: "+oObj:propname)
+               oLastObj := oObj
                EXIT
             ENDIF
          NEXT
          IF !lFound
+            if oLastObj != NIL
+               oLastObj:HintWindow:TrackHint(0)
+            ENDIF
             WinSetCursor(LoadCursor(,IDC_ARROW))
          ENDIF
       ELSE
@@ -737,7 +750,6 @@ METHOD MoveCtrl(hWnd,aPt)
    LOCAL aOriginal
    local oObj
    FOR EACH aChild IN ::aSelected
-
       AnchorX:=aChild[SEL_ANCHORX]
       AnchorY:=aChild[SEL_ANCHORY]
       aOriginal:=SnapRect(aChild[SEL_OLDRECT],::Parent:xGrid,::Parent:yGrid)
@@ -797,8 +809,12 @@ METHOD MoveCtrl(hWnd,aPt)
               Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
 
    ENDIF
-   ::HintWindow:SetTitle(0,"")
-   ::HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"           "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
+   if len(::aSelected)>0
+      if (oObj:=::Parent:ChildFromHandle(::aSelected[1][SEL_HANDLE]))!=NIL
+         oObj:HintWindow:SetTitle(0,"")
+         oObj:HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"         "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
+      ENDIF
+   ENDIF
    ::aEditRect:=aRect
 
 

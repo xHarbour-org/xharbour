@@ -1,5 +1,5 @@
 /*
- * $Id: test.prg,v 1.1 2002/10/16 22:49:30 fsgiudice Exp $
+ * $Id: test.prg,v 1.2 2002/10/16 22:53:44 fsgiudice Exp $
  */
 
 //#include "windows.ch"
@@ -32,6 +32,7 @@ PROCEDURE Main()
   FC:Print()
 
   ? CRLF
+wait
   ? "Modified FirstClass Data externally"
 
   FC:data_published := "AA"
@@ -39,7 +40,6 @@ PROCEDURE Main()
   FC:data_hidden    := "CC"
   FC:data_exported  := "DD"
   FC:data_RO        := "EE"
-
   FC:Print()
   ? CRLF
 
@@ -47,6 +47,7 @@ PROCEDURE Main()
   SC:Print()
   ? CRLF
 
+wait
   ? "Modified Data internally from SecondClass"
   SC:Modify()
   SC:Print()
