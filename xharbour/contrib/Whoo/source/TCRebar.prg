@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.33 2002/12/31 08:17:10 what32 Exp $
+ * $Id: TCRebar.prg,v 1.34 2003/01/09 08:21:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -68,7 +68,7 @@ typedef struct tagREBARBANDINFOA;
     UINT        cxIdeal;
     LPARAM      lParam;
     UINT        cxHeader;
-}   REBARBANDINFO, FAR *LPREBARBANDINFOA;
+}   REBARBANDINFO
 
 *------------------------------------------------------------------------------*
 
