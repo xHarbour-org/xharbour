@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2781 2004/04/12 21:02:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2782 2004/04/13 21:06:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-14 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+    * fixed bug in DBCREATE(....,.t.)
+
+  * xharbour/include/hbdefs.h
+    + added HB_COUNTER and HB_PTRDIFF types - first for reference
+      counters and second for any pointer differences and pointer to
+      integer conversions - this modification is synced with Harbour
+
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rtl/trim.c
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/debug.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/memvars.c
+    * use HB_COUNTER type
 
 2004-04-13 14:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvm.h

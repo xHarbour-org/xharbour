@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.36 2004/04/08 13:26:53 druzus Exp $
+ * $Id: hbdefs.h,v 1.37 2004/04/09 01:04:43 druzus Exp $
  */
 
 /*
@@ -240,6 +240,12 @@
 #  endif
 
 #endif
+
+/* type of reference counter */
+typedef ULONG HB_COUNTER;
+
+/* type for memory pointer diff */
+typedef ULONG HB_PTRDIFF;
 
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.377 2004/04/13 09:42:17 jacekp Exp $
+ * $Id: hvm.c,v 1.378 2004/04/13 21:06:31 ronpinkas Exp $
  */
 
 /*
@@ -2191,7 +2191,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                    (*pGlobals)[ iGlobal ]->item.asString.value = sString;
                    (*pGlobals)[ iGlobal ]->item.asString.bStatic = FALSE;
-                   (*pGlobals)[ iGlobal ]->item.asString.pulHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
+                   (*pGlobals)[ iGlobal ]->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
                    *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) = 1;
                 }
 
@@ -2526,7 +2526,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      memcpy( sString, pString->item.asString.value, iNewLen );
                      sString[ iNewLen ] = '\0';
                      pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
 
                      *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
@@ -2545,7 +2545,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
                      *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
@@ -2580,7 +2580,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                      sString[ iNewLen ] = '\0';
                      pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
                   *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
@@ -2599,7 +2599,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
                      *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
@@ -3399,7 +3399,7 @@ static void hb_vmPlus( void )
              hb_itemReleaseString( pItem1 );
 
              pItem1->type = HB_IT_STRING;
-             pItem1->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+             pItem1->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
              *( pItem1->item.asString.pulHolders ) = 1;
              pItem1->item.asString.bStatic = FALSE;
          }
@@ -3513,7 +3513,7 @@ static void hb_vmMinus( void )
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
 
          //pItem1->type = HB_IT_STRING;
-         pItem1->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+         pItem1->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pItem1->item.asString.pulHolders ) = 1;
          pItem1->item.asString.bStatic = FALSE;
          pItem1->item.asString.value   = pNewString;
@@ -5089,7 +5089,7 @@ static void hb_vmArrayPop( void )
             }
 
             pArray->item.asString.value           =  sNew;
-            pArray->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+            pArray->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
             *( pArray->item.asString.pulHolders ) = 1;
             pArray->item.asString.bStatic         = FALSE;
          }
@@ -6548,7 +6548,7 @@ HB_EXPORT void hb_vmPushString( char * szText, ULONG length )
    hb_xmemcpy( szTemp, szText, length );
    szTemp[ length ] = '\0';
 
-   pTop->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   pTop->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( pTop->item.asString.pulHolders ) = 1;
    pTop->type = HB_IT_STRING;
    pTop->item.asString.bStatic = FALSE;
@@ -6946,7 +6946,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
          pLocal->item.asString.value = sString;
          pLocal->item.asString.bStatic = FALSE;
-         pLocal->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+         pLocal->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pLocal->item.asString.pulHolders ) = 1;
       }
 
@@ -7010,7 +7010,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
       pReference->item.asString.value = sString;
       pReference->item.asString.bStatic = FALSE;
-      pReference->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pReference->item.asString.pulHolders ) = 1;
    }
 

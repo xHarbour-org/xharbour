@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.67 2004/04/03 23:48:18 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.68 2004/04/08 13:26:54 druzus Exp $
  */
 
 /*
@@ -470,7 +470,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
    }
    else
    {
-      pItem->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = strlen( szText );
@@ -513,7 +513,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
    else
    {
-      pItem->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = ulLen;
@@ -542,7 +542,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( pItem->item.asString.pulHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
@@ -570,7 +570,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( pItem->item.asString.pulHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
@@ -732,7 +732,7 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -756,7 +756,7 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -778,7 +778,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -799,7 +799,7 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;

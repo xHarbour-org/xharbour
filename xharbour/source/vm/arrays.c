@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.106 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: arrays.c,v 1.107 2004/04/08 13:26:53 druzus Exp $
  */
 
 /*
@@ -503,7 +503,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
          pElement->item.asString.value = sString;
          pElement->item.asString.bStatic = FALSE;
-         pElement->item.asString.pulHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
+         pElement->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pElement->item.asString.pulHolders ) = 1;
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.104 2004/04/01 09:35:36 andijahja Exp $
+ * $Id: dbcmd.c,v 1.105 2004/04/09 01:47:56 druzus Exp $
  */
 
 /*
@@ -1400,10 +1400,12 @@ HB_FUNC( DBCREATE )
    PHB_FNAME pFileName;
    PHB_ITEM pStruct, pFieldDesc;
    BOOL bOpen, bCurr;
-   BYTE * codePageId = (BYTE*) hb_parcx(6);
+   BYTE * codePageId = (BYTE*) hb_parc(6);
    AREAP pArea;
 
    hb_ret();
+
+   s_bNetError = FALSE;
 
    szFileName[0] = szFileName[_POSIX_PATH_MAX] = '\0';
    if ( ISCHAR( 1 ) )
@@ -1466,7 +1468,7 @@ HB_FUNC( DBCREATE )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( szDriverBuffer, hb_parcx( 3 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parc( 3 ), uiLen );
       szDriver = szDriverBuffer;
    }
    else
@@ -1476,10 +1478,10 @@ HB_FUNC( DBCREATE )
 
    pFileName = hb_fsFNameSplit( szFileName );
 
-   szAlias[0] = '\0';
+   szAlias[0] = szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH ] = '\0';
    if( ISCHAR(5) )
    {
-      strncat( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
    uiLen = strlen( szAlias );
@@ -1525,7 +1527,7 @@ HB_FUNC( DBCREATE )
       if( hb_parl( 4 ) )
       {
          bCurr = FALSE;
-         /* see not above */
+         /* see note above */
          hb_rddSelectWorkAreaNumber( 0 );
       }
       else
@@ -1572,6 +1574,7 @@ HB_FUNC( DBCREATE )
    pInfo.atomAlias = ( BYTE * ) szAliasTmp;
    pInfo.fShared = FALSE;
    pInfo.fReadonly = FALSE;
+   pInfo.cdpId = codePageId;
 
    // pArea->atomAlias = hb_dynsymGet( ( char * ) szAlias );
    pArea->atomAlias = hb_dynsymGet( ( char * ) szAliasTmp );
@@ -1598,6 +1601,7 @@ HB_FUNC( DBCREATE )
    }
 
    hb_rddReleaseCurrentArea();
+
    if( ! bOpen )
    {
       hb_rddSelectWorkAreaNumber( uiPrevArea );
@@ -1616,17 +1620,23 @@ HB_FUNC( DBCREATE )
       bOpen = FALSE;
       if( hb_rddInsertAreaNode( szDriver ) )
       {
+         pArea = HB_CURRENT_WA;
+
          pInfo.uiArea = pArea->uiArea;
-         pInfo.abName = ( BYTE * ) szFileName;
+         pInfo.abName = ( BYTE * ) szSavedFileName;
          pInfo.atomAlias = ( BYTE * ) szAlias;
-         strcpy( ( char * ) pInfo.abName, szSavedFileName );
          pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
+         pInfo.fReadonly = FALSE;
          pInfo.cdpId = codePageId;
-         bOpen = ( SELF_OPEN( HB_CURRENT_WA, &pInfo ) == SUCCESS );
+
+         bOpen = ( SELF_OPEN( pArea, &pInfo ) == SUCCESS );
+         if ( !bOpen )
+         {
+            hb_rddReleaseCurrentArea();
+         }
       }
       if ( !bOpen )
       {
-         hb_rddReleaseCurrentArea();
          s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
       }
       hb_retl( bOpen );

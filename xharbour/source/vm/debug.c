@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.12 2004/03/05 23:00:05 andijahja Exp $
+ * $Id: debug.c,v 1.13 2004/04/08 13:26:54 druzus Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 
       sprintf( (&Temp)->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
 
-      (&Temp)->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      (&Temp)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( (&Temp)->item.asString.pulHolders ) = 1;
       (&Temp)->item.asString.bStatic         = FALSE;
 

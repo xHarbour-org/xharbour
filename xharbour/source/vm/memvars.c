@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.74 2004/04/06 22:20:04 ronpinkas Exp $
+ * $Id: memvars.c,v 1.75 2004/04/08 13:26:55 druzus Exp $
  */
 
 /*
@@ -881,7 +881,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
             pReference->item.asString.value = sString;
             pReference->item.asString.bStatic = FALSE;
-            pReference->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+            pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
             *( pReference->item.asString.pulHolders ) = 1;
          }
 

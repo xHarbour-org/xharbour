@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.28 2004/04/08 13:26:53 druzus Exp $
+ * $Id: hbvmpub.h,v 1.29 2004/04/09 01:04:44 druzus Exp $
  */
 
 /*
@@ -184,7 +184,7 @@
        ULONG           length;
        char            *value;
        BOOL            bStatic;
-       ULONG           *pulHolders; /* number of holders of this string */
+       HB_COUNTER      *pulHolders; /* number of holders of this string */
     };
 
     struct hb_struSymbol
@@ -243,26 +243,26 @@
        ULONG    ulLen;        /* number of items in the array */
 #ifdef HB_FWH_COMPATIBLE
     #ifdef HB_LONG_HOLDERS
-       USHORT   uiDummy;      /* dummy var for binary compatibility with old API */
-       USHORT   uiClass;      /* offset to the classes base if it is an object */
-       USHORT   uiPrevCls;    /* for fixing after access super */
-       USHORT * puiClsTree;   /* remember array of super called ID Tree  */
-       ULONG    ulHolders;    /* number of holders of this array */
+       USHORT     uiDummy;      /* dummy var for binary compatibility with old API */
+       USHORT     uiClass;      /* offset to the classes base if it is an object */
+       USHORT     uiPrevCls;    /* for fixing after access super */
+       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
+       HB_COUNTER ulHolders;    /* number of holders of this array */
    #else
-       USHORT   ulHolders;    /* number of holders of this array */
-       USHORT   uiClass;      /* offset to the classes base if it is an object */
-       USHORT   uiPrevCls;    /* for fixing after access super */
-       USHORT * puiClsTree;   /* remember array of super called ID Tree  */
+       USHORT     ulHolders;    /* number of holders of this array */
+       USHORT     uiClass;      /* offset to the classes base if it is an object */
+       USHORT     uiPrevCls;    /* for fixing after access super */
+       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
    #endif
 #else
-       ULONG    ulHolders;    /* number of holders of this array */
-       USHORT   uiClass;      /* offset to the classes base if it is an object */
-       USHORT   uiPrevCls;    /* for fixing after access super */
-       USHORT * puiClsTree;   /* remember array of super called ID Tree  */
+       HB_COUNTER ulHolders;    /* number of holders of this array */
+       USHORT     uiClass;      /* offset to the classes base if it is an object */
+       USHORT     uiPrevCls;    /* for fixing after access super */
+       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
 #endif
-       #ifndef HB_ARRAY_USE_COUNTER
-          PHB_ARRAY_HOLDER pOwners;
-       #endif
+#ifndef HB_ARRAY_USE_COUNTER
+       PHB_ARRAY_HOLDER pOwners;
+#endif
     } HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
 
     /* Hash utility functions */
@@ -289,15 +289,15 @@
     typedef struct _HB_CODEBLOCK
     {
        char* procname;
-       USHORT lineno;
-       BYTE     *pCode;       /* codeblock pcode */
-       PHB_ITEM pLocals;      /* table with referenced local variables */
-       USHORT   uiLocals;     /* number of referenced local variables */
-       PHB_SYMB pSymbols;     /* codeblocks symbols */
-       ULONG    ulCounter;    /* numer of references to this codeblock */
-       BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
-       PHB_ITEM **pGlobals;
-       USHORT   uLen;
+       USHORT     lineno;
+       BYTE       *pCode;       /* codeblock pcode */
+       PHB_ITEM   pLocals;      /* table with referenced local variables */
+       USHORT     uiLocals;     /* number of referenced local variables */
+       PHB_SYMB   pSymbols;     /* codeblocks symbols */
+       HB_COUNTER ulCounter;    /* numer of references to this codeblock */
+       BOOL       dynBuffer;    /* is pcode buffer allocated dynamically */
+       PHB_ITEM   **pGlobals;
+       USHORT     uLen;
        PHB_BASEARRAY pSelfBase;
     } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
