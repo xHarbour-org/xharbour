@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.28 2004/01/07 19:53:42 peterrees Exp $
+ * $Id: gtwvt.c,v 1.29 2004/01/07 19:57:47 peterrees Exp $
  */
 
 /*
@@ -3065,7 +3065,7 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
           OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
-          if ( iPicture == S_OK)
+          if ( iPicture )
           {
             iPicture->lpVtbl->get_Width( iPicture,&lWidth );
             iPicture->lpVtbl->get_Height( iPicture,&lHeight );
