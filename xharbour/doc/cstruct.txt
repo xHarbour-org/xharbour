@@ -1,0 +1,92 @@
+CLASS C Structure:
+------------------
+
+Syntax:
+-------
+
+   Definition:
+   -----------
+
+   C STRUCTURE <strucName> [Align <nAlign>]
+     MEMBER <memberName>   AS <CTYPEDEF>
+     ...
+   END C STRUCTURE
+
+
+   Usage:
+   ------
+
+   <lValue> := C STRUCTURE <strucName>
+
+   <strucObj>:<memberName> 
+
+
+Properties:
+-----------
+
+   acTypes        -> Array Of CTYPE Definitions of Structure Members.
+   nAlign         -> [READ ONLY] Alignment attribute of the C Structure.
+   SizeOf         -> [READ ONLY] The equivalent of C' sizeof( STRUCTURE ).
+   nId            -> [READ ONLY] Unique ID of this Structure.
+   InternalBuffer -> [READ ONLY] String reprentation of the C Structure memory image.
+
+   [xMember] -> Each Structure Member is represented by a given Property of the same name.
+
+
+Methods:
+--------
+
+   Reset           -> Initializes all Structure Member properties to NIL.
+
+   Buffer( [New] ) -> Optionaly SET the InternalBuffer to a new image, which will automatically
+                      call the DeValue() Method to reflect the change in Member Properties.
+
+                      Return a copy of the InternalBuffer.
+
+   Value           -> Return a newly calculated C Strucure Image which and record it into InternalBuffer.
+
+   DeValue         -> Calculates new values for all Member Properties to reflect the current image of
+                      the C Structure from the InternalBuffer.
+
+                      Return Array of Member Properties values.
+
+   Array           -> Return Array of Member Properties values.
+
+
+PRG Support Functions:
+----------------------
+
+   __ActiveStructure( cStructure, aStructure, nAlign ) -> PP Syntax Support. Registers the new Structure.
+
+                                                          Return the last registered Structure.
+
+   HB_CStructureID( cStructure )                       -> Returns the ID of a given Structure by LITERAL Name.
+
+
+   HB_CStructure( cStructure, aStructure, nAlign )     -> Creates a new Instance of a C Structure Class for the
+                                                          given defintions. If such Structure was already defined
+                                                          it will instanciate an object of the pre-existing class,
+                                                          otherwise it will create new Class matching the definitions
+                                                          and will instanciate the new class.
+
+                                                          Return new object instance of the specified C Structure class.
+
+  HB_CStructureFromID( nId, nAlign )                   -> Creates a new Instance of a C Structure based on the Structure ID.
+
+                                                          Return new object instance of the specified C Structure class.
+
+  HB_SizeOfCStructure( acTypes, nAlign )               -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given specs.
+
+  HB_ArrayToStructure( aValues, acTypes, nAlign )      -> Return a String representation of the C Structure memory image
+                                                          for the given values in array aVales based on given defintions.
+
+  HB_StructureToArray( Buffer, acTypes, nAlign )       -> Return an Array calculated from the given C Structure memory image
+                                                          based on given defintions.
+
+
+
+C Support Functions:
+--------------------
+
+  unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
+  -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given defintions.

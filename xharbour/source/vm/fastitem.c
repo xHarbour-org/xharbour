@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.30 2002/05/02 00:05:03 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.31 2002/05/06 02:52:07 ronpinkas Exp $
  */
 
 /*
@@ -338,7 +338,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
-   pItem->item.asString.value[ ulLen ] = '\0';
+   //pItem->item.asString.value[ ulLen ] = '\0';
 
    return pItem;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: eval.c,v 1.5 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -195,9 +195,6 @@ BOOL hb_evalRelease( PEVALINFO pEvalInfo )
          don't need to be duplicated when passed as argument, one line is
          enough to initiate a call, the number of parameters is not limited.
          [vszakats]
-
-   NOTE: When calling hb_itemDo() with no arguments for the Harbour item being
-         evaluated, you must use '(PHB_ITEM *) 0' as the third parameter.
 */
 
 PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
@@ -215,21 +212,23 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          if( pDynSym )
          {
             ULONG ulParam;
-            va_list va;
-
-            va_start( va, ulPCount );
 
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
 
-            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            if( ulPCount )
             {
-               hb_vmPush( va_arg( va, PHB_ITEM ) );
+               va_list va;
+
+               va_start( va, ulPCount );
+               for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+               {
+                  hb_vmPush( va_arg( va, PHB_ITEM ) );
+               }
+               va_end( va );
             }
 
             hb_vmDo( ( unsigned short ) ulPCount );
-
-            va_end( va );
 
             pResult = hb_itemNew( NULL );
             hb_itemForwardValue( pResult, &hb_stack.Return );
@@ -242,15 +241,23 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
       else if( HB_IS_BLOCK( pItem ) )
       {
          ULONG ulParam;
-         va_list va;
 
-         va_start( va, ulPCount );
          hb_vmPushSymbol( &hb_symEval );
          hb_vmPush( pItem );
-         for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-            hb_vmPush( va_arg( va, PHB_ITEM ) );
+
+         if( ulPCount )
+         {
+            va_list va;
+
+            va_start( va, ulPCount );
+            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            {
+               hb_vmPush( va_arg( va, PHB_ITEM ) );
+            }
+            va_end( va );
+         }
+
          hb_vmSend( ( unsigned short ) ulPCount );
-         va_end( va );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &hb_stack.Return );
@@ -258,21 +265,23 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
       else if( HB_IS_SYMBOL( pItem ) )
       {
          ULONG ulParam;
-         va_list va;
-
-         va_start( va, ulPCount );
 
          hb_vmPushSymbol( pItem->item.asSymbol.value );
          hb_vmPushNil();
 
-         for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+         if( ulPCount )
          {
-            hb_vmPush( va_arg( va, PHB_ITEM ) );
+            va_list va;
+
+            va_start( va, ulPCount );
+            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            {
+               hb_vmPush( va_arg( va, PHB_ITEM ) );
+            }
+            va_end( va );
          }
 
          hb_vmDo( ( unsigned short ) ulPCount );
-
-         va_end( va );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &hb_stack.Return );
@@ -292,9 +301,6 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
-
-   NOTE: When calling hb_itemDoC() with no arguments for the Harbour function
-         being called, you must use '(PHB_ITEM *) 0' as the third parameter.
 */
 
 PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
@@ -310,21 +316,23 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
       if( pDynSym )
       {
          ULONG ulParam;
-         va_list va;
-
-         va_start( va, ulPCount );
 
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
 
-         for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+         if( ulPCount )
          {
-            hb_vmPush( va_arg( va, PHB_ITEM ) );
+            va_list va;
+
+            va_start( va, ulPCount );
+            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            {
+               hb_vmPush( va_arg( va, PHB_ITEM ) );
+            }
+            va_end( va );
          }
 
          hb_vmDo( ( unsigned short ) ulPCount );
-
-         va_end( va );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &hb_stack.Return );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.266 2002/06/12 11:53:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.267 2002/06/13 22:15:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,123 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-13 15:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+  * include/hbapi.h
+    + Added: hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+
+    /*
+       NOTE: I belive few individuals wrote variations of this function
+       PLEASE standardise your code with this API documented function.
+    */
+
+  * source/vm/eval.c
+    ! Fixed hb_itemDo() and hb_itemDoC() to not require 3rd parameter.
+
+  * source/vm/fastitem.c
+    ! Fixed hb_itemPutCPtr() to NOT overiride last char with a NULL Terminator.
+
+  * source/vm/hvm.c
+    ! Fixed minor bug in HB_P_LOCALNEARSETINT and HB_P_ADDINT
+
+  * source/vm/arrayshb.c
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    + Added support for nested structures.
+
+  * tests/tstcstru.prg
+    * Modified the sample to demo Nested Structures.
+
+  + doc/cstruct.txt
+    + New documention for C Structure support.
+
+  /*
+     Syntax:
+     -------
+
+        Definition:
+        -----------
+        C STRUCTURE <strucName> [Align <nAlign>]
+          MEMBER <memberName>   AS <CTYPEDEF>
+          ...
+        END C STRUCTURE
+
+        Usage:
+        ------
+
+        <lValue> := C STRUCTURE <strucName>
+
+        <strucObj>:<memberName>
+
+
+     CLASS C Structure:
+     ------------------
+
+     Properties:
+
+        acTypes        -> Array Of CTYPE Definitions of Structure Members.
+        nAlign         -> [READ ONLY] Alignment attribute of the C Structure.
+        SizeOf         -> [READ ONLY] The equivalent of C' sizeof( STRUCTURE ).
+        nId            -> [READ ONLY] Unique ID of this Structure.
+        InternalBuffer -> [READ ONLY] String reprentation of the C Structure memory image.
+
+        [xMember] -> Each Structure Member is represented by a given Property of the same name.
+
+     Methods:
+
+        Reset           -> Initializes all Structure Member properties to NIL.
+
+        Buffer( [New] ) -> Optionaly SET the InternalBuffer to a new image, which will automatically
+                           call the DeValue() Method to reflect the change in Member Properties.
+
+                           Return a copy of the InternalBuffer.
+
+        Value           -> Return a newly calculated C Strucure Image which and record it into InternalBuffer.
+
+        DeValue         -> Calculates new values for all Member Properties to reflect the current image of
+                           the C Structure from the InternalBuffer.
+
+                           Return Array of Member Properties values.
+
+        Array           -> Return Array of Member Properties values.
+
+     PRG Support Functions:
+
+        __ActiveStructure( cStructure, aStructure, nAlign ) -> PP Syntax Support. Registers the new Structure.
+
+                                                               Return the last registered Structure.
+
+        HB_CStructureID( cStructure )                       -> Returns the ID of a given Structure by LITERAL Name.
+
+
+        HB_CStructure( cStructure, aStructure, nAlign )     -> Creates a new Instance of a C Structure Class for the
+                                                               given defintions. If such Structure was already defined
+                                                               it will instanciate an object of the pre-existing class,
+                                                               otherwise it will create new Class matching the definitions
+                                                               and will instanciate the new class.
+
+                                                               Return new object instance of the specified C Structure class.
+
+       HB_CStructureFromID( nId, nAlign )                   -> Creates a new Instance of a C Structure based on the Structure ID.
+
+                                                               Return new object instance of the specified C Structure class.
+
+       HB_SizeOfCStructure( acTypes, nAlign )               -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given specs.
+
+       HB_ArrayToStructure( aValues, acTypes, nAlign )      -> Return a String representation of the C Structure memory image
+                                                               for the given values in array aVales based on given defintions.
+
+       HB_StructureToArray( Buffer, acTypes, nAlign )       -> Return an Array calculated from the given C Structure memory image
+                                                               based on given defintions.
+
+
+     C Support Functions:
+
+       unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
+       -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given defintions.
+
+  */
 
 2002-06-13 19:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/console.c

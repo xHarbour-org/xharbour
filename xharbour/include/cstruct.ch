@@ -1,5 +1,5 @@
 /*
- * $Id: hbctypes.ch,v 1.0 2002/05/23 20:12:05 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.1 2002/06/12 11:53:06 ronpinkas Exp $
  */
 
 /*
@@ -77,10 +77,13 @@
 
 #define CTYPE_VOID_PTR 6
 
+#define CTYPE_STRUCTURE_PTR 1000
+
 // Excluse from C compilation
 #ifdef _SET_CH
-   #command C STRUCTURE <!stru!> => INIT PROCEDURE __INIT_<stru>; MEMVAR <stru>; PUBLIC <stru> := __ActiveStructure( { #<stru> } )
+   #command C STRUCTURE <!stru!> [ALIGN <align> ] => INIT PROCEDURE __INIT_<stru>; MEMVAR <stru>; PUBLIC <stru> := __ActiveStructure( #<stru>, { #<stru> }, <align> )
    #command MEMBER <!elem!> AS <type> => aAdd( __ActiveStructure(), {#<elem>, <type> } )
+   #command MEMBER <!elem!> AS C STRUCTURE <!stru!> => aAdd( __ActiveStructure(), { #<elem>, HB_CStructureID( #<stru> ) } )
    #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
-   #translate := C STRUCTURE <!stru!> => := HB_CStructure( M-><stru> )
+   #translate := C STRUCTURE <!stru!> => := HB_CStructure( #<stru>, M-><stru> )
 #endif

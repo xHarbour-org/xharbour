@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.76 2002/05/21 00:27:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.77 2002/05/22 19:24:18 horacioroldan Exp $
  */
 
 /*
@@ -1479,14 +1479,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             }
             else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
             {
+               pLocal->type = HB_IT_INTEGER;
                pLocal->item.asInteger.value = ( int ) dNewVal;
             }
             else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
             {
+               pLocal->type = HB_IT_LONG;
                pLocal->item.asLong.value = ( long ) dNewVal;
             }
             else
             {
+               pLocal->type = HB_IT_DOUBLE;
                pLocal->item.asDouble.value = dNewVal;
                pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
                pLocal->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
@@ -1600,14 +1603,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             }
             else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
             {
+               pTop->type = HB_IT_INTEGER;
                pTop->item.asInteger.value = ( int ) dNewVal;
             }
             else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
             {
+               pTop->type = HB_IT_LONG;
                pTop->item.asLong.value = ( long ) dNewVal;
             }
             else
             {
+               pTop->type = HB_IT_DOUBLE;
                pTop->item.asDouble.value = dNewVal;
                pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
@@ -4655,17 +4661,24 @@ void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumber(%lf, %d)", dNumber, iDec));
 
+   //printf( "%i\n", (int) dNumber );
+
    if( iDec || iType1 & HB_IT_DOUBLE || iType2 & HB_IT_DOUBLE )
+   {
       hb_vmPushDouble( dNumber, iDec );
-
+   }
    else if( SHRT_MIN <= dNumber && dNumber <= SHRT_MAX )
+   {
       hb_vmPushInteger( ( int ) dNumber );
-
+   }
    else if( LONG_MIN <= dNumber && dNumber <= LONG_MAX )
+   {
       hb_vmPushLong( ( long ) dNumber );
-
+   }
    else
+   {
       hb_vmPushDouble( dNumber, hb_set.HB_SET_DECIMALS );
+   }
 }
 
 void hb_vmPushInteger( int iNumber )

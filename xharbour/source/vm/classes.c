@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.12 2002/03/08 03:57:18 ronpinkas Exp $
+ * $Id: classes.c,v 1.13 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -1803,6 +1803,40 @@ HB_FUNC( __OBJCLONE )
    }
 }
 
+void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
+{
+   PHB_DYNS pMsgSym = hb_dynsymFindName( sMsg );
+
+   //printf( "%s %p\n", sMsg, pMsgSym );
+
+   if( pMsgSym )
+   {
+      hb_vmPushSymbol( pMsgSym->pSymbol );
+      hb_vmPush( pObj );
+
+      if( ulArg )
+      {
+         unsigned long i;
+
+         va_list ap;
+
+         va_start( ap, ulArg );
+
+         for( i = 0; i < ulArg; i++ )
+         {
+            hb_vmPush( va_arg( ap, PHB_ITEM ) );
+         }
+
+         va_end( ap );
+      }
+
+      hb_vmSend( ulArg );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__ObjSendMsg()", 0 );
+   }
+}
 
 /*
  * <xRet> = __objSendMsg( <oObj>, <cSymbol>, <xArg,..>
