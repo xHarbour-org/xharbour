@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.52 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: estack.c,v 1.53 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -183,6 +183,9 @@ void hb_stackInit( void )
    /*JC1: Under threads, the stack is not present until it is created here. Notice that
      calling xgrab is an error also WITHOUT threads, as the xgrab routine accesses
      a variable (the stack) that cannot be initialized yet */
+   
+   hb_stack.pItems = NULL;  // tell xgrab we are not ready
+   
    #ifndef HB_THREAD_SUPPORT
    hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
 
@@ -199,7 +202,9 @@ void hb_stackInit( void )
 
    // other data to be initialized under MT
    #else
-      hb_threadInit();
+   hb_ht_stack = 0; // signal xgrab we are not ready
+   hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
+   hb_ht_stack = &hb_stack; // then this, preparing the head stack
    #endif
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1820 2003/12/04 17:55:50 druzus Exp $
+ * $Id: ChangeLog,v 1.1821 2003/12/05 01:38:27 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-05 05:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/fm.c
+  * source/vm/estack.c
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    ! initialiation of thread and stack is now the same under ST and MT;
+      this gives way for optimization of memory control management.
 
 2003-12-05 02:37 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/fm.c
