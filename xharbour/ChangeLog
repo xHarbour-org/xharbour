@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3031 2004/06/06 23:53:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3031 2004/06/06 03:10:40 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-06 14:05 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/odbc/hdo_odbc.prg
+    ! Fixed a bug in HDO_ODBC_Reader():FieldAttr().
 
 2004-06-06 23:53 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * source/rtl/ttextlin.prg

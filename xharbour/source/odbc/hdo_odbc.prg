@@ -348,7 +348,7 @@ METHOD FieldAttr( cField, nAttr ) CLASS HDO_ODBC_Reader
 
    aField := ::aFields[ cField ]
 
-RETURN aFields[ nAttr ]
+RETURN aField[ nAttr ]
 
 METHOD Read() CLASS HDO_ODBC_Reader
 
