@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.16 2004/04/03 00:27:03 druzus Exp $
+ * $Id: macro.slx,v 1.17 2004/06/09 06:26:50 ronpinkas Exp $
  */
 
 /*
@@ -373,6 +373,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       else
       {
          hb_macroError( EG_SYNTAX, YYLEX_PARAM );
+         iRet = -1;
       }
    }
 

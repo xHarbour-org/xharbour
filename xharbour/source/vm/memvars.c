@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.82 2004/04/30 16:11:04 ronpinkas Exp $
+ * $Id: memvars.c,v 1.83 2004/06/08 06:10:22 ronpinkas Exp $
  */
 
 /*
@@ -200,9 +200,16 @@ void hb_memvarsRelease( void )
             }
          #endif
 
-         if( --( s_globalTable[ ulCnt ].counter ) == 0 && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         if( --( s_globalTable[ ulCnt ].counter ) == 0 )
          {
-            if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
+            {
+               if( HB_IS_STRING( &s_globalTable[ ulCnt ].item ) )
+               {
+                  hb_itemReleaseString( &s_globalTable[ ulCnt ].item );
+               }
+            }
+            else if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
                hb_itemClear( &s_globalTable[ ulCnt ].item );
             }
@@ -231,6 +238,7 @@ void hb_memvarsRelease( void )
 void hb_memvarsInit( HB_STACK *pStack )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear(%p)", pStack));
+
    pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize = TABLE_INITHB_VALUE;
@@ -256,9 +264,16 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )
          {
-            if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
+            if( pStack->globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
+            {
+               if( HB_IS_STRING( &pStack->globalTable[ ulCnt ].item ) )
+               {
+                  hb_itemReleaseString( &pStack->globalTable[ ulCnt ].item );
+               }
+            }
+            else if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
                hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
             }
@@ -1152,6 +1167,8 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
             {
                PHB_ITEM pRef;
 
+               s_globalTable[ pDynVar->hMemvar ].counter = 0;
+
                pRef = &s_globalTable[ pDynVar->hMemvar ].item;
 
                if( HB_IS_COMPLEX( pRef ) )
@@ -1218,6 +1235,8 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          {
             if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) == 0 )
             {
+               s_globalTable[ pDynVar->hMemvar ].counter = 0;
+
                if( HB_IS_COMPLEX( pRef ) )
                {
                   hb_itemClear( pRef );
@@ -1230,6 +1249,8 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          }
          else if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) )
          {
+            s_globalTable[ pDynVar->hMemvar ].counter = 0;
+
             if( HB_IS_COMPLEX( pRef ) )
             {
                hb_itemClear( pRef );
