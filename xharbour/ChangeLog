@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1735 2003/11/17 02:15:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1736 2003/11/17 10:58:47 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-17 09:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Few corrections to recent optimization of PP_CompileLine()
+
+  * tests/pptest.prg
+    + Added few more tests
 
 2003-11-17 08:52 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/tobject.prg
@@ -18,7 +25,7 @@
   * tests/pp.txt
     + Added support for BEGIN SEQUENCE [RECOVER USING [<idRecover>]] END [SEQUENCE]
     + Added support for TRY [CATCH [<xCatcher>]] END
-    % Optimized PP_ExecProcedure()
+    % Optimized PP_ExecProcedure() and PP_CompileLine()
 
   * tests/pp.txt
     * Updated.

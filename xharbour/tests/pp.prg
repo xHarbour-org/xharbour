@@ -1300,6 +1300,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
          ExtractLeadingWS( @sBlock )
          DropTrailingWS( @sBlock )
 
+         TraceLog( sBlock )
+
          IF ! Empty( sBlock )
             IF sBlock = "#line"
                LOOP
@@ -1462,12 +1464,14 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__EXIT"
 
-                     sBlock := ""
                      IF s_nCompLoop == 0
                         Alert( [EXIT with no loop in sight!] )
                      ELSE
-                        aAdd( s_aLoopJumps[ s_nCompLoop ][2], Len( aProcedures[ nProcId ][2] ) + 1 ) // Address of line to later place unconditional Jump instruction into.
+                        aAdd( aProcedures[ nProcId ][2], { 0, PP_OP_JUMP, nLine } ) // Place holder for unconditional Jump to END.
+                        aAdd( s_aLoopJumps[ s_nCompLoop ][2], Len( aProcedures[ nProcId ][2] ) ) // Address of line to later place unconditional Jump instruction into.
                      ENDIF
+
+                     LOOP
 
                   ELSEIF sBlock = "PP__ENDDO"
                      s_nFlowId--
@@ -1495,16 +1499,17 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      aSize( s_acFlowType, s_nFlowId )
                      s_acFlowType[ s_nFlowId ] := "C"
 
-                     sBlock := ""//SubStr( sBlock, 12 )
                      s_nCompIf++
                      aSize( s_aIfJumps, s_nCompIf )
                      s_aIfJumps[ s_nCompIf ] := { 0, {}, "C", .F. } // Address of line to later place conditional Jump instruction into.
 
+                     LOOP
+
                   ELSEIF sBlock = "PP__CASE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        sBlock := ""
                         Alert( [CASE does not match DO CASE] )
+                        LOOP
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
                            aAdd( aProcedures[ nProcId ][2], { 0, PP_OP_JUMP, nLine } ) // Place holder for unconditional Jump to END.
@@ -1518,16 +1523,20 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__OTHERWISE"
 
-                     sBlock := ""
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
                         Alert( [OTHERWISE does not match DO CASE] )
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
+
+                        aAdd( aProcedures[ nProcId ][2], { 0, PP_OP_JUMP, nLine } ) // Place holder for unconditional Jump to END.
+
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
-                           aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) + 1 // Patching the previous conditional Jump Instruction
-                           s_aIfJumps[ s_nCompIf ][1] := Len( aProcedures[ nProcId ][2] ) + 1 // Address of line to later place Jump instruction into.
+                           aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
+                           s_aIfJumps[ s_nCompIf ][1] := Len( aProcedures[ nProcId ][2] ) // Address of line to later place Jump instruction into.
                         ENDIF
                      ENDIF
+
+                     LOOP
 
                   ELSEIF sBlock = "PP__ENDCASE"
                      s_nFlowId--
@@ -1579,15 +1588,18 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__ELSE"
 
-                     sBlock := ""
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
                         Alert( [ELSE does not match IF] )
-                        LOOP
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
-                        aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) + 1 // Patching the prebvious conditional Jump Instruction
-                        s_aIfJumps[ s_nCompIf ][1] := Len( aProcedures[ nProcId ][2] ) + 1 // Address of line to later place Jump instruction into.
+
+                        aAdd( aProcedures[ nProcId ][2], { 0, PP_OP_JUMP, nLine } ) // Place holder for unconditional Jump to END.
+
+                        aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the prebvious conditional Jump Instruction
+                        s_aIfJumps[ s_nCompIf ][1] := Len( aProcedures[ nProcId ][2] ) // Address of line to later place Jump instruction into.
                      ENDIF
+
+                     LOOP
 
                   ELSEIF sBlock = "PP__ENDIF"
                      s_nFlowId--
@@ -1696,7 +1708,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   aProcedures[nProcId] := { sSymbol, {} }
                ENDIF
 
-               //TraceLog( sBlock )
+               TraceLog( sBlock )
                aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
             ENDIF
          ENDIF

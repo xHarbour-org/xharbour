@@ -45,6 +45,18 @@ PROCEDURE Main
         ? "Err"
    ENDCASE
 
+   FOR Counter = 1 TO 10
+     ? Counter
+     IF Counter == 1
+        Counter++
+        LOOP
+     ENDIF
+
+     IF Counter == 6
+        EXIT  
+     ENDIF 
+   NEXT
+
    REPLACE First WITH "From PP"
 
    ? FIELD->First
