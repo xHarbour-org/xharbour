@@ -270,7 +270,7 @@ HB_FUNC( RECVFROM )
 
 // syntax: select
 
-HB_FUNC( SELECT )
+HB_FUNC( SOCKSELECT )
 {
    fd_set   *readfds   ;
    fd_set   *writefds  ;
