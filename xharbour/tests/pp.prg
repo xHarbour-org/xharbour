@@ -8331,7 +8331,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks )
    ENDDO
    IF Len( sLines ) > nClose
       aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1 ) ) ) )
-      TraceLog( Len( asLines) , aTail( asLines ) )
+      //TraceLog( Len( asLines) , aTail( asLines ) )
    ENDIF
 
    //ErrorBlock( {|oErr| RP_PPText_Err( oErr, asLines[nLine], nLine ) } )
