@@ -6,25 +6,25 @@
 #Define RCF_MDIFRAME   2
 #Define RCF_MDICHILD   4
 
+//----------------------------------------------------------------------------
+
 CLASS TForm FROM TWindow
    
    METHOD New()
    METHOD Add()
    METHOD ChildFromHandle( hHandle )
+   METHOD ChildFromId( hHandle )
 ENDCLASS
 
-//----------------------------------------------------------------------------//
-
 METHOD New( oParent ) CLASS TForm
-
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .F.
    ::Style     := WS_OVERLAPPEDWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
+   ::lControl  := .F.
    ::ExStyle   := 0
-   
 return( super:New( oParent ) )
 
 
@@ -75,3 +75,22 @@ return( super:New( oParent ) )
 
 
 //------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+
+CLASS TPanel FROM TForm
+   METHOD New()
+ENDCLASS
+
+METHOD New( oParent ) CLASS TForm
+   super:New( oParent )
+   ::WndProc   := 'FormProc'
+   ::Msgs      := -1
+   ::FrameWnd  := .F.
+   ::Style     := WS_POPUP + WS_CAPTION + DS_MODALFRAME + WS_VISIBLE + DS_ABSALIGN
+   ::FormType  := RCF_DIALOG
+   ::lRegister := .f.
+   ::lControl  := .F.
+   ::Modal     := .F.
+return( self )
+

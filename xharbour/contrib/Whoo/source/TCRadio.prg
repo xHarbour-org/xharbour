@@ -1,5 +1,6 @@
 #include "windows.ch"
 #include "HbClass.ch"
+#include "what32.ch"
 #include "debug.ch"
 
 
@@ -20,5 +21,5 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TRadio
    ::Height    := IFNIL( nHeight, IFNIL( ::height, 20, ::height), nHeight)
    ::Name      := 'button'
    ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_AUTORADIOBUTTON
-return( super:new( oParent  ) )
+return( super:new( oParent ) )
 

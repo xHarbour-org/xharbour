@@ -81,7 +81,7 @@ return( super:OnCommand() )
 
 //-------------------------------------------------------------------------------------------
 
-CLASS SubForm1 FROM TForm
+CLASS SubForm1 FROM TPanel
    
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::left    := 0,;
@@ -124,7 +124,7 @@ METHOD CreateSub() CLASS SubForm1
    ::SetWindowMenu()
 
 
-   ::Add('TestButton',  TButton():New( self, 'OOPS',                       500,   0,  0, 200, 100 ) ) 
+   ::Add('TestButton',  TButton():New( self, 'This is a BUTTON',           500,   0,  0, 200, 100 ) ) 
    ::Add('TestEdit',      TEdit():New( self, 'This is an edit control',    501, 210,  0, 200,  20 ) )
    ::Add('TestCombo', TComboBox():New( self, 'This is a ComboBox control', 502, 210, 30, 200, 100 ) )
    ::Add('TestText',    TStatic():New( self, 'This is a Static control',   503, 210, 55, 200,  20 ) )
@@ -133,8 +133,8 @@ METHOD CreateSub() CLASS SubForm1
 
    ::TestButton:SetFocus()
 
-   oMask:=oCtrlMask():New( ::TestButton )
-   ::Add('mask', oMask)
+//   oMask:=oCtrlMask():New( ::TestButton )
+//   ::Add('mask', oMask)
 
 return( super:OnCreate() )
 

@@ -1,5 +1,6 @@
 #include "windows.ch"
 #include "HbClass.ch"
+#include "what32.ch"
 #include "debug.ch"
 
 CLASS TEdit FROM TControl
