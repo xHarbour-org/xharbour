@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.10 2003/11/22 21:35:26 druzus Exp $
+ * $Id: idle.c,v 1.11 2003/12/18 14:47:54 jonnymind Exp $
  */
 
 /*
@@ -262,7 +262,7 @@ ULONG hb_idleAddFunc( PHB_ITEM pBlock )
    }
    else
    {
-      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+      return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
    }
 }
 
