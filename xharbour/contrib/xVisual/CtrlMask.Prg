@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.44 2002/11/17 09:03:45 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.45 2002/11/18 06:24:20 what32 Exp $
  */
 
 /*
@@ -584,9 +584,9 @@ METHOD WMLButtonDown( wParam, x, y )
       IF lFound
          ::ChangeInspector( 0 )
 
-//         ::HintWindow:Activate(1)
-//         ::HintWindow:TrackHint(1)
-//         ::lHintActive := .T.
+         ::HintWindow:Activate(1)
+         ::HintWindow:TrackHint(1)
+         ::lHintActive := .T.
       ELSE
          // Only if MOUSE Click, NOT simulated
          ::ChangeInspector( 1 )
@@ -688,9 +688,9 @@ METHOD WMMouseMove( aParam, x, y )
            DrawFocusRect( hDC, aTipRect ) //::aEditRect )
          ENDIF
 
-//         ::HintWindow:SetTitle(0,"")
-//         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
-//                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
+         ::HintWindow:SetTitle(0,"")
+         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
+                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
 
          UpdateWindow( ::FParent:handle )
 
@@ -737,10 +737,10 @@ METHOD WMMouseMove( aParam, x, y )
                ENDIF
 
                IF oLastObj == NIL .OR. hChild != oLastObj:handle .OR. ::lHintActive
-//                  ::HintWindow:Activate(1)
-//                  ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
-//                  ::HintWindow:SetText( "Object: " + oObj:name )
-//                  ::lHintActive := .F.
+                  ::HintWindow:Activate(1)
+                  ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
+                  ::HintWindow:SetText( "Object: " + oObj:name )
+                  ::lHintActive := .F.
                   oLastObj      := oObj
                endif
 
@@ -749,7 +749,7 @@ METHOD WMMouseMove( aParam, x, y )
          NEXT
          IF !lFound
             oLastObj := NIL
-//            ::HintWindow:Activate(0)
+            ::HintWindow:Activate(0)
             WinSetCursor( LoadCursor(, IDC_ARROW ) )
          ENDIF
       ELSE
@@ -799,7 +799,7 @@ METHOD WMLButtonUp( wParam, x, y )
       ELSE
         DrawFocusRect( hDC, ::aEditRect )
       ENDIF
-//      ::HintWindow:Activate(0)
+      ::HintWindow:Activate(0)
 
    ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.94 2002/11/19 00:47:06 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.95 2002/11/19 03:47:40 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -159,8 +159,9 @@ METHOD WMCreate() CLASS TFormEdit
    oTree:Select()
 
 
-//   ::oMask:Hint:=""
-//   ::oMask:HintWindow:SetMaxTipWidth(10)
+   ::oMask:Hint:= ""
+   ::oMask:HintWindow:SetMaxTipWidth(10)
+
 RETURN NIL
 
 //--------------------------------------------------------------------------------------------
@@ -234,9 +235,9 @@ RETURN(NIL)
 
 METHOD CreateControl( aRect ) CLASS TFormEdit
 
-   LOCAL oObj
+   LOCAL oObj, oBand
    LOCAL nInd:=0
-   LOCAL cName
+   LOCAL cName, cClass, n
 
    IF ! Empty( ::CtrlName )
 
@@ -246,68 +247,126 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
 
       cName:=::GetUniquePropName(::CtrlName)
 
-      oObj := &( "T" + AllTrim( ::CtrlName ) + "()" )
-      /*
-      DO CASE
-      CASE ::CtrlName == "Button"
-         oObj := TButton()
-         
-      CASE ::CtrlName == "Edit"
-         oObj := TEdit()
-
-      CASE ::CtrlName=="Label"
-         oObj := TStatic()
-
-      CASE ::CtrlName=="CheckBox"
-         oObj := TCheck()
-
-      CASE ::CtrlName=="RadioButton"
-         oObj := TRadio()
-
-      CASE ::CtrlName=="ComboBox"
-         oObj := TComboBox()
-
-      CASE ::CtrlName=="ListBox"
-         oObj := TListBox()
-
-      CASE ::CtrlName=="StatusBar"
-         IF !("2" $ cName) // only one status bar
-           oObj := TStatusBar()
-         ENDIF
-
-      CASE ::CtrlName=="TabControl"
-         oObj := TTabControl()
-
-      CASE ::CtrlName=="GroupBox"
-         oObj := TGroupBox()
-
-      CASE ::CtrlName=="TreeView"
-         oObj := TTreeView()
-
-      CASE ::CtrlName=="CoolBar"
-         IF !("2" $ cName) // only one CoolBar
-            oObj := TCoolBar()
-         ENDIF
-
-      CASE ::CtrlName=="ToolBar"
-         oObj := TToolBar()
-
-      CASE ::CtrlName=="ProgressBar"
-         oObj := TProgressBar()
-
-      OTHERWISE // unknown name
-         ::CtrlName    :=NIL
-         ::oMask:Cursor:=NIL
-      ENDCASE
+/*
+      cClass := "T" + AllTrim( ::CtrlName )
+      n := HB_FuncPtr( cClass )
+      oObj := HB_Exec( n )
 */
-      IF oObj != NIL
-      
-         oObj:Create( self )
-         oObj:FCaption := oObj:Name
-         oObj:FLeft    := aRect[1]
-         oObj:FTop     := aRect[2]
-         oObj:SetParent( Self )
 
+      DO CASE
+         CASE ::CtrlName == "Button"
+            oObj := TButton():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+            
+         CASE ::CtrlName == "Edit"
+            oObj := TEdit():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="Label"
+            oObj := TStatic():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="CheckBox"
+            oObj := TCheck():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="RadioButton"
+            oObj := TRadio():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="ComboBox"
+            oObj := TComboBox():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="ListBox"
+            oObj := TListBox():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="StatusBar"
+            IF !("2" $ cName) // only one status bar
+               oObj := TStatusBar():Create( self )
+               oObj:FCaption := oObj:Name
+               oObj:FLeft    := aRect[1]
+               oObj:FTop     := aRect[2]
+               oObj:SetParent( Self )
+            ENDIF
+
+         CASE ::CtrlName=="TabControl"
+            oObj := TTabControl():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+   
+         CASE ::CtrlName=="GroupBox"
+            oObj := TGroupBox():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="TreeView"
+            oObj := TTreeView():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+         CASE ::CtrlName=="CoolBar"
+            IF !("2" $ cName) // only one CoolBar
+               oObj := TCoolBar():Create( self )
+               oObj:FCaption := oObj:Name
+               oObj:SetParent( Self )
+               
+               oBand := TCoolBand():Create( oObj )
+               oBand:MinHeight := 28
+            ENDIF
+
+         CASE ::CtrlName=="ToolBar"
+            oObj := TToolBar():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+   
+         CASE ::CtrlName=="ProgressBar"
+            oObj := TProgressBar():Create( self )
+            oObj:FCaption := oObj:Name
+            oObj:FLeft    := aRect[1]
+            oObj:FTop     := aRect[2]
+            oObj:SetParent( Self )
+
+            oObj:Position := 50
+            oObj:Step := 10
+            oObj:StepIt()
+
+         OTHERWISE // unknown name
+            ::CtrlName    :=NIL
+            ::oMask:Cursor:=NIL
+      ENDCASE
+
+      IF oObj != NIL
          ::SetControl( oObj )
       ENDIF
    ENDIF
@@ -525,7 +584,7 @@ RETURN Self
 //----------------------------------------------------------------------------//
 METHOD XFMReflect() CLASS TFormEdit
 
-   LOCAL cTExt := "", cLine, aVar, XFMControl
+   LOCAL cText := "", cLine, aVar, XFMControl
 
    FOR EACH cLine IN ::aXFM[ XFM_Header ]
       cText += ( cLine + CRLF )
@@ -560,8 +619,11 @@ METHOD XFMReflect() CLASS TFormEdit
       cText += ( cLine + CRLF )
    NEXT
 
-   //TraceLog( cText )
-
+   ObjEdit:SourceEdit:aText := {''}
+   ObjEdit:SourceEdit:Line  := 1
+   ObjEdit:SourceEdit:Col   := 1
+   ObjEdit:SourceEdit:Lines := 1
+   
    ObjEdit:SourceEdit:SetText( cText )
 
 RETURN Self

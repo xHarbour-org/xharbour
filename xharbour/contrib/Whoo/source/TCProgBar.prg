@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.12 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.13 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -32,6 +32,7 @@
 #Include "debug.ch"
 #INCLUDE "WinGdi.ch"
 #INCLUDE "progbar.ch"
+#INCLUDE "classex.ch"
 
 CLASS TProgressBar FROM TCustomControl
 
@@ -40,8 +41,9 @@ CLASS TProgressBar FROM TCustomControl
    DATA FWidth  PROTECTED   INIT  160
    DATA FHeight PROTECTED   INIT   16
 
+   PROPERTY Position READ FPosition WRITE SetPosition DEFAULT 50
+
    DATA Max      INIT  100
-   DATA Position INIT  0
    DATA Step     INIT  1
 
    DATA bkColor  INIT GetSysColor(COLOR_BTNFACE)
@@ -65,20 +67,38 @@ CLASS TProgressBar FROM TCustomControl
    METHOD DrawText()
    METHOD SetBkColor()
    METHOD SetBarColor()
-   METHOD WMCreate() INLINE ::SendMessage( PBM_SETRANGE, 0, ::Max ),;
-                            ::SendMessage( PBM_SETSTEP, ::Step, 0),;
-                            ::SetPosition(50),nil
-
+   METHOD StepIt()   INLINE HB_QSelf():SendMessage( PBM_STEPIT, 0, 0 )
+   METHOD WMCreate()
 ENDCLASS
 
-METHOD SetPosition(n) CLASS TProgressBar
+
+
+METHOD WMCreate() CLASS TProgressBar
+ 
+   view ::FHandle
+   
+   SendMessage( ::FHandle, PBM_SETRANGE, 0, ::Max )
+   SendMessage( ::FHandle, PBM_SETSTEP, ::Step, 0)
+   ::SetPosition( ::FPosition )
+
+RETURN Self
+
+
+
+METHOD SetPosition( n ) CLASS TProgressBar
+
    DEFAULT n TO 0
-   ::position := n
-   ::SendMessage( PBM_SETPOS, 20, 0 )
-   IF ::Caption!="".and.AND(GetWindowLong(::Handle,GWL_STYLE),PBS_SMOOTH)>0
+
+   ::FPosition := n
+
+   SendMessage( ::FHandle, PBM_SETPOS, n, 0 )
+   
+   IF ::FCaption!="" .AND. AND( GetWindowLong( ::FHandle, GWL_STYLE ), PBS_SMOOTH ) > 0
       ::DrawText()
    END
-   UpdateWindow( ::handle )
+
+   UpdateWindow( ::FHandle )
+   
 RETURN(self)
 
 METHOD DrawText() CLASS TProgressBar

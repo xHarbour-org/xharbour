@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.30 2002/11/17 09:03:41 what32 Exp $
+ * $Id: TCRebar.prg,v 1.31 2002/11/17 23:43:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -170,8 +170,9 @@ METHOD Create( oOwner ) CLASS TCoolBand
    ::Parent := oOwner
    ::oStruct IS REBARBANDINFO
 
+   ::oStruct:hwndChild  := 0
    ::oStruct:cbSize     := ::oStruct:sizeof()
-   ::oStruct:fMask      := RBBIM_STYLE
+   ::oStruct:fMask      := RBBIM_STYLE + RBBIM_CHILD
    ::oStruct:fStyle     := RBBS_GRIPPERALWAYS + RBBS_NOVERT
 
    ::Index := oOwner:SendMessage( RB_GETBANDCOUNT, 0, 0 )

@@ -9,9 +9,7 @@ Procedure Main()
 
    Application := Application():Initialize()
 
-   //Application:CreateFrame( 'MainFrame', TFrame() )
-
-   Application:CreateForm( @Form1, TForm1(), Application )
+   Application:CreateForm( TForm1(), @Form1 )
 
    Application:Run()
 
