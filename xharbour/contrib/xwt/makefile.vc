@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.vc,v 1.2 2003/09/25 06:01:54 paultucker Exp $
 #
 
 #
@@ -149,7 +149,6 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\framewindow.obj \
    $(OBJ_DIR)\grid.obj \
    $(OBJ_DIR)\hex.obj \
-   $(OBJ_DIR)\hpane.obj \
    $(OBJ_DIR)\image.obj \
    $(OBJ_DIR)\inputmask.obj \
    $(OBJ_DIR)\label.obj \
@@ -166,7 +165,6 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\treeitem.obj \
    $(OBJ_DIR)\treelist.obj \
    $(OBJ_DIR)\viewport.obj \
-   $(OBJ_DIR)\vpane.obj \
    $(OBJ_DIR)\widget.obj \
    $(OBJ_DIR)\window.obj
 

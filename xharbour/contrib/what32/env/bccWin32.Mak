@@ -2,13 +2,13 @@
 OUTDIR=build
 OBJDIR=obj\b32
 SRCDIR=source
-LIBDIR=lib\b32
+LIBDIR=..\..\lib\b32
 
 
 #-- HARBOUR COMPILER ----
 hbc     = $(HBR_DIR)\BIN\harbour
 hbcdebug =
-hbcflags  = -n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
+hbcflags  = -n -w -q0 -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 cc      = bcc32

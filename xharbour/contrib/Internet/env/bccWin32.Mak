@@ -8,7 +8,7 @@ SRCDIR=source
 #-- HARBOUR COMPILER ----
 hbc     = $(HBR_DIR)\BIN\harbour
 hbcdebug =
-hbcflags  = -n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include;
+hbcflags  = -n -w -q0 -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include;
 
 #-- C COMPILER ----------
 cc      = bcc32

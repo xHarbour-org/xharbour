@@ -29,7 +29,7 @@
 #include    'WinINet.ch'
 #include    'cStruct.ch'
 #include   'WinTypes.ch'
-#include    'Windows.ch'
+#include    'Winuser.ch'
 #include     'Common.ch'
 
 //---------------------------------------------------------------------//
