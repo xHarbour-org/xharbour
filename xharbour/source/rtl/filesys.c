@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.59 2003/12/29 12:41:04 lculik Exp $
+ * $Id: filesys.c,v 1.60 2004/01/05 18:59:28 lf_sfnet Exp $
  */
 
 /*
@@ -3405,6 +3405,8 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    #if defined(_MSC_VER)
       if ( uiError == EBADF )
          uiError = 6;
+      else if ( uiError == EACCES )
+         uiError = 5;
    #endif
 
    #if defined(X__WIN32__)
