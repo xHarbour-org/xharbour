@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.23 2004/02/06 18:12:59 jonnymind Exp $
+ * $Id: gtapi.c,v 1.24 2004/02/07 11:41:01 druzus Exp $
  */
 
 /*
@@ -1449,7 +1449,7 @@ BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
 /******************************************************************/
 void HB_EXPORT hb_gt_hasChanged( int status )
 {
-
+   HB_SYMBOL_UNUSED( status );
 }
 
 /******************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.65 2004/02/06 18:13:00 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.66 2004/02/07 19:31:02 vouchcac Exp $
  */
 
 /*
@@ -67,6 +67,11 @@
  *
  */
 #include "hbgtwvt.h"
+
+#ifndef WM_MOUSEWHEEL
+   #define WM_MOUSEWHEEL 0x020A
+#endif
+
 //-------------------------------------------------------------------//
 
 static TCHAR szAppName[] = TEXT( "xHarbour WVT" );
@@ -3332,8 +3337,8 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
    HGLOBAL hglbCopy;
-   char *  cText;
-   int     nLen;
+   // char *  cText;
+   // int     nLen;
 
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {

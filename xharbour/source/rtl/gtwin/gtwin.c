@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.38 2004/02/06 17:07:30 jonnymind Exp $
+ * $Id: gtwin.c,v 1.39 2004/02/06 18:13:00 jonnymind Exp $
  */
 
 /*
@@ -1885,8 +1885,8 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
    HGLOBAL hglbCopy;
-   char *  cText;
-   int     nLen;
+   // char *  cText;
+   // int     nLen;
 
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {

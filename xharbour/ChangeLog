@@ -1,5 +1,5 @@
-﻿/*
- * $Id: ChangeLog,v 1.2236 2004/02/07 13:14:39 lculik Exp $
+/*
+ * $Id: ChangeLog,v 1.2237 2004/02/07 19:37:09 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-08 03:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    * remove unused variable
+
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwin/gtwin.c
+    * remmed unused variables
+
+  * source/rtl/gtapi.c
+    * void unused parameter
 
 2004-02-08 01:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/inkey.ch
