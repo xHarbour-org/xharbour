@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c $
+ * $Id: gtwvw.c,v 1.3 2004/11/13 18:56:43 bdj Exp $
  */
 
 /*
@@ -144,6 +144,10 @@ static LOGFONT s_lfPB;       /* default font for pushbuttons */
 
 /* for GTWVW private use: ***********************************************/
 static BOOL s_bQuickSetMode = FALSE;   /* quick SetMode(), to reset maxrow() and maxcol() only */
+
+static BOOL s_bFlashingWindow = FALSE; /* topmost window is flashing
+                                          due to invalid input on other
+                                          window */
 
 static TCHAR szAppName[] = TEXT( "xHarbour WVW" );
 
@@ -1855,6 +1859,14 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   hb_wvw_gtProcessMessages( s_pWindows[ s_usCurWindow ]) ;
+   return;
+}
+
+/* *********************************************************************** */
+
 /*WARNING: assume working on current window
  *NOTES: in MainCoord Mode current window is always the Main Window
  */
@@ -2317,6 +2329,7 @@ static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
@@ -5326,9 +5339,28 @@ static BOOL hb_wvw_gtAcceptingInput( void )
            GetControlClass(s_usNumWindows-1, hWndFocus) > 0 );
 }
 
+/* this TIMERPROC is to flash the topmost window using FlashWindow.
+   need to do it this way since FlashWindowEx is not available in Win95 */
+static VOID CALLBACK hb_wvw_gtFlashWindow(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+  static BYTE byCount = 0;
+
+  HB_SYMBOL_UNUSED( uMsg );
+  HB_SYMBOL_UNUSED( dwTime );
+
+  FlashWindow( s_pWindows[ s_usNumWindows-1 ]->hWnd, TRUE );
+
+  if (++byCount >= 15)
+  {
+    KillTimer( hwnd, idEvent );
+    byCount = 0;
+    s_bFlashingWindow = FALSE;
+  }
+}
+
 static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wParam, LPARAM lParam )
 {
-  FLASHWINFO fwi;
+  //FLASHWINFO fwi;
 
   /* user may handle this event and returns .t. from .PRG level
      using function WVW_INPUTFOCUS()
@@ -5355,13 +5387,20 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
 
   MessageBeep(MB_OK);
 
+  /* this simpler method is not available in Win95
   fwi.cbSize = sizeof(fwi);
   fwi.hwnd = s_pWindows[ s_usNumWindows-1 ]->hWnd;
   fwi.dwFlags = FLASHW_CAPTION | FLASHW_TRAY;
   fwi.uCount = 5;
   fwi.dwTimeout = 100;
   FlashWindowEx(&fwi);
+  */
 
+  if (!s_bFlashingWindow)
+  {
+    s_bFlashingWindow = TRUE;
+    SetTimer( NULL, 0, 50, hb_wvw_gtFlashWindow );
+  }
 }
 
 /* ********************************************************************
