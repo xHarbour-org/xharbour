@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.47 2003/03/07 23:14:11 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.48 2003/03/08 04:26:51 ronpinkas Exp $
  */
 
 /*
@@ -1125,6 +1125,14 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
      if( *sLine == '=' )
      {
         int i = ipos;
+
+        if( ipos && *(sLine - 1) == '\\' )
+        {
+           ipos--;
+           mpatt[ipos - 1] = '=';
+           sLine++;
+           continue;
+        }
 
         sLine++;
         mpatt[i++] = *sLine;

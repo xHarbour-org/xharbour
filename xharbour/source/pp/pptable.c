@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.12 2003/01/12 11:55:22 lculik Exp $
+ * $Id: pptable.c,v 1.13 2003/01/12 19:47:58 lculik Exp $
  */
 
 /*
@@ -435,7 +435,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___250 = {0,"SET","DIRSEPARATOR \1A30","Set(_SET_DIRSEPARATOR, \1A10 )",&sC___249 };
    static COMMANDS sC___251 = {0,"SET","DIRSEPARATOR ( \1A00 )","Set(_SET_DIRSEPARATOR, \1A00 )",&sC___250 };
 
+   static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } )",NULL };
+
    hb_pp_topDefine = &sD___56;
    hb_pp_topCommand = &sC___251;
-   hb_pp_topTranslate = NULL;
+   hb_pp_topTranslate = &sT___01;
 }

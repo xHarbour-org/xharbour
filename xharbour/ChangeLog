@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.819 2003/03/08 22:59:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.820 2003/03/09 00:06:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-09 09:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+  * source/pp/ppcore.c
+    + Added support for escaping => (\=>).
+
+  * source/pp/pptable.c
+  * source/rtl/tobject.prg
+    + Added support for literal Associative Array.
+
+     SYNTAX: { <Propery> => <Value> [, <PropertyN> => <ValueN> ] }
+
+  * tests/assocarr.prg
+    + Added sample for literal Associative Array.
 
 2003-03-08 16:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tobject.prg

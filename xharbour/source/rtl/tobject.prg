@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.3 2003/03/08 23:47:38 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.4 2003/03/09 00:06:46 ronpinkas Exp $
  */
 
 /*
@@ -229,16 +229,26 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
 
     RETURN NIL
 #else
-    FUNCTION TAssociativeArray
+    FUNCTION TAssociativeArray( aInit )
 
-       STATIC s_hClass
+       LOCAL hClass
+       LOCAL  aMember, nSeq := 1
 
        // Intentionally creating NEW Class for every instance - Don't change!
-       s_hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 0 )
+       IF ValType( aInit ) == 'A'
+          hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 0 )
 
-        __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
+          FOR EACH aMember IN aInit
+             __clsAddMsg( hClass,       aMember[1], nSeq++, HB_OO_MSG_DATA, aMember[2] )
+             __clsAddMsg( hClass, '_' + aMember[1], nSeq  , HB_OO_MSG_DATA )
+          NEXT
+       ELSE
+          hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 0 )
+       ENDIF
 
-    RETURN __clsInst( s_hClass )
+       __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
+
+    RETURN __clsInst( hClass )
 
     STATIC FUNCTION TAssociativeArray_OnError( xParam )
 

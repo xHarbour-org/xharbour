@@ -5913,9 +5913,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    aRule := { sKey, {}, bX }
 
    #ifdef __XHARBOUR__
-      HB_AtX( "= *>", sRule, , @nNext, @nTokenLen )
+      HB_AtX( "[^\\]= *>", sRule, , @nNext, @nTokenLen )
    #else
-      nNext := At( "=>", sRule )
+      DO WHILE ( nNext := At( "=>", sRule ) ) > 0
+         IF SubStr( sRule, nNext - 1 ) != '\'
+            EXIT
+         ENDIF
+      ENDDO
+
       nTokenLen := 2
    #endif
 
