@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.3 2003/02/16 00:00:14 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.4 2003/02/16 02:32:37 paultucker Exp $
  */
 
 /*
@@ -300,7 +300,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'A':
          ulData = ulNext = 9;
-         ulCount = hb_getlen8( ( char *) (cBuf + 1) );
+         ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
 
          while ( ulCount > 0 )
          {
@@ -346,7 +346,7 @@ HB_FUNC( HB_DESERIALBEGIN )
    cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 8 );
    hb_createlen8( cBuf, 9 );
    memcpy( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
-   hb_retclenAdoptRaw( cBuf, ( BYTE *) (8 + pItem->item.asString.length ) );
+   hb_retclenAdoptRaw( ( char *) cBuf, 8 + pItem->item.asString.length );
 
 }
 
