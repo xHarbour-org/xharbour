@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.15 2002/03/18 12:08:06 alkresin Exp $
+ * $Id: hbrddntx.h,v 1.19 2002/03/29 11:12:59 alkresin Exp $
  */
 
 /*
@@ -88,9 +88,6 @@ extern "C" {
 #define PREV_RECORD                                                     3
 #define NEXT_RECORD                                                     4
 
-#define NTX_MAX_REC_NUM                                       0x7FFFFFFFL
-#define NTX_IGNORE_REC_NUM                                             -1
-
 #define NTX_MAX_KEY  256      /* Max len of key */
 #define NTXBLOCKSIZE 1024     /* Size of block in NTX file */
 
@@ -103,10 +100,10 @@ struct _NTXINDEX;
 
 typedef struct _KEYINFO
 {
-   PHB_ITEM pItem;
+   // PHB_ITEM pItem;
    LONG     Tag;
    LONG     Xtra;
-   // struct  _KEYINFO * pNext;
+   char     key[ 1 ]; /* value of key */
 } KEYINFO;
 
 typedef KEYINFO * LPKEYINFO;
@@ -119,9 +116,10 @@ typedef struct HB_PAGEINFO_STRU
    BOOL      NewRoot;
    BOOL      lBusy;
    BYTE      PageType;
-   LPKEYINFO pKeys;
+   // LPKEYINFO pKeys;
    USHORT    uiKeys;
    SHORT     CurKey;
+   char*     buffer;
    struct   HB_PAGEINFO_STRU * pPrev;
    struct   HB_PAGEINFO_STRU * pNext;
    struct   _TAGINFO * TagParent;
@@ -156,6 +154,7 @@ typedef struct _TAGINFO
    LONG       blockNext;
    USHORT     keyPrev;
    USHORT     keyNext;
+   ULONG      keyCount;
    LPKEYINFO  CurKeyInfo;
    LPPAGEINFO RootPage;
    BOOL       InIndex;
@@ -361,7 +360,7 @@ static ERRCODE ntxClose( NTXAREAP pArea );
 #define ntxOpen                  NULL
 #define ntxRelease               NULL
 static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize );
-#define ntxSysName               NULL
+static ERRCODE ntxSysName( NTXAREAP pArea, BYTE * pBuffer );
 #define ntxEval                  NULL
 static ERRCODE ntxPack( NTXAREAP pArea );
 #define ntPackRec                NULL

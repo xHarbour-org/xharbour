@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.17 2002/02/10 15:50:00 alkresin Exp $
+ * $Id: runner.c,v 1.19 2002/03/21 12:57:44 alkresin Exp $
  */
 
 /*
@@ -273,7 +273,7 @@ HB_FUNC( __HRBDOFU )
          for( i = 0; i < argc-1; i++ ) /* Push other  params  */
             hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );
 
-         hb_vmDo( argc-1 );          /* Run function        */
+         hb_vmDo( argc-1 );            /* Run function        */
       }
       else
          hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDOFU", 0 );
@@ -408,6 +408,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       hb_hrbFileClose( file );
    }
+   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols );
    return pHrbBody;
 }
 
@@ -416,8 +417,6 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
    PHB_ITEM pRetVal = NULL;
    ULONG ul;
    int i;
-
-   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols );
 
    /* Initialize static variables first
     */
@@ -442,7 +441,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
          for( i = 0; i < argc; i++ ) /* Push other cmdline params*/
             hb_vmPushString( argv[i],strlen(argv[i]) );
 
-         hb_vmDo( argc );          /* Run init function        */
+         hb_vmDo( argc );            /* Run init function        */
       }
    }
 
@@ -453,7 +452,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
        hb_vmPushNil();
        for( i = 0; i < ( hb_pcount() - 1 ); i++ )
           hb_vmPush( hb_param( i + 2, HB_IT_ANY ) ); /* Push other cmdline params*/
-       hb_vmDo( hb_pcount() - 1 );                 /* Run the thing !!!        */
+       hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
        pRetVal = hb_itemNew( NULL );
        hb_itemCopy( pRetVal, &hb_stack.Return );
@@ -465,7 +464,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
       {
          hb_vmPushSymbol( pHrbBody->pSymRead + ul );
          hb_vmPushNil();
-         hb_vmDo( 0 );                        /* Run exit function        */
+         hb_vmDo( 0 );                   /* Run exit function        */
          pHrbBody->pSymRead[ ul ].cScope = pHrbBody->pSymRead[ ul ].cScope & ( ~HB_FS_EXIT );
                                          /* Exit function cannot be
                                             handled by main in hvm.c */

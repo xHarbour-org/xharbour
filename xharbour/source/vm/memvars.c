@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.9 2002/01/30 03:32:41 ronpinkas Exp $
+ * $Id: memvars.c,v 1.10 2002/03/17 06:46:34 ronpinkas Exp $
  */
 
 /*
@@ -59,6 +59,10 @@
  *    __MVRESTORE() (Thanks to Dave Pearson and Jo French for the original
  *                   Clipper function (FReadMem()) to read .mem files)
  *
+ * Copyright 2002 Ron Pinnkas <ron@ronpinkas.com>
+ *   hb_memvarReleasePublic()
+ *   hb_memvarReleasePublicWorker()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -101,6 +105,7 @@ struct mv_PUBLIC_var_info
 static void hb_memvarCreateFromDynSymbol( PHB_DYNS, BYTE, PHB_ITEM );
 static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
+void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
 void hb_memvarsInit( void )
 {
@@ -766,13 +771,18 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
                   ( &s_globalTable[ pDynVar->hMemvar ].item )->type = HB_IT_NIL;
                }
 
-               ulBase = 0;
+               return;
             }
          }
       }
+
+      // No match found for PRIVATEs - try PUBLICs.
+      hb_memvarReleasePublic( pMemvar );
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 3008, NULL, "RELEASE", 1, hb_paramError( 1 ) );
+   }
 }
 
 
@@ -912,6 +922,31 @@ static HB_DYNS_FUNC( hb_memvarCountPublics )
       ( * ( ( int * )Cargo ) )++;
 
    return TRUE;
+}
+
+static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
+{
+   if( hb_memvarScopeGet( pDynSymbol ) == HB_MV_PUBLIC )
+   {
+      if( hb_stricmp( pDynSymbol->pSymbol->szName, (char *) Cargo ) == 0 )
+      {
+         s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
+         hb_memvarValueDecRef( pDynSymbol->hMemvar );
+         pDynSymbol->hMemvar = 0;
+         return FALSE;
+      }
+   }
+
+   return TRUE;
+}
+
+static void hb_memvarReleasePublic( PHB_ITEM pMemVar )
+{
+   char *sPublic = pMemVar->item.asString.value;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleasePublic(%p)", pMemVar ));
+
+   hb_dynsymEval( hb_memvarReleasePublicWorker, ( void * ) sPublic );
 }
 
 /* Count the number of variables with given scope
@@ -1384,6 +1419,106 @@ HB_FUNC( __MVPUT )
 #define HB_MEM_REC_LEN          32
 #define HB_MEM_NUM_LEN          8
 
+typedef struct
+{
+   char * pszMask;
+   BOOL bIncludeMask;
+   BYTE * buffer;
+   FHANDLE fhnd;
+} MEMVARSAVE_CARGO;
+
+/* saves a variable to a mem file already open */
+
+static HB_DYNS_FUNC( hb_memvarSave )
+{
+   char * pszMask    = ( ( MEMVARSAVE_CARGO * ) Cargo )->pszMask;
+   BOOL bIncludeMask = ( ( MEMVARSAVE_CARGO * ) Cargo )->bIncludeMask;
+   BYTE * buffer     = ( ( MEMVARSAVE_CARGO * ) Cargo )->buffer;
+   FHANDLE fhnd      = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
+
+   /* NOTE: Harbour name lengths are not limited, but the .MEM file
+            structure is not flexible enough to allow for it.
+            [vszakats] */
+
+   if( pDynSymbol->hMemvar )
+   {
+      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynSymbol->pSymbol->szName, pszMask ) );
+
+      PHB_ITEM pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
+
+      /* Process it if it matches the passed mask */
+      if( bIncludeMask ? bMatch : ! bMatch )
+      {
+         /* NOTE: Clipper will not initialize the record buffer with
+                  zeros, so they will look trashed. [vszakats] */
+         memset( buffer, 0, HB_MEM_REC_LEN );
+
+         /* NOTE: Save only the first 10 characters of the name */
+         strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, 10 );
+         buffer[ 10 ] = '\0';
+
+         if( HB_IS_STRING( pItem ) && ( hb_itemGetCLen( pItem ) + 1 ) <= SHRT_MAX )
+         {
+            /* Store the closing zero byte, too */
+            USHORT uiLength = ( USHORT ) ( hb_itemGetCLen( pItem ) + 1 );
+
+            buffer[ 11 ] = 'C' + 128;
+            buffer[ 16 ] = HB_LOBYTE( uiLength );
+            buffer[ 17 ] = HB_HIBYTE( uiLength );
+
+            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, ( BYTE * ) hb_itemGetCPtr( pItem ), uiLength );
+         }
+         else if( HB_IS_NUMERIC( pItem ) )
+         {
+            double dNumber = hb_itemGetND( pItem );
+            int iWidth;
+            int iDec;
+
+            hb_itemGetNLen( pItem, &iWidth, &iDec );
+
+            buffer[ 11 ] = 'N' + 128;
+#ifdef HB_C52_STRICT
+/* NOTE: This is the buggy, but fully CA-Cl*pper compatible method. [vszakats] */
+            buffer[ 16 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
+#else
+/* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
+            buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
+#endif
+            buffer[ 17 ] = ( BYTE ) iDec;
+
+            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
+         }
+         else if( HB_IS_DATE( pItem ) )
+         {
+            double dNumber = ( double ) hb_itemGetDL( pItem );
+
+            buffer[ 11 ] = 'D' + 128;
+            buffer[ 16 ] = 1;
+            buffer[ 17 ] = 0;
+
+            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
+         }
+         else if( HB_IS_LOGICAL( pItem ) )
+         {
+            BYTE byLogical[ 1 ];
+
+            buffer[ 11 ] = 'L' + 128;
+            buffer[ 16 ] = sizeof( BYTE );
+            buffer[ 17 ] = 0;
+
+            byLogical[ 0 ] = hb_itemGetL( pItem ) ? 1 : 0;
+
+            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, byLogical, sizeof( BYTE ) );
+         }
+      }
+   }
+   return TRUE;
+}
+
 HB_FUNC( __MVSAVE )
 {
    /* Clipper also checks for the number of arguments here */
@@ -1415,102 +1550,17 @@ HB_FUNC( __MVSAVE )
 
       if( fhnd != FS_ERROR )
       {
-         char * pszMask = hb_parc( 2 );
-         BOOL bIncludeMask = hb_parl( 3 );
          BYTE buffer[ HB_MEM_REC_LEN ];
+         MEMVARSAVE_CARGO msc;
 
-         /* Walk through all visible memory variables */
+         msc.pszMask      = hb_parc( 2 );
+         msc.bIncludeMask = hb_parl( 3 );
+         msc.buffer       = buffer;
+         msc.fhnd         = fhnd;
 
-         ULONG ulBase = 0;
+         /* Walk through all visible memory variables and save each one */
 
-         while( ulBase < s_privateStackCnt )
-         {
-            PHB_DYNS pDynVar;
-
-            pDynVar = s_privateStack[ ulBase ];
-
-            /* NOTE: Harbour name lengths are not limited, but the .MEM file
-                     structure is not flexible enough to allow for it.
-                     [vszakats] */
-            if( pDynVar->hMemvar )
-            {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynVar->pSymbol->szName, pszMask ) );
-
-               /* Process it if it matches the passed mask */
-               if( bIncludeMask ? bMatch : ! bMatch )
-               {
-                  PHB_ITEM pItem = &s_globalTable[ pDynVar->hMemvar ].item;
-
-                  /* NOTE: Clipper will not initialize the record buffer with
-                           zeros, so they will look trashed. [vszakats] */
-                  memset( buffer, 0, HB_MEM_REC_LEN );
-
-                  /* NOTE: Save only the first 10 characters of the name */
-                  strncpy( ( char * ) buffer, pDynVar->pSymbol->szName, 10 );
-                  buffer[ 10 ] = '\0';
-
-                  if( HB_IS_STRING( pItem ) && ( hb_itemGetCLen( pItem ) + 1 ) <= SHRT_MAX )
-                  {
-                     /* Store the closing zero byte, too */
-                     USHORT uiLength = ( USHORT ) ( hb_itemGetCLen( pItem ) + 1 );
-
-                     buffer[ 11 ] = 'C' + 128;
-                     buffer[ 16 ] = HB_LOBYTE( uiLength );
-                     buffer[ 17 ] = HB_HIBYTE( uiLength );
-
-                     hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-                     hb_fsWrite( fhnd, ( BYTE * ) hb_itemGetCPtr( pItem ), uiLength );
-                  }
-                  else if( HB_IS_NUMERIC( pItem ) )
-                  {
-                     double dNumber = hb_itemGetND( pItem );
-                     int iWidth;
-                     int iDec;
-
-                     hb_itemGetNLen( pItem, &iWidth, &iDec );
-
-                     buffer[ 11 ] = 'N' + 128;
-#ifdef HB_C52_STRICT
-/* NOTE: This is the buggy, but fully CA-Cl*pper compatible method. [vszakats] */
-                     buffer[ 16 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
-#else
-/* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
-                     buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
-#endif
-                     buffer[ 17 ] = ( BYTE ) iDec;
-
-                     hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-                     hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
-                  }
-                  else if( HB_IS_DATE( pItem ) )
-                  {
-                     double dNumber = ( double ) hb_itemGetDL( pItem );
-
-                     buffer[ 11 ] = 'D' + 128;
-                     buffer[ 16 ] = 1;
-                     buffer[ 17 ] = 0;
-
-                     hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-                     hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
-                  }
-                  else if( HB_IS_LOGICAL( pItem ) )
-                  {
-                     BYTE byLogical[ 1 ];
-
-                     buffer[ 11 ] = 'L' + 128;
-                     buffer[ 16 ] = sizeof( BYTE );
-                     buffer[ 17 ] = 0;
-
-                     byLogical[ 0 ] = hb_itemGetL( pItem ) ? 1 : 0;
-
-                     hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-                     hb_fsWrite( fhnd, byLogical, sizeof( BYTE ) );
-                  }
-               }
-            }
-
-            ulBase++;
-         }
+         hb_dynsymEval( hb_memvarSave, ( void * ) &msc );
 
          buffer[ 0 ] = '\x1A';
          hb_fsWrite( fhnd, buffer, 1 );
@@ -1519,6 +1569,7 @@ HB_FUNC( __MVSAVE )
       }
    }
    else
+      /* NOTE: Undocumented error message in CA-Cl*pper 5.2e and 5.3x. [ckedem] */
       hb_errRT_BASE( EG_ARG, 2008, NULL, "__MSAVE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 }
 
