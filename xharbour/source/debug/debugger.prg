@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.49 2004/08/09 17:10:06 mauriliolongo Exp $
+ * $Id: debugger.prg,v 1.50 2004/08/19 08:55:26 likewolf Exp $
  */
 
 /*
@@ -73,15 +73,18 @@
 #define  NTRIM(x)    (ALLTRIM(STR(x)))
 
 
-/* A macro to compare filenames on different platforms.
- * What to do on OS/2? */
-#ifdef __PLATFORM__Windows
-#define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
-#else
+/* A macro to compare filenames on different platforms. */
 #ifdef __PLATFORM__DOS
 #define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
 #else
+#ifdef __PLATFORM__OS2
+#define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
+#else
+#ifdef __PLATFORM__Windows
+#define FILENAME_EQUAL(s1, s2) ( Lower( s1 ) == Lower( s2 ) )
+#else
 #define FILENAME_EQUAL(s1, s2) ( s1 == s2 )
+#endif
 #endif
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.161 2004/07/15 21:01:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.162 2004/07/18 17:56:00 ronpinkas Exp $
  */
 
 /*
@@ -743,13 +743,27 @@ void hb_pp_Init( void )
 
       if( pSpace )
       {
-         strncat( (char *) sOS, szPlatform, pSpace - szPlatform );
+         if ( !strncmp( szPlatform, "OS/2", 4 ) )
+         {
+            strcat( (char *) sOS, "OS2" );
+         }
+         else
+         {
+            strncat( (char *) sOS, szPlatform, pSpace - szPlatform );
+         }
          strcat( (char *) sVer, pSpace + 1 );
          strcat( (char *) sVer, "\"" );
       }
       else
       {
-         strcat( (char *) sOS, szPlatform );
+         if ( !strncmp( szPlatform, "OS/2", 4) )
+         {
+            strcat( (char *) sOS, "OS2" );
+         }
+         else
+         {
+            strcat( (char *) sOS, szPlatform );
+         }
          strcat( (char *) sVer, "\"" );
       }
 
