@@ -50,6 +50,8 @@
 
 #include "inkey.ch"
 
+#define CRLF chr(13) + chr(10)
+
 procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
 
    local cTok, nTok := 1
@@ -64,9 +66,11 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
    Local cType
    Local sType
    Local cValue
+   Local nCommit := 500
 
    SET CENTURY ON
    SET EPOCH TO 1960
+   SET DELETE ON
 
    rddSetDefault( "DBFDBT" )
 
@@ -117,6 +121,8 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
       ? oServer:Error()
       quit
    endif
+   
+   oServer:lallCols := .F.
 
    if lCreateTable
       if oServer:TableExists(cTable)
@@ -139,6 +145,11 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
       quit
    endif
 
+   oServer:StartTransaction()
+   
+   ? "Start: ", time()
+   ? 
+
    while !dbffile->(eof()) .AND. Inkey() <> K_ESC
 
       oRecord := oTable:GetBlankRow()
@@ -148,6 +159,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
          cType := dbffile->(valtype(fieldget(i)))
          sType := Valtype(oRecord:Fieldget(oRecord:Fieldpos(cfield)))
          cValue := dbffile->(fieldget(i))
+         
          
          if oRecord:Fieldpos( cField ) != 0
             if sType != cType           
@@ -177,23 +189,38 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14)
             
                end
             end            
-
-            oRecord:FieldPut(oRecord:Fieldpos(cfield), cValue)
+            
+            if ! Empty(cValue)
+                oRecord:FieldPut(oRecord:Fieldpos(cfield), cValue)
+            end             
          end
       next
 
       oTable:Append(oRecord)
       if oTable:NetErr()
-         Alert(oTable:Error())
+         ?
+         ? "Record: ", recno(), " ", oTable:Error()
+         ? 
       endif
 
       dbffile->(dbSkip())
 
-      DevPos(Row(), 1)
-      if (dbffile->(RecNo()) % 100) == 0
+      if (dbffile->(RecNo()) % nCommit) == 0
+         DevPos(Row(), 1)
          DevOut("imported recs: " + Str(dbffile->(RecNo())))
+         
+         oServer:commit()
+         oServer:StartTransaction()
       endif
    enddo
+   
+   if (dbffile->(RecNo()) % nCommit) != 0
+        oServer:commit()
+   endif        
+
+   ?
+   ? "End: ", time()
+   ? 
 
    dbffile->(dbCloseArea())
    oTable:Destroy()
