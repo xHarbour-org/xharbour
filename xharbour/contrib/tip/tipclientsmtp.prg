@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipclientsmtp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -94,7 +94,7 @@ METHOD Data( cData ) CLASS tIPClientSMTP
       RETURN .F.
    ENDIF
    InetSendAll(::SocketCon, cData + InetCRLF() + "." + InetCRLF() )
-RETURN .T.
+RETURN ::GetOk()
 
 
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
