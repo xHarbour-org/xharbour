@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1834 2003/12/07 19:36:17 druzus Exp $
+ * $Id: ChangeLog,v 1.1835 2003/12/08 01:36:06 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-08 16:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbset.h
+    * Revised order of HB_SET_STRUCT memebers so that members not available in Harbour are the the end of the structure.
 
 2003-12-07 23:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   + source/rtl/readline.c

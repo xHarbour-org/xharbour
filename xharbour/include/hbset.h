@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.15 2003/11/20 23:47:36 druzus Exp $
+ * $Id: hbset.h,v 1.16 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -142,9 +142,7 @@ typedef struct
    BOOL    hb_set_century;
    FHANDLE hb_set_extrahan;
    FHANDLE hb_set_printhan;
-   BOOL    hb_set_winprinter;
-   FHANDLE hb_set_winhan;
-   char *  hb_set_printerjob;
+
    /* Upper case members are directly related to a SET */
    BOOL    HB_SET_ALTERNATE;
    char *  HB_SET_ALTFILE;
@@ -164,6 +162,7 @@ typedef struct
    char *  HB_SET_DELIMCHARS;
    BOOL    HB_SET_DELIMITERS;
    char *  HB_SET_DEVICE;
+   BOOL    HB_SET_EOF;
    int     HB_SET_EPOCH;
    BOOL    HB_SET_ESCAPE;
    HB_inkey_enum  HB_SET_EVENTMASK;
@@ -189,19 +188,26 @@ typedef struct
    BOOL    HB_SET_SCROLLBREAK;
    BOOL    HB_SET_SOFTSEEK;
    BOOL    HB_SET_STRICTREAD;
-   BOOL    HB_SET_TRACE;
-   char    HB_SET_TRACEFILE[_POSIX_PATH_MAX];
-   char    HB_SET_TRACESTACK;
    int     HB_SET_TYPEAHEAD;
    BOOL    HB_SET_UNIQUE;
-   int     HB_SET_VIDEOMODE;
-   BOOL    HB_SET_WRAP;
    int     HB_SET_FILECASE;
    int     HB_SET_DIRCASE;
    char    HB_SET_DIRSEPARATOR;
+   int     HB_SET_VIDEOMODE;
+   BOOL    HB_SET_WRAP;
+
+   int     HB_SET_DBFLOCKSCHEME;
+
+   BOOL    HB_SET_TRACE;
+   char    HB_SET_TRACEFILE[_POSIX_PATH_MAX];
+   char    HB_SET_TRACESTACK;
+
    int     HB_SET_ERRORLOOP;
    BOOL    HB_SET_OUTPUTSAFETY;
-   int     HB_SET_DBFLOCKSCHEME;
+
+   BOOL    hb_set_winprinter;
+   FHANDLE hb_set_winhan;
+   char *  hb_set_printerjob;
 } HB_SET_STRUCT;
 
 #define HB_SET_CASE_MIXED  0
