@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.149 2004/08/04 14:48:10 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.150 2004/08/09 23:58:45 druzus Exp $
  */
 
 /*
@@ -8261,7 +8261,16 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                   break;
 
                default:
-                  printf( "hb_cdxTagDoIndex: hb_itemType( pItem ) = %i", hb_itemType( pItem ) );
+                  if ( hb_vmRequestQuery() )
+                  {
+                     pEvalItem = NULL;
+                     ulNextCount = 1;
+                  }
+                  else
+                  {
+                     printf( "hb_cdxTagDoIndex: hb_itemType( pItem ) = %i", hb_itemType( pItem ) );
+                  }
+                  break;
             }
          }
          if ( pEvalItem )

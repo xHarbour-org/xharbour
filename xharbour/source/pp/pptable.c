@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.44 2004/05/27 13:26:11 lculik Exp $
+ * $Id: pptable.c,v 1.45 2004/07/29 21:16:24 druzus Exp $
  */
 
 /*
@@ -136,6 +136,7 @@ void hb_pp_Table( void )
    static DEFINES sD___65 = {"_SET_BACKGROUNDTICK",NULL,-1,"114", &sD___64 };
    static DEFINES sD___66 = {"_SET_PRINTERJOB",NULL,-1,"115", &sD___65 };
    static DEFINES sD___67 = {"_SET_HARDCOMMIT",NULL,-1,"116", &sD___66 };
+   static DEFINES sD___68 = {"_SET_FORCEOPT",NULL,-1,"117", &sD___67 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -497,6 +498,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___276 = {0,"SET","BACKGROUNDTICK \1A00","Set( _SET_BACKGROUNDTICK, \1A00 )",&sC___275 };
    static COMMANDS sC___277 = {0,"SET","HARDCOMMIT \1A20 ON,OFF,&>","Set(_SET_HARDCOMMIT,\1A30 )",&sC___276 };
    static COMMANDS sC___278 = {0,"SET","HARDCOMMIT (\1A00)","Set(_SET_HARDCOMMIT,\1A00 )",&sC___277 };
+   static COMMANDS sC___279 = {0,"SET","FORCE OPTIMIZATION \1A20 ON,OFF,&>","Set(_SET_FORCEOPT,\1A30 )",&sC___278 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\16\1A00\17 => \16\1B00\17 \16,\1C00 => \1D00 \17 }", "Hash(\16\1A00,\1B00\17 \16,\1C00,\1D00 \17 )",NULL };
@@ -505,11 +507,11 @@ void hb_pp_Table( void )
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___278;
+   hb_pp_topCommand = &sC___279;
 #else
    hb_pp_topCommand = &sC___256;
 #endif
 
-   hb_pp_topDefine = &sD___67;
+   hb_pp_topDefine = &sD___68;
    hb_pp_topTranslate = &sT___04;
 }

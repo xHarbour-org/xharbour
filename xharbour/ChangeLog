@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3294 2004/08/09 21:10:35 likewolf Exp $
+ * $Id: ChangeLog,v 1.3295 2004/08/09 23:58:43 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-10 03:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * immediate interrupt the indexing on VM request (ALT-C, BREAK())
+
+  * xharbour/include/hbset.h
+  * xharbour/include/set.ch
+  * xharbour/source/pp/pptable.c
+  * xharbour/source/rtl/set.c
+   * set( _SET_FORCEOPT, lOnOff ) and SET FORCE OPTIMIZATION [ON|OFF]
+     added for ADS RDD and future bitmap filters. When it's set the
+     filter set by SET FILTER TO <...> will be fully evaluated on each
+     record to reduce any records which may not meet the condition.
+     In ADS see RESOLVE_{STATIC|DYNAMIC} for filters.
 
 2004-08-10 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddcdx.h

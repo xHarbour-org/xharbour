@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.51 2004/07/19 03:48:20 peterrees Exp $
+ * $Id: set.c,v 1.52 2004/07/29 21:16:25 druzus Exp $
  */
 
 /*
@@ -980,6 +980,14 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_FORCEOPT   :
+         hb_retl( hb_set.HB_SET_FORCEOPT );
+         if( args > 1 )
+         {
+            hb_set.HB_SET_FORCEOPT = set_logical( pArg2, hb_set.HB_SET_FORCEOPT );
+         }
+         break;
+
       case HB_SET_STRICTREAD :
          hb_retl( hb_set.HB_SET_STRICTREAD );
          if( args > 1 )
@@ -1548,6 +1556,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
    hb_set.HB_SET_OPTIMIZE = FALSE;
+   hb_set.HB_SET_FORCEOPT = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
    hb_set.HB_SET_HARDCOMMIT = TRUE;
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
