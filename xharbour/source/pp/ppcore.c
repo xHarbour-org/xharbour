@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.179 2004/10/22 02:55:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.180 2004/10/22 05:40:53 ronpinkas Exp $
  */
 
 /*
@@ -871,25 +871,22 @@ int hb_pp_ParseDirective( char * sLine )
      {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ELSE, NULL, NULL );
      }
-     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] >= 0 )
+     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] > 0 )
      {
-        if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] >= 0 )
-        {
-           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 1 - hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ];
+        hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 1 - hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ];
 
-           if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
-           {
-              hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 2;
-           }
-           else
-           {
-              hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -2;
-           }
+        if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
+        {
+           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 2;
         }
         else
         {
            hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -2;
         }
+     }
+     else
+     {
+        hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -2;
      }
   }
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "ENDIF", i ) == 0 )
