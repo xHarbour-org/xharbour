@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.902 2003/04/01 21:44:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.903 2003/04/01 22:41:51 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-01 20:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    ! minor Change to Lib editor mode( Added an -I cUserInclude to CFLAG1 macro)
 
 2003-04-02 00:31 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
   * source\vm\hvm.c
