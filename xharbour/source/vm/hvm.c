@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.19 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.20 2002/01/23 02:32:08 ronpinkas Exp $
  */
 
 /*
@@ -1034,14 +1034,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_PUSHSTR:
          {
             USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
-            hb_itemPushStaticString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
+            hb_itemPushStaticString( ( char * ) pCode + w + 3, ( ULONG )( uiSize - 1 ) );
             //hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
             w += ( 3 + uiSize );
             break;
          }
 
          case HB_P_PUSHSTRSHORT:
-            hb_itemPushStaticString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
+            hb_itemPushStaticString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] - 1 ) );
             //hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
             w += ( 2 + pCode[ w + 1 ] );
             break;
