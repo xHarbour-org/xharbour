@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.74 2003/11/04 18:12:18 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.75 2003/11/05 03:32:48 druzus Exp $
  */
 
 /*
@@ -4079,7 +4079,7 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag, BOOL fUniq )
          hb_cdxKeyFree( pKey );
       }
    }
-   return ( pTag->CurKey->rec == pArea->ulRecNo );
+   return ( pTag->CurKey->rec != 0 && pTag->CurKey->rec == pArea->ulRecNo );
 }
 
 /*
@@ -4169,12 +4169,9 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
  */
 static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 {
-   LPCDXKEY pCurKey;
-   LPCDXPAGE pPage;
    ULONG lKeyCount = 0;
 
-   pTag = hb_cdxGetActiveTag( pArea );
-
+   /* TODO: what with deleted flag? */
    if ( fFilters && ! pArea->dbfi.itmCobExpr )
       fFilters = FALSE;
 
@@ -4210,6 +4207,7 @@ static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
    }
    else if ( pTag )
    {
+      LPCDXKEY pCurKey;
       hb_cdxIndexLockRead( pTag->pIndex );
       pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
 
@@ -4227,6 +4225,7 @@ static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
       }
       else
       {
+         LPCDXPAGE pPage;
          hb_cdxTagKeyRead( pTag, TOP_RECORD );
          pPage = pTag->RootPage;
          while ( pPage->Child )
@@ -4263,19 +4262,13 @@ static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
  */
 static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 {
-   LPCDXKEY pCurKey;
-   LPCDXPAGE pPage;
    ULONG lKeyNo = 0;
 
-   pTag = hb_cdxGetActiveTag( pArea );
-
+   /* TODO: what with deleted flag? */
    if ( fFilters && ! pArea->dbfi.itmCobExpr )
       fFilters = 0;
 
    if ( pArea->fEof )
-      lKeyNo = 0;
-   else if ( pTag && ( pTag->CurKey->rec != pArea->ulRecNo ) )
-      /* TODO: fix it */
       lKeyNo = 0;
    else if ( fFilters )
    {
@@ -4310,64 +4303,61 @@ static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
       hb_cdxIndexLockRead( pTag->pIndex );
       if ( hb_cdxCurKeyRefresh( pArea, pTag, FALSE ) )
       {
-         pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
          if ( pTag->topScope || pTag->bottomScope || pTag->UsrUnique )
          {
             if ( hb_cdxBottomScope( pTag ) )
             {
+               LPCDXKEY pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
                while ( !pTag->TagBOF && !pTag->TagEOF && hb_cdxTopScope( pTag ) )
                {
                   lKeyNo++;
                   hb_cdxTagKeyRead( pTag, PREV_RECORD );
                }
+               pTag->fRePos = TRUE;
+               hb_cdxKeyCopy( pTag->CurKey, pCurKey );
+               hb_cdxKeyFree( pCurKey );
             }
          }
          else
          {
-            if ( !pTag->TagBOF && !pTag->TagEOF )
+            LPCDXPAGE pPage = pTag->RootPage;
+            while ( pPage->Child )
+               pPage = pPage->Child;
+            if ( pTag->UsrAscend )
             {
-               pPage = pTag->RootPage;
-               while ( pPage->Child )
-                  pPage = pPage->Child;
-               if ( pTag->UsrAscend )
+               lKeyNo = pPage->iCurKey + 1;
+               if ( pPage->Left != CDX_DUMMYNODE )
                {
-                  lKeyNo = pPage->iCurKey + 1;
-                  if ( pPage->Left != CDX_DUMMYNODE )
+                  ULONG ulPage = pPage->Left;
+                  pPage = hb_cdxPageNew( pTag, NULL, CDX_DUMMYNODE );
+                  pPage->Page = ulPage;
+                  while ( pPage->Page != CDX_DUMMYNODE )
                   {
-                     ULONG ulPage = pPage->Right;
-                     pPage = hb_cdxPageNew( pTag, NULL, CDX_DUMMYNODE );
-                     pPage->Page = ulPage;
-                     while ( pPage->Page != CDX_DUMMYNODE )
-                     {
-                        hb_cdxPageLoad( pPage );
-                        lKeyNo += pPage->iKeys;
-                        pPage->Page = pPage->Left;
-                     }
-                     hb_cdxPageFree( pPage, TRUE );
+                     hb_cdxPageLoad( pPage );
+                     lKeyNo += pPage->iKeys;
+                     pPage->Page = pPage->Left;
                   }
+                  hb_cdxPageFree( pPage, TRUE );
                }
-               else
-               {
+            }
+            else
+            {
                lKeyNo = pPage->iKeys - pPage->iCurKey;
                if ( pPage->Right != CDX_DUMMYNODE )
                {
                   ULONG ulPage = pPage->Right;
                   pPage = hb_cdxPageNew( pTag, NULL, CDX_DUMMYNODE );
                   pPage->Page = ulPage;
-                     while ( pPage->Page != CDX_DUMMYNODE )
-                     {
-                        hb_cdxPageLoad( pPage );
-                        lKeyNo += pPage->iKeys;
-                        pPage->Page = pPage->Right;
-                     }
-                     hb_cdxPageFree( pPage, TRUE );
+                  while ( pPage->Page != CDX_DUMMYNODE )
+                  {
+                     hb_cdxPageLoad( pPage );
+                     lKeyNo += pPage->iKeys;
+                     pPage->Page = pPage->Right;
                   }
+                  hb_cdxPageFree( pPage, TRUE );
                }
             }
          }
-         pTag->fRePos = TRUE;
-         hb_cdxKeyCopy( pTag->CurKey, pCurKey );
-         hb_cdxKeyFree( pCurKey );
       }
       hb_cdxIndexUnLockRead( pTag->pIndex );
    }
@@ -4385,14 +4375,78 @@ static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 /*
  * DBOI_KEYGOTO goto specific logical record in the index file
  */
-static long hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
+static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, BOOL fFilters )
 {
-   /* TODO: DBOI_KEYGOTO goto specific logical record in the index file */
-   HB_SYMBOL_UNUSED( pArea );
-   HB_SYMBOL_UNUSED( pTag );
-   HB_SYMBOL_UNUSED( fFilters );
+   ERRCODE retval;
 
-   return 0;
+   /* TODO: what with deleted flag? */
+   if ( fFilters && ! pArea->dbfi.itmCobExpr )
+      fFilters = 0;
+
+   if ( ulKeyNo == 0 )
+      retval = hb_cdxGoEof( pArea );
+   else if ( fFilters )
+   {
+      USHORT uiTag = pArea->uiTag;
+      pArea->uiTag = hb_cdxGetTagNumber( pArea, pTag );
+      retval = SELF_GOTOP( ( AREAP ) pArea );
+      while ( !pArea->fEof && ulKeyNo-- )
+         retval = SELF_SKIP( ( AREAP ) pArea, 1 );
+      pArea->uiTag = uiTag;
+   }
+   else if ( pTag )
+   {
+      hb_cdxIndexLockRead( pTag->pIndex );
+      if ( pTag->topScope || pTag->bottomScope || pTag->UsrUnique )
+      {
+         if ( pTag->topScope )
+            hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
+         else
+            hb_cdxTagKeyRead( pTag, TOP_RECORD );
+         while ( !pTag->TagBOF && !pTag->TagEOF && hb_cdxBottomScope( pTag ) &&
+                 --ulKeyNo )
+            hb_cdxTagKeyRead( pTag, NEXT_RECORD );
+      }
+      else
+      {
+         LPCDXPAGE pPage, pOwnerPage = NULL;
+         ULONG ulNextPg;
+         hb_cdxTagKeyRead( pTag, TOP_RECORD );
+         pPage = pTag->RootPage;
+         while ( pPage->Child )
+         {
+            pOwnerPage = pPage;
+            pPage = pPage->Child;
+         }
+         while ( (USHORT) pPage->iKeys < ulKeyNo && pOwnerPage &&
+                 ( ulNextPg = pTag->UsrAscend ?
+                   pPage->Right : pPage->Left ) != CDX_DUMMYNODE )
+         {
+            ulKeyNo -= pPage->iKeys;
+            pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, ulNextPg );
+            hb_cdxPageFree( pPage, FALSE );
+            pPage = pOwnerPage->Child;
+         }
+         if ( (USHORT) pPage->iKeys >= ulKeyNo )
+         {
+            pPage->iCurKey = pTag->UsrAscend ? ulKeyNo - 1 : pPage->iKeys - ulKeyNo;
+            hb_cdxSetCurKey( pPage );
+         }
+         else
+            pTag->CurKey->rec = 0;
+      }
+      hb_cdxIndexUnLockRead( pTag->pIndex );
+      if ( pTag->CurKey->rec == 0 )
+         retval = hb_cdxGoEof( pArea );
+      else
+         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+   }
+   else
+   {
+      retval = SELF_GOTO( ( AREAP ) pArea, ulKeyNo );
+   }
+
+   return retval;
 }
 
 
@@ -5671,8 +5725,9 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
             /* TODO: DBOI_KEYGOTO goto specific logical record in the index file */
-             pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
-                                       hb_cdxDBOIKeyGoto( pArea, pTag, TRUE ) );
+             pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                  hb_cdxDBOIKeyGoto( pArea, pTag,
+                              hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) == SUCCESS );
          }
          else
             pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
