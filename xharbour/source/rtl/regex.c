@@ -6456,23 +6456,16 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       pString = hb_param( 2, HB_IT_STRING );
    }
 
-   if( pRegEx == NULL || pString == NULL ||
-         ( pRegEx != NULL && pRegEx->type != HB_IT_STRING) ||
-         ( pString != NULL && pString->type != HB_IT_STRING)
-   )
+   if( pRegEx == NULL || pString == NULL || ( pRegEx != NULL && pRegEx->type != HB_IT_STRING) || ( pString != NULL && pString->type != HB_IT_STRING ) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameters",
-         "Regex subsystem",
-         4, pRegEx, pString,
-          hb_paramError( 3 ), hb_paramError( 4 ));
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameters", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ) );
       return FALSE;
    }
 
    /* now check if it is a precompiled regex */
-   if ( pRegEx->item.asString.length > 3 &&
-      memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
+   if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
    {
-      pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
+      pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
       aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
    }
    else
@@ -6489,10 +6482,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
       if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
       {
-         hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",
-            "Regex subsystem",
-            4, pRegEx, pString,
-            hb_paramError( 3 ), hb_paramError( 4 ));
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ));
          return FALSE;
       }
 
@@ -6529,10 +6519,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                if (aMatches[i].rm_eo > -1 )
                {
-                  hb_itemPutCL(
-                     hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ),
-                     pString->item.asString.value + aMatches[i].rm_so,
-                     aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_itemPutCL( hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
                }
                else
                {
@@ -6551,17 +6538,19 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          case 3: // Split
          {
-            PHB_ITEM pMatch;
+            HB_ITEM Match;
             char *str = pString->item.asString.value;
             int iMax = hb_parni( 5 );
             int iCount = 1;
 
             hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
+            Match.type = HB_IT_NIL;
+
             do
             {
-               pMatch = hb_itemPutCL( NULL, str, aMatches[0].rm_so );
-               hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
+               hb_itemPutCL( &Match, str, aMatches[0].rm_so );
+               hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
@@ -6569,14 +6558,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
-            pMatch = hb_itemPutCL( NULL, str, strlen( str ) );
-            hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
+            hb_itemPutCL( &Match, str, strlen( str ) );
+            hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
          }
+
          return TRUE;
 
          case 4: // Wants Results AND positions
          {
-            PHB_ITEM aSingleMatch;
+            HB_ITEM aSingleMatch;
 
             // Count sucessful matches
             for ( i = 0; i < iMaxMatch; i ++ )
@@ -6592,36 +6582,31 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
             for ( i = 0; i < iMatches; i++ )
             {
-               aSingleMatch = hb_itemNew( NULL );
+               aSingleMatch.type = HB_IT_NIL;
 
                if ( aMatches[i].rm_eo != -1 )
                {
-                  hb_arrayNew( aSingleMatch, 3 );
+                  hb_arrayNew( &aSingleMatch, 3 );
 
                   //matched string
-                  hb_itemPutCL(
-                     hb_arrayGetItemPtr( aSingleMatch, 1 ),
-                     pString->item.asString.value + aMatches[i].rm_so,
-                     aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
 
                   // begin of match
-                  hb_itemPutNI(
-                     hb_arrayGetItemPtr( aSingleMatch, 2 ),
-                     aMatches[i].rm_so );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), aMatches[i].rm_so );
 
                   // End of match
-                  hb_itemPutNI(
-                     hb_arrayGetItemPtr( aSingleMatch, 3 ),
-                     aMatches[i].rm_eo );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), aMatches[i].rm_eo );
                }
-               else {
-                  hb_itemPutCL( hb_arrayGetItemPtr( aSingleMatch, 1 ), "", 0 );
-                  hb_itemPutNI( hb_arrayGetItemPtr( aSingleMatch, 2 ), 0 );
-                  hb_itemPutNI( hb_arrayGetItemPtr( aSingleMatch, 3 ), 0 );
+               else
+               {
+                  hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
                }
 
-               hb_itemArrayPut( &(HB_VM_STACK.Return), i + 1, aSingleMatch );
+               hb_itemArrayPut( &(HB_VM_STACK.Return), i + 1, &aSingleMatch );
             }
+
             return TRUE;
 
          }
