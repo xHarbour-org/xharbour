@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3269 2004/08/04 18:00:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3270 2004/08/04 20:39:36 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-04 1:00 UTC+0100 Ath <ath at ath.doge.nl>
+  * utils/hbmake/hbmake.prg
+    + Added optional extra functionality in the makescript by
+      implementing #DEPENDS section. This section can be filled
+      (generated) from interactive mode (-ex) by selecting the
+      corresponding checkbox. Recursive scanning of sourcefiles
+      is also optional, and specific file-extensions can be left
+      out of the scan.
+
 2004-08-04 22:39 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/round.c
     * made compatible with Clipper 5.3b
@@ -15,6 +24,7 @@
     * now HB_WIN32_IO is the default. Use -DHB_WIN32_IO_OFF to
     * disable it.
 
+>>>>>>> 1.3270
 2004-08-04 10:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/harbour.slx
     * Revised IS_OP() macro to support all operators.
