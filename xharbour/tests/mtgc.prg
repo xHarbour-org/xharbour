@@ -3,7 +3,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.8 2003/02/01 12:45:36 jonnymind Exp $
+* $Id: mtgc.prg,v 1.9 2003/02/02 02:08:10 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -24,42 +24,49 @@ PROCEDURE Main()
 
   set color to w+/b
   CLEAR SCREEN
+  @2,15 SAY "X H A R B O U R - Multithreading / Garbage collecting test"
   Mutex := CreateMutex()
 
   // 1st param is the Startup Function, 2nd. is Self if 1st param 
   // is a Method or NIL otherwise,
   // rest are paramaters to be passed to the Function/Method.
-  StartThread ( @MyThreadFunc(), 2, "1st Thread:",     0,  5000 )
-  StartThread ( @MyThreadFunc(), 4, "2nd Thread:",  5000, 10000 )
-  StartThread ( @MyThreadFunc(), 6, "3rd Thread:", 10000, 15000 )
+  StartThread ( @MyThreadFunc(),  4, " 1st Thread:",    0,  500 )
+  HB_GCALL( .T. )
+  StartThread ( @MyThreadFunc(),  5, " 2nd Thread:",  500, 1000 )
+  HB_GCALL( .T. )
+  StartThread ( @MyThreadFunc(),  6, " 3rd Thread:", 1000, 1500 )
+  HB_GCALL( .T. )
+  StartThread ( @MyThreadFunc(),  7, " 4th Thread:", 1500, 2000 )
+  HB_GCALL( .T. )
+  StartThread ( @MyThreadFunc(),  8, " 5th Thread:", 2000, 2500 )
+  HB_GCALL( .T. )
+  StartThread ( @MyThreadFunc(),  9, " 6th Thread:", 2500, 3000 )
+  StartThread ( @MyThreadFunc(), 10, " 7th Thread:", 3000, 3500 )
+  StartThread ( @MyThreadFunc(), 11, " 8th Thread:", 3500, 4000 )
+  StartThread ( @MyThreadFunc(), 12, " 9th Thread:", 4000, 4500 )
+  StartThread ( @MyThreadFunc(), 13, "10th Thread:", 4050, 5000 )
 
   WaitForThreads()
-  @ 8, 0 SAY "Threads Time:" + Str( Seconds() - nStart )
-  @ 9, 0 SAY "Press a key to continue"
+  @ 15, 2 SAY "Threads Time:" + Str( Seconds() - nStart )
+  @ 16, 2 SAY "Press a key to continue"
   Inkey(0)
 
 RETURN
 
 PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
-
   LOCAL i, aVar
 
   FOR i := nStart TO nMax
      @ nRow, 10 SAY cName + Str( i )
 
+     aVar := { 1 }
+     aVar[1] := Array( 50 )
+     *aVar[1][1] := aVar
+     aVar := NIL
 
-     IF nRow < 10
-        aVar := { 1 }
-        aVar[1] := Array( 50 )
-        *aVar[1][1] := aVar
-        aVar := NIL
-
-        @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
-        IF nRow == 2
-           HB_GCALL( .T. )
-        ENDIF
-        @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
-     ENDIF
+     @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
+     HB_GCALL( .T. )
+     @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
 
   NEXT
 

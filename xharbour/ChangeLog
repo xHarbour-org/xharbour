@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.752 2003/02/21 15:08:02 lculik Exp $
+ * $Id: ChangeLog,v 1.753 2003/02/21 15:40:17 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-21 23:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! Return element of newly allocated stacks were not initialized
+      to HB_IT_NIL, and this caused GPF if GC come in the way before
+      the new thread had the chance to initialize it.
+  
+  * tests/mtgc.c
+    + Added more extensive stress tests that have allowed the detection
+      of the above problem.
 
 2003-02-21 16:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c

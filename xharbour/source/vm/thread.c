@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.46 2003/02/20 01:35:24 jonnymind Exp $
+* $Id: thread.c,v 1.47 2003/02/21 15:19:37 jonnymind Exp $
 */
 
 /*
@@ -103,6 +103,8 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
    tc->stack->pPos   = tc->stack->pItems;     /* points to the first stack item */
    tc->stack->wItems = STACK_THREADHB_ITEMS;
    tc->stack->pMethod = NULL;
+   tc->stack->Return.type = HB_IT_NIL;
+   
 
 
    //printf( "New Context: %p Stack: %p\n", tc, tc->stack );
@@ -311,9 +313,7 @@ hb_create_a_thread(
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
    HB_THREAD_T tCurrent = HB_CURRENT_THREAD();
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
-   
-   /* NO CODE HERE ! */
-  
+      
    #ifndef HB_OS_WIN_32
        hb_threadCreateContext( tCurrent );
       /* now that the context has been created,
@@ -349,9 +349,6 @@ hb_create_a_thread(
       hb_vmPush( hb_arrayGetItemPtr( pt->pArgs, uiParam ) );
    }
 
-   hb_gcUnlock( pt->pArgs->item.asArray.value );
-   hb_itemRelease( pt->pArgs );
-
    if( pt->bIsMethod )
    {
       hb_vmSend( pt->uiCount - 2 );
@@ -360,9 +357,10 @@ hb_create_a_thread(
    {
       hb_vmDo( pt->uiCount - 1 );
    }
-
-   free( pt );
    hb_threadDestroyContext( tCurrent );
+   hb_gcUnlock( pt->pArgs->item.asArray.value );
+   hb_itemRelease( pt->pArgs );
+   free( pt );
 
    #ifdef HB_OS_WIN_32
       return 0;
@@ -375,18 +373,19 @@ hb_create_a_thread(
 
 void hb_threadIsLocalRef( void )
 {
-   HB_THREAD_CONTEXT *pContext = hb_ht_context;
+   HB_THREAD_CONTEXT *pContext;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-
    hb_vmIsLocalRef();
+
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   
+   pContext = hb_ht_context;
 
    while( pContext )
    {
-      //printf( "   Context: %p Stack: %p Items: %i\n", pContext, pContext->stack, pContext->stack->pPos - pContext->stack->pItems );
-    
+      
       if( pContext->stack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
       {
          hb_gcItemRef( &(pContext->stack->Return) );
@@ -411,8 +410,9 @@ void hb_threadIsLocalRef( void )
 
       pContext = pContext->next;
    }
-
+   
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
 }
 
 HB_FUNC( STARTTHREAD )
@@ -517,7 +517,7 @@ HB_FUNC( STARTTHREAD )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pArgs );
       hb_gcUnlock( pt->pArgs->item.asArray.value );
       hb_itemRelease( pArgs );
-      return;
+      return; 
    }
 
    HB_CRITICAL_LOCK( hb_allocMutex );
