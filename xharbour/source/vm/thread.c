@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.24 2002/12/30 05:05:01 ronpinkas Exp $
+* $Id: thread.c,v 1.25 2002/12/30 06:53:00 ronpinkas Exp $
 */
 
 /*
@@ -482,6 +482,14 @@ HB_FUNC( STARTTHREAD )
     pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
 
     /* Error Checking */
+    if( pPointer == NULL )
+    {
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pArgs );
+        hb_gcUnlock( pt->args->item.asArray.value );
+        hb_itemRelease( pArgs );
+        return;
+    }
+
     if ( pPointer->type == HB_IT_LONG )
     {
         PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
@@ -505,6 +513,8 @@ HB_FUNC( STARTTHREAD )
         if( pExecSym == NULL )
         {
             hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            hb_gcUnlock( pt->args->item.asArray.value );
+            hb_itemRelease( pArgs );
             return;
         }
 
@@ -519,6 +529,7 @@ HB_FUNC( STARTTHREAD )
         if( ! pDynSym )
         {
             hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pArgs );
+            hb_gcUnlock( pt->args->item.asArray.value );
             hb_itemRelease( pArgs );
             return;
         }
@@ -526,6 +537,7 @@ HB_FUNC( STARTTHREAD )
     else if( ( ! HB_IS_BLOCK( pPointer ) ) && ( ! HB_IS_SYMBOL( pPointer ) )  && ( ! HB_IS_LONG( pPointer ) ) )
     {
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pArgs );
+        hb_gcUnlock( pt->args->item.asArray.value );
         hb_itemRelease( pArgs );
         return;
     }

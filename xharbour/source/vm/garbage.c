@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.33 2002/12/30 05:05:01 ronpinkas Exp $
+ * $Id: garbage.c,v 1.34 2002/12/30 06:17:51 ronpinkas Exp $
  */
 
 /*
@@ -181,7 +181,6 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    {
       s_uAllocated++;
 
-      //hb_gcLink( pContextList, pAlloc );
       hb_gcLink( &s_pCurrBlock, pAlloc );
 
       pAlloc->pFunc  = pCleanupFunc;
@@ -249,7 +248,6 @@ void hb_gcFree( void *pBlock )
          {
             s_uAllocated--;
 
-            //hb_gcUnlink( pContextList, pAlloc );
             hb_gcUnlink( &s_pCurrBlock, pAlloc );
 
             HB_GARBAGE_FREE( pAlloc );
@@ -454,7 +452,6 @@ void *hb_gcUnlock( void *pBlock )
          {
             hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
-            //hb_gcLink( pContextList, pAlloc );
             hb_gcLink( &s_pCurrBlock, pAlloc );
 
             pAlloc->used = s_uUsedFlag;
@@ -819,7 +816,8 @@ void hb_gcReleaseAll( void )
          hb_gcUnlink( &s_pLockedBlock, s_pLockedBlock );
          //HB_GARBAGE_FREE( pDelete );
          hb_xfree( (void *) ( pDelete ) );
-      } while ( s_pLockedBlock );
+      }
+      while ( s_pLockedBlock );
    }
 
    if( s_pCurrBlock )
@@ -846,7 +844,8 @@ void hb_gcReleaseAll( void )
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
          //HB_GARBAGE_FREE( pDelete );
          hb_xfree( (void *) ( pDelete ) );
-      } while( s_pCurrBlock );
+      }
+      while( s_pCurrBlock );
    }
 
    #ifdef GC_RECYCLE

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.41 2002/12/30 06:17:51 ronpinkas Exp $
+ * $Id: arrays.c,v 1.42 2002/12/30 06:52:59 ronpinkas Exp $
  */
 
 /*
@@ -442,11 +442,15 @@ char * HB_EXPORT hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDS(%p, %lu, %s)", pArray, ulIndex, szDate));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetDS( pArray->item.asArray.value->pItems + ulIndex - 1, szDate );
+   }
    else
+   {
       /* NOTE: Intentionally calling it with a bad parameter in order to get
                the default value from hb_itemGetDS(). [vszakats] */
       return hb_itemGetDS( NULL, szDate );
+   }
 }
 
 long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
@@ -454,11 +458,15 @@ long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetDL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       /* NOTE: Intentionally calling it with a bad parameter in order to get
                the default value from hb_itemGetDL(). [vszakats] */
       return hb_itemGetDL( NULL );
+   }
 }
 
 /*
@@ -470,9 +478,13 @@ PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetItemPtr(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return pArray->item.asArray.value->pItems + ulIndex - 1;
+   }
    else
+   {
       return NULL;
+   }
 }
 
 BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
@@ -480,9 +492,13 @@ BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetL(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return FALSE;
+   }
 }
 
 int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
@@ -490,9 +506,13 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNI(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetNI( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return 0;
+   }
 }
 
 long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
@@ -500,9 +520,13 @@ long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNL(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetNL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return 0;
+   }
 }
 
 double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
@@ -510,9 +534,13 @@ double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetND( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return 0;
+   }
 }
 
 ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen )
@@ -520,9 +548,13 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopyC(%p, %lu, %s, %lu)", pArray, ulIndex, szBuffer, ulLen));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemCopyC( pArray->item.asArray.value->pItems + ulIndex - 1, szBuffer, ulLen );
+   }
    else
+   {
       return 0;
+   }
 }
 
 char * HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
@@ -530,9 +562,13 @@ char * HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetC(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetC( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return NULL;
+   }
 }
 
 char * HB_EXPORT hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
@@ -540,9 +576,13 @@ char * HB_EXPORT hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetCPtr( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return "";
+   }
 }
 
 ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
@@ -550,9 +590,13 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCLen(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemGetCLen( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return 0;
+   }
 }
 
 USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
@@ -560,9 +604,13 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetType(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
       return hb_itemType( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
    else
+   {
       return 0;
+   }
 }
 
 BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
@@ -1232,7 +1280,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    #ifdef HB_THREAD_SUPPORT
      if( hb_ht_context )
      {
-        // FORCING a ref to the array just to protect from GC
         hb_threadAllow( &hb_gcCollectionMutex );
      }
    #endif

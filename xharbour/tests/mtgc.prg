@@ -32,7 +32,7 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
         aVar := NIL
 
         @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
-        HB_GCALL( .T. )
+        //HB_GCALL( .T. )
         @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
      ENDIF
   NEXT
