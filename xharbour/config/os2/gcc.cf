@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.6 2004/05/10 10:38:04 mauriliolongo Exp $
+# $Id: gcc.cf,v 1.7 2004/09/13 07:39:37 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -101,6 +101,11 @@ LINKLIBS += -lgtos2
 endif
 endif
 endif
+
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 
 #LINKLIBS += -Wl,-)
