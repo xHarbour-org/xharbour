@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.13 2004/02/20 16:54:39 ronpinkas Exp $
+ * $Id: round.c,v 1.14 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -253,6 +253,7 @@ double hb_numRound( double dNum, int iDec )
 #endif
 
    doComplete5 /= doBase;
+   doComplete5 *= 1.0000000000000002;
    modf( doComplete5, &doComplete5i );
 
    if ( iDec < 0 )
