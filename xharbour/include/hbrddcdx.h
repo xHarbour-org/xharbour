@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.1 2003/02/16 17:23:23 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.12 2003/06/09 17:49:05 ronpinkas Exp $
  */
 
 /*
@@ -248,7 +248,7 @@ typedef struct _CDXTAGHEADER
 {
    LONG lRoot;                /* offset of the root node */
    LONG lFreeList;            /* offset of list of free   pages or -1 */
-   LONG lChgFlag; //lLength;  /* Version number ? */
+   LONG lChgFlag; //lLength;  /* Version number ? MSDN: pointer to end of file */
    USHORT uiKeySize;          /* key length */
    BYTE bType;                /* index options see CDX_TYPE_* */
    BYTE bSignature;           /* index signature */
