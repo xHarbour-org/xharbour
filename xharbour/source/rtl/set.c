@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.15 2002/12/22 07:03:19 walito Exp $
+ * $Id: set.c,v 1.16 2002/12/23 00:14:22 ronpinkas Exp $
  */
 
 /*
@@ -1040,6 +1040,7 @@ int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
    PHB_SET_LISTENER p_sl = (PHB_SET_LISTENER) hb_xgrab( sizeof( HB_SET_LISTENER ) );
    p_sl->callback = callback;
    p_sl->listener = s_next_listener++;
+   p_sl->next = NULL;
    if( sp_sl_last ) sp_sl_last->next = p_sl;
    else if( ! sp_sl_first ) sp_sl_first = p_sl;
    sp_sl_last = p_sl;
