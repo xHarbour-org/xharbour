@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.67 2004/02/07 20:06:35 andijahja Exp $
+ * $Id: harbour.c,v 1.68 2004/02/18 10:50:44 andijahja Exp $
  */
 
 /*
@@ -266,6 +266,7 @@ BOOL hb_comp_iGenVarList = FALSE;
 FILE *hb_comp_VariableList = NULL;
 
 #ifndef HB_COMMON_VARNAME_OFF
+static void hb_compCheckIllegalChar( char * szName );
 char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
                              "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
                              "\x20", "\x21", "\x22", "\x23", "\x24", "\x25", "\x26", "\x27", "\x28", "\x29", "\x2A", "\x2B", "\x2C", "\x2D", "\x2E", "\x2F",
@@ -540,6 +541,10 @@ PFUNCTION hb_compFunCallAdd( char * szFunctionName )
 {
    PFUNCTION pFunc = hb_compFunctionNew( szFunctionName, 0 );
 
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szFunctionName );
+#endif
+
    if( ! hb_comp_funcalls.iCount )
    {
       hb_comp_funcalls.pFirst = pFunc;
@@ -562,8 +567,13 @@ PFUNCTION hb_compFunCallAdd( char * szFunctionName )
  */
 void hb_compExternAdd( char * szExternName ) /* defines a new extern name */
 {
-   PEXTERN pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) ), pLast;
+   PEXTERN pExtern, pLast;
 
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szExternName );
+#endif
+
+   pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
    pExtern->szName = szExternName;
    pExtern->pNext  = NULL;
 
@@ -660,20 +670,10 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    PVAR pVar, pLastVar;
    PFUNCTION pFunc = hb_comp_functions.pLast;
 
-#ifndef HB_COMMON_VARNAME_OFF
-   int iSz = 0, iSzLen = strlen( szVarName );
-#endif
-
    HB_SYMBOL_UNUSED( cValueType );
 
 #ifndef HB_COMMON_VARNAME_OFF
-   for ( iSz = 0; iSz < iSzLen ; iSz ++ )
-   {
-      if( !isalnum( (int) szVarName[ iSz ] ) && (int) szVarName [ iSz ] != '_' )
-      {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER, hb_vm_acAscii[ szVarName [ iSz ] ], NULL );
-      }
-   }
+   hb_compCheckIllegalChar( szVarName );
 #endif
 
    if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
@@ -1833,10 +1833,14 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    char szFileName[ _POSIX_PATH_MAX ];
    PHB_FNAME hb_FileName;
 
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szFunName );
+#endif
+
    hb_FileName = hb_fsFNameSplit( hb_comp_files.pLast->szFileName );
    hb_FileName->szPath = NULL;
    hb_fsFNameMerge( szFileName, hb_FileName );
-   
+
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
@@ -5158,3 +5162,18 @@ void hb_compAddI18nString( char *szString )
       hb_comp_bI18n = FALSE;
    }
 }
+
+#ifndef HB_COMMON_VARNAME_OFF
+static void hb_compCheckIllegalChar( char * szName )
+{
+   int iSz, iSzLen = strlen( szName );
+
+   for ( iSz = 0; iSz < iSzLen ; iSz ++ )
+   {
+      if( !isalnum( (int) szName[ iSz ] ) && (int) szName [ iSz ] != '_' )
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER, hb_vm_acAscii[ szName [ iSz ] ], NULL );
+      }
+   }
+}
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2315 2004/02/18 08:55:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2316 2004/02/18 10:50:43 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-19 03:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    + static void hb_compCheckIllegalChar( char * ) to verify illegal chars.
+    ! do not accept EXTERNS, FUNCTION CALLS, FUNCTION NAMES containing
+      illegal characters.
+
 2004-02-18 17:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hberrors.h
     ! minor correction on error code definition
