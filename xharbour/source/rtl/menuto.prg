@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
+ * $Id: menuto.prg,v 1.10 2003/10/23 09:01:35 ronpinkas Exp $
  */
 
 /*
@@ -149,7 +149,7 @@ function __MenuTo( bBlock, cVariable )
          endif
 
          IF Set( _SET_INTENSITY )
-            IF cBackColor <> Nil
+            IF cBackColor == Nil    // Only select Color Enhace if no color was passed
                ColorSelect( CLR_ENHANCED )
             ENDIF
          ENDIF
@@ -161,7 +161,7 @@ function __MenuTo( bBlock, cVariable )
                     cBackColor )
 
          IF Set( _SET_INTENSITY )
-            IF cFrontColor <> nil
+            IF cFrontColor == NIL    // Only select Color Enhace if no color was passed
               ColorSelect( CLR_STANDARD )
             ENDIF
          ENDIF
