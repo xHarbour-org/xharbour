@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.13 2004/02/15 20:14:03 peterrees Exp $
+ * $Id: tmysql.prg,v 1.14 2004/02/26 04:16:38 peterrees Exp $
  */
 
  /*
@@ -1133,9 +1133,11 @@ CLASS TMySQLServer
    DATA  cUser                   // user accessing db
    DATA  cPassword               // his/her password
    DATA  lError                  // .T. if occurred an error
+   DATA  nPort
+   DATA  nFlags
    DATA  cCreateQuery
 
-   METHOD   New( cServer, cUser, cPassword ) // Opens connection to a server, returns a server object
+   METHOD   New( cServer, cUser, cPassword, nPort, nFlags ) // Opens connection to a server, returns a server object
 
    METHOD   Destroy()    INLINE sqlClose( ::nSocket ), Self
                                              // Closes connection to server
@@ -1179,12 +1181,14 @@ CLASS TMySQLServer
 ENDCLASS
 
 
-METHOD New( cServer, cUser, cPassword ) CLASS TMySQLServer
+METHOD New( cServer, cUser, cPassword, nPort, nFlags ) CLASS TMySQLServer
 
    ::cServer   := cServer
    ::cUser     := cUser
    ::cPassword := cPassword
-   ::nSocket   := sqlConnect(cServer, cUser, cPassword)
+   ::nPort     := nPort
+   ::nFlags    := nFlags
+   ::nSocket   := sqlConnect(cServer, cUser, cPassword, nPort, nFlags )
    ::lError    := .F.
 
    if ::nSocket == 0

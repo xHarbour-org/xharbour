@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.6 2004/02/25 00:16:42 peterrees Exp $
+ * $Id: mysql.c,v 1.7 2004/03/04 21:49:09 peterrees Exp $
  */
 
 /*
@@ -85,9 +85,11 @@
 HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * user, char * password, char * db, uint port, char *, uint flags)
 {
    MYSQL * mysql;
-   const char *szHost=hb_parc(1);
-   const char *szUser=hb_parc(2);
-   const char *szPass=hb_parc(3);
+   const char *szHost=hb_parc( 1 );
+   const char *szUser=hb_parc( 2 );
+   const char *szPass=hb_parc( 3 );
+   unsigned int port  = ISNUM( 4 ) ? ( unsigned int ) hb_parni(4) :  MYSQL_PORT;
+   unsigned int flags = ISNUM( 5 ) ? ( unsigned int ) hb_parni(5) :  0;
 #if MYSQL_VERSION_ID > 32200
    /* from 3.22.x of MySQL there is a new parameter in mysql_real_connect() call, that is char * db
       which is not used here */
@@ -95,7 +97,7 @@ HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * use
 
    if ( ( mysql != NULL) )
    {
-     if( mysql_real_connect( mysql, szHost, szUser, szPass, 0, MYSQL_PORT, NULL, 0) )
+     if( mysql_real_connect( mysql, szHost, szUser, szPass, 0, port, NULL, flags) )
      {
         hb_retnl((long) mysql);
      }
