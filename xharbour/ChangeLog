@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3944 2005/03/15 21:38:51 andijahja Exp $
+ * $Id: ChangeLog,v 1.3945 2005/03/15 22:31:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-16 16:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/w32/xcc.cf
+    * some minor cleanups
+  * xharbour/source/common/hbstr.c
+    * add hack for XCC which gives differ results for:
+         (double) iVal1 / (double) iVal1
+      then:
+         (double) iVal1 / iVal1
+      It should resolve the problem with:
+         local x:=2, y:=2.000
+         ? x==y
+      but IMHO XCC should not behave in such way.
+      This problem were reported on xharbour.builder list.
+
 2005-03-15 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.slx
     ! increase HB_INLINE to HB_INLINE_MAX ( default 999 )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.11 2004/11/21 21:43:43 druzus Exp $
+ * $Id: hbstr.c,v 1.12 2004/12/28 06:39:19 druzus Exp $
  */
 
 /*
@@ -379,6 +379,15 @@ double HB_EXPORT hb_numRound( double dNum, int iDec )
 
    modf( doComplete5, &doComplete5i );
 
+#if defined( __XCC__ )
+   if ( iDec < 16 )
+   {
+      if ( iDec >= 0 )
+         return doComplete5i / (LONGLONG) dPow;
+      else if ( iDec > -16 )
+         return doComplete5i * (LONGLONG) dPow;
+   }
+#endif
    if ( iDec < 0 )
       return doComplete5i * dPow;
    else
@@ -517,8 +526,15 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
       *dVal = (double) *lVal;
       fDbl = TRUE;
    }
-   if ( fDbl && iDec )
-      *dVal /= hb_numPow10( iDec );
+   if ( iDec )
+   {
+#if defined( __XCC__ )
+      if ( iDec < 16 )
+         *dVal /= ( LONGLONG ) hb_numPow10( iDec );
+      else
+#endif
+         *dVal /= hb_numPow10( iDec );
+   }
 
    if ( piDec )
       *piDec = iDec + iDecR;

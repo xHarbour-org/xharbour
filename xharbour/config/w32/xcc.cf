@@ -1,5 +1,5 @@
 #
-# $Id: xcc.cf,v 1.1 2005/02/11 18:58:35 druzus Exp $
+# $Id: xcc.cf,v 1.2 2005/02/17 19:52:42 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,9 +12,13 @@ LIB_EXT = .lib
 CC = xcc.exe
 CC_IN = -c
 CC_OUT = -Fo
-CPPFLAGS = -I. -I$(TOP) -I$(TOP)$(ROOT) -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(TOP) -I$(TOP)$(ROOT)
 # disabled - it produces bad code
 #CPPFLAGS += -Ot
+
+ifneq ($(HB_INC_COMPILE),)
+CPPFLAGS += -I$(HB_INC_COMPILE)
+endif
 
 # -U_MSC_VER -D__XCC__
 CFLAGS = 
@@ -38,16 +42,22 @@ LINKLIBS += $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
+ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+endif
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
 endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+endif
 LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
 ifeq ($(HB_MULTI_GT),yes)
+ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+endif
 LINKLIBS += gtnul$(LIB_EXT)
 endif
 endif
