@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.924 2003/04/07 20:15:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.925 2003/04/08 03:00:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-08 20:26 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * include/hbapi.h
+    ! Fixed compilation with HB_NO_DEFAULT_API_MACROS and
+      HB_NO_DEFAULT_STACK_MACROS turned on
 
 2003-04-08 10:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * remove unneeded file -> include/hbclass.chk
