@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.25 2004/05/12 02:25:08 druzus Exp $
+ * $Id: files.c,v 1.26 2004/06/18 21:13:03 likewolf Exp $
  */
 
 /*
@@ -736,7 +736,7 @@ HB_FUNC( FILETIME )
       if(  iAttr & FA_NORMAL  )
           dwFlags |=    FILE_ATTRIBUTE_NORMAL;
 
-      hFind = FindFirstFile( szFile,&hFilesFind );
+      hFind = FindFirstFile( szFile, &hFilesFind );
 
       if ( hFind != INVALID_HANDLE_VALUE )
          if ( dwFlags & hFilesFind.dwFileAttributes )
@@ -744,12 +744,12 @@ HB_FUNC( FILETIME )
          else
             hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );
       else
-         hb_retc( "  :  " );
+         hb_retc( "" );
 
-  }
+   }
    else
    {
-      szDateString=GetTime( &Lastff32.ftLastWriteTime );
+      szDateString = GetTime( &Lastff32.ftLastWriteTime );
       hb_retc( szDateString );
    }
 
@@ -758,34 +758,41 @@ HB_FUNC( FILETIME )
 #elif defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
 {
 
-   char szTime[7];
+   char szTime[9];
    int iFind;
 
-   if ( hb_pcount(  ) >0 )
+   if ( hb_pcount(  ) > 0 )
    {
-      char *szFiles=hb_parcx( 1 );
-      int iAttr=0 ;
+      char *szFiles = hb_parcx( 1 );
+      int iAttr = 0;
       struct ffblk fsFiles;
 
       if ( ISNUM( 2 ) )
-         iAttr=hb_parni( 2 );
+      {
+         iAttr = hb_parni( 2 );
+      }
 
-      iFind=findfirst( szFiles,&fsFiles,iAttr );
+      iFind = findfirst( szFiles, &fsFiles, iAttr );
 
       if ( !iFind )
       {
-         if ( ( iAttr>0 ) & ( iAttr&fsFiles.ff_attrib ) )
-            sprintf( szTime,"%2.2u:%2.2u",( fsFiles.ff_ftime >> 11 ) & 0x1f,( fsFiles.ff_ftime>> 5 ) & 0x3f );
-         else
-            sprintf( szTime,"%2.2u:%2.2u",( fsFiles.ff_ftime >> 11 ) & 0x1f,( fsFiles.ff_ftime>> 5 ) & 0x3f );
+         sprintf( szTime, "%02d:%02d:%02d",
+	          ( fsFiles.ff_ftime >> 11 ) & 0x1f,
+	          ( fsFiles.ff_ftime >> 5 ) & 0x3f,
+		  ( fsFiles.ff_ftime & 0x1f ) << 1 );
          hb_retc( szTime );
       }
       else
-         hb_retc( "  :  " );
+      {
+         hb_retc( "" );
+      }
    }
    else
    {
-      sprintf( szTime,"%2.2u:%2.2u",( fsOldFiles.ff_ftime >> 11 ) & 0x1f,( fsOldFiles.ff_ftime>> 5 ) & 0x3f );
+      sprintf( szTime, "%02d:%02d:%02d",
+               ( fsOldFiles.ff_ftime >> 11 ) & 0x1f,
+	       ( fsOldFiles.ff_ftime >> 5 ) & 0x3f,
+	       ( fsOldFiles.ff_ftime & 0x1f ) << 1 );
       hb_retc( szTime );
    }
 }
@@ -793,22 +800,22 @@ HB_FUNC( FILETIME )
 #elif defined( OS_UNIX_COMPATIBLE )
 
 {
-   const char *szFile=hb_parcx( 1 );
+   const char *szFile = hb_parcx( 1 );
    struct stat sStat;
-   time_t tm_t=0;
+   time_t tm_t = 0;
    char szTime[9];
    struct tm *ft;
-   stat( szFile,&sStat    );
+   
+   stat( szFile, &sStat );
    tm_t = sStat.st_mtime;
    ft = localtime( &tm_t );
-   sprintf(  szTime, "%02d:%02d:%02d",ft->tm_hour, ft->tm_min, ft->tm_sec  );
-
+   sprintf( szTime, "%02d:%02d:%02d", ft->tm_hour, ft->tm_min, ft->tm_sec );
    hb_retc( szTime );
 }
 
 #else
 {
-   hb_retc( "  :  " );
+   hb_retc( "" );
 }
 #endif
 
@@ -847,7 +854,7 @@ LPTSTR GetDate( FILETIME *rTime )
 
 LPTSTR GetTime( FILETIME *rTime )
 {
-   static const LPTSTR tszFormat = "HH':'mm";/*_T( "MM'\\'dd'\\'yyyy" );*/
+   static const LPTSTR tszFormat = "HH':'mm':'ss"; /*_T( "MM'\\'dd'\\'yyyy" );*/
    FILETIME ft;
 
    if ( FileTimeToLocalFileTime( rTime, &ft ) )
