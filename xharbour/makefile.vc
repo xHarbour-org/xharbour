@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.228 2001/12/21 15:31:30 vszakats Exp $
+# $Id: makefile.vc,v 1.4 2002/01/19 14:15:41 ronpinkas Exp $
 #
 
 #
@@ -653,6 +653,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\initexit.obj \
    $(OBJ_DIR)\initsymb.obj \
    $(OBJ_DIR)\itemapi.obj \
+   $(OBJ_DIR)\fastitem.obj \
    $(OBJ_DIR)\macro.obj \
    $(OBJ_DIR)\maindll.obj \
    $(OBJ_DIR)\mainstd.obj \
