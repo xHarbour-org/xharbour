@@ -30,7 +30,7 @@ PROCEDURE Main( cAddress, cPort )
        return
    ENDIF
 
-   ThreadID = StartThread( @ReceivePoll(), NIL, Socket );
+   ThreadID = StartThread( @ReceivePoll(), Socket );
 
    DO WHILE InetErrorCode( Socket ) == 0
       cText := Space( 60 )

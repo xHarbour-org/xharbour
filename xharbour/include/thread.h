@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.18 2002/12/30 19:43:59 ronpinkas Exp $
+* $Id: thread.h,v 1.19 2002/12/31 07:15:41 jonnymind Exp $
 */
 
 /*
@@ -165,8 +165,9 @@ typedef struct tag_HB_THREAD_CONTEXT
 typedef struct tag_HB_THREAD_PARAM
 {
     HB_THREAD_T th_id;
-    PHB_ITEM args;
-    USHORT count;
+    PHB_ITEM pArgs;
+    USHORT uiCount;
+    BOOL bIsMethod;
 } HB_THREAD_PARAM;
 
 /* Ligthweight system indepented reentrant mutex, used internally by harbour */
@@ -213,6 +214,8 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             }
 
     #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x.Critical )
+//TraceLog( NULL, "+LOCK Thread: %i Mutex: %s File: %s[%i]\n", pthread_self(), #x, __FILE__, __LINE__ );
+
     #define HB_CRITICAL_LOCK( lpMutex )  \
          { \
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.568 2003/01/01 18:17:53 jonnymind Exp $
+ * $Id: ChangeLog,v 1.569 2003/01/01 20:58:47 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-01 04:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbstack.h
+    * Default compilation is now WITHOUT threads; -DHB_THREAD_SUPPORT
+      must be specified for thread functions to be included.
+
+  * include/thread.h
+  * source/vm/thread.c
+    * Changed grammar of StartThread Function as follow (all are
+      alternatives)
+        StarThread( @Function(), param1 ... paramN )
+        StarThread( "Function_Name", param1 ... paramN )
+        StarThread( {codeblock}, param1 ... paramN )
+        StarThread( Object, Method, param1 ... paramN )
+      This allows to pass an object to a function when starting a
+      thread as a normal parameter.
+
+  * tests/client.prg
+  * tests/mtcomplex.prg
+  * tests/mtgc.prg
+  * tests/mttest.prg
+    * Modified to reflect the change in StartThread grammar.
 
 2003-01-01 21:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/garbage.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.9 2002/12/27 22:34:37 jonnymind Exp $
+ * $Id: hbstack.h,v 1.10 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -86,10 +86,6 @@ typedef struct
    int      iStatics;     /* statics base for the current function call */
    char     szDate[ 9 ];  /* last returned date from _pards() yyyymmdd format */
 } HB_STACK;
-
-#if !defined(HB_NO_DEFAULT_THREADS) && !defined(HB_OS_DOS)
-   #define HB_THREAD_SUPPORT
-#endif
 
 /* JC1: test for macro accessing the stack */
 #if defined( HB_THREAD_SUPPORT )

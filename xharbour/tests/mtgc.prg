@@ -9,9 +9,9 @@ PROCEDURE Main()
 
   // 1st param is the Startup Function, 2nd. is Self if 1st param is a Method or NIL otherwise,
   // rest are paramaters to be passed to the Function/Method.
-  StartThread ( @MyThreadFunc(), NIL, 2, "1st Thread:",     0,  5000 )
-  StartThread ( @MyThreadFunc(), NIL, 4, "2nd Thread:",  5000, 10000 )
-  StartThread ( @MyThreadFunc(), NIL, 6, "3rd Thread:", 10000, 15000 )
+  StartThread ( @MyThreadFunc(), 2, "1st Thread:",     0,  5000 )
+  StartThread ( @MyThreadFunc(), 4, "2nd Thread:",  5000, 10000 )
+  StartThread ( @MyThreadFunc(), 6, "3rd Thread:", 10000, 15000 )
 
   WaitForThreads()
   @ 8, 0 SAY "Threads Time:" + Str( Seconds() - nStart )

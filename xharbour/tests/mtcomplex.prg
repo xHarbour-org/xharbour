@@ -1,42 +1,49 @@
 PROCEDURE Main()
 
-    LOCAL i
-    LOCAL Mutex := CreateMutex()
-    LOCAL Thread4Handle, MonitorHandle
+   LOCAL i
+   LOCAL Mutex := CreateMutex()
+   LOCAL Thread4Handle, MonitorHandle
 
-    CLS
+   CLS
 
-    StartThread ( @ThreadFunc(), NIL,  8, "1st. Thread:", 100, Mutex )
-    StartThread ( @ThreadFunc(), NIL,  9, "2nd. Thread:", 400, Mutex )
-    StartThread ( @ThreadFunc(), NIL, 10, "3rd. Thread:", 600, Mutex )
-    Thread4Handle := StartThread( @ThreadFunc(), NIL, 11, "4th. Thread", 700, Mutex )
+   StartThread ( @ThreadFunc(), 8, "1st. Thread:", 100, Mutex )
+   StartThread ( @ThreadFunc(), 9, "2nd. Thread:", 400, Mutex )
 
-    MonitorHandle := StartThread ( @MonitorFunc(), NIL, Mutex )
-    StartThread ( @FourthMonitor(), NIL, Thread4Handle, Mutex )
+   /* Test of the { codeblock } grammar */
+   StartThread ( { | nRow, cName, nLoops, Mtx| ThreadFunc(nRow, cName, nLoops, Mtx) } ;
+         , 10, "3rd. Thread:", 600, Mutex )
 
-    FOR i := 0 TO 600
-       @ 12, 10 SAY 'Main Thread:' + Str( i, 4 )
+   Thread4Handle := StartThread( @ThreadFunc(), 11, "4th. Thread", 700, Mutex )
 
-       IF i == 100
-          StopThread( Thread4Handle )
-          @ 12, 27 SAY "(Killed 4th. Thread!)"
-       ENDIF
+   /* Notice the "function name" grammar */
+   MonitorHandle := StartThread ( "MonitorFunc", Mutex )
+   *MonitorHandle := StartThread ( @MonitorFunc() , Mutex )
 
-       // Be nice (at first).
-       IF i < 300
-          ThreadSleep( 30 )
-       ENDIF
-    NEXT
+   StartThread ( @FourthMonitor(), Thread4Handle, Mutex )
 
-    @ 13, 10 SAY 'Cycle over, stopping Monitor     '
+   FOR i := 0 TO 600
+      @ 12, 10 SAY 'Main Thread:' + Str( i, 4 )
 
-    *StopThread( MonitorHandle, Mutex )
-    StopThread( MonitorHandle )
-    WaitforThreads()
-    DestroyMutex( Mutex )
-    @ 14, 10 SAY 'Program over     '
+      IF i == 100
+         StopThread( Thread4Handle )
+         @ 12, 27 SAY "(Killed 4th. Thread!)"
+      ENDIF
 
-    @ 24, 00
+      // Be nice (at first).
+      IF i < 300
+         ThreadSleep( 30 )
+      ENDIF
+   NEXT
+
+   @ 13, 10 SAY 'Cycle over, stopping Monitor     '
+
+   *StopThread( MonitorHandle, Mutex )
+   StopThread( MonitorHandle )
+   WaitforThreads()
+   DestroyMutex( Mutex )
+   @ 14, 10 SAY 'Program over     '
+
+   @ 24, 00
 
 PROCEDURE ThreadFunc( nRow, cName, nMax, Mutex )
 
