@@ -12,8 +12,8 @@
 #  ßßßßßßßßßßßßßßßßßßßßßßß
 # BIN_DIR is defined in dll_55.bat, please adjust accordingly
 
-HARBOUR_EXE = $(BIN_DIR)\harbour.exe
-BCC_DIR     = c:\compiler\bcc55
+HARBOUR_EXE = bin\harbour.exe
+BCC_DIR     = c:\bcc55
 CC          = bcc32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -345,10 +345,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbgwa.obj \
   $(OBJ_DIR)\maindllh.obj \
   $(OBJ_DIR)\hvm.obj \
-  $(OBJ_DIR)\fastitem.obj \
   $(OBJ_DIR)\tprint.obj \
-  $(OBJ_DIR)\tprinter.obj 
-
+  $(OBJ_DIR)\tprinter.obj \
+  $(OBJ_DIR)\fastitem.obj
 
 !if $(HB_LEX) == SIMPLEX
     HARBOUR_DLL_OBJS = \
@@ -658,7 +657,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tprint.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\tprinter.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
   echo. $(BCC_DIR)\lib\c0d32w.obj,       + >> hdll.tmp
   echo. $(HARBOUR_DLL),                  + >> hdll.tmp
@@ -1746,10 +1745,8 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
-   $(CC) $(CLIBFLAGS)  -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+   $(CC) $(CLIBFLAGS) -o$@ $** 
 
 $(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
-   $(CC) $(CLIBFLAGS)  -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
