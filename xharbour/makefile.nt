@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.37 2003/06/24 18:10:45 paultucker Exp $
+# $Id: makefile.nt,v 1.38 2003/06/24 22:02:50 paultucker Exp $
 #
 
 #
@@ -367,7 +367,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
-   $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
@@ -469,6 +468,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fieldbl.obj \
    $(OBJ_DIR)$(MT)\getlist.obj \
    $(OBJ_DIR)$(MT)\getsys.obj \
+   $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \
