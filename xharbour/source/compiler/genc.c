@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.69 2004/03/24 08:08:30 andijahja Exp $
+ * $Id: genc.c,v 1.70 2004/04/01 09:35:36 andijahja Exp $
  */
 
 /*
@@ -877,7 +877,6 @@ static void hb_compGenCCheckInLineStatic( char *str )
    char *pTmp, *pCode;
    LONG ulLen = strlen( str );
    LONG i ;
-   PSSYMLIST pStatSymCurrent = NULL;
    BOOL bPublic;
 
    while( ( nAt = hb_strAt( "HB_FUNC", 7, str, ulLen ) ) != 0 )

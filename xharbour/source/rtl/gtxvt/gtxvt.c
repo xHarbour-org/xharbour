@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.29 2004/02/19 23:43:09 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.30 2004/02/20 13:45:33 jonnymind Exp $
  */
 
 /*
@@ -381,7 +381,7 @@ PXWND_DEF s_wnd = NULL;
 
 /*** Current clipboard buffer **/
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 /** Font request cache **/
 static int s_fontReqSize = XVT_DEFAULT_FONT_HEIGHT;
@@ -754,8 +754,10 @@ static void xvt_bufferClearRange(
 static void xvt_bufferQueueKey( PXVT_BUFFER buf, int data )
 {
    USHORT appMsg = XVT_ICM_KEYSTORE;
-   //TODO: use select to decide wether write is possible
 
+   HB_SYMBOL_UNUSED( buf );
+
+   //TODO: use select to decide wether write is possible
    write( streamChr[1], &appMsg, sizeof( appMsg ) );
    write( streamChr[1], &data, sizeof( data ) );
 }
@@ -768,8 +770,10 @@ static BOOL xvt_bufferDeqeueKey( PXVT_BUFFER buf, int *c )
    fd_set keySet;
    USHORT appMsg;
    struct timeval timeout = {0,0};
-   *c = 0;
 
+   HB_SYMBOL_UNUSED( buf );
+
+   *c = 0;
    FD_ZERO(&keySet);
    FD_SET(streamChr[0], &keySet );
 
@@ -814,7 +818,7 @@ static void xvt_bufferWriteBytes( PXVT_BUFFER buf,
 
    // determine the index and put the string into the TextBuffer
    index = HB_GT_INDEXOF(buf, col, row);
-   if (length + index <= buf->bufsize)
+   if ( (ULONG) (length + index) <= buf->bufsize)
    {
       for ( pAttributes = buf->pAttributes + index;
          pAttributes < buf->pAttributes + index + length;
@@ -1039,7 +1043,7 @@ static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
    wnd->width = wnd->buffer->cols * wnd->fontWidth;
    wnd->height = wnd->buffer->rows * wnd->fontHeight;
 
-   if ( wnd->gc > 0 )
+   if ( wnd->gc != NULL )
    {
       XSetFont( wnd->dpy, wnd->gc, wnd->xfs->fid );
    }
@@ -2597,7 +2601,7 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       // Protocol request from the window manager (usually delete window)
       case ClientMessage:
          // yes; a delete request
-         if ( evt->xclient.data.l[0] == s_atom_delwin )
+         if ( (ULONG) evt->xclient.data.l[0] == s_atom_delwin )
          {
             USHORT appMsg = XVT_ICM_QUIT;
             //write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
@@ -2609,9 +2613,9 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       case SelectionNotify:
       {
          XTextProperty text;
-         int npos, data, stream;
+         int data, stream;
          USHORT appMsg;
-         ULONG nCount;
+         ULONG nCount, npos;
          char cData;
 
          // have we got a property to read?
@@ -2671,7 +2675,7 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       {
          XSelectionRequestEvent *req;
          XEvent respond;
-         int atarget, atomtg;
+         ULONG atarget, atomtg;
 
          atarget = XInternAtom( wnd->dpy, "STRING", 1 );
          atomtg = XInternAtom( wnd->dpy, "TARGETS", 1 );
@@ -4235,6 +4239,8 @@ int HB_GT_FUNC(mouse_Row( void ))
 
 void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
+   HB_SYMBOL_UNUSED( iRow );
+   HB_SYMBOL_UNUSED( iCol );
    /*s_status->mouseGotoRow = iRow;
    s_status->mouseGotoCol = iCol;*/
 }
