@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.11 2004/03/03 08:20:05 andijahja Exp $
+ * $Id: tprint.prg,v 1.12 2004/03/07 21:42:51 andijahja Exp $
  */
 
 /*
@@ -762,7 +762,7 @@ HB_FUNC_STATIC( CREATEFONT )
     iWidth = 0 ; // Use the default font width
   }
 
-  hFont = CreateFont(iHeight, iWidth, 0, 0, iWeight, dwUnderLine, dwItalic, 0,
+  hFont = CreateFont(iHeight, iWidth, 0, 0, iWeight, dwItalic, dwUnderLine, 0,
         dwCharSet ? dwCharSet : OEM_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,  pszFont) ;
   if (hFont)
   {
