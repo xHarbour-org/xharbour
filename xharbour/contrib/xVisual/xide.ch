@@ -32,4 +32,10 @@
 
 #command OBJECT <!object!> IS <!class!> => WITH OBJECT ( :<object> := <class>() )
 
+#command DATA Caption INIT <x> => DATA xhCaption PROTECTED INIT <x>
+#command DATA Top     INIT <x> => DATA xxTop     PROTECTED INIT <x>
+#command DATA Left    INIT <x> => DATA xxLeft    PROTECTED INIT <x>
+#command DATA Height  INIT <x> => DATA xxHeight  PROTECTED INIT <x>
+#command DATA Width   INIT <x> => DATA xxWidth   PROTECTED INIT <x>
+
 //#command END OBJECT => END WITH

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.34 2002/10/29 03:11:11 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.35 2002/10/29 03:34:33 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -114,13 +114,17 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
    __objAddData( Self, oForm:Name )
    __ObjSetValueList( self, { { oForm:Name, oForm } } )
 
-   oForm:Create()
+   WITH OBJECT oForm
+      TraceLog( :Caption, :Top, :Left, :Height, :Width )
 
-   IF oParent:handle == ::handle
-      aAdd( ::aForms, oForm )
-   ENDIF
+      :Create()
 
-   aAdd( ::AppForms, oForm:Name )
+      IF oParent:handle == ::handle
+         aAdd( ::aForms, oForm )
+      ENDIF
+
+      aAdd( ::AppForms, :Name )
+   END WITH
 
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    FOR EACH aVar IN aVars
@@ -130,12 +134,13 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
             :Parent    := oForm
             :Instance  := _GetInstance()
             :Create()
+            //OutputDebugString( HB_QWith():Id )
             //TraceLog( HB_QWith():Id )
          END WITH
       ENDIF
    NEXT
 
-   ProcessMessages()
+   //ProcessMessages()
 
    oTarget := oForm
 
