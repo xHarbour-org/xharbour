@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.76 2003/06/26 01:29:14 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.77 2003/07/14 19:18:46 jonnymind Exp $
  */
 
 /*
@@ -2753,10 +2753,13 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    HB_SKIPTABSPACES( *ptri );
 
    // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
-   if( strchr( "}]),|=*^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
+   if( strchr( "}]),|=*^%", ( *ptri )[0] ) ||
+       ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) ||
+       ( ( *ptri )[0] == '-' && ( *ptri )[1] == '>' ) )
    {
       return 0;
    }
+
 
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 

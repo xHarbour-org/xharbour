@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.5 2003/03/09 21:40:18 ronpinkas Exp $
+ * $Id: simplex.c,v 1.1 2003/03/21 00:06:29 ronpinkas Exp $
  */
 
 /*
@@ -1096,7 +1096,7 @@ int Reduce( int iToken )
 void SimpLex_CheckWords( void )
 {
    int iTentative = -1, iCompare;
-   unsigned int i, iMax, iLenMatched, iBaseSize, iKeyLen;
+   unsigned int i, iMax, iLenMatched, iBaseSize, iKeyLen, iSavedLen;
    char *pNextSpacer, *sKeys2Match = NULL, *szBaseBuffer = s_szBuffer, cSpacer = chr;
    LEX_WORD *aCheck;
 
@@ -1235,9 +1235,12 @@ void SimpLex_CheckWords( void )
 
      #ifdef LEX_ABBREVIATE
       iLen2Match = iLen;
+      DEBUG_INFO( printf( "iLenMatch %i\n", iLen2Match ) );
+
       if( iLen2Match < LEX_ABBREVIATE && iLen2Match < iKeyLen )
       {
          iLen2Match = ( LEX_ABBREVIATE < iKeyLen ) ? LEX_ABBREVIATE : iKeyLen ;
+         DEBUG_INFO( printf( "iLenMatch from %i to %i\n", iLen, iLen2Match ) );
       }
 
       if( iLen2Match > iKeyLen && i < iMax - 1 )
@@ -1325,7 +1328,11 @@ void SimpLex_CheckWords( void )
 
             /* Saving this pointer of the input stream, we might have to get here again. */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
-            DEBUG_INFO( printf( "Saved Buffer Postion: %i at: [%s]\n", iBaseSize, szBaseBuffer ) );
+
+            /* Saving Token Length. */
+            iSavedLen = iLen;
+
+            DEBUG_INFO( printf( "Saved Buffer Postion: %i at: [%s] Len: %i\n", iBaseSize, szBaseBuffer, iSavedLen ) );
          }
 
          /* i may have been increased above - don't want to read next token if it won't get used! */
@@ -1375,7 +1382,8 @@ void SimpLex_CheckWords( void )
    if( s_szBuffer != szBaseBuffer )
    {
       s_szBuffer = szBaseBuffer; iSize = iBaseSize; iHold = 0; iReturn = 0; iPairToken = 0;
-      DEBUG_INFO( printf( "Partial Match - Restored position: %i at: [%s]\n", iSize, s_szBuffer ) );
+      iLen = iSavedLen;
+      DEBUG_INFO( printf( "Partial Match - Restored position: %i at: [%s] Len: %i\n", iSize, s_szBuffer, iLen ) );
    }
 
    if( iTentative > -1 )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1333 2003/08/07 18:27:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1334 2003/08/07 20:23:32 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-09 11:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/simplex.c
+    ! Fixed save/restore of tentative match to save/restore length of token.
+
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() to reject an expression startting with '->'.
+
+  * source/vm/hvm.c
+    + Added 2 commented TraceLog() debugging lines.
 
 2003-08-07 22:23 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfntx/dbfntx1.c
