@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: isprint.c,v 1.4 2002/02/02 10:52:37 lculik Exp $
  */
 
 /*
@@ -65,7 +65,8 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
-
+#include "hbset.h"
+#include "hbapiitm.h"
 #if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
 
    #include <stdio.h>
@@ -420,5 +421,30 @@ static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize)
 
   return TRUE;
 }
+#define MAX_PRINTERS 20
+
+HB_FUNC(GETPRINTERS)
+{
+    PHB_ITEM pArrayPrinter= hb_itemArrayNew( 0 );
+    unsigned long needed,returned,a;
+    PRINTER_INFO_5 buffer[MAX_PRINTERS];
+    EnumPrinters(PRINTER_ENUM_LOCAL,NULL,5,(LPBYTE)buffer,
+                MAX_PRINTERS*sizeof(PRINTER_INFO_5),
+                &needed,&returned);
+   for (a=0; a<returned; a++){
+        PHB_ITEM pSubItems= hb_itemArrayNew( 2 );
+        PHB_ITEM pFile=hb_itemPutC( NULL, buffer[a].pPrinterName );
+        PHB_ITEM pPort=hb_itemPutC( NULL,buffer[a].pPortName);
+        hb_arraySet(pSubItems,1,pFile);
+        hb_arraySet(pSubItems,2,pPort);
+        hb_arrayAdd(pArrayPrinter,pSubItems);
+        hb_itemRelease(pFile);
+        hb_itemRelease(pPort);
+        hb_itemRelease(pSubItems );
+    }
+   hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
+
+}    
+
 
 #endif

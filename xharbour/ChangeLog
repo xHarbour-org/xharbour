@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.175 2002/04/26 23:27:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.176 2002/04/27 20:37:57 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-04-27 22:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/isprint.c
+    + Added GETPRINTERS() function(win32) to retrive all instaled printer
+      on an computer to an array
+      Each Array element is {"Printer Name"," Printer Port"} Where Printer Name
+      is the Name that apear on the printers folder, and Printer port, what port
+      this printer use
+      
 2002-04-27 17:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/dbedit.prg
     *Fix an bug on dbedit function that was Generating an Recursive call to DBEDIT()
