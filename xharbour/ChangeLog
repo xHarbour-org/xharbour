@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2941 2004/05/17 01:51:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2942 2004/05/17 02:40:03 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-16 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Fixed compilation of <BEGIN SEQUENCE, END> when no RECOVER USING is used.
+    ! Fixed compilation of <TRY, END> when no CATCH is used.
+    ! Fixed management of <FOR EACH, NEXT> in BREAK context.
 
 2004-05-16 21:37 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/philes.c

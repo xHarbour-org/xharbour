@@ -840,9 +840,10 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    LOCAL aProc := aProcedures[nProc]
    LOCAL nBlock, nBlocks := Len( aProc[2] ), xErr
    LOCAL nVar, nVars
-   LOCAL anRecover := {}, acRecover := {}, lRecover := .F.
+   LOCAL anRecover := {}, acRecover := {}, aSequence := {}, lRecover := .F.
    LOCAL bErrHandler
    LOCAL aBlocks, aCode, OpCode
+   LOCAL nForEachIndex := s_nForEachIndex
 
    IF s_nProcStack > 0
       /* Saving Privates of upper level. */
@@ -919,6 +920,12 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
                s_lReturnRequested := .F.
                EXIT
             ELSE
+               s_nForEachIndex := aSequence[ Len( aSequence ) ]
+               aSize( s_aForEachEnumerations, s_nForEachIndex )
+               aSize( s_anForEachEnumerationIndex, s_nForEachIndex )
+               aSize( s_anForEachEnumerator, s_nForEachIndex )
+               aSize( s_anForEachStartingBlock, s_nForEachIndex )
+
                IF Len( anRecover ) > 0
                   IF ! Empty( acRecover[ Len( acRecover ) ] )
                      //TraceLog( acRecover[ Len( acRecover ) ] )
@@ -942,6 +949,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          aAdd( acRecover, aCode[1][1] ) // Catcher Var
          aAdd( anRecover, aCode[1][2] ) // Recovery Address
+         aAdd( aSequence, s_nForEachIndex )
 
          s_lTrying := .T.
 
@@ -949,6 +957,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          aSize( acRecover, Len( acRecover ) - 1 )
          aSize( anRecover, Len( anREcover ) - 1 )
+         aSize( aSequence, Len( aSequence ) - 1 )
 
          s_lTrying := .F.
 
@@ -956,11 +965,13 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
          aAdd( acRecover, aCode[1][1] ) // Catcher Var
          aAdd( anRecover, aCode[1][2] ) // Recovery Address
+         aAdd( aSequence, s_nForEachIndex )
 
       ELSEIF OpCode == PP_OP_ENDBEGIN
 
          aSize( acRecover, Len( acRecover ) - 1 )
          aSize( anRecover, Len( anREcover ) - 1 )
+         aSize( aSequence, Len( aSequence ) - 1 )
 
       ELSEIF OpCode == PP_OP_FOREACH
 
@@ -1058,6 +1069,12 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       aSize( s_aProcStack[s_nProcStack], 2 )
    ENDIF
+
+   s_nForEachIndex := nForEachIndex
+   aSize( s_aForEachEnumerations, s_nForEachIndex )
+   aSize( s_anForEachEnumerationIndex, s_nForEachIndex )
+   aSize( s_anForEachEnumerator, s_nForEachIndex )
+   aSize( s_anForEachStartingBlock, s_nForEachIndex )
 
    IF lRecover
       //TraceLog( "Return to RECOVER of parrent" )
@@ -1783,7 +1800,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                         ELSEIF s_acFlowType[ s_nFlowId ] == "T"
 
-                           aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
+                           IF aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][2] == PP_OP_JUMP
+                              aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
+                           ELSE
+                              aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := { NIL , Len( aProcedures[ nProcId ][2] ) } // Patching the previous conditional Jump Instruction
+                           ENDIF
                            s_nCompLoop--
 
                            aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_ENDTRY, nLine } ) // Register Recovery Address and Catch Var.
@@ -2187,6 +2208,8 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
 
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
+
+   TraceLog()
 
    oErr:ProcName   := PP_ProcName()
    oErr:ProcLine   := PP_ProcLine()
