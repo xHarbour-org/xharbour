@@ -1,5 +1,5 @@
 /*
- * $Id: left.c,v 1.0 2002/01/26 02:03:43 ronpinkas Exp $
+ * $Id: left.c,v 1.3 2002/01/27 05:23:32 ronpinkas Exp $
  */
 
 /*
@@ -63,9 +63,9 @@ HB_FUNC( LEFT )
    {
       char *sLeft, *sString = pText->item.asString.value;
       long lLeft = hb_parnl( 2 );
-      ULONG lLen = pText->item.asString.length;
+      ULONG ulLen = pText->item.asString.length;
 
-      HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, lLen ) );
+      HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
 
       /* Must come first, because negative signed always greater than unsigned! */
       if( lLeft <= 0 )
@@ -73,7 +73,7 @@ HB_FUNC( LEFT )
          hb_retclen( "", 0 );
          return;
       }
-      else if( lLeft >= lLen )
+      else if( (ULONG) lLeft >= ulLen )
       {
          /* No need to retain the 1st parameter - Recycle. */
          hb_itemForwardValue( &hb_stack.Return, pText );

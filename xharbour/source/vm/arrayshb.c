@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.1.1.1 2001/12/21 10:41:03 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.2 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -246,7 +246,7 @@ HB_FUNC( AFILL )
             }
          }
 
-         hb_arrayFill( pArray, pValue, ulStart, ulCount );
+         hb_arrayFill( pArray, pValue, (ULONG) ulStart, (ULONG) ulCount );
       }
 
       hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
