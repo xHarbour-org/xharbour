@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.4 2002/08/09 17:48:20 lculik Exp $
+ * $Id: achoice.prg,v 1.5 2002/08/09 17:56:57 lculik Exp $
  */
 
 /*
@@ -64,9 +64,13 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    DEFAULT nHiLiteRow TO 0                 // The row to be highlighted
 
    IF nRight == 79 .and. nLeft ==0
-      nNumCols := 79
+      nNumCols := 80  
    ELSE
       nNumCols := nRight - nLeft + 1
+   ENDIF
+
+   IF nRight > MaxCol()
+      nRight--
    ENDIF
 
    nNumRows := nBottom - nTop + 1
@@ -507,10 +511,10 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
    LOCAL nRightPos := 0
 
    IF nRight == 79 .and. nLeft == 0
-      nRightPos := nRight
+      nRightPos := 80
    ELSE                            
       nRightPos := nRight - nLeft + 1 
-   ENDIF
+   ENDIF 
 
    Default nRowsClr to nNumRows
 
@@ -520,7 +524,7 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
 
       nRow   := nTop + nCntr - 1
       nIndex := nCntr + nAtTop - 1
-      tracelog(nright,nRightPos)
+
       IF INRANGE( 1, nIndex, nArrLen )
          DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRightPos)
       ELSE

@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
+ * $Id: dummy.prg,v 1.2 2002/05/21 17:45:39 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,6 @@ FUNCTION ordSkipUnique()   ; RETURN .F.
 #endif
 
 FUNCTION __dbJoin()        ; RETURN NIL
-FUNCTION __dbTotal()       ; RETURN NIL
 
 /* NOTE: Internal functions */
 FUNCTION __dbFList()       ; RETURN {}
