@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.59 2003/09/23 04:52:34 paultucker Exp $
+ * $Id: tget.prg,v 1.60 2003/09/30 03:06:29 lculik Exp $
  */
 
 /*
@@ -68,6 +68,8 @@
 
 #define GET_CLR_UNSELECTED      0
 #define GET_CLR_ENHANCED        1
+#define GET_CLR_CAPTION         2
+#define GET_CLR_ACCEL           3
 
 //----------------------------------------------------------------------------//
 
@@ -182,7 +184,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cVarName   TO ""
    DEFAULT bVarBlock  TO IIF( ValType( cVarName ) == 'C', MemvarBlock( cVarName ), NIL )
    DEFAULT cPicture   TO ""
-   DEFAULT cColorSpec TO hb_ColorIndex( SetColor(), CLR_UNSELECTED ) + "," + hb_ColorIndex( SetColor(), CLR_ENHANCED )
+   DEFAULT cColorSpec TO hb_ColorIndex( SetColor(), CLR_UNSELECTED ) + "," + hb_ColorIndex( SetColor(), CLR_ENHANCED ) + "," + __guiColor( SetColor(), CLR_STANDARD + 1 ) + "," + __guiColor( SetColor(), CLR_BACKGROUND + 1 )
 
    ::HasFocus   := .f.
    ::lEdit      := .f.
@@ -373,8 +375,18 @@ METHOD Display( lForced ) CLASS Get
    LOCAL nOldCursor := SetCursor( SC_NONE )
    LOCAL xBuffer
    LOCAL xVar
+   LOCAL cCaption
+   LOCAL cClrCap := hb_ColorIndex( ::ColorSpec, GET_CLR_CAPTION )
+   LOCAL cClrAcc := hb_ColorIndex( ::ColorSpec, GET_CLR_ACCEL )
 
    DEFAULT lForced TO .t.
+
+   IF Empty( cClrCap )
+     cClrCap := hb_ColorIndex( SetColor(), CLR_STANDARD )
+   ENDIF
+   IF Empty( cClrAcc )
+     cClrAcc := hb_ColorIndex( SetColor(), CLR_BACKGROUND )
+   ENDIF
 
    IF ::buffer == NIL
       xVar      := ::VarGet() // In VarGet() is setting ::xVarGet needed to
@@ -407,6 +419,14 @@ METHOD Display( lForced ) CLASS Get
          DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
          DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
       ENDIF
+   ENDIF
+
+   IF !Empty( ::Caption )
+     cCaption := StrTran( ::Caption, "&", "" )
+     DispOutAt( ::Row, ::Col - Len( cCaption ) - 1, cCaption, cClrCap )
+     IF "&" $ ::Caption
+       DispOutAt( ::Row, ::Col - Len( cCaption ) - 2 + At( "&", ::Caption ), cCaption[At( "&", ::Caption )], cClrAcc )
+     ENDIF
    ENDIF
 
    ::nOldPos := ::nDispPos
