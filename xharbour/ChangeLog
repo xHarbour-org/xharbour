@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1507 2003/09/24 18:02:18 druzus Exp $
+ * $Id: ChangeLog,v 1.1508 2003/09/24 20:45:05 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,8 @@
 */
 
 2003-09-24 16:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * makallbc.bat
-    * don't compile contrib/xwt for now.
+  * contrib/xwt/makefile.bc
+    * corrected dependancy list
 
 2003-09-24 19:56 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

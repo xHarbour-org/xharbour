@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.67 2003/09/13 20:53:27 walito Exp $
+# $Id: makefile.bc,v 1.1 2003/09/23 21:23:56 paultucker Exp $
 #
 
 #
@@ -48,7 +48,7 @@
 # The macros are referenced in makefile.bc
 # ---------------------------------------------------------------
 
-#.AUTODEPEND
+.AUTODEPEND
 
 !if !$d(ECHO)
    ECHO = echo.
@@ -82,7 +82,6 @@ AS = tasm
 BIN_DIR = ..\..\bin\b32
 LIB_DIR = ..\..\lib\b32
 OBJ_DIR = obj\b32
-SRC_DIR = src
 
 # This is needed, otherwise the libs may overflow when
 # debug info is requested with -v -y
@@ -92,6 +91,8 @@ SRC_DIR = src
 !endif
 
 !endif
+
+SRC_DIR = src
 
 !if !$d(BCC_NOOPTIM)
    CFLAGS = -O2 $(CFLAGS)
@@ -122,15 +123,6 @@ XWT_LIB     = $(LIB_DIR)\xwt.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 
-($(SRC_DIR)).prg($(OBJ_DIR)).c:
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $& -o$?
-
-($(OBJ_DIR)).c($(SRC_DIR)).prg:
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$?
-
-$(OBJ_DIR).c$(OBJ_DIR).obj:
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
 
 
 #
@@ -139,10 +131,10 @@ $(OBJ_DIR).c$(OBJ_DIR).obj:
 
 
 XWT_LIB_OBJS = \
-   $(SRC_DIR)\xwt_api.c \
+   $(OBJ_DIR)\xwt_api.obj \
    \
-   $(SRC_DIR)\button.prg \
-   $(SRC_DIR)\checkbox.prg \
+   $(OBJ_DIR)\button.obj \
+   $(OBJ_DIR)\checkbox.obj \
    $(OBJ_DIR)\container.obj \
    $(OBJ_DIR)\event.obj \
    $(OBJ_DIR)\filesel.obj \
@@ -192,4 +184,186 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 
 !
 
+$(OBJ_DIR)\xwt_api.obj : $(SRC_DIR)\xwt_api.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\button.c : $(SRC_DIR)\button.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\button.obj : $(OBJ_DIR)\button.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\checkbox.c : $(SRC_DIR)\checkbox.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\checkbox.obj : $(OBJ_DIR)\checkbox.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\container.c : $(SRC_DIR)\container.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\container.obj : $(OBJ_DIR)\container.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\event.c : $(SRC_DIR)\event.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\event.obj : $(OBJ_DIR)\event.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\filesel.c : $(SRC_DIR)\filesel.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\filesel.obj : $(OBJ_DIR)\filesel.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\fontsel.c : $(SRC_DIR)\fontsel.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\fontsel.obj : $(OBJ_DIR)\fontsel.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\framewindow.c : $(SRC_DIR)\framewindow.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\framewindow.obj : $(OBJ_DIR)\framewindow.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\grid.c : $(SRC_DIR)\grid.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\grid.obj : $(OBJ_DIR)\grid.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gridpane.c : $(SRC_DIR)\gridpane.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\gridpane.obj : $(OBJ_DIR)\gridpane.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hex.c : $(SRC_DIR)\hex.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hex.obj : $(OBJ_DIR)\hex.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hpane.c : $(SRC_DIR)\hpane.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hpane.obj : $(OBJ_DIR)\hpane.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\image.c : $(SRC_DIR)\image.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\image.obj : $(OBJ_DIR)\image.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\inputmask.c : $(SRC_DIR)\inputmask.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\inputmask.obj : $(OBJ_DIR)\inputmask.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\label.c : $(SRC_DIR)\label.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\label.obj : $(OBJ_DIR)\label.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\laycontainer.c : $(SRC_DIR)\laycontainer.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\laycontainer.obj : $(OBJ_DIR)\laycontainer.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\layout.c : $(SRC_DIR)\layout.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\layout.obj : $(OBJ_DIR)\layout.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\menu.c : $(SRC_DIR)\menu.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\menu.obj : $(OBJ_DIR)\menu.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\menuitem.c : $(SRC_DIR)\menuitem.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\menuitem.obj : $(OBJ_DIR)\menuitem.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msgbox.c : $(SRC_DIR)\msgbox.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\msgbox.obj : $(OBJ_DIR)\msgbox.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\pane.c : $(SRC_DIR)\pane.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\pane.obj : $(OBJ_DIR)\pane.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\radiobutton.c : $(SRC_DIR)\radiobutton.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\radiobutton.obj : $(OBJ_DIR)\radiobutton.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\splitter.c : $(SRC_DIR)\splitter.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\splitter.obj : $(OBJ_DIR)\splitter.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\textbox.c : $(SRC_DIR)\textbox.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\textbox.obj : $(OBJ_DIR)\textbox.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\togglebutton.c : $(SRC_DIR)\togglebutton.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\togglebutton.obj : $(OBJ_DIR)\togglebutton.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\treeitem.c : $(SRC_DIR)\treeitem.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\treeitem.obj : $(OBJ_DIR)\treeitem.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\treelist.c : $(SRC_DIR)\treelist.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\treelist.obj : $(OBJ_DIR)\treelist.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\viewport.c : $(SRC_DIR)\viewport.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\viewport.obj : $(OBJ_DIR)\viewport.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\vpane.c : $(SRC_DIR)\vpane.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\vpane.obj : $(OBJ_DIR)\vpane.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\widget.c : $(SRC_DIR)\widget.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\widget.obj : $(OBJ_DIR)\widget.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\window.c : $(SRC_DIR)\window.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\window.obj : $(OBJ_DIR)\window.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
