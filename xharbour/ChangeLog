@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1610 2003/10/20 02:39:28 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1611 2003/10/20 18:44:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-10-20 13:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Minor fix in NextExp() for macro expressions.
+
+  * source/pp/ppcore.c
+    * Minor fix to last post.
 
 2003-10-20 11:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly

@@ -5122,7 +5122,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     s_bArrayPrefix := .T.
                  #endif
                  sNextToken     := NextToken( @sNextLine, .T. )
-                 IF sNextToken != NIL .AND. Left( sNextToken, 1 ) == '.'
+                 IF sNextToken != NIL .AND. Left( sNextToken, 1 ) $ '.&'
                     // Get the macro terminator.
                     sExp           += sNextToken
                     sLastToken     := "."
@@ -5148,6 +5148,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                              #endif
                           ENDIF
                        ENDIF
+                    ELSEIF sNextToken == '&' //(Last Token) Get the next Macro suffix.
+                       sExp += NextExp( @sLine, cType, aWords, sNextAnchor, bX )
                     ENDIF
                  ENDIF
               ELSE
@@ -5895,6 +5897,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
                     IF '.' $ sTemp .OR. '&' $ sTemp
                        lComplexMacro := .T.
+                    ELSE
+                       lComplexMacro := .F.
                     ENDIF
                  ELSE
                     lMacro := .F.
@@ -5928,6 +5932,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
                     IF '.' $ sTemp .OR. '&' $ sTemp
                        lComplexMacro := .T.
+                    ELSE
+                       lComplexMacro := .F.
                     ENDIF
                  ELSE
                     lMacro := .F.
@@ -5965,6 +5971,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
                        IF '.' $ sTemp .OR. '&' $ sTemp
                           lComplexMacro := .T.
+                       ELSE
+                          lComplexMacro := .F.
                        ENDIF
                     ELSE
                        lMacro := .F.
@@ -5996,6 +6004,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
                        IF '.' $ sTemp .OR. '&' $ sTemp
                           lComplexMacro := .T.
+                       ELSE
+                          lComplexMacro := .F.
                        ENDIF
                     ELSE
                        lMacro := .F.
