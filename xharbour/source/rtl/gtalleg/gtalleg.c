@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.16 2004/02/03 05:00:45 maurifull Exp $
+ * $Id: gtalleg.c,v 1.17 2004/02/03 14:01:13 druzus Exp $
  */
 
 /*
@@ -1676,15 +1676,12 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
       return (int) TRUE;
 
       case GTI_SCREENWIDTH:
-         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
+         if ( bUpdate && iParam > 0 )
          {
-            iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
-            if ( bUpdate && iParam > 0 )
-            {
-               s_usGFXWidth = (USHORT) iParam;
+            s_usGFXWidth = (USHORT) iParam;
 //            lClearInit = ( s_pbyScrBuffer == NULL );
 //            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
-            }
          }
       return iOldValue;
 
