@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3913 2005/03/06 06:27:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.3914 2005/03/06 19:21:29 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -123,6 +123,7 @@
     * Startup code changes.
   * include/hbinit.h
     * minor formatting. Added comment to MSC section.
+    * startup code return type is now int, not void.
   * source/compiler/genc.c
     * all msc startup code is the same now.
 
