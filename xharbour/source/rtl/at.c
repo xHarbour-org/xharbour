@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.2 2002/04/17 02:47:12 ronpinkas Exp $
+ * $Id: at.c,v 1.3 2002/05/08 20:07:07 ronpinkas Exp $
  */
 
 /*
@@ -86,6 +86,30 @@
           ULONG ulStart = ISNUM( 3 ) ? hb_parnl( 3 ) : 1;
           ULONG ulEnd = ISNUM( 4 ) ? hb_parnl( 4 ) : ulLength;
           ULONG ulPos;
+
+          // SANITIZATION
+          // JC1: Don't know if it is clipper compliant, but anyway something
+          // about that must be done.
+          if ( ulStart < 1 )
+          {
+             ulStart = 1;
+          }
+
+          if ( ulStart > pText->item.asString.length )
+          {
+             ulStart = pText->item.asString.length;
+          }
+
+          if ( ulEnd < ulStart )
+          {
+             ulEnd = ulStart;
+          }
+
+          if ( ulEnd > pText->item.asString.length )
+          {
+             ulEnd = pText->item.asString.length;
+          }
+          // END OF SANITIZATION
 
           ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + ulStart - 1, ulEnd - ulStart + 1 );
 

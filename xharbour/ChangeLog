@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1029 2003/05/17 15:32:40 druzus Exp $
+ * $Id: ChangeLog,v 1.1030 2003/05/17 15:55:13 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-17 19:02 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/at.c
+    ! Parameters 3 and 4 of AT() were not sanitized nor checked,
+      causing endless loops/segfaults on misbehaving programs.
+      Currently, they have been sanitized, but probably the
+      correct thing to do there is to issue an out of bound
+      error.
 
 2003-05-17 17:30 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/bin/hb-mkslib.sh
@@ -245,7 +253,7 @@
 
 2003-05-14 12:02 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   *source/vm/errorapi.c
-   + errorapi generated error missed procname and procline
+   ! errorapi generated error missed procname and procline
      initialization in terror class. Fixed.
 
 2003-05-14 10:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
