@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.3 2004/01/03 14:06:20 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.4 2004/01/05 04:54:30 jonnymind Exp $
  */
 
 /*
@@ -101,9 +101,14 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_INITIALIZE \
    if ( ! s_gtxvt_initialized ) {\
       s_gtxvt_initialized = TRUE;\
-      xvt_InitDisplay( s_buffer );\
+      xvt_InitDisplay( s_buffer, s_status );\
    }
 
+#define COMMIT_STATUS( status ) \
+   msync( status, sizeof( XVT_STATUS ), MS_INVALIDATE | MS_ASYNC )
+
+#define COMMIT_BUFFER( buffer ) \
+   msync( buffer, sizeof( XVT_BUFFER ), MS_INVALIDATE | MS_ASYNC )
 
 #define XVT_CHAR_QUEUE_SIZE  128
 #define XVT_CHAR_BUFFER     1024
@@ -113,8 +118,36 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_DEFAULT_COLS      80
 #define XVT_MAX_BUTTONS        8
 #define CLIP_KEY_COUNT       122
+#define XVT_BOX_CHARS         49
 
-#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask)
+/************************************************************************/
+/* XVT intercommunication protocol XVT_ICM                              */
+#define XVT_ICM_KEYSTORE      0     // follows a CLIPPER keystore (USHORT)
+#define XVT_ICM_RESIZE        1     // Resize request. Follows an ICM_DATA_RESIZE structure
+#define XVT_ICM_UPDATE        2     // UPDATE request. Follows an ICM_DATA_UPDATE struture
+#define XVT_ICM_MOUSEMOVE     3     // Change mouse position. Follows an ICM_DATA_RESIZE struture
+#define XVT_ICM_SETCURSOR     4     // Application has changed cursor shape
+#define XVT_ICM_BEGIN         50
+#define XVT_ICM_QUIT          100   // App requests message loop to quit
+
+
+typedef struct tag_ICM_RESIZE
+{
+   USHORT rows;
+   USHORT cols;
+} ICM_DATA_RESIZE;
+
+typedef struct tag_ICM_UPDATE
+{
+   USHORT x1;
+   USHORT y1;
+   USHORT x2;
+   USHORT y2;
+} ICM_DATA_UPDATE;
+
+/********************************************************************/
+
+#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask | VisibilityChangeMask)
 
 /* Box char definitions - these are compatible with unicode, so that it can
    be used inside unicode char definitions*/
@@ -202,17 +235,13 @@ typedef struct tag_xvt_buffer
    // cursor:
    int col;
    int row;
+
    // Directly clipper cursor style
    USHORT curs_style;
 
    // size in character cells
    USHORT cols;
    USHORT rows;
-
-   // Key pointer
-   int keyPointerIn;
-   int keyPointerOut;
-   int Keys[ XVT_CHAR_QUEUE_SIZE ];
 
    // buffer informations
    HB_GT_CELLTYPE pBuffer[XVT_MAX_ROWS * XVT_MAX_COLS];
@@ -221,8 +250,24 @@ typedef struct tag_xvt_buffer
    ULONG bufsize;
    BOOL bInvalid;
    XSegment rInvalid;
-
 } XVT_BUFFER, *PXVT_BUFFER;
+
+/************************ Window status logical structure *****************/
+
+typedef struct tag_xvt_status
+{
+   // Mouse functions
+   int mouseCol;
+   int mouseRow;
+   int mouseNumButtons;
+   int mouseDblClick1TO;
+   int mouseDblClick2TO;
+   int lastMouseEvent;
+   BOOL mouseButtons[XVT_MAX_BUTTONS];
+
+   BOOL bUpdateDone;
+
+} XVT_STATUS, *PXVT_STATUS;
 
 
 /********************** Phisical screen window structure ******************/
@@ -244,17 +289,8 @@ typedef struct tag_x_wnddef
 
    // cursor:
    USHORT cursorHeight;
-
-   // Mouse functions
-   int mouseCol;
-   int mouseRow;
-   int mouseGotoCol;
-   int mouseGotoRow;
-   int mouseNumButtons;
-   int mouseDblClick1TO;
-   int mouseDblClick2TO;
-   int lastMouseEvent;
-   BOOL mouseButtons[XVT_MAX_BUTTONS];
+   SHORT cursRow;
+   SHORT cursCol;
 
    // font informations
    XFontStruct *xfs;
@@ -262,9 +298,9 @@ typedef struct tag_x_wnddef
    int fontWidth;
 
    XVT_BUFFER *buffer;
+   XVT_STATUS *status;
 
 } XWND_DEF, *PXWND_DEF;
 
 
-#define XVT_BOX_CHARS 49
 #endif

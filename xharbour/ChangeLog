@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1992 2004/01/05 02:59:21 lculik Exp $
+ * $Id: ChangeLog,v 1.1993 2004/01/05 04:54:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-01-05 05:50 UTC+0100 Giancarlo Niccolai
+2004-01-05 16:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    * Now the system implements twin process coordination; one process
+      manages the window and the other (bound to the xharbour VM) manages
+      the buffer.
+
+2004-01-05 05:50 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
   * source/rtl/gtxvt/gtxvt.h
     ! GT is now initialized only after screen output is done

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.8 2004/01/03 14:06:20 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.9 2004/01/05 04:54:29 jonnymind Exp $
  */
 
 /*
@@ -13,10 +13,10 @@
  *                    Rees Software & Systems Ltd
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 Przemys?aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 Przemys?aw Czerpak <druzus@polbox.com>
  *
  *
  * See doc/license.txt for licensing terms.
@@ -70,6 +70,11 @@
 
 #include "gtxvt.h"
 #include <sys/mman.h>
+#include <sys/select.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 typedef struct tag_modifiers
 {
@@ -267,14 +272,10 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
 };
 
 
-#ifdef XVT_DEBUG
-static int nCountPuts=0,nCountScroll=0, nCountPaint=0, nSetFocus=0, nKillFocus=0;
-#endif
-
 /******************************************************************/
 
 static void xvt_InitStatics( void );
-static void xvt_InitDisplay( PXVT_BUFFER buf );
+static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS stat );
 static PXVT_BUFFER xvt_bufferNew( USHORT col, USHORT row, USHORT bkg );
 static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows );
 static void xvt_bufferInvalidate( PXVT_BUFFER buf,int left, int top, int right, int bottom );
@@ -289,25 +290,25 @@ static void xvt_bufferWriteBytes( PXVT_BUFFER buf,
    BYTE attr,
    BYTE *sBuffer, USHORT length);
 
-static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf );
-static void xvt_windowResize( PXWND_DEF s_wnd );
+static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS status );
+static void xvt_windowResize( PXWND_DEF wnd );
 static void xvt_windowSetCursor( PXWND_DEF wnd );
 static void xvt_windowSetHints( PXWND_DEF wnd );
 static XFontStruct *xvt_fontNew( Display *dpy, char *fontFace, char *weight, int size,  char *encoding );
 static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs );
-static void xvt_windowInvalidate( PXWND_DEF wnd,
-   int left, int top, int right, int bottom );
 void xvt_windowUpdate( PXWND_DEF wnd );
 static void xvt_windowRepaintColRow( PXWND_DEF wnd,
    int colStart, int rowStart, int colStop, int rowStop );
-
 static BOOL xvt_windowDrawText( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT cbString );
 static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar );
 static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr );
 
 static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt);
 static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt );
-void HB_EXPORT xvt_processMessages(int test);
+static void xvt_processMessages( PXWND_DEF wnd );
+
+static PXVT_STATUS xvt_statusNew( void );
+static int xvt_statusQueryMouseBtns( PXVT_STATUS status, Display *dpy );
 
 static HB_GT_CELLTYPE xvt_charTranslate( unsigned char ch );
 static BYTE xvt_charUntranslate( HB_GT_CELLTYPE ch );
@@ -316,6 +317,7 @@ static void xvt_putTextInternal (
       USHORT top, USHORT left, USHORT bottom, USHORT right,
       USHORT width,
       BYTE * sBuffer );
+void xvt_cursorPaint( PXWND_DEF wnd );
 
 
 static char *color_refs[] = {
@@ -339,9 +341,10 @@ static char *color_refs[] = {
 
 
 /************************ globals ********************************/
-static PXWND_DEF s_wnd = 0;
 static PXVT_BUFFER s_buffer = 0;
+static PXVT_STATUS s_status = 0;
 static BOOL s_gtxvt_initialized = FALSE;
+static int s_childPid = 0;
 
 static USHORT  s_uiDispCount;
 
@@ -349,8 +352,13 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 int s_cursorState = 0;
 MODIFIERS s_modifiers;
-BOOL sig_allarming = FALSE;
 
+// Pipe stream for update queue (app to wnd )
+static int streamUpdate[2];
+// Pipe stream for message queue (wnd to app )
+static int streamFeedback[2];
+// Pipe stream for input queue (wnd to app)
+static int streamChr[2];
 
 /**********************************************************************
 *                                                                     *
@@ -358,23 +366,7 @@ BOOL sig_allarming = FALSE;
 *                                                                     *
 **********************************************************************/
 
-/************* Temporary *************************************/
-static void hb_xvt_gtDisable( void )
-{
-   signal( SIGALRM, SIG_IGN);
-}
 
-static void hb_xvt_gtEnable( void )
-{
-   struct itimerval itv;
-
-   sig_allarming = FALSE;
-   signal( SIGALRM, xvt_processMessages);
-   itv.it_interval.tv_sec = 0;
-   itv.it_interval.tv_usec = 25000;
-   itv.it_value = itv.it_interval;
-   setitimer( ITIMER_REAL, &itv, NULL);
-}
 /************************************************************/
 
 static int s_errorHandler( Display *dpy, XErrorEvent *e )
@@ -402,10 +394,23 @@ static void xvt_InitStatics(void)
 }
 
 /*** Prepare the default window ***/
-static void xvt_InitDisplay( PXVT_BUFFER buf )
+static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
 {
    PHB_FNAME pFileName;
    Display *dpy;
+   PXWND_DEF wnd;
+
+   // Pipe stream for update queue (app to wnd )
+   pipe( streamUpdate );
+   pipe( streamFeedback );
+   // Pipe stream for input queue (wnd to app)
+   pipe( streamChr );
+
+   s_childPid = fork();
+   if ( s_childPid != 0 )
+   {
+      return;
+   }
 
    xvt_InitStatics();
 
@@ -417,19 +422,27 @@ static void xvt_InitDisplay( PXVT_BUFFER buf )
       return;
    }
 
-   s_wnd = xvt_windowCreate( dpy, buf );
+   xvt_statusQueryMouseBtns( status, dpy );
+   wnd = xvt_windowCreate( dpy, buf, status );
 
    pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
-   XStoreName( s_wnd->dpy, s_wnd->window, pFileName->szName );
+   XStoreName( wnd->dpy, wnd->window, pFileName->szName );
    hb_xfree( pFileName );
 
-   XMapWindow( s_wnd->dpy, s_wnd->window );
-   HB_GT_FUNC(mouse_Init());
+   XMapWindow( wnd->dpy, wnd->window );
    // ok, now we can inform the X manager about our new status:
-   xvt_windowSetHints( s_wnd );
+   xvt_windowSetHints( wnd );
 
-   // and start the message loop (temporary)
-   hb_xvt_gtEnable();
+   //we'r done. Now the ball passes to the window managing function
+   xvt_processMessages( wnd );
+
+   // exiting
+   if ( wnd->xfs ) {
+      XFreeFont( wnd->dpy, wnd->xfs );
+   }
+   XCloseDisplay( wnd->dpy );
+   hb_xfree( wnd );
+   exit( 0 );
 }
 
 /**********************************************************************
@@ -443,6 +456,7 @@ static PXVT_BUFFER xvt_bufferNew( USHORT col, USHORT row, USHORT bkg )
 
    if ( row <= XVT_MAX_ROWS && col <= XVT_MAX_COLS )
    {
+
       buf = (PXVT_BUFFER) mmap( 0, sizeof( XVT_BUFFER ), PROT_READ | PROT_WRITE,
          MAP_SHARED |MAP_ANON, -1, 0  );
 
@@ -453,12 +467,10 @@ static PXVT_BUFFER xvt_bufferNew( USHORT col, USHORT row, USHORT bkg )
       buf->background = bkg;
       buf->curs_style = SC_NORMAL;
 
-      /* Clear keyboard buffer */
-      buf->keyPointerIn = 1;
-      buf->keyPointerOut = 0;
-
       buf->bufsize = col * row * HB_GT_CELLSIZE;
       buf->bInvalid = FALSE;
+      COMMIT_BUFFER( buf );
+
       return buf;
    }
    else
@@ -503,6 +515,7 @@ static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows )
       {
          buf->row = rows -1;
       }
+      COMMIT_BUFFER( buf );
 
       return TRUE;
    }
@@ -518,18 +531,47 @@ static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows )
 static void xvt_bufferInvalidate( PXVT_BUFFER buf,
    int left, int top, int right, int bottom )
 {
+   USHORT appMsg;
+   fd_set keySet;
+
+   struct timeval timeout = {0,0};
+   FD_ZERO(&keySet);
+   FD_SET(streamFeedback[0], &keySet );
+
+   // See if there is data available
+
+   if ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
+   {
+      read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
+      switch( appMsg )
+      {
+         case XVT_ICM_UPDATE:
+            buf->bInvalid = FALSE;
+            break;
+      }
+   }
+
    if ( buf->bInvalid == FALSE ) {
       buf->bInvalid = TRUE;
       buf->rInvalid.y1 = top;
       buf->rInvalid.x1 = left;
       buf->rInvalid.y2 = bottom;
       buf->rInvalid.x2 = right;
+      // wake up our friend.
    }
    else {
       if ( buf->rInvalid.x1 > left ) buf->rInvalid.x1 = left;
       if ( buf->rInvalid.y1 > top ) buf->rInvalid.y1 = top;
       if ( buf->rInvalid.x2 < right ) buf->rInvalid.x2 = right;
       if ( buf->rInvalid.y2 < bottom ) buf->rInvalid.y2 = bottom;
+
+   }
+
+   if ( s_uiDispCount == 0 )
+   {
+      COMMIT_BUFFER( buf );
+      appMsg = XVT_ICM_UPDATE;
+      write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
    }
 }
 
@@ -592,33 +634,47 @@ static void xvt_bufferClearRange(
 
 static void xvt_bufferQueueKey( PXVT_BUFFER buf, int data )
 {
-  int iNextPos;
+   USHORT appMsg = XVT_ICM_KEYSTORE;
+   //TODO: use select to decide wether write is possible
 
-  iNextPos = ( buf->keyPointerIn >= XVT_CHAR_QUEUE_SIZE) ? 0 : buf->keyPointerIn+1 ;
-  if (iNextPos != buf->keyPointerOut ) // Stop accepting characters once the buffer is full
-  {
-    buf->Keys[ buf->keyPointerIn ] = data ;
-    buf->keyPointerIn = iNextPos ;
-  }
+   write( streamChr[1], &appMsg, sizeof( appMsg ) );
+   write( streamChr[1], &data, sizeof( data ) );
 }
 
 /******************** Gets a keystore from the input queue ****************************/
 
 static BOOL xvt_bufferDeqeueKey( PXVT_BUFFER buf, int *c )
 {
-  int iNextPos;
-  BOOL bRet = FALSE;
-  *c = 0;
+   BOOL bRet = FALSE;
+   fd_set keySet;
+   USHORT appMsg;
+   struct timeval timeout = {0,0};
+   *c = 0;
 
-  iNextPos = (buf->keyPointerOut >= XVT_CHAR_QUEUE_SIZE) ? 0 : buf->keyPointerOut+1 ;
-  if (iNextPos != buf->keyPointerIn )  // No more events in queue ??
-  {
-    *c = buf->Keys[iNextPos] ;
-    buf->keyPointerOut = iNextPos ;
-    bRet =  TRUE;
-  }
+   FD_ZERO(&keySet);
+   FD_SET(streamChr[0], &keySet );
 
-  return bRet;
+   // See if there is data available
+   if ( select( streamChr[0] + 1, &keySet, NULL , NULL, &timeout) )
+   {
+
+      if ( read( streamChr[0], &appMsg, sizeof( appMsg ) ) > 0 )
+      {
+         switch( appMsg )
+         {
+            case XVT_ICM_KEYSTORE:
+               read( streamChr[0], c, sizeof( *c ) );
+               bRet = TRUE;
+            break;
+
+            default:
+               bRet = FALSE;
+               // Signal error?
+         }
+      }
+   }
+
+   return bRet;
 }
 
 /******************** Writes a string into the buffer ****************************/
@@ -632,21 +688,17 @@ static void xvt_bufferWriteBytes( PXVT_BUFFER buf,
    HB_GT_CELLTYPE *pBuffer;
    HB_GT_CELLTYPE *pAttributes;
 
+
    // determine the index and put the string into the TextBuffer
    index = HB_GT_INDEXOF(buf, col, row);
    if (length + index <= buf->bufsize)
    {
-      if (attr != ' ') // if no attribute, don't overwrite
+      for ( pAttributes = buf->pAttributes + index;
+         pAttributes < buf->pAttributes + index + length;
+         pAttributes++)
       {
-         for ( pAttributes = buf->pAttributes + index;
-            pAttributes < buf->pAttributes + index + length;
-            pAttributes++)
-         {
-            *pAttributes = attr;
-         }
+         *pAttributes = attr;
       }
-
-      // translate characters
 
       for ( pBuffer = buf->pBuffer + index ;
          pBuffer < buf->pBuffer + index + length;
@@ -667,7 +719,7 @@ static void xvt_bufferWriteBytes( PXVT_BUFFER buf,
 
 /************************ Create a default window *************************/
 
-static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf )
+static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS status )
 {
    PXWND_DEF wnd;
    int whiteColor;
@@ -684,7 +736,10 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf )
    wnd = ( PXWND_DEF ) hb_xgrab( sizeof( XWND_DEF ) );
    wnd->dpy = dpy;
    wnd->bResizing = FALSE;
+   wnd->cursRow = -1;
+   wnd->cursCol = -1;
    wnd->buffer = buf;
+   wnd->status = status;
    wnd->gc = NULL;
    xvt_windowSetFont( wnd, xfs );
 
@@ -795,26 +850,21 @@ static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
    }
 }
 
-/***** Signals that the buffer needs a redraw   *******/
-static void xvt_windowInvalidate( PXWND_DEF wnd,
-   int left, int top, int right, int bottom )
-{
-   xvt_bufferInvalidate( wnd->buffer,
-      left / wnd->fontWidth, top / wnd->fontHeight,
-      right / wnd->fontWidth +1, bottom / wnd->fontHeight+1);
-}
 
 /******************** Repaint the window if necessary **********************/
 void xvt_windowUpdate( PXWND_DEF wnd )
 {
    PXVT_BUFFER buf = wnd->buffer;
+   USHORT appMsg;
 
    if ( buf->bInvalid )
    {
-      buf->bInvalid = FALSE;
       xvt_windowRepaintColRow( wnd,
          buf->rInvalid.x1, buf->rInvalid.y1,
          buf->rInvalid.x2, buf->rInvalid.y2);
+      /* Signal the buffer filler that we have done with it */
+      appMsg = XVT_ICM_UPDATE;
+      write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
    }
 }
 
@@ -2046,14 +2096,12 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
    {
 
       case Expose:
-         xvt_bufferInvalidate( wnd->buffer,
-            evt->xexpose.x , evt->xexpose.y,
-            evt->xexpose.x + evt->xexpose.width,
-            evt->xexpose.y + evt->xexpose.height );
+         xvt_windowRepaintColRow( wnd,
+            evt->xexpose.x / wnd->fontWidth, evt->xexpose.y / wnd->fontHeight,
+            (evt->xexpose.x + evt->xexpose.width) / wnd->fontWidth,
+            (evt->xexpose.y + evt->xexpose.height) / wnd->fontHeight);
 
-         //hb_xvt_gtUpdate( s_wnd );
       break;
-
 
       case KeyPress:
       {
@@ -2088,17 +2136,18 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       break;
 
       case MotionNotify:
-         wnd->mouseCol = evt->xmotion.x / wnd->fontWidth;
-         wnd->mouseRow = evt->xmotion.y / wnd->fontHeight;
-         wnd->lastMouseEvent = K_MOUSEMOVE;
+         wnd->status->mouseCol = evt->xmotion.x / wnd->fontWidth;
+         wnd->status->mouseRow = evt->xmotion.y / wnd->fontHeight;
+         wnd->status->lastMouseEvent = K_MOUSEMOVE;
       break;
 
       case ButtonPress: case ButtonRelease:
       {
          unsigned char map[ XVT_MAX_BUTTONS ];
          int button=0;
+         PXVT_STATUS status = wnd->status;
 
-         XGetPointerMapping( wnd->dpy, map, wnd->mouseNumButtons );
+         XGetPointerMapping( wnd->dpy, map, wnd->status->mouseNumButtons );
 
          switch ( evt->xbutton.button )
          {
@@ -2106,64 +2155,64 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
                button = map[0];
                if ( evt->type == ButtonPress )
                {
-                  if ( wnd->mouseDblClick1TO > 0 )
+                  if ( status->mouseDblClick1TO > 0 )
                   {
-                     wnd->lastMouseEvent = K_LDBLCLK;
+                     status->lastMouseEvent = K_LDBLCLK;
                   }
                   else
                   {
-                     wnd->lastMouseEvent = K_LBUTTONDOWN;
+                     status->lastMouseEvent = K_LBUTTONDOWN;
                   }
                   // about half a second
-                  wnd->mouseDblClick1TO = 8;
+                  status->mouseDblClick1TO = 8;
                }
                else {
-                  wnd->lastMouseEvent = K_LBUTTONUP;
+                  status->lastMouseEvent = K_LBUTTONUP;
                }
             break;
 
             case Button2:
                button = map[1];
-               if ( wnd->mouseNumButtons == 2 )
+               if ( status->mouseNumButtons == 2 )
                {
                   if ( evt->type == ButtonPress )
                   {
-                     if ( wnd->mouseDblClick2TO > 0 )
+                     if ( status->mouseDblClick2TO > 0 )
                      {
-                         wnd->lastMouseEvent = K_RDBLCLK;
+                         status->lastMouseEvent = K_RDBLCLK;
                      }
                      else
                      {
-                         wnd->lastMouseEvent = K_RBUTTONDOWN;
+                         status->lastMouseEvent = K_RBUTTONDOWN;
                      }
                      // about half a second
-                     wnd->mouseDblClick2TO = 8;
+                     status->mouseDblClick2TO = 8;
                   }
                   else {
-                     wnd->lastMouseEvent = K_RBUTTONUP;
+                     status->lastMouseEvent = K_RBUTTONUP;
                   }
                }
             break;
 
             case Button3:
                button = map[2];
-               if ( wnd->mouseNumButtons >= 3 )
+               if ( status->mouseNumButtons >= 3 )
                {
                   if ( evt->type == ButtonPress )
                   {
-                     if ( wnd->mouseDblClick2TO > 0 )
+                     if ( status->mouseDblClick2TO > 0 )
                      {
-                        wnd->lastMouseEvent = K_RDBLCLK;
+                        status->lastMouseEvent = K_RDBLCLK;
                      }
                      else
                      {
-                        wnd->lastMouseEvent = K_RBUTTONDOWN;
+                        status->lastMouseEvent = K_RBUTTONDOWN;
                      }
                      // about half a second
-                     wnd->mouseDblClick2TO = 8;
+                     status->mouseDblClick2TO = 8;
                   }
                   else {
-                     wnd->lastMouseEvent = K_RBUTTONUP;
+                     status->lastMouseEvent = K_RBUTTONUP;
                   }
                }
             break;
@@ -2179,18 +2228,18 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
 
          button--;
 
-         if ( button < 0 || button >= s_wnd->mouseNumButtons )
+         if ( button < 0 || button >= status->mouseNumButtons )
          {
             button = 0;
          }
 
          if ( evt->type == ButtonPress )
          {
-            wnd->mouseButtons[ button ] = TRUE;
+            status->mouseButtons[ button ] = TRUE;
          }
          else
          {
-            wnd->mouseButtons[ button ] = FALSE;
+            status->mouseButtons[ button ] = FALSE;
          }
       }
       break;
@@ -2213,52 +2262,146 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
 }
 
 
-void HB_EXPORT xvt_processMessages(int test)
+static void xvt_processMessages( PXWND_DEF wnd )
 {
    static int count = 0;
-   // for now, just handle s_wnd events
+   USHORT appMsg;
    XEvent evt;
+   fd_set updateSet;
+   struct timeval timeout;
+   BOOL bLoop = TRUE, bUpdate;
 
-   sig_allarming = TRUE;
+   FD_ZERO(&updateSet);
+   FD_SET(streamUpdate[0], &updateSet );
 
-
-   // optionally move the pointer
-   if ( s_wnd->mouseGotoRow >= 0 && s_wnd->mouseGotoCol >= 0 )
+   while ( bLoop )
    {
-      XWarpPointer( s_wnd->dpy, None, s_wnd->window, 0,0,0,0,
-         s_wnd->mouseGotoCol * s_wnd->fontWidth + s_wnd->fontWidth/2,
-         s_wnd->mouseGotoRow * s_wnd->fontHeight + s_wnd->fontHeight/2 );
-      s_wnd->mouseGotoRow = -1;
+      bUpdate = FALSE;
+
+      // wait for app input
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 25000;
+      FD_SET(streamUpdate[0], &updateSet );
+      select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout );
+
+      if ( FD_ISSET( streamUpdate[0], &updateSet ) )
+      {
+         do {
+
+            if ( read( streamUpdate[0], &appMsg, sizeof( appMsg ) ) <= 0 )
+            {
+               printf( "Comm closed\n" );
+               bLoop = FALSE;
+               break;
+            }
+
+            switch( appMsg )
+            {
+               // when the app requires a resize, resize value is inside the buffer.
+               case XVT_ICM_RESIZE:
+                  xvt_windowResize( wnd );
+               break;
+
+               case XVT_ICM_MOUSEMOVE:
+               {
+                  ICM_DATA_RESIZE data;
+                  read( streamUpdate[0], &data, sizeof( data ) );
+
+                  XWarpPointer( wnd->dpy, None, wnd->window, 0,0,0,0,
+                     data.cols * wnd->fontWidth + wnd->fontWidth/2,
+                     data.rows * wnd->fontHeight + wnd->fontHeight/2 );
+               }
+               break;
+
+               case XVT_ICM_UPDATE:
+                  bUpdate = TRUE;
+               break;
+
+               case XVT_ICM_SETCURSOR:
+                  xvt_windowSetCursor( wnd );
+               break;
+
+               case XVT_ICM_QUIT:
+                  bLoop = FALSE;
+                  break;
+            }
+
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 0;
+            FD_SET(streamUpdate[0], &updateSet );
+            select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout );
+         } while ( bLoop && FD_ISSET( streamUpdate[0], &updateSet ) );
+      }
+
+      // now manage periodic changes
+      if ( wnd->status->mouseDblClick1TO > 0 ) {
+         wnd->status->mouseDblClick1TO--;
+      }
+
+      if ( wnd->status->mouseDblClick2TO > 0 )
+      {
+         wnd->status->mouseDblClick2TO--;
+      }
+
+      evt.type = 0;
+      while ( XCheckMaskEvent( wnd->dpy, XVT_STD_MASK, &evt) )
+      {
+         xvt_eventManage( wnd, &evt );
+      }
+
+      if ( ++count == 10 ) {
+         s_cursorState = s_cursorState ? 0: 1;
+         xvt_cursorPaint( wnd );
+         count = 0;
+      }
+
+      if ( bUpdate )
+      {
+         xvt_windowUpdate( wnd );
+      }
    }
-
-   if ( s_wnd->mouseDblClick1TO > 0 ) {
-      s_wnd->mouseDblClick1TO--;
-   }
-
-   if ( s_wnd->mouseDblClick2TO > 0 )
-   {
-      s_wnd->mouseDblClick2TO--;
-   }
-
-   evt.type = 0;
-   while ( XCheckMaskEvent( s_wnd->dpy, XVT_STD_MASK, &evt) )
-   {
-      xvt_eventManage( s_wnd, &evt );
-   }
-
-   xvt_windowSetCursor( s_wnd );
-
-   if ( ++count == 10 ) {
-      s_cursorState = s_cursorState ? 0: 1;
-      xvt_bufferInvalidate( s_wnd->buffer,
-         s_wnd->buffer->col, s_wnd->buffer->row, s_wnd->buffer->col, s_wnd->buffer->row);
-      count = 0;
-   }
-   xvt_windowUpdate( s_wnd );
-
-   sig_allarming = FALSE;
 }
 
+/**********************************************************************
+* XVT Status Oriented utilities                                       *
+**********************************************************************/
+
+static PXVT_STATUS xvt_statusNew( void )
+{
+   PXVT_STATUS status;
+
+   status = (PXVT_STATUS) mmap( 0, sizeof( XVT_STATUS ), PROT_READ | PROT_WRITE,
+         MAP_SHARED |MAP_ANON, -1, 0  );
+
+   status->mouseDblClick1TO = 0;
+   status->mouseDblClick2TO = 0;
+   status->lastMouseEvent = 0;
+   status->mouseNumButtons = 0;
+   status->bUpdateDone = FALSE;
+
+   COMMIT_STATUS( status );
+   return status;
+}
+
+static int xvt_statusQueryMouseBtns( PXVT_STATUS status, Display *dpy )
+{
+   unsigned char map[1];
+   int i;
+
+   status->mouseNumButtons = XGetPointerMapping( dpy, map, 1 );
+
+   if ( status->mouseNumButtons > XVT_MAX_BUTTONS )
+   {
+      status->mouseNumButtons = XVT_MAX_BUTTONS;
+   }
+
+   for ( i = 0; i < status->mouseNumButtons; i ++ )
+   {
+      status->mouseButtons[ i ] = FALSE;
+   }
+
+   return status->mouseNumButtons;
+}
 
 /**********************************************************************
 * XVT Generic utility                                                 *
@@ -2372,6 +2515,22 @@ static int xvt_keyTranslate( int key )
 }
 
 
+void xvt_cursorPaint( PXWND_DEF wnd )
+{
+   if ( wnd->cursRow > 0 )
+   {
+      xvt_windowRepaintColRow( wnd,
+         wnd->cursCol, wnd->cursRow, wnd->cursCol, wnd->cursRow );
+   }
+
+   wnd->cursRow = wnd->buffer->row;
+   wnd->cursCol = wnd->buffer->col;
+
+   xvt_windowRepaintColRow( wnd,
+      wnd->cursCol, wnd->cursRow, wnd->cursCol, wnd->cursRow );
+}
+
+
 
 /*****************************************************************************
 *
@@ -2435,19 +2594,6 @@ void HB_EXPORT hb_xvt_gtSetShutdownEvent(int iEvent)
 
 
 
-BOOL HB_EXPORT hb_xvt_gtSetWindowPos(int left, int top)
-{
-  XMoveWindow( s_wnd->dpy, s_wnd->window, left, top );
-  return TRUE;
-}
-
-BOOL HB_EXPORT hb_xvt_gtSetAltF4Close( BOOL bCanClose)
-{
-   HB_SYMBOL_UNUSED( bCanClose );
-   return FALSE;
-}
-
-
 
 /**********************************************************************
 *                                                                     *
@@ -2466,32 +2612,28 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
    /* Prepare the GT to be started as soon as possible,
       but don't start it NOW */
-   s_wnd = NULL;
    s_buffer = xvt_bufferNew( XVT_DEFAULT_COLS, XVT_DEFAULT_ROWS, 0x07 );
+   s_status = xvt_statusNew();
 }
 
 /* *********************************************************************** */
 
 void HB_GT_FUNC(gt_Exit( void ))
 {
+   USHORT appMsg = XVT_ICM_QUIT;
+   int result;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
-   hb_xvt_gtDisable();
-
-   if (s_wnd)
+   write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   close( streamUpdate[1] );
+   if ( s_childPid > 0 )
    {
-      HB_GT_FUNC(mouse_Exit());
-
-      if ( s_wnd->xfs ) {
-         XFreeFont( s_wnd->dpy, s_wnd->xfs );
-      }
-
-      XCloseDisplay( s_wnd->dpy );
-
-      hb_xfree( s_wnd );
-      s_wnd = 0;
+      waitpid( s_childPid, &result, 0 );
    }
 
+   munmap( s_buffer, sizeof( XVT_BUFFER) );
+   munmap( s_status, sizeof( XVT_STATUS) );
 }
 
 /* *********************************************************************** */
@@ -2532,15 +2674,34 @@ SHORT HB_GT_FUNC(gt_Row( void ))
 
 void HB_GT_FUNC(gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ))
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", sRow, sCol, sMethod));
-  HB_SYMBOL_UNUSED( sMethod );
-  if (sRow >= 0 && sRow< s_buffer->rows && sCol>=0 && sCol <= s_buffer->cols )
-  {
-    xvt_bufferInvalidate( s_buffer, s_buffer->col, s_buffer->row, s_buffer->col, s_buffer->row );
-    s_buffer->col = sCol;
-    s_buffer->row = sRow;
-    xvt_bufferInvalidate( s_buffer, s_buffer->col, s_buffer->row, s_buffer->col, s_buffer->row );
-  }
+   SHORT oldCol, oldRow, tmp;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", sRow, sCol, sMethod));
+   HB_SYMBOL_UNUSED( sMethod );
+
+   if (sRow >= 0 && sRow< s_buffer->rows && sCol>=0 && sCol <= s_buffer->cols )
+   {
+      oldCol = s_buffer->col;
+      oldRow = s_buffer->row;
+      s_buffer->col = sCol;
+      s_buffer->row = sRow;
+
+      if ( sCol > oldCol )
+      {
+         tmp = sCol;
+         sCol = oldCol;
+         oldCol = tmp;
+      }
+
+      if ( sRow > oldRow )
+      {
+         tmp = sRow;
+         sRow = oldRow;
+         oldRow = tmp;
+      }
+
+      xvt_bufferInvalidate( s_buffer, sCol, sRow, oldCol, oldRow );
+   }
 }
 
 /* *********************************************************************** */
@@ -2566,17 +2727,21 @@ BOOL HB_GT_FUNC(gt_IsColor( void ))
 
 USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
-  return s_buffer->curs_style;
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
+   return s_buffer->curs_style;
 }
 
 /* *********************************************************************** */
 
 void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
 {
+   USHORT appMsg;
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
 
   s_buffer->curs_style = usStyle;
+
+  appMsg = XVT_ICM_SETCURSOR;
+  write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
 }
 
 /* *********************************************************************** */
@@ -2591,14 +2756,21 @@ void HB_GT_FUNC(gt_DispBegin( void ))
 
 void HB_GT_FUNC(gt_DispEnd())
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
-  if (s_uiDispCount > 0)
-  {
-    --s_uiDispCount;
-    /*if ( s_uiDispCount == 0 && s_wnd->bInvalid ) {
-       hb_xvt_gtUpdate( s_wnd );
-    }*/
-  }
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
+
+   if (s_uiDispCount > 0)
+   {
+      --s_uiDispCount;
+
+      if ( s_uiDispCount == 0 )
+      {
+         USHORT appMsg;
+
+         msync( s_buffer, sizeof( XVT_BUFFER ), MS_INVALIDATE | MS_ASYNC );
+         appMsg = XVT_ICM_UPDATE;
+         write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+      }
+   }
 }
 
 /* *********************************************************************** */
@@ -2840,10 +3012,9 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
    }
    HB_GT_FUNC(gt_SetPos( usSaveRow, usSaveCol, HB_GT_SET_POS_AFTER ));
 
-   xvt_bufferInvalidate( s_buffer, 0, 0, s_buffer->cols-1, s_buffer->rows-1 );
-
    HB_GT_FUNC(gt_DispEnd());
 
+   xvt_bufferInvalidate( s_buffer, 0, 0, s_buffer->cols-1, s_buffer->rows-1 );
 
    if (bMalloc)
    {
@@ -2893,17 +3064,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
             col = oldcols;
          }
          xvt_putTextInternal( 0, 0, row, col, oldcols+1,  memory );
+         
          xvt_bufferInvalidate( s_buffer, 0, 0, s_buffer->cols, s_buffer->rows );
-
-         if ( s_wnd )
-         {
-            if ( ! s_wnd->bResizing )
-            {
-               xvt_windowResize( s_wnd );
-            }
-
-            xvt_windowUpdate(s_wnd);
-         }
       }
    }
 
@@ -2948,7 +3110,6 @@ static void HB_GT_FUNC(gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bCh
    if (index < s_buffer->bufsize )
    {
       s_buffer->pBuffer[index] = xvt_charTranslate( bChar );
-      //s_wnd->pBuffer[index] = bChar;
       s_buffer->pAttributes[index] = bAttr;
 
       //determine bounds of rect around character to refresh
@@ -3259,6 +3420,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int c=0;
    BOOL bKey = FALSE;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
    XVT_INITIALIZE
@@ -3270,53 +3432,53 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    if (! bKey  && ( eventmask & INKEY_MOVE ) > 0)
    {
-      if ( s_wnd->lastMouseEvent == K_MOUSEMOVE )
+      if ( s_status->lastMouseEvent == K_MOUSEMOVE )
       {
          bKey = TRUE;
          c = K_MOUSEMOVE;
-         s_wnd->lastMouseEvent = 0;
+         s_status->lastMouseEvent = 0;
       }
    }
 
    if (! bKey  && ( eventmask & INKEY_LDOWN ) > 0)
    {
-      if ( s_wnd->lastMouseEvent == K_LBUTTONDOWN ||
-           s_wnd->lastMouseEvent == K_LDBLCLK )
+      if ( s_status->lastMouseEvent == K_LBUTTONDOWN ||
+           s_status->lastMouseEvent == K_LDBLCLK )
       {
          bKey = TRUE;
-         c = s_wnd->lastMouseEvent;
-         s_wnd->lastMouseEvent = 0;
+         c = s_status->lastMouseEvent;
+         s_status->lastMouseEvent = 0;
       }
    }
 
    if (! bKey  && ( eventmask & INKEY_LUP ) > 0)
    {
-      if ( s_wnd->lastMouseEvent == K_LBUTTONUP )
+      if ( s_status->lastMouseEvent == K_LBUTTONUP )
       {
          bKey = TRUE;
-         c = s_wnd->lastMouseEvent;
-         s_wnd->lastMouseEvent = 0;
+         c = s_status->lastMouseEvent;
+         s_status->lastMouseEvent = 0;
       }
    }
 
    if (! bKey  && ( eventmask & INKEY_RDOWN ) > 0)
    {
-      if ( s_wnd->lastMouseEvent == K_RBUTTONDOWN ||
-           s_wnd->lastMouseEvent == K_RDBLCLK )
+      if ( s_status->lastMouseEvent == K_RBUTTONDOWN ||
+           s_status->lastMouseEvent == K_RDBLCLK )
       {
          bKey = TRUE;
-         c = s_wnd->lastMouseEvent;
-         s_wnd->lastMouseEvent = 0;
+         c = s_status->lastMouseEvent;
+         s_status->lastMouseEvent = 0;
       }
    }
 
    if (! bKey  && ( eventmask & INKEY_RUP ) > 0)
    {
-      if ( s_wnd->lastMouseEvent == K_RBUTTONUP )
+      if ( s_status->lastMouseEvent == K_RBUTTONUP )
       {
          bKey = TRUE;
-         c = s_wnd->lastMouseEvent;
-         s_wnd->lastMouseEvent = 0;
+         c = s_status->lastMouseEvent;
+         s_status->lastMouseEvent = 0;
       }
    }
 
@@ -3339,26 +3501,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
 void HB_GT_FUNC(mouse_Init( void ))
 {
-   unsigned char map[1];
-   int i;
-
-   s_wnd->mouseDblClick1TO = 0;
-   s_wnd->mouseDblClick2TO = 0;
-   s_wnd->lastMouseEvent = 0;
-   s_wnd->mouseGotoCol = -1;
-   s_wnd->mouseGotoRow = -1;
-   s_wnd->mouseNumButtons = XGetPointerMapping( s_wnd->dpy, map, 1 );
-
-   if ( s_wnd->mouseNumButtons > XVT_MAX_BUTTONS )
-   {
-      s_wnd->mouseNumButtons = XVT_MAX_BUTTONS;
-   }
-
-   for ( i = 0; i < s_wnd->mouseNumButtons; i ++ )
-   {
-      s_wnd->mouseButtons[ i ] = FALSE;
-   }
-
+   // can be done ONLY in the subprocess. GT requests are ignored.
 }
 
 /* *********************************************************************** */
@@ -3390,41 +3533,41 @@ void HB_GT_FUNC(mouse_Hide( void ))
 
 int HB_GT_FUNC(mouse_Col( void ))
 {
-  return s_wnd->mouseCol;
+  return s_status->mouseCol;
 }
 
 /* *********************************************************************** */
 
 int HB_GT_FUNC(mouse_Row( void ))
 {
-  return s_wnd->mouseRow;
+  return s_status->mouseRow;
 }
 
 /* *********************************************************************** */
 
 void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
-   s_wnd->mouseGotoRow = iRow;
-   s_wnd->mouseGotoCol = iCol;
+   /*s_status->mouseGotoRow = iRow;
+   s_status->mouseGotoCol = iCol;*/
 }
 
 /* *********************************************************************** */
 
 BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
-   if ( iButton >= s_wnd->mouseNumButtons || iButton < 0 )
+   if ( iButton >= s_status->mouseNumButtons || iButton < 0 )
    {
       return FALSE;
    }
 
-   return s_wnd->mouseButtons[ iButton ] = TRUE;
+   return s_status->mouseButtons[ iButton ] = TRUE;
 }
 
 /* *********************************************************************** */
 
 int HB_GT_FUNC(mouse_CountButton( void ))
 {
-   return s_wnd->mouseNumButtons;
+   return s_status->mouseNumButtons;
 }
 
 /* *********************************************************************** */
