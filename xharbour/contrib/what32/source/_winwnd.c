@@ -1194,14 +1194,34 @@ HB_FUNC( CREATEMDICLIENT )
   hb_retnl((LONG)hwndClient);
 }
 
-/*
-SetLayeredWindowAttributes(
-    HWND hwnd,
-    COLORREF crKey,
-    BYTE bAlpha,
-    DWORD dwFlags);
-HB_FUNC( SETLAYEREDWINDOWATTRIBUTES )
+
+// sets a member of the MINMAXINFO  structure
+
+HB_FUNC( SETMINMAXINFO )
 {
-   SetLayeredWindowAttributes( (HWND) hb_parnl(1), (COLORREF) hb_parnl(2), (BYTE) hb_parni(3), (DWORD) hb_parnl(4));
+  MINMAXINFO *mmi = (MINMAXINFO *) hb_parnl(1) ;
+  POINT pt  ;
+
+  pt.x = hb_parni( 3, 1 ) ;
+  pt.y = hb_parni( 3, 2 ) ;
+
+  switch (hb_parni(2)) {
+    case 2:
+      mmi->ptMaxSize = pt ;
+      break;
+
+    case 3:
+      mmi->ptMaxPosition = pt ;
+      break;
+
+    case 4:
+      mmi->ptMinTrackSize = pt ;
+      break;
+
+    case 5:
+      mmi->ptMaxTrackSize = pt ;
+      break;
+
+  }
+
 }
-*/
