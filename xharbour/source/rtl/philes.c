@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.7 2003/07/07 13:22:52 jonnymind Exp $
+ * $Id: philes.c,v 1.8 2003/07/09 22:09:42 jonnymind Exp $
  */
 
 /*
@@ -267,4 +267,16 @@ HB_FUNC( HB_OSPATHDELIMITERS )
    hb_retc( OS_PATH_DELIMITER_LIST );
 }
 
+HB_FUNC( HB_OSDRIVESEPARATOR )
+{
+#ifdef OS_DRIVE_DELIMITER
+   char ret[2];
+   ret[0] = OS_DRIVE_DELIMITER;
+   ret[1] = 0;
+
+   hb_retc( ret );
+#else
+   hb_retc( "" );
+#endif
+}
 #endif

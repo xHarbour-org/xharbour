@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.11 2003/06/12 22:23:34 iananderson Exp $
+ * $Id: debugger.prg,v 1.12 2003/06/17 11:09:41 iananderson Exp $
  */
 
 /*
@@ -352,7 +352,11 @@ METHOD New() CLASS TDebugger
    // default the search path for files to the current directory
    // that way if the source is in the same directory it will still be found even if the application
    // changes the current directory with the SET DEFAULT command
-   ::cPathForFiles     := CURDRIVE() + ':\' + CURDIR() + '\'
+   /* ::cPathForFiles     := CURDRIVE() + ':\' + CURDIR() + '\' */
+   ::cPathForFiles     := iif( HB_OSHASDRIVELETTER(), CURDRIVE() + ':', '' ) + ;
+                          HB_OSPATHSEPARATOR() + CURDIR() + HB_OSPATHSEPARATOR()
+   ::cPathForFiles     := CURDRIVE() + HB_OSDRIVESEPARATOR() + ;
+                          HB_OSPATHSEPARATOR() + CURDIR() + HB_OSPATHSEPARATOR()
    ::nTabWidth         := 4
    ::nSpeed            := 0
    ::lShowCallStack    := .f.
@@ -388,9 +392,10 @@ return Self
 METHOD PathForFiles() CLASS TDebugger
 
    ::cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
-   IF RIGHT(::cPathForFiles,1)<>'\'
-     ::cPathForFiles:=::cPathForFiles+'\'
+   IF ! RIGHT(::cPathForFiles,1) $ HB_OSPATHDELIMITERS()
+     ::cPathForFiles:=::cPathForFiles + HB_OSPATHSEPARATOR()
    ENDIF
+
 return Self
 
 METHOD Activate( cModuleName ) CLASS TDebugger

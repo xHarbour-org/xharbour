@@ -1,5 +1,5 @@
 /*
- * $Id: philesx.c,v 1.6 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: philesx.c,v 1.1.1.1 2001/12/21 10:41:57 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
 
 HB_FUNC( CURDRIVE )
 {
+#ifdef OS_HAS_DRIVE_LETTER
    USHORT uiErrorOld = hb_fsError();
    char szDrive[ 1 ];
 
@@ -78,8 +79,10 @@ HB_FUNC( CURDRIVE )
             break;
       }
    }
-
    hb_fsSetError( uiErrorOld );
+#else
+   hb_retc( "" );
+#endif
 }
 
 #endif

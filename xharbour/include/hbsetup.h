@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.10 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.11 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -233,6 +233,8 @@
       #define OS_PATH_LIST_SEPARATOR    ';'
       #define OS_PATH_DELIMITER         '\\'
       #define OS_PATH_DELIMITER_LIST    "\\/:"
+      #define OS_DRIVE_DELIMITER        ':'
+      #define OS_HAS_DRIVE_LETTER
       #define OS_OPT_DELIMITER_LIST     "/-"
       #define OS_EOL_LEN                2  /* # of bytes in End of Line marker */
    #else
@@ -240,6 +242,8 @@
       #define OS_PATH_LIST_SEPARATOR    ':'
       #define OS_PATH_DELIMITER         '/'
       #define OS_PATH_DELIMITER_LIST    "/"
+      #undef  OS_DRIVE_DELIMITER
+      #undef  OS_HAS_DRIVE_LETTER
       #define OS_OPT_DELIMITER_LIST     "-"
       #define OS_EOL_LEN                1
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.40 2003/07/24 18:55:10 druzus Exp $
+ * $Id: filesys.c,v 1.41 2003/07/25 01:57:59 druzus Exp $
  */
 
 /*
@@ -2053,8 +2053,10 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
       /* NOTE: A trailing underscore is not returned on this platform,
                so we don't need to strip it. [vszakats] */
 
-      if( pbyStart[ 1 ] == ':' )
+#if defined(OS_HAS_DRIVE_LETTER)
+      if( pbyStart[ 1 ] == OS_DRIVE_DELIMITER )
          pbyStart += 2;
+#endif
       if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
          pbyStart++;
 
@@ -2394,8 +2396,10 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
       /* NOTE: A trailing underscore is not returned on this platform,
                so we don't need to strip it. [vszakats] */
 
-      if( pbyStart[ 1 ] == ':' )
-         pbyStart += 1;
+#if defined(OS_HAS_DRIVE_LETTER)
+      if( pbyStart[ 1 ] == OS_DRIVE_DELIMITER )
+         pbyStart += 2;
+#endif
       if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
          pbyStart++;
 

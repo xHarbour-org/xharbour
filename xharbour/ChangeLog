@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1307 2003/07/30 06:59:23 brianhays Exp $
+ * $Id: ChangeLog,v 1.1308 2003/07/30 09:44:18 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-30 15:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbsetup.h
+    + Two new definitions added OS_DRIVE_DELIMITER and OS_HAS_DRIVE_LETTER
+
+  * xharbour/source/rtl/filesys.c
+    ! Fixed hb_fsCurDirBuff{Ex,}() functions to not strip '[A-Z]:' from
+      begining of path if OS has no drive letters
+
+  * xharbour/source/rtl/philes.c
+    + new function HB_OSDRIVESEPARATOR()
+
+  * xharbour/source/rtl/philesx.c
+    * CURDRIVE() returns empty string on systems which doesn't support
+      drive letters
+
+  * xharbour/source/debug/debugger.prg
+    * Fixed hard coded OS PATH/DRIVE separators
 
 2003-07-30 06:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/vm/arrayshb.c
