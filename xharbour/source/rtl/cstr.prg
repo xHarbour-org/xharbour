@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.17 2003/11/14 16:36:04 jonnymind Exp $
+ * $Id: cstr.prg,v 1.18 2004/01/31 08:24:26 ronpinkas Exp $
  */
 
 /*
@@ -348,7 +348,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          NEXT
 
          cRet[-1] := ", "
-         cRet += Str( xVal[3], 3 ) + "} )"
+         cRet += Str( xVal[3], 3 ) + "}, HB_QSelf() )"
 
          RETURN cRet
 

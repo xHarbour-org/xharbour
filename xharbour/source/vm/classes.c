@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.99 2004/02/21 04:45:19 ronpinkas Exp $
+ * $Id: classes.c,v 1.100 2004/02/22 04:24:43 jonnymind Exp $
  */
 
 /*
@@ -2057,7 +2057,6 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
          /* Init Classdata (inherited and not) if needed */
          if( pMeth->pInitValue )
          {
-
             if( pMeth->pFunction == hb___msgGetClsData && !( pMeth->bClsDataInitiated ) )
             {
                HB_ITEM init;
@@ -2081,9 +2080,20 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                   {
                      pInit = hb_itemNew( NULL );
                      hb_itemCopy( pInit, pMeth->pInitValue );
+
+                     if( HB_IS_BLOCK( pInit ) )
+                     {
+                        pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+
+                        #ifdef HB_ARRAY_USE_COUNTER
+                           pInit->item.asBlock.value->pSelfBase->uiHolders++;
+                        #else
+                           hb_arrayRegisterHolder( ( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
+                        #endif
+                     }
                   }
 
-                  hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
+                  hb_arraySetForward( pClass->pClassDatas, pMeth->uiData, pInit );
                   hb_itemRelease( pInit );
                   pMeth->bClsDataInitiated = 1;
                }
@@ -2109,9 +2119,20 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                {
                   pInitValue = hb_itemNew( NULL );
                   hb_itemCopy(pInitValue,  pMeth->pInitValue );
+
+                  if( HB_IS_BLOCK( pInitValue ) )
+                  {
+                     pInitValue->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+
+                     #ifdef HB_ARRAY_USE_COUNTER
+                        pInitValue->item.asBlock.value->pSelfBase->uiHolders++;
+                     #else
+                        hb_arrayRegisterHolder( ( pInitValue->item.asBlock.value->pSelfBase, (void *) pInitValue );
+                     #endif
+                  }
                }
 
-               hb_arraySet( pSelf, pMeth->uiData, pInitValue );
+               hb_arraySetForward( pSelf, pMeth->uiData, pInitValue );
                hb_itemRelease( pInitValue );
             }
             else if( pMeth->pFunction == hb___msgGetShrData && !( pMeth->bClsDataInitiated ) )
@@ -2137,12 +2158,22 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                   }
                   else
                   {
-                   pInit = hb_itemNew( NULL );
-                   hb_itemCopy( pInit, pMeth->pInitValue );
+                     pInit = hb_itemNew( NULL );
+                     hb_itemCopy( pInit, pMeth->pInitValue );
+
+                     if( HB_IS_BLOCK( pInit ) )
+                     {
+                        pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+
+                        #ifdef HB_ARRAY_USE_COUNTER
+                           pInit->item.asBlock.value->pSelfBase->uiHolders++;
+                        #else
+                           hb_arrayRegisterHolder( ( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
+                        #endif
+                     }
                   }
 
-
-                  hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
+                  hb_arraySetForward( pClass->pClassDatas, pMeth->uiData, pInit );
                   hb_itemRelease( pInit );
                   pMeth->bClsDataInitiated = 1;
                }
