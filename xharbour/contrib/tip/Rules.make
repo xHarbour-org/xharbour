@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.6 2003/12/01 00:19:39 jonnymind Exp $
+# $Id: Rules.make,v 1.7 2004/02/07 16:03:12 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -10,6 +10,15 @@
 LINKER = ar
 CC = gcc
 LIBRARIAN = ranlib
+
+ifeq ($(HB_ARCHITECTURE),linux)
+CP = cp -f
+RM = rm -f
+else
+CP = copy 
+RM = del /N 
+endif
+
 ifeq ($(HB_INCLUDE),)
    HB_INCLUDE=$(HB_INC_INSTALL)
 endif
@@ -39,7 +48,7 @@ ifeq ($(HB_ARCHITECTURE),linux)
    ifeq ($(HB_GT_LIB),gtcgi)
       GT_LIBS=-lgtcgi
    endif
-   
+
 EXE_EXT=
 
 else
@@ -59,10 +68,20 @@ else
   endif
 endif
 
+
+ifeq ($(HB_ARCHITECTURE),OS2)
+   ifeq ($(HB_GT_LIB),)
+      HB_GT_LIB=gtos2
+   endif	
+   GT_LIBS=-l$(HB_GT_LIB) -lsocket
+   EXE_EXT=.exe
+endif
+
+
 #Sources / object determination rule
 #subidr might override this file by providing a makefile.sources
 ifeq ($(strip $(SOURCES)),)
-SOURCES=$(wildcard *.prg) 
+SOURCES=$(wildcard *.prg)
 endif
 
 ifeq ($(strip $(OBJECTS)),)
@@ -70,7 +89,7 @@ OBJECTS=$(patsubst %.prg,%.o,$(SOURCES))
 endif
 
 ifeq ($(strip $(C_SOURCES)),)
-C_SOURCES=$(wildcard *.c) 
+C_SOURCES=$(wildcard *.c)
 endif
 
 ifeq ($(strip $(C_OBJECTS)),)
@@ -80,35 +99,35 @@ endif
 
 #COMMANDS
 
-all:$(TARGET)
+all: $(TARGET)
 
 .PHONY: clean
 
 %.c: %.prg
-	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(INCLUDE) $(PRG_USR) -n -w2 $<
+	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL)  $(INCLUDE)  $(PRG_USR) -n -w2 $<
 
 %.o: %.c
-	$(CC) -c -I$(HB_INC_INSTALL) $(INCLUDE) $(C_USR) $<
+	$(CC) -c -I$(HB_INC_INSTALL)  $(INCLUDE)  $(C_USR) $<
 
 $(TARGET): $(OBJECTS) $(C_OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 	$(LINKER) -r $(TARGET) $(OBJECTS) $(C_OBJECTS)
 	$(LIBRARIAN) $(TARGET)
 else
-	$(CC) -o $(TARGET) $(OBJECTS) $(C_OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
-		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
-		$(GT_LIBS) -lm 
+	$(CC) -o $(TARGET)$(EXE_EXT) $(OBJECTS) $(C_OBJECTS)  -L$(HB_LIB_INSTALL)  $(LIBDIR)  $(LIBS)  $(LIBFILES)  \
+	-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
+	$(GT_LIBS) -lm
 endif
 
 clean:
-	rm -f *.o
-	rm -f *~
-	rm -f $(TARGET)
+	$(RM) *.o
+	$(RM) *~
+	$(RM) $(TARGET)
 
 install: $(TARGET)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
-	cp -f $(TARGET) $(HB_LIB_INSTALL)
+	$(CP) $(TARGET) $(HB_LIB_INSTALL)
 else
-	cp -f $(TARGET) $(HB_BIN_INSTALL)
+	$(CP) $(TARGET) $(HB_BIN_INSTALL)
 endif
 

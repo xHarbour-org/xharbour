@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.27 2004/01/14 00:11:06 lculik Exp $
+ * $Id: Changelog,v 1.28 2004/02/07 16:03:12 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-23 11:05 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * Rules.make
+    + added support for building under OS/2 with GCC (I hope I did not break anything else)
+    + inserted TABs between target and rule to make target since this is requested by gnu-make
+  * tiputils.c
+    * fixed to work under OS/2 GCC
+    contrib/tip can now be built under OS/2 GCC and tests work ok (I could download a web
+    page and a mail using tiptest).
 
 2004-02-07 17:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * Rules.make
@@ -32,7 +41,7 @@
   * makefile.bc
   * makefile.bc
     Makefile
-    ! makefile updated  
+    ! makefile updated
 
 
 2003-12-10 14:32 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
@@ -53,7 +62,7 @@
   * tipclienthttp.prg
     ! fixed a loop and initialization of READ() in PostRequest
       method
-      
+
   * tipurl.prg
     ! Fixed parsing of file
 
@@ -68,7 +77,7 @@
     + If provided with a Hash, method PostRequest will create an HTTP
       request using key/values pair from the hash, automatically
       translating them into strings AND encoding them.
-      
+
 2003-12-07 15:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipencoderbase64.prg
     ! Must used unsigned char instead of char to encode binary

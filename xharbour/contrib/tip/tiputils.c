@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.3 2003/12/03 00:51:16 fsgiudice Exp $
+* $Id: tiputils.c,v 1.4 2003/12/03 15:07:05 jonnymind Exp $
 ************************************************/
 
 #include "hbapi.h"
@@ -33,15 +33,15 @@ HB_FUNC( TIP_TIMESTAMP )
    TIME_ZONE_INFORMATION tzInfo;
    long lDate, lYear, lMonth, lDay;
    char *days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-   char *months[] = { 
-         "Jan", "Feb", "Mar", 
-         "Apr", "May", "Jun", 
-         "Jul", "Aug", "Sep", 
+   char *months[] = {
+         "Jan", "Feb", "Mar",
+         "Apr", "May", "Jun",
+         "Jul", "Aug", "Sep",
          "Oct", "Nov", "Dec" };
    char *szRet = (char *) hb_xgrab( 64 );
    SYSTEMTIME st;
 
-   
+
    if ( !ulHour )
    {
       ulHour = 0;
@@ -55,29 +55,29 @@ HB_FUNC( TIP_TIMESTAMP )
    {
       tzInfo.Bias -= tzInfo.Bias;
    }
-   
+
    if ( !pDate )
    {
       GetLocalTime( &st );
-      
+
       sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
-            days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1], 
+            days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1],
             st.wYear,
-            st.wHour, st.wMinute, st.wSecond, 
+            st.wHour, st.wMinute, st.wSecond,
             tzInfo.Bias/60,
-            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ); 
+            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 );
    }
    else
    {
       lDate = hb_itemGetDL( pDate );
       hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
-         
+
       sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
-            days[ hb_dateDOW( lYear, lMonth, lDay ) - 1 ], lDay, 
+            days[ hb_dateDOW( lYear, lMonth, lDay ) - 1 ], lDay,
             months[ lMonth -1], lYear,
             ulHour / 3600, (ulHour % 3600) / 60, (ulHour % 60),
             tzInfo.Bias/60,
-            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ); 
+            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 );
    }
 
 
@@ -101,7 +101,7 @@ HB_FUNC( TIP_TIMESTAMP )
    char szDate[9];
    struct tm tmTime;
    time_t current;
-   
+
    char *szRet = (char *) hb_xgrab( 64 );
 
    if ( !ulHour )
@@ -109,10 +109,14 @@ HB_FUNC( TIP_TIMESTAMP )
       ulHour = 0;
    }
 
-   
+
    /* init time structure anyway */
    time( &current );
+   #ifdef HB_OS_OS2
+   memcpy((void *)&tmTime, (void *)localtime( &current ), sizeof(tmTime));
+   #else
    localtime_r( &current , &tmTime );
+   #endif
 
    if ( pDate )
    {
