@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.1217 2003/07/06 19:15:19 lculik Exp $
+ * $Id: ChangeLog,v 1.1218 2003/07/06 19:32:47 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-06 22:00 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  + bin/bld_solib.sh
+  + doc/linuxso_howto.txt
+    + Added a script that builds and install shared objects for linux
+      (and other ELF systems) from static .a libraries. Uses
+      Przemyslaw's utility and wraps it in a user-friendly
+      installer. The documentation help to see how to use shared
+      objects to build xharbour applications.
+
+      TODO: I'll add a doc to explain the users how to create .so
+      libraries from their own application libraries.
+
 
 2003-07-06 16:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/vm/hvm.c
