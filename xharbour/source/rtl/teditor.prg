@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.25 2004/04/16 16:40:36 lculik Exp $
+/* $Id: teditor.prg,v 1.26 2004/04/17 23:27:21 jonnymind Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -418,6 +418,23 @@ return Self
 
 METHOD Down() CLASS HBEditor
 
+   IF ::nRow < ::naTextLen
+      ::GotoLine( ::nRow + 1 )
+      // Modified = keep at max of end of line
+      // JC1: nRow has changed now, but can be at max ::naTextLen, so its valid
+      IF ::nCol > ::LineLen( ::nRow )
+         ::End()
+      ENDIF
+   ELSE
+      // JC1: pressing down at the end of text will make
+      // cursor to go to the end of line (temporarily disabled )
+      /*IF ::naTextLen > 0
+         ::End()
+      ENDIF
+      */
+   ENDIF
+
+/*
    if !::lEditAllow
       while ::Row() < ::nBottom .AND. ::nRow < ::naTextLen
          ::nRow++
@@ -443,8 +460,8 @@ METHOD Down() CLASS HBEditor
    if ::nCol > ::LineLen( ::nRow )
       ::End()
    endif
-
-   Return Self
+*/
+RETURN Self
 
 //-------------------------------------------------------------------//
 
@@ -504,6 +521,15 @@ METHOD GoBottom() CLASS HBEditor
 
 METHOD Up() CLASS HBEditor
 
+   IF ::nRow > 1
+      ::GotoLine( ::nRow - 1 )
+      // nRow changes in the meanwhile
+      IF ::nCol > ::LineLen( ::nRow )
+         ::End()
+      ENDIF
+   ENDIF
+
+/*
    if ! ::lEditAllow
       while ::Row() > ::nTop .AND. ::nRow > 1
          ::nRow--
@@ -523,12 +549,8 @@ METHOD Up() CLASS HBEditor
       ::SetPos( ::Row() - 1, ::Col() )
    endif
 
-   // Modified = keep at max of end of line
-   if ::nCol > ::LineLen( ::nRow )
-      ::End()
-   endif
-
-   Return Self
+*/
+Return Self
 
 //-------------------------------------------------------------------//
 
@@ -1201,12 +1223,15 @@ return Self
 METHOD GotoLine( nRow ) CLASS HBEditor
 
    if nRow <= ::naTextLen .AND. nRow > 0
-      IF nRow < ::nFirstRow .OR. nRow - ::nFirstRow > ::nBottom - ::nTop
+      IF nRow < ::nFirstRow 
+         ::nFirstRow := nRow
+         ::RefreshWindow()
+      ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
          ::nFirstRow := Max( 1, nRow - (::nBottom - ::nTop) )
+         ::RefreshWindow()
       ENDIF
       ::nRow := nRow
       ::SetPos( ::nTop + nRow - ::nFirstRow, ::Col() )
-      ::RefreshWindow()
    ENDIF
 
 return Self
@@ -1216,12 +1241,15 @@ METHOD GotoCol( nCol ) CLASS HBEditor
    IF nCol <= ::LineLen( ::nRow ) +1 .AND. nCol >= 1 
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
-      IF nCol < ::nFirstCol .OR. nCol - ::nFirstCol > ::nRight - ::nLeft
+      IF nCol < ::nFirstCol
+         ::nFirstCol :=  nCol
+         ::RefreshWindow()
+      ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
          ::nFirstCol := Max( 1, nCol - (::nRight - ::nLeft) )
+         ::RefreshWindow()
       ENDIF
       ::nCol := nCol
       ::SetPos( ::Row(), ::nLeft + nCol - ::nFirstCol )
-      ::RefreshLine()
    ENDIF
 RETURN Self
 
@@ -1230,21 +1258,27 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
    DEFAULT lRefresh TO .F.
    
    if nRow <= ::naTextLen .AND. nRow > 0
-      IF nRow < ::nFirstRow .OR. nRow - ::nFirstRow > ::nBottom - ::nTop
+      IF nRow < ::nFirstRow 
+         ::nFirstRow := nRow
+         lRefresh := .T.
+      ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
          ::nFirstRow := Max( 1, nRow - (::nBottom - ::nTop) )
+         lRefresh := .T.
       ENDIF
       ::nRow := nRow
-      lRefresh := .T.
    endif
    
    if nCol <= ::LineLen( nRow ) .AND. nCol >= 1 
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
-      if nCol < ::nFirstCol .OR. nCol - ::nFirstCol > ::nRight - ::nLeft
+      if nCol < ::nFirstCol 
+         ::nFirstCol := nCol
+         lRefresh := .T.
+      ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
          ::nFirstCol := Max( 1, nCol - (::nRight - ::nLeft) )
+         lRefresh := .T.
       ENDIF
       ::nCol := nCol
-      lRefresh := .T.
    endif
    
    
