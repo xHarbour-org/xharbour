@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.356 2004/03/11 00:43:48 ronpinkas Exp $
+ * $Id: hvm.c,v 1.357 2004/03/11 04:22:28 ronpinkas Exp $
  */
 
 /*
@@ -7874,12 +7874,22 @@ void hb_vmRequestDebug( void )
    s_bDebugRequest = TRUE;
 }
 
+/* Check if debugger activation was requested or request debugger activation
+ * if .T. is passed */
 HB_FUNC( HB_DBG_INVOKEDEBUG )
 {
    HB_THREAD_STUB
 
    BOOL bRequest = s_bDebugRequest;
-   s_bDebugRequest = FALSE;
+   
+   if ( hb_pcount() > 0 )
+   {
+      s_bDebugRequest = hb_parl( 1 );
+   }
+   else
+   {
+      s_bDebugRequest = FALSE;
+   }
    hb_retl( bRequest );
 }
 

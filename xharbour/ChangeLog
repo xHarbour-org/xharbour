@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2559 2004/03/11 13:56:29 andijahja Exp $
+ * $Id: ChangeLog,v 1.2560 2004/03/11 22:03:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-12 15:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+  * source/debug/dbgtwin.prg
+  * source/vm/hvm.c
+    ! Synced with latest Harbour debugger fixes by Ryszard Glab (which fix
+      procedure callstack and debugger activation issues when modules with
+      and without debug info are linked together).
 
 2004-03-11 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/filesys.c

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.25 2004/02/28 00:39:21 likewolf Exp $
+ * $Id: debugger.prg,v 1.26 2004/03/03 13:20:55 lf_sfnet Exp $
  */
 
 /*
@@ -78,6 +78,7 @@
 #define CSTACK_LINE        3  //start line
 #define CSTACK_MODULE      4  //module name (.PRG file)
 #define CSTACK_STATICS     5  //an array with static variables
+#define CSTACK_LEVEL       6  //eval stack level of the function
 
 /* Information structure stored in aCallStack[n][ CSTACK_LOCALS ]
    { cLocalName, nLocalIndex, "Local", ProcName( 1 ), nLevel } */
@@ -104,12 +105,17 @@ memvar __DbgStatics
 
 
 procedure __dbgAltDEntry()
-   s_lExit := .f.
+   /*s_lExit := .f.
    if !s_oDebugger==nil		// protects if altd() in code and debugger
                                 // linked but not active
       s_oDebugger:lGo := .F.
       __dbgEntry( HB_DBG_SHOWLINE, ProcLine( 2 ) )
-   endif
+   endif*/
+   /* do not activate the debugger imediatelly because the module
+      where ALTD() was called can have no debugger info - stop
+      on first LINE with debugged info 
+    */
+   HB_DBG_INVOKEDEBUG( SET( _SET_DEBUG ) )
 return
 
 procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry point
@@ -147,7 +153,8 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
               s_oDebugger:lGo :=.F.
               s_oDebugger:lToCursor :=.F.
               s_oDebugger:lNextRoutine :=.F.
-              s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1  
+              s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1
+              s_oDebugger:nProcLevel := hb_dbg_Proclevel() - IIf( ProcName( 2 ) == "ALTD", 3, 1 )
               s_oDebugger:Activate()
               RETURN
             ENDIF
@@ -157,7 +164,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         // set the current line number on the CallStack
         if s_oDebugger:lTrace
           //In TRACE mode (step over procedure)
-          IF s_oDebugger:nProcLevel < Len( s_oDebugger:aCallStack )
+          IF s_oDebugger:nTraceLevel < Len( s_oDebugger:aCallStack )
             s_oDebugger:lTrace := (! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
                                  .AND. !HB_DBG_INVOKEDEBUG())
             IF s_oDebugger:lTrace
@@ -204,6 +211,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1  
         if !s_oDebugger:lGo .or. HB_DBG_INVOKEDEBUG()
           s_oDebugger:lGo := .F.
+          s_oDebugger:nProcLevel := hb_dbg_Proclevel() - IIf( ProcName( 2 ) == "ALTD", 3, 1 )
           s_oDebugger:Activate()
         endif
         
@@ -302,7 +310,11 @@ CLASS TDebugger
    DATA   oBar, oBrwText, cPrgName, oBrwStack, oBrwVars, aVars
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
-   DATA   aBreakPoints, aCallStack, aColors
+   DATA   aBreakPoints
+   DATA   aCallStack    //stack of procedures with debug info
+   DATA   aProcStack    //stack of all procedures
+   DATA   nProcLevel    //procedure level where the debugger is currently
+   DATA   aColors
    DATA   aWatch, aTrace, lTracepoints
    DATA   aLastCommands, nCommand, oGetListCommand
    DATA   lAnimate, lEnd, lCaseSensitive, lMonoDisplay, lSortVars
@@ -312,7 +324,7 @@ CLASS TDebugger
    DATA   lShowCallStack
    DATA   lGo           //stores if GO was requested
    DATA   lTrace        //stores if TRACE over procedure was requested
-   DATA   nProcLevel    //procedure level where TRACE was requested
+   DATA   nTraceLevel   //procedure level where TRACE was requested
    DATA   lCodeblock INIT .F.
    DATA   lActive INIT .F.
    DATA   lCBTrace INIT .T.   //stores if codeblock tracing is allowed
@@ -354,9 +366,10 @@ CLASS TDebugger
    METHOD HideVars()
    METHOD InputBox( cMsg, uValue, bValid, lEditable )
    METHOD Inspect( uValue, cValueName )
-   METHOD IsBreakPoint( nLine, cPrgName)
+   METHOD IsBreakPoint( nLine, cPrgName )
    METHOD LoadSettings()
    METHOD LoadVars()
+   METHOD LoadCallStack()
 
    METHOD Local()
 
@@ -364,7 +377,8 @@ CLASS TDebugger
    METHOD NextWindow()
    METHOD Open()
    METHOD OpenPPO()
-   METHOD Resume() INLINE IIF( LEN(::aCallStack[1])>0, ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] ), NIL) 
+//   METHOD Resume() INLINE IIF( LEN(::aCallStack[1])>0, ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] ), NIL) 
+   METHOD Resume() INLINE ::ShowCodeLine( 1 )
    METHOD OSShell()
    METHOD PathForFiles()
 
@@ -381,7 +395,7 @@ CLASS TDebugger
    METHOD ShowAppScreen()
    METHOD ShowCallStack()
    METHOD ShowCodeLine( nLine, cPrgName )
-   METHOD StackProc(cModuleName)
+   METHOD StackProc( cModuleName, nProcLevel )
    METHOD ShowHelp( nTopic )
    METHOD ShowVars()
    METHOD RedisplayBreakpoints()
@@ -405,7 +419,7 @@ CLASS TDebugger
 
    METHOD ToggleBreakPoint()
 
-   METHOD Trace() INLINE ::lTrace := .t., ::nProcLevel := Len( ::aCallStack ),;
+   METHOD Trace() INLINE ::lTrace := .t., ::nTraceLevel := Len( ::aCallStack ),;
                          ::Step() //forces a Step()
 
    METHOD ToCursor()
@@ -457,6 +471,7 @@ METHOD New() CLASS TDebugger
    ::aTrace            := {}
    ::lTracepoints      := .F.
    ::aCallStack        := {}
+   ::aProcStack        := {}
    ::aVars             := {}
    ::lCaseSensitive    := .f.
    ::cSearchString     := ""
@@ -514,6 +529,7 @@ return Self
 
 METHOD Activate() CLASS TDebugger
 
+  ::LoadCallStack()  
   IF ! ::lActive
     ::lActive := .T.
     ::Show()
@@ -528,8 +544,8 @@ METHOD Activate() CLASS TDebugger
   IF( ::oWndPnt != NIL )
     ::WatchpointsShow()
   ENDIF
-  // new function ShowCodeLine( nline, cFilename)
-  ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] )
+  // show the topmost procedure
+  ::ShowCodeLine( 1 ) //::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] )
   ::HandleEvent()
 
 return nil
@@ -606,16 +622,16 @@ METHOD BuildBrowseStack() CLASS TDebugger
       ::oBrwStack := TBrowseNew( 2, MaxCol() - 14, MaxRow() - 7, MaxCol() - 1 )
       ::oBrwStack:ColorSpec := ::aColors[ 3 ] + "," + ::aColors[ 4 ] + "," + ::aColors[ 5 ]
       ::oBrwStack:GoTopBlock := { || ::oBrwStack:Cargo := 1 }
-      ::oBrwStack:GoBottomBlock := { || ::oBrwStack:Cargo := Len( ::aCallStack ) }
+      ::oBrwStack:GoBottomBlock := { || ::oBrwStack:Cargo := Len( ::aProcStack ) }
       ::oBrwStack:SkipBlock = { | nSkip, nOld | nOld := ::oBrwStack:Cargo,;
                               ::oBrwStack:Cargo += nSkip,;
                               ::oBrwStack:Cargo := Min( Max( ::oBrwStack:Cargo, 1 ),;
-                              Len( ::aCallStack ) ), ::oBrwStack:Cargo - nOld }
+                              Len( ::aProcStack ) ), ::oBrwStack:Cargo - nOld }
 
       ::oBrwStack:Cargo := 1 // Actual highligthed row
 
-      ::oBrwStack:AddColumn( TBColumnNew( "", { || If( Len( ::aCallStack ) > 0,;
-            PadC( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_FUNCTION ], 14 ), Space( 14 ) ) } ) )
+      ::oBrwStack:AddColumn( TBColumnNew( "", { || If( Len( ::aProcStack ) > 0,;
+            PadC( ::aProcStack[ ::oBrwStack:Cargo ][ 1 ], 14 ), Space( 14 ) ) } ) )
    endif
 
 return nil
@@ -633,7 +649,7 @@ METHOD CallStackProcessKey( nKey ) CLASS TDebugger
            endif
 
       case nKey == K_END
-           if ::oBrwStack:Cargo < Len( ::aCallStack )
+           if ::oBrwStack:Cargo < Len( ::aProcStack )
               ::oBrwStack:GoBottom()
               ::oBrwStack:ForceStable()
               lUpdate = .t.
@@ -647,7 +663,7 @@ METHOD CallStackProcessKey( nKey ) CLASS TDebugger
            endif
 
       case nKey == K_DOWN
-           if ::oBrwStack:Cargo < Len( ::aCallStack )
+           if ::oBrwStack:Cargo < Len( ::aProcStack )
               ::oBrwStack:Down()
               ::oBrwStack:ForceStable()
               lUpdate = .t.
@@ -688,11 +704,12 @@ METHOD CallStackProcessKey( nKey ) CLASS TDebugger
       endif
 
       // jump to source line for a function
-      if ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
+      /*if ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
          ::ShowCodeLine( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ], ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ] )
       else
          ::GotoLine( 1 )
-      endif
+      endif*/
+      ::ShowCodeLine( ::oBrwStack:Cargo ) 
    endif
 
 return nil
@@ -1377,6 +1394,30 @@ METHOD ShowCallStack() CLASS TDebugger
 
 return nil
 
+
+METHOD LoadCallStack() CLASS TDebugger
+  LOCAL i
+  LOCAL nDebugLevel
+  LOCAL nCurrLevel
+  LOCAL nlevel, nPos
+  
+  ::aProcStack := ARRAY( ::nProcLevel )
+  nCurrLevel := hb_dbg_ProcLevel() - 1
+  nDebugLevel := nCurrLevel - ::nProcLevel + 1
+  FOR i := nDebugLevel TO nCurrLevel
+    nLevel := nCurrLevel - i + 1
+    nPos := ASCAN( ::aCallStack, {|a| a[CSTACK_LEVEL] == nLevel} )
+    IF ( nPos > 0 )
+      //a procedure with debug info
+      ::aProcStack[i-nDebugLevel+1] := ::aCallStack[ nPos ]
+    ELSE
+      ::aProcStack[i-nDebugLevel+1] := { PROCNAME( i ), ,,,, nLevel }
+    ENDIF
+  NEXT
+
+RETURN NIL
+
+
 METHOD LoadSettings() CLASS TDebugger
 
    local cInfo := MemoRead( ::cSettingsFileName )
@@ -1467,36 +1508,38 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       next
    endif
 
-   if ::lShowStatics
-      if Type( "__DbgStatics" ) == "A"
-         cName := ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
-         n := ASCAN( __dbgStatics, {|a| a[1]==cName} )
-         IF( n > 0 )
-            aVars := __DbgStatics[ n ][ 2 ]
-            for m := 1 to Len( aVars )
-               AAdd( aBVars, aVars[ m ] )
+   IF ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil   
+      if ::lShowStatics
+         if Type( "__DbgStatics" ) == "A"
+            cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
+            n := ASCAN( __dbgStatics, {|a| a[1]==cName} )
+            IF ( n > 0 )
+               aVars := __DbgStatics[ n ][ 2 ]
+               for m := 1 to Len( aVars )
+                  AAdd( aBVars, aVars[ m ] )
+               next
+            ENDIF
+            aVars := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ]
+            for n := 1 to Len( aVars )
+               AAdd( aBVars, aVars[ n ] )
             next
-         ENDIF
-         aVars := ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ]
+         endif
+      endif
+
+      if ::lShowLocals
+         aVars := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_LOCALS ]
          for n := 1 to Len( aVars )
-            AAdd( aBVars, aVars[ n ] )
+            cName := aVars[ n ][ VAR_NAME ]
+            m := AScan( aBVars,; // Is there another var with this name ?
+                        { | aVar | aVar[ VAR_NAME ] == cName .AND. aVar[VAR_TYPE]=='S'} )
+            IF ( m > 0 )
+               aBVars[ m ] := aVars[ n ]
+            ELSE
+               AAdd( aBVars, aVars[ n ] )
+            ENDIF
          next
       endif
-   endif
-
-   if ::lShowLocals
-     aVars := ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LOCALS ]
-     for n := 1 to Len( aVars )
-       cName := aVars[ n ][ VAR_NAME ]
-       m := AScan( aBVars,; // Is there another var with this name ?
-       { | aVar | aVar[ VAR_NAME ] == cName .AND. aVar[VAR_TYPE]=='S'} )
-       IF( m > 0 )
-         aBVars[ m ] := aVars[ n ]
-       ELSE
-         AAdd( aBVars, aVars[ n ] )
-       ENDIF
-     next
-   endif
+   ENDIF
 
    IF( ::oBrwVars != NIL .AND. ::oBrwVars:cargo[1] > LEN(aBVars) )
      ::oBrwVars:gotop()
@@ -1613,6 +1656,8 @@ METHOD ShowVars() CLASS TDebugger
       elseif Len( ::aVars ) < ::oWndVars:nBottom - ::oWndVars:nTop - 1
          ::oWndVars:Resize( ,, ::oWndVars:nTop + Len( ::aVars ) + 1 )
          lRepaint := .t.
+      else
+         ::oBrwVars:RefreshAll():ForceStable()
       endif
       if ! ::oWndVars:lVisible .OR. lRepaint
          ::ResizeWindows( ::oWndVars )
@@ -1650,7 +1695,7 @@ static function CompareLine( Self )
 
 return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
 
-METHOD StackProc( cModuleName ) CLASS TDebugger
+METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
    // always treat filename as lower case - we need it consistent for comparisons   
    LOCAL nPos:=RAT( ":", cModuleName )
 
@@ -1663,12 +1708,14 @@ METHOD StackProc( cModuleName ) CLASS TDebugger
      {},;   //local vars
      nil,;  //line no
      lower(LEFT( cModuleName, nPos - 1 )),; // and the module name
-     {} }  // static vars
-
+     {}, ;  // static vars
+     nProcLevel }
 return nil
 
-METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
-   LOCAL nPos
+//METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
+METHOD ShowCodeLine( nProc ) CLASS TDebugger
+   LOCAL nPos, nLevel
+   LOCAL nLine, cPrgName
   
    // we only update the stack window and up a new browse
    // to view the code if we have just broken execution
@@ -1676,6 +1723,17 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
       if ::oWndStack != nil
          ::oBrwStack:RefreshAll()
       endif
+       
+      nLine := ::aProcStack[ nProc ][ CSTACK_LINE ]
+      cPrgName := ::aProcStack[ nProc ][ CSTACK_MODULE ]
+      IF ( nLine == NIL )
+         ::oBrwText := nil
+         ::oWndCode:Browser := nil
+         ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_FUNCTION ] +;
+                                ": Code not available" )
+         ::oWndCode:Refresh()// to force the window caption to update
+         RETURN nil
+      ENDIF
 
       if( ::lppo )
          nPos :=RAT(".PRG", UPPER(cPrgName) ) 
@@ -1686,7 +1744,7 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
          ENDIF
       endif    
       if !empty( cPrgName ) 
-         if ( cPrgName != ::cPrgName )
+         if ( cPrgName != ::cPrgName .OR. ::oBrwText == NIL )
             if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
                cPrgName := ::LocatePrgPath( cPrgName )
             endif
@@ -1698,7 +1756,7 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
                          __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
             
             ::oWndCode:Browser := ::oBrwText
-            ::oWndCode:bPainted := {|| ::oBrwText:RefreshAll():ForceStable() }
+            ::oWndCode:bPainted := {|| IIF( ::oBrwText != nil, ::oBrwText:RefreshAll():ForceStable(), ::oWndCode:Clear() ) }
             ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
             ::oWndCode:SetCaption( ::cPrgName )
             ::oWndCode:Refresh()			// to force the window caption to update
@@ -1966,10 +2024,10 @@ METHOD GotoLine( nLine ) CLASS TDebugger
    nCol = Col()
 
    // no source code line stored yet
-   if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
+   /*if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
       ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] == nil
       ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] = nLine
-   endif
+   endif*/
 
    if ::oWndStack != nil .and. ! ::oBrwStack:Stable
       ::oBrwStack:ForceStable()
@@ -2736,26 +2794,26 @@ STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
             FOR i:=1 TO nLen
                cVar := aWatch[ i + WP_BLOCK ]
                //search local variables in current procedure
-               aLocVars := s_oDebugger:aCallStack[1][CSTACK_LOCALS]
+               aLocVars := s_oDebugger:aProcStack[1][CSTACK_LOCALS]
                nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                IF( nPos > 0 )
                   j :=hb_dbg_ProcLevel() - aLocVars[ nPos ][ VAR_LEVEL ]                           
                   aVars[i] := hb_dbg_vmVarLGet( j, aLocVars[ nPos ][ VAR_POS ] )
                ELSE
                   //search local statics
-                  aLocVars := s_oDebugger:aCallStack[1][CSTACK_STATICS]
+                  aLocVars := s_oDebugger:aProcStack[1][CSTACK_STATICS]
                   nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                   IF( nPos > 0 )
                      aVars[i] := hb_dbg_vmVarSGet( aLocVars[ nPos ][VAR_LEVEL], aLocVars[ nPos ][VAR_POS] )
                   ELSE
                      //search global statics
-                     cName := s_oDebugger:aCallStack[1][CSTACK_MODULE]
+                     cName := s_oDebugger:aProcStack[1][CSTACK_MODULE]
                      nPos := ASCAN( __dbgStatics, {|a| a[1]==cName} )
                      IF( nPos > 0 )
                         aLocVars := __dbgStatics[nPos][ 2 ]
                         nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                         IF( nPos > 0 )
-                           aVars[i] :=hb_dbg_vmVarSGet( aLocVars[ nPos ][VAR_LEVEL], aLocVars[ nPos ][VAR_POS] )
+                           aVars[i] := hb_dbg_vmVarSGet( aLocVars[ nPos ][VAR_LEVEL], aLocVars[ nPos ][VAR_POS] )
                            EXIT                                                                    
                         ENDIF                                                                      
                      ENDIF

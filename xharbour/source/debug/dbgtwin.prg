@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.5 2004/01/29 14:25:59 likewolf Exp $
+ * $Id: dbgtwin.prg,v 1.6 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -76,6 +76,7 @@ CLASS TDbWindow  // Debugger windows and dialogs
    METHOD Hide()
    METHOD IsOver( nRow, nCol )
    METHOD nWidth() INLINE ::nRight - ::nLeft + 1
+   METHOD Clear()
    METHOD ScrollUp( nLines )
    METHOD SetCaption( cCaption )
    METHOD ShowCaption()
@@ -92,6 +93,13 @@ CLASS TDbWindow  // Debugger windows and dialogs
    METHOD Resize()
 
 ENDCLASS
+
+METHOD Clear() CLASS TDbWindow
+  
+  SetColor( ::cColor )
+  ::Scroll( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
+
+RETURN nil
 
 METHOD New( nTop, nLeft, nBottom, nRight, cCaption, cColor ) CLASS TDbWindow
 
