@@ -14,9 +14,10 @@ static oApp
 FUNCTION Main
    local n, oTool, oSplash
    LOCAL hImg1,hImg2,hBmp,aStdTab
-   
+
    oApp := Application():Initialize()
 
+   // splash screen
    oSplash := TSplash():New( oApp, "visual_xharbour.bmp", 5000 )
 
    WITH OBJECT oApp
@@ -24,9 +25,9 @@ FUNCTION Main
          :WindowMenu := TMenu():New()
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
+         // add the menu
          WITH OBJECT :WindowMenu
             :AddPopup('&Test')
-
             WITH OBJECT :Popup
                :AddItem( 'Editor'     , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
                :AddSeparator()
@@ -34,9 +35,10 @@ FUNCTION Main
             END
          END
          :SetWindowMenu()
+         // add the rebar
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
+            // add the xmake toolbar
             WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ))
-               
                :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",10, {|o|MessageBox(,o:hint)} ) )
                :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",11 ) )
                :AddButton( "Properties",   ToolButton():New( 2,,"Properties",12 ) )
@@ -63,6 +65,7 @@ FUNCTION Main
             END
             :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tools:handle, 200, 52, 200, "", NIL )
 
+            // add the TabControl on the Rebarband
             WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0,  0,  0) )
                :AddTab( "Standard" )
                :AddTab( "Aditional" )
@@ -77,6 +80,7 @@ FUNCTION Main
             :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tabs:handle, 550, 56, , "", NIL )
             :Tabs:Configure()
             
+            // sets the controls toolbar on the TabControl
             WITH OBJECT :Tabs:Tabs[1]
                WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
                   :SetStyle( WS_BORDER, .F. )
@@ -111,13 +115,18 @@ FUNCTION Main
             END
          END
          
+         // add the main status bar
          WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
             :SetPanels( { 150,380,480,580,-1 } )
             :SetPanelText( 0, "What32 API StatusBar" )
             :SetPanelText( 2, "Enjoy" )
          END
+         
+         // add the object windows
          :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
          :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
+         
+         // focus to main Frame
          :SetFocus()
       END
       :Run()
@@ -150,6 +159,7 @@ CLASS ObjTree FROM TForm
                                 ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
                                 ::ExStyle := WS_EX_CLIENTEDGE ,;
                                 super:new( oParent )
+   // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
 ENDCLASS
 
@@ -164,6 +174,7 @@ CLASS ObjInspect FROM TForm
                                 ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
                                 ::ExStyle := WS_EX_CLIENTEDGE ,;
                                 super:new( oParent )
+   // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
    METHOD OnSize(n,x,y)  INLINE ::InspTabs:Move(,,x,y,.t.),nil
