@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.42 2003/09/14 18:07:24 jonnymind Exp $
+ * $Id: memvars.c,v 1.43 2003/10/14 15:24:06 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,7 @@
 
 #include "error.ch"
 #include "hbmemvar.ch"
+#include "hbset.h"
 
 //JC1: under threads, we need this to be in thread stack
 #ifndef HB_THREAD_SUPPORT
