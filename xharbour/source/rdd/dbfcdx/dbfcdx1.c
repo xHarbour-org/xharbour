@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.69 2003/09/27 16:15:41 paultucker Exp $
+ * $Id: dbfcdx1.c,v 1.70 2003/10/13 00:03:46 druzus Exp $
  */
 
 /*
@@ -1049,7 +1049,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          {
             if ( bEnd )
                break;
-            if( pArea->lpdbOrdCondInfo->lNextCount > 0 )
+            if ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->lNextCount > 0 )
             {
                pArea->lpdbOrdCondInfo->lNextCount--;
                if( pArea->lpdbOrdCondInfo->lNextCount <= 0 )
