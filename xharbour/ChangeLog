@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2645 2004/03/24 11:51:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.2646 2004/03/24 12:55:16 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-24 21:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * Overall Changes suggested by Budyanto Dj. Thanks. Now Tbrowse is very near to Clipper's.
 
 2004-03-24 09:30 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
    * contrib/hbzlib/zip.c
