@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3068 2004/06/12 18:55:07 bdj Exp $
+ * $Id: ChangeLog,v 1.3069 2004/06/13 08:41:20 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-14 19:30 UTC-0800 Luis Krause Mantilla
+  * source/rtl/minmax.c
+    ! Fixed r/t error when Min() and Max() received logical values
+      (Clipper compatibility)
 
 2004-06-13 10:40 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/direct.c

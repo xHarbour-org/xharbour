@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: minmax.c,v 1.5 2004/02/23 10:01:42 andijahja Exp $
  */
 
 /*
@@ -107,6 +107,13 @@ HB_FUNC( MAX )
          hb_retni( i1 >= i2 ? i1 : i2 );
       }
    }
+   else if( HB_IS_LOGICAL( p1 ) && HB_IS_LOGICAL( p2 ) )
+   {
+      BOOL b1 = hb_itemGetL( p1 );
+      BOOL b2 = hb_itemGetL( p2 );
+
+      hb_retl( b1 >= b2 ? b1 : b2 );
+   }
    else
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
@@ -166,9 +173,15 @@ HB_FUNC( MIN )
          hb_retni( i1 <= i2 ? i1 : i2 );
       }
    }
+   else if( HB_IS_LOGICAL( p1 ) && HB_IS_LOGICAL( p2 ) )
+   {
+      BOOL b1 = hb_itemGetL( p1 );
+      BOOL b2 = hb_itemGetL( p2 );
+
+      hb_retl( b1 <= b2 ? b1 : b2 );
+   }
    else
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
-
