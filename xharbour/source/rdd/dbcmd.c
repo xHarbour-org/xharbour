@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.117 2004/05/23 22:10:41 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.118 2004/05/24 08:47:43 lf_sfnet Exp $
  */
 
 /*
@@ -5538,7 +5538,7 @@ static BOOL hb_ExportBufSqlVar( PHB_FILEBUF pFileBuf, PHB_ITEM pValue, char *cDe
 // Export DBF content to a SQL script file
 static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                         char *cDelim, char *cSep, char *cEsc, int nCount, char *cTable, FHANDLE handle,
-                        BOOL bAppend, BOOL bInsert, BOOL bRecno )
+                        BOOL bInsert, BOOL bRecno )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
@@ -5555,8 +5555,7 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    BOOL bEof = TRUE;
    BOOL bBof = TRUE;
 
-   /* left for future intergration with hb_Dbf2Text */
-   /* BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ; */
+   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ; 
 
    if( ! handle )
    {
@@ -5601,25 +5600,33 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
             hb_addStrToFBuffer( pFileBuf, szRecno );
             hb_addStrToFBuffer( pFileBuf, cSep );
          }
-
-         for ( ui = 1; ui <= uiFields; ui ++ )
+         
+         if ( bNoFieldPassed )
          {
-            SELF_GETVALUE( pArea, ui, &Tmp );
-            if ( bWriteSep )
+            for ( ui = 1; ui <= uiFields; ui ++ )
             {
-               hb_addStrToFBuffer( pFileBuf, cSep );
+               SELF_GETVALUE( pArea, ui, &Tmp );
+               if ( bWriteSep )
+               {
+                  hb_addStrToFBuffer( pFileBuf, cSep );
+               }
+               bWriteSep = hb_ExportBufSqlVar( pFileBuf, &Tmp, cDelim, cEsc );
             }
-            bWriteSep = hb_ExportBufSqlVar( pFileBuf, &Tmp, cDelim, cEsc );
+         }
+         else
+         {
+            /* TODO: exporting only some fields */
          }
 
          if( bInsert )
          {
             hb_addStrToFBuffer( pFileBuf, " );" );
          }
-         
-         hb_addStrToFBuffer( pFileBuf, hb_conNewLine() );
-         bWriteSep = FALSE;
-      }
+      
+      }   
+      
+      hb_addStrToFBuffer( pFileBuf, hb_conNewLine() );
+      bWriteSep = FALSE;
 
       if ( nCount != -1 )
       {
@@ -5628,9 +5635,9 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
 
       SELF_SKIP( pArea, 1 );
    }
-
+      
    hb_itemClear( &Tmp );
-
+   
    // Writing EOF
    // hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
 
@@ -5777,7 +5784,7 @@ HB_FUNC( __DBSQL )
          }
 
          // Doing things now
-         lRecno = hb_Dbf2Sql( pWhile, pFor, pFields, cDelim, cSep, cEsc, lCount, cTable, handle, bAppend, bInsert, bRecno ); 
+         lRecno = hb_Dbf2Sql( pWhile, pFor, pFields, cDelim, cSep, cEsc, lCount, cTable, handle, bInsert, bRecno );
 
          hb_fsClose( handle );
 
