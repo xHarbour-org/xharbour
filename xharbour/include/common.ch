@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.3 2003/11/03 20:09:24 brianhays Exp $
+ * $Id: common.ch,v 1.4 2003/11/12 11:28:49 toninhofwi Exp $
  */
 
 /*
@@ -78,6 +78,7 @@
 #xtranslate VALTYPE( <Expr> ) == "L" => ( HB_ISLOGICAL( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "N" => ( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "O" => ( HB_ISOBJECT( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) == "P" => ( HB_ISPOINTER( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "U" => ( HB_ISNIL( <Expr> ) )
 
 #xtranslate VALTYPE( <Expr> ) != "A" => !( HB_ISARRAY( <Expr> ) )
@@ -87,6 +88,7 @@
 #xtranslate VALTYPE( <Expr> ) != "L" => !( HB_ISLOGICAL( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "N" => !( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "O" => !( HB_ISOBJECT( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) != "P" => !( HB_ISPOINTER( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "U" => !( HB_ISNIL( <Expr> ) )
 
 #xtranslate VALTYPE( <Expr> ) <> "A" => !( HB_ISARRAY( <Expr> ) )
@@ -96,7 +98,16 @@
 #xtranslate VALTYPE( <Expr> ) <> "L" => !( HB_ISLOGICAL( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "N" => !( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "O" => !( HB_ISOBJECT( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) <> "P" => !( HB_ISPOINTER( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "U" => !( HB_ISNIL( <Expr> ) )
+
+#xtranslate LEN( <Expr> ) == 0       => ( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) = 0        => ( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) != 0       => !( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) # 0        => !( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) <> 0       => !( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) > 0        => !( HB_ISNULL( <Expr> ) )
+#xtranslate LEN( <Expr> ) >= 1       => !( HB_ISNULL( <Expr> ) )
 
 /* DEFAULT and UPDATE commands */
 #xcommand DEFAULT <v1> TO <x1> [, <vn> TO <xn> ] => ;
