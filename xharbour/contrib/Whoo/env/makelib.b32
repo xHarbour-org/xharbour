@@ -1,0 +1,22 @@
+
+!include $(WHO_DIR)\env\makeb32.env
+
+lib: $(WHOOLIB) 
+
+$(WHOOLIB): $(WHOOOBJ)
+   -erase $(WHOOLIB)
+   $(lib) "$(WHOOLIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+
+clean:
+        -erase *.obj
+        -erase *.exe
+        -erase *.res
+        -erase *.map
+        -erase *.rws
+        -erase $(WHOOLIB)
+
+
