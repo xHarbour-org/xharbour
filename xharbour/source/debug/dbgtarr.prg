@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.12 2003/05/21 16:03:42 antoniolinares Exp $
+ * $Id: dbgtarr.prg,v 1.6 2003/06/17 10:51:43 iananderson Exp $
  */
 
 /*
@@ -157,23 +157,27 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
               OBrwSets:PageUp()
 
       Case nKey == K_ENTER
-           if valtype(aArray[nSet])=="A"
-                  SetPos(ownd:nBottom,ownd:nLeft)
-                  ::aWindows[::nCurwindow]:lFocused:=.f.
-                  ::arrayname:= ::arrayname+"["+alltrim(cTemp)+"]"
-                  ::AddWindows(aArray[nSet],oBrwSets:RowPos+oBrwSets:nTop)
-                  ::arrayname:=coldname
+         if valtype(aArray[nSet])=="A"
+            if Len( aArray[ nSet ] ) == 0
+               Alert( "Array is empty" )
+            else
+               SetPos(ownd:nBottom,ownd:nLeft)
+               ::aWindows[::nCurwindow]:lFocused:=.f.
+               ::arrayname:= ::arrayname+"["+alltrim(cTemp)+"]"
+               ::AddWindows(aArray[nSet],oBrwSets:RowPos+oBrwSets:nTop)
+               ::arrayname:=coldname
 
-                  adel(::aWindows,::nCurWindow)
-                  asize(::awindows,len(::awindows)-1)
-                  if ::nCurwindow==0
+               adel(::aWindows,::nCurWindow)
+               asize(::awindows,len(::awindows)-1)
+               if ::nCurwindow==0
                   ::ncurwindow:=1
-                  else
+               else
                   ::ncurwindow--
-                  endif
-           elseif valtype(aArray[nSet])=="B"
+               endif
+            endif
+         elseif valtype(aArray[nSet])=="B"
                   Alert("Value cannot be edited")
-           else
+         else
               if ::lEditable
                  oBrwSets:RefreshCurrent()
                  if ValType( aArray[ nSet ] ) == "O"
@@ -188,7 +192,7 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                  Alert("Value cannot be edited")
               endif
 
-           endif
+         endif
 
    endcase
 
