@@ -1,12 +1,13 @@
 /*
- * $Id: dbedit.prg,v 1.13 2003/12/09 02:47:03 maurifull Exp $
+ * $Id: dbedit.prg,v 1.14 2003/12/09 23:08:20 maurifull Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * DBEDIT() function
  *
  * Copyright 2003 Mauricio Abre <maurifull@datafull.com>
+ * www - http://www.xharbour.org
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -178,7 +179,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
   IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
 
   // EXTENSION: Initialization call
-  nRet := _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
+  _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
 
   i := RecNo()
   Go Top
@@ -201,13 +202,22 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
         oTBR:refreshCurrent()
 	Exit
     End
+    oTBR:forceStable()
+    oTBR:refreshCurrent()
+    oTBR:stabilize()
     If oTBR:hitTop
       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
     ElseIf oTBR:hitBottom
       nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
     End
-    oTBR:forceStable()
+    If nRet == DE_ABORT
+      Exit
+    End
     nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    If nRet == DE_ABORT
+      Exit
+    End
+    oTBR:hilite()
     nKey := Inkey(0)
 
 #ifdef HB_COMPAT_C53
@@ -321,9 +331,14 @@ Local oTB1, oTB2
 Return Nil
 
 Static Function _DoUserFunc(bFun, nMode, nColPos, oTBR)
-Local nRet
+Local nRet, nRec := RecNo()
 
   nRet := Eval(bFun, nMode, nColPos, oTBR)
  
-  IIf(!HB_ISNUMERIC(nRet), nRet := 1, .T.)
+  If RecNo() != nRec .And. nRet != DE_ABORT
+    nRet := DE_REFRESH
+  End
+  If !HB_ISNUMERIC(nRet) .Or. nRet < 0 .Or. nRet > 2
+     nRet := DE_CONT
+  End
 Return nRet

@@ -39,6 +39,10 @@ Local nRet := DE_CONT
   Do Case
     Case nMode == -1 // EXTENSION: Initialization mode
       oTBR:colorSpec := "n/bg,w/n,r/bg,w+/bg,w+/gr"
+    Case nMode == DE_HITTOP
+      Keyboard Chr(K_CTRL_PGDN)
+    Case nMode == DE_HITBOTTOM
+      Keyboard Chr(K_CTRL_PGUP)
     Case LastKey() == K_ESC
       nRet := DE_ABORT
     Case LastKey() == K_SPACE .And. nCol > 1
