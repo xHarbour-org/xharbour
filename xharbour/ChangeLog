@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.131 2002/03/22 19:49:19 walito Exp $
+ * $Id: ChangeLog,v 1.132 2002/03/24 16:17:24 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-25 21:58 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/tget.prg
+     ! Fix bug in picture "999,999.99" and "999.999,99".
+     ! Fix bug in picture with initial spaces.
 
 2002-03-24 16:08 UTC-0300 Walter Negro <anegro@overnet.com.ar>
    * include\hbtrace.h
