@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.12 2003/06/30 17:07:28 ronpinkas Exp $
+ * $Id: ads1.c,v 1.13 2003/07/06 19:34:08 walito Exp $
  */
 
 /*
@@ -1092,48 +1092,46 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD    pField;
    BYTE *     pBuffer = pArea->pRecord;
-   UNSIGNED8  szName[ ADS_MAX_FIELD_NAME ];
       /* For fast stack allocations, we use the largest possible
        sized buffer. Even though 128 bytes is overkill for 10 byte
        ADSCDX access, the speed over hb_xgrab(pArea->uiMaxFieldNameLength+1)
        seems worth it.  */
 
-   UNSIGNED16 pusBufLen = ADS_MAX_FIELD_NAME + 1;
    UNSIGNED32 pulLength;
-   DOUBLE     dVal;
+   DOUBLE     dVal = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("adsGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   dVal = 0;
 
    if( uiIndex > pArea->uiFieldCount )
       return FAILURE;
 
    pField = pArea->lpFields + uiIndex - 1;
+
    /* Cannot test for EOF here because related children may not have the eof flag reset yet, yielded erroneous blank results */
 
-   AdsGetFieldName( pArea->hTable, uiIndex, szName, &pusBufLen );
+   /* This code was optimized for use ADSFIELD() macro instead */
+   /* AdsGetFieldName() function for speed. Toninho@fwi, 22/07/2003 */
 
    switch( pField->uiType )
    {
       case HB_IT_STRING:
-            pulLength = pArea->maxFieldLen;
-            if (AdsGetField( pArea->hTable, szName, pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
-            {
-               memset( pBuffer, ' ', pField->uiLen );
-               pArea->fEof = TRUE;
-            }
+         pulLength = pArea->maxFieldLen;
+         if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
+         {
+            memset( pBuffer, ' ', pField->uiLen );
+            pArea->fEof = TRUE;
+         }
          hb_itemPutCL( pItem, ( char * ) pBuffer, pField->uiLen );
          break;
 
       case HB_IT_LONG:
          pulLength = pArea->maxFieldLen + 1;
-         if (AdsGetField( pArea->hTable, szName, pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
+         if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
          {
             memset( pBuffer, ' ', pField->uiLen );
             pArea->fEof = TRUE;
          }
-         AdsGetDouble(pArea->hTable, szName, &dVal);
+         AdsGetDouble(pArea->hTable, ADSFIELD( uiIndex ), &dVal);
          if( pField->uiDec ) {
             hb_itemPutNDLen( pItem, dVal,
                            ( int ) pField->uiLen - ( ( int ) pField->uiDec + 1 ),
@@ -1146,7 +1144,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case  ADS_DOUBLE :
                   hb_itemPutNDLen( pItem, dVal,
                               ( int ) pField->uiLen,
-                              ( int ) pField->uiDec  /*hb_set.HB_SET_DECIMALS*/ );
+                              ( int ) pField->uiDec );
 
                   break;
             /*case  ADS_AUTOINC:
@@ -1166,7 +1164,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             AdsGetDateFormat  ( pucFormat, &pusLen );
             AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
                pulLength = pArea->maxFieldLen + 1;
-               if (AdsGetField( pArea->hTable, szName, pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
+               if (AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
                {
                   memset( pBuffer, ' ', pField->uiLen );
                   pArea->fEof = TRUE;
@@ -1179,7 +1177,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_LOGICAL:
          {
             UNSIGNED16 pbValue = FALSE;
-               if (AdsGetLogical( pArea->hTable, szName, &pbValue ) == AE_NO_CURRENT_RECORD  )
+               if (AdsGetLogical( pArea->hTable, ADSFIELD( uiIndex ), &pbValue ) == AE_NO_CURRENT_RECORD  )
                {
                   pbValue = FALSE;
                   pArea->fEof = TRUE;
@@ -1193,7 +1191,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
            UNSIGNED8 *pucBuf;
            UNSIGNED32 pulLen;
 
-           if ( AdsGetMemoLength( pArea->hTable, szName, &pulLen ) == AE_NO_CURRENT_RECORD )
+           if ( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
                hb_itemPutC( pItem, "" );
            else
            {
@@ -1201,7 +1199,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
               {
                  pulLen++;                 /* make room for NULL */
                  pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
-                 AdsGetString( pArea->hTable, szName, pucBuf, &pulLen, ADS_NONE );
+                 AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
                  hb_itemPutCL( pItem, ( char * ) pucBuf, pulLen );
                  hb_xfree( pucBuf );
               }
@@ -1243,12 +1241,9 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    LPFIELD pField;
    USHORT uiCount;
    BYTE * szText;
-   BOOL bError;
+   BOOL bError = TRUE;
    long lDay, lMonth, lYear;
-   UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
-      /* See adsGetValue() for why we don't use pArea->uiMaxFieldNameLength here */
 
-   UNSIGNED16 pusBufLen = ADS_MAX_FIELD_NAME + 1;
    UNSIGNED8 pucFormat[ 11 ];
    UNSIGNED16 pusLen = 10;
    UNSIGNED32 ulRetVal;
@@ -1265,8 +1260,9 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    pField = pArea->lpFields + uiIndex - 1;
    szText = pArea->pRecord;
-   bError = TRUE;
-   AdsGetFieldName( pArea->hTable, uiIndex, szName, &pusBufLen );
+
+   /* This code was optimized for use ADSFIELD() macro instead */
+   /* AdsGetFieldName() function for speed. Toninho@fwi, 22/07/2003 */
 
    switch( pField->uiType )
    {
@@ -1276,7 +1272,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
             if( uiCount > pField->uiLen )
                uiCount = pField->uiLen;
-            AdsSetString( pArea->hTable, szName, (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
             bError = FALSE;
          }
          break;
@@ -1284,7 +1280,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_LONG:
          if( HB_IS_NUMERIC( pItem ) )
          {
-            ulRetVal = AdsSetDouble( pArea->hTable, szName, hb_itemGetND( pItem ) );
+            ulRetVal = AdsSetDouble( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetND( pItem ) );
             if( ulRetVal != AE_DATA_TOO_LONG )
                bError = FALSE;
          }
@@ -1297,7 +1293,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
             hb_dateDecode( hb_itemGetDL( pItem ), &lYear, &lMonth, &lDay );
             hb_dateStrPut( ( char * ) szText, lYear, lMonth, lDay );
-            AdsSetDate( pArea->hTable, szName, szText, 8 );
+            AdsSetDate( pArea->hTable, ADSFIELD( uiIndex ), szText, 8 );
             AdsSetDateFormat  ( pucFormat );
             bError = FALSE;
          }
@@ -1308,7 +1304,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             *szText = hb_itemGetL( pItem ) ? 'T' : 'F';
             bError = FALSE;
-            AdsSetLogical( pArea->hTable, szName, hb_itemGetL( pItem ) );
+            AdsSetLogical( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetL( pItem ) );
          }
          break;
 
@@ -1316,7 +1312,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( HB_IS_STRING( pItem ) )
          {
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
-            AdsSetString( pArea->hTable, szName,
+            AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
             bError = FALSE;
          }
