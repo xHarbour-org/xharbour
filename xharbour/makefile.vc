@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.121 2004/10/22 11:55:51 paultucker Exp $
+# $Id: makefile.vc,v 1.122 2004/10/22 14:28:48 paultucker Exp $
 #
 
 #
@@ -1216,6 +1216,8 @@ CLEAN:
    -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
    -@if exist $(BIN_DIR)\*.pdb $(DEL) $(BIN_DIR)\*.pdb > nul
    -@if exist $(BIN_DIR)\*.ilk $(DEL) $(BIN_DIR)\*.ilk > nul
+   -@if exist vc60.idb $(DEL) vc60.idb > nul
+   -@if exist vc70.idb $(DEL) vc70.idb > nul
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
