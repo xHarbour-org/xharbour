@@ -1,8 +1,12 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.2 2003/09/23 21:40:12 paultucker Exp $
+rem $Id: makallbc.bat,v 1.3 2003/09/24 20:45:05 paultucker Exp $
 rem 
 
+IF '%BCC_DIR%'=='' SET BCC_DIR=e:\bcc55
+echo.
+echo BCC_DIR is set to %BCC_DIR% (change if needed)
+echo.
 echo create system files
 call make_b32 %1
 
@@ -91,13 +95,13 @@ if errorlevel 1 goto end
 :xVisual
 echo xVisual
 cd contrib\xVisual
-call make_b32.bat %1
+if exist make_b32.bat call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
 :xwt
-rem echo xwt
-rem cd contrib\xwt
-rem call make_b32.bat %1
-rem cd ..\..
+echo xwt
+cd contrib\xwt
+call make_b32.bat %1
+cd ..\..
 :end

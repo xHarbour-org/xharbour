@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.23 2003/09/15 04:09:10 paultucker Exp $
+# $Id: hrbdll.bc,v 1.24 2003/09/23 21:36:51 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -13,7 +13,7 @@
 # BIN_DIR is defined in dll_55.bat, please adjust accordingly
 
 HARBOUR_EXE = bin\harbour.exe
-CC          = bcc32
+CC          = $(BCC_DIR)\bin\bcc32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ source directory ³Û
@@ -30,8 +30,8 @@ PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
 VM_DIR            = source\vm
-SAMPLES_DIR  = source\clipsamp
-CODEPAGE_DIR = source\codepage
+SAMPLES_DIR       = source\clipsamp
+CODEPAGE_DIR      = source\codepage
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ obj file output directory ³Û
@@ -418,6 +418,11 @@ HARBOUR_DLL_OBJS = \
 all: \
    $(HARBOUR_DLL)
 
+CLEAN:
+   if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
+   if exist lib\b32\harbour.tds del lib\b32\harbour.tds >nul
+   if exist lib\b32\harbour.map del lib\b32\harbour.map >nul
+
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ Library dependencies and build rules ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
@@ -757,13 +762,13 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
-  echo. $(BCC_DIR)\c0d32w.obj,           + >> hdll.tmp
+  echo. $(BCC_DIR)\lib\c0d32w.obj,       + >> hdll.tmp
   echo. $(HARBOUR_DLL),                  + >> hdll.tmp
   echo. ,                                + >> hdll.tmp
-  echo. $(BCC_DIR)\cw32.lib              + >> hdll.tmp
-  echo. $(BCC_DIR)\import32.lib          + >> hdll.tmp
-  echo. $(BCC_DIR)\uuid.lib                >> hdll.tmp
-  $(BCC_DIR)\ILINK32 -aa -Tpd -Gn @hdll.tmp
+  echo. $(BCC_DIR)\lib\cw32.lib          + >> hdll.tmp
+  echo. $(BCC_DIR)\lib\import32.lib      + >> hdll.tmp
+  echo. $(BCC_DIR)\lib\uuid.lib            >> hdll.tmp
+  $(BCC_DIR)\bin\ILINK32 -aa -Tpd -Gn @hdll.tmp
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ object file creation ³Û

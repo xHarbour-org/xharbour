@@ -49,12 +49,11 @@ $(WAPILIB): $(WAPIOBJ)
 #
 #!
 clean:
-        -erase *.obj
-        -erase *.exe
-        -erase *.res
-        -erase *.map
-        -erase *.rws
-        -erase $(WOOPGUILIB)
-        -erase $(UTILSLIB)
+        -@if exist obj\b32\*.obj erase obj\b32\*.obj >nul
+        -@if exist obj\b32\*.exe erase obj\b32\*.exe >nul
+        -@if exist obj\b32\*.res erase obj\b32\*.res >nul
+        -@if exist obj\b32\*.map erase obj\b32\*.map >nul
+        -@if exist obj\b32\*.rws erase obj\b32\*.rws >nul
+        -@if exist $(WOOPGUILIB) erase $(WOOPGUILIB) >nul
 
 
