@@ -6,7 +6,7 @@ test_reqrpm()
 }
 
 TOINST_LST=""
-for i in gcc binutils bash flex bison ncurses ncurses-devel slang-devel
+for i in gcc binutils bash flex bison ncurses ncurses-devel slang-devel gpm-devel
 do
     test_reqrpm "$i" || TOINST_LST="${TOINST_LST} $i"
 done
