@@ -1,5 +1,5 @@
 /*
- * $Id: wvtmenu.prg,v 1.0 2004/06/11 21:54:04 peterrees Exp $
+ * $Id: wvtmenu.prg,v 1.1 2004/06/11 01:56:41 peterrees Exp $
  */
 
 /*
