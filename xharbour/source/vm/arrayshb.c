@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.8 2002/06/12 11:53:06 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.9 2002/06/13 22:46:04 ronpinkas Exp $
  */
 
 /*
@@ -614,6 +614,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
       BYTE  *Buffer;
       unsigned int uiAlign, uiOffset = 0;
       unsigned char cShift, cSize;
+      PHB_ITEM pRet = hb_itemNew( NULL );
 
       if( pAlign )
       {
@@ -626,7 +627,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
       Buffer = (BYTE *) hb_xgrab( SizeOfCStructure( aDef, uiAlign ) + 1 );
       //printf( "Buffer: %p Size: %i\n", Buffer, uiOffset );
-      hb_itemPutCPtr( &hb_stack.Return, (char *) Buffer, uiOffset );
+      hb_itemPutCPtr( pRet, (char *) Buffer, uiOffset );
 
       uiOffset = 0;
       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
@@ -870,6 +871,10 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
          uiOffset += cSize;
       }
+
+      hb_itemForwardValue( &hb_stack.Return, pRet );
+
+      hb_itemRelease( pRet );
 
       //printf( "Used: %i\n", uiOffset );
    }
