@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.8 2003/02/20 02:33:15 lculik Exp $
+ * $Id: tmysql.prg,v 1.9 2003/02/25 03:51:36 walito Exp $
  */
 
  /*
@@ -290,13 +290,9 @@ CLASS TMySQLQuery
    METHOD   Eof()        INLINE ::lEof  // ::nCurRow == ::nNumRows
    METHOD   RecNo()      INLINE ::nCurRow
    METHOD   LastRec()    INLINE ::nNumRows
-   METHOD   GoTop()      INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
-                                ::getRow( 1 )
-   METHOD   GoBottom()   INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
-                                ::getRow( ::nNumRows ) //-1 )
-   METHOD   GoTo( nRow ) INLINE ::lEof := ( ::nCurRow + nRow > ::nNumRows ),;
-                                ::lBof := ( ::nCurRow + nRow < 1 ),;
-                                ::GetRow( nRow )
+   METHOD   GoTop()      INLINE ::GetRow( 1 )
+   METHOD   GoBottom()   INLINE ::GetRow( ::nNumRows ) //-1 )
+   METHOD   GoTo( nRow ) INLINE ::GetRow( nRow )
 
    METHOD   FCount()     INLINE ::nNumFields
 
@@ -304,6 +300,9 @@ CLASS TMySQLQuery
 
    METHOD   Error()      INLINE ::lError := .F., sqlGetErr(::nSocket)
                                               // Returns textual description of last error and clears ::lError
+
+   METHOD   ErrorNo()    INLINE ::lError := .F., sqlGetErrNo(::nSocket)
+                                              // Returns number of last error and clears ::lError
 
    METHOD   FieldName( nNum )
    METHOD   FieldPos( cFieldName )
@@ -314,6 +313,8 @@ CLASS TMySQLQuery
    METHOD   FieldType( nNum )                   // Clipper type of field N
 
    METHOD   Locate( cFieldName, Value, bPartialKey, bSoftSeek )
+
+   METHOD   RecCount()   INLINE ::nNumRows
 
    PROTECTED:
 
@@ -481,27 +482,24 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
          nRow := ::nCurRow + 1
       endif
 
-      if ::nNumRows == 0
+      do case
+      case ::nNumRows == 0
          ::lBof    := .t.
          ::lEof    := .t.
          ::nCurRow := 1
-      else
-         if nRow < 1
-            ::lBof    := .t.
-            ::lEof    := .t.
-            ::nCurRow := ::nNumRows + 1
-         endif
-         if nRow > 0 .and. nRow <= ::nNumRows //- 1
-            ::lBof    := .f.
-            ::lEof    := .f.
-            ::nCurRow := nRow
-         endif
-         if nRow > ::nNumRows
-            ::lBof    := .f.
-            ::lEof    := .t.
-            ::nCurRow := ::nNumRows + 1
-         endif
-      endif
+      case nRow < 1
+         ::lBof    := .t.
+         ::lEof    := .t.
+         ::nCurRow := ::nNumRows + 1
+      case nRow > 0 .and. nRow <= ::nNumRows //- 1
+         ::lBof    := .f.
+         ::lEof    := .f.
+         ::nCurRow := nRow
+      case nRow > ::nNumRows
+         ::lBof    := .f.
+         ::lEof    := .t.
+         ::nCurRow := ::nNumRows + 1
+      endcase
       nRow := ::nCurRow
 
       if nRow > 0 .AND. nRow <= ::nNumRows
