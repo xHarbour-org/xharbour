@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.37 2004/05/09 23:40:01 druzus Exp $
+# $Id: hrbdll.vc,v 1.38 2004/05/11 16:29:48 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -30,6 +30,7 @@ MACRO_DIR         = source\macro
 PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
+TIP_DIR           = source\tip
 VM_DIR            = source\vm
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -72,7 +73,7 @@ HARBOUR_DLL  = $(LIB_DIR)\harbour.dll
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogtyb2 /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogtyb2 /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -261,6 +262,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrollbr.obj \
   $(OBJ_DIR)\setfunc.obj \
   $(OBJ_DIR)\setta.obj \
+  $(OBJ_DIR)\stream.obj \
   $(OBJ_DIR)\tbcolumn.obj \
   $(OBJ_DIR)\tbrowse.obj \
   $(OBJ_DIR)\tclass.obj \
@@ -285,7 +287,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\typefile.obj \
   $(OBJ_DIR)\wait.obj \
   $(OBJ_DIR)\win32ole.obj \
-  $(OBJ_DIR)\stream.obj \
+  $(OBJ_DIR)\win32prn.obj \
 #
 # Vm c
 #
@@ -481,6 +483,23 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc8859_2.obj \
   $(OBJ_DIR)\uckoi8.obj   \
   $(OBJ_DIR)\ucmaz.obj    \
+#
+# hbtip
+#
+  $(OBJ_DIR)\base64x.obj \
+  $(OBJ_DIR)\utils.obj \
+  $(OBJ_DIR)\client.obj \
+  $(OBJ_DIR)\credent.obj \
+  $(OBJ_DIR)\encb64.obj \
+  $(OBJ_DIR)\encoder.obj \
+  $(OBJ_DIR)\encqp.obj \
+  $(OBJ_DIR)\encurl.obj \
+  $(OBJ_DIR)\ftpcln.obj \
+  $(OBJ_DIR)\httpcln.obj \
+  $(OBJ_DIR)\mail.obj \
+  $(OBJ_DIR)\popcln.obj \
+  $(OBJ_DIR)\smtpcln.obj \
+  $(OBJ_DIR)\url.obj \
 #
 # pplib
 #
@@ -1790,6 +1809,12 @@ $(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
 $(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\win32prn.obj : $(OBJ_DIR)\win32prn.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -1836,4 +1861,84 @@ $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+# hbtip
+
+$(OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\utils.obj : $(TIP_DIR)\utils.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\client.c : $(TIP_DIR)\client.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\client.obj : $(OBJ_DIR)\client.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\credent.c : $(TIP_DIR)\credent.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\credent.obj : $(OBJ_DIR)\credent.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encoder.obj : $(OBJ_DIR)\encoder.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\encqp.c : $(TIP_DIR)\encqp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encqp.obj : $(OBJ_DIR)\encqp.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\encurl.c : $(TIP_DIR)\encurl.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encurl.obj : $(OBJ_DIR)\encurl.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\ftpcln.c : $(TIP_DIR)\ftpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ftpcln.obj : $(OBJ_DIR)\ftpcln.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\httpcln.c : $(TIP_DIR)\httpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\httpcln.obj : $(OBJ_DIR)\httpcln.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\mail.c : $(TIP_DIR)\mail.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\mail.obj : $(OBJ_DIR)\mail.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\popcln.c : $(TIP_DIR)\popcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\popcln.obj : $(OBJ_DIR)\popcln.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\smtpcln.c : $(TIP_DIR)\smtpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\smtpcln.obj : $(OBJ_DIR)\smtpcln.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\url.c : $(TIP_DIR)\url.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\url.obj : $(OBJ_DIR)\url.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**

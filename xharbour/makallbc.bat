@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.9 2004/02/20 09:07:08 paultucker Exp $
+rem $Id: makallbc.bat,v 1.10 2004/02/25 08:55:13 paultucker Exp $
 rem 
 
 echo create system files
@@ -84,16 +84,16 @@ rem if exist make_b32.bat call make_b32.bat %1
 rem cd ..\..
 rem if errorlevel 1 goto end
 
-:rdd_ads
-echo rdd_ads
-cd contrib\rdd_ads
-call make_b32.bat %1
+:pdf
+echo pdf
+cd contrib\pdflib
+if exist make_b32.bat call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
-:tip
-echo tip
-cd contrib\tip
+:rdd_ads
+echo rdd_ads
+cd contrib\rdd_ads
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
@@ -122,14 +122,6 @@ if errorlevel 1 goto end
 :woopgui
 echo WoopGui
 cd contrib\WoopGUI
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:xhwgui
-if not exist contrib\xhwgui\make_b32.bat goto xVisual
-echo xhwgui
-cd contrib\xhwgui
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.4 2004/04/25 11:26:01 andijahja Exp $
+# $Id: hrbdll.wc,v 1.5 2004/05/09 23:40:01 druzus Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -29,6 +29,7 @@ MACRO_DIR         = source\macro
 PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
+TIP_DIR           = source\tip
 VM_DIR            = source\vm
 SAMPLES_DIR       = source\clipsamp
 CODEPAGE_DIR      = source\codepage
@@ -428,7 +429,24 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ppcore.obj \
   $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
-  $(OBJ_DIR)\pragma.obj
+  $(OBJ_DIR)\pragma.obj \
+#
+# hbtip
+#
+  $(OBJ_DIR)\base64x.obj \
+  $(OBJ_DIR)\utils.obj \
+  $(OBJ_DIR)\client.obj \
+  $(OBJ_DIR)\credent.obj \
+  $(OBJ_DIR)\encb64.obj \
+  $(OBJ_DIR)\encoder.obj \
+  $(OBJ_DIR)\encqp.obj \
+  $(OBJ_DIR)\encurl.obj \
+  $(OBJ_DIR)\ftpcln.obj \
+  $(OBJ_DIR)\httpcln.obj \
+  $(OBJ_DIR)\mail.obj \
+  $(OBJ_DIR)\popcln.obj \
+  $(OBJ_DIR)\smtpcln.obj \
+  $(OBJ_DIR)\url.obj
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -1833,4 +1851,84 @@ $(OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+# hbtip
+
+$(OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\utils.obj : ($TIP_DIR)\utils.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\client.c : $(TIP_DIR)\client.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\client.obj : $(OBJ_DIR)\client.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\credent.c : $(TIP_DIR)\credent.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\credent.obj : $(OBJ_DIR)\credent.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encoder.obj : $(OBJ_DIR)\encoder.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\encqp.c : $(TIP_DIR)\encqp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encqp.obj : $(OBJ_DIR)\encqp.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\encurl.c : $(TIP_DIR)\encurl.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\encurl.obj : $(OBJ_DIR)\encurl.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\ftpcln.c : $(TIP_DIR)\ftpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ftpcln.obj : $(OBJ_DIR)\ftpcln.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\httpcln.c : $(TIP_DIR)\httpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\httpcln.obj : $(OBJ_DIR)\httpcln.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\mail.c : $(TIP_DIR)\mail.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\mail.obj : $(OBJ_DIR)\mail.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\popcln.c : $(TIP_DIR)\popcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\popcln.obj : $(OBJ_DIR)\popcln.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\smtpcln.c : $(TIP_DIR)\smtpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\smtpcln.obj : $(OBJ_DIR)\smtpcln.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\url.c : $(TIP_DIR)\url.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\url.obj : $(OBJ_DIR)\url.c
    $(CC) $(CLIBFLAGS) -fo$@ $**

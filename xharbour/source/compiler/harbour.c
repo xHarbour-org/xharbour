@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.83 2004/06/04 19:22:56 ronpinkas Exp $
+ * $Id: harbour.c,v 1.84 2004/07/21 20:59:48 ronpinkas Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ BOOL           hb_comp_bAnyWarning = FALSE;               /* holds if there was 
 BOOL           hb_comp_bAutoMemvarAssume = FALSE;         /* holds if undeclared variables are automatically assumed MEMVAR (-a)*/
 BOOL           hb_comp_bForceMemvars = FALSE;             /* holds if memvars are assumed when accesing undeclared variable (-v)*/
 BOOL           hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
-char           hb_comp_szPrefix[ 20 ] = { '\0' };         /* holds the prefix added to the generated symbol init function name (in C output currently) */
+char           hb_comp_szPrefix[ 21 ] = { '\0' };         /* holds the prefix added to the generated symbol init function name (in C output currently) */
 int            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE; /* C code generation should be verbose (use comments) or not */
 BOOL           hb_comp_bNoStartUp = FALSE ;               /* C code generation embed HB_FS_FIRST or not */
 int            hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.83 2004/07/13 17:25:12 paultucker Exp $
+# $Id: makefile.nt,v 1.84 2004/08/03 01:39:34 paultucker Exp $
 #
 
 #
@@ -115,18 +115,19 @@ CODEPAGE_DIR =source\codepage
 DEBUG_DIR    =source\debug
 LANG_DIR     =source\lang
 MACRO_DIR    =source\macro
+ODBC_DIR     =source\odbc
 PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
+TIP_DIR      =source\tip
 VM_DIR       =source\vm
+SAMPLES_DIR  =source\clipsamp
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
 HBPP_DIR     =utils\hbpp
 HBMAKE_DIR   =utils\hbmake
 XBSCRIPT_DIR =utils\xbscript
-ODBC_DIR     =source\odbc
-SAMPLES_DIR  =source\clipsamp
 
 !ifdef HB_DOC_PDF
 # don't indent definitions
@@ -138,7 +139,7 @@ HBPDF_DIR    =contrib\pdflib
 #
 
 AS           =ML
-C_FLAGSNMT   =-G6 -Ogtyb2p -FD -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGSNMT   =-G6 -Ogtyb2p -FD -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
 C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
@@ -190,6 +191,7 @@ RDD_LIB          =$(LIB_DIR)\rdd.lib
 RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB          =$(LIB_DIR)\rtl.lib
 RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
+TIP_LIB          =$(LIB_DIR)\hbtip.lib
 SAMPLES_LIB      =$(LIB_DIR)\samples.lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
@@ -223,7 +225,6 @@ XBSCRIPT_EXE     =$(BIN_DIR)\xbscript.exe
 #
 
 # TODO: Add GTSLN and GTCRS
-
 
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
@@ -281,6 +282,7 @@ LIBLIST = \
    $(DLL_MAIN_LIB) \
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
+   $(TIP_LIB) \
    $(SAMPLES_LIB) \
    $(ODBC_LIB)
 
@@ -1051,6 +1053,39 @@ SAMPLES_LIB_OBJS =  \
    $(OBJ_DIR)\time.obj
 
 #
+# HBTIP.LIB rules
+#
+{$(TIP_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(TIP_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+
+{$(TIP_DIR)}.prg{$(OBJ_DIR)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(TIP_LIB)2
+
+# List C modules first, then PRG modules
+
+TIP_LIB_OBJS = \
+   $(OBJ_DIR)\base64x.obj \
+   $(OBJ_DIR)\utils.obj \
+   \
+   $(OBJ_DIR)\client.obj \
+   $(OBJ_DIR)\credent.obj \
+   $(OBJ_DIR)\encb64.obj \
+   $(OBJ_DIR)\encoder.obj \
+   $(OBJ_DIR)\encqp.obj \
+   $(OBJ_DIR)\encurl.obj \
+   $(OBJ_DIR)\ftpcln.obj \
+   $(OBJ_DIR)\httpcln.obj \
+   $(OBJ_DIR)\mail.obj \
+   $(OBJ_DIR)\popcln.obj \
+   $(OBJ_DIR)\smtpcln.obj \
+   $(OBJ_DIR)\url.obj
+
+
+#
 # ODBC.LIB rules
 #
 {$(ODBC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
@@ -1253,7 +1288,7 @@ $(XBSCRIPT_EXE) : \
    $(XBSCRIPT_DIR)\XBSCRIPT.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\XBSCRIPT.c \
-                      -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+                       -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 
 #
 # HARBOUR.EXE rules
@@ -1373,6 +1408,9 @@ $(VM_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
 $(VM_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
    lib /out:$@ /SUBSYSTEM:WINDOWS $**
 
+$(TIP_LIB) : $(TIP_LIB_OBJS)
+   lib /out:$@ $**
+
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1432,7 +1470,7 @@ $(OBJ_DIR)$(MT)\macroy.obj : $(OBJ_DIR)$(MT)\macroy.c
 
 $(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
+   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR)$(MT) -W3 -Fo$@ $**
    -$(DEL) $(OBJ_DIR)\unistd.h
 
 # dummy targets used for prg to c creation
@@ -1445,6 +1483,7 @@ $(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
 $(MACRO_LIB)2  : $(MACRO_LIB_OBJS)
 $(PP_LIB)2     : $(PP_LIB_OBJS)
 $(RDD_LIB)2    : $(RDD_LIB_OBJS)
+$(TIP_LIB)2    : $(TIP_LIB_OBJS)
 $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
 $(DBFDBT_LIB)2 : $(DBFDBT_LIB_OBJS)
 $(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)

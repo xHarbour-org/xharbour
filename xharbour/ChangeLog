@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3280 2004/08/05 15:20:16 kaddath Exp $
+ * $Id: ChangeLog,v 1.3281 2004/08/05 16:41:38 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -20,6 +20,7 @@
   * makallbc.bat
     - contrib/tip
     - contrib/hwgui
+    + contrib/pdflib
   * makefile.bc
   * makefile.nt
   * makefile.vc

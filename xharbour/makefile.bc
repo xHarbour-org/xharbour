@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.99 2004/07/22 10:49:18 paultucker Exp $
+# $Id: makefile.bc,v 1.100 2004/08/03 01:39:34 paultucker Exp $
 #
 
 #
@@ -95,6 +95,7 @@ LIB_DIR = lib\b32
    FPT_OBJ_DIR   = $(OBJ_DIR)\mt
    NTX_OBJ_DIR   = $(OBJ_DIR)\mt
    CDX_OBJ_DIR   = $(OBJ_DIR)\mt
+   TIP_OBJ_DIR   = $(OBJ_DIR)\mt
    PP_OBJ_DIR    = $(OBJ_DIR)\mt
    SAM_OBJ_DIR   = $(OBJ_DIR)\mt
    OPT_CON_OBJ_DIR = $(OBJ_DIR)\mt\opt\console
@@ -108,6 +109,7 @@ LIB_DIR = lib\b32
    FPT_OBJ_DIR   = $(OBJ_DIR)
    NTX_OBJ_DIR   = $(OBJ_DIR)
    CDX_OBJ_DIR   = $(OBJ_DIR)
+   TIP_OBJ_DIR   = $(OBJ_DIR)
    PP_OBJ_DIR    = $(OBJ_DIR)
    SAM_OBJ_DIR   = $(OBJ_DIR)
    OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
@@ -140,6 +142,7 @@ MACRO_DIR    = source\macro
 PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
+TIP_DIR      = source\tip
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
 SAMPLES_DIR  = source\clipsamp
@@ -207,6 +210,7 @@ NULSYS_LIB     = $(LIB_DIR)\nulsys.lib
 PP_LIB         = $(LIB_DIR)\pp.lib
 RDD_LIB        = $(LIB_DIR)\rdd.lib
 RTL_LIB        = $(LIB_DIR)\rtl.lib
+TIP_LIB        = $(LIB_DIR)\hbtip.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 SAMPLES_LIB    = $(LIB_DIR)\samples.lib
@@ -812,6 +816,31 @@ GTNUL_LIB_OBJS = \
    $(OBJ_DIR)\gtnul.obj \
    $(OBJ_DIR)\gtext.obj
 
+#
+# HBTIP.LIB rules
+#
+
+TIP_LIB_OBJS = \
+   $(TIP_OBJ_DIR)\base64x.obj \
+   $(TIP_OBJ_DIR)\utils.obj \
+   \
+   $(TIP_OBJ_DIR)\client.obj \
+   $(TIP_OBJ_DIR)\credent.obj \
+   $(TIP_OBJ_DIR)\encb64.obj \
+   $(TIP_OBJ_DIR)\encoder.obj \
+   $(TIP_OBJ_DIR)\encqp.obj \
+   $(TIP_OBJ_DIR)\encurl.obj \
+   $(TIP_OBJ_DIR)\ftpcln.obj \
+   $(TIP_OBJ_DIR)\httpcln.obj \
+   $(TIP_OBJ_DIR)\mail.obj \
+   $(TIP_OBJ_DIR)\popcln.obj \
+   $(TIP_OBJ_DIR)\smtpcln.obj \
+   $(TIP_OBJ_DIR)\url.obj
+
+#
+# CODEPAGE.LIB rules
+#
+
 CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpesdos.obj \
    $(OBJ_DIR)\cdpeswin.obj \
@@ -978,6 +1007,7 @@ all: \
    $(DEBUG_LIB) \
    $(LANG_LIB) \
    $(RDD_LIB) \
+   $(TIP_LIB) \
    $(NULSYS_LIB) \
    $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
@@ -1090,6 +1120,14 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
 $(RTL_LIB) : $(RTL_LIB_OBJS)
     IF EXIST "$(RTL_LIB)" $(DEL) "$(RTL_LIB)" > NUL
     $(LINKER) "$(RTL_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(TIP_LIB) : $(TIP_LIB_OBJS)
+    IF EXIST "$(TIP_LIB)" $(DEL) "$(TIP_LIB)" > NUL
+    $(LINKER) "$(TIP_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2916,6 +2954,88 @@ $(OBJ_DIR)\todbc.c   : $(ODBC_DIR)\todbc.prg
 
 $(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
+
+#
+# HBTIP.LIB dependencies
+#
+
+$(TIP_OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\utils.obj : $(TIP_DIR)\utils.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\client.c : $(TIP_DIR)\client.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\client.obj : $(TIP_OBJ_DIR)\client.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\credent.c : $(TIP_DIR)\credent.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\credent.obj : $(TIP_OBJ_DIR)\credent.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\encb64.obj : $(TIP_OBJ_DIR)\encb64.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\encoder.obj : $(TIP_OBJ_DIR)\encoder.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\encqp.c : $(TIP_DIR)\encqp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\encqp.obj : $(TIP_OBJ_DIR)\encqp.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\encurl.c : $(TIP_DIR)\encurl.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\encurl.obj : $(TIP_OBJ_DIR)\encurl.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\ftpcln.c : $(TIP_DIR)\ftpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\ftpcln.obj : $(TIP_OBJ_DIR)\ftpcln.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\httpcln.c : $(TIP_DIR)\httpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\httpcln.obj : $(TIP_OBJ_DIR)\httpcln.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\mail.c : $(TIP_DIR)\mail.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\mail.obj : $(TIP_OBJ_DIR)\mail.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\popcln.c : $(TIP_DIR)\popcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\popcln.obj : $(TIP_OBJ_DIR)\popcln.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\smtpcln.c : $(TIP_DIR)\smtpcln.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\smtpcln.obj : $(TIP_OBJ_DIR)\smtpcln.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(TIP_OBJ_DIR)\url.c : $(TIP_DIR)\url.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(TIP_OBJ_DIR)\url.obj : $(TIP_OBJ_DIR)\url.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
 # HBPP.EXE dependencies
