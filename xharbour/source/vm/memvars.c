@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.88 2004/10/26 04:56:49 ronpinkas Exp $
+ * $Id: memvars.c,v 1.89 2004/12/02 03:26:37 druzus Exp $
  */
 
 /*
@@ -2011,25 +2011,26 @@ static HB_DYNS_FUNC( hb_memvarSave )
          }
          else if( HB_IS_DATE( pItem ) )
          {
-            double dNumber = ( double ) pItem->item.asDate.value;
+            BYTE byNum[ sizeof( double ) ];
 
             buffer[ 11 ] = 'D' + 128;
             buffer[ 16 ] = 1;
             buffer[ 17 ] = 0;
 
+            HB_PUT_LE_DOUBLE( byNum, ( double ) pItem->item.asDate.value );
+
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
+            hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_NUMERIC( pItem ) )
          {
-            double dNumber = hb_itemGetND( pItem );
+            BYTE byNum[ sizeof( double ) ];
             int iWidth;
             int iDec;
 
             hb_itemGetNLen( pItem, &iWidth, &iDec );
 
             buffer[ 11 ] = 'N' + 128;
-
 #ifdef HB_C52_STRICT
 /* NOTE: This is the buggy, but fully CA-Cl*pper compatible method. [vszakats] */
             buffer[ 16 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
@@ -2037,11 +2038,12 @@ static HB_DYNS_FUNC( hb_memvarSave )
 /* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
             buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
 #endif
-
             buffer[ 17 ] = ( BYTE ) iDec;
 
+            HB_PUT_LE_DOUBLE( byNum, hb_itemGetND( pItem ) );
+
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-            hb_fsWrite( fhnd, ( BYTE * ) &dNumber, sizeof( dNumber ) );
+            hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_LOGICAL( pItem ) )
          {
@@ -2239,7 +2241,7 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
-                     hb_itemPutNLen( &Item, * ( double * ) &pbyNumber, uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
+                     hb_itemPutNLen( &Item, HB_GET_LE_DOUBLE( pbyNumber ), uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
                   }
 
                   break;
@@ -2251,7 +2253,7 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
-                     hb_itemPutDL( &Item, ( LONG ) ( * ( double * ) &pbyNumber ) );
+                     hb_itemPutDL( &Item, ( LONG ) HB_GET_LE_DOUBLE( pbyNumber ) );
                   }
 
                   break;

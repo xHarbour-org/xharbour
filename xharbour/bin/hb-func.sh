@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.37 2004/12/04 22:37:45 druzus Exp $
+# $Id: hb-func.sh,v 1.38 2004/12/14 00:15:36 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -55,7 +55,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 hbtip hbct hbodbc debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct hbodbc debug profiler"
     else
         echo -n "$@"
     fi
@@ -281,7 +281,7 @@ if [ "\${HB_STATIC}" = "full" ]; then
     HB_STATIC="yes"
 fi
 if [ "\${HB_XBGTK}" = "yes" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} `pkg-config --libs gtk+-2.0`"
+    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
 fi
 
 HB_LNK_REQ=""

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.104 2004/11/21 21:44:29 druzus Exp $
+ * $Id: itemapi.c,v 1.105 2004/12/14 00:15:40 druzus Exp $
  */
 
 /*
@@ -1326,12 +1326,14 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 /* TODO: look if finite()/_finite() or isinf()/_isinf and isnan()/_isnan
    does exist for your compiler and add this to the check below */
 
-#if defined(__RSXNT__) || defined(__EMX__) || defined( __XCC__ ) || defined( __POCC__ )
+#if defined(__RSXNT__) || defined(__EMX__) || \
+    defined(__XCC__) || defined(__POCC__) || \
+    defined(HB_OS_HPUX)
 #  define HB_FINITE_DBL(d)    ( isfinite(d)!=0 )
 #elif defined(__WATCOMC__) || defined(__BORLANDC__) || defined(_MSC_VER)
 #  define HB_FINITE_DBL(d)    ( _finite(d)!=0 )
-#elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) || \
-      defined( __LCC__ ) || defined( __MSC__ )
+#elif defined(__GNUC__) || defined(__DJGPP__) || defined(__MINGW32__) || \
+      defined(__LCC__)
 #  define HB_FINITE_DBL(d)    ( finite(d)!=0 )
 #else
       /* added infinity check for Borland C [martin vogel] */

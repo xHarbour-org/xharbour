@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.7 2004/03/30 22:47:23 druzus Exp $
+ * $Id: hbcomprs.c,v 1.8 2004/04/06 09:58:23 andijahja Exp $
  */
 
 /*
@@ -1589,7 +1589,6 @@ local void copy_block     OF((deflate_state *s, charf *buf, unsigned len,
 }
 
 
-#define MAX(a,b) (a >= b ? a : b)
 /* the arguments must not have side effects */
 
 /* ===========================================================================
@@ -1875,7 +1874,7 @@ local void build_tree(
 
         /* Create a new node father of n and m */
         tree[node].Freq = tree[n].Freq + tree[m].Freq;
-        s->depth[node] = (uch) (MAX(s->depth[n], s->depth[m]) + 1);
+        s->depth[node] = (uch) (HB_MAX(s->depth[n], s->depth[m]) + 1);
         tree[n].Dad = tree[m].Dad = (ush)node;
 #ifdef DUMP_BL_TREE
         if (tree == s->bl_tree) {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3673 2004/12/14 00:15:12 druzus Exp $
+ * $Id: ChangeLog,v 1.3674 2004/12/14 23:26:33 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-15 14:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_gnu.sh
+    * small modifications to avoid problem when file called '-' exist
+
+  * xharbour/make_tgz.sh
+    * fixed HPUX detection
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/xharbour.spec
+    * changed hbct, hbtip to ct, tip
+
+  * xharbour/contrib/libnf/chdir.c
+  * xharbour/contrib/libnf/ftint86.ch
+  * xharbour/contrib/libnf/getver.c
+  * xharbour/contrib/libnf/mkdir.c
+  * xharbour/contrib/libnf/rmdir.c
+    * modified for OpenWatcom compilation
+
+  * xharbour/source/rtl/hbcomprs.c
+    * replaced MAX() macro by HB_MAX()
+
+  * xharbour/source/rtl/gtsln/gtsln.c
+    * removed #if __linux__ for cursor shape setting - it's
+      client terminal dependent code not the build platform
+
+  * xharbour/source/ct/files.c
+  * xharbour/source/tip/utils.c
+    * keep localtime_r under proper macros
+
+  * xharbour/source/vm/itemapi.c
+    * HPUX uses isfinite() not finite()
+
+  * xharbour/source/vm/memvars.c
+    ! fixed endian dependent code
 
 2004-12-14 21:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * include/hbsetup.h

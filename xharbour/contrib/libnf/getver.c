@@ -1,5 +1,5 @@
 /*
- * $Id: getver.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: getver.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ HB_FUNC(_FT_TEMPFIL)
       regs.HB_XREGS.cx=iMode;
       sregs.ds=FP_SEG(cPath);
       regs.HB_XREGS.dx=FP_OFF(cPath);
-      int86x(0x21,&regs,&regs,&sregs);
+      HB_DOS_INT86X(0x21,&regs,&regs,&sregs);
       nax=regs.HB_XREGS.ax;
       iflags=regs.HB_XREGS.flags;
    }

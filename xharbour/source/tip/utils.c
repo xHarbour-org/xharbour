@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.3 2004/11/01 05:38:11 likewolf Exp $
+ * $Id: utils.c,v 1.4 2004/11/21 21:44:23 druzus Exp $
  */
 
 /*
@@ -161,10 +161,8 @@ HB_FUNC( TIP_TIMESTAMP )
 
    /* init time structure anyway */
    time( &current );
-#if defined( HB_OS_OS2 ) || defined( HB_OS_DARWIN_5 )
-   memcpy((void *)&tmTime, (void *)localtime( &current ), sizeof(tmTime));
-#elif defined( HB_OS_DAWIN ) || defined( HB_OS_SUNOS )
-   tmTime = *localtime( &current );
+#if _POSIX_C_SOURCE < 199506L || defined( HB_OS_DARWIN_5 )
+   memcpy( (void *) &tmTime, (void *) localtime( &current ), sizeof(tmTime) );
 #else
    localtime_r( &current , &tmTime );
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.31 2004/10/24 09:38:55 oh1 Exp $
+ * $Id: gtsln.c,v 1.32 2004/11/25 04:48:47 guerra000 Exp $
  */
 
 /*
@@ -751,9 +751,6 @@ USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 
 void HB_GT_FUNC(gt_SetCursorStyle( USHORT uiStyle ))
 {
-    /* keyseq to define cursor shape under linux console */
-    static char cursDefseq[] = { 27, '[', '?', '1', 'c', 0 };
-
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", uiStyle));
 
     /* TODO: How to set the shape of the cursor on terminals ? */
@@ -763,10 +760,12 @@ void HB_GT_FUNC(gt_SetCursorStyle( USHORT uiStyle ))
 
     if( ( s_sCursorStyle >= SC_NONE ) && ( s_sCursorStyle <= SC_SPECIAL2 ) )
     {
+        /* keyseq to define cursor shape under linux console */
+        static char cursDefseq[] = { 27, '[', '?', '1', 'c', 0 };
+
         s_sCursorStyle = uiStyle;
         SLtt_set_cursor_visibility( s_sCursorStyle != SC_NONE );
 
-#ifdef __linux__
         /* NOTE: cursor apearence works only under linux console */
         if( hb_gt_UnderLinuxConsole )
         {
@@ -797,7 +796,6 @@ void HB_GT_FUNC(gt_SetCursorStyle( USHORT uiStyle ))
 
             SLtt_write_string( cursDefseq );
         }
-#endif
 
         if( s_uiDispCount == 0 )
             /* SLsmg_refresh(); */
