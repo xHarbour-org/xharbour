@@ -9,7 +9,6 @@ CLASS TButton FROM TControl
 ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
-
    ::Name      := 'button'
    ::id        := nId
    ::lRegister := .F.
@@ -22,6 +21,5 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
    ::Width     := nWidth
    ::Height    := IFNIL( nHeight, IFNIL( ::height, 20, ::height), nHeight)
    ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_PUSHBUTTON
-
 return( super:new( oParent ) )
 
