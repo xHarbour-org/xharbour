@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: button.prg,v 1.3 2003/07/21 18:14:40 xthefull Exp $
+   $Id: button.prg,v 1.4 2003/08/29 02:06:38 lculik Exp $
 
    Widget class - basic widget & event management
 */
@@ -17,9 +17,6 @@ ENDCLASS
 
 METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor , cBgColor ,cBaseClr, cTxtClr) CLASS XWTButton
    Local cFontString :=""
-   Local cColorText  :=""
-   Local aColor
-   Local c
 
    ::Super:New()
    ::nWidgetType := XWT_TYPE_BUTTON
@@ -30,73 +27,22 @@ METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor , cBgColor ,cBaseClr
    ENDIF
 
    IF !Empty( cColor )
-      IF "," in cColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+      ::SetColor( cColor )
    ENDIF
 
    IF !Empty( cBgColor )
-   cColorText := ""
-      IF "," in cBgColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cBgColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cBgColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_BGCOLOR,  cColorText )
+      ::SetColor( cBgColor, XWT_PROP_BGCOLOR )
    ENDIF
 
    IF !Empty( cBaseClr )
-   cColorText := ""
-      IF "," in cBaseClr // is an RGB String so Convert
-
-      aColor := HB_aTokens(  cBaseClr ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText :=  cBaseClr
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_BASECOLOR,  cColorText )
+      ::SetColor( cBaseClr, XWT_PROP_BASECOLOR )
    ENDIF
 
    IF !Empty( cTxtClr )
-   cColorText := ""
-      IF "," in cTxtClr // is an RGB String so Convert
-
-      aColor := HB_aTokens(  cTxtClr ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText :=  cTxtClr
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXTCOLOR,  cColorText )
+      ::SetColor( cTxtClr, XWT_PROP_TEXTCOLOR )
    ENDIF
-  
-   IF Valtype( cFont )  == "C" 
+
+   IF Valtype( cFont )  == "C"
       cFontString += cFont
       IF Valtype( nFontSize ) == "N"
          cFontString += " "+ Str(nFontSize,2,0)
@@ -116,5 +62,5 @@ METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor , cBgColor ,cBaseClr
    IF oParent != NIL
       oParent:Add( Self )
    ENDIF
-   
+
 RETURN Self

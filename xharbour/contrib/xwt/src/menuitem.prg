@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.4 2003/07/22 16:04:11 xthefull Exp $
+   $Id: menuitem.prg,v 1.5 2003/08/27 20:53:07 lculik Exp $
 
    Menuitem class.
 */
@@ -22,9 +22,6 @@ ENDCLASS
 
 METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu , cFont, nFontSize, cColor) CLASS XWTMenuItem
    Local cFontString :=""
-   Local cColorText  :=""
-   Local aColor
-   Local c
 
    ::Super:New()
 
@@ -49,23 +46,11 @@ METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu , cFont, nFontSize, cColor
    ENDIF
 
    IF !Empty( cColor )
-      IF "," in cColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+      ::SetColor( cColor )
    ENDIF
 
-  
-   IF Valtype( cFont )  == "C" 
+
+   IF Valtype( cFont )  == "C"
       cFontString += cFont
       IF Valtype( nFontSize ) == "N"
          cFontString += " "+ Str(nFontSize,2,0)

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: label.prg,v 1.5 2003/08/27 02:46:16 lculik Exp $
+   $Id: label.prg,v 1.6 2003/08/27 20:53:07 lculik Exp $
 
    Label class. Just a concrete widget implementation
 */
@@ -17,9 +17,6 @@ ENDCLASS
 
 METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor) CLASS XWTLabel
    Local cFontString :=""
-   Local cColorText  :=""
-   Local aColor
-   Local c
 
    ::Super:New()
    tracelog(cText, x, y, oParent ,cFont, nFontSize , cColor)
@@ -32,20 +29,9 @@ METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor) CLASS XWTLabel
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
    ENDIF
 
+
    IF !Empty( cColor )
-      IF "," in cColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+      ::SetColor( cColor )
    ENDIF
 
   

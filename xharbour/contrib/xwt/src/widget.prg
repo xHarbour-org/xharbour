@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.4 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: widget.prg,v 1.5 2003/05/11 15:14:43 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -55,6 +55,8 @@ CLASS XWTWidget
    METHOD RiseEvent( oEvent )
    METHOD Destroy()
 
+   METHOD SetColor( cColor, nTypeColor )
+   
 PROTECTED:
    DATA nWidgetType
 
@@ -249,3 +251,29 @@ METHOD IsSensible() CLASS XWTWidget
    ENDIF
 
 RETURN bSense
+
+METHOD SetColor( cColor, nTypeColor ) CLASS XWTWidget
+   LOCAL cColorText  := ""
+   Local aColor
+   Local c
+
+   IF Empty(  nTypeColor )
+      nTypeColor := XWT_PROP_FGCOLOR
+   ENDIF
+
+   IF "," in cColor // is an RGB String so Convert
+
+      aColor := HB_aTokens( cColor ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+
+   ELSE
+      cColorText := cColor
+   ENDIF
+
+   XWT_SetProperty( ::oRawWidget, nTypeColor,  cColorText )
+
+RETURN NIL

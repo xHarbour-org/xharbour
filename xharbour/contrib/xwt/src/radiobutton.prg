@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: radiobutton.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: radiobutton.prg,v 1.3 2003/08/30 21:37:52 lculik Exp $
 
    Radio box - A certain cooperation of the container widget is needed
 */
@@ -22,9 +22,6 @@ ENDCLASS
 
 METHOD New( cText ,cFont, nFontSize , cColor , cBgColor ,cBaseClr, cTxtClr) CLASS XWTRadioButton
    Local cFontString :=""
-   Local cColorText  :=""
-   Local aColor
-   Local c
 
    ::Super:New()
    ::nWidgetType := XWT_TYPE_RADIOBUTTON
@@ -33,74 +30,23 @@ METHOD New( cText ,cFont, nFontSize , cColor , cBgColor ,cBaseClr, cTxtClr) CLAS
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
    ENDIF
 
-      IF !Empty( cColor )
-      IF "," in cColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+   IF !Empty( cColor )
+      ::SetColor( cColor )
    ENDIF
 
    IF !Empty( cBgColor )
-   cColorText := ""
-      IF "," in cBgColor // is an RGB String so Convert
-
-      aColor := HB_aTokens( cBgColor ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText := cBgColor
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_BGCOLOR,  cColorText )
+      ::SetColor( cBgColor, XWT_PROP_BGCOLOR )
    ENDIF
 
    IF !Empty( cBaseClr )
-   cColorText := ""
-      IF "," in cBaseClr // is an RGB String so Convert
-
-      aColor := HB_aTokens(  cBaseClr ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText :=  cBaseClr
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_BASECOLOR,  cColorText )
+      ::SetColor( cBaseClr, XWT_PROP_BASECOLOR )
    ENDIF
 
    IF !Empty( cTxtClr )
-   cColorText := ""
-      IF "," in cTxtClr // is an RGB String so Convert
-
-      aColor := HB_aTokens(  cTxtClr ,",")
-      cColorText := "#"
-
-      FOR EACH c in aColor
-         cColorText += DecToHexa(Str(c,3))
-      NEXT
-         
-      ELSE
-         cColorText :=  cTxtClr
-      ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXTCOLOR,  cColorText )
+      ::SetColor( cTxtClr, XWT_PROP_TEXTCOLOR )
    ENDIF
-  
-   IF Valtype( cFont )  == "C" 
+
+   IF Valtype( cFont )  == "C"
       cFontString += cFont
       IF Valtype( nFontSize ) == "N"
          cFontString += " "+ Str(nFontSize,2,0)
