@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.20 2004/06/15 11:56:09 druzus Exp $
+# $Id: hb-func.sh,v 1.21 2004/06/17 12:23:19 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -94,9 +94,10 @@ mk_hbtools()
         HB_SLN_LIB="slang"
     fi
 
+    echo "Generating ${hb_tool}... "
     cat > ${hb_tool} <<EOF
 #!/bin/sh
-[ "\$BASH" ] || exec bash `which \$0` \${1+"\$@"}
+[ "\$BASH" ] || exec bash \`which \$0\` \${1+"\$@"}
 #
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
@@ -399,6 +400,7 @@ case "\${HB}" in
 esac
 EOF
     chmod 755 ${hb_tool}
+    echo "Creating links..."
     ${hb_tool} mk-links
 }
 
@@ -444,6 +446,7 @@ mk_hblibso()
                 ;;
         esac
     done
+    echo "Making lib${name}-${hb_ver}.so..."
     $HB_BIN_INSTALL/hb-mkslib lib${name}-${hb_ver}.so $LIBS
     [ "$HB_MT" != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
     for l in lib${name}-${hb_ver}.so lib${name}mt-${hb_ver}.so

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3156 2004/07/15 03:21:57 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3157 2004/07/15 10:24:10 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-15 22:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * bin/hb-func.sh
+    ! Fixed mk_hbtools() on BSD.
+    + Added a couple of status messages.
 
 2004-07-14 12:22 UTC-0200 Giancarlo Niccolai <antispam /at/ niccolai "dot" ws>
   * doc/hbxml.txt
