@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.32 2004/03/24 12:17:39 lculik Exp $
+ * $Id: zip.c,v 1.33 2004/03/26 03:23:22 lculik Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
    }
 }
 
-static void ZipCreateArray( PHB_ITEM pParam )
+static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
 {
    PHB_ITEM pDirEntry;
    HB_ITEM Temp, TempArray, WildFile;
@@ -295,6 +295,15 @@ static void ZipCreateArray( PHB_ITEM pParam )
       {
          if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
+// if don't gave path add current dir !
+            if ( ( pCurDir ) && ( ! strchr( szArrEntry, OS_PATH_DELIMITER ) ) )
+            {
+               char * szTemp = szArrEntry ;
+               szArrEntry = ( char * ) hb_xrealloc( szArrEntry, _POSIX_PATH_MAX );
+               hb_xstrcpy( szArrEntry, (char *) pCurDir,
+                              OS_PATH_DELIMITER_STRING, szTemp, NULL );
+            }
+
             hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
             ulLen = WildFile.item.asArray.value->ulLen;
 
@@ -366,7 +375,7 @@ HB_FUNC( HB_ZIPFILE )
 
          ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam );
+         ZipCreateArray( pParam, pCurDir );
 
          hb_fsChDir( pCurDir ) ;
          hb_xfree( pCurDir ) ;
@@ -375,8 +384,18 @@ HB_FUNC( HB_ZIPFILE )
          {
            hb_itemCopy( &iProgress, pProgress );
          }
+// add current dir to file name if not specified
 
-         strcpy( szFile, hb_parc( 1 ) );
+         if ( ! strchr( hb_parc( 1 ), OS_PATH_DELIMITER ) )
+         {
+            strcpy( szFile, (char *) pCurDir );
+            strcat( szFile, OS_PATH_DELIMITER_STRING) ;
+            strcat( szFile, hb_parc( 1 ) ) ;
+         }
+         else
+         {
+            strcpy( szFile, hb_parc( 1 ) );
+         }
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -460,19 +479,35 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
          PHB_ITEM pExclude = hb_param( 11, HB_IT_STRING | HB_IT_ARRAY );
          HB_ITEM iProgress;
          char *szZipFileName;
+         BYTE *pCurDir;
 
          iProgress.type = HB_IT_NIL;
+         pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam );
+         ZipCreateArray( pParam, pCurDir );
+
+         hb_fsChDir( pCurDir );
+         hb_xfree( pCurDir );
 
          if( pProgress )
          {
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parc( 1 ) );
+// add current dir to file name if not specified
+         if ( ! strchr( szFile, OS_PATH_DELIMITER ) )
+         {
+            strcpy( szFile, (char *) pCurDir );
+            strcat( szFile, OS_PATH_DELIMITER_STRING) ;
+            strcat( szFile, hb_parc( 1 ) ) ;
+         }
+         else
+         {
+            strcpy( szFile, hb_parc( 1 ) );
+         }
+
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -514,12 +549,17 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
          HB_ITEM iProgress;
          char *szZipFileName;
+         BYTE * pCurDir ;
 
          iProgress.type = HB_IT_NIL;
+         pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          ZipCreateExclude( pExclude );
 
-         ZipCreateArray( pParam );
+         ZipCreateArray( pParam, pCurDir );
+
+         hb_fsChDir( pCurDir ) ;
+         hb_xfree( pCurDir ) ;
 
          if( pProgress )
          {
