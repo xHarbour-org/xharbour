@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.50 2004/11/21 21:44:20 druzus Exp $
+ * $Id: gtcrs.c,v 1.51 2004/11/24 18:31:05 lf_sfnet Exp $
  */
 
 /*
@@ -3579,6 +3579,11 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    return s_clipsize;
 }
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 /* *********************************************************************** */
 
 int
@@ -3703,6 +3708,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
     gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
 }
