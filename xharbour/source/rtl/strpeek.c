@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: strpeek.c,v 1.1 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( STRPOKE )
 
       if( ulPos > 0 && ulPos < pText->item.asString.length )
       {
-         char * pszNew = hb_xgrab( ulLen );
+         char * pszNew = (char *) hb_xgrab( ulLen );
 	 memcpy( pszNew, pszText, ulLen );
 	 pszNew[ ulPos - 1 ] = (char) (hb_parnl( 3 ) & 0xff);
          hb_retclenAdopt( pszNew, ulLen );
