@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.10 2002/09/27 20:51:49 map Exp $
+ * $Id: gtsln.c,v 1.11 2002/10/22 02:11:47 paultucker Exp $
  */
 
 /*
@@ -84,7 +84,12 @@ int SLsmg_get_color();
 
 //#include <unistd.h>
 #include <signal.h>
+
+#ifdef HB_OS_DARWIN
+#include <unistd.h>
+#else
 #include <time.h>
+#endif
 
 /* *********************************************************************** */
 
@@ -797,7 +802,9 @@ void hb_gt_Tone( double dFrequency, double dDuration )
         while( dDuration > 0.0 )
         {
             USHORT temp = ( USHORT ) HB_MIN( HB_MAX( 0, dDuration ), 1000 );
+#ifndef HB_OS_DARWIN	    
             static struct timespec nanosecs;
+#endif
 
             dDuration -= temp;
             if( temp <= 0 )
@@ -807,9 +814,13 @@ void hb_gt_Tone( double dFrequency, double dDuration )
             else
             {
                 hb_idleState();
+#ifndef HB_OS_DARWIN		
                 nanosecs.tv_sec  = 0;
                 nanosecs.tv_nsec = temp * 10;
                 nanosleep( &nanosecs, NULL );
+#else
+		usleep(temp / 100);
+#endif
             }
         }
     }
