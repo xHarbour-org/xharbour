@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.8 2004/04/20 05:18:43 bdj Exp $
+ * $Id: tbcolumn.prg,v 1.9 2004/06/17 09:23:44 vouchcac Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 //-------------------------------------------------------------------//
 
 #include "hbclass.ch"
-#include "hbsetup.ch"
 #include "common.ch"
 #include "tbrowse.ch"
 

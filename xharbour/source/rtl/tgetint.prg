@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.3 2002/10/19 16:30:46 ronpinkas Exp $
+ * $Id: tgetint.prg,v 1.4 2004/02/18 08:55:41 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,6 @@
  */
 
 #include "hbclass.ch"
-#include "hbsetup.ch"
 
 //---------------------------------------------------------------------------//
 

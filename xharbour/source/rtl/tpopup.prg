@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.6 2003/02/01 19:12:18 patrickmast Exp $
+ * $Id: tpopup.prg,v 1.8 2004/01/22 03:48:00 maurifull Exp $
  */
 
 /*
@@ -50,12 +50,11 @@
  *
  */
 
+#include "hbclass.ch"
 #include "box.ch"
 #include "button.ch"
 #include "color.ch"
 #include "common.ch"
-#include "hbsetup.ch"
-#include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
 

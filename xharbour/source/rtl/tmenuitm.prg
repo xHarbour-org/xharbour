@@ -1,5 +1,5 @@
 /*
- * $Id: tmenuitm.prg,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
+ * $Id: tmenuitm.prg,v 1.2 2003/01/27 04:03:12 walito Exp $
  */
 
 /*
@@ -50,10 +50,9 @@
  *
  */
 
+#include "hbclass.ch"
 #include "common.ch"
 #include "button.ch"
-#include "hbsetup.ch"
-#include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
 

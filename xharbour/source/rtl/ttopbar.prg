@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.4 2003/01/31 21:03:36 walito Exp $
+ * $Id: ttopbar.prg,v 1.5 2004/03/25 13:15:45 lculik Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbclass.ch"
 #include "box.ch"
 #include "button.ch"
 #include "color.ch"
@@ -57,8 +58,6 @@
 #include "inkey.ch"
 #include "setcurs.ch"
 #include "getexit.ch"
-#include "hbsetup.ch"
-#include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
 
