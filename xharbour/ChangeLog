@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.303 2002/07/08 04:50:35 walito Exp $
+ * $Id: ChangeLog,v 1.304 2002/07/10 01:05:16 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-10 17:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Added missing break that caused an excess call to HB_XFREE() resulting in error 9022.
+
 2002-07-09 22:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
    ! Fix the determination of Error when compiling C/Cpp sources
