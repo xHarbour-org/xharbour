@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.3 2004/07/30 07:16:04 likewolf Exp $
+ * $Id: token1.c,v 1.4 2004/07/31 16:40:46 likewolf Exp $
  */
 
 /*
@@ -300,7 +300,7 @@ static void do_token1 (int iSwitch)
 	    char *t;
 	    BOOL bLast = TRUE;
 	    
-	    for ( t = pc + 1; t + 1 < pcString + sStrLen; t++ )
+	    for ( t = pc + 1; t < pcString + sStrLen; t++ )
 	    {
 	       if ( !memchr( pcSeparatorStr, *t, sSeparatorStrLen ) )
 	       {
