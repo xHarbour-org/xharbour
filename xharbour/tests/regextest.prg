@@ -1,6 +1,6 @@
 ***********************************************************
 * regextest.prg
-* $Id: regex.prg,v 1.4 2003/05/27 20:05:54 jonnymind Exp $
+* $Id: regextest.prg,v 1.1 2003/08/19 11:51:53 jonnymind Exp $
 * Test for regular expression functions -
 * This allows to use a finetune regex to use them in programs
 *
@@ -43,7 +43,7 @@ PROCEDURE Main()
                @12,5 SAY "MATCHES:"
                nRow := 13
                FOR EACH cMatch in aMatch
-                  @nRow++, 5 SAY cMatch
+                  @nRow++, 5 SAY ">"+cMatch
                NEXT
             ELSE
                @12,5 SAY "No matches"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1359 2003/08/19 04:11:06 lculik Exp $
+ * $Id: ChangeLog,v 1.1360 2003/08/19 11:51:51 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-19 13:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    ! Parenthetized expressions must be returned by HB_Regex &co
+      even if they are not found. See this case:
+      HB_Regex( "abc(de)fg(hi)?", "abcdefg")
+      This expression MUST return an array of EXACTLY three
+      elements; the first one is the sucessful whole match,
+      the second is the first parenthetized expression match,
+      and the third is an empty string (that means that the
+      "possible" (?) expression was not present).
+      To achive this, I changed the code
+      while ( aMatches[i].rm_eo > 0 )
+      into
+      while ( aMatches[i].rm_eo > -1 )
+      in two points.
+
+  * tests/regextest.prg
+    + Added a ">" in front of the match to count for emtpy
+      parenthetized expression matches.
 
 2003-08-19 13:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/regex.c

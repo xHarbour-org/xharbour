@@ -6499,7 +6499,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
             i = 0;
-            while ( aMatches[i].rm_eo > 0 )
+            while ( aMatches[i].rm_eo > -1 )
             {
                pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
                hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
@@ -6548,7 +6548,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
             i = 0;
-            while ( aMatches[i].rm_eo > 0 )
+            while ( aMatches[i].rm_eo > -1 )
             {
                aSingleMatch = hb_itemNew( NULL );
                hb_arrayNew( aSingleMatch, 0 );
