@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: TPostgres.prg,v 1.14 2004/04/27 18:06:29 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -963,9 +963,7 @@ METHOD SetKey() CLASS TPQquery
                 endif
                 
                 if empty(::Tablename)
-                    cQuery := 'select typname from pg_type where typrelid in (' + str(xTableId) + ')'
-                    cQuery += ' union all '
-                    cQuery += 'select relname from pg_class where reltype in (' + str(xTableId) + ')'
+                    cQuery := 'select relname from pg_class where oid = ' + str(xTableId)
 
                     res := PQexec(::pDB, cQuery)
             
