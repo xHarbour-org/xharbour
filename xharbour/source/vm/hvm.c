@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.303 2003/12/21 23:35:27 fsgiudice Exp $
+ * $Id: hvm.c,v 1.304 2003/12/27 02:57:13 fsgiudice Exp $
  */
 
 /*
@@ -195,6 +195,12 @@ static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a l
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
 static void    hb_vmPushLongConst( long lNumber );  /* Pushes a long constant (pcode) */
 HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is integer, long or double */
+#ifndef HB_LONG_LONG_OFF
+   HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a long long (pcode) */
+   HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
+#else
+   HB_EXPORT void    hb_vmPushNumInt( long lNumber );
+#endif
 static void    hb_vmPushStatic( USHORT uiStatic );     /* pushes the containts of a static onto the stack */
 static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by refrence onto the stack */
 static void    hb_vmPushVariable( PHB_SYMB pVarSymb ); /* pushes undeclared variable */
@@ -290,13 +296,13 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 //JC1: in MT this are handled by the single thread stack creation.
 #ifndef HB_THREAD_SUPPORT
    HB_ITEM hb_vm_aWithObject[ HB_MAX_WITH_OBJECTS ];
-   USHORT  hb_vm_wWithObjectCounter; // Initilaized in hb_vmInit()
+   USHORT  hb_vm_wWithObjectCounter; // Initialized in hb_vmInit()
    BOOL    hb_vm_bWithObject = FALSE;
 
    HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
    ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
-   USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+   USHORT   hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
    /* Request for some action - stop processing of opcodes
    */
    static USHORT   s_uiActionRequest;
@@ -453,7 +459,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
 
-   /* Moved to hb_vmProcessSymbols() because hb_xgrab i sused from static initializers before we get here.
+   /* Moved to hb_vmProcessSymbols() because hb_xgrab is used from static initializers before we get here.
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
    */
@@ -2132,7 +2138,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
             short iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
-            double dNewVal;
+            #ifndef HB_LONG_LONG_OFF
+               long double dNewVal;
+            #else
+               double dNewVal;
+            #endif
 
             w += 4;
 
@@ -2141,24 +2151,42 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( pLocal->type & HB_IT_INTEGER )
+            if( HB_IS_NUMBER_INT( pLocal ) )
             {
-               dNewVal = pLocal->item.asInteger.value + iAdd;
-            }
-            else if( pLocal->type & HB_IT_LONG )
-            {
-               dNewVal = pLocal->item.asLong.value + iAdd;
-            }
-            else if( pLocal->type & HB_IT_DOUBLE )
-            {
-               dNewVal = pLocal->item.asDouble.value + iAdd;
-            }
+               #ifndef HB_LONG_LONG_OFF
+                  LONGLONG lNewVal, lVal;
+               #else
+                  long lNewVal, lVal;
+               #endif
+
+               if( HB_IS_INTEGER( pLocal ) )
+               {
+                  lVal = pLocal->item.asInteger.value;
+               }
+               else if( HB_IS_LONG( pLocal ) )
+               {
+                  lVal = pLocal->item.asLong.value;
+               }
             #ifndef HB_LONG_LONG_OFF
-            else if( pLocal->type & HB_IT_LONGLONG )
-            {
-               dNewVal = (double) pLocal->item.asLongLong.value + iAdd;
-            }
+               else if( HB_IS_LONGLONG( pLocal ) )
+               {
+                  lVal = pLocal->item.asLongLong.value;
+               }
             #endif
+
+               lNewVal = lVal + iAdd;
+
+               if(( iAdd >= 0 && lNewVal >= lVal ) ||
+                  ( iAdd <  0 && lNewVal <  lVal ))
+               {
+                  hb_itemPutNInt( pLocal, lNewVal );
+                  break;
+               }
+               else
+               {
+                  dNewVal = ( double ) lVal + ( double ) iAdd;
+               }
+            }
             else if( HB_IS_DATE( pLocal ) )
             {
                pLocal->item.asDate.value += iAdd;
@@ -2168,6 +2196,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                pLocal->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pLocal->item.asString.value[0] + iAdd ) ];
                break;
+            }
+            else if( HB_IS_DOUBLE( pLocal ) )
+            {
+               dNewVal = pLocal->item.asDouble.value + iAdd;
             }
             else
             {
@@ -2184,40 +2216,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                break;
             }
 
-            if( pLocal->type & HB_IT_DOUBLE )
-            {
-               pLocal->item.asDouble.value = dNewVal;
-               pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
-            }
-            else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
-            {
-               pLocal->type = HB_IT_INTEGER;
-               pLocal->item.asInteger.value = ( int ) dNewVal;
-               pLocal->item.asInteger.length = 10;
-            }
-            else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
-            {
-               pLocal->type = HB_IT_LONG;
-               pLocal->item.asLong.value = ( long ) dNewVal;
+            pLocal->item.asDouble.value = ( double ) dNewVal;
+            pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
 
-               if( dNewVal >= 1000000000 )
-               {
-                  pLocal->item.asLong.length = 11;
-               }
-               else if( dNewVal <= -1000000000 )
-               {
-                  pLocal->item.asLong.length = 20;
-               }
-               else
-               {
-                  pLocal->item.asLong.length = 10;
-               }
-            }
-            else
+            if( !HB_IS_DOUBLE( pLocal ) )
             {
                pLocal->type = HB_IT_DOUBLE;
-               pLocal->item.asDouble.value = dNewVal;
-               pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
                pLocal->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
 
@@ -2278,28 +2282,55 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
             short iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
-            double dNewVal = 0.0;
+            #ifndef HB_LONG_LONG_OFF
+               long double dNewVal = 0.0;
+            #else
+               double dNewVal = 0.0;
+            #endif
 
             w += 3;
 
-            if( pTop->type & HB_IT_INTEGER )
+
+            if( HB_IS_NUMBER_INT( pTop ) )
             {
-               dNewVal = pTop->item.asInteger.value + iAdd;
+               #ifndef HB_LONG_LONG_OFF
+                  LONGLONG lNewVal, lVal;
+               #else
+                  long lNewVal, lVal;
+               #endif
+
+               if( HB_IS_INTEGER( pTop ) )
+               {
+                  lVal = pTop->item.asInteger.value;
+               }
+               else if( HB_IS_LONG( pTop ) )
+               {
+                  lVal = pTop->item.asLong.value;
+               }
+            #ifndef HB_LONG_LONG_OFF
+               else if( HB_IS_LONGLONG( pTop ) )
+               {
+                  lVal = pTop->item.asLongLong.value;
+               }
+            #endif
+
+               lNewVal = lVal + iAdd;
+
+               if(( iAdd >= 0 && lNewVal >= lVal ) ||
+                  ( iAdd <  0 && lNewVal <  lVal ))
+               {
+                  hb_itemPutNInt( pTop, lNewVal );
+                  break;
+               }
+               else
+               {
+                  dNewVal = ( double ) lVal + ( double ) iAdd;
+               }
             }
-            else if( pTop->type & HB_IT_LONG )
-            {
-               dNewVal = pTop->item.asLong.value + iAdd;
-            }
-            else if( pTop->type & HB_IT_DOUBLE )
+            else if( HB_IS_DOUBLE( pTop ) )
             {
                dNewVal = pTop->item.asDouble.value + iAdd;
             }
-            #ifndef HB_LONG_LONG_OFF
-            else if( pTop->type & HB_IT_LONGLONG )
-            {
-               dNewVal = (double) pTop->item.asLongLong.value + iAdd;
-            }
-            #endif
             else if( HB_IS_DATE( pTop ) )
             {
                pTop->item.asDate.value += iAdd;
@@ -2335,40 +2366,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            if( pTop->type & HB_IT_DOUBLE )
-            {
-               pTop->item.asDouble.value = dNewVal;
-               pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
-            }
-            else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
-            {
-               pTop->type = HB_IT_INTEGER;
-               pTop->item.asInteger.value = ( int ) dNewVal;
-               pTop->item.asInteger.length = 10;
-            }
-            else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
-            {
-               pTop->type = HB_IT_LONG;
-               pTop->item.asLong.value = ( long ) dNewVal;
 
-               if( dNewVal >= 1000000000 )
-               {
-                  pTop->item.asLong.length = 11;
-               }
-               else if( dNewVal <= -1000000000 )
-               {
-                  pTop->item.asLong.length = 20;
-               }
-               else
-               {
-                  pTop->item.asLong.length = 10;
-               }
-            }
-            else
+            pTop->item.asDouble.value = ( double ) dNewVal;
+            pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
+
+            if( !HB_IS_DOUBLE( pTop ) )
             {
                pTop->type = HB_IT_DOUBLE;
-               pTop->item.asDouble.value = dNewVal;
-               pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
 
@@ -2376,7 +2380,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
 
          case HB_P_SWITCHCASE:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_SWITCHCASE") );
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
             long lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
@@ -3726,11 +3730,32 @@ static void hb_vmInc( void )
    {
       pItem->item.asDate.value++;
    }
-   else if( HB_IS_NUMERIC( pItem ) )
+   else if( HB_IS_NUMBER_INT( pItem  ) )
    {
-      int iDec, iType = pItem->type;
-      double dNumber = hb_vmPopDouble( &iDec );
-      hb_vmPushNumType( ++dNumber, iDec, iType, iType );
+      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < SHRT_MAX )
+      {
+         pItem->item.asInteger.value++;
+      }
+      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < LONG_MAX )
+      {
+         pItem->item.asLong.value++;
+      }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
+      {
+         pItem->item.asLongLong.value++;
+      }
+#endif
+      else
+      {
+         int iDec, iType = pItem->type;
+         double dNumber = hb_vmPopDouble( &iDec );
+         hb_vmPushNumType( ++dNumber, iDec, iType, iType );
+      }
+   }
+   else if( HB_IS_DOUBLE( pItem ) )
+   {
+      pItem->item.asDouble.value++;
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpInc" ) )
    {
@@ -3767,11 +3792,32 @@ static void hb_vmDec( void )
    {
       pItem->item.asDate.value--;
    }
-   else if( HB_IS_NUMERIC( pItem ) )
+   else if( HB_IS_NUMBER_INT( pItem  ) )
    {
-      int iDec, iType = pItem->type;
-      double dNumber = hb_vmPopDouble( &iDec );
-      hb_vmPushNumType( --dNumber, iDec, iType, iType );
+      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < SHRT_MAX )
+      {
+         pItem->item.asInteger.value--;
+      }
+      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < LONG_MAX )
+      {
+         pItem->item.asLong.value--;
+      }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
+      {
+         pItem->item.asLongLong.value--;
+      }
+#endif
+      else
+      {
+         int iDec, iType = pItem->type;
+         double dNumber = hb_vmPopDouble( &iDec );
+         hb_vmPushNumType( --dNumber, iDec, iType, iType );
+      }
+   }
+   else if( HB_IS_DOUBLE( pItem ) )
+   {
+      pItem->item.asDouble.value++;
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpDec" ) )
    {
@@ -6053,7 +6099,7 @@ HB_EXPORT void hb_vmPushNumber( double dNumber, int iDec )
 
 HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumber(%lf, %d)", dNumber, iDec));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%lf, %d, %i, %i)", dNumber, iDec, iType1, iType2));
 
    //printf( "%i\n", (int) dNumber );
 
@@ -6073,6 +6119,32 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    {
       hb_vmPushDouble( dNumber, hb_set.HB_SET_DECIMALS );
    }
+}
+
+#ifndef HB_LONG_LONG_OFF
+HB_EXPORT void hb_vmPushNumInt( LONGLONG lNumber )
+#else
+HB_EXPORT void hb_vmPushNumInt( long lNumber )
+#endif
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%Ld, %i, %i)", lNumber ));
+
+   //printf( "%i\n", (int) dNumber );
+
+   if( SHRT_MIN <= lNumber && lNumber <= SHRT_MAX )
+   {
+      hb_vmPushInteger( ( int ) lNumber );
+   }
+   else if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
+   {
+      hb_vmPushLong( ( long ) lNumber );
+   }
+#ifndef HB_LONG_LONG_OFF
+   else if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
+   {
+      hb_vmPushLongLong( lNumber );
+   }
+#endif
 }
 
 HB_EXPORT void hb_vmPushInteger( int iNumber )
@@ -6134,6 +6206,18 @@ static void hb_vmPushLongConst( long lNumber )
       ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
    }
 
+   hb_stackPush();
+}
+
+HB_EXPORT void hb_vmPushLongLong( LONGLONG lNumber )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLongLong(%Ld)", lNumber));
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_LONGLONG;
+   ( * HB_VM_STACK.pPos )->item.asLongLong.value = lNumber;
+   ( * HB_VM_STACK.pPos )->item.asLongLong.length = 20;
    hb_stackPush();
 }
 
