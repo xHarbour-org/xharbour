@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.1.1.1 2001/12/21 10:41:46 ronpinkas Exp $
+ * $Id: inkey.c,v 1.2 2002/01/23 02:32:08 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,9 @@
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  *    HB_KEYPUT()
  *
+ * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
+ *    hb_setInkeyLast()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -85,7 +88,22 @@ static int    s_inkeyTail;       /* Harbour keyboard buffer tail pointer (next e
 static int    s_inkeyLast;       /* Last key extracted from Harbour keyboard buffer     */
 static BOOL   s_inkeyPoll;       /* Flag to override no polling when TYPEAHEAD is 0     */
 static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHEAD is 0 */
+
+static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
+
+static void hb_inkeyKBfree( void )
+{
+   PHB_inkeyKB pNext;
+
+   if( s_inkeyKB )
+   {
+      pNext     = s_inkeyKB->pNext;
+      hb_xfree( s_inkeyKB->String );
+      hb_xfree( s_inkeyKB );
+      s_inkeyKB = pNext;
+   }
+}
 
 static int hb_inkeyFetch( void ) /* Extract the next key from the keyboard buffer */
 {
@@ -101,14 +119,40 @@ static int hb_inkeyFetch( void ) /* Extract the next key from the keyboard buffe
       else
       {                                            /* Keyboard buffer is not empty */
          s_inkeyLast = s_inkeyBuffer[ s_inkeyTail++ ];
+
+         if( s_inkeyLast == -99 && s_inkeyKB )
+         {
+            s_inkeyLast = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
+
+            if( s_inkeyKB->Pos >= 0 )
+               s_inkeyTail--;
+            else
+               hb_inkeyKBfree( );
+         }
+
          if( s_inkeyTail >= hb_set.HB_SET_TYPEAHEAD )
             s_inkeyTail = 0;
+
          key = s_inkeyLast;
       }
+      s_inkeyForce = 0;
    }
    else
-      key = s_inkeyLast = s_inkeyForce;           /* Typeahead support is disabled */
-   s_inkeyForce = 0;
+   {
+      s_inkeyLast = s_inkeyForce;           /* Typeahead support is disabled */
+
+      if( s_inkeyKB )
+      {
+         s_inkeyLast = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
+
+         if( s_inkeyKB->Pos < 0 )
+         {
+            hb_inkeyKBfree( );
+            s_inkeyForce = 0;
+         }
+      }
+      key = s_inkeyLast;
+   }
 
    return key;
 }
@@ -177,6 +221,17 @@ int hb_inkeyLast( HB_inkey_enum event_mask )      /* Return the value of the las
    return hb_inkeyTranslate( s_inkeyLast, event_mask );
 }
 
+int hb_setInkeyLast( int ch )      /* Force a value to s_inkeyLast and return previous value */
+{
+   int last = s_inkeyLast;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_setInkeyLast()"));
+
+   s_inkeyLast = ch;
+
+   return last;
+}
+
 int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without extracting it */
 {
    int key = s_inkeyForce;    /* Assume that typeahead support is disabled */
@@ -191,7 +246,17 @@ int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without
       if( s_inkeyHead == s_inkeyTail )
          key = 0;
       else
+      {
          key = s_inkeyBuffer[ s_inkeyTail ];    /* Next key */
+
+         if( key == -99  && s_inkeyKB )
+            key = s_inkeyKB->String[ s_inkeyKB->Pos ];
+      }
+   }
+   else
+   {
+      if( s_inkeyKB )
+         key = s_inkeyKB->String[ s_inkeyKB->Pos ];
    }
 
    return hb_inkeyTranslate( key, event_mask );
@@ -242,6 +307,10 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
    s_inkeyPoll = FALSE;
    s_inkeyForce = 0;
 
+   while( s_inkeyKB )
+      hb_inkeyKBfree( );
+   s_inkeyKB = NULL;
+
    /* The allocate flag allows the same function to be used to reset the
       buffer or to reset and allocate, reallocate, or free the buffer */
    if( allocate )
@@ -275,6 +344,7 @@ HB_FUNC( INKEY )
 
 HB_FUNC( __KEYBOARD )
 {
+
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
    hb_inkeyReset( FALSE );
 
@@ -284,12 +354,50 @@ HB_FUNC( __KEYBOARD )
 
       if( size != 0 )
       {
-         /* Stuff the string */
-         BYTE * fPtr = ( BYTE * ) hb_parc( 1 );
+
+         BYTE * fPtr        = ( BYTE * ) hb_parc( 1 );
+         BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
+         PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
+         PHB_inkeyKB pRoot;
+
+         pString[ size ] = 0;
+         pInkey->Pos    = size - 1;
+
+         while( size-- )
+         {
+            if( * fPtr == 59 )
+               pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
+            else
+               pString[ size ] = * fPtr;
+            fPtr++;
+         }
+
+         pInkey->String = pString;
+         pInkey->pNext  = NULL;
+
+//         printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
+
+         if( s_inkeyKB )
+         {
+            pRoot = s_inkeyKB;
+
+            while( pRoot->pNext )
+               pRoot = pRoot->pNext;
+
+            pRoot->pNext = pInkey;
+         }
+         else
+            s_inkeyKB = pInkey;
+
+
+         hb_inkeyPut( -99 );
+               
+/*
+         // Stuff the string 
 
          if( size >= ( ULONG ) hb_set.HB_SET_TYPEAHEAD )
          {
-            /* Have to allow for a zero size typehead buffer */
+            // Have to allow for a zero size typehead buffer 
             if( hb_set.HB_SET_TYPEAHEAD )
                size = ( ULONG ) ( hb_set.HB_SET_TYPEAHEAD - 1 );
             else
@@ -300,9 +408,10 @@ HB_FUNC( __KEYBOARD )
          {
             int ch = *fPtr++;
             if( ch == 59 )
-               ch = 13; /* Convert ";" to CR, like Clipper does */
+               ch = 13; // Convert ";" to CR, like Clipper does 
             hb_inkeyPut( ch );
          }
+*/
       }
    }
 }
@@ -340,12 +449,14 @@ HB_FUNC( HB_KEYPUT )
 
 HB_FUNC( NEXTKEY )
 {
+   hb_idleState();
+   hb_idleReset();
    hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
 }
 
 HB_FUNC( LASTKEY )
 {
-   hb_retni( hb_inkeyTranslate( s_inkeyLast, ( HB_inkey_enum ) hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) ) );
+   hb_retni( hb_inkeyTranslate( s_inkeyLast, ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
 }
 
 int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.3 2002/10/22 02:11:47 paultucker Exp $
+ * $Id: hbapigt.h,v 1.4 2002/12/23 06:45:58 jonnymind Exp $
  */
 
 /*
@@ -135,6 +135,16 @@ typedef enum
    INKEY_ALL            = 159,  /* All Mouse and Keyboard Events */
    INKEY_RAW            = 256   /* Minimally Decoded Keyboard Events */
 } HB_inkey_enum;
+
+/* KEYBOARD struct */
+
+typedef struct _HB_inkeyKB
+{
+   int    Pos;
+   BYTE * String;
+   struct _HB_inkeyKB * pNext;
+} HB_inkeyKB, * PHB_inkeyKB;
+
 
 /* Cursor style constants */
 
@@ -274,6 +284,7 @@ extern int    hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );
 extern int    hb_inkeyGet( HB_inkey_enum event_mask );            /* Extract the next key from the Harbour keyboard buffer */
 extern void   hb_inkeyPut( int ch );          /* Inserts an inkey code into the keyboard buffer */
 extern int    hb_inkeyLast( HB_inkey_enum event_mask );           /* Return the value of the last key that was extracted */
+extern int    hb_setInkeyLast( int ch );      /* Force a value to LASTKEY and return the previous value */
 extern int    hb_inkeyNext( HB_inkey_enum event_mask );           /* Return the next key without extracting it */
 extern void   hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */
 extern void   hb_inkeyReset( BOOL allocate ); /* Reset the Harbour keyboard buffer */
