@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.9 2003/09/03 00:34:01 ronpinkas Exp $
+ * $Id: dbfcdx1.h,v 1.10 2003/11/04 08:31:04 druzus Exp $
  */
 
 /*
@@ -74,8 +74,6 @@
 #define SORT_END_OF_WORD                2
 #define SORT_STACK_OF_CHAR              3
 #define SORT_NOT_KEY                    0x10
-
-#define HB_CDXMAXKEY( x )              ((USHORT) ((x) > CDX_MAXKEY ? CDX_MAXKEY : (x)))
 
 #if (__BORLANDC__ > 1040) /* Use this only above Borland C++ 3.1 */
    #pragma option -a1 /* byte alignment */

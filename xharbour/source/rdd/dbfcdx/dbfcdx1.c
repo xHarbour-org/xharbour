@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.72 2003/11/04 08:31:03 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.73 2003/11/04 18:00:30 ronpinkas Exp $
  */
 
 /*
@@ -6093,7 +6093,7 @@ static void hb_cdxSortAddInternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
 #define hb_cdxSwapBytes( n )  HB_SWAP_ULONG( n );
 /* ######################################################################### */
 
-static LPCDXKEYINFO hb_cdxSortKeyNew()
+static LPCDXKEYINFO hb_cdxSortKeyNew( void )
 {
    LPCDXKEYINFO pKey;
    pKey = ( LPCDXKEYINFO ) hb_xgrab( sizeof( CDXKEYINFO ) );
