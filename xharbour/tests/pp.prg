@@ -75,6 +75,11 @@
 
       EXTERN CreateObject
       EXTERN GetActiveObject
+
+      #ifdef SQL
+         REQUEST SQLRDD
+         REQUEST SR_ODBC
+      #endif
    #endif
 
    #ifndef NO_BOOST
@@ -393,7 +398,7 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
-STATIC s_cVer := "1.0.RC2"
+STATIC s_cVer := "1.0.RC3"
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -4294,7 +4299,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      /* Top of nested optional. */
                      IF aMP[2] > 1
                         /* Upper level optional should be accepted - rewind to top of parent group. */
-                        nOptional--
+                        //nOptional--
                         WHILE nMatch > 1
                            nMatch--
                            IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
@@ -4348,7 +4353,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      // End of rule or reached end of parrent group.
                      IF nMatch > nMatches .OR. aRules[nRule][2][nMatch][2] >= 0 .OR. nTemp + aRules[nRule][2][nMatch][2] > 1
                         /* Upper level optional should be accepted - rewind to top of parent group. */
-                        nOptional--
+                        //nOptional--
                         WHILE nMatch > 1
                            nMatch--
                            IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
