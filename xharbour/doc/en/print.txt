@@ -6,7 +6,7 @@
  *  $ONELINER$
  *      Get an List of printers
  *  $SYNTAX$
- *      <aPrint> := GetPrinters([ <lPorts> ])
+ *      GetPrinters([ <lPorts> ]) -> <aPrint>
  *  $ARGUMENTS$
  *      [<lPorts>] = .T. or .F. ( default .F. )
  *  $RETURNS$
@@ -74,7 +74,7 @@
  *  $ONELINER$
  *      Return the computer default printer name
  *  $SYNTAX$
- *      <cPrinter> := GETDEFAULTPRINTER()
+ *      GETDEFAULTPRINTER() -> <cPrinter>
  *  $ARGUMENTS$
  *      None
  *  $RETURNS$
@@ -108,7 +108,7 @@
  *  $ONELINER$
  *      Print a file to a windows printer in RAW mode
  *  $SYNTAX$
- *      <nResult> := PRINTFILERAW( <cPrinterName>, <cFileName> [, <cDocName>])
+ *      PRINTFILERAW( <cPrinterName>, <cFileName> [, <cDocName>]) -> <nResult>
  *  $ARGUMENTS$
  *      <cPrinter> = a valid windows printer name
  *      <cFileName>= a valid filename that exists and can be printed
@@ -165,7 +165,7 @@
  *  $ONELINER$
  *      See if a printer is installed
  *  $SYNTAX$
- *      <bInstalled> := PRINTEREXISTS( <cPrinterName>)
+ *      PRINTEREXISTS( <cPrinterName>) -> <bInstalled>
  *  $ARGUMENTS$
  *      <cPrinter> = a string that represents a printer name e.g. "HP LaserJet 1200 Series PCL"
  *  $RETURNS$
