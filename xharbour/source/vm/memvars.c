@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.11 2002/03/31 02:56:32 ronpinkas Exp $
+ * $Id: memvars.c,v 1.12 2002/04/01 21:09:17 ronpinkas Exp $
  */
 
 /*
@@ -564,6 +564,20 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
       if( pDyn->hMemvar )
       {
+         PHB_ITEM pReference = &s_globalTable[ pDyn->hMemvar ].item;
+
+         if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
+         {
+            char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
+
+            memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
+
+            pReference->item.asString.value = sString;
+            pReference->item.asString.bStatic = FALSE;
+            pReference->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+            *( pReference->item.asString.puiHolders ) = 1;
+         }
+
          /* value is already created */
          pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
          pItem->item.asMemvar.offset = 0;

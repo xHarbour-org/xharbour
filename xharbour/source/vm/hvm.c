@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.82 2002/06/19 21:52:48 ronpinkas Exp $
+ * $Id: hvm.c,v 1.83 2002/06/24 04:17:20 ronpinkas Exp $
  */
 
 /*
@@ -2403,21 +2403,14 @@ static void hb_vmPlus( void )
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       ULONG ulLen1     = pItem1->item.asString.length;
-
       ULONG ulLen2     = pItem2->item.asString.length;
 
-
-
       if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
-
       {
-
          ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
 
          if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.puiHolders ) > 1 ) )
-
          {
-
              pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
 
              hb_xmemcpy( (void * ) pNewString, (void *) pItem1->item.asString.value, ulLen1 );
@@ -2425,36 +2418,20 @@ static void hb_vmPlus( void )
              hb_itemReleaseString( pItem1 );
 
              pItem1->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-
              *( pItem1->item.asString.puiHolders ) = 1;
-
              pItem1->item.asString.bStatic = FALSE;
-
          }
-
          else
-
          {
-
              pNewString = pItem1->item.asString.value;
-
              pNewString = (char *) hb_xrealloc( (void *) pNewString, ulNewLen + 1 );
-
          }
-
-
 
          hb_xmemcpy( pNewString + ulLen1, pItem2->item.asString.value, ulLen2 );
 
-
-
          pItem1->item.asString.value   = pNewString;
-
          pItem1->item.asString.length  = ulNewLen;
-
          pItem1->item.asString.value[ ulNewLen ] = '\0';
-
-
 
          hb_stackPop();
       }
@@ -5061,8 +5038,23 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    /* we store its stack offset instead of a pointer to support a dynamic stack */
    pTop->item.asRefer.value = iLocal;
    pTop->item.asRefer.offset = hb_stackBaseOffset();
+
    if( iLocal >= 0 )
+   {
+      if( ( * ( hb_stack.pBase + iLocal + 1 ) )->type == HB_IT_STRING && ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.bStatic )
+      {
+         char *sString = (char*) hb_xgrab( ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.length + 1 );
+
+         memcpy( sString, ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.value, ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.length + 1 );
+
+         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.value = sString;
+         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.bStatic = FALSE;
+         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+         *( ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.puiHolders ) = 1;
+      }
+
       pTop->item.asRefer.BasePtr.itemsbasePtr = &hb_stack.pItems;
+   }
    else
    {
       /* store direct codeblock address because an item where a codeblock
@@ -5097,7 +5089,21 @@ static void hb_vmPushStatic( USHORT uiStatic )
 static void hb_vmPushStaticByRef( USHORT uiStatic )
 {
    HB_ITEM_PTR pTop = ( * hb_stack.pPos );
+   PHB_ITEM pReference = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
+
+   if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
+   {
+      char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
+
+      memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
+
+      pReference->item.asString.value = sString;
+      pReference->item.asString.bStatic = FALSE;
+      pReference->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      *( pReference->item.asString.puiHolders ) = 1;
+   }
 
    pTop->type = HB_IT_BYREF;
    /* we store the offset instead of a pointer to support a dynamic stack */

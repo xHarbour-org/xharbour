@@ -1,13 +1,13 @@
 rem @echo off
 rem
-rem $Id: bld.bat,v 1.4 2002/03/10 03:34:08 ronpinkas Exp $
+rem $Id: bld.bat,v 1.5 2002/06/22 02:24:51 lculik Exp $
 rem
 
 rem ---------------------------------------------------------------
-rem This is a generic template file, if it doesn't fit your own needs 
+rem This is a generic template file, if it doesn't fit your own needs
 rem please DON'T MODIFY IT.
 rem
-rem Instead, make a local copy and modify that one, or make a call to 
+rem Instead, make a local copy and modify that one, or make a call to
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
 
@@ -24,9 +24,9 @@ rem if "%HB_ARCHITECTURE%" == "" set HB_ARCHITECTURE=dos
 rem if "%HB_COMPILER%" == "" set HB_COMPILER=djgpp
 rem if "%HB_GT_LIB%" == "" set HB_GT_LIB=
 
-if "%HB_BIN_INSTALL%" == "" set HB_BIN_INSTALL=c:\xharbour\bin
-if "%HB_LIB_INSTALL%" == "" set HB_LIB_INSTALL=c:\xharbour\lib
-if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=c:\xharbour\include
+if "%HB_BIN_INSTALL%" == "" set HB_BIN_INSTALL=..\bin
+if "%HB_LIB_INSTALL%" == "" set HB_LIB_INSTALL=..\lib
+if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :START
 
@@ -55,8 +55,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=c:\xharbour\include
    echo       - w32   (HB_GT_LIB=gtwin by default)
    echo       - linux (HB_GT_LIB=gtstd by default)
    echo       - os2   (HB_GT_LIB=gtos2 by default)
-   echo.   
-   pause   
+   echo.
+   pause
    echo     HB_COMPILER:
    echo       - When HB_ARCHITECTURE=dos
    echo         - bcc16   (Borland C++ 3.x, 4.x, 5.0x, DOS 16-bit)
@@ -75,8 +75,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=c:\xharbour\include
    echo       - When HB_ARCHITECTURE=os2
    echo         - gcc     (EMX GNU C, OS/2 32-bit)
    echo         - icc     (IBM Visual Age C++ 3.0, OS/2 32-bit)
-   echo.   
-   pause   
+   echo.
+   pause
    echo     HB_GT_LIB:
    echo       - gtstd (Standard streaming) (for all architectures)
    echo       - gtdos (DOS console)        (for dos architecture)
@@ -140,7 +140,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=c:\xharbour\include
       goto END
 
 :A_DOS_BCC16_NOT
-                                          
+
    if not "%HB_COMPILER%" == "djgpp" goto A_DOS_DJGPP_NOT
 
       echo %1.c > build.tmp

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.297 2002/07/04 00:43:30 lculik Exp $
+ * $Id: ChangeLog,v 1.298 2002/07/05 19:46:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-05 12:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    ! Reverted Luiz change of hardcoded paths with relative paths. (Luiz ??? - This wasted an hour of my time!!!)
+
+  * source/vm/hvm.c
+    ! Minor fix to hb_vmPushLocalByRef() and hb_vmPushStsticByRef()
+
+  * source/vm/memvars.c
+    ! Minor fix to hb_memvarGetRefer()
 
 2002-07-05 12:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapifs.h
