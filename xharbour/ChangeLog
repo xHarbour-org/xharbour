@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3190 2004/07/22 14:29:04 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3191 2004/07/22 14:47:43 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 21:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+  * xharbour/source/rtl/gtwvt/wvtclass.prg
+  * xharbour/source/rtl/gtwvt/wvtpaint.prg
+    Fixed compiler warnings.
+
+  * xharbour/include/hbgtwvt.h
+    + s_.hDlgModeless slot to hold one modeless dialog window handle.
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    Optimization as to correct rectangle in terms fo rows/cols to be 
+    painted in WM_PAINT message. Earlier it was painting 2 rows and two 
+    cols more than required, i.e., { 4,4,10,20 } -> { 3,3,11,21 }
+    Due care has been taken if the painting is not initiated by any
+    GtWvt function, then entire region is painted.
+
+    + static BOOL CALLBACK hb_wvt_gtDlgProcModeless()
+    + HB_EXPORT HWND hb_wvt_gtCreateDialog()
+      Started logic to handle MODELESS dialogs from within the Gtwvt.
+
+  * xharbour/tests/wvtgui.prg
+    Fixed WvtLines() to respect window's focus change behavior.
+
+  * xharbour/source/vm/hvm.c
+    + HB_FUNC( HB_NOSTARTUPWINDOW )
+      Earlier, if no startup window was required, GtWvt.lib needed 
+      to be compiled with -D__WVT_NOSHOW_STARTUP__ cflag.
+      This behavior is now changed. Now you need to 
+      REQUEST Hb_NoStartupWindow
+      which will force the startup window to be HIDDEN which can be 
+      brought in view with Wvt_ShowWindow( S_RESTORE ).
 
 2004-07-22 18:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/filesys.c
