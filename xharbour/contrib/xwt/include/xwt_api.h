@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.h,v 1.4 2003/08/27 02:47:49 lculik Exp $
+   $Id: xwt_api.h,v 1.5 2003/08/27 20:53:44 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE - header
 */
@@ -63,10 +63,17 @@ typedef struct tag_xwt_rect
    int height;
 } XWT_RECT, *PXWT_RECT;
 
+typedef struct tag_xwt_string
+{
+   int iLength;
+   char *text;
+} XWT_STRING, *PXWT_STRING;
 
 typedef struct tag_xwt_property
 {
    int type;
+   BOOL bStatic;
+
    union {
       int number;
       XWT_POSITION position;
@@ -76,14 +83,17 @@ typedef struct tag_xwt_property
       PXWT_WIDGET widget;
       const char *text;
       void *data;
-      char * font;
+      char *font;
+      XWT_STRING string;
    } value;
+   
    union {
       char * fg;
       char * bg;
       char * base;
       char * text;
-      } color;
+   } color;
+   
 } XWT_PROPERTY, *PXWT_PROPERTY;
 
 #define XWT_CREATE_PROPERTY( name ) \
@@ -106,7 +116,7 @@ BOOL xwt_drv_destroy( PXWT_WIDGET wSelf );
 void xwt_drv_modal( PXWT_WIDGET wSelf );
 
 BOOL xwt_drv_init( int argc, char **argv );
-BOOL xwt_drv_quit();
-BOOL xwt_drv_process_events();
+BOOL xwt_drv_quit(void);
+BOOL xwt_drv_process_events(void);
 
 #endif

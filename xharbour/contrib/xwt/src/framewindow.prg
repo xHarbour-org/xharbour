@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: framewindow.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: framewindow.prg,v 1.3 2003/08/31 20:02:35 xthefull Exp $
 
    Frame window class. A window with a menu, a central area and a statusbar
 */
@@ -59,10 +59,12 @@ RETURN .T.
 
 METHOD Destroy() CLASS XWTFrameWindow
    LOCAL oMenu
-   
-   FOR EACH oMenu IN ::aMenus
-      oMenu:oOwner := NIL
-      oMenu:Destroy()
-   NEXT
+
+   IF ::aMenus != NIL   
+      FOR EACH oMenu IN ::aMenus
+         oMenu:oOwner := NIL
+         oMenu:Destroy()
+      NEXT
+   ENDIF
 
 RETURN ::Super:Destroy()

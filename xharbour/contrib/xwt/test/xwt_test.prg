@@ -1,7 +1,15 @@
+************************************************************
+* XWT_TEST. 
+*
+* Giancarlo Niccolai et al.:
+* (PLZ. add your copyright...)
+*
+* $Id$
+*
+
+
 #include "xwt.ch"
 #include "xwtcmd.ch"
-
-
 
 GLOBAL oFileSel
 GLOBAL oOtherBox

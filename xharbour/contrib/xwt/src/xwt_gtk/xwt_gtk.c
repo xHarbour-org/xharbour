@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.22 2003/09/02 22:42:32 lculik Exp $
+   $Id: xwt_gtk.c,v 1.23 2003/09/04 20:26:24 xthefull Exp $
 
    Global declarations, common functions
 
@@ -858,6 +858,9 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_TEXT:
          switch( wWidget->type )
          {
+            // GTK always return static data
+            prop->bStatic = TRUE;
+            
             case XWT_TYPE_WINDOW:
             case XWT_TYPE_FRAME:
                prop->value.text = gtk_window_get_title ( GTK_WINDOW(wSelf) );

@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.4 2003/09/25 14:24:52 paultucker Exp $
+# $Id: makefile.bc,v 1.5 2003/09/25 17:42:43 paultucker Exp $
 #
 
 #
@@ -108,7 +108,7 @@ INCLUDE_DIR  = include;..\..\include
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
+CFLAGS               = -I$(INCLUDE_DIR);src\xwt_win -d $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
 HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -159,7 +159,11 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\treelist.obj \
    $(OBJ_DIR)\viewport.obj \
    $(OBJ_DIR)\widget.obj \
-   $(OBJ_DIR)\window.obj
+   $(OBJ_DIR)\window.obj \
+   \
+   $(OBJ_DIR)\xwt_win.obj \
+   $(OBJ_DIR)\xwt_win_framewnd.obj \
+   $(OBJ_DIR)\xwt_win_msgbox.obj
 
 
 #
@@ -352,3 +356,11 @@ $(OBJ_DIR)\window.c : $(SRC_DIR)\window.prg
 $(OBJ_DIR)\window.obj : $(OBJ_DIR)\window.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\xwt_win.obj : $(SRC_DIR)\xwt_win\xwt_win.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\xwt_win_framewnd.obj : $(SRC_DIR)\xwt_win\xwt_win_framewnd.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\xwt_win_msgbox.obj : $(SRC_DIR)\xwt_win\xwt_win_msgbox.c
+   $(CC) $(CLIBFLAGS) -o$@ $**

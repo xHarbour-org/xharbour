@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.37 2003/09/02 22:42:30 lculik Exp $
+ * $Id: Changelog,v 1.38 2003/09/04 20:26:17 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-10 01:12 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+ 
+  + src/xwt_win/xwt_win.c
+  + src/xwt_win/xwt_win.h
+    + Added XWT driver for Windows
+
+  + src/xwt_win/xwt_win_framewnd.c
+    + Added minimal implementation of a frame window for XWT_WIN
+
+  * make_b32.bat
+  * makefile.bc
+    + Added xwt_win compilation
+
+  * src/xwt_api.c
+    ! Ingore NIL widgets to allow progressive driver implementations.
+
+  + test/bldtest.bat
+  + test/makefile.bc
+  + test/wndtest.prg
+    + Added test for windows
+
+  * include/xwt_api.h
+    ! style
+
+  * src/framewindow.prg
+    ! Do not delete menus when there are no menus...
+  
+  
+  + src/xwt_win/xwt_win_msgbox.c
+    + Added MessageBox (skeleton)
+
+  ! test/xwt_test.prg
+    ! Stylistic
 
 2003-09-04 22:21 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/xwt_gtk/xwt_gtk.c

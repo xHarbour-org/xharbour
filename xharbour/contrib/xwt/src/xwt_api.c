@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.13 2003/08/27 02:46:16 lculik Exp $
+   $Id: xwt_api.c,v 1.14 2003/08/27 20:53:07 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -157,8 +157,16 @@ HB_FUNC( XWT_FASTRISEEVENT )
 HB_FUNC( XWT_MODAL )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
-
+   PXWT_WIDGET wSelf;
+   
+   /* Unready driver widget? */
+   if ( pSelf == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
    xwt_drv_modal( wSelf );
 }
 /*******************************************************
@@ -190,8 +198,15 @@ HB_FUNC( XWT_CREATE )
 HB_FUNC( XWT_DESTROY )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
-
+   PXWT_WIDGET wSelf;
+   /* Unready driver widget? */
+   if ( pSelf == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
    hb_retl( xwt_drv_destroy( wSelf ) );
 }
 
@@ -199,8 +214,17 @@ HB_FUNC( XWT_DESTROY )
 HB_FUNC( XWT_SETPROPERTY )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+   PXWT_WIDGET wSelf;
    XWT_PROPERTY prop;
+   
+   /* Unready driver widget? */
+   if ( pSelf == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
 
    prop.type = hb_parni( 2 );
 
@@ -319,10 +343,19 @@ HB_FUNC( XWT_SETPROPERTY )
 HB_FUNC( XWT_GETPROPERTY )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+   PXWT_WIDGET wSelf;
    XWT_PROPERTY prop;
    PHB_ITEM pParam1, pParam2;
    BOOL bRet = FALSE;
+   
+   /* Unready driver widget? */
+   if ( pSelf == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
 
    prop.type = hb_parni( 2 );
    if ( ! xwt_drv_get_property( wSelf, &prop ) )
@@ -385,8 +418,15 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_FILENAME:
          if( pParam1 != NULL )
          {
-            hb_itemPutC( pParam1, (char *)prop.value.text );
-            bRet = TRUE;
+            if ( prop.bStatic )
+            {
+               hb_itemPutC( pParam1, (char *)prop.value.text );
+            }
+            else
+            {
+               hb_itemPutCRaw( pParam1, prop.value.string.text, prop.value.string.iLength );
+            } 
+            bRet = TRUE;    
          }
       break;
       // Font Parametre
@@ -474,8 +514,18 @@ HB_FUNC( XWT_ADD )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PHB_ITEM pChild = hb_param( 2, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
-   PXWT_WIDGET wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
+   PXWT_WIDGET wSelf;
+   PXWT_WIDGET wChild;
+
+   /* Unready driver widget? */
+   if ( pSelf == NULL || pChild == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+   wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
 
    hb_retl( xwt_drv_add( wSelf, wChild ) );
 }
@@ -484,8 +534,18 @@ HB_FUNC( XWT_REMOVE )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PHB_ITEM pChild = hb_param( 2, HB_IT_POINTER );
-   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
-   PXWT_WIDGET wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
+   PXWT_WIDGET wSelf;
+   PXWT_WIDGET wChild;
+
+   /* Unready driver widget? */
+   if ( pSelf == NULL || pChild == NULL ) 
+   { 
+      hb_retl( FALSE );
+      return;
+   }
+   
+   wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+   wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
    
    hb_retl( xwt_drv_remove( wSelf, wChild ) );
 }
