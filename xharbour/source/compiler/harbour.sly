@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.46 2003/05/31 15:22:12 paultucker Exp $
+ * $Id: harbour.sly,v 1.47 2003/08/14 08:44:21 ronpinkas Exp $
  */
 
 /*
@@ -130,6 +130,8 @@ static HB_EXPR_PTR pGetArgList = NULL, pBaseArrayName = NULL, pGetVarArray;
 
 static BOOL s_bBlock = FALSE, s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE, s_bSetGet;
 static HB_EXPR_PTR pBlockSimple;
+
+static int s_LastControlLine = 0;
 
 extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
@@ -456,6 +458,19 @@ LineStat   : Crlf          { $<lNumber>$ = 0; hb_comp_bDontGenLineNum = TRUE; }
            | Statement     { $<lNumber>$ = 1; }
            | Declaration   { $<lNumber>$ = 1; }
            | Line          { $<lNumber>$ = 1; }
+           | ControlError  { char LineAsString[10]; sprintf( LineAsString, "%i", s_LastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
+           ;
+
+ControlError : FunScope2 FUNCTION  IdentName Params Crlf {}
+             | FunScope2 PROCEDURE IdentName Params Crlf {}
+             ;
+
+FunScope2  :
+           | STATIC
+           | INIT
+           | EXIT
+           | CRITICAL
+           | CRITICAL_STATIC
            ;
 
 Statements : LineStat                  { $<lNumber>$ = $<lNumber>1; }
@@ -1824,7 +1839,7 @@ EmptyStats : /* empty */           { $<lNumber>$ = 0; }
            | EmptyStatements       { $<lNumber>$ = $<lNumber>1; }
            ;
 
-IfBegin    : IF Expression { ++hb_comp_wIfCounter; hb_compLinePush(); } Crlf
+IfBegin    : IF Expression { ++hb_comp_wIfCounter; hb_compLinePush(); s_LastControlLine = hb_comp_iLine; } Crlf
                            {
                               hb_compExprDelete( hb_compExprGenPush( $2 ) ); $$ = hb_compGenJumpFalse( 0 );
                            }
@@ -1888,7 +1903,7 @@ EndCase    : ENDCASE
                }
            ;
 
-DoCaseStart : DOCASE { ++hb_comp_wCaseCounter; } Crlf
+DoCaseStart : DOCASE { ++hb_comp_wCaseCounter; s_LastControlLine = hb_comp_iLine; } Crlf
             ;
 
 DoCaseBegin : DoCaseStart            { }
@@ -2005,7 +2020,7 @@ EndSwitch  : END
                }
            ;
 
-SwitchBegin : SWITCH Expression { hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0; hb_compExprGenPush( $2 ); hb_compLoopStart(); } Crlf
+SwitchBegin : SWITCH Expression { hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0; hb_compExprGenPush( $2 ); hb_compLoopStart(); s_LastControlLine = hb_comp_iLine; } Crlf
             ;
 
 SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
@@ -2179,7 +2194,7 @@ DoWhile    : WhileBegin Expression Crlf
                 }
            ;
 
-WhileBegin : WHILE    { $$ = hb_comp_functions.pLast->lPCodePos; hb_compLinePushIfInside(); ++hb_comp_wWhileCounter; hb_compLoopStart(); }
+WhileBegin : WHILE { $$ = hb_comp_functions.pLast->lPCodePos; hb_compLinePushIfInside(); ++hb_comp_wWhileCounter; hb_compLoopStart(); s_LastControlLine = hb_comp_iLine; }
            ;
 
 EndWhile   : END   { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
@@ -2205,10 +2220,17 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
              Crlf                                     /* 10 */
                {
                   if( $<asExpr>8 )
+                  {
                      hb_compGenPCode1( HB_P_FORTEST );
+                  }
                   else
+                  {
                      hb_compGenPCode1( HB_P_LESSEQUAL );
+                  }
+
                   $<lNumber>$ = hb_compGenJumpFalse( 0 );   /* 11 */
+
+                  s_LastControlLine = hb_comp_iLine;
                }
              ForStatements                            /* 12 */
                {
@@ -2288,6 +2310,8 @@ ForEach    : FOREACH IdentName  /* 1  2 */
              Crlf                                     /* 7 */
                { /* 8 */
                   $<lNumber>$ = hb_compGenJumpFalse( 0 );   /* 8 */
+
+                  s_LastControlLine = hb_comp_iLine;
                }
              ForStatements                            /* 9 */
                {
@@ -2300,12 +2324,12 @@ ForEach    : FOREACH IdentName  /* 1  2 */
                }
            ;
 
-WithObject   : WITHOBJ Expression { hb_compGenWithObject($2); } Crlf
+WithObject   : WITHOBJ Expression { hb_compGenWithObject($2); s_LastControlLine = hb_comp_iLine; } Crlf
                  EmptyStats
                END                { hb_compGenEndWithObject(); }
              ;
 
-BeginSeq   : BEGINSEQ { ++hb_comp_wSeqCounter; $<lNumber>$ = hb_compSequenceBegin(); } Crlf
+BeginSeq   : BEGINSEQ { ++hb_comp_wSeqCounter; $<lNumber>$ = hb_compSequenceBegin(); s_LastControlLine = hb_comp_iLine; } Crlf
                 EmptyStats
                 {
                   /* Set jump address for HB_P_SEQBEGIN opcode - this address
@@ -2374,6 +2398,8 @@ Try          : TRY
                   ++hb_comp_wSeqCounter; $<lNumber>$ = hb_compSequenceBegin();
 
                   hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_SETTRY", TRUE ) ), NULL ) ) );
+
+                  s_LastControlLine = hb_comp_iLine;
                }
                Crlf
                EmptyStats

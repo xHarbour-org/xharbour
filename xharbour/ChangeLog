@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1521 2003/09/26 00:15:29 paultucker Exp $
+ * $Id: ChangeLog,v 1.1522 2003/09/26 08:22:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-26 13:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/hbgenerr.c
+    * Changed "Unclosed control structures" to "Unclosed control structure (at line: %s)"
+  * source/compiler/harbour.sly
+    + Added logic to report unclosed control structures, instead of generic "Parse error ..."
 
 2003-09-26 10:21 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hbxml.c
@@ -35,7 +41,7 @@
   * contrib/xwt/make_b32.bat
   * contrib/xwt/makefile.bc
     * Correct CLEAN support
-    
+
 2003-09-25 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + doc/en/print.txt
     * Docs for Getprinters() and GetDefaultPrinter() function
