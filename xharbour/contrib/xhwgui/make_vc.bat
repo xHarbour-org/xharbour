@@ -7,17 +7,12 @@ if not exist obj\vc md obj\vc
 if not exist lib md lib
 if not exist lib\vc md lib\vc
 
+SET _CF_=%CFLAGS%
+
 :BUILD
 
-rem why?
-   set _Cf_=%CFLAGS%
    SET CFLAGS=-D__EXPORT__ -DHB_API_MACROS -DHB_STACK_MACROS -DHB_FM_STATISTICS_OFF
-
    nmake /Fmakefile.vc %1 %2 %3 > make_vc.log
-
-   SET CFLAGS=%_CF_%
-   SET _CF_=
-
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -37,4 +32,5 @@ rem why?
   if exist make_vc.log del make_vc.log
 
 :EXIT
-
+   SET CFLAGS=%_CF_%
+   SET _CF_=
