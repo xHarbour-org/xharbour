@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2564 2004/03/12 18:19:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2565 2004/03/12 18:22:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-13 02:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    - remove PRG level functions APPENDTODB() and DBF2TEXT()
+    ! move the entire __DBDELIM() to dbcmd.c.
+      Now __DBDELIM() completely uses C code
+
+  * source/rtl/dbdelim.prg
+    ! put the entire codes into #ifdef __USE_OLD__
 
 2004-03-12 10:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg

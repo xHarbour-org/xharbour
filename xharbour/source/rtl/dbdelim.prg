@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.10 2004/03/10 12:15:37 andijahja Exp $
+ * $Id: dbdelim.prg,v 1.11 2004/03/10 19:24:56 andijahja Exp $
  */
 
 /*
@@ -51,11 +51,17 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#ifdef __USE_OLD__
+/*
+   AJ: 2004-03-12
+   Move the entire codes to dbcmd.c
+*/
 #include "hbcommon.ch"
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.10 2004/03/10 12:15:37 andijahja Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.11 2004/03/10 19:24:56 andijahja Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -106,11 +112,6 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
       nStart := 0
       nCount := -1
    ENDIF
-   IF EMPTY( bFor )
-      // This simplifies the test that determines whether or not to
-      // use (i.e., import or export) any given processed record.
-      bFor := {||.T.}
-   ENDIF
 
    IF lExport
       // COPY TO DELIMITED
@@ -126,10 +127,6 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
                GO (nStart)
             ENDIF
          ENDIF
-         IF EMPTY( bWhile )
-            // This simplifies the looping logic.
-            bWhile := {||.T.}
-         ENDIF
 
          DBF2TEXT( bWhile, bFor, aFields, cDelim, handle, cSeparator, nCount )
 
@@ -141,10 +138,6 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
       IF handle == F_ERROR
          Eval( ErrorBlock(), __dbDelimErr( EG_OPEN, 1001, cFileName ) )
       ELSE
-         IF EMPTY( bWhile )
-            // This simplifies the looping logic.
-            bWhile := {||.T.}
-         ENDIF
 
          FClose( handle )
          AppendToDb( cFileName, cSeparator )
@@ -168,3 +161,4 @@ STATIC FUNCTION __dbDelimErr( genCode, subCode, cFileName )
    oErr:osCode     := FERROR()
 
    Return oErr
+#endif

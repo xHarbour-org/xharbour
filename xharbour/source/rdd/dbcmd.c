@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.92 2004/03/10 23:21:46 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.93 2004/03/11 01:26:07 andijahja Exp $
  */
 
 /*
@@ -5011,127 +5011,127 @@ HB_FUNC( DBSKIPPER )
 /*
   AJ: Added 2004-03-10
 */
-HB_FUNC( APPENDTODB )
+// Import values from delimited text file
+static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
 {
    HB_THREAD_STUB
 
-   if( s_pCurrArea )
+   if ( pDelimitedFile )
    {
-      PHB_ITEM pDelimitedFile = hb_param( 1, HB_IT_STRING );
-      PHB_ITEM pDelimiter = hb_param( 2, HB_IT_STRING );
+      // Getting return value from FARSEEX()
+      PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
 
-      if ( pDelimitedFile )
+      ULONG ulContent = pContent->item.asArray.value->ulLen;
+      HB_ITEM Structure;
+      USHORT uiStruct;
+      ULONG ulData;
+
+      Structure.type = HB_IT_NIL;
+      hb_dbfStructure( &Structure );
+      uiStruct = ( USHORT ) (&Structure)->item.asArray.value->ulLen;
+
+      if ( ulContent > 0 )
       {
-         PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
-
-         ULONG ulContent = pContent->item.asArray.value->ulLen;
-         HB_ITEM Structure;
-         USHORT uiStruct;
-         ULONG ulData;
-
-         Structure.type = HB_IT_NIL;
-         hb_dbfStructure( &Structure );
-         uiStruct = ( USHORT ) (&Structure)->item.asArray.value->ulLen;
-
-         if ( ulContent > 0 )
+         for ( ulData = 0; ulData < ulContent; ulData ++ )
          {
-            for ( ulData = 0; ulData < ulContent; ulData ++ )
+            PHB_ITEM pData = hb_arrayGetItemPtr( pContent, ulData + 1 );
+            USHORT uiData = ( USHORT ) pData->item.asArray.value->ulLen;
+            USHORT uiField = ( uiData < uiStruct ) ? uiData : uiStruct;
+            USHORT ui;
+
+            s_bNetError = FALSE;
+
+            if( SELF_APPEND( ( AREAP ) s_pCurrArea->pArea, TRUE ) == FAILURE )
             {
-               PHB_ITEM pData = hb_arrayGetItemPtr( pContent, ulData + 1 );
-               USHORT uiData = ( USHORT ) pData->item.asArray.value->ulLen;
-               USHORT uiField = ( uiData < uiStruct ) ? uiData : uiStruct;
-               USHORT ui;
-
-               s_bNetError = FALSE;
-
-               if( SELF_APPEND( ( AREAP ) s_pCurrArea->pArea, TRUE ) == FAILURE )
+               s_bNetError = TRUE;
+            }
+            else
+            {
+               for ( ui = 0; ui < uiField ; ui ++ )
                {
-                  s_bNetError = TRUE;
-               }
-               else
-               {
-                  for ( ui = 0; ui < uiField ; ui ++ )
+                  HB_ITEM FieldValue;
+                  PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
+                  char *cBuffer = hb_arrayGetC( pData, ui + 1 );
+                  char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
+
+                  ( &FieldValue )->type = HB_IT_NIL;
+
+                  /* Create PHB_ITEM to be FIELDPUTted */
+                  switch( cFieldType[0] )
                   {
-                     HB_ITEM FieldValue;
-                     PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
-                     char *cBuffer = hb_arrayGetC( pData, ui + 1 );
-                     char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
+                     /* It's a DATE field */
+                     case 'D':
+                        hb_itemPutDS( &FieldValue, cBuffer );
+                        break;
 
-                     ( &FieldValue )->type = HB_IT_NIL;
-
-                     /* Create PHB_ITEM to be FIELDPUTted */
-                     switch( cFieldType[0] )
+                     /* It's a LOGICAL field '*/
+                     case 'L':
                      {
-                        /* It's a DATE field */
-                        case 'D':
-                           hb_itemPutDS( &FieldValue, cBuffer );
-                           break;
-
-                        /* It's a LOGICAL field '*/
-                        case 'L':
-                        {
-                           BOOL bTrue;
-                           hb_strupr( cBuffer );
-                           bTrue = ( cBuffer[0] == 'T' );
-                           hb_itemPutL( &FieldValue, bTrue );
-                           break;
-                        }
-
-                        /* It's a NUMERIC field */
-                        case 'N':
-                           hb_itemPutND( &FieldValue, hb_strVal( cBuffer ) );
-                           break;
-
-                        /* It's a CHARACTER field */
-                        default:
-                           hb_itemPutC( &FieldValue, cBuffer );
-                           break;
+                        BOOL bTrue;
+                        hb_strupr( cBuffer );
+                        bTrue = ( cBuffer[0] == 'T' );
+                        hb_itemPutL( &FieldValue, bTrue );
+                        break;
                      }
 
-                     /* FieldPut */
-                     SELF_PUTVALUE( ( AREAP ) s_pCurrArea->pArea, ui + 1, &FieldValue );
+                     /* It's a NUMERIC field */
+                     case 'N':
+                        hb_itemPutND( &FieldValue, hb_strVal( cBuffer ) );
+                        break;
 
-                     /* Clean Ups */
-                     hb_itemClear( &FieldValue );
-                     hb_xfree( cBuffer );
-                     hb_xfree( cFieldType );
+                     /* It's a CHARACTER field */
+                     default:
+                        hb_itemPutC( &FieldValue, cBuffer );
+                        break;
                   }
+
+                  /* FieldPut */
+                  SELF_PUTVALUE( ( AREAP ) s_pCurrArea->pArea, ui + 1, &FieldValue );
+
+                  /* Clean Ups */
+                  hb_itemClear( &FieldValue );
+                  hb_xfree( cBuffer );
+                  hb_xfree( cFieldType );
                }
             }
          }
-         /* Clean Ups */
-         hb_itemClear( &Structure );
-         hb_itemRelease( pContent );
       }
-   }
-   else
-   {
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "APPENDTODB" );
+      /* Clean Ups */
+      hb_itemClear( &Structure );
+      hb_itemRelease( pContent );
    }
 }
 
-static BOOL ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
+// Export field values to text file
+static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 {
    switch( pValue->type )
    {
+      // a "C" field
       case HB_IT_STRING:
       {
          char *szString;
          char *szText = pValue->item.asString.value;
          USHORT iSzLen = ( USHORT ) pValue->item.asString.length;
 
+         // RTRIM( szText )
          while( iSzLen && HB_ISSPACE( szText[ iSzLen - 1 ] ) )
          {
             iSzLen--;
          }
          szText[ iSzLen ] = '\0';
 
+         // szString := cDelim + szText + cDelim
          szString = hb_xstrcpy( NULL,cDelim,szText,cDelim,NULL);
 
+         // FWrite( handle, szString )
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+
+         // Orphaned, get rif off it
          hb_xfree( szString );
          break;
       }
+      // a "D" field
       case HB_IT_DATE:
       {
          char *szDate = (char*) hb_xgrab( 9 );
@@ -5141,11 +5141,13 @@ static BOOL ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          hb_xfree( szDate );
          break;
       }
+      // an "L" field
       case HB_IT_LOGICAL:
       {
          hb_fsWriteLarge( handle, (BYTE*) ( pValue->item.asLogical.value ? "T" : "F" ), 1 );
          break;
       }
+      // an "N" field
       case HB_IT_NUMERIC:
       {
          char * szResult = hb_itemStr( pValue, NULL, NULL );
@@ -5162,150 +5164,367 @@ static BOOL ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          }
          break;
       }
+      // an "M" field or the other, might be a "V" in SixDriver
       default:
+      // We do not want MEMO contents
          return FALSE;
    }
    return TRUE;
 }
 
+// Eval( bBlock )
 static BOOL hb___Eval( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
-   hb_vmPushSymbol( &hb_symEval );
-   hb_vmPush( pItem );
-   hb_vmDo( 0 );
-   return (&HB_VM_STACK.Return)->item.asLogical.value ;
+   if( pItem )
+   {
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pItem );
+      hb_vmDo( 0 );
+      return (&HB_VM_STACK.Return)->item.asLogical.value ;
+   }
+   return TRUE;
 }
 
-HB_FUNC( DBF2TEXT )
+// Export DBF content to text file
+static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
+                        char *cDelim, FHANDLE handle, BYTE *cSep, int nCount )
+{
+   HB_THREAD_STUB
+
+   int iSepLen;
+   USHORT uiFields = 0;
+   USHORT ui;
+   HB_ITEM Tmp;
+   BOOL bWriteSep = FALSE;
+
+   BOOL bEof = TRUE;
+   BOOL bBof = TRUE;
+
+   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+
+   if( ! handle )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBF2TEXT" );
+      return;
+   }
+
+   if ( !cDelim )
+   {
+      cDelim = "\"";
+   }
+
+   if ( cSep )
+   {
+      iSepLen = strlen( (char*) cSep );
+   }
+   else
+   {
+      cSep = (BYTE*) ',';
+      iSepLen = 1;
+   }
+
+   SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
+
+   Tmp.type = HB_IT_NIL;
+
+   while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+   {
+      // While !BOF() .AND. !EOF()
+      SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bEof );
+      SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBof );
+
+      if ( bEof || bBof )
+      {
+         break;
+      }
+
+      // For condition is met
+      // if For is NULL, hb__Eval returns TRUE
+      if ( hb___Eval ( pFor ) )
+      {
+         // User does not request fields, copy all fields
+         if ( bNoFieldPassed )
+         {
+            for ( ui = 1; ui <= uiFields; ui ++ )
+            {
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, ui, &Tmp );
+               bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
+               hb_itemClear( &Tmp );
+            }
+         }
+         // Only requested fields are exorted here
+         else
+         {
+            USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
+            USHORT uiItter;
+
+            for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+            {
+               char *szFieldName = hb_arrayGetC( pFields, uiItter );
+
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               if ( szFieldName )
+               {
+                  int iFieldLen = strlen( szFieldName );
+                  char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
+                  int iPos;
+
+                  hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
+                  iPos = hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName );
+                  hb_xfree( szName );
+
+                  SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, iPos, &Tmp );
+                  bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
+                  hb_itemClear( &Tmp );
+               }
+
+               hb_xfree( szFieldName );
+            }
+         }
+         hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
+         bWriteSep = FALSE;
+      }
+
+      if ( nCount != -1 )
+      {
+         nCount-- ;
+      }
+
+      // DBSKIP()
+      SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+   }
+
+   // Writing EOF
+   hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
+}
+
+/*
+   AJ: 2004-03-12
+   This concludes removal of the entire PRG codes for __DBDELIM()
+*/
+HB_FUNC( __DBDELIM )
 {
    HB_THREAD_STUB
 
    if( s_pCurrArea )
    {
-      PHB_ITEM pWhile = hb_param( 1, HB_IT_BLOCK );
-      PHB_ITEM pFor = hb_param( 2, HB_IT_BLOCK );
-      PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
-      char *cDelim;
-      int handle = hb_parnl( 5 );
-      BYTE *cSep;
-      int iSepLen;
-      int nCount = hb_parni( 7 );
-      USHORT uiFields = 0;
-      USHORT ui;
-      HB_ITEM Tmp;
-      BOOL bWriteSep = FALSE;
+      PHB_ITEM pError = NULL;
+      BOOL bExport = hb_parl( 1 );
+      char *cFileName = hb_parc( 2 );
+      PHB_ITEM pDelimArg = hb_param( 3, HB_IT_STRING );
+      char *cDelimArg;
+      PHB_ITEM pFields = hb_param( 4, HB_IT_ARRAY );
+      PHB_ITEM pFor = hb_param( 5, HB_IT_BLOCK );
+      PHB_ITEM pWhile = hb_param( 6, HB_IT_BLOCK );
+      PHB_ITEM pNext = hb_param( 7, HB_IT_NUMERIC );
+      PHB_ITEM pRecord = hb_param( 8, HB_IT_NUMERIC );
+      PHB_ITEM pRest = hb_param( 9, HB_IT_LOGICAL );
 
-      BOOL bEof = TRUE;
-      BOOL bBof = TRUE;
+      PHB_FNAME pFileName;
+      FHANDLE handle;
+      LONG lStart, lCount;
+      BYTE *cSeparator = (BYTE*) ",";
+      BYTE *cDelim = (BYTE*) "\"";
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
 
-      BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+      BOOL bRetry;
 
-      if( ! handle || ! ISNUM( 7 ) )
+      if( pDelimArg )
       {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBF2TEXT" );
-         return;
-      }
+         cDelimArg = hb_strupr( pDelimArg->item.asString.value );
 
-      if ( ISCHAR( 4 ) )
-      {
-         cDelim = hb_parc( 4 );
-      }
-      else
-      {
-         cDelim = "\"";
-      }
-
-      if ( ISCHAR( 6 ) )
-      {
-         cSep = (BYTE*) hb_parc( 6 );
-         iSepLen = hb_parclen( 6 );
-      }
-      else
-      {
-         cSep = (BYTE*) ',';
-         iSepLen = 1;
-      }
-
-      SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
-
-      Tmp.type = HB_IT_NIL;
-
-      while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
-      {
-         SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bEof );
-         SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBof );
-
-         if ( bEof || bBof )
+         if ( strcmp ( cDelimArg, "BLANK" ) == NULL )
          {
-            break;
+            cDelim = (BYTE*) "";
+            cSeparator = (BYTE*) " ";
          }
-
-         if ( hb___Eval ( pFor ) )
+         else
          {
-            if ( bNoFieldPassed )
-            {
-               for ( ui = 1; ui <= uiFields; ui ++ )
-               {
-                  if ( bWriteSep )
-                  {
-                     hb_fsWriteLarge( handle, cSep, iSepLen );
-                  }
+            strncpy( (char*) cDelim, cDelimArg, 1 );
+         }
+      }
 
-                  SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, ui, &Tmp );
-                  bWriteSep = ExportVar( handle, &Tmp, cDelim );
-                  hb_itemClear( &Tmp );
+      // Process the file name argument.
+      pFileName = hb_fsFNameSplit( cFileName );
+
+      if ( ! pFileName->szExtension )
+      {
+         // No file name extension, so provide the default.
+         pFileName->szExtension = ".txt";
+      }
+
+      hb_fsFNameMerge( szFileName, pFileName );
+
+      // Immediately cleared things, don't want it no more
+      hb_xfree( pFileName );
+
+      // Determine where to start and how many records to process.
+      if( pRecord )
+      {
+        // The RECORD clause has the highest priority.
+         lStart = hb_parnl( 8 );
+         lCount = 1;
+      }
+      else if ( pNext )
+      {
+         // The NEXT clause has the next highest priority.
+         lStart = -1;
+         lCount = hb_parnl( 7 );
+      }
+      else if ( pWhile || ( pRest && pRest->item.asLogical.value ) )
+      {
+         // The WHILE and REST clauses have equal priority.
+         lStart = -1;
+         lCount = -1;
+      }
+      else
+      {
+         // Followed by the FOR clause or the ALL clause.
+         lStart = 0;
+         lCount = -1;
+      }
+
+      // COPY TO DELIMITED
+      if ( bExport )
+      {
+         // Try to create text file 
+         do
+         {
+            handle = hb_fsCreate( (BYTE*) szFileName, FC_NORMAL );
+
+            if( handle == F_ERROR )
+            {
+               if( pError == NULL )
+               {
+                  pError = hb_errNew();
+                  hb_errPutSeverity( pError, ES_ERROR );
+                  hb_errPutGenCode( pError, EG_CREATE );
+                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
+                  hb_errPutSubCode( pError, 1002 ); // Where is the Macro ?
+                  hb_errPutFileName( pError, szFileName );
+                  hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
+                  hb_errPutSubSystem( pError, "DELIM" );
                }
+
+               hb_errPutOsCode( pError, hb_fsError() );
+               bRetry = hb_errLaunch( pError );
             }
             else
             {
-               USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
-               USHORT uiItter;
-
-               for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
-               {
-                  char *szFieldName = hb_arrayGetC( pFields, uiItter );
-
-                  if ( bWriteSep )
-                  {
-                     hb_fsWriteLarge( handle, cSep, iSepLen );
-                  }
-
-                  if ( szFieldName )
-                  {
-                     int iFieldLen = strlen( szFieldName );
-                     char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
-                     int iPos;
-
-                     hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
-                     iPos = hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName );
-                     hb_xfree( szName );
-
-                     SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, iPos, &Tmp );
-                     bWriteSep = ExportVar( handle, &Tmp, cDelim );
-                     hb_itemClear( &Tmp );
-                  }
-
-                  hb_xfree( szFieldName );
-               }
+               bRetry = FALSE;
             }
-            hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
-            bWriteSep = FALSE;
-         }
+         } while( bRetry );
 
-         if ( nCount != -1 )
+         if( pError )
          {
-            nCount-- ;
+            hb_itemRelease( pError );
+            pError = NULL;
          }
 
-         SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-      }
+         if ( lStart > -1 )
+         {
+            // Only reposition if a starting record was specified or implied.
+            if ( lStart == 0 )
+            {
+               // DBGOTOP()
+               SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
+            }
+            else
+            {
+               // DBGOTO( lStart )
+               HB_ITEM pGoto;
+               pGoto.type = HB_IT_NIL;
+               hb_itemPutNL( &pGoto, lStart );
+               SELF_GOTOID( ( AREAP ) s_pCurrArea->pArea, &pGoto );
+               // Clean up
+               hb_itemClear( &pGoto );
+            }
+         }
 
-      hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
+         // Doing things now
+         hb_Dbf2Text( pWhile, pFor, pFields, (char*) cDelim, handle, cSeparator, lCount );
+
+         hb_fsClose( handle );
+      }
+      // APPEND FROM DELIMITED
+      else
+      {
+         // Container to pass to AppendToDb() 
+         HB_ITEM pDelimitedFile;
+         HB_ITEM pSep;
+
+         // NIL them at the first place 
+         pDelimitedFile.type = HB_IT_NIL;
+         pSep.type = HB_IT_NIL;
+
+         // Try to open the delimited text file
+         do
+         {
+            handle = hb_fsOpen( (BYTE*) szFileName, FO_READ | FO_COMPAT );
+
+            // Booo error in opening file 
+            if( handle == F_ERROR )
+            {
+               // Only create object once in this loop
+               if( pError == NULL )
+               {
+                  pError = hb_errNew();
+                  hb_errPutSeverity( pError, ES_ERROR );
+                  hb_errPutGenCode( pError, EG_OPEN );
+                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
+                  hb_errPutSubCode( pError, 1001 ); // Where is the Macro ?
+                  hb_errPutFileName( pError, szFileName );
+                  hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
+                  hb_errPutSubSystem( pError, "DELIM" );
+               }
+
+               hb_errPutOsCode( pError, hb_fsError() );
+
+               // Execute the error handler 
+               bRetry = hb_errLaunch( pError );
+            }
+            else
+            {
+               bRetry = FALSE;
+            }
+         } while( bRetry );
+
+         if( pError )
+         {
+            hb_itemRelease( pError );
+            pError = NULL;
+         }
+
+         // We don't need this handle as the process is done in FPARSEEX() 
+         hb_fsClose( handle );
+
+         // Assign value to HB_ITEM 
+         hb_itemPutC( &pSep, (char*) cSeparator );
+         hb_itemPutC( &pDelimitedFile, szFileName );
+
+         // The Job is being done here 
+         hb_AppendToDb( &pDelimitedFile, &pSep );
+
+         // Clean ups
+         hb_itemClear( &pSep );
+         hb_itemClear( &pDelimitedFile );
+      }
+      // We are Done!
    }
    else
    {
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBF2TXT" );
+      // No workarea to do the job
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "__DBDELIM" );
    }
 }
