@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2317 2004/02/18 20:15:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.2318 2004/02/18 21:35:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -160,6 +160,38 @@
     * minor reorder
   * source/vm/macro.c
     * cast on xgrab call
+
+2004-02-15 20:10 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/adsfunc.c
+    * moved adsGetNumActiveLinks() inside #ifdef ADS_REQUIRE_VERSION6
+
+  * contrib/rdd_ads/ads1.c
+    * fixed pointer overflow when freeing a workarea after reading
+      a timestamp value.
+
+    * Set minimum buffer to
+         pArea->maxFieldLen = 24
+      to accommodate extended types whose lengths may be 24 (timestamps
+      can include 3 digits for milliseconds).
+      Removed redundant call to server for all numerics.
+
+    * added these fixes by Mindaugas Kavaliauskas:
+      * adsDeleted() comment was incorrect and eof handling is cleaner now.
+      * OrdSetFocus("") did not set order to 0
+
+      * Bug: DBORDERINFO(DBOI_SCOPETOP), DBORDERINFO(DBOI_SCOPEBOTTOM)
+        returned "" instead of NIL if NO INDEX is selected.
+
+      * Bug: DBORDERINFO(DBOI_SCOPETOP), DBORDERINFO(DBOI_SCOPEBOTTOM) returns
+        invalid value on date indexes if CDX or ADT indexes used
+
+      * Bug: ORDSETSCOPE() does not work if index key contains CHR(0)
+         BH: I did not test this one, though it seemed a simple and correct fix.
+
+      * OrdKeyCount() was very slow because it counted records using skip
+        if a scope was set. If no filter is set, this could be optimized.
+        Now if no filter is used it is much faster!
+
 
 2004-02-15 20:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprop.h
