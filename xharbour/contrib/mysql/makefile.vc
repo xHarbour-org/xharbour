@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/05/27 15:19:12 paultucker Exp $
+# $Id: makefile.vc,v 1.2 2003/10/10 13:33:52 paultucker Exp $
 #
 
 #
@@ -10,9 +10,9 @@
 # NOTE: You can use these envvars to configure the make process:
 #       (note that these are all optional)
 #
-#       CFLAGS       - Extra C compiler options for libraries and for 
+#       CFLAGS       - Extra C compiler options for libraries and for
 #                      executables
-#       C_USR        - Extra C compiler options for libraries and for 
+#       C_USR        - Extra C compiler options for libraries and for
 #                      executables (GNU make compatible envvar)
 #       CLIBFLAGS    - Extra C compiler options for the libraries
 #       HARBOURFLAGS - Extra Harbour compiler options
@@ -66,7 +66,7 @@ TOOLS_DIR    = .
 #
 
 AS             = masm
-CFLAGS         = -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)
+CFLAGS         = -I$(INCLUDE_DIR) -Ic:\mysql\include -TP -W3 -nologo -DHB_OS_WIN_32_USED $(C_USR) $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG = -Zi $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -145,4 +145,6 @@ $(TOOLS_LIB) : $(TOOLS_LIB_OBJS)
 # dummy targets used for prg to c creation
 
 $(TOOLS_LIB)2  : $(TOOLS_LIB_OBJS)
+
+
 
