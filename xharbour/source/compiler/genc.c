@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.94 2005/04/02 21:13:47 andijahja Exp $
+ * $Id: genc.c,v 1.96 2005/04/06 02:18:04 andijahja Exp $
  */
 
 /*
@@ -38,9 +38,6 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCInLine( FILE* ) ;
 static void hb_writeEndInit( FILE* yyc );
-static char *hb_comParseLine( char *sz, BOOL );
-static BOOL hb_compNewLine( char * sz, BOOL );
-static char ** hb_comExternSplit ( char *string, int *iWord );
 static void hb_compGenCAddProtos( FILE *yyc );
 
 // AJ: 2004-02-05
@@ -92,9 +89,8 @@ extern char *hb_Command_Line;
 */
 FILE *hb_comp_pCodeList = NULL;
 
-#define HB_PROTO_FUNC_REQUEST 1
-#define HB_PROTO_FUNC_STATIC  2
-#define HB_PROTO_FUNC_PUBLIC  3
+#define HB_PROTO_FUNC_STATIC  1
+#define HB_PROTO_FUNC_PUBLIC  2
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
@@ -447,18 +443,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
-#if defined( HB_NO_STATIC_FUNC_START )
-               /*
-                  We found first public function in program body and
-                  make it starting procedure.
-               */
-               if ( !bSymFIRST && !hb_compFunCallFind( pSym->szName ) && !hb_comp_bNoStartUp )
-               {
-                  fprintf( yyc, " | HB_FS_FIRST" );
-                  iStartupOffset = iSymOffset;
-                  bSymFIRST = TRUE;
-               }
-#endif
             }
 
             if( pSym->cScope & VS_MEMVAR )
@@ -471,11 +455,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, " | HB_FS_MESSAGE" );
             }
 
-#if !defined( HB_NO_STATIC_FUNC_START )
             if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) )
-#else
-            if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) && !( pSym->cScope & HB_FS_STATIC )  && ( ! bSymFIRST ) )
-#endif
             {
                fprintf( yyc, " | HB_FS_FIRST" );
                iStartupOffset = iSymOffset;
@@ -697,73 +677,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    }
    else
    {
-      /*
-         We do not have an ordinary PRG code in file
-      */
-      if ( pInline && pInline->pCode )
-      {
-         hb_compGenCInLineSymbol();
-      }
-
-      /*
-        We have functions in dump areas
-      */
-      if ( pStatSymb )
-      {
-         fprintf( yyc, "#include \"hbvmpub.h\"\n" );
-
-         if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
-         {
-            fprintf( yyc, "#include \"hbpcode.h\"\n" );
-         }
-
-         fprintf( yyc, "#include \"hbinit.h\"\n\n" );
-         fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
-
-         fprintf( yyc, "#undef HB_PRG_PCODE_VER\n" );
-         fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n\n", (int) HB_PCODE_VER );
-
-         hb_compGenCAddProtos( yyc );
-
-         hb_compWriteGlobalFunc( yyc, &iLocalGlobals, &iGlobals );
-
-         fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
-
-         hb_compWriteExternEntries( yyc, &bSymFIRST );
-
-         /*
-            End of initialization codes
-         */
-         hb_writeEndInit( yyc );
-
-         hb_compWriteDeclareGlobal( yyc );
-
-         /*
-            Function bodies are processed here
-         */
-         pInline = hb_comp_inlines.pFirst;
-
-         if ( pInline && pInline->pCode )
-         {
-            hb_compGenCInLine( yyc );
-         }
-
-         /*
-            Function body for Global Registration
-         */
-         if( iLocalGlobals )
-         {
-            fprintf( yyc, "\nHB_FUNC_REGISTERGLOBAL()\n"
-                          "{\n"
-                          "   hb_vmRegisterGlobals( &pGlobals, %i );\n", iGlobals );
-            fprintf( yyc, "}\n" );
-         }
-
-      }
-      else
-      {
-         fprintf( yyc, "/* Empty source file */\n\n" );
-      }
+      fprintf( yyc, "/* Empty source file */\n\n" );
    }
 
    fclose( yyc );
@@ -884,13 +798,6 @@ static void hb_compWriteExternEntries( FILE *yyc, BOOL *bSymFIRST )
       BOOL bWrite = TRUE;
       switch ( pTemp->Type )
       {
-         case HB_PROTO_FUNC_REQUEST:
-            bWrite = (!hb_compCStaticSymbolFound( pTemp->szName, HB_PROTO_FUNC_STATIC ));
-            if( bWrite )
-            {
-               fprintf( yyc, "{ \"%s\", HB_FS_PUBLIC, {HB_FUNCNAME( %s )}, NULL }",pTemp->szName,pTemp->szName);
-            }
-            break;
          case HB_PROTO_FUNC_STATIC:
             fprintf( yyc, "{ \"%s\", HB_FS_STATIC, {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pTemp->szName, pTemp->szName );
             break;
@@ -998,14 +905,7 @@ static void hb_compGenCAddProtos( FILE *yyc )
    {
       if(!hb_compSymbFound( pTemp->szName ))
       {
-         if ( pTemp->Type == HB_PROTO_FUNC_REQUEST )
-         {
-            if (!hb_compCStaticSymbolFound( pTemp->szName, HB_PROTO_FUNC_STATIC ) )
-	    {
-               fprintf( yyc, "HB_FUNC_EXTERN( %s );\n",pTemp->szName);
-	    }
-         }
-         else if ( pTemp->Type == HB_PROTO_FUNC_STATIC )
+         if ( pTemp->Type == HB_PROTO_FUNC_STATIC )
          {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pTemp->szName );
          }
@@ -1152,8 +1052,8 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
                 sInline[2] == 'M' &&
                 sInline[3] == 'E' )
       {
-         iOption = HB_PROTO_FUNC_REQUEST;
          sInline += 4;
+	 continue;
       }
       /* If it is a HB_FUNC_PTR then skip it */
       else if ( sInline[0] == '_' &&
@@ -1183,8 +1083,8 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
                 sInline[3] == 'E' &&
                 sInline[4] == 'C' )
       {
-         iOption = HB_PROTO_FUNC_REQUEST;
          sInline += 5;
+	 continue;
       }
       /* If it is a HB_FUNC_STATIC we want it */
       else if ( sInline[0] == '_' &&
@@ -1240,9 +1140,6 @@ static void hb_compGenCInLineSymbol()
       {
          hb_compGenCCheckInLineStatic( sInline );
          hb_xfree( sInline );
-         sInline = hb_stripOutComments( (char*) pInline->pCode );
-         hb_comParseLine( sInline, FALSE );
-         hb_xfree( sInline );
          pInline = pInline->pNext;
       }
    }
@@ -1255,7 +1152,6 @@ static void hb_compGenCInLine( FILE *yyc )
 {
    PINLINE pInline = hb_comp_inlines.pFirst;
    char *pszFileName;
-   char *pszInLine;
 
    while( pInline )
    {
@@ -1279,262 +1175,9 @@ static void hb_compGenCInLine( FILE *yyc )
          fprintf( yyc, "HB_FUNC_STATIC( %s )\n", pInline->szName );
       }
 
-      /* parse for REQUEST before writing */
-      pszInLine = hb_comParseLine( (char*) pInline->pCode, TRUE );
-      fprintf( yyc, "%s", pszInLine );
-      hb_xfree( pszInLine );
+      fprintf( yyc, "%s", pInline->pCode );
       pInline = pInline->pNext;
    }
-}
-
-/*
-  Parse in-line-code here
-*/
-static char* hb_comParseLine( char *sz, BOOL bRetSz )
-{
-  int i = strlen( sz ), j = 0 , t = 0;
-  BOOL bExtern;
-  char *szReturn = NULL;
-  char *szInLine = ( char* ) hb_xgrab( i + 1 );
-
-  hb_xmemset( szInLine, 0, i + 1 );
-
-  if( bRetSz )
-  {
-     szReturn = ( char* ) hb_xgrab( i + 1024 );
-     hb_xmemset( szReturn, 0, i + 1 );
-  }
-
-  while( t < i )
-  {
-    if ( sz [ t ] == '\n' || sz [ t ] == '\r' )
-    {
-       j = 0;
-
-       if ( sz [ t ] == '\r' )
-       {
-          t ++;
-       }
-    }
-    else
-    {
-       szInLine [ j ] = sz[ t ];
-       j ++;
-    }
-
-    t ++;
-
-    if ( j == 0 || t == i )
-    {
-       /* parse line here */
-       bExtern = hb_compNewLine( szInLine, bRetSz ) ;
-
-       if ( bRetSz )
-       {
-          if ( ! bExtern )
-          {
-             hb_xstrcat( szReturn, szInLine, "\n", NULL );
-          }
-          else
-          {
-             /* It is a REQUEST in C code, comment it */
-             hb_xstrcat( szReturn, "// ", szInLine, "\n", NULL );
-          }
-       }
-
-       hb_xmemset( szInLine, 0, i + 1 );
-    }
-  }
-
-  hb_xfree( szInLine );
-
-  return ( szReturn );
-}
-
-/*
-  search for REQUEST or EXTERNAL
-*/
-static BOOL hb_compNewLine( char * sz, BOOL bRetSz )
-{
-   char **szExtern;
-   int iExtern = 0, iToken;
-   BOOL bExtern = FALSE;
-   BOOL bGlobal = FALSE;
-   BOOL bExternalGlobal = FALSE;
-
-   while( HB_ISSPACE( *sz ) )
-   {
-      sz++;
-   }
-
-   if( sz && *sz )
-   {
-      if ( strlen( sz ) > 8 )
-      {
-         if ( toupper( sz[0] ) == 'R' &&
-              toupper( sz[1] ) == 'E' &&
-              toupper( sz[2] ) == 'Q' &&
-              toupper( sz[3] ) == 'U' &&
-              toupper( sz[4] ) == 'E' &&
-              toupper( sz[5] ) == 'S' &&
-              toupper( sz[6] ) == 'T' &&
-              sz[7] == ' ' )
-            {
-               sz += 8;
-               bExtern = TRUE;
-            }
-         else if ( toupper( sz[0] ) == 'E' &&
-                   toupper( sz[1] ) == 'X' &&
-                   toupper( sz[2] ) == 'T' &&
-                   toupper( sz[3] ) == 'E' &&
-                   toupper( sz[4] ) == 'R' &&
-                   toupper( sz[5] ) == 'N' &&
-                   toupper( sz[6] ) == 'A' &&
-                   toupper( sz[7] ) == 'L' &&
-                   sz[8] == ' ' )
-            {
-               sz += 9;
-               bExtern = TRUE;
-            }
-         else if ( toupper( sz[0] ) == 'G' &&
-                   toupper( sz[1] ) == 'L' &&
-                   toupper( sz[2] ) == 'O' &&
-                   toupper( sz[3] ) == 'B' &&
-                   toupper( sz[4] ) == 'A' &&
-                   toupper( sz[5] ) == 'L' &&
-                   sz[6] == ' ' )
-            {
-               sz += 7;
-               bGlobal = TRUE;
-            }
-
-         if ( bExtern || bGlobal )
-         {
-            while( HB_ISSPACE( *sz ) )
-            {
-               sz++;
-            }
-
-            if ( !bRetSz )
-            {
-               if ( bGlobal &&
-                   toupper( sz[0] ) == 'E' &&
-                   toupper( sz[1] ) == 'X' &&
-                   toupper( sz[2] ) == 'T' &&
-                   toupper( sz[3] ) == 'E' &&
-                   toupper( sz[4] ) == 'R' &&
-                   toupper( sz[5] ) == 'N' &&
-                   toupper( sz[6] ) == 'A' &&
-                   toupper( sz[7] ) == 'L' &&
-                   sz[8] == ' ' )
-               {
-                  sz += 9;
-                  while( HB_ISSPACE( *sz ) )
-                  {
-                     sz++;
-                  }
-                  bExternalGlobal = TRUE;
-               }
-
-               szExtern = hb_comExternSplit( sz, &iExtern );
-
-               for (iToken = 0; szExtern [ iToken ]; iToken++)
-               {
-                  int ulLen = strlen( szExtern[ iToken ] );
-                  while( ulLen && HB_ISSPACE( szExtern[ iToken ][ ulLen - 1 ] ) )
-                  {
-                     ulLen--;
-                  }
-
-                  szExtern[ iToken ][ ulLen ] = 0;
-
-                  if( bExtern )
-                  {
-                     hb_compCStatSymList( szExtern [ iToken ], HB_PROTO_FUNC_REQUEST );
-                  }
-                  else
-                  {
-                     char *sz = (char*) hb_xgrab( strlen(szExtern[ iToken ]) + 1 );
-                     hb_comp_iVarScope = bExternalGlobal ? VS_EXTERNGLOBAL : VS_GLOBAL;
-                     strcpy( sz, szExtern[ iToken ]);
-                     hb_compVariableAdd( sz, 'A' );
-                  }
-               }
-
-               szExtern--;
-               hb_xfree( szExtern [0] );
-               hb_xfree( szExtern );
-            }
-         }
-      }
-   }
-
-   return ( bExtern || bGlobal );
-}
-
-/*
-  Getting REQUEST symbols
-*/
-static char ** hb_comExternSplit ( char *string, int *iWord )
-{
-   char *buffer = (char *) hb_xgrab( strlen( string ) + 1 );
-   char *bufptr;
-   char **extern_list;
-   char last_char = '\0';
-   int word_count = 0, word_nbr;
-
-   bufptr = buffer;
-
-   while ( *string )
-   {
-      if ( *string == ',' )
-      {
-         while ( *string == ',' )
-         {
-            string ++;
-         }
-
-         while( HB_ISSPACE( *string ) )
-         {
-            string ++;
-         }
-
-         if (bufptr > buffer)
-         {
-            word_count ++;
-            last_char = *bufptr++ = '\0';
-         }
-      }
-      else
-      {
-         last_char = *bufptr++ = toupper( *string++ );
-      }
-   }
-
-   if (last_char > 0)
-   {
-      word_count++;
-   }
-
-   *bufptr = '\0';
-
-   extern_list = (char **) hb_xgrab (sizeof (char *) * (word_count + 2));
-   extern_list [0] = buffer;
-   extern_list++;
-
-   bufptr = buffer;
-
-   for (word_nbr = 0; word_nbr < word_count; word_nbr++)
-   {
-      extern_list [word_nbr] = bufptr;
-      bufptr += strlen (bufptr) + 1;
-   }
-
-   extern_list [word_count] = NULL;
-
-   *iWord = word_count;
-
-   return (extern_list);
 }
 
 static HB_GENC_FUNC( hb_p_and )
