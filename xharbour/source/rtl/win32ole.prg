@@ -1,10 +1,9 @@
 /*
- * $Id: win32ole.prg,v 1.15 2002/08/09 16:50:55 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.16 2002/09/19 01:57:42 ronpinkas Exp $
  */
 
 /*
  * Copyright 2002  José F. Giménez (JFG) - <jfgimenez@wanadoo.es>
- *                                         <tecnico.sireinsa@ctv.es>
  *                 Ron Pinkas            - <ron@ronpinkas.com>
  *
  * www - http://www.xharbour.org
@@ -49,7 +48,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
 
 Static bOleInitialized := .F.
 
@@ -135,6 +133,7 @@ RETURN TOleAuto():GetActiveObject( cString )
    }
 
 #pragma ENDDUMP
+
 
 //----------------------------------------------------------------------------//
 
@@ -1088,13 +1087,45 @@ RETURN uObj
           }
           break;
 
-        case VT_I2:
-        case VT_I4:
-          hb_retnl( ( LONG ) RetVal.n1.n2.n3.iVal );
+        case VT_I1:     // Byte
+        case VT_UI1:
+          hb_retni( ( short ) RetVal.n1.n2.n3.bVal );
           break;
 
-        case VT_R8:
+        case VT_I2:     // Short (2 bytes)
+        case VT_UI2:
+          hb_retni( ( short ) RetVal.n1.n2.n3.iVal );
+          break;
+
+        case VT_I4:     // Long (4 bytes)
+        case VT_UI4:
+        case VT_INT:
+        case VT_UINT:
+          hb_retnl( ( LONG ) RetVal.n1.n2.n3.lVal );
+          break;
+
+        case VT_R4:     // Single
+          hb_retnd( RetVal.n1.n2.n3.fltVal );
+          break;
+
+        case VT_R8:     // Double
           hb_retnd( RetVal.n1.n2.n3.dblVal );
+          break;
+
+        case VT_CY:     // Currency
+        {
+          double tmp = 0;
+          VarR8FromCy( RetVal.n1.n2.n3.cyVal, &tmp );
+          hb_retnd( tmp );
+        }
+          break;
+
+        case VT_DECIMAL: // Decimal
+          {
+          double tmp = 0;
+          VarR8FromDec( &RetVal.n1.decVal, &tmp );
+          hb_retnd( tmp );
+          }
           break;
 
         case VT_DATE:
@@ -1176,7 +1207,6 @@ RETURN uObj
      }
 
      hb_retnl( ( LONG ) pDisp );
-
   }
 
   //---------------------------------------------------------------------------//
@@ -1727,3 +1757,4 @@ RETURN uObj
   //---------------------------------------------------------------------------//
 
 #pragma ENDDUMP
+

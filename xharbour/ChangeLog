@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.415 2002/10/01 17:29:09 map Exp $
+ * $Id: ChangeLog,v 1.416 2002/10/01 20:34:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,8 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-03 08:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    + Added support for few additional VT_* types (Thanks to José F. Giménez <jfgimenez@wanadoo.es>)
+
 2002-10-01 17:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
-* source/rtl/dbsdf.prg
+  * source/rtl/dbsdf.prg
     * Changes to support Rddads extended fields type whe using append from
 
 2002-10-01 19:30 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
