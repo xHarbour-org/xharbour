@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.59 2002/11/07 23:01:37 what32 Exp $
+ * $Id: xInspect.prg,v 1.60 2002/11/08 01:36:01 what32 Exp $
  */
 
 /*
@@ -36,8 +36,10 @@
 #include "debug.ch"
 #include "accel.ch"
 
-GLOBAL EXTERNAL oApp
+GLOBAL EXTERNAL Application
 GLOBAL EXTERNAL FormEdit
+GLOBAL EXTERNAL MainFrame
+GLOBAL EXTERNAL ObjInspect
 GLOBAL InspTabs
 
 CLASS ObjInspect FROM TForm
@@ -52,14 +54,7 @@ CLASS ObjInspect FROM TForm
    METHOD Create()
    METHOD OnCloseQuery() INLINE 0
 
-/*
-   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Width := x,;
-                                 InspTabs:Move( , 25, x, y-25, .T. ),;
-                                 ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
-                                 ::browser:FHeight:= InspTabs:Properties:ClientRect()[4],;
-                                 ::browser:Move( , , , , .T. ),;
-                                 NIL
-*/
+
    METHOD OnSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::ComboBox1:Width := x,;
                                                           InspTabs:Move( , 25, x, y-25, .T. ),;
                                                           ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
@@ -109,6 +104,8 @@ RETURN Self
 METHOD Create( oParent ) CLASS ObjInspect
 
    // Object Inspector Window
+   ::Super:Create( oParent )
+
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
    ::FLeft    := 0
@@ -116,22 +113,21 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::FWidth   := 200
    ::FHeight  := 297
    ::ExStyle  := WS_EX_TOOLWINDOW
-   super:Create( oParent )
 
    // ComboBox   
    ::Combo        := ComboInsp():Create( self )
 
-   ::Combo:FWidth := ::FWidth
+   ::Combo:FWidth := ::FWidth - 8
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    ::Combo:SetItemHeight( -1, 15 )
-   ::Combo:GetHandle() // needs handle
+   ::Combo:GetHandle()
 
    // TabControls
    InspTabs := TTabControl():Create( self )
 
    InspTabs:FTop   := 25
-   InspTabs:FWidth := ::FWidth
-   InspTabs:FHeight:= ::FHeight - 25
+   InspTabs:FWidth := ::FWidth - 8
+   InspTabs:FHeight:= ::FHeight - 50
    InspTabs:AddTab( "Properties", TabPage():Create( InspTabs ) )
    InspTabs:AddTab( "Events", TabPage():Create( InspTabs ) )
 
@@ -139,7 +135,9 @@ METHOD Create( oParent ) CLASS ObjInspect
    
    // Browser
    ::Browser:=InspectBrowser():Create( InspTabs:Properties )
-
+   
+   Application:ProcessMessages()
+   
 return( Self )
 
 //----------------------------------------------------------------------------------------------
@@ -188,7 +186,6 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 CLASS ComboInsp FROM TComboBox
-//   METHOD Create( oParent ) INLINE super:Create( oParent ), ::Show( SW_SHOW )
    METHOD DrawItem()
    METHOD OnClick()
    METHOD AddString()
@@ -370,7 +367,7 @@ METHOD Create( oParent ) CLASS InspectBrowser
    oCol2 := whColumn():Init( "Value",   {|oCol,oB,n| asString(oB:source[n,2]) }, DT_LEFT, 80 )
    oCol2:VertAlign  := TA_CENTER
    oCol2:Style      := TBC_MOVE + TBC_SIZE
-   oCol2:bSaveBlock := {| cText, o, nKey| oApp:MainFrame:ObjInspect:SaveVar( cText, nKey ) }
+   oCol2:bSaveBlock := {| cText, o, nKey| ObjInspect:SaveVar( cText, nKey ) }
    ::AddColumn( oCol2 )
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
@@ -471,7 +468,7 @@ METHOD OnCreate() CLASS StringList
 
    LOCAL cText := "", cItem
 
-   FOR EACH cItem IN oApp:MainFrame:ObjInspect:CurObject:Items:Strings
+   FOR EACH cItem IN ObjInspect:CurObject:Items:Strings
       cText += ( cItem + CRLF )
    NEXT
 
@@ -479,7 +476,7 @@ METHOD OnCreate() CLASS StringList
 
    PostMessage( GetDlgItem( ::handle, 103 ), EM_SETSEL, 0, 0)
    SetDlgItemText( ::handle, 103, cText )
-   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInspect:CurObject:Items:Strings ) ) ) + " Lines" )
+   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( ObjInspect:CurObject:Items:Strings ) ) ) + " Lines" )
 
 RETURN Self
 
@@ -502,8 +499,8 @@ METHOD OnCommand( nwParam ) CLASS StringList
               nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
            ENDIF
 
-           oApp:MainFrame:ObjInspect:CurObject:Items:Strings := {}
-           oApp:MainFrame:ObjInspect:CurObject:Items:Clear()
+           ObjInspect:CurObject:Items:Strings := {}
+           ObjInspect:CurObject:Items:Clear()
            
            FOR n := 1 TO nLines
                cText := I2Bin( 100 ) + Space( 200 )
@@ -511,10 +508,10 @@ METHOD OnCommand( nwParam ) CLASS StringList
                cText := StrTran( cText, Chr(0) , '' )
                cText := StrTran( cText, Chr(10), '' )
                cText := StrTran( cText, Chr(13), '' )
-               oApp:MainFrame:ObjInspect:CurObject:Items:Add( AllTrim( cText ) )
+               ObjInspect:CurObject:Items:Add( AllTrim( cText ) )
            NEXT
 
-           oApp:MainFrame:ObjInspect:CurObject:Parent:XFMControl( , oApp:MainFrame:ObjInspect:CurObject, .F. )
+           ObjInspect:CurObject:Parent:XFMControl( , ObjInspect:CurObject, .F. )
            nLines := NIL
            EndDialog( ::handle, IDOK )
 
