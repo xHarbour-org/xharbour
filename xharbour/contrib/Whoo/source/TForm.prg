@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.39 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TForm.prg,v 1.40 2002/10/12 09:40:53 what32 Exp $
  */
 
 /*
@@ -45,33 +45,45 @@ CLASS TForm FROM TWindow
    DATA WindowMenu   EXPORTED
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
-
+   
    DATA biSystemMenu EXPORTED INIT .T.
    DATA biMinimize   EXPORTED INIT .T.
    DATA biMaximize   EXPORTED INIT .T.
+   DATA BorderStyle  EXPORTED INIT "bsSizeable"
+
 
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE )
    
    ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE )
 
    ASSIGN biMaximize(l)   INLINE ::SetStyle(WS_MINIMIZEBOX,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE )
 
-   DATA BorderStyle EXPORTED AS ARRAY INIT {;
-      {"bsDialog",      WS_POPUP+WS_CAPTION+WS_DLGFRAME+WS_SYSMENU,   0 },;
-      {"bsNone",        WS_POPUP,                                     0 },;
-      {"bsSingle",      WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+;
-                        WS_MINIMIZEBOX+WS_MAXIMIZEBOX,                0 },;
-      {"bsSizeable",    WS_OVERLAPPEDWINDOW,                          0 },;
-      {"bsSizeToolWin", WS_OVERLAPPEDWINDOW,           WS_EX_TOOLWINDOW },;
-      {"bsToolWindow",  WS_OVERLAPPED+WS_CAPTION+WS_SYSMENU+;
-                        WS_MINIMIZEBOX+WS_MAXIMIZEBOX, WS_EX_TOOLWINDOW } }
+   DATA aBorders     PROTECTED AS ARRAY INIT {;
+      {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME,                        0 },;
+      {WS_POPUP+WS_VISIBLE,                                                          0 },;
+      {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_MAXIMIZEBOX, 0 },;
+      {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+WS_MAXIMIZEBOX+WS_THICKFRAME,0 },;
+      {WS_OVERLAPPEDWINDOW,                                               WS_EX_TOOLWINDOW },;
+      {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME, WS_EX_TOOLWINDOW } }
 
-   ASSIGN BorderStyle(n) INLINE SetWindowLong( ::handle, GWL_STYLE,   ::BorderStyle[n][2] ),;
-                                SetWindowLong( ::handle, GWL_EXSTYLE, ::BorderStyle[n][3] ),;
-                                ::Style := GetWindowLong( ::handle, GWL_EXSTYLE ),n
+   ACCESS bsDialog      INLINE ::aBorders[1]
+   ACCESS bsNone        INLINE ::aBorders[2]
+   ACCESS bsSingle      INLINE ::aBorders[3]
+   ACCESS bsSizeable    INLINE ::aBorders[4]
+   ACCESS bsSizeToolWin INLINE ::aBorders[5]
+   ACCESS bsToolWindow  INLINE ::aBorders[6]
+
+
+   ASSIGN BorderStyle(c) INLINE SetWindowLong( ::handle, GWL_STYLE,  __objSendMsg( self, c )[1] ),;
+                                SetWindowLong( ::handle, GWL_EXSTYLE,__objSendMsg( self, c )[2] ),;
+                                ::Style   := GetWindowLong( ::handle, GWL_STYLE ),;
+                                OutPutDebugString( str(::Style)),;
+                                ::ExStyle := GetWindowLong( ::handle, GWL_EXSTYLE ),;
+                                InvalidateRect( ::handle ),;
+                                c
 
    METHOD New()
    METHOD Add()
@@ -81,6 +93,9 @@ CLASS TForm FROM TWindow
    METHOD GetObj()
    METHOD SetLink()
 ENDCLASS
+
+//------------------------------------------------------------------------------------
+
 
 *-----------------------------------------------------------------------------*
 

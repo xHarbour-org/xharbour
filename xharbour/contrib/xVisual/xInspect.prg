@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.26 2002/10/11 03:27:24 what32 Exp $
+ * $Id: xInspect.prg,v 1.27 2002/10/11 22:37:39 what32 Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ return( super:OnCreate() )
 //----------------------------------------------------------------------------------------------
 
 METHOD SaveVar(cText,nKey) CLASS ObjInspect
-   local cType, cVar
+   local cType, cVar, oObj
    cVar := ::Browser:source[::Browser:RecPos][1]
    cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
    do case
@@ -148,6 +148,7 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
 
    if __objSendMsg( ::CurObject, cVar ) != cText
       __objSendMsg( ::CurObject, "_"+cVar, cText )
+
       ::Browser:source[::Browser:RecPos][2]:= cText
       ::Browser:RefreshCurrent()
       ::CurObject:Update()
