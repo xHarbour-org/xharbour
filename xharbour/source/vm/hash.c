@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.24 2004/02/21 05:04:46 ronpinkas Exp $
+ * $Id: hash.c,v 1.25 2004/02/21 05:11:48 ronpinkas Exp $
  */
 
 /*
@@ -1908,8 +1908,7 @@ HB_FUNC( HGETKEYAT )
 
    if ( pHash == NULL || pPos == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
 
@@ -1917,8 +1916,7 @@ HB_FUNC( HGETKEYAT )
 
    if ( ulPos < 1 ||  ulPos > hb_hashLen( pHash )  )
    {
-      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETKEYAT", 2,
-            hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETKEYAT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
@@ -1933,8 +1931,7 @@ HB_FUNC( HGETVALUEAT )
 
    if ( pHash == NULL || pPos == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
 
@@ -1942,8 +1939,7 @@ HB_FUNC( HGETVALUEAT )
 
    if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
-      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETVALUEAT", 2,
-            hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETVALUEAT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
@@ -1960,22 +1956,19 @@ HB_FUNC( HSETVALUEAT )
 
    if ( pHash == NULL || pPos == NULL || pValue == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2),
-         hb_paramError(3) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
+
    ulPos = hb_itemGetNL( pPos );
 
    if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
-      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HSETVALUEAT",
-          3, hb_paramError(1), hb_paramError(2),
-         hb_paramError(3) );
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
-   pItem = hb_hashGetValueAt(pHash, ulPos );
+   pItem = hb_hashGetValueAt( pHash, ulPos );
    hb_itemCopy( pItem, pValue );
 }
 
@@ -1984,7 +1977,7 @@ HB_FUNC( HGETPAIRAT )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pKey, pValue;
-   PHB_ITEM pArrRet;
+   HB_ITEM ArrRet;
 
    ULONG ulPos;
 
@@ -2006,20 +1999,20 @@ HB_FUNC( HGETPAIRAT )
    pKey = hb_param( 3, HB_IT_BYREF );
    pValue = hb_param( 4, HB_IT_BYREF );
 
+   ArrRet.type = HB_IT_NIL;
+
    if ( pKey == NULL || pValue == NULL )
    {
-      pArrRet = hb_itemNew( NULL );
-      hb_arrayNew( pArrRet, 2 );
+      hb_arrayNew( &ArrRet, 2 );
 
-      hb_itemCopy( hb_arrayGetItemPtr( pArrRet, 1 ), hb_hashGetKeyAt(pHash, ulPos ) );
-      hb_itemCopy( hb_arrayGetItemPtr( pArrRet, 2 ), hb_hashGetValueAt(pHash, ulPos ) );
-      hb_itemForwardValue( &HB_VM_STACK.Return, pArrRet );
+      hb_itemCopy( hb_arrayGetItemPtr( &ArrRet, 1 ), hb_hashGetKeyAt(pHash, ulPos ) );
+      hb_itemCopy( hb_arrayGetItemPtr( &ArrRet, 2 ), hb_hashGetValueAt(pHash, ulPos ) );
+      hb_itemForwardValue( &HB_VM_STACK.Return, &ArrRet );
    }
    else
    {
       hb_itemCopy( pKey, hb_hashGetKeyAt( pHash, ulPos ) );
       hb_itemCopy( pValue, hb_hashGetValueAt( pHash, ulPos ) );
-      hb_ret();
    }
 }
 
@@ -2031,16 +2024,14 @@ HB_FUNC( HDELAT )
 
    if ( pHash == NULL || pKey == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HDELAT", 2, hb_paramError(1), hb_paramError(2));
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HDELAT", 2, hb_paramError(1), hb_paramError(2));
       return;
    }
    ulPos = hb_itemGetNL( pKey );
 
    if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
-      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HDELAT", 2,
-         hb_paramError(1), hb_paramError(2) );
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HDELAT", 2, hb_paramError(1), hb_paramError(2) );
       return;
    }
 
@@ -2095,8 +2086,7 @@ HB_FUNC( HFILL )
 
    if ( pHash == NULL || pVal == NULL  )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HFILL", 2, hb_paramError(1), hb_paramError(2) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HFILL", 2, hb_paramError(1), hb_paramError(2) );
       return;
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.328 2004/02/21 01:40:54 andijahja Exp $
+ * $Id: hvm.c,v 1.329 2004/02/21 04:45:20 ronpinkas Exp $
  */
 
 /*
@@ -5692,13 +5692,20 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          }
          else if( strcmp( szIndex, "KEYS" ) == 0 )
          {
-            hb_itemForwardValue( &(HB_VM_STACK.Return), hb_hashGetKeys( pSelf ) );
+            PHB_ITEM pKeys = hb_hashGetKeys( pSelf );
+
+            hb_itemForwardValue( &(HB_VM_STACK.Return), pKeys );
+            hb_itemRelease( pKeys );
          }
          else if( strcmp( szIndex, "VALUES" ) == 0 )
          {
-            hb_itemForwardValue( &(HB_VM_STACK.Return), hb_hashGetValues( pSelf ) );
+            PHB_ITEM pValues = hb_hashGetValues( pSelf );
+
+            hb_itemForwardValue( &(HB_VM_STACK.Return), pValues );
+            hb_itemRelease( pValues );
          }
-         else {
+         else
+         {
             HB_ITEM hbIndex;
             hbIndex.type = HB_IT_NIL;
             hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
