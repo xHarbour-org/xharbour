@@ -325,12 +325,18 @@ static BOOL hb_fptFileLockEx( FPTAREAP pArea, BOOL fWait )
 {
    BOOL fRet;
 
-   do
+   if ( !pArea->fShared )
    {
-      fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
-                        FL_LOCK | FLX_EXCLUSIVE | ( fWait ? FLX_WAIT : 0 ) );
-   } while ( !fRet );
-
+      fRet = TRUE;
+   }
+   else
+   {
+      do
+      {
+         fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
+                           FL_LOCK | FLX_EXCLUSIVE | ( fWait ? FLX_WAIT : 0 ) );
+      } while ( !fRet );
+   }
    return fRet;
 }
 
@@ -343,11 +349,18 @@ static BOOL hb_fptFileLockSh( FPTAREAP pArea, BOOL fWait )
 {
    BOOL fRet;
 
-   do
+   if ( !pArea->fShared )
    {
-      fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
-                        FL_LOCK | FLX_SHARED | ( fWait ? FLX_WAIT : 0 ) );
-   } while ( !fRet );
+      fRet = TRUE;
+   }
+   else
+   {
+      do
+      {
+         fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
+                           FL_LOCK | FLX_SHARED | ( fWait ? FLX_WAIT : 0 ) );
+      } while ( !fRet );
+   }
    return fRet;
 }
 
@@ -2117,15 +2130,15 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
+      /* Force read record */
+      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
+         return FAILURE;
+
       if( !pArea->fPositioned )
          return SUCCESS;
 
       /* Buffer is hot? */
       if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
-         return FAILURE;
-
-      /* Force read record */
-      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 
       if( hb_fptFileLockEx( pArea, TRUE ) )
