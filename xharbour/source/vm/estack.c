@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.42 2003/09/11 06:56:41 ronpinkas Exp $
+ * $Id: estack.c,v 1.43 2003/09/24 04:40:43 ronpinkas Exp $
  */
 
 /*
@@ -119,7 +119,9 @@ void hb_stackPush( void )
    /* enough room for another item ? */
    if( !( TopIndex > CurrIndex ) )
    {
-      PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
+      #ifndef HB_ARRAY_USE_COUNTER
+         PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
+      #endif
 
       LONG BaseIndex;   /* index of stack base */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.8 2003/05/28 11:59:06 druzus Exp $
+ * $Id: strcase.c,v 1.9 2003/09/27 16:15:41 paultucker Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ char * HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && (*pDest++ = toupper( *pSource )))
+   while( ulLen && (*pDest++ = toupper( *pSource )) != '\0' )
    {
       ulLen--;
       pSource++;
@@ -187,7 +187,7 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && ulSLen && (*pDest++ = toupper( *pSource )))
+   while( ulLen && ulSLen && (*pDest++ = toupper( *pSource )) != '\0' )
    {
       ulSLen--;
       ulLen--;

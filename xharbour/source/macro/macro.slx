@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.6 2003/01/23 23:35:00 ronpinkas Exp $
+ * $Id: macro.slx,v 1.7 2003/03/07 23:14:11 ronpinkas Exp $
  */
 
 /*
@@ -127,9 +127,9 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
 
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
-                                START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\0") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\0") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\0") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT)
+                                START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT)
                               };
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );

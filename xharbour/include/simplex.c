@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.2 2003/08/09 18:49:49 ronpinkas Exp $
+ * $Id: simplex.c,v 1.3 2003/09/09 01:32:26 druzus Exp $
  */
 
 /*
@@ -576,7 +576,7 @@ int SimpLex_GetNextToken( void )
             /* Not using LEX_CASE() yet (white space)!!! */
             if( acOmmit[(int)chr] )
             {
-               while( acOmmit[(int)(*szBuffer)] )
+               while( iSize && acOmmit[(int)(*szBuffer)] )
                {
                   iSize--; szBuffer++;
                }
@@ -643,13 +643,24 @@ int SimpLex_GetNextToken( void )
                   }
                }
 
-               {  register int iPairLen = 0;
+               {
+                  register int iPairLen = 0;
                   register char chrPair;
 
                   /* Look for the terminator. */
-                  while ( *szBuffer )
+                  while( *szBuffer )
                   {
+                     if( iSize <= 0 || iPairLen >= MAX_STREAM )
+                     {
+                        STREAM_EXCEPTION( sPair, '\0' );
+
+                        s_szBuffer = szBuffer;
+
+                        return iPairToken;
+                     }
+
                      /* Next Character. */
+                     iSize--;
                      chrPair = *szBuffer++ ;
 
                      /* Terminator ? */
@@ -741,7 +752,7 @@ int SimpLex_GetNextToken( void )
             /* NewLine ? */
             if( acNewLine[(int)chr] )
             {
-               while( acNewLine[(int)(*szBuffer)] )
+               while( iSize && acNewLine[(int)(*szBuffer)] )
                {
                   iSize--; szBuffer++;
                }
