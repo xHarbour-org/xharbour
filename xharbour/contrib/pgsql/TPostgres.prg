@@ -745,26 +745,28 @@ METHOD Delete(oRow) CLASS TPQquery
     Local i
     Local nField
     Local xField
-    Local cWhere
+    Local cWhere := ''
+    Local aParams := {}
     
     if len(::aTables) == 1
         // Cannot delete joined tables 
 
-        cWhere := ''
-        
         For i := 1 to len(::aKeys)
             nField := oRow:Fieldpos(::aKeys[i])
             xField := oRow:FieldGetOld(nField)
 
-            cWhere += ::aKeys[i] + '=' + DataToSql(xField)                    
+            cWhere += ::aKeys[i] + ' = $' + ltrim(str(i))
+            
+            AADD( aParams, ValueToString(xField) )
 
             if i <> len(::aKeys)
-                cWhere += ','
+                cWhere += ' and '
             end                    
         Next                        
 
         if ! (cWhere == '')
-            res := PQexec( ::pDB, 'DELETE FROM ' + ::aTables[1] + ' WHERE ' + cWhere)            
+            res := PQexecParams( ::pDB, 'DELETE FROM ' + ::aTables[1] + ' WHERE ' + cWhere, aParams)    
+
             result := ! ISCHARACTER(res)  
             
             if ! result     
@@ -787,6 +789,8 @@ METHOD Append( oRow ) CLASS TPQquery
     Local i
     Local res
     Local lChanged := .f.
+    Local aParams := {}
+    Local nParams := 0
         
     if len(::aTables) == 1
         // Can insert only one table, not in joined tables 
@@ -803,14 +807,16 @@ METHOD Append( oRow ) CLASS TPQquery
 
         For i := 1 to oRow:FCount()
             if ::lallCols .or. oRow:Changed(i)
-                cQuery += DataToSql(oRow:FieldGet(i)) + ','
+                nParams++
+                cQuery += '$' + ltrim(str(nParams)) + ','
+                aadd( aParams, ValueToString(oRow:FieldGet(i)) )
             end                
         Next
         
         cQuery := Left( cQuery, len(cQuery) - 1  ) + ')'
 
         if lChanged
-            res := PQexec( ::pDB, cQuery)            
+            res := PQexecParams( ::pDB, cQuery, aParams)    
             result := ! ISCHARACTER(res)   
 
             if ! result     
@@ -839,6 +845,8 @@ METHOD Update(oRow) CLASS TPQquery
     Local cWhere
     Local res
     Local lChanged := .f.
+    Local aParams := {}
+    Local nParams := 0
         
     if len(::aTables) == 1
          // Can't insert joined tables
@@ -860,7 +868,9 @@ METHOD Update(oRow) CLASS TPQquery
         For i := 1 to oRow:FCount()
             if ::lallcols .or. oRow:Changed(i)
                 lChanged := .t.
-                cQuery += oRow:Fieldname(i) + ' = ' + DataToSql(oRow:FieldGet(i)) + ','
+                nParams++
+                cQuery += oRow:Fieldname(i) + ' = $' + ltrim(str(nParams)) + ','
+                aadd( aParams, ValueToString(oRow:FieldGet(i)) )
             end                
         Next
         
@@ -868,7 +878,7 @@ METHOD Update(oRow) CLASS TPQquery
 
             cQuery := Left( cQuery, len(cQuery) - 1 ) + ' WHERE ' + cWhere            
             
-            res := PQexec( ::pDB, cQuery)            
+            res := PQexecParams( ::pDB, cQuery, aParams)    
             result := ! ISCHARACTER(res)   
         
             if ! result     
@@ -1107,8 +1117,24 @@ Static Function DataToSql(xField)
                 result := str(xField)
         elseif cType == "L"
                 result := iif( xField, "'t'", "'f'" )
-        end
-        
+        end        
 return result           
+
+Static Function ValueToString(xField)
+        Local cType, result := 'NULL'
+
+        cType := ValType(xField)
+        
+        if cType == "D" .and. ! Empty(xField)
+                result := StrZero(month(xField),2) + '/' + StrZero(day(xField),2) + '/' + StrZero(Year(xField),4)
+        elseif cType == "N"
+                result := str(xField)
+        elseif cType == "L"
+                result := iif( xField, "t", "f" )
+        elseif cType == "C" .or. cType == "M"
+                result := xField                                
+        end        
+return result           
+
 
                                              

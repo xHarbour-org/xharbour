@@ -134,7 +134,7 @@ HB_FUNC(PQEXECPARAMS)
 {
     PGconn     *conn;
     PGresult   *res;
-    char       **paramvalues;
+    const char **paramvalues;
     int        i;
     long       n;
 
@@ -147,10 +147,10 @@ HB_FUNC(PQEXECPARAMS)
 
         n = hb_arrayLen(aParam);
 
-        paramvalues = (char **) hb_xgrab( sizeof( char ) * n );
+        paramvalues = (const char **) hb_xgrab( sizeof( char *) * n );
 
         for (i=0;i < n;i++)
-            paramvalues[i] = hb_itemGetCPtr(hb_itemArrayGet( aParam, i + 1 ));
+            paramvalues[i] = hb_arrayGetCPtr( aParam, i + 1 );
 
         conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
 
