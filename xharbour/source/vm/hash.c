@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.79 2003/09/13 19:14:30 ronpinkas Exp $
+ * $Id: hash.c,v 1.1 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -206,6 +206,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
 {
    ULONG ulLen;
    PHB_ITEM pPos, pPos1;
+   PHB_BASEHASH pBaseHash;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
 
@@ -231,7 +232,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
    // failed scan.
 
 
-   PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+   pBaseHash = pHash->item.asHash.value;
 
    if( pBaseHash->ulLen < ULONG_MAX )
    {
