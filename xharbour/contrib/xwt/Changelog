@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.8 2003/04/14 22:34:51 jonnymind Exp $
+ * $Id: Changelog,v 1.9 2003/04/17 23:41:58 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-18 14:22 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * Rules.make
+    % Linking against gtcgi instead of gtstd
+
+  * include/xwt_api.h
+  * src/xwt_api.c
+    + Added support for MODAL dialogs
+
+  * src/filesel.prg
+    ! Using now support for modal dialogs
+
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+  * src/xwt_gtk/xwt_gtk_fileselect.c
+    + Added SetFile() method for FileSel class
+    ! Using now modal support in the new DoModal() method
+
+  * test/xwt_test.prg
+    ! Changed to reflect this updates.
 
 2003-04-17 20:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * src/filesel.prg
@@ -18,7 +38,7 @@
   * src/xwt_api.c
   * src/xwt_gtk/xwt_gtk.c    
     * Added code to proper Get and Set Properties on FileSelection Dialog
-     
+
 2003-04-15 00:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   + src/filesel.prg
   + src/xwt_gtk/xwt_gtk_fileselct.c

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.6 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.7 2003/04/14 22:35:07 jonnymind Exp $
 
    GTK interface
 */
@@ -28,6 +28,13 @@ typedef struct tag_xwt_gtk_base
    PHB_BASEARRAY owner;
 
 } XWT_GTK_BASE, *PXWT_GTK_BASE;
+
+typedef struct tag_xwt_gtk_modal
+{
+  XWT_GTK_BASE;
+  BOOL modal;
+  BOOL canceled;
+} XWT_GTK_MODAL, *PXWT_GTK_MODAL;
 
 typedef struct tag_xwt_gtk_wnd
 {

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.h,v 1.4 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_api.h,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE - header
 */
@@ -91,6 +91,8 @@ BOOL xwt_drv_remove( PXWT_WIDGET wSelf, PXWT_WIDGET wChild );
 PXWT_WIDGET xwt_drv_create( PHB_ITEM pSelf, int xwt_type );
 BOOL xwt_drv_destroy( PXWT_WIDGET wSelf );
 
+/* executes a widget in modal state */
+void xwt_drv_modal( PXWT_WIDGET wSelf );
 
 BOOL xwt_drv_init( int argc, char **argv );
 BOOL xwt_drv_quit();

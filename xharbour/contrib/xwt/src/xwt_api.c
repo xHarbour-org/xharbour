@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.7 2003/04/14 22:35:07 jonnymind Exp $
+   $Id: xwt_api.c,v 1.8 2003/04/17 23:42:17 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -153,6 +153,14 @@ HB_FUNC( XWT_FASTRISEEVENT )
 }
 
 
+/* A Function for doing modal dialogs */
+HB_FUNC( XWT_MODAL )
+{
+   PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
+   PXWT_WIDGET wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+
+   xwt_drv_modal( wSelf );
+}
 /*******************************************************
 * Generic xwt widget functions
 */

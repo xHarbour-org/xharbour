@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.8 2003/04/14 22:35:07 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.9 2003/04/17 23:42:17 lculik Exp $
 
    Global declarations, common functions
 */
@@ -606,7 +606,14 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       return FALSE;
 
       case XWT_PROP_FILENAME:
-         prop->value.text = gtk_file_selection_get_filename( GTK_FILE_SELECTION( wSelf ) );
+         if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
+         {
+            prop->value.text = gtk_file_selection_get_filename( GTK_FILE_SELECTION( wSelf ) );
+         }
+         else
+         {
+            prop->value.text = "";
+         }
          return TRUE;
 
 
@@ -665,6 +672,23 @@ BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
    return TRUE;
 }
 
+/******************************************************
+*  Modal procedures
+*/
+
+void xwt_drv_modal( PXWT_WIDGET widget )
+{
+   PXWT_GTK_MODAL wSelf = ( (PXWT_GTK_MODAL) widget->widget_data );
+
+   // this flag will be changed by widget callbacks
+   wSelf->modal = TRUE;
+
+   while( wSelf->modal )
+   {
+      gtk_main_iteration();
+   }
+
+}
 
 /******************************************************
 *  Container Functions

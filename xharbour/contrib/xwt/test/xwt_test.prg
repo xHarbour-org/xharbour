@@ -3,6 +3,7 @@
 GLOBAL oFileSel
 GLOBAL oOtherBox
 
+
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
    LOCAL oMenuSec, oPane, oTextbox, oLabel, oViewPort
@@ -132,17 +133,17 @@ RETURN
 
 
 FUNCTION WindowReceive( oEvent )
-   ? "Received event at top level ", oEvent:nType, " from ", oEvent:oSender:GetText()
+OutStd( "Received event at top level ", oEvent:nType, " from ", oEvent:oSender:GetText(), HB_OSNewLine())
 RETURN .F.
 
 FUNCTION DumpEvent( oEvent )
-   ? "Event type: ", oEvent:nType, " from ", oEvent:oSender:GetText()
-   ?  Len ( oEvent:aParams )
+OutStd( "Event type: ", oEvent:nType, " from ", oEvent:oSender:GetText(), HB_OSNewLine())
+OutStd(  Len ( oEvent:aParams ), HB_OSNewLine())
    IF Len ( oEvent:aParams ) == 1
-      ? "Parameter ", oEvent:aParams[1]
+OutStd( "Parameter ", oEvent:aParams[1], HB_OSNewLine())
    ELSE
       IF Len( oEvent:aParams ) == 2
-         ? "Parameters ", oEvent:aParams[1], " ", oEvent:aParams[2]
+OutStd( "Parameters ", oEvent:aParams[1], " ", oEvent:aParams[2], HB_OSNewLine())
       ENDIF
    ENDIF
    IF oEvent:nType == XWT_E_CLICKED
@@ -157,17 +158,23 @@ FUNCTION FileEvent( oEvent )
    //Filesel can't be local!
    //Local oFileSel
 
-   ? "Menu activated: ", oEvent:oSender:nId
+OutStd( "Menu activated: ", oEvent:oSender:nId, HB_OSNewLine())
    IF oEvent:oSender:nId == 1
       oFileSel := XWTFileSel():New( "Open file" )
-      // Todo: modal diaog function call
-      // now we must provide a callback:
-      oFileSel:AddEventListener( XWT_E_UPDATED, @DumpEvent() )
+      oFileSel:SetFile( "test.file" )
+
+      // Notice: after a "do_modal", the object will not exist anymore
+      cFileName := oFileSel:DoModal()
+      IF cFileName == ""
+OutStd( "Canceled!", HB_OSNewLine())
+      ELSE
+OutStd( "FILENAME: ", cFileName, HB_OSNewLine())
+      ENDIF
    ENDIF
 RETURN .F.
 
 FUNCTION BoxModified( oEvent )
-   ? "Text entered in box: ", oEvent:oSender:getText()
+OutStd( "Text entered in box: ", oEvent:oSender:getText(), HB_OSNewLine())
    oEvent:oSender:SetText( "Reset" )
    oOtherBox:SetFocus()
 RETURN .F.
@@ -175,11 +182,11 @@ RETURN .F.
 
 FUNCTION InputChanged( oEvent )
    Local aField
-   ? "Input has been set:"
+OutStd( "Input has been set:", HB_OSNewLine())
 
    FOR EACH aField IN oEvent:oSender:aInputFields
-      ? aField[1], ": ", aField[2]
+OutStd( aField[1], ": ", aField[2], HB_OSNewLine())
    NEXT
 
-   ? ""
+OutStd( "", HB_OSNewLine())
 RETURN
