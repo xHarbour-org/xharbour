@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.12 2003/11/21 01:54:23 ronpinkas Exp $
+ * $Id: inkey.c,v 1.13 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -60,6 +60,10 @@
  * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
  *    hb_setInkeyLast()
  *
+ * Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *    SETINKEYBEFOREBLOCK()
+ *    SETINKEYAFTERBLOCK()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -92,6 +96,8 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
+static PHB_ITEM s_inKeyBlockBefore = NULL ;
+static PHB_ITEM s_inKeyBlockAfter = NULL ;
 
 static void hb_inkeyKBfree( void )
 {
@@ -335,10 +341,71 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
 
 HB_FUNC( INKEY )
 {
-   USHORT uiPCount = hb_pcount();
-   hb_retni( hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
+  BOOL bContinue = TRUE ;
+  USHORT uiPCount = hb_pcount();
+  int iKey;
+  if ( s_inKeyBlockBefore )
+  {
+    hb_vmEvalBlock( s_inKeyBlockBefore );
+  }
+  while ( bContinue )
+  {
+    iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
-                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK ) );
+                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
+    bContinue = iKey && s_inKeyBlockAfter ;
+    if ( bContinue )
+    {
+      PHB_ITEM pKey = hb_itemPutNI( NULL, iKey );
+      PHB_ITEM pReturn = hb_vmEvalBlockV( s_inKeyBlockAfter, 1, pKey );
+      // set iKey from return value of EvalBlock()
+      iKey = hb_itemGetNI( pReturn );
+      // if iKey = 0 then we continue as iKey was handled in hb_vmEvalBlock( s_inKeyBlockAfter )
+      bContinue = (BOOL) !iKey ;
+      hb_itemRelease( pKey );
+    }
+  }
+  hb_retni(iKey);
+}
+
+HB_FUNC( SETINKEYBEFOREBLOCK )
+{
+  USHORT uiPCount = hb_pcount();
+  if ( s_inKeyBlockBefore )
+  {
+    hb_itemReturn( s_inKeyBlockBefore );
+  }
+  if ( uiPCount > 0 )
+  {
+    if ( ISBLOCK(1) )
+    {
+    s_inKeyBlockBefore = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
+    }
+    else if ( ISNIL(1) )
+    {
+      s_inKeyBlockBefore= NULL;
+    }
+  }
+}
+
+HB_FUNC( SETINKEYAFTERBLOCK )
+{
+  USHORT uiPCount = hb_pcount();
+  if ( s_inKeyBlockAfter )
+  {
+    hb_itemReturn( s_inKeyBlockAfter );
+  }
+  if ( uiPCount > 0 )
+  {
+    if ( ISBLOCK(1) )
+    {
+      s_inKeyBlockAfter = hb_itemNew( hb_param( 1, HB_IT_BLOCK ) );
+    }
+    else if ( ISNIL(1) )
+    {
+      s_inKeyBlockAfter= NULL;
+    }
+  }
 }
 
 HB_FUNC( __KEYBOARD )
