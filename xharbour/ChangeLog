@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3469 2004/09/26 15:24:18 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3470 2004/09/26 16:37:00 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-28 09:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+  * xHarbour/source/rtl/gtwvt/wvtutils.c
+    + WVT_CREATEDIALOGMODAL()
+  * xHarbour/source/rtl/gtwvt/wvtpaint.prg
+    + Wvt_DialogBox( acnDlg, cbDlgProc, hWndParent )
+  * xharbour/include/hbgtwvt.h
+    + HWND      hDlgModal[ WVT_DLGMD_MAX ];   // Handle to a modeless dialog
+    + PHB_ITEM  pFuncModal[ WVT_DLGMD_MAX ];  // Function pointer for WndProc
+    + HB_ITEM   cbFuncModal[ WVT_DLGMD_MAX ]; // codeblock for WndProc
+    + int       iTypeModal[ WVT_DLGMD_MAX ];  // Type of Function Pointers - Function 1, Block 2, Method 3
+  * xHarbour/tests/wvtgui.prg
+    ! Synchronised to use modal dialogs alongwith modeless dialog.
+
+    Now GTWVT is capabble of firing MODAL Dialogs via Wvt_DialogBox() function. 
+    There is no change in the dialog creation protocol as implemented for 
+    modeless dialogs. The only limitation is that with Modal dialogs, the three
+    options available with modeless dialogs, viz., <ncIcon, nTimerTicks, hMenu>, 
+    are to be activated in WM_INITDIALOG window message by the programmer himself.
+    In all other respects the functionality is the same between modeless and 
+    modal dialogs.
 
 2004-09-26 18:35 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/rtl/trpc.prg
