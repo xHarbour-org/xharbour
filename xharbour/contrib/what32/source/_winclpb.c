@@ -170,6 +170,8 @@ HB_FUNC ( GETCLIPBOARDDATA )
 {
    WORD    wType = ( ISNIL( 1 ) ? CF_TEXT : hb_parni( 1 ) );
    HGLOBAL hMem ;
+   HANDLE  hClipMem ;
+   LPSTR   lpClip ;
 
    switch( wType )
    {
@@ -190,6 +192,17 @@ HB_FUNC ( GETCLIPBOARDDATA )
          else
             hb_retnl( 0 );
          break;
+
+      default:
+         hClipMem = GetClipboardData( ( UINT ) hb_parni( 1 ) );
+
+         if( hClipMem )
+         {
+            lpClip = ( LPSTR )  GlobalLock( hClipMem ) ;
+            hb_retclen( lpClip, GlobalSize( hClipMem ) ) ;
+            GlobalUnlock( hClipMem ) ;
+         }
+         break;      
    }
 }
 
@@ -232,13 +245,14 @@ HB_FUNC( SETCLIPBOARDDATA )
    }
 }
 */
-
 //----------------------------------------------------------------------------//
 
 HB_FUNC( SETCLIPBOARDDATA )
 {
    WORD    wType = hb_parni( 1 ) ;
    HGLOBAL hMem ;
+   DWORD   dwLen;
+   void    *pMem;
 
    switch( wType )
    {
@@ -258,6 +272,22 @@ HB_FUNC( SETCLIPBOARDDATA )
             hb_retnl( ( LONG ) DuplicateBitmap( ( HBITMAP ) GetClipboardData( CF_BITMAP ) ) );
          else
             hb_retnl( 0 );
+         break;
+
+      default:
+         dwLen = ( DWORD ) hb_parclen( 2 );
+         hMem  = GlobalAlloc( ( GMEM_MOVEABLE | GMEM_DDESHARE) , dwLen ) ;
+         if ( hMem )
+         {
+            pMem = GlobalLock( hMem ) ;
+            memcpy( pMem, hb_parcx( 2 ), dwLen ) ;
+            GlobalUnlock( hMem ) ;
+            hb_retnl( ( ULONG ) SetClipboardData( ( UINT ) hb_parni( 1 ), hMem ) ) ;
+         }
+         else
+         {
+            hb_retnl( 0 );
+         }
          break;
    }
 }
