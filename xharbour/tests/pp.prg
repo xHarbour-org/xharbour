@@ -4779,7 +4779,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
                EXIT
             ENDIF
 
-            sDigits+= s1
+            sDigits += s1
          NEXT
 
          // Must have accumulated decimal digits.
@@ -5058,7 +5058,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      CASE cType == '('
         s1 := Left( sLine, 1 )
-        IF ! ( s1 $ "(['" + '"' )
+        IF ! ( s1 $ "&(['" + '"' )
             nSpaceAt := At( ' ', sLine )
 
             IF nSpaceAt = 0
@@ -5146,11 +5146,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      IF nLen == 1
 
-        IF s1 $ "-+!:@|" // *** Very ODD Clipper consider '|' a continuation token !!!
+        IF s1 $ "-+!:@|." // *** Very ODD Clipper consider '|' continuation token !!!
            sExp += sToken
            LOOP
+
         ELSEIF s1 == "&"
            sExp += sToken
+
            IF sNext1 == '('
               LOOP
            ELSE
@@ -5164,7 +5166,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     s_bArrayPrefix := .T.
                  #endif
                  sNextToken     := NextToken( @sNextLine, .T. )
-                 IF sNextToken != NIL .AND. Left( sNextToken, 1 ) $ '.&'
+                 IF sNextToken != NIL .AND. Left( sNextToken, 1 ) == '.'
                     // Get the macro terminator.
                     sExp           += sNextToken
                     sLastToken     := "."
@@ -5200,8 +5202,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               ENDIF
            ENDIF
 
-            sLastToken := RTrim( sLastToken )
+           sLastToken := RTrim( sLastToken )
+
+           IF Left( sLine, 1 ) == '.'
+              LOOP
+           ENDIF
+
            // Continue  2nd level checks below.
+
         ELSEIF s1 == '('
            sExp += sToken
            IF Left( sNext1, 1 ) == ')'
@@ -5382,7 +5390,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
            sLastToken := "]"
            // Continue  2nd level checks below.
-        ELSEIF s1 $ ".*/=^><!$%#)}]?"
+        ELSEIF s1 $ "*/=^><!$%#)}]?"
            sLine := sToken + sLine
            EXIT
         ELSEIF s1 == ","
@@ -5672,7 +5680,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
   LOCAL xValue, nRepeats := 0, nDependee, nGroupStart, sDumb, aBackUp := aClone( aMarkers )
   LOCAL nMarkers, anMarkers, bBuildList
   LOCAL nGroupIterator
-  LOCAL lMacro, lComplexMacro, sTemp
+  LOCAL lMacro, lComplexMacro
 
   IF aResults[1] == NIL
      nResults := 0
@@ -5935,9 +5943,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               FOR nMatch := 1 TO nMatches
                  IF Left( xValue[nMatch], 1 ) == '&'
                     lMacro := .T.
-                    sTemp := SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
 
-                    IF '.' $ sTemp .OR. '&' $ sTemp
+                    IF SubStr( xValue[nMatch], 2, 1 ) != '(' .AND. '.' $ SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
                        lComplexMacro := .T.
                     ELSE
                        lComplexMacro := .F.
@@ -5970,9 +5977,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               IF ! ( xValue == NIL )
                  IF Left( xValue, 1 ) == '&'
                     lMacro := .T.
-                    sTemp := SubStr( xValue, 2, Len( xValue ) - 2 )
 
-                    IF '.' $ sTemp .OR. '&' $ sTemp
+                    IF SubStr( xValue, 2, 1 ) != '(' .AND. '.' $ SubStr( xValue, 2, Len( xValue ) - 2 )
                        lComplexMacro := .T.
                     ELSE
                        lComplexMacro := .F.
@@ -6009,9 +6015,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  ELSE
                     IF Left( xValue[nMatch], 1 ) == '&'
                        lMacro := .T.
-                       sTemp := SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
 
-                       IF '.' $ sTemp .OR. '&' $ sTemp
+                       IF SubStr( xValue[nMatch], 2, 1 ) != '(' .AND. '.' $ SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
                           lComplexMacro := .T.
                        ELSE
                           lComplexMacro := .F.
@@ -6042,9 +6047,8 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  ELSE
                     IF Left( xValue, 1 ) == '&'
                        lMacro := .T.
-                       sTemp := SubStr( xValue, 2, Len( xValue ) - 2 )
 
-                       IF '.' $ sTemp .OR. '&' $ sTemp
+                       IF SubStr( xValue, 2, 1 ) != '(' .AND. '.' $ SubStr( xValue, 2, Len( xValue ) - 2 )
                           lComplexMacro := .T.
                        ELSE
                           lComplexMacro := .F.
@@ -6174,8 +6178,6 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    */
 
    //? "=>" + sRule + "<="
-
-   TraceLog( sRule )
 
    ExtractLeadingWS( @sRule )
 

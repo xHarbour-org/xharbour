@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.85 2003/10/23 19:49:59 uid30952 Exp $
+ * $Id: ppcore.c,v 1.86 2003/10/23 22:04:09 ronpinkas Exp $
  */
 
 /*
@@ -3119,7 +3119,62 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                else
                /* Ron Pinkas end 2000-06-02 */
                {
-                  State = STATE_EXPRES;
+                  if( **ptri == '.' )
+                  {
+                     if( lens == 0 || isspace( *(*ptri - 1) ) || *(*ptri + 1) == '\0' )
+                     {
+                        // always accept as new top or as terminator.
+                     }
+                     else if( isdigit( *(*ptri + 1) ) )
+                     {
+                        if( lens && ! isdigit( *(*ptri - 1) ) )
+                        {
+                           //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
+                           rez = TRUE;
+                        }
+                     }
+                     else if( isalpha( *(*ptri + 1) ) || *(*ptri + 1) == '_' )
+                     {
+                        if( lens && ! ( isalpha( *(*ptri - 1) ) || *(*ptri - 1) == '.' ) )
+                        {
+                           //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
+                           rez = TRUE;
+                        }
+                     }
+
+                     if( ( *(*ptri + 1) == 'A' || *(*ptri + 1) == 'a' ) && ( *(*ptri + 2) == 'N' || *(*ptri + 2) == 'n' ) && ( *(*ptri + 3) == 'D' || *(*ptri + 3) == 'd' ) && *(*ptri + 4) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && ( *(*ptri + 2) == 'O' || *(*ptri + 2) == 'o' ) && ( *(*ptri + 3) == 'T' || *(*ptri + 3) == 't' ) && *(*ptri + 4) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'O' || *(*ptri + 1) == 'o' ) && ( *(*ptri + 2) == 'R' || *(*ptri + 2) == 'r' ) && *(*ptri + 3) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'T' || *(*ptri + 1) == 't' ) && *(*ptri + 2) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'F' || *(*ptri + 1) == 'f' ) && *(*ptri + 2) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'Y' || *(*ptri + 1) == 'y' ) && *(*ptri + 2) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                     else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && *(*ptri + 2) == '.' )
+                     {
+                        State = STATE_EXPRES;
+                     }
+                  }
+                  else
+                  {
+                     State = STATE_EXPRES;
+                  }
                }
 
                // Must terminate macro if any.
@@ -4035,7 +4090,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
            if( *expreal != '\0' )
            {
               /* Ron Pinkas added 2000-01-21 */
-              if( *expreal == '&' && ( ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenitem - 1 ) )
+              if( *expreal == '&' && ( expreal[1] == '(' || ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenitem - 1 ) )
               {
                  i = 0;
                  if( ! ifou )
@@ -4070,7 +4125,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     else
     {
        /* Ron Pinkas added 2000-01-21 */
-       if( *expreal == '&' && ( ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenreal - 1 ) )
+       if( *expreal == '&' && ( expreal[1] == '(' || ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenreal - 1 ) )
        {
           rmlen--;
 
@@ -4094,6 +4149,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     break;
 
   case '3':  /* Smart stringify result marker  */
+
     if( patttype == '1' )          /* list match marker */
     {
         hb_pp_Stuff( "", ptro, 0, 4, lenres );
@@ -4107,7 +4163,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
            if( *expreal != '\0' )
            {
-               if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) != NULL && pTemp - expreal < lenitem )
+               if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenitem - 1 ) )
                {
                    i = (ifou)? 3:2;
                    pp_rQuotes( expreal, sQuotes );
@@ -4155,14 +4211,14 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         }
         while( ifou > 0 );
     }
-    else if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) != NULL && pTemp - expreal < lenitem )
+    else if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenreal - 1 ) )
     {
         pp_rQuotes( expreal, sQuotes );
         hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
         hb_pp_Stuff( expreal, ptro + 1, lenreal, 0, lenres );
         rmlen = lenreal + 2;
     }
-    else if( !lenreal || *expreal == '(' || (*expreal=='&' && lenreal>1) ||
+    else if( !lenreal || *expreal == '(' || ( *expreal == '&' && lenreal > 1 ) ||
              ( *expreal == '\"' && *( expreal + lenreal - 1 ) == '\"' ) ||
              ( *expreal == '\'' && *( expreal + lenreal - 1 ) == '\'' ) )
     {

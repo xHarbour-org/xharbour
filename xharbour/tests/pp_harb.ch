@@ -1749,7 +1749,7 @@
             Counter = 1;
 
             // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
-            while( isalnum( sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
+            while( isalnum( sLine[Counter] ) || sLine[Counter] == '_' ) //|| sLine[Counter] == '\\' )
             {
                sReturn[Counter] = sLine[Counter];
                Counter++;
