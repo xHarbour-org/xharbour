@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.4 2003/11/14 23:17:31 ronpinkas Exp $
+* $Id: hashmass.prg,v 1.5 2003/11/23 03:13:54 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -24,7 +24,7 @@ PROCEDURE Main()
    @nRow++,5 SAY "Insertion in a non-optimized hash"
    hHash := {=>}
    nSecs := Seconds()
-   FOR i := 1 TO 100000
+   FOR i := 1 TO 10000
       IF I % 500 == 0
          @nRow,5 say Str(i)
          // Test for GC usage.
@@ -149,16 +149,6 @@ PROCEDURE Main()
    NEXT
    @nRow++,5 SAY "HASH Partitioned Retreiving " + Str( Seconds() - nSecs )
 
-
-
-   @nRow++,5 SAY "    Dumping   "
-
-   hFile := FCreate( "hash.dump" )
-   FOR i := 1 to Len( hHash )
-      FWrite( hFile, ValToPrg(HGetKeyAt(hHash, i )) + " => " + ValToPrg( HGetValueAt(hHash, i ) )+;
-         HB_OsNewLine() )
-   NEXT
-   FClose( hFile )
    @nRow++,5 SAY "    Done   "
    @nRow+2,0
 

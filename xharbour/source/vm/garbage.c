@@ -441,12 +441,10 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
    if( HB_IS_POINTER( pItem ) )
    {
-      printf( "\r\n   REFERENCE     \r\n" );
       /* check if this memory was allocated by a hb_gcAlloc() */
       if ( pItem->item.asPointer.collect )
       {
          HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asPointer.value;
-         printf( "\r\n   REFERENCE COLL  \r\n" );
          --pAlloc;
          /* Check this memory only if it was not checked yet */
          if( pAlloc->used == s_uUsedFlag )

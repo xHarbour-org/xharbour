@@ -24,7 +24,8 @@
     * Successful experiment of GC-olny item cleaning.
 
   * source/vm/errorapi.c
-    ! Ops, forgot that we have 2 idle inspector: GC and error ALERT messages... Fixed.
+    ! Ops, forgot that we have 2 idle inspector: GC and error ALERT
+      messages... Fixed.
 
 
 2003-11-26 10:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
