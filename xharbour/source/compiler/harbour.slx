@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.8 2002/05/18 09:12:48 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.9 2002/05/23 20:12:05 ronpinkas Exp $
  */
 
 /*
@@ -202,6 +202,8 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
 #define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 27
 #define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 28
+
+#define HB_TEXT_ID       LEX_CUSTOM_ACTION - 29
 
 #define USE_KEYWORDS
 
@@ -435,7 +437,8 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
                     IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
 
-                    IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             )
+                    IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             ),
+                    IF_SEQUENCE_IS( HB_TEXT     , 0           , 0      , 0          ) REDUCE_TO( HB_TEXT_ID        , 0             )
                    };
 
 /* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
@@ -540,7 +543,7 @@ int hb_comp_SLX_InterceptAction( int iRet, char *sToken )
       else if( iRet == REJECT_OP )
          { yylval.string = hb_compIdentifierNew( (char*) sToken, TRUE ); iRet = IDENTIFIER; }
       else
-         { printf( "Error SLX0001 Missing handler for '%i' line: %i\n", iRet, hb_comp_iLine - 1 ); hb_comp_iErrorCount++; }
+         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, hb_comp_iLine - 1 ); hb_comp_iErrorCount++; }
    }
 
    #ifdef SHOW_LEX_TOKENS
@@ -1245,8 +1248,13 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
          return IDENTIFIER + DONT_REDUCE;
       }
 
+      case HB_TEXT_ID :
+         yylval.string = hb_compIdentifierNew( "TEXT", TRUE );
+         return IDENTIFIER + DONT_REDUCE;
+
       default:
-         printf( "WARNING! No Handler for Custom Action %i\n", x );
+         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, hb_comp_iLine - 1 );
+         hb_comp_iErrorCount++;
    }
 
    return x;
