@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.24 2002/07/23 01:36:43 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.25 2002/07/24 02:58:43 ronpinkas Exp $
  */
 
 /*
@@ -447,6 +447,7 @@ extern double   hb_numRound( double dResult, int iDec ); /* round a number to a 
 
 /* class management */
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
+extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
 
 /* object management */
 extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
