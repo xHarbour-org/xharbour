@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3769 2005/01/25 10:47:41 druzus Exp $
+ * $Id: ChangeLog,v 1.3770 2005/01/26 02:29:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-26 19:30 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
+  * source/rtl/teditor.prg
+    ! minor fix to Tmemoeditor:gotoline() method
+      Their was times that the ::nrow was bigger the len(::atext)
+      if this occur, i set the ::nrow to the len of ::atext
 
 2005-01-25 18:26 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/vm/hvm.c
