@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2092 2004/01/18 03:51:34 paultucker Exp $
+ * $Id: ChangeLog,v 1.2093 2004/01/18 04:25:13 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-18 09:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * config/bsd/gcc.cf
+  * config/darwin/gcc.cf
+    ! Changed -Iinclude to -I$(TOP)/include. Maybe this is needed for
+      other architectures, too? This fixes, e.g., libct compilation.
+    ! Under BSD slang still needs curses.
+  * contrib/libct/Makefile
+    * A cosmetic change.
+  * source/rtl/gtcrs/gtcrs.c
+    ! Include <libutil.h> instead of <pty.h> on BSD.
 
 2004-01-18 07:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/bit1.c

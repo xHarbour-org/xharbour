@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.12 2003/12/14 11:28:16 druzus Exp $
+# $Id: Makefile,v 1.13 2004/01/04 13:12:46 lculik Exp $
 #
 
 ROOT = ../../
@@ -45,7 +45,7 @@ C_SOURCES = \
 	keyset.c \
 	math.c \
 	misc1.c \
-    net.c \
+	net.c \
 	num1.c \
 	numat.c \
 	pad.c \

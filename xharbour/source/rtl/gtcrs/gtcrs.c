@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.26 2003/11/04 08:31:04 druzus Exp $
+ * $Id: gtcrs.c,v 1.27 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -79,7 +79,11 @@
 # include <gpm.h>
 #endif
 #if defined( HB_OS_LINUX ) || defined( HB_OS_BSD )
-# include <pty.h>  /* for openpty and forkpty */
+# if defined( HB_OS_LINUX )
+#  include <pty.h>  /* for openpty and forkpty */
+# elif defined( HB_OS_BSD )
+#  include <libutil.h> /* for openpty and forkpty */
+# endif
 # include <utmp.h> /* for login_tty */
 #endif
 

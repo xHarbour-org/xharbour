@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.5 2004/01/03 14:06:20 jonnymind Exp $
+# $Id: gcc.cf,v 1.6 2004/01/05 18:59:27 lf_sfnet Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -Iinclude -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS = -Wall -g -DHB_OS_BSD -DSIMPLEX
 else
@@ -68,6 +68,11 @@ LINKPATHS += -L/usr/local/lib
 LINKLIBS += -l$(HB_SCREEN_LIB)
 endif
 
+# In BSD, slang still needs curses :(
+ifeq ($(HB_GT_LIB),gtsln)
+LINKLIBS += -lncurses
+endif
+
 ifeq ($(HB_GT_LIB),gtxvt)
 LINKLIBS += -lX11
 LINKPATHS +=-L/usr/X11R6/lib
@@ -88,7 +93,7 @@ include $(TOP)$(ROOT)config/rules.cf
 
 
 #
-# $Id: gcc.cf,v 1.5 2004/01/03 14:06:20 jonnymind Exp $
+# $Id: gcc.cf,v 1.6 2004/01/05 18:59:27 lf_sfnet Exp $
 #
 
 # How to run yacc.

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.6 2003/09/25 02:24:02 paultucker Exp $
+# $Id: gcc.cf,v 1.7 2003/11/26 20:16:07 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -no-cpp-precomp -I. -Iinclude -I$(HB_INC_COMPILE)
+CPPFLAGS = -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS = -Wall -g -DSIMPLEX
 else
@@ -90,9 +90,15 @@ ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
 endif
 
+# In BSD, slang still needs curses :(
+ifeq ($(HB_GT_LIB),gtsln)
+LINKLIBS += -lncurses
+endif
+
 # HB_GPM_MOUSE: use gpm mouse driver
+# Actually, there is no gpm on BSD.
 ifeq ($(HB_GPM_MOUSE),yes)
-####LINKLIBS += -lgpm
+LINKLIBS += -lgpm
 endif
 
 #it never hurts if MT is enabled.
