@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1208 2003/07/02 10:12:36 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1209 2003/07/02 18:08:20 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-04 12:33 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/rtl/txml.prg
+    + Added contestualization, that is a needed feature for init
+      file parsing.
+    ! Now iterators are well structured in an object oriented
+      hierarcy.
+
+  * incudle/hbxml.ch
+    - removed uneeded iterator types
+
+  * source/vm/errorapi.c
+    ! When calling hb_errRT_BASE with a NULL in any of the arguments
+      (most probably because the PRG program passed a NIL variable)
+      there was a segfault. Fixed
+
+  * doc/hbxml.txt
+    ! Updated with current API.
+
 
 2003-07-02 14:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg

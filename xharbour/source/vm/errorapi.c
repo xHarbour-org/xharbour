@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.11 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.12 2003/06/27 05:05:36 ronpinkas Exp $
  */
 
 /*
@@ -932,7 +932,15 @@ PHB_ITEM HB_EXPORT hb_errPutArgs( PHB_ITEM pError, ULONG ulArgCount, ... )
 
    va_start( va, ulArgCount );
    for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
-      hb_arraySet( pArray, ulArgPos, va_arg( va, PHB_ITEM ) );
+   {
+      PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
+      if ( pVaItem == NULL )
+      {
+         pVaItem = hb_itemNew( NULL );
+      }
+      hb_arraySet( pArray, ulArgPos, pVaItem );
+   }
    va_end( va );
 
    /* Assign the new array to the object data item. */
@@ -1076,7 +1084,13 @@ USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, char * szDescr
 
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
-         hb_arraySet( pArray, ulArgPos, va_arg( va, PHB_ITEM ) );
+         PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
+         if ( pVaItem == NULL )
+         {
+            pVaItem = hb_itemNew( NULL );
+         }
+         hb_arraySet( pArray, ulArgPos, pVaItem );
       }
    }
    va_end( va );
@@ -1118,7 +1132,16 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, char * sz
    /* Build the array from the passed arguments. */
    va_start( va, ulArgCount );
    for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
-      hb_arraySet( pArray, ulArgPos, va_arg( va, PHB_ITEM ) );
+   {
+      PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
+      if ( pVaItem == NULL )
+      {
+         pVaItem = hb_itemNew( NULL );
+      }
+      hb_arraySet( pArray, ulArgPos, pVaItem );
+   }
+
    va_end( va );
 
    pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, uiOsCode, uiFlags );
@@ -1156,7 +1179,15 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, char *
    /* Build the array from the passed arguments. */
    va_start( va, ulArgCount );
    for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
-      hb_arraySet( pArray, ulArgPos, va_arg( va, PHB_ITEM ) );
+   {
+       PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
+      if ( pVaItem == NULL )
+      {
+         pVaItem = hb_itemNew( NULL );
+      }
+      hb_arraySet( pArray, ulArgPos, pVaItem );
+   }
    va_end( va );
 
    pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
@@ -1210,7 +1241,13 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
 
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
-         hb_arraySet( pArray, ulArgPos, va_arg( va, PHB_ITEM ) );
+         PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
+         if ( pVaItem == NULL )
+         {
+            pVaItem = hb_itemNew( NULL );
+         }
+         hb_arraySet( pArray, ulArgPos, pVaItem );
       }
    }
    va_end( va );

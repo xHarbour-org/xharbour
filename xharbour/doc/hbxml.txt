@@ -8,7 +8,7 @@
                                gian@nccolai.ws
 
 
-$Id: hbxml.txt,v 1.1 2003/06/15 21:05:14 jonnymind Exp $
+$Id: hbxml.txt,v 1.2 2003/07/02 10:12:38 jonnymind Exp $
 
 
 STATUS OF THE LIBRARY
@@ -190,6 +190,21 @@ Find the next node matching the criteria given in ::FindFirst() or
 is returned. A new ::FindFirst() or ::FindFirstRegex() can
 reset the search in any moment.
 
+
+=====================
+
+TXmlDocument:GetContext() --> oXmlDocument
+
+Creates a new document where the root node is the current node.
+This is needed when you want to i.e. scan, write or change
+all the nodes below the current node. All find and write operations
+are limited to this sub-document. The root node of the document
+has still his former parent and brothers, and it is NOT a copy
+of the original document node; so, any change made to this
+sub-document will be reflected on the original one.
+
+Similar (but maybe simpler) result can be achieved with iterators.
+TODO: write documentation about iterators.
 
 
 
@@ -418,7 +433,6 @@ TXmlNode:Write( fhHandle, nStyle ) --> lValue
 Writes an XML string representation of current node and all its children to
 an open file handle. See TXMLDocument:Write() for a description of the nStyle
 parameter.
-
 
 
 
