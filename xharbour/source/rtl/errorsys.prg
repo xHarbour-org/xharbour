@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.37 2004/06/17 07:07:48 guerra000 Exp $
+ * $Id: errorsys.prg,v 1.38 2004/06/29 22:14:13 ronpinkas Exp $
  */
 
 /*
@@ -495,8 +495,6 @@ RETURN cArguments
 #include <windows.h>
 
 static PHB_FUNC s_xHbFunc;
-
-PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested );
 
 LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
 {

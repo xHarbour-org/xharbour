@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3341 2004/08/25 20:36:51 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3342 2004/08/25 23:49:56 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-26 01:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/vm/fastitem.c
+    ! Fixed hb_itemPutCStatic() to detect NUL value (was a GPF Trap).
+  * source/vm/arrayshb.c
+    ! Fixed HB_StructureToArray() to circumvent override of existing string with same pointer.
+    * Added PHB_ITEM pRet param to HB_StructureToArray()
+  * source/rtl/cstruct.prg
+    * ::Value() and ::DeValue() to pass pRet to HB_StructureToArray()
+
+  * source/rtl/errorsys.prg
+    - Removed unused delaration
+
+  * utils/xbscript/xbs_harb.ch
+    * Minor correction
 
 2004-08-25 16:46 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * makefile.bc
@@ -27,7 +42,7 @@
   + source/ct/*
   + doc/en/ct/*
     * copied contrib/libct/* but strfile.prg and fcopy.prg
-    * separated $DOC$..$END$ embedded doc sections and moved to 
+    * separated $DOC$..$END$ embedded doc sections and moved to
     * doc/en/ct, renamed files to .txt and changed some names
     * to avoid conflicts with /doc/en files
     * updated gnu Makefile ( please update other makefiles )

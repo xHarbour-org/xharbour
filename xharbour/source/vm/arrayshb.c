@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.48 2004/08/24 02:15:14 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.49 2004/08/25 02:01:16 ronpinkas Exp $
  */
 
 /*
@@ -1510,19 +1510,19 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested )
+PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    unsigned long ulLen = pBaseDef->ulLen;
    unsigned long ulIndex;
    unsigned int uiOffset, uiMemberSize;
    BYTE cShift;
-   PHB_ITEM pRet = hb_itemNew( NULL );
+   //PHB_ITEM pRet = hb_itemNew( NULL );
    PHB_BASEARRAY pBaseVar;
 
    //TraceLog( NULL, "StructureToArray(%p, %p, %u, %i) ->%u\n", Buffer, aDef, uiAlign, bAdoptNested, ulLen );
 
-   hb_arrayNew( pRet, ulLen );
+   //hb_arrayNew( pRet, ulLen );
    pBaseVar = pRet->item.asArray.value;
 
    uiOffset = 0;
@@ -1653,11 +1653,37 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_CHAR_PTR : // char *
-            hb_itemPutC( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( (char **) ( Buffer + uiOffset ) ) )
+            {
+               //TraceLog( NULL, "IDENTICAL: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+            }
+            else if( bAdoptNested )
+            {
+               //TraceLog( NULL, "Adopt: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+            }
+            else
+            {
+               //TraceLog( NULL, "Static: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (char **) ( Buffer + uiOffset ) ) );
+            }
             break;
 
          case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
-            hb_itemPutC( pBaseVar->pItems + ulIndex , (char *) *( (BYTE **) ( Buffer + uiOffset ) ) );
+            if( HB_IS_STRING( pBaseVar->pItems + ulIndex ) && ( pBaseVar->pItems + ulIndex )->item.asString.value == *( (char **) ( Buffer + uiOffset ) ) )
+            {
+               //TraceLog( NULL, "IDENTICAL: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+            }
+            else if( bAdoptNested )
+            {
+               //TraceLog( NULL, "Adopt: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutC( pBaseVar->pItems + ulIndex , *( (BYTE **) ( Buffer + uiOffset ) ) );
+            }
+            else
+            {
+               //TraceLog( NULL, "Static: %s\n", *( (char **) ( Buffer + uiOffset ) ) );
+               hb_itemPutCStatic( pBaseVar->pItems + ulIndex , *( (BYTE **) ( Buffer + uiOffset ) ) );
+            }
             break;
 
          case CTYPE_SHORT : // short
@@ -1803,14 +1829,14 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
 HB_FUNC( HB_STRUCTURETOARRAY )
 {
    PHB_ITEM Structure = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM aDef = hb_param( 2, HB_IT_ARRAY );
-   PHB_ITEM pAlign = hb_param( 3, HB_IT_INTEGER );
-   PHB_ITEM pAdopt = hb_param( 4, HB_IT_LOGICAL );
+   PHB_ITEM aDef      = hb_param( 2, HB_IT_ARRAY );
+   PHB_ITEM pAlign    = hb_param( 3, HB_IT_INTEGER );
+   PHB_ITEM pAdopt    = hb_param( 4, HB_IT_LOGICAL );
+   PHB_ITEM pRet      = hb_param( 5, HB_IT_ARRAY );
    BOOL bAdopt;
 
    if( Structure && aDef )
    {
-      PHB_ITEM pRet;
       BYTE  *Buffer = (BYTE *) Structure->item.asString.value;
       unsigned int uiAlign;
 
@@ -1832,9 +1858,7 @@ HB_FUNC( HB_STRUCTURETOARRAY )
          bAdopt = FALSE;
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pRet = StructureToArray( Buffer, aDef, uiAlign, bAdopt ) );
-
-      hb_itemRelease( pRet );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), StructureToArray( Buffer, aDef, uiAlign, bAdopt, pRet ) );
    }
    else
    {

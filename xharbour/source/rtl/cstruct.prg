@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.33 2004/05/24 20:42:12 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.34 2004/05/27 02:31:10 ronpinkas Exp $
  */
 
 /*
@@ -525,29 +525,32 @@ RETURN QSelf()
 //---------------------------------------------------------------------------//
 STATIC Function Value()
 
-   LOCAL aValues := {}
+   //LOCAL aValues := {}
 
-   aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
+   //aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
-   QSelf():InternalBuffer := HB_ArrayToStructure( aValues, QSelf():aCTypes, QSelf():nAlign )
+   QSelf():InternalBuffer := HB_ArrayToStructure( QSelf(), QSelf():aCTypes, QSelf():nAlign )
 
 RETURN QSelf():InternalBuffer
 
 //---------------------------------------------------------------------------//
 STATIC Function DeValue( lAdopt )
 
-   LOCAL aValues
+   //LOCAL aValues := {}
    LOCAL xProperty, nLen := Len( QSelf() ) - CLASS_PROPERTIES
    LOCAL Buffer := QSelf():InternalBuffer
 
    //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ), lAdopt )
 
+   //aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
+
    IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
-      aValues := Array( nLen )
+      TraceLog( "EMPTY Buffer passed to " + ProcName() )
    ELSE
-      aValues := HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt  )
+      HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt, QSelf()  )
    ENDIF
 
+   /*
    FOR EACH xProperty IN QSelf()
       IF HB_EnumIndex() > nLen
          EXIT
@@ -555,6 +558,7 @@ STATIC Function DeValue( lAdopt )
 
       xProperty := aValues[ HB_EnumIndex() ]
    NEXT
+   */
 
 RETURN QSelf()
 

@@ -127,8 +127,9 @@
            PP_ModuleName( ::cName )
         ENDIF
 
-        ::cPPed += PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
+        ::cPPed := PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
         nLines  := Len( ::acPPed )
+        //TraceLog( ::cText, ::cPPed, nLines )
 
 	acPPed := ::acPPed
         nStart := ::nCompiledLines + 1
@@ -157,6 +158,7 @@
         FOR nLine := nStart TO nLines
            sLine := acPPed[nLine]
            IF sLine != NIL
+              //TraceLog( "COMPLE: " + sLine )
               PP_CompileLine( sLine, nLine, aCompiledProcs, aInitExit, @nProcId )
            ENDIF
         NEXT
@@ -2691,6 +2693,7 @@
                 pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
 
                 pDynSym = hb_dynsymGet( sFunctionName );
+                //TraceLog( NULL, "Dyn: %p %s\n", pDynSym, sFunctionName );
 
                 pDynList[ iBase + iProcedure ].iID         = iProcedure;
                 pDynList[ iBase + iProcedure ].pDynFunc    = pDynFunc;
@@ -2699,6 +2702,7 @@
                 pDynList[ iBase + iProcedure ].pPresetFunc = pDynSym->pSymbol->value.pFunPtr;
 
                 pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
+                pDynSym->pFunPtr = pDynFunc->pFunPtr;
              }
 
              //hb_retptr( (void *) pDynList );
@@ -2749,6 +2753,7 @@
                 if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == pDynList[i].pDynFunc->pFunPtr )
                 {
                    pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
+                   pDynList[i].pDynSym->pFunPtr = pDynList[i].pPresetFunc ;
                 }
                 else
                 {
