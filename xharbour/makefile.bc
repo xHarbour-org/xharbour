@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.65 2003/09/09 02:07:54 paultucker Exp $
+# $Id: makefile.bc,v 1.66 2003/09/10 00:33:37 ronpinkas Exp $
 #
 
 #
@@ -413,6 +413,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\spfiles.obj \
    $(RTL_OBJ_DIR)\str.obj \
    $(RTL_OBJ_DIR)\strcase.obj \
+   $(RTL_OBJ_DIR)\strdel.obj \
    $(RTL_OBJ_DIR)\strings.obj \
    $(RTL_OBJ_DIR)\strmatch.obj \
    $(RTL_OBJ_DIR)\strpeek.obj \
@@ -2029,6 +2030,9 @@ $(RTL_OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\strdel.obj : $(RTL_DIR)\strdel.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.43 2003/07/24 04:11:44 andijahja Exp $
+# $Id: makefile.nt,v 1.44 2003/09/09 02:07:54 paultucker Exp $
 #
 
 #
@@ -435,6 +435,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\spfiles.obj \
    $(OBJ_DIR)$(MT)\str.obj \
    $(OBJ_DIR)$(MT)\strcase.obj \
+   $(OBJ_DIR)$(MT)\strdel.obj \
    $(OBJ_DIR)$(MT)\strings.obj \
    $(OBJ_DIR)$(MT)\strmatch.obj \
    $(OBJ_DIR)$(MT)\strpeek.obj \
