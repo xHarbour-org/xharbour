@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.26 2002/06/29 03:02:19 lculik Exp $
+ * $Id: hbmake.prg,v 1.27 2002/07/08 02:08:04 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -983,7 +983,7 @@ FUNCTION Compfiles()
                             Outstd( cComm )
                                      ! ( cComm )
                             cErrText := Memoread( 'test.out' )
-                            lEnd     := 'Error' $ cErrText
+                            lEnd     := 'Error E' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
 
@@ -2136,7 +2136,7 @@ FUNCTION CompUpdatedfiles()
                             Outstd( hb_osnewline() )
                             ! ( cComm )
                             cErrText := Memoread( 'test.out' )
-                            lEnd     := 'Error' $ cErrText
+                            lEnd     := 'Error E' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
 
