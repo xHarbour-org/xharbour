@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.22 2002/10/28 12:03:51 what32 Exp $
+ * $Id: TCRebar.prg,v 1.23 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -114,7 +114,7 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
       MoveWindow(::handle,0,0,acRect[3],aRect[4]-aRect[2],.t.)
    endif
    
-   RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
+   RETURN( 0) //CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
 
 *------------------------------------------------------------------------------*
 
