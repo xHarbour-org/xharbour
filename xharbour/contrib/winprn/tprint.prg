@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.6 2004/01/22 00:46:52 peterrees Exp $
+ * $Id: tprint.prg,v 1.7 2004/02/05 12:44:17 andijahja Exp $
  */
 
 /*
@@ -896,23 +896,20 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray)
 {
-    PHB_ITEM pSubItems, pFontName, pFixed, pTrueType, pCharSet;
-//    HB_SYMBOL_UNUSED( lpntm );
-    pSubItems = hb_itemArrayNew( 4 );
-    pFontName = hb_itemPutC( NULL, lplf->lfFaceName);
-    pFixed    = hb_itemPutL( NULL, lplf->lfPitchAndFamily & FIXED_PITCH  );
-    pTrueType = hb_itemPutL( NULL, FontType & TRUETYPE_FONTTYPE);
-    pCharSet  = hb_itemPutNL( NULL, lpntm->tmCharSet);
-    hb_arraySet( pSubItems , 1 , pFontName ) ;
-    hb_arraySet( pSubItems , 2 , pFixed ) ;
-    hb_arraySet( pSubItems , 3 , pTrueType ) ;
-    hb_arraySet( pSubItems , 4 , pCharSet ) ;
-    hb_arrayAdd((PHB_ITEM) pArray , pSubItems);
-    hb_itemRelease( pFontName ) ;
-    hb_itemRelease( pFixed ) ;
-    hb_itemRelease( pTrueType );
-    hb_itemRelease( pCharSet );
-    hb_itemRelease( pSubItems );
+    HB_ITEM pSubItems, pFontName, pFixed, pTrueType, pCharSet;
+    pSubItems.type = HB_IT_NIL;
+    pFontName.type = HB_IT_NIL;
+    pFixed.type = HB_IT_NIL;
+    pTrueType.type = HB_IT_NIL;
+    pCharSet.type = HB_IT_NIL;
+
+    hb_arrayNew( &pSubItems, 4 );
+    hb_arraySetForward( &pSubItems, 1 ,hb_itemPutC(  &pFontName, lplf->lfFaceName) ) ;
+    hb_arraySetForward( &pSubItems, 2 ,hb_itemPutL(  &pFixed   , lplf->lfPitchAndFamily & FIXED_PITCH  ) ) ;
+    hb_arraySetForward( &pSubItems, 3 ,hb_itemPutL(  &pTrueType, FontType & TRUETYPE_FONTTYPE) ) ;
+    hb_arraySetForward( &pSubItems, 4 ,hb_itemPutNL( &pCharSet , lpntm->tmCharSet) ) ;
+    hb_arrayAddForward((PHB_ITEM) pArray , &pSubItems);
+
     return(TRUE);
 }
 
@@ -922,11 +919,13 @@ HB_FUNC_STATIC( ENUMFONTS )
   HDC hDC                  = (HDC) hb_parnl(1) ;
   if (hDC)
   {
-    PHB_ITEM pArray = hb_itemArrayNew( 0 );
-    if ( pArray )
+    HB_ITEM pArray;
+    pArray.type = HB_IT_NIL;
+    hb_arrayNew( &pArray, 0 );
+    if ( &pArray )
     {
-      EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) pArray);
-      hb_itemReturn( pArray) ;
+      EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) &pArray);
+      hb_itemReturn( &pArray) ;
       Result = TRUE ;
     }
   }
