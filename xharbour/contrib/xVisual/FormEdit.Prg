@@ -193,7 +193,7 @@ METHOD CreateControl(aRect)
          ::Parent:ObjTree:Tree:Expand()
       endif
    ENDIF
-   ::Parent:StdBar:CheckButton( 100, .T. )
+   ::Parent:StdBar:CheckButton( 150, .T. )
 
    RETURN(oObj)
 
