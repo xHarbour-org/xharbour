@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.105 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: hvm.c,v 1.106 2002/09/23 17:50:44 ronpinkas Exp $
  */
 
 /*
@@ -565,7 +565,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    LONG lOffset;
    ULONG ulLastOpcode = 0; /* opcodes profiler support */
    ULONG ulPastClock = 0;  /* opcodes profiler support */
-   //short iGlobal;
+
+   USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
@@ -1064,7 +1065,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
 
             /*
-             * NOTE!!! Return!!!
+             * *** NOTE!!! Return!!!
              */
 
             return;
@@ -2410,7 +2411,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    if( pSymbols )
+   {
       hb_memvarSetPrivatesBase( ulPrivateBase );
+   }
+
+   while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
+   {
+      hb_vm_wEnumCollectionCounter--;
+      hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+   }
+
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 }

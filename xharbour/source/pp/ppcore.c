@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.27 2002/09/16 18:17:29 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.28 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -920,7 +920,8 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   if( (ipos = hb_strAt( "=>", 2, sLine, strlen(sLine) )) > 0 ) */
   if( bOk || bRemove )
   {
-    RemoveSlash( mpatt );
+    // Ron Pinkas commented 2002-09-23
+    //RemoveSlash( mpatt );
     mlen = strotrim( mpatt, TRUE );
 
     /* Ron Pinkas removed 2000-12-03
@@ -931,6 +932,9 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
     rlen = strotrim( rpatt, TRUE );
 
     ConvertPatterns( mpatt, mlen, rpatt, rlen );
+
+    // Ron Pinkas added 2002-09-23
+    RemoveSlash( mpatt );
 
     if( bRemove )
     {
@@ -1031,7 +1035,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
   while( *(mpatt+i) != '\0' )
     {
-      if( *(mpatt+i) == '<' )
+      if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
         {  /* Drag match marker, determine it type */
           explen = 0; ipos = i; i++; exptype = '0';
           while( *(mpatt+i) == ' ' || *(mpatt+i) == '\t' ) i++;
@@ -1955,7 +1959,10 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   SearnRep( "\1", "", 0, ptro, lenres );
   *(ptro + *lenres) = '\0';
+
+  //printf( "%s\n", ptro );
   *lenres = RemoveSlash( ptro );   /* Removing '\', '[' and ']' from result string */
+  //printf( "%s\n", ptro );
 
   if( com_or_tra )
   {
@@ -1994,11 +2001,12 @@ static int RemoveSlash( char * stroka )
             State = STATE_INIT;
             bDirective = FALSE;
           }
-          else if( !bDirective )
+          else //if( !bDirective )
           {
-             if( *ptr == '\\' && ( *(ptr+1) == '[' || *(ptr+1) == ']' ||
+             // Ron Pinkas commented 2002-09-23
+             if( *ptr == '\\' /* && ( *(ptr+1) == '[' || *(ptr+1) == ']' ||
                                    *(ptr+1) == '{' || *(ptr+1) == '}' || *(ptr+1) == '<' ||
-                                   *(ptr+1) == '>' || *(ptr+1) == '\'' || *(ptr+1) == '\"' ) )
+                                   *(ptr+1) == '>' || *(ptr+1) == '\'' || *(ptr+1) == '\"' || *(ptr+1) == '\\' )*/ )
              {
                 hb_pp_Stuff( "", ptr, 0, 1, lenres - (ptr - stroka) );
                 lenres--;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.8 2002/05/22 15:24:55 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.9 2002/05/22 16:35:10 ronpinkas Exp $
  */
 
 /*
@@ -308,6 +308,18 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
             {
                pExpr = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
             }
+
+            HB_EXPR_PCODE1( hb_compExprDelete, pParms );
+            HB_EXPR_PCODE1( hb_compExprDelete, pName );
+         }
+      }
+      else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && iCount == 1 )
+      {
+         HB_EXPR_PTR pText = pParms->value.asList.pExprList;
+
+         if( pText->ExprType == HB_ET_STRING )
+         {
+            pExpr = hb_compExprNewString( hb_strupr( pText->value.asString.string ) );
 
             HB_EXPR_PCODE1( hb_compExprDelete, pParms );
             HB_EXPR_PCODE1( hb_compExprDelete, pName );

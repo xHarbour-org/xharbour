@@ -3393,7 +3393,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aAdd( aTranslated, nRule )
             ENDIF
 
-
             nPosition := 0
             WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
                nPendingLines++
@@ -3405,11 +3404,19 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aIns( aPendingLines, nPosition )
                aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
+               IF Left( aPendingLines[ nPosition ], 1 ) == '#'
+                  FWrite( hPP, aPendingLines[ nPosition ] + ';' )
+               ENDIF
+
                //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
                sLine := SubStr( sLine, nNewLineAt + 1 )
             ENDDO
 
             IF nPosition == 0
+               IF Left( sLine, 1 ) == '#'
+                  FWrite( hPP, sLine + ';' )
+               ENDIF
+
                sLine := sLeft + sPassed + sLine
             ELSE
                IF ! Empty( sLine )
@@ -3463,11 +3470,19 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             aIns( aPendingLines, nPosition )
             aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
+            IF Left( aPendingLines[ nPosition ], 1 ) == '#'
+               FWrite( hPP, aPendingLines[ nPosition ] + ';' )
+            ENDIF
+
             //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
             sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
          ENDDO
 
          IF nPosition == 0
+            IF Left( sLine, 1 ) == '#'
+               FWrite( hPP, sLine + ';' )
+            ENDIF
+
             sLine := sLeft + sLine
          ELSE
             IF ! Empty( sLine )
@@ -5821,6 +5836,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    LOCAL nLastOptional, nPending
    LOCAL sDots
    LOCAL nMarkerID
+   LOCAL nTempMP
 
    /*
    nMarkerID
@@ -6733,8 +6749,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          //? "Repeatable: ", nMarker, "Root: ", nOptional
 
          IF ValType( nMarker ) == 'N'
-            nMP := 0
-            WHILE ( nMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker }, nMP + 1 ) ) > 0
+            nTempMP := 0
+            WHILE ( nTempMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker }, nTempMP + 1 ) ) > 0
+               nMP := nTempMP
                WHILE aRule[2][nMP][2] < 0
                   IF aRule[2][nMP][1] >= 0
 
@@ -6762,7 +6779,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ENDIF
 
       IF ValType( aRP[2] ) == 'C'
+         aRP[2] := StrTran( aRP[2], '\\', '~' )
          aRP[2] := StrTran( aRP[2], '\', '' )
+         aRP[2] := StrTran( aRP[2], '~', '\' )
          //? "RP #", Counter, aRP[1], '"' + aRP[2] + '"'
       ELSE
          //? "RP #", Counter, aRP[1], aRP[2]

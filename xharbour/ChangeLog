@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.397 2002/09/23 17:50:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.398 2002/09/23 17:53:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-23 20:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed long oustanding issue of correct support for \ (escape) in pre-processor rules.
+
+  * include/hbclass.ch
+    + Added missing escapes in nested directives.
+
+  * include/hbexpra.c
+    + Added compile time optimization of Upper() when applied to a literal.
+
+  * source/vm/hvm.c
+    + Added logic to support a RETURN from inside a FOR EACH loop.
+
+  * tests/pp.prg
+    + Added support for \\ (double esacpe).
+    ! Fixed possible infinite loop when marking match marker as repeatable.
 
 2002-09-23 10:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
