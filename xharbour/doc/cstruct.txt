@@ -16,17 +16,58 @@ Syntax:
      [ ... ]
    END C STRUCTURE
 
+   Example:
+   --------
+
+     // Explicit Alignment.
+     C STRUCTURE MyNestedStructure Align 1
+       Member c1[2] IS CTYPE_CHAR
+       Member l2    IS CTYPE_LONG
+     END C STRUCTURE
+
+     // Different Alignment.
+     C STRUCTURE MyStructure Align 4
+       Member sName    IS CTYPE_CHAR_PTR
+       Member cAge     IS CTYPE_CHAR
+       Member uiWeight IS CTYPE_UNSIGNED_INT
+       Member dHeight  IS CTYPE_DOUBLE
+
+       // This is IN-PLACE - Note IS clause (may also use INPLACE clause).
+       Member Nested   IS MyNestedStructure
+
+       // This is DETACHED - Note AS clause.
+       Member pNext    AS MyStructure
+     END C STRUCTURE
+ 
 
    Usage:
    ------
 
    <lValue> IS <strucName>
 
+     Example: 
+     --------
+       LOCAL oStructure IS MyStructure
+
    <lValue> IS <strucName> := {...}
+
+     Example: 
+     --------
+       LOCAL oStructure IS MyStructure := { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
 
    <lValue> IS <strucName> INIT|FROM {...}
 
+     Example: 
+     --------
+       LOCAL oStructure IS MyStructure INIT { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
+
+       oStructure IS MyStructure FROM { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
+
    <strucObj>:<memberName>
+
+     Example: 
+     --------
+       oStructure:pNext IS MyStructure
 
 
 Properties:

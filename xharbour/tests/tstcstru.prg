@@ -1,11 +1,12 @@
 #include "cstruct.ch"
 
-// Different Alignment
+// Explicit Alignment
 C STRUCTURE MyNestedStructure Align 1
   Member c1[2] IS CTYPE_CHAR
   Member l2    IS CTYPE_LONG
 END C STRUCTURE
 
+// Different Alignment
 C STRUCTURE MyStructure Align 4
   Member sName    IS CTYPE_CHAR_PTR
   Member cAge     IS CTYPE_CHAR
@@ -25,7 +26,7 @@ Procedure Main()
    LOCAL oStructure IS MyStructure := { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
 
    // Manualy initialize DETACHED Structure Member.
-   oStructure:pNext := C STRUCTURE MyStructure
+   oStructure:pNext IS MyStructure
    WITH OBJECT oStructure:pNext
        :sName    := "Nested"
        :cAge     := 100

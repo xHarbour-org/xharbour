@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.4 2002/06/18 05:48:40 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.5 2002/06/19 01:00:55 ronpinkas Exp $
  */
 
 /*
@@ -106,6 +106,4 @@
             HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
 
    #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
-
-   #translate := C STRUCTURE <!stru!> => := HB_CStructure( #<stru> )
 #endif
