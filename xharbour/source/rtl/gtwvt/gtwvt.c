@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.117 2004/07/23 04:39:01 paultucker Exp $
+ * $Id: gtwvt.c,v 1.118 2004/07/24 00:59:11 peterrees Exp $
  */
 
 /*
@@ -4000,6 +4000,19 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 
       case GTI_ERRORFD:
          return (int) GetStdHandle( STD_ERROR_HANDLE );
+
+      case GTI_WINTITLE:
+         {
+            hb_wvt_gtSetWindowTitle( (char *) vpParam );
+            return 0;
+         }   
+
+      case GTI_CODEPAGE:
+         return (int) hb_wvt_gtSetCodePage( iParam );
+
+      case GTI_ICONFILE:
+         return (long) hb_wvt_gtSetWindowIconFromFile( (char *) vpParam  );
+
    }
 
    // DEFAULT: there's something wrong if we are here.

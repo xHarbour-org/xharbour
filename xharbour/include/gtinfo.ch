@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.4 2004/05/25 20:27:22 druzus Exp $
+ * $Id: gtinfo.ch,v 1.5 2004/06/28 14:16:33 jonnymind Exp $
  */
 
 /*
@@ -74,6 +74,9 @@
 #define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
 #define GTI_FONTQUALITY   23  /* Get/set quality of font rendering in the appl. */
 #define GTI_FONTNAME      24  /* Set-only font name */
+#define GTI_CODEPAGE      25  /* codepage */
+#define GTI_WINTITLE      26  /* title */
+#define GTI_ICONFILE      27  /* icon file */
 
 #define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
 #define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3219 2004/07/27 09:58:31 patrickmast Exp $
+ * $Id: ChangeLog,v 1.3220 2004/07/27 13:19:28 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-27 19:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * include/inkey.ch
+    + added K_SH_BS to simulate K_CTRL_SH_TAB in gtcrs
+  * include/gtinfo.ch
+  * source/rtl/gtwvt/gtwvt.c
+    + added GTI_WINTITLE, GTI_ICONFILE, GTI_CODEPAGE to easy 
+      windows MULTI_GT
 
 2004-07-27 15:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh

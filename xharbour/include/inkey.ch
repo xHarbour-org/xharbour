@@ -177,6 +177,7 @@
 #define K_ALT_TAB               421   /* * Alt-Tab                       */
 
 #define K_CTRL_SH_TAB           423   /* * Ctrl-Shift-Tab                */
+#define K_SH_BS                 423   /* * Shift-Backspace               */
 
 #ifdef HB_EXT_SHIFT_KEYS_CODES
 
