@@ -8,587 +8,594 @@
                                gian@nccolai.ws
 
 
-$Id: hbxml.txt,v 1.3 2003/07/04 10:34:34 jonnymind Exp $
-
-
-STATUS OF THE LIBRARY
-=====================
-
-HBDoc is a part of xharbour RTL library; currently, it is functionally
-complete and actively tested.
-
-
-
-HBLOG concepts
-==============
-
-HBLOG is based on an ojbect oriented view of the logging system; anyway
-a "standard" logging is provided to access easily to minimal logging
-features, and preprocessor commands are made available in hblog.ch.
-The main hblog object is the HB_Logger class. HB_Logger implements a
-logical logger, to which an applicaton can require to create a log
-entry with a pre-set style. To a logger, any number of "channels" can
-be attacched; a channel has the role to translate the log requests into
-real output. A logger may have any number of channels of any type (i.e.
-two channels of kind "file", sending log entries to two different files),
-and it can have even no channel.
-
-Users can overload the existing channels: they are meant to write to
-console, files, syslog facility (or event logger system under windows),
-internet ports and even e-mail addresses. Users can create a whole
-new channel overloading the TChannel class, or derive its own new
-channel from an already existing one.
-
-Anyhow, the mean usage of the log system is simply the calling of some
-standard function called HB_StandardLog* and abbrevated with pre-processor
-commands like "INIT LOG" "LOG ... " and "CLOSE LOG". This functions
-creates a logger object held inside the hblog.prg module, and free the
-user from the need to manage the log object.
-
-
-
-HBLOG in (your) libraries
-=========================
-
-Standard log function are able to determine if the standard logger has
-been initialized. If it has not, they won't try to output anything.
-This means that you can use the standard logging functions, or even
-the LOG preprocessor command even if you don't have initialized
-the logger. So, users can use the LOG commands in their libraries,
-and decide to use the log facility in the final application, or
-having that turned off by simply not initializing it.
-
-* If you want to use the standard logging for your final application
-  and a different logging system in your libraries, it is possible
-  to copy the standard log functions you find in hblog.prg to have
-  them work on an logger object declared in your libs. So final
-  application will be able to use the LOG command, and to control
-  the log activity coming from libraries by initializing or not
-  the log object used by them.
-
-Remember that you can have any number of different TLog objects,
-and that they can log on any number of channles, inlcuding none.
-
-Standard logger is Multithreading compliant. The logger class is
-not threadsafe; if you write to a logger object from two different
-threads at the same moment, output from the two threads may be mixed.
-In MT programs, log activity must be guarded with mutexes; this has
-been done for standard logger, so you don't have to worry about
-MT compliancy of LOG commands.
-
-
-
-The HB_Logger class
-===================
-
-The logger class is defined as follows:
-
-CLASS HB_Logger
-   DATA aLogToChannel                  INIT  {}
-   DATA nStyle                         INIT  -1
-   DATA nDefaultPriority               INIT  HB_LOG_INFO
-   DATA cProgramName
-
-   METHOD New()
-   METHOD AddChannel( oChannel )       INLINE Aadd( ::aLogToChannel, oChannel )
-
-   METHOD SetStyle( nStyle )           INLINE ::nStyle := nStyle
-
-   METHOD Open()
-   METHOD Close()
-
-   METHOD Log( cMessage, nPriority )
-
-ENDCLASS
-
-The array aLogToChannel contains all the channel objects that will
-be used by the logger to log an event.
-
-nStyle will hold the default log style, that is what kind of data
-should be displayed at top of each log entry. Log channels have the
-ability do decide how to format the log message on their own, but
-this nStyle member will be passed to them as a "kind" suggestion.
-The value of "-1" means "standard" style, that should display a
-date/time heading (in YYYY-MM-DD HH:MM:SS format), the name of
-the application (that is set into the channels), and a string
-indicating the priority level.
-
-Styles are defined in hblog.ch and are the followings:
-
-#define HB_LOG_ST_DATE     1
-#define HB_LOG_ST_TIME     2
-#define HB_LOG_ST_SECS     4
-#define HB_LOG_ST_LEVEL    8
-#define HB_LOG_ST_ISODATE  16
-#define HB_LOG_ST_NAME     32
-
-A linear combination of the styles (just adding them) is possible;
-if ISODATE format is not specified, the date should be displayed
-with the current SET DATE settings, else it should be displayed
-using the YYYY-MM-DD format.
-
-nDefaultPriority is the priority level that will be sent to the
-channels if nPriority is not passed to Log() mebmer function.
-Log priorities are defined as follows:
-
-#define HB_LOG_DEFAULT    -1
-#define HB_LOG_CRITICAL    1
-#define HB_LOG_ERROR       2
-#define HB_LOG_WARNING     3
-#define HB_LOG_WARN        3
-#define HB_LOG_INFO        4
-#define HB_LOG_DEBUG       5
-
-Any log channel has a "trigger" priority, so that only messages
-with a priority equal or greather than the trigger level will
-be logged to the channel.
-
-* NOTE: To create a log channel that logs only below a certain
-  priority, or exactly a priority level, it is necessary to
-  create a logchannel subclass, and customize the "log" member
-  function.
-
-
-The New() method initializes the logger and can be called with
-a list of channel objects to be imediately added to the channels
-array like this:
-
-   oLog := TLogger():New( oChan1, oChan2 .. oChanN )
-
-AddChannel() and SetStyle() are shortcuts to add elemets in the channel
-array and to set a different default style.
-
-Open() and Close() will call the Open() and Close() methods of each
-registered channel, passing the cProgramName value to them in case
-they want to write a sensible intial/closing log. The program name
-should be set by the user, or it defaults to the program command line
-name (without path or extension) right in the Open() method.
-
-The Log() method is the most important one. It sends a Log() request
-to all the registered channel, passing them all relevant information
-for the log entry (priority level, program name and log message); then
-is up to the channel wether write a log on their devie or not.
-
-
-The HB_LogChannel class
-=======================
-
-CLASS HB_LogChannel
-   DATA lOpened                  INIT .F.
-
-   METHOD New( nLevel )          CONSTRUCTOR
-   METHOD Open( cName )          VIRTUAL
-   METHOD Close( cName )         VIRTUAL
-
-   METHOD Log( nStyle, cMessage, cName, nPriority )
-   METHOD SetActive( lAct )      INLINE   ::lActive := lAct
-
-   METHOD Format( nStyle, cMessage, cName, nPriority )
-
-PROTECTED:
-   METHOD Send( nStyle, cMessage, cName, nPriority )    VIRTUAL
-
-HIDDEN:
-   DATA nLevel
-   DATA lActive                  INIT .T.
-
-ENDCLASS
-
-
-The log channel is a virtual class that must be overloaded by
-physical channel managers to become usable. The New() method
-will set the trigger level; messages with a priority lower than
-that level will be rejected. The macro HB_LOG_ALL is provide to
-make a channel to accept all the messages.
-
-Open() and Close() methods should open the physical channel and
-eventually provide an initial/closeure log message. The lOpened
-logical value is provided for Open() method to be able to do
-startup operations only once, and is left public because a subclass
-may accept an already existing physical channel (i.e. an already
-opened file descriptor), and then would want its default open
-to do nothing.
-
-The default Log() method will filter the messages based on their
-priority. The nStyle and cName (the name of the program) are passed
-to allow the channel to format the output message on its preference.
-A commodity Format() method is provided if default formatting rules
-(i.e. formats that respects fully the nStyle requests) are applicable
-to the channel.
-
-The Method Send() does the real job of writing to the physical channel,
-and must be overloaded by the subclasses.
-
-The method SetActive() is here provided to temporarily turn off a
-channel without removing it from the logger. This may be useful
-if the program is in control of the channel (having created it
-in a local variable), but is not able to access the main logger.
-
-
-The available channels
-======================
-
-The log systems comes with a set of pre-made channels:
-
-- Console: outputs to the standard output device, which is usually
-  the console screen on Windows. This channel can then be redirected
-  to other devices (like files or logging daemons) from command line
-  commands.
-- File: logs to a file. Logging system has support for automatic
-  file rolling when a log file has exceeded a pre-defined size:
-  the extension ".nnn" is automatically added to all the logfiles
-  already existing, shifting their number up by one, so that the
-  current file used for logging hasn't any extension (or has the
-  extension defined in during channel creation); the others are
-  numbered .001, .002 and so on, the most recent having the lower
-  number. When a file has reached the maximum file roll count,
-  if defined, the oldest file is removed.
-- Syslog: is a channel that logs to the system logger, where available.
-  This includes unix systems (where the data is sent to the syslog
-  daemon), and the windows-NT, 2000 and XP systems, where the log
-  entries are sent to the event logger.
-- Email: the log entry is sent by e-mail to system administrators
-  or to any person interested in receiving it. This channel requires
-  a mail transfer server (SMTP) to be listening for connections from
-  the logging application.
-- Monitor (or internet port): this channels acts as a simple telnet
-  server redistributing log entries to all the listeners connecting
-  on a given port. Security on this port is not implemented; authentication
-  schemes may be given by system security policies (i.e. firewalls),
-  or by subclassing this channel class into something that is also able
-  to receive authentication messages from clients.
-- Debug: This channel logs on the "debug device": under all windows
-  systems, this is implemented by a call to "OutputDebugString()"
-  Winapi function, that is available only for GUI applications. Under
-  unixes, this is implemented by sending the data to a listening
-  "xterm" application, via a unix pipe file created in the "/tmp"
-  directory; so, this is available also for text based application,
-  but only if run under an X (graphical) environment.
-
-All this channels can be tested for a sucessful opening, but they
-will silently fail if the log entry can't be written (i.e. if the
-email server is not responding, or if the file can't be written
-anymore).
-
-
-The Console channel
-===================
-
-The console channel can be initialized by calling
-
-   oChnConsole := HB_LogConsole():New( nPriority )
-
-The priority is the level above which the data is displayed to
-console; all messages with a priority lower than nPriority will
-be discarded.
-  * NOTE: remember that a lower number means an higher priority,
-    0 being maximum or "CRITICAL".
-
-
-The InetPort channel
-====================
-
-InetPort channel opens a TCP/IP port where any client able go get
-strings can connect to (eventually even a telnet connection
-will do).
-
-The channel is initialized with:
-
-oChanMonitor := HB_LogInetPort():New( nPriority [, nPort] )
-
-where nPort is the port where the clients have to connect to
-receive the log items. If not given, nPort will default to 7761.
-
-The channel will handle any number of connected clients; no
-security scheme is implemented. To have any form of security,
-a subclass must re-define the method Send(), that checks for
-new incoming connections and then send the data to them.
-
- * Note: if multithreading is supported, acceptance of new
-   client is done more efficiently by an asyncrhonous method:
-   AcceptCon(). 
-
-
-
-The Syslog channel
-==================
-
-This channels sends the log entry (without the timestamp string,
-even if required in the log style flags) to the standard logging
-systems. Under unix, this is done by the syslog daemon, writing
-all its data to a file that is usually /var/syslog. Under windows
-NT and following, this is done by creating a new entry in the
-event log.
-
-The channel is initialized by the command
-
-oChanSyslog := HB_LogSyslog():New( nPriority [, nPrgId ] )
-
-If given, nPrgId is a 64 bit number that is reported into the
-syslog entries, helping to filter out them. On unix, this is
-simply translated to a hex string and appended to the log messages,
-while in Windows this value sets the application ID, that is a
-filed that can be searched in the event log table.
-
-
-The File channel
-================
-
-Channel is initialized with:
-
-oChanFile := HB_LogFile():New( nPriority, cFileName [, nMaxSize [, nLogFiles]])
-
-cFileName is a relative or absolute path.
-nMaxSize, if given, sets the maximum size for the log file. After that the log
-file reaches this size, the log file is moved into a file with the same name
-but with the suffix ".000", and a new log is started. If nLogFiles is also
-given, the channel moves also files named cFileName + ".xxx" shifting them
-down one position.
-
-
-The Debug channel
-=================
-
-The debug channel is meant for debuggin purposes and takes advantage
-of the HB_OutDebug() function. That function outputs a string on a
-pseudoterminal that may vary in its actual implementation on different
-platform. Since it is meant for debugging purposes, this function is
-not guaranteed to work under all conditions; if it is not able to open
-the pseudo terminal, it will silently fail.
-
-Under windows, this function uses the OutDebugString() winapi function,
-that will write the data on a small window if the application has
-GUI support. Under unix, it will open a pipe on /tmp subdirectory,
-ad then it will open an Xterm reading from that pipe; this requires
-both the /tmp directory to be properly configured and X to be running.
-
-Open() and Close() methods are (currently) unused by this class. The sole
-act of logging to this channel will open the debug window if it is possible
-to open it, and if it is not already displayed.
-
-Being meant for debug reasons, the debug channel is the only one that
-can display a range of priorities, from a minimum to a maximum. So,
-it is possible to i.e. display just messages of priority HB_LOG_DEBUG+2,
-while they are filtered out by all other channels of the application.
-
-The channel is initialized with:
-oDebug := HB_LogDebug():New( [nMinPriority [, nMaxPriority]])
-
-If nMinPriority is not given all messages are logged. If nMaxPriority
-is given, only messages with priority lower or equal to nMaxPriority and
-greater or equal than nMaxPriority are logged.
-
-
-The Email channel
-=================
-
-The email channel implement a VERY simple smtp client, connecting to
-a mail server to send an e-mail containing the log data, and other
-data as well.
-
-Since the connection is synchronous with the log request, and network
-times are usually high, you should use this channel only to report
-patologic situations that require immediate attention: wait time could
-be high. Also, you should make sure that the SMTP server serving this
-channel is available and will accept messages from the logger, as no
-extra checking is done by the channel, and a connection error causes
-the log to silently fail.
-
-Finally, you should make sure that the log you are sending by e-mail
-is also logged in some other fashon (e.g. file), so that if the mail
-is lost, you have anyway a record of what happened.
-
-The channel email is initialized this way:
-
-oEmail :=  HB_LogEmail():New(  nLevel, cHelo, cServer, cSendTo, ;
-                                 cSubject, cFrom )
-
-nLevel is the priority level that will trigger the channel; cHelo
-is the client name by which the server know your organization identity;
-most modern servers will ignore it and will just rely on your IP
-address, and/or on your FROM name.
-
-cServer is the internet address of the server (can be a quad dot
-IP notation or a full DNS name); port 25 (standard for SMTP) is assumed,
-but it can be overriden by adding ":port" at the end of the cServer
-string.
-
-cSendTo is the destination address. This implementation of Email class
-only allows one target address; if you need the mail to be delivered
-to more than one address you will need to use site-dependant replication
-system (automatic forwarding).
-
-cSubject is an optional parameter; it is the subject row that will
-be displayed by the mail client of the receiver. A dummy one, using
-the application LOG name, is provided if this parameter is not given.
-
-cFrom is a FROM: addres that is both sent to the SMTP server AND
-displayed as FROM field in the final message. This parameter is
-optional as, usually, this data is useless: you don't have to reply
-to the logging application; if not given, a dummy data is provided.
-Anyway, you should provide a valid sender address because:
-1) The mail server may check for the domain of the sender, or even
-   for the whole sender address, before allowing mail go get through.
-2) An incorrect from: address may cause anti-spam filters to block the
-   mail.
-3) A correct from: address may help to filter the messages and move them
-   in locations with higher visibility, or build special rules for those
-   messages in mail clients.
-
-
-To make the message more complete, you can add a prefix and a postfix
-to the "crude" log message; the fields ::cPrefix and ::cPostfix are meant
-to "beautify" the final messages (that may reach also non technical
-personnel), and are also a place to give extra explanations on the
-conditions that caused the error.
-
-
-THE STANDARD LOGGER API
-=======================
-
-Xharbour provides a pre-defined logger that is accessible via a restricted
-set of routines. This logger can be included in user-defined libraries
-to provide a level of logging that is completely abstracted from the final
-application. In this way, a library can just state "I would like to
-log the fact that I am doing this, with an informational priority"; the
-final application will be able to control the standard logger to decide
-what the outcome of this request will be, and this without the need to
-exchange objects, variables or any informations between the final
-applications and the lower level (and maybe foreign) libraries they
-are using. Logging onto an uninitialized standard logger is guaranteed
-to fail silently and to have a minimal overhead.
-
-Functions to handle the standard logger are the following.
-
-PROCEDURE HB_InitStandardLog( ... )
-   This initializes te standard logger and prepares it to receive
-   channels. An arbitrary list of channel objects can be passed as
-   parameter: the parameters are immediately added to the logger.
-
-PROCEDURE HB_StandardLogAdd( oChannel )
-   Adds a channel to the standard logger. The channel may or may
-   not be opened when it is added to the logger; logging to an
-   unopen channel is guaranteed to have no effect.
-
-   * Note: there isn't any way to remove a channel from a logger
-     (now). It is possible to disable a channel and have it never
-     accepting log requests by calling its method SetActive( .F. )
-
-PROCEDURE HB_SetStandardLogStyle( nStyle )
-   Changes the "suggested" log style to the parameter.
-
-PROCEDURE HB_StandardLogName( cName )
-   Changes the name of the application (by default, it is the
-   name of the binary file that is being executed). This influences
-   open() and close() automatic log entries.
-
-PROCEDURE HB_OpenStandardLog()
-   This is just a shortcut to open all the channels that are currently
-   held by the standard logger. Opening an already open channel is
-   guaranteed to have not any effect.
-
-PROCEDURE HB_CloseStandardLog()
-   This is just a shortcut to close all the channels that are currently
-   held by the standard logger. Closing an already closed channel is
-   guaranteed to have not any effect.
-
-PROCEDURE HB_StandardLog( cMsg, nPrio )
-   Sends cMsg with nPrio log level to all the channels for their
-   local processing and logging. Program name and suggested style
-   are automatically added by the logger in the channel Log()
-   method call (they are NOT added to cMsg).
-
-FUNCTION HB_BldLogMsg( ... ) -->cMsg
-   Utility functions that accepts a list of xharbour variables and
-   merges them in a message suitable to being printed.
-
-
-
-
-THE STANDARD LOGGER COMMANDS
-============================
-
-To simplify the tast of writing applications that uses the standard
-logger api, a set of commands have been added in "hblog.ch"
-
-The commands and the API calls can be seamlessy mixed; using them
-is a matter of tastes, but commands are usually faster to type
-and more clean/readable in the finished application.
-
-Commands can be also used in libraries where the log task need to
-be abstracted from the final applications.
-
-
-Init command
-------------
-
-Init command initializes the standard logger and provides also a set
-of sub-commands to immediately create and add log channels. The
-channels added in this way are not controllable anymore after
-the initialization stage, so if you want to create channels that
-you want to disable or change later on, you will need to add them
-with HB_StandardLogAdd().
-
-The command has the following grammar:
-
-INIT LOG [ON] ;
-   [FILE([nFilPrio [,cFileName[,nFileSize[,nFileCount] ] ] ] ) ] ;
-   [CONSOLE( [nConPrio] ) ] ;
-   [MONITOR( [nMonPrio [,nMonPort] ] ) ] ;
-   [SYSLOG( [nSysPrio [,nSysId] ] ) ] ;
-   [EMAIL ([nEmaPrio [,cHelo[,cServer[,cDest[,cSubject[,cFrom]]]]]])] ;
-   [DEBUG ( [nDebugPrio [,nMaxDebugPrio]] )] ;
-   [NAME cName]
-
-The clauses from FILE() to DEBUG has the same grammar as the channel
-constructors; the NAME clause will eventually set the application
-name for the logger.
-
-ALWAYS remember to add the parenthesis after the clauses declaring
-channels, even if you want default parameters (and so the brackets are
-void).
-
-An example:
-
-   INIT LOG ON CONSOLE() SYSLOG( HB_LOG_INFO, 0xfff19231 ) NAME "Myapp"
-
-The INIT statement also calls HB_OpenStandardLog(), so, under normal
-circumstances, it is all your program has to do to have a logging
-environment ready to go.
-
-The LOG command
----------------
-
-Log command sends a message or a sequence of xharbour variables string
-representation to the channels of the standard logger. The format is:
-
-LOG msg [, ... ] [PRIORITY nPrioLevel]
-
-msg ( or comma separated variables) can be any sequence of xharbour
-variables; each element of the list will be added to the output string
-with an extra space; an OS or channel dependent line terminator will
-be always added after the given entry list.
-
-PRIORITY clause can be abbreviated to PRIO
-
-nPrioLevel is a numeric value indicating a priority; if PRIORITY clause
-is not given, then ::nDefaultPriority member of the standard logger is
-used (currently it is set to HB_LOG_INFO priority).
-
-Using the LOG command if the standard logger is not initialized, or
-if it has not any channel yet, or if the channels are not opened
-will haven't any effect. This means that the LOG command can be used
-safely without having to make assumptions on how and when the standard
-logger is set.
-
-
-The CLOSE LOG command
----------------------
-
-This command is to be used on program termination to cleanly close
-the standard logger channels. Usually, log channels record both
-their opening and their closing issuing a default message at info
-priority; this helps to track when a program stopped working due to
-"natural" reasons, i.e. when last a program has been used correctly
-by a user.
-
+$Id: hblog.txt,v 1.1 2003/08/01 16:56:52 jonnymind Exp $
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      Xharbour Logger
+ *  $CATEGORY$
+ *      Xharbour Enhacements
+ *  $ONELINER$
+ *      XHARBOUR - Versatile logging system
+ *  $DESCRIPTION$
+ *      
+ *      STATUS OF THE LIBRARY
+ *      =====================
+ *      
+ *      HBDoc is a part of xharbour RTL library; currently, it is functionally
+ *      complete and actively tested.    
+ *      
+ *      HBLOG concepts
+ *      ==============
+ *      
+ *      HBLOG is based on an ojbect oriented view of the logging system; anyway
+ *      a "standard" logging is provided to access easily to minimal logging
+ *      features, and preprocessor commands are made available in hblog.ch.
+ *      The main hblog object is the HB_Logger class. HB_Logger implements a
+ *      logical logger, to which an applicaton can require to create a log
+ *      entry with a pre-set style. To a logger, any number of "channels" can
+ *      be attacched; a channel has the role to translate the log requests into
+ *      real output. A logger may have any number of channels of any type (i.e.
+ *      two channels of kind "file", sending log entries to two different files),
+ *      and it can have even no channel.
+ *      
+ *      Users can overload the existing channels: they are meant to write to
+ *      console, files, syslog facility (or event logger system under windows),
+ *      internet ports and even e-mail addresses. Users can create a whole
+ *      new channel overloading the TChannel class, or derive its own new
+ *      channel from an already existing one.
+ *      
+ *      Anyhow, the mean usage of the log system is simply the calling of some
+ *      standard function called HB_StandardLog* and abbrevated with pre-processor
+ *      commands like "INIT LOG" "LOG ... " and "CLOSE LOG". This functions
+ *      creates a logger object held inside the hblog.prg module, and free the
+ *      user from the need to manage the log object.
+ *      
+ *      
+ *      HBLOG in (your) libraries
+ *      =========================
+ *      
+ *      Standard log function are able to determine if the standard logger has
+ *      been initialized. If it has not, they won't try to output anything.
+ *      This means that you can use the standard logging functions, or even
+ *      the LOG preprocessor command even if you don't have initialized
+ *      the logger. So, users can use the LOG commands in their libraries,
+ *      and decide to use the log facility in the final application, or
+ *      having that turned off by simply not initializing it.
+ *      
+ *      * If you want to use the standard logging for your final application
+ *        and a different logging system in your libraries, it is possible
+ *        to copy the standard log functions you find in hblog.prg to have
+ *        them work on an logger object declared in your libs. So final
+ *        application will be able to use the LOG command, and to control
+ *        the log activity coming from libraries by initializing or not
+ *        the log object used by them.
+ *      
+ *      Remember that you can have any number of different TLog objects,
+ *      and that they can log on any number of channles, inlcuding none.
+ *      
+ *      Standard logger is Multithreading compliant. The logger class is
+ *      not threadsafe; if you write to a logger object from two different
+ *      threads at the same moment, output from the two threads may be mixed.
+ *      In MT programs, log activity must be guarded with mutexes; this has
+ *      been done for standard logger, so you don't have to worry about
+ *      MT compliancy of LOG commands.
+ *      
+ *      
+ *      
+ *      The HB_Logger class
+ *      ===================
+
+ *      The logger class is defined as follows:
+
+ *      CLASS HB_Logger
+ *         DATA aLogToChannel                  INIT  {}
+ *         DATA nStyle                         INIT  -1
+ *         DATA nDefaultPriority               INIT  HB_LOG_INFO
+ *         DATA cProgramName
+ *      
+ *         METHOD New()
+ *         METHOD AddChannel( oChannel )       INLINE Aadd( ::aLogToChannel, oChannel )
+ *      
+ *         METHOD SetStyle( nStyle )           INLINE ::nStyle := nStyle
+ *      
+ *         METHOD Open()
+ *         METHOD Close()
+ *      
+ *         METHOD Log( cMessage, nPriority )
+ *      
+ *      ENDCLASS
+ *      
+ *      The array aLogToChannel contains all the channel objects that will
+ *      be used by the logger to log an event.
+ *      
+ *      nStyle will hold the default log style, that is what kind of data
+ *      should be displayed at top of each log entry. Log channels have the
+ *      ability do decide how to format the log message on their own, but
+ *      this nStyle member will be passed to them as a "kind" suggestion.
+ *      The value of "-1" means "standard" style, that should display a
+ *      date/time heading (in YYYY-MM-DD HH:MM:SS format), the name of
+ *      the application (that is set into the channels), and a string
+ *      indicating the priority level.
+ *      
+ *      Styles are defined in hblog.ch and are the followings:
+ *      
+ *      #define HB_LOG_ST_DATE     1
+ *      #define HB_LOG_ST_TIME     2
+ *      #define HB_LOG_ST_SECS     4
+ *      #define HB_LOG_ST_LEVEL    8
+ *      #define HB_LOG_ST_ISODATE  16
+ *      #define HB_LOG_ST_NAME     32
+ *      
+ *      A linear combination of the styles (just adding them) is possible;
+ *      if ISODATE format is not specified, the date should be displayed
+ *      with the current SET DATE settings, else it should be displayed
+ *      using the YYYY-MM-DD format.
+ *      
+ *      nDefaultPriority is the priority level that will be sent to the
+ *      channels if nPriority is not passed to Log() mebmer function.
+ *      Log priorities are defined as follows:
+ *      
+ *      #define HB_LOG_DEFAULT    -1
+ *      #define HB_LOG_CRITICAL    1
+ *      #define HB_LOG_ERROR       2
+ *      #define HB_LOG_WARNING     3
+ *      #define HB_LOG_WARN        3
+ *      #define HB_LOG_INFO        4
+ *      #define HB_LOG_DEBUG       5
+ *      
+ *      Any log channel has a "trigger" priority, so that only messages
+ *      with a priority equal or greather than the trigger level will
+ *      be logged to the channel.
+ *      
+ *      * NOTE: To create a log channel that logs only below a certain
+ *        priority, or exactly a priority level, it is necessary to
+ *        create a logchannel subclass, and customize the "log" member
+ *        function.
+ *      
+ *      
+ *      The New() method initializes the logger and can be called with
+ *      a list of channel objects to be imediately added to the channels
+ *      array like this:
+ *      
+ *         oLog := TLogger():New( oChan1, oChan2 .. oChanN )
+ *      
+ *      AddChannel() and SetStyle() are shortcuts to add elemets in the channel
+ *      array and to set a different default style.
+ *      
+ *      Open() and Close() will call the Open() and Close() methods of each
+ *      registered channel, passing the cProgramName value to them in case
+ *      they want to write a sensible intial/closing log. The program name
+ *      should be set by the user, or it defaults to the program command line
+ *      name (without path or extension) right in the Open() method.
+ *      
+ *      The Log() method is the most important one. It sends a Log() request
+ *      to all the registered channel, passing them all relevant information
+ *      for the log entry (priority level, program name and log message); then
+ *      is up to the channel wether write a log on their devie or not.
+ *      
+ *      
+ *      The HB_LogChannel class
+ *      =======================
+ *      
+ *      CLASS HB_LogChannel
+ *         DATA lOpened                  INIT .F.
+ *      
+ *         METHOD New( nLevel )          CONSTRUCTOR
+ *         METHOD Open( cName )          VIRTUAL
+ *         METHOD Close( cName )         VIRTUAL
+ *      
+ *         METHOD Log( nStyle, cMessage, cName, nPriority )
+ *         METHOD SetActive( lAct )      INLINE   ::lActive := lAct
+ *      
+ *         METHOD Format( nStyle, cMessage, cName, nPriority )
+ *      
+ *      PROTECTED:
+ *         METHOD Send( nStyle, cMessage, cName, nPriority )    VIRTUAL
+ *      
+ *      HIDDEN:
+ *         DATA nLevel
+ *         DATA lActive                  INIT .T.
+ *      
+ *      ENDCLASS
+ *      
+ *      
+ *      The log channel is a virtual class that must be overloaded by
+ *      physical channel managers to become usable. The New() method
+ *      will set the trigger level; messages with a priority lower than
+ *      that level will be rejected. The macro HB_LOG_ALL is provide to
+ *      make a channel to accept all the messages.
+ *      
+ *      Open() and Close() methods should open the physical channel and
+ *      eventually provide an initial/closeure log message. The lOpened
+ *      logical value is provided for Open() method to be able to do
+ *      startup operations only once, and is left public because a subclass
+ *      may accept an already existing physical channel (i.e. an already
+ *      opened file descriptor), and then would want its default open
+ *      to do nothing.
+ *      
+ *      The default Log() method will filter the messages based on their
+ *      priority. The nStyle and cName (the name of the program) are passed
+ *      to allow the channel to format the output message on its preference.
+ *      A commodity Format() method is provided if default formatting rules
+ *      (i.e. formats that respects fully the nStyle requests) are applicable
+ *      to the channel.
+ *      
+ *      The Method Send() does the real job of writing to the physical channel,
+ *      and must be overloaded by the subclasses.
+ *      
+ *      The method SetActive() is here provided to temporarily turn off a
+ *      channel without removing it from the logger. This may be useful
+ *      if the program is in control of the channel (having created it
+ *      in a local variable), but is not able to access the main logger.
+ *      
+ *      
+ *      The available channels
+ *      ======================
+ *      
+ *      The log systems comes with a set of pre-made channels:
+ *      
+ *      - Console: outputs to the standard output device, which is usually
+ *       the console screen on Windows. This channel can then be redirected
+ *        to other devices (like files or logging daemons) from command line
+ *       commands.
+ *      - File: logs to a file. Logging system has support for automatic
+ *        file rolling when a log file has exceeded a pre-defined size:
+ *        the extension ".nnn" is automatically added to all the logfiles
+ *        already existing, shifting their number up by one, so that the
+ *        current file used for logging hasn't any extension (or has the
+ *        extension defined in during channel creation); the others are
+ *        numbered .001, .002 and so on, the most recent having the lower
+ *        number. When a file has reached the maximum file roll count,
+ *        if defined, the oldest file is removed.
+ *      - Syslog: is a channel that logs to the system logger, where available.
+ *        This includes unix systems (where the data is sent to the syslog
+ *        daemon), and the windows-NT, 2000 and XP systems, where the log
+ *        entries are sent to the event logger.
+ *      - Email: the log entry is sent by e-mail to system administrators
+ *        or to any person interested in receiving it. This channel requires
+ *        a mail transfer server (SMTP) to be listening for connections from
+ *        the logging application.
+ *      - Monitor (or internet port): this channels acts as a simple telnet
+ *        server redistributing log entries to all the listeners connecting
+ *        on a given port. Security on this port is not implemented; authentication
+ *        schemes may be given by system security policies (i.e. firewalls),
+ *        or by subclassing this channel class into something that is also able
+ *        to receive authentication messages from clients.
+ *      - Debug: This channel logs on the "debug device": under all windows
+ *        systems, this is implemented by a call to "OutputDebugString()"
+ *        Winapi function, that is available only for GUI applications. Under
+ *        unixes, this is implemented by sending the data to a listening
+ *        "xterm" application, via a unix pipe file created in the "/tmp"
+ *        directory; so, this is available also for text based application,
+ *        but only if run under an X (graphical) environment.
+ *      
+ *      All this channels can be tested for a sucessful opening, but they
+ *      will silently fail if the log entry can't be written (i.e. if the
+ *      email server is not responding, or if the file can't be written
+ *      anymore).
+ *      
+ *      
+ *      The Console channel
+ *      ===================
+ *      
+ *      The console channel can be initialized by calling
+ *      
+ *         oChnConsole := HB_LogConsole():New( nPriority )
+ *      
+ *      The priority is the level above which the data is displayed to
+ *      console; all messages with a priority lower than nPriority will
+ *      be discarded.
+ *        * NOTE: remember that a lower number means an higher priority,
+ *          0 being maximum or "CRITICAL".
+ *      
+ *      
+ *      The InetPort channel
+ *      ====================
+ *      
+ *      InetPort channel opens a TCP/IP port where any client able go get
+ *      strings can connect to (eventually even a telnet connection
+ *      will do).
+ *      
+ *      The channel is initialized with:
+ *      
+ *      oChanMonitor := HB_LogInetPort():New( nPriority [, nPort] )
+ *      
+ *      where nPort is the port where the clients have to connect to
+ *      receive the log items. If not given, nPort will default to 7761.
+ *      
+ *      The channel will handle any number of connected clients; no
+ *      security scheme is implemented. To have any form of security,
+ *      a subclass must re-define the method Send(), that checks for
+ *      new incoming connections and then send the data to them.
+ *      
+ *       * Note: if multithreading is supported, acceptance of new
+ *         client is done more efficiently by an asyncrhonous method:
+ *         AcceptCon(). 
+ *      
+ *      
+ *      
+ *      The Syslog channel
+ *      ==================
+ *      
+ *      This channels sends the log entry (without the timestamp string,
+ *      even if required in the log style flags) to the standard logging
+ *      systems. Under unix, this is done by the syslog daemon, writing
+ *      all its data to a file that is usually /var/syslog. Under windows
+ *      NT and following, this is done by creating a new entry in the
+ *      event log.
+ *      
+ *      The channel is initialized by the command
+ *      
+ *      oChanSyslog := HB_LogSyslog():New( nPriority [, nPrgId ] )
+ *      
+ *      If given, nPrgId is a 64 bit number that is reported into the
+ *      syslog entries, helping to filter out them. On unix, this is
+ *      simply translated to a hex string and appended to the log messages,
+ *      while in Windows this value sets the application ID, that is a
+ *      filed that can be searched in the event log table.
+ *      
+ *      
+ *      The File channel
+ *      ================
+ *      
+ *      Channel is initialized with:
+ *      
+ *      oChanFile := HB_LogFile():New( nPriority, cFileName [, nMaxSize [, nLogFiles]])
+ *      
+ *      cFileName is a relative or absolute path.
+ *      nMaxSize, if given, sets the maximum size for the log file. After that the log
+ *      file reaches this size, the log file is moved into a file with the same name
+ *      but with the suffix ".000", and a new log is started. If nLogFiles is also
+ *      given, the channel moves also files named cFileName + ".xxx" shifting them
+ *      down one position.
+ *      
+ *      
+ *      The Debug channel
+ *      =================
+ *      
+ *      The debug channel is meant for debuggin purposes and takes advantage
+ *      of the HB_OutDebug() function. That function outputs a string on a
+ *      pseudoterminal that may vary in its actual implementation on different
+ *      platform. Since it is meant for debugging purposes, this function is
+ *      not guaranteed to work under all conditions; if it is not able to open
+ *      the pseudo terminal, it will silently fail.
+ *      
+ *      Under windows, this function uses the OutDebugString() winapi function,
+ *      that will write the data on a small window if the application has
+ *      GUI support. Under unix, it will open a pipe on /tmp subdirectory,
+ *      ad then it will open an Xterm reading from that pipe; this requires
+ *      both the /tmp directory to be properly configured and X to be running.
+ *      
+ *      Open() and Close() methods are (currently) unused by this class. The sole
+ *      act of logging to this channel will open the debug window if it is possible
+ *      to open it, and if it is not already displayed.
+ *      
+ *      Being meant for debug reasons, the debug channel is the only one that
+ *      can display a range of priorities, from a minimum to a maximum. So,
+ *      it is possible to i.e. display just messages of priority HB_LOG_DEBUG+2,
+ *      while they are filtered out by all other channels of the application.
+ *      
+ *      The channel is initialized with:
+ *      oDebug := HB_LogDebug():New( [nMinPriority [, nMaxPriority]])
+ *      
+ *      If nMinPriority is not given all messages are logged. If nMaxPriority
+ *      is given, only messages with priority lower or equal to nMaxPriority and
+ *      greater or equal than nMaxPriority are logged.
+ *      
+ *      
+ *      The Email channel
+ *      =================
+ *      
+ *      The email channel implement a VERY simple smtp client, connecting to
+ *      a mail server to send an e-mail containing the log data, and other
+ *      data as well.
+ *      
+ *      Since the connection is synchronous with the log request, and network
+ *      times are usually high, you should use this channel only to report
+ *      patologic situations that require immediate attention: wait time could
+ *      be high. Also, you should make sure that the SMTP server serving this
+ *      channel is available and will accept messages from the logger, as no
+ *      extra checking is done by the channel, and a connection error causes
+ *      the log to silently fail.
+ *      
+ *      Finally, you should make sure that the log you are sending by e-mail
+ *      is also logged in some other fashon (e.g. file), so that if the mail
+ *      is lost, you have anyway a record of what happened.
+ *      
+ *      The channel email is initialized this way:
+ *      
+ *      oEmail :=  HB_LogEmail():New(  nLevel, cHelo, cServer, cSendTo, ;
+ *                                       cSubject, cFrom )
+ *      
+ *      nLevel is the priority level that will trigger the channel; cHelo
+ *      is the client name by which the server know your organization identity;
+ *      most modern servers will ignore it and will just rely on your IP
+ *      address, and/or on your FROM name.
+ *      
+ *      cServer is the internet address of the server (can be a quad dot
+ *      IP notation or a full DNS name); port 25 (standard for SMTP) is assumed,
+ *      but it can be overriden by adding ":port" at the end of the cServer
+ *      string.
+ *      
+ *      cSendTo is the destination address. This implementation of Email class
+ *      only allows one target address; if you need the mail to be delivered
+ *      to more than one address you will need to use site-dependant replication
+ *      system (automatic forwarding).
+ *      
+ *      cSubject is an optional parameter; it is the subject row that will
+ *      be displayed by the mail client of the receiver. A dummy one, using
+ *      the application LOG name, is provided if this parameter is not given.
+ *      
+ *      cFrom is a FROM: addres that is both sent to the SMTP server AND
+ *      displayed as FROM field in the final message. This parameter is
+ *      optional as, usually, this data is useless: you don't have to reply
+ *      to the logging application; if not given, a dummy data is provided.
+ *      Anyway, you should provide a valid sender address because:
+ *      1) The mail server may check for the domain of the sender, or even
+ *         for the whole sender address, before allowing mail go get through.
+ *      2) An incorrect from: address may cause anti-spam filters to block the
+ *         mail.
+ *      3) A correct from: address may help to filter the messages and move them
+ *         in locations with higher visibility, or build special rules for those
+ *         messages in mail clients.
+ *      
+ *      
+ *      To make the message more complete, you can add a prefix and a postfix
+ *      to the "crude" log message; the fields ::cPrefix and ::cPostfix are meant
+ *      to "beautify" the final messages (that may reach also non technical
+ *      personnel), and are also a place to give extra explanations on the
+ *      conditions that caused the error.
+ *      
+ *      
+ *      THE STANDARD LOGGER API
+ *      =======================
+ *      
+ *      Xharbour provides a pre-defined logger that is accessible via a restricted
+ *      set of routines. This logger can be included in user-defined libraries
+ *      to provide a level of logging that is completely abstracted from the final
+ *      application. In this way, a library can just state "I would like to
+ *      log the fact that I am doing this, with an informational priority"; the
+ *      final application will be able to control the standard logger to decide
+ *      what the outcome of this request will be, and this without the need to
+ *      exchange objects, variables or any informations between the final
+ *      applications and the lower level (and maybe foreign) libraries they
+ *      are using. Logging onto an uninitialized standard logger is guaranteed
+ *      to fail silently and to have a minimal overhead.
+ *      
+ *      Functions to handle the standard logger are the following.
+ *      
+ *      PROCEDURE HB_InitStandardLog( ... )
+ *         This initializes te standard logger and prepares it to receive
+ *         channels. An arbitrary list of channel objects can be passed as
+ *         parameter: the parameters are immediately added to the logger.
+ *      
+ *      PROCEDURE HB_StandardLogAdd( oChannel )
+ *         Adds a channel to the standard logger. The channel may or may
+ *         not be opened when it is added to the logger; logging to an
+ *         unopen channel is guaranteed to have no effect.
+ *      
+ *         * Note: there isn't any way to remove a channel from a logger
+ *           (now). It is possible to disable a channel and have it never
+ *           accepting log requests by calling its method SetActive( .F. )
+ *      
+ *      PROCEDURE HB_SetStandardLogStyle( nStyle )
+ *         Changes the "suggested" log style to the parameter.
+ *      
+ *      PROCEDURE HB_StandardLogName( cName )
+ *         Changes the name of the application (by default, it is the
+ *         name of the binary file that is being executed). This influences
+ *         open() and close() automatic log entries.
+ *      
+ *      PROCEDURE HB_OpenStandardLog()
+ *         This is just a shortcut to open all the channels that are currently
+ *         held by the standard logger. Opening an already open channel is
+ *         guaranteed to have not any effect.
+ *      
+ *      PROCEDURE HB_CloseStandardLog()
+ *         This is just a shortcut to close all the channels that are currently
+ *         held by the standard logger. Closing an already closed channel is
+ *         guaranteed to have not any effect.
+ *      
+ *      PROCEDURE HB_StandardLog( cMsg, nPrio )
+ *         Sends cMsg with nPrio log level to all the channels for their
+ *         local processing and logging. Program name and suggested style
+ *         are automatically added by the logger in the channel Log()
+ *         method call (they are NOT added to cMsg).
+ *      
+ *      FUNCTION HB_BldLogMsg( ... ) -->cMsg
+ *         Utility functions that accepts a list of xharbour variables and
+ *         merges them in a message suitable to being printed.
+ *      
+ *      
+ *      
+ *      
+ *      THE STANDARD LOGGER COMMANDS
+ *      ============================
+ *      
+ *      To simplify the tast of writing applications that uses the standard
+ *      logger api, a set of commands have been added in "hblog.ch"
+ *      
+ *      The commands and the API calls can be seamlessy mixed; using them
+ *      is a matter of tastes, but commands are usually faster to type
+ *      and more clean/readable in the finished application.
+ *      
+ *      Commands can be also used in libraries where the log task need to
+ *      be abstracted from the final applications.
+ *      
+ *      
+ *      Init command
+ *      ------------
+ *      
+ *      Init command initializes the standard logger and provides also a set
+ *      of sub-commands to immediately create and add log channels. The
+ *      channels added in this way are not controllable anymore after
+ *      the initialization stage, so if you want to create channels that
+ *      you want to disable or change later on, you will need to add them
+ *      with HB_StandardLogAdd().
+ *      
+ *      The command has the following grammar:
+ *      
+ *      INIT LOG [ON] ;
+ *         [FILE([nFilPrio [,cFileName[,nFileSize[,nFileCount] ] ] ] ) ] ;
+ *         [CONSOLE( [nConPrio] ) ] ;
+ *         [MONITOR( [nMonPrio [,nMonPort] ] ) ] ;
+ *         [SYSLOG( [nSysPrio [,nSysId] ] ) ] ;
+ *         [EMAIL ([nEmaPrio [,cHelo[,cServer[,cDest[,cSubject[,cFrom]]]]]])] ;
+ *         [DEBUG ( [nDebugPrio [,nMaxDebugPrio]] )] ;
+ *         [NAME cName]
+ *      
+ *      The clauses from FILE() to DEBUG has the same grammar as the channel
+ *      constructors; the NAME clause will eventually set the application
+ *      name for the logger.
+ *      
+ *      ALWAYS remember to add the parenthesis after the clauses declaring
+ *      channels, even if you want default parameters (and so the brackets are
+ *      void).
+ *      
+ *      An example:
+ *      
+ *         INIT LOG ON CONSOLE() SYSLOG( HB_LOG_INFO, 0xfff19231 ) NAME "Myapp"
+ *      
+ *      The INIT statement also calls HB_OpenStandardLog(), so, under normal
+ *      circumstances, it is all your program has to do to have a logging
+ *      environment ready to go.
+ *      
+ *      The LOG command
+ *      ---------------
+ *      
+ *      Log command sends a message or a sequence of xharbour variables string
+ *      representation to the channels of the standard logger. The format is:
+ *      
+ *      LOG msg [, ... ] [PRIORITY nPrioLevel]
+ *      
+ *      msg ( or comma separated variables) can be any sequence of xharbour
+ *      variables; each element of the list will be added to the output string
+ *      with an extra space; an OS or channel dependent line terminator will
+ *      be always added after the given entry list.
+ *      
+ *      PRIORITY clause can be abbreviated to PRIO
+ *      
+ *      nPrioLevel is a numeric value indicating a priority; if PRIORITY clause
+ *      is not given, then ::nDefaultPriority member of the standard logger is
+ *      used (currently it is set to HB_LOG_INFO priority).
+ *      
+ *      Using the LOG command if the standard logger is not initialized, or
+ *      if it has not any channel yet, or if the channels are not opened
+ *      will haven't any effect. This means that the LOG command can be used
+ *      safely without having to make assumptions on how and when the standard
+ *      logger is set.
+ *      
+ *      
+ *      The CLOSE LOG command
+ *      ---------------------
+ *      
+ *      This command is to be used on program termination to cleanly close
+ *      the standard logger channels. Usually, log channels record both
+ *      their opening and their closing issuing a default message at info
+ *      priority; this helps to track when a program stopped working due to
+ *      "natural" reasons, i.e. when last a program has been used correctly
+ *      by a user.
+ *      
+ *  $END$
+ */

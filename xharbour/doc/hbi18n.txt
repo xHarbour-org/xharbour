@@ -8,467 +8,478 @@
                                   gian@nccolai.ws
 
 
-$Id$
-
-
-STATUS OF THE DOCUMENT
-======================
-
-This is a small draft to explain the working of the i18n system in xharbour.
-There could be error or even typos, and the document is Work IN Progress...
-But the system i18n in itself is pretty complete, and is NOT subject to
-radical changes: it can be used in production environent.
-
-
-I18N CONCEPT
-============
-
-
-What do we mean for internationalization ?
-------------------------------------------
-
-For i18n we mean a subcomponent of the localization (l10n) problem. I18N is
-the ability of translate the user interface of a program into any possible
-language. Currently, i18n() only supports languages in western encodings,
-as left to right and unicode supported languages are NOT supported by
-XHARBOUR. But i18n() is ready to use this extensions as soon as they
-are available.
-
-While i18n is translation of the UI into many languages, l10n is the usage
-of local national standards for dates, monetary values, mathematica symbols
-(many countries have comma and dot meaning swapped).
-
-This document and the i18n system only reates the first problem, in the future
-we could have a standard interface for producing both internationalized and
-localized programs.
-
-
-How do this is accomplished?
-----------------------------
-
-How do we are able to translate a program in any possible language without
-having to recompile it, or without having to put a comprhensive prebuilt
-table of translation somewhere available?
-
-The thing goes like this: you write down your program as always, without
-worryng about writing your application in a specified language. You should
-just write your application using plain english, and surround each
-static string with the i18n() function call, like this:
-
-/* Minimal i18n program */
-
-Procedure MAIN()
-   ? i18n( "Hello world in your language!" )
-RETURN
-
-When your program is complete, you will use xharbour support for i18n in
-these steps:
-
-1) compile your project using the -j step, obtaining an
-   "Harbour international list" (or .hil) file as output.
-
-2) use a program called hbdict (available under utils/) to translate
-   every string you want to be translated into a language; you can
-   crete in this way any amount of "harbour international tables", or
-   .hit.
-
-3) put the .hits into a subdirectory available to your program, that must
-   be called i18n/.
-
-4) at startup, the xharbour program will search for a file named after the
-   environment variable LANG (plus .hit as extension) in the i18n/ directory
-   under his start directory. If this file is found, your program will be
-   displayed in the language you have chosen via the LANG variable.
-
-It is also possible to configure search paths and file names, and even to
-change language at any moment in the program.
-
-
-
-USING XHARBOUR TO PRODUCE THE INTERNATIONAL LIST
-================================================
-
-When you have a reasonablely complete program that you want to test in a
-foreign language, you must compile it with the "/j" flag to obtain the
-hil file, that is built with every string that you put inside an i18n()
-call.
-
-* NOTE: you don't have to translate all the strings of a program to test it.
-  Actually, you don't have to do any traslation at all to have it working.
-  This system allows you to build translations only when you are pretty
-  confident that the program has reached a fairly stable moment of its
-  developement. Also, this systems allow foreign users to add their own
-  translation (and then send it to you or share with other ousers), so
-  that you are freed from this part of developement.
-
-If used without any parameter, /j (or -j, depending on the system you
-are compiling on), will create an hit file named after your source, along
-with your source's code.
-
-This goes like that:
-
-harbour -n -j myprog.prg
-
-will generate myprog.c AND myprog.hil.
-
-If the hil file is already present, the strings being internationalized
-in you program will be added to the HIL file. This means that, if you
-don't regularily delete the hil file, it will grow endlessy, as no merge
-mechanism is currently available, both to speed up compilation and to
-keep harbour code simple as possible.
-
-If you give a parameter to -j option, you will be able to direct the hil
-output that file. Combined with the fact that hil files are never
-overwritten, but just "grown", an average build process for a project
-built on many prg files, and to be internationalized, could be this:
-
-
-del myproject.hil
-harbour -n -jmyproject.hil main.prg
-(on success) harbour -n -jmyproject.hil func1.prg
-(on success) harbour -n -jmyproject.hil func2.prg
-...
-link...
-
-
-
-BUILDING A DICTIONARY USING HBDICT
-==================================
-
-Hbdict is an utility (currently RUDIMENTAL) that allows to build dictionaries.
-It has two command line parameters: the first is the input file, and can be
-an hil that you want to translate, or a pre-existing hit. The output is
-an hit that you want to create.
-
-The API used by hbdict is available in harbour RTL, and this makes possible to
-build dictionary translators in a very simple fashon. The code that handles the
-tables is no more than 50 xharbour lines, and using hbdict as a template, fairly
-complete dictionary utilities can be built. Anyway, hbdict has anything an
-essential dictionary editor should have, and will have more in the future.
-
-As hit files names, you are invited to choose names after the international
-language names schemes. It is a 5 character code, having two lowercase letters
-indicating the main language, an undersocre and two uppercase letters indicating
-the subtype of the language. In example:
-
-British english: en_UK
-Italian: it_IT
-Swiss Italian: it_CH
-French: fr_FR
-American english: en_US
-japanese: ja_JP  (jp is the nation code, while ja is the language).
-
-The "en_US" language code is currently used as "international", or
-"no translation". But this may change in the future, so you can develop
-applications in i.e. spanish and AFTER that you have built them, you
-can traslate them to english.
-
-Anyway, you can select any name you like; you will have to make sure that
-your LANG variable will be set to that name (without the hit extension) to
-load automatically the language at startup, but we'll discuss this point
-later.
-
-Now, if you launch for example:
-
-hbdict file.hil it_IT.hit
-
-you will see the hbdict interface. With arrows you will be able to see all
-the strings that were found in i18n() funciton calls in your sources. Pressing
-enter, you can set a new translation, or change it; the windows in which the
-translations are made is a simple memoedit, so you can use standard memoedit
-keys to do edits.
-
-Pressing "E" (or a key that is named in the window), you can alter the default
-title, language name and author of the dictionary. Pressing "S" will save your
-output hit table. I suggest to do this often.
-
-To modify an existing hit file, you can set it as both for input and output
-file:
-
-hbdict it_IT.hit it_IT.hit
-
-
-
-IMPORTANT: How to modify existing hits AFTER a new hil compilation?
--------------------------------------------------------------------
-
-If you have done some modification after having created the hits, and/or you set
-as output file an existing hit file, the new strings will be merged into the
-hit file without destroying the old existing translations.
-
-
-
-
-
-
-
-USING the I18N API IN YOUR PROGRAMS
-===================================
-
-I18N system is automatically initialized at xharbour startup. The standard
-process consists in searching a file named after the "LANG" environment
-variable, plus the extension .hit, in the i18n/ subdirectory of the file
-startup directory. If no file can be found, i18n will silenty fail and the
-untraslated strings being in the program will be displayed.
-
-NOTE: LANG variable is usually defined in unix systems to allow their own
-      i18n to be enabled. So, this variable should be found in an average
-      unix enviroment, and it will have the naming scheme that we have
-      proposed above. TODO: remove the '@' lang extension, like
-      it_IT@euro
-
-If you don't have access to the LANG variable, or if you have your own way
-to determine what language, or what .hit file, you want to load, you can
-simply add this code to your program:
-
-Procedure MAIN()
-
-   HB_I18nSetPath( "C:\WhereAreHits\" )
-   HB_I18nSetLanguage( "NameOfTheLanguageFileWithoutHITextension")
-   ...
-
-This functions have also an error diagnostic, so you can ask your user
-for non default actions.
-
-
-This simple example explains how is possible to configure the i18n system
-at runtime:
-
-
-************************************************************
-* i18ntest.prg
-
-#include "inkey.ch"
-
-Procedure MAIN()
-   LOCAL nChoice
-   LOCAL aLanguages
-   LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR" }
-
-   SET COLOR TO W+/B
-
-   nChoice := 1
-   DO WHILE nChoice < 4 .and. nChoice > 0
-      aLanguages := { ;
-         i18n( "International" ), ;
-         i18n( "Italian" ), ;
-         i18n( "French" ), ;
-         i18n( "Quit" ) }
-
-      CLEAR SCREEN
-      @2,10 SAY i18n( "X H A R B O U R - Internationalization test " )
-      @4,10 SAY i18n( "Current language: " ) + HB_I18NGetLanguageName() +;
-                  "(" +HB_I18NGetLanguage() +")"
-      @6,10 SAY i18n( "This is a test with a plain string")
-
-      @12,10 SAY i18n( "Select Language: " )
-      MakeBox( 12,40, 20, 55 )
-      nChoice := Achoice(13, 41, 19, 54, aLanguages,,, ;
-         Ascan( aLangCodes, { |x| x == HB_I18NGetLanguage() } ) )
-
-      IF nChoice > 0 .and. nChoice < 4
-         HB_I18NSetLanguage( aLangCodes[ nChoice ] )
-      ENDIF
-   ENDDO
-
-
-RETURN
-
-PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
-   @nRow, nCol, nRowTo, nColTo ;
-        BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
-        Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
-RETURN
-
----------------------------
-
-This program displays some strings and then allows to select a language among the
-ones that are in the list. Notice that each element of the list must be in the
-i18n() string to be correctly translated. Notice also that we could have used
-any "language name" in the aLangCodes array, the important thing is that a file
-.hit with that name were present in the current i18npath, that is "i18n/" by
-default.
-
----------------------------
-
-
-
-
-HB_I18N api
-===========
-
-I18n API is divided into three layers. The upper level layers has the
-function needed to load and to use an hit file, and includes the i18n function.
-
-The middle level is meant to manage hil and hit tables, and is avaialble for
-programs like hbdict.
-
-The low level layer is meant for developers, and is written in C. The core
-api is meant to be lightning fast, with much complexity being incorporated in
-the hit table by the dictionary programs, so that I18N calls are resolved as
-fast as possible, that is usually lot faster than it is possible to notice
-in an average GUI.
-
-The choice of having pre-compiled tables instead of easy to mangle with ascii
-oriented dictionary files is has been made for the reason of allowing
-applications to start with a minimal overhead. This is very important in
-nowdays world for little service programs, like CGI. So, you can use i18n in
-programs that are loaded many times per second, without having to worry about
-the overhead of loading a translation file.
-
-
-High level api
---------------
-
-I18N( cString ) --> cTranslated
-
-   Searches cString in the currently loaded table, using a fast binary
-   (dicotomic) search, thus reducing the amount of tests needed to a
-   log2 factor of the table size. I.e., if your program has 1000 strings
-   to be translated (they are really a LOT for an average application),
-   I18N will find a result in 10 steps (at worst).
-
-   If the string is not present, cString will be returned untranslated,
-   without any new allocation or copy being made.
-
-
-HB_I18nSetPath( cPath )
-
-   Sets the current languages tables search pat to cpath. No tests is
-   made to see if cPath is a valid path. The path can be relative,
-   if it does not begin with a drive specification (windows) or with
-   a slash, or absolute. Default directory set at program startup is
-   i18n/
-
-
-HB_I18nGetPath() --> cPath
-
-   Returns the currently selected path for searching i18n table files.
-
-
-HB_I18NSetLanguage( cLanguage ) --> lResult
-
-   Loads a language translation table into the current I18N() translation
-   table. cLanguage is a filename (without the .hit extension) that must
-   be searched in the current i18n search path (see HB_I18nGetPath()).
-
-   This function is called by the virtual machine before the programs
-   begins using the value of the environment variable "LANG" as the
-   cLanguage parameter, if this variable is present present, but can
-   be also called in a later moment by the program.
-
-
-HB_I18NGetLanguage() --> cLanguage
-
-   Retunrs the name of the table that has been loaded into I18N()
-   translation table with HB_I18nSetLanguage(), or at startup.
-
-
-HB_I18NGetLanguageName() --> cLanguage
-
-   Returns the name of the currently loaded language, as it has been
-   declared in the language header. Generally, this is a descriptive
-   non-internationalized name of the language, like "Espanol",
-   "Italiano", "English", "Françoise", "Detusche", "Nihongo" and
-   so on.
-
--------- TODO: functions to access other language members, and
-         functions to allow i18n lookups on more than one table:
-         you could have web service threads speaking english and
-         other speaking french.
-
-
-
-
-Middle Level api
-----------------
-
-HB_I18NLoadTable( cFileName| nFileHandle ) --> aTable.
-
-   This function loads a file containing a table and stores it in
-   an xharbour array. If a filename is given, that won't follow the
-   i18n() opening conventions: you will have to use a full valid
-   relative or absolute filename to open the file.
-
-   On success, the returned array has two elements. The first element
-   is a 6 element array holding the header of the table:
-
-   aHead[1] == Signature ( 4 characters ).
-   aHead[2] == Author (50 characters)
-   aHead[3] == language name ( non international local name, 50 chars).
-   aHead[4] == language name in english (50 chars)
-   aHead[5] == language code as xx_XX format, 5 chars.
-   aHead[6] == number of table entries, or -1
-
-   The signature must be chr(3) + "HIL" or "HIT". Hil and Hit file are
-   intrinsically absolutely identical, except for the fact that a valid
-   hit file must:
-   1) have its international entries ordered with ascii() code ascending order.
-   2) have the number of entries correctly set up
-   3) never have duplicates in it's table international entries.
-
-   An application can know the type of the table loaded by looking at the
-   last 3 characters of the signature. A file failing to have a correct
-   signature, not respecting one of the above rules (if it's a HIT file)
-   or failing to load the table will be closed, and a NIL will be returned.
-
-   The second element of the returned array is the translation table; its
-   is an array of 2 items long arrays, each of which represent the
-   international (untraslated) string followed by the translated one:
-
-   aTable[1] == { "intSting1", "TranslatedString1" }
-   aTable[2] == { "intSting1", "TranslatedString1" }
-   ...
-   aTable[N] == { "intSting1", "TranslatedString1" }
-
-   If the file is an HIL, the strings can be in any order, or they could
-   be even duplicated.
-
-   In an HIT, this is not allowed.
-
-   The untranslated entry will be an empty string.
-
-   On failure, NIL is returned. IF Ferror() is not 0, you can suppose that
-   an hardware failure happened, else you can suppose that the file is
-   malformed.
-
-
-HB_I18NSaveTable( cFileName| nFileHandle, aTable ) --> lSuccess
-
-   Saves a table stored in the aTable array. The first element of the
-   array is the header, while the second element is the translation
-   table. See HB_I18nLoadTable for details upon the table format.
-
-   If yu are saving an HIT table after having modified an HIL,
-   remember to change the header signature to chr(3) + "HIT", and
-   to set the number of entries to Len( aTable[2] ). This is necessary
-   for the appliaction to load faster the HIT table on startup.
-
-
-HB_I18nSortTable( aTable ) --> aSorted
-
-   FUNCTION YET UNTESTED.
-
-   This function gets the two entry table in aTable and sorts it on
-   ascii acending order of the first element, removing also duplicates
-   int the table. In other words, it transform a messy hil table in
-   a table suitable to be saved in a HIT.
-
-   NOTE: currently I am doing this with the usual ASort(); this function
-   would be more efficient, but since array sorting is done in dictionary
-   files, efficiency should not be a concern.
-
-
-
-Low level api
--------------
-
-Yet undocmuented. refer to source/vm/hbi18n.c file to see what those function
-are doing; generally they implement low level operations required by higher
-level api, and they are all written in C.
-
-
-
+$Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      Xharbour I18N
+ *  $CATEGORY$
+ *      Xharbour Enhacements
+ *  $ONELINER$
+ *      XHARBOUR - Internationalization model
+ *  $DESCRIPTION$
+ *
+ *
+ *      STATUS OF THE DOCUMENT
+ *      ======================
+ *      
+ *      This is a small draft to explain the working of the i18n system in xharbour.
+ *      There could be error or even typos, and the document is Work IN Progress...
+ *      But the system i18n in itself is pretty complete, and is NOT subject to
+ *      radical changes: it can be used in production environent.
+ *      
+ *      
+ *      I18N CONCEPT
+ *      ============
+ *      
+ *      
+ *      What do we mean for internationalization ?
+ *      ------------------------------------------
+ *      
+ *      For i18n we mean a subcomponent of the localization (l10n) problem. I18N is
+ *      the ability of translate the user interface of a program into any possible
+ *      language. Currently, i18n() only supports languages in western encodings,
+ *      as left to right and unicode supported languages are NOT supported by
+ *      XHARBOUR. But i18n() is ready to use this extensions as soon as they
+ *      are available.
+ *      
+ *      While i18n is translation of the UI into many languages, l10n is the usage
+ *      of local national standards for dates, monetary values, mathematica symbols
+ *      (many countries have comma and dot meaning swapped).
+ *      
+ *      This document and the i18n system only reates the first problem, in the future
+ *      we could have a standard interface for producing both internationalized and
+ *      localized programs.
+ *      
+ *      
+ *      How do this is accomplished?
+ *      ----------------------------
+ *      
+ *      How do we are able to translate a program in any possible language without
+ *      having to recompile it, or without having to put a comprhensive prebuilt
+ *      table of translation somewhere available?
+ *      
+ *      The thing goes like this: you write down your program as always, without
+ *      worryng about writing your application in a specified language. You should
+ *      just write your application using plain english, and surround each
+ *      static string with the i18n() function call, like this:
+ *      
+ *      /* Minimal i18n program */
+ *      
+ *      Procedure MAIN()
+ *         ? i18n( "Hello world in your language!" )
+ *      RETURN
+ *      
+ *      When your program is complete, you will use xharbour support for i18n in
+ *      these steps:
+ *      
+ *      1) compile your project using the -j step, obtaining an
+ *         "Harbour international list" (or .hil) file as output.
+ *      
+ *      2) use a program called hbdict (available under utils/) to translate
+ *         every string you want to be translated into a language; you can
+ *         crete in this way any amount of "harbour international tables", or
+ *         .hit.
+ *      
+ *      3) put the .hits into a subdirectory available to your program, that must
+ *         be called i18n/.
+ *      
+ *      4) at startup, the xharbour program will search for a file named after the
+ *         environment variable LANG (plus .hit as extension) in the i18n/ directory
+ *         under his start directory. If this file is found, your program will be
+ *         displayed in the language you have chosen via the LANG variable.
+ *      
+ *      It is also possible to configure search paths and file names, and even to
+ *      change language at any moment in the program.
+ *      
+ *      
+ *      
+ *      USING XHARBOUR TO PRODUCE THE INTERNATIONAL LIST
+ *      ================================================
+ *      
+ *      When you have a reasonablely complete program that you want to test in a
+ *      foreign language, you must compile it with the "/j" flag to obtain the
+ *      hil file, that is built with every string that you put inside an i18n()
+ *      call.
+ *      
+ *      * NOTE: you don't have to translate all the strings of a program to test it.
+ *        Actually, you don't have to do any traslation at all to have it working.
+ *        This system allows you to build translations only when you are pretty
+ *        confident that the program has reached a fairly stable moment of its
+ *        developement. Also, this systems allow foreign users to add their own
+ *        translation (and then send it to you or share with other ousers), so
+ *        that you are freed from this part of developement.
+ *      
+ *      If used without any parameter, /j (or -j, depending on the system you
+ *      are compiling on), will create an hit file named after your source, along
+ *      with your source's code.
+ *      
+ *      This goes like that:
+ *      
+ *      harbour -n -j myprog.prg
+ *      
+ *      will generate myprog.c AND myprog.hil.
+ *      
+ *      If the hil file is already present, the strings being internationalized
+ *      in you program will be added to the HIL file. This means that, if you
+ *      don't regularily delete the hil file, it will grow endlessy, as no merge
+ *      mechanism is currently available, both to speed up compilation and to
+ *      keep harbour code simple as possible.
+ *      
+ *      If you give a parameter to -j option, you will be able to direct the hil
+ *      output that file. Combined with the fact that hil files are never
+ *      overwritten, but just "grown", an average build process for a project
+ *      built on many prg files, and to be internationalized, could be this:
+ *      
+ *      
+ *      del myproject.hil
+ *      harbour -n -jmyproject.hil main.prg
+ *      (on success) harbour -n -jmyproject.hil func1.prg
+ *      (on success) harbour -n -jmyproject.hil func2.prg
+ *      ...
+ *      link...
+ *      
+ *      
+ *      
+ *      BUILDING A DICTIONARY USING HBDICT
+ *      ==================================
+ *      
+ *      Hbdict is an utility (currently RUDIMENTAL) that allows to build dictionaries.
+ *      It has two command line parameters: the first is the input file, and can be
+ *      an hil that you want to translate, or a pre-existing hit. The output is
+ *      an hit that you want to create.
+ *      
+ *      The API used by hbdict is available in harbour RTL, and this makes possible to
+ *      build dictionary translators in a very simple fashon. The code that handles the
+ *      tables is no more than 50 xharbour lines, and using hbdict as a template, fairly
+ *      complete dictionary utilities can be built. Anyway, hbdict has anything an
+ *      essential dictionary editor should have, and will have more in the future.
+ *      
+ *      As hit files names, you are invited to choose names after the international
+ *      language names schemes. It is a 5 character code, having two lowercase letters
+ *      indicating the main language, an undersocre and two uppercase letters indicating
+ *      the subtype of the language. In example:
+ *      
+ *      British english: en_UK
+ *      Italian: it_IT
+ *      Swiss Italian: it_CH
+ *      French: fr_FR
+ *      American english: en_US
+ *      japanese: ja_JP  (jp is the nation code, while ja is the language).
+ *      
+ *      The "en_US" language code is currently used as "international", or
+ *      "no translation". But this may change in the future, so you can develop
+ *      applications in i.e. spanish and AFTER that you have built them, you
+ *      can traslate them to english.
+ *      
+ *      Anyway, you can select any name you like; you will have to make sure that
+ *      your LANG variable will be set to that name (without the hit extension) to
+ *      load automatically the language at startup, but we'll discuss this point
+ *      later.
+ *      
+ *      Now, if you launch for example:
+ *      
+ *      hbdict file.hil it_IT.hit
+ *      
+ *      you will see the hbdict interface. With arrows you will be able to see all
+ *      the strings that were found in i18n() funciton calls in your sources. Pressing
+ *      enter, you can set a new translation, or change it; the windows in which the
+ *      translations are made is a simple memoedit, so you can use standard memoedit
+ *      keys to do edits.
+ *      
+ *      Pressing "E" (or a key that is named in the window), you can alter the default
+ *      title, language name and author of the dictionary. Pressing "S" will save your
+ *      output hit table. I suggest to do this often.
+ *      
+ *      To modify an existing hit file, you can set it as both for input and output
+ *      file:
+ *      
+ *      hbdict it_IT.hit it_IT.hit
+ *      
+ *      
+ *      
+ *      IMPORTANT: How to modify existing hits AFTER a new hil compilation?
+ *      -------------------------------------------------------------------
+ *      
+ *      If you have done some modification after having created the hits, and/or you set
+ *      as output file an existing hit file, the new strings will be merged into the
+ *      hit file without destroying the old existing translations.
+ *      
+ *      
+ *      
+ *      
+ *      
+ *      
+ *      
+ *      USING the I18N API IN YOUR PROGRAMS
+ *      ==================================
+ *      
+ *      I18N system is automatically initialized at xharbour startup. The standard
+ *      process consists in searching a file named after the "LANG" environment
+ *      variable, plus the extension .hit, in the i18n/ subdirectory of the file
+ *      startup directory. If no file can be found, i18n will silenty fail and the
+ *      untraslated strings being in the program will be displayed.
+ *      
+ *      NOTE: LANG variable is usually defined in unix systems to allow their own
+ *            i18n to be enabled. So, this variable should be found in an average
+ *            unix enviroment, and it will have the naming scheme that we have
+ *            proposed above. TODO: remove the '@' lang extension, like
+ *            it_IT@euro
+ *      
+ *      If you don't have access to the LANG variable, or if you have your own way
+ *      to determine what language, or what .hit file, you want to load, you can
+ *      simply add this code to your program:
+ *      
+ *      Procedure MAIN()
+ *      
+ *        HB_I18nSetPath( "C:\WhereAreHits\" )
+ *        HB_I18nSetLanguage( "NameOfTheLanguageFileWithoutHITextension")
+ *        ...
+ *      
+ *      This functions have also an error diagnostic, so you can ask your user
+ *      for non default actions.
+ *      
+ *      
+ *      This simple example explains how is possible to configure the i18n system
+ *      at runtime:
+ *      
+ *      
+ *      ************************************************************
+ *      * i18ntest.prg
+ *      
+ *      #include "inkey.ch"
+ *      
+ *      Procedure MAIN()
+ *         LOCAL nChoice
+ *         LOCAL aLanguages
+ *         LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR" }
+ *      
+ *         SET COLOR TO W+/B
+ *      
+ *         nChoice := 1
+ *        DO WHILE nChoice < 4 .and. nChoice > 0
+ *           aLanguages := { ;
+ *              i18n( "International" ), ;
+ *              i18n( "Italian" ), ;
+ *              i18n( "French" ), ;
+ *              i18n( "Quit" ) }
+ *      
+ *            CLEAR SCREEN
+ *            @2,10 SAY i18n( "X H A R B O U R - Internationalization test " )
+ *            @4,10 SAY i18n( "Current language: " ) + HB_I18NGetLanguageName() +;
+ *                        "(" +HB_I18NGetLanguage() +")"
+ *            @6,10 SAY i18n( "This is a test with a plain string")
+ *      
+ *            @12,10 SAY i18n( "Select Language: " )
+ *            MakeBox( 12,40, 20, 55 )
+ *            nChoice := Achoice(13, 41, 19, 54, aLanguages,,, ;
+ *               Ascan( aLangCodes, { |x| x == HB_I18NGetLanguage() } ) )
+ *      
+ *            IF nChoice > 0 .and. nChoice < 4
+ *               HB_I18NSetLanguage( aLangCodes[ nChoice ] )
+ *            ENDIF
+ *         ENDDO
+ *      
+ *      
+ *      RETURN
+ *      
+ *      PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
+ *        @nRow, nCol, nRowTo, nColTo ;
+ *              BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
+ *              Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
+ *      RETURN
+ *      
+ *      ---------------------------
+ *      
+ *      This program displays some strings and then allows to select a language among the
+ *      ones that are in the list. Notice that each element of the list must be in the
+ *      i18n() string to be correctly translated. Notice also that we could have used
+ *      any "language name" in the aLangCodes array, the important thing is that a file
+ *      .hit with that name were present in the current i18npath, that is "i18n/" by
+ *      default.
+ *      
+ *      ---------------------------
+ *      
+ *      
+ *      
+ *      HB_I18N api
+ *      ===========
+ *      
+ *      I18n API is divided into three layers. The upper level layers has the
+ *      function needed to load and to use an hit file, and includes the i18n function.
+ *      
+ *      The middle level is meant to manage hil and hit tables, and is avaialble for
+ *      programs like hbdict.
+ *      
+ *      The low level layer is meant for developers, and is written in C. The core
+ *      api is meant to be lightning fast, with much complexity being incorporated in
+ *      the hit table by the dictionary programs, so that I18N calls are resolved as
+ *      fast as possible, that is usually lot faster than it is possible to notice
+ *      in an average GUI.
+ *      
+ *      The choice of having pre-compiled tables instead of easy to mangle with ascii
+ *      oriented dictionary files is has been made for the reason of allowing
+ *      applications to start with a minimal overhead. This is very important in
+ *      nowdays world for little service programs, like CGI. So, you can use i18n in
+ *      programs that are loaded many times per second, without having to worry about
+ *      the overhead of loading a translation file.
+ *      
+ *      
+ *      High level api
+ *      --------------
+ *      
+ *      I18N( cString ) --> cTranslated
+ *      
+ *         Searches cString in the currently loaded table, using a fast binary
+ *         (dicotomic) search, thus reducing the amount of tests needed to a
+ *         log2 factor of the table size. I.e., if your program has 1000 strings
+ *         to be translated (they are really a LOT for an average application),
+ *         I18N will find a result in 10 steps (at worst).
+ *      
+ *         If the string is not present, cString will be returned untranslated,
+ *         without any new allocation or copy being made.
+ *      
+ *      
+ *      HB_I18nSetPath( cPath )
+ *      
+ *         Sets the current languages tables search pat to cpath. No tests is
+ *         made to see if cPath is a valid path. The path can be relative,
+ *         if it does not begin with a drive specification (windows) or with
+ *         a slash, or absolute. Default directory set at program startup is
+ *         i18n/
+ *      
+ *      
+ *      HB_I18nGetPath() --> cPath
+ *      
+ *        Returns the currently selected path for searching i18n table files.
+ *      
+ *      
+ *      HB_I18NSetLanguage( cLanguage ) --> lResult
+ *      
+ *         Loads a language translation table into the current I18N() translation
+ *         table. cLanguage is a filename (without the .hit extension) that must
+ *         be searched in the current i18n search path (see HB_I18nGetPath()).
+ *      
+ *         This function is called by the virtual machine before the programs
+ *         begins using the value of the environment variable "LANG" as the
+ *         cLanguage parameter, if this variable is present present, but can
+ *         be also called in a later moment by the program.
+ *      
+ *      
+ *      HB_I18NGetLanguage() --> cLanguage
+ *      
+ *         Retunrs the name of the table that has been loaded into I18N()
+ *         translation table with HB_I18nSetLanguage(), or at startup.
+ *      
+ *      
+ *      HB_I18NGetLanguageName() --> cLanguage
+ *      
+ *         Returns the name of the currently loaded language, as it has been
+ *         declared in the language header. Generally, this is a descriptive
+ *         non-internationalized name of the language, like "Espanol",
+ *         "Italiano", "English", "Françoise", "Detusche", "Nihongo" and
+ *         so on.
+ *      
+ *      -------- TODO: functions to access other language members, and
+ *               functions to allow i18n lookups on more than one table:
+ *               you could have web service threads speaking english and
+ *               other speaking french.
+ *      
+ *      
+ *      
+ *      
+ *      Middle Level api
+ *      ----------------
+ *      
+ *      HB_I18NLoadTable( cFileName| nFileHandle ) --> aTable.
+ *      
+ *         This function loads a file containing a table and stores it in
+ *         an xharbour array. If a filename is given, that won't follow the
+ *         i18n() opening conventions: you will have to use a full valid
+ *         relative or absolute filename to open the file.
+ *      
+ *         On success, the returned array has two elements. The first element
+ *         is a 6 element array holding the header of the table:
+ *      
+ *         aHead[1] == Signature ( 4 characters ).
+ *         aHead[2] == Author (50 characters)
+ *         aHead[3] == language name ( non international local name, 50 chars).
+ *         aHead[4] == language name in english (50 chars)
+ *         aHead[5] == language code as xx_XX format, 5 chars.
+ *         aHead[6] == number of table entries, or -1
+ *      
+ *         The signature must be chr(3) + "HIL" or "HIT". Hil and Hit file are
+ *         intrinsically absolutely identical, except for the fact that a valid
+ *         hit file must:
+ *         1) have its international entries ordered with ascii() code ascending order.
+ *         2) have the number of entries correctly set up
+ *         3) never have duplicates in it's table international entries.
+ *      
+ *         An application can know the type of the table loaded by looking at the
+ *         last 3 characters of the signature. A file failing to have a correct
+ *         signature, not respecting one of the above rules (if it's a HIT file)
+ *         or failing to load the table will be closed, and a NIL will be returned.
+ *      
+ *         The second element of the returned array is the translation table; its
+ *         is an array of 2 items long arrays, each of which represent the
+ *         international (untraslated) string followed by the translated one:
+ *      
+ *         aTable[1] == { "intSting1", "TranslatedString1" }
+ *         aTable[2] == { "intSting1", "TranslatedString1" }
+ *         ...
+ *         aTable[N] == { "intSting1", "TranslatedString1" }
+ *      
+ *         If the file is an HIL, the strings can be in any order, or they could
+ *         be even duplicated.
+ *      
+ *         In an HIT, this is not allowed.
+ *      
+ *         The untranslated entry will be an empty string.
+ *      
+ *         On failure, NIL is returned. IF Ferror() is not 0, you can suppose that
+ *         an hardware failure happened, else you can suppose that the file is
+ *         malformed.
+ *      
+ *      
+ *      HB_I18NSaveTable( cFileName| nFileHandle, aTable ) --> lSuccess
+ *      
+ *         Saves a table stored in the aTable array. The first element of the
+ *         array is the header, while the second element is the translation
+ *         table. See HB_I18nLoadTable for details upon the table format.
+ *      
+ *         If yu are saving an HIT table after having modified an HIL,
+ *         remember to change the header signature to chr(3) + "HIT", and
+ *         to set the number of entries to Len( aTable[2] ). This is necessary
+ *         for the appliaction to load faster the HIT table on startup.
+ *      
+ *      
+ *      HB_I18nSortTable( aTable ) --> aSorted
+ *      
+ *         FUNCTION YET UNTESTED.
+ *      
+ *         This function gets the two entry table in aTable and sorts it on
+ *         ascii acending order of the first element, removing also duplicates
+ *         int the table. In other words, it transform a messy hil table in
+ *         a table suitable to be saved in a HIT.
+ *      
+ *         NOTE: currently I am doing this with the usual ASort(); this function
+ *         would be more efficient, but since array sorting is done in dictionary
+ *         files, efficiency should not be a concern.
+ *      
+ *      
+ *      
+ *      Low level api
+ *      -------------
+ *      
+ *      Yet undocmuented. refer to source/vm/hbi18n.c file to see what those function
+ *      are doing; generally they implement low level operations required by higher
+ *      level api, and they are all written in C.
+ *      
+ *      
+ *      
+ *  $END$
+ */
 
 CONTRIBUTORS
 ============
