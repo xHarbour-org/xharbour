@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.5 2004/05/03 12:56:57 lculik Exp $
+ * $Id: pickarry.prg,v 1.6 2004/05/03 13:06:02 lculik Exp $
  */
 
 STATIC someitems
@@ -79,7 +79,7 @@ LOCAL cOldColor  := Setcolor()
                  ELSE
                     SOMEITEMS ++
                  ENDIF
-        
+               lAdd := .F.
             NEXT
             else
          lIsChecked := Substr( IN_ARRAY[ nChoice ], 2, 1 ) == 'û'
