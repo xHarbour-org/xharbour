@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.6 2002/06/17 22:32:53 andijahja Exp $
+# $Id: hrbdll.bc,v 1.7 2002/10/25 03:06:04 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -51,7 +51,7 @@ INCLUDE_DIR  = include
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 
-C_USR          = -tWM -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
+C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
 CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
@@ -884,6 +884,9 @@ $(OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\proc.obj : $(VM_DIR)\proc.c
