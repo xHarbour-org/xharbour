@@ -1,6 +1,6 @@
 
 // What32.Lib
-// Graphics  & Drawing 
+// Graphics  & Drawing
 
 #define HB_OS_WIN_32_USED
 #define _WIN32_WINNT   0x0400
@@ -38,10 +38,10 @@ HB_FUNC ( MOVETO )
 
 HB_FUNC ( MOVETOEX )
 {
-   
+
    POINT Point ;
    PHB_ITEM aPt;
-  
+
 
    if ( MoveToEx(
                     (HDC) hb_parnl(1),   // device context handle
@@ -55,8 +55,8 @@ HB_FUNC ( MOVETOEX )
      aPt = Point2Array(&Point) ;
      _itemReturn( aPt );
      _itemRelease( aPt );
- 
-     }        
+
+     }
 
 }
 
@@ -125,9 +125,9 @@ HB_FUNC( DESCRIBEPIXELFORMAT )
                                   nBytes                 ,
                                   pfd
                                   ) ) ;
-    if ( ISBYREF(3) ) 
+    if ( ISBYREF(3) )
        hb_storclen( (char*) pfd, sizeof(PIXELFORMATDESCRIPTOR), 3 ) ;
-    //hb_itemPutCRaw( &hb_stack.Return, (char *) pfd , sizeof( PIXELFORMATDESCRIPTOR ) );
+    //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) pfd , sizeof( PIXELFORMATDESCRIPTOR ) );
 
 }
 
@@ -142,7 +142,7 @@ HB_FUNC( SETPIXEL )
    hb_retnl( (ULONG) SetPixel( (HDC) hb_parnl( 1 ),
                                hb_parni( 2 )      ,
                                hb_parni( 3 )      ,
-                               (COLORREF) hb_parnl( 4 )           
+                               (COLORREF) hb_parnl( 4 )
                              ) ) ;
 }
 
@@ -206,7 +206,7 @@ HB_FUNC( LINEDDA )
                      hb_parni( 3 ),
                      hb_parni( 4 ),
                      LineddaProc  ,
-                     lParam       
+                     lParam
                      ) ) ;
 }
 
@@ -251,7 +251,7 @@ HB_FUNC( ARC )
                  hb_parni( 6 )      ,
                  hb_parni( 7 )      ,
                  hb_parni( 8 )      ,
-                 hb_parni( 9 )      
+                 hb_parni( 9 )
                  ) ) ;
 }
 
@@ -274,7 +274,7 @@ HB_FUNC( ARCTO )
                  hb_parni( 6 )      ,
                  hb_parni( 7 )      ,
                  hb_parni( 8 )      ,
-                 hb_parni( 9 )      
+                 hb_parni( 9 )
                  ) ) ;
 }
 
@@ -301,7 +301,7 @@ HB_FUNC( POLYLINE )
        iCount = (DWORD) hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -349,7 +349,7 @@ HB_FUNC( POLYLINETO )
        iCount = (DWORD) hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -408,7 +408,7 @@ HB_FUNC( POLYPOLYLINE )
        iCount = hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -471,7 +471,7 @@ HB_FUNC( POLYDRAW )
        {
             Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
             aParam = hb_param(2,HB_IT_ARRAY);
-       
+
             for ( i = 0 ; i<iCount ; i++ )
             {
                aSub = hb_itemArrayGet( aParam, i+1 );
@@ -528,7 +528,7 @@ HB_FUNC( POLYBEZIER )
        iCount = (DWORD) hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -578,7 +578,7 @@ HB_FUNC( POLYBEZIERTO )
        iCount = (DWORD) hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -626,7 +626,7 @@ HB_FUNC( RECTANGLE )
                        hb_parni( 2 )      ,
                        hb_parni( 3 )      ,
                        hb_parni( 4 )      ,
-                       hb_parni( 5 )      
+                       hb_parni( 5 )
                        ) ) ;
 }
 
@@ -643,7 +643,7 @@ HB_FUNC( ROUNDRECT )
                        hb_parni( 4 )      ,
                        hb_parni( 5 )      ,
                        hb_parni( 6 )      ,
-                       hb_parni( 7 )      
+                       hb_parni( 7 )
                        ) ) ;
 }
 
@@ -664,7 +664,7 @@ HB_FUNC( CHORD )
                    hb_parni( 6 )      ,
                    hb_parni( 7 )      ,
                    hb_parni( 8 )      ,
-                   hb_parni( 9 )      
+                   hb_parni( 9 )
                    ) ) ;
 }
 
@@ -683,7 +683,7 @@ HB_FUNC( PIE )
                  hb_parni( 6 )      ,
                  hb_parni( 7 )      ,
                  hb_parni( 8 )      ,
-                 hb_parni( 9 )      
+                 hb_parni( 9 )
                  ) ) ;
 }
 
@@ -698,7 +698,7 @@ HB_FUNC( ELLIPSE )
                      hb_parni( 2 )      ,
                      hb_parni( 3 )      ,
                      hb_parni( 4 )      ,
-                     hb_parni( 5 )      
+                     hb_parni( 5 )
                      ) ) ;
 }
 
@@ -726,7 +726,7 @@ HB_FUNC( POLYGON )
        iCount = (int) hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -785,7 +785,7 @@ HB_FUNC( POLYPOLYGON )
        iCount = hb_parinfa( 2, 0 ) ;
        Point = (POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
        aParam = hb_param(2,HB_IT_ARRAY);
-       
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -929,7 +929,7 @@ HB_FUNC( FLOODFILL )
    hb_retl( FloodFill( (HDC) hb_parnl( 1 ),
                        hb_parni( 2 )      ,
                        hb_parni( 3 )      ,
-                       (COLORREF) hb_parnl( 4 )           
+                       (COLORREF) hb_parnl( 4 )
                        ) ) ;
 }
 

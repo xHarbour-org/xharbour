@@ -22,7 +22,7 @@
 //  SOCKET  accept( IN SOCKET s, OUT struct sockaddr FAR * addr, IN OUT int FAR * addrlen );
 
 // syntax: accept(s [,@cAddr][,@nAddrLen]) -> s
-   
+
 HB_FUNC( ACCEPT )
 {
    char *addr  ;
@@ -302,7 +302,7 @@ HB_FUNC( SELECT )
 
  }
 
- 
+
 //-----------------------------------------------------------------------------
 //  int  send( IN SOCKET s, IN const char FAR * buf, IN int len, IN int flags );
 
@@ -769,7 +769,7 @@ int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lp
       hb_vmPushLong( (LONG ) g );
 
       hb_vmDo(7) ;
-      res = hb_itemGetNI( (PHB_ITEM) &hb_stack.Return );
+      res = hb_itemGetNI( (PHB_ITEM) &HB_VM_STACK.Return );
 
    }
    return res ;
@@ -847,7 +847,7 @@ HB_FUNC( WSACONNECT )
                                                 lpCallerData ,
                                                 lpCalleeData ,
                                                 lpSQOS       ,
-                                                lpGQOS       
+                                                lpGQOS
                                               ) ) ;
 }
 
@@ -878,7 +878,7 @@ HB_FUNC( WSADUPLICATESOCKET )
 
 // hb_retni( (int ) WSADuplicateSocket( (SOCKET) hb_parnl( 1 )               ,
                                                         (DWORD) hb_parnl( 2 ),
-                                                        lpProtocolInfo       
+                                                        lpProtocolInfo
                                                       ) ) ;
 }
 
@@ -1047,7 +1047,7 @@ HB_FUNC( WSAIOCTL )
                                               (DWORD) hb_parnl( 6 ),
                                               lpcbBytesReturned    ,
                                               lpOverlapped         ,
-                                              lpCompletionRoutine  
+                                              lpCompletionRoutine
                                             ) ) ;
 }
 
@@ -1144,7 +1144,7 @@ HB_FUNC( WSARECV )
                                              lpNumberOfBytesRecvd ,
                                              lpFlags              ,
                                              lpOverlapped         ,
-                                             lpCompletionRoutine  
+                                             lpCompletionRoutine
                                            ) ) ;
 }
 
@@ -1193,7 +1193,7 @@ HB_FUNC( WSARECVFROM )
                                                  &lpFrom              ,
                                                  lpFromlen            ,
                                                  lpOverlapped         ,
-                                                 lpCompletionRoutine  
+                                                 lpCompletionRoutine
                                                ) ) ;
 }
 
@@ -1229,7 +1229,7 @@ HB_FUNC( WSASEND )
                                              lpNumberOfBytesSent  ,
                                              (DWORD) hb_parnl( 5 ),
                                              lpOverlapped         ,
-                                             lpCompletionRoutine  
+                                             lpCompletionRoutine
                                            ) ) ;
 }
 
@@ -1280,7 +1280,7 @@ HB_FUNC( WSASENDTO )
                                                &lpTo                ,
                                                hb_parni( 7 )        ,
                                                lpOverlapped         ,
-                                               lpCompletionRoutine  
+                                               lpCompletionRoutine
                                              ) ) ;
 }
 
@@ -1335,7 +1335,7 @@ HB_FUNC( WSAWAITFORMULTIPLEEVENTS )
                                                                 &lphEvents           ,
                                                                 hb_parl( 3 )         ,
                                                                 (DWORD) hb_parnl( 4 ),
-                                                                hb_parl( 5 )         
+                                                                hb_parl( 5 )
                                                               ) ) ;
 }
 
@@ -1384,7 +1384,7 @@ HB_FUNC( WSASTRINGTOADDRESS )
                                                         hb_parni( 2 )       ,
                                                         lpProtocolInfo      ,
                                                         lpAddress           ,
-                                                        lpAddressLength     
+                                                        lpAddressLength
                                                       ) ) ;
 }
 
@@ -1406,7 +1406,7 @@ HB_FUNC( WSALOOKUPSERVICEBEGIN )
 
 // hb_retni( (int ) WSALookupServiceBegin( lpqsRestrictions     ,
                                                            (DWORD) hb_parnl( 2 ),
-                                                           lphLookup            
+                                                           lphLookup
                                                          ) ) ;
 }
 
@@ -1429,7 +1429,7 @@ HB_FUNC( WSALOOKUPSERVICENEXT )
 // hb_retni( (int ) WSALookupServiceNext( (HANDLE) hb_parnl( 1 ),
                                                           (DWORD) hb_parnl( 2 ) ,
                                                           lpdwBufferLength      ,
-                                                          lpqsResults           
+                                                          lpqsResults
                                                         ) ) ;
 }
 
@@ -1539,7 +1539,7 @@ HB_FUNC( WSAGETSERVICECLASSNAMEBYCLASSID )
 
 // hb_retni( (int ) WSAGetServiceClassNameByClassId( lpServiceClassId    ,
                                                                      (LPSTR) hb_parc( 2 ),
-                                                                     lpdwBufferLength    
+                                                                     lpdwBufferLength
                                                                    ) ) ;
 }
 
@@ -1582,7 +1582,7 @@ HB_FUNC( WSAPROVIDERCONFIGCHANGE )
 
 // hb_retni( (int ) WSAProviderConfigChange( lpNotificationHandle,
                                                              lpOverlapped        ,
-                                                             lpCompletionRoutine 
+                                                             lpCompletionRoutine
                                                            ) ) ;
 }
 

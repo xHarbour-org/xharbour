@@ -116,7 +116,7 @@ HB_FUNC( F2BIN )
 
    hb_retclen( ( char *)Buffer,sizeof(float) ) ;
    hb_xfree(Buffer);
-   
+
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ BOOL Array2Rect(PHB_ITEM aRect, RECT *rc )
    if (HB_IS_ARRAY(aRect) && hb_itemSize(aRect) == 4) {
 
       PHB_ITEM item;
-      
+
       if (!HB_IS_NUMERIC(item = hb_itemArrayGet(aRect, 1)))
          return FALSE;
       rc->left = hb_itemGetNL(item);
@@ -234,7 +234,7 @@ BOOL Array2Point(PHB_ITEM aPoint, POINT *pt )
    if (HB_IS_ARRAY(aPoint) && hb_itemSize(aPoint) == 2) {
 
       PHB_ITEM item;
-      
+
       if (!HB_IS_NUMERIC(item = hb_itemArrayGet(aPoint, 1)))
          return FALSE;
       pt->x = hb_itemGetNL(item);
@@ -320,11 +320,11 @@ PHB_ITEM Size2Array( SIZE *siz  )
 
 //-----------------------------------------------------------------------------
 // LPTSTR MAKEINTRESOURCE( WORD wInteger )  // integer to convert
-// #define MAKEINTRESOURCE( i )  (LPTSTR) ((DWORD) ((WORD) (i))) 
+// #define MAKEINTRESOURCE( i )  (LPTSTR) ((DWORD) ((WORD) (i)))
 
 HB_FUNC( MAKEINRESOURCE )
-{  
-  hb_retc( MAKEINTRESOURCE( (WORD) hb_parni( 1 ) ) ) ;  
+{
+  hb_retc( MAKEINTRESOURCE( (WORD) hb_parni( 1 ) ) ) ;
 }
 
 
@@ -503,16 +503,16 @@ int nCopyAnsiToWideChar (LPWORD lpWCStr, LPSTR lpAnsiIn)
 HB_FUNC( CREATEMUTEX )
 {
    SECURITY_ATTRIBUTES *sa;
-   
-   if (ISCHAR(2)) 
+
+   if (ISCHAR(2))
        sa = (SECURITY_ATTRIBUTES *) hb_param(1, HB_IT_STRING)->item.asString.value;
 
    hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa,
-                                  hb_parnl( 2 )         , 
+                                  hb_parnl( 2 )         ,
                                   hb_parc( 3 ) ) );
 
 }
- 
+
 //----------------------------------------------------------------------------
 // HANDLE OpenMutex(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName )
 
@@ -525,7 +525,7 @@ HB_FUNC( OPENMUTEX )
 // BOOL ReleaseMutex( HANDLE hMutex )
 
 HB_FUNC( RELEASEMUTEX )
-{ 
+{
   hb_retl( ReleaseMutex( (HANDLE) hb_parnl( 1 ) ) );
 }
 
@@ -558,22 +558,22 @@ HB_FUNC( UNREGISTERHOTKEY )
 // WINUSERAPI BOOL WINAPI GetClassInfoA( IN HINSTANCE hInstance, IN LPCSTR lpClassName, OUT LPWNDCLASSA lpWndClass);
 
 
-// syntax: 
+// syntax:
 // GetClasInfo(hInst,cClass) -> WNDCLASS struct or NIL
 
 
 HB_FUNC( GETCLASSINFO )
 {
    WNDCLASS WndClass  ;
-   
-   if ( GetClassInfo( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ),
-                      (LPCSTR) hb_parc( 2 ), &WndClass ) ) 
 
-     
-     hb_retclen( (char*) &WndClass, sizeof(WNDCLASS) ) ; 
+   if ( GetClassInfo( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ),
+                      (LPCSTR) hb_parc( 2 ), &WndClass ) )
+
+
+     hb_retclen( (char*) &WndClass, sizeof(WNDCLASS) ) ;
 
    // the line below GPFs !
-   // hb_itemPutCRaw( &hb_stack.Return, (char *) &WndClass, sizeof( WNDCLASS ) );
+   // hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &WndClass, sizeof( WNDCLASS ) );
 
 }
 
@@ -583,7 +583,7 @@ HB_FUNC( GETCLASSINFO )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetClassInfoExA( IN HINSTANCE, IN LPCSTR, OUT LPWNDCLASSEXA);
 
-// syntax: 
+// syntax:
 // GetClasInfoEx(hInst,cClass) -> WNDCLASS struct or NIL
 
 
@@ -592,10 +592,10 @@ HB_FUNC( GETCLASSINFOEX )
    WNDCLASSEX WndClassEx ;
 
    if ( GetClassInfoEx( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ),
-                            (LPCSTR) hb_parc( 2 ), &WndClassEx ) ) 
+                            (LPCSTR) hb_parc( 2 ), &WndClassEx ) )
 
-      hb_retclen( (char*) &WndClassEx, sizeof(WNDCLASSEX) ) ;       
-      //hb_itemPutCRaw( &hb_stack.Return, (char *) &WndClassEx, sizeof( WNDCLASSEX ) );
+      hb_retclen( (char*) &WndClassEx, sizeof(WNDCLASSEX) ) ;
+      //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &WndClassEx, sizeof( WNDCLASSEX ) );
 
 }
 

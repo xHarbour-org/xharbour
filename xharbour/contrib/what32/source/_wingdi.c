@@ -107,7 +107,7 @@ HB_FUNC( GETBKCOLOR )
 
 HB_FUNC( SETBKCOLOR )
 {
-   
+
    hb_retnl( (ULONG) SetBkColor( (HDC) hb_parnl( 1 ), (COLORREF) hb_parnl(2) ) ) ;
 }
 
@@ -200,7 +200,7 @@ HB_FUNC( GETCURRENTOBJECT )
 
 HB_FUNC( GETOBJECT )
 {
-   
+
    int nBytes = GetObject( (HGDIOBJ) hb_parnl( 1 ), 0, NULL );
    LPVOID  lpObj = (VOID *) hb_xgrab(nBytes) ;
 
@@ -227,14 +227,14 @@ HB_FUNC( ENUMOBJECTS )
    hb_retni( EnumObjects( (HDC) hb_parnl( 1 ),
                           hb_parni( 2 )      ,
                           gObjEnumProc       ,
-                          lpVoid             
+                          lpVoid
                           ) ) ;
 }
 
 */
 
 
-// MAPPING FUNCTIONS 
+// MAPPING FUNCTIONS
 
 
 //-----------------------------------------------------------------------------
@@ -434,7 +434,7 @@ HB_FUNC( GETPATH )
 HB_FUNC( LPTODP )
 {
    POINT * Point ;
-   POINT pt; 
+   POINT pt;
    INT iCount ;
    INT i ;
    PHB_ITEM aParam;
@@ -445,8 +445,8 @@ HB_FUNC( LPTODP )
    {
        iCount = hb_parinfa( 2, 0 ) ;
        Point = ( POINT *) hb_xgrab( iCount * sizeof (POINT) ) ;
-       aParam = hb_param(2,HB_IT_ARRAY); 
-       
+       aParam = hb_param(2,HB_IT_ARRAY);
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -457,26 +457,26 @@ HB_FUNC( LPTODP )
             hb_xfree(Point);
             return ;
           }
-       }  
-              
+       }
+
        if ( LPtoDP( (HDC) hb_parnl( 1 ), Point, iCount ) )
-       {   
-         for ( i = 0 ; i < iCount ; i++ ) 
+       {
+         for ( i = 0 ; i < iCount ; i++ )
          {
             aSub = Point2Array(Point+i);
             hb_arraySet( aParam, i+1, hb_arrayClone(aSub, NULL ) ) ;
-            hb_itemRelease(aSub);  
-         } 
+            hb_itemRelease(aSub);
+         }
          hb_retl(1);
        }
        else
-         hb_retl(0); 
-                         
+         hb_retl(0);
+
        hb_xfree(Point) ;
 
    }
    else
-     hb_retl(0) ;   
+     hb_retl(0) ;
 
 }
 
@@ -491,7 +491,7 @@ HB_FUNC( LPTODP )
 HB_FUNC( DPTOLP )
 {
    POINT * Point ;
-   POINT pt; 
+   POINT pt;
    INT iCount ;
    INT i ;
    PHB_ITEM aParam;
@@ -502,8 +502,8 @@ HB_FUNC( DPTOLP )
    {
        iCount = hb_parinfa( 2, 0 ) ;
        Point = ( POINT * ) hb_xgrab( iCount * sizeof (POINT) ) ;
-       aParam = hb_param(2,HB_IT_ARRAY); 
-       
+       aParam = hb_param(2,HB_IT_ARRAY);
+
        for ( i = 0 ; i<iCount ; i++ )
        {
           aSub = hb_itemArrayGet( aParam, i+1 );
@@ -514,26 +514,26 @@ HB_FUNC( DPTOLP )
             hb_xfree(Point);
             return ;
           }
-       }  
-              
+       }
+
        if ( DPtoLP( (HDC) hb_parnl( 1 ), Point, iCount ) )
-       {   
-         for ( i = 0 ; i < iCount ; i++ ) 
+       {
+         for ( i = 0 ; i < iCount ; i++ )
          {
             aSub = Point2Array(Point+i);
             hb_arraySet( aParam, i+1, hb_arrayClone(aSub, NULL ) ) ;
-            hb_itemRelease(aSub);  
-         } 
+            hb_itemRelease(aSub);
+         }
          hb_retl(1);
        }
        else
-         hb_retl(0); 
-                         
+         hb_retl(0);
+
        hb_xfree(Point) ;
 
    }
    else
-     hb_retl(0) ;   
+     hb_retl(0) ;
 
 }
 
@@ -569,7 +569,7 @@ HB_FUNC( PAINTDESKTOP )
 HB_FUNC( GETGUIRESOURCES )
 {
    hb_retnl( (LONG) GetGuiResources( (HANDLE) hb_parnl( 1 ),
-                                     (DWORD) hb_parnl( 2 ) 
+                                     (DWORD) hb_parnl( 2 )
                                    ) ) ;
 }
 
@@ -625,14 +625,14 @@ HB_FUNC( GETCLIPBOX )
 {
    RECT Rect ;
    PHB_ITEM aRect ;
-   
+
    hb_retni( GetClipBox( (HDC) hb_parnl( 1 ), &Rect ) ) ;
 
       aRect = Rect2Array( &Rect ) ;
       _itemReturn( aRect );
-      _itemRelease( aRect );       
+      _itemRelease( aRect );
 
- 
+
 }
 
 
@@ -661,9 +661,9 @@ HB_FUNC( GETRASTERIZERCAPS )
 {
    LPRASTERIZER_STATUS lprs = (LPRASTERIZER_STATUS)hb_param( 1,HB_IT_STRING )->item.asString.value;
 
-   if( GetRasterizerCaps( lprs, (UINT) hb_parni( 2 ) ) ) 
-       hb_retclen( (char*) lprs, sizeof(RASTERIZER_STATUS) ) ; 
-   //hb_itemPutCRaw( &hb_stack.Return, (char *) lprs, sizeof(RASTERIZER_STATUS ) );
+   if( GetRasterizerCaps( lprs, (UINT) hb_parni( 2 ) ) )
+       hb_retclen( (char*) lprs, sizeof(RASTERIZER_STATUS) ) ;
+   //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) lprs, sizeof(RASTERIZER_STATUS ) );
 
 }
 
@@ -689,7 +689,7 @@ HB_FUNC( GETASPECTRATIOFILTEREX )
    else
       hb_retl(FALSE);
 
-   
+
 }
 
 
@@ -711,7 +711,7 @@ HB_FUNC( DEVICECAPABILITIESA )
                                   (LPCSTR) hb_parc( 2 ),
                                   Word                 ,
                                   (LPSTR) hb_parc( 4 ) ,
-                                  &DEVMODEA            
+                                  &DEVMODEA
                                   ) ) ;
 }
 
@@ -729,11 +729,11 @@ HB_FUNC( GETUPDATERECT )
    RECT Rect ;
    PHB_ITEM aRect ;
 
-   if ( GetUpdateRect( (HWND) hb_parnl( 1 ), &Rect, hb_parl( 2 ) ) ) 
+   if ( GetUpdateRect( (HWND) hb_parnl( 1 ), &Rect, hb_parl( 2 ) ) )
    {
       aRect = Rect2Array( &Rect ) ;
       _itemReturn( aRect );
-      _itemRelease( aRect );       
+      _itemRelease( aRect );
    }
 
 }
@@ -789,12 +789,12 @@ HB_FUNC( DRAGDETECT )
 
 HB_FUNC( GETDRAWITEMSTRUCT )
 {
-  
+
   DRAWITEMSTRUCT *dis =(DRAWITEMSTRUCT*) hb_parnl( 1 ) ;
 
   PHB_ITEM arrDis = _itemArrayNew(12) ;
   PHB_ITEM temp ;
-   
+
   temp = _itemPutNL( NULL, dis->CtlType );
   hb_arraySet( arrDis, 1, temp );
   _itemRelease( temp );
@@ -845,7 +845,7 @@ HB_FUNC( GETDRAWITEMSTRUCT )
 
   _itemReturn( arrDis );
   _itemRelease( arrDis );
-}  
+}
 
 
 //-----------------------------------------------------------------------------
@@ -896,15 +896,15 @@ HB_FUNC( DRAWANIMATEDRECTS )
       if(DrawAnimatedRects( (HWND) hb_parnl( 1 ),
                                hb_parni( 2 )       ,
                                &lprcFrom           ,
-                               &lprcTo             
-                             ) ) 
+                               &lprcTo
+                             ) )
          hb_retl(TRUE);
       else
          hb_retl(FALSE);
    }
    else
       hb_retl(FALSE);
-                           
+
 }
 
 
@@ -982,7 +982,7 @@ HB_FUNC( OFFSETVIEWPORTORGEX )
    hb_retl( OffsetViewportOrgEx( (HDC) hb_parnl( 1 ),
                                  hb_parni( 2 )      ,
                                  hb_parni( 3 )      ,
-                                 lpPoInt            
+                                 lpPoInt
                                  ) ) ;
 }
 
@@ -1002,7 +1002,7 @@ HB_FUNC( OFFSETWINDOWORGEX )
    hb_retl( OffsetWindowOrgEx( (HDC) hb_parnl( 1 ),
                                hb_parni( 2 )      ,
                                hb_parni( 3 )      ,
-                               lpPoInt            
+                               lpPoInt
                                ) ) ;
 }
 
@@ -1024,7 +1024,7 @@ HB_FUNC( SCALEWINDOWEXTEX )
                               hb_parni( 3 )      ,
                               hb_parni( 4 )      ,
                               hb_parni( 5 )      ,
-                              &lpSize             
+                              &lpSize
                               ) )
    {
       Size2ArrayEx(&lpSize,pArray);

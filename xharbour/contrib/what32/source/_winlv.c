@@ -76,7 +76,7 @@ HB_FUNC ( LISTVIEWNOTIFY )
                hb_vmPushString( cAlias,strlen(cAlias) );
                hb_vmPushInteger( hb_parni(6) );
                hb_vmDo( 6 );
-               cRet=hb_itemGetC( &hb_stack.Return );
+               cRet=hb_itemGetC( &HB_VM_STACK.Return );
                lstrcpy(lpdi->item.pszText, cRet);
                }
             }
@@ -101,7 +101,7 @@ HB_FUNC ( LISTVIEWNOTIFY )
                hb_vmPushString( cAlias,strlen(cAlias) );
                hb_vmPushInteger( hb_parni(6) );
                hb_vmDo( 6 );
-               cRet=hb_itemGetC( &hb_stack.Return );
+               cRet=hb_itemGetC( &HB_VM_STACK.Return );
                lstrcpy(lpdi->item.pszText, cRet);
                }
             }

@@ -1,6 +1,6 @@
 
 // What32
-// Scrollbar API functions 
+// Scrollbar API functions
 
 #define _WIN32_WINNT   0x0400
 #include <windows.h>
@@ -17,7 +17,7 @@ HB_FUNC( SETSCROLLPOS )
    hb_retni( SetScrollPos( (HWND) hb_parnl( 1 ),
                            hb_parni( 2 )       ,
                            hb_parni( 3 )       ,
-                           hb_parl( 4 )        
+                           hb_parl( 4 )
                          ) ) ;
 }
 
@@ -40,7 +40,7 @@ HB_FUNC( SETSCROLLRANGE )
                             hb_parni( 2 )       ,
                             hb_parni( 3 )       ,
                             hb_parni( 4 )       ,
-                            hb_parl( 5 )        
+                            hb_parl( 5 )
                           ) ) ;
 }
 
@@ -62,15 +62,15 @@ HB_FUNC( GETSCROLLRANGE )
       if ( ISBYREF(3) && ISBYREF(4) )
       {
          hb_storni(3,*lpMinPos) ;
-         hb_storni(4,*lpMaxPos) ;  
+         hb_storni(4,*lpMaxPos) ;
          hb_retl(1) ;
       }
       else
         hb_retl(0);
    }
    else
-     hb_retl(0) ; 
-   
+     hb_retl(0) ;
+
 }
 
 
@@ -109,7 +109,7 @@ HB_FUNC( SETSCROLLINFO )
    hb_retni( SetScrollInfo( (HWND) hb_parnl( 1 ),
                             hb_parni( 2 )       ,
                             scrollInfo          ,
-                            hb_parl( 4 )        
+                            hb_parl( 4 )
                           ) ) ;
 }
 
@@ -126,12 +126,12 @@ HB_FUNC( GETSCROLLINFO )
    si.cbSize = sizeof(SCROLLINFO) ;
    si.fMask  = SIF_ALL ;
 
-   if ( GetScrollInfo( (HWND) hb_parnl( 1 ), hb_parni( 2 ), &si ) ) 
+   if ( GetScrollInfo( (HWND) hb_parnl( 1 ), hb_parni( 2 ), &si ) )
       hb_retclen( (char *) &si, sizeof( SCROLLINFO ) );
-      
-      // problem 
-      //hb_itemPutCRaw( &hb_stack.Return, (char *) &si, sizeof( SCROLLINFO ) );
-       
+
+      // problem
+      //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &si, sizeof( SCROLLINFO ) );
+
 }
 
 
@@ -147,11 +147,11 @@ HB_FUNC( GETSCROLLBARINFO )
 {
    SCROLLBARINFO sbi     ;
 
-   if ( GetScrollBarInfo( (HWND) hb_parnl( 1 ), hb_parnl( 2 ), &sbi ) ) 
-       hb_retclen( (char *) &sbi, sizeof( SCROLLBARINFO ) );      
- 
-     // problem 
-     // hb_itemPutCRaw( &hb_stack.Return, (char *) &sbi, sizeof( SCROLLBARINFO ) );      
+   if ( GetScrollBarInfo( (HWND) hb_parnl( 1 ), hb_parnl( 2 ), &sbi ) )
+       hb_retclen( (char *) &sbi, sizeof( SCROLLBARINFO ) );
+
+     // problem
+     // hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &sbi, sizeof( SCROLLBARINFO ) );
 }
 
 #endif

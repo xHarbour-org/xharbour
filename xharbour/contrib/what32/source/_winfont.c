@@ -32,7 +32,7 @@ HB_FUNC( CREATEFONT )
 {
 
    if ( ISARRAY(1))
-   { 
+   {
       hb_retnl( (LONG) CreateFont( hb_parni( 1, 1 )         ,  // nHeight
                                     hb_parni( 1, 2 )         ,  // nWidth
                                     hb_parni( 1, 3 )         ,  // nEscapement
@@ -48,7 +48,7 @@ HB_FUNC( CREATEFONT )
                                     (DWORD) hb_parnl( 1, 13 ),  // fdwPitchAndFamily
                                     (LPCSTR) hb_parc( 1, 14 )   // lpszFace
                                    ) ) ;
- 
+
    }
    else
    {
@@ -67,9 +67,9 @@ HB_FUNC( CREATEFONT )
                                     (DWORD) hb_parnl( 13 ),  // fdwPitchAndFamily
                                     (LPCSTR) hb_parc( 14 )   // lpszFace
                                    ) ) ;
- 
+
    }
-     
+
 }
 
 //-----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ HB_FUNC( ENUMFONTFAMILIES )
      hb_retni( EnumFontFamilies( (HDC) hb_parnl( 1 )  ,
                                 (LPCSTR) hb_parc( 2 ),
                                 (FONTENUMPROC) GenericCallblockProc  ,
-                                lParam               
+                                lParam
                                 ) ) ;
    }
    else
@@ -202,7 +202,7 @@ HB_FUNC( ENUMFONTS )
      hb_retni( EnumFonts( (HDC) hb_parnl( 1 )  ,
                          (LPCSTR) hb_parc( 2 ),
                          (FONTENUMPROC) GenericCallblockProc  ,
-                         lParam               
+                         lParam
                          ) ) ;
    }
    else
@@ -234,8 +234,8 @@ int CALLBACK GenericCallbackProc( LONG param1, LONG param2, int wParam, LPARAM l
       hb_vmPushLong( (LONG ) wParam );
       hb_vmPushLong( (LONG ) lParam );
       hb_vmDo( 4 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( (PHB_ITEM) &HB_VM_STACK.Return );
+
       return res;
    }
    else // shouldn't happen
@@ -266,8 +266,8 @@ int CALLBACK GenericCallblockProc( LONG param1, LONG param2, int wParam, LPARAM 
       hb_vmPushLong( (LONG ) wParam );
       hb_vmPushLong( (LONG ) lParam );
       hb_vmSend( 4 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( (PHB_ITEM) &HB_VM_STACK.Return );
+
       return res;
    }
    else // shouldn't happen
@@ -374,7 +374,7 @@ HB_FUNC( ADDFONTRESOURCEEXA )
 
    hb_retni( AddFontResourceExA( (LPCSTR) hb_parc( 1 ),
                                  (DWORD) hb_parnl( 2 ),
-                                 pVoid                
+                                 pVoid
                                  ) ) ;
 }
 
@@ -419,7 +419,7 @@ HB_FUNC( REMOVEFONTRESOURCEEXA )
 
    hb_retl( RemoveFontResourceExA( (LPCSTR) hb_parc( 1 ),
                                    (DWORD) hb_parnl( 2 ),
-                                   pVoid                
+                                   pVoid
                                    ) ) ;
 }
 
