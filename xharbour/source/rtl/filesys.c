@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.95 2004/04/05 22:25:43 andijahja Exp $
+ * $Id: filesys.c,v 1.96 2004/04/06 01:50:55 druzus Exp $
  */
 
 /*
@@ -355,8 +355,10 @@ static void convert_create_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
       }
       *dwAttr = FILE_ATTRIBUTE_NORMAL;
    }
+   
    /* shared flags */
-   *dwShare = 0;
+   *dwShare = FILE_SHARE_WRITE | FILE_SHARE_READ;
+   
    switch ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
    {
       case FO_DENYREAD :

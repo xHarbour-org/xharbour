@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2782 2004/04/13 21:06:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2783 2004/04/14 10:31:59 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-14 16:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwin/gtwin.c
+    * modified readKey code to use only inkey.ch
+    * no more support of INKEY_RAW and INKEY_EXTENDED
+  * source/rtl/inkey.c
+  * source/vm/hvm.c
+    * hbinkey.ch no more used
+  * source/rtl/gtwvt/gtwvt.c
+    * added an hack to manage K_CTRL_RETURN
+    * fixed support of keystrokes like Ctrl+Shift+F1 as suggested by Budyanto Dj.
+  * source/rtl/filesys.c
+    * fixed shared mode when -DHB_WIN32_IO as suggested by Przemyslaw.
 
 2004-04-14 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.90 2004/04/05 22:25:43 andijahja Exp $
+ * $Id: gtwvt.c,v 1.91 2004/04/06 09:58:24 andijahja Exp $
  */
 
 /*
@@ -1949,11 +1949,15 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_CHAR:
     {
       BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
-      // int  iScanCode = HIWORD( lParam ) & 0xFF ;
+      int  iScanCode = HIWORD( lParam ) & 0xFF ;
       int c = ( int )wParam;
       if ( !bIgnoreWM_SYSCHAR )
       {
-        if ( bCtrl && ( c >= 1 && c<= 26 ) )  // K_CTRL_A - Z
+        if ( bCtrl && iScanCode == 28 )  // K_CTRL_RETURN
+        {
+          hb_wvt_gtAddCharToInputQueue( K_CTRL_RETURN );
+        }   
+        else if ( bCtrl && ( c >= 1 && c<= 26 ) )  // K_CTRL_A - Z
         {
           hb_wvt_gtAddCharToInputQueue( K_Ctrl[c-1]  );
         }
@@ -2561,24 +2565,24 @@ static void hv_wvt_gtDoInvalidateRect( void )
 
 static void hb_wvt_gtTranslateKey( int key, int shiftkey, int altkey, int controlkey )
 {
-  int nVirtKey = GetKeyState( VK_SHIFT );
-  if ( nVirtKey & 0x8000 ) // shift + key
+  int nVirtKey = GetKeyState( VK_MENU );
+  if ( nVirtKey & 0x8000 ) // alt + key
   {
-    hb_wvt_gtAddCharToInputQueue( shiftkey );
+    hb_wvt_gtAddCharToInputQueue( altkey );
   }
   else
   {
-    nVirtKey = GetKeyState( VK_MENU );
-    if ( nVirtKey & 0x8000 ) // alt + key
+    nVirtKey = GetKeyState( VK_CONTROL );
+    if ( nVirtKey & 0x8000 ) // control + key
     {
-      hb_wvt_gtAddCharToInputQueue( altkey );
+      hb_wvt_gtAddCharToInputQueue( controlkey );
     }
     else
     {
-      nVirtKey = GetKeyState( VK_CONTROL );
-      if ( nVirtKey & 0x8000 ) // control + key
+      nVirtKey = GetKeyState( VK_SHIFT );
+      if ( nVirtKey & 0x8000 ) // shift + key
       {
-        hb_wvt_gtAddCharToInputQueue( controlkey );
+        hb_wvt_gtAddCharToInputQueue( shiftkey );
       }
       else //just key
       {

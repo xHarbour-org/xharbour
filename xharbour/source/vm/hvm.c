@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.378 2004/04/13 21:06:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.379 2004/04/14 10:32:14 druzus Exp $
  */
 
 /*
@@ -95,7 +95,6 @@
 #include "hbvm.h"
 #include "hbpcode.h"
 #include "hbset.h"
-#include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
 #include "hbdebug.ch"
@@ -933,12 +932,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             switch( ch )
             {
-               case HB_K_ALT_C:           /* Check for extended Alt+C */
                case K_ALT_C:              /* Check for normal Alt+C */
                case HB_BREAK_FLAG:
                   hb_vmRequestCancel();/* Request cancellation */
                   break;
-               case HB_K_ALT_D:           /* Check for extended Alt+C */
                case K_ALT_D:              /* Check for normal Alt+C */
                   hb_vmRequestDebug();/* Request debugger */
                   break;
