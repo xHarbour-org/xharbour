@@ -94,17 +94,21 @@ Properties:
 Methods:
 --------
 
-   Reset              -> Initializes all Structure Member properties to NIL.
+   Reset               -> Initializes all Structure Member properties to NIL.
 
-   Buffer( [New] )    -> Optionally SET the InternalBuffer to a new image, which will automatically
-                         call the DeValue() Method to reflect the change in Member Properties.
+   Buffer( [New], [lAdopt] ) -> Optionally SET the InternalBuffer to a new image, which will automatically
+                                call the DeValue() Method to reflect the change in Member Properties. The
+                                lAdopt flag indicates memory pointed by nested pointers should be assigned
+                                to the resulting members, or should remain the responsability of caller.
 
-                      -> Return a copy of the InternalBuffer.
+                             -> Return a copy of the InternalBuffer.
 
-   Value              -> Return a newly calculated C Structure Image and record it into InternalBuffer.
+   Value               -> Return a newly calculated C Structure Image and record it into InternalBuffer.
 
-   DeValue            -> Calculates new values for all Member Properties to reflect the current image of
-                         the C Structure from the InternalBuffer.
+   DeValue( [lAdopt] ) -> Calculates new values for all Member Properties to reflect the current image of
+                          the C Structure from the InternalBuffer. The lAdopt flag indicates memory pointed
+                          by nested pointers should be assigned to the resulting members, or should remain
+                          the responsability of caller.
 
                          Return Array of Member Properties values.
 
@@ -118,11 +122,13 @@ Methods:
                       -> Return refernce to the initialized stracture object.
 
 
-   Pointer( [nNew] )  -> Optionally SET the InternalBuffer to a new image (pointed to by nNew), which will
-                         automatically call the Buffer() Method (and thus DeValue()) to reflect the change
-                         in Member Properties.
+   Pointer( [nNew], [lAdopt] ) -> Optionally SET the InternalBuffer to a new image (pointed to by nNew),
+                                  which will automatically call the Buffer() Method (and thus DeValue())
+                                  to reflect the change in Member Properties. The lAdopt flag indicates
+                                  memory pointed by nested pointers should be assigned to the resulting
+                                  members, or should remain the responsability of caller.
 
-                      -> Return the Pointer address of the InternalBuffer.
+                               -> Return the Pointer address of the InternalBuffer.
 
 
 PRG Support Functions:
@@ -150,6 +156,9 @@ PRG Support Functions:
 
                                                      Return new object instance of the specified C Structure class.
 
+  HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAlign ) -> PP Syntax Support. Creates new Structure
+                                                                                From C Syntax definition. Reset __ActiveStructure().
+
   HB_SizeOfCStructure( acTypes, nAlign )          -> Return the equivalent of C' sizeof( STRUCTURE ) for the given specs.
 
   HB_ArrayToStructure( aValues, acTypes, nAlign ) -> Return a String representation of the C Structure memory image
@@ -171,5 +180,5 @@ C Support Functions:
   PHB_ITEM ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign )
   -> Return the equivalent of C Structure Memory Image for the given parameters.
 
-  PHB_ITEM StructureToArray( BYTE *Buffer, PHB_ITEM aDef, unsigned int uiAlign )
+  PHB_ITEM StructureToArray( BYTE *Buffer, PHB_ITEM aDef, unsigned int uiAlign, bAdopt   )
   -> Return xHarbour C Structure Class Object for the given parameters.

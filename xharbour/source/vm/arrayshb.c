@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.17 2002/07/24 03:22:20 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.18 2002/07/27 23:11:36 ronpinkas Exp $
  */
 
 /*
@@ -1291,7 +1291,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign )
+PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    ULONG ulLen = pBaseDef->ulLen;
@@ -1515,7 +1515,6 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign )
             {
                if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                {
-
                   //printf( "Offset %i Pointer: %p\n", uiOffset, *(char **) ( (long ** )( Buffer + uiOffset ) ) );
 
                   if( *(char **) ( (long ** )( Buffer + uiOffset ) ) )
@@ -1523,7 +1522,14 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign )
                      PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
                      PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
 
-                     hb_itemPutCRaw( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiNestedSize );
+                     if( bAdoptNested )
+                     {
+                        hb_itemPutCRaw( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiNestedSize );
+                     }
+                     else
+                     {
+                        hb_itemPutCRawStatic( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiNestedSize );
+                     }
 
                      hb_objSendMsg( pStructure, "DEVALUE", 0 );
                   }
@@ -1567,6 +1573,8 @@ HB_FUNC( HB_STRUCTURETOARRAY )
    PHB_ITEM Structure = hb_param( 1, HB_IT_STRING );
    PHB_ITEM aDef = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pAlign = hb_param( 3, HB_IT_INTEGER );
+   PHB_ITEM pAdopt = hb_param( 4, HB_IT_LOGICAL );
+   BOOL bAdopt;
 
    if( Structure && aDef )
    {
@@ -1583,7 +1591,16 @@ HB_FUNC( HB_STRUCTURETOARRAY )
          uiAlign = 4;
       }
 
-      hb_itemForwardValue( &hb_stack.Return, pRet = StructureToArray( Buffer, aDef, uiAlign ) );
+      if( pAdopt )
+      {
+         bAdopt = pAdopt->item.asLogical.value;
+      }
+      else
+      {
+         bAdopt = FALSE;
+      }
+
+      hb_itemForwardValue( &hb_stack.Return, pRet = StructureToArray( Buffer, aDef, uiAlign, bAdopt ) );
 
       hb_itemRelease( pRet );
    }

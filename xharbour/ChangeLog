@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.327 2002/07/29 17:37:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.328 2002/07/30 06:59:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-30 11:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    * Reverted "Multplication Method" to "Division Method" due to amplification of tendancy in MsgToNum()
+    * More reasonable initial allocation for inherted classes too.
+
+  * source/vm/arrayshb.c
+    + Added <lAdopt> optional 4th parameter to HB_StructureToArray() indicating wether memory pointed to
+      by nested pointers should be adopted by the created members. Default is .F.
+    + Added <bAdopt> optional 4th parameter to StructureToArray() indicating wether memory pointed to
+      by nested pointers should be adopted by the created members. Default is FALSE.
+
+  * source/rtl/cstruct.prg
+    + Added <lAdopt> optional 2nd. parameter to :Buffer() Method, indicating wether memory pointed to
+      by nested pointers should be adopted by the created members. Default is .F.
+    + Added <lAdopt> optional parameter to :DeValue() Method, indicating wether memory pointed to
+      by nested pointers should be adopted by the created members. Default is .F.
+    + Added <lAdopt> optional 2nd. parameter to :Pointer() Method, indicating wether memory pointed to
+      by nested pointers should be adopted by the created members. Default is .F.
+
+  * tests/tstcstru.prg
+    * Added .T. as 2nd. parameter to Buffer() method call to demonstrate how to adopt the memory allocated from C.
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * source/vm/fm.c
+    * Minor modification to error message.
 
 2002-07-29 23:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/cstruct.prg

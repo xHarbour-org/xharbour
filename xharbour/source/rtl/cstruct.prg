@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.12 2002/07/27 23:11:36 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.13 2002/07/30 06:59:58 ronpinkas Exp $
  */
 
 /*
@@ -485,11 +485,11 @@ STATIC Function Reset()
 Return QSelf()
 
 //---------------------------------------------------------------------------//
-STATIC Function Buffer( Buffer )
+STATIC Function Buffer( Buffer, lAdopt )
 
    IF ValType( Buffer ) == "C"
       QSelf():InternalBuffer := Buffer
-      QSelf():DeValue()
+      QSelf():DeValue( lAdopt )
    ENDIF
 
    IF ValType( QSelf():InternalBuffer ) != "C"
@@ -510,7 +510,7 @@ STATIC Function Value()
 Return QSelf():InternalBuffer
 
 //---------------------------------------------------------------------------//
-STATIC Function DeValue()
+STATIC Function DeValue( lAdopt )
 
    LOCAL aValues
    LOCAL Counter, nLen := Len( QSelf() ) - CLASS_PROPERTIES
@@ -521,7 +521,7 @@ STATIC Function DeValue()
    IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
       aValues := Array( nLen )
    ELSE
-      aValues := HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign  )
+      aValues := HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt  )
    ENDIF
 
    FOR Counter := 1 TO nLen
@@ -555,12 +555,12 @@ STATIC Function Init( aValues )
 Return QSelf()
 
 //---------------------------------------------------------------------------//
-STATIC Function Pointer( nNewPointer )
+STATIC Function Pointer( nNewPointer, lAdopt )
 
    LOCAL nPointer := HB_String2Pointer( QSelf():Buffer() )
 
    IF nNewPointer != NIL
-      QSelf():Buffer( HB_Pointer2String( nNewPointer ), QSelf():SizeOf() )
+      QSelf():Buffer( HB_Pointer2String( nNewPointer ), QSelf():SizeOf(), lAdopt )
    ENDIF
 
 Return nPointer

@@ -63,7 +63,7 @@ Procedure Main()
    DemoTransferToC( oStructure:Value )
 
    // Here we receive a true C Structure from a C Function.
-   oStructure:Buffer( DemoTransferFromC() )
+   oStructure:Buffer( DemoTransferFromC(), .T. )
 
    // Show us the values in our PRG Structure.
    oStructure:SayMembers( "   " )
