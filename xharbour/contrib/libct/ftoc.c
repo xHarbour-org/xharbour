@@ -1,5 +1,5 @@
 /*
- *  $Id: ftoc.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
+ *  $Id: ftoc.c,v 1.3 2004/03/18 03:43:08 ronpinkas Exp $
  */
 
 /*
@@ -149,18 +149,20 @@ HB_FUNC( CTOF )
    union
    {
       double value;
-      char   string[ sizeof( double )];
-   }  xConvert;
-  char *   pcString;
+      char   string[ sizeof( double ) ];
+   } xConvert;
+   char *pcString;
 
-  if (hb_parclen( 1 ) == sizeof( double ))
-  {
-    pcString = hb_parcx( 1 );
+   if ( hb_parclen( 1 ) >= sizeof( double ) )
+   {
+      pcString = hb_parcx( 1 );
 
-    memcpy( xConvert.string, pcString, sizeof(double) );
-    hb_retnd( xConvert.value );
-  }
-  else
-    hb_retnd( 0.0 );
+      memcpy( xConvert.string, pcString, sizeof( double ) );
+      hb_retnd( xConvert.value );
+   }
+   else
+   {
+      hb_retnd( 0.0 );
+   }
 }
 
