@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.41 2002/10/25 01:25:48 what32 Exp $
+ * $Id: xInspect.prg,v 1.42 2002/10/25 05:33:57 what32 Exp $
  */
 
 /*
@@ -50,7 +50,6 @@ CLASS ObjInspect FROM TForm
                                 ::height  := 297,;
                                 ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
-   // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
    METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;

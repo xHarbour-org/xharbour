@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.10 2002/10/25 05:33:52 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.11 2002/10/25 07:13:43 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -2345,14 +2345,14 @@ STATIC FUNCTION gotorec(ob,newrec)
             (ob:Source)->(DBSKIP(newrec-ob:RecCount)) // (cmkeyskip(newrec-ob:RecCount))
            ELSE
             (ob:Source)->(DBGOTOP())
-            (ob:Source)->(DBSKIP(newrec-1)) //(cmkeygoto(newrec))
+            (ob:Source)->(DBSKIP(newrec-1))           // (cmkeygoto(newrec))
          ENDIF
         ELSE
          IF ob:RecCount-newrec < absdiff
             (ob:Source)->(dbgobottom())
             (ob:Source)->(DBSKIP(newrec-ob:RecCount)) // (cmkeyskip(newrec-ob:RecCount))
            ELSE
-            (ob:Source)->(DBSKIP(recdiff)) // (cmkeyskip(recdiff))
+            (ob:Source)->(DBSKIP(recdiff))            // (cmkeyskip(recdiff))
          ENDIF
       ENDIF
    ENDIF
@@ -2392,4 +2392,3 @@ RETURN(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 STATIC FUNCTION GetAColumn(a,i)
  RETURN whColumn():INIT( a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
-
