@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.146 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: ppcore.c,v 1.147 2004/04/14 22:39:19 andijahja Exp $
  */
 
 /*
@@ -3403,22 +3403,6 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
    HB_SKIPTABSPACES( *ptri );
 
-   // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
-   if( strchr( "}]),|=*^%", ( *ptri )[0] ) ||
-       ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) ||
-       ( ( *ptri )[0] == '-' && ( *ptri )[1] == '>' ) )
-   {
-      if( cMarkerType == '1' && ( *ptri )[0] == ',' )
-      {
-         goto ProcessExp;
-      }
-      else
-      {
-         lens = 0;
-         goto Done;
-      }
-   }
-
    // Extended Match Marker
    if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
    {
@@ -3453,7 +3437,17 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       goto Done;
    }
 
- ProcessExp:
+   // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
+   if( strchr( "}]),|=*^%", ( *ptri )[0] ) ||
+       ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) ||
+       ( ( *ptri )[0] == '-' && ( *ptri )[1] == '>' ) )
+   {
+      if( ! ( cMarkerType == '1' && ( *ptri )[0] == ',' ) )
+      {
+         lens = 0;
+         goto Done;
+      }
+   }
 
    State = ( **ptri == '\'' || **ptri =='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
