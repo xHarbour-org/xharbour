@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.24 2002/01/24 02:47:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.25 2002/01/24 05:41:03 ronpinkas Exp $
  */
 
 /*
@@ -616,6 +616,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTION:
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
+            {
+               hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
+            }
+
             hb_vmDo( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
             hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
@@ -623,6 +632,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTIONSHORT:
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
+            {
+               hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
+            }
+
             hb_vmDo( pCode[ w + 1 ] );
             hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
@@ -3089,6 +3107,7 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
 /* Object                          */
 /* ------------------------------- */
 
+#if 0
 void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
 {
    PHB_ITEM pItemMsg = hb_stackItemFromTop( -1 );
@@ -3101,6 +3120,7 @@ void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
    pItemMsg->item.asSymbol.stackbase = hb_stackTopOffset() - 1;
    hb_stackPush();
 }
+#endif
 
 static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.13 2002/01/20 20:55:50 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.14 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -355,7 +355,7 @@ void hb_retcAdopt( char * szText )
 {
    HB_TRACE( HB_TR_INFO, ("hb_retcAdopt(%s) %p", &hb_stack.Return, szText ) );
 
-   if( &hb_stack.Return )
+   if( ( &hb_stack.Return )->type )
    {
       if( HB_IS_STRING( &hb_stack.Return ) )
       {
@@ -381,7 +381,7 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
 
    HB_TRACE( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) %p \"%s\"", szText, ulLen, &hb_stack.Return, szText ) );
 
-   if( &hb_stack.Return )
+   if( ( &hb_stack.Return )->type )
    {
       if( HB_IS_STRING( &hb_stack.Return ) )
       {

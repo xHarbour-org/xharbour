@@ -1,5 +1,5 @@
 //
-// $Id: testpers.prg,v 1.3 2001/09/05 10:38:46 antoniolinares Exp $
+// $Id: testpers.prg,v 1.4 2002/01/25 14:28:51 davep Exp $
 //
 // Class HBPersistent test
 
@@ -9,8 +9,6 @@ function Main()
 
    local oTest := Test():New()
    local oTest2 := Test2():New()
-
-   oTest:cName = "oTest"  // We set a name for the persistent object to save
 
    oTest:One   = "hello"
    oTest:Two   = 123
