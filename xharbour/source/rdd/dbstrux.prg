@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.10 2002/04/26 11:10:29 alkresin Exp $
+ * $Id: dbstrux.prg,v 1.2 2002/05/21 16:43:05 horacioroldan Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ FUNCTION __dbCopyXStruct( cFileName )
    LOCAL nOldArea
    LOCAL oError
    LOCAL aStruct
+   local cTmpAlias
 
    IF Empty( aStruct := dbStruct() )
       RETURN .F.
@@ -70,9 +71,11 @@ FUNCTION __dbCopyXStruct( cFileName )
    nOldArea := Select()
 
    BEGIN SEQUENCE
+      cTmpAlias := __rddGetTempAlias()
 
       dbSelectArea( 0 )
-      __dbCreate( cFileName, NIL, NIL, .F., NIL )
+      // __dbCreate( cFileName, NIL, NIL, .F., NIL )
+      __dbCreate( cFileName, NIL, NIL, .F., cTmpAlias )
 
       AEval( aStruct, {| aField | iif( aField[ DBS_TYPE ] == "C" .AND. aField[ DBS_LEN ] > 255, ;
          ( aField[ DBS_DEC ] := Int( aField[ DBS_LEN ] / 256 ), aField[ DBS_LEN ] := aField[ DBS_LEN ] % 256 ), NIL ) } )
@@ -84,7 +87,7 @@ FUNCTION __dbCopyXStruct( cFileName )
                                   FIELD->FIELD_DEC := aField[ DBS_DEC ] } )
 
    /* NOTE: CA-Cl*pper has a bug, where only a plain RECOVER statement is
-            used here (without the USING keyword), so oError will always be 
+            used here (without the USING keyword), so oError will always be
             NIL. */
    RECOVER USING oError
    END SEQUENCE
@@ -104,6 +107,7 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
    LOCAL nOldArea := Select()
    LOCAL aStruct := {}
    LOCAL oError
+   local cTmpAlias
 
    DEFAULT lNew TO .F.
 
@@ -124,7 +128,9 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
 
       ELSE
 
-         dbUseArea( lNew,, cFileFrom ) 
+         cTmpAlias := __rddGetTempAlias()
+
+         dbUseArea( lNew,, cFileFrom, cTmpAlias )
 
          dbEval( {|| AAdd( aStruct, { Rtrim(FIELD->FIELD_NAME) ,;
                                       Rtrim(FIELD->FIELD_TYPE) ,;
