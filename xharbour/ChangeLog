@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.246 2002/05/24 02:55:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.247 2002/05/24 05:12:10 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-24 06:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Corrected hb_pp_ParseDefine() so that compiled marker qualify as valid array prefix.
+
+  * source/pp/pptable.c
+    ! Corrected representation of #define _DFSET ... to match hb_pp_ParseDefine()
 
 2002-05-24 02:02 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/console.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.16 2002/05/20 20:41:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.17 2002/05/24 02:35:54 ronpinkas Exp $
  */
 
 /*
@@ -578,8 +578,8 @@ int hb_pp_ParseDefine( char * sLine )
 
               iParams++;
 
-              sMarker[0] = '\2';
-              sMarker[1] = iParams;
+              sMarker[0] = '\1';
+              sMarker[1] = iParams + 64;
               sMarker[2] = '\0';
 
               pTmp = (char *) sLine;
@@ -592,8 +592,8 @@ int hb_pp_ParseDefine( char * sLine )
                  pTmp = pTmp + ( ( iParamLen > 2 ) ? iParamLen - 2 : 2 );
               }
 
-              sParams[iParamsLen++] = '\2';
-              sParams[iParamsLen++] = iParams;
+              sParams[iParamsLen++] = '\1';
+              sParams[iParamsLen++] = iParams + 64;
               sParams[iParamsLen++] = ',';
 
               HB_SKIPTABSPACES( sLine );
