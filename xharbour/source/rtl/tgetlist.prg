@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.1.1.1 2001/12/21 10:41:40 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.2 2002/02/21 06:31:26 walito Exp $
  */
 
 /*
@@ -319,7 +319,8 @@ METHOD GetPostValidate() CLASS HBGetList
    endif
 
    if oGet:BadDate()
-      oGet:SetFocus()
+//      oGet:SetFocus()
+      oGet:TypeOut := .f.
       ::DateMsg()
       ::ShowScoreboard()
       return .f.
