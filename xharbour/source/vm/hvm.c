@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.364 2004/03/25 18:54:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.365 2004/03/25 21:54:19 ronpinkas Exp $
  */
 
 /*
@@ -108,6 +108,10 @@
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
+#endif
+
+#ifdef HB_VM_REQUESTS
+   HB_VM_REQUESTS
 #endif
 
 //JC1: macro and codeblock parameters are handled in thread stack

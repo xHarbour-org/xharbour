@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.40 2004/02/20 19:45:51 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.41 2004/03/05 08:59:29 andijahja Exp $
  */
 
 /*
@@ -609,6 +609,7 @@ HB_FUNC( HB_ATOKENS )
       HB_ITEM Token;
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
+      BOOL bSkipStrings = hb_parl( 3 );
 
       Token.type = HB_IT_NIL;
       HB_VM_STACK.Return.type = HB_IT_NIL;
@@ -616,7 +617,15 @@ HB_FUNC( HB_ATOKENS )
 
       for( i = 0; i < pLine->item.asString.length; i++ )
       {
-         if( pLine->item.asString.value[i] == cDelimiter )
+         if( bSkipStrings && pLine->item.asString.value[i] == '"' || pLine->item.asString.value[i] == '\'' )
+         {
+            char cTerminator = pLine->item.asString.value[i];
+
+            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != cTerminator )
+            {
+            }
+         }
+         else if( pLine->item.asString.value[i] == cDelimiter )
          {
             hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, i - iOffset ) );
 
@@ -632,7 +641,7 @@ HB_FUNC( HB_ATOKENS )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_ATOKENS", 2, hb_paramError(1), hb_paramError(2) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_ATOKENS", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 }
