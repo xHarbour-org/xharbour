@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.183 2005/02/08 14:04:51 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.184 2005/02/12 16:44:20 druzus Exp $
  */
 
 /*
@@ -1294,7 +1294,7 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
    BOOL ret;
 
    if ( pIndex->lockRead )
-      hb_errInternal( 9105, "hb_cdxIndexLockRead: writeLock after readLock.", "", "" );
+      hb_errInternal( 9105, "hb_cdxIndexLockWrite: writeLock after readLock.", "", "" );
    if ( pIndex->lockWrite > 0 )
    {
       pIndex->lockWrite++;
@@ -1375,7 +1375,7 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
 
    if ( pIndex->lockWrite < 1 )
    {
-      hb_errInternal( 9106, "hb_cdxIndexUnLockRead: bad count of locks.", "", "" );
+      hb_errInternal( 9106, "hb_cdxIndexUnLockWrite: bad count of locks.", "", "" );
    }
    if ( pIndex->lockRead )
    {
@@ -7419,11 +7419,11 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_HPLOCKING:
       case DBOI_LOCKOFFSET:
          {
-            ULONG ulPos, ulPool;
+            HB_FOFFSET ulPos, ulPool;
 
             hb_dbfLockIdxGetData( pArea->bLockType, &ulPos, &ulPool );
             if ( uiIndex == DBOI_LOCKOFFSET )
-               pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult, ulPos );
+               pOrderInfo->itmResult = hb_itemPutNInt( pOrderInfo->itmResult, ulPos );
             else
                pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, ulPool > 0 );
             break;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.19 2004/03/25 12:13:13 druzus Exp $
+ * $Id: hbrddntx.h,v 1.20 2004/11/21 21:43:38 druzus Exp $
  */
 
 /*
@@ -58,6 +58,8 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
+#define HB_EXTERNAL_RDDDBF_USE
+#include "hbrdddbf.h"
 
 HB_EXTERN_BEGIN
 
@@ -74,7 +76,7 @@ HB_EXTERN_BEGIN
 #define NTX_MAX_KEY          256      /* Max len of key */
 #define NTXBLOCKSIZE         1024     /* Size of block in NTX file */
 #define NTX_MAX_TAGNAME      12       /* Max len of tag name */
-#define NTX_LOCK_OFFSET      1000000000
+/* #define NTX_LOCK_OFFSET      1000000000 */
 #define NTX_PAGES_PER_TAG    32
 
 /* forward declarations
@@ -161,14 +163,17 @@ typedef TAGINFO * LPTAGINFO;
 
 typedef struct _NTXINDEX
 {
-   char *    IndexName;
-   BOOL      Locked;
-   LONG      NextAvail;
-   struct   _NTXAREA * Owner;
-   FHANDLE   DiskFile;
-   BOOL      fFlush;
-   LPTAGINFO CompoundTag;
-   struct   _NTXINDEX * pNext;   /* The next index in the list */
+   char *      IndexName;
+   ULONG       NextAvail;
+   USHORT      Version;       /* The index VERSION filed to signal index updates for other stations */
+   struct     _NTXAREA * Owner;
+   FHANDLE     DiskFile;
+   BOOL        fFlush;
+   HB_FOFFSET  ulLockPos;     /* readlock position for CL53 lock scheme */
+   int         lockWrite;     /* number of write lock set */
+   int         lockRead;      /* number of read lock set */
+   LPTAGINFO   CompoundTag;
+   struct     _NTXINDEX * pNext;   /* The next index in the list */
 } NTXINDEX;
 
 typedef NTXINDEX * LPNTXINDEX;

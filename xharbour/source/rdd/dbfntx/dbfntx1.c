@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.93 2005/01/30 21:19:24 druzus Exp $
+ * $Id: dbfntx1.c,v 1.94 2005/02/12 16:44:21 druzus Exp $
  */
 
 /*
@@ -207,6 +207,132 @@ static int hb_ntxItemCompare( char* s1, char* s2, int ilen1, int ilen2, BOOL Exa
 #define KEYPOINTER(P,N) ( (USHORT*)((P)->buffer+(N)*2+2) )
 #define hb_ntxKeyFree(K) hb_xfree(K)
 
+static void commonError( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char* filename, USHORT uiFlags )
+{
+   PHB_ITEM pError;
+
+   pError = hb_errNew();
+   hb_errPutGenCode( pError, uiGenCode );
+   hb_errPutSubCode( pError, uiSubCode );
+   hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
+   if( filename )
+      hb_errPutFileName( pError, filename );
+   if( uiFlags )
+      hb_errPutFlags( pError, uiFlags );
+   SUPER_ERROR( ( AREAP ) pArea, pError );
+   hb_errRelease( pError );
+   return;
+}
+
+static BOOL hb_ntxIndexLockRead( LPTAGINFO pTag )
+{
+   LPNTXINDEX pIndex = pTag->Owner;
+   BOOL fOK;
+
+   if ( pIndex->lockRead > 0 || pIndex->lockWrite > 0 ||
+        !pIndex->Owner->fShared || pTag->Memory )
+   {
+      fOK = TRUE;
+   }
+   else
+   {
+      fOK = hb_dbfLockIdxFile( pIndex->DiskFile, pIndex->Owner->bLockType,
+                        FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
+      /* TODO: if fOK then check VERSION field in NTXHEADER and
+         if it has changed then discard all page buffers */
+   }
+   if ( fOK )
+      pIndex->lockRead++;
+   else
+      commonError( pIndex->Owner, EG_LOCK, EDBF_LOCK, pIndex->IndexName, 0 );
+
+   return fOK;
+}
+
+static BOOL hb_ntxIndexLockWrite( LPTAGINFO pTag )
+{
+   LPNTXINDEX pIndex = pTag->Owner;
+   BOOL fOK;
+
+   if ( pIndex->lockRead )
+      hb_errInternal( 9105, "hb_ntxIndexLockWrite: writeLock after readLock.", "", "" );
+
+   if ( pIndex->lockWrite > 0 ||
+        !pIndex->Owner->fShared || pTag->Memory )
+   {
+      fOK = TRUE;
+   }
+   else
+   {
+      fOK = hb_dbfLockIdxFile( pIndex->DiskFile, pIndex->Owner->bLockType,
+                               FL_LOCK | FLX_WAIT, &pIndex->ulLockPos );
+      /* TODO: if fOK then check VERSION field in NTXHEADER and
+         if it has changed then discard all page buffers */
+   }
+   if ( fOK )
+      pIndex->lockWrite++;
+   else
+      commonError( pIndex->Owner, EG_LOCK, EDBF_LOCK, pIndex->IndexName, 0 );
+
+   return fOK;
+}
+
+static BOOL hb_ntxIndexUnLockRead( LPTAGINFO pTag )
+{
+   LPNTXINDEX pIndex = pTag->Owner;
+   BOOL fOK;
+
+   pIndex->lockRead--;
+   if ( pIndex->lockRead < 0 )
+      hb_errInternal( 9106, "hb_ntxIndexUnLockRead: bad count of locks.", "", "" );
+
+   if ( pIndex->lockRead || pIndex->lockWrite ||
+        !pIndex->Owner->fShared || pTag->Memory )
+   {
+      fOK = TRUE;
+   }
+   else
+   {
+      hb_ntxPageFree( pTag, FALSE );
+      fOK = hb_dbfLockIdxFile( pIndex->DiskFile, pIndex->Owner->bLockType,
+                               FL_UNLOCK, &pIndex->ulLockPos );
+   }
+   if ( !fOK )
+      hb_errInternal( 9108, "hb_ntxIndexUnLockRead: unlock error.", "", "" );
+
+   return fOK;
+}
+
+static BOOL hb_ntxIndexUnLockWrite( LPTAGINFO pTag )
+{
+   LPNTXINDEX pIndex = pTag->Owner;
+   BOOL fOK;
+
+   pIndex->lockWrite--;
+   if ( pIndex->lockWrite < 0 )
+      hb_errInternal( 9106, "hb_ntxIndexUnLockWrite: bad count of locks.", "", "" );
+   if ( pIndex->lockRead )
+      hb_errInternal( 9105, "hb_cdxIndexUnLockWrite: writeUnLock before readUnLock.", "", "" );
+
+   if ( pIndex->lockWrite ||
+        !pIndex->Owner->fShared || pTag->Memory )
+   {
+      fOK = TRUE;
+   }
+   else
+   {
+      hb_ntxPageFree( pTag, FALSE );
+      /* TODO: update version number if anything was written to disk
+         in index update */
+      fOK = hb_dbfLockIdxFile( pIndex->DiskFile, pIndex->Owner->bLockType,
+                               FL_UNLOCK, &pIndex->ulLockPos );
+   }
+   if ( !fOK )
+      hb_errInternal( 9108, "hb_ntxIndexUnLockWrite: unlock error.", "", "" );
+
+   return fOK;
+}
+
 static ULONG* hb_ntxKeysInPage( ULONG ulRecCount, USHORT maxkeys )
 {
   double dSum = 0, koeff, _maxkeys = (double) maxkeys,
@@ -251,23 +377,6 @@ static ULONG* hb_ntxKeysInPage( ULONG ulRecCount, USHORT maxkeys )
   }
 
   return lpArray;
-}
-
-static void commonError( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char* filename, USHORT uiFlags )
-{
-   PHB_ITEM pError;
-
-   pError = hb_errNew();
-   hb_errPutGenCode( pError, uiGenCode );
-   hb_errPutSubCode( pError, uiSubCode );
-   hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
-   if( filename )
-      hb_errPutFileName( pError, filename );
-   if( uiFlags )
-      hb_errPutFlags( pError, uiFlags );
-   SUPER_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
-   return;
 }
 
 static void hb_IncString( NTXAREAP pArea, char* s, int slen )
@@ -439,11 +548,8 @@ static ULONG hb_ntxTagKeyNo( LPTAGINFO pTag )
 {
    ULONG ulKeyNo = 0;
 
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-   {
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
-      pTag->Owner->Locked = TRUE;
-   }
+   if ( ! hb_ntxIndexLockRead( pTag ) )
+      return 0;
 
    if( pTag->topScope || pTag->bottomScope )
    {
@@ -501,12 +607,8 @@ static ULONG hb_ntxTagKeyNo( LPTAGINFO pTag )
       }
    }
 
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-   {
-      hb_ntxPageFree( pTag,FALSE );
-      hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
-      pTag->Owner->Locked = FALSE;
-   }
+   hb_ntxIndexUnLockRead( pTag );
+
    return ulKeyNo;
 }
 
@@ -517,13 +619,11 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
    ULONG ulKeyCount = 0;
    int i;
 
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-   {
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
-      pTag->Owner->Locked = TRUE;
-   }
-   else if( pTag->keyCount )
+   if( ( !pTag->Owner->Owner->fShared || pTag->Memory ) && pTag->keyCount )
       return pTag->keyCount;
+
+   if ( ! hb_ntxIndexLockRead( pTag ) )
+      return 0;
 
    if( pTag->topScope || pTag->bottomScope )
    {
@@ -581,15 +681,10 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
       }
       hb_ntxPageRelease( pTag,pPage );
    }
+   pTag->keyCount = ulKeyCount;
 
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-   {
-      hb_ntxPageFree( pTag,FALSE );
-      hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
-      pTag->Owner->Locked = FALSE;
-   }
-   else
-      pTag->keyCount = ulKeyCount;
+   hb_ntxIndexUnLockRead( pTag );
+
    return ulKeyCount;
 }
 
@@ -1150,18 +1245,10 @@ static BOOL hb_ntxTagGoToBottomKey( LPTAGINFO pTag, LPPAGEINFO pPage, ULONG ulOf
 
 static void hb_ntxTagKeyGoTo( LPTAGINFO pTag, BYTE bTypRead, BOOL * lContinue )
 {
-   BOOL wasLocked = FALSE;
-
    pTag->TagBOF = pTag->TagEOF = FALSE;
-   if( pTag->Owner->Owner->ulRecCount )
+   if( pTag->Owner->Owner->ulRecCount &&
+       hb_ntxIndexLockRead( pTag ) )
    {
-      if( pTag->Owner->Owner->fShared && !pTag->Owner->Locked && !pTag->Memory )
-      {
-         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
-         wasLocked = pTag->Owner->Locked;
-         pTag->Owner->Locked = TRUE;
-      }
-
       switch( bTypRead )
       {
          case TOP_RECORD:
@@ -1182,16 +1269,7 @@ static void hb_ntxTagKeyGoTo( LPTAGINFO pTag, BYTE bTypRead, BOOL * lContinue )
             pTag->TagBOF = !hb_ntxTagGoToPrevKey( pTag, *lContinue );
             break;
       }
-      if( pTag->Owner->Owner->fShared && !pTag->Memory )
-      {
-         hb_ntxPageFree( pTag,FALSE );
-         /* pTag->RootPage = NULL; */
-         if( !wasLocked )
-         {
-            hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
-            pTag->Owner->Locked = FALSE;
-         }
-      }
+      hb_ntxIndexUnLockRead( pTag );
    }
    else
    {
@@ -1364,7 +1442,6 @@ static void hb_ntxPageRelease( LPTAGINFO pTag, LPPAGEINFO pPage )
 
 static void hb_ntxPageFree( LPTAGINFO pTag, BOOL lFull )
 {
-
    ULONG ul = 0, ulMax = (lFull)? pTag->ulPagesDepth:pTag->ulPages;
    LPPAGEINFO pPage = pTag->pages;
 
@@ -1380,7 +1457,7 @@ static void hb_ntxPageFree( LPTAGINFO pTag, BOOL lFull )
    {
       if( pPage->Changed && !pTag->Memory )
          hb_ntxPageSave( pTag, pPage );
-      if( pTag->NewRoot  && !pTag->Memory )
+      if( pTag->NewRoot && !pTag->Memory )
       {
          pTag->RootBlock = pPage->Page;
          hb_ntxHeaderSave( pTag->Owner, FALSE );
@@ -1904,7 +1981,7 @@ static void hb_ntxTagKeyAdd( LPTAGINFO pTag, LPKEYINFO pKey )
          KEYITEM( pNewPage, 1 )->page = pPage->Page;
 
          pNewPage->Changed = pTag->NewRoot = TRUE;
-         hb_ntxPageRelease( pTag,pNewPage );
+         hb_ntxPageRelease( pTag, pNewPage );
          hb_ntxKeyFree( pKeyFromChild );
       }
    }
@@ -2756,7 +2833,7 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
    hb_fsSeek( pIndex->DiskFile , 0 , 0 );
    memset( (void*) &Header, 0, sizeof( NTXHEADER ) );
    Header.type = 0x06 | ( pIndex->CompoundTag->ForExpr ? 0x01 : 0x00 ) |
-                 ( pIndex->Owner->bLockType == HB_SET_DBFLOCK_CL53 ? 0x20 : 0 );
+                 ( pIndex->Owner->bLockType == HB_SET_DBFLOCK_CL53EXT ? 0x20 : 0 );
    Header.version = 1;
    Header.root = pIndex->CompoundTag->RootBlock;
    Header.next_page = pIndex->NextAvail;
@@ -2782,6 +2859,7 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
       hb_fsWrite( pIndex->DiskFile, (BYTE*)&Header, NTXBLOCKSIZE-sizeof(NTXHEADER) );
    }
    else
+      /* IMHO It should be 12 not 16, Druzus */
       hb_fsWrite( pIndex->DiskFile,(BYTE*)&Header,16 );
 
    pIndex->fFlush = TRUE;
@@ -2974,6 +3052,15 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *ITN )
    pTag->pages = (LPPAGEINFO) hb_xgrab( sizeof(HB_PAGEINFO)*NTX_PAGES_PER_TAG );
    memset( pTag->pages , 0 ,sizeof( HB_PAGEINFO )*NTX_PAGES_PER_TAG );
    pTag->TagRoot = 1;
+   if ( Header.type & 0x20 )
+   {
+      pIndex->Owner->bLockType = HB_SET_DBFLOCK_CL53EXT;
+   }
+   else if ( ! pIndex->Owner->bLockType )
+   {
+      pIndex->Owner->bLockType = Header.type & 0x20 ? HB_SET_DBFLOCK_CL53EXT :
+                                                      HB_SET_DBFLOCK_CLIP;
+   }
    return SUCCESS;
 }
 
@@ -3032,18 +3119,15 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag )
    pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
    hb_ntxGetCurrentKey( pTag, pKey );
    if( hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) &&
-         hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
+       hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
    {
-      pKey->Tag = 0;
-      if( pTag->Owner->Owner->fShared && !pTag->Memory )
-         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
-      hb_ntxTagKeyAdd( pTag, pKey );
-      if( pTag->Owner->Owner->fShared && !pTag->Memory )
+      if( hb_ntxIndexLockWrite( pTag ) )
       {
-         hb_ntxPageFree( pTag,FALSE );
-         hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
+         pKey->Tag = 0;
+         hb_ntxTagKeyAdd( pTag, pKey );
+         hb_ntxIndexUnLockWrite( pTag );
+         bResult = TRUE;
       }
-      bResult = TRUE;
    }
    hb_ntxKeyFree( pKey );
 
@@ -3061,24 +3145,21 @@ static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag )
 
    pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
    hb_ntxGetCurrentKey( pTag, pKey );
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
-   pTag->stackLevel = 0;
-   if( hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) &&
-         hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) &&
-         !hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ), pKey, (int)pTag->KeyLength, FALSE, 0 ) )
+   if( hb_ntxIndexLockWrite( pTag ) )
    {
-      LPPAGEINFO pPage = hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
-      pPage->CurKey =  hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra ) - 1;
-      hb_ntxPageKeyDel( pTag, pPage, pPage->CurKey, 1 );
-      if( pTag->stack[0].ikey < 0 )
-         hb_ntxTagBalance( pTag,0 );
-      bResult = TRUE;
-   }
-   if( pTag->Owner->Owner->fShared && !pTag->Memory )
-   {
-      hb_ntxPageFree( pTag,FALSE );
-      hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
+      pTag->stackLevel = 0;
+      if( hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) &&
+          hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) &&
+          !hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ), pKey, (int)pTag->KeyLength, FALSE, 0 ) )
+      {
+         LPPAGEINFO pPage = hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
+         pPage->CurKey =  hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra ) - 1;
+         hb_ntxPageKeyDel( pTag, pPage, pPage->CurKey, 1 );
+         if( pTag->stack[0].ikey < 0 )
+            hb_ntxTagBalance( pTag,0 );
+         bResult = TRUE;
+      }
+      hb_ntxIndexUnLockWrite( pTag );
    }
    hb_ntxKeyFree( pKey );
 
@@ -3219,11 +3300,12 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
      }
      pKey2->Xtra = 0;
 
-     if( pArea->fShared && !pTag->Memory )
+     if( ! hb_ntxIndexLockRead( pTag ) )
      {
-        while( !hb_fsLock( pArea->lpCurTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
-        pArea->lpCurTag->Owner->Locked = TRUE;
+        hb_ntxKeyFree( pKey2 );
+        return FAILURE;
      }
+
      lRecno = hb_ntxTagKeyFind( pTag, pKey2, keylen, &result, bSoftSeek );
      if( bFindLast && lRecno > 0 && result )
      {
@@ -3253,12 +3335,8 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         }
         pArea->fFound = TRUE;
      }
-     if( pArea->fShared && !pTag->Memory )
-     {
-        hb_ntxPageFree( pTag,FALSE );
-        hb_fsLock( pArea->lpCurTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
-        pArea->lpCurTag->Owner->Locked = FALSE;
-     }
+     hb_ntxIndexUnLockRead( pTag );
+
      if( retvalue == 0xFFFF )
      {
         pArea->fEof = pTag->TagEOF;
@@ -3420,10 +3498,12 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                        pTag->KeyLength, pTag->KeyLength, TRUE,pArea->cdPage )
                        || InIndex != pTag->InIndex )
                {
+                  if ( ! hb_ntxIndexLockWrite( pTag ) )
+                  {
+                     pTag = pTag->pNext;
+                     continue;
+                  }
                   pArea->lpCurTag = pTag;
-                  if( pArea->fShared && !pTag->Memory )
-                     while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
-                  pTag->Owner->Locked = TRUE;
                   if( !pArea->fNtxAppend && !fAppend && pTag->InIndex )
                   {
                      LPKEYINFO pKeyOld = hb_ntxKeyNew( pTag->CurKeyInfo,pTag->KeyLength );
@@ -3432,6 +3512,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                      if( hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ), pKeyOld, (int)pTag->KeyLength, FALSE, 0 ) )
                      {
                          printf( "\n\rntxGoCold: Cannot find current key:" );
+                         hb_ntxIndexUnLockWrite( pTag );
                          pTag = pTag->pNext;
                          continue;
                      }
@@ -3456,12 +3537,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                            hb_ntxInBottomScope( pTag, pKey->key ) )
                         pTag->keyCount ++;
                   }
-                  if( pArea->fShared && !pTag->Memory )
-                  {
-                     hb_ntxPageFree( pTag,FALSE );
-                     hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
-                     pTag->Owner->Locked = FALSE;
-                  }
+                  hb_ntxIndexUnLockWrite( pTag );
                }
                hb_ntxKeyFree( pKey );
                pTag = pTag->pNext;

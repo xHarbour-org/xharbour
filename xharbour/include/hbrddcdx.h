@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.38 2005/01/19 23:36:33 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.39 2005/01/25 10:47:48 druzus Exp $
  */
 
 /*
@@ -333,27 +333,27 @@ typedef CDXTAG * LPCDXTAG;
 
 typedef struct _CDXINDEX
 {
-   char *   szFileName;       /* Name of index file */
-   FHANDLE  hFile;            /* Index file handle */
+   char *      szFileName;    /* Name of index file */
+   FHANDLE     hFile;         /* Index file handle */
    struct _CDXAREA  * pArea;  /* Parent WorkArea */
    struct _CDXINDEX * pNext;  /* The next index in the list */
-   LPCDXTAG pCompound;        /* Compound Tag (index of tags) */
-   LPCDXTAG TagList;          /* List of tags in index file */
-   BOOL     fShared;          /* Shared file */
-   BOOL     fReadonly;        /* Read only file */
-   ULONG    nextAvail;        /* offset to next free page in the end of index file */
-   ULONG    freePage;         /* offset to next free page inside index file */
-   LPCDXLIST freeLst;         /* list of free pages in index file */
-   int      lockWrite;        /* number of write lock set */
-   int      lockRead;         /* number of read lock set */
-   ULONG    ulLockPos;        /* readlock position for CL53 lock scheme */
+   LPCDXTAG    pCompound;     /* Compound Tag (index of tags) */
+   LPCDXTAG    TagList;       /* List of tags in index file */
+   BOOL        fShared;       /* Shared file */
+   BOOL        fReadonly;     /* Read only file */
+   ULONG       nextAvail;     /* offset to next free page in the end of index file */
+   ULONG       freePage;      /* offset to next free page inside index file */
+   LPCDXLIST   freeLst;       /* list of free pages in index file */
+   int         lockWrite;     /* number of write lock set */
+   int         lockRead;      /* number of read lock set */
+   HB_FOFFSET  ulLockPos;     /* readlock position for CL53 lock scheme */
 #ifdef HB_CDX_DBGCODE
-   BOOL     RdLck;
-   BOOL     WrLck;
+   BOOL        RdLck;
+   BOOL        WrLck;
 #endif
-   BOOL     fChanged;         /* changes written to index, need upadte ulVersion */
-   ULONG    ulVersion;        /* network version/update flag */
-   BOOL     fFlush;           /* changes written to index, need upadte ulVersion */
+   BOOL        fChanged;      /* changes written to index, need upadte ulVersion */
+   ULONG       ulVersion;     /* network version/update flag */
+   BOOL        fFlush;        /* changes written to index, need upadte ulVersion */
 } CDXINDEX;
 typedef CDXINDEX * LPCDXINDEX;
 

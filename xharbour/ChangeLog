@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3816 2005/02/14 18:43:03 snaiperis Exp $
+ * $Id: ChangeLog,v 1.3817 2005/02/14 19:54:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-14 22:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbset.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+    + added new locking schemes:
+      HB_SET_DBFLOCK_CL53EXT = 4
+        Clipper's ntxlock2.obj - I'm not sure it's exactly the same
+        Clipper documentation gives differ information here - I will
+        have to make my own tests checking what Clipper really locks
+        so be careful with using it simultaneously with Clipper
+        application in network environment. Anyhow for xHarbour
+        applications could be safely used. It emulates shared locks
+        so it's very efficient in systems which doesn't have it and
+        moves maximum file size to 4'000'000'000 - probably the best
+        locking mode for FAT32. It could be used for DBFNTX and DBFCDX.
+      HB_SET_DBFLOCK_XHB64 = 5
+        xHarbour locking scheme for long files - over 4GB. It needs
+        long file support in OS. Effectively it does not reduce file size.
+        Please test it in Windows - I made test in Linux and it works
+        correctly.
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * modified to use 64bit locking schemes
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * some modifications which are the first part of cleaning DBFNTX.
+      I'll try to make other necessary modifications and fixes soon.
 
 2005-02-14 22:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg
@@ -23,7 +55,7 @@
          cString operator nMask => cResult
          nValue operator cString => nResult
          nValue1 operator nValue2 => nResult
-   
+
 2005-02-14 00:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/hbzlib/zipplatformcomm.cpp
    * cast so compiler selects a compare method.

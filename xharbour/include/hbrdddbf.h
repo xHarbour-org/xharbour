@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.16 2004/07/22 08:28:17 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.17 2004/12/02 03:26:19 druzus Exp $
  */
 
 /*
@@ -64,38 +64,51 @@ HB_EXTERN_BEGIN
 
 /* DBF default file extensions */
 #define DBF_TABLEEXT                      ".dbf"
+
 /* DBF locking schemes */
-#define DBF_LOCKPOS_CLIP                  1000000000L
-#define DBF_LOCKPOS_CL53                  1000000000L
-#define DBF_LOCKPOS_VFP                   0x40000000L
-#define DBF_LOCKPOS_VFPX                  0x7ffffffeL
+#define DBF_LOCKPOS_CLIP                  1000000000UL
+#define DBF_LOCKPOS_CL53                  1000000000UL
+#define DBF_LOCKPOS_VFP                   0x40000000UL
+#define DBF_LOCKPOS_VFPX                  0x7ffffffeUL
+#define DBF_LOCKPOS_CL53EXT               4000000000UL
+#define DBF_LOCKPOS_XHB64                 HB_LL( 0x7FFFFFFF00000001 )
 
 #define DBF_LOCKDIR_CLIP                  1
 #define DBF_LOCKDIR_CL53                  1
 #define DBF_LOCKDIR_VFP                   2  /* lock forward at at record offset */
 #define DBF_LOCKDIR_VFPX                  -1
+#define DBF_LOCKDIR_CL53EXT               1
+#define DBF_LOCKDIR_XHB64                 1
 
-#define DBF_FLCKSIZE_CLIP                 1000000000L
-#define DBF_FLCKSIZE_CL53                 1000000000L
-#define DBF_FLCKSIZE_VFP                  0x3ffffffdL
-#define DBF_FLCKSIZE_VFPX                 0x07ffffffL
+#define DBF_FLCKSIZE_CLIP                 1000000000UL
+#define DBF_FLCKSIZE_CL53                 1000000000UL
+#define DBF_FLCKSIZE_VFP                  0x3ffffffdUL
+#define DBF_FLCKSIZE_VFPX                 0x07ffffffUL
+#define DBF_FLCKSIZE_CL53EXT              294967295UL
+#define DBF_FLCKSIZE_XHB64                0x7ffffffeUL
 
-#define DBF_RLCKSIZE_CLIP                 1L
-#define DBF_RLCKSIZE_CL53                 1L
-#define DBF_RLCKSIZE_VFP                  1L
-#define DBF_RLCKSIZE_VFPX                 1L
+#define DBF_RLCKSIZE_CLIP                 1UL
+#define DBF_RLCKSIZE_CL53                 1UL
+#define DBF_RLCKSIZE_VFP                  1UL
+#define DBF_RLCKSIZE_VFPX                 1UL
+#define DBF_RLCKSIZE_CL53EXT              1UL
+#define DBF_RLCKSIZE_XHB64                1UL
 
-#define IDX_LOCKPOS_CLIP                  1000000000L
-#define IDX_LOCKPOS_CL53                  0xfffeffffL
-#define IDX_LOCKPOS_VFP                   0x7ffffffeL
+#define IDX_LOCKPOS_CLIP                  1000000000UL
+#define IDX_LOCKPOS_CL53                  0xfffeffffUL
+#define IDX_LOCKPOS_VFP                   0x7ffffffeUL
+#define IDX_LOCKPOS_CL53EXT               0xfffeffffUL
+#define IDX_LOCKPOS_XHB64                 HB_LL( 0x7FFFFFFF00000001 )
 
-#define IDX_LOCKPOOL_CLIP                 0L
-#define IDX_LOCKPOOL_CL53                 0x00010000L
-#define IDX_LOCKPOOL_VFP                  0L
+#define IDX_LOCKPOOL_CLIP                 0UL
+#define IDX_LOCKPOOL_CL53                 0x00010000UL
+#define IDX_LOCKPOOL_VFP                  0UL
+#define IDX_LOCKPOOL_CL53EXT              0x00010000UL
+#define IDX_LOCKPOOL_XHB64                0UL
 
 #ifdef OS_UNIX_COMPATIBLE
-#define DBF_EXLUSIVE_LOCKPOS              0x7fffffffL
-#define DBF_EXLUSIVE_LOCKSIZE             1L
+#define DBF_EXLUSIVE_LOCKPOS              0x7fffffffUL
+#define DBF_EXLUSIVE_LOCKSIZE             1UL
 #endif
 
 /*
@@ -295,8 +308,8 @@ extern BOOL HB_EXPORT  hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 extern ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
 extern void  HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );
-extern BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos );
-extern BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool );
+extern BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+extern BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
 
 HB_EXTERN_END
 
