@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.35 2004/08/23 15:40:03 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.36 2004/09/21 02:52:34 druzus Exp $
  */
 
 /*
@@ -484,11 +484,11 @@ typedef struct _CDXAREA
    *  example.
    */
 
-   BOOL       fCdxAppend;        /* Appended record changed */
-   LPCDXINDEX lpIndexes;         /* Pointer to indexes array  */
-   USHORT     uiTag;             /* current tag focus */
-   BYTE *     bCdxSortTab;       /* Table with storted characters */
-   LPCDXSORTINFO pSort;          /* Index build structur */
+   BOOL           fCdxAppend;    /* Appended record changed */
+   LPCDXINDEX     lpIndexes;     /* Pointer to indexes array  */
+   USHORT         uiTag;         /* current tag focus */
+   BYTE *         bCdxSortTab;   /* Table with storted characters */
+   LPCDXSORTINFO  pSort;         /* Index build structur */
 
 } CDXAREA;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3458 2004/09/21 04:57:56 paultucker Exp $
+ * $Id: ChangeLog,v 1.3459 2004/09/21 12:52:55 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-22 00:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/fm.c
+    * hb_fsFNameMerge() changed to use only _POSIX_PATH_MAX - 1
+      significant characters plus leading 0 char until other sources
+      will not have been changed to use _POSIX_PATH_MAX + 1 buffer size
+
+  * xharbour/bin/hb-func.sh
+    * reverted the last changes with log files. Luiz please tell me what
+      you need and I'll implement it or simply use in hbmake:
+         RUN xhblnk <...> &>> logfile 2>&1
+      or
+         RUN xhblnk <...> 2>&1 | tee logfile
+      and you will reach exactly the same effect which will work also
+      for other tools and compilers not only xhb* ones.
 
 2004-09-21 14:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/fm.c
