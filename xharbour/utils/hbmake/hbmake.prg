@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.17 2002/05/21 20:46:42 lculik Exp $
+ * $Id: hbmake.prg,v 1.18 2002/05/22 03:07:14 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -3610,7 +3610,7 @@ FUNCTION ProcessParameters( cParams )
 
         IF At( "-ELX", cParams ) > 0
 
-            lExtended := .T.
+
             cParams   := Strtran( cParams, "-ELX", "" )
 
         ELSE
@@ -3618,7 +3618,7 @@ FUNCTION ProcessParameters( cParams )
             cParams := Strtran( cParams, "-EL", "" )
 
         ENDIF
-
+        lExtended := .T.
         lLibrary  := .T.
         lEditMode := .T.
 
