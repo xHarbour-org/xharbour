@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.10 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: hbstr.c,v 1.11 2002/02/26 19:11:47 dholm Exp $
  */
 
 /*
@@ -83,7 +83,12 @@ ULONG hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG u
             ulPos++;
          }
          else if( ulSubPos )
+         {
+            /* Go back to the first character after the first match,
+               or else tests like "22345" $ "012223456789" will fail. */
+            ulPos -= ( ulSubPos - 1 );
             ulSubPos = 0;
+         }
          else
             ulPos++;
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.5 2002/01/31 22:26:33 ronpinkas Exp $
+ * $Id: workarea.c,v 1.25 2002/02/10 15:50:00 alkresin Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 
 #include <ctype.h>
 #include "hbapi.h"
-#include "hbfast.h"
 #include "hbinit.h"
 #include "hbvm.h"
 #include "hbapiitm.h"
@@ -228,54 +227,28 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 {
    ULONG ulSize;
    LPFIELD pField;
-   char *sFieldName = ( char *) pFieldInfo->atomName;
-   BOOL bFreeName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waAddField(%p, %p)", pArea, pFieldInfo));
 
    /* Validate the name of field */
-   ulSize = strlen( sFieldName );
-   sFieldName = hb_strLTrim( sFieldName, &ulSize );
-   ulSize = hb_strRTrimLen( sFieldName, ulSize, TRUE );
-
-   if( ! ulSize )
-   {
+   ulSize = strlen( ( char * ) pFieldInfo->atomName );
+   hb_strLTrim( ( char * ) pFieldInfo->atomName, &ulSize );
+   ulSize = hb_strRTrimLen( ( char * ) pFieldInfo->atomName, ulSize, TRUE );
+   if( !ulSize )
       return FAILURE;
-   }
-
-   if( sFieldName[ulSize] != '\0' )
-   {
-      char *sTmp = (char *) hb_xgrab( ulSize + 1 );
-	  strncpy( sTmp, sFieldName, ulSize );
-	  sFieldName = sTmp;
-      sFieldName[ulSize] = '\0';
-	  bFreeName = TRUE;
-   }
-   else
-   {
-	  bFreeName = FALSE;
-   }
+   /* This line writes to the protected memory
+    pFieldInfo->atomName[ulSize] = '\0'; */
 
    pField = pArea->lpFields + pArea->uiFieldCount;
-
    if( pArea->uiFieldCount > 0 )
-   {
       ( ( LPFIELD ) ( pField - 1 ) )->lpfNext = pField;
-   }
-
-   pField->sym = ( void * ) hb_dynsymGet( sFieldName );
+   pField->sym = ( void * ) hb_dynsymGet( ( char * ) pFieldInfo->atomName );
    pField->uiType = pFieldInfo->uiType;
    pField->uiTypeExtended = pFieldInfo->uiTypeExtended;
    pField->uiLen = pFieldInfo->uiLen;
    pField->uiDec = pFieldInfo->uiDec;
    pField->uiArea = pArea->uiArea;
-   pArea->uiFieldCount++;
-
-   if( bFreeName )
-   {
-      hb_xfree( (void *) sFieldName );
-   }
-
+   pArea->uiFieldCount ++;
    return SUCCESS;
 }
 
@@ -342,12 +315,9 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
          default:
             return FAILURE;
       }
-
       /* Add field */
       if( SELF_ADDFIELD( pArea, &pFieldInfo ) == FAILURE )
-	  {
          return FAILURE;
-	  }
    }
    return SUCCESS;
 }
@@ -639,7 +609,7 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
       return SUCCESS;
    }
 
-   if( !pEvalInfo->dbsci.itmCobWhile &&
+   if( !pEvalInfo->dbsci.itmCobWhile && 
          (!pEvalInfo->dbsci.fRest || !hb_itemGetL( pEvalInfo->dbsci.fRest ) ) &&
          !pEvalInfo->dbsci.lNext )
       SELF_GOTOP( pArea );

@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.7 2001/12/30 09:45:43 andijahja Exp $
+ * $Id: dynlibhb.c,v 1.8 2002/02/10 15:50:00 alkresin Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ HB_FUNC( LIBFREE )
 
 HB_FUNC( HB_LIBDO )
 {
+   char *szName = hb_strupr( hb_strdup( hb_parc( 1 ) ) );
    PHB_DYNS pDynSym = hb_dynsymFind( hb_strupr( hb_parc( 1 ) ) );
 
    if( pDynSym )
@@ -111,4 +112,5 @@ HB_FUNC( HB_LIBDO )
 
       hb_vmDo( uiPCount - 1 );
    }
+   hb_xfree( szName );
 }

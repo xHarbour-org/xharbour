@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.6 2002/02/05 06:08:51 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.106 2002/02/05 05:05:58 horacioroldan Exp $
  */
 
 /*
@@ -556,7 +556,7 @@ static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    ULONG ulNewBlock, ulNextBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem,
-                           ulLen, ulStoredBlock));
+                           ulLen, ulNewBlock));
 
    memset( pBlock, 0x1A, DBT_BLOCKSIZE );
    bNewBlock = !( ulBlock && ulLen < DBT_BLOCKSIZE - 1 );
@@ -814,7 +814,8 @@ ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
       return SUCCESS;
    }
    else
-      return SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip );
+      /* return SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip ); */
+      return SELF_GOTO( ( AREAP ) pArea, ((LONG)pArea->ulRecNo + lToSkip) <= 0 ? 0 : (pArea->ulRecNo + lToSkip));
 }
 
 /*
@@ -1964,7 +1965,7 @@ ERRCODE hb_dbfPack( DBFAREAP pArea )
             ulEvery = 0;
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pBlock );
-            hb_vmSend( 0 );
+            hb_vmDo( 0 );
          }
       }
 
@@ -1987,7 +1988,7 @@ ERRCODE hb_dbfPack( DBFAREAP pArea )
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pBlock );
-      hb_vmSend( 0 );
+      hb_vmDo( 0 );
    }
 
    pArea->ulRecCount = ulRecOut;

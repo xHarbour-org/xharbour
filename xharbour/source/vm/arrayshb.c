@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.3 2002/01/27 10:57:09 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.4 2002/01/31 05:08:31 ronpinkas Exp $
  */
 
 /*
@@ -195,7 +195,13 @@ HB_FUNC( ADEL )
    if( pArray )
    {
       if( ISNUM( 2 ) )
+      {
          hb_arrayDel( pArray, hb_parnl( 2 ) );
+      }
+      else
+      {
+         hb_arrayDel( pArray, 1 );
+      }
 
       hb_itemCopy( &hb_stack.Return, pArray ); /* ADel() returns the array itself */
    }
