@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.718 2003/02/15 02:02:18 lculik Exp $
+ * $Id: ChangeLog,v 1.719 2003/02/15 22:19:57 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -19,6 +19,8 @@
     ! added casts for aslogicals...
   * source/rdd/dbcmd/c
     ! comment out unused pFileExt in DBUSEAREAD
+  * source/rtl/hbsrlraw.c
+    ! Added a number of casts
   * makefile.nt
     ! modified for faster execution.
     + source/rtl/hbserial.prg

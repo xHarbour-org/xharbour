@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.27 2003/01/28 22:09:14 lculik Exp $
+ * $Id: dbcmd.c,v 1.28 2003/02/01 14:14:49 lculik Exp $
  */
 
 /*
@@ -4025,7 +4025,7 @@ HB_FUNC( DBUSEAREAD )
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   PHB_ITEM pFileExt;
+   /* PHB_ITEM pFileExt; */
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
@@ -4096,7 +4096,7 @@ HB_FUNC( DBUSEAREAD )
                strlen( szFileName ) );
       hb_itemRelease( pFileExt );
    }
-   */
+*/
    hb_xfree( pFileName );
 
    /* Fill pInfo structure */

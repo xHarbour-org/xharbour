@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.31 2003/02/11 03:43:02 paultucker Exp $
+# $Id: makefile.vc,v 1.32 2003/02/12 03:31:03 paultucker Exp $
 #
 
 #
@@ -233,6 +233,8 @@ LIBS2 = \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
 
+# List C modules first, then PRG modules
+
 RTL_LIB_OBJS = \
    $(OBJ_DIR)\abs.obj \
    $(OBJ_DIR)\accept.obj \
@@ -271,6 +273,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\hbcompress.obj \
    $(OBJ_DIR)\hbrandom.obj \
+   $(OBJ_DIR)\hbsrlraw.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
@@ -370,6 +373,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\fieldbl.obj \
    $(OBJ_DIR)\getlist.obj \
    $(OBJ_DIR)\getsys.obj \
+   $(OBJ_DIR)\hbserial.obj \
    $(OBJ_DIR)\input.obj \
    $(OBJ_DIR)\listbox.obj \
    $(OBJ_DIR)\memoedit.obj \

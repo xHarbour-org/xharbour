@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbsrlraw.c,v 1.1 2003/02/14 17:13:38 jonnymind Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( HB_CREATELEN8 )
 
    ULONG uRet = (ULONG) hb_parnl( 1 );
    hb_createlen8( ret, uRet );
-   hb_retclen( ret, 8 );
+   hb_retclen( (char *)ret, 8 );
 }
 
 
@@ -198,7 +198,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       return;
    }
 
-   hb_retclenAdoptRaw( cRet, ulRet );
+   hb_retclenAdoptRaw( (char *)cRet, ulRet );
 }
 
 /* Deserializes a variable and get the value back
@@ -221,7 +221,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
    switch( cBuf[0] )
    {
       case 'C':
-         ulData = hb_getlen8( cBuf + 1 );
+         ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
          hb_retclen( cBuf + 9, ulData );
       break;
 
@@ -239,12 +239,12 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       case 'N':
          if( cBuf[1] == 'I' )
          {
-            ulData = hb_getlen8( cBuf + 2 );
+            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retni( (int) ulData );
          }
          else if( cBuf[1] == 'L' )
          {
-            ulData = hb_getlen8( cBuf + 2 );
+            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnl( (long) ulData );
          }
          else
@@ -269,7 +269,7 @@ ULONG hb_serialNextRaw( char *cBuf )
    switch( cBuf[0] )
    {
       case 'C':
-         ulData = hb_getlen8( cBuf + 1 );
+         ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
       return ulData + 9;
 
       case 'L':
@@ -287,7 +287,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'A':
          ulNext = 9;
-         ulCount = hb_getlen8( cBuf + 1 );
+         ulCount = hb_getlen8( ( BYTE * )cBuf + 1 );
 
          while ( ulCount > 0 )
          {

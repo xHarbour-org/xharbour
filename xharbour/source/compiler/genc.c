@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.30 2003/01/24 09:52:43 ronpinkas Exp $
+ * $Id: genc.c,v 1.31 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -50,6 +50,7 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
+   char *pszFileName;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    PCOMDECLARED pDeclared;
@@ -413,7 +414,16 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       pInline = hb_comp_inlines.pFirst;
       while( pInline )
       {
-         fprintf( yyc, "#line %i \"%s\"\n", pInline->iLine, pInline->szFileName );
+      /* fprintf( yyc, "#line %i \"%s\"\n", pInline->iLine, pInline->szFileName ); */
+         fprintf( yyc, "#line %i \"", pInline->iLine );
+         pszFileName = pInline->szFileName;
+         while( *pszFileName )
+         {
+            if( *pszFileName == '\\' )
+               fprintf( yyc, "\\" );
+            fprintf( yyc, "%c", *pszFileName++ );
+         }
+         fprintf( yyc, "\"\n" );
 
          if( pInline->szName )
          {

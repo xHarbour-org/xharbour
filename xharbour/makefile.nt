@@ -262,7 +262,7 @@ LIBS2 = \
 {$(RTL_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)}.cpp{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)}.cpp{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RTL_DIR)}.prg{$(OBJ_DIR)}.obj::
@@ -831,7 +831,7 @@ $(HBRUN_EXE) : \
    $(HBRUN_DIR)\hbrun.prg \
    $(HBRUN_DIR)\external.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbrun.c  $(OBJ_DIR)\external.c -o $(HBRUN_EXE) /link $(LDFLAGS) $(LIBS2)
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c $(OBJ_DIR)\external.c -o $(HBRUN_EXE) /link $(LDFLAGS) $(LIBS2)
 
 #
 # HBTEST.EXE rules
@@ -850,17 +850,17 @@ $(HBTEST_EXE) : \
    $(HBTEST_DIR)\rt_stra.prg \
    $(HBTEST_DIR)\rt_trans.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbtest.c \
-                                   $(OBJ_DIR)\rt_array.c \
-                                   $(OBJ_DIR)\rt_date.c \
-                                   $(OBJ_DIR)\rt_file.c \
-                                   $(OBJ_DIR)\rt_hvm.c \
-                                   $(OBJ_DIR)\rt_hvma.c \
-                                   $(OBJ_DIR)\rt_math.c \
-                                   $(OBJ_DIR)\rt_misc.c \
-                                   $(OBJ_DIR)\rt_str.c \
-                                   $(OBJ_DIR)\rt_stra.c \
-                                   $(OBJ_DIR)\rt_trans.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbtest.c \
+                                  $(OBJ_DIR)\rt_array.c \
+                                  $(OBJ_DIR)\rt_date.c \
+                                  $(OBJ_DIR)\rt_file.c \
+                                  $(OBJ_DIR)\rt_hvm.c \
+                                  $(OBJ_DIR)\rt_hvma.c \
+                                  $(OBJ_DIR)\rt_math.c \
+                                  $(OBJ_DIR)\rt_misc.c \
+                                  $(OBJ_DIR)\rt_str.c \
+                                  $(OBJ_DIR)\rt_stra.c \
+                                  $(OBJ_DIR)\rt_trans.c \
                    -o $(HBTEST_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS) user32.lib winspool.lib ole32.lib oleaut32.lib
 
 #
@@ -886,23 +886,23 @@ $(HBDOC_EXE) : \
    $(HBDOC_DIR)\ffile1.prg \
    $(HBDOC_DIR)\ft_funcs.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbdoc.c \
-                                   $(OBJ_DIR)\genchm.c \
-                                   $(OBJ_DIR)\genos2.c \
-                                   $(OBJ_DIR)\gentrf.c \
-                                   $(OBJ_DIR)\genng.c \
-                                   $(OBJ_DIR)\genhtm.c \
-                                   $(OBJ_DIR)\genrtf.c \
-                                   $(OBJ_DIR)\genhpc.c \
-                                   $(OBJ_DIR)\genasc.c \
-                                   $(OBJ_DIR)\html.c \
-                                   $(OBJ_DIR)\ng.c \
-                                   $(OBJ_DIR)\os2.c \
-                                   $(OBJ_DIR)\rtf.c \
-                                   $(OBJ_DIR)\troff.c \
-                                   $(OBJ_DIR)\fclass1.c \
-                                   $(OBJ_DIR)\ffile1.c \
-                                   $(OBJ_DIR)\ft_funcs.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbdoc.c \
+                                  $(OBJ_DIR)\genchm.c \
+                                  $(OBJ_DIR)\genos2.c \
+                                  $(OBJ_DIR)\gentrf.c \
+                                  $(OBJ_DIR)\genng.c \
+                                  $(OBJ_DIR)\genhtm.c \
+                                  $(OBJ_DIR)\genrtf.c \
+                                  $(OBJ_DIR)\genhpc.c \
+                                  $(OBJ_DIR)\genasc.c \
+                                  $(OBJ_DIR)\html.c \
+                                  $(OBJ_DIR)\ng.c \
+                                  $(OBJ_DIR)\os2.c \
+                                  $(OBJ_DIR)\rtf.c \
+                                  $(OBJ_DIR)\troff.c \
+                                  $(OBJ_DIR)\fclass1.c \
+                                  $(OBJ_DIR)\ffile1.c \
+                                  $(OBJ_DIR)\ft_funcs.c \
                    -o $(HBDOC_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
 
 #
@@ -921,17 +921,17 @@ $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\pickfile.prg \
    $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbmake.c \
-                                   $(OBJ_DIR)\hbmutils.c \
-                                   $(OBJ_DIR)\radios.c \
-                                   $(OBJ_DIR)\checks.c \
-                                   $(OBJ_DIR)\fclass1.c \
-                                   $(OBJ_DIR)\ffile1.c \
-                                   $(OBJ_DIR)\ft_funcs.c \
-                                   $(OBJ_DIR)\pickarry.c \
-                                   $(OBJ_DIR)\pickfile.c \
-                                   $(OBJ_DIR)\prb_stak.c \
-                                   $(HBMAKE_DIR)\hbmlang.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbmake.c \
+                                  $(OBJ_DIR)\hbmutils.c \
+                                  $(OBJ_DIR)\radios.c \
+                                  $(OBJ_DIR)\checks.c \
+                                  $(OBJ_DIR)\fclass1.c \
+                                  $(OBJ_DIR)\ffile1.c \
+                                  $(OBJ_DIR)\ft_funcs.c \
+                                  $(OBJ_DIR)\pickarry.c \
+                                  $(OBJ_DIR)\pickfile.c \
+                                  $(OBJ_DIR)\prb_stak.c \
+                                  $(HBMAKE_DIR)\hbmlang.c \
                    -o $(HBMAKE_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
 
 #
@@ -1118,4 +1118,3 @@ $(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
 $(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)2  : $(GTWIN_LIB_OBJS)
-

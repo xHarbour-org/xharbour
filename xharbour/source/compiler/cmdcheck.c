@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.4 2003/02/11 03:08:37 druzus Exp $
  */
 
 /*
@@ -483,7 +483,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                       }
                    }
 
-                   free( szOption );
+                   hb_xfree( szOption );
                 }
                 break;
 
@@ -504,7 +504,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    else
                       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, szOption, NULL );
 
-                   free( szOption );
+                   hb_xfree( szOption );
                 }
                 break;
 
@@ -704,14 +704,10 @@ void hb_compChkEnvironVar( char * szSwitch )
              case 'o':
              case 'O':
                 {
-                   unsigned int i = 0;
                    char * szPath = hb_strdup( s + 1 );
-                   while( i < strlen( szPath ) )
-                      i++;
-                   szPath[ i ] = '\0';
 
                    hb_comp_pOutPath = hb_fsFNameSplit( szPath );
-                   free( szPath );
+                   hb_xfree( szPath );
                 }
                 break;
 
@@ -792,7 +788,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    hb_comp_szPrefix[ 20 ] = '\0';
                    strcat( hb_comp_szPrefix, "_" );
 
-                   free( szPrefix );
+                   hb_xfree( szPrefix );
                 }
                 break;
 
