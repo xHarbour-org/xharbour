@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.121 2004/11/10 15:23:45 paultucker Exp $
+# $Id: makefile.bc,v 1.122 2004/11/22 15:35:04 druzus Exp $
 #
 
 #
@@ -2971,13 +2971,13 @@ $(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpitdos.obj : $(CODEPAGE_DIR)\cpitdos.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpitisb.obj : $(CODEPAGE_DIR)\cpitisb.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpitiso.obj : $(CODEPAGE_DIR)\cpitiso.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpltwin.obj : $(CODEPAGE_DIR)\cpltwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**

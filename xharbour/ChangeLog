@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3607 2004/11/22 15:35:01 druzus Exp $
+ * $Id: ChangeLog,v 1.3608 2004/11/22 21:11:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-22 19:33 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * makefile.bc
+    ! fixed typo in codepage build
 
 2004-11-22 22:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/win32ole.prg
@@ -196,7 +200,7 @@
       long file names are used
     * changed variable length structure definitions to fixed one
       Now DBFNTX works on 64bit machines but it's still not endian free
-      so the index files created on BE platforms are not binary compatible 
+      so the index files created on BE platforms are not binary compatible
 
   * xharbour/include/hbsetup.h
     * define HB_OS_BSD when HB_OS_DARWIN is set
@@ -233,7 +237,7 @@
     * grouped functions which converts string to number with the ones
       which make rounding to keep the same algorithm and be sure that
       they are compiled together with the same compiler switches
-      
+
   * xharbour/source/common/hbver.c
     + added machine type to string returned by hb_verPlatform() in
       *nixes
@@ -252,7 +256,7 @@
     ! fixed bug in jump optimization (calculation of jump size) - fix
       borrowed from Harbour and was originally done by Ryszard - thanks
     * fixed yet another bug in jump optimization (updating new jump address)
-    ! fixed memory leak in jump optimization with updating of 
+    ! fixed memory leak in jump optimization with updating of
 
   * xharbour/source/compiler/harbour.slx
   * xharbour/source/compiler/harbour.sly
@@ -307,7 +311,7 @@
       long file names are used
     * changed variable length structure definitions to fixed one
       Now DBFNTX works on 64bit machines but it's still not endian free
-      so the index files created on BE platforms are not binary compatible 
+      so the index files created on BE platforms are not binary compatible
     ! fixed a scope problem reported quite long time ago
     ! fixed a seek problem (as above) borrowed from Harbour - thx
       to Alexander
@@ -424,7 +428,7 @@
     + added(changed) hb_parnint()/hb_retnint()hb_retnintlen()/hb_stornint()
       hb_itemGetNInt()/hb_itemPutNInt() - they operates on HB_LONG but
       internally chose to optimum integer ITEM
-    
+
   * xharbour/source/vm/fm.c
     + added support for HB_STRICT_ALIGNMENT and HB_ALLOC_ALIGNMENT
       macros - some platforms like based on SPARC processors need it
