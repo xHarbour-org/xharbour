@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.28 2004/09/06 17:17:37 mauriliolongo Exp $
+ * $Id: memoedit.prg,v 1.29 2004/09/13 11:12:03 lf_sfnet Exp $
  */
 
 /*
@@ -154,11 +154,44 @@ METHOD Edit() CLASS TMemoEditor
 
       enddo
 
-   else
-      // If I can't edit text buffer or there is not a user function enter standard HBEditor
+   elseif ::lEditAllow
+      // If There is not a user function enter standard HBEditor
       // ::Edit() method which is able to handle everything
-      //
-      super:Edit()
+      super:Edit( nKey )
+
+   else
+      // Edit not allowed, so I scroll text area instead of moving cursor
+      while ! ::lExitEdit
+
+         if NextKey() == 0
+            ::IdleHook()
+         endif
+
+         nKey := InKey( 0 )
+
+         switch nKey
+         case K_UP
+            if ::nFirstRow > 1
+               ::nFirstRow--
+               ::nRow--
+               ::RefreshWindow()
+            endif
+            exit
+
+         case K_DOWN
+            if ::nFirstRow < ::naTextLen
+               ::nFirstRow++
+               ::nRow++
+               ::RefreshWindow()
+            endif
+            exit
+
+         default
+            // Just handle this key and then return
+            super:BrowseText( nKey, .T. )
+         end
+
+      enddo
 
    endif
 

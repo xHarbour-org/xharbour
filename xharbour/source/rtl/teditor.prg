@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.52 2004/11/14 21:40:55 likewolf Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.52 2004/11/14 21:40:55 likewolf Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -217,6 +217,10 @@ CLASS HBEditor
    METHOD  K_Tab()
    METHOD  K_Mouse()
    METHOD  K_Esc()
+
+   PROTECTED:
+
+   METHOD   BrowseText( nPassedKey, lHandleOneKey )
 
 ENDCLASS
 
@@ -554,7 +558,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
    //  [ ::lDirty := .T. ] marks memoedit() return as "file change made."
 
    if ! ::lEditAllow
-      BrowseText( Self,nPassedKey )
+      ::BrowseText( nPassedKey )
 
    else
       // If user pressed an exiting key ( K_ESC or K_ALT_W ) or I've received a key to handle and then exit
@@ -590,16 +594,16 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_CTRL_C
                GTSETCLIPBOARD( ::GetText() )
-               exit 
+               exit
 
             case K_CTRL_X
                GTSETCLIPBOARD( ::GetText() )
                ::DelText()
-               exit 
+               exit
 
             case K_CTRL_V
                ::AddText( GTGETCLIPBOARD() )
-               exit 
+               exit
 
          #endif
 
@@ -1970,17 +1974,21 @@ return aArray
 // if editing isn't allowed we enter this loop which
 // handles only movement keys and discards all the others
 //
-STATIC procedure BrowseText( oSelf, nPassedKey )
+METHOD BrowseText( nPassedKey, lHandleOneKey ) CLASS HBEditor
 
    LOCAL nKey,bKeyBlock
 
-   while ! oSelf:lExitEdit
+
+   default lHandleOneKey TO .F.
+
+
+   while ! ::lExitEdit
 
       // If I haven't been called with a key already preset, evaluate this key and then exit
       if nPassedKey == NIL
 
          if NextKey() == 0
-            oSelf:IdleHook()
+            ::IdleHook()
          endif
 
          nKey := InKey( 0 )
@@ -1989,16 +1997,16 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
       endif
 
       if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-         Eval( bKeyBlock, oSelf:ProcName, oSelf:ProcLine, "", oSelf )
+         Eval( bKeyBlock, ::ProcName, ::ProcLine, "", Self )
          Loop
       endif
 
       // ******* modified to add exit with K_LEFT when in non-edit mode
       if nKey == K_ESC .or. nkey == K_CTRL_W
-         oSelf:lExitEdit := .T.
+         ::lExitEdit := .T.
 
       else
-         oSelf:MoveCursor( nKey )
+         ::MoveCursor( nKey )
          /* 02/09/2004 - <maurilio.longo@libero.it>
                          If I'm on a readonly editor don't call KeyboardHook() because
                          it calls HandleUserKey() which calls Edit() which sees this is
@@ -2007,6 +2015,11 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
             oSelf:KeyboardHook( nKey )
          endif
          */
+      endif
+
+      // If I want to handle only one key and then exit...
+      if lHandleOneKey
+         exit
       endif
 
    enddo

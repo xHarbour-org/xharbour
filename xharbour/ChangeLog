@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3629 2004/11/25 22:53:11 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3630 2004/11/25 23:01:00 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-26 13:05 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/teditor.prg
+   * source/rtl/memoedit.prg
+     ! Fixed compatibility with clipper when edit buffer cannot be
+       edited and cursor keys are pressed (that is, make text scroll
+       instead of cursor)
 
 2004-11-25 23:58 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * tests/readhrb.prg
