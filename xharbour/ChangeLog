@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3299 2004/08/10 20:20:40 druzus Exp $
+ * $Id: ChangeLog,v 1.3300 2004/08/11 20:09:29 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-11 23:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+	! fixed handling of column's colsep/footsep when tbrowse has not a
+	  colsep/footsep and/or only a few columns have a colsep/footsep.
+
+	/*
+	  oB := TBrowseNew(...)
+	  for i := 1 to 10
+	  	oB:AddColumn(...)
+	  	if i == 10
+	  	   oB:GetColumn(i):FootSep := "-------"
+	  	endif
+	  next
+	*/
 
 2004-08-11 22:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg

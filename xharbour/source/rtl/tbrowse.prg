@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.90 2004/08/10 13:27:35 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.91 2004/08/11 20:09:32 mauriliolongo Exp $
  */
 
 /*
@@ -166,10 +166,14 @@ CLASS TBrowse
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
    ASSIGN colSep( cColSep )   INLINE ::lConfigured := .f., ::cColSep  := cColSep
+
    ACCESS footSep INLINE ::cFootSep       // Footing separator character
-   ASSIGN footSep( cFootSep ) INLINE ::lConfigured := .f., ::cFootSep := cFootSep
+   ASSIGN footSep( cFootSep ) INLINE ::lConfigured := .f.,;
+                                     ::lFootSep := ! Empty( ::cFootSep := cFootSep )
+
    ACCESS headSep INLINE ::cHeadSep       // Head separator character
-   ASSIGN headSep( cHeadSep ) INLINE ::lConfigured := .f., ::cHeadSep := cHeadSep
+   ASSIGN headSep( cHeadSep ) INLINE ::lConfigured := .f.,;
+                                     ::lHeadSep := ! Empty( ::cHeadSep := cHeadSep )
 
    ACCESS freeze INLINE ::nFrozenCols     // Number of columns to freeze/frozen
    ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols
@@ -249,8 +253,12 @@ CLASS TBrowse
    DATA aRedraw                           // Array of logical items indicating, is appropriate row need to be redraw
    DATA lHeaders                          // Internal variable which indicates whether there are column headers to paint
    DATA lFooters                          // Internal variable which indicates whether there are column footers to paint
-   DATA lHeadSep                          // Internal variable which indicates whether there are line headers to paint
-   DATA lFootSep                          // Internal variable which indicates whether there are line footers to paint
+
+   DATA lHeadSep                          // Internal variable which indicates whether TBrowse has line headers to paint
+   DATA lFootSep                          // Internal variable which indicates whether TBrowse has line footers to paint
+   DATA lColHeadSep                       // Internal variable which indicates whether at least a TBColumn has line headers to paint
+   DATA lColFootSep                       // Internal variable which indicates whether at least a TBColumn has line footers to paint
+
    DATA lRedrawFrame                      // True if I need to redraw Headers/Footers
    DATA nColsWidth                        // Total width of visible columns plus ColSep
    DATA nColsVisible                      // Number of columns that fit on the browse width
@@ -337,8 +345,9 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::aRedraw         := {}
    ::lHeaders        := .F.
    ::lFooters        := .F.
-   ::lHeadSep        := .F.
-   ::lFootSep        := .F.
+
+   ::lHeadSep := ::lFootSep := ::lColHeadSep := ::lColFootSep := .F.
+
    ::lRedrawFrame    := .T.
    ::aRect           := {}
    ::aRectColor      := {}
@@ -422,21 +431,30 @@ METHOD Configure( nMode ) CLASS TBrowse
    if nMode < 2 .or. ::lNeverDisplayed
       ::lHeaders     := .F.
       ::lFooters     := .F.
+      ::lColHeadSep  := .F.
+      ::lColFootSep  := .F.
       ::lRedrawFrame := .T.
-      ::lHeadSep     := !Empty( ::cHeadSep )
-      ::lFootSep     := !Empty( ::cFootSep )
 
-      // Are there column headers to paint ?
+      // Are there column headers/footers/separators to paint ?
       FOR EACH aCol IN ::aColsInfo
-         if !Empty( aCol[ o_Heading ] )
+         if ! Empty( aCol[ o_Heading ] )
             ::lHeaders := .T.
-            exit
+         endif
+         if ! Empty( aCol[ o_Footing ] )
+            ::lFooters := .T.
+         endif
+         /* as soon as we find one, we stop testing aCol[o_Obj]:XX to speed things up */
+         if ! ::lColHeadSep .AND. ! Empty( aCol[ o_Obj ]:HeadSep )
+            ::lColHeadSep := .T.
+         endif
+         if ! ::lColFootSep .AND. ! Empty( aCol[ o_Obj ]:FootSep )
+            ::lColFootSep := .T.
          endif
       NEXT
 
       // Are there column footers to paint ?
       FOR EACH aCol IN ::aColsInfo
-         if !Empty( aCol[ o_Footing ] )
+         if ! Empty( aCol[ o_Footing ] )
             ::lFooters := .T.
             exit
          endif
@@ -523,8 +541,9 @@ METHOD Configure( nMode ) CLASS TBrowse
       // of available rows
       //
       ::RowCount := ::nwBottom - ::nwTop + 1 - iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
-                     iif( ::lFooters, ::nFooterHeight, 0 ) - iif( ::lHeadSep, 1, 0 ) - ;
-                     iif( ::lFootSep, 1, 0 )
+                     iif( ::lFooters, ::nFooterHeight, 0 ) - ;
+                     iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - ;
+                     iif( ::lFootSep .OR. ::lColFootSep, 1, 0 )
 
       if ::lNeverDisplayed
          exit
@@ -596,7 +615,8 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    //   Starting position of data rows excluding headers . Pritpal Bedi
    //
-   ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + iif( ::lHeadSep, 1, 0 ) - 1
+   ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
+                           iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
 
    if Len( ::aRedraw ) <> ::RowCount
       ::aRedraw := Array( ::RowCount )
@@ -612,7 +632,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    ::SetFrozenCols( nFreeze, .t. )
 
    #ifdef HB_COMPAT_C53
-   ::Rect := { ::nwTop + ::nHeaderHeight + if( ::lHeadSep, 1, 0 ), ::nwLeft, ::nwBottom - ::nFooterHeight - if( ::lFootSep, 1, 0 ), ::nwRight }
+   ::Rect := { ::nwTop + ::nHeaderHeight + if( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ), ::nwLeft, ::nwBottom - ::nFooterHeight - if( ::lFootSep .OR. ::lColFootSep, 1, 0 ), ::nwRight }
 
    ASize( ::aVisibleCols, ::nwRight - ::nwLeft + 1 )
    n := ::nwLeft - 1
@@ -1435,6 +1455,7 @@ METHOD HowManyCol() CLASS TBrowse
 // Gets TBrowse width and width of displayed columns plus colsep
 //
 METHOD RedrawHeaders( nWidth ) CLASS TBrowse
+
    LOCAL n, nTPos, nBPos
    LOCAL cBlankBox := Space( 9 )
    LOCAL nScreenRowT, nScreenRowB
@@ -1449,7 +1470,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    nSpacePre := INT( ( nWidth - ::nColsWidth ) / 2 )
    nSpaceLast := nWidth - nSpacePre - ::nColsWidth
 
-   nCol     := ::nwLeft + iif( ::nFrozenCols > 0, 0, nSpacePre )
+   nCol := ::nwLeft + iif( ::nFrozenCols > 0, 0, nSpacePre )
 
    nColFrom := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
@@ -1462,8 +1483,8 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
       if n < ::rightVisible
          if ::aColsInfo[ n,o_Width ] > 0
-            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n+1, o_SepWidth ] / 2 ) )
-            nCol += ::aColsInfo[ n+1, o_SepWidth ]
+            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n + 1, o_SepWidth ] / 2 ) )
+            nCol += ::aColsInfo[ n + 1, o_SepWidth ]
          endif
       endif
 
@@ -1490,12 +1511,12 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
       next
    endif
 
-   if ::lHeadSep                      //Draw horizontal heading separator line
+   if ::lHeadSep .OR. ::lColHeadSep    //Draw horizontal heading separator line
       nScreenRowT := ::nRowData
 
    endif
 
-   if ::lFootSep                      //Draw horizontal footing separator line
+   if ::lFootSep .OR. ::lColFootSep    //Draw horizontal footing separator line
       nScreenRowB := ::nwBottom - iif( ::lFooters, ::nFooterHeight, 0 )
 
    endif
@@ -1507,103 +1528,123 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
    // Draw headin/footing column separator
    for n := iif( ::nFrozenCols > 0, 1, ::leftVisible ) to ::rightVisible
+
       // colsep's width will be needed later
       ccSep := if( ::aColsInfo[ n,o_Obj ]:ColSep == nil, ::ColSep, ;
                               ::aColsInfo[ n,o_Obj ]:ColSep )
+
       ncSepWidth := if( ccSep == nil, 0, len(ccSep) )
 
       // which column is displayed to the left of current col?
-      if ::nFrozenCols > 0 .and. n==::leftVisible
+      if ::nFrozenCols > 0 .and. n == ::leftVisible
          nLeftCol := ::nFrozenCols
       else
-         nLeftCol := n-1
+         nLeftCol := n - 1
       endif
 
-      if (::nFrozenCols > 0 .and. n == ::nFrozenCols + 1) .or.;
-         (::nFrozenCols ==0 .and. n == ::leftVisible )
+      if (::nFrozenCols > 0  .and. n == ::nFrozenCols + 1) .or.;
+         (::nFrozenCols == 0 .and. n == ::leftVisible )
          n     := ::leftVisible
 
          // we need to draw headSep for the nSpacePre gap
-         if ::lHeadSep
-            chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                    ::aColsInfo[ n,o_Obj ]:HeadSep )
-            if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+         if ! Empty( chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                                  ::aColsInfo[ n,o_Obj ]:HeadSep ) )
+            if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, o_Width ] > 0 .and.;
                ::nFrozenCols > 0
-               DispOutAT( nScreenRowT, nTPos-min(len(chSep), ncSepWidth), chSep, ::cColorSpec )
+               DispOutAT( nScreenRowT, nTPos - min( len(chSep), ncSepWidth), chSep, ::cColorSpec )
             endif
             DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), nSpacePre ), ::cColorSpec )
+
+         elseif ::lColHeadSep
+            DispOutAT( nScreenRowT, nTPos, Replicate( Space(1), nSpacePre ), ::cColorSpec )
+
          endif
 
          // we need to draw footSep for the nSpacePre gap
-         if ::lFootSep
-            cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
-                                    ::aColsInfo[ n,o_Obj ]:FootSep )
-            if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+         if ! Empty ( cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
+                                   ::aColsInfo[ n,o_Obj ]:FootSep ) )
+
+            if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, o_Width ] > 0 .and. ;
                ::nFrozenCols > 0
-               DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
+               DispOutAT( nScreenRowB, nBPos - min( len(cfSep), ncSepWidth), cfSep, ::cColorSpec )
             endif
             DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), nSpacePre ), ::cColorSpec )
+
+         elseif ::lColFootSep
+            DispOutAT( nScreenRowB, nBPos, Replicate( Space(1), nSpacePre ), ::cColorSpec )
+
          endif
 
          nTPos += nSpacePre
          nBPos += nSpacePre
       endif
 
-      // we need to handle even n==::rightVisible in the following block
+      // we need to handle even n == ::rightVisible in the following block
 
-      if ::aColsInfo[ n,o_Width ] > 0 .and.;
-         n < ::rightVisible
+      if ::aColsInfo[ n, o_Width ] > 0 .and. n < ::rightVisible
          nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
       else
          nLCS := 0
       endif
 
-      if ::lHeadSep
-         //DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n,o_Width ] ), ;
-         //                if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-         //                          ::aColsInfo[ n,o_Obj ]:HeadSep ), ::cColorSpec )
+      if ! Empty( chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                               ::aColsInfo[ n,o_Obj ]:HeadSep ) )
 
-         chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                 ::aColsInfo[ n,o_Obj ]:HeadSep )
-         if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
-            DispOutAT( nScreenRowT, nTPos-min(len(chSep),ncSepWidth), chSep, ::cColorSpec )
+         if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, o_Width ] > 0
+            DispOutAT( nScreenRowT, nTPos - min( len(chSep), ncSepWidth), chSep, ::cColorSpec )
          endif
          DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
-         nTPos += ::aColsInfo[ n,o_Width ]
 
-         nTPos += nLCS
+         nTPos += ::aColsInfo[ n, o_Width ] + nLCS
+
+      /* If I haven't got a default separator or a colsep for current column, there could
+         be a colsep on a next column, so I have to fill the width of this column with spaces.
+      */
+      elseif ::lColHeadSep
+         DispOutAT( nScreenRowT, nTPos, Replicate( Space(1), ::aColsInfo[ n, o_Width ] + nLCS ), ::cColorSpec )
+         nTPos += ::aColsInfo[ n, o_Width ] + nLCS
+
       endif
 
-      if ::lFootSep
-         //DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ;
-         //              if(::aColsInfo[ n,o_Obj ]:FootSep = nil, ::FootSep, ;
-         //                          ::aColsInfo[ n,o_Obj ]:FootSep ), ::cColorSpec )
+      if ! Empty( cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
+                               ::aColsInfo[ n,o_Obj ]:FootSep ) )
 
-         cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
-                                 ::aColsInfo[ n,o_Obj ]:FootSep )
-         if ::lHeadSep .and. len(chSep) > len(cfSep)
+         if Valtype(chSep) <> "U" .and. len(chSep) > len(cfSep)
             cfSep += Replicate( Right( cfSep, 1 ), Len( chSep ) - Len( cfSep ) )
          endif
 
-         if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
-            DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
+         if nLeftCol > 0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, o_Width ] > 0
+            DispOutAT( nScreenRowB, nBPos - min( len(cfSep), ncSepWidth), cfSep, ::cColorSpec )
          endif
          DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
-         nBPos += ::aColsInfo[ n,o_Width ]
 
-         nBPos += nLCS
+         nBPos += ::aColsInfo[ n, o_Width ] + nLCS
+
+      elseif ::lColFootSep
+         DispOutAT( nScreenRowB, nBPos, Replicate( Space(1), ::aColsInfo[ n, o_Width ] + nLCS ), ::cColorSpec )
+         nBPos += ::aColsInfo[ n, o_Width ] + nLCS
 
       endif
+
    next
 
    if nSpaceLast > 0
       // right gap of spaces (nSpaceLast) on Header
-      if ::lHeadSep
+      if ! Empty( chSep )
          DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), nSpaceLast ), ::cColorSpec )
+
+      elseif ::lColHeadSep
+         DispOutAT( nScreenRowT, nTPos, Replicate( Space(1), nSpaceLast ), ::cColorSpec )
+
       endif
+
       // right gap of spaces (nSpaceLast) on Footer
-      if ::lFootSep
+      if ! Empty( cfSep )
          DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), nSpaceLast ), ::cColorSpec )
+
+      elseif ::lColFootSep
+         DispOutAT( nScreenRowB, nBPos, Replicate( Space(1), nSpaceLast ), ::cColorSpec )
+
       endif
    endif
 
@@ -2678,7 +2719,7 @@ Method HitTest( mrow,mcol ) CLASS TBROWSE
 
    ::mRowPos := mRow - ::rect[ 1 ] + 1
    // Is the header separator part of the "header" when click?
-   if ::mRowPos < 1 - if( ::lHeadSep , 1, 0 )
+   if ::mRowPos < 1 - if( ::lHeadSep .OR. ::lColHeadSep , 1, 0 )
       lHitHeader := .t.
    endif
 
