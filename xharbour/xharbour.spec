@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.46 2003/12/12 10:16:02 druzus Exp $
+# $Id: xharbour.spec,v 1.47 2003/12/23 22:52:47 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -30,10 +30,13 @@
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
 %if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
-%if "%{platform}" == ""  
+%if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
-%if "%{platform}" == ""  
-%define platform %([ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/)
+%if "%{platform}" == ""
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' aurox-release 2>/dev/null) && echo "aur$release"|tr -d ".")
+%if "%{platform}" == ""
+%define platform %([ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/')
+%endif
 %endif
 %endif
 %endif

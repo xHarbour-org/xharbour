@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.11 2003/11/20 23:47:36 druzus Exp $
+ * $Id: inkey.c,v 1.12 2003/11/21 01:54:23 ronpinkas Exp $
  */
 
 /*
@@ -80,6 +80,7 @@
 #include <time.h>
 #if defined( HB_OS_UNIX )
   #include <sys/times.h>
+  #include <unistd.h>
 #endif
 
 static int *  s_inkeyBuffer = 0; /* Harbour keyboard buffer (empty if head == tail)     */
@@ -190,11 +191,10 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          clock_t end_clock;
          struct tms tm;
 
-         end_clock = times( &tm ) + ( clock_t ) ( dSeconds * 100 );
+         end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
          while( hb_inkeyNext( event_mask ) == 0 && (times( &tm ) < end_clock) )
 #else
          clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
-
          while( hb_inkeyNext( event_mask ) == 0 && clock() < end_clock )
 #endif
          {

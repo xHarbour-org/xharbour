@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.6 2003/06/15 13:11:58 druzus Exp $
+ * $Id: gtpca.c,v 1.7 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -454,12 +454,18 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
+   BYTE szBell[] = { HB_CHAR_BEL, 0 };
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
    /* TODO: Implement this */
 
    HB_SYMBOL_UNUSED( dFrequency );
    HB_SYMBOL_UNUSED( dDuration );
+
+   fprintf( stdout, szBell );
+   fflush( stdout );
+   hb_idleSleep( dDuration / 18.2 );
 }
 
 char * HB_GT_FUNC(gt_Version( void ))

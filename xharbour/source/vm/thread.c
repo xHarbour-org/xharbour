@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.145 2003/12/15 06:08:47 jonnymind Exp $
+* $Id: thread.c,v 1.146 2003/12/19 16:14:02 jonnymind Exp $
 */
 
 /*
@@ -2278,10 +2278,15 @@ void hb_threadSleep( int millisec )
       }
    #elif defined(HB_OS_OS2)
       DosSleep( millisec );
-   #else
+   #elif defined(HB_OS_WIN_32)
       HB_TEST_CANCEL_ENABLE_ASYN;
       Sleep( millisec );
       HB_DISABLE_ASYN_CANC;
+   #else
+      /* Note: delay() in <dos.h> for DJGPP does not work and
+               delay() in <dos.h> for BORLANDC is not multi-
+               tasking friendly. */
+      delay( millisec );
    #endif
 
    HB_STACK_LOCK;

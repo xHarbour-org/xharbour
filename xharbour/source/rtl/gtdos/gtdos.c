@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.8 2003/11/30 10:02:47 druzus Exp $
+ * $Id: gtdos.c,v 1.9 2003/12/04 09:26:55 druzus Exp $
  */
 
 /*
@@ -1160,11 +1160,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
-   /* The conversion from Clipper timer tick units to
-      milliseconds is * 1000.0 / 18.2. */
-
    dFrequency = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
-   dDuration = dDuration * CLOCKS_PER_SEC / 18.2 ; /* clocks */
 
 #if defined(__BORLANDC__) || defined(__WATCOMC__)
    sound( ( unsigned ) dFrequency );
@@ -1172,30 +1168,10 @@ void hb_gt_Tone( double dFrequency, double dDuration )
    sound( ( int ) dFrequency );
 #endif
 
-   while( dDuration > 0.0 )
-   {
-      /* Use USHORT, because this variable gets added to clock()
-         to form end_clock and we want to minimize overflow risk */
-      USHORT temp = ( USHORT ) HB_MIN( HB_MAX( 0, dDuration ), USHRT_MAX );
-      clock_t end_clock;
-
-      dDuration -= temp;
-      if( temp <= 0 )
-      {
-         /* Ensure that the loop gets terminated when
-            only a fraction of the delay time remains. */
-         dDuration = -1.0;
-      }
-      else
-      {
-         /* Note: delay() in <dos.h> for DJGPP does not work and
-                  delay() in <dos.h> for BORLANDC is not multi-
-                  tasking friendly. */
-         end_clock = clock() + temp;
-         while( clock() < end_clock )
-            hb_idleState();
-      }
-   }
+   /* The conversion from Clipper (DOS) timer tick units to
+      milliseconds is * 1000.0 / 18.2. */
+   dDuration /= 18.2;
+   hb_idleSleep( dDuration );
 
 #if defined(__BORLANDC__) || defined(__WATCOMC__)
    nosound();

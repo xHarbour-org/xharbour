@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.108 2003/12/21 23:35:26 fsgiudice Exp $
+ * $Id: hbapi.h,v 1.109 2003/12/27 02:57:13 fsgiudice Exp $
  */
 
 /*
@@ -580,6 +580,8 @@ extern char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewS
 /* idle states */
 extern void     hb_idleState( void ); /* services a single idle state */
 extern void     hb_idleReset( void ); /* reset idle state routine count*/
+extern void     hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */
+
 extern void     hb_idleShutDown( void ); /* closes all idle state tasks */
 extern ULONG    hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
 extern PHB_ITEM hb_idleDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */

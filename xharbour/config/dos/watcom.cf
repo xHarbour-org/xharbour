@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.12 2003/12/20 10:57:26 lf_sfnet Exp $
+# $Id: watcom.cf,v 1.13 2003/12/22 21:48:24 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -18,11 +18,14 @@ CC_IN =
 CC_OUT = -fo=
 
 # important: -j is necessary for proper build
-CPPFLAGS = -j -w3 -d1 -5s -5r -fp5 -oehtz -s -zq -zt0 -bt=DOS
-CFLAGS := -i$(subst /,\,$(HB_INC_COMPILE)) -i.
+CPPFLAGS = -j -w3 -d1 -5 -fp5 -onaehtzlr -oi+ -ei -zp8 -s -zq -zt0 -bt=DOS
+CPPFLAGS += -I. -I$(TOP)include -Iinclude
+ifeq ($(HB_LIB_COMPILE),)
+    CPPFLAGS += -I$(HB_INC_COMPILE)
+endif
 
 # work arround to DOS command line size limit
-export WPP386 := $(CPPFLAGS)
+export WPP386 := $(strip $(CPPFLAGS))
 CPPFLAGS =
 
 ifeq ($(HB_LEX),SIMPLEX)

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.6 2003/09/24 01:20:34 druzus Exp $
+ * $Id: files.c,v 1.7 2003/09/26 00:15:46 paultucker Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include <hbapi.h>
 #include <hbapifs.h>
 
-#if defined( HB_OS_DOS )
+#if defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
    static struct ffblk fsOldFiles;
 #endif
 
@@ -77,7 +77,10 @@
    #endif
       #include "hb_io.h"
       #include "dos.h"
+	 #if defined( __WATCOMC__ )
+	 #else
       #include <dir.h>
+	 #endif
 #endif
 #if defined( __GNUC__ ) && !defined( __MINGW32__ )
    #include <sys/types.h>
@@ -98,7 +101,7 @@
    LPTSTR GetDate( FILETIME *rTime );
    LPTSTR GetTime( FILETIME *rTime );
 
-#if !defined( _MSC_VER ) && !defined( __RSXNT__ )
+#if !defined( _MSC_VER ) && !defined( __RSXNT__ ) && !defined( __WATCOMC__ )
    #include <dir.h>
 #endif
 
@@ -197,22 +200,22 @@ HB_FUNC( FILEATTR )
          #endif
 
          hb_retni( iAttri );
+      }
       #endif
-      }
 
-      #elif defined( HB_OS_WIN_32 )
-        {
-         DWORD dAttr;
+   #elif defined( HB_OS_WIN_32 )
+   {
+      DWORD dAttr;
 
-         LPCTSTR cFile=hb_parc( 1 );
-         dAttr = GetFileAttributes( cFile );
-         hb_retnl( dAttr );
+      LPCTSTR cFile=hb_parc( 1 );
+      dAttr = GetFileAttributes( cFile );
+      hb_retnl( dAttr );
 
-      }
-      #else
-      {
-         hb_retnl( 1 );
-      }
+   }
+   #else
+   {
+      hb_retnl( 1 );
+   }
    #endif
 
 }
@@ -396,7 +399,7 @@ HB_FUNC( FILESEEK )
       }
    }
 
-   #elif defined( HB_OS_DOS )
+   #elif defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
 
    {
       int iFind;
@@ -524,7 +527,7 @@ HB_FUNC( FILESIZE )
    }
 }
 
-#elif defined( HB_OS_DOS )
+#elif defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
 
 {
    int iFind;
@@ -652,7 +655,7 @@ HB_FUNC( FILEDATE )
 
        }
    }
-   #elif defined( HB_OS_DOS )
+   #elif defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
    {
    int iFind;
    if ( hb_pcount(  ) >0 )
@@ -772,7 +775,7 @@ HB_FUNC( FILETIME )
 
 }
 
-#elif defined( HB_OS_DOS )
+#elif defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
 {
 
    char szTime[7];
@@ -921,4 +924,3 @@ HB_FUNC( FILEDELETE )
    }
    hb_retl( bReturn );
 }
-

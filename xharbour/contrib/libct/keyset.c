@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.2 2002/01/15 00:21:15 dholm Exp $
+ * $Id: keyset.c,v 1.1 2003/03/04 21:04:36 lculik Exp $
  */
 
 /*
@@ -232,10 +232,10 @@ static void SetGet( char cKey )
    if ( hb_pcount() >= 1 )
    {
       cKey = hb_parl( 1 ) * cKey;
-      
+
    #if defined(__WATCOMC__) && defined(__386__)
 
-      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( !cKey ) ) | cKey );
+      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( !cKey ) ) | cKey ;
 
    #elif defined(__DJGPP__)
 
@@ -246,7 +246,7 @@ static void SetGet( char cKey )
       *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) = ( *( ( char FAR * ) MK_FP( 0x0040, 0x0017 ) ) & ( !cKey ) ) | cKey;
 
    #endif
-   }   
+   }
 
 }
 

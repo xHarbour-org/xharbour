@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.12 2003/07/31 19:41:34 druzus Exp $
+ * $Id: gtnul.c,v 1.13 2003/12/05 05:47:14 mlombardo Exp $
  */
 
 /*
@@ -473,7 +473,8 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
    HB_SYMBOL_UNUSED( dFrequency );
-   HB_SYMBOL_UNUSED( dDuration );
+
+   hb_idleSleep( dDuration / 18.2 );
 }
 
 /* ********************************************************************** */

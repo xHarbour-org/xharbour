@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.28 2003/12/04 09:26:55 druzus Exp $
+ * $Id: gtwin.c,v 1.29 2003/12/22 21:48:26 druzus Exp $
  */
 
 /*
@@ -1707,14 +1707,16 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 
 /* *********************************************************************** */
 
-static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
+static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 {
-  INT uLSB,uMSB;
-  UINT uiValue;
-  ULONG lAdjFreq;
-  clock_t end_clock;
+    INT uLSB,uMSB;
+    UINT uiValue;
+    ULONG lAdjFreq;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+
+    /* sync with internal clock with very small time period */
+    hb_idleSleep( 0.01 );
 
     /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
@@ -1758,12 +1760,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
 
       hb_Outp9x(97, uiValue);
 
-      end_clock = clock() + ( clock_t ) ( dDurat );
-      while( clock() < end_clock )
-      {
-        hb_idleState();
-      }
-      hb_idleReset();
+      hb_idleSleep( dDurat * 1000.0 );
 
       /* Read back current Port value for Reset */
 
@@ -1777,29 +1774,20 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
       hb_Outp9x(97, uiValue);
 
     }
-
-    /* Delay (1) clock tick, just like Clipper .. */
-
-    end_clock = clock() + ( clock_t ) ( dTick );
-    while( clock() < end_clock )
-    {
-      hb_idleState();
-    }
-    hb_idleReset();
-
 }
 #endif
 
 /* *********************************************************************** */
 
-static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat, double dTick ))
+static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 {
-  clock_t end_clock;
-
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
 
     /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
+
+    /* sync with internal clock with very small time period */
+    hb_idleSleep( 0.01 );
 
     if ( dFreq > 20.0 )
     {
@@ -1807,14 +1795,19 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat, double dTick ))
     }
 
     /* Delay (1) clock tick, just like Clipper .. */
-
-    end_clock = clock() + ( clock_t ) ( dTick );
-    while( clock() < end_clock )
-    {
-      hb_idleState();
-    }
-    hb_idleReset();
-
+    /* hb_idleSleep( 1 / 18.2 ); */
+    /* Druzus: In my opinion Clipper sync with DOS clock before begin
+     * to play sound, sth like:
+     *   clock_t end_clock = clock(); while (clock()==end_clock);
+     *   end_clock = clock() + dDurat()
+     *   [generate tone]
+     *   while (clock()<end_clock);
+     *   [shut down tone]
+     *
+     * I've just check it. The source code of tone is in Clipper5.2
+     * source/sample/examplea.asm and it's implemented as I show above
+     * Paul, can you check it?
+     */
 }
 
 /* *********************************************************************** */
@@ -1827,16 +1820,13 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
-    /* The conversion from Clipper timer tick units to
-       milliseconds is * 1000.0 / 18.2. */
-
     dDuration = HB_MIN( HB_MAX( 1, dDuration ), ULONG_MAX );
 
     if( dDuration > 0 )
     {
-      double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
-
-      dMillisecs = dDuration * dTick;   /* milliseconds */
+      /* The conversion from Clipper timer tick units to
+         milliseconds is * 1000.0 / 18.2. */
+      dMillisecs = dDuration * 1000.0 / 18.2;   /* milliseconds */
 
       /* What version of Windows are you running? */
       osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -1847,10 +1837,10 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
       {
          #if defined(__BORLANDC__) || defined( _MSC_VER )
             HB_GT_FUNC(gt_w9xTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs, dTick ));
+                                   dMillisecs ));
          #else
             HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs, dTick ));
+                                   dMillisecs ));
          #endif
       }
 
@@ -1860,7 +1850,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
       {
         /* We pass the Millisecond converted value here .. */
         HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                   dMillisecs, dTick ));
+                   dMillisecs ));
       }
    }
 }

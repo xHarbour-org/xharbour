@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.11 2003/12/18 14:47:54 jonnymind Exp $
+ * $Id: idle.c,v 1.12 2003/12/19 22:07:12 jonnymind Exp $
  */
 
 /*
@@ -75,12 +75,10 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "error.ch"
-#if defined(HB_OS_UNIX)
-#if defined(HB_OS_DARWIN)
-   #include <unistd.h>    /* We need usleep() in Darwin */
-#else
-   #include <time.h>
-#endif
+#include <time.h>
+#if defined( HB_OS_UNIX )
+  #include <sys/times.h>
+  #include <unistd.h>
 #endif
 
 /* list of background tasks
@@ -145,16 +143,14 @@ static void hb_releaseCPU( void )
          HB_DOS_INT86( 0x2F, &regs, &regs );
       }
 
+   #elif defined(HB_OS_DARWIN)
+      usleep( 1 );
    #elif defined(HB_OS_UNIX)
-      #if defined(HB_OS_DARWIN)
-   usleep( 1 );
-      #else
    {
       static struct timespec nanosecs = { 0, 1000 };
       /* NOTE: it will sleep at least 10 miliseconds (forced by kernel) */
       nanosleep( &nanosecs, NULL );
    }
-      #endif
    #else
 
    /* Do nothing */
@@ -226,6 +222,27 @@ void hb_idleShutDown( void )
    }
 }
 
+void hb_idleSleep( double dSeconds )
+{
+#if defined( HB_OS_UNIX )
+   /* NOTE: clock() returns a time used by a program - if it is suspended
+    * then this time will be zero
+    */
+   clock_t end_clock;
+   struct tms tm;
+
+   end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
+   while( times( &tm ) < end_clock )
+#else
+   clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
+   while( clock() < end_clock )
+#endif
+   {
+      hb_idleState();
+   }
+   hb_idleReset();
+}
+
 /* signal that the user code is in idle state */
 HB_FUNC( HB_IDLESTATE )
 {
@@ -236,6 +253,12 @@ HB_FUNC( HB_IDLESTATE )
 HB_FUNC( HB_IDLERESET )
 {
    hb_idleReset();
+}
+
+/* call from user code to stay in idle state for given period */
+HB_FUNC( HB_IDLESLEEP )
+{
+   hb_idleSleep( hb_parnd( 1 ) );
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.14 2003/05/21 09:35:37 druzus Exp $
+ * $Id: gtsln.c,v 1.15 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -796,33 +796,10 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
     if( hb_gt_UnderLinuxConsole )
     {
-        /* NOTE : the code below is adapted from gtdos.c/hb_gt_Tone() */
-
-        dDuration *= 1800;
-        while( dDuration > 0.0 )
-        {
-            USHORT temp = ( USHORT ) HB_MIN( HB_MAX( 0, dDuration ), 1000 );
-#ifndef HB_OS_DARWIN
-            static struct timespec nanosecs;
-#endif
-
-            dDuration -= temp;
-            if( temp <= 0 )
-                /* Ensure that the loop gets terminated when
-                    only a fraction of the delay time remains. */
-                dDuration = -1.0;
-            else
-            {
-                hb_idleState();
-#ifndef HB_OS_DARWIN
-                nanosecs.tv_sec  = 0;
-                nanosecs.tv_nsec = temp * 10;
-                nanosleep( &nanosecs, NULL );
-#else
-		usleep(temp / 100);
-#endif
-            }
-        }
+        /* The conversion from Clipper (DOS) timer tick units to
+           milliseconds is * 1000.0 / 18.2. */
+        dDuration /= 18.2;
+        hb_idleSleep( dDuration );
     }
 }
 

@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.6 2003/09/24 01:20:34 druzus Exp $
+# $Id: rules.cf,v 1.7 2003/12/20 10:57:27 lf_sfnet Exp $
 #
 
 # How to run yacc.
@@ -47,19 +47,19 @@ endif
 ifeq ($(CC),bcc)
 # Rule to generate an object file from a C source file in the parent.
 %$(OBJ_EXT) : $(SOURCE_DIR)%.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?)) $(CC_IN) $?
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?)) $(CC_IN) $?)
 
 # Rule to generate an object file from a C source file.
 %$(OBJ_EXT) : %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(?:.c=$(OBJ_EXT)) $(CC_IN) $?
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(?:.c=$(OBJ_EXT)) $(CC_IN) $?)
 else
 # Rule to generate an object file from a C source file in the parent.
 %$(OBJ_EXT) : $(SOURCE_DIR)%.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?))
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?)))
 
 # Rule to generate an object file from a C source file.
 %$(OBJ_EXT) : %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?:.c=$(OBJ_EXT))
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?:.c=$(OBJ_EXT)))
 endif
 
 #rules for CPP files

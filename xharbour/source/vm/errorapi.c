@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.30 2003/12/11 11:22:11 mlombardo Exp $
+ * $Id: errorapi.c,v 1.31 2003/12/11 16:32:23 lf_sfnet Exp $
  */
 
 /*
@@ -1544,6 +1544,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
    {
        int *pGPF = NULL;
        *pGPF = 0;
+       *(--pGPF) = 0;
    }
    exit( EXIT_FAILURE );
 }
