@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3309 2004/08/14 12:00:00 modalsit Exp $
+ * $Id: ChangeLog,v 1.3309 2004/08/14 15:10:38 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-16 14:44 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/gtapi.c
+    ! fixed hb_gtGetCursor(), read comment there, this one fixes this
+      sample code:
+
+      procedure main()
+
+ 		setcursor(3)
+ 		devpos(row(),MaxCol()-11)
+ 		devout(Replicate("a", 10))
+ 		? setcursor()
+ 		inkey(0)
+
+ 		devpos(row()+1,MaxCol()-10)
+ 		devout(Replicate("b",11))
+ 		? setcursor()
+ 		inkey(0)
+	  return
 
 2004-08-14 12:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.30 2004/06/18 00:52:17 paultucker Exp $
+ * $Id: gtapi.c,v 1.31 2004/06/28 18:10:17 paultucker Exp $
  */
 
 /*
@@ -766,7 +766,17 @@ USHORT HB_EXPORT hb_gtGetCursor( USHORT * uipCursorStyle )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtGetCursor(%p)", uipCursorStyle));
 
-   *uipCursorStyle = hb_gt_GetCursorStyle();
+	/* 16/08/2004 - <maurilio.longo@libero.it>
+						 Wrong since hb_gtSetPos() can call hb_gt_SetCursor(SC_NONE)
+						 to force it off when cursor is out of screen bounds.
+						 When, later, we ask to gtapi which is our cursor shape
+						 we have to answer with the last one set with hb_gtSetCursor()
+						 and not lower level hb_gt_XXX current one.
+
+	*uipCursorStyle = hb_gt_GetCursorStyle();
+	*/
+
+   *uipCursorStyle = s_uiCursorStyle;
 
    return 0;
 }
@@ -779,8 +789,9 @@ USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorStyle )
    {
       /* Set the cursor only when, it's in bounds. */
       if( s_iRow >= 0 && s_iRow < s_Height &&
-          s_iCol >= 0 && s_iCol < s_Width )
+          s_iCol >= 0 && s_iCol < s_Width ) {
          hb_gt_SetCursorStyle( uiCursorStyle );
+		}
 
       s_uiCursorStyle = uiCursorStyle;
 
@@ -824,11 +835,12 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
 
       /* If cursor was out bounds, now enable it */
       if( s_Width > 0 && ( s_iRow < 0 || s_iRow >= s_Height ||
-          s_iCol < 0 || s_iCol >= s_Width) )
+          					   s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
-   else
+   else {
       hb_gt_SetCursorStyle( SC_NONE ); /* Disable cursor if out of bounds */
+   }
 
    s_iRow = iRow;
    s_iCol = iCol;
@@ -850,12 +862,13 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
       hb_gt_SetPos( iRow, iCol, iMethod );
 
       /* If cursor was out bounds, now enable it */
-      if( s_Width <= 0|| (s_iRow < 0 || s_iRow >= s_Height ||
-          s_iCol < 0 || s_iCol >= s_Width) )
+      if( s_Width > 0 && ( s_iRow < 0 || s_iRow >= s_Height ||
+          					   s_iCol < 0 || s_iCol >= s_Width) )
          hb_gt_SetCursorStyle( s_uiCursorStyle );
    }
-   else
+   else {
       hb_gt_SetCursorStyle( SC_NONE ); /* Disable cursor if out of bounds */
+   }
 
    s_iRow = iRow;
    s_iCol = iCol;

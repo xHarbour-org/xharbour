@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.64 2004/07/15 03:22:00 vouchcac Exp $
+ * $Id: ChangeLog,v 1.65 2004/07/15 04:31:49 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-16 14:44 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * _winsys.c
+    + added SetConsoleOutputCP() function.
 
 2004-07-15 01:33 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
   + functions.txt
@@ -18,17 +22,17 @@
     ! CharToOem()
     ! OemToAnsi()
     ! AnsiToOem()
-      Changed the memroy protocol as per advice from Przem, Mindaugus, Vic 
+      Changed the memroy protocol as per advice from Przem, Mindaugus, Vic
       and compiled by Paul. Thanks to all of them.
- 
+
 2004-07-14 16:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/_winsys.c
     + OemToChar()
     + CharToOem()
     ! OemToAnsi()
     ! AnsiToOem()
-      Changed the way the return buffer was being used, was a buggy one, 
-      overwriting the memory somewhere.      
+      Changed the way the return buffer was being used, was a buggy one,
+      overwriting the memory somewhere.
 
 2004-07-08 04:39 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
   * source/WinTBar.Prg
@@ -89,8 +93,8 @@
     * Formatted.
 
   * _winsys.c
-    * Formatted.  
-   
+    * Formatted.
+
 2003-12-11 16:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   + _winserial.c
     Serial Communications WinApi Functions
@@ -121,7 +125,7 @@
 
     All functions are working perfectly except TransmitCommError(). I feel i am not handelling
     the cast ( cChar ) properly. Someone please correct it if I am wrong.
-  
+
 2003-12-11 14:02 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/_winsys.c
     * fixed HB_FUNC( READFILE )
@@ -160,24 +164,24 @@
      + -q0 to Harbour flags
 
 2003-02-11 21:14 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * source/_winclpb.c 
+   * source/_winclpb.c
       ! GETCLIPBOARDFORMATNAME
         removed unused cchMaxCount
-   * source/_windll.c 
+   * source/_windll.c
       ! CALLDLL
         removed unused float  FltParms[15];
-   * source/_wininet.c 
+   * source/_wininet.c
       ! FTPCOMMAND
         phFtpCommand  should be an HINTERNET, not a pointer.
-   * source/_winhead.c 
+   * source/_winhead.c
       ! HEADER_GETITEM
         hdi should be an HDITEM, not a pointer to it.
-   * source/_winmenu.c 
+   * source/_winmenu.c
       ! added cast in call to GetMenuItemInfo
-   * source/_winlv.c 
+   * source/_winlv.c
       ! LISTVIEWNOTIFY
         commented out unused szString decl
-   * source/_winsys.c 
+   * source/_winsys.c
       ! GETUSERNAME
         nSize is a DWORD, not a pointer.
       ! GETVERSIONEX
@@ -195,35 +199,35 @@
       ! WSASTARTUP
         WSAData should be a WSADATA, not a pointer
       ! WSAACCEPT
-        commented out unused s 
+        commented out unused s
    * source/_winmous.c
      ! GETCURSORINFO
       pci should be a CURSORINFO, not a pointer.
-   * source/_winwnd.c 
+   * source/_winwnd.c
      ! GETTITLEBARINFO
        pti should be a TITLEBARINFO, not a pointer.
-   * source/_winshell.c 
+   * source/_winshell.c
      ! DRAGQUERYPOINT
        lpPoint should actually be a POINT, not a pointer.
-   * source/wincore.prg 
+   * source/wincore.prg
      ! Changed Otherwise: to Default:
-   * source/_winicon.c 
+   * source/_winicon.c
      ! GETICONINFO
        ii should be an ICONINFO, not a pointer.
      ! EXTRACTASSOCIATEDICON
        lpilcon should be a WORD not a pointer to one.
-   * source/_windlg.c 
+   * source/_windlg.c
      ! MAPDIALOGRECT
        lpRect is only a pointer to a RECT.  It is being used
        as if it IS a RECT.  Changed into a rect, and passed
        address to MapDialogRect
-   * source/_winbmp.c 
+   * source/_winbmp.c
      ! CreateDIBSection()
        VOID ** ppBits -> VOID ** ppBits = (VOID **)0;
        to remove 'use before initialise' warning
-   * makefile.nt 
+   * makefile.nt
    * makefile.vc
-   * make_vc.bat 
+   * make_vc.bat
      ! Now compiles with MSVC
 
 2002-12-29 17:00 UTC+05:30 Pritpal Bedi <vouch32@vouchcac.com>
@@ -232,8 +236,8 @@
        Deletes a specified key from the Windows Registry Database.
      + RegDeleteValue()
        Deletes value for a name for a specified key.
-       ( Please someone take care as this function is not deleting 
-         the value as all the parameters are according to WinApi 
+       ( Please someone take care as this function is not deleting
+         the value as all the parameters are according to WinApi
          documentation. )
 
 2002-12-28 20:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
@@ -254,7 +258,7 @@
 
 2002-10-03 14:50 UCT -0800 Augusto Infante <augusto@profit-master.com>
    * Windows.ch
-     + PeekMessage() Options 
+     + PeekMessage() Options
 
 2002-11-06 00:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.nt
@@ -271,7 +275,7 @@
    * makefile.bc
    * env/bccWin32.Mak
      - Removed BCC_DIR hard coded refernces to BCC32 - Path and standard .cfg file will work.
-   
+
 2002-11-04 10:38 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.nt
    * makefile.vc

@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.23 2004/07/14 11:21:05 vouchcac Exp $
+ * $Id: _winsys.c,v 1.24 2004/07/15 03:22:00 vouchcac Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -1140,8 +1140,14 @@ HB_FUNC( FILETIMETOSYSTEMTIME )
    else
    {
       hb_retl( FALSE ) ;
-   } 
+   }
 }
 
 //---------------------------------------------------------------------//
+// BOOL SetConsoleOutputCP(  UINT wCodePageID )  // code page to set;
+HB_FUNC( SETCONSOLEOUTPUTCP )
+{
+   hb_retl( SetConsoleOutputCP( (UINT) hb_parnl( 1 ) ) ) ;
+}
+
 
