@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1081 2003/05/29 22:33:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1082 2003/05/29 22:48:58 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,8 @@
 */
 
 2003-05-29 18:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * source/rtl/trace.c
-    * hb_fsFile -> hb_fsfile
+  * include/hbtrac.h
+    + #include hbapifs.h
 
 2003-05-29 15:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/trace.c
