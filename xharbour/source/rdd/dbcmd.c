@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.43 2003/08/02 01:21:57 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.44 2003/08/13 02:28:43 ronpinkas Exp $
  */
 
 /*
@@ -292,6 +292,11 @@ static void hb_rddCloseAll( void )
    LPAREANODE pAreaNode,pCurrArea;
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
 
+   //JC1: system not initialized, not needed to cleanup
+   //In MT causes segfault. In ST is just useless to go on.
+   if ( s_pWorkAreas == NULL )
+      return; 
+      
    LOCK_AREA
    while( isParents )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.248 2003/08/09 18:49:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.249 2003/08/14 23:49:47 jonnymind Exp $
  */
 
 /*
@@ -575,74 +575,74 @@ void HB_EXPORT hb_vmQuit( void )
       return;
    }
 
-   //printf "\nvmQuit()\n" );
+   //printf("\nvmQuit()\n" );
 
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();
-     //printf "After PP\n" );
+     //printf("After PP\n" );
    #endif
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
 
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
-   //printf "After ExitFunctions\n" );
+   //printf("After ExitFunctions\n" );
 
    /* release all known items stored in subsystems */
    hb_rddShutDown();
-   //printf "After RDD\n" );
+   //printf("After RDD\n" );
 
    hb_idleShutDown();
-   //printf "After Idle\n" );
+   //printf("After Idle\n" );
 
    hb_i18nExit();
 
    hb_errExit();
-   //printf "After Err\n" );
+   //printf("After Err\n" );
 
    hb_clsReleaseAll();
-   //printf "After Class\n" );
+   //printf("After Class\n" );
 
    hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
-   //printf "After Symbols\n" );
+   //printf("After Symbols\n" );
 
    hb_dynsymRelease();          /* releases the dynamic symbol table */
-   //printf "After Dyn\n" );
+   //printf("After Dyn\n" );
 
    hb_conRelease();             /* releases Console */
-   //printf "After Con\n" );
+   //printf("After Con\n" );
 
    hb_setRelease();             /* releases Sets */
-   //printf "After Set\n" );
+   //printf("After Set\n" );
 
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdpReleaseAll();          /* releases codepages */
-   //printf "After Cdp\n" );
+   //printf("After Cdp\n" );
 #endif
 
    /* release all remaining items */
 #ifndef HB_THREAD_SUPPORT
    hb_stackRemove( 0 );
-   //printf "After Stack\n" );
+   //printf("After Stack\n" );
 #endif
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
       hb_itemClear( &(HB_VM_STACK.Return) );
    }
-   //printf "After Return\n" );
+   //printf("After Return\n" );
 
    if( s_aStatics.type == HB_IT_ARRAY )
    {
       hb_arrayRelease( &s_aStatics );
    }
-   //printf "\nAfter Statics\n" );
+   //printf("\nAfter Statics\n" );
 
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
       hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
       hb_arrayRelease( &s_aGlobals );
    }
-   //printf "\nAfter Globals\n" );
+   //printf("\nAfter Globals\n" );
 
 #ifndef HB_THREAD_SUPPORT
    hb_memvarsRelease();    /* clear all PUBLIC variables */
@@ -650,38 +650,38 @@ void HB_EXPORT hb_vmQuit( void )
    hb_memvarsRelease( &hb_stack );
 #endif
 
-   //printf "After Memvar\n" );
+   //printf("After Memvar\n" );
 
    /* release all known garbage */
    hb_gcReleaseAll();
-   //printf "After GC\n" );
+   //printf("After GC\n" );
 
 
 #ifndef HB_THREAD_SUPPORT
    //JC1: under threads, we'll kill our stack when needed
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
-   //printf "After memvarsFree\n" );
+   //printf("After memvarsFree\n" );
 
    hb_stackFree();
-   //printf "After hbStackFree\n" );
+   //printf("After hbStackFree\n" );
 #else
    hb_threadExit();
-   //printf "After thread exit\n" );
+   //printf("After thread exit\n" );
 #endif
 
-   //printf "After stackFree\n" );
+   //printf("After stackFree\n" );
 
    /* hb_dynsymLog(); */
 
    hb_xexit();
-   //printf "After xexit\n" );
+   //printf("After xexit\n" );
 
    hb_gcExit();
-   //printf "After gcExit\n" );
+   //printf("After gcExit\n" );
 
    hb_traceExit();
-   //printf "After traceExit\n" );
+   //printf("After traceExit\n" );
 
 #ifdef HB_THREAD_SUPPORT
    // JC1: Under MT, the HB_VM_STACK must continue to retreive the correct stack,

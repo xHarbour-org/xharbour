@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1347 2003/08/14 08:44:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1348 2003/08/14 23:49:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-15 02:48 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/hvm.c
+    ! commented //printf were missing ( before ".
+
+  * source/rdd/dbcmd.c
+    ! skipping cleanup sequence (involving mutex lock and destruction
+      under MT) if RDD is not initialized. Not doing so causes GPF
+      at program termination under MT if the program does not uses
+      databases.
 
 2003-08-15 01:46 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/eval.c
