@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.7 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.bc,v 1.1 2003/10/09 05:31:55 paultucker Exp $
 #
 
 #
@@ -204,6 +204,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\workdays.obj \
    $(OBJ_DIR)\woy.obj \
    $(OBJ_DIR)\xbox.obj \
+   $(OBJ_DIR)\dfile.obj \
    $(OBJ_DIR)\year.obj
 
 
@@ -974,6 +975,13 @@ $(OBJ_DIR)\year.obj : $(OBJ_DIR)\year.c
 $(OBJ_DIR)\year.c : $(TOOLS_DIR)\year.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
+
+$(OBJ_DIR)\dfile.obj : $(OBJ_DIR)\dfile.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\dfile.c : $(TOOLS_DIR)\dfile.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 
 #   $(OBJ_DIR)\sysmem.obj \
