@@ -10,7 +10,7 @@
 #include "debug.ch"
 
 #xtranslate NTRIM( < n > ) = > lTrim( Str( < n > ) )
-#define LOGFILE error.log // don't use quotes
+//#define LOGFILE  error.log // don't use quotes
 
 *------------------------------------------------------------------------------*
 
@@ -144,7 +144,7 @@ STATIC FUNCTION ErrorMessage( e )
    END
    cMessage += ';Called from ' + procname( 3 ) + ' (' + AllTrim( Str( procline( 3 ) ) ) + '),  ' + ;
                + procname( 4 ) + ' (' + AllTrim( Str( procline( 4 ) ) ) + ')'
-   cMessage += ';Error logged in file ERROR.LOG'
+   cMessage += ';Error logged in file '+GetModuleFileName()+'\ERROR.LOG'
 
    RETURN ( cMessage )
 
@@ -193,7 +193,7 @@ STATIC FUNCTION LogError( e, cProcStack )
 
    cErr += cProcStack
 
-   SET PRINTER TO Error.Log ADDITIVE
+   SET PRINTER TO  GetModuleFileName()+"\Error.Log" ADDITIVE
    SET CONSOLE OFF
    SET PRINTER ON
 

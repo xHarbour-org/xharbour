@@ -3,7 +3,7 @@
  *
  * Whoo.lib TTVItem CLASS for TreeView Items
  *
- * Copyright 2002 Augusto Infante [systems@quesoro.com]
+ * Copyright 2002 Augusto Infante [augusto@2vias.com.ar]
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify

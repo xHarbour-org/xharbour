@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.30 2002/10/08 09:29:06 vouchcac Exp $
+ * $Id: ChangeLog,v 1.31 2002/10/08 18:02:01 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-10-08 23:42 UCT -0300 Augusto Infante <augusto@2vias.com.ar>
+   * errorsys.prg
+     + GetModuleFileName() for file output
 
 2002-10-08 19:40 UCT+0100 Robert Arseniuk <roberta@jmpolska.com>
    * _WinDate.c

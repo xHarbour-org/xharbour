@@ -1,9 +1,22 @@
+[Version]
+Type=xMake
+
+[Info]
+Type=Executable
+Architecture=Windows (bcc32)
+Include=
+Define=
+Params=
+
 [Project]
+Target=C:\XHARBOUR\CONTRIB\XVISUAL\BIN\XIDE.EXE
+Run=
 %HOME%\xIde.Exe
-Run=%HOME%\xIde.Exe
+Run=%HOME%\bin\xIde.Exe
 
 [Version]
 Type=xMake
+
 [Info]
 Type=Executable
 Architecture=Windows (bcc32)
@@ -35,4 +48,3 @@ Params=
 %C_LIB_INSTALL%\CW32.LIB=21,.T.
 %C_LIB_INSTALL%\IMPORT32.LIB=22,.T.
 %HB_INSTALL%\contrib\xVisual\xide.res=23,.F.
-

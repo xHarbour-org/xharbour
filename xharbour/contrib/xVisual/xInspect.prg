@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.22 2002/10/06 21:39:31 what32 Exp $
+ * $Id: xInspect.prg,v 1.23 2002/10/07 01:54:24 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ CLASS ObjInspect FROM TForm
    METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
                                  ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),;
                                  MoveWindow(::browser:hWnd, 0, 0,;
-                                                      ::InspTabs:Properties:ClientRect()[3]+1,;
+                                                      ::InspTabs:Properties:ClientRect()[3],;
                                                       ::InspTabs:Properties:ClientRect()[4],.t.),;
                                  nil
    METHOD SetBrowserData()
@@ -100,8 +100,8 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
-  local oCol1, oCol2
-  local aProp := {{"",""}}
+  local oCol1, oCol2, aProp, aHeads
+
   local aRect := ::ClientRect()
   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
   oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
@@ -114,33 +114,20 @@ METHOD OnCreate() CLASS ObjInspect
   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
   ::InspTabs:Configure()
 
-  ::Browser:=TBrowser():Init( aProp )
-  ::Browser:Create( ::InspTabs:Properties:handle,  0, 0,;
-                                                 ::InspTabs:Properties:ClientRect()[3],;
-                                                 ::InspTabs:Properties:ClientRect()[4],;
-                                                 WS_CHILD+WS_VISIBLE+WS_VSCROLL,;
-                                                 WS_EX_CLIENTEDGE )
-  ::Browser:wantHScroll:=.F.
-  oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,85)
-  oCol1:VertAlign   :=TA_CENTER
-  oCol1:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
-  oCol1:Style  := 0
 
-  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,81)
-  oCol2:VertAlign  :=TA_CENTER
-  oCol2:fgColor    := RGB(0,0,128)
-  oCol2:bSaveBlock := {|cText,o,nwParam|::SaveVar(cText,nwParam) }
+//------------------------------------------------------------------------ sets the browser
+  aHeads:= { { "Property", 85,},;
+             { "Value",    81, {|cText,o,nwParam|::SaveVar(cText,nwParam)} }   }
 
-  ::Browser:addColumn(oCol1)
-  ::Browser:addColumn(oCol2)
-  ::Browser:HeadFont      :=GetMessageFont()
-  ::Browser:Font          :=GetMessageFont()
-  ::Browser:HeadHeight    :=0
-  ::Browser:BgColor       := GetSysColor(COLOR_BTNFACE)
-  ::Browser:HiliteNoFocus := GetSysColor(COLOR_BTNFACE)
+  aProp := { {'',''} }  // initial data
 
-  ::Browser:bKillBlock:={|| DeleteObject(::Browser:Font),DeleteObject(::Browser:HeadFont)}
-  ::Browser:configure()
+  ::Browser:= TCBrowser():New( ::InspTabs:Properties, 0, 0, 100, 100, aHeads, aProp )
+  ::Browser:wantHScroll  :=.F.
+  ::Browser:HeadHeight   :=0
+  ::Browser:BgColor      := GetSysColor(COLOR_BTNFACE)
+  ::Browser:HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
+  ::Browser:Create()
+
 
 return( super:OnCreate() )
 
@@ -268,18 +255,6 @@ METHOD DrawItem( dis ) CLASS ComboInsp
       drawfocusrect( dis:hDC  , aclip )
    endif
 return(1)
-
-//---------------------------------------------------------------------------------
-
-CLASS TBrowser FROM whBrowse
-   METHOD New() CONSTRUCTOR
-ENDCLASS
-
-//---------------------------------------------------------------------------------
-
-METHOD New( oSource ) CLASS TBrowser
-   super:Init( oSource )
-return(self)
 
 //---------------------------------------------------------------------------------
 
