@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1616 2003/10/22 09:06:28 brianhays Exp $
+ * $Id: ChangeLog,v 1.1617 2003/10/22 18:32:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-23 09:35 GMT+1200 Peter Rees <peter@rees.co.nz>
+  * /rtl/console.c
+    hb_conDevPos() (DEVPOS())
+      Fix to work correctly with SET DEVICE TO PRINTER
+
+    HB_FUNC( __EJECT )
+     change: hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+         to: hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D\x0C", 2 );
 
 2003-10-22 11:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/compiler/harbour.slx
