@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.12 2002/12/27 22:34:37 jonnymind Exp $
+* $Id: inet.h,v 1.13 2003/01/02 06:07:39 jonnymind Exp $
 */
 
 /*
@@ -61,13 +61,8 @@
    #else
       #if defined( HB_OS_WIN_32 )
          #define HB_SOCKET_T SOCKET
-         #include <winsock.h>
+         #include <winsock2.h>
          #include <windows.h>
-
-         /* JC1: Defined sd_both where not available (is in winsock2.h) */
-         #ifndef SD_BOTH
-            #define SD_BOTH         0x02
-         #endif
 
          #define HB_INET_CLOSE( x )    closesocket( x )
 
