@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.3 2002/01/31 05:57:24 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.4 2003/01/02 23:31:00 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )
 
-   LOCAL FileHandle, Counter := 0, ProcName, aParams, xParam
+   LOCAL FileHandle, Counter := 1, ProcName, aParams, xParam
 
    IF ! SET( _SET_TRACE )
       RETURN .T.

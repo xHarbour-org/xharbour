@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.577 2003/01/02 23:10:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.578 2003/01/02 23:30:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-01-02 15:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2003-01-02 15:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/traceprg.prg
     * Changed to use variable number of paramaters (...).
     % Optimized to use FOR EACH.
 
-2003-01-02 15:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2003-01-02 15:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbtrace.h
   * source/rtl/trace.c
   * source/vm/cmdarg.c
