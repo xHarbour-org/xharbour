@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.38 2002/12/30 00:16:52 ronpinkas Exp $
+ * $Id: arrays.c,v 1.36 2002/12/29 19:58:43 ronpinkas Exp $
  */
 
 /*
@@ -76,24 +76,16 @@
 #include "hbvm.h"
 #include "hbstack.h"
 
-extern char *hb_vm_acAscii[256];
-
 #ifdef HB_THREAD_SUPPORT
    extern HB_FORBID_MUTEX hb_gcCollectionMutex;
 #endif
 
+extern char *hb_vm_acAscii[256];
+
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
-   PHB_BASEARRAY pBaseArray;
+   PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    ULONG ulPos;
-
-   /** Do not allow garbage collecting now */
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadForbid( &hb_gcCollectionMutex );
-   #endif
-
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
 
@@ -103,7 +95,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    {
       hb_itemClear( pItem );
    }
-
    pItem->type = HB_IT_ARRAY;
 
    if( ulLen > 0 )
@@ -127,11 +118,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    }
 
    pItem->item.asArray.value = pBaseArray;
-
-   /** Garbage collecting can go now */
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadAllow( &hb_gcCollectionMutex );
-   #endif
 
    return TRUE;
 }
@@ -815,7 +801,10 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
 
       #ifdef HB_THREAD_SUPPORT
-         hb_threadForbid( &hb_gcCollectionMutex );
+        if( hb_ht_context )
+        {
+           hb_threadForbid( &hb_gcCollectionMutex );
+        }
       #endif
 
       /* Release object tree as needed */
@@ -874,7 +863,10 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       pArray->item.asArray.value = NULL;
 
       #ifdef HB_THREAD_SUPPORT
-         hb_threadAllow( &hb_gcCollectionMutex );
+        if( hb_ht_context )
+        {
+           hb_threadAllow( &hb_gcCollectionMutex );
+        }
       #endif
 
       //printf( "\nDone! hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value );
@@ -990,12 +982,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
       PHB_NESTED_CLONED pCloned;
       BOOL bTop;
 
-      #ifdef HB_THREAD_SUPPORT
-         hb_threadForbid( &hb_gcCollectionMutex );
-      #endif
-
       pDstArray = hb_itemNew( NULL );
-
       hb_arrayNew( pDstArray, ulSrcLen );
 
       if( pClonedList == NULL )
@@ -1016,7 +1003,6 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
          bTop = FALSE;
 
          pCloned = pClonedList;
-
          while( pCloned->pNext )
          {
             pCloned = pCloned->pNext;
@@ -1054,7 +1040,6 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
                pClone = pCloned->pDest;
                goto DontClone;
             }
-
             while( pCloned->pNext )
             {
                pCloned = pCloned->pNext;
@@ -1065,7 +1050,6 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
                   goto DontClone;
                }
             }
-
             if( pCloned->pSrcBaseArray == pSrcItem->item.asArray.value )
             {
                pClone = pCloned->pDest;
@@ -1101,10 +1085,6 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
          }
       }
 
-      #ifdef HB_THREAD_SUPPORT
-         hb_threadAllow( &hb_gcCollectionMutex );
-      #endif
-
       return pDstArray;
    }
    else
@@ -1115,20 +1095,13 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
 
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 {
-   PHB_ITEM pArray;
-   PHB_BASEARRAY pBaseArray;
+   PHB_ITEM pArray = hb_itemNew( NULL );
+   PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    USHORT uiPos;
 
    //printf( "Got: %p\n", pBaseArray );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
-
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadForbid( &hb_gcCollectionMutex );
-   #endif
-
-   pArray = hb_itemNew( NULL );
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
    pArray->type = HB_IT_ARRAY;
 
@@ -1155,30 +1128,18 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 
    pArray->item.asArray.value = pBaseArray;
 
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadAllow( &hb_gcCollectionMutex );
-   #endif
-
    return pArray;
 }
 
 PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
-   PHB_ITEM pArray;
-   PHB_BASEARRAY pBaseArray;
-   USHORT uiPos, uiPCount;
+   PHB_ITEM pArray = hb_itemNew( NULL );
+   PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
+   USHORT uiPos, uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
    //printf( "Got: %p\n", pBaseArray );
-
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadForbid( &hb_gcCollectionMutex );
-   #endif
-
-   pArray = hb_itemNew( NULL );
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-   uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
    pArray->type = HB_IT_ARRAY;
 
@@ -1210,10 +1171,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    }
 
    pArray->item.asArray.value = pBaseArray;
-
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadAllow( &hb_gcCollectionMutex );
-   #endif
 
    return pArray;
 }
@@ -1251,12 +1208,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          {
             hb_itemReleaseString( pItem );
          }
-		 /* 03-07-2002 RP commented out - Needs further testing.
+         /* 03-07-2002 RP commented out - Needs further testing.
          else if( HB_IS_MEMVAR( pItem ) )
          {
             hb_memvarValueDecRef( pItem->item.asMemvar.value );
          }
-		 */
+         */
          ++pItem;
       }
 
@@ -1268,3 +1225,5 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
    }
 }
+
+

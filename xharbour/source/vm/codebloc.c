@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.14 2002/12/29 23:32:42 jonnymind Exp $
+ * $Id: codebloc.c,v 1.13 2002/12/29 19:58:43 ronpinkas Exp $
  */
 
 /*
@@ -84,10 +84,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
 
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadForbid( &hb_gcCollectionMutex );
-   #endif
-
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
    /* Store the number of referenced local variables
@@ -147,7 +143,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              */
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
          }
-
          hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          ++ui;
       }
@@ -158,15 +153,15 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
        * codeblock - all inner codeblocks use the local variables table
        * created during creation of the outermost codeblock
        */
-      PHB_ITEM pLocal = hb_stackSelfItem();
+      PHB_ITEM pLocal;
 
+      pLocal = hb_stackSelfItem();
       if( HB_IS_BLOCK( pLocal ) )
       {
          HB_CODEBLOCK_PTR pOwner = pLocal->item.asBlock.value;
 
          pCBlock->pLocals = pOwner->pLocals;
          pCBlock->uiLocals = uiLocals = pOwner->uiLocals;
-
          if( pOwner->pLocals )
          {  /* the outer codeblock have the table with local references - reuse it */
             while( uiLocals )
@@ -198,10 +193,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
    pCBlock->pGlobals  = pGlobals;
 
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadAllow( &hb_gcCollectionMutex );
-   #endif
-
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
@@ -212,10 +203,6 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    HB_CODEBLOCK_PTR pCBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockMacroNew(%p, %i)", pBuffer, usLen));
-
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadForbid( &hb_gcCollectionMutex );
-   #endif
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
@@ -237,10 +224,6 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock->pGlobals  = NULL;
 
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadAllow( &hb_gcCollectionMutex );
-   #endif
-
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
@@ -257,13 +240,15 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
       #ifdef HB_THREAD_SUPPORT
-         hb_threadForbid( &hb_gcCollectionMutex );
+        if( hb_ht_context )
+        {
+           hb_threadForbid( &hb_gcCollectionMutex );
+        }
       #endif
 
       if( pCBlock->pLocals )
       {
          USHORT ui = pCBlock->uiLocals;
-
          while( ui )
          {
             hb_memvarValueDecRef( pCBlock->pLocals[ ui-- ].item.asMemvar.value );
@@ -293,7 +278,10 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       hb_gcFree( pCBlock );
 
       #ifdef HB_THREAD_SUPPORT
-         hb_threadAllow( &hb_gcCollectionMutex );
+        if( hb_ht_context )
+        {
+           hb_threadAllow( &hb_gcCollectionMutex );
+        }
       #endif
    }
 }
@@ -311,13 +299,11 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    if( pCBlock->pLocals )
    {
       USHORT ui = 1;
-
       while( ui <= pCBlock->uiLocals )
       {
          hb_memvarValueDecGarbageRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
          ++ui;
       }
-
       /* decrement the table reference counter and release memory if
        * it was the last reference
        */
@@ -418,4 +404,3 @@ PHB_ITEM  hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer )
 
    return pCBlock->pLocals - pRefer->item.asRefer.value;
 }
-

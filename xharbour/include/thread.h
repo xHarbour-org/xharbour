@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.15 2002/12/29 08:32:41 ronpinkas Exp $
+* $Id: thread.h,v 1.16 2002/12/29 23:32:42 jonnymind Exp $
 */
 
 /*
@@ -59,6 +59,9 @@
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapierr.h"
+
+extern void hb_gcInit( void );
+extern void hb_gcExit( void );
 
 #if defined( HB_OS_WIN_32 )
    #ifndef _WIN32_WINNT
@@ -176,9 +179,8 @@ typedef struct tag_HB_LWR_MUTEX
 /* Forbidder mutex for xharbour */
 typedef struct tag_HB_FORBID_MUTEX
 {
-    HB_LWR_MUTEX Critical;
     HB_CRITICAL_T Control;
-    int nCount;
+    long lCount;
 } HB_FORBID_MUTEX;
 
 
@@ -206,8 +208,4 @@ void hb_threadForbidenInit( HB_FORBID_MUTEX *Forbid );
 void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
 extern void hb_threadForbid( HB_FORBID_MUTEX * );
 extern void hb_threadAllow( HB_FORBID_MUTEX * );
-extern int hb_threadForbidenLockIfAllowed( HB_FORBID_MUTEX * );
-extern void hb_threadForbidenLock( HB_FORBID_MUTEX * );
-extern void hb_threadForbidenUnlock( HB_FORBID_MUTEX * );
-
 #endif
