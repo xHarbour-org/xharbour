@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.2 2004/01/19 22:00:50 andijahja Exp $
+ * $Id: hbcc.prg,v 1.3 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -199,9 +199,11 @@ static ULONG uni2chr(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG chr2uni(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG uni2uni(BYTE *,ULONG,BYTE *);
 
+extern BOOL hbcc_file_read ( FILE *, char * );
+
 //Harbour callable
 
-static HB_FUNC( HB_INT_CSINIT )
+HB_FUNC_STATIC( HB_INT_CSINIT )
 {
    ULONG i;
 
@@ -237,7 +239,7 @@ static HB_FUNC( HB_INT_CSINIT )
    }
 }
 
-static HB_FUNC( HB_INT_CSEXIT )
+HB_FUNC_STATIC( HB_INT_CSEXIT )
 {
    ULONG i;
 
@@ -1442,6 +1444,222 @@ static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
    return utflen;
 }
 
+//----------------------------------------------------------------------------//
+HB_FUNC( B64DECODE_FILE )
+{
+   PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
+   FILE *inFile, *outFile;
+   char *string, *szFileName;
+   ULONG nBytesWritten = 0;
+   PHB_ITEM pStruct, pItem;
+   USHORT uiLen = 1, uiCount;
+   BOOL bOutFile = FALSE;
+   BOOL bAlloc = FALSE;
+
+   ULONG srclen,dstlen,tmplen,i;
+   BYTE *dststr,*tmpstr;
+
+   char *szFile ;
+
+   if( pinFile )
+   {
+      if ( ISCHAR( 1 ) )
+      {
+         if ( strlen( pinFile->item.asString.value ) == 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+         else
+         {
+            pStruct = hb_itemNew( NULL );
+            pItem = hb_itemNew( NULL );
+            hb_arrayNew( pStruct, 1 );
+            hb_arraySet( pStruct, 1, hb_itemPutC( pItem, pinFile->item.asString.value ) );
+            bAlloc = TRUE;
+         }
+      }
+      else if ( ISARRAY( 1 ) )
+      {
+         pStruct = hb_param( 1, HB_IT_ARRAY );
+         uiLen = (USHORT) pStruct->item.asArray.value->ulLen;
+
+         if ( uiLen <= 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+      }
+      else
+      {
+         hb_retni( 0 );
+         return;
+      }
+   }
+   else
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( poutFile )
+   {
+      if ( strlen(poutFile->item.asString.value) == 0 )
+      {
+         hb_retni(0);
+         return;
+      }
+   }
+
+   string = (char*) hb_xgrab( SHRT_MAX );
+
+   for ( uiCount = 0; uiCount < uiLen; uiCount++ )
+   {
+      szFileName = hb_arrayGetC( pStruct, uiCount + 1 );
+
+      if ( !szFileName )
+      {
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      if ( strlen( szFileName ) == 0 )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      inFile = fopen( szFileName, "rb" );
+
+      if ( !inFile )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      while ( hbcc_file_read ( inFile, string ) )
+      {
+         if ( string )
+         {
+            if ( strstr ( string ,"Content-Transfer-Encoding: base64" ) != NULL )
+               break;
+
+            if ( !bOutFile )
+            {
+               if ( poutFile )
+               {
+                  outFile = fopen( poutFile->item.asString.value, "wb" );
+
+                  if ( !outFile )
+                  {
+                    break;
+                  }
+
+                  bOutFile = TRUE;
+               }
+               else
+               {
+                  if ( strstr ( string ,"Content-Type: application/octet-stream; name=" ) != NULL )
+                  {
+                     szFile = string + 46;
+                     szFile[strlen(szFile)-1] = '\0';
+                  }
+
+                  if( szFile )
+                  {
+                     outFile = fopen( szFile, "wb" );
+
+                     if ( !outFile )
+                     {
+                        break;
+                     }
+
+                     bOutFile = TRUE;
+                  }
+               }
+               continue;
+            }
+         }
+      }
+
+      if ( !bOutFile )
+      {
+         fclose( inFile );
+         hb_xfree( string );
+         if ( szFileName )
+         {
+            hb_xfree( szFileName );
+         }
+         hb_retni( 0 );
+         return;
+      }
+
+      while ( hbcc_file_read ( inFile, string ) )
+      {
+         srclen = strlen( string );
+
+         if ( srclen )
+         {
+            i = 0;
+            tmplen = 0;
+            tmpstr = (BYTE *) hb_xgrab( srclen );
+
+            while (i<srclen)
+            {
+               if (strchr((char*)wspchars,string[i])!=NULL)
+               {
+                  i++;
+               }
+               else if (b64invalid(string[i]))
+               {
+                  break;
+               }
+               else
+               {
+                  tmpstr[tmplen++]=string[i++];
+               }
+            }
+
+            dstlen=b64dec(tmpstr,tmplen,NULL);
+            dststr=(BYTE *) hb_xgrab(dstlen);
+            b64dec(tmpstr,tmplen,dststr);
+
+            nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+
+            hb_xfree(dststr);
+            hb_xfree(tmpstr);
+         }
+      }
+
+      fclose( inFile );
+
+      if ( szFileName )
+      {
+         hb_xfree( szFileName );
+      }
+   }
+
+   hb_retnl( nBytesWritten );
+
+   hb_xfree( string );
+
+   if ( bAlloc )
+   {
+     hb_itemRelease(pStruct);
+     hb_itemRelease(pItem);
+   }
+
+   if ( outFile )
+   {
+      fclose( outFile );
+   }
+}
 #pragma ENDDUMP
 
 //Harbour specific

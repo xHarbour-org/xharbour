@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.61 2004/01/27 09:56:08 likewolf Exp $
+ * $Id: genc.c,v 1.62 2004/02/05 12:44:17 andijahja Exp $
  */
 
 /*
@@ -801,7 +801,14 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol )
 static PSSYMLIST hb_compCStatSymList( PSSYMLIST pStatSymCurrent, char* statSymName )
 {
    PSSYMLIST pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
+   int ulLen = strlen( statSymName );
 
+   while( ulLen && HB_ISSPACE( statSymName[ ulLen - 1 ] ) )
+   {
+      ulLen--;
+   }
+
+   statSymName[ ulLen ] = '\0';
    pStatSymLast->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
    strcpy( pStatSymLast->szName, statSymName );
    pStatSymLast->pNext = NULL;
@@ -838,7 +845,7 @@ static void hb_compGenCCheckInLineStatic( char *str )
          pTmp++ ;
       }
 
-      i = 0;
+      i = 1;
       ulLen = strlen( str );
 
       while( ( pCode = strchr( str, ')' ) ) == NULL && ++i < ulLen ) {}

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdecode.prg,v 1.2 2004/02/03 10:07:41 andijahja Exp $
+ * $Id: hbdecode.prg,v 1.3 2004/02/03 22:11:43 andijahja Exp $
  */
 
 /*
@@ -114,6 +114,47 @@ YYDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
       previously encoded using encoding functions of this library.
 */
 
+#PRAGMA BEGINDUMP
+#include "hbapi.h"
+#undef LINE_MAX
+#define LINE_MAX SHRT_MAX
+
+//----------------------------------------------------------------------------//
+BOOL hbcc_file_read ( FILE *fileHandle, char *string )
+{
+   int ch, cnbr = 0;
+
+   memset (string, ' ', LINE_MAX);
+
+   for (;;)
+   {
+      ch = fgetc (fileHandle);
+
+      if ( (ch == '\n') ||  (ch == EOF) ||  (ch == 26) )
+      {
+         string [cnbr] = '\0';
+         return (ch == '\n' || cnbr);
+      }
+      else
+      {
+         if (cnbr < LINE_MAX)
+         {
+            if ( ch != '\r' )
+               string [cnbr++] = (char) ch;
+         }
+      }
+
+      if (cnbr >= LINE_MAX)
+      {
+         string [LINE_MAX] = '\0';
+         return (TRUE);
+      }
+   }
+}
+
+#PRAGMA ENDDUMP
+
+#ifdef __USE_PRG_FUNCTIONS__
 //----------------------------------------------------------------------------//
 FUNCTION UUDECODE_FILE( cEncodedFile, cOutFile )
 
@@ -427,3 +468,4 @@ STATIC FUNCTION JoinSection( aFile, nEncoding )
    END
 
    RETURN cTempFile
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id: hbcy.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -79,6 +79,190 @@ static ULONG yy_len=128;
 
 static ULONG str2yye(BYTE *,ULONG,BYTE *);
 static ULONG yye2str(BYTE *,ULONG,BYTE *);
+extern BOOL hbcc_file_read ( FILE *, char * );
+
+HB_FUNC( YYDECODE_FILE )
+{
+   PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
+   FILE *inFile, *outFile;
+   char *string, *szFileName;
+   ULONG srclen, dstlen, nBytesWritten = 0;
+   BYTE *dststr;
+   PHB_ITEM pStruct, pItem;
+   USHORT uiLen = 1, uiCount;
+   BOOL bOutFile = FALSE;
+   BOOL bAlloc = FALSE;
+
+   if( pinFile )
+   {
+      if ( ISCHAR( 1 ) )
+      {
+         if ( strlen( pinFile->item.asString.value ) == 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+         else
+         {
+            pStruct = hb_itemNew( NULL );
+            pItem = hb_itemNew( NULL );
+            hb_arrayNew( pStruct, 1 );
+            hb_arraySet( pStruct, 1, hb_itemPutC( pItem, pinFile->item.asString.value ) );
+            bAlloc = TRUE;
+         }
+      }
+      else if ( ISARRAY( 1 ) )
+      {
+         pStruct = hb_param( 1, HB_IT_ARRAY );
+         uiLen = (USHORT) pStruct->item.asArray.value->ulLen;
+
+         if ( uiLen <= 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+      }
+      else
+      {
+         hb_retni( 0 );
+         return;
+      }
+   }
+   else
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( poutFile )
+   {
+      if ( strlen(poutFile->item.asString.value) == 0 )
+      {
+         hb_retni(0);
+         return;
+      }
+   }
+
+   string = (char*) hb_xgrab( SHRT_MAX );
+
+   for ( uiCount = 0; uiCount < uiLen; uiCount++ )
+   {
+      szFileName = hb_arrayGetC( pStruct, uiCount + 1 );
+
+      if ( !szFileName )
+      {
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      if ( strlen( szFileName ) == 0 )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      inFile = fopen( szFileName, "rb" );
+
+      if ( !inFile )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      while ( hbcc_file_read ( inFile, string ) )
+      {
+         if ( string )
+         {
+            srclen = strlen( string );
+            dstlen = yye2str((BYTE*) string,srclen,NULL);
+            if ( dstlen )
+            {
+               dststr = (BYTE *) hb_xgrab(dstlen);
+               yye2str((BYTE*) string,srclen,dststr);
+
+               if ( bOutFile )
+               {
+                  nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+               }
+
+               hb_xfree(dststr);
+            }
+            else
+            {
+              /* file name always at the first line */
+              /* substring 10 */
+              if ( !bOutFile )
+              {
+                 if ( poutFile )
+                 {
+                    if ( strstr ( string ,"=ybegin" ) != NULL )
+                    {
+                       outFile = fopen( poutFile->item.asString.value, "wb" );
+
+                       if ( !outFile )
+                       {
+                          break;
+                       }
+
+                       bOutFile = TRUE;
+                    }
+                 }
+                 else
+                 {
+                    char *szFile ;
+                    int ulHeader;
+                    int n_At;
+
+                    if ( strstr ( string ,"=ybegin" ) != NULL )
+                    {
+                       ulHeader = strlen( string );
+
+                       n_At = hb_strAt( "name=", 5, string, ulHeader );
+
+                       szFile = string + n_At + 4 ;
+
+                       printf( "szFile=%s\n",szFile);
+
+                       if( szFile )
+                       {
+                          outFile = fopen( szFile, "wb" );
+
+                          if ( outFile )
+                          {
+                             bOutFile = TRUE;
+                          }
+                       }
+                    }
+                 }
+              }
+            }
+         }
+      }
+
+      fclose( inFile );
+
+      if ( szFileName )
+         hb_xfree( szFileName );
+   }
+
+   hb_retnl( nBytesWritten );
+
+   hb_xfree( string );
+
+   if ( bAlloc )
+   {
+     hb_itemRelease(pStruct);
+     hb_itemRelease(pItem);
+   }
+
+   fclose( outFile );
+}
 
 HB_FUNC(HB_YYENCODE)
 {
