@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.8 2004/01/22 03:48:00 maurifull Exp $
+ * $Id: tpopup.prg,v 1.9 2004/07/13 19:51:41 paultucker Exp $
  */
 
 /*
@@ -531,6 +531,7 @@ METHOD SetCoors( nRow, nCol, lTop ) CLASS PopUpMenu
    endif
 
 return Self
+
 #endif
 //--------------------------------------------------------------------------//
 
@@ -551,33 +552,34 @@ METHOD IsShortCut( nKey, nID ) CLASS PopUpMenu
   do case
    // Test and assign top menu item shortCut, enabled, and !PopUp:
    // Changed by enclosing assignment before ':Enabled':
-   case   ( ( nShortCut := ::GetShortCt( nKey ) ) > 0 ) .AND. ;
-            ( ( oItem := ::GetItem( nShortcut ) ):Enabled ) .AND. ;
-            ( !( oItem:IsPopUp() ) )
+   case ( ( nShortCut := ::GetShortCt( nKey ) ) > 0 ) .AND. ;
+          ( ( oItem := ::GetItem( nShortcut ) ):Enabled ) .AND. ;
+          ( !( oItem:IsPopUp() ) )
       ::Select( nShortCut )
       EVAL( oItem:Data, oItem )
       nID := oItem:ID
-      RETURN ( .T. )
+
+      RETURN .T.
 
    // Test and assignment for TopBar MenuItem:
-   case   nShortCut == 0
+   case nShortCut == 0
       nTotal := ::ItemCount()
       nItem  := ::Current
       IIF( nItem == 0, nItem := 1, )
 
       // Loop to wrap around through TopMenu from Current Item:
       FOR i := 1 TO nTotal
-         IF ( !( oItem := ::GetItem( nItem ) ):Enabled )
-         ELSEIF ( !oItem:IsPopUp() )
-         ELSEIF ( oItem:Data:IsQuick( nKey, @nID ) )
-            RETURN ( .T. )
+         IF !( oItem := ::GetItem( nItem ) ):Enabled
+         ELSEIF !oItem:IsPopUp()
+         ELSEIF oItem:Data:IsQuick( nKey, @nID )
+            RETURN .T.
          ENDIF
          IIF( ++nItem > nTotal, nItem := 1, )
       NEXT
 
-   ENDcase
+   endcase
 
-   RETURN ( .F. )
+RETURN .F.
 
 /***
 *
@@ -592,27 +594,27 @@ METHOD IsQuick( nKey, nID ) CLASS PopUpMenu
 
    LOCAL nItem, nTotal, nShortCut, oItem // , i
 
-   IF ( ( nShortCut := ::GetShortCt( nKey ) ) == 0 )
+   IF ( nShortCut := ::GetShortCt( nKey ) ) == 0
       nTotal := ::ItemCount
 
       FOR nItem := 1 TO nTotal
-         IF ( !( oItem := ::GetItem( nItem ) ):Enabled )
-	 ELSEIF ( !( oItem:IsPopUp() ) )
-         ELSEIF ( oItem:Data:IsQuick( nKey, @nID ) )
-	    RETURN ( .T. )
+         IF !( oItem := ::GetItem( nItem ) ):Enabled
+	 ELSEIF ! oItem:IsPopUp()
+         ELSEIF oItem:Data:IsQuick( nKey, @nID )
+	    RETURN .T.
 	 ENDIF
       NEXT
 
-   ELSEIF ( !( oItem := ::GetItem( nShortCut ) ):IsPopUp() )
+   ELSEIF !( oItem := ::GetItem( nShortCut ) ):IsPopUp()
       IF oItem:Enabled
          ::Select( nShortCut )
 	 EVAL( oItem:Data, oItem )
 	 nID := oItem:ID
-	 RETURN ( .T. )
+	 RETURN .T.
       ENDIF
 
    ENDIF
 
-   RETURN ( .F. )
+   RETURN .F.
 
 #endif

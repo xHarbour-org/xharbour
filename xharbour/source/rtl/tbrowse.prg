@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.79 2004/07/13 03:44:39 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.80 2004/07/13 04:55:17 guerra000 Exp $
  */
 
 /*
@@ -79,9 +79,9 @@
 
 //-------------------------------------------------------------------//
 
-#include "common.ch"
 #include "hbclass.ch"
 #include "color.ch"
+#include "common.ch"
 #include "inkey.ch"
 #include "setcurs.ch"
 #include "button.ch"
@@ -2786,22 +2786,22 @@ Method HitTest( mrow,mcol ) CLASS TBROWSE
       next
    endif
 
-   Return if( lHitHeader, -5122, HTCELL )
+   Return if( lHitHeader, HTHEADING, HTCELL )
 
 //-------------------------------------------------------------------//
 
 METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
-  LOCAL lRet := .F.
+   LOCAL lRet := .F.
 
-  IF nMode > LEN( ::aSetStyle )
-     RETURN .F.
-  ENDIF
+   IF nMode > LEN( ::aSetStyle )
+      RETURN .F.
+   ENDIF
 
-  lRet := ::aSetStyle[ nMode ]
+   lRet := ::aSetStyle[ nMode ]
 
-  IF ISLOGICAL( lSetting )
-     ::aSetStyle[ nMode ] := lSetting
-  ENDIF
+   IF ISLOGICAL( lSetting )
+      ::aSetStyle[ nMode ] := lSetting
+   ENDIF
 
    Return lRet
 
@@ -2822,28 +2822,28 @@ static Function EvalSkipBlock( bBlock, nSkip )
 function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
    LOCAL n
 
-   if oBrowse:hittest( nMouseRow, nMouseCol ) == -5121
+   if oBrowse:hittest( nMouseRow, nMouseCol ) == HTCELL
 
       n := oBrowse:mrowpos - oBrowse:rowpos
 
-      do while ( n < 0 )
+      do while n < 0
          n++
          oBrowse:up():forceStable()
       enddo
 
-      do while ( n > 0 )
+      do while n > 0
          n--
          oBrowse:down():forceStable()
       enddo
 
       n := oBrowse:mcolpos - oBrowse:colpos
 
-      do while ( n < 0 )
+      do while n < 0
          n++
          oBrowse:left()
       enddo
 
-      do while ( n > 0 )
+      do while n > 0
          n--
          oBrowse:right()
       enddo
@@ -2851,7 +2851,7 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
       return 0
    endif
 
-   return 1
+return 1
 
 //---------------------------------------------------------------------//
 #endif
@@ -2878,17 +2878,17 @@ static function LenVal( xVal, cType, cPict )
          Endif
 
          Switch cType
-         case "N"
-            nLen := Len( Str( xVal ) )
-            exit
+            case "N"
+               nLen := Len( Str( xVal ) )
+               exit
 
-         case "C"
-            nLen := Len( xVal )
-            exit
+            case "C"
+               nLen := Len( xVal )
+               exit
 
-         case "D"
-            nLen := Len( DToC( xVal ) )
-            exit
+            case "D"
+               nLen := Len( DToC( xVal ) )
+               exit
          end
          exit
 

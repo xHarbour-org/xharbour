@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3158 2004/07/15 18:01:18 likewolf Exp $
+ * $Id: ChangeLog,v 1.3159 2004/07/15 21:01:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-15 20:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/checkbox.prg
+  * source/rtl/pushbtn.prg
+  * source/rtl/radiobtn.prg
+  * source/rtl/radiogrp.prg
+  * source/rtl/scrollbr.prg
+  * source/rtl/tbrowse.prg
+    + #include "button.ch"
+    * replace constants with proper definitions.
+    * formatting.
+  * source/rtl/color53.prg
+  * source/rtl/tpopup.prg
+    * minor formatting.
 
 2004-07-15 14:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/genc.c
