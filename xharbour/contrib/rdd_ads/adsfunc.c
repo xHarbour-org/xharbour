@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.14 2003/07/22 09:40:44 toninhofwi Exp $
+ * $Id: adsfunc.c,v 1.15 2003/07/23 09:43:33 brianhays Exp $
  */
 
 /*
@@ -244,6 +244,17 @@ HB_FUNC( ADSSETCHARTYPE )
    hb_retni( oldType );
    return;
 }
+
+// return whether the current table is opened with OEM or ANSI character set
+HB_FUNC( ADSGETTABLECHARTYPE )
+{
+   UNSIGNED16 usCharType;
+   ADSAREAP   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   AdsGetTableCharType(pArea->hTable, &usCharType );
+   hb_retni( usCharType );
+   return;
+}
+
 
 HB_FUNC( ADSSETDEFAULT )
 {
@@ -1509,10 +1520,127 @@ HB_FUNC( ADSDDCREATE )
 
 }
 
-HB_FUNC( ADSDDGETDBPROPERTY )
+HB_FUNC( ADSADDTABLE )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pTableName     = hb_parc( 1 );
+   UNSIGNED8 *pTableFileName = hb_parc( 2 );
+   UNSIGNED8 *pTableIndexFileName = hb_parc( 3 );
+
+   ulRetVal= AdsDDAddTable( adsConnectHandle, pTableName, pTableFileName, adsFileType, adsCharType, pTableIndexFileName, NULL);
+
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+
+}
+
+HB_FUNC( ADSADDUSERTOGROUP )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pGroup = hb_parc( 1 );
+   UNSIGNED8 *pName  = hb_parc( 2 );
+
+   ulRetVal = AdsDDAddUserToGroup( adsConnectHandle,
+                                   pGroup,
+                                   pName);
+
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+
+}
+
+HB_FUNC( ADSUSEDICTIONARY )
+{
+   BOOL bOld = bDictionary;
+   if ( ISLOG( 1 ) )
+   {
+      bDictionary = hb_parl( 1 ) ;
+   }
+
+   hb_retl( bOld );
+}
+
+HB_FUNC( ADSCONNECT60 )
+{
+
+   UNSIGNED32 ulRetVal ;
+   UNSIGNED8  *pucServerPath = hb_parc( 1 );
+   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
+   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parc( 4 ) : NULL ;
+   UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
+
+   ulRetVal = AdsConnect60( pucServerPath,
+                            usServerTypes,
+                            pucUserName,
+                            pucPassword,
+                            ulOptions,
+                            &adsConnectHandle );
+
+   if (ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 ) ;
+   }
+   else
+   {
+      hb_retl( 0 ) ;
+   }
+
+}
+
+HB_FUNC( ADSDDCREATE )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8  *pucDictionaryPath = hb_parc( 1 ) ;
+   UNSIGNED16 usEncrypt          = ISNUM(2) ? hb_parnl( 0 ) : 0 ;
+   UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
+
+   ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
+                           usEncrypt,
+                           ( UNSIGNED8 *)pucDescription,
+                           &adsConnectHandle );
+
+   if (ulRetVal == AE_SUCCESS)
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+
+}
+
+
+HB_FUNC( ADSDDCREATEUSER )
+{
+    UNSIGNED32 ulRetVal;
+	UNSIGNED8 *pucGroupName 	= ISCHAR(1) ? hb_parc(1) : NULL;
+	UNSIGNED8 *pucUserName  	= ISCHAR(2) ? hb_parc(2) : NULL;
+	UNSIGNED8 *pucPassword 		= ISCHAR(3) ? hb_parc(3) : NULL;
+	UNSIGNED8 *pucDescription 	= ISCHAR(4) ? hb_parc(4) : NULL;
+ 	ulRetVal=AdsDDCreateUser(adsConnectHandle, pucGroupName,
+ 	                         pucUserName, pucPassword, pucDescription );
+    hb_retl( ulRetVal == AE_SUCCESS);
+}
+
+
+HB_FUNC( ADSDDGETDATABASEPROPERTY )
 {
     #define ADS_MAX_PARAMDEF_LEN  2048
-    UNSIGNED16 ulPropety = ( UNSIGNED16 ) hb_parni( 1 );
+    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
     char sBuffer[ADS_MAX_PARAMDEF_LEN];
     UNSIGNED16 ulLength;
     UNSIGNED16 ulBuffer;
@@ -1520,7 +1648,7 @@ HB_FUNC( ADSDDGETDBPROPERTY )
     BOOL bChar = FALSE ;
 
 
-    switch ( ulPropety )
+    switch ( ulProperty )
     {
        case ADS_DD_COMMENT:
        case ADS_DD_DEFAULT_TABLE_PATH:
@@ -1529,7 +1657,7 @@ HB_FUNC( ADSDDGETDBPROPERTY )
        case ADS_DD_VERSION:
        {
           ulLength = ADS_MAX_PARAMDEF_LEN ;
-          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulPropety, &sBuffer, &ulLength );
+          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulProperty, &sBuffer, &ulLength );
           bChar = TRUE ;
           break;
        }
@@ -1544,7 +1672,7 @@ HB_FUNC( ADSDDGETDBPROPERTY )
        }
     }
 
-   if  ( ulPropety == ADS_DD_LOG_IN_REQUIRED || ulPropety == ADS_DD_VERIFY_ACCESS_RIGHTS  || ulPropety == ADS_DD_ENCRYPT_NEW_TABLE)
+   if  ( ulProperty == ADS_DD_LOG_IN_REQUIRED || ulProperty == ADS_DD_VERIFY_ACCESS_RIGHTS  || ulProperty == ADS_DD_ENCRYPT_NEW_TABLE)
    {
       hb_retl(ulBuffer );
    }
@@ -1555,17 +1683,17 @@ HB_FUNC( ADSDDGETDBPROPERTY )
 }
 
 
-HB_FUNC( ADSSETDBPROPERTY )
+HB_FUNC( ADSDDSETDATABASEPROPERTY )
 {
 
    char * szProperty;
    UNSIGNED16 ulLength;
    UNSIGNED32 ulRetVal;
    UNSIGNED16 ulBuffer;
-   UNSIGNED16 ulPropety = ( UNSIGNED16 ) hb_parni( 1 );
+   UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
    PHB_ITEM pParam = hb_param( 2, HB_IT_ANY ) ;
 
-   switch( ulPropety )
+   switch( ulProperty )
    {
       case ADS_DD_COMMENT:
       case ADS_DD_DEFAULT_TABLE_PATH:
@@ -1574,7 +1702,7 @@ HB_FUNC( ADSSETDBPROPERTY )
       case ADS_DD_ADMIN_PASSWORD:
       case ADS_DD_ENCRYPT_TABLE_PASSWORD:
       {
-         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
          break;
       }
       case ADS_DD_MAX_FAILED_ATTEMPTS:
@@ -1583,7 +1711,7 @@ HB_FUNC( ADSSETDBPROPERTY )
       case ADS_DD_VERSION_MINOR:
       {
          ulBuffer =  hb_itemGetNI( pParam );
-         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, &ulBuffer, 2 );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, &ulBuffer, 2 );
          break;
       }
       case  ADS_DD_LOG_IN_REQUIRED:
@@ -1592,13 +1720,79 @@ HB_FUNC( ADSSETDBPROPERTY )
       case  ADS_DD_ENABLE_INTERNET:
       {
          ulBuffer =  hb_itemGetL( pParam );
-         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, &ulBuffer, 2 );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, &ulBuffer, 2 );
          break;
       }
    }
    hb_retl( ulRetVal == AE_SUCCESS);
 }
 
+/*
+UNSIGNED32 ENTRYPOINT AdsDDGetUserProperty( ADSHANDLE  hObject,
+                                            UNSIGNED8  *pucUserName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 *pusPropertyLen );
+*/
+HB_FUNC( ADSDDGETUSERPROPERTY )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8  *pucUserName  	= hb_parc(1);
+   UNSIGNED16 usPropertyID  	= hb_parni(2);
+   UNSIGNED8  *pvProperty   	= hb_parc(3);
+   UNSIGNED16 usPropertyLen     = hb_parni(4);
+   ulRetVal = AdsDDGetUserProperty( adsConnectHandle, pucUserName, usPropertyID,
+                                    pvProperty, &usPropertyLen );
+   hb_retl( ulRetVal == AE_SUCCESS);
+}
+/*
+   Verify if a username/password combination is valid for this database
+   Call : 	 ADSTESTLOGIN(serverpath,servertypes,username,password,options,
+                          [userproperty,buffer,bufferlength])
+   Returns : True if login succeeds
+
+   Notes: 	 This creates a temporary connection only during the execution of this
+             function, without disturbing the stored one for any existing connection
+
+             If the optional last 3 parameters are supplied, then it queries the
+             requested user property and returns it in the buffer. This is useful
+             fo example to get the groups of which the user is a member
+*/
+
+HB_FUNC( ADSTESTLOGIN )
+{
+
+   UNSIGNED32 ulRetVal ;
+   UNSIGNED8  *pucServerPath = hb_parc( 1 );
+   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
+   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parc( 4 ) : NULL ;
+   UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
+   UNSIGNED16 usPropertyID   = ISNUM( 6 ) ? hb_parni( 6 ) : 0;
+   UNSIGNED8  *pvProperty    = ISCHAR( 7 ) ? hb_parc( 7 ) : NULL ;
+   UNSIGNED16 usPropertyLen  = ISNUM( 8 ) ? hb_parni( 8 ) : 0;
+   ADSHANDLE  adsTestHandle;
+
+   ulRetVal = AdsConnect60( pucServerPath,
+                            usServerTypes,
+                            pucUserName,
+                            pucPassword,
+                            ulOptions,
+                            &adsTestHandle );
+
+   if (ulRetVal == AE_SUCCESS )
+   {
+      if (usPropertyLen>0)
+        AdsDDGetUserProperty( adsTestHandle, pucUserName, usPropertyID,
+                                                pvProperty, &usPropertyLen );
+      AdsDisconnect(adsTestHandle);
+      hb_retl( 1 ) ;
+   }
+   else
+   {
+      hb_retl( 0 ) ;
+   }
+}
 
 #endif   /* ADS_REQUIRE_VERSION6  */
 /*  Please add all-version functions above this block */
