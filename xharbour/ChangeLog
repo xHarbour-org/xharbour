@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3734 2005/01/12 16:35:56 druzus Exp $
+ * $Id: ChangeLog,v 1.3735 2005/01/13 04:31:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-13 11:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/hbgtwvw.c
+  * contrib/gtwvw/doc/whatsnew.txt
+    + Combobox functions and some other changes.
+      Please see details in the changelog on contrib/gtwvw/doc/whatsnew.txt
+      starting at change date 2005-11-25.
+
+  * contrib/gtwvw/samples/wvwtest9.bat
+  * contrib/gtwvw/samples/wvwtest9.bc
+    * Some typo fixed.
 
 2005-01-12 20:30 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/hbslex.c

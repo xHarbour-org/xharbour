@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.4 2004/11/24 04:13:48 bdj Exp $
+ * $Id: gtwvw.c $
  */
 
 /*
@@ -97,10 +97,10 @@
     #define _WIN32_IE 0x0400
 #endif
 
+#include "hbgtwvw.h"
+
 #include <windows.h>
 #include <commctrl.h>
-
-#include "hbgtwvw.h"
 
 /***
 
@@ -141,6 +141,8 @@ static int  s_iDefLSpaceColor = -1;    /* if >= 0 this will be the color index
                                           for spacing between lines */
 
 static LOGFONT s_lfPB;       /* default font for pushbuttons */
+
+static LOGFONT s_lfCB;       /* default font for comboboxes */
 
 /* for GTWVW private use: ***********************************************/
 static BOOL s_bQuickSetMode = FALSE;   /* quick SetMode(), to reset maxrow() and maxcol() only */
@@ -324,7 +326,7 @@ static WNDPROC GetControlProc(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl);
 
 static int GetControlClass(USHORT usWinNum, HWND hWndCtrl);
 
-static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT message, WPARAM wParam, LPARAM lParam );
+static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT message, WPARAM wParam, LPARAM lParam, BYTE bEventType );
 static void ReposControls(USHORT usWinNum, BYTE byCtrlClass);
 
 /*-------------------------------------------------------------------*/
@@ -506,6 +508,11 @@ void HB_GT_FUNC( gt_Exit( void ) )
          if (pWindowData->hPBfont)
          {
            DeleteObject( ( HFONT ) pWindowData->hPBfont );
+         }
+
+         if (pWindowData->hCBfont)
+         {
+           DeleteObject( ( HFONT ) pWindowData->hCBfont );
          }
 
        }
@@ -1717,9 +1724,10 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
    HGLOBAL   hglb;
    LPTSTR    lptstr;
-   LPTSTR    lptstrOem;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   UINT      uFormat = ( s_pWindows[s_usCurWindow]->CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
+
+   if ( !IsClipboardFormatAvailable(uFormat) )
    {
      *pulMaxSize = 0;
      return;
@@ -1731,7 +1739,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
      return;
    }
 
-   hglb = GetClipboardData(CF_TEXT);
+   hglb = GetClipboardData(uFormat);
    if (hglb != NULL)
    {
       lptstr = (LPSTR) GlobalLock(hglb);
@@ -1748,17 +1756,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
             return;
          }
 
-         if( s_pWindows[s_usCurWindow]->CodePage == OEM_CHARSET )
-         {
-            lptstrOem = ( char* ) hb_xgrab( *pulMaxSize );
-            CharToOemBuff( ( LPCSTR ) lptstr, ( LPTSTR ) lptstrOem, *pulMaxSize );
-            memcpy( szData, lptstrOem, *pulMaxSize );
-            hb_xfree( lptstrOem );
-         }
-         else
-         {
-            memcpy( szData, lptstr, *pulMaxSize );
-         }
+         memcpy( szData, lptstr, *pulMaxSize );
 
          szData[*pulMaxSize] = '\0';
          GlobalUnlock(hglb);
@@ -1770,8 +1768,9 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
-   LPTSTR  lptstrAnsi;
+
    HGLOBAL hglbCopy;
+   UINT    uFormat = ( s_pWindows[s_usCurWindow]->CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
 
 /*  This poses problems when some other application copies a bitmap on the
     clipboard. The only way to set text to clipboard is made possible
@@ -1803,24 +1802,14 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
     */
    lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
 
-   if( s_pWindows[s_usCurWindow]->CodePage == OEM_CHARSET )
-   {
-      lptstrAnsi = ( char* ) hb_xgrab( ulSize+1 );
-      OemToCharBuff( ( LPCSTR ) szData, ( LPTSTR ) lptstrAnsi, ulSize + 1 );
-      memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );
-      hb_xfree( lptstrAnsi );
-   }
-   else
-   {
-      memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
-   }
+   memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
 
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;
    GlobalUnlock( hglbCopy );
 
    /* Place the handle on the clipboard.
     */
-   SetClipboardData( CF_TEXT, hglbCopy );
+   SetClipboardData( uFormat, hglbCopy );
 
    CloseClipboard();
 }
@@ -1829,9 +1818,10 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
    HGLOBAL   hglb;
    LPTSTR    lptstr;
+   UINT      uFormat = ( s_pWindows[s_usCurWindow]->CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
    int ret;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   if ( !IsClipboardFormatAvailable(uFormat) )
    {
      return 0;
    }
@@ -1841,7 +1831,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
      return 0;
    }
 
-   hglb = GetClipboardData(CF_TEXT);
+   hglb = GetClipboardData(uFormat);
    ret = 0;
    if (hglb != NULL)
    {
@@ -1862,7 +1852,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 void HB_GT_FUNC( gt_ProcessMessages( void ) )
 {
    hb_wvw_gtProcessMessages( s_pWindows[ s_usCurWindow ]) ;
-   return;
+
 }
 
 /* *********************************************************************** */
@@ -2119,7 +2109,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          return (long) hb_wvw_gtSetWindowIconFromFile( s_usCurWindow, (char *) vpParam  );
 
       case GTI_ICONRES:
-         return (long) hb_wvw_gtSetWindowIcon( s_usCurWindow, iParam );
+         return (long) hb_wvw_gtSetWindowIcon( s_usCurWindow, iParam, (char *) vpParam );
 
       /* TODO: these two doesn't seem right. see gtwin about what they're supposed to do */
       case GTI_VIEWMAXWIDTH:
@@ -3172,6 +3162,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
            hb_wvw_gtHandleMenuSelection( ( int ) LOWORD( wParam ) );
         }
         else
+        if (LOWORD(wParam) <= WVW_ID_MAX_PUSHBUTTON)
         {
 
            HWND hWndCtrl = (HWND) lParam;
@@ -3187,10 +3178,57 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
              return(0);
            }
 
-           RunControlBlock(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndCtrl, message, wParam, lParam );
+           RunControlBlock(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndCtrl, message, wParam, lParam, 0 );
 
            return 0 ;
         } /* button click */
+
+        else
+        {
+           /*
+           int lowordwParam = (int) LOWORD(wParam);
+           int hiwordwParam = (int) HIWORD(wParam);
+           int lowordlParam = (int) LOWORD(lParam);
+           int hiwordlParam = (int) HIWORD(lParam);
+           HWND hWndCtrl = (HWND) lParam;
+
+           TraceLog( NULL, "debugging: WM_COMMAND is processed?\n" );
+           TraceLog( NULL, "  lowordwParam (control id)=%i\n", lowordwParam );
+           TraceLog( NULL, "  hiwordwParam (notification)=%i\n", hiwordwParam );
+           TraceLog( NULL, "  lowordlParam=%i\n", lowordlParam );
+           TraceLog( NULL, "  hiwordlParam=%i\n", hiwordlParam );
+           */
+
+           switch( HIWORD(wParam) )
+           {
+
+             case CBN_SELCHANGE:
+             case CBN_SETFOCUS:
+             case CBN_KILLFOCUS:
+             {
+
+                HWND hWndCtrl = (HWND) lParam;
+                UINT uiCBid;
+                byte bStyle;
+
+                uiCBid = (UINT) FindControlId (usWinNum, WVW_CONTROL_COMBOBOX, hWndCtrl, &bStyle) ;
+                if (uiCBid==0)
+                {
+
+                  hb_wvw_gtHandleMenuSelection( ( int ) LOWORD( wParam ) );
+
+                  return(0);
+                }
+
+                RunControlBlock(usWinNum, WVW_CONTROL_COMBOBOX, hWndCtrl, message, wParam, lParam, (BYTE) HIWORD(wParam));
+
+                return 0 ;
+             }
+           }
+
+           return 1;
+        } /* combobox */
+
       }
       return( 0 );
     }
@@ -3235,6 +3273,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
        * using the update rect, determine which rows and columns of text
        * to paint, and do so
        */
+
       if ( pWindowData->pBuffer != NULL && pWindowData->pAttributes != NULL )
       {
 
@@ -3934,7 +3973,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         return(0);
       }
 
-      RunControlBlock(usWinNum, WVW_CONTROL_SCROLLBAR, hWndCtrl, message, wParam, lParam );
+      RunControlBlock(usWinNum, WVW_CONTROL_SCROLLBAR, hWndCtrl, message, wParam, lParam, 0 );
 
       return 0 ;
     } /* WM_VSCROLL  WM_HSCROLL */
@@ -4678,6 +4717,20 @@ static void gt_hbInitStatics( USHORT usWinNum, LPCTSTR lpszWinName, USHORT usRow
     s_lfPB.lfPitchAndFamily = FF_DONTCARE;
     strcpy( s_lfPB.lfFaceName, "Arial" );
 
+    s_lfCB.lfHeight         = pWindowData->fontHeight - 2;
+    s_lfCB.lfWidth          = 0;
+      s_lfCB.lfEscapement     = 0;
+      s_lfCB.lfOrientation    = 0;
+    s_lfCB.lfWeight         = 0;
+    s_lfCB.lfItalic         = 0;
+    s_lfCB.lfUnderline      = 0;
+    s_lfCB.lfStrikeOut      = 0;
+    s_lfCB.lfCharSet        = DEFAULT_CHARSET;
+
+    s_lfCB.lfQuality        = DEFAULT_QUALITY;
+    s_lfCB.lfPitchAndFamily = FF_DONTCARE;
+    strcpy( s_lfCB.lfFaceName, "Arial" );
+
     s_sApp.pSymWVW_PAINT    = hb_dynsymFind( "WVW_PAINT" ) ;
     s_sApp.pSymWVW_SETFOCUS = hb_dynsymFind( "WVW_SETFOCUS" ) ;
     s_sApp.pSymWVW_KILLFOCUS= hb_dynsymFind( "WVW_KILLFOCUS" ) ;
@@ -4793,6 +4846,8 @@ static void gt_hbInitStatics( USHORT usWinNum, LPCTSTR lpszWinName, USHORT usRow
   pWindowData->pcdCtrlList = NULL;
 
   pWindowData->hPBfont = NULL;  /* will be created on first creation of pushbutton, if ever */
+
+  pWindowData->hCBfont = NULL;  /* will be created on first creation of combobox, if ever */
 
   s_usCurWindow = usWinNum;
 }
@@ -5165,7 +5220,7 @@ static USHORT hb_wvw_gtOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, in
        (pParentWindow==NULL ? NULL : pParentWindow->hWnd),  /*x parent window */
 
        NULL,                                                /*menu            */
-       hb_hInstance,                                        /*x instance      */
+       (HINSTANCE) hb_hInstance,                            /*x instance      */
        NULL );                                              /*lpParam         */
 
     s_pWindows[ s_usNumWindows-1 ]->hWnd = hWnd;
@@ -5308,6 +5363,10 @@ static void hb_wvw_gtCloseWindow( void )
         DeleteObject( ( HFONT ) pWindowData->hPBfont );
       }
 
+      if (pWindowData->hCBfont)
+      {
+        DeleteObject( ( HFONT ) pWindowData->hCBfont );
+      }
     }
 
     hb_wvw_gtWindowEpilogue(  );
@@ -5352,6 +5411,7 @@ static VOID CALLBACK hb_wvw_gtFlashWindow(HWND hwnd, UINT uMsg, UINT_PTR idEvent
 
   if (++byCount >= 15)
   {
+
     KillTimer( hwnd, idEvent );
     byCount = 0;
     s_bFlashingWindow = FALSE;
@@ -5360,7 +5420,7 @@ static VOID CALLBACK hb_wvw_gtFlashWindow(HWND hwnd, UINT uMsg, UINT_PTR idEvent
 
 static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wParam, LPARAM lParam )
 {
-  //FLASHWINFO fwi;
+  FLASHWINFO fwi;
 
   /* user may handle this event and returns .t. from .PRG level
      using function WVW_INPUTFOCUS()
@@ -5399,8 +5459,9 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
   if (!s_bFlashingWindow)
   {
     s_bFlashingWindow = TRUE;
-    SetTimer( NULL, 0, 50, hb_wvw_gtFlashWindow );
+    SetTimer( NULL, 0, 50, (TIMERPROC) hb_wvw_gtFlashWindow );
   }
+
 }
 
 /* ********************************************************************
@@ -6874,9 +6935,19 @@ void HB_EXPORT hb_wvw_gtSetWindowTitle( USHORT usWinNum, char * title )
 
 /*-------------------------------------------------------------------*/
 
-DWORD HB_EXPORT hb_wvw_gtSetWindowIcon( USHORT usWinNum, int icon )
+DWORD HB_EXPORT hb_wvw_gtSetWindowIcon( USHORT usWinNum, int icon, char *lpIconName )
 {
-  HICON hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
+
+  HICON hIcon;
+
+  if( lpIconName == NULL )
+  {
+    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
+  }
+  else
+  {
+    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, lpIconName );
+  }
 
   if ( hIcon )
   {
@@ -7905,9 +7976,11 @@ HB_FUNC( WVW_SETFONT )
 HB_FUNC( WVW_SETICON )
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
-   if ( ISNUM( 2 ) )
+
+   if ( ISNUM( 2 ) || ISCHAR( 3 ) )
    {
-      hb_retnl( hb_wvw_gtSetWindowIcon( usWinNum, hb_parni( 2 ) ) ) ;
+
+      hb_retnl( hb_wvw_gtSetWindowIcon( usWinNum, hb_parni( 2 ), hb_parc( 3 ) ) ) ;
    }
    else
    {
@@ -9214,7 +9287,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
          else
          {
             s_sApp.pFunc[ iIndex ] = NULL;
-            s_sApp.iType[ iIndex ] = (int) NULL;
+            s_sApp.iType[ iIndex ] = 0;
          }
          SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
       }
@@ -9460,11 +9533,13 @@ HB_FUNC( WVW_LBSETCURSEL )
    SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_SETCURSEL, hb_parni( 3 ), 0 );
 }
 
+/* WARNING!!! this function is not member of WVW_CB* group of functions */
 HB_FUNC( WVW_CBADDSTRING )
 {
    SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), CB_ADDSTRING, 0, ( LPARAM )( LPSTR ) hb_parcx( 3 ) );
 }
 
+/* WARNING!!! this function is not member of WVW_CB* group of functions */
 HB_FUNC( WVW_CBSETCURSEL )
 {
    SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), CB_SETCURSEL, hb_parni( 3 ), 0 );
@@ -12278,7 +12353,7 @@ static BITMAPINFO * PackedDibLoad (PTSTR szFileName)
 
      dwPackedDibSize = bmfh.bfSize - sizeof (BITMAPFILEHEADER) ;
 
-     pbmi = hb_xgrab(dwPackedDibSize) ;
+     pbmi = (BITMAPINFO *) hb_xgrab(dwPackedDibSize) ;
 
      bSuccess = ReadFile (hFile, pbmi, dwPackedDibSize, &dwBytesRead, NULL) ;
      CloseHandle (hFile) ;
@@ -12413,7 +12488,7 @@ static HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight
 
 static void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
 {
-  BITMAP_HANDLE * pbhNew = hb_xgrab( sizeof( BITMAP_HANDLE ) );
+  BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
 
   strcpy(pbhNew->szFilename, szFileName);
   pbhNew->hBitmap = hBitmap;
@@ -12846,7 +12921,7 @@ HB_FUNC( WVW_TBCREATE)
                                    WS_CHILD | WS_VISIBLE | dwStyle,
                                    WVW_ID_BASE_TOOLBAR+usWinNum,
                                    0,
-                                   hb_hInstance,
+                                   (HINSTANCE) hb_hInstance,
                                    0,
                                    NULL,
                                    0,
@@ -13199,7 +13274,7 @@ static UINT LastControlId(USHORT usWinNum, BYTE byCtrlClass)
 static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid, HB_ITEM * phiCodeBlock, RECT rCtrl, RECT rOffCtrl, byte bStyle)
 {
   WIN_DATA * pWindowData = s_pWindows[usWinNum];
-  CONTROL_DATA * pcdNew = hb_xgrab( sizeof( CONTROL_DATA ) );
+  CONTROL_DATA * pcdNew = (CONTROL_DATA *) hb_xgrab( sizeof( CONTROL_DATA ) );
 
   pcdNew->byCtrlClass = byCtrlClass;
   pcdNew->hWndCtrl = hWndCtrl;
@@ -13297,7 +13372,7 @@ static int GetControlClass(USHORT usWinNum, HWND hWndCtrl)
   return 0;
 }
 
-static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT message, WPARAM wParam, LPARAM lParam )
+static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT message, WPARAM wParam, LPARAM lParam, BYTE bEventType )
 {
   WIN_DATA * pWindowData = s_pWindows[usWinNum];
   CONTROL_DATA * pcd = pWindowData->pcdCtrlList;
@@ -13311,7 +13386,10 @@ static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UI
     return;
   }
 
-  if ( (pcd->byCtrlClass==WVW_CONTROL_SCROLLBAR || pcd->byCtrlClass==WVW_CONTROL_PUSHBUTTON)
+  if ( (pcd->byCtrlClass==WVW_CONTROL_SCROLLBAR ||
+        pcd->byCtrlClass==WVW_CONTROL_PUSHBUTTON ||
+        pcd->byCtrlClass==WVW_CONTROL_COMBOBOX
+        )
        && pcd->hiCodeBlock.type == HB_IT_BLOCK && !(pcd->bBusy))
   {
      HB_ITEM hiWinNum, hiXBid, hiXBmsg, hiXBpos;
@@ -13338,6 +13416,64 @@ static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UI
      else if (pcd->byCtrlClass==WVW_CONTROL_PUSHBUTTON)
      {
         pReturn = hb_vmEvalBlockV( &(pcd->hiCodeBlock), 2, &hiWinNum, &hiXBid );
+     }
+
+     else if (pcd->byCtrlClass==WVW_CONTROL_COMBOBOX)
+     {
+        int     iCurSel;
+
+        HB_ITEM hiEvent, hiIndex;
+
+        switch (bEventType)
+        {
+           case CBN_SELCHANGE:
+           case CBN_SETFOCUS:
+           case CBN_KILLFOCUS:
+           {
+              iCurSel = SendMessage((HWND) pcd->hWndCtrl,
+                                    CB_GETCURSEL,
+                                    (WPARAM) 0,
+                                    (LPARAM) 0
+                                    );
+              if (iCurSel == CB_ERR)
+              {
+                 break;
+              }
+
+              /***********************
+              let user find by his own, what is the string of iCurSel
+              we don;t have to do this:
+
+              iTextLen = SendMessage((HWND) pcd->hWndCtrl,
+                                     CB_GETLBTEXTLEN,
+                                     (WPARAM) iCurSel;
+                                     (LPARAM) 0
+                                     );
+              lptstrSelected = ( char* ) hb_xgrab( iTextLen+1 );
+
+              SendMessage((HWND) pcd->hWndCtrl,
+                          CB_GETLBTEXT,
+                          (WPARAM) iCurSel,
+                          (LPARAM) lptstrSelected
+                          );
+
+              ...
+
+              hb_xfree( lptstrSelected );
+
+              **************************/
+
+              /* now execute the codeblock */
+              hiEvent.type = HB_IT_NIL;
+              hb_itemPutNI( &hiEvent, (int) bEventType );
+
+              hiIndex.type = HB_IT_NIL;
+              hb_itemPutNI( &hiIndex, (int) iCurSel );
+
+              pReturn = hb_vmEvalBlockV( &(pcd->hiCodeBlock), 4, &hiWinNum, &hiXBid, &hiEvent, &hiIndex );
+
+           }
+        }
      }
 
      HB_SYMBOL_UNUSED( pReturn );
@@ -13395,6 +13531,13 @@ static void ReposControls(USHORT usWinNum, BYTE byCtrlClass)
          else if (pcd->byCtrlClass==WVW_CONTROL_PROGRESSBAR)
          {
             iBottom = xy.y - 1 + pcd->rOffCtrl.bottom;
+            iRight  = xy.x - 1 + pcd->rOffCtrl.right;
+         }
+
+         else if (pcd->byCtrlClass==WVW_CONTROL_COMBOBOX)
+         {
+
+            iBottom = xy.y - 1 + (pcd->rOffCtrl.bottom * hb_wvw_LineHeight(pWindowData));
             iRight  = xy.x - 1 + pcd->rOffCtrl.right;
          }
 
@@ -13561,7 +13704,7 @@ HB_FUNC( WVW_XBCREATE)
        iBottom-iTop+1,
        hWndParent,
        (HMENU) uiXBid,
-       hb_hInstance,
+       (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
 
@@ -13935,7 +14078,7 @@ HB_FUNC( WVW_PBCREATE)
        iBottom-iTop+1,
        hWndParent,
        (HMENU) uiPBid,
-       hb_hInstance,
+       (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
 
@@ -14320,7 +14463,7 @@ HB_FUNC( WVW_PGCREATE)
        iBottom-iTop+1,
        hWndParent,
        (HMENU) uiPGid,
-       hb_hInstance,
+       (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
 
@@ -14489,6 +14632,763 @@ HB_FUNC( WVW_PGGETPOS )
 
 /*-------------------------------------------------------------------*/
 /* PROGRESSBAR ends                                                   */
+/*-------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------*/
+/* COMBOBOX begins (experimental)                                    */
+/*-------------------------------------------------------------------*/
+
+static LRESULT CALLBACK hb_wvw_gtCBProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+  HWND hWndParent = GetParent(hWnd);
+  USHORT usWinNum;
+
+  UINT uiCBid;
+  WNDPROC OldProc;
+  BYTE bKbdType;
+
+  if (hWndParent==NULL)
+  {
+
+    return( DefWindowProc( hWnd, message, wParam, lParam ) );
+  }
+
+  for(usWinNum=0; usWinNum<s_usNumWindows; usWinNum++)
+  {
+    if (s_pWindows[usWinNum]->hWnd == hWndParent)
+    {
+     break;
+    }
+  }
+  if(usWinNum>=s_usNumWindows)
+  {
+
+    return( DefWindowProc( hWnd, message, wParam, lParam ) );
+  }
+
+  uiCBid = (UINT) FindControlId (usWinNum, WVW_CONTROL_COMBOBOX, hWnd, &bKbdType) ;
+
+  if (uiCBid==0)
+  {
+    MessageBox( NULL, TEXT( "Failed FindControlId" ),
+                szAppName, MB_ICONERROR );
+
+    return( DefWindowProc( hWnd, message, wParam, lParam ) );
+  }
+
+  OldProc = GetControlProc(usWinNum, WVW_CONTROL_COMBOBOX, hWnd);
+  if (OldProc == NULL)
+  {
+    MessageBox( NULL, TEXT( "Failed GetControlProc" ),
+                szAppName, MB_ICONERROR );
+
+    return( DefWindowProc( hWnd, message, wParam, lParam ) );
+  }
+
+  switch ( message )
+  {
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+    {
+      BOOL bAlt      = GetKeyState( VK_MENU ) & 0x8000;
+      BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
+      BOOL bShift    = GetKeyState( VK_SHIFT ) & 0x8000;
+      int  c = (int) wParam;
+      BOOL bDropped;
+
+      if ( !hb_wvw_gtBufferedKey( (LONG) wParam ) )
+      {
+        break;
+      }
+
+      bDropped = SendMessage( (HWND) hWnd,
+                              CB_GETDROPPEDSTATE,
+                              (WPARAM) 0,
+                              (LPARAM) 0
+                             );
+
+      if (bKbdType==WVW_CB_KBD_STANDARD)
+      {
+
+        switch ( c )
+        {
+          case VK_ESCAPE:
+          {
+            if (!bCtrl && !bAlt && !bShift && !bDropped)
+            {
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+
+          case VK_TAB:
+          {
+            if (!bCtrl && !bAlt)
+            {
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+
+          case VK_RETURN:
+          {
+            if (!bCtrl && !bAlt && !bShift && !bDropped)
+            {
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+
+          default:
+          {
+            break;
+          }
+        }
+
+        break;
+
+      } /* WVW_CB_KBD_STANDARD */
+      else /* assume WVW_CB_KBD_CLIPPER */
+      {
+        switch(c)
+        {
+          case VK_RETURN:
+          {
+
+            if (bDropped || bAlt || bShift || bCtrl)
+            {
+
+              break;
+            }
+            else
+            {
+
+              if (!bDropped)
+              {
+                SendMessage(
+                  (HWND) hWnd,
+                  CB_SHOWDROPDOWN,
+                  (WPARAM) TRUE,
+                  (LPARAM) 0
+                );
+                return 0;
+              }
+              else
+              {
+
+                SetFocus(hWndParent);
+                PostMessage(hWndParent, message, wParam, lParam);
+                return 0;
+              }
+            }
+          }
+
+          case VK_UP:
+          case VK_DOWN:
+          case VK_ESCAPE:
+          {
+            if (bDropped || bAlt || bShift || bCtrl)
+            {
+
+              break;
+            }
+            else
+            {
+              SetFocus(hWndParent);
+              PostMessage(hWndParent, message, wParam, lParam);
+              return 0;
+            }
+          }
+
+          case VK_TAB:
+          {
+            if (!bCtrl && !bAlt )
+            {
+
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+        }
+        break;
+
+      }
+    }
+  }
+
+  return( CallWindowProc( OldProc, hWnd, message, wParam, lParam ) );
+}
+
+/*WVW_CBcreate( [nWinNum], nTop, nLeft, nWidth, aText, bBlock, nListLines, ;
+ *                         nReserved, nKbdType, aOffset)
+ *create combobox (drop-down list, no editbox) for window nWinNum
+ *nTop: row of top/left corner (in character unit)
+ *nLeft: col of top/left corner (in character unit)
+ *nWidth: width of combobox (in character unit)
+ *aText: array of drop-down list members, default = {"empty"}
+ *       eg. {"yes","no"}
+ *bBlock: codeblock to execute on these events:
+ *         event=CBN_SELCHANGE(1): user changes selection
+                        (not executed if selection
+                        is changed programmatically)
+ *         event=CBN_SETFOCUS
+ *         event=CBN_KILLFOCUS
+ *         This codeblock will be evaluated with these parameters:
+ *         nWinNum: window number
+ *         nCBid  : combobox id
+ *         nType  : event type (CBN_SELCHANGE/CBN_SETFOCUS/CBN_KILLFOCUS supported)
+ *         nIndex : index of the selected list item (0 based)
+ *nListLines: number of lines for list items, default = 3
+ *            (will be automatically truncated if it's > len(aText))
+ *nReserved: reserved for future (this parm is now ignored)
+ *
+ *nKbdType: WVW_CB_KBD_STANDARD (0): similar to standard windows convention
+ *            ENTER/ESC: will kill focus from combobox
+ *          WVW_CB_KBD_CLIPPER (1):
+ *            ENTER: drop (show) the list box
+ *            UP/DOWN/TAB/SHIFTTAB/ESC: kill focus
+ *default is WVW_CB_KBD_STANDARD (0)
+ *
+ *aOffset: array {y1,x1,y2,x2} of offsets to corner pixels, to adjust
+ *         dimension of combobox.
+ *         defaults: {-2,-2,+2,+2}
+ *         NOTES: the third element (y2) is actually ignored.
+ *                height of combobox is always 1 char height
+ *                (see also wvw_cbSetFont())
+ *
+ *returns control id of newly created combobox of windows nWinNum
+ *returns 0 if failed
+ *
+ *example:
+ */
+
+HB_FUNC( WVW_CBCREATE)
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+   HWND hWndParent = pWindowData->hWnd;
+   HWND hWndCB;
+   HWND hWndLB;
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+   int   iOffTop, iOffLeft, iOffBottom, iOffRight;
+   UINT uiCBid;
+   USHORT   usWidth  = hb_parni( 4 );
+   USHORT   usTop    = hb_parni( 2 ),
+            usLeft   = hb_parni( 3 ),
+            usBottom = usTop,
+            usRight  = usLeft + usWidth - 1;
+   USHORT   usNumElement = ISARRAY(5) ? hb_arrayLen( hb_param(5, HB_IT_ARRAY) ) : 0;
+   USHORT   usListLines  = ISNUM(7) ? hb_parni(7) : 3;
+   BYTE     byCharHeight = hb_wvw_LineHeight(pWindowData);
+
+   /* in the future combobox type might be selectable by 8th parameter */
+   int      iStyle = CBS_DROPDOWNLIST | WS_VSCROLL;
+   BYTE     bKbdType = ISNUM(9) ? hb_parni(9) : WVW_CB_KBD_STANDARD;
+
+   if (pWindowData->hCBfont==NULL)
+   {
+      pWindowData->hCBfont = CreateFontIndirect( &s_lfCB );
+      if (pWindowData->hCBfont==NULL)
+      {
+        hb_retnl(0);
+        return;
+      }
+   }
+
+   iOffTop    = !ISNIL( 10 ) ? hb_parni( 10,1 ) : 0;
+   iOffLeft   = !ISNIL( 10 ) ? hb_parni( 10,2 ) : 0;
+
+   iOffBottom = usListLines;
+   iOffRight  = !ISNIL( 10 ) ? hb_parni( 10,4 ) : 0;
+
+   if (s_bMainCoordMode)
+   {
+     hb_wvw_HBFUNCPrologue(usWinNum, &usTop, &usLeft, &usBottom, &usRight);
+   }
+
+   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usLeft, usTop );
+   iTop    = xy.y + iOffTop ;
+   iLeft   = xy.x + iOffLeft;
+
+   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
+
+   xy.y   -= pWindowData->byLineSpacing;
+
+   iBottom = xy.y - 1 + (iOffBottom * byCharHeight);
+   iRight  = xy.x - 1 + iOffRight;
+
+   uiCBid = LastControlId(usWinNum, WVW_CONTROL_COMBOBOX);
+   if (uiCBid==0)
+   {
+     uiCBid = WVW_ID_BASE_COMBOBOX;
+   }
+   else
+   {
+     uiCBid++;
+   }
+
+   InitCommonControls();
+
+   hWndCB = CreateWindowEx(
+       0L,
+       "COMBOBOX",
+       (LPSTR) NULL,
+       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,
+       iLeft,
+       iTop,
+       iRight-iLeft+1,
+       iBottom-iTop+1,
+       hWndParent,
+       (HMENU) uiCBid,
+       (HINSTANCE) hb_hInstance,
+       (LPVOID) NULL
+   );
+
+   if(hWndCB)
+   {
+     RECT rXB, rOffXB;
+     WNDPROC OldProc;
+     USHORT i;
+     TCHAR szDefault[] = TEXT( "empty" );
+
+     SendMessage(
+       (HWND) hWndCB,
+       WM_SETREDRAW,
+       (WPARAM) TRUE,
+       (LPARAM) 0
+     );
+
+     if (usNumElement==0)
+     {
+       if (SendMessage((HWND) hWndCB,
+                    CB_ADDSTRING,
+                    (WPARAM) 0,
+                    (LPARAM) (LPCTSTR) szDefault
+                  ) < 0)
+       {
+         /* ignore failure */
+
+       }
+     }
+     else
+     {
+       for(i=1; i<=usNumElement; i++)
+       {
+         if (SendMessage((HWND) hWndCB,
+                      CB_ADDSTRING,
+                      (WPARAM) 0,
+                      (LPARAM) (LPCTSTR) hb_parcx( 5, i)
+                    ) < 0)
+         {
+           /* ignore failure */
+
+         }
+       }
+     }
+
+     SendMessage(
+       (HWND) hWndCB,
+       CB_SETCURSEL,
+       (WPARAM) 0,
+       (LPARAM) 0
+     );
+
+     SendMessage(
+       (HWND) hWndCB,
+       CB_SETEXTENDEDUI,
+       (WPARAM) TRUE,
+       (LPARAM) 0
+     );
+
+     rXB.top = usTop;     rXB.left= usLeft;
+     rXB.bottom=usBottom; rXB.right =usRight;
+     rOffXB.top = iOffTop;     rOffXB.left= iOffLeft;
+
+     rOffXB.bottom=iOffBottom; rOffXB.right =iOffRight;
+
+     AddControlHandle(usWinNum, WVW_CONTROL_COMBOBOX, hWndCB, uiCBid, (HB_ITEM *) hb_param( 6, HB_IT_BLOCK ), rXB, rOffXB, (byte) bKbdType);
+
+     OldProc = (WNDPROC) SetWindowLong (hWndCB,
+                                        GWL_WNDPROC, (LONG) hb_wvw_gtCBProc) ;
+
+     StoreControlProc(usWinNum, WVW_CONTROL_COMBOBOX, hWndCB, OldProc);
+
+     SendMessage( hWndCB, WM_SETFONT, (WPARAM) pWindowData->hCBfont, (LPARAM) TRUE);
+
+     hb_retnl( (LONG) uiCBid );
+   }
+   else
+   {
+
+     hb_retnl( (LONG) 0 );
+   }
+}
+
+/*WVW_CBdestroy( [nWinNum], nCBid )
+ *destroy combobox nCBid for window nWinNum
+ */
+HB_FUNC( WVW_CBDESTROY)
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+   UINT uiCBid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   CONTROL_DATA * pcd = pWindowData->pcdCtrlList;
+   CONTROL_DATA * pcdPrev = (CONTROL_DATA *) NULL;
+
+   while (pcd)
+   {
+     if (pcd->byCtrlClass == WVW_CONTROL_COMBOBOX && pcd->uiCtrlid == uiCBid)
+     {
+       break;
+     }
+
+     pcdPrev = pcd;
+     pcd = pcd->pNext;
+   }
+   if (pcd==NULL) { return; }
+
+   DestroyWindow (pcd->hWndCtrl) ;
+
+   if (pcdPrev==NULL)
+   {
+     pWindowData->pcdCtrlList = pcd->pNext;
+   }
+   else
+   {
+     pcdPrev->pNext = pcd->pNext;
+   }
+
+   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   {
+      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
+      hb_itemClear( &(pcd->hiCodeBlock) );
+   }
+
+   hb_xfree( pcd );
+}
+
+/*WVW_CBsetFocus( [nWinNum], nComboId )
+ *set the focus to combobox nComboId in window nWinNum
+ */
+HB_FUNC( WVW_CBSETFOCUS )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
+  byte   bStyle;
+  HWND   hWndCB = FindControlHandle(usWinNum, WVW_CONTROL_COMBOBOX, uiCtrlId, &bStyle);
+
+  if (hWndCB)
+  {
+    hb_retl(hWndCB == SetFocus(hWndCB));
+  }
+  else
+  {
+    hb_retl(FALSE);
+  }
+}
+
+/*WVW_CBisFocused( [nWinNum], nComboId )
+ *returns .t. if the focus is on combobox nComboId in window nWinNum
+ */
+HB_FUNC( WVW_CBISFOCUSED )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
+  byte   bStyle;
+  HWND   hWndCB = FindControlHandle(usWinNum, WVW_CONTROL_COMBOBOX, uiCtrlId, &bStyle);
+
+  hb_retl((HWND) GetFocus() == hWndCB);
+}
+
+/*WVW_CBenable( [nWinNum], nComboId, [lEnable] )
+ *enable/disable button nComboId on window nWinNum
+ *(lEnable defaults to .t., ie. enabling the combobox)
+ *return previous state of the combobox (TRUE:enabled FALSE:disabled)
+ *(if nComboId is invalid, this function returns FALSE too)
+ */
+HB_FUNC( WVW_CBENABLE )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
+  BOOL   bEnable  = ISNIL(3) ? TRUE : hb_parl(3);
+  byte   bStyle;
+  HWND   hWndCB = FindControlHandle(usWinNum, WVW_CONTROL_COMBOBOX, uiCtrlId, &bStyle);
+
+  if (hWndCB)
+  {
+    hb_retl( EnableWindow(hWndCB, bEnable)==0 );
+
+    if (!bEnable)
+    {
+       SetFocus( s_pWindows[ usWinNum ]->hWnd );
+    }
+  }
+  else
+  {
+    hb_retl(FALSE);
+  }
+}
+
+/*WVW_CBsetcodeblock( [nWinNum], nCBid, bBlock )
+ *assign (new) codeblock bBlock to combobox nCBid for window nWinNum
+ *
+ * return .t. if successful
+ */
+HB_FUNC( WVW_CBSETCODEBLOCK )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCBid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+
+   if (!ISBLOCK(3) || pcd==NULL || pcd->bBusy)
+   {
+     hb_retl( FALSE );
+     return;
+   }
+
+   pcd->bBusy = TRUE;
+
+   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   {
+      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
+      hb_itemClear( &(pcd->hiCodeBlock) );
+   }
+
+   pcd->hiCodeBlock.type = HB_IT_NIL;
+   hb_itemCopy( &(pcd->hiCodeBlock), (HB_ITEM *) hb_param( 3, HB_IT_BLOCK ));
+   HB_ITEM_LOCK( &(pcd->hiCodeBlock) );
+
+   pcd->bBusy = FALSE;
+
+   hb_retl( TRUE );
+}
+
+/*WVW_CBSetFont([nWinNum], cFontFace, nHeight, nWidth, nWeight, nQUality,;
+ *                             lItalic, lUnderline, lStrikeout
+ *
+ *this will initialize font for ALL comboboxes in window nWinNum
+ *(including ones created later on)
+ *
+ *TODO: ? should nHeight be ignored, and always forced to use standard char height?
+ */
+HB_FUNC( WVW_CBSETFONT )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+
+   BOOL  retval = TRUE;
+
+   s_lfCB.lfHeight         = ISNIL( 3 ) ? pWindowData->fontHeight - 2 : hb_parnl( 3 );
+   s_lfCB.lfWidth          = ISNIL( 4 ) ? s_lfCB.lfWidth : hb_parni( 4 );
+     s_lfCB.lfEscapement     = 0;
+     s_lfCB.lfOrientation    = 0;
+   s_lfCB.lfWeight         = ISNIL( 5 ) ? s_lfCB.lfWeight : hb_parni( 5 );
+   s_lfCB.lfItalic         = ISNIL( 7 ) ? s_lfCB.lfItalic : hb_parl( 7 );
+   s_lfCB.lfUnderline      = ISNIL( 8 ) ? s_lfCB.lfUnderline : hb_parl( 8 );
+   s_lfCB.lfStrikeOut      = ISNIL( 9 ) ? s_lfCB.lfStrikeOut : hb_parl( 9 );
+   s_lfCB.lfCharSet        = DEFAULT_CHARSET;
+
+   s_lfCB.lfQuality        = ISNIL( 6 ) ? s_lfCB.lfQuality : hb_parni( 6 );
+   s_lfCB.lfPitchAndFamily = FF_DONTCARE;
+   if ( ISCHAR( 2 ) )
+   {
+      strcpy( s_lfCB.lfFaceName, hb_parcx( 2 ) );
+   }
+
+   if (pWindowData->hCBfont)
+   {
+      HFONT hOldFont = pWindowData->hCBfont;
+      HFONT hFont = CreateFontIndirect( &s_lfCB );
+      if (hFont)
+      {
+         CONTROL_DATA * pcd = pWindowData->pcdCtrlList;
+
+         while (pcd)
+         {
+           if ((pcd->byCtrlClass == WVW_CONTROL_COMBOBOX) &&
+               ((HFONT) SendMessage( pcd->hWndCtrl, WM_GETFONT, (WPARAM) 0, (LPARAM) 0) == hOldFont)
+              )
+           {
+              SendMessage( pcd->hWndCtrl, WM_SETFONT, (WPARAM) hFont, (LPARAM) TRUE);
+
+           }
+
+           pcd = pcd->pNext;
+         }
+
+         pWindowData->hCBfont = hFont;
+         DeleteObject( (HFONT) hOldFont );
+
+      }
+      else
+      {
+         retval = FALSE;
+      }
+   }
+
+   hb_retl( retval );
+
+}
+
+/*WVW_CBsetIndex( [nWinNum], nCBid, nIndex )
+ *set current selection of combobox nCBid in window nWinNum to nIndex
+ *(nIndex is 0 based)
+ *returns .t. if successful.
+ *
+ *NOTE: the better name to this function should be WVW_CBsetCurSel()
+ *      but that name is already used.
+ *      (WVW_CBsetcursel() and WVW_CBaddstring() is NOT related to other
+ *       WVW_CB* functions)
+ */
+HB_FUNC( WVW_CBSETINDEX )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCBid = hb_parni(2);
+   int iIndex = hb_parni(3);
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+   BOOL  retval;
+
+   if (pcd==NULL || iIndex < 0)
+   {
+     hb_retl(FALSE);
+     return;
+   }
+
+   retval = (SendMessage((HWND) pcd->hWndCtrl,
+                         CB_SETCURSEL,
+                         (WPARAM) iIndex,
+                         (LPARAM) 0
+                         )==iIndex);
+   hb_retl(retval);
+}
+
+/*WVW_CBgetIndex( [nWinNum], nCBid )
+ *get current selection of combobox nCBid in window nWinNum
+ *return nIndex (0 based)
+ *returns CB_ERR (-1) if none selected
+ *
+ *NOTE: the better name to this function should be WVW_CBgetCurSel()
+ *      but that name is potentially misleading to WVW_CBsetCursel
+ *      which is not our family of WVW_CB* functions
+ *      (WVW_CBsetcursel() and WVW_CBaddstring() is NOT related to other
+ *       WVW_CB* functions)
+ */
+HB_FUNC( WVW_CBGETINDEX )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCBid = hb_parni(2);
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+   int retval;
+
+   if (pcd==NULL)
+   {
+     hb_retni(CB_ERR);
+     return;
+   }
+
+   retval = SendMessage((HWND) pcd->hWndCtrl,
+                        CB_GETCURSEL,
+                        (WPARAM) 0,
+                        (LPARAM) 0
+                        );
+   hb_retni(retval);
+}
+
+/*WVW_CBfindString( [nWinNum], nCBid, cString )
+ *find index of cString in combobox nCBid in window nWinNum
+ *returns index of cString (0 based)
+ *returns CB_ERR (-1) if string not found
+ *
+ *NOTE:case insensitive
+ */
+HB_FUNC( WVW_CBFINDSTRING )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCBid = hb_parni(2);
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+   int retval;
+
+   if (pcd==NULL)
+   {
+     hb_retni(CB_ERR);
+     return;
+   }
+
+   retval = SendMessage((HWND) pcd->hWndCtrl,
+                         CB_FINDSTRING,
+                         (WPARAM) -1,
+                         (LPARAM) (LPCSTR) hb_parcx(3)
+                         );
+   hb_retni(retval);
+}
+
+/*WVW_cbGetCurText( [nWinNum], nCBid )
+ *get current selected cString in combobox nCBid in window nWinNum
+ *returns "" if none selected
+ *
+ */
+HB_FUNC( WVW_CBGETCURTEXT )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCBid = hb_parni(2);
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+   int iCurSel,iTextLen;
+   LPTSTR lptstr;
+
+   if (pcd==NULL)
+   {
+     hb_retclen(lptstr,0);
+     return;
+   }
+
+   iCurSel = SendMessage((HWND) pcd->hWndCtrl,
+                        CB_GETCURSEL,
+                        (WPARAM) 0,
+                        (LPARAM) 0
+                        );
+   iTextLen = SendMessage((HWND) pcd->hWndCtrl,
+                          CB_GETLBTEXTLEN,
+                          (WPARAM) iCurSel,
+                          (LPARAM) 0
+                          );
+   if (iTextLen==CB_ERR)
+   {
+     hb_retclen(lptstr, 0);
+     return;
+   }
+
+   lptstr = ( char* ) hb_xgrab( iTextLen+1 );
+   if (SendMessage((HWND) pcd->hWndCtrl,
+                   CB_GETLBTEXT,
+                   (WPARAM) iCurSel,
+                   (LPARAM) lptstr
+                   )==CB_ERR)
+   {
+     hb_retclen(lptstr, 0);
+   }
+   else
+   {
+     hb_retc(lptstr);
+   }
+   hb_xfree( lptstr );
+}
+
+/*-------------------------------------------------------------------*/
+/* COMBOBOX ends (experimental)                                    */
 /*-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------*

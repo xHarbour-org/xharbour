@@ -89,6 +89,16 @@
 
    #if defined(_MSC_VER)
       #include <conio.h>
+
+      #if !defined( LONG_PTR )
+         typedef __int64 LONG_PTR ;
+         #ifndef SetWindowLongPtr
+            #define SetWindowLongPtr SetWindowLong
+         #endif
+         #ifndef GetWindowLongPtr
+            #define GetWindowLongPtr GetWindowLong
+         #endif
+      #endif
    #endif
 #else
    #include <olectl.h>
@@ -104,7 +114,6 @@
 #include "inkey.ch"
 #include "error.ch"
 #include "hbvm.h"
-#include "hbstack.h"
 
 /*-------------------------------------------------------------------*/
 
@@ -143,10 +152,16 @@
 
 #define WVW_ID_BASE_PROGRESSBAR 100
 
-#define WVW_ID_BASE_PUSHBUTTON 65000
+#define WVW_ID_BASE_PUSHBUTTON 64000
 
 #define WVW_ID_MAX_PUSHBUTTON  WVW_ID_BASE_PUSHBUTTON+200-1
 /* ie. effectively there are max 200 buttons on a window */
+
+#define WVW_ID_BASE_COMBOBOX   WVW_ID_MAX_PUSHBUTTON+1
+#define WVW_CB_KBD_STANDARD  0
+#define WVW_CB_KBD_CLIPPER   1
+
+#define WVW_COMBOBOX_MAXLEN  255  /* maximum length of combobox string */
 
 #define WVW_CHAR_QUEUE_SIZE  128
 #define WVW_CHAR_BUFFER     1024
@@ -212,6 +227,7 @@ typedef struct bitmap_handle
 #define WVW_CONTROL_SCROLLBAR  1
 #define WVW_CONTROL_PUSHBUTTON 2
 #define WVW_CONTROL_PROGRESSBAR  3
+#define WVW_CONTROL_COMBOBOX   4
 
 #define WVW_MAXCAPTIONLENGTH  80
 
@@ -225,6 +241,7 @@ typedef struct control_data
   RECT    rCtrl, rOffCtrl;
 
   /* SCROLLBAR specifics: */
+  /* also used by combobox to store kbd type */
   byte    bStyle;
 
   /* PUSHBUTTON specifics: */
@@ -316,6 +333,8 @@ typedef struct win_data
 
   HFONT     hPBfont;                   /* handle to font used by pushbuttons */
 
+  HFONT     hCBfont;                   /* handle to font used by comboboxes */
+
   BOOL      bIgnoreWM_SYSCHAR;
   BOOL      bPaint;
   BOOL      bGetFocus;
@@ -377,7 +396,7 @@ void   HB_EXPORT hb_wvw_gtResetWindow( USHORT usWinNum );
 BOOL   HB_EXPORT hb_wvw_gtSetCodePage( USHORT usWinNum, int iCodePage );
 int    HB_EXPORT hb_wvw_gtGetLastMenuEvent( USHORT usWinNum );
 void   HB_EXPORT hb_wvw_gtSetWindowTitle( USHORT usWinNum, char * title );
-DWORD  HB_EXPORT hb_wvw_gtSetWindowIcon( USHORT usWinNum, int icon );
+DWORD  HB_EXPORT hb_wvw_gtSetWindowIcon( USHORT usWinNum, int icon, char *lpicon );
 DWORD  HB_EXPORT hb_wvw_gtSetWindowIconFromFile( USHORT usWinNum, char *icon );
 int    HB_EXPORT hb_wvw_gtGetWindowTitle( USHORT usWinNum, char *title, int length );
 BOOL   HB_EXPORT hb_wvw_gtSetFont( USHORT usWinNum, char *fontFace, int height, int width, int Bold, int Quality );
