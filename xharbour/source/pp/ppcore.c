@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.120 2004/01/18 02:21:25 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.121 2004/01/18 03:51:35 paultucker Exp $
  */
 
 /*
@@ -654,7 +654,7 @@ char * hb_ppPlatform( void )
                break;
          }
 
-         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName, 
+         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName,
                               ( ULONG ) osVer.dwMajorVersion,
                               ( ULONG ) osVer.dwMinorVersion,
                               ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
@@ -3229,23 +3229,26 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       {
          lens = pTmp - *ptri;
 
-         if( expreal != NULL )
+         if( expreal )
          {
             strncpy( expreal, *ptri, lens );
             expreal[lens] = '\0';
-
-            *ptri   += lens;
             expreal += lens;
          }
+
+         *ptri += lens;
       }
       else
       {
-         strcpy( expreal, *ptri );
+         lens = strlen( *ptri );
 
-         lens = strlen( expreal );
+         if( expreal )
+         {
+            strcpy( expreal, *ptri );
+            expreal += lens;
+         }
 
-         *ptri   += lens;
-         expreal += lens;
+         *ptri += lens;
       }
 
       goto Done;

@@ -2367,7 +2367,7 @@ RETURN nIf
 
 //------------------------------- *** END - RP DOT Functions *** -------------------------------//
 
-FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
+FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLines )
 
    LOCAL hSource, sBuffer, sLine, nPosition, sExt, cPrev
    LOCAL nLen, nMaxPos, cChar := '', nClose, nBase, nNext, nLine := 0
@@ -2375,9 +2375,16 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    LOCAL sPath := "", oError, sPrevFile := s_sFile
    LOCAL sTmp, nLastPosition := 0
    LOCAL bErrHandler
+   LOCAL lMaintainPending
 
    IF At( '.', sSource ) == 0
      sSource += ".prg"
+   ENDIF
+
+   IF aPendingLines == NIL
+      lMaintainPending := .F.
+   ELSE
+      lMaintainPending := .T.
    ENDIF
 
    s_sFile := sSource
@@ -2405,7 +2412,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
       sPath := s_asPaths[ nPath - 1 ]
    ENDIF
 
-   IF hPP == NIL
+   IF hPP == NIL .AND. aPendingLines == NIL
       IF bBlanks == NIL
          bBlanks := .T.
       ENDIF
@@ -2429,7 +2436,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
          ENDIF
       ENDIF
    ELSE
-      FWrite( hPP, '#line 1 "' + sPath + Upper( sSource ) + '"' + CRLF )
+      sLine := '#line 1 "' + sPath + Upper( sSource ) + '"'
+      FWrite( hPP, sLine + CRLF )
+      IF lMaintainPending
+         aAdd( aPendingLines, sLine )
+      ENDIF
       bBlanks := .F.
    ENDIF
 
@@ -2468,6 +2479,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
                          IF bBlanks
                             FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
                          ENDIF
 
                          nNext++
@@ -2493,6 +2507,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          ENDIF
                          IF bBlanks
                             FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
                          ENDIF
                          nNext++
                       ENDDO
@@ -2533,6 +2550,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
                          IF bBlanks
                             FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
                          ENDIF
 
                          /* Right after the NL */
@@ -2550,12 +2570,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          IF LTrim( sLine ) == ''
                             IF bBlanks
                                FWrite( hPP, CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, "" )
+                               ENDIF
                             ENDIF
                          ELSE
                             IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
                                sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
                                IF bBlanks .OR. ! ( sLine == '' )
                                   FWrite( hPP, sLine + CRLF )
+                                  IF lMaintainPending
+                                     aAdd( aPendingLines, sLine )
+                                  ENDIF
                                ENDIF
                             ENDIF
                          ENDIF
@@ -2592,12 +2618,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       IF LTrim( sLine ) == ''
                          IF bBlanks
                             FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
                          ENDIF
                       ELSE
                          IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
                             sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
                             IF bBlanks .OR. ! ( sLine == '' )
                                FWrite( hPP, sLine + CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, sLine )
+                               ENDIF
                             ENDIF
                          ENDIF
                       ENDIF
@@ -2630,6 +2662,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          ENDIF
                          IF bBlanks
                             FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
                          ENDIF
                          nPosition += ( nClose )
                          sLine := ''
@@ -2661,6 +2696,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       ENDIF
                       IF bBlanks
                          FWrite( hPP, CRLF )
+                         IF lMaintainPending
+                            aAdd( aPendingLines, "" )
+                         ENDIF
                       ENDIF
                       nPosition += ( nClose )
                       sLine := ''
@@ -2769,6 +2807,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                    sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
                    IF bBlanks
                       FWrite( hPP, CRLF )
+                      IF lMaintainPending
+                         aAdd( aPendingLines, "" )
+                      ENDIF
                    ENDIF
 
                    /* Skip leading spaces in continued next line. */
@@ -2783,6 +2824,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                    IF LTrim( sLine ) == ''
                       IF bBlanks
                          FWrite( hPP, CRLF )
+                         IF lMaintainPending
+                            aAdd( aPendingLines, "" )
+                         ENDIF
                       ENDIF
                    ELSE
                       //sLine += sRight
@@ -2790,6 +2834,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
                          IF bBlanks .OR. ! ( sLine == '' )
                             FWrite( hPP, sLine + CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, sLine )
+                            ENDIF
                          ENDIF
                       ENDIF
                    ENDIF
@@ -2809,12 +2856,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                 IF LTrim( sLine ) == ''
                    IF bBlanks
                       FWrite( hPP, CRLF )
+                      IF lMaintainPending
+                         aAdd( aPendingLines, "" )
+                      ENDIF
                    ENDIF
                 ELSE
                    IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
                       sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
                       IF bBlanks .OR. ! ( sLine == '' )
                          FWrite( hPP, sLine + CRLF )
+                         IF lMaintainPending
+                            aAdd( aPendingLines, sLine )
+                         ENDIF
                       ENDIF
                    ENDIF
                 ENDIF
@@ -2881,12 +2934,18 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    IF LTrim( sLine ) == ''
       IF bBlanks
          FWrite( hPP, sLine )
+         IF lMaintainPending
+            aAdd( aPendingLines, sLine )
+         ENDIF
       ENDIF
    ELSE
       IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
          sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
          IF bBlanks .OR. ! ( sLine == '' )
             FWrite( hPP, sLine + CRLF )
+            IF lMaintainPending
+               aAdd( aPendingLines, sLine )
+            ENDIF
          ENDIF
       ENDIF
    ENDIF
@@ -2905,6 +2964,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    IF ! Empty( sPrevFile )
       s_sFile := sPrevFile
    ENDIF
+
+   //TraceLog( ValToPrg( aPendingLines ) )
 
 RETURN .T.
 
@@ -3004,11 +3065,12 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          IF s_sIncludeFile != NIL
             IF ! Empty( sSource )
-               aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) + ' "' + Upper( sSource ) + '"' )
+               aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) )
             ENDIF
             s_sIncludeFile := NIL
          ENDIF
 
+         //TraceLog( "Processing: '" + sLine +"'" )
          //? "Processing: '" + sLine +"'"
          //WAIT
 
@@ -3058,6 +3120,12 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   Eval( bErrHandler, ErrorNew( [PP], 2069, [Pre-Process], [#endif with no #ifdef in sight],  ) )
                ENDIF
 
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == "LINE"
+
+               aAdd( asOutLines, "#line " + sLine )
                sLine := ''
                LOOP
 
@@ -3220,7 +3288,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
              #endif
 
                ELSE
-                  PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
+                  IF bCompile .OR. ( hPP != NIL .AND. hPP > 0 )
+                     PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
+                  ELSE
+                     PP_PreProFile( sLine, NIL, .T., .F., aPendingLines ) // Intentionally not using s_sIncludeFile
+                     aAdd( aPendingLines, "#line " + LTrim( Str( nLine ) ) + " " + sSource )
+                     nPendingLines := Len( aPendingLines )
+                  ENDIF
 
                   /* Recursion safety - don't use the Static might be modified. */
                   s_sIncludeFile := sLine
@@ -4870,10 +4944,10 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
             IF nCommaAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
                nAt := nCommaAt
             ENDIF
-            IF nDoubleAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
+            IF nDoubleAt > 0 .AND. ( nAt == 0 .OR. nAt > nDoubleAt )
                nAt := nDoubleAt
             ENDIF
-            IF nSingleAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
+            IF nSingleAt > 0 .AND. ( nAt == 0 .OR. nAt > nSingleAt )
                nAt := nSingleAt
             ENDIF
 
@@ -5523,8 +5597,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            nGroupIterator := Counter
            nRepeats := 0
            WHILE nGroupIterator <= nResults .AND. aResults[1][nGroupIterator][1] == nDependee
-              IF ValType( aResults[1][nGroupIterator][2] ) == 'N' .AND. ValType( aMarkers[ aResults[1][nGroupIterator][2] ] ) == 'A'
-                 nRepeats := Max( nRepeats, Len( aMarkers[ aResults[1][nGroupIterator][2] ] ) )
+              IF ValType( aResults[1][nGroupIterator][2] ) == 'N'
+                 IF ValType( aMarkers[ aResults[1][nGroupIterator][2] ] ) == 'A'
+                    nRepeats := Max( nRepeats, Len( aMarkers[ aResults[1][nGroupIterator][2] ] ) )
+                 ELSEIF ! Empty( aMarkers[ aResults[1][nGroupIterator][2] ] )
+                    nRepeats := Max( nRepeats, 1 )
+                 ENDIF
               ENDIF
               nGroupIterator++
            ENDDO
@@ -9048,7 +9126,7 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 RETURN
 
 //--------------------------------------------------------------//
-FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
+FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSource )
 
    LOCAL nOpen, nClose, sTemp := "", nLine, nLines
    LOCAL bErrHandler, oError
@@ -9067,6 +9145,14 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
 
    IF asLines == NIL
       asLines := {}
+   ENDIF
+
+   IF nStartLine == NIL
+      nStartLine := 1
+   ENDIF
+
+   IF sSource == NIL
+      sSource := ""
    ENDIF
 
    sLines := StrTran( sLines, Chr(13), " " )
@@ -9215,7 +9301,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
             ENDIF
          ENDDO
 
-         sTemp := PP_PreProLine( sTemp )
+         sTemp := PP_PreProLine( sTemp, nStartLine + nLine - 1, sSource )
 
          sLines += sTemp
          sLines += ";"
@@ -9540,7 +9626,7 @@ PROCEDURE PP_Warning( cMsg )
    ? cMsg
 RETURN
 
-Static FUNCTION Version
+FUNCTION PP_Version()
 
 RETURN s_cVer
 

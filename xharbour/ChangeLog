@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2096 2004/01/18 13:04:24 paultucker Exp $
+ * $Id: ChangeLog,v 1.2097 2004/01/18 20:48:50 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-19 09:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Fixed gpf trap related to recent changes to Extended Match Marker.
+
+  * tests/pp.prg
+    * Fixed few typos related to recent changes to Extended Match Marker.
+    * Minor fix to PPOut() when repetead group has only single value of non repeated marker.
+    * Renamed Version() to PP_Version()
+    ! Fixed support of #include when processing text.
+
+  * tests/pp_harb.ch
+    * Work in progress to correct support for Line Number and Module Name.
 
 2004-01-18 21:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapigt.h

@@ -37,11 +37,12 @@
      DATA aScriptHostGlobals   INIT {}
      DATA bWantsErrorObject    INIT .T.
      DATA nStartLine           INIT 1
+     DATA cName
 
      METHOD New()              INLINE ( Self )
 
      METHOD AddLine( cLine )   INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText += ( cLine + Chr(10) ) )
-     METHOD SetScript( cText, nStartLine ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::aScriptHostGlobals := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
+     METHOD SetScript( cText, nStartLine, cName ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::aScriptHostGlobals := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
      METHOD GetPPO()           INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -93,7 +94,7 @@
         IF Len( ::acPPed ) == 0
            PP_InitStd()
            PP_LoadRun()
-           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
+           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
            ::aCompiledProcs := {}
            ::aInitExit      := { {}, {} }
         ENDIF
