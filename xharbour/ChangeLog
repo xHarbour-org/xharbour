@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.130 2002/03/22 15:32:03 walito Exp $
+ * $Id: ChangeLog,v 1.131 2002/03/22 19:49:19 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-24 16:08 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * include\hbtrace.h
+     + Added #defines HB_TR_LEVEL_xxx
+
+   * This allows to skip the limitation of DOS and WINDOWS to include the
+     symbol '=' inside an environment variable.
+     Ex:
+         SET CFLAGS=-DHB_TR_LEVEL_DEBUG
+     it's equal to
+         SET CFLAGS=-DHB_TR_LEVEL_DEBUG=5      // Not permited in DOS &WIN
 
 2002-03-22 19:49 UTC-0300 Walter Negro <anegro@overnet.com.ar>
    * source/rtl/tget.prg
