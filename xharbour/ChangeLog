@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3494 2004/10/12 12:28:49 lculik Exp $
+ * $Id: ChangeLog,v 1.3495 2004/10/13 20:03:49 oh1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-14 19:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! force to use SET DEFAULT in index file when there is no path
+      in the index file name due to Clipper compatibility - note that
+      it means that SET DEFAULT TO <cPath> works in differ way then
+      SET PATH TO <cPath>
 
 2004-10-13 22:00 UTC+0200 Henryk Olkowski <oh1@op.pl>
   * xharbour/source/ct/getsecrt.prg

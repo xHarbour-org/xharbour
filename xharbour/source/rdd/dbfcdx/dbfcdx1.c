@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.162 2004/10/01 01:56:58 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.163 2004/10/03 02:10:42 druzus Exp $
  */
 
 /*
@@ -4711,6 +4711,10 @@ static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName,
       hb_xfree( pDbfFName );
    }
 */
+   else if( hb_set.HB_SET_DEFAULT )
+   {
+      hb_strncpy( szFileName, hb_set.HB_SET_DEFAULT, _POSIX_PATH_MAX );
+   }
    else
    {
       szFileName[ 0 ] = '.';
