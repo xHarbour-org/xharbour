@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1009 2003/05/08 10:50:38 lculik Exp $
+ * $Id: ChangeLog,v 1.1010 2003/05/09 02:52:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,10 +13,15 @@
     + Added some missing symbols.
 
   * source/vm/hvm.c
+    + Added HB_EXPORT PSYMBOLS hb_vmLastModule( void )
+      /* Needed by runner.c to reset Module Sybols list after unloading a module. */
     * Minor formatting.
 
   * source/vm/runner.c
-    ! Fixed few bugs causing GPFs.
+    + Added member PSYMBOLS pPrevLastModule to structure HRB_BODY and logic to reset
+      the global modules sybols list after reloading a module. This fixed a GPF.
+    ! Commented out freeing of module symbols because it corrupts the Dynamic-Symbols-Table,
+      which was causing GPFs.
     * Some Formatting.
 
   * tests/pp.prg
