@@ -1,0 +1,139 @@
+#
+# File:     makefile.nt
+# Author:   Paul Tucker <ptucker@sympatico.ca>
+# Created:  2002
+# Updated:
+# Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
+#
+# Makefile : Builds What32 for msvc in non batch mode
+
+# Global paths
+#
+HBR_DIR =..\..
+WH_DIR  =.
+OBJ_DIR =obj
+OUTDIR  =build
+SRCDIR  =source
+LIBDIR  =lib
+
+
+MK_FILE  = makefile.vc
+MK_FLAGS = $(MAKEFLAGS: =)
+
+.SUFFIXES:
+.SUFFIXES: .exe .lib .obj .prg .c
+
+.c.obj:
+   $(CC) $(cflags) -Fo$(OBJ_DIR)\ $<
+   !exit
+
+#-- HARBOUR COMPILER ----
+hbc      =$(HBR_DIR)\BIN\harbour
+hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
+
+#-- C COMPILER ----------
+cc       =cl
+cflags   =-TP -Fpvc -W3 -G6 -Ox -GA -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+
+#-- RESOURCE COMPILER ---
+rc       =rc
+rcflags  =-r
+
+WHAT32LIB  = $(LIBDIR)\what32.lib
+
+LIBLIST  = $(WHAT32LIB)
+
+# library
+#
+
+{$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(cflags) -Fo$(OBJ_DIR)\ $<
+
+{$(SRCDIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(cflags) -Fo$(OBJ_DIR)\ $<
+
+{$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
+   $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(WHAT32LIB)2
+
+WHAT32OBJ  = \
+    $(OBJ_DIR)\Debug.obj \
+    $(OBJ_DIR)\ErrorSys.obj \
+    $(OBJ_DIR)\WhatUtil.obj \
+    $(OBJ_DIR)\WinCDlg.obj \
+    $(OBJ_DIR)\WinComm.obj \
+    $(OBJ_DIR)\WinCore.obj \
+    $(OBJ_DIR)\WinIni.obj \
+    $(OBJ_DIR)\WinRBar.obj \
+    $(OBJ_DIR)\WinTBar.obj \
+    $(OBJ_DIR)\WinTabs.obj \
+    \
+    $(OBJ_DIR)\_winbmp.obj \
+    $(OBJ_DIR)\_winbrsh.obj \
+    $(OBJ_DIR)\_wincall.obj \
+    $(OBJ_DIR)\_wincdlg.obj \
+    $(OBJ_DIR)\_winclpb.obj \
+    $(OBJ_DIR)\_wincomm.obj \
+    $(OBJ_DIR)\_wincret.obj \
+    $(OBJ_DIR)\_windate.obj \
+    $(OBJ_DIR)\_windc.obj \
+    $(OBJ_DIR)\_windir.obj \
+    $(OBJ_DIR)\_windlg.obj \
+    $(OBJ_DIR)\_windll.obj \
+    $(OBJ_DIR)\_windraw.obj \
+    $(OBJ_DIR)\_winfont.obj \
+    $(OBJ_DIR)\_wingdi.obj \
+    $(OBJ_DIR)\_winhead.obj \
+    $(OBJ_DIR)\_winicon.obj \
+    $(OBJ_DIR)\_winilst.obj \
+    $(OBJ_DIR)\_winINet.obj \
+    $(OBJ_DIR)\_winini.obj \
+    $(OBJ_DIR)\_winkbrd.obj \
+    $(OBJ_DIR)\_winlv.obj \
+    $(OBJ_DIR)\_winmain.obj \
+    $(OBJ_DIR)\_winmapi.obj \
+    $(OBJ_DIR)\_winmem.obj \
+    $(OBJ_DIR)\_winmenu.obj \
+    $(OBJ_DIR)\_winmeta.obj \
+    $(OBJ_DIR)\_winmisc.obj \
+    $(OBJ_DIR)\_winmous.obj \
+    $(OBJ_DIR)\_winmsg.obj \
+    $(OBJ_DIR)\_winpen.obj \
+    $(OBJ_DIR)\_winprn.obj \
+    $(OBJ_DIR)\_winrect.obj \
+    $(OBJ_DIR)\_winreg.obj \
+    $(OBJ_DIR)\_winrgn.obj \
+    $(OBJ_DIR)\_winscrlb.obj \
+    $(OBJ_DIR)\_winshell.obj \
+    $(OBJ_DIR)\_winsock.obj \
+    $(OBJ_DIR)\_winsys.obj \
+    $(OBJ_DIR)\_wintab.obj \
+    $(OBJ_DIR)\_wintbar.obj \
+    $(OBJ_DIR)\_wintext.obj \
+    $(OBJ_DIR)\_winTree.obj \
+    $(OBJ_DIR)\_winview.obj \
+    $(OBJ_DIR)\_winwnd.obj
+
+
+!if ( "$(MK_FLAGS)"=="A" )
+
+all: zot \
+   $(WHAT32LIB)
+
+MK_FLAGS = $(MK_FLAGS:A=)
+
+zot:
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
+
+!else
+
+all: \
+   $(WHAT32LIB)
+!endif
+
+$(WHAT32LIB) : $(WHAT32OBJ)
+   lib /out:$@ $**
+
+$(WHAT32LIB)2  : $(WHAT32C)
