@@ -7,7 +7,7 @@ rem *** Create C source if PRG exists
 IF NOT EXIST %1.prg  GOTO MAKEOBJ
 
 rem harbour %1 /w /n /m /gc0 /es2 /i..\..\..\include > comp.log
-c:\cvs\xharbour\bin\harbour %1 /w /p /n /m /gc0 /es2 /i..\..\..\include;..\include;include /o%1 >> comp.log
+harbour %1 /w /p /n /m /gc0 /es2 /i..\..\..\include;..\include;include /o%1 >> comp.log
 @type comp.log
 
 IF ERRORLEVEL 1 GOTO EXIT

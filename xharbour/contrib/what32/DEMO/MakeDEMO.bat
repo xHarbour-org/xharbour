@@ -2,8 +2,6 @@ del demo.exe
 CLS
 @ECHO OFF
 
-IF '%HB_INSTALL%'=='' SET HB_INSTALL=..\..\..
-
 echo c0w32.obj + > b32.bc
 
 rem Compile demo
@@ -17,17 +15,17 @@ echo demo.map, + >> b32.bc
 echo ..\lib\what32.lib +  >>  b32.bc
 rem echo ..\..\whoo\lib\whoo.lib +  >>  b32.bc
 echo ..\..\xVisual\whatplus.lib +  >>  b32.bc
-echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
-echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
-echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc
-echo %HB_INSTALL%\lib\lang.lib + >> b32.bc
-echo %HB_INSTALL%\lib\macro.lib + >> b32.bc
-echo %HB_INSTALL%\lib\rdd.lib + >> b32.bc
-echo %HB_INSTALL%\lib\dbfntx.lib + >> b32.bc
-echo %HB_INSTALL%\lib\dbfcdx.lib + >> b32.bc
-echo %HB_INSTALL%\lib\debug.lib + >> b32.bc
-echo %HB_INSTALL%\lib\common.lib + >> b32.bc
-echo %HB_INSTALL%\lib\pp.lib + >> b32.bc
+echo ..\..\..\lib\rtl.lib + >> b32.bc
+echo ..\..\..\lib\vm.lib + >> b32.bc
+echo ..\..\..\lib\gtwin.lib + >> b32.bc
+echo ..\..\..\lib\lang.lib + >> b32.bc
+echo ..\..\..\lib\macro.lib + >> b32.bc
+echo ..\..\..\lib\rdd.lib + >> b32.bc
+echo ..\..\..\lib\dbfntx.lib + >> b32.bc
+echo ..\..\..\lib\dbfcdx.lib + >> b32.bc
+echo ..\..\..\lib\debug.lib + >> b32.bc
+echo ..\..\..\lib\common.lib + >> b32.bc
+echo ..\..\..\lib\pp.lib + >> b32.bc
 echo cw32.lib + >> b32.bc
 echo import32.lib,, + >> b32.bc
     IF EXIST demo.res echo demo.res >> b32.bc
