@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.16 2002/07/24 03:22:20 ronpinkas Exp $
+ * $Id: classes.c,v 1.17 2002/07/29 17:37:07 ronpinkas Exp $
  */
 
 /*
@@ -137,6 +137,8 @@
  *
  */
 
+#include <math.h>
+
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -180,9 +182,11 @@ typedef struct
    PHB_FUNC pFunError;      /* error handler for not defined messages */
 } CLASS, * PCLASS;
 
-#define BASE_METHODS   100  /* starting maximum number of message */
-#define BUCKET          5
-#define HASH_KEY        ( BASE_METHODS / BUCKET )
+#define BUCKET                   5
+#define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
+#define HASH_KEY       ( BASE_METHODS / BUCKET )
+
+//#define DEBUG_HASH
 
 extern BOOL hb_bProfiler; /* profiler activity status */
 
@@ -201,7 +205,6 @@ static PHB_DYNS s_msgClsParent = NULL;
 
 static PHB_ITEM hb_clsInst( USHORT uiClass );
 static void     hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod );
-static ULONG    hb_cls_MsgToNum( PHB_DYNS pMsg );
 static BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
@@ -233,6 +236,35 @@ static HARBOUR  hb___msgSetShrData( void );
 static HARBOUR  hb___msgGetData( void );
 static HARBOUR  hb___msgSetData( void );
 
+USHORT MsgToNum( const char *ptr, USHORT uiHashKey )
+{
+   int val = 0;
+
+   while( *ptr )
+   {
+      int tmp;
+
+      val = ( val << 4 ) + *ptr;
+
+      if( ( tmp = ( val & 0xf0000000 ) ) != 0 )
+      {
+         val = val ^ ( tmp >> 24 );
+         val = val ^ tmp;
+      }
+
+      ptr++;
+   }
+
+   if( val < 0 )
+   {
+      val = -val;
+   }
+
+   //printf( "Val: %i Mult: %f Mod: %f Floor: %f Key: %i\n", val, val * 0.618, fmod( (double) ( val * 0.618 ), (double) 1 ), floor( fmod( (double) ( val * 0.618 ), (double) 1 ) * uiHashKey ), uiHashKey );
+
+   return (USHORT) floor( fmod( (double) ( val * 0.618 ), (double) 1 ) * uiHashKey ) ;
+}
+
 /* ================================================ */
 
 /*
@@ -240,6 +272,7 @@ static HARBOUR  hb___msgSetData( void );
  *
  * Realloc (widen) class
  */
+
 static void hb_clsDictRealloc( PCLASS pClass )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_clsDictRealloc(%p)", pClass));
@@ -247,7 +280,7 @@ static void hb_clsDictRealloc( PCLASS pClass )
    if( pClass )
    {
       PMETHOD pNewMethods;
-      USHORT  uiNewHashKey = pClass->uiHashKey * 2;
+      USHORT  uiNewHashKey = pClass->uiHashKey;
       USHORT  ui;
       USHORT  uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
 
@@ -255,44 +288,45 @@ static void hb_clsDictRealloc( PCLASS pClass )
       {
          uiNewHashKey += ( USHORT ) HASH_KEY ;
 
+         #ifdef DEBUG_HASH
+            printf( "ReAllocating: '%s' Hashkey: %i Bucket: %i NewHashkey: %i\n", pClass->szName, pClass->uiHashKey, BUCKET, uiNewHashKey );
+         #endif
+
+         HB_TRACE( HB_TR_DEBUG, ( "ReAllocating: '%s' Hashkey: %i Bucket: %i NewHashkey: %i\n", pClass->szName, pClass->uiHashKey, BUCKET, uiNewHashKey ) );
+
          pNewMethods = ( PMETHOD ) hb_xgrab( uiNewHashKey * BUCKET * sizeof( METHOD ) );
          memset( pNewMethods, 0, uiNewHashKey * BUCKET * sizeof( METHOD ) );
 
 
          for( ui = 0; ui < uiLimit; ui++ )
          {
-             PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ ui ].pMessage;
+            PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ ui ].pMessage;
 
-             if( pMessage )
-             {
-                USHORT uiBucket;
-                USHORT uiAt = ( USHORT ) ( ( hb_cls_MsgToNum( pMessage ) % uiNewHashKey ) * BUCKET );
+            if( pMessage )
+            {
+               USHORT uiBucket;
+               USHORT uiAt = ( USHORT ) ( MsgToNum( pMessage->pSymbol->szName, uiNewHashKey ) * BUCKET );
 
-                for( uiBucket = 0; uiBucket < BUCKET; uiBucket++ )
-                {
-                    if( pNewMethods[ uiAt+uiBucket ].pMessage == 0 ) /* this message position is empty */
-                    {
-                       hb_xmemcpy( pNewMethods + (uiAt+uiBucket), pClass->pMethods + ui, sizeof( METHOD ) );
-                       break;
-                    }
-                }
-
-                /* Not enough go back to the beginning */
-                if( uiBucket >= BUCKET ) /*&& nOccurs++ < 5)*/
-                {
-                   hb_xfree( pNewMethods );
-                   break;
-                }
-                /*else
-                   if( nOccurs < 5 )
-                      nOccurs = 0;
-                   else
+               for( uiBucket = 0; uiBucket < BUCKET; uiBucket++ )
+               {
+                   if( pNewMethods[ uiAt + uiBucket ].pMessage == 0 ) /* this message position is empty */
                    {
-                      hb_xfree( pNewMethods );
-                      hb_errInternal( 9999, "Not able to realloc classmessage! __clsDictRealloc", NULL, NULL );
+                      hb_xmemcpy( pNewMethods + (uiAt+uiBucket), pClass->pMethods + ui, sizeof( METHOD ) );
                       break;
-                   }*/
-             }
+                   }
+               }
+
+               /* Not enough go back to the beginning */
+               if( uiBucket >= BUCKET ) /*&& nOccurs++ < 5)*/
+               {
+                 #ifdef DEBUG_HASH
+                    printf( "3 Bucket: %i Hashkey: %i At: %i\n", BUCKET, pClass->uiHashKey, uiAt );
+                 #endif
+
+                  hb_xfree( pNewMethods );
+                  break;
+               }
+            }
          }
 
       } while( ui < uiLimit );
@@ -304,7 +338,6 @@ static void hb_clsDictRealloc( PCLASS pClass )
 
    }
 }
-
 
 /*
  * hb_clsRelease( <pClass> )
@@ -578,17 +611,6 @@ static void hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod )
     }
 }
 
-ULONG hb_cls_MsgToNum( PHB_DYNS pMsg )
-{
-   USHORT i;
-   ULONG nRetVal = 0;
-
-   for( i = 0; pMsg->pSymbol->szName[ i ] != '\0'; i++)
-      nRetVal = ( nRetVal << 1 ) + pMsg->pSymbol->szName[ i ];
-
-   return nRetVal;
-}
-
 BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
 {
   USHORT uiAt, uiLimit;
@@ -727,7 +749,7 @@ char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
             if( uiCurCls && uiCurCls <= s_uiClasses )
             {
                PCLASS pClass  = s_pClasses + ( uiCurCls - 1 );
-               USHORT uiAt    = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pClass->uiHashKey ) * BUCKET );
+               USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
                USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
                USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
@@ -827,7 +849,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
    PHB_FUNC pFunction;
    PMETHOD pMethod;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, %p)", pObject, pMessage));
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc));
 
    if( pObject->type == HB_IT_ARRAY )
    {
@@ -841,7 +863,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
-      USHORT uiAt    = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pClass->uiHashKey ) * BUCKET );
+      USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
       USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
       USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
@@ -925,7 +947,7 @@ PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
-      USHORT uiAt    = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pClass->uiHashKey ) * BUCKET );
+      USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
       USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
       USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
@@ -1074,25 +1096,42 @@ HB_FUNC( __CLSADDMSG )
       if( wType == HB_OO_MSG_INLINE && hb_param( 3, HB_IT_BLOCK ) == NULL )
          hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSADDMSG", 0 );
 
-      if( pClass->uiMethods > ( pClass->uiHashKey * BUCKET * 2 / 3 ) )
+      if( pClass->uiMethods > ( pClass->uiHashKey * BUCKET /* * 2 / 3 */ ) )
+      {
+         #ifdef DEBUG_HASH
+            printf( "1 Methods: %i Hashkey: %i Bucket: %i\n", pClass->uiMethods, pClass->uiHashKey, BUCKET );
+         #endif
+
+         HB_TRACE( HB_TR_DEBUG, ( "1 Methods: %i Hashkey: %i Bucket: %i\n", pClass->uiMethods, pClass->uiHashKey, BUCKET ) );
          hb_clsDictRealloc( pClass );
+      }
 
       do
       {
-         uiAt = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMessage ) ) % pClass->uiHashKey ) * BUCKET );
+         uiAt = ( USHORT ) ( MsgToNum( pMessage->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
+
+         #ifdef DEBUG_HASH
+            printf( "Message '%s' Num: %i\n", pMessage->pSymbol->szName, uiAt );
+         #endif
 
          /* Find either the existing message or an open spot for a new message */
          for( uiBucket = 0; uiBucket < BUCKET; uiBucket++ )
          {
-            if( !pClass->pMethods[ uiAt+uiBucket ].pMessage
-                ||
-                ( pClass->pMethods[ uiAt+uiBucket ].pMessage == pMessage )
-              )
+            if( pClass->pMethods[ uiAt + uiBucket ].pMessage == NULL || pClass->pMethods[ uiAt+uiBucket ].pMessage == pMessage )
+            {
                break;
+            }
          }
 
          if( uiBucket >= BUCKET )
+         {
+            #ifdef DEBUG_HASH
+               printf( "2 Message: '%s' Class: '%s' Bucket: %i\n", pMessage->pSymbol->szName, pClass->szName, BUCKET );
+            #endif
+
+            HB_TRACE( HB_TR_DEBUG, ( "2 Message '%s' At: %i First '%s' Last '%s' Class: '%s' Bucket: %i\n", pMessage->pSymbol->szName, uiAt, pClass->pMethods[ uiAt ].pMessage->pSymbol->szName,pClass->pMethods[ uiAt + 4 ].pMessage->pSymbol->szName, pClass->szName, BUCKET ) );
             hb_clsDictRealloc( pClass );
+         }
 
       } while( uiBucket >= BUCKET );
 
@@ -1238,12 +1277,13 @@ HB_FUNC( __CLSADDMSG )
 
 
 /*
- * <hClass> := __clsNew( <cClassName>, <nDatas>, [ahSuper,aoSuper] )
+ * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [ahSuper,aoSuper] )
  *
  * Create a new class
  *
  * <cClassName> Name of the class
  * <nDatas>     Number of DATAs in the class
+ * <nMethods>   Number of additional Methods in the class
  * <ahSuper>    Optional handle(s) of superclass(es)
  * <ahSuper>    Optional superclass(es) Object instance
  */
@@ -1260,19 +1300,26 @@ HB_FUNC( __CLSNEW )
    USHORT nLenClsDatas = 0;
    USHORT nLenInlines = 0;
    USHORT nLenDatas = 0;
+   USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
 
-   pahSuper = hb_itemParam( 3 );      /* Replace the initial uiSuper   */
+   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_itemParam(4) ) ) );
+
+   pahSuper = hb_itemParam( 4 );      /* Replace the initial uiSuper   */
    uiSuper  = ( USHORT ) hb_itemSize( pahSuper ); /* Number of Super class present */
 
    if( s_pClasses )
+   {
       s_pClasses = ( PCLASS ) hb_xrealloc( s_pClasses, sizeof( CLASS ) * ( s_uiClasses + 1 ) );
+   }
    else
+   {
       s_pClasses = ( PCLASS ) hb_xgrab( sizeof( CLASS ) );
+   }
 
    pNewCls = s_pClasses + s_uiClasses;
    pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
 
-   memset(pNewCls->szName, 0, hb_parclen( 1 ) + 1);
+   memset( pNewCls->szName, 0, hb_parclen( 1 ) + 1);
 
    strcpy( pNewCls->szName, hb_parc( 1 ) );
    pNewCls->uiDataFirst = 0;
@@ -1306,7 +1353,15 @@ HB_FUNC( __CLSNEW )
 
          if( i == 1 ) /* This is the first superclass */
          {
-            pNewCls->uiHashKey = pSprCls->uiHashKey;
+            HB_TRACE( HB_TR_DEBUG, ( "Class: %s Super: %s Known: %i + Super %i\n", pNewCls->szName, pSprCls->szName, uiKnownMethods, pSprCls->uiMethods ) );
+
+            // TODO: findout why this break ???
+            pNewCls->uiHashKey = pSprCls->uiHashKey; //+ ( ( ( BASE_METHODS > uiKnownMethods ? BASE_METHODS : uiKnownMethods ) / BUCKET ) * 2 ) ;
+
+            ulSize = pNewCls->uiHashKey * BUCKET * sizeof( METHOD );
+            pNewCls->pMethods = ( PMETHOD ) hb_xgrab( ulSize );
+            memset( pNewCls->pMethods, 0, ulSize );
+            pNewCls->pFunError = pSprCls->pFunError;
 
             /* CLASS DATA Not Shared ( new array, new value ) */
             pNewCls->pClassDatas  = hb_arrayClone( pSprCls->pClassDatas, NULL );
@@ -1314,7 +1369,6 @@ HB_FUNC( __CLSNEW )
             pNewCls->pInlines = hb_arrayClone( pSprCls->pInlines, NULL );
 
             pNewCls->uiDatasShared = pSprCls->uiDatasShared;
-
          }
          else
          {
@@ -1351,111 +1405,103 @@ HB_FUNC( __CLSNEW )
             hb_itemRelease( pClsAnyTmp );
          }
 
-
-         /* Now working on pMethods */
-
-         if( i == 1 )
-         {
-            ulSize = pNewCls->uiHashKey * BUCKET * sizeof( METHOD );
-            pNewCls->pMethods = ( PMETHOD ) hb_xgrab( ulSize );
-            memset( pNewCls->pMethods, 0, ulSize );
-            pNewCls->pFunError = pSprCls->pFunError;
-         }
-
-         bResize = ( ( pNewCls->uiMethods + pSprCls->uiMethods ) > ( pNewCls->uiHashKey * BUCKET * 2 / 3 ) ) ;
+         bResize = ( ( pNewCls->uiMethods + pSprCls->uiMethods ) > ( pNewCls->uiHashKey * BUCKET /* * 2 / 3 */ ) ) ;
          uiCurrent = 0 ;
 
          do
          {
-
-          if( bResize )
-          {
-            hb_clsDictRealloc( pNewCls );
-            bResize=FALSE;
-          }
-
-          /* When doing the eventual second pass after call to hb_clsDictRealloc */
-          /* We review only messages not already treated */
-
-          for( ui = uiCurrent ; ui < uiLimit; ui++ )
-          {
-            USHORT uiBucket;
-
-            pMsg = ( PHB_DYNS ) pSprCls->pMethods[ ui ].pMessage;
-
-            if( pMsg )
+            if( bResize )
             {
-               uiAt = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pNewCls->uiHashKey ) * BUCKET );
+               #ifdef DEBUG_HASH
+                  printf( "Resize\n" );
+               #endif
 
-               for( uiBucket = 0; uiBucket < BUCKET; uiBucket++ )
-               {
-
-                  /* Ok, this bucket is empty */
-                  if( pNewCls->pMethods[ uiAt+uiBucket ].pMessage == 0 )
-                  {
-
-                     /* Now, we can increment the msg count */
-                     pNewCls->uiMethods++;
-
-                     hb_xmemcpy(pNewCls->pMethods + ( uiAt+uiBucket ), pSprCls->pMethods + ui, sizeof( METHOD ) );
-
-                     if(
-                         pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSetClsData
-                         ||
-                         pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgGetClsData
-                       )
-                        pNewCls->pMethods[ uiAt+uiBucket ].uiData += nLenClsDatas;
-
-                     if(
-                         pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSetData
-                         ||
-                         pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgGetData
-                         ||
-                         pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSuper
-                       )
-                     {
-                       pNewCls->pMethods[ uiAt+uiBucket ].uiData     += nLenDatas;
-                     }
-
-                     if( pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgEvalInline )
-                        pNewCls->pMethods[ uiAt+uiBucket ].uiData += nLenInlines;
-
-                     if( ( pSprCls->pMethods[ ui ].uiScope & HB_OO_CLSTP_SUPER ) != HB_OO_CLSTP_SUPER )
-                        pNewCls->pMethods[ uiAt+uiBucket ].uiScope = ( USHORT ) ( pSprCls->pMethods[ ui ].uiScope + HB_OO_CLSTP_SUPER );
-                     else
-                        pNewCls->pMethods[ uiAt+uiBucket ].uiScope = pSprCls->pMethods[ ui ].uiScope;
-
-                     if( pSprCls->pMethods[ ui ].pInitValue )
-                     {
-                        PHB_ITEM pInitValue;
-
-                        if( HB_IS_ARRAY( pSprCls->pMethods[ ui ].pInitValue ) )
-                           pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_arrayClone( pSprCls->pMethods[ ui ].pInitValue, NULL );
-                        else
-                        {
-                           pInitValue = hb_itemNew( NULL );
-
-                           hb_itemCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
-                           pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = pInitValue;
-                        }
-                     }
-                     break;
-                  }
-                  else if( pNewCls->pMethods[ uiAt + uiBucket ].pMessage == pMsg )
-                     break;
-               }
-
-               /* No space found for this message, call hb_dicrealloc() */
-               if (uiBucket == BUCKET)
-                {
-                 bResize=TRUE;
-                 uiCurrent = ui ;
-                 break;
-                }
-
+               HB_TRACE( HB_TR_DEBUG, ( "Resize\n" ) );
+               hb_clsDictRealloc( pNewCls );
+               bResize=FALSE;
             }
 
-          }
+            /* When doing the eventual second pass after call to hb_clsDictRealloc */
+            /* We review only messages not already treated */
+            for( ui = uiCurrent ; ui < uiLimit; ui++ )
+            {
+               USHORT uiBucket;
+
+               pMsg = ( PHB_DYNS ) pSprCls->pMethods[ ui ].pMessage;
+
+               if( pMsg )
+               {
+                  uiAt = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pNewCls->uiHashKey ) * BUCKET );
+
+                  for( uiBucket = 0; uiBucket < BUCKET; uiBucket++ )
+                  {
+                     /* Ok, this bucket is empty */
+                     if( pNewCls->pMethods[ uiAt + uiBucket ].pMessage == 0 )
+                     {
+                        /* Now, we can increment the msg count */
+                        pNewCls->uiMethods++;
+
+                        hb_xmemcpy( pNewCls->pMethods + ( uiAt+uiBucket ), pSprCls->pMethods + ui, sizeof( METHOD ) );
+
+                        if(
+                            pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSetClsData
+                            ||
+                            pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgGetClsData
+                          )
+                        {
+                           pNewCls->pMethods[ uiAt+uiBucket ].uiData += nLenClsDatas;
+                        }
+
+                        if(
+                            pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSetData
+                            ||
+                            pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgGetData
+                            ||
+                            pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSuper
+                          )
+                        {
+                          pNewCls->pMethods[ uiAt+uiBucket ].uiData     += nLenDatas;
+                        }
+
+                        if( pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgEvalInline )
+                           pNewCls->pMethods[ uiAt+uiBucket ].uiData += nLenInlines;
+
+                        if( ( pSprCls->pMethods[ ui ].uiScope & HB_OO_CLSTP_SUPER ) != HB_OO_CLSTP_SUPER )
+                           pNewCls->pMethods[ uiAt+uiBucket ].uiScope = ( USHORT ) ( pSprCls->pMethods[ ui ].uiScope + HB_OO_CLSTP_SUPER );
+                        else
+                           pNewCls->pMethods[ uiAt+uiBucket ].uiScope = pSprCls->pMethods[ ui ].uiScope;
+
+                        if( pSprCls->pMethods[ ui ].pInitValue )
+                        {
+                           PHB_ITEM pInitValue;
+
+                           if( HB_IS_ARRAY( pSprCls->pMethods[ ui ].pInitValue ) )
+                              pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_arrayClone( pSprCls->pMethods[ ui ].pInitValue, NULL );
+                           else
+                           {
+                              pInitValue = hb_itemNew( NULL );
+
+                              hb_itemCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
+                              pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = pInitValue;
+                           }
+                        }
+                        break;
+                     }
+                     else if( pNewCls->pMethods[ uiAt + uiBucket ].pMessage == pMsg )
+                     {
+                        break;
+                     }
+                  }
+
+                  /* No space found for this message, call hb_dicrealloc() */
+                  if( uiBucket == BUCKET )
+                  {
+                     bResize = TRUE;
+                     uiCurrent = ui ;
+                     break;
+                  }
+               }
+            }
 
          } while ( ui < uiLimit );
       }
@@ -1466,17 +1512,24 @@ HB_FUNC( __CLSNEW )
       pNewCls->uiDataFirst  = 0;
       pNewCls->uiDatasShared= 0;
 
-      pNewCls->pMethods     = ( PMETHOD ) hb_xgrab( BASE_METHODS * sizeof( METHOD ) );
-      memset( pNewCls->pMethods, 0, BASE_METHODS * sizeof( METHOD ) );
-
       pNewCls->uiMethods    = 0;
-      pNewCls->uiHashKey    = HASH_KEY;
+      pNewCls->uiHashKey    = ( ( uiKnownMethods > BASE_METHODS ? uiKnownMethods : BASE_METHODS ) / BUCKET ) * 2;
+
+      #ifdef DEBUG_HASH
+         printf( "Class '%s' Known: %i Datas: %i Extras %i HashKey: %i Bucket %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, hb_parni(3), pNewCls->uiHashKey, BUCKET );
+      #endif
+      HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i HashKey: %i Bucket %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, hb_parni(3), pNewCls->uiHashKey, BUCKET ) );
+
+      pNewCls->pMethods = ( PMETHOD ) hb_xgrab( pNewCls->uiHashKey * BUCKET * sizeof( METHOD ) );
+      memset( pNewCls->pMethods, 0, pNewCls->uiHashKey * BUCKET * sizeof( METHOD ) );
 
       pNewCls->pClassDatas  = hb_itemArrayNew( 0 );
       pNewCls->pInlines     = hb_itemArrayNew( 0 );
       pNewCls->pFunError    = NULL;
    }
    hb_itemRelease( pahSuper );
+
+   HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
 
    hb_retni( ++s_uiClasses );
 }
@@ -1503,7 +1556,7 @@ HB_FUNC( __CLSDELMSG )
       {
          PCLASS pClass  = s_pClasses + ( uiClass - 1 );
          USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
-         USHORT uiAt    = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pClass->uiHashKey ) * BUCKET );
+         USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
          USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
          while( ( uiAt != uiLimit ) &&
@@ -1697,7 +1750,7 @@ HB_FUNC( __CLSMODMSG )
       if( pMsg )
       {
          PCLASS   pClass   = s_pClasses + ( uiClass - 1 );
-         USHORT   uiAt     = ( USHORT ) ( ( ( hb_cls_MsgToNum( pMsg ) ) % pClass->uiHashKey ) * BUCKET );
+         USHORT   uiAt     = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
          USHORT   uiMask   = ( USHORT ) ( pClass->uiHashKey * BUCKET );
          USHORT   uiLimit  = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
@@ -2559,23 +2612,12 @@ HB_FUNC( __CLS_PAR00 )
    hb_itemRelease( hb_itemReturn( array ) );
 }
 
-static ULONG MsgToNum( char * szName )
-{
-   USHORT i;
-   ULONG nRetVal = 0;
-
-   for( i = 0; szName[ i ] != '\0'; i++)
-      nRetVal = ( nRetVal << 1 ) + szName[ i ];
-
-   return nRetVal;
-}
-
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {
    PCLASS pClass  = s_pClasses + ( hb_parnl( 1 ) - 1 );
    char * cMsg    = hb_parc( 2 );
-   USHORT uiAt    = ( USHORT ) ( ( ( MsgToNum( cMsg ) ) % pClass->uiHashKey ) * BUCKET );
+   USHORT uiAt    = ( USHORT ) ( MsgToNum( cMsg, pClass->uiHashKey ) * BUCKET );
    USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
    USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
    PMETHOD pMethod;

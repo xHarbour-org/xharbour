@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.1.1.1 2001/12/21 10:41:51 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.2 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -85,8 +85,8 @@ FUNCTION HBClass()
    STATIC s_hClass /* NOTE: Automatically default to NIL */
 
    IF s_hClass == NIL
-      s_hClass := __clsNew( "HBCLASS", 10)
-/*    s_hClass := __clsNew( "HBCLASS", 11)  */
+      s_hClass := __clsNew( "HBCLASS", 10, 15 )
+/*    s_hClass := __clsNew( "HBCLASS", 11, 15 )  */
 
       __clsAddMsg( s_hClass, "New"            , @New()            , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "Create"         , @Create()         , HB_OO_MSG_METHOD )
@@ -186,17 +186,18 @@ STATIC PROCEDURE Create(MetaClass)
    LOCAL nClassBegin := 0
    LOCAL hClass
    LOCAL ahSuper := Array( nLen )
+   LOCAL nExtraMsgs := Len( ::aMethods ) +  ( 2 * Len( ::aClsDatas ) ) + Len( ::aInlines ) + Len( ::aVirtuals )
 
 /* Self:Class := MetaClass */
 
    IF nLen == 0
-      hClass := __clsNew( ::cName, nLenDatas )
+      hClass := __ClsNew( ::cName, nLenDatas, nExtraMsgs )
    ELSE                                         // Multi inheritance
       FOR n := 1 TO nLen
          ahSuper[ n ] := __clsInstSuper( Upper( ::acSuper[ n ] ) ) // Super handle available
       NEXT
 
-      hClass := __clsNew( ::cName, nLenDatas + nlen , ahSuper )
+      hClass := __ClsNew( ::cName, nLenDatas + nlen, nExtraMsgs, ahSuper )
 
       nDataBegin   += __cls_CntData( ahSuper[ 1 ] )        // Get offset for new Datas
       nClassBegin  += __cls_CntClsData( ahSuper[ 1 ] )     // Get offset for new ClassData

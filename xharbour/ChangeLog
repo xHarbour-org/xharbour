@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.326 2002/07/27 23:11:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.327 2002/07/29 17:37:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-29 23:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstruct.prg
+    * Minor modification of Array Structure member names.
+
+  * source/vm/classes.c
+    * Changed __ClsNew() to receive additional 3rd parameter indicating the Number of additional messages (other than datas)
+      pushing subsequent optional Parent to be 4th paramater.
+    * __ClsNew() will now pre allocate a more reasonable initial size to ->pMethods based on class definition.
+    - Removed hb_cls_MsgToNum()
+    * Modified hb_cls_MsgToNum() calls to MsgToNum()
+    * Modified MsgToNum() to use "Multiplication Method" instead of "Division Method" as per suggestion in
+      "Mastering Algorithms with C" Pg. 145 - This produces a more consistent distribution over a table of NON prime size.
+    * Reverted doubling size logic in recent change to hb_clsDictRealloc().
+
+  * source/rtl/tclass.prg
+    + Added 3rd paramater to __ClsNew() calls.
+
+  /* J.F., can you please review these changes... */
 
 2002-07-29 10:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

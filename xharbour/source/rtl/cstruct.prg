@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.11 2002/07/27 16:56:43 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.12 2002/07/27 23:11:36 ronpinkas Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ Function HB_CStructure( cStructure, nAlign )
 
       //TraceLog( "Created: " + Str( nId ) )
 
-      hClass := __clsNew( "C Structure " + cStructure, Len( aCTypes ) + CLASS_PROPERTIES )
+      hClass := __clsNew( "C Structure " + cStructure, Len( aCTypes ) + CLASS_PROPERTIES, 8 )
 
       s_aClasses[nID][2] := hClass
 
@@ -387,7 +387,7 @@ Function HB_CTypeArrayID( CType, nLen )
    nID := aScan( s_aArrayClasses, { | aArrayDefinitions | aArrayDefinitions[1] == CType .AND. aArrayDefinitions[2] == nLen } )
 
    IF nID == 0
-      hClass := __clsNew( "C Structure " + cArrayClassName, nLen + CLASS_PROPERTIES )
+      hClass := __clsNew( "C Structure " + cArrayClassName, nLen + CLASS_PROPERTIES, 8 )
 
       aAdd( s_aClasses, { cArrayClassName, hClass, Array( nLen ), Array( nLen ), 1 } )
       nID := Len( s_aClasses )
@@ -405,7 +405,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
 
       FOR Counter := 1 TO nLen
-         cMember := "Element_" + LTrim( Str( Counter ) )
+         cMember := LTrim( Str( Counter ) )
 
          acMembers[Counter] := cMember
 
