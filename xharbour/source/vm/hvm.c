@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.413 2004/07/29 23:55:59 ronpinkas Exp $
+ * $Id: hvm.c,v 1.414 2004/08/17 19:32:52 ronpinkas Exp $
  */
 
 /*
@@ -787,7 +787,6 @@ int HB_EXPORT hb_vmQuit( void )
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
-   OutputDebugString("\nAfter Statics\n" );
 
    #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
       HB_TRACE( HB_TR_INFO, ("Quit Ole" ) );
