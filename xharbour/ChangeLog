@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1430 2003/09/09 03:07:35 paultucker Exp $
+ * $Id: ChangeLog,v 1.1431 2003/09/09 04:02:58 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,16 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-09-09 05:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * hrbdll.vc
+   * hrbdll.bc
+     + dbfdbt,dbffpt
+   * source/rdd/dbffpt/dbffpt1.c
+   * source/rdd/dbfdbt/dbfdbt1.c
+   * include/hbrdddbt.h
+   * include/hbrddfpt.h
+     * recast AREAP to DBFAREAP for get/putMemoBlock()
+
 2003-09-09 01:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
    * updated to use the new dbf[fpt|dbt] libraries
    
-
-2003-09-08 23:07 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * hrbdll.vc
-   * hrbdll.bc
-     + dbfdbt,dbffpt
-
 2003-09-08 22:07 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.nt
    * makefile.vc

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.2 2003/09/09 01:32:27 druzus Exp $
+ * $Id: dbffpt1.c,v 1.3 2003/09/09 02:08:01 paultucker Exp $
  */
 
 /*
@@ -892,7 +892,7 @@ static ULONG hb_fptGetMemoLen( FPTAREAP pArea, USHORT uiIndex )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetMemoLen(%p, %hu)", pArea, uiIndex));
 
-   ulBlock = hb_dbfGetMemoBlock( (AREAP) pArea, uiIndex );
+   ulBlock = hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex );
 
    if( ulBlock == 0 )
       return 0;
@@ -1163,7 +1163,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
 
-   ulBlock = hb_dbfGetMemoBlock( (AREAP) pArea, uiIndex );
+   ulBlock = hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex );
 
    if( ulBlock > 0 )
    {
@@ -1687,7 +1687,7 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       ulLen = 0;
    }
 
-   ulBlock = hb_dbfGetMemoBlock( (AREAP) pArea, uiIndex );
+   ulBlock = hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex );
 
    errCode = hb_fptWriteMemo( pArea, ulBlock, bBufPtr, ulType, ulLen, &ulBlock );
 
@@ -1696,7 +1696,7 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_xfree( bBufAlloc );
    }
 
-   hb_dbfPutMemoBlock( (AREAP) pArea, uiIndex, ulBlock );
+   hb_dbfPutMemoBlock( (DBFAREAP) pArea, uiIndex, ulBlock );
 
    return errCode;
 }

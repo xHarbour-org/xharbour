@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbfdbt1.c,v 1.1 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -303,7 +303,7 @@ static ULONG hb_dbtGetMemoLen( DBTAREAP pArea, USHORT uiIndex )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtGetMemoLen(%p, %hu)", pArea, uiIndex));
 
-   ulBlock = hb_dbfGetMemoBlock( ( AREAP ) pArea, uiIndex );
+   ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );
    if( ulBlock == 0 )
       return 0;
    hb_fsSeek( pArea->hMemoFile, ulBlock * DBT_BLOCKSIZE, FS_SET );
@@ -334,7 +334,7 @@ static void hb_dbtGetMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    pBuffer = ( BYTE * ) hb_xgrab( ulSize + 1 );
    if( ulSize > 0 )
    {
-      ulBlock = hb_dbfGetMemoBlock( ( AREAP ) pArea, uiIndex );
+      ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );
       hb_fsSeek( pArea->hMemoFile, ulBlock * DBT_BLOCKSIZE, FS_SET );
       hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize );
    }
@@ -410,12 +410,12 @@ static BOOL hb_dbtPutMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    ulLen = hb_itemGetCLen( pItem );
    if( ulLen > 0 )
    {
-      ulBlock = hb_dbfGetMemoBlock( ( AREAP ) pArea, uiIndex );
+      ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );
       hb_dbtWriteMemo( pArea, ulBlock, pItem, ulLen, &ulBlock );
    }
    else
       ulBlock = 0;
-   hb_dbfPutMemoBlock( ( AREAP ) pArea, uiIndex, ulBlock );
+   hb_dbfPutMemoBlock( ( DBFAREAP ) pArea, uiIndex, ulBlock );
    return TRUE;
 }
 

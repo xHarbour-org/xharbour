@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbrdddbt.h,v 1.1 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -190,11 +190,11 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea );
 #define hb_dbtWhoCares                             NULL
 
 
-extern ULONG hb_dbfGetMemoBlock( AREAP pArea, USHORT uiIndex );
-extern void  hb_dbfPutMemoBlock( AREAP pArea, USHORT uiIndex, ULONG ulBlock );
-
 #if defined(HB_EXTERN_C)
 }
 #endif
+
+extern ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern void  hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 
 #endif /* HB_RDDDBT */

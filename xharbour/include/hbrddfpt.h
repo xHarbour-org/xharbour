@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbrddfpt.h,v 1.1 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -307,13 +307,12 @@ static ERRCODE hb_fptWriteDBHeader( FPTAREAP pArea );
 #define hb_fptExists                               NULL
 #define hb_fptWhoCares                             NULL
 
-
-extern ULONG hb_dbfGetMemoBlock( AREAP pArea, USHORT uiIndex );
-extern void  hb_dbfPutMemoBlock( AREAP pArea, USHORT uiIndex, ULONG ulBlock );
-extern ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
-
 #if defined(HB_EXTERN_C)
 }
 #endif
+
+extern ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern void  hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
+extern ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
 
 #endif /* HB_RDDFPT */
