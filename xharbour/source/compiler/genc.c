@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.60 2004/01/21 11:39:54 andijahja Exp $
+ * $Id: genc.c,v 1.61 2004/01/27 09:56:08 likewolf Exp $
  */
 
 /*
@@ -36,6 +36,21 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCInLine( FILE* ) ;
 
+// AJ: 2004-02-05
+// Routines to check C-In-Line static function declared in a PRG file
+// with #PRAGMA BEGINDUMP - ENDDUMP
+static void hb_compGenCInLineSymbol( void );
+static void hb_compGenCCheckInLineStatic( char * str );
+static BOOL hb_compCStaticSymbolFound( char* szSymbol );
+/* struct to hold symbol names of c-in-line static functions */
+typedef struct _SSYMLIST
+{
+   char *    szName;
+   struct _SSYMLIST * pNext;
+} SSYMLIST, * PSSYMLIST;
+
+static PSSYMLIST pStatSymFirst = NULL;
+
 /* helper structure to pass information */
 typedef struct HB_stru_genc_info
 {
@@ -49,8 +64,8 @@ typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
 /*
- Andi Jahja
- Extended to generate pCode listing 2003.06.25
+ AJ: 2003-06-25
+ Extended to generate pCode listing
  hb_comp_iGenVarList is first initialized in harbour.c as FALSE
  The value is TRUE when /gc3 is used
 */
@@ -63,7 +78,7 @@ extern char *hb_comp_PrgFileName;
 */
 FILE *hb_comp_pCodeList = NULL;
 
-void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSourcePath )       /* generates the C language output */
+void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
    char szpCodeFileName[ _POSIX_PATH_MAX ] ;
@@ -87,7 +102,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
    int  iSymOffset, iStartupOffset;
 
-   HB_SYMBOL_UNUSED( szSourcePath );
+   PSSYMLIST pStatSymTemp;
 
    if( ! pFileName->szExtension )
    {
@@ -233,8 +248,17 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       while( pInline )
       {
          if( pInline->szName )
+         {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pInline->szName );
+         }
          pInline = pInline->pNext;
+      }
+
+      /* check c-in-line static functions */
+      pInline = hb_comp_inlines.pFirst;
+      if ( pInline )
+      {
+         hb_compGenCInLineSymbol();
       }
 
       /* write functions prototypes for called functions outside this PRG */
@@ -243,7 +267,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       {
          if( hb_compFunctionFind( pFunc->szName ) == NULL && hb_compInlineFind( pFunc->szName ) == NULL )
          {
-            fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
+            if( hb_compCStaticSymbolFound( pFunc->szName ) )
+            {
+               fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
+            }
+            else
+            {
+               fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
+            }
          }
 
          pFunc = pFunc->pNext;
@@ -362,7 +393,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
             }
             else
             {
-               fprintf( yyc, "HB_FS_PUBLIC" );
+               if ( hb_compCStaticSymbolFound( pSym->szName ) )
+               {
+                  fprintf( yyc, "HB_FS_STATIC" );
+
+                  if( pSym->cScope & HB_FS_PUBLIC )
+                  {
+                     fprintf( yyc, " | HB_FS_PUBLIC" );
+                  }
+               }
+               else
+               {
+                  fprintf( yyc, "HB_FS_PUBLIC" );
+               }
             }
 
             if( pSym->cScope & VS_MEMVAR )
@@ -723,6 +766,108 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
    hb_xfree( hb_comp_PrgFileName );
 
+   pStatSymTemp = pStatSymFirst;
+   while( pStatSymTemp )
+   {
+      // printf( "%s\n", pStatSymTemp->szName );
+      hb_xfree( pStatSymTemp->szName );
+      pStatSymTemp = pStatSymTemp->pNext;
+      hb_xfree( ( void * ) pStatSymFirst );
+      pStatSymFirst = pStatSymTemp;
+   }
+}
+
+static BOOL hb_compCStaticSymbolFound( char* szSymbol )
+{
+   BOOL bStatSymFound = FALSE;
+   PSSYMLIST pStatSymTemp = pStatSymFirst;
+
+   while( pStatSymTemp )
+   {
+      if( strcmp( pStatSymTemp->szName, szSymbol ) )
+      {
+         pStatSymTemp = pStatSymTemp->pNext;
+      }
+      else
+      {
+         bStatSymFound = TRUE;
+         break;
+      }
+   }
+
+   return bStatSymFound;
+}
+
+static PSSYMLIST hb_compCStatSymList( PSSYMLIST pStatSymCurrent, char* statSymName )
+{
+   PSSYMLIST pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
+
+   pStatSymLast->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
+   strcpy( pStatSymLast->szName, statSymName );
+   pStatSymLast->pNext = NULL;
+
+   if( pStatSymCurrent )
+   {
+      pStatSymCurrent->pNext = pStatSymLast;
+   }
+
+   pStatSymCurrent = pStatSymLast;
+
+   return pStatSymCurrent;
+}
+
+static void hb_compGenCCheckInLineStatic( char *str )
+{
+   LONG nAt;
+   char *pTmp, *pCode;
+   LONG ulLen = strlen( str );
+   LONG i ;
+   PSSYMLIST pStatSymCurrent = NULL;
+
+   while( ( nAt = hb_strAt( "HB_FUNC_STATIC", 14, str, ulLen ) ) != 0 )
+   {
+      str += nAt;
+      i = 0;
+
+      while( ( pTmp = strchr( str, '(' ) ) == NULL && ++i < ulLen ) {}
+
+      pTmp++ ;
+
+      while( HB_ISSPACE( *pTmp ) )
+      {
+         pTmp++ ;
+      }
+
+      i = 0;
+      ulLen = strlen( str );
+
+      while( ( pCode = strchr( str, ')' ) ) == NULL && ++i < ulLen ) {}
+
+      *( pCode - 1 ) = '\0';
+
+      pStatSymCurrent = hb_compCStatSymList( pStatSymCurrent, pTmp );
+
+      if( !pStatSymFirst )
+      {
+         pStatSymFirst = pStatSymCurrent;
+      }
+
+   }
+}
+
+static void hb_compGenCInLineSymbol()
+{
+   PINLINE pInline = hb_comp_inlines.pFirst;
+   char *sInline;
+
+   while( pInline )
+   {
+      sInline = (char*) hb_xgrab( strlen( (char*) pInline->pCode ) + 1 );
+      strcpy( sInline, (char*) pInline->pCode );
+      hb_compGenCCheckInLineStatic( sInline );
+      pInline = pInline->pNext;
+      hb_xfree( sInline );
+   }
 }
 
 static void hb_compGenCInLine( FILE *yyc )

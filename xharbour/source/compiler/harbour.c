@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.64 2004/01/28 07:34:06 likewolf Exp $
+ * $Id: harbour.c,v 1.65 2004/01/29 23:24:13 jonnymind Exp $
  */
 
 /*
@@ -114,7 +114,7 @@
 #endif
 
 static void hb_compInitVars( void );
-static void hb_compGenOutput( int, char *szSourceExtension, char *szSourcePath );
+static void hb_compGenOutput( int, char *szSourceExtension );
 static void hb_compOutputFile( void );
 
 int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
@@ -4489,12 +4489,12 @@ static void hb_compInitVars( void )
    hb_comp_pEnum          = NULL;
 }
 
-static void hb_compGenOutput( int iLanguage, char *szSourceExtension, char *szSourcePath )
+static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
 {
    switch( iLanguage )
    {
       case LANG_C:
-         hb_compGenCCode( hb_comp_pFileName, szSourceExtension, szSourcePath );
+         hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
          break;
 
       case LANG_OBJ32:
@@ -4510,7 +4510,7 @@ static void hb_compGenOutput( int iLanguage, char *szSourceExtension, char *szSo
          break;
 
       case LANG_OBJ_MODULE:
-         hb_compGenCObj( hb_comp_pFileName, szSourceExtension, szSourcePath );
+         hb_compGenCObj( hb_comp_pFileName, szSourceExtension );
          break;
    }
 }
@@ -4861,7 +4861,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
                }
 
-               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension, szSourcePath );
+               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
             }
          }
          else

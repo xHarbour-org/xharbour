@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.314 2004/01/30 23:26:10 ronpinkas Exp $
+ * $Id: hvm.c,v 1.315 2004/02/04 03:45:55 ronpinkas Exp $
  */
 
 /*
@@ -174,7 +174,8 @@ static void    hb_vmSwapAlias( void );           /* swaps items on the eval stac
 /* Execution */
 static HARBOUR hb_vmDoBlock( void );             /* executes a codeblock */
 static void    hb_vmLocalName( USHORT uiLocal, char * szLocalName ); /* locals and parameters index and name information for the debugger */
-static void    hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
+// static void    hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
+static void    hb_vmStaticName( USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
 static void    hb_vmModuleName( char * szModuleName ); /* PRG and function name information for the debugger */
 static void    hb_vmFrame( BYTE bLocals, BYTE bParams ); /* increases the stack pointer for the amount of locals and params suplied */
 static void    hb_vmSFrame( PHB_SYMB pSym );     /* sets the statics frame for a function */
@@ -1690,8 +1691,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_STATICNAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_STATICNAME") );
+            hb_vmStaticName( HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
+                             ( char * ) pCode + w + 4 );
+/*
             hb_vmStaticName( pCode[ w + 1 ], HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
                             ( char * ) pCode + w + 4 );
+*/
             w += 4;
             while( pCode[ w++ ] );
             break;
@@ -5920,7 +5925,7 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
    s_bDebugShowLines = TRUE;
 }
 
-static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName ) /* statics vars information for the debugger */
+static void hb_vmStaticName( USHORT uiStatic, char * szStaticName ) /* statics vars information for the debugger */
 {
    HB_THREAD_STUB
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.5 2004/01/21 23:49:20 peterrees Exp $
+ * $Id: tprint.prg,v 1.6 2004/01/22 00:46:52 peterrees Exp $
  */
 
 /*
@@ -519,7 +519,7 @@ ENDCLASS
 #include <windows.h>
 #include "hbapi.h"
 
-static HB_FUNC( CREATEDC )
+HB_FUNC_STATIC( CREATEDC )
 {
   LONG Result = 0 ;
   if (ISCHAR(1))
@@ -529,7 +529,7 @@ static HB_FUNC( CREATEDC )
   hb_retnl(Result) ;
 }
 
-static HB_FUNC( STARTDOC )
+HB_FUNC_STATIC( STARTDOC )
 {
   HDC hDC = (HDC) hb_parnl(1) ;
   DOCINFO sDoc ;
@@ -547,7 +547,7 @@ static HB_FUNC( STARTDOC )
 }
 
 
-static HB_FUNC(ENDDOC)
+HB_FUNC_STATIC(ENDDOC)
 {
   BOOL Result = FALSE;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -565,7 +565,7 @@ static HB_FUNC(ENDDOC)
   hb_retl(Result) ;
 }
 
-static HB_FUNC( DELETEDC )
+HB_FUNC_STATIC( DELETEDC )
 {
   HDC hDC =  (HDC) hb_parnl(1) ;
   if (hDC)
@@ -575,7 +575,7 @@ static HB_FUNC( DELETEDC )
   hb_retnl(0) ;  // Return zero as a new handle even if fails
 }
 
-static HB_FUNC(STARTPAGE)
+HB_FUNC_STATIC(STARTPAGE)
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -586,7 +586,7 @@ static HB_FUNC(STARTPAGE)
   hb_retl(Result) ;
 }
 
-static HB_FUNC(ENDPAGE)
+HB_FUNC_STATIC(ENDPAGE)
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -597,7 +597,7 @@ static HB_FUNC(ENDPAGE)
   hb_retl(Result) ;
 }
 
-static HB_FUNC(TEXTOUT)
+HB_FUNC_STATIC(TEXTOUT)
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -635,7 +635,7 @@ static HB_FUNC(TEXTOUT)
   hb_retnl(Result) ;
 }
 
-static HB_FUNC(GETTEXTSIZE)
+HB_FUNC_STATIC(GETTEXTSIZE)
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -658,7 +658,7 @@ static HB_FUNC(GETTEXTSIZE)
 }
 
 
-static HB_FUNC( GETCHARSIZE )
+HB_FUNC_STATIC( GETCHARSIZE )
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -678,7 +678,7 @@ static HB_FUNC( GETCHARSIZE )
   hb_retnl(Result) ;
 }
 
-static HB_FUNC( GETDEVICECAPS )
+HB_FUNC_STATIC( GETDEVICECAPS )
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -689,7 +689,7 @@ static HB_FUNC( GETDEVICECAPS )
   hb_retnl( Result) ;
 }
 
-static HB_FUNC( SETMAPMODE )
+HB_FUNC_STATIC( SETMAPMODE )
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -700,7 +700,7 @@ static HB_FUNC( SETMAPMODE )
   hb_retnl( Result) ;
 }
 
-static HB_FUNC( SETTEXTCHARACTEREXTRA )
+HB_FUNC_STATIC( SETTEXTCHARACTEREXTRA )
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -711,7 +711,7 @@ static HB_FUNC( SETTEXTCHARACTEREXTRA )
   hb_retnl( Result) ;
 }
 
-static HB_FUNC( SELECTOBJECT )
+HB_FUNC_STATIC( SELECTOBJECT )
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -722,7 +722,7 @@ static HB_FUNC( SELECTOBJECT )
   hb_retnl( Result) ;
 }
 
-static HB_FUNC( DELETEOBJECT )
+HB_FUNC_STATIC( DELETEOBJECT )
 {
   HGDIOBJ hObj = (HGDIOBJ) hb_parnl(1) ;
   if (hObj)
@@ -737,7 +737,7 @@ HB_FUNC( MULDIV )
   hb_retnl(MulDiv(hb_parnl(1), hb_parnl(2), hb_parnl(3)));
 }
 
-static HB_FUNC( CREATEFONT )
+HB_FUNC_STATIC( CREATEFONT )
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -776,7 +776,7 @@ static HB_FUNC( CREATEFONT )
   hb_retl( Result ) ;
 }
 
-static HB_FUNC( GETPRINTERFONTNAME )
+HB_FUNC_STATIC( GETPRINTERFONTNAME )
 {
   HDC hDC = (HDC) hb_parnl(1) ;
   if (hDC)
@@ -791,7 +791,7 @@ static HB_FUNC( GETPRINTERFONTNAME )
   }
 }
 
-static HB_FUNC(BITMAPSOK)
+HB_FUNC_STATIC(BITMAPSOK)
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -802,7 +802,7 @@ static HB_FUNC(BITMAPSOK)
   hb_retl(Result) ;
 }
 
-static HB_FUNC( SETDOCUMENTPROPERTIES )
+HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
@@ -837,7 +837,7 @@ static HB_FUNC( SETDOCUMENTPROPERTIES )
 
 // Functions for Loading & Printing bitmaps
 
-static HB_FUNC( LOADBITMAPFILE )
+HB_FUNC_STATIC( LOADBITMAPFILE )
 {
   PTSTR pstrFileName = hb_parc(1) ;
   BOOL               bSuccess= FALSE ;
@@ -873,7 +873,7 @@ static HB_FUNC( LOADBITMAPFILE )
   }
 }
 
-static HB_FUNC( DRAWBITMAP ) {
+HB_FUNC_STATIC( DRAWBITMAP ) {
   HDC hDC                  = (HDC) hb_parnl(1) ;
   BITMAPFILEHEADER * pbmfh = (BITMAPFILEHEADER *) hb_parc(2) ;
   BITMAPINFO       * pbmi ;
@@ -916,7 +916,7 @@ static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD Fon
     return(TRUE);
 }
 
-static HB_FUNC( ENUMFONTS )
+HB_FUNC_STATIC( ENUMFONTS )
 {
   BOOL Result= FALSE ;
   HDC hDC                  = (HDC) hb_parnl(1) ;
@@ -936,7 +936,7 @@ static HB_FUNC( ENUMFONTS )
   }
 }
 
-static HB_FUNC( GETEXEFILENAME )
+HB_FUNC_STATIC( GETEXEFILENAME )
 {
   unsigned char pBuf[1024] ;
   GetModuleFileName(NULL, (LPTSTR) pBuf, 1023) ;

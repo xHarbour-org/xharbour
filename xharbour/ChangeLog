@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2225 2004/02/05 06:06:17 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2226 2004/02/05 12:33:51 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-05 19:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * contrib/winprn/tprint.prg
+     ! change 'static HB_FUNC' construct to 'HB_FUNC_STATIC'
+
+   * source/vm/hvm.c
+     ! remove first parameter of hb_vmStaticName() as it is not used
+
+   * include/hbcomp.h
+   * source/compiler/harbour.c
+   * source/compiler/gencobj.c
+     ! remove third parameter of hb_compGenCCode() and hb_compGenCObj()
+
+   * source/compiler/gen.c
+     ! fix generation of functions protos if there are C-IN-LINE codes
+       in a PRG program body.
+
+    /*
+     This fix sample per below:
+
+     / --
+     |  proc main()
+     |  foo1()
+     |  foo2()
+     |  foo3()
+     |
+     |  #PRAGMA BEGINDUMP
+     |  HB_FUNC_STATIC( FOO1 ){}
+     |  HB_FUNC_STATIC( FOO2 ){}
+     |  HB_FUNC_STATIC( FOO3 ){}
+     |  #PRAGMA ENDDUMP
+     \ --
+
+    Previously, xHarbour generates static function protos as externs while they
+    should actually be statics. This is wrong (inconsistent declaration as per
+    function body) and is not always acceptable to all C compilers.
+    Open Watcom is one of those.
+
+    IMPORTANT NOTE:
+    Declaration of static C functions in a PRG program body should always use
+    xHarbour macros ie. HB_FUNC_STATIC. Use of 'static HB_FUNC' should be
+    discouraged.
+   */
 
 2004-02-04 13:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtwin/gtwin.c
