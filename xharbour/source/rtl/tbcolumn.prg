@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.9 2004/06/17 09:23:44 vouchcac Exp $
+ * $Id: tbcolumn.prg,v 1.10 2004/07/13 19:51:41 paultucker Exp $
  */
 
 /*
@@ -69,32 +69,27 @@ CLASS TBColumn
    DATA  FootSep              // Footing separator character
    DATA  HeadSep              // Heading separator character
    DATA  Picture              // Column picture string
-#ifdef HB_COMPAT_C53
+
+   ACCESS Width      INLINE ::nWidth      // Column display width
+   ASSIGN Width(n)   INLINE ::SetWidth(n)
+
+   METHOD New(cHeading, bBlock)
+
+   #ifdef HB_COMPAT_C53
    DATA  PreBlock             //
    DATA  PostBlock            //
-#endif
 
-   ACCESS Width INLINE ::nWidth           // Column display width
-   ASSIGN Width(n) INLINE ::SetWidth(n)
-
-   // NOTE: 17/08/01 - <maurilio.longo@libero.it>
-   //       It is not correct in my opinion that this instance variable be exported
-   DATA  ColPos               // Temporary column position on screen needed by TBrowse class
-
-   METHOD New(cHeading, bBlock)  // Constructor
-
-#ifdef HB_COMPAT_C53
    METHOD SetStyle( nMode, lSetting )
-#endif
+   #endif
 
    HIDDEN:     /* H I D D E N */
 
-   DATA  nWidth
-   METHOD SetWidth(n)
+   DATA     nWidth
+   METHOD   SetWidth(n)
 
-#ifdef HB_COMPAT_C53
-   DATA aSetStyle
-#endif
+   #ifdef HB_COMPAT_C53
+   DATA     aSetStyle
+   #endif
 
 ENDCLASS
 
@@ -107,8 +102,6 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    DEFAULT cHeading TO ""
 
    ::DefColor := { 1, 2, 1, 1 }
-   //x ::FootSep  := ""      //x let it be NIL
-   ::ColPos   := 1
    ::ColSep   := nil
 
    ::nWidth   := nil
@@ -120,13 +113,13 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    ::Footing  := ""
    ::block    := bBlock
 
-#ifdef HB_COMPAT_C53
+   #ifdef HB_COMPAT_C53
    ::aSetStyle := ARRAY( 3 )
 
    ::aSetStyle[ TBC_READWRITE ] := .f.
    ::aSetStyle[ TBC_MOVE ]      := .f.
    ::aSetStyle[ TBC_SIZE ]      := .f.
-#endif
+   #endif
 
 return Self
 
