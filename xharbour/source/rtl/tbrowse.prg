@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.64 2004/03/24 15:37:08 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.65 2004/03/25 03:16:30 vouchcac Exp $
  */
 
 /*
@@ -1364,13 +1364,17 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    endif
 
    if ::lHeadSep                      //Draw horizontal heading separator line
+
       DispOutAt( ( nScreenRowT := ::nRowData ), ::nwLeft,;
-                Replicate( Right( ::HeadSep, 1 ), nWidth ), ::cColorSpec )
+           Replicate( Right( ::HeadSep, 1 ), nWidth ), ::cColorSpec )
+
    endif
 
    if ::lFootSep                      //Draw horizontal footing separator line
+
       DispOutAt( ( nScreenRowB := ::nwBottom - iif( ::lFooters, ::nFooterHeight, 0 ) ), ::nwLeft,;
-                Replicate( Right( ::FootSep, 1 ), nWidth ), ::cColorSpec )
+                                        Replicate( Right( ::FootSep, 1 ), nWidth ), ::cColorSpec )
+
    endif
 
    nTPos := nBPos := aCol[ iif( ::nFrozenCols > 0, 1, ::leftVisible ) ]
@@ -1391,12 +1395,19 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          endif
 
          if ::lHeadSep
-            DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n, o_Width ] ), ::HeadSep, ::cColorSpec )
+            //            DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n, o_Width ] ), ::HeadSep, ::cColorSpec )
+            DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n,o_Width ] ), ;
+                            if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                                    ::aColsInfo[ n,o_Obj ]:HeadSep ), ::cColorSpec )
             nTPos += nLCS
          endif
 
          if ::lFootSep
-            DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ::FootSep, ::cColorSpec )
+            //            DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ::FootSep, ::cColorSpec )
+
+            DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ;
+                          if(::aColsInfo[ n,o_Obj ]:FootSep = nil, ::FootSep, ;
+                                ::aColsInfo[ n,o_Obj ]:FootSep ), ::cColorSpec )
             nBPos += nLCS
          endif
       endif
