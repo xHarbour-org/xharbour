@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.31 2003/03/10 02:46:02 druzus Exp $
+* $Id: thread.h,v 1.32 2003/03/10 23:21:55 jonnymind Exp $
 */
 
 /*
@@ -85,6 +85,8 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_COND_INIT( x )           x = CreateEvent( NULL,FALSE, FALSE, NULL )
 
    DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
+   void hb_threadSuspendAll();
+   void hb_threadResumeAll();
    
    #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
    #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t, FALSE )
@@ -128,7 +130,42 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
     
    extern DWORD hb_dwCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
-         
+
+   #define HB_STACK_LOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( ! HB_VM_STACK.bInUse ) \
+      {\
+         hb_runningStacks.content.asLong++;\
+         HB_VM_STACK.bInUse = TRUE;\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   }
+
+   #define HB_STACK_UNLOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( HB_VM_STACK.bInUse ) \
+      {\
+         HB_VM_STACK.bInUse = FALSE;\
+         if ( --hb_runningStacks.content.asLong == 0)\
+         {\
+            hb_threadCallIdle();\
+         }\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   } 
+
+   typedef void ( * HB_IDLE_FUNC )();
+   void hb_threadSubscribeIdle( HB_IDLE_FUNC );
+   void hb_threadCallIdle(); 
+   
+   typedef struct tag_HB_IDLE_FUNC_LIST
+   {
+      HB_IDLE_FUNC func;
+      struct tag_HB_IDLE_FUNC_LIST *next;
+   } HB_IDLE_FUNC_LIST;
+   
 #else
 
    #include <pthread.h>
@@ -159,7 +196,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
    #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &(y) )
    #define HB_COND_WAITTIME( x, y, t )  hb_condTimeWait( &(x) , &(y), t )
-   #define HB_COND_SIGNAL( x )         pthread_cond_signal( &(x) )
+   #define HB_COND_SIGNAL( x )         pthread_cond_broadcast( &(x) )
    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
    
    
@@ -174,6 +211,38 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )
+
+   /* Context using management */
+   #define HB_STACK_LOCK \
+   {\
+      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      while ( hb_runningStacks.content.asLong < 0 ) \
+      {\
+         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
+      }\
+      if( ! HB_VM_STACK.bInUse ) \
+      {\
+         hb_runningStacks.content.asLong++;\
+         HB_VM_STACK.bInUse = TRUE;\
+      }\
+      HB_COND_SIGNAL( hb_runningStacks.Cond );\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+      HB_CLEANUP_POP;\
+   } 
+   
+   #define HB_STACK_UNLOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( HB_VM_STACK.bInUse ) \
+      {\
+         hb_runningStacks.content.asLong--;\
+         HB_VM_STACK.bInUse = FALSE;\
+         HB_COND_SIGNAL( hb_runningStacks.Cond );\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   } 
+
 #endif
 
 /**********************************************************/
@@ -428,54 +497,9 @@ extern HB_CRITICAL_T HB_mutexMutex;
 
 /* count of running stacks; set to -1 to block stacks from running */
 extern HB_SHARED_RESOURCE hb_runningStacks;
-
-
-/* Context using management */
-#define HB_STACK_LOCK \
-{\
-   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
-   HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-   while ( hb_runningStacks.content.asLong < 0 ) \
-   {\
-      HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-   }\
-   if( ! HB_VM_STACK.bInUse ) \
-   {\
-      hb_runningStacks.content.asLong++;\
-      HB_VM_STACK.bInUse = TRUE;\
-      HB_COND_SIGNAL( hb_runningStacks.Cond );\
-   }\
-   HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   HB_CLEANUP_POP;\
-} 
-
-#define HB_STACK_UNLOCK \
-{\
-   HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-   if( HB_VM_STACK.bInUse ) \
-   {\
-      hb_runningStacks.content.asLong--;\
-      HB_VM_STACK.bInUse = FALSE;\
-      HB_COND_SIGNAL( hb_runningStacks.Cond );\
-   }\
-   HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-} 
-
-#define HB_STACK_STOP_TELLING( var, value )\
-{\
-   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
-   HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-   var = value;\
-   while ( hb_runningStacks.content.asLong != 0 ) \
-   {\
-      HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-   }\
-   hb_runningStacks.content.asLong = -1;\
-   HB_COND_SIGNAL( hb_runningStacks.Cond );\
-   HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   HB_CLEANUP_POP;\
-}
-
+#ifdef HB_OS_WIN_32
+   extern HB_SHARED_RESOURCE hb_idleQueueRes;
+#endif
 
 
 #define HB_STACK_STOP    ( HB_WAIT_SHARED( hb_runningStacks, HB_COND_EQUAL, 0, HB_COND_SET, -1 ) )
