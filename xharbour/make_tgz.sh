@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.44 2005/02/26 15:28:00 likewolf Exp $
+# $Id: make_tgz.sh,v 1.45 2005/03/13 12:44:13 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -120,8 +120,13 @@ INSTALL=install
 MAKE=make
 TAR=tar
 case "$HB_ARCHITECTURE" in
-    darwin) TAR=gtar; INSTALL="install -c" ;;
-    bsd)    MAKE=gmake ;;
+    darwin)
+        gtar --version >/dev/null 2>&1 && TAR=gtar
+        INSTALL="install -c"
+        ;;
+    bsd)
+        MAKE=gmake
+        ;;
 esac
 
 # Select the contribs to build
