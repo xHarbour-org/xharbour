@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.14 2003/05/29 16:39:47 iananderson Exp $
+ * $Id: _winsys.c,v 1.15 2003/05/29 17:01:16 paultucker Exp $
  */
 
 // WHAT32
@@ -638,7 +638,7 @@ HB_FUNC( GETMODULEHANDLE )
 
 HB_FUNC( GETCOMMANDLINE )
 {
-// (LPSTR) GetCommandLineA(  ) ) ;
+   _retc( (LPSTR) GetCommandLine() );
 }
 
 
