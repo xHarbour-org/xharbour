@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.38 2002/11/19 03:47:35 what32 Exp $
+ * $Id: TabControl.Prg,v 1.39 2003/01/09 08:22:14 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -60,28 +60,28 @@ IMPORT C STRUCTURE RECT
 
 CLASS TTabControl FROM TCustomControl
 
-   DATA FCaption PROTECTED INIT ""
+   DATA FCaption EXPORTED INIT ""
    
-   DATA FLeft    PROTECTED INIT    0
-   DATA FTop     PROTECTED INIT    0
-   DATA FWidth   PROTECTED INIT  160
-   DATA FHeight  PROTECTED INIT  160
+   DATA FLeft    EXPORTED INIT    0
+   DATA FTop     EXPORTED INIT    0
+   DATA FWidth   EXPORTED INIT  160
+   DATA FHeight  EXPORTED INIT  160
 
    DATA CurSel  INIT    1
 
-   DATA Style     PROTECTED INIT  WS_CHILD + WS_VISIBLE + WS_CLIPSIBLINGS
-   DATA ExStyle   PROTECTED INIT  0
+   DATA Style     EXPORTED INIT  WS_CHILD + WS_VISIBLE + WS_CLIPSIBLINGS
+   DATA ExStyle   EXPORTED INIT  0
 
-   DATA lRegister PROTECTED INIT .F.
-   DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
-   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA lRegister EXPORTED INIT .F.
+   DATA lControl  EXPORTED INIT .T.
+   DATA Msgs      EXPORTED INIT {WM_SIZE,WM_MOVE}
+   DATA WndProc   EXPORTED INIT 'ControlProc'
    
-   DATA Cargo            PROTECTED
-   DATA SendTo AS OBJECT PROTECTED
+   DATA Cargo            EXPORTED
+   DATA SendTo AS OBJECT EXPORTED
 
-   DATA WinClass    PROTECTED INIT WC_TABCONTROL
-   DATA ControlName PROTECTED INIT "TabControl"
+   DATA WinClass    EXPORTED INIT WC_TABCONTROL
+   DATA ControlName EXPORTED INIT "TabControl"
 
    METHOD InsertTab()
    METHOD DeleteTab()
@@ -429,7 +429,7 @@ METHOD CreateWnd() CLASS TabPage
 
       AADD( ::FParent:Controls, Self )
 
-      __objAddData( ::FParent, ::Name, HB_OO_CLSTP_PROTECTED )
+      __objAddData( ::FParent, ::Name, HB_OO_CLSTP_EXPORTED )
       __ObjSetValueList( ::FParent, { { ::Name, Self } } )
 
    ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.18 2003/01/09 08:21:53 what32 Exp $
+ * $Id: TPanel.prg,v 1.19 2003/01/29 10:26:45 what32 Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ CLASS TPanel FROM TForm
 
 //-------------------------------------------------------------------------------------------
    DATA WinClass    PROTECTED INIT "Panel"
-   DATA ControlName PROTECTED INIT "Panel"
+   DATA ControlName EXPORTED INIT "Panel"
 
    METHOD Create()
 

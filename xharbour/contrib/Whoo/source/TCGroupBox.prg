@@ -1,5 +1,5 @@
 /*
- * $Id: TCGroupBox.prg,v 1.15 2002/11/19 00:47:01 what32 Exp $
+ * $Id: TCGroupBox.prg,v 1.16 2003/01/09 08:21:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -49,7 +49,7 @@ CLASS TGroupBox FROM TCustomControl
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
    DATA WinClass    PROTECTED INIT "button"
-   DATA ControlName PROTECTED INIT "GroupBox"
+   DATA ControlName EXPORTED INIT "GroupBox"
 
 ENDCLASS
 

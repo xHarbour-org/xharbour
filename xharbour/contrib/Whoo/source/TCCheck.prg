@@ -1,5 +1,5 @@
 /*
- * $Id: TCCheck.prg,v 1.21 2002/11/19 20:23:20 what32 Exp $
+ * $Id: TCCheck.prg,v 1.22 2003/01/09 08:21:03 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -48,7 +48,7 @@ CLASS TCheckBox FROM TCustomControl
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
    DATA WinClass    PROTECTED INIT "button"
-   DATA ControlName PROTECTED INIT "CheckBox"
+   DATA ControlName EXPORTED INIT "CheckBox"
 
 ENDCLASS
 

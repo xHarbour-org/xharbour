@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.34 2003/01/09 08:21:25 what32 Exp $
+ * $Id: TCRebar.prg,v 1.35 2003/01/17 13:18:07 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -74,26 +74,26 @@ typedef struct tagREBARBANDINFOA;
 
 CLASS TCoolBar FROM TCustomControl
 
-   DATA Caption  PROTECTED  INIT ""
-   DATA FLeft   PROTECTED  INIT    0
-   DATA FTop    PROTECTED  INIT    0
-   DATA FWidth  PROTECTED  INIT  200
-   DATA FHeight PROTECTED  INIT  100
+   DATA Caption  EXPORTED  INIT ""
+   DATA FLeft   EXPORTED  INIT    0
+   DATA FTop    EXPORTED  INIT    0
+   DATA FWidth  EXPORTED  INIT  200
+   DATA FHeight EXPORTED  INIT  100
 
    DATA Style   INIT  WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                       /*RBS_VARHEIGHT+*/RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
    DATA ExStyle INIT  WS_EX_TOOLWINDOW
 
-   DATA lRegister PROTECTED INIT .F.
-   DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_NOTIFY}
-   DATA WndProc   PROTECTED INIT 'FormProc'
+   DATA lRegister EXPORTED INIT .F.
+   DATA lControl  EXPORTED INIT .T.
+   DATA Msgs      EXPORTED INIT {WM_NOTIFY}
+   DATA WndProc   EXPORTED INIT 'FormProc'
 
-   VAR nrProc     PROTECTED
+   VAR nrProc     EXPORTED
 
-   DATA WinClass    PROTECTED INIT REBARCLASSNAME
-   DATA ControlName PROTECTED INIT "CoolBar"
-   DATA Bands       PROTECTED INIT {}
+   DATA WinClass    EXPORTED INIT REBARCLASSNAME
+   DATA ControlName EXPORTED INIT "CoolBar"
+   DATA Bands       EXPORTED INIT {}
 
    METHOD CreateWnd()
    METHOD CoolBarProc()
@@ -169,10 +169,10 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------
 
 CLASS TCoolBand
-   DATA oStruct  PROTECTED
-   DATA Index    PROTECTED
-   DATA Parent   PROTECTED
-   DATA ChildObj PROTECTED
+   DATA oStruct  EXPORTED
+   DATA Index    EXPORTED
+   DATA Parent   EXPORTED
+   DATA ChildObj EXPORTED
    
    DATA BorderStyles    AS ARRAY INIT { 0, RBBS_CHILDEDGE }
    DATA BreakStyles     AS ARRAY INIT { 0, RBBS_BREAK }

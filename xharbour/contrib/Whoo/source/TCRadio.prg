@@ -1,5 +1,5 @@
 /*
- * $Id: TCRadio.prg,v 1.20 2002/11/19 20:23:20 what32 Exp $
+ * $Id: TCRadio.prg,v 1.21 2003/01/09 08:21:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -49,7 +49,7 @@ CLASS TRadioButton FROM TCustomControl
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
    DATA WinClass    PROTECTED INIT "button"
-   DATA ControlName PROTECTED INIT "RadioButton"
+   DATA ControlName EXPORTED INIT "RadioButton"
 
 ENDCLASS
 

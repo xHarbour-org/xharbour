@@ -54,7 +54,7 @@ CLASS TMenu FROM TComponent
    DATA Popup  AS OBJECT
    DATA FOwnerDraw INIT .F.
    
-   DATA aItems PROTECTED INIT {}
+   DATA aItems EXPORTED INIT {}
 
    PROPERTY Items        READ FItems DEFAULT {}
    PROPERTY OnChange     READ FOnChange

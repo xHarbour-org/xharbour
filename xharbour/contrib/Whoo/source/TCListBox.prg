@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.26 2003/01/29 10:26:45 what32 Exp $
+ * $Id: TCListBox.prg,v 1.27 2003/02/02 16:48:09 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -70,7 +70,7 @@ CLASS TListBox FROM TCustomControl
    ACCESS CurSel  INLINE ::GetCurSel()
 
    DATA WinClass    PROTECTED INIT "listbox"
-   DATA ControlName PROTECTED INIT "ListBox"
+   DATA ControlName EXPORTED INIT "ListBox"
 
    METHOD GetString()
    METHOD GetItemRect()

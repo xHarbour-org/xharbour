@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.14 2002/11/19 08:00:00 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.15 2003/01/09 08:21:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -61,7 +61,7 @@ CLASS TProgressBar FROM TCustomControl
    DATA Color     PROTECTED
 
    DATA WinClass    PROTECTED INIT PROGRESS_CLASS
-   DATA ControlName PROTECTED INIT "ProgressBar"
+   DATA ControlName EXPORTED INIT "ProgressBar"
 
    METHOD SetPosition()
    METHOD DrawText()

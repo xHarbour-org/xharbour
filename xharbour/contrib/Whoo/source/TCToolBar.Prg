@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.38 2003/01/30 13:27:47 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.39 2003/01/31 06:50:46 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -90,33 +90,33 @@ typedef struct {;
 
 CLASS TToolBar FROM TCustomControl
 
-   DATA Caption PROTECTED INIT ""
-   DATA FLeft   PROTECTED  INIT    0
-   DATA FTop    PROTECTED  INIT    0
-   DATA FWidth  PROTECTED  INIT    100
-   DATA FHeight PROTECTED  INIT    24
+   DATA Caption EXPORTED INIT ""
+   DATA FLeft   EXPORTED  INIT    0
+   DATA FTop    EXPORTED  INIT    0
+   DATA FWidth  EXPORTED  INIT    100
+   DATA FHeight EXPORTED  INIT    24
 
    DATA FStyle   INIT  WS_CHILD + WS_VISIBLE + TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + CCS_NODIVIDER + CCS_NORESIZE
    
    DATA ExStyle  INIT  0
 
-   DATA lRegister PROTECTED INIT .F.
-   DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT { WM_SIZE, WM_MOVE }
+   DATA lRegister EXPORTED INIT .F.
+   DATA lControl  EXPORTED INIT .T.
+   DATA Msgs      EXPORTED INIT { WM_SIZE, WM_MOVE }
    
    ACCESS RowCount          INLINE SendMessage( ::handle, TB_GETROWS, 0, 0 )
    ASSIGN RowCount( nRows ) INLINE SendMessage( ::handle, TB_SETROWS, nRows )
 
-   DATA abuttons PROTECTED INIT {}
-   DATA aBitmaps PROTECTED
-   DATA Created  PROTECTED
-   DATA ntProc   PROTECTED
-   DATA aMenus   PROTECTED
+   DATA abuttons EXPORTED INIT {}
+   DATA aBitmaps EXPORTED
+   DATA Created  EXPORTED
+   DATA ntProc   EXPORTED
+   DATA aMenus   EXPORTED
    
-   VAR nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp PROTECTED
+   VAR nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp EXPORTED
 
-   DATA WinClass    PROTECTED INIT TOOLBARCLASSNAME
-   DATA ControlName PROTECTED INIT "ToolBar"
+   DATA WinClass    EXPORTED INIT TOOLBARCLASSNAME
+   DATA ControlName EXPORTED INIT "ToolBar"
 
    METHOD Add()
    METHOD AddBitmap()
@@ -328,7 +328,7 @@ CLASS ToolButton
    DATA ImageIndex INIT -1
    DATA Name
    DATA ControlName INIT "ToolButton"
-   DATA Style      PROTECTED INIT TBSTYLE_BUTTON
+   DATA Style      EXPORTED INIT TBSTYLE_BUTTON
    DATA PopupMenu
    DATA Height
    DATA Width
@@ -339,8 +339,8 @@ CLASS ToolButton
    DATA TextIndex  INIT 0
    DATA TabIndex   INIT 1
 
-   DATA Parent     PROTECTED
-   DATA oStruct    PROTECTED
+   DATA Parent     EXPORTED
+   DATA oStruct    EXPORTED
 
    PROPERTY Id READ oStruct:idCommand WRITE SetId DEFAULT 0
    
@@ -374,7 +374,7 @@ METHOD Create( oParent ) CLASS ToolButton
       ::Name := ( ::ControlName + AllTrim( Str( nInst ) ) )
    ENDIF
 
-   __objAddData( oParent, ::Name, HB_OO_CLSTP_PROTECTED )
+   __objAddData( oParent, ::Name, HB_OO_CLSTP_EXPORTED )
    __ObjSetValueList( oParent, { { ::Name, self } } )
 
    ::Parent := oParent

@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.21 2002/11/19 00:47:01 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.22 2003/01/09 08:21:33 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -53,7 +53,7 @@ CLASS TStatusBar FROM TCustomControl
    DATA rect      PROTECTED
 
    DATA WinClass    PROTECTED INIT "msctls_statusbar32"
-   DATA ControlName PROTECTED INIT "StatusBar"
+   DATA ControlName EXPORTED INIT "StatusBar"
 
    METHOD CreateWnd()
    

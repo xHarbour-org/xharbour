@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.19 2002/11/11 23:18:02 what32 Exp $
+ * $Id: TTreeview.prg,v 1.20 2003/01/09 08:21:58 what32 Exp $
  */
 
 /*
@@ -41,26 +41,26 @@
 
 CLASS TTreeView FROM TCustomControl
 
-   DATA Items     PROTECTED INIT {}
-   DATA ImageList PROTECTED
-   DATA bChanged  PROTECTED
+   DATA Items     EXPORTED INIT {}
+   DATA ImageList EXPORTED
+   DATA bChanged  EXPORTED
 
-   DATA FCaption PROTECTED  INIT ""
-   DATA FLeft    PROTECTED  INIT    0
-   DATA FTop     PROTECTED  INIT    0
-   DATA FWidth   PROTECTED  INIT  160
-   DATA FHeight  PROTECTED  INIT  160
+   DATA FCaption EXPORTED  INIT ""
+   DATA FLeft    EXPORTED  INIT    0
+   DATA FTop     EXPORTED  INIT    0
+   DATA FWidth   EXPORTED  INIT  160
+   DATA FHeight  EXPORTED  INIT  160
 
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT+TVS_SHOWSELALWAYS
    DATA ExStyle INIT  WS_EX_CLIENTEDGE
 
-   DATA lRegister PROTECTED INIT .F.
-   DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_MOUSEMOVE}
-   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA lRegister EXPORTED INIT .F.
+   DATA lControl  EXPORTED INIT .T.
+   DATA Msgs      EXPORTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_MOUSEMOVE}
+   DATA WndProc   EXPORTED INIT 'ControlProc'
 
-   DATA WinClass    PROTECTED INIT "SysTreeView32"
-   DATA ControlName PROTECTED INIT "TreeView"
+   DATA WinClass    EXPORTED INIT "SysTreeView32"
+   DATA ControlName EXPORTED INIT "TreeView"
 
    METHOD Add()
    METHOD Expand()               INLINE aEval( ::Items, { | oItem | oItem:Expand() } )

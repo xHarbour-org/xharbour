@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.25 2003/01/29 10:26:45 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.2 2003/02/19 02:45:01 augusto Exp $
  */
 /*
  * xHarbour Project source code:
@@ -101,126 +101,126 @@ CLASS TWBrowse FROM TWinControl
 
    DATA Style     INIT WS_CHILD+WS_BORDER+WS_VISIBLE+WS_VSCROLL+WS_HSCROLL
    DATA ExStyle   INIT WS_EX_CLIENTEDGE
-   DATA lRegister PROTECTED INIT .T.
-   DATA FrameWnd  PROTECTED INIT .F.
+   DATA lRegister EXPORTED INIT .T.
+   DATA FrameWnd  EXPORTED INIT .F.
    DATA Menu
 
-   DATA nDataTop           PROTECTED // data display area top coordinate (usually == headHeight)
-   DATA nDataLeft          PROTECTED // data display area left coordinate ( usually 0 )
-   DATA nDataWidth         PROTECTED // data display area width
-   DATA nDataHeight        PROTECTED // data display area height
-   DATA hWndHeader         PROTECTED // handle to the header window
-   DATA aRect              PROTECTED // browse window client rectangle
-   DATA Configured         PROTECTED // internal subclassing flag
-   DATA ImageList          PROTECTED 
+   DATA nDataTop           EXPORTED // data display area top coordinate (usually == headHeight)
+   DATA nDataLeft          EXPORTED // data display area left coordinate ( usually 0 )
+   DATA nDataWidth         EXPORTED // data display area width
+   DATA nDataHeight        EXPORTED // data display area height
+   DATA hWndHeader         EXPORTED // handle to the header window
+   DATA aRect              EXPORTED // browse window client rectangle
+   DATA Configured         EXPORTED // internal subclassing flag
+   DATA ImageList          EXPORTED 
 
    // tbd
 
-   DATA hWndNub            PROTECTED // numbs window handle ( future expansion )
-   DATA NubWidth           PROTECTED // width of nums window
+   DATA hWndNub            EXPORTED // numbs window handle ( future expansion )
+   DATA NubWidth           EXPORTED // width of nums window
 
    // user options (assignable)
 
-   DATA HeadHeight         PROTECTED // header height
-   DATA ItemHeight         PROTECTED // height of a single data item
-   DATA wantHeading        PROTECTED //
-   DATA wantResize         PROTECTED 
-   DATA wantHScroll        PROTECTED 
-   DATA wantVScroll        PROTECTED 
-   DATA wantHiliteAll      PROTECTED 
-   DATA wantRowSep         PROTECTED 
-   DATA wantColSep         PROTECTED 
-   DATA wantNotify         PROTECTED 
-   DATA wantNubs           PROTECTED 
-   DATA wantDrawFocus      PROTECTED 
-   DATA wantUseSysColors   PROTECTED 
-   DATA wantEnterKey       PROTECTED 
-   DATA wantAutoHilite     PROTECTED 
+   DATA HeadHeight         EXPORTED // header height
+   DATA ItemHeight         EXPORTED // height of a single data item
+   DATA wantHeading        EXPORTED //
+   DATA wantResize         EXPORTED 
+   DATA wantHScroll        EXPORTED 
+   DATA wantVScroll        EXPORTED 
+   DATA wantHiliteAll      EXPORTED 
+   DATA wantRowSep         EXPORTED 
+   DATA wantColSep         EXPORTED 
+   DATA wantNotify         EXPORTED 
+   DATA wantNubs           EXPORTED 
+   DATA wantDrawFocus      EXPORTED 
+   DATA wantUseSysColors   EXPORTED 
+   DATA wantEnterKey       EXPORTED 
+   DATA wantAutoHilite     EXPORTED 
    //
 
-   DATA si                 PROTECTED // scrollinfo
+   DATA si                 EXPORTED // scrollinfo
 
-   DATA ColWidths          PROTECTED // array of cumulative column widths (starting from 0)
-   DATA Columns            PROTECTED // array of column objects
-   DATA aData              PROTECTED // data buffer - containg all columns text data for all displayed rows
-   DATA aFgColors          PROTECTED 
-   DATA aBgColors          PROTECTED 
+   DATA ColWidths          EXPORTED // array of cumulative column widths (starting from 0)
+   DATA Columns            EXPORTED // array of column objects
+   DATA aData              EXPORTED // data buffer - containg all columns text data for all displayed rows
+   DATA aFgColors          EXPORTED 
+   DATA aBgColors          EXPORTED 
 
-   DATA RowPos             PROTECTED // row number in the data display window
-   DATA ColPos             PROTECTED // current column position
-   DATA Hilited            PROTECTED // hilite flag
-   DATA Frozen             PROTECTED 
+   DATA RowPos             EXPORTED // row number in the data display window
+   DATA ColPos             EXPORTED // current column position
+   DATA Hilited            EXPORTED // hilite flag
+   DATA Frozen             EXPORTED 
 
-   DATA RowCountVisible    PROTECTED // all rows incl. the partially visible row
-   DATA RowCountUsable     PROTECTED // fully visible rows only
-   DATA OldRecNo           PROTECTED // previous record
-   DATA OldColPos          PROTECTED // provious column position (temp)
-   DATA ColCount           PROTECTED // number of all comumns in the browse
-   DATA LeftVisible        PROTECTED // leftmost visible column
-   DATA RightVisible       PROTECTED // rightmost visible column
-   DATA lResizing          PROTECTED // busy resizing a column logical flag
-   DATA lMoving            PROTECTED // busy moving a column logical flag
+   DATA RowCountVisible    EXPORTED // all rows incl. the partially visible row
+   DATA RowCountUsable     EXPORTED // fully visible rows only
+   DATA OldRecNo           EXPORTED // previous record
+   DATA OldColPos          EXPORTED // provious column position (temp)
+   DATA ColCount           EXPORTED // number of all comumns in the browse
+   DATA LeftVisible        EXPORTED // leftmost visible column
+   DATA RightVisible       EXPORTED // rightmost visible column
+   DATA lResizing          EXPORTED // busy resizing a column logical flag
+   DATA lMoving            EXPORTED // busy moving a column logical flag
 
-   DATA xvScroll           PROTECTED 
-   DATA xhScroll           PROTECTED 
-   DATA SepColor           PROTECTED 
-   DATA HeadFgColor        PROTECTED 
-   DATA HeadBgColor        PROTECTED 
-   DATA HeadFont           PROTECTED 
-   DATA FgColor            PROTECTED 
-   DATA BgColor            PROTECTED 
-   DATA Font               PROTECTED 
-   DATA HiliteColor        PROTECTED 
-   DATA HiliteBgColor      PROTECTED 
-   DATA HiliteNoFocus      PROTECTED 
-   DATA LinePen            PROTECTED 
-   DATA HeadText           PROTECTED 
-   DATA HeadAlign          PROTECTED 
-   DATA HeadBmps           PROTECTED 
-   DATA HeadBmpAlign       PROTECTED 
+   DATA xvScroll           EXPORTED 
+   DATA xhScroll           EXPORTED 
+   DATA SepColor           EXPORTED 
+   DATA HeadFgColor        EXPORTED 
+   DATA HeadBgColor        EXPORTED 
+   DATA HeadFont           EXPORTED 
+   DATA FgColor            EXPORTED 
+   DATA BgColor            EXPORTED 
+   DATA Font               EXPORTED 
+   DATA HiliteColor        EXPORTED 
+   DATA HiliteBgColor      EXPORTED 
+   DATA HiliteNoFocus      EXPORTED 
+   DATA LinePen            EXPORTED 
+   DATA HeadText           EXPORTED 
+   DATA HeadAlign          EXPORTED 
+   DATA HeadBmps           EXPORTED 
+   DATA HeadBmpAlign       EXPORTED 
 
-   DATA ColBgColors        PROTECTED 
-   DATA ColFgColors        PROTECTED 
-   DATA ColAlign           PROTECTED 
-   DATA ColVAlign          PROTECTED 
-   DATA ColFonts           PROTECTED 
-   DATA ColBmps            PROTECTED 
-   DATA ColBmpAlign        PROTECTED 
-   DATA ColOffset          PROTECTED 
-   DATA ColStyle           PROTECTED 
+   DATA ColBgColors        EXPORTED 
+   DATA ColFgColors        EXPORTED 
+   DATA ColAlign           EXPORTED 
+   DATA ColVAlign          EXPORTED 
+   DATA ColFonts           EXPORTED 
+   DATA ColBmps            EXPORTED 
+   DATA ColBmpAlign        EXPORTED 
+   DATA ColOffset          EXPORTED 
+   DATA ColStyle           EXPORTED 
 
-   DATA objs              PROTECTED 
+   DATA objs              EXPORTED 
 
-   DATA vScrollEx          PROTECTED 
+   DATA vScrollEx          EXPORTED 
 
-   DATA Source             PROTECTED 
-   DATA ArrayMode          PROTECTED 
-   DATA Element            PROTECTED 
-   DATA RecPos             PROTECTED 
-   DATA RecCount           PROTECTED 
-   DATA HitTop             PROTECTED 
-   DATA HitBottom          PROTECTED 
+   DATA Source             EXPORTED
+   DATA ArrayMode          EXPORTED 
+   DATA Element            EXPORTED 
+   DATA RecPos             EXPORTED 
+   DATA RecCount           EXPORTED 
+   DATA HitTop             EXPORTED 
+   DATA HitBottom          EXPORTED 
 
-   DATA bSeekChar          PROTECTED 
-   DATA bGoToPos           PROTECTED 
-   DATA bGoTop             PROTECTED 
-   DATA bGoBottom          PROTECTED 
-   DATA bSkip              PROTECTED 
-   DATA bRecNo             PROTECTED 
-   DATA bSetLogPos         PROTECTED 
-   DATA bOnChangeBlock     PROTECTED 
-   DATA bOnClick           PROTECTED 
-   DATA bOnDblClick        PROTECTED 
+   DATA bSeekChar          EXPORTED 
+   DATA bGoToPos           EXPORTED 
+   DATA bGoTop             EXPORTED 
+   DATA bGoBottom          EXPORTED 
+   DATA bSkip              EXPORTED 
+   DATA bRecNo             EXPORTED 
+   DATA bSetLogPos         EXPORTED 
+   DATA bOnChangeBlock     EXPORTED 
+   DATA bOnClick           EXPORTED 
+   DATA bOnDblClick        EXPORTED 
 
-   DATA bOnKey             PROTECTED 
-   DATA bOnChar            PROTECTED 
-   DATA bKillBlock         PROTECTED 
+   DATA bOnKey             EXPORTED 
+   DATA bOnChar            EXPORTED 
+   DATA bKillBlock         EXPORTED 
 
-   DATA xTrack             PROTECTED 
-   DATA xTrackOffset       PROTECTED 
-   DATA xTrackColumn       PROTECTED 
-   DATA xDragColumn        PROTECTED INIT 0
-   DATA aDragRect          PROTECTED
+   DATA xTrack             EXPORTED 
+   DATA xTrackOffset       EXPORTED 
+   DATA xTrackColumn       EXPORTED 
+   DATA xDragColumn        EXPORTED INIT 0
+   DATA aDragRect          EXPORTED
    
    
    METHOD AddColumn()
@@ -311,7 +311,7 @@ CLASS TWBrowse FROM TWinControl
    METHOD CreateWnd() 
 
    METHOD WMMessage()
-   METHOD OnCustomDraw()
+//   METHOD OnCustomDraw()
    METHOD OnHeaderDrag( nProc, nwParam, nlParam )
 ENDCLASS
 
@@ -1168,7 +1168,7 @@ METHOD WMMessage( nMsg, nwParam, nlParam)
       ::OnEndDrag(nwParam)
    ENDIF
 RETURN NIL
-
+/*
 METHOD OnCustomDraw( nlParam ) CLASS TWBrowse
 
    LOCAL cd IS NMCUSTOMDRAW
@@ -1183,7 +1183,7 @@ METHOD OnCustomDraw( nlParam ) CLASS TWBrowse
    ENDCASE
 
 RETURN 0
-
+*/
 METHOD OnHeaderDrag( nProc, nwParam, nlParam )
    STATIC aLast, nInit, oWnd
    LOCAL nDif, hWnd, nPos, nLeft, nRight, xColPos, aPt, aRect, hDC, aMouse := GetCursorPos()
@@ -1248,8 +1248,8 @@ METHOD WMNotify( Hdr, nlParam ) CLASS TWBrowse
       nmHdr IS NMHEADER
    ENDIF
    DO CASE
-      CASE Hdr:code == NM_CUSTOMDRAW
-           RETURN ::OnCustomDraw( nlParam )
+//      CASE Hdr:code == NM_CUSTOMDRAW
+//           RETURN ::OnCustomDraw( nlParam )
 
       CASE Hdr:code == HDN_BEGINTRACK
            nmHdr:Pointer(nlParam)

@@ -1,5 +1,5 @@
 /*
- * $Id: TPageControl.prg,v 1.1 2002/10/31 04:08:44 what32 Exp $
+ * $Id: TPageControl.prg,v 1.2 2003/01/09 08:21:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,7 +36,7 @@
 
 CLASS TPageControl FROM TCustomTabControl
 
-   DATA ControlName PROTECTED INIT "PageControl"
+   DATA ControlName EXPORTED INIT "PageControl"
 
    METHOD New() CONSTRUCTOR
 

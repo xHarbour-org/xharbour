@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.16 2003/01/27 11:54:01 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.17 2003/02/07 19:18:17 what32 Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ CLASS TMenuItem FROM TComponent
 
    PROPERTY OnChange READ FOnChange
 
-   DATA FMenu    AS OBJECT PRIVATE
+   DATA FMenu    AS OBJECT
    DATA Id
    DATA Action  AS CODEBLOCK
    DATA Checked
@@ -74,7 +74,7 @@ CLASS TMenuItem FROM TComponent
    DATA FDefault   INIT .F.
 
    DATA PopUp
-   DATA aItems PROTECTED INIT {}
+   DATA aItems EXPORTED INIT {}
    
    PROPERTY Enabled    READ FEnabled WRITE SetEnabled
    PROPERTY Command    READ FCommand WRITE SetCommand

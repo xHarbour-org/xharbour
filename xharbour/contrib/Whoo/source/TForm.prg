@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.62 2003/01/09 08:21:41 what32 Exp $
+ * $Id: TForm.prg,v 1.63 2003/02/07 19:18:16 what32 Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ CLASS TForm FROM TCustomForm //WinControl
 
 //-------------------------------------------------------------------------------------------
    DATA WinClass    PROTECTED INIT "Form"
-   DATA ControlName PROTECTED INIT "Form"
+   DATA ControlName EXPORTED INIT "Form"
 
 
    METHOD Create()
@@ -164,7 +164,7 @@ METHOD Add( oObj ) CLASS TForm
 
    oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
 
-   __objAddData( self, oObj:Name, HB_OO_CLSTP_PROTECTED )
+   __objAddData( self, oObj:Name, HB_OO_CLSTP_EXPORTED )
    __ObjSetValueList( self, { { oObj:Name, oObj } } )
 
    oObj:Parent := Self

@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.12 2003/01/09 08:21:58 what32 Exp $
+ * $Id: TSplash.prg,v 1.13 2003/03/07 14:11:50 what32 Exp $
  */
 
 /*
@@ -48,27 +48,17 @@ typedef struct _BLENDFUNCTION {;
 CLASS TSplash FROM TForm
    DATA bitmap
    METHOD Create() CONSTRUCTOR
-   METHOD WMPaint( hDC )  INLINE ::TestAlpha(hDC), 0
+   METHOD WMPaint( hDC )  INLINE DrawBitmap( hDC, ::bitmap,,0,0)
    METHOD WMDestroy()     INLINE DeleteObject(::bitmap),NIL
    METHOD WMTimer( n )    INLINE IIF( n==1,::DestroyWindowHandle(),)
    METHOD WMLButtonDown() INLINE ::DestroyWindowHandle()
    METHOD WMRButtonDown() INLINE ::DestroyWindowHandle()
-   METHOD TestAlpha()
 ENDCLASS
 
 #define AC_SRC_OVER      0 
 #define AC_SRC_ALPHA     1 
 #define AC_SRC_NO_ALPHA  2 
 
-
-METHOD TestAlpha(hDC) CLASS TSplash
-   LOCAL bf IS BLENDFUNCTION
-   bf:BlendOp             := AC_SRC_OVER
-   bf:BlendFlags          := 0
-   bf:SourceConstantAlpha := 172
-   bf:AlphaFormat         := 0
-   DrawBitmap( hDC, ::bitmap,,0,0,,,bf:value)
-RETURN 0
 
 METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash
    local aRect,abRect

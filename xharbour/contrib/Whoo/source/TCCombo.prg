@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.25 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TCCombo.prg,v 1.26 2003/01/09 08:21:03 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -39,21 +39,21 @@
 
 CLASS TComboBox FROM TCustomControl
 
-   DATA FCaption PROTECTED  INIT ""
-   DATA FLeft    PROTECTED  INIT   0
-   DATA FTop     PROTECTED  INIT   0
-   DATA FWidth   PROTECTED  INIT  80
-   DATA FHeight  PROTECTED  INIT  20
+   DATA FCaption EXPORTED  INIT ""
+   DATA FLeft    EXPORTED  INIT   0
+   DATA FTop     EXPORTED  INIT   0
+   DATA FWidth   EXPORTED  INIT  80
+   DATA FHeight  EXPORTED  INIT  20
    
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+CBS_DROPDOWNLIST+WS_VSCROLL+CBS_HASSTRINGS
 
-   DATA lRegister PROTECTED INIT .F.
-   DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_COMMAND}
-   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA lRegister EXPORTED INIT .F.
+   DATA lControl  EXPORTED INIT .T.
+   DATA Msgs      EXPORTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_COMMAND}
+   DATA WndProc   EXPORTED INIT 'ControlProc'
 
-   DATA WinClass    PROTECTED INIT "combobox"
-   DATA ControlName PROTECTED INIT "ComboBox"
+   DATA WinClass    EXPORTED INIT "combobox"
+   DATA ControlName EXPORTED INIT "ComboBox"
 
    METHOD AddString( cText )        INLINE ::SendMessage( CB_ADDSTRING, 0, cText)
    METHOD InsertString(cText,nLine) INLINE ::SendMessage( CB_INSERTSTRING, nLine, cText )
