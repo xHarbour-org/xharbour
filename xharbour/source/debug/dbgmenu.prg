@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.15 2001/04/12 18:56:29 dholm Exp $
+ * $Id: dbgmenu.prg,v 1.17 2002/07/14 10:36:17 antoniolinares Exp $
  */
 
 /*
@@ -67,6 +67,7 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
    local oCaseSensitive
    local oMonoDisplay
    local oPublic, oPrivate, oStatic, oLocal, oAll, oSort
+   local oCallStack
 
    MENU oMenu
       MENUITEM " ~File "
@@ -95,12 +96,14 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
          MENUITEM " ~WorkAreas   F6"  ACTION oDebugger:ShowWorkAreas()
          MENUITEM " ~App Screen  F4 " ACTION oDebugger:ShowAppScreen()
          SEPARATOR
-         MENUITEM " ~CallStack"       ACTION oDebugger:ShowCallStack()
+         MENUITEM oCallStack PROMPT " ~CallStack" ;
+            ACTION ( oDebugger:Stack(), oCallStack:Toggle() )
       ENDMENU
 
       MENUITEM " ~Run "
       MENU
-         MENUITEM " ~Animate"               ACTION oDebugger:Animate()
+         MENUITEM " ~Animate" ;
+            ACTION ( oDebugger:ToggleAnimate(), oDebugger:Animate() )
          MENUITEM " ~Step              F8 " ACTION oDebugger:Step()
          MENUITEM " ~Trace            F10"  ACTION oDebugger:Trace()
          MENUITEM " ~Go                F5"  ACTION oDebugger:Go()
@@ -174,12 +177,12 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
 
       MENUITEM " ~Help "
       MENU
-         MENUITEM " ~About Help "           ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~About Help "           ACTION oDebugger:ShowHelp( 0 )
          SEPARATOR
-         MENUITEM " ~Keys"                  ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Windows"               ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Menus"                 ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Commands"              ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Keys"                  ACTION oDebugger:ShowHelp( 2 )
+         MENUITEM " ~Windows"               ACTION oDebugger:ShowHelp( 6 )
+         MENUITEM " ~Menus"                 ACTION oDebugger:ShowHelp( 12 )
+         MENUITEM " ~Commands"              ACTION oDebugger:ShowHelp( 21 )
       ENDMENU
 
    ENDMENU
