@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.47 2002/10/06 03:03:04 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.48 2002/10/06 03:06:50 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -98,7 +98,7 @@ GLOBAL EXTERNAL oApp
 
    METHOD XFMTop()
    METHOD XFMRoot()
-   METHOD XFMControl( cName, oControl )
+   METHOD XFMControl( cName, oControl, lDelete )
    METHOD XFMReflect()
    METHOD XFMTrace()
 
@@ -116,7 +116,7 @@ METHOD Add( cName, oObj )
    ::oMask:Cursor := NIL
    ::CtrlName := NIL
 
-   ::XFMControl( cName, oObj )
+   ::XFMControl( cName, oObj, .F. )
 
    RETURN(oCtrl)
 
@@ -232,12 +232,13 @@ METHOD CreateControl(aRect)
          ::oMask:Cursor:=NIL
 
       ENDCASE
+
       if oObj!=NIL
          oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
          oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
 
-         oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ),;
-                                    HB_QSELF():DelControl() } )
+         oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
+                                    HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
@@ -386,12 +387,19 @@ METHOD XFMRoot() CLASS TFormEdit
 RETURN Self
 
 //----------------------------------------------------------------------------//
-METHOD XFMControl( cName, oControl ) CLASS TFormEdit
+METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
    LOCAL nControl, nBase, aVar, XFMControl
 
    IF cName == NIL
       nControl := aScan( ::aXFM[ XFM_Controls ], { |XFM| XFM[2] == oControl } )
+
+      IF lDelete
+         aDel( ::aXFM[ XFM_Controls ], nControl, .T. )
+         ::XFMReflect()
+         Return Self
+      ENDIF
+
       nBase    := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } )
 
       XFMControl := ::aXFM[ XFM_Controls ][ nControl ]
