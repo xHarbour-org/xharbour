@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.6 2003/07/22 11:35:11 jonnymind Exp $
+* $Id: hblog.prg,v 1.8 2003/07/23 20:12:43 toninhofwi Exp $
 */
 
 /*
@@ -100,13 +100,8 @@ RETURN
 PROCEDURE HB_OpenStandardLog()
    LOCAL nCount
 
-   // This avoid using the LOG mutex to open the logs, as each
-   // log channel could have his own mutexes, and could be subject
-   // of cross locking.
+   StdLogger:Open()
 
-   FOR nCount := 1 TO PCount()
-      HB_Pvalue( nCount ):Open()
-   NEXT
 RETURN
 
 

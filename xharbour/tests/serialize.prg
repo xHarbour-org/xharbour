@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.5 2003/05/17 18:04:28 jonnymind Exp $
+* $Id: serialize.prg,v 1.6 2003/07/10 12:50:41 jonnymind Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -39,7 +39,7 @@ PROCEDURE MAIN()
    cTmp += HB_Serialize( Directory( "serialize.prg") ) 
    cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
-   cTmp += HB_Serialize( 20 )
+   cTmp += HB_Serialize( 2100010101 )
    cTmp += HB_Serialize( SomeClass():New("A parameter") )
    cTmp += HB_Serialize( "Last String, closing test" )
 

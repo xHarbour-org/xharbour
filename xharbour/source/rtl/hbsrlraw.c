@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.14 2003/07/15 09:15:34 andijahja Exp $
+ * $Id: hbsrlraw.c,v 1.15 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -62,16 +62,9 @@
 
 #ifndef HB_LONG_LONG_OFF
 void hb_createlen8( BYTE *ret, ULONGLONG uRet )
-{
-   int i;
-   for( i = 7; i >= 0; i -- )
-   {
-      ret[i] = (BYTE) (uRet % 256 );
-      uRet /= 256l;
-   }
-}
 #else
 void hb_createlen8( BYTE *ret, ULONG uRet )
+#endif
 {
    int i;
    for( i = 7; i >= 0; i -- )
@@ -80,7 +73,6 @@ void hb_createlen8( BYTE *ret, ULONG uRet )
       uRet /= 256l;
    }
 }
-#endif
 
 HB_FUNC( HB_CREATELEN8 )
 {
@@ -108,27 +100,35 @@ HB_FUNC( HB_CREATELEN8 )
 /* Returns a numeric length using the first 4 bytes of the given string
 * HB_GetLen8( cStr ) --> nLength
 */
-ULONG hb_getlen8( BYTE *cStr )
+#ifndef HB_LONG_LONG_OFF
+ULONGLONG hb_getlen8( BYTE *cStr )
 {
    int i;
-   long lFact = 1;
-   ULONG ulRet = 0;
+   ULONGLONG lFact = 1;
+   ULONGLONG ulRet = 0;
 
-#ifndef HB_LONG_LONG_OFF
    for (i = 7; i >= 0; i-- )
    {
       ulRet += (( ULONGLONG ) cStr[i]) * lFact;
       lFact *= 256l;
    }
+   return ulRet;
+}
 #else
+ULONG hb_getlen8( BYTE *cStr )
+{
+   int i;
+   ULONG lFact = 1;
+   ULONG ulRet = 0;
+
    for (i = 7; i >= 4; i-- )
    {
       ulRet += (( ULONG ) cStr[i]) * lFact;
       lFact *= 256l;
    }
-#endif
    return ulRet;
 }
+#endif
 
 
 

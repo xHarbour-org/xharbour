@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.2 2003/02/22 01:30:36 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.3 2003/02/22 01:58:46 jonnymind Exp $
  */
 
 /*
@@ -53,9 +53,6 @@
 #include <hbapi.h>
 #include <stdlib.h>
 #include <time.h>
-
-/* Providing a prototype */
-double hb_random_num( void );
 
 /*
 * HB_RANDOM

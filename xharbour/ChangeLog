@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1287 2003/07/23 21:38:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.1288 2003/07/23 22:09:29 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-24 03:55 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  + source/rtl/hboutdebug.c
+    + Portable "Output string to debug window" function called HB_OutDebug()
+
+  + tests/outdebug.prg
+    + Portable "Output string to debug window" test
+
+  * source/rtl/Makefile
+    + support for HB_OutDebug()
+
+  * include/hbmath.h
+    + added prototype of hb_random_num() used by HB_Random() but useful
+      also for other functions.
+
+  * source/rtl/hbrandom.c
+    ! Prototype of hb_random_num() moved to header file
+
+  * source/rtl/hbsrlraw.c
+    ! Finetuned latest changes of Przemyslav; they are mostly ok.
+
+  + tests/serialize.prg
+    + More extensive test on integers
+
+  * source/rtl/hblog.prg
+    * Stylistic changes
+
 
 2003-07-23 23:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/xharbour.spec
