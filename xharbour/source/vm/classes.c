@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.68 2003/06/19 20:50:33 andijahja Exp $
+ * $Id: classes.c,v 1.69 2003/06/21 07:36:04 ronpinkas Exp $
  */
 
 /*
@@ -499,7 +499,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          {
             if( pRealClass->pModuleSymbols == NULL || pCallerClass->pModuleSymbols == NULL )
             {
-               TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
+               // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
             }
             else if( pRealClass->pModuleSymbols == pCallerClass->pModuleSymbols )
             {
