@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.11 2003/02/11 03:43:02 paultucker Exp $
+# $Id: makefile.nt,v 1.12 2003/02/12 03:31:03 paultucker Exp $
 #
 
 #
@@ -132,11 +132,11 @@ CFLAGS = $(CFLAGS) -DSIMPLEX
 # C compiler definition and C flags. These should never have to change.
 #
 
-AS             = ML
-CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
-HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
-LDFLAGS        = $(LDFLAGS)
+AS           = ML
+CFLAGS       = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
+CLIBFLAGS    = -c $(CFLAGS) $(CLIBFLAGS)
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS      = $(LDFLAGS)
 
 !ifdef HB_DOC_PDF
 HARBOURFLAGS = $(HARBOURFLAGS) -dPDF
@@ -199,10 +199,10 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 # override builtin
 
-.c.obj:
+.c.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-.cpp.obj:
+.cpp.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 #
@@ -269,6 +269,8 @@ LIBS2 = \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
 
+# List C modules first, then PRG modules
+
 RTL_LIB_OBJS = \
    $(OBJ_DIR)\abs.obj \
    $(OBJ_DIR)\accept.obj \
@@ -307,6 +309,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\hbcompress.obj \
    $(OBJ_DIR)\hbrandom.obj \
+   $(OBJ_DIR)\hbsrlraw.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
@@ -406,6 +409,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\fieldbl.obj \
    $(OBJ_DIR)\getlist.obj \
    $(OBJ_DIR)\getsys.obj \
+   $(OBJ_DIR)\hbserial.obj \
    $(OBJ_DIR)\input.obj \
    $(OBJ_DIR)\listbox.obj \
    $(OBJ_DIR)\memoedit.obj \
