@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.48 2003/11/26 22:58:44 jonnymind Exp $
+ * $Id: Changelog,v 1.49 2003/11/28 14:46:33 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,20 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-14 10:22 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+    * fixed typo
+
 2003-11-28 15:16 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini@tin.it>
   * Rules.make
     ! added support to msys/mingw32
-  * test/Makefile 
+  * test/Makefile
     ! added support to msys/mingw32
     + test/Makefile.mingw32
     + test/Makefile.linux
 
 2003-11-27 00:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * src/browse.prg
-    ! hb_IsNum() is no longer supported; using hb_IsNumeric 
+    ! hb_IsNum() is no longer supported; using hb_IsNumeric
   * src/xwt_gtk/xwt_gtk_browse.c
     ! using hb_objSendMsg() to access object data
-      
+
 2003-11-15 18:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * makefile.bc
     ! Fixes from Gianluca Piemonte
