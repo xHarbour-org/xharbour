@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.3 2005/02/17 12:22:26 andijahja Exp $
+# $Id: hrbdll.pc,v 1.1 2005/02/19 11:22:29 andijahja Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -2855,3 +2855,75 @@ $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
    $(CC_CMD)
 
+# DEBUG
+$(OBJ_DIR)/dbgmenu.c : $(DEBUG_DIR)/dbgmenu.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgmenu.o : $(OBJ_DIR)/dbgmenu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgtmenu.c : $(DEBUG_DIR)/dbgtmenu.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgtmenu.o : $(OBJ_DIR)/dbgtmenu.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgtmitm.c : $(DEBUG_DIR)/dbgtmitm.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgtmitm.o : $(OBJ_DIR)/dbgtmitm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgtwin.c : $(DEBUG_DIR)/dbgtwin.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgtwin.o : $(OBJ_DIR)/dbgtwin.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/debugger.c : $(DEBUG_DIR)/debugger.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/debugger.o : $(OBJ_DIR)/debugger.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbghelp.c : $(DEBUG_DIR)/dbghelp.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbghelp.o : $(OBJ_DIR)/dbghelp.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/tbrwtext.c : $(DEBUG_DIR)/tbrwtext.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/tbrwtext.o : $(OBJ_DIR)/tbrwtext.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgtarr.c : $(DEBUG_DIR)/dbgtarr.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgtarr.o : $(OBJ_DIR)/dbgtarr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgtobj.c : $(DEBUG_DIR)/dbgtobj.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgtobj.o : $(OBJ_DIR)/dbgtobj.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgwa.c : $(DEBUG_DIR)/dbgwa.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgwa.o : $(OBJ_DIR)/dbgwa.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgbrwsr.c : $(DEBUG_DIR)/dbgbrwsr.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgbrwsr.o : $(OBJ_DIR)/dbgbrwsr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgaltd.c : $(DEBUG_DIR)/dbgaltd.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgaltd.o : $(OBJ_DIR)/dbgaltd.c
+	$(CC_CMD)
