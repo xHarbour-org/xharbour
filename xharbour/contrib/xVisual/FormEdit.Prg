@@ -157,6 +157,8 @@ METHOD CreateControl(aRect)
       DO CASE
       CASE ::CtrlName=="Button"
          oObj:=::Add(cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+//         oObj:AddInline("OnMove",{||OutputDebugString('oops')}) //::Parent:ObjInsp:SetBrowserData( oObj )} )
+         
       CASE ::CtrlName=="Edit"
          oObj:=::Add(cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Label"
@@ -198,6 +200,7 @@ METHOD CreateControl(aRect)
    RETURN(oObj)
 
 //----------------------------------------------------------------------------//
+
 
 METHOD GetUniquePropName(cName)
 
