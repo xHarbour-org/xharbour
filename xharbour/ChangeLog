@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.285 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.286 2002/06/21 21:02:07 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-21 23:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  + lib/bcc640.lib
+    + Lib for extending the number of open files for xharbour for bcc32
+  * bin/bld.bat
+    utils/hbmake/hbmake.prg
+     * Added bcc640.lib to be linked when Bcc32 is used
+
 
 2002-06-21 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/getsys.prg
