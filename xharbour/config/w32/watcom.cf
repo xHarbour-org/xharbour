@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+# $Id: watcom.cf,v 1.1 2003/02/12 13:23:01 lculik Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -56,8 +56,13 @@ ifeq ($(findstring rdd,$(LIBS)),rdd)
 RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
 endif
 
-GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
-GTLIBS := $(subst /,\,$(GTLIBS))
+#GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
+#GTLIBS := $(subst /,\,$(GTLIBS))
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+endif
+
 
 LD_RULE = $(link_exe_file)
 
