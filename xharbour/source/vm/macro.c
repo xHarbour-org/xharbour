@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.44 2004/04/28 18:31:40 druzus Exp $
+ * $Id: macro.c,v 1.45 2004/05/10 13:45:51 snaiperis Exp $
  */
 
 /*
@@ -1345,11 +1345,14 @@ void hb_compGenPushLong( LONG lNumber, HB_MACRO_DECL )
 {
    if( lNumber )
    {
+      int i = sizeof( LONG );
       hb_compGenPCode1( HB_P_PUSHLONG, HB_MACRO_PARAM );
-      hb_compGenPCode1( HB_LOBYTE( lNumber ), HB_MACRO_PARAM );
-      hb_compGenPCode1( HB_HIBYTE( lNumber ), HB_MACRO_PARAM );
-      hb_compGenPCode1( HB_LOBYTE( HB_HIWORD( lNumber ) ), HB_MACRO_PARAM );
-      hb_compGenPCode1( HB_HIBYTE( HB_HIWORD( lNumber ) ), HB_MACRO_PARAM );
+      do
+      {
+         hb_compGenPCode1( HB_LOBYTE( lNumber ), HB_MACRO_PARAM );
+         lNumber >>= 8;
+      }
+      while ( --i );
    }
    else
       hb_compGenPCode1( HB_P_ZERO, HB_MACRO_PARAM );

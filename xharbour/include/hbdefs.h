@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.42 2004/05/10 00:17:13 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.43 2004/05/10 10:38:04 mauriliolongo Exp $
  */
 
 /*
@@ -185,13 +185,8 @@
    #undef TRUE
    #define TRUE   (BOOL) !0
 
-#endif /* HB_DONT_DEFINE_BASIC_TYPES */
-
 #ifndef HB_LONG_LONG_OFF
-
-   /* 10/05/2004 - <maurilio.longo@libero.it>
-      In my opinion this should be moved up where we define basic types */
-   #if ! defined(_WINNT_H) && ! defined(HB_DONT_DEFINE_BASIC_TYPES)
+   #if ! defined(_WINNT_H)
       #if !defined(LONGLONG)
          #if defined(__GNUC__)
             typedef long long LONGLONG;
@@ -243,6 +238,48 @@
    #endif
 #endif /* HB_LONG_LONG_OFF */
 
+/*
+ * this is a hack and doesn't have to be true on some machines
+ * please update it if necessary
+ */
+#if !defined( UINT16 )
+#  if USHRT_MAX == 0xffff
+      typedef USHORT       UINT16;
+#     define UINT16_MAX    USHRT_MAX
+#     define INT16_MAX     SHRT_MAX
+#     define INT16_MIN     SHRT_MIN
+#  endif
+#endif
+#if !defined( UINT32 )
+#  if UINT_MAX == 0xffffffff
+      typedef UINT         UINT32;
+#     define UINT32_MAX    UINT_MAX
+#     define INT32_MAX     INT_MAX
+#     define INT32_MIN     INT_MIN
+#  elif ULONG_MAX == 0xffffffff
+      typedef ULONG        UINT32;
+#     define UINT32_MAX    ULONG_MAX
+#     define INT32_MAX     LONG_MAX
+#     define INT32_MIN     LONG_MIN
+#  endif
+#endif
+#if !defined( UINT64 ) && !defined( HB_LONG_LONG_OFF )
+#  if ULONG_MAX > UINT_MAX && UINT_MAX > USHORT_MAX
+      typedef ULONG        UINT64;
+#     define UINT64_MAX    ULONG_MAX
+#     define INT64_MAX     LONG_MAX
+#     define INT64_MIN     LONG_MIN
+#  else
+      typedef ULONGLONG    UINT64;
+#     define UINT64_MAX    ULONGLONG_MAX
+#     define INT64_MAX     LONGLONG_MAX
+#     define INT64_MIN     LONGLONG_MIN
+#  endif
+#endif
+
+#endif /* HB_DONT_DEFINE_BASIC_TYPES */
+
+
 /* try to detect byte order if not explicitly set */
 #if !defined( HB_PDP_ENDIAN ) && !defined( HB_BIG_ENDIAN ) && \
     !defined( HB_LITTLE_ENDIAN ) && \
@@ -287,12 +324,12 @@ typedef unsigned long HB_PTRDIFF;
                                        ( ( ( ULONG ) ( b2 ) ) <<  8 ) | \
                                        ( ( ( ULONG ) ( b1 ) ) ) )
 
-#define HB_SWAP_USHORT( w )     ( ( USHORT ) ( ( ( ( USHORT ) ( w ) & 0xFF00 ) >> 8 ) | \
-                                               ( ( ( USHORT ) ( w ) & 0x00FF ) << 8 ) ) )
-#define HB_SWAP_ULONG( w )      ( ( ULONG ) ( ( ( ( ULONG ) ( w ) & 0x000000FFL ) << 24 ) | \
-                                              ( ( ( ULONG ) ( w ) & 0x0000FF00L ) <<  8 ) | \
-                                              ( ( ( ULONG ) ( w ) & 0x00FF0000L ) >>  8 ) | \
-                                              ( ( ( ULONG ) ( w ) & 0xFF000000L ) >> 24 ) ) )
+#define HB_SWAP_UINT16( w )     ( ( UINT16 ) ( ( ( ( UINT16 ) ( w ) & 0xFF00 ) >> 8 ) | \
+                                               ( ( ( UINT16 ) ( w ) & 0x00FF ) << 8 ) ) )
+#define HB_SWAP_UINT32( w )     ( ( UINT32 ) ( ( ( ( UINT32 ) ( w ) & 0x000000FF ) << 24 ) | \
+                                               ( ( ( UINT32 ) ( w ) & 0x0000FF00 ) <<  8 ) | \
+                                               ( ( ( UINT32 ) ( w ) & 0x00FF0000 ) >>  8 ) | \
+                                               ( ( ( UINT32 ) ( w ) & 0xFF000000 ) >> 24 ) ) )
 
 #ifndef HB_LONG_LONG_OFF
 /*
@@ -306,14 +343,14 @@ typedef unsigned long HB_PTRDIFF;
 #  define HB_LL( num )           num##LL
 #endif
 
-#define HB_SWAP_UINT64( w )      ( ( ULONGLONG ) ( ( ( ( ULONGLONG ) ( w ) & 0x00000000000000FFLL ) << 56 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x000000000000FF00LL ) << 40 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x0000000000FF0000LL ) >> 24 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x00000000FF000000LL ) >>  8 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x000000FF00000000LL ) >>  8 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x0000FF0000000000LL ) >> 24 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0x00FF000000000000LL ) >> 40 ) | \
-                                                   ( ( ( ULONGLONG ) ( w ) & 0xFF00000000000000LL ) >> 56 ) ) )
+#define HB_SWAP_UINT64( w )      ( ( UINT64 ) ( ( ( ( UINT64 ) ( w ) & 0x00000000000000FFLL ) << 56 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x000000000000FF00LL ) << 40 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x0000000000FF0000LL ) >> 24 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x00000000FF000000LL ) >>  8 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x000000FF00000000LL ) >>  8 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x0000FF0000000000LL ) >> 24 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0x00FF000000000000LL ) >> 40 ) | \
+                                                ( ( ( UINT64 ) ( w ) & 0xFF00000000000000LL ) >> 56 ) ) )
 #endif
 
 #if defined( HB_PDP_ENDIAN )
@@ -321,19 +358,19 @@ typedef unsigned long HB_PTRDIFF;
 #elif defined( HB_BIG_ENDIAN )
    /* We use Big-Endian here */
 
-   #define HB_GET_LE_USHORT( p )    HB_SWAP_USHORT( *( USHORT * )( p ) )
-   #define HB_PUT_LE_USHORT( p, w ) ( *( USHORT * )( p ) = HB_SWAP_USHORT( w ) )
-   #define HB_GET_LE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
-   #define HB_PUT_LE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
-   #define HB_GET_LE_UINT64( p )    HB_SWAP_UINT64( *( ULONGLONG * )( p ) )
-   #define HB_PUT_LE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = HB_SWAP_UINT64( l ) )
+   #define HB_GET_LE_UINT16( p )    HB_SWAP_UINT16( *( UINT16 * )( p ) )
+   #define HB_PUT_LE_UINT16( p, w ) ( *( UINT16 * )( p ) = HB_SWAP_UINT16( w ) )
+   #define HB_GET_LE_UINT32( p )    HB_SWAP_UINT32( *( UINT32 * )( p ) )
+   #define HB_PUT_LE_UINT32( p, l ) ( *( UINT32 * )( p ) = HB_SWAP_UINT32( l ) )
+   #define HB_GET_LE_UINT64( p )    HB_SWAP_UINT64( *( UINT64 * )( p ) )
+   #define HB_PUT_LE_UINT64( p, l ) ( *( UINT64 * )( p ) = HB_SWAP_UINT64( l ) )
 
-   #define HB_GET_BE_USHORT( p )    ( *( USHORT * )( p ) )
-   #define HB_PUT_BE_USHORT( p, w ) ( *( USHORT * )( p ) = ( USHORT ) ( w ) )
-   #define HB_GET_BE_ULONG( p )     ( *( ULONG * )( p ) )
-   #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = ( ULONG ) ( l ) )
-   #define HB_GET_BE_UINT64( p )    ( *( ULONGLONG * )( p ) )
-   #define HB_PUT_BE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = ( ULONGLONG ) ( l ) )
+   #define HB_GET_BE_UINT16( p )    ( *( UINT16 * )( p ) )
+   #define HB_PUT_BE_UINT16( p, w ) ( *( UINT16 * )( p ) = ( UINT16 ) ( w ) )
+   #define HB_GET_BE_UINT32( p )    ( *( UINT32 * )( p ) )
+   #define HB_PUT_BE_UINT32( p, l ) ( *( UINT32 * )( p ) = ( UINT32 ) ( l ) )
+   #define HB_GET_BE_UINT64( p )    ( *( UINT64 * )( p ) )
+   #define HB_PUT_BE_UINT64( p, l ) ( *( UINT64 * )( p ) = ( UINT64 ) ( l ) )
 
    #define HB_USHORT_FROM_LE( w )   HB_MKUSHORT( HB_HIBYTE( w ), HB_LOBYTE( w ) )
    #define HB_ULONG_FROM_LE( l )    HB_MKULONG( HB_HIBYTE( HB_HIWORD( l ) ), HB_LOBYTE( HB_HIWORD( l ) ), HB_HIBYTE( l ), HB_LOBYTE( l ) )
@@ -400,19 +437,19 @@ typedef unsigned long HB_PTRDIFF;
 #else
    /* We use Little-Endian here */
 
-   #define HB_GET_LE_USHORT( p )    ( *( USHORT * )( p ) )
-   #define HB_PUT_LE_USHORT( p, w ) ( *( USHORT * )( p ) = ( USHORT ) ( w ) )
-   #define HB_GET_LE_ULONG( p )     ( *( ULONG * )( p ) )
-   #define HB_PUT_LE_ULONG( p, l )  ( *( ULONG * )( p ) = ( ULONG ) ( l ) )
-   #define HB_GET_LE_UINT64( p )    ( *( ULONGLONG * )( p ) )
-   #define HB_PUT_LE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = ( ULONGLONG ) ( l ) )
+   #define HB_GET_LE_UINT16( p )    ( *( UINT16 * )( p ) )
+   #define HB_PUT_LE_UINT16( p, w ) ( *( UINT16 * )( p ) = ( UINT16 ) ( w ) )
+   #define HB_GET_LE_UINT32( p )    ( *( UINT32 * )( p ) )
+   #define HB_PUT_LE_UINT32( p, l ) ( *( UINT32 * )( p ) = ( UINT32 ) ( l ) )
+   #define HB_GET_LE_UINT64( p )    ( *( UINT64 * )( p ) )
+   #define HB_PUT_LE_UINT64( p, l ) ( *( UINT64 * )( p ) = ( UINT64 ) ( l ) )
 
-   #define HB_GET_BE_USHORT( p )    HB_SWAP_USHORT( *( USHORT * )( p ) )
-   #define HB_PUT_BE_USHORT( p, w ) ( *( USHORT * )( p ) = HB_SWAP_USHORT( w ) )
-   #define HB_GET_BE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
-   #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
-   #define HB_GET_BE_UINT64( p )    HB_SWAP_UINT64( *( ULONGLONG * )( p ) )
-   #define HB_PUT_BE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = HB_SWAP_UINT64( l ) )
+   #define HB_GET_BE_UINT16( p )    HB_SWAP_UINT16( *( UINT16 * )( p ) )
+   #define HB_PUT_BE_UINT16( p, w ) ( *( UINT16 * )( p ) = HB_SWAP_UINT16( w ) )
+   #define HB_GET_BE_UINT32( p )    HB_SWAP_UINT32( *( UINT32 * )( p ) )
+   #define HB_PUT_BE_UINT32( p, l ) ( *( UINT32 * )( p ) = HB_SWAP_UINT32( l ) )
+   #define HB_GET_BE_UINT64( p )    HB_SWAP_UINT64( *( UINT64 * )( p ) )
+   #define HB_PUT_BE_UINT64( p, l ) ( *( UINT64 * )( p ) = HB_SWAP_UINT64( l ) )
 
    #define HB_GET_LE_DOUBLE( p )    ( *( double * )( p ) )
    #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = ( double ) ( d ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.c,v 1.3 2001/07/17 17:47:34 mbirdyg Exp $
+ * $Id: addascii.c,v 1.1 2003/03/04 21:03:58 lculik Exp $
  */
 
 /*
@@ -85,7 +85,7 @@
  *      ADDASCII() can be used to add or subtract integer values from
  *      ASCII values in a string. The new <lCarryOver> parameter allows
  *      to treat a string as an integer written to the base 256. Since
- *      <nValue> is limited to a signed long, only substrings 4 characters
+ *      <nValue> is limited to a signed LONG, only substrings 4 characters
  *      long can be affected by one ADDASCII() call.
  *      If the length of <[@]cString> is smaller than <nPosition>, the
  *      string remains unchanged. The same happens, if uninterpretable
@@ -136,7 +136,7 @@ HB_FUNC (ADDASCII)
     size_t sLen = hb_parclen (1);
     char *pcResult;
     size_t sPos;
-    long lValue;
+    LONG lValue;
     int iCarryOver;
 
     if (ISNUM (3))
@@ -176,11 +176,11 @@ HB_FUNC (ADDASCII)
     if (iCarryOver)
     {
       size_t sCurrent;
-      long lResult;
+      LONG lResult;
 
       for (sCurrent = sPos; (sCurrent>0) && (lValue != 0); sCurrent--)
       {
-        lResult = (long)pcSource[sCurrent-1]+(lValue%256);
+        lResult = (LONG)pcSource[sCurrent-1]+(lValue%256);
         
         lValue /= 256;
         if (lResult > 255)
@@ -193,7 +193,7 @@ HB_FUNC (ADDASCII)
     }
     else
     {
-      pcResult[sPos-1] = (char)(((long)pcResult[sPos-1]+lValue)%256);
+      pcResult[sPos-1] = (char)(((LONG)pcResult[sPos-1]+lValue)%256);
     }
 
     if (iNoRet)

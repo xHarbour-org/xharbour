@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.27 2004/04/14 22:39:19 andijahja Exp $
+ * $Id: hbcomp.h,v 1.28 2004/04/14 22:44:14 andijahja Exp $
  */
 
 /*
@@ -375,6 +375,8 @@ extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAli
 extern void hb_compGenPushAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPopAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPushFunRef( char * );
+extern void hb_compGenSwitchCase( LONG );         /* generates the pcode to push switchcase value on the virtual machine stack */
+
 extern void hb_compGenPCode1( BYTE );             /* generates 1 byte of pcode */
 extern void hb_compGenPData1( BYTE );             /* generates 1 byte of pcode argument */
 extern void hb_compGenPCode2( BYTE, BYTE, BOOL );       /* generates 2 bytes of pcode + flag for optional StrongType(). */

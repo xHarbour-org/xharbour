@@ -1,5 +1,5 @@
 /*
- * $Id: pad.c,v 1.2 2001/10/20 05:40:55 paultucker Exp $
+ * $Id: pad.c,v 1.1 2003/03/04 21:04:45 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ static void do_pad (int iSwitch)
     char *pcString = (char *)hb_parc (1);
     size_t sStrLen = (size_t)hb_parclen (1);
     char *pcRet, *pc;
-    long lRetLen;
+    LONG lRetLen;
     size_t sRetLen;
     char cFill;
 

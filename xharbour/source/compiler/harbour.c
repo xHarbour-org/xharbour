@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.79 2004/05/09 23:40:05 druzus Exp $
+ * $Id: harbour.c,v 1.80 2004/05/11 01:22:40 druzus Exp $
  */
 
 /*
@@ -3848,6 +3848,22 @@ void hb_compGenPushFunCall( char * szFunName )
    }
 }
 
+/* generates the pcode to push switchcase value on the virtual machine stack */
+void hb_compGenSwitchCase( LONG lValue )
+{
+   BYTE pBuffer[ 1 + sizeof( LONG ) ];
+   int i = 0;
+
+   pBuffer[i] = HB_P_SWITCHCASE;
+   while ( ++i <= (int) sizeof( LONG ) )
+   {
+      pBuffer[i] = HB_LOBYTE( lValue );
+      lValue >>= 8;
+   }
+
+   hb_compGenPCodeN( pBuffer, 1 + sizeof( LONG ), FALSE );
+}
+
 /* generates the pcode to push a long number on the virtual machine stack */
 void hb_compGenPushLong( LONG lNumber )
 {
@@ -3869,15 +3885,17 @@ void hb_compGenPushLong( LONG lNumber )
    }
    else
    {
-      BYTE pBuffer[5];
+      BYTE pBuffer[ 1 + sizeof( LONG ) ];
+      int i = 0;
 
-      pBuffer[0] = HB_P_PUSHLONG;
-      pBuffer[1] = HB_LOBYTE( lNumber );
-      pBuffer[2] = HB_HIBYTE( lNumber );
-      pBuffer[3] = HB_LOBYTE( HB_HIWORD( lNumber ) );
-      pBuffer[4] = HB_HIBYTE( HB_HIWORD( lNumber ) );
+      pBuffer[i] = HB_P_PUSHLONG;
+      while ( ++i <= (int) sizeof( LONG ) )
+      {
+         pBuffer[i] = HB_LOBYTE( lNumber );
+         lNumber >>= 8;
+      }
 
-      hb_compGenPCodeN( pBuffer, 5, 1 );
+      hb_compGenPCodeN( pBuffer, 1 + sizeof( LONG ), 1 );
    }
 }
 

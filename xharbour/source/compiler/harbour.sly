@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.65 2004/05/08 17:40:43 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.66 2004/05/11 01:22:40 druzus Exp $
  */
 
 /*
@@ -2117,8 +2117,7 @@ SwitchBegin : SWITCH Expression {
 
 SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
                {
-                  hb_compGenPCode1( HB_P_SWITCHCASE );
-                  hb_compGenPCode4( HB_LOBYTE( $3->value.asNum.lVal ), HB_HIBYTE( $3->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), FALSE );
+                  hb_compGenSwitchCase( ( LONG ) $3->value.asNum.lVal );
                   hb_compExprDelete( $3 );
                   $<iNumber>$ = hb_compGenJumpFalse( 0 );
                }
@@ -2145,8 +2144,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
 
            | SwitchCases CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
                {
-                  hb_compGenPCode1( HB_P_SWITCHCASE );
-                  hb_compGenPCode4( HB_LOBYTE( $4->value.asNum.lVal ), HB_HIBYTE( $4->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), FALSE );
+                  hb_compGenSwitchCase( ( LONG ) $4->value.asNum.lVal );
                   hb_compExprDelete( $4 );
                   $<iNumber>$ = hb_compGenJumpFalse( 0 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
+ * $Id: bit2.c,v 1.3 2004/03/18 03:43:08 ronpinkas Exp $
  */
 
 /*
@@ -56,8 +56,8 @@
 #include "ct.h"
 
 
-static long int __hex2long( char *cNum1, int iLenHex );
-static long int __getparam( int iParam );
+static LONG __hex2long( char *cNum1, int iLenHex );
+static LONG __getparam( int iParam );
 
 
 /*  $DOC$
@@ -88,10 +88,10 @@ static long int __getparam( int iParam );
 
 HB_FUNC( CLEARBIT )
 {
-  long int lNumClearBit = -1;
-  long int lNum1;
-  int      iNum2;
-  int iPCount, iFor;
+  LONG lNumClearBit = -1;
+  LONG lNum1;
+  int  iNum2;
+  int  iPCount, iFor;
 
   iPCount = hb_pcount();
 
@@ -159,10 +159,10 @@ HB_FUNC( CLEARBIT )
 
 HB_FUNC( SETBIT )
 {
-  long int lNumSetBit = -1L;
-  long int lNum1;
-  int      iNum2;
-  int iPCount, iFor;
+  LONG lNumSetBit = -1L;
+  LONG lNum1;
+  int  iNum2;
+  int  iPCount, iFor;
 
   iPCount = hb_pcount();
 
@@ -229,8 +229,8 @@ HB_FUNC( SETBIT )
 
 HB_FUNC ( ISBIT )
 {
-  long int lNum1;
-  int      iTestBit;
+  LONG lNum1;
+  int  iTestBit;
 
   if (( ISNUM( 1 ) || ISCHAR( 1 ) ) && ( ISNUM( 2 ) ) )
   {
@@ -245,11 +245,11 @@ HB_FUNC ( ISBIT )
 }
 
 
-static long int __hex2long( char *cNum1, int iLenHex )
+static LONG __hex2long( char *cNum1, int iLenHex )
 {
   register int i;
   register int iNum;
-  long int     iHexNum = 0;
+  LONG         iHexNum = 0;
 
 
   i = ( iLenHex - 1 );
@@ -263,14 +263,14 @@ static long int __hex2long( char *cNum1, int iLenHex )
      if ((iNum < 0) || (iNum > 0x0F))
        break;
 
-     iHexNum += (long int) iNum * (1 << (4 * ( iLenHex - i - 1 )));
+     iHexNum += (LONG) iNum * (1 << (4 * ( iLenHex - i - 1 )));
      i--;
   }
   return iHexNum;
 }
 
 
-static long int __getparam( int iParam )
+static LONG __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )

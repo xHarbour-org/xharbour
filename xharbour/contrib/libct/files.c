@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.23 2004/04/06 01:50:54 druzus Exp $
+ * $Id: files.c,v 1.24 2004/05/04 16:35:24 mauriliolongo Exp $
  */
 
 /*
@@ -689,14 +689,14 @@ HB_FUNC( FILEDATE )
 
       if ( !iFind )
          if ( ( iAttr>0 ) & ( iAttr&fsFiles.ff_attrib ) )
-            hb_retd( ( long ) ( fsFiles.ff_fdate >> 9 ) +1980, ( long ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( long )fsFiles.ff_fdate & ~0xFFE0 );
+            hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsFiles.ff_fdate & ~0xFFE0 );
          else
-            hb_retd( ( long ) ( fsFiles.ff_fdate >> 9 ) +1980, ( long ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( long )fsFiles.ff_fdate & ~0xFFE0 );
+            hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsFiles.ff_fdate & ~0xFFE0 );
       else
          hb_retds( "        " );
    }
      else
-      hb_retd( ( long ) ( fsOldFiles.ff_fdate >> 9 ) +1980, ( long ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( long )fsOldFiles.ff_fdate & ~0xFFE0 );
+      hb_retd( ( LONG ) ( fsOldFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsOldFiles.ff_fdate & ~0xFFE0 );
     }
 
 #elif defined( OS_UNIX_COMPATIBLE )
@@ -1144,11 +1144,11 @@ HB_FUNC( FILESMAX )
 #ifdef __DJGPP__
    __dpmi_regs r;
    unsigned handles;
-   unsigned long psp;
+   ULONG psp;
 
    r.h.ah = 0x62; /* Get PSP address */
    __dpmi_int( 0x21, &r );
-   psp = ( ( (unsigned long) r.x.bx ) << 4 ) & 0xFFFFF;
+   psp = ( ( (ULONG) r.x.bx ) << 4 ) & 0xFFFFF;
 
    handles = _farpeekw( _dos_ds, psp + 0x32 );
    hb_retni( handles );

@@ -1,5 +1,5 @@
 /*
- * $Id: bit3.c,v 1.3 2004/01/18 04:25:14 likewolf Exp $
+ * $Id: bit3.c,v 1.4 2004/03/18 03:43:08 ronpinkas Exp $
  */
 
 /*
@@ -63,13 +63,13 @@ typedef BOOL * BOOLP;
 typedef LONG * LONGP;
 typedef USHORT * USHORTP;
 
-static long __hex2long( char *cNum1, int iLenHex );
-static long __getparam( int iParam );
-static long __numand( long wNum1, long wNum2 );
-static long __numor ( long wNum1, long wNum2 );
-static long __numxor( long wNum1, long wNum2 );
-static long __numnot( long wNum1, long wNum2 );
-static long __numfun( int iPCount, long (*operation)(long wNum1, long wNum2), BOOLP pbOk );
+static LONG __hex2long( char *cNum1, int iLenHex );
+static LONG __getparam( int iParam );
+static LONG __numand( LONG wNum1, LONG wNum2 );
+static LONG __numor ( LONG wNum1, LONG wNum2 );
+static LONG __numxor( LONG wNum1, LONG wNum2 );
+static LONG __numnot( LONG wNum1, LONG wNum2 );
+static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk );
 static void sizeofbits( USHORTP pusBytes, LONGP plPattern, LONGP plTestMSB );
 
 /*  $DOC$
@@ -120,12 +120,12 @@ static void sizeofbits( USHORTP pusBytes, LONGP plPattern, LONGP plTestMSB );
 HB_FUNC( NUMANDX )
 {
   int   iPCount;
-  long  lNumOp;
+  LONG  lNumOp;
   BOOL  bOk;
 
   iPCount = hb_pcount();
 
-  lNumOp = __numfun( iPCount, (long (*)(long wNum1, long wNum2))(__numand), &bOk );
+  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numand), &bOk );
 
   if ( bOk )
      hb_retnl( lNumOp );
@@ -182,12 +182,12 @@ HB_FUNC( NUMANDX )
 HB_FUNC( NUMORX )
 {
   int   iPCount;
-  long  lNumOp;
+  LONG  lNumOp;
   BOOL  bOk;
 
   iPCount = hb_pcount();
 
-  lNumOp = __numfun( iPCount, (long (*)(long wNum1, long wNum2))(__numor), &bOk );
+  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numor), &bOk );
 
   if ( bOk )
      hb_retnl( lNumOp );
@@ -244,14 +244,14 @@ HB_FUNC( NUMORX )
 HB_FUNC( NUMXORX )
 {
   int   iPCount;
-  long  lNumOp;
+  LONG  lNumOp;
   BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
 
   iPCount = 3;
 
-  lNumOp = __numfun( iPCount, (long (*)(long wNum1, long wNum2))(__numxor), &bOk );
+  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numxor), &bOk );
 
   if ( bOk )
      hb_retnl( lNumOp );
@@ -307,14 +307,14 @@ HB_FUNC( NUMXORX )
 HB_FUNC( NUMNOTX )
 {
   int   iPCount;
-  long  lNumOp;
+  LONG  lNumOp;
   BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
 
   iPCount = 2;
 
-  lNumOp = __numfun( iPCount, (long (*)(long wNum1, long wNum2))(__numnot), &bOk );
+  lNumOp = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numnot), &bOk );
 
   if ( bOk )
      hb_retnl( lNumOp );
@@ -370,7 +370,7 @@ HB_FUNC( NUMNOTX )
 
 HB_FUNC( NUMROLX )
 {
-  long    lNum1, lNumBak, lPattern, lTestRol;
+  LONG    lNum1, lNumBak, lPattern, lTestRol;
   USHORT  usBytes, usFor, usNum2;
 
   if ( ISNUM(2) || ISCHAR(2) )
@@ -451,7 +451,7 @@ HB_FUNC( NUMROLX )
 
 HB_FUNC ( NUMMIRRX )
 {
-  long    lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
+  LONG    lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
   USHORT  usBytes, usFor;
 
   if ( ISNUM(2) || ISCHAR(2) )
@@ -486,11 +486,11 @@ HB_FUNC ( NUMMIRRX )
 }
 
 
-static long __hex2long( char *cNum1, int iLenHex )
+static LONG __hex2long( char *cNum1, int iLenHex )
 {
   int  i;
   int  iNum;
-  unsigned long lHexNum = 0;
+  ULONG lHexNum = 0;
 
 
   i = ( iLenHex - 1 );
@@ -504,14 +504,14 @@ static long __hex2long( char *cNum1, int iLenHex )
      if ((iNum < 0) || (iNum > 0x0F))
        break;
 
-     lHexNum += (unsigned long) iNum * (1 << (4 * ( iLenHex - i - 1 )));
+     lHexNum += (ULONG) iNum * (1 << (4 * ( iLenHex - i - 1 )));
      i--;
   }
   return lHexNum;
 }
 
 
-static long __getparam( int iParam )
+static LONG __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
@@ -522,36 +522,36 @@ static long __getparam( int iParam )
 }
 
 
-static long __numand( long lNum1, long lNum2 )
+static LONG __numand( LONG lNum1, LONG lNum2 )
 {
     return lNum1 & lNum2;
 }
 
 
-static long __numor( long lNum1, long lNum2 )
+static LONG __numor( LONG lNum1, LONG lNum2 )
 {
     return lNum1 | lNum2;
 }
 
 
-static long __numxor( long lNum1, long lNum2 )
+static LONG __numxor( LONG lNum1, LONG lNum2 )
 {
     return lNum1 ^ lNum2;
 }
 
 
-static long __numnot( long lNum1, long lNum2 )
+static LONG __numnot( LONG lNum1, LONG lNum2 )
 {
     HB_SYMBOL_UNUSED (lNum2);
     return ~lNum1;
 }
 
 
-static long __numfun( int iPCount, long (*operation)(long wNum1, long wNum2), BOOLP pbOk )
+static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk )
 {
-  long   lNumOp = 0;
-  long   lNum1, lNum2;
-  long   lPattern, lTestMSB;
+  LONG   lNumOp = 0;
+  LONG   lNum1, lNum2;
+  LONG   lPattern, lTestMSB;
   USHORT usBytes;
   int    iFor;
 
@@ -619,16 +619,16 @@ static long __numfun( int iPCount, long (*operation)(long wNum1, long wNum2), BO
 
 }
 
-static void sizeofbits( USHORTP pusBytes, long *plPattern, long *plTestMSB )
+static void sizeofbits( USHORTP pusBytes, LONG *plPattern, LONG *plTestMSB )
 {
 
   *pusBytes = ((ISNIL(1) || hb_parni(1) == 0) ? sizeof( int ) * 8
                                              : (USHORT) hb_parni( 1 ) );
 
-  if ( *pusBytes > sizeof( long ) * 8 )
-     *pusBytes = *pusBytes % (sizeof( long ) * 8);
+  if ( *pusBytes > sizeof( LONG ) * 8 )
+     *pusBytes = *pusBytes % (sizeof( LONG ) * 8);
 
-  *plPattern = *pusBytes == ( sizeof( long ) * 8) ? 0 : (-1) << *pusBytes;
+  *plPattern = *pusBytes == ( sizeof( LONG ) * 8) ? 0 : (-1) << *pusBytes;
   *plTestMSB = *pusBytes == 0 ? 0 : 1 << (*pusBytes - 1);
 }
 

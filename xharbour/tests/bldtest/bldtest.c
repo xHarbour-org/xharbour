@@ -58,8 +58,8 @@ int main()
    buf[1] = 0x34;
    buf[2] = 0x56;
    buf[3] = 0x78;
-   i = ( HB_GET_BE_ULONG( buf ) == 0x12345678L &&
-         HB_GET_LE_ULONG( buf ) == 0x78563412L );
+   i = ( HB_GET_BE_UINT32( buf ) == 0x12345678L &&
+         HB_GET_LE_UINT32( buf ) == 0x78563412L );
    if ( ! i )
    {
       iRet = 1;

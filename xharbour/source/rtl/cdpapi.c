@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.14 2004/03/18 21:34:54 druzus Exp $
+ * $Id: cdpapi.c,v 1.15 2004/03/21 15:55:05 druzus Exp $
  */
 
 /*
@@ -498,7 +498,7 @@ ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE cdp, BYTE* pSrc, ULONG ulLen, BYTE
          for ( i = 0; i < ulLen; i++, pDst += 2 )
          {
             u = hb_cdpGetU16( cdp, pSrc[ i ] );
-            HB_PUT_BE_USHORT( pDst, u );
+            HB_PUT_BE_UINT16( pDst, u );
          }
          return i<<1;
       }
@@ -519,7 +519,7 @@ ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE cdp, BYTE* pSrc, ULONG ulLen, BYTE
       u = pSrc[ i ];
       if ( uniCodes && u < nChars )
          u = uniCodes[ u ];
-      HB_PUT_BE_USHORT( pDst, u );
+      HB_PUT_BE_UINT16( pDst, u );
    }
    return i<<1;
 }

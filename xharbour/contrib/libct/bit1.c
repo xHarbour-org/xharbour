@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.3 2004/01/18 04:25:14 likewolf Exp $
+ * $Id: bit1.c,v 1.4 2004/03/18 03:43:08 ronpinkas Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ static USHORT __numand( USHORT wNum1, USHORT wNum2 );
 static USHORT __numor ( USHORT wNum1, USHORT wNum2 );
 static USHORT __numxor( USHORT wNum1, USHORT wNum2 );
 static USHORT __numnot( USHORT wNum1, USHORT wNum2 );
-static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2));
+static LONG __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2));
 
 
 /*  $DOC$
@@ -442,7 +442,7 @@ static USHORT __numnot( USHORT uiNum1, USHORT uiNum2 )
 }
 
 
-static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2))
+static LONG __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2))
 {
   USHORT uiNumOp = 0;
   USHORT uiNum1, uiNum2;

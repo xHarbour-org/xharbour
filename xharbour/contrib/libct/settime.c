@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.4 2004/04/30 19:42:23 druzus Exp $
+ * $Id: settime.c,v 1.5 2004/05/02 19:29:32 druzus Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -64,17 +64,11 @@
 #define HB_OS_WIN_32_USED
 #endif
 
-#define _SVID_SOURCE
-#if defined( OS_UNIX_COMPATIBLE )
-   #if defined( HB_OS_BSD )
-      #include <sys/time.h>
-   #else
-      #include <sys/timeb.h>
+#if defined( HB_OS_LINUX )
+   /* stime exists only in SVr4, SVID, X/OPEN and Linux */
+   #ifndef _SVID_SOURCE
+      #define _SVID_SOURCE
    #endif
-   #include <sys/times.h>
-   #include <unistd.h>
-#else
-   #include <sys/timeb.h>
 #endif
 #include <time.h>
 
@@ -102,10 +96,25 @@ HB_FUNC ( SETNEWDATE )
 
    hb_retl ( SetLocalTime(&st) );
 }
-#elif defined( OS_UNIX_COMPATIBLE ) || defined(__DJGPP__)
+#elif defined( HB_OS_LINUX )
+/* stime exists only in SVr4, SVID, X/OPEN and Linux */
 {
    /* LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek; */
-   hb_retl(0);
+
+   ULONG lNewDate;
+   int iY, iM, iD;
+   time_t tm;
+
+   iY = hb_parni( 1 );
+   iM = hb_parni( 2 );
+   iD = hb_parni( 3 );
+
+   lNewDate = hb_dateEncode( iY, iM, iD ) - hb_dateEncode( 1970, 1, 1 );
+
+   tm = time(NULL);
+   tm = lNewDate * 86400 + ( tm % 86400 );
+
+   hb_retl( stime(&tm) == 0);
 }
 #endif
 }
@@ -132,15 +141,21 @@ HB_FUNC ( SETNEWTIME )
 
    hb_retl ( SetLocalTime(&st) );
 }   
-#elif defined( OS_UNIX_COMPATIBLE )
+#elif defined( HB_OS_LINUX )
+/* stime exists only in SVr4, SVID, X/OPEN and Linux */
 {
-   LONG lNewHour,lNewMin,lNewSec;
+   ULONG lNewTime;
+   int iH, iM, iS;
    time_t tm;
+
+   iH = hb_parni( 1 );
+   iM = hb_parni( 2 );
+   iS = hb_parni( 3 );
+   lNewTime = iH * 3600 + iM * 60 + iS;
+
    tm = time(NULL);
-   lNewHour = (LONG) hb_parni(1)*3600;
-   lNewMin = (LONG) hb_parni(2)*60;
-   lNewSec = (LONG) hb_parni(3);
-   tm += lNewHour+lNewMin+lNewSec;
+   tm += lNewTime - ( tm % 86400 );
+
    hb_retl( stime(&tm) == 0);
 }   
 #endif   

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2923 2004/05/11 18:27:48 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2924 2004/05/11 21:06:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,57 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-12 04:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/libct/addascii.c
+  * xharbour/contrib/libct/bit1.c
+  * xharbour/contrib/libct/bit2.c
+  * xharbour/contrib/libct/bit3.c
+  * xharbour/contrib/libct/files.c
+  * xharbour/contrib/libct/pad.c
+    * long to LONG changed
+
+  * xharbour/contrib/libct/settime.c
+    * correctly implemented SETNEWTIME and SETNEWDATE for Linux -
+      remember that you need root privileges to use it.
+      I still don't know why we have these functions (they are
+      not part of CT) and didn't implement them directly inside
+      SETTIME and SETDATE - it will be faster.
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/fm.c
+    * fixed hb_xmem{cpy|set} to use only on 16bit platforms
+      They were activated on 64bit machines when LONG was not hacked
+      to 32bit size.
+
+  * xharbour/include/hbdefs.h
+    * HB_{GET|PUT}_{LE|BE}_{USHORT|ULONG} macros changed to
+      HB_{GET|PUT}_{LE|BE}_{UINT16|UINT32} to make them basic C types
+      (int,long) size independent and avoid confusion for programmers
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/tests/bldtest/bldtest.c
+    * use new HB_{GET|PUT}_{LE|BE}_{UINT16|UINT32} macros instead
+      of the old ones
+
+  * xharbour/include/hbcomp.h
+    + hb_compGenSwitchCase() to generate pcode for 32 or 64bit switch
+      case value
+
+  * xharbour/source/compiler/harbour.c
+    + hb_compGenSwitchCase() to generate pcode for 32 or 64bit switch
+      case value
+    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG 
+
+  * xharbour/source/vm/macro.c
+    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG 
+
+  * xharbour/source/compiler/harbour.sly
+    * use hb_compGenSwitchCase() for HB_P_SWITCHCASE
+
 2004-05-12 04:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     + define _WIN32_IE if not defined. For MinGW and Open-Watcom
