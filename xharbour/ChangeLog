@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1481 2003/09/15 17:38:15 druzus Exp $
+ * $Id: ChangeLog,v 1.1482 2003/09/15 18:58:26 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-15 21:28 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/philes.c
+    + HB_OSError() to return the hard untranslated OS dependant error.
 
 2003-09-15 20:59 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/filesys.c

@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.12 2003/08/27 10:29:14 jonnymind Exp $
+ * $Id: philes.c,v 1.13 2003/08/27 12:07:32 jonnymind Exp $
  */
 
 /*
@@ -137,6 +137,11 @@ HB_FUNC( FWRITE )
 HB_FUNC( FERROR )
 {
    hb_retni( hb_fsError() );
+}
+
+HB_FUNC( HB_OSERROR )
+{
+   hb_retni( hb_fsOsError() );
 }
 
 HB_FUNC( FCLOSE )
