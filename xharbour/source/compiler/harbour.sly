@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.45 2003/05/28 05:42:29 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.46 2003/05/31 15:22:12 paultucker Exp $
  */
 
 /*
@@ -135,6 +135,7 @@ extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of
 extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
 extern int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
 extern int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
+extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
 
 extern char * hb_comp_SLX_LastBlock( BOOL bReset );
 
@@ -556,7 +557,11 @@ Variable    : IdentName         {
                                   $$ = hb_compExprNewVar( $1 );
                                   if( s_bBlock )
 				  {
-                                     s_bBlockDeclared = ( s_bBlockDeclared || hb_compLocalGetPos( $1 ) || hb_compStaticGetPos( $1, hb_comp_functions.pLast ) || ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
+                                     s_bBlockDeclared = ( s_bBlockDeclared ||
+                                                          hb_compLocalGetPos( $1 ) ||
+                                                          hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
+                                                          hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
+                                                          ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
 				  }
                                 }
 ;
@@ -569,7 +574,11 @@ VarAlias    : IdentName ALIASOP      { $$ = hb_compExprNewAlias( $1 ); }
 MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                 if( s_bBlock )
 				{
-                                   s_bBlockDeclared = ( s_bBlockDeclared || hb_compLocalGetPos( $1 ) || hb_compStaticGetPos( $1, hb_comp_functions.pLast ) || ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
+                                   s_bBlockDeclared = ( s_bBlockDeclared ||
+                                                        hb_compLocalGetPos( $1 ) ||
+                                                        hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
+                                                        hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
+                                                        ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
                                    s_bBlockMacro = TRUE;
 				}
                               }
@@ -1311,6 +1320,7 @@ GetVar     : Variable
              {
 		s_bSetGet = ( hb_compLocalGetPos( $1->value.asSymbol ) ||
                               hb_compStaticGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) ||
+                              hb_compVariableGetPos( hb_comp_pGlobals, $1->value.asSymbol ) ||
                               ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1->value.asSymbol, hb_comp_functions.pFirst ) ) ||
 		              hb_compMemvarGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) ||
 		              hb_compFieldGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) );

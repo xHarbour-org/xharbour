@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1345 2003/08/13 02:28:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1346 2003/08/13 23:51:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-14 01:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    + Added GLOBAL detection to recent fix to HB_P_ARRAYPUSH.
+
+  * source/compiler/harbour.sly
+    + Added GLOBAL detection to s_bSetGet logic, and s_bBlockDeclared logic.
+
+  * source/compiler/harbour.c
+    + Added declaration of hb_compVariableGetPos()
 
 2003-08-13 16:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c

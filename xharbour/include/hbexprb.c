@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.59 2003/07/21 22:41:06 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.60 2003/08/13 23:51:02 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,9 @@
 #include "hbcomp.h"
 #include "hbmacro.ch"
 
-extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
+extern int hb_compLocalGetPos( char * szVarName );
+extern int hb_compStaticGetPos( char *, PFUNCTION );
+extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
 
 /* memory allocation
  */
@@ -1094,6 +1096,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                #else
                   if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
                       hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
+                      hb_compVariableGetPos( hb_comp_pGlobals, pSelf->value.asList.pExprList->value.asSymbol ) ||
                       ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
                   {
                      // Declared var - do not change context.

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.47 2003/07/07 04:39:31 walito Exp $
+ * $Id: harbour.c,v 1.49 2003/07/24 20:53:45 andijahja Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a loca
 int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
 int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
 int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
+USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the order + 1 of a variable if defined or zero */
 
 static void hb_compGenFieldPCode( BYTE , int, char *, PFUNCTION );      /* generates the pcode for database field */
 static void hb_compGenVariablePCode( BYTE , char * );    /* generates the pcode for undeclared variable */
