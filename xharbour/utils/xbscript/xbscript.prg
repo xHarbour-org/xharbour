@@ -77,6 +77,7 @@
 #ifdef __HARBOUR__
 
    EXTERN dbClearRel
+   REQUEST DBFFPT
 
    // Enable extended syntax.
    #ifdef __XHARBOUR__
@@ -93,17 +94,17 @@
          REQUEST SQLRDD
          REQUEST SR_ODBC
 
-				 #ifdef MYSQL
-				    REQUEST SR_MYSQL
-				 #endif
-				 #ifdef PGS
-				    REQUEST SR_PGS
-				 #endif
+         #ifdef MYSQL
+            REQUEST SR_MYSQL
+         #endif
+         #ifdef PGS
+            REQUEST SR_PGS
+         #endif
       #endif
 
       #ifdef ZIP
-				 EXTERN ZipCreate
-			#endif
+         EXTERN ZipCreate
+      #endif
    #endif
 
    #ifndef NO_BOOST
@@ -1313,6 +1314,8 @@ PROCEDURE RP_Dot()
 
       sLine := StrTran( sLine,  Chr(9), " " )
 
+      Scroll( MaxRow(), 0, MaxRow(), MaxCol(), 1 )
+
       BEGIN SEQUENCE
          ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
       //RECOVER USING oErr
@@ -1320,9 +1323,9 @@ PROCEDURE RP_Dot()
 
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
 
-      IF s_nRow >= MaxRow() - 1
-         Scroll( 2, 0, MaxRow() - 1, MaxCol(), 1 )
-         s_nRow := MaxRow() - 2
+      IF s_nRow >= MaxRow()
+         Scroll( 2, 0, MaxRow(), MaxCol(), 1 )
+         s_nRow := MaxRow() - 1
       ENDIF
 
       #ifndef DONT_CLONE_RULES
