@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.33 2004/03/03 22:26:42 andijahja Exp $
+ * $Id: direct.c,v 1.34 2004/03/04 00:02:22 andijahja Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
          {
             HB_ITEM Subarray;
             char buffer[ 32 ];
-            BOOL bAddEntry;
+            BOOL bAddEntry = TRUE;
 
             hb_arrayNew( &Subarray, 0 );
 
@@ -158,7 +158,10 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
-            bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
+            if ( bDirOnly )
+            {
+               bAddEntry = hb_fsIsDirectory( ( BYTE * ) ffind->szName );
+            }
 
             if( bAddEntry )
             {
@@ -169,12 +172,13 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
       while( hb_fsFindNext( ffind ) );
 
       hb_fsFindClose( ffind );
+
    }
 }
 
 void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
-   USHORT    uiMask;
+   USHORT    uiMask, uiMask1;
    BYTE      *szDirSpec;
 
 /*
@@ -203,6 +207,8 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
           | HB_FA_NOTINDEXED
           | HB_FA_ENCRYPTED
           | HB_FA_VOLCOMP;
+
+   uiMask1 = uiMask;
 
    hb_arrayNew( pDir, 0 );
 
@@ -249,10 +255,10 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    /* Get the file list */
    hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask, fDirSpec, bFullPath, bDirOnly );
 
-   if ( uiMask & HB_FA_LABEL )
+   if ( uiMask == HB_FA_LABEL )
    {
-      uiMask &= ~HB_FA_LABEL;
-      hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask, fDirSpec, bFullPath, bDirOnly );
+      uiMask1 |= hb_fsAttrEncode( szAttributes );
+      hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask1, fDirSpec, bFullPath, bDirOnly );
    }
 
    if ( fDirSpec != NULL )
