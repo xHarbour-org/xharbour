@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1531 2003/10/01 04:39:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1532 2003/10/01 05:56:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-30 23:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  *  source/vm/estack.c
+     * Reverted addition of HB_EXPORT to hb_stack (until more complete solution.)
 
 2003-09-30 22:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   *  dll_b32.bat

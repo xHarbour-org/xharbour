@@ -1625,6 +1625,9 @@
     #ifdef __XHARBOUR__
        #pragma BEGINDUMP
           #define __XHARBOUR__
+
+          #define HB_NO_DEFAULT_API_MACROS
+          #define HB_NO_DEFAULT_STACK_MACROS
        #pragma ENDDUMP
     #endif
 
