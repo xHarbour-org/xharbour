@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.309 2004/01/27 03:07:00 ronpinkas Exp $
+ * $Id: hvm.c,v 1.310 2004/01/27 09:56:10 likewolf Exp $
  */
 
 /*
@@ -843,7 +843,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       ULONG ulLastOpcode = 0; /* opcodes profiler support */
       ULONG ulPastClock = 0;  /* opcodes profiler support */
    #endif
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
    //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
@@ -3211,8 +3211,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       #endif
    }
 
- Done:
-
    /* No cancellation here */
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
@@ -3225,6 +3223,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
+
+ Done:
 
    // Reset FOR EACH.
    while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )

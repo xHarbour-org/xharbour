@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2156 2004/01/27 09:56:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.2158 2004/01/27 15:20:36 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-27 09:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Moved Done label in hb_vmExecute() below line restoring Private Base, becuase CodeBlocks do not affect Private Base.
 
 2004-01-27 18:15 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/compiler/harbour.c
@@ -46,7 +50,7 @@
         codeblock was created
   * source/vm/fm.c
     * Fixed a typo.
-      
+
 2004-01-26 20:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * hrbdll.vc
     - Commented out uc437.c ( hb_uniTbl_437 already defined in cdpapi.c )
