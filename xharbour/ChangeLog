@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.469 2002/10/28 20:39:36 mlombardo Exp $
+ * $Id: ChangeLog,v 1.470 2002/10/30 02:09:34 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-29 21:21 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * modified by Robert Haley <rhaley@cheshire.net> to allow Tone()
+    * to work correctly under Win9x.
+    * Win9x Tone() support currently only for Borland and MSVC compilers.
+    * The only issue for the moment, is if the calculation of TICKS is
+    * incorrect for other compilers.  SEE dTicks in hb_gt_Tone().
+    * Someone may wish to adapt the code above hb_gt_tone() in gtwin.c
+    * for other compilers.
+  * makefile.vc
+    * slight re-ordering and for the moment, removed win32ole.prg till
+    * I or someone can review the problem with it for MSVC.
+  + makefile.nt
+  * make_vc.bat
+    * if building Harbour under NT, use the alternate makefile.nt
+    * for faster builds.
 
 2002-10-29 23:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/memoedit.prg

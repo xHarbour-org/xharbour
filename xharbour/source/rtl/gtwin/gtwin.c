@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.10 2002/10/09 03:43:21 druzus Exp $
+ * $Id: gtwin.c,v 1.11 2002/10/22 02:08:33 paultucker Exp $
  */
 
 /*
@@ -255,6 +255,7 @@ static void hb_gt_xScreenUpdate( void )
              ( s_csbi.dwCursorPosition.Y != s_sCurRow ||
                s_csbi.dwCursorPosition.X != s_sCurCol ) )
             hb_gt_xSetCursorPos();
+
     }
 }
 
@@ -896,27 +897,6 @@ void hb_gt_SetBlink( BOOL bBlink )
 
 /* *********************************************************************** */
 
-void hb_gt_Tone( double dFrequency, double dDuration )
-{
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
-
-    /* The conversion from Clipper timer tick units to
-       milliseconds is * 1000.0 / 18.2. */
-
-    dDuration = dDuration * 1000.0 / 18.2; /* milliseconds */
-    dDuration = HB_MIN( HB_MAX( 0, dDuration ), ULONG_MAX );
-
-    if( dDuration > 0.0 ) {
-        /* Bad news for non-NT Windows platforms: Beep() ignores
-           both parameters and either generates the default sound
-           event or the standard system beep. */
-        Beep( ( ULONG ) HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-              ( ULONG ) dDuration );
-    }
-}
-
-/* *********************************************************************** */
-
 char * hb_gt_Version( void )
 {
     return "Harbour Terminal: Win32 buffered console";
@@ -950,28 +930,26 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     SHORT Col;
     SHORT Height;
     SHORT Width;
+    USHORT sWidth = hb_gt_GetScreenWidth(),
+          sHeight = hb_gt_GetScreenHeight();
 
-    /* ???: What's this? All 4 lines below gives allways TRUE
-        x < 0  => x < hb_gt_...
-       MaP : Ok, ok ...
-    */
-    if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  ) ||
-        ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  ) ||
-        ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() ) ||
-        ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
+    if( ( Left   >= 0 && Left   < sWidth  ) ||
+        ( Right  >= 0 && Right  < sWidth  ) ||
+        ( Top    >= 0 && Top    < sHeight ) ||
+        ( Bottom >= 0 && Bottom < sHeight ) )
     {
         /* Ensure that box is drawn from top left to bottom right. */
         if( Top > Bottom )
         {
-            SHORT tmp = Top;
+            Row = Top;
             Top = Bottom;
-            Bottom = tmp;
+            Bottom = Row;
         }
         if( Left > Right )
         {
-            SHORT tmp = Left;
+            Row = Left;
             Left = Right;
-            Right = tmp;
+            Right = Row;
         }
 
         /* Draw the box or line as specified */
@@ -981,8 +959,8 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         hb_gt_DispBegin();
 
         if( Height > 1 && Width > 1 &&
-               Top >= 0 && Top < hb_gt_GetScreenHeight() &&
-              Left >= 0 && Left < hb_gt_GetScreenWidth() )
+               Top >= 0 && Top < sHeight &&
+              Left >= 0 && Left < sWidth )
             hb_gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ); /* Upper left corner */
 
         Col = ( Height > 1 ? Left + 1 : Left );
@@ -991,25 +969,25 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             Width += Col;
             Col = 0;
         }
-        if( Right >= hb_gt_GetScreenWidth() )
+        if( Right >= sWidth )
         {
-            Width -= Right - hb_gt_GetScreenWidth();
+            Width -= Right - sWidth;
         }
 
-        if( Col <= Right && Col < hb_gt_GetScreenWidth() && 
-                Top >= 0 && Top < hb_gt_GetScreenHeight() )
+        if( Col <= Right && Col < sWidth &&
+                Top >= 0 && Top < sHeight )
             hb_gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) ); /* Top line */
 
         if( Height > 1 &&
-               (Right - Left) > 1 && Right < hb_gt_GetScreenWidth() &&
-               Top >= 0 && Top < hb_gt_GetScreenHeight() )
+               (Right - Left) > 1 && Right < sWidth &&
+               Top >= 0 && Top < sHeight )
             hb_gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ); /* Upper right corner */
 
         if( szBox[ 8 ] && Height > 2 && Width > 2 )
         {
             for( Row = Top + 1; Row < Bottom; Row++ )
             {
-                if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
+                if( Row >= 0 && Row < sHeight )
                 {
                     Col = Left;
                     if( Col < 0 )
@@ -1017,7 +995,7 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                     else
                         hb_gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] ); /* Left side */
                     hb_gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 ); /* Fill */
-                    if( Right < hb_gt_GetScreenWidth() )
+                    if( Right < sWidth )
                         hb_gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ); /* Right side */
                 }
             }
@@ -1026,11 +1004,11 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         {
             for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( (Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
             {
-                if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
+                if( Row >= 0 && Row < sHeight )
                 {
-                    if( Left >= 0 && Left < hb_gt_GetScreenWidth() )
+                    if( Left >= 0 && Left < sWidth )
                         hb_gt_xPutch( Row, Left, byAttr, szBox[ 7 ] ); /* Left side */
-                    if( ( Width > 1 || Left < 0 ) && Right < hb_gt_GetScreenWidth() )
+                    if( ( Width > 1 || Left < 0 ) && Right < sWidth )
                         hb_gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ); /* Right side */
                 }
             }
@@ -1038,17 +1016,17 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
         if( Height > 1 && Width > 1 )
         {
-            if( Left >= 0 && Bottom < hb_gt_GetScreenHeight() )
+            if( Left >= 0 && Bottom < sHeight )
                 hb_gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] ); /* Bottom left corner */
 
             Col = Left + 1;
             if( Col < 0 )
                 Col = 0; /* The width was corrected earlier. */
 
-            if( Col <= Right && Bottom < hb_gt_GetScreenHeight() )
+            if( Col <= Right && Bottom < sHeight )
                 hb_gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ); /* Bottom line */
 
-            if( Right < hb_gt_GetScreenWidth() && Bottom < hb_gt_GetScreenHeight() )
+            if( Right < sWidth && Bottom < sHeight )
                 hb_gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ); /* Bottom right corner */
         }
 
@@ -1514,3 +1492,207 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 
 /* *********************************************************************** */
 
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+static int hb_Inp9x( USHORT usPort )
+{
+  USHORT usVal;
+
+    HB_TRACE(HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort));
+
+    #if defined(__BORLANDC__)
+       _DX = usPort;
+       __emit__(0xEC);        /* ASM  IN AL, DX */
+       __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
+       usVal = _AX;
+    #else
+       usVal = _inp( usPort );
+    #endif
+
+    return usVal;
+}
+
+/* *********************************************************************** */
+
+static int hb_Outp9x( USHORT usPort, USHORT usVal )
+{
+    HB_TRACE(HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
+
+    #if defined(__BORLANDC__)
+      _DX = usPort;
+      _AL = usVal;
+      __emit__(0xEE);        /* ASM OUT DX, AL */
+      __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
+      usVal = _AX;
+    #else
+       usVal = _outp( usPort, usVal );
+    #endif
+
+    return usVal;
+}
+
+/* *********************************************************************** */
+
+static void hb_gt_w9xTone( double dFreq, double dDurat, double dTick )
+{
+  INT uLSB,uMSB;
+  UINT uiValue;
+  ULONG lAdjFreq;
+  clock_t end_clock;
+
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+
+    /* Clipper ignores Tone() requests if Frequency is less than  
+       < 20 hz (and so should we) to maintain compatibility .. */
+
+    if ( dFreq > 20.0 )
+    {
+
+      /* Setup Sound Control Port Registers.. */
+
+      /* select timer channel 2 */
+
+      hb_Outp9x(67, 182) ;
+
+      lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
+
+      if( lAdjFreq < 0 ) 
+         uLSB = lAdjFreq + 65536;
+      else
+         uLSB = lAdjFreq % 256;
+
+      if( lAdjFreq < 0 ) 
+         uMSB = lAdjFreq + 65536;
+      else
+         uMSB = lAdjFreq / 256;
+
+
+      /* set the frequency (LSB,MSB) */
+
+      hb_Outp9x(66, uLSB);
+      hb_Outp9x(66, uMSB);
+
+      /* Get current Port setting */
+
+      uiValue = hb_Inp9x( 97 );
+
+      /* enable Speaker Data & Timer gate bits */
+
+      uiValue = uiValue | 3;  /* 00000011B is bitmask to enable sound */
+
+      /* Turn on Speaker - sound Tone for duration.. */
+
+      hb_Outp9x(97, uiValue);
+
+      end_clock = clock() + ( clock_t ) ( dDurat );
+      while( clock() < end_clock )
+      {
+        hb_idleState();
+      }
+      hb_idleReset();
+
+      /* Read back current Port value for Reset */
+
+      uiValue = hb_Inp9x( 97 );
+
+      /* disable Speaker Data & Timer gate bits */
+      uiValue = uiValue & 0xFC ;
+
+      /* Turn off the Speaker ! */
+
+      hb_Outp9x(97, uiValue);
+
+    }
+
+    /* Delay (1) clock tick, just like Clipper .. */
+
+    end_clock = clock() + ( clock_t ) ( dTick );
+    while( clock() < end_clock )
+    {
+      hb_idleState();
+    }
+    hb_idleReset();
+
+}
+#endif
+
+/* *********************************************************************** */
+
+static void hb_gt_wNtTone( double dFreq, double dDurat, double dTick )
+{
+  clock_t end_clock;
+
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+
+    /* Clipper ignores Tone() requests if Frequency is less than  
+       < 20 hz (and so should we) to maintain compatibility .. */
+
+    if ( dFreq > 20.0 )
+    {
+       Beep( (ULONG) dFreq, (ULONG) dDurat );
+    }
+
+    /* Delay (1) clock tick, just like Clipper .. */
+
+    end_clock = clock() + ( clock_t ) ( dTick );
+    while( clock() < end_clock )
+    {
+      hb_idleState();
+    }
+    hb_idleReset();
+
+}
+
+/* *********************************************************************** */
+
+
+void hb_gt_Tone( double dFrequency, double dDuration )
+{
+    double dMillisecs;
+    OSVERSIONINFO osv;
+
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
+
+    /* The conversion from Clipper timer tick units to
+       milliseconds is * 1000.0 / 18.2. */
+
+    dDuration = HB_MIN( HB_MAX( 0, dDuration ), ULONG_MAX );
+
+    if( dDuration > 0 ) 
+    {
+      #if defined( _MSC_VER )
+         double dTick = (double) ( 1000.0 / CLOCKS_PER_SEC );
+      #else
+         double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
+      #endif
+
+      dMillisecs = dDuration * dTick;   /* milliseconds */
+
+      /* What version of Windows are you running? */
+      osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+      GetVersionEx(&osv);
+
+      /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
+      if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+      {
+         #if defined(__BORLANDC__) || defined( _MSC_VER )
+            hb_gt_w9xTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+                           dMillisecs, dTick );
+         #else
+            hb_gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+                           dMillisecs, dTick );
+         #endif
+      }
+
+      /* If Windows NT or NT2k, use wNtTone, which provides TONE()
+         reset sequence support (new) */
+      else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
+      {
+        /* We pass the Millisecond converted value here .. */
+        hb_gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+              dMillisecs, dTick );
+      }
+    }
+}
+
+
+/* *********************************************************************** */

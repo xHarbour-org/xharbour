@@ -3,6 +3,12 @@
 #
 
 #
+# Makefile.nt - This file is identical to makefile.vc, except that
+# under something higher than Win9x, you should see overall improved
+# speed of building Harbour.
+#
+
+#
 # Makefile for Harbour Project for Microsoft Visual C (32 bit)
 #
 
@@ -83,7 +89,7 @@ DEL = del
 # SimpLex is the only supported Scanner in xHarbour.
 HB_LEX = SIMPLEX
 
-MK_FILE      = makefile.vc
+MK_FILE      = makefile.nt
 MK_FLAGS     = $(MAKEFLAGS: =)
 
 BIN_DIR      = bin\vc
@@ -253,13 +259,13 @@ LIBS2 = \
 #    is cause make to evaluate the obj list of dependants which then
 #    causes the .c.obj rule above to fire. (by inference)
 
-{$(RTL_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RTL_DIR)}.cpp{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)}.prg{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(RTL_LIB)2
 
@@ -440,7 +446,7 @@ RTL_LIB_OBJS = \
 # LANG.LIB rules
 #
 
-{$(LANG_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(LANG_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 LANG_LIB_OBJS = \
@@ -483,7 +489,7 @@ LANG_LIB_OBJS = \
 # MACRO.LIB rules
 #
 
-{$(MACRO_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(MACRO_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 MACRO_LIB_OBJS = \
@@ -506,10 +512,10 @@ MACRO_LIB_OBJS = \
 # RDD.LIB rules
 #
 
-{$(RDD_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(RDD_DIR)}.prg{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(RDD_LIB)2
 
@@ -538,10 +544,10 @@ RDD_LIB_OBJS = \
 # NULSYS.LIB rules
 #
 
-{$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(NULSYS_LIB)2
 
@@ -552,10 +558,10 @@ NULSYS_LIB_OBJS = \
 # DBFNTX.LIB rules
 #
 
-{$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DBFNTX_LIB)2
 
@@ -568,10 +574,10 @@ DBFNTX_LIB_OBJS = \
 # DBFCDX.LIB rules
 #
 
-{$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DBFCDX_LIB)2
 
@@ -584,7 +590,7 @@ DBFCDX_LIB_OBJS = \
 # PP.LIB rules
 #
 
-{$(PP_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(PP_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 PP_LIB_OBJS = \
@@ -598,10 +604,10 @@ PP_LIB_OBJS = \
 # DEBUG.LIB rules
 #
 
-{$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj:
+{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DEBUG_LIB)2
 
@@ -620,7 +626,7 @@ DEBUG_LIB_OBJS = \
 # COMMON.LIB rules
 #
 
-{$(COMMON_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(COMMON_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 COMMON_LIB_OBJS = \
@@ -640,10 +646,10 @@ COMMON_LIB_OBJS = \
 # VM.LIB rules
 #
 
-{$(VM_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(VM_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)}.obj:
+{$(VM_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(VM_LIB)2
 
@@ -685,7 +691,7 @@ VM_LIB_OBJS = \
 # GTCGI.LIB rules
 #
 
-{$(RTL_DIR)\gtcgi}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtcgi}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 GTCGI_LIB_OBJS = \
@@ -696,7 +702,7 @@ GTCGI_LIB_OBJS = \
 # GTDOS.LIB rules
 #
 
-{$(RTL_DIR)\gtdos}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtdos}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 GTDOS_LIB_OBJS = \
@@ -707,7 +713,7 @@ GTDOS_LIB_OBJS = \
 # GTPCA.LIB rules
 #
 
-{$(RTL_DIR)\gtpca}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtpca}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 GTPCA_LIB_OBJS = \
@@ -718,7 +724,7 @@ GTPCA_LIB_OBJS = \
 # GTSTD.LIB rules
 #
 
-{$(RTL_DIR)\gtstd}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtstd}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 GTSTD_LIB_OBJS = \
@@ -729,7 +735,7 @@ GTSTD_LIB_OBJS = \
 # GTWIN.LIB rules
 #
 
-{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
 
 GTWIN_LIB_OBJS = \
