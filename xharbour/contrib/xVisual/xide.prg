@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.77 2002/10/07 03:45:38 what32 Exp $
+ * $Id: xide.prg,v 1.78 2002/10/10 02:51:46 what32 Exp $
  */
 
 /*
@@ -148,9 +148,9 @@ METHOD MainToolBar() CLASS MainFrame
          :AddTab( "Win 3.1" )
          :AddTab( "Samples" )
          :AddTab( "Activex" )
+         :Configure()
       End
       :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tabs"):handle, 550, 56, , "", NIL )
-      :GetObj("Tabs"):Configure()
 
       // sets the controls toolbar on the TabControl
       With Object :Tabs:StdTab
@@ -194,7 +194,7 @@ METHOD MainToolBar() CLASS MainFrame
 
                :SetStyle( TBSTYLE_CHECKGROUP )
 
-               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', '', '', '', ;
+               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', '', '', 'Rebar', ;
                                 '', '', '', '', '', '', ;
                                 '', '', '' }
                for n:=0 to 16

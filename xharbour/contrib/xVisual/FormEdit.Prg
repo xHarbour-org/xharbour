@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.57 2002/10/09 06:46:59 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.58 2002/10/10 02:51:45 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -236,6 +236,8 @@ METHOD CreateControl(aRect)
          oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="TreeView"
          oObj:=::Add(cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="Rebar"
+         oObj:=::Add(cName, TRebar():New( self ) )
       OTHERWISE // unknown name
 
          ::CtrlName:=NIL

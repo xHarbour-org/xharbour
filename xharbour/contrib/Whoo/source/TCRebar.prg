@@ -40,8 +40,23 @@ pragma pack(4)
 
 CLASS TRebar FROM TForm
 
-   VAR nrProc
-   VAR rect
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT    0
+   DATA Top     INIT    0
+   DATA Width   INIT  200
+   DATA Height  INIT  100
+
+   DATA Style   INIT  WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
+                      RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
+   DATA ExStyle INIT  WS_EX_TOOLWINDOW
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_NOTIFY}
+   DATA WndProc   PROTECTED INIT 'FormProc'
+   DATA Name      PROTECTED INIT REBARCLASSNAME
+
+   VAR nrProc     PROTECTED
 
    METHOD New() CONSTRUCTOR
    METHOD AddBand()
@@ -78,25 +93,8 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TRebar
-   
-   super:new( oParent )
-    
    InitCommonControlsEx(ICC_COOL_CLASSES)
-
-   ::Name      := REBARCLASSNAME
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::WndProc   := "FormProc"
-   ::lHaveProc := .F.
-   ::Caption   := ""
-   ::Left      := 0
-   ::Top       := 0
-   ::Width     := 200   
-   ::Height    := 100
-   ::ExStyle   := WS_EX_TOOLWINDOW
-   ::Style     := WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
-                  RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
-   ::Msgs :={WM_NOTIFY}
+   super:new( oParent )
    RETURN( self )
 
 *------------------------------------------------------------------------------*

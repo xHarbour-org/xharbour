@@ -97,7 +97,6 @@ CLASS TTabControl FROM TControl
    METHOD Notify()
    METHOD OnSize()
    METHOD GetObj()
-
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
