@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.46 2003/03/05 05:11:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.47 2003/03/07 23:14:11 ronpinkas Exp $
  */
 
 /*
@@ -2328,7 +2328,7 @@ static int RemoveSlash( char * stroka )
         case STATE_NORMAL:
           if( *ptr == '\'' )  State = STATE_QUOTE1;
           else if( *ptr == '\"' )  State = STATE_QUOTE2;
-          else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )  State = STATE_QUOTE3;
+          else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )  State = STATE_QUOTE3;
           else if( *ptr == ';' )
           {
             State = STATE_INIT;
@@ -2755,7 +2755,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             State = ( StBr1==0 && StBr2==0 && StBr3==0 )? STATE_ID_END: STATE_BRACKET;
             continue;
          }
-         else if( **ptri == '[' /* ( see below 5-2-2001 && ( State == STATE_EXPRES || ( strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )*/ )
+         else if( **ptri == '[' /* ( see below 5-2-2001 && ( State == STATE_EXPRES || ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )*/ )
          {
             char *pString;
 
@@ -2817,7 +2817,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
       {
          break;
       }
-      else if( **ptri == '[' && ( strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )  /* New String, can't belong to extracted expression. */
+      else if( **ptri == '[' && ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )  /* New String, can't belong to extracted expression. */
       {
          break;
       }
@@ -4020,7 +4020,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
               /* Ron Pinkas modified 2000-06-17
               if( ISNAME(s_prevchar) || s_prevchar == ']' )
               */
-              if( ISNAME(s_prevchar) || strchr( ")]}.\"", s_prevchar ) )
+              if( ISNAME(s_prevchar) || strchr( ")]}.\"'", s_prevchar ) )
               {
                  s_ParseState = STATE_BRACKET;
               }
@@ -4242,7 +4242,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               lPos++;
               continue;
            }
-           else if( bRule == FALSE && *(szText+lPos) == '[' && strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+           else if( bRule == FALSE && *(szText+lPos) == '[' && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
            {
               State = STATE_QUOTE3;
               lPos++;
@@ -4648,7 +4648,7 @@ static int strotrim( char * stroka, BOOL bRule )
         }
         /* Ron Pinkas added 2000-11-05 */
         /* Ron Pinkas 2001-02-14 added bRule logic  (removed array logic). */
-        else if( curc == '[' && bRule == FALSE ) /* && ( strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) */
+        else if( curc == '[' && bRule == FALSE ) /* && ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) */
         {
            State = STATE_QUOTE3;
         }
@@ -4836,7 +4836,7 @@ static int NextName( char ** sSource, char * sDest )
      /* Ron Pinkas added 2000-11-08 */
      else if( **sSource == '[' )
      {
-        if( s_bArray == FALSE && strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+        if( s_bArray == FALSE && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
         {
            /* Ron Pinkas added 2000-11-08 */
            pString = *sSource;
@@ -4948,7 +4948,7 @@ static int NextParm( char ** sSource, char * sDest )
      {
         State = STATE_QUOTE2;
      }
-     else if( **sSource == '[' && strchr( ")]}.\"", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+     else if( **sSource == '[' && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
      {
         State = STATE_QUOTE3;
      }
