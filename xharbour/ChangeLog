@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1487 2003/09/16 15:51:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1488 2003/09/17 07:00:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-17 14:42 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    ! fixes for buggy RPM - automatic _topdir detection
 
 2003-09-17 08:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/filesys.c

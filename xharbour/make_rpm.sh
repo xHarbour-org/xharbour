@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.9 2003/09/16 02:21:49 lculik Exp $
+# $Id: make_rpm.sh,v 1.10 2003/09/16 14:26:34 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,6 +14,27 @@ test_reqrpm()
 {
     rpm -q "$1" &> /dev/null
 }
+
+get_rpmmacro()
+{
+    local R X Y
+
+    R=`rpm --showrc|sed -e "/^-14:.${1}[^a-z0-9A-Z_]/ !d" -e "s/^-14: ${1}.//"`
+    X=`echo "${R}"|sed -e "s/.*\(%{\([^}]*\)}\).*/\2/"`
+    while [ "${X}" != "${R}" ]
+    do
+	Y=`get_rpmmacro "$X"`
+	if [ -n "${Y}" ]
+	then
+	    R=`echo "${R}"|sed -e "s!%{${X}}!${Y}!g"`
+	    X=`echo "${R}"|sed -e "s/.*\(%{\([^}]*\)}\).*/\2/"`
+	else
+	    X="${R}"
+	fi
+    done
+    echo -n "${R}"
+}
+
 
 BUGGY_RPM=""
 if [ -f /etc/conectiva-release ]; then
@@ -46,8 +67,9 @@ then
 	    mkdir -p ${RPMDIR}/SOURCES ${RPMDIR}/RPMS ${RPMDIR}/SRPMS \
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
-
-	fi	
+	else
+	    RPMDIR=`get_rpmmacro "_topdir"`
+	fi
         if [ "${BUGGY_RPM}" = "yes" ]
 	then
 	    cp ${hb_filename} ${RPMDIR}/SOURCES
@@ -56,7 +78,6 @@ then
 	if [ "${BUGGY_RPM}" = "yes" ]
 	then
 	    rpm -ba xharbour.spec
-	
 	elif which rpmbuild &>/dev/null	    
 	then
 	    rpmbuild -ta ${hb_filename} --rmsource

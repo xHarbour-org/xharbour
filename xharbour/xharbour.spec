@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.31 2003/09/11 14:57:48 lculik Exp $
+# $Id: xharbour.spec,v 1.32 2003/09/11 17:59:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -17,11 +17,11 @@
 # please add your distro suffix if it not belong to the one recognized below
 # and remember that order checking can be important
 
-%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
 %if "%{platform}" == ""
-%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
 %if "%{platform}" == ""  
-%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
 %if "%{platform}" == ""  
 %define platform %([ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/)
 %endif
