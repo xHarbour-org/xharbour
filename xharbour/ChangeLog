@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2299 2004/02/15 22:21:09 lculik Exp $
+ * $Id: ChangeLog,v 1.2300 2004/02/15 22:49:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 20:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/libct/files.c
+    ! Added Code to relese memory from fname variable if is valid
 
 2004-02-15 14:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/extend.c
