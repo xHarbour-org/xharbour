@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.52 2003/02/03 18:36:01 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.53 2003/03/07 14:11:47 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -360,7 +360,7 @@ void Idle( MSG *pMsg )
 
       case HB_IT_LONG:
       {
-         hb_vmPushSymbol( pSymExec );
+         hb_vmPushSymbol( ( PHB_SYMB ) pSymExec );
          hb_vmPushNil();
          hb_itemPushForward( &HB_OnIdle );
          hb_vmDo( 0 );

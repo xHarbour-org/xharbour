@@ -11,9 +11,9 @@ BHC = $(HMAKEDIR)
 RECURSE= NO 
  
 PROJECT = $(BHC)\lib\html.lib 
-OBJFILES = counter.obj errorsys.obj htmbrows.obj htmutil.obj jlist.obj jwindow.obj ocgi.obj oedit.obj ofile.obj oframe.obj //
+OBJFILES = counter.obj hterrsys.obj htmbrows.obj htmutil.obj jlist.obj jwindow.obj ocgi.obj oedit.obj ofile.obj oframe.obj //
  ohtm.obj oini.obj outil.obj $(OB) 
-PRGFILES = counter.prg errorsys.prg htmbrows.prg htmutil.prg jlist.prg jwindow.prg ocgi.prg oedit.prg ofile.prg oframe.prg //
+PRGFILES = counter.prg hterrsys.prg htmbrows.prg htmutil.prg jlist.prg jwindow.prg ocgi.prg oedit.prg ofile.prg oframe.prg //
  ohtm.prg oini.prg outil.prg $(PS) 
 RESFILES =
 RESDEPEN = $(RESFILES)

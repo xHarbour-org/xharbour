@@ -54,7 +54,6 @@ void WG_SetObjectData( PHB_ITEM pObj, char* cData, PHB_ITEM pNew );
 
 char * hb_itemVal2Str( PHB_ITEM pItem )
 {
-   PHB_ITEM pResult;
    char * buffer;
    ULONG ulLen;
    BOOL bFreeReq;
@@ -75,7 +74,6 @@ void WG_error(LPCTSTR cError, LPCTSTR cWhere)
     char   cErrorMsg[200];
     DWORD dw = GetLastError();
     static PHB_DYNS Dyns = 0 ;
-    long int res;
 
     FormatMessage(
                    FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -162,7 +160,7 @@ long WG_GetObjectDataLong( PHB_ITEM pObj, char* cData )
 
 char * WG_GetObjectDataString( PHB_ITEM pObj, char* cData )
 {
-   PHB_ITEM pItem;
+   //PHB_ITEM pItem;
    char * cText;
 
    //pItem = WG_GetObjectData( pObj, cData );

@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.3 2002/11/05 06:04:24 paultucker Exp $
+rem $Id: make_vc.bat,v 1.2 2002/11/06 05:11:01 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -38,7 +38,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
-   nmake /f %MK_FILE% %1 %2 %3
+   nmake /f %MK_FILE% %1 %2 %3 >make_vc.log
    if errorlevel 1 goto error
 
 :BUILD_OK
@@ -49,7 +49,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 :error
 
-   echo. there is an error building WoopGUI
+   notepad make_vc.log
    goto exit
 
 :clean

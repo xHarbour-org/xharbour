@@ -31,8 +31,6 @@ HB_FUNC( GETSYSTEMTIME )
    SYSTEMTIME SysTime ;
    PHB_ITEM aSysTime ;
    PHB_ITEM temp ;
-   long nRet;
-
 
    GetSystemTime( &SysTime );     // Pointer to a SYSTEMTIME structure.
 
@@ -86,24 +84,24 @@ HB_FUNC( GETSYSTEMTIME )
 
 HB_FUNC( SETSYSTEMTIME )
 {
-   SYSTEMTIME *SysTime ;
+   SYSTEMTIME SysTime ;
 
    if ( ISARRAY( 1 ) ) // array
    {
-      SysTime->wYear         = (WORD)  hb_parnl( 1, 1 );
-      SysTime->wMonth        = (WORD)  hb_parnl( 1, 2 );
-      SysTime->wDayOfWeek    = (WORD)  hb_parnl( 1, 3 );
-      SysTime->wDay          = (WORD)  hb_parnl( 1, 4 );
-      SysTime->wHour         = (WORD)  hb_parnl( 1, 5 );
-      SysTime->wMinute       = (WORD)  hb_parnl( 1, 6 );
-      SysTime->wSecond       = (WORD)  hb_parnl( 1, 7 );
-      SysTime->wMilliseconds = (WORD)  hb_parnl( 1, 8 );
+      SysTime.wYear         = (WORD)  hb_parnl( 1, 1 );
+      SysTime.wMonth        = (WORD)  hb_parnl( 1, 2 );
+      SysTime.wDayOfWeek    = (WORD)  hb_parnl( 1, 3 );
+      SysTime.wDay          = (WORD)  hb_parnl( 1, 4 );
+      SysTime.wHour         = (WORD)  hb_parnl( 1, 5 );
+      SysTime.wMinute       = (WORD)  hb_parnl( 1, 6 );
+      SysTime.wSecond       = (WORD)  hb_parnl( 1, 7 );
+      SysTime.wMilliseconds = (WORD)  hb_parnl( 1, 8 );
    }
    else
    {
      if ( ISCHAR( 1 ) )  // xHarbour structure
      {
-        SysTime =( SYSTEMTIME *) hb_param( 1, HB_IT_STRING)->item.asString.value;
+        memcpy( &SysTime, hb_param( 1, HB_IT_STRING)->item.asString.value, sizeof( SYSTEMTIME ));
      }
      else
      {
@@ -113,8 +111,7 @@ HB_FUNC( SETSYSTEMTIME )
    }
 
    hb_retl( SetSystemTime(
-                      SysTime                  // Pointer to SYSTEMTIME structures
+                      &SysTime                  // Pointer to SYSTEMTIME structures
                          ) );
 
 }
-

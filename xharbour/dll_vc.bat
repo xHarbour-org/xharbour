@@ -1,7 +1,7 @@
 @echo off
 
 REM
-REM $Id: dll_vc.bat,v 1.1 2002/01/07 04:06:26 andijahja Exp $
+REM $Id: dll_vc.bat,v 1.2 2003/05/27 20:41:29 paultucker Exp $
 REM
 REM 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
 REM � This is a batch file to create harbour.dll 넴
@@ -12,7 +12,7 @@ if not exist obj md obj
 if not exist obj\dll md obj\dll
 if not exist obj\dll\vc md obj\dll\vc
 
-   nmake /NOLOGO /f hrbdll.vc %1 %2 %3 >hrbdllvc.log
+   nmake /f hrbdll.vc %1 %2 %3 >dll_vc.log
    if errorlevel 1 goto BUILD_ERR
 
    copy lib\vc\harbour.lib lib > nul
@@ -23,6 +23,5 @@ if not exist obj\dll\vc md obj\dll\vc
 
 :BUILD_ERR
    notepad hrbdllvc.log
-   goto EXIT
 
 :EXIT

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/02/23 23:15:13 lculik Exp $
+# $Id: Makefile,v 1.2 2003/04/09 17:47:14 lculik Exp $
 #
 
 ROOT = ../../
@@ -24,7 +24,7 @@ PRG_SOURCES=\
     jwindow.prg \
     htmutil.prg \
     counter.prg \
-    errorsys.prg \
+    hterrsys.prg \
     htmbrows.prg \
     jlist.prg \
 

@@ -1,10 +1,14 @@
 @echo off
 
 rem 
-rem $Id: makallvc.bat $
+rem $Id: makallvc.bat,v 1.2 2003/05/27 06:08:25 paultucker Exp $
 rem 
 
 call make_vc %1
+
+echo harbour.dll
+call dll_vc %1
+if errorlevel 1 goto end
 
 :start
 echo htmllib

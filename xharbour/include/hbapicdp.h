@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbapicdp.h,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -92,13 +92,13 @@ typedef struct _HB_CODEPAGE
    PHB_MULTICHAR multi;
 } HB_CODEPAGE, * PHB_CODEPAGE;
 
-extern BOOL hb_cdpRegister( PHB_CODEPAGE );
-extern char * hb_cdpSelectID( char * );
-extern PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE );
-extern PHB_CODEPAGE hb_cdpFind( char * );
-extern void hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
-extern void hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
-extern int hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
+extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
+extern char HB_EXPORT * hb_cdpSelectID( char * );
+extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
+extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
+extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
+extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
+extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 
 #endif /* HB_APICDP_H_ */
 

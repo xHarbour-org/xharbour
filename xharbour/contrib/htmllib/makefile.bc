@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/02/23 23:15:17 lculik Exp $
+# $Id: makefile.bc,v 1.2 2003/05/25 22:23:22 lculik Exp $
 #
 
 #
@@ -99,7 +99,7 @@ $(OBJ_DIR)\jwindow.obj \
 $(OBJ_DIR)\ocgi.obj \
 $(OBJ_DIR)\oframe.obj \
 $(OBJ_DIR)\counter.obj \
-$(OBJ_DIR)\errorsys.obj \
+$(OBJ_DIR)\hterrsys.obj \
 $(OBJ_DIR)\htmutil.obj 
 
 #
@@ -187,10 +187,10 @@ $(OBJ_DIR)\counter.obj : $(OBJ_DIR)\counter.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\errorsys.c : $(TOOLS_DIR)\errorsys.prg
+$(OBJ_DIR)\hterrsys.c : $(TOOLS_DIR)\hterrsys.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\errorsys.obj : $(OBJ_DIR)\errorsys.c
+$(OBJ_DIR)\hterrsys.obj : $(OBJ_DIR)\hterrsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 

@@ -43,11 +43,11 @@ HB_FUNC ( WG_REGISTERFONT )
     mylf.lfItalic            =           hb_parl(6);    // italic attribute option
     mylf.lfUnderline         =           hb_parl(7);    // underline attribute option
     mylf.lfStrikeOut         =           hb_parl(8);    // strikeout attribute option
-    mylf.lfCharSet           =           hb_parnl(9);   // character set identifier
-    mylf.lfOutPrecision      =           hb_parnl(10);  // output precision
-    mylf.lfClipPrecision     =           hb_parnl(11);  // clipping precision
-    mylf.lfQuality           =           hb_parnl(12);  // output quality
-    mylf.lfPitchAndFamily    =           hb_parnl(13);  // pitch and family
+    mylf.lfCharSet           =  (BYTE)   hb_parnl(9);   // character set identifier
+    mylf.lfOutPrecision      =  (BYTE)   hb_parnl(10);  // output precision
+    mylf.lfClipPrecision     =  (BYTE)   hb_parnl(11);  // clipping precision
+    mylf.lfQuality           =  (BYTE)   hb_parnl(12);  // output quality
+    mylf.lfPitchAndFamily    =  (BYTE)   hb_parnl(13);  // pitch and family
     strcpy( mylf.lfFaceName, hb_parc(14) );   // typeface name
     
 }
@@ -63,11 +63,11 @@ HB_FUNC ( CREATEFONT )
     DWORD fdwItalic          =           hb_parl(6);    // italic attribute option
     DWORD fdwUnderline       =           hb_parl(7);    // underline attribute option
     DWORD fdwStrikeOut       =           hb_parl(8);    // strikeout attribute option
-    DWORD fdwCharSet         =           hb_parnd(9);   // character set identifier
-    DWORD fdwOutputPrecision =           hb_parnd(10);  // output precision
-    DWORD fdwClipPrecision   =           hb_parnd(11);  // clipping precision
-    DWORD fdwQuality         =           hb_parnd(12);  // output quality
-    DWORD fdwPitchAndFamily  =           hb_parnd(13);  // pitch and family
+    DWORD fdwCharSet         =           hb_parnl(9);   // character set identifier
+    DWORD fdwOutputPrecision =           hb_parnl(10);  // output precision
+    DWORD fdwClipPrecision   =           hb_parnl(11);  // clipping precision
+    DWORD fdwQuality         =           hb_parnl(12);  // output quality
+    DWORD fdwPitchAndFamily  =           hb_parnl(13);  // pitch and family
     CHAR  *lpszFace          =           hb_parc(14);   // typeface name
     
     hb_retnl( (long) CreateFont( nHeight, nWidth, nEscapement, nOrientation, fnWeight, 

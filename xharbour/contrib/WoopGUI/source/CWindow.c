@@ -387,7 +387,7 @@ HB_FUNC ( WG_CENTERWINDOW )
 HB_FUNC ( GETWINDOWWIDTH )
 {
     RECT rect;
-    int w, h, x, y;
+    int w;
     HWND hWnd = (HWND) hb_parnl (1);
 
     GetWindowRect(hWnd, &rect);
@@ -399,7 +399,7 @@ HB_FUNC ( GETWINDOWWIDTH )
 HB_FUNC ( GETWINDOWHEIGHT )
 {
     RECT rect;
-    int w, h, x, y;
+    int h;
     HWND hWnd = (HWND) hb_parnl (1);
 
     GetWindowRect(hWnd, &rect);
@@ -501,7 +501,7 @@ endif
 HB_FUNC ( CLIENTTOSCREEN )
 {
    POINT Point ;
-   PHB_ITEM pArray,pItem;
+   PHB_ITEM pArray;
    pArray=  hb_param( 2 , HB_IT_ARRAY );
    if (Array2Point( pArray ,&Point  ) )
    {
@@ -531,8 +531,7 @@ endif
 HB_FUNC ( SCREENTOCLIENT )
 {
    POINT Point ;
-   BOOL bRet;
-   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY ) ,pItem;
+   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY );
 
    if (Array2Point(pArray, &Point ) )
    {

@@ -278,7 +278,7 @@ HB_FUNC ( WG_DIALOG2PIXELY )
 LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
 {
    WORD *p, *pDlgTemplate;
-   PHB_ITEM paoItems, pItem, pParent;
+   PHB_ITEM paoItems, pItem;
    int nchar, nItems, i;
    int lPixel;
 
@@ -290,15 +290,15 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
    nItems = paoItems->item.asArray.value->ulLen;
 
    // Start with dialog template
-   *p++ = WG_GetObjectDataLong( pObj, "NDLGVER" );              // 1      - dlgVer
-   *p++ = WG_GetObjectDataLong( pObj, "NSIGNATURE" );           // 0xFFFF - signature
+   *p++ = ( WORD) WG_GetObjectDataLong( pObj, "NDLGVER" );              // 1      - dlgVer
+   *p++ = ( WORD) WG_GetObjectDataLong( pObj, "NSIGNATURE" );           // 0xFFFF - signature
    *p++ = LOWORD( WG_GetObjectDataLong( pObj, "NHELPID" ) );    //        - LOWORD helpID
    *p++ = HIWORD( WG_GetObjectDataLong( pObj, "NHELPID" ) );    //        - HIWORD helpID
    *p++ = LOWORD( WG_GetObjectDataLong( pObj, "NEXSTYLE" ) );   //        - LOWORD ExStyle
    *p++ = HIWORD( WG_GetObjectDataLong( pObj, "NEXSTYLE" ) );   //        - HIWORD ExStyle
    *p++ = LOWORD( WG_GetObjectDataLong( pObj, "NSTYLE" ) );     //        - LOWORD Style
    *p++ = HIWORD( WG_GetObjectDataLong( pObj, "NSTYLE" ) );     //        - HIWORD Style
-   *p++ = WG_GetObjectDataLong( pObj, "NDLGITEMS" );            //        - cDlgItems
+   *p++ = ( WORD) WG_GetObjectDataLong( pObj, "NDLGITEMS" );            //        - cDlgItems
    if (lPixel)
    {
       *p++ = WG_Pixel2DialogX( WG_GetObjectDataInteger( pObj, "NLEFT" ) ); //    - x
@@ -313,8 +313,8 @@ LPDLGTEMPLATE WG_CreateDialogTemplate( PHB_ITEM pObj )
       *p++ = WG_GetObjectDataInteger( pObj, "NWIDTH" );  // cx
       *p++ = WG_GetObjectDataInteger( pObj, "NHEIGHT" ); // cy
    }
-   *p++ = WG_GetObjectDataLong( pObj, "NMENU" );                //        - menu
-   *p++ = WG_GetObjectDataLong( pObj, "NCLASSNAME" );           //        - windowClass
+   *p++ = (WORD) WG_GetObjectDataLong( pObj, "NMENU" );                //        - menu
+   *p++ = (WORD) WG_GetObjectDataLong( pObj, "NCLASSNAME" );           //        - windowClass
 
    // Get the title
    nchar = nCopyAnsiToWideChar( p, ( char *) WG_GetObjectDataString( pObj, "CNAME" ) );
@@ -451,7 +451,6 @@ LRESULT CALLBACK WG_ModalDlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
 {
    PHB_DYNS pSymTest;
    long int res;
-   char szBuffer[256];
 
    if( ( pSymTest = hb_dynsymFind( "WG_DEFDLGEVENTS" ) ) != NULL )
    {
@@ -478,8 +477,6 @@ BOOL CALLBACK WG_DlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
    PHB_DYNS pSymTest;
    long int res;
-   char szBuffer[256];
-
 
    if( ( pSymTest = hb_dynsymFind( "WG_DEFDLGEVENTS" ) ) != NULL )
    {

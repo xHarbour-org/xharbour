@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.2 2002/11/05 06:33:14 paultucker Exp $
+# $Id: makefile.nt,v 1.3 2002/11/06 05:11:01 paultucker Exp $
 #
 
 # File:     makefile.nt
@@ -11,6 +11,15 @@
 
 # Global paths
 #
+
+!ifndef ECHO
+# don't indent definitions
+ECHO = echo.
+!endif
+!ifndef DEL
+# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
+DEL = del
+!endif
 
 HBR_DIR=..\..
 WG_DIR=.
@@ -24,7 +33,7 @@ MK_FLAGS = $(MAKEFLAGS: =)
 
 #-- HARBOUR COMPILER ----
 hbc      =$(HBR_DIR)\BIN\harbour
-hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
+hbcflags =-n -q0 -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
@@ -36,7 +45,7 @@ rcflags  =-r -x -fo$*.res
 
 .SUFFIXES: .prg .c
 
-.c.obj:
+.c.obj::
  $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
 
 
