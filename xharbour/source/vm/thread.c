@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.78 2003/05/26 06:06:20 paultucker Exp $
+* $Id: thread.c,v 1.79 2003/06/22 16:21:57 jonnymind Exp $
 */
 
 /*
@@ -76,12 +76,19 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbstack.h"
+
 #ifdef HB_OS_WIN_32
-#define extern
+   #include <windows.h>
 #endif
-#include "thread.h"
+
 #ifdef HB_OS_WIN_32
-#undef extern
+    #define extern
+#endif
+
+#include "thread.h"
+
+#ifdef HB_OS_WIN_32
+   #undef extern
 #endif
 
 #ifdef HB_THREAD_SUPPORT
@@ -516,7 +523,7 @@ HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx )
       HB_CRITICAL_UNLOCK( hb_mutexMutex );
       return mx;
    }
-      
+
    p = hb_ht_mutex;
 
    while( p->next )
@@ -525,7 +532,7 @@ HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx )
    }
 
    p->next = mx;
-   
+
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
    return mx;
@@ -537,7 +544,7 @@ HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
    HB_MUTEX_STRUCT *p, *prev;
 
    HB_CRITICAL_LOCK( hb_mutexMutex );
-   
+
    if ( hb_ht_mutex == NULL )
    {
       HB_CRITICAL_UNLOCK( hb_mutexMutex );
@@ -612,7 +619,7 @@ void hb_threadResumeAll()
 void hb_threadCallIdle()
 {
    HB_IDLE_FUNC_LIST *pIdle;
-   HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );   
+   HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
 
    pIdle = (HB_IDLE_FUNC_LIST *)hb_idleQueueRes.content.asPointer;
    while( pIdle != NULL )
@@ -620,7 +627,7 @@ void hb_threadCallIdle()
       pIdle->func();
       pIdle = pIdle->next;
    }
-   
+
    /* Begin to signal waiting threads */
    pIdle = (HB_IDLE_FUNC_LIST*)hb_idleQueueRes.content.asPointer;
    if ( pIdle != NULL )
@@ -651,7 +658,7 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
    pIdle = (HB_IDLE_FUNC_LIST *) hb_xgrab( sizeof( HB_IDLE_FUNC_LIST ) );
    pIdle->func = pFunc;
    pIdle->next = NULL;
-   
+
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
 
    if ( hb_idleQueueRes.content.asPointer == NULL )
@@ -674,10 +681,10 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
    HB_TEST_CANCEL_ENABLE_ASYN;
    WaitForSingleObject( hb_idleQueueRes.Cond, INFINITE );
    HB_DISABLE_ASYN_CANC;
-   
+
    HB_STACK_LOCK;
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
-      
+
    /* Continue to signal waiting threaeds */
    pIdle = (HB_IDLE_FUNC_LIST *)hb_idleQueueRes.content.asPointer;
    if ( pIdle != NULL )
@@ -782,7 +789,7 @@ void hb_threadTerminator( void *pData )
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
    hb_threadDestroyStack( _pStack_ );
-   
+
    /* we are out of business */
    HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
    hb_runningStacks.content.asLong--;
@@ -906,7 +913,7 @@ void hb_threadIsLocalRef( void )
 HB_FUNC( STARTTHREAD )
 {
    HB_THREAD_STUB
-   
+
    PHB_ITEM pPointer;
    PHB_ITEM pArgs;
    HB_THREAD_T th_id;
@@ -1068,7 +1075,7 @@ HB_FUNC( STOPTHREAD )
    }
 
    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-      
+
       pthread_cancel( th );
       pthread_join( th, NULL );
 
@@ -1078,10 +1085,10 @@ HB_FUNC( STOPTHREAD )
       HB_CRITICAL_LOCK( hb_cancelMutex );
       stack->bCanceled = TRUE;
       HB_CRITICAL_UNLOCK( hb_cancelMutex );
-      
+
       HB_TEST_CANCEL_ENABLE_ASYN;
       WaitForSingleObject( stack->th_h, INFINITE );
-      HB_DISABLE_ASYN_CANC;   
+      HB_DISABLE_ASYN_CANC;
    #endif
 
    /* Notify mutex before to leave */
@@ -1138,9 +1145,9 @@ HB_FUNC( KILLTHREAD )
 
 
 HB_FUNC( JOINTHREAD )
-{   
+{
    HB_THREAD_STUB
-   
+
    HB_THREAD_T  th;
 #ifdef HB_OS_WIN_32
    HB_STACK *stack;
@@ -1149,7 +1156,7 @@ HB_FUNC( JOINTHREAD )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs;
-      
+
       pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
 
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "JOINTHREAD", 1, pArgs );
@@ -1179,7 +1186,7 @@ HB_FUNC( JOINTHREAD )
       WaitForSingleObject( stack->th_h, INFINITE );
    #endif
    HB_STACK_LOCK;
-   
+
    hb_retl( TRUE );
 
 }
@@ -1202,7 +1209,7 @@ HB_FUNC( CREATEMUTEX )
    mt->next = 0;
 
    hb_threadLinkMutex( mt );
-   
+
    hb_retclenAdoptRaw( (char *) mt, sizeof( HB_MUTEX_STRUCT ) );
 }
 
@@ -1227,7 +1234,7 @@ HB_FUNC( DESTROYMUTEX )
    Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
 
    hb_threadUnlinkMutex( Mutex );
-   
+
    HB_MUTEX_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_itemRelease( Mutex->aEventObjects );
@@ -1257,7 +1264,7 @@ HB_FUNC( MUTEXLOCK )
       Mutex->lock_count ++;
    }
    else
-   {  
+   {
       HB_STACK_UNLOCK;
       HB_MUTEX_LOCK( Mutex->mutex );
       Mutex->locker = HB_CURRENT_THREAD();
@@ -1674,9 +1681,9 @@ HB_FUNC( THREADIDLEFENCE )
    {
       hb_bIdleFence = hb_parl( 1 );
    }
-   
+
    hb_retl( bOld );
-   
+
    HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
 }
 
