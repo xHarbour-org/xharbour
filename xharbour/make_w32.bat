@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_w32.bat,v 1.1 2004/04/06 21:11:34 andijahja Exp $
+rem $Id: make_w32.bat,v 1.2 2004/08/29 01:52:44 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -11,16 +11,16 @@ rem Instead, make a local copy and modify that one, or make a call to
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
 
-SET BISON_SIMPLE=c:\windows\bison.simple
+rem SET BISON_SIMPLE=c:\windows\bison.simple
 SET _LIB=%LIB%
 SET _PATH=%PATH%
 SET _INCLUDE=%INCLUDE%
 rem Please set up WatCom Directives accordingly
-SET PATH=C:\watcom\BINNT;C:\watcom\BINW;%_PATH%
-SET LIB=C:\watcom\LIB386;C:\watcom\LIB386\NT;%_LIB%
-SET WATCOM=C:\watcom
-SET EDPATH=C:\watcom\EDDAT
-SET INCLUDE=C:\watcom\H;C:\watcom\H\NT
+SET PATH=e:\wc\rel2\BINNT;e:\wc\rel2\BINW;%_PATH%
+SET LIB=e:\wc\rel2\LIB386;e:\wc\rel2\LIB386\NT;%_LIB%
+SET WATCOM=e:\wc
+SET EDPATH=e:\wc\rel2\EDDAT
+SET INCLUDE=e:\wc\rel2\H;e:\wc\rel2\H\NT
 
 if not exist obj md obj
 if not exist obj\w32 md obj\w32
