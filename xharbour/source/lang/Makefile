@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2001/11/20 20:02:14 vszakats Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:39 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -36,6 +36,7 @@ C_SOURCES=\
 	msgru866.c   \
 	msgruwin.c   \
 	msgsr852.c   \
+   msgsrwin.c   \
 	msgsriso.c   \
 	msgzhb5.c    \
 	msgzhgb.c    \
