@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.80 2003/07/25 01:17:44 lculik Exp $
+ * $Id: hbmake.prg,v 1.81 2003/08/04 16:59:31 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1849,10 +1849,10 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
       fWrite( s_nLinkHandle, "CFLAG1 = " + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L $(HB_LIB_INSTALL)", " -L $(BHC)/lib" ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = $(CFLAG2)" + IIF(!lUseXharbourDll," -static ","")+ CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = $(CFLAG2)" + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = gcc" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
