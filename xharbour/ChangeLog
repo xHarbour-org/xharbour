@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3083 2004/06/18 00:52:01 paultucker Exp $
+ * $Id: ChangeLog,v 1.3084 2004/06/18 01:05:37 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-06-18 06:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * Method AColInfo()
+      Checking is performed as if <oCol> is really an object, pointed out by Paul Tucker.
 
 2004-06-17 21:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtapi.c
@@ -16,6 +20,7 @@
   * include/hbver.h
     * Refreshed.
 
+>>>>>>> 1.3084
 2004-06-17 20:19 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * include/hbclass.ch
     ! Add syntax for Visual Objects compatibility.
