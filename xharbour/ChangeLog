@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.260 2002/06/05 22:39:37 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.261 2002/06/06 14:35:18 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-07 12:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtwin/gtwin.c
+    ! Removed Clipper-incompatible change that made Shift+ESC
+      return 641 instead of 27 in normal keyboard input mode,
+      instead of only returning 641 in HB_INKEY_EXTENDED mode.
+      by David G. Holm
+
+2002-06-07 12:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tgetlist.prg
+  * source/rtl/getsys.prg
+    ! Modification of work for save oGetList active.
+      Save oGetList for recursives calls to ReadModal().
+      Necessary to support post-evaluation functions
+      to the exit of the ReadModal().
+      eg: UPDATE()
 
 2002-06-06 11:36 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/gtwin/gtwin.c
