@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2796 2004/04/17 19:52:31 brianhays Exp $
+ * $Id: ChangeLog,v 1.2797 2004/04/17 22:42:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-18 01:26 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/at.c
+    ! AT xharbour extra parameters were too much sanitized; Now AT is returning 0
+      if start parameter is bigger than string size.
+        
+  * source/rtl/memoedit.prg
+    ! Changed
+         DEFAULT nLineLength     TO nRight - nLeft
+      INTO
+         DEFAULT nLineLength     TO nRight - nLeft + 1
+         
+      The previous setting (seemingly just a typo) was always neglecting the
+      ability to use the very last character in the window when wordwrapping was on.
+
+  * source/rtl/teditor.prg
+    ! Many fix and some addition.
+      Wordwrapping works quite OK for normal characters, space, backspace and delete.
+      Tab is giving some troubles, but it has been explicitly designed so.
+      /* I would like to change it, but I need to listen ML opinions. */
+    + Added GotoCol() and GotoPos() that are doing a similar job as GotoRow(): they go
+      to a Logical location that is then translated into screen coordinates (and scrolled)
+      as needed.
+    ! GotoRow(), K_enter(), K_Bs(), K_del(), K_Ascii() have been highly optimized and 
+      simplified. They are now relying on the fixed SplitLine() that works on a fixed
+      GetParagraph(). The short story: they all rely on SplitLine to fix word wrapping
+      and cursor position when needed.
+    - K_Space(): with the new SplitLine() that works for that, K_Space is absorbed into
+      K_Ascii().
+      
+    /* NOTE: For optimization reasons, I now use AT() with the third extra parameter in many
+       points. Compiling this program with xharbour in strict compatibility mode will make
+       memoedit to silently do wrong in many points. If someone is interested, it should provide
+       a different version of AT with the third parameter when strict compatibility is on */
+       
+      
+
 2004-04-18 05:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/philes.c
     ! convert errorno 32 to 5 for BCC, MinGW and WatCom

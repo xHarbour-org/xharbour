@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.4 2003/05/17 17:30:28 jonnymind Exp $
+ * $Id: at.c,v 1.5 2004/03/20 23:24:47 druzus Exp $
  */
 
 /*
@@ -79,12 +79,14 @@
     {
        PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
        PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
-
+       PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC ); 
+       PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC ); 
+      
        if( pText && pSub )
        {
           ULONG ulLength = pText->item.asString.length;
-          ULONG ulStart = ISNUM( 3 ) ? hb_parnl( 3 ) : 1;
-          ULONG ulEnd = ISNUM( 4 ) ? (ULONG) hb_parnl( 4 ) : ulLength;
+          ULONG ulStart = pStart ? (ULONG) hb_itemGetNL( pStart ) : 1;
+          ULONG ulEnd = pEnd ? (ULONG) hb_itemGetNL( pEnd ) : ulLength;
           ULONG ulPos;
 
           // SANITIZATION
@@ -95,9 +97,11 @@
              ulStart = 1;
           }
 
-          if ( ulStart > pText->item.asString.length )
+          // Stop searching if starting past beyond end.
+          if ( ulStart > ulEnd || ulStart > ulLength )
           {
-             ulStart = pText->item.asString.length;
+             hb_retnl( 0 );
+             return;
           }
 
           if ( ulEnd < ulStart )
@@ -105,9 +109,9 @@
              ulEnd = ulStart;
           }
 
-          if ( ulEnd > pText->item.asString.length )
+          if ( ulEnd > ulLength )
           {
-             ulEnd = pText->item.asString.length;
+             ulEnd = ulLength;
           }
           // END OF SANITIZATION
 
