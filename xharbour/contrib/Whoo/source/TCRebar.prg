@@ -46,6 +46,7 @@ METHOD New( oParent ) CLASS TRebar
    ::lControl  := .T.
    ::Msgs      := NIL
    ::WndProc   := ""
+   ::lHaveProc := .T.
    ::Caption   := ""
    ::Left      := 0
    ::Top       := 0
