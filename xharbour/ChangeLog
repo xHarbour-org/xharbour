@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.323 2002/07/24 18:41:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.324 2002/07/25 18:20:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2002-07-26 02:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Minor optimization in hb_vmFuncPtr()
 
 2002-07-25 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/common/expropt1.c

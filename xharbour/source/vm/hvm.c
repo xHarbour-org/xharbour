@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.84 2002/07/05 19:53:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.85 2002/07/24 02:58:43 ronpinkas Exp $
  */
 
 /*
@@ -2853,11 +2853,13 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
 
    if( HB_IS_SYMBOL( pItem ) )
    {
-      hb_stackPop();
-      hb_vmPushLong( ( ULONG ) pItem->item.asSymbol.value->pFunPtr );
+      pItem->item.asLong.value = (long) pItem->item.asSymbol.value->pFunPtr;
+      pItem->type = HB_IT_LONG;
    }
    else
+   {
       hb_errInternal( HB_EI_VMNOTSYMBOL, NULL, "hb_vmFuncPtr()", NULL );
+   }
 }
 
 /* ------------------------------- */
