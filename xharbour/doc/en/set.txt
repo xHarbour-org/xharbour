@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.6 2004/07/23 08:50:13 patrickmast Exp $
+ * $Id: set.txt,v 1.7 2004/07/27 09:58:33 patrickmast Exp $
  */
 
 /*
@@ -1378,13 +1378,15 @@
  *  $ONELINER$
  *      Toggles the lock scheme
  *  $SYNTAX$
- *      SET DBFLOCKSCHEME 0 | 1 | 2 | 3
+ *      SET DBFLOCKSCHEME 0 | 1 | 2 | 3 | 4 | 5
  *  $ARGUMENTS$
  *      The type of locking scheme to use.
  *      #define DBFLOCK_DEFAULT    0
  *      #define DBFLOCK_CLIP       1
  *      #define DBFLOCK_CL53       2
  *      #define DBFLOCK_VFP        3
+ *	#define DBFLOCK_CL53EXT	   4
+ *	#define DBFLOCK_XHB64	   5
  *  $DESCRIPTION$
  *  This command affects how a database file will be locked.
  *
@@ -1410,6 +1412,19 @@
  *  locking scheme, set DBFLOCKSCHEME to 2. This will emulate shared
  *  locks using exclusive locks.  Visual FoxPro's locking scheme can be
  *  set with DBFLOCKSCHEME TO 3.
+ *
+ *  When using locking scheme 4, a shared locking will be emulated. This 
+ *  scheme is very useful with systems that do not have this. Although there 
+ *  are no problems with xHarbour, be cautious when using this scheme 
+ *  with a Clipper application in a network environment. Note that the 
+ *  file size is up to 4GB which makes this locking scheme the finest for 
+ *  use with a FAT32 file system. It can also be used for DBFNTX and 
+ *  DBFCDX.
+ *
+ *  When using long files (bigger than 4GB), use scheme 5. This locking 
+ *  scheme does need long file support in OS. Note that it does not 
+ *  reduce the size of the file. This scheme was tested successfully on a
+ *  Linux system.
  *
  *  Note: The DBFLOCK_CL53 locking scheme uses the same locking scheme
  *  as the locking scheme that COMMIX for CA-Clipper uses.
