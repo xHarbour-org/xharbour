@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.38 2004/06/29 22:14:13 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.39 2004/08/26 08:00:32 ronpinkas Exp $
  */
 
 /*
@@ -265,6 +265,13 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, 'Date ............: ' + Dtoc( Date() ) )
         FWriteLine( nHandle, 'Time ............: ' + Time() )
         FWriteLine( nHandle, 'Available Memory : ' + strvalue( Memory( 0 ) ) )
+        FWriteLine( nHandle, 'Multi Threading  : ' + If( Hb_MultiThread(),"Yes","No" ) )
+        FWriteLine( nHandle, 'VM Optimization  : ' + strvalue( Hb_VmMode() ) )
+        FWriteLine( nHandle, 'Application      : ' + hb_cmdargargv() )
+        FWriteLine( nHandle, 'Operating System : ' + os() )
+        FWriteLine( nHandle, 'Compiler         : ' + hb_compiler() )
+        FWriteLine( nHandle, 'xHarbour Version : ' + version() )
+        FWriteLine( nHandle, 'Build Date       : ' + hb_builddate() )
 
         IF Type( "Select()" ) == "UI"
            FWriteLine( nHandle, 'Current Area ....:' + strvalue( &("Select()") ) )
@@ -302,7 +309,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "Intensity is ....: " + strvalue( Set( 31 ), .T. ) )
         FWriteLine( nHandle, "Scoreboard is ...: " + strvalue( Set( 32 ), .T. ) )
         FWriteLine( nHandle, "Delimeters is ...: " + strvalue( Set( 33 ), .T. ) )
-        FWriteLine( nHandle, "Delimchars em ...: " + strvalue( Set( 34 ) ) )
+        FWriteLine( nHandle, "Delimchars is ...: " + strvalue( Set( 34 ) ) )
         FWriteLine( nHandle, "Wrap is .........: " + strvalue( Set( 35 ), .T. ) )
         FWriteLine( nHandle, "Message is ......: " + strvalue( Set( 36 ) ) )
         FWriteLine( nHandle, "MCenter is ......: " + strvalue( Set( 37 ), .T. ) )
@@ -495,6 +502,7 @@ RETURN cArguments
 #include <windows.h>
 
 static PHB_FUNC s_xHbFunc;
+extern char* hb_builddate( void );
 
 LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
 {
@@ -565,6 +573,12 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
    //TraceLog( NULL, "Default: %p\n", pDefaultHandler );
 
    hb_retnl( (LONG) pDefaultHandler );
+}
+
+HB_FUNC( HB_BUILDDATE )
+{
+   char *szBldDate = hb_builddate() ;
+   hb_retcAdopt( szBldDate );
 }
 
 #pragma ENDDUMP

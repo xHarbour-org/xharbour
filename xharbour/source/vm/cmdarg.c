@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.14 2004/05/07 16:13:05 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.15 2004/05/08 13:42:06 andijahja Exp $
  */
 
 /*
@@ -51,25 +51,25 @@
  */
 
 #include "hbapi.h"
+#include "hbinit.h"
 #include "hbmemory.ch"
 
 #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
   #include <windows.h>
 #endif
 
-/* To disable mouse in Windows Console Mode
-   This variable will be set to FALSE upon
-   initialization of gt -> hb_gt_Init()
-*/
-
 /* Command line argument management */
 static int     s_argc = 0;
 static char ** s_argv = NULL;
 
 #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-
-
+  /*
+   To disable mouse in Windows Console Mode
+   This variable will be set to FALSE upon
+   initialization of gt -> hb_gt_Init()
+  */
   BOOL b_MouseEnable = TRUE;
+
   HB_EXTERN_BEGIN
   HANDLE hb_hInstance = 0;
   HANDLE hb_hPrevInstance = 0;
@@ -309,8 +309,10 @@ HB_FUNC( HB_ARGV )
 void hb_cmdargProcessVM( void )
 {
    int iHandles;
+
    if( hb_cmdargCheck( "INFO" ) )
    {
+
       {
          char * pszVersion = hb_verHarbour();
          hb_conOutErr( pszVersion, 0 );
@@ -326,11 +328,24 @@ void hb_cmdargProcessVM( void )
       }
 
       {
+         char * pszVersion = hb_verCompiler();
+         hb_conOutErr( pszVersion, 0 );
+         hb_conOutErr( hb_conNewLine(), 0 );
+         hb_xfree( pszVersion );
+      }
+
+      {
          char buffer[ 128 ];
+         PHB_ITEM pMT = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
+         BOOL lMT = pMT->item.asLogical.value;
+         PHB_ITEM pOpt = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
+         int iOpt = pOpt->item.asInteger.value;
          //sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
-         sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off" );
+         sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s  MT:%s  Opt:%i", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off", lMT ? "On" : "Off", iOpt );
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );
+         hb_itemRelease( pMT );
+         hb_itemRelease( pOpt );
       }
    }
 
@@ -360,6 +375,33 @@ void hb_cmdargProcessVM( void )
       #endif
    }
 
-
    hb_traceInit();
 }
+
+HB_FUNC( HB_CMDARGARGV )
+{
+   hb_retc( hb_cmdargARGV()[0] );
+}
+
+#define __PRG_SOURCE__ __FILE__
+HB_FUNC_EXTERN( HB_VMMODE );
+HB_FUNC_EXTERN( HB_MULTITHREAD );
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
+HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_CMDARG )
+{ "HB_VMMODE", HB_FS_PUBLIC, {HB_FUNCNAME( HB_VMMODE )}, NULL },
+{ "HB_MULTITHREAD", HB_FS_PUBLIC, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
+HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_CMDARG )
+
+#if defined(HB_PRAGMA_STARTUP)
+   #pragma startup hb_vm_SymbolInit_CMDARG
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_SymbolInit_CMDARG = hb_vm_SymbolInit_CMDARG;
+   #pragma data_seg()
+#endif

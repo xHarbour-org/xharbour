@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.22 2005/02/25 10:43:47 andijahja Exp $
+ * $Id: hbver.c,v 1.23 2005/02/26 15:16:47 andijahja Exp $
  */
 
 /*
@@ -86,6 +86,8 @@
    #include <sys/utsname.h>
 
 #endif
+
+#include <time.h>
 
 /* NOTE: OS() function, as a primary goal will detect the version number
          of the target platform. As an extra it may also detect the host OS.
@@ -419,7 +421,7 @@ char * hb_verCompiler( void )
    char * szName;
    int iVerMajor;
    int iVerMinor;
-   int iVerPatch = 0;
+   int iVerPatch;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_verCompiler()"));
 
@@ -440,32 +442,34 @@ char * hb_verCompiler( void )
 
    iVerMajor /= 100;
    iVerMinor = iVerMajor % 100;
+   iVerPatch = 0;
 
 #elif defined(__POCC__)
 
    szName = "Pelles ISO C Compiler";
    iVerMajor = __POCC__ / 100;
    iVerMinor = __POCC__ % 100;
+   iVerPatch = 0;
 
 #elif defined(__XCC__)
 
    szName = "Pelles ISO C Compiler";
    iVerMajor = __XCC__ / 100;
    iVerMinor = __XCC__ % 100;
+   iVerPatch = 0;
 
 #elif defined(__LCC__)
 
    szName = "Logiciels/Informatique lcc-win32";
    iVerMajor = 0;
    iVerMinor = 0;
+   iVerPatch = 0;
 //   iVerMajor = __LCC__ / 100;
 //   iVerMinor = __LCC__ % 100;
 
 #elif defined(__DMC__)
 
    szName = __DMC_VERSION_STRING__ ;
-   iVerMajor = __DMC__ >> 8;
-   iVerMinor = ( __DMC__ - 1 & 0xFF ) >> 4;
 
 #elif defined(_MSC_VER)
 
@@ -489,8 +493,9 @@ char * hb_verCompiler( void )
       iVerMajor = 3;
       iVerMinor = 1;
    #elif (__BORLANDC__ >= 1280) /* Version 5.x */
-      iVerMajor = __BORLANDC__ >> 8;
-      iVerMinor = ( __BORLANDC__ & 0xFF ) >> 4;
+      iVerMajor = ( __BORLANDC__ >> 8 ) & 0xF;
+      iVerMinor = ( __BORLANDC__ >> 4 ) & 0xF;
+      iVerPatch = __BORLANDC__ & 0xF;
    #else /* Version 4.x */
       iVerMajor = __BORLANDC__ >> 8;
       iVerMinor = ( __BORLANDC__ - 1 & 0xFF ) >> 4;
@@ -507,6 +512,7 @@ char * hb_verCompiler( void )
    szName = "MPW C";
    iVerMajor = __MPW__ / 100;
    iVerMinor = __MPW__ % 100;
+   iVerPatch = 0;
 
 #elif defined(__WATCOMC__)
 
@@ -526,6 +532,7 @@ char * hb_verCompiler( void )
 
    iVerMajor = __WATCOMC__ / 100;
    iVerMinor = __WATCOMC__ % 100;
+   iVerPatch = 0;
 
 #elif defined(__GNUC__)
 
@@ -549,12 +556,15 @@ char * hb_verCompiler( void )
    iVerMinor = __GNUC_MINOR__;
    #if defined(__GNUC_PATCHLEVEL__)
       iVerPatch = __GNUC_PATCHLEVEL__;
+   #else
+      iVerPatch = 0;
    #endif
 #else
 
    szName = ( char * ) NULL;
    iVerMajor = 0;
    iVerMinor = 0;
+   iVerpatch = 0;
 
 #endif
 
@@ -592,8 +602,10 @@ char * hb_verCompiler( void )
       char szSub[ 32 ];
       /* QUESTION: Is there any better, safer, more official way to detect
                    the bit depth of the C compiler ? [vszakats] */
-      sprintf( szSub, " (%i bit)", ( int ) ( sizeof( int ) * 8 ) );
-      strcat( pszCompiler, szSub );
+
+      sprintf( pszCompiler, "%s %hd.%hd.%hd", szName, iVerMajor, iVerMinor, iVerPatch );
+      // sprintf( szSub, " (%i bit)", ( int ) ( sizeof( int ) * 8 ) );
+      // strcat( pszCompiler, szSub );
    }
 
 #endif
@@ -831,4 +843,13 @@ void hb_verBuildInfo( void )
 
    hb_conOutErr( "---------------------------", 0 );
    hb_conOutErr( hb_conNewLine(), 0 );
+}
+
+char * hb_builddate()
+{
+   char* sz_Date = (char* ) hb_xgrab( 64 );
+   hb_xmemset( sz_Date, '\0', 64 );
+   hb_xstrcat( sz_Date,  __DATE__," ", __TIME__, NULL );
+
+   return  sz_Date;
 }

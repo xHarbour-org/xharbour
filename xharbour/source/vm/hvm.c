@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.442 2005/03/04 17:18:33 druzus Exp $
+ * $Id: hvm.c,v 1.443 2005/03/04 22:23:44 andijahja Exp $
  */
 
 /*
@@ -9306,6 +9306,21 @@ HB_FUNC( HB_MULTITHREAD )
    hb_retl( TRUE );
 #else
    hb_retl( FALSE );
+#endif
+}
+
+HB_FUNC( HB_VMMODE )
+{
+   HB_THREAD_STUB
+#if defined(HB_NO_PROFILER) && defined(HB_NO_TRACE) && !defined(HB_GUI)
+   // optimized for console applications
+   hb_retni( 2 );
+#elif defined(HB_NO_PROFILER) && defined(HB_NO_TRACE) && defined(HB_GUI)
+   // optimized for gui applications
+   hb_retni( 1 );
+#else
+   // no optimization
+   hb_retni( 0 );
 #endif
 }
 

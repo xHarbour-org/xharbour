@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.9 2005/02/17 12:22:31 andijahja Exp $
+ * $Id: hbtest.prg,v 1.10 2005/03/04 22:23:45 andijahja Exp $
  */
 
 /*
@@ -190,6 +190,11 @@ STATIC FUNCTION Main_LAST()
 
 STATIC FUNCTION TEST_BEGIN( cParam )
 
+   LOCAL nOpt
+   LOCAL aOpt := {"No Optimization",;
+                  "Optimized for Console Apps",;
+                  "Optimized for GUI Apps" }
+
    s_nStartTime := Seconds()
 
    s_lShowAll := "/ALL" $ Upper( cParam ) .OR. ;
@@ -246,6 +251,7 @@ STATIC FUNCTION TEST_BEGIN( cParam )
 #ifdef __HARBOUR__
    FWrite( s_nFhnd, "     Compiler: " + HB_Compiler() + HB_OSNewLine() )
    FWrite( s_nFhnd, " Multi Thread: " + iif(HB_MultiThread(),"ON","OFF") + HB_OSNewLine() )
+   FWrite( s_nFhnd, " Optimization: " + Str(nOpt:=hb_vmMode(),1) + " ("+aOpt[nOpt+1] +")"+ HB_OSNewLine() )
 #endif
    FWrite( s_nFhnd, "           OS: " + OS() + HB_OSNewLine() +;
                     "   Date, Time: " + DToC( Date() ) + " " + Time() + HB_OSNewLine() +;
