@@ -1,5 +1,5 @@
 /*
- * $Id: scrollbr.prg,v 1.1.1.1 2001/12/21 10:42:24 ronpinkas Exp $
+ * $Id: scrollbr.prg,v 1.2 2003/02/20 15:51:09 lculik Exp $
  */
 
 /*
@@ -445,11 +445,11 @@ FUNCTION Scrollbar( nStart, nEnd, nOffSet, bsBlock, nOrient )
    LOCAL cStyle
    PUBLIC hb_p_lShow := .F.
 
-   IF !( Isnumber( nStart ) ) .or. !( Isnumber( nEnd ) ) .or. !( Isnumber( nOffSet ) ) .or. !( Isnumber( nOrient ) )
+   IF !( Isnumber( nStart ) ) .or. !( Isnumber( nEnd ) ) .or. !( Isnumber( nOffSet ) )
       RETURN Nil
    ENDIF
 
-   IF Valtype( nOrient ) == "U"
+   IF nOrient == NIL
       nOrient := 1
    ENDIF
 
