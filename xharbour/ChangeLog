@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3353 2004/08/27 07:20:50 brianhays Exp $
+ * $Id: ChangeLog,v 1.3354 2004/08/27 07:25:43 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-08-27 03:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * hrbdll.vc
+   * hrbdll.wc
+   * hrbdll.bc
+   * makefile.vc
+   * makefile.wc
+   * makefile.nt
+     + source/ct/fcopy.prg
 
 2004-08-27 09:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
 	* source/ct/fcopy.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.8 2004/08/25 20:36:55 lf_sfnet Exp $
+# $Id: makefile.wc,v 1.9 2004/08/27 05:42:13 paultucker Exp $
 #
 
 #
@@ -840,6 +840,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\dattime2.obj \
    $(OBJ_DIR)\dattime3.obj \
    $(OBJ_DIR)\diskutil.obj \
+   $(OBJ_DIR)\fcopy.obj \
    $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
@@ -3012,6 +3013,12 @@ $(OBJ_DIR)\diskutil.c : $(CT_DIR)\diskutil.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\diskutil.obj : $(OBJ_DIR)\diskutil.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg

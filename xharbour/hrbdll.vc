@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.40 2004/08/27 05:42:13 paultucker Exp $
+# $Id: hrbdll.vc,v 1.41 2004/08/27 06:38:57 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -572,6 +572,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
+  $(OBJ_DIR)\fcopy.obj \
   $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\numconv.obj \
   $(OBJ_DIR)\screen2.obj \
@@ -2251,6 +2252,12 @@ $(OBJ_DIR)\diskutil.c : $(CT_DIR)\diskutil.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\diskutil.obj : $(OBJ_DIR)\diskutil.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
