@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3793 2005/02/04 12:55:52 likewolf Exp $
+ * $Id: ChangeLog,v 1.3794 2005/02/04 13:25:50 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-04 22:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/debugger.prg
+    * Added support for dynamic debugger windows repositioning when screen
+      dimensions are changed. It works at least with gtwin and gtwvt.
 
 2005-02-04 16:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/gtxwc/gtxwc.c

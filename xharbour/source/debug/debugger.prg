@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.53 2004/11/01 10:06:41 likewolf Exp $
+ * $Id: debugger.prg,v 1.54 2004/11/02 22:39:10 likewolf Exp $
  */
 
 /*
@@ -335,6 +335,7 @@ CLASS TDebugger
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
    DATA   nAppDirCase, nAppFileCase, nAppTypeAhead
+   DATA   nMaxRow, nMaxCol
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -531,9 +532,13 @@ METHOD New() CLASS TDebugger
    ::lRunAtStartup     := .t. //Clipper compatible
    ::lGo               := ::lRunAtStartup
 
+   /* Store the initial screen dimensions for now */
+   ::nMaxRow := MaxRow()
+   ::nMaxCol := MaxCol()
+
    ::oPullDown      := __dbgBuildMenu( Self )
 
-   ::oWndCode       := TDbWindow():New( 1, 0, MaxRow() - 6, MaxCol() )
+   ::oWndCode       := TDbWindow():New( 1, 0, ::nMaxRow - 6, ::nMaxCol )
    ::oWndCode:Cargo       := { ::oWndCode:nTop, ::oWndCode:nLeft }
    ::oWndCode:bKeyPressed := { | nKey | ::CodeWindowProcessKey( nKey ) }
    ::oWndCode:bGotFocus   := { || ::oGetListCommand:SetFocus(), SetCursor( SC_SPECIAL1 ), ;
@@ -594,21 +599,21 @@ METHOD BarDisplay() CLASS TDebugger
 
    DispBegin()
    SetColor( cClrItem )
-   @ MaxRow(), 0 CLEAR TO MaxRow(), MaxCol()
+   @ ::nMaxRow, 0 CLEAR TO ::nMaxRow, ::nMaxCol
 
-   DispOutAt( MaxRow(),  0,;
+   DispOutAt( ::nMaxRow,  0,;
    "F1-Help F2-Zoom F3-Repeat F4-User F5-Go F6-WA F7-Here F8-Step F9-BkPt F10-Trace",;
    cClrItem )
-   DispOutAt( MaxRow(),  0, "F1", cClrHotKey )
-   DispOutAt( MaxRow(),  8, "F2", cClrHotKey )
-   DispOutAt( MaxRow(), 16, "F3", cClrHotKey )
-   DispOutAt( MaxRow(), 26, "F4", cClrHotKey )
-   DispOutAt( MaxRow(), 34, "F5", cClrHotKey )
-   DispOutAt( MaxRow(), 40, "F6", cClrHotKey )
-   DispOutAt( MaxRow(), 46, "F7", cClrHotKey )
-   DispOutAt( MaxRow(), 54, "F8", cClrHotKey )
-   DispOutAt( MaxRow(), 62, "F9", cClrHotKey )
-   DispOutAt( MaxRow(), 70, "F10", cClrHotKey )
+   DispOutAt( ::nMaxRow,  0, "F1", cClrHotKey )
+   DispOutAt( ::nMaxRow,  8, "F2", cClrHotKey )
+   DispOutAt( ::nMaxRow, 16, "F3", cClrHotKey )
+   DispOutAt( ::nMaxRow, 26, "F4", cClrHotKey )
+   DispOutAt( ::nMaxRow, 34, "F5", cClrHotKey )
+   DispOutAt( ::nMaxRow, 40, "F6", cClrHotKey )
+   DispOutAt( ::nMaxRow, 46, "F7", cClrHotKey )
+   DispOutAt( ::nMaxRow, 54, "F8", cClrHotKey )
+   DispOutAt( ::nMaxRow, 62, "F9", cClrHotKey )
+   DispOutAt( ::nMaxRow, 70, "F10", cClrHotKey )
    DispEnd()
 
 return nil
@@ -617,7 +622,7 @@ return nil
 METHOD BuildBrowseStack() CLASS TDebugger
 
    if ::oBrwStack == nil
-      ::oBrwStack := TBrowseNew( 2, MaxCol() - 14, MaxRow() - 7, MaxCol() - 1 )
+      ::oBrwStack := TBrowseNew( 2, ::nMaxCol - 14, ::nMaxRow - 7, ::nMaxCol - 1 )
       ::oBrwStack:ColorSpec := ::aColors[ 3 ] + "," + ::aColors[ 4 ] + "," + ::aColors[ 5 ]
       ::oBrwStack:GoTopBlock := { || ::oBrwStack:Cargo := 1 }
       ::oBrwStack:GoBottomBlock := { || ::oBrwStack:Cargo := Len( ::aProcStack ) }
@@ -640,7 +645,7 @@ METHOD BuildCommandWindow() CLASS TDebugger
    local GetList := {}, oGet
    local cCommand
 
-   ::oWndCommand := TDbWindow():New( MaxRow() - 5, 0, MaxRow() - 1, MaxCol(),;
+   ::oWndCommand := TDbWindow():New( ::nMaxRow - 5, 0, ::nMaxRow - 1, ::nMaxCol,;
                                     "Command" )
 
    ::oWndCommand:bGotFocus   := { || ::oGetListCommand:SetFocus(), SetCursor( SC_NORMAL ) }
@@ -788,7 +793,7 @@ return nil
 
 METHOD Colors() CLASS TDebugger
 
-   local oWndColors := TDbWindow():New( 4, 5, 16, MaxCol() - 5,;
+   local oWndColors := TDbWindow():New( 4, 5, 16, ::nMaxCol - 5,;
                                         "Debugger Colors[1..11]", ::ClrModal() )
    local aColors := { "Border", "Text", "Text High", "Text PPO", "Text Selected",;
                       "Text High Sel.", "Text PPO Sel.", "Menu", "Menu High",;
@@ -842,10 +847,10 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
    do case
       case nKey == K_UP .OR. nKey == K_F3
            if ::nCommand > 1
-         ::oGetListCommand:oGet:Assign()
-         ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
-         ::nCommand--
-         cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+              ::oGetListCommand:oGet:Assign()
+              ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+              ::nCommand--
+              cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
               ::oGetListCommand:oGet:VarPut( cCommand )
               ::oGetListCommand:oGet:Buffer := cCommand
               ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
@@ -854,10 +859,10 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
       case nKey == K_DOWN
            if ::nCommand < Len( ::aLastCommands )
-         ::oGetListCommand:oGet:Assign()
-         ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
-         ::nCommand++
-         cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+              ::oGetListCommand:oGet:Assign()
+              ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+              ::nCommand++
+              cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
               ::oGetListCommand:oGet:VarPut( cCommand )
               ::oGetListCommand:oGet:Buffer := cCommand
               ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
@@ -871,12 +876,12 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            cCommand := Trim( ::oGetListCommand:oGet:VarGet() )
 
            if ! Empty( cCommand )
-         IF ( n := AScan( ::aLastCommands, cCommand ) ) > 0 .AND. n < Len( ::aLastCommands )
-           ADel( ::aLastCommands, n, .T. )
-         ENDIF
-         ::nCommand := Len( ::aLastCommands )
-         ::aLastCommands[ ::nCommand ] := cCommand
-         AAdd( ::aLastCommands, "" )
+              IF ( n := AScan( ::aLastCommands, cCommand ) ) > 0 .AND. n < Len( ::aLastCommands )
+                 ADel( ::aLastCommands, n, .T. )
+              ENDIF
+              ::nCommand := Len( ::aLastCommands )
+              ::aLastCommands[ ::nCommand ] := cCommand
+              AAdd( ::aLastCommands, "" )
               ::nCommand := Len( ::aLastCommands )
               ::oWndCommand:ScrollUp( 1 )
               ::DoCommand( cCommand )
@@ -1360,7 +1365,7 @@ METHOD HandleEvent() CLASS TDebugger
          case nKey == K_LDBLCLK
               if MRow() == 0
 
-              elseif MRow() == MaxRow()
+              elseif MRow() == ::nMaxRow
 
               else
                  nMRow := MRow()
@@ -1390,7 +1395,7 @@ METHOD HandleEvent() CLASS TDebugger
                     ::oPullDown:ShowPopup( nPopup )
                  endif
 
-              elseif MRow() == MaxRow()
+              elseif MRow() == ::nMaxRow
 
               else
                  nMRow := MRow()
@@ -1530,10 +1535,10 @@ return nil
 
 METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
 
-   local nTop    := ( MaxRow() / 2 ) - 5
-   local nLeft   := ( MaxCol() / 2 ) - 25
-   local nBottom := ( MaxRow() / 2 ) - 3
-   local nRight  := ( MaxCol() / 2 ) + 25
+   local nTop    := ( ::nMaxRow / 2 ) - 5
+   local nLeft   := ( ::nMaxCol / 2 ) - 25
+   local nBottom := ( ::nMaxRow / 2 ) - 3
+   local nRight  := ( ::nMaxCol / 2 ) + 25
    local cType   := ValType( uValue )
    local uTemp   := PadR( uValue, nRight - nLeft - 1 )
    local GetList := {}
@@ -2116,7 +2121,7 @@ RETURN self
 METHOD RestoreAppScreen() CLASS TDebugger
   ::cImage := SaveScreen()
   DispBegin()
-  RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
+  RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
   SetPos( ::nAppRow, ::nAppCol )
   SetColor( ::cAppColors )
   SetCursor( ::nAppCursor )
@@ -2150,6 +2155,8 @@ return nil
 
 
 METHOD SaveAppScreen( lRestore ) CLASS TDebugger
+  LOCAL nRight, nTop
+  
   IF lRestore == NIL
     lRestore := .T.
   ENDIF
@@ -2160,7 +2167,35 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
   ::cAppColors := SetColor()
   ::nAppCursor := SetCursor( SC_NONE )
   IF lRestore
-    RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
+    RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
+  ENDIF
+  IF ::nMaxRow != MaxRow() .OR. ::nMaxCol != MaxCol()
+    ::nMaxRow := MaxRow()
+    ::nMaxCol := MaxCol()
+    nTop := 1
+    nRight := ::nMaxCol
+    ::oWndCommand:Resize( ::nMaxRow - 5, 0, ::nMaxRow - 1, ::nMaxCol )
+    ::oGetListCommand:oGet:Row := ::oWndCommand:nBottom - 1
+    ::oGetListCommand:oGet:Col := ::oWndCommand:nLeft + 3
+    IF ::oWndStack != NIL
+      nRight -= 16
+      ::oBrwStack:nRight := ::nMaxCol - 1
+      ::oBrwStack:nBottom := ::nMaxRow - 7
+      ::oBrwStack:nLeft := nRight + 2
+      ::oBrwStack:nTop := 2
+      ::oWndStack:Resize( , nRight + 1, ::nMaxRow - 6, ::nMaxCol )
+    ENDIF
+    IF ::oWndVars != NIL
+      ::oWndVars:Resize( , , , nRight )
+      nTop := Max( nTop, ::oWndVars:nBottom + 1 )
+    ENDIF
+    IF ::oWndPnt != NIL
+      ::oWndPnt:Resize( , , , nRight )
+      nTop := Max( nTop, ::oWndPnt:nBottom + 1 )
+    ENDIF
+    ::oWndCode:Resize( nTop, 0, ::nMaxRow - 6, nRight )
+    ::oPullDown:Refresh()
+    ::BarDisplay()
   ENDIF
   DispEnd()
 return nil
@@ -2294,7 +2329,7 @@ return nil
 METHOD ShowAppScreen() CLASS TDebugger
 
    ::cImage := SaveScreen()
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
+   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
 
    if LastKey() == K_LBUTTONDOWN
       InKey( 0, INKEY_ALL )
@@ -2306,7 +2341,7 @@ METHOD ShowAppScreen() CLASS TDebugger
    while LastKey() == K_MOUSEMOVE
       InKey( 0, INKEY_ALL )
    end
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
+   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
 
 return nil
 
@@ -2339,7 +2374,7 @@ METHOD ShowCallStack() CLASS TDebugger
          ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
       endif
 
-      ::oWndStack := TDbWindow():New( 1, MaxCol() - 15, MaxRow() - 6, MaxCol(),;
+      ::oWndStack := TDbWindow():New( 1, ::nMaxCol - 15, ::nMaxRow - 6, ::nMaxCol,;
                                      "Calls" )
       ::oWndStack:bKeyPressed  := { | nKey | ::CallStackProcessKey( nKey ) }
       ::oWndStack:bLButtonDown := { | nKey | ::CallStackProcessKey( K_LBUTTONDOWN ) }
@@ -2472,7 +2507,7 @@ METHOD ShowVars() CLASS TDebugger
       nTop := IIF(::oWndPnt!=NIL .AND. ::oWndPnt:lVisible,::oWndPnt:nBottom+1,1)
 
       ::oWndVars := TDbWindow():New( nTop, 0, nTop+Min( 5, Len( ::aVars )+1 ),;
-         MaxCol() - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
+         ::nMaxCol - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
          "Monitor:" + iif( ::lShowLocals, " Local", "" ) + ;
          iif( ::lShowStatics, " Static", "" ) + iif( ::lShowPrivates, " Private", "" ) + ;
          iif( ::lShowPublics, " Public", "" ) )
@@ -2480,7 +2515,7 @@ METHOD ShowVars() CLASS TDebugger
       ::oWndVars:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
       ::oWndVars:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwVars:Cargo[ 1 ] ) }
 
-      ::oBrwVars := TDbgBrowser():New( nTop+1, 1, ::oWndVars:nBottom - 1, MaxCol() - iif( ::oWndStack != nil,;
+      ::oBrwVars := TDbgBrowser():New( nTop+1, 1, ::oWndVars:nBottom - 1, ::nMaxCol - iif( ::oWndStack != nil,;
                                ::oWndStack:nWidth(), 0 ) - 1 )
 
       ::oWndVars:Browser := ::oBrwVars
@@ -2770,7 +2805,7 @@ RETURN self
 
 METHOD ViewSets() CLASS TDebugger
 
-   local oWndSets := TDbWindow():New( 1, 8, MaxRow() - 2, MaxCol() - 8,;
+   local oWndSets := TDbWindow():New( 1, 8, ::nMaxRow - 2, ::nMaxCol - 8,;
                                       "System Settings[1..47]", ::ClrModal() )
    local aSets := { "Exact", "Fixed", "Decimals", "DateFormat", "Epoch", "Path",;
                     "Default", "Exclusive", "SoftSeek", "Unique", "Deleted",;
@@ -2953,7 +2988,7 @@ METHOD WatchPointsShow() CLASS TDebugger
       ::oWndPnt := TDbWindow():New( nTop,;
          0, ;
          nTop +Min( 4, Len( ::aWatch ) ) + 1,;
-         MaxCol() - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
+         ::nMaxCol - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
          "Watch" )
 
       //::oBrwText:Resize( ::oWndPnt:nBottom + 1 )
@@ -2965,7 +3000,7 @@ METHOD WatchPointsShow() CLASS TDebugger
 //      ::oWndPnt:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
 //      ::oWndPnt:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwPnt:Cargo[ 1 ] ) }
 
-      ::oBrwPnt := TDbgBrowser():New( nTop+1, 1, ::oWndPnt:nBottom - 1, MaxCol() - iif( ::oWndStack != nil,;
+      ::oBrwPnt := TDbgBrowser():New( nTop+1, 1, ::oWndPnt:nBottom - 1, ::nMaxCol - iif( ::oWndStack != nil,;
                                ::oWndStack:nWidth(), 0 ) - 1 )
 
       ::oWndPnt:Browser := ::oBrwPnt
