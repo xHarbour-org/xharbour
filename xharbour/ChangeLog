@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.892 2003/03/29 19:16:34 paultucker Exp $
+ * $Id: ChangeLog,v 1.893 2003/03/29 20:35:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,9 +10,12 @@
 
 2003-03-29 12:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
-    + Added BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+    + Added BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoParent )
     ! Fixed hb_clsValidScope() to allow a a Caller Method to access a Message that is
       avialable within the scope of the Super Class where the CAller Method is implemented.
+
+  * tests/tstscope.prg
+    * Corrected Instance Var syntax.
 
 2003-03-29 14:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib\libct\makefile.vc

@@ -35,7 +35,7 @@ PROCEDURE Main()
    END
 
    TRY
-      TestByRef( @( oChild:ReadOnlyOfParent ) )
+      TestByRef( @oChild:ReadOnlyOfParent )
       ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
       ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'

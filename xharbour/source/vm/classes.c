@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.48 2003/03/27 22:55:14 ronpinkas Exp $
+ * $Id: classes.c,v 1.49 2003/03/29 20:35:09 ronpinkas Exp $
  */
 
 /*
@@ -183,7 +183,7 @@ BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
        void     hb_clsReleaseAll( void );
-       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
+       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoParent );
 
        char *   hb_objGetClsName( PHB_ITEM pObject );
        char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
@@ -521,7 +521,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
          {
             char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
 
-            #if 1//def DEBUG_SCOPE
+            #ifdef DEBUG_SCOPE
                printf( "Object: %s, Message: %s, RealClass: %s, Caller: %s, CallerMessage: %s, CallerMessageClass: %s\n",
                        ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName,
                        pMethod->pMessage->pSymbol->szName,
@@ -539,7 +539,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
             // It's possible that caller Method is Derived from a Class which also implements the Message we now validate.
             // This means the validated Message IS avialable within the scope of the Methods that calls this Message.
-            if( hb_clsHasMsg( hb_objGetRealCls( pCaller, szCallerMessage ), pMethod->pMessage->pSymbol->szName ) )
+            if( hb_clsHasMsg( hb_objGetRealCls( pCaller, szCallerMessage ), pMethod->pMessage->pSymbol->szName, TRUE ) )
             {
                return TRUE;
             }
@@ -980,7 +980,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
    return NULL;
 }
 
-BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoSuper )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
 
@@ -997,7 +997,14 @@ BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
       {
          if( pClass->pMethods[ uiAt ].pMessage == pMsg )
          {
-            return TRUE;
+            if( bNoSuper && (pClass->pMethods + uiAt)->uiScope & HB_OO_CLSTP_SUPER )
+            {
+               return FALSE;
+            }
+            else
+            {
+               return TRUE;
+            }
          }
 
          uiAt++;
