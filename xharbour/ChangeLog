@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2100 2004/01/19 21:17:40 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2101 2004/01/19 21:30:00 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,16 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-19 16:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in SearnRep() when instanciating group with non repetable.
+    - Removed redundant IsInStr() and replaced with ANSI strchr()
+
 2004-01-20 03:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/tests/wvtgui.prg
-    ! Updated to ( still under heavy changes ) reflect the Wvt_DrawButton() 
-      functionality. First two buttons are functional. Just move the 
-      mouse over them, try to keep left button pressed and release them, 
+    ! Updated to ( still under heavy changes ) reflect the Wvt_DrawButton()
+      functionality. First two buttons are functional. Just move the
+      mouse over them, try to keep left button pressed and release them,
       inside the button as well as outside.
     + Few small .ico files to demonstrate the button usage.
 
       The push button functionality is under changes and some functionality may change.
- 
+
 2004-01-20 02:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cImage, nFormat, ;
@@ -26,7 +31,7 @@
       responds to mouse clicks.
     + hb_wvt_gtMouseEvent()
       Moved the code to handle mouse events from ever growing loop of hb_wvt_gtWndProc().
-     
+
     + hb_wvt_gtDrawBoxRecessed()
     + hb_wvt_ftDrawBoxRaised()
     + hb_vt_gtDrawOutline()
@@ -38,7 +43,7 @@
     + BOOL HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
     + BOOL HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
     + BOOL HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
-  
+
     + One more member to GLOBAL_DATA _s.pSymWVT_MOUSE to handle the mouse events callback
       function WVT_Mouse() at application level.
 

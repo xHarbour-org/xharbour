@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.121 2004/01/18 03:51:35 paultucker Exp $
+ * $Id: ppcore.c,v 1.122 2004/01/19 17:47:55 ronpinkas Exp $
  */
 
 /*
@@ -140,7 +140,6 @@ static int    ReplacePattern( char, char *, int, char *, int );
 static void   pp_rQuotes( char *, char * );
 static int    md_strAt( char *, int, char *, BOOL, BOOL, BOOL, BOOL );
 static char * PrevSquare( char * , char *, int * );
-static int    IsInStr( char, char * );
 static int    stroncpy( char *, char *, int );
 static int    strincpy( char *, char * );
 static BOOL   truncmp( char **, char **, BOOL );
@@ -3492,7 +3491,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   rez = TRUE;
                }
             }
-            else if( IsInStr( **ptri, sZnaki ) )
+            else if( strchr( sZnaki, **ptri ) )
             {
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
@@ -3934,7 +3933,7 @@ static BOOL isExpres( char * stroka, char cMarkerType )
   return ( l1 <= l2 );
   */
 
-  return ( l1 <= l2 /*&& ! IsInStr( ( stroka - l2 )[l1-1], ":/+*-%^=(<>[{" ) */ );
+  return ( l1 <= l2 /*&& ! strchr( ":/+*-%^=(<>[{", ( stroka - l2 )[l1-1] ) */ );
 }
 
 static BOOL TestOptional( char *ptr1, char *ptr2 )
@@ -4355,13 +4354,17 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   *(expnew + lennew++) = ' ';
                   *(expnew + lennew) = '\0';
 
+                  #ifdef DEBUG_MARKERS
+                     printf( "   Instanciated %s Len: %i\n", expnew, lennew );
+                  #endif
+
                   while( ( i = hb_strAt( exppatt, 2, expnew, lennew ) ) > 0 )
                   {
                      #ifdef DEBUG_MARKERS
-                        printf( "   Expand: '%s' at %i\n", exppatt, i );
+                        printf( "   Expand: '%s' at %i, lennew - i: %i, strlen: %i\n", exppatt, i, lennew - i, strlen( expnew + i - 1 ) );
                      #endif
 
-                     lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew + i - 1, lennew );
+                     lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew + i - 1, lennew - i );
                   }
 
                   if( kolmarkers )
@@ -4475,18 +4478,28 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                                #endif
 
                                // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
-                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, lennew );
+
+                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, *lenres - ( ptr + i - ptro ) );
                                lennew += iOffset;
                                iResidualOffset += iOffset;
+
+                               #ifdef DEBUG_MARKERS
+                                  printf( "lennew: %i, Offset: %i\n", lennew, iOffset );
+                               #endif
                             }
 
                             #ifdef DEBUG_MARKERS
-                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
+                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen( ptr ) - 2 );
                             #endif
 
                             memcpy( expnew, ptr + 1, lennew );
                             *( expnew + lennew++ ) = ' ';
                             *(expnew + lennew) = '\0';
+
+                            #ifdef DEBUG_MARKERS
+                               printf( "   expnew >%s<, lennew: %i\n", expnew, lennew );
+                            #endif
+
                         #else
                             /*
                              * This is the original segment. It does NOT install the Marker Value into the residual
@@ -5442,14 +5455,6 @@ static char * PrevSquare( char * ptr, char * bound, int * kolmark )
    }
 
    return ( *ptr == '\16' && State == STATE_NORMAL ) ? ptr : NULL;
-}
-
-static int IsInStr( char symb, char * s )
-{
-  HB_TRACE(HB_TR_DEBUG, ("IsInStr(%c, %s)", symb, s));
-
-  while( *s != '\0' ) if( *s++ == symb ) return 1;
-  return 0;
 }
 
 void hb_pp_Stuff( char *ptri, char * ptro, int len1, int len2, int lenres )
