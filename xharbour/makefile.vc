@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.6 2002/01/31 05:08:29 ronpinkas Exp $
+# $Id: makefile.vc,v 1.7 2002/01/31 05:57:24 ronpinkas Exp $
 #
 
 #
@@ -254,6 +254,10 @@ LIBS2 = \
 {$(RTL_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
+{$(RTL_DIR)}.cpp{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+
 {$(RTL_DIR)}.prg{$(OBJ_DIR)}.obj:
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(RTL_LIB)2
@@ -369,6 +373,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\word.obj \
    $(OBJ_DIR)\xhelp.obj \
    $(OBJ_DIR)\xsavescr.obj \
+   \
+   $(OBJ_DIR)\tprint.obj \
+   $(OBJ_DIR)\tprinter.obj \
    \
    $(OBJ_DIR)\achoice.obj \
    $(OBJ_DIR)\adir.obj \

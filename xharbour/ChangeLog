@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.178 2002/04/28 02:49:15 lculik Exp $
+ * $Id: ChangeLog,v 1.179 2002/04/28 03:08:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-28 17:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbset.h
+    * Added the necessary member to work WinPrinter
+  * source/rtl/console.c
+    sourcr/rtl/set.c
+    * Added support for Winprinter on SET()
+       Set(24,"job:xxx") Set the winprinter Jobname
+       Set(24,"Win:xxx") Set the Windows Printer to USE( must match the Printer
+       name on Printer Folder
+  + source/rtl/tprint.cpp
+    source/rtl/tprinter.cpp
+    * Printer Class and wrapper for Winprinter
+  * makefile.bc
+    makefile.gc
+    * Updated makefiles
+  + tests/testwprn.prg
+    * Test file for printer enhacementes
 
 2002-04-27 20:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h

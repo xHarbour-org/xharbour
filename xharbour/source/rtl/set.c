@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.5 2002/03/27 05:57:24 horacioroldan Exp $
+ * $Id: set.c,v 1.6 2002/03/31 02:56:32 ronpinkas Exp $
  */
 
 /*
@@ -174,6 +174,20 @@ static void close_binary( FHANDLE handle )
       hb_fsSetError( user_ferror );
    }
 }
+static void close_binarywin( FHANDLE handle )
+{
+   HB_TRACE(HB_TR_DEBUG, ("close_binarywin(%p)", handle));
+
+   if( handle != FS_ERROR )
+   {
+      /* Close the file handle without disrupting the current
+         user file error value */
+      USHORT user_ferror = hb_fsError();
+      CloseWinPrinter();
+      hb_fsSetError( user_ferror );
+   }
+}
+
 
 static void close_text( FHANDLE handle )
 {
@@ -190,6 +204,29 @@ static void close_text( FHANDLE handle )
       hb_fsClose( handle );
       hb_fsSetError( user_ferror );
    }
+}
+static FHANDLE openw_handle(char *szPrinter,HB_set_enum set_specifier)
+{
+   FHANDLE hHandle;
+   hHandle=FS_ERROR;
+   while (hHandle==FS_ERROR){
+      hHandle=OpenWinPrinter(szPrinter);
+      if( hHandle == FS_ERROR )
+      {
+         USHORT uiAction;
+
+         /* NOTE: using switch() here will result in a compiler warning.
+                  [vszakats] */
+         if( set_specifier == HB_SET_PRINTFILE )
+            uiAction = hb_errRT_TERM( EG_CREATE, 2014, NULL, NULL, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
+         else
+            uiAction = E_DEFAULT;
+
+         if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+            break;
+      }
+    }
+ return hHandle;
 }
 
 static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_set_enum set_specifier )
@@ -243,7 +280,7 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
             if( hb_fsFile( ( BYTE * ) path ) )
             {  /* If the file already exists, open it (in read-write mode, in
                   case of non-Unix and text modes). */
-               handle = hb_fsOpen( ( BYTE * ) path, FO_READWRITE | FO_DENYWRITE );
+               handle = hb_fsOpen( ( BYTE * ) path, FO_READWRITE);
                if( handle != FS_ERROR )
                {  /* Position to EOF */
                #if ! defined(OS_UNIX_COMPATIBLE)
@@ -540,11 +577,30 @@ HB_FUNC( SET )
          else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
+            /*Check if the SET_PRINTFILE start with WIN:*/
+           char   szTemp[5] ={0} ;
+           char * szResult; 
+           char * sPrinterName;
+           strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
+           szResult=hb_strupr(szTemp);
+           if(stricmp(szResult, "WIN:") == 0)
+           {
+               sPrinterName = hb_set.HB_SET_PRINTFILE + 4;
+               hb_set.hb_set_winprinter=TRUE;
+           }
+         
             /* If the print file is not already open, open it in overwrite mode. */
             hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
-            if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan == FS_ERROR
-            && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
-               hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
+
+            if ( !hb_set.hb_set_winprinter){
+                if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan == FS_ERROR
+                && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+                   hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
+            }
+            else
+                if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan == FS_ERROR
+                && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+                   hb_set.hb_set_winhan = openw_handle(sPrinterName,HB_SET_PRINTFILE);
          }
          break;
       case HB_SET_EPOCH      :
@@ -675,8 +731,29 @@ HB_FUNC( SET )
          else bFlag = FALSE;
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
-            close_binary( hb_set.hb_set_printhan );
-            if( hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+            /* Check is the Passed String is a file or an Windows Printer Name or Windows Printer Job Name*/
+           char   szTemp[5] = {0};
+           char * szResult;
+           BOOL bOpen=TRUE;
+           strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
+           szResult=hb_strupr(szTemp);
+           if (stricmp(szResult, "WIN:") == 0)
+               bOpen=FALSE;
+           if (stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ {
+                bOpen=FALSE;  
+                hb_set.hb_set_printerjob=hb_set.HB_SET_PRINTFILE + 4;
+                }
+
+            if (!hb_set.hb_set_winprinter)
+               close_binary( hb_set.hb_set_printhan );
+            else{
+               hb_set.hb_set_winprinter=FALSE;
+               close_binarywin(hb_set.hb_set_winhan);
+               }
+            /* Just Open an New File if is not an Printer Name Or an
+            Printer Job Name */
+
+            if( hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0  && bOpen)
                hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
          }
          break;
@@ -739,6 +816,13 @@ HB_FUNC( SET )
           hb_retl( hb_set.HB_SET_TRACE );
           if( args > 1 ) hb_set.HB_SET_TRACE = set_logical( pArg2 );
           break;
+/*
+      case HB_SET_PRINTERJOB    :
+         if( hb_set.HB_SET_PRINTERJOB ) hb_retc( hb_set.HB_SET_PRINTERJOB );
+         else hb_retc( NULL );
+         if( args > 1 ) hb_set.HB_SET_PRINTERJOB = set_string( pArg2, hb_set.HB_SET_PRINTERJOB);
+         break;
+  */
       default                :
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -813,6 +897,7 @@ void hb_setInitialize( void )
    memcpy( hb_set.HB_SET_PRINTFILE, "PRN", 4 ); /* Default printer device */
 #endif
    hb_set.hb_set_printhan = FS_ERROR;
+   hb_set.hb_set_winhan=FS_ERROR;
    hb_set.HB_SET_SCOREBOARD = TRUE;
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
@@ -822,6 +907,9 @@ void hb_setInitialize( void )
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
    hb_set.HB_SET_WRAP = FALSE;
+   hb_set.hb_set_winprinter=FALSE;
+   hb_set.hb_set_printerjob = ( char * ) hb_xgrab( 8 );
+   memcpy( hb_set.hb_set_printerjob, "Harbour", 8 ); /* Default Winprinter Job Name */
 
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
@@ -857,6 +945,8 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_MFILEEXT  )  hb_xfree( hb_set.HB_SET_MFILEEXT );
    if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
+   if( hb_set.hb_set_printerjob )  hb_xfree( hb_set.hb_set_printerjob );
+
 
    hb_set.HB_SET_TYPEAHEAD = -1; hb_inkeyReset( TRUE ); /* Free keyboard typeahead buffer */
 

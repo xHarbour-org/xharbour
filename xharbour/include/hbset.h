@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.2 2002/01/31 05:08:31 ronpinkas Exp $
+ * $Id: hbset.h,v 1.3 2002/03/27 05:57:02 horacioroldan Exp $
  */
 
 /*
@@ -50,13 +50,13 @@
  *
  */
 
+
 #ifndef HB_SET_H_
 #define HB_SET_H_
-
+#define HB_OS_WIN_32_USED
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapigt.h"
-
 #if defined(HB_EXTERN_C)
 extern "C" {
 #endif
@@ -136,7 +136,9 @@ typedef struct
    BOOL    hb_set_century;
    FHANDLE hb_set_extrahan;
    FHANDLE hb_set_printhan;
-
+   BOOL    hb_set_winprinter;
+   FHANDLE hb_set_winhan;
+   char *  hb_set_printerjob;
    /* Upper case members are directly related to a SET */
    BOOL    HB_SET_ALTERNATE;
    char *  HB_SET_ALTFILE;
@@ -186,6 +188,7 @@ typedef struct
    BOOL    HB_SET_UNIQUE;
    int     HB_SET_VIDEOMODE;
    BOOL    HB_SET_WRAP;
+
 } HB_SET_STRUCT;
 
 extern HB_SET_STRUCT hb_set;
@@ -204,6 +207,12 @@ typedef void HB_SET_LISTENER_CALLBACK( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerRemove( int );
+#if defined(HB_OS_WIN_32_USED)
+    extern void CloseWinPrinter();
+    extern void WinPrinterEject();           
+    extern void WriteStringtoPrint(const char * szString);
+    extern int OpenWinPrinter(char * szPrinter);
+#endif
 
 #if defined(HB_EXTERN_C)
 }

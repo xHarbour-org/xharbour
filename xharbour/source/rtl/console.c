@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.198 2002/01/08 22:49:26 dholm Exp $
+ * $Id: console.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
+#define HB_OS_WIN_32_USED
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
@@ -269,7 +269,10 @@ static void hb_conOutAlt( char * pStr, ULONG ulLen )
    {
       /* Print to printer if SET PRINTER ON and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      if (!hb_set.hb_set_winprinter)
+          hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      else  
+          WriteStringtoPrint(pStr);
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -284,7 +287,10 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
    {
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      if (!hb_set.hb_set_winprinter)
+          hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      else  
+          WriteStringtoPrint(pStr);
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -344,8 +350,14 @@ HB_FUNC( QOUT )
       s_uiPRow++;
 
       uiCount = s_uiPCol = hb_set.HB_SET_MARGIN;
-      while( uiCount-- > 0 )
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+      if (!hb_set.hb_set_winprinter)
+          while( uiCount-- > 0 )
+             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+      else
+          while( uiCount-- > 0 )
+            WriteStringtoPrint(" ");
+
+        
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
@@ -358,7 +370,10 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+      if (!hb_set.hb_set_winprinter)
+          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+      else
+          WinPrinterEject();
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
@@ -391,12 +406,18 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
       if( uiProw < s_uiPRow )
       {
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+         if (hb_set.hb_set_winprinter)
+            WinPrinterEject();
+         else
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
          s_uiPRow = s_uiPCol = 0;
       }
 
       for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ )
+        if (!hb_set.hb_set_winprinter)        
          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+        else
+         WriteStringtoPrint(s_szCrLf);
 
       if( uiProw > s_uiPRow )
          s_uiPCol = 0;
@@ -404,7 +425,10 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       uiPcol += hb_set.HB_SET_MARGIN;
 
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+        if (!hb_set.hb_set_winprinter)        
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+        else
+            WriteStringtoPrint(" ");
 
       s_uiPRow = uiProw;
       s_uiPCol = uiPcol;

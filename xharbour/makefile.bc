@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.6 2002/01/31 05:08:29 ronpinkas Exp $
+# $Id: makefile.bc,v 1.7 2002/01/31 05:57:24 ronpinkas Exp $
 #
 
 #
@@ -127,8 +127,8 @@ HBMAKE_DIR   = utils\hbmake
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
+CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS) -DHB_LANG_DEFAULT=PT
+CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS) 
 CLIBFLAGSDEBUG = -v $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -314,6 +314,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\substr.obj \
    $(OBJ_DIR)\teditorl.obj \
    $(OBJ_DIR)\tone.obj \
+   $(OBJ_DIR)\tprint.obj \
+   $(OBJ_DIR)\tprinter.obj \
    $(OBJ_DIR)\trace.obj \
    $(OBJ_DIR)\transfrm.obj \
    $(OBJ_DIR)\trim.obj \
@@ -861,12 +863,12 @@ $(OBJ_DIR)\harbour.obj : $(COMPILER_DIR)\harbour.c
 !if $(HB_LEX) == SIMPLEX
 
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
-   bison --no-line -d $** -o$@
+   bison -v -d $** -o$@
 
 !else
 
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.y
-   bison --no-line -d $** -o$@
+   bison -v -d $** -o$@
 
 !endif
 
@@ -1474,7 +1476,7 @@ $(OBJ_DIR)\is.obj : $(RTL_DIR)\is.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\isprint.obj : $(RTL_DIR)\isprint.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC) $(CLIBFLAGS)  -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\langapi.obj : $(RTL_DIR)\langapi.c
@@ -1914,6 +1916,15 @@ $(OBJ_DIR)\tpopup.obj : $(OBJ_DIR)\tpopup.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
+$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
+   $(CC) $(CLIBFLAGS)  -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
+   $(CC) $(CLIBFLAGS)  -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+
 $(OBJ_DIR)\trace.obj : $(RTL_DIR)\trace.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
@@ -2145,7 +2156,7 @@ $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
 #
 
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
-   bison --no-line -p hb_comp -d $** -o$@
+   bison -v -p hb_comp -d $** -o$@
 
 !if $(HB_LEX) == SIMPLEX
    # Flex not needed in SimpLex build.
