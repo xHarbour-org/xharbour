@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.925 2003/04/08 03:00:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.926 2003/04/08 18:27:14 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,18 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-04-08 15:30 UTC-03000 Luiz Rafael Culik <culikr@uol.com.br>
+
+  * include/hbver.h
+    ! change build number to 82
+    ! change ChangeLog entries
+  * taggeg CVC files per "04-08-2003 15:30:00" (Local Time)
+  
 2003-04-08 20:26 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h
   * include/hbapi.h
     ! Fixed compilation with HB_NO_DEFAULT_API_MACROS and
       HB_NO_DEFAULT_STACK_MACROS turned on
 
-2003-04-08 10:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
-  * remove unneeded file -> include/hbclass.chk
-  * include/hbver.h
-    ! change build number to 81
-    ! change ChangeLog entries
-  * taggeg CVC files per "04-08-2003 10:00:00" (Local Time)
+
 
 2003-04-07 22:14 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbcrypt.c
