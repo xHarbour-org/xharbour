@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: macro.y,v 1.3 2002/05/01 22:54:59 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <string>  IDENTIFIER LITERAL MACROVAR MACROTEXT
 %type <valDouble>  NUM_DOUBLE
 %type <valLong>    NUM_LONG
-%type <asExpr>  Argument ArgList ElemList BlockExpList BlockVarList BlockNoVar
+%type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockNoVar
 %type <asExpr>  NumValue NumAlias
 %type <asExpr>  NilValue
 %type <asExpr>  LiteralValue
@@ -294,7 +294,7 @@ SelfValue  : SELF            { $$ = hb_compExprNewSelf(); }
 
 /* Literal array
  */
-Array      : '{' ElemList '}'          { $$ = hb_compExprNewArray( $2 ); }
+Array      : '{' ArgList '}'          { $$ = hb_compExprNewArray( $2 ); }
            ;
 
 /* Literal array access
@@ -738,10 +738,6 @@ ArrayIndex : IndexList ']'                   { $$ = $1; }
 IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr>0, $2, HB_MACRO_PARAM ); }
            | IndexList ',' Expression     { $$ = hb_compExprNewArrayAt( $1, $3, HB_MACRO_PARAM ); }
            | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4, HB_MACRO_PARAM ); }
-           ;
-
-ElemList   : EmptyExpression                 { $$ = hb_compExprNewList( $1 ); }
-           | ElemList ',' EmptyExpression    { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
 
 CodeBlock  : '{' '|'
