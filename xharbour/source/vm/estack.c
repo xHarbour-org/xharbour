@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.47 2003/10/01 17:41:48 paultucker Exp $
+ * $Id: estack.c,v 1.48 2003/11/06 06:46:18 ronpinkas Exp $
  */
 
 /*
@@ -273,9 +273,11 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    {
       --HB_VM_STACK.pPos;
 
-      if( HB_IS_BYREF( *HB_VM_STACK.pPos ) )
+      if( HB_IS_BYREF( *HB_VM_STACK.pPos ) && HB_IS_MEMVAR( *HB_VM_STACK.pPos ) )
       {
          pDetached = hb_itemUnRefOnce( *HB_VM_STACK.pPos );
+
+         //printf( "Type: %i\n", pDetached->type );
 
          if( HB_IS_BYREF( pDetached ) )
          {
