@@ -177,12 +177,12 @@ RETURN nil
 
 *+--------------------------------------------------------------------
 *+
-*+    Class HDO_ODBC_RecordSet
-*+    Manages HDO_ODBC_ Windows ODBC RecordSets
+*+    Class HDO_ODBC_Reader
+*+    Manages HDO_ODBC_ Windows ODBC Readers
 *+
 *+--------------------------------------------------------------------
 *+
-CLASS HDO_ODBC_RecordSet FROM HBClass
+CLASS HDO_ODBC_Reader FROM HBClass
 
    DATA ActiveCommand
    DATA ActiveConnection
@@ -205,11 +205,11 @@ CLASS HDO_ODBC_RecordSet FROM HBClass
 
 ENDCLASS
 
-METHOD New() CLASS HDO_ODBC_RecordSet
+METHOD New() CLASS HDO_ODBC_Reader
 
 RETURN Self
 
-METHOD Open( cSql, oCnn ) CLASS HDO_ODBC_RecordSet
+METHOD Open( cSql, oCnn ) CLASS HDO_ODBC_Reader
 
    LOCAL i
    LOCAL nRet
@@ -266,7 +266,7 @@ METHOD Open( cSql, oCnn ) CLASS HDO_ODBC_RecordSet
    RETURN SQL_SUCCESS
 
 // Closes the dataset
-METHOD CLOSE() CLASS HDO_ODBC_RecordSet
+METHOD CLOSE() CLASS HDO_ODBC_Reader
 
    ::aFields := nil
    ::aValues := nil
@@ -277,7 +277,7 @@ METHOD CLOSE() CLASS HDO_ODBC_RecordSet
 RETURN NIL
 
 // Returns the Field number from a Field name
-METHOD FieldPos( cField ) CLASS HDO_ODBC_RecordSet
+METHOD FieldPos( cField ) CLASS HDO_ODBC_Reader
 
    LOCAL aField
 
@@ -285,7 +285,7 @@ METHOD FieldPos( cField ) CLASS HDO_ODBC_RecordSet
 
 RETURN aField[ 1 ]
 
-METHOD Fields( cField ) CLASS HDO_ODBC_RecordSet
+METHOD Fields( cField ) CLASS HDO_ODBC_Reader
 
    LOCAL xValue
    LOCAL aField
@@ -305,7 +305,7 @@ METHOD Fields( cField ) CLASS HDO_ODBC_RecordSet
 
 RETURN xValue
 
-METHOD FieldAttr( cField, nAttr ) CLASS HDO_ODBC_RecordSet
+METHOD FieldAttr( cField, nAttr ) CLASS HDO_ODBC_Reader
 
    LOCAL aField
 
@@ -313,7 +313,7 @@ METHOD FieldAttr( cField, nAttr ) CLASS HDO_ODBC_RecordSet
 
 RETURN aFields[ nAttr ]
 
-METHOD Read() CLASS HDO_ODBC_RecordSet
+METHOD Read() CLASS HDO_ODBC_Reader
 
    ::aValues := array( ::nNumFields )
 
