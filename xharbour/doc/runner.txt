@@ -1,0 +1,18 @@
+__HRBRUN(  <cFile> [, xParam1 [, xParamN ] ]  ) -> xReturn
+  Execute specified hrb file, passing optional paramaters.
+ 
+__HRBLOAD( <cFile> ) -> nHandle
+  Load an hrb file and return a Handle.
+
+__HRBDO( <nHandle> )
+  Execute previously loaded hrb module specified by it's Handle.
+
+__HRBUNLOAD( <nHandle> )
+  Unload an hrb module.
+
+__HRBGETFU( <nHandle>, <cFuncName> ) -> nHandle
+  Retrieve Handle to specified function in a given preloaded hrb module.
+
+__HRBDOFU( <nHandle>, [xParam1 [, xParamN] ] ) -> xReturn
+  Execute specified function by its handle, passing optional paramaters.
+  
