@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.3 2003/07/13 19:34:33 jonnymind Exp $
+* $Id: hblog.prg,v 1.4 2003/07/17 19:19:41 jonnymind Exp $
 */
 
 /*
@@ -399,7 +399,7 @@ METHOD Open() CLASS HB_LogConsole
    ENDIF
 
    IF ::cProgramName == NIL
-      ::cProgramName := "Unamed Program"
+      HB_FnameSplit( hb_argv(0),,@::cProgramName )
    ENDIF
 
    OutStd( HB_LogDateStamp(), Time(), "--", ::cProgramName, "start --", HB_OsNewLine() )
@@ -473,7 +473,7 @@ METHOD Open() CLASS HB_LogFile
    ENDIF
 
    IF ::cProgramName == NIL
-      ::cProgramName := "Unamed Program"
+      HB_FnameSplit( hb_argv(0),,@::cProgramName )
    ENDIF
 
    Fwrite( ::nFileHandle,;
