@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.376 2004/04/08 13:26:54 druzus Exp $
+ * $Id: hvm.c,v 1.377 2004/04/13 09:42:17 jacekp Exp $
  */
 
 /*
@@ -8194,6 +8194,24 @@ static void hb_itemReleaseStringX( PHB_ITEM pItem )
    }
 }
 
+HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBaseArray(%p)", pBaseArray));
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_ARRAY;
+   ( * HB_VM_STACK.pPos )->item.asArray.value = pBaseArray;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      pBaseArray->ulHolders++;
+   #else
+       hb_arrayRegisterHolder( pBaseArray, (void *) ( * HB_VM_STACK.pPos ) );
+   #endif
+
+   hb_stackPush();
+}
+
 HB_FUNC( HB_FUNCPTR )
 {
    HB_THREAD_STUB
@@ -8228,7 +8246,6 @@ HB_FUNC( HB_FUNCPTR )
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_FuncPtr", 1, hb_paramError( 1 ) );
    }
 }
-
 
 HB_FUNC( HB_QWITH )
 {
