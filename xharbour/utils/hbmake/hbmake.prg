@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.20 2002/05/25 16:22:12 lculik Exp $
+ * $Id: hbmake.prg,v 1.22 2002/06/01 00:10:02 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1092,7 +1092,7 @@ FUNCTION Compfiles()
             IF nPos > 0
 
                 cComm := aCommands[ nPos, 2 ]
-
+                cold  := ccomm 
             ENDIF
 
             FOR nFiles := 1 TO Len( aRes )
@@ -1105,6 +1105,8 @@ FUNCTION Compfiles()
                     ! ( cComm )
 
                 ENDIF
+
+                  ccomm := cold
 
             NEXT
 
@@ -2225,7 +2227,7 @@ FUNCTION CompUpdatedfiles()
             IF nPos > 0
 
                 cComm := aCommands[ nPos, 2 ]
-
+                cOld  := ccomm 
             ENDIF
 
             FOR nFiles := 1 TO Len( aRes )
@@ -2237,7 +2239,7 @@ FUNCTION CompUpdatedfiles()
                     ! ( cComm )
 
                 ENDIF
-
+                  ccomm := cold
             NEXT
 
         ENDIF
@@ -3428,7 +3430,13 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
 
    If AT( "-EX" , cParam ) >0 .or. AT( "-ELX" , cParam )  >0
 
-       lEditMode:=.T.
+      if AT( "-ELX" , cParam )  >0
+
+         lLibrary := .T.
+
+      ENDIF
+
+      lEditMode:=.T.
 
    ENDIF
 
@@ -3611,7 +3619,6 @@ FUNCTION ProcessParameters( cParams )
     IF At( "-EL", cParams ) > 0 .or. At( "-ELX", cParams ) > 0
 
         IF At( "-ELX", cParams ) > 0
-
 
             cParams   := Strtran( cParams, "-ELX", "" )
 
