@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.2 2002/04/17 19:59:05 walito Exp $
+ * $Id: valtype.c,v 1.3 2002/04/17 20:36:19 ronpinkas Exp $
  */
 
 /*
@@ -54,8 +54,18 @@
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
  *
- * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
+ * Copyright 2002-2003 Walter Negro <anegro@overnet.com.ar>
  *    HB_ISBYREF()
+ *    HB_ISNIL()
+ *    HB_ISCHAR()
+ *    HB_ISMEMO()
+ *    HB_ISNUM()
+ *    HB_ISLOGIC()
+ *    HB_ISDATE()
+ *    HB_ISARRAY()
+ *    HB_ISOBJECT()
+ *    HB_ISBLOCK()
+ *    HB_ISPOINTER()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -94,5 +104,55 @@ HB_FUNC( HB_ISBYREF )
       else
          hb_ret( );
    }
+}
+
+HB_FUNC( HB_ISNIL )
+{
+  hb_retl( ISNIL( 1 ) );
+}
+
+HB_FUNC( HB_ISCHAR )
+{
+  hb_retl( ISCHAR( 1 ) );
+}
+
+HB_FUNC( HB_ISMEMO )
+{
+  hb_retl( ISMEMO( 1 ) );
+}
+
+HB_FUNC( HB_ISNUM )
+{
+  hb_retl( ISNUM( 1 ) );
+}
+
+HB_FUNC( HB_ISLOGIC )
+{
+  hb_retl( ISLOG( 1 ) );
+}
+
+HB_FUNC( HB_ISDATE )
+{
+  hb_retl( ISDATE( 1 ) );
+}
+
+HB_FUNC( HB_ISARRAY )
+{
+  hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
+}
+
+HB_FUNC( HB_ISOBJECT )
+{
+  hb_retl( ISOBJECT( 1 ) );
+}
+
+HB_FUNC( HB_ISBLOCK )
+{
+  hb_retl( ISBLOCK( 1 ) );
+}
+
+HB_FUNC( HB_ISPOINTER )
+{
+  hb_retl( ISPOINTER( 1 ) );
 }
 
