@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3736 2005/01/13 04:41:18 bdj Exp $
+ * $Id: ChangeLog,v 1.3737 2005/01/13 04:46:09 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-13 09:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/filesys.c
+    * modified HB_FS_SETDRIVE() macro for save use in any C statement
+
+  * xharbour/source/rtl/mod.c
+    ! fixed mod() function to be Clipper/DBASE III compatible
+      (not the % operator) for combination of psitive and negative
+      numbers
 
 2005-01-13 11:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c

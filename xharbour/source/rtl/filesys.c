@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.131 2005/01/11 17:50:53 guerra000 Exp $
+ * $Id: filesys.c,v 1.132 2005/01/12 16:36:22 druzus Exp $
  */
 
 /*
@@ -216,10 +216,10 @@
 #elif defined( __WATCOMC__ )
    #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
    #define HB_FS_SETDRIVE(n) \
-   { \
+   do { \
       UINT uiDummy; \
       _dos_setdrive( ( n ) + 1, &uiDummy ); \
-   }
+   } while( 0 );
 
 #elif defined(HB_OS_OS2)
    #define HB_FS_GETDRIVE(n) ( n = _getdrive() - 65 )
