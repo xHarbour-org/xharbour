@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.56 2003/11/27 13:27:21 lf_sfnet Exp $
+ * $Id: filesys.c,v 1.57 2003/12/11 09:02:05 andijahja Exp $
  */
 
 /*
@@ -3327,7 +3327,20 @@ int GnuErrtoDosErr( int ErrCode )
     if (ErrCode == ENOENT)
         iResult = 2;
 }
+#elif defined(__WATCOMC__)
+{
+    if (ErrCode == EMFILE)
+        iResult = 4 ;
 
+    if (ErrCode == ESPIPE)
+        iResult = 25;
+
+    if (ErrCode == EACCES )
+        iResult = 5  ;
+
+    if (ErrCode == ENOENT)
+        iResult = 2;
+}
 #elif defined(__GNUC__)
 {
 
@@ -3342,7 +3355,6 @@ int GnuErrtoDosErr( int ErrCode )
 
     if (ErrCode == EACCES )
         iResult = 5  ;
-
 }
 
 #endif
@@ -3380,7 +3392,7 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    #if defined(X__WIN32__)
       s_uiErrorLast=WintoDosError(uiError);
    #else
-      #if ! defined( HB_OS_WIN_32 )
+      #if !defined( HB_OS_WIN_32 )
          s_uiErrorLast = GnuErrtoDosErr( uiError );
       #else
          s_uiErrorLast = uiError;

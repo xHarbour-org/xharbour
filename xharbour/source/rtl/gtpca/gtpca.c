@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.7 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: gtpca.c,v 1.8 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -461,9 +461,8 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    /* TODO: Implement this */
 
    HB_SYMBOL_UNUSED( dFrequency );
-   HB_SYMBOL_UNUSED( dDuration );
 
-   fprintf( stdout, szBell );
+   fprintf( stdout, "%s", szBell );
    fflush( stdout );
    hb_idleSleep( dDuration / 18.2 );
 }
