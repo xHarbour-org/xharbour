@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.60 2005/04/01 20:00:00 ptsarenko Exp $
+ * $Id: ads1.c,v 1.61 2005/04/03 13:30:00 ptsarenko Exp $
  */
 
 /*
@@ -1430,7 +1430,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                  AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
                  if( adsOEM )
                  {
-                    hb_ansioem(pucBuf, pulLen);
+                    hb_ansioem( ( char * ) pucBuf, pulLen);
                  }
                  hb_itemPutCL( pItem, ( char * ) pucBuf, pulLen );
                  hb_xfree( pucBuf );
