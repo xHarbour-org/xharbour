@@ -1,6 +1,6 @@
 
 /*
- * $Id: zipcomp.cpp, v 1.3 2002/10/13 01:53:46 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.4 2003/02/14 21:08:05 lculik Exp $
  */
 
 /*
@@ -159,6 +159,7 @@ int   hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM p
          szDummy = ( char * ) hb_arrayGetCPtr( pArray, uiCount ) ;
          dwSize              = GetCurrentFileSize( szDummy );
          uiPos               = uiCount;
+         bAdded       = false;
          if( pBlock  != NULL )
          {
             PHB_ITEM pFileName = hb_itemPutC( NULL, hb_arrayGetCPtr( pArray, uiCount ) );
@@ -302,6 +303,7 @@ int   hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlo
          szDummy = ( char * )hb_arrayGetCPtr( pArray, uiCount ) ;
          dwSize = GetCurrentFileSize( szDummy );
          uiPos = uiCount;
+         bAdded       = false;
 
          if( pBlock  != NULL )
          {
