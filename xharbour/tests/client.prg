@@ -1,10 +1,9 @@
 // Client:
-GLOBAL RequestTerm
+GLOBAL g_bDone
 
 PROCEDURE Main( cAddress, cPort )
 
    LOCAL Socket, ThreadID
-   LOCAL nLen, bFlag
    LOCAL cText
    LOCAL GetList := {}
 
@@ -18,7 +17,7 @@ PROCEDURE Main( cAddress, cPort )
       cPort := "2000"
    ENDIF
 
-   RequestTerm = .F.
+   g_bDone = .F.
 
    InetInit()
 
@@ -33,24 +32,24 @@ PROCEDURE Main( cAddress, cPort )
 
    ThreadID = StartThread( @ReceivePoll(), NIL, Socket );
 
-   bFlag = .T.
-   DO WHILE InetErrorCode( Socket ) == 0 .and. bFlag
+   DO WHILE InetErrorCode( Socket ) == 0
       cText := Space( 60 )
       @ 1, 2 SAY "Enter cText: " GET cText
       READ
       @ 1, 15
 
       IF Upper( RTrim( cText ) ) == "QUIT"
-          bFlag := .F.
+          EXIT
       ENDIF
 
-      nLen  := InetSend( Socket, Trim( cText ) + chr(13) + chr( 10 ) )
+      InetSend( Socket, Trim( cText ) + chr(13) + chr( 10 ) )
    ENDDO
 
-   RequestTerm = .T.
-   InetClose( Socket )
-   waitforthreads()
+   g_bDone = .T.
 
+   WaitForThreads()
+
+   InetClose( Socket )
    InetDestroy( Socket)
    InetCleanup()
 
@@ -66,14 +65,16 @@ PROCEDURE ReceivePoll( Socket )
 
    @ nRow, nCol
 
-   DO WHILE ! RequestTerm
-     IF InetDataReady( Socket ) > 0
-        nResponse := InetRecvLine( Socket, @cResponse, 128 )
+   DO WHILE ! g_bDone
+      IF InetDataReady( Socket ) > 0
+         cResponse := InetRecvLine( Socket, @nResponse )
 
-        IF nResponse > 0
-           @ 10, 0 SAY cResponse
-           @ nRow, nCol
-        ENDIF
+         IF nResponse > 0
+            @ 10, 0 SAY cResponse
+            @ nRow, nCol
+         ELSE
+            @ 10, 0 SAY "Error: " + Str( nResponse )
+         ENDIF
      ENDIF
 
      Progress( @nProgress )

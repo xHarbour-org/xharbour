@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.15 2002/12/22 02:07:17 ronpinkas Exp $
+* $Id: thread.c,v 1.16 2002/12/23 00:14:22 ronpinkas Exp $
 */
 
 /*
@@ -166,6 +166,11 @@ void hb_destroyContext( void )
         /* Free each element of the stack */
         for( i = 0; i < p->stack->wItems; ++i )
         {
+            if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
+            {
+               hb_itemClear( p->stack->pItems[ i ] );
+            }
+
             free( p->stack->pItems[ i ] );
         }
 

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.9 2002/12/22 06:56:19 walito Exp $
+* $Id: inet.h,v 1.10 2002/12/23 00:14:22 ronpinkas Exp $
 */
 
 /*
@@ -50,89 +50,102 @@
 */
 
 #ifndef HB_INET_H_
-#define HB_INET_H_
+   #define HB_INET_H_
 
-#include "hbdefs.h"
-#include "hbvm.h"
-#include "hbapierr.h"
+   #include "hbdefs.h"
+   #include "hbvm.h"
+   #include "hbapierr.h"
 
-#if defined( HB_OS_DOS )
+   #if defined( HB_OS_DOS )
+       #define HB_NO_DEFAULT_INET
+   #else
+      #if defined( HB_OS_WIN_32 )
+         #define HB_SOCKET_T SOCKET
+         #include <winsock.h>
+         #include <windows.h>
 
-    #define HB_NO_DEFAULT_INET
+         #define HB_INET_CLOSE( x )    closesocket( x )
 
-#else
+         extern char *hstrerror( int i );
+      #else
+         #define HB_SOCKET_T int
+         #include <unistd.h>
+         #include <sys/types.h>
+         #include <sys/socket.h>
+         #include <netdb.h>
+         extern int h_errno;
+         #define HB_INET_CLOSE( x )    close( x )
+         #ifdef HB_OS_DARWIN
+             #include <netinet/in.h>
+         #endif
+         #include <errno.h>
+      #endif
 
-#if defined( HB_OS_WIN_32 )
-    #define HB_SOCKET_T SOCKET
-    #include <winsock.h>
-    #include <windows.h>
+      #define HB_SENDRECV_BUFFER_SIZE         2048
 
-    #define HB_INET_CLOSE( x )    closesocket( x )
+      typedef struct tag_HB_SOCKET_STRUCT
+      {
+          HB_SOCKET_T com;
+          char *errorDesc;
+          int errorCode;
+          struct sockaddr_in remote;
+          ULONG count;
+          HB_CRITICAL_T Mutex;
+      } HB_SOCKET_STRUCT;
 
-    extern char *hstrerror( int i );
-#else
-    #define HB_SOCKET_T int
-    #include <unistd.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netdb.h>
-    extern int h_errno;
-    #define HB_INET_CLOSE( x )    close( x )
-    #ifdef HB_OS_DARWIN
-        #include <netinet/in.h>
-    #endif
-    #include <errno.h>
+      typedef struct tag_HB_INET_CARGO
+      {
+          HB_SOCKET_STRUCT *Socket;
+          HB_SOCKET_STRUCT *NewSocket;
+          void * Cargo;
+      } HB_INET_CARGO;
+
+      #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
+
+      #if defined( HB_OS_WIN_32 )
+          #define HB_SOCKET_SET_ERROR( s ) \
+              s->errorCode = WSAGetLastError(); \
+              s->errorDesc = strerror( s->errorCode );\
+              WSASetLastError( 0 );
+
+          #define HB_CRITICAL_INET_INIT( x )       TraceLogPointer( NULL, "Init %p\n", &(x) ); InitializeCriticalSection( &(x) )
+          #define HB_CRITICAL_INET_DESTROY( x )    TraceLogPointer( NULL, "Destroy %p\n", &(x) ); DeleteCriticalSection( &(x) )
+          #define HB_CRITICAL_INET_LOCK( x )       TraceLogPointer( NULL, "Lock %p\n", &(x) ); EnterCriticalSection( &(x) )
+          #define HB_CRITICAL_INET_UNLOCK( x )     TraceLogPointer( NULL, "Unlock %p\n", &(x) ); LeaveCriticalSection( &(x) )
+      #else
+          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+
+          #define HB_CRITICAL_INET_INIT( x )       pthread_mutex_init( &(x), NULL )
+          #define HB_CRITICAL_INET_DESTROY( x )    pthread_mutex_destroy( &(x) )
+          #define HB_CRITICAL_INET_LOCK( x )       pthread_mutex_lock( &(x) )
+          #define HB_CRITICAL_INET_UNLOCK( x )     pthread_mutex_unlock( &(x) )
+      #endif
+
+      #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
+      #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
+
+      #define HB_SOCKET_INIT( s ) \
+          {\
+             s = ( HB_SOCKET_STRUCT *) hb_xgrab( sizeof( HB_SOCKET_STRUCT ) );\
+             HB_SOCKET_ZERO_ERROR( s );\
+             s->com = 0;\
+             s->count = 0;\
+             HB_CRITICAL_INET_INIT( s->Mutex );\
+          }
+
+      #define HB_SOCKET_FREE( s ) HB_CRITICAL_INET_DESTROY( s->Mutex )
+
+      #ifndef MSG_NOSIGNAL
+          #define MSG_NOSIGNAL  0
+      #endif
+
+      #ifndef MSG_DONTWAIT
+          /* #define MSG_DONTWAIT 0x80 */
+          #define MSG_DONTWAIT    0
+      #endif
+
+      #ifndef MSG_WAITALL
+          #define MSG_WAITALL 0
+      #endif
+   #endif
 #endif
-
-#define HB_SENDRECV_BUFFER_SIZE         2048
-
-typedef struct tag_HB_SOCKET_STRUCT
-{
-    HB_SOCKET_T com;
-    char *errorDesc;
-    int errorCode;
-    struct sockaddr_in remote;
-    ULONG count;
-} HB_SOCKET_STRUCT;
-
-#define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
-
-#if defined( HB_OS_WIN_32 )
-    #define HB_SOCKET_SET_ERROR( s ) \
-        s->errorCode = WSAGetLastError(); \
-        s->errorDesc = strerror( s->errorCode );\
-        WSASetLastError( 0 );
-#else
-    #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
-#endif
-
-#define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
-#define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
-
-#define HB_SOCKET_INIT( s ) \
-    {\
-    s = ( HB_SOCKET_STRUCT *) hb_xgrab( sizeof( HB_SOCKET_STRUCT ) );\
-    HB_SOCKET_ZERO_ERROR( s );\
-    s->com = 0;\
-    s->count = 0;\
-    }
-
-//#define HB_SOCKET_FREE( s ) hb_xfree( s )
-
-#ifndef MSG_NOSIGNAL
-    #define MSG_NOSIGNAL  0
-#endif
-
-#ifndef MSG_DONTWAIT
-    /* #define MSG_DONTWAIT	0x80 */
-    #define MSG_DONTWAIT	0
-#endif
-
-#ifndef MSG_WAITALL
-    #define MSG_WAITALL 0
-#endif
-
-#endif
-
-#endif
-

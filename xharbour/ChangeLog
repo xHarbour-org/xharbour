@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.547 2002/12/23 20:04:11 lculik Exp $
+ * $Id: ChangeLog,v 1.548 2002/12/24 00:42:47 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,19 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-23 22:41 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbtrace.h
+  * source/rtl/trace.c
+    Added:
+      extern void TraceLogValue( const char * sFile, const char * sTraceMsg, long Value );
+      extern void TraceLogPointer( const char * sFile, const char * sTraceMsg, void *Pointer  );
+
+  * include/inet.h
+  * source/rtl/inet.c
+    + Added HB_INET_CARGO structure
+    + Added HB_CRITICAL_INET* Mutex macros.
+    + Added auto critical sections protection to all critical sections.
+    * Modified InetRecvLine() to:
+      InetRecvLine( Socket [,@nResult [, nMax, [, nBufferSize] ] ] ) => cLine
+
+  * source/vm/thread.c
+    + Added Stack cleanup in hb_destroyContext().
+
+  * source/rtl/console.c
+    * Corrected declaration of hb_consolLock() and hb_consoleUnlock().
+
+  * tests/client.prg
+  * tests/server.prg
+    * Corrected InetRecvLine() usage.
+
+  * include/ord.ch
+    - Removed #define of entries recently added under dbinfo.ch
+
 2002-12-23 22:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/ttable.ch
     + Commands for Table/Record and Field classes
   + source/rtl/ttable.prg
     + Source code for Table,Record and Field Classes
   * include/Makefile
-   + Added ttable.ch to PRG_HEADERS    
+   + Added ttable.ch to PRG_HEADERS
   *  source/rtl/Makefile
      makefile.bc
      makefile.vc
    * Added ttable.prg to dependencie list
   + tests/TstTable.prg
-    * Test For table Class  
+    * Test For table Class
 
 2002-12-23 18:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/dbinfo.ch

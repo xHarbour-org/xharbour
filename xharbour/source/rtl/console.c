@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.16 2002/12/20 09:02:14 ronpinkas Exp $
+ * $Id: console.c,v 1.17 2002/12/23 06:46:01 jonnymind Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 #include "hbapigt.h"
 #include "hbset.h"
 #include "hb_io.h"
+#include "thread.h"
 
 /* length of buffer for CR/LF characters */
 #define CRLF_BUFFER_LEN   OS_EOL_LEN + 1
@@ -94,6 +95,40 @@ static int    s_iFilenoStderr;
    static HB_CRITICAL_T s_ConsoleMutex;
    static HB_THREAD_T hb_tConsoleLocking;
    static int hb_nCountConsoleLock;
+
+   /* JC1: explicit console locking */
+   void hb_consoleLock( void )
+   {
+      if( hb_ht_context )
+      {
+         if ( hb_tConsoleLocking == HB_CURRENT_THREAD() )
+         {
+            hb_nCountConsoleLock++;
+         }
+         else
+         {
+            HB_CRITICAL_LOCK( s_ConsoleMutex );
+            hb_nCountConsoleLock = 1;
+            hb_tConsoleLocking = HB_CURRENT_THREAD();
+         }
+      }
+   }
+
+   void hb_consoleUnlock( void )
+   {
+      if( hb_ht_context )
+      {
+         if ( hb_tConsoleLocking == HB_CURRENT_THREAD() )
+         {
+            hb_nCountConsoleLock--;
+            if ( hb_nCountConsoleLock == 0 )
+            {
+               hb_tConsoleLocking = 0;
+               HB_CRITICAL_UNLOCK( s_ConsoleMutex );
+            }
+         }
+      }
+   }
 #endif
 
 void hb_conInit( void )
@@ -726,44 +761,6 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       hb_consoleUnlock();
    #endif
 }
-
-
-/* JC1: explicit console locking */
-#ifdef HB_THREAD_SUPPORT
-void hb_consoleLock()
-{
-   if( hb_ht_context )
-   {
-      if ( hb_tConsoleLocking == HB_CURRENT_THREAD() )
-      {
-         hb_nCountConsoleLock++;
-      }
-      else
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-         hb_nCountConsoleLock = 1;
-         hb_tConsoleLocking = HB_CURRENT_THREAD();
-      }
-   }
-}
-
-void hb_consoleUnlock()
-{
-   if( hb_ht_context )
-   {
-      if ( hb_tConsoleLocking == HB_CURRENT_THREAD() )
-      {
-         hb_nCountConsoleLock--;
-         if ( hb_nCountConsoleLock == 0 )
-         {
-            hb_tConsoleLocking = 0;
-            HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-         }
-      }
-   }
-}
-
-#endif
 
 HB_FUNC( HBCONSOLELOCK )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.2 2002/03/17 06:46:34 ronpinkas Exp $
+ * $Id: trace.c,v 1.3 2002/10/22 02:08:33 paultucker Exp $
  */
 
 /*
@@ -74,6 +74,52 @@ void TraceLog( const char * sFile, const char * sTraceMsg )
    if ( hFile )
    {
       fprintf( hFile, sTraceMsg );
+      fclose( hFile );
+   }
+}
+
+void TraceLogValue( const char * sFile, const char * sTraceMsg, long Value )
+{
+   FILE *hFile;
+
+   if( !sTraceMsg )
+      return;
+
+   if( sFile == NULL )
+   {
+      hFile = fopen( "trace.log", "a" );
+   }
+   else
+   {
+      hFile = fopen( sFile, "a" );
+   }
+
+   if ( hFile )
+   {
+      fprintf( hFile, sTraceMsg, Value );
+      fclose( hFile );
+   }
+}
+
+void TraceLogPointer( const char * sFile, const char * sTraceMsg, void *Pointer )
+{
+   FILE *hFile;
+
+   if( !sTraceMsg )
+      return;
+
+   if( sFile == NULL )
+   {
+      hFile = fopen( "trace.log", "a" );
+   }
+   else
+   {
+      hFile = fopen( sFile, "a" );
+   }
+
+   if ( hFile )
+   {
+      fprintf( hFile, sTraceMsg, Pointer );
       fclose( hFile );
    }
 }
