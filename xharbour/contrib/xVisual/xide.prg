@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.91 2002/10/18 23:37:00 what32 Exp $
+ * $Id: xide.prg,v 1.92 2002/10/19 10:03:48 what32 Exp $
  */
 
 /*
@@ -27,6 +27,9 @@
  *
  */
 
+GLOBAL MainFrame
+GLOBAL FormEdit
+
 #include "windows.ch"
 #include "wingdi.ch"
 #include "common.ch"
@@ -52,7 +55,7 @@ FUNCTION Main
    oSplash := TSplash():New( oApp, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT oApp
-      WITH OBJECT :CreateForm( 'MainFrame', MainFrame() )
+      WITH OBJECT :CreateForm( @MainFrame, TMainFrame() )
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
          :MainMenu()
@@ -73,7 +76,7 @@ RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
 
-CLASS MainFrame FROM TFrame
+CLASS TMainFrame FROM TFrame
    METHOD New( oParent ) INLINE ::Caption := 'xHarbour xIde',;
                                 ::left    := 0,;
                                 ::top     := 0,;
@@ -91,12 +94,12 @@ ENDCLASS
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainMenu() CLASS MainFrame
+METHOD MainMenu() CLASS TMainFrame
    ::WindowMenu := TMenu():New()
    With Object ::WindowMenu
       :AddPopup('&Test')
       With Object :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( 'Form1', TFormEdit(), oApp:MainFrame ) } )
+         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit,TFormEdit(), oApp:MainFrame ) } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
@@ -106,7 +109,7 @@ return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainToolBar() CLASS MainFrame
+METHOD MainToolBar() CLASS TMainFrame
    local n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
    ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
@@ -165,7 +168,7 @@ METHOD MainToolBar() CLASS MainFrame
                           'RadioGroup', 'Panel', 'ActionList' }
          for n:=0 to 16
              oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
-             oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
+             oTool:Action := {|oItem| oApp:FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
          next
@@ -193,7 +196,7 @@ METHOD MainToolBar() CLASS MainFrame
                       '', '', '' }
          for n:=0 to 16
              oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
-             oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
+             oTool:Action := {|oItem| oApp:FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
          next
@@ -217,7 +220,7 @@ return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainStatusBar() CLASS MainFrame
+METHOD MainStatusBar() CLASS TMainFrame
    ::Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) )
    ::Status:SetPanels( { 150,380,480,580,-1 } )
    ::Status:SetPanelText( 0, "Visual xHarbour" )

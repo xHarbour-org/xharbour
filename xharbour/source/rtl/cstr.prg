@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.3 2002/10/09 06:46:59 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.4 2002/10/25 03:06:08 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
       CASE cType == 'O'
          cPad  := sPace( nPad + 3 )
          aVars := __objGetValueDiff( xVal )
-         cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF + CRLF
+         cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
 
          IF aObjs == NIL
             aObjs := { { xVal, cName } }
@@ -214,7 +214,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             ENDIF
          NEXT
 
-         cRet += CRLF + sPace( nPad ) + "END OBJECT" + CRLF
+         cRet += sPace( nPad ) + "END OBJECT"
 
       OTHERWISE
          return ""

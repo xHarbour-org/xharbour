@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.27 2002/10/12 09:40:53 what32 Exp $
+ * $Id: TApplication.prg,v 1.28 2002/10/22 17:24:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -99,22 +99,24 @@ METHOD Run() CLASS Application
 
 *------------------------------------------------------------------------------*
 
-METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
+METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
 
-   LOCAL aVars, aVar
-   
+   LOCAL aVars, aVar, cForm := SubStr( oForm:ClassName, 2 )
+
    DEFAULT oParent TO self
 
-   __objAddData( self, cForm )
+   TraceLog( cForm, oForm )
+
+   __objAddData( Self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
    __ObjSetValueList( self, { { cForm, oForm } } )
    oForm:propname := cForm
    oForm:Create()
-   
+
    IF oParent:handle == ::handle
       aAdd( ::aForms, oForm )
    ENDIF
-   
+
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
@@ -126,6 +128,8 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
          END WITH
       ENDIF
    NEXT
+
+   oTarget := oForm
 
 RETURN( oForm )
 

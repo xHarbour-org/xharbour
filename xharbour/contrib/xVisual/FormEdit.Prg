@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.67 2002/10/22 17:23:46 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.68 2002/10/22 17:44:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -272,7 +272,7 @@ METHOD CreateControl(aRect)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
          oTree := ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
          ::Parent:ObjTree:Tree:Expand()
-         
+
          IF !EMPTY(oObj:Controls)
             FOR n:=1 TO LEN(oObj:Controls)
                 o:=oObj:Controls[n]
@@ -280,7 +280,7 @@ METHOD CreateControl(aRect)
                 oTree:Expand()
             NEXT
          ENDIF
-         
+
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 150, .T. )
@@ -386,12 +386,14 @@ METHOD XFMTop() CLASS TFormEdit
       XFM := {}
    NEXT
 
-   aAdd( ::aXFM[ XFM_Header ], "#include [hbclass.ch]" )
-   aAdd( ::aXFM[ XFM_Header ], "#include [xide.ch]" )
+   aAdd( ::aXFM[ XFM_Header ], "GLOBAL " + SubStr( ::Caption, 2 ) + CRLF )
+
+   aAdd( ::aXFM[ XFM_Header ], '#include "hbclass.ch"' )
+   aAdd( ::aXFM[ XFM_Header ], '#include "xide.ch"' )
 
    aAdd( ::aXFM[ XFM_Class ], "CLASS " + ::Caption + " FROM TForm" )
 
-   aAdd( ::aXFM[ XFM_EndClass ], "END CLASS " + ::Caption )
+   aAdd( ::aXFM[ XFM_EndClass ], "END CLASS //" + ::Caption )
 
    ::aBases[1] := __ClsInst( ::ClassH )
 
@@ -452,7 +454,9 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
       FOR EACH aVar IN XFMControl[ 3 ]
          IF ValType( aVar[2] ) == 'O'
+            aAdd( XFMControl[ 4 ], "" )
             aAdd( XFMControl[ 4 ], ValToPrg( aVar[2], aVar[1], 6 ) )
+            aAdd( XFMControl[ 4 ], "" )
          ELSE
             aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
          ENDIF
@@ -508,7 +512,7 @@ METHOD XFMReflect() CLASS TFormEdit
       IF ValType( aVar[2] ) == 'O'
          ctext += ValToPrg( aVar[2], aVar[1], 6 ) + CRLF
       ELSE
-         cText += "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
+         cText += "      VAR " + aVar[1] + " INIT " + ValToPrg( aVar[2] ) + CRLF
       ENDIF
    NEXT
 
@@ -522,11 +526,11 @@ METHOD XFMReflect() CLASS TFormEdit
       cText += CRLF
    NEXT
 
-   cText += CRLF
-
    FOR EACH cLine IN ::aXFM[ XFM_EndClass ]
       cText += ( cLine + CRLF )
    NEXT
+
+   TraceLog( cText )
 
    oApp:MainFrame:ObjEdit:SourceEdit:SetText( cText )
 
