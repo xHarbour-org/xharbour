@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.30 2004/01/07 19:59:12 peterrees Exp $
+ * $Id: gtwvt.c,v 1.31 2004/01/07 20:06:57 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
  *
  */
 
-#include "hbwvt.h"
+#include "hbgtwvt.h"
 //-------------------------------------------------------------------//
 
 static TCHAR szAppName[] = TEXT( "xHarbour WVT" );
