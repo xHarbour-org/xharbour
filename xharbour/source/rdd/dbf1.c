@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.71 2004/03/26 13:35:36 druzus Exp $
+ * $Id: dbf1.c,v 1.72 2004/03/30 01:56:57 andijahja Exp $
  */
 
 /*
@@ -1760,6 +1760,7 @@ static ERRCODE hb_dbfNewArea( DBFAREAP pArea )
       return FAILURE;
 
    pArea->hDataFile = pArea->hMemoFile = FS_ERROR;
+   pArea->fDataFlush = pArea->fMemoFlush = FALSE;
 
    /* Size for deleted records flag */
    pArea->uiRecordLen = 1;
@@ -1834,7 +1835,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          {
             hb_fsClose( pArea->hDataFile );
             pArea->hDataFile = FS_ERROR;
-	       bLock = TRUE;
+            bLock = TRUE;
          }
       }
 #endif

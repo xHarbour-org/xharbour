@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2679 2004/03/30 01:56:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.2680 2004/03/30 05:27:39 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-30 08:04 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * position the record in the same way as Cl5.3 DBCDX when
+     removed with FOR filter or set out of index by GOTO
+
+  * xharbour/tests/rddtest/adscl52.prg
+  * xharbour/tests/rddtest/adscl53.prg
+  * xharbour/tests/rddtest/cdxcl52.prg
+  * xharbour/tests/rddtest/cdxcl53.prg
+  * xharbour/tests/rddtest/ntxcl52.prg
+  * xharbour/tests/rddtest/ntxcl53.prg
+  * xharbour/tests/rddtest/rddmktst.prg
+   * extend to show the above situation
+
+  * xharbour/source/rdd/dbf1.c
+   * sync COMMIT flags for reused WA
+
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/thread.h
+  * xharbour/source/rdd/dbcmd.c
+   % change internals of workarea. Now speed of aliased field access
+     doesn't depend on number of open workareas. In some of my test
+     it gives even 30% speedup.
+   ! fixed setting/using area in different operation. 
+     A lot of bug fixed bug and probably new ones introduced.
+     This modification has to be extensively checked. It's possible
+     I broke sth. In fact I had to modify most of the functions.
+   ! fixed race conditions in MT mode - Gian please look at it - now
+     using USE ... NEW/COPY TO .../APPEND FROM .../DBCREATE(...,.t.)
+     is (should be) thread safe.
+   ! fixed copy to/append from
+   It's quite possible that the above introduced new or exploits old
+   bugs. I'll be very surprised if not ;-) after such many modification
+   in core RDD part.
+   To all: please test it and inform me about any problems.
+   I hope that that now each of developers will use proper functions/macros 
+   instead of hacking WA internals. If you want to do this please carefuly
+   study first all dependences. There was a lot of bugs with very bad side
+   effects because someone made some shortcuts and area or fields was not
+   fully registered (like in COPY TO/APPEND FROM what had very bad side
+   effects) or not fully changed (DBCOMMITALL()/DBUNLOCKALL() or any
+   other place were was s_uiCurrArea was directly assigned without updating
+   s_pCurrarea or vice versa.
 
 2004-03-29 23:33 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/inkey.c

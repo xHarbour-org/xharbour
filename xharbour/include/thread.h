@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.80 2004/01/27 03:06:59 ronpinkas Exp $
+* $Id: thread.h,v 1.81 2004/03/06 12:56:59 jonnymind Exp $
 */
 
 /*
@@ -55,6 +55,7 @@
 #include "hbapi.h"
 
 #ifdef HB_THREAD_SUPPORT
+
 
 /* Check if malloc/free is thread safe */
 /* temporarily disabled
@@ -227,16 +228,7 @@ extern "C" {
 
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;
-
-/* Declaration from dbfcmd.c in rdd */
-typedef struct _AREANODE
-{
-   void * pArea;               /* WorkAreas with different sizes */
-   struct _AREANODE * pPrev;   /* Prev WorkArea in the list */
-   struct _AREANODE * pNext;   /* Next WorkArea in the list */
-} AREANODE;
-
-typedef AREANODE * LPAREANODE;
+struct _AREA;
 
 typedef struct tag_HB_STACK
 {
@@ -329,8 +321,8 @@ typedef struct tag_HB_STACK
    ULONG hMemvarsLastFree;
 
    /* Data useful for dbcmd & friends */
-   USHORT uiCurrArea;        /* Selectd area */
-   LPAREANODE pCurrArea;  /* Pointer to a selected and valid area */
+   USHORT uiCurrArea;         /* Selectd area */
+   struct _AREA * pCurrArea;  /* Pointer to a selected and valid area */
 
    /* Background per-thread jobs */
    struct HB_BACKGROUNDTASK_ **pBackgroundTasks;

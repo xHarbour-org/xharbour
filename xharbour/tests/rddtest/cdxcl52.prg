@@ -244,10 +244,19 @@ RDDTESTC {16,.t.,.t.,.f.}, INDEX on FSTR tag TG_C to "_tst" FOR FNUM==6
 RDDTESTF NIL, {1,.f.,.f.,.f.}, DBGOTO(1)
 RDDTESTF NIL, {16,.t.,.t.,.f.}, DBGOTOP()
 RDDTESTF NIL, {16,.t.,.t.,.f.}, DBGOBOTTOM()
+RDDTESTC {15,.f.,.f.,.f.}, INDEX on FSTR tag TG_C to "_tst" FOR RECNO()<>5 DESCEND
+RDDTESTF NIL, {5,.f.,.f.,.f.}, DBGOTO(5)
+RDDTESTF NIL, {8,.f.,.f.,.f.}, DBSKIP(-1)
+RDDTESTF NIL, {5,.f.,.f.,.f.}, DBGOTO(5)
+RDDTESTF NIL, {16,.f.,.t.,.f.}, DBSKIP(1)
 RDDTESTC {1,.f.,.f.,.f.}, INDEX on FSTR tag TG_C to "_tst" FOR RECNO()<>5
-RDDTESTF "TG_C", {1,.f.,.f.,.f.}, ORDSETFOCUS(0)
-RDDTESTC {1,.f.,.f.,.f.}, SET DELETE ON
-RDDTESTF .t., {1,.f.,.f.,.f.}, FLOCK()
+RDDTESTF NIL, {5,.f.,.f.,.f.}, DBGOTO(5)
+RDDTESTF NIL, {6,.f.,.f.,.f.}, DBSKIP(-1)
+RDDTESTF NIL, {5,.f.,.f.,.f.}, DBGOTO(5)
+RDDTESTF NIL, {16,.f.,.t.,.f.}, DBSKIP(1)
+RDDTESTF "TG_C", {16,.f.,.t.,.f.}, ORDSETFOCUS(0)
+RDDTESTC {16,.f.,.t.,.f.}, SET DELETE ON
+RDDTESTF .t., {16,.t.,.t.,.f.}, FLOCK()
 RDDTESTF NIL, {1,.f.,.f.,.f.}, DBGOTO(1)
 RDDTESTF NIL, {1,.f.,.f.,.f.}, DBDELETE()
 RDDTESTF NIL, {3,.f.,.f.,.f.}, DBGOTO(3)

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.119 2004/03/24 10:17:22 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.120 2004/03/25 12:13:13 druzus Exp $
  */
 
 /*
@@ -4032,6 +4032,7 @@ static void hb_cdxTagKeyAdd( LPCDXTAG pTag, LPCDXKEY pKey )
 #endif
       /* TODO: !!! remove when page leaf balance can save CurKey */
       hb_cdxTagKeyFind( pTag, pKey );
+      /* pTag->fRePos = TRUE; */
    }
 }
 
@@ -5334,7 +5335,7 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
 {
    LPCDXTAG pTag;
    ERRCODE retval;
-   BOOL fOut = FALSE;
+   BOOL fOut = FALSE, fForward;
 
    HB_TRACE(HB_TR_DEBUG, ("cdxSkipRaw(%p, %ld)", pArea, lToSkip));
 
@@ -5346,23 +5347,30 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
    if ( ! pTag || lToSkip == 0 )
       return SUPER_SKIPRAW( ( AREAP ) pArea, lToSkip );
 
+   fForward = ( lToSkip > 0 );
+
    hb_cdxIndexLockRead( pTag->pIndex );
    if ( !pArea->fEof )
    {
       if ( ! hb_cdxCurKeyRefresh( pArea, pTag, FALSE ) )
       {
-         if ( lToSkip > 0 )
+         if ( fForward )
          {
             if ( pTag->TagEOF )
                fOut = TRUE;
-            else
+            else if ( pTag->UsrAscend )
                lToSkip--;
          }
-         else if ( pTag->TagEOF && !pArea->fEof )
-            fOut = TRUE;
+         else
+         {
+            if ( pTag->TagEOF && !pArea->fEof )
+               fOut = TRUE;
+            else if ( !pTag->UsrAscend )
+               lToSkip++;
+         }
       }
    }
-   if ( lToSkip >= 0 )
+   if ( fForward )
    {
       if ( !pArea->fEof && !fOut )
       {
@@ -5540,7 +5548,10 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                   fLck = TRUE;
                }
                if ( fDel && hb_cdxTagKeyFind( pTag, pTag->HotKey ) > 0 )
+               {
                   hb_cdxPageKeyDelete( pTag->RootPage );
+                  pTag->CurKey->rec = 0;
+               }
                if ( fAdd )
                   hb_cdxTagKeyAdd( pTag, pKey );
             }
@@ -6738,6 +6749,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if ( hb_cdxTagKeyFind( pTag, pKey ) > 0 )
                {
                   hb_cdxPageKeyDelete( pTag->RootPage );
+                  pTag->CurKey->rec = 0;
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, TRUE );
                }
                else
