@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.1.1.1 2001/12/21 10:43:16 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.2 2001/12/21 11:36:01 ronpinkas Exp $
  */
 
 /*
@@ -328,5 +328,8 @@ int hb_pp_ReadRules( void )
         *s_szLine = '\0';
      }
   }
+
+  // Formal only.
+  return 0;
 }
 

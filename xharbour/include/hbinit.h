@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.3 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -163,6 +163,24 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       static int func( void ) {
 
    #define HB_CALL_ON_STARTUP_END( func ) return 1; }; \
+      static int static_int_##func = func();
+
+#elif defined( __LCC__ )
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static HB_SYMB symbols[] = {
+
+   #define HB_INIT_SYMBOLS_END( func ) }; \
+      static int func( void ) \
+      { \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
+         return 1; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static int func( void ) {
+
+   #define HB_CALL_ON_STARTUP_END( func ) return 1; } \
       static int static_int_##func = func();
 
 #endif
