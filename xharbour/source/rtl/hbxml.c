@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.16 2004/03/23 18:09:29 jonnymind Exp $
+ * $Id: hbxml.c,v 1.17 2004/03/23 22:16:53 andijahja Exp $
  */
 
 /*
@@ -1162,7 +1162,7 @@ static int mxml_node_read_closing( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc
    int iLen;
    
    hb_objSendMsg( pNode,"CNAME", 0 );
-   iLen = (int) ( HB_VM_STACK.Return.item.asString.value+1 );
+   iLen = HB_VM_STACK.Return.item.asString.length+1;
    buf = (char *) MXML_ALLOCATOR( iLen );
    
    
@@ -1329,7 +1329,7 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
       mxml_node_read_closing( ref, pNode, doc );
       if ( ref->status != MXML_STATUS_OK )
       {
-         return ( (MXML_STATUS) iStatus );
+         return ref->status;
       }
                
       //checking for data nodes
@@ -1981,9 +1981,8 @@ static char *edesc[] =
 
 char *mxml_error_desc( MXML_ERROR_CODE code )
 {
-   // code --;
-   code = (MXML_ERROR_CODE) ( code - 1 );
-   if ( code < 0 || code > sizeof( edesc ) / sizeof( char * ) )
+   int iCode = ((int)code) - 1;
+   if ( iCode < 0 || iCode > sizeof( edesc ) / sizeof( char * ) )
       return NULL;
 
    return edesc[ code ];

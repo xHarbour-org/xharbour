@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.76 2004/03/23 12:43:00 andijahja Exp $
+ * $Id: filesys.c,v 1.77 2004/03/23 19:56:29 ronpinkas Exp $
  */
 
 /*
@@ -529,6 +529,10 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
+#if defined(OS_UNIX_COMPATIBLE)
+   HB_THREAD_STUB;
+#endif
+
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -546,7 +550,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       BYTE * pbyTmp;
       BOOL bRead;
       ULONG ulLen;
-
+      
       //JC1: unlocking the stack to allow cancelation points
       HB_STACK_UNLOCK;
 
