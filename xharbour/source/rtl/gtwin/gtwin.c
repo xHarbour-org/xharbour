@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.18 2003/06/30 17:08:58 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.19 2003/09/02 22:59:37 andijahja Exp $
  */
 
 /*
@@ -100,8 +100,6 @@
  To disable mouse, initialization was made in cmdarg.c
 */
 extern BOOL b_MouseEnable;
-BOOL bCapsLockOn = FALSE;
-BOOL bShiftPressed = FALSE;
 
 /* *********************************************************************** */
 
@@ -1275,6 +1273,128 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              if ( s_wRepeated > 0 ) /* Might not be redundant */
                 s_wRepeated--;
 
+             if ( dwState & CAPSLOCK_ON )
+             {
+                if ( dwState & SHIFT_PRESSED )
+                {
+                   switch( ch ) {
+                      case 39:
+                         ch = 34;
+                         break;
+                      case 44:
+                         ch = 60;
+                         break;
+                      case 45:
+                         ch = 95;
+                         break;
+                      case 46:
+                         ch = 62;
+                         break;
+                      case 47:
+                         ch = 63;
+                         break;
+                      case 48:
+                         ch = 41;
+                         break;
+                      case 49:
+                         ch = 33;
+                         break;
+                      case 50:
+                         ch = 64;
+                         break;
+                      case 51:
+                         ch = 35;
+                         break;
+                      case 52:
+                         ch = 36;
+                         break;
+                      case 53:
+                         ch = 37;
+                         break;
+                      case 54:
+                         ch = 94;
+                         break;
+                      case 55:
+                         ch = 38;
+                         break;
+                      case 56:
+                         ch = 42;
+                         break;
+                      case 57:
+                         ch = 40;
+                         break;
+                      case 59:
+                         ch = 58;
+                         break;
+                      case 61:
+                         ch = 43;
+                         break;
+                      case 91:
+                         ch = 123;
+                         break;
+                      case 92:
+                         ch = 124;
+                         break;
+                      case 93:
+                         ch = 125;
+                         break;
+                      case 96:
+                         ch = 126;
+                         break;
+                   }
+                }
+                else
+                {
+                   switch( ch ) {
+                      case 34:
+                         ch = 39;
+                         break;
+                      case 33:
+                      case 64:
+                      case 35:
+                      case 36:
+                      case 37:
+                      case 94:
+                      case 38:
+                      case 42:
+                      case 40:
+                      case 41:
+                         ch = wChar;
+                         break;
+                      case 43:
+                         ch = 61;
+                         break;
+                      case 58:
+                         ch = 59;
+                         break;
+                      case 60:
+                         ch = 44;
+                         break;
+                      case 62:
+                         ch = 46;
+                         break;
+                      case 63:
+                         ch = 47;
+                         break;
+                      case 95:
+                         ch = 45;
+                         break;
+                      case 123:
+                         ch = 91;
+                         break;
+                      case 124:
+                         ch = 92;
+                         break;
+                      case 125:
+                         ch = 93;
+                         break;
+                      case 126:
+                         ch = 96;
+                         break;
+                   }
+                }
+             }
+
              #ifdef HB_DEBUG_KEYBOARD
                 /* if( dwState & ENHANCED_KEY ) ch = -32; */
                 fprintf( stdout, "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
@@ -1289,9 +1409,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 if( dwState & SHIFT_PRESSED ) fprintf( stdout, " SH" );
                 fprintf( stdout, " " );
              #endif
-
-             bCapsLockOn = ( dwState & CAPSLOCK_ON );
-             bShiftPressed = ( dwState & SHIFT_PRESSED );
 
              if( ch == 224 )
              {
@@ -1416,7 +1533,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                       #endif
 
                       HB_TRACE(HB_TR_INFO, ("hb_gt_ReadKey(): wKey is %d, dwState is %d, ch is %d", wKey, dwState, ch));
-
                       if( bAlt )
                       {
                          #ifdef HB_DEBUG_KEYBOARD
@@ -1520,6 +1636,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
        if ( s_wRepeated == 0 )
           s_cNumIndex++;
     }
+
     return ch;
 }
 

@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.7 2003/06/30 17:08:58 ronpinkas Exp $
+ * $Id: gtstd.c,v 1.8 2003/09/03 00:42:21 andijahja Exp $
  */
 
 /*
@@ -100,11 +100,6 @@ static ULONG  s_ulCrLf;
 
 #if defined(_MSC_VER)
    static BOOL s_bStdinConsole;
-#endif
-
-#if ( defined( __WIN32__ ) || defined( HB_OS_WIN_32_USED ) )
-   BOOL bCapsLockOn = FALSE;
-   BOOL bShiftPressed = FALSE;
 #endif
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))

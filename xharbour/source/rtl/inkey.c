@@ -92,11 +92,6 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
 
-#if ( defined( __WIN32__) || defined( HB_OS_WIN_32_USED ) )
-   extern bCapsLockOn;
-   extern bShiftPressed;
-#endif
-
 static void hb_inkeyKBfree( void )
 {
    PHB_inkeyKB pNext;
@@ -341,153 +336,9 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
 HB_FUNC( INKEY )
 {
    USHORT uiPCount = hb_pcount();
-   int iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
+   hb_retni( hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
-                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
-
-#if ( defined( __WIN32__ ) || defined( HB_OS_WIN_32_USED ) )
-   if ( bCapsLockOn )
-   {
-      if ( bShiftPressed )
-      {
-         switch( iKey ) {
-            case 96:
-               iKey = 126;
-               break;
-            case 49:
-               iKey = 33;
-               break;
-            case 50:
-               iKey = 64;
-               break;
-            case 51:
-               iKey = 35;
-               break;
-            case 52:
-               iKey = 36;
-               break;
-            case 53:
-               iKey = 37;
-               break;
-            case 54:
-               iKey = 94;
-               break;
-            case 55:
-               iKey = 38;
-               break;
-            case 56:
-               iKey = 42;
-               break;
-            case 57:
-               iKey = 40;
-               break;
-            case 48:
-               iKey = 41;
-               break;
-            case 45:
-               iKey = 95;
-               break;
-            case 61:
-               iKey = 43;
-               break;
-           case 91:
-               iKey = 123;
-               break;
-           case 93:
-               iKey = 125;
-               break;
-           case 92:
-               iKey = 124;
-               break;
-           case 59:
-               iKey = 58;
-               break;
-           case 39:
-               iKey = 34;
-               break;
-           case 44:
-               iKey = 60;
-               break;
-           case 46:
-               iKey = 62;
-               break;
-           case 47:
-               iKey = 63;
-               break;
-         }
-      }
-      else
-      {
-         switch( iKey ) {
-            case 126:
-               iKey = 96;
-               break;
-            case 33:
-               iKey = 49;
-               break;
-            case 64:
-               iKey = 50;
-               break;
-            case 35:
-               iKey = 51;
-               break;
-            case 36:
-               iKey = 52;
-               break;
-            case 37:
-               iKey = 53;
-               break;
-            case 94:
-               iKey = 54;
-               break;
-            case 38:
-               iKey = 55;
-               break;
-            case 42:
-               iKey = 56;
-               break;
-            case 40:
-               iKey = 57;
-               break;
-            case 41:
-               iKey = 48;
-               break;
-            case 95:
-               iKey = 45;
-               break;
-            case 43:
-               iKey = 61;
-               break;
-           case 123:
-               iKey = 91;
-               break;
-           case 125:
-               iKey = 93;
-               break;
-           case 124:
-               iKey = 92;
-               break;
-           case 58:
-               iKey = 59;
-               break;
-           case 34:
-               iKey = 39;
-               break;
-           case 60:
-               iKey = 44;
-               break;
-           case 62:
-               iKey = 46;
-               break;
-           case 63:
-               iKey = 47;
-               break;
-         }
-      }
-   }
-#endif
-
-   hb_retni( iKey );
+                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK ) );
 }
 
 HB_FUNC( __KEYBOARD )
