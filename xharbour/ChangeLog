@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3359 2004/08/28 00:49:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.3360 2004/08/29 00:26:19 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-28 17:51 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/vm/macro.c
+    ! Fixed GPF Trap in hb_macroPushSymbol()
 
 2004-08-29 01:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_rpm.sh

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.47 2004/06/09 06:26:51 ronpinkas Exp $
+ * $Id: macro.c,v 1.48 2004/06/12 13:23:09 druzus Exp $
  */
 
 /*
@@ -901,14 +901,16 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
       }
       else
       {
-         hb_stackPop();    /* remove compiled string */
-
          if( bNewBuffer )
          {
             hb_xfree( szString );   /* free space allocated in hb_macroTextSubst */
          }
 
-         hb_macroSyntaxError( NULL );
+         // Recycle
+         //hb_stackPop();    /* remove compiled string */
+         //hb_vmPushString( pMacro->string, pMacro->length );
+
+         hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 1, hb_stackItemFromTop( -1 ) );
       }
    }
 }
