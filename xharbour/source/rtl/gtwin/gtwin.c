@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.31 2003/12/29 19:25:52 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.32 2004/01/04 01:11:25 druzus Exp $
  */
 
 /*
@@ -1710,7 +1710,6 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 {
     INT uLSB,uMSB;
-    UINT uiValue;
     ULONG lAdjFreq;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat));
@@ -1721,7 +1720,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
     /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
 
-    if ( dFreq > 20.0 )
+    if ( dFreq >= 20.0 )
     {
 
       /* Setup Sound Control Port Registers.. */
@@ -1749,30 +1748,24 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
       hb_Outp9x(66, uMSB);
 
       /* Get current Port setting */
-
-      uiValue = hb_Inp9x( 97 );
-
       /* enable Speaker Data & Timer gate bits */
-
-      uiValue = uiValue | 3;  /* 00000011B is bitmask to enable sound */
-
+      /* (00000011B is bitmask to enable sound) */
       /* Turn on Speaker - sound Tone for duration.. */
 
-      hb_Outp9x(97, uiValue);
+      hb_Outp9x(97, hb_Inp9x( 97 ) | 3);
 
-      hb_idleSleep( dDurat / 1000.0 );
+      hb_idleSleep( dDurat );
 
       /* Read back current Port value for Reset */
-
-      uiValue = hb_Inp9x( 97 );
-
       /* disable Speaker Data & Timer gate bits */
-      uiValue = uiValue & 0xFC ;
-
       /* Turn off the Speaker ! */
 
-      hb_Outp9x(97, uiValue);
+      hb_Outp9x(97, hb_Inp9x( 97 ) & 0xFC);
 
+    }
+    else
+    {
+       hb_idleSleep( dDurat );
     }
 }
 #endif
@@ -1783,31 +1776,20 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat));
 
-    /* Clipper ignores Tone() requests if Frequency is less than
-       < 20 hz (and so should we) to maintain compatibility .. */
+    /* Clipper ignores Tone() requests if Frequency is less than < 20 hz
+       Windows minimum is 37... */
 
     /* sync with internal clock with very small time period */
     hb_idleSleep( 0.01 );
 
-    if ( dFreq > 20.0 )
+    if ( dFreq >= 37.0 )
     {
-       Beep( (ULONG) dFreq, (ULONG) dDurat );
+       Beep( (ULONG) dFreq, (ULONG) ( dDurat * 1000 ) ); /* Beep wants Milliseconds */
     }
-
-    /* Delay (1) clock tick, just like Clipper .. */
-    /* hb_idleSleep( 1 / 18.2 ); */
-    /* Druzus: In my opinion Clipper sync with DOS clock before begin
-     * to play sound, sth like:
-     *   clock_t end_clock = clock(); while (clock()==end_clock);
-     *   end_clock = clock() + dDurat()
-     *   [generate tone]
-     *   while (clock()<end_clock);
-     *   [shut down tone]
-     *
-     * I've just check it. The source code of tone is in Clipper5.2
-     * source/sample/examplea.asm and it's implemented as I show above
-     * Paul, can you check it?
-     */
+    else
+    {
+       hb_idleSleep( dDurat );
+    }
 }
 
 /* *********************************************************************** */
@@ -1815,44 +1797,34 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
-    double dMillisecs;
     OSVERSIONINFO osv;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
-    dDuration = HB_MIN( HB_MAX( 1, dDuration ), ULONG_MAX );
+    /* Convert from seconds to ticks */
+    dDuration  = ( HB_MIN( HB_MAX( 1.0, dDuration ), ULONG_MAX ) ) / 18.2;
+    dFrequency =   HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
-    if( dDuration > 0 )
+    /* What version of Windows are you running? */
+    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osv);
+
+    /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
+    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     {
-      /* The conversion from Clipper timer tick units to
-         milliseconds is * 1000.0 / 18.2. */
-      dMillisecs = dDuration * 1000.0 / 18.2;   /* milliseconds */
+       #if defined(__BORLANDC__) || defined( _MSC_VER )
+          HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
+       #else
+          HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));
+       #endif
+    }
 
-      /* What version of Windows are you running? */
-      osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-      GetVersionEx(&osv);
-
-      /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-      if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-      {
-         #if defined(__BORLANDC__) || defined( _MSC_VER )
-            HB_GT_FUNC(gt_w9xTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs ));
-         #else
-            HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs ));
-         #endif
-      }
-
-      /* If Windows NT or NT2k, use wNtTone, which provides TONE()
-         reset sequence support (new) */
-      else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
-      {
-        /* We pass the Millisecond converted value here .. */
-        HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                   dMillisecs ));
-      }
-   }
+    /* If Windows NT or NT2k, use wNtTone, which provides TONE()
+       reset sequence support (new) */
+    else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    {
+      HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));
+    }
 }
 
 /* *********************************************************************** */

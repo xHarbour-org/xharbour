@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1986 2004/01/04 04:26:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1987 2004/01/04 13:19:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2003-01-04 11:15 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+
+2004-01-04 11:37 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * Tone related optimisations.
+
+2004-01-04 11:15 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   + contrib/libct/net.c
     ! functions for CT3 Network subsistem provided by Eduardo Fernandes <eduardo@modalsistemas.com.br>
     Docs for functions includes
