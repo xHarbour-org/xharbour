@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2002/11/05 06:25:34 paultucker Exp $
+# $Id: makefile.vc,v 1.4 2002/11/05 06:30:30 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -34,7 +34,7 @@ CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_W
 rc       =rc
 rcflags  =-r
 
-.SUFFIXES: .prg .c
+.SUFFIXES: .prg .lib
 
 .c.obj:
  $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
@@ -54,7 +54,7 @@ LIBLIST  = $(WHAT32LIB)
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(WHAT32LIB)2
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $*.c
 
 WHAT32OBJ = \
     $(OBJ_DIR)\_winbmp.obj \
@@ -114,25 +114,26 @@ WHAT32OBJ = \
     $(OBJ_DIR)\WinTBar.obj \
     $(OBJ_DIR)\WinTabs.obj
 
-!if ( "$(MK_FLAGS)"=="A" )
+!if ( "$(MK_FLAGS:Y=)"=="A" )
 
-all: zot \
+all: \
+   CLEAN \
    $(WHAT32LIB)
 
 MK_FLAGS = $(MK_FLAGS:A=)
-
-zot:
-   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
-   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
-   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
 
 !else
 
 all: \
    $(WHAT32LIB)
+
 !endif
+
+CLEAN:
+   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
 
 $(WHAT32LIB) : $(WHAT32OBJ)
    lib /out:$@ $**
-
-$(WHAT32LIB)2  : $(WHAT32OBJ)

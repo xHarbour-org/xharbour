@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.4 2002/11/05 06:25:34 paultucker Exp $
+# $Id: makefile.nt,v 1.2 2002/11/05 06:33:14 paultucker Exp $
 #
 
 # File:     makefile.nt
@@ -138,17 +138,13 @@ WAPIOBJ    =  \
 #    $(OBJ_DIR)\datetime.obj \
 #    $(OBJ_DIR)\condeval.obj
 
-!if ( "$(MK_FLAGS)"=="A" )
+!if ( "$(MK_FLAGS:Y=)"=="A" )
 
-all: zot \
+all: \
+   CLEAN \
    $(LIBLIST)
 
 MK_FLAGS = $(MK_FLAGS:A=)
-
-zot:
-   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
-   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
-   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
 
 !else
 
@@ -156,6 +152,13 @@ all: \
    $(LIBLIST)
 
 !endif
+
+CLEAN:
+   -@if exist $(LIB_DIR)\*.res $(DEL) $(LIB_DIR)\*.res > nul
+   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
 
 $(WOOPGUILIB)  : $(WOOPGUIOBJ)
    lib /out:$@ $**
