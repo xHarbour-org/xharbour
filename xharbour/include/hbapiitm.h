@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.10 2002/06/14 03:24:16 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.11 2002/06/17 08:07:36 ronpinkas Exp $
  */
 
 /*
@@ -77,6 +77,7 @@ extern PHB_ITEM hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
 
 extern PHB_ITEM hb_itemArrayGet     ( PHB_ITEM pArray, ULONG ulIndex );
 extern PHB_ITEM hb_itemArrayNew     ( ULONG ulLen );
+extern PHB_ITEM hb_itemArrayPut     ( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem );
 extern ULONG    hb_itemCopyC        ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
 extern BOOL     hb_itemFreeC        ( char * szText );
 extern char *   hb_itemGetC         ( PHB_ITEM pItem );

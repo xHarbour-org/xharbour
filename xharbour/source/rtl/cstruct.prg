@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.6 2002/06/19 01:00:55 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.7 2002/06/21 19:18:27 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hboo.ch"
 #include "cstruct.ch"
+#include "error.ch"
 
 #define CLASS_PROPERTIES 5
 
@@ -62,13 +63,34 @@ static s_aArrayClasses := {}
 //---------------------------------------------------------------------------//
 Function __ActiveStructure( cStructure, nAlign )
 
+   LOCAL oErr
+
    IF PCount() == 2
       cStructure := Upper( cStructure )
 
-      IF aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) == 0
-         //TraceLog( "Registered: " + cStructure )
-         aAdd( s_aClasses, { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
+      IF aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) > 0
+         /* In most cases we can simply ignore the reduefinition, by returning a FAKED Structure Array!
+         oErr := ErrorNew()
+         oErr:Args := { cStructure, nAlign }
+         oErr:CanDefault    := .F.
+         oErr:CanRetry      := .F.
+         oErr:CanSubstitute := .T.
+         oErr:Description  := "Structure already defined."
+         oErr:Operation     := "__ActiveStructure()"
+         oErr:Severity      := ES_ERROR
+         oErr:SubCode       := 1
+         oErr:SubSystem     := "C Structure"
+
+         Return Eval( ErrorBlock(), oErr )
+         */
+
+         // In most cases we can simply ignore the redefinition, by returning a FAKED Structure Array!
+         TraceLog( "Redefinition of C Structure: " + cStructure )
+         Return ( s_aActiveStructure := { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
       END
+
+         //TraceLog( "Registered: " + cStructure )
+      aAdd( s_aClasses, { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
 
       s_aActiveStructure := s_aClasses[-1]
 
@@ -174,13 +196,24 @@ Function HB_CStructure( cStructure, nAlign )
    LOCAL acMembers, acTypes, cMember
    LOCAL aMemberDefinition
    LOCAL aStructure
+   LOCAL oErr
 
    cStructure := Upper( cStructure )
    nID        := aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } )
 
    IF nID == 0
-      Alert( "Class: " + cStructure + " was not initialized with __ActiveStructure()" )
-      Return NIL
+      oErr := ErrorNew()
+      oErr:Args          := { cStructure, nAlign }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Desscription  := "Structure not initialized with __ActiveStructure()"
+      oErr:Operation     := "HB_CStructure()"
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 2
+      oErr:SubSystem     := "C Structure"
+
+      Return Eval( ErrorBlock(), oErr )
    ENDIF
 
    acMembers := s_aClasses[nID][3]
@@ -284,6 +317,7 @@ Function HB_CStructureFromID( nID, nAlign )
 
    LOCAL hClass, oStructure, lInplace
    LOCAL Counter, CType
+   LOCAL oErr
 
    //TraceLog( nId, s_aClasses )
 
@@ -294,8 +328,18 @@ Function HB_CStructureFromID( nID, nAlign )
       lInplace := .T.
       nID -= CTYPE_STRUCTURE
    ELSE
-      Alert( "ID out of range!" )
-      Return NIL
+      oErr := ErrorNew()
+      oErr:Args          := { nID, nAlign }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description  := "ID out of range."
+      oErr:Operation     := "HB_CStructureFromID()"
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 3
+      oErr:SubSystem     := "C Structure"
+
+      Return Eval( ErrorBlock(), oErr )
    ENDIF
 
    IF s_aClasses[nID][2] == NIL

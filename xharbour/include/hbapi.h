@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.22 2002/06/13 22:44:17 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.23 2002/06/21 19:18:27 ronpinkas Exp $
  */
 
 /*
@@ -303,7 +303,6 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_retc_buffer( szText )                   hb_retcAdopt( szText )
 #define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
 #define hb_retc_const( szText )                    hb_retcStatic( szText )
-#define hb_itemArrayPut( pArray, ulIndex, pItem ) ( hb_arraySet( pArray, ulIndex, pItem ), pArray )
 
 #define HB_API_MACROS
 

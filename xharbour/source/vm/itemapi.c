@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.17 2002/04/29 01:27:27 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.18 2002/07/11 14:29:49 walito Exp $
  */
 
 /*
@@ -174,12 +174,18 @@ PHB_ITEM hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
 
    pItem = hb_itemNew( NULL );
 
-   if( pArray )
-   {
-      hb_arrayGet( pArray, ulIndex, pItem );
-   }
+   hb_arrayGet( pArray, ulIndex, pItem );
 
    return pItem;
+}
+
+PHB_ITEM hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemArrayPut(%p, %lu, %p)", pArray, ulIndex, pItem));
+
+   hb_arraySet( pArray, ulIndex, pItem );
+
+   return pArray;
 }
 
 /* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
