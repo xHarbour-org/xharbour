@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3840 2005/02/19 05:03:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3841 2005/02/19 10:08:09 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-19 18:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + makefile.pc
+  + make_pc.bat
+    * makefiles for PellesC
+
+  + hrbdll.gc
+  + dll_gc.bat
+    * makefiles for creating harbour.dll with MinGW
+
+  + hrbdll.pc
+  + dll_pc.bat
+    * makefiles for creating harbour.dll with PellesC
+
+  * makefile.gc
+  * make_gc.bat
+    * changes to support MT compilation
+
 2005-02-19 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/clipdefs.h
     * undefine WORD, WORDP, PWORD for MinGW32/PellesC under MT
