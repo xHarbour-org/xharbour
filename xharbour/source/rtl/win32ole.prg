@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.24 2003/06/19 18:29:44 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.25 2003/06/19 19:09:19 ronpinkas Exp $
  */
 
 /*
@@ -1427,7 +1427,7 @@ RETURN uObj
         }
         else
         {
-           wFlags = DISPATCH_PROPERTYPUT;
+           wFlags = DISPATCH_PROPERTYPUT | DISPATCH_METHOD;
         }
 
         //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parc(2), dParams.cArgs );

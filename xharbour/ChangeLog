@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1145 2003/06/19 20:50:32 andijahja Exp $
+ * $Id: ChangeLog,v 1.1146 2003/06/19 22:39:01 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-19 15:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    + Added | DISPATCH_METHOD to DISPATCH_PROPERTYPUT
 
 2003-06-19 10:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbapigt.h
