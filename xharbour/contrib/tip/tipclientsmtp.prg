@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientsmtp.prg,v 1.2 2003/07/13 19:18:38 jonnymind Exp $
+* $Id: tipclientsmtp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -25,6 +25,11 @@ CLASS tIPClientSMTP FROM tIPClient
    METHOD Commit()
    METHOD Quit()
    METHOD GetOK()
+   /* Method for smtp server that require login */
+   METHOD OpenSecure()
+   METHOD AUTH( cUser, cPass) // Auth by login method
+   METHOD AUTHplain( cUser, cPass) // Auth by plain method
+
 
 ENDCLASS
 
@@ -112,3 +117,54 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
    ::nLastWrite := ::super:Write( cData, nLen, bCommit )
 RETURN ::nLastWrite
 
+
+METHOD OpenSecure( ) CLASS tIPClientSMTP
+
+   Local cUser
+
+   IF .not. ::super:Open()
+      RETURN .F.
+   ENDIF
+
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
+
+   cUser := ::oUrl:cUserid
+
+   IF .not. Empty ( ::oUrl:cUserid )
+      InetSendAll( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
+   ELSE
+      InetSendAll( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
+   ENDIF
+
+RETURN ::getOk()
+
+METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
+
+   Local cs:=''
+   Local cEncodedUser
+   Local cEncodedPAss
+
+   cUser := StrTran( cUser,"&at;", "@")
+
+   cEncodedUser := alltrim(HB_BASE64(cuser,len(cuser)))
+   cEncodedPAss :=alltrim(HB_BASE64(cPass,len(cpass)))
+
+
+   InetSendAll( ::SocketCon, "AUTH LOGIN " +::ccrlf )
+
+   if ::GetOk()
+      InetSendAll( ::SocketCon, cEncodedUser+::cCrlf  )
+      if ::Getok()
+         InetSendAll( ::SocketCon, cEncodedPass +::cCrlf )
+      endif
+   endif
+
+   return ::GetOk()
+
+METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
+
+   Local cBase := BUILDUSERPASSSTRING( cUser, cPass )
+   Local cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
+
+   InetSendAll( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf)
+   return ::GetOk()
