@@ -276,18 +276,15 @@ HB_FUNC( GETMENUINFO )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI SetMenuInfo( IN HMENU, IN LPCMENUINFO);
 
-/*
+
 
 HB_FUNC( SETMENUINFO )
 {
-   LPCMENUINFO lpcmenuInfo ;
-
-   // Your code goes here
-
+   LPCMENUINFO lpcmenuInfo =(LPCMENUINFO) hb_param( 2, HB_IT_STRING )->item.asString.value;
    hb_retl( SetMenuInfo( (HMENU) hb_parnl( 1 ), lpcmenuInfo ) ) ;
 }
 
-*/
+
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI EndMenu( VOID);
@@ -319,22 +316,19 @@ HB_FUNC( INSERTMENUITEM )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetMenuItemInfoA( IN HMENU, IN UINT, IN BOOL, IN OUT LPMENUITEMINFOA );
 
-/*
+
 
 HB_FUNC( GETMENUITEMINFO )
 {
-   LPMENUITEMINFOA lpmenuitemInfoa ;
-
-   // Your code goes here
-
+   LPCMENUITEMINFOA lpcmenuitemInfoa =(LPCMENUITEMINFOA) hb_param( 4, HB_IT_STRING )->item.asString.value;
    hb_retl( GetMenuItemInfo( (HMENU) hb_parnl( 1 ),
                              (UINT) hb_parni( 2 ) ,
                              hb_parl( 3 )         ,
-                             lpmenuitemInfoa      
+                             lpcmenuitemInfoa      
                            ) ) ;
 }
 
-*/
+
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI SetMenuItemInfoA( IN HMENU, IN UINT, IN BOOL, IN LPCMENUITEMINFOA );

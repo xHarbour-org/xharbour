@@ -32,6 +32,20 @@
 #include "what32.ch"
 #include "classex.ch"
 #include "debug.ch"
+#include "wintypes.ch"
+#include "cstruct.ch"
+
+pragma pack(4)
+
+typedef struct tagMENUINFO {;
+  DWORD   cbSize;
+  DWORD   fMask;
+  DWORD   dwStyle;
+  UINT    cyMax;
+  HBRUSH  hbrBack;
+  DWORD   dwContextHelpID;
+  ULONG  dwMenuData;
+} MENUINFO
 
 *-----------------------------------------------------------------------------*
 
@@ -40,15 +54,16 @@ CLASS TMenu FROM TComponent
    DATA Popup  AS OBJECT
    DATA FOwnerDraw INIT .F.
    
-   PROPERTY Items        READ FItems
+   DATA aItems PROTECTED INIT {}
+
+   PROPERTY Items        READ FItems DEFAULT {}
    PROPERTY OnChange     READ FOnChange
    PROPERTY Handle       READ GetHandle
    PROPERTY WindowHandle READ FWindowHandle WRITE SetWindowHandle
    PROPERTY OwnerDraw    READ FOwnerDraw
    PROPERTY Images       READ FImages
 
-   DATA aItems PROTECTED INIT {}
-   
+  
    METHOD Create() CONSTRUCTOR
    METHOD GetHandle()
    METHOD SetWindowHandle()
@@ -171,7 +186,18 @@ METHOD GetPos( nId ) CLASS TMenu
 Return( aScan( ::aItems,{|o|o:id == nId} ) )
 
 METHOD GetHandle() CLASS TMenu
-RETURN ::FItems:GetHandle()
+   LOCAL hMenu, lpMenuInfo
+   IF ::FHandle == NIL
+      lpMenuInfo IS MENUINFO
+      
+      lpMenuInfo:cbsize  := lpMenuInfo:SizeOf()
+      lpMenuInfo:fMask   := MIM_STYLE
+      lpMenuInfo:dwStyle := MNS_NOTIFYBYPOS
+      
+      hMenu := ::FItems:GetHandle()
+      SetMenuInfo( hMenu, lpMenuInfo:value )
+   ENDIF
+RETURN hMenu
 
 
 METHOD IsOwnerDraw() CLASS TMenu

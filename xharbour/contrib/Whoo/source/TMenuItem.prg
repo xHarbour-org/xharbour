@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.14 2003/01/23 03:47:09 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.15 2003/01/27 09:34:17 what32 Exp $
  */
 
 /*
@@ -43,20 +43,7 @@ STATIC Separators := { MF_STRING, MF_SEPARATOR }
 
 pragma pack(4)
 
-typedef struct tagMENUITEMINFO {;
-  UINT    cbSize; 
-  UINT    fMask; 
-  UINT    fType; 
-  UINT    fState; 
-  UINT    wID; 
-  HANDLE  hSubMenu; 
-  HBITMAP hbmpChecked; 
-  HBITMAP hbmpUnchecked; 
-  ULONG   dwItemData; 
-  LPTSTR  dwTypeData; 
-  UINT    cch; 
-  HBITMAP hbmpItem;
-} MENUITEMINFO
+IMPORT C STRUCTURE MENUITEMINFO
 
 CLASS TMenuItem FROM TComponent
 
@@ -87,6 +74,7 @@ CLASS TMenuItem FROM TComponent
    DATA FDefault   INIT .F.
 
    DATA PopUp
+   DATA aItems PROTECTED INIT {}
    
    PROPERTY Enabled    READ FEnabled WRITE SetEnabled
    PROPERTY Command    READ FCommand WRITE SetCommand
@@ -143,7 +131,7 @@ METHOD Create( oMenu ) CLASS TMenuItem
    ::FEnabled   := .T.
    ::FDefault   := .F.
    ::MenuItemInfo IS MENUITEMINFO
-   
+
 Return Self
 
 *-----------------------------------------------------------------------------*
@@ -174,11 +162,7 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
   IF ::FVisible
      Caption := ::FCaption
 
-     IF ::GetCount() > 0
-        ::MenuItemInfo:hSubMenu := ::GetHandle()
-     ELSE
-        ::MenuItemInfo:hSubMenu := 0
-     ENDIF
+     ::MenuItemInfo:hSubMenu := 0
 
      DEFAULT Caption TO "?"
 
@@ -206,6 +190,8 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
      ENDIF
 
      InsertMenuItem( HMenu, -1, .T., ::MenuItemInfo:value )
+
+     AADD( ::FMenu:aItems, Self )
      
   ENDIF
 
@@ -219,19 +205,20 @@ METHOD GetHandle() CLASS TMenuItem
       ELSE
          ::FHandle := CreateMenu()
       ENDIF
+//      ::PopulateMenu()
    ENDIF
-   //::PopulateMenu()
 
 Return ::FHandle
 
 METHOD PopulateMenu() CLASS TMenuItem
-
+/*
    LOCAL MenuItem
 
-   FOR EACH MenuItem IN ::FItems
-      MenuItem:AppendTo( MenuItem:FHandle )
+   FOR EACH MenuItem IN ::FMenu:aItems
+      view MenuItem:Caption
+      MenuItem:AppendTo( MenuItem:FMenu:Handle )
    NEXT
-
+*/
 Return NIL
 
 METHOD Insert( Index, Item ) CLASS TMenuItem
