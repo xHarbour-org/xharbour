@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.26 2004/06/18 21:13:03 likewolf Exp $
+ * $Id: files.c,v 1.27 2004/07/22 11:32:27 likewolf Exp $
  */
 
 /*
@@ -322,8 +322,11 @@ HB_FUNC( SETFATTR )
    #endif
 }
 
+
 HB_FUNC( FILESEEK )
 {
+   BOOL bFound = FALSE;
+   
    #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
       LPCTSTR szFile;
@@ -333,7 +336,7 @@ HB_FUNC( FILESEEK )
 
       if ( hb_pcount() >= 1 )
       {
-         szFile=hb_parcx( 1 );
+         szFile = hb_parcx( 1 );
 /*
          if ( ISNUM( 2 ) )
          {
@@ -356,22 +359,25 @@ HB_FUNC( FILESEEK )
          if(  iAttr & FA_NORMAL  )
             dwFlags |=    FILE_ATTRIBUTE_NORMAL;
 */
-         hLastFind = FindFirstFile( szFile,&Lastff32 );
+         hLastFind = FindFirstFile( szFile, &Lastff32 );
 
          if ( hLastFind != INVALID_HANDLE_VALUE )
          {
+	    bFound = TRUE;
             hb_retc( Lastff32.cFileName );
          }
-
       }
       else
       {
-         if ( FindNextFile( hLastFind,&Lastff32 ) )
+         if ( FindNextFile( hLastFind, &Lastff32 ) )
+	 {
+	    bFound = TRUE;
             hb_retc( Lastff32.cFileName );
+	 }
          else
          {
             FindClose( hLastFind );
-            hLastFind=NULL;
+            hLastFind = NULL;
          }
       }
    }
@@ -385,29 +391,31 @@ HB_FUNC( FILESEEK )
 
       if ( hb_pcount() >=1 )
       {
-         szFiles=hb_parcx( 1 );
+         szFiles = hb_parcx( 1 );
 
-         if( ISNUM( 2 ) )
+         if ( ISNUM( 2 ) )
          {
-            iAttr=hb_parnl( 2 );
+            iAttr = hb_parnl( 2 );
          }
          else
          {
-            iAttr=32;
+            iAttr = 32;
          }
 
-         iFind=findfirst( szFiles,&fsOldFiles,iAttr );
+         iFind = findfirst( szFiles, &fsOldFiles, iAttr );
 
          if ( !iFind )
          {
+	    bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
       }
       else
       {
-         iFind=findnext( &fsOldFiles );
+         iFind = findnext( &fsOldFiles );
          if ( !iFind )
          {
+	    bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
          #if !defined ( __DJGPP__ )
@@ -419,13 +427,12 @@ HB_FUNC( FILESEEK )
       }
    }
 
-   #else
+   #endif
 
+   if ( !bFound )
    {
       hb_retc( "" );
    }
-
-   #endif
 }
 
 

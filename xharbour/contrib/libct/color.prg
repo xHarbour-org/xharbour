@@ -1,5 +1,5 @@
 /*
- * $Id: color.prg,v 1.2 2003/07/29 16:24:00 druzus Exp $
+ * $Id: color.prg,v 1.3 2004/03/03 19:27:13 likewolf Exp $
  */
 
 /*
@@ -266,6 +266,7 @@ FUNCTION COLORTON( cColor )
      if ( nSep := at( "/", cColor ) ) == 0
 
         cColorFore = cColor
+	cColorBack = ""
      else
 
         cColorFore = alltrim( substr( cColor, 1, nSep - 1 ) )
