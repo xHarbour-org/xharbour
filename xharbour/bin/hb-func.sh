@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.27 2004/09/14 20:15:37 druzus Exp $
+# $Id: hb-func.sh,v 1.28 2004/09/17 02:37:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -164,6 +164,9 @@ HB_STATIC="no"
 HB_MT=""
 HB_GT="${HB_GT_LIB#gt}"
 HB_MG="${HB_MULTI_GT}"
+HB_LOG_FILE=""
+HB_LOG_FILES=""
+HB_LOG_FILEX=""
 
 HB_GPM_MOUSE="${HB_GPM_MOUSE}"
 
@@ -317,6 +320,13 @@ if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
     fi
 fi
 
+FOUTC1="\${FILEOUT%.*}.c"
+FOUTO1="\${FILEOUT%.*}.o"
+FOUTE1="\${FILEOUT%.[Pp][Rr][Gg]}"
+FOUTE1="\${FOUTE1%.[oc]}"
+HB_LOG_FILE="\${FOUTE1}.log"
+HB_LOG_FILES="\${FOUTE1}.1log"
+HB_LOG_FILEX="\${FOUTE1}.2log"
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
 FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
@@ -336,10 +346,12 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}" >\${HB_LOG_FILE} 2>&1
     else
-        gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}" >\${HB_LOG_FILE} 2>&1
     fi
+    cp \${HB_LOG_FILE} \${HB_LOG_FILES}
+    cat \${HB_LOG_FILES} \${HB_LOG_FILEX} > \${HB_LOG_FILE}
 }
 
 hb_cmp()
