@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2179 2004/01/29 22:20:59 andijahja Exp $
+ * $Id: ChangeLog,v 1.2180 2004/01/29 23:24:10 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-30 07:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/debug.c
+    + add wrappers (some 3rd-party-libs still use these ones) for :
+      __VMSTKLCOUNT()
+      __VMPARLLIST()
+      __VMSTKLLIST()
+      __VMVARLGET()
+      __VMVARLSET()
 
 2004-01-30 00:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hbi18n.c

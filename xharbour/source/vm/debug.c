@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.7 2004/01/11 22:04:12 ronpinkas Exp $
+ * $Id: debug.c,v 1.8 2004/01/29 14:26:00 likewolf Exp $
  */
 
 /*
@@ -274,6 +274,31 @@ HB_FUNC( HB_DBG_VMVARLSET )
      pLocal = *(pBase + 1 + iLocal);
    else
      pLocal = hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal );
-   
+
    hb_itemCopy( hb_itemUnRef(pLocal), *(HB_VM_STACK.pBase + 4) );
+}
+
+HB_FUNC( __VMSTKLCOUNT )
+{
+   HB_FUNCNAME(HB_DBG_VMSTKLCOUNT)();
+}
+
+HB_FUNC( __VMPARLLIST )
+{
+   HB_FUNCNAME(HB_DBG_VMPARLLIST)();
+}
+
+HB_FUNC( __VMSTKLLIST )
+{
+   HB_FUNCNAME(HB_DBG_VMSTKLLIST)();
+}
+
+HB_FUNC( __VMVARLGET )
+{
+   HB_FUNCNAME(HB_DBG_VMVARLGET)();
+}
+
+HB_FUNC( __VMVARLSET )
+{
+   HB_FUNCNAME(HB_DBG_VMVARLSET)();
 }
