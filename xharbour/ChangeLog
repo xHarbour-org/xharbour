@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.642 2003/01/23 23:34:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.643 2003/01/24 09:52:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-24 17:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+    + Added #define HB_MAX_SWITCHES 16
+
+  * source/compiler/harbour.sly
+  * tests/switch.prg
+    + Added support for upto HB_MAX_SWITCHES nested SWITCH control flows.
+
+  + xdiff.txt
+    + Added document describing xHarbour Extensions.
+
+  + doc/switch.txt
+  + doc/try.txt
+    + Added documentation files.
 
 2003-01-24 01:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbpcode.h

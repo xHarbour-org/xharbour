@@ -1,0 +1,297 @@
+xHarbour is a fork from Harbour created Demeber 2001. It aims to follow a more
+aggressive development path, and be more responsive to market trends, and
+users input.
+
+As it stands at this point, xHarbour offers many Syntax extensions over
+Harbour and Clipper, including:
+
+SWITCH syntax:
+-----------
+
+   SWITCH <Exp>
+      CASE <Constant>
+         ...
+         [EXIT]
+
+      [More Cases ...]
+
+      [DEFAULT]
+         ...
+   END
+
+NOTE: This syntax is modeled after the C 'switch' flow control. It offers
+      great speed benefit [30-300%] over DO CASE flow control, but is
+      restricted to comparing only constants.
+
+      Constants maybe: Integers, Longs, or Single Character
+      Strings [much like in C]
+
+WARNING: Those NOT familiar with the C switch flow control, should understand
+         that unlike DO CASE, you MUST explicitly use the EXIT statement or
+         else logic will FALL THROUGH to the NEXT CASE, until stopped at a
+         BREAK, or END statements.
+
+         At first this might seem VERY ODD, but it provides great flexibility
+         exactly like the C model.
+
+         See tests/switch.prg to for a sample and to learn how the FALL-THROUGH
+         logic works.
+
+Multi Threading (MT) Support:
+-----------------------------
+
+xHarbour supports MT applications. There is still some more work to be done,
+but you can already take advantage of this very powerful feature.
+
+Basic sample can be found at:
+
+   tests/mttest.prg
+
+Syntax:
+
+   StartThread ( @MyThreadFunc() [, xParam1 [,xParamN ] ] )
+
+NOTE: MT Application must link against the MT versions of the Libraries, i.e.
+      vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib and dbfcdxmt.lib.
+
+The full description of MT is beyond the scope of this document.
+
+Portable Sockets Support:
+-------------------------
+
+The full description is beyond the scope of this document - please refer to
+samples/sitesvr/sitesvr.prg for a WebServer example.
+
+Perl-5 compatible RegEx:
+------------------------
+
+xHarbour includes PCRE which is a full feature, Perl 5 compatible, Regular
+Expression engine. Full feature Search & Replace classes are currently under
+construction, but you may already use the full power of RegEx searches, with:
+
+   HB_Atx( <cRegEx>, <cTargetString> [, lCaseSensitive [, [@]nStart ]
+           [, [@]nLen ] ] ] ) => cFoundText
+
+TRY syntax:
+-----------
+
+   TRY
+      ...
+      [THROW( <Exp> )]
+      ...
+   CATCH <Id>
+      ...
+   END
+
+The above is very similiar to Clipper BEGIN SEQ, BREAK(), RECOVER USING, END,
+but is more inline with more "modern" languages, and dismisses the need to
+worry about Error codeblock.
+
+IN operator:
+------------
+
+   <Exp> IN <Array_or_StringExp> => .T./.F.
+
+The IN operator is very similiar to the @ operator, but is valid on *both*
+Strings and Arrays. IN is much faster than the eqivalent:
+
+   aScan( <Array>, <Exp> ) > 0
+
+Variable Paramaters syntax:
+---------------------------
+
+   Function <cFuncName>( ... )
+
+The above definition allows this Function to receive up-to 254 paramaters.
+You may retriev an ARRAY with all the paramaters using:
+
+   HB_aParamas()
+
+The above is appropriate for such functions that may receive any
+number of generic paramaters, which normally will then be processed in
+a loop, or with hard coded IF statements based on PCount(). Instead
+the above is much easier to code, requires less memory, and is faster than
+declaring the paramaters.
+
+GLOBAL variables:
+-----------------
+
+   GLOBAL <Id1> [,<Id2> [,<IdN>]]
+
+GLOBAL Variables are a new kind of a declared variables. they have PUBLIC like
+visability, but are faster than even STATICs. GLOBLAS can be refernced from
+other modules using the syntax:
+
+   GLOBAL EXTERNAL <Id1> [,<Id2> [,<IdN>]]
+
+GLOBAL Variables have the added benefit of being *directly* accessable from C
+code too.
+
+True C Type Structures:
+-----------------------
+
+   C STRUCTURE <strucName> [Align <align>]
+     [ MEMBER <memberName> IS <CTYPEDEF> ]
+     [ MEMBER <memberName[<arrayLength>]> IS <CTYPEDEF> ]
+     [ MEMBER <memberName> IS <CTYPEDEF>(<arrayLength>) ]
+     [ MEMBER <memberName> IS|INPLACE <strucName> ]
+     [ MEMBER <memberName> AS <strucName> ]
+     [ ... ]
+   END C STRUCTURE
+
+C Structure can be passed *directly* TO and FROM C code. The full description
+is beyond the scope of this document - please refer to cstruct.txt in doc
+folder.
+
+WITH OBJECT syntax:
+-------------------
+
+   WITH OBJECT <exp>
+      ...
+      :<exp>
+      ...
+   END
+
+   HB_QWith() can also be used to retrieve the current WITH OBJECT within a
+   WITH OBJECT block.
+
+The above syntax not only saves typing, but is also MUCH faster than
+equivalent conventional coding.
+
+FOR EACH Syntax:
+----------------
+
+   FOR EACH <Element> IN <Array> // <Element> must be a declared variable.
+       <Element> // Enumarate value of each respective element in the <exp>.
+      HB_EnumIndex() returns
+      [LOOP]
+      [EXIT]
+   NEXT
+
+is not only more elegant than:
+
+   FOR Counter := 1 TO Len(Array)
+      Element := Array[Counter]
+      ...
+   NEXT
+
+but is also MUCH faster - and it also supports enumarating all properties in
+an object.
+
+Full access to OLE Servers:
+---------------------------
+
+   CreateObject( "ServerName" ) => oOleObject
+      Create new instance of an Ole Server.
+
+   GetActiveObject( "ServerName" ) => oOleObject
+      Get existing instance of an Ole Server.
+
+All documeneted methods and properties of such Server should be directly
+accessable.
+
+Strings may be indexed like arrays:
+-----------------------------------
+
+   <StringExp>[<IndexExp>]
+
+String as Array Index can also accepts a numeric as an assigned value:
+
+   <StringExp>[<IndexExp>] := 65 // Same as := 'A'
+
+String Index and all String of 1 character length, automatically carry a
+secondary CHAR type, which means they are also compatible with numeric
+operations.
+
+   cVar := "hello"; cVar[1] -= 32 // -> "Hello"
+
+Negative Array Index:
+---------------------
+Both Arrays and Strings may be indexed with negative numbers (Reveresed),
+where -1 indexes the LAST Element (or NIL if the Array is empty):
+
+   cVar[-1] // => "o"
+
+assuming cVar is the value "Hello" as per above.
+
+#[x]uncommand and #[x]untranslate directives:
+---------------------------------------------
+
+#uncommad and untranslate directives allow the removal of a given rule from
+the active rules used by the Pre-Processor. It is very much like the #undefine
+directive.
+
+Extended macro support:
+-----------------------
+
+   &cMacro.<suffix>
+
+will compile correctly even if cMacro is a declared var.
+
+
+Optimizations:
+--------------
+
+String additions is more than 50 times faster than Harbour.
+
+PCODE based optimized SubStr(), Left(), and Right() functions.
+
+Much optimized code for FOR LOOPs, :=, +=, -=, -, +, when involving declared
+variables and numeric values.
+
+Optimized WHILE .T. loops.
+
+The underlaying ITEM API has been rewritten (source/vm/fastitem.c) and is far
+faster and consumes much less memory.
+
+Much extended Expression Optimizer produces faster code for common functions,
+and code notations. For example it will automatically convert:
+
+   aTail( <aArray> )         to aArray[-1]
+   SubStr( <cString>, X, 1 ) to cString[X]
+
+which will execute much faster than the above common code.
+
+Optimized generation of Line numbers and other similiar optimizations which
+endup producing smaller and faster executables.
+
+Built-in support for SET TRACE [On|Off] and TraceLog() function.
+
+Optimized and extended Garbage Collector.
+
+Optimized OOP system.
+
+Full support for Clipper undocumented OOP internals (not avialable in Harbour).
+
+Built-in support for OLE in Win32.
+
+Enhanced aIns() and aDel() dismiss need for subsequent [common] aSize().
+
+New HB_FuncPtr(), HB_ObjMsgPtr() and HB_Exec().
+
+The xHarbour Run-Time library was re-written to take advantage of all above
+syntax extensions, and is taking full advantage of the resulting speed
+improvments.
+
+Fixed:
+------
+
+   HB_Qself() returns correct QSelf() even from inide codeblocks (inline
+   methods).
+
+   @ x,y GET &xMacro.Suffix
+   -> Clipper complains: Error C2081  Macro of declared symbol.
+
+   @ x,y GET &( xMacro )
+   -> Clipper complains: Error C2047  GET contains complex macro.
+
+   @ x,y GET &( xMacro )[...]
+   -> Clipper complains: Error C2047  GET contains complex macro.
+
+xHarbour is about twice as fast as Clipper, on most common operations
+[excluding console screen output, and DBF access], and about 10 times faster
+than Harbour.
+
+xHarbour should compile and execute all valid Clipper and Harbour code,
+without any modifications - such code will be automatically optimized to take
+advantage of xHarbour extensions.

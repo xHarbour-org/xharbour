@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.11 2003/01/10 05:40:02 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.12 2003/01/16 01:30:34 ronpinkas Exp $
  */
 
 /*
@@ -155,6 +155,8 @@ typedef struct _VAR
 
 /* pcode chunks bytes size */
 #define HB_PCODE_CHUNK   100
+
+#define HB_MAX_SWITCHES 16
 
 /* structure to hold a Clipper defined function */
 typedef struct __FUNC
