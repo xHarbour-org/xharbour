@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.1 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwtcmd.ch,v 1.2 2003/08/27 02:47:49 lculik Exp $
 
    Definitions
 */
@@ -74,7 +74,7 @@
           => <oMenu> := XWTMenu():New( <cPrompt>, <oParent> )
 
 #xcommand MENUITEM [<oMenuItem>] [ PROMPT <cPrompt> ] [ ID <nId>] [ICON <cIcon>];
-                               [ ACTION <pAction> ] [ METHOD <oMethod> ][ OF <oMenu> ];
-          => [<oMenuItem> := ] XWTMenuItem():New( <cPrompt>, <nId>, <pAction>, <oMethod>, <cIcon>, <oMenu> )
+                               [ ACTION <pAction> ] [ METHOD <oMethod> ][ OF <oMenu> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
+          => [<oMenuItem> := ] XWTMenuItem():New( <cPrompt>, <nId>, <pAction>, <oMethod>, <cIcon>, <oMenu> ,<(cFont)>,<nSize>,<(clr)>)
 	  
 #endif

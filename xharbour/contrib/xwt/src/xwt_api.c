@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.12 2003/06/08 14:05:33 jonnymind Exp $
+   $Id: xwt_api.c,v 1.13 2003/08/27 02:46:16 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -278,13 +278,25 @@ HB_FUNC( XWT_SETPROPERTY )
 
       //Font Parameter
       case XWT_PROP_FONT:
-         prop.value.font = hb_parc(3);
+         prop.value.font = hb_parc( 3 );
       break;
 
-      case XWT_PROP_COLOR:
-         prop.value.color = hb_parc(3);
+      case XWT_PROP_FGCOLOR:
+         prop.color.fg = hb_parc( 3 );
       break;
-
+      
+      case XWT_PROP_BGCOLOR:
+         prop.color.bg = hb_parc( 3 );
+      break;
+      
+      case XWT_PROP_BASECOLOR:
+         prop.color.base = hb_parc( 3 );
+      break;
+      
+      case XWT_PROP_TEXTCOLOR:
+         prop.color.text = hb_parc( 3 );
+      break;
+      
       //Array
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:
@@ -385,14 +397,36 @@ HB_FUNC( XWT_GETPROPERTY )
             bRet = TRUE;
          }
       break;
-      case XWT_PROP_COLOR:
+      case XWT_PROP_FGCOLOR:
          if( pParam1 != NULL )
          {
-            hb_itemPutC( pParam1, (char *)prop.value.color );
+            hb_itemPutC( pParam1, (char *)prop.color.fg );
             bRet = TRUE;
          }
       break;
 
+      case XWT_PROP_BGCOLOR:
+         if( pParam1 != NULL )
+         {
+            hb_itemPutC( pParam1, (char *)prop.color.bg );
+            bRet = TRUE;
+         }
+      break;
+
+      case XWT_PROP_BASECOLOR:
+         if( pParam1 != NULL )
+         {
+            hb_itemPutC( pParam1, (char *)prop.color.base );
+            bRet = TRUE;
+         }
+      break;
+      case XWT_PROP_TEXTCOLOR:
+         if( pParam1 != NULL )
+         {
+            hb_itemPutC( pParam1, (char *)prop.color.text );
+            bRet = TRUE;
+         }
+      break;
 
       //Numeric parameters
       case XWT_PROP_VISIBILITY:

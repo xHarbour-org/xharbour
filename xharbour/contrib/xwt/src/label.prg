@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: label.prg,v 1.4 2003/07/21 18:14:40 xthefull Exp $
+   $Id: label.prg,v 1.5 2003/08/27 02:46:16 lculik Exp $
 
    Label class. Just a concrete widget implementation
 */
@@ -45,13 +45,9 @@ METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor) CLASS XWTLabel
       ELSE
          cColorText := cColor
       ENDIF
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_COLOR,  cColorText )
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
    ENDIF
 
-  IF Valtype( nFontSize ) == "N"
-     cFontString :=  Str( nFontSize ,2 )
-     XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
-  ENDIF
   
    IF Valtype( cFont )  == "C" 
       cFontString += cFont
@@ -60,6 +56,11 @@ METHOD New( cText, x, y, oParent ,cFont, nFontSize , cColor) CLASS XWTLabel
       ENDIF
       XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
    ENDIF
+
+  IF Valtype( nFontSize ) == "N"
+     cFontString :=  Str( nFontSize ,2 )
+     XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
+  ENDIF
 
    IF ValType( x ) == "N" .and. ValType( y ) == "N"
       ::Move( x, y )

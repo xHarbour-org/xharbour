@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.3 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: menuitem.prg,v 1.4 2003/07/22 16:04:11 xthefull Exp $
 
    Menuitem class.
 */
@@ -15,12 +15,17 @@ CLASS XWTMenuItem FROM XWTWidget
    DATA nId
    CLASSDATA nAutoId INIT 1
 
-   METHOD New( cStr, nId, oCalled, oMethod )
+   METHOD New( cStr, nId, oCalled, oMethod ,cIcon, oMenu, cFont, nSize, cColor)
    METHOD SetIcon( cFileName )
 
 ENDCLASS
 
-METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu ) CLASS XWTMenuItem
+METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu , cFont, nFontSize, cColor) CLASS XWTMenuItem
+   Local cFontString :=""
+   Local cColorText  :=""
+   Local aColor
+   Local c
+
    ::Super:New()
 
    IF nId != NIL
@@ -42,6 +47,36 @@ METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu ) CLASS XWTMenuItem
    IF cIcon != NIL
       ::SetIcon( cIcon )
    ENDIF
+
+   IF !Empty( cColor )
+      IF "," in cColor // is an RGB String so Convert
+
+      aColor := HB_aTokens( cColor ,",")
+      cColorText := "#"
+
+      FOR EACH c in aColor
+         cColorText += DecToHexa(Str(c,3))
+      NEXT
+         
+      ELSE
+         cColorText := cColor
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_FGCOLOR,  cColorText )
+   ENDIF
+
+  
+   IF Valtype( cFont )  == "C" 
+      cFontString += cFont
+      IF Valtype( nFontSize ) == "N"
+         cFontString += " "+ Str(nFontSize,2,0)
+      ENDIF
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
+   ENDIF
+
+  IF Valtype( nFontSize ) == "N"
+     cFontString :=  Str( nFontSize ,2 )
+     XWT_SetProperty( ::oRawWidget, XWT_PROP_FONT, cFontString )
+  ENDIF
 
    IF oMenu != NIL
       oMenu:Add( Self )

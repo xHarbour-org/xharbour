@@ -121,17 +121,17 @@ PROCEDURE MAIN()
    /***** MENU design *****/
 
    MENU oMenu PROMPT "File"
-        MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu
-        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu
-        MENUITEM PROMPT "QUIT"  ACTION @FileEvent() OF oMenu
+        MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
+        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5
+        MENUITEM PROMPT "QUIT"  ACTION @FileEvent() OF oMenu SIZE 40
 
         MENU oMenuSec PROMPT "SubMenu" OF oMenu
-             MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec
-             MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec
+             MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec FONT "Sans" SIZE 60
+             MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec FONT "Clean" SIZE 14
 
    MENU oMenuHelp PROMPT "Help"
-        MENUITEM PROMPT "About" ACTION @FileEvent() OF oMenuHelp
-        MENUITEM PROMPT "Help"  ACTION @FileEvent() OF oMenuHelp
+        MENUITEM PROMPT "About" ACTION @FileEvent() OF oMenuHelp  FONT "Helvetica" SIZE 8
+        MENUITEM PROMPT "Help"  ACTION @FileEvent() OF oMenuHelp  FONT "Courier" SIZE 10
    
    oWindow:SetMenuBar( { oMenu, oMenuHelp } )
 

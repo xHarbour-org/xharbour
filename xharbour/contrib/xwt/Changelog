@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.26 2003/08/27 02:48:23 lculik Exp $
+ * $Id: Changelog,v 1.27 2003/08/27 20:09:22 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-27 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  *include/xwt.ch
+  *include/xwtcmd.ch
+    ! menuitems now can has color , as also other font and font size
+  *include/xwt_api.h
+    !small change to hold all 4 colors state   
+  *src/menuitem.prg 
+    ! Enhaced to accept font/fontsize and color parameter
+  *src/xwt_api.c 
+    ! Changed XWT_SET_PROPERTY/XWT_GET_PROPERTY to handle the font/color properties on menutitems
+  *src/xwt_gtk/xwt_gtk.c 
+    ! xtw_drv_set_property changes to properly handle font/color properties on menuitems
+  * test/xwt_test.prg
+    ! changes to menuitems so now it has colors or diferent font size
+   Please note this is an work in progress
+
 
 2003-08-27 18:03 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/xwt_gtk/xwt_gtk_image.c
