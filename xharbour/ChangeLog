@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2746 2004/04/04 23:37:59 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2747 2004/04/05 00:16:02 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,7 @@
   * source/rtl/hbxml.c
     ! fix inconsistent function declarations
 
+  * source/compiler/harbour.c
   * source/compiler/hbfunchk.c
   * source/compiler/cmdcheck.c
   * source/compiler/hbgenerr.c
