@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.269 2003/10/07 23:48:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.270 2003/10/08 13:07:24 paultucker Exp $
  */
 
 /*
@@ -7685,7 +7685,13 @@ HB_FUNC( HB_QSELF )
       {
          if( (*( pBase + 1 ))->item.asBlock.value->pSelfBase )
          {
-            break;
+            HB_ITEM Self;
+
+            Self.type = HB_IT_ARRAY;
+            Self.item.asArray.value = (*( pBase + 1 ))->item.asBlock.value->pSelfBase;
+
+            hb_itemCopy( &(HB_VM_STACK.Return), &Self );
+            return;
          }
       }
 

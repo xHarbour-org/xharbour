@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.29 2003/09/08 02:17:11 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.30 2003/09/10 06:07:31 ronpinkas Exp $
  */
 
 /*
@@ -124,6 +124,11 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
           * Swap the current value of local variable with the reference to this value.
           */
          pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable++ ) );
+
+         if( HB_IS_BYREF( pLocal ) )
+         {
+            pLocal = hb_itemUnRef( pLocal );
+         }
 
          if( ! HB_IS_MEMVAR( pLocal ) )
          {
