@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.2 2005/01/13 04:41:18 bdj Exp $
+ * $Id: whatsnew.txt,v 1.3 2005/01/13 10:33:28 bdj Exp $
  */
 
 /*
@@ -15,6 +15,11 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+ 2005/01/13:
+ * gtwvw.c
+   + WVW_CBisDropped() new function
+   ! hb_wvw_gtCBProc(): Handle ALT-F4 to avoid GPF if it is pressed when CB on focus
 
  2005/01/13:
  * gtwvw.c

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.6 2005/01/13 04:41:17 bdj Exp $
+ * $Id: gtwvw.c,v 1.7 2005/01/13 10:30:40 bdj Exp $
  */
 
 /*
@@ -14712,6 +14712,17 @@ static LRESULT CALLBACK hb_wvw_gtCBProc( HWND hWnd, UINT message, WPARAM wParam,
 
         switch ( c )
         {
+          case VK_F4:
+          {
+            if (bAlt)
+            {
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+
           case VK_ESCAPE:
           {
             if (!bCtrl && !bAlt && !bShift && !bDropped)
@@ -14758,6 +14769,17 @@ static LRESULT CALLBACK hb_wvw_gtCBProc( HWND hWnd, UINT message, WPARAM wParam,
       {
         switch(c)
         {
+          case VK_F4:
+          {
+            if (bAlt)
+            {
+               SetFocus(hWndParent);
+               PostMessage(hWndParent, message, wParam, lParam);
+               return 0;
+            }
+            break;
+          }
+
           case VK_RETURN:
           {
 
@@ -15385,6 +15407,33 @@ HB_FUNC( WVW_CBGETCURTEXT )
      hb_retc(lptstr);
    }
    hb_xfree( lptstr );
+}
+
+
+/*WVW_cbIsDropped( [nWinNum], nCBid )
+ *get current dropped state of combobox nCBid in window nWinNum
+ *returns .t. if listbox is being shown, otherwise .f.
+ *Also returns .f. if nCBid not valid
+ */
+HB_FUNC( WVW_CBISDROPPED )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   UINT uiCBid = hb_parni(2);
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
+   BOOL bDropped;
+
+   if (pcd==NULL)
+   {
+      hb_retl(FALSE);
+      return;
+   }
+
+   bDropped = SendMessage( (HWND) pcd->hWndCtrl,
+                           CB_GETDROPPEDSTATE,
+                           (WPARAM) 0,
+                           (LPARAM) 0
+                          );
+   hb_retl(bDropped);
 }
 
 /*-------------------------------------------------------------------*/
