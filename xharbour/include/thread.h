@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.81 2004/03/06 12:56:59 jonnymind Exp $
+* $Id: thread.h,v 1.82 2004/03/30 05:55:35 druzus Exp $
 */
 
 /*
@@ -329,6 +329,7 @@ typedef struct tag_HB_STACK
    BOOL bIamBackground;
    USHORT uiBackgroundTask;
    USHORT uiBackgroundMaxTask;
+   ULONG  ulBackgroundID;
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
@@ -579,7 +580,7 @@ extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
 /* Used by dynsym thread specific system */
 void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 
-/* A thread willingly terminating itself */   
+/* A thread willingly terminating itself */
 void hb_threadCancelInternal( void );
 
 /* Win 32 specific functions */

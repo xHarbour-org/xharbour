@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.10 2004/04/04 19:50:30 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.11 2004/04/04 22:04:41 andijahja Exp $
  */
 
 /*
@@ -81,6 +81,9 @@
 
 #ifndef HB_THREAD_SUPPORT
 
+/* Task ID */
+static ULONG s_ulBackgroundID = 0;
+
 /* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
 */
@@ -96,6 +99,7 @@ static USHORT s_uiBackgroundTask = 0;
 static USHORT s_uiBackgroundMaxTask = 0;
 #else
 
+#define s_ulBackgroundID      HB_VM_STACK.ulBackgroundID
 #define s_pBackgroundTasks    (HB_VM_STACK.pBackgroundTasks)
 #define s_bIamBackground      HB_VM_STACK.bIamBackground
 #define s_uiBackgroundTask    HB_VM_STACK.uiBackgroundTask
@@ -115,7 +119,7 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
 
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
-   pBkgTask->ulTaskID = ( pBkgTask->ulTaskID == 0 ? (ULONG) 1 : ++pBkgTask->ulTaskID );
+   pBkgTask->ulTaskID = ++s_ulBackgroundID;
    pBkgTask->pTask    = hb_itemNew( pBlock );
    pBkgTask->dSeconds = hb_secondsCPU( 3 );
    pBkgTask->millisec = nMillisec;

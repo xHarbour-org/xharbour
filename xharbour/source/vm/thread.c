@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.163 2004/04/01 22:00:43 druzus Exp $
+* $Id: thread.c,v 1.164 2004/04/03 11:47:11 jonnymind Exp $
 */
 
 /*
@@ -312,6 +312,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->bIamBackground = 0;
    tc->uiBackgroundTask = 0;
    tc->uiBackgroundMaxTask = 0;
+   tc->ulBackgroundID = 0;
 
    #ifdef HB_OS_WIN_32
       tc->th_h = NULL;
@@ -716,7 +717,7 @@ void hb_threadIsLocalRef( void )
 
       pStack = pStack->next;
    }
-   
+
 }
 
 /* DEBUG FUNCTION:
