@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1057 2003/05/26 14:48:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1058 2003/05/26 15:46:28 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-26 18:35 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpccli.prg
+    ! Moved nTcpPort and nUdpPort to non-hidden scope
+    + Added nUdpPort and nTcpPort as initialization parameters
 
 2003-05-26 17:46 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/macro/Makefile

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.19 2003/04/21 23:21:29 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.20 2003/04/22 13:46:10 jonnymind Exp $
  */
 
 /*
@@ -59,6 +59,9 @@ CLASS tRPCClient
    DATA aServers
    DATA aFunctions
 
+   DATA nUdpPort
+   DATA nTcpPort
+
    /* asyncrhonous mode */
    DATA lAsyncMode
    /* block to be called at scan completion */
@@ -75,7 +78,7 @@ CLASS tRPCClient
    DATA bOnFunctionFail
 
 
-   METHOD New( cNetwork ) CONSTRUCTOR
+   METHOD New( cNetwork, nTcpPort, nUdpPort ) CONSTRUCTOR
    METHOD Destroy()
 
    /* Connection */
@@ -83,8 +86,8 @@ CLASS tRPCClient
    METHOD Disconnect()
 
    /* Network scan functions */
-   METHOD ScanServers( cName, nTime )
-   METHOD ScanFunctions( cName, cSerial, nTime )
+   METHOD ScanServers( cName )
+   METHOD ScanFunctions( cName, cSerial )
    METHOD ScanAgain()            INLINE ::UDPAccept()
    METHOD StopScan()
 
@@ -138,8 +141,6 @@ HIDDEN:
    /* Network data */
    DATA cServer
    DATA cNetwork
-   DATA nUdpPort
-   DATA nTcpPort
    DATA skUdp
    DATA skTcp
 
@@ -197,14 +198,13 @@ HIDDEN:
 ENDCLASS
 
 
-METHOD New( cNetwork ) CLASS tRPCClient
+METHOD New( cNetwork, nTcpPort, nUdpPort ) CLASS tRPCClient
    ::nStatus := RPC_STATUS_NONE // not connected
    ::nErrorCode := 0 // no RPC error
    ::cServer := NIL // no server
 
-   ::nUdpPort := 1139
-   ::nTcpPort := 1140
-
+   ::nUdpPort := IIF( nUdpPort == NIL, 1139, nUdpPort )
+   ::nTcpPort := IIF( nTcpPort == NIL, 1140, nTcpPort )
 
    ::skTcp := InetCreate()
    ::skUdp := InetDGram( .T. )
