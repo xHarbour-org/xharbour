@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.35 2004/05/17 15:18:03 jonnymind Exp $
+ * $Id: Changelog,v 1.36 2004/06/03 10:41:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
   
+2004-06-03 12:40 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclient.prg
+    ! Using (now properly) InetReadAll to read data slices.
+
 2004-06-03 12:40 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * tiputils.c
     ! TIP_FileMimeType was not closing the file if it had to
