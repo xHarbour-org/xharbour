@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.15 2002/08/28 00:36:45 lculik Exp $
+# $Id: makefile.bc,v 1.16 2002/12/11 11:06:53 ronpinkas Exp $
 #
 
 #
@@ -1939,14 +1939,13 @@ $(OBJ_DIR)\tpopup.obj : $(OBJ_DIR)\tpopup.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
+$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.c
    $(CC) $(CLIBFLAGS)  -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
+$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
    $(CC) $(CLIBFLAGS)  -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
 
 $(OBJ_DIR)\trace.obj : $(RTL_DIR)\trace.c
    $(CC) $(CLIBFLAGS) -o$@ $**
