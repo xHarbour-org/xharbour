@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.42 2004/06/03 02:38:21 kaddath Exp $
+ * $Id: adsfunc.c,v 1.43 2004/06/04 19:15:47 kaddath Exp $
  */
 
 /*
@@ -1783,7 +1783,7 @@ HB_FUNC( ADSVERSION )
    UNSIGNED32 ulMinor;
    UNSIGNED8  ucLetter;
    UNSIGNED8  ucDesc[128];
-   UNSIGNED16 usDescLen = sizeof(ucDesc) - 1;
+   UNSIGNED16 usDescLen = sizeof( ucDesc ) - 1, usPos;
    char ucVersion[256];
 
    AdsGetVersion( &ulMajor, &ulMinor, &ucLetter, ucDesc, &usDescLen );
@@ -1794,10 +1794,16 @@ HB_FUNC( ADSVERSION )
       sprintf( ucVersion, "%ld.%ld%c", ulMajor, ulMinor, ucLetter );
       break;
    case 3:
-      sprintf( ucVersion, "%s, v%ld.%ld%c", (char *)ucDesc, ulMajor, ulMinor, ucLetter );
+      sprintf( ucVersion, "%s, v%ld.%ld%c", (char *) ucDesc, ulMajor, ulMinor, ucLetter );
       break;
    default:
       ucVersion[0] = 0;
+   }
+
+   usPos = strlen( ucVersion ) - 1;
+   while( ucVersion[usPos] == 0x20 && usPos > 0 )  // remove trailing spaces
+   {
+      ucVersion[usPos--] = 0;
    }
 
    hb_retc( ucVersion );

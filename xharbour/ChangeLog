@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3409 2004/09/06 17:17:33 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3410 2004/09/06 19:25:38 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-06 12:45 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * contrib/ads_rdd/adsfunc.c
+    ! removed trailing spaces from adsVersion() return value
+  * tests/i18n/es_MX.hit
+    * Spanish (México) translation updated
 
 2004-09-06 23:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * hrbdll.bc
@@ -760,7 +766,7 @@
       to add other language translations
 
   + tests/i18n/es_MX.hit
-    + Spanish (Mï¿½ico) translation added
+    + Spanish (México) translation added
 
 2004-08-19 08:50 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/utils/hbdict/hbdict.prg
