@@ -1,5 +1,5 @@
 /*
- * $Id: gtslang.txt,v 1.4 2001/07/10 16:35:53 dholm Exp $
+ * $Id: gtslang.txt,v 1.1.1.1 2001/12/21 10:48:18 ronpinkas Exp $
  */
 
                         Gt Slang driver
@@ -29,15 +29,21 @@ Compiling a gt slang driver ...
 
 
 The driver should be automaticly compiled when you build Harbour from
-sourcees, regardless of what gt driver you've chosen by setting HB_GT_LIB.
+sources, regardless of what gt driver you've chosen by setting HB_GT_LIB.
 Succesfull compilation requires Slang library and Slang header files
 properly installed on your system. The driver expects Slang header files
 to be placed in <system_default_inc_dir>/slang/ directory on Linux based
 systems ( this usualy means /usr/include/slang on most of them ) and
 <system_default_inc_dir> on other systems (which is usually /usr/include).
 
-To build programs (by using a bld.sh script from Harbour sources), which
-will use a gtsln, you need to :
+If you want to have a gpm mouse support on Linux console you have to
+define an environment varable HB_GPM_MOUSE=yes. Note that this requires
+a gpm development package to be installed (gpm.h and libgpm.a). 
+
+Look at make_gnu.sh - a sample script to build Harbour from sources.
+
+To build user programs (by using a bld.sh script from Harbour sources), 
+which will use a gtsln, you need to :
     - have a Slang library and header files properly installed
     - set an environment variable HB_GT_LIB to gtsln
     - modify bld.sh by adding -lslang to a link command
@@ -188,11 +194,11 @@ Here is a (probably not complete) list of them :
       will work well in all cases, although generally it should work
 
     - a screen size change does not work at all. This is a big problem on
-      an xterm where you can change a window's size at your request.  Doing
+      an xterm where you can change a window's size at your request. Doing
       this confuses a Harbour program
 
-    - Clipper programs which utilized PC hardware specifications about screen
-      construction (an array of char+attr)  (for example to make quick shadow
+    - Clipper programs which utilize PC hardware specifications about screen
+      construction (an array of char+attr) (for example to make quick shadow
       on a screen) can't run properly. There is no hardware emulation at all
 
     - Tone() support currently works for Linux console only.
@@ -209,8 +215,6 @@ Here is a (probably not complete) list of them :
 
     - to get an ESC key you have to press ESC twice. This is an issue
       related to OS behavior where ESC begins a control sequence
-
-    - currently there is no mouse support. This is a TODO item
 
     - Out<XXX>() functions do not work well. This is caused by a design of
       a gt layer where writing directly to stdout is done outside Slang,
@@ -253,6 +257,7 @@ TODO
 
    - keyboard emulation on terminals with lack of posibilities
    - support for mouse on Linux text console and on xterm
+     ( already done )
    - fix a problem with redirecting output to a file or a pipe
    - find a way to inherit screen from a system at startup
      (is it possible at all ?)

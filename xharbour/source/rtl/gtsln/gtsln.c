@@ -81,7 +81,7 @@
 #endif
 #endif
 
-#include <unistd.h>
+//#include <unistd.h>
 #include <signal.h>
 #include <time.h>
 
@@ -93,6 +93,9 @@
 /* to convert DeadKey+letter to national character */
 extern unsigned char s_convKDeadKeys[];
 extern int hb_gt_Init_Terminal( int phase );
+
+/* standard output */
+/* static int s_iFilenoStdout; */
 
 /* to convert characters displayed */
 static void hb_gt_build_conv_tabs();
@@ -112,9 +115,6 @@ static SHORT s_sCursorStyle = SC_NORMAL;
 
 /* indicate if we are currently running a command from system */
 static BOOL s_bSuspended = FALSE;
-
-/* standard output */
-static int s_iFilenoStdout;
 
 /* to convert high characters (mostly graphics, nation and control chars) */
 static SLsmg_Char_Type s_convHighChars[ 256 ];
@@ -166,7 +166,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-   s_iFilenoStdout = iFilenoStdout;
+   /* s_iFilenoStdout = iFilenoStdout; */
    s_uiDispCount = 0;
 
    /* read a terminal descripion from a terminfo database */
@@ -246,9 +246,17 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
 void hb_gt_Exit( void )
 {
-   char *escstr;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
+
+   /* restore a standard bell frequency and duration */
+   if( hb_gt_UnderLinuxConsole )
+   {
+      char *escstr;
+
+      escstr = "\033[10]";  SLtt_write_string( escstr );
+      escstr = "\033[11]";  SLtt_write_string( escstr );
+      SLtt_flush_output();
+   }
 
    hb_mouse_Exit();
 
@@ -259,15 +267,6 @@ void hb_gt_Exit( void )
    SLsmg_refresh();
    SLsmg_reset_smg();
    SLang_reset_tty();
-
-   /* restore a standard bell frequency and duration */
-   if( hb_gt_UnderLinuxConsole )
-   {
-      escstr = "\033[10]";
-      write( s_iFilenoStdout, escstr, strlen( escstr ) );
-      escstr = "\033[11]";
-      write( s_iFilenoStdout, escstr, strlen( escstr ) );
-   }
 }
 
 /* *********************************************************************** */
@@ -318,7 +317,12 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
    /* SLtt_goto_rc( iRow, iCol ); */
 
    if( s_uiDispCount == 0 )
+   {
       SLsmg_refresh();
+#ifdef HAVE_GPM_H
+      hb_mouse_FixTrash();
+#endif
+   }
 }
 
 /* *********************************************************************** */
@@ -1198,7 +1202,7 @@ static void hb_gt_build_conv_tabs()
    }
 
    /* QUESTION: do we have double, single-double, ... frames under xterm ? */
-   if( hb_gt_UnderXTerm )
+   if( hb_gt_UnderXterm )
    {
       /* frames of all Clipper type are _B_SINBLE under xterm */
       s_convHighChars[ 205 ] = s_convHighChars[ 196 ];

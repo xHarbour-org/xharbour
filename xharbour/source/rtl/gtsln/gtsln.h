@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
  */
 
 /*
@@ -57,15 +57,17 @@
 #include <slang.h>
 #include "hbapigt.h"
 #include "inkey.ch"
+#include <unistd.h>
 
 /* *********************************************************************** */
 
 extern BOOL hb_gt_UnderLinuxConsole;
-extern BOOL hb_gt_UnderXTerm;
+extern BOOL hb_gt_UnderXterm;
 
 /* *********************************************************************** */
 
 void hb_gt_Init_TermType();
-int hb_gt_MouseInkey( HB_inkey_enum eventmask );
+int  hb_mouse_Inkey( HB_inkey_enum EventMask );
+void hb_mouse_FixTrash();
 
 /* *********************************************************************** */

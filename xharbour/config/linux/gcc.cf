@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.20 2001/12/26 21:21:08 dholm Exp $
+# $Id: gcc.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -56,6 +56,11 @@ endif
 
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
+endif
+
+# HB_GPM_MOUSE: use gpm mouse driver
+ifeq ($(HB_GPM_MOUSE),yes)
+LINKLIBS += -lgpm
 endif
 
 LINKLIBS += -lm -Wl,--end-group

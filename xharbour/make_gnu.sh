@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.8 2001/05/15 11:46:55 vszakats Exp $
+# $Id: make_gnu.sh,v 1.1.1.1 2001/12/21 10:40:33 ronpinkas Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,7 +16,8 @@
 
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
-if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=; fi
+if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
+if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
 
 # export PRG_USR=
 # export C_USR=

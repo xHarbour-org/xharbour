@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 /* *********************************************************************** */
 
 BOOL hb_gt_UnderLinuxConsole = FALSE;
-BOOL hb_gt_UnderXTerm = FALSE;
+BOOL hb_gt_UnderXterm = FALSE;
 
 /* *********************************************************************** */
 
@@ -75,7 +75,8 @@ void hb_gt_Init_TermType()
     
     /* an uncertain way to check if we run under xterm */
     Env = hb_getenv( "TERM" );
-    hb_gt_UnderXTerm = Env && Env[ 0 ] != '\0' && ( strstr( Env, "xterm" ) != NULL );
+    hb_gt_UnderXterm = Env && Env[ 0 ] != '\0' && 
+	( ( strstr( Env, "xterm" ) != NULL ) || ( strncmp( Env, "rxvt", 4 ) == 0 ) );
     if( Env )
         hb_xfree( ( void * ) Env );
 }

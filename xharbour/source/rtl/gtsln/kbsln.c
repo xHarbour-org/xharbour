@@ -192,14 +192,14 @@ static void hb_gt_Init_KeyTranslations()
     }
  
     /* mouse events under xterm */
-    if( hb_gt_UnderXTerm )
+    if( hb_gt_UnderXterm )
     {
         keyseq = SLtt_tgetstr( "Km" );
         if( ( keyseq != NULL ) && ( keyseq[ 0 ] != 0 ) )
-	{
-	    //fprintf( stderr, "%s\r\n", keyseq );
+        {
+            //fprintf( stderr, "%s\r\n", keyseq );
             SLkp_define_keysym( keyseq, SL_KEY_MOU );
-	}
+        }
     }
     
     /* five on numeric console */
@@ -272,28 +272,22 @@ int hb_gt_Init_Terminal( int phase )
         hb_gt_SortKeyTranslationTable();
     }
  
-    return ret;
+    return( ret );
 }
 
 /* *********************************************************************** */
 
 int hb_gt_ExtendedKeySupport()
 {
-    return 0;
+    return( 0 );
 }
 
 /* *********************************************************************** */
-
-#undef DO_LOCAL_DEBUG
-/* #define DO_LOCAL_DEBUG */
 
 int hb_gt_ReadKey( HB_inkey_enum eventmask )
 {
     static int InDeadState = FALSE;
     unsigned int ch, tmp, kbdflags;
-#ifdef DO_LOCAL_DEBUG
-    USHORT savy, savx;
-#endif
  
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
  
@@ -301,7 +295,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
  
     /* user AbortKey break */
     if( SLKeyBoard_Quit == 1 )
-        return HB_BREAK_FLAG;
+        return( HB_BREAK_FLAG );
  
     /* has screen size changed ? */
     if( hb_gt_sln_bScreen_Size_Changed )
@@ -314,111 +308,98 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
         /* TODO: we need here some kind of screen redrawing */
         /*SLsmg_refresh();*/
     }
- 
-    if( SLang_input_pending( 0 ) > 0 )
-    {
+
+    /* if no pending chars */
+    if( 0 == SLang_input_pending( 0 ) )
+        return( hb_mouse_Inkey( eventmask ) );
+        
 #if HB_GT_KBD_MODIF_MASK
-        kbdflags = hb_gt_try_get_Kbd_State();
+    kbdflags = hb_gt_try_get_Kbd_State();
 #else
-        kbdflags = 0;
+    kbdflags = 0;
 #endif
 
 /* ------- one key ESC handling ----------------- */
-        /* NOTE: This will probably not work on slow terminals
-           or on very busy lines (i.e. modem lines ) */
-        ch = SLang_getkey();
- 
-#ifdef DO_LOCAL_DEBUG
-        hb_gtGetPos( &savy, &savx );
-        SLsmg_gotorc( 23, 40 );
-        SLsmg_printf( " %8x %d              ", ch, kbdflags );
-        SLsmg_gotorc( savy, savx );
-#endif
-        if( ch == 033 )   /* escape pressed - wait 1 sec for another key */
-            if( 0 == SLang_input_pending( 10 ) )
-                return( 0 );
- 
-        /* user AbortKey break */
-        if( ch == s_hb_gt_Abort_key )
-            return HB_BREAK_FLAG;
- 
-        SLang_ungetkey( ch );
+    /* NOTE: This will probably not work on slow terminals
+       or on very busy lines (i.e. modem lines ) */
+    ch = SLang_getkey();
+
+    if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
+        if( 0 == SLang_input_pending( 6 ) )
+            return( 0 );
+
+    /* user AbortKey break */
+    if( ch == s_hb_gt_Abort_key )
+        return( HB_BREAK_FLAG );
+
+    SLang_ungetkey( ch );
 /* ------------------------------------------------- */
 
-        ch = SLkp_getkey();
- 
-        if( ch != SL_KEY_ERR )
+    ch = SLkp_getkey();
+
+    /* unrecognized character */
+    if( ch == SL_KEY_ERR )
+        return( 0 );
+        
+    /* Dead key handling */
+    if( InDeadState )
+    {
+        InDeadState = FALSE;
+        if( ch == hb_DeadKey ) /* double press Dead key */
+            return( ch );
+        if( ch < 256 )  /* is this needed ??? */
         {
             int i;
- 
-#ifdef DO_LOCAL_DEBUG
-            hb_gtGetPos( &savy, &savx );
-            SLsmg_gotorc( 23, 0 );
-            SLsmg_printf( " %8x %d                             ", ch, kbdflags );
-            SLsmg_gotorc( savy, savx );
-#endif
-            /* Dead key handling */
-            if( InDeadState )
-            {
-                InDeadState = FALSE;
-                if( ch == hb_DeadKey ) /* double press Dead key */
-                    return ch;
-                if( ch < 256 )  /* is this needed ??? */
-                {
-                    for( i=0; i < ( int ) s_convKDeadKeys[ 0 ]; i++ )
-                        if( ( int ) s_convKDeadKeys[ 2 * i + 1 ] == ch )
-                            return ( int ) s_convKDeadKeys[ 2 * i + 2 ];
-                }
-                return 0;
-            }
-            else if( ch == hb_DeadKey )
-            {
-                /* entering Dead key state */
-                InDeadState = TRUE;
-                return 0;
-            }
-  
-            /* any special key ? */
-            if( ( tmp = ( ch | ( kbdflags << 16 ) ) ) > 256 )
-            {
-    		if( ( tmp = SL_KEY_MOU ) ) 
-		{
-		    if( ( eventmask & MOUSE_ALL_EVENTS_MASK ) != 0 )
-			return hb_gt_MouseInkey( eventmask );
-		    else
-		    {
-			/* mouse events are not requested so */
-			/* clear a reported mouse position */
-			/* NOTE : this will work only under Xterm */
-    			SLang_getkey(); SLang_getkey(); SLang_getkey();
-	                if( ( eventmask & INKEY_RAW ) == 0 )
-		            return 0;
-			else
-		            return tmp;
-		    }
-		}
-		
-                if( ( eventmask & INKEY_RAW ) == 0 )
-                {
-                    tmp = hb_gt_FindKeyTranslation( tmp );
-   
-                    /* TOFIX: this code is broken - needs a diffrent aproach */
-                    if( tmp == 0 )
-                    {
-                        tmp = hb_gt_FindKeyTranslation( ch );
-                        if( tmp == 0 && ch < 256 ) tmp = ch;
-                    }
-                }
-  
-                return tmp;
-            }
-  
-            /* standard ASCII key */
-            return ch;
+            for( i=0; i < ( int ) s_convKDeadKeys[ 0 ]; i++ )
+                if( ( int ) s_convKDeadKeys[ 2 * i + 1 ] == ch )
+                    return( ( int ) s_convKDeadKeys[ 2 * i + 2 ] );
         }
+        return( 0 );
     }
- 
-    return 0;
+    else if( ch == hb_DeadKey )
+    {
+        /* entering Dead key state */
+        InDeadState = TRUE;
+        return( 0 );
+    }
+
+    /* any special key ? */
+    if( ( tmp = ( ch | ( kbdflags << 16 ) ) ) > 256 )
+    {
+        if( ( tmp == SL_KEY_MOU ) ) 
+        {
+            if( ( eventmask & MOUSE_ALL_EVENTS_MASK ) != 0 )
+                return( hb_mouse_Inkey( eventmask ) );
+            else
+            {
+                /* mouse events are not requested so */
+                /* clear a reported mouse position */
+                /* NOTE : this will work only under Xterm */
+                SLang_getkey(); SLang_getkey(); SLang_getkey();
+                if( ( eventmask & INKEY_RAW ) == 0 )
+                    return( 0 );
+                else
+                    return( tmp );
+            }
+        }
+        
+        if( ( eventmask & INKEY_RAW ) == 0 )
+        {
+            tmp = hb_gt_FindKeyTranslation( tmp );
+
+            /* TOFIX: this code is broken - needs a diffrent aproach */
+            if( tmp == 0 )
+            {
+                tmp = hb_gt_FindKeyTranslation( ch );
+                if( tmp == 0 && ch < 256 ) tmp = ch;
+            }
+        }
+
+        return( tmp );
+    }
+
+    /* standard ASCII key */
+    return( ch );
 }
 
 /* *********************************************************************** */

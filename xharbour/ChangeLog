@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.150 2002/04/06 21:25:28 map Exp $
+ * $Id: ChangeLog,v 1.151 2002/04/15 05:06:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-16 18:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * make_gnu.sh
+  * config/linux/gcc.cf
+  * doc/en/gtslang.txt
+  * source/rtl/gtsln/Makefile
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/gtsln.h
+  * source/rtl/gtsln/kbsln.c
+  * source/rtl/gtsln/mousesln.c
+  * source/rtl/gtsln/termtype.c
+    + Added gpm mouse support on linux console
+    * Fixed mouse support under xterm
 
 2002-04-14 22:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * doc/inline_c.txt
@@ -32,7 +45,7 @@
   * source/rtl/gtsln/mousesln.c
   + source/rtl/gtsln/gtsln.h
   + source/rtl/gtsln/termtype.c
-    * Added very basic mouse support under xterm
+    + Added very basic mouse support under xterm
 
 2002-04-04 11:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
