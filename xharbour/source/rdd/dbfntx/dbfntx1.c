@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.42 2003/05/31 22:26:54 lculik Exp $
+ * $Id: dbfntx1.c,v 1.43 2003/06/05 17:19:39 lculik Exp $
  */
 
 /*
@@ -3133,7 +3133,8 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         }
         else
         {
-           retvalue = SELF_GOTO( ( AREAP ) pArea, lRecno );
+           hb_ntxTagKeyGoTo( pTag, BTTM_RECORD, NULL );
+           retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
            pArea->fFound = TRUE;
            return retvalue;
         }

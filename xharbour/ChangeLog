@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1117 2003/06/15 14:26:28 patrickmast Exp $
+ * $Id: ChangeLog,v 1.1118 2003/06/15 18:05:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-14 17:10 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  * xharbour/source/lang/msges.c
+    xharbour/source/lang/msgeo.c
+    xharbour/source/lang/msgpt.c
+    xharbour/source/lang/msgfr.c
+     ! the bug reported by Alexander in msgru* on harbour-devel fixed.
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Bug fixed, related to seek with lLast and go bottom with scope set.
+    Borrow from harbour
 
 2003-06-14 14:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
