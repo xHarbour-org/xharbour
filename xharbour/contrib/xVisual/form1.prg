@@ -6,7 +6,7 @@ GLOBAL Form1
 // ! AUTO_GENERATED !
 CLASS TForm1 FROM TForm
 
-   DATA CAPTION INIT "TForm1"
+   DATA CAPTION INIT "Form1"
    DATA HEIGHT INIT        400
    DATA LEFT INIT        200
    DATA STYLE INIT   13565952
@@ -75,11 +75,9 @@ METHOD Button1Click( Sender /* Button1 class TButton() */ ) CLASS TForm1
    Sender:Caption := "New Caption"    // Still very fast.
    // Or:
    Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
-   :Update()
 
    // Now self:
    ::Caption := "My Form"     // Faster.
-   ::Update()
 
    END WITH // Sender
 

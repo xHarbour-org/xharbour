@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.50 2002/10/30 21:39:26 ronpinkas Exp $
+ * $Id: TForm.prg,v 1.51 2002/10/31 04:08:43 what32 Exp $
  */
 
 /*
@@ -165,8 +165,6 @@ METHOD Add( oObj, lCreate ) CLASS TForm
    IF lCreate
       oObj:Create()
    endif
-
-   OutputDebugString( CRLF + "*** " + oObj:Name + " ***" + CRLF );
 
    aAdd( ::Controls, oObj )
 
