@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.3 2002/08/20 20:43:35 ronpinkas Exp $
+rem $Id: !pack_src.bat,v 1.4 2003/04/02 02:10:40 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -112,6 +112,10 @@ rem SOURCE\RTL\GT_TPL
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gt_tpl/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gt_tpl/*.c
 
+rem SOURCE\RTL\GTNUL
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtnul/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtnul/*.c
+
 rem SOURCE\RTL\GTCGI
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcgi/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcgi/*.c
@@ -119,6 +123,7 @@ rem SOURCE\RTL\GTCGI
 rem SOURCE\RTL\GTCRS
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcrs/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcrs/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcrs/*.h
 
 rem SOURCE\RTL\GTDOS
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtdos/Makefile
@@ -135,6 +140,7 @@ rem SOURCE\RTL\GTPCA
 rem SOURCE\RTL\GTSLN
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtsln/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtsln/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtcrs/*.h
 
 rem SOURCE\RTL\GTSTD
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtstd/Makefile
@@ -173,6 +179,7 @@ rem UTILS\HBMAKE
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbmake/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbmake/*.ch
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbmake/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% utils/hbmake/*.c
 
 rem UTILS\HBPP
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbpp/Makefile
