@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.20 2003/08/02 10:22:10 druzus Exp $
+# $Id: xharbour.spec,v 1.21 2003/08/03 19:06:52 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -35,9 +35,9 @@
 %define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
 %define hb_cgpm  export HB_GPM_MOUSE="%{hb_gpm}"
 %define hb_cmgt  export HB_MULTI_GT="%{hb_mgt}"
-%define hb_bdir  export HB_BIN_INSTALL="%{prefix}/bin/"
-%define hb_idir  export HB_INC_INSTALL="%{prefix}/include/%{name}/"
-%define hb_ldir  export HB_LIB_INSTALL="%{prefix}/lib/%{name}/"
+%define hb_bdir  export HB_BIN_INSTALL="%{prefix}/bin"
+%define hb_idir  export HB_INC_INSTALL="%{prefix}/include/%{name}"
+%define hb_ldir  export HB_LIB_INSTALL="%{prefix}/lib/%{name}"
 %define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -90,6 +90,7 @@ uma maquina virtual e documenta‡Æo
 Summary:        Shared runtime libaries for %{dname} compiler
 Summary(pl):    Dzielone bilioteki dla kompilatora %{dname}
 Group:          Development/Languages
+Provides:       lib%{name}.so lib%{name}mt.so
 
 %description lib
 %{dname} is a Clipper compatible compiler.
@@ -228,7 +229,7 @@ popd
 # build fm lib with memory statistic
 pushd source/vm
     TMP_C_USR=$C_USR
-    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/-DHB_PARANOID_MEM_CHECK}
     rm -f fm.o
     make fm.o
     ar -r $HB_LIB_INSTALL/libfm.a fm.o
@@ -377,8 +378,8 @@ HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
 HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
 
 # set environment variables
-%{hb_cc}
 %{hb_arch}
+%{hb_cc}
 [ -z "\${HB_BIN_INSTALL}" ] && %{hb_bdir}
 [ -z "\${HB_INC_INSTALL}" ] && %{hb_idir}
 [ -z "\${HB_LIB_INSTALL}" ] && %{hb_ldir}
@@ -411,7 +412,7 @@ done
 HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
+[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
@@ -465,7 +466,7 @@ hb_lnk_request()
 	fi
 	echo "}"
     fi
-    gt="\${HB_GT_REQ%% *}"
+    gt="\${HB_GT_REQ%%%% *}"
     if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
 	echo "#include \\"hbinit.h\\""
 	echo "extern char * s_defaultGT;"

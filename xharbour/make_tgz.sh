@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.7 2003/08/01 19:52:44 druzus Exp $
+# $Id: make_tgz.sh,v 1.8 2003/08/02 10:22:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -59,7 +59,7 @@ popd
 # build fm lib with memory statistic
 pushd source/vm
     TMP_C_USR=$C_USR
-    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/-DHB_PARANOID_MEM_CHECK}
     rm -f fm.o
     make fm.o
     ar -r $HB_LIB_INSTALL/libfm.a fm.o
@@ -221,7 +221,7 @@ done
 HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
+[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"

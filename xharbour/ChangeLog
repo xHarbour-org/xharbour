@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1324 2003/08/03 02:47:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1325 2003/08/05 10:20:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-05 16:41 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/fm.c
+    * added code for initializing allocated memory with 
+      static complex HB_ITEM. This code is compiled when
+      macro HB_PARANOID_MEM_CHECK is set and there is no
+      macro HB_FM_STATISTICS_OFF
+  * xharbour/xharbour.spec
+  * xharbour/make_tgz.sh
+    * libfm (fm.o with memory statistic) is compiled with
+      HB_PARANOID_MEM_CHECK macro
 
 2003-08-05 03:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/cstr.prg

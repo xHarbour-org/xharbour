@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.37 2003/07/20 17:50:03 jonnymind Exp $
+ * $Id: fm.c,v 1.38 2003/08/01 18:29:37 jacekp Exp $
  */
 
 /*
@@ -101,6 +101,16 @@
 #include "hbapierr.h"
 #include "hbmemory.ch"
 
+#ifndef HB_FM_STATISTICS
+# undef HB_PARANOID_MEM_CHECK
+#endif
+
+#ifdef HB_PARANOID_MEM_CHECK
+   HB_ITEM itmMemStat;
+   char *pszMemStat = "This is static text for paranoid mem test.";
+   BOOL bParanoidMemInit = FALSE;
+#endif
+
 #if defined(HB_FM_STATISTICS) && !defined(HB_TR_LEVEL)
    #define HB_TR_LEVEL HB_TR_ERROR
 #endif
@@ -130,6 +140,47 @@ static LONG s_lFreed = 0;
 static PHB_MEMINFO s_pFirstBlock = NULL;
 static PHB_MEMINFO s_pLastBlock = NULL;
 
+#endif
+
+#ifdef HB_PARANOID_MEM_CHECK
+void hb_paraniodMemInit( void *pMem, ULONG ulSize )
+{
+   void *pTmp;
+
+   if( !bParanoidMemInit )
+   {
+      itmMemStat.type = HB_IT_STRING;
+      itmMemStat.item.asString.puiHolders = (USHORT*) malloc( sizeof( USHORT ) );
+      *( itmMemStat.item.asString.puiHolders ) = 1;
+      itmMemStat.item.asString.bStatic = FALSE;
+      itmMemStat.item.asString.length  = strlen(pszMemStat);
+      itmMemStat.item.asString.value   = pszMemStat;
+
+      bParanoidMemInit = TRUE;
+   }
+   pTmp = pMem + ulSize - sizeof(HB_ITEM);
+   while( pTmp >= pMem )
+   {
+      memcpy(pTmp, &itmMemStat, sizeof(HB_ITEM));
+      pTmp -= sizeof(HB_ITEM);
+   }
+   //memset(pMem, 0, ulSize);
+}
+
+void hb_paraniodMemCheck( void *pMem )
+{
+   static BOOL bLoop = FALSE;
+   
+   if( ! bLoop &&
+       ( pMem == pszMemStat ||
+         pMem == itmMemStat.item.asString.puiHolders ||
+         itmMemStat.item.asString.puiHolders == NULL ||
+         *( itmMemStat.item.asString.puiHolders ) != 1 ) )
+   {
+      bLoop = TRUE;
+      hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) [Paranoid Test] Pointer Overflow '%s'", (char *) pMem, (char *) pMem );
+   }
+}
 #endif
 
 /* allocates fixed memory, do *not* exits on failure */
@@ -237,6 +288,9 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
+#ifdef HB_PARANOID_MEM_CHECK
+   hb_paraniodMemInit( ( char * ) pMem + sizeof( HB_MEMINFO ), ulSize );
+#endif
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -357,6 +411,9 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
+#ifdef HB_PARANOID_MEM_CHECK
+   hb_paraniodMemInit( ( char * ) pMem + sizeof( HB_MEMINFO ), ulSize );
+#endif
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -466,6 +523,10 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
+#ifdef HB_PARANOID_MEM_CHECK
+   if( ulSize > ulMemSize )
+      hb_paraniodMemInit( ( char * ) pMem + sizeof( HB_MEMINFO ) + ulMemSize, ulSize - ulMemSize );
+#endif
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -518,6 +579,9 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - sizeof( HB_MEMINFO ) );
       ULONG *pSig;
 
+#ifdef HB_PARANOID_MEM_CHECK
+      hb_paraniodMemCheck( pMem );
+#endif
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
       {
          //printf( "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
