@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.280 2002/06/17 22:40:42 andijahja Exp $
+ * $Id: ChangeLog,v 1.281 2002/06/18 05:48:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-18 17:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Modified syntax for Members of basic type to use IS instead of AS syntax.
+    + Added support for syntax IS <structureName> as a replacement to IS C STRUCTURE <structureName>
+    + Added support for syntax MEMBER <member> AS <structureName> as a replacement to AS C STRUCTURE <structureName>
+    + Added suport for optional := | INIT | FROM { ... } as an optional postfix to IS <structureName>
+    + Added Method Init( <aValues> ) to initialize the structure from a supplied [possibly nested] array.
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * tests/tstcstru.prg
+    * Modified to demonstrate Members of basic type syntax was changed to: IS CTYPE*
+    * Modified to that nested structure are declared with the much simpler:
+         IS <structureName> or AS <structureName> instead of IS|AS C STRUCTURE <structureName>.
+    * Modified to demonstrate new IS <structureName> := {...} syntax to provide inline initialization of all members.
 
 2002-06-17 22:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/cstruct.ch

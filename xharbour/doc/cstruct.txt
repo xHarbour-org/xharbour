@@ -7,12 +7,12 @@ Syntax:
    Definition:
    -----------
 
-   C STRUCTURE <strucName> [Align <nAlign>]
-     [ MEMBER <memberName> AS <CTYPEDEF> ]
-     [ MEMBER <memberName>\[<ArrayLength>\] AS <CTYPEDEF> ]
-     [ MEMBER <memberName> AS <CTYPEDEF> (<ArrayLength>) ]
-     [ MEMBER <memberName> AS C STRUCTURE <strucName> ]
-     [ MEMBER <memberName> IS|INPLACE C STRUCTURE <strucName> ]
+   C STRUCTURE <strucName> [Align <align>]
+     [ MEMBER <memberName> IS <CTYPEDEF> ]
+     [ MEMBER <memberName[<arrayLength>]> IS <CTYPEDEF> ]
+     [ MEMBER <memberName> IS <CTYPEDEF>(<arrayLength>) ]
+     [ MEMBER <memberName> IS|INPLACE <strucName> ]
+     [ MEMBER <memberName> AS <strucName> ]
      [ ... ]
    END C STRUCTURE
 
@@ -20,7 +20,11 @@ Syntax:
    Usage:
    ------
 
-   <lValue> := C STRUCTURE <strucName>
+   <lValue> IS <strucName>
+
+   <lValue> IS <strucName> := {...}
+
+   <lValue> IS <strucName> INIT|FROM {...}
 
    <strucObj>:<memberName>
 
@@ -40,23 +44,28 @@ Properties:
 Methods:
 --------
 
-   Reset           -> Initializes all Structure Member properties to NIL.
+   Reset              -> Initializes all Structure Member properties to NIL.
 
-   Buffer( [New] ) -> Optionally SET the InternalBuffer to a new image, which will automatically
-                      call the DeValue() Method to reflect the change in Member Properties.
+   Buffer( [New] )    -> Optionally SET the InternalBuffer to a new image, which will automatically
+                         call the DeValue() Method to reflect the change in Member Properties.
 
-                      Return a copy of the InternalBuffer.
+                         Return a copy of the InternalBuffer.
 
-   Value           -> Return a newly calculated C Structure Image and record it into InternalBuffer.
+   Value              -> Return a newly calculated C Structure Image and record it into InternalBuffer.
 
-   DeValue         -> Calculates new values for all Member Properties to reflect the current image of
-                      the C Structure from the InternalBuffer.
+   DeValue            -> Calculates new values for all Member Properties to reflect the current image of
+                         the C Structure from the InternalBuffer.
 
-                      Return Array of Member Properties values.
+                         Return Array of Member Properties values.
 
-   Array           -> Return Array of Member Properties values.
+   Array              -> Return Array of Member Properties values.
 
-   SayMembers( cPad ) Outputs formated list of all Members and Sub-Members.
+   SayMembers( cPad ) -> Outputs formated list of all Members and Sub-Members.
+
+   Init( aValues )    -> Initializes the structure with the values supplied in the [optionaly nested]
+                         aValues array.
+ 
+                      -> Return refernce to the initialized stracture object.
 
 
 PRG Support Functions:

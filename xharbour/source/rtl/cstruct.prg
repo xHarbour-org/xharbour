@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.4 2002/06/17 08:07:36 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.5 2002/06/18 05:48:40 ronpinkas Exp $
  */
 
 /*
@@ -137,6 +137,7 @@ Function HB_CStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "DeValue"   , @DeValue()    , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Array"     , @ArrayMethod(), HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
 
       Counter := 1
       FOR EACH cMember IN acMembers
@@ -235,22 +236,22 @@ Function HB_CStructureFromID( nID, nAlign )
    ENDIF
 
    IF s_aClasses[nID][2] == NIL
-      Alert( "Invalid ID: " + Str( nID ) )
-      Return NIL
+      // Meta class was not created yet.
+      Return HB_CStructure( s_aClasses[nId][1] )
    ELSE
       hClass := s_aClasses[nId][2]
+
+      oStructure := __clsInst( hClass )
+
+      // All instances will share the same definitions array.
+      oStructure:aCTypes := s_aClasses[nID][4]
+
+      oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
+
+      oStructure:SizeOf := HB_SizeOfCStructure( oStructure:acTypes, oStructure:nAlign )
+
+      oStructure:nID = nID + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
    ENDIF
-
-   oStructure := __clsInst( hClass )
-
-   // All instances will share the same definitions array.
-   oStructure:aCTypes := s_aClasses[nID][4]
-
-   oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
-
-   oStructure:SizeOf := HB_SizeOfCStructure( oStructure:acTypes, oStructure:nAlign )
-
-   oStructure:nID = nID + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
 
 Return oStructure
 
@@ -280,6 +281,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "DeValue"   , @DeValue()    , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Array"     , @ArrayMethod(), HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
 
       FOR Counter := 1 TO nLen
          cMember := "Element_" + LTrim( Str( Counter ) )
@@ -415,4 +417,19 @@ STATIC Function ArrayMethod()
    aScan( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
 Return aValues
+
+//---------------------------------------------------------------------------//
+STATIC Function Init( aValues )
+
+    LOCAL Counter, nLen := Len( aValues )
+
+    FOR Counter := 1 TO nLen
+       IF Left( QSelf()[Counter]:ClassName, 11 ) == "C Structure"
+          QSelf()[Counter]:Init( aValues[Counter] )
+       ELSE
+          QSelf()[Counter] := aValues[Counter]
+       ENDIF
+    NEXT
+
+Return QSelf()
 //---------------------------------------------------------------------------//

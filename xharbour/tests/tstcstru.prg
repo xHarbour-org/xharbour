@@ -2,39 +2,27 @@
 
 // Different Alignment
 C STRUCTURE MyNestedStructure Align 1
-  Member c1[2] AS CTYPE_CHAR
-  Member l2    AS CTYPE_LONG
+  Member c1[2] IS CTYPE_CHAR
+  Member l2    IS CTYPE_LONG
 END C STRUCTURE
 
 C STRUCTURE MyStructure Align 4
-  Member sName    AS CTYPE_CHAR_PTR
-  Member cAge     AS CTYPE_CHAR
-  Member uiWeight AS CTYPE_UNSIGNED_INT
-  Member dHeight  AS CTYPE_DOUBLE
+  Member sName    IS CTYPE_CHAR_PTR
+  Member cAge     IS CTYPE_CHAR
+  Member uiWeight IS CTYPE_UNSIGNED_INT
+  Member dHeight  IS CTYPE_DOUBLE
 
   // This is IN-PLACE - Note IS clause (may also use INPLACE clause).
-  Member Nested   IS C STRUCTURE MyNestedStructure
+  Member Nested   IS MyNestedStructure
 
-  // This is DETACHED (default).
-  Member pNext    AS C STRUCTURE MyStructure
+  // This is DETACHED - Note AS clause.
+  Member pNext    AS MyStructure
 END C STRUCTURE
 
 Procedure Main()
 
-   LOCAL oStructure := C STRUCTURE MyStructure
-
-   oStructure:sName    := "Tom"
-   oStructure:cAge     := 10
-   oStructure:uiWeight := 35
-   oStructure:dHeight  := 1.10
-
-   // Automatic initialization of In-Place Structure Members.
-   WITH OBJECT oStructure:Nested
-       // Automatic initialization of Array Members.
-       :c1[1] := 65
-       :c1[2] := 0
-       :l2 := 10000
-   END WITH
+   // Initialize from Nested Array.
+   LOCAL oStructure IS MyStructure := { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
 
    // Manualy initialize DETACHED Structure Member.
    oStructure:pNext := C STRUCTURE MyStructure
@@ -44,6 +32,7 @@ Procedure Main()
        :uiWeight := 1000
        :dHeight  := 2.22
 
+        // Automatic initialization of In-Place Structure Members.
        :Nested:c1[1] := 66
        :Nested:c1[2] := 0
        :Nested:l2 := 20000
