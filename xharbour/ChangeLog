@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1370 2003/08/20 22:07:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1371 2003/08/20 23:17:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-20 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed optimization of SubStr( x, n, 1 ) => x[n] to NOT optimize SubStr( NonDeclaredVar, n, 1 )
+      because NonDeclaredVar maybe a non declared FIELD, but Array context forces a MEMVAR resolution.
 
 2003-08-20 16:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/macro.c
