@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.2 2002/01/23 02:32:08 ronpinkas Exp $
+ * $Id: inkey.c,v 1.3 2003/01/27 04:21:36 walito Exp $
  */
 
 /*
@@ -356,6 +356,12 @@ HB_FUNC( __KEYBOARD )
       {
 
          BYTE * fPtr        = ( BYTE * ) hb_parc( 1 );
+         /* it is just a request to clear the buffer */
+         if( *fPtr == 0 )
+         {
+            return;
+         }
+
          BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
          PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
          PHB_inkeyKB pRoot;
@@ -391,13 +397,13 @@ HB_FUNC( __KEYBOARD )
 
 
          hb_inkeyPut( -99 );
-               
+
 /*
-         // Stuff the string 
+         // Stuff the string
 
          if( size >= ( ULONG ) hb_set.HB_SET_TYPEAHEAD )
          {
-            // Have to allow for a zero size typehead buffer 
+            // Have to allow for a zero size typehead buffer
             if( hb_set.HB_SET_TYPEAHEAD )
                size = ( ULONG ) ( hb_set.HB_SET_TYPEAHEAD - 1 );
             else

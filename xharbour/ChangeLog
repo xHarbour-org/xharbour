@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.689 2003/02/06 19:34:09 andijahja Exp $
+ * $Id: ChangeLog,v 1.690 2003/02/07 10:28:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-07 15:50 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+  *source/rtl/inkey.c
+    ! Keyboard chr( 0 ) was hanging the next inkey() instead of cleaning
+      the input buffer. Now it is fixed.
 
 2003-02-07 11:30 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
   *include/inet.h
