@@ -1,5 +1,5 @@
 /*
- * $Id: ascpos.prg,v 1.2 2001/07/17 20:27:13 mbirdyg Exp $
+ * $Id: ascpos.prg,v 1.1 2003/03/04 21:05:34 lculik Exp $
  */
 
 /*
@@ -53,9 +53,6 @@
  */
 
 
-#include "../ct.ch"
-
-
 procedure main
 
  ctinit()
@@ -66,6 +63,7 @@ procedure main
  qout ([  ascpos ("0123456789") == 57   ? --> ] + str (ascpos ("0123456789")))   
  qout ([  ascpos ("0123456789",1) == 48 ? --> ] + str (ascpos ("0123456789",1))) 
  qout ([  ascpos ("0123456789",11) == 0 ? --> ] + str (ascpos ("0123456789",11)))
+ qout( [  ascpos( Chr( 160 ) ) == 160   ? --> ] + str( ascpos( Chr( 160 ) ) ) )
 
  qout ("")
  qout ("End test of ASCPOS()")

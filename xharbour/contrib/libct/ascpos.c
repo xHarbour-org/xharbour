@@ -1,5 +1,5 @@
 /*
- * $Id: ascpos.c,v 1.3 2001/07/23 16:38:00 mbirdyg Exp $
+ * $Id: ascpos.c,v 1.1 2003/03/04 21:03:59 lculik Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ static void do_ascpos (int iSwitch)
   {
   
     size_t sStrSize = hb_parclen (1);
-    char *pcString = hb_parc (1);
+    BYTE *pcString = hb_parc (1);
     size_t sPos;
 
     if (ISNUM (2))
