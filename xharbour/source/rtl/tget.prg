@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.71 2004/03/27 17:50:05 guerra000 Exp $
+ * $Id: tget.prg,v 1.72 2004/03/28 05:39:06 guerra000 Exp $
  */
 
 /*
@@ -215,7 +215,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::lMinusPrinted := .f.
 
 //   ::Picture    := cPicture
-   ::cPicture   := Upper( cPicture )
+   ::cPicture   := /*Upper(*/ cPicture /*)*/
    #ifdef HB_COMPAT_C53
    ::Caption    := ""
    ::CapRow     := 0
