@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.31 2002/10/27 01:29:24 what32 Exp $
+ * $Id: TApplication.prg,v 1.32 2002/10/29 01:42:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -119,7 +119,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
    IF oParent:handle == ::handle
       aAdd( ::aForms, oForm )
    ENDIF
-   
+
    aAdd( ::AppForms, oForm:Name )
 
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
@@ -132,8 +132,9 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
             :Create()
          END WITH
       ENDIF
-      ProcessMessages()
    NEXT
+
+   ProcessMessages()
 
    oTarget := oForm
 
@@ -152,7 +153,6 @@ METHOD RemoveForm( oForm ) CLASS Application
 return(nRet)
 
 *------------------------------------------------------------------------------*
-
 METHOD CreateFrame( cName, oFrame ) CLASS Application
 
    LOCAL n
@@ -168,10 +168,9 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
    oFrame:propname:=cName
    oFrame:Create()
 
-   RETURN( oFrame )
+RETURN( oFrame )
 
-
-
+*------------------------------------------------------------------------------*
 #pragma BEGINDUMP
 
 #define _WIN32_WINNT   0x0400
@@ -182,19 +181,14 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
 #include "hbstack.h"
 #include "hbapiitm.h"
 
-
 HB_FUNC( PROCESSMESSAGES )
-  {
-    MSG msg ;
-    while ( PeekMessage( &msg,NULL,0,0,PM_REMOVE ))
-    {
+{
+   MSG msg ;
+
+   while( PeekMessage( &msg,NULL, 1, 65000, PM_REMOVE ) )
+   {
       TranslateMessage(&msg);
       DispatchMessage(&msg);
-    }
-  }
-
-
+   }
+}
 #pragma ENDDUMP
-
-
-
