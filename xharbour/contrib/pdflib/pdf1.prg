@@ -1,5 +1,5 @@
 /*
- * $Id: pdf1.prg,v 1.1 2004/07/26 01:32:09 lculik Exp $
+ * $Id: pdf1.prg,v 1.2 2004/07/26 09:13:56 lculik Exp $
  */
 
 /*
@@ -7,6 +7,7 @@
  * PDF api Api for multiple porpurse
  *
  * Copyright 2000-2004 Luiz Rafael Culik <culikr /at/ brturbo.com>
+ *            2000-2004 Priptpal Bedi  <vouchcac /at/ hotmail.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
