@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3233 2004/07/29 14:33:08 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3234 2004/07/29 16:01:17 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-29 23:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbset.h
+  * xharbour/include/set.ch
+  * xharbour/source/rtl/set.c
+  * xharbour/source/pp/pptable.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+   + added SET HARDCOMMIT [ ON|OFF ] | set(_SET_HARDCOMMIT, lParam)
+     (ON by default) which force hard OS low level commit of data
+     files (DBF/MEMO/INDEXES) in DBF, DBFDBT, DBFFPT, DBFCDX, DBFNTX RDDs
+
+  * xharbour/source/rdd/dbf1.c
+   + properly recognize hacked DBF header for RDD private data
+     (VFP can make such files)
 
 2004-07-22 21:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c

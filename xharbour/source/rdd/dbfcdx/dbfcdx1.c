@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.142 2004/07/27 13:19:35 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.143 2004/07/28 23:27:55 druzus Exp $
  */
 
 /*
@@ -5914,17 +5914,25 @@ static ERRCODE hb_cdxFlush( CDXAREAP pArea )
    LPCDXINDEX pIndex;
    ERRCODE uiError;
 
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxFlush(%p)", pArea));
+
+   if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+      return FAILURE;
+
    uiError = SUPER_FLUSH( ( AREAP ) pArea );
 
-   pIndex = pArea->lpIndexes;
-   while ( pIndex )
+   if ( hb_set.HB_SET_HARDCOMMIT )
    {
-      if ( pIndex->hFile != FS_ERROR && pIndex->fFlush )
+      pIndex = pArea->lpIndexes;
+      while ( pIndex )
       {
-         hb_fsCommit( pIndex->hFile );
-         pIndex->fFlush = FALSE;
+         if ( pIndex->hFile != FS_ERROR && pIndex->fFlush )
+         {
+            hb_fsCommit( pIndex->hFile );
+            pIndex->fFlush = FALSE;
+         }
+         pIndex = pIndex->pNext;
       }
-      pIndex = pIndex->pNext;
    }
 
    return uiError;

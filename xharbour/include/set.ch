@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.12 2004/03/03 19:37:53 mlombardo Exp $
+ * $Id: set.ch,v 1.13 2004/05/19 23:46:15 peterrees Exp $
  */
 
 /*
@@ -130,6 +130,7 @@
 #define _SET_GTMODE          113 /* Harbour extension */
 #define _SET_BACKGROUNDTICK  114 /* Harbour extension */
 #define _SET_PRINTERJOB      115 /* Harbour extension */
+#define _SET_HARDCOMMIT      116 /* Harbour extension */
 
 #define HB_SET_BASE        100
 #define HB_SET_COUNT       15

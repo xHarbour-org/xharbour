@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.82 2004/05/08 22:07:11 druzus Exp $
+ * $Id: dbfntx1.c,v 1.83 2004/07/22 08:28:18 druzus Exp $
  */
 
 /*
@@ -3515,16 +3515,20 @@ static ERRCODE ntxFlush( NTXAREAP pArea )
 
    uiError = SUPER_FLUSH( ( AREAP ) pArea );
 
-   pTag = pArea->lpNtxTag;
-   while( pTag )
+   if ( hb_set.HB_SET_HARDCOMMIT )
    {
-      if( !pTag->Memory && pTag->Owner->fFlush )
+      pTag = pArea->lpNtxTag;
+      while( pTag )
       {
-         hb_fsCommit( pTag->Owner->DiskFile );
-         pTag->Owner->fFlush = FALSE;
+         if( !pTag->Memory && pTag->Owner->fFlush )
+         {
+            hb_fsCommit( pTag->Owner->DiskFile );
+            pTag->Owner->fFlush = FALSE;
+         }
+         pTag = pTag->pNext;
       }
-      pTag = pTag->pNext;
    }
+
    return uiError;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.43 2004/05/27 13:22:27 lculik Exp $
+ * $Id: pptable.c,v 1.44 2004/05/27 13:26:11 lculik Exp $
  */
 
 /*
@@ -135,6 +135,7 @@ void hb_pp_Table( void )
    static DEFINES sD___64 = {"_SET_GTMODE",NULL,-1,"113", &sD___63 };
    static DEFINES sD___65 = {"_SET_BACKGROUNDTICK",NULL,-1,"114", &sD___64 };
    static DEFINES sD___66 = {"_SET_PRINTERJOB",NULL,-1,"115", &sD___65 };
+   static DEFINES sD___67 = {"_SET_HARDCOMMIT",NULL,-1,"116", &sD___66 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -494,6 +495,8 @@ void hb_pp_Table( void )
    static COMMANDS sC___274 = {0,"SET","BACKGROUND TASKS \1A20 ON,OFF,&>","Set(_SET_BACKGROUNDTASKS,\1A30 )",&sC___273 };
    static COMMANDS sC___275 = {0,"SET","GTMODE TO \1A30","Set( _SET_GTMODE,\1A30 )",&sC___274 };
    static COMMANDS sC___276 = {0,"SET","BACKGROUNDTICK \1A00","Set( _SET_BACKGROUNDTICK, \1A00 )",&sC___275 };
+   static COMMANDS sC___277 = {0,"SET","HARDCOMMIT \1A20 ON,OFF,&>","Set(_SET_HARDCOMMIT,\1A30 )",&sC___276 };
+   static COMMANDS sC___278 = {0,"SET","HARDCOMMIT (\1A00)","Set(_SET_HARDCOMMIT,\1A00 )",&sC___277 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\16\1A00\17 => \16\1B00\17 \16,\1C00 => \1D00 \17 }", "Hash(\16\1A00,\1B00\17 \16,\1C00,\1D00 \17 )",NULL };
@@ -502,11 +505,11 @@ void hb_pp_Table( void )
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___276;
+   hb_pp_topCommand = &sC___278;
 #else
    hb_pp_topCommand = &sC___256;
 #endif
 
-   hb_pp_topDefine = &sD___66;
+   hb_pp_topDefine = &sD___67;
    hb_pp_topTranslate = &sT___04;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.84 2004/07/27 13:19:35 druzus Exp $
+ * $Id: dbf1.c,v 1.85 2004/07/28 20:56:18 druzus Exp $
  */
 
 /*
@@ -1106,16 +1106,20 @@ static ERRCODE hb_dbfFlush( DBFAREAP pArea )
       SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
 
-   if ( pArea->fDataFlush )
+   if ( hb_set.HB_SET_HARDCOMMIT )
    {
-      hb_fsCommit( pArea->hDataFile );
-      pArea->fDataFlush = FALSE;
+      if ( pArea->fDataFlush )
+      {
+         hb_fsCommit( pArea->hDataFile );
+         pArea->fDataFlush = FALSE;
+      }
+      if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR && pArea->fMemoFlush )
+      {
+         hb_fsCommit( pArea->hMemoFile );
+         pArea->fMemoFlush = FALSE;
+      }
    }
-   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR && pArea->fMemoFlush )
-   {
-      hb_fsCommit( pArea->hMemoFile );
-      pArea->fMemoFlush = FALSE;
-   }
+
    return uiError;
 }
 
@@ -1625,7 +1629,7 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    /* Close the data file */
    if( pArea->hDataFile != FS_ERROR )
    {
-      if ( pArea->fDataFlush )
+      if ( pArea->fDataFlush && hb_set.HB_SET_HARDCOMMIT )
       {
          hb_fsCommit( pArea->hDataFile );
          pArea->fDataFlush = FALSE;
@@ -1637,7 +1641,7 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    /* Close the memo file */
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
    {
-      if ( pArea->fMemoFlush )
+      if ( pArea->fMemoFlush && hb_set.HB_SET_HARDCOMMIT )
       {
          hb_fsCommit( pArea->hMemoFile );
          pArea->fMemoFlush = FALSE;
@@ -2166,7 +2170,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    /* Add fields */
    uiFields = ( pArea->uiHeaderLen - sizeof( DBFHEADER ) ) / sizeof( DBFFIELD );
-   SELF_SETFIELDEXTENT( ( AREAP ) pArea, uiFields );
    uiSize = uiFields * sizeof( DBFFIELD );
    pBuffer = ( BYTE * ) hb_xgrab( uiSize );
 
@@ -2203,6 +2206,27 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       hb_xfree( pBuffer );
       SELF_CLOSE( ( AREAP ) pArea );
       return FAILURE;
+   }
+
+   /* some RDDs use the additional space in the header after field arrray
+      for private data we should check for 0x0D marker to not use this
+      data as fields description */
+   for( uiCount = 0; uiCount < uiFields; uiCount++ )
+   {
+      if ( pBuffer[ uiCount * sizeof( DBFFIELD ) ] == 0x0d )
+      {
+         uiFields = uiCount;
+         break;
+      }
+   }
+
+   if ( uiFields == 0 )
+   {
+      bError = TRUE;
+   }
+   else
+   {
+      SELF_SETFIELDEXTENT( ( AREAP ) pArea, uiFields );
    }
 
    /* Size for deleted flag */
@@ -2279,7 +2303,10 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             break;
       }
 
-      if( pField->bType == 0 && pArea->bVersion == 0x30 )
+      /* Peter, is it necessary?
+         shouldn't be such filed after 0x0D terminator?
+       */
+      if( pArea->bVersion == 0x30 && pField->bType == 0 )
       {
          bError = FALSE;
          break;

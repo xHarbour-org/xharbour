@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.50 2004/07/18 14:29:55 lculik Exp $
+ * $Id: set.c,v 1.51 2004/07/19 03:48:20 peterrees Exp $
  */
 
 /*
@@ -988,6 +988,14 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_HARDCOMMIT :
+         hb_retl( hb_set.HB_SET_HARDCOMMIT );
+         if( args > 1 )
+         {
+            hb_set.HB_SET_HARDCOMMIT = set_logical( pArg2, hb_set.HB_SET_HARDCOMMIT );
+         }
+         break;
+
       case HB_SET_PATH       :
          if( hb_set.HB_SET_PATH )
          {
@@ -1522,7 +1530,6 @@ void hb_setInitialize( void )
    hb_set.HB_SET_MESSAGE = 0;
    hb_set.HB_SET_MFILEEXT = ( char * ) hb_xgrab( 1 );
    hb_set.HB_SET_MFILEEXT[ 0 ] = '\0';
-   hb_set.HB_SET_OPTIMIZE = FALSE;
    hb_set.HB_SET_PATH = ( char * ) hb_xgrab( 1 );
    hb_set.HB_SET_PATH[ 0 ] = '\0';
    hb_set.HB_SET_PRINTER = FALSE;
@@ -1540,7 +1547,9 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SCOREBOARD = TRUE;
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
+   hb_set.HB_SET_OPTIMIZE = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
+   hb_set.HB_SET_HARDCOMMIT = TRUE;
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
 
    strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
