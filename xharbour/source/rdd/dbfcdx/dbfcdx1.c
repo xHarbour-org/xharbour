@@ -1220,6 +1220,7 @@ static void hb_cdxTagIndexTagNew( LPCDXTAG pTag, char * KeyExp, PHB_ITEM pKeyIte
    {
       pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
       hb_strncpyUpper( pTag->KeyExpr, KeyExp, CDX_MAXKEY );
+      pTag->nField  = hb_rddFieldIndex( (AREAP) pTag->pIndex->pArea, pTag->KeyExpr );
    }
    pTag->pKeyItem = pKeyItem;
    if( ForExp != NULL )
@@ -1241,36 +1242,85 @@ static void hb_cdxTagIndexTagNew( LPCDXTAG pTag, char * KeyExp, PHB_ITEM pKeyIte
 
 static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 {
-   ULONG ulRecNo;
-   BOOL bWhileOk;
+   ULONG ulRecNo, ulRecCount;
+   BOOL bForOk;
+   // BOOL bWhileOk;
    LPSORTINFO pSort;
    PHB_ITEM pItem;
    HB_MACRO_PTR pMacro;
    BYTE cTemp[8];
    LPCDXAREA pArea = pTag->pIndex->pArea;
    LONG lStep = 0;
+   BOOL bDirectRead, bCondAll, bCondRest, bEnd;
+   PHB_ITEM pForItem, pWhileItem, pEvalItem;
 
    if( ( pTag->OptFlags & 0x80 ) || pTag->Custom )
       hb_cdxTagEmptyIndex( pTag );
    else
    {
+      PHB_ITEM pSaveFilter;
+      BOOL bSaveDeleted;
+      bSaveDeleted = hb_set.HB_SET_DELETED;
+      hb_set.HB_SET_DELETED = FALSE;
+      pSaveFilter = pArea->dbfi.itmCobExpr;
+      pArea->dbfi.itmCobExpr = NULL;
+
+      bDirectRead = 1;
+      if ( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll )
+         bDirectRead = 0;
+      if ( pArea->lpdbRelations )
+         bDirectRead = 0;
+      bEnd = 0;
+      if ( !bDirectRead )
+      {
+         if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll || pArea->lpdbOrdCondInfo->fUseCurrent ) {
+            SELF_GOTOP( ( AREAP ) pArea );
+         }
+         else
+         {
+            if ( pArea->lpdbOrdCondInfo->lRecno )
+            {
+               SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lRecno );
+               bEnd = 1;
+            }
+            else
+            {
+               SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lStartRecno );
+            }
+         }
+      }
       pSort = hb_cdxSortNew( pTag, pTag->UniqueKey );
       pItem = hb_itemNew( NULL );
-      for( ulRecNo = 1; ulRecNo <= pTag->pIndex->pArea->ulRecCount; ulRecNo++ )
+      ulRecCount = pArea->ulRecCount;
+      pForItem = pTag->pForItem;
+      bForOk = TRUE;
+      pEvalItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobEval : NULL);
+      pWhileItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobWhile : NULL);
+      for( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++ )
       {
-         hb_fsSeek( pTag->pIndex->pArea->hDataFile,
-                    pTag->pIndex->pArea->uiHeaderLen +
-                    ( ulRecNo - 1 ) * pTag->pIndex->pArea->uiRecordLen,
-                    FS_SET );
-         hb_fsRead( pTag->pIndex->pArea->hDataFile,
-                    pTag->pIndex->pArea->pRecord,
-                    pTag->pIndex->pArea->uiRecordLen );
-         pTag->pIndex->pArea->ulRecNo = ulRecNo;
-         if( pTag->pForItem != NULL )
+         if ( bDirectRead )
+         {
+            hb_fsSeek( pArea->hDataFile,
+                     pArea->uiHeaderLen +
+                     ( ulRecNo - 1 ) * pArea->uiRecordLen,
+                     FS_SET );
+            hb_fsRead( pArea->hDataFile,
+                     pArea->pRecord,
+                     pArea->uiRecordLen );
+            pArea->ulRecNo = ulRecNo;
+            pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+         }
+         else
+         {
+            if ( pWhileItem && !hb_cdxEvalCond ( NULL, pWhileItem, 0 ) )
+               break;
+         }
+         if( pForItem != NULL )
          {
             /* TODO: test for expression */
             /* now is working but not tested */
             /* bWhileOk = TRUE; */
+            /*
             if( hb_itemType( pTag->pForItem ) == HB_IT_BLOCK )
             {
                hb_vmPushSymbol( &hb_symEval );
@@ -1285,33 +1335,43 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
                hb_stackPop();
             }
-            bWhileOk = hb_itemGetL( pItem );
+            bForOk = hb_itemGetL( pItem );
+            */
+            bForOk = hb_cdxEvalCond ( pArea, pForItem, 0 );
          }
+         /*
          else
-            bWhileOk = TRUE;
-
-         if( bWhileOk )
+            bForOk = TRUE;
+         */
+         if( bForOk )
          {
-            if( hb_itemType( pTag->pKeyItem ) == HB_IT_BLOCK )
+            if ( pTag->nField )
             {
-
-               hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pTag->pKeyItem );
-               hb_vmSend( 0 );
-               hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
+               SELF_GETVALUE( ( AREAP ) pArea, pTag->nField, pItem );
             }
             else
             {
-               pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
-               hb_macroRun( pMacro );
-               hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
-               hb_stackPop();
+               if( hb_itemType( pTag->pKeyItem ) == HB_IT_BLOCK )
+               {
+
+                  hb_vmPushSymbol( &hb_symEval );
+                  hb_vmPush( pTag->pKeyItem );
+                  hb_vmSend( 0 );
+                  hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
+               }
+               else
+               {
+                  pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
+                  hb_macroRun( pMacro );
+                  hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
+                  hb_stackPop();
+               }
             }
 
             switch( hb_itemType( pItem ) )
             {
                case HB_IT_STRING:
-                  hb_cdxSortInsertWord( pSort, (long) ulRecNo, pItem->item.asString.value,
+                  hb_cdxSortInsertWord( pSort, (long) pArea->ulRecNo, pItem->item.asString.value,
                      HB_CDXMAXKEY( pItem->item.asString.length ) );
                   break;
 
@@ -1319,24 +1379,24 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                case HB_IT_LONG:
                case HB_IT_DOUBLE:
                   hb_cdxDNtoSort( hb_itemGetND( pItem ), &cTemp[0] );
-                  hb_cdxSortInsertWord( pSort, ulRecNo, (char *) cTemp, 8 );
+                  hb_cdxSortInsertWord( pSort, pArea->ulRecNo, (char *) cTemp, 8 );
                   break;
 
                case HB_IT_LOGICAL:
                   cTemp[0] = (BYTE) (hb_itemGetL( pItem ) ? 'T' : 'F');
-                  hb_cdxSortInsertWord( pSort, ulRecNo, (char *) cTemp, 1 );
+                  hb_cdxSortInsertWord( pSort, pArea->ulRecNo, (char *) cTemp, 1 );
                   break;
 
                case HB_IT_DATE:
                   hb_cdxDNtoSort( (double) hb_itemGetDL( pItem ), &cTemp[0] );
-                  hb_cdxSortInsertWord( pSort, ulRecNo, (char *) cTemp, 8 );
+                  hb_cdxSortInsertWord( pSort, pArea->ulRecNo, (char *) cTemp, 8 );
                   break;
 
                default:
                   printf( "hb_cdxTagDoIndex( LPCDXTAG pTag ): hb_itemType( pItem ) = %i", hb_itemType( pItem ) );
             }
          }
-         if( pArea->lpdbOrdCondInfo )
+         if( pEvalItem )
          {
             if( pArea->lpdbOrdCondInfo->lStep )
             {
@@ -1344,12 +1404,26 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                if( lStep == pArea->lpdbOrdCondInfo->lStep )
                   lStep = 0;
             }
-            if( pArea->lpdbOrdCondInfo->itmCobEval && !lStep )
+            if( pEvalItem && !lStep )
             {
                hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pArea->lpdbOrdCondInfo->itmCobEval );
+               hb_vmPush( pEvalItem );
                hb_vmSend( 0 );
             }
+         }
+         if ( !bDirectRead )
+         {
+            if ( bEnd )
+               break;
+            if( pArea->lpdbOrdCondInfo->lNextCount > 0 )
+            {
+               pArea->lpdbOrdCondInfo->lNextCount--;
+               if( pArea->lpdbOrdCondInfo->lNextCount <= 0 )
+                  break;
+            }
+            SELF_SKIP( ( AREAP ) pArea, 1 );
+            if ( pArea->fEof )
+               break;
          }
       }
 #ifdef CDXDEBUG
@@ -1373,6 +1447,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 #endif
       hb_cdxSortFree( pSort );
       hb_itemRelease( pItem );
+      hb_set.HB_SET_DELETED = bSaveDeleted;
+      pArea->dbfi.itmCobExpr = pSaveFilter;
    }
    pTag->TagChanged = TRUE;
    hb_cdxTagTagStore( pTag );
@@ -4449,6 +4525,44 @@ static LPCDXKEYINFO hb_cdxEvalKey( CDXAREAP pArea, LPCDXTAG pTag )
    return pKey;
 }
 
+static BOOL hb_cdxEvalCond ( CDXAREAP pArea, PHB_ITEM pCondItem, BOOL checkenv )
+{
+   HB_MACRO_PTR pMacro;
+   int iCurrArea;
+   BOOL ret;
+
+   if ( checkenv ) {
+      iCurrArea = hb_rddGetCurrentWorkAreaNumber();
+      if ( iCurrArea != pArea->uiArea )
+         hb_rddSelectWorkAreaNumber( pArea->uiArea );
+      else
+         iCurrArea = 0;
+   }
+
+   if( hb_itemType( pCondItem ) == HB_IT_BLOCK )
+   {
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pCondItem );
+      hb_vmSend( 0 );
+      ret = hb_itemGetL( &(HB_VM_STACK.Return) );
+   }
+   else
+   {
+      pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pCondItem );
+      hb_macroRun( pMacro );
+      // hb_cdxMacroRun( (AREAP) pArea, pMacro );
+      ret = hb_itemGetL( hb_stackItemFromTop( - 1 ) );
+      hb_stackPop();
+   }
+
+   if ( checkenv ) {
+      if ( iCurrArea )
+         hb_rddSelectWorkAreaNumber( iCurrArea );
+   }
+   return ret;
+}
+
+
 static ERRCODE cdxError( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiFlags )
 {
    PHB_ITEM pError;
@@ -6953,7 +7067,7 @@ ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInf
        * CUSTOM: allow changing an index into custom
        * */
       case DBOI_CUSTOM :
-         hb_itemPutL( pOrderInfo->itmResult, pTag->Custom );
+         hb_itemPutL( pOrderInfo->itmResult, ( pTag ? pTag->Custom : 0 ) );
          break;
       case DBOI_KEYADD :
          if ( !pTag ) {

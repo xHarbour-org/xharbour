@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.8 2002/11/13 18:45:50 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.9 2003/01/12 01:52:50 horacioroldan Exp $
  */
 
 /*
@@ -156,6 +156,7 @@ typedef struct _CDXTAG
    char *     ForExpr;   /* a tag for expression as text */
    USHORT uiType;        /* a type of key expression value */
    USHORT uiLen;         /* length of the key expression value */
+   USHORT nField;
    struct _CDXINDEX * pIndex;    /* a parent index info */
    // review this ...
    struct    _CDXTAG * pNext;

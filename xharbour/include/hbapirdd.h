@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.6 2002/10/27 14:41:36 lculik Exp $
+ * $Id: hbapirdd.h,v 1.7 2003/01/06 12:39:04 horacioroldan Exp $
  */
 
 /*
@@ -1057,6 +1057,7 @@ extern USHORT  HB_EXPORT hb_rddFieldType( USHORT extendType );
 
 typedef short (* WACALLBACK )( AREA *, int );
 extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
+USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
 
 #if defined(HB_EXTERN_C)
 }
