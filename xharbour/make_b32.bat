@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.10 2003/03/27 07:44:52 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.11 2003/06/24 08:37:21 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -49,7 +49,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD_ERR
 
-REM notepad make_b32.log
+   notepad make_b32.log
    goto EXIT
 
 :CLEAN

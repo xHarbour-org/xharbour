@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.64 2003/07/08 20:19:30 andijahja Exp $
+# $Id: makefile.vc,v 1.65 2003/07/14 12:33:48 andijahja Exp $
 #
 
 #
@@ -330,6 +330,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
+   $(OBJ_DIR)$(MT)\hboutdebug.obj \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hblog.obj \
    $(OBJ_DIR)$(MT)\hbloginet.obj \
