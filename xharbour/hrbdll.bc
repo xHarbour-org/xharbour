@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.37 2003/12/19 01:32:38 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.38 2003/12/27 11:24:15 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -411,6 +411,17 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdprukoi.obj \
   $(OBJ_DIR)\cdphr852.obj \
   $(OBJ_DIR)\cdphr1250.obj \
+  $(OBJ_DIR)\uc1250.obj   \
+  $(OBJ_DIR)\uc1251.obj   \
+  $(OBJ_DIR)\uc1257.obj   \
+  $(OBJ_DIR)\uc437.obj    \
+  $(OBJ_DIR)\uc850.obj    \
+  $(OBJ_DIR)\uc852.obj    \
+  $(OBJ_DIR)\uc866.obj    \
+  $(OBJ_DIR)\uc8859_1.obj \
+  $(OBJ_DIR)\uc8859_2.obj \
+  $(OBJ_DIR)\uckoi8.obj   \
+  $(OBJ_DIR)\ucmaz.obj    \
 #
 #  Pp
 #
@@ -2095,6 +2106,39 @@ $(OBJ_DIR)\cdphr852.obj : $(CODEPAGE_DIR)\cdphr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdphr1250.obj : $(CODEPAGE_DIR)\cdphr1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc437.obj : $(CODEPAGE_DIR)\uc437.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc852.obj : $(CODEPAGE_DIR)\uc852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc866.obj : $(CODEPAGE_DIR)\uc866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc8859_1.obj : $(CODEPAGE_DIR)\uc8859_1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc8859_2.obj : $(CODEPAGE_DIR)\uc8859_2.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uckoi8.obj : $(CODEPAGE_DIR)\uckoi8.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c

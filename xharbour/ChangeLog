@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2146 2004/01/26 18:43:42 druzus Exp $
+ * $Id: ChangeLog,v 1.2147 2004/01/26 19:40:58 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 22:40 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * hrbdll.bc
+  * hrbdll.vc
+    * updated to compile new codepage files added from Przemyslaw
+
+    /* I've tested BCC version. Please check other files */
 
 2004-01-26 16:30 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/dbedit.prg
@@ -115,15 +125,15 @@
 2004-01-26 14:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + Wvt_Minimize()
-      Minimizes the application window. Useful when application is engaged in 
+      Minimizes the application window. Useful when application is engaged in
       long uninterrupted tasks.
 
     + Wvt_Maximize()
       Maximizes, I mean, restores to normal position the previously minimized
       application window.
-     
+
     + Wvt_SetOnTop()
-      Forces the application window to be as the TOPMOST window. Useful when a 
+      Forces the application window to be as the TOPMOST window. Useful when a
       compulsory input is required, or, where developer wants that no other window
       is allowed to operlap application window.
 
@@ -132,14 +142,14 @@
       window on the Desktop can be brought in focus overlapping application window.
 
     + Wvt_SaveScreen( nTop, nLeft, nBottom, nRight )
-      Saves the designated rectangle in an array with three elelments, viz., 
+      Saves the designated rectangle in an array with three elelments, viz.,
       { nWidth, nHeight, hBitmap }. The bitmap image of the rectanle is retained
-      in memory until Wvt_RestScreen() is called. So it is important that 
+      in memory until Wvt_RestScreen() is called. So it is important that
       Wvt_RestScreen() must be called when current program returns.
 
     + Wvt_RestScreen( nTop, nLeft, nBottom, nRight, aSavedScreen )
       Flushes the bitmap referenced in <aSavedScreen> onto the designated rectangle.
-      This function must be called after Wvt_SaveScreen() just not to exhaust 
+      This function must be called after Wvt_SaveScreen() just not to exhaust
       GDI resources of Windows.
 
     ! Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrientation, nFormat, nAlign, ;
@@ -157,7 +167,7 @@
   * source/rtl/gtxvt/gtxvt.c
     - removed debug printout...
     ! setting appMsg to zero before trying to read it.
-    
+
 2004-01-26 04:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   + contrib/libct/numlohi.c
     + Implemented NumLow() and NumHigh().
@@ -188,7 +198,7 @@
     ! hb_gtGobjectInside() must return true if the area INTERSECTS with the given
       object, and not just if the object is partially or completely inside the area
       as it was before.
-      
+
   * source/rtl/gtxvt/gtxvt.c
     + Added X Clipping while drawing graphical objects to allow correctly
       layering of graphical objects.
@@ -295,7 +305,7 @@
 2004-01-22 18:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * source/odbc/todbc.prg
     ! fixed method Open. Fix provided by Alexandre Bassanesi
-    
+
 2004-01-22 00:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/tpopup.prg
     ! Yet another bug making MenuBar crash when pressed right button or ALT+<nonshortcut>

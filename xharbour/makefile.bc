@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.81 2004/01/25 15:07:12 jonnymind Exp $
+# $Id: makefile.bc,v 1.82 2004/01/25 20:44:28 paultucker Exp $
 #
 
 #
@@ -785,7 +785,18 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpsrwin.obj \
    $(OBJ_DIR)\cdprukoi.obj \
    $(OBJ_DIR)\cdphr852.obj \
-   $(OBJ_DIR)\cdphr1250.obj
+   $(OBJ_DIR)\cdphr1250.obj \
+   $(OBJ_DIR)\uc1250.obj   \
+   $(OBJ_DIR)\uc1251.obj   \
+   $(OBJ_DIR)\uc1257.obj   \
+   $(OBJ_DIR)\uc437.obj    \
+   $(OBJ_DIR)\uc850.obj    \
+   $(OBJ_DIR)\uc852.obj    \
+   $(OBJ_DIR)\uc866.obj    \
+   $(OBJ_DIR)\uc8859_1.obj \
+   $(OBJ_DIR)\uc8859_2.obj \
+   $(OBJ_DIR)\uckoi8.obj   \
+   $(OBJ_DIR)\ucmaz.obj
 
 #
 # HARBOUR.EXE rules
@@ -2699,6 +2710,39 @@ $(OBJ_DIR)\cdphr852.obj : $(CODEPAGE_DIR)\cdphr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdphr1250.obj : $(CODEPAGE_DIR)\cdphr1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc437.obj : $(CODEPAGE_DIR)\uc437.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc852.obj : $(CODEPAGE_DIR)\uc852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc866.obj : $(CODEPAGE_DIR)\uc866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc8859_1.obj : $(CODEPAGE_DIR)\uc8859_1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uc8859_2.obj : $(CODEPAGE_DIR)\uc8859_2.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uckoi8.obj : $(CODEPAGE_DIR)\uckoi8.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #

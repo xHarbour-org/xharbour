@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.27 2003/12/13 17:47:21 paultucker Exp $
+# $Id: hrbdll.vc,v 1.28 2003/12/19 01:32:39 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -461,6 +461,19 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpru866.obj \
   $(OBJ_DIR)\cdpruwin.obj \
   $(OBJ_DIR)\cdprukoi.obj \
+  $(OBJ_DIR)\cdphr852.obj \
+  $(OBJ_DIR)\cdphr1250.obj \
+  $(OBJ_DIR)\uc1250.obj   \
+  $(OBJ_DIR)\uc1251.obj   \
+  $(OBJ_DIR)\uc1257.obj   \
+  $(OBJ_DIR)\uc437.obj    \
+  $(OBJ_DIR)\uc850.obj    \
+  $(OBJ_DIR)\uc852.obj    \
+  $(OBJ_DIR)\uc866.obj    \
+  $(OBJ_DIR)\uc8859_1.obj \
+  $(OBJ_DIR)\uc8859_2.obj \
+  $(OBJ_DIR)\uckoi8.obj   \
+  $(OBJ_DIR)\ucmaz.obj    \
 #
 # pplib
 #

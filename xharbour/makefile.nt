@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.62 2004/01/18 13:04:24 paultucker Exp $
+# $Id: makefile.nt,v 1.63 2004/01/25 20:44:28 paultucker Exp $
 #
 
 #
@@ -605,7 +605,20 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpplwin.obj \
    $(OBJ_DIR)\cdpru866.obj \
    $(OBJ_DIR)\cdpruwin.obj \
-   $(OBJ_DIR)\cdprukoi.obj
+   $(OBJ_DIR)\cdprukoi.obj \
+   $(OBJ_DIR)\cdphr852.obj \
+   $(OBJ_DIR)\cdphr1250.obj \
+   $(OBJ_DIR)\uc1250.obj   \
+   $(OBJ_DIR)\uc1251.obj   \
+   $(OBJ_DIR)\uc1257.obj   \
+   $(OBJ_DIR)\uc437.obj    \
+   $(OBJ_DIR)\uc850.obj    \
+   $(OBJ_DIR)\uc852.obj    \
+   $(OBJ_DIR)\uc866.obj    \
+   $(OBJ_DIR)\uc8859_1.obj \
+   $(OBJ_DIR)\uc8859_2.obj \
+   $(OBJ_DIR)\uckoi8.obj   \
+   $(OBJ_DIR)\ucmaz.obj
 
 #
 # MACRO.LIB rules
