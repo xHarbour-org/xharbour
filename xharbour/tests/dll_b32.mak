@@ -20,12 +20,10 @@ $(APPEXE) : $(OBJDIR)\$(PRGFILE).obj \
    echo $(HARBOURLIB)\harbour.lib + >> b32.bc
    echo $(COMPILERDIR)\lib\ws2_32.lib + >> b32.bc
    echo $(COMPILERDIR)\lib\cw32.lib + >> b32.bc
-   echo $(COMPILERDIR)\lib\cw32.lib + >> b32.bc
    echo $(COMPILERDIR)\lib\import32.lib, >> b32.bc
    @$(ILINK_EXE) -ap -Tpe -Gn @b32.bc
-   @delbat
 
-$(OBJDIR)\$(PRGFILE).c : hnews.ch $(PRGFILE).prg
+$(OBJDIR)\$(PRGFILE).c : $(PRGFILE).prg
    $(COMPILER) $(HARBOURFLAGS) $** -o$@
 
 $(OBJDIR)\$(PRGFILE).obj : $(OBJDIR)\$(PRGFILE).c
