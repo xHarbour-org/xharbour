@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.30 2002/10/26 01:10:25 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.31 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -132,6 +132,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
             :Create()
          END WITH
       ENDIF
+      ProcessMessages()
    NEXT
 
    oTarget := oForm
@@ -168,4 +169,32 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
    oFrame:Create()
 
    RETURN( oFrame )
+
+
+
+#pragma BEGINDUMP
+
+#define _WIN32_WINNT   0x0400
+
+#include<windows.h>
+#include "hbapi.h"
+#include "hbvm.h"
+#include "hbstack.h"
+#include "hbapiitm.h"
+
+
+HB_FUNC( PROCESSMESSAGES )
+  {
+    MSG msg ;
+    while ( PeekMessage( &msg,NULL,0,0,PM_REMOVE ))
+    {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
+  }
+
+
+#pragma ENDDUMP
+
+
 
