@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2743 2004/04/04 19:54:02 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2744 2004/04/04 22:04:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-04-05 01:05 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * include/hbxml.h
+  * source/rtl/hbxml.c
+    ! now internal functions are static; unused mxml functions are commented 
+      out (size of hbxml.o is reduced by 10%).
+    ! fixed ret value in mxml_sgs_extract.
+  
 2004-04-05 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/filesys.c
     ! Definition of __inline functions for certain version of _MSC_VER (?)

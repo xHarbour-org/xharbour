@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.5 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbxml.h,v 1.6 2004/03/23 18:09:29 jonnymind Exp $
  */
 
 /*
@@ -204,73 +204,11 @@ typedef struct tag_mxml_self_growing_string
    int length;
 } MXML_SGS;
 
-
-/* Tag oriented operations */
-PHB_ITEM mxml_node_new( PHB_ITEM pDoc );
-PHB_ITEM mxml_node_clone( PHB_ITEM tg );
-PHB_ITEM mxml_node_clone_tree( PHB_ITEM tg );
-
-void mxml_node_unlink( PHB_ITEM tag );
-
-void mxml_node_insert_before( PHB_ITEM tg, PHB_ITEM node );
-void mxml_node_insert_after( PHB_ITEM tg, PHB_ITEM node );
-void mxml_node_insert_below( PHB_ITEM tg, PHB_ITEM node );
-void mxml_node_add_below( PHB_ITEM tg, PHB_ITEM node );
-
-MXML_STATUS mxml_node_read( MXML_REFIL *data, PHB_ITEM node, PHB_ITEM doc, int style );
-
-MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style );
-
-
-/* Attribute oriented operations */
-PHB_ITEM mxml_attribute_new( void );
-
 typedef struct _hbxml_attribute {
    PHB_ITEM pName;
    PHB_ITEM pValue;
 } HBXML_ATTRIBUTE, *PHBXML_ATTRIBUTE;
 
-MXML_STATUS mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, PHB_ITEM pNode, PHBXML_ATTRIBUTE dest, int style );
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE attr, int style );
-
-/* Refil routines */
-MXML_REFIL *mxml_refil_new( MXML_REFIL_FUNC func, char *buf, int buflen,
-   int bufsize );
-MXML_STATUS mxml_refil_setup( MXML_REFIL *ref, MXML_REFIL_FUNC func,
-   char *buf, int buflen, int bufsize );
-void mxml_refil_destory( MXML_REFIL *ref );
-
-int mxml_refil_getc( MXML_REFIL *ref );
-#define mxml_refil_ungetc( ref, ch )  ref->sparechar = ch
-
-void mxml_refill_from_stream_func( MXML_REFIL *ref );
-void mxml_refill_from_handle_func( MXML_REFIL *ref );
-
-/* Output routines */
-MXML_OUTPUT *mxml_output_new( MXML_OUTPUT_FUNC func, int node_count);
-MXML_STATUS mxml_output_setup( MXML_OUTPUT *out, MXML_OUTPUT_FUNC func, int node_count);
-void mxml_output_destroy( MXML_OUTPUT *out );
-MXML_STATUS mxml_output_char( MXML_OUTPUT *out, int c );
-MXML_STATUS mxml_output_string_len( MXML_OUTPUT *out, char *s, int len );
-MXML_STATUS mxml_output_string( MXML_OUTPUT *out, char *s );
-MXML_STATUS mxml_output_string_escape( MXML_OUTPUT *out, char *s );
-
-void mxml_output_func_to_stream( MXML_OUTPUT *out, char *s, int len );
-void mxml_output_func_to_handle( MXML_OUTPUT *out, char *s, int len );
-void mxml_output_func_to_sgs( MXML_OUTPUT *out, char *s, int len );
-
-
-/* Self growing string routines */
-MXML_SGS *mxml_sgs_new( void );
-void mxml_sgs_destroy( MXML_SGS *sgs );
-char *mxml_sgs_extract( MXML_SGS *sgs );
-MXML_STATUS mxml_sgs_append_char( MXML_SGS *sgs, char c );
-MXML_STATUS mxml_sgs_append_string_len( MXML_SGS *sgs, char *s, int slen );
-MXML_STATUS mxml_sgs_append_string( MXML_SGS *sgs, char *s );
-
-
-/* Error description */
-char *mxml_error_desc( MXML_ERROR_CODE code );
 
 /* Allocator and deletor functions are meant to be redeclared by includers */
 #ifndef MXML_ALLOCATOR
