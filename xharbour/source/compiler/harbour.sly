@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.71 2004/07/22 08:40:52 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.72 2004/07/22 17:04:14 ronpinkas Exp $
  */
 
 /*
@@ -247,7 +247,7 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  NumValue NumAlias
 %type <asExpr>  NilValue NilAlias
 %type <asExpr>  LiteralValue LiteralAlias
-%type <asExpr>  CodeBlock CodeBlockAlias
+%type <asExpr>  CodeBlock CodeBlock2 CodeBlockAlias
 %type <asExpr>  Logical LogicalAlias
 %type <asExpr>  SelfValue SelfAlias
 %type <asExpr>  Array ArrayAlias
@@ -994,6 +994,7 @@ SimpleExpression :
            | NilValue                         { $$ = $1; }
            | LiteralValue                     { $$ = $1; }
            | CodeBlock                        { $$ = $1; }
+           | CodeBlock2                       { $$ = $1; }
            | Logical                          { $$ = $1; }
            | SelfValue                        { $$ = $1; }
            | SelfValue    {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
@@ -1537,6 +1538,15 @@ CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); 
                           hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
                        }
 		     }
+           ;
+
+CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); } ParamList BITOR Crlf
+                 Source
+             '>'
+             {
+                hb_compCodeBlockEnd();
+                $$ = hb_compExprNewDummy();
+             }
            ;
 
 /* NOTE: This uses $-2 then don't use BlockExpList in other context

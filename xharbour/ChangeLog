@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3546 2004/10/27 04:15:47 bdj Exp $
+ * $Id: ChangeLog,v 1.3547 2004/10/27 04:20:23 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-26 22:26 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * source/common/expropt1.c
+  * source/compiler/exproptb.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    + Added support for new [experimental] Extended Codeblocks.
+      /*
+         Extended Codeblocks use the following syntax:
+
+         <| [Param1 [,ParamN]]| <EOL>
+           [Source...]
+         >
+
+         Source maybe any valid code except STATIC Variable declaration.
+      */
+
+  * include/hbclass.ch
+    + Added support for syntax:
+      INLINE METHOD <MethodName>( [Param1 [,ParamN ] ] ) <EOL>
+         [Sources...]
+      ENDMETHOD
+
+  + tests/extblock.prg
+    + Sample for new Extended Codeblocks syntax.
+
+  + tests/inline_method.prg
+    + Sample for new INLINE METHOD syntax.
+
+  /*
+     NOTE: Please note these new features are experimental and subject to
+     change or removal.
+   */
 
 2004-10-27 11:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c

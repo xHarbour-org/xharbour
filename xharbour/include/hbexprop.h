@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.11 2004/05/08 04:25:09 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.12 2004/05/24 07:34:00 ronpinkas Exp $
  */
 
 /*
@@ -112,6 +112,7 @@ typedef enum
 typedef enum
 {
    HB_ET_NONE = 0,
+   HB_ET_DUMMY,
    HB_ET_NIL,
    HB_ET_NUMERIC,
    HB_ET_STRING,
@@ -304,6 +305,7 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
 
 
 HB_EXPR_PTR hb_compExprNew( int );
+HB_EXPR_PTR hb_compExprNewDummy( void );
 HB_EXPR_PTR hb_compExprNewEmpty( void );
 HB_EXPR_PTR hb_compExprNewNil( void );
 HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );

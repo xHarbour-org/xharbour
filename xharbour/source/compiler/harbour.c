@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.86 2004/08/18 19:15:38 paultucker Exp $
+ * $Id: harbour.c,v 1.87 2004/10/20 03:14:40 ronpinkas Exp $
  */
 
 /*
@@ -706,6 +706,12 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    if( ( hb_comp_functions.pLast->bFlags & FUN_STATEMENTS ) && !( hb_comp_iVarScope == VS_FIELD || ( hb_comp_iVarScope & VS_MEMVAR ) ) )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, ( hb_comp_iVarScope == VS_LOCAL ? "LOCAL" : "STATIC" ), NULL );
+   }
+
+   // STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
+   if( hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
+   {
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, "STATIC", NULL );
    }
 
    /* Check if a declaration of duplicated variable name is requested */

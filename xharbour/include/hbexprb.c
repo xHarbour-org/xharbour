@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.82 2004/06/29 22:14:11 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.83 2004/07/03 03:34:53 ronpinkas Exp $
  */
 
 /*
@@ -129,6 +129,7 @@ HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL )
 
 /* forward declaration of callback functions
  */
+static HB_EXPR_FUNC( hb_compExprUseEmpty );
 static HB_EXPR_FUNC( hb_compExprUseDummy );
 static HB_EXPR_FUNC( hb_compExprUseNil );
 static HB_EXPR_FUNC( hb_compExprUseNumeric );
@@ -192,6 +193,7 @@ static HB_EXPR_FUNC( hb_compExprUseMatch );
 static HB_EXPR_FUNC( hb_compExprUseNegate );
 
 HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
+   hb_compExprUseEmpty,
    hb_compExprUseDummy,
    hb_compExprUseNil,
    hb_compExprUseNumeric,
@@ -257,7 +259,10 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
 
 /* ************************************************************************* */
 
-static HB_EXPR_FUNC( hb_compExprUseDummy )
+/* HB_ET_NONE is used by Empty Expressions as well as Errors,
+ * it pushes NIL in HB_EA_PUSH_PCODE
+ */
+static HB_EXPR_FUNC( hb_compExprUseEmpty )
 {
    switch( iMessage )
    {
@@ -272,6 +277,33 @@ static HB_EXPR_FUNC( hb_compExprUseDummy )
          break;
       case HB_EA_PUSH_PCODE:
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+         break;
+      case HB_EA_POP_PCODE:
+      case HB_EA_PUSH_POP:
+      case HB_EA_STATEMENT:
+      case HB_EA_DELETE:
+         break;
+   }
+   return pSelf;
+}
+
+/* HB_ET_DUMMY is used by Extended Blocks,
+ * it does NOT pushes anything in HB_EA_PUSH_PCODE
+ */
+static HB_EXPR_FUNC( hb_compExprUseDummy )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         break;
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+      case HB_EA_ARRAY_INDEX:
+         break;
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+      case HB_EA_PUSH_PCODE:
          break;
       case HB_EA_POP_PCODE:
       case HB_EA_PUSH_POP:

@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.21 2004/07/29 23:55:59 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.22 2004/08/04 23:50:47 ronpinkas Exp $
  */
 
 /*
@@ -550,6 +550,8 @@ DECLARE HBClass ;
 #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] INLINE [Local <v>,] <Code,...> [<other>] => ;
           METHOD <MethodName> [ AS <type> ] BLOCK {|Self [,<params>] [,<v>] | <Code> } [<other>]
 
+#XCOMMAND INLINE METHOD <!Method!>( [<params,...>] ) => WITH OBJECT \<|Self, <params>|; #undef __METHOD__; #define __METHOD__ <Method>
+#XCOMMAND ENDMETHOD => \>; METHOD __METHOD__ BLOCK HB_QWith(); END
 
 #xcommand METHOD <MethodName> [ AS <type> ] [ <ctor: CONSTRUCTOR> ] VIRTUAL => ;
    _HB_MEMBER <MethodName>() [ AS <type> ];;

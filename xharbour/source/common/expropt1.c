@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.12 2004/05/08 04:25:12 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.13 2004/05/24 07:34:01 ronpinkas Exp $
  */
 
 /*
@@ -181,6 +181,11 @@ int hb_compExprType( HB_EXPR_PTR pExpr )
 }
 
 /* ************************************************************************* */
+
+HB_EXPR_PTR hb_compExprNewDummy( void )
+{
+   return hb_compExprNew( HB_ET_DUMMY );
+}
 
 HB_EXPR_PTR hb_compExprNewEmpty( void )
 {
