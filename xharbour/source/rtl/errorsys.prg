@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.23 2003/10/19 00:17:36 jonnymind Exp $
+ * $Id: errorsys.prg,v 1.24 2003/11/07 18:20:53 jonnymind Exp $
  */
 
 /*
@@ -160,10 +160,10 @@ STATIC FUNCTION DefError( oError )
      ? cMessage
 
      ?
-     ? "Error at:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
+     ? "Error at ...:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
      n := 3
      WHILE ( ! Empty(ProcName( n ) ) )
-       ? "Called from:", ProcName( n ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  in Module:", ProcFile( n )
+       ? "Called from :", ProcName( n ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ") in Module:", ProcFile( n )
        n++
      END
 
@@ -252,68 +252,70 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, '              Date: ' + Dtoc( Date() ) )
-        FWriteLine( nHandle, '              Time: ' + Time() )
-        FWriteLine( nHandle, ' Avaliavle Memory :' + strvalue( Memory( 0 ) ) )
+        FWriteLine( nHandle, 'Date ............: ' + Dtoc( Date() ) )
+        FWriteLine( nHandle, 'Time ............: ' + Time() )
+        FWriteLine( nHandle, 'Avaliable Memory : ' + strvalue( Memory( 0 ) ) )
 
         IF Type( "Select()" ) == "UI"
-           FWriteLine( nHandle, '     Current Area :' + strvalue( &("Select()") ) )
+           FWriteLine( nHandle, 'Current Area ....:' + strvalue( &("Select()") ) )
         ENDIF
 
+        FWriteLine( nHandle, '' )
         FWriteLine( nHandle, Padc( ' Enviromental Information ', 79, '-' ) )
         FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, "Exact is :" + strvalue( Set( 1 ), .T. ) )
-        FWriteLine( nHandle, "Fixed is :" + strvalue( Set( 2 ), .T. ) )
-        FWriteLine( nHandle, "Decimals is at :" + strvalue( Set( 3 ) ) )
-        FWriteLine( nHandle, "Date Format is :" + strvalue( Set( 4 ) ) )
-        FWriteLine( nHandle, "Epoch is :" + strvalue( Set( 5 ) ) )
-        FWriteLine( nHandle, "Path is :" + strvalue( Set( 6 ) ) )
-        FWriteLine( nHandle, "Default is :" + strvalue( Set( 7 ) ) )
-        FWriteLine( nHandle, "Exclusive is :" + strvalue( Set( 8 ), .T. ) )
-        FWriteLine( nHandle, "SoftSeek is :" + strvalue( Set( 9 ), .T. ) )
-        FWriteLine( nHandle, "Unique is :" + strvalue( Set( 10 ), .T. ) )
-        FWriteLine( nHandle, "Deleted is :" + strvalue( Set( 11 ), .T. ) )
-        FWriteLine( nHandle, "Cancel is :" + strvalue( Set( 12 ), .T. ) )
-        FWriteLine( nHandle, "Debug is :" + strvalue( Set( 13 ) ) )
-        FWriteLine( nHandle, "Color is :" + strvalue( Set( 15 ) ) )
-        FWriteLine( nHandle, "Cursor is :" + strvalue( Set( 16 ) ) )
-        FWriteLine( nHandle, "Console is :" + strvalue( Set( 17 ), .T. ) )
-        FWriteLine( nHandle, "Alternate is :" + strvalue( Set( 18 ), .T. ) )
-        FWriteLine( nHandle, "AltFile is :" + strvalue( Set( 19 ) ) )
-        FWriteLine( nHandle, "Device is :" + strvalue( Set( 20 ) ) )
-        FWriteLine( nHandle, "Printer is :" + strvalue( Set( 23 ) ) )
-        FWriteLine( nHandle, "PrintFile is :" + strvalue( Set( 24 ) ) )
-        FWriteLine( nHandle, "Margin is :" + strvalue( Set( 25 ) ) )
-        FWriteLine( nHandle, "Bell is :" + strvalue( Set( 26 ), .T. ) )
-        FWriteLine( nHandle, "Confirm is :" + strvalue( Set( 27 ), .T. ) )
-        FWriteLine( nHandle, "Escape is :" + strvalue( Set( 28 ), .T. ) )
-        FWriteLine( nHandle, "Insert is :" + strvalue( Set( 29 ), .T. ) )
-        FWriteLine( nHandle, "Intensity is :" + strvalue( Set( 31 ), .T. ) )
-        FWriteLine( nHandle, "Scoreboard is :" + strvalue( Set( 32 ), .T. ) )
-        FWriteLine( nHandle, "Delimeters is :" + strvalue( Set( 33 ), .T. ) )
-        FWriteLine( nHandle, "Delimchars em :" + strvalue( Set( 34 ) ) )
-        FWriteLine( nHandle, "Wrap is :" + strvalue( Set( 35 ), .T. ) )
-        FWriteLine( nHandle, "Message is :" + strvalue( Set( 36 ) ) )
-        FWriteLine( nHandle, "MCenter is :" + strvalue( Set( 37 ), .T. ) )
-        FWriteLine( nHandle, "" )
+        FWriteLine( nHandle, "Exact is ........: " + strvalue( Set( 1 ), .T. ) )
+        FWriteLine( nHandle, "Fixed is ........: " + strvalue( Set( 2 ), .T. ) )
+        FWriteLine( nHandle, "Decimals is at ..: " + strvalue( Set( 3 ) ) )
+        FWriteLine( nHandle, "Date Format is ..: " + strvalue( Set( 4 ) ) )
+        FWriteLine( nHandle, "Epoch is ........: " + strvalue( Set( 5 ) ) )
+        FWriteLine( nHandle, "Path is .........: " + strvalue( Set( 6 ) ) )
+        FWriteLine( nHandle, "Default is ......: " + strvalue( Set( 7 ) ) )
+        FWriteLine( nHandle, "Exclusive is ....: " + strvalue( Set( 8 ), .T. ) )
+        FWriteLine( nHandle, "SoftSeek is .....: " + strvalue( Set( 9 ), .T. ) )
+        FWriteLine( nHandle, "Unique is .......: " + strvalue( Set( 10 ), .T. ) )
+        FWriteLine( nHandle, "Deleted is ......: " + strvalue( Set( 11 ), .T. ) )
+        FWriteLine( nHandle, "Cancel is .......: " + strvalue( Set( 12 ), .T. ) )
+        FWriteLine( nHandle, "Debug is ........: " + strvalue( Set( 13 ) ) )
+        FWriteLine( nHandle, "Color is ........: " + strvalue( Set( 15 ) ) )
+        FWriteLine( nHandle, "Cursor is .......: " + strvalue( Set( 16 ) ) )
+        FWriteLine( nHandle, "Console is ......: " + strvalue( Set( 17 ), .T. ) )
+        FWriteLine( nHandle, "Alternate is ....: " + strvalue( Set( 18 ), .T. ) )
+        FWriteLine( nHandle, "AltFile is ......: " + strvalue( Set( 19 ) ) )
+        FWriteLine( nHandle, "Device is .......: " + strvalue( Set( 20 ) ) )
+        FWriteLine( nHandle, "Printer is ......: " + strvalue( Set( 23 ) ) )
+        FWriteLine( nHandle, "PrintFile is ....: " + strvalue( Set( 24 ) ) )
+        FWriteLine( nHandle, "Margin is .......: " + strvalue( Set( 25 ) ) )
+        FWriteLine( nHandle, "Bell is .........: " + strvalue( Set( 26 ), .T. ) )
+        FWriteLine( nHandle, "Confirm is ......: " + strvalue( Set( 27 ), .T. ) )
+        FWriteLine( nHandle, "Escape is .......: " + strvalue( Set( 28 ), .T. ) )
+        FWriteLine( nHandle, "Insert is .......: " + strvalue( Set( 29 ), .T. ) )
+        FWriteLine( nHandle, "Intensity is ....: " + strvalue( Set( 31 ), .T. ) )
+        FWriteLine( nHandle, "Scoreboard is ...: " + strvalue( Set( 32 ), .T. ) )
+        FWriteLine( nHandle, "Delimeters is ...: " + strvalue( Set( 33 ), .T. ) )
+        FWriteLine( nHandle, "Delimchars em ...: " + strvalue( Set( 34 ) ) )
+        FWriteLine( nHandle, "Wrap is .........: " + strvalue( Set( 35 ), .T. ) )
+        FWriteLine( nHandle, "Message is ......: " + strvalue( Set( 36 ) ) )
+        FWriteLine( nHandle, "MCenter is ......: " + strvalue( Set( 37 ), .T. ) )
+        //FWriteLine( nHandle, "" )
+
         FWriteLine( nHandle, "" )
         IF MaxCol() > 0
-            FWriteLine( nHandle, Padc( 'Detalaid Work Area Items', Maxcol(), "=" ) )
+            FWriteLine( nHandle, Padc( 'Detailed Work Area Items', Maxcol(), "=" ) )
         ELSE
-            FWriteLine( nHandle, 'Detalaid Work Area Items ' )
+            FWriteLine( nHandle, 'Detailed Work Area Items ' )
         ENDIF
         FWriteLine( nHandle, "" )
 
         IF Type( "Select()" ) == "UI"
            For nCount := 1 To 600
               If !Empty( ( nCount )->( &("Alias()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "   Work Area No.: " + strvalue( &("Select()") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "           Alias: " + &("Alias()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "  Current Recno : " + strvalue( &("RecNo()") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "  Current Filter: " + &("DbFilter()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "   Relation Exp.: " + &("DbRelation()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "     Index Order: " + strvalue( &("IndexOrd(0)") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "      Ative Key : " + strvalue( &("IndexKey(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Work Area No ....: " + strvalue( &("Select()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Alias ...........: " + &("Alias()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Current Recno ...: " + strvalue( &("RecNo()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Current Filter ..: " + &("DbFilter()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Relation Exp. ...: " + &("DbRelation()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Index Order .....: " + strvalue( &("IndexOrd(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Active Key ......: " + strvalue( &("IndexKey(0)") ) ) )
                  ( nCount )->( FWriteLine( nHandle, "" ) )
               Endif
            Next
@@ -326,40 +328,40 @@ STATIC FUNCTION LogError( oerr )
             FWriteLine( nHandle, " Internal Error Handling Information  " )
         ENDIF
         FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, "Subsystem Call: " + oErr:subsystem() )
-        FWriteLine( nHandle, "   System Code: " + strvalue( oErr:suBcode() ) )
-        FWriteLine( nHandle, "Default Status: " + strvalue( oerr:candefault() ) )
-        FWriteLine( nHandle, "   Description: " + oErr:description() )
-        FWriteLine( nHandle, "     Operation: " + Oerr:operation() )
-        FWriteLine( nHandle, "     Arguments:"  + Arguments( oErr ) )
-        FWriteLine( nHandle, " Involved File: " + oErr:filename() )
-        FWriteLine( nHandle, "Dos Error Code: " + strvalue( oErr:oscode() ) )
+        FWriteLine( nHandle, "Subsystem Call ..: " + oErr:subsystem() )
+        FWriteLine( nHandle, "System Code .....: " + strvalue( oErr:suBcode() ) )
+        FWriteLine( nHandle, "Default Status ..: " + strvalue( oerr:candefault() ) )
+        FWriteLine( nHandle, "Description .....: " + oErr:description() )
+        FWriteLine( nHandle, "Operation .......: " + oErr:operation() )
+        FWriteLine( nHandle, "Arguments .......: " + Arguments( oErr ) )
+        FWriteLine( nHandle, "Involved File ...: " + oErr:filename() )
+        FWriteLine( nHandle, "Dos Error Code ..: " + strvalue( oErr:oscode() ) )
 
         #ifdef HB_THREAD_SUPPORT
-        FWriteLine( nHandle, "Running threads: " + strvalue( oErr:RunningThreads() ) )
-        FWriteLine( nHandle, "VM thread ID: " + strvalue( oErr:VmThreadId() ) )
-        FWriteLine( nHandle, "OS thread ID: " + strvalue( oErr:OsThreadId() ) )
+        FWriteLine( nHandle, "Running threads .: " + strvalue( oErr:RunningThreads() ) )
+        FWriteLine( nHandle, "VM thread ID ....: " + strvalue( oErr:VmThreadId() ) )
+        FWriteLine( nHandle, "OS thread ID ....: " + strvalue( oErr:OsThreadId() ) )
         #endif
 
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, " Trace Through:" )
-        FWriteLine( nHandle, "---------------" )
+        FWriteLine( nHandle, "----------------" )
 
-        FWriteLine( nHandle, Padr( oErr:ProcName, 21 ) + ": " + Transform( oErr:ProcLine, "999,999" ) + " - in Module: " + oErr:ModuleName )
+        FWriteLine( nHandle, Padr( oErr:ProcName, 21 ) + " : " + Transform( oErr:ProcLine, "999,999" ) + " in Module: " + oErr:ModuleName )
         nCount := 3
         While !Empty( Procname( ++ nCount ) )
-          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Transform( Procline( nCount ), "999,999" ) + " in Module: " + ProcFile( nCount ) )
+          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ' : ' + Transform( Procline( nCount ), "999,999" ) + " in Module: " + ProcFile( nCount ) )
         Enddo
 
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
 
         IF MaxCol() > 0
-            FWriteLine( nHandle, " Video Screen Dump " )
+            FWriteLine( nHandle, Padc( " Video Screen Dump ", Maxcol(), "#" ) )
             FWriteLine( nHandle, "" )
-            FWriteLine( nHandle, "" )
+            //FWriteLine( nHandle, "" )
             FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
-            FWriteLine( nHandle, "" )
+            //FWriteLine( nHandle, "" )
             For nCount := 1 To Maxrow()
                cOutString := ''
                cSubString := Substr( cScreen, nStart, nRange )
@@ -450,6 +452,7 @@ STATIC FUNCTION FWriteLine( nh, c )
      Fwrite( nh, c )
      Fwrite( nh, Chr( 13 ) )
      Fwrite( nh, Chr( 10 ) )
+     HB_OutDebug( c + Chr( 13 ) + Chr( 10 ) )
 Return nil
 
 STATIC FUNCTION Arguments( oErr )

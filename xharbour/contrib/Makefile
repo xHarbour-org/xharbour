@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2002/06/24 19:58:23 dholm Exp $
+# $Id: Makefile,v 1.1 2003/02/23 22:17:57 lculik Exp $
 #
 
 ROOT = ../
@@ -9,6 +9,7 @@ ifeq ($(HB_ARCHITECTURE),w32)
 DIRS=\
 	btree \
 	htmllib \
+	hbzlib \
 	libct \
 	libgt \
 	libmisc \
@@ -23,6 +24,7 @@ ifeq ($(HB_COMPILER),icc)
 DIRS=\
 	hgf/os2pm \
 	htmllib \
+	hbzlib \
 	libct \
 	libgt \
 	libmisc \
@@ -46,6 +48,7 @@ else
 
 DIRS=\
 	htmllib \
+	hbzlib \
 	libct \
 	libgt \
 	libmisc \

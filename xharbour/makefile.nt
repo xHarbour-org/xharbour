@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.51 2003/10/21 15:31:05 paultucker Exp $
+# $Id: makefile.nt,v 1.52 2003/11/09 23:48:09 jonnymind Exp $
 #
 
 #
@@ -479,6 +479,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \
    $(OBJ_DIR)$(MT)\dummy.obj \
+   $(OBJ_DIR)$(MT)\dumpvar.obj \
    $(OBJ_DIR)$(MT)\errorsys.obj \
    $(OBJ_DIR)$(MT)\fieldbl.obj \
    $(OBJ_DIR)$(MT)\getlist.obj \

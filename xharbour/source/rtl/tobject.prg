@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.9 2003/10/03 05:50:03 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.10 2003/10/27 15:06:14 toninhofwi Exp $
  */
 
 /*
@@ -178,11 +178,16 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
 
 RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 
-FUNCTION TAssociativeArray( aInit )
+FUNCTION TAssociativeArray( aInit, lCase )
 
    LOCAL hClass
    LOCAL aMember, nSeq := 1
    LOCAL aKeys := {}
+   LOCAL lCaseSensitive := .T.
+
+   IF ValType( lCase ) == "L"
+      lCaseSensitive := lCase
+   ENDIF
 
    // Intentionally creating NEW Class for every instance - Don't change!
    IF ValType( aInit ) == 'A'
@@ -196,36 +201,153 @@ FUNCTION TAssociativeArray( aInit )
       hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
    ENDIF
 
+   __clsAddMsg( hClass, "lCaseSensitive", {|Self, lNew, lOld| lOld := lCaseSensitive, IIF( lNew <> NIL, lCaseSensitive := lNew, ), lOld }, HB_OO_MSG_INLINE )
    // Intentionally using DEATCHED Local.
    __clsAddMsg( hClass, "Keys"     , {|Self, cKey | IIF( cKey == NIL, , aAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
 
+   __clsAddMsg( hClass, "SendKey"  , @TAssociativeArray_SendKey(), HB_OO_MSG_METHOD )
+   __clsAddMsg( hClass, "GetKeyPos", @TAssociativeArray_GetKeyPos(), HB_OO_MSG_METHOD )
+   __clsAddMsg( hClass, "GetKey"   , @TAssociativeArray_GetKey(), HB_OO_MSG_METHOD )
    __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
 
 RETURN __clsInst( hClass )
 
 STATIC FUNCTION TAssociativeArray_OnError( xParam )
-
+    LOCAL Self := QSelf()
     LOCAL cMsg, cProperty
     LOCAL hClass, nSeq
+    LOCAL aUpperKeys := {}
+    LOCAL lCaseSensitive := ::lCaseSensitive
 
     cMsg := __GetMessage()
-    //TraceLog( cMsg )
+    //TraceLog( "OnError: cMsg, xParam", cMsg, xParam )
+    //TraceLog( "lCaseSensitive", lCaseSensitive )
+    IF !lCaseSensitive
+       cMsg := Upper( cMsg )
+    ENDIF
 
     IF cMsg[1] == '_'
-       hClass    := QSelf():ClassH
+       hClass    := ::ClassH
        nSeq      := __cls_IncData( hClass )
+
        cProperty := SubStr( cMsg, 2 )
 
        __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T., .T. )
+       __ObjSendMsgCase( Self, cMsg, xParam )
 
-       QSelf():Keys( cProperty )
-
-       __ObjSendMsg( QSelf(), cMsg, xParam )
+       ::Keys( cProperty )
+       //TraceLog( "OnError - Added MSG: cMsg, cProperty, xParam", cMsg, cProperty, xParam )
     ELSE
-       Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+       IF cMsg IN ::Keys
+          //TraceLog( "OnError - Query MSG: cMsg, xParam", cMsg, xParam )
+          RETURN __ObjSendMsgCase( Self, cMsg )
+       ELSE
+          Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+       ENDIF
     ENDIF
 
 RETURN NIL
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * set/get a key within an associative array
+ *
+*/
+STATIC FUNCTION TAssociativeArray_SendKey( cKey, xParam )
+    LOCAL Self := QSelf()
+    LOCAL cMsg, cProperty
+    LOCAL hClass, nSeq, aKeys
+    LOCAL xRet
+
+    //cKey := Upper( cKey )
+    aKeys := __ObjSendMsg( Self, "Keys" )
+    //TraceLog( "PCOUNT(), cKey, xParam", PCOUNT(), cKey, xParam )
+
+    IF !( cKey IN aKeys )
+       hClass    := ::ClassH
+       nSeq      := __cls_IncData( hClass )
+
+       __clsAddMsg( hClass, cKey, nSeq, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_EXPORTED, .T., .T. )
+       ::Keys( cKey )
+    ENDIF
+    IF PCount() > 1
+       xRet := __ObjSendMsgCase( Self, "_" + cKey, xParam )
+    ELSE
+       xRet := __ObjSendMsgCase( Self, cKey )
+    ENDIF
+
+RETURN xRet
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * get a key position within an associative array
+ *
+*/
+STATIC FUNCTION TAssociativeArray_GetKeyPos( cKey )
+    LOCAL Self := QSelf()
+    LOCAL aKeys, nPos := 0
+
+    aKeys := __ObjSendMsg( Self, "Keys" )
+
+    IF !( cKey IN aKeys )
+       nPos := aScan( aKeys, {|e| e == cKey } )
+    ENDIF
+
+RETURN nPos
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * get a key value or NIL within an associative array
+ *
+*/
+STATIC FUNCTION TAssociativeArray_GetKey( cKey, lCaseSensitive )
+    LOCAL Self := QSelf()
+    LOCAL aKeys, xRet, cMsg, nPos
+    LOCAL lGlobalCase
+
+    IF !( ValType( lCaseSensitive ) == "L" )
+       lGlobalCase    := __SetAssociativeCaseSensitive()
+       IF lGlobalCase <> NIL
+          lCaseSensitive := lGlobalCase
+       ELSE
+          lCaseSensitive := ::lCaseSensitive
+       ENDIF
+    ENDIF
+
+    aKeys := __ObjSendMsg( Self, "Keys" )
+
+    IF !lCaseSensitive
+       cMsg := Upper( cKey )
+       nPos := aScan( aKeys, {|e| Upper( e ) == cMsg } )
+       IF nPos > 0
+          xRet := __ObjSendMsgCase( Self, aKeys[ nPos ] )
+       ENDIF
+    ELSE
+       IF ( cKey IN aKeys )
+          xRet := __ObjSendMsgCase( Self, cKey )
+       ENDIF
+    ENDIF
+
+RETURN xRet
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * set case sensitive for associative arrays
+ *
+*/
+FUNCTION __SetAssociativeCaseSensitive( lNew )
+  STATIC s_lCase // Can be: TRUE or FALSE to force Case Sensitive or NIL to leave every associative to do itself
+  LOCAL lOld := s_lCase
+
+  IF PCount() == 1 .AND. ;
+     ( ValType( lNew ) == "L" .OR. lNew == NIL )
+     s_lCase := lNew
+  ENDIF
+RETURN lOld
 
 
 /*
@@ -301,9 +423,7 @@ procedure TAssociativeArrayMember( aName, cType, uInit, oObj )
    endif
 
    for x := 1 to y
-       oObj[ aName[ x ] ] = uInit
+       oObj[ Upper( aName[ x ] ) ] = uInit
    next
 
 return
-
-

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.8 2003/06/24 03:35:05 ronpinkas Exp $
  */
 
 /*
@@ -463,14 +463,52 @@ STATIC FUNCTION InitClass()
    RETURN Self
 
 //----------------------------------------------------------------------------//
+
+/*
+ * (C) 2002 - Francesco Saverio Giudice
+ *
+ * Used to autoinitialize a class
+ *
+ * FSG 2003/11/05 - Fixed with right check of class constructor method
+*/
 STATIC FUNCTION ConstructorCall( oClass, aParams )
    LOCAL Self := QSelf()
    LOCAL aConstrMethods
-   // Search CONSTRUCTOR methods
-   aConstrMethods := __objGetMethodList( oClass, HB_OO_CLSTP_CTOR )  //  8 = CONSTRUCTOR SCOPE
-   IF !Empty( aConstrMethods )
-      // We take only first constructor method
-      HB_ExecFromArray( oClass, aConstrMethods[1], aParams )
+   LOCAL lClassAutoInit := __SetClassAutoInit()
+   LOCAL lOldScope, nPos
+
+   IF lClassAutoInit .AND. Len( aParams ) > 0
+     // Set class scoping off
+     lOldScope := __SetClassScope( .F. )
+
+       // Get method full list but limited to those with class type as constructor
+       aConstrMethods  := __objGetMsgFullList( oClass, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
+
+       // Search the constructor which is not derived from a parent class
+       //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
+       //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
+       nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
+
+     // Revert class scoping
+     __SetClassScope( lOldScope )
+
+     IF nPos > 0
+        // Exec method - i have found the constructor in this class
+        //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
+        HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
+     ELSE
+        // Get LAST constructor from parent (NOTE: this can be a default and faster way,
+        // but i prefer check rightly before)
+        IF !Empty( aConstrMethods )
+           //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
+           HB_ExecFromArray( oClass, aTail( aConstrMethods )[ HB_OO_DATA_SYMBOL ], aParams )
+        ELSE
+           //TraceLog( "Call new default constructor:", "NEW" )
+           // If i have no constructor i call NEW method that is defined is HBOBJECT class
+           HB_ExecFromArray( oClass, "NEW", aParams )
+        ENDIF
+     ENDIF
+
    ENDIF
    RETURN Self
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.39 2003/09/13 20:55:07 walito Exp $
+# $Id: Makefile,v 1.40 2003/10/09 20:51:02 paultucker Exp $
 #
 
 ROOT = ../../
@@ -155,6 +155,7 @@ PRG_SOURCES=\
         devoutp.prg  \
         dircmd.prg   \
         dummy.prg    \
+        dumpvar.prg  \
         errorsys.prg \
         fieldbl.prg  \
         getlist.prg  \
@@ -213,7 +214,7 @@ endif
 LIBNAME=rtl
 
 # The list of all valid GT drivers is defined in config/<arch>/global.cf.
-DIRS=$(HB_GT_LIBS) 
+DIRS=$(HB_GT_LIBS)
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf

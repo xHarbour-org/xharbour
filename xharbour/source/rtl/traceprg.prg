@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.9 2003/06/19 04:55:54 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.10 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 #include "set.ch"
 
 #DEFINE  CRLF HB_OsNewLine()
+#xtranslate Write( <cString> ) => FWrite( FileHandle, <cString> ); HB_OutDebug( <cString> )
 
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )
@@ -71,26 +72,28 @@ FUNCTION TraceLog( ... )
    FSeek( FileHandle, 0, 2 )
 
    IF nLevel > 0
-      FWrite( FileHandle, '[' + ProcFile(1) + "->" + ProcName( 1 ) + '] (' + Str( Procline(1), 5 ) + ')' )
+      Write( '[' + ProcFile(1) + "->" + ProcName( 1 ) + '] (' + LTrim( Str( Procline(1) ) ) + ')' )
    ENDIF
 
    IF nLevel > 1 .AND. ! ( ProcName( 2 ) == '' )
-      FWrite( FileHandle,  ' Called from: '  + CRLF )
+      Write( ' Called from: '  + CRLF )
       nLevel := 1
       DO WHILE ! ( ( ProcName := ProcName( ++nLevel ) ) == '' )
-         FWrite( FileHandle, space(30) + ProcFile( nLevel ) + "->" + ProcName + '(' + Str( Procline( nLevel ), 5 ) + ')' + CRLF )
+         Write( space(30) + ProcFile( nLevel ) + "->" + ProcName + '(' + LTrim( Str( Procline( nLevel ) ) ) + ')' + CRLF )
       ENDDO
    ELSE
-      FWrite( FileHandle,  CRLF )
+      Write( CRLF )
    ENDIF
 
    FOR EACH xParam IN HB_aParams()
-      FWrite( FileHandle, '>>>' + CStr( xParam ) + '<<<' + CRLF )
+      Write( 'Type: ' + ValType( xParam ) + ' >>>' + CStr( xParam ) + '<<<' + CRLF )
    NEXT
 
-   FWrite( FileHandle, CRLF )
+   Write( CRLF )
 
    FClose(FileHandle)
 
 RETURN .T.
 //--------------------------------------------------------------//
+
+

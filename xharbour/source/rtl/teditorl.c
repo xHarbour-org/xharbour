@@ -1,5 +1,5 @@
 /*
- * $Id: teditorl.c,v 1.7 2001/04/12 18:24:41 dholm Exp $
+ * $Id: teditorl.c,v 1.1.1.1 2001/12/21 10:42:08 ronpinkas Exp $
  */
 
 /*
@@ -104,6 +104,53 @@ static char * hb_strToken( char * szText, ULONG ulText,
    }
 }
 
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * hb_strTokenCount returns the number of tokens inside the string
+*/
+static ULONG hb_strTokenCount( char * szText, ULONG ulText,
+                               char cDelimiter )
+{
+   ULONG ulStart;
+   ULONG ulEnd = 0;
+   ULONG ulCounter = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strTokenCount(%s, %lu, %d)", szText, ulText, (int) cDelimiter));
+
+   do
+   {
+      ulStart = ulEnd;
+
+      if( cDelimiter != ' ' )
+      {
+         if( szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+      else
+      {
+         while( ulStart < ulText && szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+
+      if( ulStart < ulText && szText[ ulStart ] != cDelimiter )
+      {
+         ulEnd = ulStart + 1;
+
+         while( ulEnd < ulText && szText[ ulEnd ] != cDelimiter )
+            ulEnd++;
+      }
+      else
+         ulEnd = ulStart;
+
+      ulCounter++;
+   }
+   while( ulEnd < ulText );
+
+   return ulCounter;
+
+}
+
 /* returns the nth occurence of a substring within a token-delimited string */
 HB_FUNC( __STRTOKEN )
 {
@@ -147,5 +194,22 @@ HB_FUNC( __STRTKPTR )
 
    /* return token */
    hb_retclen( pszText, ulLen );
+}
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * returns number of tokens within a token-delimited string
+ *
+ * __StrTokenCount( cString, Chr( 9 ) )
+*/
+HB_FUNC( __STRTOKENCOUNT )
+{
+   ULONG ulCounter;
+
+   ulCounter = hb_strTokenCount( hb_parc( 1 ), hb_parclen( 1 ),
+                          ISCHAR( 2 ) ? *hb_parc( 2 ) : ' ' );
+
+   hb_retnl( ulCounter );
 }
 

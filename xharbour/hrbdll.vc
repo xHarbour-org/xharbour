@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.21 2003/10/21 15:31:05 paultucker Exp $
+# $Id: hrbdll.vc,v 1.22 2003/11/10 00:32:13 jonnymind Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -80,9 +80,9 @@ CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogtyb2 /Gs /GD 
 #  ßßßßßßßßßßßßßßßßßßßßßßß
 
 HARBOUR_DLL_OBJS = \
-#  
-# Rtl c 
-#  
+#
+# Rtl c
+#
   $(OBJ_DIR)\abs.obj \
   $(OBJ_DIR)\accept.obj \
   $(OBJ_DIR)\ampm.obj \
@@ -227,6 +227,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\devoutp.obj \
   $(OBJ_DIR)\dircmd.obj \
   $(OBJ_DIR)\dummy.obj \
+  $(OBJ_DIR)\dumpvar.obj \
   $(OBJ_DIR)\errorsys.obj \
   $(OBJ_DIR)\fieldbl.obj \
   $(OBJ_DIR)\getlist.obj \
@@ -927,6 +928,12 @@ $(OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dummy.obj : $(OBJ_DIR)\dummy.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dumpvar.c : $(RTL_DIR)\dumpvar.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dumpvar.obj : $(OBJ_DIR)\dumpvar.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c

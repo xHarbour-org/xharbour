@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.6 2003/04/13 21:39:24 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.7 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             // then the value
             oVal := HB_Deserialize( cSerial, nMaxLen )
 
-            __objSendMsg( oObject, "_" + oElem, oVal )
+            __objSendMsgCase( oObject, "_" + oElem, oVal )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
 
             nLen--

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.80 2003/11/07 18:20:54 jonnymind Exp $
+ * $Id: classes.c,v 1.81 2003/11/08 00:14:22 jonnymind Exp $
  */
 
 /*
@@ -177,7 +177,10 @@ static PHB_DYNS s_msgClassName = NULL;
 static PHB_DYNS s_msgClassH    = NULL;
 static PHB_DYNS s_msgEval      = NULL;
 static PHB_DYNS s_msgClassSel  = NULL;
+static PHB_DYNS s_msgClassFullSel  = NULL;
 static PHB_DYNS s_msgClsParent = NULL;
+static BOOL     s_bClsScope    = TRUE;
+static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
 
 /* All functions contained in classes.c */
@@ -190,6 +193,7 @@ static void     hb_clsRelease( PCLASS );
 
 static HARBOUR  hb___msgClsH( void );
 static HARBOUR  hb___msgClsName( void );
+static HARBOUR  hb___msgClsFullSel( void );
 static HARBOUR  hb___msgClsSel( void );
 /* static HARBOUR  hb___msgClass( void ); */
 static HARBOUR  hb___msgSuper( void );
@@ -427,7 +431,13 @@ void hb_clsIsClassRef( void )
 
 static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend )
 {
-   USHORT uiScope = pMethod->uiScope;
+   USHORT uiScope;
+
+   // Checking scope. s_bClsScope is defined FALSE to retrieve values without scope violation
+   // i.e. during debug or in designer mode
+   if ( !s_bClsScope ) return TRUE;
+
+   uiScope = pMethod->uiScope;
 
    //#define DEBUG_SCOPE
 
@@ -1101,6 +1111,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       s_msgClassName = hb_dynsymGet( "CLASSNAME" );  /* Standard messages        */
       s_msgClassH    = hb_dynsymGet( "CLASSH" );     /* Not present in classdef. */
       s_msgClassSel  = hb_dynsymGet( "CLASSSEL" );
+      s_msgClassFullSel = hb_dynsymGet( "CLASSFULLSEL" );
       s_msgEval      = hb_dynsymGet( "EVAL" );
       /*s_msgClsParent = hb_dynsymGet( "ISDERIVEDFROM" );*/
       /*s_msgClass     = hb_dynsymGet( "CLASS" );*/
@@ -1114,6 +1125,9 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
    else if( pMsg == s_msgClassSel )
       return hb___msgClsSel;
+
+   else if( pMsg == s_msgClassFullSel )
+      return hb___msgClsFullSel;
 
    else if( pMsg == s_msgEval )
       return hb___msgEval;
@@ -1422,6 +1436,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_B
       pNewMeth->ulTime = 0;
       pNewMeth->ulRecurse = 0;
       pNewMeth->bIsPersistent = bPersistent;
+      pNewMeth->uiType = wType;
 
       /* in case of re-used message */
       if ( pNewMeth->pInitValue )
@@ -2485,6 +2500,47 @@ HB_FUNC( __OBJSENDMSG )
 }
 
 /*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * <xRet> = __objSendMsgCase( <oObj>, <cSymbol>, <xArg,..>
+ *
+ * Send a case sensitive message to an object
+ */
+HB_FUNC( __OBJSENDMSGCASE )
+{
+   HB_THREAD_STUB
+   PHB_ITEM pObject  = hb_param( 1, HB_IT_OBJECT );
+   USHORT uiPCount = hb_pcount();
+
+   if( uiPCount >= 2 && pObject )    /* Object & message passed */
+   {
+                    /*hb_dynsymFindName( hb_parc(2) );*/
+      PHB_DYNS pMsg = hb_dynsymGetCase( hb_parc(2) );
+
+      if( pMsg )
+      {
+         USHORT uiParam;
+
+         hb_vmPushSymbol( pMsg->pSymbol );      /* Push char symbol as message  */
+
+         hb_vmPush( pObject );               /* Push object */
+
+         for( uiParam = 3; uiParam <= uiPCount; uiParam++ )   /* Push arguments on stack */
+         {
+            // NOTE: hb_param() cannot be used here, because it dereferences the parameters
+            hb_vmPush( hb_stackItemFromBase( uiParam ) );
+         }
+
+         hb_vmSend( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSGCASE", 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ) );
+   }
+}
+
+/*
  * <hClass> := __clsInstSuper( <cName> )
  *
  * Instance super class and return class handle
@@ -2835,6 +2891,97 @@ static HARBOUR hb___msgClsName( void )
    hb_retc( hb_objGetClsName( pItemRef ) );
 }
 
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * <aMessages> := <obj>:ClassFullSel()
+ *
+ * Returns all the messages in <obj> as ClassSel plus scope
+ */
+static HARBOUR hb___msgClsFullSel( void )
+{
+   HB_THREAD_STUB
+   HB_ITEM_PTR pSelf = hb_stackSelfItem();
+   USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
+   PHB_ITEM pReturn = hb_itemNew( NULL );
+   USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
+   BOOL bSuper = ( ISLOG( 3 ) ? hb_parl( 3 ) : TRUE );
+
+   if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
+   {
+      PHB_ITEM pItemRef = hb_itemUnRef( pSelf ); // Is it possible?
+
+      if( HB_IS_ARRAY( pItemRef ) )
+      {
+         uiClass = pItemRef->item.asArray.value->uiClass;
+      }
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
+      USHORT uiPos = 0;
+      USHORT uiAt;
+
+      hb_itemRelease( pReturn );
+      pReturn = hb_itemArrayNew( pClass->uiMethods );
+                                                /* Create a transfer array  */
+      for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+      {
+         PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
+
+         (HB_VM_STACK.pMethod) = NULL;            /* Current method pointer   */
+
+         if( pMessage )                         /* Hash Entry used ?        */
+         {
+            (HB_VM_STACK.pMethod) = pClass->pMethods + uiAt;
+
+            if( ( nParam == HB_MSGLISTALL ) ||
+                ( ( nParam == HB_MSGLISTCLASS ) &&
+                  ( ( (HB_VM_STACK.pMethod)->pFunction == hb___msgSetClsData ) ||
+                    ( (HB_VM_STACK.pMethod)->pFunction == hb___msgGetClsData ) ||
+                    ( (HB_VM_STACK.pMethod)->pFunction == hb___msgSetShrData ) ||
+                    ( (HB_VM_STACK.pMethod)->pFunction == hb___msgGetShrData ) )
+                ) ||
+                ( ( nParam == HB_MSGLISTPURE ) &&
+                  ( ( ! ( (HB_VM_STACK.pMethod)->pFunction == hb___msgSetClsData ) ) &&
+                    ( ! ( (HB_VM_STACK.pMethod)->pFunction == hb___msgGetClsData ) ) &&
+                    ( ! ( (HB_VM_STACK.pMethod)->pFunction == hb___msgSetShrData ) ) &&
+                    ( ! ( (HB_VM_STACK.pMethod)->pFunction == hb___msgGetShrData ) ) )
+                )
+              )
+            {
+               if( uiScope == 0 || (HB_VM_STACK.pMethod)->uiScope & uiScope )
+               {
+                  PHB_ITEM pSubArray = hb_itemArrayNew( 4 );
+
+                     PHB_ITEM pMsg   = hb_itemPutC( NULL, pMessage->pSymbol->szName );
+                     PHB_ITEM pType  = hb_itemPutNI( NULL, (HB_VM_STACK.pMethod)->uiType );
+                     PHB_ITEM pScope = hb_itemPutNI( NULL, (HB_VM_STACK.pMethod)->uiScope );
+
+                     hb_arraySet( pSubArray, HB_OO_DATA_SYMBOL, pMsg );
+                     // value 2 is VALUE or PFUNCTION
+                     hb_arraySet( pSubArray, HB_OO_DATA_TYPE, pType );
+                     hb_arraySet( pSubArray, HB_OO_DATA_SCOPE, pScope );
+
+                     hb_itemRelease( pMsg );
+                     hb_itemRelease( pType );
+                     hb_itemRelease( pScope );
+
+                  hb_arraySet( pReturn, ++uiPos, pSubArray );
+                  hb_itemRelease( pSubArray );
+               }
+            }
+         }
+      }
+
+      hb_arraySize( pReturn, uiPos );
+   }
+
+   hb_itemRelease( hb_itemReturn( pReturn ) );
+}
 
 /*
  * <aMessages> := <obj>:ClassSel()
@@ -3503,3 +3650,54 @@ void hb_clsSetModule( USHORT uiClass )
       #endif
    }
 }
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * Activate Class Scoping
+ *       TRUE  - Class Scoping is active (Default)
+ *       FALSE - for debugging purpose and to retrieve data without get scope error
+ *
+ * <bOldClsScope> := __SetClassScope( <bNewClsScope> )
+ */
+HB_FUNC( __SETCLASSSCOPE )
+{
+   HB_THREAD_STUB
+   BOOL bOldClsScope = s_bClsScope;
+
+   if ( ISLOG( 1 ) )
+   {
+      s_bClsScope = hb_parl( 1 );
+   }
+
+   hb_retl( bOldClsScope );
+}
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * Auto Initialize Class Flag
+ *
+ * <bOldClsAutoInit> := __SetClassAutoInit( <bNewClsAutoInit> )
+ *
+ * <bNewClsAutoInit> =
+ *       FALSE - No auto initialization (Default)
+ *       TRUE  - Auto initialize class with its default constructor
+ *               If true class will be initialized calling its first constructor method
+ *               i.e.: oWin := TWindow() is equivalent to oWin := TWindow():New()
+ *
+ */
+HB_FUNC( __SETCLASSAUTOINIT )
+{
+   HB_THREAD_STUB
+   BOOL bOldClsAutoInit = s_bClsAutoInit;
+
+   if ( ISLOG( 1 ) )
+   {
+      s_bClsAutoInit = hb_parl( 1 );
+   }
+
+   hb_retl( bOldClsAutoInit );
+}
+
+

@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.15 2003/08/05 10:20:51 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.16 2003/08/07 18:27:04 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,10 @@
  *
  * New Param for Method :ClassSel() to allow it to return only ClassData array
  *
+ * Copyright 2003 Francesco Saverio Giudice <info@fsgiudice.com>
+ *    __objGetMsgFullList
+ *    __objGetValueFullList
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -127,6 +131,51 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
 
 RETURN aReturn
 
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * return all informations about classes, included type and scope
+*/
+FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
+
+   LOCAL aMessages
+   LOCAL aReturn
+   LOCAL nFirstProperty, aMsg
+
+   IF ValType( oObject ) != 'O'
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+   ENDIF
+
+   IF ValType( lData ) != 'L'
+      lData := .T.
+   ENDIF
+
+   IF ValType( nNoScope ) != 'N'
+      nNoScope := 0
+   ENDIF
+
+   // nRange is already defaulted in ClassFullSel in classes.c
+
+   aMessages := ASort( oObject:ClassFullSel( nRange, nScope ),,, {|x,y| x[HB_OO_DATA_SYMBOL] < y[HB_OO_DATA_SYMBOL] } )
+   aReturn   := {}
+
+   nFirstProperty := aScan( aMessages, { | aElement | aElement[HB_OO_DATA_SYMBOL][1] == '_' } )
+
+   FOR EACH aMsg IN aMessages
+
+      IF aMsg[HB_OO_DATA_SYMBOL][1] == '_'
+         LOOP
+      ENDIF
+
+      IF ( AScan( aMessages, { | aElement | aElement[HB_OO_DATA_SYMBOL] == "_" + aMsg[HB_OO_DATA_SYMBOL] }, nFirstProperty ) != 0 ) == lData
+         IF nNoScope == 0 .OR. HB_BITAND( aMsg[HB_OO_DATA_SCOPE], nNoScope ) == 0
+            AAdd( aReturn, aMsg )
+         ENDIF
+      ENDIF
+   NEXT
+
+RETURN aReturn
+
 FUNCTION __objGetMethodList( oObject, nScope )
 
    IF !ISOBJECT( oObject )
@@ -155,6 +204,37 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
    FOR EACH cVar IN aVars
       IF !( cVar IN aExcept )
          AAdd( aReturn, { cVar, __objSendMsg( oObject, cVar ) } )
+      ENDIF
+   NEXT
+
+RETURN aReturn
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * return all values from classes, included type and scope
+*/
+FUNCTION __objGetValueFullList( oObject, aExcept, nScope, nNoScope )
+
+   LOCAL aVars
+   LOCAL aReturn
+   LOCAL aVar
+
+   IF ValType( oObject ) != 'O'
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+   IF ValType( aExcept ) != 'A'
+      aExcept := {}
+   ENDIF
+
+   aVars   := __objGetMsgFullList( oObject, .T., HB_MSGLISTALL, nScope, nNoScope )
+   aReturn := {}
+
+   FOR EACH aVar IN aVars
+      IF !( aVar[HB_OO_DATA_SYMBOL] IN aExcept )
+         //TraceLog( "__objGetValueFullList():  aVar[HB_OO_DATA_SYMBOL]",  aVar[HB_OO_DATA_SYMBOL] )
+         AAdd( aReturn, { aVar[HB_OO_DATA_SYMBOL], __objSendMsgCase( oObject, aVar[HB_OO_DATA_SYMBOL] ), aVar[HB_OO_DATA_TYPE], aVar[HB_OO_DATA_SCOPE] } )
       ENDIF
    NEXT
 

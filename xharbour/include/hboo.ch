@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.3 2002/10/14 23:54:32 ronpinkas Exp $
+ * $Id: hboo.ch,v 1.4 2003/03/25 02:36:11 ronpinkas Exp $
  */
 
 /*
@@ -72,17 +72,17 @@
 #define HB_MSGLISTPURE  2
 
 /* Method or Data attribute (nScope)*/
-#define HB_OO_CLSTP_PUBLISHED   0 /* Filtering scope only */
 #define HB_OO_CLSTP_EXPORTED    1 /* No comment, default */
-#define HB_OO_CLSTP_PROTECTED   2 /* Only usable from one of the object's method (even sublclassed object) */
-#define HB_OO_CLSTP_HIDDEN      4 /* Only usable from one of the object's method (and not from sublclassed one) */
-#define HB_OO_CLSTP_CTOR        8 /* Constructor  (Not yet used) */
-#define HB_OO_CLSTP_READONLY   16 /* No comment */
-#define HB_OO_CLSTP_SHARED     32 /* Allow a classvar (or classmethod) to be shared by all the subclasses.
+#define HB_OO_CLSTP_PUBLISHED   2 /* Filtering scope only */
+#define HB_OO_CLSTP_PROTECTED   4 /* Only usable from one of the object's method (even sublclassed object) */
+#define HB_OO_CLSTP_HIDDEN      8 /* Only usable from one of the object's method (and not from sublclassed one) */
+#define HB_OO_CLSTP_CTOR       16 /* Constructor  (Not yet used) */
+#define HB_OO_CLSTP_READONLY   32 /* No comment */
+#define HB_OO_CLSTP_SHARED     64 /* Allow a classvar (or classmethod) to be shared by all the subclasses.
                                      Not the default behaviour as each subclass will have its own copy by default. */
-#define HB_OO_CLSTP_CLASS      64 /* The related message is a superobject call, uidata is the superclass handle
+#define HB_OO_CLSTP_CLASS     128 /* The related message is a superobject call, uidata is the superclass handle
                                      pInitValue contain one superclass object instance (absolutely needed for Inline msg and class data) */
-#define HB_OO_CLSTP_SUPER     128 /* The related message is inherited from a superclass */
+#define HB_OO_CLSTP_SUPER     256 /* The related message is inherited from a superclass */
 
 /* Message types */
 #define HB_OO_MSG_METHOD        0

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.6 2003/08/15 22:17:26 ronpinkas Exp $
+ * $Id: classes.h,v 1.7 2003/10/07 23:48:23 ronpinkas Exp $
  */
 
 /*
@@ -71,6 +71,7 @@ typedef struct hb_class_method
    ULONG    ulTime;              /* profiler support */
    ULONG    ulRecurse;           /* profiler support */
    BOOL     bIsPersistent;       /* persistence support */
+   USHORT   uiType;              /* Type value */
 } METHOD, * PMETHOD;
 
 typedef struct
