@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.25 2002/05/08 08:58:11 alkresin Exp $
+ * $Id: hbrddntx.h,v 1.26 2002/09/20 08:28:56 alkresin Exp $
  */
 
 /*
@@ -307,6 +307,7 @@ typedef struct _NTXAREA
 
    LPTAGINFO lpCurTag;         /* Pointer to current order */
    LPTAGINFO lpNtxTag;         /* Pointer to tags list */
+   BOOL fNtxAppend;            /* TRUE if new record is added */
 
 } NTXAREA;
 
