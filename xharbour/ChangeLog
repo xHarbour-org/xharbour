@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3938 2005/03/14 12:35:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3939 2005/03/14 12:52:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-14 12:51 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * /tests/cttest/volget.prg
+  * /tests/cttest/volset.prg
+    + tests of two new ct functions.
 
 2005-03-14 12:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * /utils/hbmake.prg
@@ -19,7 +24,7 @@
       name of a drive. In the future this function could be enhanced to
       return a disk serial number also. If anyone want to do it...
       note: Sorry, I know that we are in bug freeze, but these functions does
-      not affect main xharbour's functionalities.
+      not affect the main xharbour's functionalities.
 
 2005-03-13 16:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_tgz.sh
