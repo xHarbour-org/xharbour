@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.27 2004/03/12 12:37:25 likewolf Exp $
+ * $Id: debugger.prg,v 1.28 2004/03/21 12:01:25 likewolf Exp $
  */
 
 /*
@@ -2710,6 +2710,8 @@ METHOD WatchPointsShow() CLASS TDebugger
       elseif Len( ::aWatch ) < ::oWndPnt:nBottom - ::oWndPnt:nTop - 1
          ::oWndPnt:Resize( ,, ::oWndPnt:nTop + Len( ::aWatch ) + 1 )
          lRepaint := .t.
+      else
+         ::oBrwPnt:RefreshAll():ForceStable()
       endif
       if ! ::oWndPnt:lVisible .OR. lRepaint
          ::ResizeWindows( ::oWndPnt )
