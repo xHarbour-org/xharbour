@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.40 2002/10/24 19:07:04 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.41 2002/10/25 01:25:48 what32 Exp $
  */
 
 /*
@@ -242,28 +242,32 @@ return(1)
 
 
 CLASS InspectBrowser FROM TWBrowse
+
    DATA oCtrl
    METHOD New() CONSTRUCTOR
    METHOD SetColControl()
    METHOD OnCommand()
+
 ENDCLASS
 
 METHOD New( oParent ) CLASS InspectBrowser
    local oCol1,oCol2, aProp := { {"",""} }
+   
    super:New( oParent, 150, 0, 0, 100, 100, aProp )
-   ::BgColor      := GetSysColor(COLOR_BTNFACE)
-   ::HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
+   
+   ::BgColor      := GetSysColor( COLOR_BTNFACE )
+   ::HiliteNoFocus:= GetSysColor( COLOR_BTNFACE )
    ::wantHScroll  :=.F.
    ::HeadHeight   := 20
 
-   oCol1:= whColumn():Init( "Property",{|oCol,oB,n| asString(oB:source[n,1]) },DT_LEFT, 84 )
+   oCol1 := whColumn():Init( "Property",{|oCol,oB,n| asString(oB:source[n,1]) }, DT_LEFT, 84 )
    oCol1:VertAlign  := TA_CENTER
    oCol1:Style      := TBC_MOVE + TBC_SIZE
 
-   oCol2:= whColumn():Init( "Value",   {|oCol,oB,n| asString(oB:source[n,2]) },DT_LEFT, 80 )
+   oCol2 := whColumn():Init( "Value",   {|oCol,oB,n| asString(oB:source[n,2]) }, DT_LEFT, 80 )
    oCol2:VertAlign  := TA_CENTER
    oCol2:Style      := TBC_MOVE + TBC_SIZE
-   oCol2:bSaveBlock := {|cText,o,nKey|oApp:MainFrame:ObjInsp:SaveVar(cText,nKey)}
+   oCol2:bSaveBlock := {| cText, o, nKey| oApp:MainFrame:ObjInsp:SaveVar( cText, nKey ) }
 
    ::AddColumn( oCol1 )
    ::AddColumn( oCol2 )
@@ -275,22 +279,27 @@ RETURN(self)
 METHOD SetColControl(x,y) CLASS InspectBrowser
    local cType, cVar, aRect
    if y==2
-      IF ::oCtrl!=NIL
+   
+      IF ::oCtrl != NIL
          ::oCtrl:Destroy()
-         ::oCtrl:=NIL
+         ::oCtrl := NIL
       ENDIF
+      
       cVar := ::source[::RecPos][1]
       cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
       DO CASE
          CASE cType == "L"
-              aRect:=::GetItemRect()
-              ::oCtrl:=TComboBox():New(self,222,aRect[1]-1,aRect[2]-1,aRect[3]-aRect[1]+1,100) //,aRect[4]-aRect[2]+1)
+              aRect   := ::GetItemRect()
+              ::oCtrl := TComboBox():New( self, 222, aRect[1]-1, aRect[2]-1,;
+                                                     aRect[3]-aRect[1]+1, 100)
               ::oCtrl:Create()
-              ::oCtrl:SetItemHeight(-1,aRect[4]-(aRect[2]+5))
-              ::oCtrl:AddString("TRUE")
-              ::oCtrl:AddString("FALSE")
+              ::oCtrl:SetItemHeight( -1, aRect[4]-(aRect[2]+5) )
+              ::oCtrl:AddString( "TRUE" )
+              ::oCtrl:AddString( "FALSE" )
+
          CASE cType == "C"
               ::EditCell(,::Columns[::ColPos]:bSaveBlock,,,,)
+
          CASE cType == "O"
               aRect:=::GetItemRect()
               view aRect
@@ -304,22 +313,28 @@ RETURN(self)
 
 METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
    LOCAL oList
-   IF ::oCtrl!=NIL.AND.nlParam==::oCtrl:handle
+   
+   IF ::oCtrl != NIL .AND. nlParam == ::oCtrl:handle
+   
       DO CASE
-         CASE ::oCtrl:ClassName()=="TCOMBOBOX"
-              IF HIWORD(nwParam)==CBN_KILLFOCUS
+         CASE ::oCtrl:ClassName() == "TCOMBOBOX"
+         
+              IF HiWord(nwParam) == CBN_KILLFOCUS
                  ::oCtrl:Destroy()
-                 ::oCtrl:=NIL
+                 ::oCtrl := NIL
               ENDIF
-         CASE ::oCtrl:ClassName()=="TBUTTON"
+              
+         CASE ::oCtrl:ClassName() == "TBUTTON"
               DO CASE
-                 CASE HIWORD(nwParam)==BN_KILLFOCUS
+                 CASE HiWord(nwParam) == BN_KILLFOCUS
                       ::oCtrl:Destroy()
-                      ::oCtrl:=NIL
-                 CASE HIWORD(nwParam)==BN_CLICKED
+                      ::oCtrl := NIL
+                      
+                 CASE HiWord(nwParam)==BN_CLICKED
                       ::oCtrl:Destroy()
-                      ::oCtrl:=NIL
-                      oList:=StringList():New(self)
+                      ::oCtrl := NIL
+                      
+                      oList := StringList():New(self)
                       oList:Create()
               ENDCASE
       ENDCASE
@@ -346,11 +361,11 @@ METHOD OnCreate() CLASS StringList
    NEXT
 
    cText:= Left( cText, Len( cText ) -2 )
-   SetDlgItemText( ::handle, 103, cText )
-   //nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
-   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInsp:CurObject:Items:Text ) ) ) + " Lines" )
 
-   TraceLog( oApp:MainFrame:ObjInsp:CurObject:Items:Text, cText, GetDlgItemText( ::handle, 103 ) )
+   PostMessage( GetDlgItem( ::handle, 103 ), EM_SETSEL, 0, 0)
+   SetDlgItemText( ::handle, 103, cText )
+
+   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInsp:CurObject:Items:Text ) ) ) + " Lines" )
 
 RETURN Self
 

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.22 2002/10/19 10:03:48 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.23 2002/10/22 17:23:46 what32 Exp $
  */
 
 /*
@@ -488,8 +488,10 @@ METHOD OnLButtonDown( wParam, x, y )
                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
+            
             ::HintWindow:Activate(1)
-                  ::HintWindow:TrackHint(1)
+            ::HintWindow:TrackHint(1)
+            
             ::lHintActive := .T.
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
                ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
@@ -589,7 +591,14 @@ METHOD OnMouseMove( aParam,x,y)
          ::aEditRect:=::MoveCtrl(::Handle,aPt)
          DrawFocusRect(hDC,::aEditRect)
       ENDIF
+
       ReleaseDc(::Handle,hDC)
+
+      if ::moving.or.::sizing
+         ::HintWindow:SetTitle(0,"")
+         ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
+                              alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
+      endif
 
    ELSE
       IF Empty(::Cursor)
@@ -811,10 +820,6 @@ METHOD MoveCtrl(hWnd,aPt)
               Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
 
    ENDIF
-   if ::moving.or.::sizing
-      ::HintWindow:SetTitle(0,"")
-      ::HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"  "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
-   endif
 
    ::aEditRect:=aRect
 

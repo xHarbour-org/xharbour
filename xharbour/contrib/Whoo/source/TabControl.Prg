@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.20 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TabControl.Prg,v 1.21 2002/10/22 17:24:21 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -214,7 +214,7 @@ METHOD Configure(lCreate) CLASS TTabControl
                          acRect[2]+acRect[4],;
                          aTab[3]-6,;
                          aTab[4]-acRect[2]-acRect[4]-4,;
-                         .T.)
+                         .F.)
 
          if lCreate
             IF i<>::CurSel
@@ -381,12 +381,12 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
 *-----------------------------------------------------------------------------*
 
 METHOD OnSize( nwParam,x , y ) CLASS TTabControl
-   local n, aRect
-   for n:=1 to LEN( ::Controls )
-       if ::Controls[n]!=nil
+   local n, aRect, oCtrl
+//   FOR EACH oCtrl IN ::Controls
+//       IF oCtrl != NIL
           ::Configure(.F.)
-       endif
-   next
+//       ENDIF
+//   NEXT
 return( nil )
 
 *-----------------------------------------------------------------------------*

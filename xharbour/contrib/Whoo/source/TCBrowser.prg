@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.8 2002/10/23 02:19:41 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.9 2002/10/25 01:25:47 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -242,7 +242,7 @@ CLASS TWBrowse FROM TWinControl
    METHOD OnSetFocus()   INLINE ::drawdata(,::RowPos,IF(::wantHiliteAll,NIL,::ColPos)),NIL
    METHOD OnKillFocus()  INLINE ::drawdata(,::RowPos,IF(::wantHiliteAll,NIL,::ColPos)),NIL
    METHOD OnEraseBkGnd() INLINE 0
-   METHOD OnSize()       INLINE ::RefreshAll(),0
+   METHOD OnSize()       INLINE ::RefreshAll(),nil
    METHOD OnNotify()
    METHOD OnSysColorChange()
 
@@ -1076,7 +1076,7 @@ METHOD OnChange() CLASS TWBrowse
    ENDIF
    ::OldRecNo:=::RecPos
    ::OldColPos:=::ColPos
-RETURN(self)
+RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
 
@@ -1934,7 +1934,6 @@ METHOD OnKeyDown( nwParam, nlParam)  CLASS TWBrowse
 
       ENDCASE
    ENDIF
-   ::OnChange()
 RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
