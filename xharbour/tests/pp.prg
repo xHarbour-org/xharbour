@@ -826,7 +826,6 @@ PROCEDURE RP_Dot()
    LOCAL aCpyTranRules, aCpyTranResults
 
    LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nKBCommands := 1, nTemp
-   LOCAL sTemp
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
@@ -889,10 +888,7 @@ PROCEDURE RP_Dot()
 
       sLine := StrTran( sLine,  Chr(9), " " )
 
-      sTemp := RTrim( sLine )
-      sTemp := PP_PreProLine( sTemp, 1, '' )
-      ExecuteLine( sTemp )
-      //ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
+      ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
 
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
 
@@ -1041,9 +1037,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
             @ 0,4 SAY Pad( sBlock, 76 ) COLOR "N/R"
             DevPos( nRow, nCol )
 
-            TraceLog( "Before", sBlock )
             Eval( &( "{|| " + sBlock + " }" ) )
-            TraceLog( "After", sBlock )
 
             #ifdef __CLIPPER__
                nBlockID := 0

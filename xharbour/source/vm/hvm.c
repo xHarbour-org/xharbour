@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.93 2002/08/24 01:48:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.94 2002/08/26 00:29:55 ronpinkas Exp $
  */
 
 /*
@@ -522,18 +522,18 @@ void HB_EXPORT hb_vmQuit( void )
    {
       hb_itemClear( &hb_stack.Return );
    }
-   printf( "After Return\n" );
+   //printf( "After Return\n" );
 
    hb_arrayRelease( &s_aStatics );
-   printf( "After Statics\n" );
+   //printf( "After Statics\n" );
 
    hb_memvarsRelease();    /* clear all PUBLIC variables */
-   printf( "After Memvar\n" );
+   //printf( "After Memvar\n" );
 
    /* release all known garbage */
    //hb_gcCollectAll();
    hb_gcReleaseAll();
-   printf( "After GC\n" );
+   //printf( "After GC\n" );
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
    //printf( "After memvarsFree\n" );
