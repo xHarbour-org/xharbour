@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.3 2003/10/13 11:54:08 jonnymind Exp $
+   $Id: xwt_win.c,v 1.4 2003/10/14 23:12:12 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -195,7 +195,7 @@ BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
    /* menus are handled differently in WINDOWS */
    if ( wWidget->type == XWT_TYPE_MENU )
    {
-      DestroyMenu( wWidget->widget_data );
+      DestroyMenu( (HMENU) wWidget->widget_data );
    }
    else {
       HWND wSelf = (HWND) wWidget->get_top_widget( wWidget->widget_data );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.29 2004/06/17 22:14:38 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.30 2004/06/18 00:52:17 paultucker Exp $
  */
 
 /*
@@ -603,7 +603,7 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
       s_pColor[ 1 ] = 0x70;
       s_pColor[ 2 ] = 0;
       s_pColor[ 3 ] = 0;
-      s_pColor[ 4 ] = 0x07;
+      s_pColor[ 4 ] = 0x70;
    }
 
    do

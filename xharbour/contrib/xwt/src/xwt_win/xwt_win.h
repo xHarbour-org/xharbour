@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.h,v 1.2 2003/10/13 11:54:08 jonnymind Exp $
+   $Id: xwt_win.h,v 1.3 2003/10/14 23:12:12 jonnymind Exp $
 
    GTK interface
 */
@@ -36,13 +36,26 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
     LPARAM lParam
 );
 
-
+#ifdef __cplusplus
 typedef struct tag_xwt_win_base_data
 {
    PXWT_WIDGET xwt_widget;
    HWND  hMain;
 } XWT_WIN_BASE_DATA, *PXWT_WIN_BASE_DATA;
 
+typedef struct tag_xwt_win_data : public tag_xwt_win_base_data
+{
+   PHB_BASEARRAY pMenu;
+   HWND  hMainWidget;
+   HWND  hStatusBar;
+} XWT_WIN_DATA, *PXWT_WIN_DATA;
+
+#else
+typedef struct tag_xwt_win_base_data
+{
+   PXWT_WIDGET xwt_widget;
+   HWND  hMain;
+} XWT_WIN_BASE_DATA, *PXWT_WIN_BASE_DATA;
 
 typedef struct tag_xwt_win_data
 {
@@ -51,6 +64,8 @@ typedef struct tag_xwt_win_data
    HWND  hMainWidget;
    HWND  hStatusBar;
 } XWT_WIN_DATA, *PXWT_WIN_DATA;
+#endif
+
 
 /* Windows menu are not considered widgets (popup menus are, but only at toplevel);
 Making them real widgets would require a complete rewrite of windows menu (as GTK
