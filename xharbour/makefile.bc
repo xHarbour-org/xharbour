@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.40 2003/04/08 20:26:04 lculik Exp $
+# $Id: makefile.bc,v 1.41 2003/04/10 16:54:53 ronpinkas Exp $
 #
 
 #
@@ -127,7 +127,6 @@ MACRO_DIR    = source\macro
 PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
-RPC_DIR      = source\rtl\uses_mt
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
 SAMPLES_DIR  = source\clipsamp
@@ -173,6 +172,11 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
    HARBOURFLAGS = $(HARBOURFLAGS) -dPDF
 !endif
 
+!if $d(HB_THREAD_SUPPORT)
+   HB_MT_FLAGS=-DHB_THREAD_SUPPORT
+   HARBOURFLAGS= $(HARBOURFLAGS) $(HB_MT_FLAGS)   
+!endif
+
 #
 # Macros to access our library names
 #
@@ -202,7 +206,6 @@ SAMPLES_LIB    = $(LIB_DIR)\samples.lib
    DBFNTX_LIB = $(LIB_DIR)\dbfntxmt.lib
    DBFCDX_LIB = $(LIB_DIR)\dbfcdxmt.lib
    PP_LIB     = $(LIB_DIR)\ppmt.lib
-   RPC_LIB    = $(LIB_DIR)\rpcmt.lib
    ODBC_LIB   = $(LIB_DIR)\hbodbcmt.lib
 !endif
 
@@ -260,15 +263,6 @@ HB_GT_LIBS = \
 # Rules
 #
 
-#
-# RPC.LIB rules
-#
-
-!if $d(HB_THREAD_SUPPORT)
-   RPC_LIB_OBJS = \
-   $(RTL_OBJ_DIR)\trpc.obj \
-   $(RTL_OBJ_DIR)\trpccli.obj
-!endif
 
 #
 # RTL.LIB rules
@@ -451,6 +445,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\tpopup.obj \
    $(RTL_OBJ_DIR)\traceprg.obj \
    $(RTL_OBJ_DIR)\treport.obj \
+   $(RTL_OBJ_DIR)\trpc.obj \
+   $(RTL_OBJ_DIR)\trpccli.obj \
    $(RTL_OBJ_DIR)\ttable.obj \
    $(RTL_OBJ_DIR)\ttextlin.obj \
    $(RTL_OBJ_DIR)\ttopbar.obj \
@@ -814,7 +810,6 @@ all: \
    $(HARBOUR_EXE) \
    $(VM_LIB) \
    $(RTL_LIB) \
-   $(RPC_LIB) \
    $(MACRO_LIB) \
    $(DEBUG_LIB) \
    $(LANG_LIB) \
@@ -849,7 +844,6 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 $(PP_LIB)     : $(PP_LIB_OBJS)
 $(RDD_LIB)    : $(RDD_LIB_OBJS)
 $(RTL_LIB)    : $(RTL_LIB_OBJS)
-$(RPC_LIB)    : $(RPC_LIB_OBJS)
 $(VM_LIB)     : $(VM_LIB_OBJS)
 $(GTCGI_LIB)  : $(GTCGI_LIB_OBJS)
 $(GTDOS_LIB)  : $(GTDOS_LIB_OBJS)
@@ -2232,23 +2226,19 @@ $(RTL_OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-#
-# RPC LIB
-#
-
-$(RTL_OBJ_DIR)\trpc.c : $(RPC_DIR)\trpc.prg
+$(RTL_OBJ_DIR)\trpc.c : $(RTL_DIR)\trpc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpc.obj : $(RTL_OBJ_DIR)\trpc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RPC_LIB) $(ARFLAGS) -+$@,,
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(RTL_OBJ_DIR)\trpccli.c : $(RPC_DIR)\trpccli.prg
+$(RTL_OBJ_DIR)\trpccli.c : $(RTL_DIR)\trpccli.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RPC_LIB) $(ARFLAGS) -+$@,,
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 #
 # LANG.LIB dependencies

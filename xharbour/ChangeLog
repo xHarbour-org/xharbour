@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.944 2003/04/12 23:28:34 jonnymind Exp $
+ * $Id: ChangeLog,v 1.945 2003/04/13 09:29:56 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-13 13:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+  + source/rtl/trpc.prg
+  + source/rtl/trpccli.prg
+    ! Now -DHB_THREAD_SUPPORT switch is added during MT compilation
+      under windows (linux version is under way). For this reason,
+      I am moving back trcp* to rtl, as rtl.lib won't contain any
+      of the rpc functions (at the moment).
+
+  * makefile.vc
+   ! fixed as above, but I cannot be sure it works correctly. Please,
+     have a test
 
 2003-04-13 11:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/filesys.c
