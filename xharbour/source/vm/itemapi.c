@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.18 2002/07/11 14:29:49 walito Exp $
+ * $Id: itemapi.c,v 1.19 2002/07/23 01:36:43 ronpinkas Exp $
  */
 
 /*
@@ -411,6 +411,12 @@ double hb_itemGetND( PHB_ITEM pItem )
 
          case HB_IT_LONG:
             return ( double ) pItem->item.asLong.value;
+
+         case HB_IT_DATE:
+            return ( double ) pItem->item.asDate.value;
+
+         case HB_IT_STRING:
+            return ( double ) pItem->item.asString.value[0];
       }
    }
 
@@ -433,6 +439,12 @@ int hb_itemGetNI( PHB_ITEM pItem )
 
          case HB_IT_DOUBLE:
             return ( int ) pItem->item.asDouble.value;
+
+         case HB_IT_DATE:
+            return ( int ) pItem->item.asDate.value;
+
+         case HB_IT_STRING:
+            return ( int ) pItem->item.asString.value[0];
       }
    }
 
@@ -458,6 +470,9 @@ long hb_itemGetNL( PHB_ITEM pItem )
 
          case HB_IT_DATE:
             return pItem->item.asDate.value;
+
+         case HB_IT_STRING:
+            return ( long ) pItem->item.asString.value[0];
       }
    }
 
@@ -804,6 +819,11 @@ void hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
 
          case HB_IT_INTEGER:
             if( piWidth ) *piWidth = ( int ) pItem->item.asInteger.length;
+            if( piDecimal ) *piDecimal = 0;
+            break;
+
+         case HB_IT_DATE:
+            if( piWidth ) *piWidth = ( int ) 10;
             if( piDecimal ) *piDecimal = 0;
             break;
 

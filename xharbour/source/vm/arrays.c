@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.17 2002/06/12 11:53:06 ronpinkas Exp $
+ * $Id: arrays.c,v 1.18 2002/06/21 19:18:27 ronpinkas Exp $
  */
 
 /*
@@ -595,7 +595,7 @@ ULONG hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * 
                   return ulStart + 1;                  /* arrays start from 1 */
             }
          }
-         else if( HB_IS_STRING( pValue ) )
+         else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
          {
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
@@ -604,6 +604,18 @@ ULONG hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * 
                /* NOTE: The order of the pItem and pValue parameters passed to
                         hb_itemStrCmp() is significant, please don't change it. [vszakats] */
                if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, FALSE ) == 0 )
+                  return ulStart + 1;
+            }
+         }
+         else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
+         {
+            long lValue = hb_itemGetDL( pValue );
+
+            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            {
+               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
+
+               if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
                   return ulStart + 1;
             }
          }
@@ -618,18 +630,6 @@ ULONG hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * 
                 HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
 
                if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
-                  return ulStart + 1;
-            }
-         }
-         else if( HB_IS_DATE( pValue ) )
-         {
-            long lValue = hb_itemGetDL( pValue );
-
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
-            {
-               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
-
-               if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
                   return ulStart + 1;
             }
          }

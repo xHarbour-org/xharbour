@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.337 2002/08/08 00:03:13 lculik Exp $
+ * $Id: ChangeLog,v 1.338 2002/08/08 03:54:50 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-08 12:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Modified HB_IS_NUMERIC() to accept HB_IT_DATE and HB_IT_STRING (length 1).
+
+  * source/vm/hvm.c
+    - Removed no longer needed hb_vmPopDate().
+    + Added support for HB_IT_DATE and HB_IT_STRING[] in hb_vmPopNumber() and hb_vmPopDouble().
+    - Removed explicit logic supporting DATE and STRING[] from math and comparisons opertations.
+    * Completed support for DATE and STRING[] in ?all? numeric contexts.
+
+  * source/vm/itemapi.c
+    + Added support for HB_IT_STRING and HB_IT_DATE in hb_itemGetN*()
+
+  * source/rdd/dbf1.c
+  * source/rtl/minmax.c
+  * source/rtl/transfrm.c
+  * source/vm/arrays.c
+    * Changed order of type checking so HB_IS_DATE() and HB_IS_STRING() precede HB_IS_NUMERIC() because DATE and STRING may also be NUMERIC.
+
+  /*
+     HBTEST "errors" increased by 2 (to 107 in BCC 5.5), but that only because of
+     Clipper not correctly supporting DATE types in Max() and Min().
+     These are NOT errors but actually the correct behaviour.
+  */
+
 2002-08-08 00:40 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbcmd.c
    * source/rdd/dbf1.c

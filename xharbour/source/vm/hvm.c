@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.85 2002/07/24 02:58:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.86 2002/07/26 09:32:16 ronpinkas Exp $
  */
 
 /*
@@ -182,7 +182,6 @@ static void    hb_vmDuplTwo( void );              /* duplicates the latest two v
 
 /* Pop */
 static BOOL    hb_vmPopLogical( void );           /* pops the stack latest value and returns its logical value */
-static long    hb_vmPopDate( void );              /* pops the stack latest value and returns its date value as a long */
 static double  hb_vmPopNumber( void );            /* pops the stack latest value and returns its numeric value */
 static double  hb_vmPopDouble( int * );           /* pops the stack latest value and returns its double numeric format value */
 static void    hb_vmPopAlias( void );             /* pops the workarea number form the eval stack */
@@ -1448,7 +1447,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_NUMERIC( pLocal ) )
+            if( HB_IS_DATE( pLocal ) )
+            {
+               pLocal->item.asDate.value += iAdd;
+               break;
+            }
+            else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
+            {
+               pLocal->item.asString.value[0] += iAdd;
+               break;
+            }
+            else if( HB_IS_NUMERIC( pLocal ) )
             {
                if( pLocal->type & HB_IT_INTEGER )
                {
@@ -1458,15 +1467,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                {
                   dNewVal = pLocal->item.asLong.value + iAdd;
                }
-               else //if( pLocal->type & HB_IT_DOUBLE )
+               else if( pLocal->type & HB_IT_DOUBLE )
                {
                   dNewVal = pLocal->item.asDouble.value + iAdd;
                }
-            }
-            else if( HB_IS_DATE( pLocal ) )
-            {
-               pLocal->item.asDate.value += iAdd;
-               break;
+               /* See above!
+               else if( pLocal->type & HB_IT_DATE )
+               {
+                  dNewVal = pLocal->item.asDate.value + iAdd;
+               }
+               else if( pLocal->type & HB_IT_STRING )
+               {
+                  dNewVal = pLocal->item.asString.value[0] + iAdd;
+               }
+               */
             }
             else
             {
@@ -2380,27 +2394,8 @@ static void hb_vmPlus( void )
    pItem1 = hb_stackItemFromTop( -2 );
    pItem2 = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-   {
-      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem2->type;
-      double dNumber2 = hb_vmPopDouble( &iDec2 );
-      double dNumber1 = hb_vmPopDouble( &iDec1 );
-
-      hb_vmPushNumType( dNumber1 + dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
-   }
-   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.length == 1 )
-   {
-      BYTE bChar = pItem2->item.asString.value[0];
-      int iDec;
-      double dNumber;
-
-      hb_stackPop();
-
-      dNumber = hb_vmPopDouble( &iDec );
-
-      hb_vmPushNumType( dNumber + bChar, iDec, pItem1->type, HB_IT_INTEGER );
-   }
-   else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
+   // Must be first because STRING (length 1) qualifies as NUMERIC!
+   if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       ULONG ulLen1     = pItem1->item.asString.length;
       ULONG ulLen2     = pItem2->item.asString.length;
@@ -2441,35 +2436,18 @@ static void hb_vmPlus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
       }
    }
-   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.length == 1 && HB_IS_NUMERIC( pItem2 ) )
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      BYTE bChar = pItem1->item.asString.value[0];
-      int iDec;
-      double dNumber;
+      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem2->type;
+      double dNumber2 = hb_vmPopDouble( &iDec2 );
+      double dNumber1 = hb_vmPopDouble( &iDec1 );
 
-      dNumber = hb_vmPopDouble( &iDec );
-
-      hb_stackPop();
-
-      hb_vmPushNumType( dNumber + bChar, iDec, pItem2->type, HB_IT_INTEGER );
-   }
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-
-      /* NOTE: This is not a bug. CA-Cl*pper does exactly that. */
-      hb_vmPushDate( lDate1 + lDate2 );
-   }
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-   {
-      long lNumber2 = ( long ) hb_vmPopNumber();
-      long lDate1 = hb_vmPopDate();
-
-      hb_vmPushDate( lDate1 + lNumber2 );
+      hb_vmPushNumType( dNumber1 + dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpPlus" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPPLUS" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pItem1, pItem2 );
@@ -2494,41 +2472,8 @@ static void hb_vmMinus( void )
    pItem1 = hb_stackItemFromTop( -2 );
    pItem2 = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-   {
-      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem1->type;
-      double dNumber2 = hb_vmPopDouble( &iDec2 );
-      double dNumber1 = hb_vmPopDouble( &iDec1 );
-
-      hb_vmPushNumType( dNumber1 - dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
-   }
-   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_STRING( pItem2 ) && pItem2->item.asString.length == 1 )
-   {
-      BYTE bChar = pItem2->item.asString.value[0];
-      int iDec;
-      double dNumber;
-
-      hb_stackPop();
-
-      dNumber = hb_vmPopDouble( &iDec );
-
-      hb_vmPushNumType( dNumber - bChar, iDec, pItem1->type, HB_IT_INTEGER );
-   }
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-
-      hb_vmPushLong( lDate1 - lDate2 );
-   }
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-   {
-      long lNumber2 = ( long ) hb_vmPopNumber();
-      long lDate1 = hb_vmPopDate();
-
-      hb_vmPushDate( lDate1 - lNumber2 );
-   }
-   else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
+   // Must be first because STRING (length 1) qualifies as NUMERIC!
+   if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
       {
@@ -2565,17 +2510,13 @@ static void hb_vmMinus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
    }
-   else if( HB_IS_STRING( pItem1 ) && pItem1->item.asString.length == 1 && HB_IS_NUMERIC( pItem2 ) )
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      BYTE bChar = pItem1->item.asString.value[0];
-      int iDec;
-      double dNumber;
+      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem1->type;
+      double dNumber2 = hb_vmPopDouble( &iDec2 );
+      double dNumber1 = hb_vmPopDouble( &iDec1 );
 
-      dNumber = hb_vmPopDouble( &iDec );
-
-      hb_stackPop();
-
-      hb_vmPushNumType( bChar - dNumber, iDec, pItem2->type, HB_IT_INTEGER );
+      hb_vmPushNumType( dNumber1 - dNumber2, ( ( iDec1 > iDec2 ) ? iDec1 : iDec2 ), iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMinus" ) )
    {
@@ -2613,9 +2554,10 @@ static void hb_vmMult( void )
 
       hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
    }
-
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMult" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPMULT" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1083, NULL, "*", 2, pItem1, pItem2 );
@@ -2670,9 +2612,10 @@ static void hb_vmDivide( void )
          hb_vmPushDouble( d1 / d2, hb_set.HB_SET_DECIMALS );
       }
    }
-
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpDivide" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPDIVIDE" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1084, NULL, "/", 2, pItem1, pItem2 );
@@ -2718,9 +2661,10 @@ static void hb_vmModulus( void )
                   with the SET number of decimal places. */
          hb_vmPushNumType( fmod( d1, d2 ), hb_set.HB_SET_DECIMALS, iType1, iType2 );
    }
-
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMod" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPMOD" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1085, NULL, "%", 2, pItem1, pItem2 );
@@ -2754,11 +2698,10 @@ static void hb_vmPower( void )
                with the SET number of decimal places. */
       hb_vmPushDouble( pow( d1, d2 ), hb_set.HB_SET_DECIMALS );
    }
-
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpPower" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPPOWER" );
-   /* else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMod" ) )
-      hb_vmOperatorCall( pItem1, pItem2, "__OPMOD" ); JFL 02/2002 */
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "^", 2, pItem1, pItem2 );
@@ -2786,10 +2729,6 @@ static void hb_vmInc( void )
       int iDec, iType = pItem->type;
       double dNumber = hb_vmPopDouble( &iDec );
       hb_vmPushNumType( ++dNumber, iDec, iType, iType );
-   }
-   else if( HB_IS_DATE( pItem ) )
-   {
-      hb_vmPushDate( hb_vmPopDate() + 1 );
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpInc" ) )
    {
@@ -2821,10 +2760,6 @@ static void hb_vmDec( void )
       int iDec, iType = pItem->type;
       double dNumber = hb_vmPopDouble( &iDec );
       hb_vmPushNumType( --dNumber, iDec, iType, iType );
-   }
-   else if( HB_IS_DATE( pItem) )
-   {
-      hb_vmPushDate( hb_vmPopDate() - 1 );
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpDec" ) )
    {
@@ -2900,8 +2835,6 @@ static void hb_vmEqual( BOOL bExact )
 
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
       hb_vmPushLogical( hb_vmPopNumber() == hb_vmPopNumber() );
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-      hb_vmPushLogical( hb_vmPopDate() == hb_vmPopDate() );
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
       hb_vmPushLogical( hb_vmPopLogical() == hb_vmPopLogical() );
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpEqual" ) )
@@ -2975,8 +2908,6 @@ static void hb_vmNotEqual( void )
 
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
       hb_vmPushLogical( hb_vmPopNumber() != hb_vmPopNumber() );
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-      hb_vmPushLogical( hb_vmPopDate() != hb_vmPopDate() );
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
       hb_vmPushLogical( hb_vmPopLogical() != hb_vmPopLogical() );
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpNotEqual" ) )
@@ -3020,12 +2951,6 @@ static void hb_vmLess( void )
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 < dNumber2 );
    }
-   else if( HB_IS_DATE( hb_stackItemFromTop( -1 ) ) && HB_IS_DATE( hb_stackItemFromTop( -2 ) ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-      hb_vmPushLogical( lDate1 < lDate2 );
-   }
    else if( HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) && HB_IS_LOGICAL( hb_stackItemFromTop( -2 ) ) )
    {
       BOOL bLogical2 = hb_vmPopLogical();
@@ -3066,12 +2991,6 @@ static void hb_vmLessEqual( void )
       double dNumber2 = hb_vmPopNumber();
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 <= dNumber2 );
-   }
-   else if( HB_IS_DATE( hb_stackItemFromTop( -1 ) ) && HB_IS_DATE( hb_stackItemFromTop( -2 ) ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-      hb_vmPushLogical( lDate1 <= lDate2 );
    }
    else if( HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) && HB_IS_LOGICAL( hb_stackItemFromTop( -2 ) ) )
    {
@@ -3114,12 +3033,6 @@ static void hb_vmGreater( void )
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 > dNumber2 );
    }
-   else if( HB_IS_DATE( hb_stackItemFromTop( -1 ) ) && HB_IS_DATE( hb_stackItemFromTop( -2 ) ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-      hb_vmPushLogical( lDate1 > lDate2 );
-   }
    else if( HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) && HB_IS_LOGICAL( hb_stackItemFromTop( -2 ) ) )
    {
       BOOL bLogical2 = hb_vmPopLogical();
@@ -3160,12 +3073,6 @@ static void hb_vmGreaterEqual( void )
       double dNumber2 = hb_vmPopNumber();
       double dNumber1 = hb_vmPopNumber();
       hb_vmPushLogical( dNumber1 >= dNumber2 );
-   }
-   else if( HB_IS_DATE( hb_stackItemFromTop( -1 ) ) && HB_IS_DATE( hb_stackItemFromTop( -2 ) ) )
-   {
-      long lDate2 = hb_vmPopDate();
-      long lDate1 = hb_vmPopDate();
-      hb_vmPushLogical( lDate1 >= lDate2 );
    }
    else if( HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) && HB_IS_LOGICAL( hb_stackItemFromTop( -2 ) ) )
    {
@@ -5186,18 +5093,6 @@ static BOOL hb_vmPopLogical( void )
 
 /* NOTE: Type checking should be done by the caller. */
 
-static long hb_vmPopDate( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPopDate()"));
-
-   hb_stackDec();
-
-   ( * hb_stack.pPos )->type = HB_IT_NIL;
-   return ( * hb_stack.pPos )->item.asDate.value;
-}
-
-/* NOTE: Type checking should be done by the caller. */
-
 static double hb_vmPopNumber( void )
 {
    PHB_ITEM pItem;
@@ -5220,6 +5115,14 @@ static double hb_vmPopNumber( void )
 
       case HB_IT_DOUBLE:
          dNumber = pItem->item.asDouble.value;
+         break;
+
+      case HB_IT_DATE:
+         dNumber = (double) pItem->item.asDate.value;
+         break;
+
+      case HB_IT_STRING:
+         dNumber = (double) pItem->item.asString.value[0];
          break;
 
       default:
@@ -5260,6 +5163,16 @@ static double hb_vmPopDouble( int * piDec )
       case HB_IT_DOUBLE:
          dNumber = pItem->item.asDouble.value;
          *piDec = pItem->item.asDouble.decimal;
+         break;
+
+      case HB_IT_DATE:
+         dNumber = (double) pItem->item.asDate.value;
+         *piDec = 0;
+         break;
+
+      case HB_IT_STRING:
+         dNumber = (double) pItem->item.asString.value[0];
+         *piDec = 0;
          break;
 
       default:

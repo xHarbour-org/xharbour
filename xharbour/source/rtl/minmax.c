@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.10 2001/04/12 18:24:41 dholm Exp $
+ * $Id: minmax.c,v 1.1.1.1 2001/12/21 10:41:51 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,14 @@ HB_FUNC( MAX )
    PHB_ITEM p1 = hb_param( 1, HB_IT_ANY );
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
-   if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
+   // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
+   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
+   {
+      char szDate[ 9 ];
+
+      hb_retds( hb_itemGetDL( p1 ) >= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
+   }
+   else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {
       /* NOTE: The order of these if() branches is significant,
                please, don't change it. [vszakats] */
@@ -96,14 +103,10 @@ HB_FUNC( MAX )
          hb_retni( i1 >= i2 ? i1 : i2 );
       }
    }
-   else if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
-   {
-      char szDate[ 9 ];
-
-      hb_retds( hb_itemGetDL( p1 ) >= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
-   }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
 
 /* returns the minimum of two date or numerics */
@@ -112,7 +115,14 @@ HB_FUNC( MIN )
    PHB_ITEM p1 = hb_param( 1, HB_IT_ANY );
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
-   if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
+   // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
+   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
+   {
+      char szDate[ 9 ];
+
+      hb_retds( hb_itemGetDL( p1 ) <= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
+   }
+   else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {
       /* NOTE: The order of these if() branches is significant,
                please, don't change it. [vszakats] */
@@ -148,13 +158,9 @@ HB_FUNC( MIN )
          hb_retni( i1 <= i2 ? i1 : i2 );
       }
    }
-   else if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
-   {
-      char szDate[ 9 ];
-
-      hb_retds( hb_itemGetDL( p1 ) <= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
-   }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
 

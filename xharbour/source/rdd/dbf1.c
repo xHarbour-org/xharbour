@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.112 2002/08/07 19:26:03 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.14 2002/08/08 03:44:27 horacioroldan Exp $
  */
 
 /*
@@ -1240,6 +1240,17 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else
             uiError = EDBF_DATATYPE;
       }
+      // Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC.
+      else if( HB_IS_DATE( pItem ) )
+      {
+         if( pField->uiType == HB_IT_DATE )
+         {
+            hb_itemGetDS( pItem, szBuffer );
+            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
+         }
+         else
+            uiError = EDBF_DATATYPE;
+      }
       else if( HB_IS_NUMERIC( pItem ) )
       {
          if( pField->uiType == HB_IT_LONG )
@@ -1285,16 +1296,6 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             else
                memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        szBuffer, pField->uiLen );
-         }
-         else
-            uiError = EDBF_DATATYPE;
-      }
-      else if( HB_IS_DATE( pItem ) )
-      {
-         if( pField->uiType == HB_IT_DATE )
-         {
-            hb_itemGetDS( pItem, szBuffer );
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
          }
          else
             uiError = EDBF_DATATYPE;
