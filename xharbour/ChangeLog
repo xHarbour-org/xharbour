@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.480 2002/11/06 18:57:20 lculik Exp $
+ * $Id: ChangeLog,v 1.481 2002/11/07 05:05:51 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,8 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-11-08 22:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    ! Added Gauge bar to show compiling progress
+  *utils/hbmake/hbmlang.c
+    ! added code to display the gauge bar
 
-2002/07/11 02>05 UTC/0300 Walter Negro <anegro@overnet.com.ar>
+2002/07/11 02:05 UTC/0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/achoice.prg
     ! Fix, if no UDF is set, pressing an alpha key it
       go to first item finding this letter without respecting

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.32 2002/09/21 02:41:18 lculik Exp $
+ * $Id: hbmake.prg,v 1.33 2002/10/27 19:16:40 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -785,7 +785,10 @@ FUNCTION Compfiles()
     LOCAL lLinux   := At( 'linux', Lower( Os() ) ) > 0
     LOCAL cPrg := ''
     LOCAL cOrder := ""
-
+    Local nFile := 1
+    Local aGauge := GaugeNew( 5, 5, 7,40 , "W/B", "W+/B" ,'²')
+          
+    @ 4, 5 Say "Compiling :"
 //    FOR nCount := 1 TO Len( aOrder )
       For EACH cOrder in aOrder 
 
@@ -960,9 +963,11 @@ FUNCTION Compfiles()
                 ENDIF
 
                 IF Len( acs ) > 0
+                GaugeDisplay( aGauge )
+                nFile:=1
 
                     FOR nFiles := 1 TO Len( acs )
-
+                      @ 4,16 Say space(50)
                         xItem := Substr( acs[ nFiles ], Rat( If( lgcc, '/', '\' ), ;
                                          acs[ nFiles ] ) + 1 )
                         nPos := Ascan( aObjsc, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), ;
@@ -982,7 +987,10 @@ FUNCTION Compfiles()
 
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
                             cComm += " >> Test.out"
-                            Outstd( cComm )
+                        @ 4,16 Say acs[nFiles]
+                        GaugeUpdate(aGauge,nFile/Len( aprgs ))
+
+//                            Outstd( cComm )
                                      ! ( cComm )
                             cErrText := Memoread( 'Test.out' )
                             lEnd     := 'Error E' $ cErrText
@@ -1037,10 +1045,12 @@ FUNCTION Compfiles()
                     ENDIF
 
                 ENDIF
-
+                GaugeDisplay( aGauge )
+    nFile:=1
 //                FOR nFiles := 1 TO Len( aprgs )
-                FOR EACH cPrg In aprgs 
-
+                FOR EACH cPrg In aprgs
+            
+                      @ 4,16 Say space(50)
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), ;
                                      cPrg ) + 1 )
                     nPos := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), ;
@@ -1060,10 +1070,13 @@ FUNCTION Compfiles()
 
                         cComm := Strtran( cComm, "$**", cPrg )
                         cComm += " >> Test.out"
-                        Outstd( " " )
+//                        Outstd( " " )
 
-                        Outstd( cComm )
-                        Outstd( hb_osnewline() )
+//                        Outstd( cComm )
+                        @ 4,16 Say cPrg
+                        GaugeUpdate(aGauge,nFile/Len( aprgs ))
+//                        Outstd( hb_osnewline() )
+    nFile++
                         ! ( cComm )
                         cErrText := Memoread( 'Test.out' )
                         lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -1982,7 +1995,7 @@ FUNCTION CompUpdatedfiles()
     LOCAL cOld
     LOCAL nPos
     LOCAL nCount
-    LOCAL nFiles
+
     LOCAL aCtocompile := {}
     LOCAL aOrder      := Listasarray2( aBuildOrder[ 2 ], " " )
     LOCAL lEnd
@@ -1991,6 +2004,10 @@ FUNCTION CompUpdatedfiles()
     LOCAL nObjPos
     Local cOrder := ""
     Local cPrg := ""
+    Local nFiles,nFile:=1
+    Local aGauge := GaugeNew( 5, 5, 7,40 , "W/B", "W+/B" ,'²')
+          
+    @ 4, 5 Say "Compiling :"
 
 //    FOR nCount := 1 TO Len( aOrder )
       FOR EACH cOrder in  aOrder 
@@ -2020,8 +2037,9 @@ FUNCTION CompUpdatedfiles()
                             Aadd( aCtocompile, acs[ nPos ] )
                             cComm := Strtran( cComm, "o$*", "o" + aCs[ nPos ] )
                             cComm := Strtran( cComm, "$**", aPrgs[ nFiles ] )
-                            Outstd( cComm )
-                            Outstd( hb_osnewline() )
+
+         //                   Outstd( cComm )
+         //                   Outstd( hb_osnewline() )
                             ! ( cComm )
                             cErrText := Memoread( 'Test.out' )
                             lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -2126,9 +2144,10 @@ FUNCTION CompUpdatedfiles()
                     ENDIF
 
                 ENDIF
+                GaugeDisplay( aGauge )
 
                 FOR nFiles := 1 TO Len( acs )
-
+                      @ 4,16 Say space(50)
                     xItem := Substr( acs[ nFiles ], Rat( If( lgcc, '/', '\' ), acs[ nFiles ] ) + 1 )
                     nPos  := Ascan( aObjsc, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xitem, At( ".", xitem ) ) } )
 
@@ -2139,8 +2158,12 @@ FUNCTION CompUpdatedfiles()
                             cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
                             cComm += " >> Test.out"
-                            Outstd( cComm )
-                            Outstd( hb_osnewline() )
+                        @ 4,16 Say acs[nFiles]
+                        GaugeUpdate(aGauge,nFile/Len( aprgs ))
+
+//                            Outstd( cComm )
+//                            Outstd( hb_osnewline() )
+
                             ! ( cComm )
                             cErrText := Memoread( 'Test.out' )
                             lEnd     := 'Error E' $ cErrText
@@ -2162,8 +2185,9 @@ FUNCTION CompUpdatedfiles()
                     ENDIF
 
                 NEXT
-
+nFile++
             ENDIF
+            GaugeDisplay( aGauge )
 
             IF cOrder == "$(OBJFILES)"
 
@@ -2194,11 +2218,12 @@ FUNCTION CompUpdatedfiles()
                     ENDIF
 
                 ENDIF
-
+nFile:=1
 //                FOR nFiles := 1 TO Len( aprgs )
                   FOR EACH cPrg IN aprgs 
-
+                  @ 4,16 Say space(50)
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), cPrg ) + 1 )
+                    tracelog(xitem)
                     nPos  := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
                     IF fileisnewer( cPrg, aobjs[ npos ] )
@@ -2208,9 +2233,12 @@ FUNCTION CompUpdatedfiles()
                             cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
                             cComm := Strtran( cComm, "$**", cPrg )
                             cComm += " >> Test.out"
-                            Outstd( " " )
-                            Outstd( cComm )
-                            Outstd( hb_osnewline() )
+        //                    Outstd( " " )
+        //                    Outstd( cComm )
+        //                    Outstd( hb_osnewline() )
+                        @ 4,16 Say cPrg
+                        GaugeUpdate(aGauge,nFile/Len( aprgs ))
+
                             ! ( cComm )
                             cErrText := Memoread( 'Test.out' )
                             lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -2233,6 +2261,7 @@ FUNCTION CompUpdatedfiles()
 
                 NEXT
 
+            nFile++
             ENDIF
 
         ENDIF
