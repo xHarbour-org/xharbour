@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2101 2004/01/19 21:30:00 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2102 2004/01/20 00:20:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-20 01:20 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  ! source/rtl/teditor.prg
+    ! fixed browseText() which affect memoedit( clipper docs says that CTRL+W is an
+     valid key to exit an memoedit even in view mode
 
 2004-01-19 16:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

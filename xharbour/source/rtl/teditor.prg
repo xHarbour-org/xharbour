@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.13 2003/12/19 21:04:54 lanceowens Exp $
+/* $Id: teditor.prg,v 1.14 2004/01/06 23:54:46 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -971,7 +971,7 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
       endif
 
       // ******* modified to add exit with K_LEFT when in non-edit mode
-      if nKey == K_ESC
+      if nKey == K_ESC .or. nkey == K_CTRL_W
          oSelf:lExitEdit := .T.
       elseif nKey == K_LEFT
          oSelf:lExitEdit := .T.
