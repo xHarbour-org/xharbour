@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3700 2004/12/28 08:35:13 druzus Exp $
+ * $Id: ChangeLog,v 1.3702 2004/12/28 22:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-28 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rtl/gtwvt/gtwvt.c
+    * use CF_OEMTEXT parameter for clipboard functions for OEM charsets
+  * source/rtl/gtwin/gtwin.c
+    * unconditional usage CF_OEMTEXT instead of CF_TEXT because of
+      only OEM charset is used in the win32 console apps
 
 2004-12-28 16:25 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
 	* source/rtl/run.c

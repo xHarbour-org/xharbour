@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.77 2004/11/27 04:05:18 guerra000 Exp $
+ * $Id: gtwin.c,v 1.79 2004/12/28 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -2212,7 +2212,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
    HGLOBAL   hglb;
    LPTSTR    lptstr;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   if ( !IsClipboardFormatAvailable(CF_OEMTEXT) )
    {
      *pulMaxSize = 0;
      return;
@@ -2224,7 +2224,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
      return;
    }
 
-   hglb = GetClipboardData(CF_TEXT);
+   hglb = GetClipboardData(CF_OEMTEXT);
    if (hglb != NULL)
    {
       lptstr = (LPSTR) GlobalLock(hglb);
@@ -2262,7 +2262,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
     clipboard. The only way to set text to clipboard is made possible
     only if another application copies some text on the clipboard.
 
-   if ( !IsClipboardFormatAvailable( CF_TEXT ) )
+   if ( !IsClipboardFormatAvailable( CF_OEMTEXT ) )
    {
      return;
    }
@@ -2293,7 +2293,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
    // Place the handle on the clipboard.
    //
-   SetClipboardData( CF_TEXT, hglbCopy );
+   SetClipboardData( CF_OEMTEXT, hglbCopy );
 
    CloseClipboard();
 }
@@ -2304,7 +2304,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    LPTSTR    lptstr;
    int ret;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   if ( !IsClipboardFormatAvailable(CF_OEMTEXT) )
    {
      return 0;
    }
@@ -2314,7 +2314,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
      return 0;
    }
 
-   hglb = GetClipboardData(CF_TEXT);
+   hglb = GetClipboardData(CF_OEMTEXT);
    ret = 0;
    if (hglb != NULL)
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.138 2004/11/25 01:54:13 guerra000 Exp $
+ * $Id: gtwvt.c,v 1.140 2004/12/28 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -3665,9 +3665,9 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
    HGLOBAL hglb;
    LPTSTR  lptstr;
-   LPTSTR  lptstrOem;
+   UINT    uFormat = ( _s.CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
 
-   if ( ! IsClipboardFormatAvailable( CF_TEXT ) )
+   if ( ! IsClipboardFormatAvailable( uFormat ) )
    {
      *pulMaxSize = 0;
      return;
@@ -3679,7 +3679,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
      return;
    }
 
-   hglb = GetClipboardData( CF_TEXT );
+   hglb = GetClipboardData( uFormat );
    if ( hglb != NULL )
    {
       lptstr = ( LPSTR ) GlobalLock( hglb );
@@ -3698,18 +3698,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
             return;
          }
 
-         if( _s.CodePage == OEM_CHARSET )
-         {
-            lptstrOem = ( char* ) hb_xgrab( *pulMaxSize );
-            CharToOemBuff( ( LPCSTR ) lptstr, ( LPTSTR ) lptstrOem, *pulMaxSize );
-            memcpy( szData, lptstrOem, *pulMaxSize );
-            hb_xfree( lptstrOem );
-         }
-         else
-         {
-            memcpy( szData, lptstr, *pulMaxSize );
-         }
-
+         memcpy( szData, lptstr, *pulMaxSize );
          szData[ *pulMaxSize ] = '\0';
 
          GlobalUnlock( hglb );
@@ -3723,8 +3712,8 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
-   LPTSTR  lptstrAnsi;
    HGLOBAL hglbCopy;
+   UINT    uFormat = ( _s.CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
 
 /*  This poses problems when some other application copies a bitmap on the
     clipboard. The only way to set text to clipboard is made possible
@@ -3755,17 +3744,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    //
    lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
 
-   if( _s.CodePage == OEM_CHARSET )
-   {
-      lptstrAnsi = ( char* ) hb_xgrab( ulSize+1 );
-      OemToCharBuff( ( LPCSTR ) szData, ( LPTSTR ) lptstrAnsi, ulSize + 1 );
-      memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );
-      hb_xfree( lptstrAnsi );
-   }
-   else
-   {
-      memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
-   }
+   memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
 
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
 
@@ -3773,7 +3752,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
    // Place the handle on the clipboard.
    //
-   SetClipboardData( CF_TEXT, hglbCopy );
+   SetClipboardData( uFormat, hglbCopy );
 
    CloseClipboard();
 }
@@ -3784,9 +3763,10 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
    HGLOBAL hglb;
    LPTSTR  lptstr;
+   UINT    uFormat = ( _s.CodePage == OEM_CHARSET ) ? CF_OEMTEXT : CF_TEXT;
    int     ret;
 
-   if ( !IsClipboardFormatAvailable( CF_TEXT ) )
+   if ( !IsClipboardFormatAvailable( uFormat ) )
    {
      return 0;
    }
@@ -3796,7 +3776,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
      return 0;
    }
 
-   hglb = GetClipboardData( CF_TEXT );
+   hglb = GetClipboardData( uFormat );
    ret  = 0;
    if ( hglb != NULL )
    {
