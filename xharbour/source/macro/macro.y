@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.3 2002/05/01 22:54:59 ronpinkas Exp $
+ * $Id: macro.y,v 1.4 2002/05/12 17:58:56 ronpinkas Exp $
  */
 
 /*
@@ -786,6 +786,16 @@ IfInline   : IIF '(' Expression ',' EmptyExpression ','
              { $<asExpr>$ = hb_compExprAddListExpr( hb_compExprNewList( $3 ), $5 ); }
              EmptyExpression ')'
              { $$ = hb_compExprNewIIF( hb_compExprAddListExpr( $<asExpr>7, $8 ) ); }
+
+           | IIF '(' Expression ',' EmptyExpression
+             { $<asExpr>$ = hb_compExprAddListExpr( hb_compExprNewList( $3 ), $5 ); }
+             ')'
+             { $$ = hb_compExprNewIIF( hb_compExprAddListExpr( $<asExpr>6, hb_compExprNew( HB_ET_NONE ) ) ); }
+
+           | IF '(' Expression ',' EmptyExpression
+             { $<asExpr>$ = hb_compExprAddListExpr( hb_compExprNewList( $3 ), $5 ); }
+             ')'
+             { $$ = hb_compExprNewIIF( hb_compExprAddListExpr( $<asExpr>6, hb_compExprNew( HB_ET_NONE ) ) ); }
            ;
 
 %%
