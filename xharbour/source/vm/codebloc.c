@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.32 2003/10/19 18:05:11 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.33 2003/10/19 18:38:02 ronpinkas Exp $
  */
 
 /*
@@ -164,7 +164,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
                hb_memvarValueIncRef( pLocal->item.asMemvar.value );
 
                // Scan the stack for possible additional refrences to the now *detached* value!
-               while( pItem != hb_stack.pItems )
+               while( pItem != HB_VM_STACK.pItems )
                {
                   if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
                   {
