@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.12 2003/12/07 03:06:05 maurifull Exp $
+ * $Id: dbedit.prg,v 1.13 2003/12/09 02:47:03 maurifull Exp $
  */
 
 /*
@@ -83,13 +83,16 @@
 #include "setcurs.ch"
 #include "hbsetup.ch"
 
-Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot)
-Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
+#translate SETIFEMPTY(<x>,<v>) => Do Case; Case Empty(<x>); <x>:=<v>; End
+#translate SETIFNIL(<x>,<v>) => Do Case; Case HB_ISNIL(<x>); <x>:=<v>; End
 
-  IIf(Empty(nTop), nTop := 0, .T.)
-  IIf(Empty(nLeft), nLeft := 0, .T.)
-  IIf(Empty(nBottom), nBottom := MaxRow(), .T.)
-  IIf(Empty(nRight), nRight := MaxCol(), .T.)
+Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot)
+Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
+
+  SetIfEmpty(nTop, 0)
+  SetIfEmpty(nLeft, 0)
+  SetIfEmpty(nBottom, MaxRow())
+  SetIfEmpty(nRight, MaxCol())
 
   If Empty(aCols)
     // If no database in use, do nothing
@@ -97,18 +100,19 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
       Return .F.
     End
     aCols := Array(FCount())
-    For i := 1 To Len(aCols)
-      aCols[i] := FieldName(i)
+    For Each i In aCols
+      i := FieldName(HB_EnumIndex())
     Next
     xHdr := aCols
   End
-  IIf(Empty(xHdr), xHdr := "", .T.)
-  IIf(Empty(xFoot), xFoot := "", .T.)
+  SetIfEmpty(xHdr, "")
+  SetIfEmpty(xFoot, "")
   // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
   //       this is because most codepages (unicode too) don't have DOUBLE line chars
   //       so the output is ugly with them
-  IIf(HB_ISNIL(xHSep), xHSep := Chr(196) + Chr(194) + Chr(196), .T.)
-  IIf(HB_ISNIL(xCSep), xCSep := ' ' + Chr(179) + ' ', .T.)
+  SetIfNil(xHSep, Chr(196) + Chr(194) + Chr(196))
+  SetIfNil(xCSep, ' ' + Chr(179) + ' ')
+  
   IIf(HB_ISNIL(xFSep) .And. !Empty(xFoot), xFSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
   oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
@@ -129,41 +133,41 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
   oTBR:setKey(K_CTRL_DOWN, {|| _MoveCol(oTBR, K_CTRL_DOWN), 0})
 #endif
 
-  For i := 1 To Len(aCols)
-    If HB_ISARRAY(aCols[i])
-      bFun := IIf(HB_ISBLOCK(aCols[i,1]), aCols[i,1], &("{||" + aCols[i,1] + '}'))
+  For Each i In aCols
+    If HB_ISARRAY(i)
+      bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
     Else
-      bFun := IIf(HB_ISBLOCK(aCols[i]), aCols[i], &("{||" + aCols[i] + '}'))
+      bFun := IIf(HB_ISBLOCK(i), i, &("{||" + i + '}'))
     End
     If ValType(Eval(bFun)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
       bFun := {|| "  <Memo>  "}
     End
 
-    If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[i])  // handle empty column headers
-      IIf(HB_ISSTRING(aCols[i]), xHdr[i] := aCols[i], "<block>")
+    If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[HB_EnumIndex()])  // handle empty column headers
+      IIf(HB_ISSTRING(i), xHdr[HB_EnumIndex()] := i, "<block>")
     End
 
-    oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[i]), bFun)
+    oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[HB_EnumIndex()]), bFun)
 
-    If HB_ISARRAY(aCols[i])
-      oTBC:colorBlock := aCols[i,2]
+    If HB_ISARRAY(i)
+      oTBC:colorBlock := i[2]
     End
     If HB_ISARRAY(xCSep)
-      oTBC:colSep := xCSep[i]
+      oTBC:colSep := xCSep[HB_EnumIndex()]
     End
     If HB_ISARRAY(xHSep)
-      oTBC:headSep := xHSep[i]
+      oTBC:headSep := xHSep[HB_EnumIndex()]
     End
     If HB_ISARRAY(xFSep)
-      oTBC:footSep := xFSep[i]
+      oTBC:footSep := xFSep[HB_EnumIndex()]
     End
     If HB_ISARRAY(xFoot)
-      oTBC:footing := xFoot[i]
+      oTBC:footing := xFoot[HB_EnumIndex()]
     ElseIf HB_ISSTRING(xFoot)
       oTBC:footing := xFoot
     End
     If HB_ISARRAY(xPict)
-      oTBC:picture := xPict[i]
+      oTBC:picture := xPict[HB_EnumIndex()]
     ElseIf HB_ISSTRING(xPict)
       oTBC:picture := xPict
     End
@@ -183,10 +187,19 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
   End
   Go (i)
 
-  While nRet != 0
-    If nRet == 2
-      oTBR:refreshAll()
-      oTBR:invalidate()
+  If nRet != DE_ABORT
+    nRet := DE_REFRESH
+  End
+
+  While nRet != DE_ABORT
+    Switch nRet
+      Case DE_REFRESH
+        oTBR:refreshAll()
+        oTBR:invalidate()
+	Exit
+      Case DE_CONT
+        oTBR:refreshCurrent()
+	Exit
     End
     If oTBR:hitTop
       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
@@ -212,6 +225,9 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
 
 #ifdef HB_COMPAT_C53
     // got a key exception
+    oTBR:refreshCurrent()
+    oTBR:stabilize()
+    oTBR:hilite()
     nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
 #else
     // xHarbour without 5.3 extensions code
@@ -265,6 +281,9 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
         Exit
       Default
        // got a key exception
+       oTBR:refreshCurrent()
+       oTBR:stabilize()
+       oTBR:hilite()
        nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
     End
 #endif
