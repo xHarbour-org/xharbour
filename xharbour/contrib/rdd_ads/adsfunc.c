@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.55 2002/12/17 18:52:53 brianhays Exp $
+ * $Id: adsfunc.c,v 1.5 2003/01/06 16:57:05 horacioroldan Exp $
  */
 
 /*
@@ -1333,3 +1333,67 @@ HB_FUNC(ADSUSEDICTIONARY)
 }
 
 #endif
+
+HB_FUNC(ADSBEGINTRANSACTION)
+{
+
+    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+
+    if ( AdsBeginTransaction( hConnect )  == AE_SUCCESS )
+        hb_retl(TRUE);
+    else
+        hb_retl(FALSE);
+}
+
+
+
+
+
+HB_FUNC(ADSCOMMITTRANSACTION)
+{
+
+    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+
+    if ( AdsCommitTransaction( hConnect )  == AE_SUCCESS )
+        hb_retl(TRUE);
+    else
+        hb_retl(FALSE);
+}
+
+HB_FUNC(ADSFAILEDTRANSACTIONRECOVERY)
+{
+
+    UNSIGNED8 *pucServer = ISCHAR(1) ? hb_parc(1) : NULL;
+
+    if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
+        hb_retl(TRUE);
+    else
+        hb_retl(FALSE);
+}
+
+
+HB_FUNC(ADSINTRANSACTION)
+{
+
+    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+    UNSIGNED16       pbInTrans ;
+    if ( AdsInTransaction( hConnect, &pbInTrans)  == AE_SUCCESS )
+        hb_retl(pbInTrans);
+    else
+        hb_retl(FALSE);
+}
+
+
+HB_FUNC(ADSROOLBACKTRANSACTION)
+{
+
+    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+
+    if ( AdsRollbackTransaction( hConnect )  == AE_SUCCESS )
+        hb_retl(TRUE);
+    else
+        hb_retl(FALSE);
+}
+
+
+
