@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.4 2002/01/17 23:20:48 ronpinkas Exp $
+ * $Id: memvars.c,v 1.5 2002/01/21 09:11:57 ronpinkas Exp $
  */
 
 /*
@@ -451,10 +451,15 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       {
          /* value is already created */
          HB_ITEM_PTR pSetItem = &s_globalTable[ pDyn->hMemvar ].item;
+
          if( HB_IS_BYREF( pSetItem ) )
+         {
             hb_itemCopy( hb_itemUnRef( pSetItem ), pItem );
+         }
          else
+         {
             hb_itemCopy( pSetItem, pItem );
+         }
       }
       else
       {
@@ -462,9 +467,14 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
           */
          hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, pItem );
       }
+
+      /* Remove MEMOFLAG if exists (assignment from field). */
+      s_globalTable[ pDyn->hMemvar ].item.type &= ~HB_IT_MEMOFLAG;
    }
    else
+   {
       hb_errInternal( HB_EI_MVBADSYMBOL, NULL, pMemvarSymb->szName, NULL );
+   }
 }
 
 ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )

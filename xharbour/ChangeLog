@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.35 2002/01/21 09:11:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.36 2002/01/21 20:51:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,58 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-21 03:40 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+  *ChangeLog
+  *config/dos/bcc16.cf
+  *include/hbextern.ch
+  *include/hbstack.h
+  *source/rdd/dbfcdx/dbfcdx1.c
+  *source/rdd/dbfcdx/dbfcdx2.h
+  *source/rdd/dbfntx/dbfntx1.c
+  *source/vm/hvm.c
+  *source/vm/memvars.c
+    * Synched the following patches from Harbour:
+
+        2002-01-21 00:19 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+           * include/hbstack.h
+             ! fixed a few errors inside macro definition of stack operations
+               -DHB_STACK_MACROS defined
+
+        2002-01-21 17:00 UTC-0500 David G. Holm <dholm@jsd-llc.com>
+          * config/dos/bcc16.cf
+            ! Force a minimum symbol length of 48 characters, due to the length
+              of some the class member function names in source/rtl/profiler.prg.
+            ! Added the library name conversion to remove the LIB prefix in one
+              spot that I had missed the first time around.
+            ! LINKLIB contents were being replaced instead of accumulating, with
+              the result that no CONTRIBS libraries were included.
+
+        2002-01-21 23:24 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+           * include/hbextern.ch
+             * minor fix, hbrun now works better ( thanks to Viktor Szakats ).
+
+        2002-01-21 10:10 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/vm/hvm.c
+          * source/vm/memvars.c
+            * Added resetting of HB_IT_MEMOFLAG in functions:
+               hb_vmArrayPop(), hb_vmPopLocal(), hb_vmPopStatic(), hb_memvarSetValue()
+          * source/rdd/dbfntx/dbfntx1.c
+            * Added support of DBOI_POSITION and DBOI_KEYCOUNT to ntxOrderInfo()
+              and empty prototypes of hb_ntxTagKeyNo(), hb_ntxTagKeyCount()
+
+        2002-01-19 17:55 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+           * source/rdd/dbfcdx1.c
+             ! speed boost for ordKeyNo() and ordKeyCount()
+
+        2002-01-19 13:39 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+           * source/rdd/dbfcdx1.c
+             ! fixed a bug in descending skipping
+             + added support for ordKeyNo() and ordKeyCount()
+
+        2002-01-19 08:00 UTC+0700 Andi Jahja <harbour@cbn.net.id>
+           * source/rtl/typefile.prg
+             * modification to be more Clip*r compliant and behaviour.
 
 2002-01-21 12:50 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
