@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.14 2004/09/06 20:01:03 druzus Exp $
+ * $Id: postgres.c,v 1.15 2004/09/29 22:34:23 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -232,9 +232,9 @@ HB_FUNC(PQMETADATA)
     HB_ITEM aNew;
     HB_ITEM temp;
 
-    aTemp.type = HB_IT_NIL;
-    aNew.type = HB_IT_NIL;
-    temp.type = HB_IT_NIL;
+    aTemp.type = HB_IT_NIL;
+    aNew.type = HB_IT_NIL;
+    temp.type = HB_IT_NIL;
 
     if (hb_parinfo(1))
     {
@@ -362,9 +362,9 @@ HB_FUNC(PQMETADATA)
                 hb_itemPutNI( &temp, PQftablecol( res, i ) );
                 hb_arraySetForward( &aTemp, 6, &temp);
 
-                hb_arrayAddForward(&aNew, &aTemp);
-            }
-
+                hb_arrayAddForward(&aNew, &aTemp);
+            }
+
             hb_itemForwardValue( &(HB_VM_STACK).Return, &aNew);
         }
     }
