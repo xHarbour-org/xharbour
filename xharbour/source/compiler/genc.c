@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.36 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: genc.c,v 1.37 2003/04/12 22:28:36 andijahja Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          {
             if( pGlobal->szAlias == NULL )
             {
-               fprintf( yyc, "HB_ITEM %s = { 0, 0 };\n", pGlobal->szName );
+               fprintf( yyc, "HB_ITEM %s = { 0, { { 0 } } };\n", pGlobal->szName );
             }
             else
             {
