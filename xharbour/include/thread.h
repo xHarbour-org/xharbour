@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.100 2005/01/25 10:47:49 druzus Exp $
+* $Id: thread.h,v 1.101 2005/02/04 12:56:01 likewolf Exp $
 */
 
 /*
@@ -85,6 +85,10 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
    /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
    #define WIN32_LEAN_AND_MEAN
+
+   #ifndef CINTERFACE
+   #define CINTERFACE
+   #endif
 
    #include <windows.h>
 

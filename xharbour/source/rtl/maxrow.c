@@ -1,5 +1,5 @@
 /*
- * $Id: maxrow.c,v 1.5 2004/10/28 14:00:39 paultucker Exp $
+ * $Id: maxrow.c,v 1.6 2004/10/30 15:10:38 paultucker Exp $
  */
 
 /*
@@ -67,9 +67,12 @@ HB_FUNC( MAXROW ) /* Return the highest screen/window row number (zero origin) *
          hb_retni( hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) );
          break;
 
+      case GTI_CLIENT:
+         hb_retni( hb_gt_info(GTI_VIEWPORTHEIGHT,FALSE,0,NULL) );
+         break;
+
       case GTI_WINDOW:
       case GTI_SCREEN:
-      case GTI_CLIENT:       /* 'client' is future use */
       default:
          hb_retni( hb_ctMaxRow( nMode == GTI_SCREEN ) );
    }
@@ -87,9 +90,12 @@ HB_FUNC( MAXCOL ) /* Return the highest screen/window column number (zero origin
          hb_retni( hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) );
          break;
 
+      case GTI_CLIENT:
+         hb_retni( hb_gt_info(GTI_VIEWPORTWIDTH,FALSE,0,NULL) );
+         break;
+
       case GTI_WINDOW:
       case GTI_SCREEN:
-      case GTI_CLIENT:       /* 'client' is future use */
       default:
          hb_retni( hb_ctMaxCol( nMode == GTI_SCREEN ) );
    }

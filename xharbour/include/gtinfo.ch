@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.11 2004/10/22 20:37:13 likewolf Exp $
+ * $Id: gtinfo.ch,v 1.12 2004/10/28 14:00:39 paultucker Exp $
  */
 
 /*
@@ -87,9 +87,12 @@
 
 #define GTI_ESCDELAY      33  /* Get/Set escape key delay */
 
-/* these 2 are used for MaxCol(.t.) and MaxRow(.t.) */
-#define GTI_VIEWMAXHEIGHT 34  /* Maximum viewport height:for current mode */
-#define GTI_VIEWMAXWIDTH  35  /* Max viewport width:either win or full scrn */
+/* these 2 are used for MaxCol(?) and MaxRow(?) */
+#define GTI_VIEWMAXHEIGHT 34  /* Maximum viewable height:for current mode */
+#define GTI_VIEWMAXWIDTH  35  /* Maximum viewable width:either win or full scrn */
+
+#define GTI_VIEWPORTHEIGHT 36  /* Current viewport height:for current mode */
+#define GTI_VIEWPORTWIDTH  37  /* Current viewport width:either win or full scrn */
 
 /* these are used _by_ MaxRow/Col */
 #define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */

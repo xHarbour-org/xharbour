@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.81 2005/02/11 18:59:07 druzus Exp $
+ * $Id: gtwin.c,v 1.82 2005/02/12 19:54:03 druzus Exp $
  */
 
 /*
@@ -2382,6 +2382,14 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       {
          COORD coBuf = GetLargestConsoleWindowSize( s_HOutput );
          return coBuf.X - 1;
+      }
+      case GTI_VIEWPORTHEIGHT:
+      {
+         return s_csbi.srWindow.Bottom - s_csbi.srWindow.Top;
+      }
+      case GTI_VIEWPORTWIDTH:
+      {
+         return s_csbi.srWindow.Right - s_csbi.srWindow.Left;
       }
 
    }

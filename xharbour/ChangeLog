@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3810 2005/02/12 19:53:53 druzus Exp $
+ * $Id: ChangeLog,v 1.3811 2005/02/13 01:22:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-13 12:31 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/thread.h
+    * define CINTERFACE to correct win32ole.prg compiling.
+    * this forces a C linkage to interfaces instead of c++
+    * the actual cause needs to be reviewed.
+  * include/gtinfo.ch
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/maxrow.c
+    * enable support for MaxRow/Col(GTI_CLIENT)
+    * Gives the currently visible screen size.
+    * If you have a console dimensions of 300 lines, MaxRow(GTI_CLIENT)
+    * at startup will give the size of the window currently shown on screen.
+    * so - at program startup SetMode(MaxRow(2)+1, MaxCol(2)+1) would have
+    * the effect of turning off the scrollbars.
 
 2005-02-12 17:21 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
