@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.28 2002/10/24 17:59:27 ronpinkas Exp $
+ * $Id: arrays.c,v 1.29 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -351,7 +351,16 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      hb_itemCopy( pItem, pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
+      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+
+      if( HB_IS_BYREF( pElement ) )
+      {
+         hb_itemCopy( pItem, hb_itemUnRef( pElement ) );
+      }
+      else
+      {
+         hb_itemCopy( pItem, pElement );
+      }
 
       return TRUE;
    }

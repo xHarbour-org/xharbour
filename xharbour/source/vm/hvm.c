@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.127 2002/11/12 17:49:48 ronpinkas Exp $
+ * $Id: hvm.c,v 1.128 2002/11/14 07:59:28 what32 Exp $
  */
 
 /*
@@ -756,12 +756,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_ARRAYPUSH:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYPUSH") );
             hb_vmArrayPush();
-            if( HB_IS_BYREF( hb_stackItemFromTop( -1 ) ) )
-            {
-               PHB_ITEM pTemp = hb_itemUnRef( hb_stackItemFromTop( - 1 ) );
-               hb_stackPop();
-               hb_vmPush( pTemp );
-            }          
             w++;
             break;
 
