@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.9 2002/12/04 06:24:06 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.10 2002/12/18 13:43:55 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,11 @@ typedef struct _COMDECLARED
    BYTE                  cType;
    USHORT                iParamCount;
    BYTE                * cParamTypes;
-   struct _COMCLASS    * pClass;
+   union
+   {
+      struct _COMCLASS *pClass;
+      struct _ENUMDEF  *pEnum;
+   };
    struct _COMCLASS    * ( * pParamClasses );
    struct _COMDECLARED * pNext;               /* pointer to the next declared function */
 } COMDECLARED, * PCOMDECLARED;
@@ -141,8 +145,11 @@ typedef struct _VAR
    int       iUsed;                /* number of times used */
    int       iDeclLine;            /* declaration line number */
    BYTE      cType;                /* optional strong typing */
-   PCOMCLASS pClass;
-   PENUMDEF  pEnum;
+   union
+   {
+      PCOMCLASS pClass;
+      PENUMDEF  pEnum;
+   };
    struct _VAR * pNext;            /* pointer to next defined variable */
 } VAR, * PVAR;
 
@@ -215,7 +222,11 @@ typedef struct _COMSYMBOL
    char *    szName;               /* the name of the symbol */
    char      cScope;               /* the scope of the symbol */
    BYTE      cType;
-   PCOMCLASS pClass;
+   union
+   {
+      PCOMCLASS pClass;
+      PENUMDEF  pEnum;
+   };
    struct _COMSYMBOL * pNext;   /* pointer to the next defined symbol */
 } COMSYMBOL, * PCOMSYMBOL;
 
@@ -317,8 +328,9 @@ extern void hb_compExternAdd( char * szExternName ); /* defines a new extern nam
 
 extern void hb_compAutoOpenAdd( char * szName );
 
-extern void hb_compEnumAdd( char * szName );
-extern void hb_compEnumMemberAdd( char * szName );
+extern void     hb_compEnumAdd( char * szName );
+extern PENUMDEF hb_compEnumFind( char * szName );
+extern void     hb_compEnumMemberAdd( char * szName );
 
 #ifdef HB_MACRO_SUPPORT
 
