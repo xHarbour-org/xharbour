@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.3 2003/11/01 16:09:58 toninhofwi Exp $
+ * $Id: adsfuncs.txt,v 1.4 2003/11/04 09:54:50 brianhays Exp $
  */
 
 /*
@@ -518,7 +518,7 @@
  *      a particular Index File in cases where two files are open that contain
  *      orders with the same name. The ADS driver does not support this and
  *      will select the first order with the requested name. To stay consistent
- *      with other RDDs, therefore(),the second parameter is reserved and the
+ *      with other RDDs, therefore, the second parameter is reserved and the
  *      <nFilterOption> is passed as a third parameter.
  *
  *      <nFilterOption> Indicates if filters and/or scopes are to be respected if set.
@@ -716,6 +716,7 @@
  *      DLLs doing all the indexing. So to do progress meters
  *      you need to implement this.
  *  $EXAMPLES$
+ *       <table>
  *       FUNCTION Main()
  *          ...
  *          AdsRegCallBack( {|nPercent| outputstuff(nPercent)}  )
@@ -730,6 +731,7 @@
  *          ? "output stuff", nPercent
  *       RETURN inkey() == 27
  *       /*  If press ESC, returns .T. to abort.   */
+ *      </table>
  *  $STATUS$
  *      R
  *  $COMPLIANCE$

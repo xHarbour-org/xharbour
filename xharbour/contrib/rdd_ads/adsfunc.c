@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.21 2003/11/02 02:57:47 toninhofwi Exp $
+ * $Id: adsfunc.c,v 1.22 2003/11/03 20:09:24 brianhays Exp $
  */
 
 /*
@@ -1690,7 +1690,6 @@ HB_FUNC( ADSVERSION )
 
    hb_retc(ucVersion);
 }
-
 
 #ifdef ADS_REQUIRE_VERSION6
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.2 2002/08/15 04:47:06 ronpinkas Exp $
+# $Id: makefile.bc,v 1.3 2003/10/31 12:29:01 toninhofwi Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -24,7 +24,7 @@ $(OBJ_DIR)\adsfunc.obj  : adsfunc.c
 $(OBJ_DIR)\adsmgmnt.obj : adsmgmnt.c
 
 .c.obj:
-  bcc32 $(CLIBFLAGS) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
+  bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
   tlib $(LIB_DIR)\rddads.lib -+$@,,
 
 .prg.c:

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.56 2003/11/04 08:31:03 druzus Exp $
+ * $Id: dbcmd.c,v 1.57 2003/11/06 19:20:00 druzus Exp $
  */
 
 /*
@@ -4832,47 +4832,51 @@ HB_FUNC( DBSKIPPER )
    if( s_pCurrArea )
    {  long  nSkipped   = 0;
       long  nRecs      = 1;
-      ULONG ulRecCount = 0;
       BOOL bBEof       = TRUE;
       if( hb_pcount() > 0 )
+      {
          nRecs = hb_parnl( 1 ) ;
+      }
 
-      SELF_RECCOUNT( ( AREAP ) s_pCurrArea->pArea, &ulRecCount );
-      if( ulRecCount != 0 )
-      {  PHB_ITEM pRecNo  = hb_itemPutNL( NULL, 0 );
-         SELF_RECNO( ( AREAP ) s_pCurrArea->pArea, pRecNo );
-         if( nRecs == 0 )
-         {  SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 0 );
-         }
-         else if( nRecs > 0 && ( ULONG )pRecNo != ulRecCount + 1 )
-            {  while( nSkipped < nRecs )
-               { SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-                 SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bBEof );
-                  if( bBEof )
-                  {  SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
-                     nRecs = nSkipped ;
-                  }
-                  else
-                  {  nSkipped++ ;
-                  }
+      SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bBEof );
+      if( nRecs == 0 )
+      {
+         SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 0 );
+      }
+      else if( nRecs > 0 && !bBEof  )
+         {
+            while( nSkipped < nRecs )
+            {
+               SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+               if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
+               {
+                  SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
+                  nRecs = nSkipped ;
+               }
+               else
+               {
+                  nSkipped++ ;
                }
             }
-         else if( nRecs < 0 )
-            {  while( nSkipped > nRecs )
-               { SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
-                 SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBEof );
-                  if( bBEof )
-                  {  nRecs = nSkipped ;
-                  }
-                  else
-                  {  nSkipped-- ;
-                  }
+         }
+      else if( nRecs < 0 )
+         {
+            while( nSkipped > nRecs )
+            {
+               SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
+               if( ( ( AREAP ) s_pCurrArea->pArea )->fBof )
+               {
+                  nRecs = nSkipped ;
                }
-            };
-         hb_itemRelease( pRecNo );
-      }
+               else
+               {
+                  nSkipped-- ;
+               }
+            }
+         };
+
       hb_retnl( nSkipped );
    }
    else
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPER" );
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPPER" );
 }

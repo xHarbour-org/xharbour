@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.23 2003/11/03 20:09:24 brianhays Exp $
+ * $Id: ads1.c,v 1.24 2003/11/04 09:54:50 brianhays Exp $
  */
 
 /*
@@ -157,7 +157,6 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
    }
 
 }
-
 
 
 static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char* filename )
@@ -1281,18 +1280,15 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             UNSIGNED8 pucFormat[ 11 ];
             UNSIGNED16 pusLen = 11;
-            AdsGetDateFormat  ( pucFormat, &pusLen );
-            AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
             pulLength = pArea->maxFieldLen + 1;
-
-            if(AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
+            // AdsGetString  returns dates in YYYYMMDD format!
+            if(AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
             {
                memset( pBuffer, ' ', pField->uiLen );
                pArea->fEof = TRUE;
             }
 
             hb_itemPutDS( pItem, (char *) pBuffer );
-            AdsSetDateFormat  ( pucFormat );
             break;
          }
 
@@ -1373,7 +1369,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    long lDay, lMonth, lYear;
 
    UNSIGNED8 pucFormat[ 11 ];
-   UNSIGNED16 pusLen = 10;
+   UNSIGNED16 pusLen = 11;
    UNSIGNED32 ulRetVal = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("adsPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
@@ -1403,7 +1399,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       ulRetVal = AdsIsRecordLocked( pArea->hTable, 0, &pbLocked ) ;
       if( ulRetVal != AE_SUCCESS )
       {
-         hb_errRT_DBCMD( EG_LOCK, 0, "in adsPutValue", "ADSISRECORDLOCKED" );
+         hb_errRT_DBCMD( EG_LOCK, ulRetVal, "Lock Required by TestRecLocks", "ADSISRECORDLOCKED" );
       }
 
       if( !pbLocked  )
@@ -1452,6 +1448,9 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             bTypeError = FALSE;
             ulRetVal = AdsSetDouble( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetND( pItem ) );
+            // write to autoincrement field will gen error 5066
+            //   if( pField->uiTypeExtended == ADS_AUTOINC )
+            //AdsShowError( (UNSIGNED8 *) "Error" );
          }
          break;
 
@@ -1524,7 +1523,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
       else
       {
-         commonError( pArea, EG_WRITE, EDBF_WRITE, NULL );
+         commonError( pArea, EG_WRITE, (USHORT) ulRetVal, NULL );
       }
 
       return FAILURE;
@@ -1546,7 +1545,7 @@ static ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsRecCount(%p, %p)", pArea, pRecCount));
 
-   AdsGetRecordCount( pArea->hTable, ADS_IGNOREFILTERS | ADS_REFRESHCOUNT, pRecCount );
+   AdsGetRecordCount( pArea->hTable, ADS_IGNOREFILTERS /*| ADS_REFRESHCOUNT*/, pRecCount );
    pArea->ulRecCount = *pRecCount;
    return SUCCESS;
 }
@@ -1963,7 +1962,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 	  }
 
 	  // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-	  // in the dictionary, OR if we are not using a ditionary at all, try the open with standard settings.
+     // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
 	  // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
       if( !bDictionary || ulLastErr == 5132L )
       {

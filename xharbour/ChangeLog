@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1671 2003/11/08 00:14:19 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1672 2003/11/08 01:12:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-07 22:14 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * tweaked error reporting in adsPutValue
+    * fixed retrieval of date fields to avoid extra formatting calls
+         (AdsSetDateFormat seems to dump the read-ahead cache)
+
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    * minor formatting
+
+  * contrib/rdd_ads/makefile.bc
+    * added $(C_USR) to bcc line so you can add v6 support by setting
+      set C_USR=-DADS_REQUIRE_VERSION6
+  * source/rdd/dbcmd.c
+    * optimized dbSkipper()
+
+  ADS is dramatically faster on a WAN connection for browses now.
+  Remote server is also improved, though I haven't quantified it.
+  Expect only modest effect on local server, if any.
+
+
 2003-11-08 08:05 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rdd/dbfcdx/dbfcdx1.c
     ! Addes some missing casts to please MSVC
@@ -40,7 +62,7 @@
   * source/rtl/gtapi.c
     ! Ops, a mispelled variable was making DevOutAt() to fail on gtwin. Reported
       by Andy.
- 
+
 2003-11-07 10:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
     * Minor optimization.
@@ -171,7 +193,7 @@
 
   * contrib/rdd_ads/doc/en/readme.txt
     * added a page about speed and performance issues.
-  * contrib/rdd_ads/doc/en/adsfunc.txt
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
     * fixed docs for AdsGetRelKeyPos (it only operates on the current index)
     * added docs for AdsSetRelKeyPos, AdsTestRecLocks( <lOnOff> ),
          AdsIsExprValid(cExp) and AdsGetLastError()
