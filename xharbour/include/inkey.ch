@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.1.1.1 2001/12/21 10:47:26 ronpinkas Exp $
+ * $Id: inkey.ch,v 1.2 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
@@ -80,6 +80,15 @@
 #define K_RBUTTONUP             1005
 #define K_LDBLCLK               1006
 #define K_RDBLCLK               1007
+#define K_MBUTTONDOWN           1008   // Middle Button Down
+#define K_MBUTTONUP             1009   // Middle Button Up
+#define K_MDBLCLK               1010   // Middle Button Double Click
+#define K_MMLEFTDOWN            1011   // Mouse Move Left Down
+#define K_MMRIGHTDOWN           1012   // Mouse Move Right Down
+#define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
+#define K_MWFORWARD             1014   // Mouse Wheel Forward
+#define K_MWBACKWARD            1015   // Mouse Wheel Backward
+
 
 /* Harbour extension - this marks that multi-characters keycode will be
    returned - call INKEY() until ZERO will be returned

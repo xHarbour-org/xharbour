@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.64 2004/02/06 17:07:30 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.65 2004/02/06 18:13:00 jonnymind Exp $
  */
 
 /*
@@ -2108,7 +2108,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_LBUTTONUP:
     case WM_RBUTTONDBLCLK:
     case WM_LBUTTONDBLCLK:
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_MBUTTONDBLCLK:
     case WM_MOUSEMOVE:
+    case WM_MOUSEWHEEL:    
     {
        hb_wvt_gtMouseEvent( hWnd, message, wParam, lParam );
        return( 0 );
@@ -2803,9 +2807,50 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         keyCode = K_RBUTTONUP;
         break;
 
+      case WM_MBUTTONDOWN:
+        keyCode = K_RBUTTONUP;
+        break;
+
+      case WM_MBUTTONUP:
+        keyCode = K_MBUTTONUP;
+        break;
+
+      case WM_MBUTTONDBLCLK:
+        keyCode = K_MDBLCLK;
+        break;
+
       case WM_MOUSEMOVE:
-        keyCode = K_MOUSEMOVE;
         keyState = wParam;
+
+        if      ( keyState == MK_LBUTTON )
+        {
+           keyCode = K_MMLEFTDOWN; 
+        }
+        else if ( keyState == MK_RBUTTON )
+        {
+           keyCode = K_MMRIGHTDOWN; 
+        }
+        else if ( keyState == MK_MBUTTON )
+        {
+           keyCode = K_MMMIDDLEDOWN; 
+        }
+        else
+        {
+           keyCode = K_MOUSEMOVE;
+        }
+        break;
+
+      case WM_MOUSEWHEEL:
+        keyState = HIWORD( wParam );
+
+        if ( keyState > 0 )
+        {
+           keyCode = K_MWFORWARD;
+        }
+        else
+        {
+           keyCode = K_MWBACKWARD;
+        }
         break;
     }
 
@@ -2813,7 +2858,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     {
       hb_vmPushSymbol( _s.pSymWVT_MOUSE->pSymbol );
       hb_vmPushNil();
-      hb_vmPushLong( ( SHORT ) keyCode );
+      hb_vmPushLong( ( SHORT ) keyCode  );
       hb_vmPushLong( ( SHORT ) colrow.y );
       hb_vmPushLong( ( SHORT ) colrow.x );
       hb_vmPushLong( ( SHORT ) keyState );
@@ -4923,8 +4968,8 @@ HB_FUNC( WVT_DRAWBUTTON )
 //
 //-------------------------------------------------------------------//
 //
-//     Wvt_ChooseFont( { cFontName, nHeight, nWidth, nWeight, nQuality, ;
-//                                    lItalic, lUnderline, lStrikeout } )
+//     Wvt_ChooseFont( cFontName, nHeight, nWidth, nWeight, nQuality, ;
+//                                    lItalic, lUnderline, lStrikeout )
 //
 HB_FUNC( WVT_CHOOSEFONT )
 {
