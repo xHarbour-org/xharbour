@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.32 2003/12/07 13:35:02 jonnymind Exp $
+ * $Id: extend.c,v 1.33 2003/12/18 21:12:44 ronpinkas Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
          }
       }
 
-      if( iMask == HB_IT_ANY || pItem->type & ( USHORT ) iMask )
+      if( ( USHORT ) iMask == HB_IT_ANY || pItem->type & ( USHORT ) iMask )
       {
          return pItem;
       }
