@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.97 2004/05/30 14:41:11 lculik Exp $
+# $Id: makefile.bc,v 1.98 2004/07/01 13:18:34 vouchcac Exp $
 #
 
 #
@@ -573,6 +573,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
+   $(OBJ_DIR)\msgplwin.obj \
    $(OBJ_DIR)\msgpt.obj \
    $(OBJ_DIR)\msgro.obj \
    $(OBJ_DIR)\msgru866.obj \
@@ -2494,6 +2495,9 @@ $(OBJ_DIR)\msgpliso.obj : $(LANG_DIR)\msgpliso.c
 
 $(OBJ_DIR)\msgplmaz.obj : $(LANG_DIR)\msgplmaz.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msgplwin.obj : $(LANG_DIR)\msgplwin.c
+    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\msgpt.obj : $(LANG_DIR)\msgpt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
