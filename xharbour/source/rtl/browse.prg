@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.3 2003/09/06 22:24:35 lculik Exp $
+ * $Id: browse.prg,v 1.4 2004/10/26 01:59:01 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
       if ( !lKeyPressed)
          while !oBrw:stabilize()
-            if ( ( nKey := InKey(0.1) ) != 0 )
+            if ( ( nKey := InKey() ) != 0 )
                lKeyPressed := .T.
                exit
             endif
@@ -389,7 +389,7 @@ static function SKIPPED( nSkip, lSkip )
          skip 0
       elseif ( nSkip > 0 .AND. RecNo() != LastRec() + 1 )
          do while ( nPos < nSkip )
-            skip 
+            skip
             if ( EOF() )
                if ( lSkip )
                   nPos++

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3587 2004/11/07 21:12:48 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3588 2004/11/08 18:50:11 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-08 10:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/browse.prg
+  * source/rtl/tgetlist.prg
+    * Reverted changed of Inkey() to Inkey(0.1) - Module developers should review correct fix.
 
 2004-11-07 13:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/filesys.c

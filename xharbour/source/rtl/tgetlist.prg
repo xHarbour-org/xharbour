@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.28 2004/09/13 13:16:40 druzus Exp $
+ * $Id: tgetlist.prg,v 1.29 2004/10/26 01:59:01 ronpinkas Exp $
  */
 
 /*
@@ -1411,7 +1411,7 @@ METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
             nKey := 0
 
             while !oTB:Stabilize() .and. nKey == 0
-               nKey := Inkey(0.1)
+               nKey := Inkey()
             end
 
             if nKey == 0
