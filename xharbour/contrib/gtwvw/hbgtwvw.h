@@ -293,6 +293,7 @@ typedef struct win_data
   TCHAR     szWinName[ WVW_MAXWINNAMELENGTH ];  /*x name of Window ~ szAppName for Window 0  */
 
   BYTE      byLineSpacing;             /*x linespacing in pixels */
+  int       iLSpaceColor;              /*x linespacing color index */
 
   USHORT    usRowOfs;                  /*x offset to Main Window's (0,0)                     */
   USHORT    usColOfs;                  /*x offset to Main Window's (0,0)                     */

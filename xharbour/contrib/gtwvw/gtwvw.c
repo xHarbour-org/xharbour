@@ -137,6 +137,9 @@ static BOOL s_bNOSTARTUPSUBWINDOW = FALSE;  /* if TRUE, subwindow will not be di
 
 static BYTE s_byDefLineSpacing = 0;    /* default line spacing */
 
+static int  s_iDefLSpaceColor = -1;    /* if >= 0 this will be the color index
+                                          for spacing between lines */
+
 static LOGFONT s_lfPB;       /* default font for pushbuttons */
 
 /* for GTWVW private use: ***********************************************/
@@ -4763,6 +4766,8 @@ static void gt_hbInitStatics( USHORT usWinNum, LPCTSTR lpszWinName, USHORT usRow
 
   pWindowData->byLineSpacing = s_byDefLineSpacing;
 
+  pWindowData->iLSpaceColor = s_iDefLSpaceColor;
+
   pWindowData->bPaintPending = FALSE;
   hb_wvw_InitPendingRect( pWindowData );
 
@@ -6014,7 +6019,11 @@ static void hb_wvw_gtFillLineSpace( WIN_DATA * pWindowData, HDC hdc, USHORT star
   RECT     rc;
   LOGBRUSH lb;
   HBRUSH   hBrush;
-  COLORREF bkColor = _COLORS[ ( byAttrib & 0x00F0 )>>4 ];
+
+  BYTE     byColorIndex = pWindowData->iLSpaceColor < 0 ?
+                          ( byAttrib & 0x00F0 )>>4 :
+                          pWindowData->iLSpaceColor;
+  COLORREF bkColor = _COLORS[ byColorIndex ];
 
   rc.top    = irow;
   rc.left   = startCol;
@@ -6674,6 +6683,57 @@ HB_FUNC( WVW_SETLINESPACING )
    }
 
    hb_retni( byOldLineSpacing );
+}
+
+/*WVW_SetDefLSpaceColor( [nColorIndex] )
+ *returns old setting of s_iDefLSpaceColor (color index of spacing between lines)
+ *then assigns s_iDefLSpaceColor:= nColorIndex (if supplied)
+ *NOTES:
+ * - nColorIndex will be the default line spacing color for all window opens
+ * - nColorIndex must >= 0 and <= 15, or == -1
+ *   nCOlorIndex == 0:black, 1:blue, ..., 7:white, ..., 15:bright white
+ *   nColorIndex == -1 means line spacing has no color
+ * - to check line spacing color being used by a window, use WVW_SetLSpaceColor()
+ */
+HB_FUNC( WVW_SETDEFLSPACECOLOR )
+{
+   BYTE iOldDefLSpaceColor = s_iDefLSpaceColor;
+
+   if ( !ISNIL(1) && ISNUM( 1 ) && hb_parni(1) >= -1 && hb_parni(1) <= 15 )
+   {
+     s_iDefLSpaceColor = hb_parni( 1 );
+   }
+
+   hb_retni( iOldDefLSpaceColor );
+}
+
+/*WVW_SetLSpaceColor( [nWinNum], [nColorIndex] )
+ *returns old setting of line space color in window nWinNum
+ *then set the line spacing color to nColorIndex (if supplied)
+ *NOTES:
+ * - nColorIndex must be >= 0 and <= 15, or -1
+ *   otherwise it will be ignored
+ *   nCOlorIndex == 0:black, 1:blue, ..., 7:white, ..., 15:bright white
+ * - nColorIndex == -1 means line spacing is not colored
+ * - to change default line space color for next window open, use WVW_SetDefLineSpacing()
+ */
+HB_FUNC( WVW_SETLSPACECOLOR )
+{
+   USHORT   usWinNum = WVW_WHICH_WINDOW;
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+   int      iOldLSpaceColor = pWindowData->iLSpaceColor;
+
+   if ( !ISNIL(2) && ISNUM( 2 ) && hb_parni(2) >= -1 && hb_parni(2) <= 15 )
+   {
+      pWindowData->iLSpaceColor = hb_parni( 2 );
+
+      if ( iOldLSpaceColor != pWindowData->iLSpaceColor )
+      {
+         hb_wvw_gtSetInvalidRect( pWindowData, 0, 0, pWindowData->COLS-1, pWindowData->ROWS-1 );
+      }
+   }
+
+   hb_retni( iOldLSpaceColor );
 }
 
 /*WVW_NoStartupSubWindow( [lOn] )
@@ -8272,8 +8332,8 @@ HB_FUNC( WVW_DRAWLABELOBJ )
 
    xy.y   -= pWindowData->byLineSpacing;
 
-   iBottom      = xy.y - 1;
-   iRight       = xy.x - 1;
+   iBottom      = xy.y - 1 + 1;
+   iRight       = xy.x - 1 + 1;
 
    iAlignHorz   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
    iAlignVert   = ( ISNIL( 8 ) ? 0 : hb_parni( 8 ) );

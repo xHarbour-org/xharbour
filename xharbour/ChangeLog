@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3598 2004/11/13 18:30:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3599 2004/11/13 18:36:29 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-14 01:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    + wvw_setDefLSpaceColor()
+    + wvw_setLSpaceColor()
+
+    * Allow one to define color for the spacing between lines.
 
 2004-11-13 13:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/vm/itemapi.c
