@@ -8,7 +8,7 @@ NOTE: If you define INT as the C type, (eg. in WinTypes.ch)
 It may clash with INT() function in Harbour.
 
 Make sure that when you use INT() function, you type it in mixed case
-eg. Int(), otherwise, a difficult to trace and understand compile time 
+eg. Int(), otherwise, a difficult to trace and understand compile time
 error will be occur.
 */
 
@@ -37,6 +37,8 @@ error will be occur.
 #define BYTE           1 //CTYPE_CHAR
 #define TCHAR         -1 //CTYPE_UNSIGNED_CHAR
 #define HINSTANCE     -4 //CTYPE_UNSIGNED_LONG
+#define HMENU         -4 //CTYPE_UNSIGNED_LONG
+#define HTREEITEM     -4 //CTYPE_UNSIGNED_LONG
 #define INT            3 //CTYPE_INT
 #define HWND          -4 //CTYPE_UNSIGNED_LONG
 #define LPARAM         4 //CTYPE_LONG
@@ -53,22 +55,22 @@ error will be occur.
 #define ULONG         -4 //CTYPE_UNSIGNED_LONG
 #define UCHAR         -1 //CTYPE_UNSIGNED_CHAR
 #define SHORT          2
-#define USHORT        -2 
+#define USHORT        -2
 #define PVOID          7 //CTYPE_VOID_PTR
 #define ULONG_PTR    -40 //CTYPE_UNSIGNED_LONG_PTR
-       
+
 
 #define LPOFNHOOKPROC   -4 // CTYPE_UNSIGNED_LONG
 #define LPCFHOOKPROC    -4
 #define LPFRHOOKPROC    -4
 #define LPPAGESETUPHOOK -4
 #define LPPAGEPAINTHOOK -4
-#define LPPRINTHOOKPROC -4  
-#define LPSETUPHOOKPROC -4  
-     
-#define BFFCALLBACK     -4 
+#define LPPRINTHOOKPROC -4
+#define LPSETUPHOOKPROC -4
 
-#define HDC           -4  
+#define BFFCALLBACK     -4
+
+#define HDC           -4
 #define HIMAGELIST    -4
 
 #endif
