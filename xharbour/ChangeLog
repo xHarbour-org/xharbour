@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.664 2003/01/31 09:08:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.665 2003/01/31 18:39:19 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-31 20:15 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rtl/gtsln/mousesln.c
+    * Some cleanup related to last mousesln.c fixes
+    
 2003-01-31 19:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c
     ! fixed a potential problem in InetRecv().
