@@ -183,13 +183,13 @@ METHOD OnKeyDown( wParam, lParam )
      LOCAL aRect
      LOCAL acRect
      LOCAL lOnBorder:=.T.
-     LOCAL n
+     LOCAL n:=0
      LOCAL l:=0
      LOCAL t:=0
      LOCAL b:=0
      LOCAL r:=0
 
-     IF Len(::aSelected) > 0
+  //   IF Len(::aSelected) > 0 .OR. wParam==VK_TAB
 
          cKbd  :=GetKeyboardState()
          lShift:=( cKbd[VK_SHIFT+1]   < 0  ) // size
@@ -208,6 +208,7 @@ METHOD OnKeyDown( wParam, lParam )
                ENDIF
             NEXT
             ::aSelected:={}
+            ::GetSiblings()
             ::nClick:=HTCLIENT
              SetFocus(::Handle)
             RETURN(NIL)
@@ -215,28 +216,28 @@ METHOD OnKeyDown( wParam, lParam )
          CASE wParam==VK_ESCAPE // ESC unselect ?
             ::aSelected:={}
             ::nClick:=HTCLIENT
-            InvalidateRect(::Parent:Handle,,.T.)
+            InvalidateRect(::Parent:Handle,,.F.)
             SetFocus(::Handle)
 //            WinSetCursor(LoadCursor(,IDC_ARROW))
             RETURN(NIL)
 
          CASE wParam==VK_TAB
-            IF (n:=aScan(::aSiblings,{|h| h==::aSelected[1,SEL_HANDLE]}))==0
+            IF Len(::aSelected)==0 .OR. (n:=aScan(::aSiblings,{|h| h==::aSelected[1,SEL_HANDLE]}))==0
                IF len(::aSiblings)>0
                   n:=1
                ENDIF
             ENDIF
             IF n > 0
                IF lShift
-                  n:=IF(n==1,len(::aSiblings),n-1)
+                  n:=IF(n==1,len(::aSiblings),Max(1,n-1))
                ELSE
-                  n:=IF(len(::aSiblings) = n,1,n+1)
+                  n:=IF(len(::aSiblings) = n,1,Min(Len(::aSiblings),n+1))
                ENDIF
-               IF (::aSiblings[n] <> ::aSelected[1,SEL_HANDLE] ) .OR. len(::aSelected) > 1
+               IF Len(::aSelected)==0 .OR. (::aSiblings[n] <> ::aSelected[1,SEL_HANDLE] ) .OR. len(::aSelected) > 1
                   aRect:=GetWindowRect(::aSiblings[n])
                   RectScreenToClient(::Handle,aRect)
                   ::aSelected:={{::aSiblings[n],aclone(aRect),0,0,{},{}}}   // handle,rect,anchorX,anchorY,aHot
-                  InvalidateRect(::Parent:Handle,,.T.)
+                  InvalidateRect(::Parent:Handle,,.F.)
                ENDIF
             ENDIF
             RETURN(NIL)
@@ -244,7 +245,7 @@ METHOD OnKeyDown( wParam, lParam )
            // select next control
 
 
-         CASE (!lCtrl .AND. !lShift) .OR. ( lShift .AND. lCtrl )
+         CASE (!lCtrl .AND. !lShift) .OR. ( lShift .AND. lCtrl ) .OR. Len(::aSelected)==0
             RETURN(NIL)
 
          CASE wParam==VK_DOWN // down
@@ -319,7 +320,7 @@ METHOD OnKeyDown( wParam, lParam )
 
          IF !lOnBorder
             FOR EACH a IN ::aSelected
-               InvalidateRect(::Parent:Handle,a[SEL_OLDRECT],.T.) // for statics
+               InvalidateRect(::Parent:Handle,a[SEL_OLDRECT],.F.) // for statics
                a[SEL_OLDRECT,1]+=l
                a[SEL_OLDRECT,2]+=t
                a[SEL_OLDRECT,3]+=r
@@ -329,7 +330,7 @@ METHOD OnKeyDown( wParam, lParam )
             NEXT
          ENDIF
 
-     ENDIF
+  //   ENDIF
 
      RETURN(NIL)
 
@@ -337,29 +338,11 @@ METHOD OnKeyDown( wParam, lParam )
 
 METHOD OnPaint(hDC)
 
-   LOCAL acRect
-   //LOCAL hBrush
-   LOCAL aPt
    LOCAL a
    LOCAL n:=0
 
    IF !empty(::aSelected)
-      SetTextColor(hDC,RGB(0,0,0))
-      SetBkColor(hDC,RGB(255,255,255))
-      IF ::mousedown
-         //view SetROP2(hDC, R2_NOTXORPEN)
-         //hBrush:=GetStockObject(DKGRAY_BRUSH)
-         IF len(::aSelected) > 1
-            FOR EACH a In ::aSelected
-               //FrameRect(hDC,a[6],hBrush)
-               DrawFocusRect(hDC,a[SEL_NEWRECT])
-            NEXT
-         ELSE
-           // FrameRect(hDC,::aEditRect,hBrush)
-            DrawFocusRect(hDC,::aEditRect)
-         ENDIF
-      ELSE
-         //hBrush:=GetStockObject( if( len(::aSelected) > 1, DKGRAY_BRUSH, BLACK_BRUSH ) )
+      IF ! ::mousedown
          FOR EACH a In ::aSelected
            n++
            ::aSelected[n,SEL_HOTAREAS]:=DrawHandles(hDC,a[SEL_OLDRECT],;
@@ -384,8 +367,8 @@ METHOD Refresh()
       RectScreenToClient(::Handle,aRect)
       a[SEL_OLDRECT]:=aClone(aRect)
    NEXT
+
    InvalidateRect(::Parent:Handle,,.T.)
-   //ReleaseCapture()
    ::BringToTop()
    ::SetFocus()
 
@@ -405,7 +388,7 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL nPos
    LOCAL hDC
    LOCAL a
-
+   LOCAL aOldSelected:=aClone(::aSelected)
    ClientToScreen(::Handle,aPt)
 
    FOR EACH hChild IN ::aSiblings
@@ -442,11 +425,25 @@ METHOD OnLButtonDown( wParam, x, y )
       ::aEditRect:={x,y,x,y}
       ::selecting:=.T.
       ::aClickPt:={x,y}
-    ENDIF
+   ENDIF
 
-   InvalidateRect(::Parent:Handle,,.T.)
+   InvalidateRect(::Handle,,.F.)
+   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
+
+   hDC:=GetDC(::Handle)
+   SetTextColor(hDC,RGB(255,255,128))
+   SetBkColor(hDC,RGB(0,0,128))
+
+   IF len(::aSelected) > 1
+      FOR EACH a In ::aSelected
+         DrawFocusRect(hDC,a[SEL_NEWRECT])
+      NEXT
+   ELSE
+      DrawFocusRect(hDC,::aEditRect)
+   ENDIF
+   ReleaseDc(::Handle,hDC)
+
    ::mousedown:=.T.
-   SetFocus(::Handle)
    SetCapture(::Handle)
 
    RETURN(NIL)
@@ -464,35 +461,26 @@ METHOD OnMouseMove( aParam,x,y)
    LOCAL n
    LOCAL hDC
    LOCAL a
-   //LOCAL hBrush
 
    IF ::mousedown
       hDC:=GetDC(::Handle)
-      SetTextColor(hDC,RGB(0,0,0))
-      SetBkColor(hDC,RGB(255,255,255))
-     // hBrush:=GetStockObject(DKGRAY_BRUSH)
-     // view SetROP2(hDC, R2_NOTXORPEN)
-     // SetBkMode(hDC,TRANSPARENT)
+      SetTextColor(hDC,RGB(255,255,128))
+      SetBkColor(hDC,RGB(0,0,128))
       IF len(::aSelected) > 1
          FOR EACH a In ::aSelected
-           // FrameRect(hDC,a[6],hBrush)
             DrawFocusRect(hDC,a[SEL_NEWRECT])
          NEXT
       ELSE
-        //FrameRect(hDC,::aEditRect,hBrush)
         DrawFocusRect(hDC,::aEditRect)
       ENDIF
-     // ::aOriginal:=aclone(::aEditRect)
 
       IF len(::aSelected) > 1
          ::MoveCtrl(::Handle,aPt)
          FOR EACH a In ::aSelected
-          // FrameRect(hDC,a[6],hBrush)
            DrawFocusRect(hDC,a[SEL_NEWRECT])
          NEXT
       ELSE
          ::aEditRect:=::MoveCtrl(::Handle,aPt)
-         //FrameRect(hDC,::aEditRect,hBrush)
          DrawFocusRect(hDC,::aEditRect)
       ENDIF
       ReleaseDc(::Handle,hDC)
@@ -535,6 +523,7 @@ METHOD OnLButtonUp( wParam, x, y )
    LOCAL hChild
    LOCAL aWRect
    LOCAL aRect
+   LOCAL hDC
    LOCAL a
 
    if !::mousedown // if dragged pressed from different window
@@ -562,6 +551,10 @@ METHOD OnLButtonUp( wParam, x, y )
       ::selecting:=.F.
       WinSetCursor(LoadCursor(,IDC_ARROW))
 
+      hDC:=GetDC(::Handle)
+      DrawFocusRect(hDC,::aEditRect)
+      ReleaseDc(::Handle,hDC)
+
       FOR EACH hChild IN ::aSiblings
          aWRect:=GetWindowRect(hChild)
          aRect:=aClone(aWRect)
@@ -572,7 +565,8 @@ METHOD OnLButtonUp( wParam, x, y )
       NEXT
    ENDIF
 
-   InvalidateRect(::Parent:Handle,,.T.)
+   InvalidateRect(::Handle,,.F.)
+   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
    ::SetFocus()
@@ -599,8 +593,6 @@ METHOD MoveCtrl(hWnd,aPt)
 
       DO CASE
       CASE ::nClick==HTCAPTION
-         //MoveWindow(hWnd,aPt[1]-AnchorX,aPt[2]-::AnchorY,aOriginal[3]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
-
          aRect:=SnapRect({aPt[1]-AnchorX,aPt[2]-AnchorY,;
                          aPt[1]+aOriginal[3]-aOriginal[1]-AnchorX,;
                          aPt[2]+aOriginal[4]-aOriginal[2]-AnchorY},;
@@ -608,46 +600,38 @@ METHOD MoveCtrl(hWnd,aPt)
 
       CASE ::nClick==HTTOP
          aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aOriginal[1],aPt[2],aOriginal[3]-aOriginal[1],aOriginal[4]-aPt[2],.t.)
          aRect:={aOriginal[1],aPt[2],aOriginal[3],aOriginal[4]}
 
       CASE ::nClick==HTBOTTOM
          aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aOriginal[3]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
          aRect:={aOriginal[1],aOriginal[2],aOriginal[3],aPt[2]}
 
       CASE ::nClick==HTLEFT
          aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
-         //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aOriginal[4]-aOriginal[2],.t.)
          aRect:={aPt[1],aOriginal[2],aOriginal[3],aOriginal[4]}
 
       CASE ::nClick==HTRIGHT
          aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
-         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
          aRect:={aOriginal[1],aOriginal[2],aPt[1],aOriginal[4]}
 
       CASE ::nClick==HTTOPLEFT
          aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
          aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
          aRect:={aPt[1],aPt[2],aOriginal[3],aOriginal[4]}
 
       CASE ::nClick==HTBOTTOMLEFT
          aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
          aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aPt[2]-aOriginal[2],.t.)
          aRect:={aPt[1],aOriginal[2],aOriginal[3],aPt[2]}
 
       CASE ::nClick==HTTOPRIGHT
          aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
          aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aOriginal[1],aPt[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
          aRect:={aOriginal[1],aPt[2],aPt[1],aOriginal[4]}
 
       CASE ::nClick==HTBOTTOMRIGHT
          aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
          aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
          aRect:={aOriginal[1],aOriginal[2],aPt[1],aPt[2]}
 
       ENDCASE
@@ -667,6 +651,7 @@ METHOD MoveCtrl(hWnd,aPt)
    RETURN(aRect)
 
 *-----------------------------------------------------------------------------*
+// in reversed order
 
 METHOD GetSiblings()
 
@@ -675,7 +660,7 @@ METHOD GetSiblings()
    ::aSiblings:={}
    DO WHILE !empty(hWnd)
       IF hWnd<>::Handle
-         aAdd(::aSiblings,hWnd)
+         aIns(::aSiblings, 1, hWnd, .T.)
       ENDIF
       hWnd:=GetWindow(hWnd,GW_HWNDNEXT)
    ENDDO
@@ -700,8 +685,6 @@ FUNCTION SnapRect(aRect,xGrain,yGrain)
    RETURN(aRect)
 
 *-----------------------------------------------------------------------------*
-
-
 
 FUNCTION DrawHandles(hDC,aRect,hBrush)
 
@@ -770,12 +753,69 @@ FUNCTION RectClientToScreen(hWnd,aRect)
 
    RETURN(aRect)
 
+*-----------------------------------------------------------------------------*
 
+FUNCTION RaScan(a,b,s,n)  // scans array backwards
 
+  LOCAL i:=0
+  LOCAL block
+  LOCAL e
+  LOCAL r:=0
 
+  IF ValType(b) # 'B'
+    block:={|x| x==b }
+  ELSE
+    block:=b
+  ENDIF
 
+  IF ValType(s) # 'N'
+    s:=Len(a)
+  ELSE
+    s:=Min(Max(1,s),Len(a))
+  ENDIF
 
+  IF ValType(n) # 'N'
+    n:=Len(a)
+  ENDIF
+  n:=Min(Max(0,n),s)
 
+  e:=s-n+1
+
+  FOR i:=s To e STEP -1
+    IF Eval(block,a[i])
+      r:=i
+      EXIT
+    ENDIF
+  NEXT
+
+  RETURN(r)
+
+*------------------------------------------------------------------------------*
+
+FUNCTION RaEval(a,b,s,n)  // traverses array backwards
+
+  LOCAL i
+  LOCAL block
+  LOCAL e
+
+  IF ValType(s) # 'N'
+    s:=Len(a)
+  ELSE
+    s:=Min(Max(1,s),Len(a))
+  ENDIF
+
+  IF ValType(n) # 'N'
+    n:=Len(a)
+  ENDIF
+  n:=Min(Max(0,n),s)
+
+  e:=s-n+1
+
+  FOR i:=s To e STEP -1
+    Eval(b,a[i],i)
+  NEXT
+
+  RETURN(a)
 
 
 

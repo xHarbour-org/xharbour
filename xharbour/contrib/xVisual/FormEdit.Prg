@@ -1,6 +1,7 @@
 
 // Form class in edit mode
 
+
 #include "windows.ch"
 #include "wingdi.ch"
 #include "HbClass.ch"
