@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.4 2003/11/14 12:01:41 jonnymind Exp $
+# $Id: Rules.make,v 1.5 2003/11/30 14:41:50 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -29,12 +29,16 @@ endif
 ifeq ($(HB_ARCHITECTURE),linux)
    ifeq ($(HB_GT_LIB),)
       GT_LIBS=-lgtcrs -lncurses -lgpm
-   else
-      ifeq ($(HB_GT_LIB),gtcgi)
-         GT_LIBS=-lgtcgi
-      endif
    endif
+   ifeq ($(HB_GT_LIB),gtcrs)
+      GT_LIBS=-lgtcrs -lncurses -lgpm
+   endif
+   ifeq ($(HB_GT_LIB),gtcgi)
+      GT_LIBS=-lgtcgi
+   endif
+   
 EXE_EXT=
+
 else
   ifeq ($(HB_ARCHITECTURE),darwin)
     ifeq ($(HB_GT_LIB),gtcrs)
@@ -55,11 +59,19 @@ endif
 #Sources / object determination rule
 #subidr might override this file by providing a makefile.sources
 ifeq ($(strip $(SOURCES)),)
-SOURCES=$(wildcard *.prg)
+SOURCES=$(wildcard *.prg) 
 endif
 
 ifeq ($(strip $(OBJECTS)),)
 OBJECTS=$(patsubst %.prg,%.o,$(SOURCES))
+endif
+
+ifeq ($(strip $(C_SOURCES)),)
+C_SOURCES=$(wildcard *.c) 
+endif
+
+ifeq ($(strip $(C_OBJECTS)),)
+C_OBJECTS=$(patsubst %.c,%.o,$(C_SOURCES))
 endif
 
 
@@ -75,19 +87,18 @@ all:$(TARGET)
 %.o: %.c
 	$(CC) -c -I$(HB_INC_INSTALL) $(INCLUDE) $(C_USR) $<
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) $(C_OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
-	$(LINKER) -r $(TARGET) $(OBJECTS)
+	$(LINKER) -r $(TARGET) $(OBJECTS) $(C_OBJECTS)
 	$(LIBRARIAN) $(TARGET)
 else
-	$(CC) -o $(TARGET) $(OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
+	$(CC) -o $(TARGET) $(OBJECTS) $(C_OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
 		$(GT_LIBS) -lm 
 endif
 
 clean:
 	rm -f *.o
-	rm -f *.c
 	rm -f *~
 	rm -f $(TARGET)
 

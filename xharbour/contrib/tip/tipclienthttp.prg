@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.5 2003/11/28 23:56:46 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.6 2003/11/29 03:22:03 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -185,7 +185,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
             ::bEof := .T.
             RETURN NIL
          ELSE
-            ::nLength := IP_HexToDec( cLine ) + ::nRead
+            ::nLength := HB_HexToNum( cLine ) + ::nRead
          ENDIF
       ELSE
          RETURN  NIL

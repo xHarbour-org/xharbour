@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.5 2003/11/28 16:05:40 jonnymind Exp $
+* $Id: tipencoderbase64.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -58,7 +58,15 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
    }
 
    // read the status of bHttpExcept
-   bExcept = hb_itemGetL( hb_objSendMsg( hb_stackSelfItem(), "BHTTPEXCEPT",0));
+   if ( hb_pcount() > 1 )
+   {
+      // this makes this function static!!!!
+      bExcept = hb_parl(2);
+   }
+   else
+   {
+      bExcept = hb_itemGetL( hb_objSendMsg( hb_stackSelfItem(), "BHTTPEXCEPT",0));
+   }
    // we know exactly the renturned length.
    nFinalLen = (ULONG) ((nLen / 3 + 2) * 4);
    // add line termination padding, CRLF each 76 output bytes

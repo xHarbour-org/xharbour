@@ -9,30 +9,65 @@
 * Usage:
 * base64test < file-to-encode >encoded-file
 * base64test -d  < encoded-file  >file-to-decode
+* base64test -q [-d]  to use quoted printable encoding/decoding.
+* base64test -u [-d]  to use url encoding/decoding.
 *
-* $Id: httpadvtest.prg,v 1.1 2003/11/22 15:10:33 jonnymind Exp $
+* $Id: base64test.prg,v 1.1 2003/11/30 14:42:03 jonnymind Exp $
 *****/
 
-PROCEDURE MAIN( cOption )
+PROCEDURE MAIN( ... )
    LOCAL oEncoder
-   LOCAL cData := ""
+   LOCAL cData
    LOCAL cBuffer := Space( 1024 )
    LOCAL nLen
+   LOCAL cOption, lHelp := .F.,lDecode := .F., lQp := .F., lUrl := .F.
 
-   IF cOption == NIL
-      cOption := ""
-   ENDIF
+   /* Parameter parsing */
+   FOR nLen := 1 TO PCount()
+      cData := Lower( HB_PValue( nLen ) )
+      DO CASE
+         CASE cData == '-h'
+            lHelp := .T.
 
-   IF Lower( cOption ) == "-h"
+         CASE cData == '-d'
+            lDecode := .T.
+
+         CASE cData == '-q'
+            lQp := .T.
+
+         CASE cData == '-u'
+            lUrl := .T.
+
+         OTHERWISE
+            ? "Wrong parameter", cData
+            ?
+            lHelp := .T.
+            EXIT
+      ENDCASE
+   NEXT
+
+   /* Providing help */
+   IF lHelp
       ? "Usage:"
       ? "base64test < file-to-encode >encoded-file"
       ? "base64test -d  < encoded-file  >file-to-decode"
+      ? "base64test -q [-d]  to use quoted printable encoding/decoding"
+      ? "base64test -u [-d]  to use url encoding/decoding."
       ?
       QUIT
    ENDIF
 
-   oEncoder := TIPEncoder():New( "base64" )
+   /* Selecting the encoder */
+   IF lUrl
+      oEncoder := TIPEncoder():New( "url" )
+   ELSEIF lQp
+      oEncoder := TIPEncoder():New( "quoted-printable" )
+   ELSE
+      oEncoder := TIPEncoder():New( "base64" )
+   ENDIF
 
+   /* Reading input stream */
+   cData := ""
    nLen := FRead( 0, @cBuffer, 1024 )
    DO WHILE nLen > 0
       IF nLen < 1024
@@ -43,11 +78,13 @@ PROCEDURE MAIN( cOption )
       nLen := FRead( 0, @cBuffer, 1024 )
    ENDDO
 
-   IF Lower( cOption ) == "-d"
+   /* Encoding/decoding */
+   IF lDecode
       cData := oEncoder:Decode( cData )
    ELSE
       cData := oEncoder:Encode( cData )
    ENDIF
 
+   /* Writing stream */
    FWrite( 1, cData )
 RETURN
