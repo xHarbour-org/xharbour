@@ -1,10 +1,11 @@
-REQUEST DBFCDX
-#define _TESTRDD "DBFCDX"
+REQUEST dbfcdx
+#define _TESTRDD "dbfcdx"
 #include "rddtst.prg"
 
 FUNCTION test_main()
 
 RDDTESTC {0,.t.,.t.,.f.}, LOCAL n
+RDDTESTF "DBFCDX", {0,.t.,.t.,.f.}, RDDSETDEFAULT()
 RDDTESTC {1,.t.,.t.,.f.}, USE "_tst" SHARED
 RDDTESTF NIL, {1,.t.,.t.,.f.}, DBGOTOP()
 RDDTESTF NIL, {1,.t.,.t.,.f.}, DBGOBOTTOM()

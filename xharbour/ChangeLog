@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2504 2004/03/05 23:44:45 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2505 2004/03/06 02:32:35 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-06 03:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  - xharbour/tests/rddtest/mktst.bat
+  - xharbour/tests/rddtest/out.prg
+  - xharbour/tests/rddtest/outads.prg
+  + xharbour/tests/rddtest/adscl52.prg
+  + xharbour/tests/rddtest/adscl53.prg
+  + xharbour/tests/rddtest/cdxcl52.prg
+  + xharbour/tests/rddtest/cdxcl53.prg
+  + xharbour/tests/rddtest/mkcl52.bat
+  + xharbour/tests/rddtest/mkcl53.bat
+  + xharbour/tests/rddtest/ntxcl52.prg
+  + xharbour/tests/rddtest/ntxcl53.prg
+  * xharbour/tests/rddtest/rddmktst.prg
+  * xharbour/tests/rddtest/rddtst.prg
+    * modified to allow easy compilation with clipper 5.2 / 5.3 for
+      DBFNTX/DBFCDX/ADS testing. There are some diffenreces between
+      CL5.2 and CL5.3 so there is no way to pass all of the above
+      tests by xHarbour. Now I've made DBFCDX CL5.3 compatible.
+      I'll try to describe what xHarbour RDD should do in the future
+      so we will have sth what should be our goal in RDD developing.
+      I hope that third party developers will take a part in this
+      process so it will be possible to document any differences in
+      each RDD.
+      I someone will want to add SIX, CM and real clipper ADS RDD to
+      the above tests I'll be glad.
+
 2004-03-06 09:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/clipsamp/date.c
   * source/clipsamp/stack.c

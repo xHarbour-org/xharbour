@@ -42,8 +42,10 @@ static nErrors := 0
 static aBadRetFunc:={ "DBSKIP", "DBGOTO", "DBDELETE", "DBRECALL", ;
                       "DBUNLOCK", "DBCOMMIT" }
 
+#ifdef _TEST_SCOPE_
 #include "ord.ch"
 #include "dbinfo.ch"
+#endif
 
 #ifdef __HARBOUR__
 #ifdef _TEST_ADS_
@@ -57,7 +59,7 @@ return
 #endif
 #endif
 
-REQUEST DBSEEK, DBGOTO, DBGOTOP, DBGOBOTTOM, ORDSETFOCUS, ORDSCOPE
+//REQUEST DBSEEK, DBGOTO, DBGOTOP, DBGOBOTTOM, ORDSETFOCUS, ORDSCOPE
 
 #ifdef _TEST_CREATE_
   function main(cOutFile, rdd)
@@ -110,6 +112,7 @@ rddSetDefault(rdd)
 #endif
 
 aeval(directory("./"+_DBNAME+".??x"),{|x|ferase(x[1])})
+aeval(directory("./TG_?.??x"),{|x|ferase(x[1])})
 ferase("./"+_DBNAME+".dbf")
 ? "RDD: "+rdd
 ? "creating databse and index..."
@@ -148,6 +151,7 @@ local cOut
 #endif
 dbclosearea()
 aeval(directory("./"+_DBNAME+".??x"),{|x|ferase(x[1])})
+aeval(directory("./TG_?.??x"),{|x|ferase(x[1])})
 ferase("./"+_DBNAME+".dbf")
 ?
 return nil
