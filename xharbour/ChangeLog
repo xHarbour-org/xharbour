@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3571 2004/11/01 21:36:40 druzus Exp $
+ * $Id: ChangeLog,v 1.3572 2004/11/01 22:40:56 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-11-02 15:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/tbrowse.prg
+    ! (Clipper compatibility)
+      ::LeftDetermine() should not stop at empty column.
+      IOW, do not let an empty column be at ::LeftVisible.
+
 2004-11-02 01:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_drw.sh
   * include/hbdefs.h
     * Removed -DHB_OS_DARWIN_5. Autodetect Darwin version in hbdefs.h.
   * make_tgz.sh
     * Use "install -c" only on Darwin.
- 
+
 2004-11-01 22:32 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/postinst.sh
   * xharbour/bin/hb-func.sh

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.92 2004/08/11 21:56:12 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.93 2004/08/12 14:08:53 vouchcac Exp $
  */
 
 /*
@@ -1311,9 +1311,15 @@ METHOD LeftDetermine() CLASS TBrowse
       nCol--
    enddo
 
+   /* Clipper compatible: do not let nCol stop at empty column */
+   nCol++
+   while nCol <= ::rightVisible .and. ::aColsInfo[ nCol, o_Width ] == 0
+      nCol++
+   enddo
+
        /* ::rightVisible could be larger then available space, for example because of
           frozen columns, so nCol-- never gets executed  */
-Return Min(nCol + 1, ::rightVisible)
+Return Min(nCol, ::rightVisible)
 
 //-------------------------------------------------------------------//
 //
