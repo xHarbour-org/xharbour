@@ -33,7 +33,6 @@ PROCEDURE Main( cAddress, cPort )
 
    ThreadID = StartThread( @ReceivePoll(), NIL, Socket );
 
-
    bFlag = .T.
    DO WHILE InetErrorCode( Socket ) == 0 .and. bFlag
       cText := Space( 60 )
@@ -45,7 +44,7 @@ PROCEDURE Main( cAddress, cPort )
           bFlag := .F.
       ENDIF
 
-      nLen  := InetSend( Socket, trim( cText ) + chr(13) + chr( 10 ) )
+      nLen  := InetSend( Socket, Trim( cText ) + chr(13) + chr( 10 ) )
    ENDDO
 
    RequestTerm = .T.
@@ -57,7 +56,7 @@ PROCEDURE Main( cAddress, cPort )
 
 PROCEDURE ReceivePoll( Socket )
 
-   LOCAL s
+   LOCAL nRensponse, cResponse
    LOCAL nProgress
    LOCAL nRow := Row(), nCol := Col()
 
@@ -69,10 +68,10 @@ PROCEDURE ReceivePoll( Socket )
 
    DO WHILE ! RequestTerm
      IF InetDataReady( Socket ) > 0
-        s := InetRecvLine( Socket )
+        nResponse := InetRecvLine( Socket, @cResponse, 128 )
 
-        IF s != NIL
-           @ 10, 0 SAY s
+        IF nResponse > 0
+           @ 10, 0 SAY cResponse
            @ nRow, nCol
         ENDIF
      ENDIF

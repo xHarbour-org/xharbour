@@ -1,7 +1,8 @@
 // SERVER:
 Procedure Main( cPort )
 
-   LOCAL Socket, s, nResponse, cResponse
+   LOCAL Socket, s
+   LOCAL nResponse, cResponse
 
    CLS
 
@@ -22,7 +23,7 @@ Procedure Main( cPort )
    nResponse := InetSend( s, "Welcome to my server!" + Chr(13) + Chr(10) )
 
    DO WHILE nResponse >= 0
-      cResponse := InetRecvLine( s )
+      nResponse := InetRecvLine( s, @cResponse, 128 )
 
       IF InetErrorCode( s ) != 0
           @ 8, 5 SAY Space(70)
@@ -34,12 +35,12 @@ Procedure Main( cPort )
           QUIT
       ENDIF
 
-      IF cResponse != NIL
+      IF nResponse > 0
          @ 7, 5 SAY "Received:"
          @ 8, 5 SAY space(70)
          @ 8, 5 SAY cResponse
 
-         InetSend( s, "Count: " + Str( Len( cResponse ) ) + " characters" + Chr(13) + Chr(10 ) )
+         InetSend( s, "Count: " + Trim( Str( Len( cResponse ) ) ) + " characters" + Chr(13) + Chr(10) )
       ENDIF
    ENDDO
 
