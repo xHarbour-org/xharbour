@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.13 2003/07/06 19:34:08 walito Exp $
+ * $Id: adsfunc.c,v 1.14 2003/07/22 09:40:44 toninhofwi Exp $
  */
 
 /*
@@ -52,11 +52,7 @@
 
 #define HB_OS_WIN_32_USED
 
-#pragma message( "Before hbdefs" )
-
 #include "hbsetup.h"
-
-#pragma message( "After hbdefs" )
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -446,12 +442,12 @@ HB_FUNC( ADSKEYCOUNT )
       else            /* ads scope handling is flawed; do our own */
       {               /* One more optimization would be to check if there's a fully optimized AOF available so don't walk ours */
          AdsGetScope  ( hIndex, ADS_BOTTOM, pucScope, &pusBufLen);
-         if ( pusBufLen )                // had a scope
+         if ( pusBufLen )                /* had a scope */
          {
             AdsGetAOF( pArea->hTable, pucFilter, &pusBufLen );
-            if ( !pusBufLen )            // had a AOF
+            if ( !pusBufLen )            /* had no AOF */
                AdsGetFilter( pArea->hTable, pucFilter, &pusBufLen );
-            if ( pusBufLen )             // had a scope with AOF or filter, walk it. Skips obey filters */
+            if ( pusBufLen )             /* had a scope with AOF or filter, walk it. Skips obey filters */
             {
                AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS,
                      (UNSIGNED32 *)&(pArea->ulRecNo) );
@@ -1305,6 +1301,109 @@ HB_FUNC( ADSGETLASTERROR )
    hb_retnl( ulLastErr );
 }
 
+
+HB_FUNC( ADSBEGINTRANSACTION )
+{
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+
+   if ( AdsBeginTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+
+}
+
+HB_FUNC( ADSCOMMITTRANSACTION )
+{
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+
+   if ( AdsCommitTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+
+}
+
+HB_FUNC( ADSFAILEDTRANSACTIONRECOVERY )
+{
+
+   UNSIGNED8 *pucServer =  ( UNSIGNED8 *) ( ISCHAR( 1 ) ? hb_parc( 1 ) : NULL);
+
+   if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
+
+HB_FUNC( ADSINTRANSACTION )
+{
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+   UNSIGNED16       pbInTrans ;
+
+   if ( AdsInTransaction( hConnect, &pbInTrans)  == AE_SUCCESS )
+   {
+      hb_retl( pbInTrans );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
+
+HB_FUNC( ADSROLLBACK )
+{
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+
+   if ( AdsRollbackTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
+/*
+   set the number of records to read ahead, for the current work area
+   Call :    ADSCACHERECORDS(nRecords)
+   Returns : True if successful
+*/
+HB_FUNC( ADSCACHERECORDS )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSAREAP pArea;
+
+   ulRetVal=FALSE;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   if( pArea )
+      ulRetVal = AdsCacheRecords( pArea->hTable, hb_parni(1) );
+
+   if( !pArea || ulRetVal != AE_SUCCESS )
+ 	  hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCACHERECORDS" );
+
+   hb_retl( ulRetVal );
+}
+
 #ifdef ADS_REQUIRE_VERSION6
 
 HB_FUNC( ADSADDTABLE )
@@ -1501,108 +1600,5 @@ HB_FUNC( ADSSETDBPROPERTY )
 }
 
 
-#endif
-
-HB_FUNC( ADSBEGINTRANSACTION )
-{
-
-   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
-
-   if ( AdsBeginTransaction( hConnect )  == AE_SUCCESS )
-   {
-      hb_retl( TRUE );
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-
-}
-
-HB_FUNC( ADSCOMMITTRANSACTION )
-{
-
-   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
-
-   if ( AdsCommitTransaction( hConnect )  == AE_SUCCESS )
-   {
-      hb_retl( TRUE );
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-
-}
-
-HB_FUNC( ADSFAILEDTRANSACTIONRECOVERY )
-{
-
-   UNSIGNED8 *pucServer =  ( UNSIGNED8 *) ( ISCHAR( 1 ) ? hb_parc( 1 ) : NULL);
-
-   if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
-   {
-      hb_retl( TRUE );
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-}
-
-
-HB_FUNC( ADSINTRANSACTION )
-{
-
-   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
-   UNSIGNED16       pbInTrans ;
-
-   if ( AdsInTransaction( hConnect, &pbInTrans)  == AE_SUCCESS )
-   {
-      hb_retl( pbInTrans );
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-}
-
-
-HB_FUNC( ADSROLLBACK )
-{
-
-   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
-
-   if ( AdsRollbackTransaction( hConnect )  == AE_SUCCESS )
-   {
-      hb_retl( TRUE );
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-}
-
-/*
-   set the number of records to read ahead, for the current work area
-   Call :    ADSCACHERECORDS(nRecords)
-   Returns : True if successful
-*/
-HB_FUNC( ADSCACHERECORDS )
-{
-   UNSIGNED32 ulRetVal ;
-   ADSAREAP pArea;
-
-   ulRetVal=FALSE;
-
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
-   if( pArea )
-      ulRetVal = AdsCacheRecords( pArea->hTable, hb_parni(1) );
-
-   if( !pArea || ulRetVal != AE_SUCCESS )
- 	  hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCACHERECORDS" );
-
-   hb_retl( ulRetVal );
-}
-
-
+#endif   /* ADS_REQUIRE_VERSION6  */
+/*  Please add all-version functions above this block */

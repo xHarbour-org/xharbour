@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1280 2003/07/22 18:24:07 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1281 2003/07/23 00:23:06 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-23 02:37 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * tests/pp.txt
+    * minor grammar fixes
+  * contrib/rdd_ads/ads1.c
+    ! fixed to allow dbcreate to make field names longer than 10 chars for adt files
+  * contrib/rdd_ads/adsfunc.c
+    * removed leftover debug pragmas and a unnecessary comment
+    * fixed comments from // to /**/
+    ! moved all pre-v6 funcs above the set of v6 funcs.
+
+   Please add all-version funcs above the v6 stuff and leave the v6 calls
+   at the bottom of the file.
 
 2003-07-22 21:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rdd/dbcmd.c

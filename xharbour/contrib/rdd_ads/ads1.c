@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.13 2003/07/06 19:34:08 walito Exp $
+ * $Id: ads1.c,v 1.14 2003/07/22 09:40:44 toninhofwi Exp $
  */
 
 /*
@@ -1092,11 +1092,6 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD    pField;
    BYTE *     pBuffer = pArea->pRecord;
-      /* For fast stack allocations, we use the largest possible
-       sized buffer. Even though 128 bytes is overkill for 10 byte
-       ADSCDX access, the speed over hb_xgrab(pArea->uiMaxFieldNameLength+1)
-       seems worth it.  */
-
    UNSIGNED32 pulLength;
    DOUBLE     dVal = 0;
 
@@ -1650,8 +1645,8 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
    /* Size for deleted records flag */
    pArea->uiRecordLen = 1;
 
-   pArea->uiMaxFieldNameLength = (pArea->iFileType == ADS_ADT) ? ADS_MAX_FIELD_NAME : ADS_MAX_DBF_FIELD_NAME;
    pArea->iFileType = adsFileType;
+   pArea->uiMaxFieldNameLength = (pArea->iFileType == ADS_ADT) ? ADS_MAX_FIELD_NAME : ADS_MAX_DBF_FIELD_NAME;
 
    return SUCCESS;
 }
