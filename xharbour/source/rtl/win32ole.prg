@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.11 2002/06/17 22:37:07 andijahja Exp $
+ * $Id: win32ole.prg,v 1.12 2002/07/17 04:36:40 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,12 @@ Static bOleInitialized := .F.
 FUNCTION CreateObject( cString )
 
 RETURN TOleAuto():New( cString )
+
+//----------------------------------------------------------------------------//
+
+FUNCTION GetObject( cString )
+
+RETURN TOleAuto():GetObject( cString )
 
 //----------------------------------------------------------------------------//
 
@@ -153,6 +159,7 @@ CLASS TOleAuto
    DATA bShowException INIT .T.
 
    METHOD New( uObj, cClass ) CONSTRUCTOR
+   METHOD GetObject( cClass ) CONSTRUCTOR
 
    METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
    METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
@@ -178,6 +185,20 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
       ENDIF
    ELSE
       MessageBox( 0, "Invalid parameter type to constructor TOleAuto():New()!", "OLE Interface", 0 )
+      ::hObj := 0
+   ENDIF
+
+RETURN Self
+
+//--------------------------------------------------------------------
+
+METHOD GetObject( cClass ) CLASS TOleAuto
+
+   IF ValType( cClass ) = 'C'
+      ::hObj := GetOleObject( cClass )
+      ::cClassName := cClass
+   ELSE
+      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetObject()!", "OLE Interface", 0 )
       ::hObj := 0
    ENDIF
 
@@ -1117,7 +1138,6 @@ RETURN uObj
 
      s_nOleError = S_OK;
 
-
      if ( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
      {
         wCLSID = AnsiToWide( hb_parc( 1 ) );
@@ -1157,6 +1177,64 @@ RETURN uObj
 
      hb_retnl( ( LONG ) pDisp );
 
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+  {
+     BSTR wCLSID;
+     IID ClassID, iid;
+     LPIID riid = (LPIID) &IID_IDispatch;
+     IDispatch * pDisp = NULL;
+
+     s_nOleError = S_OK;
+
+     if ( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
+     {
+        wCLSID = AnsiToWide( hb_parc( 1 ) );
+
+        if ( hb_parc( 1 )[ 0 ] == '{' )
+        {
+           s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
+        }
+        else
+        {
+           s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
+        }
+
+        hb_xfree( wCLSID );
+
+        if ( hb_pcount() == 2 )
+        {
+           if ( hb_parc( 2 )[ 0 ] == '{' )
+           {
+              wCLSID = AnsiToWide( hb_parc( 2 ) );
+              s_nOleError = CLSIDFromString( wCLSID, &iid );
+              hb_xfree( wCLSID );
+           }
+           else
+           {
+              memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
+           }
+
+           riid = &iid;
+        }
+
+        if ( s_nOleError == S_OK )
+        {
+           IClassFactory *pCF = NULL;
+
+           s_nOleError = CoGetClassObject( &ClassID, CLSCTX_SERVER, NULL, &IID_IClassFactory, (LPVOID FAR *) &pCF );
+
+           if ( s_nOleError == S_OK )
+           {
+              s_nOleError = pCF->lpVtbl->CreateInstance( pCF, NULL, riid, (void **) &pDisp );
+              pCF->lpVtbl->Release( pCF );
+           }
+        }
+     }
+
+     hb_retnl( ( LONG ) pDisp );
   }
 
   //---------------------------------------------------------------------------//

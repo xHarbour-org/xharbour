@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.13 2002/07/30 06:59:58 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.14 2002/07/30 18:10:31 ronpinkas Exp $
  */
 
 /*
@@ -89,8 +89,8 @@ Function __ActiveStructure( cStructure, nAlign )
          Return ( s_aActiveStructure := { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
       END
 
-         //TraceLog( "Registered: " + cStructure )
       aAdd( s_aClasses, { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
+      //TraceLog( "Registered: " + cStructure, s_aClasses[-1][5] )
 
       s_aActiveStructure := s_aClasses[-1]
 
@@ -300,8 +300,6 @@ Function HB_CStructure( cStructure, nAlign )
    oStructure:nId := nID + CTYPE_STRUCTURE
 
    AllocateMembers( oStructure )
-
-   //TraceLog( "ID: " + Str( oStructure:nID ) )
 
 Return oStructure
 

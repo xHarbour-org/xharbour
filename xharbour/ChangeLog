@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.329 2002/07/30 18:10:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.330 2002/08/02 22:33:52 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-05 11:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstruct.prg
+    * Minor trace info.
+  * source/vm/arrayshb.c
+    ! Fixed type in HB_FUNC( HB_SIZEOFCSTRUCTURE ) which caused the alingment to always be 4, regardless of passed paramater.
+
+  * source/rtl/win32ole.prg
+  * tests/testole.prg
+    + Added work in progress implementation of GetObject()
 
 2002-08-02 19:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *source/rtl/set.c
