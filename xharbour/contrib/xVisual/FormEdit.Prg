@@ -28,7 +28,6 @@ GLOBAL EXTERNAL hThisInstance
    DATA yBmpSize
    DATA CtrlName
 
-
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::Editing := .F.        ,;
                                     ::aCtrl   := {}         ,;
@@ -54,21 +53,11 @@ GLOBAL EXTERNAL hThisInstance
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()  INLINE    ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
-                                    nil
+                                    super:OnCloseQuery()
 
    
  END CLASS
- /*
-                                    ::Parent:WindowMenu:Gray( 102 ),;
-                                    ::Parent:WindowMenu:Gray( 103 ),;
-                                    ::Parent:WindowMenu:Gray( 104 ),;
-                                    ::Parent:WindowMenu:Gray( 105 ),;
-                                    ::Parent:WindowMenu:Gray( 106 ),;
-                                    ::Parent:WindowMenu:Gray( 107 ),;
-                                    ::Parent:WindowMenu:Gray( 108 ),;
-                                    ::Parent:WindowMenu:Gray( 109 ),;
-                                    ::Parent:WindowMenu:Gray( 110 ),;
-*/
+
 //----------------------------------------------------------------------------//
 
 METHOD Add( cName, oObj )

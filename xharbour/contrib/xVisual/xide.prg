@@ -29,7 +29,8 @@ FUNCTION Main
 
             WITH OBJECT :Popup
                :AddItem( 'Editor'     , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
-
+               :AddSeparator()
+               :AddItem( 'Exit'       , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
             END
          END
          :SetWindowMenu()
@@ -81,6 +82,7 @@ FUNCTION Main
                   :SetStyle( WS_BORDER, .F. )
                   WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 28, 28, 20, 20 ) )
                      :SetStyle( TBSTYLE_CHECKGROUP )
+
                      aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                                   'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                                   'RadioGroup', 'Panel', 'ActionList' }
@@ -132,7 +134,7 @@ CLASS MainFrame FROM TFrame
                                 ::height  := 125,;
                                 super:new( oParent )
 
-   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?', 'OnCloseQuery', MB_YESNO ) == IDYES,;
+   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES,;
                                     PostQuitMessage(0), 0 )
 ENDCLASS
 

@@ -26,7 +26,7 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TForm
-
+super:New( oParent )
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .F.
@@ -36,7 +36,7 @@ METHOD New( oParent ) CLASS TForm
    ::lControl  := .F.
    ::ExStyle   := 0
 
-   RETURN( super:New( oParent ) )
+   RETURN( SELF )
 
 *-----------------------------------------------------------------------------*
 

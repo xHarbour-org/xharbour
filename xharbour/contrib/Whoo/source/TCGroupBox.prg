@@ -34,3 +34,6 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TGroupB
    RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*
+
+FUNCTION GroupBox( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight )
+return( TGroupBox():New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) )
