@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.3 2002/04/28 02:49:20 lculik Exp $
+ * $Id: teditor.prg,v 1.4 2002/04/29 22:23:18 lculik Exp $
  */
 
 /*
@@ -808,8 +808,10 @@ return lMoveKey
 // Changes lInsert value and insertion / overstrike mode of editor
 METHOD InsertState(lInsState) CLASS HBEditor
 
-   ::lInsert := lInsState
-   SET(_SET_INSERT, lInsState)
+   IF ISLOGICAL( lInsState )
+      ::lInsert := lInsState
+      SET(_SET_INSERT, lInsState)
+   ENDIF
 
 return Self
 
@@ -824,18 +826,20 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
 
       // If I haven't been called with a key already preset, evaluate this key and then exit
       if nPassedKey == NIL
+
          if NextKey() == 0
             oSelf:IdleHook()
          endif
+
          nKey := InKey(0)
       else
          nKey = nPassedKey
-
       endif
-         IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
-            eval( bKeyBlock )
-            loop 
-         endif
+
+      IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
+         eval( bKeyBlock )
+         loop
+      endif
 
       if nKey == K_ESC
          oSelf:lExitEdit := .T.
@@ -873,20 +877,22 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
          // If I haven't been called with a key already preset, evaluate this key and then exit
          if nPassedKey == NIL
+
             if NextKey() == 0
                ::IdleHook()
             endif
-            nKey:=inkey(0)
+
+            nKey := InKey(0)
          else
             lSingleKeyProcess := .T.
             nKey := nPassedKey
             
          endif
 
-            IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
-              eval( bKeyBlock )
-              loop
-           endif
+         IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
+            eval( bKeyBlock )
+            loop
+         endif
 
          do case
 
