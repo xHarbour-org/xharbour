@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.23 2002/07/17 12:10:10 walito Exp $
+ * $Id: tget.prg,v 1.24 2002/08/31 14:34:27 lculik Exp $
  */
 
 /*
@@ -99,6 +99,7 @@ CLASS Get
    #ifdef HB_COMPAT_C53
    DATA Control
    DATA Message
+   DATA Caption
    #endif
 
    DATA cColorSpec   HIDDEN   // Used only for METHOD ColorSpec
