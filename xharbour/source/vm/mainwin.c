@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.10 2003/12/15 02:22:58 peterrees Exp $
+ * $Id: mainwin.c,v 1.11 2003/12/15 04:20:16 peterrees Exp $
  */
 
 /*
@@ -101,12 +101,10 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
            lpCmdLine++;
            if ( bInQuotedParam )
            {
-             *pArg = '\0';
              if (pStart == NULL)
              {
                pStart = pArg;
              }
-             pArg++;
              break ;
            }
            else
@@ -127,7 +125,6 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
            }
            else
            {
-             *pArg++ = '\0';
              lpCmdLine++ ;
              break ;
            }
@@ -144,6 +141,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
        }
        if (pStart)
        {
+         *pArg++ = '\0';
          argv[ argc++ ] = pStart ;
        }
      }
