@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.5 2002/01/27 19:14:51 ronpinkas Exp $
+ * $Id: fm.c,v 1.6 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -105,6 +105,9 @@ static LONG s_lMemoryBlocks = 0;      /* memory blocks used */
 static LONG s_lMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
 static LONG s_lMemoryMaxConsumed = 0; /* memory size consumed */
 static LONG s_lMemoryConsumed = 0;    /* memory max size consumed */
+static LONG s_lAllocations = 0;
+static LONG s_lReAllocations = 0;
+static LONG s_lFreed = 0;
 
 static PHB_MEMINFO s_pFirstBlock = NULL;
 static PHB_MEMINFO s_pLastBlock = NULL;
@@ -127,6 +130,8 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
 
  #ifdef HB_FM_STATISTICS
+
+   s_lAllocations++;
 
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
@@ -228,6 +233,8 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
  #ifdef HB_FM_STATISTICS
 
+   s_lAllocations++;
+
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
    if( ! pMem )
@@ -328,6 +335,8 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
+   s_lReAllocations++;
+
    if( ! pMem )
       hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
 
@@ -396,6 +405,8 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 #ifdef HB_FM_STATISTICS
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
+
+   s_lFreed++;
 
    if( pMem )
    {
@@ -492,7 +503,10 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( buffer, "Total memory allocated: %li bytes (%li blocks)", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
+      sprintf( buffer, "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
+      hb_conOutErr( buffer, 0 );
+      hb_conOutErr( hb_conNewLine(), 0 );
+      sprintf( buffer, "Highest total allocated %li, bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
       hb_conOutErr( buffer, 0 );
 
       if( s_lMemoryBlocks )

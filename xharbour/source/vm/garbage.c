@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.9 2002/02/01 03:48:59 ronpinkas Exp $
+ * $Id: garbage.c,v 1.10 2002/03/08 03:57:18 ronpinkas Exp $
  */
 
 /*
@@ -84,10 +84,16 @@ static HB_GARBAGE_PTR s_pCurrBlock = NULL;
 /* pointer to locked memory blocks */
 static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 
+/* pointer to Cached Items memory blocks */
+static HB_GARBAGE_PTR s_pAvailableItems = NULL, s_pReuseItem = NULL;
+
+/* pointer to Cached BaseArrays memory blocks */
+static HB_GARBAGE_PTR s_pAvailableBaseArrays = NULL;
+
 /* marks if block releasing is requested during garbage collecting */
 static BOOL s_bCollecting = FALSE;
 
-/* Signify ReleaseAll Processing is in taking place. */
+/* Signify ReleaseAll Processing is taking place. */
 static BOOL s_bReleaseAll = FALSE;
 
 /* flag for used/unused blocks - the meaning of the HB_GC_USED_FLAG bit
@@ -96,8 +102,27 @@ static BOOL s_bReleaseAll = FALSE;
 static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
 /* we may use a cache later */
-#define HB_GARBAGE_NEW( ulSize )   ( HB_GARBAGE_PTR )hb_xgrab( ulSize )
-#define HB_GARBAGE_FREE( pAlloc )    hb_xfree( (void *)(pAlloc) )
+#if 0
+#define HB_GARBAGE_NEW( ulSize )   ( s_pAvailableItems && ulSize == sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) ? \
+                                     ( hb_gcUnlink( &s_pAvailableItems, ( s_pReuseItem = s_pAvailableItems ) ), s_pReuseItem ) \
+                                     : \
+                                     ( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) + sizeof( HB_GARBAGE ) ? \
+                                       ( hb_gcUnlink( &s_pAvailableBaseArrays, ( s_pReuseItem = s_pAvailableBaseArrays ) ), s_pReuseItem ) \
+                                       : \
+                                       ( ( HB_GARBAGE_PTR ) hb_xgrab( ulSize ) ) \
+                                     ) \
+                                   )
+#endif
+
+#define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
+                                     ( hb_gcLink( &s_pAvailableItems, pAlloc ) ) \
+                                     : \
+                                     ( pAlloc->pFunc == hb_arrayReleaseGarbage ? \
+                                       ( hb_gcLink( &s_pAvailableBaseArrays, pAlloc ) ) \
+                                       : \
+                                       ( hb_xfree( (void *) ( pAlloc ) ) ) \
+                                     ) \
+                                   )
 
 /* Forward declaration.*/
 static HB_GARBAGE_FUNC( hb_gcGripRelease );
@@ -139,7 +164,19 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
+   //pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
+   #if 1
+   if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
+   {
+      pAlloc = s_pAvailableBaseArrays;
+      hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
+   }
+   else
+   {
+      pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
+   }
+   #endif
+
    if( pAlloc )
    {
       hb_gcLink( &s_pCurrBlock, pAlloc );
@@ -203,7 +240,16 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   pAlloc = HB_GARBAGE_NEW( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
+   //pAlloc = HB_GARBAGE_NEW( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
+   if( s_pAvailableItems )
+   {
+      pAlloc = s_pAvailableItems;
+      hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
+   }
+   else
+   {
+      pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
+   }
 
    if( pAlloc )
    {
@@ -250,9 +296,12 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_TRACE( HB_TR_INFO, ( "Drop %p %p", pItem, pAlloc ) );
 
-      if( HB_IS_COMPLEX( pItem ) )
+      if( pAlloc->pFunc == hb_gcGripRelease )
       {
-         hb_itemClear( pItem );    /* clear value stored in this item */
+         if( HB_IS_COMPLEX( pItem ) )
+         {
+            hb_itemClear( pItem );    /* clear value stored in this item */
+         }
       }
 
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
@@ -366,7 +415,7 @@ void hb_gcCollect( void )
    hb_gcCollectAll();
 }
 
-/* Check all memory block if they can be released
+/* Check all memory blocks if they can be released
 */
 void hb_gcCollectAll( void )
 {
@@ -395,14 +444,17 @@ void hb_gcCollectAll( void )
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
-      /* check list of locked block for blocks referenced from
+      /* check list of locked blocks for blocks referenced from
        * locked block
       */
       if( s_pLockedBlock )
       {
          pAlloc = s_pLockedBlock;
          do
-         {  /* it is not very elegant method but it works well */
+         {
+            // TODO: Locked Block may be an Array or CodeBlock!!!
+
+            /* it is not very elegant method but it works well */
             if( pAlloc->pFunc == hb_gcGripRelease )
             {
                hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
@@ -523,8 +575,8 @@ void hb_gcReleaseAll( void )
          HB_TRACE( HB_TR_INFO, ( "Release Locked %p", s_pLockedBlock ) );
          pDelete = s_pLockedBlock;
          hb_gcUnlink( &s_pLockedBlock, s_pLockedBlock );
-         HB_GARBAGE_FREE( pDelete );
-
+         //HB_GARBAGE_FREE( pDelete );
+         hb_xfree( (void *) ( pDelete ) );
       } while ( s_pLockedBlock );
    }
 
@@ -550,9 +602,27 @@ void hb_gcReleaseAll( void )
          HB_TRACE( HB_TR_INFO, ( "Release %p", s_pCurrBlock ) );
          pDelete = s_pCurrBlock;
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
-         HB_GARBAGE_FREE( pDelete );
-
+         //HB_GARBAGE_FREE( pDelete );
+         hb_xfree( (void *) ( pDelete ) );
       } while( s_pCurrBlock );
+   }
+
+   while( s_pAvailableItems )
+   {
+      HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableItems ) );
+      pDelete = s_pAvailableItems;
+      hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
+      //HB_GARBAGE_FREE( pDelete );
+      hb_xfree( (void *) ( pDelete ) );
+   }
+
+   while( s_pAvailableBaseArrays )
+   {
+      HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableBaseArrays ) );
+      pDelete = s_pAvailableBaseArrays;
+      hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
+      //HB_GARBAGE_FREE( pDelete );
+      hb_xfree( (void *) ( pDelete ) );
    }
 
    s_bCollecting = FALSE;

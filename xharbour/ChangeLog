@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.94 2002/03/07 22:16:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.95 2002/03/08 03:57:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-08 15:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    + Added reycling logic for HB_ITEMs and HB_BASEARRAYs.
+
+  * source/vm/fm.c
+    + Added Counters logic for Allocations, ReAllocations and Freed.
+    * Revised hb_xexit() //info display and added the statistics of the new counters.
 
 2002-03-07 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
