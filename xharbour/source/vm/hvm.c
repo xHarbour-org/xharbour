@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.63 2002/04/24 00:28:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.64 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -4955,6 +4955,7 @@ static void hb_vmPushLocal( SHORT iLocal )
    if( HB_IS_BYREF( pLocal ) )
    {
       hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pLocal ) );
+      ( * hb_stack.pPos )->pOrigin = pLocal;
    }
    else
    {
@@ -4997,6 +4998,7 @@ static void hb_vmPushStatic( USHORT uiStatic )
    if( HB_IS_BYREF( pStatic ) )
    {
       hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pStatic ) );
+      ( * hb_stack.pPos )->pOrigin = pStatic;
    }
    else
    {
