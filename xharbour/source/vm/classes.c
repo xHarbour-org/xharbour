@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.62 2003/06/10 23:46:19 ronpinkas Exp $
+ * $Id: classes.c,v 1.63 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -150,7 +150,6 @@
 #include "hbvm.h"
 #include "hboo.ch"
 #include "classes.h"
-#include "hbvmprv.h"
 
 #include <ctype.h>             /* For toupper() */
 
@@ -164,7 +163,6 @@
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
 extern BOOL hb_bProfiler; /* profiler activity status */
-extern int hb_vm_iOptimizedSend;
 
 static PCLASS   s_pClasses     = NULL;
 static USHORT   s_uiClasses    = 0;
@@ -179,23 +177,10 @@ static PHB_DYNS s_msgClsParent = NULL;
 /* All functions contained in classes.c */
 
 static PHB_ITEM hb_clsInst( USHORT uiClass );
-static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod );
+static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend );
 BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
-       void     hb_clsReleaseAll( void );
-       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
-
-       char *   hb_objGetClsName( PHB_ITEM pObject );
-       char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
-       USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
-       PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
-       PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor );
-       PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
-       ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
-
-       void *   hb_mthRequested( void );
-       void     hb_mthAddTime( void * pMethod, ULONG ulClockTicks );
 
 static HARBOUR  hb___msgClsH( void );
 static HARBOUR  hb___msgClsName( void );
@@ -434,13 +419,13 @@ void hb_clsIsClassRef( void )
    }
 }
 
-static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
+static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend )
 {
    USHORT uiScope = pMethod->uiScope;
 
    //#define DEBUG_SCOPE
 
-   if( uiScope & HB_OO_CLSTP_READONLY && hb_vm_iOptimizedSend != 2 )
+   if( uiScope & HB_OO_CLSTP_READONLY && iOptimizedSend != 2 )
    {
       // Allow anyway if all we do is read a property.
       if( pMethod->pMessage->pSymbol->szName[0] != '_' )
@@ -453,9 +438,35 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
    {
       HB_THREAD_STUB
 
-      PHB_ITEM * pBase = HB_VM_STACK.pBase;
+      PHB_ITEM *pBase = HB_VM_STACK.pBase;
       PHB_ITEM pCaller;
-      PCLASS pClass = s_pClasses + ( pObject->item.asArray.value->uiClass - 1 );
+      PCLASS pClass = s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ), pRealClass;
+
+      // ----------------- Get the Caller Symbol -----------------
+      if( iOptimizedSend == 0 )
+      {
+         // Outer function level.
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      }
+
+      if( strcmp( ( *pBase )->item.asSymbol.value->szName, "__OBJSENDMSG" ) == 0 )
+      {
+         // Backtrack 1 level.
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+      }
+
+      // ----------------- Get the Caller Self -----------------
+
+      if( strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )
+      {
+        pCaller = *( pBase + 1 + 2 );
+      }
+      else
+      {
+        pCaller = *( pBase + 1 );
+      }
+
+      // ----------------- Get the Real Module -----------------
 
       /*
         If Method is Inerited then the Module Name may be SAME because compared to THIS INHERTED Object
@@ -467,75 +478,104 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
          if( uiSuperClass )
          {
-            PCLASS pSuperClass = s_pClasses + ( uiSuperClass - 1 );
+            pRealClass = s_pClasses + ( uiSuperClass - 1 );
+         }
+      }
+      else
+      {
+         pRealClass = pClass;
+      }
+
+
+      // ----------------- Compare Modules -----------------
+
+      if( HB_IS_OBJECT( pCaller ) )
+      {
+         PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
+
+         if( pRealClass )
+         {
+            if( pRealClass->pModuleSymbols == NULL || pCallerClass->pModuleSymbols == NULL )
+            {
+               TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
+            }
+            else if( pRealClass->pModuleSymbols == pCallerClass->pModuleSymbols )
+            {
+               // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
+               return TRUE;
+            }
+            #ifdef DEBUG_SCOPE
+            else
+            {
+               printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, pCallerClass->pModuleSymbols->szModuleName );
+            }
+            #endif
+         }
+      }
+      else if( HB_IS_BLOCK( pCaller ) )
+      {
+         PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( ( pCaller->item.asBlock.value )->pSymbols );
+
+         if( pRealClass->pModuleSymbols == NULL || pBlockModuleSymbols == NULL )
+         {
+            TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->procname );
+         }
+         else
+         {
+            #ifdef DEBUG_SCOPE
+               printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, pBlockModuleSymbols->szModuleName );
+            #endif
 
             // Same module as the module where the Super Method is defined.
-            if( pSuperClass && pSuperClass->pModuleSymbols && ( pSuperClass->pModuleSymbols == HB_VM_STACK.pModuleSymbols ) )
+            if( pRealClass->pModuleSymbols && pRealClass->pModuleSymbols == pBlockModuleSymbols )
             {
-               // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pSuperClass->pModuleSymbols )->szModuleName );
+               // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
                return TRUE;
             }
          }
       }
       else
       {
-         // Same Module and Method is NOT Inherited.
-         if( pClass->pModuleSymbols && ( pClass->pModuleSymbols == HB_VM_STACK.pModuleSymbols ) )
+         if( pRealClass->pModuleSymbols == NULL || (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols == NULL )
          {
-            // TraceLog( NULL, "Same Module: %s\n", hb_vmFindModule( pClass->pModuleSymbols )->szModuleName );
-            return TRUE;
+            TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
+         }
+         else
+         {
+            #ifdef DEBUG_SCOPE
+               printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
+            #endif
+
+            // Same module as the module where the Super Method is defined.
+            if( pRealClass->pModuleSymbols && pRealClass->pModuleSymbols == (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+            {
+               // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
+               return TRUE;
+            }
          }
       }
+
+      // ----------------- Validate Scope -----------------
 
       #ifdef DEBUG_SCOPE
          printf( "Method: '%s' Scope: %i\n\r", pMethod->pMessage->pSymbol->szName, uiScope );
       #endif
 
-      if( hb_vm_iOptimizedSend == 0 )
-      {
-         // Outer function level.
-         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-      }
-
       #ifdef CLASSY_SCOPE
          // Outer while in Inline, Eval() or aEval().
-         while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) &&
-                  pBase != HB_VM_STACK.pItems )
+         while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) )
          {
             pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
          }
       #else
-         if( strcmp( ( *pBase )->item.asSymbol.value->szName, "__OBJSENDMSG" ) == 0  && ( pBase != HB_VM_STACK.pItems ) )
+         if( HB_IS_BLOCK( pCaller ) )
          {
-            // Backtrack 1 level.
-            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-            // Same Module and Method is NOT Inherited.
-            if( ( ! uiScope & HB_OO_CLSTP_SUPER ) && pClass->pModuleSymbols && ( pClass->pModuleSymbols == /* TODO*/ NULL ) )
-            {
-               // TraceLog( NULL, "Same Module: %s\n", hb_vmFindModule( pClass->pModuleSymbols )->szModuleName );
-               return TRUE;
-            }
-         }
-
-         if( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )
-         {
-            PHB_ITEM pBlock;
             char *szCaller;
             char *pAt;
 
-            if( HB_IS_BLOCK( *( pBase + 1 ) ) )
+            if( pCaller->item.asBlock.value->pSelfBase == NULL )
             {
-               pBlock = *( pBase + 1 );
-            }
-            else
-            {
-               pBlock = *( pBase + 1 + 2 );
-            }
-
-            if( pBlock->item.asBlock.value->pSelfBase == NULL )
-            {
-               szCaller = pBlock->item.asBlock.value->procname;
+               szCaller = pCaller->item.asBlock.value->procname;
 
                pAt = strchr( szCaller, ':' );
 
@@ -559,7 +599,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             else
             {
                // pObject and the HB_QSelf() of block are same class.
-               if( strcmp( pClass->szName, ( s_pClasses + ( pBlock->item.asBlock.value->pSelfBase->uiClass - 1 ) )->szName ) == 0 )
+               if( strcmp( pClass->szName, ( s_pClasses + ( pCaller->item.asBlock.value->pSelfBase->uiClass - 1 ) )->szName ) == 0 )
                {
                   return TRUE;
                }
@@ -574,11 +614,11 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
                   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
                }
                while( ( HB_IS_BLOCK( *( pBase + 1 ) ) && pBase != HB_VM_STACK.pItems ) );
+
+               pCaller = *( pBase + 1 );
             }
          }
       #endif
-
-      pCaller = *( pBase + 1 );
 
       if( HB_IS_OBJECT( pCaller ) )
       {
@@ -736,7 +776,6 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
    return TRUE;
 }
-
 
 BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
 {
@@ -972,10 +1011,10 @@ char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
  */
 PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
-  return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL ) ;
+  return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE ) ;
 }
 
-PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor )
+PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
@@ -1009,7 +1048,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
             pMethod = pClass->pMethods + uiAt;
             pFunction = pMethod->pFunction;
 
-            if( ! hb_clsValidScope( pObject, pMethod ) )
+            if( ! hb_clsValidScope( pObject, pMethod, iOptimizedSend ) )
             {
                // Force NO execution incase error was bypassed.
                pFunction = hb___msgVirtual;
@@ -1186,7 +1225,7 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 
    if( pDynSym )
    {
-      return ( ULONG ) hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL );
+      return ( ULONG ) hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE );
    }
    else
    {
@@ -3315,8 +3354,14 @@ void hb_clsSetModule( USHORT uiClass )
 {
    HB_THREAD_STUB
 
-   if( uiClass )
+   if( uiClass && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
    {
-      ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = HB_VM_STACK.pModuleSymbols;
+      ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
+
+      #if 0
+         printf( "Class: '%s' Caller: '%s' Module: '%s'\n", ( s_pClasses + ( uiClass - 1 ) )->szName,
+                                                            (* HB_VM_STACK.pBase)->item.asSymbol.value->szName,
+                                                            ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols->szModuleName );
+      #endif
    }
 }

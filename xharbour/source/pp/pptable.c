@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.18 2003/06/03 15:31:19 lculik Exp $
+ * $Id: pptable.c,v 1.19 2003/06/10 23:46:18 ronpinkas Exp $
  */
 
 /*
@@ -442,9 +442,8 @@ void hb_pp_Table( void )
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___02 };
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
-   static COMMANDS sT___05 = {1,"ERRORNEW","([\1A00[,\1B00[,\1C00[,\1D00[,\1E00]]]]] )", "ErrorNew(\1A00,\1B00,\1C00,\1D00,\1E00,__FILE__ )",&sT___04 };
 
    hb_pp_topDefine = &sD___58;
    hb_pp_topCommand = &sC___252;
-   hb_pp_topTranslate = &sT___05;
+   hb_pp_topTranslate = &sT___04;
 }

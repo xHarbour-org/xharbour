@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.8 2003/03/07 03:04:46 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.9 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -55,202 +55,218 @@
 
 #include "hbdefs.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+   #if defined(HB_EXTERN_C)
+      extern "C" {
+   #endif
 
-struct _HB_DYNS;
+    struct _HB_DYNS;
+    struct _SYMBOLS;
 
-#if defined(_MSC_VER) && _MSC_VER < 1000
-   #pragma pack(8)
-#endif
+    #if defined(_MSC_VER) && _MSC_VER < 1000
+       #pragma pack(8)
+    #endif
 
-/* symbol support structure */
-typedef struct
-{
-   char *            szName;  /* the name of the symbol */
-   HB_SYMBOLSCOPE    cScope;  /* the scope of the symbol */
-   PHB_FUNC          pFunPtr; /* function address for function symbol table entries */
-   struct _HB_DYNS * pDynSym; /* pointer to its dynamic symbol if defined */
-} HB_SYMB, * PHB_SYMB;
-#if defined(_MSC_VER) && _MSC_VER < 1000
-   #pragma pack()
-#endif
+    /* symbol support structure */
+    typedef struct
+    {
+       char *            szName;         /* the name of the symbol */
+       HB_SYMBOLSCOPE    cScope;         /* the scope of the symbol */
+       PHB_FUNC          pFunPtr;        /* function address for function symbol table entries */
+       struct _HB_DYNS * pDynSym;        /* pointer to its dynamic symbol if defined */
+    } HB_SYMB, * PHB_SYMB;
 
-/* dynamic symbol structure */
-typedef struct _HB_DYNS
-{
-   HB_HANDLE hArea;        /* Workarea number */
-   HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
-   PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
-   PHB_FUNC  pFunPtr;      /* Pointer to the function address */
-   ULONG     ulCalls;      /* profiler support */
-   ULONG     ulTime;       /* profiler support */
-   ULONG     ulRecurse;    /* profiler support */
-} HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+    #if defined(_MSC_VER) && _MSC_VER < 1000
+       #pragma pack()
+    #endif
 
-/* forward declarations */
-struct _HB_CODEBLOCK;
-struct _HB_BASEARRAY;
-struct _HB_ITEM;
-struct _HB_VALUE;
-
-/* Internal structures that holds data */
-struct hb_struArray
-{
-   struct _HB_BASEARRAY * value;
-};
-
-struct hb_struBlock
-{
-   LONG   statics;
-   USHORT paramcnt;
-   struct _HB_CODEBLOCK * value;
-};
-
-struct hb_struDate
-{
-   long value;
-};
-
-/* this definition signals that number of decimal places for double value
- * was not specified at compile time (the value is a result of optimization
- * performed by the compiler)
- */
-#define HB_DEFAULT_WIDTH     255
-#define HB_DEFAULT_DECIMALS  255
-
-struct hb_struDouble
-{
-   USHORT length;
-   USHORT decimal;
-   double value;
-};
-
-struct hb_struInteger
-{
-   USHORT length;
-   int value;
-};
-
-struct hb_struLogical
-{
-   BOOL value;
-};
-
-struct hb_struLong
-{
-   USHORT length;
-   long value;
-};
-
-struct hb_struMemvar
-{
-   struct _HB_VALUE ** itemsbase;
-   LONG offset;
-   LONG value;
-};
-
-struct hb_struPointer
-{
-   void * value;
-   BOOL collect;
-};
-
-struct hb_struRefer
-{
-   union {
-      struct _HB_CODEBLOCK * block;    /* codeblock */
-      struct _HB_ITEM ** itemsbase;    /* static variables */
-      struct _HB_ITEM ** *itemsbasePtr; /* local variables */
-   } BasePtr;
-   LONG offset;    /* 0 for static variables */
-   LONG value;
-};
-
-struct hb_struString
-{
-   ULONG           length;
-   char            *value;
-   BOOL            bStatic;
-   USHORT          *puiHolders; /* number of holders of this string */
-};
-
-struct hb_struSymbol
-{
-   LONG stackbase;
-   USHORT lineno;
-   USHORT paramcnt;
-   PHB_SYMB value;
-};
-
-/* items hold at the virtual machine stack */
-typedef struct _HB_ITEM
-{
-   USHORT type;
-   union
+   typedef struct _SYMBOLS
    {
-      struct hb_struArray   asArray;
-      struct hb_struBlock   asBlock;
-      struct hb_struDate    asDate;
-      struct hb_struDouble  asDouble;
-      struct hb_struInteger asInteger;
-      struct hb_struLogical asLogical;
-      struct hb_struLong    asLong;
-      struct hb_struMemvar  asMemvar;
-      struct hb_struPointer asPointer;
-      struct hb_struRefer   asRefer;
-      struct hb_struString  asString;
-      struct hb_struSymbol  asSymbol;
-   } item;
-} HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
+      PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
+      USHORT   uiModuleSymbols; /* number of symbols on that table */
+      struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
+      HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
+      char * szModuleName;
+   } SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
 
-typedef struct _HB_BASEARRAY
-{
-   PHB_ITEM pItems;       /* pointer to the array items */
-   ULONG    ulLen;        /* number of items in the array */
-   USHORT   uiHolders;    /* number of holders of this array */
-   USHORT   uiClass;      /* offset to the classes base if it is an object */
-   USHORT   uiPrevCls;    /* for fixing after access super */
-   USHORT * puiClsTree;   /* remember array of super called ID Tree  */
-} HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
-
-/* internal structure for codeblocks */
-typedef struct _HB_CODEBLOCK
-{
-   char* procname;
-   USHORT lineno;
-   BYTE     *pCode;       /* codeblock pcode */
-   PHB_ITEM pLocals;      /* table with referenced local variables */
-   USHORT   uiLocals;     /* number of referenced local variables */
-   PHB_SYMB pSymbols;     /* codeblocks symbols */
-   ULONG    ulCounter;    /* numer of references to this codeblock */
-   BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
-   PHB_ITEM **pGlobals;
-   USHORT   uLen;
-   PHB_BASEARRAY pSelfBase;
-} HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
+   extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
+   extern PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
 
 
-#define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
-typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
+    /* forward declarations */
+    struct _HB_CODEBLOCK;
+    struct _HB_BASEARRAY;
+    struct _HB_ITEM;
+    struct _HB_VALUE;
 
-/* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
-#define HB_FS_PUBLIC   ( ( HB_SYMBOLSCOPE ) 0x01 )
-#define HB_FS_STATIC   ( ( HB_SYMBOLSCOPE ) 0x02 )
-#define HB_FS_FIRST    ( ( HB_SYMBOLSCOPE ) 0x04 )
-#define HB_FS_INIT     ( ( HB_SYMBOLSCOPE ) 0x08 )
-#define HB_FS_EXIT     ( ( HB_SYMBOLSCOPE ) 0x10 )
-#define HB_FS_INITEXIT ( HB_FS_INIT | HB_FS_EXIT )
-#define HB_FS_CRITICAL ( ( HB_SYMBOLSCOPE ) 0x20 )
+    /* Internal structures that holds data */
+    struct hb_struArray
+    {
+       struct _HB_BASEARRAY * value;
+    };
 
-#define HB_FS_MESSAGE  ( ( HB_SYMBOLSCOPE ) 0x40 )
-#define HB_FS_MEMVAR   ( ( HB_SYMBOLSCOPE ) 0x80 )
+    struct hb_struBlock
+    {
+       LONG   statics;
+       USHORT paramcnt;
+       struct _HB_CODEBLOCK * value;
+    };
 
-extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+    struct hb_struDate
+    {
+       long value;
+    };
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+    /* this definition signals that number of decimal places for double value
+     * was not specified at compile time (the value is a result of optimization
+     * performed by the compiler)
+     */
+    #define HB_DEFAULT_WIDTH     255
+    #define HB_DEFAULT_DECIMALS  255
+
+    struct hb_struDouble
+    {
+       USHORT length;
+       USHORT decimal;
+       double value;
+    };
+
+    struct hb_struInteger
+    {
+       USHORT length;
+       int value;
+    };
+
+    struct hb_struLogical
+    {
+       BOOL value;
+    };
+
+    struct hb_struLong
+    {
+       USHORT length;
+       long value;
+    };
+
+    struct hb_struMemvar
+    {
+       struct _HB_VALUE ** itemsbase;
+       LONG offset;
+       LONG value;
+    };
+
+    struct hb_struPointer
+    {
+       void * value;
+       BOOL collect;
+    };
+
+    struct hb_struRefer
+    {
+       union {
+          struct _HB_CODEBLOCK * block;    /* codeblock */
+          struct _HB_ITEM ** itemsbase;    /* static variables */
+          struct _HB_ITEM ** *itemsbasePtr; /* local variables */
+       } BasePtr;
+       LONG offset;    /* 0 for static variables */
+       LONG value;
+    };
+
+    struct hb_struString
+    {
+       ULONG           length;
+       char            *value;
+       BOOL            bStatic;
+       USHORT          *puiHolders; /* number of holders of this string */
+    };
+
+    struct hb_struSymbol
+    {
+       LONG stackbase;
+       USHORT lineno;
+       USHORT paramcnt;
+       PHB_SYMB value;
+    };
+
+    /* items hold at the virtual machine stack */
+    typedef struct _HB_ITEM
+    {
+       USHORT type;
+       union
+       {
+          struct hb_struArray   asArray;
+          struct hb_struBlock   asBlock;
+          struct hb_struDate    asDate;
+          struct hb_struDouble  asDouble;
+          struct hb_struInteger asInteger;
+          struct hb_struLogical asLogical;
+          struct hb_struLong    asLong;
+          struct hb_struMemvar  asMemvar;
+          struct hb_struPointer asPointer;
+          struct hb_struRefer   asRefer;
+          struct hb_struString  asString;
+          struct hb_struSymbol  asSymbol;
+       } item;
+    } HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
+
+    typedef struct _HB_BASEARRAY
+    {
+       PHB_ITEM pItems;       /* pointer to the array items */
+       ULONG    ulLen;        /* number of items in the array */
+       USHORT   uiHolders;    /* number of holders of this array */
+       USHORT   uiClass;      /* offset to the classes base if it is an object */
+       USHORT   uiPrevCls;    /* for fixing after access super */
+       USHORT * puiClsTree;   /* remember array of super called ID Tree  */
+    } HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
+
+    /* internal structure for codeblocks */
+    typedef struct _HB_CODEBLOCK
+    {
+       char* procname;
+       USHORT lineno;
+       BYTE     *pCode;       /* codeblock pcode */
+       PHB_ITEM pLocals;      /* table with referenced local variables */
+       USHORT   uiLocals;     /* number of referenced local variables */
+       PHB_SYMB pSymbols;     /* codeblocks symbols */
+       ULONG    ulCounter;    /* numer of references to this codeblock */
+       BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
+       PHB_ITEM **pGlobals;
+       USHORT   uLen;
+       PHB_BASEARRAY pSelfBase;
+    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
+
+
+    /* dynamic symbol structure */
+    typedef struct _HB_DYNS
+    {
+       HB_HANDLE hArea;        /* Workarea number */
+       HB_HANDLE hMemvar;      /* Index number into memvars ( publics & privates ) array */
+       PHB_SYMB  pSymbol;      /* pointer to its relative local symbol */
+       PHB_FUNC  pFunPtr;      /* Pointer to the function address */
+       ULONG     ulCalls;      /* profiler support */
+       ULONG     ulTime;       /* profiler support */
+       ULONG     ulRecurse;    /* profiler support */
+       PSYMBOLS  pModuleSymbols;
+    } HB_DYNS, * PHB_DYNS, * HB_DYNS_PTR;
+
+    #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
+    typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
+
+    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
+    #define HB_FS_PUBLIC   ( ( HB_SYMBOLSCOPE ) 0x01 )
+    #define HB_FS_STATIC   ( ( HB_SYMBOLSCOPE ) 0x02 )
+    #define HB_FS_FIRST    ( ( HB_SYMBOLSCOPE ) 0x04 )
+    #define HB_FS_INIT     ( ( HB_SYMBOLSCOPE ) 0x08 )
+    #define HB_FS_EXIT     ( ( HB_SYMBOLSCOPE ) 0x10 )
+    #define HB_FS_INITEXIT ( HB_FS_INIT | HB_FS_EXIT )
+    #define HB_FS_CRITICAL ( ( HB_SYMBOLSCOPE ) 0x20 )
+
+    #define HB_FS_MESSAGE  ( ( HB_SYMBOLSCOPE ) 0x40 )
+    #define HB_FS_MEMVAR   ( ( HB_SYMBOLSCOPE ) 0x80 )
+
+    extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+
+    #if defined(HB_EXTERN_C)
+       }
+    #endif
 
 #endif /* HB_VMPUB_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.11 2003/05/24 00:29:10 ronpinkas Exp $
+ * $Id: runner.c,v 1.12 2003/05/28 04:10:18 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,6 @@
 #include "hbapifs.h"
 #include "hbvm.h"
 #include "hbpcode.h"
-#include "hbvmprv.h"
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 

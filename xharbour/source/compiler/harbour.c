@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.38 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: harbour.c,v 1.39 2003/06/10 23:46:18 ronpinkas Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ static void hb_compDeclaredInit( void );
 FILES          hb_comp_files;
 FUNCTIONS      hb_comp_functions;
 FUNCTIONS      hb_comp_funcalls;
-SYMBOLS        hb_comp_symbols;
+COMPSYMBOLS    hb_comp_symbols;
 PCOMDECLARED   hb_comp_pFirstDeclared;
 PCOMDECLARED   hb_comp_pLastDeclared;
 PCOMDECLARED   hb_comp_pReleaseDeclared;

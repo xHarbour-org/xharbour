@@ -96,7 +96,11 @@ PROCEDURE Main()
       ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
-   oChild:Property := "Can assign into a property."
+   TRY
+      oChild:Property := "Can assign into a property."
+   CATCH oErr
+      ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
    TRY
       ? oChild:FProperty

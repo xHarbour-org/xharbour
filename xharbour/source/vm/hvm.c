@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.207 2003/06/06 06:45:09 druzus Exp $
+ * $Id: hvm.c,v 1.208 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -95,7 +95,6 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
-#include "hbvmprv.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -285,8 +284,6 @@ PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
-int hb_vm_iOptimizedSend = 0;
-
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
 static BOOL s_fmInit = TRUE;
@@ -394,7 +391,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    #endif
 
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
-   hb_dynsymNew( &hb_symEval );  /* initialize dynamic symbol for evaluating codeblocks */
+   hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
    HB_TRACE( HB_TR_INFO, ("setInitialize" ) );
    hb_setInitialize();        /* initialize Sets */
    HB_TRACE( HB_TR_INFO, ("conInit" ) );
@@ -430,10 +427,17 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     * Static variables have to be initialized before any INIT functions
     * because INIT function can use static variables.
     */
+
+   //printf( "Before InitStatics\n" );
    hb_vmDoInitStatics();
 
+   //printf( "Before InitClip\n" );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
+
+   //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
+
+   //printf( "Before InitFunctions\n" );
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 
    /* This is undocumented CA-Clipper, if there's a function called _APPMAIN
@@ -491,6 +495,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
          }
       }
 
+      //printf( "Before Startup\n" );
       hb_vmDo( iArgCount ); /* invoke it with number of supplied parameters */
    }
 
@@ -631,11 +636,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #endif
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
-   PHB_SYMB pPrevModuleSymbols = HB_VM_STACK.pModuleSymbols;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
-
-   HB_VM_STACK.pModuleSymbols = pSymbols;
 
    /* NOTE: if pSymbols == NULL then hb_vmExecute is called from macro
     * evaluation. In this case all PRIVATE variables created during
@@ -1091,11 +1093,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      BOOL bConstructor;
                      PHB_FUNC pFunc;
 
-                     hb_vm_iOptimizedSend = 1;
-
-                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
-
-                     hb_vm_iOptimizedSend = 0;
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
 
                      if( pFunc == hb___msgGetData )
                      {
@@ -1151,11 +1149,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      BOOL bConstructor;
                      PHB_FUNC pFunc;
 
-                     hb_vm_iOptimizedSend = 1;
-
-                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor );
-
-                     hb_vm_iOptimizedSend = 0;
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
 
                      if( pFunc == hb___msgSetData )
                      {
@@ -1260,11 +1254,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                BOOL bConstructor;
                PHB_FUNC pFunc;
 
-               hb_vm_iOptimizedSend = 2;
-
-               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor );
-
-               hb_vm_iOptimizedSend = 0;
+               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 2 );
 
                if( pFunc == hb___msgGetData )
                {
@@ -1420,7 +1410,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-            HB_VM_STACK.pModuleSymbols = pPrevModuleSymbols;
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -2805,9 +2794,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       --hb_vm_wWithObjectCounter;
       hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
    }
-
-   // Reset pModuleSymbols.
-   HB_VM_STACK.pModuleSymbols = pPrevModuleSymbols;
 
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
@@ -4635,11 +4621,8 @@ void hb_vmDo( USHORT uiParams )
    ULONG    ulClock = 0;
    BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
    int      iPresetBase = s_iBaseLine;
-   PHB_SYMB pPrevModuleSymbols = HB_VM_STACK.pModuleSymbols;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
-
-   HB_VM_STACK.pModuleSymbols = NULL;
 
    //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
@@ -4651,8 +4634,6 @@ void hb_vmDo( USHORT uiParams )
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
       hb_vmSend( uiParams );
-
-      HB_VM_STACK.pModuleSymbols = pPrevModuleSymbols;
 
       return;
    }
@@ -4692,7 +4673,11 @@ void hb_vmDo( USHORT uiParams )
 
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
+         //printf( "Doing: '%s'\n", pSym->szName );
+
          pFunc();
+
+         //printf( "Done: '%s'\n", pSym->szName );
 
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
@@ -4740,8 +4725,6 @@ void hb_vmDo( USHORT uiParams )
    s_bDebugging = bDebugPrevState;
 
    s_iBaseLine = iPresetBase;
-
-   HB_VM_STACK.pModuleSymbols = pPrevModuleSymbols;
 }
 
 void hb_vmSend( USHORT uiParams )
@@ -4820,7 +4803,7 @@ void hb_vmSend( USHORT uiParams )
    }
    else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
    {
-      pFunc     = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor );
+      pFunc     = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
       if( uiParams == 1 && pFunc == hb___msgGetData )
       {
          pFunc = hb___msgSetData;
@@ -5495,9 +5478,28 @@ void hb_vmPushSymbol( PHB_SYMB pSym )
    HB_THREAD_STUB
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
+   #if 0
+   printf( "Symbol: %s\n", pSym->szName );
+   if( pSym->pDynSym )
+   {
+      printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
+      if( pSym->pDynSym->pModuleSymbols )
+      {
+         printf( "ModuleName: %s\n", pSym->pDynSym->pModuleSymbols->szModuleName );
+      }
+   }
+   #endif
+
    ( * HB_VM_STACK.pPos )->type = HB_IT_SYMBOL;
    ( * HB_VM_STACK.pPos )->item.asSymbol.value = pSym;
    ( * HB_VM_STACK.pPos )->item.asSymbol.stackbase = hb_stackTopOffset();
+
+   #if 1
+   if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+   {
+      pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
+   }
+   #endif
 
    hb_stackPush();
 }
@@ -5917,19 +5919,22 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
       uiAction = hb_rddFieldGet( ( * HB_VM_STACK.pPos ), pVarSymb );
 
       if( uiAction == SUCCESS )
+      {
          hb_stackPush();
+      }
       else
       {
          uiAction = hb_memvarGet( ( * HB_VM_STACK.pPos ), pVarSymb );
+
          if( uiAction == SUCCESS )
+         {
             hb_stackPush();
+         }
          else
          {
             HB_ITEM_PTR pError;
 
-            pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
-                                    NULL, pVarSymb->szName,
-                                    0, EF_CANRETRY );
+            pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pVarSymb->szName, 0, EF_CANRETRY );
 
             uiAction = hb_errLaunch( pError );
             hb_errRelease( pError );
@@ -6259,7 +6264,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
 /* ----------------------------------------------- */
 
-void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module symbols initialization */
+void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols initialization */
 {
    PSYMBOLS pNewSymbols;
    USHORT ui;
@@ -6276,9 +6281,9 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
       hb_xinit();
    }
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
-   va_start( ap, pModuleSymbols );
+   va_start( ap, pSymbols );
 
       uiModuleSymbols = (USHORT) va_arg( ap, int );
       sModule = va_arg( ap, char * );
@@ -6298,16 +6303,16 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
 
             for( ui = 0; ui < uiModuleSymbols; ui++ )
             {
-               if( pModuleSymbols[ui].pFunPtr )
+               if( pSymbols[ui].pFunPtr )
                {
-                  sprintf( sModule, "Program with 1st fun: %s", pModuleSymbols[ui].szName );
+                  sprintf( sModule, "Program with 1st fun: %s", pSymbols[ui].szName );
                   break;
                }
             }
 
             if( ui == uiModuleSymbols )
             {
-               sprintf( sModule, "Program with 1st sym: %s", pModuleSymbols[0].szName );
+               sprintf( sModule, "Program with 1st sym: %s", pSymbols[0].szName );
             }
 
             iPCodeVer = 0;
@@ -6320,16 +6325,16 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
 
          for( ui = 0; ui < uiModuleSymbols; ui++ )
          {
-            if( pModuleSymbols[ui].pFunPtr )
+            if( pSymbols[ui].pFunPtr )
             {
-               sprintf( sModule, "Program with 1st fun: %s", pModuleSymbols[ui].szName );
+               sprintf( sModule, "Program with 1st fun: %s", pSymbols[ui].szName );
                break;
             }
          }
 
          if( ui == uiModuleSymbols )
          {
-            sprintf( sModule, "Program with 1st sym: %s", pModuleSymbols[0].szName );
+            sprintf( sModule, "Program with 1st sym: %s", pSymbols[0].szName );
          }
       }
 
@@ -6345,7 +6350,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    }
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
-   pNewSymbols->pModuleSymbols = pModuleSymbols;
+   pNewSymbols->pModuleSymbols = pSymbols;
    pNewSymbols->uiModuleSymbols = uiModuleSymbols;
    pNewSymbols->pNext = NULL;
    pNewSymbols->hScope = 0;
@@ -6377,18 +6382,23 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
 
    for( ui = 0; ui < uiModuleSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
+      PHB_SYMB pSymbol = pSymbols + ui;
       HB_SYMBOLSCOPE hSymScope;
 
-      hSymScope = ( pModuleSymbols + ui )->cScope;
+      hSymScope = pSymbol->cScope;
+
       pNewSymbols->hScope |= hSymScope;
+
+      //printf( "Sym: '%s'\n", pSymbol->szName );
+
       if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
       {
-         s_pSymStart = pModuleSymbols + ui;  /* first public defined symbol to start execution */
+         s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
       }
 
       if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) )
       {
-         hb_dynsymNew( pModuleSymbols + ui );
+         hb_dynsymNew( pSymbol, pNewSymbols );
       }
    }
 }
@@ -6450,6 +6460,7 @@ static void hb_vmDoInitStatics( void )
             if( scope == ( HB_FS_INIT | HB_FS_EXIT ) )
             {
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+
                hb_vmPushNil();
                hb_vmDo( 0 );
             }
@@ -6547,7 +6558,7 @@ static void hb_vmDoInitFunctions( void )
    } while( pLastSymbols );
 }
 
-PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols )
+PSYMBOLS hb_vmFindModule( PHB_SYMB pSymbols )
 {
    PSYMBOLS pLastSymbols = s_pSymbols;
 
@@ -6555,7 +6566,7 @@ PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols )
 
    do
    {
-      if( pLastSymbols->pModuleSymbols == pModuleSymbols )
+      if( pLastSymbols->pModuleSymbols == pSymbols )
       {
          return pLastSymbols;
       }
@@ -6585,32 +6596,6 @@ PSYMBOLS hb_vmFindModuleByName( char *szModuleName )
    } while( pLastSymbols );
 
    return NULL;
-}
-
-
-char * hb_vmGetModuleName( PSYMBOLS pSymbols )
-{
-   HB_THREAD_STUB
-
-   PSYMBOLS pModuleSymbols;
-
-   if( pSymbols )
-   {
-      pModuleSymbols = hb_vmFindModule( pSymbols );
-   }
-   else
-   {
-      pModuleSymbols = hb_vmFindModule( HB_VM_STACK.pModuleSymbols );
-   }
-
-   if( pModuleSymbols )
-   {
-      return pModuleSymbols->szModuleName;
-   }
-   else
-   {
-      return "";
-   }
 }
 
 /* NOTE: We should make sure that these get linked.
@@ -6702,7 +6687,7 @@ void hb_vmRequestCancel( void )
 
       while ( buffer[0] )
       {
-         hb_procinfo( i++, buffer, &uLine );
+         hb_procinfo( i++, buffer, &uLine, NULL );
 
          if( buffer[0] == 0 )
          {
@@ -6899,47 +6884,59 @@ HB_FUNC( __TRACEPRGCALLS )
 
 /* hvm support for pcode DLLs */
 
-void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleSymbols )
+void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols )
 {
    PSYMBOLS pNewSymbols;
    USHORT ui;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pModuleSymbols, uiModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
-   pNewSymbols->pModuleSymbols = pModuleSymbols;
+   pNewSymbols->pModuleSymbols = pSymbols;
    pNewSymbols->uiModuleSymbols = uiModuleSymbols;
    pNewSymbols->pNext = NULL;
    pNewSymbols->hScope = 0;
+   pNewSymbols->szModuleName = NULL;
 
    if( s_pSymbols == NULL )
+   {
       s_pSymbols = pNewSymbols;
+   }
    else
    {
       PSYMBOLS pLastSymbols;
 
       pLastSymbols = s_pSymbols;
+
       while( pLastSymbols->pNext ) /* locates the latest processed group of symbols */
+      {
          pLastSymbols = pLastSymbols->pNext;
+      }
 
       pLastSymbols->pNext = pNewSymbols;
    }
 
    for( ui = 0; ui < uiModuleSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
+      PHB_SYMB pSymbol = pSymbols + ui;
       HB_SYMBOLSCOPE hSymScope;
 
-      hSymScope = ( pModuleSymbols + ui )->cScope;
+      hSymScope = pSymbol->cScope;
+
       pNewSymbols->hScope |= hSymScope;
 
       if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) )
       {
-         PHB_DYNS pDynSym = hb_dynsymFind( ( pModuleSymbols + ui )->szName );
+         PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
 
-         if( pDynSym && pDynSym->pFunPtr && ( pModuleSymbols + ui )->pFunPtr )
-            ( pModuleSymbols + ui )->pFunPtr = pDynSym->pFunPtr;
+         if( pDynSym && pDynSym->pFunPtr && pSymbol->pFunPtr )
+         {
+            pSymbol->pFunPtr = pDynSym->pFunPtr;
+         }
          else
-             hb_dynsymNew( ( pModuleSymbols + ui ) );
+         {
+            hb_dynsymNew( pSymbol, pNewSymbols );
+         }
       }
    }
 }

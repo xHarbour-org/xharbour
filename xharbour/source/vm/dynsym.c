@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.6 2002/11/04 21:28:16 mlombardo Exp $
+ * $Id: dynsym.c,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
    return pSymbol;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic symbol */
+PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates a new dynamic symbol */
 {
    PHB_DYNS pDynSym;
 
@@ -115,6 +115,12 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic 
             pDynSym->ulTime  = 0; /* profiler support */
             pDynSym->ulRecurse = 0;
          }
+      }
+
+      if( pSymbol->pDynSym == (PHB_DYNS) 1 )
+      {
+         pDynSym->pModuleSymbols = pModuleSymbols;
+         //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
       }
 
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
@@ -147,12 +153,14 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic 
    }
 
    s_uiDynSymbols++;                   /* Got one more symbol */
-   pDynSym->pSymbol = pSymbol;
-   pDynSym->hMemvar = 0;
-   pDynSym->hArea   = 0;
-   pDynSym->ulCalls = 0; /* profiler support */
-   pDynSym->ulTime  = 0; /* profiler support */
-   pDynSym->ulRecurse = 0;
+
+   pDynSym->pSymbol        = pSymbol;
+   pDynSym->hMemvar        = 0;
+   pDynSym->hArea          = 0;
+   pDynSym->ulCalls        = 0; /* profiler support */
+   pDynSym->ulTime         = 0; /* profiler support */
+   pDynSym->ulRecurse      = 0;
+   pDynSym->pModuleSymbols = NULL;
 
    if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
    {
@@ -160,6 +168,12 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol )    /* creates a new dynamic 
       {
          pDynSym->pFunPtr = pSymbol->pFunPtr;    /* place the function at DynSym */
       }
+   }
+
+   if( pSymbol->pDynSym == (PHB_DYNS) 1 )
+   {
+      pDynSym->pModuleSymbols = pModuleSymbols;
+      //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
    }
 
    pSymbol->pDynSym = pDynSym;                /* place a pointer to DynSym */
@@ -201,13 +215,22 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
          {
             *pDest++ = cChar;
          }
-
       }
    }
 
    pDynSym = hb_dynsymFind( szUprName );
+
    if( ! pDynSym )       /* Does it exists ? */
-      pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ) );   /* Make new symbol */
+   {
+      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+      {
+         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
+      }
+      else
+      {
+         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), NULL );   /* Make new symbol */
+      }
+   }
 
    return pDynSym;
 }
@@ -225,7 +248,14 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
    if( ! pDynSym )       /* Does it exists ? */
    {
       //TraceLog( NULL, "Creating: %s\n", szName );
-      pDynSym = hb_dynsymNew( hb_symbolNew( szName ) );   /* Make new symbol */
+      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+      {
+         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
+      }
+      else
+      {
+         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), NULL );   /* Make new symbol */
+      }
    }
 
    //TraceLog( NULL, "Returning: %p\n", pDynSym );
@@ -246,7 +276,9 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
       char * pDest = szUprName;
 
       if( iLen > HB_SYMBOL_NAME_LEN )
+      {
          iLen = HB_SYMBOL_NAME_LEN;
+      }
 
       pDest[ iLen ] = '\0';
       while( iLen-- )
@@ -267,7 +299,6 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
             *pDest++ = cChar;
          }
       }
-
    }
 
    return hb_dynsymFind( szUprName );
@@ -383,10 +414,14 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             }
          }
          else if (iLen1 == iLen2)
+         {
             bOk = 0;
+         }
 
          if (bOk)
+         {
             return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+         }
       }
 
       /*
@@ -599,9 +634,13 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
    PHB_DYNS pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
 
    if( pDynSym )
+   {
       hb_retnl( ( long ) ( s_uiClosestDynSym + 1 ) );
+   }
    else
+   {
       hb_retnl( 0L );
+   }
 }
 
 HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure pointer,
@@ -610,9 +649,13 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
+   {
       hb_retl( s_pDynItems[ lIndex - 1 ].pDynSym->pFunPtr != NULL );
+   }
    else
+   {
       hb_retl( FALSE );
+   }
 }
 
 HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or procedure

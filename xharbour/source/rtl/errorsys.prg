@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.20 2003/05/24 00:29:10 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.21 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ STATIC FUNCTION DefError( oError )
      ? "Error at:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
      n := 3
      WHILE ( ! Empty(ProcName( n ) ) )
-       ? "Called from:", Trim( ProcName( n ) ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  "
+       ? "Called from:", ProcName( n ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  in Module:", ProcFile( n )
        n++
      END
 
@@ -335,7 +335,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, Padr( oErr:ProcName, 21 ) + ": " + Transform( oErr:ProcLine, "999,999" ) + " - in Module: " + oErr:ModuleName )
         nCount := 3
         While !Empty( Procname( ++ nCount ) )
-          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Transform( Procline( nCount ), "999,999" ) )
+          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Transform( Procline( nCount ), "999,999" ) + " in Module: " + ProcFile( nCount ) )
         Enddo
 
         FWriteLine( nHandle, "" )

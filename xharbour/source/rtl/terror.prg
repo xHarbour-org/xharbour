@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.8 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: terror.prg,v 1.9 2003/06/10 23:46:19 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,9 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    IF Args != NIL
       oErr:Args := Args
    ENDIF
-   IF ModuleName != NIL
+   IF ModuleName == NIL
+      oErr:ModuleName := ProcFile( 1 )
+   ELSE
       oErr:ModuleName := ModuleName
    ENDIF
 

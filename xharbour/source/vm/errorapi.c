@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.9 2003/05/27 00:36:22 mlombardo Exp $
+ * $Id: errorapi.c,v 1.10 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -225,7 +225,18 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    HB_THREAD_STUB
 
    PHB_ITEM pError;
-   char *szModuleName = hb_vmGetModuleName( NULL );
+   char *szModuleName;
+
+   #if 1
+   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+   {
+      szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
+   }
+   else
+   {
+      szModuleName = NULL;
+   }
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
@@ -237,7 +248,10 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
    hb_itemForwardValue( pError, &(HB_VM_STACK.Return) );
 
-   hb_errPutModuleName( pError, szModuleName );
+   if( szModuleName )
+   {
+      hb_errPutModuleName( pError, szModuleName );
+   }
 
    return pError;
 }
@@ -956,7 +970,7 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine, NULL ) );
    hb_errPutProcLine( pError, uLine );
 
    #ifdef HB_THREAD_SUPPORT
@@ -993,7 +1007,7 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags | EF_CANSUBSTITUTE );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine, NULL ) );
    hb_errPutProcLine( pError, uLine );
 
    #ifdef HB_THREAD_SUPPORT

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.32 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: estack.c,v 1.33 2003/05/27 00:36:22 mlombardo Exp $
  */
 
 /*
@@ -166,7 +166,6 @@ void hb_stackInit( void )
    hb_stack.pBase  = hb_stack.pItems;
    hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
    hb_stack.wItems = STACK_INITHB_ITEMS;
-   hb_stack.pModuleSymbols = NULL;
 
    for( i=0; i < hb_stack.wItems; ++i )
    {

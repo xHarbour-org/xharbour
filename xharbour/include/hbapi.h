@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.63 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.64 2003/05/30 06:49:32 ronpinkas Exp $
  */
 
 /*
@@ -389,14 +389,14 @@ extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
 extern char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor ); /* returns the method pointer of a object class */
+extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
 extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 
 /* dynamic symbol table management */
 extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
 extern PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
-extern PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol ); /* creates a new dynamic symbol based on a local one */
+extern PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
 extern PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
 extern PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
 extern void     HB_EXPORT hb_dynsymLog( void );             /* displays all dynamic symbols */
@@ -461,7 +461,7 @@ extern void     hb_conXSaveRestRelease( void ); /* release the save/restore API 
 extern char *   hb_compReservedName( char * szName ); /* determines if a string contains a reserve word */
 
 /* misc */
-extern char *   hb_procinfo( int iLevel, char * szName, USHORT *uLine ); /* retrieve a procedure name into a buffer */
+extern char *   hb_procinfo( int iLevel, char * szName, USHORT *uLine, char *szModuleName ); /* retrieve a procedure source location info */
 
 /* macro compiler */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.14 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.15 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ typedef struct
    PCOMSYMBOL pFirst;           /* pointer to the first defined symbol */
    PCOMSYMBOL pLast;            /* pointer to the last defined symbol */
    int        iCount;           /* number of defined symbols */
-} SYMBOLS;
+} COMPSYMBOLS;
 
 typedef struct __EXTERN
 {
@@ -461,7 +461,7 @@ extern void hb_compIdentifierClose( void ); /* release the table of identifiers 
 extern int            hb_comp_iLine;
 extern FUNCTIONS      hb_comp_functions;
 extern FUNCTIONS      hb_comp_funcalls;
-extern SYMBOLS        hb_comp_symbols;
+extern COMPSYMBOLS    hb_comp_symbols;
 extern PCOMDECLARED   hb_comp_pFirstDeclared;
 extern PCOMDECLARED   hb_comp_pLastDeclared;
 extern PCOMDECLARED   hb_comp_pReleaseDeclared;

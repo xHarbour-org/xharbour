@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1131 2003/06/17 22:10:20 druzus Exp $
+ * $Id: ChangeLog,v 1.1132 2003/06/18 00:48:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,57 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-18 01:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    * Renamed SYMBOLS to COMPSYMBOLS to avoid conflict with R/T SYMBOLS.
+
+  * source/compiler/genc.c
+    + Added logic to flag pDynSym member of Symbol Table to signify internal functions.
+
+  * include/hbapi.h
+  * source/vm/runner.c
+  * source/vm/errorapi.c
+  * source/vm/dynsym.c
+  * source/vm/hvm.c
+  * include/hbvmpub.h
+    + Added Member pModueleSymbols to HB_SYMB structure.
+    + Added logic to maintain and utilize this new member for every Symbol pushed on the Stack.
+
+  * include/classes.h
+  * source/vm/classes.c
+    ! Greatly optimized hb_cldValidScope() and fixed few bugs, utilizing new extended Source Module support.
+
+  - include/hbvmprv.h
+    - Removed no longer required include file.
+
+  * include/hbstack.h
+  * include/thread.h
+  * source/vm/estack.c
+    - Removed Memebr PHB_SYMB pModuleSymbols from HB_STACK structure
+
+  * source/pp/pptable.c
+    - Removed burned-in #translate of ErrorNew() - no longer needed due to new ProcFile() implementation.
+
+  * source/vm/proc.c
+    + Implemented disfunctional un-documented ProcFile( <nLevel> )
+
+  * source/rtl/errorsys.prg
+  * source/rtl/terror.prg
+    + Added usage of new ProcFile()
+
+    /*
+       NOTE: Call stack now displays Source Module of ALL Procedures on the Stack.
+       Developers of 3rd party Libraries that overrides the default errorsys
+       [such as FWH] are encouraged to add utilization of ProcFile( <nLevel> ).
+    */
+
+
+  * tests/tstscope.prg
+    * Minor addition.
+
+  /* This optimized implementaion of Source Module support is much faster and more complete than previous implementation. */
 
 2003-06-17 21:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * xharbour/source/lang/msgpt.c

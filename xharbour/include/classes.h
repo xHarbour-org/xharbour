@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.1 2003/03/27 07:44:55 ronpinkas Exp $
+ * $Id: classes.h,v 1.2 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -85,8 +85,22 @@ typedef struct
    PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
-   PHB_SYMB pModuleSymbols;
+   PSYMBOLS pModuleSymbols;
 } CLASS, * PCLASS;
+
+void     hb_clsReleaseAll( void );
+BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
+
+char *   hb_objGetClsName( PHB_ITEM pObject );
+char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
+USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
+PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
+PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int bOptimized );
+PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
+ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
+
+void *   hb_mthRequested( void );
+void     hb_mthAddTime( void * pMethod, ULONG ulClockTicks );
 
 #if defined(HB_EXTERN_C)
 }

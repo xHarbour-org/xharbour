@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.6 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id: proc.c,v 1.7 2003/06/10 23:46:19 ronpinkas Exp $
  */
 
 /*
@@ -77,39 +77,37 @@ HB_FUNC( METHODNAME )
 {
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
 
-   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL ) );
+   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL, NULL ) );
 }
 
 HB_FUNC( PROCNAME )
 {
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
 
-   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL ) );
+   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL, NULL ) );
 }
 
 HB_FUNC( PROCLINE )
 {
    USHORT uLine = 0;
 
-   hb_procinfo( hb_parni( 1 ) + 1, NULL, &uLine );
+   hb_procinfo( hb_parni( 1 ) + 1, NULL, &uLine, NULL );
+
    hb_retni( uLine );
 }
 
-#ifdef HB_C52_UNDOC
-
-/* NOTE: Clipper undocumented function, which always returns an empty
-         string. [vszakats] */
-
 HB_FUNC( PROCFILE )
 {
-   hb_retc( "" );
-}
+   char szModuleName[ _POSIX_PATH_MAX + 1 ];
 
-#endif
+   hb_procinfo( hb_parni( 1 ) + 1, NULL, NULL, szModuleName );
+
+   hb_retc( szModuleName );
+}
 
 /* NOTE: szName size must be an at least: HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 */
 
-char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
+char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
@@ -117,6 +115,11 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
    if( szName )
    {
       szName[0] = '\0';
+   }
+
+   if( szModuleName )
+   {
+      szModuleName[0] = '\0';
    }
 
    while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
@@ -158,6 +161,14 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
          else
          {
             *uLine = ( *pBase )->item.asSymbol.lineno;
+         }
+      }
+
+      if( szModuleName )
+      {
+         if( ( *pBase )->item.asSymbol.value->pDynSym && ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols )
+         {
+            strcat( szModuleName, ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
          }
       }
    }
