@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrpt128.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbcrpt128.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ DECRYPT128(enc_string) -> string
 
 static void int_encrypt(BYTE *,ULONG);
 static void int_decrypt(BYTE *,ULONG);
-ULONG crc32(BYTE *,ULONG,ULONG);
+ULONG hbcc_crc32(BYTE *,ULONG,ULONG);
 
 static ULONG tbl[512];
 static ULONG tmpKey[4];
@@ -107,7 +107,7 @@ HB_FUNC(MKCRYPTKEY) //(cPass) -> ckey(32)
 	        srcStr=(BYTE*)"";
 	        srcLen=0;
         }
-        for(i=0;i<srcLen;i++) tCRC[i%4]=crc32(srcStr+i,1,tCRC[i%4]);
+        for(i=0;i<srcLen;i++) tCRC[i%4]=hbcc_crc32(srcStr+i,1,tCRC[i%4]);
 //        dstStr=(BYTE *)hb_xgrab(288);
 //        for (i=0;i<4;i++) {
 //        	for (j=0;j<8;j++) {
@@ -140,7 +140,7 @@ HB_FUNC(ENCRYPT128) //(cStr)->cEnc
 		srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
 		srclen=hb_itemGetCLen(phbstr);
 		dstlen=32*((srclen+39)/32);
-		crc=crc32(srcstr,srclen,0l);
+		crc=hbcc_crc32(srcstr,srclen,0l);
 		dststr=(BYTE *) hb_xgrab(dstlen);
 		dststr[0]=(BYTE) ((srclen>>24)&0xFF);
 		dststr[1]=(BYTE) ((srclen>>16)&0xFF);
@@ -179,7 +179,7 @@ HB_FUNC(DECRYPT128) //(cEnc)->cStr
 		crc=(((ULONG) dststr[4])<<24) | (((ULONG) dststr[5])<<16) | (((ULONG) dststr[6])<<8) | ((ULONG) dststr[7]);
 		for (i=0;i<dstlen;i++) dststr[i]=dststr[i+8];
 		dststr=(BYTE *) hb_xrealloc(dststr,dstlen);
-		if (crc!=crc32(dststr,dstlen,0l)) {
+		if (crc!=hbcc_crc32(dststr,dstlen,0l)) {
 			hb_xfree(dststr);
 			hb_retc("");
 			return;

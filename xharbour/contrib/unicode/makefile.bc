@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2003/11/08 06:17:29 brianhays Exp $
+# $Id: makefile.bc,v 1.1 2004/01/14 06:17:25 andijahja Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -20,18 +20,20 @@ $(LIB_DIR)\hbcc.lib :   \
    $(OBJ_DIR)\hbhex.obj \
    $(OBJ_DIR)\hbcrc16.obj \
    $(OBJ_DIR)\hbcrc32.obj \
-   $(OBJ_DIR)\hbcrpt32.obj
+   $(OBJ_DIR)\hbcrpt32.obj \
+   $(OBJ_DIR)\hbcrpt128.obj
 
-$(OBJ_DIR)\hbcc.c       : hbcc.prg
-$(OBJ_DIR)\hbcc.obj     : $(OBJ_DIR)\hbcc.c
-$(OBJ_DIR)\hbc7.obj     : hbc7.c
-$(OBJ_DIR)\hbcu.obj     : hbcu.c
-$(OBJ_DIR)\hbcx.obj     : hbcx.c
-$(OBJ_DIR)\hbcy.obj     : hbcy.c
-$(OBJ_DIR)\hbhex.obj    : hbhex.c
-$(OBJ_DIR)\hbcrc16.obj  : hbcrc16.c
-$(OBJ_DIR)\hbcrc32.obj  : hbcrc32.c
-$(OBJ_DIR)\hbcrpt32.obj : hbcrpt32.c
+$(OBJ_DIR)\hbcc.c        : hbcc.prg
+$(OBJ_DIR)\hbcc.obj      : $(OBJ_DIR)\hbcc.c
+$(OBJ_DIR)\hbc7.obj      : hbc7.c
+$(OBJ_DIR)\hbcu.obj      : hbcu.c
+$(OBJ_DIR)\hbcx.obj      : hbcx.c
+$(OBJ_DIR)\hbcy.obj      : hbcy.c
+$(OBJ_DIR)\hbhex.obj     : hbhex.c
+$(OBJ_DIR)\hbcrc16.obj   : hbcrc16.c
+$(OBJ_DIR)\hbcrc32.obj   : hbcrc32.c
+$(OBJ_DIR)\hbcrpt32.obj  : hbcrpt32.c
+$(OBJ_DIR)\hbcrpt128.obj : hbcrpt128.c
 
 .c.obj:
   bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<

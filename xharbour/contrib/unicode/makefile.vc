@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2004/01/14 06:17:25 andijahja Exp $
+# $Id: makefile.vc,v 1.2 2004/01/16 16:54:38 paultucker Exp $
 #
 
 #
@@ -43,7 +43,8 @@ HBCC_LIB_OBJS = \
    $(OBJ_DIR)\hbhex.obj \
    $(OBJ_DIR)\hbcrc16.obj \
    $(OBJ_DIR)\hbcrc32.obj \
-   $(OBJ_DIR)\hbcrpt32.obj
+   $(OBJ_DIR)\hbcrpt32.obj \
+   $(OBJ_DIR)\hbcrpt128.obj
 
 #
 # Our default target
@@ -52,16 +53,17 @@ HBCC_LIB_OBJS = \
 all: $(HBCC_LIB)
 
 CLEAN:
-   -@if exist $(OBJ_DIR)\hbcc.c       del $(OBJ_DIR)\hbcc.c
-   -@if exist $(OBJ_DIR)\hbcc.obj     del $(OBJ_DIR)\hbcc.obj
-   -@if exist $(OBJ_DIR)\hbc7.obj     del $(OBJ_DIR)\hbc7.obj
-   -@if exist $(OBJ_DIR)\hbcu.obj     del $(OBJ_DIR)\hbcu.obj
-   -@if exist $(OBJ_DIR)\hbcx.obj     del $(OBJ_DIR)\hbcx.obj
-   -@if exist $(OBJ_DIR)\hbcy.obj     del $(OBJ_DIR)\hbcy.obj
-   -@if exist $(OBJ_DIR)\hbhex.obj    del $(OBJ_DIR)\hbhex.obj
-   -@if exist $(OBJ_DIR)\hbcrc16.obj  del $(OBJ_DIR)\hbcrc16.obj
-   -@if exist $(OBJ_DIR)\hbcrc32.obj  del $(OBJ_DIR)\hbcrc32.obj
-   -@if exist $(OBJ_DIR)\hbcrpt32.obj del $(OBJ_DIR)\hbcrpt32.obj
+   -@if exist $(OBJ_DIR)\hbcc.c        del $(OBJ_DIR)\hbcc.c
+   -@if exist $(OBJ_DIR)\hbcc.obj      del $(OBJ_DIR)\hbcc.obj
+   -@if exist $(OBJ_DIR)\hbc7.obj      del $(OBJ_DIR)\hbc7.obj
+   -@if exist $(OBJ_DIR)\hbcu.obj      del $(OBJ_DIR)\hbcu.obj
+   -@if exist $(OBJ_DIR)\hbcx.obj      del $(OBJ_DIR)\hbcx.obj
+   -@if exist $(OBJ_DIR)\hbcy.obj      del $(OBJ_DIR)\hbcy.obj
+   -@if exist $(OBJ_DIR)\hbhex.obj     del $(OBJ_DIR)\hbhex.obj
+   -@if exist $(OBJ_DIR)\hbcrc16.obj   del $(OBJ_DIR)\hbcrc16.obj
+   -@if exist $(OBJ_DIR)\hbcrc32.obj   del $(OBJ_DIR)\hbcrc32.obj
+   -@if exist $(OBJ_DIR)\hbcrpt32.obj  del $(OBJ_DIR)\hbcrpt32.obj
+   -@if exist $(OBJ_DIR)\hbcrpt128.obj del $(OBJ_DIR)\hbcrpt128.obj
    -@if exist $(HBCC_LIB) del $(HBCC_LIB)
 
 #
@@ -101,4 +103,7 @@ $(OBJ_DIR)\hbcrc32.obj : hbcrc32.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
 
 $(OBJ_DIR)\hbcrpt32.obj : hbcrpt32.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcrpt128.obj : hbcrpt128.c
     $(CC) $(CLIBFLAGS) -Fo$@ $**
