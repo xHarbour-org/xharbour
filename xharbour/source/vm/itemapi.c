@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.44 2003/07/06 19:00:25 lculik Exp $
+ * $Id: itemapi.c,v 1.45 2003/07/06 19:47:30 lculik Exp $
  */
 
 /*
@@ -1656,7 +1656,7 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
       #ifndef HB_LONG_DOUBLE_OFF
       else if( HB_IS_LDOUBLE( pItem ) )
       {
-         sprintf( buffer, "%ll", hb_itemGetNLD( pItem ) );
+         sprintf( buffer, "%ld", hb_itemGetNLD( pItem ) );
          szText = buffer;
          *pulSize = strlen( szText );
       }
