@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.9 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: str.c,v 1.10 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 HB_FUNC( STR )
 {
-   BOOL bValid;
+   BOOL bValid, bLtrim = FALSE;
    PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
    PHB_ITEM pWidth  = NULL;
    PHB_ITEM pDec    = NULL;
@@ -66,22 +66,38 @@ HB_FUNC( STR )
    {
       bValid = TRUE;
 
-      if( hb_pcount() >= 2 )
+      if( hb_pcount() >= 4 )
       {
-         pWidth = hb_param( 2, HB_IT_NUMERIC );
-         if ( ! pWidth )
+         PHB_ITEM pLtrim = hb_param( 4, HB_IT_LOGICAL );
+
+         if ( ! pLtrim )
          {
-            bValid = FALSE;
+            bLtrim = FALSE;
+         }
+         else
+         {
+            bLtrim = pLtrim->item.asLogical.value;
          }
       }
-
-      if( hb_pcount() >= 3 )
+      else
       {
-         pDec = hb_param( 3, HB_IT_NUMERIC );
-
-         if ( ! pDec )
+         if( hb_pcount() >= 2 )
          {
-            bValid = FALSE;
+            pWidth = hb_param( 2, HB_IT_NUMERIC );
+            if ( ! pWidth )
+            {
+               bValid = FALSE;
+            }
+         }
+
+         if( hb_pcount() >= 3 )
+         {
+            pDec = hb_param( 3, HB_IT_NUMERIC );
+
+            if ( ! pDec )
+            {
+               bValid = FALSE;
+            }
          }
       }
    }
@@ -96,7 +112,17 @@ HB_FUNC( STR )
 
       if( szResult )
       {
-         hb_retcAdopt( szResult );
+         if ( ! bLtrim )
+         {
+            hb_retcAdopt( szResult );
+         }
+         else
+         {
+            ULONG ulLen = strlen( szResult );
+            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
+            hb_retc( szTrimmed );
+            hb_xfree( szResult );
+         }
       }
       else
       {

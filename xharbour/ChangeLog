@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2246 2004/02/09 04:51:31 andijahja Exp $
+ * $Id: ChangeLog,v 1.2247 2004/02/09 06:35:38 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-09 19:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zipnew.cpp
+    * castings.
+
+  * source/compiler/hbfunchk.c
+  * source/rtl/str.c
+    * allow STR() to receive 4th parameter as Logical to ltrim returned value.
+      ( WARNING: This is an xHarbour extension )
+
+    /*
+    If 4th parameter is passed, the 2nd and 3rd will be ignored if not passed,
+    thus maintained Clipper error handling compatibility. The 4th parameter is
+    handy to replace quite frequently used phrase: LTrim( Str( nVal ) ). So,
+    instead of using Ltrim(Str(nVal)), users can used Str( nVal,,,.T. )
+    */
 
 2004-02-09 03:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/vm/extend.c

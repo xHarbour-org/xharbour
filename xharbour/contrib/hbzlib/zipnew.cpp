@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.6 2003/11/22 21:15:04 lculik Exp $
+ * $Id: zipnew.cpp,v 1.7 2004/02/09 02:18:17 lculik Exp $
  */
 
 /*
@@ -732,13 +732,13 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       { 
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, szPath, _POSIX_PATH_MAX + 1 );
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
-         hb_fsChDir("\\");
+         hb_fsChDir((BYTE*)"\\");
 
          szZip.SetRootPath(szPath);
       }
@@ -814,7 +814,7 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    }
    if (szPath)
    {
-      hb_fsChDir(szPath);
+      hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
    return ( int ) iReturn;
@@ -882,13 +882,13 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    { 
       if (hb_stricmp(pbyBuffer,".\\")==0 )
       {
-         hb_fsCurDirBuffEx( 0, szPath, _POSIX_PATH_MAX + 1 );
+         hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
       }
       else
       {
          strcpy(szPath,pbyBuffer);
       }
-      hb_fsChDir("\\");
+      hb_fsChDir((BYTE*)"\\");
       szZip.SetRootPath(szPath);
    }
 
@@ -945,7 +945,7 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    if (szPath)
    {
-      hb_fsChDir(szPath);
+      hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
 
@@ -1113,13 +1113,13 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       { 
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, szPath, _POSIX_PATH_MAX + 1 );
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
-         hb_fsChDir("\\");
+         hb_fsChDir((BYTE*)"\\");
 
          szZip.SetRootPath(szPath);
       }
@@ -1204,7 +1204,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    if (szPath)
    {
-      hb_fsChDir(szPath);
+      hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
 

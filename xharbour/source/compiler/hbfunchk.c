@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.2 2002/05/08 23:22:47 ronpinkas Exp $
+ * $Id: hbfunchk.c,v 1.3 2003/08/20 04:55:22 ronpinkas Exp $
  */
 
 /*
@@ -97,7 +97,7 @@ static HB_FUNCINFO hb_StdFunc[] =
    { "SETPOSBS"  , 0,  0 },
    { "SPACE"     , 1,  1 },
    { "SQRT"      , 1,  1 },
-   { "STR"       , 1,  3 },
+   { "STR"       , 1,  4 }, /* Fourth parameter is a Harbour extension */
    { "SUBSTR"    , 2,  3 },
    { "TIME"      , 0,  0 },
    { "TRANSFORM" , 2,  2 },
