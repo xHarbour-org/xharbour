@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2826 2004/04/23 15:00:04 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2827 2004/04/23 22:51:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-24 13:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    * fixed syntax for BCC ( commit again due to a CVS error )
+  * source/vm/memvars.c
+    * added missing include "hbvm.h"
+
+2004-04-24 13:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    * fixed syntax for BCC
 
 2004-04-23 15:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

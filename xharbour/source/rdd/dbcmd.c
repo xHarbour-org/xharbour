@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.107 2004/04/23 10:26:26 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.108 2004/04/23 15:00:34 lf_sfnet Exp $
  */
 
 /*
@@ -4928,10 +4928,17 @@ static char *hb_strescape( char *szInput, int lLen, char *cEsc )
    
    while ( *szChr && lCnt++ < lLen )
    {
-      if( *szChr == *cEsc || *szChr < ' ' ) // *szChr == '\\' || *szChr == '"'  )
+      if( *szChr < ' ' )
       {
-         *szEscape++ = '\'';
+         *szEscape++ = ' ';
       }
+      else 
+      {   
+         if( *szChr == *cEsc ) // *szChr == '\\' || *szChr == '"'  )
+         {
+            *szEscape++ = '\'';
+         }
+      }   
       *szEscape++ = *szChr++;
    }
    *szEscape = '\0';
@@ -5393,7 +5400,14 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
          char *szString;
 
          hb_itemGetDS( pValue, szDate );
-         sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
+         if( szDate[0] == ' ' )
+         {
+            strcpy( szSqlDate, "0100-01-01" );
+         }
+         else
+         { 
+            sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
+         }   
          szSqlDate[ 10 ] = '\0';
          szString = hb_xstrcpy( NULL,cDelim,szSqlDate,cDelim,NULL);
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
@@ -5448,18 +5462,14 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    HB_ITEM Tmp;
    ULONG lRecNo = 0;
    BOOL bWriteSep = FALSE;
-
-   char *szInsert = ( char * ) hb_xgrab( 13 + strlen( cTable ) + 12 );
-   strcpy( szInsert, "INSERT INTO \"" );
-   strcat( szInsert, cTable );
-   strcat( szInsert, "\" VALUES ( " );
-
    char *szRecNo = ( char * ) hb_xgrab( 9 );
-   
+   char *szInsert = ( char * ) hb_xgrab( 13 + strlen( cTable ) + 12 );
+
    BOOL bEof = TRUE;
    BOOL bBof = TRUE;
 
    BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+
 
    if( ! handle )
    {
@@ -5487,6 +5497,10 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    SELF_FIELDCOUNT( pArea, &uiFields );
 
    Tmp.type = HB_IT_NIL;
+
+   strcpy( szInsert, "INSERT INTO \"" );
+   strcat( szInsert, cTable );
+   strcat( szInsert, "\" VALUES ( " );
 
    while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
    {
