@@ -24,6 +24,7 @@ METHOD New( oParent ) CLASS TForm
    ::Style     := WS_OVERLAPPEDWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
+   ::ExStyle   := WS_EX_CONTROLPARENT
    
 return( super:New( oParent ) )
 

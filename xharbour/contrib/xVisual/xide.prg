@@ -114,9 +114,12 @@ METHOD CreateSub() CLASS SubForm1
       
    ::SetWindowMenu()
 
-   ::AddControl('TestButton', 'button', 'Lets see it',                500,   0,  0, 200, 100 )
-   ::AddControl('TestEdit',     'edit', 'This is an edit control',    501, 210,  0, 200,  20 )
-   ::AddControl('TestCombo','combobox', 'This is a ComboBox control', 502, 210, 30, 200, 100 )
+   ::AddControl('TestButton',    'button', 'Lets see it',                500,   0,  0, 200, 100 )
+   ::AddControl('TestEdit',        'edit', 'This is an edit control',    501, 210,  0, 200,  20 )
+   ::AddControl('TestCombo',   'combobox', 'This is a ComboBox control', 502, 210, 30, 200, 100 )
+   ::AddControl('TestText',      'static', 'This is a Static control',   503, 210, 55, 200,  20 )
+   ::AddControl('TestRadio','radiobutton', 'This is a Radio Button',     504, 210, 80, 200,  20 )
+   ::AddControl('TestCheck','checkbutton', 'This is a Check Button',     505, 210,105, 200,  20 )
 
    ::TestButton:SetFocus()
 
