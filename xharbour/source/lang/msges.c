@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.3 2003/01/30 02:37:56 walito Exp $
+ * $Id: msges.c,v 1.4 2003/06/15 20:15:41 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/01/30 02:37:56 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2003/06/15 20:15:41 $",         /* Version */
 
       /* Month names */
 
@@ -190,7 +190,7 @@ static HB_LANG s_lang =
       "Memory buffer overflow",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 
