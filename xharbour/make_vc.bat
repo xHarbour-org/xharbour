@@ -1,6 +1,6 @@
 @echo on
 rem 
-rem $Id: make_vc.bat,v 1.7 2003/04/04 23:18:47 paultucker Exp $
+rem $Id: make_vc.bat,v 1.8 2003/04/09 13:52:07 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -36,7 +36,6 @@ if not exist lib md lib
 if not exist lib\vc md lib\vc
 if not exist bin md bin
 if not exist bin\vc md bin\vc
-if not exist bin\vcmt md bin\vcmt
 
 SET MK_FILE=makefile.vc
 SET _HBMT=%HB_MT%
@@ -60,7 +59,7 @@ rem do not pass /a (if used) the second time!
 
 :BUILD_OK
 
-   copy bin\vc%HB_MT%\*.exe bin > nul
+   copy bin\vc\*.exe bin > nul
    copy lib\vc\*.lib lib > nul
    goto EXIT
 

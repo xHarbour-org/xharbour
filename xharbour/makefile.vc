@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.42 2003/04/04 23:18:47 paultucker Exp $
+# $Id: makefile.vc,v 1.43 2003/04/09 13:52:07 paultucker Exp $
 #
 
 #
@@ -72,7 +72,7 @@ HB_LEX       =SIMPLEX
 MK_FILE      =makefile.vc
 MK_FLAGS     =$(MAKEFLAGS: =)
 
-BIN_DIR      =bin\vc$(MT)
+BIN_DIR      =bin\vc
 LIB_DIR      =lib\vc
 OBJ_DIR      =obj\vc
 
@@ -109,13 +109,17 @@ HBPDF_DIR    =contrib\pdflib
 #
 
 AS           =ML
-CFLAGS       =-G6 -Ox -GA -TP $(HB_MT) -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
-CLIBFLAGS    =-c $(CFLAGS) $(CLIBFLAGS)
+C_FLAGSNMT   =-G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGS      =-G6 -Ox -GA -TP $(HB_MT) -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
+CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE
+L_DFLAGSNMT  =$(LFLAGS) /NODEFAULTLIB:LIBCMT $(LDFLAGS)
 !ifdef HB_MT
-LDFLAGS      =/MACHINE:IX86 /SUBSYSTEM:CONSOLE /NODEFAULTLIB:LIBC $(LDFLAGS)
+L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC $(LDFLAGS)
 !else
-LDFLAGS      =/MACHINE:IX86 /SUBSYSTEM:CONSOLE /NODEFAULTLIB:LIBCMT $(LDFLAGS)
+L_DFLAGS     =$(L_DFLAGSNMT)
 !endif
 
 !ifdef HB_DOC_PDF
@@ -127,21 +131,28 @@ HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
 #
 
 COMMON_LIB   =$(LIB_DIR)\common.lib
-DBFCDX_LIB   =$(LIB_DIR)\dbfcdx$(MT).lib
-DBFNTX_LIB   =$(LIB_DIR)\dbfntx$(MT).lib
+DBFCDX_LIB   =$(LIB_DIR)\dbfcdx.lib
+DBFCDXMT_LIB =$(LIB_DIR)\dbfcdx$(MT).lib
+DBFNTX_LIB   =$(LIB_DIR)\dbfntx.lib
+DBFNTXMT_LIB =$(LIB_DIR)\dbfntx$(MT).lib
 DEBUG_LIB    =$(LIB_DIR)\debug.lib
 LANG_LIB     =$(LIB_DIR)\lang.lib
 MACRO_LIB    =$(LIB_DIR)\macro.lib
 NULSYS_LIB   =$(LIB_DIR)\nulsys.lib
-ODBC_LIB     =$(LIB_DIR)\hbodbc$(MT).lib
-PP_LIB       =$(LIB_DIR)\pp$(MT).lib
-RDD_LIB      =$(LIB_DIR)\rdd$(MT).lib
-RTL_LIB      =$(LIB_DIR)\rtl$(MT).lib
+ODBC_LIB     =$(LIB_DIR)\hbodbc.lib
+ODBCMT_LIB   =$(LIB_DIR)\hbodbc$(MT).lib
+PP_LIB       =$(LIB_DIR)\pp.lib
+PPMT_LIB     =$(LIB_DIR)\pp$(MT).lib
+RDD_LIB      =$(LIB_DIR)\rdd.lib
+RDDMT_LIB    =$(LIB_DIR)\rdd$(MT).lib
+RTL_LIB      =$(LIB_DIR)\rtl.lib
+RTLMT_LIB    =$(LIB_DIR)\rtl$(MT).lib
 !ifdef HB_MT
 RPC_LIB      =$(LIB_DIR)\rpcmt.lib
 !ENDIF
 SAMPLES_LIB  =$(LIB_DIR)\samples.lib
-VM_LIB       =$(LIB_DIR)\vm$(MT).lib
+VM_LIB       =$(LIB_DIR)\vm.lib
+VMMT_LIB     =$(LIB_DIR)\vm$(MT).lib
 
 GTCGI_LIB    =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB    =$(LIB_DIR)\gtdos.lib
@@ -210,7 +221,16 @@ LIBLIST = \
    $(VM_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
-   $(ODBC_LIB) \
+   $(ODBC_LIB)
+
+LIBLISTMT = \
+   $(RTLMT_LIB) \
+   $(PPMT_LIB) \
+   $(RDDMT_LIB) \
+   $(DBFCDXMT_LIB) \
+   $(DBFNTXMT_LIB) \
+   $(VMMT_LIB) \
+   $(ODBCMT_LIB) \
    $(RPC_LIB)
 
 #
@@ -438,7 +458,7 @@ RTL_LIB_OBJS = \
 
 RPC_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\trpc.obj \
-   $(OBJ_DIR)$(MT)\trpccli.obj 
+   $(OBJ_DIR)$(MT)\trpccli.obj
 !endif
 
 #
@@ -768,29 +788,17 @@ ODBC_LIB_OBJS =       \
 #
 # Our default target
 #
-Targets= \
+TARGETS= \
    $(COMMON_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
-   $(VM_LIB) \
-   $(RTL_LIB) \
-   $(MACRO_LIB) \
-   $(DEBUG_LIB) \
-   $(LANG_LIB) \
-   $(RDD_LIB) \
-   $(NULSYS_LIB) \
-   $(DBFNTX_LIB) \
-   $(DBFCDX_LIB) \
-   $(HB_GT_LIBS) \
-   $(SAMPLES_LIB) \
-   $(ODBC_LIB) \
-   $(RPC_LIB) \
+   $(LIBLIST) \
+   $(LIBLISTMT) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE)
-
 
 !if ( "$(MK_FLAGS:Y=)"=="A" )
 
@@ -824,7 +832,7 @@ CLEAN:
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)$(MT)\  $** -o $(HBPP_EXE) /link $(LDFLAGS) $(PP_LIB) $(COMMON_LIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB)
 
 #
 # HBRUN.EXE rules
@@ -833,8 +841,10 @@ $(HBPP_EXE) : \
 $(HBRUN_EXE) : \
    $(HBRUN_DIR)\hbrun.prg \
    $(HBRUN_DIR)\external.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c $(OBJ_DIR)$(MT)\external.c -o $(HBRUN_EXE) /link $(LDFLAGS) $(LIBS2)
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c \
+                                      $(OBJ_DIR)\external.c \
+                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2)
 
 #
 # HBTEST.EXE rules
@@ -852,27 +862,28 @@ $(HBTEST_EXE) : \
    $(HBTEST_DIR)\rt_str.prg \
    $(HBTEST_DIR)\rt_stra.prg \
    $(HBTEST_DIR)\rt_trans.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbtest.c \
-                                  $(OBJ_DIR)$(MT)\rt_array.c \
-                                  $(OBJ_DIR)$(MT)\rt_date.c \
-                                  $(OBJ_DIR)$(MT)\rt_file.c \
-                                  $(OBJ_DIR)$(MT)\rt_hvm.c \
-                                  $(OBJ_DIR)$(MT)\rt_hvma.c \
-                                  $(OBJ_DIR)$(MT)\rt_math.c \
-                                  $(OBJ_DIR)$(MT)\rt_misc.c \
-                                  $(OBJ_DIR)$(MT)\rt_str.c \
-                                  $(OBJ_DIR)$(MT)\rt_stra.c \
-                                  $(OBJ_DIR)$(MT)\rt_trans.c \
-                   -o $(HBTEST_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS) user32.lib winspool.lib ole32.lib oleaut32.lib
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbtest.c \
+                                      $(OBJ_DIR)\rt_array.c \
+                                      $(OBJ_DIR)\rt_date.c \
+                                      $(OBJ_DIR)\rt_file.c \
+                                      $(OBJ_DIR)\rt_hvm.c \
+                                      $(OBJ_DIR)\rt_hvma.c \
+                                      $(OBJ_DIR)\rt_math.c \
+                                      $(OBJ_DIR)\rt_misc.c \
+                                      $(OBJ_DIR)\rt_str.c \
+                                      $(OBJ_DIR)\rt_stra.c \
+                                      $(OBJ_DIR)\rt_trans.c \
+                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) ole32.lib oleaut32.lib
 
 #
 # HBDOC.EXE rules
 #
 
+# this is not working at this time.
 !ifdef HB_DOC_PDF
-PDFHBDOC =  $(OBJ_DIR)$(MT)\pdfhbdoc.obj
-GENPDF1 = $(OBJ_DIR)$(MT)\genpdf1.obj
+PDFHBDOC =  $(OBJ_DIR)\pdfhbdoc.obj
+GENPDF1 = $(OBJ_DIR)\genpdf1.obj
 !endif
 
 $(HBDOC_EXE) : \
@@ -893,25 +904,25 @@ $(HBDOC_EXE) : \
    $(HBDOC_DIR)\fclass1.prg \
    $(HBDOC_DIR)\ffile1.prg \
    $(HBDOC_DIR)\ft_funcs.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbdoc.c \
-                                  $(OBJ_DIR)$(MT)\genchm.c \
-                                  $(OBJ_DIR)$(MT)\genos2.c \
-                                  $(OBJ_DIR)$(MT)\gentrf.c \
-                                  $(OBJ_DIR)$(MT)\genng.c \
-                                  $(OBJ_DIR)$(MT)\genhtm.c \
-                                  $(OBJ_DIR)$(MT)\genrtf.c \
-                                  $(OBJ_DIR)$(MT)\genhpc.c \
-                                  $(OBJ_DIR)$(MT)\genasc.c \
-                                  $(OBJ_DIR)$(MT)\html.c \
-                                  $(OBJ_DIR)$(MT)\ng.c \
-                                  $(OBJ_DIR)$(MT)\os2.c \
-                                  $(OBJ_DIR)$(MT)\rtf.c \
-                                  $(OBJ_DIR)$(MT)\troff.c \
-                                  $(OBJ_DIR)$(MT)\fclass1.c \
-                                  $(OBJ_DIR)$(MT)\ffile1.c \
-                                  $(OBJ_DIR)$(MT)\ft_funcs.c \
-                   -o $(HBDOC_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2) $(PDFHBDOC) $(GENPDF1)
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbdoc.c \
+                                      $(OBJ_DIR)\genchm.c \
+                                      $(OBJ_DIR)\genos2.c \
+                                      $(OBJ_DIR)\gentrf.c \
+                                      $(OBJ_DIR)\genng.c \
+                                      $(OBJ_DIR)\genhtm.c \
+                                      $(OBJ_DIR)\genrtf.c \
+                                      $(OBJ_DIR)\genhpc.c \
+                                      $(OBJ_DIR)\genasc.c \
+                                      $(OBJ_DIR)\html.c \
+                                      $(OBJ_DIR)\ng.c \
+                                      $(OBJ_DIR)\os2.c \
+                                      $(OBJ_DIR)\rtf.c \
+                                      $(OBJ_DIR)\troff.c \
+                                      $(OBJ_DIR)\fclass1.c \
+                                      $(OBJ_DIR)\ffile1.c \
+                                      $(OBJ_DIR)\ft_funcs.c \
+                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(PDFHBDOC) $(GENPDF1)
 
 #
 # HBMAKE.EXE rules
@@ -928,19 +939,19 @@ $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\pickarry.prg \
    $(HBMAKE_DIR)\pickfile.prg \
    $(HBMAKE_DIR)\prb_stak.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbmake.c \
-                                  $(OBJ_DIR)$(MT)\hbmutils.c \
-                                  $(OBJ_DIR)$(MT)\radios.c \
-                                  $(OBJ_DIR)$(MT)\checks.c \
-                                  $(OBJ_DIR)$(MT)\fclass1.c \
-                                  $(OBJ_DIR)$(MT)\ffile1.c \
-                                  $(OBJ_DIR)$(MT)\ft_funcs.c \
-                                  $(OBJ_DIR)$(MT)\pickarry.c \
-                                  $(OBJ_DIR)$(MT)\pickfile.c \
-                                  $(OBJ_DIR)$(MT)\prb_stak.c \
-                                  $(HBMAKE_DIR)\hbmlang.c \
-                   -o $(HBMAKE_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbmake.c \
+                                      $(OBJ_DIR)\hbmutils.c \
+                                      $(OBJ_DIR)\radios.c \
+                                      $(OBJ_DIR)\checks.c \
+                                      $(OBJ_DIR)\fclass1.c \
+                                      $(OBJ_DIR)\ffile1.c \
+                                      $(OBJ_DIR)\ft_funcs.c \
+                                      $(OBJ_DIR)\pickarry.c \
+                                      $(OBJ_DIR)\pickfile.c \
+                                      $(OBJ_DIR)\prb_stak.c \
+                                      $(HBMAKE_DIR)\hbmlang.c \
+                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2)
 
 #
 # HARBOUR.EXE rules
@@ -948,7 +959,7 @@ $(HBMAKE_EXE) : \
 
 $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\harbour.c \
-   $(OBJ_DIR)$(MT)\harboury.c \
+   $(OBJ_DIR)\harboury.c \
    $(COMPILER_DIR)\hbslex.c \
    $(COMPILER_DIR)\cmdcheck.c \
    $(COMPILER_DIR)\hbusage.c \
@@ -965,21 +976,43 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c
-   -$(ECHO) > $(OBJ_DIR)$(MT)\unistd.h
-   $(CC) $(CFLAGS) -I$(OBJ_DIR)$(MT) -Fo$(OBJ_DIR)$(MT)\ -W3 $** -o $(HARBOUR_EXE) /link $(LDFLAGS) $(PP_LIB) $(COMMON_LIB)
-   -$(DEL) $(OBJ_DIR)$(MT)\unistd.h
+   -$(ECHO) > $(OBJ_DIR)\unistd.h
+   $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB)
+   -$(DEL) $(OBJ_DIR)\unistd.h
 
 #
 # Library dependencies and build rules
 #
 
-$(RTL_LIB) : $(RTL_LIB_OBJS)
+!ifdef HB_MT
+$(RTLMT_LIB) : $(RTL_LIB_OBJS)
    lib /out:$@ $**
 
-!ifdef HB_MT
 $(RPC_LIB) : $(RPC_LIB_OBJS)
    lib /out:$@ $**
-!endif
+
+$(PPMT_LIB) : $(PP_LIB_OBJS)
+   lib /out:$@ $**
+
+$(RDDMT_LIB) : $(RDD_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(VMMT_LIB) : $(VM_LIB_OBJS)
+   lib /out:$@ $**
+
+$(ODBCMT_LIB) : $(ODBC_LIB_OBJS)
+   lib /out:$@ $**
+
+!else
+
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+   lib /out:$@ $**
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
    lib /out:$@ $**
@@ -1032,27 +1065,29 @@ $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
    lib /out:$@ $**
 
+!endif
+
 #
 # HARBOUR.EXE dependencies
 #
 
-$(OBJ_DIR)$(MT)\harboury.c : $(COMPILER_DIR)\harbour.sly
+$(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
    bison -d --no-line -o$@ $**
 
-$(OBJ_DIR)$(MT)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR)$(MT) -W3 -Fo$@ $**
+$(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
+   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
 
 #
 # MACRO.LIB dependencies
 #
 
-$(OBJ_DIR)$(MT)\macroy.c : $(MACRO_DIR)\macro.y
+$(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
    bison -p hb_comp -d --no-line $** -o$@
 
-$(OBJ_DIR)$(MT)\macroy.obj : $(OBJ_DIR)$(MT)\macroy.c
+$(OBJ_DIR)\macroy.obj : $(OBJ_DIR)\macroy.c
    $(CC) $(CLIBFLAGS) -W3 -Fo$@  $**
 
-$(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
-   -$(ECHO) > $(OBJ_DIR)$(MT)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR)$(MT) -W3 -Fo$@ $**
-   -$(DEL) $(OBJ_DIR)$(MT)\unistd.h
+$(OBJ_DIR)\macroslx.obj : $(MACRO_DIR)\macroslx.c
+   -$(ECHO) > $(OBJ_DIR)\unistd.h
+   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
+   -$(DEL) $(OBJ_DIR)\unistd.h
