@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3732 2005/01/11 23:53:14 likewolf Exp $
+ * $Id: ChangeLog,v 1.3733 2005/01/12 02:54:43 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-12 17:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_gnu.sh
+    * fixed DJGPP name
+    * modified BSD detection for GNU make
+
+  * xharbour/make_rpm.sh
+  * xharbour/make_tgz.sh
+    * formatting
+
+  * xharbour/xharbour.spec
+    * fixed gpl switch for HB_COMMERCE
+
+  * xharbour/make_xmingw.sh
+    * redirect also stderr to /dev/null in which
+
+  * xharbour/bin/pack_src.sh
+    * fixed small typo
+
+  * xharbour/config/linux/owatcom.cf
+    * modified for compilation without any libraries
+
+  * xharbour/config/w32/mingw32.cf
+    * fixed small typo
+    * minor modification for COMMAND.COM use
+
+  * xharbour/include/hbsetup.h
+    * restored small comment I removed
+
+  * xharbour/source/common/hbtrace.c
+    * formatting
+
+  * xharbour/source/rtl/filesys.c
+    * removed HB_FS_DRIVE_LETTER - OS_HAS_DRIVE_LETTER should be used
+
+  * xharbour/source/rtl/mod.c
+    ! fixed bug in mod(a,b) when a/b exceeds LONG limit
+
+  * xharbour/source/rtl/gtsln/kbsln.c
+    * minor modification
 
 2005-01-12 10:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + tests/testbrwm.prg

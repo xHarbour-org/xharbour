@@ -1,5 +1,5 @@
 /*
- * $Id: mod.c,v 1.3 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: mod.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbmath.h"
 
 /* NOTE: In CA-Cl*pper this is written in Clipper, see the source below,
          and the error handling is NOT made here, but in the % operator.
@@ -76,12 +77,7 @@ HB_FUNC( MOD )
 
       if( dBase )
       {
-         double dResult = dNumber - ( ( LONG ) ( dNumber / dBase ) * dBase );
-
-         if( dResult * dBase < 0 )
-            hb_retnd( dResult + dBase );
-         else
-            hb_retnd( dResult );
+         hb_retnd( fmod( dNumber, dBase ) );
       }
       else
       {

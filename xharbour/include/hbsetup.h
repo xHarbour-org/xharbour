@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.29 2004/12/10 03:43:34 mlombardo Exp $
+ * $Id: hbsetup.h,v 1.30 2005/01/10 18:45:33 druzus Exp $
  */
 
 /*
@@ -266,7 +266,7 @@
    #define OS_DRIVE_DELIMITER        ':'
    #define OS_HAS_DRIVE_LETTER
    #define OS_OPT_DELIMITER_LIST     "/-"
-   #define OS_EOL_LEN                2
+   #define OS_EOL_LEN                2  /* # of bytes in End of Line marker */
 #endif
 
 #ifndef _POSIX_PATH_MAX

@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.14 2004/06/04 00:18:10 druzus Exp $
+ * $Id: kbsln.c,v 1.15 2005/01/10 18:45:39 druzus Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ extern BOOL hb_gt_sln_bScreen_Size_Changed;
 
 /* DeadKey definition's ENVVAR name. This EnvVar contains */
 /* an ASCII value of a key, which serves as a DeadKey */
-char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
+static char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
 
 /* a table for Keys work with a Dead key. The first
    element contains a number of defined keys */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.21 2004/09/17 02:37:29 druzus Exp $
+# $Id: make_rpm.sh,v 1.22 2005/01/10 18:45:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -114,6 +114,7 @@ if ! test_reqrpm "XFree86-devel"
 then
     INST_PARAM="${INST_PARAM} --without X11"
 fi
+
 
 TOINST_LST=""
 for i in ${NEED_RPM}

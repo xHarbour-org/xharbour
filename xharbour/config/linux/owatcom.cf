@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.20 2004/10/31 13:15:46 druzus Exp $
+# $Id: owatcom.cf,v 1.1 2005/01/10 18:45:32 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for OpenWatcom C/C++
@@ -74,7 +74,10 @@ endif
 
 LDFILES = $(subst $(space),$(comma) ,$(^F))
 LDLIBS  = $(subst $(space),$(comma) ,$(strip $(HB_USER_LIBS) $(LINKLIBS) $(RDDLIBS) $(GTLIBS)))
-LD_RULE = $(LD) $(LDFLAGS) NAME $@ FILE $(LDFILES) LIB $(LDLIBS)
+LD_RULE = $(LD) $(LDFLAGS) NAME $@ FILE $(LDFILES)
+ifneq ($(LDLIBS),)
+LD_RULE += LIB $(LDLIBS)
+endif
 
 AR = wlib
 # ARFLAGS = -c -n -fa $(A_USR)

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.130 2005/01/10 18:45:33 druzus Exp $
+ * $Id: filesys.c,v 1.131 2005/01/11 17:50:53 guerra000 Exp $
  */
 
 /*
@@ -168,6 +168,7 @@
       #define HAVE_POSIX_IO
    #endif
 #endif
+
 #if defined(__MPW__)
    #include <fcntl.h>
 #endif
@@ -189,9 +190,9 @@
 #endif
 
 #ifdef HB_OS_OS2
-   #include <sys\signal.h>
-   #include <sys\process.h>
-   #include <sys\wait.h>
+   #include <sys/signal.h>
+   #include <sys/process.h>
+   #include <sys/wait.h>
 #endif
 
 /* 27/08/2004 - <maurilio.longo@libero.it>
@@ -315,13 +316,6 @@
 /* These compilers use sopen() rather than open(), because their
    versions of open() do not support combined O_ and SH_ flags */
    #define HB_FS_SOPEN
-#endif
-
-#if defined(HAVE_POSIX_IO) && \
-    ( defined(HB_OS_OS2) || defined(HB_OS_DOS) || defined(HB_OS_WIN_32) ) && \
-    ! defined(__CYGWIN__)
-/* These platforms and/or compilers have common drive letter support */
-   #define HB_FS_DRIVE_LETTER
 #endif
 
 #if UINT_MAX == USHRT_MAX
@@ -2367,7 +2361,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       lseek( hFileHandle, ulOldPos, SEEK_SET );
       HB_DISABLE_ASYN_CANC
    }
-#elif defined( HB_OS_UNIX )
+#elif defined(HB_OS_UNIX)
    {
       /* TODO: check for append locks (SEEK_END)
        */
@@ -2973,7 +2967,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined(OS_HAS_DRIVE_LETTER)
    HB_THREAD_STUB
 #endif
 
@@ -2981,7 +2975,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDrv(%d)", (int) nDrive));
 
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined(OS_HAS_DRIVE_LETTER)
    HB_STACK_UNLOCK
 
    {
@@ -3031,7 +3025,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined(OS_HAS_DRIVE_LETTER)
    HB_THREAD_STUB
 #endif
 
@@ -3039,7 +3033,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDrv(%d)", (int) nDrive));
 
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined(OS_HAS_DRIVE_LETTER)
    HB_STACK_UNLOCK
 
    {
@@ -3082,9 +3076,9 @@ BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDevice(%p)", hFileHandle));
 
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined(HB_FS_FILE_IO)
 
-   bResult = ( isatty( hFileHandle ) == 0 );
+   bResult = ( isatty( hFileHandle ) != 0 );
    hb_fsSetIOError( bResult, 0 );
 
 #else
@@ -3107,7 +3101,7 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
 
-#if defined( HB_FS_DRIVE_LETTER )
+#if defined(OS_HAS_DRIVE_LETTER)
 
    HB_FS_GETDRIVE( uiResult );
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.37 2005/01/10 18:45:10 druzus Exp $
+# $Id: make_tgz.sh,v 1.38 2005/01/11 08:44:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -114,6 +114,7 @@ case "$HB_ARCHITECTURE" in
     darwin) hb_contrib="htmllib libmisc libnf" ;;
 esac
 
+# Set other platform-specific build options
 if [ -z "$HB_GPM_MOUSE" ]; then
     if [ "$HB_ARCHITECTURE" = "linux" ] && \
        ( [ -f /usr/include/gpm.h ] || [ -f /usr/local/include/gpm.h ]); then
@@ -124,7 +125,6 @@ if [ -z "$HB_GPM_MOUSE" ]; then
     export HB_GPM_MOUSE
 fi
 
-# Set other platform-specific build options
 case "$HB_ARCHITECTURE" in
     linux)
         ;;
@@ -265,8 +265,8 @@ fi
 exit \$?
 HB_INST_EOF
 EOF
-   cat "${hb_archfile}" >> "${hb_instfile}"
-   chmod +x "${hb_instfile}"
-   rm -f "${hb_archfile}"
+    cat "${hb_archfile}" >> "${hb_instfile}"
+    chmod +x "${hb_instfile}"
+    rm -f "${hb_archfile}"
 
 fi

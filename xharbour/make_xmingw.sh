@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id$
+# $Id: make_xmingw.sh,v 1.1 2005/01/11 23:53:20 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -36,7 +36,7 @@ else
 fi
 PATH="$MINGW_PREFIX/bin:$MINGW_PREFIX/$TARGET/bin:$PATH"
 
-if which harbour >> /dev/null; then
+if which harbour &> /dev/null; then
     rm -f -r /tmp/harbour.exe
     ln -s `which harbour` /tmp/harbour.exe
     export HB_BIN_COMPILE=/tmp

@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.71 2004/12/28 06:39:01 druzus Exp $
+# $Id: xharbour.spec,v 1.72 2005/01/10 18:45:11 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,7 +18,7 @@
 # --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
-# --with nogpl       - do not build libs which needs GPL 3-rd party code
+# --without gpl      - do not build libs which needs GPL 3-rd party code
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT and GTXWC
 # --without gpm      - build GTSLN and GTCRS without GPM support
@@ -71,7 +71,7 @@
 %define hb_idir  export HB_INC_INSTALL=%{_includedir}/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
-%define hb_cmrc  export HB_COMMERCE=%{?_with_nogpl:yes}
+%define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
 %define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
 %define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
 
@@ -94,7 +94,7 @@ Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
-BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel %{!?_without_gpm: gpm-devel}
+BuildPrereq:    gcc binutils bison bash ncurses ncurses-devel %{!?_without_gpm: gpm-devel}
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root

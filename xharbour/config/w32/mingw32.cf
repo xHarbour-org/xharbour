@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.21 2004/12/27 11:06:10 lf_sfnet Exp $
+# $Id: mingw32.cf,v 1.22 2005/01/11 23:53:43 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -78,7 +78,7 @@ LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
 ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
-ifneq ($(HB_DEFAULT_LIB),)
+ifneq ($(HB_DEFAULT_GT),)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)
 LINKLIBS += -l$(HB_DEFAULT_GT)
 endif
@@ -128,7 +128,7 @@ echo. CREATE $@ > __lib__.tmp
 $(foreach file, $(^F), $(lib_object))
 echo. SAVE >> __lib__.tmp
 echo. END >> __lib__.tmp
-$(AR) -M < __lib__.tmp
+$(AR) $(ARFLAGS) -M < __lib__.tmp
 endef
 
 # NOTE: The empty line below HAVE TO exist!
@@ -149,9 +149,12 @@ LDFLAGS = $(LINKPATHS) -mno-cygwin
 
 AR = $(CCPREFIX)ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || $(RM) $@
-#AR_RULE = $(create_library)
 
-#LD_RULE = $(link_exe_file)
+ifeq ($(SHLVL),) # COMMAND.COM - length of command line is limited
+AR_RULE = $(create_library)
+LD_RULE = $(link_exe_file)
+else
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || $(RM) $@
+endif
 
 include $(TOP)$(ROOT)config/rules.cf

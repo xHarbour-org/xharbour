@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.15 2005/01/10 18:45:10 druzus Exp $
+# $Id: make_gnu.sh,v 1.16 2005/01/11 23:53:19 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -123,7 +123,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "    HB_COMPILER:"
    echo "      - When HB_ARCHITECTURE=dos"
    echo "        - bcc16   (Borland C++ 3.x, 4.x, 5.0x, DOS 16-bit)"
-   echo "        - djgpp   (DJ Delorie's DGJPP GNU C, DOS 32-bit)"
+   echo "        - djgpp   (Delorie GNU C, DOS 32-bit)"
    echo "        - rsx32   (EMX/RSXNT/DOS GNU C, DOS 32-bit)"
    echo "        - watcom  (Watcom C++ 9.x, 10.x, 11.x, DOS 32-bit)"
    echo "      - When HB_ARCHITECTURE=w32"
@@ -164,7 +164,8 @@ else
 
    # ---------------------------------------------------------------
    # Start the GNU make system
-   if [ `uname` = "FreeBSD" ]; then
+
+   if [ "$HB_ARCHITECTURE" = "bsd" ] || uname|grep "BSD$" &> /dev/null; then
       gmake $*
    else
       make $*

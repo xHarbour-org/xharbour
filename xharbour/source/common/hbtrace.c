@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.6 2003/06/13 06:58:50 brianhays Exp $
+ * $Id: hbtrace.c,v 1.7 2004/03/02 01:08:35 likewolf Exp $
  */
 
 /*
@@ -63,7 +63,6 @@ char * hb_tr_file_ = "";
 int    hb_tr_line_ = 0;
 int    hb_tr_level_ = 0;
 
-//static int s_level = -1;
 static int s_enabled = 1;
 static int s_flush   = 0;
 
@@ -86,6 +85,7 @@ int hb_tracestate( int new_state )
    if( new_state == 0 ||
        new_state == 1 )
       s_enabled = new_state;
+
    return old_state;
 }
 

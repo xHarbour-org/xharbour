@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.9 2004/09/08 00:17:09 druzus Exp $
+# $Id: pack_src.sh,v 1.10 2004/11/21 21:43:17 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -53,7 +53,7 @@ $hb_collect config/os2/*.cf
 $hb_collect config/w32/*.cf
 
 # DOC
-$hb_collect dos/[Mm]akefile*
+$hb_collect doc/[Mm]akefile*
 $hb_collect doc/*.txt
 $hb_collect doc/en/[Mm]akefile*
 $hb_collect doc/en/*.txt
