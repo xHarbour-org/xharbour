@@ -91,7 +91,7 @@ linking the VMGUI library code into it.
                 nProcAddr:=GetProcAddress(<hInstDLL>,<(FuncName)>);;
              ENDIF;;
              return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return>[,<type1>,<uParam1> ] [,<typeN>,<uParamN> ] );;
-             #untranslate * <!literal!> => * 10 <literal>
+             #xuntranslate * <!literal!> //=> * 10 <literal>
 
 
 // old
