@@ -54,6 +54,8 @@
      METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
+     METHOD SetStaticProcedures()                       INLINE s_aProcedures := ::aCompiledProcs
+
      #ifdef __XHARBOUR__
         METHOD EvalExpression()
 
@@ -2533,7 +2535,7 @@
           static int s_iDyn = 0;
 
           //---------------------------------------------------------------------------//
-          HB_FUNC_STATIC( PP_GENDYNPROCEDURES )
+          HB_FUNC( PP_GENDYNPROCEDURES )
           {
              PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
              static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.78 2004/07/03 03:34:53 ronpinkas Exp $
+ * $Id: genc.c,v 1.79 2004/07/15 21:01:49 ronpinkas Exp $
  */
 
 /*
@@ -837,7 +837,7 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, BOOL bSearchStatic )
   Collecting function names from in-line-c. There are two categories, ie
   statics (HB_FUNC_STATIC) and publics (HB_FUNC)
 */
-static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
+static void hb_compCStatSymList( char* statSymName, BOOL bStatic )
 {
    PSSYMLIST pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
    int ulLen = strlen( statSymName );
@@ -851,15 +851,15 @@ static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
    pStatSymLast->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
    strcpy( pStatSymLast->szName, statSymName );
 
-   if( bPublic )
-   {
-      pStatSymLast->pNext = pPubSymFirst ? pPubSymFirst : NULL;
-      pPubSymFirst = pStatSymLast;
-   }
-   else
+   if( bStatic )
    {
       pStatSymLast->pNext = pStatSymFirst ? pStatSymFirst : NULL ;
       pStatSymFirst = pStatSymLast;
+   }
+   else
+   {
+      pStatSymLast->pNext = pPubSymFirst ? pPubSymFirst : NULL;
+      pPubSymFirst = pStatSymLast;
    }
 }
 
@@ -868,37 +868,39 @@ static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
 */
 static void hb_compGenCCheckInLineStatic( char *str )
 {
-   LONG nAt;
-   char *pTmp, *pCode;
-   LONG ulLen = strlen( str );
-   LONG i ;
-   BOOL bPublic;
+   char *pNext = str, *pTmp, *pTmp2;
+   BOOL bStatic;
 
-   while( ( nAt = hb_strAt( "HB_FUNC", 7, str, ulLen ) ) != 0 )
+   while( ( pNext = strstr( pNext, "HB_FUNC" ) ) != NULL )
    {
-      bPublic = ( str[ nAt + 6 ] != '_' );
+      pNext += 7;
 
-      str += nAt;
-      i = 0;
+      bStatic = pNext[0] == '_';
 
-      while( ( pTmp = strchr( str, '(' ) ) == NULL && ++i < ulLen ) {}
-
-      pTmp++ ;
+      pTmp = strchr( pNext, '(' );
+      if( pTmp == NULL )
+      {
+         continue;
+      }
+      pTmp++;
 
       while( HB_ISSPACE( *pTmp ) )
       {
-         pTmp++ ;
+         pTmp++;
       }
 
-      i = 1;
-      ulLen = strlen( str );
+      pTmp2 = strchr( pTmp, ')' );
+      if( pTmp == NULL )
+      {
+         continue;
+      }
 
-      while( ( pCode = strchr( str, ')' ) ) == NULL && ++i < ulLen ) {}
+      *pTmp2 = '\0';
+      //printf( "Func: %s Static: %i\n", pTmp, bStatic );
+      hb_compCStatSymList( pTmp, bStatic );
+      *pTmp2 = ')';
 
-      *pCode = '\0';
-
-      hb_compCStatSymList( pTmp, bPublic );
-
+      pNext = pTmp2 + 1;
    }
 }
 
