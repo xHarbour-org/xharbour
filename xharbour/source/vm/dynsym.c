@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.8 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.9 2003/07/14 19:18:47 jonnymind Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
 
 void HB_EXPORT hb_dynsymLog( void )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
 
    USHORT uiPos;
 
@@ -160,11 +160,11 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    {                        /* We want more symbols ! */
       s_pDynItems = ( PDYNHB_ITEM ) hb_xrealloc( s_pDynItems, ( s_uiDynSymbols + 1 ) * sizeof( DYNHB_ITEM ) );
 
-      if( s_uiClosestDynSym <= s_uiDynSymbols )   /* Closest < current !! */
+      if( (USHORT) s_uiClosestDynSym <= s_uiDynSymbols )   /* Closest < current !! */
       {                                     /* Here it goes :-) */
          USHORT uiPos;
 
-         for( uiPos = 0; uiPos < ( s_uiDynSymbols - s_uiClosestDynSym ); uiPos++ )
+         for( uiPos = 0; uiPos < (USHORT) ( s_uiDynSymbols - s_uiClosestDynSym ); uiPos++ )
          {
              /* Insert element in array */
             memcpy( &s_pDynItems[ s_uiDynSymbols - uiPos ], &s_pDynItems[ s_uiDynSymbols - uiPos - 1 ], sizeof( DYNHB_ITEM ) );
@@ -576,7 +576,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
 
 USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    BOOL bCont = TRUE;
    USHORT uiPos;
 
@@ -592,7 +592,7 @@ USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 
 void HB_EXPORT hb_dynsymRelease( void )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymRelease()"));
@@ -614,7 +614,7 @@ void HB_EXPORT hb_dynsymRelease( void )
 
 PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
 
    USHORT uiPos;
 
@@ -634,7 +634,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 // NOT TESTED YET!!!
 PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
 
    if( uiPos < s_uiDynSymbols )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.53 2003/07/15 12:31:38 lculik Exp $
+ * $Id: dbfntx1.c,v 1.54 2003/07/15 20:09:49 andijahja Exp $
  */
 
 /*
@@ -4004,7 +4004,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if( pError )
    {
       hb_errRelease( pError );
-      pError = NULL;
+      // pError = NULL;
    }
 
    if( pIndex->DiskFile == FS_ERROR )

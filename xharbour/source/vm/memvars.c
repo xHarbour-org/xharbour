@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.20 2002/12/19 18:15:36 ronpinkas Exp $
+ * $Id: memvars.c,v 1.21 2003/07/14 19:18:47 jonnymind Exp $
  */
 
 /*
@@ -450,7 +450,11 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
 {
    HB_THREAD_STUB
 
-   HB_HANDLE hVar, hOldValue;
+   HB_HANDLE hVar;
+
+   #ifndef HB_THREAD_SUPPORT
+   HB_HANDLE hOldValue;
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarSetPrivatesBase(%lu)", ulBase));
 
@@ -480,7 +484,8 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
       hVar = HB_VM_STACK.privateStack[ HB_VM_STACK.privateStackCnt ]->hMemvar;
       if( hVar )
       {
-          hOldValue = HB_VM_STACK.globalTable[ hVar ].hPrevMemvar;
+          // AJ: de-activated pending re-enabling of PRIVATES
+          // hOldValue = HB_VM_STACK.globalTable[ hVar ].hPrevMemvar;
           hb_memvarValueDecRef( hVar );
           // JC1: PRIVATES de-activated now. We'll bring them back asap
           // HB_VM_STACK.privateStack[ HB_VM_STACK.privateStackCnt ]->hMemvar = hOldValue;
