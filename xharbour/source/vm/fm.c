@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.47 2003/12/05 01:38:29 jonnymind Exp $
+ * $Id: fm.c,v 1.48 2003/12/05 04:11:48 jonnymind Exp $
  */
 
 /*
@@ -717,8 +717,8 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 
    #ifdef HB_THREAD_SUPPORT
       hb_threadInit();
+      hb_stackInit();
    #endif
-   hb_stackInit();
 }
 
 

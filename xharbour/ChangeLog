@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1850 2003/12/11 11:07:27 vouchcac Exp $
+ * $Id: ChangeLog,v 1.1851 2003/12/11 11:22:10 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 15:32 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/fm.c
+    ! Moved stack initialization of hb_xinit() into MT only compilation;
+      current version caused a stack-reinitialization after xinit()
+      initialization, making the first stack to be discarded.
 
 2003-12-11 08:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rtl/hbserv.c
@@ -89,7 +95,7 @@
 
 2003-12-10 01:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hbffind.c
-    ! unix "universal" patter is NOT "*.*"  but "*"
+    ! unix "universal" pattern is NOT "*.*"  but "*"
 
 2003-12-10 01:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/regex.c
