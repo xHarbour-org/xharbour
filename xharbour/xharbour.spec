@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.52 2004/01/30 02:06:31 druzus Exp $
+# $Id: xharbour.spec,v 1.53 2004/03/09 01:00:57 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -63,7 +63,8 @@
 %define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_plat  export HB_PLAT=%{platform}
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}
+%define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
+%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -366,7 +367,9 @@ popd
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
+    unset HB_GTALLEG
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
+    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
     for utl in hbmake hbrun hbpp hbdoc
     do
         pushd utils/${utl}

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2856 2004/04/30 16:11:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2857 2004/04/30 18:58:48 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-30 21:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * reinabled GTALLEG - I don't know when and why it was disabled.
+
+  * xharbour/contrib/libct/settime.c
+    * commented out unused params to avoid warnings
+
+  * xharbour/source/rtl/hbserv.c
+    ! fixed param checking in HB_PUSHSIGNALHANDLER - it should be
+      HB_IT_POINTER not HB_IT_LONG
+
+  * xharbour/source/rtl/inkey.c
+    * HB_SYMBOLUNUSED added to avoid warning
+
+  * xharbour/source/vm/hvm.c
+    * cleand hb_vmForTest() - it was possible that some variables
+      were used uninitialized when <counter> was differ type then
+      <end value> (LOGICAL<->NUMBER) instead of error reporting.
 
 2004-04-30 11:55 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * include/getexit.ch

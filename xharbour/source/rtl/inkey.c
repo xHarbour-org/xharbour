@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.33 2004/04/21 07:51:08 bdj Exp $
+ * $Id: inkey.c,v 1.34 2004/04/21 07:54:31 bdj Exp $
  */
 
 /*
@@ -615,7 +615,8 @@ HB_FUNC( SETLASTKEY )
 
 int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )
 {
-   // left for possible future use
+   /* left for possible future use */
+   HB_SYMBOL_UNUSED( event_mask );
    return key;
 }
 

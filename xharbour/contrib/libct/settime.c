@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.2 2004/02/01 17:23:55 paultucker Exp $
+ * $Id: settime.c,v 1.3 2004/04/28 23:04:43 lculik Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -63,9 +63,9 @@
 #include <winbase.h>
 #define HB_OS_WIN_32_USED
 #endif
-#include <time.h>
 #if defined( OS_UNIX_COMPATIBLE )
-   #if defined( HB_OS_BSD)
+   #define _SVID_SOURCE
+   #if defined( HB_OS_BSD )
       #include <sys/time.h>
    #else
       #include <sys/timeb.h>
@@ -73,8 +73,9 @@
    #include <sys/times.h>
    #include <unistd.h>
 #else
-   #include <sys\timeb.h>
+   #include <sys/timeb.h>
 #endif
+#include <time.h>
 
 HB_FUNC ( SETNEWDATE )
 {
@@ -100,12 +101,11 @@ HB_FUNC ( SETNEWDATE )
 
    hb_retl ( SetLocalTime(&st) );
 }
-#elif  defined( OS_UNIX_COMPATIBLE )    || defined(__DJGPP__)
+#elif defined( OS_UNIX_COMPATIBLE ) || defined(__DJGPP__)
 {
-   LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek;
+   /* LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek; */
    hb_retl(0);
-   
-}   
+}
 #endif
 }
 
@@ -131,7 +131,7 @@ HB_FUNC ( SETNEWTIME )
 
    hb_retl ( SetLocalTime(&st) );
 }   
-#elif  defined( OS_UNIX_COMPATIBLE )    || defined(__DJGPP__)
+#elif defined( OS_UNIX_COMPATIBLE ) || defined(__DJGPP__)
 {
    LONG lNewHour,lNewMin,lNewSec;
    time_t tm;
@@ -208,6 +208,3 @@ HB_FUNC ( WAITPERIOD )
 #endif   
    hb_retl( FALSE );
 }
-
-
-

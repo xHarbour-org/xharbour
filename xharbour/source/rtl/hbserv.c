@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.17 2004/04/14 20:59:10 andijahja Exp $
+* $Id: hbserv.c,v 1.18 2004/04/28 18:30:30 druzus Exp $
 */
 
 /*
@@ -842,7 +842,7 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
    HandEntry.type = HB_IT_NIL;
 
    if ( pFunc == NULL || iMask == 0 ||
-         (pFunc->type != HB_IT_LONG && ! HB_IS_STRING( pFunc ) && ! HB_IS_BLOCK( pFunc ) )
+         (pFunc->type != HB_IT_POINTER && ! HB_IS_STRING( pFunc ) && ! HB_IS_BLOCK( pFunc ) )
       )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type", NULL,

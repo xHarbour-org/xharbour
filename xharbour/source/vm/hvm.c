@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.384 2004/04/28 09:59:38 brianhays Exp $
+ * $Id: hvm.c,v 1.385 2004/04/28 18:31:22 druzus Exp $
  */
 
 /*
@@ -4452,12 +4452,6 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
    HB_THREAD_STUB
 
    double dStep;
-   double dEnd;
-   double dCurrent;
-
-   BOOL lEnd;
-   BOOL lCurrent;
-   BOOL lLogicalPassed = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmForTest()"));
 
@@ -4497,40 +4491,26 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
 
    if ( hb_stackItemFromTop( -1 )->type == HB_IT_LOGICAL )
    {
+      BOOL lEnd;
+      BOOL lCurrent;
+
       lEnd = hb_vmPopLogical();
-      lLogicalPassed = TRUE;
-   }
-   else
-      dEnd = hb_vmPopNumber();
-
-   while( ( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) ) && ( ! HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) ) )
-   {
-      PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
-      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1073, NULL, "<", 1, pItem1 );
-
-      if( pResult )
+      while( ! HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) )
       {
-         hb_stackPop();
-         hb_itemPushForward( pResult );
-         hb_itemRelease( pResult );
+         PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1073, NULL, "<", 1, pItem1 );
+
+         if( pResult )
+         {
+            hb_stackPop();
+            hb_itemPushForward( pResult );
+            hb_itemRelease( pResult );
+         }
+         else
+            /* NOTE: Return from the inside. */
+            return;
       }
-      else
-         /* NOTE: Return from the inside. */
-         return;
-   }
-
-   if ( hb_stackItemFromTop( -1 )->type == HB_IT_LOGICAL )
-   {
       lCurrent = hb_vmPopLogical();
-   }
-   else
-   {
-      lLogicalPassed = FALSE;
-      dCurrent = hb_vmPopNumber();
-   }
-
-   if( lLogicalPassed )
-   {
       if( dStep >= 0 )           /* Positive loop. Use LESS */
       {
          hb_vmPushLogical( lCurrent <= lEnd );
@@ -4542,6 +4522,26 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
    }
    else
    {
+      double dEnd;
+      double dCurrent;
+
+      dEnd = hb_vmPopNumber();
+      while( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
+      {
+         PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1073, NULL, "<", 1, pItem1 );
+
+         if( pResult )
+         {
+            hb_stackPop();
+            hb_itemPushForward( pResult );
+            hb_itemRelease( pResult );
+         }
+         else
+            /* NOTE: Return from the inside. */
+            return;
+      }
+      dCurrent = hb_vmPopNumber();
       if( dStep >= 0 )          /* Positive loop. Use LESS */
       {
          hb_vmPushLogical( dCurrent <= dEnd );
