@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.65 2002/04/30 06:12:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.67 2002/05/02 18:23:10 map Exp $
  */
 
 /*
@@ -2386,31 +2386,58 @@ static void hb_vmPlus( void )
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       ULONG ulLen1     = pItem1->item.asString.length;
+
       ULONG ulLen2     = pItem2->item.asString.length;
 
+
+
       if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
+
       {
+
          ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
+
          if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.puiHolders ) > 1 ) )
+
          {
+
              pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
-             hb_xmemcpy( pNewString, pItem1->item.asString.value, ulLen1 );
+
+             hb_xmemcpy( (void * ) pNewString, (void *) pItem1->item.asString.value, ulLen1 );
+
              hb_itemReleaseString( pItem1 );
+
              pItem1->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+
              *( pItem1->item.asString.puiHolders ) = 1;
+
              pItem1->item.asString.bStatic = FALSE;
+
          }
+
          else
+
          {
+
              pNewString = pItem1->item.asString.value;
-             pNewString = hb_xrealloc( pNewString, ulNewLen + 1 );
+
+             pNewString = (char *) hb_xrealloc( (void *) pNewString, ulNewLen + 1 );
+
          }
+
+
 
          hb_xmemcpy( pNewString + ulLen1, pItem2->item.asString.value, ulLen2 );
 
+
+
          pItem1->item.asString.value   = pNewString;
+
          pItem1->item.asString.length  = ulNewLen;
+
          pItem1->item.asString.value[ ulNewLen ] = '\0';
+
+
 
          hb_stackPop();
       }
