@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.7 2003/05/27 20:41:43 paultucker Exp $
+ * $Id: hbcrypt.c,v 1.8 2003/07/15 09:15:34 andijahja Exp $
  */
 
 /*
@@ -432,7 +432,8 @@ HB_FUNC( HB_CRYPT )
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
    BYTE *cRes;
 
-   if ( pSource == NULL || pKey == NULL )
+   if ( pSource == NULL || pSource->item.asString.length == 0 ||
+        pKey == NULL || pKey->item.asString.length == 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_CRYPT", 2,
             hb_param(1,HB_IT_ANY), hb_param(2,HB_IT_ANY) );
@@ -461,7 +462,8 @@ HB_FUNC( HB_DECRYPT )
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
    BYTE *cRes;
 
-   if ( pSource == NULL || pKey == NULL )
+   if ( pSource == NULL || pSource->item.asString.length == 0 ||
+        pKey == NULL || pKey->item.asString.length == 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_DECRYPT", 2,
             hb_param(1,HB_IT_ANY), hb_param(2,HB_IT_ANY) );
@@ -477,3 +479,4 @@ HB_FUNC( HB_DECRYPT )
 
    hb_retclenAdopt( (char *)cRes, pSource->item.asString.length );
 }
+
