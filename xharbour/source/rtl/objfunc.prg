@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.14 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.15 2003/08/05 10:20:51 ronpinkas Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    ENDIF
 
    aBaseVars   := __clsGetIVarNamesAndValues( oBase, nScope )
-   aObjectVars := __clsGetIVarNamesAndValues( oObject, NIL, nScope )
+   aObjectVars := __clsGetIVarNamesAndValues( oObject, nScope )
 
    aReturn := {}
 

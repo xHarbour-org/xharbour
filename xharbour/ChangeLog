@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1331 2003/08/07 05:54:04 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1332 2003/08/07 17:29:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-07 11:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/objfunc.prg
+    ! Fixed a bad typo.
 
 2003-08-07 14:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rdd/dbf1.c
@@ -40,7 +44,7 @@
 
 2003-08-05 16:41 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/vm/fm.c
-    * added code for initializing allocated memory with 
+    * added code for initializing allocated memory with
       static complex HB_ITEM. This code is compiled when
       macro HB_PARANOID_MEM_CHECK is set and there is no
       macro HB_FM_STATISTICS_OFF
