@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.48 2004/05/10 10:38:07 mauriliolongo Exp $
+ * $Id: console.c,v 1.50 2004/05/11 14:07:12 jonnymind Exp $
  */
 /*
  * Harbour Project source code:
@@ -503,7 +503,6 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       otherwise position console */
    if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      // Peter Rees: 29/10/2003 8:53a.m. Should be 100% Clipper Compatible now
       iCol += hb_set.HB_SET_MARGIN;
 
       if (iRow < s_uiPRow) {
@@ -514,10 +513,12 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
         s_uiPCol = 0 ;
       }
+/*  Removed to make Clipper compatible
       if ( iCol < s_uiPCol) {
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
         s_uiPCol = 0 ;
       }
+*/
       for ( ; s_uiPCol < iCol ; s_uiPCol++)
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
 
