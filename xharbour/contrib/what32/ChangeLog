@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.9 2002/09/17 21:44:52 lculik Exp $
+ * $Id: ChangeLog,v 1.10 2002/09/18 00:35:22 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-18 05:54 UCT -0300 Augusto Infante <systems@quesoro.com>
+   * _WinWnd.c
+     + AllowSetForegroundWindow()
+     + LockSetForegroundWindow()
+
+   * _WinSys.c
+     + GetCurrentProcessId()
+     + GetCurrentProcess()
+     + GetCurrentThreadId()
 
 2002-09-18 07:34 UCT+1000 AJ Wos <andrwos@aust1.net>
    * WinCore.Prg 

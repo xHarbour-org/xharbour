@@ -1,10 +1,9 @@
-static oAppl
+GLOBAL oAppl
 
 #include "hbclass.ch"
 #include "what32.ch"
 #include "windows.ch"
-
-#define ASFW_ANY    (-1)
+#include "debug.ch"
 
 GLOBAL EXTERNAL lPrevInstance
 
@@ -29,25 +28,21 @@ CLASS Application
 ENDCLASS
 
 METHOD Initialize() CLASS Application
+   local nId, cMsg
+   
+   ::InstMsg := RegisterWindowMessage( GetModuleFileName() )
 
-   ::InstMsg := RegisterWindowMessage( GetModuleHandle() )
-
-   AllowSetForegroundWindow( ASFW_ANY ) 
-
-   if !::MultiInstance .and. lPrevInstance 
-      
-      
-      SendMessage(HWND_BROADCAST, ::InstMsg, 0, 0)
-      
+   AllowSetForegroundWindow( -1 )
+   
+   if !::MultiInstance .and. lPrevInstance
+      SendMessage( HWND_BROADCAST, ::InstMsg, 0, 0)
       PostQuitMessage(0)
       QUIT
       return(0)
    endif
 
    ::Instance := hInstance()
-
    InitCommonControls()
-
    oAppl := Self
 
 RETURN(self)

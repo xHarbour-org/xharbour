@@ -9,7 +9,7 @@ static oApp
 
 FUNCTION Main
 
-   oApp := Application():New()
+   oApp := Application():Initialize()
 
    WITH OBJECT oApp
 
