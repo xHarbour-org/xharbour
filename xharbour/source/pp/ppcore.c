@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.50 2003/03/13 00:52:43 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.51 2003/03/22 00:08:05 ronpinkas Exp $
  */
 
 /*
@@ -1648,13 +1648,13 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               ptri = sLine + isdvig;
               lenToken = strlen(stcmd->name);
 
-              //printf( "Anchore: '%s'\n", stcmd->name );
+              //printf( "Anchore: '%s' MP: '%s' Against: '%s'\n", stcmd->name, stcmd->mpatt, ptri );
 
               while( ( ifou = md_strAt( stcmd->name, lenToken, ptri, TRUE, FALSE, FALSE, TRUE )) > 0 )
               {
                  ptri += ifou -1;
 
-                 //printf( "Trying %s\n", ptri );
+                 //printf( "Trying %s\n", ptri + lenToken );
 
                  if( ( i = WorkTranslate( ptri+lenToken, ptro, stcmd, &lens ) ) >= 0 )
                  {
@@ -1679,10 +1679,12 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                     }
 
                     ptri += i;
+                    //printf( "Translated.\n" );
                  }
                  else
                  {
                     ptri += lenToken;
+                    //printf( "No Match.\n" );
                  }
               }
 
@@ -1980,22 +1982,25 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
 
   HB_TRACE(HB_TR_DEBUG, ("WorkTranslate(%s, %s, %p, %p)", ptri, ptro, sttra, lens));
 
-  do
-  {
+  //do
+  //{
      lenres = hb_pp_strocpy( ptro, sttra->value );
      ptrmp = sttra->mpatt;
      s_Repeate = 0;
      s_groupchar = '@';
+
+     //printf( "Same: '%s' MP: '%s' Against: '%s'\n", sttra->name, sttra->mpatt, ptri );
+
      rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom );
 
-     sttra = sttra->last;
+     //sttra = sttra->last;
 
-     if( rez < 0 && sttra != NULL )
-     {
-        sttra = TraSearch(sToken, sttra);
-     }
-  }
-  while( rez < 0 && sttra != NULL );
+     //if( rez < 0 && sttra != NULL )
+     //{
+     //   sttra = TraSearch(sToken, sttra);
+     //}
+  //}
+  //while( rez < 0 && sttra != NULL );
 
   *(ptro+lenres) = '\0';
 
@@ -4536,7 +4541,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
         }
      }
 
-     if( **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper(**ptri) != toupper(**ptro) )
+     if( **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper( **ptri ) != toupper( **ptro ) )
      {
         break;
      }
@@ -4564,6 +4569,8 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
 
       return FALSE;
   }
+
+  //printf( ">>>TRUE Input: '%s', MP: '%s', co: %c, ci: %c\n", *ptro, *ptri, co, ci );
 
   return TRUE;
 }
