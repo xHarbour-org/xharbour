@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.65 2003/08/22 20:44:08 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.66 2003/08/22 21:16:16 ronpinkas Exp $
  */
 
 /*
@@ -1593,6 +1593,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   #else
                      pReduced->value.asMessage.szMessage = pName->value.asSymbol;
                   #endif
+                  pReduced->value.asMessage.pMacroMessage = NULL;
                   pReduced->value.asMessage.pObject = pBlock;
                   pReduced->value.asMessage.pParms = pParms;
                   pReduced->value.asMessage.pParms->value.asList.pExprList = pArgs;
@@ -2504,12 +2505,20 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
 
       case HB_EA_PUSH_PCODE:
          {
+            if( pSelf->value.asMessage.pMacroMessage )
+            {
+               HB_EXPR_USE( pSelf->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+            }
+            else
+            {
+               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+            }
+
+            HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
                int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
-
-               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
-               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
 
                /* NOTE: if method with no parameters is called then the list
                 * of parameters contain only one expression of type HB_ET_NONE
@@ -2536,9 +2545,6 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             }
             else
             {
-               /* acces to instance variable */
-               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
-               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
                if( pSelf->value.asMessage.bByRef )
                {
                   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_IVARREF );
@@ -2556,7 +2562,20 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             /* NOTE: This is an exception from the rule - this leaves
              *    the return value on the stack
              */
-            HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
+            if( pSelf->value.asMessage.pMacroMessage )
+            {
+               /*
+                  NOTE: We don't worry about the "_" prefix because the HVM has logic to detect assignment
+                  even without the "_", and to be sincere adding the "_" to a macro (HB_ET_MACRO_SYMBOL)
+                  might be little complicated, but can be done if will be needed.
+                */
+               HB_EXPR_USE( pSelf->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+            }
+            else
+            {
+               HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
+            }
+
             HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
@@ -2587,7 +2606,14 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
             }
 
-            HB_XFREE( pSelf->value.asMessage.szMessage );
+            if( pSelf->value.asMessage.szMessage )
+            {
+               HB_XFREE( pSelf->value.asMessage.szMessage );
+            }
+            else if( pSelf->value.asMessage.pMacroMessage )
+            {
+               HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
+            }
          }
 #endif
          break;
@@ -2617,13 +2643,21 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
 
       case HB_EA_PUSH_PCODE:
          {
+            if( pSelf->value.asMessage.pMacroMessage )
+            {
+               HB_EXPR_USE( pSelf->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+            }
+            else
+            {
+               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+            }
+
+            // Pushing NIL instead of pObject because the WITH Object will be the Self!
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
                int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
-
-               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
-               //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 
                /* NOTE: if method with no parameters is called then the list
                 * of parameters contain only one expression of type HB_ET_NONE
@@ -2650,10 +2684,6 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
             }
             else
             {
-               /* acces to instance variable */
-               HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
-               //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
                HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 0, ( BOOL ) 1 );
             }
          }
@@ -2664,8 +2694,21 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
             /* NOTE: This is an exception from the rule - this leaves
              *    the return value on the stack
              */
-            HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
-            //HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+            if( pSelf->value.asMessage.pMacroMessage )
+            {
+               /*
+                  NOTE: We don't worry about the "_" prefix because the HVM has logic to detect assignment
+                  even without the "_", and to be sincere adding the "_" to a macro (HB_ET_MACRO_SYMBOL)
+                  might be little complicated, but can be done if will be needed.
+                */
+               HB_EXPR_USE( pSelf->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+            }
+            else
+            {
+               HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
+            }
+
+            // Pushing NIL instead of pObject because the WITH Object will be the Self!
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
             HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );

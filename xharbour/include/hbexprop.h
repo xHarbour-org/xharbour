@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.5 2003/03/14 00:32:40 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.6 2003/03/27 07:44:55 ronpinkas Exp $
  */
 
 /*
@@ -226,6 +226,7 @@ typedef struct HB_EXPR_
          char * szMessage;             /* message */
          struct HB_EXPR_ *pParms;      /* method parameters */
          BOOL bByRef;
+         struct HB_EXPR_ *pMacroMessage;
       } asMessage;
       struct
       {
@@ -353,8 +354,9 @@ HB_EXPR_PTR hb_compExprNewFunRef( char * );
 HB_EXPR_PTR hb_compExprNewCodeblockExpr( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewFunCallArg( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR, char * );
+HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewWithSend( char * );
+HB_EXPR_PTR hb_compExprNewWithSend( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewWithMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewList( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewArgList( HB_EXPR_PTR );

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.5 2003/02/28 10:37:19 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.6 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -464,24 +464,64 @@ HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR pObject, char * szMessage )
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, szMessage));
 
    pExpr = hb_compExprNew( HB_ET_SEND );
-   pExpr->value.asMessage.szMessage = szMessage;
-   pExpr->value.asMessage.pObject   = pObject;
-   pExpr->value.asMessage.pParms    = NULL;
-   pExpr->value.asMessage.bByRef    = FALSE;
+   pExpr->value.asMessage.szMessage     = szMessage;
+   pExpr->value.asMessage.pObject       = pObject;
+   pExpr->value.asMessage.pParms        = NULL;
+   pExpr->value.asMessage.bByRef        = FALSE;
+   pExpr->value.asMessage.pMacroMessage = NULL;
 
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewWithSend( char * szMessage )
+HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, szMessage));
+
+   pExpr = hb_compExprNew( HB_ET_SEND );
+   pExpr->value.asMessage.pObject       = pObject;
+   pExpr->value.asMessage.pParms        = NULL;
+   pExpr->value.asMessage.bByRef        = FALSE;
+
+   if( pMessage->ExprType == HB_ET_FUNNAME )
+   {
+      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
+      pExpr->value.asMessage.pMacroMessage = NULL;
+
+      HB_XFREE( pMessage );
+   }
+   else
+   {
+      pExpr->value.asMessage.szMessage     = NULL;
+      pExpr->value.asMessage.pMacroMessage = pMessage;
+   }
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewWithSend( HB_EXPR_PTR pMessage )
 {
    HB_EXPR_PTR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%p, %s)", szMessage));
 
    pExpr = hb_compExprNew( HB_ET_WITHSEND );
-   pExpr->value.asMessage.szMessage = szMessage;
    pExpr->value.asMessage.pObject   = NULL;
    pExpr->value.asMessage.pParms    = NULL;
+
+   if( pMessage->ExprType == HB_ET_FUNNAME )
+   {
+      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
+      pExpr->value.asMessage.pMacroMessage = NULL;
+
+      HB_XFREE( pMessage );
+   }
+   else
+   {
+      pExpr->value.asMessage.szMessage     = NULL;
+      pExpr->value.asMessage.pMacroMessage = pMessage;
+   }
 
    return pExpr;
 }
@@ -910,4 +950,3 @@ ULONG hb_compExprListLen( HB_EXPR_PTR pExpr )
 
    return ulLen;
 }
-
