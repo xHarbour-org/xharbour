@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.42 2003/02/01 15:08:26 jonnymind Exp $
+* $Id: thread.c,v 1.43 2003/02/13 01:22:35 jonnymind Exp $
 */
 
 /*
@@ -98,6 +98,8 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
    tc->stack->pBase  = tc->stack->pItems;
    tc->stack->pPos   = tc->stack->pItems;     /* points to the first stack item */
    tc->stack->wItems = STACK_THREADHB_ITEMS;
+   tc->stack->pMethod = NULL;
+
 
    //printf( "New Context: %p Stack: %p\n", tc, tc->stack );
 
@@ -456,7 +458,7 @@ HB_FUNC( STARTTHREAD )
       }
       else
       {
-         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ObjMsgPtr", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          return;
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.11 2003/01/02 03:31:02 jonnymind Exp $
+ * $Id: hbstack.h,v 1.12 2003/01/07 19:35:26 ronpinkas Exp $
  */
 
 /*
@@ -76,6 +76,8 @@
 extern "C" {
 #endif
 
+struct hb_class_method;
+
 /* stack managed by the virtual machine */
 typedef struct
 {
@@ -87,6 +89,10 @@ typedef struct
    PHB_ITEM * pEvalBase;    /* stack frame position for the evaluated codeblock */
    int      iStatics;     /* statics base for the current function call */
    char     szDate[ 9 ];  /* last returned date from _pards() yyyymmdd format */
+
+   /* JC1: thread safe classes messaging */
+   struct hb_class_method * pMethod;        /* Selcted method to send message to */
+  
 } HB_STACK;
 
 /* JC1: test for macro accessing the stack */
