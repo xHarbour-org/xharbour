@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.13 2004/02/15 12:08:22 lculik Exp $
+ * $Id: files.c,v 1.14 2004/02/15 20:21:39 andijahja Exp $
  */
 
 /*
@@ -1056,10 +1056,10 @@ HB_FUNC( FILEDELETE )
 
          if( (fname = hb_fsFNameSplit( (char*) pDirSpec )) !=NULL )
          {
-           if( (fname && DRIVE)==1 )
+           if( fname->szDrive )
                hb_fsChDrv( ( BYTE ) fname->szDrive );
 
-           if( (fname && DIRECTORY)==1 )
+           if( fname->szPath)
                hb_fsChDir( ( BYTE *) fname->szPath );
          }
 
