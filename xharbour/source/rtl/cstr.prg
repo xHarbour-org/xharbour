@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.15 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: cstr.prg,v 1.16 2003/11/10 00:06:29 jonnymind Exp $
  */
 
 /*
@@ -202,12 +202,12 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
       CASE 'H'
          IF Len( xVal ) == 0
-            RETURN "{:>}"
+            RETURN "{=>}"
          ELSE
             cRet := "{ "
 
             FOR aVar := 1 TO Len( xVal )
-               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +":> " + ;
+               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +"=> " + ;
                        LTrim(ValToPrg( HGetValueAt( xVal, aVar ) )) + ", "
             NEXT
 
@@ -263,7 +263,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          IF xVal == NIL
             cRet := "NIL"
          ELSE
-            Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
+            Throw( ErrorNew( "VALTOPRG", 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
    END
 
@@ -321,12 +321,12 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
       CASE 'H'
          IF Len( xVal ) == 0
-            RETURN "{:>}"
+            RETURN "{=>}"
          ELSE
             cRet := "{ "
 
             FOR aVar := 1 TO Len( xVal )
-               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +":> " + ;
+               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +"=> " + ;
                        LTrim(ValToPrg( HGetValueAt( xVal, aVar ) )) + ", "
             NEXT
 
@@ -385,7 +385,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          IF xVal == NIL
             cRet := "NIL"
          ELSE
-            Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
+            Throw( ErrorNew( "VALTOPRG", 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
    END
 

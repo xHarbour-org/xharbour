@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.6 2003/11/12 13:49:13 jonnymind Exp $
+ * $Id: hash.c,v 1.7 2003/11/12 16:05:01 jonnymind Exp $
  */
 
 /*
@@ -893,6 +893,55 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 }
 
 
+PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
+{
+   PHB_ITEM pKeys, pK, pArr;
+   ULONG ulPos, ulLen;
+
+   if ( ! HB_IS_HASH( pHash ) )
+   {
+      return NULL;
+   }
+
+   pKeys = hb_itemNew( NULL );
+   ulLen = pHash->item.asHash.value->ulLen;
+   hb_arrayNew( pKeys, ulLen );
+   pK = pHash->item.asHash.value->pKeys;
+   pArr = pKeys->item.asArray.value->pItems;
+
+   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++, pArr++ )
+   {
+      hb_itemCopy( pArr, pK );
+   }
+
+   return pKeys;
+}
+
+PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
+{
+   PHB_ITEM pVals, pV, pArr;
+   ULONG ulPos, ulLen;
+
+   if ( ! HB_IS_HASH( pHash ) )
+   {
+      return NULL;
+   }
+
+   pVals = hb_itemNew( NULL );
+   ulLen = pHash->item.asHash.value->ulLen;
+   hb_arrayNew( pVals, ulLen );
+   pV = pHash->item.asHash.value->pKeys;
+   pArr = pVals->item.asArray.value->pItems;
+
+   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr++ )
+   {
+      hb_itemCopy( pArr, pV );
+   }
+
+   return pVals;
+}
+
+
 /**********************************************************************
 * Harbour API
 **********************************************************************/
@@ -1223,14 +1272,13 @@ HB_FUNC( HDELAT )
    hb_hashRemove( pHash, ulPos );
 }
 
+
 /**************************************************************
 * Keys/values arrays
 ***************************************************************/
 HB_FUNC( HGETKEYS )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pKeys, pK, pArr;
-   ULONG ulPos, ulLen;
 
    if ( pHash == NULL  )
    {
@@ -1239,26 +1287,13 @@ HB_FUNC( HGETKEYS )
       return;
    }
 
-   pKeys = hb_itemNew( NULL );
-   ulLen = pHash->item.asHash.value->ulLen;
-   hb_arrayNew( pKeys, ulLen );
-   pK = pHash->item.asHash.value->pKeys;
-   pArr = pKeys->item.asArray.value->pItems;
-
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++, pArr++ )
-   {
-      hb_itemCopy( pArr, pK );
-   }
-
-   hb_itemForwardValue( &HB_VM_STACK.Return, pKeys );
+   hb_itemForwardValue( &HB_VM_STACK.Return, hb_hashGetKeys( pHash )  );
 }
 
 
 HB_FUNC( HGETVALUES )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pVals, pV, pArr;
-   ULONG ulPos, ulLen;
 
    if ( pHash == NULL  )
    {
@@ -1267,18 +1302,7 @@ HB_FUNC( HGETVALUES )
       return;
    }
 
-   pVals = hb_itemNew( NULL );
-   ulLen = pHash->item.asHash.value->ulLen;
-   hb_arrayNew( pVals, ulLen );
-   pV = pHash->item.asHash.value->pValues;
-   pArr = pVals->item.asArray.value->pItems;
-
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr++ )
-   {
-      hb_itemCopy( pArr, pV );
-   }
-
-   hb_itemForwardValue( &HB_VM_STACK.Return, pVals );
+   hb_itemForwardValue( &HB_VM_STACK.Return, hb_hashGetValues( pHash )  );
 }
 
 /***********************************************************

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1718 2003/11/14 01:20:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1719 2003/11/14 03:15:11 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-14 17:30 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbhashapi.h
+  * source/vm/hash.c
+    + Added hb_hashGetKeys() and hb_hashGetValues() to the internal api, HGETKEYS()
+      and HGETVALUES() now refer to this one
+
+  * source/rtl/cstr.prg
+    ! Using now "=>" as hash separator in ValToPrg()
+
+  * source/vm/hvm.c
+    + Added ":" accessor token to hashes. Currently, it uses the UPPERCASED message
+      name; it should be good for translating old programs unless they make differences
+      between character cases. Hashes reply also to CLASSNAME, KEYS, VALUES and CLASSH
+      messages.
+
+  * tests/hash.prg
+    + Added test of new ":" grammar
 
 2003-11-14 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg

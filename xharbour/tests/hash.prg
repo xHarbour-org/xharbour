@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.3 2003/11/12 13:49:14 jonnymind Exp $
+* $Id: hash.prg,v 1.4 2003/11/12 16:05:01 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -23,7 +23,7 @@ PROCEDURE Main()
    * Creation by PP command:
    * Equivalent to Hash( K1, V1, ... KN, VN )
 
-   hHash := { "Kval":> 'StrKey 0', 8:> 'Num Key 0' }
+   hHash := { "Kval"=> 'StrKey 0', 8=> 'Num Key 0' }
 
    /* Insertion by API */
    HSet( hHash, 4,  "Numeric key 1" )
@@ -37,14 +37,14 @@ PROCEDURE Main()
    ? "Hash type:", ValType( hHash )
    ? "Hash length:", Len( hHash )
    ? "Hash value:", ValToPrg( hHash )
-   ? "Empty hash value:", ValToPrg( {:>} )
-   ? "String representation (should be nothing):", {:>}
-   ? "Equality of hashes (Success for .T. , .F.): ", hHash == hHash, hHash == {:>}
-   ? "Plus operator: ", ValToPrg( { 1:>1, 'a':>2} + { 3:>3, 'b':>4 } )
-   hHash += { 5:> "numkey 3" }
+   ? "Empty hash value:", ValToPrg( {=>} )
+   ? "String representation (should be nothing):", {=>}
+   ? "Equality of hashes (Success for .T. , .F.): ", hHash == hHash, hHash == {=>}
+   ? "Plus operator: ", ValToPrg( { 1=>1, 'a'=>2} + { 3=>3, 'b'=>4 } )
+   hHash += { 5=> "numkey 3" }
    ? "Plusequal operator (success if Len(hHash) == 9: ", Len(hHash), ",(", hHash[5], ")"
-   hTemp := {'a':>1, 1:>2, 'c':>3}
-   ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1:>2, 'c':>3} )
+   hTemp := {'a'=>1, 1=>2, 'c'=>3}
+   ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1=>2, 'c'=>3} )
    ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'a'} )
    ? "Minus hash - item operator: ", ValToPrg( hTemp - 'a' )
    ? "Hash is now: ", ValToPrg( hHash )
@@ -66,6 +66,15 @@ PROCEDURE Main()
    CATCH eError
       ? "Wrong index test: hHash[Array()]: Passed (", eError:description, ")"
    END
+   HSetCaseMatch( hHash, .F. )
+   ? "Hash gramar ':' existing key insensitive:", hHash:kval
+   HSetCaseMatch( hHash, .Y. )
+   ? "Hash gramar ':' adding key:", ( hHash:ColonKey := 'Colon value' )
+   ? "Hash gramar ':' retreiving key:", hHash:ColonKey
+   ? "Hash grammar ':' classname:", hHash:ClassName
+   ? "Hash grammar ':' keys:", ValToPrg( hHash:Keys )
+   ? "Hash grammar ':' values:", ValToPrg( hHash:Values )
+
    ? "Press a Key to continue"
    ?
    Inkey(0)
@@ -151,19 +160,19 @@ PROCEDURE Main()
 
    ? "Eval summing up all the numeric keys :", nSum
    ? "Clone of the hash:", ValToPrg(HClone( hHash ))
-   hDest := { 'A':> 1, 'b':>2 }
-   ? "Merging hash with { 'a':> 1, 'b':>2 }:"
+   hDest := { 'A'=> 1, 'b'=>2 }
+   ? "Merging hash with { 'a'=> 1, 'b'=>2 }:"
    ? "Result: ", ValToPrg(HCopy( hHash, hDest ))
 
-   hDest := { 'B':> 1, 'A':>2 }
+   hDest := { 'B'=> 1, 'A'=>2 }
    ? "Merging limited with a codeblock (Only numeric values): "
    ? "Result: ", ValToPrg( HMerge( hDest, hHash, { |cKey, nVal| HB_IsNumeric( nVal ) } ) )
    * The last "2" means XOR
    ? "Doing a xor merge with the original one (first 4 elements): "
    ? "Result: ",  ValToPrg( HCopy( hHash, hDest, , , 2 ) )
 
-   ? "Doing an AND merge with { 'A':>0, 'B':>1 } "
-   ? "Result: ",  ValToPrg( HMerge( hDest, {'A':>0, 'B':>1 }, 1) )
+   ? "Doing an AND merge with { 'A'=>0, 'B'=>1 } "
+   ? "Result: ",  ValToPrg( HMerge( hDest, {'A'=>0, 'B'=>1 }, 1) )
 
    ? "Press a Key to continue"
    ?

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.275 2003/11/12 13:49:13 jonnymind Exp $
+ * $Id: hvm.c,v 1.276 2003/11/12 16:05:01 jonnymind Exp $
  */
 
 /*
@@ -1323,8 +1323,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SENDSHORT:
          {
-            HB_THREAD_STUB
-
             USHORT usParams =  pCode[ w + 1 ];
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
@@ -5354,6 +5352,33 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    s_iBaseLine = iPresetBase;
 }
 
+/* JC1: I need this error display routine to be used also by hash pseudo class
+   operators, so I put it here
+*/
+static void s_hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
+{
+   char sDesc[128];
+   if( *szMsg == '_' )
+   {
+      PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
+
+      //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
+      sprintf( (char *) sDesc, "Class: '%s' has no property", szClassName );
+      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, pArgsArray );
+      hb_itemRelease( pArgsArray );
+   }
+   else
+   {
+      PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
+
+      //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
+      sprintf( (char *) sDesc, "Class: '%s' has no exported method", szClassName );
+      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, pArgsArray );
+      hb_itemRelease( pArgsArray );
+   }
+}
+
+
 HB_EXPORT void hb_vmSend( USHORT uiParams )
 {
    HB_THREAD_STUB
@@ -5505,8 +5530,55 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          pSelfBase->puiClsTree[ nPos ] = uiClass;
       }
    }
+   else if ( HB_IS_HASH( pSelf ) )
+   {
+      if ( uiParams == 1 )
+      {
+         char * szIndex = hb_stackItemFromTop( -3 )->item.asSymbol.value->szName;
+         if ( *szIndex == '_' )
+         {
+            hb_hashAddChar( pSelf, szIndex + 1, hb_stackItemFromTop( -1 ) );
+         }
+      }
+      else if ( uiParams == 0)
+      {
+         char * szIndex = hb_stackItemFromTop( -2 )->item.asSymbol.value->szName;
 
-   if( pFunc )
+         ULONG ulPos;
+         if( strcmp( szIndex, "CLASSNAME" ) == 0 )
+         {
+            hb_itemPutC( &(HB_VM_STACK.Return), "HASH" );
+         }
+         else if( strcmp( szIndex, "CLASSH" ) == 0 )
+         {
+            hb_itemPutNI( &(HB_VM_STACK.Return), 0 );
+         }
+         else if( strcmp( szIndex, "KEYS" ) == 0 )
+         {
+            hb_itemForwardValue( &(HB_VM_STACK.Return), hb_hashGetKeys( pSelf ) );
+         }
+         else if( strcmp( szIndex, "VALUES" ) == 0 )
+         {
+            hb_itemForwardValue( &(HB_VM_STACK.Return), hb_hashGetValues( pSelf ) );
+         }
+         else {
+            HB_ITEM hbIndex;
+            hbIndex.type = HB_IT_NIL;
+            hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
+
+            if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
+            {
+               hb_hashGet( pSelf, ulPos, &HB_VM_STACK.Return );
+            }
+            else
+            {
+               s_hb_vmClassError( uiParams, "HASH", szIndex );
+            }
+         }
+      }
+   }
+
+   if( pFunc  )
    {
       #ifndef HB_NO_PROFILER
          if( bProfiler )
@@ -5558,7 +5630,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          hb_itemForwardValue( &(HB_VM_STACK.Return), pSelf );
       }
    }
-   else
+   else if ( ! HB_IS_HASH( pSelf ) )
    {
       char *sClass = hb_objGetClsName( pSelf );
 
@@ -5572,26 +5644,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
       else
       {
-         char sDesc[128];
-
-         if( pSym->szName[ 0 ] == '_' )
-         {
-            PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
-            //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
-            sprintf( (char *) sDesc, "Class: '%s' has no property", sClass );
-            hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, pSym->szName + 1, 1, pArgsArray );
-            hb_itemRelease( pArgsArray );
-         }
-         else
-         {
-            PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
-            //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
-            sprintf( (char *) sDesc, "Class: '%s' has no exported method", sClass );
-            hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, pSym->szName, 1, pArgsArray );
-            hb_itemRelease( pArgsArray );
-         }
+         s_hb_vmClassError( uiParams, sClass, pSym->szName );
       }
    }
 
