@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.40 2004/05/23 09:38:42 guerra000 Exp $
+ * $Id: teditor.prg,v 1.41 2004/06/04 06:10:22 guerra000 Exp $
  *
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
@@ -187,6 +187,10 @@
  * v.1.41 - 2004/06/04     Vicente Guerra <vicente@guerra.com.mx>
  *
  * Send ProcName() and ProcLine() in SETKEY() procedure calls.
+ *
+ * v.1.42 - 2004/06/04     Vicente Guerra <vicente@guerra.com.mx>
+ *
+ * Fixed typo from ::ProcName to oSelf:ProcName.
  *
  */
 
@@ -2846,7 +2850,7 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
 
       if ( bKeyBlock := Setkey( nKey ) ) <> NIL
          // Passed Self as 4th. parameter
-         Eval( bKeyBlock, ::ProcName, ::ProcLine, "", oSelf )
+         Eval( bKeyBlock, oSelf:ProcName, oSelf:ProcLine, "", oSelf )
          Loop
       endif
 
