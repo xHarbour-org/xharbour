@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.44 2003/09/09 02:07:54 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2003/09/23 21:23:56 paultucker Exp $
 #
 
 #
@@ -148,7 +148,6 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\fontsel.obj \
    $(OBJ_DIR)\framewindow.obj \
    $(OBJ_DIR)\grid.obj \
-   $(OBJ_DIR)\gridpane.obj \
    $(OBJ_DIR)\hex.obj \
    $(OBJ_DIR)\hpane.obj \
    $(OBJ_DIR)\image.obj \

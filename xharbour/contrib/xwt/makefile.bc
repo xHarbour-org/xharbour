@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.1 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.bc,v 1.2 2003/09/24 20:56:09 paultucker Exp $
 #
 
 #
@@ -141,7 +141,6 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\fontsel.obj \
    $(OBJ_DIR)\framewindow.obj \
    $(OBJ_DIR)\grid.obj \
-   $(OBJ_DIR)\gridpane.obj \
    $(OBJ_DIR)\hex.obj \
    $(OBJ_DIR)\hpane.obj \
    $(OBJ_DIR)\image.obj \
@@ -233,12 +232,6 @@ $(OBJ_DIR)\grid.c : $(SRC_DIR)\grid.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\grid.obj : $(OBJ_DIR)\grid.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\gridpane.c : $(SRC_DIR)\gridpane.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\gridpane.obj : $(OBJ_DIR)\gridpane.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hex.c : $(SRC_DIR)\hex.prg
