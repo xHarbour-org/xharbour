@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.43 2004/06/24 05:29:52 ronpinkas Exp $
+ * $Id: hbver.h,v 1.44 2004/09/22 14:50:56 ronpinkas Exp $
  */
 
 /*
@@ -62,8 +62,8 @@
           then, they should be updated by the builder. [vszakats] */
 
 
-#define HB_VER_LENTRY   "2004-09-22 07:46 UTC-0800 Ron Pinkas <ron at xharbour.com>"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.3461"
+#define HB_VER_LENTRY   "2004-09-20 11:25 UTC-0800 Ron Pinkas <ron at xharbour.com>"
+#define HB_VER_CHLCVS   "ChangeLog,v 1.3464"
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""
