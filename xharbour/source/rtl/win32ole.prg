@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.66 2005/02/20 09:45:05 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.67 2005/02/21 06:15:25 ronpinkas Exp $
  */
 
 /*
@@ -1275,10 +1275,6 @@ RETURN xRet
 
   static void OleSetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
-     BSTR wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
-     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &DispID );
-     hb_xfree( wMember );
-
      // 1 Based!!!
      if( ( s_OleRefFlags && s_OleRefFlags[ 1 ] ) || hb_param( 1, HB_IT_ARRAY ) )
      {
@@ -1360,6 +1356,7 @@ RETURN xRet
      DISPPARAMS DispParams;
 
      //TraceLog( NULL, "Class: '%s' Message: '%s' Params %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount() );
+
      hb_vmPushSymbol( s_pSym_hObj->pSymbol );
      hb_vmPush( hb_stackSelfItem() );
      hb_vmSend( 0 );
