@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1077 2003/05/28 05:42:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1078 2003/05/28 11:58:56 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-05-28 26:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Fixed minor bug in CompilDefine() which mistakenly treated parentesized expression as a Psedu-Function.
+    * Changed default action to RUN [-R] when Source File argument supplied (unless -P switch present).
+    + Added support for Linux Type Association <#!> (guarded with #ifdef __PLATFORM_Linux).
 
 2003-05-28 13:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbapicdp.h

@@ -314,7 +314,7 @@ STATIC aTransRules   := {}, aTransResults := {}
 STATIC aCommRules    := {}, aCommResults  := {}
 
 STATIC bDbgMatch := .F., bDbgExp := .F., bDbgPPO := .F., bLoadRules := .T., ;
-       bCount := .T., bCCH := .F., bCompile := .F., bStrict := .T.
+       bCount := .T., bCCH := .F., bCompile := .T., bStrict := .T.
 
 STATIC nIfDef := 0, abIfDef := {}, nIf := 0, abIf := {}
 
@@ -425,6 +425,7 @@ STATIC s_aSwitchDefs := {}
 #ifdef __CLIP__
    sIncludePath := StartPath()
    nAt := AtR( '/', sIncludePath )
+
    IF nAt <= 0
       nAt := AtR( "\", sIncludePath )
    ENDIF
@@ -432,17 +433,19 @@ STATIC s_aSwitchDefs := {}
 
    IF nAt != 0
       sIncludePath := Left( sIncludePath, nAt - 1 )
+
       IF ! ( Right( sIncludePath, 1 ) $ "\/" )
-            sIncludePath += '\'
+         sIncludePath += '\'
       ENDIF
+
       aAdd( s_asPaths, sIncludePath )
    ENDIF
 
-   IF Empty(getenv("CLIPROOT"))
-      aAdd( s_asPaths, cliproot()+"\include\" )
-   else
-      aAdd( s_asPaths, getenv("CLIPROOT")+"\include\" )
-   endif
+   IF Empty( GetEnv( "CLIPROOT" ) )
+      aAdd( s_asPaths, ClipRoot() + "\include\" )
+   ELSE
+      aAdd( s_asPaths, GetEnv( "CLIPROOT" ) + "\include\" )
+   ENDIF
 #endif
 
    IF ! Empty( sSwitch )
@@ -507,6 +510,7 @@ STATIC s_aSwitchDefs := {}
       /* Generate .pp$ pre-processed output file. */
       IF "-P" $ sSwitch
          sPPOExt := ".pp$"
+         bCompile := .F.
       ENDIF
 
       /* Run file as a script. */
@@ -532,6 +536,7 @@ STATIC s_aSwitchDefs := {}
          IF( ! sCH == "" )
             ? [Loading standard definitions from: '] + sCH + "'"
             ?
+
             CompileDefine( "__PP__" )
             #ifdef __HARBOUR__
                CompileDefine( "__HARBOUR__" )
@@ -553,12 +558,15 @@ STATIC s_aSwitchDefs := {}
    IF bLoadRules
       InitRules()
       InitResults()
+
       IF Len( aDefRules ) != Len( aDefResults )
          Alert( [#DEFINE Rules size mismatch] )
       ENDIF
+
       IF Len( aTransRules ) != Len( aTransResults )
          Alert( [#TRANSLATE Rules size mismatch] )
       ENDIF
+
       IF Len( aCommRules ) != Len( aCommResults )
          Alert( [#DEFINE Rules size mismatch] )
       ENDIF
@@ -2004,14 +2012,18 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    IF ! s_lRunLoaded
       s_lRunLoaded := .T.
+
       InitRunRules()
       InitRunResults()
+
       IF Len( aDefRules ) != Len( aDefResults )
          Alert( [Run #DEFINE Rules size mismatch] )
       ENDIF
+
       IF Len( aTransRules ) != Len( aTransResults )
          Alert( [Run #TRANSLATE Rules size mismatch] )
       ENDIF
+
       IF Len( aCommRules ) != Len( aCommResults )
          Alert( [Run #DEFINE Rules size mismatch] )
       ENDIF
@@ -2789,6 +2801,41 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       ENDIF
                    ENDDO
                 ENDIF
+
+        #ifdef __XHARBOUR__
+          #ifdef __PLATFORM__Linux
+             CASE ( nLine == 0 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
+                IF LTrim( sLine ) == ''
+                   WHILE .T.
+                      nClose := At( Chr(10), sBuffer, nPosition + 1 )
+
+                      IF nClose == 0
+                         //FSeek( hSource, -1, 1 )
+                         nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         IF nLen < 2
+                            BREAK "*"
+                         ENDIF
+                         nMaxPos   := nLen - 1
+                         nPosition := 1
+                         LOOP
+                      ELSE
+                         nClose -= nPosition
+                         nLine++
+                         IF bCount
+                            @ Row(), 0 SAY nLine
+                         ENDIF
+                         IF bBlanks
+                            FWrite( hPP, CRLF )
+                         ENDIF
+                         nPosition += ( nClose )
+                         sLine := ''
+                         cChar := ''
+                         EXIT
+                      ENDIF
+                   ENDDO
+                ENDIF
+          #endif
+        #endif
 
              CASE ( cChar == '"' )
                 WHILE .T.
@@ -7088,10 +7135,12 @@ STATIC FUNCTION CompileDefine( sRule )
    ExtractLeadingWS( @sRule )
 
    sKey := NextToken( @sRule )
-   DropTrailingWS( @sKey )
 
-//? "KEY: '" + sKey + "'"
-//? "Rest: '" + sRule + "'"
+   // TraceLog( sKey, sRule )
+   // ? "KEY: '" + sKey + "'"
+   // ? "Rest: '" + sRule + "'"
+
+   DropTrailingWS( @sKey, @sPad )
 
    IF ( nId := aScan( aDefRules, {|aDefine| aDefine[1] == sKey } ) ) > 0
       Alert( [Redefinition of ] + "'" + sKey + "'" + [ in file: ] + s_sFile )
@@ -7109,7 +7158,7 @@ STATIC FUNCTION CompileDefine( sRule )
       aAdd( aDefResults, aResult )
    ENDIF
 
-   IF Left( sRule, 1 ) == '(' .AND. ( nCloseAt := At( ')', sRule ) ) > 0
+   IF sPad == "" .AND. Left( sRule, 1 ) == '(' .AND. ( nCloseAt := At( ')', sRule ) ) > 0
 
       /*Pseudo Function. */
       sResult := SubStr( sRule, nCloseAt + 1 )
@@ -7171,7 +7220,7 @@ STATIC FUNCTION CompileDefine( sRule )
 
             aResult[1] := NIL
             aResult[2] := NIL
-            aResult[3] := NIL
+            aResult[3] := Array( Len( aMarkers ) )
 
          ELSE
 
