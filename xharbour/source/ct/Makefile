@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2004/10/23 23:29:07 oh1 Exp $
+# $Id: Makefile,v 1.8 2004/11/13 14:57:49 aleytys Exp $
 #
 
 ROOT = ../../
@@ -84,7 +84,6 @@ PRG_SOURCES= \
    invrtwin.prg \
    numconv.prg \
    screen2.prg \
-   setclear.prg \
    util.prg
 
 
