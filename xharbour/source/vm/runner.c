@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.26 2004/04/28 18:31:41 druzus Exp $
+ * $Id: runner.c,v 1.27 2004/05/09 23:40:06 druzus Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ static FHANDLE   hb_hrbFileOpen( char * szFileName );
 static void      hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount );
 static BYTE      hb_hrbFileReadByte( FHANDLE file, char * szFileName );
 static int       hb_hrbFileReadHead( FHANDLE file, char * szFileName );
-static char *    hb_hrbFileReadId( FHANDLE file, char * szFileName );
+static char *    hb_hrbFileReadId( FHANDLE file, char * szFileName, BOOL bUseFM );
 static LONG      hb_hrbFileReadLong( FHANDLE file, char * szFileName );
 static void      hb_hrbFileClose( FHANDLE file );
 
@@ -367,6 +367,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
    while ( ( file = hb_hrbFileOpen( szFileName ) ) == 0 )
    {
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
+
       if( uiAction == E_DEFAULT || uiAction == E_BREAK )
       {
          break;
@@ -395,11 +396,20 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       pHrbBody->ulSymbols = hb_hrbFileReadLong( file, szFileName );
       pHrbBody->pPrevLastModule = NULL;
 
-      pSymRead = ( PHB_SYMB ) hb_xgrab( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
+      /*
+         Intentionally using malloc() instead of hb_xgrab() to "mask" unavoidable "leak" because:
+
+         1. Symbols MUST remain for the duration of the App, or Dynamic Symbol Table will become
+            a GPF trap when attrmpting to access such no longer existing Symbol.
+
+         2. It seems that it's not worth keeping track of each unloaded module symbols, since
+            release can only take place at app termination as per #1 above.
+      */
+      pSymRead = ( PHB_SYMB ) malloc( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB     */
       {
-         pSymRead[ ul ].szName  = hb_hrbFileReadId( file, szFileName );
+         pSymRead[ ul ].szName  = hb_hrbFileReadId( file, szFileName, FALSE );
          pSymRead[ ul ].cScope  = hb_hrbFileReadByte( file, szFileName );
          pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) hb_hrbFileReadByte( file, szFileName );
          pSymRead[ ul ].pDynSym = NULL;
@@ -416,7 +426,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )         /* Read symbols in .HRB     */
       {
-         pDynFunc[ ul ].szName = hb_hrbFileReadId( file, szFileName );
+         pDynFunc[ ul ].szName = hb_hrbFileReadId( file, szFileName, TRUE );
 
          ulSize = hb_hrbFileReadLong( file, szFileName );      /* Read size of function    */
          pDynFunc[ ul ].pCode = ( BYTE * ) hb_xgrab( ulSize );
@@ -586,6 +596,8 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 
    if( pHrbBody->pPrevLastModule && pHrbBody->pPrevLastModule->pNext )
    {
+      hb_xfree( pHrbBody->pPrevLastModule->pNext->szModuleName );
+
       // Release PSYMBOLS of our module.
       hb_xfree( pHrbBody->pPrevLastModule->pNext );
 
@@ -692,17 +704,16 @@ static int hb_hrbFileReadHead( FHANDLE file, char * szFileName )
 
 /* ReadId
    Read the next (zero terminated) identifier */
-static char * hb_hrbFileReadId( FHANDLE file, char * szFileName )
+static char * hb_hrbFileReadId( FHANDLE file, char * szFileName, BOOL bUseFM )
 {
-   char * szTemp;                                /* Temporary buffer         */
+   char szTemp[256];                                /* Temporary buffer         */
    char * szIdx;
    char * szRet;
    BOOL  bCont = TRUE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadId(%p, %s)", file, szFileName));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadId(%p, %s, %i)", file, szFileName, bUseFM));
 
-   szTemp = ( char * ) hb_xgrab( 256 );
-   szIdx  = szTemp;
+   szIdx = (char *) szTemp;
 
    do
    {
@@ -719,9 +730,25 @@ static char * hb_hrbFileReadId( FHANDLE file, char * szFileName )
    }
    while( bCont );
 
-   szRet = ( char * ) hb_xgrab( szIdx - szTemp + 1 );
+   if( bUseFM )
+   {
+      szRet = ( char * ) hb_xgrab( szIdx - szTemp + 1 );
+   }
+   else
+   {
+      /*
+         Intentionally using malloc() instead of hb_xgrab() to "mask" unavoidable "leak" because:
+
+         1. Symbols MUST remain for the duration of the App, or Dynamic Symbol Table will become
+            a GPF trap when attrmpting to access such no longer existing Symbol.
+
+         2. It seems that it's not worth keeping track of each unloaded module symbols, since
+            release can only take place at app termination as per #1 above.
+      */
+      szRet = ( char * ) malloc( szIdx - szTemp + 1 );
+   }
+
    strcpy( szRet, szTemp );
-   hb_xfree( szTemp );
 
    return szRet;
 }
