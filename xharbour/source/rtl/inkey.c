@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.18 2004/01/22 23:12:42 walito Exp $
+ * $Id: inkey.c,v 1.19 2004/01/27 03:06:59 ronpinkas Exp $
  */
 
 /*
@@ -448,6 +448,14 @@ HB_FUNC( __KEYBOARD )
 
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
    hb_inkeyReset( FALSE );
+
+#if defined( HB_EXTENSION )
+   if( ISNUM( 1 ) )
+   {
+      hb_inkeyPut( hb_parni(1) );
+      return;
+   }
+#endif
 
    if( ISCHAR( 1 ) )
    {
