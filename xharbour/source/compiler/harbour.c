@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.42 2003/06/21 06:59:22 jonnymind Exp $
+ * $Id: harbour.c,v 1.43 2003/06/21 22:08:54 andijahja Exp $
  */
 
 /*
@@ -220,6 +220,13 @@ short          hb_comp_iGlobals;
  * used to suppress error report generation
  */
 static BOOL hb_comp_bExternal   = FALSE;
+
+/* Limit the warning that stop compilation into ambiguous reference only so
+   that warnings on uninitialized locals would not stop compilation when
+   exit severity is set to 2
+*/
+static BOOL hb_comp_AmbiguousVar = FALSE;
+
 /* linked list with EXTERNAL symbols declarations
  */
 static PEXTERN hb_comp_pExterns = NULL;
@@ -2859,6 +2866,7 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
     * Clipper always assumes a memvar variable if undeclared variable
     * is popped (a value is asssigned to a variable).
     */
+
    if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
       bGenCode = hb_comp_bForceMemvars;    /* harbour compatibility */
    else
@@ -2870,6 +2878,12 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
        */
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, szVarName, NULL );
 
+      /* Clipper compatibility
+         Should not compile with /es2 eventhough /v is used
+      */
+      if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+         hb_comp_AmbiguousVar = TRUE;
+
       if( bPCode == HB_P_POPVARIABLE )
          bPCode = HB_P_POPMEMVAR;
       else if( bPCode == HB_P_PUSHVARIABLE )
@@ -2878,7 +2892,10 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
          bPCode = HB_P_PUSHMEMVARREF;
    }
    else
+   {
+      hb_comp_AmbiguousVar = TRUE;
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
+   }
 
    hb_compGenVarPCode( bPCode, szVarName );
 }
@@ -4611,7 +4628,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             /* End of finalization phase. */
 
             // if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
-            if( hb_comp_iErrorCount )
+            if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
             {
                if( hb_comp_iErrorCount )
                {
