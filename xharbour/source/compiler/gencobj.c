@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.13 2002/06/05 13:14:36 horacioroldan Exp $
+ * $Id: gencobj.c,v 1.3 2002/06/05 22:38:48 horacioroldan Exp $
  */
 
 /*
@@ -40,7 +40,7 @@ static char * hb_searchpath( const char *, char *, char * );
 /*--------------------------------------------------------------------------*/
 
 /* Builds platform dependant object module from Harbour C output */
-void hb_compGenCObj( PHB_FNAME pFileName )
+void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
 {
    char szFileName[ _POSIX_PATH_MAX ];
    char szLine[ HB_CFG_LINE_LEN ];
@@ -63,7 +63,7 @@ void hb_compGenCObj( PHB_FNAME pFileName )
    /* Force file extension to avoid collisions when called from a make utility */
    pFileName->szExtension = ".c";
    hb_fsFNameMerge( szFileName, pFileName );
-   hb_compGenCCode( hb_comp_pFileName );
+   hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
 
    /* Begin second pass */
 

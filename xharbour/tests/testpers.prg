@@ -1,5 +1,5 @@
 //
-// $Id: testpers.prg,v 1.2 2002/01/26 02:03:43 ronpinkas Exp $
+// $Id: testpers.prg,v 1.3 2003/05/23 03:27:09 ronpinkas Exp $
 //
 // Class HBPersistent test
 
@@ -12,7 +12,7 @@ PROCEDURE Main()
 
    oTest:One   = "hello"
    oTest:Two   = 123
-   oTest:Three = {|| oTest }
+   oTest:Three = { 1, 2, { 10, 20, 30 }, 3 }
    oTest:Four  = oTest2   // We store another persistent object here
 
    oTest2:Five = "some more text"

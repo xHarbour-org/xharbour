@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.9 2002/12/19 18:15:36 ronpinkas Exp $
+ * $Id: runner.c,v 1.10 2003/05/09 02:53:00 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,7 @@ typedef struct _SYMBOLS
    USHORT   uiModuleSymbols; /* number of symbols on that table */
    struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
    HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
+   char * szModuleName;
 } SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
@@ -509,7 +510,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
    pHrbBody->pPrevLastModule = hb_vmLastModule();
 
-   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, __FILE__, (int) HB_PCODE_VER );
+   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER );
 
    return pHrbBody;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.18 2003/03/07 03:04:46 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.19 2003/03/19 08:50:11 ronpinkas Exp $
  */
 
 /*
@@ -156,9 +156,12 @@ STATIC FUNCTION DefError( oError )
      Endif
 
      ? cMessage
-     n := 2
+
+     ?
+     ? "Error at:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
+     n := 3
      WHILE ( ! Empty(ProcName( n ) ) )
-       ? "Called from", Trim( ProcName( n ) ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  "
+       ? "Called from:", Trim( ProcName( n ) ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  "
        n++
      END
 
@@ -319,11 +322,15 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, " Involved File: " + oErr:filename() )
         FWriteLine( nHandle, "Dos Error Code: " + strvalue( oErr:oscode() ) )
         FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, " Trace Through" )
-        nCount := 2
+        FWriteLine( nHandle, " Trace Through:" )
+        FWriteLine( nHandle, "---------------" )
+
+        FWriteLine( nHandle, Padr( oErr:ProcName, 21 ) + ": " + Transform( oErr:ProcLine, "999,999" ) + " - in Module: " + oErr:ModuleName )
+        nCount := 3
         While !Empty( Procname( ++ nCount ) )
-          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Padr( Procline( nCount ), 20 ) )
+          FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Transform( Procline( nCount ), "999,999" ) )
         Enddo
+
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
 

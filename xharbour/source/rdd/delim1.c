@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
+ * $Id: delim1.c,v 1.2 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -56,6 +56,8 @@
 #include "hbapirdd.h"
 #include "hbapiitm.h"
 #include "hbrdddel.h"
+
+#define __PRG_SOURCE__ __FILE__
 
 HB_FUNC( _DELIMC );
 HB_FUNC( DELIM_GETFUNCTABLE );

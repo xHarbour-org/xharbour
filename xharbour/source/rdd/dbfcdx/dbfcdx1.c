@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.40 2003/02/14 10:58:07 paultucker Exp $
+ * $Id: dbfcdx1.c,v 1.41 2003/02/28 10:01:40 mlombardo Exp $
  */
 
 /*
@@ -118,6 +118,8 @@ hb_cdxEvalKey
 #include "dbfcdx1.h"
 #include "hbrddcdx.h"
 #include "dbfcdx2.h"
+
+#define __PRG_SOURCE__ __FILE__
 
 extern HB_FUNC( _DBFCDX );
 extern HB_FUNC( DBFCDX_GETFUNCTABLE );

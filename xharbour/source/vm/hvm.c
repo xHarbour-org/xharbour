@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.196 2003/05/16 19:52:12 druzus Exp $
+ * $Id: hvm.c,v 1.197 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -113,6 +113,7 @@ typedef struct _SYMBOLS
    USHORT   uiModuleSymbols; /* number of symbols on that table */
    struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
    HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
+   char * szModuleName;
 } SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
 
 extern HB_FUNC( SYSINIT );
@@ -226,6 +227,8 @@ BOOL hb_bProfiler = FALSE; /* profiler status is off */
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
 ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
 ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
+
+PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
 
 /* virtual machine state */
 
@@ -347,7 +350,6 @@ void hb_vmDoInitRdd( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
       APIRET rc = NO_ERROR;                           /* Return code                   */
@@ -640,6 +642,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
+
+   HB_VM_STACK.pModuleSymbols = pSymbols;
 
    /* NOTE: if pSymbols == NULL then hb_vmExecute is called from macro
     * evaluation. In this case all PRIVATE variables created during
@@ -6224,12 +6228,14 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
 
    va_start( ap, pModuleSymbols );
+
       uiModuleSymbols = (USHORT) va_arg( ap, int );
       sModule = va_arg( ap, char * );
 
       if( sModule )
       {
          iLen = strlen( sModule );
+
          if( ( iLen > 2 && sModule[ iLen - 2 ] == '.' ) || ( iLen > 3 && sModule[ iLen - 3 ] == '.' ) || ( iLen > 4 && sModule[ iLen - 4 ] == '.' ) )
          {
             iPCodeVer = va_arg( ap, int );
@@ -6275,6 +6281,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
             sprintf( sModule, "Program with 1st sym: %s", pModuleSymbols[0].szName );
          }
       }
+
    va_end( ap );
 
    if( iPCodeVer != HB_PCODE_VER )
@@ -6286,19 +6293,25 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
       hb_errInternal( HB_EI_ERRUNRECOV, sTemp, NULL, NULL );
    }
 
-   if( bFree )
-   {
-      hb_xfree( sModule );
-   }
-
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
    pNewSymbols->pModuleSymbols = pModuleSymbols;
    pNewSymbols->uiModuleSymbols = uiModuleSymbols;
    pNewSymbols->pNext = NULL;
    pNewSymbols->hScope = 0;
 
+   if( bFree )
+   {
+      pNewSymbols->szModuleName = sModule;
+   }
+   else
+   {
+      pNewSymbols->szModuleName = hb_strdup( sModule );
+   }
+
    if( s_pSymbols == NULL )
+   {
       s_pSymbols = pNewSymbols;
+   }
    else
    {
       PSYMBOLS pLastSymbols;
@@ -6481,6 +6494,65 @@ static void hb_vmDoInitFunctions( void )
    } while( pLastSymbols );
 }
 
+PSYMBOLS hb_vmFindModule( PHB_SYMB pSymbols )
+{
+   PSYMBOLS pLastSymbols = s_pSymbols;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModule(%p)", pModuleSymbols));
+
+   do
+   {
+      TraceLog( NULL, "%p, %p\n", pLastSymbols->pModuleSymbols, pSymbols );
+
+      if( pLastSymbols->pModuleSymbols == pSymbols )
+      {
+         return pLastSymbols;
+      }
+
+      pLastSymbols = pLastSymbols->pNext;
+
+   } while( pLastSymbols );
+
+   return NULL;
+}
+
+PSYMBOLS hb_vmFindModuleByName( char *szModuleName )
+{
+   PSYMBOLS pLastSymbols = s_pSymbols;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModule(%p)", pModuleSymbols));
+
+   do
+   {
+      if( strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
+      {
+         return pLastSymbols;
+      }
+
+      pLastSymbols = pLastSymbols->pNext;
+
+   } while( pLastSymbols );
+
+   return NULL;
+}
+
+
+char * hb_vmGetModuleName( void )
+{
+   HB_THREAD_STUB
+
+   PSYMBOLS pModuleSymbols = hb_vmFindModule( HB_VM_STACK.pModuleSymbols );
+
+   if( pModuleSymbols )
+   {
+      return pModuleSymbols->szModuleName;
+   }
+   else
+   {
+      return "";
+   }
+}
+
 /* NOTE: We should make sure that these get linked.
          Don't make this function static, because it's not called from
          this file. [vszakats] */
@@ -6572,19 +6644,12 @@ void hb_vmRequestCancel( void )
       while ( buffer[0] )
       {
          i2 = i;
-         hb_procinfo( i++, buffer, NULL );
+         hb_procinfo( i++, buffer, &ulLine );
 
          if( buffer[0] == 0 )
+         {
             break;
-
-         pBase = HB_VM_STACK.pBase;
-         while( ( i2-- > 0 ) && pBase != HB_VM_STACK.pItems )
-            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-         if( i2 == -1 )
-            ulLine = ( *pBase )->item.asSymbol.lineno;
-         else
-            ulLine = 0;
+         }
 
          i2 = strlen( (char *) buffer );
          sprintf( buffer + i2, " (%lu)", ulLine );

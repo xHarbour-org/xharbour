@@ -1,12 +1,12 @@
 /*
- * $Id: terror.prg,v 1.6 2003/05/14 08:44:24 jonnymind Exp $
+ * $Id: cdpruwin.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * Error Class
+ * National Collation Support Module (RUWIN)
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
+ * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,77 +50,24 @@
  *
  */
 
-/* Error Class. We are keeping Clipper compatibility here, instead of using
-   TError():New() style and also avoiding hungarian notation. */
+/* Language name: Russian */
+/* ISO language code (2 chars): RU */
+/* Codepage: Windows-1251 */
 
-#include "error.ch"
+#include <ctype.h>
+#include "hbapi.h"
+#include "hbapicdp.h"
 
-static s_aErrHandlers := {}
+static HB_CODEPAGE s_codepage = { "RU1251",32,
+    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß","àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
+    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
+HB_CODEPAGE_ANNOUNCE( RU1251 );
 
-   STATIC s_oClass
-   LOCAL oErr
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU1251 )
+   hb_cdpRegister( &s_codepage );
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU1251 )
+#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+   #pragma startup hb_codepage_Init_RU1251
+#endif
 
-   IF s_oClass == NIL
-      s_oClass := HBClass():New( "ERROR" )
-
-      s_oClass:AddData( "Args"         ,  )
-      s_oClass:AddData( "CanDefault"   , .F. )
-      s_oClass:AddData( "CanRetry"     , .F. )
-      s_oClass:AddData( "CanSubstitute", .F. )
-      s_oClass:AddData( "Cargo" )
-      s_oClass:AddData( "Description"  , "" )
-      s_oClass:AddData( "FileName"     , "" )
-      s_oClass:AddData( "GenCode"      , 0 )
-      s_oClass:AddData( "Operation"    , "" )
-      s_oClass:AddData( "OsCode"       , 0 )
-      s_oClass:AddData( "Severity"     , ES_ERROR )
-      s_oClass:AddData( "SubCode"      , 0 )
-      s_oClass:AddData( "SubSystem"    , "" )
-      s_oClass:AddData( "Tries"        , 0 )
-
-      s_oClass:AddData( "ProcName"     , Procname(1) )
-      s_oClass:AddData( "ProcLine"     , Procline(1) )
-
-      s_oClass:AddData( "ModuleName"   , "" )
-
-      s_oClass:Create()
-   ENDIF
-
-   oErr := s_oClass:Instance()
-
-   IF SubSystem != NIL
-      oErr:SubSystem := SubSystem
-   ENDIF
-   IF SubCode != NIL
-      oErr:SubCode := SubCode
-   ENDIF
-   IF Operation != NIL
-      oErr:Operation := Operation
-   ENDIF
-   IF Description != NIL
-      oErr:Description := Description
-   ENDIF
-   IF Args != NIL
-      oErr:Args := Args
-   ENDIF
-
-RETURN oErr
-
-PROCEDURE HB_SetTry()
-
-   aAdd( s_aErrHandlers, ErrorBlock( {|e| Break(e) } ) )
-
-RETURN
-
-PROCEDURE HB_ResetTry()
-
-   ErrorBlock( s_aErrHandlers[-1] )
-   aSize( s_aErrHandlers, Len( s_aErrHandlers ) - 1 )
-
-RETURN
-
-FUNCTION Throw( oErr )
-
-RETURN Eval( ErrorBlock(), oErr )

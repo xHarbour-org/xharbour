@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.5 2003/05/14 08:44:24 jonnymind Exp $
+ * $Id: errorapi.c,v 1.6 2003/05/14 10:03:57 jonnymind Exp $
  */
 
 /*
@@ -100,6 +100,8 @@ static USHORT  s_uiErrorDOS = 0; /* The value of DOSERROR() */
 
 extern HB_FUNC( ERRORNEW );
 
+PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName );
+
 /* NOTE: This is called via its symbol name, so we should make sure
          that it gets linked. WARNING ! DON'T make this function static.
          [vszakats] */
@@ -186,19 +188,22 @@ void HB_EXPORT hb_errExit( void )
 
 PHB_ITEM HB_EXPORT hb_errNew( void )
 {
-   PHB_ITEM pReturn;
+   PHB_ITEM pError;
+   char *szModuleName = hb_vmGetModuleName();
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
-   pReturn = hb_itemNew( NULL );
+   pError = hb_itemNew( NULL );
 
    hb_vmPushSymbol( hb_dynsymGet( "ERRORNEW" )->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
 
-   hb_itemForwardValue( pReturn, &(HB_VM_STACK.Return) );
+   hb_itemForwardValue( pError, &(HB_VM_STACK.Return) );
 
-   return pReturn;
+   hb_errPutModuleName( pError, szModuleName );
+
+   return pError;
 }
 
 USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
@@ -651,6 +656,17 @@ PHB_ITEM HB_EXPORT hb_errPutProcLine( PHB_ITEM pError, USHORT uiLine )
    return pError;
 }
 
+PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutModuleName(%p, %s)", pError, szModuleName));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_MODULENAME" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushString( szModuleName, strlen( szModuleName ) );
+   hb_vmSend( 1 );
+
+   return pError;
+}
 
 USHORT HB_EXPORT hb_errGetTries( PHB_ITEM pError )
 {
@@ -795,8 +811,7 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, NULL ) );
-   hb_procinfo( 0, NULL, &uLine );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
    hb_errPutProcLine( pError, uLine );
 
    return pError;
@@ -825,8 +840,7 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags | EF_CANSUBSTITUTE );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, NULL ) );
-   hb_procinfo( 0, NULL, &uLine );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
    hb_errPutProcLine( pError, uLine );
 
    return( pError );

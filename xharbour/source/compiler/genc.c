@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.37 2003/04/12 22:28:36 andijahja Exp $
+ * $Id: genc.c,v 1.38 2003/05/13 19:15:18 ronpinkas Exp $
  */
 
 /*
@@ -47,9 +47,10 @@ typedef struct HB_stru_genc_info
 typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
-void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language output */
+void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
+   char szSourceName[ _POSIX_PATH_MAX ];
    char *pszFileName;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
@@ -74,6 +75,10 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    }
 
    hb_fsFNameMerge( szFileName, pFileName );
+
+   pFileName->szExtension = szSourceExtension;
+   hb_fsFNameMerge( szSourceName, pFileName );
+
    hb_strupr( pFileName->szName );
 
    yyc = fopen( szFileName, "wb" );
@@ -90,7 +95,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    }
 
    fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n", HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   fprintf( yyc, " * Generated C source code\n */\n\n" );
+   fprintf( yyc, " * Generated C source code from <%s>\n */\n\n", szSourceName );
 
    if( hb_comp_iFunctionCnt )
    {
@@ -102,6 +107,8 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       }
 
       fprintf( yyc, "#include \"hbinit.h\"\n\n" );
+
+      fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", szSourceName );
 
       if( ! hb_comp_bStartProc )
       {
@@ -124,22 +131,34 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsPublicFunction )
+         {
             fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
+         }
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
+         {
             fprintf( yyc, "\nstatic HARBOUR hb_INITSTATICS( void );\n\n" ); /* NOTE: hb_ intentionally in lower case */
+         }
          /* Is it a GLOBAL$ */
          else if ( bIsGlobalVariable )
+         {
             fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+         }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
+         {
             fprintf( yyc, "HB_FUNC_INIT( %s );\n", pFunc->szName );
+         }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
+         {
             fprintf( yyc, "HB_FUNC_EXIT( %s );\n", pFunc->szName );
+         }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
+         {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
+         }
 
          pFunc = pFunc->pNext;
       }

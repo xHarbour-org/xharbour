@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.23 2003/04/21 18:04:12 walito Exp $
+ * $Id: dbf1.c,v 1.24 2003/05/01 14:25:21 lculik Exp $
  */
 
 /*
@@ -64,6 +64,8 @@
 #include "error.ch"
 
 #include <errno.h>
+
+#define __PRG_SOURCE__ __FILE__
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
 #define HB_MAX_DOUBLE_LENGTH 320

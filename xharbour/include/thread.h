@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.44 2003/04/25 23:02:48 jonnymind Exp $
+* $Id: thread.h,v 1.45 2003/05/16 19:52:06 druzus Exp $
 */
 
 /*
@@ -286,6 +286,7 @@ typedef struct tag_HB_STACK
    PHB_ITEM * pEvalBase;    /* stack frame position for the evaluated codeblock */
    int      iStatics;     /* statics base for the current function call */
    char     szDate[ 9 ];  /* last returned date from _pards() yyyymmdd format */
+   PHB_SYMB pModuleSymbols;
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */

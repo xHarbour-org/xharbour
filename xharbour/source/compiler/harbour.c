@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.35 2003/03/22 00:08:04 ronpinkas Exp $
+ * $Id: harbour.c,v 1.36 2003/04/29 23:55:40 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@
 #endif
 
 static void hb_compInitVars( void );
-static void hb_compGenOutput( int );
+static void hb_compGenOutput( int, char *szSourceExtension );
 static void hb_compOutputFile( void );
 
 int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
@@ -4326,13 +4326,13 @@ static void hb_compInitVars( void )
    hb_comp_pEnum          = NULL;
 }
 
-static void hb_compGenOutput( int iLanguage )
+static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
 {
 
    switch( iLanguage )
    {
       case LANG_C:
-         hb_compGenCCode( hb_comp_pFileName );
+         hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
          break;
 
       case LANG_OBJ32:
@@ -4348,7 +4348,7 @@ static void hb_compGenOutput( int iLanguage )
          break;
 
       case LANG_OBJ_MODULE:
-         hb_compGenCObj( hb_comp_pFileName );
+         hb_compGenCObj( hb_comp_pFileName, szSourceExtension );
          break;
    }
 }
@@ -4362,13 +4362,18 @@ static void hb_compOutputFile( void )
    if( hb_comp_pOutPath )
    {
       if( hb_comp_pOutPath->szPath )
+      {
          hb_comp_pFileName->szPath = hb_comp_pOutPath->szPath;
+      }
 
       if( hb_comp_pOutPath->szName )
       {
          hb_comp_pFileName->szName = hb_comp_pOutPath->szName;
+
          if( hb_comp_pOutPath->szExtension )
+         {
             hb_comp_pFileName->szExtension = hb_comp_pOutPath->szExtension;
+         }
       }
    }
 }
@@ -4384,9 +4389,14 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    {
       char szFileName[ _POSIX_PATH_MAX ];    /* filename to parse */
       char szPpoName[ _POSIX_PATH_MAX ];
+      char *szSourceExtension;
 
       if( !hb_comp_pFileName->szExtension )
+      {
          hb_comp_pFileName->szExtension = ".prg";
+      }
+
+      szSourceExtension = hb_comp_pFileName->szExtension;
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
@@ -4530,7 +4540,9 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             }
 
             if( hb_comp_szAnnounce )
+            {
                hb_compAnnounce( hb_comp_szAnnounce );
+            }
 
             /* End of finalization phase. */
 
@@ -4557,15 +4569,18 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
             {
                PFUNCTION pFunc;
-               char * szFirstFunction = NULL;
+               char *szFirstFunction = NULL;
 
                /* we create the output file name */
                hb_compOutputFile();
 
                if( ! hb_comp_bStartProc )
+               {
                   --hb_comp_iFunctionCnt;
+               }
 
                pFunc = hb_comp_functions.pFirst;
+
                while( pFunc )
                {
                   hb_compOptimizeFrames( pFunc );
@@ -4589,14 +4604,17 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                         pSym->cScope |= HB_FS_FIRST;
                         break;
                      }
+
                      pSym = pSym->pNext;
                   }
                }
 
                if( ! hb_comp_bQuiet )
+               {
                   printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
+               }
 
-               hb_compGenOutput( hb_comp_iLanguage );
+               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
             }
          }
          else

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.38 2003/05/01 14:25:22 lculik Exp $
+ * $Id: dbfntx1.c,v 1.39 2003/05/08 10:45:20 lculik Exp $
  */
 
 /*
@@ -128,8 +128,9 @@
 #include "hbapilng.h"
 #include "hbrddntx.h"
 
-extern USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
+#define __PRG_SOURCE__ __FILE__
 
+extern USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
 
 HB_FUNC( _DBFNTX );
 HB_FUNC( DBFNTX_GETFUNCTABLE );

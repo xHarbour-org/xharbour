@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1042 2003/05/23 09:17:24 iananderson Exp $
+ * $Id: ChangeLog,v 1.1043 2003/05/23 09:46:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,63 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-23 17:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/gencobj.c
+  * source/compiler/genc.c
+    + Added 2nd param char * szSourceExtension to hb_compGenCCode() and hb_compGenCObj()
+
+  * source/compiler/genc.c
+    + Added generation of #define __PRG_SOURCE__ <sourcename>
+
+  * include/hbinit.h
+    * Modified the HB_INIT_SYMBOLS macro to pass __PRG_SOURCE__ instead of __FILE__ to hb_vmProcessSymbols()
+
+  * source/vm/runner.c
+    * Modified call to hb_vmProcessSymbols() to pass the source hrb file name.
+
+  * include/hbsetup.h
+    * Increased HB_PCODE_VER to 5
+
+  * include/hbstack.h
+  * include/thread.h
+    + Added memebr PHB_SYMB pModuleSymbols to HB_STACK structure
+
+  * source/vm/hvm.c
+  * include/hbvm.h
+    + Added new char * hb_vmGetModuleName( void )
+
+  * source/vm/hvm.c
+    * Added logic to set HB_VM_STACK.pModuleSymbols with passed pSymbols in hb_vmExecute()
+
+  * source/compiler/harbour.c
+    * Added 2nd paramater char *szSourceExtension to hb_compGenOutput()
+    + Added logic to retain source file extension, and pass it as 2nd paramater to hb_compGenOutput()
+      which then forwards it to hb_compGenCCode() and hb_compGenCObj()
+
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    + Added #define __PRG_SOURCE__ __FILE__
+
+  * source/rtl/terror.prg
+    + Added property ModuleName to CLASS TError
+
+  * source/vm/errorapi.c
+    + Added new PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName );
+    + Added logic to set the ModuleName property of an Error Object to hb_errNew()
+
+  * source/rtl/errorsys.prg
+    + Modified the Stack Trace to report Module Name.
+
+  * tests/testpers.prg
+    * Modified to include Array property.
+
+  + source/codepage/cdpsrwin.c
+    + Added copy of cdpruwin.c until the correct file is uploaded so avoit error from make process.
 
 2003-05-23 06:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   *contrib/rdd_ads/ads1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.5 2003/03/14 20:35:24 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.6 2003/03/14 22:23:29 ronpinkas Exp $
  */
 
 /*
@@ -106,6 +106,8 @@ extern void    hb_vmPushString( char * szText, ULONG length );  /* pushes a stri
 extern void    hb_vmPushDate( long lDate );   /* pushes a long date onto the stack */
 extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
 extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
+
+extern char * hb_vmGetModuleName( void );
 
 #if defined(HB_EXTERN_C)
 }
