@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.49 2003/03/14 00:32:40 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.50 2003/03/27 07:44:55 ronpinkas Exp $
  */
 
 /*
@@ -581,8 +581,11 @@ static HB_EXPR_FUNC( hb_compExprUseArray )
                {
                   if( pElem->ExprType == HB_ET_MACRO )
                   {
-                      pElem->value.asMacro.SubType |= HB_ET_MACRO_LIST;
-                      bMacroList = TRUE;
+                     if( pElem->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
+                     {
+                        pElem->value.asMacro.SubType |= HB_ET_MACRO_LIST;
+                        bMacroList = TRUE;
+                     }
                   }
                   pElem = pElem->pNext;
                }
@@ -1983,8 +1986,14 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
       case HB_EA_DELETE:
          if( pSelf->value.asFunCall.pParms )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+         }
+
+         if( pSelf->value.asFunCall.pFunName )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+         }
          break;
    }
    return pSelf;
@@ -2132,11 +2141,18 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
          break;
 
       case HB_EA_DELETE:
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pAlias );
-          /* NOTE: variable name is released only during macro compilation */
+
+         if( pSelf->value.asAlias.pAlias )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pAlias );
+         }
+
+         /* NOTE: variable name is released only during macro compilation */
 #if defined( HB_MACRO_SUPPORT )
          if( pSelf->value.asAlias.pVar )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pVar );
+         }
 #endif
          break;
    }

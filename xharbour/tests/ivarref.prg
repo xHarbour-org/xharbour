@@ -2,20 +2,20 @@
 
 PROCEDURE Main()
 
-   LOCAL o := TMyClass(), e, NonObject
+   LOCAL o := TMyClass(), e, NonObject, aVar, xByRef
 
-   Test( @( o:Var ) )
-   Test( @( o:ClassVar ) )
-   Test( @( o:SharedClassVar ) )
+   Test( @o:Var )
+   Test( @o:ClassVar )
+   Test( @o:SharedClassVar )
 
    TRY
-      Test( @( o:NonInstance ) )
+      Test( @o:NonInstance )
    CATCH e
       ? "Caught:", e:Description
    END
 
    TRY
-      Test( @( NonObject:SharedClassVar ) )
+      Test( @NonObject:SharedClassVar )
    CATCH e
       ? "Caught:", e:Description
    END
@@ -25,13 +25,16 @@ PROCEDURE Main()
    ? o:SharedClassVar
    ?
 
-   o:Var := ProcLine()
-   o:ClassVar := ProcLine()
-   o:SharedClassVar := ProcLine()
+   aVar := { @o:Var, @o:ClassVar, @o:SharedClassVar }
+
+   FOR EACH xByRef IN aVar
+      xByRef := "Changed in " + ProcName() + '[' + Str( HB_EnumIndex(), 1 ) + ']'
+   NEXT
 
    ? o:Var
    ? o:ClassVar
    ? o:SharedClassVar
+   ?
 
 RETURN
 

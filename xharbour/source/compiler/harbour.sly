@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.39 2003/03/14 00:32:40 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.40 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -788,27 +788,62 @@ FunCall    : IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExpr
            | IIFInline                 { $$ = $1; }
            ;
 
-ArgList    : Argument                     { $$ = hb_compExprNewArgList( $1 ); }
-           | ArgList ',' Argument         { $$ = hb_compExprAddListExpr( $1, $3 ); }
+ArgList    : Argument                  { $$ = hb_compExprNewArgList( $1 ); }
+           | ArgList ',' Argument      { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
 
-Argument   : EmptyExpression                    { $$ = $1; }
-           | '@' IdentName                      { $$ = hb_compExprNewVarRef( $2 ); }
-           | '@' '(' ObjectData ')'             { $$ = $3; $$->value.asMessage.bByRef = TRUE; }
-           | '@' IdentName ALIASOP IdentName    {
-                                                  if( ( $2[ 0 ] == 'M' && $2[ 1 ] == '\0' ) || strncmp( $2, "MEMVAR", 4 > strlen($2) ? 4 : strlen( $2) ) == 0 )
-                                                  {
-                                                     $$ = hb_compExprNewMemVarRef( $4 );
-                                                  }
-                                                  else
-                                                  {
-                                                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, $4, NULL );
-                                                     $$ = hb_compExprNewMemVarRef( $4 );
-                                                  }
-                                                }
-           | '@' MACROVAR                       { $$ = hb_compExprNewMacro( NULL, '&', $2 ); $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF; }
-           | '@' MACROTEXT                      { $$ = hb_compExprNewMacro( NULL, 0, $2 ); $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF; }
-           | '@' IdentName '(' DummyArgList ')' { $$ = hb_compExprNewFunRef( $2 ); }
+Argument   :  EmptyExpression          { $$ = $1; }
+           | '@' Expression            {
+                                          switch( $2->ExprType )
+                                          {
+                                             case HB_ET_VARIABLE:
+                                               $$ = $2;
+                                               $$->ExprType = HB_ET_VARREF;
+                                               $$->ValType = HB_EV_VARREF;
+                                               break;
+
+                                             case HB_ET_ALIASVAR:
+                                             {
+                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol;
+
+                                               if( strcmp( szAlias, "M" ) == 0 || strncmp( szAlias, "MEMVAR", 4 > strlen( szAlias ) ? 4 : strlen( szAlias ) ) == 0 )
+                                               {
+                                                  $$ = $2->value.asAlias.pVar;
+
+                                                  $2->value.asAlias.pAlias = NULL;
+                                                  hb_compExprDelete( $2 );
+
+                                                  $$->ExprType = HB_ET_MEMVARREF;
+                                                  $$->ValType = HB_EV_VARREF;
+                                               }
+                                               break;
+                                             }
+
+                                             case HB_ET_FUNCALL:
+                                                $$ = $2->value.asFunCall.pFunName;
+
+                                                $2->value.asFunCall.pFunName = NULL;
+                                                hb_compExprDelete( $2 );
+
+                                                $$->ExprType = HB_ET_FUNREF;
+                                                $$->ValType = HB_EV_FUNREF;
+                                                break;
+
+                                             case HB_ET_SEND:
+                                               $$ = $2;
+                                               $$->value.asMessage.bByRef = TRUE;
+                                               break;
+
+                                             case HB_ET_MACRO:
+                                               $$ = $2;
+                                               $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF;
+                                               break;
+
+                                             default:
+                                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( $2 ), NULL );
+                                               $$ = $2;
+                                          }
+                                       }
            ;
 
 DummyArgList : DummyArgument                  {}

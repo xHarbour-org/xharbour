@@ -2,14 +2,18 @@
 
 PROCEDURE Main()
 
-   LOCAL cMacro := "cVar"
-   MEMVAR cVar
+   LOCAL cMacro := "cVar", aVar, xByRef
+   MEMVAR cVar1
 
-   PRIVATE cVar := "OOps!"
+   PRIVATE cVar1 := "OOps!"
+   Test( @&cMacro.1 )
+   ? cVar1
 
-   Test( @&cMacro )
-
-   ? cVar
+   cVar1 := "Oops!"
+   // Macro Refernce may be embeded in Arrays.
+   aVar := { @&( cMacro + "1" ) } // Macro Expressions supported too.
+   aVar[1] := "Again :-)"
+   ? cVar1
 
 RETURN
 
