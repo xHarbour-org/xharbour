@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.23 2004/03/10 10:02:28 vouchcac Exp $
+/* $Id: teditor.prg,v 1.24 2004/03/24 02:55:38 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -790,7 +790,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
    //  [ ::lDirty := .T. ] marks memoedit() return as "file change made."
 
    if ! ::lEditAllow
-      tracelog( nPassedKey )
       BrowseText( Self,nPassedKey )
 
    else
