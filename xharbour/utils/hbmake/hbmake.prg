@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.25 2002/06/22 02:27:14 lculik Exp $
+ * $Id: hbmake.prg,v 1.26 2002/06/29 03:02:19 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -852,11 +852,11 @@ FUNCTION Compfiles()
 
                 IF lGcc
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" .or. x[ 1 ] == ".cpp.o:"} )
 
                 ELSE
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" .or. x[ 1 ] == ".cpp.obj:" } )
 
                 ENDIF
 
@@ -932,11 +932,11 @@ FUNCTION Compfiles()
 
                 IF lGcc
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" .or. x[ 1 ] == ".cpp.o:" } )
 
                 ELSE
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" .or. x[ 1 ] == ".cpp.obj:"} )
 
                 ENDIF
 
@@ -1188,6 +1188,7 @@ FUNC crtmakfile( cFile )
     LOCAL nLenaSrc     := Len( asrc )
     LOCAL nLenaOut
     LOCAL lFwh         := .f.
+    LOCAL lxFwh         := .f.
     LOCAL lCw          := .f.
     LOCAL lMiniGui     := .f.
     LOCAL lRddAds      := .f.
@@ -1275,7 +1276,8 @@ FUNC crtmakfile( cFile )
     @  9, 40 GET lCompMod checkbox caption aLangMessages[ 37 ] 
     @ 10,  1 SAY aLangMessages[ 38 ]   GET cUserDef     PICT "@s15"
     @ 10, 40 SAY aLangMessages[ 39 ]  GET cUserInclude PICT "@s15"
-    @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ] 
+    @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ]
+    @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"
     @ 12,  1 Say "Resource file Name" Get CResName 
     READ
 
@@ -1381,7 +1383,7 @@ FUNC crtmakfile( cFile )
 
     IF lBcc
 
-        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $*" } )
+        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**" } )
         Aadd( aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
         IF lExtended
@@ -1400,7 +1402,7 @@ FUNC crtmakfile( cFile )
 
         IF At( "linux", Getenv( "HB_ARCHITECTURE" ) ) > 0 .or. cOs == "Linux"
 
-            Aadd( aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $*" } )
+            Aadd( aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
             Aadd( aCommands, { ".c.o:", "gcc -I$(HB_INC_INSTALL) $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
             IF lExtended
@@ -1415,7 +1417,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Aadd( aCommands, { ".cpp.o:", "$(BCB)\bin\gcc $(CFLAG1) $(CFLAG2) -o$* $*" } )
+            Aadd( aCommands, { ".cpp.o:", "$(BCB)\bin\gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
             Aadd( aCommands, { ".c.o:", "$(BCB)\bin\gcc -I$(BHC)/include $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
             IF lExtended
@@ -1432,7 +1434,7 @@ FUNC crtmakfile( cFile )
 
     ELSEIF lVcc
 
-        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\bin\cl $(CFLAG1) $(CFLAG2) -Fo$* $*" } )
+        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\bin\cl $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
         Aadd( aCommands, { ".c.obj:", "$(BCB)\bin\cl -I$(BHC)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
         IF lExtended
@@ -1818,7 +1820,15 @@ FUNC crtmakfile( cFile )
 
         IF lFwh
 
-            Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
+            if lXfwh
+
+               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
+
+            ELSE
+
+               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
+
+            Endif
 
         ELSEIF lMiniGui
 
@@ -1880,7 +1890,7 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "LINKER = link" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ = " + If( lCw, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES)" + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
 
     ELSEIF lGcc
@@ -1893,7 +1903,7 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "LINKER = gcc" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ = $(OBJFILES) " + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES) " + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN) " + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) " + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
 
@@ -2033,11 +2043,11 @@ FUNCTION CompUpdatedfiles()
 
                 IF lGcc
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.o:" .or. x[ 1 ] == ".cpp.o:"} )
 
                 ELSE
 
-                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" } )
+                    nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" .or. x[ 1 ] == ".cpp.obj:"} )
 
                 ENDIF
 
@@ -2090,7 +2100,7 @@ FUNCTION CompUpdatedfiles()
 
             IF cOrder == "$(CFILES)"
 
-                nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" } )
+                nPos := Ascan( aCommands, { | x | x[ 1 ] == ".c.obj:" .or. x[ 1 ] == ".cpp.obj:" } )
 
                 IF nPos > 0
 
@@ -2456,7 +2466,7 @@ FUNC crtlibmakfile( cFile )
 
     IF lBcc
 
-        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $*" } )
+        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**" } )
         Aadd( aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
         IF lextended
@@ -2475,7 +2485,7 @@ FUNC crtlibmakfile( cFile )
 
         IF At( "linux", Getenv( "HB_ARCHITECTURE" ) ) > 0 .or. cOs == "Linux"
 
-            Aadd( aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $*" } )
+            Aadd( aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
             Aadd( aCommands, { ".c.o:", "gcc -I$(HB_INC_INSTALL) $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
             IF lextended
@@ -2490,7 +2500,7 @@ FUNC crtlibmakfile( cFile )
 
         ELSE
 
-            Aadd( aCommands, { ".cpp.o:", "$(BCB)\bin\gcc $(CFLAG1) $(CFLAG2) -o$* $*" } )
+            Aadd( aCommands, { ".cpp.o:", "$(BCB)\bin\gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
             Aadd( aCommands, { ".c.o:", "$(BCB)\bin\gcc -I$(BHC)/include $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
             IF lextended
@@ -2507,7 +2517,7 @@ FUNC crtlibmakfile( cFile )
 
     ELSEIF lVcc
 
-        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\bin\cl $(CFLAG1) $(CFLAG2) -Fo$* $*" } )
+        Aadd( aCommands, { ".cpp.obj:", "$(BCB)\bin\cl $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
         Aadd( aCommands, { ".c.obj:", "$(BCB)\bin\cl -I$(BHC)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
         IF lextended
@@ -2543,7 +2553,7 @@ FUNC crtlibmakfile( cFile )
     nLenaOut := Len( aOut )
 
     Aeval( aout, { | x, y | aout[ y ] := Trim( Substr( aOut[ y ], 1, At( ' ', aout[ y ] ) ) ) } )
-    Aeval( aout, { | xItem | If( At( '.c', xItem ) > 0 .or. At( '.C', xItem ) > 0, Aadd( aoutc, xitem ), ) } )
+    Aeval( aout, { | xItem | If( At( '.c', xItem ) > 0 .or. At( '.C', xItem ) > 0 .or. at('.cpp', xItem ) > 0 .or. At( '.CPP', xItem ) > 0, Aadd( aoutc, xitem ), ) } )
     Aeval( aoutc, { | x, z | citem := x, z := Ascan( aout, { | t | t = citem } ), If( z > 0, Asize( Adel( aout, z ), Len( aout ) - 1 ), ) } )
 
     aOut  := Asort( aOut )
@@ -2773,7 +2783,7 @@ FUNC crtlibmakfile( cFile )
         Fwrite( nLinkHandle, "LINKER = tlib $(LFLAGS) $(PROJECT)" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ =  $(OBJFILES) $(OBJCFILES)" + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES)" + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = " + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
 
@@ -2787,7 +2797,7 @@ FUNC crtlibmakfile( cFile )
         Fwrite( nLinkHandle, "LINKER = lib $(PROJECT)" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ = $(OBJFILES) $(OBJCFILES) " + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES)" + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = " + CRLF )
 
     ELSEIF lGcc
@@ -2810,7 +2820,7 @@ FUNC crtlibmakfile( cFile )
 
         Fwrite( nLinkHandle, " " + CRLF )
         Fwrite( nLinkHandle, "ALLOBJ = $(OBJFILES) $(OBJCFILES) " + CRLF )
-        Fwrite( nLinkHandle, "ALLRES = $(RESFILES) " + CRLF )
+        Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN) " + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) " + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
 

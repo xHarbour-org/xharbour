@@ -49,12 +49,12 @@ Function GetSourceFiles( lSubdir )
      For nCounter := 1 To nArrayLen
          
              
-        If Len( aData := DIR_MULTI(aStru[ nCounter ]+"*.prg |"+aStru[ nCounter ]+"*.c") ) != 0
+        If Len( aData := DIR_MULTI(aStru[ nCounter ]+"*.prg |"+aStru[ nCounter ]+"*.c |"+aStru[ nCounter ]+"*.cpp" ) ) != 0
            
            nDataLen := Len( aData )
            
            For y := 1 To nDataLen
-              If At( '.PRG', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.C', Upper( adata[ y, 1 ] ) ) > 0
+              If At( '.PRG', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.C', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.CPP', Upper( adata[ y, 1 ] ) ) > 0
                  If lSubdir
                   nLen:=At(" ",aData[ y, 1 ])+1
 
@@ -86,7 +86,7 @@ Function GetSourceFiles( lSubdir )
      Next
      For nCounter := 1 To Len( aStru )
         hb_FNAMESPLIT( Left( astru[ nCounter ], At( ' ', astru[ nCounter ] ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
-        If ( cExt == '.C' ) .or. ( cExt == ".c" )
+        If ( cExt == '.C' ) .or. ( cExt == ".c" ) .or. ( cExt == '.CPP' ) .or. ( cExt == ".cpp" )
            Aadd( aret, astru[ nCounter ] )
         Endif
      Next
@@ -169,7 +169,7 @@ Return cPath
 
 Function exten( cExt, nType )
 
-     Local aext as array := { 'C', 'c' }
+     Local aext as array := { 'C', 'c' ,"CPP","cpp"}
      Local nPos as numeric
      Local cTemp as string := ""
      nPos := Ascan( aext, { | a | a == cExt } )
