@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.1 2002/05/02 22:28:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.2 2002/05/02 23:22:05 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,12 @@
 FUNCTION CreateObject( cString )
 
 RETURN TOleAuto():New( cString )
+
+//----------------------------------------------------------------------------//
+
+FUNCTION Alert( cMsg, aOptions )
+
+RETURN MessageBox( 0, cMsg, "xHarbour", 0 )
 
 //----------------------------------------------------------------------------//
 
@@ -1337,7 +1343,7 @@ RETURN uObj
 
   HB_FUNC( MESSAGEBOX )
   {
-      hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parc( 2 ), hb_parc( 3 ), hb_parni( 4 ) ) );
+     hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parc( 2 ), hb_parc( 3 ), hb_parni( 4 ) ) );
   }
 
   //---------------------------------------------------------------------------//
