@@ -207,19 +207,19 @@ STATIC FUNCTION oTRANSFORM( xVal )
       CASE "D"
          RETURN "CTOD('" + Dtoc( xVal ) + "')"
          EXIT
-      CASE IIF( "A"
+      CASE  "A"
          RETURN "{ ... }"
-         EXIT
-      CASE IIF( "B"
+         EXiT
+      CASE  "B"
          RETURN "{|| ... }"
          EXIT
-      CASE IIF( "L"
+      CASE  "L"
          RETURN Iif( xVal, ".T.", ".F." )
          EXIT
-      CASE IIF( "M"
+      CASE  "M"
          RETURN "<Memo>"
          EXIT
-      CASE IIF( "O"
+      CASE  "O"
          RETURN "-Object-"
          EXIT
    END
