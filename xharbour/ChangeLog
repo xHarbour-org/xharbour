@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.657 2003/01/29 21:30:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.658 2003/01/29 21:35:59 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-01-29 22:35 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/gtsln/mousesln.c
+    ! Some changes to work properly on xTerm and Remote terminals(Thanks for Marek for Some Help)
+
 2003-01-30 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   Again, function declaration matching among those in header files and function
   bodies to enable creation of MSVC DLL.

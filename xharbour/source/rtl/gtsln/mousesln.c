@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.1.1.1 2001/12/21 10:42:31 ronpinkas Exp $
+ * $Id: mousesln.c,v 1.3 2002/04/16 16:12:18 map Exp $
  */
 
 /*
@@ -62,6 +62,12 @@
     #include <gpm.h>
     Gpm_Connect Conn;
 #endif
+    
+#define GET_TIME(tv)    (gettimeofday(&tv, (struct timezone *)NULL))
+#define DIF_TIME(t1,t2) ((t2->tv_sec -t1->tv_sec) *1000+ \
+          (t2->tv_usec-t1->tv_usec)/1000)
+#define DIF_TIME1(t1,t2) ((t2.tv_sec -t1.tv_sec) *1000+ \
+          (t2.tv_usec-t1.tv_usec)/1000)
 
 /* *********************************************************************** */
 
@@ -69,14 +75,19 @@ typedef struct _hbgtMouseEvent_
 {
    unsigned int Col;
    unsigned int Row;
+   unsigned int LastCol;
+   unsigned int LastRow;
+
    USHORT       Key;  /* to analize DBLCLK on Xterm */
    struct timeval Time;
 } HB_MouseEvent;
 
-static HB_MouseEvent s_LastMouseEvent = { 0, 0, 0, { 0, 0 }  };
+static HB_MouseEvent s_LastMouseEvent = { 0, 0, 0, 0, 0, { 0, 0 }  };
 static BOOL s_bMousePresent = FALSE;
 static int s_iMouseButtons = -1;
-
+//static int LastKeyPressed=0;
+static int bFirstRelease = 1;
+static int   s_mouseLast = 0;  /* Last mouse button to be pressed                     */
 /* *********************************************************************** */
 
 static int XtermCheckButtonDown( struct timeval *CurrTime, struct timeval *LastTime, 
@@ -119,12 +130,13 @@ static BOOL GetXtermEvent( unsigned int *Btn, unsigned int *Col, unsigned int *R
     if( SLang_input_pending( 0 ) > 0 )
     {
         *Btn = SLang_getkey();
+
         if( SLang_input_pending( 0 ) > 0 )
         {
             *Col = SLang_getkey();
             if( SLang_input_pending( 0 ) > 0 )
             {
-                *Row = SLang_getkey();
+                *Row =SLang_getkey();
                 return( TRUE );
             }
         }
@@ -141,14 +153,14 @@ static BOOL GetGpmEvent( Gpm_Event *Evt )
     if( s_bMousePresent )
     {
         struct timeval tv = { 0, 0 };
-	fd_set ReadFD;
+   fd_set ReadFD;
 
         FD_ZERO( &ReadFD ); 
-	FD_SET( gpm_fd, &ReadFD );
+   FD_SET( gpm_fd, &ReadFD );
 
         if( select( gpm_fd+1, &ReadFD, NULL, NULL, &tv ) > 0 )
-	    if( FD_ISSET( gpm_fd, &ReadFD ) ) 
-    		return( Gpm_GetEvent( Evt ) > 0 );
+       if( FD_ISSET( gpm_fd, &ReadFD ) ) 
+         return( Gpm_GetEvent( Evt ) > 0 );
     }
     return( FALSE );
 }
@@ -160,54 +172,69 @@ int hb_mouse_Inkey( HB_inkey_enum EventMask )
 {
     struct timeval  CurrTime;
     struct timezone TimeZone;
-
-    if( hb_gt_UnderXterm )
+    static struct timeval tv1 = {0,0 }  ; /* Force first click as single */
+    static struct timeval tv2;
+    int ch;
+    if( hb_gt_UnderXterm )  
     {
-        unsigned int Btn, Col, Row;
     
+        unsigned int Btn, Col, Row;
+                
         if( GetXtermEvent( &Btn, &Col, &Row ) )
         {
             struct timeval LastTime;
-            
-            /* get the time of a mouse event */
             LastTime = s_LastMouseEvent.Time;
-            gettimeofday( &CurrTime, &TimeZone );
-            s_LastMouseEvent.Time = CurrTime;
-            
-            /* get the mouse event position */
-            s_LastMouseEvent.Col = Col - 33;
-            s_LastMouseEvent.Row = Row - 33;
 
-            /* any button was released - we don't know which one */
-            if( ( Btn & 0x03 ) == 0x03 )
-            {
-                switch ( s_LastMouseEvent.Key )
-                {
-                    case K_LBUTTONDOWN :
-                        s_LastMouseEvent.Key = K_LBUTTONUP;
-                        if( ( EventMask & INKEY_LUP ) != 0 )
-                            return( s_LastMouseEvent.Key );
-                        break;
-                    case K_RBUTTONDOWN :
-                        s_LastMouseEvent.Key = K_RBUTTONUP;
-                        if( ( EventMask & INKEY_RUP ) != 0 )
-                            return( s_LastMouseEvent.Key );
-                        break;
-                    default :
-                        s_LastMouseEvent.Key = K_LBUTTONUP;
-                }
-            }
+            s_LastMouseEvent.Time = tv1;
+            s_LastMouseEvent.LastCol = s_LastMouseEvent.Col ;
+            s_LastMouseEvent.LastRow = s_LastMouseEvent.Row ;          
 
-            /* left button was pressed */
-            else if( ( Btn & 0x03 ) == 0x00 )
-                return( XtermCheckButtonDown( &CurrTime, &LastTime, K_LBUTTONDOWN, K_LDBLCLK, INKEY_LDOWN, EventMask ) );
+            s_LastMouseEvent.Col = Col -33 ;
+            s_LastMouseEvent.Row = Row -33 ;
 
-            /* right button was pressed */
-            else if( ( Btn & 0x03 ) == 0x02 )
-                return( XtermCheckButtonDown( &CurrTime, &LastTime, K_RBUTTONDOWN, K_RDBLCLK, INKEY_RDOWN, EventMask ) );
+          if( EventMask & INKEY_MOVE && s_LastMouseEvent.LastRow != s_LastMouseEvent.Row  && s_LastMouseEvent.LastCol != s_LastMouseEvent.Col ) 
+             ch = K_MOUSEMOVE;
+
+          GET_TIME(tv2);
+
+          if( EventMask & INKEY_LDOWN && (( Btn & 0x03 ) == 0x00 ) )
+           {
+             if( DIF_TIME1(tv1,tv2) <= 250  )
+               if (bFirstRelease)
+                  ch = K_LBUTTONDOWN;
+               else
+                 ch = K_LDBLCLK;
+             else
+                ch = K_LBUTTONDOWN;
+             bFirstRelease=0;
+             s_mouseLast = K_LBUTTONDOWN;
+          }
+          else if( EventMask & INKEY_RDOWN && (( Btn & 0x03 ) == 0x02 ) )
+          {
+             if( DIF_TIME1(tv1,tv2) <= 250 && !bFirstRelease) 
+               if (bFirstRelease)
+                  ch = K_RBUTTONDOWN;
+               else
+                 ch = K_RDBLCLK;
+             else
+                ch = K_RBUTTONDOWN;
+             bFirstRelease=0;
+             s_mouseLast = K_RBUTTONDOWN;
+          }
+          else if( ( Btn & 0x03 ) == 0x03 )
+          {
+             if( EventMask & INKEY_LUP && s_mouseLast == K_LBUTTONDOWN )
+                ch = K_LBUTTONUP;
+             else if( EventMask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
+                ch = K_RBUTTONUP;
+                GET_TIME(tv1);
+          }
+
+          return ch;
         }
-    }
-    
+
+   }
+
 #ifdef HAVE_GPM_H
 
 #define CHECK_BUTTON_DOWN(Mask,GpmBtn,InkBtn,InkDbl) \
@@ -254,8 +281,9 @@ int hb_mouse_Inkey( HB_inkey_enum EventMask )
         }
     }
 #endif
-    
-    return( 0 );
+
+
+   return 0;
 }
 
 /* *********************************************************************** */
@@ -264,21 +292,21 @@ void hb_mouse_Init( void )
 {
     if( hb_gt_UnderXterm )
     {
-	char * SaveHilit = "\033[?1001s"; /* save old hilit tracking */
-	char * EnabTrack = "\033[?1000h"; /* enable mouse tracking */
-	
+   char * SaveHilit = "\033[?1001s"; /* save old hilit tracking */
+   char * EnabTrack = "\033[?1000h"; /* enable mouse tracking */
+   
         /* force mouse usage under xterm */
         (void) SLtt_set_mouse_mode (1, 1);
-	
-	/* initial xterm settings */
-	SLtt_write_string( SaveHilit );
-	SLtt_write_string( EnabTrack );
-	SLtt_flush_output();
+   
+   /* initial xterm settings */
+   SLtt_write_string( SaveHilit );
+   SLtt_write_string( EnabTrack );
+   SLtt_flush_output();
 
-	s_iMouseButtons = SLtt_tgetnum( "BT" );
-	/* force two buttons mouse under xterm */
-	if( s_iMouseButtons == -1 )
-	    s_iMouseButtons = 2;
+   s_iMouseButtons = SLtt_tgetnum( "BT" );
+   /* force two buttons mouse under xterm */
+   if( s_iMouseButtons == -1 )
+       s_iMouseButtons = 2;
 
         s_bMousePresent = TRUE;
     }
@@ -295,17 +323,17 @@ void hb_mouse_Init( void )
         gpm_zerobased = 1;  gpm_visiblepointer = 1;
 
         if( Gpm_Open( &Conn, 0 ) >= 0 )
-	{
+   {
             Gpm_Event Evt;
             s_bMousePresent = TRUE;
             while( GetGpmEvent( &Evt ) );
-	    {
-        	s_LastMouseEvent.Col = Evt.x;
-        	s_LastMouseEvent.Row = Evt.y;
-	    }
-	    s_iMouseButtons = Gpm_GetSnapshot( NULL );
-	    hb_mouse_FixTrash();
-	}
+       {
+         s_LastMouseEvent.Col = Evt.x;
+         s_LastMouseEvent.Row = Evt.y;
+       }
+       s_iMouseButtons = Gpm_GetSnapshot( NULL );
+       hb_mouse_FixTrash();
+   }
     }
 #endif
 }
@@ -316,13 +344,13 @@ void hb_mouse_Exit( void )
 {
     if( hb_gt_UnderXterm )
     {
-	char * DisabTrack = "\033[?1000l"; /* disable mouse tracking */
-	char * RestoHilit = "\033[?1001r"; /* restore old hilittracking */
-	
-	/* restore xterm settings */
-	SLtt_write_string( DisabTrack );
-	SLtt_write_string( RestoHilit );
-	SLtt_flush_output();
+   char * DisabTrack = "\033[?1000l"; /* disable mouse tracking */
+   char * RestoHilit = "\033[?1001r"; /* restore old hilittracking */
+   
+   /* restore xterm settings */
+   SLtt_write_string( DisabTrack );
+   SLtt_write_string( RestoHilit );
+   SLtt_flush_output();
 
         /* force mouse usage under xterm */
         (void) SLtt_set_mouse_mode (0, 1);
@@ -331,7 +359,7 @@ void hb_mouse_Exit( void )
 #ifdef HAVE_GPM_H
     else if( hb_gt_UnderLinuxConsole )
         if( gpm_fd >= 0 ) 
-	    Gpm_Close();
+       Gpm_Close();
 #endif
 }
 
@@ -349,7 +377,7 @@ void hb_mouse_Show( void )
 #ifdef HAVE_GPM_H
     gpm_visiblepointer = 1;
     if( hb_gt_UnderLinuxConsole && s_bMousePresent )
-	Gpm_DrawPointer( s_LastMouseEvent.Col, s_LastMouseEvent.Row, gpm_consolefd );
+   Gpm_DrawPointer( s_LastMouseEvent.Col, s_LastMouseEvent.Row, gpm_consolefd );
 #endif
    ;
 }
@@ -387,8 +415,8 @@ void hb_mouse_SetPos( int iRow, int iCol )
     s_LastMouseEvent.Row = iRow;
 #ifdef HAVE_GPM_H
     if( hb_gt_UnderLinuxConsole )
-	if( s_bMousePresent && gpm_visiblepointer )
-	    Gpm_DrawPointer( iCol, iRow, gpm_consolefd );
+   if( s_bMousePresent && gpm_visiblepointer )
+       Gpm_DrawPointer( iCol, iRow, gpm_consolefd );
 #endif
 }
 
@@ -434,8 +462,8 @@ void hb_mouse_FixTrash()
 {
 #ifdef HAVE_GPM_H
     if( hb_gt_UnderLinuxConsole )
-	if( s_bMousePresent && gpm_visiblepointer )
-	    Gpm_DrawPointer( s_LastMouseEvent.Col, s_LastMouseEvent.Row, gpm_consolefd );
+   if( s_bMousePresent && gpm_visiblepointer )
+       Gpm_DrawPointer( s_LastMouseEvent.Col, s_LastMouseEvent.Row, gpm_consolefd );
 #endif
 }
 
