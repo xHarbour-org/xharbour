@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.34 2002/10/22 23:07:44 what32 Exp $
+ * $Id: xInspect.prg,v 1.35 2002/10/23 02:18:25 what32 Exp $
  */
 
 /*
@@ -263,7 +263,7 @@ METHOD New( oParent ) CLASS InspectBrowser
    oCol2:= whColumn():Init( "Value",   {|oCol,oB,n| asString(oB:source[n,2]) },DT_LEFT, 80 )
    oCol2:VertAlign  := TA_CENTER
    oCol2:Style      := TBC_MOVE + TBC_SIZE
-   oCol2:bSaveBlock := {|cText,o,nKey|::Parent:Parent:SaveVar(cText,nKey)}
+   oCol2:bSaveBlock := {|cText,o,nKey|oApp:MainFrame:ObjInsp:SaveVar(cText,nKey)}
 
    ::AddColumn( oCol1 )
    ::AddColumn( oCol2 )
@@ -275,28 +275,106 @@ RETURN(self)
 METHOD SetColControl(x,y) CLASS InspectBrowser
    local cType, cVar, aRect
    if y==2
+      IF ::oCtrl!=NIL
+         ::oCtrl:Destroy()
+         ::oCtrl:=NIL
+      ENDIF
       cVar := ::source[::RecPos][1]
       cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
-      IF cType == "L"
-         aRect:=::GetItemRect()
-         ::oCtrl:=TComboBox():New(self,555,aRect[1]-1,aRect[2]-1,aRect[3]-aRect[1]+1,100) //,aRect[4]-aRect[2]+1)
-         ::oCtrl:Create()
-         ::oCtrl:AddString("TRUE")
-         ::oCtrl:AddString("FALSE")
-      ENDIF
+      DO CASE
+         CASE cType == "L"
+              aRect:=::GetItemRect()
+              ::oCtrl:=TComboBox():New(self,222,aRect[1]-1,aRect[2]-1,aRect[3]-aRect[1]+1,100) //,aRect[4]-aRect[2]+1)
+              ::oCtrl:Create()
+              ::oCtrl:SetItemHeight(-1,aRect[4]-(aRect[2]+5))
+              ::oCtrl:AddString("TRUE")
+              ::oCtrl:AddString("FALSE")
+         CASE cType == "C"
+              ::EditCell(,::Columns[::ColPos]:bSaveBlock,,,,)
+         CASE cType == "O"
+              aRect:=::GetItemRect()
+              view aRect
+              ::oCtrl:=TButton():New( self, "...", 333, aRect[3]-(aRect[4]-aRect[2]+1), aRect[2]-1, (aRect[4]-aRect[2]+1), aRect[4]-aRect[2]+1)
+              ::oCtrl:Create()
+              ::oCtrl:SetFocus()
+      ENDCASE
    endif
 RETURN(self)
 
 METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
-   IF nlParam==::oCtrl:handle
-      IF HIWORD(nwParam)==CBN_KILLFOCUS
-         view ::oCtrl:GetCurSel()
-         ::oCtrl:Destroy()
-         ::oCtrl:=NIL
-      ENDIF
+   LOCAL oList
+   IF ::oCtrl!=NIL.AND.nlParam==::oCtrl:handle
+      DO CASE
+         CASE ::oCtrl:ClassName()=="TCOMBOBOX"
+              IF HIWORD(nwParam)==CBN_KILLFOCUS
+                 ::oCtrl:Destroy()
+                 ::oCtrl:=NIL
+              ENDIF
+         CASE ::oCtrl:ClassName()=="TBUTTON"
+              DO CASE
+                 CASE HIWORD(nwParam)==BN_KILLFOCUS
+                      ::oCtrl:Destroy()
+                      ::oCtrl:=NIL
+                 CASE HIWORD(nwParam)==BN_CLICKED
+                      ::oCtrl:Destroy()
+                      ::oCtrl:=NIL
+                      oList:=StringList():New(self)
+                      oList:Create()
+              ENDCASE
+      ENDCASE
    ENDIF
 RETURN(nil)
 
 
 //------------------------------------------------------------------------------------------
 
+CLASS StringList FROM TPanel
+   VAR nEProc PROTECTED
+   METHOD New(oParent) INLINE ::resname := "StringList",;
+                              ::Modal   := .T.,;
+                              Super:New( oParent )
+   METHOD OnCommand()
+   METHOD OnCreate()
+ENDCLASS
+
+METHOD OnCreate() CLASS StringList
+   local n,nLines
+   local cText:=""
+   FOR n:= 1 TO LEN(oApp:MainFrame:ObjInsp:CurObject:Items:Text)
+       cText+=oApp:MainFrame:ObjInsp:CurObject:Items:Text[n]+CRLF
+   NEXT
+   cText:=LEFT( cText, LEN( cText)-2)
+   SetDlgItemText( ::handle, 103, cText)
+   nLines:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+   SetDlgItemText( ::handle, 101, alltrim(str(nLines))+" Lines" )
+RETURN(self)
+
+METHOD OnCommand( nwParam ) CLASS StringList
+   local n, cText, nPtr
+   static nLines
+   DO CASE
+      CASE HIWORD(nwParam) == EN_CHANGE
+           n:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+           IF nLines != n
+              nLines := n
+              SetDlgItemText( ::handle, 101, alltrim(str(nLines))+" Lines" )
+           ENDIF
+      CASE nwParam == IDOK
+           IF nLines==NIL
+              nLines:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+           ENDIF
+           oApp:MainFrame:ObjInsp:CurObject:Items:Text:={}
+           FOR n:=1 TO nLines
+               cText := i2bin(100)+space(200)
+               SendDlgItemMessage( ::handle, 103, EM_GETLINE, n-1, cText )
+               cText:=STRTRAN(cText,CHR(10))
+               cText:=STRTRAN(cText,CHR(13))
+               oApp:MainFrame:ObjInsp:CurObject:Items:Add(ALLTRIM(cText))
+           NEXT
+           nLines := NIL
+           EndDialog( ::handle, IDOK )
+      CASE nwParam == IDCANCEL
+           nLines := NIL
+           EndDialog( ::handle, IDCANCEL )
+   ENDCASE
+return(nil)

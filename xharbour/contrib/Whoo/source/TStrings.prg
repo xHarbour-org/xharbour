@@ -1,5 +1,5 @@
 /*
- * $Id: TStrings.prg,v 1.1 2002/10/22 23:19:52 what32 Exp $
+ * $Id: TStrings.prg,v 1.2 2002/10/23 02:19:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,7 +36,7 @@
 *------------------------------------------------------------------------------*
 
 CLASS TStrings FROM TPersistent
-
+/*
    DATA Capacity       EXPORTED  
    DATA CommaText      EXPORTED  
    DATA Count          EXPORTED  
@@ -47,13 +47,14 @@ CLASS TStrings FROM TPersistent
    DATA QuoteChar      EXPORTED  
    DATA Strings        EXPORTED  
    DATA StringsAdapter EXPORTED  
-   DATA Text           EXPORTED  
    DATA UpdateCount    EXPORTED  
    DATA Values         EXPORTED  
-     
+*/
+   DATA Text AS ARRAY  EXPORTED  INIT {}
+
    METHOD New() CONSTRUCTOR
 
-//   METHOD Add
+   METHOD Add( c)  INLINE AADD(::Text,c)
 //   METHOD AddObject
 //   METHOD AddStrings
 //   METHOD Append
