@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.4 2004/01/28 04:14:33 maurifull Exp $
+# $Id: pack_src.sh,v 1.5 2004/05/20 21:09:21 ronpinkas Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -124,6 +124,13 @@ $hb_collect source/rdd/dbfntx/*.prg
 # SOURCE\RDD\NULSYS
 $hb_collect source/rdd/nulsys/Makefile
 $hb_collect source/rdd/nulsys/*.prg
+
+for d in ${HB_DB_DRVEXT}
+do
+  $hb_collect source/rdd/$d/Makefile
+  $hb_collect source/rdd/$d/*.[ch]
+  $hb_collect source/rdd/$d/*.prg
+done
 
 # SOURCE\RTL
 $hb_collect source/rtl/Makefile

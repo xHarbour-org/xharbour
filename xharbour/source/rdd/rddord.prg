@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.2 2003/11/04 08:31:03 druzus Exp $
+ * $Id: rddord.prg,v 1.3 2004/05/08 22:07:09 druzus Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ FUNCTION ORDWILDSEEK( cPattern, lCont, lBack )
       lBack := .F.
    ENDIF
 
-   IF lCont
+   IF ! lCont
       IF lBack
          DBGOBOTTOM()
       ELSE

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3221 2004/07/27 16:56:02 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3222 2004/07/27 19:30:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-27 23:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/pack_src.sh
+    * pack HB_DB_DRVEXT also
+
+  * xharbour/source/rdd/rddord.prg
+    * fixed second lCont param in ORDWILDSEEK() - it was reverted
+      by mistake.
 
 2004-07-27 12:29 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * xdiff.txt
