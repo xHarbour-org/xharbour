@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.53 2005/02/26 20:41:56 andijahja Exp $
+ * $Id: errorapi.c,v 1.54 2005/03/31 04:02:23 druzus Exp $
  */
 
 /*
@@ -1190,7 +1190,14 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags | EF_CANSUBSTITUTE );
 
-   hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine, NULL ) );
+   if( strcmp( szSubSystem, HB_ERR_SS_BASE ) == 0 && ( ( ulGenCode == EG_NOVARMETHOD && ulSubCode == 1005 ) || ( ulGenCode == EG_NOMETHOD && ulSubCode == 1004 ) ) )
+   {
+      hb_errPutProcName( pError, hb_procinfo( 1, szName, &uLine, NULL ) );
+   }
+   else
+   {
+      hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine, NULL ) );
+   }
    hb_errPutProcLine( pError, uLine );
 
    #ifdef HB_THREAD_SUPPORT

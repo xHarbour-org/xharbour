@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.12 2004/08/25 02:40:25 mlombardo Exp $
+ * $Id: readline.c,v 1.13 2004/10/22 14:29:06 paultucker Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-#define READING_BLOCK      512
+#define READING_BLOCK      4096
 
 BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
 {

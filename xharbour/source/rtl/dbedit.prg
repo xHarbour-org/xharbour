@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.24 2004/11/09 20:04:21 guerra000 Exp $
+ * $Id: dbedit.prg,v 1.25 2005/01/10 00:20:34 guerra000 Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs, cHdr, nIndex
     // For clipper compatibility we must call Errorsys() with error 2001 !
     If !Used()
 //       Return .F.
-       Throw( ErrorNew( "DBCMD", 2001, ProcName(), "Workarea not in use" ) )
+       Throw( ErrorNew( "DBCMD", 0, 2001, ProcName(), "Workarea not in use" ) )
     End
     aCols := Array(FCount())
     For Each i In aCols

@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.12 2003/11/17 10:58:50 toninhofwi Exp $
+ * $Id: tobject.prg,v 1.13 2003/12/17 18:48:28 walito Exp $
  */
 
 /*
@@ -163,20 +163,22 @@ return QSelf():Init(xPar0, xPar1, xPar2, xPar3, xPar4, xPar5, xPar6, xPar7, xPar
 static function HBObject_Init()
 return QSelf()
 
-static function HBObject_Dftonerror(xPar0, xPar1, xPar2, xPar3, xPar4, xPar5, xPar6, xPar7, xPar8, xPar9, ;
-                                   xPar10,xPar11,xPar12,xPar13,xPar14,xPar15,xPar16,xPar17,xPar18,xPar19 )
-return QSelf():MSGNOTFOUND( __GetMessage(), xPar0, xPar1, xPar2, xPar3, xPar4, xPar5, xPar6, xPar7, xPar8, xPar9, ;
-                                            xPar10,xPar11,xPar12,xPar13,xPar14,xPar15,xPar16,xPar17,xPar18,xPar19 )
+static function HBObject_Dftonerror()
+return QSelf():MSGNOTFOUND( __GetMessage() )
 
-static function HBObject_Error( cDesc, cClass, cMsg, nCode )
+static function HBObject_Error( cDesc, cClass, cMsg, nCode, aArgs )
 
    DEFAULT nCode TO 1004
 
+   Alert( ProcName(1) + "," + ProcName(2) + "," + ProcName(3) + "," + ProcName(4) )
+
    IF nCode == 1005
-      RETURN __errRT_SBASE( EG_NOVARMETHOD, 1005, cDesc, cClass + ":" + cMsg )
+      //RETURN __errRT_SBASE( EG_NOVARMETHOD, 1005, cDesc, cClass + ":" + cMsg )
+      RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOVARMETHOD, 1005, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
    ENDIF
 
-RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
+//RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
+RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOMETHOD, nCode, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
 
 FUNCTION TAssociativeArray( aInit, lCase )
 

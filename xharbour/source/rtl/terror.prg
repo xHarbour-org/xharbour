@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.14 2004/10/26 00:38:46 ronpinkas Exp $
+ * $Id: terror.prg,v 1.15 2005/02/11 20:54:16 guerra000 Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
    static s_aErrHandlers := {}
 #endif
 
-FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName )
+FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName, ProcName, ProcLine )
 
    STATIC lInErr := .F., s_oClass
    LOCAL oErr
@@ -112,6 +112,9 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    IF SubSystem != NIL
       oErr:SubSystem := SubSystem
    ENDIF
+   IF GenCode != NIL
+      oErr:GenCode := GenCode
+   ENDIF
    IF SubCode != NIL
       oErr:SubCode := SubCode
    ENDIF
@@ -124,14 +127,22 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    IF Args != NIL
       oErr:Args := Args
    ENDIF
+
    IF ModuleName == NIL
       oErr:ModuleName := ProcFile( 1 )
    ELSE
       oErr:ModuleName := ModuleName
    ENDIF
-
-   oErr:ProcName := Procname(1)
-   oErr:ProcLine := Procline(1)
+   IF ProcName == NIL
+      oErr:ProcName := ProcName(1)
+   ELSE
+      oErr:ProcName := ProcName
+   ENDIF
+   IF ProcLine == NIL
+      oErr:ProcLine := ProcLine(1)
+   ELSE
+      oErr:ProcLine := ProcLine
+   ENDIF
 
    #ifdef HB_THREAD_SUPPORT
       oErr:RunningThreads := HB_ThreadCountStacks()

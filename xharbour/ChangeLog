@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4001 2005/04/03 13:30:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4001 2005/04/03 10:39:24 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-03 22:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/errorapi.c
+    * Corrected ProcName() and ProcLine() reporting for messages to non objects type.
+
+  * source/rtl/terror.prg
+    * Added GenCode as optional 2nd argument to ErrorNew().
+    * Added ProcName and ProcLine as optional additional arguments to ErrorNew()
+
+  * source/rtl/tobject.prg
+    * Corrected error reporting of source origination in ::Error() called ::MsgNotFound()
+    * Removed unused arguments in ::MsgNotFound()
+
+  * source/rtl/cstr.prg
+  * source/rtl/dbedit.prg
+  * source/rtl/readline.c
+  * source/rtl/stream.prg
+  * source/rtl/tclass.prg
+    * Corrected calls to ErrorNew() to pass 0 as added GenCode argument
 
 2005-04-03 20:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/ads1.c
@@ -221,7 +240,7 @@
   * xharbour/source/vm/fastitem.c
   * xharbour/source/vm/itemapi.c
     * the 'char *' parameters in hb_itemPutC[L], hb_itemPutDS, hb_retc[len],
-      hb_retds(), hb_errPut*, hb_errRT_*, hb_dateEncStr converted to 
+      hb_retds(), hb_errPut*, hb_errRT_*, hb_dateEncStr converted to
       'const char *' to avoid unnecessary casting in C++ mode. Please
       always use 'cons char *' instead of 'char *' when you are 100%
       sure it is really constant.
@@ -359,7 +378,7 @@
 2005-03-31 04:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * xharbour.spec
     ! updated version number
-  
+
 2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/xbscript/xbscript.prg
     ! change starting procedure to 'PROCEDURE MAIN()' instead of uncommon
@@ -455,11 +474,11 @@
   * source/rtl/philes.c
     ! modifications for __DMC__
 
-2005-03-30 12:48 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-30 12:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h
     * Increased to 0.99.41
 
-2005-03-24 21:51 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-24 21:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h
     * Updated.
 
@@ -473,7 +492,7 @@
       an inconvenience for anyone, but it's required to maintain
       compatibility with 3rd party products.
 
-2005-03-23 13:27 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-23 13:27 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     ! Fixed a GPF trap when OLE Server has to reallocate a string argument passed BYREF.
       /*
@@ -500,7 +519,7 @@
     ! fixed reference checking for codeblock created inside object
       methods
 
-2005-03-21 17:12 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-21 17:12 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     ! Fixed bad typo GPF trap.
     * More conservative WideToAnsi()
@@ -514,7 +533,7 @@
   * source/vm/memvars.c
     * Well behaved reset of ->type after hb_itemReleaseString()
 
-2005-03-21 90:30 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-21 90:30 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     * Added logic to try DISPATCH_PROPERTYPUT first if prg syntax implies assignment.
 
@@ -526,11 +545,11 @@
   * source/rtl/win32ole.prg
     ! some compiler treats NULL as (void*) 0, not 0
 
-2005-03-20 13:39 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-20 13:39 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     * Simplified AnsiToSysString()
 
-2005-03-20 08:06 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-20 08:06 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
     ! Fixed bad typo, was missing reset of kolSquare-- for ']'.
 
@@ -539,7 +558,7 @@
   * utils/hbtest/rt_misc.prg
     ! Len( errornew() ) is 20 in MT mode
 
-2005-03-19 12:08 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-19 12:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
     ! Fixed GPF trap in getExpReal()
 
@@ -594,7 +613,7 @@
   * tests/xhbenc.prg
     ! minor enhancements
 
-2005-03-18 13:03 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-18 13:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
     * Removed '|' '*' '/' '^' '%' and "->" from list of invalid startup tokens for normal Match Marker in getExpReal()
   * utils/xbscript/xbscript.prg
@@ -627,7 +646,7 @@
     * size of the new buffer required is > size of old buffer.
     * IAE, the resizing has to be done in 2 steps.
 
-2005-03-17 21:23 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-17 21:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/simplex.c
     * Added iLastToken = 0 to RESET_LEX() macro.
 
@@ -664,7 +683,7 @@
   * contrib/unicode/hbcx.c
     ! code changes in retrieving numeric params
 
-2005-03-16 23:01 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-16 23:01 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32prn.prg
     * Removed for the 2nd time, an unacceptable hack (__WRITE_FONT_INFO_TO_FILE__).
 
@@ -678,7 +697,7 @@
   * tests/xhbenc.prg
     ! file pp.prg no longer exist in tests. Copy from utils/xbscript.
 
-2005-03-16 18:05 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-16 18:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
     * Corrected md_strAt() to ignore ',' inside {....}, <Array>[...], and (...)
       /* Needed after recent removal of [] state. */
@@ -723,7 +742,7 @@
   * source/compiler/genc.c
     ! bug fix on processing many HB_INLINEs
 
-2005-03-15 10:01 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-15 10:01 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbclass.ch
     * Corrected 1 matcher from <Message> to <!Message!>
   * source/pp/ppcore.c
@@ -812,7 +831,7 @@
     * create an MT mode version of hbtest.exe (hbtestmt.exe)
     * minor correction to ct list and removed 1 misplaced $(MT)
 
-2005-03-09 18:40 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-09 18:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
     % Optimized hb_vmDoBlock() to use inplace evaluation instead of calling hb_codeblockEvaluate()
 
@@ -821,11 +840,11 @@
     - Removed not used hb_codeblockEvaluate()
       /* This doesn't seem to be a utilized API, it used by anyone we can restore it. */
 
-2005-03-09 17:29 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-09 17:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
     * Refined and more consistent PP_LocalParams() PP_Locals(), PP_Statics() PP_Params() PP_Privates() and PP_Publics()
 
-2005-03-09 13:18 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-09 13:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hberrors.h
     + Added:
       #define HB_PP_ERR_EMPTY_OPTIONAL                27
@@ -880,7 +899,7 @@
   + tests/bldinfo.prg
     ! test program for HB_BUILDINFO
 
-2005-03-08 17:49 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-08 17:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
    * source/rtl/cstruct.prg
      ! Fix to recent modification to ::Reset() (was blanking all class data)
 
@@ -1067,12 +1086,12 @@
   * source/rtl/errorsys.prg
     + print more info on error.log
 
-2005-03-04 21:46 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-04 21:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
   * utils/xbscript/xbscript.prg
     * Added support for script procedure in ::EvalExprfession() and PP_Eval()
 
-2005-03-04 14:56 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-04 14:56 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     ! Optimized cClassNAme in C code to use static.
     * Changed order of Invoke, to test DISPATACH_METHOD, *before* trying DISPATCH_PROPERTYGET.
@@ -1085,7 +1104,7 @@
   * utils/hbtest/hbtest.prg
     + info if MT is enabled
 
-2005-03-04 11:22 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-04 11:22 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.bc
     + added -Gi to Ilink when linking harbour.dll so it generates import lib,
       which is needed in subsequent targets.
@@ -1107,7 +1126,7 @@
   * source/rtl/tget.prg
     * Minor formatting (tab chars introduced recently)
 
-2005-03-03 12:27 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-03 12:27 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
     + Added BSTR AnsiToBSTR( char *cString )
     * Optimized using new AnsoToBSTR()
@@ -1148,7 +1167,7 @@
   * make_b32.bat
     ! dllmain.lib not erased in clean build
 
-2005-03-02 09:35 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-02 09:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * makefile.bc
     * Temprarily restored to version 1.40 until Andi provide fixes.
   * source/pp/ppcore.c
@@ -1161,7 +1180,7 @@
   * source/vm/classes.c
     * comment unused hb___msgEval but declared
 
-2005-03-01 21:53 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-01 21:53 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source\vm\classes.c
     - Commented out handling of EVENT Message fo Codeblocks.
 
@@ -1170,7 +1189,7 @@
     This fix allows claases to implement an Eval Method.
    */
 
-2005-03-01 20:50 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-03-01 20:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/simplex.c
     + Added iLastLen to maintain length of last read buffer when not sToken.
     * Simplified rewind logic and sWord2Check logic in SimpLex_CheckWords() using new iLastLen
@@ -1199,7 +1218,7 @@
   + config/w32/pellesc.cf
     + GNU make support for Digital Mars and Pelles C compilers
 
-2005-02-28 11:27 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-02-28 11:27 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/simplex.c
     * Added 1 missing reset of sSelf[0].
 
@@ -1355,11 +1374,11 @@
   * include/hbvm.h
     * do not hard code compiler specific defines in program files.
 
-2005-02-27 09:10 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-02-27 09:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.bc
     * Fixed typo (util.obj) was grouped with ADS fils in condition.
 
-2005-02-27 08:50 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-02-27 08:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly
     ! Fixed compilation of LOOP statment within SWITCH constructs.
 
@@ -1415,7 +1434,7 @@
   * utils/xbscript/xbs_harb.ch
     * single-liners to be in accordance with xHarbour coding style
 
-2005-02-26 21:49 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+2005-02-26 21:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/simplex.c
     + Added support for optionsal White Space predefined match pattern ?WS?
     + Added support for Delimiters and Self Contained tokens to be matched as literals within coumpunded words.

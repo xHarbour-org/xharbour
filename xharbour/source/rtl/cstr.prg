@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.22 2004/08/19 00:04:10 peterrees Exp $
+ * $Id: cstr.prg,v 1.23 2005/01/11 22:28:31 ronpinkas Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ RETURN ""
 FUNCTION CStrToVal( cExp, cType )
 
    IF ValType( cExp ) != 'C'
-      Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
+      Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
    ENDIF
 
    SWITCH cType
@@ -141,17 +141,17 @@ FUNCTION CStrToVal( cExp, cType )
 
       /*
       CASE 'A'
-         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'B'
-         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'O'
-         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
       */
 
       DEFAULT
-         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
+         Throw( ErrorNew( "CSTR", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
    END
 
 RETURN NIL
@@ -173,7 +173,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
             RETURN "[" + xVal + "]"
          ELSE
-            Throw( ErrorNew( "CSTR", 3102, ProcName(), "Can't stringify", { xVal } ) )
+            Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
             EXIT
          ENDIF
 
@@ -266,7 +266,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          IF xVal == NIL
             cRet := "NIL"
          ELSE
-            Throw( ErrorNew( "VALTOPRG", 3103, ProcName(), "Unsupported type", { xVal } ) )
+            Throw( ErrorNew( "VALTOPRG", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
    END
 
@@ -292,7 +292,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
             RETURN "[" + xVal + "]"
          ELSE
-            Throw( ErrorNew( "CSTR", 3102, ProcName(), "Can't stringify", { xVal } ) )
+            Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
             EXIT
          ENDIF
 
@@ -388,7 +388,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          IF xVal == NIL
             cRet := "NIL"
          ELSE
-            Throw( ErrorNew( "VALTOPRG", 3103, ProcName(), "Unsupported type", { xVal } ) )
+            Throw( ErrorNew( "VALTOPRG", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
    END
 

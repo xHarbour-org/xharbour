@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.13 2004/07/28 22:28:34 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.14 2004/07/29 23:55:59 ronpinkas Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ STATIC PROCEDURE Create( MetaClass )
          ENDIF
 
          IF ahSuper[ HB_EnumIndex() ] == 0
-            Throw( ErrorNew( "TClass", 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
+            Throw( ErrorNew( "TClass", 0, 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
          ENDIF
       NEXT
 
