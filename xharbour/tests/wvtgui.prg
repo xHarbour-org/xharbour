@@ -1,3 +1,4 @@
+
 //-------------------------------------------------------------------//
 //
 //                   GTWVT Console GUI Interface
@@ -20,20 +21,7 @@
 
 #include    'inkey.ch'
 #include   'common.ch'
-
-//-------------------------------------------------------------------//
-//
-//   Wvt_DrawButton() constants
-//
-#define WVT_BTN_FORMAT_RAISED      0   // Default
-#define WVT_BTN_FORMAT_RECESSED    1   
-#define WVT_BTN_FORMAT_FLAT        2
-#define WVT_BTN_FORMAT_OUTLINED    3
-
-#define WVT_BTN_IMAGE_TOP          0   // Default
-#define WVT_BTN_IMAGE_LEFT         1
-#define WVT_BTN_IMAGE_BOTTOM       2
-#define WVT_BTN_IMAGE_RIGHT        3
+#include   'wvtwin.ch'
 
 //-------------------------------------------------------------------//
 //
@@ -68,34 +56,6 @@
 #define OBJ_STATE_BUTTONUP         4
 
 //-------------------------------------------------------------------//
-//
-//   Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrient, nFormat,;
-//                 nAlign, nStyle, nThick, nColor ) 
-//
-//   nOrient
-#define WVT_LINE_HORZ              0   // Default
-#define WVT_LINE_VERT              1
-
-//   nFormat
-#define WVT_LINE_RAISED            0   // Default
-#define WVT_LINE_RECESSED          1   
-#define WVT_LINE_PLAIN             2
-
-//   nAlign 
-#define WVT_LINE_CENTER            0   // Default
-#define WVT_LINE_TOP               1
-#define WVT_LINE_BOTTOM            2
-#define WVT_LINE_LEFT              3
-#define WVT_LINE_RIGHT             4
-
-//   nStyle
-#define WVT_LINE_SOLID             0   // Default
-#define WVT_LINE_DASH              1   
-#define WVT_LINE_DOT               2
-#define WVT_LINE_DASHDOT           3
-#define WVT_LINE_DASHDOTDOT        4
-
-//-------------------------------------------------------------------//
 
 static wvtScreen := {}
 
@@ -116,7 +76,7 @@ PROCEDURE Main()
    LOCAL nLft    := 4
    LOCAL nBtm    := 20
    LOCAL nRgt    := 75
-	LOCAL nMaxRows:= MaxRow()
+   LOCAL nMaxRows:= MaxRow()
    LOCAL nBtnRow := nMaxRows - 1
    LOCAL cLabel  := 'xHarbour simulated GUI.'
    LOCAL aObjects:= WvtSetObjects( {} )
@@ -130,6 +90,9 @@ PROCEDURE Main()
    LOCAL kf8     := SetKey( K_F8, {|| WvtLines() } )
    LOCAL kf9     := SetKey( K_F9, {|| Wvt_ChooseFont() } )
    LOCAL kf10    := SetKey( K_F10,{|| Wvt_ChooseColor() } )
+   LOCAL hPopup  := Wvt_SetPopupMenu()
+   
+   Popups( 1 )
             
    SET DATE BRITISH
 
@@ -140,7 +103,7 @@ PROCEDURE Main()
    
    //  Force mouse pointer right below the xHarbour label
    //
-	Wvt_SetMousePos( 2,40 )
+   Wvt_SetMousePos( 2,40 )
 	   
    aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
@@ -259,7 +222,9 @@ PROCEDURE Main()
    SetKey( K_F5, kf5 )
    SetKey( K_F6, kf6 )
    SetKey( K_F7, kf7 )
-   SetKey( K_F8, kf8 )      
+   SetKey( K_F8, kf8 )
+   Wvt_SetPopupMenu( hPopup )
+         
 RETURN
 
 //-------------------------------------------------------------------//
@@ -351,7 +316,8 @@ RETURN
 //      Wvt_Paint() must be a FUNCTION in your application
 //      as it is called when Window gets WM_PAINT message.
 //-------------------------------------------------------------------//
-FUNCTION Wvt_Paint( hWnd, msg, wParam, lParam, nTop, nLeft, nBottom, nRight )
+FUNCTION Wvt_Paint()
+   LOCAL tlbr_:= Wvt_GetPaintRect()  // { ntop, nLeft, nBottom, nRight }
 
    LOCAL aBlocks := WvtSetBlocks()
 
@@ -565,7 +531,8 @@ FUNCTION WvtBrowse()
    LOCAL cColor  := SetColor( 'N/W*,N/GR*,,,N/W* ' )
 	LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL aObjects:= WvtSetObjects( {} )
-   
+   LOCAL hPopup  := Wvt_SetPopupMenu()
+  
 	STATIC nStyle := 0
 
 	USE 'TEST' NEW
@@ -574,6 +541,8 @@ FUNCTION WvtBrowse()
    endif
    info_:= DbStruct()
 
+   Popups( 2 )
+   
 	oBrowse := TBrowseNew( nTop + 3, nLeft + 2, nBottom - 1, nRight - 2 )
 
    oBrowse:ColSep        = '  '
@@ -602,7 +571,7 @@ FUNCTION WvtBrowse()
    aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( nTop+3, nLeft+2, nBottom-1, nRight-2 ) } )
    aAdd( aBlocks, {|| Wvt_DrawGridHorz( oBrowse:nTop+3, oBrowse:nLeft, oBrowse:nRight, oBrowse:nBottom - oBrowse:nTop - 2 ) } )
-	aAdd( aBlocks, {|| Wvt_DrawGridVert( oBrowse:nTop, oBrowse:nBottom, oBrowse:aColumnsSep, len( oBrowse:aColumnsSep ) ) } )
+   aAdd( aBlocks, {|| Wvt_DrawGridVert( oBrowse:nTop, oBrowse:nBottom, oBrowse:aColumnsSep, len( oBrowse:aColumnsSep ) ) } )
 
    aLastPaint := WvtSetBlocks( aBlocks )
 
@@ -676,7 +645,8 @@ FUNCTION WvtBrowse()
 
 	DBCloseArea()
    RestScreen( 0,0, maxrow(),maxcol(), cScr )
-
+	Wvt_setPopupMenu( hPopup )
+	
 RETURN nil
 //-------------------------------------------------------------------//
 STATIC FUNCTION DbSkipBlock( n, oTbr )
@@ -738,6 +708,7 @@ FUNCTION WvtPartialScreen()
    LOCAL wvtScr     := Wvt_SaveScreen( 0, 0, MaxRow(), MaxCol() )         
    LOCAL wvtScr1 
    LOCAL aLastPaint 
+   LOCAL hPopup     := Wvt_SetPopupMenu()
    
    aLastPaint := WvtSetBlocks( {} )
    
@@ -769,6 +740,7 @@ FUNCTION WvtPartialScreen()
    RestScreen( 7,20,15,60,scr )
    Wvt_RestScreen( 0, 0, MaxRow(), MaxCol(), wvtScr )
    WvtSetBlocks( aLastPaint )
+   Wvt_SetPopupMenu( hPopup )
 
 RETURN NIL
 //-------------------------------------------------------------------//
@@ -780,7 +752,8 @@ function WvtLines()
    LOCAL nCols      := maxcol()
    LOCAL aLastPaint := WvtSetBlocks( {} )
    LOCAL aObjects   := WvtSetObjects( {} )
-
+   LOCAL hPopup     := Wvt_SetPopupMenu()
+   
    CLS
   
    Wvt_DrawLine( 0, 0, 0, nCols, WVT_LINE_HORZ, WVT_LINE_RAISED  , WVT_LINE_CENTER )
@@ -823,6 +796,7 @@ function WvtLines()
    RestScreen( 0,0,maxrow(),maxcol(), scr )
    WvtSetBlocks( aLastPaint )
    WvtSetObjects( aObjects )
+   Wvt_SetPopupMenu( hPopup )
 
 RETURN nil
 
@@ -845,6 +819,77 @@ FUNCTION ClearStatusMsg()
    SetPos( nRow, nCol )
    
 RETURN .t.
+
+//-------------------------------------------------------------------//
+
+FUNCTION Popups( nID, lDestroy )
+
+local hPop, hPop1
+local nPrompt := MF_ENABLED+MF_STRING
+
+static hPop_:= { , , , , , , , , }
+
+if nID == nil
+   Wvt_SetPopupMenu()
+	return nil
+endif
+
+if lDestroy <> nil
+	Wvt_DestroyMenu( hPop_[ nID ] )
+	return nil
+endif
+
+hPop := hPop_[ nID ]
+   
+do case
+case nID == 1   //  Data Entry Module
+   
+   if hPop == nil
+		hPop := Wvt_CreatePopupMenu()
+		Wvt_AppendMenu( hPop, nPrompt, K_F2, 'Second Get Screen' )
+		Wvt_AppendMenu( hPop, nPrompt, K_F3, 'Expand Window'     )
+		Wvt_AppendMenu( hPop, nPrompt, K_F4, 'Shrink Window'     )
+		Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'            )
+		Wvt_AppendMenu( hPop, nPrompt, K_F6, 'Minimize'          )
+		Wvt_AppendMenu( hPop, nPrompt, K_F7, 'Partial Screen'    )
+		Wvt_AppendMenu( hPop, nPrompt, K_F8, 'Lines'             )
+		Wvt_AppendMenu( hPop, nPrompt, K_F9, 'Choose Font'       )
+		Wvt_AppendMenu( hPop, nPrompt, K_F10,'Choose Color'      )   
+		
+		Wvt_AppendMenu( hPop, MF_SEPARATOR )
+	
+		Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'  )
+	   
+	endif
+
+case nID == 2   //  Browser
+		
+   if hPop == nil
+		hPop := Wvt_CreatePopupMenu()	
+		Wvt_AppendMenu( hPop, nPrompt, K_DOWN     , 'Down'      )
+		Wvt_AppendMenu( hPop, nPrompt, K_UP       , 'Up'        )
+		Wvt_AppendMenu( hPop, nPrompt, K_PGDN     , 'Page Down' )
+		Wvt_AppendMenu( hPop, nPrompt, K_PGUP     , 'Page Up'   )
+		Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGUP, 'Top'       )
+		Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGDN, 'Bottom'    )
+		
+		Wvt_AppendMenu( hPop, MF_SEPARATOR )		
+		
+		hPop1 := Wvt_CreatePopupMenu()
+		Wvt_AppendMenu( hPop1, nPrompt, K_RIGHT   , 'Right'     )
+		Wvt_AppendMenu( hPop1, nPrompt, K_LEFT    , 'Left'      )
+		Wvt_AppendMenu( hPop1, nPrompt, K_END     , 'End'       )
+		Wvt_AppendMenu( hPop1, nPrompt, K_HOME    , 'Home'      )
+
+		Wvt_AppendMenu( hPop, MF_ENABLED+MF_POPUP, hPop1, 'Column Movement' )
+		
+	endif
+	
+endcase
+
+hPop_[ nID ] := hPop
+
+return Wvt_SetPopupMenu( hPop_[ nID ] )
 
 //-------------------------------------------------------------------//
 

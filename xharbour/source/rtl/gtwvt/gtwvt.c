@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.93 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: gtwvt.c,v 1.94 2004/04/23 07:29:11 vouchcac Exp $
  */
 
 /*
@@ -2807,6 +2807,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
   POINT xy, colrow ;
   SHORT keyCode;
   SHORT keyState = 0;
+  ULONG lPopupRet ;
 
   HB_SYMBOL_UNUSED( hWnd );
   HB_SYMBOL_UNUSED( wParam );
@@ -2828,10 +2829,10 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     xy.x   = LOWORD( lParam );
     xy.y   = HIWORD( lParam );
 
-    colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+    colrow = hb_wvt_gtGetColRowFromXY( ( SHORT ) xy.x, ( SHORT ) xy.y );
 
-    hb_wvt_gtSetMouseX( (SHORT) colrow.x );
-    hb_wvt_gtSetMouseY( (SHORT) colrow.y );
+    hb_wvt_gtSetMouseX( ( SHORT ) colrow.x );
+    hb_wvt_gtSetMouseY( ( SHORT ) colrow.y );
 
     switch( message )
     {
@@ -2851,12 +2852,25 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         keyCode = K_RBUTTONDOWN;
         break;
 
+      case WM_RBUTTONUP:
+        if ( _s.hPopup )
+        {
+           GetCursorPos( &xy );
+           lPopupRet = TrackPopupMenu( _s.hPopup, TPM_CENTERALIGN + TPM_RETURNCMD, xy.x, xy.y, 0, hWnd, NULL );
+           if ( lPopupRet )
+           {
+              hb_wvt_gtAddCharToInputQueue( lPopupRet );
+           }
+          return;
+        }
+        else
+        {
+          keyCode = K_RBUTTONUP;
+          break;
+        }
+
       case WM_LBUTTONUP:
         keyCode = K_LBUTTONUP;
-        break;
-
-      case WM_RBUTTONUP:
-        keyCode = K_RBUTTONUP;
         break;
 
       case WM_MBUTTONDOWN:
@@ -3018,9 +3032,6 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM ) hIcon ); // Set Title Bar ICON
     SendMessage( _s.hWnd, WM_SETICON, ICON_BIG  , ( LPARAM ) hIcon ); // Set Task List Icon
-
-//    DeleteObject( hIcon );
-//    DestroyIcon( hIcon );
   }
 
   return( ( DWORD ) hIcon ) ;
@@ -3785,9 +3796,34 @@ HB_FUNC( WVT_SETMENU )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_SETPOPUPMENU )
+{
+   HMENU hPopup = _s.hPopup ;
+/*
+   if ( _s.hPopup )
+   {
+      _s.hPopup = NULL ;  // DestroyMenu( _s.hPopup );
+   }
+*/
+   _s.hPopup = ( HMENU ) hb_parnl( 1 );
+   if ( hPopup )
+   {
+      hb_retnl( ( LONG ) hPopup );
+   }
+}
+
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_CREATEMENU )
 {
   hb_retnl( ( LONG ) CreateMenu() ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CREATEPOPUPMENU )
+{
+  hb_retnl( ( LONG ) CreatePopupMenu() ) ;
 }
 
 //-------------------------------------------------------------------//
@@ -3804,7 +3840,7 @@ HB_FUNC( WVT_APPENDMENU )
     if ( iLen > 0 && iLen < 256 )   // Translate '~' to '&'
     {
       lpszCaption = hb_parcx( 4 ) ;
-      for ( i=0; i< iLen ; i++ )
+      for ( i = 0; i < iLen; i++ )
       {
         ucBuf[ i ] = ( *lpszCaption == '~' ) ? '&' : *lpszCaption ;
         lpszCaption++;
@@ -3819,7 +3855,7 @@ HB_FUNC( WVT_APPENDMENU )
   }
   else
   {
-    lpszCaption = ( LPCTSTR ) hb_parni( 4 ) ; // It is a
+    lpszCaption = ( LPCTSTR ) hb_parni( 4 ) ; // It is a SEPARATOR or Submenu
   }
 
   hb_retl( AppendMenu( ( HMENU ) hb_parnl( 1 ), ( UINT ) hb_parni( 2 ), ( UINT_PTR ) hb_parni( 3 ), ( LPCTSTR ) lpszCaption ) ) ;
@@ -5384,38 +5420,42 @@ HB_FUNC( WVT_SETPOINTER )
       break;
 
    case 7:
-      hCursor = LoadCursor( NULL, IDC_SIZENWSE );
+      hCursor = LoadCursor( NULL, IDC_ICON     );
       break;
 
    case 8:
-      hCursor = LoadCursor( NULL, IDC_SIZENESW );
+      hCursor = LoadCursor( NULL, IDC_SIZENWSE );
       break;
 
    case 9:
-      hCursor = LoadCursor( NULL, IDC_SIZEWE   );
+      hCursor = LoadCursor( NULL, IDC_SIZENESW );
       break;
 
    case 10:
-      hCursor = LoadCursor( NULL, IDC_SIZENS   );
+      hCursor = LoadCursor( NULL, IDC_SIZEWE   );
       break;
 
    case 11:
-      hCursor = LoadCursor( NULL, IDC_SIZEALL  );
+      hCursor = LoadCursor( NULL, IDC_SIZENS   );
       break;
 
    case 12:
-      hCursor = LoadCursor( NULL, IDC_NO       );
+      hCursor = LoadCursor( NULL, IDC_SIZEALL  );
       break;
 
    case 13:
-      hCursor = LoadCursor( NULL, IDC_HAND     );
+      hCursor = LoadCursor( NULL, IDC_NO       );
       break;
 
    case 14:
-      hCursor = LoadCursor( NULL, IDC_APPSTARTING );
+      hCursor = LoadCursor( NULL, IDC_HAND     );
       break;
 
    case 15:
+      hCursor = LoadCursor( NULL, IDC_APPSTARTING );
+      break;
+
+   case 16:
       hCursor = LoadCursor( NULL, IDC_HELP     );
       break;
 

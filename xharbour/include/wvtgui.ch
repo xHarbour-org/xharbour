@@ -1,5 +1,5 @@
 /*
- * $Id: wvtgui.ch,v 1.1 2004/01/17 02:36:21 fsgiudice Exp $
+ * $Id: wvtgui.ch,v 1.1 2004/04/24 13:32:44 fsgiudice Exp $
  */
 
 /*
@@ -233,3 +233,6 @@
                    [WIDTH <nWidth>]                                     ;
                    [HEIGHT <nHeight>]                                   ;
       => WVT_AddPaintList( {|| Wvt_DrawRoundRect( <nTop>, <nLeft>, <nBottom>, <nRight>, <nHeight>, <nWidth> ) } )
+
+//-------------------------------------------------------------------//
+

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.16 2004/02/03 22:12:50 ronpinkas Exp $
+ * $Id: hbgtwvt.h,v 1.17 2004/03/31 05:22:44 vouchcac Exp $
  */
 
 /*
@@ -50,7 +50,10 @@
  *
  */
 
+//-------------------------------------------------------------------//
 #ifndef HB_WVT_H_
+//-------------------------------------------------------------------//
+
 #define HB_WVT_H_
 
 //-------------------------------------------------------------------//
@@ -69,6 +72,8 @@
 #ifndef CINTERFACE
    #define CINTERFACE 1
 #endif
+
+//-------------------------------------------------------------------//
 
 #include <windows.h>
 #include <winuser.h>
@@ -108,6 +113,8 @@
 #define WVT_DEFAULT_ROWS      25
 #define WVT_DEFAULT_COLS      80
 
+//-------------------------------------------------------------------//
+
 #define BLACK          RGB( 0x0 ,0x0 ,0x0  )
 #define BLUE           RGB( 0x0 ,0x0 ,0x85 )
 #define GREEN          RGB( 0x0 ,0x85,0x0  )
@@ -125,7 +132,11 @@
 #define YELLOW         RGB( 0xFF,0xFF,0x00 )
 #define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
 
+//-------------------------------------------------------------------//
+
 #define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )
+
+//-------------------------------------------------------------------//
 
 typedef struct global_data
 {
@@ -181,11 +192,15 @@ typedef struct global_data
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
   PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
   PHB_DYNS  pSymWVT_MOUSE;             // Stores pointer to WVT_MOUSE function
-  int       rowStart;
-  int       rowStop;
-  int       colStart;
-  int       colStop;    
+  int       rowStart;                  // Holds nTop    of last WM_PAINT rectangle returned by Wvt_GrtPaintRect()
+  int       rowStop;                   // Holds nBottom of last WM_PAINT rectangle
+  int       colStart;                  // Holds nLeft   of last WM_PAINT rectangle
+  int       colStop;                   // Holds nRight  of last WM_PAINT rectangle
+  HMENU     hPopup;                    // Handle of context menu invokable with right click
+
 } GLOBAL_DATA;
+
+//-------------------------------------------------------------------//
 
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );
 BOOL   HB_EXPORT hb_wvt_gtSetCentreWindow( BOOL bCentre, BOOL bPaint );
@@ -210,6 +225,10 @@ BOOL   HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * imag
 BOOL   HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
 BOOL   HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
 BOOL   HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
+
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 
+//-------------------------------------------------------------------//
 #endif
+//-------------------------------------------------------------------//
+
