@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: utils.c,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -301,8 +301,8 @@ static MIME_ENTRY s_mimeTable[ MIME_TABLE_SIZE ] =
    /* 51*/ { 0, "<head", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
    /* 52*/ { 0, "<body", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
    /* 53*/ { 0, "<!--", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS },
-   /* 54*/ { 0, "<h1", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
-   /* 55*/ { 0, "<!doctype html", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
+   /* 54*/ { 0, "<h", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
+   /* 55*/ { 0, "<!", "text/html", 0, 0, MIME_FLAG_TRIMSPACES | MIME_FLAG_TRIMTABS | MIME_FLAG_CASEINSENS },
 
    /* Postscript */
    /* 56*/ { 0, "%!", "application/postscript", 0, 0, 0 },
@@ -423,7 +423,8 @@ static char *s_findMimeStringInTree( char *cData, int iLen, int iElem )
 
    // trim spaces if required
    while ( iPos < iLen &&
-      ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && cData[iPos] == ' ') ||
+      ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && (
+         cData[iPos] == ' ' || cData[iPos] == '\r' || cData[iPos] == '\n') ) ||
          (( elem->flags & MIME_FLAG_TRIMTABS ) == MIME_FLAG_TRIMSPACES && cData[iPos] == '\t') ) )
    {
       iPos ++;
@@ -491,7 +492,8 @@ static char *s_findStringMimeType( char *cData, int iLen )
 
       // trim spaces if required
       while ( iPos < iLen &&
-         ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && cData[iPos] == ' ') ||
+         ( (( elem->flags & MIME_FLAG_TRIMSPACES ) == MIME_FLAG_TRIMSPACES && (
+             cData[iPos] == ' ' || cData[iPos] == '\r' || cData[iPos] == '\n') ) ||
            (( elem->flags & MIME_FLAG_TRIMTABS ) == MIME_FLAG_TRIMSPACES && cData[iPos] == '\t') ) )
       {
          iPos ++;
@@ -635,7 +637,6 @@ HB_FUNC( TIP_FILEMIMETYPE )
          ext_type = s_findExtMimeType( fname + iPos + 1 );
       }
 
-      // try to open the file
       fileIn = hb_fsOpen( ( BYTE * ) fname, FO_READ );
       if ( hb_fsError() == 0 )
       {
