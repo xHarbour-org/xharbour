@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.0 2002/01/31 05:40:18 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.1 2002/01/31 05:57:24 ronpinkas Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  *
  */
 
+#include "error.ch"
+
 //--------------------------------------------------------------//
 FUNCTION CStr( xExp )
 
@@ -90,4 +92,94 @@ FUNCTION CStr( xExp )
    ENDCASE
 
 RETURN ""
+
+//--------------------------------------------------------------//
+FUNCTION CStrToVal( cExp, cType )
+
+   IF ValType( cExp ) != 'C'
+      __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+   ENDIF
+
+   DO CASE
+      CASE cType = 'C'
+         RETURN cExp
+
+      CASE cType = 'D'
+         IF cExp[3] >= '0' .AND. cExp[3] <= '9' .AND. cExp[5] >= '0' .AND. cExp[5] <= '9'
+            RETURN cToD( cExp )
+         ELSE
+            RETURN sToD( cExp )
+         ENDIF
+
+      CASE cType = 'L'
+         RETURN IIF( cExp[1] == 'T' .OR. cExp[2] == 'Y' .OR. cExp[2] == 'T' .OR. cExp[2] == 'Y', .T., .F. )
+
+      CASE cType = 'N'
+         RETURN Val( cExp )
+
+      CASE cType = 'M'
+         RETURN cExp
+
+      /*
+      CASE cType = 'A'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+
+      CASE cType = 'B'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+
+      CASE cType = 'O'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+      */
+
+      OTHERWISE
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+   ENDCASE
+
+RETURN NIL
+
+//--------------------------------------------------------------//
+FUNCTION ValToPrg( xExp )
+
+   LOCAL cType := ValType( xExp )
+
+   DO CASE
+      CASE cType = 'C'
+         IF ! '"' $ xExp
+            RETURN '"' + xExp + '"'
+         ELSEIF ! "'" $ xExp
+            RETURN "'" + xExp + "'"
+         ELSEIF ( ! "[" $ xExp ) .AND. ( ! "]" $ xExp )
+            RETURN "[" + xExp + "]"
+         ELSE
+            __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         ENDIF
+
+      CASE cType = 'D'
+         RETURN "cToD( '" + dToC( xExp ) + "' )"
+
+      CASE cType = 'L'
+         RETURN IIF( xExp, ".T.", ".F." )
+
+      CASE cType = 'N'
+         RETURN Str( xExp )
+
+      CASE cType = 'M'
+         RETURN xExp
+
+      /*
+      CASE cType = 'A'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+
+      CASE cType = 'B'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+
+      CASE cType = 'O'
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+      */
+
+      OTHERWISE
+         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+   ENDCASE
+
+RETURN NIL
 //--------------------------------------------------------------//

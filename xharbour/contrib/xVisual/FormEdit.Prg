@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.50 2002/10/06 06:07:08 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.51 2002/10/06 08:15:58 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -428,7 +428,7 @@ METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
       XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ -1 ] )
 
       FOR EACH aVar IN XFMControl[ 3 ]
-         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + CStr( aVar[2] ) )
+         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + ValToPrg( aVar[2] ) )
       NEXT
 
       aAdd( XFMControl[ 4 ], "   END CONTROL" )
@@ -455,7 +455,7 @@ METHOD XFMReflect() CLASS TFormEdit
    cText += CRLF
 
    FOR EACH aVar IN ::aXFM[ XFM_Datas ]
-      cText += ( "   VAR " + aVar[1] + " INIT " + CStr( aVar[2] ) + CRLF )
+      cText += ( "   VAR " + aVar[1] + " INIT " + ValToPrg( aVar[2] ) + CRLF )
    NEXT
    cText += CRLF
 

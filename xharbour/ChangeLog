@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.424 2002/10/05 23:27:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.425 2002/10/06 02:00:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-06 14:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rtl/cstr.prg
+     + Added new function StrToVal( cString, cType )
+     + Added new function StrToPrg( xVal )
+
+   * contrib/xVisual/FormEdit.Prg
+     * Using new StrToPrg in XFMReflection()
+
+   * include/hbapi.h
+     + Added extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc );
+   * source/vm/hvm.c
+     * Changed hb_objGetMethod() to hb_objGetMthd()
+
+   * source/vm/classes.c
+     + Added new function __CLSMSGASSIGNED( nClassH, cMsg ) to return .F. if Message is Virtual or does not exist.
 
 2002-10-05 23:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.23 2002/10/05 08:16:43 ronpinkas Exp $
+ * $Id: classes.c,v 1.24 2002/10/05 16:19:44 ronpinkas Exp $
  */
 
 /*
@@ -1818,6 +1818,49 @@ HB_FUNC( __CLSMODMSG )
    }
 }
 
+HB_FUNC( __CLSMSGASSIGNED )
+{
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+
+   hb_stack.Return.type = HB_IT_LOGICAL;
+   hb_stack.Return.item.asLogical.value = FALSE;
+
+   if( uiClass && uiClass <= s_uiClasses && pString )
+   {
+      PHB_DYNS pMsg = hb_dynsymFindName( pString->item.asString.value );
+
+      if( pMsg )
+      {
+         PCLASS   pClass   = s_pClasses + ( uiClass - 1 );
+         USHORT   uiAt     = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
+         USHORT   uiMask   = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+         USHORT   uiLimit  = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
+
+         while( ( uiAt != uiLimit ) &&
+                ( pClass->pMethods[ uiAt ].pMessage &&
+                ( pClass->pMethods[ uiAt ].pMessage != pMsg ) ) )
+         {
+            uiAt++;
+
+            if( uiAt == uiMask )
+            {
+               uiAt = 0;
+            }
+         }
+
+         if( uiAt != uiLimit )
+         {                                         /* Requested method found   */
+            PHB_FUNC pFunc = pClass->pMethods[ uiAt ].pFunction;
+
+            if( pFunc != hb___msgVirtual )         /* NON Virtual method */
+            {
+               hb_stack.Return.item.asLogical.value = TRUE;
+            }
+         }
+      }
+   }
+}
 
 /*
  * <cClassName> := ClassName( <hClass> )
