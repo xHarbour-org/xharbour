@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.76 2004/03/15 12:45:26 druzus Exp $
+ * $Id: dbfntx1.c,v 1.77 2004/03/20 23:24:47 druzus Exp $
  */
 
 /*
@@ -1223,6 +1223,7 @@ static void hb_ntxPageSave( LPTAGINFO pTag, LPPAGEINFO pPage )
    ( ( LPNTXBUFFER ) pPage->buffer )->item_count = pPage->uiKeys;
    hb_fsSeek( pTag->Owner->DiskFile, pPage->Page, FS_SET );
    hb_fsWrite( pTag->Owner->DiskFile, (BYTE *) pPage->buffer, NTXBLOCKSIZE );
+   pTag->Owner->fFlush = TRUE;
    pPage->Changed = FALSE;
 }
 
@@ -2119,7 +2120,10 @@ static void hb_ntxWritePage( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, char* buff
       /* printf( "\nhb_ntxWritePage-1A" ); */
    }
    else
+   {
       hb_fsWrite( pTag->Owner->DiskFile, (BYTE *) buffer, NTXBLOCKSIZE );
+      pTag->Owner->fFlush = TRUE;
+   }
 }
 
 static void hb_ntxRootPage( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, LPSORTITEM pKey, ULONG* lpArray, USHORT level )
@@ -2775,6 +2779,8 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
    }
    else
       hb_fsWrite( pIndex->DiskFile,(BYTE*)&Header,16 );
+
+   pIndex->fFlush = TRUE;
 }
 
 static LPTAGINFO hb_ntxTagNew( LPNTXINDEX PIF, char * ITN, BOOL fTagName, char *szKeyExpr,
@@ -3512,9 +3518,10 @@ static ERRCODE ntxFlush( NTXAREAP pArea )
    pTag = pArea->lpNtxTag;
    while( pTag )
    {
-      if( !pTag->Memory )
+      if( !pTag->Memory && pTag->Owner->fFlush )
       {
          hb_fsCommit( pTag->Owner->DiskFile );
+         pTag->Owner->fFlush = FALSE;
       }
       pTag = pTag->pNext;
    }
@@ -3594,6 +3601,7 @@ static ERRCODE ntxZap( NTXAREAP pArea )
             hb_fsSeek( pTag->Owner->DiskFile, NTXBLOCKSIZE, FS_SET );
             hb_fsWrite( pTag->Owner->DiskFile, (BYTE *) buffer, NTXBLOCKSIZE );
             hb_fsWrite( pTag->Owner->DiskFile, NULL, 0 );
+            pTag->Owner->fFlush = TRUE;
          }
 
          pTag = pTag->pNext;
@@ -4263,6 +4271,7 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
       {
          hb_fsSeek( pTag->Owner->DiskFile, NTXBLOCKSIZE, FS_SET );
          hb_fsWrite( pTag->Owner->DiskFile, NULL, 0 );
+         pTag->Owner->fFlush = TRUE;
       }
 
       pTag->RootBlock = 0;

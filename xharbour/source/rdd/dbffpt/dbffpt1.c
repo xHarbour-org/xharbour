@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.12 2004/02/27 14:40:38 paultucker Exp $
+ * $Id: dbffpt1.c,v 1.13 2004/02/29 00:42:07 paultucker Exp $
  */
 
 /*
@@ -491,6 +491,7 @@ static ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, USHOR
             errCode = EDBF_WRITE;
          }
          pGCtable->pGCitems[i].fChanged = FALSE;
+         pArea->fMemoFlush = TRUE;
       }
    }
    return errCode;
@@ -893,6 +894,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
             hb_fsWrite( pArea->hMemoFile, NULL, 0 );
          }
       }
+      pArea->fMemoFlush = TRUE;
       pGCtable->bChanged = 0;
    }
    return errCode;
@@ -1616,6 +1618,7 @@ static ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, BYTE *bBufPtr,
                                       pArea->uiMemoBlockSize - 1, FS_SET );
          hb_fsWrite( pArea->hMemoFile, ( BYTE * ) "\xAF", 1 );
       }
+      pArea->fMemoFlush = TRUE;
    }
    else
    {
@@ -2033,6 +2036,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    /* trunc file */
    hb_fsWrite( pArea->hMemoFile, NULL, 0 );
+   pArea->fMemoFlush = TRUE;
    return SUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.28 2004/03/15 12:45:25 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.29 2004/03/18 04:28:30 druzus Exp $
  */
 
 /*
@@ -327,6 +327,7 @@ typedef struct _CDXINDEX
 #endif
    BOOL     fChanged;         /* changes written to index, need upadte ulVersion */
    ULONG    ulVersion;        /* network version/update flag */
+   BOOL     fFlush;           /* changes written to index, need upadte ulVersion */
 } CDXINDEX;
 typedef CDXINDEX * LPCDXINDEX;
 
@@ -382,6 +383,8 @@ typedef struct _CDXAREA
    BYTE bMemoType;               /* MEMO type used in DBF memo fields */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
+   BOOL fDataFlush;              /* data was written to DBF and not commited */
+   BOOL fMemoFlush;              /* data was written to MEMO and not commited */
    BYTE bVersion;                /* DBF version ID byte */
    BYTE bCodePage;               /* DBF codepage ID */
    BOOL fShared;                 /* Shared file */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.6 2004/02/20 22:33:58 ronpinkas Exp $
+ * $Id: dbfdbt1.c,v 1.7 2004/02/23 10:01:41 andijahja Exp $
  */
 
 /*
@@ -395,6 +395,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    /* Write memo data and eof mark */
    hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
    hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
+   pArea->fMemoFlush = TRUE;
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage );
 #endif
@@ -406,6 +407,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
       ulNextBlock /= DBT_BLOCKSIZE;
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
       hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &ulNextBlock, sizeof( ulNextBlock ) );
+      pArea->fMemoFlush = TRUE;
    }
 }
 
@@ -671,6 +673,7 @@ static ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo )
    if( hb_fsWrite( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE ) != DBT_BLOCKSIZE )
       return FAILURE;
    hb_fsWrite( pArea->hMemoFile, NULL, 0 );
+   pArea->fMemoFlush = TRUE;
 
    return SUCCESS;
 }

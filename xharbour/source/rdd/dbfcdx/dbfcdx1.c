@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.118 2004/03/21 21:48:49 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.119 2004/03/24 10:17:22 druzus Exp $
  */
 
 /*
@@ -1019,6 +1019,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
             if ( hb_fsWrite( hFile, byBuf, CDX_PAGELEN ) != CDX_PAGELEN )
                hb_errInternal( EDBF_WRITE, "Write in index page failed.(2)", "", "" );
          }
+         pIndex->fChanged = TRUE;
       }
    }
    return ulPos;
@@ -1320,6 +1321,7 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
          {
             hb_errInternal( EDBF_WRITE, "Write in index page failed (ver)", "", "" );
          }
+         pIndex->fFlush = TRUE;
          pIndex->fChanged = FALSE;
       }
 #ifdef HB_CDX_DBGCODE
@@ -1344,9 +1346,14 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
             hb_errInternal( EDBF_WRITE, "Write in index page failed (ver.ex)", "", "" );
          }
          pIndex->ulVersion = pIndex->freePage;
+         pIndex->fFlush = TRUE;
 #ifdef HB_CDX_DBGUPDT
          cdxWriteNO++;
 #endif
+      }
+      else if ( pIndex->fChanged )
+      {
+         pIndex->fFlush = TRUE;
       }
       pIndex->fChanged = FALSE;
    }
@@ -4203,6 +4210,7 @@ static void hb_cdxIndexReindex( LPCDXINDEX pIndex )
    pIndex->freePage = 0;
    hb_fsSeek( pIndex->hFile, 0, FS_SET );
    hb_fsWrite( pIndex->hFile, NULL, 0 );
+   pIndex->fChanged = TRUE;
 
    /* Rebuild the compound (master) tag */
    if ( pCompound )
@@ -5438,8 +5446,11 @@ static ERRCODE hb_cdxFlush( CDXAREAP pArea )
    pIndex = pArea->lpIndexes;
    while ( pIndex )
    {
-      if ( pIndex->hFile != FS_ERROR )
+      if ( pIndex->hFile != FS_ERROR && pIndex->fFlush )
+      {
          hb_fsCommit( pIndex->hFile );
+         pIndex->fFlush = FALSE;
+      }
       pIndex = pIndex->pNext;
    }
 
@@ -6292,6 +6303,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    {
       hb_fsSeek( pIndex->hFile, 0, FS_SET );
       hb_fsWrite( pIndex->hFile, NULL, 0 );
+      pIndex->fChanged = TRUE;
       hb_cdxIndexDropAvailPage( pIndex );
       if ( pIndex->pCompound != NULL )
          hb_cdxTagFree( pIndex->pCompound );

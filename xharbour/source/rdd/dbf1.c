@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.67 2004/03/21 15:55:04 druzus Exp $
+ * $Id: dbf1.c,v 1.68 2004/03/23 02:18:04 andijahja Exp $
  */
 
 /*
@@ -282,6 +282,7 @@ static BOOL hb_dbfWriteRecord( DBFAREAP pArea )
       hb_itemRelease( pError );
       return FALSE;
    }
+   pArea->fDataFlush = TRUE;
    return TRUE;
 }
 
@@ -1032,13 +1033,21 @@ static ERRCODE hb_dbfFlush( DBFAREAP pArea )
                     pArea->uiRecordLen * pArea->ulRecCount, FS_SET );
          hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
          hb_fsWrite( pArea->hDataFile, NULL, 0 );
+         pArea->fDataFlush = TRUE;
       }
       SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
 
-   hb_fsCommit( pArea->hDataFile );
-   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+   if ( pArea->fDataFlush )
+   {
+      hb_fsCommit( pArea->hDataFile );
+      pArea->fDataFlush = FALSE;
+   }
+   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR && pArea->fMemoFlush )
+   {
       hb_fsCommit( pArea->hMemoFile );
+      pArea->fMemoFlush = FALSE;
+   }
    return uiError;
 }
 
@@ -1446,12 +1455,13 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
                     pArea->uiRecordLen * pArea->ulRecCount, FS_SET );
          hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
          hb_fsWrite( pArea->hDataFile, NULL, 0 );
+         pArea->fDataFlush = TRUE;
          SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
    }
 
    /* Close the data file */
-   if( pArea->hDataFile != FS_ERROR )
+   if( pArea->hDataFile != FS_ERROR && pArea->fDataFlush )
    {
       hb_fsCommit( pArea->hDataFile );
       hb_fsClose( pArea->hDataFile );
@@ -1459,7 +1469,7 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    }
 
    /* Close the memo file */
-   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR && pArea->fMemoFlush )
    {
       hb_fsCommit( pArea->hMemoFile );
       hb_fsClose( pArea->hMemoFile );
@@ -1622,6 +1632,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_xfree( pBuffer );
       return FAILURE;
    }
+   pArea->fDataFlush = TRUE;
    hb_xfree( pBuffer );
 
    /* Create memo file */
@@ -2765,6 +2776,7 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    HB_PUT_LE_USHORT( dbfHeader.uiRecordLen, pArea->uiRecordLen );
    hb_fsSeek( pArea->hDataFile, 0, FS_SET );
    hb_fsWrite( pArea->hDataFile, ( BYTE * ) &dbfHeader, sizeof( DBFHEADER ) );
+   pArea->fDataFlush = TRUE;
    pArea->fUpdateHeader = FALSE;
    if( fLck )
       SELF_RAWLOCK( ( AREAP ) pArea, HEADER_UNLOCK, 0 );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.13 2004/01/28 14:45:40 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.14 2004/03/23 02:14:57 andijahja Exp $
  */
 
 /*
@@ -149,6 +149,8 @@ typedef struct _DBFAREA
    BYTE bMemoType;               /* MEMO type used in DBF memo fields */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
+   BOOL fDataFlush;              /* data was written to DBF and not commited */
+   BOOL fMemoFlush;              /* data was written to MEMO and not commited */
    BYTE bVersion;                /* DBF version ID byte */
    BYTE bCodePage;               /* DBF codepage ID */
    BOOL fShared;                 /* Shared file */

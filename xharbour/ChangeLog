@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2648 2004/03/25 03:17:21 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2649 2004/03/25 09:38:31 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-25 13:22 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+   * implemented logic to eliminate unnecessary hb_fsCommit() if dbf,
+     memo or index files was changed and user call COMMIT or CLOSE
+     It resolves problem with slow down performance on some Windows
+     versions and reduce one OS call.
 
 2004-03-25 10:46 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/hbxml.c

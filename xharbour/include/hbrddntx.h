@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.17 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrddntx.h,v 1.18 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -166,6 +166,7 @@ typedef struct _NTXINDEX
    LONG      NextAvail;
    struct   _NTXAREA * Owner;
    FHANDLE   DiskFile;
+   BOOL      fFlush;
    LPTAGINFO CompoundTag;
    struct   _NTXINDEX * pNext;   /* The next index in the list */
 } NTXINDEX;
@@ -268,6 +269,8 @@ typedef struct _NTXAREA
    BYTE bMemoType;               /* MEMO type used in DBF memo fields */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
+   BOOL fDataFlush;              /* data was written to DBF and not commited */
+   BOOL fMemoFlush;              /* data was written to MEMO and not commited */
    BYTE bVersion;                /* DBF version ID byte */
    BYTE bCodePage;               /* DBF codepage ID */
    BOOL fShared;                 /* Shared file */
