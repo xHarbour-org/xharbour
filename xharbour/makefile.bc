@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.126 2004/12/03 22:00:22 aleytys Exp $
+# $Id: makefile.bc,v 1.127 2004/12/08 01:24:57 peterrees Exp $
 #
 
 #
@@ -202,7 +202,7 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 
 COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
-CT_LIB         = $(LIB_DIR)\hbct.lib
+CT_LIB         = $(LIB_DIR)\ct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
 DBFDBT_LIB     = $(LIB_DIR)\dbfdbt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib
@@ -214,7 +214,7 @@ NULSYS_LIB     = $(LIB_DIR)\nulsys.lib
 PP_LIB         = $(LIB_DIR)\pp.lib
 RDD_LIB        = $(LIB_DIR)\rdd.lib
 RTL_LIB        = $(LIB_DIR)\rtl.lib
-TIP_LIB        = $(LIB_DIR)\hbtip.lib
+TIP_LIB        = $(LIB_DIR)\tip.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 SAMPLES_LIB    = $(LIB_DIR)\samples.lib
@@ -247,8 +247,8 @@ ODBC_STLIB       = $(ODBC_LIB)
    DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
    DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
    PP_LIB         = $(LIB_DIR)\ppmt.lib
-   CT_LIB         = $(LIB_DIR)\hbctmt.lib
-   TIP_LIB        = $(LIB_DIR)\hbtipmt.lib
+   CT_LIB         = $(LIB_DIR)\ctmt.lib
+   TIP_LIB        = $(LIB_DIR)\tipmt.lib
    ODBC_LIB       = $(LIB_DIR)\hbodbcmt.lib
    SAMPLES_LIB    = $(LIB_DIR)\samplesmt.lib
 !endif
@@ -831,7 +831,7 @@ GTNUL_LIB_OBJS = \
    $(OBJ_DIR)\gtext.obj
 
 #
-# HBTIP.LIB rules
+# TIP.LIB rules
 #
 
 TIP_LIB_OBJS = \
@@ -3118,7 +3118,7 @@ $(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
 
 #
-# HBTIP.LIB dependencies
+# TIP.LIB dependencies
 #
 
 $(TIP_OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
@@ -3200,7 +3200,7 @@ $(TIP_OBJ_DIR)\url.obj : $(TIP_OBJ_DIR)\url.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
-# HBCT.LIB dependencies
+# CT.LIB dependencies
 #
 
 $(CT_OBJ_DIR)\addascii.obj : $(CT_DIR)\addascii.c

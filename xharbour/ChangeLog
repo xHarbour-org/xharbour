@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3662 2004/12/09 13:41:27 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3663 2004/12/09 13:47:45 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-12-10 00:10 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * source\ct\Makefile
+  * source\tip\Makefile
+    ! Libs renamed from hbtip to tip and from hbct to ct
 
 2004-12-09 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/vm/inet.c

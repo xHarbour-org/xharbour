@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.12 2004/11/29 22:11:31 ptsarenko Exp $
+# $Id: Makefile,v 1.13 2004/12/08 14:09:16 aleytys Exp $
 #
 
 ROOT = ../../
@@ -97,9 +97,9 @@ PRG_SOURCES= \
    untext.prg \
    util.prg
 
-LIBNAME=hbct
+LIBNAME=ct
 ifeq ($(HB_MT),MT)
-   MT_LIBNAME=hbctmt
+   MT_LIBNAME=ctmt
 endif
 
 include $(TOP)$(ROOT)config/lib.cf

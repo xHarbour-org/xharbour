@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.111 2004/12/03 22:00:23 aleytys Exp $
+# $Id: makefile.nt,v 1.112 2004/12/08 01:25:13 peterrees Exp $
 #
 
 #
@@ -171,8 +171,8 @@ C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 
 CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
 COMMON_LIB       =$(LIB_DIR)\common.lib
-CT_LIB           =$(LIB_DIR)\hbct.lib
-CTMT_LIB         =$(LIB_DIR)\hbct$(MT).lib
+CT_LIB           =$(LIB_DIR)\ct.lib
+CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
 DBFDBT_LIB       =$(LIB_DIR)\dbfdbt.lib
@@ -194,8 +194,8 @@ RDD_LIB          =$(LIB_DIR)\rdd.lib
 RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB          =$(LIB_DIR)\rtl.lib
 RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
-TIP_LIB          =$(LIB_DIR)\hbtip.lib
-TIPMT_LIB        =$(LIB_DIR)\hbtip$(MT).lib
+TIP_LIB          =$(LIB_DIR)\tip.lib
+TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
 SAMPLES_LIB      =$(LIB_DIR)\samples.lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
@@ -1073,7 +1073,7 @@ SAMPLES_LIB_OBJS =  \
    $(OBJ_DIR)\time.obj
 
 #
-# HBTIP.LIB rules
+# TIP.LIB rules
 #
 {$(TIP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
