@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbcy.c,v 1.3 2004/02/06 12:55:17 andijahja Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ HB_FUNC( YYDECODE_FILE )
 
                        szFile = string + n_At + 4 ;
 
-                       printf( "szFile=%s\n",szFile);
+                       // printf( "szFile=%s\n",szFile);
 
                        if( szFile )
                        {
