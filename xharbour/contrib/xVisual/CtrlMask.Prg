@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.13 2002/10/06 02:50:59 ronpinkas Exp $
+ * $Id: CtrlMask.Prg,v 1.14 2002/10/06 02:54:14 ronpinkas Exp $
  */
 
 /*
@@ -110,6 +110,7 @@ CLASS oCtrlMask FROM TWindow
    METHOD OnLButtonUp()
    METHOD OnPaint()
    METHOD OnKeyDown()
+   METHOD OnKeyUp()
    METHOD OnSysKeyDown()
    METHOD GetSiblings()
    METHOD OnMouseMove()
@@ -296,6 +297,9 @@ METHOD OnKeyDown( wParam, lParam )
             b:=1
             IF lShift
                t:=1
+               ::moving := .T.
+            ELSE
+               ::sizing := .T.
             ENDIF
             FOR EACH a IN ::aSelected
                aRect:=GetWindowRect(a[SEL_HANDLE])
@@ -313,6 +317,9 @@ METHOD OnKeyDown( wParam, lParam )
             b:=-1
             IF lShift
                t:=-1
+               ::moving := .T.
+            ELSE
+               ::sizing := .T.
             ENDIF
             FOR EACH a IN ::aSelected
                aRect:=GetWindowRect(a[SEL_HANDLE])
@@ -330,6 +337,9 @@ METHOD OnKeyDown( wParam, lParam )
             r:=-1
             IF lShift
                l:=-1
+               ::moving := .T.
+            ELSE
+               ::sizing := .T.
             ENDIF
             FOR EACH a IN ::aSelected
                aRect:=GetWindowRect(a[SEL_HANDLE])
@@ -347,6 +357,9 @@ METHOD OnKeyDown( wParam, lParam )
             r:=1
             IF lShift
                l:=1
+              ::moving := .T.
+            ELSE
+               ::sizing := .T.
             ENDIF
             FOR EACH a IN ::aSelected
                aRect:=GetWindowRect(a[SEL_HANDLE])
@@ -375,6 +388,34 @@ METHOD OnKeyDown( wParam, lParam )
   //   ENDIF
 
      RETURN(NIL)
+
+
+*-----------------------------------------------------------------------------*
+
+ METHOD OnKeyUp( wParam, lParam )
+
+   LOCAL a
+   LOCAL oObj
+
+   IF wParam == VK_RIGHT .OR. wParam == VK_LEFT .OR. ;
+      wParam == VK_UP .OR. wParam == VK_DOWN .OR. ;
+      wParam == VK_SHIFT .OR. wParam == VK_CONTROL
+
+      IF ::sizing .OR. ::moving
+         ::sizing := .F.
+         ::moving := .F.
+
+         FOR EACH a IN ::aSelected
+            oObj:=::Parent:ChildFromHandle(a[SEL_HANDLE])
+            oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1)
+         NEXT
+
+      ENDIF
+
+   ENDIF
+
+   RETURN( NIL )
+
 
 *-----------------------------------------------------------------------------*
 
@@ -603,6 +644,8 @@ METHOD OnLButtonUp( wParam, x, y )
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)
       a[SEL_OLDRECT]:=aClone(aRect)
+      oObj:=::Parent:ChildFromHandle(a[SEL_HANDLE])
+      oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1)
    NEXT
 
    IF ::selecting
