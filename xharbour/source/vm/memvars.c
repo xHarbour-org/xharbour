@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.68 2004/03/29 17:04:19 ronpinkas Exp $
+ * $Id: memvars.c,v 1.69 2004/03/30 18:37:30 ronpinkas Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
-extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+// extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
