@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.239 2002/05/23 00:33:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.240 2002/05/23 01:21:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-23 13:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix, it was always written in the position 1 the first number
+      of a numeric field although the cursor was moved to write in
+      another position.
+    ! Fix minor bug in PutMask( )
 
 2002-05-22 18:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrayshb.c
