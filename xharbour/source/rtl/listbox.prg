@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.10 2003/05/01 14:25:23 lculik Exp $
+ * $Id: listbox.prg,v 1.11 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -1189,7 +1189,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ;
 
 RETURN oScroll
 
-Function __CAPLENGT( Arg1 )
+Function __CAPLENGTH( Arg1 )
 
      Local Local1 := Len( Arg1 )
      Local Local2
