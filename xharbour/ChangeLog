@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2673 2004/03/29 02:42:32 peterrees Exp $
+ * $Id: ChangeLog,v 1.2674 2004/03/29 03:43:38 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-29 08:12 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
+  * contrib\hbzlib\zip.c
+    ZipCreateArray()
+    ! Add full path to the file to ZIP when not given by the user
+    HB_ZIPFILE()
+    ! Add full path to the zip filename when not given by the user
+    ; This correct all problem reported by Jerzy on news.xharbour.org
+
+    HB_ZIPFILEBYPKSPAN()
+    ! Save and restore to the current directory after ZipCreateArray()
+
+    HB_ZIPFILEBYTDSPAN()
+    ! Save and restore to the current directory after ZipCreateArray()
+    ! Add full path to the zip filename when not given by the user
+
+  * contrib\hbzlib\zipcomp.cpp
+    hb_compressfile()
+    ! Fixed possiblility that the current Zipfile was added to the archive
+
 2004-03-29 15:54 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     - Posted correct file re previous post
