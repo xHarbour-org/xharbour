@@ -1,7 +1,3 @@
-/*
- * Chr(36) + "Id" + Chr(36)
- */
-
 #include "common.ch"
 /* VERY IMPORTANT: Don't use this querys as sample, they are used for stress tests !!! */
 

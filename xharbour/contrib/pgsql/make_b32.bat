@@ -1,7 +1,3 @@
-/*
- * Chr(36) + "Id" + Chr(36)
- */
-
 :@echo off
 
 if "%1" == "clean" goto CLEAN

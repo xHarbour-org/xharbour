@@ -1,8 +1,4 @@
 /*
- * Chr(36) + "Id" + Chr(36)
- */
-
-/*
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
  *

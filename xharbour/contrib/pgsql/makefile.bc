@@ -1,7 +1,3 @@
-/*
- * Chr(36) + "Id" + Chr(36)
- */
-
 # makefile for Borland C/C++ 32 bits
 # Building of postgres.lib - Harbour API to postgres
 

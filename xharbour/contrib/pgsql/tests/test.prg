@@ -1,7 +1,3 @@
-/*
- * Chr(36) + "Id" + Chr(36)
- */
-
 Function main()
     Local conn, res, aTemp, i
     

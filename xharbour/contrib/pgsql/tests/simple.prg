@@ -1,7 +1,3 @@
-/*
- * Chr(36) + "Id" + Chr(36)
- */
-
 #include "common.ch"
 
 Function main()

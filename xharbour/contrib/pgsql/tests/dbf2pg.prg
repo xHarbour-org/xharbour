@@ -1,8 +1,4 @@
 /*
- * Chr(36) + "Id" + Chr(36)
- */
-
-/*
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table
  *
