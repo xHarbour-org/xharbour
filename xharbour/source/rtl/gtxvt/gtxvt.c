@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.43 2004/09/01 16:18:51 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.44 2004/09/08 00:17:16 druzus Exp $
  */
 
 /*
@@ -4645,6 +4645,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
+    gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
+
 }
 
 /* ********************************************************************** */
