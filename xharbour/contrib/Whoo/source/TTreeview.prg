@@ -62,19 +62,23 @@ return oItem
 
 //----------------------------------------------------------------------------//
 
-static function FindItem( aItems, hItem )
-   local n, oItem
-   for n = 1 to Len( aItems )
-      if Len( aItems[ n ]:Items ) > 0
-         if ( oItem := FindItem( aItems[ n ]:Items, hItem ) ) != nil
-            return oItem
-         endif
-      endif
-      if aItems[ n ]:handle == hItem
-         return aItems[ n ]
-      endif
-   next
-return nil
+STATIC FUNCTION FindItem( aItems, hItem )
+
+   LOCAL oItem, oReturn
+
+   FOR EACH oItem IN aItems
+      IF Len( oItem:Items ) > 0
+         IF ( oReturn := FindItem( oItem:Items, hItem ) ) != NIL
+            RETURN oReturn 
+         ENDIF
+      ENDIF
+
+      IF oItem:Handle == hItem
+         RETURN oItem
+      ENDIF
+   NEXT
+
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 
