@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.60 2003/04/09 00:59:30 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.61 2003/04/10 16:51:21 ronpinkas Exp $
  */
 
 /*
@@ -1680,15 +1680,10 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
                  //printf( "Defined: >%s<\n", ptrb );
 
-                 if( ipos > 0 )
-                 {
-                    ipos += i - ( ptri - ptrb );
-                    *( sLine + isdvig + ipos - 1 ) = '\0';
-                 }
-
                  kolpass++;
-                 ptri = ptrb;
-                 goto NextName;
+
+                 // All the way from top again, check #defines from this same start position.
+                 goto Top;
               }
               else
               {
@@ -4767,12 +4762,10 @@ static int strincpy( char * ptro, char * ptri )
 
 static int strotrim( char * stroka, BOOL bRule )
 {
-  char *ptr = stroka, lastc = '0', curc;
+  char *ptr = stroka, *pString, lastc = '0', curc;
   int lens = 0, State = STATE_NORMAL;
 
-  /*
-  char *cLastChar = '\0';
-  */
+  char cLastChar = '\0';
 
   HB_TRACE(HB_TR_DEBUG, ("strotrim(%s)", stroka));
 
@@ -4784,9 +4777,24 @@ static int strotrim( char * stroka, BOOL bRule )
   {
      if( State == STATE_QUOTE1 )
      {
-        if(curc == '\'' )
+        if( curc == '\'' )
         {
            State = STATE_NORMAL;
+
+           if( ! bRule )
+           {
+              *stroka = '\0';
+              if( strchr( pString, '"' ) == NULL )
+              {
+                 *pString = '"';
+                 *stroka = '"';
+              }
+              else
+              {
+                 *stroka = '\'';
+              }
+              curc = *stroka;
+           }
         }
      }
      else if( State == STATE_QUOTE2 )
@@ -4801,22 +4809,45 @@ static int strotrim( char * stroka, BOOL bRule )
         if( curc == ']' )
         {
            State = STATE_NORMAL;
+
+           if( ! bRule )
+           {
+              *stroka = '\0';
+              if( strchr( pString, '"' ) == NULL )
+              {
+                 *pString = '"';
+                 *stroka = '"';
+              }
+              else if( strchr( pString, '\'' ) == NULL )
+              {
+                 *pString = '\'';
+                 *stroka = '\'';
+              }
+              else
+              {
+                 *stroka = ']';
+              }
+              curc = *stroka;
+           }
         }
      }
      else
      {
         if( curc == '\'' )
         {
+           pString = ptr;
            State = STATE_QUOTE1;
         }
         else if( curc == '\"' )
         {
+           pString = ptr;
            State = STATE_QUOTE2;
         }
         /* Ron Pinkas added 2000-11-05 */
-        /* Ron Pinkas 2001-02-14 added bRule logic  (removed array logic). */
-        else if( curc == '[' && bRule == FALSE ) /* && ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) */
+        /* Ron Pinkas 2001-02-14 added bRule logic */
+        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )
         {
+           pString = ptr;
            State = STATE_QUOTE3;
         }
         /* END - Ron Pinkas added 2000-11-05 */
@@ -4824,20 +4855,37 @@ static int strotrim( char * stroka, BOOL bRule )
         {
            curc = ' ';
         }
+        else if( bRule == FALSE && curc == ';' )
+        {
+           char *pTmp = stroka + 1;
+
+           while( *pTmp == ' ' || *pTmp == '\t' )
+           {
+              pTmp++;
+           }
+
+           if( *pTmp == '#' )
+           {
+              bRule = TRUE;
+           }
+
+           // Intentionally NOT resetting bRule!
+        }
      }
 
      if( State != STATE_NORMAL || curc != ' ' || ( curc == ' ' && *( stroka + 1 ) != '\0' && lastc != ' ' && lastc != ',' && lastc != '(' && *( stroka + 1 ) != ',' ) )
      {
-        *ptr++ = curc;
-        lastc = curc;
-        lens++;
-
-        /*
-        if( State == STATE_NORMAL && curc != ' ' )
+        if( bRule || curc != '\\' )
         {
-           cLastChar = curc;
+           *ptr++ = curc;
+           lastc = curc;
+           lens++;
+
+           if( State == STATE_NORMAL && curc != ' ' )
+           {
+              cLastChar = curc;
+           }
         }
-        */
      }
 
      stroka++;
@@ -4846,7 +4894,7 @@ static int strotrim( char * stroka, BOOL bRule )
   *ptr = '\0';
 
   #if 0
-     printf( "Str Out: >%s<\n", stroka - lens );
+     printf( "Str Out: >%s<\n", ptr - lens );
   #endif
 
   return lens;
