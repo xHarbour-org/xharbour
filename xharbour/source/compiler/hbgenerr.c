@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.56 2001/06/15 17:44:14 dholm Exp $
+ * $Id: hbgenerr.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
  */
 
 /*
@@ -101,9 +101,9 @@ char * hb_comp_szWarnings[] =
    "1Function \'%s\' does not end with RETURN statement",
    "3Incompatible type in assignment to: \'%s\' expected: \'%s\'",
    "3Incompatible operand type: \'%s\' expected: \'%s\'",
-   "4Suspicious operand type: \'unknown\' expected: \'%s\'",
    "3Incompatible operand types: \'%s\' and: \'%s\'",
    "4Suspicious type in assignment to: \'%s\' expected: \'%s\'",
+   "4Suspicious operand type: \'unknown\' expected: \'%s\'",
    "3Can\'t use array index with non-array",
    "3Incompatible return type: \'%s\' expected: \'%s\'",
    "4Suspicious return type: \'%s\' expected: \'%s\'",

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.6 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.7 2002/02/01 23:48:06 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
    extern void   hb_retclenAdopt( char * szText, ULONG ulLen );
    extern USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
    extern USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
+   extern BYTE   hb_itemParamId( PHB_ITEM pItem );
 
    #if defined(HB_EXTERN_C)
       }

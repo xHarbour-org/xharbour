@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.17 2002/01/29 08:35:25 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.18 2002/02/01 23:48:06 ronpinkas Exp $
  */
 
 /*
@@ -441,15 +441,18 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
    PHB_SCANNED_ARRAYS pScanned;
    BOOL bTop;
    USHORT uiCyclicCount = 0;
+   //static int i = 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_itemArrayCyclicCountWorker(%p, %p %p)", pScanBaseArray, pScannedList, pTopBaseArray ) );
 
    if( pScanBaseArray == pTopBaseArray )
    {
+      //printf( "\nTop" );
       bTop = TRUE;
    }
    else
    {
+      //printf( "\n+++ %i", ++i );
       bTop = FALSE;
 
       if( pScannedList->pScannedBaseArray == NULL )
@@ -467,6 +470,7 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
 
          pScanned->pNext = ( PHB_SCANNED_ARRAYS ) hb_xgrab( sizeof( HB_SCANNED_ARRAYS ) );
          pScanned = pScanned->pNext;
+         //printf( "\nAllocated: %p", pScanned );
       }
 
       pScanned->pScannedBaseArray = pScanBaseArray;
@@ -514,14 +518,14 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
          {
             uiCyclicCount += hb_itemArrayCyclicCountWorker( pItem->item.asArray.value, pScannedList, pTopBaseArray );
 
-            if( uiCyclicCount > pTopBaseArray->uiHolders )
+            if( uiCyclicCount == pTopBaseArray->uiHolders )
             {
-               printf( "\nLogic Error!" );
-               exit( 1 );
+               break;
             }
-            else if( uiCyclicCount == pTopBaseArray->uiHolders )
+            else if( uiCyclicCount > pTopBaseArray->uiHolders )
             {
-               return uiCyclicCount;
+               printf( "\nError! internal logic Error!\n" );
+               exit( 1 );
             }
          }
       }
@@ -530,6 +534,7 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
    /* Top Level - Release the created list. */
    if( bTop )
    {
+      //printf( "\nDone %i", i );
       if( pScannedList->pScannedBaseArray )
       {
          pScannedList = pScannedList->pNext;
@@ -539,9 +544,33 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
             pScanned     = pScannedList;
             pScannedList = pScannedList->pNext;
             hb_xfree( pScanned );
+            //printf( "\nFreed: %p", pScanned );
          }
       }
    }
+   else
+   {
+      //printf( "\n--- %i", --i );
+   }
 
    return uiCyclicCount;
+}
+
+BYTE hb_itemParamId( PHB_ITEM pItem )
+{
+   PHB_ITEM *pBase = hb_stack.pBase + 1;
+   PHB_ITEM *pTop  = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1;
+   BYTE iId = 1;
+
+   while( pBase < pTop )
+   {
+     if( *pBase == pItem )
+     {
+        //printf( "\nId: %i", iId );
+        return iId;
+     }
+     pBase++;iId++;
+   }
+
+   return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.12 2002/02/01 01:10:14 ronpinkas Exp $
+ * $Id: arrays.c,v 1.13 2002/02/01 23:48:06 ronpinkas Exp $
  */
 
 /*
@@ -103,6 +103,9 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
+   #if 0
+   pBaseArray->uiExtRef   = 0;
+   #endif
 
    for( ulPos = 0; ulPos < ulLen; ulPos++ )
    {
@@ -671,7 +674,7 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
 
 BOOL hb_arrayRelease( PHB_ITEM pArray )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray ) );
+   HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value ) );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -703,8 +706,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
              * --------------------------------------------------*/
             if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
             {
-               fprintf( stderr, "\nError Nested Release!" );
-               exit(1);
+               HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic)", pArray, pArray->item.asArray.value ) );
                ++pItem;
                continue;
             }
@@ -727,6 +729,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
       pArray->type = HB_IT_NIL;
       pArray->item.asArray.value = NULL;
 
+      //printf( "\nDone! hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value );
       return TRUE;
    }
    else

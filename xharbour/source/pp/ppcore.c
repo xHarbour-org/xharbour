@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.3 2002/01/23 23:33:52 ronpinkas Exp $
  */
 
 /*
@@ -991,7 +991,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               {
                  ptr += rmlen++;
                  while( *ptr != '\0' && *ptr != '>'  && *(ptr-1) != '\\' )
-                 {               
+                 {
                     if( *ptr != ' ' && *ptr != '\t' && *ptr != '\"' && *ptr != ')' && *ptr != '}' && *ptr != '.' && *ptr != '-' )
                     {
                        ifou = -1;
@@ -1958,6 +1958,9 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      if( !lenreal )
      {
         lenreal = getExpReal( expreal, ptri, TRUE, maxlenreal, FALSE );
+        #if 0
+           printf( "Len: %i Exp: %s\n", lenreal, expreal );
+        #endif
      }
 
      if( lenreal )
@@ -3237,6 +3240,12 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
            {
               kolSquare++;
+              cLastChar = '[';
+              lPos++;
+              continue;
+           }
+           else if( *(szText+lPos) == ',' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+           {
               cLastChar = '[';
               lPos++;
               continue;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.37 2002/01/31 05:40:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.38 2002/02/04 22:33:32 mafact Exp $
  */
 
 /*
@@ -405,10 +405,14 @@ void HB_EXPORT hb_vmQuit( void )
    /* release all remaining items */
    hb_stackRemove( 0 );
 
+   HB_TRACE( HB_TR_DEBUG, ( "Clean hb_stack.Return Type: %i", ( &hb_stack.Return )->type ) );
+
    if( HB_IS_COMPLEX( &hb_stack.Return ) )
    {
       hb_itemClear( &hb_stack.Return );
    }
+
+   HB_TRACE(HB_TR_DEBUG, ("\nClean Statics"));
 
    hb_arrayRelease( &s_aStatics );
    hb_memvarsRelease();    /* clear all PUBLIC variables */
@@ -658,16 +662,56 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTION:
+         {
+            USHORT uiParams = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTION") );
-            hb_vmFunction( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
+
+            //hb_vmFunction( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
+
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
+            {
+               hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
+            }
+
+            hb_vmDo( uiParams );
+
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
+            hb_stackPush();
+
             w += 3;
             break;
+         }
 
          case HB_P_FUNCTIONSHORT:
+         {
+            USHORT uiParams = pCode[ w + 1 ];
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTIONSHORT") );
-            hb_vmFunction( pCode[ w + 1 ] );
+
+            //hb_vmFunction( pCode[ w + 1 ] );
+
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
+            {
+               hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
+            }
+
+            hb_vmDo( uiParams );
+
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
+            hb_stackPush();
+
             w += 2;
             break;
+         }
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
@@ -3126,11 +3170,17 @@ static void hb_vmArrayPop( void )
    pIndex = hb_stackItemFromTop( -1 );
 
    if( HB_IS_INTEGER( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asInteger.value;
+   }
    else if( HB_IS_LONG( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asLong.value;
+   }
    else if( HB_IS_DOUBLE( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asDouble.value;
+   }
    else
    {
       hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
@@ -3143,6 +3193,16 @@ static void hb_vmArrayPop( void )
       {
          /* Remove MEMOFLAG if exists (assignment from field). */
          pValue->type &= ~HB_IT_MEMOFLAG;
+
+         #if 0
+         if( HB_IS_ARRAY( pValue ) )
+         {
+            if( hb_arrayScan( &s_aStatics, pArray, NULL, NULL ) )
+            {
+               ++pValue->item.asArray.value->uiExtRef;
+            }
+         }
+         #endif
 
          hb_arraySet( pArray, ulIndex, pValue );
          hb_itemCopy( pArray, pValue );  /* places pValue at pArray position */
@@ -3862,6 +3922,11 @@ void hb_vmFunction( USHORT uiParams )
       hb_vmDo( uiParams );
    }
 
+   /* *** */
+   /* TODO: This should be changed to hb_itemForwardValue()
+    * This is here to protect against ill behaved FWH code, which uses hb_stack.Return
+    * after calling vmFunction().
+   /* *** */
    hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
    hb_stackPush();
 }
@@ -3950,8 +4015,11 @@ static void hb_vmFrame( BYTE bLocals, BYTE bParams )
    if( iTotal )
    {
       int i = iTotal - hb_pcount();
+
       while( i-- > 0 )
+      {
          hb_vmPushNil();
+      }
    }
 }
 
@@ -3991,9 +4059,22 @@ static void hb_vmEndBlock( void )
 
 static void hb_vmRetValue( void )
 {
+   PHB_ITEM pVal;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
    hb_stackDec();                               /* make the last item visible */
+
+   #if 0
+   pVal = hb_stackTopItem();
+
+   if( HB_IS_ARRAY( pVal ) )
+   {
+      ++pVal->item.asArray.value->uiExtRef;
+   }
+
+   hb_itemForwardValue( &hb_stack.Return, pVal );
+   #endif
 
    hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() ); /* Forward it */
 }
@@ -4761,25 +4842,57 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
 
 static void hb_vmPopLocal( SHORT iLocal )
 {
+   PHB_ITEM pLocal, pVal;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopLocal(%hd)", iLocal));
 
    hb_stackDec();
 
+   pVal = hb_stackTopItem();
+
    /* Remove MEMOFLAG if exists (assignment from field). */
-   hb_stackTopItem()->type &= ~HB_IT_MEMOFLAG;
+   pVal->type &= ~HB_IT_MEMOFLAG;
 
    if( iLocal >= 0 )
    {
       /* local variable or local parameter */
-      PHB_ITEM pLocal = hb_stackItemFromBase( iLocal );
+      pLocal = hb_stackItemFromBase( iLocal );
 
+      /* Assigned to a parameter by refrence. */
       if( HB_IS_BYREF( pLocal ) )
       {
-         hb_itemForwardValue( hb_itemUnRef( pLocal ), hb_stackTopItem() );
+         #if 0
+         if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
+         {
+            --pLocal->item.asArray.value->uiExtRef;
+         }
+
+         if( HB_IS_ARRAY( pVal ) )
+         {
+            ++pVal->item.asArray.value->uiExtRef;
+         }
+         #endif
+
+         hb_itemForwardValue( hb_itemUnRef( pLocal ), pVal );
       }
       else
       {
-         hb_itemForwardValue( pLocal, hb_stackTopItem() );
+         if( hb_itemParamId( pLocal ) )
+         {
+            #if 0
+            if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
+            {
+               --pLocal->item.asArray.value->uiExtRef;
+            }
+
+            if( HB_IS_ARRAY( pVal ) )
+            {
+               ++pVal->item.asArray.value->uiExtRef;
+            }
+            #endif
+         }
+
+         hb_itemForwardValue( pLocal, pVal );
       }
    }
    else
@@ -4787,33 +4900,60 @@ static void hb_vmPopLocal( SHORT iLocal )
       /* local variable referenced in a codeblock
        * hb_stackSelfItem() points to a codeblock that is currently evaluated
        */
-      hb_itemForwardValue( hb_codeblockGetVar( hb_stackSelfItem(), iLocal ), hb_stackTopItem() );
+      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
+
+      #if 0
+      if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
+      {
+         --pLocal->item.asArray.value->uiExtRef;
+      }
+
+      if( HB_IS_ARRAY( pVal ) )
+      {
+         ++pVal->item.asArray.value->uiExtRef;
+      }
+      #endif
+
+      hb_itemForwardValue( pLocal, pVal );
    }
 }
 
 static void hb_vmPopStatic( USHORT uiStatic )
 {
-   PHB_ITEM pStatic;
+   PHB_ITEM pStatic, pVal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopStatic(%hu)", uiStatic));
 
    hb_stackDec();
 
+   pVal = hb_stackTopItem();
+
    /* Remove MEMOFLAG if exists (assignment from field). */
-   hb_stackTopItem()->type &= ~HB_IT_MEMOFLAG;
+   pVal->type &= ~HB_IT_MEMOFLAG;
 
    pStatic = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
 
+   #if 0
+   if( HB_IS_ARRAY( pStatic ) && pStatic->item.asArray.value->uiExtRef )
+   {
+      --pStatic->item.asArray.value->uiExtRef;
+   }
+
+   if( HB_IS_ARRAY( pVal ) )
+   {
+      ++pVal->item.asArray.value->uiExtRef;
+   }
+   #endif
+
    if( HB_IS_BYREF( pStatic ) )
    {
-      hb_itemForwardValue( hb_itemUnRef( pStatic ), hb_stackTopItem() );
+      hb_itemForwardValue( hb_itemUnRef( pStatic ), pVal );
    }
    else
    {
-      hb_itemForwardValue( pStatic, hb_stackTopItem() );
+      hb_itemForwardValue( pStatic, pVal );
    }
 }
-
 
 /* ----------------------------------------------- */
 
@@ -4869,6 +5009,8 @@ static void hb_vmReleaseLocalSymbols( void )
       s_pSymbols = s_pSymbols->pNext;
       hb_xfree( pDestroy );
    }
+
+   HB_TRACE(HB_TR_DEBUG, ("Done hb_vmReleaseLocalSymbols()"));
 }
 
 /* This calls all _INITSTATICS functions defined in the application.

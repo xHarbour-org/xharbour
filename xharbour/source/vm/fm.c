@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: fm.c,v 1.5 2002/01/27 19:14:51 ronpinkas Exp $
  */
 
 /*
@@ -343,7 +343,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    pSig = (ULONG *)( ( ( unsigned char * ) pMem ) + ulMemSize );
    if( *pSig != HB_MEMINFO_SIGNATURE )
-      hb_errInternal( HB_EI_XMEMOVERFLOW, NULL, NULL, NULL );
+      hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
 
    pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
@@ -410,7 +410,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       pSig  = (ULONG *)( ( ( unsigned char * ) pMem ) + pMemBlock->ulSize );
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
-         hb_errInternal( HB_EI_XMEMOVERFLOW, NULL, NULL, NULL );
+         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree()", NULL, NULL );
       }
 
       s_lMemoryConsumed -= pMemBlock->ulSize;
