@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.2 2001/12/26 21:21:08 dholm Exp $
+# $Id: gcc.cf,v 1.2 2002/01/19 14:15:43 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -44,6 +44,10 @@ endif
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
+ifeq ($(HB_MULTI_GT),yes)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKLIBS += -lgtnul
+endif
 endif
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang

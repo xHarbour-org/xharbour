@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1 2001/12/05 20:30:57 dholm Exp $
+# $Id: global.cf,v 1.1.1.1 2001/12/21 10:48:00 ronpinkas Exp $
 #
 
 all : first
@@ -10,6 +10,7 @@ HB_GT_LIBS=\
         gtpca \
         gtsln \
         gtstd \
+        gtnul \
 
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtstd
