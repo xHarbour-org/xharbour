@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.202 2005/03/17 02:07:16 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.203 2005/03/18 21:05:33 ronpinkas Exp $
  */
 
 /*
@@ -3744,7 +3744,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    char cLastChar = '\0';
    /* Ron Pinkas end 2000-06-17 */
 
-   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, iContext));
+   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%p, %s, %d, %i, %d)", expreal, *ptri, cMarkerType, maxrez, iContext));
 
    //#define DEBUG_EXP
    #ifdef DEBUG_EXP
@@ -3821,8 +3821,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             lens++;
          }
 
-         expreal -= lens;
-         expreal[lens] = '\0';
+         if( expreal )
+         {
+            expreal -= lens;
+            expreal[lens] = '\0';
+         }
       }
 
       goto Done;
@@ -3925,9 +3928,10 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                lens++;
             }
 
-            if( expreal != NULL )
+            if( expreal )
             {
                *(expreal - 1) = '\0';
+
                if( strchr( pString, '"' ) == NULL )
                {
                   *(pString - 1) = '"';
@@ -3976,9 +3980,10 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                lens++;
             }
 
-            if( expreal != NULL )
+            if( expreal )
             {
                *(expreal - 1) = '\0';
+
                if( strchr( pString, '"' ) == NULL )
                {
                   *(pString - 1) = '"';

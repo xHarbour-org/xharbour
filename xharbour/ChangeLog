@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3965 2005/03/19 13:09:01 andijahja Exp $
+ * $Id: ChangeLog,v 1.3966 2005/03/19 13:50:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-19 12:08 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/pp/ppcore.c
+    ! Fixed GPF trap in getExpReal()
+
+    /*
+       I belive this is maybe the trap that triggered Brian's recent hbpp/compiler oddities.
+     */
+
 2005-03-19 20:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/common/hbver.c
     ! correct version info of Open Watcom
