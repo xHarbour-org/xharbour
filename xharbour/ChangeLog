@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.954 2003/04/14 16:22:16 lculik Exp $
+ * $Id: ChangeLog,v 1.955 2003/04/14 21:10:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-16 10:25 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbreadini.prg
+    ! Invalid lines in .ini caused an error; fixed
+    + Added support for inlcusion of other .ini files, using the
+      "include FILESPEC" directive
+
+  * tests/parseini.ini
+  + tests/parseini2.ini
+    + Added tests to demonstrate this feature
+
 
 2003-04-14 23:08 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * samples/sitesvr/sitesvr.prg

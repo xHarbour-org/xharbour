@@ -18,10 +18,10 @@ StartThread
 
    Syntax
       StartThread( @FuncName() [, param1, ....., paramN] ) --> THREAD
-      StartThread( ?funcname? [, param1, ....., paramN] ) --> THREAD
+      StartThread( "funcname" [, param1, ....., paramN] ) --> THREAD
       StartThread( { CodeBlock } [, param1, ....., paramN] ) --> THREAD
       StartThread( Object, MtdPtr [, param1, ....., paramN] ) --> THREAD
-      StartThread( Object, ?MtdName? [, param1, ....., paramN] ) --> THREAD
+      StartThread( Object, "MtdName" [, param1, ....., paramN] ) --> THREAD
 
    Description
       Starts a new thread, using the first parameter as a main thread function;
