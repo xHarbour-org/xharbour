@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.6 2002/03/10 00:13:09 ronpinkas Exp $
+ * $Id: harbour.c,v 1.7 2002/03/10 18:41:54 ronpinkas Exp $
  */
 
 /*
@@ -2453,17 +2453,19 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
                   hb_comp_iBaseLine = hb_comp_iLine;
                }
 
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 1 ] = HB_LOBYTE( iLine );
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 2 ] = HB_HIBYTE( iLine );
             }
             else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
             {
+               //printf( "Offset: %i Line: %i\n", iOffset, iLine );
                hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
                hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
             }
             else
             {
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] += iOffset;
+               //printf( "Overwrite Offset: %i Line: %i\n", iOffset, iLine );
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] = iOffset;
             }
          }
       }
