@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1910 2003/12/20 11:12:02 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1911 2003/12/21 02:17:39 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-20 23:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * contrib/mysql/Makefile
+    * Indented
+  * contrib/mysql/mysql.c
+    % Code optimization
+  * contrib/mysql/tmysql.prg
+    ! Fix minor bug in type of data.
 
 2003-12-20 23:15 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/sprintf.prg
