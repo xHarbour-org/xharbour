@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.29 2004/03/22 13:55:38 lculik Exp $
+ * $Id: zip.c,v 1.27 2004/03/04 13:48:47 andijahja Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include <hbzip2.h>
 #include "hbapifs.h"
+#include "hbapierr.h"
 
 extern HB_ITEM ZipArray;
 static HB_ITEM FileToZip;
@@ -101,7 +102,6 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
    Wild2RegEx( szSkleton, sRegEx, FALSE );
 
    Temp.type = HB_IT_NIL;
-
    for ( ul = 0 ; ul < ulLen; ul ++ )
    {
       bOkAdd = TRUE;
@@ -124,7 +124,6 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
             hb_arrayAddForward( &DelZip, hb_itemPutC( &Temp, szEntry ) );
          }
       }
-
       hb_xfree( szEntry );
    }
 
@@ -182,7 +181,6 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
          WildFile.type = HB_IT_NIL;
          hb_fsDirectory( &WildFile, pExclude->item.asString.value,NULL,NULL,TRUE);
-
          uiLen = WildFile.item.asArray.value->ulLen;
 
          for ( ui = 0 ; ui < uiLen; ui ++ )
@@ -297,12 +295,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
       {
          if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
-//s.r. Keep current directory because hb_fsdirectory change it !
-            BYTE * pCurDir;
-            pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
-//
             hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
-
             ulLen = WildFile.item.asArray.value->ulLen;
 
             for ( ul = 0; ul < ulLen ; ul ++ )
@@ -321,10 +314,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
 
                hb_xfree( szEntry );
             }
-//s.r. restore to the old directory
-            hb_fsChDir( pCurDir ) ;
-            hb_xfree( pCurDir ) ;
-//
+
             hb_itemClear( &WildFile );
          }
          else
@@ -352,6 +342,17 @@ HB_FUNC( HB_ZIPFILE )
 
       if ( pParam )
       {
+//s.r. Error if the 4 paramater is passed and it's not a codeblock
+         if ( ! ISNIL( 4 ) && ! ISBLOCK( 4 ) )
+         {
+            hb_errRT_BASE_SubstR( EG_ARG, 2017, "Invalid Codeblock ","hb_zipfile",
+                                  4 ,hb_paramError( 1 ),
+                                  hb_paramError( 2 ),
+                                  hb_paramError( 3 ),
+                                  hb_paramError( 4 ) );
+            return;
+         }
+//
          char szFile[ _POSIX_PATH_MAX ];
          PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
@@ -359,6 +360,11 @@ HB_FUNC( HB_ZIPFILE )
          char *szZipFileName;
 
          iProgress.type = HB_IT_NIL;
+
+//s.r. Keep current directory because hb_fsdirectory change it !
+            BYTE *pCurDir;
+            pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
+//
 
          ZipCreateExclude( pExclude );
 
@@ -369,7 +375,7 @@ HB_FUNC( HB_ZIPFILE )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parcx( 1 ) );
+         strcpy( szFile, hb_parc( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -379,7 +385,7 @@ HB_FUNC( HB_ZIPFILE )
                                     ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                     hb_param( 4, HB_IT_BLOCK ),
                                     ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                    ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
+                                    ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                     &iProgress );
@@ -389,6 +395,10 @@ HB_FUNC( HB_ZIPFILE )
 
          hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
+//s.r. restore to the old directory
+         hb_fsChDir( pCurDir ) ;
+         hb_xfree( pCurDir ) ;
+//
       }
    }
 
@@ -401,7 +411,7 @@ HB_FUNC( HB_GETFILESINZIP )
    {
       char szFile[ _POSIX_PATH_MAX ];
       char *szZipFileName;
-      strcpy( szFile, hb_parcx( 1 ) );
+      strcpy( szFile, hb_parc( 1 ) );
 
       szZipFileName = hb___CheckFile( szFile );
 
@@ -415,7 +425,7 @@ HB_FUNC( HB_GETFILESINZIP )
 
 HB_FUNC( HB_ZIPWITHPASSWORD )
 {
-   hb_retl( hb_IsPassWord( hb_parcx( 1 ) ) );
+   hb_retl( hb_IsPassWord( hb_parc( 1 ) ) );
 }
 
 HB_FUNC( HB_GETFILECOUNT )
@@ -426,7 +436,7 @@ HB_FUNC( HB_GETFILECOUNT )
    {
       char szFile[ _POSIX_PATH_MAX ];
       char *szZipFileName;
-      strcpy( szFile, hb_parcx( 1 ) );
+      strcpy( szFile, hb_parc( 1 ) );
 
       szZipFileName = hb___CheckFile( szFile );
 
@@ -465,7 +475,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parcx( 1 ) );
+         strcpy( szFile, hb_parc( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -475,7 +485,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
+                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
@@ -519,7 +529,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parcx( 1 ) );
+         strcpy( szFile, hb_parc( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -529,7 +539,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
+                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  &iProgress );
@@ -559,12 +569,17 @@ HB_FUNC( HB_UNZIPFILE )
       Temp.type = HB_IT_NIL;
       iProgress.type = HB_IT_NIL;
 
+//s.r. Keep current directory  !
+      BYTE *pCurDir;
+      pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
+//
+
       if( pProgress )
       {
         hb_itemCopy( &iProgress, pProgress );
       }
 
-      strcpy( szFile, hb_parcx( 1 ) );
+      strcpy( szFile, hb_parc( 1 ) );
       szZipFileName = hb___CheckFile( szFile );
 
       UnzipFiles.type = HB_IT_NIL;
@@ -607,16 +622,16 @@ HB_FUNC( HB_UNZIPFILE )
       }
       else
       {
-         UnzipCreateArray( szZipFileName, "*.*", 1 );
+//s.r. change "*.*" to "*" because file without extension were ignored
+         UnzipCreateArray( szZipFileName, "*", 1 );
       }
-
       if ( UnzipFiles.item.asArray.value->ulLen > 0 )
       {
          bRet = hb_UnzipSel( szZipFileName,
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
-                             ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL,
-                             ISCHAR( 5 ) ? hb_parcx( 5 ) : ".\\",
+                             ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
+                             ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              &UnzipFiles,
                              &iProgress );
       }
@@ -624,6 +639,10 @@ HB_FUNC( HB_UNZIPFILE )
       hb_xfree( szZipFileName );
       hb_itemClear( &iProgress );
       hb_itemClear( &UnzipFiles );
+//s.r. restore to the old directory
+      hb_fsChDir( pCurDir ) ;
+      hb_xfree( pCurDir ) ;
+//
    }
 
    hb_retl( bRet );
@@ -651,7 +670,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
          char *szZipFileName;
          int ulLen;
 
-         strcpy( szFile, hb_parcx( 1 ) );
+         strcpy( szFile, hb_parc( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          hb___GetFileNamesFromZip( szZipFileName, TRUE );
@@ -730,7 +749,7 @@ HB_FUNC( HB_ZIPTESTPK )
    char szFile[ _POSIX_PATH_MAX ];
    char *szZipFileName;
 
-   strcpy( szFile, hb_parcx( 1 ) );
+   strcpy( szFile, hb_parc( 1 ) );
    szZipFileName = hb___CheckFile( szFile );
 
    hb_retni( hb_TestForPKS( szZipFileName ) );
@@ -745,12 +764,12 @@ HB_FUNC( HB_SETBUFFER )
 
 HB_FUNC( HB_SETZIPCOMMENT )
 {
-   hb_SetZipComment( hb_parcx( 1 ) );
+   hb_SetZipComment( hb_parc( 1 ) );
 }
 
 HB_FUNC( HB_GETZIPCOMMENT )
 {
-   char *szComment=( char* )hb_GetZipComment( hb_parcx( 1 ) );
+   char *szComment=( char* )hb_GetZipComment( hb_parc( 1 ) );
    hb_retcAdopt( szComment );
 }
 
@@ -781,7 +800,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parcx( 1 ) );
+         strcpy( szFile, hb_parc( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          hb___GetFileNamesFromZip( szZipFileName, TRUE );
@@ -818,8 +837,8 @@ HB_FUNC( HB_UNZIPFILEINDEX )
             bRet = hb_UnzipSelIndex( szZipFileName,
                                      hb_param( 2, HB_IT_BLOCK ),
                                      ISLOG( 3 ) ? hb_parl( 3 ) : 0,
-                                     ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL,
-                                     hb_parcx( 5 ),
+                                     ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
+                                     hb_parc( 5 ),
                                      &DelZip,
                                      &iProgress );
          }
@@ -837,7 +856,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
 /*
 HB_FUNC( HB_ZIPINMEMORY )
 {
-    hb_retl( hb_CreateZipInMemory( hb_parcx( 1 ), hb_parcx( 2 ) ) );
+    hb_retl( hb_CreateZipInMemory( hb_parc( 1 ), hb_parc( 2 ) ) );
 }
 
 HB_FUNC( HB_SAVEZIPFROMMEMORY )
@@ -848,8 +867,8 @@ HB_FUNC( HB_SAVEZIPFROMMEMORY )
 
 HB_FUNC( TRANSFERFROMZIP )
 {
-   hb_retl( hb_TransferFilesFromzip( hb_parcx( 1 ),
-                                     hb_parcx( 2 ),
+   hb_retl( hb_TransferFilesFromzip( hb_parc( 1 ),
+                                     hb_parc( 2 ),
                                      hb_param( 3, HB_IT_ARRAY ) ) );
 }
 

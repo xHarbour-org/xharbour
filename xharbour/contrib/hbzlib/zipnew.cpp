@@ -610,19 +610,16 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-//s.r.
-            szPath[0] = OS_PATH_DELIMITER ;
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath + 1 , _POSIX_PATH_MAX );
-//
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
-//s.r.         hb_fsChDir((BYTE*)"\\");
+
+         hb_fsChDir((BYTE*)"\\");
          szZip.SetRootPath(szPath);
       }
-
       for ( iCause = 1 ; ( iCause <=  ( int ) hb_arrayLen( pSelArray ) ) ; iCause ++ )
       {
          lpFiletoExtract = hb_arrayGetC( pSelArray, iCause );
@@ -643,7 +640,6 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
             szTempString  = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
             pOut = hb_fsFNameSplit( ( char * ) szFileNameInZip );
-
             if ( szPath == NULL )
             {
                szPath = ( char* )pOut->szDrive;
@@ -671,6 +667,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                /* TODO:  They're both the same.... */
                if ( !HB_IS_BLOCK( pProgress ) )
                {
+
 //                szZip.SetPassword( szPassWord );
                   szZip.ExtractFile( ( WORD )ulCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
                }
@@ -699,7 +696,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    if (szPath)
    {
-//s.r.      hb_fsChDir((BYTE*)szPath);
+      hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
 
