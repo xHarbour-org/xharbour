@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.39 2002/01/22 22:07:42 lculik Exp $
+ * $Id: ChangeLog,v 1.40 2002/01/23 02:32:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-01-22 18:30 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-22 19:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/!pack_bin.bat
+    * Changed archive name to xharbour from harbour
+
+  * include/hbver.h
+    * Updated versions info to 0.70
+
+2002-01-22 18:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/gtapi.c
     #defed out redundant hb_gtReadKey()
 
@@ -57,7 +64,7 @@
   + doc\es\dbsdf.txt
      * Doc translation to spanish provided by Alejandro de Garate
 
-2002-01-21 04:20 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-21 04:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
     - Removed Function call support from hb_vmSend()
 
@@ -78,7 +85,7 @@
 
   /* Now hb_vmDo() just "does" and hb_vmSend() just "sends" all duplications and ambiguities removed! */
 
-2002-01-21 03:40 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-21 03:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   *ChangeLog
   *config/dos/bcc16.cf
   *include/hbextern.ch
@@ -130,7 +137,7 @@
            * source/rtl/typefile.prg
              * modification to be more Clip*r compliant and behaviour.
 
-2002-01-21 12:50 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-21 12:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
     * Minor formatting.
 
@@ -145,7 +152,7 @@
   * source/vm/hvm.c
     - Removed Function handling logic from hb_vmSend()
 
-2002-01-21 01:00 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-21 01:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
     + Added #define HB_IS_COMPLEX() and #define HB_IS_SIMPLE().
 
@@ -190,7 +197,7 @@
   * tests/tstloop.prg
     * More tests.
 
-2002-01-20 12:03 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-20 12:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/itemapi.c
     #defed out hb_itemClear(), hb_itemSwap(), hb_itemPutC(), hb_itemPutCL(), hb_itemPutCPtr()
 
@@ -212,7 +219,7 @@
   * source/common/hbfhnd.c
     * increase __NFILE__ from 600 to 1250
 
-2002-01-19 06:11 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-19 06:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
     ! Minor bug correction.
 
@@ -353,7 +360,7 @@
           * source/rdd/dbfntx/dbfntx1.c
             * support of EVAL and EVERY clauses of INDEX ON command implemented
 
-2002-01-17 15:03 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-17 15:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapiitm.h
     * Reinstated declaration of hb_itemCopy()
 
@@ -396,7 +403,7 @@
     Actual single Eval() is almost 4-5 times faster.
   */
 
-2002-01-13 22:10 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-13 22:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   + tests/ppclass.ch
     + Added a Clipper compliant version of hbclass.ch (syntax relys on Harbour PP bugs)
       /* This is the file used to burn the internal support for #include "hbclass.ch". */
@@ -408,7 +415,7 @@
       Clipper also allows a Repeatble Group to refernce a marker that is NON Optional. In such case, the
       respective Marker will only accept 1 value, and consider it required!
 
-2002-01-12 02:00 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-12 02:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/clipdefs.h
   * include/error.ch
   * include/extend.api
@@ -530,7 +537,7 @@
    * source/rtl/philes.c
      * Changes all functions to recieve/return the File handle value as an long
 
-2002-01-04 19:14 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-04 19:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c
   * source/vm/garbage.c
     ! Minor corrections.
@@ -560,7 +567,7 @@ Aloccated:  4,138,118          6,570,947             58%
 
 This will get further boost upon completion of the string sharing optimization.
 
-2002-01-04 18:28 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-04 18:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
     + Added missing type casts.
 
@@ -576,11 +583,11 @@ This will get further boost upon completion of the string sharing optimization.
    * source/rtl/strcase.c
      * added typecast
 
-2002-01-04 09:49 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-04 09:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c
     + Added more security logic to hb_itemVarAssign()
 
-2002-01-03 23:09 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-03 23:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbfast.h
   * source/vm/fastitem.c
     + Added void hb_itemVarAssign( PHB_ITEM pVar )
@@ -589,7 +596,7 @@ This will get further boost upon completion of the string sharing optimization.
   * source/vm/hvm.c
     ! More optimizations.
 
-2002-01-03 17:33 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-03 17:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   *  xharbour/source/vm/fastitem.c
   *  xharbour/source/vm/hvm.c
      ! More speed optimizations.
@@ -606,13 +613,13 @@ This will get further boost upon completion of the string sharing optimization.
    * utils/hbmake/hbmutils.prg
     * Reupdaload again, the function Getlibs() is in this module
 
-2002-01-02 22:22 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-02 22:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/classes.c
   * xharbour/source/vm/garbage.c
   * xharbour/source/vm/hvm.c
     * Further optimization/cleanup to garbage collection.
 
-2002-01-02 20:11 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-02 20:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/rtl/filesys.c
     ! Changed #ifdef __WIN32__ to #ifdef X__WIN32__ to disable win32 logic, which is still broken.
 
@@ -624,7 +631,7 @@ This will get further boost upon completion of the string sharing optimization.
     /* Luiz, please fix this, as hbmake can not be used now. */
 
 
-2002-01-02 19:25 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-02 19:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/itemapi.c
   * xharbour/include/hbapiitm.h
     - Removed unneeded hb_itemReturnPtr() and hb_itemArrayPut()
@@ -693,7 +700,7 @@ This will get further boost upon completion of the string sharing optimization.
    * utils/hbmake/hbmutils.prg
     * Sinc with harbour
 
-2002-01-01 20:29 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2002-01-01 20:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/fastitem.c
   * xharbour/source/vm/itemapi.c
     + Tracing info.
@@ -713,7 +720,7 @@ This will get further boost upon completion of the string sharing optimization.
    * utils/hbmake/hbmake.prg
      * Sinc with harbour.Also command line are free now. ie hbmake -ex ola.bc
 
-2001-12-29 19:26 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2001-12-29 19:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/include/hbfast.h
   * xharbour/source/vm/fastitem.c
     + void hb_itemPushForward( PHB_ITEM pItem );
@@ -732,7 +739,7 @@ This will get further boost upon completion of the string sharing optimization.
      All tests run fine.
   */
 
-2001-12-29 17:16 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2001-12-29 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/makefile.bc
   * xharbour/makefile.vc
   * xharbour/source/vm/Makefile
@@ -805,7 +812,7 @@ This will get further boost upon completion of the string sharing optimization.
    * utils/hbmake/hbmake.prg
      * Some minor fixes to both edit mode
 
-2001-12-23 09:45 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2001-12-23 09:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbapi.h
    * include/hbundoc.api
      * #define cleanup synched with harbour.
@@ -822,7 +829,7 @@ This will get further boost upon completion of the string sharing optimization.
    * utils/hbmake/hbmutils.prg
      * Getsourcefiles() function speed optimized(thanks Victor)
 
-2001-12-21 22:28 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+2001-12-21 22:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   + bin/!pack_bin.bat
   + bin/bld.bat
   + bin/bld_b16.bat
