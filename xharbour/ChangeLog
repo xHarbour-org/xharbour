@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1688 2003/11/10 16:42:19 paultucker Exp $
+ * $Id: ChangeLog,v 1.1689 2003/11/10 17:01:11 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-10 22:25 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+ *tests\bldtest.bat
+   ! fixed file delete
 
 2003-11-10 12:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/libct/makefile.vc
@@ -27,7 +32,7 @@
     in conectiva
     mysql-devel is MySQL-devel
     unixODBC-devel is unixodbc-devel
-    
+
 2003-11-10 13:25 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbcmd.c
     ! ORDKEYNO fixed

@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.1 2003/01/16 23:38:19 fsgiudice Exp $
+rem * $Id: bldtest.bat,v 1.2 2003/08/26 09:31:19 fsgiudice Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -27,6 +27,7 @@ set HB_INSTALL=..
 SET HB_BIN_INSTALL=%HB_INSTALL%\bin
 set HB_INC_INSTALL=%HB_INSTALL%\include
 set HB_LIB_INSTALL=%HB_INSTALL%\lib
+set HB_ZIP_LIB=hbzip.lib
 
 rem Check help request
 IF %1.==/?. GOTO SHOWHELP
@@ -63,9 +64,9 @@ echo.
 call %HB_BIN_INSTALL%\bld.bat %1 %2 %3 %4 %5 > bldtest.log
 IF ERRORLEVEL 1 GOTO SHOWERROR
 
-if exist *.c   del *.c
-if exist *.obj del *.obj
-if exist *.tds del *.tds
+if exist %1.c   del %1.c
+if exist %1.obj del %1.obj
+if exist %1.tds del %1.tds
 
 GOTO COMPILEOK
 
