@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.34 2004/09/18 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.35 2004/09/29 00:00:00 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -86,6 +86,7 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    LOCAL xItem
    LOCAL nLen
    LOCAL cFile
+   LOCAL nPadr
 
    DEFAULT lSubDir TO .t.
 
@@ -108,6 +109,14 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
 
          nDataLen := LEN( aData )
 
+         nPadr := 12 // maximum Clipper/DOS source file name length with extension.
+         // if this lenght is greater than 12, then reset nPadr.
+         FOR y := 1 TO nDataLen
+             nPadr := Max( AT('.PRG', UPPER( aData[ y, 1 ] ) )+3 , nPadr )
+             nPadr := Max( AT('.C',   UPPER( aData[ y, 1 ] ) )+1 , nPadr )
+             nPadr := Max( AT('.CPP', UPPER( aData[ y, 1 ] ) )+3 , nPadr )
+         NEXT
+
          FOR y := 1 TO nDataLen
 
             IF AT( '.PRG', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.C', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.CPP', UPPER( aData[ y, 1 ] ) ) > 0
@@ -117,17 +126,17 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
                   nLen := AT( " ", aData[ y, 1 ] ) + 1
 
                   AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) +;
-                        PadR(aData[ y, 1 ],12) + ;
-                        STR( aData[ y, 2 ], 8 ) + '  ' + ;
-                        DTOC( aData[ y, 3 ] ) + '  ' + ;
-                        aData[ y, 4 ] )
+                        PadR(aData[ y, 1 ],nPadr) + ;         // prg name
+                        STR( aData[ y, 2 ], 8 ) + '  ' + ;    // prg size
+                        DTOC( aData[ y, 3 ] ) + '  ' + ;      // prg date
+                        aData[ y, 4 ] )                       // prg time
 
                ELSEIF ! lSubDir .AND. AT( IIF( lLinux, "/", "\" ), STRTRAN( aStru[ nCounter ], cDir, '' ) ) == 0
 
-                  AADD( aRet, PadR(aData[ y, 1 ],12) + ;
-                        STR( aData[ y, 2 ], 8 ) + '  ' + ;
-                        DTOC( aData[ y, 3 ] ) + '  ' + ;
-                        aData[ y, 4 ] )
+                  AADD( aRet, PadR(aData[ y, 1 ],nPadr) + ;   // prg name
+                        STR( aData[ y, 2 ], 8 ) + '  ' + ;    // prg size
+                        DTOC( aData[ y, 3 ] ) + '  ' + ;      // prg date
+                        aData[ y, 4 ] )                       // prg time
 
                ENDIF
 

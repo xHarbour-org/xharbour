@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3477 2004/09/29 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3477 2004/09/30 01:11:36 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-09-29 22:15 UTC-0300 Ron Pinkas <ron at xharbour.com>
+2004-09-29 22:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg
   * utils/hbmake/hbmutils.prg
     ! Fixed a bug introduced by me at previous hbmake version. Now hbmake 
