@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.82 2004/01/25 20:44:28 paultucker Exp $
+# $Id: makefile.bc,v 1.83 2004/01/26 22:03:24 fsgiudice Exp $
 #
 
 #
@@ -245,6 +245,7 @@ GTPCA_LIB    = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB    = $(LIB_DIR)\gtstd.lib
 GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
 GTWVT_LIB    = $(LIB_DIR)\gtwvt.lib
+GTALLEG_LIB  = $(LIB_DIR)\gtalleg.lib
 GTNUL_LIB    = $(LIB_DIR)\gtnul.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
@@ -269,11 +270,20 @@ HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
 
 !if $d(B16)
 
+!if $(HB_GTALLEG) == yes
+HB_GT_LIBS = \
+   $(GTCGI_LIB) \
+   $(GTDOS_LIB) \
+   $(GTPCA_LIB) \
+   $(GTALLEG_LIB) \
+   $(GTSTD_LIB)
+!else
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
    $(GTDOS_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB)
+!endif
 
 !if !$d(HB_GT_LIB)
    HB_GT_LIB = $(GTDOS_LIB)
@@ -285,6 +295,16 @@ HB_GT_LIBS = \
 
 # TODO: Add GTSLN and GTCRS
 
+!if $(HB_GTALLEG) == yes
+HB_GT_LIBS = \
+   $(GTCGI_LIB) \
+   $(GTPCA_LIB) \
+   $(GTSTD_LIB) \
+   $(GTWIN_LIB) \
+   $(GTWVT_LIB) \
+   $(GTALLEG_LIB) \
+   $(GTNUL_LIB)
+!else
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
    $(GTPCA_LIB) \
@@ -292,6 +312,7 @@ HB_GT_LIBS = \
    $(GTWIN_LIB) \
    $(GTWVT_LIB) \
    $(GTNUL_LIB)
+!endif
 
 !if !$d(HB_GT_LIB)
    HB_GT_LIB = $(GTWIN_LIB)
@@ -761,6 +782,14 @@ GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
 
 #
+# GTALLEG.LIB rules
+#
+
+GTALLEG_LIB_OBJS = \
+   $(OBJ_DIR)\gtalleg.obj \
+   $(OBJ_DIR)\ssf.obj
+
+#
 # GTNUL.LIB rules
 #
 
@@ -1104,6 +1133,14 @@ $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
     IF EXIST "$(GTWVT_LIB)" $(DEL) "$(GTWVT_LIB)" > NUL
     $(LINKER) "$(GTWVT_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
+    IF EXIST "$(GTALLEG_LIB)" $(DEL) "$(GTALLEG_LIB)" > NUL
+    $(LINKER) "$(GTALLEG_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2645,6 +2682,15 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
 #
 
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+#
+# GTALLEG.LIB dependencies
+#
+
+$(OBJ_DIR)\gtalleg.obj : $(RTL_DIR)\gtalleg\gtalleg.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+$(OBJ_DIR)\ssf.obj : $(RTL_DIR)\gtalleg\ssf.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #

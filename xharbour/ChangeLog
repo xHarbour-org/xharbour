@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2181 2004/01/30 00:40:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.2182 2004/01/30 02:06:31 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-29 23:20 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    * Try 16 bit modes first, then 8 bit under DOS & Linux FB
+  * makefile.bc
+    + Added conditional gtalleg compilation
 
 2004-01-30 03:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_rpm.sh

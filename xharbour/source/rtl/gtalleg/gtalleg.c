@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.7 2004/01/29 21:40:09 andijahja Exp $
+ * $Id: gtalleg.c,v 1.8 2004/01/30 02:06:31 druzus Exp $
  */
 
 /*
@@ -231,6 +231,9 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    if ( iRet > 0 )
    {
       al_set_color_depth(iRet);
+   } else
+   {
+      al_set_color_depth(16);
    }
 }
 
@@ -370,7 +373,6 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
 
          while ( gobject )
          {
-//          gcolor = gtalleg_make_color( gobject->color.usRed, gobject->color.usGreen, gobject->color.usBlue);
             gcolor = al_make_color( MK_GT8BCOLOR(gobject->color.usRed), MK_GT8BCOLOR(gobject->color.usGreen), MK_GT8BCOLOR(gobject->color.usBlue) );
             s_usUpdLeft = MIN(s_usUpdLeft,gobject->x);
             s_usUpdTop = MIN(s_usUpdTop,gobject->y);
