@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.22 2003/09/09 03:07:36 paultucker Exp $
+# $Id: hrbdll.bc,v 1.23 2003/09/15 04:09:10 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -39,7 +39,7 @@ CODEPAGE_DIR = source\codepage
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 # Please adjust according to your environment
 
-OBJ_DIR           = obj\dll\55
+OBJ_DIR           = obj\dll\b32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ include directory ³Û
@@ -64,7 +64,7 @@ HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es
 #  ßßßßßßßßßß
 # Please adjust according to your environment
 
-HARBOUR_DLL = lib\55\harbour.dll
+HARBOUR_DLL = lib\b32\harbour.dll
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HARBOUR_DLL rules ³Û
@@ -438,7 +438,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\binnumx.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\box.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\chrasc.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpapi.obj		      + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpapi.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpesdos.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpeswin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpgedos.obj          + >> hdll.tmp
@@ -631,7 +631,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tmenuitm.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tobject.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\tpopup.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\traceprg.obj	      + >> hdll.tmp
+  echo. $(OBJ_DIR)\traceprg.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\treport.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\ttextlin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\ttopbar.obj           + >> hdll.tmp
@@ -757,12 +757,13 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
-  echo. $(BCC_DIR)\lib\c0d32w.obj,       + >> hdll.tmp
+  echo. $(BCC_DIR)\c0d32w.obj,           + >> hdll.tmp
   echo. $(HARBOUR_DLL),                  + >> hdll.tmp
   echo. ,                                + >> hdll.tmp
-  echo. $(BCC_DIR)\lib\cw32.lib          + >> hdll.tmp
-  echo. $(BCC_DIR)\lib\import32.lib       >> hdll.tmp
-  $(BCC_DIR)\BIN\ILINK32 -aa -Tpd -Gn @hdll.tmp
+  echo. $(BCC_DIR)\cw32.lib              + >> hdll.tmp
+  echo. $(BCC_DIR)\import32.lib          + >> hdll.tmp
+  echo. $(BCC_DIR)\uuid.lib                >> hdll.tmp
+  $(BCC_DIR)\ILINK32 -aa -Tpd -Gn @hdll.tmp
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ object file creation ³Û

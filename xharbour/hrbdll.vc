@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.16 2003/09/09 03:07:36 paultucker Exp $
+# $Id: hrbdll.vc,v 1.17 2003/09/15 04:09:10 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -57,8 +57,8 @@ INCLUDE_DIR  = include
 # юддддддддыш
 #  ъъъъъъъъъъ
 # Please adjust accordingly
-
-HARBOUR_DLL  = lib\vc\harbour.dll
+LIB_DIR      = lib\vc
+HARBOUR_DLL  = $(LIB_DIR)\harbour.dll
 
 # здддддддддддддддд©
 # Ё compiler flags Ёш
@@ -464,6 +464,13 @@ HARBOUR_DLL_OBJS = \
 
 all: \
    $(HARBOUR_DLL)
+
+CLEAN:
+   -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
+   -@if exist $(LIB_DIR)\harbour.exp del $(LIB_DIR)\harbour.exp >nul
+   -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
+   -@if exist $(OBJ_DIR)\*.c del $(OBJ_DIR)\*.c >nul
+   -@if exist $(OBJ_DIR)\*.h del $(OBJ_DIR)\*.h >nul
 
 # зддддддддддддддддддддд©
 # Ё HARBOUR_DLL linking Ёш
