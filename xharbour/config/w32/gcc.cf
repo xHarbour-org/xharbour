@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.4 2003/01/10 17:16:35 jonnymind Exp $
+# $Id: gcc.cf,v 1.5 2003/01/10 22:17:57 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -33,7 +33,7 @@ LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 
 #Adding MT libs on need
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR)_mt/)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH)_mt/)
 endif
 
 else

@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.3 2003/01/10 17:16:37 jonnymind Exp $
+# $Id: global.cf,v 1.4 2003/01/10 22:17:58 jonnymind Exp $
 #
 
 all : first
@@ -76,6 +76,6 @@ dirbase::
 	 [ -d $(ARCH_DIR) ] || $(MD) $(ARCH_DIR)
 
 clean::
-	-$(RD) $(ARCH_DIR)
-
+	-$(RD) $(ARCH)
+	-$(RD) $(ARCH)_mt
 endif
