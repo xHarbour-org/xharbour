@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.76 2004/06/18 16:48:20 paultucker Exp $
+ * $Id: tbrowse.prg,v 1.77 2004/06/22 03:01:54 vouchcac Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
  * Copyright 2000, '01, '02 Maurilio Longo <maurilio.longo@libero.it>
  * Cursor movement handling, stabilization loop, multi-line headers and footers support
  * ::PageUp(), ::PageDown(), ::Down(), ::Up(), ::GoBottom(), ::GoTop(), ::Stabilize()
- * ::GotoXY(), ::DispCell(), ::WriteMLineText(), ::RedrawHeaders(),
+ * ::DispCell(), ::WriteMLineText(), ::RedrawHeaders(),
  * ::SetFrozenCols(), ::SetColumnWidth()
  *
  * Copyright 2001 Manu Exposito <maex14@dipusevilla.es>
@@ -2756,8 +2756,6 @@ Method HitTest( mrow,mcol ) CLASS TBROWSE
 
    if mRow < ::nTop .or. mRow > ::rect[ 3 ]
       return HTNOWHERE
-   elseif mRow = ::nTop
-      lHitHeader := .t.
    endif
 
    if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
@@ -2765,6 +2763,10 @@ Method HitTest( mrow,mcol ) CLASS TBROWSE
    endif
 
    ::mRowPos := mRow - ::rect[ 1 ] + 1
+   // Is the header separator part of the "header" when click?
+   if ::mRowPos < 1 - if( ::lHeadSep , 1, 0 )
+      lHitHeader := .t.
+   endif
 
    nVisCol := len( ::aColumnsSep )
 
@@ -2825,12 +2827,12 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 
       do while ( n < 0 )
          n++
-         oBrowse:up()
+         oBrowse:up():forceStable()
       enddo
 
       do while ( n > 0 )
          n--
-         oBrowse:down()
+         oBrowse:down():forceStable()
       enddo
 
       n := oBrowse:mcolpos - oBrowse:colpos

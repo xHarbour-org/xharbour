@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3114 2004/06/29 03:58:24 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3115 2004/06/29 22:13:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-29 20:27 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    ! Fixed for reposition cursor in the row clicked with the mouse,
+      instead of single-step movement.
+    ! Fixed recognizion for mouse-click in header.
+    - Removed "::GotoXY()" from credits... this method doesn't exist.
 
 2004-06-29 15:13 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/genc.c
