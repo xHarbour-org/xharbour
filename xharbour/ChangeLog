@@ -8,10 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-10-19 23:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
-  * source/rdd/dbcmd.c
-    ! Fixed rddMoveFields() to use the proper workarea method to
-      retrieve filed names.
+2003-10-19 95:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+    * Corrected minor typo.
 
 2003-10-19 15:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c
@@ -19,7 +18,7 @@
 
 2003-10-19 11:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c
-    + Added logic to scan the stack to find possible aditional refrences to value being detached.
+    + Added logic to scan the stack to find possible aditional references to value being detached.
 
 2003-10-19 11:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
@@ -510,6 +509,13 @@
   + contrib/libnf/ontick.c
   + contrib/libnf/origin.c
   + contrib/libnf/page.prg
+  + contrib/libnf/pchr.prg
+  + contrib/libnf/peek.c
+  + contrib/libnf/pegs.prg
+  + contrib/libnf/pending.prg
+  + contrib/libnf/pickday.prg
+  + contrib/libnf/poke.c
+/libnf/page.prg
   + contrib/libnf/pchr.prg
   + contrib/libnf/peek.c
   + contrib/libnf/pegs.prg
