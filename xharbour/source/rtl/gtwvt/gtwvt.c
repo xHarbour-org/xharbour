@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.7 2003/12/22 21:48:26 druzus Exp $
+ * $Id: gtwvt.c,v 1.8 2003/12/22 23:56:26 andijahja Exp $
  */
 
 /*
@@ -1843,7 +1843,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         colrow = hb_wvt_gtGetColRowFromXY(xy.x, xy.y);
         hb_wvt_gtSetMouseX(colrow.x);
         hb_wvt_gtSetMouseY(colrow.y);
-        if (message==WM_RBUTTONDOWN)
+        if (message==WM_LBUTTONDOWN)
         {
           lMouseDown = TRUE;
         }
@@ -1870,7 +1870,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         colrow = hb_wvt_gtGetColRowFromXY(xy.x, xy.y);
         hb_wvt_gtSetMouseX(colrow.x);
         hb_wvt_gtSetMouseY(colrow.y);
-        if (message==WM_RBUTTONUP)
+        if (message==WM_LBUTTONUP)
         {
           lMouseDown = FALSE;
         }
