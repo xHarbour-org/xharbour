@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.134 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: hvm.c,v 1.135 2002/12/20 08:39:43 ronpinkas Exp $
  */
 
 /*
@@ -91,10 +91,6 @@
 #include "hbset.h"
 #include "hbinkey.ch"
 #include "inkey.ch"
-
-#ifdef HB_THREAD_SUPPORT
-   #include "thread.h"
-#endif
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"

@@ -23,7 +23,7 @@ Procedure Main( cPort )
    nResponse := InetSend( s, "Welcome to my server!" + Chr(13) + Chr(10) )
 
    DO WHILE nResponse >= 0
-      nResponse := InetRecvLine( s, @cResponse, 128 )
+      cResponse := InetRecvLine( s )
 
       IF InetErrorCode( s ) != 0
           @ 8, 5 SAY Space(70)
@@ -33,9 +33,7 @@ Procedure Main( cPort )
           Inkey(0)
 
           QUIT
-      ENDIF
-
-      IF nResponse > 0
+      ELSE
          @ 7, 5 SAY "Received:"
          @ 8, 5 SAY space(70)
          @ 8, 5 SAY cResponse

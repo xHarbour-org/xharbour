@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.14 2002/12/21 22:40:43 likewolf Exp $
+* $Id: thread.c,v 1.15 2002/12/22 02:07:17 ronpinkas Exp $
 */
 
 /*
@@ -54,10 +54,6 @@
 *
 */
 
-#include "hbstack.h"
-
-#ifdef HB_THREAD_SUPPORT
-
 #if defined( HB_OS_DARWIN )
 #include <stdlib.h>
 #else
@@ -74,6 +70,8 @@
 #endif
 
 #include "hbapi.h"
+#include "hbvm.h"
+#include "hbstack.h"
 #include "thread.h"
 
 HB_THREAD_CONTEXT *hb_ht_context;
@@ -89,8 +87,10 @@ void hb_createContext( void )
     tc = (HB_THREAD_CONTEXT *) malloc( sizeof( HB_THREAD_CONTEXT));
     tc->th_id = HB_CURRENT_THREAD();
 
-    tc->stack = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
-    tc->next = NULL;
+    tc->stack       = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
+    tc->Cargo       = NULL;
+    tc->pDestructor = NULL;
+    tc->next        = NULL;
 
     tc->stack->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
     tc->stack->pBase  = tc->stack->pItems;
@@ -169,10 +169,15 @@ void hb_destroyContext( void )
             free( p->stack->pItems[ i ] );
         }
 
-        free( p->stack->pItems );
-
         /* Free the stack */
+        free( p->stack->pItems );
         free( p->stack );
+
+        // Call destructor
+        if( p->pDestructor )
+        {
+           p->pDestructor( (void *) p );
+        }
 
         /* Free the context */
         free( p );
@@ -231,14 +236,26 @@ void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h )
         HB_CRITICAL_UNLOCK( context_monitor );
 
         /* Free each element of the stack */
-        for( i=0; i < p->stack->wItems; ++i )
+        for( i = 0; i < p->stack->wItems; ++i )
         {
+            if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
+            {
+               hb_itemClear( p->stack->pItems[ i ] );
+            }
+
             free( p->stack->pItems[ i ] );
         }
 
-        free( p->stack->pItems );
         /* Free the stack */
+        free( p->stack->pItems );
         free( p->stack );
+
+        // Call destructor
+        if( p->pDestructor )
+        {
+           p->pDestructor( (void *) p );
+        }
+
         /* Free the context */
         free( p );
     }
@@ -918,9 +935,9 @@ HB_FUNC( WAITFORTHREADS )
     while( hb_ht_context )
     {
         #if defined(HB_OS_WIN_32)
-           Sleep( 1 );
-	#elif defined(HB_OS_DARWIN)
-	   usleep( 1 );
+           Sleep( 0 );
+        #elif defined(HB_OS_DARWIN)
+           usleep( 1 );
         #else
            static struct timespec nanosecs = { 0, 1000 };
            nanosleep( &nanosecs, NULL );
@@ -935,10 +952,10 @@ be useful in the future.
 #if defined( HB_OS_WIN_32 )
 void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
+    HB_SYMBOL_UNUSED( bUnused );
+
     ReleaseMutex( hToSignal );
     WaitForSingleObject( hToWaitFor, dwMillisec );
 }
-#endif
-
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.35 2002/10/16 04:20:25 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.36 2002/12/15 23:06:02 ronpinkas Exp $
  */
 
 /*
@@ -2892,7 +2892,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             else if( IsInStr( **ptri, sZnaki ) )
             {
                /* Ron Pinkas added 2000-06-02 */
-               if( **ptri=='.' && bMacro )
+               if( **ptri == '.' && bMacro )
                {
                   /* Macro terminator '.' */
                   if( *(*ptri+1) == ' ' )
@@ -3001,11 +3001,34 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                   rez = TRUE; State = STATE_EXPRES;
                }
             }
-            else if( **ptri == '.' && *(*ptri-2) == '.' &&
-                     ( *(*ptri-1) == 'T' || *(*ptri-1) == 'F' ||
-                     *(*ptri-1) == 't' || *(*ptri-1) == 'f' ) )
+            else if( **ptri == '.' )
             {
-               State = STATE_ID_END;
+               if( lens > 1 && *(*ptri-2) == '.' &&
+                     ( *(*ptri-1) == 'T' || *(*ptri-1) == 'F' ||
+                       *(*ptri-1) == 't' || *(*ptri-1) == 'f' ||
+                       *(*ptri-1) == 'Y' || *(*ptri-1) == 'N' ||
+                       *(*ptri-1) == 'y' || *(*ptri-1) == 'n' ) )
+               {
+                  State = STATE_ID_END;
+               }
+               else
+               {
+                  State = STATE_EXPRES;
+                  /*
+                  if( isdigit( *( *ptri + 1 ) ) )
+                  {
+                     State = STATE_EXPRES;
+                  }
+                  else if( strchr( "TFYN", toupper( *( *ptri + 1 ) ) ) && *( *ptri + 2 ) == '.' )
+                  {
+                     State = STATE_EXPRES;
+                  }
+                  else
+                  {
+                     rez = TRUE;
+                  }
+                  */
+               }
             }
             else
             {
@@ -4232,6 +4255,14 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               {
                  lPos += 3;
               }
+              else if( toupper( szText[lPos + 1] ) == 'Y' && szText[lPos + 2] == '.' )
+              {
+                 lPos += 3;
+              }
+              else if( toupper( szText[lPos + 1] ) == 'N' && szText[lPos + 2] == '.' )
+              {
+                 lPos += 3;
+              }
               else if( toupper( szText[lPos + 1] ) == 'O' && toupper( szText[lPos + 2] ) == 'R' && szText[lPos + 4] == '.' )
               {
                  lPos += 4;
@@ -4678,6 +4709,20 @@ static int NextName( char ** sSource, char * sDest )
         continue;
      }
      else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'F' && (*sSource)[2] == '.' )
+     {
+        (*sSource) += 3;
+        cLastChar = ' ';
+        continue;
+     }
+     /* End - Ron Pinkas added 2002-07-17 */
+     /* Ron Pinkas added 2002-12-21 */
+     else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'Y' && (*sSource)[2] == '.' )
+     {
+        (*sSource) += 3;
+        cLastChar = ' ';
+        continue;
+     }
+     else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'N' && (*sSource)[2] == '.' )
      {
         (*sSource) += 3;
         cLastChar = ' ';

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.543 2002/12/21 22:40:42 likewolf Exp $
+ * $Id: ChangeLog,v 1.544 2002/12/22 07:06:58 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-22 16:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/thread.h
+  * source/vm/thread.c
+    + Added support for Destructor and Cargo.
+      If Destructor is defined it's calls from hb_DestrotContext*().
+
+  * include/inet.h
+  * source/rtl/inet.c
+    * Rewriten.
+    + Added support for Thread Destructor on blocking function calls.
+
+  * source/vm/estack.c
+    * hb_getCurrentStack() always included.
+
+  * source/vm/hvm.c
+    * #include Refinments.
+
+  * include/hbapi.h
+    + Added hb_retclenAdoptRaw()
+    * #include Refinments.
+
+  * source/vm/extend.c
+    ! Fixed support for hb_param( n, HB_IT_BYREF )
+
+  * source/vm/fastitem.c
+    + Added hb_retclenAdoptRaw()
+
+  * source/rtl/set.c
+    ! Fixed compiler warnings.
+
+  * source/pp/ppcore.c
+    * Fix in progress.
+
+  * tests/client.prg
+  * tests/server.prg
+    * Made compabtible with revised inet module.
 
 2002-12-22 03:54 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * include/hbstack.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.46 2002/12/17 04:21:42 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.47 2002/12/19 18:15:34 ronpinkas Exp $
  */
 
 /*
@@ -150,6 +150,34 @@ typedef USHORT ERRCODE;
 
 extern HB_SYMB  hb_symEval;
 
+/* garbage collector */
+#define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
+typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
+typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
+
+extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
+extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
+
+extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
+extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
+extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
+extern void   hb_gcCollect( void ); /* checks if a single memory block can be released */
+extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
+extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
+extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
+extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
+extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
+extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
+
+extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
+extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
+extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
+extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
+extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
+
 /* Extend API */
 extern char HB_EXPORT * hb_parc( int iParam, ... );  /* retrieve a string parameter */
 extern ULONG    HB_EXPORT hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
@@ -177,6 +205,34 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
    #endif
 #endif
 
+/* garbage collector */
+#define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
+typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
+typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
+
+extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
+extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
+
+extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
+extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
+extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
+extern void   hb_gcCollect( void ); /* checks if a single memory block can be released */
+extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
+extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
+extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
+extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
+extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
+extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
+
+extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
+extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
+extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
+extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
+extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
+
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
    #include "hbstack.h"
@@ -190,6 +246,7 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     #define hb_retcStatic( szText )              hb_itemPutCConst( &HB_VM_STACK.Return, (szText) )
     #define hb_retclen( szText, ulLen )          hb_itemPutCL( &HB_VM_STACK.Return, (szText), (ulLen) )
     #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), (ulLen) )
+    #define hb_retclenAdoptRaw( szText, ulLen )  hb_itemPutCRaw( &HB_VM_STACK.Return, (szText), (ulLen) )
     #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &HB_VM_STACK.Return, (szText) )
     #define hb_retds( szDate )                   hb_itemPutDS( &HB_VM_STACK.Return, (szDate) )
     #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &HB_VM_STACK.Return, (lYear), (lMonth), (lDay) )
@@ -212,6 +269,7 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     extern void  HB_EXPORT  hb_retcStatic( char * szText );
     extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
@@ -446,34 +504,6 @@ extern void   hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYT
 extern void   hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
 extern char * hb_macroGetType( HB_ITEM_PTR pItem ); /* determine the type of an expression */
 extern char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
-
-/* garbage collector */
-#define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
-typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
-typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
-
-extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
-extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
-
-extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
-extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
-extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
-extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
-extern void   hb_gcCollect( void ); /* checks if a single memory block can be released */
-extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
-extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
-extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
-extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
-extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
-extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
-extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
-extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
-
-extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
-extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
-extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
-extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
-extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
 
 /* idle states */
 extern void   hb_idleState( void ); /* services a single idle state */

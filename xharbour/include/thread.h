@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.11 2002/12/21 04:00:00 jonnymind Exp $
+* $Id: thread.h,v 1.12 2002/12/21 14:35:34 jonnymind Exp $
 */
 
 /*
@@ -58,7 +58,6 @@
 
 #include "hbdefs.h"
 #include "hbstack.h"
-#include "hbvm.h"
 #include "hbapierr.h"
 
 #if defined( HB_OS_WIN_32 )
@@ -151,6 +150,8 @@ typedef struct tag_HB_THREAD_CONTEXT {
     HB_THREAD_HANDLE th_h;
 #endif
     HB_STACK *stack;
+    void *Cargo;
+    HB_GARBAGE_FUNC_PTR pDestructor;
     struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
 

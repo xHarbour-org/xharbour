@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.8 2002/12/21 22:40:43 likewolf Exp $
+* $Id: inet.h,v 1.9 2002/12/22 06:56:19 walito Exp $
 */
 
 /*
@@ -111,13 +111,13 @@ typedef struct tag_HB_SOCKET_STRUCT
 
 #define HB_SOCKET_INIT( s ) \
     {\
-    s = ( HB_SOCKET_STRUCT *) hb_gcAlloc( sizeof( HB_SOCKET_STRUCT ), NULL );\
+    s = ( HB_SOCKET_STRUCT *) hb_xgrab( sizeof( HB_SOCKET_STRUCT ) );\
     HB_SOCKET_ZERO_ERROR( s );\
     s->com = 0;\
     s->count = 0;\
     }
 
-#define HB_SOCKET_FREE( s ) hb_xfree( s )
+//#define HB_SOCKET_FREE( s ) hb_xfree( s )
 
 #ifndef MSG_NOSIGNAL
     #define MSG_NOSIGNAL  0

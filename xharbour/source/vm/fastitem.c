@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.37 2002/10/25 03:06:09 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.38 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -562,6 +562,31 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
 
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
+
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
+      {
+         hb_itemReleaseString( &(HB_VM_STACK.Return) );
+      }
+      else
+      {
+         hb_itemFastClear( &(HB_VM_STACK.Return) );
+      }
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
+   ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
+}
+
+#undef hb_retclenAdoptRaw
+void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
+{
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
    if( ( &(HB_VM_STACK.Return) )->type )

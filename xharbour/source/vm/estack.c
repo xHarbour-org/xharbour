@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.18 2002/12/20 01:26:08 jonnymind Exp $
+ * $Id: estack.c,v 1.19 2002/12/20 08:39:43 ronpinkas Exp $
  */
 
 /*
@@ -67,52 +67,52 @@ HB_STACK hb_stack;
 
 #ifdef HB_THREAD_SUPPORT
    #include "thread.h"
+#endif
 
-   HB_STACK *hb_getCurrentStack( void )
+HB_STACK *hb_getCurrentStack( void )
+{
+   // Most common first.
+   if( hb_ht_context == NULL )
    {
-      // Most common first.
-      if( hb_ht_context == NULL )
+      return &hb_stack;
+   }
+   else
+   {
+      //static HB_THREAD_CONTEXT *last_context = NULL;
+      HB_THREAD_CONTEXT *p;
+      HB_THREAD_T id;
+
+      id = HB_CURRENT_THREAD();
+
+      /*
+      if ( last_context != NULL && last_context->th_id == id )
       {
-         return &hb_stack;
+         return last_context->stack;
+      }
+      */
+
+      HB_CRITICAL_LOCK( context_monitor );
+
+      p = hb_ht_context;
+      while( p && p->th_id != id )
+      {
+         p = p->next;
+      }
+
+      if( p )
+      {
+         //last_context = p;
+         HB_CRITICAL_UNLOCK( context_monitor );
+         return p->stack;
       }
       else
       {
-         //static HB_THREAD_CONTEXT *last_context = NULL;
-         HB_THREAD_CONTEXT *p;
-         HB_THREAD_T id;
-
-         id = HB_CURRENT_THREAD();
-
-         /*
-         if ( last_context != NULL && last_context->th_id == id )
-         {
-            return last_context->stack;
-         }
-         */
-
-         HB_CRITICAL_LOCK( context_monitor );
-
-         p = hb_ht_context;
-         while( p && p->th_id != id )
-         {
-            p = p->next;
-         }
-
-         if( p )
-         {
-            //last_context = p;
-            HB_CRITICAL_UNLOCK( context_monitor );
-            return p->stack;
-         }
-         else
-         {
-            // TODO: Add Error Message.
-            HB_CRITICAL_UNLOCK( context_monitor );
-            return &hb_stack;
-         }
+         // TODO: Add Error Message.
+         HB_CRITICAL_UNLOCK( context_monitor );
+         return &hb_stack;
       }
    }
-#endif
+}
 
 /* ------------------------------- */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.14 2002/12/16 06:02:47 ronpinkas Exp $
+ * $Id: set.c,v 1.15 2002/12/22 07:03:19 walito Exp $
  */
 
 /*
@@ -138,8 +138,7 @@ static int set_number( PHB_ITEM pItem, int iOldValue )
 
 static char * set_string( PHB_ITEM pItem, char * szOldString )
 {
-   char * szString = NULL;
-   ULONG ulLen = 0;
+   char * szString;
 
    HB_TRACE(HB_TR_DEBUG, ("set_string(%p, %s)", pItem, szOldString));
 
@@ -148,18 +147,33 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
       /* Limit size of SET strings to 64K, truncating if source is longer */
       ULONG ulLen = hb_itemGetCLen( pItem );
 
-      if( ulLen > USHRT_MAX ) ulLen = USHRT_MAX;
+      if( ulLen > USHRT_MAX )
+      {
+         ulLen = USHRT_MAX;
+      }
 
-      if( szOldString ) szString = ( char * ) hb_xrealloc( szOldString, ulLen + 1 );
-      else szString = ( char * ) hb_xgrab( ulLen + 1 );
+      if( szOldString )
+      {
+         szString = ( char * ) hb_xrealloc( szOldString, ulLen + 1 );
+      }
+      else
+      {
+         szString = ( char * ) hb_xgrab( ulLen + 1 );
+      }
 
       memcpy( szString, hb_itemGetCPtr( pItem ), ulLen );
       szString[ ulLen ] = '\0';
    }
    else if( HB_IS_NIL( pItem ) )
    {
-      if( szOldString ) szString = ( char * ) hb_xrealloc( szOldString, 1 );
-      else szString = ( char * ) hb_xgrab( 1 );
+      if( szOldString )
+      {
+         szString = ( char * ) hb_xrealloc( szOldString, 1 );
+      }
+      else
+      {
+         szString = ( char * ) hb_xgrab( 1 );
+      }
 
       szString[ 0 ] = '\0';
    }

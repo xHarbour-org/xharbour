@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.10 2002/10/09 20:43:00 ronpinkas Exp $
+ * $Id: extend.c,v 1.11 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -93,6 +93,11 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
       if( pItem->type & HB_IT_BYREF )
       {
          pItem = hb_itemUnRef( pItem );
+
+         if( iMask == HB_IT_BYREF )
+         {
+            return pItem;
+         }
       }
 
       uiType = pItem->type;

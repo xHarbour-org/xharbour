@@ -56,7 +56,7 @@ PROCEDURE Main( cAddress, cPort )
 
 PROCEDURE ReceivePoll( Socket )
 
-   LOCAL nRensponse, cResponse
+   LOCAL nResponse, cResponse := Space( 80 )
    LOCAL nProgress
    LOCAL nRow := Row(), nCol := Col()
 
@@ -68,10 +68,10 @@ PROCEDURE ReceivePoll( Socket )
 
    DO WHILE ! RequestTerm
      IF InetDataReady( Socket ) > 0
-        nResponse := InetRecvLine( Socket, @cResponse, 128 )
+        cResponse := InetRecvLine( Socket )
 
-        IF nResponse > 0
-           @ 10, 0 SAY cResponse
+        IF InetErrorCode( Socket ) != 0
+           @ 10, 0 SAY Left( cResponse, nResponse )
            @ nRow, nCol
         ENDIF
      ENDIF
