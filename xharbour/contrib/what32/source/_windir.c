@@ -4,7 +4,7 @@
 
 
 #define HB_OS_WIN_32_USED
-#define _WIN32_WINNT   0x0500
+//#define _WIN32_WINNT   0x0500
 
 #include <windows.h>
 #include "hbapi.h"
@@ -245,21 +245,28 @@ HB_FUNC( GETFULLPATHNAME )
 //-----------------------------------------------------------------------------
    // GetVolumeFileName(szPath,@szPathReturn)
 // WINBASEAPI BOOL WINAPI GetVolumePathNameA( LPCSTR lpszFileName, LPSTR lpszVolumePathName, DWORD cchBufferLength );
-#if (_WIN32_WINNT >= 0x0500)
+//#if (_WIN32_WINNT >= 0x0500)
 
 HB_FUNC( GETVOLUMEPATHNAME )
 {
+   typedef BOOL ( WINAPI * P_GVPN )( LPCTSTR, LPTSTR, DWORD );
+   BOOL bResult = FALSE;
    char buffer[MAX_PATH+1] = {0};
-
-   hb_retl( GetVolumePathName( (LPCSTR) hb_parcx( 1 ),
-                               buffer,
-                               MAX_PATH
-                              ) ) ;
-   hb_storc( buffer ,2 );
+   P_GVPN pGVPN ;
+   pGVPN = ( P_GVPN ) GetProcAddress( GetModuleHandle( "kernel32.dll" ), "GetVolumePathNameA" );
+   if( pGVPN )
+   {
+      bResult = pGVPN( (LPCSTR) hb_parcx( 1 ), buffer, MAX_PATH );
+   }
+   hb_retl( bResult );
+   if ( ISBYREF( 2 ) )
+   {
+      hb_storc( buffer ,2 );
+   }
 }
 
 
-#endif
+//#endif
 
 
 //-----------------------------------------------------------------------------

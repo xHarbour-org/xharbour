@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3658 2004/12/08 01:29:49 peterrees Exp $
+ * $Id: ChangeLog,v 1.3659 2004/12/08 04:51:49 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-12-09 09:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/what32/source/_windir.c
+    - remove => #define _WIN32_WINNT   0x0500
+    * HB_FUNC( GETVOLUMEPATHNAME )
+        use GetProcAddress() to allow use on older Windows
 
 2004-12-07 22:50 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg
