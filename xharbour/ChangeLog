@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2878 2004/05/06 23:56:40 peterrees Exp $
+ * $Id: ChangeLog,v 1.2879 2004/05/07 02:57:26 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 14:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/count.c
+    ! Fixed COUNTLEFT() and COUNTRIGHT(), thanks to Valery Belorustcev.
+
 2004-05-07 15:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/filesys.c
     - fixed typo :  proc.dwProcessID -> proc.dwProcessId

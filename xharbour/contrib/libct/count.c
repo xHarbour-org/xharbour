@@ -1,5 +1,5 @@
 /*
- * $Id: count.c,v 1.1 2001/07/23 18:08:56 mbirdyg Exp $
+ * $Id: count.c,v 1.1 2003/03/04 21:04:22 lculik Exp $
  */
 
 /*
@@ -68,8 +68,8 @@ static void do_count (int iSwitch)
   if (ISCHAR (1))
   {
 
-    char *pcString = hb_parc (2);
-    size_t sStrLen = (size_t)hb_parclen (2);
+    char *pcString = hb_parc( 1 );
+    size_t sStrLen = (size_t)hb_parclen( 1 );
     size_t sRetVal;
     char *pc;
     char cSearch;
