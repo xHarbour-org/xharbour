@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2055 2004/01/14 21:44:04 peterrees Exp $
+ * $Id: ChangeLog,v 1.2056 2004/01/14 21:47:37 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2004-01-35 10:47 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+2004-01-15 11:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - replace hb_stack with HB_VM_STACK
+
+2004-01-15 10:47 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * Fix typo's in previous changelog
 
-2004-01-35 10:44 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+2004-01-15 10:44 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     + Fix translation of CTRL-A-Z to inkey.ch value of K_CTRL_A-Z
 

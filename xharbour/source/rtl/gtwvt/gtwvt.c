@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.41 2004/01/14 12:49:20 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.42 2004/01/14 21:42:54 peterrees Exp $
  */
 
 /*
@@ -1608,7 +1608,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushLong( ( LONG ) wParam  );
           hb_vmPushLong( ( LONG ) lParam  );
           hb_vmDo( 4 );
-          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
       }
       else
@@ -1642,7 +1642,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushNil();
           hb_vmPushLong( ( LONG ) hWnd    );
           hb_vmDo( 1 );
-          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
       }
       else
@@ -1665,7 +1665,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_vmPushNil();
         hb_vmPushLong( ( LONG ) hWnd );
         hb_vmDo( 1 );
-        hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
       }
       return( 0 );
     }
