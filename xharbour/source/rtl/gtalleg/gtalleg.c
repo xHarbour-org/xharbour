@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.22 2004/02/16 12:28:45 andijahja Exp $
+ * $Id: gtalleg.c,v 1.23 2004/02/17 18:44:14 andijahja Exp $
  */
 
 /*
@@ -1496,7 +1496,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       s_byMSButtons = (BYTE) al_mouse_b;
    }
 
-   if ( ( nKey == 0 ) && ( ( eventmask & INKEY_KEYBOARD ) | ( eventmask & HB_INKEY_RAW ) | ( eventmask & HB_INKEY_EXTENDED ) ) )
+   if ( ( nKey == 0 ) && ( eventmask & INKEY_KEYBOARD ) )
    {
       if ( al_keyboard_needs_poll() )
       {
@@ -1508,11 +1508,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
          nKey = al_read_key();
       }
 
-      if ( eventmask & HB_INKEY_RAW )
-      {
-         // leave the key as its raw value
-      }
-      else if ( nKey & 255 )
+      if ( nKey & 255 )
       {
          nKey = nKey & 255;
       }
