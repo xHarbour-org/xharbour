@@ -1,5 +1,5 @@
 /*
- * $Id: idle.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
+ * $Id: bkgtsks.txt,v 1.1 2003/12/29 01:26:30 fsgiudice Exp $
 */
 
 /*
@@ -57,7 +57,7 @@
  *      Similar API function are avalaible at C level.
  *
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD(),SET BACKGROUND TASKS,Set()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD(),SET BACKGROUND TASKS, SET BACKGROUNDTICK,Set()
  *  $END$
  */
 
@@ -637,3 +637,35 @@
  *  $END$
  */
 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SET BACKGROUNDTICK
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Set the number of xHarbour pCodes to run before check for tasks to execute.
+ *  $SYNTAX$
+ *      SET BACKGROUNDTICK <nPcodes>;
+ *  $ARGUMENTS$
+ *      nPcodes    Is the number of xHarbour pCodes to run before check for tasks to 
+ *                 execute
+ *  $RETURNS$
+ *  $DESCRIPTION$
+ *   With this SET you can change the number of pCodes executed
+ *   before checking Tasks. Default is 1000. When you raise this number,
+ *   system saves time checking Tasks, but lowering it you can
+ *   have a more realist multitasking
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/vm/hvm.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDTIME(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown()
+ *  $END$
+ */
