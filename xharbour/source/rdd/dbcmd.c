@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.74 2004/02/20 22:33:55 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.75 2004/02/21 20:06:42 andijahja Exp $
  */
 
 /*
@@ -3988,29 +3988,26 @@ HB_FUNC( __DBARRANGE )
 }
 
 #ifdef HB_COMPAT_C53
+
 HB_FUNC( DBINFO )
 {
    HB_THREAD_STUB
    PHB_ITEM pType, pInfo;
-   BOOL bDeleteItem;
+   HB_ITEM pTemp;
 
    if( s_pCurrArea )
    {
+      pTemp.type = HB_IT_NIL;
       pType = hb_param( 1 , HB_IT_NUMERIC );
       if( pType )
       {
          pInfo = hb_param( 2 , HB_IT_ANY );
-         if( !pInfo )
+         if( pInfo )
          {
-            pInfo = hb_itemNew( NULL );
-            bDeleteItem = TRUE;
+            pTemp = *pInfo;
          }
-         else
-            bDeleteItem = FALSE;
-         SELF_INFO( ( AREAP ) s_pCurrArea->pArea, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
-         if( bDeleteItem )
-            hb_itemRelease( pInfo );
+         SELF_INFO( ( AREAP ) s_pCurrArea->pArea, hb_itemGetNI( pType ), &pTemp );
+         hb_itemForwardValue( &(HB_VM_STACK).Return, &pTemp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
@@ -4018,19 +4015,19 @@ HB_FUNC( DBINFO )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBINFO" );
 }
+
 HB_FUNC( DBORDERINFO )
 {
    HB_THREAD_STUB
    PHB_ITEM pType;
-   BOOL bDeleteItem;
    DBORDERINFO pOrderInfo;
+   BOOL bDeleteItem;
 
    if( s_pCurrArea )
    {
       pType = hb_param( 1 , HB_IT_NUMERIC );
       if( pType )
       {
-
          pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
          /* atomBagName may be NIL */
          pOrderInfo.itmOrder = hb_param( 3, HB_IT_STRING );
@@ -4064,11 +4061,12 @@ HB_FUNC( DBFIELDINFO )
 {
    HB_THREAD_STUB
    PHB_ITEM pType, pInfo;
+   HB_ITEM pTemp;
    USHORT uiFields, uiIndex;
-   BOOL bDeleteItem;
 
    if( s_pCurrArea )
    {
+      pTemp.type = HB_IT_NIL;
       pType = hb_param( 1 , HB_IT_NUMERIC );
       uiIndex = hb_parni( 2 );
       if( pType &&
@@ -4076,19 +4074,13 @@ HB_FUNC( DBFIELDINFO )
           uiIndex > 0 && uiIndex <= uiFields )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
-         if( !pInfo )
+         if( pInfo )
          {
-            pInfo = hb_itemNew( NULL );
-            bDeleteItem = TRUE;
+            pTemp = *pInfo;
          }
-         else
-            bDeleteItem = FALSE;
 
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
-
-         if( bDeleteItem )
-            hb_itemRelease( pInfo );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, hb_itemGetNI( pType ), &pTemp );
+         hb_itemForwardValue( &(HB_VM_STACK).Return, &pTemp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
@@ -4101,26 +4093,22 @@ HB_FUNC( DBRECORDINFO )
 {
    HB_THREAD_STUB
    PHB_ITEM pType, pRecNo, pInfo;
-   BOOL bDeleteItem;
+   HB_ITEM pTemp;
 
    if( s_pCurrArea )
    {
+      pTemp.type = HB_IT_NIL;
       pType = hb_param( 1 , HB_IT_NUMERIC );
       pRecNo = hb_param( 2 , HB_IT_NUMERIC );
       if( pType )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
-         if( !pInfo )
+         if( pInfo )
          {
-            pInfo = hb_itemNew( NULL );
-            bDeleteItem = TRUE;
+            pTemp = *pInfo;
          }
-         else
-            bDeleteItem = FALSE;
-         SELF_RECINFO( ( AREAP ) s_pCurrArea->pArea, pRecNo, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
-         if( bDeleteItem )
-            hb_itemRelease( pInfo );
+         SELF_RECINFO( ( AREAP ) s_pCurrArea->pArea, pRecNo, hb_itemGetNI( pType ), &pTemp );
+         hb_itemForwardValue( &(HB_VM_STACK).Return, &pTemp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );
