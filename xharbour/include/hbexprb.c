@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.62 2003/08/20 04:55:22 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.63 2003/08/21 01:56:20 ronpinkas Exp $
  */
 
 /*
@@ -1802,7 +1802,8 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->value.asList.pExprList = pString;
                         pSelf->value.asList.pIndex    = pStart;
 
-                        PostOptimization:
+                        PostOptimization :
+                        ;
                      }
                   }
                }
