@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.16 2004/08/27 15:29:25 modalsist Exp $
+rem $Id: make_b32.bat,v 1.18 2004/08/29 10:30:00 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -54,11 +54,14 @@ if "%1" == "CLEAN" goto CLEAN
 
 :CLEAN
 
-   if exist bin\b32\*.exe del bin\b32\*.exe
-   if exist bin\b32\*.tds del bin\b32\*.tds
-   if exist bin\b32\*.map del bin\b32\*.map
-
-rem   if exist lib\*.lib     del lib\*.lib
+   if exist bin\harbour.exe    del bin\harbour.exe
+   if exist bin\hbdoc.exe      del bin\hbdoc.exe
+   if exist bin\hbmake.exe     del bin\hbmake.exe
+   if exist bin\hbpp.exe       del bin\hbpp.exe
+   if exist bin\hbrun.exe      del bin\hbrun.exe
+   if exist bin\hbrunmt.exe    del bin\hbrunmt.exe
+   if exist bin\hbtest.exe     del bin\hbtest.exe
+   if exist bin\xbscript.exe   del bin\xbscript.exe
 
    if exist lib\codepage.lib   del lib\codepage.lib
    if exist lib\common.lib     del lib\common.lib
@@ -82,6 +85,7 @@ rem   if exist lib\*.lib     del lib\*.lib
    if exist lib\lang.lib       del lib\lang.lib
    if exist lib\libct.lib      del lib\libct.lib
    if exist lib\hbct.lib       del lib\hbct.lib
+   if exist lib\hbtip.lib      del lib\hbtip.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
    if exist lib\nulsys.lib     del lib\nulsys.lib
@@ -100,29 +104,42 @@ rem   if exist lib\*.lib     del lib\*.lib
    if exist lib\vm.lib         del lib\vm.lib
    if exist lib\vmmt.lib       del lib\vmmt.lib
 
-   if exist lib\*.dll     del lib\*.dll
+   if exist lib\*.dll          del lib\*.dll
 
-   if exist lib\*.bak     del lib\*.bak
-   if exist lib\*.obj     del lib\*.obj
+   if exist lib\*.bak          del lib\*.bak
+   if exist lib\*.obj          del lib\*.obj
+
+   if exist make_b32.log       del make_b32.log
+
+   REM *** CLEAN ALL TEMP FOLDERS\FILES ***
+
+   if exist bin\*.tds del bin\*.tds
+   if exist bin\*.map del bin\*.map
+
+   if exist bin\b32\*.exe del bin\b32\*.exe
+   if exist bin\b32\*.tds del bin\b32\*.tds
+   if exist bin\b32\*.map del bin\b32\*.map
+
    if exist lib\b32\bcc640.lib copy lib\b32\bcc640.lib lib >nul
-   if exist lib\b32\*.lib del lib\b32\*.lib
-   if exist lib\bcc640.lib copy lib\bcc640.lib lib\b32 >nul
-   if exist lib\b32\*.bak del lib\b32\*.bak
-   if exist lib\b32\*.obj del lib\b32\*.obj
+   if exist lib\b32\*.lib      del lib\b32\*.lib
+   if exist lib\bcc640.lib     copy lib\bcc640.lib lib\b32 >nul
 
-   if exist obj\b32\*.obj del obj\b32\*.obj
-   if exist obj\b32\*.c   del obj\b32\*.c
-   if exist obj\b32\*.h   del obj\b32\*.h
+   if exist lib\b32\*.bak    del lib\b32\*.bak
+   if exist lib\b32\*.obj    del lib\b32\*.obj
+
+   if exist obj\b32\*.bak    del obj\b32\*.bak
+   if exist obj\b32\*.obj    del obj\b32\*.obj
+   if exist obj\b32\*.output del obj\b32\*.output
+   if exist obj\b32\*.c      del obj\b32\*.c
+   if exist obj\b32\*.h      del obj\b32\*.h
 
    if exist obj\b32\mt\*.obj del obj\b32\mt\*.obj
    if exist obj\b32\mt\*.c   del obj\b32\mt\*.c
 
-   if exist obj\b32\opt\console\*.obj del obj\b32\opt\console\*.obj
-   if exist obj\b32\opt\gui\*.obj del obj\b32\opt\gui\*.obj
+   if exist obj\b32\opt\console\*.obj    del obj\b32\opt\console\*.obj
+   if exist obj\b32\opt\gui\*.obj        del obj\b32\opt\gui\*.obj
    if exist obj\b32\mt\opt\console\*.obj del obj\b32\mt\opt\console\*.obj
-   if exist obj\b32\mt\opt\gui\*.obj del obj\b32\mt\opt\gui\*.obj
-
-   if exist make_b32.log  del make_b32.log
+   if exist obj\b32\mt\opt\gui\*.obj     del obj\b32\mt\opt\gui\*.obj
 
 :EXIT
 

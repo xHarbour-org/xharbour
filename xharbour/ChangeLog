@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3364 2004/08/29 02:35:46 paultucker Exp $
+ * $Id: ChangeLog,v 1.3366 2004/08/29 12:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-29 13:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * Changelog,v 1.3366
+   * xharbour/make_b32.bat
+     * Added effective cleaning hbtip.lib, binaries and several temp files from
+       bin\b32, lib\b32 and \obj folder when "clean" parameter is called.
+
+   * xharbour/utils/hbmake/hbmake.prg
+     * More stetical and text/help messages reviewed.
+     * Create s_cHbMakeVersion var and HbMakeVersion() function to inform
+       hbmake version at help screen and PrintMacros() function.
 
 2004-08-29 12:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   - contrib/tip

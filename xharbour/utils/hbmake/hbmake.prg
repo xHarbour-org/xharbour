@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.127 2004/08/27 21:15:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.128 2004/08/29 12:00:00 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -69,7 +69,7 @@
       Default Values for core variables are set here
       New Core vars should only be added on this section
       */
-
+STATIC s_cHbMakeVersion := "1.128"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -150,7 +150,11 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_cDefLang := IIF( s_nLang == 1, "PT", IIF( s_nLang == 2, "EN", "ES" ) )
    s_aLangMessages := BuildLangArray( s_cDefLang )
 
-   IF Pcount() == 0  .or. "?" $ AllParam
+   IF Pcount() == 0    .or. ;
+      "/?" IN AllParam .or. ;
+      "-?" IN AllParam .or. ;
+      "-h" IN AllParam .or. ;
+      "/h" IN AllParam 
       ShowHelp()
       RETURN NIL
    ENDIF
@@ -1207,7 +1211,7 @@ FUNCTION PrintMacros()
 
    LOCAL nPos
 
-   Outstd( "HBMAKE Version ", Version(), "CopyRight (c) 2000-2003 The xHarbour Project" + CRLF )
+   Outstd( "HBMAKE - Version ", HBMakeVersion(), "CopyRight (c) 2000-2004 The xHarbour Project" + CRLF )
    Outstd( "" + CRLF )
    Outstd( "Macros:" + CRLF )
    aEval( s_aMacros, { | xItem | Outstd( "     " + xItem[ 1 ] + " = " + xItem[ 2 ] + CRLF ) } )
@@ -1509,7 +1513,8 @@ FUNC CreateMakeFile( cFile )
    @ 12, 01 SAY s_aLangMessages[ 43 ] GET s_nFilestoAdd PICT "99" VALID s_nFilestoAdd > 0
    @ 13, 01 GET s_lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
    @ 13, 40 SAY s_aLangMessages[ 46 ] GET s_nWarningLevel Pict "9" VALID s_nWarningLevel>=0 .AND. s_nWarningLevel <= 4
-  // READ
+// READ
+
    READ msg at maxrow()-1,1,maxcol()-1
 
    IF ! Empty( s_cUserDef )
@@ -1983,6 +1988,9 @@ FUNC CreateMakeFile( cFile )
    cResName := Lower( cResName )
    fWrite( s_nLinkHandle, "RESFILES = " + cResName + CRLF )
    fWrite( s_nLinkHandle, "RESDEPEN = " + Strtran( cResName, ".rc", ".res" ) + CRLF )
+   if "WINDOWS" IN Upper(OS())
+      cTopFile:= upper(cTopFile)
+   endif
    fWrite( s_nLinkHandle, "TOPMODULE = " + cTopFile + CRLF )
 
    IF lRddads
@@ -2296,13 +2304,14 @@ FUNC CreateMakeFile( cFile )
       ResetInternalVars()
       SetColor("W/N,N/W")
       Clear
+      SetPos(9,0)
+      Set Cursor Off
       Main( cFile, " -f "+iif(s_nLang=1,"-lPT",iif(s_nLang=3,"-lES","-lEN")) )
+      Set Cursor On
    ELSE
       SetColor("W/N,N/W")
       Clear
    ENDIF
-
-
 
 RETURN NIL
 
@@ -3751,12 +3760,12 @@ RETURN cParam
 FUNCTION ShowHelp()
 
    LOCAL cOs := Upper( Os() )
-
+   cls
    ? s_aLangMessages[ 1 ]
-   ? "Copyright 2000,2001,2002,2003 Luiz Rafael Culik <culikr@uol.com.br>"
-   ? ""
+   ? "Copyright 2000-2004 Luiz Rafael Culik <culikr@uol.com.br>"
+//   ? ""
    ? s_aLangMessages[ 2 ]
-   ? ""
+//   ? ""
    ? s_aLangMessages[ 3 ]
    ? s_aLangMessages[ 4 ]
    ? s_aLangMessages[ 5 ]
@@ -3790,6 +3799,7 @@ FUNCTION ShowHelp()
    ? s_aLangMessages[ 24 ]
    ? s_aLangMessages[ 25 ]
    ? s_aLangMessages[ 26 ]
+
 RETURN NIL
 
 FUNCTION ProcessParameters( cParams )
@@ -3910,32 +3920,33 @@ FUNCTION BuildLangArray( cLang )
    DEFAULT cLang TO "EN"
 
    IF cLang == "EN"
-      aAdd( aLang, "Harbour Make Utility" )
-      aAdd( alang, "Syntax:  hbmake cFile [options]" )
-      aAdd( aLang, "Options:  /e[x]  Create a new Makefile. IF /ex is" )
-      aAdd( aLang, "          used it creates a new make file in extended mode" )
-      aAdd( aLang, "          /el[x]  Create a new Makefile. IF /elx is" )
-      aAdd( aLang, "          used it creates a new make file to build a library in extended mode" )
-      aAdd( aLang, "          /D  Define a macro" )
-      aAdd( aLang, "          /p  Print all commands and depedencies" )
-      aAdd( aLang, "          /b  Use BCC as C compiler" )
-      aAdd( aLang, "          /g+ Use GCC as C compiler" )
-      aAdd( aLang, "          /b+ Use BCC as C compiler" )
-      aAdd( aLang, "          /g  Use GCC as C compiler" )
-      aAdd( aLang, "          /gl Use GCC as C compiler in Linux" )
-      aAdd( aLang, "          /gl+ Use GCC as C compiler in Linux" )
-      aAdd( aLang, "          /v  Use MSVC as C compiler" )
-      aAdd( aLang, "          /f  Force recompiltion of all files" )
-      aAdd( aLang, "          /i  Ignore errors RETURNed by command" )
-      aAdd( aLang, "          /r  Recurse Source Directory" )
-      aAdd( aLang, "          Note: /p and /D can be used together" )
-      aAdd( aLang, "          Note: /r and /e[x]/el[x] can be used together" )
-      aAdd( aLang, "          Options with + are the default values" )
-      aAdd( aLang, "          -D switch can accept multiple macros on the same line" )
-      aAdd( aLang, "          or use one macro per -D switch" )
-      aAdd( aLang, "          /l[LANGID] SpecIFy the language to be used on hbmake Texts LANGID = (EN/PT/ES) " )
-      aAdd( aLang, "          On Windows System, the default will be the SO language IF is found" )
-      aAdd( aLang, "          Otherwise, will be English. On OS/2;FreeBSD/LINUX the default is English" )
+
+      aAdd( aLang, "Harbour Make Utility - the [x]Harbour make programm - version "+HbMakeVersion() )
+      aAdd( alang, "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc -ex")
+      aAdd( aLang, "Options:  /e[x]   Create a new Makefile. If /ex is used it create a" )
+      aAdd( aLang, "                  new make file in extended mode." )
+      aAdd( aLang, "          /el[x]  Create a new Makefile. If /elx is used it create a")
+      aAdd( aLang, "                  new make file to build a LIB in extended mode." )
+      aAdd( aLang, "          /D      Define a macro." )
+      aAdd( aLang, "          /p      Print all commands and depedencies." )
+      aAdd( aLang, "          /b      Use BCC as C compiler" )
+      aAdd( aLang, "          /g+     Use GCC as C compiler" )
+      aAdd( aLang, "          /b+     Use BCC as C compiler" )
+      aAdd( aLang, "          /g      Use GCC as C compiler" )
+      aAdd( aLang, "          /gl     Use GCC as C compiler in Linux" )
+      aAdd( aLang, "          /gl+    Use GCC as C compiler in Linux" )
+      aAdd( aLang, "          /v      Use MSVC as C compiler" )
+      aAdd( aLang, "          /f      Force recompiltion of all files" )
+      aAdd( aLang, "          /i      Ignore errors returned by command" )
+      aAdd( aLang, "          /r      Recurse Source Directory" )
+      aAdd( aLang, "                  Note: /p and /D can be used together" )
+      aAdd( aLang, "                        /r and /e[x]/el[x] can be used together")
+      aAdd( aLang, "                  Options with + are the default values" )
+      aAdd( aLang, "                  -D switch can accept multiple macros on the same line")
+      aAdd( aLang, "                  or use one macro per -D switch" )
+      aAdd( aLang, "                  /l[LANGID] Specify the language to be used on hbmake")
+      aAdd( aLang, "                  LANGID= (EN/PT/ES). On Windows, the default will be the S.O.")
+      aAdd( aLang, "                  language. On OS/2, FreeBSD and LINUX will be English." )
       aAdd( aLang, "Enviroment options" )
       aAdd( aLang, "Select Os" )
       aAdd( aLang, "Select C Compiler" )
@@ -3950,13 +3961,14 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "User Defines " )
       aAdd( aLang, "User include Path" )
       aAdd( aLang, "Use External Libs" )
-      aAdd( aLang, "Spacebar to select, Enter to continue process F5 sel/unsel All" )
+      aAdd( aLang, "<Spacebar>-Select <Enter>-Continue process <F5> Sel/Unsel All" )
       aAdd( aLang, "Warning level /w" )
       aAdd( aLang, "Numbers of source files per line on makefile" )
       aAdd( aLang, "Use Multi Thread Library" )
       aAdd( aLang, "Executable file name" )
       aAdd( aLang, "Warning Level /w" )
-      aadd( aLang, "Enter Select|Arrow Change Selection|Spacebar Open Box")
+      aadd( aLang, "<Tab>-Next <Sh-Tab>-Prev <Enter>-Sel <"+chr(24)+chr(25)+">-Change Sel <Spacebar>-Open Box")
+      /* Messages Start Here */
       aadd( aLang, "3rd Party Rdd")
       aadd( aLang, "What OS you Use")
       aadd( aLang, "What C compiler  you has")
@@ -3969,32 +3981,33 @@ FUNCTION BuildLangArray( cLang )
       aadd( aLang, "Inform executable name (without .exe extention)" )
 
    ELSEIF cLang == "ES"
-      aAdd( aLang, "Harbour Make Utility  -  Programa Make de Harbour" )
-      aAdd( aLang, "Sintaxis:  hbmake cArchivo [opciones]" )
-      aAdd( aLang, "Opciones:  /e[x]  Crea un Makefile nuevo. Si se usa /ex" )
-      aAdd( aLang, "          se crea un nuevo makefile en modo extendido" )
-      aAdd( aLang, "          /el[x]  Crea un Makefile nuevo. Si se usa /elx" )
-      aAdd( aLang, "          se crea un nuevo makefile para construir una librería en modo extendido" )
-      aAdd( aLang, "          /D  Define una macro" )
-      aAdd( aLang, "          /p  Imprime todos los comandos y dependencias" )
-      aAdd( aLang, "          /b  Usar BCC como compilador C" )
-      aAdd( aLang, "          /g+ Usar GCC como compilador C" )
-      aAdd( aLang, "          /b+ Usar BCC como compilador C" )
-      aAdd( aLang, "          /g  Usar GCC como compilador C" )
-      aAdd( aLang, "          /gl Usar GCC como compilador C en Linux" )
-      aAdd( aLang, "          /gl+ Usar GCC como compilador C en Linux" )
-      aAdd( aLang, "          /v  Usar MSVC como compilador C" )
-      aAdd( aLang, "          /f  Forzar la recompilación de todos los archivos" )
-      aAdd( aLang, "          /i  Ignorar los errores devueltos por el comando" )
-      aAdd( aLang, "          /r  Recorrer el directorio fuente recursivamente" )
-      aAdd( aLang, "          Nota: /p y /D pueden ser usados juntos" )
-      aAdd( aLang, "          Nota: /r y /e[x]/el[x] pueden ser usados juntos" )
-      aAdd( aLang, "          Las opciones con + son los valores por omisión" )
-      aAdd( aLang, "          El parámetro -D puede aceptar múltiples macros en la misma línea" )
-      aAdd( aLang, "          ou use uma macro por parƒmetro -D" )
-      aAdd( aLang, "          /l[LANGID] especIFica a linguagem a ser utilizada nos textos do hbmake LANGID = (EN/PT/ES) " )
-      aAdd( aLang, "          Em sistemas Windows, O padrÆo e a linguagem do SO se encontrada" )
-      aAdd( aLang, "          SenÆo, sera Ingles. Em OS/2;FreeBSD/LINUX o padrÆo ‚ Ingles" )
+
+      aAdd( aLang, "Harbour Make Utility  -  Programa Make de [x]Harbour - version "+HbMakeVersion() )
+      aAdd( aLang, "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc -ex")
+      aAdd( aLang, "Opciones: /e[x]   Crea un Makefile nuevo. Si se usa /ex se crea un nuevo" )
+      aAdd( aLang, "                  makefile en modo extendido." )
+      aAdd( aLang, "          /el[x]  Crea un Makefile nuevo. Si se usa /elx se crea un nuevo" )
+      aAdd( aLang, "                  makefile para construir una LIB en modo extendido." )
+      aAdd( aLang, "          /D      Define una macro." )
+      aAdd( aLang, "          /p      Imprime todos los comandos y dependencias." )
+      aAdd( aLang, "          /b      Usar BCC como compilador C" )
+      aAdd( aLang, "          /g+     Usar GCC como compilador C" )
+      aAdd( aLang, "          /b+     Usar BCC como compilador C" )
+      aAdd( aLang, "          /g      Usar GCC como compilador C" )
+      aAdd( aLang, "          /gl     Usar GCC como compilador C en Linux" )
+      aAdd( aLang, "          /gl+    Usar GCC como compilador C en Linux" )
+      aAdd( aLang, "          /v      Usar MSVC como compilador C" )
+      aAdd( aLang, "          /f      Forzar la recompilación de todos los archivos" )
+      aAdd( aLang, "          /i      Ignorar los errores devueltos por el comando" )
+      aAdd( aLang, "          /r      Recorrer el directorio fuente recursivamente" )
+      aAdd( aLang, "                  Nota: /p y /D pueden ser usados juntos" )
+      aAdd( aLang, "                        /r y /e[x]/el[x] pueden ser usados juntos" )
+      aAdd( aLang, "                  Las opciones con + son los valores por omisión" )
+      aAdd( aLang, "                  El parámetro -D puede aceptar múltiples macros en la misma" )
+      aAdd( aLang, "                  línea ou use uma macro por parƒmetro -D" )
+      aAdd( aLang, "                  /l[LANGID] especifica una linguagem a ser utilizada por")
+      aAdd( aLang, "                   hbmake. LANGID = (EN/PT/ES). En sistemas Windows, O padrÆo")
+      aAdd( aLang, "                   es a linguagem do SO. Em OS/2, FreeBSD i LINUX ser  Ingles." )
       aAdd( aLang, "Opciones de Ambiente" )
       aAdd( aLang, "Selecion Os" )
       aAdd( aLang, "Selecion Compilador C" )
@@ -4009,60 +4022,60 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Define de usu rios:" )
       aAdd( aLang, "Path p/ includes de usu rio:" )
       aAdd( aLang, "Usar Libs Externas" )
-      aAdd( aLang, "<Espa‡o> para selecionar, <Enter> p/ continuar processo,F5 sel/desel todos" )
+      aAdd( aLang, "<Espacio>-Seleccionar <Enter>-Continuar proceso <F5> Selec/Deselec todo." )
       aAdd( aLang, "N¡vel de aviso do compilador /w" )
       aAdd( aLang, "Qtd de PRGs por linea, no makefile:" )
-
       aAdd( aLang, "Use a libreria Multi Thread" )
       aAdd( aLang, "Nome Executable" )
       aAdd( aLang, "Nivel Warning /w" )
-      aadd( aLang, "Enter Seleciona|Setas muda sele‡Æo|Espa‡o abre caixa")
+      aadd( aLang, "<Tab>-Avanzar <Sh-Tab>-Volver <Enter>-Selec <"+chr(24)+chr(25)+">-Mudar Selec <Espacio>-Caja")
+      /* Messages Start Here */
       aadd( aLang, "Rdd Terceros")
       aadd( aLang, "Qual OS usted usa")
-      aadd( aLang, "Qual compildor C usted ten")
+      aadd( aLang, "Qual compilador C usted ten")
       aadd( aLang, "Esta App usa Lib Grafica o No")
       aadd( aLang, "Usted usa Rdd de terceros")
       aAdd( aLang, "Comprimir app")
       aAdd( aLang, "Comprimir la app despois de enlazada (usar upx)")
       aAdd( aLang, "Su aplicacione sera linkada para usar la harbour.dll")
-      aadd( aLang, "Donde los ficheros .obj/.o ser n generados")
-
+      aadd( aLang, "Donde los ficheros *.obj ser n generados")
       aadd( aLang, "Informe o nombre de lo executable (sin a extension .exe)")
 
    ELSEIF cLang == "PT"
-      aAdd( aLang, "Harbour Make Utility  -  Programa Make do Harbour" )
-      aAdd( aLang, "Sintaxe:  hbmake cArquivo [op‡äes]" )
-      aAdd( aLang, "Op‡äes:  /e[x]  Cria um Makefile novo. Se for usado /ex" )
-      aAdd( aLang, "          cria um novo makefile em modo extendido" )
-      aAdd( aLang, "          /el[x]  cria un Makefile novo. Se for usado /elx" )
-      aAdd( aLang, "          cria um novo makefile para construir uma Biblioteca em modo extendido" )
-      aAdd( aLang, "          /D   Define uma macro" )
-      aAdd( aLang, "          /p   Imprime todos os comandos e dependˆncias" )
-      aAdd( aLang, "          /b   Usar BCC como compilador C" )
-      aAdd( aLang, "          /g+  Usar GCC como compilador C" )
-      aAdd( aLang, "          /b+  Usar BCC como compilador C" )
-      aAdd( aLang, "          /g   Usar GCC como compilador C" )
-      aAdd( aLang, "          /gl  Usar GCC como compilador C en Linux" )
-      aAdd( aLang, "          /gl+ Usar GCC como compilador C en Linux" )
-      aAdd( aLang, "          /v   Usar MSVC como compilador C" )
-      aAdd( aLang, "          /f   For‡ar a recompila‡Æo de todos os arquivos" )
-      aAdd( aLang, "          /i   Ignora os erros devolvidos pelo comando" )
-      aAdd( aLang, "          /r   Recorrer o diret¢rio fonte recursivamente" )
-      aAdd( aLang, "          Nota: /p e /D podem ser usados juntos" )
-      aAdd( aLang, "          Nota: /r e /e[x]/el[x] podem ser usados juntos" )
-      aAdd( aLang, "          As op‡äes com + sÆo os valores padrÆo" )
-      aAdd( aLang, "          O parƒmetro -D pode aceitar m£ltiplas macros na mesma linha" )
-      aAdd( aLang, "          ou use uma macro por parƒmetro -D" )
-      aAdd( aLang, "          /l[LANGID] especifica a linguagem a ser utilizada nos textos do hbmake LANGID = (EN/PT/ES) " )
-      aAdd( aLang, "          Em sistemas Windows, O padrÆo ‚ a linguagem do SO,se encontrada" )
-      aAdd( aLang, "          SenÆo, ser  Inglˆs. Em OS/2;FreeBSD/LINUX o padrÆo ‚ Inglˆs" )
+
+      aAdd( aLang, "Harbour Make Utility  -  Programa Make do [x]Harbour - versÆo "+HbMakeVersion() )
+      aAdd( aLang, "Sintaxe:  hbmake <arquivo>.bc [op‡äes] -  Exemplo: hbmake hello.bc -ex")
+      aAdd( aLang, "Op‡äes:  /e[x]  Cria um Makefile novo. Se for usado /ex cria um makefile" )
+      aAdd( aLang, "                em modo extendido." )
+      aAdd( aLang, "         /el[x] Cria um Makefile novo. Se for usado /elx cria um makefile" )
+      aAdd( aLang, "                para construir uma LIB, em modo extendido." )
+      aAdd( aLang, "         /D     Define uma macro." )
+      aAdd( aLang, "         /p     Imprime todos os comandos e dependˆncias." )
+      aAdd( aLang, "         /b     Usar BCC como compilador C" )
+      aAdd( aLang, "         /g+    Usar GCC como compilador C" )
+      aAdd( aLang, "         /b+    Usar BCC como compilador C" )
+      aAdd( aLang, "         /g     Usar GCC como compilador C" )
+      aAdd( aLang, "         /gl    Usar GCC como compilador C no Linux" )
+      aAdd( aLang, "         /gl+   Usar GCC como compilador C no Linux" )
+      aAdd( aLang, "         /v     Usar MSVC como compilador C" )
+      aAdd( aLang, "         /f     For‡ar a recompila‡Æo de todos os arquivos." )
+      aAdd( aLang, "         /i     Ignora os erros devolvidos pelo comando." )
+      aAdd( aLang, "         /r     Recorrer o diret¢rio fonte recursivamente." )
+      aAdd( aLang, "                Nota:  /p e /D podem ser usados juntos" )
+      aAdd( aLang, "                       /r e /e[x]/el[x] podem ser usados juntos" )
+      aAdd( aLang, "                As op‡äes com + sÆo os valores padrÆo." )
+      aAdd( aLang, "                O parƒmetro -D pode aceitar m£ltiplas macros na mesma linha")
+      aAdd( aLang, "                ou use uma macro por parƒmetro -D" )
+      aAdd( aLang, "                /l[LANGID] especifica a linguagem a ser utilizada pelo hbmake,")
+      aAdd( aLang, "                LANGID = (EN/PT/ES). Em Windows, o padrÆo ser  a linguagem")
+      aAdd( aLang, "                definida no S.O. Em OS/2, FreeBSD e LINUX o padrÆo ser  Inglˆs.")
       aAdd( aLang, "Op‡äes de Ambiente" )
-      aAdd( aLang, "Sele‡Æo Os" )
+      aAdd( aLang, "Sele‡Æo OS" )
       aAdd( aLang, "Sele‡Æo Compilador C" )
       aAdd( aLang, "Lib Gr fica" )
-      aAdd( aLang, "Op‡äes do Harbour" )
-      aAdd( aLang, "Declara‡Æo Autom tica de memvar /a" )
-      aAdd( aLang, "Variaveis sÆo assumidas M-> /v" )
+      aAdd( aLang, "Op‡äes do [x]Harbour" )
+      aAdd( aLang, "Declara‡Æo Autom tica de Memvar /a" )
+      aAdd( aLang, "Vari veis sÆo assumidas M-> /v" )
       aAdd( aLang, "Info. Debug /b" )
       aAdd( aLang, "Suprime info de n£mero da linha /l" )
       aAdd( aLang, "Gera sa¡da pr‚-processada /p" )
@@ -4070,23 +4083,23 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "User Defines:" )
       aAdd( aLang, "User Include Path:" )
       aAdd( aLang, "Usa Libs Externas ?" )
-      aAdd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo F5 sel/desel. todos" )
-      aAdd( aLang, "N¡vel de Aviso do compilador /w" )
+      aAdd( aLang, "<Espa‡o>-Seleciona <Enter> p/ continuar processo <F5>-Sel/DeSel. tudo." )
+      aAdd( aLang, "N¡vel de aviso do compilador /w" )
       aAdd( aLang, "Qtd de PRGs por linha, no makefile: " )
-      aAdd( aLang, "Usar a Biblioteca Multi Thread" )
-      aAdd( aLang, "Nome Execut vel" )
-      aAdd( aLang, "Nivel Warning /w" )
-      aAdd( aLang,"Enter Seleciona|Setas muda sele‡Æo|Espa‡o abre caixa")
+      aAdd( aLang, "Usar a biblioteca Multi Thread ?" )
+      aAdd( aLang, "Nome Execut vel:" )
+      aAdd( aLang, "N¡vel Warning /w" )
+      aAdd( aLang, "<Tab>-Avan‡a <Sh-Tab>-Volta <Enter>-Sel. <"+chr(24)+chr(25)+">-Muda Sel. <Espc>-Abre Box")
       /* Messages Start Here */
       aAdd( aLang, "Rdd Terceiros")
-      aAdd( aLang, "Qual OS vocˆ Usa")
-      aAdd( aLang, "Qual compilador C vocˆ tem")
-      aAdd( aLang, "Essa App usa Lib Grafica ou NÆo")
-      aAdd( aLang, "Vocˆ usa Rdd's de terceiros")
-      aAdd( aLang, "Comprimir app")
-      aAdd( aLang, "Comprimir a app depois de linkada(usa upx)")
-      aAdd( aLang, "Sua aplica‡Æo ser  linkada para usar a harbour.dll")
-      aadd( aLang, "Onde os Arquivos *.obj serÆo gerados")
+      aAdd( aLang, "Selecione o Sistema Operacional")
+      aAdd( aLang, "Selecione o compilador C/C++")
+      aAdd( aLang, "Esta aplica‡Æo vai usar Lib Grafica ? Qual ?")
+      aAdd( aLang, "Esta aplica‡Æo vai usar Rdd de terceiros ? Qual ?")
+      aAdd( aLang, "Comprimir App ?")
+      aAdd( aLang, "Comprimir a aplica‡Æo ap¢s linkada (usar UPX) ?")
+      aAdd( aLang, "Sua aplica‡Æo ser  linkada para usar a harbour.dll ?")
+      aadd( aLang, "Informe a pasta onde os arquivos *.obj serÆo gerados")
       aadd( aLang, "Informe o nome do execut vel (sem a extensÆo .exe)")
    ENDIF
 
@@ -4170,3 +4183,6 @@ function asdll(x)
 Local y :=x
  x := !y
 return .t.
+
+function HBMakeVersion()
+return (s_cHbMakeVersion)
