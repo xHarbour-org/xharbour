@@ -1,5 +1,5 @@
 /*
- * $Id: error.c,v 1.0 2004/10/26 00:38:46 guerra000 Exp $
+ * $Id: error.c,v 1.1 2005/02/11 20:54:16 guerra000 Exp $
  */
 
 /*
@@ -56,6 +56,8 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbstack.h"
+
+HB_FUNC_EXTERN( ERRORNEW );
 
 HB_FUNC( ERROR )
 {
