@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.8 2002/01/27 10:57:09 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.9 2002/01/30 03:32:40 ronpinkas Exp $
  */
 
 /*
@@ -293,11 +293,13 @@ extern long     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric par
 extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
+
 #ifdef HB_API_MACROS
 
 #include "hbapiitm.h"
+#include "hbstack.h"
 
-#define hb_pcount()                          ( ( int ) hb_stack.pBase->item.asSymbol.paramcnt )
+#define hb_pcount()                          ( ( int ) ( * hb_stack.pBase )->item.asSymbol.paramcnt )
 
 #define hb_ret()                             hb_itemClear( &hb_stack.Return )
 #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )
