@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.24 2004/02/13 07:13:33 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.25 2004/02/14 22:11:51 andijahja Exp $
  */
 
 /*
@@ -184,7 +184,7 @@
        ULONG           length;
        char            *value;
        BOOL            bStatic;
-       USHORT          *puiHolders; /* number of holders of this string */
+       ULONG           *puiHolders; /* number of holders of this string */
     };
 
     struct hb_struSymbol

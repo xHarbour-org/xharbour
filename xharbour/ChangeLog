@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2398 2004/02/25 03:31:45 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2399 2004/02/25 08:55:10 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-25 09:43 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+   * include/hbvmpub.h
+     in structure struString changes
+     USHORT *piuHolders  to ULONG  *puiHolders
 
 2004-02-25 03:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makallbc.bat
