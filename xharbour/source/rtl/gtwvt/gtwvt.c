@@ -1,6 +1,5 @@
-
 /*
- * $Id: gtwvt.c,v 1.21 2004/01/04 20:11:23 peterrees Exp $
+ * $Id: gtwvt.c,v 1.22 2004/01/06 10:17:52 vouchcac Exp $
  */
 
 /*
@@ -80,6 +79,10 @@
 //#define WVT_DEBUG
 
 //-------------------------------------------------------------------//
+
+#ifndef CINTERFACE
+   #define CINTERFACE 1
+#endif
 
 #include <windows.h>
 #include <winuser.h>
@@ -389,7 +392,7 @@ SHORT HB_GT_FUNC( gt_Col( void ) )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Col()" ) );
 
-  return( _s.caretPos.x );
+  return( (SHORT) _s.caretPos.x );
 }
 
 //-------------------------------------------------------------------//
@@ -398,7 +401,7 @@ SHORT HB_GT_FUNC( gt_Row( void ) )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Row()" ) );
 
-  return( _s.caretPos.y );
+  return( (SHORT) _s.caretPos.y );
 }
 
 //-------------------------------------------------------------------//
@@ -522,7 +525,7 @@ USHORT HB_GT_FUNC( gt_DispCount() )
 void HB_GT_FUNC( gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, ULONG ulLen ) )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Puts( %hu, %hu, %d, %p, %lu )", usRow, usCol, ( int ) byAttr, pbyStr, ulLen ) );
-  hb_wvt_gtSetStringInTextBuffer( usCol, usRow, byAttr, pbyStr, ulLen );
+  hb_wvt_gtSetStringInTextBuffer( (SHORT) usCol, (SHORT) usRow, byAttr, pbyStr, (SHORT) ulLen );
 #ifdef WVT_DEBUG
   nCountPuts++;
 #endif
@@ -553,7 +556,7 @@ void HB_GT_FUNC( gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byC
     *( byChars+i ) = byChar;
   }
 
-  hb_wvt_gtSetStringInTextBuffer( usCol, usRow, byAttr, byChars, ulLen );
+  hb_wvt_gtSetStringInTextBuffer( (SHORT) usCol, (SHORT) usRow, byAttr, byChars, (SHORT) ulLen );
   if ( bMalloc )
   {
     hb_xfree( byChars );
@@ -659,7 +662,7 @@ void HB_GT_FUNC( gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowSt
 void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols ) )
 {
   SHORT         usSaveRow, usSaveCol;
-  UINT          uiSize;
+  // UINT          uiSize;
   unsigned char ucBlank[ WVT_CHAR_BUFFER ], ucBuff[ WVT_CHAR_BUFFER * 2 ] ;
   unsigned char * fpBlank ;
   unsigned char * fpBuff  ;
@@ -1533,8 +1536,8 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont )
 
   SystemParametersInfo( SPI_GETWORKAREA,0, &rcWorkArea, 0 );
 
-  maxWidth  = ( rcWorkArea.right - rcWorkArea.left );
-  maxHeight = ( rcWorkArea.bottom - rcWorkArea.top );
+  maxWidth  = (SHORT) ( rcWorkArea.right - rcWorkArea.left );
+  maxHeight = (SHORT) ( rcWorkArea.bottom - rcWorkArea.top );
 
   hdc       = GetDC( _s.hWnd );
   hOldFont  = ( HFONT ) SelectObject( hdc, hFont );
@@ -1558,7 +1561,7 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   USHORT     height, width;
   RECT       wi, ci;
   TEXTMETRIC tm;
-  HMENU      hMenu;
+  // HMENU      hMenu;
   RECT       rcWorkArea;
   int        n;
 
@@ -1605,8 +1608,8 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   GetWindowRect( hWnd, &wi );
   GetClientRect( hWnd, &ci );
 
-  diffWidth  = ( wi.right  - wi.left ) - ( ci.right  );
-  diffHeight = ( wi.bottom - wi.top  ) - ( ci.bottom );
+  diffWidth  = (SHORT) (( wi.right  - wi.left ) - ( ci.right  ));
+  diffHeight = (SHORT) (( wi.bottom - wi.top  ) - ( ci.bottom ));
   width      += diffWidth ;
   height     += diffHeight;
 
@@ -1629,9 +1632,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   static int  iPaint = 0;
   BOOL        bRet;
   PHB_DYNS    pSymTest;
-  long int    res;
+  // long int    res;
 
-  
   switch ( message )
   {
     case WM_CREATE:
@@ -2119,9 +2121,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         xy.x   = LOWORD( lParam );
         xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
-        hb_wvt_gtSetMouseX( colrow.x );
-        hb_wvt_gtSetMouseY( colrow.y );
+        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
+        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
         hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDOWN ? K_LBUTTONDOWN : K_RBUTTONDOWN );
         return( 0 );
       }
@@ -2139,9 +2141,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         xy.x   = LOWORD( lParam );
         xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
-        hb_wvt_gtSetMouseX( colrow.x );
-        hb_wvt_gtSetMouseY( colrow.y );
+        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
+        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
         hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONUP ? K_LBUTTONUP : K_RBUTTONUP );
         return( 0 );
       }
@@ -2159,9 +2161,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         xy.x   = LOWORD( lParam );
         xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
-        hb_wvt_gtSetMouseX( colrow.x );
-        hb_wvt_gtSetMouseY( colrow.y );
+        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
+        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
         hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDBLCLK ? K_LDBLCLK : K_RDBLCLK );
         return( 0 );
       }
@@ -2178,9 +2180,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         xy.x   = LOWORD( lParam );
         xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
-        hb_wvt_gtSetMouseX( colrow.x );
-        hb_wvt_gtSetMouseY( colrow.y );
+        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
+        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
         hb_wvt_gtAddCharToInputQueue( K_MOUSEMOVE );
         return( 0 );
       }
@@ -2332,7 +2334,7 @@ static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow )
 static BOOL hb_wvt_gtSetCaretPos()
 {
   POINT xy;
-  xy = hb_wvt_gtGetXYFromColRow( _s.caretPos.x, _s.caretPos.y );
+  xy = hb_wvt_gtGetXYFromColRow( (SHORT) _s.caretPos.x, (SHORT) _s.caretPos.y );
   if ( _s.CaretSize > 0 )
   {
     xy.y += ( _s.PTEXTSIZE.y - _s.CaretSize );
@@ -2696,14 +2698,14 @@ static BOOL hb_wvt_gtGetCharFromInputQueue ( int *c )
 
 static USHORT hb_wvt_gtGetMouseX ( void )
 {
-  return( _s.mousePos.x );
+  return( (SHORT) _s.mousePos.x );
 }
 
 //-------------------------------------------------------------------//
 
 static USHORT hb_wvt_gtGetMouseY ( void )
 {
-  return( _s.mousePos.y );
+  return( (SHORT) _s.mousePos.y );
 }
 
 //-------------------------------------------------------------------//
@@ -2746,7 +2748,7 @@ static void hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, B
     //  determine bounds of rect around character to refresh
     //
     end = hb_wvt_gtGetColRowForTextBuffer( index + ( length -1 ) ); //location of last char
-    hb_wvt_gtSetInvalidRect( col, row, end.x, end.y );
+    hb_wvt_gtSetInvalidRect( (SHORT) col, (SHORT) row, (SHORT) end.x, (SHORT) end.y );
   }
 }
 
@@ -3085,7 +3087,7 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
 
    SelectClipRgn( _s.hdc, NULL );
 
-   hb_retl( TRUE );
+   return( TRUE );
 
    iPicture->lpVtbl->Release( iPicture );
    GlobalFree( hGlobal );
@@ -3569,7 +3571,7 @@ HB_FUNC( WVT_DRAWLABEL )
       iAlign       = ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) );
       oldTextAlign = SetTextAlign( _s.hdc, iAlign );
 
-      oldFont      = SelectObject( _s.hdc, hFont );
+      oldFont      = (HFONT) SelectObject( _s.hdc, hFont );
             
       //  Ground is Ready, Drat the Text
       //
