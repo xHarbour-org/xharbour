@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.2 2004/02/20 22:33:59 ronpinkas Exp $
+ * $Id: pplib.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ HB_FUNC( __PPADDRULE )
       hb_retl( 0 );
 }
 
-HB_EXPORT HB_FUNC( __PREPROCESS )
+HB_FUNC( __PREPROCESS )
 {
    if( ISCHAR( 1 ) )
    {

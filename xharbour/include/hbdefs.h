@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.33 2004/04/05 02:29:30 druzus Exp $
+ * $Id: hbdefs.h,v 1.34 2004/04/06 09:58:23 andijahja Exp $
  */
 
 /*
@@ -482,7 +482,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 
 #define HB_FUNCNAME( funcname )    HB_FUN_##funcname
 
-#if defined( _MSC_VER ) && defined( HB_FUNC_NO_DECORATION )
+#if ( defined( _MSC_VER ) || defined( __WATCOMC__ ) ) && defined( HB_FUNC_NO_DECORATION )
    #define HB_EXTERN_C_ extern "C"
 #else
    #define HB_EXTERN_C_

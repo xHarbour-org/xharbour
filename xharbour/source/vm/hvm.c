@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.373 2004/04/04 09:24:47 andijahja Exp $
+ * $Id: hvm.c,v 1.374 2004/04/06 22:20:04 ronpinkas Exp $
  */
 
 /*
@@ -8429,8 +8429,8 @@ HB_FUNC( HB_RESTOREBLOCK )
 
 HB_FUNC( HB_NOMOUSE ){}
 
-#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
-extern void HB_EXPORT hb_forceLinkMain();
+#if defined(HB_OS_WIN_32) && defined(__WATCOMC__) && !defined(__EXPORT__)
+extern void HB_EXPORT hb_forceLinkMain( void );
 void _hb_forceLinkMain()
 {
    hb_forceLinkMain();

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2764 2004/04/06 22:19:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2765 2004/04/06 22:40:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-07 10:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/mainwin.c
+  * source/vm/hvm.c
+    ! force link hb_forceLinkMain() only when __EXPORT__ is not defined.
+
+  * include/hbdefs.h
+    ! allow Watcom to produce Library/DLL with undecorated symbol names
+
+  * source/rtl/pplib.c
+    ! remove unwanted HB_EXPORT attribute from __PREPROCESS()
+
+  + dll_w32.bat
+  + hrbdll.wc
+    ! makefiles for Watcom's Harbour.DLL
 
 2004-04-06 15:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/proc.c
