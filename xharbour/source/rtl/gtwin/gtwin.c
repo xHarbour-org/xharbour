@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.23 2003/10/06 10:35:44 toninhofwi Exp $
+ * $Id: gtwin.c,v 1.25 2003/10/07 00:47:50 paultucker Exp $
  */
 
 /*
@@ -139,6 +139,7 @@ extern BOOL b_MouseEnable;
 
 #define MK_SCREEN_UPDATE() HB_GT_FUNC(gt_ScreenUpdate())
 
+static DWORD s_dwAltGrBits;        /* JC: used to verify ALT+GR on different platforms */
 static BOOL s_bBreak;            /* Used to signal Ctrl+Break to hb_inkeyPoll() */
 static USHORT s_uiDispCount;
 static USHORT s_usCursorStyle;
@@ -364,6 +365,20 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
+    OSVERSIONINFO osv;
+
+    /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
+    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osv);
+    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) 
+    {
+        s_dwAltGrBits = RIGHT_ALT_PRESSED;
+    }
+    else 
+    {
+        s_dwAltGrBits = LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED;
+    }
+
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
     /* stdin && stdout && stderr */
@@ -1233,7 +1248,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     int ch = 0, extended = 0;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
-
+      
     /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
     if( s_bBreak )
     {
@@ -1276,7 +1291,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
              if ( s_wRepeated > 0 ) /* Might not be redundant */
                 s_wRepeated--;
-
+                
              if ( dwState & CAPSLOCK_ON )
              {
                 if ( dwState & SHIFT_PRESSED )
@@ -1530,7 +1545,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                       BOOL bAlt = dwState & ( LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED );
                       BOOL bCtrl = dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED );
                       BOOL bShift = dwState & SHIFT_PRESSED;
-                      BOOL bAltGr = ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED ) ) == ( LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED );
+                      BOOL bAltGr = ( dwState & s_dwAltGrBits ) == s_dwAltGrBits;
                       BOOL bEnhanced = dwState & ENHANCED_KEY;
                       #ifdef HB_DEBUG_KEYBOARD
                          fprintf( stdout, "8" );

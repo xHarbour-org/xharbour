@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1628 2003/10/25 23:02:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1629 2003/10/26 03:34:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-20 19:38 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * source/rtl/gtwin/gtwin.c
+     ! Under WIN98 & WIN95, ALTGR is returned as just RIGHT_ALT pressed in
+       ReadConsoleInput(); before, it was impossible to use correctly ALT-GR
+       generated characters under win98.
 
 2003-10-25 20:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbclass.ch
