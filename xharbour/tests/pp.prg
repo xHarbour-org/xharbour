@@ -3311,6 +3311,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
    LOCAL nSpaceAt, sStopLine, sNextStopper, nTemp
    LOCAL bRepeatableMatched
    LOCAL aaRevertMarkers := {}
+   LOCAL nBackup, nLevel, bTestDependant
 
    nRules   := Len( aRules )
 
@@ -3440,11 +3441,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
                IF aMP[2] > 0 .AND. nMatch < nMatches
                   /* Skip all same level optionals to next group. */
-                  nOptional := aMP[2]
+                  nOptional := Abs( aMP[2] )
                   nMatch++
                   WHILE nMatch <= nMatches
                      aMP := aRules[nRule][2][nMatch]
-                     IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= Abs( nOptional ) )
+                     IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= nOptional )
                         EXIT
                      ENDIF
                      nMatch++
@@ -3539,10 +3540,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   sWorkLine := sStopLine
 
                   /* Current level */
-                  nOptional := aMP[2]
-                  IF nOptional < 0
-                     nOptional := Abs( nOptional )
-                  ENDIF
+                  nOptional := Abs( aMP[2] )
 
                   /* Commented out 07-21-2001 Seems unneeded. */
                   #ifdef WHY_REWIND
@@ -3711,6 +3709,97 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ENDIF
             ENDIF
 
+            // *** This complete IF section added 2002-May-11, the bug this solved might be fixed otherwise ***
+            // EOL - Rule will match if rest is OPTIONAL.
+            IF Empty( sWorkLine )
+               IF bDbgMatch
+                  ? "End of Input."
+               ENDIF
+
+               // Remainder may be optional.
+               nBackup := nMatch
+               bTestDependant := .T.
+               nTemp := Abs( aMP[2] )
+               WHILE ++nMatch <= nMatches
+                  nLevel := aRules[nRule][2][nMatch][2]
+
+                  // Non Optional.
+                  IF nLevel == 0
+                     EXIT
+                  ELSEIF nLevel > 0 .AND. nLevel <= nTemp
+                     // Head of New Adjucent or Outer group - Adjust stop condition...
+                     nTemp := nLevel
+                     bTestDependant := .F.
+                     LOOP
+                  ELSEIF nLevel < 0 .AND. ( ( ( - nLevel ) < nTemp ) .OR. ( bTestDependant .AND. ( ( - nLevel ) == nTemp ) ) )
+                     EXIT
+                  ENDIF
+               ENDDO
+
+               IF nMatch > nMatches
+                  sLine := ( PPOut( aResults[nRule], aMarkers ) + sPad + sWorkLine )
+                  IF bDbgMatch
+                     ? "Skipped optionals and TRANSLATED to:", sLine
+                     WAIT
+                  ENDIF
+                  RETURN nRule
+               ELSE
+                  // Must consider this match a failure because End of input but NOT end of rule - REVERT if OPTIONAL.
+                  IF aMP[2] <> 0
+                     nMatch := nBackup
+
+                     /* Skip all same level optionals to next group. */
+                     nTemp := Abs( aMP[2] )
+                     WHILE nMatch < nMatches
+                        nMatch++
+                        aMP := aRules[nRule][2][nMatch]
+                        IF ( aMP[2] < 0 ) .AND. ( Abs( aMP[2] ) < nTemp )
+                           EXIT
+                        ENDIF
+                        IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= nTemp )
+                           EXIT
+                        ENDIF
+                     ENDDO
+
+                     IF bDbgMatch
+                        ? "Skipped to:", nMatch
+                     ENDIF
+
+                     // Because will LOOP
+                     nMatch--
+
+                     /* Revert. */
+                     IF nOptional <> 0 .AND. aMP[2] < 0 .AND. asRevert[Abs(nOptional)] != NIL
+                        sWorkLine := asRevert[Abs(nOptional)]
+                        aMarkers  := aaRevertMarkers[Abs(nOptional)]
+
+                        IF bDbgMatch
+                           ? "* Reverted: " + asRevert[Abs(nOptional)]
+                           WAIT
+                        ENDIF
+                     ELSE
+                        sWorkLine := sPreMatch
+                        IF bDbgMatch
+                           ? "*** Reclaimed token/marker: " + sWorkLine
+                           WAIT
+                        ENDIF
+                     ENDIF
+
+                     LOOP
+                  ELSE
+                     IF bDbgMatch
+                        ? "*** Match Failed - Not Revertable and Not End of Rule, but End of Input ***"
+                        WAIT
+                     ENDIF
+
+                     bNext := .T.
+                     EXIT
+                  ENDIF
+
+               ENDIF
+
+            ENDIF
+
             IF aMP[2] <> 0
                IF bDbgMatch
                   ? "Optional"
@@ -3719,20 +3808,6 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                /* We reached the end of current optional group - Rewind, to 1st optional at same level. */
                IF nMatch == nMatches .OR. ( aRules[nRule][2][nMatch + 1][2] >= 0 .AND. aRules[nRule][2][nMatch + 1][2] <= Abs( aMP[2] ) ) .OR. ;
                                           ( aRules[nRule][2][nMatch + 1][2] < 0 .AND. abs( aRules[nRule][2][nMatch + 1][2] ) < Abs( aMP[2] ) )
-
-                  // EOL - Rule will match if rest is OPTIONAL.
-                  IF Empty( sWorkLine )
-                     IF bDbgMatch
-                        ? "EOL exiting."
-                     ENDIF
-
-                     IF ++nMatch <= nMatches
-                        aMP := aRules[nRule][2][nMatch]
-                        sPreMatch := ""
-                     ENDIF
-
-                     EXIT
-                  ENDIF
 
                   /* Current level */
                   nOptional := Abs( aMP[2] )
@@ -3888,7 +3963,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      ENDDO
 
                      // End of rule or reached end of parrent group.
-                     IF nMatch > nMatches .OR. aRules[nRule][2][nMatch][2] >= 0 .OR. nTemp + aRules[nRule][2][nMatch][2] >= 2
+                     IF nMatch > nMatches .OR. aRules[nRule][2][nMatch][2] >= 0 .OR. nTemp + aRules[nRule][2][nMatch][2] > 1
                         /* Upper level optional should be accepted - rewind to top of parent group. */
                         nOptional--
                         WHILE nMatch > 1
@@ -3920,15 +3995,15 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   ENDIF
 
                   /* Skip all same level optionals to next group. */
-                  nOptional          := aMP[2]
+                  nOptional          := Abs( aMP[2] )
                   bRepeatableMatched := aMP[1] > 1000 .AND. aMarkers[ aMP[1] - 1000 ] != NIL //.AND. Len( aMarkers[ aMP[1] - 1000 ] ) > 0
                   WHILE nMatch < nMatches
                      nMatch++
                      aMP := aRules[nRule][2][nMatch]
-                     IF ( aMP[2] < 0 ) .AND. ( Abs( aMP[2] ) < Abs( nOptional ) )
+                     IF ( aMP[2] < 0 ) .AND. ( Abs( aMP[2] ) < nOptional )
                         EXIT
                      ENDIF
-                     IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= Abs( nOptional ) )
+                     IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= nOptional )
                         EXIT
                      ENDIF
                   ENDDO

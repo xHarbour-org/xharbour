@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.211 2002/05/10 03:34:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.212 2002/05/11 00:48:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-11 13:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+     + Added explicit logic for Empty( sWorkLine ) under sucessful match IF section.
+     /* Not all sublogic fully tested yet. */
 
 2002-05-10 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/rtl/win32ole.prg
