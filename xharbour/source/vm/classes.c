@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.46 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: classes.c,v 1.47 2003/03/27 11:48:17 ronpinkas Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ static PHB_DYNS s_msgClsParent = NULL;
 
 static PHB_ITEM hb_clsInst( USHORT uiClass );
 static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod );
-static BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
+BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
        void     hb_clsReleaseAll( void );
