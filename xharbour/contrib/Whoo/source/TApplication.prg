@@ -1,6 +1,7 @@
 static oAppl
 
 #include "hbclass.ch"
+#include "what32.ch"
 
 CLASS Application
    
@@ -38,11 +39,13 @@ METHOD Run() CLASS Application
 
 RETURN(0)
 
-METHOD CreateForm( cForm, oForm ) CLASS Application
+METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
 
+   DEFAULT oParent TO self
+   
    __objAddData( self, cForm )
    
-   oForm := if( oForm != NIL, oForm:New( self ), TForm():New( self ) )
+   oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
 
    __ObjSetValueList( self, { { cForm, oForm } } )
 

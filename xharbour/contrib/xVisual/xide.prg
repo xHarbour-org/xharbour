@@ -11,7 +11,29 @@ static oApp
 FUNCTION Main
 
    oApp := Application():New()
+   
    oApp:CreateForm( 'MainForm', mainForm() )
+
+   oApp:MainForm:WindowMenu := TMenu():New()
+   
+      oApp:MainForm:WindowMenu:AddPopup( 'popup 1' )
+      
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 101', 101)
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 102', 102)
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 103', 103)
+         
+      oApp:MainForm:WindowMenu:AddPopup( 'popup 2' )
+      
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 200', 200, {||oApp:MainForm:Maximize(),;
+                                                                     oApp:CreateForm( 'SubForm1',;
+                                                                          SubForm1(),oApp:MainForm ) } )
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 201', 201)
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 202', 202)
+         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 203', 203)
+         
+      oApp:MainForm:SetWindowMenu()
+
    oApp:Run()
 
 RETURN( nil)
@@ -20,37 +42,26 @@ RETURN( nil)
 
 CLASS MainForm FROM TForm
 
-   METHOD New( oParent ) INLINE  ::Caption := 'Main Form from TForm', super:new( oParent )
+   METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm', super:new( oParent )
    
-   METHOD OnPaint( hDC ) INLINE DrawGrid( ::handle, hDC, 3 ),0
-   METHOD OnClose()      INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
-                                PostQuitMessage(0)
-   MESSAGE OnActivate()  METHOD CreateMainMenu()
+   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnClose()            INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
+                                      PostQuitMessage(0)
+   
+   METHOD OnCommand( nwParam ) INLINE IF( nwParam == 103,;
+                                         MessageBox(, 'THIS IS FROM THE OnCommand MESSAGE' ),),0
    
 ENDCLASS
 
-METHOD CreateMainMenu() CLASS MainForm
+//-------------------------------------------------------------------------------------------
 
-   ::WindowMenu := TMenu():New( self )
+CLASS SubForm1 FROM TForm
+
+   METHOD New( oParent )       INLINE ::Caption := 'SubForm1 from TForm', super:new( oParent )
+
+   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
    
-   ::WindowMenu:AddPopup( 'popup 1' )
-      
-      ::WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
-      ::WindowMenu:Popup:AddItem( 'item 101', 101)
-      ::WindowMenu:Popup:AddItem( 'item 102', 102)
-      ::WindowMenu:Popup:AddItem( 'item 103', 103)
-         
-   ::WindowMenu:AddPopup( 'popup 2' )
-      
-      ::WindowMenu:Popup:AddItem( 'item 200', 200)
-      ::WindowMenu:Popup:AddItem( 'item 201', 201)
-      ::WindowMenu:Popup:AddItem( 'item 202', 202)
-      ::WindowMenu:Popup:AddItem( 'item 203', 203)
-         
-   ::SetWindowMenu()   
-
-return( super:OnActivate() )
-
+ENDCLASS
 
 
 

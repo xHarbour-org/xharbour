@@ -12,8 +12,7 @@ ENDCLASS
 METHOD New( oParent ) CLASS TForm
 
    super:New( oParent )
-   ::bProc := {| hWnd, nMsg, nwParam, nlParam| ::FormProc( hWnd, nMsg, nwParam, nlParam ) }
-   ::Msgs  := -1
+   ::WndProc := {| hWnd, nMsg, nwParam, nlParam| ::FormProc( hWnd, nMsg, nwParam, nlParam ) }
+   ::Msgs    := -1
 
 return( self )
-
