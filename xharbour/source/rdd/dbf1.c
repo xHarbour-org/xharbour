@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.57 2004/02/08 04:31:39 walito Exp $
+ * $Id: dbf1.c,v 1.58 2004/02/09 18:00:36 druzus Exp $
  */
 
 /*
@@ -1504,9 +1504,42 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCreate(%p, %p)", pArea, pCreateInfo));
 
+   pError = NULL;
+   /* Try create */
+   do
+   {
+      pArea->hDataFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
+      if( pArea->hDataFile == FS_ERROR )
+      {
+         if( !pError )
+         {
+            pError = hb_errNew();
+            hb_errPutGenCode( pError, EG_CREATE );
+            hb_errPutSubCode( pError, EDBF_CREATE_DBF );
+            hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
+            hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
+            hb_errPutFlags( pError, EF_CANRETRY );
+         }
+         bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
+      }
+      else
+         bRetry = FALSE;
+   } while( bRetry );
+
+   if( pError )
+   {
+      hb_errRelease( pError );
+   }
+
+   if( pArea->hDataFile == FS_ERROR )
+   {
+      return FAILURE;
+   }
+
    pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pCreateInfo->abName)+1 );
    strcpy( pArea->szDataFileName, ( char * ) pCreateInfo->abName );
    uiSize = pArea->uiFieldCount * sizeof( DBFFIELD );
+
    pBuffer = ( DBFFIELD * ) hb_xgrab( uiSize );
    pArea->uiRecordLen = 1;
    bHasMemo = FALSE;
@@ -1558,36 +1591,6 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             return FAILURE;
       }
       pBuffer[ uiCount ] = dbField;
-   }
-
-   pError = NULL;
-   /* Try create */
-   do
-   {
-      pArea->hDataFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
-      if( pArea->hDataFile == FS_ERROR )
-      {
-         if( !pError )
-         {
-            pError = hb_errNew();
-            hb_errPutGenCode( pError, EG_CREATE );
-            hb_errPutSubCode( pError, EDBF_CREATE_DBF );
-            hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-            hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
-            hb_errPutFlags( pError, EF_CANRETRY );
-         }
-         bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-      }
-      else
-         bRetry = FALSE;
-   } while( bRetry );
-   if( pError )
-      hb_errRelease( pError );
-
-   if( pArea->hDataFile == FS_ERROR )
-   {
-      hb_xfree( pBuffer );
-      return FAILURE;
    }
 
    pArea->fShared = pCreateInfo->fShared;
