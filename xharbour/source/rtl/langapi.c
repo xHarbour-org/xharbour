@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.3 2002/01/03 03:53:44 ronpinkas Exp $
+ * $Id: langapi.c,v 1.4 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ PHB_LANG HB_EXPORT hb_langSelect( PHB_LANG lang )
    return langOld;
 }
 
-char * HB_EXPORT hb_langSelectID( char * pszID )
+char HB_EXPORT * hb_langSelectID( char * pszID )
 {
    char * pszIDOld = hb_langID();
 
@@ -166,7 +166,7 @@ char * HB_EXPORT hb_langSelectID( char * pszID )
    return pszIDOld;
 }
 
-char * HB_EXPORT hb_langDGetItem( int iIndex )
+char HB_EXPORT * hb_langDGetItem( int iIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langDGetItem(%i)", iIndex));
 
@@ -176,7 +176,7 @@ char * HB_EXPORT hb_langDGetItem( int iIndex )
       return NULL;
 }
 
-char * HB_EXPORT hb_langID( void )
+char HB_EXPORT * hb_langID( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langID()"));
 
@@ -188,7 +188,7 @@ char * HB_EXPORT hb_langID( void )
 
 /* NOTE: Caller must free the pointer. */
 
-char * HB_EXPORT hb_langName( void )
+char HB_EXPORT * hb_langName( void )
 {
    char * pszName = ( char * ) hb_xgrab( 128 );
 
@@ -205,7 +205,7 @@ char * HB_EXPORT hb_langName( void )
 
 /* Compatibility interface */
 
-char * HB_EXPORT hb_langDGetErrorDesc( ULONG ulIndex )
+char HB_EXPORT * hb_langDGetErrorDesc( ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_langDGetErrorDesc(%lu)", ulIndex));
 

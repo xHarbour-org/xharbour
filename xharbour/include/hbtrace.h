@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.7 2003/01/02 20:14:09 ronpinkas Exp $
+ * $Id: hbtrace.h,v 1.8 2003/01/02 23:10:12 ronpinkas Exp $
  */
 
 /*
@@ -223,11 +223,11 @@ extern char * hb_tr_file_;
 extern int    hb_tr_line_;
 extern int    hb_tr_level_;
 
-extern int    hb_tracestate( int new_state );
-extern int    hb_tracelevel( int new_level );
+extern int  hb_tracestate( int new_state );
+extern int  hb_tracelevel( int new_level );
 
-extern int    hb_tr_level( void );
-extern void   hb_tr_trace( char * fmt, ... );
+extern int  hb_tr_level( void );
+extern void hb_tr_trace( char * fmt, ... );
 
 #if defined(HB_EXTERN_C)
 }

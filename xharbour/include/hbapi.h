@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.55 2003/01/05 20:20:02 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.56 2003/01/07 19:35:25 ronpinkas Exp $
  */
 
 /*
@@ -331,14 +331,14 @@ extern BOOL     HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM 
 extern BOOL     HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item by ref */
 extern PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex ); /* returns pointer to specified element of the array */
 extern ULONG    HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen ); /* copy a string into an array item */
-extern char *   HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
-extern char *   HB_EXPORT hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
+extern char     HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
+extern char     HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
 extern ULONG    HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
 extern BOOL     HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
 extern int      HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
 extern long     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long numeric value contained on an array element */
 extern double   HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
-extern char *   HB_EXPORT hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
+extern char     HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
 extern long     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a long integer */
 extern USHORT   HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern void     HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
@@ -360,19 +360,19 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Create
 
 extern int      HB_EXPORT hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
 extern int      HB_EXPORT hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
-extern char *   HB_EXPORT hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
-extern char *   HB_EXPORT hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
+extern char     HB_EXPORT * hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
+extern char     HB_EXPORT * hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
 extern BOOL     HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
 extern BOOL     HB_EXPORT hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
 extern void     HB_EXPORT hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
 extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */
-extern char *   HB_EXPORT hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
-extern char *   HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen );
-extern char *   HB_EXPORT hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
-extern char *   HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
-extern char *   HB_EXPORT hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
+extern char     HB_EXPORT * hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
+extern char     HB_EXPORT * hb_strUpperCopy( char * szText, ULONG ulLen );
+extern char     HB_EXPORT * hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
+extern char     HB_EXPORT * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
+extern char     HB_EXPORT * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
 extern double   HB_EXPORT hb_strVal( const char * szText, ULONG ulLen ); /* return the numeric value of a character string representation of a number */
-extern char *   HB_EXPORT hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
+extern char     HB_EXPORT * hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
 extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 
 extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */

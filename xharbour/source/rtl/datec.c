@@ -1,5 +1,5 @@
 /*
- * $Id: datec.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: datec.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -56,14 +56,14 @@
 #include "hbapilng.h"
 #include "hbdate.h"
 
-char * HB_EXPORT hb_dateCMonth( int iMonth )
+char HB_EXPORT * hb_dateCMonth( int iMonth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateCMonth(%d)", iMonth));
 
    return ( iMonth >= 1 && iMonth <= 12 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 ) : "";
 }
 
-char * HB_EXPORT hb_dateCDOW( int iDay )
+char HB_EXPORT * hb_dateCDOW( int iDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateCDOW(%d)", iDay));
 

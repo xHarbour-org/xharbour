@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.11 2003/01/06 14:11:53 lculik Exp $
+ * $Id: hbapifs.h,v 1.12 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ extern void     HB_EXPORT hb_fsCommit     ( FHANDLE hFileHandle ); /* commit upd
 extern FHANDLE  HB_EXPORT hb_fsCreate     ( BYTE * pszFileName, USHORT uiAttr ); /* create a file */
 extern FHANDLE  HB_EXPORT hb_fsCreateEx   ( BYTE * pszFilename, USHORT uiAttr, USHORT uiFlags ); /* create a file, with specific open mode */
 extern FHANDLE  HB_EXPORT hb_fsCreateTemp ( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName ); /* create a temporary file from components */
-extern BYTE *   HB_EXPORT hb_fsCurDir     ( USHORT uiDrive ); /* retrieve a static pointer containing current directory for specified drive */
+extern BYTE     HB_EXPORT * hb_fsCurDir     ( USHORT uiDrive ); /* retrieve a static pointer containing current directory for specified drive */
 extern USHORT   HB_EXPORT hb_fsCurDirBuff ( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ); /* copy current directory for given drive into a buffer */
 extern USHORT   HB_EXPORT hb_fsCurDirBuffEx ( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ); /* copy current directory for given drive into a buffer */
 extern BYTE     HB_EXPORT hb_fsCurDrv     ( void ); /* retrieve current drive number */
@@ -152,7 +152,7 @@ typedef struct
 } HB_FNAME, * PHB_FNAME, * HB_FNAME_PTR;
 
 extern PHB_FNAME HB_EXPORT hb_fsFNameSplit( char * pszFileName ); /* Split given filename into path, name and extension */
-extern char *    HB_EXPORT hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName ); /* This function joins path, name and extension into a string with a filename */
+extern char      HB_EXPORT * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName ); /* This function joins path, name and extension into a string with a filename */
 
 /* Searchable path support */
 typedef struct _HB_PATHNAMES
@@ -191,8 +191,8 @@ extern void      HB_EXPORT hb_fsFindClose( PHB_FFIND ffind );
 extern USHORT    HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr );
 extern ULONG     HB_EXPORT hb_fsAttrToRaw( USHORT uiAttr );
 extern USHORT    HB_EXPORT hb_fsAttrEncode( const char * szAttr );
-extern char *    HB_EXPORT hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
-extern BYTE *    HB_EXPORT hb_filecase ( char * ); /* Convert string to environment case */
+extern char      HB_EXPORT * hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
+extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to environment case */
 
 #ifdef HB_OS_WIN_32
    extern int WintoDosError( unsigned long lError);

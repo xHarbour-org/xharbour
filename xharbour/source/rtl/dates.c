@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.2 2002/07/03 21:44:08 walito Exp $
+ * $Id: dates.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -183,7 +183,7 @@ void HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, long * plMonth
 /* This function always closes the date with a zero byte, so it needs a
    9 character long buffer. */
 
-char * HB_EXPORT hb_dateDecStr( char * szDate, long lJulian )
+char HB_EXPORT * hb_dateDecStr( char * szDate, long lJulian )
 {
    long lYear, lMonth, lDay;
 
@@ -209,7 +209,7 @@ long HB_EXPORT hb_dateEncStr( char * szDate )
 
 /* NOTE: szFormattedDate must be an at least 11 chars wide buffer */
 
-char * HB_EXPORT hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat )
+char HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat )
 {
    /*
     * NOTE: szFormattedDate must point to a buffer of at least 11 bytes.
