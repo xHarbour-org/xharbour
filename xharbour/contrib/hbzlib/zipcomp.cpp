@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.12 2004/02/25 14:30:07 andijahja Exp $
+ * $Id: zipcomp.cpp,v 1.14 2004/03/24 03:18:05 lculik Exp $
  */
 
 /*
@@ -159,25 +159,25 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
          dwSize  = GetCurrentFileSize( szDummy );
          bAdded  = FALSE;
 
-         if( dwSize != (DWORD) -1 )
+// Prevent adding current archive file !
+         if ( strstr( szFile, szDummy ) == NULL && strstr( szDummy, szFile ) == NULL)
          {
-            if( pBlock != NULL )
+            if( dwSize != (DWORD) -1 )
             {
-               HB_ITEM FileName, FilePos;
+               if( pBlock != NULL )
+               {
+                  HB_ITEM FileName, FilePos;
 
-               FileName.type = HB_IT_NIL;
-               FilePos.type = HB_IT_NIL;
+                  FileName.type = HB_IT_NIL;
+                  FilePos.type = HB_IT_NIL;
 
-               hb_vmEvalBlockV( pBlock, 2, hb_itemPutC(&FileName,hb_arrayGetCPtr(pArray,ulCount)), hb_itemPutNI(&FilePos,ulCount));
+                  hb_vmEvalBlockV( pBlock, 2, hb_itemPutC(&FileName,hb_arrayGetCPtr(pArray,ulCount)), hb_itemPutNI(&FilePos,ulCount));
 
-               hb_itemClear( &FileName );
-               hb_itemClear( &FilePos );
-            }
+                  hb_itemClear( &FileName );
+                  hb_itemClear( &FilePos );
+               }
 
-            try
-            {
-// s.r. to prevent to Zip the current Zip file !
-               if ( strcmp( szDummy,szFile ) != 0 )
+               try
                {
                   if ( bPath && !bAdded  )
                   {
@@ -188,10 +188,10 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
                   {
                      szZip.AddNewFile( szDummy, iCompLevel, false, CZipArchive::zipsmSafeSmart, 65536 );
                   }
-               }
 
+               }
+               catch( ... ){}
             }
-            catch( ... ){}
          }
       }
    }
