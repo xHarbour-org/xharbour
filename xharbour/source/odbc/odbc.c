@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.4 2003/04/27 15:58:52 paultucker Exp $
+ * $Id: odbc.c,v 1.5 2003/06/20 19:14:45 mlombardo Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
             /* data right truncated! */
             bOut    = ( char * ) hb_xgrab( lLen + 1 );
             lLen = lLen - lInitBuff+2;
-            strcpy( bOut, bBuffer );
+            strcpy( (char *) bOut, (char *) bBuffer );
             bBuffer = ( char * ) hb_xrealloc( bBuffer, lLen );
          }
          else
@@ -229,7 +229,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       }
       else if( (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) && iReallocs > 0 )
       {
-         strcat( bOut, bBuffer );
+         strcat( (char*) bOut, (char *) bBuffer );
          hb_storclen( ( LPSTR ) bOut, ( WORD ) ( lLen + lInitBuff - 1 ), 5 );
          hb_xfree( ( PTR ) bBuffer );
          hb_xfree( ( PTR ) bOut );
@@ -349,7 +349,7 @@ HB_FUNC( SQLGETINFO ) // hDbc, nType, @cResult
    SQLSMALLINT wLen;
    WORD wResult = SQLGetInfo( ( HDBC ) hb_parnl( 1 ), ( UWORD ) hb_parnl( 2 ), bBuffer, 512, &wLen );
 
-   hb_storclen( bBuffer, wLen, 3 );
+   hb_storclen( (char *) bBuffer, wLen, 3 );
    hb_retni( wResult );
 }
 
@@ -370,7 +370,7 @@ HB_FUNC( SQLGETCONNECTOPTION ) // hDbc, nOption, @cOption
    BYTE bBuffer[ 512 ];
    WORD wResult = SQLGetConnectOption( ( HDBC ) hb_parnl( 1 ), hb_parni( 2 ), bBuffer );
    if( wResult == SQL_SUCCESS )
-      hb_storclen( bBuffer, 512, 3 );
+      hb_storclen( (char *) bBuffer, 512, 3 );
 
    hb_retni( wResult );
 }
@@ -381,7 +381,9 @@ HB_FUNC( SQLGETSTMTOPTION ) // hStmt, nOption, @cOption
    WORD wResult = SQLGetStmtOption( ( SQLHSTMT ) hb_parnl( 1 ), hb_parni( 2 ), bBuffer );
 
    if( wResult == SQL_SUCCESS )
-    hb_storclen( bBuffer, 512,3 );
+   {
+      hb_storclen( (char *) bBuffer, 512,3 );
+   }
 
    hb_retni( wResult );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.25 2003/06/19 19:09:19 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.26 2003/06/20 00:11:04 ronpinkas Exp $
  */
 
 /*
@@ -1404,7 +1404,8 @@ RETURN uObj
   {
      IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
      BSTR wMember;
-     DISPID lDispID, lPropPut = DISPID_PROPERTYPUT, wFlags;
+     DISPID lDispID, lPropPut = DISPID_PROPERTYPUT;
+     WORD wFlags;
      DISPPARAMS dParams;
      UINT uArgErr;
 
@@ -1436,7 +1437,7 @@ RETURN uObj
                                            lDispID,
                                            &IID_NULL,
                                            LOCALE_USER_DEFAULT,
-                                           ( unsigned short )wFlags,
+                                           wFlags,
                                            &dParams,
                                            NULL,    // No return value
                                            &excep,
