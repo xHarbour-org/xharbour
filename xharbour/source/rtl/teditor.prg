@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.34 2004/04/28 14:26:22 jonnymind Exp $
+/* $Id: teditor.prg,v 1.45 2004/06/19 12:27:00 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -745,9 +745,9 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLength )
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLen )
 
-   ::GotoLine( nRowTo )  // , ::nLineLenght( nRowTo ) + 1 )
+   ::GotoLine( nRowTo )  // , ::nLineLength( nRowTo ) + 1 )
 
 RETURN Self
 
