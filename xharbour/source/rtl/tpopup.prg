@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: tpopup.prg,v 1.1.1.1 2001/12/21 10:42:09 ronpinkas Exp $
  */
 
 /*
@@ -188,28 +188,33 @@ static function GetAccel( nKey )
    LOCAL Self  := QSelf()
    LOCAL nAt   := 0
    LOCAL cKey  := Upper( Chr( nKey ) )
-   LOCAL n
+//   LOCAL n
+   LOCAL oItems
 
-   for n := 1 to ::itemCount
-      nAt := At( "&", ::aItems[ n ]:caption )
-      if nAt > 0 .and. ::aItems[ n ]:enabled .and. ;
-            Upper( SubStr( ::aItems[ n ]:caption, nAt + 1, 1 ) ) == cKey
-         return n
+//   n := 1
+   FOR EACH oItems IN ::aItems
+      nAt := At( "&", oItems:caption )
+      if nAt > 0 .and. oItems:enabled .and. Upper( SubStr( oItems:caption, nAt + 1, 1 ) ) == cKey
+         return HB_EnumIndex()
       endif
-   next
+//      n++
+   NEXT
 
 return 0
 //--------------------------------------------------------------------------//
 static function GetFirst()
 
    LOCAL Self  := QSelf()
-   LOCAL n
+//   LOCAL n
+   LOCAL oItems
 
-   for n := 1 to ::itemCount
-      if ::aItems[ n ]:caption != MENU_SEPARATOR .and. ::aItems[ n ]:enabled
-         return n
+//   n := 1
+   FOR EACH oItems IN ::aItems
+      if oItems:caption != MENU_SEPARATOR .and. oItems:enabled
+         return HB_EnumIndex()
       endif
-   next
+//      n++
+   NEXT
 
 return 0
 //--------------------------------------------------------------------------//
@@ -273,13 +278,16 @@ return 0
 static function GetShortct( nKey )
 
    LOCAL Self  := QSelf()
-   LOCAL n
+//   LOCAL n
+   LOCAL oItems
 
-   for n := 1 to ::itemCount
-      if ::aItems[ n ]:enabled .and. ::aItems[ n ]:shortcut == nKey
-         return n
+//   n := 1
+   FOR EACH oItems IN ::aItems
+      if oItems:enabled .and. oItems:shortcut == nKey
+         return HB_EnumIndex()
       endif
-   next
+//      n++
+   NEXT
 
 return 0
 //--------------------------------------------------------------------------//
@@ -397,7 +405,8 @@ static function Display()
    LOCAL nAt      := 0
    LOCAL lPopup   := FALSE
    LOCAL cPrompt
-   LOCAL n
+//   LOCAL n
+   LOCAL oItems
 
    DispBegin()
 
@@ -413,41 +422,43 @@ static function Display()
    endif
 #endif
 
-   for n := 1 to ::itemCount
+//   n := 1
+   FOR EACH oItems IN ::aItems
 
-      nAt := At( "&", ::aItems[ n ]:caption )
-      cPrompt := StrTran( ::aItems[ n ]:caption, "&", "" )
+      nAt := At( "&", oItems:caption )
+      cPrompt := StrTran( oItems:caption, "&", "" )
 
       if cPrompt == MENU_SEPARATOR
          DispOutAt( ;
-            ::aItems[ n ]:row + nTop + n, ::left, ;
+            oItems:row + nTop + HB_EnumIndex(), ::left, ;
             SubStr( ::border, 9, 1 ) + ;
             Replicate( SubStr( ::border, 10, 1 ), ::right - ::left - 1 ) + ;
             SubStr( ::border, 11, 1 ), ;
             hb_ColorIndex( ::colorspec, 5 ) )
       else
-         lPopUp := ::aItems[ n ]:isPopUp()
+         lPopUp := oItems:isPopUp()
 
          DispOutAt( ;
-            ::aItems[ n ]:row + nTop + n, ::left + 1, ;
-            iif( ::aItems[ n ]:checked, SubStr( ::aItems[ n ]:style, 1, 1 ), " " ) + ;
+            oItems:row + nTop + HB_EnumIndex(), ::left + 1, ;
+            iif( oItems:checked, SubStr( oItems:style, 1, 1 ), " " ) + ;
                PadR( cPrompt + " ", ::width - 4 ) + ;
-               iif( lPopUp, SubStr( ::aItems[ n ]:style, 2, 1 ), " " ), ;
+               iif( lPopUp, SubStr( oItems:style, 2, 1 ), " " ), ;
             hb_ColorIndex( ::colorSpec, ;
-               iif( ::aItems[ n ]:enabled, ;
-                  iif( n == ::current, CLR_ENHANCED, CLR_STANDARD ), ;
+               iif( oItems:enabled, ;
+                  iif( HB_EnumIndex() == ::current, CLR_ENHANCED, CLR_STANDARD ), ;
                      CLR_UNSELECTED ) ) )
 
          if nAt > 0
             DispOutAt( ;
-               ::aItems[ n ]:row + nTop + n, ::left + nAt + 1, ;
+               oItems:row + nTop + HB_EnumIndex(), ::left + nAt + 1, ;
                SubStr( cPrompt, nAt, 1 ), ;
                hb_ColorIndex( ::colorSpec, ;
-                  iif( ::aItems[ n ]:enabled, ;
-                     iif( n == ::current, CLR_BACKGROUND, CLR_BORDER ), ;
+                  iif( oItems:enabled, ;
+                     iif( HB_EnumIndex() == ::current, CLR_BACKGROUND, CLR_BORDER ), ;
                      CLR_UNSELECTED ) ) )
          endif
       endif
+//      n++
    next
 
    DispEnd()
