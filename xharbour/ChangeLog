@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1981 2004/01/03 13:03:03 vouchcac Exp $
+ * $Id: ChangeLog,v 1.1982 2004/01/03 14:06:17 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-03 21:41 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Fixed colors BRIGHT_BLUE and BRIGHT_RED to be closest to clipper colors
+    + Added application name title
+
+  * source/rtl/dumpvar.prg
+    + Added __OutDebug() function
+      This function permit to have more (...) parameters to display with
+      hb_outdebug()
+
+  * contrib/firebird/make_b32.bat
+  * contrib/firebird/makefile.bc
+    * Changed for auto creation of fbclient.lib
+      ! Set environment var FBDIR=path/of/firebird
 
 2004-01-03 15:04 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.h
@@ -41,12 +56,12 @@
 
 	  These functions need be implemented at GT level but is only possible
         when someone implements them in proper way. Till then only for WVT.
-   
+
         When changing the fonts I could not control the box characters.
         Hopefully Peter may get it done.
 
   * xharbour/include/hbgtwvt.h
-    + Added extern hb_wvt_gtSetIconFromFile( char *icon )     
+    + Added extern hb_wvt_gtSetIconFromFile( char *icon )
 
 2004-01-02 18:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_tgz.sh
@@ -55,17 +70,17 @@
     + XLIB support for gtxvt
 
 2004-01-02 15:10 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
-  + contrib\pgsql\Changelog  
-  + contrib\pgsql\make_b32.bat  
-  + contrib\pgsql\Makefile  
-  + contrib\pgsql\makefile.bc  
-  + contrib\pgsql\postgres.c  
-  + contrib\pgsql\README  
+  + contrib\pgsql\Changelog
+  + contrib\pgsql\make_b32.bat
+  + contrib\pgsql\Makefile
+  + contrib\pgsql\makefile.bc
+  + contrib\pgsql\postgres.c
+  + contrib\pgsql\README
   + contrib\pgsql\TPostgres.prg
-  + contrib\pgsql\tests\dbf2pg.prg  
-  + contrib\pgsql\tests\Makefile  
-  + contrib\pgsql\tests\simple.prg  
-  + contrib\pgsql\tests\stress.prg  
+  + contrib\pgsql\tests\dbf2pg.prg
+  + contrib\pgsql\tests\Makefile
+  + contrib\pgsql\tests\simple.prg
+  + contrib\pgsql\tests\stress.prg
   + contrib\pgsql\tests\test.prg
     + Xharbour  functions and classes for PostgreSQL
 
@@ -84,7 +99,7 @@
       corners before.
     + Complete visualization of ALL box characters, including
       partially double and single chars.
-      
+
 2003-12-31 14:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/debug/debugger.prg
     * another fix to callstack management

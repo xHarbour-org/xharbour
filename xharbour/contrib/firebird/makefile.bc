@@ -2,12 +2,12 @@
 # makefile for Borland C/C++ 32 bits
 # Building of firebird.lib - Harbour API to Firebird
 
-INCLUDE_DIR = ..\..\include
-INCLUDE_FB = c:\tools\firebird\include
+INCLUDE_DIR = include;..\..\include
+INCLUDE_FB = $(FBDIR)\include
 
-BIN_DIR = ..\..\bin\b32
-OBJ_DIR = ..\..\obj\b32
-LIB_DIR = ..\..\lib\b32
+BIN_DIR = ..\..\bin
+OBJ_DIR = obj\b32
+LIB_DIR = lib\b32
 
 $(LIB_DIR)\firebird.lib : \
   $(OBJ_DIR)\TFirebird.obj \

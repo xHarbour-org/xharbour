@@ -1,6 +1,6 @@
 
 /*
- * $Id: gtwvt.c,v 1.17 2004/01/03 09:37:53 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.18 2004/01/03 13:03:03 vouchcac Exp $
  */
 
 /*
@@ -115,10 +115,10 @@
 #define BROWN          RGB( 0x85,0x85,0x0  )
 #define WHITE          RGB( 0xC6,0xC6,0xC6 )
 #define LIGHT_GRAY     RGB( 0x60,0x60,0x60 )
-#define BRIGHT_BLUE    RGB( 0x60,0x60,0xFF )
+#define BRIGHT_BLUE    RGB( 0x00,0x00,0xFF )
 #define BRIGHT_GREEN   RGB( 0x60,0xFF,0x60 )
 #define BRIGHT_CYAN    RGB( 0x60,0xFF,0xFF )
-#define BRIGHT_RED     RGB( 0xFF,0x60,0x60 )
+#define BRIGHT_RED     RGB( 0xF8,0x00,0x26 )
 #define BRIGHT_MAGENTA RGB( 0xFF,0x60,0xFF )
 #define YELLOW         RGB( 0xFF,0xFF,0x00 )
 #define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
@@ -257,6 +257,7 @@ static USHORT  hb_wvt_gtCalcPixelHeight( void );
 static USHORT  hb_wvt_gtCalcPixelWidth( void );
 static BOOL    hb_wvt_gtSetColors( HDC hdc, BYTE attr );
 static HFONT   hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage );
+void HB_EXPORT hb_wvt_gtSetWindowTitle( char * title );
 
 static BOOL    hb_wvt_gtTextOut( HDC hdc, USHORT col, USHORT row, LPCTSTR lpString,  USHORT cbString  );
 static void    hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length );
@@ -294,6 +295,9 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ) )
 {
+    /* FSG: filename var for application name */
+    PHB_FNAME pFileName;
+
     HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Init()" ) );
 
     /* stdin && stdout && stderr */
@@ -310,6 +314,10 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
       //
       hb_errRT_TERM( EG_CREATE, 10001, "WINAPI CreateWindow() failed", "hb_gt_Init()", 0, 0 );
     }
+    pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
+    hb_wvt_gtSetWindowTitle( pFileName->szName );
+    hb_xfree( pFileName );
+
     if( b_MouseEnable )
     {
       HB_GT_FUNC( mouse_Init() );
@@ -673,7 +681,7 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
   // there is no advantage in using ScrollWindowEx()
   //
   _s.InvalidateWindow = HB_GT_FUNC( gt_DispCount() ) > 0 || ( !iRows && !iCols ) ;
-  
+
   // if _s.InvalidateWindow is FALSE it is used to stop
   //   HB_GT_FUNC( gt_Puts() ) & HB_GT_FUNC( gt_PutText() )
   //   from actually updating the screen. ScrollWindowEx() is used
@@ -947,7 +955,7 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
 //-------------------------------------------------------------------//
 //
-//   copied from gtwin  
+//   copied from gtwin
 //
 USHORT HB_GT_FUNC( gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ) )
 {
@@ -1438,7 +1446,7 @@ void HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //
-//                    WVT specific functions 
+//                    WVT specific functions
 //
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -1818,7 +1826,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           {
             hb_wvt_gtAddCharToInputQueue( K_CTRL_QUESTION );
           }
-          else if ( ( bAlt || bCtrl ) && ( 
+          else if ( ( bAlt || bCtrl ) && (
               wParam==VK_MULTIPLY || wParam==VK_ADD || wParam== VK_SUBTRACT
               || wParam== VK_DIVIDE ) )
           {
@@ -2584,7 +2592,7 @@ static void gt_hbInitStatics( void )
   _s.RectInvalid.left = -1 ;
   _s.fontHeight       = 0;
   _s.fontWidth        = 0;
-  _s.fontWeight       = 0; 
+  _s.fontWeight       = 0;
   _s.fontQuality      = DEFAULT_QUALITY;
   strcpy( _s.fontFace,"Terminal" );
   _s.closeEvent       = 0;
@@ -2822,7 +2830,7 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon )
 //-------------------------------------------------------------------//
 
 DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
-{ 
+{
   HICON hIcon = LoadImage( ( HINSTANCE ) hb_hInstance, icon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
 
   if ( hIcon )
@@ -2872,7 +2880,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
         // resize the window based on new fonts
         //
         hb_wvt_gtResetWindowSize( _s.hWnd );
-        
+
         // send message to force resize of caret
         //
         SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 );
@@ -3056,12 +3064,12 @@ HB_CALL_ON_STARTUP_END( HB_GT_FUNC( _gt_Init_ ) )
 
 HB_FUNC( WVT_SETFONT )
 {
-   hb_retl( hb_wvt_gtSetFont( 
-            ISNIL( 1 ) ? _s.fontFace   : hb_parc( 1 ), 
+   hb_retl( hb_wvt_gtSetFont(
+            ISNIL( 1 ) ? _s.fontFace   : hb_parc( 1 ),
             ISNIL( 2 ) ? _s.fontHeight : hb_parni( 2 ),
             ISNIL( 3 ) ? _s.fontWidth  : hb_parni( 3 ),
             ISNIL( 4 ) ? _s.fontWeight : hb_parni( 4 ),
-            ISNIL( 5 ) ? _s.fontQuality: hb_parni( 5 ) 
+            ISNIL( 5 ) ? _s.fontQuality: hb_parni( 5 )
            ) ) ;
 }
 
@@ -3075,8 +3083,8 @@ HB_FUNC( WVT_SETICON )
    }
    else
    {
-      hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parc( 1 ) ) ) ;	
-   }   
+      hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parc( 1 ) ) ) ;
+   }
 }
 
 //-------------------------------------------------------------------//
@@ -3091,7 +3099,7 @@ HB_FUNC( WVT_SETTITLE )
 
 HB_FUNC( WVT_SETWINDOWPOS )
 {
-   hb_wvt_gtSetWindowPos( hb_parni( 1 ), hb_parni( 2 ) );	
+   hb_wvt_gtSetWindowPos( hb_parni( 1 ), hb_parni( 2 ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3112,8 +3120,8 @@ HB_FUNC( WVT_SETCODEPAGE )
 
 HB_FUNC( WVT_CENTERWINDOW )
 {
-   hb_retl( hb_wvt_gtSetCentreWindow( 
-	            ISNIL( 1 ) ? TRUE  : hb_parl( 1 ), 
+   hb_retl( hb_wvt_gtSetCentreWindow(
+	            ISNIL( 1 ) ? TRUE  : hb_parl( 1 ),
 	            ISNIL( 2 ) ? FALSE : hb_parl( 2 ) ) );
 }
 
@@ -3128,7 +3136,7 @@ HB_FUNC( WVT_SETMOUSEMOVE )
    else
    {
       hb_retl( hb_wvt_gtSetMouseMove( hb_parl( 1 ) ) );
-   }   
+   }
 }
 
 //-------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.2 2003/11/12 21:51:32 fsgiudice Exp $
+ * $Id: dumpvar.prg,v 1.3 2003/11/14 23:17:31 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,20 @@
 #include "hbclass.ch"
 
 #DEFINE  CRLF HB_OsNewLine()
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * Send to hb_OutDebug() more parameters
+ *
+*/
+
+PROCEDURE __OutDebug( ... )
+  LOCAL xVal
+  FOR EACH xVal IN hb_aParams()
+      hb_OutDebug( hb_DumpVar( xVal ) )
+  NEXT
+RETURN
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
