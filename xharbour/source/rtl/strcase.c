@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.13 2003/10/07 12:41:50 paultucker Exp $
+ * $Id: strcase.c,v 1.14 2003/10/27 09:02:00 paultucker Exp $
  */
 
 /*
@@ -118,8 +118,6 @@ HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
          szCopy[ i ] = toupper( (unsigned char) szText[ i ] );
    szCopy[ i ] = '\0';
 
-   fprintf( stderr, "STRCUC %d %d %d %s\n", ulLen,i,strlen( szCopy ), szCopy );
-
    return szCopy;
 }
 
@@ -145,7 +143,7 @@ HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
 /* This function copies and converts szText to upper case.
  */
 /*
- * NOTE: Unlike the documentation for strncpy, this routine will alwasy append
+ * NOTE: Unlike the documentation for strncpy, this routine will always append
  *       a null
  * pt
  */
@@ -176,7 +174,7 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 /* This function copies and converts szText to upper case AND Trims it
  */
 /*
- * NOTE: Unlike the documentation for strncpy, this routine will alwasy append
+ * NOTE: Unlike the documentation for strncpy, this routine will always append
  *       a null
  * pt
  */
