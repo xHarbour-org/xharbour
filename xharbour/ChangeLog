@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2700 2004/03/31 13:58:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.2701 2004/03/31 18:21:24 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-31 23:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/cmdcheck.c
+  * source/compiler/hbusage.c
+    ! Fixed a little bug: -d on command line without a #define name should
+      not create an empty #define.
+    + Added a new command line option, -undef:<id>, which undefines a
+      predefined #define.
 
 2004-03-31 12:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rdd/dbcmd.c

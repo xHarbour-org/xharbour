@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.12 2003/10/06 21:31:35 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.13 2004/01/04 03:57:37 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
 #include "hbcomp.h"
 
 extern int  hb_pp_ParseDefine( char * );
+extern int  hb_pp_ParseDirective( char * );
 extern BOOL hb_comp_iGenVarList;
 
 /* TODO: Add support for this compiler switches
@@ -349,7 +350,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        Args[i] += (j - 1);
                        hb_compChkEnvironVar( Args[i] );
 
-                       /* Accept rest as part of .CH Path and continue with next Args[]. */
+                       /* Accept rest as part of .CH Path or "undef:<id>" and continue with next Args[]. */
                        j = strlen( Args[i] );
                        continue;
 
@@ -792,6 +793,16 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'u':
              case 'U':
+                if ( s[1] && toupper( s[1] ) == 'N'
+                     && s[2] && toupper( s[2] ) == 'D'
+                     && s[3] && toupper( s[3] ) == 'E'
+                     && s[4] && toupper( s[4] ) == 'F'
+                     && s[5] == ':' )
+                {
+                   /* NOTE: Ignore these -undef: switches will be processed separately */
+                   break;
+                }
+
                 hb_pp_STD_CH = hb_strdup( s + 1 );
                 break;
 
@@ -870,35 +881,61 @@ void hb_compChkPaths( void )
 
 static void hb_compChkDefineSwitch( char * pszSwitch )
 {
-   if( pszSwitch && HB_ISOPTSEP( pszSwitch[ 0 ] ) &&
-      ( pszSwitch[ 1 ] == 'd' || pszSwitch[ 1 ] == 'D' ) )
+   if( pszSwitch && HB_ISOPTSEP( pszSwitch[ 0 ] ) )
    {
-      char *szDefText = hb_strdup( pszSwitch + 2 ), *pAssign, *sDefLine;
-      unsigned int i = 0;
-
-      while( i < strlen( szDefText ) && ! HB_ISOPTSEP( szDefText[ i ] ) )
-         i++;
-
-      szDefText[ i ] = '\0';
-      if( szDefText )
+      if ( pszSwitch[ 1 ] == 'd' || pszSwitch[ 1 ] == 'D' )
       {
-         if( ( pAssign = strchr( szDefText, '=' ) ) == NULL )
-         {
-            hb_pp_AddDefine( szDefText, 0 );
-         }
-         else
-         {
-            szDefText[ pAssign - szDefText ] = '\0';
+         char *szDefText = hb_strdup( pszSwitch + 2 ), *pAssign, *sDefLine;
+         unsigned int i = 0;
 
-            /* hb_pp_AddDefine( szDefText,  pAssign + 1 ); */
-            sDefLine = ( char* ) hb_xgrab( strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1 );
-            sprintf( sDefLine, "%s %s", szDefText, pAssign + 1 );
-            hb_pp_ParseDefine( sDefLine );
-            hb_xfree( sDefLine );
+         while( i < strlen( szDefText ) && ! HB_ISOPTSEP( szDefText[ i ] ) )
+           i++;
+
+         szDefText[ i ] = '\0';
+         if( szDefText[ 0 ] )
+         {
+            if( ( pAssign = strchr( szDefText, '=' ) ) == NULL )
+            {
+               hb_pp_AddDefine( szDefText, 0 );
+            }
+            else
+            {
+               szDefText[ pAssign - szDefText ] = '\0';
+
+               /* hb_pp_AddDefine( szDefText,  pAssign + 1 ); */
+               sDefLine = ( char* ) hb_xgrab( strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1 );
+               sprintf( sDefLine, "%s %s", szDefText, pAssign + 1 );
+               hb_pp_ParseDefine( sDefLine );
+               hb_xfree( sDefLine );
+            }
          }
+
+         hb_xfree( szDefText );
       }
-
-      hb_xfree( szDefText );
+      else if ( pszSwitch[1] && toupper( pszSwitch[1] ) == 'U'
+                && pszSwitch[2] && toupper( pszSwitch[2] ) == 'N'
+                && pszSwitch[3] && toupper( pszSwitch[3] ) == 'D'
+                && pszSwitch[4] && toupper( pszSwitch[4] ) == 'E'
+                && pszSwitch[5] && toupper( pszSwitch[5] ) == 'F'
+                && pszSwitch[6] == ':' )
+      {
+         char *szDefText = hb_strdup( pszSwitch + 7 );
+         char *szDefLine;
+         unsigned int i = 0;
+         
+         while ( szDefText[ i ] && ! HB_ISOPTSEP( szDefText[ i ] ) )
+           i++;
+         szDefText[ i ] = '\0';
+         
+         if ( szDefText[ 0 ] )
+         {
+            szDefLine = (char *) hb_xgrab( 7 + strlen( szDefText ) + 1 );
+            sprintf( szDefLine, "#undef %s", szDefText );
+            hb_pp_ParseDirective( szDefLine );
+            hb_xfree( szDefLine );
+         }
+         hb_xfree( szDefText );
+      }
    }
 }
 
