@@ -142,6 +142,11 @@ HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
 
 /* This function copies and converts szText to upper case.
  */
+/*
+ * NOTE: Unlike the documentation for strncpy, this routine will alwasy append
+ *       a null
+ * pt
+ */
 HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
@@ -158,12 +163,9 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
       pSource++;
    }
 
-   if( ulLen )
+   while (ulLen--)
    {
-      while (ulLen--)
-      {
-         *pDest++ = '\0';
-      }
+      *pDest++ = '\0';
    }
 
    return pBuf;
@@ -171,35 +173,37 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
 /* This function copies and converts szText to upper case AND Trims it
  */
+/*
+ * NOTE: Unlike the documentation for strncpy, this routine will alwasy append
+ *       a null
+ * pt
+ */
 HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
-   LONG ulSLen = strlen( pSource );
+   LONG lSLen = strlen( pSource );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyUpperTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
    pDest[ ulLen ] ='\0';
 
-   while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
+   while( lSLen && pSource[ lSLen - 1 ] == ' ')
    {
-      ulSLen--;
+      lSLen--;
    }
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && ulSLen && (*pDest++ = toupper( *pSource )) != '\0' )
+   while( ulLen && lSLen && (*pDest++ = toupper( *pSource )) != '\0' )
    {
-      ulSLen--;
+      lSLen--;
       ulLen--;
       pSource++;
    }
 
-   if( ulLen )
+   while (ulLen--)
    {
-      while (ulLen--)
-      {
-         *pDest++ = '\0';
-      }
+      *pDest++ = '\0';
    }
 
    return pBuf;
