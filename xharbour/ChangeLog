@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1555 2003/10/06 03:35:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1556 2003/10/06 10:35:36 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-06 14:05 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/hbrandom.c
+    ! when using the format hb_random( n1, n2 ), the interval is now
+      high-open (that is, n1 <= hb_random( n1, n2) < n2 ) 
+      (reporting AGAIN for clarity. Fixed under windows).
+
+    + Added HB_RandomSeed() to allow generation of predictable random
+      sequences (debugging purposes) and HB_RandomInt that generates 
+      integer numbers in inclusive intervals:
+      /*
+      * HB_RANDOMINT
+      * 
+      * HB_RANDOMINT() --> returns 0 or 1, evenly distributed
+      * HB_RANDOMINT( N ) --> returns an integer between 1 and N (inclusive)
+      * HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive) 
+      * The integer returned is of the longest type available
+      */
+
+      HB_randomInt is ensured to generate evenly distributed numbers in this
+      inclusive interval (y or N have the same probability to appare as all
+      the other integers in the distribution). The form HB_RANDOMINT( N )
+      is directly suitable to be used in array subscriptions or string
+      extractions.
 
 2003-10-06 07:35 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/gtwin/gtwin.c

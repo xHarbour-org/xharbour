@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.5 2003/07/24 02:10:40 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.6 2003/10/05 12:50:54 jonnymind Exp $
  */
 
 /*
@@ -54,12 +54,19 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifndef HB_OS_WIN_32
+#include <float.h>
+#endif
+
+/* Globally available data, no need to MT it */
+volatile static int s_bInit = 0;
+ 
 /*
 * HB_RANDOM
 *
-* HB_RANDOM() --> returns a real value between 0 and 1
-* HB_RANDOM( x ) --> returns a real number between 0 and x (incusive)
-* HB_RANDOM( x, y) --> Returns a  real number between x and y (inclusive )
+* HB_RANDOM() --> returns a real value n so that 0 <= n < 1
+* HB_RANDOM( x ) --> returns a real number n so that 0 <= n < x 
+* HB_RANDOM( x, y) --> Returns a  real number n so that  x <= n < y 
 */
 HB_FUNC( HB_RANDOM )
 {
@@ -92,17 +99,112 @@ HB_FUNC( HB_RANDOM )
    }
 }
 
+
+
+/*
+* HB_RANDOMINT
+* 
+* HB_RANDOMINT() --> returns 0 or 1, evenly distributed
+* HB_RANDOMINT( N ) --> returns an integer between 1 and N (inclusive)
+* HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive) 
+* The integer returned is of the longest type available
+*/
+
+HB_FUNC( HB_RANDOMINT )
+{
+   double dRnd;
+   
+   #ifndef HB_LONG_LONG_OFF
+   LONGLONG lX, lY;
+   #else
+   long lX, lY;
+   #endif
+   
+   dRnd = hb_random_num();
+
+   if( ! ISNUM( 1 ) )
+   {
+      #ifndef HB_LONG_LONG_OFF
+      hb_retnll( (LONGLONG) (dRnd >= 0.5 ? 0 : 1) );
+      #else
+      hb_retnl( (LONGLONG) (dRnd >= 0.5 ? 0 : 1) );
+      #endif
+   }
+   else if( ! ISNUM(2) )
+   {
+      #ifndef HB_LONG_LONG_OFF
+      hb_retnll( 1 + ( dRnd * hb_parnll(1)) );
+      #else
+      hb_retnl( 1 + ( dRnd * hb_parnl(1)) );
+      #endif
+   }
+   else
+   {
+      #ifndef HB_LONG_LONG_OFF
+      lX = hb_parnll( 1 );
+      lY = hb_parnll( 2 );
+      #else
+      lX = hb_parnl( 1 );
+      lY = hb_parnl( 2 );
+      #endif
+
+      if ( lX > lY )
+      {
+         #ifndef HB_LONG_LONG_OFF
+         LONGLONG lZ = lY;
+         #else
+         long lZ;
+         #endif
+         
+         lY = lX;
+         lX = lZ;
+      }
+
+      #ifndef HB_LONG_LONG_OFF
+      hb_retnll( lX + ( dRnd * (lY-lX+1) ) );
+      #else
+      hb_retnl( lX + ( dRnd * (lY-lX+1) ) );
+      #endif
+   }
+}
+
+HB_FUNC( HB_RANDOMSEED )
+{
+   if( ! ISNUM( 1 ) )
+   {
+      srand( (unsigned)time( NULL ) );
+   }
+   else 
+   {
+      srand( hb_parni(1) );
+   }
+   
+   s_bInit = 1;
+}
+      
 /* Returns a double value between 0 and 1 */
 double hb_random_num()
 {
-   static int bInit = 0;
+   double d1, d2;
 
-   if( bInit == 0 )
+   if( s_bInit == 0 )
    {
       srand( (unsigned)time( NULL ) );
-      bInit = 1;
+      s_bInit = 1;
    }
-
-   return ( (double) rand() ) / ( ((double) RAND_MAX)+1e-301);
+   
+   d1 = (double) rand();
+   d2 = (double) RAND_MAX;
+   #ifdef HB_OS_WIN_32
+   /* It seems that on win32 platform there some weirdness about EPSILON value so
+      that a float division using an epsilon smaller than 1e-10 may be rounded.
+      Must dig if it's a borland lib bug or a windows problem.
+   */
+   d2 += 0.001;
+   #else
+   d2 += DBL_EPSILON;
+   #endif
+   
+   return d1 / d2;
 }
 
