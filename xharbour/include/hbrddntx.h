@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.27 2002/09/28 04:56:26 horacioroldan Exp $
+ * $Id: hbrddntx.h,v 1.8 2002/10/12 00:38:25 horacioroldan Exp $
  */
 
 /*
@@ -153,6 +153,7 @@ typedef struct _TAGINFO
    BYTE       OptFlags;
    LONG       TagBlock;
    LONG       RootBlock;
+   USHORT     nField;
    USHORT     KeyLength;
    USHORT     KeyDec;
    USHORT     MaxKeys;
