@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.7 2003/09/11 14:57:48 lculik Exp $
+# $Id: make_rpm.sh,v 1.8 2003/09/11 17:59:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -46,12 +46,17 @@ then
 	    mkdir -p ${RPMDIR}/SOURCES ${RPMDIR}/RPMS ${RPMDIR}/SRPMS \
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
-	fi
+	    if [ "${BUGGY_RPM}" = "yes" ]
+		then
+		    cp ${hb_filename} ${RPMDIR}/SOURCES
+		    cp xharbour.spec ${RPMDIR}/SPECS	
+		fi
+	fi	
 	if [ "${BUGGY_RPM}" = "yes" ]
 	then
-	    export GZIP="-c"
-	fi
-	if which rpmbuild &>/dev/null
+	    rpm -ba xharbour.spec
+	
+	elif which rpmbuild &>/dev/null	    
 	then
 	    rpmbuild -ta ${hb_filename} --rmsource
 	else
