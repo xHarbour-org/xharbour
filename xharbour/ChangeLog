@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1805 2003/12/01 05:56:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1806 2003/12/01 20:06:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-01 15:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+    + Added support for searching for array value in aSacn() but *only* in xHarbour extended mode
+      ( when optional 5th paramater <lForceExact> is .T.)
+
+  /*
+     I'm realy puzzled that Clipper aScan() can NOT find an Array (without a search block) even
+     when EXACT is ON, because <Target[n] == aSearch> is a perfectly valid expression.
+
+     I did NOT fix it at this time for ?compabtibility? reasons - but I'd like your input
+     since this really through me off, I'd expect it it work in Clipper.
+  */
 
 2003-12-01 12:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/runner.c

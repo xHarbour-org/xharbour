@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.80 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: arrays.c,v 1.81 2003/11/23 03:13:54 jonnymind Exp $
  */
 
 /*
@@ -960,6 +960,20 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
             if( HB_IS_NIL( pItems + ulStart ) )
+            {
+               return ulStart + 1;
+            }
+         }
+      }
+      else if( bExact && HB_IS_ARRAY( pValue ) )
+      {
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+         {
+            PHB_ITEM pItem = pItems + ulStart;
+
+            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %p", pItem, pValue->item.asArray.value ) );
+
+            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pValue->item.asArray.value )
             {
                return ulStart + 1;
             }
