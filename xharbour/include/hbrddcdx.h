@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.30 2004/03/25 12:13:13 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.31 2004/04/28 18:22:07 druzus Exp $
  */
 
 /*
@@ -85,14 +85,16 @@ HB_EXTERN_BEGIN
 #define CDX_BALANCE_LEAFPAGES                         3
 #define CDX_BALANCE_INTPAGES                          3
 
-/*
-#define CDX_CURKEY_UNDEF                              1
-#define CDX_CURKEY_REC                                2
-#define CDX_CURKEY_VAL                                4
-#define CDX_CURKEY_INPAGE                             8
-#define CDX_CURKEY_INSTACK                           16
-#define CDX_CURKEY_NOTEXIST                          32
-*/
+#define CDX_CURKEY_UNDEF                        (1<< 0)
+#define CDX_CURKEY_REC                          (1<< 1)
+#define CDX_CURKEY_VAL                          (1<< 2)
+#define CDX_CURKEY_INPAGE                       (1<< 3)
+#define CDX_CURKEY_INSTACK                      (1<< 4)
+#define CDX_CURKEY_NOTEXIST                     (1<< 5)
+#define CDX_CURKEY_RAWCNT                       (1<< 6)
+#define CDX_CURKEY_RAWPOS                       (1<< 7)
+#define CDX_CURKEY_LOGCNT                       (1<< 8)
+#define CDX_CURKEY_LOGPOS                       (1<< 9)
 
 #define TOP_RECORD                                    1
 #define BTTM_RECORD                                   2
@@ -106,6 +108,19 @@ HB_EXTERN_BEGIN
 #define NODE_JOIN                                     4
 #define NODE_BALANCE                                  8
 #define NODE_EAT                                     16
+
+#define CURKEY_RAWCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_RAWCNT) != 0)
+#define CURKEY_LOGCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_LOGCNT) != 0)
+
+#define CURKEY_RAWPOS(pTag)   ( ((pTag)->curKeyState & CDX_CURKEY_RAWPOS) != 0 && \
+                                 (pTag)->rawKeyRec == (pTag)->CurKey->rec )
+#define CURKEY_SETRAWPOS(pTag) { (pTag)->curKeyState |= CDX_CURKEY_RAWPOS; \
+                                 (pTag)->rawKeyRec = (pTag)->CurKey->rec; }
+
+#define CURKEY_LOGPOS(pTag)   ( ((pTag)->curKeyState & CDX_CURKEY_LOGPOS) != 0 && \
+                                 (pTag)->logKeyRec == (pTag)->pIndex->pArea->ulRecNo )
+#define CURKEY_SETLOGPOS(pTag) { (pTag)->curKeyState |= CDX_CURKEY_LOGPOS; \
+                                 (pTag)->logKeyRec = (pTag)->pIndex->pArea->ulRecNo; }
 
 /*
 #define CURKEY_UNDEF(pTag)    (((pTag)->curKeyState & CDX_CURKEY_UNDEF) != 0)
@@ -281,7 +296,13 @@ typedef struct _CDXTAG
    BOOL     TagEOF;
 
    BOOL     fRePos;
-   BYTE     curKeyState;      /* see: CDX_CURKEY_* */
+   int      curKeyState;      /* see: CDX_CURKEY_* */
+   ULONG    rawKeyCount;
+   ULONG    rawKeyPos;
+   ULONG    rawKeyRec;
+   ULONG    logKeyCount;
+   ULONG    logKeyPos;
+   ULONG    logKeyRec;
 
    ULONG    TagBlock;         /* a page offset where a tag header is stored */
    ULONG    RootBlock;        /* a page offset with the root of keys tree */
@@ -482,7 +503,7 @@ static ERRCODE hb_cdxGoBottom( CDXAREAP pArea );
 #define hb_cdxGoToId                               NULL
 static ERRCODE hb_cdxGoTop( CDXAREAP pArea );
 static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast );
-#define hb_cdxSkip                                 NULL
+static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip );
 #define hb_cdxSkipFilter                           NULL
 static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip );
 #define hb_cdxAddField                             NULL
@@ -542,13 +563,13 @@ static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea );
 static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo );
 static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo );
-#define hb_cdxClearFilter                          NULL
+static ERRCODE hb_cdxClearFilter( CDXAREAP pArea );
 #define hb_cdxClearLocate                          NULL
 static ERRCODE hb_cdxClearScope( CDXAREAP pArea );
 #define hb_cdxCountScope                           NULL
 #define hb_cdxFilterText                           NULL
 static ERRCODE hb_cdxScopeInfo( CDXAREAP pArea, USHORT nScope, PHB_ITEM pItem );
-#define hb_cdxSetFilter                            NULL
+static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxSetLocate                            NULL
 static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo );
 #define hb_cdxSkipScope                            NULL
