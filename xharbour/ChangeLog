@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3437 2004/09/16 15:26:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.3438 2004/09/16 15:57:16 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-16 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/filesys.c
+    + respect the additional flags FO_EXCL, FO_TRUNC, FO_CREAT defined
+      in fileio.ch in FOPEN - IMHO if we already have such flags with
+      FO_ prefix then they have to be respected - also they are necessary
+      to avoid race condition in some cases
 
 2004-09-16 20:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/pp/ppcore.c

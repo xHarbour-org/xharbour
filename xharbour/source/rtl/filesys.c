@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.120 2004/09/06 00:24:21 peterrees Exp $
+ * $Id: filesys.c,v 1.121 2004/09/08 00:17:11 druzus Exp $
  */
 
 /*
@@ -484,45 +484,76 @@ static int convert_open_flags( USHORT uiFlags )
    }
 #endif
 
+   if( uiFlags & FO_CREAT )
+   {
+      result_flags |= O_CREAT;
+      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_CREAT\n"));
+   }
+
+   if( uiFlags & FO_TRUNC )
+   {
+      result_flags |= O_TRUNC;
+      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_TRUNC\n"));
+   }
+
+   if( uiFlags & FO_EXCL )
+   {
+      result_flags |= O_EXCL;
+      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_EXCL\n"));
+   }
+
    HB_TRACE(HB_TR_INFO, ("convert_open_flags: result is 0x%04x\n", result_flags));
 
    return result_flags;
 }
 
-static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned * result_pmode )
+static unsigned convert_pmode_flags( USHORT uiFlags )
 {
-   HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
+   unsigned result_pmode = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("convert_pmode_flags(%hu)", uiFlags));
 
    /* by default FC_NORMAL is set */
 
-   *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
    //JC1: sorry, but at least under unix is more sensible to
    // create files without the X attribute
-   *result_pmode = 0;
+
    if( uiFlags & FC_HIDDEN )
    {
-      *result_pmode = S_IRUSR;
+      result_pmode = S_IRUSR;
    }
    else
    {
-      *result_pmode = S_IRUSR | S_IRGRP |  S_IROTH;
+      result_pmode = S_IRUSR | S_IRGRP |  S_IROTH;
    }
 
    if( !( uiFlags & FC_READONLY) )
    {
-      if( *result_pmode & S_IRUSR )  *result_pmode |= S_IWUSR;
-      if( *result_pmode & S_IRGRP )  *result_pmode |= S_IWGRP;
-      if( *result_pmode & S_IROTH )  *result_pmode |= S_IWOTH;
+      if( result_pmode & S_IRUSR )  result_pmode |= S_IWUSR;
+      if( result_pmode & S_IRGRP )  result_pmode |= S_IWGRP;
+      if( result_pmode & S_IROTH )  result_pmode |= S_IWOTH;
    }
 
 
    // JC1: give executable attribute where read is available
    if( uiFlags & FC_SYSTEM )
    {
-      if( *result_pmode & S_IRUSR )  *result_pmode |= S_IXUSR;
-      if( *result_pmode & S_IRGRP )  *result_pmode |= S_IXGRP;
-      if( *result_pmode & S_IROTH )  *result_pmode |= S_IXOTH;
+      if( result_pmode & S_IRUSR )  result_pmode |= S_IXUSR;
+      if( result_pmode & S_IRGRP )  result_pmode |= S_IXGRP;
+      if( result_pmode & S_IROTH )  result_pmode |= S_IXOTH;
    }
+
+   HB_TRACE(HB_TR_INFO, ("convert_pmode_flags: 0x%04x\n", result_pmode));
+
+   return result_pmode;
+}
+
+static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned * result_pmode )
+{
+   HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
+
+   *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
+   *result_pmode = convert_pmode_flags( uiFlags );
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
@@ -1587,7 +1618,8 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    }
 #elif defined(HAVE_POSIX_IO)
 
-   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ),
+                                             convert_pmode_flags( 0 ) );
    hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
 
 #else
