@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.32 2003/02/24 03:50:24 ronpinkas Exp $
+ * $Id: classes.c,v 1.33 2003/02/25 08:07:05 ronpinkas Exp $
  */
 
 /*
@@ -508,19 +508,29 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
       if( HB_IS_OBJECT( pCaller ) )
       {
-         char *szClassOfMethod;
+         char *szClassOfMessage;
 
          // This is an Inherited Method
          if( uiScope & HB_OO_CLSTP_SUPER )
          {
+            char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
+
+            //printf( "Object: %s, Caller: %s CallerMessage: %s, CallerMessageClass: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName, szCallerMessage, hb_objGetRealClsName( pCaller, szCallerMessage ) );
+
+            // It's possible that the Caller Message is a Super Messge, and Super is also where this Derived  Method is defined.
+            if( strcmp( hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName ), hb_objGetRealClsName( pCaller, szCallerMessage ) ) == 0 )
+            {
+               return TRUE;
+            }
+
             // HIDDEN Method can't be called from subclass.
             if( uiScope & HB_OO_CLSTP_HIDDEN )
             {
                goto ScopeError;
             }
 
-            szClassOfMethod = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
-            //printf( "Defined in: %s\n", szClassOfMethod );
+            szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
+            //printf( "Defined in: %s\n", szClassOfMessage );
          }
          else
          {
@@ -553,7 +563,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             {
                if( ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
                {
-                  if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMethod ) == 0 )
+                  if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMessage ) == 0 )
                   {
                      // Derived class - allow access to PROTECTED.
                      return TRUE;;
@@ -568,13 +578,8 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
            //HB_ITEM pMessage;
            char szScope[ 32 ];
 
-           //pMessage.type = HB_IT_STRING;
-           //pMessage.item.asString.value = pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 );
-           //pMessage.item.asString.bStatic = TRUE;
-
            szScope[0] = '\0';
 
-           //strcat( szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ) );
            strcat( szScope, "Scope Violation <" );
 
            if( uiScope & HB_OO_CLSTP_HIDDEN )
