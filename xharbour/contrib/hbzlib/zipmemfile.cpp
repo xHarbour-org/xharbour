@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipMemFile.cpp $
 // $Archive: /ZipArchive/ZipMemFile.cpp $
-// $Date: 2003/08/20 15:03:53 $ $Author: lculik $
+// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -33,9 +33,9 @@ void CZipMemFile::Grow(size_t nGrowTo)
 			nNewSize += m_nGrowBy;
 		BYTE* lpNew;
 		if (m_lpBuf)
-			lpNew = (BYTE*)realloc((void*) m_lpBuf, nNewSize);
+			lpNew = (BYTE*)hb_xrealloc((void*) m_lpBuf, nNewSize);
 		else
-			lpNew = (BYTE*)malloc(nNewSize);
+			lpNew = (BYTE*)hb_xalloc(nNewSize);
 
 		if (!lpNew)
 			CZipException::Throw(CZipException::memError);

@@ -1,0 +1,202 @@
+#
+# Borland C++ IDE generated makefile
+# Generated 11/04/01 at 19:22:16 
+#
+.AUTODEPEND
+
+
+#
+# Borland C++ tools
+#
+!ifndef BCB
+BCB = $(MAKEDIR)\..
+!endif
+
+IMPLIB  = Implib
+BCC32   = Bcc32 +BccW32.cfg 
+TLINK32 = TLink32
+TLIB    = TLib
+BRC32   = Brc32
+TASM32  = Tasm32
+#
+# IDE macros
+#
+
+
+#
+# Options
+#
+IDE_LinkFLAGS32 =  -L$(BCB)\LIB
+LinkerLocalOptsAtC32_ziparddll =  -L$(BCB)\LIB -Tpe -ap -c
+ResLocalOptsAtC32_ziparddll = 
+BLocalOptsAtC32_ziparddll = 
+CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -I\xharbour\include;. -DWIN32 -u -DNDEBUG;_MBCS;WIN32;_WINDOWS;ZLIB_DLL;_NO_VCL;_ASSERTE;NO_STRICT
+LinkerInheritOptsAt_ziparddll = -x
+LinkerOptsAt_ziparddll = $(LinkerLocalOptsAtC32_ziparddll)
+ResOptsAt_ziparddll = $(ResLocalOptsAtC32_ziparddll)
+BOptsAt_ziparddll = $(BLocalOptsAtC32_ziparddll) 
+
+#
+# Dependency List
+#
+Dep_zipar = \
+   ziparchive.lib
+
+ziparchive : BccW32.cfg $(Dep_zipar)
+  echo MakeNode
+
+Dep_ziparddll = \
+	stdafx.obj \
+	zip.obj \
+	ziparchive.obj \
+	zipautobuffer.obj \
+	zipcentraldir.obj \
+	zipcollections.obj \
+	zipcomp.obj \
+	zipcompatibility.obj \
+	zipexception.obj \
+	zipfile.obj \
+	zipfileheader.obj \
+	zipinternalinfo.obj \
+	zipmemfile.obj \
+	zipnew.obj \
+	zippathcomponent.obj \
+	zipplatform.obj \
+	zipplatformcomm.obj \
+	zipstorage.obj \
+	ZipString.obj
+
+ziparchive.lib : $(Dep_ziparddll)
+  $(TLIB) $< $(IDE_BFLAGS) /P64  $(BOptsAt_ziparddll) @&&|
+-+stdafx.obj &
+-+zip.obj &
+-+ziparchive.obj &
+-+zipautobuffer.obj &
+-+zipcentraldir.obj &
+-+zipcollections.obj &
+-+zipcomp.obj &
+-+zipcompatibility.obj &
+-+zipexception.obj &
+-+zipfile.obj &
+-+zipfileheader.obj &
+-+zipinternalinfo.obj &
+-+zipmemfile.obj &
+-+zipnew.obj &
+-+zippathcomponent.obj &
+-+zipplatform.obj &
+-+zipplatformcomm.obj &
+-+zipstorage.obj &
+-+ZipString.obj
+|
+
+stdafx.obj :  stdafx.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ stdafx.cpp
+|
+
+zip.obj :  zip.c
+  $(BCC32) -P- -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -I\xharbour\include -DZLIB_DLL -o$@ zip.c
+|
+
+ziparchive.obj :  ziparchive.cpp
+  $(BCC32) -c   @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ ziparchive.cpp
+|
+
+zipautobuffer.obj :  zipautobuffer.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipautobuffer.cpp
+|
+
+zipcentraldir.obj :  zipcentraldir.cpp
+  $(BCC32) -c   @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipcentraldir.cpp
+|
+
+zipcollections.obj :  zipcollections.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipcollections.cpp
+|
+
+zipcomp.obj :  zipcomp.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipcomp.cpp
+|
+
+zipcompatibility.obj :  zipcompatibility.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipcompatibility.cpp
+|
+
+zipexception.obj :  zipexception.cpp
+  $(BCC32)  -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipexception.cpp
+|
+
+zipfile.obj :  zipfile.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipfile.cpp
+|
+
+zipfileheader.obj :  zipfileheader.cpp
+  $(BCC32) -c  @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipfileheader.cpp
+|
+
+zipinternalinfo.obj :  zipinternalinfo.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipinternalinfo.cpp
+|
+
+zipmemfile.obj :  zipmemfile.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipmemfile.cpp
+|
+
+zipnew.obj :  zipnew.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipnew.cpp
+|
+
+zippathcomponent.obj :  zippathcomponent.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zippathcomponent.cpp
+|
+
+zipplatform.obj :  zipplatform.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipplatform.cpp
+|
+
+zipplatformcomm.obj :  zipplatformcomm.cpp
+  $(BCC32) -c @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipplatformcomm.cpp
+|
+
+zipstorage.obj :  zipstorage.cpp
+  $(BCC32) -c  @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ zipstorage.cpp
+|
+
+ZipString.obj :  ZipString.cpp
+  $(BCC32) -c  @&&|
+ $(CompOptsAt_ziparddll) $(CompInheritOptsAt_ziparddll) -o$@ ZipString.cpp
+|
+
+
+# Compiler configuration file
+BccW32.cfg : 
+   Copy &&|
+-vi
+-Ve
+-6
+-a8
+-R-
+-H-
+-5
+-OS
+-w-
+-O2  -X- -a8 -b -k-  
+| $@
+

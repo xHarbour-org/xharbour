@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/06/27 23:48:54 lculik Exp $
+# $Id: Makefile,v 1.2 2003/08/25 19:50:06 lculik Exp $
 #
 
 ROOT = ../../
@@ -10,30 +10,28 @@ PRG_HEADERS = \
 	ctwin.ch \
 
 C_SOURCES = \
-	strcomp.c \
 	zip.c \
-	zutil.c \
 
 
 CPP_SOURCES = \
 	stdafx.cpp \
-	ZipString.cpp \
 	ziparchive.cpp \
 	zipautobuffer.cpp \
 	zipcentraldir.cpp \
 	zipcollections.cpp \
-	zipcompatibility.cpp \
 	zipcomp.cpp \
+	zipcompatibility.cpp \
 	zipexception.cpp \
 	zipfile.cpp  \
 	zipfileheader.cpp \
 	zipinternalinfo.cpp \
 	zipmemfile.cpp \
 	zipnew.cpp \
-	../../Linux/ZipPathComponent.cpp \
+	Linux/ZipPathComponent.cpp \
+	Linux/ZipPlatform.cpp \
 	zipplatformcomm.cpp \
-	../../Linux/ZipPlatform.cpp \
 	zipstorage.cpp \
+	ZipString.cpp \
 
 
 

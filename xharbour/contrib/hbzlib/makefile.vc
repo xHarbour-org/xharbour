@@ -1,0 +1,220 @@
+!IF "$(OS)" == "Windows_NT"
+NULL=
+!ELSE
+NULL=nul
+!ENDIF
+
+OUTDIR=lib\vc
+INTDIR=obj\vc
+
+ALL : "$(OUTDIR)\ziparchive.lib"
+
+CLEAN :
+	-@erase "$(INTDIR)\stdafx.obj"
+	-@erase "$(INTDIR)\zip.obj"
+	-@erase "$(INTDIR)\ziparchive.obj"
+	-@erase "$(INTDIR)\zipautobuffer.obj"
+	-@erase "$(INTDIR)\zipcentraldir.obj"
+	-@erase "$(INTDIR)\zipcollections.obj"
+	-@erase "$(INTDIR)\zipcomp.obj"
+	-@erase "$(INTDIR)\zipcompatibility.obj"
+	-@erase "$(INTDIR)\zipexception.obj"
+	-@erase "$(INTDIR)\zipfile.obj"
+	-@erase "$(INTDIR)\zipfileheader.obj"
+	-@erase "$(INTDIR)\zipinternalinfo.obj"
+	-@erase "$(INTDIR)\zipmemfile.obj"
+	-@erase "$(INTDIR)\zipnew.obj"
+	-@erase "$(INTDIR)\zippathcomponent.obj"
+	-@erase "$(INTDIR)\zipplatform.obj"
+	-@erase "$(INTDIR)\zipplatformcomm.obj"
+	-@erase "$(INTDIR)\zipstorage.obj"
+	-@erase "$(INTDIR)\ZipString.obj"
+	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(OUTDIR)\ziparchive.lib"
+
+"$(OUTDIR)" :
+    @if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+"$(INTDIR)" :
+    @if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
+
+CPP=cl.exe
+#CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
+
+CPP_PROJ=/nologo /TP /GB /MLd /W3 /GX -Od /Zi /I "..\..\include" /Iinclude\
+         /DWIN32 /DNDEBUG /D_MBCS /D_LIB\
+         /Fp"$(INTDIR)\ziparchive.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
+         /FD /c
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $<
+<<
+
+LIB32=link.exe -lib
+LIB32_FLAGS=/nologo /out:"$(OUTDIR)\ziparchive.lib"
+LIB32_OBJS= \
+	"$(INTDIR)\stdafx.obj" \
+	"$(INTDIR)\zip.obj" \
+	"$(INTDIR)\ziparchive.obj" \
+	"$(INTDIR)\zipautobuffer.obj" \
+	"$(INTDIR)\zipcentraldir.obj" \
+	"$(INTDIR)\zipcollections.obj" \
+	"$(INTDIR)\zipcomp.obj" \
+	"$(INTDIR)\zipcompatibility.obj" \
+	"$(INTDIR)\zipexception.obj" \
+	"$(INTDIR)\zipfile.obj" \
+	"$(INTDIR)\zipfileheader.obj" \
+	"$(INTDIR)\zipinternalinfo.obj" \
+	"$(INTDIR)\zipmemfile.obj" \
+	"$(INTDIR)\zipnew.obj" \
+	"$(INTDIR)\zippathcomponent.obj" \
+	"$(INTDIR)\zipplatform.obj" \
+	"$(INTDIR)\zipplatformcomm.obj" \
+	"$(INTDIR)\zipstorage.obj" \
+	"$(INTDIR)\ZipString.obj"
+
+"$(OUTDIR)\ziparchive.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+    $(LIB32) @<<
+  $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
+<<
+
+
+SOURCE=stdafx.cpp
+
+"$(INTDIR)\stdafx.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zip.c
+
+"$(INTDIR)\zip.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=ziparchive.cpp
+
+"$(INTDIR)\ziparchive.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipautobuffer.cpp
+
+"$(INTDIR)\zipautobuffer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipcentraldir.cpp
+
+"$(INTDIR)\zipcentraldir.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipcollections.cpp
+
+"$(INTDIR)\zipcollections.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipcomp.cpp
+
+"$(INTDIR)\zipcomp.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipcompatibility.cpp
+
+"$(INTDIR)\zipcompatibility.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipexception.cpp
+
+"$(INTDIR)\zipexception.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipfile.cpp
+
+"$(INTDIR)\zipfile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipfileheader.cpp
+
+"$(INTDIR)\zipfileheader.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipinternalinfo.cpp
+
+"$(INTDIR)\zipinternalinfo.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipmemfile.cpp
+
+"$(INTDIR)\zipmemfile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipnew.cpp
+
+"$(INTDIR)\zipnew.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zippathcomponent.cpp
+
+"$(INTDIR)\zippathcomponent.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipplatform.cpp
+
+"$(INTDIR)\zipplatform.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipplatformcomm.cpp
+
+"$(INTDIR)\zipplatformcomm.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=zipstorage.cpp
+
+"$(INTDIR)\zipstorage.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=ZipString.cpp
+
+"$(INTDIR)\ZipString.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
