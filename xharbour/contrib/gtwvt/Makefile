@@ -1,11 +1,10 @@
 #
-# $Id: Makefile,v 1.3 2004/08/02 21:05:49 lf_sfnet Exp $
+# $Id: Makefile,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
-	gtwvt.c \
 	wvtcore.c \
 	wvtutils.c
 

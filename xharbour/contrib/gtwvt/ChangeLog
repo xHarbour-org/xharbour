@@ -1,6 +1,6 @@
 /*
    WVT Terminal Driver Specific ChangeLog
-   * $Id: ChangeLog,v 1.3766 2005/01/22 18:38:29 fsgiudice Exp $
+   * $Id: ChangeLog,v 1.3 2005/01/22 18:41:24 fsgiudice Exp $
    Compiled from ChangeLog entries of main repositry : 03 May 04 Pritpal Bedi <pritpal@vouchcac.com>
 */
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-22 19:47 UTC+0100 Francesco Saverio Giudice <info@fsgiudice>
+  * xharbour/contrib/gtwvt/makefile
+    - removed gtwvt.c (it is already in core, not needed here)
 
 2005-01-22 19:35 UTC+0100 Francesco Saverio Giudice <info@fsgiudice>
   * xharbour/contrib/gtwvt/makefile.bc
