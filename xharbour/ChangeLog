@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3976 2005/03/23 19:45:32 druzus Exp $
+ * $Id: ChangeLog,v 1.3977 2005/03/23 21:28:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,15 @@
 2005-03-23 13:27 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * source/rtl/win32ole.prg
     ! Fixed a GPF trap when OLE Server has to reallocate a string argument passed BYREF.
+      /*
+         Stringfwe pass in pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal
+         must be a system allocated string!
+       */
+
+  * bin/pack_src.bat
+  * bin/pack_bin.bat
+  * include/hbver.h
+    * Increased to 0.99.4
 
 2005-03-23 20:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/dateshb.c
