@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.114 2002/11/07 20:16:46 what32 Exp $
+ * $Id: xide.prg,v 1.115 2002/11/07 20:27:46 what32 Exp $
  */
 
 /*
@@ -63,9 +63,9 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-//         :Add( ObjTree():Create( MainFrame ) )
-//         :Add( ObjInspect():Create( MainFrame ) )
-//         :Add( ObjEdit():Create( MainFrame ) )
+         :Add( ObjTree():Create( MainFrame ) )
+         :Add( ObjInspect():Create( MainFrame ) )
+         :Add( ObjEdit():Create( MainFrame ) )
          
          // focus to main Frame
          :SetFocus()
@@ -102,7 +102,7 @@ METHOD MainMenu() CLASS MainFrame
    WITH OBJECT ::WindowMenu
       :AddPopup('&Test')
       WITH OBJECT :Popup
-         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ):GetHandle():Show() } )
+         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ):GetHandle() } )
          :AddItem( 'Open', 102, {|| OpenProject():Create() } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
@@ -163,24 +163,20 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Dialogs" )
       :AddTab( "Samples" )
       :AddTab( "Activex" )
+      
+      :Configure()
    END 
    ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
-      //:Add( TRebar():Create( MainFrame:ToolTabs:StdTab ) )
-      //:Rebar1:SetStyle( WS_BORDER, .F. )
+      :Add( TRebar():Create( MainFrame:ToolTabs:StdTab ) )
+      :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
-         :FWidth := :Parent:Width
-         :FHeight:= :Parent:Height
-         
          :GetHandle()
-         :Show( SW_SHOW )
-         
-         view :Parent:Width, :Parent:Height, :Width, :Height
-         
          :SetStyle( TBSTYLE_CHECKGROUP )
+
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                           'RadioGroup', 'Panel', 'ActionList' }
@@ -201,16 +197,18 @@ METHOD MainToolBar() CLASS MainFrame
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
          //---------------------------------------------------------------------
       End
-      //:Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
+      :Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
       //:StdTools:Disable()
    End
-/*
+
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
-//      :Add( TRebar():Create( MainFrame:ToolTabs:Win32 ) )
-//      :Rebar1:SetStyle( WS_BORDER, .F. )
+      :Add( TRebar():Create( MainFrame:ToolTabs:Win32 ) )
+      :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( WinTools():Create( ::ToolTabs:Win32 ) )
+         :GetHandle()
          :SetStyle( TBSTYLE_CHECKGROUP )
+
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
                       '', '' }
          for n:=0 to 9
@@ -228,7 +226,7 @@ METHOD MainToolBar() CLASS MainFrame
          //---------------------------------------------------------------------
 
       End
-//      :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
+      :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
       //:WinTools:Disable()
    End
 
@@ -238,7 +236,7 @@ METHOD MainToolBar() CLASS MainFrame
 
    ::ToolTabs:Win32:WinTools:Name := "Win32Bar"
    ::SetLink( ::ToolTabs:Win32:WinTools )
-*/
+
 return(self)
 
 //----------------------------------------------------------------------------------------------

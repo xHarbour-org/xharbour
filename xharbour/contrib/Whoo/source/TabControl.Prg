@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.25 2002/11/05 21:39:59 what32 Exp $
+ * $Id: TabControl.Prg,v 1.26 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -143,7 +143,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    ENDIF
 
    IF oPage:FHandle == NIL
-//      oPage:CreateWnd()
+      oPage:CreateWnd()
    ENDIF
 
    IF Len( ::Controls ) > 1
@@ -186,7 +186,7 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
 METHOD Configure() CLASS TTabControl
 
-   LOCAL aTab //:=GetClientRect(::handle)
+   LOCAL aTab //:=GetClientRect(::FHandle)
    local acRect:={0,0,0,0}
    LOCAL aTemp
    LOCAL aWnd:={}
@@ -215,14 +215,17 @@ METHOD Configure() CLASS TTabControl
 
    FOR i:=1 TO LEN(::Controls)
       IF ::Controls[i]!=NIL
-
+         IF Empty( ::Controls[i]:FHandle )
+            ::GetHandle()
+         ENDIF
          ::Controls[i]:FLeft   := acRect[1]
          ::Controls[i]:FTop    := acRect[2]+acRect[4]
          ::Controls[i]:FWidth  := aTab[3]-6
          ::Controls[i]:FHeight := aTab[4]-acRect[2]-acRect[4]-4
  
          ::Controls[i]:Move( , , , , .T. )
-
+         
+         view LEN( ::Controls[i]:Controls )
       endif
    next
 
@@ -394,9 +397,9 @@ return( nil )
 
 METHOD GetObj( cName ) CLASS TTabControl
    local n:= ASCAN( ::Controls,{|o|o:Name==cName} )
-   if n>0
+   IF n>0
       return( ::Controls[n] )
-   endif
+   ENDIF
 return(nil)
 
 *-----------------------------------------------------------------------------*
@@ -422,6 +425,6 @@ return( Self )
 METHOD OnCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL
       RETURN(::Parent:SendTo:SendMessage( WM_COMMAND, nwParam, nlParam ))
-   endif
+   ENDIF
 return(0)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.57 2002/11/05 21:40:09 what32 Exp $
+ * $Id: xInspect.prg,v 1.58 2002/11/07 20:05:57 what32 Exp $
  */
 
 /*
@@ -51,13 +51,14 @@ CLASS ObjInspect FROM TForm
    METHOD Create()
    METHOD OnCloseQuery() INLINE 0
 
-   METHOD OnSize(n,x,y)  INLINE  /*::ComboBox1:Width := x,*/;
+/*
+   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Width := x,
                                  ::InspTabs:Move( , 25, x, y-25, .T. ),;
                                  ::browser:FWidth := ::InspTabs:Properties:ClientRect()[3],;
                                  ::browser:FHeight:= ::InspTabs:Properties:ClientRect()[4],;
                                  ::browser:Move( , , , , .T. ),;
                                  NIL
-
+*/
    METHOD SetBrowserData()
    METHOD SaveVar()
 ENDCLASS
@@ -110,16 +111,17 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::FHeight  := 297
    ::ExStyle  := WS_EX_TOOLWINDOW
 
-   super:Create( oParent )
+   super:Create( oParent ):GetHandle()
 
    ::Combo        := ComboInsp():Create( self )
    ::Add( ::Combo )
 
    ::Combo:FWidth := ::FWidth
-   ::Combo:FWidth := 100
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    ::Combo:SetItemHeight( -1, 15 )
-//   ::Combo:Show( SW_SHOW )
+
+   ::Combo:GetHandle()
+
 
    oTabs := TTabControl():Create( self )
    oTabs:FTop   := 25
@@ -129,11 +131,14 @@ METHOD Create( oParent ) CLASS ObjInspect
 
    ::Add( oTabs )
 
-   ::InspTabs:AddTab( "Properties" )
-   ::InspTabs:AddTab( "Events", TabPage():Create( ::InspTabs ) )
+   oTabs:GetHandle()
 
+
+   ::InspTabs:AddTab( "Properties", TabPage():Create( ::InspTabs ) )
+   ::InspTabs:AddTab( "Events", TabPage():Create( ::InspTabs ) )
+   oTabs:Configure()
+   
    ::Browser:=InspectBrowser():Create( ::InspTabs:Properties )
-   ::Browser:Show( SW_SHOW )
 
 return( Self )
 
@@ -343,14 +348,15 @@ METHOD Create( oParent ) CLASS InspectBrowser
 
    LOCAL oCol1,oCol2, aProp := { {"",""} }
 
+   ::Source := aProp
+
    super:Create( oParent )
 
    ::FLeft  := 0
    ::FTop   := 0
-   ::FWidth := 100
-   ::FHeight:= 100
-   ::Source := aProp
-   
+   ::FWidth := oParent:FWidth
+   ::FHeight:= oParent:FHeight
+
    ::BgColor      := GetSysColor( COLOR_BTNFACE )
    ::HiliteNoFocus:= GetSysColor( COLOR_BTNFACE )
    ::wantHScroll  :=.F.
@@ -369,6 +375,8 @@ METHOD Create( oParent ) CLASS InspectBrowser
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    ::Font          := oParent:Parent:font
+   
+   ::GetHandle()
    
 RETURN self
 

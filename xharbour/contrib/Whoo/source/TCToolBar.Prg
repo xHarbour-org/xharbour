@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.25 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.26 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -344,7 +344,7 @@ METHOD Create( oParent ) CLASS ToolButton //nImgIndex,cCaption,cHint,nId,bAction
 
    __objAddData( ::Parent, ::Name, HB_OO_CLSTP_PROTECTED )
    __ObjSetValueList( ::Parent, { { ::Name, self } } )
-   
+
    oParent:Add( Self )
 
 RETURN Self

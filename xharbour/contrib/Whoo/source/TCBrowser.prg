@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.15 2002/10/31 08:18:20 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.16 2002/11/07 20:05:55 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -368,7 +368,6 @@ METHOD Create( oParent ) CLASS TWBrowse
    ::HeadHeight      := 18
 
    ::ArrayMode       := .F.
-//   ::Source          := Source
 
    ::HeadText     :={}
    ::HeadAlign    :={}
@@ -412,8 +411,6 @@ METHOD CreateWnd() CLASS TWBrowse
          ::Source := ALIAS()
 
    ENDCASE
-   
-   TraceLog( ::ArrayMode, ::Source )
    
    IF ::ArrayMode
       ::Element   := 1

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.16 2002/11/05 21:40:09 what32 Exp $
+ * $Id: xTree.prg,v 1.17 2002/11/07 20:05:58 what32 Exp $
  */
 
 /*
@@ -55,7 +55,7 @@ METHOD Create( oParent ) CLASS ObjTree
    ::FTop     := 125
    ::FWidth   := 200
    ::FHeight  := 150
-   ::ExStyle := WS_EX_TOOLWINDOW
+   ::ExStyle  := WS_EX_TOOLWINDOW
 
    super:Create( oParent )
 

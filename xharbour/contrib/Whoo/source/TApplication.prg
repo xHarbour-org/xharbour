@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.41 2002/11/07 20:15:58 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.42 2002/11/07 20:27:45 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -158,11 +158,8 @@ RETURN oForm
 
 METHOD RemoveForm( oForm ) CLASS Application
    local nRet, n
-   IF( n:= aScan( ::aForms,{|o|o:handle == oForm:handle} ) )>0
-      aDel( ::aForms, n, .T. )
-      IF LEN( ::aForms ) == 0
-         nRet := 1
-      ENDIF
+   IF oForm == ::MainForm
+      nRet := 1
    ENDIF
 return(nRet)
 
