@@ -14,12 +14,14 @@ static oApp
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
-   local oTool, oRebar, n
+   local oTool, oRebar, n, oSplash
    LOCAL hImg1,hImg2,hBmp,aStdTab
    
    oApp := Application():Initialize()
-   WITH OBJECT oApp
 
+   oSplash := Splash():New( oApp )
+
+   WITH OBJECT oApp
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
          :WindowMenu := TMenu():New()
          :SetStyle( WS_THICKFRAME, .F. )
@@ -125,7 +127,9 @@ FUNCTION Main
             :SetPanelText( 2, "Enjoy" )
          END
       END
-
+      
+      UpdateWindow(oApp:MainFrame:handle)
+    
       :Run()
   END
 RETURN( nil)
@@ -149,3 +153,29 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------
 
 
+CLASS Splash FROM TForm
+   DATA bitmap
+   METHOD New() CONSTRUCTOR
+   METHOD OnPaint( hDC ) INLINE DrawBitmap(hDC,::bitmap),0
+   METHOD OnDestroy()    INLINE DeleteObject(::bitmap),NIL
+   METHOD OnTimer(n)     INLINE if( n==1,::Destroy(),)
+ENDCLASS
+
+METHOD New( oParent ) CLASS Splash
+   local aRect,abRect
+   super:new( oParent )
+   aRect := GetWindowRect(GetDesktopWindow())
+   
+   ::bitmap:= LoadImage( NIL, "visual_xharbour.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+   abRect  := GetBitmapSize( ::bitmap )
+   
+   ::width := abRect[1]
+   ::height:= abRect[2]
+   ::left  := (aRect[3]/2)-(::width/2)
+   ::top   := (aRect[4]/2)-(::height/2)
+   ::style := WS_POPUP + WS_BORDER
+   ::ExStyle:= WS_EX_TOPMOST
+   ::Create()
+   SetTimer( ::handle, 1, 5000 )
+   UpdateWindow( ::handle)
+return( self )
