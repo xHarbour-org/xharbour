@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.8 2003/03/14 11:22:32 jonnymind Exp $
+# $Id: Makefile,v 1.9 2003/04/25 23:02:49 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -20,12 +20,12 @@
 #
 
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt
+MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt -lmacromt
 ifeq ($(HB_ARCHITECTURE),linux)
 MTLIBS+=-lpthread
 endif
 else
-  MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx
+  MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx -lmacro
 endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
@@ -64,6 +64,6 @@ endif
 
 %$(EXE_EXT): %.o
 	gcc -o $@ $< $(C_USR) -I$(HB_INC_INSTALL) -L$(HB_LIB_INSTALL) \
-		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
+		-ldebug $(MTLIBS) -lpp  -llang  -lcommon\
 		$(GT_LIBS) -lm\
 

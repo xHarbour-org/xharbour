@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.15 2003/05/11 15:14:29 jonnymind Exp $
+ * $Id: Changelog,v 1.16 2003/05/14 10:03:57 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -46,7 +46,6 @@
   * test/xwt_test.prg
     + Added a test for togglebuttons and Widget::GetType()
     
-[gian@head xwt]$
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/splitter.prg
     ! Fixed a mispelled macro.

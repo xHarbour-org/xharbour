@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:27 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2002/01/29 08:00:26 ronpinkas Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -49,6 +49,9 @@ C_SOURCES=\
 	macrob.c \
 	macroc.c \
 
+ifeq ($(HB_MT),MT)
+   MT_LIBNAME=macromt
+endif
 
 LIBNAME=macro
 
