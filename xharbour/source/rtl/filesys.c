@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.67 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: filesys.c,v 1.68 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -3350,17 +3350,27 @@ int GnuErrtoDosErr( int ErrCode )
 }
 #elif defined(__WATCOMC__)
 {
-    if (ErrCode == EMFILE)
-        iResult = 4 ;
-
-    if (ErrCode == ESPIPE)
-        iResult = 25;
-
-    if (ErrCode == EACCES )
-        iResult = 5  ;
-
-    if (ErrCode == ENOENT)
-        iResult = 2;
+   switch ( ErrCode )
+   {
+      case ENOENT:
+         iResult = 2;
+         break;
+      case EMFILE:
+         iResult = 4;
+         break;
+      case EACCES:
+         iResult = 5;
+         break;
+      case EBADF:
+         iResult = 6;
+         break;
+      case ESPIPE:
+         iResult = 25;
+         break;
+      default:
+         iResult = ErrCode;
+         break;
+   }
 }
 #elif defined(__GNUC__)
 {

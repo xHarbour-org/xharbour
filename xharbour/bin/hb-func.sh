@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.11 2004/01/30 02:06:31 druzus Exp $
+# $Id: hb-func.sh,v 1.12 2004/02/07 11:41:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -76,6 +76,8 @@ mk_hbtools()
     HB_SYS_LIBS="-lm"
     if [ "${HB_COMPILER}" = "mingw32" ]; then
 	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+    elif [ "${HB_COMPILER}" = "djgpp" ]; then
+	HB_SYS_LIBS="${HB_SYS_LIBS}"
     else
 	if [ "${HB_NCURSES_194}" = "yes" ]; then
             HB_SYS_LIBS="${HB_SYS_LIBS} -lncur194"

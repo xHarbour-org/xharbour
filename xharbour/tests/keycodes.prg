@@ -181,22 +181,35 @@ aadd(aKeys, { "K_RBUTTONDOWN",   1004, "mouse right button down"        }  )
 aadd(aKeys, { "K_RBUTTONUP",     1005, "mouse right button up"          }  )
 aadd(aKeys, { "K_LDBLCLK",       1006, "mouse left button double click" }  )
 aadd(aKeys, { "K_RDBLCLK",       1007, "mouse right button double click"}  )
+aadd(aKeys, { "K_MBUTTONDOWN",   1008, "mouse middle button down"       }  )
+aadd(aKeys, { "K_MBUTTONUP",     1009, "mouse middle button up"         }  )
+aadd(aKeys, { "K_MDBLCLK",       1010, "mouse middle button double click"}  )
+aadd(aKeys, { "K_MMLEFTDOWN",    1011, "mouse move left down"           }  )
+aadd(aKeys, { "K_MMRIGHTDOWN",   1012, "mouse move right down"          }  )
+aadd(aKeys, { "K_MMMIDDLEDOWN",  1013, "mouse move middle down"         }  )
+aadd(aKeys, { "K_MWFORWARD",     1014, "mouse wheel forward"            }  )
+aadd(aKeys, { "K_MWBACKWARD",    1015, "mouse wheel nackward"           }  )
 
 setcancel(.f.)
-//altd(0)
-? "@ - interrupt, keycodes checking: "
+//altd(0)  // it's unnecessary now since now VM detect if debugger
+           // is linked and disable altd() if not
+? "@ - interrupt, SPACE - sleep for 3 seconds, keycodes checking: "
 ?
 while (.t.)
   k:=inkey(0)
   if (i:=ascan(aKeys, { |x| x[2]==k }))!=0
     ? " key:"+str(aKeys[i,2],7)+"  "+padr(aKeys[i,1],18)+aKeys[i,3]
-  elseif k>=32 .and. k<=126
+  elseif (k>=32 .and. k<=126) .or. (k>=160 .and. k<=255) .or. IsAlpha(chr(k))
     ? "char:"+str(k,7)+"  "+chr(k)
   else
     ? " key:"+str(k,7)
   endif
   if k==64 .and. nextkey()==0
     exit
+  elseif k==32 .and. nextkey()==0
+    ? "sleep for 3 seconds..."
+    hb_idlesleep(3)
+    ?? "OK"
   endif
 enddo
 ?

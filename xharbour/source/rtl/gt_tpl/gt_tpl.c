@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.6 2004/02/01 23:40:49 jonnymind Exp $
+ * $Id: gt_tpl.c,v 1.7 2004/02/06 17:07:28 jonnymind Exp $
  */
 
 /*
@@ -861,11 +861,21 @@ static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup HB_GT_FUNC(_gt_Init_)
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_Init_
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
+   #pragma data_seg()
 #endif
 
 #endif  /* HB_MULTI_GT */

@@ -1,5 +1,5 @@
 /*
- * $Id: run.c,v 1.12 2001/06/18 18:12:00 dholm Exp $
+ * $Id: run.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
  */
 
 /*
@@ -59,7 +59,8 @@
 
 HB_FUNC( __RUN )
 {
-#if defined(__TURBOC__) || defined(__BORLANDC__) || defined(_MSC_VER) || defined(__IBMCPP__) || defined(__GNUC__)
+#if defined(__TURBOC__) || defined(__BORLANDC__) || defined(_MSC_VER) || \
+    defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__)
    if( ISCHAR( 1 ) && hb_gtSuspend() == 0 )
    {
       system( hb_parc( 1 ) );

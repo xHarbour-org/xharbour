@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.26 2004/02/09 16:31:24 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.27 2004/02/13 18:25:23 jonnymind Exp $
  */
 
 /*
@@ -4457,11 +4457,12 @@ static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup HB_GT_FUNC(_gt_Init_)
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_Init_
 #endif
 
 #endif  /* HB_MULTI_GT */

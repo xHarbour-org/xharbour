@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.59 2004/02/12 19:25:32 andijahja Exp $
+ * $Id: dbf1.c,v 1.60 2004/02/17 18:44:13 andijahja Exp $
  */
 
 /*
@@ -881,8 +881,8 @@ static ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
       return SUCCESS;
    }
    else
-      /* return SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip ); */
-      return SELF_GOTO( ( AREAP ) pArea, ((LONG)pArea->ulRecNo + lToSkip) <= 0 ? 0 : (pArea->ulRecNo + lToSkip));
+      return SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo + lToSkip );
+      /* return SELF_GOTO( ( AREAP ) pArea, ((LONG)pArea->ulRecNo + lToSkip) <= 0 ? 0 : (pArea->ulRecNo + lToSkip)); */
 }
 
 /*
@@ -2149,6 +2149,9 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    BYTE * pBuffer;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSort(%p, %p)", pArea, pSortInfo));
+
+   if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+      return FAILURE;
 
    if( !hb_dbQSortInit( &dbQuickSort, pSortInfo, pArea->uiRecordLen ) )
       return FAILURE;

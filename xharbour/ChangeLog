@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2316 2004/02/18 10:50:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.2317 2004/02/18 20:15:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-18 22:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * respect SET STRICTREAD flag in indexing
+
+  * xharbour/source/rdd/dbf1.c
+    * SELF_GOCOLD in hb_dbfSort added
+    * removed limit of record numbers hb_dbfSkipRaw
+
+  * xharbour/tests/keycodes.prg
+    * new mouse keycodes added
+
+  * xharbour/source/rtl/run.c
+    + support for __RUN in OpenWatcom
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+    * basic changes for xhb* scripts for DJGPP (not ready yet)
+
+  * xharbour/source/rtl/filestat.c
+    * casting for OpenWatcom
+
+  * xharbour/source/rtl/filesys.c
+    * DOS error codes fixes for OpenWatcom
+
+  * xharbour/source/rtl/gt_tpl/gt_tpl.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+    * changes to using the new macro HB_PRAGMA_STARTUP
+
 2004-02-19 03:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.c
     + static void hb_compCheckIllegalChar( char * ) to verify illegal chars.

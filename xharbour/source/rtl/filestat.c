@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.2 2004/02/11 16:07:56 jonnymind Exp $
+ * $Id: filestat.c,v 1.3 2004/02/11 19:11:52 andijahja Exp $
  */
 
 /*
@@ -264,13 +264,13 @@ BOOL hb_fsFileStats(
    #else
    PHB_FFIND findinfo;
    /* Generic algorithm based on findfirst */
-   findinfo = hb_fsFindFirst( pszFileName, HB_FA_ALL );
+   findinfo = hb_fsFindFirst( (char*) pszFileName, HB_FA_ALL );
    if ( ! findinfo )
    {
       return FALSE;
    }
 
-   hb_fsAttrDecode( findinfo->attr, pszAttr );
+   hb_fsAttrDecode( findinfo->attr, (char*) pszAttr );
    *llSize = findinfo->size;
    *lcDate = findinfo->lDate;
    *lcTime = (findinfo->szTime[0] - '0') * 36000 +

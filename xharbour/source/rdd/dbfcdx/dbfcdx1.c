@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.100 2004/02/14 22:57:15 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.101 2004/02/17 18:44:13 andijahja Exp $
  */
 
 /*
@@ -7741,15 +7741,20 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       pSaveFilter = pArea->dbfi.itmCobExpr;
       pArea->dbfi.itmCobExpr = NULL;
 
-      bDirectRead = TRUE;
-      if ( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll )
-         bDirectRead = FALSE;
-      if ( pArea->lpdbRelations )
-         bDirectRead = FALSE;
+      pSort = hb_cdxSortNew( pTag, pTag->UniqueKey );
+      pItem = hb_itemNew( NULL );
+      ulRecCount = pArea->ulRecCount;
+      pForItem = pTag->pForItem;
+      bForOk = TRUE;
+      pEvalItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobEval : NULL);
+      pWhileItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobWhile : NULL);
       bEnd = FALSE;
+      bDirectRead = !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
+                    ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll );
       if ( !bDirectRead )
       {
-         if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll || pArea->lpdbOrdCondInfo->fUseCurrent ) {
+         if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll || pArea->lpdbOrdCondInfo->fUseCurrent )
+         {
             SELF_GOTOP( ( AREAP ) pArea );
          }
          else
@@ -7765,24 +7770,14 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             }
          }
       }
-      pSort = hb_cdxSortNew( pTag, pTag->UniqueKey );
-      pItem = hb_itemNew( NULL );
-      ulRecCount = pArea->ulRecCount;
-      pForItem = pTag->pForItem;
-      bForOk = TRUE;
-      pEvalItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobEval : NULL);
-      pWhileItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobWhile : NULL);
       for ( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++ )
       {
          if ( bDirectRead )
          {
             hb_fsSeek( pArea->hDataFile,
-                     pArea->uiHeaderLen +
-                     ( ulRecNo - 1 ) * pArea->uiRecordLen,
-                     FS_SET );
-            hb_fsRead( pArea->hDataFile,
-                     pArea->pRecord,
-                     pArea->uiRecordLen );
+                       pArea->uiHeaderLen + ( ulRecNo - 1 ) * pArea->uiRecordLen,
+                       FS_SET );
+            hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen );
             pArea->ulRecNo = ulRecNo;
             pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
          }
@@ -7887,6 +7882,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          hb_cdxTagEmptyIndex( pTag );
       hb_cdxSortFree( pSort );
       hb_itemRelease( pItem );
+
       hb_set.HB_SET_DELETED = bSaveDeleted;
       pArea->dbfi.itmCobExpr = pSaveFilter;
       pTag->TagChanged = TRUE;

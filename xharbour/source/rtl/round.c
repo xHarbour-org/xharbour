@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.10 2004/02/09 18:00:37 druzus Exp $
+ * $Id: round.c,v 1.11 2004/02/13 11:02:35 druzus Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ double hb_numRound( double dNum, int iDec )
    dPow = hb_numPow10( iDec );
    doComplete5 = dNum * dPow * doBase;
 
-#if 1
+#if 0
    /*
     * this is a hack for people who cannot live without hacked FL values
     * in rounding

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: postinst.sh,v 1.2 2003/12/12 10:16:05 druzus Exp $
+# $Id: postinst.sh,v 1.3 2003/12/18 10:55:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -34,7 +34,7 @@ else
 fi
 . ${hb_root}/bin/hb-func.sh
 
-if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ]
+if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
 then
     install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     mk_hbtools "${HB_BIN_INSTALL}"
