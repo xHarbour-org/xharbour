@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.9 2003/12/10 01:48:33 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.10 2003/12/10 13:30:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -16,10 +16,10 @@
 
 CLASS tIPClientHTTP FROM tIPClient
    DATA cMethod
-   DATA nVersion
    DATA nReplyCode
    DATA cReplyDescr
-   DATA nSubversion
+   DATA nVersion     INIT  1
+   DATA nSubversion  INIT  0
    DATA bChunked
    DATA hHeaders     INIT  {=>}
    DATA hCookies     INIT  {=>}
@@ -60,13 +60,21 @@ RETURN .F.
 
 
 METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
-   LOCAL cData, nI
+   LOCAL cData, nI, cTmp
 
    IF HB_IsHash( cPostData )
       cData := ""
       FOR nI := 1 TO Len( cPostData )
-         cData += TipEncoderUrl_Encode( AllTrim(CStr(HGetKeyAt( cPostData, nI ))) ) + "=" +;
-           TipEncoderUrl_Encode( AllTrim(CStr( HGetValueAt( cPostData, nI  )))) + "&"
+         cTmp := HGetKeyAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp +"="
+         cTmp := HGetValueAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp
       NEXT
       cData[-1] = ""
    ELSEIF HB_IsString( cPostData )

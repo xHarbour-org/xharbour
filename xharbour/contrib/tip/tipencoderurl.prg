@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderurl.prg,v 1.1 2003/12/01 00:19:40 jonnymind Exp $
+* $Id: tipencoderurl.prg,v 1.2 2003/12/10 13:30:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -50,7 +50,7 @@ HB_FUNC( TIPENCODERURL_ENCODE )
    }
 
    // Giving maximum final length possible
-   cRet = (char *) hb_xgrab( nLen * 3 );
+   cRet = (char *) hb_xgrab( nLen * 3 +1);
 
    while ( nPos < nLen )
    {
@@ -63,12 +63,13 @@ HB_FUNC( TIPENCODERURL_ENCODE )
       else if (
          (cElem >= 'A' && cElem <= 'Z') ||
          (cElem >= 'a' && cElem <= 'z') ||
+         (cElem >= '0' && cElem <= '9') ||
          cElem == '.' || cElem == ',' || cElem == '&' ||
-         cElem == '=' || cElem == '/' || cElem == ';' || cElem =='_' )
+         cElem == '/' || cElem == ';' || cElem =='_' )
       {
          cRet[ nPosRet ] = cElem;
       }
-      else if ( ! bComplete && ( cElem == ':' || cElem == '?' ) )
+      else if ( ! bComplete && ( cElem == ':' || cElem == '?' || cElem == '=' ) )
       {
          cRet[ nPosRet ] = cElem;
       }
@@ -85,8 +86,9 @@ HB_FUNC( TIPENCODERURL_ENCODE )
       nPos++;
    }
 
+   cRet[ nPosRet ] = 0;
    /* this function also adds a zero */
-   hb_retclenAdopt( cRet, nPosRet );
+   hb_retclenAdoptRaw( cRet, nPosRet );
 }
 #pragma ENDDUMP
 
