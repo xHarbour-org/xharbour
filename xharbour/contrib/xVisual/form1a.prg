@@ -3,6 +3,7 @@ GLOBAL Form1
 #include "hbclass.ch"
 #include "xide.ch"
 
+// ! AUTO_GENERATED !
 CLASS TForm1 FROM TForm
 
       VAR BIMAXIMIZE INIT .T.
