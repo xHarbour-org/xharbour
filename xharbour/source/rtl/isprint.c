@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.6 2002/05/03 07:38:45 ronpinkas Exp $
+ * $Id: isprint.c,v 1.7 2002/05/04 04:02:37 ronpinkas Exp $
  */
 
 /*
@@ -429,7 +429,7 @@ HB_FUNC(GETPRINTERS)
     PHB_ITEM pArrayPrinter= hb_itemArrayNew( 0 );
     unsigned long needed,returned,a;
     PRINTER_INFO_5 buffer[MAX_PRINTERS];
-    EnumPrinters(PRINTER_ENUM_LOCAL,NULL,5,(LPBYTE)buffer,
+    EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS,NULL,5,(LPBYTE)buffer,
                 MAX_PRINTERS*sizeof(PRINTER_INFO_5),
                 &needed,&returned);
    for (a=0; a<returned; a++){
