@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3 2002/09/06 10:49:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.4 2002/09/06 15:42:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-06 21:54 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * make_b32.bat
+    * Updated little fixies
 
 2002-09-06 08:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * make_b32.bat
@@ -27,14 +31,14 @@
       SETRECT() function Return an Array on Success, NIL on Failure
       UNIONRECT() function Return an Array on Success, NIL on Failure
       SUBTRACTRECT() function Return an Array on Success, NIL on Failure
-23/07/2002 AJ Wos      
+23/07/2002 AJ Wos
       Moved ValidateRect from _WinRgn.c to WinRect.c
       Added toolbar.ch
       Added tbstruct.ch
 24/07/2002 AJ Wos
-      Corrected parameters in GetObject() -> cObjBytes:=GetObject(hObj) 
+      Corrected parameters in GetObject() -> cObjBytes:=GetObject(hObj)
 25/07/2002 AJ Wos
-      What32.ch updated, more pseudo-functions added 
+      What32.ch updated, more pseudo-functions added
 25/07/2002 August Infante
       WhBrowse: Corrected parameters for vertical alignment now it accepts TA_TOP / TA_CENTER / TA_BOTTOM
 25/07/2002 August Infante
@@ -46,7 +50,7 @@
       tbstruct.ch created - REBAR structures
       ErrorSys.Prg bug fixed
 28/07/2002 AJ Wos
-      Updated What32.ch MAKELPARAM definition added 
+      Updated What32.ch MAKELPARAM definition added
 03/08/2002 AJ Wos
       Windows.ch updated, more message definitions added
 03/08/2002 August Infante
@@ -61,7 +65,7 @@
       Updated WinTypes.ch
 05/08/2002 August Infante
       Added GetBitmapSize(hBmp)->aSize function (_WinBmp.c)
-      Added BitmapToRegion(hBmp)->hRgn function       
+      Added BitmapToRegion(hBmp)->hRgn function
 
 10/08/2002 August Infante
       Added graphical calculator function to WinPlus.Lib
@@ -70,7 +74,7 @@
       Created SQL API raw function calls library
       Added sqltypes.ch
       Changed IMPORT syntax, replaced ALIAS clause with AS clause
-      to improve function calling. Suffix "A" no longer necessary   
+      to improve function calling. Suffix "A" no longer necessary
 
 12/08/2002 AJ Wos
       Added SnapShot() function WinUtil.Prg
@@ -81,7 +85,7 @@
 13/08/2002 AJ Wos
       Corrected whBrowse record pointer during :configure()
       Cleaned up windows.ch and wingdi.ch
-      
+
 13/08/2002 August Infanfe
       Added BubbleTip to WhatPlus PlusBubl.Prg
 
@@ -108,7 +112,7 @@
       Added FreeEnvironmentStrings() to _WinMisc.c
       Corrected CreateDirectory() in _WinDir.c
 
- 
+
 
 
 
