@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.4 2003/07/19 02:26:18 jonnymind Exp $
+* $Id: hbdict.prg,v 1.5 2003/07/19 07:24:09 fsgiudice Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -30,6 +30,7 @@ PROCEDURE Main( cInput, cOutput )
    LOCAL nKey
    LOCAL lModified := .F.
 
+   Save Screen
    SET COLOR TO W+/B
    CLEAR SCREEN
 
@@ -53,6 +54,11 @@ PROCEDURE Main( cInput, cOutput )
 
    // now we must merge duplicated strings
    MergeDuplicates( aInput[2] )
+   // Sorting records
+   IF SubStr( aInput[1][1], 2 ) == "HIL"
+      ASort( aInput[2],,,{| x, y | AsciiOrder(x[1], y[1]) < 0} )
+   ENDIF
+
    //then we try to load the output table
    if cInput != cOutput
       aOutput := HB_I18nLoadTable( cOutput )
@@ -67,10 +73,6 @@ PROCEDURE Main( cInput, cOutput )
       ENDIF
    ENDIF
 
-   // Sorting records
-   IF SubStr( aInput[1][1], 2 ) == "HIL"
-      ASort( aInput[2],,,{| x, y | UPPER(x[1]) < UPPER(y[1])} )
-   ENDIF
 
    // Informing user
    ShowHeader( aInput[1] )
@@ -88,7 +90,7 @@ PROCEDURE Main( cInput, cOutput )
       IF nKey == K_ESC
          IF lModified
             IF( Alert( i18n( "Dictionary modified ! Do you really want to exit?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1 )
-              EXIT
+            EXIT
             ENDIF
          ELSE
             EXIT
@@ -174,6 +176,7 @@ PROCEDURE Main( cInput, cOutput )
 
    ENDDO
 
+   Restore screen
 RETURN
 
 PROCEDURE DoQuit()
@@ -196,8 +199,8 @@ RETURN
 
 PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
    @nRow, nCol, nRowTo, nColTo ;
-        BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
-        Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
+      BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
+      Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 RETURN
 
 PROCEDURE MakeBoxShadow( nRow, nCol, nRowTo, nColTo )
@@ -350,6 +353,31 @@ PROCEDURE MergeTables( aInTable, aOutTable )
    NEXT
 
 RETURN
+
+***************************************************
+* Sorting input
+*
+FUNCTION AsciiOrder( cStr1, cStr2 )
+   LOCAL nPos := 1
+
+   DO WHILE nPos <= Len( cStr1 ) .and. nPos <= Len( cStr2 )
+      IF asc( cStr1[nPos] ) < asc( cStr2[ nPos ] )
+         RETURN -1
+      ELSEIF asc( cStr1[nPos] ) < asc( cStr2[ nPos ] )
+         RETURN 1
+      ELSE
+         nPos ++
+      ENDIF
+   ENDDO
+
+   IF Len( cStr1 ) < Len( cStr2 )
+      RETURN -1
+   ELSEIF Len( cStr1 ) > Len( cStr2 )
+      RETURN 1
+   ENDIF
+
+RETURN 0
+
 
 
 ***************************************************

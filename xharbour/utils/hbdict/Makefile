@@ -1,7 +1,7 @@
 # xHarbour project
 # Makefile for hbdict
 #
-# $Id: Makefile,v 1.12 2003/06/20 17:32:42 jonnymind Exp $
+# $Id: Makefile,v 1.1 2003/06/21 06:59:23 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -50,7 +50,7 @@ endif
 all: hbdict
 
 %.c: %.prg
-	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
+	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n -j $<
 %.o: %.c
 	gcc -I$(HB_INC_INSTALL) -c -o $@ $<
 

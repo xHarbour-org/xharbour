@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.8 2003/06/23 14:04:15 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.10 2003/07/24 20:53:45 andijahja Exp $
  */
 
 /*
@@ -31,7 +31,7 @@
  * www - http://www.harbour-project.org
  *
  * Copyright 2000 Ron Pinkas <Ron@Profit-Master.com>
- *    hb_compChkCompilerSwitch()
+ *    hb_compChkCompilerScmdwitch()
  *
  * Copyright 1999 Jose Lalin <dezac@corevia.com>
  *    hb_compChkEnvironVar()
@@ -279,20 +279,22 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                      case 'j':
                      case 'J':
                         hb_comp_bI18n = TRUE;
+                        Switch[2] = '\0';
+
                         if ( Args[i][2] )
                         {
-                           hb_comp_szHILout = (char *) hb_xgrab( strlen( Args[i] + 2 ) );
-                           strcpy( hb_comp_szHILout, Args[i] + 2);
-                           j += strlen( hb_comp_szHILout )+2;
+                           hb_comp_szHILout = (char *) hb_xgrab( strlen( Args[i] ) );
+                           strcpy( hb_comp_szHILout, Args[i] +2);
+                           j = strlen( Args[i] );
                         }
                         else
                         {
                            hb_comp_szHILout = NULL;
-                           j+=2;
+                           j=2;
                         }
 
                         /* The file will be eventually created when we find an i18n() */
-                        break;
+                        continue;
 
                      case 'n' :
                      case 'N' :

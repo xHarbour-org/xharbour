@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1415 2003/09/04 19:27:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1416 2003/09/04 22:05:01 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-05 03:14 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+   * utils/hbdict/Makefile
+      ! added -j to compilation switches
+
+   * utils/hbdict/hbdict.prg
+      ! fixed HIL table ordering routine.
+
+   * source/compiler/cmdcheck.c
+      ! fixed interpretation of switch -j and -jfilename
+
+
 2003-09-05 04:50 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * hrbdll.bc
    * hrbdll.vc
