@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.36 2001/06/18 18:12:00 dholm Exp $
+ * $Id: objfunc.prg,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
  */
 
 /*
@@ -54,8 +54,9 @@
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
+ * Copyright 2002 Ron Pinkas <ron@ronpinkas.com>
  *    __objGetMsgList
+ *    __objGetValueList
  *
  * Copyright 2000 Jf. Lefebvre <jfl@mafact.com> and Ra. Cuylen <rac@mafact.com>
  *    __objDerivedFrom
@@ -76,8 +77,7 @@ FUNCTION __objHasData( oObject, cSymbol )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   RETURN __objHasMsg( oObject, cSymbol ) .AND. ;
-          __objHasMsg( oObject, "_" + cSymbol )
+RETURN __objHasMsg( oObject, cSymbol ) .AND. __objHasMsg( oObject, "_" + cSymbol )
 
 FUNCTION __objHasMethod( oObject, cSymbol )
 
@@ -85,103 +85,88 @@ FUNCTION __objHasMethod( oObject, cSymbol )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   RETURN __objHasMsg( oObject, cSymbol ) .AND. ;
-          !__objHasMsg( oObject, "_" + cSymbol )
-
+RETURN __objHasMsg( oObject, cSymbol ) .AND. ! __objHasMsg( oObject, "_" + cSymbol )
 
 // nCLassType can be 0, 1 or 2 see hbOO.ch
 //#define HB_MSGLISTALL   0
 //#define HB_MSGLISTCLASS 1
 //#define HB_MSGLISTPURE  2
 
-FUNCTION __objGetMsgList( oObject, lDataMethod, nClassType )
-   LOCAL aInfo
-   LOCAL aData
-   LOCAL n
-   LOCAL nLen
+FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
 
-   IF !ISOBJECT( oObject )
-      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   LOCAL aMessages
+   LOCAL aReturn
+   LOCAL nFirstProperty, cMsg
+
+   IF ValType( oObject ) != 'O'
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
    ENDIF
 
-   IF !ISLOGICAL( lDataMethod )
-      lDataMethod := .T.
+   IF ValType( lData ) != 'L'
+      lData := .T.
    ENDIF
 
-   IF !ISNUMBER( nClassType  )
-      nClasstype  := HB_MSGLISTALL
-   ENDIF
+   // nRange is already defaulted in ClassSel in classes.c
 
-   aInfo := ASort( oObject:ClassSel(nClassType) )
-   aData := {}
-   n     := 1
-   nLen  := Len( aInfo )
+   aMessages := ASort( oObject:ClassSel( nRange, nScope ) )
+   aReturn   := {}
 
-   DO WHILE n <= nLen .AND. !( Substr( aInfo[ n ], 1, 1 ) == "_" )
+   nFirstProperty := aScan( aMessages, { | cElement | cElement[1] == '_' } )
 
-      /* If in range and no set function found yet ( set functions */
-      /* begin with a leading underscore ).                        */
-
-      // If found -> DATA
-      //     else    METHOD
-
-      /* Find position of matching set function in array with all symbols */
-
-      IF ( AScan( aInfo, {| tmp | tmp == ( "_" + aInfo[ n ] ) }, n + 1 ) != 0 ) == lDataMethod
-         AAdd( aData, aInfo[ n ] )
+   FOR EACH cMsg IN aMessages
+      IF cMsg[1] = '_'
+         EXIT
       ENDIF
 
-      n++
-
-   ENDDO
-
-   RETURN aData
-
-FUNCTION __objGetMethodList( oObject )
-
-   IF !ISOBJECT( oObject )
-      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
-   ENDIF
-
-   RETURN __objGetMsgList( oObject, .F. )
-
-FUNCTION __objGetValueList( oObject, aExcept )
-   LOCAL aDataSymbol
-   LOCAL nLen
-   LOCAL aData
-   LOCAL cSymbol
-   LOCAL n
-
-   IF !ISOBJECT( oObject )
-      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
-   ENDIF
-
-   IF !ISARRAY( aExcept )
-      aExcept := {}
-   ENDIF
-
-   aDataSymbol := __objGetMsgList( oObject )
-   nLen        := Len( aDataSymbol )
-   aData       := {}
-
-   FOR n := 1 to nLen
-      cSymbol := aDataSymbol[ n ]
-      IF AScan( aExcept, {| tmp | tmp == cSymbol } ) == 0
-         AAdd( aData, { cSymbol, __objSendMsg( oObject, cSymbol ) } )
+      IF ( AScan( aMessages, { | cElement | cElement == "_" + cMsg }, nFirstProperty ) != 0 ) == lData
+         AAdd( aReturn, cMsg )
       ENDIF
    NEXT
 
-   RETURN aData
+RETURN aReturn
+
+FUNCTION __objGetMethodList( oObject, nScope )
+
+   IF !ISOBJECT( oObject )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+RETURN __objGetMsgList( oObject, .F., HB_MSGLISTALL, nScope )
+
+FUNCTION __objGetValueList( oObject, aExcept, nScope )
+
+   LOCAL aVars
+   LOCAL aReturn
+   LOCAL cVar
+
+   IF ValType( oObject ) != 'O'
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+   IF ValType( aExcept ) != 'A'
+      aExcept := {}
+   ENDIF
+
+   aVars   := __objGetMsgList( oObject, .T., HB_MSGLISTALL, nScope )
+   aReturn := {}
+
+   FOR EACH cVar IN aVars
+      IF AScan( aExcept, { | cElement | cElement == cVar } ) == 0
+         AAdd( aReturn, { cVar, __objSendMsg( oObject, cVar ) } )
+      ENDIF
+   NEXT
+
+RETURN aReturn
 
 FUNCTION __ObjSetValueList( oObject, aData )
 
    IF !ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSE
-      AEval( aData, {| aItem | __objSendMsg( oObject, "_" + aItem[ HB_OO_DATA_SYMBOL ], aItem[ HB_OO_DATA_VALUE ] ) } )
+      aEval( aData, { | aItem | __objSendMsg( oObject, "_" + aItem[ HB_OO_DATA_SYMBOL ], aItem[ HB_OO_DATA_VALUE ] ) } )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objAddMethod( oObject, cSymbol, nFuncPtr )
 
@@ -191,7 +176,7 @@ FUNCTION __objAddMethod( oObject, cSymbol, nFuncPtr )
       __clsAddMsg( oObject:ClassH, cSymbol, nFuncPtr, HB_OO_MSG_METHOD, NIL, 1 )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objAddInline( oObject, cSymbol, bInline )
 
@@ -201,7 +186,7 @@ FUNCTION __objAddInline( oObject, cSymbol, bInline )
       __clsAddMsg( oObject:ClassH, cSymbol, bInline, HB_OO_MSG_INLINE, NIL, 1 )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objAddData( oObject, cSymbol )
    LOCAL nSeq, hClass
@@ -215,7 +200,7 @@ FUNCTION __objAddData( oObject, cSymbol )
       __clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, 1 )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objModMethod( oObject, cSymbol, nFuncPtr )
 
@@ -225,7 +210,7 @@ FUNCTION __objModMethod( oObject, cSymbol, nFuncPtr )
       __clsModMsg( oObject:ClassH, cSymbol, nFuncPtr )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objModInline( oObject, cSymbol, bInline )
 
@@ -235,7 +220,7 @@ FUNCTION __objModInline( oObject, cSymbol, bInline )
       __clsModMsg( oObject:ClassH, cSymbol, bInline )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objDelMethod( oObject, cSymbol )
 
@@ -245,10 +230,11 @@ FUNCTION __objDelMethod( oObject, cSymbol )
       __clsDelMsg( oObject:ClassH, cSymbol )
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objDelInline( oObject, cSymbol )
-   RETURN __objDelMethod( oObject, cSymbol )              // Same story
+
+RETURN __objDelMethod( oObject, cSymbol )              // Same story
 
 FUNCTION __objDelData( oObject, cSymbol )
 
@@ -260,7 +246,7 @@ FUNCTION __objDelData( oObject, cSymbol )
       __cls_DecData( oObject:ClassH )         // Decrease wData
    ENDIF
 
-   RETURN oObject
+RETURN oObject
 
 FUNCTION __objDerivedFrom( oObject, xSuper )
    LOCAL cClassName
@@ -277,5 +263,4 @@ FUNCTION __objDerivedFrom( oObject, xSuper )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   RETURN __clsParent( oObject:ClassH, cClassName )
-
+RETURN __clsParent( oObject:ClassH, cClassName )

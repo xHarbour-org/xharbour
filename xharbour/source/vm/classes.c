@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.20 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: classes.c,v 1.21 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -2278,20 +2278,9 @@ static HARBOUR hb___msgClsName( void )
 static HARBOUR hb___msgClsSel( void )
 {
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
-   USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf )
-                                 ? pSelf->item.asArray.value->uiClass : 0 );
-                                                /* Get class word           */
+   USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
    PHB_ITEM pReturn = hb_itemNew( NULL );
-
-
-   USHORT nParam=HB_MSGLISTALL;
-
-   USHORT uiPCount=hb_pcount();
-
-   if( uiPCount>=1 )
-    {
-       nParam = (USHORT) hb_parni( 1 );
-    }
+   USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
 
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {
@@ -2317,44 +2306,43 @@ static HARBOUR hb___msgClsSel( void )
       {
          PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
 
-         s_pMethod = NULL;                            /* Current method pointer   */
+         s_pMethod = NULL;                      /* Current method pointer   */
 
          if( pMessage )                         /* Hash Entry used ?        */
          {
             s_pMethod = pClass->pMethods + uiAt;
 
-            if (  (  nParam==HB_MSGLISTALL )  ||
-                  ( (nParam==HB_MSGLISTCLASS) &&
-                    (
-                     (s_pMethod->pFunction == hb___msgSetClsData) ||
-                     (s_pMethod->pFunction == hb___msgGetClsData) ||
-                     (s_pMethod->pFunction == hb___msgSetShrData) ||
-                     (s_pMethod->pFunction == hb___msgGetShrData)
-                    )
-                  ) ||
-                  ( (nParam==HB_MSGLISTPURE) &&
-                    (
-                     (! (s_pMethod->pFunction == hb___msgSetClsData)) &&
-                     (! (s_pMethod->pFunction == hb___msgGetClsData)) &&
-                     (! (s_pMethod->pFunction == hb___msgSetShrData)) &&
-                     (! (s_pMethod->pFunction == hb___msgGetShrData))
-                    )
-                  )
-               )
-             {
+            if( ( nParam == HB_MSGLISTALL ) ||
+                ( ( nParam == HB_MSGLISTCLASS ) &&
+                  ( ( s_pMethod->pFunction == hb___msgSetClsData ) ||
+                    ( s_pMethod->pFunction == hb___msgGetClsData ) ||
+                    ( s_pMethod->pFunction == hb___msgSetShrData ) ||
+                    ( s_pMethod->pFunction == hb___msgGetShrData ) )
+                ) ||
+                ( ( nParam == HB_MSGLISTPURE ) &&
+                  ( ( ! ( s_pMethod->pFunction == hb___msgSetClsData ) ) &&
+                    ( ! ( s_pMethod->pFunction == hb___msgGetClsData ) ) &&
+                    ( ! ( s_pMethod->pFunction == hb___msgSetShrData ) ) &&
+                    ( ! ( s_pMethod->pFunction == hb___msgGetShrData ) ) )
+                )
+              )
+            {
+               if( uiScope == 0 || s_pMethod->uiScope & uiScope )
+               {
+                  PHB_ITEM pItem = hb_itemPutC( NULL, pMessage->pSymbol->szName );
 
-               PHB_ITEM pItem = hb_itemPutC( NULL, pMessage->pSymbol->szName );
-                                                /* Add to array             */
-               hb_arraySet( pReturn, ++uiPos, pItem );
-               hb_itemRelease( pItem );
-             }
+                  hb_arraySet( pReturn, ++uiPos, pItem );
+                  hb_itemRelease( pItem );
+               }
+            }
          }
       }
+
+      hb_arraySize( pReturn, uiPos );
    }
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
-
 
 /*
  * __msgEvalInline()

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.416 2002/10/01 20:34:56 lculik Exp $
+ * $Id: ChangeLog,v 1.417 2002/10/03 15:49:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2002-10-04 11:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/objfunc.prg
+    + Added support support for a 2nd optional paramter uiScope in hb___msgClsSel()
+
+  * source/vm/classes.c
+    ! Rewrote __objGetMsgList and __objGetValueList
+    + Added support support for an optional paramter nScope to __objGetMsgList() all other functions that call it.
+
+  + tests/objlist.prg
+    + Added demo for new SCOPE paramater and usage of __objGetValueList()
 
 2002-10-03 08:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
