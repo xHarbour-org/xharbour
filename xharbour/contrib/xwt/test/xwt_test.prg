@@ -19,14 +19,18 @@ PROCEDURE MAIN()
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
 
    /*** Splitter panes layout( our new main widget) ***/
-   oVLay := XwtLayout():New( XWT_LM_VERT )
+   DEFINE LAYOUT oVLay  MODE XWT_LM_VERT PADDING 5 BORDER 2
+   DEFINE LAYOUT oVLay2 MODE XWT_LM_VERT PADDING 5 BORDER 2
+
+   /* oVLay := XwtLayout():New( XWT_LM_VERT )
    oVLay:SetPadding( 5 )
    oVLay:SetBorder( 2 )
 
    oVLay2 := XwtLayout():New( XWT_LM_VERT )
    oVLay2:SetPadding( 5 )
    oVLay2:SetBorder( 2 )
-
+   */
+   
    oSplit := XwtSplitter():New( XWT_LM_HORIZ, oVLay, oVLay2 )
    oSplit:SetShrinkFirst( .F. )
 
@@ -49,7 +53,8 @@ PROCEDURE MAIN()
    oVlay:Add( oHLay )
 
    /* A couple of Textboxes in a pane, inside a scrollable */
-   oPane := XwtPane():New()
+   // oPane := XwtPane():New()
+   DEFINE PANE oPane OF oVLay
 
    oTextbox := XwtTextbox():New("A text", 10, 10 )
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
@@ -66,7 +71,7 @@ PROCEDURE MAIN()
    oButton:move( 10, 135 )
    oButton:AddEventListener( XWT_E_CLICKED, @PaneStatus() )
    oPane:Add( oButton )
-   oVLay:Add( oPane )
+   //oVLay:Add( oPane )
 
    /* A beautiful GRID */
 
