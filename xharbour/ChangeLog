@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1163 2003/06/21 22:08:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.1164 2003/06/22 05:34:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-21 17:01 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/vm/thread.c
+    * ThreadSleep() and low level hb_threadSleep() are moved outside
+      the big ifdef that cuts away threading in ST. This makes
+      the ThreadSleep function available also in ST apps.
+    * Added SecondsSleep( nSecs ) -> NIL that accepts a float parameter
+      as a second count, and pass them to hb_threadSleep() in
+      milliseconds. The floaty parameter is compatible with Seconds()
+      family functions and is avaiable for future expansions (i.e. when
+      OS will support sleeps below the millisecond interval).
+      
 2003-06-21 00:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/getsys.prg
   * source/rtl/listbox.prg
