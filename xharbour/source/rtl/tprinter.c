@@ -241,8 +241,10 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR 
   BOOL Result = FALSE, bFound = FALSE ;
   unsigned long needed, returned, a;
   PRINTER_INFO_5 *pPrinterEnum,*buffer;
+
   HB_TRACE(HB_TR_DEBUG, "hb_GetPrinterNameByPort()");
-  EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, 0, &needed,&returned ) ;
+
+  EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) NULL, 0, &needed,&returned ) ;
   if (needed>0) {
     pPrinterEnum = buffer = ( PRINTER_INFO_5 * ) hb_xgrab( needed ) ;
     if (EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, needed, &needed,&returned ) ) {
@@ -278,13 +280,14 @@ LONG hb_PrintFileRaw(UCHAR *cPrinterName,UCHAR *cFileName, UCHAR *cDocName) {
   HANDLE  hPrinter, hFile ;
   DOC_INFO_1 DocInfo ;
   DWORD nRead, nWritten, Result;
-  if ( OpenPrinter(cPrinterName, &hPrinter, NULL) != 0 ) {
-    DocInfo.pDocName = cDocName ;
+
+  if ( OpenPrinter( (char *) cPrinterName, &hPrinter, NULL) != 0 ) {
+    DocInfo.pDocName = (char *) cDocName ;
     DocInfo.pOutputFile = NULL ;
     DocInfo.pDatatype = "RAW" ;
-    if ( StartDocPrinter(hPrinter,1,(char *) &DocInfo) != 0 ) {
+    if ( StartDocPrinter(hPrinter,1,(UCHAR *) &DocInfo) != 0 ) {
       if ( StartPagePrinter(hPrinter) != 0 ) {
-        hFile = CreateFile(cFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)   ;
+        hFile = CreateFile( (const char *) cFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)   ;
         if (hFile != INVALID_HANDLE_VALUE ) {
           while (ReadFile(hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL) && (nRead > 0)) {
             if (printBuffer[nRead-1] == 26 )
@@ -315,9 +318,9 @@ HB_FUNC( PRINTFILERAW )  {
   UCHAR *cPrinterName, *cFileName, *cDocName ;
   DWORD Result = -1 ;
   if (ISCHAR(1) && ISCHAR(2)) {
-    cPrinterName= hb_parc(1) ;
-    cFileName= hb_parc(2) ;
-    cDocName = ISCHAR(3) ? (UCHAR) hb_parc(3) : cFileName ;
+    cPrinterName= (UCHAR *) hb_parc(1) ;
+    cFileName= (UCHAR *) hb_parc(2) ;
+    cDocName = ( ISCHAR(3) ? (UCHAR *) hb_parc(3) : cFileName ) ;
     Result = hb_PrintFileRaw(cPrinterName, cFileName, cDocName) ;
   }
   hb_retnl(Result) ;
@@ -339,12 +342,15 @@ HB_FUNC(GETPRINTERS) {
   unsigned long needed = 0 , returned=0, a;
   PHB_ITEM pSubItems, pFile, pPort ;
   PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
+
   buffer = NULL ;
   HB_TRACE(HB_TR_DEBUG, "GETPRINTERS()");
+
   if (ISLOG(1))
     bPrinterNamesOnly = !hb_parl(1) ;
+
   if (isWinNt()) {
-    EnumPrinters(Flags,NULL,4,(LPBYTE) pPrinterEnum4,0,&needed,&returned) ;
+    EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
     if (needed > 0) {
       pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
       if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned)) {
