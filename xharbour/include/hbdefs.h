@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.6 2003/01/07 10:48:18 likewolf Exp $
+ * $Id: hbdefs.h,v 1.7 2003/01/21 04:56:18 likewolf Exp $
  */
 
 /*
@@ -168,17 +168,56 @@
 
 #ifndef HB_BIG_ENDIAN
 
+   #define HB_USHORT_FROM_LE( w )	( ( USHORT )( w ) )
+   #define HB_ULONG_FROM_LE( l )	( ( ULONG )( l ) )
+   #define HB_USHORT_TO_LE( w )		( ( USHORT )( w ) )
+   #define HB_ULONG_TO_LE( l )		( ( ULONG )( l ) )
+   #define HB_DOUBLE_TO_LE( d )		( ( double )( d ) )
+
    #define HB_PCODE_MKSHORT( p )	( *( SHORT * )( p ) )
    #define HB_PCODE_MKUSHORT( p )	( *( USHORT * )( p ) )
    #define HB_PCODE_MKLONG( p )		( *( LONG * )( p ) )
    #define HB_PCODE_MKULONG( p )	( *( ULONG * )( p ) )
+   #define HB_PCODE_MKDOUBLE( p )	( *( double * )( p ) )
    
 #else
+
+   #define HB_USHORT_FROM_LE( w )	HB_MKUSHORT( HB_HIBYTE( w ), HB_LOBYTE( w ) )
+   #define HB_ULONG_FROM_LE( l )	HB_MKULONG( HB_HIBYTE( HB_HIWORD( l ) ), HB_LOBYTE( HB_HIWORD( l ) ), HB_HIBYTE( l ), HB_LOBYTE( l ) )
+   #define HB_USHORT_TO_LE( w )		HB_USHORT_FROM_LE( w )
+   #define HB_ULONG_TO_LE( l )		HB_ULONG_FROM_LE( l )
 
    #define HB_PCODE_MKSHORT( p )	HB_MKSHORT( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ] )
    #define HB_PCODE_MKUSHORT( p )	HB_MKUSHORT( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ] )
    #define HB_PCODE_MKLONG( p )		HB_MKLONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], ( ( BYTE * )( p ) )[ 3 ] )
    #define HB_PCODE_MKULONG( p )	HB_MKULONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], ( ( BYTE * )( p ) )[ 3 ] )
+#if defined( __GNUC__ )   
+   #define HB_DOUBLE_FROM_LE( d )	\
+	( { \
+	   BYTE double_var[ 8 ]; \
+	   *( double * )double_var = d; \
+	   HB_PCODE_MKDOUBLE( double_var ); \
+	} )
+   #define HB_DOUBLE_TO_LE( d )		HB_DOUBLE_FROM_LE( d )
+   #define HB_PCODE_MKDOUBLE( p )	\
+	( { \
+	   union { \
+	      double d; \
+	      BYTE buffer[ 8 ]; \
+	   } u; \
+	   u.buffer[ 0 ] = ( p )[ 7 ]; \
+	   u.buffer[ 1 ] = ( p )[ 6 ]; \
+	   u.buffer[ 2 ] = ( p )[ 5 ]; \
+	   u.buffer[ 3 ] = ( p )[ 4 ]; \
+	   u.buffer[ 4 ] = ( p )[ 3 ]; \
+	   u.buffer[ 5 ] = ( p )[ 2 ]; \
+	   u.buffer[ 6 ] = ( p )[ 1 ]; \
+	   u.buffer[ 7 ] = ( p )[ 0 ]; \
+	   u.d; \
+	} )
+#else
+   #error Little-Endian IEEE 754 double type conversion unimplemented with a non-GCC compiler
+#endif
 
 #endif
 

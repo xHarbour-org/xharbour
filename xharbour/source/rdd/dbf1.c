@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.19 2002/09/21 16:32:36 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.20 2003/01/06 12:39:26 horacioroldan Exp $
  */
 
 /*
@@ -2428,7 +2428,7 @@ ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
 
    memset( pBlock, 0, DBT_BLOCKSIZE );
-   * ( ( LONG * ) pBlock ) = 1;
+   * ( ( ULONG * ) pBlock ) = HB_ULONG_TO_LE( 1 );
    if( hb_fsWrite( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE ) != DBT_BLOCKSIZE )
       return FAILURE;
    hb_fsWrite( pArea->hMemoFile, NULL, 0 );
@@ -2522,8 +2522,8 @@ ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    pArea->bDay = dbHeader.bDay;
    pArea->bMonth = dbHeader.bMonth;
    pArea->bYear = dbHeader.bYear;
-   pArea->uiHeaderLen = dbHeader.uiHeaderLen;
-   pArea->ulRecCount = dbHeader.ulRecCount;
+   pArea->uiHeaderLen = HB_USHORT_FROM_LE( dbHeader.uiHeaderLen );
+   pArea->ulRecCount = HB_ULONG_FROM_LE( dbHeader.ulRecCount );
    pArea->fHasMemo = ( dbHeader.bVersion == 0x83 );
    pArea->fHasTags = dbHeader.bHasTags;
    return SUCCESS;
@@ -2554,9 +2554,9 @@ ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
       pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
    }
 
-   dbfHeader.ulRecCount = pArea->ulRecCount;
-   dbfHeader.uiHeaderLen = pArea->uiHeaderLen;
-   dbfHeader.uiRecordLen = pArea->uiRecordLen;
+   dbfHeader.ulRecCount = HB_ULONG_TO_LE( pArea->ulRecCount );
+   dbfHeader.uiHeaderLen = HB_USHORT_TO_LE( pArea->uiHeaderLen );
+   dbfHeader.uiRecordLen = HB_USHORT_TO_LE( pArea->uiRecordLen );
    hb_fsSeek( pArea->hDataFile, 0, FS_SET );
    hb_fsWrite( pArea->hDataFile, ( BYTE * ) &dbfHeader, sizeof( DBFHEADER ) );
    if( pArea->fShared )

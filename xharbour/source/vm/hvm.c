@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.153 2003/01/23 21:47:59 andijahja Exp $
+ * $Id: hvm.c,v 1.154 2003/01/24 09:52:43 ronpinkas Exp $
  */
 
 /*
@@ -1416,7 +1416,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHDOUBLE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHDOUBLE") );
-            hb_vmPushDoubleConst( * ( double * ) ( &pCode[ w + 1 ] ),
+            hb_vmPushDoubleConst( HB_PCODE_MKDOUBLE( &pCode[ w + 1 ] ),
                                   ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) ],
                                   ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) + sizeof( BYTE ) ] );
             w += 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE );

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.35 2003/01/14 23:45:37 jonnymind Exp $
+* $Id: thread.c,v 1.36 2003/01/15 03:08:46 ronpinkas Exp $
 */
 
 /*
@@ -1006,7 +1006,7 @@ HB_FUNC( THREADSLEEP )
    }
 
    #if defined( HB_OS_DARWIN )
-      usleep( 1 );
+      usleep( hb_parni( 1 ) * 1000 );
    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       {
          struct timespec ts;

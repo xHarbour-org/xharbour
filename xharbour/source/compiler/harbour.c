@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.31 2003/01/16 01:30:34 ronpinkas Exp $
+ * $Id: harbour.c,v 1.32 2003/01/16 15:59:51 walito Exp $
  */
 
 /*
@@ -3406,10 +3406,17 @@ void hb_compGenPushNil( void )
 void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec )
 {
    BYTE pBuffer[ sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ) + 1 ];
+#ifdef BIG_ENDIAN
+   double dLENumber = HB_DOUBLE_TO_LE( dNumber );
+#endif
 
    pBuffer[ 0 ] = HB_P_PUSHDOUBLE;
 
+#ifdef BIG_ENDIAN
+   memcpy( ( BYTE * ) &( pBuffer[ 1 ] ), ( BYTE * ) &dLENumber, sizeof( double ) );
+#else   
    memcpy( ( BYTE * ) &( pBuffer[ 1 ] ), ( BYTE * ) &dNumber, sizeof( double ) );
+#endif
 
    pBuffer[ 1 + sizeof( double ) ] = bWidth;
    pBuffer[ 1 + sizeof( double ) + sizeof( BYTE ) ] = bDec;

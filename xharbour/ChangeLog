@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.645 2003/01/25 01:46:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.646 2003/01/25 20:43:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-26 05:50 UTC+0300 Phil Krylov <phil@mail.ru>
+  * include/hbdefs.h
+    + Added HB_PCODE_MKDOUBLE macro to handle little-endian IEEE 754 double
+      values on big-endian machines.
+    + Added HB_USHORT_FROM_LE, HB_ULONG_FROM_LE, HB_USHORT_TO_LE, and
+      HB_ULONG_TO_LE macros.
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    ! Made HB_P_PUSHDOUBLE work properly on big-endian machines.
+  * source/rdd/dbf1.c
+    ! Fixed to work properly on big-endian machines.
+  * source/vm/thread.c
+    ! Fixed Darwin usleep() call in THREADSLEEP().
+  
 2003-01-25 18:40 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     * Minor Fix

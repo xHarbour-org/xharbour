@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.15 2002/12/04 06:24:07 ronpinkas Exp $
+ * $Id: macro.c,v 1.16 2003/01/07 10:48:19 likewolf Exp $
  */
 
 /*
@@ -1414,8 +1414,16 @@ void hb_compGenPushLogical( int iTrueFalse, HB_MACRO_DECL )
 /* generates the pcode to push a double number on the virtual machine stack */
 void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_MACRO_DECL )
 {
+#ifdef BIG_ENDIAN
+   double dLENumber = HB_DOUBLE_TO_LE( dNumber );
+#endif
+
    hb_compGenPCode1( HB_P_PUSHDOUBLE, HB_MACRO_PARAM );
+#ifdef BIG_ENDIAN
+   hb_compGenPCodeN( ( BYTE * ) &dLENumber, sizeof( double ), HB_MACRO_PARAM );
+#else   
    hb_compGenPCodeN( ( BYTE * ) &dNumber, sizeof( double ), HB_MACRO_PARAM );
+#endif
    hb_compGenPCode1( bWidth, HB_MACRO_PARAM );
    hb_compGenPCode1( bDec, HB_MACRO_PARAM );
 }
