@@ -3,7 +3,7 @@ PROCEDURE Main()
     LOCAL aaContact  := TAssociativeArray()
     LOCAL aaSalary   := TAssociativeArray()
     LOCAL aaEmployee := TAssociativeArray()
-    LOCAL xProperty, xSub, oErr
+    LOCAL cKey, cSubKey, oErr
 
     // Array Syntax.
     aaSalary[ "Hourly" ] := 12.00
@@ -29,20 +29,20 @@ PROCEDURE Main()
     ?
 
     // Keys extraction.
-    FOR EACH xProperty IN aaEmployee:Keys
+    FOR EACH cKey IN aaEmployee:Keys
 
-       IF aaEmployee[ xProperty ]:ClassName == "TASSOCIATIVEARRAY"
+       IF aaEmployee[ cKey ]:ClassName == "TASSOCIATIVEARRAY"
           ?
-          ? xProperty
+          ? cKey
           ? "-------"
 
-          FOR EACH xSub IN aaEmployee[ xProperty ]:Keys
-             ? "     Key:", xSub
-             ? "   Value:", aaEmployee[ xProperty][ xSub ]
+          FOR EACH cSubKey IN aaEmployee[ cKey ]:Keys
+             ? "     Key:", cSubKey
+             ? "   Value:", aaEmployee[ cKey][ cSubKey ]
           NEXT
        ELSE
-          ? "  Key:", xProperty
-          ? "Value:", aaEmployee[ xProperty ]
+          ? "  Key:", cKey
+          ? "Value:", aaEmployee[ cKey ]
        ENDIF
     NEXT
     ?
