@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.52 2003/11/07 18:20:54 jonnymind Exp $
+ * $Id: itemapi.c,v 1.53 2003/11/09 23:16:40 jonnymind Exp $
  */
 
 /*
@@ -1390,8 +1390,8 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
          /* Be paranoid and use a large amount of padding */
          szResult = ( char * ) hb_xgrab( HB_MAX_DOUBLE_LENGTH );
-         if( HB_IS_DOUBLE( pNumber ) || iDec != 0  )
 
+         if( HB_IS_DOUBLE( pNumber ) || iDec != 0  )
          {
             double dNumber = hb_itemGetND( pNumber );
 
@@ -1399,9 +1399,14 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
             /* added infinity check for Borland C [martin vogel] */
             #if defined(__WATCOMC__)
             #else
-            #
+
             static double s_dInfinity = 0;
             static double s_bInfinityInit = FALSE;
+
+            if( dNumber == -0 )
+            {
+               dNumber = 0;
+            }
 
             if( ! s_bInfinityInit )
             {
@@ -1547,7 +1552,6 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          }
       }
    }
-
 
    return szResult;
 }
