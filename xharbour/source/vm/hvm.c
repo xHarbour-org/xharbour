@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.329 2004/02/21 04:45:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.330 2004/02/21 05:45:46 ronpinkas Exp $
  */
 
 /*
@@ -3415,6 +3415,7 @@ static void hb_vmPlus( void )
       hb_stackPop();
       hb_stackPop();
       hb_itemPushForward( pResult );
+      hb_itemRelease( pResult );
    }
    else
    {
@@ -3525,6 +3526,7 @@ static void hb_vmMinus( void )
       hb_stackPop();
       hb_stackPop();
       hb_itemPushForward( pResult );
+      hb_itemRelease( pResult );
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
    {
@@ -3536,7 +3538,7 @@ static void hb_vmMinus( void )
       pResult = hb_hashClone( pItem1 );
       while( ulLen > 0 )
       {
-         if ( hb_hashScan( pResult, pRef, &ulPos ) )
+         if( hb_hashScan( pResult, pRef, &ulPos ) )
          {
             hb_hashRemove( pResult, ulPos );
          }
@@ -3546,6 +3548,7 @@ static void hb_vmMinus( void )
       hb_stackPop();
       hb_stackPop();
       hb_itemPushForward( pResult );
+      hb_itemRelease( pResult );
    }
    else if( HB_IS_HASH( pItem1 ) && (
       pItem2->type & ( HB_IT_NUMERIC | HB_IT_STRING | HB_IT_DATE ) ) )
@@ -3558,10 +3561,15 @@ static void hb_vmMinus( void )
          pResult = hb_hashClone( pItem1 );
          hb_hashRemove( pResult, ulPos );
       }
+      else
+      {
+         pResult = hb_itemNew( NULL );
+      }
 
       hb_stackPop();
       hb_stackPop();
       hb_itemPushForward( pResult );
+      hb_itemRelease( pResult );
    }
    else
    {

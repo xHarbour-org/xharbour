@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.25 2004/02/21 05:11:48 ronpinkas Exp $
+ * $Id: hash.c,v 1.26 2004/02/21 05:45:46 ronpinkas Exp $
  */
 
 /*
@@ -384,6 +384,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
             hb_itemCopy( pBaseHash->pKeys, pKey );
             pBaseHash->pValues->type = HB_IT_NIL;
             hb_itemForwardValue( pBaseHash->pValues, pPage );
+            hb_itemRelease( pPage );
 
             return TRUE;
          }

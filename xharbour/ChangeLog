@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2351 2004/02/21 05:11:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2352 2004/02/21 05:45:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-02-20 22:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hash.c
+    ! Fixed remaining memory leaks.
+
+  * source/vm/hvm.c
+    ! Fixed remaining memory leaks related to hash operations and pseudo methods of Hash objects.
+
+  /* tests\has.prg and tests/hashmas.prg perform without any leak. :-) */
+
 2004-02-20 21:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hash.c
     ! Fixed memory leak in HB_FUNC( HCLONE )
 
   * source/vm/hvm.c
-    ! Fixed memory leak in :Keys() and :Values() psudo methods of Hash objects.
+    ! Fixed memory leak in :Keys() and :Values() pseudo methods of Hash objects.
 
 2004-02-20 21:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hash.c
