@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.11 2002/05/18 13:19:26 lculik Exp $
+# $Id: makefile.vc,v 1.12 2002/05/20 00:03:20 lculik Exp $
 #
 
 #
@@ -892,7 +892,7 @@ $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\ft_funcs.prg \
    $(HBMAKE_DIR)\pickarry.prg \
    $(HBMAKE_DIR)\pickfile.prg \
-   $(HBMAKE_DIR)\prb_stak.prg \
+   $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbmake.c \
                                    $(OBJ_DIR)\hbmutils.c \
