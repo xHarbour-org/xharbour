@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.3 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: workarea.c,v 1.4 2002/01/30 03:32:40 ronpinkas Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 
    /* Validate the name of field */
    ulSize = strlen( sFieldName );
-   hb_strLTrim( sFieldName, &ulSize );
+   sFieldName = hb_strLTrim( sFieldName, &ulSize );
    ulSize = hb_strRTrimLen( sFieldName, ulSize, TRUE );
 
    if( ! ulSize )
@@ -245,8 +245,9 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 
    if( sFieldName[ulSize] != '\0' )
    {
-	  hb_xgrab( ulSize + 1 );
-	  strncpy( sFieldName, ( char * ) pFieldInfo->atomName, ulSize );
+	  char *sTmp = hb_xgrab( ulSize + 1 );
+	  strncpy( sTmp, sFieldName, ulSize );
+	  sFieldName = sTmp;
       sFieldName[ulSize] = '\0';
 	  bFreeName = TRUE;
    }
