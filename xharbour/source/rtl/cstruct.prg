@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.19 2003/03/25 02:36:11 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.20 2003/03/26 02:20:03 ronpinkas Exp $
  */
 
 /*
@@ -256,16 +256,16 @@ Function HB_CStructure( cStructure, nAlign )
       NEXT
 
       Counter := Len( acMembers ) + 1
-      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
+      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY, acTypes )
 
       Counter++
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, nAlign, /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, nAlign, HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, nAlign ), HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
+      __clsAddMsg( hClass,  "nID"           , Counter, HB_OO_MSG_PROPERTY, nID )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
@@ -279,15 +279,6 @@ Function HB_CStructure( cStructure, nAlign )
    ENDIF
 
    oStructure := __clsInst( hClass )
-
-   // All instances will share the same definitions array.
-   oStructure:aCTypes := aCTypes // same as: s_aClasses[nID][4]
-
-   //oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
-
-   //oStructure:SizeOf := HB_SizeOfCStructure( aCTypes, oStructure:nAlign )
-
-   oStructure:nId := nID + CTYPE_STRUCTURE
 
    AllocateMembers( oStructure )
 
@@ -348,15 +339,6 @@ Function HB_CStructureFromID( nID, nAlign )
       hClass := s_aClasses[nId][2]
 
       oStructure := __clsInst( hClass )
-
-      // All instances will share the same definitions array.
-      oStructure:aCTypes := s_aClasses[nID][4]
-
-      oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
-
-      oStructure:SizeOf := HB_SizeOfCStructure( oStructure:aCTypes, oStructure:nAlign )
-
-      oStructure:nID = nID + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
    ENDIF
 
 Return oStructure
@@ -381,6 +363,11 @@ Function HB_CTypeArrayID( CType, nLen )
       acMembers := s_aClasses[nID][3]
       aCTypes   := s_aClasses[nID][4]
 
+      // Sames as s_aClasses[nID][4]
+      aFill( aCTypes, CType )
+
+      aAdd( s_aArrayClasses, { CType, nLen, nID } )
+
       __clsAddMsg( hClass,  "Reset"     , @Reset()      , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Buffer"    , @Buffer()     , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Value"     , @Value()      , HB_OO_MSG_METHOD )
@@ -398,25 +385,20 @@ Function HB_CTypeArrayID( CType, nLen )
          __clsAddMsg( hClass,       cMember, Counter, HB_OO_MSG_PROPERTY )
       NEXT
 
-      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
+      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY, aCTypes )
 
       Counter++
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, 1, HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, 1 ), HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
+      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY, nID )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
       __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
-
-      // Sames as s_aClasses[nID][4]
-      aFill( aCTypes, CType )
-
-      aAdd( s_aArrayClasses, { CType, nLen, nID } )
 
       //TraceLog( "Registered: " + cArrayClassName, nID, Len( s_aArrayClasses ) )
    ELSE
