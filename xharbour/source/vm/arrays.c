@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.6 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: arrays.c,v 1.7 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -691,7 +691,6 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulPos;
 
       HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
 
