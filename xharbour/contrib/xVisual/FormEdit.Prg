@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.83 2002/11/08 03:24:32 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.84 2002/11/08 04:46:52 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -49,6 +49,9 @@ GLOBAL EXTERNAL oApp
 GLOBAL EXTERNAL MainFrame
 GLOBAL EXTERNAL FormEdit
 
+GLOBAL EXTERNAL ObjTree
+GLOBAL EXTERNAL ObjInspect
+GLOBAL EXTERNAL ObjEdit
 /*
    For performance NOT using OS indpendant R/T function,
    this file only used in win32.
@@ -95,7 +98,7 @@ GLOBAL EXTERNAL FormEdit
    METHOD AddControl()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-   METHOD OnMove()           INLINE ::Parent:ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
+   METHOD OnMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
 
    METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
@@ -108,7 +111,7 @@ GLOBAL EXTERNAL FormEdit
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:Disable(),;
-                                    ::Parent:ObjInspect:ComboBox1:DelObject( self ),;
+                                    ObjInspect:ComboBox1:DelObject( self ),;
                                     super:OnCloseQuery()
    METHOD XFMTop()
    METHOD XFMRoot()
@@ -148,7 +151,7 @@ METHOD OnSize( nFlag, Width, Height)
       ::oMask:Refresh()
    ENDIF
 
-   ::Parent:ObjInspect:SetBrowserData( Self, .F. )
+   ObjInspect:SetBrowserData( Self, .F. )
 
    RETURN NIL
 
@@ -298,11 +301,11 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
    ::XFMControl( oObj:name, oObj, .F. )
 
-   oObj:SetMethod( "Delete", {||MainFrame:ObjInspect:ComboBox1:DelObject( oObj ), ;
+   oObj:SetMethod( "Delete", {||ObjInspect:ComboBox1:DelObject( oObj ), ;
                               HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
-   MainFrame:ObjInspect:ComboBox1:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
-   oTree := MainFrame:ObjTree:TreeView1:Add( oObj:Name, 1, oObj:Fhandle )
+   ObjInspect:ComboBox1:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
+   oTree := ObjTree:TreeView1:Add( oObj:Name, 1, oObj:Fhandle )
    oTree:Select()
 
    IF !EMPTY( oObj:Controls )
@@ -361,9 +364,8 @@ METHOD CreateSub()
    ::Parent:StdBar:Enable()
    ::Parent:Win32Bar:Enable()
 
-   ::Parent:ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
-//   ::Parent:ObjInspect:ComboBox1:SetCurSel(::Parent:ObjInspect:ComboBox1:GetCount()-1)
-   oTree := ::Parent:ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
+   ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
+   oTree     := ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
    oTree:Select()
 
 
@@ -561,7 +563,7 @@ METHOD XFMReflect() CLASS TFormEdit
 
    //TraceLog( cText )
 
-   MainFrame:ObjEdit:SourceEdit:SetText( cText )
+   ObjEdit:SourceEdit:SetText( cText )
 
 RETURN Self
 

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.38 2002/11/08 01:36:01 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.39 2002/11/08 03:24:32 what32 Exp $
  */
 
 /*
@@ -70,6 +70,8 @@ GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL FormEdit
 GLOBAL EXTERNAL MainFrame
 
+GLOBAL EXTERNAL ObjTree
+GLOBAL EXTERNAL ObjInspect
 // selected controls array elements
 
 #define SEL_HANDLE   1
@@ -397,7 +399,7 @@ METHOD OnKeyDown( wParam, lParam )
 
          FOR EACH a IN ::aSelected
             oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-            oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, .F. )
+            ObjInspect:SetBrowserData( oObj, .F. )
          NEXT
 
       ENDIF
@@ -594,7 +596,7 @@ METHOD ChangeInspector( n )
    LOCAL Item, SubItem, hTreeItem, oObj
 
    IF n == 1
-      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
+      FOR EACH Item IN ObjTree:TreeView1:Items
           IF Item:cargo == ::Parent:handle
              Item:Select()
              nSelObj := ::handle
@@ -607,7 +609,7 @@ METHOD ChangeInspector( n )
 
    IF Len( ::aSelected ) == 1 .AND. nSelObj != ::aSelected[ 1 ][ SEL_HANDLE ]
       // need to tell the inspector
-      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
+      FOR EACH Item IN ObjTree:TreeView1:Items
           // Check TreeView subitems
           FOR EACH SubItem IN Item:Items
               IF SubItem:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
@@ -629,8 +631,8 @@ METHOD ChangeInspector( n )
 
       // Select the TreeView item
       IF hTreeItem != NIL
-         IF ! ( ::Parent:Parent:ObjInspect:CurObject == oObj )
-            MainFrame:ObjTree:TreeView1:SelectItem( hTreeItem )
+         IF ! ( ObjInspect:CurObject == oObj )
+            ObjTree:TreeView1:SelectItem( hTreeItem )
             nSelObj := ::aSelected[ 1 ][ SEL_HANDLE ]
          ENDIF
       ENDIF
@@ -816,9 +818,9 @@ METHOD OnLButtonUp( wParam, x, y )
        RectScreenToClient( ::Handle, aRect )
        a[ SEL_OLDRECT ] := aClone( aRect )
 
-       IF ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
+       IF ::lChanged .AND. a[ SEL_HANDLE ] == ObjInspect:CurObject:handle
           oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, .F. )
+          ObjInspect:SetBrowserData( oObj, .F. )
        ENDIF
 
    NEXT

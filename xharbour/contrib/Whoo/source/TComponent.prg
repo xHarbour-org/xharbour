@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.7 2002/11/08 03:24:31 what32 Exp $
+ * $Id: TComponent.prg,v 1.8 2002/11/08 04:46:51 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ ENDCLASS
 
 METHOD Create( oOwner ) CLASS TComponent
 
-   IF ! oOwnew == oApp
+   IF ! oOwner == oApp
       oOwner:InsertComponent( Self )
    ENDIF
    

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.17 2002/11/07 20:05:58 what32 Exp $
+ * $Id: xTree.prg,v 1.18 2002/11/07 23:01:38 what32 Exp $
  */
 
 /*
@@ -34,6 +34,7 @@
 #include "TreeView.ch"
 
 GLOBAL EXTERNAL FormEdit
+GLOBAL EXTERNAL ObjInspect
 
 CLASS ObjTree FROM TForm
 
@@ -107,10 +108,10 @@ return(o)
 
 METHOD OnChange( oItem ) CLASS TreeObj
 
-   LOCAL n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:FHandle == oItem:cargo} )
+   LOCAL n := aScan( ObjInspect:Objects, {|o|o:FHandle == oItem:cargo} )
 
    IF n > 0
-      ::Parent:Parent:ObjInspect:ComboBox1:SetCurSel( n - 1 )
+      ObjInspect:ComboBox1:SetCurSel( n - 1 )
    ENDIF
 
 return(0)

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.16 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.17 2002/11/07 23:01:30 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -488,8 +488,10 @@ METHOD CreateWnd() CLASS TWBrowse
       ::bRecNo :={| | (::Source)->(RecNo())}
    ENDIF
    
-   super:CreateWnd()
-   ::Configure()   
+   ::Super:CreateWnd()
+   
+   ::Configure()
+   
 RETURN Self
 
 //---------------------------------------------------------------------------------------------

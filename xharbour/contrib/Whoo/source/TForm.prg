@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.54 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TForm.prg,v 1.55 2002/11/08 01:35:57 what32 Exp $
  */
 
 /*
@@ -120,6 +120,8 @@ METHOD Create( oParent ) CLASS TForm
 
    InitCommonControls()
    
+   super:Create( oParent )
+   
    ::WndProc   := IFNIL( ::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL( ::Msgs,-1,::Msgs)
    ::FrameWnd  := IFNIL( ::FrameWnd,.F.,::FrameWnd)
@@ -128,16 +130,15 @@ METHOD Create( oParent ) CLASS TForm
    ::lRegister := IFNIL( ::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
-   ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )
-RETURN( super:Create( oParent ) )
+   ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )   
+   
+RETURN Self
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( oObj, lCreate ) CLASS TForm
+METHOD Add( oObj ) CLASS TForm
 
    LOCAL nSeq, hClass, nInst := 1, oCtrl
-
-   DEFAULT lCreate TO .T.
 
    IF oObj:ControlName == "Form" .and. oObj:Name == NIL
       oObj:Name := oObj:ClassName()

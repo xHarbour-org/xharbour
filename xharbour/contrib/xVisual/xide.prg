@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.118 2002/11/08 03:24:32 what32 Exp $
+ * $Id: xide.prg,v 1.119 2002/11/08 04:46:52 ronpinkas Exp $
  */
 
 /*
@@ -42,6 +42,10 @@ GLOBAL oApp
 GLOBAL MainFrame
 GLOBAL FormEdit
 
+GLOBAL ObjTree
+GLOBAL ObjInspect
+GLOBAL ObjEdit
+
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
@@ -58,14 +62,14 @@ FUNCTION Main
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
 
-         :MainMenu()
+//         :MainMenu()
          :MainToolBar()
          :MainStatusBar()
 
          // add the object windows
-//         :Add( ObjTree():Create( MainFrame ) )
-//         :Add( ObjInspect():Create( MainFrame ) )
-//         :Add( ObjEdit():Create( MainFrame ) )
+         ObjTree    := ObjTree():Create( MainFrame )
+         ObjInspect := ObjInspect():Create( MainFrame )
+         ObjEdit    := ObjEdit():Create( MainFrame )
          // focus to main Frame
          :SetFocus()
 
@@ -87,8 +91,7 @@ CLASS MainFrame FROM TFrame
                                    ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
                                    super:Create( oParent )
 
-   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES,;
-                                    NIL, 0 )
+   METHOD OnCloseQuery() INLINE IIF( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 )
    METHOD MainMenu()
    METHOD MainToolBar()
    METHOD MainStatusBar()
