@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.5 2002/03/15 02:25:56 walito Exp $
+ * $Id: tget.prg,v 1.6 2002/03/17 00:10:12 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "setcurs.ch"
 #include "getexit.ch"
 #include "inkey.ch"
-
+#include "button.ch"
 /* TODO: :posInBuffer( <nRow>, <nCol> ) --> nPos
          Determines a position within the edit buffer based on screen
          coordinates.
@@ -110,7 +110,7 @@ CLASS Get
 #ifdef HB_COMPAT_XPP
    MESSAGE _Assign METHOD Assign()
 #endif
-
+   METHOD HitTest(mrow,mcol)
    METHOD Block( bBlock )         SETGET  // Replace to DATA Block
    METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
    METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
@@ -1236,4 +1236,13 @@ METHOD Block( bBlock ) CLASS Get
    endif
 
 return ::bBlock
+
+METHOD HitTest(mrow,mcol) CLASS GET
+        if ::row != mrow
+		return HTNOWHERE
+        endif
+        if mcol >= ::col .and. mrow <= ::col+::ndispLen
+		return HTCLIENT
+        endif
+return HTNOWHERE
 

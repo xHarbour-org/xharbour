@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.4 2002/01/11 00:06:22 lculik Exp $
+ * $Id: listbox.prg,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -988,6 +988,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ;
      Default arg5 To 1
      Default arg12 To .f.
      Default arg13 To .f.
+     default arg7 to ''
      oScroll := Listbox( Arg1, Arg2, Arg3, Arg4, Arg12 )
      If ( !( ISNIL( oScroll ) ) )
         If ( Ischaracter( Arg7 ) )

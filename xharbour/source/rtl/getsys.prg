@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.8 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: getsys.prg,v 1.1.1.1 2001/12/21 10:42:16 ronpinkas Exp $
  */
 
 /*
@@ -354,6 +354,19 @@ PROCEDURE GUIReader( oGet ,oGetlist,a,b)
    oGetlist:GuiReader(oGet,oGetList,a,b)
 
    RETURN
+PROCEDURE TBReader( oGet, oGetList, aMsg )
+    oGetlist:TBReader(oGet,oGetList,aMsg)
+
+return
+
+PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  aMsg )
+   LOCAL oGetList := __GetListActive()
+
+   IF oGetList != NIL
+      oGetList:oGet := oGet
+      oGetList:Tbapplykey(oGet, oTB, GetList, nKey, aMsg)
+    endif
+    return 
 
 PROCEDURE GuiApplyKey(oGet,nKey)
    LOCAL oGetList := __GetListActive()
@@ -390,5 +403,23 @@ FUNCTION GuiGetPostValidate( oGet,oGui )
    ENDIF
 
    RETURN .F.
+
+
+FUNCTION HitTest( GetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
+local n
+   LOCAL oGetList := __GetListActive()
+   n:= oGetlist:Hittest( GetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
+
+return n
+
+/***
+*
+*  Accelerator( <GetList>, <nKey>, <aMsg> ) --> 0
+*
+*  Identify the Accelerator key 
+*
+***/
+FUNCTION Accelerator( GetList, nKey, aMsg ) // Removed STATIC
+return Getlist:Accelerator( GetList, nKey, aMsg ) // Removed STATIC
 
 #endif

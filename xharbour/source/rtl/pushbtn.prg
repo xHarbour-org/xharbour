@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.2 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: pushbtn.prg,v 1.1.1.1 2001/12/21 10:41:47 ronpinkas Exp $
  */
 
 /*
@@ -286,6 +286,7 @@ return Nil
 function _PUSHBUTT_( cCaption, cMessage, cColor, bFBlock, bSBlock, cStyle)
 
    local oPushButton
+   default cCaption to ""
    oPushButton := pushbutton(Row(), Col(), cCaption)
    if ( !( ISNIL( oPushButton ) ) )
       oPushButton:caption := if(cCaption !=Nil,cCaption,)
