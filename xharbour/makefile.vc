@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.102 2004/05/30 14:41:11 lculik Exp $
+# $Id: makefile.vc,v 1.103 2004/07/01 13:18:35 vouchcac Exp $
 #
 
 #
@@ -980,26 +980,16 @@ GTWIN_LIB_OBJS = \
 {$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\wvtcore}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtutils}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtclass}.prg{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
-{$(OBJ_DIR)\wvtclass}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtpaint}.prg{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-
-{$(OBJ_DIR)\wvtpaint}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
 
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj \
+   \
    $(OBJ_DIR)\wvtcore.obj \
    $(OBJ_DIR)\wvtutils.obj \
    $(OBJ_DIR)\wvtclass.obj \
