@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.5 2004/01/02 11:11:28 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.6 2004/01/02 11:38:14 jonnymind Exp $
  */
 
 /*
@@ -1003,6 +1003,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 {
    BOOL bResult= FALSE;
    int oldrows, oldcols;
+   BYTE *memory;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
 
    oldrows = s_wnd->rows-1;
@@ -1016,8 +1018,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
       return FALSE;
    }
 
-
-   BYTE *memory = (BYTE *) hb_xgrab( (s_wnd->rows *s_wnd->cols+ 1) * HB_GT_CELLSIZE );
+   memory = (BYTE *) hb_xgrab( (s_wnd->rows *s_wnd->cols+ 1) * HB_GT_CELLSIZE );
 
    HB_GT_FUNC(gt_GetText( 0, 0, oldrows, oldcols, memory ));
 
