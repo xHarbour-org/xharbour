@@ -447,7 +447,7 @@ FUNCTION Getlibs( lGcc, cDir )
    LOCAL aLibsDesc     := { { "Harbour Ct3 library - Libct",  IIF( lGcc, 'ct.a', 'libct.lib' ) }, ;
                         { "Harbour Misc library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
                         { "Harbour html library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Nanfor library - Libnf", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Nanfor library - Libnf", IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
                         { "Harbour Gt library - Libgt", 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Zip library ", IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
                         { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
