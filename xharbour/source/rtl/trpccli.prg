@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.1 2003/02/16 00:00:17 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.2 2003/02/16 03:03:41 jonnymind Exp $
  */
 
 /*
@@ -155,9 +155,11 @@ METHOD Destroy() CLASS tRPCClient
       InetDestroy( ::skUdp )
       IF ::thUdpAccept > 0
          StopThread( ::thUdpAccept )
+         ::thUdpAccept := -1
       ENDIF
       IF ::thTcpAccept > 0
          StopThread( ::thTcpAccept )
+         ::thTcpAccept := -1
       ENDIF
    MutexUnlock( ::mtxBusy )
 
@@ -261,6 +263,11 @@ METHOD UDPAccept() CLASS tRPCClient
    ENDDO
 
    ::OnScanComplete()
+   // signal that this thread is no longer active
+   MutexLock( ::mtxBusy )
+   ::thUdpAccept := -1
+   MutexUnlock( ::mtxBusy )
+
 RETURN .T.
 
 
@@ -359,10 +366,16 @@ METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
    LOCAL oRet
    // do not allow asynchronous mode without timeout
    IF .not. ::lAsyncMode .and. ( nTime == NIL .or. nTime <= 0 )
-      RETURN .F.
+      RETURN NIL
    ENDIF
 
    MutexLock( ::mtxBusy )
+   // already active ?
+   IF ::thTcpAccept > 0
+      MutexUnlock( ::mtxBusy )
+      RETURN NIL
+   ENDIF
+
    ::oResult := NIL
    ::nStatus := 4 // waiting for a reply
    // send the call through the socket
@@ -440,6 +453,11 @@ METHOD TCPAccept() CLASS tRPCClient
       ::skTCP := NIL
       MutexUnlock( ::mtxBusy )
    ENDIF
+
+   // signal that this thread is no longer active.
+   MutexLock( ::mtxBusy )
+   ::thTcpAccept := -1
+   MutexUnlock( ::mtxBusy )
 
 RETURN .T.
 
