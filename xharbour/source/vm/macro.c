@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.33 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: macro.c,v 1.34 2003/12/12 20:36:49 ronpinkas Exp $
  */
 
 /*
@@ -144,14 +144,16 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
       HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 0 );
 
       bValid = FALSE;
+
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
          bValid = TRUE;
       }
    }
+
    return bValid;
 }
 
@@ -520,6 +522,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
           *
          */
          struMacro.Flags |= HB_MACRO_GEN_LIST;
+
          if( iContext == HB_P_MACROPUSHPARE )
          {
             struMacro.Flags |= HB_MACRO_GEN_PARE;
@@ -573,6 +576,7 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 #endif
 
       hb_stackPop();    /* remove compiled string */
+
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
@@ -723,7 +727,9 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
+
       iStatus = hb_macroParse( &struMacro, szString, iLen );
+
       hb_xfree( szString );
       struMacro.string = NULL;
 
@@ -761,7 +767,9 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
          hb_macroEvaluate( &struMacro );
       }
       else
+      {
          hb_macroSyntaxError( &struMacro );
+      }
    }
 }
 
@@ -776,10 +784,16 @@ char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString )
    HB_TRACE(HB_TR_DEBUG, ("hb_macroExpandString(%s)", szString));
 
    if( szString )
+   {
       szResultString = hb_macroTextSubst( szString, &ulLength );
+   }
    else
+   {
       szResultString = szString;
+   }
+
    *pbNewString = ( szString != szResultString );
+
    return szResultString;
 }
 
@@ -834,13 +848,14 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
       {
          HB_DYNS_PTR pDynSym;
 
-         hb_stackPop();    /* remove compiled string */
-
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
          hb_dynsymLock();
-         pDynSym =  hb_dynsymGet( szString );
+         pDynSym = hb_dynsymGet( szString );
+
+         hb_stackPop();    /* remove compiled string */
+
          hb_vmPushSymbol( pDynSym->pSymbol );  /* push compiled symbol instead of a string */
          hb_dynsymUnlock();
 

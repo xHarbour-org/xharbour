@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1862 2003/12/13 05:49:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.1863 2003/12/13 07:20:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-13 08:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * bin/bld.bat
+     + Added support for %HB_USER_LIBS% for BCC32 and MSVC
+
+   * source/vm/macro.c
+     ! Fixed another lurking bug resulting from premature release of item containing string to be parsed.
+
 2003-12-13 14:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * ChangeLog
     * Rename ChangeLog to ChangeLog.017
