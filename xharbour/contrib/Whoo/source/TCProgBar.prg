@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.9 2002/10/27 01:29:24 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.10 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,10 +35,10 @@
 
 CLASS TProgressBar FROM TCustomControl
 
-   DATA xxLeft   PROTECTED   INIT    0
-   DATA xxTop    PROTECTED   INIT    0
-   DATA xxWidth  PROTECTED   INIT  160
-   DATA xxHeight PROTECTED   INIT   16
+   DATA FLeft   PROTECTED   INIT    0
+   DATA FTop    PROTECTED   INIT    0
+   DATA FWidth  PROTECTED   INIT  160
+   DATA FHeight PROTECTED   INIT   16
 
    DATA Max      INIT  100
    DATA Position INIT  0

@@ -19,8 +19,8 @@ CLASS TForm1 FROM TForm
    CONTROL ListBox1 FROM TLISTBOX
       :ID :=        506
 
-      OBJECT ITEMS IS TSTRINGS
-         :TEXT := { "Option1", "Option2" }
+      OBJECT ITEMS IS TLISTBOXSTRINGS
+         :STRINGS := { "Option1", "Option2" }
       END OBJECT
 
       :LEFT :=        335

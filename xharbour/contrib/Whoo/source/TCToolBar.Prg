@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.23 2002/10/31 04:08:43 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.24 2002/10/31 08:18:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -79,10 +79,10 @@ typedef struct {;
 CLASS TToolBar FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
-   DATA xxLeft   PROTECTED  INIT    0
-   DATA xxTop    PROTECTED  INIT    0
-   DATA xxWidth  PROTECTED  INIT    0
-   DATA xxHeight PROTECTED  INIT    0
+   DATA FLeft   PROTECTED  INIT    0
+   DATA FTop    PROTECTED  INIT    0
+   DATA FWidth  PROTECTED  INIT    50
+   DATA FHeight PROTECTED  INIT    0
 
    DATA Style   INIT  TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
                       WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD

@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.18 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCListBox.prg,v 1.19 2002/10/31 08:18:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,6 +26,7 @@
  *
  */
 
+#include "classex.ch"
 #include "windows.ch"
 #include "HbClass.ch"
 #include "what32.ch"
@@ -41,14 +42,19 @@ IMPORT C STRUCTURE RECT
 
 *------------------------------------------------------------------------------*
 
-CLASS TListBox FROM TCustomControl
+CLASS TListBox FROM TCustomListBox
+ENDCLASS
+
+//--------------------------------------------------------------------------------------------------------------
+
+CLASS TCustomListBox FROM TCustomControl
 
    DATA Caption   PROTECTED INIT ""
 
-   DATA xxLeft    PROTECTED INIT    0
-   DATA xxTop     PROTECTED INIT    0
-   DATA xxWidth   PROTECTED INIT  160
-   DATA xxHeight  PROTECTED INIT  160
+   DATA FLeft    PROTECTED INIT    0
+   DATA FTop     PROTECTED INIT    0
+   DATA FWidth   PROTECTED INIT  160
+   DATA FHeight  PROTECTED INIT  160
 
    DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP + LBS_STANDARD
    DATA ExStyle INIT  WS_EX_CLIENTEDGE
@@ -58,7 +64,7 @@ CLASS TListBox FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
-   DATA Items     EXPORTED INIT TStrings():New()
+   PROPERTY Items INIT TListBoxStrings() READ FItems WRITE SetItems
    
    ACCESS CurSel  INLINE ::GetCurSel()
 
@@ -70,10 +76,9 @@ CLASS TListBox FROM TCustomControl
    METHOD GetString()
    METHOD GetItemRect()
    METHOD GetSelItems()
-   METHOD AddItem( cText )          INLINE ::SendMessage( LB_ADDSTRING, 0, cText)
-   METHOD Clear()                   INLINE ::SendMessage( LB_RESETCONTENT, 0, 0 )
-   METHOD InsertItem(cText,nLine)   INLINE ::SendMessage( LB_INSERTSTRING, nLine, cText )
-   METHOD DeleteItem(nLine)         INLINE ::SendMessage( LB_DELETESTRING, nLine, 0)
+   METHOD Add( cText )              INLINE ::SendMessage( LB_ADDSTRING, 0, cText)
+   METHOD Insert(cText,nLine)       INLINE ::SendMessage( LB_INSERTSTRING, nLine, cText )
+   METHOD Delete(nLine)             INLINE ::SendMessage( LB_DELETESTRING, nLine, 0)
    METHOD SetCurSel(nLine)          INLINE ::SendMessage( LB_SETCURSEL, nLine, 0)
    METHOD SetSel(nLine,lSel)        INLINE ::SendMessage( LB_SETSEL, if(lSel,1,0), MAKELPARAM(nLine, 0))
    METHOD FindString(nStart,cStr)   INLINE ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr)
@@ -82,12 +87,13 @@ CLASS TListBox FROM TCustomControl
    METHOD GetCurSel()               INLINE ::SendMessage( LB_GETCURSEL, 0, 0)
    METHOD Dir(nAttr, cFileSpec)     INLINE ::SendMessage( LB_DIR, nAttr, cFileSpec)
    METHOD GetSelCount()             INLINE ::SendMessage( LB_GETSELCOUNT, 0, 0)
-   METHOD OnCreate()
+   METHOD Create()
+   METHOD SetItems()
 ENDCLASS
 
 *------------------------------------------------------------------------------*
 
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
+METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TCustomListBox
 
    ::id        := nId
    ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
@@ -99,7 +105,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD GetString(nLine) CLASS TListBox
+METHOD GetString(nLine) CLASS TCustomListBox
 
    LOCAL nLen
    LOCAL cBuf
@@ -111,7 +117,7 @@ METHOD GetString(nLine) CLASS TListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD GetItemRect( nLine) CLASS TListBox
+METHOD GetItemRect( nLine) CLASS TCustomListBox
 
    LOCAL rc IS RECT
    LOCAL cRect := space(16)
@@ -123,7 +129,7 @@ METHOD GetItemRect( nLine) CLASS TListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD GetSelItems() CLASS TListBox
+METHOD GetSelItems() CLASS TCustomListBox
 
    LOCAL n    := ::GetSelCount()
    LOCAL cBuf := space(n * 4)
@@ -133,13 +139,75 @@ METHOD GetSelItems() CLASS TListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD OnCreate() CLASS TListBox
+METHOD Create() CLASS TCustomListBox
    
    LOCAL cStr
+   
+   Super:Create()
+   
+   ::FItems := TListBoxStrings()
+   ::FItems:ListBox := Self
+   
+RETURN Self
 
-   FOR EACH cStr IN ::Items:Text
-      ::AddItem( cStr )
-   NEXT
+//----------------------------------------------------------------------------------------------------------------
+
+METHOD SetItems( Value )
+  
+  ::Items := Value
 
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+
+
+CLASS TListBoxStrings FROM TStrings
+   
+   DATA ListBox PROTECTED
+   
+   METHOD Add()
+   METHOD GetCount()
+   METHOD Clear()     INLINE  ::Strings := {}, ::ListBox:SendMessage( LB_RESETCONTENT, 0, 0 )
+ENDCLASS
+
+//----------------------------------------------------------------------------------------------------------------
+   
+METHOD GetCount() CLASS TListBoxStrings
+RETURN ::ListBox:GetCount()
+
+//----------------------------------------------------------------------------------------------------------------
+
+METHOD Add( cStr ) CLASS TListBoxStrings
+   LOCAL nRes
+
+   IF ( nRes := SendMessage( ::ListBox:handle, LB_ADDSTRING, 0, cStr ) ) < 0
+
+      MessageBox( GetActiveWindow(), "Out of resource","Error" )
+
+   ENDIF
+
+RETURN super:Add( cStr )
+
+//----------------------------------------------------------------------------------------------------------------
+
+
+/*
+function TListBoxStrings.Add(const S: string): Integer;
+begin
+  Result := SendMessage(ListBox.Handle, LB_ADDSTRING, 0, Longint(PChar(S)));
+  if Result < 0 then raise EOutOfResources.Create(SInsertLineError);
+end;
+
+procedure TListBoxStrings.Insert(Index: Integer; const S: string);
+begin
+  if SendMessage(ListBox.Handle, LB_INSERTSTRING, Index,
+    Longint(PChar(S))) < 0 then
+    raise EOutOfResources.Create(SInsertLineError);
+end;
+
+procedure TListBoxStrings.Delete(Index: Integer);
+begin
+  ListBox.DeleteString(Index);
+end;
+*/
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCCheck.prg,v 1.16 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCCheck.prg,v 1.17 2002/10/29 06:21:38 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,10 +36,10 @@
 CLASS TCheck FROM TCustomControl
 
    //DATA Caption INIT  "CheckBox"
-   DATA xxLeft    PROTECTED INIT   0
-   DATA xxTop     PROTECTED INIT   0
-   DATA xxWidth   PROTECTED INIT  80
-   DATA xxHeight  PROTECTED INIT  20
+   DATA FLeft    PROTECTED INIT   0
+   DATA FTop     PROTECTED INIT   0
+   DATA FWidth   PROTECTED INIT  80
+   DATA FHeight  PROTECTED INIT  20
 
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+BS_AUTOCHECKBOX
 

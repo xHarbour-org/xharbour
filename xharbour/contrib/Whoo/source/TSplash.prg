@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TSplash.prg,v 1.4 2002/10/11 03:53:16 what32 Exp $
  */
 
 /*
@@ -51,10 +51,10 @@ METHOD New( oParent, cFile, nTimeOut ) CLASS TSplash
    ::bitmap:= LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
    abRect  := GetBitmapSize( ::bitmap )
    
-   ::width := abRect[1]
-   ::height:= abRect[2]
-   ::left  := (aRect[3]/2)-(::width/2)
-   ::top   := (aRect[4]/2)-(::height/2)
+   ::Fwidth := abRect[1]
+   ::Fheight:= abRect[2]
+   ::Fleft  := (aRect[3]/2)-(::Fwidth/2)
+   ::Ftop   := (aRect[4]/2)-(::Fheight/2)
    ::style := WS_POPUP + WS_BORDER
    ::ExStyle:= WS_EX_TOPMOST
    ::Create()

@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.23 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TabControl.Prg,v 1.24 2002/10/29 02:12:38 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -45,10 +45,11 @@ IMPORT C STRUCTURE NMHDR
 CLASS TTabControl FROM TCustomControl
 
    DATA Caption   PROTECTED INIT ""
-   DATA xxLeft    PROTECTED INIT    0
-   DATA xxTop     PROTECTED INIT    0
-   DATA xxWidth   PROTECTED INIT  160
-   DATA xxHeight  PROTECTED INIT  160
+   
+   DATA FLeft    PROTECTED INIT    0
+   DATA FTop     PROTECTED INIT    0
+   DATA FWidth   PROTECTED INIT  160
+   DATA FHeight  PROTECTED INIT  160
 
    DATA CurSel  INIT    1
 
@@ -101,6 +102,7 @@ CLASS TTabControl FROM TCustomControl
    METHOD Notify()
    METHOD OnSize()
    METHOD GetObj()
+
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -182,7 +184,7 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
 METHOD Configure(lCreate) CLASS TTabControl
 
-   LOCAL aTab :=GetClientRect(::handle)
+   LOCAL aTab //:=GetClientRect(::handle)
    local acRect:={0,0,0,0}
    LOCAL aTemp
    LOCAL aWnd:={}
@@ -190,34 +192,49 @@ METHOD Configure(lCreate) CLASS TTabControl
    LOCAL i
    LOCAL aPt
    LOCAL bBlock
+   
+   aTab := {::FLeft, ::FTop, ::FWidth, ::FHeight }
+
+   TraceLog()
+
    DEFAULT lCreate TO .T.
    IF LEN(::Controls) > 0
-      acRect:=TabCtrl_GetItemRect(::handle,0)
-      FOR i:=1 TO LEN(::Controls)-1
-         aTemp:=TabCtrl_GetItemRect(::handle,i)
-         acRect[1]:=MIN(acRect[1],aTemp[1])
-         acRect[2]:=MIN(acRect[2],aTemp[2])
-         acRect[3]:=MAX(acRect[3],aTemp[3])
-         acRect[4]:=MAX(acRect[4],aTemp[4])
-      NEXT
-   ENDIF
+   
+      acRect := TabCtrl_GetItemRect( ::handle, 0 )
+      
+      FOR i := 1 TO Len( ::Controls )-1
+         aTemp := TabCtrl_GetItemRect( ::handle, i )
 
-   aPt:={acRect[1],acRect[2]}
-   acRect[1]:=aPt[1]
-   acRect[2]:=aPt[2]
+         acRect[1] := MIN( acRect[1], aTemp[1] )
+         acRect[2] := MIN( acRect[2], aTemp[2] )
+         
+         acRect[3] := MAX( acRect[3], aTemp[3] )
+         acRect[4] := MAX( acRect[4], aTemp[4] )
+      NEXT
+   
+   ENDIF
 
    FOR i:=1 TO LEN(::Controls)
       IF ::Controls[i]!=NIL
          IF lCreate
             ::Controls[i]:Create()
-         endif
+         ENDIF
+         
+//         VIEW aTab
 
+         ::Controls[i]:FLeft   := acRect[1]
+         ::Controls[i]:FTop    := acRect[2]+acRect[4]
+         ::Controls[i]:FWidth  := aTab[3]-6
+         ::Controls[i]:FHeight := aTab[4]-acRect[2]-acRect[4]-4
+ 
+         ::Controls[i]:Move( , , , , .F. )
+/*         
          ::Controls[i]:Move( acRect[1],;
                          acRect[2]+acRect[4],;
                          aTab[3]-6,;
                          aTab[4]-acRect[2]-acRect[4]-4,;
                          .F.)
-
+*/
          if lCreate
             IF i<>::CurSel
                ShowWindow(::Controls[i]:handle,SW_HIDE)

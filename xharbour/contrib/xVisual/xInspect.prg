@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.55 2002/10/30 15:22:42 what32 Exp $
+ * $Id: xInspect.prg,v 1.56 2002/10/30 21:39:31 ronpinkas Exp $
  */
 
 /*
@@ -51,16 +51,16 @@ CLASS ObjInspect FROM TForm
                                 ::top     := 275,;
                                 ::width   := 200,;
                                 ::height  := 297,;
-                                ::ExStyle := WS_EX_TOOLWINDOW ,;
+                                ::ExStyle := WS_EX_TOOLWINDOW,;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Move(,,x,21,.t.),;
-                                 ::InspTabs:Move(,25,x,y-25,.t.),;
+   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Move( , , x, 21, .T. ),;
+                                 ::InspTabs:Move( , 25, x, y-25, .T. ),;
                                  ::browser:width := ::InspTabs:Properties:ClientRect()[3],;
                                  ::browser:height:= ::InspTabs:Properties:ClientRect()[4],;
-                                 nil
+                                 NIL
    METHOD SetBrowserData()
    METHOD SaveVar()
 ENDCLASS
@@ -445,7 +445,7 @@ METHOD OnCreate() CLASS StringList
 
    LOCAL cText := "", cItem
 
-   FOR EACH cItem IN oApp:MainFrame:ObjInspect:CurObject:Items:Text
+   FOR EACH cItem IN oApp:MainFrame:ObjInspect:CurObject:Items:Strings
       cText += ( cItem + CRLF )
    NEXT
 
@@ -453,7 +453,7 @@ METHOD OnCreate() CLASS StringList
 
    PostMessage( GetDlgItem( ::handle, 103 ), EM_SETSEL, 0, 0)
    SetDlgItemText( ::handle, 103, cText )
-   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInspect:CurObject:Items:Text ) ) ) + " Lines" )
+   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInspect:CurObject:Items:Strings ) ) ) + " Lines" )
 
 RETURN Self
 
@@ -476,7 +476,9 @@ METHOD OnCommand( nwParam ) CLASS StringList
               nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
            ENDIF
 
-           oApp:MainFrame:ObjInspect:CurObject:Items:Text := {}
+           oApp:MainFrame:ObjInspect:CurObject:Items:Strings := {}
+           oApp:MainFrame:ObjInspect:CurObject:Items:Clear()
+           
            FOR n := 1 TO nLines
                cText := I2Bin( 100 ) + Space( 200 )
                SendDlgItemMessage( ::handle, 103, EM_GETLINE, n - 1, @cText )

@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.5 2002/10/28 22:40:32 fsgiudice Exp $
+ * $Id: xPad.prg,v 1.6 2002/10/29 02:21:09 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -203,9 +203,10 @@ ENDCLASS
 
 METHOD OnCreate() CLASS ObjEdit
    local aRect := ::ClientRect()
-   ::Add( /*'SourceEdit',*/ TEditor():New( self, "", 101,  0,0, aRect[3], aRect[4] ) )
+   ::Add( TEditor():New( self, "", 101,  0,0, aRect[3], aRect[4] ) )
 
    ::oEd := oEdit():New( ::SourceEdit:handle )
+   
    ResetProcedure(::SourceEdit:handle)
    ::oEd:configure()
    ::oEd:subclass()
@@ -219,12 +220,12 @@ CLASS TEditor FROM TForm
                           ::ExStyle:= WS_EX_CLIENTEDGE,;
                           super:Create()
 
-   METHOD SetText(c) INLINE ::Parent:oEd:aText    :={''},;
-                            ::Parent:oEd:Lines    :=1,;
-                            ::Parent:oEd:TopLine  :=1,;
-                            ::Parent:oEd:Line     :=1,;
-                            ::Parent:oEd:Col      :=1,;
-                            ::Parent:oEd:SetText(c),;
+   METHOD SetText(c) INLINE ::Parent:oEd:aText    := {''} ,;
+                            ::Parent:oEd:Lines    := 1 ,;
+                            ::Parent:oEd:TopLine  := 1 ,;
+                            ::Parent:oEd:Line     := 1 ,;
+                            ::Parent:oEd:Col      := 1 ,;
+                            ::Parent:oEd:SetText( c ),;
                             ::Parent:oEd:Configure()
 ENDCLASS
 

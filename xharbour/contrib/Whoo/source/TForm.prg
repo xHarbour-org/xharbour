@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.51 2002/10/31 04:08:43 what32 Exp $
+ * $Id: TForm.prg,v 1.52 2002/10/31 16:34:26 ronpinkas Exp $
  */
 
 /*
@@ -151,8 +151,8 @@ METHOD Add( oObj, lCreate ) CLASS TForm
       oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
    ENDIF
 
-   IF oObj:Caption == NIL
-      oObj:Caption := oObj:Name
+   IF oObj:FCaption == NIL
+      oObj:FCaption := oObj:Name
    ENDIF
 
    oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
@@ -162,6 +162,7 @@ METHOD Add( oObj, lCreate ) CLASS TForm
 
    oObj:Parent := Self
 
+   TraceLog( oObj:Name, lCreate )
    IF lCreate
       oObj:Create()
    endif

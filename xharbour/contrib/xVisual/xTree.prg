@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.14 2002/10/30 16:37:46 what32 Exp $
+ * $Id: xTree.prg,v 1.15 2002/10/30 21:39:31 ronpinkas Exp $
  */
 
 /*
@@ -36,22 +36,26 @@
 GLOBAL EXTERNAL FormEdit
 
 CLASS ObjTree FROM TForm
+
    VAR TreeRoot AS OBJECT
+
    METHOD New( oParent ) INLINE ::Caption := 'Object Tree',;
                                 ::Name    := "ObjTree",;
-                                ::left    := 0,;
-                                ::top     := 125,;
-                                ::width   := 200,;
-                                ::height  := 150,;
+                                ::Fleft    := 0,;
+                                ::Ftop     := 125,;
+                                ::Fwidth   := 200,;
+                                ::Fheight  := 150,;
                                 ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::TreeView1:Move(,,x,y,.t.),nil
+   METHOD OnSize(n,x,y)  INLINE  ::TreeView1:Move( , , x, y, .t. )
+
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjTree
-   local o,hImg,hBmp
+
+   LOCAL o,hImg,hBmp
 
    hImg := ImageList_Create( 16, 16, ILC_COLORDDB+ILC_MASK )
    hBmp := LoadImage( hInstance(), "OBJTREE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
@@ -59,10 +63,11 @@ METHOD OnCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::Add( TreeObj():New( self, 100,  0,  0, 100, 100) )
-
+   
    TVSetImageList(::TreeView1:handle, hImg, 0 )
 RETURN(nil)
 
+//------------------------------------------------------------------------------------------------------------------
 
 CLASS TreeObj FROM TTreeView
    METHOD Add()

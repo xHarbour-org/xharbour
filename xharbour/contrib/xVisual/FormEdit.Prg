@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.79 2002/10/30 21:39:29 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.80 2002/10/31 04:08:59 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -287,7 +287,7 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
    LOCAL oTree, o, n
 
-   //TraceLog( oObj, oObj:Caption, oObj:Top, oObj:Left, oObj:Height, oObj:Width, oObj:xxCaption, oObj:xxTop, oObj:xxLeft, oObj:xxHeight, oObj:xxWidth )
+   //TraceLog( oObj, oObj:Caption, oObj:Top, oObj:Left, oObj:Height, oObj:Width, oObj:FCaption, oObj:FTop, oObj:FLeft, oObj:FHeight, oObj:FWidth )
 
    aAdd( ::aCtrl, oObj )
    ::oMask:GetSiblings()

@@ -1,5 +1,5 @@
 /*
- * $Id: TCGroupBox.prg,v 1.11 2002/10/27 01:29:24 what32 Exp $
+ * $Id: TCGroupBox.prg,v 1.12 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,10 +36,10 @@
 CLASS TGroupBox FROM TCustomControl
 
    DATA Caption INIT "GroupBox"
-   DATA xxLeft    PROTECTED INIT 0
-   DATA xxTop     PROTECTED INIT 0
-   DATA xxWidth   PROTECTED INIT 185
-   DATA xxHeight  PROTECTED INIT 105
+   DATA FLeft    PROTECTED INIT 0
+   DATA FTop     PROTECTED INIT 0
+   DATA FWidth   PROTECTED INIT 185
+   DATA FHeight  PROTECTED INIT 105
 
    DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_GROUPBOX
 
