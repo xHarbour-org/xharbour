@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.18 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbdefs.h,v 1.19 2003/11/04 08:31:03 druzus Exp $
  */
 
 /*
@@ -215,7 +215,7 @@
    #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
    #define HB_GET_BE_DOUBLE( p )    HB_SWAP_PDOUBLE( p )
    #define HB_PUT_BE_DOUBLE( p, d ) ( *( double * )( p ) = HB_SWAP_DOUBLE( d ) )
-   
+
    #define HB_USHORT_FROM_LE( w )   ( ( USHORT )( w ) )
    #define HB_ULONG_FROM_LE( l )    ( ( ULONG )( l ) )
    #define HB_USHORT_TO_LE( w )     ( ( USHORT )( w ) )
@@ -230,7 +230,7 @@
 
    /* the conversion for BIG endian can be used here but for speed reasons
     * I decided to write full version to avoid one bytes conversion */
-   #define HB_GET_SORTDBL( p ) ( { \
+   #define HB_GET_SORTDBL( v, p ) { \
                                     union { \
                                       double d; \
                                       BYTE buffer[ 8 ]; \
@@ -254,10 +254,10 @@
                                        u.buffer[ 6 ] = ( ( BYTE * ) ( p ) )[ 1 ] ^ 0xFF; \
                                        u.buffer[ 7 ] = ( ( BYTE * ) ( p ) )[ 0 ] ^ 0xFF; \
                                     } \
-                                    u.d; \
-                                 } )
+                                    v = u.d; \
+                                 }
 
-   #define HB_PUT_SORTDBL( p, v ) ( { \
+   #define HB_PUT_SORTDBL( p, v ) { \
                                     union { \
                                       double d; \
                                       BYTE buffer[ 8 ]; \
@@ -282,7 +282,7 @@
                                        ( ( BYTE * ) ( p ) )[ 1 ] = u.buffer[ 6 ] ^ 0xFF; \
                                        ( ( BYTE * ) ( p ) )[ 0 ] = u.buffer[ 7 ] ^ 0xFF; \
                                     } \
-                                 } )
+                                 }
 #else
    /* We use Big-Endian here */
 
@@ -314,8 +314,8 @@
    #define HB_DOUBLE_FROM_LE( d )   HB_SWAP_DOUBLE( d );
    #define HB_DOUBLE_TO_LE( d )     HB_DOUBLE_FROM_LE( d )
    #define HB_PCODE_MKDOUBLE( p )   HB_SWAP_PDOUBLE( p )
-   
-   #define HB_GET_SORTDBL( p ) ( { \
+
+   #define HB_GET_SORTDBL( v, p ) ( { \
                                     union { \
                                       double d; \
                                       BYTE buffer[ 8 ]; \
@@ -327,7 +327,7 @@
                                        ( ( LONG * ) ( u.buffer ) )[ 0 ] ^= 0xFFFFFFFFL; \
                                        ( ( LONG * ) ( u.buffer ) )[ 1 ] ^= 0xFFFFFFFFL; \
                                     } \
-                                    u.d; \
+                                    v = u.d; \
                                  } )
 
    #define HB_PUT_SORTDBL( p, v ) ( { \

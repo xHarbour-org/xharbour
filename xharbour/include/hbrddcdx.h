@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbrddcdx.h,v 1.17 2003/11/04 08:31:03 druzus Exp $
  */
 
 /*
@@ -113,13 +113,13 @@ extern "C" {
 #define CURKEY_ISSET(pTag)    (((pTag)->curKeyState & (CDX_CURKEY_NOTEXIST | CDX_CURKEY_UNDEF)) == 0)
 #define CURKEY_REC(pTag)      ((((pTag)->curKeyState & CDX_CURKEY_REC) != 0) ? (pTag)->curKey->rec : 0)
 #define CURKEY_VAL(pTag)      ((((pTag)->curKeyState & CDX_CURKEY_VAL) != 0) ? (pTag)->curKey->val : NULL)
-#define CURKEY_REFRESH(pTag)  
+#define CURKEY_REFRESH(pTag)
 */
 
 #define HB_CDXMAXKEY( x )     ((USHORT) ((x) > CDX_MAXKEY ? CDX_MAXKEY : (x)))
 #define HB_CDXBITMASK( x )    ((LONG) ((1L<<(x))-1))
 
-#define FAST_GOCOLD( A )      (((CDXAREAP) (A))->fRecordChanged || ((CDXAREAP) (A))->fCdxAppend ? (SELF_GOCOLD((A))) : SUCCESS)
+//#define FAST_GOCOLD( A )      (((CDXAREAP) (A))->fRecordChanged || ((CDXAREAP) (A))->fCdxAppend ? (SELF_GOCOLD((A))) : SUCCESS)
 #define FAST_GOCOLD( A )      SELF_GOCOLD(A)
 
 
@@ -147,7 +147,7 @@ typedef struct _CDXTAGHEADER
    BYTE     forExpPos[ 2 ];   /* offset of filter expression */
    BYTE     forExpLen[ 2 ];   /* length of filter expression */
    BYTE     keyExpPos[ 2 ];   /* offset of key expression */
-   BYTE     keyExpLen[ 2 ];   /* length of key expression */                        
+   BYTE     keyExpLen[ 2 ];   /* length of key expression */
    BYTE     keyExpPool[ CDX_PAGELEN ];
 } CDXTAGHEADER;
 typedef CDXTAGHEADER * LPCDXTAGHEADER;

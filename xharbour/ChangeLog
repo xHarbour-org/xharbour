@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1653 2003/11/04 08:31:01 druzus Exp $
+ * $Id: ChangeLog,v 1.1654 2003/11/04 09:54:49 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-04 09:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbdefs.h
+  * include/hbrddcdx.h
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! Fixed compilation errors.
+
+    /* Przemek I was forced to modify HB_GET_SORTDBL() to accept value to assign to, because other wise we get something like:
+
+         SomeFunction( { some code block is invalis as an expression } )
+
+       Can you please review my change to see if it's ok?
+    */
+
+  * tests/rddspeed.prg
+    * Uncommented #define TST_NUM
 
 2003-11-04 01:55 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c
@@ -91,7 +107,7 @@
   + contrib/libct/fcopy.prg
     * Source code for Filecopy,filecopen,fileapped provided by piero
   ! contrib/libct/Makefile.*
-    ! All makefile updated to handle new source filess added 
+    ! All makefile updated to handle new source filess added
 
 
 2003-11-03 12:10 UTC-0800 Brian Hays <bhays@abacuslaw.com>

@@ -1,4 +1,4 @@
-//#define TST_NUM
+#define TST_NUM
 //#define TST_DAT
 //#define TST_CHR
 
