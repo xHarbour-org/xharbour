@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.55 2003/04/05 21:06:28 paultucker Exp $
+ * $Id: ppcore.c,v 1.56 2003/04/05 23:47:31 ronpinkas Exp $
  */
 
 /*
@@ -154,6 +154,7 @@ static int    NextName( char **, char * );
 static int    NextParm( char **, char * );
 static BOOL   OpenInclude( char *, HB_PATHNAMES *, PHB_FNAME, BOOL bStandardOnly, char * );
 static BOOL   IsIdentifier( char *szProspect );
+static int    NextStopper( char ** sSource, char * sDest );
 
 int hb_pp_NextToken( char** pLine );
 
@@ -2088,12 +2089,12 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            strtopti = ptrmp;
         }
 
-        if( !s_numBrackets && strtopti && strtptri != ptri && ( ISNAME( *ptri ) || *ptri=='&' ) )
+        if( !s_numBrackets && strtopti && strtptri != ptri && ISNAME( *ptri ) )
         {
            strtptri = ptri;
            ptrmp    = strtopti;
            ptr      = ptri;
-           ipos     = NextName( &ptr, tmpname );
+           ipos     = NextStopper( &ptr, tmpname );
            ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE, TRUE );
 
            #ifdef DEBUG_OPTIONAL
@@ -2145,10 +2146,10 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
              if( s_aIsRepeate[ s_Repeate ] )
              {
-                if( ISNAME(*ptri) )
+                if( ISNAME( *ptri ) )
                 {
                    ptr  = ptri;
-                   ipos = NextName( &ptr, tmpname );
+                   ipos = NextStopper( &ptr, tmpname );
                    ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE, TRUE );
 
   HB_TRACE(HB_TR_DEBUG, ("2"));
@@ -4919,7 +4920,7 @@ static int NextName( char ** sSource, char * sDest )
      (*sSource)++;
   }
 
-  while( **sSource != '\0' && ISNAME(**sSource) )
+  while( ISNAME( **sSource ) )
   {
      *sDest++ = *(*sSource)++;
      lenName++;
@@ -4970,6 +4971,31 @@ static int NextName( char ** sSource, char * sDest )
  Done:
 
   return lenName;
+}
+
+static int NextStopper( char ** sSource, char * sDest )
+{
+  int iLen = 0;
+
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("NextStopper(%p, %s)", sSource, sDest));
+
+  #if 0
+     printf( "In: >%s<\n", *sSource );
+  #endif
+
+  while( ISNAME( (*sSource)[ iLen ] ) )
+  {
+     sDest[ iLen ] = (*sSource)[ iLen ];
+     iLen++;
+  }
+  sDest[ iLen ] = '\0';
+
+  #if 0
+     printf( "Len: %i NextName: >%s<\n", iLen, sDest );
+     printf( "Rest: >%s<\n", (*sSource) + iLen );
+  #endif
+
+  return iLen;
 }
 
 static int NextParm( char ** sSource, char * sDest )
