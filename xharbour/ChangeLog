@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1886 2003/12/15 23:15:24 peterrees Exp $
+ * $Id: ChangeLog,v 1.1887 2003/12/17 03:53:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-17 15:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed compilation of <> in #directives.
+
+  * source/rtl/console.c
+    + Added OutputDebugString() in hb_conOutErr() if under Windows.
+
+  * source/vm/estack.c
+    * Minor formatting.
 
 2003-12-16 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/genc.c

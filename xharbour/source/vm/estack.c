@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.55 2003/12/10 18:30:23 ronpinkas Exp $
+ * $Id: estack.c,v 1.56 2003/12/11 11:22:11 mlombardo Exp $
  */
 
 /*
@@ -53,9 +53,7 @@
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
 
-#if defined(HB_INCLUDE_WINEXCHANDLER)
-   #define HB_OS_WIN_32_USED
-#endif
+#define HB_OS_WIN_32_USED
 
 #include "hbapi.h"
 #include "hbdefs.h"

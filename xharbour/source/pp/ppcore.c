@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.103 2003/12/04 09:26:54 druzus Exp $
+ * $Id: ppcore.c,v 1.104 2003/12/11 05:09:26 andijahja Exp $
  */
 
 /*
@@ -1106,59 +1106,15 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
 
   HB_SKIPTABSPACES( sLine );
 
-  #if 0
-     /* JFL 2000-09-19 */
-     /* This was the original line as Alexander wrote it */
-     /* while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && *sLine != '<' && *sLine != '=' && ( *sLine != '(' || ipos == 0 ) ) */
-     /* Now the line #xtranslate = name(.. => will be allowed */
-     ipos = 0;
+  ipos = hb_pp_NextToken( &sLine, s_sToken );
 
-     /* I changed it to the following to allow < and = to be the first char within a translate or xtranslate */
-     while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && ( *sLine != '<' || ipos == 0 ) && ( *sLine != '=' || ipos == 0 ) && ( *sLine != '(' || ipos == 0 ) )
-     {
-        /* Ron Pinkas added 2000-01-24 */
-        if( ! ISNAME( *sLine ) )
-        {
-           /* Ron Pinkas added 2002-02-15 */
-           if( *sLine == '[' && ipos )
-           {
-              break;
-           }
+  if( ipos == 0 || ipos > MAX_NAME )
+  {
+     // Error???
+     return;
+  }
 
-           if( IS_2CHAR_OPERATOR( sLine ) )
-           {
-              *(cmdname+ipos++) = *sLine++;
-              *(cmdname+ipos++) = *sLine++;
-              break;
-           }
-           else
-           {
-              *(cmdname+ipos++) = *sLine++;
-              break;
-           }
-        }
-        /* END, Ron Pinkas added 2000-01-24 */
-
-        *(cmdname+ipos++) = *sLine++;
-     }
-     *(cmdname+ipos) = '\0';
-
-     if( !ipos )
-     {
-        return;
-     }
-  #else
-
-     ipos = hb_pp_NextToken( &sLine, s_sToken );
-
-     if( ipos == 0 || ipos > MAX_NAME )
-     {
-        // Error???
-        return;
-     }
-
-     strcpy( cmdname, s_sToken );
-  #endif
+  strcpy( cmdname, s_sToken );
 
   hb_strupr( cmdname );
   HB_SKIPTABSPACES(sLine);
@@ -1486,6 +1442,11 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         {
            hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mplen - i + 1 );
            mplen--;
+           continue;
+        }
+        else if( mpatt[ i + 1 ] == '>' )
+        {
+           i += 2;
            continue;
         }
         else

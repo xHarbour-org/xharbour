@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.39 2003/12/03 11:16:07 jonnymind Exp $
+ * $Id: console.c,v 1.40 2003/12/06 15:33:39 jonnymind Exp $
  */
 /*
  * Harbour Project source code:
@@ -284,6 +284,10 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
 void hb_conOutErr( char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
+
+   #ifdef HB_OS_WIN_32
+      OutputDebugString( pStr );
+   #endif
 
    if( ulLen == 0 )
    {
