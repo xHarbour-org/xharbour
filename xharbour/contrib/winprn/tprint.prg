@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.10 2004/03/02 12:58:14 andijahja Exp $
+ * $Id: tprint.prg,v 1.11 2004/03/03 08:20:05 andijahja Exp $
  */
 
 /*
@@ -896,16 +896,17 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray)
 {
-    HB_ITEM SubItems, Tmp;
+    HB_ITEM SubItems;
 
     SubItems.type = HB_IT_NIL;
-    Tmp.type = HB_IT_NIL;
 
     hb_arrayNew( &SubItems, 4 );
-    hb_arraySetForward( &SubItems, 1 ,hb_itemPutC(  &Tmp, lplf->lfFaceName) ) ;
-    hb_arraySetForward( &SubItems, 2 ,hb_itemPutL(  &Tmp   , lplf->lfPitchAndFamily & FIXED_PITCH  ) ) ;
-    hb_arraySetForward( &SubItems, 3 ,hb_itemPutL(  &Tmp, FontType & TRUETYPE_FONTTYPE) ) ;
-    hb_arraySetForward( &SubItems, 4 ,hb_itemPutNL( &Tmp , lpntm->tmCharSet) ) ;
+
+    hb_itemPutC(  hb_arrayGetItemPtr( &SubItems, 1 ), lplf->lfFaceName                     );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 2 ), lplf->lfPitchAndFamily & FIXED_PITCH );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType & TRUETYPE_FONTTYPE         );
+    hb_itemPutNL( hb_arrayGetItemPtr( &SubItems, 4 ), lpntm->tmCharSet                     );
+
     hb_arrayAddForward((PHB_ITEM) pArray , &SubItems);
 
     return(TRUE);

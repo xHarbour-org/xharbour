@@ -226,6 +226,7 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
 HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
+static void    hb_itemReleaseStringX( PHB_ITEM pItem );
 
 #ifndef HB_CDP_SUPPORT_OFF
    extern void hb_cdpReleaseAll( void );
@@ -254,7 +255,9 @@ extern void hb_clsSetModule( USHORT uiClass );
    char *s_pszLinkedMain = NULL; /* name of starup function set by linker */
 #endif
 
-BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
+#ifndef HB_NO_TRACE
+   BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
+#endif
 
 /* virtual machine state */
 
@@ -2162,7 +2165,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                    if( (*pGlobals)[ iGlobal ]->item.asString.bStatic == FALSE )
                    {
-                      hb_itemReleaseString( (*pGlobals)[ iGlobal ] );
+                      hb_itemReleaseStringX( (*pGlobals)[ iGlobal ] );
                    }
 
                    (*pGlobals)[ iGlobal ]->item.asString.value = sString;
@@ -2500,7 +2503,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      sString = (char*) hb_xgrab( iNewLen + 1 );
                      memcpy( sString, pString->item.asString.value, iNewLen );
                      sString[ iNewLen ] = '\0';
-                     hb_itemReleaseString( pString );
+                     hb_itemReleaseStringX( pString );
                      pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
                      *( pString->item.asString.puiHolders ) = 1;
                      pString->item.asString.value = sString;
@@ -2552,7 +2555,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      sString = (char*) hb_xgrab( iNewLen + 1 );
                      memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                      sString[ iNewLen ] = '\0';
-                     hb_itemReleaseString( pString );
+                     hb_itemReleaseStringX( pString );
                      pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
                      *( pString->item.asString.puiHolders ) = 1;
                      pString->item.asString.value = sString;
@@ -4831,7 +4834,7 @@ static void hb_vmArrayPush( void )
          {
             BYTE cChar = pArray->item.asString.value[lIndex];
 
-            hb_itemReleaseString( pArray );
+            hb_itemReleaseStringX( pArray );
 
             pArray->item.asString.value   = hb_vm_acAscii[ cChar ];
             pArray->item.asString.bStatic = TRUE;
@@ -4843,7 +4846,7 @@ static void hb_vmArrayPush( void )
       {
          if( ! pArray->item.asString.bStatic )
          {
-            hb_itemReleaseString( pArray );
+            hb_itemReleaseStringX( pArray );
          }
 
          pArray->item.asString.value  = hb_vm_sNull;
@@ -5057,7 +5060,7 @@ static void hb_vmArrayPop( void )
 
             if( ! pArray->item.asString.bStatic )
             {
-               hb_itemReleaseString( pArray );
+               hb_itemReleaseStringX( pArray );
             }
 
             pArray->item.asString.value           =  sNew;
@@ -5504,10 +5507,12 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
             }
          #endif
 
-         if ( hb_bTracePrgCalls )
-         {
-            HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-         }
+         #ifndef HB_NO_TRACE
+            if ( hb_bTracePrgCalls )
+            {
+               HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
+            }
+         #endif
 
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
@@ -5815,10 +5820,12 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          }
       #endif
 
-      if ( hb_bTracePrgCalls )
-      {
-         HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-      }
+      #ifndef HB_NO_TRACE
+         if ( hb_bTracePrgCalls )
+         {
+            HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
+         }
+      #endif
 
       HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
@@ -6908,7 +6915,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
          if( pLocal->item.asString.bStatic == FALSE )
          {
-            hb_itemReleaseString( pLocal );
+            hb_itemReleaseStringX( pLocal );
          }
 
          pLocal->item.asString.value = sString;
@@ -6972,7 +6979,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
       if( pReference->item.asString.bStatic == FALSE )
       {
-         hb_itemReleaseString( pReference );
+         hb_itemReleaseStringX( pReference );
       }
 
       pReference->item.asString.value = sString;
@@ -8043,13 +8050,17 @@ HB_FUNC( __SETPROFILER )
  * $End$ */
 HB_FUNC( __TRACEPRGCALLS )
 {
-   HB_THREAD_STUB
+   #ifndef HB_NO_TRACE
+      HB_THREAD_STUB
 
-   BOOL bOldValue = hb_bTracePrgCalls;
+      BOOL bOldValue = hb_bTracePrgCalls;
 
-   hb_bTracePrgCalls = hb_parl( 1 );
+      hb_bTracePrgCalls = hb_parl( 1 );
 
-   hb_retl( bOldValue );
+      hb_retl( bOldValue );
+   #else
+      hb_retl( 0 );
+   #endif
 }
 
 /* hvm support for pcode DLLs */
@@ -8119,6 +8130,20 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
          hb_dynsymUnlock();
       }
    }
+}
+
+static void hb_itemReleaseStringX( PHB_ITEM pItem )
+{
+   /*
+   This is a copy of hb_itemReleaseString() with logic for
+   checking bStatic flag removed.
+   */
+   if( --*( pItem->item.asString.puiHolders ) == 0 )
+   {
+      hb_xfree( pItem->item.asString.puiHolders );
+      hb_xfree( pItem->item.asString.value );
+   }
+   pItem->item.asString.value = NULL;
 }
 
 HB_FUNC( HB_FUNCPTR )

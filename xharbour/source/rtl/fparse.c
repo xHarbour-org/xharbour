@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.3 2004/02/20 19:10:00 andijahja Exp $
+ * $Id: fparse.c,v 1.4 2004/03/02 12:58:14 andijahja Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ FPARSE( cFile, cDelimiter ) -> array
 #define MAX_READ 4096
 
 //----------------------------------------------------------------------------//
-static char ** hb_tokensplit ( char *string, BYTE delimiter, int iCharCount )
+static char ** hb_tokensplit ( char *string, BYTE delimiter, int iCharCount, int *iWord )
 {
    char *buffer, *bufptr;
    char **token_list;
@@ -125,6 +125,8 @@ static char ** hb_tokensplit ( char *string, BYTE delimiter, int iCharCount )
 
    token_list [word_count] = NULL;
 
+   *iWord = word_count;
+
    return (token_list);
 }
 
@@ -133,17 +135,17 @@ static BOOL file_read ( FILE *stream, char *string, int *iCharCount )
 {
    int ch, cnbr = 0;
 
-   memset (string, ' ', MAX_READ);
+   memset ( string, ' ', MAX_READ );
 
    for (;;)
    {
-      ch = fgetc (stream);
+      ch = fgetc ( stream );
 
-      if ( (ch == '\n') ||  (ch == EOF) ||  (ch == 26) )
+      if ( ( ch == '\n' ) || ( ch == EOF ) || ( ch == 26 ) )
       {
          *iCharCount = cnbr;
          string [cnbr] = '\0';
-         return (ch == '\n' || cnbr);
+         return ( ch == '\n' || cnbr );
       }
       else
       {
@@ -163,12 +165,39 @@ static BOOL file_read ( FILE *stream, char *string, int *iCharCount )
 }
 
 //----------------------------------------------------------------------------//
+static BOOL char_count ( FILE *stream, ULONG *ulCharCount )
+{
+   int ch;
+   int num_char = 0;
+
+   for (;;)
+   {
+      ch = fgetc ( stream );
+
+      if ( ch == '\n' )
+      {
+         *ulCharCount = num_char;
+         return TRUE;
+      }
+      else if ( ( ch != ' ') && ( ch != 9 ) )
+      {
+         num_char ++ ;
+      }
+
+      if ( ( ch == EOF ) ||  ( ch == 26 ) )
+      {
+         return FALSE;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------//
 HB_FUNC( FPARSE )
 {
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    PHB_ITEM pDelim = hb_param(2, HB_IT_STRING);
-   HB_ITEM Temp, Array, Item;
+   HB_ITEM Array, Item;
    char *string ;
    char **tokens;
    int iToken, iCharCount = 0;
@@ -210,22 +239,21 @@ HB_FUNC( FPARSE )
    /* container for parsed line */
    Item.type = HB_IT_NIL;
 
-   /* holder for parsed text */
-   Temp.type = HB_IT_NIL;
-
    /* read the file until EOF */
    while ( file_read ( inFile, string, &iCharCount ) )
    {
       /* parse the read line */
-      tokens = hb_tokensplit ( string, nByte, iCharCount ) ;
+      int iWord = 0;
+
+      tokens = hb_tokensplit ( string, nByte, iCharCount, &iWord ) ;
 
       /* prepare empty array */
-      hb_arrayNew( &Item, 0 );
+      hb_arrayNew( &Item, iWord );
 
       /* add parsed text to array */
       for (iToken = 0; tokens [iToken]; iToken++)
       {
-         hb_arrayAddForward( &Item, hb_itemPutC( &Temp, tokens [iToken] ) );
+         hb_itemPutC( hb_arrayGetItemPtr( &Item, iToken + 1 ), tokens [iToken] );
       }
 
       /* add array containing parsed text to main array */
@@ -243,8 +271,155 @@ HB_FUNC( FPARSE )
    /* clean up */
    hb_xfree( string );
    fclose( inFile );
+}
 
-   hb_itemClear( &Temp  );
-   hb_itemClear( &Array );
-   hb_itemClear( &Item  );
+//----------------------------------------------------------------------------//
+HB_FUNC( FWORDCOUNT )
+{
+   FILE *inFile ;
+   PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
+   char *string ;
+   char **tokens;
+   int iCharCount = 0;
+   BYTE nByte = ' ';
+   ULONG ulWordCount = 0;
+
+   /* file parameter correctly passed */
+   if ( !pSrc )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( pSrc->item.asString.length == 0 )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* open file for read */
+   inFile = fopen( pSrc->item.asString.value, "r" );
+
+   /* return 0 on failure */
+   if ( !inFile )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* book memory for line to read */
+   string = (char*) hb_xgrab( MAX_READ + 1 );
+
+   /* read the file until EOF */
+   while ( file_read ( inFile, string, &iCharCount ) )
+   {
+      int iWord = 0;
+
+      tokens = hb_tokensplit ( string, nByte, iCharCount, &iWord ) ;
+
+      ulWordCount += iWord;
+
+      /* clean up */
+      tokens--;
+      hb_xfree( tokens [0] );
+      hb_xfree( tokens );
+   }
+
+   /* return number of words */
+   hb_retnl( ulWordCount );
+
+   /* clean up */
+   hb_xfree( string );
+   fclose( inFile );
+}
+
+//----------------------------------------------------------------------------//
+HB_FUNC( FLINECOUNT )
+{
+   FILE *inFile ;
+   PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
+   ULONG ulLineCount = 0;
+   int ch;
+
+   /* file parameter correctly passed */
+   if ( !pSrc )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( pSrc->item.asString.length == 0 )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* open file for read */
+   inFile = fopen( pSrc->item.asString.value, "r" );
+
+   /* return 0 on failure */
+   if ( !inFile )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* read the file until EOF */
+   while ( ( ch = fgetc ( inFile ) ) != EOF )
+   {
+      if ( ch == '\n' )
+      {
+         ulLineCount ++;
+      }
+   }
+
+   /* return number of lines */
+   hb_retnl( ulLineCount );
+
+   /* clean up */
+   fclose( inFile );
+}
+
+//----------------------------------------------------------------------------//
+HB_FUNC( FCHARCOUNT )
+{
+   FILE *inFile ;
+   PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
+   ULONG ulCharCount = 0;
+   ULONG ulResult = 0;
+
+   /* file parameter correctly passed */
+   if ( !pSrc )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( pSrc->item.asString.length == 0 )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* open file for read */
+   inFile = fopen( pSrc->item.asString.value, "r" );
+
+   /* return 0 on failure */
+   if ( !inFile )
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* read the file until EOF */
+   while ( char_count( inFile, &ulCharCount ) )
+   {
+      ulResult += ulCharCount;
+   }
+
+   /* return number of characters */
+   hb_retnl( ulResult );
+
+   /* clean up */
+   fclose( inFile );
 }

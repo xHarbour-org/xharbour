@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.84 2004/03/02 12:58:14 andijahja Exp $
+ * $Id: dbcmd.c,v 1.85 2004/03/05 15:43:46 lculik Exp $
  */
 
 /*
@@ -1172,7 +1172,6 @@ HB_FUNC( AFIELDS )
       }
    }
 
-   hb_itemClear( &Item );
    hb_retni( uiArrayLen );
 }
 
@@ -1637,14 +1636,15 @@ HB_FUNC( DBDELETE )
 HB_FUNC( DBFILTER )
 {
    HB_THREAD_STUB
-   PHB_ITEM pFilter;
+   HB_ITEM Filter;
+
+   Filter.type = HB_IT_NIL;
 
    if( s_pCurrArea )
    {
-      pFilter = hb_itemPutC( NULL, "" );
-      SELF_FILTERTEXT( ( AREAP ) s_pCurrArea->pArea, pFilter );
-      hb_retc( pFilter->item.asString.value );
-      hb_itemRelease( pFilter );
+      hb_itemPutC( &Filter, "" );
+      SELF_FILTERTEXT( ( AREAP ) s_pCurrArea->pArea, &Filter );
+      hb_retc( (&Filter)->item.asString.value );
    }
    else
       hb_retc( NULL );
@@ -1712,7 +1712,7 @@ HB_FUNC( __DBLOCATE )
 
    if( pWhile )
    {
-      pNewRest = hb_itemPutL( NULL, TRUE );
+      pNewRest = hb_itemPutL( pNewRest, TRUE );
       pScopeInfo.fRest = pNewRest;
    }
 
@@ -2073,15 +2073,16 @@ HB_FUNC( DBRLOCK )
 HB_FUNC( DBRLOCKLIST )
 {
    HB_THREAD_STUB
-   PHB_ITEM pList;
+   HB_ITEM List;
 
-   pList = hb_itemArrayNew( 0 );
+   List.type = HB_IT_NIL;
+   hb_arrayNew( &List, 0 );
    if( s_pCurrArea )
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETLOCKARRAY, pList );
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETLOCKARRAY, &List );
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBRLOCKLIST" );
 
-   hb_itemRelease( hb_itemReturn( pList ) );
+   hb_itemReturn( &List );
 }
 
 HB_FUNC( DBRUNLOCK )
@@ -2259,22 +2260,17 @@ HB_FUNC( DBSTRUCT )
 
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, &Data );
          hb_arraySetForward( &Item, 1, &Data );
-         hb_itemClear( &Data );
 
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, &Data );
          hb_arraySetForward( &Item, 2, &Data );
-         hb_itemClear( &Data );
 
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, &Data );
          hb_arraySetForward( &Item, 3, &Data );
-         hb_itemClear( &Data );
 
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, &Data );
          hb_arraySetForward( &Item, 4, &Data );
-         hb_itemClear( &Data );
 
          hb_arrayAddForward( &(HB_VM_STACK.Return), &Item );
-         hb_itemClear( &Item );
       }
 
    }
@@ -2286,7 +2282,9 @@ HB_FUNC( DBTABLEEXT )
    LPRDDNODE pRddNode;
    AREAP pTempArea;
    USHORT uiSize, uiRddID;
-   PHB_ITEM pItem;
+   HB_ITEM Item;
+
+   Item.type = HB_IT_NIL;
 
    if( !s_pCurrArea )
    {
@@ -2319,19 +2317,17 @@ HB_FUNC( DBTABLEEXT )
          hb_retc( NULL );
       else
       {
-         pItem = hb_itemPutC( NULL, "" );
-         SELF_INFO( ( AREAP ) pTempArea, DBI_TABLEEXT, pItem );
-         hb_retc( pItem->item.asString.value );
-         hb_itemRelease( pItem );
+         hb_itemPutC( &Item, "" );
+         SELF_INFO( ( AREAP ) pTempArea, DBI_TABLEEXT, &Item );
+         hb_retc( (&Item)->item.asString.value );
          SELF_RELEASE( pTempArea );
       }
    }
    else
    {
-      pItem = hb_itemPutC( NULL, "" );
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pItem );
-      hb_retc( pItem->item.asString.value );
-      hb_itemRelease( pItem );
+      hb_itemPutC( &Item, "" );
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &Item );
+      hb_retc( (&Item)->item.asString.value );
    }
 }
 
@@ -2548,7 +2544,6 @@ HB_FUNC( FIELDDEC )
          if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_DEC, &Item ) == SUCCESS)
          {
             hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
-            hb_itemClear( &Item );
             return;
          }
       }
@@ -2574,7 +2569,6 @@ HB_FUNC( FIELDGET )
    }
 
    hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
-   hb_itemClear( &Item );
 }
 
 HB_FUNC( FIELDLEN )
@@ -2593,7 +2587,6 @@ HB_FUNC( FIELDLEN )
          if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_LEN, &Item ) == SUCCESS )
          {
             hb_itemForwardValue( &(HB_VM_STACK.Return), &Item );
-            hb_itemClear( &Item );
             return;
          }
       }
@@ -2695,7 +2688,6 @@ HB_FUNC( FIELDTYPE )
          if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_TYPE, &Item ) == SUCCESS )
          {
             hb_itemForwardValue( &(HB_VM_STACK).Return, &Item );
-            hb_itemClear( &Item );
             return;
          }
       }
@@ -2744,7 +2736,6 @@ HB_FUNC( HEADER )
       RecSize.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETHEADERSIZE, &RecSize );
       hb_itemForwardValue( &(HB_VM_STACK).Return, &RecSize );
-      hb_itemClear( &RecSize );
    }
 }
 
@@ -3446,7 +3437,6 @@ HB_FUNC( RDDLIST )
       if( ( uiType == 0 ) || ( pRddNode->uiType == uiType ) )
       {
          hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutC( &Name, pRddNode->szName ) );
-         hb_itemClear( &Name );
       }
 
       pRddNode = pRddNode->pNext;
@@ -3510,12 +3500,14 @@ HB_FUNC( RECCOUNT )
 HB_FUNC( RECNO )
 {
    HB_THREAD_STUB
-   PHB_ITEM pRecNo;
+   HB_ITEM RecNo;
 
-   pRecNo = hb_itemPutNL( NULL, 0 );
+   RecNo.type = HB_IT_NIL;
+
+   hb_itemPutNL( &RecNo, 0 );
    if( s_pCurrArea )
-      SELF_RECNO( ( AREAP ) s_pCurrArea->pArea, pRecNo );
-   hb_itemRelease( hb_itemReturn( pRecNo ) );
+      SELF_RECNO( ( AREAP ) s_pCurrArea->pArea, &RecNo );
+   hb_itemReturn( &RecNo );
 }
 
 HB_FUNC( RECSIZE )
@@ -3528,7 +3520,6 @@ HB_FUNC( RECSIZE )
       RecSize.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETRECSIZE, &RecSize );
       hb_itemForwardValue( &(HB_VM_STACK).Return, &RecSize );
-      hb_itemClear( &RecSize );
    }
    else
       hb_retni( 0 );
@@ -3732,7 +3723,6 @@ HB_FUNC( ORDSCOPE )
             hb_itemPutL( &ScopeValue, TRUE );
       }
       hb_itemForwardValue( &(HB_VM_STACK).Return, &ScopeValue );
-      hb_itemClear( &ScopeValue );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSCOPE" );
@@ -4029,7 +4019,6 @@ HB_FUNC( DBINFO )
          }
          SELF_INFO( ( AREAP ) s_pCurrArea->pArea, hb_itemGetNI( pType ), &Temp );
          hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
-         hb_itemClear( &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
@@ -4103,7 +4092,6 @@ HB_FUNC( DBFIELDINFO )
 
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, hb_itemGetNI( pType ), &Temp );
          hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
-         hb_itemClear( &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
@@ -4132,7 +4120,6 @@ HB_FUNC( DBRECORDINFO )
          }
          SELF_RECINFO( ( AREAP ) s_pCurrArea->pArea, pRecNo, hb_itemGetNI( pType ), &Temp );
          hb_itemForwardValue( &(HB_VM_STACK).Return, &Temp );
-         hb_itemClear( &Temp );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );

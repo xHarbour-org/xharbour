@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2515 2004/03/07 14:22:10 druzus Exp $
+ * $Id: ChangeLog,v 1.2516 2004/03/07 14:42:21 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-08 04:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/hvm.c
+    + there are 10 instances of hb_itemReleaseString() in hvm.c. 8 of which
+      check bStatic status before calling the function leaving only 2 which
+      are ambiguous. On that ground, I create a static function
+      hb_itemReleaseStringX() within hvm.c to avoid redundant checking of
+      bStatic flag. I've tested this for one week before committing and found
+      no problem. This may not add a significant speed boost but double
+      checking is not an efficient job, IMO.
+
+    + add HB_NO_TRACE define. When defined, all logic test to hb_bTracePrgCalls
+      will be ignored.
+
+  * source/rdd/dbcmd.c
+    - remove redundant hb_itemClear()
+
+  * source/rtl/hbcomprs.c
+    % pass proper parameter to error handler in prg level functions.
+
+  * source/clipsamp/gauge.c
+    % minor optimization
+
+  * source/rtl/fparse.c
+    % minor optimization
+    - remove redundant hb_itemClear()
+    + Function FLINECOUNT( ctextFile ) -> nLineCount.
+      A pretty quick line counting routine for text file.
+    + Function FCHARCOUNT( ctextFile ) -> nCharCount.
+      A pretty quick character counting routine for text file. Spaces and tabs
+      are ignored.
+    + Function FWORDCOUNT( ctextFile ) -> nWordCount.
+      A pretty quick word counting routine for text file. A word is a stream
+      of character(s) delimited with space.
+
+  * contrib/winprn/tprint.prg
+    % minor optimization on function FontEnumCallBack(()
 
 2004-03-07 17:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * xharbour.spec
