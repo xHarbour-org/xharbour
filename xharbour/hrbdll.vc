@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.41 2004/08/27 06:38:57 paultucker Exp $
+# $Id: hrbdll.vc,v 1.42 2004/08/27 07:53:50 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -567,6 +567,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\color.obj \
   $(OBJ_DIR)\ct.obj \
   $(OBJ_DIR)\ctmisc.obj \
+  $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
   $(OBJ_DIR)\datetime.obj \
   $(OBJ_DIR)\dattime2.obj \
@@ -576,7 +577,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\numconv.obj \
   $(OBJ_DIR)\screen2.obj \
-  $(OBJ_DIR)\time.obj \
   $(OBJ_DIR)\util.obj \
 #
 # pplib
@@ -2224,6 +2224,12 @@ $(OBJ_DIR)\ctmisc.c : $(CT_DIR)\ctmisc.prg
 $(OBJ_DIR)\ctmisc.obj : $(OBJ_DIR)\ctmisc.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\ctwin.c : $(CT_DIR)\ctwin.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -2276,12 +2282,6 @@ $(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\time.c : $(CT_DIR)\time.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\time.obj : $(OBJ_DIR)\time.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg

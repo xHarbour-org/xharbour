@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.9 2004/08/27 05:42:13 paultucker Exp $
+# $Id: makefile.wc,v 1.10 2004/08/27 07:53:50 paultucker Exp $
 #
 
 #
@@ -797,6 +797,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\ctmath.obj \
    $(OBJ_DIR)\ctmath2.obj \
    $(OBJ_DIR)\ctnet.obj \
+   $(OBJ_DIR)\ctpad.obj \
    $(OBJ_DIR)\ctset.obj \
    $(OBJ_DIR)\ctstr.obj \
    $(OBJ_DIR)\dbftools.obj \
@@ -811,7 +812,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\num1.obj \
    $(OBJ_DIR)\numat.obj \
    $(OBJ_DIR)\numlohi.obj \
-   $(OBJ_DIR)\pad.obj \
    $(OBJ_DIR)\pos1.obj \
    $(OBJ_DIR)\pos2.obj \
    $(OBJ_DIR)\posdiff.obj \
@@ -835,6 +835,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\color.obj \
    $(OBJ_DIR)\ct.obj \
    $(OBJ_DIR)\ctmisc.obj \
+   $(OBJ_DIR)\cttime.obj \
    $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
@@ -844,7 +845,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\time.obj \
    $(OBJ_DIR)\util.obj
 
 #
@@ -2862,6 +2862,9 @@ $(OBJ_DIR)\ctmath2.obj : $(CT_DIR)\ctmath2.c
 $(OBJ_DIR)\ctnet.obj : $(CT_DIR)\ctnet.c
   $(CC) $(CLIBFLAGS) -fo$@ $**
 
+$(OBJ_DIR)\ctpad.obj : $(CT_DIR)\ctpad.c
+  $(CC) $(CLIBFLAGS) -fo$@ $**
+
 $(OBJ_DIR)\ctset.obj : $(CT_DIR)\ctset.c
   $(CC) $(CLIBFLAGS) -fo$@ $**
 
@@ -2902,9 +2905,6 @@ $(OBJ_DIR)\numat.obj : $(CT_DIR)\numat.c
   $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
-  $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\pad.obj : $(CT_DIR)\pad.c
   $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\pos1.obj : $(CT_DIR)\pos1.c
@@ -2988,6 +2988,12 @@ $(OBJ_DIR)\ctmisc.obj : $(OBJ_DIR)\ctmisc.c
 $(OBJ_DIR)\ctwin.c : $(CT_DIR)\ctwin.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
+$(OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
 $(OBJ_DIR)\ctwin.obj : $(OBJ_DIR)\ctwin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
@@ -3000,7 +3006,7 @@ $(OBJ_DIR)\datetime.obj : $(OBJ_DIR)\datetime.c
 $(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\dbgtwin.obj : $(OBJ_DIR)\dbgtwin.c
+$(OBJ_DIR)\dattime2.obj : $(OBJ_DIR)\dattime2.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg
@@ -3037,12 +3043,6 @@ $(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\screen2.obj : $(OBJ_DIR)\screen2.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\time.c : $(CT_DIR)\time.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\time.obj : $(OBJ_DIR)\time.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg

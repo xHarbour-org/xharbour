@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3354 2004/08/27 07:25:43 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3355 2004/08/27 07:53:50 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-27 10:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/ct/Makefile
+     * source/ct/math.c -> source/ct/ctmath2.c
+     * source/ct/net.c -> source/ct/ctnet.c
+     * source/ct/pad.c -> source/ct/ctpad.c
+     * source/ct/time.prg -> source/ct/cttime.prg
+
+   * hrbdll.vc
+   * hrbdll.wc
+   * hrbdll.bc
+   * makefile.vc
+   * makefile.wc
+   * makefile.nt
+   * makefile.bc
+     * source/ct/pad.c -> source/ct/ctpad.c
+     * source/ct/time.prg -> source/ct/cttime.prg
+     * corrected dbgtwin reference
+   * makefile.bc
+     + source/ct/fcopy.prg
 
 2004-08-27 03:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * hrbdll.vc

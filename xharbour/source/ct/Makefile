@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+# $Id: Makefile,v 1.2 2004/08/27 07:25:45 mauriliolongo Exp $
 #
 
 ROOT = ../../
@@ -27,6 +27,9 @@ C_SOURCES = \
 	count.c \
 	ctc.c \
 	ctmath.c \
+	ctmath2.c \
+	ctnet.c \
+	ctpad.c \
 	ctset.c \
 	ctstr.c \
 	ctchksum.c \
@@ -39,14 +42,11 @@ C_SOURCES = \
 	ftoc.c \
 	justify.c \
 	keyset.c \
-	math.c \
 	misc1.c \
-	net.c \
 	num1.c \
 	numat.c \
 	numlohi.c \
 	pack.c \
-	pad.c \
 	pos1.c \
 	pos2.c \
 	posdiff.c \
@@ -71,8 +71,9 @@ PRG_SOURCES= \
 	blank.prg  \
 	color.prg \
 	ct.prg \
-	ctwin.prg \
 	ctmisc.prg \
+	cttime.prg \
+	ctwin.prg \
 	datetime.prg \
 	dattime2.prg \
 	dattime3.prg \
@@ -81,7 +82,6 @@ PRG_SOURCES= \
 	invrtwin.prg \
 	numconv.prg \
 	screen2.prg \
-	time.prg \
 	util.prg 
 
 

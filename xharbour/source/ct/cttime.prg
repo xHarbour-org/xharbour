@@ -1,5 +1,5 @@
 /*
- * $Id: time.prg,v 1.1 2003/08/18 12:13:46 druzus Exp $
+ * $Id: time.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
