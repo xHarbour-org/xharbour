@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2003/01/12 22:50:21 jonnymind Exp $
+# $Id: Makefile,v 1.9 2003/04/22 08:12:56 mauriliolongo Exp $
 #
 
 ROOT = ../../
@@ -33,6 +33,7 @@ C_SOURCES=\
 	extend.c     \
 	fm.c         \
 	garbage.c    \
+	hbi18n.c     \
 	hvm.c        \
 	inet.c       \
 	initexit.c   \

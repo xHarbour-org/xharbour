@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.39 2003/06/10 23:46:18 ronpinkas Exp $
+ * $Id: harbour.c,v 1.40 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -189,6 +189,9 @@ int            hb_comp_iVarScope;                         /* holds the scope for
 PHB_FNAME      hb_comp_pOutPath = NULL;
 BOOL           hb_comp_bCredits = FALSE;                  /* print credits */
 BOOL           hb_comp_bBuildInfo = FALSE;                /* print build info */
+BOOL           hb_comp_bI18n = FALSE;                     /* Output i18n file */
+char *         hb_comp_szHILout = NULL;                   /* Output file name */
+FILE *         hb_comp_HILfile = NULL;                    /* output .hil file */
 BOOL           hb_comp_bLogo = TRUE;                      /* print logo */
 BOOL           hb_comp_bSyntaxCheckOnly = FALSE;          /* syntax check only */
 int            hb_comp_iLanguage = LANG_C;                /* default Harbour generated output language */
@@ -4658,6 +4661,20 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADFILENAME, szPrg, NULL );
       iStatus = EXIT_FAILURE;
    }
+   /* have we got i18n file ? */
+   if ( hb_comp_HILfile != NULL )
+   {
+      fclose( hb_comp_HILfile );
+   }
+   if ( hb_comp_szHILout != NULL )
+   {
+      fclose( hb_comp_HILfile );
+   }
+   if ( hb_comp_szHILout != NULL )
+   {
+      hb_xfree( hb_comp_szHILout );
+   }
+
    hb_xfree( hb_comp_pFileName );
 
    return iStatus;
@@ -4841,4 +4858,54 @@ void hb_compEnumMemberAdd( char *szName )
    }
 
    hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
+}
+
+/* Giasncarlo Niccolai: internatonalization functions */
+void hb_compAddI18nString( char *szString )
+{
+   char szFileName[ _POSIX_PATH_MAX ];
+   char *szExt, *szPath;
+   int nLen;
+
+   /* open destination file if necessary */
+   if ( hb_comp_HILfile == NULL )
+   {
+      /* Get correct filename */
+      if ( hb_comp_szHILout == NULL )
+      {
+         szExt = hb_comp_pFileName->szExtension;
+         hb_comp_pFileName->szExtension = ".hil";
+         hb_fsFNameMerge( szFileName, hb_comp_pFileName );
+         hb_comp_pFileName->szExtension = szExt;
+         szPath = szFileName;
+      }
+      else
+      {
+         szPath = hb_comp_szHILout;
+      }
+
+      hb_comp_HILfile = fopen( szPath, "wb" );
+
+      if( hb_comp_HILfile == NULL )
+      {
+         hb_compGenError( hb_comp_szErrors,
+            'E', HB_COMP_ERR_CREATE_OUTPUT,
+            szFileName, NULL );
+         /* avoidsbeing called again */
+         hb_comp_bI18n = FALSE;
+         return;
+      }
+   }
+
+   nLen = strlen( szString );
+
+   // include trailing 0
+   fwrite( &nLen, 1, sizeof( nLen + 1 ), hb_comp_HILfile );
+   fwrite( szString, 1,  nLen + 1, hb_comp_HILfile );
+
+   if ( ferror( hb_comp_HILfile ) )
+   {
+      //TODO: signal error
+      hb_comp_bI18n = FALSE;
+   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.4 2003/02/11 03:08:37 druzus Exp $
+ * $Id: cmdcheck.c,v 1.5 2003/02/15 22:20:11 paultucker Exp $
  */
 
 /*
@@ -611,6 +611,22 @@ void hb_compChkEnvironVar( char * szSwitch )
              case 'i':
              case 'I':
                 hb_fsAddSearchPath( s + 1, &hb_comp_pIncludePath );
+                break;
+
+             case 'j':
+             case 'J':
+                hb_comp_bI18n = TRUE;
+                if ( s[1] )
+                {
+                   hb_comp_szHILout = (char *) hb_xgrab( strlen( s + 1 ) );
+                   strcpy( hb_comp_szHILout, s + 1);
+                }
+                else
+                {
+                   hb_comp_szHILout = NULL;
+                }
+
+                /* The file will be eventually created when we find an i18n() */
                 break;
 
              case 'k':

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.54 2003/06/06 14:46:50 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.55 2003/06/14 21:05:15 ronpinkas Exp $
  */
 
 /*
@@ -1806,6 +1806,18 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      pSelf->value.asList.pIndex    = hb_compExprNewLong( -1 );
                   }
                }
+               #ifndef HB_MACRO_SUPPORT
+               else if( hb_comp_bI18n && strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "I18N" ) == 0 )
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+
+                  if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
+                  {
+                     hb_compAddI18nString( pString->value.asString.string );
+                  }
+               }
+               #endif
             }
           #endif
          }

@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.10 2003/05/26 15:46:30 jonnymind Exp $
+# $Id: Makefile,v 1.11 2003/06/03 04:08:56 druzus Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -63,7 +63,7 @@ endif
 %.c: %.prg
 	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
 %.o: %.c
-		gcc -I$(HB_INC_INSTALL) -c -o $@ $<
+	gcc -I$(HB_INC_INSTALL) -c -o $@ $<
 
 
 %$(EXE_EXT): %.o
@@ -72,3 +72,4 @@ endif
 			-ldebug $(MTLIBS) -lpp -llang -lcommon \
 			$(GT_LIBS) -lm \
 		-Wl,--end-group
+

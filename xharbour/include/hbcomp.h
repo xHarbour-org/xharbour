@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.15 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.16 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -432,6 +432,9 @@ extern int hb_compCompile( char * szPrg, int argc, char * argv[] );
 /* Misc functions defined in harbour.c */
 extern void hb_compFinalizeFunction( void ); /* fixes all last defined function returns jumps offsets */
 extern void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos );
+/* internationalization */
+extern void hb_compAddI18nString( char *szString );
+
 
 /* Misc functions defined in hbfix.c */
 extern void hb_compFixFuncPCode( PFUNCTION );
@@ -510,6 +513,10 @@ extern BOOL           hb_comp_bBuildInfo;
 
 /* Andi Jahja */
 extern BOOL           hb_comp_bFileVersionInfo;
+
+/* Giancarlo Niccolai */
+extern BOOL           hb_comp_bI18n;
+extern char *         hb_comp_szHILout;
 
 extern BOOL           hb_comp_bLogo;
 extern BOOL           hb_comp_bSyntaxCheckOnly;

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.73 2003/06/03 22:41:22 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.74 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -160,6 +160,9 @@ int hb_pp_NextToken( char** pLine );
 
 #define ISID( c )  ( isalpha( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
+/** Added by Giancarlo Niccolai 2003-06-20 */
+#define IS_ESC_STRING( c ) ( toupper( c ) == 'E' && (&c)[1] == '\"' )
+/** END **/
 #define MAX_NAME     255
 #define MAX_EXP      2048
 #define PATTERN_SIZE HB_PP_STR_SIZE
@@ -740,7 +743,11 @@ int hb_pp_ParseDirective( char * sLine )
             }
             else
             {
+            #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
+            #else
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
+            #endif
             }
           }
         }
@@ -1461,6 +1468,13 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               {
                  exptype = '2';
               }
+              /** Added by Giancarlo Niccolai 2003-06-20 */
+              else if( IS_ESC_STRING( *ptr ) )
+              {
+                 exptype = '2';
+                 ptr++; //skip the 'e'
+              }
+              /** End Added by Giancarlo Niccolai */
               else if( *ptr == '(' )
               {
                  exptype = '3';
@@ -2387,7 +2401,10 @@ static int RemoveSlash( char * stroka )
 
         case STATE_NORMAL:
           if( *ptr == '\'' )  State = STATE_QUOTE1;
-          else if( *ptr == '\"' )  State = STATE_QUOTE2;
+          else if( *ptr == '\"' ) State = STATE_QUOTE2;
+          /** Added by Giancarlo Niccolai 2003-06-20 */
+          else if( IS_ESC_STRING( *ptr ) ) { State = STATE_QUOTE4; ptr++; }
+          /* End */
           else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )  State = STATE_QUOTE3;
           else if( *ptr == ';' )
           {
@@ -2418,6 +2435,12 @@ static int RemoveSlash( char * stroka )
         case STATE_QUOTE3:
           if( *ptr == ']' )  State = STATE_NORMAL;
           break;
+
+        /** Added by Giancarlo Niccolai 2003-06-20 */
+        case STATE_QUOTE4:
+          if( *ptr == '\"' && ptr[-1] != '\\' )  State = STATE_NORMAL;
+          break;
+        /** END */
      }
 
      cLastChar = *ptr;
@@ -2705,6 +2728,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    int State;
    int StBr1 = 0, StBr2 = 0, StBr3 = 0;
    BOOL rez = FALSE;
+   /* Added by Giancarlo Niccolai 2003-06-20 */
+   BOOL bEsc = FALSE;
+   /* END */
 
    /* Ron Pinkas added 2000-06-02 */
    BOOL bMacro = FALSE;
@@ -2730,18 +2756,27 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
       return 0;
    }
 
-   State = ( **ptri=='\'' || **ptri=='\"' || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
+   State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
    {
       /* Added by Ron Pinkas 2000-11-08 ( removed lots of related scattered logic below! */
       if( State == STATE_EXPRES || ( cLastChar && strchr( "({[.|,$!#=<>^%*/+-", cLastChar ) ) ) /* Ron Pinkas added if on State 2001-05-02 to avoid multiple strings concatination. */
       {
-         if( **ptri == '"' )
+         if( **ptri == '"' || IS_ESC_STRING( **ptri ) )
          {
+
             if( expreal != NULL )
             {
                *expreal++ = **ptri;
+               /* Modified by Giancarlo Niccolai 2003-06-20 */
+               if ( IS_ESC_STRING( **ptri ) )
+               {
+                  (*ptri)++;
+                  lens++;
+                  *expreal++ = **ptri;
+                  bEsc = TRUE;
+               }
             }
 
             (*ptri)++;
@@ -2754,7 +2789,8 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                   *expreal++ = **ptri;
                }
 
-               if( **ptri == '"' )
+               /* Modified by Giancarlo Niccolai 2003-06-20 */
+               if( **ptri == '"' && ( !bEsc || (*ptri)[-1] != '\\'  ))
                {
                   break;
                }
@@ -3147,7 +3183,8 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    /* Ron Pinkas added 2000-06-21 */
    if( bStrict )
    {
-      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3 ||
+      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3
+          || State == STATE_QUOTE4 ||
           State == STATE_BRACKET || StBr1 || StBr2 || StBr3  )
       {
           /* Alexander should we include this???
@@ -4199,6 +4236,12 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
           s_ParseState = STATE_NORMAL;
           break;
 
+        /* Giancarlo Niccolai added 2003-06-20 */
+        case STATE_QUOTE4: if( cha=='\"' && s_prevchar != '\\')
+          s_ParseState = STATE_NORMAL;
+          break;
+        /* END */
+
         default:
           switch( cha )
           {
@@ -4223,7 +4266,14 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
             case '\"':
               if( s_ParseState != STATE_BRACKET )
               {
-                s_ParseState = STATE_QUOTE2;
+                if ( toupper( s_prevchar ) != 'E' )
+                {
+                  s_ParseState = STATE_QUOTE2;
+                }
+                else
+                {
+                  s_ParseState = STATE_QUOTE4;
+                }
               }
               break;
 
@@ -4384,6 +4434,16 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
         }
         lPos++;
      }
+     /** Added by Giancarlo Niccolai 2003-06-20 */
+     else if( State == STATE_QUOTE4 )
+     {
+        if( *(szText+lPos) == '\"' && *(szText+lPos-1) != '\\')
+        {
+           State = STATE_NORMAL;
+        }
+        lPos++;
+     }
+     /* END */
      else
      {
         if( State == STATE_BRACKET )
@@ -4420,6 +4480,12 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            {
               State = STATE_QUOTE1;
               lPos++;
+              continue;
+           }
+           else if( IS_ESC_STRING( *(szText+lPos)) )
+           {
+              State = STATE_QUOTE4;
+              lPos+=2;
               continue;
            }
            else if( *(szText+lPos) == '\"' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
@@ -4592,9 +4658,18 @@ static char * PrevSquare( char * ptr, char * bound, int * kolmark )
       {
          if( *ptr == '\"' )  State = STATE_NORMAL;
       }
+      /** Added by Giancarlo Niccolai 2003-06-20 */
+      else if( State == STATE_QUOTE4 )
+      {
+         if( *ptr == '\"' && ptr[-1] != '\\' )  State = STATE_NORMAL;
+      }
+      /* END */
       else
       {
-         if( *ptr == '\"' && *(ptr-1) != '\\' ) State = STATE_QUOTE2;
+         /** Added by Giancarlo Niccolai 2003-06-20 */
+         if( IS_ESC_STRING( *ptr ) ) State = STATE_QUOTE4;
+         /* END */
+         else if( *ptr == '\"' && *(ptr-1) != '\\' ) State = STATE_QUOTE2;
          else if( *ptr == '\'' && *(ptr-1) != '\\' ) State = STATE_QUOTE1;
          else if( kolmark && *ptr == '\1' ) (*kolmark)++;
          else if( ( *ptr == '[' || *ptr == ']' ) && *(ptr-1) != '\\' )
@@ -5122,6 +5197,15 @@ static int NextName( char ** sSource, char * sDest )
            /* END - Ron Pinkas added 2000-11-08 */
         }
      }
+    /** Added by Giancarlo Niccolai 2003-06-20 */
+     else if( State == STATE_QUOTE4 )
+     {
+        if( **sSource == '\"' && (*sSource)[-1] != '\\' )
+        {
+           State = STATE_NORMAL;
+        }
+     }
+     /* END */
      /* Ron Pinkas added 2001-02-21 */
      else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'A' && toupper( (*sSource)[2] ) == 'N' && toupper( (*sSource)[3] ) == 'D' && (*sSource)[4] == '.' )
      {
@@ -5182,6 +5266,13 @@ static int NextName( char ** sSource, char * sDest )
         pString = *sSource;
         State = STATE_QUOTE2;
      }
+    /** Added by Giancarlo Niccolai 2003-06-20 */
+     else if( IS_ESC_STRING(**sSource ) )
+     {
+        pString = *sSource;
+        State = STATE_QUOTE4;
+     }
+     /* END */
      /* Ron Pinkas added 2000-11-08 */
      else if( **sSource == '[' )
      {
@@ -5206,7 +5297,7 @@ static int NextName( char ** sSource, char * sDest )
      (*sSource)++;
   }
 
-  while( ISNAME( **sSource ) )
+  while( ISNAME( **sSource ) && ! IS_ESC_STRING( **sSource ) )
   {
      *sDest++ = *(*sSource)++;
      lenName++;
@@ -5293,7 +5384,7 @@ static int NextStopper( char ** sSource, char * sDest )
      printf( "In: >%s<\n", *sSource );
   #endif
 
-  while( ISNAME( (*sSource)[ iLen ] ) )
+  while( ISNAME( (*sSource)[ iLen ] ) && ! IS_ESC_STRING( (*sSource)[iLen] ) )
   {
      sDest[ iLen ] = (*sSource)[ iLen ];
      iLen++;
@@ -5333,6 +5424,15 @@ static int NextParm( char ** sSource, char * sDest )
            State = STATE_NORMAL;
         }
      }
+     /** Added by Giancarlo Niccolai 2003-06-20 */
+     else if( State == STATE_QUOTE4 )
+     {
+        if( **sSource == '\"' && (*sSource)[-1] != '\\')
+        {
+           State = STATE_NORMAL;
+        }
+     }
+     /* END */
      else if( State == STATE_QUOTE3 )
      {
         if( **sSource == ']' )
@@ -5344,6 +5444,12 @@ static int NextParm( char ** sSource, char * sDest )
      {
         State = STATE_QUOTE1;
      }
+     /** Added by Giancarlo Niccolai 2003-06-20 */
+     else if( IS_ESC_STRING( **sSource ) )
+     {
+        State = STATE_QUOTE4;
+     }
+     /* END */
      else if( **sSource == '\"' )
      {
         State = STATE_QUOTE2;
@@ -5577,6 +5683,34 @@ int hb_pp_NextToken( char** pLine )
          goto Done;
       }
    }
+
+   /* Added by Giancarlo Niccolai 2003-06-20 */
+   if( nLen > 1 && IS_ESC_STRING( sLine[0] ) )
+   {
+      pTmp = sLine + 2; // e" is long 2!
+      while ( 1 ) {
+
+         pTmp = strchr( pTmp, '"' );
+         if( pTmp == NULL )
+         {
+            s_sToken[0] = '"';
+            s_sToken[1] = '\0';
+            break;
+         }
+         else
+         {
+            if ( pTmp[-1] != '\\' ) {
+               strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
+               s_sToken[( pTmp - sLine ) + 1] = '\0';
+               break;
+            }
+            pTmp++; // skip current "
+         }
+      }
+
+      goto Done;
+   }
+   /* END - Added by Giancarlo Niccolai */
 
    if( isalpha( sLine[0] ) || sLine[0] == '_' )
    {

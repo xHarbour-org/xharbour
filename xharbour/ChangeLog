@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1148 2003/06/20 00:24:14 druzus Exp $
+ * $Id: ChangeLog,v 1.1149 2003/06/20 13:44:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-06-18 14:45 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * include/hbcomp.h
+  * include/hbpp.h
+  * source/pp/ppcore.c
+  * source/compiler/harbour.slx
+    + Added support for c-like escaped string beginning with e"
+
+  * include/hbexprb.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/hbusage.c
+    + added option -j to output the HIL file (list of i18n() strings)
+
+  * source/vm/Makefile
+  + source/vm/hbi18n.c
+    + Support for i18n function and table loading. Partially todo
+
+  * tests/Makefile
+    * minor fixes
+
+  + tests/i18ntest.prg
+    + Added a test to see how an i18n() enabled program can look like
+
 
 2003-06-18 14:45 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/codepage/cdpesdos.c

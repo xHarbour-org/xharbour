@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.32 2003/03/09 21:40:18 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.33 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -113,6 +113,8 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
 #define HB_LIT_ACT      LEX_CUSTOM_ACTION - 2
 #define HB_NESTED_LIT   LEX_CUSTOM_ACTION - 3
 
+#define HB_ESCAPE_LIT   LEX_CUSTOM_ACTION - 30
+
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
@@ -120,7 +122,9 @@ DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
                                 START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
-                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT)
+                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
+                                START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_ESCAPE_LIT),
+                                START_WITH("E'")    END_WITH("'" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_ESCAPE_LIT)
                               };
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
@@ -513,7 +517,8 @@ LANGUAGE_RULES_ARE {
 #undef STREAM_APPEND
    #define STREAM_APPEND(x) \
       if( iPairLen == 0 && sStart[0] == '[' && sStart[1] ) { sPair[ iPairLen++ ] = sStart[1]; } \
-      if( x == ']' && iCloseSquare == 0 ) { iCloseSquare = iPairLen + 1; } sPair[ iPairLen++ ] = x;
+      if( x == ']' && iCloseSquare == 0 ) { iCloseSquare = iPairLen + 1; } sPair[ iPairLen++ ] = x;\
+      if( x == '\\' && sStart[0] =="E" ) { sPair [ iPairLen ++ ] = *szBuffer++; }
 
 #undef STREAM_OPEN
    #define STREAM_OPEN( sStarter ) iCloseSquare = 0;
@@ -912,6 +917,39 @@ static int hb_comp_SLX_CustomAction( int x )
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
+         yylval.string = hb_compIdentifierNew( sPair, TRUE );
+         return LITERAL + DONT_REDUCE ;
+
+      case HB_ESCAPE_LIT :
+         {
+            int pos, len = strlen( sPair );
+            char *str = sPair;
+            int doit=0;
+
+            while( len > 0) {
+               if ( *str == '\\' ) {
+                  switch( str[1] ) {
+                     case 'n': *str = '\n'; doit=1; break;
+                     case 't': *str = '\t'; doit=1; break;
+                     case 'b': *str = '\b'; doit=1; break;
+                     case 'r': *str = '\r'; doit=1; break;
+
+                     case '\\':
+                     case '\'':
+                     case '"':
+                        *str = str[1]; doit=1; break;
+                  }
+                  // shift the rest of the string
+                  if ( doit )
+                  {
+                     for ( pos = 1; pos < len; pos++ )
+                        str[ pos ] = str[ pos +1 ];
+                  }
+               }
+               str++;
+               len--;
+            }
+         }
          yylval.string = hb_compIdentifierNew( sPair, TRUE );
          return LITERAL + DONT_REDUCE ;
 

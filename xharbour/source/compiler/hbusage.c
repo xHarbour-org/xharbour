@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.7 2003/01/15 04:37:53 andijahja Exp $
+ * $Id: hbusage.c,v 1.8 2003/01/16 16:07:42 walito Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cgh              output type: Harbour Portable Object (.hrb)",
            "\n          %cgj              output type: Java source (.java)",
            "\n          %ci<path>         #include file search path",
+           "\n          %cj[<file>]       output i18n support [to <file>] to .hil",
            "\n          %ck               compilation mode (type -k? for more data)",
            "\n          %cl               suppress line number information",
            "\n          %cm               compile module only",
