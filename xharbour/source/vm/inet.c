@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.12 2003/02/03 06:49:06 jonnymind Exp $
+* $Id: inet.c,v 1.13 2003/02/03 20:19:07 jonnymind Exp $
 */
 
 /*
@@ -55,11 +55,6 @@
 #include "hbstack.h"
 #include "inet.h"
 #include <fcntl.h>
-
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
-#endif
 
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD )
 	#include <sys/time.h>
@@ -544,6 +539,24 @@ HB_FUNC( INETSETTIMEOUT )
          , "INETSETTIMEOUT", 0 );
    }
 }
+
+HB_FUNC( INETGETTIMEOUT )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      hb_retni( Socket->timeout );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, nTimeout)"
+         , "INETSETTIMEOUT", 0 );
+   }
+}
+
 
 HB_FUNC( INETCLEARTIMEOUT )
 {

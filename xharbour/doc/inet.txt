@@ -67,14 +67,16 @@ InetSetTimeout( SOCKET, nMillisecs ) --> NIL
   blocking operations: if the operation can't be done in nMillisec milliseconds,
   the function returns immediately and the InetErrorCode( SOCKET ) returns -1.
   The default timeout is not the maximum time that a function using the socket
-  is allowed to execute: it is the maximum time that each single blocking 
+  is allowed to execute: it is the maximum time that each single blocking
   operation inside that function is allowed to hold the control of the socket.
-  So, an function like InetReadAll(), that may repeat a raw recv() several 
+  So, an function like InetReadAll(), that may repeat a raw recv() several
   times, is not guaranteed to terminate in nMillisecs, but you are guaranteed
   that if any of that raw socket read operation is going to take more than
   nMillisecs, the function will be terminated.
   When created, a socket is created with an infinite default timeout (-1).
 
+InetGetTimeout( SOCKET ) --> NUMERIC
+  Returns the timeout set for the given socket.
 
 InetClearTimeout( SOCKET, nMillisecs ) --> NIL
   Clears the default timeout of the given socket. Default timeout is used in all

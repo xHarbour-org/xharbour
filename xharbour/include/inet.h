@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.15 2003/01/14 02:40:26 jonnymind Exp $
+* $Id: inet.h,v 1.16 2003/01/17 12:28:34 likewolf Exp $
 */
 
 /*
@@ -73,10 +73,12 @@
          #include <sys/types.h>
          #include <sys/socket.h>
          #include <netdb.h>
+         #include <netinet/in.h>
+         #include <arpa/inet.h>
+
          extern int h_errno;
          #define HB_INET_CLOSE( x )    close( x )
          #ifdef HB_OS_DARWIN
-            #include <netinet/in.h>
             #ifndef socklen_t
                #define socklen_t int
             #endif
@@ -84,7 +86,7 @@
          #include <errno.h>
       #endif
 
-      #define HB_SENDRECV_BUFFER_SIZE         2048
+      #define HB_SENDRECV_BUFFER_SIZE         1400
 
       typedef struct tag_HB_SOCKET_STRUCT
       {
