@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3776 2005/01/28 03:29:10 druzus Exp $
+ * $Id: ChangeLog,v 1.3777 2005/01/28 12:17:41 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-28 15:26 UTC+0100 Jacek Potempa (Jacek.Potempa@otc.com.pl)
+  * xharbour/include/hbstack.h
+  * xharbour/source/vm/estack.c
+    * hb_GetStack() function declaration and definition corrected
+      to return pointer to hb_stack structure instead of the structure itself
 
 2005-01-28 14:03 UTC+0100 Alex Strickland (sscc@mweb.co.za)
   * xharbour/source/rtl/filesys.c
