@@ -1523,12 +1523,13 @@ else
     in future, so I haven't "optimized" it. */
 
     default:
-    if ((options & PCRE_EXTRA) != 0) switch(c)
+    if ((options & PCRE_EXTRA) != 0)
+/*     switch(c)
       {
-      default:
+      default: */
       *errorptr = ERR3;
-      break;
-      }
+/*      break;
+      } */
     break;
     }
   }
@@ -6343,7 +6344,7 @@ HB_FUNC( HB_ATX )
     PHB_ITEM pStart = hb_param( 4, HB_IT_INTEGER );
     PHB_ITEM pEnd = hb_param( 5, HB_IT_INTEGER );
 
-    if( pCaseSensitive && pCaseSensitive->item.asLogical.value == FALSE )
+    if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
     {
        CFlags |= REG_ICASE;
     }
@@ -6448,11 +6449,11 @@ HB_FUNC( HB_REGEX )
    }
    else
    {
-      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
       {
          CFlags |= REG_ICASE;
       }
-      if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+      if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
       {
          CFlags |= REG_NEWLINE;
       }
@@ -6505,11 +6506,11 @@ HB_FUNC( HB_REGEXCOMP )
       return;
    }
 
-   if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+   if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
    {
       CFlags |= REG_ICASE;
    }
-   if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+   if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
    {
       CFlags |= REG_NEWLINE;
    }
@@ -6563,11 +6564,11 @@ HB_FUNC( HB_REGEXMATCH )
    }
    else
    {
-      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
       {
          CFlags |= REG_ICASE;
       }
-      if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+      if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
       {
          CFlags |= REG_NEWLINE;
       }

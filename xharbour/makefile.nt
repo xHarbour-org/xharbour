@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.12 2003/02/12 03:31:03 paultucker Exp $
+# $Id: makefile.nt,v 1.15 2003/02/16 02:32:30 paultucker Exp $
 #
 
 #
@@ -435,7 +435,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\traceprg.obj \
    $(OBJ_DIR)\treport.obj \
    $(OBJ_DIR)\trpc.obj \
-   $(OBJ_DIR)\trpccli.prg \
+   $(OBJ_DIR)\trpccli.obj \
    $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
