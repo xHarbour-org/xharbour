@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.78 2004/02/19 20:52:07 andijahja Exp $
+ * $Id: itemapi.c,v 1.79 2004/02/20 12:52:52 druzus Exp $
  */
 
 /*
@@ -145,6 +145,24 @@ PHB_ITEM HB_EXPORT hb_itemParam( USHORT uiParam )
    if( pItem )
    {
       hb_itemCopy( pNew, pItem );
+   }
+
+   return pNew;
+}
+
+HB_ITEM HB_EXPORT hb_itemParamStack( USHORT uiParam )
+{
+   HB_ITEM pNew;
+   PHB_ITEM pItem;
+
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParamStack(%hu)", uiParam));
+
+   pNew.type = HB_IT_NIL;
+   pItem = hb_param( uiParam, HB_IT_ANY );
+
+   if( pItem )
+   {
+      hb_itemCopy( &pNew, pItem );
    }
 
    return pNew;

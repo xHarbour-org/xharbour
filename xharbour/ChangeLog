@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2368 2004/02/22 07:40:01 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2369 2004/02/22 10:16:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-22 19:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+    + HB_ITEM hb_itemParamStack( USHORT ) to create a copy of an item
+      parameter inside the eval stack
+
+  * contrib/hbzlib/zip.c
+    ! now using hb_itemParamStack() for progress codeblock
 
 2004-02-22 10:29 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rdd/dbcmd.c

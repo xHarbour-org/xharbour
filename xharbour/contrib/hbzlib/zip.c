@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.9 2004/02/22 00:59:03 andijahja Exp $
+ * $Id: zip.c,v 1.10 2004/02/22 02:00:15 lculik Exp $
  */
 
 /*
@@ -61,20 +61,12 @@ HB_FUNC( HB_ZIPFILE )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
+      HB_ITEM pProgress = hb_itemParamStack( 9 );
+
       strcpy( szFile, hb_parc( 1 ) );
 
       if( ISCHAR( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CompressFileStd( hb___CheckFile( szFile ),
                                     hb_parc( 2 ),
                                     ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -87,16 +79,6 @@ HB_FUNC( HB_ZIPFILE )
       }
       else if( ISARRAY( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CompressFile( hb___CheckFile( szFile ),
                                  hb_param( 2, HB_IT_ARRAY ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -153,20 +135,12 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
+      HB_ITEM pProgress = hb_itemParamStack( 10 );
+
       strcpy( szFile, hb_parc( 1 ) );
 
       if( ISCHAR( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 10, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CmpTdSpanStd( hb___CheckFile( szFile ),
                                  hb_parc( 2 ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -180,16 +154,6 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
       }
       else if( ISARRAY( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 10, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CmpTdSpan( hb___CheckFile( szFile ),
                               hb_param( 2, HB_IT_ARRAY ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -213,20 +177,12 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
+      HB_ITEM pProgress = hb_itemParamStack( 9 );
+
       strcpy( szFile, hb_parc( 1 ) );
 
       if( ISCHAR( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CmpPkSpanStd( hb___CheckFile( szFile ),
                                  hb_parc( 2 ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -239,16 +195,6 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
       }
       else if( ISARRAY( 2 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_CmpPkSpan( hb___CheckFile( szFile ),
                               hb_param( 2, HB_IT_ARRAY ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -271,20 +217,12 @@ HB_FUNC( HB_UNZIPFILE )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
+      HB_ITEM pProgress = hb_itemParamStack( 7 );
+
       strcpy( szFile, hb_parc( 1 ) );
 
       if( ISCHAR( 6 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_UnzipOne( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
@@ -295,16 +233,6 @@ HB_FUNC( HB_UNZIPFILE )
       }
       else if( ISARRAY( 6 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_UnzipSel( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
@@ -315,16 +243,6 @@ HB_FUNC( HB_UNZIPFILE )
       }
       else
       {
-         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_UnzipAll( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
@@ -398,20 +316,12 @@ HB_FUNC( HB_UNZIPFILEINDEX )
    if( ISCHAR( 1 ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
+      HB_ITEM pProgress = hb_itemParamStack( 7 );
+
       strcpy( szFile, hb_parc( 1 ) );
 
       if( ISNUM( 6 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_UnzipOneIndex( hb___CheckFile( szFile ),
                                   hb_param( 2, HB_IT_BLOCK ),
                                   ISLOG( 3 ) ? hb_parl( 3 ) : 0,
@@ -422,16 +332,6 @@ HB_FUNC( HB_UNZIPFILEINDEX )
       }
       else if( ISARRAY( 6 ) )
       {
-         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
-         HB_ITEM pProgress;
-
-         pProgress.type = HB_IT_NIL ;
-
-         if( pUpdate )
-         {
-            hb_itemCopy( &pProgress, pUpdate );
-         }
-
          bRet = hb_UnzipSelIndex( hb___CheckFile( szFile ),
                                   hb_param( 2, HB_IT_BLOCK ),
                                   ISLOG( 3 ) ? hb_parl( 3 ) : 0,
