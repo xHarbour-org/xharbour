@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.1.1.1 2001/12/21 10:41:25 ronpinkas Exp $
+ * $Id: dateshb.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -146,6 +146,9 @@ HB_FUNC( CTOD )
             }
             else if( digit != ' ' )
             {
+               if( d_value > 0 && m_value > 0 && y_value > 0 )
+                  break;
+
                /* Process the non-digit */
                if( non_digit++ == 0 )
                {
@@ -156,6 +159,9 @@ HB_FUNC( CTOD )
                   y_pos--;
                }
             }
+            else if( d_value > 0 && m_value > 0 && y_value > 0 )
+               break;
+
          }
 
          if( y_value >= 0 && y_value < 100 )
