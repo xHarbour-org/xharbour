@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-04-18 08:52 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+2003-04-18 08:56 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/xwt_gtk/xwt_gtk_grid.c
     ! Fixed a "potential" segfault
 
@@ -28,6 +28,7 @@
 
   * test/xwt_test.prg
     + Added an example of checkboxes
+
 
 2003-04-18 14:22 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * Rules.make
