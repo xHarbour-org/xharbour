@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.3 2002/10/01 20:29:06 lculik Exp $
+ * $Id: dbsdf.prg,v 1.4 2002/11/13 04:14:36 walito Exp $
  */
 
 /*
@@ -55,14 +55,13 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbsdf.prg,v 1.3 2002/10/01 20:29:06 lculik Exp $" )
-
 #define AppendEOL( handle ) FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle ) FWRITE( handle, CHR( 26 ) )
 #define SkipEOL( handle ) FSEEK( handle, 2, FS_RELATIVE )
 
 PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
    LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, aStruct, cField
+   LOCAL lLineEnd
 
    // Process the file name argument.
    index := RAT( ".", cFileName )
@@ -182,15 +181,22 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
          aStruct := DBSTRUCT()
          WHILE FSEEK( handle,0,FS_RELATIVE ) + 1 < nFileLen
             APPEND BLANK
+            lLineEnd := .F.
             IF EMPTY( aFields )
                // Process all fields.
                FOR index := 1 TO FCOUNT()
-                  FieldPut( index,ImportFixed( handle,index,aStruct ) )
+                  FieldPut( index,ImportFixed( handle,index,aStruct,@lLineEnd ) )
+                  IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
+                     EXIT
+                  END IF
                NEXT index
             ELSE
                // Process the specified fields.
                FOR EACH cField IN aFields
-                  FieldPut( FIELDPOS( cField ), ImportFixed( handle, FIELDPOS( cField ), aStruct ) )
+                  FieldPut( FIELDPOS( cField ), ImportFixed( handle, FIELDPOS( cField ), aStruct,@lLineEnd ) )
+                  IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
+                     EXIT
+                  END IF
                NEXT
             END IF
             // Set up for the start of the next record.
@@ -216,9 +222,22 @@ STATIC FUNCTION ExportFixed( handle, xField )
    END CASE
 RETURN .T.
 
-STATIC FUNCTION ImportFixed( handle, index, aStruct )
-   LOCAL cBuffer := Space(aStruct[ index,3 ])
-   FREAD( handle, @cBuffer, aStruct[ index,3 ])
+STATIC FUNCTION ImportFixed( handle, index, aStruct, lLineEnd )
+   LOCAL cBuffer, nCR, nBytes
+
+   cBuffer := Space(aStruct[ index,3 ])
+   nBytes  := FREAD( handle, @cBuffer, aStruct[ index,3 ])
+
+   nCR   := at( CHR(13), cBuffer )
+
+   IF nCR > 0
+      cBuffer  := SubStr( cBuffer, 1, nCR - 1 )
+      lLineEnd := .T.
+      FSEEK( handle, (nBytes - nCR +1) * -1, FS_RELATIVE )
+   ELSE
+      lLineEnd := .F.
+   END IF
+   
    DO CASE
       CASE aStruct[ index,2 ] == "C"
          RETURN cBuffer
@@ -231,5 +250,6 @@ STATIC FUNCTION ImportFixed( handle, index, aStruct )
          aStruct[ index,2 ] == "AUTOINC" 
          RETURN VAL( cBuffer )
    END CASE
+
 RETURN cBuffer
 
