@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.43 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: tgetlist.prg,v 1.1.1.1 2001/12/21 10:41:40 ronpinkas Exp $
  */
 
 /*
@@ -326,11 +326,11 @@ METHOD GetPostValidate() CLASS HBGetList
    endif
 
    if oGet:Changed
-      oGet:Assign()
+      oGet:UpdateBuffer()
       ::lUpdated := .t.
    endif
 
-   oGet:Reset()
+   oGet:Reset():Display()
 
    if oGet:PostBlock != NIL
 
