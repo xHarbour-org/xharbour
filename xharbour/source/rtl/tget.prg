@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.85 2004/07/13 19:35:57 paultucker Exp $
+ * $Id: tget.prg,v 1.86 2004/07/24 00:30:29 guerra000 Exp $
  */
 
 /*
@@ -196,8 +196,8 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::TypeOut        := .f.
    ::DecPos         := ;
    ::Pos            := ;
-   ::PostBlock      := ; 
-   ::PreBlock       := ; 
+   ::PostBlock      := ;
+   ::PreBlock       := ;
    ::Reader         := ;
    ::SubScript      := NIL
    ::ExitState      := ;
@@ -1759,41 +1759,45 @@ static procedure AnalyzePicture( cPicture )
 Return
 */
 
-STATIC FUNCTION BuildGetColor(cColorSpec)
-   LOCAL cCur
-   LOCAL aTokens
+STATIC FUNCTION BuildGetColor( cColorSpec )
+   Local cCur
+   Local aTokens
+
+   If ! ValType( cColorSpec ) == "C"
+      cColorSpec := Nil                          // Clipper compatibility
+   Endif
 
    cCur := SetColor()
 
-   IF SET( _SET_INTENSITY )
+   If Set( _SET_INTENSITY )
 
-      DEFAULT cColorSpec to __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
+      Default cColorSpec To __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
                             __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
                             __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
                             __guiColor( cCur, CLR_BACKGROUND + 1 )
 
-   ELSE
-      DEFAULT cColorSpec to __guiColor( cCur, CLR_STANDARD   + 1 )
+   Else
+      Default cColorSpec To __guiColor( cCur, CLR_STANDARD   + 1 )
 
-   ENDIF
+   Endif
 
                           /* NOTE */
    aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
 
-   IF Len( aTokens ) == 1
+   If Len( aTokens ) == 1
       cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur
 
-   ELSEIF Len( aTokens ) == 2
+   Elseif Len( aTokens ) == 2
       cColorSpec := cCur + "," + aTokens[ 1 ] + "," + aTokens[ 1 ]
 
-   ELSEIF Len( aTokens ) == 3
+   Elseif Len( aTokens ) == 3
       cColorSpec := cCur + "," + aTokens[ 1 ]
 
-   ELSE
+   Else
       cColorSpec := aTokens[1] + "," + aTokens[2] + "," + ;
                     aTokens[3] + "," + aTokens[4]
 
-   ENDIF
+   Endif
 
 Return cColorSpec
 

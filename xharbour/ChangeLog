@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3278 2004/08/05 12:27:00 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3279 2004/08/05 12:30:35 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-05 08:18 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/rtl/tget.prg
+    ! Fixed a Clipper compatibility issure in Static Function BuildGetColor()
+      when the param received was non-numeric.  
+      Reported by David Arturo Macías Corona
 
 2004-08-05 14:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/memoedit.prg
