@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2003/02/12 01:13:05 jonnymind Exp $
+# $Id: Makefile,v 1.18 2003/02/14 17:13:37 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -179,6 +179,8 @@ PRG_SOURCES=\
         tobject.prg  \
         tpopup.prg   \
         traceprg.prg \
+        trpc.prg     \
+        trpccli.prg  \
         treport.prg  \
         ttable.prg   \
         ttextlin.prg \

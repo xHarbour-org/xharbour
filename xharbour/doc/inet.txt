@@ -152,8 +152,8 @@ InetAccept( SOCKET ) --> SOCKET
 Client side socket functions
 ----------------------------
 
-InetConnect( cAddress, PORT ) --> SOCKET
-InetConnect( cAddress, PORT, SOCKET ) --> NIL
+InetConnect( cAddress, nPort ) --> SOCKET
+InetConnect( cAddress, nPort, SOCKET ) --> NIL
   Connects to a remote server described by cAddress, that can be in
   quad dot notation (e.g. "192.168.1.1") or in DNS name (e.g.
   "www.xharbour.org"), using the desired port.
@@ -167,7 +167,7 @@ InetConnect( cAddress, PORT, SOCKET ) --> NIL
   The second version of this functions accepts a pre-built socket
   as parameter. This allows to kill asyncronously a thread waiting
   for InetConnect to connect, and then cleaning up the leftover
-  socket data. Also, it is possible to give timeout at the given SOCKET,
+  socket data. Also, it is possible to give timeout to the given SOCKET,
   but this timeout will be used only in the connection phase, after that
   the network address resolution is completed. Use GetHosts() and
   InetConnectIP for a finer timeout control.
@@ -348,7 +348,7 @@ InetDGramSend( SOCKET, cAddress, nPort, cBuffer [, nSize ] ) --> NUMERIC
   the first nSize bytes of cBuffer will be sent.
   There isn't any guarantee that all the data required to be written is
   really sent to the socket: the calling program should check for the
-  numeric return and send iteratively the unsent data, up to complete
+  numeric return and send iteratively send the unsent data, up to complete
   the message.
   Anyway, the raw datagram is sent and received as once, and any data
   that less than the system datagram size will be sent and received
@@ -360,13 +360,10 @@ InetDGramSend( SOCKET, cAddress, nPort, cBuffer [, nSize ] ) --> NUMERIC
 InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
   Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
   given, or reads at maximum cBuffer length if nSize is not given.
-  There isn't any guarantee that all the data required to be written is
-  really sent to the socket: the calling program should check for the
-  numeric return and send iteratively the unsent data, up to complete
-  the message.
-  Anyway, the raw datagram is sent and received as once, and any data
-  that less than the system datagram size will be sent and received
-  as a single item.
+  There isn't any guarantee that all the data required to be read is
+  really sent from the kernel to the application: the kernel should
+  just return the last complete datagram that has been received, up
+  to nSize bytes.
   Returns -1 on error, or the number of bytes actually read on success.
 
 

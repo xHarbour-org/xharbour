@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.719 2003/02/15 22:19:57 paultucker Exp $
+ * $Id: ChangeLog,v 1.720 2003/02/15 22:26:45 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-02-16 01:00 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+  * source/rtl/hbserial.prg
+  * source/rtl/hbsrlraw.c
+    + Added HB_DeserialBegin() and HB_DeserialNext() for easier
+      serializationa and deserialization of streams.
+    + Fixed a bug in serialization of nested arrays
+    + HB_CreateLen8() can now create the 8 bytes system independent
+      lenght field both on the fly (returning a raw string) and
+      operating on a pre-built string.
+      HB_CreateLen8( nLongInt ) -->cSysUndepNumber
+      HB_CreateLen8( @cSysUndepNumber, nLongInt ) --> NIL
+
+  + tests/serialize.prg
+    + Added a test (and demo) for serialization and deserialization.
+
+  ! doc/inet.txt
+    ! Typos in docs have been corrected
+
+  * source/rtl/Makefile
+  + source/rtl/trpccli.prg
+  + source/rtl/trpc.prg
+    + Added XHARBOUR specific class oriented Remote Procedure Call
+      support (server and client side). This is HIGHLY experimental
+      and in the CVS just to let the developers to have a preview at
+      this. Have FUN :-)
+
 
 2003-02-15 16:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/compiler/cmdcheck.c

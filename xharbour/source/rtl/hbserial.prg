@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbserial.prg,v 1.1 2003/02/14 17:13:38 jonnymind Exp $
  */
 
 /*
@@ -75,7 +75,6 @@ FUNCTION HB_Deserialize( cSerial )
       oObject := {}
       cSerial := Substr( cSerial, 2 )
       nLen := HB_GetLen8( cSerial )
-      ? "Arr " + AllTrim(str(nLen))
       cSerial := Substr( cSerial, 9 )
       DO WHILE nLen > 0
          oElem := HB_Deserialize( cSerial )
@@ -85,6 +84,25 @@ FUNCTION HB_Deserialize( cSerial )
       ENDDO
    ELSE
       oObject := HB_DeserializeSimple( cSerial )
+   ENDIF
+
+RETURN oObject
+
+
+FUNCTION HB_DeserialNext( cSerial )
+   LOCAL oObject, cStr
+   LOCAL nPos
+
+   nPos := HB_GetLen8( cSerial )
+   IF nPos >= Len( cSerial )
+      RETURN NIL
+   ENDIF
+
+   cStr := Substr(cSerial, nPos)
+   oObject := HB_Deserialize( cStr )
+   IF oObject != NIL
+      nPos += HB_SerialNext( cStr )
+      HB_CreateLen8( cSerial, nPos )
    ENDIF
 
 RETURN oObject
