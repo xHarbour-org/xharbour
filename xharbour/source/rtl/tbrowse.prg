@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.70 2004/05/25 04:28:54 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.71 2004/06/17 09:23:44 vouchcac Exp $
  */
 
 /*
@@ -631,9 +631,16 @@ METHOD Configure( nMode ) CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD AColInfo( oCol ) CLASS Tbrowse
+   LOCAL aCol
 
-   Return { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
-                        '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
+   if HB_ISOBJECT( oCol )
+      aCol := { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
+                            '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
+   else
+      aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., '', .t. }
+   endif
+
+   Return aCol
 
 //-------------------------------------------------------------------//
 //
