@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.26 2002/10/10 16:44:59 ronpinkas Exp $
+ * $Id: arrays.c,v 1.27 2002/10/14 18:22:01 ronpinkas Exp $
  */
 
 /*
@@ -322,17 +322,21 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 
 BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
+   PHB_ITEM pElement;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySet(%p, %lu, %p)", pArray, ulIndex, pItem));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      if( HB_IS_BYREF( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ) )
+      pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+
+      if( HB_IS_BYREF( pElement ) )
       {
-         hb_itemCopy( hb_itemUnRef( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ), pItem );
+         hb_itemCopy( hb_itemUnRef( pElement ), pItem );
       }
       else
       {
-         hb_itemCopy( pArray->item.asArray.value->pItems + ( ulIndex - 1 ), pItem );
+         hb_itemCopy( pElement, pItem );
       }
 
       return TRUE;
@@ -590,12 +594,13 @@ void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCoun
 {
    PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
    ULONG ulLen = pBaseArray->ulLen;
+   PHB_ITEM pElement;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFill(%p, %p, %i, %i)", pArray, pValue, ulStart, ulCount));
 
    if( ulStart <= ulLen )
    {
-      if( ulStart + ulCount > ulLen )
+      if( ulStart + ulCount > ulLen + 1 )
       {
          ulCount = ulLen - ulStart + 1;
       }
@@ -604,7 +609,16 @@ void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCoun
 
       for( ; ulCount > 0; ulCount--, ulStart++ )
       {
-         hb_itemCopy( pBaseArray->pItems + ulStart, pValue );
+         pElement = pBaseArray->pItems + ulStart;
+
+         if( HB_IS_BYREF( pElement ) )
+         {
+            hb_itemCopy( hb_itemUnRef( pElement ), pValue );
+         }
+         else
+         {
+            hb_itemCopy( pElement, pValue );
+         }
       }
    }
 }
@@ -791,25 +805,26 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 
             //printf( "Array Item %i %p type:%i\n", ulLen, pItem, pItem->type );
 
-            pValue = pItem;
-
+            /* The Reference should NOT be cleared when an Array with element refering it is released!
+            pValue = pItem; // Subsequent pItem below were pValue, other then pItem++!!!
             if( HB_IS_BYREF( pValue ) )
             {
                pValue = hb_itemUnRef( pValue );
             }
+            */
 
             /*-----------------12/21/2001 8:01PM----------------
              * The item is not released because it was not
              * allocated by the GC, its just a portion of the
              * pItems chunk, which will be released as one piece.
              * --------------------------------------------------*/
-            if( HB_IS_ARRAY( pValue ) && pValue->item.asArray.value == pBaseArray )
+            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
             {
                HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic)", pArray, pArray->item.asArray.value ) );
             }
-            else if( HB_IS_COMPLEX( pValue ) )
+            else if( HB_IS_COMPLEX( pItem ) )
             {
-               hb_itemClear( pValue );
+               hb_itemClear( pItem );
             }
 
             ++pItem;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.121 2002/10/17 14:46:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.122 2002/10/22 20:04:42 ronpinkas Exp $
  */
 
 /*
@@ -532,6 +532,7 @@ void HB_EXPORT hb_vmQuit( void )
    hb_arrayRelease( &s_aStatics );
    //printf( "\nAfter Statics\n" );
 
+   hb_arrayFill( &s_aGlobals, ( *hb_stack.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
    hb_arrayRelease( &s_aGlobals );
    //printf( "\nAfter Globals\n" );
 

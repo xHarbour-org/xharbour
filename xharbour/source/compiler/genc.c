@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.25 2002/09/23 17:50:44 ronpinkas Exp $
+ * $Id: genc.c,v 1.26 2002/10/13 18:06:28 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
    PVAR pGlobal, pDelete;
-   short iGlobals = 0;
+   short iLocalGlobals = 0, iGlobals = 0;
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
@@ -139,15 +139,17 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       pGlobal = hb_comp_pGlobals;
       while( pGlobal )
       {
+         iGlobals++;
+
          if( pGlobal->szAlias == NULL )
          {
-            iGlobals++;
+            iLocalGlobals++;
          }
 
          pGlobal = pGlobal->pNext;
       }
 
-      if( iGlobals )
+      if( iLocalGlobals )
       {
          fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
       }
@@ -388,7 +390,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          pFunc = pFunc->pNext;
       }
 
-      if( iGlobals )
+      if( iLocalGlobals )
       {
          fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void )\n"
                        "{\n"
