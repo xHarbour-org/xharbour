@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.66 2003/05/08 03:25:32 lculik Exp $
+ * $Id: hbmake.prg,v 1.67 2003/05/23 09:01:12 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -338,18 +338,17 @@ FUNCTION ParseMakeFile( cFile )
                               lGui := .T.
                            ENDIF
 
+                           IF ".a" in Lower( aLibx )
+                              s_lBcc    := .F.
+                              s_lGcc    := .T.
+                              s_lVcc    := .F.
+                           ENDIF
+
                         NEXT
 
                      ENDIF
 
                      IF aTemp[ 1 ] == "ALLOBJ" .AND. ! lMt
-
-/*                        IF At( 'hvm', Lower( aTemp[ 2 ] ) ) ==  0 .AND. ! lLinux  .and. ! s_lLibrary
-                           aTemp[ 2 ] += IIF( ! lMt .AND. ! lGui, " $(BHC)\lib\hvm.obj", ;
-                              IIF( lMt .AND. ! lGui, " $(BHC)\lib\hvmmt.obj", ;
-                              IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
-                              " $(BHC)\lib\hvmguimt.obj" ) ) )
-                        ENDIF*/
 
                      ENDIF
 
@@ -1076,14 +1075,14 @@ FUNC CreateMakeFile( cFile )
    LOCAL getlist          := {}
    LOCAL cTopFile         := ""
    LOCAL cAppName         := Space( 50 )
-   LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
-   LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
-   LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
-   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lncurses -lgpm -lpthread -lm"
-   LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macro.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
-   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
-   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
-   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lncurses -lgpm -lpthread -lm"
+   LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib gtnul.lib"
+   LOCAL cDefGccLibs      := "-lvm -lrtl -lgtnul -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
+   LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtnul -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
+   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtnul -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lncurses -lgpm -lpthread -lm"
+   LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib gtnul.lib "
+   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtnul -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm" 
+   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtnul -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
+   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtnul -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lncurses -lgpm -lpthread -lm"
    LOCAL cHarbDll         := "bcc640.lib hbdll_"
 
    LOCAL cLibs        := ""

@@ -381,7 +381,7 @@ FUNCTION GetinstaledLibs( clibs, lGcc )
     'mysql' + IIF( lGcc, '.a', '.lib' ), 'libmysql' + IIF( lGcc, '.a', '.lib' ), 'mysqlclient' + IIF( lGcc, '.a', '.lib' ), 'samples' + IIF( lGcc, '.a', '.lib' ), ;
     'pdflib' + IIF( lGcc, '.a', '.lib' ), 'nulsys' + IIF( lGcc, '.a', '.lib' ), 'gtcgi' + IIF( lGcc, '.a', '.lib' ), 'vmmt' + IIF( lGcc, '.a', '.lib' ), ;
     'rtlmt' + IIF( lGcc, '.a', '.lib' ), 'rddmt' + IIF( lGcc, '.a', '.lib' ), 'ppmt' + IIF( lGcc, '.a', '.lib' ), 'dbfntxmt' + IIF( lGcc, '.a', '.lib' ), ;
-    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ) }
+    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ,'macromt' + IIF( lGcc, '.a', '.lib' ) ),'gtnul' + IIF( lGcc, '.a', '.lib' ) }
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
    LOCAL nPos
