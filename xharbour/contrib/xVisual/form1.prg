@@ -66,21 +66,20 @@ METHOD Button1Click( Sender /* Button1 class TButton() */ ) CLASS TForm1
       the Event (we also have :: for the container Form).
    */
    WITH OBJECT Sender
+      // Self is the container not the initiating control so:
 
-   // Self is the container not the initiating control so:
+      // Using the standard WITH shortcut.
+      :Caption := "New Caption"          // Fastest.
 
-   // Using the standard WITH shortcut.
-   :Caption := "New Caption"          // Fastest.
-   // Or:
-   Sender:Caption := "New Caption"    // Still very fast.
-   // Or:
-   Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
-   :Update()
+      /*
+      // Or:
+      Sender:Caption := "New Caption"    // Still very fast.
+      // Or:
+      Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
 
-   // Now self:
-   ::Caption := "My Form"     // Faster.
-   ::Update()
-
+      // Now self:
+      ::Caption := "My Form"     // Faster.
+      */
    END WITH // Sender
 
 Return Self
