@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.11 2003/10/23 10:04:06 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.12 2004/01/10 05:51:26 ronpinkas Exp $
  */
 
 /*
@@ -87,7 +87,8 @@
       #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
                INIT PROCEDURE __INIT_<stru>; ;
                   __ActiveStructure( #<stru>, <align> ) ; ;
-               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
+               #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+               #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       // <elem> instead of <!elem!> to allow ElemName[n] syntax.
       #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
@@ -112,7 +113,8 @@
                RETURN
 
       #command IMPORT C STRUCTURE <!stru!> => ;
-               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
+               #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+               #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       //----------------------------- C Syntax support ---------------------------------//
       /* NOTES:
@@ -129,11 +131,14 @@
                    HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
                    __ClsSetModule( __ActiveStructure() ); ;
                 RETURN; ;
-                #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} )
+                #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+                #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>
       #xcommand pragma pack() => #undef __PACK; #define __PACK 8
 
+      #xtranslate ( struct <stru> ) [<buffer>] => HB_CStructure( #<stru> ):Buffer( <buffer> )
+      #xtranslate ( struct <stru>* ) <pointer> => HB_CStructure( #<stru> ):Pointer( <pointer> )
    #endif
 
 #endif

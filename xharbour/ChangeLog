@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2779 2004/04/11 20:07:52 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2780 2004/04/12 03:44:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-12 14:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Fixes and enhancements to support more C syntax, like:
+
+         MyCStruct := (struct SOMESTRUCT)
+         MyCStruct := (struct SOMESTRUCT) SomeValue
+         MyCStruct := (struct SOMESTRUCT*) SomePointer
+
 2004-04-12 00:50 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/hbzlib/zip.c
     + GetFileAttr/SetFileAttr() compatible api for *nix(otherwise hbzip dont build on linux
@@ -15,13 +25,13 @@
   * xharbour/source/rtl/scroll.c
     + ScrollFixed()
       Introduced this new function for internal use of xHarbour classes which
-      supply all the parameters already in range. This function does not 
+      supply all the parameters already in range. This function does not
       verify the supplied parameters. To speedup TBrowse(), this function is used
       instead of Scroll().
 
   * xharbour/source/rtl/tbrowse.prg
     * ::InsColumn() was not Clipper compatible where <nPos> > ::nColumns. Fixed.
-    * More optimizations to speed up ::ForceStable(). Now it must be 10-15% 
+    * More optimizations to speed up ::ForceStable(). Now it must be 10-15%
       faster than earlier. The methods touched are ::drawRows() and ::drawARow().
 
 2004-04-10 16:59 UTC+0200 Mindaugas Kavaliauskas <dbtopas/at/dbtopas.lt>

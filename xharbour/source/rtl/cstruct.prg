@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.24 2004/01/10 06:14:38 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.25 2004/01/10 10:21:48 ronpinkas Exp $
  */
 
 /*
@@ -512,7 +512,7 @@ STATIC Function Buffer( Buffer, lAdopt )
       QSelf():InternalBuffer := QSelf():Value()
    ENDIF
 
-RETURN QSelf():InternalBuffer
+RETURN QSelf()
 
 //---------------------------------------------------------------------------//
 STATIC Function Value()
@@ -581,11 +581,9 @@ RETURN QSelf()
 //---------------------------------------------------------------------------//
 STATIC Function Pointer( nNewPointer, lAdopt )
 
-   LOCAL nPointer := HB_String2Pointer( QSelf():Buffer() )
-
    IF nNewPointer != NIL
-      QSelf():Buffer( HB_Pointer2String( nNewPointer ), QSelf():SizeOf(), lAdopt )
+      QSelf():Buffer( HB_Pointer2String( nNewPointer ), lAdopt )
    ENDIF
 
-RETURN nPointer
+RETURN QSelf
 //---------------------------------------------------------------------------//
