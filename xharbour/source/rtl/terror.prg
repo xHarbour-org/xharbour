@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.3 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id: terror.prg,v 1.4 2003/03/18 22:12:37 ronpinkas Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
       s_oClass:AddData( "OsCode"       , 0 )
       s_oClass:AddData( "Severity"     , ES_ERROR )
       s_oClass:AddData( "SubCode"      , 0 )
-      s_oClass:AddData( "SubSystem"    , 0 )
+      s_oClass:AddData( "SubSystem"    , "" )
       s_oClass:AddData( "Tries"        , 0 )
 
       s_oClass:Create()
