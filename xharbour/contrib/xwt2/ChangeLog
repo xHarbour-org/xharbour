@@ -1,0 +1,24 @@
+/*
+ * $Id: ChangeLog,v 1.2952 2004/05/18 14:08:27 lculik Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2004-05-24 19:55 UTC-0300 Luiz Rafael Culik <culikr /at / brturbo.com>
+   * xwt_gtk/xwt_gtk.h
+     !added new members to xwt_gtk_base structure(for storing colors)
+   * xwt_gtk/xwt_gtk_base.c
+     ! Handle color on BOOL xwt_gtk_base_setprop/BOOL xwt_gtk_base_getprop(current colors only for labels)
+    * xwt_gtk/xwt_gtk_label.c    
+    * xwt_gtk/xwt_gtk_button.c    
+     ! init color atribures to null
+   + tests/xwt_test1.prg
+     + new test to demostrate color( Gian, this one freeze the system, can you help)
+          
+   
+
+  
