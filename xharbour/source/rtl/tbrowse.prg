@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.28 2003/03/07 04:36:29 walito Exp $
+ * $Id: tbrowse.prg,v 1.29 2003/03/07 05:32:42 ronpinkas Exp $
  */
 
 /*
@@ -289,6 +289,8 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::nwLeft          := nLeft
    ::nwBottom        := nBottom
    ::nwRight         := nRight
+
+   ::rowCount        := nBottom - nTop + 1
 
    ::nRowData        := nTop
    ::lDispBegin      := .F.
