@@ -181,6 +181,8 @@
 
    #DEFINE __CLIPPER__
 
+   #translate At( <find>, <where>, <from> ) => IIF( ( M->__AT__  := At( <find>, SubStr( <where>, <from> ) ) ) == 0, 0, M->__AT__ )
+
    #ifndef CRLF
       #DEFINE  CRLF Chr(13) + Chr(10)
    #endif
@@ -819,9 +821,9 @@ PROCEDURE RP_Dot()
    LOCAL GetList := {}, sLine := Space(256)
    LOCAL nDefines, nCommands, nTranslates
 
-   LOCAL aCopyDefRules, aCopyDefResults
-   LOCAL aCopyCommRules, aCopyCommResults
-   LOCAL aCopyTransRules, aCopyTransResults
+   LOCAL aCpyDefRules, aCpyDefResults
+   LOCAL aCpyCommRules, aCpyCommResults
+   LOCAL aCpyTranRules, aCpyTranResults
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
@@ -835,14 +837,14 @@ PROCEDURE RP_Dot()
       PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "TInterpreter for Windows", 0 )' )
    #endif
 
-   aCopyDefRules     := aClone( aDefRules )
-   aCopyDefResults   := aClone( aDefResults )
+   aCpyDefRules     := aClone( aDefRules )
+   aCpyDefResults   := aClone( aDefResults )
 
-   aCopyCommRules    := aClone( aCommRules )
-   aCopyCommResults  := aClone( aCommResults )
+   aCpyCommRules    := aClone( aCommRules )
+   aCpyCommResults  := aClone( aCommResults )
 
-   aCopyTransRules   := aClone( aTransRules )
-   aCopyTransResults := aClone( aTransResults )
+   aCpyTranRules   := aClone( aTransRules )
+   aCpyTranResults := aClone( aTransResults )
 
    ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
 
@@ -865,14 +867,14 @@ PROCEDURE RP_Dot()
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
 
       IF s_lRunLoaded
-         aDefRules     := aClone( aCopyDefRules )
-         aDefResults   := aClone( aCopyDefResults )
+         aDefRules     := aClone( aCpyDefRules )
+         aDefResults   := aClone( aCpyDefResults )
 
-         aCommRules    := aClone( aCopyCommRules )
-         aCommResults  := aClone( aCopyCommResults )
+         aCommRules    := aClone( aCpyCommRules )
+         aCommResults  := aClone( aCpyCommResults )
 
-         aTransRules   := aClone( aCopyTransRules )
-         aTransResults := aClone( aCopyTransResults )
+         aTransRules   := aClone( aCpyTranRules )
+         aTransResults := aClone( aCpyTranResults )
 
          s_lRunLoaded := .F.
          s_lClsLoaded := .F.
@@ -2472,7 +2474,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
       ENDIF
 
       IF sPPOExt == NIL
-         hPP := 0
+         // *** Intentionally invalid handle - saves us from performing an IF on each of the FWrite( hPP, ... )
+         hPP := -1
       ELSE
          sExt := SubStr( sSource, RAt( '.', sSource ) )
          IF ! ( sExt == '' )
@@ -3119,6 +3122,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
+          #ifdef __HARBOUR__ 
             ELSEIF sLine == "FIVEWIN.CH"
                IF ! s_lFWLoaded
                   s_lFWLoaded := .T.
@@ -3177,6 +3181,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [MiniGUI #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
+          #endif
             ELSE
                PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
 
@@ -8853,6 +8858,7 @@ PROCEDURE PP_LoadRun()
 RETURN
 
 //--------------------------------------------------------------//
+
 #ifdef __HARBOUR__
 
    //--------------------------------------------------------------//
