@@ -1,5 +1,4 @@
-
-# $Id: makefile.bc,v 1.7 2003/10/10 13:33:52 paultucker Exp $
+# $Id: makefile.bc,v 1.8 2003/10/14 23:12:00 jonnymind Exp $
 #
 
 #
@@ -108,10 +107,12 @@ INCLUDE_DIR  = include;..\..\include
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS               = -I$(INCLUDE_DIR);src\xwt_win -d $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
+CFLAGS               = -I$(INCLUDE_DIR);src\xwt_win -d
+$(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
-HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR)
+$(HARBOURFLAGS)
 LDFLAGS              = $(LDFLAGS)
 
 
@@ -134,6 +135,8 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\xwt_api.obj \
    \
    $(OBJ_DIR)\button.obj \
+   $(OBJ_DIR)\bcolumn.obj \
+   $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
    $(OBJ_DIR)\container.obj \
    $(OBJ_DIR)\event.obj \
@@ -194,6 +197,18 @@ $(XWT_LIB) : $(XWT_LIB_OBJS)
 !
 
 $(OBJ_DIR)\xwt_api.obj : $(SRC_DIR)\xwt_api.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\bcolumn.c : $(SRC_DIR)\bcolumn.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\bcolumn.obj : $(OBJ_DIR)\bcolumn.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\browse.c : $(SRC_DIR)\browse.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\browse.obj : $(OBJ_DIR)\browse.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\button.c : $(SRC_DIR)\button.prg
@@ -372,3 +387,4 @@ $(OBJ_DIR)\xwt_win_framewnd.obj : $(SRC_DIR)\xwt_win\xwt_win_framewnd.c
 
 $(OBJ_DIR)\xwt_win_msgbox.obj : $(SRC_DIR)\xwt_win\xwt_win_msgbox.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+   
