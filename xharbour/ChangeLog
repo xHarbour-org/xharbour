@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1495 2003/09/19 17:04:09 lculik Exp $
+ * $Id: ChangeLog,v 1.1496 2003/09/19 17:05:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-19 13:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Uncommented #define HB_ARRAY_USE_COUNTER - Now using old array management by default.
 
 2003-09-19 09:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/listbox.prg
