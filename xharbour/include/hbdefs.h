@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.11 2003/07/10 12:50:41 jonnymind Exp $
+ * $Id: hbdefs.h,v 1.12 2003/07/10 14:20:49 jonnymind Exp $
  */
 
 /*
@@ -341,5 +341,5 @@ typedef BYTE HB_ATTR;
   typedef __int64 ULONGLONG;
 #endif
 #endif
-#
+
 #endif /* HB_DEFS_H_ */
