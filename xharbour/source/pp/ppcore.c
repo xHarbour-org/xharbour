@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.138 2004/03/08 14:57:34 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.139 2004/03/08 16:55:39 ronpinkas Exp $
  */
 
 /*
@@ -228,7 +228,7 @@ char * hb_pp_szErrors[] =
    "Bad filename in #include",
    "#define without parameters",
    "Missing => in #directive \'%s\' [%s]'",
-   "Error in pattern definition",
+   "Error in pattern definition \'%s\'",
    "Cycled #define",
    "Invalid name follows #: \'%s\'",
    "\'%s\'",
@@ -1480,13 +1480,15 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      printf( "Result: >%s<\n", rpatt );
   #endif
 
-  while( *(mpatt+i) != '\0' )
+  while( *(mpatt + i ) != '\0' )
   {
      if( mpatt[i] == '"' )
      {
-        while( mpatt[ ++i ] != '"' )
+        i++;
+
+        while( mpatt[ i ] != '"' )
         {
-           //Skip.
+           i++;
         }
 
         i++;
@@ -1565,25 +1567,27 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            /* Drag match marker, determine it type */
            explen = 0; ipos = i; i++; exptype = '0';
 
-           while( *(mpatt+i) == ' ' || *(mpatt+i) == '\t' )
+           while( *( mpatt + i ) == ' ' || *( mpatt + i ) == '\t' )
            {
               i++;
            }
 
-           if( *(mpatt+i) == '*' )        /* Wild match marker */
+           switch( *( mpatt + i ) )
            {
-              exptype = '3';
-              i++;
-           }
-           else if( *(mpatt+i) == '(' )   /* Extended expression match marker */
-           {
-              exptype = '4';
-              i++;
-           }
-           else if( *(mpatt+i) == '!' )   /* Minimal expression match marker */
-           {
-              exptype = '5';
-              i++;
+              case '*' :
+                 exptype = '3';  /* Wild match marker */
+                 i++;
+                 break;
+
+              case '(' :
+                 exptype = '4'; /* Extended expression match marker */
+                 i++;
+                 break;
+
+              case '!' :
+                 exptype = '5';  /* Minimal expression match marker */
+                 i++;
+                 break;
            }
 
            ptr = mpatt + i;
@@ -1592,37 +1596,44 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            {
               if( *ptr == '\0' || *ptr == '<' || *ptr == '[' || *ptr == ']' )
               {
-                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, mpatt + ipos, NULL );
                  return;
               }
 
               ptr++;
            }
 
-           while( *(mpatt+i) != '>' )
+           while( *( mpatt + i ) != '>' )
            {
-              if( *(mpatt+i) == ',' )      /* List match marker */
+              if( exptype != '0' )
+              {
+                 goto MarkerName;
+              }
+
+              if( *( mpatt + i ) == ',' )      /* List match marker */
               {
                  exptype = '1';
 
-                 while( *(mpatt+i) != '>' )
+                 while( *( mpatt + i ) != '>' )
                  {
                     i++;
                  }
 
                  break;
               }
-              else if( *(mpatt+i) == ':' ) /* Restricted match marker */
+              else if( *( mpatt + i ) == ':' ) /* Restricted match marker */
               {
                  exptype = '2';
-                 *(mpatt+i--) = ' ';
+                 *( mpatt + i-- ) = ' ';
 
                  break;
               }
 
-              if( *(mpatt+i) != ' ' && *(mpatt+i) != '\t' )
+            MarkerName :
+
+              if( *( mpatt + i ) != ' ' && *( mpatt + i ) != '\t' )
               {
-                *(exppatt+explen++) = *(mpatt+i);
+                 *( exppatt + explen++ ) = *( mpatt + i );
               }
 
               i++;
@@ -1636,29 +1647,29 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               }
               else
               {
-                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, mpatt + ipos, NULL );
               }
            }
            else if( exptype == '4' )
            {
-              if( *(exppatt+explen-1) == ')' )
+              if( *( exppatt + explen - 1 ) == ')' )
               {
                  explen--;
               }
               else
               {
-                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, mpatt + ipos, NULL );
               }
            }
            else if( exptype == '5' )
            {
-              if( *(exppatt+explen-1) == '!' )
+              if( *( exppatt + explen - 1 ) == '!' )
               {
                  explen--;
               }
               else
               {
-                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, NULL, NULL );
+                 hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PATTERN_DEFINITION, mpatt + ipos, NULL );
               }
            }
 
@@ -1670,10 +1681,116 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            expreal[1] = lastchar;
            expreal[2] = exptype;
 
-           hb_pp_Stuff( expreal, mpatt+ipos, 4, rmlen, mlen );
+           hb_pp_Stuff( expreal, mpatt + ipos, 4, rmlen, mlen );
 
            mlen += 4 - rmlen;
            i += 4 - rmlen;
+
+           exptype = '0';
+           ptr = mpatt + i;
+
+           //printf( "Marker: >%.*s<\n", explen, exppatt );
+
+           // Find if SAME Marker Name is used again in the remainder of the Match Rule.
+           while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, mlen ) ) > 0 )
+           {
+              char *pTmp = ptr + ifou - 1, *pStart;
+
+              while( pTmp > ptr && *pTmp != '<' )
+              {
+                 switch( *pTmp )
+                 {
+                    case '*' :
+                       exptype = '3';  /* Wild match marker */
+                       break;
+
+                    case '(' :
+                       exptype = '4'; /* Extended expression match marker */
+                       break;
+
+                    case '!' :
+                       exptype = '5';  /* Minimal expression match marker */
+                       break;
+
+                    case ' ' :
+                    case '\t' :
+                       break;
+
+                    default :
+                       // Force EXIT!
+                       pTmp = ptr;
+                       break;
+                 }
+
+                 pTmp--;
+              }
+
+              if( *pTmp != '<' )
+              {
+                 ptr += ifou + explen;
+                 continue;
+              }
+
+              pStart = pTmp;
+
+              pTmp = ptr + ifou + explen;
+
+              while( *pTmp && *pTmp != '>' )
+              {
+                 if( exptype != '0' )
+                 {
+                    pTmp++;
+                    continue;
+                 }
+
+                 if( *pTmp == ',' )      /* List match marker */
+                 {
+                    exptype = '1';
+
+                    do
+                    {
+                       pTmp++;
+                    }
+                    while( *pTmp && *pTmp != '>' );
+
+                    break;
+                 }
+                 else if( *pTmp == ':' ) /* Restricted match marker */
+                 {
+                    exptype = '2';
+
+                    do
+                    {
+                       pTmp++;
+                    }
+                    while( *pTmp && *pTmp != '>' );
+                    break;
+                 }
+                 else if( *pTmp != ' ' && *pTmp != '\t' )
+                 {
+                    break;
+                 }
+
+                 pTmp++;
+              }
+
+              if( *pTmp != '>' )
+              {
+                 ptr += ifou + explen;
+                 continue;
+              }
+
+              // Use same marker ID in expreal[1]
+              expreal[2] = exptype;
+              rmlen = ( ptr + ifou + explen ) - pStart;
+
+              //printf( "Repeated: >%.*s<\n", rmlen, pStart );
+              //printf( "maptt: >%s<\n", mpatt );
+              hb_pp_Stuff( expreal, pStart, 4, rmlen, mlen );
+              //printf( "maptt: >%s<\n", mpatt );
+              mlen += 4 - rmlen;
+              ptr += 4;
+           }
 
            /* Look for appropriate result markers */
            ptr = rpatt;
@@ -1735,7 +1852,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               }
               while( ifou >= 0 && *ptr != '<' && *(ptr-1) != '\\' );
 
-              if( ifou >=0 && *ptr == '<' )
+              if( ifou >= 0 && *ptr == '<' )
               {
                  ptr += rmlen++;
 
@@ -1751,12 +1868,12 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
                     ptr++;
                  }
 
-                 if( ifou >=0 && *ptr=='>' )
+                 if( ifou >= 0 && *ptr == '>' )
                  {
                     ptr -= rmlen;
                     ptr++;
 
-                    if( exptype == '0' && *(ptr-1) == '#' && *(ptr-2) != '\\' )
+                    if( exptype == '0' && *( ptr - 1 ) == '#' && *( ptr - 2 ) != '\\' )
                     {
                        exptype = '1';
                        ptr--;
