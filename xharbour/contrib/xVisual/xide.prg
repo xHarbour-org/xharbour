@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.81 2002/10/11 22:37:39 what32 Exp $
+ * $Id: xide.prg,v 1.82 2002/10/13 11:16:30 what32 Exp $
  */
 
 /*
@@ -46,6 +46,7 @@ FUNCTION Main
    local oSplash
 
    oApp := Application():Initialize()
+
 
    // splash screen
    oSplash := TSplash():New( oApp, "xIDE.bmp", 5000 )
