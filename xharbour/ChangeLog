@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.489 2002/11/13 14:44:57 walito Exp $
+ * $Id: ChangeLog,v 1.490 2002/11/13 15:07:54 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-13 12:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtdos/gtdos.c
+    + Add support for DispBegin() and DispEnd() for DJGPP.
 
 2002-11-13 12:03 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * include/hbfixdj.h
