@@ -163,7 +163,7 @@
  *      increase both readability and modularity, isolate change, and help
  *      manage complexity.
  *  
- *      A function in CA-Clipper is the same as a procedure, except that it must
+ *      A function in xharbour is the same as a procedure, except that it must
  *      return a value.  The returned value can be any data type including an
  *      array, a code block, or NIL.  Each function must begin with a FUNCTION
  *      statement and contain at least one RETURN statement with an argument.
