@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2067 2004/01/15 16:52:13 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2068 2004/01/15 18:18:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-15 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    ! Fixed Extended MArker to use NextToken() instead of looking for space delimiter.
 
 2004-01-15 10:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/transfrm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.109 2004/01/10 05:51:26 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.110 2004/01/11 07:32:46 ronpinkas Exp $
  */
 
 /*
@@ -3117,25 +3117,14 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       return 0;
    }
 
-   if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
+   if( cMarkerType == '4' && strchr( "&(", ( *ptri )[0] ) == NULL )
    {
-      char *pTmp = strchr( *ptri, ' ' );
+      hb_pp_NextToken( ptri, expreal );
 
-      if( pTmp )
-      {
-         lens = pTmp - *ptri;
+      lens = strlen( expreal );
+      expreal += lens;
 
-         if( expreal != NULL )
-         {
-            strncpy( expreal, *ptri, lens );
-            expreal[lens] = '\0';
-
-            *ptri   += lens;
-            expreal += lens;
-         }
-
-         goto Done;
-      }
+      goto Done;
    }
 
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
