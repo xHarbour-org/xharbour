@@ -393,7 +393,7 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
-STATIC s_cVer := "1.0.RC1"
+STATIC s_cVer := "1.0.RC2"
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -1017,7 +1017,7 @@ PROCEDURE RP_Dot()
 
    LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp, bKey5, bKey24
 
-   LOCAL bErrHandler
+   LOCAL bErrHandler, oErr
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + [;;Please try Interpreter mode, using the -R switch...] )
@@ -1106,7 +1106,10 @@ PROCEDURE RP_Dot()
 
       sLine := StrTran( sLine,  Chr(9), " " )
 
-      ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
+      BEGIN SEQUENCE
+         ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
+      //RECOVER USING oErr
+      END SEQUENCE
 
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
 
@@ -3646,6 +3649,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          PP_CompileLine( sOut, nLine, s_aProcedures, s_aInitExit, @s_nProcId )
       ENDIF
    RECOVER USING oError
+      TraceLog()
       Eval( bErrHandler, oError )
    END SEQUENCE
 

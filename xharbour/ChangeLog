@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2097 2004/01/18 20:48:50 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2098 2004/01/19 17:47:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-19 12:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.y
+    + Added few more explict error handlers to avoid memory leaks.
+
+  * tests/pp.prg
+    ! Fixed RP_Dot() to not terminate on errors.
 
 2004-01-19 09:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

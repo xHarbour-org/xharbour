@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.10 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: macro.y,v 1.11 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -283,9 +283,15 @@ Main : Expression '\n'  {
                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
                            hb_compExprDelete( $1, HB_MACRO_PARAM );
 
+                           while ( s_iPending )
+                           {
+                              hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
+                           }
+
                            if( yychar == IDENTIFIER && yylval.string )
                            {
                               hb_xfree( yylval.string );
+                              yylval.string = NULL;
                            }
 
                            YYABORT;
@@ -306,6 +312,7 @@ Main : Expression '\n'  {
                            if( yychar == IDENTIFIER && yylval.string )
                            {
                               hb_xfree( yylval.string );
+                              yylval.string = NULL;
                            }
 
                            YYABORT;
@@ -484,6 +491,22 @@ FunCall    : IDENTIFIER '(' ArgList ')'   {
                                             {
                                                s_iPending--;
                                             }
+                                          }
+            | IDENTIFIER '(' error        {
+                                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+
+                                            if( yylval.string )
+                                            {
+                                               hb_xfree( yylval.string );
+                                               yylval.string = NULL;
+                                            }
+
+                                            while ( s_iPending )
+                                            {
+                                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
+                                            }
+
+                                            YYABORT;
                                           }
 ;
 
@@ -882,6 +905,24 @@ ExpList    : '(' EmptyExpression          { $$ = hb_compExprNewList( $2 ); }
 ;
 
 PareExpList : ExpList ')'                 { $$ = $1; }
+            | ExpList error               {
+                                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+
+                                            hb_compExprDelete( $1, HB_MACRO_PARAM );
+
+                                            while ( s_iPending )
+                                            {
+                                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
+                                            }
+
+                                            if( yylval.string )
+                                            {
+                                               hb_xfree( yylval.string );
+                                               yylval.string = NULL;
+                                            }
+
+                                            YYABORT;
+                                          }
 ;
 
 PareExpListAlias : PareExpList ALIASOP     { $$ = $1; }
