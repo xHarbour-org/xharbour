@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.301 2002/07/07 17:04:26 walito Exp $
+ * $Id: ChangeLog,v 1.302 2002/07/08 02:27:01 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-08 01:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix minor bug in PutMask() method.
+
+      Reported by Luiz Rafael Culik from brazilian user
+
 2002-07-07 23:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     utils/hbmake/hbmutils.prg
