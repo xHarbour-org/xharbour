@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1926 2003/12/22 18:56:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1927 2003/12/22 20:22:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -14,7 +14,7 @@
      * Some formating.
 
    /*
-      Przmek, can you please review, I belive it makes the code and error handling more consistent.
+      Przemek, can you please review, I belive it makes the code and error handling more consistent.
       but I'd like you to confirm it's ok.
     */
 
