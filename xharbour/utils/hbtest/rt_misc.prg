@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.5 2004/04/03 00:27:04 druzus Exp $
+ * $Id: rt_misc.prg,v 1.6 2004/11/21 21:44:31 druzus Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ FUNCTION Main_MISC()
    TEST_LINE( Len( oError )                   , 7                         )
 #endif
 #ifdef __HARBOUR__
-   TEST_LINE( Len( oError )                   , 17                        )
+   TEST_LINE( Len( oError )                   , if(hb_multithread(),20,17)                        )
 #endif
 
    /* "Samples" function tests (AMPM(), DAYS(), ELAPTIME(), ... ) */
