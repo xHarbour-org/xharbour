@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.34 2004/01/10 10:45:12 ignacioortiz Exp $
+ * $Id: extend.c,v 1.35 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -862,6 +862,30 @@ void HB_EXPORT hb_retnllen( long lNumber, int iWidth )
 void hb_retptr( void *voidPtr )
 {
    hb_itemPutPtrGC( &(HB_VM_STACK.Return), voidPtr );
+}
+
+#undef hb_retnint
+#ifndef HB_LONG_LONG_OFF
+void HB_EXPORT hb_retnint( LONGLONG lNumber )
+#else
+void HB_EXPORT hb_retnint( long lNumber )
+#endif
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retnint(%Ld)", lNumber));
+
+   hb_itemPutNInt( &(HB_VM_STACK.Return), lNumber );
+}
+
+#undef hb_retnintlen
+#ifndef HB_LONG_LONG_OFF
+void HB_EXPORT hb_retnintlen( LONGLONG lNumber, int iWidth )
+#else
+void HB_EXPORT hb_retnintlen( long lNumber, int iWidth )
+#endif
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retnintlen(%Ld, %d)", lNumber, iWidth));
+
+   hb_itemPutNIntLen( &(HB_VM_STACK.Return), lNumber, iWidth );
 }
 
 void HB_EXPORT hb_storc( char * szText, int iParam, ... )

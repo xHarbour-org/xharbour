@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.113 2004/01/27 03:06:58 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.114 2004/02/08 04:31:32 walito Exp $
  */
 
 /*
@@ -278,6 +278,11 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #ifndef HB_LONG_LONG_OFF
     #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
+    #define hb_retnint( llNumber )                hb_itemPutNInt( &HB_VM_STACK.Return, (llNumber) )
+    #define hb_retnintlen( llNumber, iWidth )     hb_itemPutNIntLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
+   #else
+    #define hb_retnint( llNumber )                hb_itemPutNInt( &HB_VM_STACK.Return, (llNumber) )
+    #define hb_retnintlen( llNumber, iWidth )     hb_itemPutNIntLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
    #endif
 
    /* JC1: this helps to insolate thread independant libraries */
@@ -316,6 +321,11 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #ifndef HB_LONG_LONG_OFF
     extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
+    extern void  HB_EXPORT  hb_retnint( LONGLONG llNumber );
+    extern void  HB_EXPORT  hb_retnintlen( LONGLONG llNumber, int iWidth );
+   #else
+    extern void  HB_EXPORT  hb_retnint( long llNumber );
+    extern void  HB_EXPORT  hb_retnintlen( long lNumber, int iWidth );
    #endif
 
    /* JC1: this helps to insolate thread independant libraries */

@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.7 2003/07/13 18:20:52 walito Exp $
+ * $Id: val.c,v 1.8 2003/12/03 13:01:24 mauriliolongo Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbapifs.h"
 
 /* returns the numeric value of a character string representation of a number */
 /*
@@ -120,6 +121,66 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
    return dResult;
 }
 
+#ifndef HB_LONG_LONG_OFF
+LONGLONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
+#else
+long     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
+#endif
+{
+  #ifndef HB_LONG_LONG_OFF
+   LONGLONG lResult = 0, lPrev;
+  #else
+   long     lResult = 0, lPrev;
+  #endif
+   ULONG ulPad = 0, ulLen;
+   BOOL bNeg = FALSE;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strValInt(%s)", szText));
+
+   while( isspace( szText[ulPad] ) )
+   {
+      ulPad++;
+   }
+
+   if( szText[ulPad] == '-' || szText[ulPad] == '+' )
+   {
+      if( szText[ulPad] == '-' )
+      {
+         bNeg = TRUE;
+      }
+      ulPad++;
+   }
+
+   ulLen = ulPad;
+
+   while( szText[ulLen] && isdigit( szText[ulLen] ) )
+   {
+      lPrev = lResult;
+      lResult *= 10;
+      lResult += (bNeg?-(szText[ulLen]-0x30):(szText[ulLen]-0x30));
+
+      if ( ( !bNeg && lPrev > lResult) || ( bNeg && lPrev < lResult ) )
+      {
+        // Overflow
+        if( iOverflow )
+        {
+           *iOverflow = 1;
+        }
+        return 0;
+      }
+      ulLen++;
+   }
+
+   if( iOverflow )
+   {
+      *iOverflow = 0;
+   }
+
+//   printf( "String: >%s< Val:%Ld\n", szText, lResult );
+
+   return lResult;
+}
+
 /* returns the numeric value of a character string representation of a number  */
 HB_FUNC( VAL )
 {
@@ -130,22 +191,38 @@ HB_FUNC( VAL )
       char * szText = hb_itemGetCPtr( pText );
       int iWidth, iLen = ( int ) hb_itemGetCLen( pText );
       int iDec;
-      double dValue = hb_strVal( szText, hb_itemGetCLen( pText ) );
+      BOOL bInteger = TRUE;
 
       for( iWidth = 0; iWidth < iLen; iWidth++ )
       {
          if( szText[ iWidth ] == '.' )
          {
+            bInteger = FALSE;
             break;
          }
       }
 
-      if( iWidth >= iLen - 1 )
+      if( bInteger )
       {
-         hb_retnlen( dValue, iLen, 0 );
+       #ifndef HB_LONG_LONG_OFF
+         LONGLONG lValue;
+       #else
+         long lValue;
+       #endif
+         int iOverflow;
+
+         lValue = hb_strValInt( szText, &iOverflow );
+
+         if( !iOverflow )
+         {
+            hb_retnintlen( lValue, iLen );
+            return;
+         }
       }
-      else
+
       {
+         double dValue = hb_strVal( szText );
+
          iDec = iLen - iWidth - 1;
 
          if( iWidth == 0 )
