@@ -1,8 +1,7 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.4 2003/09/12 20:50:49 paultucker Exp $
+rem $Id: makallvc.bat,v 1.5 2003/09/23 21:36:51 paultucker Exp $
 rem 
-tm start >st
 
 echo creating system files
 call make_vc %1
@@ -102,4 +101,3 @@ cd contrib\xwt
 call make_vc.bat %1
 cd ..\..
 :end
-tm stop >>st
