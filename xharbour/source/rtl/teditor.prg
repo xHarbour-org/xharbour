@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.47 2004/07/22 12:57:44 likewolf Exp $
+/* $Id: teditor.prg,v 1.48 2004/08/09 11:15:18 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1069,6 +1069,7 @@ METHOD K_Del() CLASS HBEditor
       // stuff the character
       //
       ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 1, "" )
+      ::lDirty := .T.
 
       // in case of softcr, reparse the paragraph.
       //
@@ -1084,6 +1085,7 @@ METHOD K_Del() CLASS HBEditor
 
    // have we to merge with the next line?
    IF lMerge
+      ::lDirty := .T.
       nCurRow := ::nRow
       nCurCol := ::nCol
 
