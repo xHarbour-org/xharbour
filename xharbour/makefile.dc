@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.pc,v 1.3 2005/02/20 22:14:03 andijahja Exp $
+# $Id: makefile.dc,v 1.1 2005/02/24 10:43:56 andijahja Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -121,18 +121,34 @@ DMC_LIBRARY = \
    $(DMCLIB_DIR)\oleaut32.lib
 
 HARBOUR_LIBRARY = \
-   $(VM_LIB) \
-   $(PP_LIB) \
-   $(GTWIN_LIB) \
-   $(DBFCDX_LIB) \
-   $(DBFFPT_LIB) \
-   $(DBFNTX_LIB) \
-   $(DBFDBT_LIB) \
-   $(RDD_LIB) \
-   $(COMMON_LIB) \
-   $(RTL_LIB) \
-   $(MACRO_LIB) \
+   $(VM_LIB) + \
+   $(PP_LIB) + \
+   $(GTWIN_LIB) + \
+   $(DBFCDX_LIB) + \
+   $(DBFFPT_LIB) + \
+   $(DBFNTX_LIB) + \
+   $(DBFDBT_LIB) + \
+   $(RDD_LIB) + \
+   $(COMMON_LIB) + \
+   $(RTL_LIB) + \
+   $(MACRO_LIB) + \
    $(LANG_LIB)
+
+HBTEST_LIBRARY = \
+   $(LIB_DIR)\pp.lib \
+   $(LIB_DIR)\macro.lib \
+   $(LIB_DIR)\dbfcdx.lib \
+   $(LIB_DIR)\dbfdbt.lib \
+   $(LIB_DIR)\dbffpt.lib \
+   $(LIB_DIR)\dbfntx.lib \
+   $(LIB_DIR)\rtl.lib \
+   $(LIB_DIR)\vm.lib \
+   $(LIB_DIR)\rdd.lib \
+   $(LIB_DIR)\common.lib \
+   $(LIB_DIR)\codepage.lib \
+   $(LIB_DIR)\lang.lib \
+   $(LIB_DIR)\debug.lib \
+   $(LIB_DIR)\gtwin.lib
 
 HARBOUR_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD      = $(CC) $(CFLAGS) -o$@ $**
@@ -178,12 +194,12 @@ PROJECT = \
    $(GTPCA_LIB) \
    $(DESIGN_LIB) \
    $(HTML_LIB) \
-   $(HBTEST_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
    $(HBPP_EXE) \
    $(XBSCRIPT_EXE) \
-   $(HBRUN_EXE)
+   $(HBRUN_EXE) \
+   $(HBTEST_EXE)
 
 ALL: $(PROJECT)
 
@@ -4651,7 +4667,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\rt_misc.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_ccall.obj,>> make.tmp
    $(ECHO) $(HBTEST_EXE),, >> make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY) + >> make.tmp
+   $(ECHO) $(HBTEST_LIBRARY) + >> make.tmp
    $(ECHO) $(DMC_LIBRARY),, >> make.tmp
    $(DMLINK) @make.tmp
 
@@ -4777,7 +4793,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\ffile1.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\ft_funcs.obj, >> make.tmp
    $(ECHO) $(HBDOC_EXE),, >> make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY) + >> make.tmp
+   $(ECHO) $(HBTEST_LIBRARY) + >> make.tmp
    $(ECHO) $(DMC_LIBRARY),, >> make.tmp
    $(DMLINK) @make.tmp
 
@@ -4908,7 +4924,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\prb_stak.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbmlang.obj, >> make.tmp
    $(ECHO) $(HBMAKE_EXE),, >> make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY) + >> make.tmp
+   $(ECHO) $(HBTEST_LIBRARY) + >> make.tmp
    $(ECHO) $(DMC_LIBRARY),, >> make.tmp
    $(DMLINK) @make.tmp
 
@@ -4971,7 +4987,7 @@ $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
 $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\xbscript.obj, > make.tmp
    $(ECHO) $(XBSCRIPT_EXE),, >> make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY) + >> make.tmp
+   $(ECHO) $(HBTEST_LIBRARY) + >> make.tmp
    $(ECHO) $(DMC_LIBRARY),, >> make.tmp
    $(DMLINK) @make.tmp
 

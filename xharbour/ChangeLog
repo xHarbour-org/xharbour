@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3863 2005/02/24 11:12:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.3864 2005/02/24 13:04:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-24 21:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * makefile.dc
+    ! EXE files were linked with MT libraries, thus generating
+      exception when executed. Fixed.
+
 2005-02-24 20:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/clipdefs.h
     * undef WORD etc when __DMC__ and MT
