@@ -9,6 +9,7 @@
 #Include "cstruct.ch"
 #Include "winGdi.ch"
 #Include "what32.ch"
+#include "error.ch"
 
 // move that structure to WinStruc.ch
 
@@ -113,6 +114,7 @@ METHOD TabNotify( nMsg,nwParam, nlParam ) CLASS TTabControl
 
 METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    LOCAL hTab, cRes
+   local hClass, nSeq
    if VALTYPE( oPage ) == "C"
       cRes := oPage
       oPage:= NIL
@@ -125,7 +127,17 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    oPage:propname := cName
    if (hTab:=TabCtrl_AddItem(::handle,oPage:Caption,oPage:ImageIndex)) > -1
       AADD(::Controls,oPage )
-      __objAddData( self, cName )
+//      __objAddData( self, cName )
+
+      IF !ISCHARACTER( cName )
+         __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+        ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
+         hClass := ::ClassH
+         nSeq   := __cls_IncData( hClass )
+         __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+         __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+      ENDIF
+
       __ObjSetValueList( self, { { cName, oPage } } )
    ENDIF
    RETURN(hTab)

@@ -47,9 +47,9 @@ ENDCLASS
 
 METHOD SetBrowserData(oObj) CLASS ObjInspect
    local n,c
-   ::Browser:source := oObj:RetrieveData()
-   ASort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
-   aeval(::Browser:source,{|a|a[2]:=__objSendMsg( oObj, a[1] )} )
+   ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
+   aSort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
+   aEval( ::Browser:source,{|a|a[1]:=Proper( a[1] )} )
    ::Browser:RefreshAll()
 return(self)
 

@@ -4,6 +4,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 #include "what32.ch"
+#include "error.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -31,7 +32,6 @@ METHOD New( oParent ) CLASS TFrame
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
    InitCommonControls()
-//   InitCommonControlsEx(ICC_BAR_CLASSES)
 
    return( super:New( oParent ) )
 
@@ -52,7 +52,15 @@ METHOD Add( cName, oObj, lCreate ) CLASS TFrame
 *-----------------------------------------------------------------------------*
 
 METHOD SetLink( cName, oObj ) CLASS TFrame
-   __objAddData( self, cName )
+   local hClass, nSeq
+   IF !ISCHARACTER( cName )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+     ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
+      hClass := ::ClassH
+      nSeq   := __cls_IncData( hClass )
+      __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+      __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+   ENDIF
    __ObjSetValueList( self, { { cName, oObj } } )
 return( oObj )
 

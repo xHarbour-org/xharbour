@@ -6,6 +6,8 @@
 #include "debug.ch"
 #include "what32.ch"
 
+#include "error.ch"
+
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
 #Define RCF_MDIFRAME   2
@@ -57,9 +59,25 @@ METHOD New( oParent ) CLASS TForm
 *-----------------------------------------------------------------------------*
 
 METHOD Add( cName, oObj, lCreate ) CLASS TForm
+   LOCAL nSeq, hClass
+
    DEFAULT lCreate TO .T.
+
    oObj:propname := cName
-   __objAddData( self, cName )
+
+//   __objAddData( self, cName )
+   
+//-------------------------------------------------------------------------------------   
+   IF !ISCHARACTER( cName )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+     ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
+      hClass := ::ClassH
+      nSeq   := __cls_IncData( hClass )
+      __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+      __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
+   ENDIF
+//-------------------------------------------------------------------------------------
+
    __ObjSetValueList( self, { { cName, oObj } } )
    IF lCreate
       oObj:Create()

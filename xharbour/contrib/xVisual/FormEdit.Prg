@@ -16,17 +16,17 @@ GLOBAL EXTERNAL oApp
 
  CLASS TFormEdit FROM TForm
 
-   DATA oMask
-   DATA Editing
-   DATA aCtrl
-   DATA nCurrent
-   DATA GridColor
-   DATA xGrid
-   DATA yGrid
-   DATA hBmpGrid
-   DATA xBmpSize
-   DATA yBmpSize
-   DATA CtrlName
+   DATA oMask        PROTECTED
+   DATA Editing      PROTECTED
+   DATA aCtrl        PROTECTED
+   DATA nCurrent     PROTECTED
+   DATA GridColor    PROTECTED
+   DATA xGrid        PROTECTED
+   DATA yGrid        PROTECTED
+   DATA hBmpGrid     PROTECTED
+   DATA xBmpSize     PROTECTED
+   DATA yBmpSize     PROTECTED
+   DATA CtrlName     PROTECTED
 
    METHOD New( oParent )     INLINE ::Caption := 'TForm1', ;
                                     ::Editing := .F.        ,;
