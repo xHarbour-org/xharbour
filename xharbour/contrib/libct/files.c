@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.11 2004/01/26 00:30:48 likewolf Exp $
+ * $Id: files.c,v 1.12 2004/02/01 22:52:07 likewolf Exp $
  */
 
 /*
@@ -1020,6 +1020,7 @@ HB_FUNC( SETFDATI )
 }
       
    
+
 HB_FUNC( FILEDELETE )
 {
    BOOL bReturn = FALSE;
@@ -1027,26 +1028,47 @@ HB_FUNC( FILEDELETE )
    USHORT uiAttr = HB_FA_ALL;
    BYTE *pDirSpec;
 
+   PHB_FNAME fname;
+   BYTE *pCurDir;
+   char cCurDsk;
+
    if ( ISCHAR( 1 ) )
    {
       pDirSpec = hb_fileNameConv( hb_strdup( hb_parc( 1 ) ) );
 
+      cCurDsk = hb_fsCurDrv() ;
+      pCurDir = hb_fsCurDir( cCurDsk ) ;
+
       if ( ISNUM( 2 ) )
-      {
+         {
          uiAttr = hb_parni( 2 );
-      }
+         }
 
       if( ( ffind = hb_fsFindFirst( ( const char *)pDirSpec, uiAttr ) ) != NULL )
       {
+
+         if( (fname = hb_fsFNameSplit( pDirSpec )) !=NULL )
+         {
+           if( (fname && DRIVE)==1 )
+               hb_fsChDrv( ( BYTE ) fname->szDrive );
+
+           if( (fname && DIRECTORY)==1 )
+               hb_fsChDir( ( BYTE *) fname->szPath );
+         }
+
          do
          {
-            if ( hb_fsDelete( ( BYTE * ) ffind->szName ) )
-               bReturn = TRUE;
+         if( hb_fsDelete( ( BYTE * ) ffind->szName ) )
+              bReturn = TRUE;
          }
          while( hb_fsFindNext( ffind ) );
+
          hb_fsFindClose( ffind );
+         }
+         hb_xfree( pDirSpec );
       }
-      hb_xfree( pDirSpec );
+      hb_fsChDrv( (BYTE ) cCurDsk );
+      hb_fsChDir( pCurDir );
+      hb_retl( bReturn );
    }
-   hb_retl( bReturn );
-}
+
