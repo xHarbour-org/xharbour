@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3070 2004/06/15 02:32:15 kaddath Exp $
+ * $Id: ChangeLog,v 1.3071 2004/06/15 11:55:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-15 17:04 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbexprb.c
+    ! Fixed/optimized .AND. implementation to use Clipper compatible optimization when Logical Shortcuts are enabled.
+
+  * source/compiler/exproptb.c
+  * source/macro/macrob.c
+    * Touched to force recompilation.
+
+  * source/pp/ppcore.c
+    + Added new char *strpbrkSkipStrings( const char* string, const char *strCharSet )
+    ! Fixed getExpReal() implemntation of Extended Marker to use normal matching if Expression begins with '('
+    ! Fixed getExpReal() implemntation of Extended Marker to terminate the Exp when encountering the first
+      Space or Comma (excluding literl strings).
+    ! Fixed output engine to add string delimiters to Expression begining with a Macro if the Expression involves
+      any operator[s].
+    ! Fixed output engine to add string delimiters to Expression begining with a string delimiter if the Expression involves
+      any operator[s].
+
+  * utils/xbscript/xbscript.prg
+    ! Fixed NextExp() implemntation of Extended Marker to use normal matching if Expression begins with '('
+    ! Fixed NextExp() implemntation of Extended Marker to terminate the Exp when encountering the first
+      Space or Comma (excluding literl strings).
+    ! Fixed output engine to add string delimiters to Expression begining with a Macro if the Expression involves
+      any operator[s].
+    ! Fixed output engine to add string delimiters to Expression begining with a string delimiter if the Expression involves
+      any operator[s].
+
+  * include/hbver.h
+    * Refreshed.
 
 2004-06-15 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec

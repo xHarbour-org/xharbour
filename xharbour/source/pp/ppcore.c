@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.153 2004/05/23 01:12:22 likewolf Exp $
+ * $Id: ppcore.c,v 1.154 2004/05/23 01:20:00 ronpinkas Exp $
  */
 
 /*
@@ -151,6 +151,7 @@ static int    NextParm( char **, char * );
 static BOOL   OpenInclude( char *, HB_PATHNAMES *, PHB_FNAME, BOOL bStandardOnly, char * );
 static BOOL   IsIdentifier( char *szProspect );
 static int    NextStopper( char ** sSource, char * sDest );
+char *strpbrkSkipStrings( const char* string, const char *strCharSet );
 
 int hb_pp_NextToken( char** pLine, char *sToken );
 
@@ -3249,7 +3250,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
      if( lenreal && IsIdentifier( expreal ) )
      {
-        SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+        SearnRep( exppatt, expreal, lenreal, ptro, lenres);
      }
      else
      {
@@ -3260,7 +3261,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      if( !lenreal ) lenreal = getExpReal( expreal, ptri, '4', maxlenreal, 0 );
      {
-        SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+        SearnRep( exppatt, expreal, lenreal, ptro, lenres);
      }
   }
   else if( *(exppatt+2) == '3' )  /*  ----  wild match marker  */
@@ -3273,7 +3274,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
      lenreal = hb_pp_strocpy( expreal, *ptri );
      *ptri += lenreal;
-     SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+     SearnRep( exppatt, expreal, lenreal, ptro, lenres);
   }
   else if( *(exppatt+2) == '2' )  /*  ---- restricted match marker  */
   {
@@ -3295,7 +3296,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
               rezrestr = 1;
               /*  (*ptri)++; */
               lenreal = getExpReal( expreal, ptri, '2', maxlenreal, 0 );
-              SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+              SearnRep( exppatt, expreal, lenreal, ptro, lenres);
               break;
            }
            else
@@ -3310,9 +3311,9 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
            ptrtemp = ptr;
            if( !strincmp( *ptri, &ptr, !com_or_xcom ) )
            {
-              lenreal = stroncpy( expreal, *ptri, (ptr-ptrtemp) );
+              lenreal = stroncpy( expreal, *ptri, ( ptr - ptrtemp ) );
               *ptri += lenreal;
-              SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+              SearnRep( exppatt, expreal, lenreal, ptro, lenres );
               rezrestr = 1;
               break;
            }
@@ -3348,7 +3349,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
      if( lenreal )
      {
-        SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+        SearnRep( exppatt, expreal, lenreal, ptro, lenres);
      }
      else
      {
@@ -3408,9 +3409,19 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    HB_SKIPTABSPACES( *ptri );
 
    // Extended Match Marker
-   if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
+   if( cMarkerType == '4' && **ptri != '(' )
    {
-      char *pTmp = strpbrk( *ptri, " ,\"'=" );
+      char *pTmp;
+
+      // Clipper does no allow any Extended Marker Expression to begin with '=' or ':'
+      if( strchr( "=:", ( *ptri )[0] ) )
+      {
+         lens = 0;
+         goto Done;
+      }
+
+      // Clipper terminates any Extended Marker Expression upon the first Space or Comma (excluding Literal Strings).
+      pTmp = strpbrkSkipStrings( *ptri, " ," );
 
       if( pTmp )
       {
@@ -4897,57 +4908,61 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
   case '2':  /* Normal stringify result marker  */
     if( !lenreal )
-      hb_pp_Stuff( "", ptro, 0, 4, lenres );
+    {
+       hb_pp_Stuff( "", ptro, 0, 4, lenres );
+    }
     else if( patttype == '1' )          /* list match marker */
-      {
-        hb_pp_Stuff( "", ptro, 0, 4, lenres );
-        lenres -= 4;
-        rmlen = 0;
+    {
+       hb_pp_Stuff( "", ptro, 0, 4, lenres );
+       lenres -= 4;
+       rmlen = 0;
 
-        do
-        {
-           ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
-           lenitem = (ifou)? ifou-1:lenreal;
+       do
+       {
+          ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
+          lenitem = (ifou)? ifou-1:lenreal;
 
-           if( *expreal != '\0' )
-           {
-              /* Ron Pinkas added 2000-01-21 */
-              if( *expreal == '&' && ( expreal[1] == '(' || ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenitem - 1 ) )
-              {
-                 i = 0;
-                 if( ! ifou )
-                 {
-                    lenitem--;
+          if( *expreal != '\0' )
+          {
+             /* Ron Pinkas added 2000-01-21 */
+             if( *expreal == '&' && ( expreal[1] == '(' || ( ( ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenitem - 1 ) &&
+                 strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) )
+             {
+                i = 0;
+                if( ! ifou )
+                {
+                   lenitem--;
 
-                    if( expreal[lenitem - 1] == '.' )
-                    {
-                       lenitem--;
-                    }
-                 }
+                   if( expreal[lenitem - 1] == '.' )
+                   {
+                      lenitem--;
+                   }
+                }
 
-                 hb_pp_Stuff( expreal + 1, ptro, lenitem, 0, lenres );
-              }
-              else /* END Ron Pinkas 2000-01-21 */
-              {
-                 i = (ifou)? 3:2;
-                 pp_rQuotes( expreal, sQuotes );
-                 hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
-                 hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
-              }
+                hb_pp_Stuff( expreal + 1, ptro, lenitem, 0, lenres );
+             }
+             else /* END Ron Pinkas 2000-01-21 */
+             {
+                i = (ifou)? 3:2;
+                pp_rQuotes( expreal, sQuotes );
+                hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
+                hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
+             }
 
-              ptro += i + lenitem;
-              rmlen += i + lenitem;
-           }
+             ptro += i + lenitem;
+             rmlen += i + lenitem;
+          }
 
-           expreal += ifou;
-           lenreal -= ifou;
-        }
-        while( ifou > 0 );
+          expreal += ifou;
+          lenreal -= ifou;
+       }
+       while( ifou > 0 );
     }
     else
     {
        /* Ron Pinkas added 2000-01-21 */
-       if( *expreal == '&' && ( expreal[1] == '(' || ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenreal - 1 ) )
+       if( *expreal == '&' && ( expreal[1] == '(' || ( ( ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenreal - 1 ) &&
+           strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) )
        {
           rmlen--;
 
@@ -4985,18 +5000,19 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
            if( *expreal != '\0' )
            {
-               if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenitem - 1 ) )
+               if( expreal[0] == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL &&
+                  pTemp < expreal + lenitem - 1 ) && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL )
                {
-                   i = (ifou)? 3:2;
+                   i = ifou ? 3 : 2;
                    pp_rQuotes( expreal, sQuotes );
                    hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
-                   hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
+                   hb_pp_Stuff( expreal, ptro + 1, lenitem, 0, lenres+i );
                    ptro += i;
                    rmlen += i;
                }
-               else if( !lenitem || *expreal == '(' || (*expreal=='&' && lenreal > 1 ) ||
-                    ( *expreal=='\"' && *(expreal+lenitem-1)=='\"' ) ||
-                    ( *expreal == '\'' && *(expreal+lenitem-1)=='\'' ) )
+               else if( !lenitem || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
+                    ( *expreal =='\"' && *(expreal + lenitem - 1 ) == '\"' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
+                    ( *expreal == '\'' && *(expreal + lenitem - 1 ) == '\'' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) )
                {
                    if( ifou )
                    {
@@ -5033,16 +5049,17 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         }
         while( ifou > 0 );
     }
-    else if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenreal - 1 ) )
+    else if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenreal - 1 ) &&
+             strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL )
     {
         pp_rQuotes( expreal, sQuotes );
         hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
         hb_pp_Stuff( expreal, ptro + 1, lenreal, 0, lenres );
         rmlen = lenreal + 2;
     }
-    else if( !lenreal || *expreal == '(' || ( *expreal == '&' && lenreal > 1 ) ||
-             ( *expreal == '\"' && *( expreal + lenreal - 1 ) == '\"' ) ||
-             ( *expreal == '\'' && *( expreal + lenreal - 1 ) == '\'' ) )
+    else if( !lenreal || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
+             ( *expreal == '\"' && *( expreal + lenreal - 1 ) == '\"' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
+             ( *expreal == '\'' && *( expreal + lenreal - 1 ) == '\'' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) )
     {
         if( *expreal == '&' )
         {
@@ -7015,4 +7032,60 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    #endif
 
    return nLen + iPad;
+}
+
+char *strpbrkSkipStrings( const char* string, const char *strCharSet )
+{
+   unsigned long ulAt;
+   char cChar, cLastChar = ' ';
+
+   if( string == NULL || strCharSet == NULL )
+   {
+      return NULL;
+   }
+
+   for( ulAt = 0; string[ ulAt ] != '\0'; ulAt++ )
+   {
+       //printf( "String: >%s< Chars: >%s< #%i\n", string, strCharSet, ulAt );
+
+       if( strchr( strCharSet, string[ ulAt ] ) )
+       {
+          return (char *) string + ulAt;
+       }
+
+       cChar = string[ ulAt ];
+
+       if( strchr(  "'\"", cChar ) )
+       {
+          while( string[ ++ulAt ] != cChar )
+          {
+             if( string[ ulAt ] == '\0' )
+             {
+                return NULL;
+             }
+          }
+
+          continue;
+       }
+       else if( cChar == '[' )
+       {
+          if( ! ( isalpha( cLastChar  ) || isdigit( cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+          {
+             while( string[ ++ulAt ] != ']' )
+             {
+                if( string[ ulAt ] == '\0' )
+                {
+                   return NULL;
+                }
+             }
+
+             cLastChar = ']';
+             continue; // Recorded cLastChar
+          }
+       }
+
+       cLastChar = cChar;
+   }
+
+   return NULL;
 }

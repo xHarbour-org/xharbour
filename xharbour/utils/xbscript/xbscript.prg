@@ -4990,14 +4990,14 @@ RETURN sReturn
 
 STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
-  LOCAL  sExp, sTemp, Counter, sPad, sToken, sList
-  LOCAL  sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
-  LOCAL  s1, s2, s4, s5, sNext1, sNext2, sNext4, sNext5, nLen, nNextLen
-  LOCAL  sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper
-  LOCAL  sMultiStopper, nSpaceAt, sNextStopper, cChar
-  LOCAL  aExp
+  LOCAL sExp, sTemp, Counter, sPad, sToken, sList
+  LOCAL sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
+  LOCAL s1, s2, s4, s5, sNext1, sNext2, sNext4, sNext5, nLen, nNextLen
+  LOCAL sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper
+  LOCAL sMultiStopper, nSpaceAt, sNextStopper, cChar
+  LOCAL aExp
   LOCAL bErrHandler := ErrorBlock()
-  LOCAL nCommaAt, nAt, nDoubleAt, nSingleAt
+  LOCAL nAt
 
   IF Empty( sLine )
      RETURN NIL
@@ -5095,23 +5095,12 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      CASE cType == '('
         s1 := Left( sLine, 1 )
 
-        IF ! ( s1 $ "&(['" + '"' )
-            nSpaceAt  := At( ' ', sLine )
-            nCommaAt  := At( ',', sLine )
-            nDoubleAt := At( '"', sLine )
-            nSingleAt := At( "'", sLine )
-
-            nAt := nSpaceAt
-
-            IF nCommaAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
-               nAt := nCommaAt
-            ENDIF
-            IF nDoubleAt > 0 .AND. ( nAt == 0 .OR. nAt > nDoubleAt )
-               nAt := nDoubleAt
-            ENDIF
-            IF nSingleAt > 0 .AND. ( nAt == 0 .OR. nAt > nSingleAt )
-               nAt := nSingleAt
-            ENDIF
+        IF s1 $ "=:"
+           RETURN NIL
+        ELSEIF s1 == '('
+           // Continue with normal Matcher
+        ELSE
+            nAt := nAtAnyCharSkipStr( " ,", sLine )
 
             IF nAt == 0
                sExp  := sLine
@@ -5194,7 +5183,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         WAIT
      ENDIF
 
-     //TraceLog( "Token: '" + sToken + "' Len: " + Str( nLen ) + " Next: '" + sNextToken + "'" )
+     TraceLog( "Token: '" + sToken + "' Len: " + Str( nLen ) + " Next: '" + sNextToken + "'" )
 
      IF nLen == 1
 
@@ -5997,7 +5986,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            IF ValType( xValue ) == 'A'
               nMatches := Len( xValue )
               FOR nMatch := 1 TO nMatches
-                 IF Left( xValue[nMatch], 1 ) == '&'
+                 /*
+                    Clipper bug does NOT check operator existence if the Experssion begins with a Parentesized Macro - apparantly because
+                    it then becomes somewhat complex to find such operator only after the end of the Parentesized Macro.
+                    Emulating this bug due to same "complexity". :-)
+                  */
+                 IF Left( xValue[nMatch], 1 ) == '&' .AND. ( SubStr( xValue[nMatch], 2, 1 ) == '(' .OR. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue[nMatch] ) == 0 )
                     lMacro := .T.
 
                     IF SubStr( xValue[nMatch], 2, 1 ) != '(' .AND. '.' $ SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
@@ -6031,7 +6025,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               NEXT
            ELSE
               IF ! ( xValue == NIL )
-                 IF Left( xValue, 1 ) == '&'
+                 /*
+                    Clipper bug does NOT check operator existence if the Experssion begins with a Parentesized Macro - apparantly because
+                    it then becomes somewhat complex to find such operator only after the end of the Parentesized Macro.
+                    Emulating this bug due to same complexity. :-)
+                  */
+                 IF Left( xValue, 1 ) == '&' .AND. ( SubStr( xValue, 2, 1 ) == '(' .OR. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue ) == 0 )
                     lMacro := .T.
 
                     IF SubStr( xValue, 2, 1 ) != '(' .AND. '.' $ SubStr( xValue, 2, Len( xValue ) - 2 )
@@ -6066,10 +6065,15 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            IF ValType( xValue ) == 'A'
               nMatches := Len( xValue )
               FOR nMatch := 1 TO nMatches
-                 IF Left( xValue[nMatch], 1 ) $ "('[" + '"'
+                 IF Left( xValue[nMatch], 1 ) == '(' .OR. ( Left( xValue[nMatch], 1 ) $ "'[" + '"' .AND. Left( xValue[nMatch], 1 ) == Right( xValue[nMatch], 1 ) .AND. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue[nMatch] ) == 0 )
                     sResult += xValue[nMatch]
                  ELSE
-                    IF Left( xValue[nMatch], 1 ) == '&'
+                    /*
+                       Clipper bug does NOT check operator existence if the Experssion begins with a Parentesized Macro - apparantly because
+                       it then becomes somewhat complex to find such operator only after the end of the Parentesized Macro.
+                       Emulating this bug due to same complexity. :-)
+                    */
+                    IF Left( xValue[nMatch], 1 ) == '&' .AND. ( SubStr( xValue[nMatch], 2, 1 ) == '(' .OR. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue[nMatch] ) == 0 )
                        lMacro := .T.
 
                        IF SubStr( xValue[nMatch], 2, 1 ) != '(' .AND. '.' $ SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
@@ -6087,6 +6091,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                        ELSE
                           sResult += SubStr( xValue[nMatch], 2 )
                        ENDIF
+                    ELSEIF '"' $ xValue[nMatch] .AND. "'" $ xValue[nMatch] .AND. ']' $ xValue[nMatch] .AND. Left( xValue[nMatch], 1 ) != '['
+                       sResult += "[[" + RTrim( xValue[nMatch] ) + "]]"
+                    ELSEIF '"' $ xValue[nMatch] .AND. "'" $ xValue[nMatch]
+                       sResult += '[' + RTrim( xValue[nMatch] ) + "]"
+                    ELSEIF '"' $ xValue[nMatch]
+                       sResult += "'" + RTrim( xValue[nMatch] ) + "'"
                     ELSE
                        sResult += '"' + RTrim( xValue[nMatch] ) + '"'
                     ENDIF
@@ -6098,10 +6108,15 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               NEXT
            ELSE
               IF xValue != NIL
-                 IF Left( xValue, 1 ) $ "('[" + '"'
+                 IF Left( xValue, 1 ) == '(' .OR. ( Left( xValue, 1 ) $ "('[" + '"' .AND. Left( xValue, 1 ) == Right( xValue, 1 ) .AND. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue ) == 0 )
                     sResult += xValue
                  ELSE
-                    IF Left( xValue, 1 ) == '&'
+                    /*
+                       Clipper bug does NOT check operator existence if the Experssion begins with a Parentesized Macro - apparantly because
+                       it then becomes somewhat complex to find such operator only after the end of the Parentesized Macro.
+                       Emulating this bug due to same complexity. :-)
+                     */
+                    IF Left( xValue, 1 ) == '&' .AND. ( SubStr( xValue, 2, 1 ) == '(' .OR. nAtAnyCharSkipStr( "+-*/^$=!#<>|", xValue ) == 0 )
                        lMacro := .T.
 
                        IF SubStr( xValue, 2, 1 ) != '(' .AND. '.' $ SubStr( xValue, 2, Len( xValue ) - 2 )
@@ -6119,8 +6134,14 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                        ELSE
                           sResult += SubStr( xValue, 2 )
                        ENDIF
+                    ELSEIF '"' $ xValue .AND. "'" $ xValue .AND. ']' $ xValue .AND. Left( xValue, 1 ) != '['
+                       sResult += "[[" + xValue + "]]"
+                    ELSEIF '"' $ xValue .AND. "'" $ xValue
+                       sResult += '[' + xValue + ']'
+                    ELSEIF '"' $ xValue
+                       sResult += "'" + xValue + "'"
                     ELSE
-                       sResult += '"' + RTrim( xValue ) + '"'
+                       sResult += '"' + xValue + '"'
                     ENDIF
                  ENDIF
               ENDIF
@@ -9056,7 +9077,7 @@ RETURN sIdentifier
 
 FUNCTION nAtSkipStr( sFind, sLine, nStart )
 
-   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' ', sTmp, nLenFind := Len( sFind )
+   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' ', nLenFind := Len( sFind )
    LOCAL lRule
 
    IF nStart == NIL
@@ -9071,6 +9092,47 @@ FUNCTION nAtSkipStr( sFind, sLine, nStart )
 
    FOR nAt := nStart TO nLen
        IF SubStr( sLine, nAt, nLenFind ) == sFind
+          RETURN nAt
+       ENDIF
+
+       cChar := SubStr( sLine, nAt, 1 )
+
+       IF cChar $ '"'+"'"
+          DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
+          ENDDO
+          LOOP // No need to record cLastChar
+       ELSEIF lRule == .F. .AND. cChar == '['
+          IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+             DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
+             ENDDO
+          ENDIF
+          cLastChar := ']'
+          LOOP // Recorded cLastChar
+       ENDIF
+
+       cLastChar := cChar
+    NEXT
+
+RETURN 0
+
+//--------------------------------------------------------------//
+FUNCTION nAtAnyCharSkipStr( sChars, sLine, nStart )
+
+   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' '
+   LOCAL lRule
+
+   IF nStart == NIL
+      nStart := 1
+   ENDIF
+
+   IF ProcName( 1 ) == "COMPILERULE"
+      lRule := .T.
+   ELSE
+      lRule := .F.
+   ENDIF
+
+   FOR nAt := nStart TO nLen
+       IF SubStr( sLine, nAt, 1 ) $ sChars
           RETURN nAt
        ENDIF
 
