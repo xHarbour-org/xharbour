@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.52 2004/11/21 21:43:34 druzus Exp $
+ * $Id: ads1.c,v 1.54 2005/02/23 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -83,6 +83,7 @@ extern int adsFileType;                 /* current global setting */
 extern int adsLockType;
 extern int adsRights;
 extern int adsCharType;
+extern BOOL adsOEM;
 extern BOOL bTestRecLocks;
 extern BOOL bDictionary;
 extern ADSHANDLE adsConnectHandle;
@@ -649,7 +650,8 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       if( hb_itemType( pKey ) == HB_IT_STRING )
       {
          AdsSeekLast( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
-                    (UNSIGNED16) hb_itemGetCLen( pKey ), ADS_STRINGKEY,
+                    (UNSIGNED16) hb_itemGetCLen( pKey ),
+                    (adsOEM ? ADS_RAWKEY : ADS_STRINGKEY),
                     (UNSIGNED16*) &(pArea->fFound) );
       }
       else if( hb_itemType( pKey ) & HB_IT_NUMERIC )
@@ -671,8 +673,8 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
          hb_itemGetNLen( pKey, &uiLen, &uiDec  );
          hb_ndtoa( hb_itemGetND( pKey ), ( char * ) szText, uiLen, uiDec );
          szText[ uiLen ] = '\0';
-         AdsSeekLast( pArea->hOrdCurrent, szText,
-                 uiLen, ADS_STRINGKEY, (UNSIGNED16*) &(pArea->fFound) );
+         AdsSeekLast( pArea->hOrdCurrent, szText, uiLen, ADS_STRINGKEY,
+                      (UNSIGNED16*) &(pArea->fFound) );
       }
    }
    else
@@ -680,7 +682,8 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       if( hb_itemType( pKey ) == HB_IT_STRING )
       {
          AdsSeek( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
-                  (UNSIGNED16) hb_itemGetCLen( pKey ), ADS_STRINGKEY, usSeekType, (UNSIGNED16*) &(pArea->fFound) );
+                  (UNSIGNED16) hb_itemGetCLen( pKey ),
+                  (adsOEM ? ADS_RAWKEY : ADS_STRINGKEY), usSeekType, (UNSIGNED16*) &(pArea->fFound) );
       }
       else if( hb_itemType( pKey ) & HB_IT_NUMERIC )
       {
@@ -1309,7 +1312,19 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case HB_IT_STRING:
          pulLength = pArea->maxFieldLen;
-         if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
+         if( adsOEM )
+         {
+            AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+            if( pArea->fEof )
+            {
+               memset( pBuffer, ' ', pField->uiLen );
+            }
+            else
+            {
+               AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength );
+            }
+         }
+         else if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
          {
             memset( pBuffer, ' ', pField->uiLen );
             pArea->fEof = TRUE;
@@ -1532,7 +1547,14 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                uiCount = pField->uiLen;
             }
 
-            ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            if( adsOEM )
+            {
+               ulRetVal = AdsSetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            }
+            else
+            {
+               ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            }
 
          }
          break;
@@ -1575,8 +1597,16 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             bTypeError = FALSE;
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
-            ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
+            if( adsOEM )
+            {
+               ulRetVal = AdsSetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ),
+                  (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            }
+            else
+            {
+               ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+            }
          }
          break;
    }
@@ -3363,6 +3393,10 @@ static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
                if( sInfo->scopeValue->type == HB_IT_STRING )
                {
                   /* bTypeError = FALSE; */
+                  if( adsOEM )
+                  {
+                     usDataType = ADS_RAWKEY;
+                  }
                   pucScope = (UNSIGNED8*) hb_itemGetCPtr( sInfo->scopeValue );
                   AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1), /*ADS top/bottom are 1,2 instead of 0,1*/
                      (UNSIGNED8*) pucScope,

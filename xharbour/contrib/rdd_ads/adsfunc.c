@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.46 2004/12/12 06:04:17 brianhays Exp $
+ * $Id: adsfunc.c,v 1.48 2005/02/23 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ int adsFileType = ADS_CDX;
 int adsLockType = ADS_PROPRIETARY_LOCKING;
 int adsRights = 1;
 int adsCharType = ADS_ANSI;
+BOOL adsOEM = FALSE;
 ADSHANDLE adsConnectHandle = 0;
 BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
@@ -80,6 +81,16 @@ BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 #if !defined( ADS_LINUX )
 static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
 #endif
+
+void HB_EXPORT hb_oemansi(char* pcString, LONG lLen)
+{
+#if defined(HB_OS_WIN_32)
+   char * pszDst = ( char * ) hb_xgrab( lLen + 1 );
+   OemToCharBuff( ( LPCSTR ) pcString, ( LPSTR ) pszDst, (DWORD) lLen );
+   memcpy( pcString, pszDst, lLen );
+   hb_xfree( pszDst );
+#endif
+}
 
 HB_FUNC( ADSTESTRECLOCKS )              /* Debug Implicit locks Set/Get call */
 {
@@ -339,6 +350,10 @@ HB_FUNC( ADSSETCHARTYPE )
       if( charType > 0 && charType < 3 )
       {
          adsCharType = charType;
+      }
+      if( ISLOG( 2 ) )
+      {
+         adsOEM = hb_parnl( 2 );
       }
    }
    hb_retni( oldType );
@@ -777,6 +792,10 @@ HB_FUNC( ADSEVALAOF )
    if( pArea && ISCHAR( 1 ) )
    {
       pucFilter = hb_parcx( 1 );
+      if( adsOEM )
+      {
+         hb_oemansi( pucFilter, hb_parclen( 1 ) );
+      }
 
       AdsEvalAOF( pArea->hTable, (UNSIGNED8*) pucFilter, &pusOptLevel );
       hb_retni( pusOptLevel );
@@ -1007,6 +1026,10 @@ HB_FUNC( ADSSETAOF )
    else if( pArea )
    {
       pucFilter = hb_parcx( 1 );
+      if( adsOEM )
+      {
+         hb_oemansi( pucFilter, hb_parclen( 1 ) );
+      }
       if( hb_pcount() > 1 )
       {
          usResolve = hb_parni( 2 );
