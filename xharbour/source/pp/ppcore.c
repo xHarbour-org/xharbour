@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.166 2004/09/11 10:42:42 druzus Exp $
+ * $Id: ppcore.c,v 1.167 2004/09/16 15:57:21 likewolf Exp $
  */
 
 /*
@@ -3479,7 +3479,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
    }
 
-   State = ( **ptri == '\'' || **ptri =='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
+   State = ( **ptri == '\'' || **ptri == '\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
    {
@@ -4066,7 +4066,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                else if( lens > 2 && ( ( *(*ptri-2)=='+' && *(*ptri-1)=='+' ) ||
                                     ( *(*ptri-2)=='-' && *(*ptri-1)=='-' ) ) )
                {
-                  State = STATE_ID_END;
+                  State = STATE_EXPRES_ID; //STATE_ID_END;
                }
             }
             /* Ron Pinkas added 2000-06-14 */
