@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_align.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
   Align widget - block over unaligned widgets to provide them with alignment ability.
 */
@@ -25,7 +25,7 @@ GtkWidget *xwt_gtk_align_topwidget( PXWT_WIDGET widget )
    {
       return wBase->align;
    }
-   
+
    return xwt_gtk_base_topwidget( widget );
 }
 
@@ -33,9 +33,9 @@ BOOL xwt_gtk_align_destroy( PXWT_WIDGET widget )
 {
    GtkWidget *wnd;
    PXWT_GTK_ALIGN wSelf = (PXWT_GTK_ALIGN) widget->widget_data;
-   
+
    wnd = wSelf->align;
-   if ( wnd != NULL ) 
+   if ( wnd != NULL )
    {
       gtk_widget_destroy( wnd );
       wSelf->align = NULL;
@@ -44,29 +44,29 @@ BOOL xwt_gtk_align_destroy( PXWT_WIDGET widget )
 }
 
 BOOL xwt_gtk_align_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
-{   
+{
    BOOL ret = TRUE;
    XWT_GTK_ALIGN* wMain = (XWT_GTK_ALIGN*) widget->widget_data;
    char *szAName;
-   
+
    if ( strcmp( prop, "valign" ) == 0 )
    {
       szAName = hb_itemGetCPtr( pValue );
-      if ( szAName == NULL ) 
+      if ( szAName == NULL )
       {
          ret = FALSE;
       }
-      else 
+      else
       {
-         if ( strcmp( "top", szAName ) == 0 ) 
+         if ( strcmp( "top", szAName ) == 0 )
          {
             wMain->iVAlign = XWT_ALIGN_TOP;
          }
-         else if ( strcmp( "center", szAName ) == 0 ) 
+         else if ( strcmp( "center", szAName ) == 0 )
          {
             wMain->iVAlign = XWT_ALIGN_CENTER;
          }
-         else if ( strcmp( "bottom", szAName ) == 0 ) 
+         else if ( strcmp( "bottom", szAName ) == 0 )
          {
             wMain->iVAlign = XWT_ALIGN_BOTTOM;
          }
@@ -75,7 +75,7 @@ BOOL xwt_gtk_align_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
             ret = FALSE;
          }
       }
-      
+
       if (ret) {
          xwt_gtk_set_alignment( wMain );
       }
@@ -83,21 +83,21 @@ BOOL xwt_gtk_align_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    else if ( strcmp( prop, "align" ) == 0 )
    {
      szAName = hb_itemGetCPtr( pValue );
-      if ( szAName == NULL ) 
+      if ( szAName == NULL )
       {
          ret = FALSE;
       }
-      else 
+      else
       {
-         if ( strcmp( "left", szAName ) == 0 ) 
+         if ( strcmp( "left", szAName ) == 0 )
          {
             wMain->iHAlign = XWT_ALIGN_LEFT;
          }
-         else if ( strcmp( "center", szAName ) == 0 ) 
+         else if ( strcmp( "center", szAName ) == 0 )
          {
             wMain->iHAlign = XWT_ALIGN_CENTER;
          }
-         else if ( strcmp( "right", szAName ) == 0 ) 
+         else if ( strcmp( "right", szAName ) == 0 )
          {
             wMain->iHAlign = XWT_ALIGN_RIGHT;
          }
@@ -106,7 +106,7 @@ BOOL xwt_gtk_align_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
             ret = FALSE;
          }
       }
-      
+
       if (ret) {
          xwt_gtk_set_alignment( wMain );
       }
@@ -115,7 +115,7 @@ BOOL xwt_gtk_align_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       ret = xwt_gtk_base_setprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
 
@@ -123,7 +123,7 @@ BOOL xwt_gtk_align_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
    BOOL ret = TRUE;
    XWT_GTK_ALIGN* wMain = (XWT_GTK_ALIGN*) widget->widget_data;
-   
+
    if ( strcmp( prop, "valign" ) == 0 )
    {
       switch( wMain->iVAlign )
@@ -148,7 +148,7 @@ BOOL xwt_gtk_align_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       ret = xwt_gtk_base_setprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
 
@@ -156,14 +156,14 @@ BOOL xwt_gtk_align_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
 {
    HB_ITEM hbValue;
    XWT_GTK_ALIGN* wMain = (XWT_GTK_ALIGN*) widget->widget_data;
-   
+
    hbValue.type = HB_IT_NIL;
-   
+
    if (! xwt_gtk_base_getall( widget, pProps ) )
    {
       return FALSE;
    }
-   
+
    // Vertical alignment
    switch( wMain->iVAlign )
    {
@@ -173,7 +173,7 @@ BOOL xwt_gtk_align_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
       default: return FALSE;
    }
    hb_hashAddChar( pProps, "valign", &hbValue );
-   
+
    // Horizontal alignment
    switch( wMain->iHAlign )
    {
@@ -186,7 +186,7 @@ BOOL xwt_gtk_align_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
 
 
    // clear the item in case it is a complex value;
-   // to be removed after developement stage if this is not the case   
+   // to be removed after developement stage if this is not the case
    hb_itemClear( &hbValue );
    return TRUE;
 }
@@ -215,7 +215,7 @@ void xwt_gtk_set_alignment( XWT_GTK_ALIGN* widget )
 
    if ( widget->align == NULL )
    {
-      widget->align = gtk_alignment_new( hpos, vpos, 0.0, 0.0 );
+      widget->align = gtk_alignment_new( hpos, vpos, 0.0, 0.0);
       g_object_ref( widget->align );
       parent = gtk_widget_get_parent( target );
 

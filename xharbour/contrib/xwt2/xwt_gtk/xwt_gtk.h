@@ -3,18 +3,19 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    GTK interface
 */
 
-/** 
+/**
    XWT_GTK inheritance map.
 
    XWT_GTK prefixes all widget types.
-   
+
    BASE <---+---- MODAL
-            |---- SPLITTER 
+            |---- TEXTAREA
+            |---- SPLITTER
             |---- WND <---- FRAMEWND (*)
             |---- IDWID <--- MENUITEM (**)
             |---- ALIGN <---+---- SENSIBLE <---+---- IMAGE
@@ -22,11 +23,11 @@
                             |
                             |---- CONTAINER <---+---- LAYOUT
                                                 |---- GRID
-    
+
 (*) Collaborates with MENUITEM
 (**) Collaborates with ALIGN, LABEL and IMAGE
-*/  
-                       
+*/
+
 #ifndef XWT_GTK_H
 #define XWT_GTK_H
 
@@ -34,11 +35,11 @@
 #include <xwt_api.h>
 
 #if __GNUC__ < 3 || defined( XWT_GTK_OLD_INHERITANCE )
-#   define INHERIT( x )         x inherit
-#   define INH( field )         inherit.field
+#   define INHERIT( something )     something inherit
+#   define INH( field )             inherit.field
 #else
-#   define INHERIT( x )         x
-#   define INH( field )         field
+#   define INHERIT( something )     something
+#   define INH( field )             field
 #endif
 
 gboolean xwt_idle_function( gpointer data );
@@ -63,6 +64,14 @@ typedef struct tag_xwt_gtk_modal
   BOOL modal;
   BOOL canceled;
 } XWT_GTK_MODAL, *PXWT_GTK_MODAL;
+
+typedef struct tag_xwt_gtk_textarea
+{
+   INHERIT( XWT_GTK_BASE );
+   GtkTextBuffer *textbuf;
+   GtkScrolledWindow *frame;
+} XWT_GTK_TEXTAREA, *PXWT_GTK_TEXTAREA;
+
 
 typedef struct tag_xwt_gtk_menu
 {
@@ -110,6 +119,7 @@ typedef struct tag_xwt_gtk_idwid
    char szEventName[XWT_EVENT_NAME_SIZE+1];
 } XWT_GTK_IDWID, *PXWT_GTK_IDWID;
 
+
 typedef struct tag_xwt_gtk_menuitem
 {
    INHERIT( XWT_GTK_IDWID );
@@ -151,7 +161,7 @@ typedef struct tag_xwt_gtk_container
    INHERIT( XWT_GTK_ALIGN );
    GtkWidget *frame;
    BOOL (*add)( PXWT_WIDGET self, PXWT_WIDGET child);
-   BOOL (*remove)( PXWT_WIDGET self, PXWT_WIDGET child);   
+   BOOL (*remove)( PXWT_WIDGET self, PXWT_WIDGET child);
 } XWT_GTK_CONTAINER, *PXWT_GTK_CONTAINER;
 
 
@@ -185,7 +195,7 @@ typedef struct tag_xwt_gtk_calendar
 
   GtkWidget *vbox;
   GtkWidget *hbox;
-  GtkWidget *hbbox;  
+  GtkWidget *hbbox;
   GtkWidget *button;
   GtkWidget *button1;
   GtkWidget *frame;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.25 2004/02/08 12:58:18 lculik Exp $
+   $Id: xwt.ch,v 1.1 2004/05/11 14:55:47 jonnymind Exp $
 
    Definitions
 */
@@ -76,9 +76,9 @@
 
 #define XWT_PROP_STATUS    70 // Integer or bool, depending on widget
 #define XWT_PROP_RADIOGROUP    71 // Pointer
-#define XWT_PROP_GETDATEMODAL   72 //date 
-#define XWT_PROP_GETDATE   73 //date 
-#define XWT_PROP_SETDATE   74 //date 
+#define XWT_PROP_GETDATEMODAL   72 //date
+#define XWT_PROP_GETDATE   73 //date
+#define XWT_PROP_SETDATE   74 //date
 
 #define XWT_PROP_FILEMASK  80
 #define XWT_PROP_FILENAME  81
@@ -182,6 +182,7 @@
 #define XWT_TYPE_MENU     30
 #define XWT_TYPE_MENUITEM 31
 #define XWT_TYPE_TEXTBOX  40
+#define XWT_TYPE_TEXTAREA 41
 #define XWT_TYPE_IMAGE    50
 #define XWT_TYPE_FILESEL  60
 #define XWT_TYPE_SPLITTER 70

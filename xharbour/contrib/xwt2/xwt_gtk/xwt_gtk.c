@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -42,8 +42,8 @@ int xwt_gtk_translate_key( unsigned int keyval )
    {
       return keyval;
    }
-   
-   switch( keyval ) 
+
+   switch( keyval )
    {
       case GDK_F1: return K_F1;
       case GDK_F2: return K_F2;
@@ -61,7 +61,7 @@ int xwt_gtk_translate_key( unsigned int keyval )
       case GDK_Delete: return K_DEL;
       case GDK_Insert: return K_INS;
       case GDK_Return: return K_RETURN;
-      
+
       case GDK_Home: return K_HOME;
       case GDK_End: return K_END;
       case GDK_Left: return K_LEFT;
@@ -71,7 +71,7 @@ int xwt_gtk_translate_key( unsigned int keyval )
       case GDK_Page_Up: return K_PGUP;
       case GDK_Page_Down: return K_PGDN;
    }
-      
+
    // no equivalent clipper key
    return 0;
 }
@@ -83,7 +83,7 @@ BOOL xwt_gtk_getxy( GtkWidget *wTop, int *xpos, int *ypos )
 {
    GtkWidget *wParent = gtk_widget_get_parent( wTop );
    GList *pList;
-   
+
    if( wParent != 0 && strcmp( "GtkFixed", G_OBJECT_TYPE_NAME( wParent )) == 0 )
    {
       // find ourselves among the children and get the x/y
@@ -99,7 +99,7 @@ BOOL xwt_gtk_getxy( GtkWidget *wTop, int *xpos, int *ypos )
          pList = pList->next;
       }
    }
-   
+
    return FALSE;
 }
 
@@ -149,6 +149,7 @@ static BOOL xwt_gtk_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_LABEL:   return xwt_gtk_createLabel( xwtData );
       case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( xwtData );
       case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( xwtData );
+      case XWT_TYPE_TEXTAREA: return xwt_gtk_createTextarea( xwtData );
       case XWT_TYPE_BUTTON:  return xwt_gtk_createButton( xwtData );
       case XWT_TYPE_WINDOW:  return xwt_gtk_createWindow( xwtData );
       case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
@@ -157,7 +158,7 @@ static BOOL xwt_gtk_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_VIEWPORT:    return xwt_gtk_createViewPort( xwtData );
       /*case XWT_TYPE_IMAGE:   return xwt_gtk_createImage( xwtData );
       case XWT_TYPE_PANE:    return xwt_gtk_createPane( xwtData );
-      
+
       case XWT_TYPE_RADIOBUTTON: return xwt_gtk_createRadioButton( xwtData );
       case XWT_TYPE_CHECKBOX:    return xwt_gtk_createCheckbox( xwtData );
       case XWT_TYPE_FILESEL:     return xwt_gtk_createFileSelection( xwtData );
@@ -184,7 +185,7 @@ BOOL xwt_gtk_add( PXWT_WIDGET wWidget, PXWT_WIDGET wChild )
    GtkWidget *gtkChild = wChildBase->top_widget( wChild );
    PXWT_GTK_BASE wParentBase = (PXWT_GTK_BASE) wWidget->widget_data;
    GtkWidget *gtkSelf = wParentBase->main_widget;
-   
+
    switch( wWidget->type )
    {
       case XWT_TYPE_PANE:
@@ -213,7 +214,7 @@ BOOL xwt_gtk_remove( PXWT_WIDGET wWidget, PXWT_WIDGET wChild )
    GtkWidget *gtkChild = wChildBase->top_widget( wChild );
    PXWT_GTK_BASE wParentBase = (PXWT_GTK_BASE) wWidget->widget_data;
    GtkWidget *gtkSelf = wParentBase->top_widget( wWidget );
-   
+
    // removal of the child object should NOT cause it's destruction
    g_object_ref( G_OBJECT( gtkChild ) );
    gtk_container_remove( GTK_CONTAINER( gtkSelf ), gtkChild );
@@ -230,14 +231,14 @@ BOOL xwt_gtk_remove( PXWT_WIDGET wWidget, PXWT_WIDGET wChild )
 BOOL xwt_gtk_connect( PXWT_WIDGET wWidget, PXWT_WIDGET wChild )
 {
    PXWT_GTK_WND wnd = (PXWT_GTK_WND) wWidget->widget_data;
-   
+
    return wnd->connect( wWidget, wChild );
 }
 
 BOOL xwt_gtk_disconnect( PXWT_WIDGET wWidget )
 {
    PXWT_GTK_WND wnd = (PXWT_GTK_WND) wWidget->widget_data;
-   
+
    return wnd->disconnect( wWidget );
 }
 
@@ -259,7 +260,7 @@ static XWT_DRIVER s_gtkDriver;
 XWT_MODULE_ANNOUNCE( GTK );
 
 HB_CALL_ON_STARTUP_BEGIN( _xwt_register_gtk )
-   
+
    sprintf( s_gtkDriver.name, "gtk" );
    s_gtkDriver.init = xwt_gtk_init;
    s_gtkDriver.quit = xwt_gtk_quit;
@@ -271,8 +272,8 @@ HB_CALL_ON_STARTUP_BEGIN( _xwt_register_gtk )
    s_gtkDriver.remove = xwt_gtk_remove;
    s_gtkDriver.connect = xwt_gtk_connect;
    s_gtkDriver.disconnect = xwt_gtk_disconnect;
-    
+
    xwt_register_driver( &s_gtkDriver );
-   
+
 HB_CALL_ON_STARTUP_END( _xwt_register_gtk )
 
