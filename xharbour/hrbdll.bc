@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.3 2002/05/25 18:28:07 lculik Exp $
+# $Id: hrbdll.bc,v 1.4 2002/05/25 18:39:15 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -712,7 +712,7 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\cstr.c : $(RDD_DIR)\cstr.prg
+$(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
