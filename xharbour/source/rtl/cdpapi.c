@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.18 2004/12/28 06:39:23 druzus Exp $
+ * $Id: cdpapi.c,v 1.19 2004/12/31 11:56:10 druzus Exp $
  */
 
 /*
@@ -418,7 +418,7 @@ PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE cdpage )
    return cdpOld;
 }
 
-char HB_EXPORT * hb_cdpSelectID( char * pszID )
+HB_EXPORT char * hb_cdpSelectID( char * pszID )
 {
    char * pszIDOld = hb_cdp_page->id;
 

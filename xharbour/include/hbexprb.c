@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.88 2005/01/02 03:31:12 guerra000 Exp $
+ * $Id: hbexprb.c,v 1.89 2005/01/03 16:52:42 guerra000 Exp $
  */
 
 /*
@@ -1644,8 +1644,8 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      }
                      else
                      {
-                        pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
-                        pReduced->value.asString.string[ 0 ] = ( ( LONG ) pArg->value.asNum.dVal % 256 );
+                        pReduced->value.asString.string = (char *) HB_XGRAB( 2 );
+                        pReduced->value.asString.string[ 0 ] = (char)( ( LONG ) pArg->value.asNum.dVal % 256 );
                         pReduced->value.asString.string[ 1 ] = '\0';
                         pReduced->value.asString.dealloc = TRUE;
                         pReduced->ulLength = 1;

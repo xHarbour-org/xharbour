@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.16 2004/12/28 06:39:18 druzus Exp $
+ * $Id: hbapicdp.h,v 1.17 2004/12/31 11:55:49 druzus Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ typedef struct _HB_CODEPAGE
 } HB_CODEPAGE, * PHB_CODEPAGE;
 
 extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
-extern char * HB_EXPORT hb_cdpSelectID( char * );
+HB_EXPORT extern char * hb_cdpSelectID( char * );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
 extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.428 2004/12/28 06:39:24 druzus Exp $
+ * $Id: hvm.c,v 1.429 2005/01/02 03:37:15 guerra000 Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
    BYTE uiType = *pSource;
    // ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pSource[ 1 ] ) );
 
-   pBuffer = hb_xgrab( HB_MAX( ulSize, 1 ) );
+   pBuffer = (BYTE *) hb_xgrab( HB_MAX( ulSize, 1 ) );
    pSource += 3;
 
    switch( uiType )
@@ -2400,7 +2400,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             BYTE *pBuffer;
 
             pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 3, ulSize );
-            hb_vmPushString( pBuffer, ulSize - 1 );
+            hb_vmPushString( (char *) pBuffer, ulSize - 1 );
             hb_xfree( pBuffer );
 
             w += ( 6 + ulBufferLen );
@@ -2744,12 +2744,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                // hb_vmOperatorCall() will POP 2 arguments.
                hb_vmPushNil();
-               hb_vmPushString( pBuffer, ulSize - 1 );
+               hb_vmPushString( (char *) pBuffer, ulSize - 1 );
                hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL );
             }
             else
             {
-               hb_itemPutCL( pLocal, pBuffer, ulSize - 1 );
+               hb_itemPutCL( pLocal, (char *) pBuffer, ulSize - 1 );
             }
 
             hb_xfree( pBuffer );
@@ -4474,7 +4474,7 @@ static void hb_vmEqual( BOOL bExact )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value == 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value ==
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
@@ -4569,7 +4569,7 @@ static void hb_vmNotEqual( void )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value != 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value !=
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
@@ -4642,7 +4642,7 @@ static void hb_vmLess( void )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value < 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value <
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
@@ -4700,7 +4700,7 @@ static void hb_vmLessEqual( void )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value <= 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value <=
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
@@ -4758,7 +4758,7 @@ static void hb_vmGreater( void )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value > 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value >
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
@@ -4816,7 +4816,7 @@ static void hb_vmGreaterEqual( void )
    }
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value >= 
+      pItem1->item.asLogical.value = ( pItem1->item.asLogical.value >=
                                        pItem2->item.asLogical.value);
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
