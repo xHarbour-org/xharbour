@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.40 2004/05/08 22:07:08 druzus Exp $
+ * $Id: hbdefs.h,v 1.41 2004/05/09 23:40:04 druzus Exp $
  */
 
 /*
@@ -295,11 +295,11 @@ typedef unsigned long HB_PTRDIFF;
 
 #ifndef HB_LONG_LONG_OFF
 /*
- * It's a hack for MSC which doesn't support LL suffix for LONGLONG 
+ * It's a hack for MSC which doesn't support LL suffix for LONGLONG
  * numeric constant. This suffix is necessary for some compilers -
  * without it they cut the number to LONG
  */
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) || defined( __BORLANDC__ )
 #  define HB_LL( num )           ((LONGLONG)num)
 #else
 #  define HB_LL( num )           num##LL
