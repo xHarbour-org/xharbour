@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.24 2004/01/06 23:18:43 peterrees Exp $
+ * $Id: gtwvt.c,v 1.25 2004/01/07 06:37:00 vouchcac Exp $
  */
 
 /*
@@ -80,20 +80,7 @@
 
 //-------------------------------------------------------------------//
 
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
-
-#include <windows.h>
-#include <winuser.h>
-#include <commctrl.h>
-#include <olectl.h>
-#include <time.h>
-#include <ctype.h>
-
-#if defined( _MSC_VER )
-  #include <conio.h>
-#endif
+#define HB_OS_WIN_32_USED
 
 #include "hbset.h"
 #include "hbapigt.h"
@@ -103,6 +90,25 @@
 #include "error.ch"
 #include "hbvm.h"
 #include "hbstack.h"
+
+#ifndef CINTERFACE
+   #define CINTERFACE 1
+#endif
+
+#include <winuser.h>
+#include <commctrl.h>
+#if defined(__MINGW32__) || defined(__WATCOMC__)
+   #include <ole2.h>
+   #include <ocidl.h>
+#else
+   #include <olectl.h>
+#endif
+#include <time.h>
+#include <ctype.h>
+
+#if defined( _MSC_VER )
+  #include <conio.h>
+#endif
 
 //-------------------------------------------------------------------//
 
