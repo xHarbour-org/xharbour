@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.22 2004/03/05 13:26:03 andijahja Exp $
+ * $Id: inkey.c,v 1.23 2004/03/08 12:44:07 andijahja Exp $
  */
 
 /*
@@ -370,16 +370,18 @@ HB_FUNC( INKEY )
   BOOL bContinue = TRUE ;
   USHORT uiPCount = hb_pcount();
   int iKey;
-  if ( &s_inKeyBlockBefore )
+
+  if ( &s_inKeyBlockBefore && (&s_inKeyBlockBefore)->type == HB_IT_BLOCK )
   {
-    hb_vmEvalBlock( &s_inKeyBlockBefore );
+     hb_vmEvalBlock( &s_inKeyBlockBefore );
   }
+
   while ( bContinue )
   {
     iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
-    bContinue = iKey && &s_inKeyBlockAfter ;
+    bContinue = iKey && &s_inKeyBlockAfter && (&s_inKeyBlockAfter)->type == HB_IT_BLOCK;
     if ( bContinue )
     {
       HB_ITEM Key;
