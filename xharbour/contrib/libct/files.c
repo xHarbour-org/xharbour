@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.9 2004/01/17 17:54:02 lculik Exp $
+ * $Id: files.c,v 1.10 2004/01/23 09:48:17 andijahja Exp $
  */
 
 /*
@@ -89,6 +89,7 @@
    #include <errno.h>
    #include <dirent.h>
    #include <time.h>
+   #include <utime.h>
    #if !defined( HAVE_POSIX_IO )
       #define HAVE_POSIX_IO
    #endif
@@ -895,6 +896,127 @@ LPTSTR GetTime( FILETIME *rTime )
 
 #endif
 
+
+HB_FUNC( SETFDATI )
+{
+   if (hb_pcount() >= 1)
+   {
+      char *szFile = hb_parc(1);
+      char *szDate = NULL, *szTime = NULL;
+      int year, month, day, hour, minute, second;
+      
+      if (ISDATE(2))
+      {
+         szDate = hb_pards(2);
+         sscanf(szDate, "%4d%2d%2d", &year, &month, &day);
+      }
+      if (ISCHAR(3))
+      {
+         szTime = hb_parc(3);
+         sscanf(szTime, "%2d:%2d:%2d", &hour, &minute, &second);
+      }
+
+#if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
+      {
+         FILETIME ft, local_ft;
+         SYSTEMTIME st, old_st;
+         HANDLE f = (HANDLE)_lopen(szFile, OF_READWRITE | OF_SHARE_COMPAT);
+         
+         if (f != (HANDLE)HFILE_ERROR)
+         {
+            if (!szDate || !szTime)
+            {
+               GetSystemTime(&st);
+               GetFileTime(f, NULL, NULL, &ft);
+               FileTimeToLocalFileTime(&ft, &local_ft);
+               FileTimeToSystemTime(&local_ft, &old_st);
+            }
+            if (szDate)
+            {
+               st.wYear = year;
+               st.wMonth = month;
+               st.wDay = day;
+            }
+            else
+            {
+               st.wYear = old_st.wYear;
+               st.wMonth = old_st.wMonth;
+               st.wDay = old_st.wDay;
+            }
+            if (szTime)
+            {
+               st.wHour = hour;
+               st.wMinute = minute;
+               st.wSecond = second;
+            }
+            else
+            {
+               st.wHour = old_st.wHour;
+               st.wMinute = old_st.wMinute;
+               st.wSecond = old_st.wSecond;
+            }
+            SystemTimeToFileTime(&st, &local_ft);
+            LocalFileTimeToFileTime(&local_ft, &ft);
+            hb_retl(SetFileTime(f, NULL, &ft, &ft));
+            _lclose((HFILE)f);
+            return;
+         }
+      }
+#elif defined( OS_UNIX_COMPATIBLE )
+      {
+         struct utimbuf buf;
+         struct tm old_value, new_value;
+         
+         if (!szDate && !szTime)
+         {
+            hb_retl(utime(szFile, NULL) == 0);
+            return;
+         }
+         
+         if (!szDate || !szTime)
+         {
+            struct stat st;
+            time_t current_time;
+            
+            stat(szFile, &st);
+            localtime_r(&st.st_mtime, &old_value);
+            current_time = time(NULL);
+            localtime_r(&current_time, &new_value);
+         }
+         if (szDate)
+         {
+            new_value.tm_year = year - 1900;
+            new_value.tm_mon = month - 1;
+            new_value.tm_mday = day;
+         }
+         else
+         {
+            new_value.tm_year = old_value.tm_year;
+            new_value.tm_mon = old_value.tm_mon;
+            new_value.tm_mday = old_value.tm_mday;
+         }
+         if (szTime)
+         {
+            new_value.tm_hour = hour;
+            new_value.tm_min = minute;
+            new_value.tm_sec = second;
+         }
+         else
+         {
+            new_value.tm_hour = old_value.tm_hour;
+            new_value.tm_min = old_value.tm_min;
+            new_value.tm_sec = old_value.tm_sec;
+         }
+         buf.actime = buf.modtime = mktime(&new_value);
+         hb_retl(utime(szFile, &buf) == 0);
+         return;
+      }
+#endif
+   }
+   hb_retl(FALSE);
+}
+      
+   
 HB_FUNC( FILEDELETE )
 {
    BOOL bReturn = FALSE;
