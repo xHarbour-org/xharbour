@@ -6,7 +6,7 @@
  * Harbour Project source code:
  * The Debugger
  *
- * Copyright 1999 Antonio Linares <alinares@fivetechsoft.com>
+ * Cop yright 1999 Antonio Linares <alinares@fivetechsoft.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -97,6 +97,7 @@
 #define TR_IDX       1  //index into ::aWatch item storing expression
 #define TR_VALUE     2  //the current value of the expression
 
+#define USE_READ        // undef it if you want to debug a custom getsys.prg
 
 static s_oDebugger
 static s_lExit := .F.
@@ -1075,12 +1076,16 @@ METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
    oBrwColors:RefreshCurrent()
    oBrwColors:ForceStable()
 
+   #ifdef USE_READ
    SetCursor( SC_NORMAL )
    @ Row(), Col() + 15 GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. )
 
    READ
    SetCursor( SC_NONE )
+   #else
+   cColor := getdbginput( Row(), Col() + 15, cColor,  { |cColor| iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. ) }, SubStr( ::ClrModal(), 5 ) )
+   #endif
 
    Set( _SET_SCOREBOARD, lPrevScore )
    Set( _SET_EXIT, lPrevExit )
@@ -1105,12 +1110,16 @@ METHOD EditSet( nSet, oBrwSets ) CLASS TDebugger
    oBrwSets:RefreshCurrent()
    oBrwSets:ForceStable()
 
+   #ifdef USE_READ
    SetCursor( SC_NORMAL )
    @ Row(), Col()+13 GET cSet COLOR SubStr( ::ClrModal(), 5 ) ;
      VALID iif( Type(cSet) != cType, (Alert( "Must be of type '"+cType+"'" ), .f. ), .t. )
 
    READ
    SetCursor( SC_NONE )
+   #else
+   cSet := getdbginput( Row(), Col()+13, cSet, { |cSet| iif( Type(cSet) != cType, (Alert( "Must be of type '"+cType+"'" ), .f. ), .t. ) }, SubStr( ::ClrModal(), 5 ) )
+   #endif
 
    Set( _SET_SCOREBOARD, lPrevScore )
    Set( _SET_EXIT, lPrevExit )
@@ -1235,6 +1244,9 @@ METHOD HandleEvent() CLASS TDebugger
    nLastKey := LastKey()
    bInkeyBefore := SetInkeyBeforeBlock( NIL )
    bInkeyAfter := SetInkeyAfterBlock( NIL )
+
+   /* Save LastKey value() */
+   nLastKey := LastKey()
    
    if ::lAnimate
       if ::nSpeed != 0
@@ -1327,7 +1339,8 @@ METHOD HandleEvent() CLASS TDebugger
 
          case nKey == K_UP .or. nKey == K_DOWN .or. nKey == K_HOME .or. ;
               nKey == K_END .or. nKey == K_ENTER .or. nKey == K_PGDN .or. ;
-              nKey == K_PGUP .or. nKey == K_DEL
+              nKey == K_PGUP .or. nKey == K_DEL .or. nKey == K_LEFT .or. ;
+              nKey == K_RIGHT
               oWnd := ::aWindows[ ::nCurrentWindow ]
               oWnd:KeyPressed( nKey )
 
@@ -2100,16 +2113,20 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
    oWndInput:Show()
 
    if lEditable
+      #ifdef USE_READ
       if bValid == nil
          @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
       else
-         @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
+          @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
            COLOR "," + __DbgColors()[ 5 ]
       endif
 
       nOldCursor := SetCursor( SC_NORMAL )
       READ
       SetCursor( nOldCursor )
+      #else
+      uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )     
+      #endif 
    else
       @ nTop + 1, nLeft + 1 SAY ValToStr( uValue ) COLOR "," + __DbgColors()[ 5 ]
       SetPos( nTop + 1, nLeft + 1 )
@@ -2147,9 +2164,12 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
       SetCursor( nOldCursor )
    endif
 
+   #ifdef USE_READ
    nOldCursor := SetCursor( SC_NORMAL )
    READ
    SetCursor( nOldCursor )
+   #endif
+
    oWndInput:Hide()
    Set( _SET_SCOREBOARD, lScoreBoard )
 
@@ -3354,3 +3374,33 @@ STATIC FUNCTION strip_path( cFileName )
 
   HB_FNAMESPLIT( cFileName, NIL, @cName, @cExt )
 RETURN cName + cExt
+
+#ifndef USE_READ
+STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
+
+  LOCAL nOldCursor 
+  LOCAL uTemp
+
+  nOldCursor := SetCursor( SC_NORMAL )
+
+  if cColor != nil
+     setcolor( cColor )
+  endif
+
+  uTemp := uValue
+
+  do while .t.
+     @ nTop, nLeft say space( len( uTemp ) )
+     @ nTop, nLeft say ""
+     accept to uTemp 
+     if bValid != nil .and. !eval( bValid, uTemp )
+        uTemp := uValue
+     else
+        exit
+     endif
+  enddo
+
+  setCursor( nOldCursor )
+
+  RETURN uTemp
+#endif
