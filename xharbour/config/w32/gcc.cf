@@ -1,15 +1,21 @@
 #
-# $Id: gcc.cf,v 1.12 2004/10/31 13:15:46 druzus Exp $
+# $Id: gcc.cf,v 1.13 2005/02/18 21:20:04 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+ifeq ($(HB_COMPILER),gpp)
+   HB_CMP = g++
+else
+   HB_CMP = gcc
+endif
 
 OBJ_EXT = .o
 EXE_EXT = .exe
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = gcc
+CC = $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Iinclude

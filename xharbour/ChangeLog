@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4005 2005/04/05 01:59:36 druzus Exp $
+ * $Id: ChangeLog,v 1.4006 2005/04/05 13:42:20 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-04-05 16:50 UTC+0300 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
+  * xharbour/config/w32/gcc.cf
+  + xharbour/config/w32/gpp.cf
+    + added GNU make file for GCC in C++ mode (g++)
+      to eliminate synchronization of two files in the future I made
+      a small trick and gpp.cf include gcc.cf which is still the base one
+      (This is clone of last Przemyslaw's change. Adapted for Windows OS)
 
 2005-04-05 15:40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/tip/popcln.prg
