@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.6 2003/04/02 09:33:44 iananderson Exp $
+ * $Id: gtapi.c,v 1.7 2003/06/23 02:49:30 andijahja Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ static int *  s_pColor;
  executable
 */
 #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-extern BOOL b_MouseEnable;
+   extern BOOL b_MouseEnable;
 #endif
 
 /* gt API functions */

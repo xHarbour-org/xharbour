@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.4 2003/01/02 23:10:13 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.5 2003/06/23 02:49:30 andijahja Exp $
  */
 
 /*
@@ -57,8 +57,8 @@
    This variable will be set to FALSE upon
    initialization of gt -> hb_gt_Init()
 */
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-BOOL b_MouseEnable = TRUE;
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+   BOOL b_MouseEnable = TRUE;
 #endif
 
 /* Command line argument management */
