@@ -1,5 +1,5 @@
 /*
- * $Id: cpru866.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
+ * $Id: cpru866.c,v 1.3 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /*
@@ -59,9 +59,9 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "RU866",
-    CPID_866,UNITB_866,32,
-    "€‚ƒ„…†‡‰‹‘’“”•–—™›",
-    " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
+    CPID_866,UNITB_866,36,
+    "€‚ƒ„…†‡‰‹‘’“”•–—™›πςτφ",
+    " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξορσυχ",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( RU866 );

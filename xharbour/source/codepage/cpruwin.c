@@ -1,5 +1,5 @@
 /*
- * $Id: cpruwin.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
+ * $Id: cpruwin.c,v 1.3 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /*
@@ -59,9 +59,9 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "RU1251",
-    CPID_1251,UNITB_1251,32,
-    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞ‗",
-    "אבגדהוזחטיךכלםמןנסעףפץצקרשתûü‎‏ÿ",
+    CPID_1251,UNITB_1251,36,
+    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞ‗¨×¯¡",
+    "אבגדהוזחטיךכלםמןנסעףפץצקרשתûü‎‏ÿ¸÷¿¢",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( RU1251 );

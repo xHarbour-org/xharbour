@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.48 2005/02/23 23:00:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.49 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /*
@@ -82,11 +82,21 @@ BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
 #endif
 
-void HB_EXPORT hb_oemansi(char* pcString, LONG lLen)
+void hb_oemansi(char* pcString, LONG lLen)
 {
 #if defined(HB_OS_WIN_32)
    char * pszDst = ( char * ) hb_xgrab( lLen + 1 );
    OemToCharBuff( ( LPCSTR ) pcString, ( LPSTR ) pszDst, (DWORD) lLen );
+   memcpy( pcString, pszDst, lLen );
+   hb_xfree( pszDst );
+#endif
+}
+
+void hb_ansioem(char* pcString, LONG lLen)
+{
+#if defined(HB_OS_WIN_32)
+   char * pszDst = ( char * ) hb_xgrab( lLen + 1 );
+   CharToOemBuff( ( LPCSTR ) pcString, ( LPSTR ) pszDst, (DWORD) lLen );
    memcpy( pcString, pszDst, lLen );
    hb_xfree( pszDst );
 #endif
@@ -854,12 +864,20 @@ HB_FUNC( ADSGETAOF )
          ulRetVal = AdsGetAOF( pArea->hTable, pucFilter2, &pusLen );
          if( ulRetVal == AE_SUCCESS )
          {
+            if( adsOEM )
+            {
+               hb_ansioem( pucFilter2, pusLen );
+            }
             hb_retc( (char *) pucFilter2 );
          }
          hb_xfree( pucFilter2 );
       }
       else if( ulRetVal == AE_SUCCESS )
       {
+         if( adsOEM )
+         {
+            hb_ansioem( pucFilter, pusLen );
+         }
          hb_retc( (char *) pucFilter );
       }
 
@@ -1072,6 +1090,10 @@ HB_FUNC( ADSGETFILTER )
          ulRetVal = AdsGetFilter( pArea->hTable, pucFilter2, &pusLen );
          if( ulRetVal == AE_SUCCESS )
          {
+            if( adsOEM )
+            {
+               hb_ansioem( pucFilter2, pusLen );
+            }
             hb_retc( (char *) pucFilter2 );
          }
          else
@@ -1082,6 +1104,10 @@ HB_FUNC( ADSGETFILTER )
       }
       else if( ulRetVal == AE_SUCCESS )
       {
+         if( adsOEM )
+         {
+            hb_ansioem( pucFilter, pusLen );
+         }
          hb_retc( (char *) pucFilter );
       }
       else
@@ -1365,7 +1391,12 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
    if( adsConnectHandle && ( pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer() ) != 0
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
-      ulRetVal = AdsExecuteSQLDirect( pArea->hStatement, (UNSIGNED8 *) hb_parcx( 1 ), &hCursor );
+      char * pucStmt = hb_parcx( 1 );
+      if( adsOEM )
+      {
+         hb_oemansi( pucStmt, hb_parclen( 1 ) );
+      }
+      ulRetVal = AdsExecuteSQLDirect( pArea->hStatement, (UNSIGNED8 *) pucStmt, &hCursor );
       if( ulRetVal == AE_SUCCESS )
       {
          if( hCursor )
@@ -1400,7 +1431,12 @@ HB_FUNC( ADSPREPARESQL )
    if( adsConnectHandle && ( pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer() ) != 0
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
-      ulRetVal = AdsPrepareSQL( pArea->hStatement, (UNSIGNED8 *) hb_parcx( 1 ) );
+      char * pucStmt = hb_parcx( 1 );
+      if( adsOEM )
+      {
+         hb_oemansi( pucStmt, hb_parclen( 1 ) );
+      }
+      ulRetVal = AdsPrepareSQL( pArea->hStatement, (UNSIGNED8 *) pucStmt );
       if( ulRetVal == AE_SUCCESS )
       {
          hb_retl( 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.54 2005/02/23 21:59:37 ptsarenko Exp $
+ * $Id: ads1.c,v 1.56 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /*
@@ -75,6 +75,8 @@ static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
 static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
 static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
 static int iSetListenerHandle;
+
+void hb_oemansi(char* pcString, LONG lLen);
 
 HB_FUNC( _ADS );
 HB_FUNC( ADS_GETFUNCTABLE );
@@ -3354,17 +3356,23 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
    /* must do this first as it calls clearFilter */
    if( SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo ) == SUCCESS )
    {
-      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_itemGetCPtr( pFilterInfo->abFilterText ), &bValidExpr );
+      char * pucFilter = hb_itemGetCPtr( pFilterInfo->abFilterText );
+
+      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) pucFilter, &bValidExpr );
 
       if( bValidExpr != FALSE )
       {
+         if( adsOEM )
+         {
+            hb_oemansi( pucFilter, hb_itemGetCLen( pFilterInfo->abFilterText ) );
+         }
          if( hb_set.HB_SET_OPTIMIZE )
          {
-            ulRetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) hb_itemGetCPtr( pFilterInfo->abFilterText), usResolve );
+            ulRetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) pucFilter, usResolve );
          }
          else
          {
-            ulRetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) hb_itemGetCPtr( pFilterInfo->abFilterText ) );
+            ulRetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) pucFilter );
          }
       }     /* else let SUPER handle filtering */
 

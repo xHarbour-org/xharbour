@@ -1,5 +1,5 @@
 /*
- * $Id: cprukoi.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
+ * $Id: cprukoi.c,v 1.3 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /*
@@ -59,9 +59,9 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "RUKOI8",
-    CPID_KOI_8,UNITB_KOI_8,32,
-    "бвчздецъйклмнопртуфхжигюыэящшьас",
-    "БВЧЗДЕЦЪЙКЛМНОПРТУФХЖИГЮЫЭЯЩШЬАС",
+    CPID_KOI_8,UNITB_KOI_8,36,
+    "бвчздецъйклмнопртуфхжигюыэящшьасі™“џ",
+    "БВЧЗДЕЦЪЙКЛМНОПРТУФХЖИГЮЫЭЯЩШЬАСЈ›—",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( RUKOI8 );

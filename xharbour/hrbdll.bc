@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.84 2005/01/23 12:14:30 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.86 2005/02/27 09:30:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -14,6 +14,11 @@
 
 HARBOUR_EXE = bin\harbour.exe
 CC          = bcc32
+
+# uncomment this line if you want to build harbour with multi-gt capabilities
+#HB_MULTI_GT = yes
+# uncomment this line if you want to add rdd_ads into harbour.dll
+#HB_RDDADS = yes
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ source directory ³Û
@@ -34,6 +39,9 @@ TIP_DIR           = source\tip
 VM_DIR            = source\vm
 SAMPLES_DIR       = source\clipsamp
 CODEPAGE_DIR      = source\codepage
+!if $d(HB_RDDADS)
+RDDADS_DIR        = contrib\rdd_ads
+!endif
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ obj file output directory ³Û
@@ -58,6 +66,9 @@ INCLUDE_DIR  = include
 
 C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__ -DHB_NO_PROFILER -DHB_NO_TRACE $(CFLAGS)
 CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
+!if $d(HB_MULTI_GT)
+CLIBFLAGS               = $(CLIBFLAGS) -DHB_MULTI_GT
+!endif
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
 # ÚÄÄÄÄÄÄÄÄ¿
@@ -588,6 +599,15 @@ HARBOUR_DLL_OBJS = \
 #
 #  Gt
 #
+!if $d(HB_MULTI_GT)
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\gtwin.obj \
+  $(OBJ_DIR)\mousewin.obj \
+  $(OBJ_DIR)\gtwvt.obj \
+  $(OBJ_DIR)\gtnul.obj \
+  $(OBJ_DIR)\gtext.obj \
+  $(OBJ_DIR)\gtsys.obj
+!else
 !if $(HB_GT_LIB) == gtwvt
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwvt.obj
@@ -595,6 +615,18 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj
+!endif
+!endif
+
+#
+#  RDDADS
+#
+!if $d(HB_RDDADS)
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\ads0.obj \
+  $(OBJ_DIR)\ads1.obj \
+  $(OBJ_DIR)\adsfunc.obj \
+  $(OBJ_DIR)\adsmgmnt.obj
 !endif
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
@@ -996,11 +1028,20 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msguawin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgzhb5.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
+!if $d(HB_MULTI_GT)
+  echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtnul.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtext.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtsys.obj             + >> hdll.tmp
+!else
 !if $(HB_GT_LIB) == gtwvt
   echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
 !else
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
+!endif
 !endif
   echo. $(OBJ_DIR)\dbgmenu.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtmenu.obj          + >> hdll.tmp
@@ -1123,11 +1164,20 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\scrmark.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\spread.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\untext.obj            + >> hdll.tmp
+!if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\util.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\ads0.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\adsmgmnt.obj          + >> hdll.tmp
+!endif
   echo. c0d32.obj,                       + >> hdll.tmp
   echo. $(HARBOUR_DLL),                  + >> hdll.tmp
   echo. ,                                + >> hdll.tmp
   echo. cw32.lib                         + >> hdll.tmp
+!if $d(HB_RDDADS)
+  echo. ace32.lib                        + >> hdll.tmp
+!endif
   echo. import32.lib                     + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
   ILINK32 -aa -Tpd -Gn @hdll.tmp
@@ -2418,6 +2468,28 @@ $(OBJ_DIR)\tbrwtext.c : $(DEBUG_DIR)\tbrwtext.prg
 $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+!if $d(HB_MULTI_GT)
+
+$(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+!else
+
 !if $(HB_GT_LIB) == gtwvt
 
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
@@ -2430,6 +2502,8 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+!endif
 
 !endif
 
@@ -3041,3 +3115,22 @@ $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
 
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+!if $d(HB_RDDADS)
+
+$(OBJ_DIR)\ads0.c : $(RDDADS_DIR)\ads0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ads0.obj : $(OBJ_DIR)\ads0.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\ads1.obj : $(RDDADS_DIR)\ads1.c
+   $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+$(OBJ_DIR)\adsfunc.obj : $(RDDADS_DIR)\adsfunc.c
+   $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+$(OBJ_DIR)\adsmgmnt.obj : $(RDDADS_DIR)\adsmgmnt.c
+   $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+!endif

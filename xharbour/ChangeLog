@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3879 2005/02/27 05:51:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3881 2005/02/27 09:30:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-02-23 23:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    * added necessary string conversion for filter expressions and
+      sql statements for console applications, which used oem charset
+  * source/codepage/cpru866.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruwin.c
+    * added 4 additional characters
+  * hrbdll.bc
+    * added (optional) multi-gt capabilities and rdd_ads
+
 2005-02-27 14:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbdefs.h
   * utils/hbtest/rt_ccall.prg
