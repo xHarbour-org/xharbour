@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.2 2004/01/02 11:11:28 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.3 2004/01/03 14:06:20 jonnymind Exp $
  */
 
 /*
@@ -91,15 +91,28 @@ typedef USHORT HB_GT_CELLTYPE;
    #define min( a, b ) ( a < b ? a : b )
 #endif
 
+#ifdef HB_BIG_ENDIAN
+   #define XVT_SWAP_ENDIAN( value )
+#else
+   #define XVT_SWAP_ENDIAN( value ) \
+      (0xFFFF & ( (value << 8) | (value>>8) ))
+#endif
+
+#define XVT_INITIALIZE \
+   if ( ! s_gtxvt_initialized ) {\
+      s_gtxvt_initialized = TRUE;\
+      xvt_InitDisplay( s_buffer );\
+   }
+
 
 #define XVT_CHAR_QUEUE_SIZE  128
 #define XVT_CHAR_BUFFER     1024
-#define XVT_MAX_ROWS         256
-#define XVT_MAX_COLS         256
+#define XVT_MAX_ROWS          64
+#define XVT_MAX_COLS         168
 #define XVT_DEFAULT_ROWS      25
 #define XVT_DEFAULT_COLS      80
-#define XVT_MAX_BUTTONS       8
-#define CLIP_KEY_COUNT	122
+#define XVT_MAX_BUTTONS        8
+#define CLIP_KEY_COUNT       122
 
 #define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask)
 
@@ -164,15 +177,15 @@ typedef USHORT HB_GT_CELLTYPE;
 #define HB_GTXVT_DBL_SNG_CRS 0xE038 /* Double cross (single horiz) */
 
 
-#define HB_GTXVG_FULL      0xE090 /* Full character filler */
-#define HB_GTXVG_FULL_T    0xE091
-#define HB_GTXVG_FULL_B    0xE092
-#define HB_GTXVG_FULL_L    0xE094
-#define HB_GTXVG_FULL_R    0xE095
+#define HB_GTXVT_FULL      0xE090 /* Full character filler */
+#define HB_GTXVT_FULL_T    0xE091
+#define HB_GTXVT_FULL_B    0xE092
+#define HB_GTXVT_FULL_L    0xE094
+#define HB_GTXVT_FULL_R    0xE095
 
-#define HB_GTXVG_FILLER1   0xE0A0
-#define HB_GTXVG_FILLER2   0xE0A1
-#define HB_GTXVG_FILLER3   0xE0A2
+#define HB_GTXVT_FILLER1   0xE0A0
+#define HB_GTXVT_FILLER2   0xE0A1
+#define HB_GTXVT_FILLER3   0xE0A2
 
 /********************** Unix to graphic box translation ******************/
 
@@ -180,6 +193,78 @@ typedef struct tag_UnixBox {
     USHORT c1;
     USHORT c2;
 } UnixBoxChar;
+
+
+/********************** Virtual Buffer logical structure ******************/
+
+typedef struct tag_xvt_buffer
+{
+   // cursor:
+   int col;
+   int row;
+   // Directly clipper cursor style
+   USHORT curs_style;
+
+   // size in character cells
+   USHORT cols;
+   USHORT rows;
+
+   // Key pointer
+   int keyPointerIn;
+   int keyPointerOut;
+   int Keys[ XVT_CHAR_QUEUE_SIZE ];
+
+   // buffer informations
+   HB_GT_CELLTYPE pBuffer[XVT_MAX_ROWS * XVT_MAX_COLS];
+   HB_GT_CELLTYPE pAttributes[XVT_MAX_ROWS * XVT_MAX_COLS];
+   HB_GT_CELLTYPE background;
+   ULONG bufsize;
+   BOOL bInvalid;
+   XSegment rInvalid;
+
+} XVT_BUFFER, *PXVT_BUFFER;
+
+
+/********************** Phisical screen window structure ******************/
+
+typedef struct tag_x_wnddef
+{
+   Display *dpy;
+   Window window;
+   GC gc;
+   Colormap colors;
+
+   // functionc called when the window receives a message.
+   void (*eventManager)( struct tag_x_wnddef* wnd, XEvent *evt );
+
+   // size in pixels
+   USHORT width;
+   USHORT height;
+   BOOL bResizing;
+
+   // cursor:
+   USHORT cursorHeight;
+
+   // Mouse functions
+   int mouseCol;
+   int mouseRow;
+   int mouseGotoCol;
+   int mouseGotoRow;
+   int mouseNumButtons;
+   int mouseDblClick1TO;
+   int mouseDblClick2TO;
+   int lastMouseEvent;
+   BOOL mouseButtons[XVT_MAX_BUTTONS];
+
+   // font informations
+   XFontStruct *xfs;
+   int fontHeight;
+   int fontWidth;
+
+   XVT_BUFFER *buffer;
+
+} XWND_DEF, *PXWND_DEF;
+
 
 #define XVT_BOX_CHARS 49
 #endif

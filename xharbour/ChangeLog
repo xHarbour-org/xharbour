@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1991 2004/01/04 23:47:57 lculik Exp $
+ * $Id: ChangeLog,v 1.1992 2004/01/05 02:59:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-05 05:50 UTC+0100 Giancarlo Niccolai
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! GT is now initialized only after screen output is done
+    * internal api rationlaization
+    * preliminary works for process splitting.
+
 2004-01-05 01:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * utils/hbmake.prg
     utils/hbmutils.prg
@@ -37,6 +45,13 @@
     contrib/libct/Makefile.vc
     contrib/libct/Makefile
     ! updated makefiles to include net.c
+
+2004-01-05 05:50 UTC+0100 Giancarlo Niccolai
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! GT is now initialized only after screen output is done
+    * internal api rationlaization
+    * preliminary works for process splitting.
 
 2004-01-03 20:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.nt
