@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.39 2002/12/23 00:14:22 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.40 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -646,10 +646,10 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
 }
 
-#undef hb_retcStatic
-void HB_EXPORT hb_retcStatic( char * szText )
+#undef hb_retcAdoptStatic
+void HB_EXPORT hb_retcAdoptStatic( char * szText )
 {
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdoptStatic(%s)", szText ) );
 
    if( ( &(HB_VM_STACK.Return) )->type )
    {
@@ -669,10 +669,10 @@ void HB_EXPORT hb_retcStatic( char * szText )
    ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
 }
 
-#undef hb_retclenStatic
-void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
+#undef hb_retclenAdoptStatic
+void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
 {
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptStatic(%s)", szText ) );
 
    if( ( &(HB_VM_STACK.Return) )->type )
    {

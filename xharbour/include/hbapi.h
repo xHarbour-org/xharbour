@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.53 2002/12/30 19:43:59 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.54 2003/01/05 06:50:35 ronpinkas Exp $
  */
 
 /*
@@ -237,11 +237,11 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
     #define hb_retcAdopt( szText )                    hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), strlen( szText ) )
     #define hb_retclenAdopt( szText, ulLen )          hb_itemPutCPtr( &HB_VM_STACK.Return, (szText), (ulLen) )
+    #define hb_retcAdoptStatic( szText )              hb_itemPutCStatic( &HB_VM_STACK.Return, (szText) )
+    #define hb_retclenAdoptStatic( szText, ulLen )    hb_itemPutCLStatic( &HB_VM_STACK.Return, (szText), (ulLen) )
+
     #define hb_retclenAdoptRaw( szText, ulLen )       hb_itemPutCRaw( &HB_VM_STACK.Return, (szText), (ulLen) )
     #define hb_retclenAdoptRawStatic( szText, ulLen ) hb_itemPutCRawStatic( &HB_VM_STACK.Return, (szText), (ulLen) )
-
-    #define hb_retcStatic( szText )              hb_itemPutCStatic( &HB_VM_STACK.Return, (szText) )
-    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLStatic( &HB_VM_STACK.Return, (szText), (ulLen) )
 
     #define hb_retds( szDate )                   hb_itemPutDS( &HB_VM_STACK.Return, (szDate) )
     #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &HB_VM_STACK.Return, (lYear), (lMonth), (lDay) )
@@ -264,11 +264,11 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
     extern void  HB_EXPORT  hb_retcAdopt( char * szText );
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retcAdoptStatic( char * szText );
+    extern void  HB_EXPORT  hb_retclenAdoptStatic( char * szText, ULONG ulLen );
+
     extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retclenAdoptRawStatic( char * szText, ULONG ulLen );
-
-    extern void  HB_EXPORT  hb_retcStatic( char * szText );
-    extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */

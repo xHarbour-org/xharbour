@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: str.c,v 1.7 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -127,7 +127,7 @@ HB_FUNC( HB_POINTER2STRING )
       }
       else
       {
-         hb_retcStatic( (char *) hb_itemGetNL( pPointer ) );
+         hb_retcAdoptStatic( (char *) hb_itemGetNL( pPointer ) );
       }
    }
    else
