@@ -13,7 +13,7 @@ FUNCTION Main
 
    WITH OBJECT oApp
 
-      WITH OBJECT :CreateForm( 'MainForm', mainForm() )
+      WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
 
          :SetBkBrush( COLOR_APPWORKSPACE+1 )
 
@@ -31,47 +31,46 @@ FUNCTION Main
 
             :AddPopup('popup 2')
 
-            WITH OBJECT  :Popup
-               :AddItem( 'item 200', 200, {||oApp:MainForm:Maximize(), oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainForm ) } )
+            WITH OBJECT :Popup
+               :AddItem( 'item 200', 200, {||oApp:MainFrame:Maximize(), oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainFrame ) } )
                :AddItem( 'item 201', 201)
                :AddItem( 'item 202', 202)
-               :AddItem( 'item 203', 203)
+               :AddItem( 'item 203', 203, {||oApp:SubForm1:SetProcedure()} )
             END
          END
 
          :SetWindowMenu()
       END
 
-      :MainForm:PostMessage( WM_COMMAND, 200 )
+      :MainFrame:PostMessage( WM_COMMAND, 200 )
       :Run()
   END
 
  #ifdef ZZ
-   oApp:CreateForm( 'MainForm', mainForm() )
+   oApp:CreateForm( 'MainFrame', MainFrame() )
 
-   oApp:MainForm:SetBkBrush( COLOR_APPWORKSPACE+1 )
+   oApp:MainFrame:SetBkBrush( COLOR_APPWORKSPACE+1 )
 
-   oApp:MainForm:WindowMenu := TMenu():New()
+   oApp:MainFrame:WindowMenu := TMenu():New()
 
-      oApp:MainForm:WindowMenu:AddPopup( 'popup 1' )
+      oApp:MainFrame:WindowMenu:AddPopup( 'popup 1' )
 
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 101', 101)
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 102', 102)
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 103', 103)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 101', 101)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 102', 102)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 103', 103)
 
-      oApp:MainForm:WindowMenu:AddPopup( 'popup 2' )
+      oApp:MainFrame:WindowMenu:AddPopup( 'popup 2' )
 
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 200', 200, {||oApp:MainForm:Maximize(),;
-                                                                     oApp:CreateForm( 'SubForm1',;
-                                                                          SubForm1(),oApp:MainForm ) } )
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 201', 201)
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 202', 202)
-         oApp:MainForm:WindowMenu:Popup:AddItem( 'item 203', 203)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 200', 200, {||oApp:MainFrame:Maximize(),;
+                                                                     oApp:CreateForm( 'SubForm1',SubForm1(),oApp:MainFrame ) } )
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 201', 201)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 202', 202)
+         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 203', 203)
 
-      oApp:MainForm:SetWindowMenu()
+      oApp:MainFrame:SetWindowMenu()
 
-   oApp:MainForm:PostMessage( WM_COMMAND, 200 )
+   oApp:MainFrame:PostMessage( WM_COMMAND, 200 )
    oApp:Run()
  #endif
 
@@ -80,7 +79,7 @@ RETURN( nil)
 
 //-------------------------------------------------------------------------------------------
 
-CLASS MainForm FROM TForm
+CLASS MainFrame FROM TFrame
 
    METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm', super:new( oParent )
 
