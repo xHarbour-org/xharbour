@@ -252,14 +252,17 @@ METHOD IsSensible() CLASS XWTWidget
 
 RETURN bSense
 
-METHOD SetColor( cColor ) CLASS XWTWidget
+METHOD SetColor( cColor, nTypeColor ) CLASS XWTWidget
    LOCAL cColorText  := ""
+   Local aColor
+   Local c
 
-   IF Empty( nTypeColor )
+   IF Empty(  nTypeColor )
       nTypeColor := XWT_PROP_FGCOLOR
    ENDIF
 
    IF "," in cColor // is an RGB String so Convert
+
       aColor := HB_aTokens( cColor ,",")
       cColorText := "#"
 
