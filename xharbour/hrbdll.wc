@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.42 2004/02/16 06:55:52 paultucker Exp $
+# $Id: hrbdll.wc,v 1.2 2004/04/07 03:32:41 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -53,8 +53,8 @@ INCLUDE_DIR = include
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßß
 
-C_USR        = -dHB_FM_STATISTICS_OFF -d__WIN32__ -d__EXPORT__ -dHB_NO_PROFILER -dHB_NO_TRACE
-CFLAGS       = -j -w3 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
+C_USR        = -dHB_WIN32_IO -dHB_FM_STATISTICS_OFF -d__WIN32__ -d__EXPORT__ -dHB_NO_PROFILER -dHB_NO_TRACE
+CFLAGS       = -bd -j -w3 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
 CLIBFLAGS    = $(CFLAGS) $(C_USR) -i$(INCLUDE_DIR)
 HARBOURFLAGS = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
@@ -374,11 +374,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
-  $(OBJ_DIR)\ppcomp.obj \
-  $(OBJ_DIR)\ppcore.obj \
-  $(OBJ_DIR)\pplib.obj \
-  $(OBJ_DIR)\pptable.obj \
-  $(OBJ_DIR)\pragma.obj \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\dbgmenu.obj \
@@ -394,6 +389,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbgbrwsr.obj \
   $(OBJ_DIR)\maindllh.obj \
   $(OBJ_DIR)\hvm.obj \
+  $(OBJ_DIR)\inet.obj \
   $(OBJ_DIR)\tprinter.obj \
   $(OBJ_DIR)\fastitem.obj \
   $(OBJ_DIR)\macroslx.obj \
@@ -416,26 +412,21 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdprukoi.obj \
   $(OBJ_DIR)\cdphr852.obj \
   $(OBJ_DIR)\cdphr1250.obj \
-  $(OBJ_DIR)\uc1250.obj   \
-  $(OBJ_DIR)\uc1251.obj   \
-  $(OBJ_DIR)\uc1257.obj   \
-  $(OBJ_DIR)\uc437.obj    \
-  $(OBJ_DIR)\uc850.obj    \
-  $(OBJ_DIR)\uc852.obj    \
-  $(OBJ_DIR)\uc866.obj    \
+  $(OBJ_DIR)\uc1250.obj \
+  $(OBJ_DIR)\uc1251.obj \
+  $(OBJ_DIR)\uc1257.obj \
+  $(OBJ_DIR)\uc850.obj \
+  $(OBJ_DIR)\uc852.obj \
+  $(OBJ_DIR)\uc866.obj \
   $(OBJ_DIR)\uc8859_1.obj \
   $(OBJ_DIR)\uc8859_2.obj \
-  $(OBJ_DIR)\uckoi8.obj   \
-  $(OBJ_DIR)\ucmaz.obj    \
-#
-#  Pp
-#
-   $(OBJ_DIR)\ppcomp.obj \
-   $(OBJ_DIR)\ppcore.obj \
-   $(OBJ_DIR)\pplib.obj \
-   $(OBJ_DIR)\pptable.obj \
-   $(OBJ_DIR)\pragma.obj
-
+  $(OBJ_DIR)\uckoi8.obj \
+  $(OBJ_DIR)\ucmaz.obj \
+  $(OBJ_DIR)\ppcomp.obj \
+  $(OBJ_DIR)\ppcore.obj \
+  $(OBJ_DIR)\pplib.obj \
+  $(OBJ_DIR)\pptable.obj \
+  $(OBJ_DIR)\pragma.obj
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -447,8 +438,8 @@ all: \
 
 CLEAN:
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
-   -@if exist lib\watcom\harbour.tds del lib\watcom\harbour.tds >nul
-   -@if exist lib\watcom\harbour.map del lib\watcom\harbour.map >nul
+   -@if exist $(HARBOUR_LIB) del $(HARBOUR_LIB) >nul
+   -@if exist $(LIB_DIR)\harbour.map del $(LIB_DIR)\harbour.map >nul
    -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
    -@if exist $(OBJ_DIR)\*.c del $(OBJ_DIR)\*.c >nul
    -@if exist $(OBJ_DIR)\*.h del $(OBJ_DIR)\*.h >nul
@@ -459,364 +450,12 @@ CLEAN:
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ HARBOUR_DLL linking ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßß
-  echo. $(OBJ_DIR)\abs.obj                > hdll.tmp
-  echo. $(OBJ_DIR)\accept.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\ampm.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\at.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\bkgtsks.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\binnum.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\binnumx.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\box.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\chrasc.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpapi.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpesdos.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpeswin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpgedos.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpgewin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpltwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdppt850.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpptiso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdppl852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdppliso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpplmaz.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpru866.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpruwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdpsrwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdprukoi.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdphr852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cdphr1250.obj          >> hdll.tmp
-  echo. $(OBJ_DIR)\uc1250.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\uc1251.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\uc1257.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\uc850.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\uc852.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\uc866.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\uc8859_1.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\uc8859_2.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\uckoi8.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\ucmaz.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\colorind.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\console.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\copyfile.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\cstruct.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\datec.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\dates.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\dateshb.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\datesx.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\defpath.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbtotal.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbsdf.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\descend.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\direct.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\dirdrive.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\diskspac.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\disksphb.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\do.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\empty.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\errorapi.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\file.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\filehb.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\filestat.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\filesys.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\fserror.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\fkmax.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\fnsplit.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\fparse.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\fssize.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\fstemp.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\gete.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\gt.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\gtapi.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\gtapiu.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\gtgraph.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\gx.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\hardcr.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hbbitf.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hbffind.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hash.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\hbi18n.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hboutdbg.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbrandom.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbserial.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbsrlraw.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbsyslog.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbchksum.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbhex2n.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hbxml.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\hblog.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\hbcomprs.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hbcrc32.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hbcrypt.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hbserv.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\txml.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\idle.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\inkey.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\is.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\isprint.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\langapi.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\left.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\len.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\lennum.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\listbox.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\math.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\maxrow.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\memofile.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\menuto.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\memoline.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\minmax.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\mlcount.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\mlctopos.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\mlpos.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\mpostolc.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\mod.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\mouseapi.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\mousex.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\mtran.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\natmsg.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\net.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\oemansi.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\oldbox.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\oldclear.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\pad.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\padc.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\padl.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\padr.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\perfuncs.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\persist.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\philes.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\philes53.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\philesx.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\ppcomp.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\ppcore.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\pplib.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\pptable.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\pragma.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\profiler.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\pushbtn.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\radiobtn.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\radiogrp.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\rat.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\regex.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\replic.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\right.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\round.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\run.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\samples.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\saverest.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\scroll.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\scrollbr.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\seconds.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\set.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\setcolor.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\setcurs.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\setkey.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\setpos.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\setposbs.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\shadow.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\soundex.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\space.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\spfiles.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\str.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\strcase.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\strdel.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\strings.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\strmatch.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\strpeek.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\strtran.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\strzero.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\stuff.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\substr.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\teditorl.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\tone.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\trace.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\transfrm.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\trim.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\type.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\val.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\valtostr.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\valtype.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\version.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\word.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\xhelp.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\xsavescr.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\achoice.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\adir.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\alert.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\arrayblk.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\browdb.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\browdbx.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\browse.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\checkbox.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\color53.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\cstr.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\dbedit.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\devoutp.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dircmd.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\dummy.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\dumpvar.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\errorsys.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\fieldbl.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\getlist.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\getsys.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\input.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\memoedit.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\memvarbl.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\mssgline.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\objfunc.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\readkey.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\readline.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\readvar.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\setfunc.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\setta.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\tbcolumn.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\tbrowse.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\tclass.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\teditor.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\terror.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\text.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\tget.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\tgetint.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\tgetlist.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\tlabel.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\tmenuitm.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\tobject.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\tpopup.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\traceprg.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\treport.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\ttextlin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\ttopbar.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\typefile.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\wait.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\arrays.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\arrayshb.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\asort.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\break.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\classes.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\cmdarg.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\codebloc.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\debug.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\dynlibhb.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dynsym.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\estack.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\eval.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\evalhb.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\extend.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\fm.obj                 >> hdll.tmp
-  echo. $(OBJ_DIR)\garbage.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\initexit.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\initsymb.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\itemapi.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\macro.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\memvars.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\memvclip.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\pcount.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\proc.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\pvalue.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\runner.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\thread.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\harbinit.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\macroy.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\macroslx.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\macroa.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\macrob.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\macroc.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\dbcmd.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\workarea.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbf1.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\dbnubs.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\delim1.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\sdf1.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\dbf0.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfuncs.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dblist.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\dbsort.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hbdbsort.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbstrux.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbupdat.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\delim0.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\rddord.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\rddsys.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\sdf0.obj               >> hdll.tmp
-  echo. $(OBJ_DIR)\hbfsapi.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hbgete.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hbini.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\hbstr.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\hbtrace.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\hbver.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\hbhash.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\hbfhnd.obj             >> hdll.tmp
-  echo. $(OBJ_DIR)\expropt1.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\expropt2.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\reserved.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfcdx0.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfcdx1.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfdbt0.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfdbt1.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbffpt0.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbffpt1.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfntx0.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfntx1.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\msgca.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgcs852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgcsiso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgcskam.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgcswin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgde.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgen.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgeo.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msges.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgeu.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgfr.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msggl.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msghe862.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghewin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghr852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghr1250.obj          >> hdll.tmp
-  echo. $(OBJ_DIR)\msghriso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghu852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghucwi.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msghuwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgid.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgis850.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgit.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgko.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgltwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgpl852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgpliso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgplmaz.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgpt.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgro.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\msgru866.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgruwin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgsr852.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgsriso.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\msgzhgb.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\msgzhb5.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\gtwin.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\mousewin.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgmenu.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgtmenu.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgtmitm.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgtwin.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\debugger.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbghelp.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgtarr.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgtobj.obj            >> hdll.tmp
-  echo. $(OBJ_DIR)\tbrwtext.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgwa.obj              >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgbrwsr.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\maindllh.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\tprinter.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\win32ole.obj           >> hdll.tmp
-  echo. $(OBJ_DIR)\hvm.obj                >> hdll.tmp
-  echo. $(OBJ_DIR)\fastitem.obj           >> hdll.tmp
-  echo. uuid.lib                          >> hdll.tmp
-  LINK386 /nologo /out:$(HARBOUR_DLL) /implib:$(HARBOUR_LIB) /dll @hdll.tmp
+   LINK386 /out:$(HARBOUR_DLL)\
+   /dll\
+   /defaultlib:uuid.lib ws2_32.lib\
+   /implib:$(HARBOUR_LIB)\
+   /nologo\
+   $(HARBOUR_DLL_OBJS)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ object file creation ³Û
@@ -1001,6 +640,9 @@ $(OBJ_DIR)\harbinit.obj : $(OBJ_DIR)\harbinit.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\inet.obj : $(VM_DIR)\inet.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\fastitem.obj : $(VM_DIR)\fastitem.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2769 2004/04/07 12:36:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.2770 2004/04/08 00:14:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-08 17:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/rdd_ads/ace.h
+    ! replace dllexport with dllimport
+      (I just wonder why dllexport definition has been working for ages.
+       According to common documentation, dllexport should be used when
+       creating a DLL whilst dllimport when USING a DLL. In case of RDDADS,
+       we are in the later position, using ace32.dll, so, IMO, dllimport
+       should be used instead of dllexport)
+
+  + contrib/rdd_ads/ace620.prg
+    ! utility to create required RDDADS import library, ace32.lib, for
+      Open-Watcom as it is not readily available elsewhere.
+      (Open-Watcom users can now enjoy the powerful xHarbour RDDADS)
+
+  * hrbdll.wc
+    - remove double entries
+
+  * source/rtl/fserror.c
+    ! function hb_WinToDosError():
+      translate ERROR_SHARING_VIOLATION to 5 for Borland and Watcom
+
+    /*
+    This brings down hbtest.exe's errors to 8 and 9 for BCC and Watcom
+    respectively (same level as MSVC so far as FError() is concerned).
+    Note: Under Windoze OS, it is highly recommended that HB_WIN32_IO be
+    enabled by default, because undefining it will result incorrect return
+    values of FError() from Clipper compatibility POV.
+    */
 
 2004-04-07 17:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
