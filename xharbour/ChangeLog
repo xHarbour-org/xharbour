@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3968 2005/03/20 02:13:22 andijahja Exp $
+ * $Id: ChangeLog,v 1.3969 2005/03/20 16:07:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-03-20 13:39 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Simplified AnsiToSysString()
 
 2005-03-20 08:06 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * source/pp/ppcore.c

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.72 2005/03/05 16:58:40 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.73 2005/03/15 18:02:53 ronpinkas Exp $
  */
 
 /*
@@ -375,7 +375,7 @@ RETURN xRet
      if( uLen > 1 )
      {
         wString = ( BSTR ) hb_xgrab( uLen * 2 );
-        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
+        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, uLen );
      }
      else
      {
@@ -392,30 +392,16 @@ RETURN xRet
 
   static BSTR AnsiToSysString( LPSTR cString )
   {
-     UINT uLen;
-     LPWSTR wString;
-     BSTR   bstrString;
+     BSTR bstrString;
+     int nConvertedLen = MultiByteToWideChar( CP_ACP, 0, cString, -1, NULL, NULL ) -1;
 
-     uLen  = strlen( cString ) + 1;
+     bstrString = SysAllocStringLen( NULL, nConvertedLen );
 
-     if( uLen > 1 )
+     if( bstrString )
      {
-        wString = ( BSTR ) hb_xgrab( uLen * 2 );
-        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
+        bstrString[0] = '\0';
+        MultiByteToWideChar( CP_ACP, 0, cString, -1,  bstrString, nConvertedLen );
      }
-     else
-     {
-        // *** This is a speculation about L"" - need to be verified.
-        wString = (BSTR) hb_xgrab( 2 );
-        wString[0] = L'\0';
-     }
-
-     //printf( "\nAnsi: '%s'\n", cString );
-     //wprintf( L"\nWide: '%s'\n", wString );
-
-     bstrString = SysAllocString( wString );
-
-     hb_xfree( wString );
 
      return bstrString;
   }
@@ -488,7 +474,7 @@ RETURN xRet
               s_OleRefFlags[ nArg ] = FALSE;
            }
 
-           //TraceLog( NULL, "N: %i Arg: %i Type: %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, bByRef );
+           TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, uParam->type, bByRef );
 
            aPrgParams[ n ] = uParam;
 
@@ -507,11 +493,13 @@ RETURN xRet
                    hb_itemPutCRaw( uParam, (char *) bstrString, uParam->item.asString.length * 2 + 1 );
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
+                   //wprintf( L"*** BYREF >%s<\n", *pArgs[ n ].n1.n2.n3.bstrVal );
                 }
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
                    pArgs[ n ].n1.n2.n3.bstrVal = AnsiToSysString( hb_parcx( nArg ) );
+                   //wprintf( L"*** >%s<\n", pArgs[ n ].n1.n2.n3.bstrVal );
                 }
                 break;
 
