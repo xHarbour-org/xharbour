@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.6 2004/11/04 14:06:04 druzus Exp $
+ * $Id: pragma.c,v 1.7 2004/11/21 21:43:49 druzus Exp $
  */
 
 /*
@@ -328,6 +328,13 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
          {
             s_bTracePragma = StringToBool( szLine, s_bTracePragma );
             DebugPragma( szLine, -1, s_bTracePragma );
+         }
+         else if( memcmp( szLine, "TEXTHIDDEN", PRAGMAS_LEN ) == 0 )
+         {
+            hb_comp_iHidden = StringToInt( szLine, hb_comp_iHidden );
+            if( hb_comp_iHidden < 0 || hb_comp_iHidden > 1 )
+               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
+            DebugPragma( szLine, hb_comp_iHidden, FALSE );
          }
       }
    }

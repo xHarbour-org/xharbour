@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.9 2004/11/02 23:07:48 paultucker Exp $
+ * $Id: hbpp.c,v 1.10 2004/11/03 20:11:23 paultucker Exp $
  */
 
 /*
@@ -98,6 +98,8 @@ FILE *hb_comp_PPTrace = NULL;
 int  hb_comp_iLinePRG;
 int  hb_comp_iLineINLINE = 0;
 
+int  hb_comp_iHidden = 0;
+
 int main( int argc, char * argv[] )
 {
   FILE * handl_o;
@@ -111,9 +113,9 @@ int main( int argc, char * argv[] )
 
   HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
 
-  printf( "Harbour Preprocessor %d.%d.%d\n",
+  printf( "xHarbour Preprocessor %d.%d.%d\n",
      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION );
-  printf( "Copyright 1999-2000, http://www.harbour-project.org\n" );
+  printf( "Copyright 1999-2005, http://www.xharbour.org\n" );
 
   hb_pp_Table();
   stdef = hb_pp_topDefine;

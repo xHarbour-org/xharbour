@@ -1,13 +1,13 @@
 /*
- * $Id: harbour.c,v 1.90 2004/10/29 01:28:59 ronpinkas Exp $
+ * $Id: harbour.c,v 1.91 2004/11/21 21:43:44 druzus Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * Compiler main file
  *
  * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  * their web site at http://www.gnu.org/).
  *
  * The following parts are Copyright of the individual authors.
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * Copyright 2000 RonPinkas <Ron@Profit-Master.com>
  *    hb_compPrepareOptimize()
@@ -43,6 +43,9 @@
  *    hb_compDeclaredInit()
  *    hb_compEnumAdd()
  *    hb_compEnumMemberAdd()
+ *
+ * Copyright 2005 Vicente Guerra <vicente@guerra.com.mx>
+ *    hb_compHideString()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -214,6 +217,9 @@ int            hb_comp_ulLastOffsetPos;
 
 PVAR           hb_comp_pGlobals;
 short          hb_comp_iGlobals;
+
+// Encode strings method (0 means "no encode")
+int            hb_comp_iHidden = 0;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
@@ -3945,12 +3951,49 @@ void hb_compGenPushLong( HB_LONG lNumber )
    }
 }
 
+BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBufferLen )
+{
+   BYTE * pBuffer;
+   ULONG ulCount;
+
+   switch( iType )
+   {
+      case 1:              // Simple XOR 0xf3 mask
+         pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
+         for( ulCount = 0; ulCount < ulStrLen; ulCount++ )
+         {
+            pBuffer[ ulCount ] = szText[ ulCount ] ^ 0xf3;
+         }
+         *ulBufferLen = ulStrLen;
+         break;
+
+      default:             // No encode
+         pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
+         memcpy( pBuffer, ( BYTE * ) szText, ulStrLen );
+         *ulBufferLen = ulStrLen;
+         break;
+
+   }
+
+   return pBuffer;
+}
+
 /* generates the pcode to push a string on the virtual machine stack */
 void hb_compGenPushString( char * szText, ULONG ulStrLen )
 {
    BYTE * pBuffer;
 
-   if( ulStrLen > 255 )
+   if( hb_comp_iHidden )
+   {
+      ULONG ulBufferLen;
+
+      pBuffer = hb_compHideString( hb_comp_iHidden, szText, ulStrLen, &ulBufferLen );
+
+      hb_compGenPCode3( HB_P_PUSHSTRHIDDEN, HB_LOBYTE( ulStrLen ), HB_HIBYTE( ulStrLen ), TRUE );
+      hb_compGenPCode3( hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), TRUE );
+      hb_compGenPCodeN( pBuffer, ulBufferLen, 1 );
+   }
+   else if( ulStrLen > 255 )
    {
       pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 3 );
 
@@ -3964,7 +4007,7 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
    }
    else
    {
-      pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 3 );
+      pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 2 );
 
       pBuffer[0] = HB_P_PUSHSTRSHORT;
       pBuffer[1] = ( BYTE ) ulStrLen;

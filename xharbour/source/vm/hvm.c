@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.427 2004/12/11 00:43:04 druzus Exp $
+ * $Id: hvm.c,v 1.428 2004/12/28 06:39:24 druzus Exp $
  */
 
 /*
@@ -64,6 +64,9 @@
  *
  * Copyright 2003 Giancarlo Niccolai <gian@niccolai.ws>
  *      Threadsafing and MT stack operations. MT Optimization.
+ *
+ * Copyright 2005 Vicente Guerra <vicente@guerra.com.mx>
+ *    hb_vmUnhideString()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -150,6 +153,38 @@
    /* DEBUG only*/
    #include <windows.h>
 #endif
+
+static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
+{
+   BYTE * pBuffer;
+   BYTE uiType = *pSource;
+   // ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pSource[ 1 ] ) );
+
+   pBuffer = hb_xgrab( HB_MAX( ulSize, 1 ) );
+   pSource += 3;
+
+   switch( uiType )
+   {
+      case 1:      // Simple XOR 0xf3
+         {
+            BYTE * pTarget = pBuffer;
+
+            while( ulSize )
+            {
+               *pTarget++ = ( *pSource++ ) ^ 0xf3;
+               ulSize--;
+            }
+         }
+         break;
+
+      default:     // No decode
+         memcpy( pBuffer, pSource, ulSize );
+         break;
+
+   }
+
+   return pBuffer;
+}
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -2357,6 +2392,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
          }
 
+         case HB_P_PUSHSTRHIDDEN:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTRHIDDEN") );
+         {
+            ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+            ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 4 ] ) );
+            BYTE *pBuffer;
+
+            pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 3, ulSize );
+            hb_vmPushString( pBuffer, ulSize - 1 );
+            hb_xfree( pBuffer );
+
+            w += ( 6 + ulBufferLen );
+            break;
+         }
+
          case HB_P_PUSHBLOCK:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCK") );
             /* +0    -> _pushblock
@@ -2672,6 +2722,39 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             pLocal->item.asString.length = ( ULONG ) ( uiSize - 1 );
 
             w += ( 4 + uiSize );
+            break;
+         }
+
+         case HB_P_LOCALNEARSETSTRHIDDEN:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTRHIDDEN") );
+         {
+            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+            ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
+            USHORT uiBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
+            BYTE *pBuffer;
+
+            pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 4, ulSize );
+
+            if( HB_IS_BYREF( pLocal ) )
+            {
+               pLocal = hb_itemUnRef( pLocal );
+            }
+
+            if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
+            {
+               // hb_vmOperatorCall() will POP 2 arguments.
+               hb_vmPushNil();
+               hb_vmPushString( pBuffer, ulSize - 1 );
+               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL );
+            }
+            else
+            {
+               hb_itemPutCL( pLocal, pBuffer, ulSize - 1 );
+            }
+
+            hb_xfree( pBuffer );
+
+            w += ( 7 + uiBufferLen );
             break;
          }
 
