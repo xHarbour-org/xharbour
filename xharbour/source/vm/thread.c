@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.142 2003/12/11 14:44:52 jonnymind Exp $
+* $Id: thread.c,v 1.143 2003/12/15 02:35:37 jonnymind Exp $
 */
 
 /*
@@ -99,9 +99,9 @@
 
 #if defined( HB_THREAD_TLS_KEYWORD )
    #if defined(__GNUC__) || defined( __BORLANDC__ )
-   __thread HB_STACK *hb_thread_stack;
+   HB_STACK __thread  *hb_thread_stack;
    #elif defined( _MSVC_VER )
-   __declspec(thread) HB_STACK *hb_thread_stack;
+   HB_STACK __declspec(thread) *hb_thread_stack;
    #else
       #error "This platform does not support __thread keyword; undefine HB_THREAD_TLS_KEYWORD & recompile"
    #endif
