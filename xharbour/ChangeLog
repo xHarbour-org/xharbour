@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2919 2004/05/11 01:22:37 druzus Exp $
+ * $Id: ChangeLog,v 1.2920 2004/05/11 10:14:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-11 16:06 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/console.c
+    ! Reverted last changes. This leaves the "open" problem of CRLF bound
+      printers in unix (has lpr automatic conversion? has the user to use
+      sed?), but the good solution is that of eventually add a SET TERMINATOR
+      or something the like.
+      
 
 2004-05-11 14:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/ctmisc.prg
