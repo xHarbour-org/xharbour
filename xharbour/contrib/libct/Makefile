@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2003/09/08 12:56:52 druzus Exp $
+# $Id: Makefile,v 1.9 2003/09/23 21:23:56 paultucker Exp $
 #
 
 ROOT = ../../
@@ -75,8 +75,10 @@ PRG_SOURCES= \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
+    fcopy.prg \
 	invertwin.prg \
 	numconv.prg \
+    strfile.prg \
 	screen2.prg \
 	time.prg \
 
@@ -84,7 +86,7 @@ LIBNAME=ct
 ifeq ($(HB_MT),MT)
   MT_LIBNAME=ctmt
 endif
-
+C_USR = -I../../include
 include $(TOP)$(ROOT)config/header.cf
 INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf

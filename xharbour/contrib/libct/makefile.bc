@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.6 2003/09/09 16:33:58 toninhofwi Exp $
+# $Id: makefile.bc,v 1.7 2003/09/23 21:23:56 paultucker Exp $
 #
 
 #
@@ -157,7 +157,10 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\invertwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\time.obj
+   $(OBJ_DIR)\time.obj \
+   $(OBJ_DIR)\strcopy.obj \
+   $(OBJ_DIR)\fcopy.obj
+
 
 #
 # Our default target
@@ -479,6 +482,20 @@ $(OBJ_DIR)\blank.c : $(TOOLS_DIR)\blank.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\blank.obj : $(OBJ_DIR)\blank.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\strcopy.c : $(TOOLS_DIR)\strcopy.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\strcopy.obj : $(OBJ_DIR)\strcopy.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\fcopy.c : $(TOOLS_DIR)\fcopy.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 

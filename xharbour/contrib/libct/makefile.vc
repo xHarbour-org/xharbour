@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.8 2003/10/09 05:31:55 paultucker Exp $
+# $Id: makefile.vc,v 1.9 2003/10/10 13:33:50 paultucker Exp $
 #
 
 #
@@ -179,7 +179,11 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\invertwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\time.obj
+   $(OBJ_DIR)\time.obj \
+   $(OBJ_DIR)\strcopy.obj \
+   $(OBJ_DIR)\fcopy.obj
+
+
 
 #
 # Our default target
