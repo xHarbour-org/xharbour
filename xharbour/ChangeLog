@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2132 2004/01/25 12:42:10 lculik Exp $
+ * $Id: ChangeLog,v 1.2133 2004/01/25 12:52:37 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,12 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
 2004-01-25 19:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rdd/dbfcdx/dbfcdx1.c
     * corrections on recently commited changes on casts.
 
   * source/rtl/gtgraph.c
     ! add type castings
+
+2004-01-25 13:56 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    + Objects are now drawn last-to-first, and the internal objects are
+      represented as a linked list.
+    ! Fixed castings.
+
+  * source/rtl/gtgraph.c
+    + Added prgfunction GtRGB( nRed, nGreen, nBlue [,nAlpha] )
+      Values can be float from 0 to 1 or integers from 0 to 65635 (256*256-1).
+      REMEMBER TO USE 1.0 to signify "full" for one color, if using the float
+      numbers.
+
+  * source/rtl/gtxvt/gtxvt.c
+    ! Before, color codes were ranging from 0 to 255, while they are
+      corrected now in gtapi so that they ranges from 0 to 65635; corrections
+      here to cope with this.
+
+  * tests/gtgrap.prg
+    + Added tests to demonstrate both this features.
 
 2004-01-25 10:40 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   *config/linux/gcc.cf

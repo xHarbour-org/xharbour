@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.22 2004/01/21 22:51:35 maurifull Exp $
+ * $Id: hbapigt.h,v 1.23 2004/01/24 16:29:22 jonnymind Exp $
  */
 
 /*
@@ -175,6 +175,7 @@ typedef struct _tag_gt_gobject
 {
    int type;
    struct _tag_gt_gobject *next;
+   struct _tag_gt_gobject *prev;
    HB_GT_GCOLOR color;
    int x;
    int y;
@@ -203,6 +204,7 @@ typedef enum
 
 /* This pointers holds the list of items that the GT module should draw */
 extern HB_GT_GOBJECT *hb_gt_gobjects;
+extern HB_GT_GOBJECT *hb_gt_gobjects_end;
 
 /* This is the list of colors */
 #define HB_GT_COLDEF_COUNT 16

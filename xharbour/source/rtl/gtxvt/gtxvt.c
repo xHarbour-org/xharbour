@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.17 2004/01/18 20:48:52 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.18 2004/01/24 16:29:46 jonnymind Exp $
  */
 
 /*
@@ -1017,9 +1017,9 @@ static void xvt_windowRepaintGraphical( PXWND_DEF wnd, int x1, int y1, int x2, i
       /* Check if pObj boundaries are inside the area to be updated */
       if ( hb_gtGobjectInside( pObj, x1, y1, x2, y2 ) )
       {
-         color.red = pObj->color.usRed <<8;
-         color.green = pObj->color.usGreen<<8;
-         color.blue = pObj->color.usBlue<<8;
+         color.red = pObj->color.usRed;
+         color.green = pObj->color.usGreen;
+         color.blue = pObj->color.usBlue;
          color.flags = DoRed | DoGreen | DoBlue;
          /* Ignore alpha for now */
          XAllocColor( wnd->dpy, wnd->colors, &color );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.16 2004/01/18 20:48:52 jonnymind Exp $
+ * $Id: gtapi.c,v 1.17 2004/01/24 16:29:40 jonnymind Exp $
  */
 
 /*
@@ -107,24 +107,25 @@ static PHB_ITEM s_pOnClose = 0;
 
 /* GT graphic susbsystem */
 HB_GT_GOBJECT *hb_gt_gobjects;
+HB_GT_GOBJECT *hb_gt_gobjects_end;
 HB_GT_COLDEF hb_gt_gcoldefs[ HB_GT_COLDEF_COUNT ] =
 {
-   { "N",  { 0xFF, 0x00, 0x00, 0x00 } },
-   { "B",  { 0xFF, 0x00, 0x00, 0xAA } },
-   { "G",  { 0xFF, 0x00, 0xAA, 0x00 } },
-   { "BG", { 0xFF, 0x00, 0xAA, 0xAA } },
-   { "R",  { 0xFF, 0xAA, 0x00, 0x00 } },
-   { "RB", { 0xFF, 0xAA, 0x00, 0xAA } },
-   { "GR", { 0xFF, 0xAA, 0x55, 0x00 } },
-   { "W",  { 0xFF, 0xAA, 0xAA, 0xAA } },
-   { "N+", { 0xFF, 0x55, 0x55, 0x55 } },
-   { "B+", { 0xFF, 0x55, 0x55, 0xFF } },
-   { "G+", { 0xFF, 0x55, 0xFF, 0x55 } },
-   { "BG+",{ 0xFF, 0x55, 0xFF, 0xFF } },
-   { "R+", { 0xFF, 0xFF, 0x55, 0x55 } },
-   { "RB+",{ 0xFF, 0xFF, 0x55, 0xFF } },
-   { "GR+",{ 0xFF, 0xFF, 0xFF, 0x55 } },
-   { "W+", { 0xFF, 0xFF, 0xFF, 0xFF } }
+   { "N",  { 0xFFFF, 0x0000, 0x0000, 0x0000 } },
+   { "B",  { 0xFFFF, 0x0000, 0x0000, 0xAAAA } },
+   { "G",  { 0xFFFF, 0x0000, 0xAAAA, 0x0000 } },
+   { "BG", { 0xFFFF, 0x0000, 0xAAAA, 0xAAAA } },
+   { "R",  { 0xFFFF, 0xAAAA, 0x0000, 0x0000 } },
+   { "RB", { 0xFFFF, 0xAAAA, 0x0000, 0xAAAA } },
+   { "GR", { 0xFFFF, 0xAAAA, 0x5555, 0x0000 } },
+   { "W",  { 0xFFFF, 0xAAAA, 0xAAAA, 0xAAAA } },
+   { "N+", { 0xFFFF, 0x5555, 0x5555, 0x5555 } },
+   { "B+", { 0xFFFF, 0x5555, 0x5555, 0xFFFF } },
+   { "G+", { 0xFFFF, 0x5555, 0xFFFF, 0x5555 } },
+   { "BG+",{ 0xFFFF, 0x5555, 0xFFFF, 0xFFFF } },
+   { "R+", { 0xFFFF, 0xFFFF, 0x5555, 0x5555 } },
+   { "RB+",{ 0xFFFF, 0xFFFF, 0x5555, 0xFFFF } },
+   { "GR+",{ 0xFFFF, 0xFFFF, 0xFFFF, 0x5555 } },
+   { "W+", { 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF } }
 };
 
 HB_GT_GCOLOR hb_gtGForeground;
@@ -1336,8 +1337,19 @@ void HB_EXPORT hb_gtHandleResize( void )
 /******************************************************************/
 void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject )
 {
-   gobject->next = hb_gt_gobjects;
-   hb_gt_gobjects = gobject;
+   gobject->next = NULL;
+   gobject->prev = hb_gt_gobjects_end;
+
+   if ( hb_gt_gobjects == NULL )
+   {
+      hb_gt_gobjects = gobject;
+   }
+   else
+   {
+      hb_gt_gobjects_end->next = gobject;
+   }
+
+   hb_gt_gobjects_end = gobject;
 }
 
 /* WARNING: This functions does NOT unlinks the object, it just free the memory
@@ -1367,11 +1379,13 @@ void HB_EXPORT hb_gtClearGobjects( void )
    }
 
    hb_gt_gobjects = NULL;
+   hb_gt_gobjects_end = NULL;
 }
 
 HB_GT_COLDEF* HB_EXPORT hb_gt_gcolorFromString( char *color_name )
 {
-   int i;
+   int i, len;
+
 
    for ( i = 0; i < HB_GT_COLDEF_COUNT; i ++ )
    {

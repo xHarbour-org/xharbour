@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.1 2004/01/24 16:29:40 jonnymind Exp $
+ * $Id: gtgraph.c,v 1.2 2004/01/25 12:10:23 andijahja Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
 {
    HB_GT_COLDEF  *color = NULL;
+   static HB_GT_GCOLOR lcolor;
 
    if ( HB_IS_STRING( pColor ) )
    {
@@ -67,6 +68,15 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
          hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong color code", funcname, 0 );
       }
    }
+   else if ( HB_IS_LONGLONG( pColor ) )
+   {
+      ULONGLONG col  = (ULONGLONG) hb_itemGetNLL( pColor );
+      lcolor.usAlpha = ( (col & 0xFFFF000000000000) >> 48 );
+      lcolor.usRed   = ( (col & 0x0000FFFF00000000) >> 32 );
+      lcolor.usGreen = ( (col & 0x00000000FFFF0000) >> 16 );
+      lcolor.usBlue  = ( (col & 0x000000000000FFFF) );
+      return &lcolor;
+   }
    else
    {
       color = hb_gt_gcolorFromString( "W" );
@@ -75,6 +85,89 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
    return &(color->color);
 }
 
+/**********************************************************************
+* Utility functions
+***********************************************************************/
+
+HB_FUNC( GTRGB )
+{
+   PHB_ITEM pRed   = hb_param(1, HB_IT_NUMERIC );
+   PHB_ITEM pGreen = hb_param(2, HB_IT_NUMERIC );
+   PHB_ITEM pBlue  = hb_param(3, HB_IT_NUMERIC );
+   PHB_ITEM pAlpha = hb_param(4, HB_IT_NUMERIC );
+   ULONGLONG color = (ULONGLONG) 0;
+   BOOL lCorrect = TRUE;
+
+   if ( pRed )
+   {
+      if ( HB_IS_DOUBLE( pRed ) )
+      {
+         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pRed  ) ) ) << 32;
+      }
+      else
+      {
+         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pRed ) ) ) << 32;
+      }
+   }
+   else
+   {
+      lCorrect = FALSE;
+   }
+
+   if ( lCorrect && pGreen )
+   {
+     if ( HB_IS_DOUBLE( pGreen ) )
+      {
+         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pGreen  ) ) ) << 16;
+      }
+      else
+      {
+         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pGreen ) ) ) << 16;
+      }
+   }
+   else
+   {
+      lCorrect = FALSE;
+   }
+
+   if ( lCorrect && pBlue )
+   {
+     if ( HB_IS_DOUBLE( pGreen ) )
+      {
+         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pBlue  ) ) );
+      }
+      else
+      {
+         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pBlue ) ) );
+      }
+   }
+   else
+   {
+      lCorrect = FALSE;
+   }
+
+   if ( lCorrect && pAlpha )
+   {
+     if ( HB_IS_DOUBLE( pAlpha ) )
+      {
+         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pBlue  ) ) ) << 48;
+      }
+      else
+      {
+         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pBlue ) ) ) << 48;
+      }
+   }
+   else
+   {
+      color |= ((ULONGLONG)0xFFFF) << 48;
+   }
+
+   hb_retnll( color );
+}
+
+/**********************************************************************
+* Graphic functions
+***********************************************************************/
 
 HB_FUNC( GTPOINT )
 {
