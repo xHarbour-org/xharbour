@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3576 2004/11/02 20:44:57 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3577 2004/11/02 22:17:39 oh1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-11-03 01:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Fixed the debugger to save also _SET_DIRCASE value and also to save
+      the application state at startup.
 
 2004-11-02 23:10 UTC+0100 Henryk Olkowski <oh1@op.pl>
   * source/rtl/gtapi.c

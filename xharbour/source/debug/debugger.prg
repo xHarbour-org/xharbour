@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.52 2004/10/04 21:52:58 likewolf Exp $
+ * $Id: debugger.prg,v 1.53 2004/11/01 10:06:41 likewolf Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #include "box.ch"
 #include "inkey.ch"
 #include "common.ch"
+#include "set.ch"
 #include "setcurs.ch"
 #include "hbdebug.ch"   // for "nMode" of __dbgEntry
 
@@ -333,7 +334,7 @@ CLASS TDebugger
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
-   DATA   nAppFileCase, nAppTypeAhead
+   DATA   nAppDirCase, nAppFileCase, nAppTypeAhead
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -556,6 +557,7 @@ return Self
 METHOD Activate() CLASS TDebugger
 
   ::LoadCallStack()
+  ::SaveAppState()
   IF ! ::lActive
     ::lActive := .T.
     ::Show()
@@ -563,7 +565,6 @@ METHOD Activate() CLASS TDebugger
       ::ShowCallStack()
     endif
   ELSE
-    ::SaveAppState()
     ::SaveAppScreen()
   ENDIF
   ::loadVars()
@@ -2124,6 +2125,7 @@ return nil
 
 
 METHOD RestoreAppState() CLASS TDebugger
+  Set( _SET_DIRCASE, ::nAppDirCase )
   Set( _SET_FILECASE, ::nAppFileCase )
   Set( _SET_TYPEAHEAD, ::nAppTypeAhead )
   SetLastKey( ::nAppLastKey )
@@ -2165,6 +2167,7 @@ return nil
 
 
 METHOD SaveAppState() CLASS TDebugger
+  ::nAppDirCase := Set( _SET_DIRCASE, 0 )
   ::nAppFileCase := Set( _SET_FILECASE, 0 )
   ::nAppTypeAhead := Set( _SET_TYPEAHEAD, 16 )
   ::nAppLastKey := LastKey()
