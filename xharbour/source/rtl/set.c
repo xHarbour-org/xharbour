@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.36 2003/11/20 23:47:36 druzus Exp $
+ * $Id: set.c,v 1.37 2003/12/19 01:32:39 fsgiudice Exp $
  */
 
 /*
@@ -1364,6 +1364,14 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_TRIMFILENAME:
+         hb_retl( hb_set.HB_SET_TRIMFILENAME );
+         if( args > 1 )
+         {
+            hb_set.HB_SET_TRIMFILENAME = set_logical( pArg2, hb_set.HB_SET_TRIMFILENAME );
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1473,6 +1481,7 @@ void hb_setInitialize( void )
 
    hb_set.HB_SET_DBFLOCKSCHEME = 0;
    hb_set.HB_SET_BACKGROUNDTASKS = FALSE;
+   hb_set.HB_SET_TRIMFILENAME = FALSE;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

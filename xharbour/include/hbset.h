@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.17 2003/12/09 00:50:26 ronpinkas Exp $
+ * $Id: hbset.h,v 1.18 2003/12/19 01:32:39 fsgiudice Exp $
  */
 
 /*
@@ -132,7 +132,8 @@ typedef enum
    HB_SET_ERRORLOOP       = 108,
    HB_SET_OUTPUTSAFETY    = 109,
    HB_SET_DBFLOCKSCHEME   = 110,
-   HB_SET_BACKGROUNDTASKS = 111
+   HB_SET_BACKGROUNDTASKS = 111,
+   HB_SET_TRIMFILENAME    = 112
 
 } HB_set_enum;
 
@@ -206,6 +207,7 @@ typedef struct
    int     HB_SET_ERRORLOOP;
    BOOL    HB_SET_OUTPUTSAFETY;
    BOOL    HB_SET_BACKGROUNDTASKS;
+   BOOL    HB_SET_TRIMFILENAME ;
 
    BOOL    hb_set_winprinter;
    FHANDLE hb_set_winhan;

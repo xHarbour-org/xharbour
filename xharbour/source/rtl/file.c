@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.9 2004/01/14 13:05:13 lculik Exp $
+ * $Id: file.c,v 1.10 2004/01/14 22:28:45 andijahja Exp $
  */
 
 /*
@@ -58,21 +58,16 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
+#include "hbset.h"
 BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
-   char * szFile = (char*) pFilename;
-   #ifdef HB_OS_LINUX
-      ULONG ulPos;
-      szFile = (char * ) hb_xgrab( 255 );
-      ulPos =  hb_strRTrimLen( pFilename, strlen( pFilename ),
- FALSE );
-      pFilename = hb_strLTrim( pFilename, &ulPos );
-      strncpy( szFile, pFilename, ulPos );
-      szFile[ulPos]  = '\0';
-
-   #endif
+   char * szFile ;
+   if (hb_set.HB_SET_TRIMFILENAME)
+      szFile = (char *) hb_fileTrim(  pFilename );
+   else
+      szFile = (char * ) pFilename;
 
    pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
 
@@ -91,9 +86,9 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 
    hb_xfree(pFilename);
 
-   #ifdef HB_OS_LINUX
-   hb_xfree(szFile);
-   #endif
+   if (hb_set.HB_SET_TRIMFILENAME)
+      hb_xfree(szFile);
+
    hb_fsSetError( 0 );
 
    return bResult;

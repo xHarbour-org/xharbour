@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.60 2004/01/05 18:59:28 lf_sfnet Exp $
+ * $Id: filesys.c,v 1.61 2004/01/13 00:16:36 andijahja Exp $
  */
 
 /*
@@ -1440,10 +1440,17 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    HB_THREAD_STUB
 
    FHANDLE hFileHandle;
+   char * szFile ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
+   if ( hb_set.HB_SET_TRIMFILENAME )
+      szFile = (char *) hb_fileTrim( pFilename );
+   else
+      szFile = (char * ) pFilename;
+
+
+   pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
@@ -1586,6 +1593,10 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
+
+   if (hb_set.HB_SET_TRIMFILENAME)
+      hb_xfree( szFile );
+
    return hFileHandle;
 }
 
@@ -1595,10 +1606,17 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    FHANDLE hFileHandle;
    int oflag;
    unsigned pmode;
+   char * szFile ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
-   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
+   if (hb_set.HB_SET_TRIMFILENAME)
+      szFile = (char *) hb_fileTrim(  pFilename );
+   else
+      szFile = (char * ) pFilename;
+
+
+   pFilename = hb_filecase( hb_strdup( ( char * ) szFile ) );
 
    HB_STACK_UNLOCK
 
@@ -1661,6 +1679,10 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_STACK_LOCK
 
    hb_xfree( pFilename );
+
+   if (hb_set.HB_SET_TRIMFILENAME)
+      hb_xfree(szFile);
+
    return hFileHandle;
 }
 
@@ -3421,3 +3443,18 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    s_uiOsErrorLast = uiError;
 
 }
+
+char HB_EXPORT * hb_fileTrim( BYTE * szFile)  /* Caller must free the buffer returned */
+{
+
+   char * szFileTrim = (char*) szFile;
+   ULONG ulPos;
+   szFile = (char * ) hb_xgrab( 255 );
+   ulPos =  hb_strRTrimLen( szFile, strlen( szFile ), FALSE );
+   szFile = hb_strLTrim( szFile, &ulPos );
+   strncpy( szFileTrim, szFile, ulPos );
+   szFileTrim[ulPos]  = '\0';
+
+   return szFileTrim;
+}
+
