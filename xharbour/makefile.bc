@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.58 2003/07/08 22:23:54 andijahja Exp $
+# $Id: makefile.bc,v 1.59 2003/07/08 23:15:30 fsgiudice Exp $
 #
 
 #
@@ -873,147 +873,147 @@ all: \
 #
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-    TLIB "$(COMMON_LIB)" /P512 @&&!
+    TLIB "$(COMMON_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-    TLIB "$(DBFCDX_LIB)" /P512 @&&!
+    TLIB "$(DBFCDX_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-    $(LINKER) "$(DBFNTX_LIB)" /P512 @&&!
+    $(LINKER) "$(DBFNTX_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-    $(LINKER) "$(DEBUG_LIB)" /P512 @&&!
+    $(LINKER) "$(DEBUG_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
-    $(LINKER) "$(LANG_LIB)" /P512 @&&!
+    $(LINKER) "$(LANG_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
-    $(LINKER) "$(MACRO_LIB)" /P512 @&&!
+    $(LINKER) "$(MACRO_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-    $(LINKER) "$(NULSYS_LIB)" /P512 @&&!
+    $(LINKER) "$(NULSYS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(PP_LIB) : $(PP_LIB_OBJS)
-    $(LINKER) "$(PP_LIB)" /P512 @&&!
+    $(LINKER) "$(PP_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-    $(LINKER) "$(RDD_LIB)" /P512 @&&!
+    $(LINKER) "$(RDD_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-    $(LINKER) "$(RTL_LIB)" /P512 @&&!
+    $(LINKER) "$(RTL_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(VM_LIB) : $(VM_LIB_OBJS)
-    $(LINKER) "$(VM_LIB)" /P512 @&&!
+    $(LINKER) "$(VM_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
-    $(LINKER) "$(VM_LIB_OPT_CON)" /P512 @&&!
+    $(LINKER) "$(VM_LIB_OPT_CON)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
-    $(LINKER) "$(VM_LIB_OPT_GUI)" /P512 @&&!
+    $(LINKER) "$(VM_LIB_OPT_GUI)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-    $(LINKER) "$(GTCGI_LIB)" /P512 @&&!
+    $(LINKER) "$(GTCGI_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
-    $(LINKER) "$(GTDOS_LIB)" /P512 @&&!
+    $(LINKER) "$(GTDOS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-    $(LINKER) "$(GTPCA_LIB)" /P512 @&&!
+    $(LINKER) "$(GTPCA_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-    $(LINKER) "$(GTSTD_LIB)" /P512 @&&!
+    $(LINKER) "$(GTSTD_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-    $(LINKER) "$(GTWIN_LIB)" /P512 @&&!
+    $(LINKER) "$(GTWIN_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-    $(LINKER) "$(CODEPAGE_LIB)" /P512 @&&!
+    $(LINKER) "$(CODEPAGE_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
-    $(LINKER) "$(SAMPLES_LIB)" /P512 @&&!
+    $(LINKER) "$(SAMPLES_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
-    $(LINKER) "$(ODBC_LIB)" /P512 @&&!
+    $(LINKER) "$(ODBC_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
