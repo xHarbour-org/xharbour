@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.21 2004/03/01 22:00:38 andijahja Exp $
+ * $Id: direct.c,v 1.22 2004/03/02 08:21:55 andijahja Exp $
  */
 
 /*
@@ -349,10 +349,11 @@ HB_FUNC( DIRECTORYRECURSE )
       szAttributes = (char*) hb_xgrab( 4 + 1 ); // HSDV
       hb_xmemset( szAttributes, 0, 5 );
       szAttributes[0] = 'D';                    // Compulsory
-      hb_strupr(pAttribute->item.asString.value);
 
       if ( pAttribute )
       {
+         hb_strupr(pAttribute->item.asString.value);
+
          if ( strchr( pAttribute->item.asString.value, 'H' ) != NULL )
             strcat( szAttributes, "H" );
 
