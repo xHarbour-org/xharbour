@@ -97,7 +97,7 @@ METHOD SubCommands( nwParam ) CLASS SubForm1
    if nwParam == 500 
       ::MsgBox( 'HI FROM TBUTTON')
    endif
-return(0)
+return(nil)
 
 METHOD CreateSub() CLASS SubForm1
 
@@ -114,20 +114,20 @@ METHOD CreateSub() CLASS SubForm1
       
    ::SetWindowMenu()
 
-   ::AddControl('TestButton',    'button', 'Lets see it',                500,   0,  0, 200, 100 )
-   ::AddControl('TestEdit',        'edit', 'This is an edit control',    501, 210,  0, 200,  20 )
-   ::AddControl('TestCombo',   'combobox', 'This is a ComboBox control', 502, 210, 30, 200, 100 )
-   ::AddControl('TestText',      'static', 'This is a Static control',   503, 210, 55, 200,  20 )
-   ::AddControl('TestRadio','radiobutton', 'This is a Radio Button',     504, 210, 80, 200,  20 )
-   ::AddControl('TestCheck','checkbutton', 'This is a Check Button',     505, 210,105, 200,  20 )
+   ::Add('TestButton',  TButton(), 'Lets see it',                500,   0,  0, 200, 100 )
+   ::Add('TestEdit',      TEdit(), 'This is an edit control',    501, 210,  0, 200,  20 )
+   ::Add('TestCombo', TComboBox(), 'This is a ComboBox control', 502, 210, 30, 200, 100 )
+   ::Add('TestText',    TStatic(), 'This is a Static control',   503, 210, 55, 200,  20 )
+   ::Add('TestRadio',    TRadio(), 'This is a Radio Button',     504, 210, 80, 200,  20 )
+   ::Add('TestCheck',    TCheck(), 'This is a Check Button',     505, 210,105, 200,  20 )
 
    ::TestButton:SetFocus()
 
-
+/*
    xRet := super:OnCreate()
    oMask:=oCtrlMask():New( ::TestButton )
    oMask:Create()
-   
+*/   
 return( nil )
 
 //----------------------------------

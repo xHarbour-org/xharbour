@@ -7,7 +7,7 @@ CLASS TCheck FROM TControl
    METHOD New() CONSTRUCTOR
 ENDCLASS
 
-METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TControl
+METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TCheck
    ::id       := nId
    ::lRegister:= .F.
    ::lControl := .T.

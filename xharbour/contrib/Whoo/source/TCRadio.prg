@@ -7,7 +7,7 @@ CLASS TRadio FROM TControl
    METHOD New() CONSTRUCTOR
 ENDCLASS
 
-METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TControl
+METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TRadio
    ::id       := nId
    ::lRegister:= .F.
    ::lControl := .T.
