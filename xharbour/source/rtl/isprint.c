@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.29 2002/01/08 22:14:12 dholm Exp $
+ * $Id: isprint.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+#if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
 
    #include <stdio.h>
    #include <malloc.h>
@@ -169,7 +169,7 @@ HB_FUNC( ISPRINTER )
 
 /* The code below does the check for the printer under Win32 */
 
-#if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+#if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
 
 static BOOL IsPrinterError( HANDLE hPrinter )
 {
