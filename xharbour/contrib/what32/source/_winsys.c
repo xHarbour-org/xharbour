@@ -1011,3 +1011,12 @@ HB_FUNC ( GETCURRENTTHREADID )
    hb_retnl( (DWORD) GetCurrentThreadId() );
 }
 
+
+HB_FUNC( GETMESSAGEFONT )
+{
+   HFONT hFont ;
+   NONCLIENTMETRICS ncm ;
+   ncm.cbSize = sizeof( NONCLIENTMETRICS );
+   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm , 0 );
+   hb_retnl( (LONG) CreateFontIndirect(&ncm.lfMessageFont) );
+}

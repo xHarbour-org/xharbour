@@ -2,6 +2,9 @@
 #include "wingdi.ch"
 #include "common.ch"
 #include "hbclass.ch"
+#include "wintypes.ch"
+#include "cstruct.ch"
+#include "debug.ch"
 
 static oApp
 
@@ -71,11 +74,14 @@ METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
    endcase
 return( 0 )
 
+
 //-------------------------------------------------------------------------------------------
 
 CLASS SubForm1 FROM TForm
    
-   METHOD New( oParent ) INLINE ::Caption := 'SubForm1 from TForm', super:New( oParent )
+   METHOD New( oParent ) INLINE ::Caption := 'SubForm1 from TForm', ;
+                                super:New( oParent )
+                                
    METHOD OnPaint( hDC ) INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()     INLINE ::CreateSub()  // careful handles OnCreate not OnCreation
 //   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Closing SubForm1', 'OnCloseQuery', MB_YESNO ) == IDYES,;
@@ -90,6 +96,8 @@ ENDCLASS
 
 METHOD CreateSub() CLASS SubForm1
 
+   local oCtrl
+
    ::WindowMenu := TMenu():New()
 
    ::WindowMenu:AddPopup( 'popup 1' )
@@ -98,6 +106,13 @@ METHOD CreateSub() CLASS SubForm1
       ::WindowMenu:Popup:AddItem( 'item 101', 101)
       
    ::SetWindowMenu()
+
+   oCtrl := TControl():New( self, 500 )
+   
+   oCtrl:Caption := 'Testing a Button'
+   oCtrl:Width   := 200
+   oCtrl:Height  := 100
+   oCtrl:Create()
 
 return( super:OnCreate() )
 

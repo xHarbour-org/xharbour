@@ -12,7 +12,7 @@ WH_DIR=..\what32
 #
 WHOOLIB    = lib\whoo.lib
 
-WHOOOBJ    = TApplication.obj TWindow.obj TForm.obj TMenu.obj
+WHOOOBJ    = TApplication.obj TWindow.obj TForm.obj TControl.obj TMenu.obj
 
 !include $(WHO_DIR)\env\makelib.b32
 

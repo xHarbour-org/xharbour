@@ -16,7 +16,8 @@ METHOD New( oParent ) CLASS TForm
    ::FrameWnd  := .F.
    ::Style     := WS_OVERLAPPEDWINDOW
    ::FormStyle := 1
-
+   ::lRegister := .T.
+   
 return( super:New( oParent ) )
 
 //----------------------------------------------------------------------------//
@@ -36,6 +37,7 @@ METHOD New( oParent ) CLASS TFrame
    ::Style     := WS_OVERLAPPEDWINDOW
    ::ExStyle   := WS_EX_APPWINDOW + WS_EX_CLIENTEDGE
    ::FormStyle := 1
+   ::lRegister := .T.
 
 return( super:New( oParent ) )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.11 2002/09/18 08:58:34 what32 Exp $
+ * $Id: ChangeLog,v 1.12 2002/09/19 11:01:21 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-19 16:47 UCT -0300 Augusto Infante <systems@quesoro.com>
+   * _WinSys.c
+     + GetMessageFont() to retrieve messagebox font to be used in controls instead of system font
+
+2002-09-19 22:18 UCT+1000 AJ Wos <andrwos@aust1.net>
+   * WinTabs.Prg
+     * changed _TempPageProc() to STATIC FUNCTION
+     * Passed the code through the PRG formatter 
+
+2002-09-19 22:10 UCT+1000 AJ Wos <andrwos@aust1.net>
+   * ErrorSys.Prg  
+     * Removed obsolete PP directives
+     - Removed unnecessary WinSetCursor() calls
+     * Passed the code through the PRG formatter
+       ( please do not create confusion by modifying files
+         without adding value to the source )          
 
 2002-09-19 16:15 UCT +0530 Pritpal Bedi <info@vouchcac.com>
    * ErrorSys.prg
