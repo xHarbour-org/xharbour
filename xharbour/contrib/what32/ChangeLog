@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.60 2004/03/26 02:12:18 vouchcac Exp $
+ * $Id: ChangeLog,v 1.61 2004/07/06 04:35:05 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-08 04:39 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
+  * source/WinTBar.Prg
+    ! Some formating in the code.
 
 2004-07-06 01:35 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
   * source/_winbmp.c
@@ -170,7 +174,7 @@
         WSAData should be a WSADATA, not a pointer
       ! WSAACCEPT
         commented out unused s 
-   * source/_winmous.c 
+   * source/_winmous.c
      ! GETCURSORINFO
       pci should be a CURSORINFO, not a pointer.
    * source/_winwnd.c 
@@ -196,7 +200,7 @@
        VOID ** ppBits -> VOID ** ppBits = (VOID **)0;
        to remove 'use before initialise' warning
    * makefile.nt 
-   * makefile.vc 
+   * makefile.vc
    * make_vc.bat 
      ! Now compiles with MSVC
 

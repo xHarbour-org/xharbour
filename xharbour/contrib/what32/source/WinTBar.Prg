@@ -16,7 +16,7 @@ pragma pack(4)
 typedef struct _RECT { ;
     LONG left; 
     LONG top; 
-    LONG right; 
+    LONG right;
     LONG bottom; 
 } RECT 
 
@@ -91,31 +91,31 @@ METHOD Init() CONSTRUCTOR
 METHOD AddButton
 METHOD AddBitmap
 METHOD AddString
-method Create
+METHOD Create
 METHOD createbuttons
 METHOD tbProc
 
-method setsizes(xBtn,yBtn,xImg,yImg )
-method setheight(nHeight )
-method loadbitmap
-method setbitmap
-method setbuttons
-method commandtoindex
-method GetItemId
-method getitemrect
-method getbuttonstyle
-method getbuttoninfo
-method setbuttoninfo
-method getbuttontext
-method setbuttontext
-method gettollbarctrl
-method disable
-method enable
-method disableall
-method enableall
-method CheckButton
-method IsButtonChecked
-method AddMenu
+METHOD setsizes(xBtn,yBtn,xImg,yImg )
+METHOD setheight(nHeight )
+METHOD loadbitmap
+METHOD setbitmap
+METHOD setbuttons
+METHOD commandtoindex
+METHOD GetItemId
+METHOD getitemrect
+METHOD getbuttonstyle
+METHOD getbuttoninfo
+METHOD setbuttoninfo
+METHOD getbuttontext
+METHOD setbuttontext
+METHOD gettollbarctrl
+METHOD disable
+METHOD enable
+METHOD disableall
+METHOD enableall
+METHOD CheckButton
+METHOD IsButtonChecked
+METHOD AddMenu
 ENDCLASS
 
 
@@ -352,91 +352,91 @@ RETURN(NIL)
 *-----------------------------------------------------------------------------*
 
 
-method setsizes(xBtn,yBtn,xImg,yImg )
+METHOD setsizes(xBtn,yBtn,xImg,yImg )
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method setheight(nHeight )
+METHOD setheight(nHeight )
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method loadbitmap
+METHOD loadbitmap
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method setbitmap
+METHOD setbitmap
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method setbuttons
+METHOD setbuttons
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method commandtoindex
+METHOD commandtoindex
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method GetItemId
+METHOD GetItemId
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method getitemrect(nIndex)
+METHOD getitemrect(nIndex)
 RETURN(GetToolbarItemRect(::hWnd,nIndex))
 
 *-----------------------------------------------------------------------------*
 
-method getbuttonstyle
+METHOD getbuttonstyle
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method getbuttoninfo
+METHOD getbuttoninfo
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method setbuttoninfo
+METHOD setbuttoninfo
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method getbuttontext
+METHOD getbuttontext
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method setbuttontext
+METHOD setbuttontext
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method gettollbarctrl
+METHOD gettollbarctrl
 
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method disable(nBtn)
+METHOD disable(nBtn)
 SendMessage(::hWnd,TB_ENABLEBUTTON,nBtn,0)
 RETURN(SELF)
 
 *-----------------------------------------------------------------------------*
 
-method enable(nBtn,lFlag)
+METHOD enable(nBtn,lFlag)
 DEFAULT lFlag TO .T.
 SendMessage(::hWnd,TB_ENABLEBUTTON,nBtn,If(lFlag,1,0))
 RETURN(SELF)
 
 *-----------------------------------------------------------------------------*
 
-method disableall()
+METHOD disableall()
 AEVAL(::aButtons,{|btn| ::disable(btn:idCommand)})
 return(self)
 
 *-----------------------------------------------------------------------------*
 
-method enableall()
+METHOD enableall()
 AEVAL(::aButtons,{|btn| ::enable(btn:idCommand)})
 return(self)
 
-method CheckButton(nBtn,lFlag)
+METHOD CheckButton(nBtn,lFlag)
 DEFAULT lFlag TO !::IsButtonChecked(nBtn)
 SendMessage(::hWnd,TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
 RETURN(SELF)
 
-method IsButtonChecked(nBtn)
+METHOD IsButtonChecked(nBtn)
 RETURN(IIF(SendMessage(::hWnd,TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.))
