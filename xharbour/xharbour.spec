@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.24 2003/08/06 13:50:21 lculik Exp $
+# $Id: xharbour.spec,v 1.25 2003/08/09 20:45:18 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -141,6 +141,7 @@ dos os programas
 %package pp
 Summary:        Clipper/Harbour/xBase compatible Pre-Processor, DOT prompt and interpreter
 Summary(pl):    Kompatybilny z Clipper/Harbour/xBase Preprocesor i interpreter
+Copyright:      GPL
 Group:          Development/Languages
 Requires:       %{name} = %{version}
 
@@ -609,10 +610,11 @@ All these scripts accept command line switches:
 -main=<main_func>	# set the name of main program function/procedure.
                         # if not set then 'MAIN' is used or if it doesn't
                         # exist the name of first public function/procedure
-                        # in first linked object module
+                        # in first linked object module (link)
 
 Link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and have no effect
 in "%{hb_pref}cc" and "%{hb_pref}cmp".
+Other options are passed to %{dname}/C compiler/linker.
 To save compatibility with older rpm distributions, "gharbour" can be used
 as a synonym of "%{hb_pref}cmp", and "harbour-link" as synonym of "%{hb_pref}lnk"
 
@@ -677,7 +679,8 @@ druzus@uran:~/tmp$ ./foo.prg
 
 I hope this RPM is useful. Have fun with %{dname}.
 
-Dave Pearson <davep@davep.org>
+Many thanks to Dave Pearson <davep@davep.org>
+
 Przemyslaw Czerpak <druzus@polbox.com>
 EOF
 
