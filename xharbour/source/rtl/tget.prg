@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.74 2004/05/27 00:29:34 lculik Exp $
+ * $Id: tget.prg,v 1.75 2004/05/27 14:13:30 lculik Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cVarName   TO ""
    DEFAULT bVarBlock  TO IIF( ValType( cVarName ) == 'C', MemvarBlock( cVarName ), NIL )
    DEFAULT cPicture   TO ""
-   DEFAULT cColorSpec TO buildGetColor()
+   DEFAULT cColorSpec TO SetColor()
 
    ::HasFocus   := .f.
    ::lEdit      := .f.
@@ -1758,15 +1758,20 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
    DEFAULT cColorSpec to SetColor()
 
    /* ONLY ONE PAIR COLOR PASSED */
+   
    IF ( len( cColorSpec ) == 3 .or. Len( cColorSpec ) == 4 ) .AND. AT(',', cColorSpec ) == 0 
    // replicate to 4 colors pairs as clipper do
       cCur := cColorSpec
       cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur   
    ENDIF
+
    // now process color acording to set intensity setting
 
    cEndColor := "," + __guiColor( cColorSpec, CLR_STANDARD + 1 ) + "," + __guiColor( cColorSpec, CLR_BACKGROUND + 1 )
+
    cCur := hb_ColorIndex( cColorSpec, CLR_UNSELECTED )
+
+
    IF ( lIntensity)
       cRet += cCur +","
    ELSE
