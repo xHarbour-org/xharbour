@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.85 2003/11/11 23:51:47 fsgiudice Exp $
+ * $Id: classes.c,v 1.86 2003/11/26 21:58:35 jonnymind Exp $
  */
 
 /*
@@ -2364,8 +2364,9 @@ HB_FUNC( __OBJCLONE )
    }
 }
 
-void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
+PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
 {
+   HB_THREAD_STUB
    PHB_DYNS pMsgSym = hb_dynsymFindName( sMsg );
 
    //printf( "%s %p\n", sMsg, pMsgSym );
@@ -2397,6 +2398,8 @@ void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
    {
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__ObjSendMsg()", 0 );
    }
+
+   return &(HB_VM_STACK.Return);
 }
 
 

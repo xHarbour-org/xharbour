@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.97 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: hbapi.h,v 1.99 2003/11/26 22:19:40 jonnymind Exp $
  */
 
 /*
@@ -428,7 +428,7 @@ extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szStrin
 extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
 extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend );
 extern HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
-extern HB_EXPORT void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 /*#define hb_objGetPropValue( pObj, szProp, pDestNullable ) \
    if ( pDestNullable == NULL ) \
    {\

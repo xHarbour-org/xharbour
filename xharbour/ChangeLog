@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1777 2003/11/26 20:16:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.1778 2003/11/26 21:58:32 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-27 00:03 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+  * source/vm/classes.c
+    * hb_objSendMessage now returns the VM Return pointer so that it can
+      be used in non-thread specivic 3d party libs to access object
+      properties and method call results.
+    - removed hb_obj(Get|Set)PropValue
 
 2003-11-26 22:59 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h
