@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.33 2003/11/22 04:34:46 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.34 2003/12/01 23:50:12 druzus Exp $
  */
 
 /*
@@ -186,9 +186,9 @@ CLASS TOleAuto
    METHOD New( uObj, cClass ) CONSTRUCTOR
    METHOD GetActiveObject( cClass ) CONSTRUCTOR
 
-   METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-   METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
-   METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
+   METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
+   METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
+   METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
 
    ERROR HANDLER OnError()
 
@@ -1785,6 +1785,10 @@ RETURN uObj
 
         case E_OUTOFMEMORY:
            hb_retc( "E_OUTOFMEMORY" );
+           break;
+
+        case E_NOTIMPL:
+           hb_retc( "E_NOTIMPL" );
            break;
 
         case E_INVALIDARG:

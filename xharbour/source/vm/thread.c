@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.131 2003/12/04 13:39:08 jonnymind Exp $
+* $Id: thread.c,v 1.132 2003/12/05 04:34:58 jonnymind Exp $
 */
 
 /*
@@ -1114,7 +1114,6 @@ void hb_threadCondDestroy( HB_WINCOND_T *cond )
 */
 void hb_threadCondSignal( HB_WINCOND_T *cond )
 {
-   register int result;
    register int nSignalsToIssue;
 
    EnterCriticalSection( &(cond->mtxUnblockLock) );
@@ -1333,7 +1332,7 @@ HB_FUNC( STARTTHREAD )
 /*   #ifndef __BORLANDC__
       if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
    #else*/
-      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, &th_id) ) != 0L )
+      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (unsigned int *) &th_id) ) != 0L )
 //   #endif
 #else
    pStack->th_vm_id = 0;

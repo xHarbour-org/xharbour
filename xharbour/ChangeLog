@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1821 2003/12/05 01:38:27 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1822 2003/12/05 04:11:41 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-04 20:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/direct.c
+  * source/vm/thread.c
+    * MSVC compliation.
+
+  * source/rtl/win32ole.prg
+    * Added E_NOTIMPL to list of literal errors.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Few Error management and GenDynProcedures refinments.
 
 2003-12-05 05:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/fm.c
@@ -24,7 +36,7 @@
 
   * source/vm/memvars.c
     * removed a misleading comment
-  
+
   * bin/bld.bat
     ! after compiling under MT, was not resetting bcc flags to ST.
 

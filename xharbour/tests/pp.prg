@@ -388,10 +388,6 @@ STATIC s_sPending
 STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
-#ifdef __XHARBOUR__
-   static s_aDynProcedures := {}
-#endif
-
 #define EXTERNAL_RECOVERY
 #ifdef EXTERNAL_RECOVERY
    STATIC s_bExternalRecovery
@@ -1371,6 +1367,13 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                //TraceLog( sSymbol , nProcId )
                aProcedures[nProcId] := { sSymbol, {} }
             ELSE
+               // No procedure declaration.
+               IF nProcId == 0
+                  sSymbol := "Implied_Main"
+                  aSize( aProcedures, ++nProcId )
+                  aProcedures[nProcId] := { sSymbol, {} }
+               ENDIF
+
                IF sBlock = "PP__"
                   IF sBlock = "PP__FOR"
                      s_nFlowId++
@@ -1735,13 +1738,6 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         sBlock := Left( sBlock, nAt ) + ":" + SubStr( sBlock, nPos )
                      ENDIF
                   ENDIF
-               ENDIF
-
-               // No procedure declaration.
-               IF nProcId == 0
-                  sSymbol := "Implied_Main"
-                  aSize( aProcedures, ++nProcId )
-                  aProcedures[nProcId] := { sSymbol, {} }
                ENDIF
 
                //TraceLog( sBlock )
@@ -9043,8 +9039,7 @@ RETURN
 FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
 
    LOCAL nOpen, nClose, sTemp := "", nLine, nLines
-
-   //ErrorBlock( {|oErr| RP_PPText_Err( oErr, sLines, 0 ) } )
+   LOCAL bErrHandler, oError
 
    //TraceLog( sLines )
 
@@ -9171,51 +9166,61 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
 
    //TraceLog( nLines )
 
-   // Don't process the last line for [;].
-   nLines--
-   FOR nLine := 1 TO nLines
-      sTemp := asLines[nLine]
-      //TraceLog( sTemp )
-      IF sTemp == NIL
-         LOOP
-      ENDIF
+   bErrHandler := ErrorBlock( {|e| Break(e) } )
 
-      DO WHILE Right( sTemp, 1 ) == ';'
-         IF bBlanks
-            #ifdef __STR_INDEX__
-               sTemp[-1] := ' '
-            #else
-               sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' '
-            #endif
-            asLines[nLine] := NIL
-            nLine++
-            IF asLines[nLine] == NIL
-               asLines[nLine] := sTemp
-            ELSE
-               asLines[nLine] := sTemp + asLines[nLine]
-            ENDIF
-            sTemp := asLines[nLine]
-         ELSE
-            aDel( asLines, nLine )
-            nLines--
-            aSize( asLines, nLines )
-            // nLine now points to the next line.
-            sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' ' + asLines[nLine]
+   BEGIN SEQUENCE
+
+      // Don't process the last line for [;].
+      nLines--
+      FOR nLine := 1 TO nLines
+         sTemp := asLines[nLine]
+         //TraceLog( sTemp )
+         IF sTemp == NIL
+            LOOP
          ENDIF
-      ENDDO
 
-      sTemp := PP_PreProLine( sTemp )
+         DO WHILE Right( sTemp, 1 ) == ';'
+            IF bBlanks
+               #ifdef __STR_INDEX__
+                  sTemp[-1] := ' '
+               #else
+                  sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' '
+               #endif
+               asLines[nLine] := NIL
+               nLine++
+               IF asLines[nLine] == NIL
+                  asLines[nLine] := sTemp
+               ELSE
+                  asLines[nLine] := sTemp + asLines[nLine]
+               ENDIF
+               sTemp := asLines[nLine]
+            ELSE
+               aDel( asLines, nLine )
+               nLines--
+               aSize( asLines, nLines )
+               // nLine now points to the next line.
+               sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' ' + asLines[nLine]
+            ENDIF
+         ENDDO
 
-      sLines += sTemp
-      sLines += ";"
+         sTemp := PP_PreProLine( sTemp )
 
-      IF sTemp == ""
-         asLines[nLine] := NIL
-      ELSE
-         asLines[nLine] := sTemp
-      ENDIF
-      //TraceLog( nLine, sTemp )
-   NEXT
+         sLines += sTemp
+         sLines += ";"
+
+         IF sTemp == ""
+            asLines[nLine] := NIL
+         ELSE
+            asLines[nLine] := sTemp
+         ENDIF
+         //TraceLog( nLine, sTemp )
+      NEXT
+
+   RECOVER USING oError
+      oError:ProcLine := nLine
+      Eval( bErrHandler, oError )
+
+   END SEQUENCE
 
    sTemp := asLines[nLine]
 
@@ -9231,6 +9236,8 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
    ENDIF
 
    //TraceLog( nLine, sTemp, sLines )
+
+   ErrorBlock( bErrHandler )
 
 RETURN sLines
 
@@ -9324,11 +9331,12 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
    s_aProcedures := aProcedures
 
    #ifdef __XHARBOUR__
+      // TODO - Change that so the DynList is saved/restored.
+      // Incase of nested execution.
+      PP_ReleaseDynProcedures()
+
       FOR EACH aProcedure IN aProcedures
-         IF aScan( s_aDynProcedures, aProcedure, , , .T. ) == 0
-            PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
-            aAdd( s_aDynProcedures, aProcedure )
-         ENDIF
+          PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
       NEXT
    #endif
 
@@ -9384,6 +9392,10 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
       Eval( bErrHandler, oError )
    END
 
+   #ifdef __XHARBOUR__
+      PP_ReleaseDynProcedures()
+   #endif
+
    ErrorBlock( bErrHandler )
 
 RETURN xRet
@@ -9402,20 +9414,21 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
       s_aParams := {}
    ENDIF
 
-   s_aProcedures := aProcedures
-
    InitRules()
    InitResults()
 
    InitRunRules()
    InitRunResults()
 
+   s_aProcedures := aProcedures
+
    #ifdef __XHARBOUR__
-      FOR EACH aProcedure IN s_aProcedures
-         IF aScan( s_aDynProcedures, aProcedure, , , .T. ) == 0
-            PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
-            aAdd( s_aDynProcedures, aProcedure )
-         ENDIF
+      // TODO - Change that so the DynList is saved/restored.
+      // Incase of nested execution.
+      PP_ReleaseDynProcedures()
+
+      FOR EACH aProcedure IN aProcedures
+          PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
       NEXT
    #endif
 
@@ -9439,7 +9452,12 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
    RECOVER USING oError
       Eval( bErrHandler, oError )
    END SEQUENCE
+
    //TraceLog( xRet )
+
+   #ifdef __XHARBOUR__
+       PP_ReleaseDynProcedures()
+   #endif
 
 RETURN xRet
 

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.7 2003/12/02 12:25:55 lculik Exp $
+ * $Id: direct.c,v 1.8 2003/12/04 17:55:53 druzus Exp $
  */
 
 /*
@@ -151,12 +151,12 @@ HB_FUNC( DIRECTORY )
          uiMask = HB_FA_LABEL;
       }
 
-   szDirSpec = pDirSpec ? 
-               hb_filecase( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) : 
+   szDirSpec = pDirSpec ?
+               hb_filecase( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) :
                (BYTE *) HB_DIR_ALL_FILES_MASK;
 
    /* Get the file list */
-   if( ( ffind = hb_fsFindFirst( szDirSpec, uiMask ) ) != NULL )
+   if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
       PHB_ITEM pFilename = hb_itemNew( NULL );
       PHB_ITEM pSize = hb_itemNew( NULL );

@@ -35,11 +35,13 @@
      DATA aInitExit            INIT { {}, {} }
      DATA nProcs               INIT 0
      DATA aScriptHostGlobals   INIT {}
+     DATA bWantsErrorObject    INIT .T.
+     DATA nStartLine           INIT 1
 
      METHOD New()              INLINE ( Self )
 
      METHOD AddLine( cLine )   INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText += ( cLine + Chr(10) ) )
-     METHOD SetScript( cText ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText := cText )
+     METHOD SetScript( cText, nStartLine ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
      METHOD GetPPO()           INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -75,50 +77,125 @@
   ENDCLASS
 
   //----------------------------------------------------------------------------//
+  METHOD Compile() CLASS  TInterpreter
+
+     LOCAL nLine, nLines, sLine, nProcId := 0
+     LOCAL bErrHandler, oError
+
+     IF Empty( ::cText )
+        RETURN .F.
+     ENDIF
+
+     IF Len( ::aScriptHostGlobals ) > 0
+        ErrorBlock( {|e| Break( e ) } )
+     ENDIF
+
+     bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
+
+     BEGIN SEQUENCE
+
+        IF Len( ::acPPed ) == 0
+           PP_InitStd()
+           PP_LoadRun()
+           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
+           ::aCompiledProcs := {}
+           ::aInitExit      := { {}, {} }
+        ENDIF
+
+        IF Len( ::aCompiledProcs ) == 0
+           PP_ModuleName( "_TINTERPRETER_" )
+
+           nLines := Len( ::acPPed )
+
+           FOR nLine := 1 TO nLines
+              sLine := ::acPPed[nLine]
+              IF sLine != NIL
+                 PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+              ENDIF
+           NEXT
+        ENDIF
+
+     RECOVER USING oError
+         IF ValType( nLine ) == 'N'
+            oError:ProcLine := ::nStartLine + nLine - 1
+         ELSE
+            oError:ProcLine += ::nStartLine - 1
+         ENDIF
+
+         nProcID := -1
+
+         IF ! ::bWantsErrorObject
+            Eval( bErrHandler, oError )
+         ENDIF
+
+     END SEQUENCE
+
+     ErrorBlock( bErrHandler )
+
+     ::nProcs := nProcId
+
+     IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
+        RETURN oError
+     ENDIF
+
+  RETURN nProcId > 0
+
+  //----------------------------------------------------------------------------//
   METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 ) CLASS  TInterpreter
 
-     LOCAL aParams := HB_aParams(), xRet
+     LOCAL aParams := HB_aParams(), xRet, oError
      LOCAL bErrHandler
 
      #ifdef AX
         LOCAL bRecoveryBlock
      #endif
 
-     IF Len( ::aScriptHostGlobals ) > 0
-        ErrorBlock( {|e| Break( e ) } )
-     ENDIF
-
      bErrHandler := ErrorBlock( {|e| Break(e) } )
 
-     IF ::nProcs == 0
-        BEGIN SEQUENCE
-           ::Compile()
-        RECOVER USING xRet
-           ErrorBlock( bErrHandler )
-           RETURN xRet
-        END SEQUENCE
-     ENDIF
+     BEGIN SEQUENCE
 
-     IF ::nProcs > 0
-        BEGIN SEQUENCE
+        IF ::nProcs == 0
+           // if ::bWantsErrorObject then Compile will NOT raise an Error!
+           xRet := ::Compile()
+
+           IF ::bWantsErrorObjects .AND. xRet:ClassName == "ERROR"
+              Break( xRet )
+           ENDIF
+        ENDIF
+
+        IF ::nProcs > 0
            #ifdef AX
               IF Len( ::aScriptHostGlobals ) > 0
                  bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
               ENDIF
            #endif
-           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
-        RECOVER USING xRet
-           // xRet will be returned below.
-        END SEQUENCE
 
-        #ifdef AX
-           IF Len( ::aScriptHostGlobals ) > 0
-              PP_RecoveryBlock( bRecoveryBlock )
-           ENDIF
-        #endif
-     ENDIF
+           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
+        ELSE
+            oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
+            oError:ProcLine := 0
+            Break( oError )
+        ENDIF
+
+     RECOVER USING oError
+
+        IF ! ::bWantsErrorObject
+           Eval( bErrHandler, oError )
+        ENDIF
+
+     END SEQUENCE
+
+     #ifdef AX
+        IF Len( ::aScriptHostGlobals ) > 0
+           PP_RecoveryBlock( bRecoveryBlock )
+        ENDIF
+     #endif
 
      ErrorBlock( bErrHandler )
+
+     IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
+        RETURN oError
+     ENDIF
 
   RETURN xRet
 
@@ -171,17 +248,96 @@
      //----------------------------------------------------------------------------//
      METHOD RecoverSiteGlobals( oErr )
 
-         LOCAL Global, xRet
+         LOCAL Global, xRet, aParams, nParams, p1, p2, p3, p4, p5, p6, p7, p8, p9
 
          //Alert( ProcName() + ":" + oErr:Operation + "->" + oErr:Description )
 
          SWITCH oErr:SubCode
             CASE 1001
+               aParams := oErr:Args
+               nParams := Len( aParams )
+
+               IF nParams > 9
+                  Eval( ErrorBlock(), ErrorNew( [PP], 9009, [OLE], [Too many params], { oErr:Operation, aParams } ) )
+                  nParams := 9
+               ENDIF
+
+               // Intentionally reversed so we may fall through.
+               SWITCH nParams
+                  CASE 9
+                     p9 := aParams[9]
+
+                  CASE 8
+                     p8 := aParams[8]
+
+                  CASE 7
+                     p7 := aParams[7]
+
+                  CASE 6
+                     p6 := aParams[6]
+
+                  CASE 5
+                     p5 := aParams[5]
+
+                  CASE 4
+                     p4 := aParams[4]
+
+                  CASE 3
+                     p3 := aParams[3]
+
+                  CASE 2
+                     p2 := aParams[2]
+
+                  CASE 1
+                     p1 := aParams[1]
+               END
+
                FOR EACH Global IN ::aScriptHostGlobals
-                   //Alert( "Trying: "  + oErr:Operation + " with: " + Global[1] )
+                   //Alert( "Trying: "  + oErr:Operation + "(" + Str( nParams, 1 ) + ") with: " + Global[1] )
 
                    TRY
-                      xRet := Global[3]:&( oErr:Operation )
+                      SWITCH nParams
+                         CASE 0
+                            xRet := Global[3]:&( oErr:Operation )()
+                            EXIT
+
+                         CASE 1
+                            xRet := Global[3]:&( oErr:Operation )( p1 )
+                            EXIT
+
+                         CASE 2
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2 )
+                            EXIT
+
+                         CASE 3
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3 )
+                            EXIT
+
+                         CASE 4
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4 )
+                            EXIT
+
+                         CASE 5
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5 )
+                            EXIT
+
+                         CASE 6
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6 )
+                            EXIT
+
+                         CASE 7
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7 )
+                            EXIT
+
+                         CASE 8
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7, p8 )
+                            EXIT
+
+                         CASE 9
+                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
+                            EXIT
+                      END
+
                    CATCH xRet
                       //Alert( "OLE Error: " + xRet:Operation + "->" + xRet:Description )
                    END
@@ -205,58 +361,6 @@
   #endif
 
   #endif
-
-  //----------------------------------------------------------------------------//
-  METHOD Compile() CLASS  TInterpreter
-
-     LOCAL nLine, nLines, sLine, nProcId := 0
-     LOCAL bErrHandler, oError
-
-     IF Empty( ::cText )
-        RETURN .F.
-     ENDIF
-
-     IF Len( ::aScriptHostGlobals ) > 0
-        ErrorBlock( {|e| Break( e ) } )
-     ENDIF
-
-     bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
-
-     BEGIN SEQUENCE
-
-        IF Len( ::acPPed ) == 0
-           PP_InitStd()
-           PP_LoadRun()
-           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
-           ::aCompiledProcs := {}
-           ::aInitExit      := { {}, {} }
-        ENDIF
-
-        IF Len( ::aCompiledProcs ) == 0
-           PP_ModuleName( "_TINTERPRETER_" )
-
-           BEGIN SEQUENCE
-              nLines := Len( ::acPPed )
-              FOR nLine := 1 TO nLines
-                 sLine := ::acPPed[nLine]
-                 IF sLine != NIL
-                    PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
-                 ENDIF
-              NEXT
-           RECOVER USING oError
-              nProcID := 0
-              Eval( bErrHandler, oError )
-           END SEQUENCE
-
-        ENDIF
-
-     END SEQUENCE
-
-     ErrorBlock( bErrHandler )
-
-     ::nProcs := nProcId
-
-  RETURN nProcId > 0
 
   //----------------------------------------------------------------------------//
 
@@ -2463,11 +2567,11 @@
       }
 
       #ifdef __XHARBOUR__
-         #include "hbpcode.h"
-
          #ifdef AX
-            extern void OutputDebugValues( FILE *hFile, char *sFormat, ... );
+            #include <windows.h>
          #endif
+
+         #include "hbpcode.h"
 
          typedef union
          {
@@ -2512,7 +2616,7 @@
             */
 
             #ifdef AX
-               OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
+               TraceLog( NULL, "Dyn: '%s'\n", sFunctionName );
             #endif
 
             BYTE *pcode = (BYTE *) hb_xgrab( 31 );
@@ -2545,8 +2649,8 @@
             pcode[17] = HB_P_PUSHNIL;
 
             pcode[18] = HB_P_PUSHSTATIC;
-            pcode[19] = 54;
-            pcode[20] = 0;                 /* S_ADYNPROCEDURES */
+            pcode[19] = 27;
+            pcode[20] = 0;                 /* S_APROCEDURES */
 
             pcode[21] = HB_P_PUSHINT;
             pcode[22] = HB_LOBYTE( iID );
@@ -2599,7 +2703,7 @@
             for( i = 0; i < s_iDyn; i++ )
             {
                #ifdef AX
-                  OutputDebugValues( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
+                  TraceLog( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
                                  s_pDynList[i].pAsm,
                                  s_pDynList[i].pcode,
                                  s_pDynList[i].pDyn->pSymbol->pFunPtr );
@@ -2608,6 +2712,8 @@
                hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
                hb_xfree( (void *) ( s_pDynList[i].pcode ) );
                hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->pFunPtr ) );
+
+               s_pDynList[i].pDyn->pSymbol->pFunPtr = NULL;
             }
 
             if( s_iDyn )
