@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.2 2003/03/08 22:59:13 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.3 2003/03/08 23:47:38 ronpinkas Exp $
  */
 
 /*
@@ -179,53 +179,84 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
    RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 
 
-FUNCTION TAssociativeArray
+#ifdef HB_USE_ARRAYS
+    FUNCTION TAssociativeArray
 
-   STATIC s_hClass
+       STATIC s_hClass
 
-   IF s_hClass == NIL
-      s_hClass := __clsNew( "TASSOCIATIVEARRAY", 2, 0 )
+       IF s_hClass == NIL
+          s_hClass := __clsNew( "TASSOCIATIVEARRAY", 2, 0 )
 
-      __clsAddMsg( s_hClass,   "$Members", 1, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
-      __clsAddMsg( s_hClass,  "_$Members", 1, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+          __clsAddMsg( s_hClass,   "$Members", 1, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
+          __clsAddMsg( s_hClass,  "_$Members", 1, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
 
-      __clsAddMsg( s_hClass,    "$Values", 2, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
-      __clsAddMsg( s_hClass,   "_$Values", 2, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+          __clsAddMsg( s_hClass,    "$Values", 2, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
+          __clsAddMsg( s_hClass,   "_$Values", 2, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
 
-      __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
-   ENDIF
-
-RETURN __clsInst( s_hClass )
-
-STATIC FUNCTION TAssociativeArray_OnError( xParam )
-
-    LOCAL cMsg := __GetMessage()
-    LOCAL aMembers := QSelf()[1], aValues := QSelf()[2]
-    LOCAL bAssign := .F.
-    LOCAL nMsg
-
-    IF cMsg[1] == '_'
-       bAssign := .T.
-       cMsg := SubStr( cMsg, 2 )
-    ENDIF
-
-    nMsg := aScan( aMembers, cMsg, , , .T. )
-
-    IF nMsg = 0
-       IF bAssign
-          aAdd( aMembers, cMsg )
-          aAdd( aValues, xParam )
-       ELSE
-          //Throw( ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
-          Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+          __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
        ENDIF
-    ELSE
-       IF bAssign
-          aValues[nMsg]:= xParam
-       ELSE
-          RETURN aValues[nMsg]
-       ENDIF
-    ENDIF
 
-RETURN NIL
+    RETURN __clsInst( s_hClass )
 
+    STATIC FUNCTION TAssociativeArray_OnError( xParam )
+
+        LOCAL cMsg := __GetMessage()
+        LOCAL aMembers := QSelf()[1], aValues := QSelf()[2]
+        LOCAL bAssign := .F.
+        LOCAL nMsg
+
+        IF cMsg[1] == '_'
+           bAssign := .T.
+           cMsg := SubStr( cMsg, 2 )
+        ENDIF
+
+        nMsg := aScan( aMembers, cMsg, , , .T. )
+
+        IF nMsg = 0
+           IF bAssign
+              aAdd( aMembers, cMsg )
+              aAdd( aValues, xParam )
+           ELSE
+              Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+           ENDIF
+        ELSE
+           IF bAssign
+              aValues[nMsg]:= xParam
+           ELSE
+              RETURN aValues[nMsg]
+           ENDIF
+        ENDIF
+
+    RETURN NIL
+#else
+    FUNCTION TAssociativeArray
+
+       STATIC s_hClass
+
+       // Intentionally creating NEW Class for every instance - Don't change!
+       s_hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 0 )
+
+        __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
+
+    RETURN __clsInst( s_hClass )
+
+    STATIC FUNCTION TAssociativeArray_OnError( xParam )
+
+        LOCAL cMsg := __GetMessage(), cProperty
+        LOCAL hClass, nSeq
+
+        IF cMsg[1] == '_'
+           hClass    := QSelf():ClassH
+           nSeq      := __cls_IncData( hClass )
+           cProperty := SubStr( cMsg, 2 )
+
+           __clsAddMsg( hClass, cMsg     , nSeq, HB_OO_MSG_DATA )
+           __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_DATA )
+
+           QSelf()[ cProperty ] := xParam
+        ELSE
+           Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
+        ENDIF
+
+    RETURN NIL
+#endif
