@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.29 2004/03/11 04:22:27 ronpinkas Exp $
+ * $Id: hbapigt.h,v 1.30 2004/03/31 09:19:53 andijahja Exp $
  */
 
 /*
@@ -477,7 +477,7 @@ extern int  hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
 
 #define HB_GT_REQUEST( id )     HB_GT_REQUEST_( _HB_GT_PREF_( id ) )
 #define HB_GT_REQUEST_( id )    HB_GT_REQUEST__( id )
-#define HB_GT_REQUEST__( id )   extern HB_FUNC( HB_GT##id ); \
+#define HB_GT_REQUEST__( id )   HB_FUNC_EXTERN( HB_GT##id ); \
                                 void hb_gt_ForceLink##id( void ) \
                                 { \
                                    HB_FUNCNAME( HB_GT##id )(); \
