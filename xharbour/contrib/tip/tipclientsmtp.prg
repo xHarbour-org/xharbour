@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientsmtp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tipclientsmtp.prg,v 1.2 2003/07/13 19:18:38 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -42,15 +42,12 @@ METHOD Open() CLASS tIPClientSMTP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF .not. Empty ( ::oUrl:cUserid )
-      InetSendAll( ::SocketCon, "HELO " +  ::oUrl:cUserid + InetCRLF() )
+      InetSendAll( ::SocketCon, "HELO " +  ::oUrl:cUserid + ::cCRLF )
    ELSE
-      InetSendAll( ::SocketCon, "HELO tipClientSMTP" + InetCRLF() )
+      InetSendAll( ::SocketCon, "HELO tipClientSMTP" + ::cCRLF )
    ENDIF
 
-   IF ::GetOk()
-      RETURN .T.
-   ENDIF
-RETURN .F.
+RETURN ::GetOk()
 
 
 METHOD GetOk() CLASS tIPClientSMTP
@@ -69,31 +66,31 @@ METHOD Close() CLASS tIPClientSMTP
 RETURN ::super:Close()
 
 METHOD Commit() CLASS tIPClientSMTP
-   InetSendAll( ::SocketCon, InetCRLF() + "." + InetCRLF() )
+   InetSendAll( ::SocketCon, ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Quit() CLASS tIPClientSMTP
-   InetSendAll( ::SocketCon, "QUIT" + InetCRLF() )
+   InetSendAll( ::SocketCon, "QUIT" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Mail( cFrom ) CLASS tIPClientSMTP
-   InetSendAll( ::SocketCon, "MAIL FROM: <" + cFrom +">" + InetCRLF() )
+   InetSendAll( ::SocketCon, "MAIL FROM: <" + cFrom +">" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Rcpt( cTo ) CLASS tIPClientSMTP
-   InetSendAll( ::SocketCon, "RCPT TO: <" + cTo + ">" + InetCRLF() )
+   InetSendAll( ::SocketCon, "RCPT TO: <" + cTo + ">" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Data( cData ) CLASS tIPClientSMTP
-   InetSendAll( ::SocketCon, "DATA" + InetCRLF() )
+   InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
    IF .not. ::GetOk()
       RETURN .F.
    ENDIF
-   InetSendAll(::SocketCon, cData + InetCRLF() + "." + InetCRLF() )
+   InetSendAll(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
 
 
@@ -105,7 +102,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
       IF .not. ::Mail( ::oUrl:cUserid ) .or. .not. ::Rcpt( ::oUrl:cFile )
          RETURN -1
       ENDIF
-      InetSendAll( ::SocketCon, "DATA" + InetCRLF() )
+      InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
       IF .not. ::GetOk()
          RETURN -1
       ENDIF

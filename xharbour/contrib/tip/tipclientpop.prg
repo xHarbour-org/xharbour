@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipclientpop.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -46,9 +46,9 @@ METHOD Open() CLASS tIPClientPOP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetOk()
-      InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + InetCRLF() )
+      InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
       IF ::GetOK()
-         InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + InetCRLF() )
+         InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          IF ::GetOK()
             RETURN .T.
          ENDIF
@@ -74,13 +74,13 @@ RETURN ::super:Close()
 
 
 METHOD Quit() CLASS tIPClientPOP
-   InetSendAll( ::SocketCon, "QUIT" + InetCRLF() )
+   InetSendAll( ::SocketCon, "QUIT" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Stat() CLASS tIPClientPOP
    LOCAL nRead
-   InetSendAll( ::SocketCon, "STAT" + InetCRLF() )
+   InetSendAll( ::SocketCon, "STAT" + ::cCRLF )
 RETURN InetRecvLine( ::SocketCon, @nRead, 128)
 
 
@@ -106,7 +106,7 @@ METHOD List() CLASS tIPClientPOP
    LOCAL nPos
    LOCAL cStr, cRet
 
-   InetSendAll( ::SocketCon, "LIST" + InetCRLF() )
+   InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
    IF .not. ::GetOk()
       RETURN NIL
    ENDIF
@@ -115,7 +115,7 @@ METHOD List() CLASS tIPClientPOP
    DO WHILE cStr != "." .and. InetErrorCode( ::SocketCon ) == 0
       cStr := InetRecvLine( ::SocketCon, @nPos, 256 )
       IF cStr != "."
-         cRet += cStr + InetCRLF()
+         cRet += cStr + ::cCRLF
       ELSE
          ::bEof := .T.
       ENDIF
@@ -135,7 +135,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
    LOCAL cStr, cRet
 
    IF .not. ::bInitialized
-      InetSendAll( ::SocketCon, "RETR "+ Str( nId ) + InetCRLF() )
+      InetSendAll( ::SocketCon, "RETR "+ Str( nId ) + ::cCRLF )
       IF .not. ::GetOk()
          ::bEof := .T.
          RETURN NIL
@@ -151,7 +151,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
             ::bEof := .T.
             EXIT
          ELSE
-            cRet += cStr + InetCRLF()
+            cRet += cStr + ::cCRLF
             IF .not. Empty( nLen ) .and. nLen < Len( cRet )
                EXIT
             ENDIF
@@ -167,6 +167,6 @@ RETURN cRet
 
 
 METHOD Delete( nId ) CLASS tIPClientPOP
-   InetSendAll( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  InetCRLF() )
+   InetSendAll( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  ::cCRLF )
 RETURN ::GetOk()
 

@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientftp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tipclientftp.prg,v 1.2 2003/06/22 04:43:51 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -72,9 +72,9 @@ METHOD Open() CLASS tIPClientFTP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetReply()
-      InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + InetCRLF() )
+      InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
       IF ::GetReply()
-         InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + InetCRLF() )
+         InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          // set binary by default
          IF ::GetReply() .and. ::TypeI()
             RETURN .T.
@@ -110,7 +110,7 @@ RETURN .T.
 METHOD Pasv() CLASS tIPClientFTP
    LOCAL aRep
 
-   InetSendAll( ::SocketCon, "PASV" + InetCRLF() )
+   InetSendAll( ::SocketCon, "PASV" + ::cCRLF )
    IF .not. ::GetReply()
       RETURN .F.
    ENDIF
@@ -133,22 +133,22 @@ RETURN ::super:Close()
 
 
 METHOD Quit() CLASS tIPClientFTP
-   InetSendAll( ::SocketCon, "QUIT" + InetCRLF() )
+   InetSendAll( ::SocketCon, "QUIT" + ::cCRLF )
 RETURN ::GetReply()
 
 
 METHOD TypeI() CLASS tIPClientFTP
-   InetSendAll( ::SocketCon, "TYPE I" + InetCRLF() )
+   InetSendAll( ::SocketCon, "TYPE I" + ::cCRLF )
 RETURN ::GetReply()
 
 
 METHOD TypeA() CLASS tIPClientFTP
-   InetSendAll( ::SocketCon, "TYPE A" + InetCRLF() )
+   InetSendAll( ::SocketCon, "TYPE A" + ::cCRLF )
 RETURN ::GetReply()
 
 
 METHOD CWD( cPath ) CLASS tIPClientFTP
-   InetSendAll( ::SocketCon, "CWD " + cPath + InetCRLF() )
+   InetSendAll( ::SocketCon, "CWD " + cPath + ::cCRLF )
 RETURN ::GetReply()
 
 
@@ -202,7 +202,7 @@ METHOD List() CLASS tIPClientFTP
       ENDIF
    ENDIF
 */
-   InetSendAll( ::SocketCon, "LIST" + InetCRLF() )
+   InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
    cStr := ::ReadAuxPort()
    IF ::GetReply()
       IF .not. ::GetReply()
@@ -222,7 +222,7 @@ METHOD Retr( cFile ) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-   InetSendAll( ::SocketCon, "RETR " + cFile+ InetCRLF() )
+   InetSendAll( ::SocketCon, "RETR " + cFile+ ::cCRLF )
    nTimeout := InetGetTimeout( ::SocketCon )
    InetSetTimeout( ::SocketCon, 100 )
    // have we got a timeout? then the server is waiting for us on the
@@ -246,7 +246,7 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-   InetSendAll( ::SocketCon, "STOR " + cFile+ InetCRLF() )
+   InetSendAll( ::SocketCon, "STOR " + cFile+ ::cCRLF )
    nTimeout := InetGetTimeout( ::SocketCon )
    InetSetTimeout( ::SocketCon, 100 )
    // have we got a timeout? then the server is waiting for us on the
@@ -289,7 +289,7 @@ METHOD SendPort() CLASS tIPClientFTP
    cPort := "," + AllTrim( Str ( Int( nPort / 256 ) ) ) +  "," + AllTrim( Str ( nPort % 256 ) )
 
    ? "PORT " + cAddr + cPort
-   InetSendAll( ::SocketCom, "PORT " + cAddr + cPort  + InetCRLF() )
+   InetSendAll( ::SocketCom, "PORT " + cAddr + cPort  + ::cCRLF )
 RETURN ::GetReply()
 */
 

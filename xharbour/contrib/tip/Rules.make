@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+# $Id: Rules.make,v 1.2 2003/06/16 00:41:28 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -30,7 +30,7 @@ ifeq ($(HB_ARCHITECTURE),linux)
    ifeq ($(HB_GT_LIB),gtQTc)
       GT_LIBS=-lgtQTc -lqt-mt -L/usr/lib/qt3/lib
    else
-      GT_LIBS=-lgtsln -lslang -lgpm
+      GT_LIBS=-lgtcrs -lncurses -lgpm
    endif
 EXE_EXT=
 else
@@ -80,7 +80,7 @@ ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 else
 	$(CC) -o $(TARGET) $(OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
-		$(GT_LIBS) -lm
+		$(GT_LIBS) -lm -ldbfdbt 
 endif
 
 clean:

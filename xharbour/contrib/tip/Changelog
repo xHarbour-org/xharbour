@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.6 2003/07/13 19:18:38 jonnymind Exp $
+ * $Id: Changelog,v 1.7 2003/09/23 21:23:56 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-05 12:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * Rules.make
+    ! default GT changed to gtcrs
+    + added new libraries
+
+  * tipclient.prg
+  * tipclientftp.prg
+  * tipclientpop.prg
+  * tipclientsmtp.prg
+    ! Access to function InetCRLF has been changed to TipClient::cCRLF
+
+  * tipclienthttp.prg
+    ! Checking for error while receiving HTTP header
+    
 2003-09-15 12:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.bc
   * makefile.vc

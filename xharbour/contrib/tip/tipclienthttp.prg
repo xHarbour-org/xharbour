@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.2 2003/02/22 21:26:49 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -36,21 +36,27 @@ RETURN Self
 
 
 METHOD GetRequest( cQuery ) CLASS tIPClientHTTP
-   InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.0" + InetCRLF() )
-   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + InetCRLF() )
-   InetSendAll( ::SocketCon, "Connection: close" + InetCRLF() )
-   InetSendAll( ::SocketCon, InetCRLF() )
-RETURN ::ReadHeaders()
+   InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.0" + ::cCRLF )
+   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
+   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+   InetSendAll( ::SocketCon, ::cCRLF )
+   IF InetErrorCode( ::SocketCon ) ==  0
+      RETURN ::ReadHeaders()
+   ENDIF
+RETURN .F.
 
 
 METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
-   InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + InetCRLF() )
-   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + InetCRLF() )
-   InetSendAll( ::SocketCon, "Connection: close" + InetCRLF() )
-   InetSendAll( ::SocketCon, "Content-Length: " + ::oUrl:cServer + InetCRLF() )
-   InetSendAll( ::SocketCon, InetCRLF() )
-   InetSendAll( ::SocketCon, cPostData )
-RETURN ::ReadHeaders()
+   InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
+   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
+   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+   InetSendAll( ::SocketCon, "Content-Length: " + ::oUrl:cServer + ::cCRLF )
+   InetSendAll( ::SocketCon, ::cCRLF )
+   IF InetErrorCode( ::SocketCon  ) ==  0
+      InetSendAll( ::SocketCon, cPostData )
+      RETURN ::ReadHeaders()
+   ENDIF
+RETURN .F.
 
 
 METHOD ReadHeaders() CLASS tIPClientHTTP
@@ -58,9 +64,15 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
    // Now reads the fields and set the content lenght
    cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+   IF Empty( cLine )
+      // In case of timeout or error on receiving
+      RETURN .F.
+   ENDIF
+
    // Get Protocol version
    aVersion := HB_Regex( "^HTTP/(.)\.(.)", cLine )
    ::cReply := cLine
+
    IF aVersion == NIL
       ::nVersion := 0
       ::nSubvesion := 9

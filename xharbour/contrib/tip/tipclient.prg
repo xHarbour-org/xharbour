@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipclient.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -16,6 +16,7 @@
 
 CLASS tIPClient
    CLASSDATA bInitSocks INIT .F.
+   CLASSDATA cCRLF INIT InetCRLF()
    DATA oUrl            //url to wich to connect
    DATA oCredentials    //credential needed to access the service
    DATA nStatus         //basic status
