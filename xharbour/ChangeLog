@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2323 2004/02/19 06:09:22 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2324 2004/02/19 13:21:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-19 20:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    ! avoid the followings from receiving illegal characters:
+      * announce            ie. ANNOUNCE AB
+      * aliased variable    ie. MEMVAR->AB
+      * symbol-to-push      ie. AB->MYFIELD
+      * undeclared variable ie. AB = 1
 
 2004-02-19 00:03 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg

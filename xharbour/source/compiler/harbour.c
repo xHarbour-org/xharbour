@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.68 2004/02/18 10:50:44 andijahja Exp $
+ * $Id: harbour.c,v 1.69 2004/02/18 20:15:52 andijahja Exp $
  */
 
 /*
@@ -807,7 +807,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                pSym->cScope |= VS_MEMVAR;
 
-               /*printf( "\nAdded Symbol: %s Pos: %i\n", pSym->szName, wPos );*/
+               /* printf( "\nAdded Symbol: %s Pos: %i\n", pSym->szName, wPos ); */
 
                hb_compGenPCode4( HB_P_PARAMETER, HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), HB_LOBYTE( hb_comp_functions.pLast->wParamNum ), ( BOOL ) 0 );
             }
@@ -1033,9 +1033,9 @@ void hb_compGenStaticName( char *szVarName )
       pBuffer[3] = HB_HIBYTE( iVar );
       
       memcpy( ( BYTE * ) ( & ( pBuffer[4] ) ), szVarName, strlen( szVarName ) + 1 );
-      
+
       hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 5 , 0 );
-      
+
       hb_xfree( pBuffer );
 
       if( bGlobal )
@@ -1980,6 +1980,10 @@ PINLINE hb_compInlineAdd( char * szFunName )
 void hb_compAnnounce( char * szFunName )
 {
    PFUNCTION pFunc;
+
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szFunName );
+#endif
 
    pFunc = hb_compFunctionFind( szFunName );
    if( pFunc )
@@ -2988,6 +2992,10 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
     * is popped (a value is asssigned to a variable).
     */
 
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szVarName );
+#endif
+
    if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
       bGenCode = hb_comp_bForceMemvars;    /* harbour compatibility */
    else
@@ -3259,6 +3267,11 @@ void hb_compGenPopAliasedVar( char * szVarName,
                               char * szAlias,
                               LONG lWorkarea )
 {
+
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szVarName );
+#endif
+
    if( bPushAliasValue )
    {
       if( szAlias )
@@ -3718,6 +3731,10 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
 {
    PCOMSYMBOL pSym;
    USHORT wSym;
+
+#ifndef HB_COMMON_VARNAME_OFF
+   hb_compCheckIllegalChar( szSymbolName );
+#endif
 
    if( ( pSym = hb_compSymbolFind( szSymbolName, &wSym ) ) != NULL )  /* the symbol was found on the symbol table */
    {
