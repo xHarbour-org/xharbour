@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.4 2002/04/02 04:50:33 walito Exp $
+ * $Id: menuto.prg,v 1.5 2002/05/13 16:09:18 walito Exp $
  */
 
 /*
@@ -245,12 +245,16 @@ function __MenuTo( bBlock, cVariable )
 
 static function HITTEST( aMenu, nMouseRow, nMouseCol )
 
-   local nPos, nLen := Len(aMenu)
-   for nPos := 1 to nLen
-      if ( nMouseRow != aMenu[ nPos , 1 ] )
-      elseif ( nMouseCol < aMenu[ nPos , 2 ] )
-      elseif ( nMouseCol < aMenu[ nPos , 2 ] + Len(aMenu[ nPos , 3 ]) )
-         return nPos
-      endif
-   next
+//   LOCAL nPos:=1
+   LOCAL xMenu
+
+   FOR EACH xMenu IN aMenu
+     IF nMouseRow == xMenu[ 1 ] .AND. nMouseCol >= xMenu[ 2 ] .AND.;
+          nMouseCol < xMenu[ 2 ] + Len( xMenu[ 3 ] )
+//        RETURN nPos
+        RETURN HB_EnumIndex()
+     ENDIF
+//     nPos++
+   NEXT
    return 0
+
