@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.16 2004/09/08 00:17:14 druzus Exp $
+ * $Id: gtos2.c,v 1.17 2004/09/08 10:39:40 druzus Exp $
  */
 
 /*
@@ -94,6 +94,10 @@
 #include "hbapifs.h"
 #include "inkey.ch"
 
+#ifndef HB_CDP_SUPPORT_OFF
+#include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
 
 /* convert 16:16 address to 0:32 */
 #define SELTOFLAT(ptr) (void *)(((((ULONG)(ptr))>>19)<<16)|(0xFFFF&((ULONG)(ptr))))
@@ -109,7 +113,6 @@
    #endif
 #endif
 #include <conio.h>
-
 
 /* faster macro version for use inside this module */
 #define _GetScreenWidth()  ( s_vi.col )
@@ -155,7 +158,12 @@ static BOOL s_Dirty = FALSE;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
+static BYTE         s_charTransRev[ 256 ];
+static BYTE         s_charTrans[ 256 ];
+static BYTE         s_keyTrans[ 256 ];
 
+
+/* ******************************************************************************* */
 
 static void refresh_buffer(int Row, int Col, int Len) {
 
@@ -1318,6 +1326,92 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
+void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
+{
+   int i;
+
+   HB_SYMBOL_UNUSED( bBox );
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = s_cdpage->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                         ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                         ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTransRev[ s_charTrans[ i ] ] = ( BYTE ) i;
+   }
+
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
+{
+   int i;
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_keyTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = s_cdpage->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                        ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                        ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+}
+
+/* ***************************************************************************  */
+
+
 /*
 * GTInfo() implementation
 */
@@ -1409,10 +1503,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     /* extended GT functions */
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
-/*
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
-*/
+
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );

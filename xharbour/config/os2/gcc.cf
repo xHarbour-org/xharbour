@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.5 2004/05/04 16:04:46 mauriliolongo Exp $
+# $Id: gcc.cf,v 1.6 2004/05/10 10:38:04 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -74,13 +74,13 @@ ifeq ($(findstring rddmt,$(LIBS)),rddmt)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
 # add a last round of rtl/vm to solve positional interdependencies (at the moment hbrun requires this)
-LINKLIBS += -lrtlmt -lvmmt 
+LINKLIBS += -lrtlmt -lvmmt
 else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 # add a last round of rtl/vm to solve positional interdependencies (at the moment hbrun requires this)
-LINKLIBS += -lrtl -lvm 
+LINKLIBS += -lrtl -lvm
 endif
 endif
 
@@ -94,8 +94,10 @@ LINKLIBS += -l$(HB_GT_LIB)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)
 LINKLIBS += -lgtos2
 else
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKLIBS += -lgtnul
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)
+LINKLIBS += -lgtos2
 endif
 endif
 endif
