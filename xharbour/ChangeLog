@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.697 2003/02/11 03:43:02 paultucker Exp $
+ * $Id: ChangeLog,v 1.698 2003/02/11 03:53:19 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * source/rtl/diskspac.c
+    + added support for diskspace on UNIX platforms
+      (first parameter is path if omitted "/" is checked)
+
+  * source/rtl/seconds.c
+    + new function added SECONDSCPU(n) which reports how many CPU and/or
+      system seconds have elapsed since the beginning of the program execution.
+      n == 1  utime  -> user CPU time of the current process
+      n == 2  stime  -> system CPU time behalf of the current process
+      n == 3  u + s  -> sum of utime + stime (default)
+      n == 11 cutime -> sum of the user CPU time of the current + child process
+      n == 12 cstime -> sum of the system CPU time of the current + child process
+      n == 13 cu+cs  -> sum of cutime + cstime
+      I have to ask someone similar with Windows to add support for this
+      function. I found 'GetProcessTimes' in WIN API which can be used for
+      NT based platforms but I cannot find anything for WIN 9X/ME.
+
+  * source/pp/ppcore.c
+    * allow to compile file with <CR><LF> on *nix platforms.
+      It's dirty hack but works good for me and resolves one of the
+      most important problem with common CLIPPER and Harbour 
+      (and other XBASE compatible compilers like FlagShip and CLIP)
+      sources - only [x]Harbour cannot compile files with <CR>.
+
+  * source/compiler/cmdcheck.c
+    ! fix which allow to use file names with '-' char in '-o' option
+
+  + bin/hb-mkslib
+    + simple script which creates shared libraries for Linux for
+    static ones (*.a) and/or object files (*.o).
 
 2003-02-10 22:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.nt
