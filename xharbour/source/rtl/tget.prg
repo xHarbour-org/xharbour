@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.34 2003/01/14 23:45:31 jonnymind Exp $
+ * $Id: tget.prg,v 1.35 2003/01/16 16:40:55 walito Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "getexit.ch"
 #include "inkey.ch"
 #include "button.ch"
+#include "hblang.ch"
 
 /* TODO: :posInBuffer( <nRow>, <nCol> ) --> nPos
          Determines a position within the edit buffer based on screen
@@ -292,8 +293,8 @@ METHOD ParsePict( cPicture ) CLASS Get
 
    if Empty( ::cPicMask )
 
-      do case
-      case ::type == "D"
+      Switch ::type
+      case "D"
 
          ::cPicMask := Set( _SET_DATEFORMAT )
          ::cPicMask := StrTran( ::cPicmask, "y", "9" )
@@ -303,7 +304,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := StrTran( ::cPicmask, "d", "9" )
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
 
-      case ::type == "N"
+      case "N"
 
          cNum := Str( ::VarGet() )
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0
@@ -313,7 +314,7 @@ METHOD ParsePict( cPicture ) CLASS Get
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
 
-      endcase
+      end
 
    endif
 
@@ -322,9 +323,8 @@ METHOD ParsePict( cPicture ) CLASS Get
    ::lPicComplex := .f.
 
    if ! Empty( ::cPicMask )
-      For nFor := 1 to Len( ::cPicMask )
-         cChar := SubStr( ::cPicMask, nFor, 1 )
-         if !cChar IN "!ANX9#"
+      For each cChar in ::cPicMask
+         if !(cChar IN "!ANX9#")
             ::lPicComplex := .t.
             exit
          endif
@@ -460,7 +460,6 @@ return Self
 METHOD SetFocus() CLASS Get
 
    local lWasNil := ::buffer == NIL
-   local nFor
 
    ::hasfocus   := .t.
    ::rejected   := .f.
@@ -566,22 +565,22 @@ METHOD Untransform( cBuffer ) CLASS Get
    endif
 */
 
-   do case
-   case ::type == "C"
+   Switch ::type
+   case "C"
 
       if "R" IN ::cPicFunc
-         for nFor := 1 to Len( ::cPicMask )
-            cChar := SubStr( ::cPicMask, nFor, 1 )
-            if !cChar IN "ANX9#!"
-               cBuffer := SubStr( cBuffer, 1, nFor - 1 ) + Chr( 1 ) + SubStr( cBuffer, nFor + 1 )
+         For each cChar in ::cPicMask
+            if !(cChar IN "ANX9#!")
+               cBuffer := SubStr( cBuffer, 1, HB_EnumIndex() - 1 ) + Chr( 1 ) + SubStr( cBuffer, HB_EnumIndex() + 1 )
             endif
-         next
+         Next
          cBuffer := StrTran( cBuffer, Chr( 1 ), "" )
       endif
 
       xValue := cBuffer
+      exit
 
-   case ::type == "N"
+   case "N"
 
 *      ::minus := .f.
       if "X" IN ::cPicFunc
@@ -639,11 +638,12 @@ METHOD Untransform( cBuffer ) CLASS Get
 //      xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
 
       if ::minus
-         for nFor := 1 to Len( cBuffer )
-            if IsDigit( SubStr( cBuffer, nFor, 1 ) )
+         For each cChar in cBuffer
+            if IsDigit( cChar )
+               nFor := HB_EnumIndex()
                exit
             endif
-         next
+         Next
          nFor--
          if nFor > 0
             cBuffer := Left( cBuffer, nFor-1 ) + "-" + SubStr( cBuffer, nFor+1 )
@@ -653,18 +653,21 @@ METHOD Untransform( cBuffer ) CLASS Get
       endif
 
       xValue  := Val( cBuffer )
+      exit
 
-   case ::type == "L"
+   case "L"
       cBuffer := Upper( cBuffer )
-      xValue := "T" IN cBuffer .or. "Y" IN cBuffer
+      xValue := "T" IN cBuffer .or. "Y" IN cBuffer .or. hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 1 ) IN cBuffer
+      exit
 
-   case ::type == "D"
+   case "D"
       if "E" IN ::cPicFunc
          cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
       endif
       xValue := CToD( cBuffer )
+      exit
 
-   endcase
+   end
 
 return xValue
 
@@ -1002,16 +1005,17 @@ METHOD IsEditable( nPos ) CLASS Get
 
    cChar := SubStr( ::cPicMask, nPos, 1 )
 
-   do case
-   case ::type == "C"
+   Switch ::type
+   case "C"
       return cChar IN "!ANX9#"
-   case ::type == "N"
+   case "N"
       return cChar IN "9#$*"
-   case ::type == "D"
+   case "D"
       return cChar == "9"
-   case ::type == "L"
-      return cChar IN "TFYN"
-   endcase
+   case "L"
+//      return cChar IN "TFYN"
+      return cChar IN "LY"
+   end
 
 return .f.
 
@@ -1021,36 +1025,58 @@ METHOD Input( cChar ) CLASS Get
 
    local cPic
 
-   do case
-   case ::type == "N"
+   Switch ::type
+   case "N"
 
-      do case
-      case cChar == "-"
-         ::minus := .t.
-               /* The minus symbol can be write in any place */
+      Switch cChar
+      case "-"
+         ::minus := .t.  /* The minus symbol can be write in any place */
+         exit
 
-      case cChar IN ".,"
+      case "."
+      case ","
          ::toDecPos()
          return ""
 
-      case !( cChar IN "0123456789" )
+      case "0"
+      case "1"
+      case "2"
+      case "3"
+      case "4"
+      case "5"
+      case "6"
+      case "7"
+      case "8"
+      case "9"
+         exit
+
+      Default
          return ""
 
-      endcase
+      end
+      exit
 
-   case ::type == "D"
+   case "D"
 
       if !( cChar IN "0123456789" )
          return ""
       endif
+      exit
 
-   case ::type == "L"
+   case "L"
 
-      if !( Upper( cChar ) IN "YNTF" )
+      if !( Upper( cChar ) IN "YNTF"+hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 1 )+hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 2 ) )
          return ""
       endif
+      Do Case
+         case UPPER( cChar ) == hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 1 )
+            cChar := "Y"
+         case UPPER( cChar ) == hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 2 )
+            cChar := "N"
+      endcase
+      exit
 
-   endcase
+   end
 
    if ! Empty( ::cPicFunc )
       cChar := Left( Transform( cChar, ::cPicFunc ), 1 ) // Left needed for @D
@@ -1062,38 +1088,58 @@ METHOD Input( cChar ) CLASS Get
 //      cChar := Transform( cChar, cPic )
 // Above line eliminated because some get picture template symbols for
 // numeric input not work in text input. eg: $ and *
-      do case
-      case cPic == "A"
+
+      Switch cPic
+      case "A"
          if ! IsAlpha( cChar )
             cChar := ""
          endif
-      case cPic == "N"
+         exit
+
+      case "N"
          if ! IsAlpha( cChar ) .and. ! IsDigit( cChar )
             cChar := ""
          endif
-      case cPic == "9"
+         exit
+
+      case "9"
          if ! IsDigit( cChar ) .and. cChar != "-"
             cChar := ""
          endif
-      case cPic == "#"
+         exit
+
+      case "#"
          if ! IsDigit( cChar ) .and. !( cChar == " " ) .and. !( cChar IN "+-" )
             cChar := ""
          endif
-      case cPic == "L"
+         exit
+
+      case "L"
          if !( Upper( cChar ) IN "YNTF" )
             cChar := ""
          endif
-      case cPic == "Y"
+         exit
+
+      case "Y"
          if !( Upper( cChar ) IN "YN" )
             cChar := ""
          endif
-      case ( cPic == "$" .or. cPic == "*" ) .and. ::type == "N"
-         if ! IsDigit( cChar ) .and. cChar != "-"
-            cChar := ""
+         exit
+
+      case "$"
+      case "*"
+         if ::type == "N"
+            if ! IsDigit( cChar ) .and. cChar != "-"
+               cChar := ""
+            endif
+         else
+            cChar := Transform( cChar, cPic )
          endif
-      other
+         exit
+
+      Default
          cChar := Transform( cChar, cPic )
-      end case
+      end
    endif
 
 return cChar
@@ -1108,7 +1154,6 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    local cMask    := ::cPicMask
 
    local nFor
-//   local nLen
    local nAt
    local nNoEditable := 0
 
@@ -1167,10 +1212,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cMask, ::LastEditable() + 1 )
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), chr(1), "." ) + SubStr( cMask, ::LastEditable() + 1 )
       endif
-      for nFor := 1 to ::nMaxLen
-         cChar := SubStr( cMask, nFor, 1 )
-         if cChar IN ",." .and. SubStr( cBuffer, nFor, 1 ) IN ",."
-            cBuffer := SubStr( cBuffer, 1, nFor - 1 ) + cChar + SubStr( cBuffer, nFor + 1 )
+      for each cChar in cMask
+         if cChar IN ",." .and. SubStr( cBuffer, HB_EnumIndex(), 1 ) IN ",."
+            cBuffer := Substr( cBuffer, 1, HB_EnumIndex() - 1 ) + cChar + Substr( cBuffer, HB_EnumIndex() + 1 )
          endif
       next
       if ::lEdit .and. Empty(xValue)
@@ -1294,18 +1338,22 @@ METHOD DeleteAll() CLASS Get
 
    ::lEdit := .t.
 
-   do case
-   case ::type == "C"
+   Switch ::type
+   case "C"
       xValue := Space( ::nMaxlen )
-   case ::type == "N"
-      xValue := 0
-      ::minus  := .f.
-   case ::type == "D"
+      exit
+   case "N"
+      xValue  := 0
+      ::minus := .f.
+      exit
+   case "D"
       xValue := CToD( "" )
       ::BadDate := .f.
-   case ::type == "L"
+      exit
+   case "L"
       xValue := .f.
-   endcase
+      exit
+   end
 
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable( )
