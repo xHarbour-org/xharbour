@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.197 2001/08/22 17:41:09 dholm Exp $
+ * $Id: console.c,v 1.1.1.1 2001/12/21 10:41:14 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
+#define HB_OS_WIN_32_USED
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
@@ -85,10 +85,15 @@ static USHORT s_uiPCol;
 static SHORT  s_originalMaxRow;
 static SHORT  s_originalMaxCol;
 static char   s_szCrLf[ CRLF_BUFFER_LEN ];
+#if defined(__WIN32__) || defined(HB_OS_WIN_32)
+static long    s_iFilenoStdin;
+static long    s_iFilenoStdout;
+static long    s_iFilenoStderr;
+#else
 static int    s_iFilenoStdin;
 static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
-
+#endif
 void hb_conInit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
@@ -103,31 +108,42 @@ void hb_conInit( void )
 #endif
 
    s_uiPRow = s_uiPCol = 0;
-
-   s_iFilenoStdin = fileno( stdin );
-   s_iFilenoStdout = fileno( stdout );
-
+   #ifdef __WIN32__
+      s_iFilenoStdin = (long)GetStdHandle(STD_INPUT_HANDLE);
+      s_iFilenoStdout = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+   #else
+      s_iFilenoStdin = fileno( stdin );
+      s_iFilenoStdout = fileno( stdout );
+   #endif
 #ifdef HB_C52_UNDOC
    {
       int iStderr = hb_cmdargNum( "STDERR" ); /* Undocumented CA-Clipper switch //STDERR:x */
 
       if( iStderr < 0 )        /* //STDERR not used or invalid */
+      #ifdef __WIN32__
+        s_iFilenoStderr = (long)GetStdHandle(STD_ERROR_HANDLE);
+      #else
          s_iFilenoStderr = fileno( stderr );
+      #endif
       else if( iStderr == 0 )  /* //STDERR with no parameter or 0 */
          s_iFilenoStderr = s_iFilenoStdout;
       else                     /* //STDERR:x */
          s_iFilenoStderr = iStderr;
    }
 #else
-   s_iFilenoStderr = fileno( stderr );
+   #ifdef __WIN32__
+      s_iFilenoStderr = (long)GetStdHandle(STD_ERROR_HANDLE);
+   #else
+      s_iFilenoStderr = fileno( stderr );
+   #endif
 #endif
 
    /* Some compilers open stdout and stderr in text mode, but
       Harbour needs them to be open in binary mode. */
-
-   hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
-   hb_fsSetDevMode( s_iFilenoStderr, FD_BINARY );
-
+   #ifndef __WIN32__
+      hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
+      hb_fsSetDevMode( s_iFilenoStderr, FD_BINARY );
+   #endif
    s_bInit = TRUE;
 
    hb_gtInit( s_iFilenoStdin, s_iFilenoStdout, s_iFilenoStderr );
@@ -145,10 +161,10 @@ void hb_conRelease( void )
       /* If the program changed the screen size, restore the original */
       hb_gtSetMode( s_originalMaxRow + 1, s_originalMaxCol + 1 );
    }
-
+   #ifndef __WIN32__
    hb_fsSetDevMode( s_iFilenoStdout, FD_TEXT );
    hb_fsSetDevMode( s_iFilenoStderr, FD_TEXT );
-
+   #endif
    /* The is done by the OS from now on */
    s_szCrLf[ 0 ] = HB_CHAR_LF;
    s_szCrLf[ 1 ] = '\0';

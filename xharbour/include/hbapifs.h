@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
+ * $Id: hbapifs.h,v 1.3 2002/01/03 03:22:13 lculik Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #ifndef HB_APIFS_H_
 #define HB_APIFS_H_
-
+#define HB_OS_WIN_32_USED
 #include "hbapi.h"
 #include "fileio.ch"
 
@@ -61,11 +61,8 @@ extern "C" {
 #endif
 
 #define FS_ERROR F_ERROR
-#ifdef __WIN32__
+
 typedef long    FHANDLE;
-#else
-typedef int    FHANDLE;
-#endif
 /* File locking flags */
 #define FL_LOCK       0x0000   /* Lock a region   */
 #define FL_UNLOCK     0x0001   /* Unlock a region */

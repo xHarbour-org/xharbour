@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: philes.c,v 1.4 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 HB_FUNC( FOPEN )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
+      hb_retnl( hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
                            ISNUM( 2 ) ? hb_parni( 2 ) : FO_READ | FO_COMPAT ) );
    else
       hb_errRT_BASE( EG_ARG, 2021, NULL, "FOPEN", 2, hb_paramError( 1 ), hb_paramError( 2 ) ); /* NOTE: Undocumented but existing Clipper Run-time error */
@@ -67,10 +67,10 @@ HB_FUNC( FOPEN )
 HB_FUNC( FCREATE )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsCreate( ( BYTE * ) hb_parc( 1 ),
+      hb_retnl( hb_fsCreate( ( BYTE * ) hb_parc( 1 ),
                              ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL ) );
    else
-      hb_retni( FS_ERROR );
+      hb_retnl( FS_ERROR );
 }
 
 #ifdef HB_EXTENSION
@@ -103,7 +103,7 @@ HB_FUNC( FREAD )
       if( ulRead <= hb_parcsiz( 2 ) )
          /* NOTE: Warning, the read buffer will be directly modified,
                   this is normal here ! [vszakats] */
-         ulRead = hb_fsReadLarge( hb_parni( 1 ),
+         ulRead = hb_fsReadLarge( hb_parnl( 1 ),
                                   ( BYTE * ) hb_parc( 2 ),
                                   ulRead );
       else
@@ -118,7 +118,7 @@ HB_FUNC( FREAD )
 HB_FUNC( FWRITE )
 {
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
-      hb_retnl( hb_fsWriteLarge( hb_parni( 1 ),
+      hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ),
                                  ( BYTE * ) hb_parc( 2 ),
                                  ISNUM( 3 ) ? hb_parnl( 3 ) : hb_parclen( 2 ) ) );
    else
@@ -136,7 +136,7 @@ HB_FUNC( FCLOSE )
 
    if( ISNUM( 1 ) )
    {
-      hb_fsClose( hb_parni( 1 ) );
+      hb_fsClose( hb_parnl( 1 ) );
       hb_retl( hb_fsError() == 0 );
    }
    else
@@ -162,7 +162,7 @@ HB_FUNC( FRENAME )
 HB_FUNC( FSEEK )
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_retnl( hb_fsSeek( hb_parni( 1 ),
+      hb_retnl( hb_fsSeek( hb_parnl( 1 ),
                            hb_parnl( 2 ),
                            ISNUM( 3 ) ? hb_parni( 3 ) : FS_SET ) );
    else
@@ -177,7 +177,7 @@ HB_FUNC( FREADSTR )
 
       if( ulToRead > 0 )
       {
-         FHANDLE fhnd = ( FHANDLE ) hb_parni( 1 );
+         FHANDLE fhnd = ( FHANDLE ) hb_parnl( 1 );
          BYTE * buffer = ( BYTE * ) hb_xgrab( ulToRead + 1 );
          ULONG ulRead;
 
