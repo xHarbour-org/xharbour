@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.248 2002/05/24 13:22:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.249 2002/05/24 16:32:40 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-24 16:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/achoice.prg
+    * More compliant with Cli**er.
+    ! Fix minor bug when press CTRL_END and the quantity of items
+      is smaller to the long of the window.
+      This bug exist in previous versions of achoice().
+    Reported by Carlos Vargas.
 
 2002-05-24 13:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
