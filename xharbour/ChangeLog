@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1574 2003/10/09 23:04:23 peterrees Exp $
+ * $Id: ChangeLog,v 1.1575 2003/10/09 23:16:54 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-10-10 13:14 GMT+1200 Peter Rees <peter@rees.co.nz>
+
+  * /rtl/console.c
+    __EJECT() fix to respect SET PRINTER ON
+
+  * /doc/es/print.txt
+    change example for GETPRINTERS()
+
+  * /tests/testwprn.prg
+    minor change
 2003-10-10 03:15 UTC+0300 Phil Krylov <phil@mail.ru>
   * source/debug/dbgwa.prg
     * Corrected the file header.
