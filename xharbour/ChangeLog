@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.506 2002/11/27 04:05:33 mlombardo Exp $
+ * $Id: ChangeLog,v 1.507 2002/11/29 08:59:53 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-29 17:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/achoice.prg
+  * source/rtl/alert.prg
+  * source/rtl/cstr.prg
+  * source/rtl/devoutp.prg
+  * source/rtl/errorsys.prg
+  * source/rtl/listbox.prg
+  * source/rtl/memoedit.prg
+  * source/rtl/objfunc.prg
+  * source/rtl/persist.prg
+  * source/rtl/pushbtn.prg
+  * source/rtl/tclass.prg
+  * source/rtl/tget.prg
+  * source/rtl/tlabel.prg
+  * source/rtl/treport.prg
+    ! add recent optimization. <exp> IN <string_or_array>
+  * source/rtl/cstruct.prg
+    * delete redundant code.
+  * source/rtl/tbcolumn.prg
+    ! Set ::DefColor to four numeric values.
+      The third color display the heading.
+      The fourth color display the footing.
 
 2002-11-29 00:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/binnum.c
