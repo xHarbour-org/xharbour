@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.21 2003/08/03 19:06:52 druzus Exp $
+# $Id: xharbour.spec,v 1.22 2003/08/05 16:37:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -412,7 +412,13 @@ done
 HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
+    if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
+	HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
+    else
+	HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    fi
+fi
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"

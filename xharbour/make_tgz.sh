@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.8 2003/08/02 10:22:10 druzus Exp $
+# $Id: make_tgz.sh,v 1.9 2003/08/05 16:37:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -221,7 +221,13 @@ done
 HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
+    if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
+	HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
+    else
+	HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    fi
+fi
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
