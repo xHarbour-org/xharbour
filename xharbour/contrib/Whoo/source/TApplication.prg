@@ -46,7 +46,7 @@ RETURN(0)
 METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
    local n
    DEFAULT oParent TO self
-   
+/*   
    IF ( n := aScan( ::aForms, {|a|a[1] == cForm} ) ) > 0
       IF ::aForms[n][2] == NIL
          MessageBox(, 'Form '+cForm+' is acting as the Frame',MB_ICONEXCLAMATION )
@@ -55,7 +55,7 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
       ::aForms[n][2]:Create()
       return( ::aForms[n][2] )
    endif
-   
+*/   
    __objAddData( self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
    __ObjSetValueList( self, { { cForm, oForm } } )

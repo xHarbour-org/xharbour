@@ -11,11 +11,13 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TForm
 
-   ::WndProc := {| hWnd, nMsg, nwParam, nlParam| ::FormProc( hWnd, nMsg, nwParam, nlParam ) }
+   super:New( oParent )
+   ::WndProc := 'FormProc'
    ::Msgs    := -1
    ::FrameWnd:= .F.
-
-   super:New( oParent )
+   ::Style   := WS_OVERLAPPEDWINDOW + WS_DLGFRAME
+   ::ExStyle := WS_EX_DLGMODALFRAME
+   ::FormStyle := 0
 
 return( self )
 
@@ -30,10 +32,11 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TFrame
 
-   ::WndProc := {| hWnd, nMsg, nwParam, nlParam| ::FormProc( hWnd, nMsg, nwParam, nlParam ) }
+   ::WndProc := 'FormProc'
    ::Msgs    := -1
    ::FrameWnd:= .T.
-
+   ::Style   := WS_OVERLAPPEDWINDOW
+//   ::FormStyle := 1
    super:New( oParent )
 
 return( self )
