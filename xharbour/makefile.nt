@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.10 2003/02/08 05:51:25 ronpinkas Exp $
+# $Id: makefile.nt,v 1.11 2003/02/11 03:43:02 paultucker Exp $
 #
 
 #
@@ -305,6 +305,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gtapiu.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
+   $(OBJ_DIR)\hbcompress.obj \
    $(OBJ_DIR)\hbrandom.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
