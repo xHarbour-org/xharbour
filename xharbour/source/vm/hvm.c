@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.417 2004/08/27 03:28:58 walito Exp $
+ * $Id: hvm.c,v 1.418 2004/09/06 19:25:54 mlombardo Exp $
  */
 
 /*
@@ -4273,15 +4273,18 @@ static void hb_vmInc( void )
       if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < SHRT_MAX )
       {
          pItem->item.asInteger.value++;
+         pItem->item.asInteger.length = 10;
       }
       else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < LONG_MAX )
       {
          pItem->item.asLong.value++;
+         pItem->item.asLong.length = ( pItem->item.asLong.value <= -1000000000 ) ? 20 : 10;
       }
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
       {
          pItem->item.asLongLong.value++;
+         pItem->item.asLongLong.length = 20 ;
       }
 #endif
       else
@@ -4294,6 +4297,7 @@ static void hb_vmInc( void )
    else if( HB_IS_DOUBLE( pItem ) )
    {
       pItem->item.asDouble.value++;
+      pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpInc" ) )
    {
@@ -4335,15 +4339,18 @@ static void hb_vmDec( void )
       if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value > SHRT_MIN )
       {
          pItem->item.asInteger.value--;
+         pItem->item.asInteger.length = 10;
       }
       else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value > LONG_MIN )
       {
          pItem->item.asLong.value--;
+         pItem->item.asLong.length = ( pItem->item.asLong.value <= -1000000000 ) ? 20 : 10;
       }
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value > LONGLONG_MIN )
       {
          pItem->item.asLongLong.value--;
+         pItem->item.asLongLong.length = 20 ;
       }
 #endif
       else
@@ -4356,6 +4363,7 @@ static void hb_vmDec( void )
    else if( HB_IS_DOUBLE( pItem ) )
    {
       pItem->item.asDouble.value--;
+      pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpDec" ) )
    {

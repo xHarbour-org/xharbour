@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3419 2004/09/09 21:27:34 druzus Exp $
+ * $Id: ChangeLog,v 1.3420 2004/09/10 10:01:13 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-10 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/pp/ppcore.c
+    * small modification in hb_pp_Init() for __PLATFORM__* macro
+      accept only '_', digit and letters
+
+  * xharbour/source/vm/hvm.c
+    ! update item length for numeric values in hb_vmInc()/hb_vmDec()
 
 2004-09-10 07:00 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/dates.c

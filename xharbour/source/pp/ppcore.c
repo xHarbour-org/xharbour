@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.163 2004/08/19 13:11:27 likewolf Exp $
+ * $Id: ppcore.c,v 1.164 2004/09/04 18:59:08 ronpinkas Exp $
  */
 
 /*
@@ -732,40 +732,35 @@ void hb_pp_Init( void )
    {
       char sOS[64];
       char sVer[64];
+      char *pSrc, *pDst;
       char * szPlatform = hb_ppPlatform();
-      char * pSpace = strchr( szPlatform, ' ' );
 
-      sOS[0] = 0;
-      sVer[0] = '"';
-      sVer[1] = 0;
+      strcpy( sOS, "__PLATFORM__" );
 
-      strcat( (char *) sOS, "__PLATFORM__" );
+      pSrc = szPlatform;
+      pDst = sOS + strlen( sOS );
 
-      if( pSpace )
+      while ( *pSrc && *pSrc != ' ' )
       {
-         if ( !strncmp( szPlatform, "OS/2", 4 ) )
+         if ( *pSrc == '_' || ( *pSrc >= 'A' && *pSrc <= 'Z' )
+                           || ( *pSrc >= 'a' && *pSrc <= 'a' )
+                           || ( *pSrc >= '0' && *pSrc <= '9' ) )
          {
-            strcat( (char *) sOS, "OS2" );
+            *pDst++ = *pSrc;
          }
-         else
-         {
-            strncat( (char *) sOS, szPlatform, pSpace - szPlatform );
-         }
-         strcat( (char *) sVer, pSpace + 1 );
-         strcat( (char *) sVer, "\"" );
+         pSrc++;
       }
-      else
+      *pDst = 0;
+
+      pDst = sVer;
+      *pDst++ = '"';
+      if ( *pSrc == ' ' )
       {
-         if ( !strncmp( szPlatform, "OS/2", 4) )
-         {
-            strcat( (char *) sOS, "OS2" );
-         }
-         else
-         {
-            strcat( (char *) sOS, szPlatform );
-         }
-         strcat( (char *) sVer, "\"" );
+         while ( *(++pSrc) )
+            *pDst++ = *pSrc;
       }
+      *pDst++ = '"';
+      *pDst = 0;
 
       hb_pp_AddDefine( (char *) sOS, (char *) sVer );
 
