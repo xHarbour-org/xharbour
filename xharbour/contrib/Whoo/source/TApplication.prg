@@ -4,6 +4,8 @@ static oAppl
 #include "what32.ch"
 #include "windows.ch"
 
+#define ASFW_ANY    (-1)
+
 GLOBAL EXTERNAL lPrevInstance
 
 CLASS Application
@@ -16,7 +18,7 @@ CLASS Application
    DATA MultiInstance         INIT .F.
    DATA InstMsg
 
-   METHOD New() CONSTRUCTOR
+   METHOD Initialize() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()
    METHOD CreateFrame()
@@ -26,11 +28,14 @@ CLASS Application
 //   METHOD NotifyForms( nMsg, nwParam, nlParam )  INLINE 
 ENDCLASS
 
-METHOD New() CLASS Application
+METHOD Initialize() CLASS Application
 
    ::InstMsg := RegisterWindowMessage( GetModuleHandle() )
 
+   AllowSetForegroundWindow( ASFW_ANY ) 
+
    if !::MultiInstance .and. lPrevInstance 
+      
       
       SendMessage(HWND_BROADCAST, ::InstMsg, 0, 0)
       

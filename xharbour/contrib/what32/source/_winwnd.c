@@ -1225,3 +1225,23 @@ HB_FUNC( SETMINMAXINFO )
   }
 
 }
+
+/*
+BOOL LockSetForegroundWindow(          UINT uLockCode
+);
+*/
+
+HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
+{
+   hb_retl( LockSetForegroundWindow( (UINT) hb_parni( 1 ) ) );
+}
+
+/*
+BOOL AllowSetForegroundWindow(          DWORD dwProcessId
+);
+*/
+
+HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
+{
+   hb_retl( AllowSetForegroundWindow ( (DWORD) hb_parnl( 1 ) ) );
+}
