@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.30 2002/09/17 22:28:48 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.31 2002/09/19 01:57:42 ronpinkas Exp $
  */
 
 /*
@@ -122,6 +122,12 @@ extern "C" {
 #define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->asArray.value->uiClass != 0 )
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL ) /* Not available in CA-Cl*pper. */
+
+#define HB_ITEM_LOCK( pItem )   ( (pItem)->type == HB_IT_ARRAY ? hb_gcLock( (pItem)->item.asArray.value ) : \
+                                  (pItem)->type == HB_IT_BLOCK ? hb_gcLock( (pItem)->item.asBlock.value ) : NULL )
+
+#define HB_ITEM_UNLOCK( pItem ) ( (pItem)->type == HB_IT_ARRAY ? hb_gcUnlock( (pItem)->item.asArray.value ) : \
+                                  (pItem)->type == HB_IT_BLOCK ? hb_gcUnlock( (pItem)->item.asBlock.value ) : NULL )
 
 typedef struct _HB_VALUE
 {
@@ -345,7 +351,7 @@ extern PHB_SYMB hb_symbolNew( char * szName ); /* create a new symbol */
 extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
 extern HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
-extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */
+extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos, BOOL *pbNeedLock ); /* get local variable referenced in a codeblock */
 extern PHB_ITEM hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer ); /* get local variable passed by reference */
 extern void     hb_codeblockEvaluate( HB_ITEM_PTR pItem ); /* evaluate a codeblock */
 
@@ -453,7 +459,7 @@ extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
-extern void   hb_vmGlobalLock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcLock(...) when needed. */
+
 extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
 extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
 extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */

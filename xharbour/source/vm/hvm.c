@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.101 2002/09/17 23:12:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.102 2002/09/19 01:57:42 ronpinkas Exp $
  */
 
 /*
@@ -268,12 +268,8 @@ BOOL    hb_vm_bWithObject = FALSE;
 HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
 PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
+BOOL    hb_vm_abEnumNeedLock[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
-
-/*
-PHB_ITEM **hb_vm_pGlobals = NULL;
-short    hb_vm_iGlobals = 0;
-*/
 
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
@@ -528,6 +524,19 @@ void HB_EXPORT hb_vmQuit( void )
       hb_itemClear( &hb_stack.Return );
    }
    //printf( "After Return\n" );
+
+   // Unlocking ALL STATIC variables.
+   if( s_aStatics.item.asArray.value && s_aStatics.item.asArray.value->pItems )
+   {
+      HB_ITEM_PTR pStatic = s_aStatics.item.asArray.value->pItems;
+      ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
+
+      while( ulLen-- )
+      {
+         HB_ITEM_UNLOCK( pStatic );
+         ++pStatic;
+      }
+   }
 
    hb_arrayRelease( &s_aStatics );
    //printf( "After Statics\n" );
@@ -868,18 +877,31 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_FOREACH:
+         {
+            PHB_ITEM pEnumerator;
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FOREACH") );
             hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
             hb_stackPop();
+
             if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY )
             {
                hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * hb_stack.pPos, 1 ) );
             }
-            hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
+
+            pEnumerator = hb_itemUnRef( hb_stackItemFromTop( -1 ), &( hb_vm_abEnumNeedLock[ hb_vm_wEnumCollectionCounter ] ) );
+
+            if( hb_vm_abEnumNeedLock[ hb_vm_wEnumCollectionCounter ] )
+            {
+               HB_ITEM_UNLOCK( pEnumerator );
+            }
+
+            hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = pEnumerator;
             hb_stackPop();
             hb_vm_wEnumCollectionCounter++;
             w++;
             break;
+         }
 
          case HB_P_ENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
@@ -892,8 +914,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_ENDENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDENUMERATE") );
-            hb_itemClear( &( hb_vm_aEnumCollection[ --hb_vm_wEnumCollectionCounter ] ) );
+            --hb_vm_wEnumCollectionCounter;
+
+            if( hb_vm_abEnumNeedLock[ hb_vm_wEnumCollectionCounter ] )
+            {
+               HB_ITEM_LOCK( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
+            }
+
+            hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
             hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+
             w++;
             break;
 
@@ -1488,7 +1518,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_IS_BYREF( pLocal ) )
             {
-               pLocal = hb_itemUnRef( pLocal );
+               pLocal = hb_itemUnRef( pLocal, NULL );
             }
 
             if( pLocal->type & HB_IT_INTEGER )
@@ -1558,16 +1588,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
             short iNewVal = ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) );
+            BOOL bNeedLock;
 
             if( HB_IS_BYREF( pLocal ) )
             {
-               pLocal = hb_itemUnRef( pLocal );
+               pLocal = hb_itemUnRef( pLocal, &bNeedLock );
             }
 
             if( HB_IS_COMPLEX( pLocal ) )
             {
+               if( bNeedLock )
+               {
+                  HB_ITEM_UNLOCK( pLocal );
+               }
+
                hb_itemClear( pLocal );
             }
+
             pLocal->type = HB_IT_INTEGER;
             pLocal->item.asInteger.length = 10;
             pLocal->item.asInteger.value = iNewVal;
@@ -1581,14 +1618,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
             USHORT uiSize = pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 );
+            BOOL bNeedLock;
 
             if( HB_IS_BYREF( pLocal ) )
             {
-               pLocal = hb_itemUnRef( pLocal );
+               pLocal = hb_itemUnRef( pLocal, &bNeedLock );
             }
 
             if( HB_IS_COMPLEX( pLocal ) )
             {
+               if( bNeedLock )
+               {
+                  HB_ITEM_UNLOCK( pLocal );
+               }
+
                hb_itemClear( pLocal );
             }
 
@@ -1788,6 +1831,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
                pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+               pTop->item.asRefer.bNeedLock = TRUE;
 
                if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && (*pGlobals)[ iGlobal ]->item.asString.bStatic )
                {
@@ -1927,26 +1971,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_stackDec();
 
             // So that released var can be claimed by GC.
-            if( (*pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
-            {
-               hb_gcUnlock( (*pGlobals)[ iGlobal ]->item.asArray.value );
-            }
-            else if( (*pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
-            {
-               hb_gcUnlock( (*pGlobals)[ iGlobal ]->item.asBlock.value );
-            }
+            HB_ITEM_UNLOCK( (*pGlobals)[ iGlobal ] );
 
             hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( hb_stack.pPos ) );
 
             // So that GLOBAL value can NEVER be claimed by GC
-            if( (*pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
-            {
-               hb_gcLock( (*pGlobals)[ iGlobal ]->item.asArray.value );
-            }
-            else if( (*pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
-            {
-               hb_gcLock( (*pGlobals)[ iGlobal ]->item.asBlock.value );
-            }
+            HB_ITEM_LOCK( (*pGlobals)[ iGlobal ] );
 
             w += 2;
             break;
@@ -3649,7 +3679,7 @@ static void hb_vmArrayPop( void )
 
    if( HB_IS_BYREF( pArray ) )
    {
-      pArray = hb_itemUnRef( pArray );
+      pArray = hb_itemUnRef( pArray, NULL );
    }
 
    if( HB_IS_INTEGER( pIndex ) )
@@ -4185,6 +4215,7 @@ void hb_vmSend( USHORT uiParams )
    PHB_BASEARRAY  pSelfBase = NULL;
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
+   BOOL bNeedLock;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
 
@@ -4227,7 +4258,16 @@ void hb_vmSend( USHORT uiParams )
 
    if( HB_IS_BYREF( pSelf ) )
    {
-      pSelf = hb_itemUnRef( pSelf );
+      pSelf = hb_itemUnRef( pSelf, &bNeedLock );
+
+      if( bNeedLock )
+      {
+         HB_ITEM_UNLOCK( pSelf );
+      }
+   }
+   else
+   {
+      bNeedLock = FALSE;
    }
 
    if( HB_IS_BLOCK( pSelf ) )
@@ -4283,8 +4323,6 @@ void hb_vmSend( USHORT uiParams )
 
    if( pFunc )
    {
-      //short iGlobal;
-
       if( bProfiler )
       {
          pMethod = hb_mthRequested();
@@ -4356,6 +4394,11 @@ void hb_vmSend( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmSend()"));
 
+   if( bNeedLock )
+   {
+      HB_ITEM_LOCK( pSelf );
+   }
+
    hb_stackOldFrame( &sStackState );
 
    HB_TRACE(HB_TR_DEBUG, ("Restored Stack hb_vmSend()"));
@@ -4382,7 +4425,7 @@ static HARBOUR hb_vmDoBlock( void )
 
    if( HB_IS_BYREF( pBlock ) )
    {
-      pBlock = hb_itemUnRef( pBlock );
+      pBlock = hb_itemUnRef( pBlock, NULL );
    }
 
    if( ! HB_IS_BLOCK( pBlock ) )
@@ -4516,6 +4559,7 @@ static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticNam
    s_bDebugShowLines = FALSE;
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_vmPushNil();
+
    if( bIsGlobal )
    {
       hb_vmPushLongConst( hb_arrayLen( &s_aStatics ) - s_uiStatics );
@@ -4599,6 +4643,7 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
    {
       pSym->pFunPtr = NULL;         /* statics frame for this PRG */
       hb_arrayNew( &s_aStatics, uiStatics );
+      hb_gcLock( s_aStatics.item.asArray.value );
    }
    else
    {
@@ -5078,12 +5123,12 @@ static void hb_vmPushLocal( SHORT iLocal )
       /* local variable referenced in a codeblock
        * hb_stackSelfItem() points to a codeblock that is currently evaluated
        */
-      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), ( LONG ) iLocal );
+      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), ( LONG ) iLocal, NULL );
    }
 
    if( HB_IS_BYREF( pLocal ) )
    {
-      hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pLocal ) );
+      hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pLocal, NULL ) );
    }
    else
    {
@@ -5091,30 +5136,6 @@ static void hb_vmPushLocal( SHORT iLocal )
    }
 
    hb_stackPush();
-}
-
-void hb_vmGlobalLock( PHB_ITEM pGlobal )
-{
-   if( pGlobal->type == HB_IT_ARRAY )
-   {
-      hb_gcLock( pGlobal->item.asArray.value );
-   }
-   else if( pGlobal->type == HB_IT_BLOCK )
-   {
-      hb_gcLock( pGlobal->item.asBlock.value );
-   }
-}
-
-void hb_vmGlobalUnlock( PHB_ITEM pGlobal )
-{
-   if( pGlobal->type == HB_IT_ARRAY )
-   {
-      hb_gcUnlock( pGlobal->item.asArray.value );
-   }
-   else if( pGlobal->type == HB_IT_BLOCK )
-   {
-      hb_gcUnlock( pGlobal->item.asBlock.value );
-   }
 }
 
 static void hb_vmPushLocalByRef( SHORT iLocal )
@@ -5126,6 +5147,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    /* we store its stack offset instead of a pointer to support a dynamic stack */
    pTop->item.asRefer.value = iLocal;
    pTop->item.asRefer.offset = hb_stackBaseOffset();
+   pTop->item.asRefer.bNeedLock = FALSE;
 
    if( iLocal >= 0 )
    {
@@ -5164,7 +5186,7 @@ static void hb_vmPushStatic( USHORT uiStatic )
 
    if( HB_IS_BYREF( pStatic ) )
    {
-      hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pStatic ) );
+      hb_itemCopy( ( * hb_stack.pPos ), hb_itemUnRef( pStatic, NULL ) );
    }
    else
    {
@@ -5198,6 +5220,8 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    pTop->item.asRefer.value = hb_stack.iStatics + uiStatic - 1;
    pTop->item.asRefer.offset = 0;    /* 0 for static variables */
    pTop->item.asRefer.BasePtr.itemsbase = &s_aStatics.item.asArray.value->pItems;
+   pTop->item.asRefer.bNeedLock = TRUE;
+
    hb_stackPush();
 }
 
@@ -5460,6 +5484,7 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
 static void hb_vmPopLocal( SHORT iLocal )
 {
    PHB_ITEM pLocal, pVal;
+   BOOL bNeedLock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopLocal(%hd)", iLocal));
 
@@ -5478,11 +5503,11 @@ static void hb_vmPopLocal( SHORT iLocal )
       /* Assigned to a parameter by refrence. */
       if( HB_IS_BYREF( pLocal ) )
       {
-         hb_itemForwardValue( hb_itemUnRef( pLocal ), pVal );
+         pLocal = hb_itemUnRef( pLocal, &bNeedLock );
       }
       else
       {
-         hb_itemForwardValue( pLocal, pVal );
+         bNeedLock = FALSE;
       }
    }
    else
@@ -5490,9 +5515,19 @@ static void hb_vmPopLocal( SHORT iLocal )
       /* local variable referenced in a codeblock
        * hb_stackSelfItem() points to a codeblock that is currently evaluated
        */
-      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
+      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal, &bNeedLock ) ;
+   }
 
-      hb_itemForwardValue( pLocal, pVal );
+   if( bNeedLock )
+   {
+      HB_ITEM_UNLOCK( pLocal );
+   }
+
+   hb_itemForwardValue( pLocal, pVal );
+
+   if( bNeedLock )
+   {
+      HB_ITEM_LOCK( pLocal );
    }
 }
 
@@ -5511,14 +5546,11 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    pStatic = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
 
-   if( HB_IS_BYREF( pStatic ) )
-   {
-      hb_itemForwardValue( hb_itemUnRef( pStatic ), pVal );
-   }
-   else
-   {
-      hb_itemForwardValue( pStatic, pVal );
-   }
+   HB_ITEM_UNLOCK( pStatic );
+
+   hb_itemForwardValue( pStatic, pVal );
+
+   HB_ITEM_LOCK( pStatic );
 }
 
 /* ----------------------------------------------- */

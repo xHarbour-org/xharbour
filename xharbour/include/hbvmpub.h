@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.3 2002/09/19 01:57:42 ronpinkas Exp $
  */
 
 /*
@@ -167,6 +167,7 @@ struct hb_struRefer
    } BasePtr;
    LONG offset;    /* 0 for static variables */
    LONG value;
+   BOOL bNeedLock;
 };
 
 struct hb_struString

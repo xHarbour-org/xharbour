@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.19 2002/08/08 19:36:08 ronpinkas Exp $
+ * $Id: arrays.c,v 1.20 2002/08/24 01:48:13 ronpinkas Exp $
  */
 
 /*
@@ -326,7 +326,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
    {
       if( HB_IS_BYREF( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ) )
       {
-         hb_itemCopy( hb_itemUnRef( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ), pItem );
+         hb_itemCopy( hb_itemUnRef( pArray->item.asArray.value->pItems + ( ulIndex - 1 ), NULL ), pItem );
       }
       else
       {
@@ -341,7 +341,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
 BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p)", pArray, ulIndex, pItem));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.13 2002/07/05 19:53:30 ronpinkas Exp $
+ * $Id: memvars.c,v 1.14 2002/08/28 21:29:00 ronpinkas Exp $
  */
 
 /*
@@ -464,7 +464,21 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
 
          if( HB_IS_BYREF( pSetItem ) )
          {
-            hb_itemCopy( hb_itemUnRef( pSetItem ), pItem );
+            BOOL bNeedLock;
+
+            pSetItem = hb_itemUnRef( pSetItem, &bNeedLock );
+
+            if( bNeedLock )
+            {
+               HB_ITEM_UNLOCK( pSetItem );
+            }
+
+            hb_itemCopy( pSetItem, pItem );
+
+            if( bNeedLock )
+            {
+               HB_ITEM_LOCK( pSetItem );
+            }
          }
          else
          {
@@ -504,9 +518,10 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          /* value is already created
           */
          HB_ITEM_PTR pGetItem = &s_globalTable[ pDyn->hMemvar ].item;
+
          if( HB_IS_BYREF( pGetItem ) )
          {
-            hb_itemCopy( pItem, hb_itemUnRef( pGetItem ) );
+            hb_itemCopy( pItem, hb_itemUnRef( pGetItem, NULL ) );
          }
          else
          {
@@ -655,7 +670,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
 
          if( HB_IS_BYREF( pItem ) )
          {
-            pItem = hb_itemUnRef( pItem );   /* it is a PARAMETER variable */
+            pItem = hb_itemUnRef( pItem, NULL );   /* it is a PARAMETER variable */
          }
 
          if( HB_IS_STRING( pItem ) )

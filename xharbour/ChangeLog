@@ -8,29 +8,48 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-09-20 21:10 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
-  * include/hbapigt.h
-  * source/rtl/console.c
-  * source/rtl/gtapi.c
-  * source/rtl/gtcgi/gtcgi.c
-  * source/rtl/gtcrs/gtcrs.c
-  * source/rtl/gtdos/gtdos.c
-  * source/rtl/gtos2/gtos2.c
-  * source/rtl/gtpca/gtpca.c
-  * source/rtl/gtstd/gtstd.c
-  * source/rtl/gtwin/gtwin.c
-    * Fixed long waiting problem with OutStd()/OutErr()
-      (gt layer can now track OutStd()/OutErr() usage)
-      
-  * source/rtl/gtsln/gtsln.c
-  * source/rtl/gtsln/gtsln.h
-  * source/rtl/gtsln/keytrans.c
-    * Fixed problem with OutStd()/OutErr() redirected
-        to a file (MANY THANKS for Przemyslaw Czerpak 
-        for detailed information on how to do that)
-    * Fixed long waiting problem with OutStd()/OutErr()
-        (gt layer can now track OutStd()/OutErr() usage)
-    * Fixed broken logic in gtsln keyboard handling 
+2002-09-20 12:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Changed hb_vmGlobalLock() to a macro HB_ITEM_LOCK()
+    * Changed hb_vmGlobalUnlock() to a macro HB_ITEM_UNLOCK()
+
+  * include/hbvmpub.h
+    + Added member bNeedLock to hb_struRefer
+
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+    * Changed hb_itemUnRef() to accept 2nd paramater pointer to BOOL.
+
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/extend.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * tests/pp_harb.ch
+    * Changed all hb_itemUnRef() calls to pass 2nd paramater pointer to BOOL, or NULL.
+
+  * source/vm/memvars.c
+  * source/vm/hvm.c
+    + Added logic to HB_ITEM_UNLOCK given STATIC and GLOBAL just before assignment, and HB_ITEM_LOCK just after assignment.
+    + Added logic to HB_ITEM_UNLOCK given VAR just before assignment, and HB_ITEM_LOCK just after assignment -
+      if VAR the De-Refernce VAR is a GLOBAL or STATIC.
+
+  * source/vm/hvm.c
+    + Added logic to mark a variables pushed by refernce asRefer.bNeedLock as TRUE for GLOBALs and STATICs and FALSE for LOCALs
+      /* MEMVARs don't use asRefer. */
+    + Added LOCK to s_aStatics.
+    + Added UNLOCK to all s_aStatics elements in hb_vmQuit().
+
+  * source/vm/garbage.c
+    - Removed hb_vmIsStaticRef() from sweep scan, since STATIC should no longer require garbage collection.
+
+  /*
+     NOTE: Garbage collection should be much faster, and thus applications which have frequent calls to HB_GCALL()
+           (like FWH) should be noticably faster after this change. I tested heavily, but will appreciate extensive
+           testing, [and reports] from everyone.
+   */
 
 2002-09-19 18:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/tbrowse.prg
@@ -160,6 +179,37 @@
     * Modified to demonstrate sharing and usage of GLOBAL variables from C code.
 
 2002-09-16 11:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.vc
+    + Added /FORCE:MULTIPLE to switches used to build hbmake.exe to overcome link error.
+
+  * bin/bld.bat
+    + Added 2nd prg support to MSVC, and corrected typo.
+
+  * source/compiler/genc.c
+  * source/pp/ppcore.c
+    + Added missing ; required by MSVC.
+
+  * source/rdd/dbfcdx/dbfcdx1.c
+    + Added type casts required by MSVC.
+
+2002-09-15 22:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * include/hbpcode.h
+  * source/vm/hvm.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/compiler/harbour.c
+    + Added support for new HB_P_PUSHGLOBAL and HB_P_POPGLOBAL.
+
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for new syntax:
+      GLOBAL <Var> [ := <exp> ] [,...]
+      GLOBAL <Array> \[ <length>\] [,...]
+      GLOBAL EXTERNAL <Var> [,...]
+
+:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.vc
     + Added /FORCE:MULTIPLE to switches used to build hbmake.exe to overcome link error.
 

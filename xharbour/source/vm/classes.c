@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.18 2002/07/30 06:59:58 ronpinkas Exp $
+ * $Id: classes.c,v 1.19 2002/07/30 16:24:43 ronpinkas Exp $
  */
 
 /*
@@ -2221,10 +2221,14 @@ static HARBOUR hb___msgClsParent( void )
    USHORT uiClass, i;
    BOOL lClass=FALSE;
 
-   if( HB_IS_BYREF( hb_stackSelfItem() ) )            /* Variables by reference   */
-      pItemRef = hb_itemUnRef( hb_stackSelfItem() );
+   if( HB_IS_BYREF( hb_stackSelfItem() ) ) // Is it possible?
+   {
+      pItemRef = hb_itemUnRef( hb_stackSelfItem(), NULL );
+   }
    else
+   {
       pItemRef = hb_stackSelfItem();
+   }
 
    uiClass = pItemRef->item.asArray.value->uiClass;
 
@@ -2257,8 +2261,10 @@ static HARBOUR hb___msgClsName( void )
 {
    PHB_ITEM pItemRef = hb_stackSelfItem();
 
-   if( HB_IS_BYREF( pItemRef ) )            /* Variables by reference   */
-      pItemRef = hb_itemUnRef( pItemRef );
+   if( HB_IS_BYREF( pItemRef ) ) // Is it possible?
+   {
+      pItemRef = hb_itemUnRef( pItemRef, NULL );
+   }
 
    hb_retc( hb_objGetClsName( pItemRef ) );
 }
@@ -2288,10 +2294,13 @@ static HARBOUR hb___msgClsSel( void )
     }
 
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
-   {                                            /* Variables by reference   */
-      PHB_ITEM pItemRef = hb_itemUnRef( pSelf );
+   {
+      PHB_ITEM pItemRef = hb_itemUnRef( pSelf, NULL ); // Is it possible?
+
       if( HB_IS_ARRAY( pItemRef ) )
+      {
          uiClass = pItemRef->item.asArray.value->uiClass;
+      }
    }
 
    if( uiClass && uiClass <= s_uiClasses )

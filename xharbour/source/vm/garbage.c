@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.19 2002/09/17 05:51:42 ronpinkas Exp $
+ * $Id: garbage.c,v 1.20 2002/09/17 22:28:48 ronpinkas Exp $
  */
 
 /*
@@ -180,6 +180,9 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       pAlloc->pFunc  = pCleanupFunc;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
+
+      HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
+
       return (void *)( pAlloc + 1 );   /* hide the internal data */
    }
    else
@@ -206,6 +209,7 @@ void hb_gcFree( void *pBlock )
 
       if( pAlloc->locked )
       {
+         HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p) *LOCKED* %p", pBlock, pAlloc ) );
          hb_gcUnlink( &s_pLockedBlock, pAlloc );
          HB_GARBAGE_FREE( pAlloc );
       }
@@ -361,7 +365,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    if( HB_IS_BYREF( pItem ) )
    {
-      pItem = hb_itemUnRef( pItem );
+      pItem = hb_itemUnRef( pItem, NULL );
    }
 
    if( HB_IS_POINTER( pItem ) )
@@ -473,7 +477,10 @@ void hb_gcCollectAll( void )
       hb_vmIsLocalRef();
       //printf( "After LocalRef\n" );
 
-      hb_vmIsStaticRef();
+      /*-----------------9/19/2002 6:16PM-----------------
+       * Statics are now Locked on each assignment, and thus can be excluded.
+       * --------------------------------------------------*/
+      //hb_vmIsStaticRef();
       //printf( "After StaticRef\n" );
 
       hb_memvarsIsMemvarRef();
@@ -484,13 +491,6 @@ void hb_gcCollectAll( void )
 
       hb_clsIsClassRef();
       //printf( "After ClassRef\n" );
-
-      /*
-      for( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
-      {
-         hb_gcItemRef( (*hb_vm_pGlobals)[ iGlobal ] );
-      }
-      */
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
