@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.80 2004/03/10 19:16:52 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.81 2004/03/15 16:52:17 vouchcac Exp $
  */
 
 /*
@@ -1436,7 +1436,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
 
 static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidth )
 {
-//  HDC        hdc;
+  HDC        hdc;
   HFONT      hOldFont ;
   USHORT     width, height, maxWidth, maxHeight;
   TEXTMETRIC tm;
@@ -1447,11 +1447,11 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
   maxWidth  = (SHORT) ( rcWorkArea.right - rcWorkArea.left );
   maxHeight = (SHORT) ( rcWorkArea.bottom - rcWorkArea.top );
 
-//  hdc       = GetDC( _s.hWnd );
-  hOldFont  = ( HFONT ) SelectObject( _s.hdc, hFont );
-  GetTextMetrics( _s.hdc, &tm );
-  SelectObject( _s.hdc, hOldFont ); // Put old font back
-//  ReleaseDC( _s.hWnd, hdc );
+  hdc       = GetDC( _s.hWnd );
+  hOldFont  = ( HFONT ) SelectObject( hdc, hFont );
+  GetTextMetrics( hdc, &tm );
+  SelectObject( hdc, hOldFont ); // Put old font back
+  ReleaseDC( _s.hWnd, hdc );
 
   width     = iWidth < 0 ? -iWidth : tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
   height    = tm.tmHeight * rows;         // Total pixel height this setting would take
@@ -1463,7 +1463,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
 
 static void hb_wvt_gtResetWindowSize( HWND hWnd )
 {
-//  HDC        hdc;
+  HDC        hdc;
   HFONT      hFont, hOldFont ;
   USHORT     diffWidth, diffHeight;
   USHORT     height, width;
@@ -1476,17 +1476,17 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   // set the font and get it's size to determine the size of the client area
   // for the required number of rows and columns
   //
-//  hdc      = GetDC( hWnd );
+  hdc      = GetDC( hWnd );
   hFont    = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
   _s.hFont = hFont ;
-  hOldFont = ( HFONT ) SelectObject( _s.hdc, hFont );
+  hOldFont = ( HFONT ) SelectObject( hdc, hFont );
   if ( hOldFont )
   {
     DeleteObject( hOldFont );
   }
-  GetTextMetrics( _s.hdc, &tm );
-  SetTextCharacterExtra( _s.hdc,0 ); // do not add extra char spacing even if bold
-//  ReleaseDC( hWnd, hdc );
+  GetTextMetrics( hdc, &tm );
+  SetTextCharacterExtra( hdc,0 ); // do not add extra char spacing even if bold
+  ReleaseDC( hWnd, hdc );
 
   // we will need to use the font size to handle the transformations from
   // row column space in the future, so we keep it around in a static!
