@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.460 2002/10/23 01:50:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.461 2002/10/24 17:59:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-24 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added support for HB_NO_DEFAULT_API_MACROS
+  * include/hbstack.h
+    + Added support for HB_NO_DEFAULT_STACK_MACROS
+
+  - tests/dll.mak
+    - Removed.
+
+  + tests/dll_b32.bat
+  + tests/dll_b32.mak
+    + Added standard files for creating BCC32 version of xharbour R/T dll [Thanks to Andi].
+
+  * tests/pp_harb.ch
+    * Removed direct access to hb_stack.
 
 2002-10-24 10:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.39 2002/10/09 20:42:58 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.41 2002/10/15 17:02:25 mlombardo Exp $
  */
 
 /*
@@ -171,7 +171,9 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
 #define hb_retc_const( szText )                    hb_retcStatic( szText )
 
-#define HB_API_MACROS
+#ifndef HB_NO_DEFAULT_API_MACROS
+   #define HB_API_MACROS
+#endif
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"

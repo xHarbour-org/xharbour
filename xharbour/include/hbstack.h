@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.2 2002/01/21 23:42:31 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.3 2002/10/19 01:22:38 ronpinkas Exp $
  */
 
 /*
@@ -85,28 +85,28 @@ typedef struct
    LONG iStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
-#if 1 //defined(HB_STACK_MACROS)
+#ifndef HB_NO_DEFAULT_STACK_MACROS
+  #define HB_STACK_MACROS
+#endif
 
-#define hb_stackItemFromTop( n )    ( * ( hb_stack.pPos + (n) ) )
-#define hb_stackItemFromBase( n )   ( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 ? *( hb_stack.pBase + (n) + 1 ) : *( hb_stack.pBase + (n) + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
-#define hb_stackTopOffset( )        ( hb_stack.pPos - hb_stack.pItems )
-#define hb_stackBaseOffset( )       ( hb_stack.pBase - hb_stack.pItems + 1)
-#define hb_stackTopItem( )          ( * hb_stack.pPos )
-#define hb_stackBaseItem( )         ( * hb_stack.pBase )
-#define hb_stackSelfItem( )         ( * ( hb_stack.pBase + 1 ) )
-#define hb_stackItem( iItemPos )    ( * ( hb_stack.pItems + iItemPos ) )
-
+#ifdef HB_STACK_MACROS
+    #define hb_stackItemFromTop( n )    ( * ( hb_stack.pPos + (n) ) )
+    #define hb_stackItemFromBase( n )   ( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 ? *( hb_stack.pBase + (n) + 1 ) : *( hb_stack.pBase + (n) + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
+    #define hb_stackTopOffset( )        ( hb_stack.pPos - hb_stack.pItems )
+    #define hb_stackBaseOffset( )       ( hb_stack.pBase - hb_stack.pItems + 1)
+    #define hb_stackTopItem( )          ( * hb_stack.pPos )
+    #define hb_stackBaseItem( )         ( * hb_stack.pBase )
+    #define hb_stackSelfItem( )         ( * ( hb_stack.pBase + 1 ) )
+    #define hb_stackItem( iItemPos )    ( * ( hb_stack.pItems + iItemPos ) )
 #else
-
-extern HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
-extern HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
-extern LONG hb_stackTopOffset( void );
-extern LONG hb_stackBaseOffset( void );
-extern HB_ITEM_PTR hb_stackTopItem( void );
-extern HB_ITEM_PTR hb_stackBaseItem( void );
-extern HB_ITEM_PTR hb_stackSelfItem( void );
-extern HB_ITEM_PTR hb_stackItem( LONG iItemPos );
-
+    extern HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
+    extern HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
+    extern LONG hb_stackTopOffset( void );
+    extern LONG hb_stackBaseOffset( void );
+    extern HB_ITEM_PTR hb_stackTopItem( void );
+    extern HB_ITEM_PTR hb_stackBaseItem( void );
+    extern HB_ITEM_PTR hb_stackSelfItem( void );
+    extern HB_ITEM_PTR hb_stackItem( LONG iItemPos );
 #endif
 
 extern void hb_stackRemove( LONG lUntilPos );

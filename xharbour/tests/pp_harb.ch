@@ -673,7 +673,7 @@
 
          if( i > 0 )
          {
-            if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
+            if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
             {
                hb_itemPutCPtr( pLine, hb_strdup( pLine->item.asString.value + i ), iLen - i );
             }
@@ -682,9 +682,9 @@
          pTmp = ( char * ) hb_xgrab( i + 1 );
          memset( pTmp, ' ', i );
 
-         if( HB_IS_BYREF( * ( hb_stack.pBase + 2 + 1 ) ) )
+         if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
          {
-            PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ) );
+            PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
             hb_itemPutCL( pWS, pTmp, i );
          }
 
@@ -723,14 +723,14 @@
             pString[i] = '\0';
          }
 
-         if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
+         if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
          {
             hb_itemPutCL( pLine, pString, i );
          }
 
-         if( HB_IS_BYREF( * ( hb_stack.pBase + 2 + 1 ) ) )
+         if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
          {
-            PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ) );
+            PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
             char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
             memset( pTmp, ' ', iLen - i );
@@ -772,7 +772,7 @@
             pString[i] = '\0';
          }
 
-         if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
+         if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
          {
             hb_itemPutCL( pLine, pString, i );
          }
