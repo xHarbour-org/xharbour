@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.3 2004/01/22 01:01:46 maurifull Exp $
+ * $Id: ssf.h,v 1.4 2004/01/22 02:58:01 maurifull Exp $
  */
 
 /*
@@ -62,6 +62,117 @@
 
 #include <allegro.h>
 
+// Hack to use old Allegro branches
+#ifndef AL_GFX_NONE
+#define AL_GFX_NONE GFX_NONE
+#define AL_GFX_SAFE GFX_SAFE
+#define AL_GFX_XDGA GFX_XDGA
+#define AL_GFX_XDGA2 GFX_XDGA2
+#define AL_GFX_XWINDOWS GFX_XWINDOWS
+#define AL_GFX_VBEAF GFX_VBEAF
+#define AL_GFX_FBCON GFX_FBCON
+#define AL_GFX_AUTODETECT_WINDOWED GFX_AUTODETECT_WINDOWED
+#define AL_GFX_AUTODETECT GFX_AUTODETECT
+#ifdef GFX_GDI
+#define AL_GFX_GDI GFX_GDI
+#define AL_GFX_DIRECTX_WIN GFX_DIRECTX_WIN
+#endif
+#define AL_BITMAP BITMAP
+#define AL_SCREEN_W SCREEN_W
+#define AL_SCREEN_H SCREEN_H
+#define AL_KEY_ESC KEY_ESC
+#define AL_KEY_INSERT KEY_INSERT
+#define AL_KEY_HOME KEY_HOME
+#define AL_KEY_PGUP KEY_PGUP
+#define AL_KEY_PGDN KEY_PGDN
+#define AL_KEY_END KEY_END
+#define AL_KEY_DEL KEY_DEL
+#define AL_KEY_UP KEY_UP
+#define AL_KEY_DOWN KEY_DOWN
+#define AL_KEY_LEFT KEY_LEFT
+#define AL_KEY_RIGHT KEY_RIGHT
+#define AL_KEY_A KEY_A
+#define AL_KEY_B KEY_B
+#define AL_KEY_C KEY_C
+#define AL_KEY_D KEY_D
+#define AL_KEY_E KEY_E
+#define AL_KEY_F KEY_F
+#define AL_KEY_G KEY_G
+#define AL_KEY_H KEY_H
+#define AL_KEY_I KEY_I
+#define AL_KEY_J KEY_J
+#define AL_KEY_K KEY_K
+#define AL_KEY_L KEY_L
+#define AL_KEY_M KEY_M
+#define AL_KEY_N KEY_N
+#define AL_KEY_O KEY_O
+#define AL_KEY_P KEY_P
+#define AL_KEY_Q KEY_Q
+#define AL_KEY_R KEY_R
+#define AL_KEY_S KEY_S
+#define AL_KEY_T KEY_T
+#define AL_KEY_U KEY_U
+#define AL_KEY_V KEY_V
+#define AL_KEY_W KEY_W
+#define AL_KEY_X KEY_X
+#define AL_KEY_Y KEY_Y
+#define AL_KEY_Z KEY_Z
+#define AL_KEY_F1 KEY_F1
+#define AL_KEY_F2 KEY_F2
+#define AL_KEY_F3 KEY_F3
+#define AL_KEY_F4 KEY_F4
+#define AL_KEY_F5 KEY_F5
+#define AL_KEY_F6 KEY_F6
+#define AL_KEY_F7 KEY_F7
+#define AL_KEY_F8 KEY_F8
+#define AL_KEY_F9 KEY_F9
+#define AL_KEY_F10 KEY_F10
+#define AL_KEY_F11 KEY_F11
+#define AL_KEY_F12 KEY_F12
+#define al_desktop_color_depth desktop_color_depth
+#define al_set_color_depth set_color_depth
+#define al_install_timer install_timer
+#define al_screen screen
+#define al_set_gfx_mode set_gfx_mode
+#define al_set_window_title set_window_title
+#define al_text_mode text_mode
+#define al_make_color makecol
+#define al_install_keyboard install_keyboard
+#define al_keyboard_needs_poll keyboard_needs_poll
+#define al_poll_keyboard poll_keyboard
+#define al_key_pressed keypressed
+#define al_read_key readkey
+#define al_install_mouse install_mouse
+#define al_show_mouse show_mouse
+#define al_mouse_needs_poll mouse_needs_poll
+#define al_poll_mouse poll_mouse
+#define al_mouse_x mouse_x
+#define al_mouse_y mouse_y
+#define al_mouse_b mouse_b
+#define al_scare_mouse scare_mouse
+#define al_scare_mouse_area scare_mouse_area
+#define al_unscare_mouse unscare_mouse
+#define al_position_mouse position_mouse
+#define al_set_mouse_range set_mouse_range
+#define al_create_bitmap create_bitmap
+#define al_create_system_bitmap create_system_bitmap
+#define al_destroy_bitmap destroy_bitmap
+#define al_acquire_screen acquire_screen
+#define al_release_screen release_screen
+#define al_acquire_bitmap acquire_bitmap
+#define al_release_bitmap release_bitmap
+#define al_drawing_mode drawing_mode
+#define al_put_pixel putpixel
+#define al_draw_line line
+#define al_draw_rect rect
+#define al_draw_rect_fill rectfill
+#define al_draw_spline spline
+#define al_draw_circle circle
+#define al_draw_circle_fill circlefill
+#define al_draw_triangle triangle
+#define al_blit blit
+#endif
+
 typedef enum {
     SSF_NONE,
     SSF_LINE,
@@ -99,6 +210,7 @@ typedef struct _ssfFont {
 extern ssfFont *ssfDefaultFont;
 
 void ssfSetFontSize(ssfFont *sfont, unsigned short fsize);
-char ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color);
+unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color);
+int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color);
 
 #endif  // _SSF_H_

@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.c,v 1.2 2004/01/22 01:01:46 maurifull Exp $
+ * $Id: ssf.c,v 1.3 2004/01/22 02:58:01 maurifull Exp $
  */
 
 /*
@@ -80,9 +80,8 @@ void ssfSetFontSize(ssfFont *sfont, unsigned short fsize)
 #define fRight2 points[6]
 #define fBottom2 points[7]
 
-char ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color)
+unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color)
 {
-char cRet = 0;
 unsigned char p;
 int i, j, thick;
 ssfGlyph charGlyph;
@@ -188,8 +187,18 @@ float fScale;
 	}
     }
 
-    if (charGlyph.num != 0)
-	cRet = 1;
+    return (sfont->fsize / 2);
+}
 
-    return cRet;    
+int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color)
+{
+int i = 0;
+
+    while ( s[i] )
+    {
+	x += ssfDrawChar(dst, sfont, s[i], x, y, color);
+	i++;
+    }
+
+    return x;
 }

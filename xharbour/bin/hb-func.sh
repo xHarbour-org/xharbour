@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.8 2003/12/30 22:59:13 druzus Exp $
+# $Id: hb-func.sh,v 1.9 2004/01/02 17:22:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -39,9 +39,14 @@ get_hbver()
 
 mk_hbgetlibs()
 {
+    HB_GT_ALLEG=""
+    if [ "${HB_GTALLEG}" = "yes" ]; then
+	HB_GT_ALLEG=gtalleg
+    fi
+    export HB_GT_ALLEG
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtxvt gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtxvt ${HB_GT_ALLEG} gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
     else
         echo -n "$@"
     fi
@@ -73,12 +78,17 @@ mk_hbtools()
     [ -z "${_DEFAULT_INC_DIR}" ] && _DEFAULT_INC_DIR="${HB_INC_INSTALL}"
     [ -z "${_DEFAULT_LIB_DIR}" ] && _DEFAULT_LIB_DIR="${HB_LIB_INSTALL}"
 
+    HB_ALLEG_LIBS=""
+    if [ "${HB_GTALLEG}" = "yes" ]; then
+	HB_ALLEG_LIBS=`allegro-config --static`
+    fi
+    export HB_ALLEG_LIBS
     HB_SYS_LIBS="-lm"
     if [ "${HB_COMPILER}" = "mingw32" ]; then
 	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     else
         HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
-        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11 ${HB_ALLEG_LIBS}"
     fi
 
     cat > ${hb_tool} <<EOF
@@ -231,7 +241,11 @@ do
         [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     fi
 done
-HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+HB_ALLEG_LIBS=""
+if [ "\${HB_GTALLEG}" = "yes" ]; then
+    HB_ALLEG_LIBS=`allegro-config --static`
+fi
+HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} \${HB_ALLEG_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
 if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then

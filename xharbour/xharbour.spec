@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.49 2004/01/02 17:22:44 druzus Exp $
+# $Id: xharbour.spec,v 1.50 2004/01/05 21:17:56 ronpinkas Exp $
 #
 
 # ---------------------------------------------------------------
@@ -329,10 +329,15 @@ install -m644 rp_dot.src $HB_INC_INSTALL/
 install -m644 rp_run.src $HB_INC_INSTALL/
 popd
 
+if [ "${HB_GTALLEG}" = yes ]
+then
+    export HB_ALLEG_LIBS=`allegro-config --static`
+fi
+
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 ${HB_ALLEG_LIBS}"
     for utl in hbmake hbrun hbpp hbdoc
     do
         pushd utils/${utl}

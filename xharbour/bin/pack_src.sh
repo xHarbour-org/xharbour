@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.2 2003/12/21 21:31:52 druzus Exp $
+# $Id: pack_src.sh,v 1.3 2003/12/30 22:59:13 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -191,6 +191,12 @@ $hb_collect source/rtl/gtwvt/*.h
 $hb_collect source/rtl/gtxvt/Makefile
 $hb_collect source/rtl/gtxvt/*.c
 $hb_collect source/rtl/gtxvt/*.h
+
+# SOURCE\RTL\GTALLEG
+$hb_collect source/rtl/gtalleg/Makefile
+$hb_collect source/rtl/gtalleg/*.c
+$hb_collect source/rtl/gtalleg/*.h
+$hb_collect source/rtl/gtalleg/*.sfc
 
 # SOURCE\VM
 $hb_collect source/vm/Makefile

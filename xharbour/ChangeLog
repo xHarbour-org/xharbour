@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2162 2004/01/27 21:50:38 andijahja Exp $
+ * $Id: ChangeLog,v 1.2163 2004/01/28 01:54:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-28 1:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+    + Added defines to allow gtalleg & ssf to be compiled under 4.x Allegro branches
+  * source/rtl/gtalleg/ssf.c
+    + Added function to render strings
+  * source/rtl/gtalleg/fixedth.sfc
+    + Double box chars redirected to single ones by now, so apps don't miss their boxes (mixed boxed chars still does nothing)
+  * source/rtl/gtalleg/gtalleg.c
+    % Some speed improvements, mainly with static text
+    + Added support for recently introduced 'graphics objects' by Gian
+    ! Some fixes for mouse and keyboard events
+  * xharbour.spec
+  * config/linux/global.cf
+  * config/linux/gcc.cf
+  * bin/pack_src.sh
+  * bin/hb-func.sh
+    + Added gtAlleg compilation for Linux :)
 
 2004-01-27 17:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
