@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.h,v 1.1 2004/09/08 00:17:17 druzus Exp $
+ * $Id: gtxwc.h,v 1.2 2004/12/28 07:16:15 druzus Exp $
  */
 
 /*
@@ -88,6 +88,8 @@ typedef USHORT HB_GT_CELLTYPE;
 
 #define XVT_CHAR_QUEUE_SIZE         128
 #define XVT_CHAR_BUFFER            1024
+#define XVT_MIN_ROWS                  3
+#define XVT_MIN_COLS                  6
 #define XVT_MAX_ROWS                256
 #define XVT_MAX_COLS                256
 #define XVT_DEFAULT_ROWS             25

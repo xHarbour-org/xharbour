@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.138 2005/01/27 11:49:19 druzus Exp $
+ * $Id: filesys.c,v 1.139 2005/01/28 12:16:41 alexstrickland Exp $
  */
 
 /*
@@ -1916,7 +1916,16 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
       }
       else
       {
+#if defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+         /*
+          * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+          * define and efectively enables lseek64/flock64/ftruncate64 functions
+          * on 32bit machines.
+          */
+         hb_fsSetIOError( ftruncate64( hFileHandle, lseek64( hFileHandle, 0L, SEEK_CUR ) ) != -1, 0 );
+#else
          hb_fsSetIOError( ftruncate( hFileHandle, lseek( hFileHandle, 0L, SEEK_CUR ) ) != -1, 0 );
+#endif
          uiWritten = 0;
       }
 
@@ -2109,8 +2118,17 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
       #endif
       else
       {
-         ulWritten = 0;
+#if defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+         /*
+          * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+          * define and efectively enables lseek64/flock64/ftruncate64 functions
+          * on 32bit machines.
+          */
+         hb_fsSetIOError( ftruncate64( hFileHandle, lseek64( hFileHandle, 0L, SEEK_CUR ) ) != -1, 0 );
+#else
          hb_fsSetIOError( ftruncate( hFileHandle, lseek( hFileHandle, 0L, SEEK_CUR ) ) != -1, 0 );
+#endif
+         ulWritten = 0;
       }
 
       HB_DISABLE_ASYN_CANC
@@ -2513,8 +2531,8 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
 #elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
-    * define and efectively enables lseek64/flock64 functions on 32bit
-    * machines.
+    * define and efectively enables lseek64/flock64/ftruncate64 functions
+    * on 32bit machines.
     */
    {
       HB_THREAD_STUB
@@ -2710,8 +2728,8 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
 #elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
-    * define and efectively enables lseek64/flock64 functions on 32bit
-    * machines.
+    * define and efectively enables lseek64/flock64/ftruncate64 functions
+    * on 32bit machines.
     */
    {
       HB_THREAD_STUB

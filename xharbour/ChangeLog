@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3795 2005/02/04 19:04:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.3796 2005/02/06 15:52:01 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,68 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-06 21:06 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * use hb_fsSeekLarge() instead of hb_fsSeek() - for long file
+      support (over 2GB)
+
+  * xharbour/source/rtl/filesys.c
+    * hb_fsWrite() and hb_fsWriteLarge() with 0 length buffer (which
+      means truncate file at current position) should use long file
+      (64 bit) API - for HB_WIN32_IO SetEndOfFile is used so it should
+      work without any modifications.
+
+   The following program should create 6GB DBF file - I tested it in
+   Linux - please make some tests with HB_WIN32_IO
+
+      #define REC_SIZE     ( 256 * 128)         // 32KB
+      #define TOTAL_SIZE   ( ( 2 ^ 30 ) * 6 )   //  6GB
+      request dbfcdx
+      field F1
+      proc main(xOpt,xDel)
+      local nSize:=0, nTotSize:=TOTAL_SIZE, nRecSize:=REC_SIZE
+      rddsetdefault("DBFCDX")
+      dbcreate('temp',{{'F1','C',REC_SIZE-1,0}})
+      ? nTotSize
+      use temp
+      while nSize < nTotSize
+         dbappend()
+         F1 := str( recno(), 10 )
+         nSize += nRecSize
+      enddo
+      ? "Total DBF size: ", recSize() * lastRec() + header() + 1
+      ? "#records: ", lastRec()
+      dbGoto( lastRec() - 1 )
+      ? "recno: ", recno(), "F1->", left(F1,10)
+      dbSkip(-10)
+      ? "recno: ", recno(), "F1->", left(F1,10)
+      dbGoto( 1 )
+      ? "recno: ", recno(), "F1->", left(F1,10)
+      dbSkip( lastRec() - 5 )
+      ? "recno: ", recno(), "F1->", left(F1,10)
+      inkey(0)
+      close
+      return
+
+   Now the DBF size in xHarbour is limited by number of records (2^31)
+   if platform supports long files.
+   The DBT size is 2^41 = 2TB. The FPT size is 2^32*memo_block_size
+   (by default - 64-bytes blocks - it's 2^38 = 256MB - unfortunately
+   the GC pages uses real 32bit offsets not the block number so it will
+   not work over 4GB. I will have to design new one which will not be
+   CL5.3/Flex compatible. GC is used for reusing freed blocks.
+   The CDX is is limited to 4GB and it cannot be changed without breaking
+   compatibility with CDX format. I do not think it's a big problem because
+   CDXes are compressed so 4GB seems to be big enough in most cases.
+   Anyhow I can add compilation switch which move this limit to 2TB
+   but created indexes will not be compatible.
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/rtl/gtxwc/gtxwc.h
+    ! fixed setmode()
 
 2005-02-06 16:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   - contrib/gtwvt

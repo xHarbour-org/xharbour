@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.180 2005/02/01 20:43:58 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.181 2005/02/04 01:11:55 druzus Exp $
  */
 
 /*
@@ -1065,7 +1065,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
       }
       else
       {
-         if ( hb_fsSeek( hFile, ulPos, FS_SET ) != ulPos ||
+         if ( hb_fsSeekLarge( hFile, ulPos, FS_SET ) != ( HB_FOFFSET ) ulPos ||
               hb_fsRead( hFile, (BYTE *) byBuf, 4 ) != 4 )
             hb_errInternal( EDBF_READ, "hb_cdxIndexGetAvailPage: Read index page failed.", "", "" );
          pIndex->freePage = HB_GET_LE_UINT32( byBuf );
@@ -1081,7 +1081,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
       if ( pIndex->nextAvail != CDX_DUMMYNODE )
          ulPos = pIndex->nextAvail;
       else
-         ulPos = hb_fsSeek( hFile, 0, FS_END );
+         ulPos = ( ULONG ) hb_fsSeekLarge( hFile, 0, FS_END );
       pIndex->nextAvail = ulPos + iCnt * CDX_PAGELEN;
 
       /* TODO: ### */
@@ -1089,7 +1089,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
       {
          BYTE byBuf[CDX_PAGELEN];
          memset( byBuf, 0, CDX_PAGELEN );
-         if ( hb_fsSeek( hFile, ulPos, FS_SET ) != ulPos )
+         if ( hb_fsSeekLarge( hFile, ulPos, FS_SET ) != ( HB_FOFFSET ) ulPos )
             hb_errInternal( EDBF_WRITE, "Write in index page failed.(1)", "", "" );
          while ( iCnt-- )
          {
@@ -1149,7 +1149,7 @@ static void hb_cdxIndexFlushAvailPage( LPCDXINDEX pIndex )
    while ( pLst && pLst->fStat )
    {
       HB_PUT_LE_UINT32( byPageBuf, pLst->ulAddr );
-      if ( hb_fsSeek( pIndex->hFile, ulPos, FS_SET ) != ulPos ||
+      if ( hb_fsSeekLarge( pIndex->hFile, ulPos, FS_SET ) != ( HB_FOFFSET ) ulPos ||
            hb_fsWrite( pIndex->hFile, byPageBuf, CDX_PAGELEN ) != CDX_PAGELEN )
       {
          hb_errInternal( EDBF_WRITE, "Write in index page failed.", "", "" );
@@ -1190,7 +1190,7 @@ static void hb_cdxIndexPageWrite( LPCDXINDEX pIndex, ULONG ulPos, BYTE * pBuffer
    if ( pIndex->fShared && !pIndex->lockWrite )
       hb_errInternal( 9102, "hb_cdxIndexPageWrite on not locked index file.", "", "" );
 
-   if ( hb_fsSeek( pIndex->hFile, ulPos, FS_SET ) != ulPos ||
+   if ( hb_fsSeekLarge( pIndex->hFile, ulPos, FS_SET ) != ( HB_FOFFSET ) ulPos ||
         hb_fsWrite( pIndex->hFile, pBuffer, uiSize ) != uiSize )
       hb_errInternal( EDBF_WRITE, "Write in index page failed.", "", "" );
    pIndex->fChanged = TRUE;
@@ -1208,7 +1208,7 @@ static void hb_cdxIndexPageRead( LPCDXINDEX pIndex, ULONG ulPos, BYTE * pBuffer,
    if ( pIndex->fShared && !( pIndex->lockRead || pIndex->lockWrite ) )
       hb_errInternal( 9103, "hb_cdxIndexPageRead on not locked index file.", "", "" );
 
-   if ( hb_fsSeek( pIndex->hFile, ulPos, FS_SET ) != ulPos ||
+   if ( hb_fsSeekLarge( pIndex->hFile, ulPos, FS_SET ) != ( HB_FOFFSET ) ulPos ||
         hb_fsRead( pIndex->hFile, pBuffer, uiSize ) != uiSize )
       hb_errInternal( EDBF_READ, "hb_cdxIndexPageRead: Read index page failed.", "", "" );
 #ifdef HB_CDX_DBGUPDT
@@ -3449,7 +3449,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
     * invalid key value length
     */
    if ( pTag->RootBlock == 0 || pTag->RootBlock % CDX_PAGELEN != 0 ||
-        pTag->RootBlock >= hb_fsSeek( pTag->pIndex->hFile, 0, FS_END ) ||
+        ( HB_FOFFSET ) pTag->RootBlock >= hb_fsSeekLarge( pTag->pIndex->hFile, 0, FS_END ) ||
         HB_GET_LE_UINT16( pHeader.keySize ) > CDX_MAXKEY )
    {
       /* TODO: pTag->RootBlock = 0; || {internal,RT}Error ? */
@@ -6565,7 +6565,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
       else
       {
-         if ( hb_fsSeek( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) )
+         if ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) )
          {
             hb_fsClose( hFile );
             hFile = FS_ERROR;
@@ -6970,7 +6970,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       {
          /* TODO: check if index file is not corrupted */
          /* cut corrupted files */
-         fNewFile = ( hb_fsSeek( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
+         fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
       }
       if ( !fNewFile )
          hb_cdxIndexLoad( pIndex, szCpndTagName );

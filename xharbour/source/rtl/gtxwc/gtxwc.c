@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.8 2004/12/28 07:16:15 druzus Exp $
+ * $Id: gtxwc.c,v 1.9 2005/02/04 13:26:21 likewolf Exp $
  */
 
 /*
@@ -2780,7 +2780,7 @@ static BOOL hb_xvt_gtResize( PXWND_DEF wnd, USHORT cols, USHORT rows )
                XFreePixmap( wnd->dpy, wnd->pm );
             }
             wnd->pm = XCreatePixmap( wnd->dpy, wnd->window,
-                                     wnd->fontWidth * wnd->cols, wnd->fontHeight * wnd->rows,
+                                     wnd->width, wnd->height,
                                      DefaultDepth( wnd->dpy, DefaultScreen( wnd->dpy ) ) );
             wnd->drw = wnd->pm;
             XResizeWindow( wnd->dpy, wnd->window, wnd->width, wnd->height );
@@ -2837,11 +2837,13 @@ static PXWND_DEF hb_xvt_gtCreateWndDef( void )
    wnd->hostCDP = hb_cdp_page;
    wnd->cursorType = SC_NORMAL;
 
+   /* Window Title */
    pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
    wnd->szTitle = hb_strdup( pFileName->szName );
    wnd->fDspTitle = TRUE;
    hb_xfree( pFileName );
 
+   /* Font parameters */
    wnd->fontHeight = XVT_DEFAULT_FONT_HEIGHT;
    wnd->fontWidth = XVT_DEFAULT_FONT_WIDTH;
    wnd->szFontName = hb_strdup( XVT_DEFAULT_FONT_NAME );
@@ -2962,8 +2964,8 @@ static void hb_xvt_gtCreateWindow( PXWND_DEF wnd )
    blackColor = BlackPixel( wnd->dpy, DefaultScreen( wnd->dpy ) );
    wnd->window = XCreateSimpleWindow( wnd->dpy, DefaultRootWindow( wnd->dpy ),
                            0, 0,
-                           wnd->fontWidth * XVT_DEFAULT_COLS,
-                           wnd->fontHeight * XVT_DEFAULT_ROWS,
+                           wnd->fontWidth * wnd->cols,
+                           wnd->fontHeight * wnd->rows,
                            0, blackColor, blackColor );
    wnd->gc = XCreateGC( wnd->dpy, wnd->window, 0, NULL );
 
@@ -3002,8 +3004,8 @@ static void hb_xvt_gtCreateWindow( PXWND_DEF wnd )
    xsize.win_gravity = CenterGravity;
    xsize.width_inc = wnd->fontWidth;
    xsize.height_inc = wnd->fontHeight;
-   xsize.min_width = wnd->fontWidth * 6;
-   xsize.min_height = wnd->fontHeight * 3;
+   xsize.min_width = wnd->fontWidth * XVT_MIN_COLS;
+   xsize.min_height = wnd->fontHeight * XVT_MIN_ROWS;
    xsize.max_width = wnd->fontWidth * XVT_MAX_COLS;
    xsize.max_height = wnd->fontHeight * XVT_MAX_ROWS;
    xsize.base_width = wnd->width;
@@ -3443,10 +3445,17 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
 
    /* ignore stupid requests */
-   if ( col < 1 || row < 1 || col > XVT_MAX_COLS || row > XVT_MAX_ROWS ||
+   if ( col < XVT_MIN_COLS || row < XVT_MIN_ROWS || 
+        col > XVT_MAX_COLS || row > XVT_MAX_ROWS ||
         ( col == _GetScreenWidth() && row == _GetScreenHeight()) )
    {
       return FALSE;
+   }
+
+   if ( !s_wnd->fInit )
+   {
+      hb_xvt_gtSetScrBuff( s_wnd, col, row );
+      return TRUE;
    }
 
    oldrows = _GetScreenHeight()-1;
@@ -3466,13 +3475,13 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
       s_wnd->cols = col;
       s_wnd->rows = row;
 
-      if ( s_wnd->col >= _GetScreenWidth() )
+      if ( s_wnd->col >= col )
       {
-         s_wnd->col = _GetScreenWidth() -1;
+         s_wnd->col = col -1;
       }
-      if ( s_wnd->row >= _GetScreenHeight() )
+      if ( s_wnd->row >= row )
       {
-         s_wnd->row = _GetScreenHeight() -1;
+         s_wnd->row = row -1;
       }
       HB_GT_FUNC(gt_PutText( 0, 0, oldrows, oldcols, memory ));
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.8 2004/12/28 09:29:28 druzus Exp $
+ * $Id: dbffpt1.c,v 1.35 2004/12/31 11:56:08 druzus Exp $
  */
 
 /*
@@ -573,8 +573,9 @@ static ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, USHOR
          HB_PUT_BE_UINT32( fptBlock.type, FPTIT_FLEX_UNUSED );
          HB_PUT_BE_UINT32( fptBlock.size, pArea->uiMemoBlockSize *
                           pGCtable->pGCitems[i].ulSize - sizeof( FPTBLOCK ) );
-         hb_fsSeek( pArea->hMemoFile, pGCtable->pGCitems[i].ulOffset *
-                                      pArea->uiMemoBlockSize, FS_SET );
+         hb_fsSeekLarge( pArea->hMemoFile,
+                         ( HB_FOFFSET ) pGCtable->pGCitems[i].ulOffset *
+                         ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
          if ( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                           sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
          {
@@ -600,7 +601,8 @@ static ERRCODE hb_fptGCfreeBlock( FPTAREAP pArea, LPMEMOGCTABLE pGCtable,
    {
       FPTBLOCK fptBlock;
 
-      hb_fsSeek( pArea->hMemoFile, ulOffset * pArea->uiMemoBlockSize, FS_SET );
+      hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulOffset * 
+                      ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
       if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                                  sizeof( FPTBLOCK ) ) == sizeof( FPTBLOCK ) )
       {
@@ -980,7 +982,9 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
          else
          {
             /* trunc file */
-            hb_fsSeek( pArea->hMemoFile, pGCtable->ulNextBlock * pArea->uiMemoBlockSize, FS_SET );
+            hb_fsSeekLarge( pArea->hMemoFile,
+                            ( HB_FOFFSET ) pGCtable->ulNextBlock *
+                            ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
             hb_fsWrite( pArea->hMemoFile, NULL, 0 );
          }
       }
@@ -1005,7 +1009,8 @@ static ULONG hb_fptGetMemoLen( FPTAREAP pArea, USHORT uiIndex )
    if( ulBlock == 0 )
       return 0;
 
-   hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
+   hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulBlock *
+                   ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
 
    if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                               sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
@@ -1029,7 +1034,8 @@ static char * hb_fptGetMemoType( FPTAREAP pArea, USHORT uiIndex )
    if( ulBlock == 0 )
       return "C";
 
-   hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
+   hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulBlock *
+                   ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
 
    if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                               sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
@@ -1419,7 +1425,8 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    if( ulBlock > 0 )
    {
-      hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
+      hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulBlock *
+                      ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
 
       if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                                  sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
@@ -1847,7 +1854,8 @@ static ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, BYTE *bBufPtr,
 
       HB_PUT_BE_UINT32( fptBlock.type, ulType );
       HB_PUT_BE_UINT32( fptBlock.size, ulLen );
-      hb_fsSeek( pArea->hMemoFile, *ulStoredBlock * pArea->uiMemoBlockSize, FS_SET );
+      hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) *ulStoredBlock *
+                      ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
       hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptBlock, sizeof( FPTBLOCK ) );
 
       if ( ulLen > 0 )
@@ -1866,8 +1874,9 @@ static ERRCODE hb_fptWriteMemo( FPTAREAP pArea, ULONG ulBlock, BYTE *bBufPtr,
       {
          ULONG ulBlocks = ( ulLen + sizeof( FPTBLOCK ) + pArea->uiMemoBlockSize - 1 ) /
                            pArea->uiMemoBlockSize;
-         hb_fsSeek( pArea->hMemoFile, ( *ulStoredBlock + ulBlocks ) *
-                                      pArea->uiMemoBlockSize - 1, FS_SET );
+         hb_fsSeekLarge( pArea->hMemoFile,
+                         ( HB_FOFFSET ) ( *ulStoredBlock + ulBlocks ) *
+                         ( HB_FOFFSET ) pArea->uiMemoBlockSize - 1, FS_SET );
          hb_fsWrite( pArea->hMemoFile, ( BYTE * ) "\xAF", 1 );
       }
       pArea->fMemoFlush = TRUE;
