@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.10 2004/05/03 23:52:25 peterrees Exp $
+ * $Id: dbfdbt1.c,v 1.11 2004/05/08 22:07:10 druzus Exp $
  */
 
 /*
@@ -354,7 +354,7 @@ static void hb_dbtGetMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage );
+   hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage, ulSize );
 #endif
    hb_itemSetCMemo( pItem );
 }
@@ -390,14 +390,14 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    * ulStoredBlock = ulNewBlock;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpTranslate( pItem->item.asString.value, s_cdpage, pArea->cdPage );
+   hb_cdpnTranslate( pItem->item.asString.value, s_cdpage, pArea->cdPage, ulLen );
 #endif
    /* Write memo data and eof mark */
    hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
    hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
    pArea->fMemoFlush = TRUE;
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage );
+   hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage, ulLen );
 #endif
 
    if( bNewBlock )

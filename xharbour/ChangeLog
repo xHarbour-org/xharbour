@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3181 2004/07/21 23:03:41 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.3182 2004/07/22 03:16:14 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 10:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+    + SELF_RECINFO() implemented - DBRECINFO() now should work
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed ORDKENO() which was bugy reported in some cases
+      when DESCEND flag was changed by ORDDESCEND()
+
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    ! use hb_cdpnTranslate instead of hb_cdpTranslate
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! last Alexander fix from Harbour for SEEK
+
+  * xharbour/source/rtl/fstemp.c
+    * respect _SET_[FILE|DIR]CASE flag in hb_fsCreateTemp()
 
 2004-07-21 20:12 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * doc/en/zipnew.txt

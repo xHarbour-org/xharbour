@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.81 2004/04/28 18:29:54 druzus Exp $
+ * $Id: dbfntx1.c,v 1.82 2004/05/08 22:07:11 druzus Exp $
  */
 
 /*
@@ -720,7 +720,7 @@ static int hb_ntxTagFindCurrentKey( LPTAGINFO pTag, LPPAGEINFO pPage, LPKEYINFO 
          {
             kChild = hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad(
                      pTag,p->page ), pKey, keylen, bExact, lSeek );
-            if( kChild == 0 || ( lSeek==2 && kChild < 0 ) )
+            if( kChild == 0 || ( lSeek==2 && kChild < 0 && k != 0 ) )
                k = kChild;
 
             if( k <= 0 )

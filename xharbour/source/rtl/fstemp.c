@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.12 2004/04/08 13:26:53 druzus Exp $
+ * $Id: fstemp.c,v 1.13 2004/04/09 01:04:45 druzus Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hbmath.h"
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
 #if !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
@@ -148,43 +149,72 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
 {
    /* less attemps */
-   USHORT nAttemptLeft = 99;
-   FHANDLE fd = -1;
+   int iAttemptLeft = 99, iLen;
+   FHANDLE fd;
 
    HB_SYMBOL_UNUSED( uiAttr );
 
-   pszName[0] = '\0';
-
-   if ( pszDir != NULL && pszDir[0] != '\0' )
+   do
    {
-      strcpy( pszName, pszDir );
-   }
-   else
-   {
-      strcpy( pszName, P_tmpdir );
-   }
-   if ( pszName[0] != '\0' )
-   {
-      int len;
-      len = strlen( pszName );
-      pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
-      pszName[ len + 1 ] = '\0';
-   }
+      pszName[0] = '\0';
 
-   if ( pszPrefix != NULL )
-   {
-      strcat(pszName, pszPrefix );
+      if ( pszDir != NULL && pszDir[0] != '\0' )
+      {
+         strcpy( pszName, pszDir );
+      }
+      else
+      {
+         strcpy( pszName, P_tmpdir );
+      }
+      if ( pszName[0] != '\0' )
+      {
+         int len;
+         len = strlen( pszName );
+         pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
+         pszName[ len + 1 ] = '\0';
+      }
+
+      if ( pszPrefix != NULL )
+      {
+         strcat(pszName, pszPrefix );
+      }
+
+      iLen = strlen( pszName );
+      if ( iLen > _POSIX_PATH_MAX - 6 )
+         return FS_ERROR;
+
+      if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER ||
+          hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER ||
+          hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER ||
+          hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      {
+         int i, n;
+         double d = hb_random_num(), x;
+
+         for ( i = 0; i < 6; i++ )
+         {
+            d = d * 36;
+            n = ( int ) d;
+            d = modf( d, &x );
+            pszName[ iLen++ ] = n + ( n > 9 ? 'a' - 10 : '0' );
+         }
+         hb_fileNameConv( pszName );
+         fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL);
+      }
+      else
+      {
+         strcat(pszName, "XXXXXX" );
+         fd = (FHANDLE) mkstemp( pszName );
+         hb_fsSetIOError( fd != (FHANDLE) -1, 0 );
+      }
+      if ( fd != (FHANDLE) -1 )
+      {
+         return fd;
+      }
    }
+   while( --iAttemptLeft );
 
-   strcat(pszName, "XXXXXX" );
-
-   while( fd == -1 && --nAttemptLeft )
-   {
-      fd = (FHANDLE) mkstemp( pszName );
-   }
-
-   hb_fsSetIOError( fd != -1, 0 );
-   return fd != -1 ? fd : FS_ERROR;
+   return FS_ERROR;
 }
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.14 2004/03/23 02:14:57 andijahja Exp $
+ * $Id: hbrdddbf.h,v 1.15 2004/03/25 12:13:13 druzus Exp $
  */
 
 /*
@@ -222,7 +222,7 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer );
 static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 static ERRCODE hb_dbfRecall( DBFAREAP pArea );
 static ERRCODE hb_dbfRecCount( DBFAREAP pArea, ULONG * pRecCount );
-#define hb_dbfRecInfo                              NULL
+static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo );
 static ERRCODE hb_dbfRecNo( DBFAREAP pArea, PHB_ITEM pRecNo );
 static ERRCODE hb_dbfSetFieldExtent( DBFAREAP pArea, USHORT uiFieldExtent );
 #define hb_dbfAlias                                NULL

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.81 2004/05/12 14:11:22 lf_sfnet Exp $
+ * $Id: dbf1.c,v 1.82 2004/05/20 21:30:06 druzus Exp $
  */
 
 /*
@@ -1942,8 +1942,69 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                pArea->bLockType = (BYTE) bScheme;
          }
       }
+
+      default:
+         return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
    }
 
+   return SUCCESS;
+}
+
+/*
+ * Retrieve information about a raw
+ */
+static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo )
+{
+   ULONG ulRecNo = hb_itemGetNL( pRecID );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfRecInfo(%p, %p, %hu, %p)", pArea, pRecID, uiInfoType, pInfo));
+
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   if( ulRecNo == 0 )
+      ulRecNo = pArea->ulRecNo;
+
+   switch( uiInfoType )
+   {
+      case DBRI_DELETED:
+      {
+         BOOL bDeleted;
+         ULONG ulPrevRec = 0;
+         
+         if( pArea->ulRecNo != ulRecNo )
+         {
+            ulPrevRec = pArea->ulRecNo;
+            SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+         }
+         SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+         if( ulPrevRec != 0 )
+         {
+            SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
+         }
+         hb_itemPutL( pInfo, bDeleted );
+         break;
+      }
+
+      case DBRI_LOCKED:
+         hb_itemPutL( pInfo, hb_dbfIsLocked( pArea, ulRecNo ) );
+         break;
+
+      case DBRI_RECSIZE:
+         hb_itemPutNL( pInfo, pArea->uiRecordLen );
+         break;
+
+      case DBRI_RECNO:
+         hb_itemPutNL( pInfo, ulRecNo );
+         break;
+
+      case DBRI_UPDATED:
+         hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
+         break;
+
+      default:
+         return SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
+   }
    return SUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.139 2004/05/27 23:58:18 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.140 2004/06/08 09:27:32 druzus Exp $
  */
 
 /*
@@ -2951,7 +2951,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
       else
 #endif
       {
-         iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+         iMin = HB_MAX( iKeys / iNeedKeys, 2 );
          iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          for ( i = iBlncKeys - 1; i > 1 &&
                   childs[i]->iKeys >= iMin && childs[i]->iKeys <= iMax; i-- )
@@ -2959,7 +2959,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
             iKeys -= childs[i]->iKeys;
             hb_cdxPageFree( childs[i], FALSE );
             iBlncKeys--;
-            iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+            iMin = HB_MAX( iKeys / iNeedKeys, 2 );
             iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          }
          while ( iBlncKeys > 2 && childs[0]->iKeys >= iMin && childs[0]->iKeys <= iMax )
@@ -2972,7 +2972,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
             {
                childs[i] = childs[i+1];
             }
-            iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+            iMin = HB_MAX( iKeys / iNeedKeys, 2 );
             iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          }
       }
@@ -6927,13 +6927,19 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_ISDESC:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, ( pTag ? !pTag->UsrAscend : FALSE ) );
          if ( pOrderInfo->itmNewVal && HB_IS_LOGICAL( pOrderInfo->itmNewVal ) )
+         {
             pTag->UsrAscend = ! hb_itemGetL( pOrderInfo->itmNewVal );
+            pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS );
+         }
          break;
 
       case DBOI_UNIQUE:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, ( pTag ? pTag->UniqueKey || pTag->UsrUnique : FALSE ) );
          if ( pOrderInfo->itmNewVal && HB_IS_LOGICAL( pOrderInfo->itmNewVal ) && !pTag->UniqueKey )
+         {
             pTag->UsrUnique = hb_itemGetL( pOrderInfo->itmNewVal );
+            pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS );
+         }
          break;
 
       case DBOI_KEYTYPE:
@@ -6957,6 +6963,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_KEYVAL:
          hb_itemClear( pOrderInfo->itmResult );
+         if( pArea->lpdbPendingRel )
+            SELF_FORCEREL( ( AREAP ) pArea );
          if ( pTag && pArea->fPositioned )
          {
             if ( pTag->CurKey->rec != pArea->ulRecNo )
@@ -7018,6 +7026,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             if ( pTag->Custom )
             {
                LPCDXKEY pKey;
+               if( pArea->lpdbPendingRel )
+                  SELF_FORCEREL( ( AREAP ) pArea );
                hb_cdxIndexLockWrite( pTag->pIndex );
                if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
                   pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
@@ -7047,6 +7057,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             if ( pTag->Custom )
             {
                LPCDXKEY pKey;
+               if( pArea->lpdbPendingRel )
+                  SELF_FORCEREL( ( AREAP ) pArea );
                hb_cdxIndexLockWrite( pTag->pIndex );
                if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
                   pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
