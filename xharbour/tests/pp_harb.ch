@@ -28,6 +28,8 @@
   //----------------------------------------------------------------------------//
   CLASS  TInterpreter
 
+     DATA cCompiledText        INIT ""
+     DATA nCompiledLines       INIT 0
      DATA cText                INIT ""
      DATA acPPed               INIT {}
      DATA cPPed                INIT ""
@@ -41,9 +43,10 @@
 
      METHOD New()              INLINE ( Self )
 
-     METHOD AddLine( cLine )   INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText += ( cLine + Chr(10) ) )
-     METHOD SetScript( cText, nStartLine, cName ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::aScriptHostGlobals := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
-     METHOD GetPPO()           INLINE ( ::cPPed )
+     METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
+     METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
+     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::nProcs := 0, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
+     METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
      METHOD Run()
@@ -83,40 +86,39 @@
         RETURN .F.
      ENDIF
 
-     IF Len( ::aScriptHostGlobals ) > 0
-        ErrorBlock( {|e| Break( e ) } )
-     ENDIF
-
      bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
      BEGIN SEQUENCE
 
-        IF Len( ::acPPed ) == 0
+        IF ::nProcs == 0
            PP_InitStd()
            PP_LoadRun()
-           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
-           ::aCompiledProcs := {}
-           ::aInitExit      := { {}, {} }
+
+           ::cCompiledText      := ""
+           ::cPPed              := ""
+           ::aCompiledProcs     := {}
+           ::acPPed             := {}
+           ::aInitExit          := { {}, {} }
+           ::nCompiledLines     := 0
+           ::nProcs             := 0
+           ::aScriptHostGlobals := {}
         ENDIF
 
-        IF Len( ::aCompiledProcs ) == 0
-           PP_ModuleName( "_TINTERPRETER_" )
+        ::cPPed += PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
+        nLines  := Len( ::acPPed )
 
-           nLines := Len( ::acPPed )
-
-           FOR nLine := 1 TO nLines
-              sLine := ::acPPed[nLine]
-              IF sLine != NIL
-                 PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
-              ENDIF
-           NEXT
-        ENDIF
+        FOR nLine := ::nCompiledLines + 1 TO nLines
+           sLine := ::acPPed[nLine]
+           IF sLine != NIL
+              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+           ENDIF
+        NEXT
 
      RECOVER USING oError
          IF ValType( nLine ) == 'N'
-            oError:ProcLine := ::nStartLine + nLine - 1
+            oError:ProcLine := nLine
          ELSE
-            oError:ProcLine += ::nStartLine - 1
+            oError:ProcLine += ::nStartLine
          ENDIF
 
          nProcID := -1
@@ -135,6 +137,10 @@
         RETURN oError
      ENDIF
 
+     ::cCompiledText += ::cText
+     ::nCompiledLines := nLines
+     ::cText := ""
+
   RETURN nProcId > 0
 
   //----------------------------------------------------------------------------//
@@ -151,11 +157,11 @@
 
      BEGIN SEQUENCE
 
-        IF ::nProcs == 0
+        IF ! Empty( ::cText )
            // if ::bWantsErrorObject then Compile will NOT raise an Error!
            xRet := ::Compile()
 
-           IF ::bWantsErrorObjects .AND. xRet:ClassName == "ERROR"
+           IF ::bWantsErrorObject .AND. xRet:ClassName == "ERROR"
               Break( xRet )
            ENDIF
         ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.19 2004/02/13 09:22:47 andijahja Exp $
+ * $Id: proc.c,v 1.20 2004/02/14 00:22:08 ronpinkas Exp $
  */
 
 /*
@@ -243,6 +243,11 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
                else
                {
                   uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+               }
+
+               if( uiSuperClass == 0 )
+               {
+                  uiSuperClass = pSelf->item.asArray.value->uiClass;
                }
             }
 

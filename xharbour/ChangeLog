@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2384 2004/02/23 19:55:18 andijahja Exp $
+ * $Id: ChangeLog,v 1.2385 2004/02/23 22:55:03 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-23 19:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed reversed arguments for :Keys() and :Values() psudo methods of Hash.
+    % Optimized out HB_ITEM, byt using &(HB_VM_STACK.Return) directly as the reciever.
+
+  * source/vm/proc.c
+    ! Fixed GPF trap, when Object Method is not a valid Method for that class.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Few revisions and minor fixes.
+
+  * tests/prgscrpt.prg
+    * Revised to reflect latest.
 
 2004-02-23 03:05 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * doc/howtoext.txt

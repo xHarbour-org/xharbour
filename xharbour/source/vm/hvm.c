@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.333 2004/02/22 04:24:44 jonnymind Exp $
+ * $Id: hvm.c,v 1.334 2004/02/22 07:36:19 jonnymind Exp $
  */
 
 /*
@@ -5694,19 +5694,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          }
          else if( strcmp( szIndex, "KEYS" ) == 0 )
          {
-            HB_ITEM ArrKeys;
-
-            ArrKeys.type = HB_IT_NIL;
-            hb_hashGetKeys( pSelf, &ArrKeys );
-            hb_itemForwardValue( &(HB_VM_STACK.Return), &ArrKeys );
+            hb_hashGetKeys( &(HB_VM_STACK.Return), pSelf );
          }
          else if( strcmp( szIndex, "VALUES" ) == 0 )
          {
-            HB_ITEM ArrValues;
-
-            ArrValues.type = HB_IT_NIL;
-            hb_hashGetValues( pSelf, &ArrValues );
-            hb_itemForwardValue( &(HB_VM_STACK.Return), &ArrValues );
+            hb_hashGetValues( &(HB_VM_STACK.Return), pSelf );
          }
          else
          {

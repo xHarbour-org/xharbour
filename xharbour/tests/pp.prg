@@ -2044,7 +2044,7 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    ErrorBlock( bErrHandler )
 
-RETURN
+RETURN s_xRet
 
 //--------------------------------------------------------------//
 
@@ -9396,6 +9396,8 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
    //ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
    bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
+   PP_RunInit( aProcedures, aInitExit, @nLine )
+
    BEGIN SEQUENCE
       nLines := Len( asLines )
       FOR nLine := 1 TO nLines
@@ -9408,7 +9410,6 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
       Eval( bErrHandler, oError )
    END SEQUENCE
 
-   PP_RunInit( aProcedures, aInitExit, @nLine )
    xRet := PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
 RETURN xRet
@@ -9424,6 +9425,8 @@ FUNCTION PP_RunArray( asLines, aParams )
    //ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
    bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
+   PP_RunInit( aProcedures, aInitExit, @nLine )
+
    BEGIN SEQUENCE
       nLines := Len( asLines )
       FOR nLine := 1 TO nLines
@@ -9435,7 +9438,6 @@ FUNCTION PP_RunArray( asLines, aParams )
       Eval( bErrHandler, oError )
    END SEQUENCE
 
-   PP_RunInit( aProcedures, aInitExit, @nLine )
    xRet := PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
 RETURN xRet
