@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.87 2002/08/08 19:36:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.88 2002/08/09 16:50:55 ronpinkas Exp $
  */
 
 /*
@@ -2738,7 +2738,11 @@ static void hb_vmInc( void )
 
    pItem = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_NUMERIC( pItem ) )
+   if( HB_IS_DATE( pItem ) )
+   {
+      pItem->item.asDate.value++;
+   }
+   else if( HB_IS_NUMERIC( pItem ) )
    {
       int iDec, iType = pItem->type;
       double dNumber = hb_vmPopDouble( &iDec );
@@ -2769,6 +2773,10 @@ static void hb_vmDec( void )
 
    pItem = hb_stackItemFromTop( -1 );
 
+   if( HB_IS_DATE( pItem ) )
+   {
+      pItem->item.asDate.value--;
+   }
    if( HB_IS_NUMERIC( pItem ) )
    {
       int iDec, iType = pItem->type;
