@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.12 2004/01/17 17:52:59 lculik Exp $
+ * $Id: file.c,v 1.13 2004/01/23 10:38:57 andijahja Exp $
  */
 
 /*
@@ -63,26 +63,27 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
-   // char * szFile ;
+   int iFileName ;
 
    pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
-   if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
-   {
-      hb_fsFindClose( ffind );
-   #ifdef HB_OS_LINUX
-      if (( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY )
-      {
-         bResult = TRUE;
-      }
-   #else
-      bResult = TRUE;
-   #endif
+   iFileName = strlen(pFilename ) ;
+
+   if ( iFileName && pFilename[iFileName-1] != OS_PATH_DELIMITER ) // A directory cannot possibly be a FILE
+   {                                                               // so only do this is the last char is not
+                                                                   // a directory separator character
+     if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
+     {
+       if (( ffind->attr & HB_FA_DIRECTORY ) != HB_FA_DIRECTORY ) // If it's not a directory it's a file
+       {
+          bResult = TRUE;
+       }
+       hb_fsFindClose( ffind );
+     }
    }
 
-   hb_xfree(pFilename);
-
    hb_fsSetError( 0 );
+   hb_xfree(pFilename);
 
    return bResult;
 }
@@ -91,20 +92,29 @@ BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
+   int iFileName ;
 
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
 
-   if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
-   {
-      hb_fsFindClose( ffind );
-      if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
-      {
-         bResult = TRUE;
-      }
-   }
+   iFileName = strlen(pFilename ) ;
 
-   hb_xfree(pFilename);
+   if ( iFileName )
+   {
+     if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
+     {
+       hb_fsFindClose( ffind );
+       if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
+       {
+         bResult = TRUE;
+       }
+       else if ( pFilename[iFileName-1] == OS_PATH_DELIMITER )
+       {
+         bResult = TRUE;
+       }
+     }
+   }
    hb_fsSetError( 0 );
+   hb_xfree(pFilename);
 
    return bResult;
 }

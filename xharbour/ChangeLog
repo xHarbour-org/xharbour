@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2158 2004/01/27 15:20:36 likewolf Exp $
+ * $Id: ChangeLog,v 1.2159 2004/01/27 17:57:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-28 10:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/file.c
+    * hb_fsFile() update to fail on Win32 for a directory. Fixes FILE()
+    * hb_fsIsDirectory() update to correctly report Win32 directory if
+      last character of *pFilename == '\'
+  * /source/rtl/hbffind.c
+    * hb_fsFindFirst() for Win32. Update to be Clipper compatible when
+      last character of *pszFileName == '\'. Clipper appears to add "*.*"
+      This change fixes DIRECTORY()
+
+      ( Note: These change MAY be required for DOS, OS2, UNIX & MAC )
 
 2004-01-27 09:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

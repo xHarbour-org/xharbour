@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.13 2004/01/12 19:33:29 paultucker Exp $
+ * $Id: hbffind.c,v 1.14 2004/01/12 21:05:03 paultucker Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.13 2004/01/12 19:33:29 paultucker Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.14 2004/01/12 21:05:03 paultucker Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -729,76 +729,87 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
 #elif defined(HB_OS_WIN_32)
 
-   {
-      PHB_FFIND_INFO info;
-      errno = 0;
+  {
+    PHB_FFIND_INFO info;
+    errno = 0;
+    ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
+    info = ( PHB_FFIND_INFO ) ffind->info;
 
-      ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
-      info = ( PHB_FFIND_INFO ) ffind->info;
+    if ( uiAttr == HB_FA_LABEL )
+    {
+      DWORD dwSysFlags;
+      char szPath[ 4 ]  = {0};
+      strncpy( szPath, pszFileName, 3);
+      info->hFindFile = INVALID_HANDLE_VALUE;
 
-      if ( uiAttr == HB_FA_LABEL )
+      if (GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
       {
-         DWORD dwSysFlags;
-         char szPath[ 4 ]  = {0};
-         strncpy( szPath, pszFileName, 3);
-         info->hFindFile = INVALID_HANDLE_VALUE;
-
-         if (GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
-         {
-            info->fFileTime = GetOldesFile( pszFileName );
-            bFound = TRUE;
-            info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
-         }
-         else
-            bFound = FALSE;
+        info->fFileTime = GetOldesFile( pszFileName );
+        bFound = TRUE;
+        info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
       }
-
       else
       {
-      info->hFindFile = FindFirstFile( pszFileName, &info->pFindFileData );
-      info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
-
-
-
-      if( info->hFindFile != INVALID_HANDLE_VALUE )
+        bFound = FALSE;
+      }
+    }
+    else
+    {
+      char *pFileName ;
+      int iNameLen = strlen(pszFileName) ;
+      pFileName = (char *) hb_xgrab( iNameLen+4 ) ; // Allow room to add "*.*"
+      info->hFindFile = INVALID_HANDLE_VALUE;
+      bFound = FALSE ;
+      if ( pFileName )
       {
+        strcpy(pFileName, pszFileName) ;
+        if ( pFileName[iNameLen-1] == OS_PATH_DELIMITER )  //  '\\'
+        {
+          strcat(pFileName,"*.*") ; // 26/01/2004: Clipper compatibility
+        }
+        info->hFindFile = FindFirstFile( pFileName, &info->pFindFileData );
+        info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
 
-         if( info->dwAttr == 0 ||
-           ( info->pFindFileData.dwFileAttributes == 0 ) ||
-           ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
-           ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
-         {
+        if ( info->hFindFile != INVALID_HANDLE_VALUE )
+        {
+          if ( info->dwAttr == 0 ||
+             ( info->pFindFileData.dwFileAttributes == 0 ) ||
+             ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
+             ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
+          {
             bFound = TRUE;
-         }
-         else if ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY  ||
-           ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
-         {
+          }
+          else if ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY  ||
+               ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
+          {
             bFound = TRUE;
-         }
-
-         else
-         {
+          }
+          else
+          {
             bFound = FALSE;
             while( FindNextFile( info->hFindFile, &info->pFindFileData ) )
             {
-               if( info->dwAttr == 0 ||
+              if ( info->dwAttr == 0 ||
                  ( info->pFindFileData.dwFileAttributes == 0 ) ||
                  ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL )  ||
                  ( info->dwAttr & info->pFindFileData.dwFileAttributes ) )
-               {
-                  bFound = TRUE;
-                  break;
-               }
+              {
+                bFound = TRUE;
+                break;
+              }
             }
-         }
+          }
+        }
+        else
+        {
+          // bFound = FALSE;
+          errno = WintoDosError( GetLastError() );
+          hb_fsSetError( errno );
+        }
+        hb_xfree(pFileName) ;
       }
-      else {
-         bFound = FALSE;
-         errno = WintoDosError( GetLastError() );
-         hb_fsSetError( errno );
-      }
-      }
-   }
+    }
+  }
 
 #elif defined(HB_OS_UNIX)
 
