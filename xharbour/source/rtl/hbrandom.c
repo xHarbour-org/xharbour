@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.4 2003/07/24 01:55:58 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.5 2003/07/24 02:10:40 jonnymind Exp $
  */
 
 /*
@@ -78,15 +78,14 @@ HB_FUNC( HB_RANDOM )
    }
    else
    {
-      if ( hb_parnd( 1 ) > hb_parnd( 2 ) )
+      dX = hb_parnd( 2 );
+      dY = hb_parnd( 1 );
+
+      if ( dX > dY )
       {
-         dX = hb_parnd( 2 );
-         dY = hb_parnd( 1 );
-      }
-      else
-      {
-         dX = hb_parnd( 1 );
-         dY = hb_parnd( 2 );
+         double dZ = dY;
+         dY = dX;
+         dX = dZ;
       }
 
       hb_retnd(  dRnd * (dY - dX ) + dX );
@@ -104,6 +103,6 @@ double hb_random_num()
       bInit = 1;
    }
 
-   return ( (double) rand() ) / (double) RAND_MAX;
+   return ( (double) rand() ) / ( ((double) RAND_MAX)+1e-301);
 }
 

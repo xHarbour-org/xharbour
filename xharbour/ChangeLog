@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1550 2003/10/05 04:48:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1551 2003/10/05 05:25:04 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-05 14:51 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/hbrandom.c
+    ! when using the format hb_random( n1, n2 ), the interval is now
+      high-open (that is, n1 <= hb_random( n1, n2) < n2 )
 
 2003-10-05 01:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/vm/hvm.c
