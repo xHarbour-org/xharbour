@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.268 2002/06/13 22:42:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.269 2002/06/13 23:07:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-13 20:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapiitm.h
+    + Added: PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+
+  * source/vm/fastitem.c
+    + Added: extern PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+    * Reverted hb_itemPutCPtr() to override last char with a NULL Terminator.
+
+  * source/vm/arrayshb.c
+  * tests/tstcstru.prg
+    * Replaced hb_itemPutCPtr() calls, with hb_itemPutCRaw()
 
 2002-06-13 16:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrayshb.c

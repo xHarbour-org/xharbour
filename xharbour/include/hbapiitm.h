@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.8 2002/03/22 14:56:55 map Exp $
+ * $Id: hbapiitm.h,v 1.9 2002/04/17 20:31:21 walito Exp $
  */
 
 /*
@@ -95,6 +95,7 @@ extern USHORT   hb_itemPCount   ( void );
 extern PHB_ITEM hb_itemParam    ( USHORT uiParam );
 extern PHB_ITEM hb_itemPutC     ( PHB_ITEM pItem, char * szText );
 extern PHB_ITEM hb_itemPutCPtr  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern PHB_ITEM hb_itemPutCL    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern void     hb_itemSetCMemo ( PHB_ITEM pItem );
 extern PHB_ITEM hb_itemPutD     ( PHB_ITEM pItem, long lYear, long lMonth, long lDay );

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.9 2002/06/13 22:46:04 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.10 2002/06/13 23:07:17 ronpinkas Exp $
  */
 
 /*
@@ -612,7 +612,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
       ULONG ulLen = pBaseDef->ulLen;
       ULONG ulIndex;
       BYTE  *Buffer;
-      unsigned int uiAlign, uiOffset = 0;
+      unsigned int uiAlign, uiOffset;
       unsigned char cShift, cSize;
       PHB_ITEM pRet = hb_itemNew( NULL );
 
@@ -625,9 +625,9 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
          uiAlign = 4;
       }
 
-      Buffer = (BYTE *) hb_xgrab( SizeOfCStructure( aDef, uiAlign ) + 1 );
-      //printf( "Buffer: %p Size: %i\n", Buffer, uiOffset );
-      hb_itemPutCPtr( pRet, (char *) Buffer, uiOffset );
+      Buffer = (BYTE *) hb_xgrab( uiOffset = ( SizeOfCStructure( aDef, uiAlign ) + 1 ) );
+
+      hb_itemPutCRaw( pRet, (char *) Buffer, uiOffset );
 
       uiOffset = 0;
       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
@@ -1083,16 +1083,9 @@ HB_FUNC( HB_STRUCTURETOARRAY )
                      PHB_BASEARRAY pBaseStructure = pStructure->item.asArray.value;
                      PHB_ITEM pInternalBuffer = pBaseStructure->pItems + pBaseStructure->ulLen - 1;
 
-                     hb_itemPutCPtr( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiSize );
+                     hb_itemPutCRaw( pInternalBuffer, *(char **) ( (long **)( Buffer + uiOffset ) ), uiSize );
+
                      hb_objSendMsg( pStructure, "DEVALUE", 0 );
-
-                     /* Older version.
-                     PHB_ITEM pBuffer = hb_itemPutCPtr( NULL, *(char **) ( (long **)( Buffer + uiOffset ) ), uiSize );
-
-                     hb_objSendMsg( pStructure, "BUFFER", 1, pBuffer );
-
-                     hb_itemRelease( pBuffer );
-                     */
                   }
                   else
                   {

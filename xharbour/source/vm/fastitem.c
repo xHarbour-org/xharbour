@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.31 2002/05/06 02:52:07 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.32 2002/06/13 22:46:05 ronpinkas Exp $
  */
 
 /*
@@ -338,7 +338,33 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
-   //pItem->item.asString.value[ ulLen ] = '\0';
+   pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value   = szText;
 
    return pItem;
 }
@@ -347,7 +373,7 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 {
    ULONG ulLen = strlen( szText );
 
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s)", pItem, szText) );
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
 
    if( pItem )
    {

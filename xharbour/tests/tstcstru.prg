@@ -106,7 +106,8 @@ Return
      //printf( "\n\n\n\nMyStructure %p, MyStructure2: %p, MyStructure.pNext: %p\n", MyStructure, MyStructure2, MyStructure->pNext );
      //printf( "Sizeof: %i %i\n", sizeof( MY_STRUCTURE ), sizeof( MyStructure2.pNext ) );
 
-     hb_retclenAdopt( (char *) MyStructure, sizeof( MY_STRUCTURE ) );
+     //hb_retclenAdopt( (char *) MyStructure, sizeof( MY_STRUCTURE ) );
+     hb_itemPutCRaw( &hb_stack.Return, (char *) MyStructure, sizeof( MY_STRUCTURE ) );
   }
 
 #pragma ENDDUMP
