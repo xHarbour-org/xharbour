@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.27 2003/05/31 22:26:54 lculik Exp $
+ * $Id: dbf1.c,v 1.28 2003/06/17 19:47:49 lculik Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #include "hbapicdp.h"
 #include <errno.h>
 
+#define __PRG_SOURCE__ __FILE__
 extern PHB_CODEPAGE s_cdpage;
 
 extern PHB_CODEPAGE s_cdpage;
@@ -74,7 +75,7 @@ extern PHB_CODEPAGE s_cdpage;
 
 HB_FUNC( _DBFC );
 HB_FUNC( DBF_GETFUNCTABLE );
-
+#define __PRG_SOURCE__ __FILE__
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 
