@@ -1856,7 +1856,7 @@
 #endif
 
 // flags for DrawFrameControl
-
+/*
 #define DFC_CAPTION             1
 #define DFC_MENU                2
 #define DFC_SCROLL              3
@@ -1909,3 +1909,4 @@
 
 #define IDANI_OPEN          1
 
+*/
