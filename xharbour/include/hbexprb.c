@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.50 2003/03/27 07:44:55 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.51 2003/03/28 05:52:05 ronpinkas Exp $
  */
 
 /*
@@ -2734,17 +2734,20 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   }
                   else if( pSelf->value.asOperator.pRight->ExprType == HB_ET_STRING  && pSelf->value.asOperator.pRight->ulLength <= 65535 )
                   {
-                     if( 0 && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                     if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 ) ;
+                        if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                        {
+                           unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 ) ;
 
-                        hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                           hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
 
-                        hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                           hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
 
-                        HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                           HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
-                        return pSelf;
+                           return pSelf;
+                        }
                      }
                   }
                }
@@ -2802,15 +2805,18 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   }
                   else if( pSelf->value.asOperator.pRight->ExprType == HB_ET_STRING  && pSelf->value.asOperator.pRight->ulLength <= 65535 )
                   {
-                     if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                     if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 );
+                        if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                        {
+                           unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 );
 
-                        hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                           hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
 
-                        hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                           hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
 
-                        return pSelf;
+                           return pSelf;
+                        }
                      }
                   }
                }

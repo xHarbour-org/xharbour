@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1010 2003/05/09 02:52:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1011 2003/05/09 03:07:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-08 21:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    * Corrected optimization of HB_P_LOCALNEARSETSTR to consider HB_P_MACROTEXT.
+    * Reinstated 1 optimization of HB_P_LOCALNEARSETSTR which was disabled unintentionally.
 
 2003-05-08 19:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbextern.ch
