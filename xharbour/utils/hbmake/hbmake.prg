@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.52 2003/03/20 13:42:01 lculik Exp $
+ * $Id: hbmake.prg,v 1.53 2003/03/20 16:07:50 patrickmast Exp $
  */
 /*
  * Harbour Project source code:
@@ -718,7 +718,7 @@ FUNCTION CompileFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IiF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                  cComm += IiF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
                   __RUN( (cComm) )
@@ -844,7 +844,7 @@ FUNCTION CompileFiles()
 
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
 
-                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -911,7 +911,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                  cComm += IIF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                   //                        Outstd( Hb_OsNewLine() )
@@ -1768,7 +1768,7 @@ FUNCTION CompileUpdatedFiles()
                      aAdd( aCtocompile, s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                      //                   Outstd( cComm )
                      //                   Outstd( Hb_OsNewLine() )
                      __RUN( (cComm) )
@@ -1867,7 +1867,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -1928,7 +1928,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  " 2> Test.out"," > Test.out")
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
 
