@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpruwin.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_CODEPAGE_ANNOUNCE( RU1251 );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU1251 )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU1251 )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_RU1251
 #endif
 

@@ -8,9 +8,10 @@
 
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commdlg.h>
+#include <shlobj.h>
+//#include <commdlg.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -64,8 +65,8 @@ HB_FUNC(_FINDTEXT)
    fr.lpstrFindWhat    = (LPTSTR) hb_parc( 4 ) ;
    fr.lpstrReplaceWith = NULL ;
    fr.wFindWhatLen     = (WORD) hb_parclen(4) ;
-   fr.wReplaceWithLen  = NULL ;
-   fr.lCustData        = NULL ;
+   fr.wReplaceWithLen  = 0 ;
+   fr.lCustData        = 0 ;
 //   fr.lpfnHook         = ISNIL(5) ? NULL : __DlgProc ;
    fr.lpTemplateName   = NULL ;
 
@@ -90,7 +91,7 @@ HB_FUNC(_REPLACETEXT)
    fr.lpstrReplaceWith = (LPTSTR) hb_parc( 5 )  ;
    fr.wFindWhatLen     = (WORD) hb_parclen( 4 ) ;
    fr.wReplaceWithLen  = (WORD) hb_parclen( 5 ) ;
-   fr.lCustData        = NULL ;
+   fr.lCustData        = 0 ;
 //   fr.lpfnHook         = ISNIL(5) ? NULL : __DlgProc ;
    fr.lpTemplateName   = NULL ;
 

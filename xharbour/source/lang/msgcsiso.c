@@ -1,5 +1,5 @@
 /*
- * $Id: msgcsiso.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgcsiso.c,v 1.3 2003/06/17 22:10:22 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Èesky",                     /* Name (in native language) */
       "CS",                        /* RFC ID */
       "ISO-8859-2",                /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:22 $",         /* Version */
 
       /* Month names */
 
@@ -206,7 +206,7 @@ HB_LANG_ANNOUNCE( CSISO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_CSISO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_CSISO )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_CSISO
 #endif
 

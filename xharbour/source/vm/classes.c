@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.69 2003/06/21 07:36:04 ronpinkas Exp $
+ * $Id: classes.c,v 1.70 2003/06/23 07:24:02 ronpinkas Exp $
  */
 
 /*
@@ -451,7 +451,8 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
       }
 
-      if( strcmp( ( *pBase )->item.asSymbol.value->szName, "__OBJSENDMSG" ) == 0 )
+      if( strcmp( ( *pBase )->item.asSymbol.value->szName, "__OBJSENDMSG" ) == 0 ||
+          strcmp( ( *pBase )->item.asSymbol.value->szName, "ASCAN" ) == 0 )
       {
          // Backtrack 1 level.
          pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;

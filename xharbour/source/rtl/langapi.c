@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.4 2002/10/27 14:41:38 lculik Exp $
+ * $Id: langapi.c,v 1.5 2003/01/29 21:30:27 andijahja Exp $
  */
 
 /*
@@ -150,7 +150,15 @@ PHB_LANG HB_EXPORT hb_langSelect( PHB_LANG lang )
    HB_TRACE(HB_TR_DEBUG, ("hb_langSelect(%p)", lang));
 
    if( lang )
+   {
       s_lang = lang;
+   }
+   else
+   {
+      // Intentionally not using generic rutines which might require valid language setup.
+      printf( "Internal error: invalid language selected.\n" );
+      exit(1);
+   }
 
    return langOld;
 }
@@ -171,9 +179,13 @@ char HB_EXPORT * hb_langDGetItem( int iIndex )
    HB_TRACE(HB_TR_DEBUG, ("hb_langDGetItem(%i)", iIndex));
 
    if( s_lang && iIndex >= 0 && iIndex < HB_LANG_ITEM_MAX_ )
+   {
       return (char *) s_lang->pItemList[ iIndex ];
+   }
    else
+   {
       return NULL;
+   }
 }
 
 char HB_EXPORT * hb_langID( void )

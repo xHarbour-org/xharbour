@@ -1,5 +1,5 @@
 /*
- * $Id: msgplwin.c,v 1.1 2003/06/15 13:11:58 druzus Exp $
+ * $Id: msgplwin.c,v 1.2 2003/06/17 22:10:23 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Polski",                    /* Name (in native language) */
       "PL",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.1 $ $Date: 2003/06/15 13:11:58 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,7 @@ HB_LANG_ANNOUNCE( PLWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_PLWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_PLWIN )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_PLWIN
 #endif
 

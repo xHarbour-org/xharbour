@@ -1,6 +1,7 @@
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include "hbapi.h"
 
 //-------------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: msgfr.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgfr.c,v 1.3 2003/06/15 20:15:41 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "fran‡ais",                  /* Name (in native language) */
       "FR",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/15 20:15:41 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,7 @@ HB_LANG_ANNOUNCE( FR );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_FR )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_FR )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_FR
 #endif
 

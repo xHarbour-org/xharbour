@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.5 2003/05/16 19:52:11 druzus Exp $
+ * $Id: gtstd.c,v 1.6 2003/05/21 09:35:37 druzus Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ static void out_newline( void )
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int ch = 0;
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
    HB_SYMBOL_UNUSED( eventmask );
@@ -271,7 +271,7 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
             }
       }
    }
-   
+
    s_iRow = row;
    s_iCol = col;
 
@@ -302,7 +302,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 {
    BYTE szBuffer[2] = { 0, 0 };
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
    if( iMethod == HB_GT_SET_POS_BEFORE )
@@ -313,28 +313,28 @@ void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
          Updates to cursor position AFTER test output is handled
          within this driver itself
       */
-      
+
       if( iRow != s_iRow )
       {
          /* always go to a newline, even if request to go to row above.
             Although can't actually do unward movement, at least start
             a new line to avoid possibly overwriting text already on
             the current row */
-            
+
          out_newline();
          s_iCol = 0;
          if (s_iRow < iRow)
          {
             /* if requested to move down more than one row, do extra
               newlines to render the correct vertical distance */
-              
+
             while( ++s_iRow < iRow )
                out_newline();
          }
       }
 
       /* Use space and backspace to adjust horizontal position.. */
-   
+
       if( s_iCol < iCol )
       {
          szBuffer[0] = ' ';
@@ -393,7 +393,7 @@ static void HB_GT_FUNC(gt_xPutch( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE 
 
    /* make the char into a string so it can be passed to AdjustPos
       as well as being output */
-      
+
    szBuffer[ 0 ] = byChar;
    szBuffer[ 1 ] = 0;
    out_stdout( szBuffer, 1 );
@@ -459,13 +459,13 @@ void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT 
    HB_SYMBOL_UNUSED( byAttr );
 
    /* Provide some basic scroll support for full screen */
-   
+
    if( uiTop == 0 &&
       uiBottom >= (s_uiMaxRow - 1 ) &&
       uiLeft == 0 &&
       uiRight >= (s_uiMaxCol - 1 ) )
    {
-   
+
       if ( iRows == 0 && iCols == 0 )
       {
          /* clear screen request.. */
@@ -485,12 +485,12 @@ void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT 
 
          while( iRows-- > 0 )
             out_newline();
-         
+
          s_iCol = 0;
       }
    }
 }
- 
+
 void HB_GT_FUNC(gt_DispBegin( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
@@ -558,7 +558,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    BYTE szBell[] = { HB_CHAR_BEL, 0 };
    static int iSinceBell = -1;
    int iNow;
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
    HB_SYMBOL_UNUSED( dFrequency );
@@ -573,7 +573,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
    if ( iNow != iSinceBell )
       out_stdout( szBell, 1 );
-   
+
    iSinceBell = iNow;
 }
 
@@ -604,9 +604,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  || 
+   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  ||
        ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
    {
 
@@ -722,7 +722,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
          Left = 0;
       else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
          Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
-   
+
       if( Right < 0 )
          Right = 0;
       else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
@@ -870,7 +870,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -878,7 +878,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

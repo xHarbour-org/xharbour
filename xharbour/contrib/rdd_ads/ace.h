@@ -74,7 +74,6 @@
 #define EXTERN extern
 #define STATIC static
 
-
 #if defined( ASANLM ) || defined( ADS_LINUX ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE )
    #define ENTRYPOINT
 #elif defined( WIN32 ) && !defined( __BORLANDC__ )

@@ -4,10 +4,11 @@
 
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 //#include "hbdate.h"
 #include "hbvmpub.h"
 #include "hbinit.h"
@@ -333,7 +334,7 @@ HB_FUNC ( CALLDLL )
             case CTYPE_LONG              :
             case CTYPE_UNSIGNED_LONG     :
                 Parm[iCnt].nWidth = sizeof( unsigned long int );
-                if ( ISNIL(i) ) Parm[iCnt].dwArg = NULL;
+                if ( ISNIL(i) ) Parm[iCnt].dwArg = 0;
                 else Parm[iCnt].dwArg = ( DWORD ) hb_parnd( i );
                 iCnt++;
                 break;

@@ -1,5 +1,5 @@
 /*
- * $Id: msgko.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgko.c,v 1.3 2003/06/17 22:10:23 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "ÇÑ±¹¾î",                    /* Name (in native language) */
       "KO",                        /* RFC ID */
       "949",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
 
       /* Month names */
 
@@ -205,6 +205,6 @@ HB_LANG_ANNOUNCE( KO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_KO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_KO )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_KO
 #endif

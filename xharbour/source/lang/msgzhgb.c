@@ -1,5 +1,5 @@
 /*
- * $Id: msgzhgb.c,v 1.6 2003/06/16 17:19:16 alkresin Exp $
+ * $Id: msgzhgb.c,v 1.3 2003/06/17 22:10:23 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "ÖÐÎÄ¼òÌåGB",                /* Name (in native language) */
       "ZH",                        /* RFC ID */
       "936",                       /* Codepage */
-      "$Revision: 1.6 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
 
       /* Month names */
 
@@ -206,6 +206,6 @@ HB_LANG_ANNOUNCE( ZHGB );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ZHGB )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_ZHGB )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_ZHGB
 #endif

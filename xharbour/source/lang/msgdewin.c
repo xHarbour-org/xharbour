@@ -1,5 +1,5 @@
 /*
- * $Id: msgdewin.c,v 1.2 2003/06/16 17:19:16 alkresin Exp $
+ * $Id: msgdewin.c,v 1.1 2003/06/17 22:10:22 druzus Exp $
  * modified 2003 Guenther Steiner <byte-one@aon.at>
  */
 
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Deutsch ANSI",                   /* Name (in native language) */
       "DEWIN",                        /* RFC ID */
       "ANSI",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2003/06/17 22:10:22 $",         /* Version */
 
       /* Month names */
 
@@ -206,7 +206,7 @@ HB_LANG_ANNOUNCE( DEWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_DEWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_DEWIN )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_lang_Init_DEWIN
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.18 2003/06/26 12:37:08 druzus Exp $
+ * $Id: gtcrs.c,v 1.19 2003/06/27 20:58:02 druzus Exp $
  */
 
 /*
@@ -296,7 +296,7 @@ static const ClipKeyCode stdKeyTab[NO_STDKEYS] = {
     {'}',                283,            29,         0}, /* 125 */
     {'~',                297,           297,         0}, /* 126 */
     {K_CTRL_BS,     K_ALT_BS,           127,         0}  /* 127 */
-};           
+};
 
 static const ClipKeyCode extdKeyTab[NO_EXTDKEYS] = {
     {K_F1,          K_ALT_F1,     K_CTRL_F1,   K_SH_F1}, /*  00 */
@@ -370,7 +370,7 @@ static int getClipKey(int nKey)
 		    nRet = stdKeyTab[n].key;
 	    } else
 		nRet = nKey;
-	    
+
 	}
     }
 
@@ -675,7 +675,7 @@ static int test_bufch(InOutBase *ioBase, int n, int delay)
         nKey = get_inch(ioBase, delay);
 
     return IS_CLIPKEY(nKey) ? nKey :
-	    (ioBase->stdin_inbuf > n) ? 
+	    (ioBase->stdin_inbuf > n) ?
 	      ioBase->stdin_buf[(ioBase->stdin_ptr_l + n) % STDIN_BUFLEN] : -1;
 }
 
@@ -787,7 +787,7 @@ again:
 	    ioBase->key_flag = 0;
 	}
 
-	if (ioBase->nation_transtbl && ioBase->nation_mode && 
+	if (ioBase->nation_transtbl && ioBase->nation_mode &&
 		nKey >= 32 && nKey < 128 && ioBase->nation_transtbl[nKey])
 	    nKey = ioBase->nation_transtbl[nKey];
 	if (ioBase->in_transtbl && nKey >=0 && nKey <=255 && ioBase->in_transtbl[nKey])
@@ -898,8 +898,8 @@ static int getMouseKey(mouseEvent *mEvt)
 		mEvt->lbup_row = mEvt->row;
 		mEvt->lbup_col = mEvt->col;
 	    }
-	    nKey = (mEvt->buttons & M_BUTTON_LEFT) ? 
-			((mEvt->buttons & M_BUTTON_LDBLCK) ? K_LDBLCLK : 
+	    nKey = (mEvt->buttons & M_BUTTON_LEFT) ?
+			((mEvt->buttons & M_BUTTON_LDBLCK) ? K_LDBLCLK :
 			    K_LBUTTONDOWN) : K_LBUTTONUP;
 	    mEvt->lbuttons ^= M_BUTTON_LEFT;
 	    mEvt->buttons &= ~M_BUTTON_LDBLCK;
@@ -911,8 +911,8 @@ static int getMouseKey(mouseEvent *mEvt)
 		mEvt->rbup_row = mEvt->row;
 		mEvt->rbup_col = mEvt->col;
 	    }
-	    nKey = (mEvt->buttons & M_BUTTON_RIGHT) ? 
-			((mEvt->buttons & M_BUTTON_RDBLCK) ? K_RDBLCLK : 
+	    nKey = (mEvt->buttons & M_BUTTON_RIGHT) ?
+			((mEvt->buttons & M_BUTTON_RDBLCK) ? K_RDBLCLK :
 			    K_RBUTTONDOWN) : K_RBUTTONUP;
 	    mEvt->lbuttons ^= M_BUTTON_RIGHT;
 	    mEvt->buttons &= ~M_BUTTON_RDBLCK;
@@ -1019,8 +1019,8 @@ static void flush_gpmevt(mouseEvent *mEvt)
     {
         struct timeval tv = { 0, 0 };
         fd_set rfds;
-	
-        FD_ZERO( &rfds ); 
+
+        FD_ZERO( &rfds );
         FD_SET( gpm_fd, &rfds );
 
         while ( select( gpm_fd+1, &rfds, NULL, NULL, &tv ) > 0 )
@@ -1051,7 +1051,7 @@ static void mouse_init(InOutBase *ioBase)
     {
         ioBase->Conn.eventMask = GPM_MOVE | GPM_DRAG | GPM_UP | GPM_DOWN | GPM_DOUBLE;
         /* give me move events but handle them anyway */
-        ioBase->Conn.defaultMask= GPM_MOVE | GPM_HARD; 
+        ioBase->Conn.defaultMask= GPM_MOVE | GPM_HARD;
         /* only pure mouse events, no Ctrl,Alt,Shft events */
         ioBase->Conn.minMod = ioBase->Conn.maxMod = 0;
         gpm_zerobased = 1;  gpm_visiblepointer = 1;
@@ -1075,7 +1075,7 @@ static void mouse_exit(InOutBase *ioBase)
     if( ioBase->terminal_type == TERM_XTERM )
     {
         /* disable mouse tracking & restore old hilit tracking */
-	write_ttyseq(ioBase, "\033[?1002l\033[?1001r");	
+	write_ttyseq(ioBase, "\033[?1002l\033[?1001r");
     }
 #ifdef HAVE_GPM_H
     else if( ioBase->terminal_type == TERM_LINUX )
@@ -1124,7 +1124,7 @@ static void disp_cursor(InOutBase *ioBase)
 
         if ( lcurs != -1 ) {
             if( ioBase->terminal_type == TERM_LINUX ) {
-                snprintf( escseq, sizeof(escseq) - 1, "\033[?25%c\033[?%hdc", 
+                snprintf( escseq, sizeof(escseq) - 1, "\033[?25%c\033[?%hdc",
                                 ioBase->cursor == SC_NONE ? 'l' : 'h', lcurs);
                 escseq[ sizeof(escseq) - 1 ] = '\0';
                 write_ttyseq(ioBase, escseq);
@@ -1132,7 +1132,7 @@ static void disp_cursor(InOutBase *ioBase)
                 /* curses cursor shape set */
                 /* curs_set( ncurs ); */
                 write_ttyseq(ioBase, cv);
-	    
+
         }
 
         ioBase->lcursor = ioBase->cursor;
@@ -1222,7 +1222,7 @@ static void gt_outerr(InOutBase *ioBase, const char *str, int len)
 static char* tiGetS(char *capname)
 {
     char *ptr;
-    
+
     ptr = tigetstr( capname );
     if ( ptr )
     {
@@ -1449,9 +1449,9 @@ static void gt_tone(InOutBase *ioBase, double dFrequency, double dDuration)
     char escseq[ 64 ];
 
     if( ioBase->terminal_type == TERM_LINUX && ioBase->bell != NULL ) {
-        snprintf( escseq, sizeof(escseq) - 1, "\033[10;%hd]\033[11;%hd]%s", 
-                          (int) dFrequency, 
-                          (int)(dDuration * 1000.0 / 18.2), 
+        snprintf( escseq, sizeof(escseq) - 1, "\033[10;%hd]\033[11;%hd]%s",
+                          (int) dFrequency,
+                          (int)(dDuration * 1000.0 / 18.2),
                           ioBase->bell );
 	escseq[ sizeof(escseq) - 1 ] = '\0';
 	write_ttyseq(ioBase, escseq);
@@ -1626,7 +1626,7 @@ void setDispTrans(InOutBase *ioBase, unsigned char *src, unsigned char *dst, int
 	ioBase->std_chmap[i] |= ch;
 	ioBase->box_chmap[i] |= ch;
 
-	if ( (unsigned int) i != (ch & A_CHARTEXT) && 
+	if ( (unsigned int) i != (ch & A_CHARTEXT) &&
 	     (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 )
 	{
 	    if ( ioBase->out_transtbl == NULL )
@@ -1677,8 +1677,8 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     if (term && *term) {
 	if (strncmp( term, "linux", 5 ) == 0)
 	    ioBase->terminal_type = TERM_LINUX;
-	else if (strstr( term, "xterm" ) != NULL || 
-	         strncmp( term, "rxvt", 4 ) == 0 || 
+	else if (strstr( term, "xterm" ) != NULL ||
+	         strncmp( term, "rxvt", 4 ) == 0 ||
 		 strncmp( term, "putty", 4 ) == 0)
 	    ioBase->terminal_type = TERM_XTERM;
 
@@ -1777,7 +1777,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
            5 magenta       -> COLOR_MAGENTA
            6 yellow        -> COLOR_YELLOW
            7 light gray    -> COLOR_WHITE
-    
+
            8 gray          -> BOLD/BLINK BLACK
            9 light blue    -> BOLD/BLINK BLUE
           10 light green   -> BOLD/BLINK GREEN
@@ -2000,7 +2000,7 @@ static int add_new_ioBase(InOutBase *ioBase)
 	if (s_ioBaseTab == NULL)
 	    s_ioBaseTab = hb_xgrab( (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
 	else
-	    s_ioBaseTab = hb_xrealloc( s_ioBaseTab, 
+	    s_ioBaseTab = hb_xrealloc( s_ioBaseTab,
 			   (s_iSize_ioBaseTab += 10) * sizeof(InOutBase*) );
 	s_ioBaseTab[i] = ioBase;
 	for (n = i + 1; n < s_iSize_ioBaseTab; n++)
@@ -2279,7 +2279,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
         while( dDuration > 0.0 )
         {
             USHORT temp = ( USHORT ) HB_MIN( HB_MAX( 0, dDuration ), 1000 );
-#ifndef HB_OS_DARWIN	    
+#ifndef HB_OS_DARWIN
             static struct timespec nanosecs;
 #endif
 
@@ -2291,7 +2291,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
             else
             {
                 hb_idleState();
-#ifndef HB_OS_DARWIN		
+#ifndef HB_OS_DARWIN
                 nanosecs.tv_sec  = 0;
                 nanosecs.tv_nsec = temp * 10;
                 nanosleep( &nanosecs, NULL );
@@ -2496,7 +2496,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, ulLen));
 
-    ch = s_ioBase->box_chmap[ byChar ] | 
+    ch = s_ioBase->box_chmap[ byChar ] |
          ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
     wmove( s_ioBase->stdscr, uiRow, uiCol );
 
@@ -2584,9 +2584,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     maxrow = HB_GT_FUNC(gt_GetScreenHeight());
     maxcol = HB_GT_FUNC(gt_GetScreenWidth());
 
-    if( ( Left   >= 0 && Left   < maxcol )  || 
-        ( Right  >= 0 && Right  < maxcol )  || 
-        ( Top    >= 0 && Top    < maxrow )  || 
+    if( ( Left   >= 0 && Left   < maxcol )  ||
+        ( Right  >= 0 && Right  < maxcol )  ||
+        ( Top    >= 0 && Top    < maxrow )  ||
         ( Bottom >= 0 && Bottom < maxrow ) )
     {
 	HB_GT_FUNC(gt_DispBegin());
@@ -2760,7 +2760,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
 	    uCols = Left - Right + 1;
 	}
 
-	ch = s_ioBase->box_chmap[ byChar ] | 
+	ch = s_ioBase->box_chmap[ byChar ] |
 	     ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
 	while( uCols-- )
             waddch( s_ioBase->stdscr, ch );
@@ -2971,7 +2971,7 @@ int HB_GT_FUNC(gt_ExtendedKeySupport( void ))
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
-    
+
     return wait_key( s_ioBase, -1 );
 }
 
@@ -3034,7 +3034,7 @@ void HB_GT_FUNC(gt_SetDebugKey( int iDebug ))
 
 int HB_GT_FUNC(gt_Shft_Pressed())
 {
-    return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0 && 
+    return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0 &&
            ( s_ioBase->key_flag & KEY_ALTMASK ) != 0;
 }
 
@@ -3077,7 +3077,7 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ))
     {
         PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
                      cdpHost = hb_cdpFind( pszHostCDP );
-        if ( cdpTerm && cdpHost && 
+        if ( cdpTerm && cdpHost &&
              cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
         {
             char * pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
@@ -3262,7 +3262,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -3270,7 +3270,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

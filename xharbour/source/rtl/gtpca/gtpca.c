@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.5 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtpca.c,v 1.6 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -105,14 +105,14 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 #endif
    s_usMaxCol = 79;
    fprintf( stdout, "\x1B[=7h" ); /* Enable line wrap (for OUTSTD() and OUTERR()) */
-   
+
    HB_GT_FUNC(mouse_Init());
 }
 
 void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
-   
+
    HB_GT_FUNC(mouse_Exit());
    /* TODO: */
 }
@@ -335,7 +335,7 @@ static void HB_GT_FUNC(gt_xPutch( USHORT usRow, USHORT usCol, BYTE attr, BYTE by
    char tmp[ 2 ];
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", usRow, usCol, (int) attr, byChar));
 
-   /* TOFIX: add correct support for a single byte instead of a string 
+   /* TOFIX: add correct support for a single byte instead of a string
     */
    tmp[ 0 ] = byChar;
    tmp[ 1 ] = '\0';
@@ -492,9 +492,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  || 
+   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  ||
        ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
    {
 
@@ -610,7 +610,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
          Left = 0;
       else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
          Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
-   
+
       if( Right < 0 )
          Right = 0;
       else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
@@ -758,7 +758,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -766,7 +766,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

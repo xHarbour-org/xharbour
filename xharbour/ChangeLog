@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1199 2003/06/29 04:42:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.1200 2003/06/29 22:15:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,126 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-30 10:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/rdd_ads/ace.h
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    * Removed FAR and corrected compile warnings.
+
+  * contrib/what32/source/_WinTree.c
+  * contrib/what32/source/_wincall.c
+  * contrib/what32/source/_wincdlg.c
+  * contrib/what32/source/_winclpb.c
+  * contrib/what32/source/_wincomm.c
+  * contrib/what32/source/_wincret.c
+  * contrib/what32/source/_windate.c
+  * contrib/what32/source/_windlg.c
+  * contrib/what32/source/_windll.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_wininet.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winmapi.c
+  * contrib/what32/source/_winmem.c
+  * contrib/what32/source/_winmenu.c
+  * contrib/what32/source/_winmeta.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winmsg.c
+  * contrib/what32/source/_winprn.c
+  * contrib/what32/source/_winreg.c
+  * contrib/what32/source/_winshell.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintab.c
+  * contrib/what32/source/_winwnd.c
+  * contrib/what32/source/errorsys.prg
+  * contrib/what32/source/wincore.prg
+    * Removed FAR and corrected compile warnings.
+
+  * source/codepage/cdp_tpl.c
+  * source/codepage/cdpesdos.c
+  * source/codepage/cdpeswin.c
+  * source/codepage/cdpgedos.c
+  * source/codepage/cdpgewin.c
+  * source/codepage/cdppl852.c
+  * source/codepage/cdppliso.c
+  * source/codepage/cdpplmaz.c
+  * source/codepage/cdpplwin.c
+  * source/codepage/cdppt850.c
+  * source/codepage/cdpptiso.c
+  * source/codepage/cdpru866.c
+  * source/codepage/cdprukoi.c
+  * source/codepage/cdpruwin.c
+  * source/codepage/cdpsl852.c
+  * source/codepage/cdpsliso.c
+  * source/codepage/cdpslwin.c
+  * source/codepage/cdpsrwin.c
+    + Added support fo HB_STATIC_STARTUP
+
+  * source/lang/msg_tpl.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+    + Added support fo HB_STATIC_STARTUP
+
+  * source/rtl/gt_tpl/gt_tpl.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtnul/gtnul.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+    + Added support fo HB_STATIC_STARTUP
+
+  * source/rtl/cdpapi.c
+    + Added support fo HB_STATIC_STARTUP
+
+  * source/rtl/langapi.c
+    + Added "Internal error: invalid language selected.\n" in hb_langSelect() on invalid language.
+
+  * source/vm/classes.c
+    + Added support for aSacn() in hb_clsValidScope()
+
 2003-06-30 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
     * Minor correction on inconsistent linkage for hb_vmPushLongConst()
@@ -65,7 +185,7 @@
 2003-06-28 18:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rdd/dbfcdx/dbfcdx1.c
     ! Fixed Gpf's reported by Bob Owen (problem was beteen lines 3984 and 3991)
-      it was attemting to free an NULL Page pointer 
+      it was attemting to free an NULL Page pointer
   *source/rtl/mouseapi.c
     ! minor Fix static int    s_iLeftButton = 1;  --> static int    s_iLeftButton = 0;
 

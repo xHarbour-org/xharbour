@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.16 2003/06/08 08:29:06 patrickmast Exp $
+ * $Id: _winsys.c,v 1.17 2003/06/08 08:53:21 patrickmast Exp $
  */
 
 // WHAT32
@@ -24,9 +24,10 @@
 
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include <htmlhelp.h>
 #include "hbapi.h"
 #include "hbvm.h"

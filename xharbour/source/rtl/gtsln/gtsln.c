@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.13 2003/05/16 19:52:11 druzus Exp $
+ * $Id: gtsln.c,v 1.14 2003/05/21 09:35:37 druzus Exp $
  */
 
 /*
@@ -175,7 +175,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     s_iStdIn  = iFilenoStdin;
     s_iStdOut = iFilenoStdout;
     s_iStdErr = iFilenoStderr;
-    
+
     /* Slang file descriptors */
     SLang_TT_Read_FD  = -1;
     SLang_TT_Write_FD = -1;
@@ -233,7 +233,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
                 /* set the normal Slang color */
                 SLsmg_set_color( 0 );
-        
+
                 /* NOTE: due to a work of a Slang library which does not
                    prepare its internal screen buffer properly, a screen
                    must be cleared before normal work. This is not
@@ -802,7 +802,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
         while( dDuration > 0.0 )
         {
             USHORT temp = ( USHORT ) HB_MIN( HB_MAX( 0, dDuration ), 1000 );
-#ifndef HB_OS_DARWIN	    
+#ifndef HB_OS_DARWIN
             static struct timespec nanosecs;
 #endif
 
@@ -814,7 +814,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
             else
             {
                 hb_idleState();
-#ifndef HB_OS_DARWIN		
+#ifndef HB_OS_DARWIN
                 nanosecs.tv_sec  = 0;
                 nanosecs.tv_nsec = temp * 10;
                 nanosleep( &nanosecs, NULL );
@@ -896,9 +896,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     /* a box drawing hack */
     s_bUse_Alt_Char_Hack = TRUE;
 
-    if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-        ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-        ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  || 
+    if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+        ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+        ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  ||
         ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
     {
         /* Ensure that box is drawn from top left to bottom right. */
@@ -1433,7 +1433,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -1441,7 +1441,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

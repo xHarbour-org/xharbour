@@ -27,8 +27,6 @@ Static aDialog:={} //hDlg, {{anWM.bAction}} // maybe rather add them to aWindow 
 Static aProc       // array of possible windows procedures (10)
                    // for subclassing ???
 
-
-
 GLOBAL lPrevInstance
 GLOBAL hThisInstance
 
@@ -718,9 +716,10 @@ Function isDialogMessage( hDlg, cMsg )
 
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -822,7 +821,7 @@ HB_FUNC ( _CREATEMDIWINDOW )
    int    nHeight    = (ISNIL(7)  ? CW_USEDEFAULT : hb_parni(7));
    HWND   hWndParent = (ISNIL(8)  ? (HWND) NULL : (HWND) hb_parnl(8)) ;
    HANDLE hInstance  = (ISNIL(9)  ? GetModuleHandle( NULL ) : (HANDLE) hb_parnl(9));
-   LPARAM lParam     = (ISNIL(10) ? NULL : (LPARAM) hb_parnl(10));
+   LPARAM lParam     = (ISNIL(10) ? 0 : (LPARAM) hb_parnl(10));
 
    HWND hWnd = CreateMDIWindow( cClass, cTitle,nStyle,
                                 x, y, nWidth, nHeight,

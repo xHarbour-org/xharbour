@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.4 2003/06/18 00:23:39 lculik Exp $
+ * $Id: cdpapi.c,v 1.5 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ HB_FUNC( HB_TRANSLATE )
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
    hb_cdpRegister( &s_en_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_EN
 #endif
 

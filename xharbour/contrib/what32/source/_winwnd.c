@@ -1,9 +1,4 @@
-
-
-
-
 #define HB_OS_WIN_32_USED
-
 
 #include <windows.h>
 #include <winuser.h>
@@ -1282,19 +1277,24 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 
 HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 {
-HINSTANCE h = LoadLibraryEx( "user32.dll",NULL,NULL);
-BOOL bASFWRet = (BOOL) FALSE ;
-DWORD dwProcessId = ISNIL( 1 ) ? ASFW_ANY : (DWORD) hb_parnl( 1 );
 
-if( h ){
-    typedef BOOL (WINAPI *xbAllowSetForegroundWindow)( DWORD dwProcessId );
-    xbAllowSetForegroundWindow pfnASFW = (xbAllowSetForegroundWindow)
-    GetProcAddress( h, "AllowSetForegroundWindow") ;
-    if( pfnASFW ){
-        bASFWRet = (BOOL) pfnASFW( dwProcessId ) ;
-    }
-    FreeLibrary( h );
-}
+   HINSTANCE h = LoadLibraryEx( "user32.dll", NULL, 0 );
+   BOOL bASFWRet = (BOOL) FALSE ;
+   DWORD dwProcessId = ISNIL( 1 ) ? ASFW_ANY : (DWORD) hb_parnl( 1 );
+
+   if( h )
+   {
+      typedef BOOL (WINAPI *xbAllowSetForegroundWindow)( DWORD dwProcessId );
+      xbAllowSetForegroundWindow pfnASFW = (xbAllowSetForegroundWindow)
+      GetProcAddress( h, "AllowSetForegroundWindow") ;
+
+      if( pfnASFW )
+      {
+         bASFWRet = (BOOL) pfnASFW( dwProcessId ) ;
+      }
+
+      FreeLibrary( h );
+   }
  
    hb_retl( bASFWRet );
 }

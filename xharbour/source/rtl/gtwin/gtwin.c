@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.16 2003/05/21 09:35:37 druzus Exp $
+ * $Id: gtwin.c,v 1.17 2003/06/23 02:49:30 andijahja Exp $
  */
 
 /*
@@ -1570,7 +1570,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
 
-    /* Clipper ignores Tone() requests if Frequency is less than  
+    /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
 
     if ( dFreq > 20.0 )
@@ -1584,12 +1584,12 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
 
       lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
 
-      if( lAdjFreq < 0 ) 
+      if( lAdjFreq < 0 )
          uLSB = lAdjFreq + 65536;
       else
          uLSB = lAdjFreq % 256;
 
-      if( lAdjFreq < 0 ) 
+      if( lAdjFreq < 0 )
          uMSB = lAdjFreq + 65536;
       else
          uMSB = lAdjFreq / 256;
@@ -1652,7 +1652,7 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat, double dTick ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
 
-    /* Clipper ignores Tone() requests if Frequency is less than  
+    /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
 
     if ( dFreq > 20.0 )
@@ -1686,7 +1686,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
     dDuration = HB_MIN( HB_MAX( 1, dDuration ), ULONG_MAX );
 
-    if( dDuration > 0 ) 
+    if( dDuration > 0 )
     {
       double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
 
@@ -1792,7 +1792,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -1800,7 +1800,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

@@ -10,9 +10,10 @@
 
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include <commdlg.h>
 #include "hbapi.h"
 #include "hbvm.h"

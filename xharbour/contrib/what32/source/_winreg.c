@@ -1,15 +1,12 @@
-
-
 // Registry interface
-
-
 
 #define HB_OS_WIN_32_USED
 #define _WIN32_WINNT   0x0400
-#include <shlobj.h>
 
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -165,7 +162,7 @@ HB_FUNC( REGENUMKEYEX )
 HB_FUNC( REGSETVALUEEX )
 {
        
-   hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , NULL , hb_parnl( 4 ) , ( BYTE * const ) hb_parc( 5 ) , ( strlen( hb_parc( 5 ) ) + 1 ) )  ) ;
+   hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ), hb_parc( 2 ), 0, hb_parnl( 4 ), ( BYTE * const ) hb_parc( 5 ), ( strlen( hb_parc( 5 ) ) + 1 ) ) ) ;
 
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpesdos.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
+ * $Id: cdpesdos.c,v 1.2 2003/06/20 13:44:57 druzus Exp $
  */
 
 /*
@@ -93,6 +93,6 @@ HB_CODEPAGE_ANNOUNCE( ES );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ES )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_ES )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_ES
 #endif

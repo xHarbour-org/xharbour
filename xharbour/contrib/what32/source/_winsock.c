@@ -10,9 +10,10 @@
 
 #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -21,7 +22,7 @@
 #include <winsock2.h>
 
 //-----------------------------------------------------------------------------
-//  SOCKET  accept( IN SOCKET s, OUT struct sockaddr FAR * addr, IN OUT int FAR * addrlen );
+//  SOCKET  accept( IN SOCKET s, OUT struct sockaddr * addr, IN OUT int * addrlen );
 
 // syntax: accept(s [,@cAddr][,@nAddrLen]) -> s
 
@@ -44,7 +45,7 @@ HB_FUNC( ACCEPT )
 
 
 //-----------------------------------------------------------------------------
-//  int  bind( IN SOCKET s, IN const struct sockaddr FAR * name, IN int namelen );
+//  int  bind( IN SOCKET s, IN const struct sockaddr * name, IN int namelen );
 
 // syntax: bind(s, sa:value, sa:sizeof ) -> nInt
 
@@ -66,7 +67,7 @@ HB_FUNC( CLOSESOCKET )
 
 
 //-----------------------------------------------------------------------------
-//  int  connect( IN SOCKET s, IN const struct sockaddr FAR * name, IN int namelen );
+//  int  connect( IN SOCKET s, IN const struct sockaddr * name, IN int namelen );
 
 // syntax connect( s, san:value, san:sizeof ) -> nInt
 
@@ -79,7 +80,7 @@ HB_FUNC( CONNECT )
 
 
 //-----------------------------------------------------------------------------
-//  int  ioctlsocket( IN SOCKET s, IN long cmd, IN OUT u_long FAR * argp );
+//  int  ioctlsocket( IN SOCKET s, IN long cmd, IN OUT u_long * argp );
 
 //syntax: ioctlsocket( s, nCmd, @nArg) -> nErr
 
@@ -93,7 +94,7 @@ HB_FUNC( IOCTLSOCKET )
 
 
 //-----------------------------------------------------------------------------
-//  int  getpeername( IN SOCKET s, OUT struct sockaddr FAR * name, IN OUT int FAR * namelen );
+//  int  getpeername( IN SOCKET s, OUT struct sockaddr * name, IN OUT int * namelen );
 
 // syntax: getpeername( s, @san, @nLen ) -> int
 
@@ -109,7 +110,7 @@ HB_FUNC( GETPEERNAME )
 
 
 //-----------------------------------------------------------------------------
-//  int  getsockname( IN SOCKET s, OUT struct sockaddr FAR * name, IN OUT int FAR * namelen );
+//  int  getsockname( IN SOCKET s, OUT struct sockaddr * name, IN OUT int * namelen );
 
 // syntax: getstockname( s, @san, @nLen )
 
@@ -125,7 +126,7 @@ HB_FUNC( GETSOCKNAME )
 
 
 //-----------------------------------------------------------------------------
-//  int  getsockopt( IN SOCKET s, IN int level, IN int optname, OUT char FAR * optval, IN OUT int FAR * optlen );
+//  int  getsockopt( IN SOCKET s, IN int level, IN int optname, OUT char * optval, IN OUT int * optlen );
 
 // syntax: getsockopt( s, nLevel, nOptName, @cOptVal, @nOptName) -> nErr
 
@@ -165,7 +166,7 @@ HB_FUNC( HTONS )
 
 
 //-----------------------------------------------------------------------------
-//  unsigned long  inet_addr( IN const char FAR * cp );
+//  unsigned long  inet_addr( IN const char * cp );
 
 HB_FUNC( INET_ADDR )
 {
@@ -174,7 +175,7 @@ HB_FUNC( INET_ADDR )
 
 
 //-----------------------------------------------------------------------------
-//  char FAR *  inet_ntoa( IN struct in_addr in );
+//  char *  inet_ntoa( IN struct in_addr in );
 
 HB_FUNC( INET_NTOA )
 {
@@ -212,7 +213,7 @@ HB_FUNC( NTOHS )
 
 
 //-----------------------------------------------------------------------------
-//  int  recv( IN SOCKET s, OUT char FAR * buf, IN int len, IN int flags );
+//  int  recv( IN SOCKET s, OUT char * buf, IN int len, IN int flags );
 
 // syntax: recv( s, @cBuff, [nLen] , nFlags)-> nRecv or nErr
 
@@ -232,7 +233,7 @@ HB_FUNC( RECV )
 
 
 //-----------------------------------------------------------------------------
-//  int  recvfrom( IN SOCKET s, OUT char FAR * buf, IN int len, IN int flags, OUT ( struct sockaddr *) from, IN OUT int FAR * fromlen );
+//  int  recvfrom( IN SOCKET s, OUT char * buf, IN int len, IN int flags, OUT ( struct sockaddr *) from, IN OUT int * fromlen );
 
 // syntax: recvfrom( s, @cBuff, nLen, nFlags [, @cSockAddr] [, @nSockAddrLen] )-> nRecv or nErr
 
@@ -265,7 +266,7 @@ HB_FUNC( RECVFROM )
 
 
 //-----------------------------------------------------------------------------
-//  int  select( IN int nfds, IN OUT fd_set FAR * readfds, IN OUT fd_set FAR * writefds, IN OUT fd_set FAR *exceptfds, IN const struct timeval FAR * timeout );
+//  int  select( IN int nfds, IN OUT fd_set * readfds, IN OUT fd_set * writefds, IN OUT fd_set *exceptfds, IN const struct timeval * timeout );
 
 // syntax: select
 
@@ -306,7 +307,7 @@ HB_FUNC( SELECT )
 
 
 //-----------------------------------------------------------------------------
-//  int  send( IN SOCKET s, IN const char FAR * buf, IN int len, IN int flags );
+//  int  send( IN SOCKET s, IN const char * buf, IN int len, IN int flags );
 
 HB_FUNC( SEND )
 {
@@ -316,7 +317,7 @@ HB_FUNC( SEND )
 
 
 //-----------------------------------------------------------------------------
-//  int  sendto( IN SOCKET s, IN const char FAR * buf, IN int len, IN int flags, IN const struct sockaddr FAR * to, IN int tolen );
+//  int  sendto( IN SOCKET s, IN const char * buf, IN int len, IN int flags, IN const struct sockaddr * to, IN int tolen );
 
 // syntax: sendto( s, cBuff, [nBuffLen], nFlags, [sockaddr:value], [sockaddr:sizeof])-> nSent or nErr
 
@@ -344,7 +345,7 @@ HB_FUNC( SENDTO )
 
 
 //-----------------------------------------------------------------------------
-//  int  setsockopt( IN SOCKET s, IN int level, IN int optname, IN const char FAR * optval, IN int optlen );
+//  int  setsockopt( IN SOCKET s, IN int level, IN int optname, IN const char * optval, IN int optlen );
 
 HB_FUNC( SETSOCKOPT )
 {
@@ -379,7 +380,7 @@ HB_FUNC( SOCKET )
 
 
 //-----------------------------------------------------------------------------
-//  struct hostent FAR *  gethostbyaddr( IN const char FAR * addr, IN int len, IN int type );
+//  struct hostent *  gethostbyaddr( IN const char * addr, IN int len, IN int type );
 
 HB_FUNC( GETHOSTBYADDR )
 {
@@ -394,7 +395,7 @@ HB_FUNC( GETHOSTBYADDR )
 
 
 //-----------------------------------------------------------------------------
-//  struct hostent FAR *  gethostbyname( IN const char FAR * name );
+//  struct hostent *  gethostbyname( IN const char * name );
 
 HB_FUNC( GETHOSTBYNAME )
 {
@@ -408,7 +409,7 @@ HB_FUNC( GETHOSTBYNAME )
 
 
 //-----------------------------------------------------------------------------
-//  int  gethostname( OUT char FAR * name, IN int namelen );
+//  int  gethostname( OUT char * name, IN int namelen );
 
 // syntax: gethostbyname( @cBuff ) -> nErr
 
@@ -423,7 +424,7 @@ HB_FUNC( GETHOSTNAME )
 
 
 //-----------------------------------------------------------------------------
-//  struct servent FAR *  getservbyport( IN int port, IN const char FAR * proto );
+//  struct servent *  getservbyport( IN int port, IN const char * proto );
 
 HB_FUNC( GETSERVBYPORT )
 {
@@ -432,7 +433,7 @@ HB_FUNC( GETSERVBYPORT )
 
 
 //-----------------------------------------------------------------------------
-//  struct servent FAR *  getservbyname( IN const char FAR * name, IN const char FAR * proto );
+//  struct servent *  getservbyname( IN const char * name, IN const char * proto );
 
 HB_FUNC( GETSERVBYNAME )
 {
@@ -441,7 +442,7 @@ HB_FUNC( GETSERVBYNAME )
 
 
 //-----------------------------------------------------------------------------
-//  struct protoent FAR *  getprotobynumber( IN int number );
+//  struct protoent *  getprotobynumber( IN int number );
 
 HB_FUNC( GETPROTOBYNUMBER )
 {
@@ -450,7 +451,7 @@ HB_FUNC( GETPROTOBYNUMBER )
 
 
 //-----------------------------------------------------------------------------
-//  struct protoent FAR *  getprotobyname( IN const char FAR * name );
+//  struct protoent *  getprotobyname( IN const char * name );
 
 HB_FUNC( GETPROTOBYNAME )
 {
@@ -547,8 +548,8 @@ HB_FUNC( WSACANCELBLOCKINGCALL )
 
 
 //-----------------------------------------------------------------------------
-//  HANDLE  WSAAsyncGetServByName( IN HWND hWnd, IN u_int wMsg, IN const char FAR * name,
-//                                 IN const char FAR * proto, OUT char FAR * buf, IN int buflen );
+//  HANDLE  WSAAsyncGetServByName( IN HWND hWnd, IN u_int wMsg, IN const char * name,
+//                                 IN const char * proto, OUT char * buf, IN int buflen );
 
 
 
@@ -578,7 +579,7 @@ HB_FUNC( WSAASYNCGETSERVBYNAME )
 
 //-----------------------------------------------------------------------------
 //  HANDLE  WSAAsyncGetServByPort( IN HWND hWnd, IN u_int wMsg, IN int port,
-//                                 IN const char FAR * proto, OUT char FAR * buf, IN int buflen );
+//                                 IN const char * proto, OUT char * buf, IN int buflen );
 
 // syntax : se IS SERVENT
 //          if (h:=WSAAsyncGetServByPort( hWnd, wMsg, port, [proto], @c )) <> 0
@@ -605,8 +606,8 @@ HB_FUNC( WSAASYNCGETSERVBYPORT )
 
 
 //-----------------------------------------------------------------------------
-//  HANDLE  WSAAsyncGetProtoByName( IN HWND hWnd, IN u_int wMsg, IN const char FAR * name,
-//                                  OUT char FAR * buf, IN int buflen );
+//  HANDLE  WSAAsyncGetProtoByName( IN HWND hWnd, IN u_int wMsg, IN const char * name,
+//                                  OUT char * buf, IN int buflen );
 
 // syntax : se IS PROTOENT
 //          if (h:=WSAAsyncGetProtByName( hWnd, wMsg, name, @c )) <> 0
@@ -634,7 +635,7 @@ HB_FUNC( WSAASYNCGETPROTOBYNAME )
 
 //-----------------------------------------------------------------------------
 //  HANDLE  WSAAsyncGetProtoByNumber( IN HWND hWnd, IN u_int wMsg, IN int number,
-//                                    OUT char FAR * buf, IN int buflen );
+//                                    OUT char * buf, IN int buflen );
 
 // syntax : se IS PROTOENT
 //          if (h:=WSAAsyncGetProtByNumber( hWnd, wMsg, number, @c )) <> 0
@@ -660,8 +661,8 @@ HB_FUNC( WSAASYNCGETPROTOBYNUMBER )
 }
 
 //-----------------------------------------------------------------------------
-//  HANDLE  WSAAsyncGetHostByName( IN HWND hWnd, IN u_int wMsg, IN const char FAR * name,
-//                                 OUT char FAR * buf, IN int buflen );
+//  HANDLE  WSAAsyncGetHostByName( IN HWND hWnd, IN u_int wMsg, IN const char * name,
+//                                 OUT char * buf, IN int buflen );
 
 // syntax : se IS HOSTENT
 //          if (h:=WSAAsyncGetHostByName( hWnd, wMsg, name, @c )) <> 0
@@ -687,8 +688,8 @@ HB_FUNC( WSAASYNCGETHOSTBYNAME )
 
 
 //-----------------------------------------------------------------------------
-//  HANDLE  WSAAsyncGetHostByAddr( IN HWND hWnd, IN u_int wMsg, IN const char FAR * addr,
-//                                 IN int len, IN int type, OUT char FAR * buf, IN int buflen );
+//  HANDLE  WSAAsyncGetHostByAddr( IN HWND hWnd, IN u_int wMsg, IN const char * addr,
+//                                 IN int len, IN int type, OUT char * buf, IN int buflen );
 
 // syntax : se IS HOSTENT
 //          if (h:=WSAAsyncGetHostByName( hWnd, wMsg, cAddr, type, @c )) <> 0
@@ -744,7 +745,7 @@ HB_FUNC( WSAASYNCSELECT )
 // int CALLBACK ConditionFunc(  IN LPWSABUF lpCallerId,  IN LPWSABUF lpCallerData,
 //                              IN OUT LPQOS lpSQOS,  IN OUT LPQOS lpGQOS,
 //                              IN LPWSABUF lpCalleeId, OUT LPWSABUF lpCalleeData,
-//                              OUT GROUP FAR * g, IN DWORD dwCallbackData );
+//                              OUT GROUP * g, IN DWORD dwCallbackData );
 
 
 // dwCallbackData should contain the Harbour function pointer or NULL/0
@@ -752,7 +753,7 @@ HB_FUNC( WSAASYNCSELECT )
 
 int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lpSQOS,
                  LPQOS lpGQOS, LPWSABUF lpCalleeId, LPWSABUF lpCalleeData,
-                 GROUP FAR * g, DWORD dwCallbackData )
+                 GROUP * g, DWORD dwCallbackData )
 {
 
    int res = CF_ACCEPT ;
@@ -780,7 +781,7 @@ int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lp
 
 
 //-----------------------------------------------------------------------------
-//  SOCKET  WSAAccept( IN SOCKET s, OUT struct sockaddr FAR * addr, IN OUT LPINT addrlen,
+//  SOCKET  WSAAccept( IN SOCKET s, OUT struct sockaddr * addr, IN OUT LPINT addrlen,
 //                     IN LPCONDITIONPROC lpfnCondition, IN DWORD_PTR dwCallbackData );
 
 
@@ -827,7 +828,7 @@ HB_FUNC( WSACLOSEEVENT )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSAConnect( IN SOCKET s, IN const struct sockaddr FAR * name, IN int namelen,
+//  int  WSAConnect( IN SOCKET s, IN const struct sockaddr * name, IN int namelen,
 //                   IN LPWSABUF lpCallerData, OUT LPWSABUF lpCalleeData, IN LPQOS lpSQOS, IN LPQOS lpGQOS );
 
 // syntax: WSAConnect( s, cSockAddr, [cCallerData], [@cCalleeData]
@@ -1012,7 +1013,7 @@ HB_FUNC( WSAGETQOSBYNAME )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSAHtonl( IN SOCKET s, IN u_long hostlong, OUT u_long FAR * lpnetlong );
+//  int  WSAHtonl( IN SOCKET s, IN u_long hostlong, OUT u_long * lpnetlong );
 
 /*
 
@@ -1031,7 +1032,7 @@ HB_FUNC( WSAHTONL )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSAHtons( IN SOCKET s, IN u_short hostshort, OUT u_short FAR * lpnetshort );
+//  int  WSAHtons( IN SOCKET s, IN u_short hostshort, OUT u_short * lpnetshort );
 
 /*
 
@@ -1081,7 +1082,7 @@ HB_FUNC( WSAIOCTL )
 
 
 //-----------------------------------------------------------------------------
-//  SOCKET  WSAJoinLeaf( IN SOCKET s, IN const struct sockaddr FAR * name, IN int namelen, IN LPWSABUF lpCallerData, OUT LPWSABUF lpCalleeData, IN LPQOS lpSQOS, IN LPQOS lpGQOS, IN DWORD dwFlags );
+//  SOCKET  WSAJoinLeaf( IN SOCKET s, IN const struct sockaddr * name, IN int namelen, IN LPWSABUF lpCallerData, OUT LPWSABUF lpCalleeData, IN LPQOS lpSQOS, IN LPQOS lpGQOS, IN DWORD dwFlags );
 
 /*
 
@@ -1111,7 +1112,7 @@ HB_FUNC( WSAJOINLEAF )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSANtohl( IN SOCKET s, IN u_long netlong, OUT u_long FAR * lphostlong );
+//  int  WSANtohl( IN SOCKET s, IN u_long netlong, OUT u_long * lphostlong );
 
 /*
 
@@ -1130,7 +1131,7 @@ HB_FUNC( WSANTOHL )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSANtohs( IN SOCKET s, IN u_short netshort, OUT u_short FAR * lphostshort );
+//  int  WSANtohs( IN SOCKET s, IN u_short netshort, OUT u_short * lphostshort );
 
 /*
 
@@ -1196,7 +1197,7 @@ HB_FUNC( WSARECVDISCONNECT )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSARecvFrom( IN SOCKET s, IN OUT LPWSABUF lpBuffers, IN DWORD dwBufferCount, OUT LPDWORD lpNumberOfBytesRecvd, IN OUT LPDWORD lpFlags, OUT struct sockaddr FAR * lpFrom, IN OUT LPINT lpFromlen, IN LPWSAOVERLAPPED lpOverlapped, IN LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine );
+//  int  WSARecvFrom( IN SOCKET s, IN OUT LPWSABUF lpBuffers, IN DWORD dwBufferCount, OUT LPDWORD lpNumberOfBytesRecvd, IN OUT LPDWORD lpFlags, OUT struct sockaddr * lpFrom, IN OUT LPINT lpFromlen, IN LPWSAOVERLAPPED lpOverlapped, IN LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine );
 
 /*
 
@@ -1283,7 +1284,7 @@ HB_FUNC( WSASENDDISCONNECT )
 
 
 //-----------------------------------------------------------------------------
-//  int  WSASendTo( IN SOCKET s, IN LPWSABUF lpBuffers, IN DWORD dwBufferCount, OUT LPDWORD lpNumberOfBytesSent, IN DWORD dwFlags, IN const struct sockaddr FAR * lpTo, IN int iTolen, IN LPWSAOVERLAPPED lpOverlapped, IN LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine );
+//  int  WSASendTo( IN SOCKET s, IN LPWSABUF lpBuffers, IN DWORD dwBufferCount, OUT LPDWORD lpNumberOfBytesSent, IN DWORD dwFlags, IN const struct sockaddr * lpTo, IN int iTolen, IN LPWSAOVERLAPPED lpOverlapped, IN LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine );
 
 /*
 
@@ -1347,7 +1348,7 @@ HB_FUNC( WSASOCKET )
 
 
 //-----------------------------------------------------------------------------
-//  DWORD  WSAWaitForMultipleEvents( IN DWORD cEvents, IN const WSAEVENT FAR * lphEvents, IN BOOL fWaitAll, IN DWORD dwTimeout, IN BOOL fAlertable );
+//  DWORD  WSAWaitForMultipleEvents( IN DWORD cEvents, IN const WSAEVENT * lphEvents, IN BOOL fWaitAll, IN DWORD dwTimeout, IN BOOL fAlertable );
 
 /*
 

@@ -15,10 +15,11 @@
 
 #define _WIN32_WINNT   0x0400
 
-#include   <shlobj.h>
-#include   <windows.h>
-#include   <shellApi.h>
-#include   <wininet.h>
+#include   "windows.h"
+#include   "shlobj.h"
+#include   "shellApi.h"
+#include   "wininet.h"
+
 #include   "hbapi.h"
 #include   "hbvm.h"
 #include   "hbstack.h"
@@ -40,7 +41,7 @@
 //
 HB_FUNC ( INTERNETDIAL )
 {
-   HWND    hWnd   = ISNIL( 1 ) ? NULL : ( HWND ) hb_parnl( 1 ) ;
+   HWND    hWnd   = ISNIL( 1 ) ? 0    : ( HWND ) hb_parnl( 1 ) ;
    LPTSTR  lpszId = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
    DWORD   nFlags = INTERNET_AUTODIAL_FORCE_ONLINE ;
    DWORD   nRet   = 0;
@@ -101,7 +102,7 @@ HB_FUNC ( INTERNETOPEN )
    DWORD   dwAccessType    = ISNIL( 2 ) ? INTERNET_OPEN_TYPE_DIRECT : hb_parnl( 2 ) ;
    LPCTSTR lpszProxyName   = ISNIL( 3 ) ? NULL : hb_parc( 3 ) ; 
    LPCTSTR lpszProxyBypass = ISNIL( 4 ) ? NULL : hb_parc( 4 ) ;
-   DWORD   dwFlags         = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;  
+   DWORD   dwFlags         = ISNIL( 5 ) ? 0    : hb_parnl( 5 ) ;  
    
    hb_retnl( ( ULONG ) InternetOpen( lpszAgent, dwAccessType, lpszProxyName, lpszProxyBypass, dwFlags ) ) ;
 }
@@ -132,8 +133,8 @@ HB_FUNC ( INTERNETCONNECT )
    LPCTSTR       lpszUserName   = ISNIL( 4 ) ? NULL : hb_parc( 4 ) ;
    LPCTSTR       lpszPassword   = ISNIL( 5 ) ? NULL : hb_parc( 5 ) ;
    DWORD         dwService      = ISNIL( 6 ) ? INTERNET_SERVICE_HTTP : hb_parnl( 6 ) ;
-   DWORD         dwFlags        = ISNIL( 7 ) ? NULL : hb_parnl( 7 ) ;
-   DWORD_PTR     dwContext      = ISNIL( 8 ) ? NULL : hb_parnl( 8 ) ;
+   DWORD         dwFlags        = ISNIL( 7 ) ? 0    : hb_parnl( 7 ) ;
+   DWORD_PTR     dwContext      = ISNIL( 8 ) ? 0    : hb_parnl( 8 ) ;
    
    hb_retnl( ( ULONG ) InternetConnect( hInternet,    lpszServerName, 
                               nServerPort, lpszUserName, lpszPassword,   
@@ -161,7 +162,7 @@ HB_FUNC ( FTPOPENFILE )
    LPCTSTR   lpszFileName = hb_parc( 2 ) ;
    DWORD     dwAccess     = ISNIL( 3 ) ? GENERIC_READ : hb_parni( 3  ) ;
    DWORD     dwFlags      = ISNIL( 4 ) ? FTP_TRANSFER_TYPE_BINARY : hb_parni( 4 ) ;
-   DWORD_PTR dwContext    = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
+   DWORD_PTR dwContext    = ISNIL( 5 ) ? 0            : hb_parnl( 5 ) ;
    
    hb_retl( FtpOpenFile( hFtp, lpszFileName, dwAccess, dwFlags, dwContext ) ) ;
 }
@@ -251,7 +252,7 @@ HB_FUNC ( FTPCOMMAND )
    BOOL      fExpectResponse = ISNIL( 2 ) ? 0 : hb_parl( 2 ) ;
    DWORD     dwFlags         = ISNIL( 3 ) ? FTP_TRANSFER_TYPE_BINARY : hb_parnl( 3 ) ;
    LPCTSTR   lpszCommand     = hb_parc( 4 ) ;
-   DWORD_PTR dwContext       = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
+   DWORD_PTR dwContext       = ISNIL( 5 ) ? 0 : hb_parnl( 5 ) ;
    HINTERNET phFtpCommand ;
    
    BOOL      bRet ;
@@ -344,7 +345,7 @@ HB_FUNC ( FTPFINDFIRSTFILE )
    LPCTSTR   lpszSearchFile         = ISNIL( 2 ) ? TEXT ("*.*") : hb_parc( 2 ) ;
    WIN32_FIND_DATA FindFileData ;
    DWORD     dwFlags                = ISNIL( 4 ) ? INTERNET_FLAG_NEED_FILE : hb_parnl( 4 ) ;
-   DWORD_PTR dwContext              = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
+   DWORD_PTR dwContext              = ISNIL( 5 ) ? 0 : hb_parnl( 5 ) ;
    HINTERNET hResult ;  
 
    hResult = FtpFindFirstFile( hInternet, lpszSearchFile, 

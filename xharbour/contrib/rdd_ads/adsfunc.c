@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.10 2003/03/29 21:23:20 lculik Exp $
+ * $Id: adsfunc.c,v 1.11 2003/04/09 17:02:17 iananderson Exp $
  */
 
 /*
@@ -51,6 +51,12 @@
  */
 
 #define HB_OS_WIN_32_USED
+
+#pragma message( "Before hbdefs" )
+
+#include "hbsetup.h"
+
+#pragma message( "After hbdefs" )
 
 #include "hbapi.h"
 #include "hbapiitm.h"

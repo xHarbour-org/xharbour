@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.4 2003/05/16 19:52:08 druzus Exp $
+ * $Id: gtcgi.c,v 1.5 2003/05/21 09:35:35 druzus Exp $
  */
 
 /*
@@ -88,14 +88,14 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
    s_szCrLf = hb_conNewLine();
    s_ulCrLf = strlen( s_szCrLf );
-   
+
    /* stdin && stdout && stderr */
    s_iStdIn  = iFilenoStdin;
    s_iStdOut = iFilenoStdout;
    s_iStdErr = iFilenoStderr;
 
    hb_fsSetDevMode( s_iStdOut, FD_BINARY );
-    
+
    HB_GT_FUNC(mouse_Init());
 }
 
@@ -412,9 +412,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
-       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  || 
+   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
+       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  ||
        ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
    {
 
@@ -530,7 +530,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
          Left = 0;
       else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
          Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
-   
+
       if( Right < 0 )
          Right = 0;
       else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
@@ -678,7 +678,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -686,7 +686,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.10 2003/05/26 13:26:31 paultucker Exp $
+ * $Id: ads1.c,v 1.11 2003/05/27 01:37:36 brianhays Exp $
  */
 
 /*
@@ -55,6 +55,8 @@
 #define HB_OS_WIN_32_USED
 #define MAX_STR_LEN 255
 
+#include "hbdefs.h"
+
 #include "hbapi.h"
 #include "hbinit.h"
 #include "hbapiitm.h"
@@ -63,6 +65,7 @@
 #include "hbdate.h"
 #include "rddads.h"
 #include "hbset.h"
+
 #include <ctype.h>
 
 #define __PRG_SOURCE__ __FILE__
@@ -70,7 +73,7 @@
 static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
 static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
 static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
-static iSetListenerHandle;
+static int iSetListenerHandle;
 
 HB_FUNC( _ADS );
 HB_FUNC( ADS_GETFUNCTABLE );
@@ -91,7 +94,10 @@ HB_INIT_SYMBOLS_BEGIN( ads1__InitSymbols )
 { "_ADS",             HB_FS_PUBLIC, HB_FUNCNAME( _ADS ), NULL },
 { "ADS_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( ADS_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( ads1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup ads1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

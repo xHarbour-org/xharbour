@@ -13,9 +13,10 @@
 #define HB_OS_WIN_32_USED
 #define _WIN32_WINNT   0x0400
 
-#include <shlobj.h>
 #include <windows.h>
-#include <commctrl.h>
+#include <shlobj.h>
+//#include <commctrl.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -354,7 +355,7 @@ HB_FUNC( GETLISTBOXINFO )
 
 HB_FUNC ( GETLISTBOXINFO )
 {
-HINSTANCE h    = LoadLibraryEx( "user32.dll",NULL,NULL);
+HINSTANCE h    = LoadLibraryEx( "user32.dll", NULL, 0);
 DWORD dwGLIRet = 0 ;
 HWND  hWnd     = (HWND) hb_parnl( 1 );
 

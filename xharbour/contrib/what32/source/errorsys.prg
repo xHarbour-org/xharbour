@@ -46,7 +46,7 @@ STATIC FUNCTION DefError( e )
 
    i := 2
    DO WHILE ( ! Empty( ProcName( i ) ) )
-      cProcStack += ( CRLF + Trim( ProcName( i ) ) + "(" + NTRIM( ProcLine( i ++ ) ) + ")" )
+      cProcStack += ( CRLF + ProcFile( i ) + "->" + ProcName( i ) + "(" + NTRIM( ProcLine( i ++ ) ) + ")" )
       IF ProcName( i ) == 'DEFERROR' // Oops, recursive arror, cannot continue !
          OutputDebugString( "" )
          OutputDebugString( "===============" + CRLF )
@@ -142,8 +142,8 @@ STATIC FUNCTION ErrorMessage( e )
    IF ( ValType( e:subCode ) == "N" )
       cMessage += ( NTRIM( e:subCode ) )
    END
-   cMessage += ';Called from ' + procname( 3 ) + ' (' + AllTrim( Str( procline( 3 ) ) ) + '),  ' + ;
-               + procname( 4 ) + ' (' + AllTrim( Str( procline( 4 ) ) ) + ')'
+   cMessage += ';Called from ' + ProcFile(3) + "->" + procname( 3 ) + ' (' + AllTrim( Str( procline( 3 ) ) ) + '),  ' + ;
+               + ProcFile(4) + "->" + procname( 4 ) + ' (' + AllTrim( Str( procline( 4 ) ) ) + ')'
    cMessage += ';Error logged in file '+GetModuleFileName()+'\ERROR.LOG'
 
    RETURN ( cMessage )

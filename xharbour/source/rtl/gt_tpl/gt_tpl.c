@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.2 2003/05/16 19:52:08 druzus Exp $
+ * $Id: gt_tpl.c,v 1.3 2003/05/21 09:35:35 druzus Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
       uiStyle = SC_SPECIAL2;
    else
       uiStyle = 0;
-*/ 
+*/
 
    return uiStyle;
 }
@@ -367,7 +367,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
 
    HB_SYMBOL_UNUSED( uiRows );
    HB_SYMBOL_UNUSED( uiCols );
-   
+
    return FALSE;
 }
 
@@ -587,7 +587,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
@@ -595,7 +595,7 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 

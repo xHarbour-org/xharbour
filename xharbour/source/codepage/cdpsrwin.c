@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsrwin.c,v 1.1 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: cdpsrwin.c,v 1.2 2003/05/27 14:02:07 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_CODEPAGE_ANNOUNCE( SRWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SRWIN )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_SRWIN )
-#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_SRWIN
 #endif
 
