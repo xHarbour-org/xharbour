@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.61 2003/10/18 10:42:54 jonnymind Exp $
+* $Id: thread.h,v 1.62 2003/10/18 14:13:33 jonnymind Exp $
 */
 
 /*
@@ -116,7 +116,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    typedef void ( * HB_IDLE_FUNC )( void );
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
-   #define HB_SAME_THREAD(x, y)        (x == y)
+   #define HB_SAME_THREAD(x, y)        ((x) == (y))
 
    /* Guard for cancellation requets */
    extern HB_CRITICAL_T hb_cancelMutex;

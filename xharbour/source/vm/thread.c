@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.109 2003/10/18 10:42:54 jonnymind Exp $
+* $Id: thread.c,v 1.110 2003/10/18 14:13:33 jonnymind Exp $
 */
 
 /*
@@ -315,6 +315,7 @@ HB_STACK *hb_threadLinkStack( HB_STACK *tc )
    }
 
    p->next = tc;
+   tc->next = NULL;
 
    //last_stack = p;
 
@@ -498,6 +499,8 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
    }
 
+   hb_errRT_BASE_SubstR( EG_ARG, 1099, "Can't find thread ID", "INTERNAL THREADING", 1, hb_paramError( 1 ) );
+
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
    return p;
 }
@@ -517,7 +520,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 
       p = hb_ht_stack;
 
-      while( p && HB_SAME_THREAD( p->th_id, id) )
+      while( p && ! HB_SAME_THREAD( p->th_id, id) )
       {
          p = p->next;
       }
@@ -997,7 +1000,6 @@ HB_FUNC( STARTTHREAD )
 
    HB_STACK_UNLOCK;
    HB_CRITICAL_LOCK( hb_threadStackMutex );
-   hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
    if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
@@ -1018,11 +1020,11 @@ HB_FUNC( STARTTHREAD )
          HB_COND_WAIT( hb_threadStackCond, hb_threadStackMutex );
       }
 #endif
+      hb_threadLinkStack( pStack );
       hb_retnl( (long) pStack->th_id );
    }
    else
    {
-      hb_threadUnlinkStack( pStack );
       hb_threadDestroyStack( pStack );
       hb_retnl( -1 );
    }
@@ -1064,15 +1066,17 @@ HB_FUNC( STOPTHREAD )
       pthread_join( th, NULL );
 
    #else
-      stack = hb_threadGetStack( th );
+      stack = hb_threadGetStackNoError( th );
 
-      HB_CRITICAL_LOCK( hb_cancelMutex );
-      stack->bCanceled = TRUE;
-      HB_CRITICAL_UNLOCK( hb_cancelMutex );
-
-      HB_TEST_CANCEL_ENABLE_ASYN;
-      WaitForSingleObject( stack->th_h, INFINITE );
-      HB_DISABLE_ASYN_CANC;
+      if ( stack ) {
+         HB_CRITICAL_LOCK( hb_cancelMutex );
+         stack->bCanceled = TRUE;
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );
+   
+         HB_TEST_CANCEL_ENABLE_ASYN;
+         WaitForSingleObject( stack->th_h, INFINITE );
+         HB_DISABLE_ASYN_CANC;
+      }
    #endif
    HB_STACK_LOCK;
 
@@ -1111,18 +1115,21 @@ HB_FUNC( KILLTHREAD )
    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       pthread_cancel( th );
    #else
-      stack = hb_threadGetStack( th );
       /* Shell locking the thread */
       HB_STACK_UNLOCK;
-      HB_CRITICAL_LOCK( hb_cancelMutex );
-      if ( ! stack->bCanCancel )
+      stack = hb_threadGetStackNoError( th );
+      if ( stack != NULL ) 
       {
-         stack->bCanceled = TRUE;
-         HB_CRITICAL_UNLOCK( hb_cancelMutex );
-      }
-      else
-      {
-         hb_threadCancel( stack ); //also unlocks the mutex
+         HB_CRITICAL_LOCK( hb_cancelMutex );
+         if ( ! stack->bCanCancel )
+         {
+            stack->bCanceled = TRUE;
+            HB_CRITICAL_UNLOCK( hb_cancelMutex );
+         }
+         else
+         {
+            hb_threadCancel( stack ); //also unlocks the mutex
+         }
       }
       HB_STACK_LOCK;
    #endif
@@ -1590,7 +1597,7 @@ HB_FUNC( THREADISSAME )
    }
    else if ( ISNUM(1) )
    {
-      hb_retl( HB_SAME_THREAD( HB_CURRENT_THREAD(), hb_parnl(2)));
+      hb_retl( HB_SAME_THREAD( (long)HB_CURRENT_THREAD(), hb_parnl(2)));
    }
    else {
       hb_retl( FALSE);
@@ -2030,7 +2037,9 @@ void hb_threadSleep( int millisec )
          nanosleep( &ts, 0 );
       }
    #else
+      HB_TEST_CANCEL_ENABLE_ASYN;
       Sleep( millisec );
+      HB_DISABLE_ASYN_CANC;
    #endif
 
    HB_STACK_LOCK;
