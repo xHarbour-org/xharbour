@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.18 2003/02/27 06:16:39 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.19 2003/03/25 02:36:11 ronpinkas Exp $
  */
 
 /*
@@ -205,7 +205,7 @@ Function HB_CStructure( cStructure, nAlign )
    LOCAL oStructure
    LOCAL Counter
    LOCAL nID
-   LOCAL acMembers, acTypes, cMember
+   LOCAL acMembers, aCTypes, cMember
    LOCAL aMemberDefinition
    LOCAL aStructure
    LOCAL oErr
@@ -236,7 +236,6 @@ Function HB_CStructure( cStructure, nAlign )
    ENDIF
 
    IF s_aClasses[nID][2] == NIL
-
       //TraceLog( "Created: " + Str( nId ) )
 
       hClass := __clsNew( "C Structure " + cStructure, Len( aCTypes ) + CLASS_PROPERTIES, 8 )
@@ -252,44 +251,31 @@ Function HB_CStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
 
-      Counter := 1
       FOR EACH cMember IN acMembers
-         __clsAddMsg( hClass,       cMember, Counter  , HB_OO_MSG_PROPERTY )
-         //__clsAddMsg( hClass, "_" + cMember, Counter++, HB_OO_MSG_DATA )
+         __clsAddMsg( hClass,       cMember, HB_EnumIndex(), HB_OO_MSG_PROPERTY )
       NEXT
 
+      Counter := Len( acMembers ) + 1
       __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
-      //__clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
 
       Counter++
-
       __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, nAlign, /*HB_OO_CLSTP_READONLY*/ )
-      //__clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
-
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( acTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
-      //__clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
-
       __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
-      //__clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
-
       __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
-      //__clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
 
-      //TraceLog( Len( acTypes ), acTypes[1], acTypes )
-
+      //TraceLog( Len( aCTypes ), aCTypes[1], aCTypes )
    ELSE
-
       hClass := s_aClasses[nId][2]
 
       //TraceLog( "Reused: " + Str( nId ) )
-
    ENDIF
 
    oStructure := __clsInst( hClass )
@@ -299,7 +285,7 @@ Function HB_CStructure( cStructure, nAlign )
 
    //oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
 
-   //oStructure:SizeOf := HB_SizeOfCStructure( acTypes, oStructure:nAlign )
+   //oStructure:SizeOf := HB_SizeOfCStructure( aCTypes, oStructure:nAlign )
 
    oStructure:nId := nID + CTYPE_STRUCTURE
 
@@ -310,17 +296,15 @@ Return oStructure
 //---------------------------------------------------------------------------//
 static Procedure AllocateMembers( oStructure )
 
-   LOCAL aCTypes := oStructure:acTypes, CType, Counter := 1
+   LOCAL aCTypes := oStructure:aCTypes, CType
 
    //TraceLog( "Scaning: " + oStructure:ClassName )
 
    FOR EACH CType IN aCTypes
       IF CType > CTYPE_STRUCTURE .AND. CType < CTYPE_STRUCTURE_PTR
-         oStructure[Counter] := HB_CStructureFromID( CType, , .F. )
-         AllocateMembers( oStructure[Counter] )
+         oStructure[ HB_EnumIndex() ] := HB_CStructureFromID( CType, , .F. )
+         AllocateMembers( oStructure[ HB_EnumIndex() ] )
       ENDIF
-
-      Counter++
    NEXT
 
    //TraceLog( "Finished: " + oStructure:ClassName )
@@ -331,7 +315,7 @@ Return
 Function HB_CStructureFromID( nID, nAlign )
 
    LOCAL hClass, oStructure, lInplace
-   LOCAL Counter, CType
+   LOCAL CType
    LOCAL oErr
 
    //TraceLog( nId, s_aClasses )
@@ -370,7 +354,7 @@ Function HB_CStructureFromID( nID, nAlign )
 
       oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
 
-      oStructure:SizeOf := HB_SizeOfCStructure( oStructure:acTypes, oStructure:nAlign )
+      oStructure:SizeOf := HB_SizeOfCStructure( oStructure:aCTypes, oStructure:nAlign )
 
       oStructure:nID = nID + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
    ENDIF
@@ -383,7 +367,7 @@ Function HB_CTypeArrayID( CType, nLen )
    LOCAL hClass
    LOCAL Counter
    LOCAL nID
-   LOCAL acTypes, acMembers, cMember
+   LOCAL aCTypes, acMembers, cMember
    LOCAL cArrayClassName := "C Array of [" + LTrim( Str( nLen ) ) + "] CType: " + Str( CType )
 
    nID := aScan( s_aArrayClasses, { | aArrayDefinitions | aArrayDefinitions[1] == CType .AND. aArrayDefinitions[2] == nLen } )
@@ -412,32 +396,22 @@ Function HB_CTypeArrayID( CType, nLen )
          acMembers[Counter] := cMember
 
          __clsAddMsg( hClass,       cMember, Counter, HB_OO_MSG_PROPERTY )
-         //__clsAddMsg( hClass, "_" + cMember, Counter, HB_OO_MSG_DATA )
       NEXT
 
       __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY )
-      //__clsAddMsg( hClass, "_aCTypes"       , Counter, HB_OO_MSG_DATA )
 
       Counter++
-
       __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
-      //__clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
-
       __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, , /*HB_OO_CLSTP_READONLY*/ )
-      //__clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
-
       __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY )
-      //__clsAddMsg( hClass, "_nID", Counter, HB_OO_MSG_DATA )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
-
       __clsAddMsg( hClass,  "InternalBuffer", Counter, HB_OO_MSG_PROPERTY, , HB_OO_CLSTP_READONLY )
-      //__clsAddMsg( hClass, "_InternalBuffer", Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
 
       // Sames as s_aClasses[nID][4]
       aFill( aCTypes, CType )
@@ -515,7 +489,7 @@ Return QSelf():InternalBuffer
 STATIC Function DeValue( lAdopt )
 
    LOCAL aValues
-   LOCAL Counter, nLen := Len( QSelf() ) - CLASS_PROPERTIES
+   LOCAL xProperty, nLen := Len( QSelf() ) - CLASS_PROPERTIES
    LOCAL Buffer := QSelf():InternalBuffer
 
    //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ) )
@@ -526,8 +500,12 @@ STATIC Function DeValue( lAdopt )
       aValues := HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt  )
    ENDIF
 
-   FOR Counter := 1 TO nLen
-      QSelf()[Counter] := aValues[Counter]
+   FOR EACH xProperty IN QSelf()
+      IF HB_EnumIndex() > nLen
+         EXIT
+      ENDIF
+
+      xProperty := aValues[ HB_EnumIndex() ]
    NEXT
 
 Return aValues
@@ -544,15 +522,19 @@ Return aValues
 //---------------------------------------------------------------------------//
 STATIC Function Init( aValues )
 
-    LOCAL Counter, nLen := Len( aValues )
+   LOCAL xProperty, Counter, nLen := Len( aValues )
 
-    FOR Counter := 1 TO nLen
-       IF Left( QSelf()[Counter]:ClassName, 11 ) == "C Structure"
-          QSelf()[Counter]:Init( aValues[Counter] )
-       ELSE
-          QSelf()[Counter] := aValues[Counter]
-       ENDIF
-    NEXT
+   FOR EACH xProperty IN QSelf()
+      IF HB_EnumIndex() > nLen
+         EXIT
+      ENDIF
+
+      IF Left( xProperty:ClassName, 11 ) == "C Structure"
+         xProperty:Init( aValues[ HB_EnumIndex() ] )
+      ELSE
+         xProperty := aValues[ HB_EnumIndex() ]
+      ENDIF
+   NEXT
 
 Return QSelf()
 

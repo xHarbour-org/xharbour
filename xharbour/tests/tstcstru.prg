@@ -1,7 +1,8 @@
 #include "cstruct.ch"
-#include "wintypes.ch"
 
 #ifdef C_SYNTAX
+   #include "wintypes.ch"
+
    pragma pack(1)
    typedef struct { ;
       char c1[2] ;
