@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.13 2001/04/12 18:56:29 dholm Exp $
+ * $Id: valtype.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
  */
 
 /*
@@ -50,11 +50,49 @@
  *
  */
 
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
+ *    IS_VARBYREF()
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbstack.h"
 
 HB_FUNC( VALTYPE )
 {
    hb_retc( hb_itemTypeStr( hb_param( 1, HB_IT_ANY ) ) );
+}
+
+HB_FUNC( HB_ISBYREF )
+{
+   PHB_ITEM pItem;
+
+   if( hb_pcount() )
+   {
+      pItem = hb_stackItemFromBase( 1 );
+
+      if( pItem->type & HB_IT_BYREF )
+      {
+         pItem = hb_itemUnRefOnce( pItem );
+
+         if( pItem->type & HB_IT_BYREF )
+
+            hb_retl( TRUE );
+
+         else
+
+            hb_retl( FALSE );
+      }
+      else
+         hb_ret( );
+   }
 }
 
