@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.470 2002/10/30 02:09:34 lculik Exp $
+ * $Id: ChangeLog,v 1.471 2002/10/30 02:32:47 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -18,8 +18,7 @@
     * Someone may wish to adapt the code above hb_gt_tone() in gtwin.c
     * for other compilers.
   * makefile.vc
-    * slight re-ordering and for the moment, removed win32ole.prg till
-    * I or someone can review the problem with it for MSVC.
+    * slight re-ordering
   + makefile.nt
   * make_vc.bat
     * if building Harbour under NT, use the alternate makefile.nt

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.19 2002/10/22 21:20:12 paultucker Exp $
+# $Id: makefile.vc,v 1.20 2002/10/30 02:32:48 paultucker Exp $
 #
 
 #
@@ -432,9 +432,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
    $(OBJ_DIR)\typefile.obj \
-   $(OBJ_DIR)\wait.obj
-# \
-#   $(OBJ_DIR)\win32ole.obj
+   $(OBJ_DIR)\wait.obj \
+   $(OBJ_DIR)\win32ole.obj
 
 #
 # LANG.LIB rules

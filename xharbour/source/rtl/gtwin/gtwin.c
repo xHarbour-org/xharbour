@@ -89,6 +89,10 @@
 #include <time.h>
 #include <io.h>
 
+#if defined( _MSC_VER )
+  #include <conio.h>
+#endif
+
 /* *********************************************************************** */
 
 #if defined(__IBMCPP__)
