@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3802 2005/02/10 23:05:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3803 2005/02/11 18:56:22 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-11 14:47 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * source/rtl/Makefile
+  + source/rtl/error.c
+  * source/rtl/terror.prg
+    * Moved ERROR() function to a separate file.
+
+  * source/rtl/set.c
+  * source/rtl/getsys.prg
+    * Moved READINSERT() and READEXIT() from GETSYS.PRG to SET.C
+      (for avoid forced linkage of the default GETSYS).
 
 2005-02-11 19:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/w32/global.cf
