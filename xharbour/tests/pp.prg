@@ -216,7 +216,7 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams
-   LOCAL sDefine
+   LOCAL sDefine, sCH
 
    IF p1 != NIL
       sSwitch += p1
@@ -246,17 +246,20 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
       sSwitch += p9
    ENDIF
 
-   IF sSource != NIL .AND. ( "-H" $ Upper( sSource ) .OR. "--HELP"  $ Upper( sSource ) )
-      sSwitch := " PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-P] [-R] [-STRICT] [-U]" + CRLF + CRLF
-      sSwitch += [    -CCH    = Generate a .cch file (compiled command header).] + CRLF
-      sSwitch += [    -D<id>  = #define <id>.] + CRLF
-      sSwitch += [    -D:E    = Show tracing information into the Expression Scanner.] + CRLF
-      sSwitch += [    -D:M    = Show tracing information into the Match Engine.] + CRLF
-      sSwitch += [    -D:P    = Show tracing information into the Output Generator.] + CRLF
-      sSwitch += [    -P      = Generate .pp$ pre-processed output file.] + CRLF
-      sSwitch += [    -R      = Run filename as a script.] + CRLF
-      sSwitch += [    -STRICT = Strict Clipper compatability (clone PP bugs).] + CRLF
-      sSwitch += [    -U      = Don't load standard rules.] + CRLF
+   IF sSource != NIL .AND. ( Upper( sSource ) == "-H" .OR. Upper( sSource ) == "--HELP" )
+      sSwitch := "   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-I<path>] [-P] [-R]" + CRLF
+      sSwitch += "                     [-STRICT] [-U[ch-file]]" + CRLF + CRLF
+
+      sSwitch += [    -CCH     = Generate a .cch file (compiled command header).] + CRLF
+      sSwitch += [    -D<id>   = #define <id>.] + CRLF
+      sSwitch += [    -D:E     = Show tracing information into the Expression Scanner.] + CRLF
+      sSwitch += [    -D:M     = Show tracing information into the Match Engine.] + CRLF
+      sSwitch += [    -D:P     = Show tracing information into the Output Generator.] + CRLF
+      sSwitch += [    -I<path> = #include file search path(s) (';' seperated).] + CRLF
+      sSwitch += [    -P       = Generate .pp$ pre-processed output file.] + CRLF
+      sSwitch += [    -R       = Run filename as a script.] + CRLF
+      sSwitch += [    -STRICT  = Strict Clipper compatability (clone Clipper PreProcessor bugs).] + CRLF
+      sSwitch += [    -U       = Use command definitions set in <ch-file> (or none).] + CRLF
 
      	? sSwitch
       ?
@@ -306,6 +309,38 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
    IF ! Empty( sSwitch )
       sSwitch := Upper( sSwitch )
 
+      /* Generate compiled header. */
+      IF "-CCH" $ sSwitch
+         bCCH := .T.
+      ENDIF
+
+      /* Process command line defines. */
+      WHILE ( nAt := At( "-D", sSwitch ) ) > 0
+         nNext := At( "-", SubStr( sSwitch, nAt + 2 ) )
+         IF nNext == 0
+            nNext := 256
+         ENDIF
+
+         sDefine := SubStr( sSwitch, nAt + 2, nNext - 1 )
+         sSwitch := Left( sSwitch, nAt - 1 ) + SubStr( sSwitch, nAt + 1 + nNext )
+         CompileDefine( sDefine )
+      ENDDO
+
+      /* Debug tracing options. */
+      IF "-D:E" $ sSwitch
+         bDbgExp := .T.
+         sSwitch := StrTran( sSwitch, "-D:E", "" )
+      ENDIF
+      IF "-D:M" $ sSwitch
+         bDbgMatch := .T.
+         sSwitch := StrTran( sSwitch, "-D:M", "" )
+      ENDIF
+      IF "-D:P" $ sSwitch
+         bDbgPPO := .T.
+         sSwitch := StrTran( sSwitch, "-D:P", "" )
+      ENDIF
+
+      /* Process command line include paths. */
       IF ( nAt := At( "-I", sSwitch ) ) > 0
          nNext := At( "-", SubStr( sSwitch, nAt + 2 ) )
          IF nNext == 0
@@ -329,47 +364,51 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
          ENDIF
       ENDIF
 
-      IF "-U" $ sSwitch
-         bLoadRules := .F.
+      /* Generate .pp$ pre-processed output file. */
+      IF "-P" $ sSwitch
+         sPPOExt := ".pp$"
       ENDIF
+
+      /* Run file as a script. */
       IF "-R" $ sSwitch
          bCompile := .T.
       ENDIF
-      IF "-CCH" $ sSwitch
-         bCCH := .T.
-      ENDIF
-      IF "-D:E" $ sSwitch
-         bDbgExp := .T.
-         sSwitch := StrTran( sSwitch, "-D:E", "" )
-      ENDIF
-      IF "-D:M" $ sSwitch
-         bDbgMatch := .T.
-         sSwitch := StrTran( sSwitch, "-D:M", "" )
-      ENDIF
-      IF "-D:P" $ sSwitch
-         bDbgPPO := .T.
-         sSwitch := StrTran( sSwitch, "-D:P", "" )
-      ENDIF
+
+      /* Clone Clipper PreProcessor bugs. */
       IF "-STRICT" $ sSwitch
          bStrict := .T.
       ENDIF
 
-      WHILE ( nAt := At( "-D", sSwitch ) ) > 0
+      /* Use alternate command defintions file, or none. */
+      WHILE ( nAt := At( "-U", sSwitch ) ) > 0
          nNext := At( "-", SubStr( sSwitch, nAt + 2 ) )
          IF nNext == 0
             nNext := 256
          ENDIF
 
-         sDefine := SubStr( sSwitch, nAt + 2, nNext - 1 )
+         sCH := SubStr( sSwitch, nAt + 2, nNext - 1 )
          sSwitch := Left( sSwitch, nAt - 1 ) + SubStr( sSwitch, nAt + 1 + nNext )
-         CompileDefine( sDefine )
+
+         IF( ! sCH == "" )
+            ? [Loading standard definitions from: '] + sCH + "'"
+            ?
+            CompileDefine( "__PP__" )
+            #ifdef __HARBOUR__
+               CompileDefine( "__HARBOUR__" )
+            #endif
+
+            PP_PreProFile( sCH, NIL, .F., .T. ) // Process ONLY #Directives!
+
+            /* Reset.*/
+            hPP := NIL
+         ENDIF
+
+         /* Don't load standard defintions. */
+         bLoadRules := .F.
       ENDDO
 
-      IF "-P" $ sSwitch
-         sPPOExt := ".pp$"
-      ENDIF
+      /* End of command line arguments processing. */
    ENDIF
-
 
    IF bLoadRules
       InitRules()
@@ -383,15 +422,16 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
       IF Len( aCommRules ) != Len( aCommResults )
          Alert( [#DEFINE Rules size mismatch] )
       ENDIF
+
+      CompileDefine( "__PP__" )
+      #ifdef __HARBOUR__
+         CompileDefine( "__HARBOUR__" )
+      #endif
    ELSE
-      Alert( [Not using standard rules.] )
+      IF sCH == NIL
+         Alert( [Not using standard rules.] )
+      ENDIF
    ENDIF
-
-   CompileDefine( "__PP__" )
-
-   #ifdef __HARBOUR__
-      CompileDefine( "__HARBOUR__" )
-   #endif
 
    IF sSource != NIL
       nRow := Row()
@@ -2138,7 +2178,7 @@ RETURN nIf
 
 //------------------------------- *** END - RP DOT Functions *** -------------------------------//
 
-FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
+FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
    LOCAL hSource, sBuffer, sLine, nPosition, sExt, cPrev
    LOCAL nLen, nMaxPos, cChar := '', nClose, nBase, nNext, nLine := 0
@@ -2194,6 +2234,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
    ELSE
       FWrite( hPP, '#line 1 "' + sPath + Upper( sSource ) + '"' + CRLF )
       bBlanks := .F.
+   ENDIF
+
+   IF bDirectivesOnly == NIL
+      bDirectivesOnly := .F.
    ENDIF
 
    sBuffer   := Space( PP_BUFFER_SIZE )
@@ -2310,9 +2354,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
                                FWrite( hPP, CRLF )
                             ENDIF
                          ELSE
-                            sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                            IF bBlanks .OR. ! ( sLine == '' )
-                               FWrite( hPP, sLine + CRLF )
+                            IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                               sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                               IF bBlanks .OR. ! ( sLine == '' )
+                                  FWrite( hPP, sLine + CRLF )
+                               ENDIF
                             ENDIF
                          ENDIF
 
@@ -2348,9 +2394,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
                             FWrite( hPP, CRLF )
                          ENDIF
                       ELSE
-                         sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                         IF bBlanks .OR. ! ( sLine == '' )
-                            FWrite( hPP, sLine + CRLF )
+                         IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                            sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                            IF bBlanks .OR. ! ( sLine == '' )
+                               FWrite( hPP, sLine + CRLF )
+                            ENDIF
                          ENDIF
                       ENDIF
                       nPosition += ( nClose )
@@ -2502,9 +2550,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
                       ENDIF
                    ELSE
                       //sLine += sRight
-                      sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                      IF bBlanks .OR. ! ( sLine == '' )
-                         FWrite( hPP, sLine + CRLF )
+                      IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                         sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                         IF bBlanks .OR. ! ( sLine == '' )
+                            FWrite( hPP, sLine + CRLF )
+                         ENDIF
                       ENDIF
                    ENDIF
                    sLine := ''
@@ -2525,9 +2575,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
                       FWrite( hPP, CRLF )
                    ENDIF
                 ELSE
-                   sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                   IF bBlanks .OR. ! ( sLine == '' )
-                      FWrite( hPP, sLine + CRLF )
+                   IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                      sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                      IF bBlanks .OR. ! ( sLine == '' )
+                         FWrite( hPP, sLine + CRLF )
+                      ENDIF
                    ENDIF
                 ENDIF
                 sLine := ''
@@ -2587,9 +2639,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
          FWrite( hPP, sLine )
       ENDIF
    ELSE
-      sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-      IF bBlanks .OR. ! ( sLine == '' )
-         FWrite( hPP, sLine )
+      IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+         sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+         IF bBlanks .OR. ! ( sLine == '' )
+            FWrite( hPP, sLine + CRLF )
+         ENDIF
       ENDIF
    ENDIF
 
@@ -4857,6 +4911,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
   LOCAL Counter, nResults, sResult := "", nMarker, nMatches, nMatch
   LOCAL xValue, nRepeats := 0, nDependee, nGroupStart, sDumb, aBackUp := aClone( aMarkers )
   LOCAL nMarkers, anMarkers, bBuildList
+  LOCAL nGroupIterator
 
   IF aResults[1] == NIL
      nResults := 0
@@ -4879,6 +4934,20 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
         IF nDependee > 0
            nGroupStart := Counter
 
+           nGroupIterator := Counter
+           nRepeats := 0
+           WHILE nGroupIterator <= nResults .AND. aResults[1][nGroupIterator][1] == nDependee
+              IF ValType( aResults[1][nGroupIterator][2] ) == 'N' .AND. ValType( aMarkers[ aResults[1][nGroupIterator][2] ] ) == 'A'
+                 nRepeats := Max( nRepeats, Len( aMarkers[ aResults[1][nGroupIterator][2] ] ) )
+              ENDIF
+              nGroupIterator++
+           ENDDO
+           IF nRepeats > 0
+              anMarkers := {}
+              bBuildList := .T.
+           ENDIF
+
+        #ifdef z
            IF aMarkers[ nDependee ] == NIL
               nRepeats := 0
            ELSE
@@ -4886,6 +4955,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               anMarkers := {}
               bBuildList := .T.
            ENDIF
+        #endif
 
            IF bDbgPPO
               ? Counter, nDependee, aMarkers, ValType( aMarkers ), nRepeats
@@ -4897,7 +4967,13 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  IF bBuildList .AND. aScan( anMarkers, nDependee ) == 0
                     aAdd( anMarkers, nDependee )
                  ENDIF
-                 xValue := aMarkers[ nDependee ][1] // For group head nDependee and nMaker _must_ be identical.
+
+                 // For group head nDependee and nMaker _must_ be identical.
+                 IF ValType( aMarkers[ nDependee ] ) == 'A'
+                    xValue := aMarkers[ nDependee ][1]
+                 ELSE
+                    xValue := aMarkers[ nDependee ]
+                 ENDIF
               ELSE
                  sResult += aResults[1][Counter][2]
                  LOOP
@@ -4938,7 +5014,13 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  IF bBuildList .AND. aScan( anMarkers, aResults[1][Counter][2] ) == 0
                     aAdd( anMarkers, aResults[1][Counter][2] )
                  ENDIF
-                 xValue := aMarkers[ aResults[1][Counter][2] ][1]
+                 IF aMarkers[ aResults[1][Counter][2] ] == NIL .OR. Len( aMarkers[ aResults[1][Counter][2] ] ) == 0
+                    xValue := NIL
+                 ELSEIF ValType( aMarkers[ aResults[1][Counter][2] ] ) == 'A'
+                    xValue := aMarkers[ aResults[1][Counter][2] ][1]
+                 ELSE
+                    xValue := aMarkers[ aResults[1][Counter][2] ]
+                 ENDIF
                  //aDel( aMarkers[ aResults[1][Counter][2] ], 1 )
                  //aSize( aMarkers[ aResults[1][Counter][2] ], nRepeats - 1 )
               //ELSE
@@ -4955,7 +5037,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            nMarkers := Len( anMarkers )
            FOR nMarker := 1 TO nMarkers
               // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
-              IF Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1
+              IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. Len( aMarkers[ anMarkers[nMarker] ] ) > 1
                  aDel( aMarkers[ anMarkers[nMarker] ], 1 )
                  aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
                  IF bDbgPPO
@@ -4964,7 +5046,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  ENDIF
               ELSE
                  IF bDbgPPO
-                    ? nMarker, Len( aBackup[ anMarkers[1] ] ), Len( aMarkers[ anMarkers[nMarker] ] ),"Removed Repeatable"
+                    ? nMarker, "Removed Repeatable skipped"
                     WAIT
                  ENDIF
               ENDIF
@@ -5189,7 +5271,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
         nMarkers := Len( anMarkers )
         FOR nMarker := 1 TO nMarkers
            // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
-           IF Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1
+           IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
               aDel( aMarkers[ anMarkers[nMarker] ], 1 )
               aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
               IF bDbgPPO
@@ -5372,17 +5454,31 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       IF s1 == '<'
          nId++
 
+         /* Skip trailing spaces...*/
+         sRule := SubStr( sRule, 2 )
+         ExtractLeadingWS( @sRule )
+
          DO CASE
-            CASE SubStr( sRule, 2, 1 ) == '*'
+            CASE SubStr( sRule, 1, 1 ) == '*'
                cType := '*'
-               nNext := At( '*>', sRule )
-               IF nNext > 0
-                  sMarker := SubStr( sRule, 3, nNext - 3 )
-                  ExtractLeadingWS( @sMarker )
-                  aAdd( aMarkers, sMarker )
 
-                  sRule := SubStr( sRule, nNext + 2 )
+               sRule := SubStr( sRule, 2 )
+               ExtractLeadingWS( @sRule )
+
+               nNext := At( '*', sRule )
+               IF nNext > 1
+                  sMarker := Left( sRule, nNext - 1 )
+                  aAdd( aMarkers, RTrim( sMarker ) )
+
+                  sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
+
+                  IF Left( sRule, 1 ) == '>'
+                     sRule := SubStr( sRule, 2 )
+                     ExtractLeadingWS( @sRule )
+                  ELSE
+                     Alert( [ERROR! Unblanced MP: '<*' : '] + sRule + "'" )
+                  ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
                   //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
@@ -5396,20 +5492,30 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unblanced MP: '<*' at: ] + sRule )
+                  Alert( [ERROR! Unblanced MP: '<*' : '] + sRule + "'" )
                   RETURN .F.
                ENDIF
 
-            CASE SubStr( sRule, 2, 1 ) == '('
+            CASE SubStr( sRule, 1, 1 ) == '('
                cType := '('
-               nNext := At( ')>', sRule )
-               IF nNext > 0
-                  sMarker := SubStr( sRule, 3, nNext - 3 )
-                  ExtractLeadingWS( @sMarker )
-                  aAdd( aMarkers, sMarker )
 
-                  sRule := SubStr( sRule, nNext + 2 )
+               sRule := SubStr( sRule, 2 )
+               ExtractLeadingWS( @sRule )
+
+               nNext := At( ')', sRule )
+               IF nNext > 1
+                  sMarker := Left( sRule, nNext - 1 )
+                  aAdd( aMarkers, RTrim( sMarker ) )
+
+                  sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
+
+                  IF Left( sRule, 1 ) == '>'
+                     sRule := SubStr( sRule, 2 )
+                     ExtractLeadingWS( @sRule )
+                  ELSE
+                     Alert( [ERROR! Unblanced MP: '<(' : '] + sRule + "'" )
+                  ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
                   //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
@@ -5423,20 +5529,30 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unbalanced MP: '<(' at: ] + sRule )
+                  Alert( [ERROR! Unblanced MP: '<(' : '] + sRule + "'" )
                   RETURN .F.
                ENDIF
 
-            CASE SubStr( sRule, 2, 1 ) == '!'
+            CASE SubStr( sRule, 1, 1 ) == '!'
                cType := '!'
-               nNext := At( '!>', sRule )
-               IF nNext > 0
-                  sMarker := SubStr( sRule, 3, nNext - 3 )
-                  ExtractLeadingWS( @sMarker )
-                  aAdd( aMarkers, sMarker )
 
-                  sRule := SubStr( sRule, nNext + 2 )
+               sRule := SubStr( sRule, 2 )
+               ExtractLeadingWS( @sRule )
+
+               nNext := At( '!', sRule )
+               IF nNext > 1
+                  sMarker := Left( sRule, nNext - 1 )
+                  aAdd( aMarkers, RTrim( sMarker ) )
+
+                  sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
+
+                  IF Left( sRule, 1 ) == '>'
+                     sRule := SubStr( sRule, 2 )
+                     ExtractLeadingWS( @sRule )
+                  ELSE
+                     Alert( [ERROR! Unblanced MP: '<!' : '] + sRule + "'" )
+                  ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
                   //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
@@ -5450,14 +5566,12 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unbalanced MP: '<!' at: ] + sRule )
+                  Alert( [ERROR! Unblanced MP: '<!' : '] + sRule + "'" )
                   RETURN .F.
                ENDIF
 
             OTHERWISE
                cType := NIL // Reset - not known yet.
-               sRule := SubStr( sRule, 2 )
-               ExtractLeadingWS( @sRule )
          ENDCASE
 
          nCloseAt := At( '>', sRule )
@@ -5830,7 +5944,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
          IF nMarkerAt == 1 .OR. ( nMarkerAt == 2 .AND. Left( sResult, 1 ) == '#' )
             /* I consider this a Clipper bug - it produces .ppo without the padding if none suplied,
-               but treat it as if padding existed! - so at least we will generate the space. */
+               but treats it as if padding existed! - so at least we will generate the space. */
 
             //IF /*Len( aResult ) > 0 .AND. ( ValType( aTail( aResult )[2] ) == 'N' .OR. aTail( aResult )[2] == "" ) .AND.*/ Len( sPad ) > 0
             IF bStrict
@@ -5845,10 +5959,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ENDIF
 
          IF nMarkerAt > 1
-            IF SubStr( sResult, nMarkerAt - 1, 1 ) == '#'
+            sTemp := RTrim( Left( sResult, nMarkerAt - 1 ) )
+            IF Right( sTemp, 1 ) == '#'
                nType := 2
                IF nMarkerAt > 2
-                  sTemp := Left( sResult, nMarkerAt - 2 )
+                  sTemp := Left( sTemp, Len( sTemp ) - 1 )
                   aRP := { nOptional, sPad + DropExtraTrailingWS( sTemp ) }
                   aAdd( aResult, aRP )
                   aAdd( aModifiers, -1 )
@@ -5859,47 +5974,47 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                aAdd( aResult, aRP )
                aAdd( aModifiers, -1 )
             ENDIF
-
-            sResult := SubStr( sResult, nMarkerAt )
-            ExtractLeadingWS( @sResult )
          ENDIF
 
-         /* <-x-> Ommit */
-         IF SubStr( sResult, 2, 1 ) == '-'
+         sResult := SubStr( sResult, nMarkerAt + 1 )
+         ExtractLeadingWS( @sResult )
 
-            sResult := SubStr( sResult, 3 )
+         /* <-x-> Ommit */
+         IF SubStr( sResult, 1, 1 ) == '-'
+
+            sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( "->", sResult )
+            nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP <-] )
+               Alert( [ERROR! Unbalanced RP: '<-' : '] + sTemp + "'" )
             ELSE
-               nType := 0
-               sTemp := Left( sResult, nNext - 1 )
-               nId   := aScan( aMarkers, sTemp )
-               sResult := SubStr( sResult, nNext + 2 )
-               ExtractLeadingWS( @sResult, @sPad )
-               IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '<-' : ] + sTemp )
-               ELSE
-                  aRP := { nOptional, nId }
-                  aAdd( aResult, aRP )
-                  aAdd( aModifiers, nType )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
+               IF Right( sTemp, 1 ) == '-'
+                  nType := 0
+                  sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
+                  nId := aScan( aMarkers, sTemp )
+                  sResult := SubStr( sResult, nNext + 1 )
+                  ExtractLeadingWS( @sResult, @sPad )
+                  IF nId == 0
+                     Alert( [ERROR! Unrecognized RP: '<-' : '] + sTemp + "'" )
+                  ELSE
+                     aRP := { nOptional, nId }
+                     aAdd( aResult, aRP )
+                     aAdd( aModifiers, nType )
+                  ENDIF
                ENDIF
             ENDIF
 
          /* #<x> Dumb */
          ELSEIF nType == 2
 
-            sResult := SubStr( sResult, 2 )
-            ExtractLeadingWS( @sResult )
-
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: #<] )
+               Alert( [ERROR! Unbalanced RP: '#<' ] )
             ELSE
                /*nType := 2*/
-               sTemp := Left( sResult, nNext - 1 )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
                nId := aScan( aMarkers, sTemp )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
@@ -5913,105 +6028,114 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ENDIF
 
          /* <"x"> Normal */
-         ELSEIF SubStr( sResult, 2, 1 ) == '"'
+         ELSEIF SubStr( sResult, 1, 1 ) == '"'
 
-            sResult := SubStr( sResult, 3 )
+            sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( '">', sResult )
+            nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: <"] )
+               Alert( [ERROR! Unbalanced RP: '<"' : '] + sTemp + "'" )
             ELSE
-               nType := 3
-               sTemp := Left( sResult, nNext - 1 )
-               nId := aScan( aMarkers, sTemp )
-               sResult := SubStr( sResult, nNext + 2 )
-               ExtractLeadingWS( @sResult, @sPad )
-               IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '<"' : ] + sTemp )
-               ELSE
-                  aRP := { nOptional, nId }
-                  aAdd( aResult, aRP )
-                  aAdd( aModifiers, nType )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
+               IF Right( sTemp, 1 ) == '"'
+                  nType := 3
+                  sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
+                  nId := aScan( aMarkers, sTemp )
+                  sResult := SubStr( sResult, nNext + 1 )
+                  ExtractLeadingWS( @sResult, @sPad )
+                  IF nId == 0
+                     Alert( [ERROR! Unrecognized RP: '<"' : '] + sTemp + "'" )
+                  ELSE
+                     aRP := { nOptional, nId }
+                     aAdd( aResult, aRP )
+                     aAdd( aModifiers, nType )
+                  ENDIF
                ENDIF
             ENDIF
 
          /* <(x)> Smart */
-         ELSEIF SubStr( sResult, 2, 1 ) == '('
+         ELSEIF SubStr( sResult, 1, 1 ) == '('
 
-            sResult := SubStr( sResult, 3 )
+            sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ")>", sResult )
+            nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: <(] )
+               Alert( [ERROR! Unbalanced RP: '<(' : '] + sTemp + "'" )
             ELSE
-               nType := 4
-               sTemp := Left( sResult, nNext - 1 )
-               nId := aScan( aMarkers, sTemp )
-               sResult := SubStr( sResult, nNext + 2 )
-               ExtractLeadingWS( @sResult, @sPad )
-               IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '<(' : ] + sTemp )
-               ELSE
-                  aRP := { nOptional, nId }
-                  aAdd( aResult, aRP )
-                  aAdd( aModifiers, nType )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
+               IF Right( sTemp, 1 ) == ')'
+                  nType := 4
+                  sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
+                  nId := aScan( aMarkers, sTemp )
+                  sResult := SubStr( sResult, nNext + 1 )
+                  ExtractLeadingWS( @sResult, @sPad )
+                  IF nId == 0
+                     Alert( [ERROR! Unrecognized RP: '<(' : '] + sTemp + "'" )
+                  ELSE
+                     aRP := { nOptional, nId }
+                     aAdd( aResult, aRP )
+                     aAdd( aModifiers, nType )
+                  ENDIF
                ENDIF
             ENDIF
 
          /* <{x}> Blockify */
-         ELSEIF SubStr( sResult, 2, 1 ) == '{'
+         ELSEIF SubStr( sResult, 1, 1 ) == '{'
 
-            sResult := SubStr( sResult, 3 )
+            sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( "}>", sResult )
+            nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: <{] + sTemp )
+               Alert( [ERROR! Unbalanced RP: '<{' : '] + sTemp + "'" )
             ELSE
-               nType := 5
-               sTemp := Left( sResult, nNext - 1 )
-               nId := aScan( aMarkers, sTemp )
-               sResult := SubStr( sResult, nNext + 2 )
-               ExtractLeadingWS( @sResult, @sPad )
-               IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '<{' : ] + sTemp )
-               ELSE
-                  aRP := { nOptional, nId }
-                  aAdd( aResult, aRP )
-                  aAdd( aModifiers, nType )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
+               IF Right( sTemp, 1 ) == '}'
+                  nType := 5
+                  sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
+                  nId := aScan( aMarkers, sTemp )
+                  sResult := SubStr( sResult, nNext + 1 )
+                  ExtractLeadingWS( @sResult, @sPad )
+                  IF nId == 0
+                     Alert( [ERROR! Unrecognized RP: '<{' : '] + sTemp + "'" )
+                  ELSE
+                     aRP := { nOptional, nId }
+                     aAdd( aResult, aRP )
+                     aAdd( aModifiers, nType )
+                  ENDIF
                ENDIF
             ENDIF
 
          /* <.x.> Logify */
-         ELSEIF SubStr( sResult, 2, 1 ) == '.'
+         ELSEIF SubStr( sResult, 1, 1 ) == '.'
 
-            sResult := SubStr( sResult, 3 )
+            sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ".>", sResult )
+            nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: <.] )
+               Alert( [ERROR! Unbalanced RP: '<.' : '] + sTemp + "'" )
             ELSE
-               nType := 6
-               sTemp := Left( sResult, nNext - 1 )
-               nId := aScan( aMarkers, sTemp )
-               sResult := SubStr( sResult, nNext + 2 )
-               ExtractLeadingWS( @sResult, @sPad )
-               IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '<.' : ] + sTemp )
-               ELSE
-                  aRP := { nOptional, nId }
-                  aAdd( aResult, aRP )
-                  aAdd( aModifiers, nType )
+               sTemp := RTrim( Left( sResult, nNext - 1 ) )
+               IF Right( sTemp, 1 ) == '.'
+                  nType := 6
+                  sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
+                  nId := aScan( aMarkers, sTemp )
+                  sResult := SubStr( sResult, nNext + 1 )
+                  ExtractLeadingWS( @sResult, @sPad )
+                  IF nId == 0
+                     Alert( [ERROR! Unrecognized RP: '<.' : '] + sTemp + "'" )
+                  ELSE
+                     aRP := { nOptional, nId }
+                     aAdd( aResult, aRP )
+                     aAdd( aModifiers, nType )
+                  ENDIF
                ENDIF
             ENDIF
 
          ELSE
-
-            sResult := SubStr( sResult, 2 )
-            ExtractLeadingWS( @sResult )
 
             nNext := At( '>', sResult )
             IF nNext == 0
@@ -6024,7 +6148,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  aEval( aMarkers, {|sMarker| TraceLog( sMarker ) } )
+                  aEval( aMarkers, {|sMarker| TraceLog( sTemp, sMarker ) } )
                   Alert( [ERROR! Unrecognized RP: '<']+" : '" + sTemp + "'" )
                ELSE
                   aRP := { nOptional, nId }
@@ -6059,6 +6183,32 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       BREAK
    ENDIF
 
+#ifdef POSSIBLE_WORK_IN_PROGRESS
+   nResults := Len( aResult )
+   FOR Counter := nResults TO 1 STEP -1
+
+      /* Correcting the ID of the Marker this result depends upon. */
+      IF aResult[Counter][1] > 0
+         nOptional := aResult[Counter][1]
+         nMarker   := aResult[Counter][2]
+      ELSEIF aResult[Counter][1] < 0
+         aResult[Counter][1] := nOptional
+      ENDIF
+
+      IF ValType( aResult[Counter][2] ) == 'C'
+         aResult[Counter][2] := StrTran( aResult[Counter][2], '\', '' )
+         //? "RP #", Counter, aResult[Counter][1], '"' + aResult[Counter][2] + '"'
+      ELSE
+         /* Marking the respective Match Marker as Repeatable, if it is OPTIONAL. */
+         IF nOptional > 0
+            aEval( aRule[2], { |aMP| IIF( aMP[1] == nMarker .AND. aMP[2] <> 0, aMP[1] += 1000, ) } )
+         ENDIF
+
+         //? "RP #", Counter, aResult[Counter][1], aResult[Counter][2]
+      ENDIF
+   NEXT
+#endif
+
    nResults := Len( aResult )
    FOR Counter := nResults TO 1 STEP -1
 
@@ -6077,11 +6227,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                WHILE aRule[2][nMP][2] < 0
                   IF aRule[2][nMP][1] >= 0
 
-                     IF aRule[2][nMP][2] == 0
-                        TraceLog( [Result #] + Str( Counter ) + [ marked REPEATABLE but root #] + Str( nMarker ) + [ is not OPTIONAL!], sRuleCopy )
-                        aRule[2][nMP][2] := 1
-                     ENDIF
-
+                     /* Mark as Repeatable. */
                      IF aRule[2][nMP][1] < 1000
                         aRule[2][nMP][1] += ( 1000 )
                         //? "Flagged:", nMP, "As:", aRule[2][nMP][1]
@@ -6091,10 +6237,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   nMP--
                ENDDO
                IF aRule[2][nMP][2] == 0
-                  TraceLog( "Result #" + Str( Counter ) + " marked REPEATABLE but root #" + Str( nMarker ) + " is not OPTIONAL!", sRuleCopy )
-                  aRule[2][nMP][2] := 1
-               ENDIF
-               IF aRule[2][nMP][1] < 1000
+                  TraceLog( "Warning - Result #" + Str( Counter ) + " marked REPEATABLE but root #" + Str( nMarker ) + " is not OPTIONAL!", sRuleCopy )
+                  //aRule[2][nMP][2] := 1
+               ELSEIF aRule[2][nMP][1] < 1000
                   aRule[2][nMP][1] += ( 1000 )
                   //? "Flagged:", nMP, "As:", aRule[2][nMP][1]
                ENDIF
@@ -6900,7 +7045,7 @@ STATIC FUNCTION InitRules()
   aAdd( aCommRules, { 'RENAME' , { {    1,   0, NIL, '(', NIL }, {    2,   0, 'TO', '(', NIL } } , .F. } )
   aAdd( aCommRules, { 'COPY' , { {    1,   0, 'FILE', '(', NIL }, {    2,   0, 'TO', '(', NIL } } , .F. } )
   aAdd( aCommRules, { 'DIR' , { {    1,   1, NIL, '(', NIL } } , .F. } )
-  aAdd( aCommRules, { 'TYPE' , { { 1001,   1, NIL, '(', { 'TO PRINTER', 'TO' } }, {    2,   1, NIL, ':', { 'TO PRINTER' } }, { 1000,   1, 'TO', NIL, NIL }, { 1003,  -1, 'FILE', '(', NIL } } , .F. } )
+  aAdd( aCommRules, { 'TYPE' , { { 1,   1, NIL, '(', { 'TO PRINTER', 'TO' } }, {    2,   1, NIL, ':', { 'TO PRINTER' } }, { 1000,   1, 'TO', NIL, NIL }, { 1003,  -1, 'FILE', '(', NIL } } , .F. } )
   aAdd( aCommRules, { 'TYPE' , { {    1,   0, NIL, '(', NIL }, {    2,   1, NIL, ':', { 'TO PRINTER' } } } , .F. } )
   aAdd( aCommRules, { 'REQUEST' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
   aAdd( aCommRules, { 'CANCEL' ,  , .F. } )

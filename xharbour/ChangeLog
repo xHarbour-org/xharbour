@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.26 2002/01/11 00:21:29 lculik Exp $
+ * $Id: ChangeLog,v 1.27 2002/01/12 10:04:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-13 22:10 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  + tests/ppclass.ch
+    + Added a Clipper compliant version of hbclass.ch (syntax relys on Harbour PP bugs)
+      /* This is the file used to burn the internal support for #include "hbclass.ch". */
+
+  * tests/pp.prg
+    + Added -I description to -H switch.
+    ! Corrected processing of repeatable groups.
+      Clipper will repeat N times, based on the marker with the HIGHEST number of values in the given group.
+      Clipper also allows a Repeatble Group to refernce a marker that is NON Optional. In such case, the
+      respective Marker will only accept 1 value, and consider it required!
 
 2002-01-12 02:00 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * include/clipdefs.h
