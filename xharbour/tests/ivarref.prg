@@ -2,11 +2,23 @@
 
 PROCEDURE Main()
 
-   LOCAL o := TMyClass()
+   LOCAL o := TMyClass(), e, NonObject
 
    Test( @( o:Var ) )
    Test( @( o:ClassVar ) )
    Test( @( o:SharedClassVar ) )
+
+   TRY
+      Test( @( o:NonInstance ) )
+   CATCH e
+      ? "Caught:", e:Description
+   END
+
+   TRY
+      Test( @( NonObject:SharedClassVar ) )
+   CATCH e
+      ? "Caught:", e:Description
+   END
 
    ? o:Var
    ? o:ClassVar
