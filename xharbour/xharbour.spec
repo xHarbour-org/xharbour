@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.2 2003/05/17 15:55:13 druzus Exp $
+# $Id: xharbour.spec,v 1.3 2003/05/29 20:44:23 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -112,6 +112,39 @@ program linking.
 %{dname} to kompatybilny z jêzykiem CA-Clipper kompilator.
 Ten pakiet udostêpnia statyczne bilioteki dla kompilatora %{dname}
 niezbêdne do statycznej konsolidacji programów.
+
+######################################################################
+## PP
+######################################################################
+
+%package pp
+Summary:        Clipper/Harbour/xBase compatible Pre-Processor, DOT prompt and interpreter
+Summary(pl):    Kompatybilny z Clipper/Harbour/xBase Preprocesor i interpreter
+Group:          Development/Languages
+Requires:       %{name} = %{version}
+
+%description pp
+%{dname} is a Clipper compatible compiler.
+This package provides %{dname} PP. It has 3 personalities which are tied
+tightly together.
+1. What is supposed to be 100% Clipper compatible Pre-Processor
+   (with some extensions).
+2. DOT prompt, which suppose to allow most of Clipper syntax.
+3. Finally, PP is a limited Clipper/Harbour/xBase Interpreter. Subject 
+   to those same few limitations it can execute most of Harbour syntax.
+   You can write your own xBase scripts by adding to your .prg files
+   #!/usr/bin/pprun
+
+%description -l pl pp
+%{dname} to kompatybilny z jêzykiem CA-Clipper kompilator.
+Ten pakiet udostêpnia %{dname} PP, który daje trzy narzêdzia w jednym.
+1. W 100% kompatybilny z Clipperem preprocesor (z pewnymi rozeszerzeniami)
+2. ¦rodowisko DOT, w którym mo¿na u¿ywaæ wiêkszo¶ci sk³adni Clippera
+3. PP to tak¿e nieco ograniczony interpreter Clippera. Z uwzglêdnieniem
+   wspomnianych kilku ograniczeñ potrafi on uruchomiæ wiêkszo¶æ sk³adni
+   Harbour. Mo¿esz napisaæ swój w³asny skrypt dodaj±c do pliku .prg
+   #!/usr/bin/pprun
+
 
 ######################################################################
 ## Preperation.
@@ -518,8 +551,6 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/hbrun
 %{prefix}/bin/hbpp
 %{prefix}/bin/hbmake
-%{prefix}/bin/pp
-%{prefix}/bin/pprun
 %dir %{prefix}/include/%{name}
 %{prefix}/include/%{name}/*
 
@@ -531,6 +562,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{prefix}/lib/%{name}
 %{prefix}/lib/%{name}/*.so
 %{prefix}/lib/*.so
+
+%files pp
+%doc tests/pp.txt
+%doc tests/*.txt
+%{prefix}/bin/pp
+%{prefix}/bin/pprun
 
 ######################################################################
 ## Spec file Changelog.

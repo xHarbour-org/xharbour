@@ -28,6 +28,28 @@
 #DEFINE MAX_CICLES 256
 #DEFINE PP_BUFFER_SIZE 8192 //16384
 
+#ifdef __CLIP__
+   #ifdef __LINUX__
+      #define __PLATFORM__Linux
+   #endif
+#endif
+
+#ifdef __PLATFORM__Linux
+   #ifndef OS_PATH_DELIMITER
+      #define OS_PATH_DELIMITER '/'
+   #endif
+   #ifndef OS_PATH_LIST_SEPARATOR
+      #define OS_PATH_LIST_SEPARATOR ':'
+   #endif
+#else
+   #ifndef OS_PATH_DELIMITER
+      #define OS_PATH_DELIMITER '\'
+   #endif
+   #ifndef OS_PATH_LIST_SEPARATOR
+      #define OS_PATH_LIST_SEPARATOR ';'
+   #endif
+#endif
+
 #ifdef __HARBOUR__
 
    // Enable extended syntax.
@@ -394,7 +416,7 @@ STATIC s_aSwitchDefs := {}
       sSwitch += [    -D:E     = Show tracing information into the Expression Scanner.] + CRLF
       sSwitch += [    -D:M     = Show tracing information into the Match Engine.] + CRLF
       sSwitch += [    -D:P     = Show tracing information into the Output Generator.] + CRLF
-      sSwitch += [    -I<path> = #include file search path(s) (';' seperated).] + CRLF
+      sSwitch += [    -I<path> = #include file search path(s) ('] + OS_PATH_LIST_SEPARATOR + [' seperated).] + CRLF
       sSwitch += [    -P       = Generate .pp$ pre-processed output file.] + CRLF
       sSwitch += [    -R       = Run filename as a script.] + CRLF
       sSwitch += [    -FIX     = Do not clone Clipper PreProcessor bugs.] + CRLF
@@ -405,16 +427,14 @@ STATIC s_aSwitchDefs := {}
       QUIT
    endif
 
-   #ifdef __XHARBOUR__
-      #ifdef __PLATFORM__Linux
-         IF Right( hb_argv( 0 ), 6 ) == "/pprun"
-            bCount  := .F.
-            sSwitch := ""
-
-            aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9 }
-            aSize( aParams, PCount() )
-         ENDIF
-      #endif
+   #ifdef __PLATFORM__Linux
+      if right( hb_argv( 0 ), 6 ) == "/pprun"
+         bCount := .F.
+         bCompile := .T.
+         sSwitch := ""
+         aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9 }
+         aSize( aParams, PCount() )
+      endif
    #endif
 
    #ifdef _DEFAULT_INC_DIR
@@ -423,17 +443,17 @@ STATIC s_aSwitchDefs := {}
 
    sIncludePath := GetE( "INCLUDE" )
 
-   WHILE ( nNext := At( ';', sIncludePath ) ) > 0
+   WHILE ( nNext := At( OS_PATH_LIST_SEPARATOR, sIncludePath ) ) > 0
       sPath := Left( sIncludePath, nNext - 1 )
       IF ! ( Right( sPath, 1 ) $ '\/' )
-         sPath += '\'
+         sPath += OS_PATH_DELIMITER
       ENDIF
       aAdd( s_asPaths, sPath )
       sIncludePath := SubStr( sIncludePath, nNext + 1 )
    ENDDO
    IF ! ( sIncludePath == '' )
       IF ! ( Right( sIncludePath, 1 ) $ '\/' )
-         sIncludePath += '\'
+         sIncludePath += OS_PATH_DELIMITER
       ENDIF
       aAdd( s_asPaths, sIncludePath )
    ENDIF
@@ -451,16 +471,16 @@ STATIC s_aSwitchDefs := {}
       sIncludePath := Left( sIncludePath, nAt - 1 )
 
       IF ! ( Right( sIncludePath, 1 ) $ "\/" )
-         sIncludePath += '\'
+         sIncludePath += OS_PATH_DELIMITER
       ENDIF
 
       aAdd( s_asPaths, sIncludePath )
    ENDIF
 
    IF Empty( GetEnv( "CLIPROOT" ) )
-      aAdd( s_asPaths, ClipRoot() + "\include\" )
+      aAdd( s_asPaths, ClipRoot() + OS_PATH_DELIMITER + "include" + OS_PATH_DELIMITER )
    ELSE
-      aAdd( s_asPaths, GetEnv( "CLIPROOT" ) + "\include\" )
+      aAdd( s_asPaths, GetEnv( "CLIPROOT" ) + OS_PATH_DELIMITER + "include" + OS_PATH_DELIMITER )
    ENDIF
 #endif
 
@@ -508,17 +528,17 @@ STATIC s_aSwitchDefs := {}
          ENDIF
          sIncludePath := SubStr( sSwitch, nAt + 2, nNext - 1 )
 
-         WHILE ( nNext := At( ';', sIncludePath ) ) > 0
+         WHILE ( nNext := At( OS_PATH_LIST_SEPARATOR, sIncludePath ) ) > 0
             sPath := Left( sIncludePath, nNext - 1 )
             IF ! ( Right( sPath, 1 ) $ '\/' )
-               sPath += '\'
+               sPath += OS_PATH_DELIMITER
             ENDIF
             aAdd( s_asPaths, sPath )
             sIncludePath := SubStr( sIncludePath, nNext + 1 )
          ENDDO
          IF ! ( sIncludePath == '' )
             IF ! ( Right( sIncludePath, 1 ) $ '\/' )
-               sIncludePath += '\'
+               sIncludePath += OS_PATH_DELIMITER
             ENDIF
             aAdd( s_asPaths, sIncludePath )
          ENDIF
@@ -2825,7 +2845,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                    ENDDO
                 ENDIF
 
-        #ifdef __XHARBOUR__
           #ifdef __PLATFORM__Linux
              CASE ( nLine == 0 .AND. nPosition == 1 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
                 WHILE .T.
@@ -2856,7 +2875,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                    ENDIF
                 ENDDO
           #endif
-        #endif
 
              CASE ( cChar == '"' )
                 WHILE .T.

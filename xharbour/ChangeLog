@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1083 2003/05/29 22:54:57 paultucker Exp $
+ * $Id: ChangeLog,v 1.1084 2003/05/29 23:03:41 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-30 02:00 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  Sorry I don't include all changes in previous commit. So again:
+
+  * xharbour/tests/pp.prg
+    * some additional modification for running .prg files as script
+      and to make pp working on *nix systems - '/' as as directory
+      delimiter, ':' as a path list separator and some small changes
+      for case sensitive file systems
+      _DEFAULT_INC_DIR macro added and passing parameters to .prg
+      if pp is called pprun - now you can create a link 'pprun' to 'pp'
+      and use it as a script interpreter.
+      Ron, I've just seen your changelog. I hope this changes merged
+      correctly.
+
+  * xharbour/xharbour.spec
+    + Now is really _new_binary_ RPM with Ron's PP :-)
+
+  * xharbour/bin/!pack_src.sh
+    * tests/*.txt files added
 
 2003-05-29 18:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbtrac.h
