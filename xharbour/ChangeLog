@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2289 2004/02/14 22:49:57 lculik Exp $
+ * $Id: ChangeLog,v 1.2290 2004/02/14 22:57:14 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-15 10:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + source/rtl/fparse.c
+    * delimited text file parser.
+      Syntax: FParse( cFile, cDelimiter )
+      Return: Arrays
+
+  + tests/fparse.prg
+    * file parser testing program
+
+  + tests/test.csv
+    * sample of a comma delimited file
+
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+    + add fparse.c file dependency
 
 2004-02-14 23:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

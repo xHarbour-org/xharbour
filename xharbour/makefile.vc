@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.89 2004/02/11 16:07:55 jonnymind Exp $
+# $Id: makefile.vc,v 1.90 2004/02/12 07:37:57 andijahja Exp $
 #
 
 #
@@ -336,6 +336,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\filesys.obj \
    $(OBJ_DIR)$(MT)\fkmax.obj \
    $(OBJ_DIR)$(MT)\fnsplit.obj \
+   $(OBJ_DIR)$(MT)\fparse.obj \
    $(OBJ_DIR)$(MT)\fssize.obj \
    $(OBJ_DIR)$(MT)\fstemp.obj \
    $(OBJ_DIR)$(MT)\gete.obj \

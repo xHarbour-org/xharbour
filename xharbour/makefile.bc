@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.86 2004/02/11 16:07:54 jonnymind Exp $
+# $Id: makefile.bc,v 1.87 2004/02/12 07:37:57 andijahja Exp $
 #
 
 #
@@ -363,6 +363,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\filesys.obj \
    $(RTL_OBJ_DIR)\fkmax.obj \
    $(RTL_OBJ_DIR)\fnsplit.obj \
+   $(RTL_OBJ_DIR)\fparse.obj \
    $(RTL_OBJ_DIR)\fssize.obj \
    $(RTL_OBJ_DIR)\fstemp.obj \
    $(RTL_OBJ_DIR)\gete.obj \
@@ -1787,6 +1788,9 @@ $(RTL_OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\fnsplit.obj : $(RTL_DIR)\fnsplit.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\fparse.obj : $(RTL_DIR)\fparse.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\fssize.obj : $(RTL_DIR)\fssize.c
