@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.117 2004/03/20 23:24:46 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.118 2004/03/21 21:48:49 druzus Exp $
  */
 
 /*
@@ -1632,14 +1632,33 @@ static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys 
 #endif
 
 /*
+ * put record and duplicate + trailing counters into leaf page
+ */
+static void hb_cdxSetLeafRecord( BYTE *pDst, ULONG ulRec, int iDup, int iTrl,
+                                 int iReq, int iDCbits, int iTCbits )
+{
+   int i;
+   USHORT usBit;
+
+   usBit = ( ( iTrl << iDCbits ) | iDup ) << ( 16 - iTCbits - iDCbits );
+   for ( i = 0; i < iReq; i++, ulRec >>= 8 )
+   {
+      if ( i < iReq - 2 )
+         pDst[ i ] = ulRec & 0xff;
+      else if ( i == iReq - 2 )
+         pDst[ i ] = ( ulRec & 0xff ) | ( usBit & 0xff );
+      else
+         pDst[ i ] = ( ulRec & 0xff ) | ( ( usBit >> 8 ) & 0xff );
+   }
+}
+
+/*
  * encode keys in buffer into cdx leaf node
  */
 static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 {
-   int iKey, iTrl, iDup, iReq, iTmp, iNum, iLen, iShift;
+   int iKey, iTrl, iDup, iReq, iTmp, iNum, iLen;
    BYTE *pKeyPos, *pRecPos, *pSrc;
-   ULONG RNMask, ulRec;
-   USHORT usBit;
 
 #ifdef HB_CDX_DBGCODE
    if ( ( pPage->PageType & CDX_NODE_LEAF ) == 0 )
@@ -1657,8 +1676,6 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
    iNum = pPage->TagParent->uiLen;
    iLen = iNum + 6;
    iReq = pPage->ReqByte;
-   RNMask = ~pPage->RNMask;
-   iShift = 16 - pPage->TCBits;
    pKeyPos = &pPage->node.extNode.keyPool[ CDX_EXT_FREESPACE ];
    pRecPos = &pPage->node.extNode.keyPool[ 0 ];
    pSrc = &pKeyBuf[ 0 ];
@@ -1667,25 +1684,8 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
       iDup = pSrc[ iNum + 4 ];
       iTrl = pSrc[ iNum + 5 ];
       iTmp = iNum - iTrl - iDup;
-      usBit = ( iTrl << iShift ) | ( iDup << ( iShift - pPage->DCBits ) );
-#if 1 
-      /* this _PROPER_C_CODE_ is badly optimized by GCC3 and -O2 switch
-       * below is a little endian version which is not effectd
-       * by this bugy optimization. If you have troubles and
-       * use litle endian machine use it I don't plan to longer fight
-       * with it causing general slownes in other compilers. I hope
-       * GCC 3.4 will work OK.
-       */
-      HB_PUT_LE_USHORT( &pRecPos[ iReq - 2 ], usBit );
-      ulRec = ( HB_GET_LE_ULONG( pRecPos ) & RNMask ) | HB_GET_LE_ULONG( &pSrc[ iNum ] );
-      HB_PUT_LE_ULONG( pRecPos, ulRec );
-#else
-      memcpy( &pRecPos[ iReq - 2 ], &usBit, 2 );
-      memcpy( &ulRec, &pRecPos[ 0 ], 4 );
-      ulRec &= RNMask;
-      ulRec |= HB_GET_LE_ULONG( &pSrc[ iNum ] );
-      memcpy( &pRecPos[ 0 ], &ulRec, 4 );
-#endif
+      hb_cdxSetLeafRecord( pRecPos, HB_GET_LE_ULONG( &pSrc[ iNum ] ), iDup, iTrl,
+                           iReq, pPage->DCBits, pPage->TCBits );
       if ( iTmp > 0 )
       {
          pKeyPos -= iTmp;
@@ -2644,7 +2644,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                hb_cdxPageLeafEncode( childs[i], pPtr, childs[i]->iKeys );
                if ( iSize != childs[i]->iFree )
                {
-                  printf("\r\nninserting, iSize=%d, childs[i]->iFree=%d", iSize, childs[i]->iFree); fflush(stdout);
+                  printf("\r\ninserting, iSize=%d, childs[i]->iFree=%d", iSize, childs[i]->iFree); fflush(stdout);
                   printf("\r\niKeys=%d, iMaxReq=%d", iKeys, iMaxReq); fflush(stdout);
                   hb_cdxErrInternal( "hb_cdxPageGetChild: index corrupted." );
                }
@@ -3494,8 +3494,8 @@ static void hb_cdxTagOpen( LPCDXTAG pTag )
       pTag->RootBlock = HB_GET_LE_ULONG( tagHeader.rootPtr );
       if ( pTag->RootBlock && pTag->RootBlock != CDX_DUMMYNODE )
          pTag->RootPage = hb_cdxPageNew( pTag, NULL, pTag->RootBlock );
-      /* if ( !pTag->RootPage )
-         hb_cdxErrInternal("corruption"); */
+      if ( !pTag->RootPage )
+         hb_cdxErrInternal("hb_cdxTagOpen: index corrupted");
    }
 }
 
@@ -5516,16 +5516,9 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                   fDel = !fAdd &&  pTag->HotFor;
                   fAdd =  fAdd && !pTag->HotFor;
                }
-               else if ( !pTag->HotFor )
-                  fDel = FALSE;
                else
                {
-                  if ( !fLck )
-                  {
-                     hb_cdxIndexLockWrite( pTag->pIndex );
-                     fLck = TRUE;
-                  }
-                  fDel = hb_cdxTagKeyFind( pTag, pTag->HotKey ) > 0;
+                  fDel = pTag->HotFor;
                }
             }
             if ( fDel || fAdd )
@@ -5535,7 +5528,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                   hb_cdxIndexLockWrite( pTag->pIndex );
                   fLck = TRUE;
                }
-               if ( fDel )
+               if ( fDel && hb_cdxTagKeyFind( pTag, pTag->HotKey ) > 0 )
                   hb_cdxPageKeyDelete( pTag->RootPage );
                if ( fAdd )
                   hb_cdxTagKeyAdd( pTag, pKey );
@@ -6438,7 +6431,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    USHORT   uiTag = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderInfo(%p, %hu, %p)", pArea, uiIndex, pOrderInfo));
-   HB_SYMBOL_UNUSED( pArea );
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -7954,7 +7946,7 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
                                    LPCDXKEYINFO Value )
 {
    USHORT k, ct, cd, v, c;
-   LONG pa, r;
+   LONG pa;
 
    if( pSort->NodeList[ Lvl ]->Entry_Ct == 0 )
    {
@@ -7990,9 +7982,8 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
                         cd - ct );
    HB_PUT_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace, c );
    k += v;
-   /* RECMASK */
 /*
-#ifndef HB_LONG_LONG_OFF
+   // RECMASK
    rr = ( (ULONGLONG) ct << ( ( pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes * 8 ) -
                                 pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits ) ) |
         ( (ULONGLONG) cd << ( ( pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes * 8 ) -
@@ -8000,17 +7991,12 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
                                 pSort->NodeList[ Lvl ]->cdxu.External.DupCntBits ) ) |
         Tag;
    memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], &rr, pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes );
-#else
 */
-   c = ( USHORT ) ( ( ct << ( 16 - pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits ) ) |
-       ( cd << ( 16 - pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits -
-                      pSort->NodeList[ Lvl ]->cdxu.External.DupCntBits ) ) );
-   HB_PUT_LE_USHORT( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v + pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes - 2 ], c );
-   r = ( HB_GET_LE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ] ) &
-        ~HB_GET_LE_ULONG( pSort->NodeList[ Lvl ]->cdxu.External.RecNumMask ) ) |
-       Tag;
-   HB_PUT_LE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], r );
-//#endif
+   hb_cdxSetLeafRecord( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ],
+                        Tag, cd, ct,
+                        pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes,
+                        pSort->NodeList[ Lvl ]->cdxu.External.DupCntBits,
+                        pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits );
    k -= ( USHORT ) ( pSort->CurTag->uiLen - cd - ct );
    if( pSort->CurTag->uiLen - cd - ct > 0 )
       memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ k ],

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2641 2004/03/24 08:01:49 brianhays Exp $
+ * $Id: ChangeLog,v 1.2642 2004/03/24 08:08:30 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-24 11:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * code with cause troubles with GCC optimization (and some other
+     C compilers which can change the order of instructions and doesn't
+     detect that some of instructions can write to the same place of
+     memory using different pointers and casting) replaced
+     by byte oriented (a little bit slower but it should not be
+     noticeable and I hope it closes this subject.
+   ! fixed bug which cause GPF when FOR index condition were used
+      reported by Alexander Kresin (thanks)
+   
+  * xharbour/source/rtl/filesys.c
+    ! fixed MING32 compilation I broke in last commit
+
 2004-03-24 15:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * source/compiler/genc.c
    * source/compiler/hbgenerr.c

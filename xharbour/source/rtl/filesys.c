@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.77 2004/03/23 19:56:29 ronpinkas Exp $
+ * $Id: filesys.c,v 1.78 2004/03/23 22:30:22 jonnymind Exp $
  */
 
 /*
@@ -1560,7 +1560,8 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       hb_fsSetError( errno );
    }
 
-#elif defined(HAVE_POSIX_IO) && defined(HB_FS_SOPEN)
+#elif defined(HB_FS_SOPEN)
+
    {
       int iShare = SH_DENYNO;
 
@@ -1585,6 +1586,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       HB_DISABLE_ASYN_CANC
       hb_fsSetError( errno );
    }
+
 #elif defined(HAVE_POSIX_IO)
 
    // allowing async cancelation here
