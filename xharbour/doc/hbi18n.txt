@@ -8,7 +8,7 @@
                                   gian@nccolai.ws
 
 
-$Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
+$Id: hbi18n.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
 
 
 /*  $DOC$
@@ -94,7 +94,7 @@ $Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
  *      change language at any moment in the program.
  *      
  *      
- *      
+ *
  *      USING XHARBOUR TO PRODUCE THE INTERNATIONAL LIST
  *      ================================================
  *      
@@ -126,7 +126,7 @@ $Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
  *      don't regularily delete the hil file, it will grow endlessy, as no merge
  *      mechanism is currently available, both to speed up compilation and to
  *      keep harbour code simple as possible.
- *      
+ *
  *      If you give a parameter to -j option, you will be able to direct the hil
  *      output that file. Combined with the fact that hil files are never
  *      overwritten, but just "grown", an average build process for a project
@@ -160,7 +160,7 @@ $Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
  *      language names schemes. It is a 5 character code, having two lowercase letters
  *      indicating the main language, an undersocre and two uppercase letters indicating
  *      the subtype of the language. In example:
- *      
+ *
  *      British english: en_UK
  *      Italian: it_IT
  *      Swiss Italian: it_CH
@@ -264,7 +264,7 @@ $Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
  *              i18n( "Italian" ), ;
  *              i18n( "French" ), ;
  *              i18n( "Quit" ) }
- *      
+ *
  *            CLEAR SCREEN
  *            @2,10 SAY i18n( "X H A R B O U R - Internationalization test " )
  *            @4,10 SAY i18n( "Current language: " ) + HB_I18NGetLanguageName() +;
@@ -356,39 +356,71 @@ $Id: hbi18n.txt,v 1.1 2003/07/01 01:41:42 jonnymind Exp $
  *      
  *      
  *      HB_I18NSetLanguage( cLanguage ) --> lResult
- *      
+ *
  *         Loads a language translation table into the current I18N() translation
  *         table. cLanguage is a filename (without the .hit extension) that must
  *         be searched in the current i18n search path (see HB_I18nGetPath()).
- *      
+ *
  *         This function is called by the virtual machine before the programs
  *         begins using the value of the environment variable "LANG" as the
  *         cLanguage parameter, if this variable is present present, but can
  *         be also called in a later moment by the program.
- *      
- *      
+ *
+ *      HB_I18NSetBaseLanguage( cLanguage, cName )
+ *
+ *         Set the cLanguage as the "untraslated" language. Suppose that
+ *         you are writing a program in i.e. italian and using i18n to
+ *         translate it in english. The sytem must know that if your
+ *         "language" becomes equal to "it_IT", be it in the LANG environment
+ *         variable or be it set in the dynamically in the program,
+ *         then you mean "do not translate me: I was written in it_IT".
+ *
+ *         The default at the startup is "en_US", so if your write your
+ *         program in american english, and use i18n to translate it in
+ *         other languages, you don't have to use this function.
+ *
+ *         Since the default language is not read from a .hit file, but is
+ *         hard-coded in the program, you also must set a name for the
+ *         language. I.e.:
+ *
+ *             HB_I18NSetBaseLanguage( "it_CH", "Italiano Svizzero" )
+ *
  *      HB_I18NGetLanguage() --> cLanguage
- *      
+ *
  *         Retunrs the name of the table that has been loaded into I18N()
  *         translation table with HB_I18nSetLanguage(), or at startup.
- *      
- *      
+ *
+ *
  *      HB_I18NGetLanguageName() --> cLanguage
- *      
+ *
  *         Returns the name of the currently loaded language, as it has been
  *         declared in the language header. Generally, this is a descriptive
  *         non-internationalized name of the language, like "Espanol",
  *         "Italiano", "English", "Françoise", "Detusche", "Nihongo" and
  *         so on.
- *      
+ *
+ *
+ *      HB_I18NGetBaseLanguage() --> cLanguage
+ *
+ *         Retunrs the name of the languagage in which the program has been
+ *         written, that is set with HB_I18NSetBaseLanguage().
+ *
+ *
+ *      HB_I18NGetLanguageName() --> cLanguage
+ *
+ *         Returns the name of the language that the program has been written in.
+ *         Generally, this is a descriptive non-internationalized name of the
+ *         language, like "Espanol", "Italiano", "English", "Françoise",
+ *         "Detusche", "Nihongo" and so on.
+ *
  *      -------- TODO: functions to access other language members, and
  *               functions to allow i18n lookups on more than one table:
  *               you could have web service threads speaking english and
  *               other speaking french.
- *      
- *      
- *      
- *      
+ *
+ *
+ *
+ *
  *      Middle Level api
  *      ----------------
  *      

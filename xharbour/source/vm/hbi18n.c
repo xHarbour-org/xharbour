@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.8 2003/06/24 09:18:11 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.9 2003/08/18 17:38:51 jonnymind Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbsetup.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -69,11 +70,15 @@
 static PHB_ITEM s_i18n_table;
 
 /** Default translation files directory */
-static char *s_default_i18n_dir;
+static char s_default_i18n_dir[ _POSIX_PATH_MAX + 1];
 
 /** And our current language */
-static char *s_current_language;
-static char s_current_language_name[50];
+static char s_current_language[HB_I18N_CODELEN + 1];
+static char s_current_language_name[HB_I18N_NAMELEN + 1];
+
+/** Language considered to be "untranslated", or "international" */
+static char s_base_language[HB_I18N_CODELEN + 1];
+static char s_base_language_name[HB_I18N_NAMELEN];
 
 /***************************************
         Low level API interface
@@ -407,8 +412,8 @@ BOOL hb_i18n_load_language( char *language )
 
    if( pTable != NULL )
    {
-      s_current_language = language;
-      strcpy( s_current_language_name, header.language );
+      strncpy( s_current_language, language , HB_I18N_CODELEN );
+      strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
       if ( s_i18n_table != NULL )
       {
          hb_arrayRelease( s_i18n_table );
@@ -652,7 +657,7 @@ HB_FUNC( HB_I18NSETPATH )
       return;
    }
 
-   s_default_i18n_dir = hb_parc( 1 );
+   strncpy( s_default_i18n_dir, hb_parc( 1 ), _POSIX_PATH_MAX );
 }
 
 /* Gets default directory */
@@ -679,14 +684,15 @@ HB_FUNC( HB_I18NSETLANGUAGE )
 
    language = hb_itemGetCPtr( pStr );
 
-   if ( strcmp( HB_INTERNATIONAL_CODE, language ) == 0 )
+   if ( strcmp( s_base_language, language ) == 0 )
    {
       if ( s_i18n_table != NULL )
       {
          hb_arrayRelease( s_i18n_table );
          s_i18n_table = NULL;
-         s_current_language = HB_INTERNATIONAL_CODE;
-         strcpy( s_current_language_name, HB_INTERNATIONAL_NAME);
+         strncpy( s_current_language, s_base_language , HB_I18N_CODELEN );
+         strncpy( s_current_language_name, s_base_language_name,
+               HB_I18N_NAMELEN - 1 );
       }
       hb_retl( TRUE );
    }
@@ -708,12 +714,56 @@ HB_FUNC( HB_I18NGETLANGUAGENAME )
    hb_retc( s_current_language_name );
 }
 
+HB_FUNC( HB_I18NGETBASELANGUAGE )
+{
+   HB_THREAD_STUB
+   hb_retc( s_base_language );
+}
+
+HB_FUNC( HB_I18NGETBASELANGUAGENAME )
+{
+   HB_THREAD_STUB
+   hb_retc( s_base_language_name );
+}
+
+HB_FUNC( HB_I18NSETBASELANGUAGE )
+{
+   char *szCode = hb_parc( 1 );
+   char *szName = hb_parc( 2 );
+   BOOL bChange = FALSE;
+
+   if ( szCode == NULL || szName == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter format", NULL,
+         2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+
+   if ( strcmp( s_base_language, s_current_language ) == 0 )
+   {
+      bChange = TRUE;
+   }
+
+   strncpy( s_base_language, szCode , HB_I18N_CODELEN );
+   strncpy( s_base_language_name, szName, HB_I18N_NAMELEN );
+
+   if ( bChange )
+   {
+      strncpy( s_current_language, szCode , HB_I18N_CODELEN );
+      strncpy( s_current_language_name, szName, HB_I18N_NAMELEN );
+   }
+}
+
 /***********************************************
 * VM interface
 ************************************************/
 
 BOOL hb_i18nInit( char *i18n_dir, char *language )
 {
+
+   // Supposing that the user strings are compiled in englis;
+   // this default can be changed later
+   strncpy( s_base_language, HB_INTERNATIONAL_CODE, HB_I18N_CODELEN );
+   strncpy( s_base_language_name, HB_INTERNATIONAL_NAME, HB_I18N_NAMELEN - 1 );
 
    if ( language == NULL )
    {
@@ -726,19 +776,19 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
 
    if ( i18n_dir == NULL )
    {
-      s_default_i18n_dir = HB_DEFAULT_I18N_PATH;
+      strncpy( s_default_i18n_dir, HB_DEFAULT_I18N_PATH, _POSIX_PATH_MAX );
    }
    else
    {
-      s_default_i18n_dir = i18n_dir;
+      strncpy( s_default_i18n_dir, i18n_dir, _POSIX_PATH_MAX );
    }
 
    /* No automatic internationalization can be found */
    if ( language == NULL || ! hb_i18n_load_language( language ) )
    {
       s_i18n_table = NULL;
-      s_current_language = HB_INTERNATIONAL_CODE;
-      strcpy( s_current_language_name, HB_INTERNATIONAL_NAME );
+      strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
+      strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
       // but we know that we don't want internationalization
       if ( language != NULL )
       {
