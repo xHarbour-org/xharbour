@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.38 2003/01/30 01:01:59 lculik Exp $
+ * $Id: tget.prg,v 1.39 2003/01/30 13:18:17 lculik Exp $
  */
 
 /*
@@ -453,6 +453,7 @@ METHOD Undo() CLASS Get
    if ::hasfocus
       ::VarPut( ::Original, .t. )
       ::pos := ::FirstEditable( )
+      ::Display()
    endif
 
 return Self
