@@ -1,5 +1,5 @@
 /*
- * $Id: msgeo.c,v 1.3 2003/06/15 20:15:41 lculik Exp $
+ * $Id: msgeo.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Esperanto",                 /* Name (in native language) */
       "EO",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/06/15 20:15:41 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -83,7 +83,7 @@ static HB_LANG s_lang =
       "Septembro",
       "Oktobro",
       "Novembro",
-      "Decembro"
+      "Decembro",
 
       /* Day names */
 
@@ -93,7 +93,7 @@ static HB_LANG s_lang =
       "merkredo",
       "jaudo",
       "vendredo",
-      "sabato"
+      "sabato",
 
       /* CA-Cl*pper compatible natmsg items */
 

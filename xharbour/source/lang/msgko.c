@@ -1,5 +1,5 @@
 /*
- * $Id: msgko.c,v 1.3 2003/06/17 22:10:23 druzus Exp $
+ * $Id: msgko.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "한국어",                    /* Name (in native language) */
       "KO",                        /* RFC ID */
       "949",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -88,7 +88,7 @@ static HB_LANG s_lang =
       "일요일",
       "월요일",
       "화요일",
-      "수요일"
+      "수요일",
       "목요일",
       "금요일",
       "토요일",

@@ -1,5 +1,5 @@
 /*
- * $Id: msgsrwin.c,v 1.2 2003/06/17 22:10:23 druzus Exp $
+ * $Id: msgsrwin.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Српски",                   /* Name (in native language) */
       "SR",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.2 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -81,7 +81,7 @@ static HB_LANG s_lang =
       "Септембар",
       "Октобар",
       "Новембар",
-      "Децембар"
+      "Децембар",
 
       /* Day names */
 
@@ -91,7 +91,7 @@ static HB_LANG s_lang =
       "Среда",
       "Четвртак",
       "Петак",
-      "Субота"
+      "Субота",
 
       /* CA-Cl*pper compatible natmsg items */
 
@@ -161,7 +161,7 @@ static HB_LANG s_lang =
       "приступ низу",
       "величина низа",
       "није у низу",
-      "упорђеoе"
+      "упорђеoе",
 
 
       /* Internal error names */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2136 2004/01/25 19:09:48 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2137 2004/01/25 20:44:08 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-26 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/lang/msgeo.c
+  * source/lang/msgfr.c
+  * source/lang/msgko.c
+  * source/lang/msgsrwin.c
+    ! added missing commas on array members.
 
 2004-01-25 15:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.bc
