@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.30 2003/06/18 09:23:29 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.31 2003/06/19 02:44:49 druzus Exp $
  */
 
 /*
@@ -84,7 +84,10 @@ HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
 { "_DBFC",            HB_FS_PUBLIC, HB_FUNCNAME( _DBFC ), NULL },
 { "DBF_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBF_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( dbf1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup dbf1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.2 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: sdf1.c,v 1.3 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,10 @@ HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
 { "_SDFC",            HB_FS_PUBLIC, HB_FUNCNAME( _SDFC ), NULL },
 { "SDF_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( SDF_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup sdf1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

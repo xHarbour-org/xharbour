@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.2 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: delim1.c,v 1.3 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,10 @@ HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
 { "_DELIMC",            HB_FS_PUBLIC, HB_FUNCNAME( _DELIMC ), NULL },
 { "DELIM_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DELIM_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( delim1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup delim1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

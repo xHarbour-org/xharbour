@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.3 2003/06/17 19:47:49 lculik Exp $
+ * $Id: cdpapi.c,v 1.4 2003/06/18 00:23:39 lculik Exp $
  */
 
 /*
@@ -124,8 +124,8 @@ BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE cdpage )
                   }
                   if( strpbrk(cdpage->CharsUpper, "~.") != NULL )
                   {
-                     ptrUpper = cdpage->CharsUpper = strdup(cdpage->CharsUpper);
-                     ptrLower = cdpage->CharsLower = strdup(cdpage->CharsLower);
+                     ptrUpper = cdpage->CharsUpper = hb_strdup(cdpage->CharsUpper);
+                     ptrLower = cdpage->CharsLower = hb_strdup(cdpage->CharsLower);
                   }
                   for( i=1; *ptrUpper; i++,ptrUpper++,ptrLower++ )
                   {
@@ -182,7 +182,7 @@ BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE cdpage )
                      if( iu < iumax || il < ilmax )
                         cdpage->lSort = TRUE;
                      iumax = iu; ilmax = il;
-                     
+
                      iu = ((int)(*ptrLower))&255;
                      cdpage->s_upper[iu] = *ptrUpper;
                      il = ((int)(*ptrUpper))&255;
@@ -272,12 +272,12 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
       int nAddLower = (cdpIn->lLatin)? 6:0;
       for( ; *psz; psz++ )
       {
-         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) && 
-             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) && 
+         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
+             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) &&
              ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
-            *psz = ( n >= (cdpOut->nChars+nAddLower) )? 
+            *psz = ( n >= (cdpOut->nChars+nAddLower) )?
                         cdpOut->CharsLower[n-cdpOut->nChars-nAddLower]:cdpOut->CharsUpper[n];
          }
       }
@@ -294,12 +294,12 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
       int nAddLower = (cdpIn->lLatin)? 6:0;
       for( i=0; i<nChars; i++,psz++ )
       {
-         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) && 
-             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) && 
+         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
+             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) &&
              ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
-            *psz = ( n >= (cdpOut->nChars+nAddLower) )? 
+            *psz = ( n >= (cdpOut->nChars+nAddLower) )?
                         cdpOut->CharsLower[n-cdpOut->nChars-nAddLower]:cdpOut->CharsUpper[n];
          }
       }
@@ -330,14 +330,14 @@ int HB_EXPORT hb_cdpcmp( char* szFirst, char* szSecond, ULONG ulLen, PHB_CODEPAG
             /* printf( "\nhb_cdpcmp-1 %c %c",*szFirst,*szSecond ); */
             for( j=0; j<cdpage->nMulti; j++,pmulti++ )
             {
-               if( ( *szFirst == pmulti->cLast[0] || 
-                     *szFirst == pmulti->cLast[1] ) && 
-                   ( *(szFirst-1) == pmulti->cFirst[0] || 
+               if( ( *szFirst == pmulti->cLast[0] ||
+                     *szFirst == pmulti->cLast[1] ) &&
+                   ( *(szFirst-1) == pmulti->cFirst[0] ||
                      *(szFirst-1) == pmulti->cFirst[1] )  )
                    nd1 = pmulti->nCode;
-               if( ( *szSecond == pmulti->cLast[0] || 
-                     *szSecond == pmulti->cLast[1] ) && 
-                   ( *(szSecond-1) == pmulti->cFirst[0] || 
+               if( ( *szSecond == pmulti->cLast[0] ||
+                     *szSecond == pmulti->cLast[1] ) &&
+                   ( *(szSecond-1) == pmulti->cFirst[0] ||
                      *(szSecond-1) == pmulti->cFirst[1] )  )
                    nd2 = pmulti->nCode;
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.9 2003/06/10 23:46:19 ronpinkas Exp $
+ * $Id: terror.prg,v 1.10 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -82,13 +82,13 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
       s_oClass:AddData( "SubSystem"    , "" )
       s_oClass:AddData( "Tries"        , 0 )
 
-      s_oClass:AddData( "ProcName"     , Procname(1) )
-      s_oClass:AddData( "ProcLine"     , Procline(1) )
+      s_oClass:AddData( "ProcName"     ,  )
+      s_oClass:AddData( "ProcLine"     ,  )
 
       #ifdef HB_THREAD_SUPPORT
-         s_oClass:AddData( "RunningThreads" , HB_ThreadCountStacks() )
-         s_oClass:AddData( "OsThreadId"     , ThreadGetCurrent() )
-         s_oClass:AddData( "VMThreadId"     , ThreadGetCurrentInternal() )
+         s_oClass:AddData( "RunningThreads" ,  )
+         s_oClass:AddData( "OsThreadId"     ,  )
+         s_oClass:AddData( "VMThreadId"     ,  )
       #endif
 
       s_oClass:AddData( "ModuleName"   , "" )
@@ -118,6 +118,15 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    ELSE
       oErr:ModuleName := ModuleName
    ENDIF
+
+   oErr:ProcName := Procname(1)
+   oErr:ProcLine := Procline(1)
+
+   #ifdef HB_THREAD_SUPPORT
+      oErr:RunningThreads := HB_ThreadCountStacks()
+      oErr:OsThreadId     := ThreadGetCurrent()
+      oErr:VMThreadId     := ThreadGetCurrentInternal()
+   #endif
 
 RETURN oErr
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.47 2003/06/21 02:03:07 lculik Exp $
+ * $Id: dbfntx1.c,v 1.48 2003/06/21 02:34:07 lculik Exp $
  */
 
 /*
@@ -147,7 +147,10 @@ HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
 { "_DBFNTX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFNTX ),             0 },
 { "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFNTX_GETFUNCTABLE) , 0 }
 HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup dbfntx1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

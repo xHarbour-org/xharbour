@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.45 2003/06/11 23:23:59 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.46 2003/06/11 23:29:20 ronpinkas Exp $
  */
 
 /*
@@ -141,7 +141,10 @@ HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "_DBFCDX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFCDX ), NULL },
 { "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFCDX_GETFUNCTABLE ), NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
-#if defined(_MSC_VER)
+
+#if defined(HB_STATIC_STARTUP)
+   #pragma startup dbfcdx1__InitSymbols
+#elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

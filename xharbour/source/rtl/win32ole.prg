@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.26 2003/06/20 00:11:04 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.27 2003/06/21 03:17:57 ronpinkas Exp $
  */
 
 /*
@@ -110,8 +110,8 @@ RETURN TOleAuto():GetActiveObject( cString )
    #include <OleAuto.h>
 
    #ifndef __MINGW32__
-       // Missing in Mingw V 2.
-      #include <OleDB.h>
+      // Missing in Mingw V 2.
+      //#include <OleDB.h>
    #endif
 
    #include <ShlObj.h>
@@ -701,7 +701,7 @@ RETURN uObj
 
   // -----------------------------------------------------------------------
 
-  static far VARIANTARG RetVal;
+  static VARIANTARG RetVal;
 
   static EXCEPINFO excep;
 

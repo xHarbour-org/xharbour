@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.74 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.75 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -101,11 +101,13 @@
 
 #endif
 
+/* 2003-06-25 Ron Pinkas, why did we need that?
 #if defined( OS_UNIX_COMPATIBLE )
    #include <sys/timeb.h>
 #else
    #include <sys\timeb.h>
 #endif
+*/
 
 #include <time.h>
 #include <errno.h>
