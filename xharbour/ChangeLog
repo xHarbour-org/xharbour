@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2294 2004/02/15 19:11:53 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2295 2004/02/15 20:09:30 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-16 09:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/mysql/tmysql.prg
+    * METHOD GetBlankRow( loRow ) CLASS TMySQLTable
+      - set default value of "C" type field to SPACE(FIELD_LENGTH)
 
 2004-02-15 21:12 UTC+0100 Giancarlo Niccolai <gc@niccolai.ws>
   * source/rtl/radiobtn.prg
@@ -150,6 +155,6 @@
   * ChangeLog
     ! Renamed to ChangeLog.018 and started an new one
   * utils/hbtest/Makefile
-    ! added missing rt_ccall.prg    
+    ! added missing rt_ccall.prg
   * contrib/hbzlib/Makefile
     !Removed unneeded dependencies

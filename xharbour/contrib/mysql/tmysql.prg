@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.11 2003/10/22 01:00:09 lculik Exp $
+ * $Id: tmysql.prg,v 1.12 2003/12/21 02:56:15 walito Exp $
  */
 
  /*
@@ -272,7 +272,7 @@ CLASS TMySQLQuery
 
    DATA  lError            // .T. if last operation failed
 
-   DATA  loRow             // If return oRow in GetRow(), 
+   DATA  loRow             // If return oRow in GetRow(),
 
    METHOD   New( nSocket, cQuery, loRow )  // New query object
 
@@ -547,7 +547,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                      xField :=  ctod(right(xField,2,0)+ "/"+ substr(xField,6,2)+"/"+ Left(xField, 4))
 
                   elseif cDateFormat = 'yyyy.mm.dd' // ANSI
-                     xField := ctod(Left(xField, 4)+ "."+substr(xField,6,2)+"."+right(xField,2,0)) 
+                     xField := ctod(Left(xField, 4)+ "."+substr(xField,6,2)+"."+right(xField,2,0))
 
                   elseif cDateFormat = 'dd.mm.yyyy' //GERMAN
                      xField :=ctod(right(xField,2,0)+ "."+ substr(xField,6,2)+"."+ Left(xField, 4 ))
@@ -556,7 +556,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                      xField :=ctod(right(xField,2,0)+ "-"+ substr(xField,6,2)+"-"+ Left(xField, 4))
 
                   elseif cDateFormat = 'yyyy/mm/dd' //JAPAN
-                     xField :=  ctod(Left(xField, 4)+ "/"+substr(xField,6,2)+"/"+right(xField,2,0)) 
+                     xField :=  ctod(Left(xField, 4)+ "/"+substr(xField,6,2)+"/"+right(xField,2,0))
 
                   elseif cDateFormat = 'mm/dd/yyyy' // AMERICAN
                      xField :=  ctod(substr(xField,6,2)+"/"+right(xField,2,0)+ "/" + Left(xField, 4))
@@ -678,23 +678,23 @@ return cType
 METHOD Locate( cFieldName, Value, bPartialKey, bSoftSeek ) CLASS TMySQLQuery
 local nRecPrec := ::recno(), bFound := .F.
 
-   //bSoftSeek cause the record pointer to be moved to the next record 
-   
-   if bSoftSeek   == NIL ; bSoftSeek := .F. ; endif         
+   //bSoftSeek cause the record pointer to be moved to the next record
+
+   if bSoftSeek   == NIL ; bSoftSeek := .F. ; endif
    if bPartialKey == NIL ; bPartialKey := .T. ; endif
 
    ::gotop()
-   while ! ::eof() 
+   while ! ::eof()
      bFound := (::FieldGet(::FieldPos(cFieldName)) == Value) .or. ((::FieldGet(::FieldPos(cFieldName)) = Value) .and. bPartialKey)
-     
+
      if !bFound .and. ((::FieldGet(::FieldPos(cFieldName)) > Value) .and. bSoftSeek)
        bFound := .T.
      endif
-     
+
      if bFound
        exit
      endif
-     
+
      ::skip()
    enddo
 
@@ -863,7 +863,7 @@ METHOD Delete( oRow ) CLASS TMySQLTable
    local cDeleteQuery := "DELETE FROM " + ::cTable, xValue
 
    // is this a row of this table ?
-   
+
    if oRow == nil
 
          cDeleteQuery += ::MakePrimaryKeyWhere()
@@ -998,6 +998,8 @@ METHOD GetBlankRow( loRow ) CLASS TMySQLTable
 
       switch cType
       case "C"
+         ::aOldValue[ HB_EnumIndex() ] := xValue := SPACE(::aFieldStruct[ HB_EnumIndex() ][ MYSQL_FS_LENGTH ])
+         exit
       case "M"
       case "B"
          ::aOldValue[ HB_EnumIndex() ] := xValue := ""
