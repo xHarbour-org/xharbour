@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.25 2002/04/27 22:27:56 horacioroldan Exp $
+ * $Id: hbapirdd.h,v 1.3 2002/05/21 16:41:13 horacioroldan Exp $
  */
 
 /*
@@ -1166,6 +1166,9 @@ extern ERRCODE hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS p
 extern ERRCODE hb_rddDisinherit( BYTE * drvName );
 extern USHORT  hb_rddExtendType( USHORT fieldType );
 extern USHORT  hb_rddFieldType( USHORT extendType );
+
+typedef short (* WACALLBACK )( AREA *, int );
+extern ERRCODE hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
 
 #if defined(HB_EXTERN_C)
 }
