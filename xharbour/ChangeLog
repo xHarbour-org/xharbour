@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.761 2003/02/22 23:40:38 mlombardo Exp $
+ * $Id: ChangeLog,v 1.762 2003/02/22 23:42:25 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,58 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-23 21:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbcompress.c
+    - Removed adler32() checksum function, because...
+
+  + source/rtl/hbchecksum.c
+    + moved here adler32() function, with a new front end called
+      HB_CHECKSUM( cStr ) -> nCheckSum32bit
+
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+    + Added support for cyclic remote procedure call; now RPC can be
+      called defining a for/next cluse or a foreach clause. The loop
+      will be done in the server (there is no need to fill the network
+      with operations: one request, one summary reply or all replies).
+
+  * tests/rpcclient.prg
+    + Added a test of foreach RPC call
+
+  + source/rtl/hbhextonum.c
+    + Added functions
+      HB_HexToNum( cHexString )--> nNum
+      HB_NumToHex( nNum ) --> cHexString
+
+  * include/Makefile
+  + include/hbnxs.h
+  * source/rtl/Makefile
+  + source/rtl/hbcrypt.c
+    + Added HB_Crypt() and HB_Decrypt() functions. At the moment, this two
+      functions allows only simmetric encryption with NXS algorithm, an
+      algorithm provided by me; but the idea here is that HB_Crypt/HB_Decrypt
+      SHOULD be frontend for all encription methods we may want to add.
+
+      Currently:
+         HB_Crypt( cData, cKey ) --> cCipher
+         HB_Decrypt( cCipher, cKey ) --> cData
+      In the future, there will be also space for cipher method.
+
+  + tests/crypt.prg
+    + test for crypt functions.
+
+
 2003-02-22 20:40 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rtl/dbdelim.prg
-    ! Fixed bug importing from txt: if the last txt line does not ends with CRLF it 
+    ! Fixed bug importing from txt: if the last txt line does not ends with CRLF it
       is not ignored anymore.
     ! Tab idents removed
 
 2003-02-22 09:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
     * Enahnced HB_QSelf() to recive optional paramater <nLevel> much like ProcName().
+
+
 
 2003-02-22 06:53 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/arrays.c

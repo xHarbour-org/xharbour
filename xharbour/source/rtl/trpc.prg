@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.3 2003/02/16 14:06:21 jonnymind Exp $
+ * $Id: trpc.prg,v 1.4 2003/02/19 20:20:30 jonnymind Exp $
  */
 
 /*
@@ -85,12 +85,52 @@
 
    20 - Function call
      <LEN8> - raw data length
-     "Function name" + Function parameters serialized one after another
+     "Function name" + { Param1, ... Param N }
 
    21 - Compressed function call
      <LEN8> - Original data length
      <LEN8> - compressed data length
      * follows compressed data containing serialized name + params
+
+   22 - Loop Function Call
+     <LEN8> - Raw data length
+     "A" or "C" or "E": send all results/ send compressed result/
+         send confirmation at end
+     Numeric BEGIN
+     Numeric END
+     Numeric STEP
+     "Function name" + { Param1, ... Param N }
+     Note: the parameter called $1 is the loop indicator
+
+   23 - Loop Function Call / Compressed
+     <LEN8> - Original data length
+     <LEN8> - compressed data length
+     "A" or "C" or "E": send all results/ send compressed result/
+         send confirmation at end
+     * follows compressed data containing:
+     Numeric BEGIN
+     Numeric END
+     Numeric STEP
+     "Function name" + { Param1, ... Param N }
+     Note: the parameter called $1 is the loop indicator
+
+   24 - Foreach function call
+     <LEN8> - raw data length
+     "A" or "C" or "E": send all results/ send compressed result/
+         send confirmation at end
+     "Function name" + { Param1, ... Param N }
+     +Array containing the elements
+     Note: the parameter called $1 is substitued with the foreach
+
+   25 - Foreach function call / Compressed
+     <LEN8> - Original data length
+     <LEN8> - compressed data length
+     "A" or "C" or "E": send all results/ send compressed result/
+         send confirmation at end
+     * follows compressed data containing:
+     "Function name" + { Param1, ... Param N }
+     +Array containing the elements
+     Note: the parameter called $1 is substitued with the foreach
 
 
    TCP REPLIES:
@@ -154,10 +194,11 @@ CLASS tRPCFunction
    DATA cReturn
    DATA cSerial
    DATA nAuthLevel
+   DATA bGetRawParams
 
    CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
 
-   METHOD New( cFname, cSerial, cFret, aParams ) CONSTRUCTOR
+   METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, bGetRawParams ) CONSTRUCTOR
    METHOD CheckTypes( aParams )
    METHOD CheckParam( cParam )
    METHOD Describe()
@@ -165,7 +206,7 @@ CLASS tRPCFunction
 ENDCLASS
 
 
-METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel ) CLASS tRPCFunction
+METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, bGetRaw ) CLASS tRPCFunction
    LOCAL cParam
 
    ::cName := cFname
@@ -188,6 +229,12 @@ METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel ) CLASS tRPCFunction
       ::CheckParam( cParam )
       AAdd( ::aParameters, cParam )
    NEXT
+
+   IF bGetRaw != NIL
+      ::bGetRawParams := bGetRaw
+   ELSE
+      ::bGetRawParams := .T.
+   ENDIF
 
 RETURN Self
 
@@ -252,6 +299,9 @@ CLASS tRPCServeCon
    /* User ID */
    DATA cUserId
 
+   /* Allow progress ?*/
+   DATA bAllowProgress
+
    METHOD New( oCaller, skRemote ) CONSTRUCTOR
    METHOD Destroy()
 
@@ -261,10 +311,13 @@ CLASS tRPCServeCon
    METHOD Run( lEncrypt )
 
    /* Utilty */
-   METHOD GetAuth()
-   METHOD GetFunction()
-   METHOD GetFunctionComp()
-   METHOD LaunchFunction()
+   METHOD RecvAuth( lEncrypt )
+   METHOD RecvFunction( bComp, bMode )
+   METHOD FuncCall( cData )
+   METHOD FuncLoopCall( cData, cMode )
+   METHOD FuncForeachCall( cData, cMode )
+   METHOD LaunchFunction( cFuncName, aParms, nMode, aItems )
+   METHOD SendResult( oRet )
    METHOD SendProgress( nProgress, aData )
 
    METHOD Encrypt(cDataIn)
@@ -321,6 +374,7 @@ RETURN lRet
 METHOD Run() CLASS tRPCServeCon
    LOCAL cCode := Space( 6 )
    LOCAL lBreak := .F.
+   LOCAL aData
 
 
    DO WHILE InetErrorCode( ::skRemote ) == 0 .and. .not. lBreak
@@ -336,11 +390,11 @@ METHOD Run() CLASS tRPCServeCon
 
          /* Read autorization request */
          CASE cCode == "XHBR90"
-            lBreak := ::GetAuth( .F. )
+            lBreak := ::RecvAuth( .F. )
 
          /* Read encrypted autorization request */
          CASE cCode == "XHBR93"
-            lBreak := ::GetAuth( .T. )
+            lBreak := ::RecvAuth( .T. )
 
          /* Close connection */
          CASE cCode == "XHBR92"
@@ -349,11 +403,61 @@ METHOD Run() CLASS tRPCServeCon
 
          /* Execute function */
          CASE cCode == "XHBR20"
-            lBreak := ::GetFunction()
+            aData := ::RecvFunction( .F., .F. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncCall( aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
 
          /* Execute function */
          CASE cCode == "XHBR21"
-            lBreak := ::GetFunctionComp()
+            aData := ::RecvFunction( .T., .F. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncCall( aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
+
+         /* Loop function */
+         CASE cCode == "XHBR22"
+            aData := ::RecvFunction( .F., .T. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
+
+         /* Loop function - compressed */
+         CASE cCode == "XHBR23"
+            aData := ::RecvFunction( .T., .T. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
+
+         /* Foreach function */
+         CASE cCode == "XHBR24"
+            aData := ::RecvFunction( .F., .T. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
+
+         /* Foreach function - compressed*/
+         CASE cCode == "XHBR25"
+            aData := ::RecvFunction( .T., .T. )
+            IF .not. Empty( aData )
+               lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+            ELSE
+               lBreak := .T.
+            ENDIF
+
+         OTHERWISE
+            EXIT
+
       ENDCASE
 
    ENDDO
@@ -365,7 +469,7 @@ METHOD Run() CLASS tRPCServeCon
 RETURN .T.
 
 
-METHOD GetAuth( lEncrypt ) CLASS tRPCServeCon
+METHOD RecvAuth( lEncrypt ) CLASS tRPCServeCon
    LOCAL cLength := Space(8), nLen, nPos
    LOCAL cUserID, cPassword, cEncId
    LOCAL lBreak := .T.
@@ -410,61 +514,116 @@ METHOD GetAuth( lEncrypt ) CLASS tRPCServeCon
 RETURN lBreak
 
 
-METHOD GetFunction() CLASS tRPCServeCon
-   LOCAL cLength := Space(8), nLen
+METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
+   LOCAL cLength := Space(8), nLen, nComp
+   LOCAL cMode := " "
+   LOCAL nBegin, nEnd, nStep
    LOCAL cData
-   LOCAL lBreak := .T.
+   LOCAL cSer
 
-   IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
-      nLen := HB_GetLen8( cLength )
-      IF nLen < 65000
-         cData := Space( nLen )
-         IF InetRecvAll( ::skRemote, @cData, nLen ) == nLen
-            ::oServer:OnClientRequest( Self, 20, cData )
-            lBreak := .not. ::LaunchFunction( cData )
-         ENDIF
+   /* Original lenght of data */
+   IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
+      RETURN .F.
+   ENDIF
+
+   nLen := HB_GetLen8( cLength )
+   IF nLen > 65000
+      RETURN NIL
+   ENDIF
+
+   /* compressed lenght */
+   IF bComp
+      IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
+         RETURN NIL
+      ENDIF
+
+      nComp := HB_GetLen8( cLength )
+   ELSE
+      nComp := nLen
+   ENDIF
+
+   /* Mode */
+   IF bMode
+      IF InetRecvAll( ::skRemote, @cMode ) != 1
+         RETURN NIL
       ENDIF
    ENDIF
 
-RETURN lBreak
-
-
-METHOD GetFunctionComp() CLASS tRPCServeCon
-   LOCAL cLength := Space(8), cOrigLen := Space(8), nLen, nOrigLen
-   LOCAL cData
-   LOCAL lBreak := .T.
-
-   IF InetRecvAll( ::skRemote, @cOrigLen, 8 ) == 8
-      nOrigLen := HB_GetLen8( cOrigLen )
-
-      IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
-         nLen := HB_GetLen8( cLength )
-
-         IF nLen < 65000
-            cData := Space( nLen )
-            IF InetRecvAll( ::skRemote, @cData, nLen ) == nLen
-               // decompress data
-               cData := HB_Uncompress( nOrigLen, cData )
-               IF .not. Empty( cData )
-                  ::oServer:OnClientRequest( Self, 21, cData )
-                  lBreak := .not. ::LaunchFunction( cData )
-               ENDIF
-            ENDIF
-         ENDIF
-      ENDIF
+   /* Get data */
+   cData := Space( nComp )
+   IF InetRecvAll( ::skRemote, @cData ) != nComp
+      RETURN NIL
    ENDIF
-RETURN lBreak
+
+   /* Eventually uncompress it */
+   IF bComp
+      cData := HB_Uncompress( nLen, cData )
+   ENDIF
+
+RETURN { cMode, cData }
 
 
-METHOD LaunchFunction( cData ) CLASS tRPCServeCon
-   LOCAL cSer, aParam
-   LOCAL cFuncName, oFunc
-   LOCAL cOrigLen, cCompLen
-   LOCAL oRet
+METHOD FuncCall( cData ) CLASS tRPCServeCon
+   LOCAL cSer, cFuncName, aParams
 
+   /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
    cFuncName := HB_DeserialNext( cSer )
-   aParam := HB_DeserialNext( cSer )
+   aParams := HB_DeserialNext( cSer )
+
+   IF Empty( aParams )
+      RETURN .F.
+   ENDIF
+
+   ::oServer:OnClientRequest( Self, 20, { cFuncName, aParams } )
+RETURN ::LaunchFunction( cFuncName, aParams, 0 )
+
+
+METHOD FuncLoopCall( cMode, cData ) CLASS tRPCServeCon
+   LOCAL nBegin, nEnd, nStep
+   LOCAL cSer
+   LOCAL cFuncName, aParams
+
+   /* Deserialize all elements */
+   cSer := HB_DeserialBegin( cData )
+   nBegin := HB_DeserialNext( cSer )
+   nEnd := HB_DeserialNext( cSer )
+   nStep := HB_DeserialNext( cSer )
+   cFuncName := HB_DeserialNext( cSer )
+   aParams := HB_DeserialNext( cSer )
+
+   IF Empty( aParams )
+      RETURN .F.
+   ENDIF
+
+   ::oServer:OnClientRequest( Self, 22, { cFuncName, aParams, cMode, nBegin, nEnd, nStep } )
+RETURN ::LaunchFunction( cFuncName, aParams, 1, { cMode, nBegin, nEnd, nStep } )
+
+
+METHOD FuncForeachCall( cMode, cData ) CLASS tRPCServeCon
+   LOCAL cSer
+   LOCAL cFuncName, aParams
+   LOCAL aItems
+
+   /* Deserialize all elements */
+   cSer := HB_DeserialBegin( cData )
+   cFuncName := HB_DeserialNext( cSer )
+   aParams := HB_DeserialNext( cSer )
+   aItems := HB_DeserialNext( cSer )
+
+   IF Empty( aItems )
+      RETURN .F.
+   ENDIF
+
+   ::oServer:OnClientRequest( Self, 24, { cFuncName, aParams, aItems } )
+RETURN ::LaunchFunction( cFuncName, aParams, 2, { cMode, aItems } )
+
+
+METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
+   LOCAL oFunc, nCount
+   LOCAL cOrigLen, cCompLen
+   LOCAL oRet, oElem, aRet
+   LOCAL aSubst, nSubstPos
 
    //let's try to run this function.
    oFunc := ::oServer:Find( cFuncName )
@@ -486,7 +645,7 @@ METHOD LaunchFunction( cData ) CLASS tRPCServeCon
    ENDIF
 
    //check for parameters
-   IF Empty( aParam ) .or. .not. oFunc:CheckTypes( aParam )
+   IF Empty( aParams ) .or. .not. oFunc:CheckTypes( aParams )
       // signal error
       ::oServer:OnFunctionError( Self,02 )
       InetSendAll( ::skRemote, "XHBR4002" )
@@ -494,28 +653,143 @@ METHOD LaunchFunction( cData ) CLASS tRPCServeCon
       RETURN .F.
    ENDIF
 
-   IF InetErrorCode( ::skRemote ) == 0
-      // for now, just run it
-      oRet := oFunc:Run( aParam, Self )
+   IF InetErrorCode( ::skRemote ) != 0
+      RETURN .F.
+   ENDIF
 
-      // Internal error?
-      IF oRet == NIL
-         ::oServer:OnFunctionError( Self, 10 )
-         InetSendAll( ::skRemote, "XHBR4010" )
+   // allow progress indicator by default
+   ::bAllowProgress := .T.
+
+   DO CASE
+
+      CASE nMode == 0  // just run the function
+         oRet := oFunc:Run( aParams, Self )
+
+      CASE nMode == 1 // run in loop
+         aSubst := AClone( aParams )
+         nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
+
+         DO CASE
+            CASE aDesc[1] == 'A' // all results
+               FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := nCount
+                  ENDIF
+                  oRet := oFunc:Run( aSubst, Self )
+                  IF .not. ::SendResult( oRet )
+                     RETURN .F.
+                  ENDIF
+               NEXT
+               RETURN .T.
+
+            CASE aDesc[1] == 'C' // Vector of all results
+               aRet := {}
+               ::bAllowProgress = .F.
+               FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := nCount
+                  ENDIF
+                  oRet :=  oFunc:Run( aSubst, Self )
+                  IF oRet == NIL
+                     ::SendResult( NIL )
+                     RETURN .F.
+                  ENDIF
+                  AAdd( aRet, oRet )
+               NEXT
+               oRet := aRet
+
+            CASE aDesc[1] == 'E' // Just send confirmation at end
+               ::bAllowProgress = .F.
+               FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := nCount
+                  ENDIF
+                  oRet := oFunc:Run( aSubst, Self )
+                  IF oRet == NIL
+                     ::SendResult( NIL )
+                     RETURN .F.
+                  ENDIF
+               NEXT
+               oRet := "Done"
+         ENDCASE
+
+      CASE nMode == 2 // Run in a foreach loop
+         aSubst := AClone( aParams )
+         nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
+
+         DO CASE
+            CASE aDesc[1] == 'A' // all results
+               FOR EACH oElem IN  aDesc[ 2 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := oElem
+                  ENDIF
+                  oRet := oFunc:Run( aSubst, Self )
+                  IF .not. ::SendResult( oRet )
+                     RETURN .F.
+                  ENDIF
+               NEXT
+               RETURN .T.
+
+            CASE aDesc[1] == 'C' // Vector of all results
+               aRet := {}
+               ::bAllowProgress = .F.
+               FOR EACH oElem IN  aDesc[ 2 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := oElem
+                  ENDIF
+                  oRet := oFunc:Run( aSubst, Self )
+                  IF oRet == NIL
+                     ::SendResult( NIL )
+                     RETURN .F.
+                  ENDIF
+                  AAdd( aRet, oRet )
+               NEXT
+               oRet := aRet
+
+            CASE aDesc[1] == 'E' // Just send confirmation at end
+               ::bAllowProgress = .F.
+               FOR EACH oElem IN aDesc[ 2 ]
+                  IF nSubstPos > 0
+                     aSubst[ nSubstPos ] := oElem
+                  ENDIF
+                  oRet := oFunc:Run( aSubst, Self )
+                  IF oRet == NIL
+                     ::SendResult( NIL )
+                     RETURN .F.
+                  ENDIF
+               NEXT
+               oRet := "Done"
+         ENDCASE
+   ENDCASE
+
+// Default return
+RETURN ::SendResult( oRet )
+
+
+METHOD SendResult( oRet )
+   LOCAL cData, cOrigLen, cCompLen
+
+   IF oRet == NIL
+      ::oServer:OnFunctionError( Self, 10 )
+      InetSendAll( ::skRemote, "XHBR4010" )
+      RETURN .F.
+   ELSE
+      cData := HB_Serialize( oRet )
+      cOrigLen := HB_CreateLen8( Len( cData ) )
+      ::oServer:OnFunctionReturn( Self, cData )
+      // should we compress it ?
+
+      IF Len( cData ) > 512
+         cData := HB_Compress( cData )
+         cCompLen := HB_CreateLen8( Len( cData ) )
+         InetSendAll( ::skRemote, "XHBR31" + cOrigLen + cCompLen + cData )
       ELSE
-         cData := HB_Serialize( oRet )
-         cOrigLen := HB_CreateLen8( Len( cData ) )
-         ::oServer:OnFunctionReturn( Self, cData )
-         // should we compress it ?
-
-         IF Len( cData ) > 512
-            cData := HB_Compress( cData )
-            cCompLen := HB_CreateLen8( Len( cData ) )
-            InetSendAll( ::skRemote, "XHBR31" + cOrigLen + cCompLen + cData )
-         ELSE
-            InetSendAll( ::skRemote, "XHBR30" + cOrigLen + cData )
-         ENDIF
+         InetSendAll( ::skRemote, "XHBR30" + cOrigLen + cData )
       ENDIF
+   ENDIF
+
+   IF InetErrorCode( ::skRemote ) != 0
+      RETURN .F.
    ENDIF
 
 RETURN .T.
@@ -524,6 +798,11 @@ RETURN .T.
 METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
    LOCAL cOrigLen, cCompLen, lRet := .T.
    LOCAL cData
+
+   //Ignore if told so
+   IF .not. ::bAllowProgress
+      RETURN .T.
+   ENDIF
 
    ::oServer:OnFunctionProgress( Self, nProgress, oData )
    IF Empty( oData )

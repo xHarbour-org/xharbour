@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2002/12/24 00:46:05 lculik Exp $
+# $Id: Makefile,v 1.6 2003/02/12 01:13:04 jonnymind Exp $
 #
 
 ROOT = ../
@@ -25,6 +25,7 @@ C_HEADERS=\
 	hbinit.h     \
 	hbmacro.h    \
 	hbmath.h     \
+	hbnxs.h      \
 	hbpcode.h    \
 	hbpp.h       \
 	hbrddcdx.h   \

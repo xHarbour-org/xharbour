@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.4 2003/02/16 14:06:21 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.5 2003/02/19 20:20:30 jonnymind Exp $
  */
 
 /*
@@ -111,10 +111,18 @@ CLASS tRPCClient
    METHOD Connect( cServer, cUserId, cPassword, nTimeout )
 
    METHOD Call( cFucntion, aParams, nTimeout )
+   METHOD CallLoop( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
+   METHOD CallLoopSummary( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
+   METHOD CallLoopEnd( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
+   METHOD CallForEach( cFucntion, aElements, aParams, nTimeout )
+   METHOD CallForEachSummary( cFucntion, aElements, aParams, nTimeout )
+   METHOD CallForEachEnd( cFucntion, aElements, aParams, nTimeout )
+
+   METHOD CallMode( cFucntion, aParams, nTimeout, nMode, aElems )
 
    METHOD Disconnect()
    METHOD Destroy()
-   
+
    /* Utility functions */
    METHOD GetFunctionName( oId )
 
@@ -366,8 +374,29 @@ METHOD Disconnect() CLASS tRPCClient
 
 RETURN .F.
 
-
 METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 0 , NIL )
+
+METHOD CallLoop( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 1 , { nStart, nEnd, nStep } )
+
+METHOD CallLoopSummary( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 2 , { nStart, nEnd, nStep } )
+
+METHOD CallLoopEnd( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 3 , { nStart, nEnd, nStep } )
+
+METHOD CallForeach( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 4 , aElems )
+
+METHOD CallForeachSummary( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 5 , aElems )
+
+METHOD CallForeachEnd( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
+RETURN ::CallMode( cFunction, aParams, nTime, 6 , aElems )
+
+
+METHOD CallMode( cFunction, aParams, nTime, nMode, aElems ) CLASS tRPCClient
    LOCAL oRet
    // do not allow asynchronous mode without timeout
    IF .not. ::lAsyncMode .and. ( nTime == NIL .or. nTime <= 0 )
@@ -384,7 +413,9 @@ METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
    ::oResult := NIL
    ::nStatus := 4 // waiting for a reply
    // send the call through the socket
-   ::SendCall( cFunction, aParams )
+   IF .not. ::SendCall( cFunction, aParams, nMode, aElems )
+      RETURN .F.
+   ENDIF
 
    IF .not. Empty( nTime ) .and. nTime >= 0
       ::nTCPTimeout := nTime
@@ -411,19 +442,75 @@ METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
    ENDIF
 RETURN oRet
 
-METHOD SendCall( cFunction, aParams ) CLASS tRPCClient
-   LOCAL cData, nLen
 
-   cData := HB_Serialize( cFunction ) + HB_Serialize( aParams )
+METHOD SendCall( cFunction, aParams, nMode, aElems ) CLASS tRPCClient
+   LOCAL cData, nLen
+   LOCAL nReq, cType
+
+   SWITCH nMode
+      CASE 0
+         nReq = 0
+         cType = ""
+         cData := ""
+      EXIT
+
+      CASE 1
+         nReq = 2
+         cType = "A"
+         cData = HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
+                HB_Serialize( aElems[3] )
+      EXIT
+
+      CASE 2
+         nReq = 2
+         cType = "C"
+         cData = HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
+                HB_Serialize( aElems[3] )
+      EXIT
+
+      CASE 3
+         nReq = 2
+         cType = "E"
+         cData := HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
+                HB_Serialize( aElems[3] )
+      EXIT
+
+      CASE 4
+         nReq = 4
+         cType = "A"
+         cData = ""
+      EXIT
+
+      CASE 5
+         nReq = 4
+         cType = "C"
+         cData = ""
+      EXIT
+
+      CASE 6
+         nReq = 4
+         cType = "E"
+         cData = ""
+      EXIT
+   END
+
+   cData +=  HB_Serialize( cFunction ) + HB_Serialize( aParams )
+
+   IF nMode >= 4
+      cData += HB_Serialize( aElems )
+   ENDIF
+
    nLen := Len( cData )
    IF nLen > 512
       cData := HB_Compress( cData )
-      InetSendAll( ::skTCP, "XHBR21" + HB_CreateLen8( nLen ) + HB_CreateLen8( Len( cData ) ) + cData )
+      cData := "XHBR2" + AllTrim( Str( nReq + 1 ) ) + ;
+         HB_CreateLen8( nLen ) + HB_CreateLen8( Len( cData ) ) + cType + cData
    ELSE
-      InetSendAll( ::skTCP, "XHBR20" + HB_CreateLen8( nLen ) + cData )
+      cData := "XHBR2" + AllTrim( Str( nReq ) ) + HB_CreateLen8( nLen ) + cType +cData
    ENDIF
-RETURN .T.
 
+   InetSendAll( ::skTCP, cData )
+RETURN ( InetErrorCode( ::skTCP ) == 0 )
 
 
 METHOD TCPAccept() CLASS tRPCClient

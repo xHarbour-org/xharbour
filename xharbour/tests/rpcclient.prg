@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.2 2003/02/16 14:06:21 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.3 2003/02/19 20:20:32 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -26,7 +26,7 @@ PROCEDURE Main( cNetwork )
    LOCAL oRpc, aElem, cFname
    LOCAL oResult, nPos
    LOCAL cBase, nCount
-   LOCAL nSum, nNumber
+   LOCAL nSum, nNumber, oElem
 
    CLEAR SCREEN
 
@@ -113,6 +113,25 @@ PROCEDURE Main( cNetwork )
          @nRow, 10 SAY "Result of " + cFname +": " + oResult
       ENDIF
       nRow ++
+
+      @nRow, 5 SAY "Test of Self defined loop call"
+      nRow++
+
+      // test of loop
+
+      oResult := oRpc:CallForeachSummary( cFname, { "abc", "123", "xyz", "456"}, { "$." }, 2500 )
+      IF .not. Empty ( oResult )
+         nPos := 45
+         @nRow, 10 SAY "Results for abc, 123, xyz, 456: "
+         FOR EACH oElem in oResult
+            @nRow, nPos SAY AllTrim( oElem )
+            nPos +=5
+         NEXT
+      ELSE
+         @nRow, 10 SAY "Test Failed"
+      ENDIF
+
+      nRow++
 
       // tryng again asyncrhonous mode, and now autmoatic compression feature
       oRpc:lAsyncMode := .T.
