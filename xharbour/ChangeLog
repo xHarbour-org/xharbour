@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3270 2004/08/04 20:39:36 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3271 2004/08/04 20:46:23 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-04 13:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/harbour.slx
+    * Corrected minor typo in last commit
 
 2004-08-04 1:00 UTC+0100 Ath <ath at ath.doge.nl>
   * utils/hbmake/hbmake.prg
@@ -24,7 +28,6 @@
     * now HB_WIN32_IO is the default. Use -DHB_WIN32_IO_OFF to
     * disable it.
 
->>>>>>> 1.3270
 2004-08-04 10:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/harbour.slx
     * Revised IS_OP() macro to support all operators.
