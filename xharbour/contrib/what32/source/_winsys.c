@@ -1,6 +1,6 @@
 
 /*
- * $Id:$
+ * $Id: _winsys.c,v 1.14 2003/05/29 16:39:47 iananderson Exp $
  */
 
 // WHAT32
@@ -1158,7 +1158,7 @@ DWORD VirtualQuery( LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer,  SIZE
 HB_FUNC ( VIRTUALQUERY )
 {
 	if (hb_parni(1) >= sizeof(MEMORY_BASIC_INFORMATION))
-	    hb_retl(VirtualQuery((void *) hb_parnl(1), (void *) hb_parnl(2), sizeof(MEMORY_BASIC_INFORMATION)));
+	    hb_retl(VirtualQuery((void *) hb_parnl(1), (struct _MEMORY_BASIC_INFORMATION *) hb_parnl(2), sizeof(MEMORY_BASIC_INFORMATION)));
 	else
 	{
 		SetLastError(ERROR_INSUFFICIENT_BUFFER);
