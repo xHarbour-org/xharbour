@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.324 2004/02/20 00:22:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.325 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -102,6 +102,8 @@
 
 #include "hbi18n.h"
 #include "hashapi.h"
+
+#include "hbmemory.ch"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -810,11 +812,14 @@ int HB_EXPORT hb_vmQuit( void )
    /* hb_dynsymLog(); */
 
    /* release all known garbage */
-   #ifdef DEBUG_MEMORY_LEAKS
+   if ( hb_xquery( HB_MEM_USEDMAX ) ) /* check if fmstat is ON */
+   {
       hb_gcCollectAll();
-   #else
+   }
+   else
+   {
       hb_gcReleaseAll();
-   #endif
+   }
    //printf("After GC\n" );
 
    hb_xexit();
@@ -7785,10 +7790,7 @@ HB_FUNC( HB_DBG_VMVARSGET )
  * $End$ */
 HB_FUNC( HB_DBG_VMVARSSET )
 {
-   HB_THREAD_STUB
-
-   hb_itemCopy( s_aStatics.item.asArray.value->pItems + hb_parni(1) + hb_parni(2) - 1,
-                hb_itemParamPtr( 3, HB_IT_ANY ) );
+   hb_itemCopy( s_aStatics.item.asArray.value->pItems + hb_parni(1) + hb_parni(2) - 1, hb_itemParamPtr( 3, HB_IT_ANY ) );
 }
 
 HB_FUNC( HB_DBG_PROCLEVEL )

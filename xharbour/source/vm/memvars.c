@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.54 2004/02/20 00:22:41 ronpinkas Exp $
+ * $Id: memvars.c,v 1.55 2004/02/20 02:35:40 ronpinkas Exp $
  */
 
 /*
@@ -197,14 +197,7 @@ void hb_memvarsRelease( void )
             }
             else if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
-               /*
-                * We do NOT need to worry about Arrays & Blcoks as these values have been released
-                * by hb_gcReleaseAll() unconditionally!
-                */
-               #ifdef DEBUG_MEMORY_LEAKS
-                  // hb_gcAll() is used instead of hb_gcReleaseAll() - so we need to clean afterall.
-                  hb_itemClear( &s_globalTable[ ulCnt ].item );
-               #endif
+               hb_itemClear( &s_globalTable[ ulCnt ].item );
             }
 
             s_globalTable[ ulCnt ].counter = 0;
@@ -262,15 +255,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
             }
             else if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
-               /*
-                * We do NOT need to worry about Arrays & Blcoks as these values have been released
-                * by hb_gcReleaseAll() unconditionally!
-                */
-               #ifdef DEBUG_MEMORY_LEAKS
-                  // hb_gcAll() is used instead of hb_gcReleaseAll() - so we need to clean afterall.
-                  hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
-               #endif
-
+               hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
             }
          }
 
@@ -682,7 +667,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   // Might be called from hb_gcAll() after hb_memvarsRelease() if DEBUG_MEMORY_LEAKS defined.
+   // Might be called from hb_gcAll() after hb_memvarsRelease() if HB_FM_STATISTICS defined.
    if( s_globalTable == NULL )
    {
       return;
@@ -717,11 +702,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
       }
       else if( HB_IS_COMPLEX( &pValue->item ) )
       {
-         /*
-          * We do NOT need to worry about Arrays & Blcoks as these values have been released
-          * by hb_gcReleaseAll() unconditionally!
-         */
-         //hb_itemClear( &pValue->item );
+         hb_itemClear( &pValue->item );
       }
 
       pValue->item.type = HB_IT_NIL;
