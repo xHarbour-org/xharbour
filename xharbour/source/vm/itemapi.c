@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.83 2004/02/23 19:55:28 andijahja Exp $
+ * $Id: itemapi.c,v 1.84 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -1498,10 +1498,16 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          {
             int iZer, iLast;
 
-            iZer = iSize - iFirst - iPrec - 1;
-            dFract = modf( dFract * 10, &dDig );
-            iLast = ( int ) ( dDig + 0.01 );
-
+            if ( iFirst < 0 )
+            {
+               iZer = iLast = 0;
+            }
+            else
+            {
+               iZer = iSize - iFirst - iPrec - 1;
+               dFract = modf( dFract * 10, &dDig );
+               iLast = ( int ) ( dDig + 0.01 );
+            }
             /* hack for x.xxxx4999999999, f.e. 8.995 ~FL 8.994999999999999218.. */
             if ( iLast == 4 && iZer < 0 )
             {

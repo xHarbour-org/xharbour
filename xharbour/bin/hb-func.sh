@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.12 2004/02/07 11:41:01 druzus Exp $
+# $Id: hb-func.sh,v 1.13 2004/02/18 21:35:55 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -64,7 +64,11 @@ mk_hbtools()
     name="xharbour"
     hb_pref="${4-xhb}"
 
-    hb_tool="$1/${hb_pref}-build"
+    if [ "${HB_ARCHITECTURE}" = "dos" ]; then
+	hb_tool="$1/${hb_pref}-bld"
+    else
+	hb_tool="$1/${hb_pref}-build"
+    fi
     hb_libs=`mk_hbgetlibs "$2"`
     hb_libsc=`mk_hbgetlibsctb "$3"`
     [ -z "${HB_GT_LIB}" ] && HB_GT_LIB="gtstd"
@@ -130,7 +134,11 @@ elif [ "\$*" = "mk-links" ]; then
     if [ "\${DIR}" != "\${NAME}" ]; then
         pushd "\${DIR}"
         for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
-            ln -sf "\${NAME}" "\${n}"
+            if [ "\${HB_ARCHITECTURE}" = "dos" ]; then
+                cp -f "\${NAME}" "\${n}"
+            else
+                ln -sf "\${NAME}" "\${n}"
+            fi
         done
         popd
     fi
@@ -147,7 +155,10 @@ HB_GT_REQ=""
 HB_FM_REQ=""
 HB_STRIP="yes"
 HB_MAIN_FUNC=""
-_TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
+[ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
+[ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
+[ -n "\$TMPDIR" ] || TMPDIR="/tmp"
+_TMP_FILE_="${TMPDIR}/hb-build-\$USER-\$\$.c"
 
 ## parse params
 P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""

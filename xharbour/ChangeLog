@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2445 2004/03/02 08:21:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.2446 2004/03/02 12:58:02 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 18:22 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+   * xharbour/source/vm/itemapi.c
+    ! fixed bug I introduce in last commit for 0 double value.
+      str(0.0,n) was working like repl("0",n)
+  * xharbour/source/vm/hvm.c
+    * calling hb_seriviceExit() disabled for DOS and DARWIN.
+      Now DOS port works again.
+      BTW shouldn't this func be called: hb_serviceExit()
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+  * xharbour/config/dos/dir.cf
+  * xharbour/config/dos/install.cf
+    * next changes for DJGPP and and xhb* script support in bash env.
+      still not finished.
+
+  * xharbour/utils/hbtest/rt_ccall.prg
+    * added missing LL for LONGLONG numbers in C parts
+
 2004-03-02 20:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/winprn/tprint.prg
   * contrib/unicode/hbcc.prg

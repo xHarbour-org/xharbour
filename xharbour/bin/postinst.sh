@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: postinst.sh,v 1.3 2003/12/18 10:55:31 druzus Exp $
+# $Id: postinst.sh,v 1.4 2004/02/18 21:35:55 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -36,7 +36,9 @@ fi
 
 if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
 then
-    install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
+    if [ "${HB_ARCHITECTURE}" != "dos" ]; then
+        install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
+    fi
     mk_hbtools "${HB_BIN_INSTALL}"
     [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
 

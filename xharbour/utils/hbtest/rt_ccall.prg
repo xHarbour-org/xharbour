@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: rt_ccall.prg,v 1.1 2004/02/12 07:37:57 andijahja Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ PROCEDURE Main_CCall()
 
    HB_FUNC( EXTEND_02 )
    {
-      hb_stornll( 5000000000, 1, -1 );
+      hb_stornll( 5000000000LL, 1, -1 );
    }
 
    HB_FUNC( EXTEND_03 )

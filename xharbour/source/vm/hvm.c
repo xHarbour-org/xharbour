@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.340 2004/03/01 22:58:12 ronpinkas Exp $
+ * $Id: hvm.c,v 1.341 2004/03/02 04:46:56 ronpinkas Exp $
  */
 
 /*
@@ -739,7 +739,9 @@ int HB_EXPORT hb_vmQuit( void )
 
    hb_i18nExit();
 
+#if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
    hb_seriviceExit();
+#endif
 
    hb_errExit();
    //printf("After Err\n" );
