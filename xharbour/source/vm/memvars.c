@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.86 2004/08/17 17:03:38 ronpinkas Exp $
+ * $Id: memvars.c,v 1.87 2004/10/20 20:19:40 ronpinkas Exp $
  */
 
 /*
@@ -790,6 +790,9 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          {
             hb_itemCopy( pSetItem, pItem );
          }
+
+         // Count this new value.
+         s_globalTable[ pDyn->hMemvar ].counter = 1;
       }
       else
       {
@@ -1275,6 +1278,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          }
       }
    }
+
    regfree( &re );
 }
 
@@ -2188,8 +2192,13 @@ HB_FUNC( __MVRESTORE )
          // Arbitary value which should be big enough.
          char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
+         HB_ITEM Name, Item ;
+
          regex_t re;
          regmatch_t aMatches[1];
+
+         Item.type = HB_IT_NIL;
+         Name.type = HB_IT_NIL;
 
          Wild2RegEx( (char *) pszMask, (char *) sRegEx, FALSE );
 
@@ -2200,13 +2209,10 @@ HB_FUNC( __MVRESTORE )
 
          while( hb_fsRead( fhnd, buffer, HB_MEM_REC_LEN ) == HB_MEM_REC_LEN )
          {
-            HB_ITEM Name, Item ;
             USHORT uiType = ( USHORT ) ( buffer[ 11 ] - 128 );
             USHORT uiWidth = ( USHORT ) buffer[ 16 ];
             USHORT uiDec = ( USHORT ) buffer[ 17 ];
-
-            Item.type = HB_IT_NIL;
-            Name.type = HB_IT_NIL;
+            BOOL bMatch;
 
             hb_itemPutC( &Name, ( char * ) buffer );
 
@@ -2221,10 +2227,8 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyString, uiWidth ) == uiWidth )
                   {
-                     hb_itemPutCL( &Item, ( char * ) pbyString, uiWidth - 1 );
+                     hb_itemPutCPtr( &Item, ( char * ) pbyString, uiWidth - 1 );
                   }
-
-                  hb_xfree( pbyString );
 
                   break;
                }
@@ -2264,54 +2268,54 @@ HB_FUNC( __MVRESTORE )
 
                   break;
                }
+
+               default:
+               {
+                  hb_itemClear( &Item );
+               }
             }
 
-            if( &Item )
+            bMatch = ( pszMask[ 0 ] == '*' || regexec( &re, (&Name)->item.asString.value, 1, aMatches, 0 ) == 0 );
+
+            /* Process it if it matches the passed mask */
+            if( bIncludeMask ? bMatch : ! bMatch )
             {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || regexec( &re, (&Name)->item.asString.value, 1, aMatches, 0 ) == 0 );
+               /* the first parameter is a string with not empty variable name */
+               HB_DYNS_PTR pDynVar;
 
-               /* Process it if it matches the passed mask */
-               if( bIncludeMask ? bMatch : ! bMatch )
+               hb_dynsymLock();
+               pDynVar = hb_memvarFindSymbol( &Name );
+
+               if( pDynVar )
                {
-                  /* the first parameter is a string with not empty variable name */
-                  HB_DYNS_PTR pDynVar;
+                  /* variable was declared somwhere - assign a new value */
+                  PHB_SYMB pSymbol = pDynVar->pSymbol;
+                  hb_dynsymUnlock();
 
-                  hb_dynsymLock();
-                  pDynVar = hb_memvarFindSymbol( &Name );
+                  hb_memvarSetValue( pSymbol, &Item );
+               }
+               else
+               {
+                  PHB_DYNS pDyn;
 
-                  if( pDynVar )
-                  {
-                     /* variable was declared somwhere - assign a new value */
-                     PHB_SYMB pSymbol = pDynVar->pSymbol;
-                     hb_dynsymUnlock();
+                  hb_dynsymUnlock();
 
-                     hb_memvarSetValue( pSymbol, &Item );
-                  }
-                  else
-                  {
-                     PHB_DYNS pDyn;
+                  /* attempt to assign a value to undeclared variable create the PRIVATE one */
+                  #ifdef HB_THREAD_SUPPORT
+                     pDyn = s_memvarThGetName( (&Name)->item.asString.value, &HB_VM_STACK );
+                  #else
+                     pDyn = hb_dynsymGet( (&Name)->item.asString.value );
+                  #endif
 
-                     hb_dynsymUnlock();
-
-                     /* attempt to assign a value to undeclared variable create the PRIVATE one */
-                     #ifdef HB_THREAD_SUPPORT
-                        pDyn = s_memvarThGetName( (&Name)->item.asString.value, &HB_VM_STACK );
-                     #else
-                        pDyn = hb_dynsymGet( (&Name)->item.asString.value );
-                     #endif
-
-                     hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
-                  }
-
-                  hb_itemReturn( &Item );
+                  hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
                }
 
-               hb_itemClear( &Item );
+               hb_itemReturn( &Item );
             }
-
-            hb_itemClear( &Name );
-
          }
+
+         hb_itemClear( &Item );
+         hb_itemClear( &Name );
 
          regfree( &re );
 
