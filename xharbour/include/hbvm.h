@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.4 2002/10/27 14:41:37 lculik Exp $
+ * $Id: hbvm.h,v 1.5 2003/03/14 20:35:24 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ extern "C" {
 
 /* Harbour virtual machine init/exit functions */
 extern void HB_EXPORT hb_vmInit( BOOL bStartMainProc );
-extern void HB_EXPORT hb_vmQuit( BOOL bDoExit );            /* Immediately quits the virtual machine */
+extern void HB_EXPORT hb_vmQuit( void );            /* Immediately quits the virtual machine */
 
 /* Harbour virtual machine functions */
 extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */

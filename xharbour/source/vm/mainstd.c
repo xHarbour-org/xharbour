@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
+ * $Id: mainstd.c,v 1.2 2003/03/14 20:35:27 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ int main( int argc, char * argv[] )
 
    hb_cmdargInit( argc, argv );
    hb_vmInit( TRUE );
-   hb_vmQuit( TRUE );
+   hb_vmQuit();
 
    /* NOTE: The exit value is set by exit() */
    /* NOTE: This point is never reached */

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.2 2003/01/19 21:44:02 andijahja Exp $
+ * $Id: errorapi.c,v 1.3 2003/03/14 20:35:25 ronpinkas Exp $
  */
 
 /*
@@ -257,7 +257,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
          }
 
          hb_errRelease( pError );
-         hb_vmQuit( FALSE );
+         hb_vmQuit();
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
@@ -382,7 +382,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          }
 
          hb_errRelease( pError );
-         hb_vmQuit( FALSE );
+         hb_vmQuit();
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
