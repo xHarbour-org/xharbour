@@ -41,6 +41,8 @@ PROCEDURE Main()
    LOCAL kf2     := SetKey( K_F2, {|| GuiGets_1() } )
    LOCAL kf3     := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
    LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
+   LOCAL kf5     := SetKey( K_F5, {|| VouBrowse() } )
+   
    LOCAL cLabel  := 'xHarbour simulated GUI.'
 
    SET DATE BRITISH
@@ -48,7 +50,6 @@ PROCEDURE Main()
    get_1 := ctod( '04/01/04' )
 
    Wvt_SetFont( 'Courier New', 18 )
-   // aAdd( aBlocks, {|| Wvt_SetFont( 'Courier New', 18 ) } )
 
    aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
@@ -72,9 +73,10 @@ PROCEDURE Main()
 
    @ MaxRow(), 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
    @ MaxRow()-2, 8 say 'F2 New Screen' COLOR 'GR+/B'
-   @ MaxRow()-2,24 say 'F3 Expand'     COLOR 'GR+/BG'
-   @ MaxRow()-2,34 say 'F4 Shrink'     COLOR 'GR+/G'
-
+   @ MaxRow()-2,22 say 'F3 Expand'     COLOR 'GR+/BG'
+   @ MaxRow()-2,32 say 'F4 Shrink'     COLOR 'GR+/G'
+	@ MaxRow()-2,42 say 'F5 Browse'     COLOR 'GR+/B'
+	
    @  6, nColGet SAY '< Date >'
    @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
    @ 12, nColGet SAY '<' + PadC( 'Address', 33 ) + '>'
@@ -97,7 +99,8 @@ PROCEDURE Main()
    SetKey( K_F2, kf2 )
    SetKey( K_F3, kf3 )
    SetKey( K_F4, kf4 )
-
+   SetKey( K_F5, kf5 )
+   
 RETURN
 
 //-------------------------------------------------------------------//
@@ -178,6 +181,37 @@ FUNCTION Wvt_Paint( hWnd, msg, wParam, lParam )
 RETURN 0
 
 //-------------------------------------------------------------------//
+//      Wvt_SetFocus() must be a FUNCTION in your application
+//      needs to process messages sent through WM_SETFOCUS message 
+//      received by the window.
+//-------------------------------------------------------------------//
+FUNCTION Wvt_SetFocus( hWnd )
+
+   LOCAL nRow := row()
+   LOCAL nCol := col()
+
+   DispOutAt( 1,3, 'Focus Gained!', 'r/w' )
+
+   DevPos( nRow, nCol )
+
+RETURN nil
+
+//-------------------------------------------------------------------//
+//      Wvt_KillFocus() must be a FUNCTION in your application
+//      needs to process messages sent through WM_KILLFOCUS message 
+//      received by the window.
+//-------------------------------------------------------------------//
+FUNCTION Wvt_KillFocus( hWnd )
+
+   LOCAL nRow := row()
+   LOCAL nCol := col()
+
+   DispOutAt( 1,3, 'Focus Lost...', 'B/w' )
+
+   DevPos( nRow, nCol )
+
+RETURN nil
+//-------------------------------------------------------------------//
 //  Wvt_SetBlocks() is a get/set FUNCTION to be used by Wvt_Paint()
 //-------------------------------------------------------------------//
 FUNCTION Wvt_SetBlocks( a_ )
@@ -227,26 +261,186 @@ FUNCTION VouChoice( aChoices )
 RETURN nChoice
 
 //-------------------------------------------------------------------//
-FUNCTION Wvt_SetFocus( hWnd )
+FUNCTION VouBrowse()
 
-   LOCAL nRow := row()
-   LOCAL nCol := col()
+   LOCAL nKey, bBlock, oBrowse , aLastPaint, i
+   LOCAL lEnd    := .f.
+	LOCAL aBlocks := {}
+	LOCAL info_   := {}
+	LOCAL nTop    :=  3
+	LOCAL nLeft   :=  3
+	LOCAL nBottom := maxrow() - 2
+	LOCAL nRight  := maxcol() - 3
+	LOCAL nCursor := setCursor( 0 )
+	LOCAL nRow    := row()
+	LOCAL nCol    := col()
+   LOCAL cColor  := SetColor( 'N/W*,N/GR*,,,N/W* ' )
+	LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
 
-   DispOutAt( 1,3, 'Focus Gained!', 'r/w' )
+	STATIC nStyle := 0
+		   					
+	USE 'TEST' NEW
+   if NetErr()
+      return nil
+   endif
+   info_:= DbStruct()
 
+	oBrowse := TBrowseNew( nTop + 3, nLeft + 2, nBottom - 1, nRight - 2 )
+	
+   oBrowse:ColSep        = '  '
+   oBrowse:HeadSep       = '__'
+   oBrowse:GoTopBlock    = { || dbGoTop() }
+   oBrowse:GoBottomBlock = { || dbGoBottom() }
+   oBrowse:SkipBlock     = { | nSkip | dbSkipBlock( nSkip,oBrowse ) }
+
+	for i := 1 to len( info_ )
+		bBlock := VouBlockField( i )
+	   oBrowse:AddColumn( TBColumnNew( info_[ i,1 ], bBlock ) )
+	next
+
+	oBrowse:configure()
+
+   if nStyle > 5
+      nStyle := 0
+   endif
+      
+   Wvt_SetPen( nStyle, 0, rgb( 210,1210,210 ) )
+   
+   nStyle++
+      
+   aAdd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
+   aAdd( aBlocks, {|| Wvt_SetTitle( 'WVT Gui TBrowse()' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( nTop+3, nLeft+2, nBottom-1, nRight-2 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawGridHorz( oBrowse:nTop+3, oBrowse:nLeft, oBrowse:nRight, oBrowse:nBottom - oBrowse:nTop - 2 ) } )
+	aAdd( aBlocks, {|| Wvt_DrawGridVert( oBrowse:nTop, oBrowse:nBottom, oBrowse:aColumnsSep, len( oBrowse:aColumnsSep ) ) } )
+	
+   aLastPaint := Wvt_SetBlocks( aBlocks )
+
+	DispBox( 0, 0, maxrow(), maxcol(), '         ', 'N/W' )
+	DispOutAt( nTop + 1, nleft, padc( CurDrive()+':\'+CurDir()+'\'+'Test.dbf', nRight - nLeft + 1 ), 'W+/W' )
+		
+	While !lEnd
+      oBrowse:ForceStable()
+
+      nKey = InKey( 0 )
+
+      do case
+      case nKey == K_ESC
+         lEnd = .t.
+
+		case nKey == K_ENTER
+			lEnd := .t.
+
+      case nKey == K_DOWN
+         oBrowse:Down()
+
+      case nKey == K_UP
+         oBrowse:Up()
+
+      case nKey == K_LEFT
+         oBrowse:Left()
+
+      case nKey == K_RIGHT
+         oBrowse:Right()
+
+      case nKey = K_PGDN
+         oBrowse:pageDown()
+
+      case nKey = K_PGUP
+         oBrowse:pageUp()
+
+      case nKey = K_CTRL_PGUP
+         oBrowse:goTop()
+
+      case nKey = K_CTRL_PGDN
+         oBrowse:goBottom()
+
+      case nKey = K_HOME
+         oBrowse:home()
+
+      case nKey = K_END
+         oBrowse:end()
+
+      case nKey = K_CTRL_LEFT
+         oBrowse:panLeft()
+
+      case nKey = K_CTRL_RIGHT
+         oBrowse:panRight()
+
+      case nKey = K_CTRL_HOME
+         oBrowse:panHome()
+
+      case nKey = K_CTRL_END
+         oBrowse:panEnd()
+
+      endcase
+   end
+   
+	Wvt_SetPen( 0 )
+   Wvt_setBlocks( aLastPaint )
+   
    DevPos( nRow, nCol )
-
+   SetColor( cColor )
+   SetCursor( nCursor )
+   
+	DBCloseArea()
+   RestScreen( 0,0, maxrow(),maxcol(), cScr )
+		
 RETURN nil
+//-------------------------------------------------------------------//
+STATIC FUNCTION DbSkipBlock( n, oTbr )
+
+   LOCAL nSkipped := 0
+
+   if n = 0
+      DBSkip( 0 )
+      
+   elseif n > 0
+      do while nSkipped != n .and. TBNext( oTbr )
+         nSkipped++
+      enddo
+   else
+      do while nSkipped != n .and. TBPrev( oTbr )
+         nSkipped--
+      enddo
+   endif
+
+RETURN  nSkipped
 
 //-------------------------------------------------------------------//
-FUNCTION Wvt_KillFocus( hWnd )
+STATIC FUNCTION TBNext( oTbr )
 
-   LOCAL nRow := row()
-   LOCAL nCol := col()
+   LOCAL nSaveRecNum := recno()
+   LOCAL lMoved := .T.
 
-   DispOutAt( 1,3, 'Focus Lost...', 'B/w' )
+   if Eof()
+      lMoved := .F.
+   else
+      DBSkip( 1 )
+      if Eof()
+         lMoved := .F.
+         DBGoTo( nSaveRecNum )
+      endif
+   endif
 
-   DevPos( nRow, nCol )
-
-RETURN nil
+RETURN lMoved
 //-------------------------------------------------------------------//
+STATIC FUNCTION TBPrev( oTbr )
+   LOCAL nSaveRecNum := Recno()
+   LOCAL lMoved := .T.
+
+   DBSkip( -1 )
+
+   if Bof()
+      DBGoTo( nSaveRecNum )
+      lMoved := .F.
+   endif
+
+RETURN lMoved
+//-------------------------------------------------------------------//
+STATIC FUNCTION VouBlockField( i )
+
+RETURN  { || fieldget( i ) }
+//-------------------------------------------------------------------//
+

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.48 2003/11/12 12:58:44 andijahja Exp $
+ * $Id: tbrowse.prg,v 1.49 2003/11/28 23:18:32 walito Exp $
  */
 
 /*
@@ -129,6 +129,7 @@ CLASS TBrowse
    DATA skipBlock             // Code block used to reposition data source
    DATA stable                // Indicates if the TBrowse object is stable
    DATA aColumns
+   DATA aColumnsSep           // Holds the column position where seperators are marked . for Wvt_DrawGridVert() 
 
 #ifdef HB_COMPAT_C53
    DATA nRow                  // Row number for the actual cell
@@ -356,7 +357,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::aSetStyle[ TBR_SIZE      ] := .f.
 
  #endif
-
+   ::aColumnsSep     := {}
 return Self
 
 //-------------------------------------------------------------------//
@@ -1331,6 +1332,8 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
    nColFrom := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
+   ::aColumnsSep := {}
+
    for n := nColFrom to ::rightVisible
 
       aCol[ n ] := nCol
@@ -1343,6 +1346,9 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
       endif
 
       if n <= ::rightVisible
+         if n < ::rightVisible
+	    aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n, o_SepWidth ] / 2 ) ) 
+         endif 
          nCol += ::aColsInfo[ n, o_SepWidth ]
       endif
 

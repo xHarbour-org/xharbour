@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.38 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: gtwvt.c,v 1.39 2004/01/11 21:23:36 peterrees Exp $
  */
 
 /*
@@ -2811,6 +2811,8 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM ) hIcon ); // Set Title Bar ICON
     SendMessage( _s.hWnd, WM_SETICON, ICON_BIG  , ( LPARAM ) hIcon ); // Set Task List Icon
+    
+    DeleteObject( hIcon );
   }
   return( ( DWORD ) hIcon ) ;
 }
@@ -2971,11 +2973,11 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
 
     if ( nFileSize != INVALID_FILE_SIZE )
     {
-      hGlobal   = GlobalAlloc( GPTR, nFileSize );
+      hGlobal = GlobalAlloc( GPTR, nFileSize );
 
       if ( hGlobal )
       {
-        if (ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ))
+        if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
           OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
@@ -3015,7 +3017,7 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
               while ( y < ye )
               {
                 iPicture->lpVtbl->  Render( iPicture, _s.hdc, x, y, dc, dr, 0,
-                                             lHeight, lWidth, -lHeight, NULL );
+                                            lHeight, lWidth, -lHeight, NULL );
                 y += dr;
               }
               y =  r;
@@ -3446,11 +3448,11 @@ HB_FUNC( WVT_DRAWBOXGROUP )
 
    SelectObject( _s.hdc, _s.penWhite );
 
-   MoveToEx( _s.hdc, iRight + 1, iTop, NULL );   // Right Outer
+   MoveToEx( _s.hdc, iRight + 1, iTop, NULL );       // Right Outer
    LineTo( _s.hdc, iRight + 1, iBottom + 1 );
 
    MoveToEx( _s.hdc, iLeft -1, iBottom + 1, NULL );  // Bottom Outer
-   LineTo( _s.hdc, iRight + 1, iBottom + 1);
+   LineTo( _s.hdc, iRight + 1 + 1, iBottom + 1);
 
    MoveToEx( _s.hdc, iLeft, iTop, NULL );            // Left Inner
    LineTo( _s.hdc, iLeft, iBottom );
@@ -3479,25 +3481,25 @@ HB_FUNC( WVT_DRAWBOXGROUPRAISED )
 
    SelectObject( _s.hdc, _s.penWhite );
 
-   MoveToEx( _s.hdc, iRight, iTop, NULL );          // Right Inner
+   MoveToEx( _s.hdc, iRight, iTop, NULL );           // Right Inner
    LineTo( _s.hdc, iRight, iBottom );
 
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );        // Bottom Inner
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );         // Bottom Inner
    LineTo( _s.hdc, iRight, iBottom );
 
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );   // Left Outer
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );    // Left Outer
    LineTo( _s.hdc, iLeft - 1, iBottom + 1 );
 
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );   // Top Outer
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );    // Top Outer
    LineTo( _s.hdc, iRight + 1, iTop - 1 );
 
    SelectObject( _s.hdc, _s.penDarkGray );
 
-   MoveToEx( _s.hdc, iRight + 1, iTop, NULL );   // Right Outer
+   MoveToEx( _s.hdc, iRight + 1, iTop, NULL );       // Right Outer
    LineTo( _s.hdc, iRight + 1, iBottom + 1 );
 
    MoveToEx( _s.hdc, iLeft -1, iBottom + 1, NULL );  // Bottom Outer
-   LineTo( _s.hdc, iRight + 1, iBottom + 1);
+   LineTo( _s.hdc, iRight + 1 + 1, iBottom + 1);
 
    MoveToEx( _s.hdc, iLeft, iTop, NULL );            // Left Inner
    LineTo( _s.hdc, iLeft, iBottom );
@@ -3786,4 +3788,81 @@ HB_FUNC( WVT_SETBRUSH )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_DRAWFOCUSRECT )
+{
+   RECT  rc;
+   POINT xy;
+
+   xy        = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   rc.top    = xy.y;
+   rc.left   = xy.x;
+
+   xy        = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   rc.bottom = xy.y-1;
+   rc.right  = xy.x-1;
+   
+   hb_retl( DrawFocusRect( _s.hdc, &rc ) );
+}
+
+//-------------------------------------------------------------------//
+//
+//   Wvt_DrawGridHorz( nTop, nLeft, nRight, nRows )
+//
+HB_FUNC( WVT_DRAWGRIDHORZ )
+{
+   int   iAtRow = hb_parni( 1 );
+   int   iRows  = hb_parni( 4 );
+   int   i, y;
+   int   iLeft, iRight;
+   
+   iLeft  = ( hb_parni( 2 ) * _s.PTEXTSIZE.x );
+	iRight = ( ( ( hb_parni( 3 ) + 1 ) * _s.PTEXTSIZE.x ) - 1 );
+	
+	SelectObject( _s.hdc, _s.currentPen );
+	
+	for ( i = 0; i < iRows; i++ )
+	{
+      y = ( ( iAtRow ) * _s.PTEXTSIZE.y );
+      
+      MoveToEx( _s.hdc, iLeft, y, NULL );
+      LineTo( _s.hdc, iRight, y );
+      
+      iAtRow++;
+	}
+	
+	hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+//
+//     Wvt_DrawGridVert( nTop, nBottom, aCols, nCols )
+//
+HB_FUNC( WVT_DRAWGRIDVERT )
+{
+   int iTop, iBottom, x;
+   int i;  
+   int iTabs = hb_parni( 4 );
+
+	if ( ! iTabs )
+	{
+	   hb_retl( FALSE );
+	}
+	
+   iTop    = ( hb_parni( 1 ) * _s.PTEXTSIZE.y );
+   iBottom = ( ( hb_parni( 2 ) + 1 ) * _s.PTEXTSIZE.y ) - 1;
+  
+   SelectObject( _s.hdc, _s.currentPen );
+   
+   for ( i = 1; i <= iTabs; i++ )
+   {
+      x = ( hb_parni( 3,i ) * _s.PTEXTSIZE.x );
+      
+      MoveToEx( _s.hdc, x, iTop, NULL );
+      LineTo( _s.hdc, x, iBottom );
+   }
+   
+   hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
 
