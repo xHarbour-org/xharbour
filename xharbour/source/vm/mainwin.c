@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.7 2003/12/01 23:50:13 druzus Exp $
+ * $Id: mainwin.c,v 1.8 2003/12/14 22:17:36 peterrees Exp $
  */
 
 /*
@@ -142,7 +142,10 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
            pArg++;
          }
        }
-       argv[ argc++ ] = pStart ;
+       if (pStart)
+       {
+         argv[ argc++ ] = pStart ;
+       }
      }
    }
 
