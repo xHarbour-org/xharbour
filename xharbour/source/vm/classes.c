@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.37 2003/02/27 05:16:15 ronpinkas Exp $
+ * $Id: classes.c,v 1.38 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -487,12 +487,44 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
       // Outer function level.
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-      // Outer while in Inline, Eval() or aEval().
-      while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) &&
-               pBase != HB_VM_STACK.pItems )
-      {
-         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-      }
+      #ifdef CLASSY_SCOPE
+         // Outer while in Inline, Eval() or aEval().
+         while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 ) &&
+                  pBase != HB_VM_STACK.pItems )
+         {
+            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+         }
+      #else
+         if( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )
+         {
+            char *szCaller;
+            char *pAt;
+
+            if( HB_IS_BLOCK( *( pBase + 1 ) ) )
+            {
+               szCaller = ( *( pBase + 1 ) )->item.asBlock.value->procname;
+            }
+            else
+            {
+               // The Block paramater to the aEval().
+               szCaller = ( *( pBase + 1 + 2 ) )->item.asBlock.value->procname;
+            }
+
+            pAt = strchr( szCaller, ':' );
+
+            if( pAt )
+            {
+               // Same class.
+               if( strncmp( szCaller, ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, pAt - szCaller ) == 0 )
+               {
+                  return TRUE;
+               }
+            }
+
+            // Either NOT same Class or Block was created from NON Method!
+            goto ScopeError;
+         }
+      #endif
 
       pCaller = *( pBase + 1 );
 

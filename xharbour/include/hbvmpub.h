@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.6 2002/10/13 18:06:28 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.7 2003/02/26 06:45:29 ronpinkas Exp $
  */
 
 /*
@@ -103,8 +103,7 @@ struct hb_struArray
 
 struct hb_struBlock
 {
-   LONG statics;
-   USHORT lineno;
+   LONG   statics;
    USHORT paramcnt;
    struct _HB_CODEBLOCK * value;
 };
@@ -219,6 +218,8 @@ typedef struct _HB_BASEARRAY
 /* internal structure for codeblocks */
 typedef struct _HB_CODEBLOCK
 {
+   char* procname;
+   USHORT lineno;
    BYTE     *pCode;       /* codeblock pcode */
    PHB_ITEM pLocals;      /* table with referenced local variables */
    USHORT   uiLocals;     /* number of referenced local variables */

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.16 2003/01/27 03:37:23 walito Exp $
+ * $Id: errorsys.prg,v 1.17 2003/02/04 23:43:44 ronpinkas Exp $
  */
 
 /*
@@ -102,8 +102,7 @@ STATIC FUNCTION DefError( oError )
         Return .F.
      Endif
 
-     cMessage := ProcName(2) + "(" + Str( ProcLine(2) ) + ") "
-     cMessage += ErrorMessage( oError )
+     cMessage := ErrorMessage( oError )
      If !Empty( oError:osCode )
         cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
      Endif
@@ -156,18 +155,19 @@ STATIC FUNCTION DefError( oError )
         cMessage += " " + cDOSError
      Endif
 
-     Qout()         /// dgh - Temporary to keep DOS prompt from overwriting message.
-     Qout( cMessage )
-
+     ? cMessage
      n := 2
-     While !Empty( Procname( n ) )
-       Qout( "Called from " + Procname( n ) + ;
-             "(" + Alltrim( Str( Procline( n ++ ) ) ) + ")" )
-     Enddo
+     WHILE ( ! Empty(ProcName( n ) ) )
+       ? "Called from", Trim( ProcName( n ) ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ")  "
+       n++
+     END
+
      /// For some strange reason, the DOS prompt gets written on the first line
      /// *of* the message instead of on the first line *after* the message after
      /// the program quits, unless the screen has scrolled. - dgh
      LogError( oError )
+
+     ErrorLevel(1)
      Quit
 
 Return .F.
@@ -381,9 +381,6 @@ STATIC FUNCTION LogError( oerr )
         */
         Fclose( nFhandle )
      Endif
-     Errorlevel( 1 )
-     Cls
-     Close All
 
 Return .f.
 

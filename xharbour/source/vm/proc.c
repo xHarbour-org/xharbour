@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.2 2002/03/26 05:06:59 ronpinkas Exp $
+ * $Id: proc.c,v 1.3 2002/12/19 18:15:36 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ HB_FUNC( PROCFILE )
 char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   BOOL bBlock = FALSE ;
+   //BOOL bBlock = FALSE ;
 
    // Default and safety to empty string.
    if( szName )
@@ -127,6 +127,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 
    if( iLevel < 0 )
    {
+      #if 0
       /* Is it a block evaluation or inline method? if so back one more ... */
       if( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
             strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems )
@@ -134,6 +135,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
          pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
          bBlock = TRUE ;
       }
+      #endif
 
       if( szName )
       {
@@ -143,17 +145,27 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
             strcat( szName, ":" );
          }
 
-         if( bBlock )
+         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
          {
             strcat( szName, "(b)" );
+            strcat( szName, ( *( pBase + 1 ) )->item.asBlock.value->procname );
          }
-
-         strcat( szName, ( *pBase )->item.asSymbol.value->szName );
+         else
+         {
+            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
+         }
       }
 
       if( uLine )
       {
-         *uLine = ( *pBase )->item.asSymbol.lineno;
+         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
+         {
+            *uLine = ( *( pBase + 1) )->item.asBlock.value->lineno;
+         }
+         else
+         {
+            *uLine = ( *pBase )->item.asSymbol.lineno;
+         }
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.18 2003/01/21 04:56:18 likewolf Exp $
+ * $Id: codebloc.c,v 1.19 2003/02/26 05:36:09 jonnymind Exp $
  */
 
 /*
@@ -86,6 +86,8 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
+
+   pCBlock->procname = NULL;
 
    /* Store the number of referenced local variables
     */
@@ -207,6 +209,8 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
+   pCBlock->procname = NULL;
+
    /* Store the number of referenced local variables
     */
    pCBlock->uiLocals = 0;
@@ -240,6 +244,10 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
+      if( pCBlock->procname )
+      {
+         hb_xfree( pCBlock->procname );
+      }
 
       if( pCBlock->pLocals )
       {
@@ -281,6 +289,11 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    HB_CODEBLOCK_PTR pCBlock = ( HB_CODEBLOCK_PTR ) Cargo;
 
    HB_TRACE(HB_TR_INFO, ("hb_codeblockDeleteGarbage(%p)", Cargo));
+
+   if( pCBlock->procname )
+   {
+      hb_xfree( pCBlock->procname );
+   }
 
    /* free space allocated for local variables
     */

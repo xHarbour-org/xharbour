@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.169 2003/03/02 15:22:31 jonnymind Exp $
+ * $Id: hvm.c,v 1.170 2003/03/02 18:45:18 jonnymind Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
  * Copyright 1999 Eddie Runia <eddie@runia.com>
  *    __VMVARSGET()
  *    __VMVARSLIST()
- *                
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -920,7 +920,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
             }
             hb_vmDo( uiParams );
-            
+
 
             // Thread Safety.
             hb_stackPush();
@@ -947,7 +947,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
             }
             hb_vmDo( uiParams );
-            
+
             hb_stackPush();
             hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
 
@@ -1021,7 +1021,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
-            
+
             hb_vmSend( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
 
             w += 3;
@@ -1047,7 +1047,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SENDSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
-            
+
             hb_vmSend( pCode[ w + 1 ] );
 
             w += 2;
@@ -2467,7 +2467,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
       //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
       #endif
-      
+
       if( s_uiActionRequest )
       {
          if( s_uiActionRequest & HB_BREAK_REQUESTED )
@@ -2529,9 +2529,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       --hb_vm_wWithObjectCounter;
       hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
    }
-   
+
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
-   
+
 }
 
 /* ------------------------------- */
@@ -4288,7 +4288,7 @@ void hb_vmDo( USHORT uiParams )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
    //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
-   
+
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
@@ -4372,7 +4372,7 @@ void hb_vmDo( USHORT uiParams )
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
 
    hb_stackOldFrame( &sStackState );
-   
+
 
    HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
 
@@ -4630,7 +4630,8 @@ static HARBOUR hb_vmDoBlock( void )
    /* set the current line number to a line where the codeblock was defined
     */
    uiLine = hb_stackBaseItem()->item.asSymbol.lineno;
-   hb_stackBaseItem()->item.asSymbol.lineno = pBlock->item.asBlock.lineno;
+
+   hb_stackBaseItem()->item.asSymbol.lineno = pBlock->item.asBlock.value->lineno;
 
    hb_codeblockEvaluate( pBlock );
 
@@ -5153,7 +5154,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
 
-
    uiLocals = HB_PCODE_MKUSHORT( &( pCode[ 5 ] ) );
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 7 + uiLocals * 2, /* pcode buffer         */
@@ -5169,9 +5169,10 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
-   hb_stackPush();
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
+   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
 
+   hb_stackPush();
 }
 
 /* +0    -> HB_P_PUSHBLOCKSHORT
@@ -5201,9 +5202,9 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = 0;
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
+   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
    hb_stackPush();
-
 }
 
 /* +0    -> HB_P_MPUSHBLOCK
@@ -5232,7 +5233,8 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
+   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
    hb_stackPush();
 }
 
@@ -6270,7 +6272,7 @@ HB_FUNC( __VMVARSSET )
 /* Mark all locals as used so they will not be released by the
  * garbage collector
  */
- 
+
 #ifndef HB_THREAD_SUPPORT
 
 void hb_vmIsLocalRef( void )

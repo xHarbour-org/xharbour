@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.803 2003/03/05 23:59:39 jonnymind Exp $
+ * $Id: ChangeLog,v 1.804 2003/03/06 21:03:59 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-06 19:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    - Removed lineno memebr from struct hb_struBlcok.
+    + Added procname, and lineno members to struct _HB_CODEBLOCK.
+
+  * source/vm/hvm.c
+    + Added logic to set asBlock.value->procname, and asBlock.value->lineno in hb_vmPush*Block*()
+
+  * source/vm/codebloc.c
+    + Added logic to release asBlock.value->procname.
+
+  * source/vm/proc.c
+    ! Fixed ProcName() and ProcLine() handling of Codeblocks to be Clipper compatible.
+
+  * source/vm/classes.c
+    + Added logic to hb_clsValidScope() to consider Block Creation SCOPE.
+    - Defed out prior logic considering the Execution SCOPE of Codeblock under #ifdef CLASSY_SCOPE.
+
+  * source/rtl/errorsys.prg
+    ! Fixed default Error System to be more Clipper compatible.
 
 2003-03-06 17:52 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/debug/debugger.prg
