@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.13 2003/12/22 21:48:26 druzus Exp $
+# $Id: watcom.cf,v 1.14 2003/12/29 21:57:34 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -19,7 +19,7 @@ CC_OUT = -fo=
 
 # important: -j is necessary for proper build
 # don't enable -ol optimization in OpenWatcom 1.1 - gives buggy code
-CPPFLAGS = -j -w3 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
+CPPFLAGS = -j -w2 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
 
 CPPFLAGS += -i. -i$(TOP)include -iinclude
 ifeq ($(HB_LIB_COMPILE),)
