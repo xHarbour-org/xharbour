@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.202 2003/05/26 02:40:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.203 2003/05/26 05:58:55 paultucker Exp $
  */
 
 /*
@@ -6408,6 +6408,8 @@ static void hb_vmReleaseLocalSymbols( void )
 
       pDestroy = s_pSymbols;
       s_pSymbols = s_pSymbols->pNext;
+
+      hb_xfree( pDestroy->szModuleName );
       hb_xfree( pDestroy );
    }
 
