@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.36 2004/02/09 06:30:16 walito Exp $
+ * $Id: extend.c,v 1.37 2004/02/14 21:01:18 andijahja Exp $
  */
 
 /*
@@ -1184,6 +1184,14 @@ LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
    }
 
    return 0l;
+}
+
+#undef hb_retnll
+void HB_EXPORT hb_retnll( LONGLONG llNumber )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retnll(%Li)", llNumber));
+
+   hb_itemPutNLL( &(HB_VM_STACK.Return), llNumber );
 }
 
 #undef hb_retnlllen
