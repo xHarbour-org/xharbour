@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.63 2004/03/05 05:06:53 ronpinkas Exp $
+ * $Id: memvars.c,v 1.64 2004/03/05 06:28:15 andijahja Exp $
  */
 
 /*
@@ -2320,19 +2320,15 @@ static HB_DYNS_FUNC( hb_GetSymbolInfo )
   HB_THREAD_STUB
   if( pDynSymbol->hMemvar )
   {
-    PHB_ITEM pArray   = ( ( PHB_ITEM ) Cargo );
+    PHB_ITEM pArray = ( ( PHB_ITEM ) Cargo );
     PHB_ITEM pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
-    HB_ITEM SubItems, Name, Value;
+    HB_ITEM SubItems;
 
-    Value.type = HB_IT_NIL;
-    Name.type = HB_IT_NIL;
     SubItems.type = HB_IT_NIL;
 
     hb_arrayNew( &SubItems, 2 );
-    hb_itemPutC( &Name, pDynSymbol->pSymbol->szName );
-    hb_itemCopy( &Value, pItem );
-    hb_arraySetForward( &SubItems, 1, &Name ) ;
-    hb_arraySetForward( &SubItems, 2, &Value ) ;
+    hb_itemPutC( hb_arrayGetItemPtr( &SubItems, 1 ), pDynSymbol->pSymbol->szName );
+    hb_itemCopy( hb_arrayGetItemPtr( &SubItems, 2 ), pItem );
     hb_arrayAddForward( pArray, &SubItems );
   }
   return TRUE;

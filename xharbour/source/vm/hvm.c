@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.348 2004/03/05 23:00:05 andijahja Exp $
+ * $Id: hvm.c,v 1.349 2004/03/05 23:14:01 ronpinkas Exp $
  */
 
 /*
@@ -8282,22 +8282,11 @@ HB_FUNC( HB_SAVEBLOCK )
 
       if( pModuleSymbols )
       {
-         HB_ITEM ModuleName, PCode, ParamCount;
-
          hb_arrayNew( &( HB_VM_STACK.Return ), 3 );
 
-         ModuleName.type = HB_IT_NIL;
-         hb_itemPutC( &ModuleName, pModuleSymbols->szModuleName );
-
-         PCode.type = HB_IT_NIL;
-         hb_itemPutCL( &PCode, (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
-
-         ParamCount.type = HB_IT_NIL;
-         hb_itemPutNI( &ParamCount, pBlock->item.asBlock.paramcnt );
-
-         hb_arraySetForward( &( HB_VM_STACK.Return ), 1, &ModuleName );
-         hb_arraySetForward( &( HB_VM_STACK.Return ), 2, &PCode );
-         hb_arraySetForward( &( HB_VM_STACK.Return ), 3, &ParamCount );
+         hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols->szModuleName );
+         hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
+         hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
       }
    }
 }

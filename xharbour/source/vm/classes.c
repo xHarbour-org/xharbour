@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.104 2004/03/03 11:41:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.105 2004/03/05 08:59:29 andijahja Exp $
  */
 
 /*
@@ -2783,10 +2783,8 @@ HB_FUNC( __CLASSSEL )
          PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
          if( pMessage )                         /* Hash Entry used ?        */
          {
-            HB_ITEM Item;
-            Item.type = HB_IT_NIL;
                                                 /* Add to array             */
-            hb_arraySetForward( &Return, ++uiPos, hb_itemPutC( &Item, pMessage->pSymbol->szName ) );
+            hb_itemPutC( hb_arrayGetItemPtr( &Return, ++uiPos), pMessage->pSymbol->szName );
          }
       }
    }
@@ -3031,18 +3029,16 @@ static HARBOUR hb___msgClsFullSel( void )
             {
                if( uiScope == 0 || (HB_VM_STACK.pMethod)->uiScope & uiScope )
                {
-                  HB_ITEM Tmp;
                   HB_ITEM SubArray;
 
                   SubArray.type = HB_IT_NIL;
-                  Tmp.type = HB_IT_NIL;
 
                   hb_arrayNew( &SubArray, 4 );
 
-                  hb_arraySetForward( &SubArray, HB_OO_DATA_SYMBOL, hb_itemPutC( &Tmp, pMessage->pSymbol->szName ) );
+                  hb_itemPutC( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SYMBOL), pMessage->pSymbol->szName );
                   // value 2 is VALUE or PFUNCTION
-                  hb_arraySetForward( &SubArray, HB_OO_DATA_TYPE, hb_itemPutNI( &Tmp, (HB_VM_STACK.pMethod)->uiType ) );
-                  hb_arraySetForward( &SubArray, HB_OO_DATA_SCOPE, hb_itemPutNI( &Tmp, (HB_VM_STACK.pMethod)->uiScope ) );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_TYPE ), (HB_VM_STACK.pMethod)->uiType );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SCOPE ), (HB_VM_STACK.pMethod)->uiScope );
 
                   hb_arraySetForward( &Return, ++uiPos, &SubArray );
                }
@@ -3116,10 +3112,7 @@ static HARBOUR hb___msgClsSel( void )
             {
                if( uiScope == 0 || (HB_VM_STACK.pMethod)->uiScope & uiScope )
                {
-                  HB_ITEM Item;
-
-                  Item.type = HB_IT_NIL;
-                  hb_arraySetForward( &Return, ++uiPos, hb_itemPutC( &Item, pMessage->pSymbol->szName ) );
+                  hb_itemPutC( hb_arrayGetItemPtr( &Return, ++uiPos), pMessage->pSymbol->szName );
                }
             }
          }
@@ -3391,13 +3384,8 @@ HB_FUNC( __CLS_PARAM )
    }
    else
    {
-      HB_ITEM Parent;
-
-      Parent.type = HB_IT_NIL;
-      hb_itemPutCStatic( &Parent, (char *) "HBObject" );
-
       hb_arrayNew( &Array, 1 );
-      hb_arraySetForward( &Array, 1, &Parent );
+      hb_itemPutCStatic( hb_arrayGetItemPtr( &Array, 1), (char *) "HBObject" );
    }
 
    hb_itemReturn( &Array );
@@ -3514,9 +3502,9 @@ void hb_clsFinalize( PHB_ITEM pObject )
 HB_FUNC( __CLSGETPROPERTIES )
 {
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
-   HB_ITEM pReturn;
+   HB_ITEM Return;
 
-   pReturn.type = HB_IT_NIL;
+   Return.type = HB_IT_NIL;
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -3524,7 +3512,7 @@ HB_FUNC( __CLSGETPROPERTIES )
       USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
       USHORT uiAt;
 
-      hb_arrayNew( &pReturn, 0 );
+      hb_arrayNew( &Return, 0 );
                                                 /* Create a transfer array  */
       for( uiAt = 0; uiAt < uiLimit; uiAt++ )
       {
@@ -3532,14 +3520,14 @@ HB_FUNC( __CLSGETPROPERTIES )
 
          if( ( pMessage != NULL ) && pClass->pMethods[ uiAt ].bIsPersistent )
          {
-            HB_ITEM pItem;
-            pItem.type = HB_IT_NIL;
-            hb_arrayAddForward( &pReturn, hb_itemPutC( &pItem, pMessage->pSymbol->szName ) );
+            HB_ITEM Item;
+            Item.type = HB_IT_NIL;
+            hb_arrayAddForward( &Return, hb_itemPutC( &Item, pMessage->pSymbol->szName ) );
          }
       }
    }
 
-   hb_itemReturn( &pReturn );
+   hb_itemReturn( &Return );
 }
 
 HB_FUNC( __CLSGETPROPERTIESANDVALUES )
@@ -3557,13 +3545,10 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
          USHORT uiAt;
 
          HB_ITEM Return;
-         HB_ITEM Property;
          HB_ITEM Value;
          HB_ITEM SubArray;
 
-
          Return.type   = HB_IT_NIL;
-         Property.type = HB_IT_NIL;
          Value.type    = HB_IT_NIL;
          SubArray.type = HB_IT_NIL;
 
@@ -3573,14 +3558,14 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
          {
             PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
 
-            //if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
+            // if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
             if( pMessage && ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_PUBLISHED || pClass->pMethods[ uiAt ].bIsPersistent ) && pClass->pMethods[ uiAt ].uiData )
             {
-               hb_itemPutC( &Property, pMessage->pSymbol->szName );
                hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
 
                hb_arrayNew( &SubArray, 2 );
-               hb_arraySetForward( &SubArray, 1, &Property );
+
+               hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMessage->pSymbol->szName );
                hb_arraySetForward( &SubArray, 2, &Value );
 
                hb_arrayAddForward( &Return, &SubArray );
@@ -3608,12 +3593,10 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
          USHORT uiAt;
 
          HB_ITEM Return;
-         HB_ITEM Property;
          HB_ITEM Value;
          HB_ITEM SubArray;
 
          Return.type   = HB_IT_NIL;
-         Property.type = HB_IT_NIL;
          Value.type    = HB_IT_NIL;
          SubArray.type = HB_IT_NIL;
 
@@ -3629,11 +3612,10 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
                    pClass->pMethods[ uiAt ].pFunction == hb___msgGetClsData ||
                    pClass->pMethods[ uiAt ].pFunction == hb___msgGetShrData )
                {
-                  hb_itemPutC( &Property, pMessage->pSymbol->szName );
                   hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
 
                   hb_arrayNew( &SubArray, 2 );
-                  hb_arraySetForward( &SubArray, 1, &Property );
+                  hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMessage->pSymbol->szName );
                   hb_arraySetForward( &SubArray, 2, &Value );
 
                   hb_arrayAddForward( &Return, &SubArray );

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.38 2004/03/04 21:51:50 andijahja Exp $
+ * $Id: direct.c,v 1.39 2004/03/04 22:30:07 andijahja Exp $
  */
 
 /*
@@ -120,9 +120,9 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      HB_ITEM Tmp;
+      HB_ITEM Subarray;
 
-      Tmp.type = HB_IT_NIL ;
+      Subarray.type = HB_IT_NIL;
 
       do
       {
@@ -131,33 +131,31 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
                 ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
                 ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
          {
-            HB_ITEM Subarray;
             char buffer[ 32 ];
             BOOL bAddEntry = TRUE;
 
-            Subarray.type = HB_IT_NIL;
-            hb_arrayNew( &Subarray, 0 );
+            hb_arrayNew( &Subarray, 5 );
 
             if ( bFullPath )
             {
                char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, szFullName ) );
+               hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_NAME), szFullName );
                hb_xfree( szFullName );
             }
             else
             {
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szName ) );
+               hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_NAME), ffind->szName );
             }
 
          #ifndef HB_LONG_LONG_OFF
-            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Tmp, ffind->size ) );
+            hb_itemPutNLL( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
          #else
-            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Tmp, ffind->size ) );
+            hb_itemPutNL( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
          #endif
 
-            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Tmp, ffind->lDate ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szTime ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+            hb_itemPutDL( hb_arrayGetItemPtr( &Subarray, F_DATE ), ffind->lDate );
+            hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_TIME ), ffind->szTime );
+            hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_ATTR ), hb_fsAttrDecode( ffind->attr, buffer ) );
 
             /* Don't exit when array limit is reached */
             if ( bDirOnly )

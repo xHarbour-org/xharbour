@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.3 2001/07/23 16:38:00 mbirdyg Exp $
+ * $Id: charlist.c,v 1.1 2003/03/04 21:04:05 lculik Exp $
  */
 
 /*
@@ -170,17 +170,18 @@ static void do_list (int iSwitch)
 
       case DO_LIST_CHARHIST:
       {
-        PHB_ITEM pArray, pCount;
+        HB_ITEM Array, Count;
 
-        pArray = hb_itemArrayNew (256);
+        Array.type = HB_IT_NIL;
+        Count.type = HB_IT_NIL;
+
+        hb_arrayNew ( &Array, 256);
+
         for (sCnt = 0; sCnt < 256; sCnt++)
         {
-          pCount = hb_itemPutNL (NULL, asCharCnt[sCnt]);
-          hb_itemArrayPut (pArray, sCnt+1, pCount);
-          hb_itemRelease (pCount);
+          hb_arraySetForward( &Array, sCnt+1, hb_itemPutNL (&Count, asCharCnt[sCnt]));
         }
-        hb_itemReturn (pArray);
-        hb_itemRelease (pArray);
+        hb_itemReturn (&Array);
       }; break;
 
     }
@@ -349,7 +350,7 @@ HB_FUNC (CHARNOLIST)
  *                        Default: "" (empty string)
  *  $RETURNS$
  *      <aCharacterCount> an array with 256 elements where the nth element
- *                        contains the count of character #(n-1) in cString 
+ *                        contains the count of character #(n-1) in cString
  *  $DESCRIPTION$
  *      The CHARHIST() function generates a character histogram of those
  *      characters that are contained in <cString>. This histogram is stored

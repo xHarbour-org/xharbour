@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.38 2004/02/15 22:49:05 ronpinkas Exp $
+ * $Id: extend.c,v 1.39 2004/03/05 13:26:04 andijahja Exp $
  */
 
 /*
@@ -905,11 +905,8 @@ void HB_EXPORT hb_storc( char * szText, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutC( &ItemNew, szText );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutC( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -936,11 +933,8 @@ void HB_EXPORT hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutCL( &ItemNew, szText, ulLen );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutCL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText, ulLen );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -969,11 +963,8 @@ void HB_EXPORT hb_stords( char * szDate, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutDS( &ItemNew, szDate );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutDS( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szDate );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1000,11 +991,8 @@ void HB_EXPORT hb_storl( int iLogical, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutL( &ItemNew, iLogical ? TRUE : FALSE );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), iLogical ? TRUE : FALSE );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1031,11 +1019,8 @@ void HB_EXPORT hb_storni( int iValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutNI( &ItemNew, iValue );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutNI( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), iValue );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1062,11 +1047,8 @@ void HB_EXPORT hb_stornl( LONG lValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutNL( &ItemNew, lValue );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutNL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), lValue );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1093,11 +1075,8 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutND( &ItemNew, dNumber );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutND( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), dNumber );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1126,11 +1105,8 @@ void HB_EXPORT hb_stornll( LONGLONG llNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         HB_ITEM ItemNew;
-         ItemNew.type = HB_IT_NIL;
-         hb_itemPutNLL( &ItemNew, llNumber );
          va_start( va, iParam );
-         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
+         hb_itemPutNLL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), llNumber );
          va_end( va );
       }
       else if( bByRef || iParam == -1 )

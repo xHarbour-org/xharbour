@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.1 2003/08/10 21:52:01 druzus Exp $
+ * $Id: dbftools.c,v 1.2 2003/10/01 17:41:47 paultucker Exp $
  */
 
 /*
@@ -79,16 +79,16 @@ HB_FUNC( DBFSIZE )
 
    if( (pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer()) != NULL )
    {
-      PHB_ITEM pSize = hb_itemNew( NULL );
+      HB_ITEM pSize ;
       ULONG ulRecSize, ulRecCount;
 
-      SELF_INFO( pArea, DBI_GETHEADERSIZE, pSize );
-      ulSize = hb_itemGetNL( pSize ) + 1;
-      SELF_INFO( pArea, DBI_GETRECSIZE, pSize );
-      ulRecSize = hb_itemGetNL( pSize );
+      pSize.type = HB_IT_NIL;
+      SELF_INFO( pArea, DBI_GETHEADERSIZE, &pSize );
+      ulSize = hb_itemGetNL( &pSize ) + 1;
+      SELF_INFO( pArea, DBI_GETRECSIZE, &pSize );
+      ulRecSize = hb_itemGetNL( &pSize );
       SELF_RECCOUNT( pArea, &ulRecCount );
       ulSize += ulRecCount * ulRecSize;
-      hb_itemRelease( pSize );
    }
 
    hb_retnl( ulSize );

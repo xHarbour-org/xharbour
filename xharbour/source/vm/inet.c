@@ -1028,7 +1028,8 @@ HB_FUNC( INETRECVLINE )
 HB_FUNC( INETRECVENDBLOCK )
 {
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
-   PHB_ITEM pProto, pProtoOpt;
+   PHB_ITEM pProto;
+   HB_ITEM  ProtoOpt;
    PHB_ITEM pResult     = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 4, HB_IT_NUMERIC );
    PHB_ITEM pBufferSize = hb_param( 5, HB_IT_NUMERIC );
@@ -1076,10 +1077,11 @@ HB_FUNC( INETRECVENDBLOCK )
 
          for(i=0;i<iprotos;i++)
          {
-            pProtoOpt     = hb_itemArrayGet( pProto, i+1 );
-            Proto[i]      = (char *) pProtoOpt->item.asString.value;
-            iprotosize[i] = pProtoOpt->item.asString.length;
-            hb_itemRelease( pProtoOpt );
+            ProtoOpt.type = HB_IT_NIL;
+            hb_arrayGet( pProto, i+1, &ProtoOpt );
+            Proto[i]      = (char *) (&ProtoOpt)->item.asString.value;
+            iprotosize[i] = (&ProtoOpt)->item.asString.length;
+            hb_itemClear( &ProtoOpt );
          }
       }
       else
@@ -1399,7 +1401,7 @@ HB_FUNC( INETSENDALL )
 HB_FUNC( INETGETHOSTS )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM aHosts;
+   HB_ITEM aHosts, Tmp;
    struct hostent *Host;
    char **cHosts;
 
@@ -1422,31 +1424,31 @@ HB_FUNC( INETGETHOSTS )
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
-   aHosts = hb_itemArrayNew( 0 );
+   aHosts.type = HB_IT_NIL;
+   Tmp.type = HB_IT_NIL;
+
+   hb_arrayNew( &aHosts, 0 );
 
    if( Host == NULL )
    {
-      hb_itemRelease( hb_itemReturn( aHosts ) );
+      hb_itemReturn( &aHosts );
       return;
    }
 
    cHosts = Host->h_addr_list;
    while( *cHosts ) {
-      pHost = hb_itemPutC( NULL, inet_ntoa( *( (struct in_addr *)*cHosts ) ) );
-      hb_arrayAdd( aHosts, pHost );
-      hb_itemRelease( pHost );
-
+      hb_arrayAddForward( &aHosts, hb_itemPutC( &Tmp, inet_ntoa( *( (struct in_addr *)*cHosts ) ) ) );
       cHosts++;
    }
 
-   hb_itemRelease( hb_itemReturn( aHosts ) );
+   hb_itemReturn( &aHosts );
 }
 
 
 HB_FUNC( INETGETALIAS )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM aHosts;
+   HB_ITEM aHosts, Tmp;
    struct hostent *Host;
    char **cHosts;
 
@@ -1469,24 +1471,25 @@ HB_FUNC( INETGETALIAS )
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
-   aHosts = hb_itemArrayNew( 0 );
+   aHosts.type = HB_IT_NIL;
+   Tmp.type = HB_IT_NIL;
+
+   hb_arrayNew( &aHosts, 0 );
 
    if( Host == NULL )
    {
-      hb_itemRelease( hb_itemReturn( aHosts ) );
+      hb_itemReturn( &aHosts );
       return;
    }
 
    cHosts = Host->h_aliases;
    while( *cHosts ) {
-      pHost = hb_itemPutC( NULL, *cHosts );
-      hb_arrayAdd( aHosts, pHost );
-      hb_itemRelease( pHost );
+      hb_arrayAddForward( &aHosts, hb_itemPutC( &Tmp, *cHosts ) );
 
       cHosts++;
    }
 
-   hb_itemRelease( hb_itemReturn( aHosts ) );
+   hb_itemReturn( &aHosts );
 }
 
 

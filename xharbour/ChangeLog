@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2511 2004/03/06 19:54:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2512 2004/03/06 20:12:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-07 07:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    % directly assign values to subarrays w/o temporary medium in function:
+      hb_fsGrabDirectory()
+
+  * source/vm/hvm.c
+    % directly assign values to subarrays w/o temporary medium in function:
+      HB_SAVEBLOCK()
+
+  * source/vm/memvars.c
+    % directly assign values to subarrays w/o temporary medium in function:
+      hb_GetSymbolInfo()
+
+  * source/vm/classes.c
+    % directly assign values to subarrays w/o temporary medium in functions:
+      hb___msgClsFullSel(), __CLASSSEL(), hb___msgClsSel(), __CLS_PARAM(),
+      __CLSGETPROPERTIESANDVALUES() and __CLSGETIVARNAMESANDVALUES()
+
+  * source/vm/extend.c
+    % directly assign values to subarrays w/o temporary medium in functions:
+      hb_storc(),hb_storclen(),hb_stords(),hb_storl(),hb_storni(),
+      hb_stornl(),hb_stornd() and hb_stornll()
+
+  * source/rtl/hbserv.c
+  * source/vm/inet.c
+  * contrib/libct/dbftools.c
+  * contrib/libct/charlist.c
+    % avoid usage of hb_itemNew(NULL)
 
 2004-03-06 21:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
