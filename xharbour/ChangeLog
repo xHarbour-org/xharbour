@@ -17,6 +17,14 @@
       are off. This way, all the MT/non MT code can reside in vm/vmmt, and
       the lower libraries can be compiled just once.
 
+  * source/vm/classes.c
+    * added
+       hb_objGetPropValue()
+       hb_objSetPropValue()
+    They set/get a property by calling the appropriate object message
+    and get the HB_VM_STACK.Return to ensure that the higher level
+    libraries do not depend on threading.
+
 2003-11-07 01:05 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   + My first commit :-)
   * source/rtl/tget.prg
@@ -1824,7 +1832,6 @@
 
   * source/rtl/hbservice.c
     ! More strict control over mutex unlocks before signal enabling.
-
 
 
 2003-09-18 15:45 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
