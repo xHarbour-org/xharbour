@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.64 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.65 2002/04/30 06:12:13 ronpinkas Exp $
  */
 
 /*
@@ -2385,21 +2385,29 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
-      if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
+      ULONG ulLen1     = pItem1->item.asString.length;
+      ULONG ulLen2     = pItem2->item.asString.length;
+
+      if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
       {
-         ULONG ulLen1     = pItem1->item.asString.length;
-         ULONG ulNewLen   = ulLen1 + pItem2->item.asString.length;
-         char *pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
+         ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
+         if( pItem1->item.asString.bStatic )
+         {
+             pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
+             hb_xmemcpy( pNewString, pItem1->item.asString.value, ulLen1 );
+             hb_itemReleaseString( pItem1 );
+             pItem1->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+             *( pItem1->item.asString.puiHolders ) = 1;
+             pItem1->item.asString.bStatic = FALSE;
+         }
+         else
+         {
+             pNewString = pItem1->item.asString.value;
+             pNewString = hb_xrealloc( pNewString, ulNewLen + 1 );
+         }
 
-         hb_xmemcpy( pNewString, pItem1->item.asString.value, ulLen1 );
+         hb_xmemcpy( pNewString + ulLen1, pItem2->item.asString.value, ulLen2 );
 
-         hb_itemReleaseString( pItem1 );
-
-         hb_xmemcpy( pNewString + ulLen1, pItem2->item.asString.value, pItem2->item.asString.length );
-
-         pItem1->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-         *( pItem1->item.asString.puiHolders ) = 1;
-         pItem1->item.asString.bStatic = FALSE;
          pItem1->item.asString.value   = pNewString;
          pItem1->item.asString.length  = ulNewLen;
          pItem1->item.asString.value[ ulNewLen ] = '\0';

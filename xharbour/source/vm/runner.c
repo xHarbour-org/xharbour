@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.19 2002/03/21 12:57:44 alkresin Exp $
+ * $Id: runner.c,v 1.6 2002/03/31 02:56:32 ronpinkas Exp $
  */
 
 /*
