@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.11 2003/05/07 20:26:07 iananderson Exp $
+ * $Id: memoedit.prg,v 1.12 2003/09/17 13:45:35 toninhofwi Exp $
  */
 
 /*
@@ -289,10 +289,10 @@ FUNCTION MemoEdit(cString,;
 // DEFAULT cUserFunction   TO nil
    DEFAULT cString         TO ""
 
-   if Empty( cUserFunction )
+   if !ISLOGICAL(cUserFunction) .AND. Empty( cUserFunction )
       cUserFunction = nil
    endif
-   
+
    // Original MemoEdit() converts Tabs into spaces;
    oEd := TMemoEditor():New(StrTran(cString, Chr(K_TAB), Space(1)), nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize)
    oEd:MemoInit(cUserFunction)
