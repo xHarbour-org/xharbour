@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3721 2005/01/09 06:08:11 likewolf Exp $
+ * $Id: ChangeLog,v 1.3722 2005/01/09 20:39:46 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-01-10 11:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * include/hbgtwvt.h
+    - remove #include hbstack.h
 
 2004-01-09 23:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
@@ -77,7 +80,7 @@
   * source/vm/memvars.c
     ! Restore last state of hb_memvarsRelease() function
   * source/vm/hvm.c
-    ! Add call to hb_collectAll() in hb_vmQuit() to release correctly detached vars 
+    ! Add call to hb_collectAll() in hb_vmQuit() to release correctly detached vars
       in codeblocks referenced by statics vars.
       Reported by Rafa Carmona and Antonio Linares.
 

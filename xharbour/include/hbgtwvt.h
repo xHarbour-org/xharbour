@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.31 2004/09/28 03:25:07 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.32 2004/11/23 17:04:20 lf_sfnet Exp $
  */
 
 /*
@@ -103,7 +103,7 @@
 #include "inkey.ch"
 #include "error.ch"
 #include "hbvm.h"
-#include "hbstack.h"
+//#include "hbstack.h"
 
 //-------------------------------------------------------------------//
 
