@@ -1,5 +1,5 @@
 /*
- * $Id: proper.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: proper.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
  */
 
 /*
@@ -78,11 +78,8 @@ static char _ftToUpper( char );
 static int _ftIsUpper( char );
 static int _ftIsLower( char );
 
-HB_FUNC(FT_PROPER )
+HB_FUNC( FT_PROPER )
 {
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
-   {
-
   int  iLen   =  hb_parclen(1);
   char *cStr;
 
@@ -114,8 +111,6 @@ HB_FUNC(FT_PROPER )
   */
   hb_retc( cStr );
   return;
-   }
-#endif
 }
 
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.27 2004/08/19 01:17:24 druzus Exp $
+# $Id: make_tgz.sh,v 1.28 2004/08/29 00:26:20 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -29,6 +29,13 @@ if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtcrs; fi
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
+if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
+
+if [ "$HB_COMMERCE" = yes ]
+then
+   export HB_GPM_MOUSE=no
+   export HB_WITHOUT_GTSLN=yes
+fi
 
 export HB_BIN_INSTALL="/usr/bin"
 export HB_INC_INSTALL="/usr/include/${name}"

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.7 2004/05/29 21:49:25 likewolf Exp $
+# $Id: postinst.sh,v 1.8 2004/06/12 13:23:09 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -45,7 +45,7 @@ then
     if [ "${HB_ARCHITECTURE}" != "dos" ]; then
         install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
-    mk_hbtools "${HB_BIN_INSTALL}"
+    mk_hbtools "${HB_BIN_INSTALL}" "$@"
     [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
 
     # build fm lib with memory statistic

@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2003/05/16 19:52:00 druzus Exp $
+# $Id: global.cf,v 1.5 2004/05/30 20:37:17 likewolf Exp $
 #
 
 all : first
@@ -8,9 +8,16 @@ HB_GT_LIBS=\
         gtcgi \
         gtcrs \
         gtpca \
-        gtsln \
         gtstd \
         gtnul \
+
+ifeq ($(HB_COMMERCE),yes)
+   HB_GPM_MOUSE = no
+else
+ifneq ($(HB_WITHOUT_GTSLN),yes)
+   HB_GT_LIBS += gtsln
+endif
+endif
 
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtstd

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3432 2004/09/13 17:53:09 patrickmast Exp $
+ * $Id: ChangeLog,v 1.3433 2004/09/14 12:26:07 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-14 22:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/Makefile
+  * xharbour/make_tgz.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+  * xharbour/config/bsd/global.cf
+  * xharbour/config/darwin/global.cf
+  * xharbour/config/linux/global.cf
+    + added some new envvars for custom build
+    + added HB_COMMERCE envvar - when set to yes then the libraries
+      with pure GPL (or similar) licence will be excluded from the build
+      final binaries (slang, gpm) - it's for people who easy want to make
+      xHarbour for application released with non GPL compliant license
+
+  * xharbour/xharbour.spec
+    * mark /etc/harbour.cfg and /etc/harbour/hb-charmap.def
+      as configure files and disable checking md5 or mtime
+    + added --without gtsln switch
+    + added support for HB_COMMERCE
+
+  * xharbour/contrib/libnf/proper.c
+    * build FT_PROPER for all platforms not only DOS/Windows
 
 2004-09-14 08:19 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * xharbour/source/tip/client.prg

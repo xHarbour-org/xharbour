@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.25 2004/08/29 18:30:28 lf_sfnet Exp $
+# $Id: hb-func.sh,v 1.26 2004/09/08 00:17:09 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -41,11 +41,20 @@ get_hbver()
     echo -n "${MAJOR}.${MINOR}.${REVIS}"
 }
 
+get_solibname()
+{
+    local name
+
+    name="${HB_SHAREDLIB_NAME}"
+    [ -z "${name}" ] && name="xharbour"
+    echo -n "${name}"
+}
+
 mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 hbtip hbct debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} rddads macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 hbtip hbct hbodbc debug profiler"
     else
         echo -n "$@"
     fi
@@ -65,9 +74,10 @@ mk_hbtools()
 {
     local name hb_pref hb_tool hb_libs hb_libsc
 
-    name="xharbour"
-    hb_pref="${4-xhb}"
-
+    name=`get_solibname`
+    hb_pref="$4"
+    [ -z "${hb_pref}" ] && hb_pref="${HB_TOOLS_PREF-xhb}"
+    hb_cmpname="${HB_CMPNAME-harbour}"
     if [ "${HB_ARCHITECTURE}" = "dos" ]; then
         hb_tool="$1/${hb_pref}-bld"
     else
@@ -281,7 +291,7 @@ else
     l="${name}"
     [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
     [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="gtalleg debug profiler ${hb_libsc}"
+    libs="gtalleg hbodbc debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
 do
@@ -314,7 +324,7 @@ FOUTE="\${FOUTE%.[oc]}"
 
 hb_cc()
 {
-    harbour "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
+    ${hb_cmpname} "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
 }
 
 hb_link()
@@ -413,7 +423,7 @@ mk_hblibso()
 {
     local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs
 
-    name="xharbour"
+    name=`get_solibname`
     hb_rootdir="${1-.}"
     
     hb_ver=`get_hbver "${hb_rootdir}"`

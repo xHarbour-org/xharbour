@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.61 2004/08/29 20:35:43 druzus Exp $
+# $Id: xharbour.spec,v 1.62 2004/09/06 20:01:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,8 +18,9 @@
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --without nf       - do not build nanforum lib
-# --without x11      - do not build GTXVT
+# --without x11      - do not build GTXVT and GTXWC
 # --without gpm      - build GTSLN and GTCRS without GPM support
+# --without gtsln    - do not build GTSLN
 ######################################################################
 
 ######################################################################
@@ -63,14 +64,16 @@
 %define hb_mgt   export HB_MULTI_GT=yes
 %define hb_gt    export HB_GT_LIB=gtcrs
 %define hb_gpm   export HB_GPM_MOUSE=%{!?_without_gpm:yes}
+%define hb_sln   export HB_WITHOUT_GTSLN=%{?_without_gtsln:yes}
 %define hb_x11   export HB_WITHOUT_X11=%{?_without_x11:yes}
 %define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
 %define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_plat  export HB_PLAT=%{platform}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
+%define hb_cmrc  export HB_COMMERCE=yes
 %define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
+%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_plat} ; %{hb_opt} ; %{hb_cmrc}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -354,15 +357,16 @@ EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 fi
 
-[ "%{?_with_odbc:1}" ]    || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
-[ "%{?_with_allegro:1}" ] || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
+[ "%{?_without_gtsln:1}" ] && rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtsln.a
+[ "%{?_with_odbc:1}" ]     || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
+[ "%{?_with_allegro:1}" ]  || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
 
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
     unset HB_GTALLEG
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11}"
-    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11} %{?_with_allegro:%(allegro-config --static)}"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11}"
+    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11} %{?_with_allegro:%(allegro-config --static)}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do
@@ -520,9 +524,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc doc/es/
 
 %dir /etc/harbour
-/etc/harbour.cfg
+%verify(not md5 mtime) %config /etc/harbour.cfg
+%verify(not md5 mtime) %config /etc/harbour/hb-charmap.def
 %{?_with_hrbsh:/etc/profile.d/harb.sh}
-/etc/harbour/hb-charmap.def
+
 %{prefix}/bin/harbour
 %{prefix}/bin/hb-mkslib
 %{prefix}/bin/%{hb_pref}-build
