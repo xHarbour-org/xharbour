@@ -1,5 +1,5 @@
 /*
- * $Id: mousedos.c,v 1.4 2004/06/30 10:05:16 likewolf Exp $
+ * $Id: mousedos.c,v 1.5 2004/08/02 20:11:14 lf_sfnet Exp $
  */
 
 /*
@@ -75,15 +75,16 @@ void HB_GT_FUNC(mouse_Init( void ))
 
    if( s_bPresent )
    {
-      s_iInitCol = hb_mouse_Col();
-      s_iInitRow = hb_mouse_Row();
+      s_iInitCol = HB_GT_FUNC(mouse_Col());
+      s_iInitRow = HB_GT_FUNC(mouse_Row());
    }
 }
 
 void HB_GT_FUNC(mouse_Exit( void ))
 {
-   hb_mouse_SetPos( s_iInitRow, s_iInitCol );
-   hb_mouse_SetBounds( 0, 0, hb_gtMaxCol(), hb_gtMaxRow() );
+   HB_GT_FUNC(mouse_SetPos( s_iInitRow, s_iInitCol ));
+   HB_GT_FUNC(mouse_SetBounds( 0, 0, HB_GT_FUNC(gt_GetScreenWidth()),
+                                     HB_GT_FUNC(gt_GetScreenHeight()) ));
 }
 
 BOOL HB_GT_FUNC(mouse_IsPresent( void ))

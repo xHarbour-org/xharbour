@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.19 2004/05/12 02:25:28 druzus Exp $
+ * $Id: dbffpt1.c,v 1.20 2004/08/29 00:26:24 druzus Exp $
  */
 
 /*
@@ -1343,12 +1343,12 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #endif
                pBuffer[ ulSize ] = '\0';
                hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
+               hb_itemSetCMemo( pItem );
                pBuffer = NULL;
                break;
             case FPTIT_PICT:
                pBuffer[ ulSize ] = '\0';
                hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
-               hb_itemSetCMemo( pItem );
                pBuffer = NULL;
                break;
             default:

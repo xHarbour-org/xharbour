@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.19 2004/08/02 20:11:14 lf_sfnet Exp $
+ * $Id: gtdos.c,v 1.20 2004/08/06 02:25:38 maurifull Exp $
  */
 
 /*
@@ -293,6 +293,7 @@ int HB_GT_FUNC(gt_ExtendedKeySupport())
 {
    return 0;
 }
+
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int ch = 0;
@@ -509,14 +510,14 @@ static char FAR * hb_gt_ScreenAddress()
 #endif
 
 #if !defined(__DJGPP__)
-char FAR * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
+static char FAR * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ScreenPtr(%hu, %hu)", cRow, cCol));
 
    return scrnPtr + ( cRow * hb_gt_GetScreenWidth() * 2 ) + ( cCol * 2 );
 }
 #else
-char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
+static char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ScreenPtr(%hu, %hu)", cRow, cCol));
 

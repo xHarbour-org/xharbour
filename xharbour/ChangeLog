@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3377 2004/08/30 16:55:11 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3378 2004/08/30 17:08:28 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-31 01:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtdos/mousedos.c
+    * some cosmetic modifications
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * fixed the bug I introduced in last commit - the character
+      value should be marked as "M" when the binary one as "C"
+      It was reverted by mistake.
 
 2004-08-30 19:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/gtos2/gtos2.c
