@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.9 2003/12/14 22:38:57 peterrees Exp $
+ * $Id: mainwin.c,v 1.10 2003/12/15 02:22:58 peterrees Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    LPSTR pStart, pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
    char szAppName[ 250 ];
    BOOL bInQuotedParam;
-
+   int iResult ;
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
    HB_SYMBOL_UNUSED( iCmdShow );
@@ -153,9 +153,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    hb_vmInit( TRUE );
 
-//   LocalFree( pArgs );  // 15/12/2003 3:21p.m. Peter Rees: removed as causes problem with Win9X
-
-   return hb_vmQuit();
+   iResult = hb_vmQuit();
+   LocalFree( pArgs );
+   return iResult;
 }
 
 #if defined(__WATCOMC__)
