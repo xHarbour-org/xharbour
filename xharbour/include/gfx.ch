@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.ch,v 1.1 2004/08/02 01:46:12 maurifull Exp $
+ * $Id: gfx.ch,v 1.2 2004/08/02 19:17:25 ronpinkas Exp $
  *
  */
 
@@ -120,6 +120,6 @@
 
 #endif /* __XHARBOUR__*/
 
-#endif _NO_GFX_TRANSLATES_
+#endif /* _NO_GFX_TRANSLATES_ */
 
 #endif  /* _GFX_CH_ */
