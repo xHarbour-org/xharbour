@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2220 2004/02/04 01:12:00 andijahja Exp $
+ * $Id: ChangeLog,v 1.2221 2004/02/04 01:15:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 19:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    - Removed redundant logic related to item.asBlock.value->pSelfBase
+
+  /* This appears to fix a GPF trap which occasionaly triggered at some FWH apps. */
 
 2004-02-03 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg

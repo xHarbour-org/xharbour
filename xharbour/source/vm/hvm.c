@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.313 2004/01/29 22:16:31 andijahja Exp $
+ * $Id: hvm.c,v 1.314 2004/01/30 23:26:10 ronpinkas Exp $
  */
 
 /*
@@ -1403,17 +1403,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                         }
 
                         hb_arrayGet( pSelf, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
-
-                        if( HB_IS_BLOCK( &( HB_VM_STACK.Return ) ) && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
-                        {
-                           HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-
-                           #ifdef HB_ARRAY_USE_COUNTER
-                              HB_VM_STACK.Return.item.asBlock.value->pSelfBase->uiHolders++;
-                           #else
-                              hb_arrayRegisterHolder( HB_VM_STACK.Return.item.asBlock.value->pSelfBase, (void *) ( HB_VM_STACK.Return.item.asBlock.value ) );
-                           #endif
-                        }
 
                         hb_stackPop(); //pSelf.
                         hb_stackPop(); //Symbol.
@@ -6475,6 +6464,8 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
+      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       #ifdef HB_ARRAY_USE_COUNTER
          ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
       #else
@@ -6483,6 +6474,8 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    }
    else
    {
+      //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
 
@@ -6527,6 +6520,8 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
+      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       #ifdef HB_ARRAY_USE_COUNTER
          ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
       #else
@@ -6535,6 +6530,8 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    }
    else
    {
+      //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
 
@@ -6579,6 +6576,8 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
+      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       #ifdef HB_ARRAY_USE_COUNTER
          ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
       #else
@@ -6587,6 +6586,8 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    }
    else
    {
+      //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
 
