@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3928 2005/03/09 21:19:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3929 2005/03/10 01:30:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-03-09 18:40 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/vm/hvm.c
+    % Optimized hb_vmDoBlock() to use inplace evaluation instead of calling hb_codeblockEvaluate()
+
+  * include/hbapi.h
+  * source/vm/codebloc.c
+    - Removed not used hb_codeblockEvaluate()
+      /* This doesn't seem to be a utilized API, it used by anyone we can restore it. */
+
 2005-03-09 17:29 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * utils/xbscript/xbscript.prg
     * Refined and more consistent PP_LocalParams() PP_Locals(), PP_Statics() PP_Params() PP_Privates() and PP_Publics()
-    
+
 2005-03-09 13:18 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * include/hberrors.h
     + Added:

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.154 2005/03/06 06:27:57 andijahja Exp $
+ * $Id: hbapi.h,v 1.155 2005/03/09 07:16:27 andijahja Exp $
  */
 
 /*
@@ -556,7 +556,6 @@ extern HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
 extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */
 extern PHB_ITEM hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer ); /* get local variable passed by reference */
-extern void     hb_codeblockEvaluate( HB_ITEM_PTR pItem ); /* evaluate a codeblock */
 
 /* memvars subsystem */
 extern HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar ); /* create a new global value */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.443 2005/03/04 22:23:44 andijahja Exp $
+ * $Id: hvm.c,v 1.444 2005/03/06 00:53:04 andijahja Exp $
  */
 
 /*
@@ -6731,6 +6731,7 @@ static HARBOUR hb_vmDoBlock( void )
    PHB_ITEM pBlock;
    USHORT uiLine;
    int iParam;
+   int iStatics;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
 
@@ -6755,17 +6756,26 @@ static HARBOUR hb_vmDoBlock( void )
       hb_vmPushNil();
    }
 
-   /* set the current line number to a line where the codeblock was defined
-    */
+   // Save the current line number.
    uiLine = hb_stackBaseItem()->item.asSymbol.lineno;
 
+   // Change the line number to line where block was defined.
    hb_stackBaseItem()->item.asSymbol.lineno = pBlock->item.asBlock.value->lineno;
 
-   hb_codeblockEvaluate( pBlock );
+   // Save current Statics Context.
+   iStatics = HB_VM_STACK.iStatics;
+
+   // Change Statics context to that of the module where the Block was defined.
+   HB_VM_STACK.iStatics = pBlock->item.asBlock.statics;
+
+   hb_vmExecute( pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->pSymbols, pBlock->item.asBlock.value->pGlobals );
+
+   // Restore Statics context.
+   HB_VM_STACK.iStatics = iStatics;
 
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmDoBlock()"));
 
-   /* restore stack pointers */
+   // Restore line numer.
    hb_stackBaseItem()->item.asSymbol.lineno = uiLine;
 
    HB_TRACE(HB_TR_DEBUG, ("Restored Satck hb_vmDoBlock()"));

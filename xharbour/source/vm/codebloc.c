@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.46 2004/04/30 16:11:04 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.47 2004/12/31 11:56:10 druzus Exp $
  */
 
 /*
@@ -343,68 +343,6 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
       hb_xfree( pCBlock->pCode );
       pCBlock->pCode = NULL;
    }
-}
-
-/* Evaluate passed codeblock
- * Before evaluation we have to switch to a static variable base that
- * was defined when the codeblock was created.
- * (The codeblock can only see the static variables defined in a module
- * where the codeblock was created)
- */
-void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
-{
-   int iStatics = HB_VM_STACK.iStatics;
-   /*
-   PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;
-   short      Saved_iGlobals = hb_vm_iGlobals;
-   short iGlobal;
-   */
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockEvaluate(%p)", pItem));
-
- /*
-   // Lock Module Globals, so that GC from callee will not release higher level Globals.
-   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
-   {
-      if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
-      {
-         hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
-      }
-      else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
-      {
-         hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
-      }
-   }
- */
-
-   /*
-   hb_vm_pGlobals = pItem->item.asBlock.value->pGlobals;
-   hb_vm_iGlobals = pItem->item.asBlock.value->iGlobals;
-   */
-
-   HB_VM_STACK.iStatics = pItem->item.asBlock.statics;
-   hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols, pItem->item.asBlock.value->pGlobals );
-   /* hb_vmExecute() unlocks the stack on exit */
-   HB_VM_STACK.iStatics = iStatics;
-
-   /*
-   hb_vm_pGlobals = Saved_pGlobals;
-   hb_vm_iGlobals = Saved_iGlobals;
-   */
- /*
-   // Un-Lock Module Globals, so that GC can release current level Globals.
-   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
-   {
-      if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
-      {
-         hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
-      }
-      else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
-      {
-         hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
-      }
-   }
- */
 }
 
 /* Get local variable referenced in a codeblock
