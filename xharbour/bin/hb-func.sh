@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.31 2004/10/18 10:22:24 likewolf Exp $
+# $Id: hb-func.sh,v 1.32 2004/11/01 05:38:08 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -245,6 +245,7 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 LINK_OPT=""
+CC_OPT=""
 
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
@@ -327,6 +328,10 @@ if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
     fi
 fi
 
+if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
+    CC_OPT="-no-cpp-precomp -Wno-long-double"
+fi
+
 FOUTC1="\${FILEOUT%.*}.c"
 FOUTO1="\${FILEOUT%.*}.o"
 FOUTE1="\${FILEOUT%.[Pp][Rr][Gg]}"
@@ -350,7 +355,7 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        gcc "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
         gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
@@ -359,7 +364,7 @@ hb_link()
 hb_cmp()
 {
     hb_cc "\$@" && \\
-    gcc -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
+    gcc -c \${CC_OPT} "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
     rm -f "\${FOUTC}"
 }
 
