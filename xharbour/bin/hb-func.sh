@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.16 2004/03/18 04:28:30 druzus Exp $
+# $Id: hb-func.sh,v 1.17 2004/05/28 18:51:21 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -132,7 +132,7 @@ elif [ "\$*" = "mk-links" ]; then
     DIR="\${0%/*}"
     NAME="\${0##*/}"
     if [ "\${DIR}" != "\${NAME}" ]; then
-        pushd "\${DIR}"
+        (cd "\${DIR}"
         for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
             if [ "\${HB_ARCHITECTURE}" = "dos" ]; then
                 cp -f "\${NAME}" "\${n}"
@@ -140,7 +140,7 @@ elif [ "\$*" = "mk-links" ]; then
                 ln -sf "\${NAME}" "\${n}"
             fi
         done
-        popd
+        )
     fi
     exit
 fi
@@ -409,7 +409,7 @@ mk_hblibso()
     hb_libs=`mk_hbgetlibs "$2"`
     [ -z "${HB_GT_LIB}" ] && HB_GT_LIB="gtstd"
 
-    pushd $HB_LIB_INSTALL
+    (cd $HB_LIB_INSTALL
     LIBS=""
     LIBSMT=""
     for l in ${hb_libs}
@@ -461,6 +461,6 @@ mk_hblibso()
             esac
         fi
     done
-    popd
+    )
     #export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
 }

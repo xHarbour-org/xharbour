@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.5 2004/03/02 17:31:28 druzus Exp $
+# $Id: postinst.sh,v 1.6 2004/05/28 18:51:21 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -49,7 +49,7 @@ then
     [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
 
     # build fm lib with memory statistic
-    pushd ${hb_root}/source/vm
+    (cd ${hb_root}/source/vm
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
     rm -f fm.o
     ${MAKE} -r fm.o
@@ -60,5 +60,5 @@ then
         ar -r ${HB_LIB_INSTALL}/libfmmt.a fm.o
         rm -f fm.o
     fi
-    popd
+    )
 fi

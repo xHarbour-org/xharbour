@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3003 2004/05/28 22:20:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3004 2004/05/29 00:25:53 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-30 01:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * bin/hb-func.sh
+  * bin/postinst.sh
+    ! Changed "pushd" and "popd" commands to "(cd" and ")" to improve
+      compatibility.
 
 2004-05-28 17:25 UTC-0800 Luis Krause Mantilla
   * contrib/rdd_ads/adsfunc.c
