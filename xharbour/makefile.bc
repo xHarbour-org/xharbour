@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.85 2004/02/05 06:06:17 guerra000 Exp $
+# $Id: makefile.bc,v 1.86 2004/02/11 16:07:54 jonnymind Exp $
 #
 
 #
@@ -876,7 +876,8 @@ HBTEST_EXE_OBJS = \
    $(OBJ_DIR)\rt_trans.obj \
    $(OBJ_DIR)\rt_array.obj \
    $(OBJ_DIR)\rt_file.obj \
-   $(OBJ_DIR)\rt_misc.obj
+   $(OBJ_DIR)\rt_misc.obj \
+   $(OBJ_DIR)\rt_ccall.obj
 
 #
 # HBDOC.EXE rules
@@ -2910,6 +2911,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\rt_array.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_file.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_misc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\rt_ccall.obj >> make.tmp
    $(ECHO) $(PP_STLIB) >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
    $(ECHO) $(VM_STLIB) >> make.tmp
@@ -2989,6 +2991,12 @@ $(OBJ_DIR)\rt_misc.c : $(HBTEST_DIR)\rt_misc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\rt_misc.obj : $(OBJ_DIR)\rt_misc.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\rt_ccall.c : $(HBTEST_DIR)\rt_ccall.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #

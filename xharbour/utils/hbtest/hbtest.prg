@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.4 2003/09/10 01:03:58 druzus Exp $
+ * $Id: hbtest.prg,v 1.5 2003/09/10 21:35:46 druzus Exp $
  */
 
 /*
@@ -154,6 +154,9 @@ FUNCTION Main( cPar1, cPar2 )
    Main_OPOVERL()
 #endif
    Main_LAST()
+#ifdef __XHARBOUR__
+   Main_CCall()
+#endif
 
    /* Show results, return ERRORLEVEL and exit */
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.66 2004/02/01 22:38:58 paultucker Exp $
+# $Id: makefile.nt,v 1.67 2004/02/11 22:43:46 paultucker Exp $
 #
 
 #
@@ -1119,6 +1119,7 @@ $(HBTEST_EXE) : \
    $(HBTEST_DIR)\rt_hvma.prg \
    $(HBTEST_DIR)\rt_math.prg \
    $(HBTEST_DIR)\rt_misc.prg \
+   $(HBTEST_DIR)\rt_ccall.prg \
    $(HBTEST_DIR)\rt_str.prg \
    $(HBTEST_DIR)\rt_stra.prg \
    $(HBTEST_DIR)\rt_trans.prg
@@ -1131,6 +1132,7 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_hvma.c \
                                       $(OBJ_DIR)\rt_math.c \
                                       $(OBJ_DIR)\rt_misc.c \
+                                      $(OBJ_DIR)\rt_ccall.c \
                                       $(OBJ_DIR)\rt_str.c \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
