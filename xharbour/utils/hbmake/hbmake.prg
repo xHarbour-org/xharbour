@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.110 2004/01/16 11:35:08 lculik Exp $
+ * $Id: hbmake.prg,v 1.111 2004/01/22 08:57:59 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -208,6 +208,8 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
       IF File( cFile )
          ProcessParameters( AllParam )
+      elseif  s_lEditMode
+         ProcessParameters( AllParam )
       ELSE
 
          IF ! s_lEditMode
@@ -328,7 +330,7 @@ FUNCTION ParseMakeFile( cFile )
    ENDIF
 
    WHILE ! s_lEof
-tracelog(cBuffer)
+
       IF  cMacro IN  cBuffer
          lMacroSec := .T.
          lBuildSec := .f.
@@ -1891,6 +1893,13 @@ FUNC CreateMakeFile( cFile )
         cLibs += " libmysql.lib"
 	 endif 
 
+     nPos := aScan( aLibsOut, { | z | At( "hbpg", Lower( z ) ) > 0 } )
+	 
+	 if nPos >0 
+        cLibs += " libpq.lib"
+        cLibs := strtran(cLibs,"hbpg","libhbpg")
+	 endif 
+
          IF ! s_lMt
             cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
          ELSE
@@ -1914,8 +1923,14 @@ FUNC CreateMakeFile( cFile )
 	 
 	 if nPos >0 
 	    cLibs += " -lmysqlclient"
+	 endif
+     nPos := aScan( aLibsOut, { | z | At( "hbpg", Lower( z ) ) > 0 } )
+	 
+	 if nPos >0 
+        cLibs += " -lpq"
 	 endif 
-	 tracelog(cLibs)
+
+
          cExtraLibs := cLibs
 	 
          IF cOs == "Linux"
@@ -2279,7 +2294,7 @@ FUNCTION CompileUpdatedFiles()
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $ cErrText
-                                        tracelog(lEnd)
+
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
                         QUIT
@@ -3264,7 +3279,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( cFile )
 
       IF Left( cFile, 1 ) $ "- /?"
-         cParam += cFile
+         cParam += cFile+" "
       ELSE
          cFile := cFile
          aAdd( aFile, cFile )
@@ -3275,7 +3290,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p1 )
 
       IF Left( p1, 1 ) $ "- /?"
-         cParam += p1
+         cParam += p1+" "
       ELSE
          cFile := p1
          aAdd( aFile, cFile )
@@ -3286,7 +3301,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p2 )
 
       IF Left( p2, 1 ) $ "- /"
-         cParam += p2
+         cParam += p2+" "
       ELSE
          cFile := p2
          aAdd( aFile, cFile )
@@ -3297,7 +3312,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p3 )
 
       IF Left( p3, 1 ) $ "- /"
-         cParam += p3
+         cParam += p3+" "
       ELSE
          cFile := p3
          aAdd( aFile, cFile )
@@ -3308,7 +3323,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p4 )
 
       IF Left( p4, 1 ) $ "- /"
-         cParam += p4
+         cParam += p4+" "
       ELSE
          cFile := p4
          aAdd( aFile, cFile )
@@ -3319,7 +3334,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p5 )
 
       IF Left( p5, 1 ) $ "- /"
-         cParam += p5
+         cParam += p5+" "
       ELSE
          cFile := p5
          aAdd( aFile, cFile )
@@ -3330,7 +3345,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF ! Empty( p6 )
 
       IF Left( p6, 1 ) $ "- /"
-         cParam += p6
+         cParam += p6+" "
       ELSE
          cFile := p6
          aAdd( aFile, cFile )
@@ -3364,7 +3379,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF  "-L" IN cParam
       s_cDefLang := Substr( cParam, At( "-L", cParam ) + 2, 2 )
    ENDIF
-
+tracelog(cParam)
 RETURN cParam
 
 FUNCTION ShowHelp()
@@ -3414,6 +3429,7 @@ RETURN NIL
 FUNCTION ProcessParameters( cParams )
 
    LOCAL aDef
+   tracelog(cParams)
 
    IF  "-F" IN cParams
       s_lForce  := .T.
@@ -3422,6 +3438,7 @@ FUNCTION ProcessParameters( cParams )
 
    IF  "-R" IN cParams
       s_lRecurse := .T.
+      tracelog(s_lRecurse)
       cParams  := Strtran( cParams, "-R", "" )
    ENDIF
 

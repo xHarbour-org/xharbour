@@ -398,6 +398,7 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'libgt' + cSuffix, ;
                       'libmisc' + cSuffix, ;
                       'mysql' + cSuffix, ;
+                      'hbpg' + cSuffix, ;
                       'libmysql' + cSuffix, ;
                       'mysqlclient' + cSuffix, ;
                       'samples' + cSuffix, ;
@@ -450,6 +451,7 @@ FUNCTION Getlibs( lGcc, cDir )
                         { "Harbour Zip library ", 'ziparchive' + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
                         { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
+                        { "Harbour Postgres library - hbpg", 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
                         { "Harbour Samples library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) } }
 
    AEVAL( ainstaledlibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
