@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.6 2002/05/15 00:39:05 lculik Exp $
+ * $Id: console.c,v 1.7 2002/05/24 04:58:58 walito Exp $
  */
 
 /*
@@ -408,7 +408,8 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
 
-   if( hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )
+   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) ||
+       (hb_set.hb_set_winhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ))
    {
       USHORT uiCount;
       USHORT uiProw = ( USHORT ) iRow;
