@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3042 2004/06/08 18:13:30 lculik Exp $
+ * $Id: ChangeLog,v 1.3043 2004/06/08 20:09:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-08 13:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/filesys.c
+    + Added missing typecast.
+
 2004-06-08 17:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
-  *source/rtl/filesys.c
-    ! minor code  formatting (if blocks with out {}) 
+  * source/rtl/filesys.c
+    ! minor code  formatting (if blocks with out {})
 
 2004-06-08 15:10 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * include/hbapifs.h
@@ -23,7 +28,7 @@
       (using hb_fsCurDir() on an directoryrecurse("*.*") on an directory
        /usr/src/xharbour was setting path to usr/src/xharbour and this the
         function return 0 itens om array)
-     
+
 2004-06-08 09:34 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/tip/tipclientsmtp.prg
     ! Added new method ServerSuportSecure(@lAuthPlain,@lAuthLongin) to test if smtp server require

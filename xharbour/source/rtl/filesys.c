@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.107 2004/06/08 18:05:58 lculik Exp $
+ * $Id: filesys.c,v 1.108 2004/06/08 20:00:29 lculik Exp $
  */
 
 /*
@@ -2741,7 +2741,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulLen - 1 ] ) )
       {
          pbyBuffer[ ulLen - 1 ] = '\0';
-      } 
+      }
    }
 
    return 0; // correct if it arrives here
@@ -3114,11 +3114,11 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulPthLen - 1 ] ) )
       {
          pbyBuffer[ ulPthLen  ] = '\0';
-      }
+	  }
       else
-      {
-         strcat( pbyBuffer,OS_PATH_DELIMITER_LIST);
-      }
+	  {
+         strcat( (char *) pbyBuffer, OS_PATH_DELIMITER_LIST);
+	  }
 
       return 0; // if it reaches here, it is right.
    }
