@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.13 2002/10/17 17:16:20 what32 Exp $
+ * $Id: TTreeview.prg,v 1.14 2002/10/27 01:29:25 what32 Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ CLASS TTreeView FROM TCustomControl
    DATA xxWidth  PROTECTED  INIT  160
    DATA xxHeight PROTECTED  INIT  160
 
-   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT
+   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT+TVS_SHOWSELALWAYS
    DATA ExStyle INIT  WS_EX_CLIENTEDGE
 
    DATA lRegister PROTECTED INIT .F.
@@ -69,6 +69,8 @@ CLASS TTreeView FROM TCustomControl
    METHOD SelChanged()           INLINE If( ::bChanged != nil, Eval( ::bChanged, Self ), nil )
    METHOD SetBkColor( nColor )   INLINE ::SendMessage( TVM_SETBKCOLOR, 0, nColor )
    METHOD SetTextColor( nColor ) INLINE ::SendMessage( TVM_SETTEXTCOLOR, 0, nColor )
+   METHOD SelectItem( hItem )    INLINE ::SendMessage( TVM_SELECTITEM, TVGN_CARET, hItem )
+    
    METHOD SetImageList()
    METHOD Notify()
    METHOD OnChange() VIRTUAL
@@ -91,10 +93,11 @@ return( super:New( oParent ) )
 
 //----------------------------------------------------------------------------//
 
-METHOD Add( cPrompt, nImage ) CLASS TTreeView
+METHOD Add( cPrompt, nImage, cargo ) CLASS TTreeView
    local oItem
    oItem := TTVItem():New( TVInsertItem( ::handle, cPrompt,, nImage ), Self )
    oItem:Caption := cPrompt
+   oItem:Cargo   := cargo
    AAdd( ::Items, oItem )
 return oItem
 

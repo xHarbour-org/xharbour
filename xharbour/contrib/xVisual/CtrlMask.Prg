@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.28 2002/10/26 06:50:24 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.29 2002/10/27 01:29:26 what32 Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ TODO:
 
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL FormEdit
+GLOBAL EXTERNAL MainFrame
 
 // selected controls array elements
 
@@ -117,6 +118,8 @@ CLASS oCtrlMask FROM TWinControl
    METHOD OnMouseMove()
    METHOD MoveCtrl()
    METHOD Refresh()
+   METHOD ChangeInspector()
+   METHOD OnUserMsg()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -249,6 +252,8 @@ METHOD OnKeyDown( wParam, lParam )
                   RectScreenToClient( ::Handle, aRect )
                   ::aSelected := {{ ::aSiblings[n], aclone( aRect ), 0, 0, {}, {} } }   // handle,rect,anchorX,anchorY,aHot
                   InvalidateRect( ::Parent:Handle ,, .F. )
+
+                  ::PostMessage( WM_USER + 1, 0 )
 
                ENDIF
             ENDIF
@@ -454,7 +459,7 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL hDC
    LOCAL a
    LOCAL aOldSelected := aClone( ::aSelected )
-   
+   local Item
    ClientToScreen( ::Handle, aPt )
 
    IF Empty( ::Cursor )
@@ -517,28 +522,98 @@ METHOD OnLButtonDown( wParam, x, y )
  //  InvalidateRect(::Handle,,.F.)
  //  RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN)
 
+   // ToolTips and Inspector selection
+   IF lFound
+      ::HintWindow:Activate(1)
+      ::HintWindow:TrackHint(1)
+      ::lHintActive := .T.
+      ::PostMessage( WM_USER + 1, 0 )
+     ELSE
+      ::PostMessage( WM_USER + 1, 1 )
+   ENDIF
+
+
    hDC := GetDC( ::Handle )
    SetTextColor( hDC, RGB( 255, 255, 128 ) )
-
    SetBkColor( hDC, RGB( 0, 0, 125 ) )
    IF len( ::aSelected ) > 1
       FOR EACH a In ::aSelected
          DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
       NEXT
-   ELSE
+     ELSE
       DrawFocusRect( hDC, ::aEditRect )
    ENDIF
    ReleaseDc( ::Handle, hDC )
 
-   IF lFound
-      ::HintWindow:Activate(1)
-      ::HintWindow:TrackHint(1)
-      ::lHintActive := .T.
-   ENDIF
-
    ::mousedown := .T.
    SetCapture( ::Handle )
+   UpdateWindow( ::Parent:handle )
+
    RETURN( NIL )
+
+*-----------------------------------------------------------------------------*
+
+METHOD OnUserMsg( nMsg, nwParam, nlParam)
+   
+   IF nMsg == WM_USER + 1
+      ::ChangeInspector( nwParam )
+   ENDIF
+   
+RETURN( nil )
+
+*-----------------------------------------------------------------------------*
+
+METHOD ChangeInspector( n )
+
+   LOCAL Item, SubItem, hTreeItem
+   static nSelObj
+            
+   IF n == 1 
+  
+      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
+
+          IF Item:cargo == ::Parent:handle
+             Item:Select()
+             nSelObj := ::handle
+             EXIT
+          ENDIF
+
+      NEXT
+      RETURN( nil )
+      
+   ENDIF
+   
+   IF Len( ::aSelected ) == 1 .AND. ( nSelObj == NIL .OR. nSelObj != ::aSelected[ 1 ][ SEL_HANDLE ] )
+      // need to tell the inspector
+      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
+             
+          // Check TreeView subitems
+          FOR EACH SubItem IN Item:Items
+              IF SubItem:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
+                 hTreeItem := SubItem:handle
+                 EXIT
+              ENDIF
+          NEXT
+
+          // Check TreeView Root items
+          IF hTreeItem != NIL
+             EXIT
+            ELSEIF Item:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
+             hTreeItem := Item:handle
+             EXIT
+          ENDIF
+
+      NEXT
+         
+      // Select the TreeView item
+      IF hTreeItem != NIL
+         MainFrame:ObjTree:TreeView1:SelectItem( hTreeItem )
+         nSelObj := ::aSelected[ 1 ][ SEL_HANDLE ]
+      ENDIF
+            
+   ENDIF
+
+RETURN( nil )
 
 *-----------------------------------------------------------------------------*
 
@@ -552,41 +627,54 @@ METHOD OnMouseMove( aParam, x, y )
    LOCAL nPos
    LOCAL n
    LOCAL hDC
-   LOCAL a,oObj
+   LOCAL a,oObj, aTipRect
    static oLastObj
    
    IF ::mousedown
 
-      UpdateWindow( ::Parent:handle )
-      ::HintWindow:SetTitle(0,"")
-      ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
-                            alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
+      aTipRect := ::aEditRect
+
+      ::MoveCtrl( ::Handle, aPt )
       
-      hDC := GetDC( ::Handle )
+      if !aTipRect[1] == ::aEditRect[1].or.;
+         !aTipRect[2] == ::aEditRect[2].or.;
+         !aTipRect[3] == ::aEditRect[3].or.;
+         !aTipRect[4] == ::aEditRect[4]
 
-      SetTextColor( hDC, RGB( 255, 255, 128 ) )
-      SetBkColor( hDC, RGB( 0, 0, 128 ) )
-      // old
-      IF len( ::aSelected ) > 1
-         FOR EACH a In ::aSelected
-            DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
-         NEXT
-      ELSE
-        DrawFocusRect( hDC, ::aEditRect )
+         hDC := GetDC( ::Handle )
+         SetTextColor( hDC, RGB( 255, 255, 128 ) )
+         SetBkColor( hDC, RGB( 0, 0, 128 ) )
+      
+         // old
+         IF len( ::aSelected ) > 1
+            FOR EACH a In ::aSelected
+               DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
+            NEXT
+         ELSE
+           DrawFocusRect( hDC, aTipRect ) //::aEditRect )
+         ENDIF
+
+         ::HintWindow:SetTitle(0,"")
+         ::HintWindow:SetText( alltrim( str( ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 2 ] ) ) + "  " +;
+                               alltrim( str( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ) ) + "," + alltrim( str( ::aEditRect[ 4 ] - ::aEditRect[ 2 ] ) ) )
+
+         UpdateWindow( ::Parent:handle )
+
+      
+         //new
+         IF len( ::aSelected ) > 1
+            ::MoveCtrl( ::Handle, aPt )
+            FOR EACH a In ::aSelected
+              DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
+            NEXT
+         ELSE
+            ::MoveCtrl( ::Handle, aPt )
+            DrawFocusRect( hDC, ::aEditRect )
+         ENDIF
+         ReleaseDc( ::Handle, hDC )
+
+
       ENDIF
-
-      //new
-      IF len( ::aSelected ) > 1
-         ::MoveCtrl( ::Handle, aPt )
-         FOR EACH a In ::aSelected
-           DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
-         NEXT
-      ELSE
-         ::aEditRect := ::MoveCtrl( ::Handle, aPt )
-         DrawFocusRect( hDC, ::aEditRect )
-      ENDIF
-
-      ReleaseDc( ::Handle, hDC )
 
    ELSE
       IF Empty( ::Cursor )
@@ -745,7 +833,6 @@ METHOD OnLButtonUp( wParam, x, y )
 *-----------------------------------------------------------------------------*
 
 // to be revised
-
 METHOD MoveCtrl( hWnd, aPt )
 
    LOCAL aRect

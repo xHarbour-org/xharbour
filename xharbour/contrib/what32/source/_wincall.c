@@ -36,7 +36,7 @@ linking the VMGUI library code into it.
 
 #include <windows.h>
 #include <commctrl.h>
-#include "hbdate.h"
+//#include "hbdate.h"
 #include "hbvmpub.h"
 #include "hbinit.h"
 #include "hbapi.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.45 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TForm.prg,v 1.46 2002/10/28 02:19:05 what32 Exp $
  */
 
 /*
@@ -134,14 +134,27 @@ METHOD New( oParent ) CLASS TForm
 *-----------------------------------------------------------------------------*
 
 METHOD Add( oObj, lCreate ) CLASS TForm
-   LOCAL nSeq, hClass
+   LOCAL nSeq, hClass, nInst := 1, oCtrl
 
    DEFAULT lCreate TO .T.
    
    IF oObj:ControlName == "Form" .and. oObj:Name == NIL
       oObj:Name := oObj:ClassName()
    ENDIF
+   
+   IF oObj:Name == NIL
+      FOR EACH oCtrl IN ::Controls
+          IF oCtrl:ControlName == oObj:ControlName
+             nInst ++
+          ENDIF
+      NEXT
+      oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
+   ENDIF
 
+   IF oObj:Caption == NIL
+      oObj:Caption := oObj:Name
+   ENDIF
+   
    oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
 
    __objAddData( self, oObj:Name, HB_OO_CLSTP_PROTECTED )

@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.20 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCRebar.prg,v 1.21 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,7 +43,7 @@ pragma pack(4)
 
 CLASS TRebar FROM TCustomControl
 
-   DATA Caption PROTECTED INIT ""
+   DATA Caption  PROTECTED  INIT ""
    DATA xxLeft   PROTECTED  INIT    0
    DATA xxTop    PROTECTED  INIT    0
    DATA xxWidth  PROTECTED  INIT  200
@@ -120,7 +120,7 @@ METHOD New( oParent ) CLASS TRebar
    
    ::WinClass    := REBARCLASSNAME
    ::ControlName := "Rebar"
-
+   ::Height := 20
    super:new( oParent )
    RETURN( self )
 

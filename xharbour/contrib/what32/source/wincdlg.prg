@@ -134,9 +134,11 @@ local aFiles,cRet,cFile,n,x,c:=''
 IF aFilter==nil
    aFilter:={}
 END
-FOR n:=1 TO LEN(aFilter)
-    c+=aFilter[n][1]+chr(0)+aFilter[n][2]+chr(0)
-NEXT
+IF ValType( aFilter ) == "A"
+   FOR n:=1 TO LEN(aFilter)
+       c+=aFilter[n][1]+chr(0)+aFilter[n][2]+chr(0)
+   NEXT
+ENDIF
 if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
    cFile:=space(32000)
   ELSE

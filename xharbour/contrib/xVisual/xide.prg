@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.101 2002/10/28 02:19:05 what32 Exp $
+ * $Id: xide.prg,v 1.102 2002/10/28 04:49:42 what32 Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ METHOD MainToolBar() CLASS MainFrame
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    End
-   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar:handle, 200, 52, 200, "", NIL )
+   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
 
    // add the TabControl on the Rebarband
    
@@ -155,12 +155,12 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Activex" )
       :Configure()
    End
-   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
+   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
       :Add( TRebar():New( MainFrame:ToolTabs:StdTab ) )
-      :Rebar:SetStyle( WS_BORDER, .F. )
+      :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():New( MainFrame:ToolTabs:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
@@ -181,14 +181,14 @@ METHOD MainToolBar() CLASS MainFrame
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
          //---------------------------------------------------------------------
       End
-      :Rebar:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
+      :Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
       :StdTools:DisableAll()
    End
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
       :Add( TRebar():New( MainFrame:ToolTabs:Win32 ) )
-      :Rebar:SetStyle( WS_BORDER, .F. )
+      :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( WinTools():New( MainFrame:ToolTabs:Win32, 445, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
@@ -210,7 +210,7 @@ METHOD MainToolBar() CLASS MainFrame
          //---------------------------------------------------------------------
 
       End
-      :Rebar:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
+      :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
       :WinTools:DisableAll()
    End
    //--------- sets a QUICK access to the control
@@ -222,8 +222,8 @@ return(self)
 
 METHOD MainStatusBar() CLASS MainFrame
    ::Add( TStatusBar():New( MainFrame, 'StatusBar', 1001 ) )
-   ::StatusBar:SetPanels( { 150,380,480,580,-1 } )
-   ::StatusBar:SetPanelText( 0, "Visual xHarbour" )
+   ::StatusBar1:SetPanels( { 150,380,480,580,-1 } )
+   ::StatusBar1:SetPanelText( 0, "Visual xHarbour" )
 return(self)
 
 //----------------------------------------------------------------------------------------------

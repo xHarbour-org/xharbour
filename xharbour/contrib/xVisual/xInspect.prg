@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.44 2002/10/27 01:29:26 what32 Exp $
+ * $Id: xInspect.prg,v 1.45 2002/10/28 02:19:05 what32 Exp $
  */
 
 /*
@@ -52,7 +52,7 @@ CLASS ObjInspect FROM TForm
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::ComboBox:Move(,,x,21,.t.),;
+   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Move(,,x,21,.t.),;
                                  ::InspTabs:Move(,25,x,y-25,.t.),;
                                  ::browser:width := ::InspTabs:Properties:ClientRect()[3],;
                                  ::browser:height:= ::InspTabs:Properties:ClientRect()[4],;
@@ -93,7 +93,7 @@ METHOD OnCreate() CLASS ObjInspect
    oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
 
    ::Add( oCombo )
-   ::ComboBox:SetItemHeight( -1, 15 )
+   ::ComboBox1:SetItemHeight( -1, 15 )
 
    oTabs := TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25)
    oTabs:Name := "InspTabs"
@@ -138,7 +138,7 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
          ::CurObject:Parent:oMask:Refresh()
       ENDIF
 //----------------------------------------------------------------------------------------
-      SetFocus(::Browser:handle)
+//      SetFocus(::Browser:handle)
    endif
 
    IF nKey==VK_UP .OR. nKey==VK_DOWN
@@ -182,7 +182,7 @@ METHOD SetCurSel(n) CLASS ComboInsp
       ::Parent:Browser:RefreshAll()
      else
       ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
-      ::Parent:CurObject:SetFocus()
+//      ::Parent:CurObject:SetFocus()
    endif
 return(super:SetCurSel(n))
 
@@ -191,9 +191,9 @@ return(super:SetCurSel(n))
 METHOD DelObject( oObj ) CLASS ComboInsp
    local n,x,y
    IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
-      for x:=1 to len(::Parent:Parent:ObjTree:TreeView:Items)
-          if( y:=aScan( ::Parent:Parent:ObjTree:TreeView:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
-             ::Parent:Parent:ObjTree:TreeView:Items[x]:Items[y]:Delete()
+      for x:=1 to len(::Parent:Parent:ObjTree:TreeView1:Items)
+          if( y:=aScan( ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
+             ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items[y]:Delete()
              exit
           endif
       next
