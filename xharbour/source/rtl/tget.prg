@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.41 2003/03/26 20:32:49 iananderson Exp $
+ * $Id: tget.prg,v 1.42 2003/03/29 00:00:32 lculik Exp $
  */
 
 /*
@@ -686,11 +686,18 @@ METHOD overstrike( cChar ) CLASS Get
       ::pos := ::FirstEditable( )
    endif
 
+   if ::Pos > ::nMaxEdit
+      ::Rejected := .t.
+      return Self
+   endif
+
    cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
       return Self
+   else
+      ::Rejected := .f.
    endif
 
    if ::Clear .and. ::pos == ::FirstEditable( )
@@ -745,7 +752,12 @@ METHOD Insert( cChar ) CLASS Get
       ::pos := ::FirstEditable( )
    endif
 
-   cChar := ::Input(cChar)
+   if ::Pos > ::nMaxEdit
+      ::Rejected := .t.
+      return Self
+   endif
+
+   cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
@@ -1014,13 +1026,12 @@ METHOD IsEditable( nPos ) CLASS Get
 
    Switch ::type
    case "C"
-      return cChar IN "!ANXY9#"
+      return cChar IN "!ANXLY9#"
    case "N"
       return cChar IN "9#$*"
    case "D"
       return cChar == "9"
    case "L"
-//      return cChar IN "TFYN"
       return cChar IN "LY"
    end
 
@@ -1122,7 +1133,9 @@ METHOD Input( cChar ) CLASS Get
          exit
 
       case "L"
-         if !( Upper( cChar ) IN "YNTF" )
+         if !( Upper( cChar ) IN "YNTF"+;
+                         hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 1 )+;
+                         hb_langmessage( HB_LANG_ITEM_BASE_TEXT + 2 ) )
             cChar := ""
          endif
          exit
