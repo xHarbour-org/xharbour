@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.41 2003/09/12 02:26:59 jonnymind Exp $
+ * $Id: memvars.c,v 1.42 2003/09/14 18:07:24 jonnymind Exp $
  */
 
 /*
@@ -2038,6 +2038,11 @@ HB_FUNC( __MVRESTORE )
       if( pFileName->szExtension == NULL )
       {
          pFileName->szExtension = ".mem";
+      }
+
+      if( pFileName->szPath == NULL )
+      {
+         pFileName->szPath = hb_set.HB_SET_DEFAULT;
       }
 
       hb_fsFNameMerge( szFileName, pFileName );

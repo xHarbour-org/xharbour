@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1589 2003/10/13 20:40:59 druzus Exp $
+ * $Id: ChangeLog,v 1.1590 2003/10/14 02:51:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-14 08:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    ! Fixed __MVRESTORE() to support SET PATH setting.
+
+  * include/hbver.h
+    * Signaled as Build 91.1 and updated last change log to this entry.
+
+  Taged CVS as "Build 91-1"
 
 2003-10-13 19:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
