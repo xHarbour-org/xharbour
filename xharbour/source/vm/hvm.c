@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.150 2003/01/12 08:28:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.151 2003/01/21 04:56:18 likewolf Exp $
  */
 
 /*
@@ -620,6 +620,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          hb_ulOpcodesCalls[ ulLastOpcode ]++;
       }
 
+      #ifndef HB_GUI
       if( hb_set.HB_SET_CANCEL )
       {
          static unsigned short s_iCancel = 0;
@@ -636,6 +637,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
          }
       }
+      #endif
 
       switch( pCode[ w ] )
       {
