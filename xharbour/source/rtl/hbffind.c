@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.21 2004/03/30 22:47:23 druzus Exp $
+ * $Id: hbffind.c,v 1.22 2004/04/02 11:14:06 srobert Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.21 2004/03/30 22:47:23 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.22 2004/04/02 11:14:06 srobert Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -155,7 +155,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.21 2004/03/30 22:47:23 druzus Exp $" )
    {
       DIR *           dir;
       struct dirent * entry;
-      char   pattern[_POSIX_PATH_MAX +1];
+      char   pattern[ _POSIX_PATH_MAX + 1 ];
       char   szRootDir[ _POSIX_PATH_MAX + 1 ];
    } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
@@ -544,7 +544,6 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    }
 
 #elif defined(HB_OS_WIN_32)
-
    {
       FILETIME ft;
       SYSTEMTIME time;
@@ -599,27 +598,22 @@ static void hb_fsFindFill( PHB_FFIND ffind )
          lSec   = 0;
       }
    }
-
 #elif defined(HB_OS_UNIX)
-
    {
       struct stat sStat;
       time_t ftime;
       struct tm * ft;
-
       char   szFindFile[ _POSIX_PATH_MAX + 1 ];
 
-      strncpy( ffind->szName, info->entry->d_name, 256 );
-      strncpy(szFindFile,info->szRootDir,256);
-      strcat(szFindFile,info->entry->d_name);
+      ffind->szName[ _POSIX_PATH_MAX ] = '\0';
+      strncpy( ffind->szName, info->entry->d_name, _POSIX_PATH_MAX );
+      szFindFile[ _POSIX_PATH_MAX ] = '\0';
+      strncpy( szFindFile, info->szRootDir, _POSIX_PATH_MAX );
+      strncat( szFindFile, info->entry->d_name, _POSIX_PATH_MAX );
 
-      stat(szFindFile,&sStat);
-      strncpy( ffind->szName, info->entry->d_name, 256 );
-
+      stat( szFindFile, &sStat );
       ffind->size = sStat.st_size;
-
       raw_attr = sStat.st_mode;
-
       ftime = sStat.st_mtime;
       ft = localtime( &ftime );
       lYear  = ft->tm_year + 1900;
@@ -628,9 +622,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       lHour  = ft->tm_hour;
       lMin   = ft->tm_min;
       lSec   = ft->tm_sec;
-
    }
-
 #elif defined(HB_OS_MAC)
 
    {
@@ -673,13 +665,11 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
    BOOL bFound;
 
    /* Make sure we have this cleared */
-
    ffind->info = NULL;
 
    /* Do platform dependant first search */
 
 #if defined(HB_OS_DOS)
-
    {
       PHB_FFIND_INFO info;
       errno = 0;
@@ -701,9 +691,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       hb_fsSetError( errno );
    }
-
 #elif defined(HB_OS_OS2)
-
    {
       PHB_FFIND_INFO info;
 
@@ -723,9 +711,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
                              &info->findCount,
                              FIL_STANDARD ) == NO_ERROR && info->findCount > 0;
    }
-
 #elif defined(HB_OS_WIN_32)
-
   {
     PHB_FFIND_INFO info;
     errno = 0;
@@ -813,9 +799,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       }
     }
   }
-
 #elif defined(HB_OS_UNIX)
-
    {
       PHB_FFIND_INFO info;
       char     string[ _POSIX_PATH_MAX + 1 ];
@@ -826,15 +810,15 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
       info = ( PHB_FFIND_INFO ) ffind->info;
-      bFound =0;
+      bFound = FALSE;
       dirname[ 0 ] = '\0';
       info->pattern[ 0 ] = '\0';
 
       if( pszFileName )
       {
-         strcpy( string, pszFileName );
+         strncpy( string, pszFileName, _POSIX_PATH_MAX );
+         string[ _POSIX_PATH_MAX ] = '\0';
          pos = strrchr( string, OS_PATH_DELIMITER );
-
          if( pos )
          {
             strcpy( info->pattern, pos + 1 );
@@ -844,60 +828,47 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
          else
          {
             strcpy( info->pattern, string );
-            strcpy( dirname, ".X" );
-            dirname[ 1 ] = OS_PATH_DELIMITER;
-            dirname[ 2 ] = '\0';
          }
       }
+      if ( ! *dirname )
+      {
+         dirname[ 0 ] = '.';
+         dirname[ 1 ] = OS_PATH_DELIMITER;
+         dirname[ 2 ] = '\0';
+      }
+      strcpy(info->szRootDir, dirname);
 
-      strcpy(info->szRootDir,dirname);
-
-      if( !*info->pattern )
+      if( ! *info->pattern )
       {
          strcpy( info->pattern, "*" );
       }
 
       tzset();
 
-      info->dir = opendir( dirname );
-
-      if( info->dir != NULL) {
+      info->dir = opendir( info->szRootDir );
+      if( info->dir != NULL)
+      {
          while( ( info->entry = readdir( info->dir ) ) != NULL )
          {
-            strcpy( string, info->entry->d_name );
-
-            if( fnmatch( info->pattern,string,FNM_PERIOD|FNM_PATHNAME)==0)
+            if ( fnmatch( info->pattern, info->entry->d_name, FNM_PERIOD | FNM_PATHNAME ) == 0 )
             {
                bFound=TRUE;
                break;
             }
          }
-
       }
-      else
-      {
-         bFound = FALSE;
-      }
-
    }
-
 #elif defined(HB_OS_MAC)
-
    {
       /* TODO */
-
       bFound = FALSE;
    }
-
 #else
-
    {
       HB_SYMBOL_UNUSED( pszFileName );
       HB_SYMBOL_UNUSED( uiAttr );
-
       bFound = FALSE;
    }
-
 #endif
 
    /* Return file info or close the search automatically */
@@ -923,7 +894,6 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
    /* Do platform dependant search */
 
 #if defined(HB_OS_DOS)
-
    {
       #if !defined(__WATCOMC__)
           bFound = ( findnext( &info->entry ) == 0 );
@@ -937,23 +907,18 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
 
       hb_fsSetError( errno );
    }
-
 #elif defined(HB_OS_OS2)
-
    {
       bFound = DosFindNext( info->hFindFile, &info->entry, sizeof( info->entry ), &info->findCount ) == NO_ERROR &&
                             info->findCount > 0;
    }
-
 #elif defined(HB_OS_WIN_32)
-
    {
       errno = 0 ;
       bFound = FALSE;
 
       while( FindNextFile( info->hFindFile, &info->pFindFileData ) )
       {
-
          if( info->dwAttr == 0 ||
              ( info->pFindFileData.dwFileAttributes == 0 ) ||
              ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
@@ -965,26 +930,20 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
             bFound = TRUE;
             break;
          }
-         else {
+         else
+         {
             errno = WintoDosError(GetLastError()) ;
             hb_fsSetError( errno );
             break;
          }
-
       }
    }
-
 #elif defined(HB_OS_UNIX)
-
    {
-      char     string[ _POSIX_PATH_MAX + 1 ];
       bFound=FALSE;
-
       while( ( info->entry = readdir( info->dir ) ) != NULL )
       {
-         strcpy( string, info->entry->d_name );
-
-         if( fnmatch( info->pattern,string,FNM_PERIOD|FNM_PATHNAME)==0)
+         if( fnmatch( info->pattern, info->entry->d_name, FNM_PERIOD|FNM_PATHNAME ) == 0 )
          {
             bFound=TRUE;
             break;
@@ -993,29 +952,21 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
    }
 
 #elif defined(HB_OS_MAC)
-
    {
       /* TODO */
-
       bFound = FALSE;
    }
-
 #else
-
    {
       HB_SYMBOL_UNUSED( info );
-
       bFound = FALSE;
    }
-
 #endif
-
    /* Return file info */
-
-   if( bFound ) {
+   if( bFound )
+   {
       hb_fsFindFill( ffind );
    }
-
    return bFound;
 }
 
@@ -1029,7 +980,6 @@ void HB_EXPORT hb_fsFindClose( PHB_FFIND ffind )
          PHB_FFIND_INFO info = ( PHB_FFIND_INFO ) ffind->info;
 
 #if defined(HB_OS_DOS)
-
          #if defined(__DJGPP__) || defined(__BORLANDC__)
          {
             HB_SYMBOL_UNUSED( info );
@@ -1043,47 +993,33 @@ void HB_EXPORT hb_fsFindClose( PHB_FFIND ffind )
             #endif
          }
          #endif
-
 #elif defined(HB_OS_OS2)
-
          {
             DosFindClose( info->hFindFile );
          }
-
 #elif defined(HB_OS_WIN_32)
-
          {
             FindClose( info->hFindFile );
          }
-
 #elif defined(HB_OS_UNIX)
-
          {
             if (info->dir)
             {
                closedir( info->dir );
             }
          }
-
 #elif defined(HB_OS_MAC)
-
          {
             /* TODO */
          }
-
 #else
-
          {
             /* Intentionally do nothing */
-
             HB_SYMBOL_UNUSED( info );
          }
-
 #endif
-
          hb_xfree( ( void * ) ffind->info );
       }
-
       hb_xfree( ( void * ) ffind );
    }
 }

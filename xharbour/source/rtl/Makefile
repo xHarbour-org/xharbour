@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.49 2004/03/11 10:01:27 lf_sfnet Exp $
+# $Id: Makefile,v 1.50 2004/03/16 21:31:37 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -37,6 +37,7 @@ C_SOURCES=\
         filehb.c     \
         filestat.c   \
         filesys.c    \
+        fserror.c    \
         fparse.c     \
         readline.c   \
         fkmax.c      \
@@ -50,16 +51,16 @@ C_SOURCES=\
         gtapiu.c     \
         gx.c         \
         hardcr.c     \
-        hbbitf.c \
-        hbcomprs.c \
-        hbchksum.c \
+        hbbitf.c     \
+        hbcomprs.c   \
+        hbchksum.c   \
         hbcrc32.c    \
         hbcrypt.c    \
-        hboutdbg.c  \
-        hbhex2n.c \
-        hbserv.c \
-        hbsyslog.c \
-        hbffind.c \
+        hboutdbg.c   \
+        hbhex2n.c    \
+        hbserv.c     \
+        hbsyslog.c   \
+        hbffind.c    \
         hbrandom.c   \
         hbsrlraw.c   \
         hbxml.c      \
@@ -151,9 +152,9 @@ PRG_SOURCES=\
         browdbx.prg  \
         browse.prg   \
         checkbox.prg \
-        color53.prg \
-        cstr.prg \
-        cstruct.prg \
+        color53.prg  \
+        cstr.prg     \
+        cstruct.prg  \
         dbedit.prg   \
         dbsdf.prg    \
         devoutp.prg  \
@@ -167,7 +168,7 @@ PRG_SOURCES=\
         input.prg    \
         hblog.prg    \
         hblognet.prg \
-        hbini.prg \
+        hbini.prg    \
         hbserial.prg \
         listbox.prg  \
         memoedit.prg \

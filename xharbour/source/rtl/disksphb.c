@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.1.1.1 2001/12/21 10:41:29 ronpinkas Exp $
+ * $Id: disksphb.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -73,7 +73,7 @@
 
 HB_FUNC( HB_DISKSPACE )
 {
-   char * szPath = ISCHAR( 1 ) ? hb_parcx( 1 ) : NULL;
+   char * szPath = hb_parc( 1 );
    USHORT uiType = ISNUM( 2 ) ? hb_parni( 2 ) : HB_DISK_AVAIL;
    double dSpace = 0.0;
 
@@ -309,26 +309,27 @@ HB_FUNC( HB_DISKSPACE )
    {
       struct statfs sf;
 
-      statfs( szPath, &sf );
-
-      switch( uiType )
+      if ( statfs( szPath, &sf ) == 0 )
       {
-         case HB_DISK_AVAIL:
-            dSpace = ( double ) sf.f_bavail * ( double ) sf.f_bsize;
-            break;
+         switch( uiType )
+         {
+            case HB_DISK_AVAIL:
+               dSpace = ( double ) sf.f_bavail * ( double ) sf.f_bsize;
+               break;
 
-         case HB_DISK_FREE:
-            dSpace = ( double ) sf.f_bfree * ( double ) sf.f_bsize;
-            break;
+            case HB_DISK_FREE:
+               dSpace = ( double ) sf.f_bfree * ( double ) sf.f_bsize;
+               break;
 
-         case HB_DISK_USED:
-             dSpace = ( double ) ( sf.f_blocks - sf.f_bfree ) *
-                      ( double ) sf.f_bsize;
-             break;
+            case HB_DISK_USED:
+                dSpace = ( double ) ( sf.f_blocks - sf.f_bfree ) *
+                         ( double ) sf.f_bsize;
+                break;
 
-         case HB_DISK_TOTAL:
-            dSpace = ( double ) sf.f_blocks * ( double ) sf.f_bsize;
-            break;
+            case HB_DISK_TOTAL:
+               dSpace = ( double ) sf.f_blocks * ( double ) sf.f_bsize;
+               break;
+         }
       }
    }
 

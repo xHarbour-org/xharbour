@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.33 2004/03/02 08:21:54 andijahja Exp $
+ * $Id: hbapifs.h,v 1.34 2004/03/03 01:33:37 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ HB_EXTERN_BEGIN
 
 #define FS_ERROR F_ERROR
 
-#if defined(X__WIN32__)
+#if defined( HB_WIN32_IO )
 typedef long    FHANDLE;
 #else
 typedef int    FHANDLE;
@@ -140,7 +140,8 @@ extern BOOL     HB_EXPORT hb_fsRename     ( BYTE * pszOldName, BYTE * pszNewName
 extern ULONG    HB_EXPORT hb_fsSeek       ( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode ); /* reposition an open file */
 extern ULONG    HB_EXPORT hb_fsTell       ( FHANDLE hFileHandle ); /* retrieve the current position of a file */
 extern void     HB_EXPORT hb_fsSetDevMode ( FHANDLE hFileHandle, USHORT uiDevMode ); /* change the device mode of a file (text/binary) */
-extern void     HB_EXPORT hb_fsSetError   ( USHORT uiError ); /* set the file system error number */
+extern void     HB_EXPORT hb_fsSetError   ( USHORT uiError ); /* set the file system DOS error number */
+extern void     HB_EXPORT hb_fsSetIOError ( BOOL fResult, USHORT uiOperation ); /* set the file system error number after IO operation */
 extern USHORT   HB_EXPORT hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
 extern ULONG    HB_EXPORT hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern FHANDLE  HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode );

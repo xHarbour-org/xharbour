@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2747 2004/04/05 00:16:02 andijahja Exp $
+ * $Id: ChangeLog,v 1.2748 2004/04/05 00:28:19 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,51 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-05 04:38 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/makefile.bc
+  * xharbour/makefile.nt
+  * xharbour/makefile.vc
+  * xharbour/source/rtl/Makefile
+    + fserror.c added
+
+  * xharbour/source/rtl/diskspac.c
+  * xharbour/source/rtl/disksphb.c
+    * use current version hb_parc() instead of hb_parcx()
+
+  * xharbour/include/hbdefs.h
+    + hack for 64bit systems and [U]LONG_{MIN,MAX} definition
+
+  * xharbour/include/hbapifs.h
+    * new macro HB_WIN32_IO instead of X__WIN32__
+      (X__WIN32__ is still working but I'll remove it soon)
+
+  * xharbour/source/rtl/console.c
+    * use HB_WIN32_IO instead of X__WIN32__
+      Why we use it? Can someone who use Windows explain it?
+      Doesn't DostoWinHandle() work?
+
+  * xharbour/source/rtl/filesys.c
+    * error codes changed. It's first part of changes and I expect
+      that they could introduce temporary instability but it has to
+      be done. I want to clean all sources and use WinAPI only and
+      always when HB_WIN32_IO if set. In other case use compiler's API.
+      Mixing WinAPI with C compiler can cause unexpected results and
+      reduce portability - I think that Windows users will want to
+      see WindowsCE port in the future. I need help from all developers
+      especially Windows ones and other platform/compilers I don't use
+      to continue the changes.
+
+  * xharbour/source/rtl/hbffind.c
+
+  * xharbour/source/rtl/bkgtsks.c
+    * chose unique TaskID in hb_backgroundAddFunc() when counter reach
+      maximum value
+    ! removed hb_itemRelese in hb_backgroundDelFunc() - it's necessary if
+      HB_BACKGROUNDDEL() should return codeblock.
+      It should be documented that on C level caller of hb_backgroundDelFunc()
+      should make hb_itemRelease() on returned value if is not NULL
+
 2004-04-05 07:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/hbxml.c
     ! fix inconsistent function declarations

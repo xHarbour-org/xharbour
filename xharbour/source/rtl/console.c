@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.45 2004/03/23 12:43:00 andijahja Exp $
+ * $Id: console.c,v 1.46 2004/03/24 11:49:05 andijahja Exp $
  */
 /*
  * Harbour Project source code:
@@ -67,6 +67,7 @@
  * See doc/license.txt for licensing terms.
  *
  */
+
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK
@@ -114,7 +115,7 @@ static USHORT s_uiPCol;
 static SHORT  s_originalMaxRow;
 static SHORT  s_originalMaxCol;
 static char   s_szCrLf[ CRLF_BUFFER_LEN ];
-#if defined(X__WIN32__)
+#if defined( HB_WIN32_IO )
 static HANDLE    s_iFilenoStdin;
 static HANDLE    s_iFilenoStdout;
 static HANDLE    s_iFilenoStderr;
@@ -139,7 +140,7 @@ void hb_conInit( void )
 #endif
 
    s_uiPRow = s_uiPCol = 0;
-#if defined(X__WIN32__)
+#if defined( HB_WIN32_IO )
    s_iFilenoStdin = GetStdHandle( STD_INPUT_HANDLE );
    s_iFilenoStdout = GetStdHandle( STD_OUTPUT_HANDLE );
 #else
@@ -152,31 +153,31 @@ void hb_conInit( void )
       int iStderr = hb_cmdargNum( "STDERR" ); /* Undocumented CA-Clipper switch //STDERR:x */
 
       if( iStderr < 0 )        /* //STDERR not used or invalid */
-#if !defined(X__WIN32__)
-         s_iFilenoStderr = fileno( stderr );
-#else
+#if defined( HB_WIN32_IO )
          s_iFilenoStderr = GetStdHandle( STD_ERROR_HANDLE );
+#else
+         s_iFilenoStderr = fileno( stderr );
 #endif
       else if( iStderr == 0 )  /* //STDERR with no parameter or 0 */
          s_iFilenoStderr = s_iFilenoStdout;
       else                     /* //STDERR:x */
-#if defined(X__WIN32__)
+#if defined( HB_WIN32_IO )
          s_iFilenoStderr = (HANDLE) iStderr;
 #else
          s_iFilenoStderr = iStderr;
 #endif
    }
 #else
-#if !defined(X__WIN32__)
-   s_iFilenoStderr = fileno( stderr );
-#else
+#if defined( HB_WIN32_IO )
    s_iFilenoStderr = GetStdHandle( STD_ERROR_HANDLE );
+#else
+   s_iFilenoStderr = fileno( stderr );
 #endif
 
 #endif
    /* Some compilers open stdout and stderr in text mode, but
       Harbour needs them to be open in binary mode. */
-#if !defined(X__WIN32__)
+#if !defined( HB_WIN32_IO )
    hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
    hb_fsSetDevMode( s_iFilenoStderr, FD_BINARY );
 #endif
@@ -202,7 +203,7 @@ void hb_conRelease( void )
          /* If the program changed the screen size, restore the original */
          hb_gtSetMode( s_originalMaxRow + 1, s_originalMaxCol + 1 );
       }
-#if !defined(X__WIN32__)
+#if !defined( HB_WIN32_IO )
       hb_fsSetDevMode( s_iFilenoStdout, FD_TEXT );
       hb_fsSetDevMode( s_iFilenoStderr, FD_TEXT );
 #endif

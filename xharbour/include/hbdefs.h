@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.31 2004/04/01 09:35:36 andijahja Exp $
+ * $Id: hbdefs.h,v 1.32 2004/04/01 20:36:14 andijahja Exp $
  */
 
 /*
@@ -61,18 +61,27 @@
 #include "hbsetup.h"
 #include "hbtrace.h"
 
-/* Include windows.h if applicable and requested */
+#if defined( HB_OS_WIN_32 )
+   #if defined( X__WIN32__ ) && !defined( HB_WIN32_IO )
+      #define HB_WIN32_IO
+   #endif
+#else
+   #if defined( HB_WIN32_IO )
+      #undef HB_WIN32_IO
+   #endif
+#endif
 
-#if defined(HB_OS_WIN_32_USED) && defined(HB_OS_WIN_32)
+/* Include windows.h if applicable and requested */
+#if defined( HB_OS_WIN_32_USED ) && defined( HB_OS_WIN_32 )
 
    #define WIN32_LEAN_AND_MEAN
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
    #include <windows.h>
-   #if defined(__GNUC__)
+   #if defined( __GNUC__ )
       #define HB_DONT_DEFINE_BASIC_TYPES
    #endif
 
-#elif defined(HB_OS_OS2)
+#elif defined( HB_OS_OS2 )
 
    /* With the exception of WORD, the IBM Visual Age C++ compiler has
       its own definitions of the Harbour types most of which conflict with the
@@ -99,7 +108,7 @@
    #undef UINT
    #define HB_DONT_DEFINE_BASIC_TYPES
 
-#elif defined(HB_OS_DOS)
+#elif defined( HB_OS_DOS )
 
    #include <dos.h>
 
@@ -119,7 +128,7 @@
 
 #endif
 
-#if ! defined(HB_DONT_DEFINE_BASIC_TYPES)
+#if ! defined( HB_DONT_DEFINE_BASIC_TYPES )
 
    #undef BOOL                            /* boolean */
    typedef int BOOL;
@@ -136,11 +145,30 @@
    #undef USHORT                          /* 2 bytes unsigned */
    typedef unsigned short int USHORT;
 
+#if UINT_MAX > USHRT_MAX && ULONG_MAX > UINT_MAX
+   /* It's a temporary hack for 64bit machines, xHarbour use [U]LONG type
+    * as 32bit integer and this type has to be redefined in such way
+    * In the future we should clean it.
+    */
+   #undef LONG                            /* 4 bytes signed */
+   typedef int LONG;
+
+   #undef ULONG                           /* 4 bytes unsigned */
+   typedef unsigned int ULONG;
+
+   #undef ULONG_MAX
+   #define ULONG_MAX    (~(ULONG) 0)
+   #undef LONG_MAX
+   #define LONG_MAX     ((LONG)( ULONG_MAX >> 1 ))
+   #undef LONG_MIN
+   #define LONG_MIN     (-LONG_MAX - 1)
+#else
    #undef LONG                            /* 4 bytes signed */
    typedef long LONG;
 
    #undef ULONG                           /* 4 bytes unsigned */
    typedef unsigned long ULONG;
+#endif
 
    #undef FALSE
    #define FALSE  (BOOL) 0

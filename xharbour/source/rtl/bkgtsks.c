@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.11 2004/04/04 22:04:41 andijahja Exp $
+ * $Id: bkgtsks.c,v 1.12 2004/04/04 23:38:00 fsgiudice Exp $
  */
 
 /*
@@ -64,9 +64,10 @@
 #define HB_OS_WIN_32_USED
 
 #define HB_THRAED_OPTIMIZE_STACK
-#include "hbstack.h"
+
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbstack.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "error.ch"
@@ -119,25 +120,45 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
 
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
-   pBkgTask->ulTaskID = ++s_ulBackgroundID;
    pBkgTask->pTask    = hb_itemNew( pBlock );
    pBkgTask->dSeconds = hb_secondsCPU( 3 );
    pBkgTask->millisec = nMillisec;
    pBkgTask->bActive  = bActive;
 
-   ++s_uiBackgroundMaxTask;
    if( !s_pBackgroundTasks )
    {
+      pBkgTask->ulTaskID = s_ulBackgroundID = 1;
       s_pBackgroundTasks = ( PHB_BACKGROUNDTASK * ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
    }
    else
    {
+      pBkgTask->ulTaskID = ++s_ulBackgroundID;
+      if ( pBkgTask->ulTaskID == 0 ) /* the counter reach maximum value */
+      {
+         /* find unique task ID and set the counter for next */
+         int iTask = 0;
+         while( iTask < s_uiBackgroundMaxTask )
+         {
+            if ( s_pBackgroundTasks[ iTask ]->ulTaskID == pBkgTask->ulTaskID )
+            {
+               pBkgTask->ulTaskID++;
+               /* This list is unsorted so we have to scan from the begining again */
+               iTask = 0;
+            }
+            else
+            {
+               iTask++;
+               if ( s_ulBackgroundID < pBkgTask->ulTaskID )
+               {
+                  s_ulBackgroundID = pBkgTask->ulTaskID;
+               }
+            }
+         }
+      }
       s_pBackgroundTasks = ( PHB_BACKGROUNDTASK * ) hb_xrealloc( s_pBackgroundTasks, sizeof( HB_BACKGROUNDTASK ) * s_uiBackgroundMaxTask );
+      s_pBackgroundTasks[ s_uiBackgroundMaxTask ] = pBkgTask;
    }
-   s_pBackgroundTasks[ s_uiBackgroundMaxTask - 1 ] = pBkgTask;
-
-   /* return a pointer as a handle to this Background task
-   */
+   ++s_uiBackgroundMaxTask;
 
    return pBkgTask->ulTaskID;
 
@@ -262,6 +283,7 @@ void hb_backgroundShutDown( void )
    }
 }
 
+/* caller have to free return ITEM by hb_itemRelease() if it's not NULL */
 PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
 {
    HB_THREAD_STUB
@@ -276,20 +298,13 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
    while( iTask < s_uiBackgroundMaxTask )
    {
       pBkgTask = s_pBackgroundTasks[ iTask ];
-      pItem = pBkgTask->pTask;
-
-      //if( ( pItem->type == HB_IT_BLOCK &&
-      //      ulID == ( ULONG ) pItem->item.asBlock.value ) ||
-      //    ( pItem->type == HB_IT_ARRAY &&
-      //      ulID == ( ULONG ) pItem->item.asArray.value ) )
 
       if( ulID == pBkgTask->ulTaskID )
       {
-         --s_uiBackgroundMaxTask;
-         hb_itemRelease( pItem );
+         pItem = pBkgTask->pTask;
          hb_xfree( pBkgTask );
 
-         if( s_uiBackgroundMaxTask )
+         if( --s_uiBackgroundMaxTask )
          {
             if( iTask != s_uiBackgroundMaxTask )
             {
@@ -440,7 +455,6 @@ HB_FUNC( HB_BACKGROUNDDEL )
    if( s_pBackgroundTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
    {
       ULONG ulID = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
-
       pItem = hb_backgroundDelFunc( ulID );
    }
 
@@ -451,6 +465,7 @@ HB_FUNC( HB_BACKGROUNDDEL )
    else
    {
       hb_itemReturn( pItem ); /* return a codeblock */
+      hb_itemRelease( pItem );
    }
 }
 
