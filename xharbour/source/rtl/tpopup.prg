@@ -304,6 +304,9 @@ METHOD GetShortct( nKey ) CLASS PopUpMenu
    LOCAL oItems
 
    FOR EACH oItems IN ::aItems
+      If HB_ISSTRING(oItems:shortcut)
+        oItems:shortcut := Asc(oItems:shortcut[1])
+      End
       if oItems:enabled .and. oItems:shortcut == nKey
          return HB_EnumIndex()
       endif
