@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.162 2004/07/18 17:56:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.163 2004/08/19 13:11:27 likewolf Exp $
  */
 
 /*
@@ -1553,7 +1553,6 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   HB_TRACE(HB_TR_DEBUG, ("ConvertPatterns(%s, %d, %s, %d)", mpatt, mlen, rpatt, rlen));
 
   //#define DEBUG_PATTERNS
-
   #ifdef DEBUG_PATTERNS
      printf( "Match: >%s<\n", mpatt );
      printf( "Result: >%s<\n", rpatt );
@@ -1768,7 +1767,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            exptype = '0';
            ptr = mpatt + i;
 
-           //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, mlen - i, mlen - i, ptr );
+           //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, mlen - ( ptr - mpatt ), mlen - ( ptr - mpatt ), ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
            while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
@@ -1819,6 +1818,11 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
               while( *pTmp && *pTmp != '>' )
               {
+                 if( exptype != 2 && isalnum( *pTmp ) )
+                 {
+                    break;
+                 }
+
                  if( exptype != '0' )
                  {
                     pTmp++;
@@ -1878,6 +1882,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
            /* Look for appropriate result markers */
            ptr = rpatt;
+
+           //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, rlen - ( ptr - rpatt ), rlen - ( ptr - rpatt ), ptr );
 
            while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
            {

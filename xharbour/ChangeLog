@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3400 2004/09/03 16:08:22 druzus Exp $
+ * $Id: ChangeLog,v 1.3401 2004/09/03 16:40:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-04 11:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in ConvertPatterns() when Match Marker was later used in linger form (with some suffix letter)
 
 2004-09-03 18:45 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/Makefile
@@ -22,7 +26,7 @@
   * xharbour/source/compiler/gencobj.c
     * now you can you set HB_CFG_FILE=mycfg.conf. It is useful if you use
     * ( like me ) different C compilers. Before it was necessary to copy
-    * <file>.cfg to harbour.cfg. It is an addition, it does not change 
+    * <file>.cfg to harbour.cfg. It is an addition, it does not change
     * the default behaviour.
 
 2004-09-03 15:55 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
