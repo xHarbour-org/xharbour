@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.16 2004/08/06 02:25:37 maurifull Exp $
+ * $Id: gx.c,v 1.17 2004/10/22 14:29:06 paultucker Exp $
  */
 
 /*
@@ -83,8 +83,22 @@ HB_FUNC( NOSNOW )
 
 HB_FUNC( SETMODE )
 {
-   hb_retl( hb_gtSetMode( ISNUM( 1 ) ? hb_parni( 1 ) : ( hb_gtMaxRow() + 1 ),
-                          ISNUM( 2 ) ? hb_parni( 2 ) : ( hb_gtMaxCol() + 1 ) ) == 0 );
+   int nRow = -1, nCol = -1;
+
+   if( ISNUM( 1 ) && ISNUM( 2 ) )
+   {
+      nRow = hb_parni( 1 );
+      nCol = hb_parni( 2 );
+   }
+
+   if( nRow == -1 || nCol == -1 )
+   {
+      nRow = hb_gtMaxRow() + 1;
+      nCol = hb_gtMaxCol() + 1;
+   }
+
+   hb_retl( hb_gtSetMode( nRow, nCol ) == 0 );
+
 }
 
 HB_FUNC( SETGTCLOSEHANDLER )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.73 2004/10/23 23:00:00 paultucker Exp $
+ * $Id: gtwin.c,v 1.73 2004/10/23 23:33:30 oh1 Exp $
  */
 
 /*
@@ -2325,9 +2325,6 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
-   HB_SYMBOL_UNUSED( vpParam );
 
    switch ( iMsgType )
    {
@@ -2355,12 +2352,12 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       case GTI_VIEWMAXHEIGHT:
       {
          COORD coBuf = GetLargestConsoleWindowSize( s_HOutput );
-         return coBuf.Y;
+         return coBuf.Y - 1;
       }
       case GTI_VIEWMAXWIDTH:
       {
          COORD coBuf = GetLargestConsoleWindowSize( s_HOutput );
-         return coBuf.X;
+         return coBuf.X - 1;
       }
 
    }
