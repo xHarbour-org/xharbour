@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3910 2005/03/06 00:52:59 andijahja Exp $
+ * $Id: ChangeLog,v 1.3911 2005/03/06 03:23:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-06 12:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    ! bug fix on compiling empty segment of #pragma begin/enddump
+
 2005-03-06 10:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/errorsys.prg
     ! HB_BUILDDATE() to stand free for all platform

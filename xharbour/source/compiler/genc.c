@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.83 2005/02/24 11:12:35 andijahja Exp $
+ * $Id: genc.c,v 1.84 2005/02/27 11:56:02 andijahja Exp $
  */
 
 /*
@@ -281,7 +281,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       /* check c-in-line static functions */
       pInline = hb_comp_inlines.pFirst;
-      if ( pInline )
+      if ( pInline && pInline->pCode )
       {
          hb_compGenCInLineSymbol();
       }
@@ -678,7 +678,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       pInline = hb_comp_inlines.pFirst;
 
-      if ( pInline )
+      if ( pInline && pInline->pCode )
       {
          hb_compGenCInLine( yyc );
       }
@@ -687,7 +687,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    {
       pInline = hb_comp_inlines.pFirst;
 
-      if ( pInline )
+      if ( pInline && pInline->pCode )
       {
          hb_compGenCInLine( yyc );
       }
@@ -943,6 +943,7 @@ static void hb_compGenCInLine( FILE *yyc )
          }
          fprintf( yyc, "%c", *pszFileName++ );
       }
+
       fprintf( yyc, "\"\n" );
 
       if( pInline->szName )
