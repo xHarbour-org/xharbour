@@ -1,5 +1,5 @@
 /*
-* $Id$
+* $Id: thread.h,v 1.3 2002/12/19 22:25:25 jonnymind Exp $
 */
 
 /*
@@ -67,17 +67,17 @@
 
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
     #include <pthread.h>
-    #define HB_THREAD_T pthread_t
-    #define HB_MUTEX_T pthread_mutex_t
-    #define HB_MUTEX_INIT( x )      pthread_mutex_init( x, NULL )
-    #define HB_MUTEX_DESTROY( x )   pthread_mutex_destroy( x )
+    #define HB_THREAD_T                 pthread_t
+    #define HB_MUTEX_T                  pthread_mutex_t
+    #define HB_MUTEX_INIT( x )          pthread_mutex_init( &x, NULL )
+    #define HB_MUTEX_DESTROY( x )       pthread_mutex_destroy( x )
     #define HB_MUTEX_LOCK( x )          pthread_mutex_lock( x )
     #define HB_MUTEX_UNLOCK( x )        pthread_mutex_unlock( x )
 
-    #define HB_COND_T 		pthread_cond_t
-    #define HB_COND_INIT( x )			pthread_cond_init( x, NULL )
-    #define HB_COND_WAIT( x, y )			pthread_cond_wait( x, y )
-    #define HB_COND_WAITTIME( x, y, t )			\
+    #define HB_COND_T                   pthread_cond_t
+    #define HB_COND_INIT( x )           pthread_cond_init( x, NULL )
+    #define HB_COND_WAIT( x, y )        pthread_cond_wait( x, y )
+    #define HB_COND_WAITTIME( x, y, t )  \
         {\
             struct timeval now;\
             struct timespec timeout;\
@@ -86,27 +86,27 @@
             timeout.tv_nsec = now.tv_usec * 1000 + (t % 1000) * 1000000 ;\
             pthread_cond_timedwait(x, y, &timeout);\
         }
-    #define HB_COND_SIGNAL( x )		pthread_cond_signal( x )
-    #define HB_COND_DESTROY( x )		pthread_cond_destroy( x )
+    #define HB_COND_SIGNAL( x )         pthread_cond_signal( x )
+    #define HB_COND_DESTROY( x )        pthread_cond_destroy( x )
 
-    #define HB_CURRENT_THREAD		pthread_self
+    #define HB_CURRENT_THREAD           pthread_self
 
 /* Thread support is only for linux and windows now */
 #elif defined(HB_OS_WIN_32)
-    #define HB_THREAD_T           HANDLE
-    #define HB_MUTEX_T 			HANDLE
-    #define HB_MUTEX_INIT( x ) 		CreateMutex( x )
-    #define HB_MUTEX_DESTROY( x )  	CloseHandle( x )
-    #define HB_MUTEX_LOCK( x )			WaitForSingleObject( x )
-    #define HB_MUTEX_UNLOCK( x )		ReleaseMutex( x )
-    #define HB_COND_T 			HANDLE
-    #define HB_COND_INIT( x )			CreateEvent( x, TRUE, FALSE, NULL )
-    #define HB_COND_WAIT( x, y )		SignalObjectAndWait( y, x, INFINITE, FALSE )
-    #define HB_COND_WAITTIME( x, y, t )			SignalObjectAndWait( y, x, t *1000, FALSE )
-    #define HB_COND_SIGNAL( x )		SetEvent( x )
-    #define HB_COND_DESTROY( x )		CloseHandle( x )
+    #define HB_THREAD_T                 HANDLE
+    #define HB_MUTEX_T                  HANDLE
+    #define HB_MUTEX_INIT( x )          x = CreateMutex( NULL, FALSE, NULL)
+    #define HB_MUTEX_DESTROY( x )       CloseHandle( x )
+    #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
+    #define HB_MUTEX_UNLOCK( x )        ReleaseMutex( x )
+    #define HB_COND_T                   HANDLE
+    #define HB_COND_INIT( x )           CreateEvent( x, TRUE, FALSE, NULL )
+    #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
+    #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
+    #define HB_COND_SIGNAL( x )         SetEvent( x )
+    #define HB_COND_DESTROY( x )        CloseHandle( x )
 
-    #define HB_CURRENT_THREAD		GetCurrentThread
+    #define HB_CURRENT_THREAD           GetCurrentThread
 #endif
 
 /* Complex Mutex Structure*/

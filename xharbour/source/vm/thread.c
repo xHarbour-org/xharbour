@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.4 2002/12/19 18:15:36 ronpinkas Exp $
+* $Id: thread.c,v 1.5 2002/12/19 22:25:25 jonnymind Exp $
 */
 
 /*
@@ -238,9 +238,9 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
 
 void hb_contextInit( void )
 {
-hb_ht_context = NULL;
-HB_MUTEX_INIT( &context_monitor );
-last_context = NULL;
+    hb_ht_context = NULL;
+    HB_MUTEX_INIT( context_monitor );
+    last_context = NULL;
 }
 
 #ifdef HB_OS_WIN_32
@@ -258,148 +258,159 @@ void *sym
 #endif
                 )
 {
-USHORT uiParam;
-HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) sym;
-PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->args, 1 );
+    USHORT uiParam;
+    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) sym;
+    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->args, 1 );
 
-hb_createContext();
+    hb_createContext();
 
-if( HB_IS_SYMBOL( pPointer ) )
-{
-    hb_vmPushSymbol( pPointer->item.asSymbol.value );
-}
-else if( HB_IS_STRING( pPointer ) )
-{
-    PHB_DYNS pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
-
-    hb_vmPushSymbol( pExecSym->pSymbol );
-    hb_vmPushNil();
-}
-else if( HB_IS_BLOCK( pPointer ) )
-{
-    hb_vmPushSymbol( &hb_symEval );
-    hb_vmPush( pPointer );
-}
-
-for( uiParam = 2; uiParam <= pt->count; uiParam++ )
-{
-    hb_vmPush( hb_arrayGetItemPtr( pt->args, uiParam ) );
-}
-
-if( HB_IS_OBJECT( hb_arrayGetItemPtr( pt->args, 2 ) ) )
-{
-    hb_vmSend( pt->count - 2 );
-}
-else
-{
     if( HB_IS_SYMBOL( pPointer ) )
     {
-        hb_vmDo( pt->count - 2 );
+        hb_vmPushSymbol( pPointer->item.asSymbol.value );
+    }
+    else if( HB_IS_STRING( pPointer ) )
+    {
+        PHB_DYNS pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
+
+        hb_vmPushSymbol( pExecSym->pSymbol );
+        hb_vmPushNil();
+    }
+    else if( HB_IS_BLOCK( pPointer ) )
+    {
+        hb_vmPushSymbol( &hb_symEval );
+        hb_vmPush( pPointer );
+    }
+
+    for( uiParam = 2; uiParam <= pt->count; uiParam++ )
+    {
+        hb_vmPush( hb_arrayGetItemPtr( pt->args, uiParam ) );
+    }
+
+    if( HB_IS_OBJECT( hb_arrayGetItemPtr( pt->args, 2 ) ) )
+    {
+        hb_vmSend( pt->count - 2 );
     }
     else
     {
-        hb_vmDo( pt->count - 1 );
+        if( HB_IS_SYMBOL( pPointer ) )
+        {
+            hb_vmDo( pt->count - 2 );
+        }
+        else
+        {
+            hb_vmDo( pt->count - 1 );
+        }
     }
+
+    hb_itemRelease( pt->args );
+    free( pt );
+
+    hb_destroyContext();
+
+    return NULL;
 }
 
-hb_itemRelease( pt->args );
-free( pt );
 
-hb_destroyContext();
 
-return NULL;
-}
 
 HB_FUNC( STARTTHREAD )
 {
-PHB_ITEM pPointer;
-PHB_ITEM pargs;
-HB_THREAD_T thid;
-HB_THREAD_PARAM *pt;
+    PHB_ITEM pPointer;
+    PHB_ITEM pargs;
+    HB_THREAD_T thid;
+    HB_THREAD_PARAM *pt;
 
-pargs = hb_arrayFromParams( hb_stack.pBase );
-pPointer  = hb_arrayGetItemPtr( pargs, 1 );
+    #if defined(HB_OS_WIN_32)
+    ULONG ulthid;
+    #endif
 
-/* Error Checking */
-if ( pPointer->type == HB_IT_LONG )
-{
-    PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
-    PHB_ITEM pSelf = NULL;
-    PHB_DYNS pExecSym;
+    pargs = hb_arrayFromParams( hb_stack.pBase );
+    pPointer  = hb_arrayGetItemPtr( pargs, 1 );
 
-    if( hb_pcount() >= 2 )
+    /* Error Checking */
+    if ( pPointer->type == HB_IT_LONG )
     {
-        if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
+        PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
+        PHB_ITEM pSelf = NULL;
+        PHB_DYNS pExecSym;
+
+        if( hb_pcount() >= 2 )
         {
-            pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
-            pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+            if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
+            {
+                pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
+                pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+            }
+        }
+
+        if( pSelf == NULL )
+        {
+            pExecSym = hb_dynsymFindFromFunction( pFunc );
+        }
+
+        if( pExecSym == NULL )
+        {
+            hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            return;
+        }
+
+        // Converting it to its Symbol.
+        pPointer->type = HB_IT_SYMBOL;
+        pPointer->item.asSymbol.value = pExecSym->pSymbol;
+    }
+    else if( HB_IS_STRING( pPointer ) )
+    {
+        PHB_DYNS pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
+
+        if( ! pDynSym )
+        {
+            hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pargs );
+            hb_itemRelease( pargs );
+            return;
         }
     }
-
-    if( pSelf == NULL )
+    else if( ( ! HB_IS_BLOCK( pPointer ) ) && ( ! HB_IS_SYMBOL( pPointer ) )  && ( ! HB_IS_LONG( pPointer ) ) )
     {
-        pExecSym = hb_dynsymFindFromFunction( pFunc );
-    }
-
-    if( pExecSym == NULL )
-    {
-        hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-        return;
-    }
-
-    // Converting it to its Symbol.
-    pPointer->type = HB_IT_SYMBOL;
-    pPointer->item.asSymbol.value = pExecSym->pSymbol;
-}
-else if( HB_IS_STRING( pPointer ) )
-{
-    PHB_DYNS pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
-
-    if( ! pDynSym )
-    {
-        hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pargs );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pargs );
         hb_itemRelease( pargs );
         return;
     }
-}
-else if( ( ! HB_IS_BLOCK( pPointer ) ) && ( ! HB_IS_SYMBOL( pPointer ) )  && ( ! HB_IS_LONG( pPointer ) ) )
-{
-    hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pargs );
-    hb_itemRelease( pargs );
-    return;
-}
 
-pt = (HB_THREAD_PARAM *) malloc( sizeof( HB_THREAD_PARAM ) );
-pt->args = pargs;
-pt->count = hb_pcount();
+    pt = (HB_THREAD_PARAM *) malloc( sizeof( HB_THREAD_PARAM ) );
+    pt->args = pargs;
+    pt->count = hb_pcount();
 
-/*phase 3: launch thread */
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-if( pthread_create( &thid, NULL, hb_create_a_thread, (void * ) pt ) == 0 );
-#else
-if( CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &thid ) )
-#endif
-{
-    // Wait for the actual creation.
-    while( hb_ht_context == NULL )
+    /*phase 3: launch thread */
+    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+    if( pthread_create( &thid, NULL, hb_create_a_thread, (void * ) pt ) == 0 );
+    #elif defined(HB_OS_WIN_32)
+    thid = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &ulthid );
+    if( ! thid )
+    #endif
     {
-        #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+        // Wait for the actual creation.
+        while( hb_ht_context == NULL )
         {
-            static struct timespec nanosecs = { 0, 1000 };
-            nanosleep( &nanosecs, NULL );
+            #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+            {
+                static struct timespec nanosecs = { 0, 1000 };
+                nanosleep( &nanosecs, NULL );
+            }
+            #elif defined(HB_OS_WIN_32)
+                Sleep( 0 );
+            #endif
         }
-        #elif defined(HB_OS_WIN_32)
-            Sleep( 0 );
-        #endif
     }
+
+    hb_retnl( (long) thid );
 }
 
-hb_retnl( (long) thid );
-}
+
+
 
 HB_FUNC( STOPTHREAD )
 {
-    HB_THREAD_T th = hb_parni( 1 );
+    HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
     PHB_ITEM pargs;
 
     if( ! ISNUM( 1 ) || hb_pcount() != 1 )
@@ -414,8 +425,8 @@ HB_FUNC( STOPTHREAD )
     pthread_cancel( th );
     pthread_join( th, 0 );
 #else
-    TerminateThread( th, 0)
-    WaitForSingleEvent( th, INFINITE );
+    TerminateThread( th, 0);
+    WaitForSingleObject( th, INFINITE );
 #endif
     hb_destroyContextId( th );
 
@@ -423,7 +434,7 @@ HB_FUNC( STOPTHREAD )
 
 HB_FUNC( KILLTHREAD )
 {
-    HB_THREAD_T th = hb_parni( 1 );
+    HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
     PHB_ITEM pargs;
 
     if( ! ISNUM( 1 ) || hb_pcount() != 1 )
@@ -436,13 +447,14 @@ HB_FUNC( KILLTHREAD )
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
     pthread_cancel( th );
 #else
-    TerminateThread( th, 0)
+    TerminateThread( th, 0);
 #endif
 }
 
 HB_FUNC( CLEARTHREAD )
 {
     PHB_ITEM pargs;
+    HB_THREAD_T th;
 
     if( ! ISNUM( 1 ) || hb_pcount() != 1 )
     {
@@ -451,13 +463,15 @@ HB_FUNC( CLEARTHREAD )
         hb_itemRelease( pargs );
         return;
     }
-    HB_THREAD_T th = hb_parni( 1 );
+    th = (HB_THREAD_T) hb_parnl( 1 );
+
     hb_destroyContextId( th );
 }
 
 HB_FUNC( JOINTHREAD )
 {
     PHB_ITEM pargs;
+    HB_THREAD_T  th;
 
     if( ! ISNUM( 1 ) || hb_pcount() != 1 )
     {
@@ -466,13 +480,13 @@ HB_FUNC( JOINTHREAD )
         hb_itemRelease( pargs );
         return;
     }
-    HB_THREAD_T th = hb_parni( 1 );
+    th = (HB_THREAD_T) hb_parnl( 1 );
 
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+#if ! defined( HB_OS_WIN_32 )
     pthread_join( th, 0 );
 #else
-    WaitForSingleObject( th, INFINITE )
+    WaitForSingleObject( th, INFINITE );
 #endif
 
 }
@@ -481,9 +495,13 @@ HB_FUNC( JOINTHREAD )
 HB_FUNC( CREATEMUTEX )
 {
     HB_MUTEX_STRUCT *mt = (HB_MUTEX_STRUCT *) malloc( sizeof( HB_MUTEX_STRUCT ) );
+
+#if ! defined( HB_OS_WIN_32 )
     mt->mutex = (HB_MUTEX_T *) malloc( sizeof( HB_MUTEX_T ) );
+#endif
+
     mt->cond = (HB_COND_T *) malloc( sizeof( HB_COND_T ) );
-    HB_MUTEX_INIT( mt->mutex );
+    HB_MUTEX_INIT( *(mt->mutex) );
     HB_COND_INIT( mt->cond );
     mt->lock_count = 0;
     mt->waiting = 0;
@@ -512,7 +530,9 @@ HB_FUNC( DESTROYMUTEX )
     mutex = hb_parptr( 1 );
     HB_MUTEX_DESTROY( mutex->mutex );
     HB_COND_DESTROY( mutex->cond );
+#if ! defined( HB_OS_WIN_32 )
     free( mutex->mutex );
+#endif
     free( mutex->cond );
     free( mutex );
 }
@@ -591,7 +611,7 @@ HB_FUNC( SUBSCRIBE )
             HB_COND_WAIT( mt->cond, mt->mutex );
         else {
             int wt = mt->waiting;
-            HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parni( 2 ) );
+            HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
             if ( wt == mt->waiting ) mt->waiting --;
         }
     }
@@ -651,7 +671,7 @@ HB_FUNC( SUBSCRIBENOW )
         HB_COND_WAIT( mt->cond, mt->mutex );
     else {
         int wt = mt->waiting;
-        HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parni( 2 ) );
+        HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
         if ( wt == mt->waiting ) mt->waiting --;
     }
 
@@ -701,6 +721,7 @@ HB_FUNC( NOTIFY )
 
 HB_FUNC( NOTIFYALL )
 {
+    HB_MUTEX_STRUCT *mt;
     PHB_ITEM pargs;
 
     /* Parameter error checking */
@@ -712,7 +733,6 @@ HB_FUNC( NOTIFYALL )
         hb_itemRelease( pargs );
         return;
     }
-    HB_MUTEX_STRUCT *mt;
 
     mt = hb_parptr( 1 );
     if ( hb_pcount() == 2 )

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.13 2002/12/16 06:02:47 ronpinkas Exp $
+ * $Id: console.c,v 1.14 2002/12/18 13:43:56 ronpinkas Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ void hb_conInit( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
 
    #ifdef HB_THREAD_SUPPORT
-       HB_MUTEX_INIT( &s_Mutex );
+       HB_MUTEX_INIT( s_Mutex );
    #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)

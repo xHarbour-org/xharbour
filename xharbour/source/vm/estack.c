@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.16 2002/12/18 13:43:57 ronpinkas Exp $
+ * $Id: estack.c,v 1.17 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -81,11 +81,7 @@ HB_STACK hb_stack;
          HB_THREAD_CONTEXT *p;
          HB_THREAD_T id;
 
-         #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-            id = pthread_self();
-         #else
-            id = GetCurrentThreadId();
-         #endif
+         id = HB_CURRENT_THREAD();
 
          /*
          if ( last_context != NULL && last_context->th_id == id )
