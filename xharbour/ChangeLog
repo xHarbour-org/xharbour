@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2787 2004/04/14 20:59:07 andijahja Exp $
+ * $Id: ChangeLog,v 1.2788 2004/04/14 22:39:09 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-15 01:15 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+
+  * contrib/rdd_ads/adsfunc.c
+    + added AdsGetConnectionType( [hConnect] ) and AdsGetTableConType() to
+      retrieve the type of a given connection handle or the type
+      of connection used in the current workarea.
+      Thanks to Randy Portnoff for the original code.
+
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    * Docs for above funcs, plus minor formatting and grammar fixes.
+
 2004-04-15 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/pp/ppcore.c
   * source/compiler/cmdcheck.c

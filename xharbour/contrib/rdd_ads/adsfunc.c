@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.34 2004/04/01 22:00:41 druzus Exp $
+ * $Id: adsfunc.c,v 1.35 2004/04/02 00:32:57 druzus Exp $
  */
 
 /*
@@ -173,30 +173,59 @@ HB_FUNC( ADSISSERVERLOADED )
    hb_retnl( pbLoaded );
 }
 
-/* HB_FUNC( ADSGETCONNECTIONTYPE )
+HB_FUNC( ADSGETCONNECTIONTYPE )
 {
    UNSIGNED16 pusConnectType = 0;
    UNSIGNED32 ulRetVal;
-   ADSHANDLE  nConnToCheck = hb_parnl(1) ; // caller can specify a connection
+   ADSHANDLE  hConnToCheck = ISNUM( 1 ) ? (ADSHANDLE) hb_parnl( 1 ) : adsConnectHandle;
+      // caller can specify a connection. Otherwise use current handle.
+      // The global adsConnectHandle will continue to be 0 if no adsConnect60 (Data
+      // Dictionary) calls are made. Simple table access uses an implicit connection
+      // whose handle we don't see unless you get it from an opened table
+      // with  ADSGETTABLECONTYPE
 
-   if( !nConnToCheck )
+   if( hConnToCheck )
    {
-      nConnToCheck = adsConnectHandle;
+      ulRetVal = AdsGetConnectionType ( hConnToCheck, &pusConnectType ) ;
+      if( ulRetVal != AE_SUCCESS )
+      {
+         // it may have set an error value, or leave as 0.   pusConnectType = AE_INVALID_CONNECTION_HANDLE;
+      }
    }
-
-   if( !nConnToCheck )
+   else
    {
-      nConnToCheck = adsConnectHandle;
-   }
-   ulRetVal = AdsGetConnectionType (adsConnectHandle, &pusConnectType) ;
-
-   if( ulRetVal != AE_SUCCESS )
-   {
-      pusConnectType = 0;
+      // pusConnectType = AE_INVALID_CONNECTION_HANDLE;
+      pusConnectType = AE_NO_CONNECTION;
    }
    hb_retnl( pusConnectType );
-} */
+}
 
+HB_FUNC( ADSGETTABLECONTYPE )
+{
+   UNSIGNED16 pusConnectType = 0;
+   UNSIGNED32 ulRetVal;
+   ADSAREAP   pArea;
+   ADSHANDLE  pTableConnectHandle = 0;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+
+   if( pArea )
+   {
+      AdsGetTableConnection( pArea->hTable, &pTableConnectHandle );
+
+      if ( pTableConnectHandle )
+      {
+         ulRetVal = AdsGetConnectionType( pTableConnectHandle, &pusConnectType ) ;
+
+         if ( ulRetVal != AE_SUCCESS )
+         {
+            pusConnectType = 0;
+         }
+      }
+   }
+
+   hb_retnl( pusConnectType );
+}
 
 HB_FUNC( ADSGETSERVERTIME )
 {

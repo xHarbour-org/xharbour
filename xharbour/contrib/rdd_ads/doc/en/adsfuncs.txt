@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.7 2004/02/28 16:41:54 lculik Exp $
+ * $Id: adsfuncs.txt,v 1.8 2004/03/26 08:47:52 brianhays Exp $
  */
 
 /*
@@ -1117,36 +1117,84 @@
  *  $END$
  */
 
-/* TO-DO:
+/*  $DOC$
+ *  $FUNCNAME$
+ *      AdsGetConnectionType()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Returns the type of Server used by the given connection handle.
+ *  $SYNTAX$
+ *      AdsGetConnectionType( [<hConnection>] ) --> nConnectionType
+ *  $ARGUMENTS$
+ *      <hConnection>    A connection handle retrieved via AdsConnect()
+ *      or AdsConnect60(). If omitted, the RDD's current connection
+ *      handle is used, but this only exists if AdsConnect() or AdsConnect60()
+ *      were previously called.
+ *
+ *  $RETURNS$
+ *      The type of Advantage Server that the connection uses, either
+ *      ADS_REMOTE_SERVER, ADS_AIS_SERVER, or ADS_LOCAL_SERVER.
+ *  $DESCRIPTION$
+ *      Advantage uses Handles to control connections to various servers.
+ *      It's possible that an app may open some files via the Remote server,
+ *      but others via the Local server or an Internect connection.
+ *      This function identifies the type of server used by a connection handle.
+ *      Note that after a table is opened, the type of connection used for
+ *      that workarea can be retrieved with AdsGetTableConType().
+ *      See ACE.HLP for full details.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      AdsGetTableConType(),AdsConnect(),AdsConnect60()
+ *  $END$
+ */
 
-ADSGETCONNECTIONHANDLE
-
-v6:
-   AdsAddUserToGroup
-
-AdsAddCustomKey
-AdsDeleteCustomKey
-AdsGetTableAlias
-AdsConnect
-AdsDisconnect
-AdsCloseAllTables
-AdsWriteAllRecords
-AdsRefreshRecord
-AdsCopyTable
-AdsConvertTable
-AdsGetNumIndexes
-
-ADSDecryptRecord
-ADSDecryptTable
-ADSDisableEncryption
-ADSEnableEncryption
-ADSEncryptRecord
-ADSEncryptTable
-ADSIsEncryptionEnabled
-ADSIsRecordEncrypted
-ADSIsTableEncrypted
-
-*/
+/*  $DOC$
+ *  $FUNCNAME$
+ *      AdsGetTableConType()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Returns the type of Server used by current workarea.
+ *  $SYNTAX$
+ *      AdsGetTableConType() --> nConnectionType
+ *  $ARGUMENTS$
+ *      None.
+ *
+ *  $RETURNS$
+ *      The type of Advantage Server that the current workarea uses, either
+ *      ADS_REMOTE_SERVER, ADS_AIS_SERVER, or ADS_LOCAL_SERVER.
+ *      Returns zero if the current workarea does not have an Advantage table opened.
+ *  $DESCRIPTION$
+ *      Advantage uses Handles to control connections to various servers.
+ *      It's possible that an app may open some files via the Remote server,
+ *      but others via the Local server or an Internect connection.
+ *      This function identifies the type of server used in the current workarea.
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      AdsGetConnectionType(),AdsConnect(),AdsConnect60()
+ *  $END$
+ */
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -1154,25 +1202,25 @@ ADSIsTableEncrypted
  *  $CATEGORY$
  *      Advantage Database RDD
  *  $ONELINER$
- *      Add na new table do an Data dictionary
+ *      Add a new table to a Data dictionary
  *  $SYNTAX$
- *      ADSDDADDTABLE( <cTableName>,<cFileName>,<cIndexFileName> ) --> lSuccess
+ *      ADSDDADDTABLE( <cTableName>, <cFileName>, <cIndexFileName> ) --> lSuccess
  *  $ARGUMENTS$
- *      <cTableName> Name of the table inside the data dictionaty
+ *      <cTableName> Name of the table inside the data dictionary
  *      <cFileName>  Name of the adt or dbf file name
  *      <cIndexFileName> Optional name of the index file
  *  $RETURNS$
  *      <lSuccess> -> .T. if file was added, otherwise .F.
  *  $DESCRIPTION$
  *      See ACE.HLP for full details about the Advantage Database Server.
- *      AdsDDAddTable() is function that add an new table to an Ads data dictionary
- *      To add the table you must be conected as ADSSYS user using the AdsConnect60() function
+ *      AdsDDAddTable() adds a new table to an ADS data dictionary.
+ *      To add the table you must be connected as ADSSYS user using the AdsConnect60() function
  *  $EXAMPLES$
- *  IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
+ *  IF adsConnect60("xharbour.add", 7/* All types of connection*/, "ADSSYS", "",)
  *     // Add one user
- *      AdsDDCreateUser(,"Luiz","papael","This is luiz User")
+ *      AdsDDCreateUser(,"Luiz", "papael", "This is luiz User")
  *     // Add the tables
- *      AdsDDaddTable("Table1","table1.adt","table1.adi")
+ *      AdsDDaddTable("Table1", "table1.adt", "table1.adi")
  *  $TESTS$
  *  $STATUS$
  *      R
@@ -1231,25 +1279,25 @@ ADSIsTableEncrypted
  *  $CATEGORY$
  *      Advantage Database RDD
  *  $ONELINER$
- *      Connect to an localr/remote server
+ *      Connect to a local/remote/internet server
  *  $SYNTAX$
- *      ADSCONNECT60(<cFilePath>,<nServertype>,[<cUserName>],[<cUserPass>],[<nOptions>]) -> lSuccess
+ *      ADSCONNECT60(<cFilePath>, <nServertype>, [<cUserName>], [<cUserPass>], [<nOptions>]) -> lSuccess
  *  $ARGUMENTS$
- *      <cFilePath>   Name od data dictionary to connect
- *      <nServertype> Specify the server type to connect(LOCAL,REMOTE,AIS or all together)
- *      <cUserName>   Optional Name of the user connecting to the serve
+ *      <cFilePath>   Name of data dictionary to connect to.
+ *      <nServertype> The server type to connect (LOCAL, REMOTE, AIS or all together)
+ *      <cUserName>   Optional Name of the user connecting to the server
  *      <cUserPass>   Optional password for the user Name
  *      <nOptions>    The optional connection options
  *
  *  $RETURNS$
- *      <lSuccess>   True is conected , otherwise False
+ *      <lSuccess>   True if connected, otherwise False.
  *  $DESCRIPTION$
+ *      Adsconnect60() makes the connection to an advantage database server.
  *      See ACE.HLP for full details about the Advantage Database Server.
- *      Adsconnect60() does the connect to an advantage database sercer
  *  $EXAMPLES$
- *      IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
- *      // Add one user
- *         AdsDDCreateUser(,"Luiz","papael","This is luiz User")
+ *      IF adsConnect60("xharbour.add", 7/* All types of connection*/, "ADSSYS", "",)
+ *         // Add one user
+ *         AdsDDCreateUser(, "Luiz", "papael", "This is luiz User")
  *      ENDIF
  *  $STATUS$
  *      R
@@ -1264,7 +1312,6 @@ ADSIsTableEncrypted
  *      ADSUSEDICTIONARY(),ADSDDADDTABLE()
  *  $END$
  */
-
 
 
 /*  $DOC$
@@ -1300,5 +1347,34 @@ ADSIsTableEncrypted
  *      xxx()
  *  $END$
  */
+
+/* TO-DO:
+
+v6:
+   AdsAddUserToGroup
+
+AdsAddCustomKey
+AdsDeleteCustomKey
+AdsGetTableAlias
+AdsConnect
+AdsDisconnect
+AdsCloseAllTables
+AdsWriteAllRecords
+AdsRefreshRecord
+AdsCopyTable
+AdsConvertTable
+AdsGetNumIndexes
+
+ADSDecryptRecord
+ADSDecryptTable
+ADSDisableEncryption
+ADSEnableEncryption
+ADSEncryptRecord
+ADSEncryptTable
+ADSIsEncryptionEnabled
+ADSIsRecordEncrypted
+ADSIsTableEncrypted
+
+*/
 
 
