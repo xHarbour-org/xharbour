@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.24 2003/07/14 19:18:46 jonnymind Exp $
+ * $Id: codebloc.c,v 1.25 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -141,6 +141,13 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             pLocal->item.asMemvar.value     = hMemvar;
 
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+
+            #ifdef HB_ARRAY_USE_COUNTER
+               if( pLocal->type == HB_IT_ARRAY )
+               {
+                  hb_arrayResetHolder( pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
+               }
+            #endif
          }
          else
          {
@@ -152,6 +159,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              */
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
          }
+
          hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          ++ui;
       }
@@ -171,6 +179,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
          pCBlock->pLocals = pOwner->pLocals;
          pCBlock->uiLocals = uiLocals = pOwner->uiLocals;
+
          if( pOwner->pLocals )
          {  /* the outer codeblock have the table with local references - reuse it */
             while( uiLocals )
@@ -263,9 +272,12 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       if( pCBlock->pLocals )
       {
          USHORT ui = pCBlock->uiLocals;
+
          while( ui )
          {
+            //TraceLog( NULL, "blockDelete\n" );
             hb_memvarValueDecRef( pCBlock->pLocals[ ui-- ].item.asMemvar.value );
+            //TraceLog( NULL, "DONE blockDelete\n" );
          }
 
          /* decrement the table reference counter and release memory if
@@ -273,6 +285,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
           */
          if( --pCBlock->pLocals[ 0 ].item.asLong.value == 0 )
          {
+            //TraceLog( NULL, "Free Locals\n" );
             HB_TRACE( HB_TR_DEBUG, ( "Free,Locals %p", pCBlock->pLocals ) );
             hb_xfree( pCBlock->pLocals );
          }

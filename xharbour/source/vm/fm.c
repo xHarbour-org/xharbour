@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.41 2003/08/07 20:23:34 druzus Exp $
+ * $Id: fm.c,v 1.42 2003/08/07 21:33:00 druzus Exp $
  */
 
 /*
@@ -170,7 +170,7 @@ void hb_paraniodMemInit( void *pMem, ULONG ulSize )
 void hb_paraniodMemCheck( void *pMem )
 {
    static BOOL bLoop = FALSE;
-   
+
    if( ! bLoop &&
        ( pMem == pszMemStat ||
          pMem == itmMemStat.item.asString.puiHolders ||
@@ -687,7 +687,7 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 }
 
 
-/* Returns pointer to string containing printable version 
+/* Returns pointer to string containing printable version
    of pMem memory block */
 
 char * hb_mem2str( void * pMem, UINT uiSize )
@@ -720,7 +720,7 @@ char * hb_mem2str( void * pMem, UINT uiSize )
    {
      /* format as hex */
       for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
-      {  
+      {
          int lownibble, hinibble;
          lownibble = (cMem[uiIndex])>>4;
          hinibble = (cMem[uiIndex]) & 0x0F;
@@ -1076,6 +1076,36 @@ ULONG hb_xquery( USHORT uiMode )
 
    case HB_MEM_STACK_TOP : /* Harbour extension (Total items currently on the stack)      */
       ulResult = hb_stackTopOffset( );
+      break;
+
+   case HB_MEM_LIST_BLOCKS : /* Harbour extension (List all allocated blocks)      */
+     #ifdef HB_FM_STATISTICS
+     {
+        USHORT ui;
+        PHB_MEMINFO pMemBlock;
+
+        printf( "Total %li allocations (%li reallocation), of which %li freed.\n", s_lAllocations, s_lReAllocations, s_lFreed );
+        printf( "--------------------------------------------------------------------------------------\n" );
+
+        for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock )
+        {
+           /* Safety Termination. */
+           ( (char *) ( pMemBlock + 1 ) )[ pMemBlock->ulSize - 1 ] = '\0';
+
+           printf( "Block %i %p (size %lu) %s(%i), \"%s\"\n",
+              ui++,
+              (char *) ( pMemBlock + 1 ),
+              pMemBlock->ulSize,
+              pMemBlock->szProcName,
+              pMemBlock->uiProcLine,
+              hb_mem2str( pMemBlock + 1, pMemBlock->ulSize ) );
+        }
+
+        ulResult = s_lMemoryConsumed;
+     }
+    #else
+      ulResult = 0;
+    #endif
       break;
 
    default:

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmemory.ch,v 1.4 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: hbmemory.ch,v 1.1.1.1 2001/12/21 10:47:20 ronpinkas Exp $
  */
 
 /*
@@ -77,6 +77,7 @@
 #define HB_MEM_STACKITEMS    1003   /* Total items on the stack */
 #define HB_MEM_STACK         1004   /* Total memory size used by the stack (bytes) */
 #define HB_MEM_STACK_TOP     1005   /* Total items currently on the stack */
+#define HB_MEM_LIST_BLOCKS   1006   /* List all allocated blocks */
 
 #endif /* HB_MEMORY_CH_ */
 

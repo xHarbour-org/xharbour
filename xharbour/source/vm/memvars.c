@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.27 2003/08/14 23:49:47 jonnymind Exp $
+ * $Id: memvars.c,v 1.28 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -347,7 +347,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             #ifdef HB_ARRAY_USE_COUNTER
                pSource->item.asArray.value->uiHolders++;
             #else
-               hb_arrayRegisterHolder( pSource->item.asArray.value, &pValue->item );
+               hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
             #endif
          }
       }
@@ -517,7 +517,7 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
 
    pValue = s_globalTable + hValue;
 
-   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
+   //TraceLog( NULL, "Memvar item (%i) Counter: %li\n", hValue, pValue->counter );
 
    if( pValue->counter > 0 )
    {
@@ -528,11 +528,11 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
       * the codeblock will be released later then it will try to release
       * again this detached variable.
       */
-      if( --pValue->counter == 0 )
+      if( --( pValue->counter ) == 0 )
       {
-         if( HB_IS_COMPLEX( &pValue->item ) )
+         if( HB_IS_COMPLEX( &( pValue->item ) ) )
          {
-            hb_itemClear( &pValue->item );
+            hb_itemClear( &( pValue->item ) );
          }
          else
          {

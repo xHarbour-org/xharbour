@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.59 2003/08/13 00:18:00 ronpinkas Exp $
+ * $Id: arrays.c,v 1.60 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -83,13 +83,16 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    ULONG ulPos;
    char szProc[64], szModule[64];
-   static int s_i = 0;
 
-   if( s_i++ > 0 )
-   {
-      hb_procinfo( 0, szProc, NULL, szModule  );
-      //TraceLog( NULL, "New array of %i items (%s->%s)\n", ulLen, szModule, szProc );
-   }
+   #ifdef DEBUG_ARRAYS
+      static int s_i = 0;
+
+      if( s_i++ > 0 )
+      {
+         hb_procinfo( 0, szProc, NULL, szModule  );
+         TraceLog( NULL, "New array %p of %i items (%s->%s)\n", pBaseArray, ulLen, szModule, szProc );
+      }
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
 
@@ -1552,7 +1555,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
       while( pOwners )
       {
-         //TraceLog( NULL, "pOwners: %p\n", pOwners );
+         //TraceLog( NULL, "pOwners: %p %p\n", pOwners, pOwners->pOwner );
 
          if( pOwners->pOwner == pHolder )
          {
@@ -1575,9 +1578,9 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
       if( pOwners )
       {
-         // Last Owner was released.
          if( pBaseArray->pOwners == NULL )
          {
+            //TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
             hb_arrayReleaseBase( pBaseArray );
          }
       }
