@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.13 2002/01/27 05:23:33 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.14 2002/02/19 03:09:53 walito Exp $
  */
 
 /*
@@ -753,6 +753,8 @@ PHB_ITEM hb_itemPutNLLen( PHB_ITEM pItem, long lNumber, int iWidth )
    return pItem;
 }
 
+#if 0
+/* moved to fastitem.c */
 PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
@@ -774,6 +776,7 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 
    return pItem;
 }
+#endif
 
 void hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
 {
