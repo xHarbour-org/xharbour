@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.4 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: philes.c,v 1.5 2002/01/05 19:28:48 lculik Exp $
  */
 
 /*
@@ -230,6 +230,17 @@ HB_FUNC( HB_F_EOF )
       hb_fsSetError( FS_ERROR );
       hb_retl( TRUE );
    }
+}
+
+HB_FUNC( CURDIRX )
+{
+   USHORT uiErrorOld = hb_fsError();
+   BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   hb_fsCurDirBuffEx( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
+      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
+   hb_retcAdopt( ( char * ) pbyBuffer );
+
+   hb_fsSetError( uiErrorOld );
 }
 
 #endif

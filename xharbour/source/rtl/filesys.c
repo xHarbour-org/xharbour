@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.15 2002/07/02 13:24:09 lculik Exp $
+ * $Id: filesys.c,v 1.16 2002/07/12 00:00:37 lculik Exp $
  */
 
 /*
@@ -1831,3 +1831,64 @@ BOOL hb_fsEof( FHANDLE hFileHandle )
    return eof( hFileHandle ) != 0;
 #endif
 }
+
+USHORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
+
+   HB_SYMBOL_UNUSED( uiDrive );
+
+   pbyBuffer[ 0 ] = '\0';
+
+#if defined(HB_OS_WIN_32)
+
+   GetCurrentDirectory( ulLen, ( char * ) pbyBuffer );
+   s_uiErrorLast = ( USHORT ) GetLastError();
+
+#elif defined(HAVE_POSIX_IO)
+
+   errno = 0;
+   getcwd( ( char * ) pbyBuffer, ulLen );
+   s_uiErrorLast = errno;
+
+#elif defined(__MINGW32__)
+
+   errno = 0;
+   _getdcwd( uiDrive, pbyBuffer, ulLen );
+   s_uiErrorLast = errno;
+
+#else
+
+   s_uiErrorLast = FS_ERROR;
+
+#endif
+
+   /* Strip the leading drive spec, and leading backslash if there's one. */
+
+   {
+      BYTE * pbyStart = pbyBuffer;
+
+      /* NOTE: A trailing underscore is not returned on this platform,
+               so we don't need to strip it. [vszakats] */
+
+      if( pbyStart[ 1 ] == ':' )
+         pbyStart += 1;
+      if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
+         pbyStart++;
+
+      if( pbyBuffer != pbyStart )
+         memmove( pbyBuffer, pbyStart, ulLen );
+   }
+
+   /* Strip the trailing (back)slash if there's one */
+
+   {
+      ULONG ulLen = strlen( ( char * ) pbyBuffer );
+
+      if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulLen - 1 ] ) )
+         pbyBuffer[ ulLen - 1 ] = '\0';
+   }
+
+   return s_uiErrorLast;
+}
+

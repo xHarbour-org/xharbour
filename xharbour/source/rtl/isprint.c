@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.13 2002/07/24 03:31:16 lculik Exp $
+ * $Id: isprint.c,v 1.14 2002/07/24 12:22:39 lculik Exp $
  */
 
 /*
@@ -444,7 +444,7 @@ HB_FUNC(GETPRINTERS)
           &returned );
 
     if( !res )
-
+      {
         if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )  
              hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
             
@@ -461,6 +461,7 @@ HB_FUNC(GETPRINTERS)
                &needed ,
                &returned );
                }
+      }
 
        if( !res )
             hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
