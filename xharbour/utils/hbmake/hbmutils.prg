@@ -340,7 +340,7 @@ Return cBuffer
 
 Function GetinstaledLibs( clibs, lGcc )
       
-     Local adeflib     := { 'lang' + If( lgcc, '.a', '.lib' ), 'vm' + If( lgcc, '.a', '.lib' ), 'rtl' + If( lgcc, '.a', '.lib' ), 'rdd' + If( lgcc, '.a', '.lib' ), 'macro' + If( lgcc, '.a', '.lib' ), 'pp' + If( lgcc, '.a', '.lib' ), 'dbfntx' + If( lgcc, '.a', '.lib' ), 'dbfcdx' + If( lgcc, '.a', '.lib' ), 'common' + If( lgcc, '.a', '.lib' ), 'gtwin' + If( lgcc, '.a', '.lib' ), 'debug' + If( lgcc, '.a', '.lib' ), 'gtpca' + If( lgcc, '.a', '.lib' ), 'gtdos' + If( lgcc, '.a', '.lib' ), 'gtsln' + If( lgcc, '.a', '.lib' ), 'gtstd' + If( lgcc, '.a', '.lib' ), 'zlib1' + If( lgcc, '.a', '.lib' ), 'ziparchive' + If( lgcc, '.a', '.lib' ), 'rddads' + If( lgcc, '.a', '.lib' ), 'ace32' + If( lgcc, '.a', '.lib' ), 'libnf' + If( lgcc, '.a', '.lib' ), 'libct' + If( lgcc, '.a', '.lib' ), 'htmllib' + If( lgcc, '.a', '.lib' ), 'libgt' + If( lgcc, '.a', '.lib' ), 'libmisc' + If( lgcc, '.a', '.lib' ), 'mysql' + If( lgcc, '.a', '.lib' ), 'libmysql' + If( lgcc, '.a', '.lib' ), 'mysqlclient' + If( lgcc, '.a', '.lib' ), 'samples' + If( lgcc, '.a', '.lib' ), 'pdflib' + If( lgcc, '.a', '.lib' ), 'nulsys' + If( lgcc, '.a', '.lib' ), 'gtcgi' + If( lgcc, '.a', '.lib' ) }
+     Local adeflib     := { 'lang' + If( lgcc, '.a', '.lib' ), 'vm' + If( lgcc, '.a', '.lib' ), 'rtl' + If( lgcc, '.a', '.lib' ), 'rdd' + If( lgcc, '.a', '.lib' ), 'macro' + If( lgcc, '.a', '.lib' ), 'pp' + If( lgcc, '.a', '.lib' ), 'dbfntx' + If( lgcc, '.a', '.lib' ), 'dbfcdx' + If( lgcc, '.a', '.lib' ), 'common' + If( lgcc, '.a', '.lib' ), 'gtwin' + If( lgcc, '.a', '.lib' ), 'debug' + If( lgcc, '.a', '.lib' ), 'gtpca' + If( lgcc, '.a', '.lib' ), 'gtdos' + If( lgcc, '.a', '.lib' ), 'gtsln' + If( lgcc, '.a', '.lib' ), 'gtstd' + If( lgcc, '.a', '.lib' ),'ziparchive' + If( lgcc, '.a', '.lib' ), 'rddads' + If( lgcc, '.a', '.lib' ), 'ace32' + If( lgcc, '.a', '.lib' ), 'libnf' + If( lgcc, '.a', '.lib' ), 'libct' + If( lgcc, '.a', '.lib' ), 'htmllib' + If( lgcc, '.a', '.lib' ), 'libgt' + If( lgcc, '.a', '.lib' ), 'libmisc' + If( lgcc, '.a', '.lib' ), 'mysql' + If( lgcc, '.a', '.lib' ), 'libmysql' + If( lgcc, '.a', '.lib' ), 'mysqlclient' + If( lgcc, '.a', '.lib' ), 'samples' + If( lgcc, '.a', '.lib' ), 'pdflib' + If( lgcc, '.a', '.lib' ), 'nulsys' + If( lgcc, '.a', '.lib' ), 'gtcgi' + If( lgcc, '.a', '.lib' ) }
      Local aReturnLibs := {}
      Local aLibs       := Directory( clibs )
      Local nPos
@@ -371,7 +371,7 @@ Function Getlibs( lgcc ,cDir)
                           { "Harbour html library - Htmllib", 'html' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour Nanfor library - Libnf", 'nf' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour Gt library - Libgt", 'nf' + If( lgcc, '.a', '.lib' ) }, ;
-                          { "Harbour Zip library Zlib1", 'zlib1.lib ziparchive' + If( lgcc, '.a', '.lib' ) }, ;
+                          { "Harbour Zip library ", 'ziparchive' + If( lgcc, '.a', '.lib' ) +if(lLinux ,' stdc++.a z.a',' ') }, ;
                           { "Harbour Hbole library Hbole", 'hbole' + If( lgcc, '.a', '.lib' ) + ' ole2' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour Mysql library - MySql", 'mysql' + If( lgcc, '.a', '.lib' ) + ' libmysql' + If( lgcc, '.a', '.lib' ) + ' mysqlclient' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour Samples library - Samples", 'samples' + If( lgcc, '.a', '.lib' ) } }

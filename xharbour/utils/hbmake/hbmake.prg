@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.31 2002/08/31 14:34:27 lculik Exp $
+ * $Id: hbmake.prg,v 1.32 2002/09/21 02:41:18 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -829,16 +829,16 @@ FUNCTION Compfiles()
                         Outstd( cComm )
                         Outstd( hb_osnewline() )
                         ! ( cComm )
-                        cErrText := Memoread( 'test.out' )
+                        cErrText := Memoread( 'Test.out' )
                         lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
 
                         IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                             QUIT
 
                         ELSE
 
-//                            Ferase( 'test.out' )
+//                            Ferase( 'Test.out' )
 
                         ENDIF
 
@@ -984,16 +984,16 @@ FUNCTION Compfiles()
                             cComm += " >> Test.out"
                             Outstd( cComm )
                                      ! ( cComm )
-                            cErrText := Memoread( 'test.out' )
+                            cErrText := Memoread( 'Test.out' )
                             lEnd     := 'Error E' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                                 QUIT
 
                             ELSE
 
-//                                Ferase( 'test.out' )
+//                                Ferase( 'Test.out' )
 
                             ENDIF
 
@@ -1065,16 +1065,16 @@ FUNCTION Compfiles()
                         Outstd( cComm )
                         Outstd( hb_osnewline() )
                         ! ( cComm )
-                        cErrText := Memoread( 'test.out' )
+                        cErrText := Memoread( 'Test.out' )
                         lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
 
                         IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                             QUIT
 
                         ELSE
 
-//                            Ferase( 'test.out' )
+//                            Ferase( 'Test.out' )
 
                         ENDIF
 
@@ -1233,7 +1233,8 @@ FUNC crtmakfile( cFile )
     LOCAL lLinux         := At( 'linux', Lower( Os() ) ) > 0
     LOCAL nWriteFiles    := 0
     Local cResName       := Space(50)
-    Local aSelFiles 
+    Local aSelFiles
+    Local nFilestoAdd:=0
 
     nLinkHandle := Fcreate( cFile )
     WriteMakeFileHeader()
@@ -1281,7 +1282,8 @@ FUNC crtmakfile( cFile )
     @ 10, 40 SAY aLangMessages[ 39 ]  GET cUserInclude PICT "@s15"
     @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ] style "[o ]"
     @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"             style "[o ]"
-    @ 12,  1 Say "Resource file Name" Get CResName 
+    @ 12,  1 Say "Resource file Name" Get CResName
+    @ 13, 1 say aLangMessages[ 43 ] get nFilestoAdd pict "99" valid nFilestoAdd > 0
     READ
 
     IF !Empty( cUserDef )
@@ -1711,7 +1713,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Aeval( aobjs, { | x, i | nWriteFiles ++, If( ( i <> Len( aobjs ) .and. x <> cTopfile ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+            Aeval( aobjs, { | x, i | nWriteFiles ++, If( ( i <> Len( aobjs ) .and. x <> cTopfile ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
         ENDIF
 
@@ -1724,7 +1726,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Aeval( aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( aPrgs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
+            Aeval( aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( aPrgs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
 
         ENDIF
 
@@ -1737,7 +1739,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Aeval( aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( aobjsc ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+            Aeval( aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( aobjsc ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
         ENDIF
 
@@ -1750,7 +1752,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Aeval( aCs, { | x, i | nWriteFiles ++, If( i <> Len( aCs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+            Aeval( aCs, { | x, i | nWriteFiles ++, If( i <> Len( aCs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % nFilestoAdd == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
         ENDIF
 
@@ -2021,16 +2023,16 @@ FUNCTION CompUpdatedfiles()
                             Outstd( cComm )
                             Outstd( hb_osnewline() )
                             ! ( cComm )
-                            cErrText := Memoread( 'test.out' )
+                            cErrText := Memoread( 'Test.out' )
                             lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                                 QUIT
 
                             ELSE
 
-//                                Ferase( 'test.out' )
+//                                Ferase( 'Test.out' )
 
                             ENDIF
 
@@ -2140,16 +2142,16 @@ FUNCTION CompUpdatedfiles()
                             Outstd( cComm )
                             Outstd( hb_osnewline() )
                             ! ( cComm )
-                            cErrText := Memoread( 'test.out' )
+                            cErrText := Memoread( 'Test.out' )
                             lEnd     := 'Error E' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                                 QUIT
 
                             ELSE
 
-//                                Ferase( 'test.out' )
+//                                Ferase( 'Test.out' )
 
                             ENDIF
 
@@ -2210,11 +2212,11 @@ FUNCTION CompUpdatedfiles()
                             Outstd( cComm )
                             Outstd( hb_osnewline() )
                             ! ( cComm )
-                            cErrText := Memoread( 'test.out' )
+                            cErrText := Memoread( 'Test.out' )
                             lEnd     := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
 
                             IF !lIgnoreErrors .and. lEnd
-
+                                if(at("LINUX",upper(OS()))>0,__run("vi Test.out"),__run("Notepad Test.out"))
                                 QUIT
 
                             ELSE
@@ -3735,6 +3737,9 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "User include Path" )
         Aadd( aLang, "Use External Libs" )
         Aadd( aLang, "Spacebar to select, Enter to continue process" )
+        Aadd( aLang, "Warninge level /w" )
+        Aadd( aLang, "Numbers of source files per line on makefile")
+
 
     ELSEIF cLang == "ES"
 
@@ -3769,16 +3774,19 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "Selecion Compilador C" )
         Aadd( aLang, "Lib graphica" )
         Aadd( aLang, "Opciones do Harbour" )
-        Aadd( aLang, "Declaracion Automatica de memvar" )
-        Aadd( aLang, "Variaveis sÆo assumidas M->" )
-        Aadd( aLang, "Info. Debug" )
-        Aadd( aLang, "Suprime a info. de numero da linha" )
-        Aadd( aLang, "Gene Sa¡da pre-processada" )
-        Aadd( aLang, "Compile apenas o modulo " )
+        Aadd( aLang, "Declaracion Automatica de memvar /a" )
+        Aadd( aLang, "Variaveis sÆo assumidas M-> /v " )
+        Aadd( aLang, "Info. Debug /b" )
+        Aadd( aLang, "Suprime a info. de numero da linha /l" )
+        Aadd( aLang, "Gene Sa¡da pre-processada /p" )
+        Aadd( aLang, "Compile apenas o modulo /m" )
         Aadd( aLang, "User Defines " )
         Aadd( aLang, "User include Path" )
         Aadd( aLang, "Usa Libs Externas" )
         Aadd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo" )
+        Aadd( aLang, "N¡vel de Aviso do compilador /w" )
+        Aadd( aLang, "Numeros de fontes por linha no makefile")
+
 
     ELSEIF cLang == "PT"
 
@@ -3813,16 +3821,18 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "Sele‡Æo Compilador C" )
         Aadd( aLang, "Lib Graf¡ca" )
         Aadd( aLang, "Op‡äes do Harbour" )
-        Aadd( aLang, "Declara‡Æo Autom tica de memvar" )
-        Aadd( aLang, "Variaveis sÆo assumidas M->" )
-        Aadd( aLang, "Info. Debug" )
-        Aadd( aLang, "Suprime a info. de numero da linha" )
-        Aadd( aLang, "Gene Sa¡da pre-processada" )
-        Aadd( aLang, "Compile apenas o modulo " )
+        Aadd( aLang, "Declara‡Æo Autom tica de memvar /a" )
+        Aadd( aLang, "Variaveis sÆo assumidas M-> /v" )
+        Aadd( aLang, "Info. Debug /b" )
+        Aadd( aLang, "Suprime a info. de numero da linha /l" )
+        Aadd( aLang, "Gene Sa¡da pre-processada /p" )
+        Aadd( aLang, "Compile apenas o modulo /m" )
         Aadd( aLang, "User Defines " )
         Aadd( aLang, "User include Path" )
         Aadd( aLang, "Usa Libs Externas" )
         Aadd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo" )
+        Aadd( aLang, "N¡vel de Aviso do compilador /w" )
+        Aadd( aLang, "Numeros de fontes por linha no makefile")
 
     ENDIF
 
