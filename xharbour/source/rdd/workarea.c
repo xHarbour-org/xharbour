@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.12 2002/10/12 00:38:26 horacioroldan Exp $
+ * $Id: workarea.c,v 1.13 2002/11/27 04:05:57 mlombardo Exp $
  */
 
 /*
@@ -418,8 +418,11 @@ ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, void * szName )
    /*
    strncpy( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
             HARBOUR_MAX_RDD_FIELDNAME_LENGTH );
-   */
    strncpy( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
+            pArea->uiMaxFieldNameLength );
+   */
+   ((char *) szName)[0] = '\0';
+   strncat( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
             pArea->uiMaxFieldNameLength );
    return SUCCESS;
 }
