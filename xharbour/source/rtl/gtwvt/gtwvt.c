@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.39 2004/01/11 21:23:36 peterrees Exp $
+ * $Id: gtwvt.c,v 1.40 2004/01/13 16:17:13 vouchcac Exp $
  */
 
 /*
@@ -2063,7 +2063,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     }
     case WM_MOUSEMOVE:
     {
-      if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+//      if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+      if ( !b_MouseEnable || !_s.MouseMove )
       {
         break;
       }
