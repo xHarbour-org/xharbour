@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.35 2002/01/30 04:10:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.36 2002/01/31 02:20:28 ronpinkas Exp $
  */
 
 /*
@@ -251,6 +251,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
+   FILE *fpTrace;
 
 #if defined(HB_OS_OS2)
    EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
@@ -297,6 +298,17 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    /* Check for some internal switches */
    hb_cmdargProcessVM();
+
+   /* Create trace.log for tracing. */
+   fpTrace = fopen( "trace.log", "w" );
+   if( fpTrace )
+   {
+      fclose( fpTrace );
+   }
+   else
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+   }
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions

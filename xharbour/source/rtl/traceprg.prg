@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.0 2002/01/29 08:35:25 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.1 2002/01/31 05:08:31 ronpinkas Exp $
  */
 
 /*
@@ -50,16 +50,6 @@
  */
 
 #DEFINE  CRLF HB_OsNewLine()
-
-//--------------------------------------------------------------//
-INIT PROCEDURE InitTrace()
-
-   LOCAL FileHandle
-
-   FileHandle := FCreate( "Trace.Log" )
-   FClose(FileHandle)
-
-RETURN
 
 //--------------------------------------------------------------//
 FUNCTION TraceLog( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
