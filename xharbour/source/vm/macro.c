@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.39 2004/02/16 06:32:05 paultucker Exp $
+ * $Id: macro.c,v 1.40 2004/03/17 02:29:01 druzus Exp $
  */
 
 /*
@@ -1232,7 +1232,7 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
 /*
  * Function generates pcode for passed memvar name
  */
-void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
+void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, BOOL bCheck, HB_MACRO_DECL )
 {
    HB_DYNS_PTR pSym;
 
@@ -1244,10 +1244,11 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
        * then we shouldn't create the requested variable if it doesn't exist
        */
       pSym = hb_dynsymFind( szVarName );
-      if( ! pSym )
+      if( bCheck && ! pSym )
       {
+         /* The status should not be changed if memvar could get created anyway */
          HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
-         HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
+         HB_MACRO_DATA->status &= ~HB_MACRO_CONT; /* don't run this pcode */
          /*
           * NOTE: the compiled pcode will be not executed then we can ignore
           * NULL value for pSym
@@ -1261,8 +1262,13 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
       pSym = hb_dynsymGet( szVarName );
    }
 
-   hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
-   hb_compGenPCodeN( ( BYTE * )( &pSym ), sizeof( pSym ), HB_MACRO_PARAM );
+   /* If we're getting Type and memvar is not found, don't generate pcode
+    * because it can't be executed. */
+   if ( !( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE && !pSym ) )
+   {
+      hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
+      hb_compGenPCodeN( ( BYTE * )( &pSym ), sizeof( pSym ), HB_MACRO_PARAM );
+   }
    hb_dynsymUnlock();
 }
 
@@ -1372,8 +1378,9 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    {
       /* Clipper always uses MEMVAR as oppose to FIELD or VARIABLE
          when assigning into ambigious variable in Macro Compiler. */
-      hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+      hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, FALSE, HB_MACRO_PARAM );
+      /* The memvar should not be checked because it gets created anyway */
+      /* hb_compMemvarCheck( szVarName, HB_MACRO_PARAM ); */
    }
 }
 
@@ -1393,8 +1400,9 @@ void hb_compGenPopAliasedVar( char * szVarName,
       {
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
          {  /* M->variable */
-            hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-            hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, FALSE, HB_MACRO_PARAM );
+            /* The memvar should not be checked because it gets created anyway */
+            /* hb_compMemvarCheck( szVarName, HB_MACRO_PARAM ); */
          }
          else
          {
@@ -1403,8 +1411,9 @@ void hb_compGenPopAliasedVar( char * szVarName,
                   iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
-               hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+               hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, FALSE, HB_MACRO_PARAM );
+               /* The memvar should not be checked because it gets created anyway */
+               /* hb_compMemvarCheck( szVarName, HB_MACRO_PARAM ); */
             }
             else
             {  /* field variable */
@@ -1413,12 +1422,12 @@ void hb_compGenPopAliasedVar( char * szVarName,
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
                if( iCmp == 0 )
                {  /* FIELD-> */
-                  hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
+                  hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, TRUE, HB_MACRO_PARAM );
                }
                else
                {  /* database alias */
                   hb_compGenPushSymbol( szAlias, FALSE, TRUE, HB_MACRO_PARAM );
-                  hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, HB_MACRO_PARAM );
+                  hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, TRUE, HB_MACRO_PARAM );
                }
             }
          }
@@ -1426,7 +1435,7 @@ void hb_compGenPopAliasedVar( char * szVarName,
       else
       {
          hb_compGenPushLong( lWorkarea, HB_MACRO_PARAM );
-         hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarGenPCode( HB_P_MPOPALIASEDFIELD, szVarName, TRUE, HB_MACRO_PARAM );
       }
    }
    else
@@ -1435,8 +1444,9 @@ void hb_compGenPopAliasedVar( char * szVarName,
        * NOTE: An alias will be determined at runtime then we cannot decide
        * here if passed name is either a field or a memvar
        */
-      hb_compMemvarGenPCode( HB_P_MPOPALIASEDVAR, szVarName, HB_MACRO_PARAM );
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+      hb_compMemvarGenPCode( HB_P_MPOPALIASEDVAR, szVarName, FALSE, HB_MACRO_PARAM );
+      /* The memvar should not be checked because it gets created anyway */
+      /* hb_compMemvarCheck( szVarName, HB_MACRO_PARAM ); */
    }
 }
 
@@ -1459,15 +1469,15 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
       #if 0
          if( hb_rddGetCurrentFieldPos( szVarName ) )
          {
-            hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, TRUE, HB_MACRO_PARAM );
          }
          else
          {
-            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, TRUE, HB_MACRO_PARAM );
             hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
          }
       #else
-         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, TRUE, HB_MACRO_PARAM );
          hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
       #endif
    }
@@ -1483,14 +1493,14 @@ void hb_compGenPushVarRef( char * szVarName, HB_MACRO_DECL )
       hb_compGenPCode3( HB_P_PUSHLOCALREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), HB_MACRO_PARAM );
    else
    {
-      hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
+      hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, TRUE, HB_MACRO_PARAM );
       hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 
 void hb_compGenPushMemVarRef( char * szVarName, HB_MACRO_DECL )
 {
-   hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
+   hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, TRUE, HB_MACRO_PARAM );
    hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
 }
 
@@ -1514,7 +1524,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
          */
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
          {  /* M->variable */
-            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, TRUE, HB_MACRO_PARAM );
             hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
          }
          else
@@ -1524,7 +1534,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
                   iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+               hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, TRUE, HB_MACRO_PARAM );
                hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
             }
             else
@@ -1534,12 +1544,12 @@ void hb_compGenPushAliasedVar( char * szVarName,
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
                if( iCmp == 0 )
                {  /* FIELD-> */
-                  hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
+                  hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, TRUE, HB_MACRO_PARAM );
                }
                else
                {  /* database alias */
                   hb_compGenPushSymbol( szAlias, FALSE, TRUE, HB_MACRO_PARAM );
-                  hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, HB_MACRO_PARAM );
+                  hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, TRUE, HB_MACRO_PARAM );
                }
             }
          }
@@ -1547,7 +1557,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
       else
       {
          hb_compGenPushLong( lWorkarea, HB_MACRO_PARAM );
-         hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarGenPCode( HB_P_MPUSHALIASEDFIELD, szVarName, TRUE, HB_MACRO_PARAM );
       }
    }
    else
@@ -1556,7 +1566,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
        * NOTE: An alias will be determined at runtime then we cannot decide
        * here if passed name is either a field or a memvar
        */
-      hb_compMemvarGenPCode( HB_P_MPUSHALIASEDVAR, szVarName, HB_MACRO_PARAM );
+      hb_compMemvarGenPCode( HB_P_MPUSHALIASEDVAR, szVarName, TRUE, HB_MACRO_PARAM );
       hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }

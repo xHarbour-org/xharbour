@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2696 2004/03/31 08:13:49 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2697 2004/03/31 09:19:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-31 15:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/vm/macro.c
+    ! Fixed hb_compMemvarGenPCode(), hb_compGenPopVar(),
+      hb_compGenPopAliasedVar() to not set any error flag and not generate
+      associated pcode, when macro expression references an undeclared
+      memvar in assignment context if HB_MACRO_GEN_TYPE is set (that is,
+      when evaluating the expression type). Updated hb_compMemvarGenPCode()
+      calls in hb_compGenPushVar(), hb_compGenPushVarRef(),
+      hb_compGenPushMemVarRef(), hb_compGenPushAliasedVar() to reflect the
+      new syntax. All this is done to achieve Clipper compatibility of
+      Type() function.
+  * include/hbmacro.h
+    ! Updated prototype for hb_compMemvarGenPCode().
+  * doc/en/hb_macro.txt
+    * Updated documentation stub for hb_compMemvarGenPCode().
+
 2004-03-31 04:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/errorapi.c
   * source/vm/hvm.c

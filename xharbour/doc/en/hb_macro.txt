@@ -1,5 +1,5 @@
 /*
- * $Id: hb_macro.txt,v 1.2 2001/03/12 04:19:57 april Exp $
+ * $Id: hb_macro.txt,v 1.1.1.1 2001/12/21 10:48:49 ronpinkas Exp $
  */
 
 /*
@@ -493,11 +493,13 @@
  *      C Prototype
  *      
  *      #include <hbmacro.h>
- *      hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_BISON_PTR pMacro ) --> void
+ *      hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, BOOL bCheck, HB_BISON_PTR pMacro ) --> void
  *  $ARGUMENTS$
  *      <bPCode>
  * 
  *      <szVarName>
+ * 
+ *      <bCheck>
  * 
  *      <pMacro>
  *  $RETURNS$
