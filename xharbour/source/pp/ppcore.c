@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.167 2004/09/16 15:57:21 likewolf Exp $
+ * $Id: ppcore.c,v 1.168 2004/09/16 18:35:37 ronpinkas Exp $
  */
 
 /*
@@ -3489,9 +3489,10 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          if( **ptri == '"' || IS_ESC_STRING( **ptri ) )
          {
 
-            if( expreal != NULL )
+            if( expreal )
             {
                *expreal++ = **ptri;
+
                /* Modified by Giancarlo Niccolai 2003-06-20 */
                if ( IS_ESC_STRING( **ptri ) )
                {
@@ -3507,7 +3508,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
             while( **ptri != '\0' && lens < maxrez )
             {
-               if( expreal != NULL )
+               if( expreal )
                {
                   *expreal++ = **ptri;
                }
@@ -3533,7 +3534,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          {
             char *pString;
 
-            if( expreal != NULL )
+            if( expreal )
             {
                *expreal++ = **ptri;
             }
@@ -3545,7 +3546,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
             while( **ptri != '\0' && lens < maxrez )
             {
-               if( expreal != NULL )
+               if( expreal )
                {
                   *expreal++ = **ptri;
                }
@@ -3584,7 +3585,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          {
             char *pString;
 
-            if( expreal != NULL )
+            if( expreal )
             {
                *expreal++ = **ptri;
             }
@@ -3596,7 +3597,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
             while( **ptri != '\0' && lens < maxrez )
             {
-               if( expreal != NULL )
+               if( expreal )
                {
                   *expreal++ = **ptri;
                }
@@ -3715,11 +3716,26 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                else if( iContext == 1 && State == STATE_ID_END && cMarkerType == '1' && toupper( (*ptri)[0] ) == 'A' && toupper( (*ptri)[1] ) == 'S' && (*ptri)[2] == ' ' )
                {
                   //HACK! Accept AS <type> postfix for <Param,...> Matchers
-                  *expreal++ = **ptri; //'A'
+                  if( expreal )
+                  {
+                     *expreal++ = **ptri; //'A'
+                  }
+
                   (*ptri)++;
-                  *expreal++ = **ptri; //'S'
+
+                  if( expreal )
+                  {
+                     *expreal++ = **ptri; //'S'
+                  }
+
                   (*ptri)++;
-                  *expreal++ = **ptri; //' '
+
+
+                  if( expreal )
+                  {
+                     *expreal++ = **ptri; //' '
+                  }
+
                   (*ptri)++;
 
                   lens += 3;
@@ -3729,23 +3745,67 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                       toupper( (*ptri)[3] ) == 'A' && toupper( (*ptri)[4] ) == 'Y' && (*ptri)[5] == ' ' &&
                       toupper( (*ptri)[6] ) == 'O' && toupper( (*ptri)[7] ) == 'F' && (*ptri)[8] == ' ' )
                   {
-                     *expreal++ = **ptri; //'A'
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'A'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'R'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'R'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'R'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'R'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'A'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'A'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'Y'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'Y'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //' '
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //' '
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'O'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'O'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //'F'
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //'F'
+                     }
+
                      (*ptri)++;
-                     *expreal++ = **ptri; //' '
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri; //' '
+                     }
+
                      (*ptri)++;
 
                      lens += 9;
@@ -3771,7 +3831,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                   /* Ron Pinkas added 2000-05-03 */
                   /* Macro terminator is NOT a coninutation char unlike '.' of logical operators, so we don't want it recorded as cLastChar! */
-                  if( expreal != NULL )
+                  if( expreal )
                   {
                      *expreal++ = **ptri;
                   }
@@ -3785,10 +3845,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                else if( **ptri=='*' && *(*ptri+1) == '*' )
                {
                   /* Clipper replaces ** with ^ operator */
-                  if( expreal != NULL )
+                  if( expreal )
                   {
                      *expreal++ = '^';
                   }
+
                   (*ptri) +=2;
                   lens++;
                   cLastChar = '^';
@@ -3833,7 +3894,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            //printf( "Processing number: %s\n", *ptri );
 
                            // grab the dot.
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3846,7 +3907,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            {
                               //printf( "Grabing: %c\n", **ptri );
 
-                              if( expreal != NULL )
+                              if( expreal )
                               {
                                  *expreal++ = **ptri;
                               }
@@ -3879,7 +3940,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 5; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3887,6 +3948,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_EXPRES;
                         cLastChar = '.';
                         continue;
@@ -3895,7 +3957,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 5; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3903,6 +3965,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_EXPRES;
                         cLastChar = '.';
                         continue;
@@ -3911,7 +3974,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 4; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3919,6 +3982,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_EXPRES;
                         cLastChar = '.';
                         continue;
@@ -3927,7 +3991,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 3; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3935,6 +3999,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_ID_END;
                         cLastChar = '.';
                         continue;
@@ -3943,7 +4008,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 3; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3951,6 +4016,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_ID_END;
                         cLastChar = '.';
                         continue;
@@ -3959,7 +4025,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 3; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3967,6 +4033,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_ID_END;
                         cLastChar = '.';
                         continue;
@@ -3975,7 +4042,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                      {
                         for( i = 1; i <= 3; i++ )
                         {
-                           if( expreal != NULL )
+                           if( expreal )
                            {
                               *expreal++ = **ptri;
                            }
@@ -3983,6 +4050,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            (*ptri)++;
                            lens++;
                         }
+
                         State = STATE_ID_END;
                         cLastChar = '.';
                         continue;
@@ -4057,17 +4125,83 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             {
                State = STATE_EXPRES_ID;
             }
-            else if( **ptri == ' ' )
+            else if( ( **ptri == '+' && *( * ptri + 1 ) == '+' ) || ( **ptri == '-' && *( * ptri + 1 ) == '-' ) )
             {
+               cLastChar = **ptri;
+
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+               }
+
+               (*ptri)++;
+               lens++;
+
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+               }
+
+               (*ptri)++;
+               lens++;
+
                if( State == STATE_EXPRES_ID )
                {
+                  //printf( "ENDED\n" );
                   State = STATE_ID_END;
+                  continue;
                }
-               else if( lens > 2 && ( ( *(*ptri-2)=='+' && *(*ptri-1)=='+' ) ||
-                                    ( *(*ptri-2)=='-' && *(*ptri-1)=='-' ) ) )
+               else
                {
-                  State = STATE_EXPRES_ID; //STATE_ID_END;
+                  //printf( "BEGINED\n" );
+                  State = STATE_EXPRES_ID;
+                  continue;
                }
+            }
+            else if( **ptri == ' ' )
+            {
+               BOOL bPrefix = FALSE;
+
+               if( State == STATE_EXPRES_ID )
+               {
+                  if( lens > 2 && ( ( *( *ptri - 2 ) == '+' && *( *ptri - 1 ) == '+' ) || ( *( *ptri - 2 ) == '-' && *( *ptri - 1 ) == '-' ) ) )
+                  {
+                     bPrefix = TRUE;
+                  }
+               }
+
+               do
+               {
+                  if( expreal )
+                  {
+                     *expreal++ = **ptri;
+                  }
+
+                  (*ptri)++;
+                  lens++;
+               }
+               while( **ptri == ' ' );
+
+               cLastChar = ' ';
+
+               if( State == STATE_EXPRES_ID )
+               {
+                  if( ( **ptri == '+' && *( * ptri + 1 ) == '+' ) || ( **ptri == '-' && *( * ptri + 1 ) == '-' ) )
+                  {
+                     // Continue in STATE_EXPRES_ID
+                  }
+                  else if( bPrefix )
+                  {
+                     // Continue in STATE_EXPRES_ID
+                  }
+                  else
+                  {
+                     // Terminate STATE_EXPRES_ID
+                     State = STATE_ID_END;
+                  }
+               }
+
+               continue;
             }
             /* Ron Pinkas added 2000-06-14 */
             else if( **ptri == ')' && StBr1 == 0 )
