@@ -1,5 +1,5 @@
 /*
- * $Id: msgpt.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgpt.c,v 1.3 2003/06/15 20:15:41 lculik Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ static HB_LANG s_lang =
       "Portugues",                 /* Name (in native language) */
       "PT",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/15 20:15:41 $",         /* Version */
 
       /* Month names */
 
@@ -171,7 +171,7 @@ static HB_LANG s_lang =
       "",
       "acesso de array",
       "array assign",
-      ""
+      "",
       "n∆o Ç um array",
       "condicional",
 
