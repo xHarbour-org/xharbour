@@ -52,6 +52,10 @@
 
 #include <windows.h>
 
+#if defined(__LCC__)
+   #include <winspool.h>
+#endif
+
 #define HB_OS_WIN_32_USED
 #include "hbapi.h"
 

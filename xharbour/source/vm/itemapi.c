@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.92 2004/04/03 01:51:03 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.93 2004/04/08 13:26:55 druzus Exp $
  */
 
 /*
@@ -103,7 +103,7 @@
 extern PHB_CODEPAGE s_cdpage;
 #endif
 
-#if defined(__BORLANDC__) || defined(__WATCOMC__)
+#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(_MSC_VER)
 #include <float.h>  /* for _finite() and _isnan() */
 #endif
 
@@ -1400,7 +1400,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
 #if defined(__RSXNT__) || defined(__EMX__)
 #  define HB_FINITE_DBL(d)    ( isfinite(d)!=0 )
-#elif defined(__WATCOMC__) || defined(__BORLANDC__)
+#elif defined(__WATCOMC__) || defined(__BORLANDC__) || defined(_MSC_VER)
 #  define HB_FINITE_DBL(d)    ( _finite(d)!=0 )
 #elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) || \
       defined( __LCC__ ) || defined( __MSC__ )

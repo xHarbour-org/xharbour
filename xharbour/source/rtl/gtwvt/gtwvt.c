@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.91 2004/04/06 09:58:24 andijahja Exp $
+ * $Id: gtwvt.c,v 1.92 2004/04/14 15:06:07 lf_sfnet Exp $
  */
 
 /*
@@ -81,6 +81,14 @@
 
 #ifndef WM_MOUSEWHEEL
    #define WM_MOUSEWHEEL 0x020A
+#endif
+
+#ifndef INVALID_FILE_SIZE
+   #define INVALID_FILE_SIZE (DWORD)0xFFFFFFFF
+#endif
+
+#ifndef CC_ANYCOLOR
+   #define CC_ANYCOLOR 0x00000100
 #endif
 
 //-------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.97 2004/04/14 15:06:06 lf_sfnet Exp $
+ * $Id: filesys.c,v 1.98 2004/04/14 18:54:55 srobert Exp $
  */
 
 /*
@@ -171,7 +171,7 @@
 #if defined( HB_WIN32_IO )
    #include <windows.h>
 
-   #if defined( _MSC_VER ) && !defined( INVALID_SET_FILE_POINTER )
+   #if ( defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
       #define INVALID_SET_FILE_POINTER ((DWORD)-1)
    #endif
 #endif
@@ -254,7 +254,7 @@
    #define SH_DENYNO    0x40    /* Deny nothing */
 #endif
 
-#if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__)
 /* Only compilers with Posix or Posix-like I/O support are supported */
    #define HB_FS_FILE_IO
 #endif
@@ -279,7 +279,15 @@
 #if defined(HB_FS_FILE_IO)
 
 #if defined(HB_WIN32_IO)
-   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ! defined( _BASETSD_H_)
+
+   #if defined( __LCC__ )
+      __inline void * LongToHandle( const long h )
+      {
+          return((void *) (INT_PTR) h );
+      }
+   #endif
+
+   #if defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || defined(__USE_INLINE__) )
       __inline void * LongToHandle( const long h )
       {
           return((void *) (INT_PTR) h );

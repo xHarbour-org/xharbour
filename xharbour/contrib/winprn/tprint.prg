@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.13 2004/03/25 21:22:53 peterrees Exp $
+ * $Id: tprint.prg,v 1.14 2004/04/05 10:03:19 andijahja Exp $
  */
 
 /*
@@ -518,6 +518,10 @@ ENDCLASS
 
 #include <windows.h>
 #include "hbapi.h"
+
+#ifndef INVALID_FILE_SIZE
+   #define INVALID_FILE_SIZE (DWORD)0xFFFFFFFF
+#endif
 
 HB_FUNC_STATIC( CREATEDC )
 {

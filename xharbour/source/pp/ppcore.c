@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.144 2004/04/03 00:27:03 druzus Exp $
+ * $Id: ppcore.c,v 1.145 2004/04/05 10:03:19 andijahja Exp $
  */
 
 /*
@@ -205,7 +205,9 @@ static char s_prevchar;
 int *      hb_pp_aCondCompile = NULL;
 int        hb_pp_nCondCompile = 0;
 
+#if 0
 char *     hb_pp_STD_CH = NULL;
+#endif
 
 /* Ron Pinkas added 2000-11-21 */
 static BOOL s_bArray = FALSE;
@@ -263,6 +265,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_SetRules()"));
 
+#if 0
    if( hb_pp_STD_CH )
    {
       if( *hb_pp_STD_CH > ' ' )
@@ -361,6 +364,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
       }
    }
    else
+#endif
    {
       hb_pp_Table();
       hb_pp_Init();

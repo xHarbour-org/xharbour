@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.18 2004/04/01 21:21:11 andijahja Exp $
+ * $Id: hbusage.c,v 1.19 2004/04/03 21:14:21 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,9 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cs               syntax check only",
 /* TODO:   "\n          %ct<path>         path for temp file creation", */
            "\n          %cu[<file>]       use command def set in <file> (or none)",
+#if 0
            "\n          %cundef:<id>      #undef <id>",
+#endif
            "\n          %cv               variables are assumed M->",
            "\n          %cw[<level>]      set warning level number (0..3, default 1)",
            "\n          %cx[<prefix>]     set symbol init function name prefix (for .c only)",

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.15 2004/04/01 22:00:42 druzus Exp $
+* $Id: hbserv.c,v 1.16 2004/04/04 09:24:47 andijahja Exp $
 */
 
 /*
@@ -74,6 +74,10 @@
 #ifdef HB_OS_WIN_32
    #define popen  _popen
    #define pclose _pclose
+#endif
+
+#ifdef __LCC__
+#define EXCEPTION_ILLEGAL_INSTRUCTION       STATUS_ILLEGAL_INSTRUCTION
 #endif
 
 /**************************************************

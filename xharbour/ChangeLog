@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2785 2004/04/14 18:53:27 srobert Exp $
+ * $Id: ChangeLog,v 1.2786 2004/04/14 20:28:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-15 03:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/pp/ppcore.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/hbusage.c
+  * include/hbcomp.h
+    - remmed unused hb_pp_STD_CH and UNDEF switch from command line
+
+  * source/vm/itemapi.c
+    ! add define for _MSC_VER on _finite() declaration.
+      (BTW: What is __MSC__ ?)
+
+  * contrib/rdd_ads/ace620.prg (for OW32 only)
+    ! updated to version 7.0.0.5 (current aceapi) with additional
+      new 27 functions compared to version 6.20
+
+  * source/rtl/diskspac.c
+  * source/rtl/disksphb.c
+  * source/rtl/filesys.c
+  * source/rtl/filestat.c
+  * source/rtl/tprinter.c
+  * source/rtl/hbserv.c
+  * source/rtl/win32ole.prg
+  * source/rtl/gtwvt/gtwvt.c
+  * source/macro/macro.slx
+  * contrib/rdd_ads/ace.h
+  * contrib/tip/tiputils.c
+  * contrib/winprn/tprint.prg
+    ! modification to enable compilation under LCC
+      <http://www.cs.virginia.edu/~lcc-win32/>
+
+  * source/common/hbver.c
+    ! include LCC compiler definition
+
 2004-04-15 03:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapi.h
   + include/local.h (empty)

@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.5 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: diskspac.c,v 1.6 2004/04/05 02:29:31 druzus Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ HB_FUNC( DISKSPACE )
          {
             memcpy( &i64RetVal, &i64FreeBytesToCaller, sizeof( ULARGE_INTEGER ) );
 
-            #if (defined(__GNUC__) || defined(_MSC_VER)) && !defined(__RSXNT__)
+            #if (defined(__GNUC__) || defined(_MSC_VER)  || defined(__LCC__) ) && !defined(__RSXNT__)
 
                dSpace  = ( double ) i64RetVal.LowPart +
                          ( double ) i64RetVal.HighPart +

@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.5 2004/03/23 10:00:31 mauriliolongo Exp $
+* $Id: tiputils.c,v 1.6 2004/04/05 13:32:47 lf_sfnet Exp $
 ************************************************/
 
 #include "hbapi.h"
@@ -14,6 +14,10 @@
    #include <time.h>
 #else
    #include <windows.h>
+#endif
+
+#ifndef TIME_ZONE_ID_INVALID
+   #define TIME_ZONE_ID_INVALID (DWORD)0xFFFFFFFF
 #endif
 
 /************************************************************
