@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.00 2004/01/15 16:52:22  $
+ * $Id: tprint.prg,v 1.2 2004/01/21 04:10:32 peterrees Exp $
  */
 
 /*
@@ -929,7 +929,7 @@ static HB_FUNC( ENUMFONTS )
     {
       EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) pArray);
       hb_itemReturn( pArray) ;
-      hb_itemRelease(pArray );
+//      hb_itemRelease(pArray );
     }
   }
 }

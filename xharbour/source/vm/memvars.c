@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.50 2004/01/06 21:13:09 peterrees Exp $
+ * $Id: memvars.c,v 1.51 2004/01/11 22:04:12 ronpinkas Exp $
  */
 
 /*
@@ -2319,5 +2319,6 @@ HB_FUNC( __MVSYMBOLINFO )
   HB_THREAD_STUB
   PHB_ITEM pArray = hb_itemArrayNew( 0 );
   hb_dynsymEval( hb_GetSymbolInfo, ( void * ) pArray );
-  hb_itemRelease( hb_itemReturn( pArray) );
+  hb_itemReturn( pArray);
+//  hb_itemRelease( pArray ) ;
 }
