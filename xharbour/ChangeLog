@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1200 2003/06/29 22:15:36 andijahja Exp $
+ * $Id: ChangeLog,v 1.1201 2003/06/30 17:07:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-01 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    ! Put b_MouseEnable into #if defined(HB_OS_WIN_32_USED) || defined(__WIN32__)
+      loop to correct non-compilation under non-Windows platform.
+
+  * source/rtl/filesys.c
+    ! Minor fix to correct MSVC's curdrive() function which always returns 'A'.
 
 2003-06-30 10:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/rdd_ads/ace.h

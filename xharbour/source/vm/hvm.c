@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.222 2003/06/29 04:32:52 andijahja Exp $
+ * $Id: hvm.c,v 1.223 2003/06/29 22:15:37 andijahja Exp $
  */
 
 /*
@@ -103,7 +103,9 @@
 #endif
 
 /* Mouse Disabling */
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
 extern BOOL b_MouseEnable;
+#endif
 
 /* DEBUG only*/
 /*#include <windows.h>*/
@@ -344,8 +346,9 @@ void hb_vmDoInitRdd( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
    PHB_DYNS pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
+#endif
 
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
@@ -354,8 +357,10 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
 
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
    if( pDynSymHbNoMouse )
       b_MouseEnable = FALSE;
+#endif
 
    hb_gcInit();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.33 2003/05/14 08:44:23 jonnymind Exp $
+ * $Id: filesys.c,v 1.34 2003/06/17 14:22:22 ronpinkas Exp $
  */
 
 /*
@@ -165,6 +165,12 @@
    #if defined(_MSC_VER) || defined(__MINGW32__)
       #include <sys\locking.h>
       #define ftruncate _chsize
+      #if defined(__MINGW32__) && !defined(_LK_UNLCK)
+         #define _LK_UNLCK _LK_UNLOCK
+      #endif
+      #if defined(_MSC_VER) && !defined(HAVE_POSIX_IO)
+         #define HAVE_POSIX_IO
+      #endif
    #else
       #define ftruncate chsize
       #if !defined(HAVE_POSIX_IO)
@@ -272,7 +278,7 @@ static USHORT s_uiErrorLast = 0;
    #define HB_FS_SOPEN
 #endif
 
-#if ( defined(HAVE_POSIX_IO) && ( defined(HB_OS_OS2) || defined(HB_OS_DOS) || defined(_Windows) || defined(_WIN32) ) && ! defined(__CYGWIN__) ) || defined(__MINGW32__)
+#if ( defined(HAVE_POSIX_IO) && ( defined(HB_OS_OS2) || defined(HB_OS_DOS) || defined(HB_OS_WIN_32) ) && ! defined(__CYGWIN__) ) || defined(__MINGW32__)
 /* These platforms and/or compilers have common drive letter support */
    #define HB_FS_DRIVE_LETTER
 #endif
@@ -650,7 +656,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       s_uiErrorLast = errno;
    }
 
-#elif defined(HAVE_POSIX_IO) && ! defined(__IBMCPP__)
+#elif defined(HAVE_POSIX_IO) && ! defined(__IBMCPP__) && ! defined(_MSC_VER)
 
    errno = 0;
    hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
