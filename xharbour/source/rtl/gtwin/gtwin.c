@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.14 2001/08/21 03:37:25 dholm Exp $
+ * $Id: gtwin.c,v 1.8 2002/10/01 17:29:11 map Exp $
  */
 
 /*
@@ -177,6 +177,8 @@ static void hb_gt_xSetCursorStyle( void )
     CONSOLE_CURSOR_INFO cci;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xSetCursorStyle(%hu)", s_usCursorStyle));
+
+    GetConsoleCursorInfo( s_HOutput, &cci );
 
     switch( s_usCursorStyle )
     {
