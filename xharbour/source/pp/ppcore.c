@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.17 2002/05/24 02:35:54 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.18 2002/05/24 13:22:52 ronpinkas Exp $
  */
 
 /*
@@ -1616,6 +1616,9 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
         if( *ptrmp == '[' && !s_numBrackets && !strtopti )
         {
+           #ifdef DEBUG_OPTIONAL
+              printf( "SQUARE: >%s<\n", ptrmp );
+           #endif
            strtopti = ptrmp;
         }
 
@@ -1626,6 +1629,14 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            ptr      = ptri;
            ipos     = NextName( &ptr, tmpname );
            ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE, TRUE );
+
+           #ifdef DEBUG_OPTIONAL
+              printf( "At: %i Name: >%s< in >%s<\n", ipos, tmpname, strtopti );
+              if( ipos )
+              {
+                 printf( "TestOptional( >%s<, >%s< )\n", strtopti, strtopti+ipos-2 );
+              }
+           #endif
 
            if( ipos && TestOptional( strtopti, strtopti+ipos-2 ) )
            {
@@ -1652,8 +1663,10 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           lastopti[s_Repeate++] = ptrmp;
           ptrmp++;
 
+          //printf( "CHECK >%s< in >%s<\n", ptrmp, ptri );
           if( !CheckOptional( ptrmp, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
           {
+             //printf( "SKIP %s\n", ptrmp );
              SkipOptional( &ptrmp );
           }
 
@@ -2703,7 +2716,9 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
   }
   */
 
-  return !flagname;
+  //printf( "nbr: %i ptr2: >%s<\n", nbr, ptr2 );
+
+  return ( ! flagname ) && ( nbr <= 1 );
 }
 
 static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom )

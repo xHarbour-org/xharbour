@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.249 2002/05/24 16:32:40 walito Exp $
+ * $Id: ChangeLog,v 1.250 2002/05/24 19:29:06 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-24 19:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in TestOptional() which caused a match of a STOP word to be accepted within a Nested Optional.
+
+    /* NOTE: This could open new issues! I did test as much as I could including making sure all of FWH
+       compiles correctly - but extensive testing is needed by compiling everything that was compiling
+       before this change.
+    */
 
 2002-05-24 16:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/achoice.prg
