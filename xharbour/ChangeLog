@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1020 2003/05/14 10:03:46 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1021 2003/05/15 01:52:20 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-15 21:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    + Added support for PROCEDURE <ProcName> CLASS <ClassName> Syntax.
+
+  * tests/pp.prg
+    * Corrected few Alert() messages.
+
+  * tests/ppclass.prg
+    * Minor formatting.
+
 2003-05-15 09:00:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rdd/dbcmd.c
     + C-Level DBSkipper()
@@ -20,7 +31,7 @@
   *source/vm/errorapi.c
    + errorapi generated error missed procname and procline
      initialization in terror class. Fixed.
-     
+
 2003-05-14 10:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/errorapi.c
   * include/hbapierr.h

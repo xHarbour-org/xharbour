@@ -6,22 +6,23 @@
    #include "clpclass.ch"
 #endif
 
-Function Main()
+PROCEDURE Main()
     LOCAL o := TTest():New()
 
     o:Increment()
     Alert( o:nVar )
-Return nil
+Return NIL
 
 CLASS TTest
    VAR nVar
    METHOD New CONSTRUCTOR
    METHOD Increment()
+   METHOD SomeProcedure()
 ENDCLASS
 
 METHOD New //CLASS TTest /* CLASS clause now optional */
    ::nVar := 0
 return Self
 
-METHOD Increment CLASS TTest // () No longer required
+METHOD Increment() CLASS TTest // () No longer required
 Return (++::nVar)

@@ -843,7 +843,7 @@ PROCEDURE RP_Dot()
    LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp, bKey5, bKey24
 
    #ifdef FW
-       Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
+       Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + [;;Please try Interpreter mode, using the -R switch...] )
        RETURN
    #endif
 
@@ -2059,10 +2059,10 @@ RETURN
 
 PROCEDURE RP_Dot_Err( oErr )
 
-   LOCAL Counter, xArg, sArgs := ""
+   LOCAL Counter, xArg, sArgs := ";"
 
-   IF ValType( oErr:Args ) == 'A'
-      sArgs := " - Arguments: "
+   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
+      sArgs := ";Arguments: "
 
       FOR Counter := 1 TO Len( oErr:Args )
          xArg := oErr:Args[Counter]
@@ -2096,12 +2096,9 @@ PROCEDURE RP_Dot_Err( oErr )
                sArgs +=  '[' + ValType( xArg ) + "]; "
          ENDCASE
       NEXT
-
-      sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
-   TraceLog( oErr:Description, sArgs, oErr:Args )
-
+   TraceLog( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
    Alert( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
@@ -2112,10 +2109,10 @@ PROCEDURE RP_Dot_Err( oErr )
 
 PROCEDURE RP_PPText_Err( oErr, sLine, nLine )
 
-   LOCAL Counter, xArg, sArgs := ""
+   LOCAL Counter, xArg, sArgs := ";"
 
-   IF ValType( oErr:Args ) == 'A'
-      sArgs := " - Arguments: "
+   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
+      sArgs := ";Arguments: "
 
       FOR Counter := 1 TO Len( oErr:Args )
          xArg := oErr:Args[Counter]
@@ -2149,12 +2146,10 @@ PROCEDURE RP_PPText_Err( oErr, sLine, nLine )
                sArgs +=  '[' + ValType( xArg ) + "]; "
          ENDCASE
       NEXT
-
-      sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
-   TraceLog( "Line: " + Str( nLine, 4 ) + " could not pre-process text: '" + sLine + "'; " + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile: ]+"'" + sLine + "'; " + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   TraceLog( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + "'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']' )
+   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + "'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']' )
 
    BREAK
 
@@ -2164,12 +2159,12 @@ PROCEDURE RP_PPText_Err( oErr, sLine, nLine )
 
 PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
 
-   LOCAL Counter, xArg, sArgs := ""
+   LOCAL Counter, xArg, sArgs := ";"
 
    ErrorBlock( {|e| TraceLog( e:Description, e:SubSystem, e:SubCode, e:Args ), __Quit() } )
 
-   IF ValType( oErr:Args ) == 'A'
-      sArgs := "Arguments: "
+   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
+      sArgs := ";Arguments: "
 
       FOR Counter := 1 TO Len( oErr:Args )
          xArg := oErr:Args[Counter]
@@ -2203,12 +2198,10 @@ PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
                sArgs +=  '[' + ValType( xArg ) + "]; "
          ENDCASE
       NEXT
-
-      sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
-   TraceLog( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + "'; '" + oErr:Description + "'; " + sArgs + "; " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + CRLF + "'" + sLine + "'" + CRLF + oErr:Description + CRLF + sArgs + CRLF + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   TraceLog( [Line: ] + Str( nLine, 4 ) + [ could not compile:] + ";'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile:] + ";'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
 
@@ -2218,14 +2211,14 @@ PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
 
 FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
 
-   LOCAL Counter, xArg, sArgs := "", nProc, sProc
+   LOCAL Counter, xArg, sArgs := ";", nProc, sProc
 
    IF nLine == NIL
       nLine := 0
    ENDIF
 
-   IF ValType( oErr:Args ) == 'A'
-      sArgs := "Arguments: "
+   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
+      sArgs := ";Arguments: "
 
       FOR Counter := 1 TO Len( oErr:Args )
          xArg := oErr:Args[Counter]
@@ -2259,8 +2252,6 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
                sArgs +=  '[' + ValType( xArg ) + "]; "
          ENDCASE
       NEXT
-
-      sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
    IF oErr:SubCode == 1001
@@ -2288,17 +2279,17 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
          IF oErr:CanSubstitute
             RETURN ( s_xRet )
          ELSEIF oErr:CanDefault
-            Alert( [Must Default: ] + "'" + oErr:Operation + "' '" + oErr:Description + CRLF + ;
-						       sArgs + CRLF + ;
-									 PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
+            Alert( [Must Default: ] + "'" + oErr:Operation + "' '" + oErr:Description + ;
+                   sArgs + ";" + ;
+                   PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
 									 ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
             RETURN  ( .F. )
          ELSE
-            Alert( [No Recovery for: ] + "'" + oErr:Operation + "' " + oErr:Description + CRLF + ;
-						       sArgs + " " + CRLF + ;
-									 PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
-									 ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+            Alert( [No Recovery for: ] + "'" + oErr:Operation + "' " + oErr:Description + ;
+                   sArgs + ;
+                   PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
+                   ProcName(2) + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
             oErr:Cargo := nProc
             BREAK oErr
@@ -2308,10 +2299,10 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
 
    TraceLog( s_sModule, nLine, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' '" + oErr:Description + "' " + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
-   Alert( [Line: ] + Str( nLine ) + [ R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "' " + CRLF + ;
-	        oErr:Description + CRLF + ;
-					sArgs + CRLF + ;
-					PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
+   Alert( [Line: ] + Str( nLine ) + [ R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "';" + ;
+          oErr:Description + ;
+          sArgs + ;
+          PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
 					ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
    //BREAK oErr
@@ -8437,7 +8428,6 @@ INIT PROCEDURE PPInit
    FClose(FileHandle)
 
 RETURN
-#endif
 
 //--------------------------------------------------------------//
 FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
@@ -8474,7 +8464,6 @@ FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p
 
 RETURN .T.
 
-#ifndef __XHARBOUR__
 //--------------------------------------------------------------//
 FUNCTION CStr( xExp )
 
