@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.99 2004/03/29 18:04:01 ronpinkas Exp $
+ * $Id: arrays.c,v 1.100 2004/03/30 18:37:28 ronpinkas Exp $
  */
 
 /*
@@ -1158,7 +1158,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       hb_xfree( pItems );
 
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = -1 //Intentionally - might cause earlier GPF on invalid reuse.;
+      pBaseArray->ulLen = -1; //Intentionally - might cause earlier GPF on invalid reuse.;
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
@@ -1544,7 +1544,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = -2 //Intentionally - might cause earlier GPF on invalid reuse.;
+      pBaseArray->ulLen = -2; //Intentionally - might cause earlier GPF on invalid reuse.;
    }
 
    // Has to be AFTER the array elements have been released!
