@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.36 2002/10/23 06:31:58 what32 Exp $
+ * $Id: xInspect.prg,v 1.37 2002/10/23 07:10:50 what32 Exp $
  */
 
 /*
@@ -122,7 +122,7 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
 
    if __objSendMsg( ::CurObject, cVar ) != cText
       __objSendMsg( ::CurObject, "_"+cVar, cText )
-      
+
       ::Browser:source[::Browser:RecPos][2]:= cText
       ::Browser:RefreshCurrent()
 
@@ -298,7 +298,8 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
               ::oCtrl:Create()
               ::oCtrl:SetFocus()
       ENDCASE
-   endif
+   ENDIF
+
 RETURN(self)
 
 METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
@@ -338,44 +339,54 @@ CLASS StringList FROM TPanel
 ENDCLASS
 
 METHOD OnCreate() CLASS StringList
-   local n,nLines
-   local cText:=""
-   FOR n:= 1 TO LEN(oApp:MainFrame:ObjInsp:CurObject:Items:Text)
-       cText+=oApp:MainFrame:ObjInsp:CurObject:Items:Text[n]+CRLF
+   local nLines
+   local cText := "", cItem
+
+   FOR EACH cItem IN oApp:MainFrame:ObjInsp:CurObject:Items:Text
+      cText += ( cItem + CRLF )
    NEXT
-   cText:=LEFT( cText, LEN( cText)-2)
-   SetDlgItemText( ::handle, 103, cText)
-   nLines:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
-   SetDlgItemText( ::handle, 101, alltrim(str(nLines))+" Lines" )
-RETURN(self)
+
+   cText:= Left( cText, Len( cText ) -2 )
+   SetDlgItemText( ::handle, 103, cText )
+   nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+   SetDlgItemText( ::handle, 101, AllTrim( Str( nLines ) ) + " Lines" )
+
+   TraceLog( oApp:MainFrame:ObjInsp:CurObject:Items:Text, cText )
+RETURN Self
 
 METHOD OnCommand( nwParam ) CLASS StringList
    local n, cText, nPtr
    static nLines
+
    DO CASE
       CASE HIWORD(nwParam) == EN_CHANGE
            n:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
            IF nLines != n
               nLines := n
-              SetDlgItemText( ::handle, 101, alltrim(str(nLines))+" Lines" )
+              SetDlgItemText( ::handle, 101, AllTrim( Str(nLines) ) + " Lines" )
            ENDIF
+
       CASE nwParam == IDOK
-           IF nLines==NIL
-              nLines:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+           IF nLines == NIL
+              nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
            ENDIF
-           oApp:MainFrame:ObjInsp:CurObject:Items:Text:={}
-           FOR n:=1 TO nLines
-               cText := i2bin(100)+space(200)
+
+           oApp:MainFrame:ObjInsp:CurObject:Items:Text := {}
+           FOR n := 1 TO nLines
+               cText := I2Bin( 100 ) + Space( 200 )
                SendDlgItemMessage( ::handle, 103, EM_GETLINE, n-1, cText )
-               cText:=STRTRAN(cText,CHR(10))
-               cText:=STRTRAN(cText,CHR(13))
-               oApp:MainFrame:ObjInsp:CurObject:Items:Add(ALLTRIM(cText))
-               oApp:MainFrame:ObjInsp:CurObject:Parent:XFMControl( , oApp:MainFrame:ObjInsp:CurObject, .F. )
+               cText := StrTran( cText, Chr(10), '' )
+               cText := StrTran( cText, Chr(13), '' )
+               oApp:MainFrame:ObjInsp:CurObject:Items:Add( AllTrim( cText ) )
            NEXT
+
+           oApp:MainFrame:ObjInsp:CurObject:Parent:XFMControl( , oApp:MainFrame:ObjInsp:CurObject, .F. )
            nLines := NIL
            EndDialog( ::handle, IDOK )
+
       CASE nwParam == IDCANCEL
            nLines := NIL
            EndDialog( ::handle, IDCANCEL )
    ENDCASE
-return(nil)
+
+return NIL
