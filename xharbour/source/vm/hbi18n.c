@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.4 2003/06/21 15:04:30 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.5 2003/06/23 20:31:39 jonnymind Exp $
  */
 
 /*
@@ -186,9 +186,6 @@ PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
    HB_I18N_TAB_HEADER header;
    int nRead;
 
-   // force rewind
-   lseek( handle, 0, 0 );
-
    nRead = hb_fsRead( handle, (BYTE * ) &header, sizeof( header ) );
    if ( nRead != sizeof( header ) )
    {
@@ -360,7 +357,7 @@ BOOL hb_i18n_write_table( FHANDLE handle, PHB_ITEM pTable )
             return FALSE;
          }
 
-         if ( hb_fsWrite( handle, hb_arrayGetCPtr( pRow, j ), nStrLen ) != nStrLen )
+         if ( hb_fsWrite( handle, ( BYTE *) hb_arrayGetCPtr( pRow, j ), nStrLen ) != nStrLen )
          {
             return FALSE;
          }
@@ -387,7 +384,7 @@ BOOL hb_i18n_load_language( char *language )
    PHB_ITEM pTable;
 
    path = hb_i18n_build_table_filename( NULL, language );
-   handle = hb_fsOpen( path, FO_READ ); // on error will fail on next op
+   handle = hb_fsOpen( (BYTE *) path, FO_READ ); // on error will fail on next op
    hb_xfree( path );
 
    nRead = hb_fsRead( handle, (BYTE *) &header, sizeof( header ) );
@@ -459,7 +456,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = hb_fsOpen( hb_itemGetC( pParam ), FO_READ );
+      handle = hb_fsOpen( ( BYTE * ) hb_itemGetC( pParam ), FO_READ );
    }
    else
    {
@@ -579,7 +576,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    if ( HB_IS_STRING( pParam ) )
    {
 
-      handle = hb_fsCreate( hb_itemGetC( pParam ), FO_WRITE );
+      handle = hb_fsCreate( (BYTE *) hb_itemGetC( pParam ), FO_WRITE );
 
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
