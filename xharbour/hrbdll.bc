@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.38 2003/12/27 11:24:15 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.39 2004/01/26 22:03:24 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -485,6 +485,17 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cdprukoi.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdphr852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdphr1250.obj         + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1250.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1251.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1257.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc437.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc850.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc852.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc866.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc8859_1.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc8859_2.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\uckoi8.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\ucmaz.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\colorind.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\console.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\copyfile.obj          + >> hdll.tmp
