@@ -946,3 +946,81 @@
 #define IMAGE_ENHMETAFILE                3
 
 //-------------------------------------------------------------------//
+/*
+ * DrawText() Format Flags
+ */
+#define DT_TOP                           0
+#define DT_LEFT                          0
+#define DT_CENTER                        1
+#define DT_RIGHT                         2
+#define DT_VCENTER                       4
+#define DT_BOTTOM                        8
+#define DT_WORDBREAK                    16
+#define DT_SINGLELINE                   32
+#define DT_EXPANDTABS                   64
+#define DT_TABSTOP                     128
+#define DT_NOCLIP                      256
+#define DT_EXTERNALLEADING             512
+#define DT_CALCRECT                   1024
+#define DT_NOPREFIX                   2048
+#define DT_INTERNAL                   4096
+#define DT_EDITCONTROL                8192
+#define DT_PATH_ELLIPSIS             16384
+#define DT_END_ELLIPSIS              32768
+#define DT_MODIFYSTRING              65536
+#define DT_RTLREADING               131072
+#define DT_WORD_ELLIPSIS            262144
+#define DT_NOFULLWIDTHCHARBREAK     524288
+#define DT_HIDEPREFIX              1048576
+#define DT_PREFIXONLY              2097152
+
+//-------------------------------------------------------------------//
+// Brush Styles
+#define BS_SOLID            0
+#define BS_NULL             1
+#define BS_HOLLOW           BS_NULL
+#define BS_HATCHED          2
+#define BS_PATTERN          3
+#define BS_INDEXED          4
+#define BS_DIBPATTERN       5
+#define BS_DIBPATTERNPT     6
+#define BS_PATTERN8X8       7
+#define BS_DIBPATTERN8X8    8
+#define BS_MONOPATTERN      9
+
+// Hatch Styles
+#define HS_HORIZONTAL       0       // -----
+#define HS_VERTICAL         1       // |||||
+#define HS_FDIAGONAL        2       // \\\\\
+#define HS_BDIAGONAL        3       // /////
+#define HS_CROSS            4       // +++++
+#define HS_DIAGCROSS        5       // xxxxx
+
+// Pen Styles
+#define PS_SOLID            0
+#define PS_DASH             1       // -------
+#define PS_DOT              2       // .......
+#define PS_DASHDOT          3       // _._._._
+#define PS_DASHDOTDOT       4       // _.._.._
+#define PS_NULL             5
+#define PS_INSIDEFRAME      6
+#define PS_USERSTYLE        7
+#define PS_ALTERNATE        8
+#define PS_STYLE_MASK               15
+
+#define PS_ENDCAP_ROUND              0
+#define PS_ENDCAP_SQUARE           256
+#define PS_ENDCAP_FLAT             512
+#define PS_ENDCAP_MASK            3840
+
+#define PS_JOIN_ROUND                0
+#define PS_JOIN_BEVEL             4096
+#define PS_JOIN_MITER             8192
+#define PS_JOIN_MASK             61440
+
+#define PS_COSMETIC                  0
+#define PS_GEOMETRIC             65536
+#define PS_TYPE_MASK            983040
+
+//-------------------------------------------------------------------//
+

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.27 2004/07/23 13:05:41 paultucker Exp $
+ * $Id: hbgtwvt.h,v 1.28 2004/07/29 15:13:58 vouchcac Exp $
  */
 
 /*
@@ -230,6 +230,11 @@ typedef struct global_data
   PHB_DYNS  pSymDlgProcModeless[ WVT_DLGML_MAX ]; // Holds Modeless Dialog Procedure Address
   PHB_ITEM  pFunc[ WVT_DLGML_MAX ];    // Function pointer for WndProc
   int       iType[ WVT_DLGML_MAX ];    // Type of Function Pointers - Function 1, Block 2, Method 3
+  BOOL      bGui;
+  HDC       hGuiDC;
+  HBITMAP   hGuiBmp;
+  int       iGuiWidth;
+  int       iGuiHeight;
 } GLOBAL_DATA;
 
 typedef GLOBAL_DATA * LPGLOBAL_DATA;
@@ -256,16 +261,13 @@ BOOL   HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose );
 void   HB_EXPORT hb_wvt_gtDoProcessMessages( void );
 BOOL   HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent );
 BOOL   HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable );
-BOOL   HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image );
-BOOL   HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
-BOOL   HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
-BOOL   HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
 void   HB_EXPORT hb_wvt_gtAddCharToInputQueue( int data );
 IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image );
 BOOL   HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
 BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
+BOOL   HB_EXPORT hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image );
 
 LPWORD HB_EXPORT lpwAlign( LPWORD lpIn );
 int    HB_EXPORT nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );

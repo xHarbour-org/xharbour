@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.3 2004/07/21 11:07:24 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.4 2004/07/29 15:14:39 vouchcac Exp $
  */
 
 /*
@@ -115,6 +115,7 @@ DATA   oldTooltipBkColor
 DATA   oldTooltipTextColor
 DATA   oldMenuHandle
 DATA   oldMenuBlock
+DATA   lGui
 
 //  Dialog Parameters
 //
@@ -218,6 +219,7 @@ DEFAULT nFontWidth    TO fnt_[ 3 ]
 ::nKey                := 0
 ::cColor              := 'N/W'
 ::nUseObj             := 0
+::lGui                := Wvt_SetGui( .f. )
 
 RETURN Self
 
@@ -320,6 +322,7 @@ RestScreen( 0, 0, maxrow(), maxcol(), ::cScreen )
 Wvt_RestScreen( 0, 0 ,maxrow(), maxcol(), ::aWvtScreen )
 PurgePaint( ::cPaintBlockID )
 WvtSetPaint( ::aOldPnt )
+Wvt_SetGui( ::lGui )
 
 RETURN nil
 

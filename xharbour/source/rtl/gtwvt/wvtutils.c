@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.11 2004/07/29 15:14:40 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.12 2004/07/30 08:53:35 lf_sfnet Exp $
  */
 
 /*
@@ -393,6 +393,20 @@ HB_FUNC( WVT_GETTOOLTIPTEXTCOLOR )
 #endif
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETGUI )
+{
+   BOOL bGui = _s->bGui;
+
+   if ( ! ISNIL( 1 ) )
+   {
+      _s->bGui = hb_parl( 1 );
+   }
+
+   hb_retl( bGui );
+}
+
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETTIMER )
@@ -1204,7 +1218,10 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
 
    if ( HB_IS_BLOCK( pFirst ) )
    {
-      pFunc = ( PHB_ITEM ) pFirst ;
+      // This code does not work //
+      //
+      pFunc = HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
+      pFirst->item.asBlock.value->ulCounter++;
       iType = 2;
    }
    else if( pFirst->type == HB_IT_STRING )
@@ -1296,7 +1313,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC ( WVT__MAKEDLGTEMPLATE )
+HB_FUNC( WVT__MAKEDLGTEMPLATE )
 {
    WORD  *p, *pdlgtemplate ;
    WORD  nItems = hb_parni( 1, 4 ) ;
@@ -1511,7 +1528,7 @@ HB_FUNC( WVT_DLGSETICON )
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-HB_FUNC ( WIN_SENDMESSAGE )
+HB_FUNC( WIN_SENDMESSAGE )
 {
    char *cText ;
 
@@ -1538,7 +1555,7 @@ HB_FUNC ( WIN_SENDMESSAGE )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC ( WIN_SENDDLGITEMMESSAGE )
+HB_FUNC( WIN_SENDDLGITEMMESSAGE )
 {
    char     *cText;
    PHB_ITEM pText = hb_param( 5, HB_IT_STRING );
@@ -1604,6 +1621,13 @@ HB_FUNC( WIN_SETBKCOLOR )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WIN_SETBKMODE )
+{
+   hb_retni( ( int ) SetBkMode( ( HDC ) hb_parnl( 1 ), hb_parni( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
 HB_FUNC( WIN_GETSTOCKOBJECT )
 {
    hb_retnl( ( ULONG ) GetStockObject( hb_parnl( 1 ) ) );
@@ -1613,7 +1637,14 @@ HB_FUNC( WIN_GETSTOCKOBJECT )
 
 HB_FUNC( WIN_DELETEOBJECT )
 {
-   hb_retl( DeleteObject( ( HANDLE ) hb_parnl( 1 ) ) );
+   hb_retl( DeleteObject( ( HGDIOBJ ) hb_parnl( 1 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SELECTOBJECT )
+{
+   hb_retnl( ( ULONG ) SelectObject( ( HDC ) hb_parnl( 1 ), ( HGDIOBJ ) hb_parnl( 2 ) ) );
 }
 
 //-------------------------------------------------------------------//
@@ -1776,6 +1807,89 @@ HB_FUNC( WIN_LOADIMAGE )
    }
 
    hb_retnl( ( ULONG ) hImage ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETCLIENTRECT )
+{
+   RECT     rc;
+   HB_ITEM  info;
+   HB_ITEM  temp;
+
+   GetClientRect( ( HWND ) hb_parnl( 1 ), &rc );
+
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
+
+   hb_arrayNew( &info, 4 );
+
+   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, rc.left   ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, rc.top    ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, rc.right  ) );
+   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, rc.bottom ) );
+
+   hb_itemReturn( &info );
+}
+
+//-------------------------------------------------------------------//
+//
+//    Win_DrawImage( hdc, nLeft, nTop, nWidth, nHeight, cImage ) in Pixels
+//
+HB_FUNC( WIN_DRAWIMAGE )
+{
+   hb_retl( hb_wvt_DrawImage( ( HDC ) hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                                   hb_parni( 4 ), hb_parni( 5 ), hb_parc( 6 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETDC )
+{
+   hb_retnl( ( ULONG ) GetDC( ( HWND ) hb_parnl( 1 )  ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_RELEASEDC )
+{
+   hb_retl( ReleaseDC( ( HWND ) hb_parnl( 1 ), ( HDC ) hb_parnl( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_RECTANGLE )
+{
+   Rectangle( ( HDC ) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ), hb_parni( 4 ), hb_parni( 5 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_CREATEBRUSH )
+{
+   LOGBRUSH lb;
+
+   lb.lbStyle = hb_parni( 1 );
+   lb.lbColor = ISNIL( 2 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 2 ) ;
+   lb.lbHatch = ISNIL( 3 ) ? 0 : hb_parni( 3 );
+
+   hb_retnl( ( ULONG ) CreateBrushIndirect( &lb ) );
+}
+
+//-------------------------------------------------------------------//
+//
+//   Win_DrawText( hDC, cText, aRect, nFormat )
+//
+HB_FUNC( WIN_DRAWTEXT )
+{
+   RECT rc;
+
+   rc.left   = hb_parni( 3,1 );
+   rc.top    = hb_parni( 3,2 );
+   rc.right  = hb_parni( 3,3 );
+   rc.bottom = hb_parni( 3,4 );
+
+   hb_retl( DrawText( ( HDC ) hb_parnl( 1 ), hb_parc( 2 ), strlen( hb_parc( 2 ) ), &rc, hb_parni( 4 ) ) );
 }
 
 //-------------------------------------------------------------------//

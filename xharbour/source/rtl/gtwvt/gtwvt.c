@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.124 2004/08/06 02:25:55 maurifull Exp $
+ * $Id: gtwvt.c,v 1.125 2004/08/22 17:20:12 lf_sfnet Exp $
  */
 
 /*
@@ -194,11 +194,10 @@ static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static void    hb_wvt_gtCreateToolTipWindow( void );
-/*
-static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
-static int     hb_wvt_gtDialogMLIndex( void );
-static void    hb_wvt_gtDialogMLPlace( HWND hDlg, int iIndex, char * pszDlgProc );
-*/
+static void    hb_wvt_gtRestGuiState( LPRECT rect );
+static void    hb_wvt_gtInitGui( void );
+static void    hb_wvt_gtInitClipBoard( void );
+
 //-------------------------------------------------------------------//
 //
 // mouse initialization was made in cmdarg.c
@@ -236,7 +235,7 @@ extern BOOL    b_MouseEnable;
 void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ) )
 {
     /* FSG: filename var for application name */
-    PHB_FNAME pFileName;
+   PHB_FNAME pFileName;
 
     HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Init()" ) );
 
@@ -248,7 +247,9 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     last_gobject = NULL;
 
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
+
     gt_hbInitStatics();
+
     _s.hWnd = hb_wvt_gtCreateWindow( ( HINSTANCE ) hb_hInstance, ( HINSTANCE ) hb_hPrevInstance,  "", hb_iCmdShow );
     if ( !_s.hWnd )
     {
@@ -261,8 +262,9 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     hb_xfree( pFileName );
 
     hb_wvt_gtCreateObjects();
-    _s.hdc     = GetDC( _s.hWnd );
-    _s.hCompDC = CreateCompatibleDC( _s.hdc );
+    _s.hdc        = GetDC( _s.hWnd );
+    _s.hCompDC    = CreateCompatibleDC( _s.hdc );
+    hb_wvt_gtInitGui();
 
     hb_wvt_wvtCore();
     hb_wvt_wvtUtils();
@@ -288,6 +290,14 @@ void HB_GT_FUNC( gt_Exit( void ) )
 
     if ( _s.hWnd )
     {
+      for ( i = 0; i < WVT_DLGML_MAX; i++ )
+      {
+         if ( _s.hDlgModeless[ i ] )
+         {
+            SendMessage( _s.hDlgModeless[ i ], WM_CLOSE, 0, 0 );
+         }
+      }
+
       DeleteObject( ( HPEN   ) _s.penWhite      );
       DeleteObject( ( HPEN   ) _s.penWhiteDim   );
       DeleteObject( ( HPEN   ) _s.penBlack      );
@@ -309,6 +319,15 @@ void HB_GT_FUNC( gt_Exit( void ) )
       {
          DeleteDC( _s.hCompDC );
       }
+      if ( _s.hGuiDC )
+      {
+         DeleteDC( _s.hGuiDC );
+      }
+      if ( _s.hGuiBmp )
+      {
+         DeleteObject( _s.hGuiBmp );
+      }
+
 
       for ( i = 0; i < WVT_PICTURES_MAX; i++ )
       {
@@ -331,7 +350,6 @@ void HB_GT_FUNC( gt_Exit( void ) )
             DeleteObject( _s.hUserPens[ i ] );
          }
       }
-
       if ( _s.hMSImg32 )
       {
          FreeLibrary( _s.hMSImg32 );
@@ -1626,10 +1644,40 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
     wi.top  = rcWorkArea.top  + ( ( ( rcWorkArea.bottom-rcWorkArea.top ) - ( height ) ) / 2 ) ;
   }
   SetWindowPos( hWnd, NULL, wi.left, wi.top, width, height, SWP_NOZORDER );
+
+  if ( _s.bGui )
+  {
+     hb_wvt_gtInitGui();
+  }
 }
 //-------------------------------------------------------------------//
-/* JC1: rendering of graphical objects */
 
+static void hb_wvt_gtInitGui( void )
+{
+  _s.iGuiWidth  = _s.COLS * _s.PTEXTSIZE.x ;
+  _s.iGuiHeight = _s.ROWS * _s.PTEXTSIZE.y ;
+
+  if ( _s.hGuiDC )
+  {
+     DeleteDC( _s.hGuiDC );
+  }
+  _s.hGuiDC = CreateCompatibleDC( _s.hdc );
+
+  if ( _s.hGuiBmp )
+  {
+     DeleteObject( _s.hGuiBmp );
+  }
+  _s.hGuiBmp = CreateCompatibleBitmap( _s.hdc, _s.iGuiWidth, _s.iGuiHeight );
+
+  SelectObject( _s.hGuiDC, _s.hGuiBmp );
+  SetTextCharacterExtra( _s.hGuiDC,0 );
+  SelectObject( _s.hGuiDC, _s.hFont );
+}
+
+//-------------------------------------------------------------------//
+//
+/* JC1: rendering of graphical objects */
+//
 static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
 {
    HB_GT_GOBJECT *pObj;
@@ -1711,7 +1759,6 @@ static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
 
       pObj = pObj->next;
    }
-
 }
 
 //-------------------------------------------------------------------//
@@ -1721,6 +1768,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
   static BOOL bPaint     = FALSE;
   static BOOL bGetFocus  = FALSE;
+  static BOOL bSetFocus  = FALSE;
+  static BOOL bKillFocus = FALSE;
 
   BOOL        bRet;
 
@@ -1750,8 +1799,26 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
        * the GetUpdateRect call MUST be made BEFORE the BeginPaint call, since
        * BeginPaint resets the update rectangle - don't move it or nothing is drawn!
        */
+      if ( _s.bGui && bKillFocus )
+      {
+         hb_wvt_gtRestGuiState( &updateRect );
+         ValidateRect( hWnd, &updateRect );
+         return( 0 );
+      }
+      if ( _s.bGui && bSetFocus )
+      {
+         bSetFocus  = FALSE;
+         hb_wvt_gtRestGuiState( &updateRect );
+         ValidateRect( hWnd, &updateRect );
+         return( 0 );
+      }
+
       hdc = BeginPaint( hWnd, &ps );
       SelectObject( hdc, _s.hFont );
+      if ( _s.bGui )
+      {
+         SelectObject( _s.hGuiDC, _s.hFont );
+      }
 
       if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
       {
@@ -1789,6 +1856,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
             {
               hb_wvt_gtSetColors( hdc, oldAttrib );
               hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
+              if ( _s.bGui )
+              {
+                hb_wvt_gtSetColors( _s.hGuiDC, oldAttrib );
+                hb_wvt_gtTextOut( _s.hGuiDC, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
+              }
               oldAttrib  = attrib;
               startIndex = index;
               startCol   = icol;
@@ -1800,6 +1872,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           }
           hb_wvt_gtSetColors( hdc, oldAttrib );
           hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
+          if ( _s.bGui )
+          {
+            hb_wvt_gtSetColors( _s.hGuiDC, oldAttrib );
+            hb_wvt_gtTextOut( _s.hGuiDC, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
+          }
         }
       }
 
@@ -1841,6 +1918,12 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 #ifdef WVT_DEBUG
   nSetFocus++;
 #endif
+      if ( _s.bGui )
+      {
+         bSetFocus  = TRUE ;
+         bKillFocus = FALSE;
+      }
+
       hb_wvt_gtCreateCaret() ;
 
       if ( bGetFocus )
@@ -1866,6 +1949,10 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 #ifdef WVT_DEBUG
   nKillFocus++;
 #endif
+      if ( _s.bGui )
+      {
+         bKillFocus = TRUE;
+      }
       hb_wvt_gtKillCaret();
 
       if ( _s.pSymWVT_KILLFOCUS )
@@ -1976,14 +2063,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           }
           else if ( bCtrl && wParam == VK_TAB ) // K_CTRL_TAB
           {
-             if ( bShift ) 
+             if ( bShift )
              {
                 hb_wvt_gtAddCharToInputQueue( K_CTRL_SH_TAB );
              }
              else
              {
                 hb_wvt_gtAddCharToInputQueue( K_CTRL_TAB );
-             }   
+             }
           }
           else if ( iScanCode == 70 ) // Ctrl_Break key OR Scroll Lock Key
           {
@@ -2269,9 +2356,17 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
 //-------------------------------------------------------------------//
 
+static void hb_wvt_gtRestGuiState( LPRECT rect )
+{
+   BitBlt( _s.hdc, rect->left, rect->top, rect->right - rect->left, rect->bottom - rect->top,
+                                                 _s.hGuiDC, rect->left, rect->top, SRCCOPY );
+}
+
+//-------------------------------------------------------------------//
+
 static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
 {
-  HWND     hWnd;
+   HWND     hWnd;
   WNDCLASS wndclass;
 
   HB_SYMBOL_UNUSED( hPrevInstance );
@@ -2321,6 +2416,7 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
   // If so compiled, then you need to issue Wvt_ShowWindow( SW_RESTORE )
   // at the point you desire in your code.
   //
+
   if ( hb_dynsymFind( "HB_NOSTARTUPWINDOW" ) != NULL )
   {
      iCmdShow = SW_HIDE;
@@ -2656,27 +2752,28 @@ static POINT hb_wvt_gtGetColRowForTextBuffer( USHORT index )
  */
 static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString, USHORT cbString  )
 {
-  BOOL Result ;
+  BOOL  Result ;
   POINT xy;
-  RECT rClip;
-  long nFontCX = _s.PTEXTSIZE.x;
-  long nFontCY = _s.PTEXTSIZE.y;
+  RECT  rClip;
+//  long  nFontCX = _s.PTEXTSIZE.x;
+//  long  nFontCY = _s.PTEXTSIZE.y;
 
   if ( cbString > _s.COLS ) // make sure string is not too long
   {
     cbString = _s.COLS;
   }
   xy = hb_wvt_gtGetXYFromColRow( col, row );
-  SetRect( &rClip, xy.x, xy.y, xy.x + cbString * nFontCX, xy.y + nFontCY );
+
+//  SetRect( &rClip, xy.x, xy.y, xy.x + cbString * nFontCX, xy.y + nFontCY );
+  SetRect( &rClip, xy.x, xy.y, xy.x + cbString * _s.PTEXTSIZE.x, xy.y + _s.PTEXTSIZE.y );
+
   if ( _s.FixedFont )
   {
-    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, NULL );
-//    Result = TextOut( hdc, xy.x, xy.y, lpString, cbString );
+     Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString, cbString, NULL );
   }
   else
   {
-    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString, cbString, _s.FixedSize );
-//    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
+     Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString, cbString, _s.FixedSize );
   }
   return( Result ) ;
 }
@@ -2695,6 +2792,7 @@ static BOOL hb_wvt_gtSetColors( HDC hdc, BYTE attr )
 
   SetTextColor( hdc, _s.foreground );
   SetBkColor( hdc, _s.background );
+  SetTextAlign( hdc, TA_LEFT );
 
   return( TRUE );
 }
@@ -2899,6 +2997,7 @@ static void gt_hbInitStatics( void )
      _s.pFunc[ iIndex ]               = NULL;
      _s.iType[ iIndex ]               = NULL;
   }
+  _s.bGui             = FALSE;
 }
 
 //-------------------------------------------------------------------//
@@ -3370,104 +3469,6 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 }
 
 //-------------------------------------------------------------------//
-//
-//            Function borrowed from HBPrint.lib
-//
-BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image )
-{
-  IStream  *iStream;
-  IPicture *iPicture;
-  HGLOBAL  hGlobal;
-  HANDLE   hFile;
-  DWORD    nFileSize;
-  DWORD    nReadByte;
-  LONG     lWidth,lHeight;
-  int      x,y,xe,ye;
-  int      c   = x1 ;
-  int      r   = y1 ;
-  int      dc  = wd ;
-  int      dr  = ht ;
-  int      tor =  0 ;
-  int      toc =  0 ;
-  HRGN     hrgn1;
-  POINT    lpp;
-  BOOL     bResult = FALSE;
-
-  hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                                      FILE_ATTRIBUTE_NORMAL, NULL );
-  if ( hFile != INVALID_HANDLE_VALUE )
-  {
-    nFileSize = GetFileSize( hFile, NULL );
-
-    if ( nFileSize != INVALID_FILE_SIZE )
-    {
-      hGlobal = GlobalAlloc( GPTR, nFileSize );
-
-      if ( hGlobal )
-      {
-        if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
-        {
-          CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
-          if ( iPicture )
-          {
-            iPicture->lpVtbl->get_Width( iPicture,&lWidth );
-            iPicture->lpVtbl->get_Height( iPicture,&lHeight );
-
-            if ( dc  == 0 )
-            {
-              dc = ( int ) ( ( float ) dr * lWidth  / lHeight );
-            }
-            if ( dr  == 0 )
-            {
-              dr = ( int ) ( ( float ) dc * lHeight / lWidth  );
-            }
-            if ( tor == 0 )
-            {
-              tor = dr;
-            }
-            if ( toc == 0 )
-            {
-              toc = dc;
-            }
-            x  = c;
-            y  = r;
-            xe = c + toc - 1;
-            ye = r + tor - 1;
-
-            GetViewportOrgEx( _s.hdc, &lpp );
-
-            hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
-            SelectClipRgn( _s.hdc, hrgn1 );
-
-            while ( x < xe )
-            {
-              while ( y < ye )
-              {
-                iPicture->lpVtbl->Render( iPicture, _s.hdc, x, y, dc, dr, 0,
-                                          lHeight, lWidth, -lHeight, NULL );
-                y += dr;
-              }
-              y =  r;
-              x += dc;
-            }
-
-            SelectClipRgn( _s.hdc, NULL );
-            DeleteObject( hrgn1 );
-
-            iPicture->lpVtbl->Release( iPicture );
-            bResult = TRUE ;
-          }
-        }
-        GlobalFree( hGlobal );
-      }
-    }
-    CloseHandle( hFile );
-  }
-  return( bResult );
-}
-
-//-------------------------------------------------------------------//
 
 IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
 {
@@ -3617,103 +3618,6 @@ HB_EXPORT BOOL hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr )
 }
 
 //-------------------------------------------------------------------//
-
-HB_EXPORT BOOL hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight )
-{
-   SelectObject( _s.hdc, _s.penWhiteDim );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left Inner
-   LineTo( _s.hdc, iLeft, iBottom );
-
-   SelectObject( _s.hdc, _s.penWhite );
-
-   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Top Outer
-   LineTo( _s.hdc, iRight+1, iTop-1 );
-
-   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Left Outer
-   LineTo( _s.hdc, iLeft-1, iBottom+1 );
-
-   SelectObject( _s.hdc, _s.penDarkGray );
-
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   MoveToEx( _s.hdc, iRight, iBottom, NULL );    //  Right Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   SelectObject( _s.hdc, _s.penBlack );
-
-   MoveToEx( _s.hdc, iLeft-1, iBottom+1, NULL ); //  Bottom Outer
-   LineTo( _s.hdc, iRight+1+1, iBottom+1 );
-
-   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );   //  Right Outer
-   LineTo( _s.hdc, iRight+1, iBottom+1 );
-
-   return ( TRUE );
-}
-
-//-------------------------------------------------------------------//
-
-HB_EXPORT BOOL hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight )
-{
-   SelectObject( _s.hdc, _s.penWhiteDim );
-
-   MoveToEx( _s.hdc, iRight, iTop, NULL );            // Right Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );          // Bottom Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   SelectObject( _s.hdc, _s.penWhite );
-
-   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );        // Right Outer
-   LineTo( _s.hdc, iRight + 1, iBottom + 1 );
-
-   MoveToEx( _s.hdc, iLeft - 1, iBottom + 1, NULL );  // Bottom Outer
-   LineTo( _s.hdc, iRight + 2, iBottom + 1 );
-
-   SelectObject( _s.hdc, _s.penBlack );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Left Inner
-   LineTo( _s.hdc, iLeft, iBottom );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Top Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   SelectObject( _s.hdc, _s.penDarkGray );
-
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Left Outer
-   LineTo( _s.hdc, iLeft - 1 , iBottom + 1 );
-
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Top Outer
-   LineTo( _s.hdc, iRight + 1, iTop - 1 );
-
-   return ( TRUE );
-}
-
-//-------------------------------------------------------------------//
-
-HB_EXPORT BOOL hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight )
-{
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top
-   LineTo( _s.hdc, iRight, iTop );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left
-   LineTo( _s.hdc, iLeft, iBottom );
-
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom
-   LineTo( _s.hdc, iRight, iBottom );
-
-   MoveToEx( _s.hdc, iRight, iTop, NULL );       //  Right
-   LineTo( _s.hdc, iRight, iBottom + 1);
-
-   return ( TRUE );
-}
-
-//-------------------------------------------------------------------//
 //                         Clipboard support
 //-------------------------------------------------------------------//
 
@@ -3775,6 +3679,8 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
      return;
    }
 
+   hb_wvt_gtInitClipBoard();
+
    if ( ! OpenClipboard( NULL ) )
    {
      hb_retl( FALSE );
@@ -3794,7 +3700,9 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    // Lock the handle and copy the text to the buffer.
    //
    lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
+
    memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
+
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
    GlobalUnlock( hglbCopy );
 
@@ -3836,6 +3744,29 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    }
    CloseClipboard();
    return ret;
+}
+
+//-------------------------------------------------------------------//
+
+static void hb_wvt_gtInitClipBoard( void )
+{
+   if ( OpenClipboard( NULL ) )
+   {
+      LPTSTR  lptstrCopy;
+      HGLOBAL hglbCopy;
+
+      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ( 2 ) * sizeof( TCHAR ) );
+      if ( ! hglbCopy  )
+      {
+         CloseClipboard();
+      }
+      lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
+      lptstrCopy[ 1 ] = ( TCHAR ) 0;
+
+      GlobalUnlock( hglbCopy );
+      SetClipboardData( 1, hglbCopy );
+      CloseClipboard();
+   }
 }
 
 //-------------------------------------------------------------------//
@@ -4056,8 +3987,9 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
    return -1;
 }
 
-/* ********** Graphics API ********** */
+//-------------------------------------------------------------------//
 
+/* ********** Graphics API ********** */
 /*
  * NOTE:
  *      gfxPrimitive() parameters may have different meanings
@@ -4323,8 +4255,6 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
       }
    }
 
-   //TraceLog( NULL, "C----------Entered-   %i %i %i %i  \n \n", hDlg, message, pFunc, iType );
-
    if ( pFunc )
    {
       switch ( iType )
@@ -4345,8 +4275,6 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
          case 2:  // Block
          {
-            //TraceLog( NULL, "C----------Exec-PRG   %i %i \n \n", hDlg, message );
-
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pFunc );
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -4356,7 +4284,6 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmFunction( 4 );
             bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
 
-            //TraceLog( NULL, "C----------Exit-PRG   %i %i \n \n", hDlg, message );
             break;
          }
       }
@@ -4385,15 +4312,19 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
       }
       break;
 
-      case WM_CLOSE:   // CLOSE:
+      case WM_CLOSE:
       {
          DestroyWindow( hDlg );
          bReturn = FALSE;
       }
       break;
 
-      case WM_NCDESTROY:   // CLOSE:
+      case WM_NCDESTROY:
       {
+         if ( _s.pFunc[ iIndex ] != NULL && _s.iType[ iIndex ] == 2 )
+         {
+            HB_ITEM_UNLOCK( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
+         }
          _s.hDlgModeless[ iIndex ] = NULL;
          _s.pSymDlgProcModeless[ iIndex ] = NULL;
          _s.pFunc[ iIndex ] = NULL;

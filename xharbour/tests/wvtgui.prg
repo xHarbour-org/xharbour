@@ -93,7 +93,9 @@ REQUEST DbfCdx
 
 //-------------------------------------------------------------------//
 
-REQUEST Hb_NoStartUpWindow
+#ifndef __SQL__
+//REQUEST Hb_NoStartUpWindow
+#endif
 
 //-------------------------------------------------------------------//
 
@@ -111,6 +113,7 @@ static keys_:= { , , , , , , , , , , , , , , , , , , , }
 
 static ahFonts := {}
 static shIcon, shImage
+static aSlides := {}
 
 #ifdef __XCC__
 static paint_:= { { '', {} } }
@@ -150,13 +153,14 @@ PROCEDURE Main( cDSN )
       nConxn := Sr_AddConnection( CONNECT_ODBC, cDSN )
       if nConxn < 0
          alert( 'You requested for Sql Server which is not available!' )
-         return .f.
+         return
       endif
 
       SR_SetCollation( 'Latin1_General_BIN' )
       SR_SetFastOpen( .f. )
    #endif
 
+   Wvt_SetGui( .t. )
    WvtSetKeys( .t. )
    Popups( 1 )
 
@@ -674,9 +678,9 @@ FUNCTION WvtMyBrowse()
       return nil
    endif
    if fLock()
-      INDEX ON FIRST TAG '001' TO ( cFileIndex )
-      INDEX ON LAST  TAG '002' TO ( cFileIndex )
-      INDEX ON CITY  TAG '003' TO ( cFileIndex )
+      INDEX ON Test->FIRST TAG '001' TO ( cFileIndex )
+      INDEX ON Test->LAST  TAG '002' TO ( cFileIndex )
+      INDEX ON Test->CITY  TAG '003' TO ( cFileIndex )
       dbUnlock()
    endif
    SET INDEX TO
@@ -1289,7 +1293,10 @@ FUNCTION CreateMainMenu()
    oMenu:Caption:= "Modeless Dialogs"
    oMenu:AddItem( "Dialog First" ,{|| DynDialog_2() } )
    oMenu:AddItem( "-")
+   oMenu:AddItem( "Slide Show"   ,{|| DlgSlideShow() } )
+   oMenu:AddItem( "-")
    oMenu:AddItem( "Dialog Scond" ,{|| DynDialog_1() } )
+
    g_oMenuBar:addItem( "",oMenu)
 
 
@@ -2018,8 +2025,8 @@ Function DynDialog_2()
    cDlgIcon    := 'V_Notes.Ico'
    nTimerTicks := 1000  // 1 second
 
-   //hDlg        := Wvt_CreateDialog( aDlg, lOnTop, bDlgProc, cDlgIcon, nTimerTicks, hMenu )
-   //nProc := AsCallBack( {|| 0 } ) // DynDialog_2() } )
+   //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, bDlgProc, cDlgIcon, nTimerTicks, hMenu )
+   //nProc := AsCallBack( {|| DynDialog_2() } )
    //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, nProc /*cDlgProc*/, cDlgIcon, nTimerTicks, hMenu )
    hDlg  := Wvt_CreateDialog( aDlg, lOnTop, cDlgProc, cDlgIcon, nTimerTicks, hMenu )
 
@@ -2213,6 +2220,66 @@ EXIT PROCEDURE CleanHandles()
    endif
 
    Return
+
+//-------------------------------------------------------------------//
+
+FUNCTION DlgSlideShow()
+   LOCAL hDlg, aDlg, nStyle
+
+   aSlides := { 'Vouch1.bmp', 'V_Notes.ico', '2000.gif', 'V_Lock.bmp', 'V_Help.ico' }
+
+   nStyle  := DS_SETFONT + WS_VISIBLE + WS_POPUP + WS_CAPTION + WS_SYSMENU + WS_THICKFRAME + WS_MINIMIZEBOX
+
+   aDlg    := Wvt_MakeDlgTemplate( 0, 0, 20, 40, {}, 'Slide Show', nStyle )
+
+   hDlg    := Wvt_CreateDialog( aDlg, .f., 'DlgSlideShowProc', 'Vr_1.ico', 5000 )
+
+   Return hDlg
+
+//-------------------------------------------------------------------//
+
+FUNCTION DlgSlideShowProc( hDlg, nMsg, wParam, lParam )
+   LOCAL  aRect, hDC
+   STATIC nSlide := 1
+
+   Switch nMsg
+
+   case WM_INITDIALOG
+      DrawSlide( hDlg, nSlide )
+      exit
+
+   case WM_PAINT
+      DrawSlide( hDlg, nSlide )
+      exit
+
+   case WM_TIMER
+      nSlide++
+      if nSlide > len( aSlides )
+         nSlide := 1
+      endif
+      DrawSlide( hDlg, nSlide )
+
+      exit
+
+   end
+
+   Return ( 0 )
+
+//-------------------------------------------------------------------//
+
+FUNCTION DrawSlide( hDlg, nSlide )
+   LOCAL hDC, aRect
+
+   hDC   := Win_GetDC( hDlg )
+   aRect := Win_GetClientRect( hDlg )
+
+   Win_Rectangle( hDC, aRect[ 1 ]+10, aRect[ 2 ]+10, aRect[ 3 ]-10, aRect[ 4 ]-10 )
+   Win_DrawImage( hDC, aRect[ 1 ]+10, aRect[ 2 ]+10, aRect[ 3 ] - aRect[ 1 ] -20, ;
+                                  aRect[ 4 ] - aRect[ 2 ] - 20, aSlides[ nSlide ] )
+
+   Win_ReleaseDC( hDlg,hDC )
+
+   Return nil
 
 //-------------------------------------------------------------------//
 
