@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.256 2003/09/02 05:41:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.257 2003/09/06 20:42:58 ronpinkas Exp $
  */
 
 /*
@@ -1340,7 +1340,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                         hb_arrayGet( pSelf, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
 
-                        if( HB_VM_STACK.Return.type == HB_IT_BLOCK && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
+                        if( HB_IS_BLOCK( &( HB_VM_STACK.Return ) ) && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
                         {
                            HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
 
@@ -5143,9 +5143,7 @@ void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
          //printf( "Doing: '%s'\n", pSym->szName );
-
          pFunc();
-
          //printf( "Done: '%s'\n", pSym->szName );
 
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
@@ -5365,7 +5363,7 @@ void hb_vmSend( USHORT uiParams )
 
       HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
-      //TraceLog( NULL, "Doing %i\n", pFunc );
+      //TraceLog( NULL, "Doing %s\n", pSym->szName );
       pFunc();
       //TraceLog( NULL, "Done\n" );
 
@@ -6069,7 +6067,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
    ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
-   if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+   if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
@@ -6121,7 +6119,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
    ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
-   if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+   if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
@@ -6173,7 +6171,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
    ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
-   if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+   if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 

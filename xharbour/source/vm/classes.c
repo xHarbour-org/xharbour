@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.74 2003/08/15 22:17:26 ronpinkas Exp $
+ * $Id: classes.c,v 1.75 2003/08/18 22:17:16 ronpinkas Exp $
  */
 
 /*
@@ -1028,7 +1028,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor));
 
-   if( pObject->type == HB_IT_ARRAY )
+   if( HB_IS_ARRAY( pObject ) )
    {
       uiClass = pObject->item.asArray.value->uiClass;
    }
@@ -1188,10 +1188,14 @@ PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetpMethod(%p, %p)", pObject, pMessage));
 
-   if( pObject->type == HB_IT_ARRAY )
+   if( HB_IS_ARRAY( pObject ) )
+   {
       uiClass = pObject->item.asArray.value->uiClass;
+   }
    else
+   {
       uiClass = 0;
+   }
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -3341,7 +3345,7 @@ PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_clsSymbolFromFunction(%p, %p)", pObject, pFunction));
 
-   if( pObject->type == HB_IT_ARRAY )
+   if( HB_IS_ARRAY( pObject ) )
    {
       uiClass = pObject->item.asArray.value->uiClass;
    }

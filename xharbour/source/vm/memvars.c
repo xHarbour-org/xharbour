@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.30 2003/09/03 01:28:56 ronpinkas Exp $
+ * $Id: memvars.c,v 1.31 2003/09/04 02:14:39 ronpinkas Exp $
  */
 
 /*
@@ -336,7 +336,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             {
                for( ulPos = 0; ulPos < ulValues; ulPos++ )
                {
-                  if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY )
+                  if( HB_IS_ARRAY( &( ( s_globalTable + ulPos )->item ) ) )
                   {
                      hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
                   }
@@ -366,7 +366,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             #ifdef HB_ARRAY_USE_COUNTER
                pSource->item.asArray.value->uiHolders++;
             #else
-               hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
+               hb_arrayRegisterHolder( pSource->item.asArray.value, &pValue->item );
             #endif
          }
       }
@@ -774,13 +774,17 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetRefer(%p, %p)", pItem, pMemvarSymb));
 
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
+
    if( pDyn )
    {
       HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) referenced", hb_threadGetHMemvar( pDyn ), pMemvarSymb->szName));
 
+      TraceLog( NULL, "***\n" );
+
       if( hb_threadGetHMemvar( pDyn ) )
       {
          PHB_ITEM pReference;
+
          pReference = &s_globalTable[ hb_threadGetHMemvar( pDyn ) ].item;
 
          if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
@@ -810,8 +814,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          USHORT uiAction = E_RETRY;
          HB_ITEM_PTR pError;
 
-         pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
-                                 NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
+         pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pMemvarSymb->szName, 0, EF_CANRETRY );
 
          while( uiAction == E_RETRY )
          {
@@ -835,11 +838,14 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
                }
             }
          }
+
          hb_errRelease( pError );
       }
    }
    else
+   {
       hb_errInternal( HB_EI_MVBADSYMBOL, NULL, pMemvarSymb->szName, NULL );
+   }
 }
 
 /*
@@ -914,14 +920,22 @@ void hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue )
 
    /* find dynamic symbol or creeate one */
    if( HB_IS_SYMBOL( pMemvar ) )
+   {
       pDynVar = hb_dynsymGet( pMemvar->item.asSymbol.value->szName );
+   }
    else if( HB_IS_STRING( pMemvar ) )
+   {
       pDynVar = hb_dynsymGet( pMemvar->item.asString.value );
+   }
    else
+   {
       hb_errRT_BASE( EG_ARG, 3008, NULL, "&", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 
    if( pDynVar )
+   {
       hb_memvarCreateFromDynSymbol( pDynVar, bScope, pValue );
+   }
 }
 
 static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITEM pValue )
@@ -937,7 +951,8 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
       if( ! hb_threadGetHMemvar( pDynVar ) )
       {
          hb_threadSetHMemvar( pDynVar,  hb_memvarValueNew( pValue, TRUE ));
-         if( !pValue )
+
+         if( ! pValue )
          {
             /* new PUBLIC variable - initialize it to .F.
              */
@@ -946,11 +961,14 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
             /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized */
             /*       to .T., this is normal Clipper behaviour. [vszakats] */
 
-            if( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 ||
-                 strcmp( pDynVar->pSymbol->szName, "CLIPPER" ) == 0 )
+            if( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 || strcmp( pDynVar->pSymbol->szName, "CLIPPER" ) == 0 )
+            {
                s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item.item.asLogical.value = TRUE;
+            }
             else
+            {
                s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item.item.asLogical.value = FALSE;
+            }
          }
       }
    }
@@ -1126,10 +1144,15 @@ int hb_memvarScope( char * szVarName )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s)", szVarName));
 
    pDynVar = hb_dynsymFindName( szVarName );
+
    if( pDynVar )
+   {
       iMemvar = hb_memvarScopeGet( pDynVar );
+   }
    else
+   {
       iMemvar = HB_MV_NOT_FOUND;
+   }
 
    return iMemvar;
 }
@@ -1157,7 +1180,9 @@ static HB_DYNS_FUNC( hb_memvarClear )
 static HB_DYNS_FUNC( hb_memvarCountPublics )
 {
    if( hb_memvarScopeGet( pDynSymbol ) == HB_MV_PUBLIC )
+   {
       ( * ( ( int * )Cargo ) )++;
+   }
 
    return TRUE;
 }
@@ -1220,6 +1245,7 @@ static HB_DYNS_FUNC( hb_memvarFindPublicByPos )
    if( hb_memvarScopeGet( pDynSymbol ) == HB_MV_PUBLIC )
    {
       struct mv_PUBLIC_var_info *pStruPub = (struct mv_PUBLIC_var_info *) Cargo;
+
       if( pStruPub->iPos-- == 0 )
       {
          pStruPub->bFound  = TRUE;
@@ -1248,6 +1274,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
    if( iPos > 0 )
    {
       --iPos;
+
       if( iScope == HB_MV_PUBLIC )
       {
          struct mv_PUBLIC_var_info struPub;
@@ -1258,6 +1285,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
           * with info for requested PUBLIC variable
           */
          hb_dynsymEval( hb_memvarFindPublicByPos, ( void * ) &struPub );
+
          if( struPub.bFound )
          {
             pValue =&s_globalTable[ hb_threadGetHMemvar( struPub.pDynSym ) ].item;
@@ -1293,6 +1321,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
          pDynSym = hb_dynsymFindName( pName->item.asString.value );
       }
    }
+
    return pDynSym;
 }
 
@@ -1453,7 +1482,10 @@ HB_FUNC( __MVRELEASE )
             bIncludeVar = TRUE;
 
          if( pMask->item.asString.value[ 0 ] == '*' )
+         {
             bIncludeVar = TRUE;   /* delete all memvar variables */
+         }
+
          hb_memvarReleaseWithMask( pMask->item.asString.value, bIncludeVar );
       }
    }
@@ -1470,7 +1502,9 @@ HB_FUNC( __MVSCOPE )
       PHB_ITEM pVarName = hb_param( 1, HB_IT_STRING );
 
       if( pVarName )
+      {
          iMemvar = hb_memvarScope( pVarName->item.asString.value );
+      }
    }
 
    hb_retni( iMemvar );
@@ -1488,7 +1522,9 @@ HB_FUNC( __MVDBGINFO )
    int iCount = hb_pcount();
 
    if( iCount == 1 )          /* request for a number of variables */
+   {
       hb_retni( hb_memvarCount( hb_parni( 1 ) ) );
+   }
 
    else if( iCount >= 2 )     /* request for a value of variable */
    {
@@ -1824,8 +1860,10 @@ HB_FUNC( __MVSAVE )
       }
    }
    else
+   {
       /* NOTE: Undocumented error message in CA-Cl*pper 5.2e and 5.3x. [ckedem] */
       hb_errRT_BASE( EG_ARG, 2008, NULL, "__MSAVE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+   }
 }
 
 /* NOTE: There's an extension in Harbour, which makes it possible to only
@@ -1848,14 +1886,18 @@ HB_FUNC( __MVRESTORE )
       /* Clear all memory variables if not ADDITIVE */
 
       if( ! bAdditive )
+      {
          hb_dynsymEval( hb_memvarClear, NULL );
+      }
 
       /* Generate filename */
 
       pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
 
       if( pFileName->szExtension == NULL )
+      {
          pFileName->szExtension = ".mem";
+      }
 
       hb_fsFNameMerge( szFileName, pFileName );
       hb_xfree( pFileName );
@@ -1965,10 +2007,14 @@ HB_FUNC( __MVRESTORE )
          hb_fsClose( fhnd );
       }
       else
+      {
          hb_retl( FALSE );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 2007, NULL, "__MRESTORE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
 
 /* ----------------------------------------------------------------------- */
@@ -2009,9 +2055,13 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
    PHB_DYNS pDyn;
 
    if( ( pDyn = hb_dynsymFindName( szName ) ) != NULL )
+   {
       return  hb_threadGetHMemvar( pDyn );
+   }
    else
+   {
       return 0; /* invalid handle */
+   }
 }
 
 PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.8 2003/08/14 23:49:46 jonnymind Exp $
+ * $Id: eval.c,v 1.9 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -475,7 +475,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       hb_vmFunction( ( USHORT ) ulLen );
       return;
    }
-   else if( pFirst->type == HB_IT_ARRAY )
+   else if( HB_IS_ARRAY( pFirst ) )
    {
       pString = hb_arrayGetItemPtr( pFirst, 1 );
       pArgs = pFirst;

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.64 2003/09/06 20:42:58 ronpinkas Exp $
+ * $Id: arrays.c,v 1.65 2003/09/07 02:55:08 ronpinkas Exp $
  */
 
 /*
@@ -242,7 +242,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   {
                      for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                      {
-                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                        if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) )
                         {
                            hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
                         }
@@ -289,7 +289,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                      {
                         for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                         {
-                           if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                           if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) )
                            {
                               hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
                            }
@@ -1045,12 +1045,24 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
              {
                 if( pArray->item.asArray.value->pOwners->pNext )
                 {
-                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p\n", pArray->item.asArray.value->pOwners->pNext->pOwner, pArray->item.asArray.value );
+                   char szProc[64], szModule[64];
+                   USHORT uiLine;
+
+                   hb_procinfo( 0, szProc, &uiLine, szModule  );
+                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
+                                   pArray->item.asArray.value->pOwners->pNext->pOwner, pArray->item.asArray.value,
+                                   szModule, szProc, uiLine );
                 }
              }
              else
              {
-                TraceLog( NULL, "Warning! (2) Residual owner %p of array %p\n", pArray->item.asArray.value->pOwners->pOwner, pArray->item.asArray.value );
+                char szProc[64], szModule[64];
+                USHORT uiLine;
+
+                hb_procinfo( 0, szProc, &uiLine, szModule  );
+                TraceLog( NULL, "Warning! (2) Residual owner %p of array %p [%s->%s(%i)]\n",
+                                pArray->item.asArray.value->pOwners->pOwner, pArray->item.asArray.value,
+                                   szModule, szProc, uiLine );
              }
 
              //TraceLog( NULL, "Diverting to ReleaseHolder() - Class '%s'\n", hb_objGetClsName( pArray ) );
@@ -1066,7 +1078,11 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
-      TraceLog( NULL, "Warning! not an array %p\n", pArray );
+      char szProc[64], szModule[64];
+      USHORT uiLine;
+
+      hb_procinfo( 0, szProc, &uiLine, szModule  );
+      TraceLog( NULL, "Warning! not an array %p [%s->%s(%i)]\n", pArray, szModule, szProc, uiLine );
       return FALSE;
    }
 }
@@ -1219,7 +1235,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
          PHB_ITEM pSrcItem = pSrcBaseArray->pItems + ulCount;
 
          /* Clipper clones nested array ONLY if NOT an Object!!! */
-         if( pSrcItem->type == HB_IT_ARRAY && pSrcItem->item.asArray.value->uiClass == 0 )
+         if( HB_IS_ARRAY( pSrcItem ) && pSrcItem->item.asArray.value->uiClass == 0 )
          {
             PHB_ITEM pClone;
 
@@ -1554,7 +1570,14 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          pOwners = pOwners->pNext;
       }
 
-      TraceLog( NULL, "Warning! Could not locate old owner %p of array %p\n", pOldHolder, pBaseArray );
+      {
+         char szProc[64], szModule[64];
+         USHORT uiLine;
+
+         hb_procinfo( 0, szProc, &uiLine, szModule  );
+         TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)]\n",
+                         pOldHolder, pBaseArray, szModule, szProc, uiLine );
+      }
 
       hb_arrayRegisterHolder( pBaseArray, pNewHolder );
    }

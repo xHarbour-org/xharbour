@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.26 2003/08/25 22:25:03 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.27 2003/09/04 01:03:46 ronpinkas Exp $
  */
 
 /*
@@ -133,6 +133,14 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * pool so it can be shared by codeblocks
              */
 
+            #ifndef HB_ARRAY_USE_COUNTER
+               if( HB_IS_ARRAY( pLocal ) )
+               {
+                  //TraceLog( NULL, "Detached: %p from %p to %p\n", pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
+                  hb_arrayResetHolder( pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
+               }
+            #endif
+
             hMemvar = hb_memvarValueNew( pLocal, FALSE );
 
             pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
@@ -141,13 +149,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             pLocal->item.asMemvar.value     = hMemvar;
 
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
-
-            #ifndef HB_ARRAY_USE_COUNTER
-               if( pLocal->type == HB_IT_ARRAY )
-               {
-                  hb_arrayResetHolder( pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
-               }
-            #endif
          }
          else
          {
@@ -158,6 +159,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * released if other codeblock will be deleted
              */
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            //TraceLog( NULL, "Detach: %p to %p\n", pLocal, pCBlock->pLocals + ui );
          }
 
          hb_memvarValueIncRef( pLocal->item.asMemvar.value );

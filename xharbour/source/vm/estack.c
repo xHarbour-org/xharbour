@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.37 2003/07/14 23:27:56 jonnymind Exp $
+ * $Id: estack.c,v 1.38 2003/09/04 02:14:39 ronpinkas Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ void hb_stackPush( void )
          {
             for( i = 0; i < HB_VM_STACK.wItems; ++i )
             {
-               if( HB_VM_STACK.pItems[ i ]->type == HB_IT_ARRAY )
+               if( HB_IS_ARRAY( HB_VM_STACK.pItems[ i ] ) )
                {
                   hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
                }
@@ -434,14 +434,14 @@ void hb_stackDispCall( void )
 
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-      if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ),
-            ( *pBase )->item.asSymbol.value->szName,
-            ( *pBase )->item.asSymbol.lineno );
+      if( HB_IS_ARRAY( *( pBase + 1 ) ) )
+      {
+         sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+      }
       else
-         sprintf( buffer, HB_I_("Called from %s(%i)"),
-            ( *pBase )->item.asSymbol.value->szName,
-            ( *pBase )->item.asSymbol.lineno );
+      {
+         sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+      }
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
@@ -466,14 +466,14 @@ WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * Ex
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
 
-      if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )
-         sprintf( buffer, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ),
-            ( *pBase )->item.asSymbol.value->szName,
-            ( *pBase )->item.asSymbol.lineno );
+      if( HB_IS_ARRAY( *( pBase + 1 ) ) )
+      {
+         sprintf( buffer, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+      }
       else
-         sprintf( buffer, HB_I_("Called from %s(%i)\n"),
-            ( *pBase )->item.asSymbol.value->szName,
-            ( *pBase )->item.asSymbol.lineno );
+      {
+         sprintf( buffer, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+      }
 
       strcat( msg, buffer );
 
@@ -514,14 +514,14 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
       do
       {
-         if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )
-            fprintf( stderr, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ),
-                     ( *pBase )->item.asSymbol.value->szName,
-                     ( *pBase )->item.asSymbol.lineno );
+         if( HB_IS_ARRAY( *( pBase + 1 ) ) )
+         {
+            fprintf( stderr, HB_I_("Called from %s:%s(%i)\n"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         }
          else
-            fprintf( stderr, HB_I_("Called from %s(%i)\n"),
-                     ( *pBase )->item.asSymbol.value->szName,
-                     ( *pBase )->item.asSymbol.lineno );
+         {
+            fprintf( stderr, HB_I_("Called from %s(%i)\n"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+         }
 
          pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
       }
