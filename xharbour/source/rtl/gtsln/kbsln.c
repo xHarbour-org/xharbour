@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.8 2003/04/18 22:10:34 jonnymind Exp $
+ * $Id: kbsln.c,v 1.9 2003/05/16 19:52:11 druzus Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 /* we're assuming target has termios - should be better done */
 #include <termios.h> 
-
+#define HB_SLANG_ONE_ESC
 /* *********************************************************************** */
 
 /* keyboard states - these should be taken
@@ -323,7 +323,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     /* NOTE: This will probably not work on slow terminals
        or on very busy lines (i.e. modem lines ) */
     ch = SLang_getkey();
-#if HB_SLANG_ONE_ESC
+#ifdef HB_SLANG_ONE_ESC
     if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
         if( 0 == SLang_input_pending( 0.3))
             return( 033 );
