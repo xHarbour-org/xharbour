@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1707 2003/11/12 14:18:57 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1708 2003/11/12 15:04:56 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-12 17:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hvm.c
+    ! Fixed '+' and '-' operator for hashes
+  * source/vm/hash.c
+    + Added hb_hashMerge() NOT modality.
+  * include/hbapi.h
+    % better HB_IS_ORDERABLE macro definition
+  * tests/hash.prg
+    % slighly better tests
 
 
 2003-11-12 16:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>

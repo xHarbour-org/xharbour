@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.2 2003/11/10 00:06:29 jonnymind Exp $
+* $Id: hash.prg,v 1.3 2003/11/12 13:49:14 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -45,8 +45,9 @@ PROCEDURE Main()
    ? "Plusequal operator (success if Len(hHash) == 9: ", Len(hHash), ",(", hHash[5], ")"
    hTemp := {'a':>1, 1:>2, 'c':>3}
    ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1:>2, 'c':>3} )
-   ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'c'} )
-   ? "Minus hash - item operator: ", ValToPrg( hTemp - 1 )
+   ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'a'} )
+   ? "Minus hash - item operator: ", ValToPrg( hTemp - 'a' )
+   ? "Hash is now: ", ValToPrg( hHash )
    ? "Press a Key to continue"
    ?
    Inkey(0)
@@ -142,11 +143,11 @@ PROCEDURE Main()
    ? "HASH Secondary API test:"
    ? "Scanning for value 'A newer value': ", HScan( hHash, 'A newer value' )
    ? "Scanning for value 'Date key 1' using CB: ",;
-       HScan( hHash, {| cKey, cVal| HB_ISCHAR(cVal) .and. cVal == 'A newer value'} )
+       HScan( hHash, {| cKey, cVal| HB_ISSTRING(cVal) .and. cVal == 'A newer value'} )
 
    nSum := 0
    HEval( hHash, { | cKey, cVal|;
-       IIF (HB_ISNUM(cKey), nSum += cKey, )} )
+       IIF (HB_ISNUMERIC(cKey), nSum += cKey, )} )
 
    ? "Eval summing up all the numeric keys :", nSum
    ? "Clone of the hash:", ValToPrg(HClone( hHash ))
@@ -156,7 +157,7 @@ PROCEDURE Main()
 
    hDest := { 'B':> 1, 'A':>2 }
    ? "Merging limited with a codeblock (Only numeric values): "
-   ? "Result: ", ValToPrg( HMerge( hDest, hHash, { |cKey, nVal| HB_IsNum( nVal ) } ) )
+   ? "Result: ", ValToPrg( HMerge( hDest, hHash, { |cKey, nVal| HB_IsNumeric( nVal ) } ) )
    * The last "2" means XOR
    ? "Doing a xor merge with the original one (first 4 elements): "
    ? "Result: ",  ValToPrg( HCopy( hHash, hDest, , , 2 ) )

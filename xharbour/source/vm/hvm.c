@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.274 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: hvm.c,v 1.275 2003/11/12 13:49:13 jonnymind Exp $
  */
 
 /*
@@ -3373,7 +3373,7 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
-      ULONG ulLen     = pItem2->item.asHash.value->ulLen;
+      ULONG ulLen     = pItem1->item.asHash.value->ulLen;
       HB_ITEM hbNum;
       PHB_ITEM pResult;
 
@@ -3483,7 +3483,7 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
-      ULONG ulLen     = pItem2->item.asHash.value->ulLen;
+      ULONG ulLen = pItem2->item.asHash.value->ulLen;
       HB_ITEM hbNum;
       PHB_ITEM pResult;
 
@@ -3502,13 +3502,12 @@ static void hb_vmMinus( void )
       PHB_ITEM pResult;
       PHB_ITEM pRef = pItem2->item.asArray.value->pItems;
 
-      pResult = hb_hashNew( NULL );
+      pResult = hb_hashClone( pItem1 );
       while( ulLen > 0 )
       {
-         if ( hb_hashScan( pItem1, pRef, &ulPos ) )
+         if ( hb_hashScan( pResult, pRef, &ulPos ) )
          {
-            hb_hashAdd( pResult, ULONG_MAX, pRef,
-                  pItem1->item.asHash.value->pValues + ( ulPos - 1 ) );
+            hb_hashRemove( pResult, ulPos );
          }
          pRef++;
          ulLen --;
@@ -3517,7 +3516,8 @@ static void hb_vmMinus( void )
       hb_stackPop();
       hb_itemPushForward( pResult );
    }
-   else if( HB_IS_HASH( pItem1 ) )
+   else if( HB_IS_HASH( pItem1 ) && (
+      pItem2->type & ( HB_IT_NUMERIC | HB_IT_STRING | HB_IT_DATE ) ) )
    {
       ULONG ulPos;
       PHB_ITEM pResult;

@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.5 2003/11/11 21:24:20 ronpinkas Exp $
+ * $Id: hash.c,v 1.6 2003/11/12 13:49:13 jonnymind Exp $
  */
 
 /*
@@ -650,7 +650,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
       if ( HB_IS_NUMERIC( pBlock ) )
       {
          mode = hb_itemGetNI( pBlock );
-         if ( mode < 0 || mode > 2 )
+         if ( mode < 0 || mode > 3 )
          {
             mode = 0;
          }

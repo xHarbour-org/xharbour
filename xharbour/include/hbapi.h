@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.93 2003/11/12 12:11:54 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.94 2003/11/12 14:19:01 jonnymind Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ extern "C" {
 #define HB_IS_MEMVAR( p )  HB_IS_OF_TYPE( p, HB_IT_MEMVAR )
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
 #define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
-#define HB_IS_ORDERABLE( p )    (( p )->type  && (( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) )
+#define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
 #define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
 #define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
 
