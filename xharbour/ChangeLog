@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2025 2004/01/09 18:51:24 lculik Exp $
+ * $Id: ChangeLog,v 1.2026 2004/01/10 05:51:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-01-10 13:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawOutline( nTop, nLeft, nBottom, nRight )
+       Draws a one pixel black outline for given rectangle.
+     + Wvt_DrawLine( nTop, nLeft, nBottom, nRight )
+       This functions draws a horizontal line at the middle of ( nBottom - nTop + 1 ).
+     ! Wvt_DrawBoxGet()
+       Right and Bottom edged corrected.
 
 2004-01-09 21:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/what32/include/wintypes.ch

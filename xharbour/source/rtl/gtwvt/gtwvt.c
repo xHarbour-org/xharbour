@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.33 2004/01/08 08:41:19 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.34 2004/01/09 14:32:21 paultucker Exp $
  */
 
 /*
@@ -1096,10 +1096,10 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 /* dDurat is in seconds */
 static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 {
-    INT uLSB,uMSB;
+    INT   uLSB,uMSB;
     ULONG lAdjFreq;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat));
+    HB_TRACE( HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat ) );
 
     /* sync with internal clock with very small time period */
     hb_idleSleep( 0.01 );
@@ -1110,16 +1110,16 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
     if ( dFreq >= 20.0 )
     {
       /* Setup Sound Control Port Registers and timer channel 2 */
-      hb_Outp9x(67, 182) ;
+      hb_Outp9x( 67, 182 ) ;
 
-      lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
+      lAdjFreq = ( ULONG ) ( 1193180 / dFreq ) ;
 
-      if( (LONG) lAdjFreq < 0 )
+      if( ( LONG ) lAdjFreq < 0 )
          uLSB = lAdjFreq + 65536;
       else
          uLSB = lAdjFreq % 256;
 
-      if( (LONG) lAdjFreq < 0 )
+      if( ( LONG ) lAdjFreq < 0 )
          uMSB = lAdjFreq + 65536;
       else
          uMSB = lAdjFreq / 256;
@@ -1127,15 +1127,15 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 
       /* set the frequency (LSB,MSB) */
 
-      hb_Outp9x(66, uLSB);
-      hb_Outp9x(66, uMSB);
+      hb_Outp9x( 66, uLSB );
+      hb_Outp9x( 66, uMSB );
 
       /* Get current Port setting */
       /* enable Speaker Data & Timer gate bits */
       /* (00000011B is bitmask to enable sound) */
       /* Turn on Speaker - sound Tone for duration.. */
 
-      hb_Outp9x(97, hb_Inp9x( 97 ) | 3);
+      hb_Outp9x( 97, hb_Inp9x( 97 ) | 3 );
 
       hb_idleSleep( dDurat );
 
@@ -1144,7 +1144,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
       /* (11111100B is bitmask to disable sound) */
       /* Turn off the Speaker ! */
 
-      hb_Outp9x(97, hb_Inp9x( 97 ) & 0xFC);
+      hb_Outp9x( 97, hb_Inp9x( 97 ) & 0xFC );
 
     }
     else
@@ -1154,11 +1154,13 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 }
 #endif
 
-/* *********************************************************************** */
+//-------------------------------------------------------------------//
+//
 /* dDurat is in seconds */
-static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
+//
+static void HB_GT_FUNC( gt_wNtTone( double dFreq, double dDurat ) )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat ) );
 
     /* Clipper ignores Tone() requests (but delays anyway) if Frequency is
        less than < 20 hz.  Windows NT minimum is 37... */
@@ -1176,9 +1178,11 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
     }
 }
 
-/* *********************************************************************** */
+//-------------------------------------------------------------------//
+//
 /* dDuration is in 'Ticks' (18.2 per second) */
-void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
+//
+void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
 {
     OSVERSIONINFO osv;
 
@@ -1196,24 +1200,24 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     dFrequency =   HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
     /* What version of Windows are you running? */
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&osv);
+    osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+    GetVersionEx( &osv );
 
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined(__BORLANDC__) || defined( _MSC_VER )
-          HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
+       #if defined( __BORLANDC__ ) || defined( _MSC_VER )
+          HB_GT_FUNC( gt_w9xTone( dFrequency, dDuration ) );
        #else
-          HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));
+          HB_GT_FUNC( gt_wNtTone( dFrequency, dDuration ) );
        #endif
     }
 
     /* If Windows NT or NT2k, use wNtTone, which provides TONE()
        reset sequence support (new) */
-    else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    else if ( osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
     {
-      HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));
+      HB_GT_FUNC( gt_wNtTone( dFrequency, dDuration ) );
     }
 }
 
@@ -1486,10 +1490,10 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
-  static BOOL  bPaint = FALSE;
+  static BOOL bPaint = FALSE;
 
   BOOL        bRet;
-  // long int    res;
+
 
   switch ( message )
   {
@@ -3233,18 +3237,18 @@ HB_FUNC( WVT_DRAWBOXGET )
    SelectObject( _s.hdc, _s.penBlack );
 
    MoveToEx( _s.hdc, xy.x-1, xy.y-1, NULL );        // Top Inner
-   LineTo( _s.hdc, yz.x-2, xy.y-1 );
+   LineTo( _s.hdc, yz.x-1, xy.y-1 );
 
    MoveToEx( _s.hdc, xy.x-1, xy.y-1, NULL );        // Left Inner
-   LineTo( _s.hdc, xy.x-1, yz.y-2 );
+   LineTo( _s.hdc, xy.x-1, yz.y-1 );
 
    SelectObject( _s.hdc, _s.penDarkGray );
 
    MoveToEx( _s.hdc, xy.x-2, xy.y-2, NULL );        // Top Outer
-   LineTo( _s.hdc, yz.x-1, xy.y-2 );
+   LineTo( _s.hdc, yz.x, xy.y-2 );
 
    MoveToEx( _s.hdc, xy.x-2, xy.y-2, NULL );        // Top Inner
-   LineTo( _s.hdc, xy.x-2, yz.y-1 );
+   LineTo( _s.hdc, xy.x-2, yz.y );
 
    hb_retl( TRUE );
 }
@@ -3517,4 +3521,69 @@ HB_FUNC( WVT_DRAWLABEL )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWOUTLINE )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y - 1;
+   iLeft   = xy.x - 1;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+   iBottom = xy.y;
+   iRight  = xy.x;
+
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top
+   LineTo( _s.hdc, iRight, iTop );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left
+   LineTo( _s.hdc, iLeft, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iRight, iTop, NULL );       //  Right
+   LineTo( _s.hdc, iRight, iBottom + 1);
+
+   hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWLINE )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight, iOffset ;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y;
+   iLeft   = xy.x;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y-1;
+   iRight  = xy.x-1;
+
+   iOffset = ( ( iBottom - iTop + 1 ) / 2 ) ;
+   
+   iTop    = iTop + iOffset;
+   
+   SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );         //  Top
+   LineTo( _s.hdc, iRight, iTop );
+
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft, iTop+1, NULL );        //  Top
+   LineTo( _s.hdc, iRight, iTop+1 );
+
+   hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
 
