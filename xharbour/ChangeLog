@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.753 2003/02/21 15:40:17 jonnymind Exp $
+ * $Id: ChangeLog,v 1.754 2003/02/21 22:33:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-22 02:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbrandom.c
+    ! Removed an annoyng warning under BCC
+
+  * source/vm/hvm.c
+    ! Removed an annoyng warning under BCC
+
+  * source/vm/garbage.c
+  * source/vm/thread.c
+    ! fixed a deadlock in GC related routines
+    ! fixed GAWk flag in HB_GCALL() (could be not
+      cleared upon exit)
+  
+  * tests/mtgc.prg
+    * even more intensive stress tests. Work in progress
+
 2003-02-21 23:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
     ! Return element of newly allocated stacks were not initialized
       to HB_IT_NIL, and this caused GPF if GC come in the way before
       the new thread had the chance to initialize it.
-  
+
   * tests/mtgc.c
     + Added more extensive stress tests that have allowed the detection
       of the above problem.
@@ -21,7 +37,7 @@
 2003-02-21 16:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
     ! Some thread unsafe operation have been guarded with mutex
-    * Using CREATE_SUSPENDED to mangle with thread context under 
+    * Using CREATE_SUSPENDED to mangle with thread context under
       windows.
   * source/vm/inet.c
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbrandom.c,v 1.1 2003/01/29 23:39:33 jonnymind Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* Providing a prototype */
+double hb_random();
 
 /* Returns a double value between 0 and 1 */
 double hb_random()

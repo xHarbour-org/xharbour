@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.161 2003/02/19 10:16:32 jonnymind Exp $
+ * $Id: hvm.c,v 1.162 2003/02/19 12:17:50 jonnymind Exp $
  */
 
 /*
@@ -6545,7 +6545,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
    PHB_FUNC pFunc;
-   int i;
+   ULONG i;
    ULONG ulLen, ulStart = 1;
 
    if( HB_IS_OBJECT( pFirst ) && hb_pcount() == 3)

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.39 2003/01/01 18:17:55 jonnymind Exp $
+ * $Id: garbage.c,v 1.40 2003/02/20 00:28:59 jonnymind Exp $
  */
 
 /*
@@ -211,16 +211,19 @@ void hb_gcFree( void *pBlock )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( s_CriticalMutex );
+   #endif
+
    if( s_bReleaseAll )
    {
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      #endif
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
 
       return;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
 
    if( pBlock )
    {
@@ -328,15 +331,21 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
+   #if defined( HB_THREAD_SUPPORT )
+      HB_CRITICAL_LOCK( s_CriticalMutex );
+   #endif
+
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
+      #if defined( HB_THREAD_SUPPORT )
+         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      #endif
 
       return;
    }
-
    #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_UNLOCK( s_CriticalMutex );
    #endif
 
    if( pItem )
@@ -354,14 +363,19 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
          }
       }
 
+      #if defined( HB_THREAD_SUPPORT )
+         HB_CRITICAL_LOCK( s_CriticalMutex );
+      #endif
+
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
+
+      #if defined( HB_THREAD_SUPPORT )
+         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      #endif
 
       HB_GARBAGE_FREE( pAlloc );
    }
 
-   #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -526,6 +540,12 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
+   /* Even if not locked, a read only non-critical variable here 
+     should not be a problem */
+   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+   {
+      return;
+   }
 
    #ifdef HB_THREAD_SUPPORT
       BOOL bWait = FALSE;
@@ -541,6 +561,10 @@ void hb_gcCollectAll( void )
       {
          bWait = TRUE;
       }
+      else
+      {
+         s_bGarbageAtWork = TRUE;
+      }
       HB_CRITICAL_UNLOCK( s_GawMutex );
 
       /* Lock if first thread, sync if others */
@@ -553,20 +577,8 @@ void hb_gcCollectAll( void )
          return;
       }
 
-      /* Write safely GAW */
-      HB_CRITICAL_LOCK( s_GawMutex );
-      s_bGarbageAtWork = TRUE;
-      HB_CRITICAL_UNLOCK( s_GawMutex );
    #endif
 
-   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
-   {
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-      #endif
-
-      return;
-   }
 
       /*
       HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );

@@ -1,9 +1,14 @@
-*******
+***********************************************************
 * Multitheraded garbage collection test
+*
+* This program is a everlasting "work in progres", to be
+* used by xHarbour core developers to test new features in
+* fields covered by the library calls appearing in this
+* source.
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.9 2003/02/02 02:08:10 jonnymind Exp $
+* $Id: mtgc.prg,v 1.10 2003/02/21 22:33:22 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -27,24 +32,24 @@ PROCEDURE Main()
   @2,15 SAY "X H A R B O U R - Multithreading / Garbage collecting test"
   Mutex := CreateMutex()
 
-  // 1st param is the Startup Function, 2nd. is Self if 1st param 
+  // 1st param is the Startup Function, 2nd. is Self if 1st param
   // is a Method or NIL otherwise,
   // rest are paramaters to be passed to the Function/Method.
-  StartThread ( @MyThreadFunc(),  4, " 1st Thread:",    0,  500 )
+  StartThread ( @MyThreadFunc(),  4, " 1st Thread:",    0,  5000 )
   HB_GCALL( .T. )
-  StartThread ( @MyThreadFunc(),  5, " 2nd Thread:",  500, 1000 )
+  StartThread ( @MyThreadFunc(),  5, " 2nd Thread:",  5000, 10000 )
   HB_GCALL( .T. )
-  StartThread ( @MyThreadFunc(),  6, " 3rd Thread:", 1000, 1500 )
+  StartThread ( @MyThreadFunc(),  6, " 3rd Thread:", 10000, 15000 )
   HB_GCALL( .T. )
-  StartThread ( @MyThreadFunc(),  7, " 4th Thread:", 1500, 2000 )
+  StartThread ( @MyThreadFunc(),  7, " 4th Thread:", 15000, 20000 )
   HB_GCALL( .T. )
-  StartThread ( @MyThreadFunc(),  8, " 5th Thread:", 2000, 2500 )
+  StartThread ( @MyThreadFunc(),  8, " 5th Thread:", 20000, 25000 )
   HB_GCALL( .T. )
-  StartThread ( @MyThreadFunc(),  9, " 6th Thread:", 2500, 3000 )
-  StartThread ( @MyThreadFunc(), 10, " 7th Thread:", 3000, 3500 )
-  StartThread ( @MyThreadFunc(), 11, " 8th Thread:", 3500, 4000 )
-  StartThread ( @MyThreadFunc(), 12, " 9th Thread:", 4000, 4500 )
-  StartThread ( @MyThreadFunc(), 13, "10th Thread:", 4050, 5000 )
+  StartThread ( @MyThreadFunc(),  9, " 6th Thread:", 25000, 30000 )
+  StartThread ( @MyThreadFunc(), 10, " 7th Thread:", 30000, 35000 )
+  StartThread ( @MyThreadFunc(), 11, " 8th Thread:", 35000, 40000 )
+  StartThread ( @MyThreadFunc(), 12, " 9th Thread:", 40000, 45000 )
+  StartThread ( @MyThreadFunc(), 13, "10th Thread:", 45000, 50000 )
 
   WaitForThreads()
   @ 15, 2 SAY "Threads Time:" + Str( Seconds() - nStart )
@@ -61,7 +66,7 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
 
      aVar := { 1 }
      aVar[1] := Array( 50 )
-     *aVar[1][1] := aVar
+     aVar[1][1] := aVar
      aVar := NIL
 
      @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )

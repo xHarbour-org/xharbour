@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.47 2003/02/21 15:19:37 jonnymind Exp $
+* $Id: thread.c,v 1.48 2003/02/21 22:33:21 jonnymind Exp $
 */
 
 /*
@@ -173,7 +173,10 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
       {
          hb_ht_context = p->next;
       }
+      s_threadStarted --;
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
+      HB_CRITICAL_LOCK( hb_allocMutex );
       /* Free each element of the stack */
       for( i = 0; i < p->stack->wItems; ++i )
       {
@@ -182,13 +185,10 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
             hb_itemClear( p->stack->pItems[ i ] );
          }
 
-         HB_CRITICAL_LOCK( hb_allocMutex );
          free( p->stack->pItems[ i ] );
-         HB_CRITICAL_UNLOCK( hb_allocMutex );
       }
 
       /* Free the stack */
-      HB_CRITICAL_LOCK( hb_allocMutex );
 
       free( p->stack->pItems );
       free( p->stack );
@@ -201,11 +201,8 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
 
       /* Free the context */
       free( p );
-      
+
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-      
-      s_threadStarted --;
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
    }
    else
