@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.9 2003/06/18 19:28:58 ronpinkas Exp $
+ * $Id: proc.c,v 1.10 2003/06/20 18:25:39 ronpinkas Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 #include "hbapi.h"
 #include "hbstack.h"
 #include "classes.h"
+#include "hbapierr.h"
 
 HB_FUNC( METHODNAME )
 {
@@ -146,10 +147,17 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
             if( pSelf->item.asBlock.value->pSelfBase )
             {
-               PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asBlock.value->pSelfBase->uiClass - 1 );
+               if( pSelf->item.asBlock.value->pSelfBase->uiClass < hb_clsMaxClasses() )
+               {
+                  PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asBlock.value->pSelfBase->uiClass - 1 );
 
-               strcat( szName, pClass->szName );
-               strcat( szName, ":" );
+                  strcat( szName, pClass->szName );
+                  strcat( szName, ":" );
+               }
+               else
+               {
+                  hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted codeblock, points to invalid class id!", NULL, NULL );
+               }
             }
 
             strcat( szName, pSelf->item.asBlock.value->procname );
@@ -178,13 +186,20 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
       if( szModuleName )
       {
-         if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
+         if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
          {
-            PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
-
-            if( pClass->pModuleSymbols )
+            if( pSelf->item.asArray.value->uiClass < hb_clsMaxClasses() )
             {
-               strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+               PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
+
+               if( pClass->pModuleSymbols )
+               {
+                  strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+               }
+            }
+            else
+            {
+               hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
             }
          }
          else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.72 2003/07/14 07:49:38 andijahja Exp $
+ * $Id: classes.c,v 1.73 2003/08/05 10:20:51 ronpinkas Exp $
  */
 
 /*
@@ -3082,6 +3082,11 @@ static HARBOUR hb___msgVirtual( void )
 PCLASS hb_clsClassesArray( void )
 {
    return s_pClasses;
+}
+
+USHORT hb_clsMaxClasses( void )
+{
+   return s_uiClasses;
 }
 
 /* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
