@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.867 2003/03/22 06:05:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.868 2003/03/22 17:44:10 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-23 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbreadini.prg
+    * Line continuation is now the string " ||" (that is, two pipes
+      preceded by at least a space). "Void" continuation lines
+      (that is, two pipes alone on a line) are NOT allowed.
+    
+    * tests/parseini.ini 
+      * Changed to demponstrate the feature
+      
 2003-03-22 14:36 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/libct/files.c
     % reformated and added filedelete function
