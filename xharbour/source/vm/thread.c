@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.99 2003/08/16 02:09:10 jonnymind Exp $
+* $Id: thread.c,v 1.100 2003/08/18 19:16:41 jonnymind Exp $
 */
 
 /*
@@ -199,6 +199,11 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->errorHandler = NULL;
    tc->errorBlock = hb_itemNew( NULL );
    tc->aTryCatchHandlerStack = hb_itemNew( NULL );
+
+   /* VM requests and recover sequence */
+   tc->uiActionRequest = 0;
+   tc->lRecoverBase = 0;
+
    hb_arrayNew( tc->aTryCatchHandlerStack, 0 );
    hb_gcLock(  tc->aTryCatchHandlerStack );
    tc->iLaunchCount = 0;

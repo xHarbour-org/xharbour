@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.55 2003/07/27 14:59:01 jonnymind Exp $
+* $Id: thread.h,v 1.56 2003/08/01 11:36:04 jonnymind Exp $
 */
 
 /*
@@ -331,6 +331,9 @@ typedef struct tag_HB_STACK
 
    /* List of error handlers for TRY/CATCH blocks */
    PHB_ITEM aTryCatchHandlerStack;
+   /* VM requests and recover sequence */
+   USHORT uiActionRequest;
+   ULONG lRecoverBase;
 
    /* Mt With Object index */
    HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
@@ -351,6 +354,7 @@ typedef struct tag_HB_STACK
    int iExtraElementsIndex;
    int iExtraElements;
    int iExtraIndex;
+
 
    /* FS api error system */
    UINT uiErrorLast;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.251 2003/08/20 20:06:06 ronpinkas Exp $
+ * $Id: hvm.c,v 1.252 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -250,10 +250,6 @@ static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
 static BOOL     s_bDebugShowLines;  /* update source code line on the debugger display */
 static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invoked */
 
-/* Stores the position on the stack of current SEQUENCE envelope or 0 if no
- * SEQUENCE is active
- */
-static LONG     s_lRecoverBase;
 #define  HB_RECOVER_STATE     -1
 #define  HB_RECOVER_BASE      -2
 #define  HB_RECOVER_ADDRESS   -3
@@ -265,13 +261,9 @@ static LONG     s_lRecoverBase;
    PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
    int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex = 0, hb_vm_iExtraElements = 0;
    int hb_vm_iExtraIndex;
+
 #endif
 
-/* Request for some action - stop processing of opcodes
- */
-static USHORT   s_uiActionRequest;
-
-static int s_iBaseLine;
 
 char *hb_vm_sNull = "";
 
@@ -302,8 +294,21 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
    ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
    USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+   /* Request for some action - stop processing of opcodes
+   */
+   static USHORT   s_uiActionRequest;
+
+   /* Stores the position on the stack of current SEQUENCE envelope or 0 if no
+   * SEQUENCE is active
+   */
+   static LONG     s_lRecoverBase;
+
+#else
+   #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
+   #define s_lRecoverBase     (HB_VM_STACK.lRecoverBase)
 #endif
 
+static int s_iBaseLine;
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
@@ -381,8 +386,10 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_bDebugging = FALSE;
    s_bDebugShowLines = FALSE;
    s_bDebuggerIsWorking = FALSE;
+   #ifndef HB_THREAD_SUPPORT
    s_lRecoverBase = 0;
    s_uiActionRequest = 0;
+   #endif
 
 #ifndef HB_THREAD_SUPPORT
    HB_VM_STACK.pItems = NULL; /* keep this here as it is used by fm.c */
