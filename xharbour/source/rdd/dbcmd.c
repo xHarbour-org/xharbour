@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.78 2004/02/23 08:31:54 andijahja Exp $
+ * $Id: dbcmd.c,v 1.79 2004/02/23 13:08:26 andijahja Exp $
  */
 
 /*
@@ -4302,10 +4302,11 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   HB_THREAD_STUB
   LPAREANODE pAreaNode;
   LPRDDNODE  pRDDNode;
-  PHB_ITEM   tableItem;
+  HB_ITEM   tableItem;
   USHORT     uiRddID;
   PHB_FNAME  pFileName;
   DBOPENINFO pInfo;
+  char *szFileWithExt = NULL;
 
   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
 
@@ -4334,7 +4335,11 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   {
       s_DefaultExtension.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
-      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+      szFileWithExt = (char *) hb_xgrab( strlen( szFileName ) +
+            s_DefaultExtension.item.asString.length + 1 );
+      sprintf( szFileWithExt, "%s%s", szFileName,
+         s_DefaultExtension.item.asString.value );
+      szFileName = szFileWithExt;
       hb_itemClear( &s_DefaultExtension );
   }
 
@@ -4404,20 +4409,30 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
         hb_xfree( pInfo.abName );
         hb_xfree( pAreaNode );
 
+        if ( szFileWithExt )
+        {
+           hb_xfree( szFileWithExt );
+        }
         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
         return NULL;
      }
 
      /* check for table existence and if true, drop it */
-     tableItem = hb_itemNew( NULL );
-     hb_itemPutCL( tableItem, szFileName, strlen( szFileName ) );
+     tableItem.type = HB_IT_NIL;
+     hb_itemPutCL( &tableItem, szFileName, strlen( szFileName ) );
 
-     if( SELF_EXISTS( pRDDNode, tableItem, NULL ))
+     // not needed anymore
+     if ( szFileWithExt )
      {
-        SELF_DROP( pRDDNode, tableItem );
+        hb_xfree( szFileWithExt );
      }
 
-     hb_itemRelease( tableItem );
+     if( SELF_EXISTS( pRDDNode, &tableItem, NULL ))
+     {
+        SELF_DROP( pRDDNode, &tableItem );
+     }
+
+     hb_itemClear( &tableItem );
 
      /* now create a new table based on the current Area's record layout */
      ( ( AREAP ) pAreaNode->pArea )->atomAlias = hb_dynsymGet( ( char * ) pInfo.atomAlias );
@@ -4480,10 +4495,10 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   HB_THREAD_STUB
 
   USHORT   i,f;
-  PHB_ITEM fieldValue;
+  HB_ITEM fieldValue;
   char * szName;
 
-  fieldValue = hb_itemNew( NULL );
+  fieldValue.type = HB_IT_NIL;
 
   szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
 
@@ -4502,14 +4517,14 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
       {
         LPAREANODE s_curr = s_pCurrArea;
 
-        SELF_GETVALUE( pAreaFrom, f++, fieldValue );
+        SELF_GETVALUE( pAreaFrom, f++, &fieldValue );
 
         if( s )
         {
           s_pCurrArea = s;
         }
 
-        SELF_PUTVALUE( pAreaTo, i + 1, fieldValue );
+        SELF_PUTVALUE( pAreaTo, i + 1, &fieldValue );
 
         s_pCurrArea = s_curr;
       }
@@ -4517,7 +4532,7 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   }
 
   hb_xfree( szName );
-  hb_itemRelease( fieldValue );
+  hb_itemClear( &fieldValue );
 }
 
 /*move the records, filtering if apropiate*/
