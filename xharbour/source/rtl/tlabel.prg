@@ -1,5 +1,5 @@
 /*
- * $Id: tlabel.prg,v 1.9 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: tlabel.prg,v 1.1.1.1 2001/12/21 10:42:00 ronpinkas Exp $
  */
 
 /*
@@ -225,21 +225,23 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
 
    RETURN Self
 
-   METHOD ExecuteLabel() CLASS HBLabelForm
+METHOD ExecuteLabel() CLASS HBLabelForm
    LOCAL nField, nMoreLines, aBuffer := {}, cBuffer
    LOCAL v
+   LOCAL aLabel
+   LOCAL cBand
 
    // Load the current record into aBuffer
-   FOR nField := 1 TO LEN( ::aLabelData[ LBL_FIELDS ] )
+   FOR EACH aLabel IN ::aLabelData[ LBL_FIELDS ]
 
-      if ( ::aLabelData[ LBL_FIELDS, nField ] <> NIL )
+      if ( aLabel <> NIL )
 
-         v := Eval( ::aLabelData[ LBL_FIELDS, nField, LF_EXP ] )
+         v := Eval( aLabel[ LF_EXP ] )
 
          cBuffer := PadR( v, ::aLabelData[ LBL_WIDTH ] )
          cBuffer := cBuffer + Space( ::aLabelData[ LBL_SPACES ] )
 
-         if ( ::aLabelData[ LBL_FIELDS, nField, LF_BLANK ] )
+         if ( aLabel[ LF_BLANK ] )
             if ( !Empty( cBuffer ) )
                AADD( aBuffer, cBuffer )
             end
@@ -258,19 +260,21 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
    ASIZE( aBuffer, LEN( ::aLabelData[ LBL_FIELDS ] ) )
 
    // Add aBuffer to ::aBandToPrint
-   FOR nField := 1 TO LEN( ::aLabelData[ LBL_FIELDS ] )
-      IF aBuffer[ nField ] == NIL
-         ::aBandToPrint[ nField ] := ::aBandToPrint[ nField ] + ::cBlank
+//   nField := 1
+   FOR EACH cBand IN ::aBandToPrint
+      IF aBuffer[ HB_EnumIndex() ] == NIL
+         cBand += ::cBlank
       ELSE
-         ::aBandToPrint[ nField ] := ::aBandToPrint[ nField ]  + aBuffer[ nField ]
+         cBand += aBuffer[ HB_EnumIndex() ]
       ENDIF
+//      nField++
    NEXT
 
    IF ::nCurrentCol == ::aLabelData[ LBL_ACROSS ]
 
       // trim
-      FOR nField := 1 TO LEN( ::aBandToPrint )
-         ::aBandToPrint[ nField ] := Trim( ::aBandToPrint[ nField ] )
+      FOR EACH aLabel IN ::aBandToPrint
+         aLabel := Trim( aLabel )
       NEXT
 
 
@@ -358,8 +362,8 @@ METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
    LOCAL err                              // error object
 
    LOCAL cDefPath          // contents of SET DEFAULT string
-   LOCAL aPaths            // array of paths
    LOCAL nPathIndex := 0   // iteration counter
+   LOCAL cPath
 
    // Create and initialize default label array
    LOCAL aLabel[ LBL_COUNT ]
@@ -380,10 +384,9 @@ METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
       // Search through default path; attempt to open label file
       cDefPath := SET( _SET_DEFAULT )
       cDefPath := STRTRAN( cDefPath, ",", ";" )
-      aPaths := ListAsArray( cDefPath, ";" )
 
-      FOR nPathIndex := 1 TO LEN( aPaths )
-         nHandle := FOPEN( aPaths[ nPathIndex ] + "\" + cLblFile )
+      FOR EACH cPath IN ListAsArray( cDefPath, ";" )
+         nHandle := FOPEN( cPath + "\" + cLblFile )
          // if no error is reported, we have our label file
          IF EMPTY( nFileError := FERROR() )
             EXIT
