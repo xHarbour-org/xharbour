@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.2 2003/03/25 15:32:50 mbirdyg Exp $
+ * $Id: dattime2.prg,v 1.2 2005/01/13 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -215,68 +215,6 @@ local bExact
   return (0)
 
 
-
-FUNCTION daysInmonth ( nMonth, lLeap )
-
-local nday := 0
-
-  do case
-     case nMonth == 2
-          if lLeap == .T.
-             nday := 29
-          else
-             nday := 28
-          endif
-
-     case nMonth == 4 .or. nMonth == 6 .or. ;
-          nMonth == 9 .or. nMonth == 11
-          nday := 30
-     otherwise 
-          nday := 31
-  endcase
-
-  return nday
-
-
-FUNCTION daystomonth ( nMonth, lLeap )
-
-local ndays := 0
-
-   if valtype(lLeap) != "L"
-      lLeap := .F.
-   endif
-
-   do case
-      case nMonth == 2
-           ndays :=  31     // + Jan 31
-      case nMonth == 3     
-           ndays :=  59     // + Feb 28
-      case nMonth == 4
-           ndays :=  90     // + Mar 31
-      case nMonth == 5
-           ndays := 120     // + Apr 30
-      case nMonth == 6
-           ndays := 151     // + May 31
-      case nMonth == 7
-           ndays := 181     // + Jun 30
-      case nMonth == 8
-           ndays := 212     // + Jul 31
-      case nMonth == 9
-           ndays := 243     // + Aug 31
-      case nMonth == 10
-           ndays := 273     // + Sep 30
-      case nMonth == 11
-           ndays := 304     // + Oct 31
-      case nMonth == 12
-           ndays := 334     // + Nov 30
-   endcase
-  
-   if (lLeap,  ndays ++, )
-
-   return ndays
-
-
-
 FUNCTION dmy ( ddate, lmode )
 
 //local nMonth  := month (dDate)
@@ -311,64 +249,103 @@ local lSetCentury := __SETCENTURY()
    return cDate
 
 
+#pragma BEGINDUMP
 
-FUNCTION doy ( dDate )
+#include "hbapi.h"
+#include "hbdate.h"
 
-local lleap   := .F.
-local nMonth  := month (dDate)
-local nDay    := day (dDate)
-local numdays := 0
 
-   if valtype ( dDate ) != "D"
-      dDate := date()
-   endif
+HB_FUNC( DOY )
+{
+   int iYear, iMonth, iDay;
+   LONG lFirst, lCurrent;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
-   if empty (dDate)
-      return 0
-   endif
+   if( pDate )
+   {
+      lCurrent = pDate->item.asDate.value;
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lCurrent = hb_dateEncode(iYear, iMonth, iDay);
+   }
 
-   lLeap := isleap (dDate)
-   numdays := daystomonth ( nMonth, lleap ) + nDay
+   lFirst = hb_dateEncode(iYear, 1, 1);
 
-   return numdays
+   hb_retnl( lCurrent - lFirst + 1);
+}
 
+HB_FUNC( ISLEAP )
+{
+   int iYear, iMonth, iDay;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate && pDate->item.asDate.value )
+   {
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+
+   hb_retl( ( ( iYear % 4 == 0 && iYear % 100 != 0 ) || iYear % 400 == 0 ) );
+}
+
+
+HB_FUNC( DAYSTOMONTH )
+{
+   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
+   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
+   int iMonthes[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+   hb_retni( (iMonth < 1 && iMonth > 12) ? 0 : iMonthes[iMonth - 1] +
+              ((bLeap && iMonth > 2) ? 1 : 0) );
+}
+
+HB_FUNC( DAYSINMONTH )
+{
+   int iMonth = (ISNUM( 1 ) ? hb_parni(1) : 0 );
+   BOOL bLeap = (ISLOG( 2 ) ? hb_parl(2) : 0 );
+
+   if( iMonth == 2)
+   {
+      hb_retni( bLeap ? 29 : 28 );
+   }
+   else if(iMonth == 4 || iMonth == 6 || iMonth == 9 || iMonth == 11)
+   {
+      hb_retni( 30 );
+   }
+   else
+   {
+      hb_retni( 31 );
+   }
+
+}
+
+HB_FUNC( QUARTER )
+{
+   int iYear, iMonth, iDay;
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate && pDate->item.asDate.value )
+   {
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+
+   hb_retni( (iMonth+2) / 3);
+}
+
+
+#pragma ENDDUMP
 
    
-FUNCTION isleap ( ddate )
-
-local nYear
-local nMmyr
-local nCyYr
-local nQdYr
-local lRetval
-
-   if empty ( ddate )
-     ddate := date ()
-   endif
-
-   nYear  := year (ddate)
-   nCyYr  := nYear / 400
-//   nMmyr  := nyear /1000
-   nMmyr  := nYear /100
-   nQdYr  := nYear / 4
-   
-   do case
-      case int (nCyYr) == nCyYr
-           lRetVal := .T.
-
-      case int (nMmyr) == nMmyr
-           lRetVal := .F.
-           
-      case int (nQdYr) == nQdYr
-           lRetVal := .T.
-
-      otherwise
-           lRetVal := .F.
-   endcase
-   
-   return lRetVal
-   
-
 FUNCTION lastdayom ( xDate )
 
 local nMonth := 0
@@ -479,24 +456,6 @@ local cMonth := ""
 //  endcase
 
     return cMonth
-
-
-
-FUNCTION quarter ( ddate )
-
-local nmonth
-local nretmonth
-
-   if empty (ddate)
-      ddate := date()
-   endif
-
-   nmonth    := month (ddate)
-//   nretmonth := int (( nmonth / 3 ) + 0.67 )
-   nretmonth := int ((nmonth + 2) / 3 )
-
-   return nretmonth
-
 
 
 

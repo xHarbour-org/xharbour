@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3738 2005/01/13 08:24:38 druzus Exp $
+ * $Id: ChangeLog,v 1.3740 2005/01/13 23:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-13 23:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/datetime.prg
+    ! Fixed bug in DAYSTOMONTH, thanks to Bill Robertson,
+      fixed bug in DOY with empty date paremeter,
+      rewritten ISLEAP, DAYSINMONTH, QUARTER functions
 
 2005-01-13 17:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
