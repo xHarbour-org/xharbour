@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.3 2002/12/19 22:25:25 jonnymind Exp $
+* $Id: thread.h,v 1.4 2002/12/20 01:25:54 jonnymind Exp $
 */
 
 /*
@@ -100,7 +100,7 @@
     #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
     #define HB_MUTEX_UNLOCK( x )        ReleaseMutex( x )
     #define HB_COND_T                   HANDLE
-    #define HB_COND_INIT( x )           CreateEvent( x, TRUE, FALSE, NULL )
+    #define HB_COND_INIT( x )           x = CreateEvent( NULL, TRUE, FALSE, NULL )
     #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
     #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
     #define HB_COND_SIGNAL( x )         SetEvent( x )
