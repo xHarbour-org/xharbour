@@ -1,5 +1,5 @@
 /*
- * $Id: saverest.c,v 1.6 2004/01/21 03:58:35 maurifull Exp $
+ * $Id: saverest.c,v 1.7 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -54,28 +54,40 @@
 #include "hbfast.h"
 #include "hbapigt.h"
 
+// This function validates parameters. They must be coordinates inside
+// the screen size, and the lower number must be first. The input
+// parameters from the user's function are signed, and the output
+// parameters (to the real work) are unsigned.
+void savescreen_coords( USHORT *uiSmall, USHORT *uiBig, int iMax, int iParamNum )
+{
+   int iParam1, iParam2, iSwap;
+
+   iParam1 = ( ISNUM( iParamNum ) ? hb_parni( iParamNum ) : 0 );
+   iParam1 = ( ( iParam1 < 0 ) ? 0 : ( ( iParam1 > iMax ) ? iMax : iParam1 ) );
+
+   iParam2 = ( ISNUM( iParamNum + 2 ) ? hb_parni( iParamNum + 2 ) : iMax );
+   iParam2 = ( ( iParam2 < 0 ) ? 0 : ( ( iParam2 > iMax ) ? iMax : iParam2 ) );
+
+   if( iParam1 > iParam2 )
+   {
+      iSwap = iParam1;
+      iParam1 = iParam2;
+      iParam2 = iSwap;
+   }
+
+   *uiSmall = ( USHORT ) iParam1;
+   *uiBig   = ( USHORT ) iParam2;
+}
+
 HB_FUNC( SAVESCREEN )
 {
-   USHORT uiTop    = hb_parni( 1 ); /* Defaults to zero on bad type */
-   USHORT uiLeft   = hb_parni( 2 ); /* Defaults to zero on bad type */
-   USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow();
-   USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol();
-   USHORT uiChg;
+   USHORT uiTop, uiLeft, uiBottom, uiRight;
    UINT uiSize;
    void * pBuffer;
 
-   if ( uiTop > uiBottom )
-   {
-      uiChg = uiTop;
-      uiTop = uiBottom;
-      uiBottom = uiChg;
-   }
-   if ( uiLeft > uiRight )
-   {
-      uiChg = uiLeft;
-      uiLeft = uiRight;
-      uiRight = uiChg;
-   }
+   savescreen_coords( &uiTop,  &uiBottom, hb_gtMaxRow(), 1 );
+   savescreen_coords( &uiLeft, &uiRight,  hb_gtMaxCol(), 2 );
+
    hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
    pBuffer = hb_xgrab( uiSize + 1 );  /* why +1? */
 
@@ -85,10 +97,13 @@ HB_FUNC( SAVESCREEN )
 
 HB_FUNC( RESTSCREEN )
 {
+   USHORT uiTop, uiLeft, uiBottom, uiRight;
+
    if( ISCHAR( 5 ) )
-      hb_gtRest( hb_parni( 1 ), /* Defaults to zero on bad type */
-                 hb_parni( 2 ), /* Defaults to zero on bad type */
-                 ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow(),
-                 ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol(),
-                 ( void * ) hb_parcx( 5 ) );
+   {
+      savescreen_coords( &uiTop,  &uiBottom, hb_gtMaxRow(), 1 );
+      savescreen_coords( &uiLeft, &uiRight,  hb_gtMaxCol(), 2 );
+
+      hb_gtRest( uiTop, uiLeft, uiBottom, uiRight, ( void * ) hb_parcx( 5 ) );
+   }
 }
