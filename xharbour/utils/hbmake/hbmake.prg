@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.111 2004/01/22 08:57:59 lculik Exp $
+ * $Id: hbmake.prg,v 1.112 2004/01/24 17:26:44 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1638,24 +1638,25 @@ FUNC CreateMakeFile( cFile )
 
    s_aObjs := aClone( aout )
 
-   x     := aScan( s_aObjs, { | x | Lower( x ) == Lower( cTopFile ) } )
+   x     := aScan( s_aObjs, { | x | Lower( x ) in Lower( cTopFile ) } )
 
    IF x > 0
       aDel( s_aObjs, x )
       aSize( s_aObjs, Len( s_aObjs ) - 1 )
       aSize( s_aObjs, Len( s_aObjs ) + 1 )
       aIns( s_aObjs, 1 )
-      s_aObjs[ 1 ] := cTopFile
+      s_aObjs[ 1 ] := AllTrim( cTopFile )
    ENDIF
 
-   x := aScan( s_aPrgs, { | x | Lower( x ) == Lower( cTopFile ) } )
+   x := aScan( s_aPrgs, { | x | Lower( x ) in Lower( cTopFile ) } )
 
    IF x > 0
       aDel( s_aPrgs, x )
       aSize( s_aPrgs, Len( s_aPrgs ) - 1 )
       aSize( s_aPrgs, Len( s_aPrgs ) + 1 )
       aIns( s_aPrgs, 1 )
-      s_aPrgs[ 1 ] := cTopFile
+      s_aPrgs[ 1 ] :=  AllTrim( cTopFile )
+
    ENDIF
 
    aEval( s_aObjs, { | xItem, x | hb_FNAMESPLIT( xiTem, @cPath, @cTest, @cExt, @cDrive ), cext := Substr( cExt, 2 ), IIF( ! s_lGcc, s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 2 ), s_aObjs[ x ] := cObjDir + cTest + "." + Exte( cExt, 3 ) ) } )
@@ -3379,7 +3380,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF  "-L" IN cParam
       s_cDefLang := Substr( cParam, At( "-L", cParam ) + 2, 2 )
    ENDIF
-tracelog(cParam)
+
 RETURN cParam
 
 FUNCTION ShowHelp()
@@ -3429,7 +3430,7 @@ RETURN NIL
 FUNCTION ProcessParameters( cParams )
 
    LOCAL aDef
-   tracelog(cParams)
+   
 
    IF  "-F" IN cParams
       s_lForce  := .T.
@@ -3438,7 +3439,7 @@ FUNCTION ProcessParameters( cParams )
 
    IF  "-R" IN cParams
       s_lRecurse := .T.
-      tracelog(s_lRecurse)
+      
       cParams  := Strtran( cParams, "-R", "" )
    ENDIF
 
