@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.5 2003/12/22 02:06:31 peterrees Exp $
+ * $Id: gtwvt.c,v 1.7 2003/12/22 21:48:26 druzus Exp $
  */
 
 /*
@@ -252,8 +252,8 @@ static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy);
 extern BOOL b_MouseEnable;
 
 // set in mainwin.c
-extern HINSTANCE hb_hInstance;
-extern HINSTANCE hb_hPrevInstance;
+extern HANDLE hb_hInstance;
+extern HANDLE hb_hPrevInstance;
 extern int hb_iCmdShow;
 
 static USHORT s_uiDispCount;
@@ -278,7 +278,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
     gt_hbInitStatics();
-    _s.hWnd = hb_wvt_gtCreateWindow( hb_hInstance,  hb_hPrevInstance,  "", hb_iCmdShow);
+    _s.hWnd = hb_wvt_gtCreateWindow( (HINSTANCE) hb_hInstance,  (HINSTANCE) hb_hPrevInstance,  "", hb_iCmdShow);
     if (!_s.hWnd)
     {
       //Runtime error
@@ -299,7 +299,7 @@ void HB_GT_FUNC(gt_Exit( void ))
     {
       DestroyWindow(_s.hWnd);
     }
-    UnregisterClass(szAppName,hb_hInstance);
+    UnregisterClass(szAppName,(HINSTANCE) hb_hInstance);
 
     if( b_MouseEnable )
     {
@@ -2100,8 +2100,6 @@ static void hb_wvt_gtValidateCol(void)
  */
 static void hb_wvt_gtValidateCaret(void)
 {
-  RECT rect;
-  POINT point;
 
   hb_wvt_gtValidateCol();
   hb_wvt_gtValidateRow();
@@ -2283,7 +2281,6 @@ static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeig
 static void gt_hbInitStatics(void)
 {
   OSVERSIONINFO osvi ;
-  int i;
   _s.PTEXTSIZE.x = 0;
   _s.PTEXTSIZE.y = 0;
   _s.ROWS = WVT_DEFAULT_ROWS;
@@ -2494,7 +2491,7 @@ void HB_EXPORT hb_wvt_gtSetWindowTitle(char * title)
 
 DWORD HB_EXPORT hb_wvt_gtSetWindowIcon(int icon)
 {
-  HICON hIcon = LoadIcon(hb_hInstance, MAKEINTRESOURCE(icon));
+  HICON hIcon = LoadIcon((HINSTANCE) hb_hInstance, MAKEINTRESOURCE(icon));
   if (hIcon )
   {
     SendMessage(_s.hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon); // Set Title Bar ICON
