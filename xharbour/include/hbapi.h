@@ -303,7 +303,6 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
-    extern void  HB_EXPORT  hb_retptrfin( void *voidPtr, PHB_FINALIZER_FUNC pf ); /* returns a pointer to an allocated memory, collected by GC and finalized with a custom function */
    #ifndef HB_LONG_LONG_OFF
     extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
