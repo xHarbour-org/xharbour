@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldwvt.bat,v 1.1 2005/01/22 16:14:00 lf_sfnet Exp $
+rem * $Id: bldwvt.bat,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -31,7 +31,7 @@ set HB_INC_INSTALL=%HB_INSTALL%\include;%HB_INSTALL%\contrib\gtwvt
 set HB_LIB_INSTALL=%HB_INSTALL%\lib
 set HB_ZIP_LIB=
 set HB_GT_LIB=gtwvt
-set HB_USER_LIBS=gtwvt.lib
+set HB_USER_LIBS=wvtgui.lib
 set CFLAGS=-W
 
 rem Check help request

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtmenu.prg,v 1.1 2005/01/22 16:14:00 lf_sfnet Exp $
+ * $Id: wvtmenu.prg,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
+ * $Id: wvtcore.c,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
  */
 
 /*

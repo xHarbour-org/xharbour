@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
+# $Id: makefile.bc,v 1.2 2005/01/22 18:38:41 fsgiudice Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -10,7 +10,7 @@ BIN_DIR = ..\..\bin\b32
 OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
 
-$(LIB_DIR)\gtwvt.lib :   \
+$(LIB_DIR)\wvtgui.lib :   \
    $(OBJ_DIR)\wvtcore.obj  \
    $(OBJ_DIR)\wvtutils.obj \
    $(OBJ_DIR)\wvtpaint.obj \
@@ -27,7 +27,7 @@ $(OBJ_DIR)\wvtutils.obj : wvtutils.c
 
 .c.obj:
   bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
-  tlib $(LIB_DIR)\gtwvt.lib -+$@,,
+  tlib $(LIB_DIR)\wvtgui.lib -+$@,,
 
 .prg.c:
   $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.33 2005/01/09 22:35:39 peterrees Exp $
+ * $Id: hbgtwvt.h,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.6 2004/09/28 03:25:18 vouchcac Exp $
+ * $Id: wvtpaint.prg,v 1.1 2005/01/22 15:21:12 lf_sfnet Exp $
  */
 
 /*

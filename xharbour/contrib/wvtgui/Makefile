@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
+# $Id: Makefile,v 1.2 2005/01/22 18:49:52 fsgiudice Exp $
 #
 
 ROOT = ../../
@@ -12,7 +12,7 @@ PRG_SOURCES=\
 	wvtclass.prg \
 	wvtpaint.prg
 
-LIBNAME=gtwvt
+LIBNAME=wvtgui
 
 include $(TOP)$(ROOT)config/lib.cf
 

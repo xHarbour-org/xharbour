@@ -1,5 +1,5 @@
 /*
- * $Id: wvt.prg,v 1.2 2004/01/17 21:54:04 fsgiudice Exp $
+ * $Id: wvt.prg,v 1.1 2005/01/22 16:14:00 lf_sfnet Exp $
  */
 
 /*

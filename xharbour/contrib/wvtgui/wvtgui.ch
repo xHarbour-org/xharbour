@@ -1,5 +1,5 @@
 /*
- * $Id: wvtgui.ch,v 1.2 2004/04/25 07:17:35 vouchcac Exp $
+ * $Id: wvtgui.ch,v 1.1 2005/01/22 15:21:12 lf_sfnet Exp $
  */
 
 /*

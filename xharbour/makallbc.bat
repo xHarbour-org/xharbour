@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallbc.bat,v 1.13 2004/11/21 16:26:11 bdj Exp $
+rem $Id: makallbc.bat,v 1.14 2005/01/22 18:38:34 fsgiudice Exp $
 rem
 
 echo create system files
@@ -146,9 +146,9 @@ cd contrib\gtwvw
 call make_b32.bat %1
 cd ..\..
 
-:gtwvt
-echo gtwvt
-cd contrib\gtwvt
+:wvtgui
+echo wvtgui
+cd contrib\wvtgui
 call make_b32.bat %1
 cd ..\..
 
