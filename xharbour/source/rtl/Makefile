@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.37 2003/07/24 01:55:58 jonnymind Exp $
+# $Id: Makefile,v 1.38 2003/09/11 12:08:28 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -114,6 +114,7 @@ C_SOURCES=\
         spfiles.c    \
         str.c        \
         strcase.c    \
+        strdel.c     \
         strings.c    \
         strmatch.c   \
         strpeek.c    \
