@@ -134,11 +134,8 @@ HB_FUNC( BIN2F )
 }
 
 
-
-
 // Add PRG interface
 // Add POINT conversion
-
 
 
 //-----------------------------------------------------------------------------
@@ -495,8 +492,44 @@ int nCopyAnsiToWideChar (LPWORD lpWCStr, LPSTR lpAnsiIn)
   return MultiByteToWideChar(GetACP(), MB_PRECOMPOSED, lpAnsiIn, cchAnsi, lpWCStr, cchAnsi) +1;
 }
 
-   Last change:  WN   26 May 2002    3:13 pm
 */
+
+
+// Mutex functions
+
+//----------------------------------------------------------------------------
+// HANDLE CreateMutex(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCTSTR lpName )
+
+HB_FUNC( CREATEMUTEX )
+{
+   LPSECURITY_ATTRIBUTES *sa;
+   
+   if (ISCHAR(2)) 
+       sa = (SECURITY_ATTRIBUTES *) hb_param(1, HB_IT_STRING)->item.asString.value;
+
+   hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa, 
+                                  hb_parnl( 2 )         , 
+                                  hb_parc( 3 ) ) );
+
+}
+ 
+//----------------------------------------------------------------------------
+// HANDLE OpenMutex(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName )
+
+HB_FUNC( OPENMUTEX )
+{
+  hb_retnl( (ULONG) OpenMutex( hb_parnl( 1 ), hb_parl( 2 ), hb_parc( 3 ) ) );
+}
+
+//----------------------------------------------------------------------------
+// BOOL ReleaseMutex( HANDLE hMutex )
+
+HB_FUNC( RELEASEMUTEX )
+{ 
+  hb_retl( ReleaseMutex( (HANDLE) hb_parnl( 1 ) ) );
+}
+
+
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI RegisterHotKey( IN HWND hWnd, IN int id, IN UINT fsModifiers, IN UINT vk);
@@ -611,6 +644,8 @@ HB_FUNC( ATAN )
    hb_retnd(atan(hb_parnd(1)));
 }
 
+//-----------------------------------------------------------------------------
+
 /* Extended function for Array CopyRight Luiz Rafael Culik Guimaraes Culikr@uol.com.br */
 void  Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
 {
@@ -623,6 +658,8 @@ void  Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
    hb_itemRelease(element);
 }
 
+//-----------------------------------------------------------------------------
+
 void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint)
 {
 
@@ -633,6 +670,9 @@ void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint)
    hb_itemRelease(element);
 
 }
+
+//-----------------------------------------------------------------------------
+
 void Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize )
 {
    PHB_ITEM element = hb_itemNew(NULL);

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5 2002/09/06 20:04:09 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.6 2002/09/08 22:05:48 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-17 AJ Wos
+  * _WinMisc.c      
+    + CreateMutex()
+    + OpenMutex()
+    + ReleaseMutex()
+
+2002-09-10 AJ Wos
+      Corrected return value from SHBrowseForFolder() to return NIL if
+      the dialog is cancelled. (_WinCDlg.c)
 
 2002-09-06 21:54 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * make_b32.bat
@@ -111,9 +121,6 @@
       Fixed GetEnvironmentStrings()
       Added FreeEnvironmentStrings() to _WinMisc.c
       Corrected CreateDirectory() in _WinDir.c
-08/09/2002 AJ Wos
-      Corrected return value from SHBrowseForFolder() to return NIL if
-      the dialog is cancelled. (_WinCDlg.c)
 
     
 
