@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.66 2003/03/14 13:08:13 jonnymind Exp $
+* $Id: thread.c,v 1.67 2003/03/16 06:00:36 jonnymind Exp $
 */
 
 /*
@@ -324,6 +324,35 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
    return p;
 }
 
+/* to be internally used byt functions willing to know if there is a stack */
+HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
+{
+   HB_STACK *p;
+
+   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   
+   if( last_stack && last_stack->th_id == id )
+   {
+      p = last_stack;
+   }
+   else {
+
+      p = hb_ht_stack;
+
+      while( p && p->th_id != id )
+      {
+         p = p->next;
+      }
+
+      if( p )
+      {
+         last_stack = p;
+      }
+   }
+
+   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   return p;
+}
 
 
 /* This function is meant to be called in a protected environment */
@@ -1020,13 +1049,25 @@ HB_FUNC( JOINTHREAD )
 
    #if ! defined( HB_OS_WIN_32 )
       HB_STACK_UNLOCK;
-      pthread_join( th, 0 );
+      if( pthread_join( th, NULL ) != 0 )
+      {
+         HB_STACK_LOCK;
+         hb_retl( FALSE );
+         return;
+      }
    #else
-      stack = hb_threadGetStack( th );
+      stack = hb_threadGetStackNoError( th );
+      if( stack == NULL )
+      {
+         hb_retl( FALSE );
+         return;
+      }
       HB_STACK_UNLOCK;
       WaitForSingleObject( stack->th_h, INFINITE );
    #endif
    HB_STACK_LOCK;
+   
+   hb_retl( TRUE );
 
 }
 

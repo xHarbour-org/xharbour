@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.7 2003/02/24 05:55:55 jonnymind Exp $
+ * $Id: trpc.prg,v 1.8 2003/03/10 23:22:00 jonnymind Exp $
  */
 
 /*
@@ -383,12 +383,15 @@ METHOD Stop() CLASS tRPCServeCon
 
    MutexLock( ::mtxBusy )
    IF ::thSelf > 0
-      StopThread( ::thSelf )
-      ::thSelf := -1
+      KillThread( ::thSelf )
       lRet := .T.
+      MutexUnlock( ::mtxBusy )
+      JoinThread( ::thSelf )
+      ::thSelf := -1
+   ELSE
+      MutexUnlock( ::mtxBusy )
    ENDIF
-   MutexUnlock( ::mtxBusy )
-
+   
 RETURN lRet
 
 
@@ -638,7 +641,7 @@ METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
    IF InetRecvAll( ::skRemote, @cData ) != nComp
       RETURN NIL
    ENDIF
-
+   
    /* Eventually decrypt it */
    IF ::bEncrypted
       cData := ::Decrypt( cData )
@@ -702,7 +705,7 @@ METHOD FuncForeachCall( cMode, cData ) CLASS tRPCServeCon
 
    /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
-   IF Empty( aParams )
+   IF Empty( cSer )
       RETURN .F.
    ENDIF
 
@@ -733,7 +736,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
       // request socket closing
       RETURN .F.
    ENDIF
-
+   
    // check for level
    IF oFunc:nAuthLevel > ::nAuthLevel
       // signal error
@@ -860,7 +863,6 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
                oRet := "Done"
          ENDCASE
    ENDCASE
-
 // Default return
 RETURN ::SendResult( oRet )
 
@@ -1123,16 +1125,19 @@ METHOD Stop() CLASS tRPCService
       RETURN .F.
    ENDIF
 
-   StopThread( ::thAccept )
+   KillThread( ::thAccept )
+   JoinThread( ::thAccept )
    IF ::thUDP > 0
-      StopThread( ::thUdp )
+      KillThread( ::thUdp )
+      JoinThread( ::thUdp )
    ENDIF
 
    // now destroy all the allocated resources
    InetDestroy( ::skServer )
    InetDestroy( ::skUdp )
    FOR EACH oElem IN ::aServing
-      StopThread( oElem:thSelf )
+      KillThread( oElem:thSelf )
+      JoinThread( oElem:thSelf )
       InetDestroy( oElem:skRemote )
    NEXT
    ASize( ::aServing, 0 )

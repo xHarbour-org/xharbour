@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.7 2003/02/24 01:58:10 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.8 2003/02/24 05:55:55 jonnymind Exp $
  */
 
 /*
@@ -177,11 +177,11 @@ METHOD Destroy() CLASS tRPCClient
          InetDestroy( ::skUdp )
       ENDIF
       IF ::thUdpAccept > 0
-         StopThread( ::thUdpAccept )
+         KillThread( ::thUdpAccept )
          ::thUdpAccept := -1
       ENDIF
       IF ::thTcpAccept > 0
-         StopThread( ::thTcpAccept )
+         KillThread( ::thTcpAccept )
          ::thTcpAccept := -1
       ENDIF
    MutexUnlock( ::mtxBusy )
@@ -333,7 +333,7 @@ RETURN .T.
 METHOD StopScan() CLASS tRPCClient
    MutexLock( ::mtxBusy )
    IF ::thUDPAccept > 0
-      StopThread( ::thUDPAccept )
+      KillThread( ::thUDPAccept )
       ::thUDPAccept := -1
       MutexUnlock( ::mtxBusy )
       ::OnScanComplete()
