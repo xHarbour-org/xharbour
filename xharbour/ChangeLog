@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.141 2002/03/31 03:25:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.142 2002/03/31 03:29:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-31 14:00 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+  * source/rtl/tbrowse.prg
+    * Fixed an problem on SetColumnwidth() method that was Tbrowse not be properly show on screen
 
 2002-03-30 19:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
