@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.19 2004/04/02 13:50:16 srobert Exp $
+ * $Id: philes.c,v 1.20 2004/04/17 22:42:30 andijahja Exp $
  */
 
 /*
@@ -319,31 +319,34 @@ HB_FUNC( HB_OPENPROCESS )
    PHB_ITEM pOut = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pErr = hb_param( 4, HB_IT_BYREF );
    PHB_ITEM pBackground = hb_param( 5, HB_IT_LOGICAL );
+   PHB_ITEM pProcID = hb_param( 6, HB_IT_BYREF );
 
    FHANDLE fhIn, fhOut, fhErr;
    FHANDLE *pfhIn, *pfhOut, *pfhErr;
    FHANDLE fhProcess;
    BOOL bBackground;
+   ULONG pid;
 
    if ( szName == NULL )
    {
       hb_errRT_BASE( EG_ARG, 4001,
          "First parameter (process name) is mandatory",
-         "HB_OPENPROCESS", 5,
+         "HB_OPENPROCESS", 6,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
-            hb_paramError( 4 ), hb_paramError( 5 ) );
+            hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
    if ( (pIn != NULL && !ISBYREF(2) ) ||
         (pOut != NULL && !ISBYREF(3) ) ||
-        (pErr != NULL && !ISBYREF(4) ) )
+        (pErr != NULL && !ISBYREF(4) ) ||
+        (pProcID != NULL && !ISBYREF(6) ) )
    {
       hb_errRT_BASE( EG_ARG, 4001,
          "All the given file handle parameters must be by reference",
-         "HB_OPENPROCESS", 5,
+         "HB_OPENPROCESS", 6,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
-            hb_paramError( 4 ), hb_paramError( 5 ));
+            hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
@@ -351,9 +354,9 @@ HB_FUNC( HB_OPENPROCESS )
    {
       hb_errRT_BASE( EG_ARG, 4001,
          "Input stream must differ from output and error stream",
-         "HB_OPENPROCESS", 5,
+         "HB_OPENPROCESS", 6,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
-            hb_paramError( 4 ), hb_paramError( 5 ));
+            hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
 
@@ -399,7 +402,7 @@ HB_FUNC( HB_OPENPROCESS )
    {
       pfhErr = NULL;
    }
-   fhProcess = hb_fsOpenProcess( szName, pfhIn, pfhOut, pfhErr, bBackground );
+   fhProcess = hb_fsOpenProcess( szName, pfhIn, pfhOut, pfhErr, bBackground, &pid );
 
    if ( fhProcess != FS_ERROR )
    {
@@ -416,6 +419,11 @@ HB_FUNC( HB_OPENPROCESS )
       if ( pErr != NULL && pErr != pOut)
       {
          hb_itemPutNL( pErr, fhErr );
+      }
+      
+      if ( pProcID != NULL )
+      {
+         hb_itemPutNL( pProcID, (LONG) pid );
       }
    }
 

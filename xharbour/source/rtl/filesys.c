@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.101 2004/04/28 18:30:22 druzus Exp $
+ * $Id: filesys.c,v 1.102 2004/05/04 16:43:52 mauriliolongo Exp $
  */
 
 /*
@@ -747,7 +747,8 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       FHANDLE *fhStdin,
       FHANDLE *fhStdout,
       FHANDLE *fhStderr,
-      BOOL bBackground
+      BOOL bBackground,
+      ULONG *ProcessID
       )
 {
    FHANDLE hRet = FS_ERROR;
@@ -871,6 +872,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       pid = _spawnvp( iFlags, argv[0], argv );
       #endif
 
+      *ProcessID = (DWORD) pid;
       hb_xfree( command );
       hb_xfree( argv );
 
@@ -908,6 +910,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    }
 
    if( pid != 0 ) {
+      *ProcessID = (ULONG) pid;
       // I am the father
       if ( fhStdin != NULL )
       {
@@ -1188,6 +1191,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       hb_xfree( completeCommand );
       hb_fsSetError( 0 );
       hRet = HandleToLong( proc.hProcess );
+      *ProcessID = proc.dwProcessID;
 
       if ( fhStdin != NULL )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.34 2004/03/03 01:33:37 ronpinkas Exp $
+ * $Id: hbapifs.h,v 1.35 2004/04/05 02:29:30 druzus Exp $
  */
 
 /*
@@ -149,7 +149,7 @@ extern void     HB_EXPORT hb_fsDirectory( PHB_ITEM Dir, char* szSkleton, char* s
 extern void     HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
 
 /* Open a child process */
-extern FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground );
+extern FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground, ULONG *ProcID );
 extern BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
 int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait );
 
