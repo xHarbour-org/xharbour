@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2211 2004/02/03 13:03:43 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2212 2004/02/03 14:01:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 21:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_ChooseColor( nRGBInit, aRGB16, nFlags )
+    + Wvt_ChooseFont( cFontName, nHeight, nWidth, nWeight, nQuality, lItalic, lUnderline, lStrikeOut )
+    + Wvt_SetMousePos( nRow, nCol )
+      Forces the mouse pointer to rest at the nRow, nCol, in the mid of top and bottom of nRow.
+
+  * xharbour/include/hbgtwvt.h
+    + #include <commdlg.h>
+
+  * xhatbour/tests/wvtgui.prg
+    * Updated to demonstrate above functions.  
 
 2004-02-03 15:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
