@@ -202,13 +202,18 @@ METHOD Read( nLen ) CLASS tIPClient
    ELSE
       // read an amount of data
       cStr0 := Space( nLen )
-      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
+
+// S.R. if len of file is less than 1024 InetRecvAll return 0
+//      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
+
+      InetRecvAll( ::SocketCon, @cStr0, nLen )
+      ::nLastRead := InetCount( ::SocketCon )
       ::nRead += ::nLastRead
 
       IF ::nLastRead != nLen
          ::bEof := .T.
          cStr0 := Substr( cStr0, 1, ::nLastRead )
-         RETURN NIL
+// S.R.         RETURN NIL
       ENDIF
 
       IF ::nRead == ::nLength
@@ -230,9 +235,7 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
 
    ::nStatus := 1
    DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
-// change ( 1024 ) to ( ) because if file is less than 1024 byte
-// this method don't work !
-      cData := ::Read( )
+      cData := ::Read( 1024 )
       IF cData == NIL
          IF nFout != NIL
             Fclose( nFout )
@@ -243,7 +246,6 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
             RETURN .T.
          ENDIF
       ENDIF
-
       IF nFout == NIL
          nFout := Fcreate( cFile, nMode )
          IF nFout < 0

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3431 2004/09/13 17:20:33 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3432 2004/09/13 17:53:09 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-14 08:19 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * xharbour/source/tip/client.prg
+    ! Fix method ReadToFile() now work properly when file to retrieve is
+      less than 1024
 
 2004-09-13 19:51 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   * xharbour/source/tip/client.prg
@@ -32,7 +37,7 @@
       so it should not break any 3-rd party code.
     + added 3-rd parameter to *_GETFUNCTABLE() - it's a pointer to
       supper table in RDDNODE
-    
+
     The above changes are for future modification in AREAP - I'll add
          struct _RDDFUNCS * lprfsSuper
     to this structure to allow single RDD code to be used as base for
