@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3652 2004/12/03 22:05:24 aleytys Exp $
+ * $Id: ChangeLog,v 1.3653 2004/12/04 22:37:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-05 17:24 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * bin/bld.bat
+    * hbzip.lib will only be linked if the file (hbzip.lib) exist.
 
 2004-12-04 23:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec

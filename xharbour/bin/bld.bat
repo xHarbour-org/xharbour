@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.44 2004/08/29 01:46:18 paultucker Exp $
+rem $Id: bld.bat,v 1.45 2004/08/29 17:05:59 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -218,9 +218,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if "%HB_GTALLEG%" == "yes" set HB_ALGLIB=alleg.lib
 
-   if "%HB_DLL%" == "" set HB_LIBLIST=common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfdbt%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib samples.lib hbzip.lib hbct%HB_MT%.lib hbtip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
-   if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib hbzip.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
-   
+   if "%HB_DLL%" == "" set HB_LIBLIST=common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfdbt%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib samples.lib hbct%HB_MT%.lib hbtip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
+   if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
+
+   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
+
    if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM
    if "%HB_MT%" == "" SET BC_MT_FLAG=
 
@@ -235,7 +237,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
    if "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfdbt%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\samples.lib %HB_LIB_INSTALL%\hbct%HB_MT%.lib %HB_LIB_INSTALL%\hbtip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
-   if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\samples.lib %HB_LIB_INSTALL%\hbzip.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
+   if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\samples.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
 
    if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% %HB_LIB_INSTALL%\hbzip.lib
 
