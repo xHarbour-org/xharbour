@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.70 2004/02/09 18:57:19 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.71 2004/02/09 21:25:07 druzus Exp $
  */
 
 /*
@@ -1513,7 +1513,11 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
    }
 
    /* Set to asterisks in case of overflow */
-   if( iBytes > iSize )
+   if( iBytes > iSize
+        #if defined( _MSC_VER ) && ! defined( __XCC__ )
+           || iBytes < 0
+        #endif
+     )
    {
       memset( szResult, '*', iSize );
       szResult[ iSize ] = '\0';

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2253 2004/02/09 19:15:00 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2254 2004/02/09 21:25:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 16:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    ! Fixed MSVC support in hb_itemStrBuf(). MSVC snprintf() returns -1 for overflow
+      instead of needed size.
 
 2004-02-09 22:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/vm/itemapi.c
