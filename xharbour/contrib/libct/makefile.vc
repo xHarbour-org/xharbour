@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/03/04 21:04:38 lculik Exp $
+# $Id: makefile.vc,v 1.2 2003/03/22 17:22:44 lculik Exp $
 #
 
 #
@@ -137,6 +137,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\ctchksum.obj \
    $(OBJ_DIR)\ctcrypt.obj \
    $(OBJ_DIR)\exponent.obj \
+   $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
    $(OBJ_DIR)\ftoc.obj \
    $(OBJ_DIR)\justify.obj \
@@ -167,14 +168,14 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\blank.obj \
    $(OBJ_DIR)\color.obj \
    $(OBJ_DIR)\ct.obj \
-   $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\ctmisc.obj \
+   $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
    $(OBJ_DIR)\invertwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\setlast.obj \
+   $(OBJ_DIR)\setlast.obj
 
 #
 # Our default target
@@ -212,6 +213,7 @@ CLEAN:
    -@if exist $(OBJ_DIR)\ctchksum.* del $(OBJ_DIR)\ctchksum.*
    -@if exist $(OBJ_DIR)\ctcrypt.* del $(OBJ_DIR)\ctcrypt.*
    -@if exist $(OBJ_DIR)\exponent.* del $(OBJ_DIR)\exponent.*
+   -@if exist $(OBJ_DIR)\files.* del $(OBJ_DIR)\files.*
    -@if exist $(OBJ_DIR)\finan.* del $(OBJ_DIR)\finan.*
    -@if exist $(OBJ_DIR)\ftoc.* del $(OBJ_DIR)\ftoc.*
    -@if exist $(OBJ_DIR)\justify.* del $(OBJ_DIR)\justify.*
