@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.7 2003/12/22 04:55:31 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.8 2003/12/22 16:01:51 ronpinkas Exp $
  */
 
 /*
@@ -228,7 +228,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      }
      else
      {
-        if( s_szOutLine[0] == '#' )
+	    if( handl_o && s_szOutLine[0] == '#' )
         {
            hb_pp_WrStr( handl_o, s_szOutLine );
            s_szOutLine[0] = '\0';
