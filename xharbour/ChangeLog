@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.276 2002/06/17 08:31:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.277 2002/06/17 18:21:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-18 03:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    + HB_FUN__OPCOUNT -  returns the total amount of opcodes
+    + HB_FUN__OPGETPRF - returns an array with an opcode called and consumed times { nTimes, nTime }
+    Note: Some changes were made here and there in order to make profiler.prg works with xHarbour. These stuffs are borrowed from Harbour.
+          ( I dunno if "borrow" is the right word, since AFAIK, when one borrows something, then he must one time in future return it :-)) ).
+          Anyway, \tests\testprof.prg now should work and creation of DLL should be OK too.
 
 2002-06-17 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
