@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3320 2004/08/19 08:55:02 likewolf Exp $
+ * $Id: ChangeLog,v 1.3321 2004/08/19 13:11:25 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-19 08:50 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/utils/hbdict/hbdict.prg
+    ! fixed typo in browse header ("Untraslated") and removed footer to allow
+      an additional row in browse
+
+  + xharbour/utils/hbdict/i18n/hbdict_es_MX.hit
+    + Spanish (México) translation added
 
 2004-08-19 17:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/pp/ppcore.c
