@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.22 2003/01/27 03:40:53 walito Exp $
+ * $Id: tbrowse.prg,v 1.23 2003/02/03 14:12:58 walito Exp $
  */
 
 /*
@@ -378,13 +378,15 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    ::lHeaders     := .F.
    ::lFooters     := .F.
+   ::lFootSep     := .F.
+   ::lHeadSep     := .F.
    ::lRedrawFrame := .T.
 
    // Are there column headers to paint ?
    FOR EACH aCol IN ::aColsInfo
       if !Empty( aCol[ o_Obj ]:Heading )
          ::lHeaders := .T.
-         ::lHeadSep := .T.
+         ::lHeadSep := !Empty( ::cHeadSep )
          exit
       endif
    NEXT
@@ -393,7 +395,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    FOR EACH aCol IN ::aColsInfo
       if !Empty( aCol[ o_Obj ]:Footing )
          ::lFooters := .T.
-         ::lFootSep := .T.
+         ::lFootSep := !Empty( ::cFootSep )
          exit
       endif
    NEXT
@@ -1303,12 +1305,14 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
       next
    endif
 
-   if ::lHeadSep .and. ! Empty( ::HeadSep )  //Draw horizontal heading separator line
+//   if ::lHeadSep  .and. ! Empty( ::HeadSep )  // Empty( ::HeadSep ) is evaluated when set lHeadSep
+   if ::lHeadSep                      //Draw horizontal heading separator line
       DispOutAt( ( nScreenRowT := ::nRowData ), ::nwLeft,;
                 Replicate( Right( ::HeadSep, 1 ), nWidth ), ::cColorSpec )
    endif
 
-   if ::lFootSep .and. ! Empty( ::FootSep )  //Draw horizontal footing separator line
+//   if ::lFootSep .and. ! Empty( ::FootSep )   // Empty( ::FootSep ) is evaluated when set lFootSep
+   if ::lFootSep                      //Draw horizontal footing separator line
       DispOutAt( ( nScreenRowB := ::nwBottom - iif( ::lFooters, ::nFooterHeight, 0 ) ), ::nwLeft,;
                 Replicate( Right( ::FootSep, 1 ), nWidth ), ::cColorSpec )
    endif
@@ -1326,12 +1330,12 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
       if n < ::rightVisible
          nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
 
-         if ::lHeadSep .and. ! Empty( ::HeadSep )
+         if ::lHeadSep  // .and. ! Empty( ::HeadSep )
             DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n, o_Width ] ), ::HeadSep, ::cColorSpec )
             nTPos += nLCS           
          endif
 
-         if ::lFootSep .and. ! Empty( ::FootSep )
+         if ::lFootSep  // .and. ! Empty( ::FootSep )
             DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ::FootSep, ::cColorSpec )
             nBPos += nLCS
          endif
