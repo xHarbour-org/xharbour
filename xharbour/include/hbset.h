@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.1.1.1 2001/12/21 10:47:41 ronpinkas Exp $
+ * $Id: hbset.h,v 1.2 2002/01/31 05:08:31 ronpinkas Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ typedef struct
    BOOL    HB_SET_ALTERNATE;
    char *  HB_SET_ALTFILE;
    BOOL    HB_SET_AUTOPEN;
-   BOOL    HB_SET_AUTORDER;
+   int     HB_SET_AUTORDER;
    int     HB_SET_AUTOSHARE;
    BOOL    HB_SET_BELL;
    BOOL    HB_SET_CANCEL;
