@@ -39,8 +39,8 @@
 
 CLASS TForm FROM TWindow
    DATA WindowMenu   EXPORTED
-   DATA Modal        EXPORTED INIT .F.
-   DATA resname      EXPORTED
+   DATA Modal        PROTECTED INIT .F.
+   DATA resname      PROTECTED
    DATA biSystemMenu EXPORTED INIT .T.
    DATA biMinimize   EXPORTED INIT .T.
    DATA biMaximize   EXPORTED INIT .T.
@@ -66,6 +66,7 @@ METHOD New( oParent ) CLASS TForm
    ::lControl  := .F.
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    ::PropName  := IFNIL(::PropName,"TForm",::PropName)
+   InitCommonControls()
    
    RETURN( super:New( oParent ) )
 

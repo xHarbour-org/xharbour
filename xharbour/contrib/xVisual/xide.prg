@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.75 2002/10/06 21:57:52 what32 Exp $
+ * $Id: xide.prg,v 1.76 2002/10/06 23:54:06 what32 Exp $
  */
 
 /*
@@ -51,7 +51,7 @@ FUNCTION Main
    oSplash := TSplash():New( oApp, "visual_xharbour.bmp", 5000 )
 
    WITH OBJECT oApp
-      WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
+      WITH OBJECT :CreateForm( 'MainFrame', MainFrame() )
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
          :MainMenu()
@@ -82,7 +82,7 @@ CLASS MainFrame FROM TFrame
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES,;
-                                    PostQuitMessage(0), 0 )
+                                    NIL, 0 )
    METHOD MainMenu()
    METHOD MainToolBar()
    METHOD MainStatusBar()

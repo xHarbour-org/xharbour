@@ -52,13 +52,13 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
-      
-   ::Caption   := cCaption
+   
    ::id        := nId
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::Width     := IFNIL( nWidth , ::Width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
+   ::Caption   := IFNIL( cCaption, ::Caption, cCaption )
+   ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
+   ::Top       := IFNIL( nTop,     ::Top,     nTop     )
+   ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
+   ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
  
    RETURN( super:new( oParent ) )
 

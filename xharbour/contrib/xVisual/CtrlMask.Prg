@@ -472,6 +472,7 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL hDC
    LOCAL a
    LOCAL aOldSelected:=aClone(::aSelected)
+
    ClientToScreen(::Handle,aPt)
 
    IF Empty(::Cursor)
@@ -482,6 +483,9 @@ METHOD OnLButtonDown( wParam, x, y )
             IF aScan(::aSelected,{|a| a[SEL_HANDLE]==hChild })==0
                aRect:=aClone(aWRect)
                RectScreenToClient(::Handle,aRect)
+               aEval(::aSelected,{|a| ShowWindow(a[SEL_HANDLE],SW_HIDE),;
+               RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN),;
+               ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},{}}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
@@ -507,6 +511,15 @@ METHOD OnLButtonDown( wParam, x, y )
    ENDIF
 
    IF !lFound
+      FOR EACH hChild in ::aSelected
+         aWRect:=GetWindowRect(hChild)
+         aRect:=aClone(aWRect)
+         RectScreenToClient(::Handle,aRect)
+         aEval(::aSelected,{|a| ShowWindow(a[SEL_HANDLE],SW_HIDE),;
+                RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN),;
+                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
+      NEXT
+
       ::aSelected:={}
       ::nClick:=HTCLIENT
       WinSetCursor(LoadCursor(,IDC_SIZEALL))
@@ -516,7 +529,7 @@ METHOD OnLButtonDown( wParam, x, y )
    ENDIF
 
    InvalidateRect(::Handle,,.F.)
-   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
+   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN)
 
    hDC:=GetDC(::Handle)
    SetTextColor(hDC,RGB(255,255,128))

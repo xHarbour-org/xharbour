@@ -45,10 +45,12 @@ CLASS Application
    DATA FrameCreated AS LOGIC INIT .F.
    DATA MultiInstance         INIT .F.
    DATA InstMsg               INIT NIL
-
+   DATA aForms                INIT {}
+   
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()
+   METHOD RemoveForm()
    METHOD CreateFrame()
    METHOD Terminate()                            INLINE PostQuitMessage(0)
    METHOD MessageBox( cText, cCaption, nFlags )  INLINE MessageBox( GetActiveWindow(), cText, cCaption, nFlags )
@@ -97,7 +99,7 @@ METHOD Run() CLASS Application
 METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
 
    LOCAL aVars, aVar
-
+   
    DEFAULT oParent TO self
 
    __objAddData( self, cForm )
@@ -105,12 +107,16 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
    __ObjSetValueList( self, { { cForm, oForm } } )
    oForm:propname := cForm
    oForm:Create()
-
+   
+   IF oParent:handle == ::handle
+      aAdd( ::aForms, oForm )
+      view LEN( ::aForms )   
+   ENDIF
+   
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
          aAdd( oForm:Controls, aVar[2] )
-
          WITH OBJECT aVar[2]
             :Parent    := oForm
             :Instance  := oForm:Instance
@@ -120,6 +126,19 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
    NEXT
 
 RETURN( oForm )
+
+*------------------------------------------------------------------------------*
+
+METHOD RemoveForm( oForm ) CLASS Application
+   local nRet, n
+   IF( n:= aScan( ::aForms,{|o|o:handle == oForm:handle} ) )>0
+      aDel( ::aForms, n, .T. )
+      IF LEN( ::aForms ) == 0
+         nRet := 1
+      ENDIF
+   ENDIF
+view LEN( ::aForms )   
+return(nRet)
 
 *------------------------------------------------------------------------------*
 

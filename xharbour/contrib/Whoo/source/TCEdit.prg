@@ -57,7 +57,7 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TEdit
 
-   ::Caption   := cCaption
+   ::Caption   := IFNIL(cCaption, ::Caption, cCaption)
    ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
