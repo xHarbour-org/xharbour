@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.7 2004/02/05 12:44:17 andijahja Exp $
+ * $Id: tprint.prg,v 1.8 2004/02/23 15:50:25 andijahja Exp $
  */
 
 /*
@@ -459,10 +459,10 @@ METHOD SetPrc(nRow, nCol) CLASS TPRINT
   ::SetPos((nCol * ::CharWidth)+ ::LeftMArgin, (nRow * ::LineHeight) + ::TopMargin)
   RETURN(NIL)
 
-METHOD PROW()
+METHOD PROW() CLASS TPRINT
   RETURN(INT((::PosY- ::TopMargin)/::LineHeight))   // No test for Div by ZERO
 
-METHOD PCOL()
+METHOD PCOL() CLASS TPRINT
   RETURN(INT((::PosX - ::LeftMargin)/::CharWidth))   // Uses width of current character
 
 METHOD MaxRow() CLASS TPRINT
