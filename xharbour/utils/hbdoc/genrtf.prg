@@ -1,5 +1,5 @@
 /*
- * $Id: genrtf.prg,v 1.21 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genrtf.prg,v 1.1.1.1 2001/12/21 10:45:33 ronpinkas Exp $
  */
 
 /*
@@ -881,6 +881,10 @@ FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
                nPos    := AT( " ", cReturn )
                cOLine  := LEFT( cReturn, nPos - 1 )
                cReturn := STRTRAN( cReturn, coLine, "" )
+               if "\" in cReturn
+                  cReturn := Strtran( cReturn, '\', '\\')
+                  tracelog( cReturn )
+               endif
                IF AT( "@", cOLine ) > 0 .OR. AT( "()", cOLine ) > 0 .OR. AT( "<", cOLine ) > 0 .OR. AT( "_", cOLine ) > 0
                   lArgBold := .T.
                ELSE
@@ -904,6 +908,11 @@ FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
    ENDIF
 
    IF AT( '<par>', cBuffer ) > 0 .AND. AT( '</par>', cBuffer ) > 0
+      if "\" in cBuffer
+                  cBuffer := Strtran(cBuffer, '\', '\\')
+                  tracelog( cBuffer )
+               endif
+
       cBuffer   := STRTRAN( cBuffer, '<par>', '' )
       cBuffer   := STRTRAN( cBuffer, '<b>', '\b ' )
       cBuffer   := STRTRAN( cBuffer, '</b>', '\b0 ' )
