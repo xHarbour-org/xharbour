@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1241 2003/07/13 22:21:24 andijahja Exp $
+ * $Id: ChangeLog,v 1.1242 2003/07/13 22:26:16 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-14 09:40 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbloginet.prg
+    ! Added InetInit at inet log modules.
+
+  * source/vm/inet.c
+    ! Sequence for multiple InetInit has been fixed.
+    ! Removed signal intercepting SIGUSR1 from linux initialization,
+      As the final user would not have been able to modify it (and as
+      we are going to provide a direct way to handle this just after
+      version .82 is out).
 
 2003-07-14 00:24 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
