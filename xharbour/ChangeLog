@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.685 2003/02/04 05:52:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.686 2003/02/04 23:43:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-05 19:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    + Added HB_RegexComp( cPattern, [bCaseSens [, bNewLine]] ) --> REGEX
+      function that pre-compiles a pattern. A compiled REGEX can be then
+      used many times in HB_Regex() to save time. On error ( i.e. wrong
+      regex), it returns NIL. Case sensitivity is TRUE by default,
+      and if bNewLine and true then the multiline pattern matching is
+      activated ( '^' and '$' will match begin and end of the line, and not
+      begin and end of the string).
+    * HB_Regex( cPattern, cString, [bCaseSens, [, bNewLine]] ) --> aMatch
+      Now cPattern can be a pre-compiled REGEX or a regular expression
+      pattern. bCaseSens and bNewLine are ignored if cPattern is pre
+      compiled.
+
+  + tests/regex.prg
+    + Added a demo for HB_Regex
 
 2003-02-04 15:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/errorsys.prg
