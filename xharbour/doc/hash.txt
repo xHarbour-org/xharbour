@@ -61,7 +61,7 @@ Hash declarator
 ---------------
 
 To build an hash, the construct { (kexp) => (vexp) } has been introduced.
-Kexp is a key expression, that is an expression which evalutes to an orderable
+kexp is a key expression, that is an expression which evaluates to an orderable
 type. Currently, type useable for keys are:
 
 - Numeric (non floating point)
@@ -102,8 +102,8 @@ Examples:
 Hash accessor
 -------------
 
-The [] is the hash accessor, so that hHash[ xKey ] evalutes to xValue. The
-accessor may be used to retreive an already existing value, to substitute
+The [] is the hash accessor, so that hHash[ xKey ] evaluates to xValue. The
+accessor may be used to retrieve an already existing value, to substitute
 an old one or to create a new pair of key/values; this is determined by the
 access context.
 
@@ -128,7 +128,7 @@ Example:
 
 In evaluation context, that is just using the hash value, the key
 must exists before access. Trying to access it with an unexisting
-key rises a BOUND ERROR, like tring to access an array with an index
+key rises a BOUND ERROR, like trying to access an array with an index
 out of bounds.
 
 Example:
@@ -147,7 +147,7 @@ that we'll see later.
    ----------------------------------------------------------------------
    * NOTE: After that you have populated the hash with a set of keys that
      you don't want to change, you can set auto adding off with
-     HSetAutoAdd( hHash, .F.); this will make xharobur to rise a BOUND
+     HSetAutoAdd( hHash, .F.); this will make xharbour to rise a BOUND
      ERROR if the program tries to add a new key. See HSetAutoAdd for
      more details.
    ----------------------------------------------------------------------
@@ -255,7 +255,7 @@ Example:
      sensitive.
    ----------------------------------------------------------------------
 
-To check cleanly if a key is in an hash before retreiving its value and
+To check cleanly if a key is in an hash before retrieving its value and
 do some work on it you can safely do things like
 
    IF 'myKey' IN hVal1 .and. hVal1[ 'myKey' ] == 'some value'
@@ -264,15 +264,15 @@ do some work on it you can safely do things like
 
    ----------------------------------------------------------------------
    * NOTE: if efficiency is at stake, there is an API function that
-     retreives the position of the given key, or zero if not found,
-     and another one that retreives a values at that position. So,
+     retrieves the position of the given key, or zero if not found,
+     and another one that retrieves a values at that position. So,
      you may want to use HGetKeyPos() and HGetValueAt() to do just
      one scan in the array.
    ----------------------------------------------------------------------
 
 
 
-XHARBOUR RTL COMPATIBILTY FOR HASHES
+XHARBOUR RTL COMPATIBILITY FOR HASHES
 ====================================
 
 The realtime library is currently hash compliant:
@@ -293,13 +293,13 @@ XHARBOUR OBJECT MESSAGE COMPATIBILITY
 =====================================
 
 To make programs that used TAssociativeArray() compatible with new hashes,
-a basic compatibility layer has been developed. Hashes can incercept
+a basic compatibility layer has been developed. Hashes can intercept
 certain "object messages" invoked with the colon (:) operator.
 
 It is possible to access string keys by using the hHash:cKey notation.
 The message name, that is, the string after the ':' operator, is
 uppercased and then matched against the hash keys. It is useful, but
-not necessary, to turn off case sensitivty matches for hashes that are
+not necessary, to turn off case sensitivity matches for hashes that are
 intended to be used in this way; otherwise, it is important to remember
 that keys after the ':' are inserted and searched UPPERCASED.
 
@@ -323,9 +323,9 @@ This is a typical usage of the colon operator:
 A program written using only the ':' operator has not to care about
 hash case match mode.
 
-The colon operator has fuor special messages that mimics the
+The colon operator has for special messages that mimics the
 TAssociativeArray() syntax. This messages can only be used to
-retreive their values:
+retrieve their values:
 
 - Keys: creates an array that contains all the keys in the hash
 - Values: creates an array that contains all the values in the hash
@@ -379,7 +379,7 @@ PROCEDURE HSet( hHash, xKey, xValue )
 Set the xKey key in hHash to xValue. If xKey is not present, it is added.
 If xKey is not of an orderable type, an error is risen.
 
-This procedure is slighly less efficient than the [] construct.
+This procedure is slightly less efficient than the [] construct.
 
    ----------------------------------------------------------------------
    * NOTE: HAdd is not provided now, as it may be implemented later with
@@ -400,7 +400,7 @@ FUNCTION HHasKey( hHash, xKey ) --> lValue
 ------------------------------------------
 
 Returns true if xKey in the hash, false the key is not present. This
-function is slighly more efficient than HGetPos( hHash, xKey ) == 0
+function is slightly more efficient than HGetPos( hHash, xKey ) == 0
 
 
 
@@ -408,13 +408,13 @@ PROCEDURE HDel( hHash, xKey )
 -----------------------------
 
 Remove a pair of xKey/value if it is in the hash. If not, a BOUND ERROR
-is risen. It is slighly more efficient than '-' operator on a single
+is risen. It is slightly more efficient than '-' operator on a single
 value, but '-' on an array or on a hash is more efficient than a loop
 on HDel.
 
    ----------------------------------------------------------------------
    * NOTE: Deleting a key is the only way to change a key in a hash. If
-     the value must be preserved, first it is necessary to retreive
+     the value must be preserved, first it is necessary to retrieve
      the value, then remove the key and finally add the new key with the
      old value.
    ----------------------------------------------------------------------
@@ -449,7 +449,7 @@ FUNCTION HGetKeyAt( hHash, nPos ) --> xKey
 ------------------------------------------
 
 Returns the key that is at a given position in the hash. Keys are ordered
-from the lower to the higest one, and cannot be moved or changed.
+from the lower to the highest one, and cannot be moved or changed.
 If the position is zero or below, or it is higher than Len( hHash ) a
 BOUND ERROR is risen.
 
@@ -472,7 +472,7 @@ or it is higher than Len( hHash ) a BOUND ERROR is risen.
 PROCEDURE HDelAt( hHash, nPos )
 -------------------------------
 
-Deletes the key/value pair at a given position. Lenght of the hash is
+Deletes the key/value pair at a given position. Length of the hash is
 reduced by one.
 
 If the position is zero or below or it is higher than Len( hHash ),
@@ -528,15 +528,15 @@ any of the following:
      removed, the others are untouched. Is the same as '-' hash operator.
 
 xMode may also be a codeblock, that allows to merge the two arrays in a
-more sophisticated fashon. The codeblock is provided with the key, the
+more sophisticated fashion. The codeblock is provided with the key, the
 value and the item position in source for each element of hSource, and
 it should evaluate to .T. if the value is to be merged into the
-destionation, or to .F. if the element is to be ignored. Merge is then
+destination, or to .F. if the element is to be ignored. Merge is then
 done in normal mode, adding the pair if the key is not present, or changing
 the value if it is present.
 
    ----------------------------------------------------------------------
-   * NOTE: If you need more sophiscated fashon of mergin, always return
+   * NOTE: If you need more sophisticated fashion of merging, always return
      .F. from the codeblock and change hDest directly from within that.
    ----------------------------------------------------------------------
 
@@ -593,11 +593,11 @@ is provided, only the first nCount elements (eventually starting from
 nStart ) are considered.
 
 If bExact is provided and xCode is a string, then EXACT string match
-mode is set ON or OFF according with bExact (defaluts to .T.).
+mode is set ON or OFF according with bExact (defaults to .T.).
 
 A codeblock may be also provided as xCode, in which case HScan passes
-each element of hSource to codeblock, until it evalutes to .T.
-When this happends, the function returns the position where this
+each element of hSource to codeblock, until it evaluates to .T.
+When this happens, the function returns the position where this
 has happened. If the whole hash (or the interval described by
 nStart and nCount, if given) is traversed without success, 0 is
 returned. BExact is ignored in this case.
@@ -623,7 +623,7 @@ act on the hashes as a whole.
 FUNCTION HSetCaseMatch( hHash, lMode ) --> hHash
 ------------------------------------------------
 
-Sets case sensitivity of a hash. By default, strings are matced in a
+Sets case sensitivity of a hash. By default, strings are matched in a
 case sensitivity manner. If lMode is false, key are ordered and searched
 in case insensitive mode. In example, 'Hbold' key would be placed after
 a 'hAGAIN'.
@@ -635,11 +635,11 @@ this, once an hash has set to case insensitive matches AND some keys
 have been added, never turn it back to sensitive mode, or some keys
 may be lost, and ordering may be inconsistent.
 
-This funtion returns hHash so it is possible to use it in fast
+This function returns hHash so it is possible to use it in fast
 XTRANSLATE macros to create directly insensitive arrays
 
    ----------------------------------------------------------------------
-   * NOTE: This funtion returns hHash so it is possible to use it in fast
+   * NOTE: This function returns hHash so it is possible to use it in fast
      XTRANSLATE macros to create directly insensitive arrays
 
       #xtranslate ihash() => HSetCaseMatch( Hash(), .F. )
