@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.1.1.1 2001/12/21 10:41:10 ronpinkas Exp $
+ * $Id: achoice.prg,v 1.3 2002/05/24 19:23:45 walito Exp $
  */
 
 /*
@@ -63,7 +63,12 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    DEFAULT nPos       TO 1                 // The number of the selected item
    DEFAULT nHiLiteRow TO 0                 // The row to be highlighted
 
-   nNumCols := nRight - nLeft + 1
+   IF nRight == 79
+      nNumCols := 79
+   ELSE
+      nNumCols := nRight - nLeft + 1
+   ENDIF
+
    nNumRows := nBottom - nTop + 1
 
 
@@ -499,6 +504,13 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
    LOCAL nIndex                            // Array index
    LOCAL nSaveRow := Row()                 // Position at start of routine
    LOCAL nSaveCol := Col()                 // Position at start of routine
+   LOCAL nRightPos := 0
+
+   IF nRight == 79
+      nRightPos := nRight
+   ELSE
+      nRightPos := nRight - nLeft + 1 
+   ENDIF
 
    Default nRowsClr to nNumRows
 
@@ -508,9 +520,9 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
 
       nRow   := nTop + nCntr - 1
       nIndex := nCntr + nAtTop - 1
-
+      tracelog(nright,nRightPos)
       IF INRANGE( 1, nIndex, nArrLen )
-         DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRight - nLeft + 1 )
+         DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRightPos)
       ELSE
          ColorSelect( CLR_STANDARD )
          DispOutAt( nRow, nLeft, Space( nRight - nLeft + 1 ) )
