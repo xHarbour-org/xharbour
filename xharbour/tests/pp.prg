@@ -393,7 +393,7 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
-STATIC s_cVer := "1.0.B16"
+STATIC s_cVer := "1.0.RC1"
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__

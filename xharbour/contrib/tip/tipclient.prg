@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.6 2003/12/10 00:11:22 jonnymind Exp $
+* $Id: tipclient.prg,v 1.7 2004/01/14 00:11:06 lculik Exp $
 ************************************************/
 /* 2004-01-13
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
@@ -55,7 +55,7 @@ CLASS tIPClient
    /* Method for smtp server that require login */
    METHOD AUTH( cUser, cPass) // Auth by login method
    METHOD AUTHplain( cUser, cPass) // Auth by plain method
-
+   METHOD Data( cData )
 ENDCLASS
 
 
@@ -101,11 +101,11 @@ METHOD OpenSecure( ) CLASS tIPClient
    IF .not. ::super:Open()
       RETURN .F.
    ENDIF
- 
+
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
 
    cUser := ::oUrl:cUserid
-   
+
    IF .not. Empty ( ::oUrl:cUserid )
       InetSendAll( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
    ELSE
@@ -115,16 +115,16 @@ METHOD OpenSecure( ) CLASS tIPClient
 RETURN ::getOk()
 
 
-METHOD Open() CLASS tIPClientSMTP
+METHOD Open() CLASS tIPClient
    Local cUser
    IF .not. ::super:Open()
       RETURN .F.
    ENDIF
- 
+
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
 
 	cUser := ::oUrl:cUserid
-   
+
    IF .not. Empty ( ::oUrl:cUserid )
       InetSendAll( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
    ELSE
@@ -187,24 +187,24 @@ METHOD Read( nLen ) CLASS tIPClient
    ENDIF
 RETURN cStr
 
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
+METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 Local aTo,cRecpt
    IF .not. ::bInitialized
       IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
          RETURN -1
       ENDIF
-		
-      IF .not. ::Mail( ::oUrl:cUserid ) 	 
+
+      IF .not. ::Mail( ::oUrl:cUserid )
          RETURN -1
       ENDIF
       aTo:= HB_RegexSplit(",", ::oUrl:cFile )
-		
-      FOR each cRecpt in Ato				
+
+      FOR each cRecpt in Ato
          IF .not.   ::Rcpt(cRecpt)
             RETURN -1
          ENDIF
-      NEXT 
-		
+      NEXT
+
       InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
       IF .not. ::GetOk()
          RETURN -1
@@ -281,7 +281,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    Fclose( nFin )
 RETURN .T.
 
-METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
+METHOD AUTH( cUser, cPass) CLASS tIPClient
 
    Local cs:=''
    Local cEncodedUser
@@ -296,23 +296,23 @@ METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
    InetSendAll( ::SocketCon, "AUTH LOGIN " +::ccrlf )
 
    if ::GetOk()
-      InetSendAll( ::SocketCon, cEncodedUser+::cCrlf  )   
+      InetSendAll( ::SocketCon, cEncodedUser+::cCrlf  )
       if ::Getok()
-         InetSendAll( ::SocketCon, cEncodedPass +::cCrlf )   
+         InetSendAll( ::SocketCon, cEncodedPass +::cCrlf )
       endif
    endif
 
-   return ::GetOk()     
+   return ::GetOk()
 
-METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
+METHOD AuthPlain( cUser, cPass) CLASS tIPClient
 
    Local cBase := BUILDUSERPASSSTRING( cUser, cPass )
    Local cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
 
-   InetSendAll( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf) 
-   return ::GetOk()     
-    
-METHOD Data( cData ) CLASS tIPClientSMTP
+   InetSendAll( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf)
+   return ::GetOk()
+
+METHOD Data( cData ) CLASS tIPClient
    InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
    IF .not. ::GetOk()
       RETURN .F.
