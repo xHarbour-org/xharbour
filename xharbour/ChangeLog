@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2667 2004/03/28 09:05:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.2668 2004/03/28 15:11:37 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-28 19:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * tests/macro.prg
+    + Added some tests for Clipper compatibility of &() and Type().
 
 2004-03-28 19:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/compiler/harbour.slx
