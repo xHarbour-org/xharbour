@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.34 2003/09/10 06:07:33 ronpinkas Exp $
+ * $Id: memvars.c,v 1.35 2003/09/10 19:02:29 ronpinkas Exp $
  */
 
 /*
@@ -137,6 +137,8 @@ void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
 {
+   ULONG ulPos;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsInit()"));
 
    s_globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.71 2003/09/10 17:18:19 ronpinkas Exp $
+ * $Id: arrays.c,v 1.72 2003/09/10 19:02:29 ronpinkas Exp $
  */
 
 /*
@@ -1518,27 +1518,28 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            * allocated by the GC, its just a portion of the
            * pItems chunk, which will be released as one piece.
            * --------------------------------------------------*/
-         if( HB_IS_STRING( pItem ) )
+         if( HB_IS_ARRAY( pItem ) )
          {
-            if( ! pItem->item.asString.bStatic )
-            {
-               hb_itemReleaseString( pItem );
-            }
+            #ifdef HB_ARRAY_USE_COUNTER
+               if( pItem->item.asArray.value == pBaseArray )
+               {
+                  // Cyclic!
+               }
+               else
+               {
+                  hb_itemCear( pItem );
+               }
+            #else
+               if( pItem->item.asArray.value )
+               {
+                  hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
+               }
+            #endif
          }
-      #ifndef HB_ARRAY_USE_COUNTER
-         else if( HB_IS_ARRAY( pItem ) )
-         {
-            if( pItem->item.asArray.value )
-            {
-               hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
-            }
-         }
-      #endif
-
          // 03-07-2002 RP commented out - Needs further testing.
-         else if( HB_IS_MEMVAR( pItem ) )
+         else if( HB_IS_COMPLEX( pItem ) )
          {
-            hb_memvarValueDecRef( pItem->item.asMemvar.value );
+            hb_itemClear( pItem );
          }
 
          ++pItem;

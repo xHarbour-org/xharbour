@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1436 2003/09/10 06:07:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1437 2003/09/10 17:18:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-10 12:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    * Added missing initialization to type = HB_IT_NIL and counter = 0 when allocating and expanding Memvars global table.
+    * Changed hb_itemClear() to hb_memvarValueDecRef() in hb_memvarsRelease()
+
+  * source/vm/arrays.c
+    * Uncommented if( HB_IS_MEMVAR( pItem ) ) and optimized hb_arrayReleaseGarbage()
 
 2003-09-10 10:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
