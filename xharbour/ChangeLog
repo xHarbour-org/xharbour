@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2944 2004/05/17 04:30:30 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2945 2004/05/17 09:51:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-17 15:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Fixed an error in EXIT procedures when exiting the debugger via Alt-X.
 
 2004-05-17 13:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/tbrwtext.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.38 2004/05/08 16:26:18 likewolf Exp $
+ * $Id: debugger.prg,v 1.39 2004/05/10 01:47:49 likewolf Exp $
  */
 
 /*
@@ -245,6 +245,11 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         if ProcName( 1 ) == "(_INITSTATICS)"
           return
         endif
+
+	IF s_lExit
+	  RETURN
+	ENDIF
+
         if s_oDebugger:lCodeblock
           s_oDebugger:lCodeblock := .F.
         endif
