@@ -1,16 +1,16 @@
 /*
- *  $Id: util.prg,v 1.2 2004/12/08 00:00:00 modalsist Exp $
+ *  $Id: util.prg,v 1.3 2004/12/17 01:26:00 modalsist Exp $
  */
 
 /*
  * xHarbour Project source code:
- * LibCT util functions used by another libct functions.
+ * CT lib util functions.
  *
  * Default()
  * IsDir()
  * Occurs()
  *
- * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * Copyright 2004 Eduardo Fernandes <modalsist@yahoo.com.br>
  * http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modIFy
@@ -53,61 +53,58 @@
  * IF you do not wish that, delete this exception notice.
  *
  */
-#include "common.ch"
 
-
-*********************************
-FUNCTION Default( cVar , uValue )
-*********************************
-
-IF cVar == NIL
-   cVar := uValue
+*----------------------------------------
+FUNCTION Default( cVarByRef , uDefValue )
+*----------------------------------------
+/* This function is similar to SET DEFAULT <var> TO <value> command.
+* <cVarByRef> Variable passed by reference
+* <uDefValue> Default value to assign to the cVarByRef. Can be any data type.
+* ex: Default( @AnyVar, "hello")
+*     Default( @AnyVar, 10)
+*/
+IF cVarByRef == NIL
+   cVarByRef := uDefValue
 ENDIF
-
 RETURN (Nil)
 
-****************************
-FUNCTION IsDir( cDirectory )
-****************************
+*---------------------
+FUNCTION IsDir( cDir )
+*---------------------
+/*
+* Short function name.
+* IsDirectory() is xHarbour rtl function. 
+* Source is in \source\rtl\file.c and 
+*              \source\rtl\filehb.c
+*/
+RETURN IsDirectory( cDir )
 
-   LOCAL lExist,cCurDir
+*------------------------
+FUNCTION Occurs( c1, c2 )
+*------------------------
+/*
+Return the ammout of times that c1 occurs into c2
+*/
+   LOCAL nRet,nPos
 
-   IF valtype( cDirectory ) != "C"
-      RETURN ( .F. )
+   IF valtype( c1 ) != "C" .or. valtype( c2 ) != "C"
+      RETURN ( 0 )
    ENDIF
 
-   cCurDir := DiskName()+":\"+CurDir()
-
-   lExist := ( DirChange( cDirectory ) == 0  )
-
-   IF lExist
-      DirChange( cCurDir )
+   IF Len( c1 ) = 0 .or. Len( c2 ) = 0
+      RETURN ( 0 )
    ENDIF
 
-RETURN ( lExist )
+   nPos := nRet := 0
 
-
-********************************
-FUNCTION Occurs( cStr1 , cStr2 )
-********************************
-
-   LOCAL i,nOccurs
-
-   i := 0
-   nOccurs := 0
-
-   IF valtype( cStr1 ) != "C" .or. valtype( cStr2 ) != "C"
-      RETURN ( nOccurs )
-   ENDIF
-
-   IF Len( cStr1 ) = 0 .or. Len( cStr2 ) = 0
-      RETURN ( nOccurs )
-   ENDIF
-
-   FOR i := 1 to Len( cStr2 ) 
-      IF cStr1 == substr( cStr2 , i , Len( cStr1) )
-         nOccurs += 1
-      ENDIF  
-   NEXT
-
-RETURN ( nOccurs )
+   While !empty(c2)
+       nPos := At( c1, c2 )
+       if nPos>0
+          nRet++
+          c2 := SubStr( c2, nPos+1 ) 
+       else
+          c2 := ""
+       endif   
+   Enddo
+   
+RETURN ( nRet )

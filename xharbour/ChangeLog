@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3680 2004/12/17 13:15:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3682 2004/12/17 22:30:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +9,14 @@
 */
 
 
+2004-12-17 22:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * source/ct/util.prg
+     ! Fixed IsDir() function to call isdirectory rtl function.
+     * Default() and Occurs() functions were rewrited.
+   * make_b32.bat
+     ! libct, hbct and hbtip was renamed to your proper new names
+   * makefile.bc
+     ! fixed missing ct setkeys reference.
 
 2004-12-17 17:32 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/ct/files.c

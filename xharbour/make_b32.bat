@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.19 2004/08/31 22:44:00 modalsist Exp $
+rem $Id: make_b32.bat,v 1.19 2004/09/01 02:01:19 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -83,11 +83,10 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\hbodbc.lib     del lib\hbodbc.lib
    if exist lib\hbodbcmt.lib   del lib\hbodbcmt.lib
    if exist lib\lang.lib       del lib\lang.lib
-   if exist lib\libct.lib      del lib\libct.lib
-   if exist lib\hbct.lib       del lib\hbct.lib
-   if exist lib\hbctmt.lib     del lib\hbctmt.lib
-   if exist lib\hbtip.lib      del lib\hbtip.lib
-   if exist lib\hbtipmt.lib    del lib\hbtipmt.lib
+   if exist lib\ct.lib         del lib\ct.lib
+   if exist lib\ctmt.lib       del lib\ctmt.lib
+   if exist lib\tip.lib        del lib\tip.lib
+   if exist lib\tipmt.lib      del lib\tipmt.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
    if exist lib\nulsys.lib     del lib\nulsys.lib
