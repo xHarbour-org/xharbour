@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.77 2004/12/19 19:47:58 kaddath Exp $
+# $Id: hrbdll.bc,v 1.79 2004/12/25 19:47:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -338,6 +338,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx0.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgby866.obj \
+  $(OBJ_DIR)\msgbywin.obj \
   $(OBJ_DIR)\msgca.obj \
   $(OBJ_DIR)\msgcs852.obj \
   $(OBJ_DIR)\msgcsiso.obj \
@@ -927,6 +929,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbffpt1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx0.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx1.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgby866.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgbywin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgca.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgcs852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgcsiso.obj          + >> hdll.tmp
@@ -2114,6 +2118,12 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c

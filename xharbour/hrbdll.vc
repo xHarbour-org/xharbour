@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.59 2004/12/19 11:33:52 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.61 2004/12/25 19:47:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -399,6 +399,8 @@ HARBOUR_DLL_OBJS = \
 #
 # Lang
 #
+  $(OBJ_DIR)\msgby866.obj \
+  $(OBJ_DIR)\msgbywin.obj \
   $(OBJ_DIR)\msgca.obj \
   $(OBJ_DIR)\msgcs852.obj \
   $(OBJ_DIR)\msgcsiso.obj \
@@ -1650,6 +1652,12 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c

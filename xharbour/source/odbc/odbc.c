@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.21 2004/11/22 15:35:09 druzus Exp $
+ * $Id: odbc.c,v 1.23 2004/12/25 14:00:00 ptsarenko Exp $
  */
 
 /*
@@ -340,9 +340,9 @@ HB_FUNC( SQLFETCHSC )
 
 HB_FUNC( SQLERROR ) //  hEnv, hDbc, hStmt, @ cErrorClass, @ nType, @ cErrorMsg
 {
-   BYTE        bBuffer1[ 256 ], szErrorMsg[ 256 ];
-   SQLUINTEGER lError;
-   SWORD       wLen;
+   BYTE       bBuffer1[ 256 ], szErrorMsg[ 256 ];
+   SQLINTEGER lError;
+   SWORD      wLen;
 
    hb_retni( SQLError( ( HENV ) hb_parnl( 1 ), ( HDBC ) hb_parnl( 2 ),
                        ( HSTMT ) hb_parnl( 3 ), bBuffer1, &lError,
@@ -355,13 +355,13 @@ HB_FUNC( SQLERROR ) //  hEnv, hDbc, hStmt, @ cErrorClass, @ nType, @ cErrorMsg
 
 HB_FUNC( SQLROWCOUN )
 {
-    SQLUINTEGER  uiRowCountPtr = hb_parni( 2 );
-    WORD         wResult       = SQLRowCount( ( HSTMT ) hb_parnl( 1 ),
-                                              &uiRowCountPtr );
+    SQLLEN  iRowCountPtr = hb_parni( 2 );
+    WORD    wResult      = SQLRowCount( ( HSTMT ) hb_parnl( 1 ),
+                                        &iRowCountPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
-       hb_stornl( ( LONG ) uiRowCountPtr, 2 );
+       hb_stornl( ( LONG ) iRowCountPtr, 2 );
     }
 
     hb_retni( wResult );

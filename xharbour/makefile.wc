@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.34 2004/12/19 14:00:00 ptsarenko Exp $
+# $Id: makefile.wc,v 1.35 2004/12/25 11:33:54 ptsarenko Exp $
 #
 
 #
@@ -485,6 +485,8 @@ RTL_LIB_OBJS = \
 #
 
 LANG_LIB_OBJS = \
+   $(OBJ_DIR)\msgby866.obj \
+   $(OBJ_DIR)\msgbywin.obj \
    $(OBJ_DIR)\msgca.obj \
    $(OBJ_DIR)\msgcs852.obj \
    $(OBJ_DIR)\msgcsiso.obj \
@@ -2362,6 +2364,12 @@ $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
 #
 # LANG.LIB dependencies
 #
+
+$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c
    $(CC) $(CLIBFLAGS) -fo$@ $**

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.29 2004/12/19 11:33:52 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.31 2004/12/25 19:47:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -340,6 +340,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx0.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgby866.obj \
+  $(OBJ_DIR)\msgbywin.obj \
   $(OBJ_DIR)\msgca.obj \
   $(OBJ_DIR)\msgcs852.obj \
   $(OBJ_DIR)\msgcsiso.obj \
@@ -1620,6 +1622,12 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c

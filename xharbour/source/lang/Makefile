@@ -1,11 +1,13 @@
 #
-# $Id: Makefile,v 1.6 2004/12/19 14:00:00 ptsarenko Exp $
+# $Id: Makefile,v 1.7 2004/12/25 11:34:10 ptsarenko Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
 	msgca.c      \
+	msgby866.c   \
+	msgbywin.c   \
 	msgcs852.c   \
 	msgcsiso.c   \
 	msgcskam.c   \
