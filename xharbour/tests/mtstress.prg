@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.10 2003/11/27 00:40:31 jonnymind Exp $
+* $Id: mtstress.prg,v 1.11 2003/12/04 13:39:08 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -65,6 +65,8 @@ PROCEDURE Stress( nId, nRow )
 
    // Step 40: database test
    @nRow,5 SAY Space( 80 )
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Database test"
+
    IF File( "test.dbf" )
       Select &nId
       USE test SHARED Alias &( "Test" + Alltrim( Str(nId)) )
@@ -93,14 +95,18 @@ PROCEDURE Stress( nId, nRow )
    //Step 1: foreach test
 
    @nRow,5 SAY Space( 80 )
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Foreach Pre-test"
    aData := Array( 10000 )
    FOR nCount := 1 TO 10000
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
+      IF bShow
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
           Alltrim( Str( nCount ) )
+      ENDIF
    NEXT
 
    @nRow,5 SAY Space( 80 )
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Foreach test"
    nCount := 1
    FOR EACH cData IN aData
       IF bShow
@@ -117,7 +123,7 @@ PROCEDURE Stress( nId, nRow )
 
    // STEP 2: With object test.
    @nRow,5 SAY Space( 80 )
-
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " With Object test"
    oTest := TTest():New()
    WITH OBJECT oTest
 
@@ -137,7 +143,7 @@ PROCEDURE Stress( nId, nRow )
    // Step 3: private test
 
    @nRow,5 SAY Space( 80 )
-
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Private memvar test"
    m->cMemVal := "XXX"
    FOR nCount := 1 TO 10000
       m->cMemVal := m->cRnd[ Int( HB_Random(1, 21) ) ]
@@ -155,6 +161,7 @@ PROCEDURE Stress( nId, nRow )
    // Step 4: Public Memvar test
 
    @nRow,5 SAY Space( 80 )
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Public memvar test"
    FOR nCount := 1 TO 10000
       m->var1 := m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
@@ -171,6 +178,8 @@ PROCEDURE Stress( nId, nRow )
    // Step 5: macro test
 
    @nRow,5 SAY Space( 80 )
+   @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Macro test"
+
    FOR nCount := 1 TO 10000
       cData := "cRndMem := cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ]"
       &cData

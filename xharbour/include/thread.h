@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.68 2003/11/28 20:39:14 jonnymind Exp $
+* $Id: thread.h,v 1.69 2003/11/28 21:21:07 jonnymind Exp $
 */
 
 /*
@@ -505,6 +505,14 @@ extern HB_CRITICAL_T hb_outputMutex;
 extern HB_CRITICAL_T hb_garbageAllocMutex;
 /* Guard for thread unsafe macro compilation */
 extern HB_CRITICAL_T hb_macroMutex;
+/* Mutex to control dynsym scanning and add */
+extern HB_CRITICAL_T hb_dynsymMutex;
+/* As dynsym require recursive locks, here I provide an hook that can
+   be used in system that do not provide a native spinlock count to
+   implement a user-defined spinlock scheme */
+#define hb_dynsymLock()      HB_CRITICAL_LOCK( hb_dynsymMutex )
+#define hb_dynsymUnlock()    HB_CRITICAL_UNLOCK( hb_dynsymMutex )
+
 
 /* count of running stacks */
 extern HB_SHARED_RESOURCE hb_runningStacks;
@@ -591,6 +599,9 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    #define HB_SHARED_UNLOCK
    #define HB_SHARED_SIGNAL
    #define HB_SHARED_WAIT
+
+   #define hb_dynsymLock()
+   #define hb_dynsymUnlock()
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.9 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: dynsym.c,v 1.10 2003/07/16 13:46:55 andijahja Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbapi.h"
+#include "thread.h"
 
 #define SYM_ALLOCATED ( ( HB_SYMBOLSCOPE ) -1 )
 
@@ -95,10 +96,14 @@ void HB_EXPORT hb_dynsymLog( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymLog()"));
 
+   hb_dynsymLock();
+
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )   /* For all dynamic symbols */
    {
       printf( "%i %s\n", uiPos + 1, s_pDynItems[ uiPos ].pDynSym->pSymbol->szName );
    }
+
+   hb_dynsymUnlock();
 }
 
 PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
@@ -124,6 +129,8 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymNew(%p)", pSymbol));
 
+   hb_dynsymLock();
+
    pDynSym = hb_dynsymFind( pSymbol->szName ); /* Find position */
 
    if( pDynSym )            /* If name exists */
@@ -148,6 +155,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
 
+      hb_dynsymUnlock();
       return pDynSym;                /* Return pointer to DynSym */
    }
 
@@ -201,6 +209,8 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    pSymbol->pDynSym = pDynSym;                /* place a pointer to DynSym */
 
+   hb_dynsymUnlock();
+
    return pDynSym;
 }
 
@@ -242,6 +252,15 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
       }
    }
 
+   /* JC1: Notice, locking this function MAY seem useless but it is not.
+   Suppose two threads calling this functon with the same szUprName: both
+   of them may find ! pDynSym, and both of them may proceed to hb_dynsymNew().
+   Although this operation would suceed, one of the threas would get an
+   invalid reference, and we would have a memory leak, as one of the
+   two dynsymNew() would be overriden */
+
+   hb_dynsymLock();
+
    pDynSym = hb_dynsymFind( szUprName );
 
    if( ! pDynSym )       /* Does it exists ? */
@@ -256,6 +275,8 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
       }
    }
 
+   hb_dynsymUnlock();
+
    return pDynSym;
 }
 
@@ -267,6 +288,9 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
 
    //TraceLog( NULL, "Searching: %s\n", szName );
+
+   /* JC1: read the notice for hb_dynsymGet() */
+   hb_dynsymLock();
 
    pDynSym = hb_dynsymFind( szName );
 
@@ -282,6 +306,8 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
          pDynSym = hb_dynsymNew( hb_symbolNew( szName ), NULL );   /* Make new symbol */
       }
    }
+
+   hb_dynsymUnlock();
 
    //TraceLog( NULL, "Returning: %p\n", pDynSym );
 
@@ -334,6 +360,8 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
 
+   hb_dynsymLock();
+
    if( s_pDynItems == NULL )
    {
       s_pDynItems = ( PDYNHB_ITEM ) hb_xgrab( sizeof( DYNHB_ITEM ) );     /* Grab array */
@@ -343,6 +371,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
       s_pDynItems->pDynSym->pSymbol = NULL;
       s_pDynItems->pDynSym->pFunPtr = NULL;
 
+      hb_dynsymUnlock();
       return NULL;
    }
    else
@@ -378,6 +407,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
          if( iCmp == 0 )
          {
             s_uiClosestDynSym = uiMiddle;
+            hb_dynsymUnlock();
             return s_pDynItems[ uiMiddle ].pDynSym;
          }
          else if( iCmp < 0 )
@@ -446,6 +476,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
 
          if (bOk)
          {
+            hb_dynsymUnlock();
             return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
          }
       }
@@ -480,6 +511,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             if( iCmp == 0 )
             {
                s_uiClosestDynSym = uiMiddle;
+               hb_dynsymUnlock();
                return s_pDynItems[ uiMiddle ].pDynSym;
             }
             else if( iCmp < 0 )
@@ -533,6 +565,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             if( iCmp == 0 )
             {
                s_uiClosestDynSym = uiMiddle;
+               hb_dynsymUnlock();
                return s_pDynItems[ uiMiddle ].pDynSym;
             }
             else if( iCmp < 0 )
@@ -564,35 +597,43 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
             }
 
             if (bOk)
+            {
+               hb_dynsymUnlock();
                return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+            }
          }
       }
    }
 
    #endif
 
+   hb_dynsymUnlock();
+
    return NULL;
 }
 
 USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
-   // HB_THREAD_STUB
    BOOL bCont = TRUE;
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymEval(%p, %p)", pFunction, Cargo));
+
+   hb_dynsymLock();
 
    for( uiPos = 0; uiPos < s_uiDynSymbols && bCont; uiPos++ )
    {
       bCont = ( pFunction )( s_pDynItems[ uiPos ].pDynSym, Cargo );
    }
 
+   hb_dynsymUnlock();
+
    return uiPos;
 }
 
+/* JC1: this is called at VM termination, no need to lock */
 void HB_EXPORT hb_dynsymRelease( void )
 {
-   // HB_THREAD_STUB
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymRelease()"));
@@ -612,21 +653,25 @@ void HB_EXPORT hb_dynsymRelease( void )
    hb_xfree( s_pDynItems );
 }
 
+
 PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 {
-   // HB_THREAD_STUB
-
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFindSymbolFromFunction(%p)", pFunc ));
+
+   hb_dynsymLock();
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
    {
       if( s_pDynItems[ uiPos ].pDynSym->pFunPtr == pFunc )
       {
+         hb_dynsymUnlock();
          return s_pDynItems[ uiPos ].pDynSym;
       }
    }
+
+   hb_dynsymUnlock();
 
    return NULL;
 }
@@ -634,56 +679,87 @@ PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 // NOT TESTED YET!!!
 PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 {
-   // HB_THREAD_STUB
+   PHB_DYNS ret;
+
+   hb_dynsymLock();
 
    if( uiPos < s_uiDynSymbols )
    {
-      return s_pDynItems[ uiPos ].pDynSym;
+      ret = s_pDynItems[ uiPos ].pDynSym;
    }
+   else
+   {
+      ret = NULL;
+   }
+   hb_dynsymUnlock();
 
-   return NULL;
+   return ret;
 }
 
 #ifdef HB_EXTENSION
 
 HB_FUNC( __DYNSCOUNT ) /* How much symbols do we have: dsCount = __dynsymCount() */
 {
+#ifdef HB_API_MACROS
    HB_THREAD_STUB
+#endif
    hb_retnl( ( long ) s_uiDynSymbols );
 }
 
 HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsIndex ) */
 {
+#ifdef HB_API_MACROS
    HB_THREAD_STUB
+#endif
 
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
+   hb_dynsymLock();
+
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
+   {
       hb_retc( s_pDynItems[ lIndex - 1 ].pDynSym->pSymbol->szName );
+   }
    else
+   {
       hb_retc( "" );
+   }
+
+   hb_dynsymUnlock();
 }
 
 HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGetIndex( cSymbol ) */
 {
    HB_THREAD_STUB
-   PHB_DYNS pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
+   PHB_DYNS pDynSym;
+
+   /* JC1: Does not needs lock... */
+   hb_dynsymLock();
+
+   pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
 
    if( pDynSym )
    {
+      /* ... because this is from HB_VM_STACK (see macros at top of file) */
       hb_retnl( ( long ) ( s_uiClosestDynSym + 1 ) );
    }
    else
    {
       hb_retnl( 0L );
    }
+
+   hb_dynsymLock();
 }
 
 HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure pointer,
                           given its symbol index */
 {
+#ifdef HB_API_MACROS
    HB_THREAD_STUB
+#endif
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
+
+   hb_dynsymLock();
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
    {
@@ -693,18 +769,24 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
    {
       hb_retl( FALSE );
    }
+
+   hb_dynsymUnlock();
 }
 
 HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or procedure
                                      called and consumed times { nTimes, nTime }
                                      , given the dynamic symbol index */
 {
+#ifdef HB_API_MACROS
    HB_THREAD_STUB
+#endif
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_reta( 2 );
    hb_stornl( 0, -1, 1 );
    hb_stornl( 0, -1, 2 );
+
+   hb_dynsymLock();
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
    {
@@ -714,6 +796,9 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
          hb_stornl( s_pDynItems[ lIndex - 1 ].pDynSym->ulTime,  -1, 2 );
       }
    }
+
+   hb_dynsymUnlock();
+
 }
 
 #endif

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.132 2003/12/05 04:34:58 jonnymind Exp $
+* $Id: thread.c,v 1.133 2003/12/05 04:52:25 ronpinkas Exp $
 */
 
 /*
@@ -126,6 +126,7 @@ HB_EXPORT HB_CRITICAL_T hb_garbageAllocMutex;
 HB_EXPORT HB_CRITICAL_T hb_outputMutex;
 HB_EXPORT HB_CRITICAL_T hb_mutexMutex;
 HB_EXPORT HB_CRITICAL_T hb_cancelMutex;
+HB_EXPORT HB_CRITICAL_T hb_dynsymMutex;
 
 HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
 
@@ -144,6 +145,7 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( hb_macroMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
    HB_CRITICAL_INIT( hb_mutexMutex );
+   HB_CRITICAL_INIT( hb_dynsymMutex );
    s_thread_unique_id = 1;
    HB_CRITICAL_INIT( s_thread_unique_id_mutex );
    HB_SHARED_INIT( hb_runningStacks, 0 );
@@ -198,6 +200,7 @@ void hb_threadCloseHandles( void )
    HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
    HB_CRITICAL_DESTROY( hb_allocMutex );
    HB_CRITICAL_DESTROY( hb_threadStackMutex );
+   HB_CRITICAL_DESTROY( hb_dynsymMutex );
 
    #ifdef HB_OS_WIN_32
       TlsFree( hb_dwCurrentStack );
