@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.264 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: hvm.c,v 1.265 2003/10/05 04:48:26 ronpinkas Exp $
  */
 
 /*
@@ -7405,7 +7405,7 @@ void hb_vmIsStaticRef( void )
    hb_gcItemRef( &s_aStatics );
 }
 
-HB_EXPORT void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
+void HB_EXPORT hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
 {
    HB_THREAD_STUB
 

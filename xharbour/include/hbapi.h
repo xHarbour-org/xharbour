@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.83 2003/09/19 20:16:38 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.84 2003/09/24 01:20:34 druzus Exp $
  */
 
 /*
@@ -191,7 +191,7 @@ extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as us
 #endif
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
 extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
-extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
+extern void   HB_EXPORT hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
 
 extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
 extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
