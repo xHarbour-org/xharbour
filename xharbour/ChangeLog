@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3620 2004/11/24 04:49:10 kaddath Exp $
+ * $Id: ChangeLog,v 1.3622 2004/11/24 10:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-11-24 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/settime.c
+    ! Fixed waitperiod function. Thanks to Bill Robertson and Rafa Carmona.
 
 2004-11-24 11:28 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
