@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.13 2002/05/09 07:25:33 ronpinkas Exp $
+ * $Id: harbour.c,v 1.14 2002/05/18 08:55:49 ronpinkas Exp $
  */
 
 /*
@@ -102,6 +102,9 @@
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
    extern unsigned _stklen = UINT_MAX;
+#endif
+#if defined( __GNUC__) && defined( __linux__ )
+   #include <errno.h>
 #endif
 
 static void hb_compInitVars( void );
