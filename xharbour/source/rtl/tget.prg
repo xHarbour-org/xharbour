@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.47 2003/05/06 17:02:59 walito Exp $
+ * $Id: tget.prg,v 1.48 2003/05/07 20:05:49 walito Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
    ::lMinusPrinted := .f.
 
-   ::Picture    := cPicture
+//   ::Picture    := cPicture
    ::cPicture   := cPicture
    #ifdef HB_COMPAT_C53
    ::Caption    := ""
@@ -364,13 +364,14 @@ METHOD Display( lForced ) CLASS Get
    LOCAL nOldCursor := SetCursor( SC_NONE )
    LOCAL xBuffer
 
-   IF ::buffer == NIL
-      ::buffer := ::PutMask( ::VarGet(), .f. )
-   ENDIF
-
-   xBuffer := ::buffer
-
    DEFAULT lForced TO .t.
+
+   IF ::buffer == NIL
+      ::Picture := ::cPicture
+      xBuffer   := ::PutMask( ::VarGet(), .f. )
+   ELSE
+      xBuffer   := ::buffer
+   ENDIF
 
    HBConsoleLock()
 
@@ -531,10 +532,12 @@ METHOD KillFocus() CLASS Get
    endif
 
    ::hasfocus := .f.
-   ::buffer   := ::PutMask( )
+//   ::buffer   := ::PutMask( )
+   ::buffer   := NIL
    ::pos      := NIL
 
    ::Display()
+
 
 return Self
 
@@ -1249,6 +1252,10 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    ::nMaxLen  := Len( cBuffer )
    ::nMaxEdit := ::nMaxLen
+   if ::nDispLen == NIL
+      ::nDispLen := ::nMaxLen
+   endif
+
 
    if lEdit .and. ::type == "N" .and. ! Empty( cMask )
       if "E" IN cPicFunc
@@ -1553,7 +1560,7 @@ METHOD Picture( cPicture ) CLASS Get
       ::cPicture := cPicture
       ::ParsePict( cPicture )
 
-      ::buffer  := ::PutMask( )
+//      ::buffer  := ::PutMask( )
 //      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
 
       if ::nDispLen == NIL

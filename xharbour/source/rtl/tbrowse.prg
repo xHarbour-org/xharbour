@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.39 2003/05/05 23:03:53 lculik Exp $
+ * $Id: tbrowse.prg,v 1.40 2003/05/07 20:05:53 walito Exp $
  */
 
 /*
@@ -574,9 +574,15 @@ METHOD Configure( nMode ) CLASS TBrowse
 
 #ifdef HB_COMPAT_C53
    ::Rect := { ::nwTop + ::nHeaderHeight, ::nwLeft, ::nwBottom - ::nHeaderHeight, ::nwRight }
-   for n := ::nwLeft to ::nwRight
-      aadd( ::aVisibleCols, n )
+//   for n := ::nwLeft to ::nwRight
+//      aadd( ::aVisibleCols, n )
+//   next
+   ASize( ::aVisibleCols, ::nwRight - ::nwLeft + 1 )
+   n := ::nwLeft - 1
+   for each xVal in ::aVisibleCols
+      xVal := HB_EnumIndex() + n
    next
+
 #endif
 
    //   Flag that browser has been configured properly
@@ -1650,14 +1656,18 @@ METHOD Stabilize() CLASS TBrowse
                   // I've scrolled on screen rows, now I need to scroll ::aRedraw array as well!
                   //
                   if nRecsSkipped > 0
-                     ACopy( ::aRedraw, ::aRedraw, 2,, 1 )
+//                     ACopy( ::aRedraw, ::aRedraw, 2,, 1 )
+                     ADel( ::aRedraw, 1 )
+                     ::aRedraw[ -1 ] := .F.
 
                   else
                      // Cannot use ACopy() here
                      //
-                     for nRow := ::RowCount - 1 to 1 step -1
-                        ::aRedraw[ nRow + 1 ] := ::aRedraw[ nRow ]
-                     next
+//                     for nRow := ::RowCount - 1 to 1 step -1
+//                        ::aRedraw[ nRow + 1 ] := ::aRedraw[ nRow ]
+//                     next
+                     ADel( ::aRedraw, ::RowCount )
+                     AIns( ::aRedraw, 1, .F. )
 
                   endif
 
@@ -2020,14 +2030,18 @@ METHOD ForceStabilize() CLASS TBrowse
                   // I've scrolled on screen rows, now I need to scroll ::aRedraw array as well!
                   //
                   if nRecsSkipped > 0
-                     ACopy( ::aRedraw, ::aRedraw, 2,, 1 )
+//                     ACopy( ::aRedraw, ::aRedraw, 2,, 1 )
+                     ADel( ::aRedraw, 1 )
+                     ::aRedraw[ -1 ] := .F.
 
                   else
                      // Cannot use ACopy() here
                      //
-                     for nRow := ::RowCount - 1 to 1 step -1
-                        ::aRedraw[ nRow + 1 ] := ::aRedraw[ nRow ]
-                     next
+//                     for nRow := ::RowCount - 1 to 1 step -1
+//                        ::aRedraw[ nRow + 1 ] := ::aRedraw[ nRow ]
+//                     next
+                     ADel( ::aRedraw, ::RowCount )
+                     AIns( ::aRedraw, 1, .F. )
 
                   endif
 
