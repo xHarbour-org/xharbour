@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.70 2003/06/03 23:35:01 lculik Exp $
+ * $Id: hbmake.prg,v 1.71 2003/06/05 17:19:40 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -249,7 +249,16 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL aLibx
    LOCAL lGui        := .f.
    LOCAL lMt         := .f.
+   LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
+   LOCAL x :=1
 
+   IF lDjgpp
+      s_lBcc    := .F.
+      s_lGcc    := .T.
+      s_lVcc    := .F.
+   ENDIF 
+
+   tracelog( lDjgpp )
    s_nHandle := FT_FUSE( cFile )
 
    IF s_nHandle < 0
@@ -315,8 +324,9 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                       aAdd( s_aMacros, { aTemp[ 1 ], Strtran( Replacemacros( aTemp[ 2 ] ), "\", "/" ) } )
+                      tracelog( s_aMacros[x,1],s_aMacros[x,2])
+                      x++
                    ELSE
-
                      IF aTemp[ 1 ] == "GUI" .AND. aTemp[ 2 ] == "YES"
                         lGui := .T.
                      ENDIF
@@ -324,7 +334,7 @@ FUNCTION ParseMakeFile( cFile )
                      IF aTemp[ 1 ] == "MT" .AND. aTemp[ 2 ] == "YES"
                         lMt := .T.
                      ENDIF
-
+                     
                      IF aTemp[ 1 ] == "LIBFILES" .AND. ! lMt
                         aLib := ListAsArray2( aTemp[ 2 ], ' ' )
 
@@ -337,11 +347,13 @@ FUNCTION ParseMakeFile( cFile )
                            IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0
                               lGui := .T.
                            ENDIF
-
-                           IF ".a" in Lower( aLibx )
+                           tracelog(s_aDefines[2],alibx)
+                           IF "-l" in Lower( aLibx ) 
                               s_lBcc    := .F.
                               s_lGcc    := .T.
                               s_lVcc    := .F.
+                           
+                           s_aDefines[2] := { "MAKEDIR", GetGccDir() }
                            ENDIF
 
                         NEXT
@@ -360,16 +372,45 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                      aAdd( s_aMacros, { aTemp[ 1 ], Strtran( aTemp[ 2 ], "\", "/" ) } )
+                      tracelog( s_aMacros[x,1],s_aMacros[x,2])
+                      x++
+
                   ELSE
-                     aAdd( s_aMacros, { aTemp[ 1 ], aTemp[ 2 ] } )
+                     IF aTemp[ 1 ] == "LIBFILES" .AND. ! lMt
+                        aLib := ListAsArray2( aTemp[ 2 ], ' ' )
+
+                        FOR each aLibx in aLib
+
+                           IF At( 'mt.lib', Lower( aLibx ) ) > 0
+                              lMt := .T.
+                           ENDIF
+
+                           IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0
+                              lGui := .T.
+                           ENDIF
+                           tracelog(s_aDefines[2],alibx)
+                           IF "-l" in Lower( aLibx ) 
+                              s_lBcc    := .F.
+                              s_lGcc    := .T.
+                              s_lVcc    := .F.
+                           
+                           s_aDefines[2] := { "MAKEDIR", GetGccDir() }
+                           s_aMacros[2,2] :=  GetGccDir() 
+                           ENDIF
+
+                        NEXT
+                             
+                     ENDIF
+                        aAdd( s_aMacros, { aTemp[ 1 ], aTemp[ 2 ] } )
                   ENDIF
 
                ENDIF
 
             ENDIF
-                IF aTemp[ 1 ] == "COMPRESS"
-                   s_lCompress := "YES" IN aTemp[ 2 ]
-                endif
+
+            IF aTemp[ 1 ] == "COMPRESS"
+               s_lCompress := "YES" IN aTemp[ 2 ]
+            ENDIF
 
 
             IF aTemp[ 1 ] == "PROJECT"
@@ -1046,6 +1087,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL lxFwh        := .f.
    LOCAL lCw          := .f.
    LOCAL lMiniGui     := .f.
+   LOCAL lHwGui       := .f.
    LOCAL lRddAds      := .f.
    LOCAL lMediator    := .f.
    LOCAL lApollo      := .f.
@@ -1057,6 +1099,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cApolloPath     := Space( 200 )
    LOCAL ccwpath      := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
+   LOCAL cHwPath      := Space( 200 )
    LOCAL cObjDir      := "obj" + Space( 20 )
    LOCAL lAutomemvar  := .f.
    LOCAL lvarismemvar := .f.
@@ -1136,10 +1179,11 @@ FUNC CreateMakeFile( cFile )
          lCompMod     := oMake:lCompMod
          lGenppo      := oMake:lGenppo
          cRdd         := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
-         cGui         := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui", IIF( oMake:lCw, "C4W", "None" ) ) )
+         cGui         := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui", IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI","None" ) ) ) )
          cfwhpath     := oMake:cFmc
          ccwpath      := oMake:cFmc
          cMiniPath    := oMake:cFmc
+         cHwPath      := oMake:cFmc
          cmedpath     := oMake:cMedpath
          cAppName     := oMake:cAppLibName
          s_cAppName     := oMake:cAppLibName
@@ -1167,7 +1211,7 @@ FUNC CreateMakeFile( cFile )
 //   @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
 //   @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
 //   @  4, 64 GET lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
- @ 1, 60,8,78 Get  cGui ListBox { "None","FWH","MiniGui","What32","Whoo","C4W"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
+ @ 1, 60,8,78 Get  cGui ListBox { "None","FWH","MiniGui","What32","Whoo","C4W","HWGUI"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
 //   @  2, 1 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
    @ 2,1 Say s_aLangMessages[ 48 ]
    @ 2,16,6,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
@@ -1189,6 +1233,7 @@ FUNC CreateMakeFile( cFile )
    lRddAds  := "RddAds"    IN cRdd
    lMediator :=  "Mediator" IN cRdd
    lApollo := "Apollo" IN cRdd
+   lHwGui := "HWGUI" in cGui
 
    IF lUseXharbourDll
       cDefBccLibs      := cHarbDll+"bc.lib"
@@ -1202,6 +1247,8 @@ FUNC CreateMakeFile( cFile )
       @  3, 40 SAY "C4H path" GET ccwpath PICT "@s20"
    ELSEIF lMiniGui
       @  3, 40 SAY "MinuGui path" GET cMiniPath PICT "@s20"
+   ELSEIF lHwGui
+      @  3, 40 SAY "Hwgui path" GET cHwPath PICT "@s20"
    ENDIF
    IF lMediator
       @  3, 40 SAY "Mediator path" GET cmedpath PICT "@s20"
@@ -1331,9 +1378,9 @@ FUNC CreateMakeFile( cFile )
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include", "" ) ) + IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) ) + IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
       ELSE
-         aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include", "" ) ) + " -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) )) + " -o$* $**" } )
       ENDIF
 
       aAdd( s_aCommands, { ".rc.res:", "$(BCB)\BIN\brcc32 $(RFLAGS) $<" } )
@@ -1467,15 +1514,19 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "FWH = " + cfwhpath + CRLF )
       lGui := .T.
    ELSEIF lCw
-      fWrite( s_nLinkHandle, "C4W =" + ccwpath + CRLF )
+      fWrite( s_nLinkHandle, "C4W = " + ccwpath + CRLF )
       lGui := .T.
    ELSEIF lMiniGui
-      fWrite( s_nLinkHandle, "MINIGUI =" + cMiniPath + CRLF )
+      fWrite( s_nLinkHandle, "MINIGUI = " + cMiniPath + CRLF )
       lGui := .T.
+   ELSEIF lHwGui
+      fWrite( s_nLinkHandle, "HWGUI = " + cHwPath + CRLF )
+      lGui := .T.
+
    ENDIF
 
    IF lMediator
-      fWrite( s_nLinkHandle, "MEDIATOR =" + cMedPath + CRLF )
+      fWrite( s_nLinkHandle, "MEDIATOR = " + cMedPath + CRLF )
       lGui := .F.
    ENDIF
 
@@ -1734,6 +1785,8 @@ FUNC CreateMakeFile( cFile )
 
       ELSEIF lMiniGui
          fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+      ELSEIF lHwGui
+         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib promisc.lib hwg_ghtm.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
@@ -1760,11 +1813,11 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui, " -aa", " -ap" ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib", "" ) + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui, " -aa", IIF( lHwgui, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = ilink32" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
-      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lFwh .OR. lMinigui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
+      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lFwh .OR. lMinigui .OR. lHwgui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
                + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( lMt,"cw32.lib", "cw32.lib" )+ CRLF )

@@ -42,6 +42,7 @@ Data  cDefLang
 data  lFwh           init .F.
 data  lCw            init .F.
 Data  lmini          init .F.
+Data  lHwgui         init .F.
 data  lRddAds        init .F.
 DAta  lMediator      init .F.
 Data  cMakefile      init ""
@@ -122,7 +123,8 @@ Method WriteMakeFileHeader() Class THbmake
 
         Fwrite( ::nLinkHandle, "MINIGUI =" + ::cFMC + CRLF )
 
-
+    ELSEIF ::lHwgui
+        Fwrite( ::nLinkHandle, "HWGUI =" + ::cFMC + CRLF )
     ENDIF
 
 
@@ -459,6 +461,11 @@ Method WriteMakeFile() CLASS THBMAKE
 
             Fwrite( ::nLinkHandle, "LIBFILES = Minigui.lib " + cDefBccLibs + CRLF )
 
+        ELSEIF ::lHwgui
+
+            Fwrite( ::nLinkHandle, "LIBFILES = hwgui.lib promisc.lib hwg_ghtm.lib " + cDefBccLibs + CRLF )
+
+
         ELSEIF ::lCw
 
             Fwrite( ::nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + cDefBccLibs + CRLF )
@@ -496,7 +503,7 @@ Method WriteMakeFile() CLASS THBMAKE
         Fwrite( ::nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + CRLF )
 
         Fwrite( ::nLinkHandle, "RFLAGS = " + CRLF )
-        Fwrite( ::nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( ::lFwh, " -aa", IF( ::lMini , " -aa" , " -ap" )) + CRLF )
+        Fwrite( ::nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( ::lFwh, " -aa", IF( ::lMini , " -aa" , IF( ::lHwgui , " -aa", " -ap" ))) + CRLF )
         Fwrite( ::nLinkHandle, "IFLAGS = " + CRLF )
         Fwrite( ::nLinkHandle, "LINKER = ilink32" + CRLF )
         Fwrite( ::nLinkHandle, " " + CRLF )
@@ -1042,6 +1049,11 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                 ::cFMC:= aTemp[2]
                 ::lmini :=.t.
                 endif
+                IF aTemp[ 1 ] == "HWGUI"
+                ::cFMC:= aTemp[2]
+                ::lHwGui :=.t.
+                endif
+
                 IF aTemp[ 1 ] == "MEDIATOR"
                 ::cMedpath:= aTemp[2]
                 ::lmEDIATOR :=.t.

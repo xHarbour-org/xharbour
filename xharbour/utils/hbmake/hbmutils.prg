@@ -410,7 +410,9 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'ppmt' + cSuffix, ;
                       'dbfntxmt' + cSuffix, ;
                       'dbfcdxmt' + cSuffix, ;
-                      'macromt' + cSuffix, 'gtnul' + cSuffix }
+                      'macromt' + cSuffix,;
+                      'codepage' + cSuffix,;
+                      'gtnul' + cSuffix }
 
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )

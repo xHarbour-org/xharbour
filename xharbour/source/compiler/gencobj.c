@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.4 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: gencobj.c,v 1.5 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -181,10 +181,13 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension, char *szSourc
       if( hb_comp_pOutPath->szPath )
          pOut->szPath = hb_comp_pOutPath->szPath;
 
+      if(hb_comp_pOutPath->szExtension)
+         pOut->szExtension = hb_comp_pOutPath->szExtension;
+      else
 #if defined(__BORLANDC__) || defined(_MSC_VER)
-      pOut->szExtension = ".obj";
+         pOut->szExtension = ".obj";
 #else
-      pOut->szExtension = ".o";  /* Don't know if we can hardcode it for Un*x */
+         pOut->szExtension = ".o";  /* Don't know if we can hardcode it for Un*x */
 #endif
       hb_fsFNameMerge( pszTemp, pOut );
 
