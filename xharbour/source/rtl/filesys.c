@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.127 2004/12/20 16:48:44 mlombardo Exp $
+ * $Id: filesys.c,v 1.128 2004/12/31 11:56:10 druzus Exp $
  */
 
 /*
@@ -1898,7 +1898,7 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
          else
          {
              dwWritten = 0;
-             fResult = SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) &&
+             fResult = ( SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) != -1 ) &&
                        SetEndOfFile( DostoWinHandle(hFileHandle) );
          }
          hb_fsSetIOError( fResult, 0 );
@@ -2050,7 +2050,7 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
       }
       else
       {
-         hb_fsSetIOError( SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) &&
+         hb_fsSetIOError( ( SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) != -1 ) &&
                           SetEndOfFile( DostoWinHandle(hFileHandle) ), 0 );
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3722 2005/01/09 20:39:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.3723 2005/01/09 22:37:55 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,11 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-09 16:40 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/filesys.c
+    ! Fixed conditional for setting file size to 0 when
+      HB_WIN32_IO is defined.
+
 2005-01-10 11:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * include/hbgtwvt.h
     - remove #include hbstack.h
 
-2004-01-09 23:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+2005-01-09 23:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
   * make_tgz.sh
   * bin/hb-func.sh
@@ -19,7 +25,7 @@
   * source/debug/tbrwtext.prg
     * Reformatted.
 
-2004-01-09 09:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+2005-01-09 09:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
     ! Fixed DJGPP detection (it has no uname).
     ! Enable HB_GPM_MOUSE only for Linux.
@@ -45,14 +51,14 @@
   * source/tip/utils.c
     ! Typecasts.
 
-2004-01-08 13:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+2005-01-08 13:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   ! Changelog
     ! Restored 1.3714 entries
   ! source/odbc/todbc.prg
     ! Fixed :LoadData() method and data fetch for non-cached recordsets
       Thanks to EMG and Gianluca Piemonte
 
-2006-01-07 06:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+2005-01-07 06:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
     * SC_NORMAL 'shape' is now 13 instead or 12 or 25.
     * removed call to GetConsoleCursorInfo().
