@@ -913,9 +913,9 @@ PROCEDURE RP_Dot()
 
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
 
-      IF s_nRow == MaxRow() - 1
+      IF s_nRow >= MaxRow() - 1
          Scroll( 2, 0, MaxRow() - 1, MaxCol(), 1 )
-         s_nRow--
+         s_nRow := MaxRow() - 2
       ENDIF
 
       IF s_lRunLoaded

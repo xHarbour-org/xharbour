@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.94 2002/08/26 00:29:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.95 2002/08/26 15:24:16 ronpinkas Exp $
  */
 
 /*
@@ -1473,7 +1473,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_DATE( pLocal ) )
+            if( pLocal->type & HB_IT_INTEGER )
+            {
+               dNewVal = pLocal->item.asInteger.value + iAdd;
+            }
+            else if( pLocal->type & HB_IT_LONG )
+            {
+               dNewVal = pLocal->item.asLong.value + iAdd;
+            }
+            else if( pLocal->type & HB_IT_DOUBLE )
+            {
+               dNewVal = pLocal->item.asDouble.value + iAdd;
+            }
+            else if( HB_IS_DATE( pLocal ) )
             {
                pLocal->item.asDate.value += iAdd;
                break;
@@ -1482,31 +1494,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             {
                pLocal->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pLocal->item.asString.value[0] + iAdd ) ];
                break;
-            }
-            else if( HB_IS_NUMERIC( pLocal ) )
-            {
-               if( pLocal->type & HB_IT_INTEGER )
-               {
-                  dNewVal = pLocal->item.asInteger.value + iAdd;
-               }
-               else if( pLocal->type & HB_IT_LONG )
-               {
-                  dNewVal = pLocal->item.asLong.value + iAdd;
-               }
-               else if( pLocal->type & HB_IT_DOUBLE )
-               {
-                  dNewVal = pLocal->item.asDouble.value + iAdd;
-               }
-               /* See above!
-               else if( pLocal->type & HB_IT_DATE )
-               {
-                  dNewVal = pLocal->item.asDate.value + iAdd;
-               }
-               else if( pLocal->type & HB_IT_STRING )
-               {
-                  dNewVal = pLocal->item.asString.value[0] + iAdd;
-               }
-               */
             }
             else
             {
@@ -1605,7 +1592,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
             w += 3;
 
-            if( HB_IS_DATE( pTop ) )
+            if( pTop->type & HB_IT_INTEGER )
+            {
+               dNewVal = pTop->item.asInteger.value + iAdd;
+            }
+            else if( pTop->type & HB_IT_LONG )
+            {
+               dNewVal = pTop->item.asLong.value + iAdd;
+            }
+            else if( pTop->type & HB_IT_DOUBLE )
+            {
+               dNewVal = pTop->item.asDouble.value + iAdd;
+            }
+            else if( HB_IS_DATE( pTop ) )
             {
                pTop->item.asDate.value += iAdd;
                break;
@@ -1617,21 +1616,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pTop->item.asLong.length = 10;
                //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
                break;
-            }
-            else if( HB_IS_NUMERIC( pTop ) )
-            {
-               if( pTop->type & HB_IT_INTEGER )
-               {
-                  dNewVal = pTop->item.asInteger.value + iAdd;
-               }
-               else if( pTop->type & HB_IT_LONG )
-               {
-                  dNewVal = pTop->item.asLong.value + iAdd;
-               }
-               else //if( pTop->type & HB_IT_DOUBLE )
-               {
-                  dNewVal = pTop->item.asDouble.value + iAdd;
-               }
             }
             else
             {

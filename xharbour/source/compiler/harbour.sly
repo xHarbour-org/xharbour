@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.16 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.17 2002/05/23 20:12:05 ronpinkas Exp $
  */
 
 /*
@@ -1825,9 +1825,17 @@ Otherwise  : OTHERWISE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_COD
 
 DoWhile    : WhileBegin Expression Crlf
                {
-                  hb_compExprDelete( hb_compExprGenPush( $2 ) );
-                  $<lNumber>$ = hb_compGenJumpFalse( 0 );
-                }
+                  if( $2->ValType = HB_EV_LOGICAL && $2->value.asLogical )
+                  {
+                     hb_compExprDelete( $2 );
+                     $<lNumber>$ = -1;
+                  }
+                  else
+                  {
+                     hb_compExprDelete( hb_compExprGenPush( $2 ) );
+                     $<lNumber>$ = hb_compGenJumpFalse( 0 );
+                  }
+               }
              EmptyStats
                {
                   hb_compLoopHere();
@@ -1835,7 +1843,11 @@ DoWhile    : WhileBegin Expression Crlf
                }
              EndWhile
                {
-                  hb_compGenJumpHere( $<lNumber>4 ); --hb_comp_wWhileCounter;
+                  if( $<lNumber>4 != -1 )
+                  {
+                     hb_compGenJumpHere( $<lNumber>4 );
+                  }
+                  --hb_comp_wWhileCounter;
                   hb_compLoopEnd();
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                 }
