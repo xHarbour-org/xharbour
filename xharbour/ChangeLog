@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3140 2004/07/09 19:54:53 likewolf Exp $
+ * $Id: ChangeLog,v 1.3141 2004/07/10 01:44:20 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-09 23:49 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/transfrm.c
+    ! Fixed a few toupper() to TOUPPER() (for CODEPAGE support).
 
 2004-07-09 20:38 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/box.c

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.35 2004/06/17 07:07:57 guerra000 Exp $
+ * $Id: transfrm.c,v 1.36 2004/06/23 17:55:59 guerra000 Exp $
  */
 
 /*
@@ -325,7 +325,7 @@ HB_FUNC( TRANSFORM )
                      case 'x':
                      case 'X':
                      {
-                        szResult[ ulResultPos++ ] = ( uiPicFlags & PF_UPPER ) ? toupper( szExp[ ulExpPos ] ) : szExp[ ulExpPos ];
+                        szResult[ ulResultPos++ ] = ( uiPicFlags & PF_UPPER ) ? TOUPPER( szExp[ ulExpPos ] ) : szExp[ ulExpPos ];
                         ulExpPos++;
                         bAnyPic = TRUE;
                         break;
@@ -412,7 +412,7 @@ HB_FUNC( TRANSFORM )
                         break;
                      }
                      default:
-                        szResult[ ulResultPos++ ] = ( uiPicFlags & PF_UPPER ) ? toupper( *szExp ) : *szExp;
+                        szResult[ ulResultPos++ ] = ( uiPicFlags & PF_UPPER ) ? TOUPPER( *szExp ) : *szExp;
                   }
                }
                else
