@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.18 2003/08/20 20:06:06 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.19 2003/09/03 00:34:01 ronpinkas Exp $
  */
 
 /*
@@ -440,9 +440,15 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          if( pResult )
          {
             hb_itemRelease( pResult );
+            pResult = NULL;
          }
 
          hb_errRelease( pError );
+
+         /*
+          *  If the error happened from an EXIT procedure (already called from hb_vmQuit() then
+          *   hb_vmQuit() might immdeiately return here!
+          */
          hb_vmQuit();
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
@@ -1223,8 +1229,8 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, char *
 void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, ULONG ulArgCount, ... )
 {
    PHB_ITEM pError;
-
    PHB_ITEM pArray, pArg;
+   PHB_ITEM pResult;
    va_list va;
    ULONG ulArgPos;
    BOOL bRelease = TRUE;
@@ -1278,8 +1284,18 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
    }
 
    /* Ok, launch... */
-   hb_itemRelease( hb_itemReturn( hb_errLaunchSubst( pError ) ) );
-   hb_errRelease( pError );
+   pResult = hb_errLaunchSubst( pError );
+   
+   if( pResult )
+   {
+      hb_itemRelease( hb_itemReturn( pResult ) );
+   }
+
+   // Might have been released by hb_errLaunchSubst()
+   if( pError->type )
+   {
+      hb_errRelease( pError );
+   }
 }
 
 USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiOSCode, USHORT uiFlags )
