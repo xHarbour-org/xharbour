@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.48 2003/02/26 05:36:09 jonnymind Exp $
+ * $Id: arrays.c,v 1.49 2003/03/08 02:06:46 jonnymind Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
  *    hb_arrayCopyC()
  *    hb_arrayGetC()
  *
- * Copyright 2001 Ron Pinkas <ron@profit-master.com>
+ * Copyright 2001 Ron Pinkas <ron@ronpinks.com>
  *    hb_arrayClone()
  *    hb_arrayFromStack()
  *    hb_arrayFromParams()
@@ -79,8 +79,8 @@
 extern char *hb_vm_acAscii[256];
 
 /*JC1: THREAD UNSAFE.
-* The caller must be sure that pItem, if given, is detached by any data set 
-* and/or not subject to garbage collection or else it must lock the 
+* The caller must be sure that pItem, if given, is detached by any data set
+* and/or not subject to garbage collection or else it must lock the
 * appropriate mutex.
 * Also, the caller must make sure that 1) the target pItem is in a data set,
 * or else to use the hb_gcLock function:
@@ -93,7 +93,7 @@ extern char *hb_vm_acAscii[256];
 * LOCK GC
 * hb_arrayNew( pItem )
 * UNLOCK GC
-* This second pattern is done by hb_arrayNewLocked(). 
+* This second pattern is done by hb_arrayNewLocked().
 */
 
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
@@ -137,7 +137,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array is on a dataset, the caller must lock it.
 * If the item is on a dataset, the caller must lock it.
 */
@@ -159,12 +159,12 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
          return TRUE;
       }
    }
-   
+
    return FALSE;
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array is on a dataset, the caller must lock it.
 * If the item is on a dataset, the caller must lock it.
 */
@@ -186,12 +186,12 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
          return TRUE;
       }
    }
-   
+
    return FALSE;
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array is on a non-local dataset, the caller must lock it.
 */
 
@@ -209,7 +209,7 @@ ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array is on a non-local dataset, the caller must lock it.
 */
 
@@ -227,14 +227,14 @@ BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * Array dataset must be locked.
 */
 
 BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySize(%p, %lu)", pArray, ulLen));
-  
+
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -303,7 +303,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * Caller must lock array dataset.
 */
 
@@ -342,7 +342,7 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * Caller must lock array dataset.
 */
 
@@ -381,7 +381,7 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked.
 * If the item's dataset must be locked if non-local.
 */
@@ -413,7 +413,39 @@ BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
+* If the array's dataset must be locked.
+* If the item's dataset must be locked if non-local.
+*/
+
+BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+{
+   PHB_ITEM pElement;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_arraySetForward(%p, %lu, %p)", pArray, ulIndex, pItem));
+
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+
+      if( HB_IS_BYREF( pElement ) )
+      {
+         hb_itemForwardValue( hb_itemUnRef( pElement ), pItem );
+      }
+      else
+      {
+         hb_itemForwardValue( pElement, pItem );
+      }
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
+}
+
+/**
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -447,12 +479,12 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
          pItem->type = HB_IT_NIL;
       }
    }
-   
+
    return FALSE;
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -513,7 +545,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -537,7 +569,7 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -566,7 +598,7 @@ long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
  * array element - it doesn't return an item's value
  */
  /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -585,7 +617,7 @@ PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -607,7 +639,7 @@ BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -629,7 +661,7 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -651,7 +683,7 @@ long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -669,12 +701,12 @@ double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
    {
       dRet = 0;
    }
-   
+
    return dRet;
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -696,7 +728,7 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -734,7 +766,7 @@ char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -756,7 +788,7 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -778,7 +810,7 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 * If the item's dataset must be locked.
 */
@@ -820,7 +852,7 @@ BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked.
 * If the item's dataset must be locked  if non-local.
 */
@@ -862,7 +894,7 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked.
 * If the item's dataset must be locked  if non-local.
 */
@@ -870,7 +902,7 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
 ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
-   
+
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -913,7 +945,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                hb_vmSend( 2 );
 
                if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
-               {  
+               {
                   return ulStart + 1;                  /* arrays start from 1 */
                }
             }
@@ -993,7 +1025,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked.
 * If the item's dataset must be locked  if non-local.
 */
@@ -1037,14 +1069,14 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       }
       return TRUE;
    }
-   else 
+   else
    {
       return FALSE;
    }
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked.
 */
 
@@ -1128,7 +1160,7 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
          is greater than the length of the array. [vszakats] */
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the target array's dataset must be locked.
 * If the source array's dataset must be locked  if non-local.
 */
@@ -1221,7 +1253,7 @@ BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pul
 }
 
 /**
-* Warning: THREAD UNSAFE. 
+* Warning: THREAD UNSAFE.
 * If the array's dataset must be locked if non-local.
 */
 
@@ -1386,7 +1418,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
       ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
       hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
    }
-   
+
    return pArray;
 }
 
@@ -1437,7 +1469,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    pArray->item.asArray.value = pBaseArray;
 
    /*Notice: the thread could still be killed HERE, causing a memory leak */
-   
+
    return pArray;
 }
 

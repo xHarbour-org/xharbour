@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1038 2003/05/21 22:49:37 druzus Exp $
+ * $Id: ChangeLog,v 1.1039 2003/05/22 11:47:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-22 20:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+  * include/hbapi.h
+    + Added new hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element by forwarding it's value */
+
+  * source/vm/classes.c
+    - Removed redunandant function HB_FUNC( __CLASSSELPERSISTENT ) /* see HB_FUNC( __CLSGETPROPERTIES ) */
+    + Added new HB_FUNC( __CLSGETPROPERTIESANDVALUES ) returning Array of Sub-Arrays of { cProperty, xValue }
+
+  * source/rtl/cstr.prg
+    + Added new ValtoPrgExp( xValue ) returning a valid source string representing the value of any type.
+    * Improved ValToPrg() to support Block type.
+
+  * source/rtl/persist.prg
+    * Rewrote LoadFromText() and SaveToText() from scratch.
+    % Greatly optimized SaveToText() by utilizing new __clsGetPropertiesAndValues() which is far faster then sending messages to the Object.
+    ! Completed LoadFromText() to support nested Objects.
+
+  * source/rtl/hbserial.prg
+    % Greatly optimized HB_Serilaize() by utilizing new __clsGetPropertiesAndValues() which is far faster then sending messages to the Object.
+
+  * tests/testpers.prg
+    * Extended sample to show new ability to restore Nested objects from stream.
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmEqual() to correctly handle comparison of empty arrays.
 
 2003-05-22 13:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/gtcrs/chrmap.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.9 2003/03/26 02:20:02 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.10 2003/04/29 23:55:40 ronpinkas Exp $
  */
 
 /*
@@ -191,8 +191,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
          RETURN cRet
 
-      //CASE 'B'
-      //   RETURN "{|| }"
+      CASE 'B'
+         RETURN "{|| " + ValToPrgExp( Eval( xVal ) ) + " }"
 
       CASE 'O'
          IF nPad == NIL
@@ -230,10 +230,102 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )
-         Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
+         IF xVal == NIL
+            cRet := "NIL"
+         ELSE
+            Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
+         ENDIF
    END
 
    //TraceLog( cRet )
+
+RETURN cRet
+//--------------------------------------------------------------//
+
+FUNCTION ValToPrgExp( xVal, aObjs )
+
+   LOCAL cType := ValType( xVal )
+   LOCAL aVars, aVar, cRet, nObj
+
+   //TraceLog( xVal, cName, nPad, aObjs )
+
+   SWITCH cType
+      CASE 'C'
+         IF ! '"' IN xVal
+            RETURN '"' + xVal + '"'
+         ELSEIF ! "'" IN xVal
+            RETURN "'" + xVal + "'"
+         ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
+            RETURN "[" + xVal + "]"
+         ELSE
+            Throw( ErrorNew( "CSTR", 3102, ProcName(), "Can't stringify", { xVal } ) )
+            EXIT
+         ENDIF
+
+      CASE 'D'
+         RETURN "cToD( '" + dToC( xVal ) + "' )"
+
+      CASE 'L'
+         RETURN IIF( xVal, ".T.", ".F." )
+
+      CASE 'N'
+         RETURN Str( xVal )
+
+      CASE 'M'
+         RETURN xVal
+
+      CASE 'A'
+         cRet := "{ "
+
+         FOR EACH aVar IN xVal
+            cRet += ( ValToPrgExp( aVar ) + ", " )
+         NEXT
+
+         IF cRet[ -2 ] == ','
+            cRet[ -2 ] := ' '
+         ENDIF
+         cRet[ -1 ] := '}'
+
+         RETURN cRet
+
+      CASE 'B'
+         RETURN "{|| " + ValToPrgExp( Eval( xVal ) ) + " }"
+
+      CASE 'O'
+         aVars := __objGetValueDiff( xVal )
+         cRet  := "M->_1 := " + xVal:ClassName + "(), "
+
+         IF aObjs == NIL
+            aObjs := { xVal }
+         ELSE
+            aAdd( aObjs, xVal )
+         ENDIF
+
+         FOR EACH aVar IN aVars
+            IF ValType( aVar[2] ) == 'O'
+               IF ( nObj := aScan( aObjs, xVal ) ) > 0
+                  cRet += "M->_1:" + aVar[1] + " := " + "/* Cyclic into outer property: */ " + aObjs[ nObj ][2] + ", "
+               ELSE
+                  cRet += ValToPrgExp( aVar[2], aObjs ) + ", "
+               ENDIF
+            ELSE
+               //TraceLog( aVar[1], aVar[2] )
+               cRet += "M->_1:" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
+            ENDIF
+         NEXT
+
+         RETURN cRet + "M->_1"
+
+      DEFAULT
+         //TraceLog( xVal, cName, nPad )
+         IF xVal == NIL
+            cRet := "NIL; "
+         ELSE
+            Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
+         ENDIF
+   END
+
+   TraceLog( cRet )
 
 RETURN cRet
 //--------------------------------------------------------------//

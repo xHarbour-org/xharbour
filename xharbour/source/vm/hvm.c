@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.195 2003/05/12 20:49:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.196 2003/05/16 19:52:12 druzus Exp $
  */
 
 /*
@@ -3377,8 +3377,7 @@ static void hb_vmEqual( BOOL bExact )
       hb_vmOperatorCall( pItem1, pItem2, "__OPEQUAL" );
    else if( bExact && HB_IS_ARRAY( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
    {
-      BOOL bResult = pItem1->item.asArray.value->pItems && pItem2->item.asArray.value->pItems &&
-                     pItem1->item.asArray.value->pItems == pItem2->item.asArray.value->pItems;
+      BOOL bResult = pItem1->item.asArray.value == pItem2->item.asArray.value;
       hb_stackPop();
       hb_stackPop();
       hb_vmPushLogical( bResult );

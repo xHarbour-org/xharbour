@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.5 2003/04/13 20:40:45 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.6 2003/04/13 21:39:24 jonnymind Exp $
  */
 
 /*
@@ -51,35 +51,38 @@
  *
  */
 
+FUNCTION HB_Serialize( xValue )
 
-FUNCTION HB_Serialize( oObject )
    LOCAL cSerial
-   LOCAL oElem, aProperties
+   LOCAL xElement, aPropertiesAndValues, aPropertyAndValue
 
-   SWITCH ValType( oObject )
+   SWITCH ValType( xValue )
       CASE "A"
-         cSerial :="A" + HB_CreateLen8( Len( oObject ) )
-         FOR EACH oElem IN oObject
-            cSerial += HB_Serialize( oElem )
+         cSerial :="A" + HB_CreateLen8( Len( xValue ) )
+
+         FOR EACH xElement IN xValue
+            cSerial += HB_Serialize( xElement )
          NEXT
-      EXIT
+
+         EXIT
 
       CASE "O"
-         aProperties := __ClassSelPersistent( __ClassH( oObject ) )
-         cSerial := "O" + HB_CreateLen8( Len( aProperties ) )
-         cSerial += HB_SerializeSimple( oObject:ClassName )
+         aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
+         cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
+         cSerial += HB_SerializeSimple( xValue:ClassName )
 
-         FOR EACH oElem in aProperties
+         FOR EACH aPropertyAndValue in aPropertiesAndValues
             // saves name and content
-            cSerial += HB_Serialize( oElem )
-            cSerial += HB_Serialize( __objSendMsg( oObject, oElem ) )
+            cSerial += HB_Serialize( aPropertyAndValue[1] )
+            cSerial += HB_Serialize( aPropertyAndValue[2] )
          NEXT
 
-      EXIT
+         EXIT
 
       DEFAULT
-         cSerial := HB_SerializeSimple( oObject )
+         cSerial := HB_SerializeSimple( xValue )
    END
+
 RETURN cSerial
 
 FUNCTION HB_Deserialize( cSerial, nMaxLen )
