@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3205 2004/07/23 13:05:39 paultucker Exp $
+ * $Id: ChangeLog,v 1.3206 2004/07/24 00:30:12 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-24 13:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/gtwvt/gtwvt.c
+    - reintroduce hb_wvt_gtValidWindowSize() checks in gt_SetMode() & hb_wvt_gtSetFont()
 
 2004-07-23 19:24 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tget.prg
@@ -27,7 +30,7 @@
   * contrib/libct/tests/wordone.prg
     ! Fixed CHARONE(), WORDONE(), and their tests.
 
-2004-07-23 10:47 UTC+0100 Patrick Mast <patrick@xHarbour.com> 
+2004-07-23 10:47 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   * doc/en/set.txt
     * Enhanced set dbflockscheme doc
 

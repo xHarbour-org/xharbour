@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.116 2004/07/22 21:19:56 peterrees Exp $
+ * $Id: gtwvt.c,v 1.117 2004/07/23 04:39:01 paultucker Exp $
  */
 
 /*
@@ -149,9 +149,7 @@ static void    hb_wvt_gtResetWindowSize( HWND hWnd );
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static BOOL    hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row );
 static DWORD   hb_wvt_gtProcessMessages( void );
-#if 0
 static BOOL    hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int width );
-#endif
 static void    hb_wvt_gtSetCaretOn( BOOL bOn );
 static BOOL    hb_wvt_gtSetCaretPos( void );
 static void    hb_wvt_gtValidateCaret( void );
@@ -765,13 +763,10 @@ BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
          {
             // make sure that the mode selected along with the current
             // font settings will fit in the window
-            //
-            // JC1: See my note
-            //
-            //if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
-            //{
+            if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
+            {
               bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
-            //}
+            }
             DeleteObject( hFont );
          }
       }
@@ -1525,7 +1520,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
 }
 
 //-------------------------------------------------------------------//
-#if 0
+
 static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidth )
 {
   HDC        hdc;
@@ -1550,7 +1545,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
 
   return( ( width <= maxWidth ) && ( height <= maxHeight ) );
 }
-#endif
+
 //-------------------------------------------------------------------//
 
 static void hb_wvt_gtResetWindowSize( HWND hWnd )
@@ -3250,13 +3245,8 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
   {
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
-    //
-    //JC1: There's definitely something WRONG with this way of thinking.
-    // This makes effectively impossible to enlarge the window from it's
-    // initial size.
-    //
-    // if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
-    // {
+    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
+    {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
       _s.fontWeight  = Bold;
@@ -3279,7 +3269,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
         hb_wvt_gtCreateCaret();
       }
       bResult= TRUE;
-    //}
+    }
     DeleteObject( hFont );
   }
   return( bResult );
