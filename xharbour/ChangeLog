@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3330 2004/08/23 22:41:28 druzus Exp $
+ * $Id: ChangeLog,v 1.3331 2004/08/24 00:30:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-23 19:14 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/vm/arrayshb.c
+    ! Fixed GPF Trap in HB_arrayId()
 
 2004-08-24 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/workarea.c
@@ -42,7 +46,7 @@
 2004-08-21 19:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/compiler/gencobj.c
     * Cleanup and added some printfs to help to debug -go mode
-  + contrib/xwt/src/notebook.prg 
+  + contrib/xwt/src/notebook.prg
   + contrib/src/xwt_gtk/xwt_gtk_notebook.c
     * added notebook (folder) widget
   + contrib/xwt/src/editbox.prg

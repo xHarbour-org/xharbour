@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.46 2004/07/20 20:46:18 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.47 2004/07/30 18:23:20 ronpinkas Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
-   if( HB_IS_ARRAY(pArray) )
+   if( pArray )
    {
       hb_retptr( ( void * ) pArray->item.asArray.value );
    }
