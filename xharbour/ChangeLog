@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3208 2004/07/24 09:19:50 likewolf Exp $
+ * $Id: ChangeLog,v 1.3209 2004/07/24 23:08:15 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-07-27 17:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+2004-07-24 17:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg
     ! Fixed bug which leaves "blank" lines at the top of the browse.
     - Removed ::ForceStabilize(). ::ForceStable() performs all the work.
