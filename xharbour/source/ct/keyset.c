@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.2 2004/11/21 21:43:47 druzus Exp $
+ * $Id: keyset.c,v 1.3 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -151,6 +151,7 @@ static void SetGet( char cKey )
 static BOOL hb_SetKeyBoardState( USHORT uKey, BOOL bOn )
 {
    BYTE kbBuffer[ 256 ];
+   BOOL bRetval;
 
    GetKeyboardState( kbBuffer );
 
@@ -169,7 +170,10 @@ static BOOL hb_SetKeyBoardState( USHORT uKey, BOOL bOn )
       }
    }
 
-   SetKeyboardState( kbBuffer );
+   bRetval = SetKeyboardState( kbBuffer );
+
+   return bRetval;
+
 }
 
 HB_FUNC (KSETINS)

@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.14 2004/09/16 00:00:00 modalsist Exp $
+ * $Id: alert.prg,v 1.14 2004/09/16 15:26:48 modalsist Exp $
  */
 
 /*
@@ -527,55 +527,20 @@ PROCEDURE __NONOALERT()
 STATIC FUNCTION COLORLETTER( cColor )
 
 Local nColor
+Local aColor := {"N","B","G","BG","R","RB","GR","W","N+",;
+                 "B+","G+","BG+","R+","RB+","GR+","W+"}
 
   if !IsCharacter( cColor )
      cColor:=""
   endif
-     
+
   cColor := StrTran( cColor, " ","")
   cColor := StrTran( cColor, "*","")
   cColor := StrTran( cColor, "+","")
-  
-  nColor := Abs( Val( cColor ) )
-  
 
-  if nColor=0
-     cColor:="N"
-  elseif nColor=1
-     cColor:="B"
-  elseif nColor=2
-     cColor:="G"
-  elseif nColor=3
-     cColor:="BG"
-  elseif nColor=4
-     cColor:="R"
-  elseif nColor=5
-     cColor:="RB"
-  elseif nColor=6
-     cColor:="GR"
-  elseif nColor=7
-     cColor:="W"
-  elseif nColor=8
-     cColor:="N+"
-  elseif nColor=9
-     cColor:="B+"
-  elseif nColor=10
-     cColor:="G+"
-  elseif nColor=11
-     cColor:="BG+"
-  elseif nColor=12
-     cColor:="R+"
-  elseif nColor=13
-     cColor:="RB+"
-  elseif nColor=14
-     cColor:="GR+"
-  elseif nColor=15
-     cColor:="W+"
-  else
-     cColor:="W+" // 15 is the max.
-  endif   
+  nColor := Min( Abs( Val( cColor ) ), 15 )
 
-RETURN ( cColor )
+RETURN (  cColor := aColor[ nColor + 1 ] )
 
 //-----------------------------------//
 // 2004/Setp/15 - Eduardo Fernandes
@@ -591,33 +556,5 @@ cColor := StrTran( cColor, "*","" )
 cColor := StrTran( cColor, "+","" )
 cColor := Upper( cColor )
 
-if cColor=="0"  .or.;
-   cColor=="1"  .or.;
-   cColor=="2"  .or.;
-   cColor=="3"  .or.;
-   cColor=="4"  .or.;
-   cColor=="5"  .or.;
-   cColor=="6"  .or.;
-   cColor=="7"  .or.;
-   cColor=="8"  .or.;
-   cColor=="9"  .or.;
-   cColor=="10" .or.;
-   cColor=="11" .or.;
-   cColor=="12" .or.;
-   cColor=="13" .or.;
-   cColor=="14" .or.;
-   cColor=="15" .or.;
-   cColor=="B"  .or.;
-   cColor=="BG" .or.;
-   cColor=="G"  .or.;
-   cColor=="GR" .or.;
-   cColor=="N"  .or.;
-   cColor=="R"  .or.;
-   cColor=="RB" .or.;
-   cColor=="W"  
-
-   Return .T.
-   
-ENDIF
-
-Return .F.   
+Return cColor IN { "0","1","2","3","4","5","6","7","8","9","10","11","12",;
+                   "13","14","15","B","BG","G","GR","N","R","RB","W"}
