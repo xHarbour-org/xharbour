@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.11 2003/11/07 18:20:53 jonnymind Exp $
+ * $Id: alert.prg,v 1.12 2004/06/30 03:25:57 paultucker Exp $
  */
 
 /*
@@ -332,20 +332,21 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
             CASE K_LBUTTONDOWN
 
-               nMRow := MRow()
-               nMCol := MCol()
+               nMRow  := MRow()
+               nMCol  := MCol()
+               nPos   := 0
+               nCount := Len( aSay )
 
-               nChoice := 0
-               nCount  := Len( aSay )
                FOR EACH cEval IN aOptionsOK
                   IF nMRow == nInitRow + nCount + 2 .AND. ;
                        INRANGE( aPos[ HB_EnumIndex() ], nMCol, aPos[ HB_EnumIndex() ] + Len( cEval ) + 2 - 1 )
-                     nChoice := HB_EnumIndex()
+                     nPos := HB_EnumIndex()
                      EXIT
                   ENDIF
                NEXT
 
-               IF nChoice > 0
+               IF nPos > 0
+                  nChoice := nPos
                   lWhile := .F.
                ENDIF
 
