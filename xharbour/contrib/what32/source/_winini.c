@@ -65,32 +65,67 @@
 //-----------------------------------------------------------------------------
 HB_FUNC (GETPROFILESTRING )
 {
-   TCHAR bBuffer[ 1024 ] = { 0 };
+   DWORD nSize = 1024 ;
+   LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection = hb_parc( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
+   char * lpSection = ISNIL( 1 ) ? NULL : hb_parc( 1 ) ;
+   char * lpEntry   = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
    char * lpDefault = hb_parc ( 3 );
-   dwLen = GetProfileString( lpSection , lpEntry ,lpDefault , bBuffer, sizeof( bBuffer ) );
+
+   while ( TRUE )
+   {
+      dwLen = GetProfileString( lpSection , lpEntry ,lpDefault , bBuffer, nSize );
+      if ( ( ( ( lpSection == NULL ) || ( lpEntry == NULL ) ) && ( nSize - dwLen == 2 ) ) || ( ( lpSection && lpEntry ) && ( nSize - dwLen == 1 ) ) )
+      { 
+        hb_xfree( bBuffer ) ;
+        nSize *= 2 ; 
+        bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
+      }
+      else
+        break ;               
+
+   }   
+  
    if( dwLen )
      hb_retclen( ( char * ) bBuffer, dwLen );
    else
       hb_retc( lpDefault );
+
+   hb_xfree( bBuffer ) ;
+
 }
 
 //-----------------------------------------------------------------------------
 HB_FUNC (GETPRIVATEPROFILESTRING )
 {
-   TCHAR bBuffer[ 1024 ] = { 0 };
+   DWORD nSize = 1024 ;
+   LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection = hb_parc( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
-   char * lpDefault = hb_parc( 3 );
+   char * lpSection  = ISNIL( 1 ) ? NULL : hb_parc( 1 );
+   char * lpEntry    = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
+   char * lpDefault  = hb_parc( 3 );
    char * lpFileName = hb_parc( 4 );
-   dwLen = GetPrivateProfileString( lpSection , lpEntry ,lpDefault , bBuffer, sizeof( bBuffer ) , lpFileName);
+
+   while ( TRUE )
+   {
+      dwLen = GetPrivateProfileString( lpSection , lpEntry ,lpDefault , bBuffer, nSize , lpFileName) ;
+      if ( ( ( ( lpSection == NULL ) || ( lpEntry == NULL ) ) && ( nSize - dwLen == 2 ) ) || ( ( lpSection && lpEntry ) && ( nSize - dwLen == 1 ) ) )
+      { 
+        hb_xfree( bBuffer ) ;
+        nSize *= 2 ; 
+        bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
+      }
+      else
+        break ;               
+
+   }   
    if( dwLen )
      hb_retclen( ( char * ) bBuffer, dwLen );
    else
       hb_retc( lpDefault );
+
+   hb_xfree( bBuffer ) ;
+
 }
 
 //-----------------------------------------------------------------------------
