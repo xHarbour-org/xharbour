@@ -1,0 +1,97 @@
+#
+# $Id$
+#
+
+#
+# Directory macros. These should never have to change.
+#
+
+BIN_DIR     = ..\..\bin
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = ..\..\obj\vc
+INCLUDE_DIR = ..\..\include
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CC = cl
+C_FLAGS = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DWIN32 $(C_USR) $(CFLAGS)
+CLIBFLAGS = $(C_FLAGS) -c
+CLIBFLAGSDEBUG = $(CLIBFLAGS) -Zi
+
+#
+# Macros to access our library names
+#
+
+DESIGN_LIB = $(LIB_DIR)\design.lib
+HARBOUR_EXE = $(BIN_DIR)\harbour.exe
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
+
+#
+# OBJ list for design.lib
+#
+
+DESIGN_LIB_OBJS = \
+   $(OBJ_DIR)\general.obj  \
+   $(OBJ_DIR)\tbox.obj     \
+   $(OBJ_DIR)\tcheck.obj   \
+   $(OBJ_DIR)\tmenu.obj    \
+   $(OBJ_DIR)\tradio.obj   \
+   $(OBJ_DIR)\twindow.obj
+
+#
+# Our default target
+#
+
+all: $(DESIGN_LIB)
+
+CLEAN:
+   -@if exist $(DESIGN_LIB)            del $(DESIGN_LIB)
+   -@if exist $(OBJ_DIR)\general.c     del $(OBJ_DIR)\general.c
+   -@if exist $(OBJ_DIR)\general.obj   del $(OBJ_DIR)\general.obj
+   -@if exist $(OBJ_DIR)\tbox.c        del $(OBJ_DIR)\tbox.c
+   -@if exist $(OBJ_DIR)\tbox.obj      del $(OBJ_DIR)\tbox.obj
+   -@if exist $(OBJ_DIR)\tcheck.c      del $(OBJ_DIR)\tcheck.c
+   -@if exist $(OBJ_DIR)\tcheck.obj    del $(OBJ_DIR)\tcheck.obj
+   -@if exist $(OBJ_DIR)\tmenu.c       del $(OBJ_DIR)\tmenu.c
+   -@if exist $(OBJ_DIR)\tmenu.obj     del $(OBJ_DIR)\tmenu.obj
+   -@if exist $(OBJ_DIR)\tradio.c      del $(OBJ_DIR)\tradio.c
+   -@if exist $(OBJ_DIR)\tradio.obj    del $(OBJ_DIR)\tradio.obj
+   -@if exist $(OBJ_DIR)\twindow.c     del $(OBJ_DIR)\twindow.c
+   -@if exist $(OBJ_DIR)\twindow.obj   del $(OBJ_DIR)\twindow.obj
+
+#
+# Library dependencies and build rules
+#
+
+$(DESIGN_LIB) : $(DESIGN_LIB_OBJS)
+    lib /OUT:$(DESIGN_LIB) $(DESIGN_LIB_OBJS)
+
+#
+# DESIGN.LIB dependencies
+#
+
+$(OBJ_DIR)\general.obj : general.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\tbox.obj : tbox.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\tcheck.obj : tcheck.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\tradio.obj : tradio.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\tmenu.obj : tmenu.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\twindow.obj : twindow.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c

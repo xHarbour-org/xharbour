@@ -1,0 +1,39 @@
+#
+# $Id$
+#
+
+# makefile for Borland C/C++ 32 bits
+# Building of design.lib - xHarbour Screen Designer
+
+INCLUDE_DIR = ..\..\include
+BIN_DIR = ..\..\bin\b32
+OBJ_DIR = ..\..\obj\b32
+LIB_DIR = ..\..\lib\b32
+
+$(LIB_DIR)\design.lib :   \
+   $(OBJ_DIR)\general.obj  \
+   $(OBJ_DIR)\tbox.obj     \
+   $(OBJ_DIR)\tcheck.obj   \
+   $(OBJ_DIR)\tmenu.obj    \
+   $(OBJ_DIR)\tradio.obj   \
+   $(OBJ_DIR)\twindow.obj
+
+$(OBJ_DIR)\general.c   : general.prg
+$(OBJ_DIR)\general.obj : $(OBJ_DIR)\general.c
+$(OBJ_DIR)\tbox.c      : tbox.prg
+$(OBJ_DIR)\tbox.obj    : $(OBJ_DIR)\tbox.c
+$(OBJ_DIR)\tcheck.c    : tcheck.prg
+$(OBJ_DIR)\tcheck.obj  : $(OBJ_DIR)\tcheck.c
+$(OBJ_DIR)\tmenu.c     : tmenu.prg
+$(OBJ_DIR)\tmenu.obj   : $(OBJ_DIR)\tmenu.c
+$(OBJ_DIR)\tradio.c    : tradio.prg
+$(OBJ_DIR)\tradio.obj  : $(OBJ_DIR)\tradio.c
+$(OBJ_DIR)\twindow.c   : twindow.prg
+$(OBJ_DIR)\twindow.obj : $(OBJ_DIR)\twindow.c
+
+.c.obj:
+  bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
+  tlib $(LIB_DIR)\design.lib -+$@,,
+
+.prg.c:
+  $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@
