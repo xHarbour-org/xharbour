@@ -1,6 +1,6 @@
 /*
  *
- * $Id: dbf2pg.prg,v 1.5 2004/04/30 18:23:35 rodrigo_moreno Exp $
+ * $Id: dbf2pg.prg,v 1.6 2004/07/13 14:34:25 rodrigo_moreno Exp $
  *
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table
@@ -71,7 +71,6 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
    Local dType
    Local cValue
    Local nCommit := 100
-   Local cError
    Local nHandle
    Local nCount := 0
    Local nRecno := 0
@@ -253,9 +252,13 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
             end            
             
             if ! ISNIL(cValue)
-                oRecord:FieldPut(i, cValue)
-            end             
-         end
+                if oRecord:Fieldtype(i) == 'C' .or. oRecord:Fieldtype(i) == 'M'                    
+                    oRecord:FieldPut(i, hb_oemtoansi(cValue))
+                else                    
+                    oRecord:FieldPut(i, cValue)
+                endif                                        
+            endif
+         endif
       next
 
       oTable:Append(oRecord)
@@ -264,7 +267,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
          ?
          ? "Error Record: ", recno(), left(oTable:Error(),70)
          ? 
-         FWrite( nHandle, "Error at record: " + Str(recno()) + " Description: " + cError + CRLF )         
+         FWrite( nHandle, "Error at record: " + Str(recno()) + " Description: " + oTable:Error() + CRLF )         
       else
          nCount++         
       endif
