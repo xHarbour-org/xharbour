@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.25 2004/02/16 04:02:13 brianhays Exp $
+ * $Id: adsfunc.c,v 1.26 2004/02/16 06:40:55 paultucker Exp $
  */
 
 /*
@@ -996,7 +996,7 @@ HB_FUNC( ADSENABLEENCRYPTION )
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
-      ulRetVal = AdsEnableEncryption( pArea->hTable, ( BYTE * ) pucPassword );
+      ulRetVal = AdsEnableEncryption( pArea->hTable, ( UNSIGNED8 * ) pucPassword );
       hb_retni( ulRetVal );
    }
    else
@@ -1568,12 +1568,12 @@ HB_FUNC( ADSGETNUMOPENTABLES )
 
 HB_FUNC( ADSSHOWERROR )
 {
-   char * pucTitle;
+   UNSIGNED8 * pucTitle;
    if( ISCHAR( 1 ) )
    {
-      pucTitle = (char *) hb_parc( 1 );
+      pucTitle = (UNSIGNED8 *) hb_parc( 1 );
    }
-   AdsShowError( (BYTE *)pucTitle );
+   AdsShowError( pucTitle );
 }
 
 
