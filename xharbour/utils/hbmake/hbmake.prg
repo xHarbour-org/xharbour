@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.62 2003/03/31 16:21:23 lculik Exp $
+ * $Id: hbmake.prg,v 1.63 2003/04/01 23:15:34 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -107,6 +107,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nLang    := GETUSERLANG()
 
    Ferase( "Test.out" )
+   Ferase( s_cLinker )
 
    IF Pcount() == 0
       s_cDefLang      := IIF( nLang == 1, "PT", IIF( nLang == 2, "EN", "ES" ) )
