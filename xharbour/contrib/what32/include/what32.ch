@@ -41,9 +41,11 @@ GET < Var > ;
 [ < lAllowOverstrike: OVERSTRIKE > ] ;
 [ < lWantEnter: LIKEDOS > ] ;
 [ IN < oObj > ] ;
+[ FONT < hFont > ] ;
+[ < lReadOnly: READONLY > ] ;
 = > aAdd( ;
           GetList, ;
-          [< oObj > := ] WinGet( GetDlgItem( < hWndDlg > , < nId > ) , < Var > , < pic > , < { when } > , < { valid } > , < cColorSpec > , < .lAllowOverstrike. > , < .lWantEnter. > ) ;
+          [< oObj > := ] WinGet( GetDlgItem( < hWndDlg > , < nId > ) , < Var > , < pic > , < { when } > , < { valid } > , < cColorSpec > , < .lAllowOverstrike. > , < .lWantEnter. >, <hFont>, < .lReadOnly. > ) ;
         )
 
         
