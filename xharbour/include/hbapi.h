@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.17 2002/04/22 23:09:58 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.18 2002/04/28 03:08:04 ronpinkas Exp $
  */
 
 /*
@@ -306,55 +306,57 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_retc_const( szText )                    hb_retcStatic( szText )
 #define hb_itemArrayPut ( pArray, ulIndex, pItem ) ( hb_arraySet( pArray, ulIndex, pItem ), pArray )
 
+#define HB_API_MACROS
+
 #ifdef HB_API_MACROS
+   #include "hbapiitm.h"
+   #include "hbstack.h"
 
-#include "hbapiitm.h"
-#include "hbstack.h"
+    #define hb_pcount()                          ( ( int ) ( * hb_stack.pBase )->item.asSymbol.paramcnt )
 
-#define hb_pcount()                          ( ( int ) ( * hb_stack.pBase )->item.asSymbol.paramcnt )
-
-#define hb_ret()                             hb_itemClear( &hb_stack.Return )
-#define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )
-#define hb_retc( szText )                    hb_itemPutC( &hb_stack.Return, szText )
-#define hb_retcAdopt( szText )               hb_itemPutCPtr( &hb_stack.Return, szText, strlen( szText ) )
-#define hb_retcStatic( szText )              hb_itemPutCConst( &hb_stack.Return, szText )
-#define hb_retclen( szText, ulLen )          hb_itemPutCL( &hb_stack.Return, szText, ulLen )
-#define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &hb_stack.Return, szText, ulLen )
-#define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &hb_stack.Return, szText )
-#define hb_retds( szDate )                   hb_itemPutDS( &hb_stack.Return, szDate )
-#define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &hb_stack.Return, lYear, lMonth, lDay )
-#define hb_retdl( lJulian )                  hb_itemPutDL( &hb_stack.Return, lJulian )
-#define hb_retl( iLogical )                  hb_itemPutL( &hb_stack.Return, iLogical ? TRUE : FALSE )
-#define hb_retnd( dNumber )                  hb_itemPutND( &hb_stack.Return, dNumber )
-#define hb_retni( iNumber )                  hb_itemPutNI( &hb_stack.Return, iNumber )
-#define hb_retnl( lNumber )                  hb_itemPutNL( &hb_stack.Return, lNumber )
-#define hb_retnlen( dNumber, iWidth, iDec )  hb_itemPutNLen( &hb_stack.Return, dNumber, iWidth, iDec )
-#define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, dNumber, iWidth, iDec )
-#define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, iNumber, iWidth )
-#define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth )
-#define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
-
+    #define hb_ret()                             hb_itemClear( &hb_stack.Return )
+    #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )
+    #define hb_retc( szText )                    hb_itemPutC( &hb_stack.Return, szText )
+    #define hb_retcAdopt( szText )               hb_itemPutCPtr( &hb_stack.Return, szText, strlen( szText ) )
+    #define hb_retcStatic( szText )              hb_itemPutCConst( &hb_stack.Return, szText )
+    #define hb_retclen( szText, ulLen )          hb_itemPutCL( &hb_stack.Return, szText, ulLen )
+    #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &hb_stack.Return, szText, ulLen )
+    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &hb_stack.Return, szText )
+    #define hb_retds( szDate )                   hb_itemPutDS( &hb_stack.Return, szDate )
+    #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &hb_stack.Return, lYear, lMonth, lDay )
+    #define hb_retdl( lJulian )                  hb_itemPutDL( &hb_stack.Return, lJulian )
+    #define hb_retl( iLogical )                  hb_itemPutL( &hb_stack.Return, iLogical ? TRUE : FALSE )
+    #define hb_retnd( dNumber )                  hb_itemPutND( &hb_stack.Return, dNumber )
+    #define hb_retni( iNumber )                  hb_itemPutNI( &hb_stack.Return, iNumber )
+    #define hb_retnl( lNumber )                  hb_itemPutNL( &hb_stack.Return, lNumber )
+    #define hb_retnlen( dNumber, iWidth, iDec )  hb_itemPutNLen( &hb_stack.Return, dNumber, iWidth, iDec )
+    #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, dNumber, iWidth, iDec )
+    #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, iNumber, iWidth )
+    #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth )
+    #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
 #else
+    extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
-extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
-
-extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */
-extern void  HB_EXPORT  hb_retc( char * szText );   /* returns a string */
-extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
-extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
-extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
-extern void  HB_EXPORT  hb_retdl( long lJulian );   /* returns a long value as a julian date */
-extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
-extern void  HB_EXPORT  hb_retnd( double dNumber ); /* returns a double */
-extern void  HB_EXPORT  hb_retni( int iNumber );    /* returns a integer number */
-extern void  HB_EXPORT  hb_retnl( long lNumber );   /* returns a long number */
-extern void  HB_EXPORT  hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-extern void  HB_EXPORT  hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
-extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
-extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
-extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
-
+    extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */
+    extern void  HB_EXPORT  hb_retc( char * szText );   /* returns a string */
+    extern void  HB_EXPORT  hb_retcAdopt( char * szText );
+    extern void  HB_EXPORT  hb_retcStatic( char * szText );
+    extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
+    extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
+    extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
+    extern void  HB_EXPORT  hb_retdl( long lJulian );   /* returns a long value as a julian date */
+    extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
+    extern void  HB_EXPORT  hb_retnd( double dNumber ); /* returns a double */
+    extern void  HB_EXPORT  hb_retni( int iNumber );    /* returns a integer number */
+    extern void  HB_EXPORT  hb_retnl( long lNumber );   /* returns a long number */
+    extern void  HB_EXPORT  hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+    extern void  HB_EXPORT  hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+    extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
+    extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
+    extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
+    extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
 #endif
 
 extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.28 2002/04/23 05:01:41 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.29 2002/04/28 03:08:04 ronpinkas Exp $
  */
 
 /*
@@ -497,6 +497,7 @@ void hb_itemPushStaticString( char * szText, ULONG length )
    hb_stackPush();
 }
 
+#undef hb_retcAdopt
 void hb_retcAdopt( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
@@ -522,6 +523,7 @@ void hb_retcAdopt( char * szText )
    ( &hb_stack.Return )->item.asString.length  = strlen( szText );
 }
 
+#undef hb_retclenAdopt
 void hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
@@ -549,6 +551,7 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
    ( &hb_stack.Return )->item.asString.length  = ulLen;
 }
 
+#undef hb_retcStatic
 void hb_retcStatic( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
@@ -572,6 +575,7 @@ void hb_retcStatic( char * szText )
    ( &hb_stack.Return )->item.asString.length  = strlen( szText );
 }
 
+#undef hb_retclenStatic
 void hb_retclenStatic( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );

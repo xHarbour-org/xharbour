@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.191 2002/05/01 19:04:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.192 2002/05/01 22:54:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-01 17:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+     + Added declaration of hb_retcAdopt(), hb_retcStatic(), hb_retclenAdopt(), hb_retclenStatic()
+     + Added #define HB_API_MACROS to force MACRO usage by default.
+
+   * include/hbfast.h
+     - Removed declaration of hb_retcAdopt(), hb_retcStatic(), hb_retclenAdopt(), hb_retclenStatic()
+
+   * source/vm/extend.c
+   * source/vm/fastitem.c
+     + Added #undef directive preceding each of the functions that have a MACRO version.
 
 2002-05-01 15:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbset.h

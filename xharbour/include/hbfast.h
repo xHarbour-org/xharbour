@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.8 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.9 2002/04/28 03:08:04 ronpinkas Exp $
  */
 
 /*
@@ -70,10 +70,7 @@
    extern void     hb_itemReleaseString( PHB_ITEM pItem );
    extern void     hb_itemFastClear( PHB_ITEM pItem );
    extern void     hb_itemPushStaticString( char * szText, ULONG length );
-   extern void     hb_retcAdopt( char * szText );
-   extern void     hb_retclenAdopt( char * szText, ULONG ulLen );
-   extern void     hb_retcStatic( char * szText );
-   extern void     hb_retclenStatic( char * szText, ULONG ulLen );
+
    extern USHORT   hb_itemArrayCyclicCount( PHB_ITEM pArray );
    extern USHORT   hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
    extern BYTE     hb_itemParamId( PHB_ITEM pItem );
