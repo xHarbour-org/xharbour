@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3392 2004/09/02 08:01:44 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3393 2004/09/03 01:34:43 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-09-03 14:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rdd/dbffpt/dbffpt1.c
+    +  added support for #define HB_FPT_USE_READLOCK & #define HB_FPT_NO_READLOCK
+    +  added hb_fptReadLock() & hb_fptReadUnLock()
+       Solves speed problem on Windows in shared network environment when a lot of memo
+       data is being read. Less "safe" than default build but necessary to get
+       acceptable performance when large databases with many memo fields are being read.
 
 2004-09-03 03:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdbferr.h
