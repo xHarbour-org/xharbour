@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1995 2004/01/05 18:59:27 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1996 2004/01/05 21:09:03 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-05 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbver.h
+  * bin/!pack_bin.bat
+  * bin/!pack_src.bat
+  * xharbour.spec
+    * Changed to 0.92.0
 
 2004-01-05 16:06 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makallvc.bat
@@ -20,7 +27,7 @@
   * bin/bld.bat
     * add -lgdi32 -lcomctl32 to mingw32 for gtwvt
   * source/rtl/gtwvt/gtwvt.c
-    * add HB_OS_WIN_32_USED and changed includes order 
+    * add HB_OS_WIN_32_USED and changed includes order
       to fix mingw32 warnings
   * source/rtl/filesys.c
     * add a __WATCOMC__ to fix OpenWatcom/W32 ferror()
@@ -51,12 +58,12 @@
 2004-01-05 01:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * utils/hbmake.prg
     utils/hbmutils.prg
-    ! minor fix for lib files include on linux 
+    ! minor fix for lib files include on linux
 
 2004-01-04 21:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * contrib/libct/net.c
     ! code formated and optimized
-                                                                           
+
 2004-01-04 15:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/libct/net.c
     ! Fixed few places where low level c worker was using hb_retl(...) instead of return,
