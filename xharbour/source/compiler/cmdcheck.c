@@ -738,23 +738,10 @@ void hb_compChkEnvironVar( char * szSwitch )
              /* Added for preprocessor needs */
              case 'p':
              case 'P':
-                hb_comp_bPPO = 1;
-
-                switch( *( s + 1 ) )
-                {
-                   case '-':
-                   {
-                      hb_comp_bPPO = 0;
-                      break;
-                   }
-                   case '0':
-                   {
-                      hb_comp_bPPO = 1;
-                      hb_comp_bPPO_Only = TRUE;
-                      break;
-                   }
-                }
-
+                if( *( s + 1 ) == '-' )
+                   hb_comp_bPPO = 0;
+                else
+                   hb_comp_bPPO = 1;
                 break;
 
              case 'q':

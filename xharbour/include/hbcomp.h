@@ -481,7 +481,6 @@ extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;
 extern PHB_FNAME      hb_comp_pFileName;
 extern BOOL           hb_comp_bPPO;
-extern BOOL           hb_comp_bPPO_Only;
 extern FILE *         hb_comp_yyppo;
 extern BOOL           hb_comp_bStartProc;
 extern BOOL           hb_comp_bLineNumbers;

@@ -162,7 +162,6 @@ PFUNCTION      hb_comp_pInitFunc;
 PFUNCTION      hb_comp_pGlobalsFunc;
 PHB_FNAME      hb_comp_pFileName = NULL;
 
-BOOL           hb_comp_bPPO_Only = FALSE;                 /* flag indicating, is only ppo output needed */
 BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
 FILE *         hb_comp_yyppo = NULL;                      /* output .ppo file */
 BOOL           hb_comp_bStartProc = TRUE;                 /* holds if we need to create the starting procedure */
@@ -4456,7 +4455,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       /* Local Variable List (.var) File
          hb_comp_iGenVarList is TRUE if /gc3 is used
       */
-      if ( hb_comp_iGenVarList && !hb_comp_bPPO_Only )
+      if ( hb_comp_iGenVarList )
       {
          hb_comp_pFileName->szExtension = ".var";
          hb_fsFNameMerge( szVarListName, hb_comp_pFileName );
@@ -4575,176 +4574,173 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_comp_yyppo = NULL;
             }
 
-            if ( !hb_comp_bPPO_Only )
+            /* Saving main file. */
+            pFileName = hb_comp_pFileName;
+
+            /* Open refernced modules. */
+            while( hb_comp_pAutoOpen )
             {
-               /* Saving main file. */
-               pFileName = hb_comp_pFileName;
+               PAUTOOPEN pAutoOpen = hb_comp_pAutoOpen;
 
-               /* Open refernced modules. */
-               while( hb_comp_pAutoOpen )
-               {
-                  PAUTOOPEN pAutoOpen = hb_comp_pAutoOpen;
+               hb_comp_pAutoOpen = hb_comp_pAutoOpen->pNext;
 
-                  hb_comp_pAutoOpen = hb_comp_pAutoOpen->pNext;
+               if( ! hb_compFunctionFind( pAutoOpen->szName ) )
+                  hb_compAutoOpen( pAutoOpen->szName, &bSkipGen );
 
-                  if( ! hb_compFunctionFind( pAutoOpen->szName ) )
-                     hb_compAutoOpen( pAutoOpen->szName, &bSkipGen );
+               hb_xfree( pAutoOpen->szName );
+               hb_xfree( pAutoOpen );
+            }
 
-                  hb_xfree( pAutoOpen->szName );
-                  hb_xfree( pAutoOpen );
-               }
+            /* Restoring main file. */
+            hb_comp_pFileName = pFileName;
 
-               /* Restoring main file. */
-               hb_comp_pFileName = pFileName;
+            /* Begin of finalization phase. */
 
-               /* Begin of finalization phase. */
+            /* fix all previous function returns offsets */
+            hb_compFinalizeFunction();
 
-               /* fix all previous function returns offsets */
-               hb_compFinalizeFunction();
+            hb_compExternGen();       /* generates EXTERN symbols names */
 
-               hb_compExternGen();       /* generates EXTERN symbols names */
+            if( hb_comp_pInitFunc )
+            {
+               PCOMSYMBOL pSym;
 
-               if( hb_comp_pInitFunc )
+               /* Fix the number of static variables */
+               hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
+               hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
+               hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
+
+               pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL );
+               pSym->cScope |= hb_comp_pInitFunc->cScope;
+               hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
+               hb_comp_functions.pLast = hb_comp_pInitFunc;
+               hb_compGenPCode1( HB_P_ENDPROC );
+               ++hb_comp_functions.iCount;
+            }
+
+            if( hb_comp_pGlobalsFunc )
+            {
+               PVAR pGlobal = hb_comp_pGlobals;
+
+               if( hb_comp_pGlobalsFunc->pCode )
                {
                   PCOMSYMBOL pSym;
 
-                  /* Fix the number of static variables */
-                  hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
-                  hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
-                  hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
-
-                  pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL );
-                  pSym->cScope |= hb_comp_pInitFunc->cScope;
-                  hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
-                  hb_comp_functions.pLast = hb_comp_pInitFunc;
+                  pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL );
+                  pSym->cScope |= hb_comp_pGlobalsFunc->cScope;
+                  hb_comp_functions.pLast->pNext = hb_comp_pGlobalsFunc;
+                  hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
                   hb_compGenPCode1( HB_P_ENDPROC );
                   ++hb_comp_functions.iCount;
                }
 
-               if( hb_comp_pGlobalsFunc )
+               // Any NON EXTERN Globals?
+               while( pGlobal )
                {
-                  PVAR pGlobal = hb_comp_pGlobals;
-
-                  if( hb_comp_pGlobalsFunc->pCode )
+                  if( pGlobal->szAlias == NULL )
                   {
-                     PCOMSYMBOL pSym;
-
-                     pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL );
-                     pSym->cScope |= hb_comp_pGlobalsFunc->cScope;
-                     hb_comp_functions.pLast->pNext = hb_comp_pGlobalsFunc;
-                     hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
-                     hb_compGenPCode1( HB_P_ENDPROC );
-                     ++hb_comp_functions.iCount;
+                     break;
                   }
 
-                  // Any NON EXTERN Globals?
-                  while( pGlobal )
+                  pGlobal = pGlobal->pNext;
+               }
+
+               // Yes.
+               if( pGlobal )
+               {
+                  PCOMSYMBOL pSym;
+
+                  pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL );
+                  pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;
+               }
+            }
+
+            if( hb_comp_szAnnounce )
+            {
+               hb_compAnnounce( hb_comp_szAnnounce );
+            }
+
+            /* End of finalization phase. */
+
+            // if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
+            if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
+            {
+               if( hb_comp_iErrorCount )
+               {
+                  iStatus = EXIT_FAILURE;
+                  bSkipGen = TRUE;
+                  printf( "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
+               }
+               else if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
+               {
+                  iStatus = EXIT_FAILURE;
+               }
+               else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+               {
+                  iStatus = EXIT_FAILURE;
+                  bSkipGen = TRUE;
+                  printf( "\nNo code generated.\n" );
+               }
+            }
+
+            if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
+            {
+               PFUNCTION pFunc;
+               char *szFirstFunction = NULL;
+
+               /* we create the output file name */
+               hb_compOutputFile();
+
+               if( ! hb_comp_bStartProc )
+               {
+                  --hb_comp_iFunctionCnt;
+               }
+
+               pFunc = hb_comp_functions.pFirst;
+
+               while( pFunc )
+               {
+                  bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp(pFunc->szName,"(_INITSTATICS)") > 0  ) ) ;
+
+                  /* Using function name as section name */
+                  if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
+
+                  hb_compOptimizeFrames( pFunc );
+
+                  /* Just a new line for readability */
+                  if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"\n");
+
+                  if( szFirstFunction == NULL && pFunc->szName[0] && ! ( pFunc->cScope & HB_FS_INIT || pFunc->cScope & HB_FS_EXIT ) )
                   {
-                     if( pGlobal->szAlias == NULL )
+                     szFirstFunction = pFunc->szName;
+                  }
+
+                  pFunc = pFunc->pNext;
+
+               }
+
+               if( szFirstFunction )
+               {
+                  PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
+
+                  while( pSym )
+                  {
+                     if( strcmp( pSym->szName, szFirstFunction ) == 0 )
                      {
+                        pSym->cScope |= HB_FS_FIRST;
                         break;
                      }
 
-                     pGlobal = pGlobal->pNext;
-                  }
-
-                  // Yes.
-                  if( pGlobal )
-                  {
-                     PCOMSYMBOL pSym;
-
-                     pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL );
-                     pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;
+                     pSym = pSym->pNext;
                   }
                }
 
-               if( hb_comp_szAnnounce )
+               if( ! hb_comp_bQuiet )
                {
-                  hb_compAnnounce( hb_comp_szAnnounce );
+                  printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
                }
 
-               /* End of finalization phase. */
-
-               // if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
-               if( hb_comp_iErrorCount || ( hb_comp_AmbiguousVar && hb_comp_bAnyWarning ) )
-               {
-                  if( hb_comp_iErrorCount )
-                  {
-                     iStatus = EXIT_FAILURE;
-                     bSkipGen = TRUE;
-                     printf( "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
-                  }
-                  else if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
-                  {
-                     iStatus = EXIT_FAILURE;
-                  }
-                  else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
-                  {
-                     iStatus = EXIT_FAILURE;
-                     bSkipGen = TRUE;
-                     printf( "\nNo code generated.\n" );
-                  }
-               }
-
-               if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
-               {
-                  PFUNCTION pFunc;
-                  char *szFirstFunction = NULL;
-
-                  /* we create the output file name */
-                  hb_compOutputFile();
-
-                  if( ! hb_comp_bStartProc )
-                  {
-                     --hb_comp_iFunctionCnt;
-                  }
-
-                  pFunc = hb_comp_functions.pFirst;
-
-                  while( pFunc )
-                  {
-                     bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp(pFunc->szName,"(_INITSTATICS)") > 0  ) ) ;
-
-                     /* Using function name as section name */
-                     if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
-
-                     hb_compOptimizeFrames( pFunc );
-
-                     /* Just a new line for readability */
-                     if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"\n");
-
-                     if( szFirstFunction == NULL && pFunc->szName[0] && ! ( pFunc->cScope & HB_FS_INIT || pFunc->cScope & HB_FS_EXIT ) )
-                     {
-                        szFirstFunction = pFunc->szName;
-                     }
-
-                     pFunc = pFunc->pNext;
-
-                  }
-
-                  if( szFirstFunction )
-                  {
-                     PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
-
-                     while( pSym )
-                     {
-                        if( strcmp( pSym->szName, szFirstFunction ) == 0 )
-                        {
-                           pSym->cScope |= HB_FS_FIRST;
-                           break;
-                        }
-
-                        pSym = pSym->pNext;
-                     }
-                  }
-
-                  if( ! hb_comp_bQuiet )
-                  {
-                     printf( "\rLines %i, Functions/Procedures %i\n", hb_comp_iLine, hb_comp_iFunctionCnt );
-                  }
-
-                  hb_compGenOutput( hb_comp_iLanguage, szSourceExtension, szSourcePath );
-               }
+               hb_compGenOutput( hb_comp_iLanguage, szSourceExtension, szSourcePath );
             }
          }
          else
