@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.4 2002/02/02 10:52:37 lculik Exp $
+ * $Id: isprint.c,v 1.5 2002/04/28 01:34:22 lculik Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 #include "hbapifs.h"
 #include "hbset.h"
 #include "hbapiitm.h"
-#if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
+#if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
 
    #include <stdio.h>
    #include <malloc.h>
@@ -92,29 +92,29 @@ BOOL hb_printerIsReady( char * pszPrinterName )
 
    {
       USHORT uiPort;
-      
+
       if( hb_strnicmp( pszPrinterName, "PRN", 3 ) == 0 )
       {
          union REGS regs;
-      
+
          regs.h.ah = 2;
          regs.HB_XREGS.dx = 0; /* LPT1 */
-      
+
          HB_DOS_INT86( 0x17, &regs, &regs );
-      
+
          bIsPrinter = ( regs.h.ah == 0x90 );
       }
-      else if( strlen( pszPrinterName ) >= 4 && 
-               hb_strnicmp( pszPrinterName, "LPT", 3 ) == 0 && 
+      else if( strlen( pszPrinterName ) >= 4 &&
+               hb_strnicmp( pszPrinterName, "LPT", 3 ) == 0 &&
                ( uiPort = atoi( pszPrinterName + 3 ) ) > 0 )
       {
          union REGS regs;
-      
+
          regs.h.ah = 2;
          regs.HB_XREGS.dx = uiPort - 1;
-      
+
          HB_DOS_INT86( 0x17, &regs, &regs );
-      
+
          bIsPrinter = ( regs.h.ah == 0x90 );
       }
       else
@@ -444,7 +444,7 @@ HB_FUNC(GETPRINTERS)
     }
    hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
 
-}    
+}
 
 
 #endif

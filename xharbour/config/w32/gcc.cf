@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.12 2001/12/26 21:21:08 dholm Exp $
+# $Id: gcc.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -38,7 +38,7 @@ LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # This library is needed for CharToOemBuff() and OemToCharBuff() support.
-LINKLIBS += -luser32 -lwinspool
+# LINKLIBS += -luser32 -lwinspool
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.3 2002/05/03 00:34:02 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.4 2002/05/03 00:46:25 ronpinkas Exp $
  */
 
 /*
@@ -428,14 +428,13 @@ RETURN uObj
     #define __FLAT__ 1
   #endif
 
+  #include <ctype.h>
+
   #include <Windows.h>
   #include <Ole2.h>
-
   #include <OleAuto.h>
   #include <OleDB.h>
   #include <ShlObj.h>
-
-  #include <ctype.h>
 
   #undef  WORD
   #define WORD  unsigned short
@@ -820,8 +819,8 @@ RETURN uObj
   HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR wCLSID;
-     GUID ClassID, iid;
-     /*REFIID*/ struct _GUID *riid = (struct _GUID *) &IID_IDispatch;
+     IID ClassID, iid;
+     LPIID riid;
      IDispatch * pDisp = NULL;
 
      nOleError = S_OK;
@@ -839,11 +838,11 @@ RETURN uObj
 
         if ( hb_parc( 1 )[ 0 ] == '{' )
         {
-           nOleError = CLSIDFromString( wCLSID, &ClassID );
+           nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
         }
         else
         {
-           nOleError = CLSIDFromProgID( wCLSID, &ClassID );
+           nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
         }
 
         hb_xfree( wCLSID );
@@ -866,7 +865,7 @@ RETURN uObj
 
         if ( nOleError == S_OK )
         {
-           nOleError = CoCreateInstance( &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
+           nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
         }
      }
 

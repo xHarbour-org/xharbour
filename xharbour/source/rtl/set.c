@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.8 2002/04/28 21:57:33 lculik Exp $
+ * $Id: set.c,v 1.9 2002/04/29 19:21:37 lculik Exp $
  */
 
 /*
@@ -574,14 +574,16 @@ HB_FUNC( SET )
          hb_retl( hb_set.HB_SET_DELIMITERS );
          if( args > 1 ) hb_set.HB_SET_DELIMITERS = set_logical( pArg2 );
          break;
+
       case HB_SET_DEVICE     :
          if( hb_set.HB_SET_DEVICE ) hb_retc( hb_set.HB_SET_DEVICE );
          else hb_retc( NULL );
+
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /*Check if the SET_PRINTFILE start with WIN:*/
            char   szTemp[5] ={0} ;
-           char * szResult; 
+           char * szResult;
            char * sPrinterName;
            strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
            szResult=hb_strupr(szTemp);
@@ -590,19 +592,29 @@ HB_FUNC( SET )
                sPrinterName = hb_set.HB_SET_PRINTFILE + 4;
                hb_set.hb_set_winprinter=TRUE;
            }
-         
+
             /* If the print file is not already open, open it in overwrite mode. */
             hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
 
-            if ( !hb_set.hb_set_winprinter) 
-                if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan == FS_ERROR
-                && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
-                   hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
-      #if defined(HB_OS_WIN_32)            
+            if ( ! hb_set.hb_set_winprinter )
+            {
+               if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 &&
+                   hb_set.hb_set_printhan == FS_ERROR &&
+                   hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+               {
+                  hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
+               }
+            }
+      #if defined(HB_OS_WIN_32)
             else
-                if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan == FS_ERROR
-                && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
-                   hb_set.hb_set_winhan = openw_handle(sPrinterName,HB_SET_PRINTFILE);
+            {
+               if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 &&
+                   hb_set.hb_set_winhan == FS_ERROR &&
+                   hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+               {
+                  hb_set.hb_set_winhan = openw_handle(sPrinterName,HB_SET_PRINTFILE);
+               }
+            }
       #endif
          }
          break;
@@ -743,7 +755,7 @@ HB_FUNC( SET )
            if (hb_stricmp(szResult, "WIN:") == 0)
                bOpen=FALSE;
            if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ {
-                bOpen=FALSE;  
+                bOpen=FALSE;
                 hb_set.hb_set_printerjob=hb_set.HB_SET_PRINTFILE + 4;
                 }
 

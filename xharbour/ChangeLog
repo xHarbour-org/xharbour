@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.198 2002/05/03 00:34:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.199 2002/05/03 01:25:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-03 00:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * config/w32/gcc.cf
+     - removed user32 and winspool from added libs.
+
+   * source/rtl/isprint.c
+     - removed  && !defined(__CYGWIN__) from line 70
+
+   * source/rtl/set.c
+     ! Corrected ambigious else.
+
+   * source/rtl/win32ole.prg
+     * Corrected some declarations and type casts.
 
 2002-05-02 17:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    + tests/testole.prg
