@@ -30,22 +30,20 @@ Static aProc       // array of possible windows procedures (10)
                    // for subclassing ???
 
 
-/*
+
 GLOBAL lPrevInstance
 GLOBAL hThisInstance
 
 *-----------------------------------------------------------------------------*
 
 INIT PROCEDURE _CheckMultiInst
-
+   
    lPrevInstance:=(empty(CreateMutex( , .T., GetModuleFileName())) ;
                    .or. (GetLastError() > 0) )
 
-   hThisInstance:=GetModuleHandle()
-
+   hThisInstance:=_getinstance()
+   
    RETURN
-*/
-
 
 *-----------------------------------------------------------------------------*
 FUNCTION WhatVersion(dDate)

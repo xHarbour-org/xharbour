@@ -378,11 +378,10 @@ HB_FUNC (GETLASTERROR )
 HB_FUNC( FORMATMESSAGE)
 {
 
-DWORD FormatMessage(
-  DWORD dwFlags,      // source and processing options
-  LPCVOID lpSource,   // pointer to  message source
-  DWORD dwMessageId,  // requested message identifier
-  DWORD dwLanguageId, // language identifier for requested message
+   hb_retnl( FormatMessage( (DWORD) hb_parnl( 1 )           ,   // source and processing options
+                            ISNIL( 2) ? NULL : hb_parc( 2 ) ,   // pointer to  message source
+                            (DWORD) hb_parnl( 3 )           ,  // requested message identifier
+                            (DWORD) hb_parnl( 4 )           , // language identifier for requested message
   LPTSTR lpBuffer,    // pointer to message buffer
   DWORD nSize,        // maximum size of message buffer
   va_list *Arguments  // pointer to array of message inserts
@@ -568,7 +567,8 @@ HB_FUNC( GETMODULEFILENAME )
 
 HB_FUNC( GETMODULEHANDLE )
 {
-   hb_retnl( (LONG) GetModuleHandleA( (LPCSTR) hb_parc( 1 ) ) ) ;
+   
+   hb_retnl( (LONG) GetModuleHandleA( (ISNIL(1) ? NULL : (LPCSTR) hb_parc( 1 ) ) ) ) ;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2002/09/17 13:58:30 andy_wos Exp $
+ * $Id: ChangeLog,v 1.9 2002/09/17 21:44:52 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-18 07:34 UCT+1000 AJ Wos <andrwos@aust1.net>
+   * WinCore.Prg 
+     + GLOBAL variable lPrevInstance, which indicates if there is
+       an instance of the application already running
+       Usage eample: 
+       FUNCTION Main()       
+       IF lPrevInstance()
+          MessageBox(, "Application already running","Attention")
+          QUIT
+       ENDIF  
+     + GLOBAL variable hThisInstance, to hold the handle of the     
+       current instance (for quick access)
+   * WinSys.c        
+     * corrected GetModuleHandle()   
 
 2002-09-17 18:50 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
    * env/bccwin32.mak
