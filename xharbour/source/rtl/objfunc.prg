@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.2 2002/10/04 18:24:25 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.3 2002/10/05 00:32:08 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
  * Copyright 2002 Ron Pinkas <ron@ronpinkas.com>
  *    __objGetMsgList
  *    __objGetValueList
+ *   __objSetMethod
  *
  * Copyright 2000 Jf. Lefebvre <jfl@mafact.com> and Ra. Cuylen <rac@mafact.com>
  *    __objDerivedFrom
@@ -241,6 +242,20 @@ RETURN oObject
 FUNCTION __objDelInline( oObject, cSymbol )
 
 RETURN __objDelMethod( oObject, cSymbol )              // Same story
+
+FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
+
+   IF ! ISOBJECT( oObject ) .OR. ! ISCHARACTER( cMsg ) .OR. ( ! ISBLOCK( FuncOrBlock ) .AND. ! ISNUMBER( FuncOrBlock ) )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+   ENDIF
+
+   IF __objHasMsg( oObject, cMsg )
+      __ClsModMsg( oObject:ClassH, cMsg, FuncOrBlock )
+   ELSE
+      __ClsAddMsg( oObject:ClassH, cMsg, FuncOrBlock, IIF( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
+   ENDIF
+
+RETURN oObject
 
 FUNCTION __objDelData( oObject, cSymbol )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.21 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: classes.c,v 1.22 2002/10/04 18:24:25 ronpinkas Exp $
  */
 
 /*
@@ -1733,7 +1733,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
 }
 
 /*
- * __clsModMsg( <oObj>, <cMessage>, <pFunc> )
+ * __clsModMsg( <oObj>, <cMessage>, <pFuncOrBlock> [, nScope ] )
  *
  * Modify message (only for INLINE and METHOD)
  */
@@ -1772,7 +1772,18 @@ HB_FUNC( __CLSMODMSG )
 
                if( pBlock == NULL )
                {
-                  hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+                  PHB_FUNC pFunc = (PHB_FUNC) hb_parnl( 3 );
+
+                  if( pFunc ) // Convert to Method.
+                  {
+                     pClass->pMethods[ uiAt ].pFunction = pFunc;
+                     hb_arrayDel( pClass->pInlines, pClass->pMethods[ uiAt ].uiData );
+                     hb_arraySize( pClass->pInlines, pClass->pInlines->item.asArray.value->ulLen - 1 );
+                  }
+                  else
+                  {
+                     hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+                  }
                }
                else
                {
@@ -1783,9 +1794,22 @@ HB_FUNC( __CLSMODMSG )
             {                                      /* Not allowed for DATA     */
                hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a DATA item", "__CLSMODMSG", 0 );
             }
-            else
-            {                                   /* Modify METHOD            */
-               pClass->pMethods[ uiAt ].pFunction = ( PHB_FUNC ) hb_parnl( 3 );
+            else  /* Modify METHOD            */
+            {
+               PHB_FUNC pFunc = (PHB_FUNC) hb_parnl( 3 );
+
+               if( pFunc )
+               {
+                  pClass->pMethods[ uiAt ].pFunction = pFunc;
+               }
+               else /* Convert to INLINE. */
+               {
+                  PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
+
+                  pClass->pMethods[ uiAt ].pFunction = hb___msgEvalInline;
+                  hb_arrayAdd( pClass->pInlines, pBlock );
+                  pClass->pMethods[ uiAt ].uiData = pClass->pInlines->item.asArray.value->ulLen;
+               }
             }
          }
       }

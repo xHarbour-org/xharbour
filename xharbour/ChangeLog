@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.419 2002/10/05 00:32:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.420 2002/10/05 06:05:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-05 01:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    * Modified __CLSMODMSG() to allow conversion from Block to Method, or vice versa.
+
+  * contrib/Whoo/source/TWindow.prg
+    * Renamed method SetBlock() to SetMethod().
+      It may now override or add the method, and set it to either a block or a function pointer
+
+  * source/rtl/objfunc.prg
+    + Added __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
+      It will override or add the requested method of the specified object, with either a block or function pointer.
+
+  + tests/setmethd.prg
+    + New test to demonstrate the above additions.
 
 2002-10-04 23:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
