@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.34 2003/12/11 21:33:43 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.35 2003/12/13 20:09:02 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -346,6 +346,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msghe862.obj \
   $(OBJ_DIR)\msghewin.obj \
   $(OBJ_DIR)\msghr852.obj \
+  $(OBJ_DIR)\msghr1250.obj \
   $(OBJ_DIR)\msghriso.obj \
   $(OBJ_DIR)\msghu852.obj \
   $(OBJ_DIR)\msghucwi.obj \
@@ -406,6 +407,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpruwin.obj \
   $(OBJ_DIR)\cdpsrwin.obj \
   $(OBJ_DIR)\cdprukoi.obj \
+  $(OBJ_DIR)\cdphr852.obj \
+  $(OBJ_DIR)\cdphr1250.obj \
 #
 #  Pp
 #
@@ -413,7 +416,7 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\ppcore.obj \
    $(OBJ_DIR)\pplib.obj \
    $(OBJ_DIR)\pptable.obj \
-   $(OBJ_DIR)\pragma.obj \
+   $(OBJ_DIR)\pragma.obj 
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -466,6 +469,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cdpruwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpsrwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdprukoi.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdphr852.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdphr1250.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\colorind.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\console.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\copyfile.obj          + >> hdll.tmp
@@ -738,6 +743,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msghe862.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghewin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghr852.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msghr1250.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\msghriso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghu852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghucwi.obj          + >> hdll.tmp
@@ -1820,6 +1826,9 @@ $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
 $(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2070,6 +2079,12 @@ $(OBJ_DIR)\cdpsrwin.obj : $(CODEPAGE_DIR)\cdpsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdphr852.obj : $(CODEPAGE_DIR)\cdphr852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdphr1250.obj : $(CODEPAGE_DIR)\cdphr1250.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c

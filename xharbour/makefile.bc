@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.76 2003/12/05 05:47:12 mlombardo Exp $
+# $Id: makefile.bc,v 1.77 2003/12/08 01:36:07 mlombardo Exp $
 #
 
 #
@@ -527,6 +527,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msghe862.obj \
    $(OBJ_DIR)\msghewin.obj \
    $(OBJ_DIR)\msghr852.obj \
+   $(OBJ_DIR)\msghr1250.obj \
    $(OBJ_DIR)\msghriso.obj \
    $(OBJ_DIR)\msghu852.obj \
    $(OBJ_DIR)\msghucwi.obj \
@@ -771,7 +772,9 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpru866.obj \
    $(OBJ_DIR)\cdpruwin.obj \
    $(OBJ_DIR)\cdpsrwin.obj \
-   $(OBJ_DIR)\cdprukoi.obj
+   $(OBJ_DIR)\cdprukoi.obj \
+   $(OBJ_DIR)\cdphr852.obj \
+   $(OBJ_DIR)\cdphr1250.obj
 
 #
 # HARBOUR.EXE rules
@@ -2330,6 +2333,9 @@ $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
 $(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2655,6 +2661,12 @@ $(OBJ_DIR)\cdpsrwin.obj : $(CODEPAGE_DIR)\cdpsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdphr852.obj : $(CODEPAGE_DIR)\cdphr852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdphr1250.obj : $(CODEPAGE_DIR)\cdphr1250.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
