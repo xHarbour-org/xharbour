@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.19 2002/12/15 23:06:03 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.20 2002/12/18 16:32:02 ronpinkas Exp $
  */
 
 /*
@@ -906,7 +906,7 @@ RETURN uObj
               {
                  pArgs[ n ].n1.n2.vt = VT_EMPTY;
 
-                 if ( hb_stricmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
+                 if( strcmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
                  {
                     if( s_pSym_hObj == NULL )
                     {
@@ -918,7 +918,7 @@ RETURN uObj
                        hb_vmPushSymbol( s_pSym_hObj->pSymbol );
                        hb_vmPush( uParam );
                        hb_vmSend( 0 );
-                       //printf( "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
+                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
                        pArgs[ n ].n1.n2.vt = VT_DISPATCH;
                        pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
                        //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
@@ -926,7 +926,7 @@ RETURN uObj
                  }
                  else
                  {
-                    //TraceLog( NULL, "Not found!\n" );
+                    TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
                  }
               }
               break;
@@ -953,7 +953,7 @@ RETURN uObj
         {
            nParam = dParams->cArgs - n;
 
-           //printf( "*** N: %i, Param: %i\n", n, nParam );
+           //TraceLog( NULL, "*** N: %i, Param: %i Type: %i\n", n, nParam, dParams->rgvarg[ n ].n1.n2.vt );
 
            if( s_OleRefFlags && s_OleRefFlags[ nParam - 1 ] == 'Y' )
            {
@@ -982,8 +982,9 @@ RETURN uObj
                    break;
                  */
 
+                 case VT_DISPATCH:
                  case VT_BYREF | VT_DISPATCH:
-                   //printf( "Dispatch\n" );
+                   //TraceLog( NULL, "Dispatch %p\n", dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                    if( dParams->rgvarg[ n ].n1.n2.n3.pdispVal == NULL )
                    {
                       hb_itemClear( aPrgParams[ n ] );
@@ -1011,7 +1012,8 @@ RETURN uObj
 
                       hb_itemForwardValue( aPrgParams[ n ], &hb_stack.Return );
                    }
-                   break;
+                   // Can't CLEAR this Variant
+                   continue;
 
                  /*
                  case VT_BYREF | VT_I2:
@@ -1043,8 +1045,17 @@ RETURN uObj
                  */
 
                  default:
-                   //printf( "*** Other %i***\n", dParams->rgvarg[ n ].n1.n2.vt );
-                   ;
+                   TraceLog( NULL, "*** Unexpected Type: %i***\n", dParams->rgvarg[ n ].n1.n2.vt );
+              }
+           }
+           else
+           {
+              switch( dParams->rgvarg[ n ].n1.n2.vt )
+              {
+                 case VT_DISPATCH:
+                   //TraceLog( NULL, "***NOT REF*** Dispatch %p\n", dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
+                   // Can'r CLEAR this Variant.
+                   continue;
               }
            }
 
