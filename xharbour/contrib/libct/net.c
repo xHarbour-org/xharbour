@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.0 2004/01/03 17:30 modalsist Exp$
+ * $Id: net.c,v 1.1 2004/01/04 13:12:46 lculik Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -104,13 +104,13 @@ static BOOL hb_IsNetShared(LPSTR szLocalDevice )
 	dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff) ;
 
     if ( dwResult == NO_ERROR )
-		{
-		hb_retl ( TRUE ) ;
-        }
+    {
+       return TRUE;
+    }
  	else
-		{
-		hb_retl( FALSE ) ;
- 	    }
+    {
+       return FALSE;
+    }
 }
 
 /*  $DOC$
@@ -150,7 +150,7 @@ static BOOL hb_IsNetShared(LPSTR szLocalDevice )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NETREDIR(),NETLOCNAME() 
+ *      NETREDIR(),NETLOCNAME()
  *  $END$
  */
 
@@ -209,7 +209,7 @@ HB_FUNC ( NETCANCEL )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NETREDIR(),NETDISK() 
+ *      NETREDIR(),NETDISK()
  *  $END$
  */
 
@@ -217,7 +217,7 @@ HB_FUNC ( NETPRINTER )
 {
 	char *cPrn = hb_set.HB_SET_PRINTFILE ;  // query default local printer port.
 
-	return hb_IsNetShared( cPrn ) ;
+    hb_retl( hb_IsNetShared( cPrn ) );
 }
 
 /*  $DOC$
@@ -269,7 +269,7 @@ HB_FUNC ( NETDISK )
 		strcat(cDrive,":");
 		}
 
-	return hb_IsNetShared( cDrive ) ;
+    hb_retl( hb_IsNetShared( cDrive ) );
 }
 
 /*  $DOC$
@@ -304,11 +304,11 @@ HB_FUNC ( NETDISK )
  *      The device is not available on the server.  Use NET USE or NET SHARE
  *      on the selected server to review all the devices available there.
  *
- *      The server device is unavailable. 
+ *      The server device is unavailable.
  *
- *      The server device name is wrong. 
+ *      The server device name is wrong.
  *
- *      The password is incorrect or does not exist.  
+ *      The password is incorrect or does not exist.
  *
  *      Too many devices have already been allocated.  In this instance you must
  *      change some of the flags with the NET START command. See PC LAN/MS-NET manual.
@@ -334,7 +334,7 @@ HB_FUNC ( NETDISK )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NETCANCEL(),NETLOCNAME(),NETRMTNAME() 
+ *      NETCANCEL(),NETLOCNAME(),NETRMTNAME()
  *  $END$
  */
 
@@ -397,7 +397,7 @@ HB_FUNC ( NETREDIR )
  *      corresponding local device.
  *  $EXAMPLES$
  *      Determine the server device used by the local device:
- * 
+ *
  *      ?  NETRMTNAME( "F:" ) // Display server device
  *  $TESTS$
  *  $STATUS$
@@ -409,7 +409,7 @@ HB_FUNC ( NETREDIR )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NETLOCNAME() 
+ *      NETLOCNAME()
  *  $END$
  */
 
@@ -470,7 +470,7 @@ HB_FUNC ( NETRMTNAME )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NNETWORK() 
+ *      NNETWORK()
  *  $END$
  */
 
@@ -519,7 +519,7 @@ HB_FUNC ( NETWORK )
  *  $DESCRIPTION$
  *      NOVELL NETWORK
  *      With NNETWORK(), you can determine if you are working with a Novell
- *      network. 
+ *      network.
  *
  *      Note
  *
@@ -542,7 +542,7 @@ HB_FUNC ( NETWORK )
  *  $FILES$
  *      Source is net.c, library is libct.
  *  $SEEALSO$
- *      NETWORK() 
+ *      NETWORK()
  *  $END$
  */
 

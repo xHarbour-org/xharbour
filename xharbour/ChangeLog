@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1988 2004/01/04 16:39:01 paultucker Exp $
+ * $Id: ChangeLog,v 1.1989 2004/01/04 20:14:43 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-04 15:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/libct/net.c
+    ! Fixed few places where low level c worker was using hb_retl(...) instead of return,
+      and HB_FUNC() was using return instead of hbretl().
+
 2004-01-05 09:12 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
    + remove if (attr!=' ') test from hb_wvt_gtSetColors()
