@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3775 2005/01/28 01:32:42 modalsist Exp $
+ * $Id: ChangeLog,v 1.3776 2005/01/28 03:29:10 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-28 14:03 UTC+0100 Alex Strickland (sscc@mweb.co.za)
+  * xharbour/source/rtl/filesys.c
+    * Added casts (PLONG) to 3rd parameter of SetFilePointer() for MSVC 6.
 
 2005-01-28 04:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/dbinfo.ch

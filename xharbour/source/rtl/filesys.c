@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.137 2005/01/26 21:46:35 druzus Exp $
+ * $Id: filesys.c,v 1.138 2005/01/27 11:49:19 druzus Exp $
  */
 
 /*
@@ -2690,7 +2690,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       else
       {
          ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
-                                       ulOffsetLow, &ulOffsetHigh,
+                                       ulOffsetLow, (PLONG) &ulOffsetHigh,
                                        ( DWORD ) Flags );
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
          hb_fsSetIOError( llPos != ( HB_FOFFSET ) INVALID_SET_FILE_POINTER, 0 );
@@ -2700,7 +2700,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       {
          ulOffsetHigh = 0;
          ulOffsetLow = SetFilePointer( DostoWinHandle( hFileHandle ),
-                                       0, &ulOffsetHigh, SEEK_CUR );
+                                       0, (PLONG) &ulOffsetHigh, SEEK_CUR );
          llPos = ( ( HB_FOFFSET ) ulOffsetHigh << 32 ) | ulOffsetLow;
       }
 
