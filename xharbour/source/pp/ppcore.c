@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.49 2003/03/09 17:30:36 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.50 2003/03/13 00:52:43 ronpinkas Exp $
  */
 
 /*
@@ -744,7 +744,7 @@ int hb_pp_ParseDirective( char * sLine )
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
             else
             {
-            #if defined(__CYGWIN__) || defined(__IBMCPP__)
+            #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
             #else
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, sys_errlist[ errno ] );

@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.1.1.1 2001/12/21 10:43:27 ronpinkas Exp $
+ * $Id: macroslx.c,v 1.2 2003/03/21 00:06:31 ronpinkas Exp $
  */
 
 /*
@@ -76,7 +76,6 @@
 
 /* NOTE: 02/08/2000 - maurilio.longo@libero.it, under OS/2 GCC I need to use relative paths in include command */
 /* this is relative to position of simplex.c in harbour source tree */
-#define SLX_RULES "../macro/macro.slx"
+#define SLX_RULES "../source/macro/macro.slx"
 
-/* this is relative to position of macroslx.c in harbour source tree */
-#include "../../include/simplex.c"
+#include "simplex.c"

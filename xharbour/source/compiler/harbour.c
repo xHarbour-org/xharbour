@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.33 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: harbour.c,v 1.34 2003/03/21 05:19:11 ronpinkas Exp $
  */
 
 /*
@@ -1121,7 +1121,7 @@ PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * szMethodName )
    return NULL;
 }
 
-void hb_compDeclaredInit( void )
+static void hb_compDeclaredInit( void )
 {
   #define _DECL static COMDECLARED
 
@@ -2882,7 +2882,7 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
 
 /* Generate a pcode for a field variable
  */
-void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNCTION pFunc )
+static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNCTION pFunc )
 {
    PVAR pField;
 
@@ -2922,7 +2922,7 @@ void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNCTION pF
  * Function generates passed pcode for passed runtime variable
  * (field or memvar)
  */
-void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
+static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 {
    USHORT wVar;
    PCOMSYMBOL pSym;
@@ -4664,7 +4664,7 @@ void hb_compAutoOpenAdd( char * szName )
    }
 }
 
-BOOL hb_compAutoOpenFind( char * szName )
+static BOOL hb_compAutoOpenFind( char * szName )
 {
    PAUTOOPEN pLast = hb_comp_pAutoOpen;
 
@@ -4686,7 +4686,7 @@ BOOL hb_compAutoOpenFind( char * szName )
    return FALSE;
 }
 
-int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
+static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 {
    int iStatus = EXIT_SUCCESS;
 
