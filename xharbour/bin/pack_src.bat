@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.15 2004/05/20 21:09:21 ronpinkas Exp $
+rem $Id: !pack_src.bat,v 1.16 2004/06/12 01:42:58 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -172,10 +172,38 @@ rem SOURCE\RTL\GTXVT
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtxvt/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtxvt/*.c
 
+rem SOURCE\RTL\GTALLEG
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtalleg/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtalleg/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtalleg/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtalleg/*.sfc
+
 rem SOURCE\VM
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/*.c
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/*.prg
+
+rem SOURCE\samples
+%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.ch
+%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.prg
+
+rem SOURCE\odbc
+%hb_archbin% %hb_archopt%  %hb_filename% source/odbc/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/odbc/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/odbc/*.ch
+%hb_archbin% %hb_archopt%  %hb_filename% source/odbc/*.prg
+
+rem SOURCE\tip
+%hb_archbin% %hb_archopt%  %hb_filename% source/tip/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/tip/*.[ch]
+%hb_archbin% %hb_archopt%  %hb_filename% source/tip/*.prg
+
+rem SOURCE\ct
+%hb_archbin% %hb_archopt%  %hb_filename% source/ct/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/ct/*.[ch]
+%hb_archbin% %hb_archopt%  %hb_filename% source/ct/*.prg
 
 rem TESTS
 REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.bat
@@ -226,3 +254,33 @@ rem UTILS\HBTEST
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbtest/*.ch
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbtest/*.cmd
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbtest/*.prg
+
+rem CONTRIB\RDD_ADS
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/rdd_ads/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/rdd_ads/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/rdd_ads/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/rdd_ads/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/rdd_ads/*.ch
+
+rem CONTRIB\MYSQL
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/mysql/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/mysql/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/mysql/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/mysql/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/mysql/*.ch
+
+rem CONTRIB\PGSQL
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/pgsql/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/pgsql/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/pgsql/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/pgsql/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/pgsql/*.ch
+
+rem CONTRIB\LIBNF
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/*.[ch]
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/*.ch
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/include/*.h
+%hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/include/*.ch
+

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.6 2004/07/27 21:05:05 druzus Exp $
+# $Id: pack_src.sh,v 1.7 2004/08/29 00:26:22 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -284,26 +284,28 @@ $hb_collect utils/hbtest/*.ch
 $hb_collect utils/hbtest/*.cmd
 $hb_collect utils/hbtest/*.prg
 
-# CONTRIB\LIBCT
-#$hb_collect contrib/libct/Makefile
-#$hb_collect contrib/libct/*.[ch]
-#$hb_collect contrib/libct/*.prg
-#$hb_collect contrib/libct/*.ch
-#$hb_collect contrib/libct/include/*.h
-#$hb_collect contrib/libct/include/*.ch
-
+# CONTRIB\RDD_ADS
 $hb_collect contrib/rdd_ads/Makefile
 $hb_collect contrib/rdd_ads/*.c
 $hb_collect contrib/rdd_ads/*.prg
 $hb_collect contrib/rdd_ads/*.h
 $hb_collect contrib/rdd_ads/*.ch
 
+# CONTRIB\MYSQL
 $hb_collect contrib/mysql/Makefile
 $hb_collect contrib/mysql/*.c
 $hb_collect contrib/mysql/*.prg
 $hb_collect contrib/mysql/*.h
 $hb_collect contrib/mysql/*.ch
 
+# CONTRIB\PGSQL
+$hb_collect contrib/pgsql/Makefile
+$hb_collect contrib/pgsql/*.c
+$hb_collect contrib/pgsql/*.prg
+$hb_collect contrib/pgsql/*.h
+$hb_collect contrib/pgsql/*.ch
+
+# CONTRIB\LIBNF
 $hb_collect contrib/libnf/Makefile
 $hb_collect contrib/libnf/*.[ch]
 $hb_collect contrib/libnf/*.prg

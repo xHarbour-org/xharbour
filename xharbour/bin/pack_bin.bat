@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_bin.bat,v 1.14 2004/01/05 21:18:02 ronpinkas Exp $
+rem $Id: !pack_bin.bat,v 1.15 2004/06/12 01:42:58 ronpinkas Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
