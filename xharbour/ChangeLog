@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1954 2003/12/29 11:16:51 druzus Exp $
+ * $Id: ChangeLog,v 1.1955 2003/12/29 12:40:59 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-12-29 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/hbffind.c
+   ! added error 25 to winToDosError
 
 2003-12-29 10:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * xharbour/source/rtl/filesys.c
    ! Fix to hb_fsWrite and hb_fsWriteLarge on Win32 api section, when number of bytes to write is 0
+
 2003-12-29 11:41 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/strfile.prg
    * fixed strfile() - we still haven't SETSHARE()/GETSHARE()/SETFCREATE()
