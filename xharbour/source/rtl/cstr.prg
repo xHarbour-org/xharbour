@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.16 2003/11/10 00:06:29 jonnymind Exp $
+ * $Id: cstr.prg,v 1.17 2003/11/14 16:36:04 jonnymind Exp $
  */
 
 /*
@@ -357,7 +357,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
       CASE 'O'
          aVars := __objGetValueDiff( xVal )
-         cRet  := "M->_1 := " + xVal:ClassName + "(), "
+         cRet  := "( M->_1 := " + xVal:ClassName + "(), "
 
          IF aObjs == NIL
             aObjs := { xVal }
@@ -378,7 +378,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
             ENDIF
          NEXT
 
-         RETURN cRet + "M->_1"
+         RETURN cRet + "M->_1 )"
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )

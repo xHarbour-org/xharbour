@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.16 2003/08/07 18:27:04 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.17 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    ENDIF
 
    IF nScope == NIL
-      nScope := HB_OO_CLSTP_EXPORTED
+      nScope := HB_OO_CLSTP_EXPORTED + HB_OO_CLSTP_PUBLISHED
    ENDIF
 
    aBaseVars   := __clsGetIVarNamesAndValues( oBase, nScope )
