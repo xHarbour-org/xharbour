@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.9 2002/04/28 20:25:15 lculik Exp $
+# $Id: makefile.bc,v 1.10 2002/05/02 22:28:58 ronpinkas Exp $
 #
 
 #
@@ -707,7 +707,8 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\pickarry.obj \
    $(OBJ_DIR)\pickfile.obj \
    $(OBJ_DIR)\prb_stak.obj \
-   $(OBJ_DIR)\radios.obj
+   $(OBJ_DIR)\radios.obj \
+   $(OBJ_DIR)\hbmlang.obj 
 
 #
 # Our default target
@@ -2685,6 +2686,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\pickarry.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\pickfile.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\prb_stak.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbmlang.obj  >> make.tmp
    $(ECHO) $(PP_LIB) >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
    $(ECHO) $(VM_LIB) >> make.tmp
@@ -2738,5 +2740,8 @@ $(OBJ_DIR)\prb_stak.c : $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbmlang.obj : $(OBJ_DIR)\hbmlang.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2001/10/21 08:08:17 davep Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:45:03 ronpinkas Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -19,6 +19,10 @@ PRG_SOURCES=\
     pickarry.prg \
     pickfile.prg \
     prb_stak.prg \
+
+C_SOURCES=\
+   hbmlang.c        \
+
 
 PRG_MAIN=hbmake.prg
 

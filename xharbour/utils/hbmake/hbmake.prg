@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.12 2002/03/22 18:10:32 lculik Exp $
+ * $Id: hbmake.prg,v 1.13 2002/05/14 00:45:15 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -3786,87 +3786,3 @@ FUNCTION BuildLangArray( cLang )
 
     RETURN aLang
 
-#pragma begindump
-#define HB_OS_WIN_32_USED
-#include <hbapi.h>
-#include <stdio.h>
-#include "windows.h"
-HB_FUNC(GETUSERLANG)
-{
-   long lRet ;
-
-#if defined(HB_OS_WIN_32)
-
-   {
-   
-      LANGID pLang=GetSystemDefaultLangID();
-
-      switch(pLang) {
-
-         case 0x0416:
-         case 0x0816:
-         {
-            lRet=1;
-         }
-
-         break;
-
-         case 0x0409 : 
-         case 0x0809 : 
-         case 0x0c09 : 
-         case 0x1009 : 
-         case 0x1409 : 
-         case 0x1809 : 
-         case 0x1c09 : 
-         case 0x2009 : 
-         case 0x2409 : 
-         case 0x2809 : 
-         case 0x2c09 :
-         {
-            lRet=2;
-         }
-
-         break;
-
-         case 0x040a :
-         case 0x080a :   
-         case 0x0c0a :   
-         case 0x100a :   
-         case 0x140a :   
-         case 0x180a :   
-         case 0x1c0a :   
-         case 0x200a :   
-         case 0x240a :   
-         case 0x280a :   
-         case 0x2c0a :   
-         case 0x300a :   
-         case 0x340a :   
-         case 0x380a :   
-         case 0x3c0a :   
-         case 0x400a :   
-         case 0x440a :   
-         case 0x480a :   
-         case 0x4c0a :   
-         case 0x500a :
-         {
-            lRet=3;
-         }        
-         break;
-
-      default:
-
-      lRet=2;
-
-      break; 
-
-      }                  
-
-   }
-#else
-   lRet = 2 ;
-#endif
-     hb_retnl( lRet ); 
-}
-
-
-#pragma enddump
