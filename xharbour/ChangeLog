@@ -12,7 +12,7 @@
   * source/debug/dbgbrwsr.prg
     ! Fixed runtime error when Monitored variables list became empty under
       certain circumstances.
-  * source/debug/debgmenu.prg
+  * source/debug/dbgmenu.prg
   * source/debug/debugger.prg
     ! On startup, correctly visualize some menu options preset in the
       settings file.
