@@ -36,7 +36,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    LOCAL nLen
    LOCAL cFile
    DEFAULT lSubDir TO .t.
-
    WHILE ++ nCounter <= LEN( aStru )
 
       IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lGcc ) )                  // There are elements! 
@@ -53,7 +52,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    FOR nCounter := 1 TO nArrayLen
 
       IF LEN( aData := DIR_MULTI( aStru[ nCounter ] + "*.prg |" + aStru[ nCounter ] + "*.c |" + aStru[ nCounter ] + "*.cpp" ) ) != 0
-
          nDataLen := LEN( aData )
 
          FOR y := 1 TO nDataLen
@@ -107,7 +105,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
       ENDIF
 
    NEXT
-
 RETURN aRet
 
 FUNCTION ExtenPrg( cExt, nType )
@@ -429,8 +426,7 @@ RETURN aLibsDesc
 
 FUNCTION DIR_MULTI( cFileMaskList, cAttr )
 
-   LOCAL aList := HB_ATokens( cFileMaskList, "|" )
-
+   LOCAL aList := listasarray2( cFileMaskList, "|" )
    AEVAL( aList, { | tmp, tmp1 | aList[ tmp1 ] := DIRECTORY( tmp, cAttr ) } )
 
 RETURN ArrayAJoin( alist )
@@ -454,7 +450,24 @@ FUNCTION ArrayAJoin( aArray )
       ACOPY( aArray[ tmp ], aArray[ 1 ],,, nPos )
       nPos += LEN( aArray[ tmp ] )
    NEXT
-
 RETURN aArray[ 1 ]
+
+FUNCTION ListAsArray2( cList, cDelimiter )
+
+   LOCAL nPos 
+   LOCAL aList  := {}              // Define an empty array
+
+   IF cDelimiter = NIL
+      cDelimiter := ","
+   ENDIF
+   //
+   DO WHILE ( nPos := AT( cDelimiter, cList ) ) != 0
+      AADD( aList, ALLTRIM( SUBSTR( cList, 1, nPos - 1 ) ) )                    // Add a new element
+      cList := SUBSTR( cList, nPos + 1 )
+
+   ENDDO
+   AADD( aList, ALLTRIM( cList ) )      // Add final element
+   //
+RETURN aList        // Return the array
 
 *+ EOF: HBMUTILS.PRG
