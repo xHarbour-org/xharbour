@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.43 2004/05/10 10:38:04 mauriliolongo Exp $
+ * $Id: hbdefs.h,v 1.44 2004/05/12 02:25:24 druzus Exp $
  */
 
 /*
@@ -242,38 +242,49 @@
  * this is a hack and doesn't have to be true on some machines
  * please update it if necessary
  */
+
 #if !defined( UINT16 )
 #  if USHRT_MAX == 0xffff
       typedef USHORT       UINT16;
-#     define UINT16_MAX    USHRT_MAX
-#     define INT16_MAX     SHRT_MAX
-#     define INT16_MIN     SHRT_MIN
+#     if ( ! defined( __XCC__ ) )
+#        define UINT16_MAX    USHRT_MAX
+#        define INT16_MAX     SHRT_MAX
+#        define INT16_MIN     SHRT_MIN
+#     endif
 #  endif
 #endif
 #if !defined( UINT32 )
 #  if UINT_MAX == 0xffffffff
       typedef UINT         UINT32;
-#     define UINT32_MAX    UINT_MAX
-#     define INT32_MAX     INT_MAX
-#     define INT32_MIN     INT_MIN
+#     if ( ! defined( __XCC__ ) )
+#        define UINT32_MAX    UINT_MAX
+#        define INT32_MAX     INT_MAX
+#        define INT32_MIN     INT_MIN
+#     endif
 #  elif ULONG_MAX == 0xffffffff
       typedef ULONG        UINT32;
-#     define UINT32_MAX    ULONG_MAX
-#     define INT32_MAX     LONG_MAX
-#     define INT32_MIN     LONG_MIN
+#     if ( ! defined( __XCC__ ) )
+#        define UINT32_MAX    ULONG_MAX
+#        define INT32_MAX     LONG_MAX
+#        define INT32_MIN     LONG_MIN
+#     endif
 #  endif
 #endif
 #if !defined( UINT64 ) && !defined( HB_LONG_LONG_OFF )
 #  if ULONG_MAX > UINT_MAX && UINT_MAX > USHORT_MAX
       typedef ULONG        UINT64;
-#     define UINT64_MAX    ULONG_MAX
-#     define INT64_MAX     LONG_MAX
-#     define INT64_MIN     LONG_MIN
+#     if ( ! defined( __XCC__ ) )
+#        define UINT64_MAX    ULONG_MAX
+#        define INT64_MAX     LONG_MAX
+#        define INT64_MIN     LONG_MIN
+#     endif
 #  else
       typedef ULONGLONG    UINT64;
-#     define UINT64_MAX    ULONGLONG_MAX
-#     define INT64_MAX     LONGLONG_MAX
-#     define INT64_MIN     LONGLONG_MIN
+#     if ( ! defined( __XCC__ ) )
+#        define UINT64_MAX    ULONGLONG_MAX
+#        define INT64_MAX     LONGLONG_MAX
+#        define INT64_MIN     LONGLONG_MIN
+#     endif
 #  endif
 #endif
 

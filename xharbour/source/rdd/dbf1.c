@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.78 2004/05/08 22:07:09 druzus Exp $
+ * $Id: dbf1.c,v 1.79 2004/05/12 02:25:25 druzus Exp $
  */
 
 /*
@@ -65,9 +65,14 @@
 #include "hbdbsort.h"
 #include "error.ch"
 #include <errno.h>
+
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
 extern PHB_CODEPAGE s_cdpage;
+#endif
+
+#if defined( __XCC__ )
+   #include <stdint.h>
 #endif
 
 #define __PRG_SOURCE__ __FILE__

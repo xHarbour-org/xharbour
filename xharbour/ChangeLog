@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2926 2004/05/11 23:35:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.2926 2004/05/12 02:40:10 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-11 21:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbdefs.h
+    * Added #if ( ! defined( __XCC__ ) ) guard arounf #define [U]INT16|32_MIN|MAX
+
+  * source/rdd/dbf1.c
+    + Added #include <stdint.h> guarded by #if defined( __XCC__ )
+
 2004-05-11 23:20 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * source/rtl/teditor.prg
-    + Any fixes, enhancements and improvements: Tab management. Text scroll
+    + Many fixes, enhancements and improvements: Tab management. Text scroll
       management, <insert> message, HardCR and SoftCR management.
-      CTRL-T (Del word right) behaviour implemented. Any methods was added,
-      others changed and rewrited. See teditor.prg to more details.
+      CTRL-T (Del word right) behaviour implemented. Manny methods were added,
+      others changed and rewriten. See teditor.prg to more details.
 
   * source/rtl/memoedit.prg
     + New memoedit parameter <lToggleExitSave> to toggle CTRL-W / CTRL-Q to
@@ -68,10 +75,10 @@
   * xharbour/source/compiler/harbour.c
     + hb_compGenSwitchCase() to generate pcode for 32 or 64bit switch
       case value
-    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG 
+    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG
 
   * xharbour/source/vm/macro.c
-    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG 
+    * hb_compGenPushLong() changed to operate on 32 and 64bit LONG
 
   * xharbour/source/compiler/harbour.sly
     * use hb_compGenSwitchCase() for HB_P_SWITCHCASE
@@ -85,7 +92,7 @@
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + Wvt_DrawStatusbar()
       Draws Windows alike statusbar on the row ( defaults to maxrow() ) specified
-      Panels. 
+      Panels.
 
     + static void hb_wvt_gtCreateToolTipWindow( void )
       Creates and places the hWndTT returned by above function in _s.hWndTT member.
@@ -100,7 +107,7 @@
     + HWND hWndTT;
     + BOOL bToolTipActive;
       Added members to GLOBAL_DATA _s to hold functionality of tooltips.
-    
+
     /*
     Functions above are the building blocks of upcoming Wvt*Classes and must not
     be used as per.
@@ -116,11 +123,11 @@
 
     Now the point is where this class library be put on CVS?
 
-    My proposal is it should be part of existing gtwvt.lib and be placed 
+    My proposal is it should be part of existing gtwvt.lib and be placed
     in source/rtl/gtwvt alongwith gtwvt.c. But more knowledgable comments are welcome.
 
     Please note that these classes are enhancement over and above the normal
-    behavior of GTWVT and in no way interrupt its functioning. Instead, developer is 
+    behavior of GTWVT and in no way interrupt its functioning. Instead, developer is
     free to use the classes per requirements.
     */
 
