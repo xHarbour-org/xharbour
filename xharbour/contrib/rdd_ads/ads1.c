@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.6 2003/05/08 10:48:10 lculik Exp $
+ * $Id: ads1.c,v 1.7 2003/05/23 09:46:35 lculik Exp $
  */
 
 /*
@@ -1537,6 +1537,8 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_GETHEADERSIZE:
+         if( !pArea->uiHeaderLen && pArea->iFileType!=ADS_ADT )
+            pArea->uiHeaderLen = 32 + pArea->uiFieldCount * 32 + 2;
          hb_itemPutNL( pItem, pArea->uiHeaderLen );
          break;
 
@@ -1600,6 +1602,27 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, ((pArea->iFileType==ADS_ADT) ? ".adm" :
                                 (pArea->iFileType==ADS_CDX) ? ".fpt" : ".dbt") );
          break;
+      case DBI_DB_VERSION     :   /* HOST driver Version */
+      {
+         UNSIGNED32 ulMajor;
+         UNSIGNED32 ulMinor;
+         UNSIGNED8  ucLetter;
+         UNSIGNED8  ucDesc[128];
+         UNSIGNED16 usDescLen = sizeof(ucDesc) - 1;
+         UNSIGNED8  ucVersion[256];
+
+         AdsGetVersion( &ulMajor, &ulMinor, &ucLetter, ucDesc, &usDescLen);
+
+         sprintf(ucVersion, "%s, v%ld.%ld%c", ucDesc, ulMajor, ulMinor, ucLetter);
+
+         hb_itemPutC( pItem, ucVersion );
+         break;
+      }
+
+      case DBI_RDD_VERSION    :   /* RDD version (current RDD) */
+         hb_itemPutC( pItem, HB_RDD_ADS_VERSION_STRING );
+         break;
+
 
 /* TODO ... */
       //case DBI_DBFILTER:
@@ -1620,8 +1643,6 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case DBI_LOCKOFFSET     :   /* New locking offset */
       case DBI_MEMOHANDLE     :   /* Dos handle for memo file */
       case DBI_MEMOBLOCKSIZE  :   /* Blocksize in memo files */
-      case DBI_DB_VERSION     :   /* HOST driver Version */
-      case DBI_RDD_VERSION    :   /* RDD version (current RDD) */
          break;
    }
    return SUCCESS;
