@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.10 2004/04/22 12:01:35 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.11 2004/05/10 01:47:49 likewolf Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #include "common.ch"
 #include "fileio.ch"
 #include "inkey.ch"
+#include "setcurs.ch"
 
 
 // Color definitions and positions inside ::cColorSpec
@@ -110,7 +111,10 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
 
    Super:New("", nTop, nLeft, nBottom, nRight, .T.)
    Super:SetColor(cColor)
-   
+
+   /* A hack to enforce cursor setting */
+   ::nCurrentCursor := SC_SPECIAL1
+  
    ::lWordWrap := .F.
 
    Super:LoadFile(cFileName)
