@@ -1,5 +1,5 @@
 /*
- * $Id: charswap.c,v 1.2 2004/07/22 16:58:26 likewolf Exp $
+ * $Id: charswap.c,v 1.2 2005/03/09 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -82,6 +82,19 @@ static void do_charswap (int iSwitch)
     size_t sRetIndex = 0;
     int iShift, iMod;
     char *pcSub;
+
+    if ( sStrLen == 0 )
+    {
+       if (iNoRet)
+       {
+          hb_ret();
+       }
+       else
+       {
+          hb_retc( "" );
+       }
+       return;
+    }
 
     if (iSwitch == DO_CHARSWAP_WORDSWAP)
     {

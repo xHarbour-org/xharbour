@@ -1,5 +1,5 @@
 /*
- * $Id: replace.c,v 1.3 2004/07/29 10:58:43 likewolf Exp $
+ * $Id: replace.c,v 1.2 2005/03/09 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -85,6 +85,19 @@ static void do_replace (int iSwitch)
     char *pcRet, *pc;
     char cSearch, cReplace;
     
+    if ( sStrLen == 0 )
+    {
+       if (iNoRet)
+       {
+          hb_ret();
+       }
+       else
+       {
+          hb_retc( "" );
+       }
+       return;
+    }
+
     if (ISNUM (2))
     {
       cReplace = hb_parnl (2) % 256;

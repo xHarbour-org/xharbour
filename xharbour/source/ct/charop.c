@@ -1,5 +1,5 @@
 /*
- * $Id: charop.c,v 1.2 2004/07/22 16:58:26 likewolf Exp $
+ * $Id: charop.c,v 1.2 2005/03/09 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -92,8 +92,23 @@ static void do_charop (int iSwitch)
     size_t sStrLen = hb_parclen (1);
     size_t sPos;
     unsigned char *pucString = ( unsigned char * ) hb_parc (1);
-    unsigned char *pucResult = ( unsigned char * ) hb_xgrab (sStrLen);
+    unsigned char *pucResult;
     
+    if ( sStrLen == 0 )
+    {
+       if (iNoRet)
+       {
+          hb_ret();
+       }
+       else
+       {
+          hb_retc( "" );
+       }
+       return;
+    }
+
+    pucResult = ( unsigned char * ) hb_xgrab (sStrLen);
+
     switch (iSwitch)
     {
       /* NOT */

@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.5 2004/08/09 21:10:54 likewolf Exp $
+ * $Id: token1.c,v 1.2 2005/03/09 23:00:00 ptsarenko Exp $
  */
 
 /*
@@ -165,6 +165,18 @@ static void do_token1 (int iSwitch)
     /* prepare return value for TOKENUPPER/TOKENLOWER */
     if ((iSwitch == DO_TOKEN1_TOKENLOWER) || (iSwitch == DO_TOKEN1_TOKENUPPER))
     {
+      if ( sStrLen == 0 )
+      {
+         if (iNoRef)
+         {
+            hb_retl(0);
+         }
+         else
+         {
+            hb_retc( "" );
+         }
+         return;
+      }
       pcRet = ( char * ) hb_xgrab (sRetStrLen = sStrLen);
       hb_xmemcpy (pcRet, pcString, sRetStrLen);
     }
