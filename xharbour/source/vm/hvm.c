@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.284 2003/11/26 03:17:48 likewolf Exp $
+ * $Id: hvm.c,v 1.285 2003/11/26 05:44:04 jonnymind Exp $
  */
 
 /*
@@ -628,7 +628,6 @@ int HB_EXPORT hb_vmQuit( void )
          #else
             pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
             HB_STACK_LOCK
-            //hb_threadTerminator( NULL );
             pthread_exit(0);
          #endif
       }
@@ -841,15 +840,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
          }
       }
-#endif
-      /* JC1: we can proceed here only if not in garbage collecting */
-#if defined(HB_THREAD_SUPPORT)
- /*     if ( HB_VM_STACK.iPcodeCount == 0 )
-      {
-         HB_DISABLE_ASYN_CANC;
-         HB_STACK_LOCK;
-      }
-      HB_VM_STACK.iPcodeCount++;*/
 #endif
       switch( pCode[ w ] )
       {
@@ -3122,8 +3112,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               //HB_STACK_UNLOCK;
-               //HB_TEST_CANCEL_ENABLE_ASYN;
                break;
             }
          }
@@ -3134,8 +3122,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vm_bQuitRequest = TRUE;
             #endif
 
-            //HB_STACK_UNLOCK;
-            //HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
          else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
@@ -3144,9 +3130,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * (from macro evaluation)
              */
             s_uiActionRequest = 0;
-            // no need to unlock the stack
-            //HB_STACK_UNLOCK;
-            //HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
       }
@@ -3157,13 +3140,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             HB_VM_STACK.iPcodeCount = 0;
             HB_STACK_UNLOCK;
-            HB_TEST_CANCEL_ENABLE_ASYN;
-
-            /* This would be a GOOD place where to do things that are
-             interruptable and may take a long time; we can also move
-             the above or the below code slice to embrace VM regions
-             that are acting as interruptable cleanup routines */
-            HB_DISABLE_ASYN_CANC;
+            HB_TEST_CANCEL;
             HB_STACK_LOCK;
          }
          HB_VM_STACK.iPcodeCount++;
