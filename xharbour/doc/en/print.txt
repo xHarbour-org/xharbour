@@ -1,0 +1,65 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GETPRINTERS()
+ *  $CATEGORY$
+ *      Printer
+ *  $ONELINER$
+ *      Get an List of printers
+ *  $SYNTAX$
+ *      <aPrint> := GetPrinters()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <aPrint> An list of printer with two items on array {Printer name , Printer Port}
+ *  $DESCRIPTION$
+ *      Getprinters() function return an list of printers instaled on your machine
+ *      this function is useful to get an printer list, and say to what printer the data should be send
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Xharbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      This function is part of Rtl library
+ *  $SEEALSO$
+ *      GETDEFAULTPRINTER()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GETDEFAULTPRINTER()
+ *  $CATEGORY$
+ *      Printer
+ *  $ONELINER$
+ *      Return the computer default printer name
+ *  $SYNTAX$
+ *      <cPrinter> := GETDEFAULTPRINTER()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <cPrinter> The printer name
+ *  $DESCRIPTION$
+ *      GETDEFAULTPRINTER() return the default printer name that can be used with
+ *      set(24,"win:"+printername) to send data to this specific printer
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+ *        Local cPrinter := GETDEFAULTPRINTER()
+ *        ? cPrinter
+ *      RETURN NIL
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Xharbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      This function is part of Rtl library
+ *  $SEEALSO$
+ *      GETPRINTERS()
+ *  $END$
+ */
+
