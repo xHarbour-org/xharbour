@@ -1,5 +1,5 @@
-/*
- * $Id: gtcrs.c,v 1.8 2003/05/22 11:48:04 druzus Exp $
+;/*
+ * $Id: gtcrs.c,v 1.9 2003/05/26 13:32:49 druzus Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ typedef struct InOutBase {
     int is_color;
     unsigned int disp_count;
 
-    char *acsc, *bell, *flash, *civis, *cnorm, *cvvis;
+    unsigned char *acsc, *bell, *flash, *civis, *cnorm, *cvvis;
 
     int is_mouse;
     int mButtons;
@@ -1213,18 +1213,33 @@ static char* tiGetS(char *capname)
     return ptr;
 }
 
-static unsigned char get_acsc(InOutBase *ioBase, unsigned char ch)
+chtype get_acsc(InOutBase *ioBase, unsigned char ch)
 {
-    char *ptr;
+    unsigned char *ptr;
+    chtype retch = 0;
 
     if (ioBase->acsc != NULL)
 	for (ptr = ioBase->acsc; *ptr && *(ptr+1); ptr+=2)
-	    if ((unsigned char) *ptr == ch)
+	    if (*ptr == ch)
 	    {
-		ch = (unsigned char) *(ptr+1);
+		retch = *(ptr+1) | A_ALTCHARSET;
 		break;
 	    }
-    return ch;
+
+    if ( !retch )
+	switch (ch)
+	{
+	    case '.':	retch = 'v' | A_NORMAL; break;
+	    case ',':	retch = '<' | A_NORMAL; break;
+	    case '+':	retch = '>' | A_NORMAL; break;
+	    case '-':	retch = '^' | A_NORMAL; break;
+	    case 'a':	retch = '#' | A_NORMAL; break;
+	    case '0':
+	    case 'h':	retch = get_acsc(ioBase, 'a'); break;
+	    default:	retch = ch | A_NORMAL;
+	}
+
+    return retch;
 }
 
 static void init_keys(InOutBase *ioBase)
@@ -1535,23 +1550,37 @@ static void gt_ttyrestore(InOutBase *ioBase)
 static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_t termpid)
 {
     InOutBase *ioBase;
-    int transTbl[256], i, ch, bg, fg;
+    int transTbl[256], i, bg, fg;
+    char buf[256], *ptr, *crsterm = NULL;
+    chtype ch;
 
     ioBase = hb_xgrab(sizeof(*ioBase));
     memset(ioBase, 0, sizeof(*ioBase));
 
-    if (!term || !term[0])
+    if (!term || ! *term)
 	term = getenv("HB_TERM");
-    if (!term || !term[0])
+    if (!term || ! *term)
 	term = getenv("TERM");
 
-    if (term) {
+    if (term && *term) {
 	if (strncmp( term, "linux", 5 ) == 0)
 	    ioBase->terminal_type = TERM_LINUX;
 	else if (strstr( term, "xterm" ) != NULL || 
 	         strncmp( term, "rxvt", 4 ) == 0 || 
 		 strncmp( term, "putty", 4 ) == 0)
 	    ioBase->terminal_type = TERM_XTERM;
+
+	if ( (ptr = strchr( term, '/' )) != NULL )
+	{
+	    if ( (i = ptr - term) >= sizeof(buf) )
+		i = sizeof(buf) - 1;
+	    strncpy(buf, term, i);
+	    buf[i] = '\0';
+	    if ( i )
+		crsterm = buf;
+	}
+	else
+	    crsterm = term;
     }
 
     ioBase->esc_delay = ESC_DELAY;
@@ -1595,7 +1624,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 
     /* curses screen initialization */
     /* initscr(); */
-    ioBase->basescr = newterm(term, ioBase->baseout, ioBase->basein);
+    ioBase->basescr = newterm(crsterm, ioBase->baseout, ioBase->basein);
 
     if ( ioBase->basescr == NULL ) {
 	destroy_ioBase(ioBase);
@@ -1615,13 +1644,11 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     HB_GT_FUNC(gt_chrmapinit(transTbl, term));
 
     for (i = 0; i < 256; i++ ) {
-	ch = transTbl[i] & 0xff;
-	switch (transTbl[i] >> 16) {
+	ch = transTbl[i] & 0xffff;
+	switch ((transTbl[i] >> 16) & 0xff) {
 	    case 1:
 		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_NORMAL;
 		break;
-	    case 5:
-		ch = get_acsc(ioBase, ch);
 	    case 2:
 		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET;
 		break;
@@ -1631,6 +1658,10 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	    case 4:
 		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
 		break;
+	    case 5:
+		ch = get_acsc(ioBase, ch & 0xff);
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = ch & A_ATTRIBUTES;
+		break;
 	    case 0:
 	    default:
 		ioBase->std_chmap[i] = A_NORMAL;
@@ -1639,7 +1670,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	}
 	ioBase->std_chmap[i] |= ch;
 	ioBase->box_chmap[i] |= ch;
-	if (ch != i) {
+	if (ch != i && (ioBase->std_chmap[i] & A_ALTCHARSET) == 0) {
 	    if ( ioBase->out_transtbl == NULL )
 		ioBase->out_transtbl = hb_xgrab(256);
 	    ioBase->out_transtbl[i] = ch;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1068 2003/05/27 05:55:05 paultucker Exp $
+ * $Id: ChangeLog,v 1.1069 2003/05/27 06:03:38 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-27 15:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/chrmap.c
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    + now GTCRS is looking for screen map file in $HB_CHARMAP,
+      $HB_ROOT/etc/harbour/hb-charmap.def, /etc/harbour/hb-charmap.def
+      terminal name is taken from 'HB_TERM' or 'TERM' environment variable.
+      If terminal name contains '/' character then is divided to subsections
+      by this char and then each of them is included f.e.:
+          export HB_TERM=linux/acsc/maz2iso
+      means that sections :linux, :acsc, :maz2iso will be loaded.
+      Remember that first subsection name (linux) will be used for terminfo
+      initialization.
+
+  * xharbour/source/codepage/cdpsrwin.c
+    ! changed the codepage name to make the file linking with cdpruwin.c
+      possible. This file is still bad - it's only copy of cdpruwin.c
+      and Luiz has to upload the proper version of it.
 
 2003-05-27 02:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   + makallvc.bat

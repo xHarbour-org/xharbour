@@ -1,5 +1,5 @@
 /*
- * $Id: chrmap.c,v 1.1 2003/05/16 19:52:09 druzus Exp $
+ * $Id: chrmap.c,v 1.2 2003/05/22 11:48:04 druzus Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ static int get_val(char **buf)
 
 static int parse_line(char *buf, int *from, int *to, char *op, int *val, int *mod)
 {
-    char *s;
+    char *s, *s2;
     int ret = 0, ina = 0;
 
     s = buf;
@@ -131,7 +131,16 @@ static int parse_line(char *buf, int *from, int *to, char *op, int *val, int *mo
     s=buf;
     skip_blank(&s);
 
-    if ( *s != '\0' )
+    if ( *s == '@' )
+    {
+	++s;
+	s2 = buf;
+	while ( *s != '\0' && *s != ' ' )
+	    *s2++ = *s++;
+	*s2 = '\0';
+	ret = strlen(buf) > 0 ? 2 : -1;
+    }
+    else if ( *s != '\0' )
     {
 	ret = *from = *to = *val = *mod = -1;
 	*op = '=';
@@ -181,113 +190,145 @@ static void chrmap_init( int *piTransTbl )
 	piTransTbl[i] = (i < 128 ? 1 : 0) << 16 | i;
 }
 
+static int chrmap_parse( FILE *fp, char *pszTerm, int *nTransTbl, char *pszFile )
+{
+    int line = 0, from, to, val, mod, i, n;
+    char buf[256], *s, op;
+    int isTerm = 0;
+    fpos_t pos;
+
+    fgetpos(fp, &pos);
+    rewind(fp);
+
+    while ( !feof(fp) && isTerm < 2 )
+    {
+	++line;
+	if ( fgets(buf, sizeof(buf), fp) != NULL )
+	{
+	    n = 0;
+	    if ( *buf == ':' )
+	    {
+		if ( isTerm == 1 )
+		    isTerm = 2;
+		else
+		{
+		    *buf = '|';
+		    s = buf;
+		    while ( *s != '\0' && *s != ' ' && *s != '\t' &&
+			    *s != '\n' && *s != '\r' )
+			++s;
+		    *s = '\0';
+		    s = buf;
+		    i = strlen(pszTerm);
+		    while ( isTerm == 0 && (s = strstr(s+1, pszTerm)) != NULL )
+		    {
+			if ( *(s-1) == '|' && 
+			     ( s[i] == '|' || s[i] == '\0' ) )
+			    isTerm = 1;
+		    }
+		}
+	    }
+	    else if ( isTerm == 1 )
+	    {
+		n = parse_line(buf, &from, &to, &op, &val, &mod);
+	    }
+
+	    if( n == 2 )
+	    {
+		n = chrmap_parse( fp, buf, nTransTbl, pszFile );
+	    }
+	    else if( n == 1 )
+	    {
+		/* printf("line: %3d\tfrom=%d, to=%d, op='%c', val=%d, mod=%d\n", line, from, to, op, val, mod); */
+		for ( i = from; i <= to; ++i)
+		{
+		    switch (op)
+		    {
+			case '|':
+			    nTransTbl[i] = (i | val);
+			    break;
+			case '&':
+			    nTransTbl[i] = (i & val);
+			    break;
+			case '^':
+			    nTransTbl[i] = (i ^ val);
+			    break;
+			case '+':
+			    nTransTbl[i] = (i + val) & 0xff;
+			    break;
+			case '-':
+			    nTransTbl[i] = (i - val) & 0xff;
+			    break;
+			case '=':
+			    nTransTbl[i] = val;
+			    break;
+			case '*':
+			case ' ':
+			default:
+			    nTransTbl[i] = i;
+			    break;
+		    }
+		    nTransTbl[i] |= mod << 16;
+		}
+	    }
+	    else if ( n == -1 )
+	    {
+		printf("file: %s, parse error at line: %d\n", pszFile, line);
+	    }
+	}
+    }
+
+    fsetpos(fp, &pos);
+
+    return isTerm;
+}
+
 int HB_GT_FUNC(gt_chrmapread( char *pszFile, char *pszTerm, int *nTransTbl ))
 {
     FILE *fp;
+    char buf[256], *ptr, *pTerm;
     int isTerm = -1;
 
     fp = fopen(pszFile, "r");
 
     if ( fp != NULL )
     {
-	int line = 0, from, to, val, mod, i, n;
-	char buf[256], *s, op;
-	
+	strncpy(buf, pszTerm, sizeof(buf));
+	buf[sizeof(buf) - 1] = '\0';
 	isTerm = 0;
-	chrmap_init( nTransTbl );
-
-	while ( !feof(fp) && isTerm < 2 )
+	pTerm = buf;
+	while ( pTerm )
 	{
-	    ++line;
-	    if ( fgets(buf, sizeof(buf), fp) != NULL )
-	    {
-		n = 0;
-		if ( *buf == ':' )
-		{
-		    if ( isTerm == 1 )
-			isTerm = 2;
-		    else
-		    {
-			*buf = '|';
-			s = buf;
-			while ( *s != '\0' && *s != ' ' && *s != '\t' &&
-			        *s != '\n' && *s != '\r' )
-			    ++s;
-			*s = '\0';
-			s = buf;
-			i = strlen(pszTerm);
-			while ( isTerm == 0 && (s = strstr(s+1, pszTerm)) != NULL )
-			{
-			    if ( *(s-1) == '|' && 
-				 ( s[i] == '|' || s[i] == '\0' ) )
-				isTerm = 1;
-			}
-		    }
-		}
-		else if ( isTerm == 1 )
-		    n = parse_line(buf, &from, &to, &op, &val, &mod);
+	    if ( (ptr = strchr( pTerm, '/' )) != NULL )
+		*ptr++ = '\0';
 
-		if( n == 1 )
-		{
-		    /* printf("line: %3d\tfrom=%d, to=%d, op='%c', val=%d, mod=%d\n", line, from, to, op, val, mod); */
-		    for ( i = from; i <= to; ++i)
-		    {
-			switch (op)
-			{
-			    case '|':
-				nTransTbl[i] = (i | val);
-				break;
-			    case '&':
-				nTransTbl[i] = (i & val);
-				break;
-			    case '^':
-				nTransTbl[i] = (i ^ val);
-				break;
-			    case '+':
-				nTransTbl[i] = (i + val) & 0xff;
-				break;
-			    case '-':
-				nTransTbl[i] = (i - val) & 0xff;
-				break;
-			    case '=':
-				nTransTbl[i] = val;
-				break;
-			    case '*':
-			    case ' ':
-			    default:
-				nTransTbl[i] = i;
-				break;
-			}
-			nTransTbl[i] |= mod << 16;
-		    }
-		}
-		/* 
-		else if ( n == -1 )
-		{
-		    printf("file: %s, parse error at line: %d\n", pszFile, line);
-		}
-		*/
-	    }
+	    if ( *pTerm )
+		if ( chrmap_parse( fp, pTerm, nTransTbl, pszFile ) > 0 )
+		    isTerm = 1;
+
+	    pTerm = ptr;
 	}
 	fclose(fp);
     }
-    return isTerm > 1 ? 1 : isTerm;
+    return isTerm;
 }
 
 int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ))
 {
     char *pszFile, szFile[_POSIX_PATH_MAX + 1];
     int nRet = -1;
+
+    chrmap_init( piTransTbl );
     
-    if ( pszTerm == NULL )
+    if ( pszTerm == NULL || *pszTerm == '\0' )
 	pszTerm = getenv("HB_TERM");
-    if ( pszTerm == NULL )
+    if ( pszTerm == NULL || *pszTerm == '\0' )
 	pszTerm = getenv("TERM");
 
-    if ( pszTerm != NULL )
+    if ( pszTerm != NULL && *pszTerm != '\0' )
     {
 	pszFile = getenv("HB_CHRMAP");
-	if ( pszFile != NULL )
+	if ( pszFile != NULL && *pszFile != '\0' )
 	    nRet = HB_GT_FUNC(gt_chrmapread( pszFile, pszTerm, piTransTbl ));
 	if ( nRet == -1 )
 	{
@@ -303,8 +344,6 @@ int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ))
 	if ( nRet == -1 )
 	    nRet = HB_GT_FUNC(gt_chrmapread( s_szDefaultCharMapFile, pszTerm, piTransTbl ));
     }
-    if ( nRet == -1 )
-	chrmap_init( piTransTbl );
 
     return nRet;
 }
