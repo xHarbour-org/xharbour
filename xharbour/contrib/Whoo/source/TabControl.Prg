@@ -87,7 +87,7 @@ METHOD New( oParent, nId, nL, nT, nW, nH, nSel ) CLASS TTabControl
    ::Controls:= {}
    ::nCurSel := IF(nSel==NIL,1,nSel)
 
-   ::Msgs    := {WM_NOTIFY,WM_SIZE}
+   ::Msgs    := {WM_SIZE}
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*

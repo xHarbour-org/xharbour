@@ -53,12 +53,12 @@ typedef struct tagTBADDBITMAP {;
 } TBADDBITMAP, *LPTBADDBITMAP
 
 typedef struct {;
-    NMHDR     hdr;        // required for all WM_NOTIFY messages
-    LPTSTR    lpszText;   // see below
-    WCHAR     szText[80]; // buffer for tool tip text
-    HINSTANCE hinst;      // see below
-    UINT      uflags;     // flag indicating how to interpret the idFrom member of the NMHDR structure that is included in the structure
-} TOOLTIPTEXT, FAR *LPTOOLTIPTEXT
+    NMHDR     hdr;
+    LPTSTR    lpszText;
+    char      szText[80];
+    HINSTANCE hinst;
+    UINT      uflags;
+} TOOLTIPTEXT
 
 CLASS TToolbar FROM TControl
 
@@ -118,7 +118,7 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
    ::lRegister := .F.
    ::lControl  := .T.
 
-   ::Msgs      := IFNIL( ::Msgs, {WM_SIZE}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_SIZE,WM_NOTIFY}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Left      := 0
    ::Top       := 0
@@ -126,7 +126,6 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
    ::Height    := 0
    ::Name      := 'ToolBar32'
    ::ExStyle   := 0
-
    RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
@@ -164,9 +163,6 @@ METHOD AddButton( cName, oBtn ) CLASS TToolBar
    tbb:iString   := LEN(::aButtons)
    AADD(::aButtons,oBtn)
 
-   //__objAddData( self, oBtn:name )
-   //__ObjSetValueList( self, { { oBtn:name, oBtn } } )
-
    SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
    SendMessage(::handle,TB_ADDSTRING, 0,oBtn:Caption)
 
@@ -191,9 +187,9 @@ METHOD Create() CLASS TToolBar
       ::hBMInst:=HINST_COMMCTRL
       ::nBMId  :=IDB_STD_LARGE_COLOR
    ENDIF
-   ::handle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,LEN(::aButtons),;
+   ::handle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,,;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
-   ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
+   ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
    ::Created:=.T.
 return( self )
@@ -201,7 +197,7 @@ return( self )
 
 *-----------------------------------------------------------------------------*
 
-METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
+METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
 
    LOCAL Hdr
    LOCAL Ttt
@@ -224,14 +220,16 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
        endif
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
-     Hdr:Buffer(peek(nlParam,Hdr:sizeof))
+     Hdr:Buffer(peek(nlParam,Hdr:sizeof()))
      DO CASE
      CASE Hdr:code==TTN_NEEDTEXT
        IF (n:=ASCAN(::aButtons,{|btn| btn:id==Hdr:idFrom})) > 0
-         Ttt IS TOOLTIPTEXT
-         Ttt:Buffer(peek(nlParam,Ttt:sizeof))
-         Ttt:lpszText:=::aButtons[n]:hint
-         poke(nlParam,Ttt:value,Ttt:sizeof)
+          Ttt IS TOOLTIPTEXT
+          Ttt:Reset()
+          Ttt:Buffer(peek(nlParam,Ttt:sizeof()))
+          Ttt:lpszText:=::aButtons[n]:hint
+          poke(nlParam,Ttt:value,Ttt:sizeof())
+         RETURN(1)
        ENDIF
 
      CASE Hdr:code==TBN_QUERYINSERT
@@ -242,13 +240,13 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
 
      CASE Hdr:code==TBN_GETBUTTONINFO
          Nmt IS NMTOOLBAR
-         nmt:buffer(peek(nlParam,nmt:sizeof))
+         nmt:buffer(peek(nlParam,nmt:sizeof()))
          RETURN(1)
 
      ENDCASE
    ENDCASE
 
-   RETURN( CallWindowProc(::ntProc,::Parent:handle,nMsg,nwParam,nlParam))
+   RETURN(CallWindowProc(::ntProc,hWnd /*::Parent:handle*/,nMsg,nwParam,nlParam))
 
 *-----------------------------------------------------------------------------*
 

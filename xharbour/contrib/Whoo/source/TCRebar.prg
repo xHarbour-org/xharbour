@@ -66,7 +66,6 @@ METHOD New( oParent ) CLASS TRebar
    ::id        := 1
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := NIL
    ::WndProc   := ""
    ::lHaveProc := .T.
    ::Caption   := ""

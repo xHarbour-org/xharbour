@@ -57,7 +57,7 @@ typedef struct tagTBADDBITMAP {;
 typedef struct {;
     NMHDR     hdr;        // required for all WM_NOTIFY messages
     LPTSTR    lpszText;   // see below
-    WCHAR     szText[80]; // buffer for tool tip text
+    char      szText[80]; // buffer for tool tip text
     HINSTANCE hinst;      // see below
     UINT      uflags;     // flag indicating how to interpret the idFrom member of the NMHDR structure that is included in the structure
 } TOOLTIPTEXT, FAR *LPTOOLTIPTEXT
