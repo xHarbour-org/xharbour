@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.17 2004/03/03 19:27:13 likewolf Exp $
+ * $Id: files.c,v 1.18 2004/03/03 21:45:23 likewolf Exp $
  */
 
 /*
@@ -1068,7 +1068,7 @@ HB_FUNC( FILEDELETE )
          if( (fname = hb_fsFNameSplit( (char*) pDirSpec )) !=NULL )
          {
            if( fname->szDrive )
-               hb_fsChDrv( ( BYTE ) fname->szDrive );
+               hb_fsChDrv( ( BYTE ) (fname->szDrive[0] - 'A') );
 
            if( fname->szPath)
                hb_fsChDir( ( BYTE *) fname->szPath );
@@ -1137,7 +1137,7 @@ HB_FUNC( FILESMAX )
    __dpmi_int( 0x21, &r );
    psp = ( ( (unsigned long) r.x.bx ) << 4 ) & 0xFFFFF;
    
-   handles =_farpeekw( _dos_ds, psp + 0x32 );
+   handles = _farpeekw( _dos_ds, psp + 0x32 );
    hb_retni( handles );
 #endif
 }
