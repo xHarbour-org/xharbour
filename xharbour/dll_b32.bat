@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.5 2003/05/25 22:23:22 lculik Exp $
+REM $Id: dll_b32.bat,v 1.1 2003/09/25 05:55:07 paultucker Exp $
 REM
 REM 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
 REM � This is a batch file to create harbour.dll 넴
@@ -16,9 +16,10 @@ IF '%BCC_DIR%'=='' SET BCC_DIR=e:\bcc55
 :BUILD
 
    make -fhrbdll.bc %1 %2 %3 > dll_b32.log
-
-if errorlevel 1 goto BUILD_ERR
-
+   if errorlevel 1 goto BUILD_ERR
+   if "%1" == "clean" goto CLEAN
+   if "%1" == "CLEAN" goto CLEAN
+ 
 :BUILD_OK
 
 if exist hdll.tmp del hdll.tmp
@@ -31,5 +32,9 @@ goto EXIT
 :BUILD_ERR
 
 notepad dll_b32.log
+goto EXIT
+
+:CLEAN
+  if exist dll_b32.log del dll_b32.log
 
 :EXIT
