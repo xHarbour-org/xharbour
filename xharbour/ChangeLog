@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2051 2004/01/13 17:28:45 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2052 2004/01/14 05:26:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-14 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     !  if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+     changed to :
+        if ( !b_MouseEnable || !_s.MouseMove )
 
 2004-01-13 2:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/tip/tipclient.prg
