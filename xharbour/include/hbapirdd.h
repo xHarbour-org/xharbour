@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.9 2003/01/19 21:44:01 andijahja Exp $
+ * $Id: hbapirdd.h,v 1.10 2003/03/08 01:30:45 horacioroldan Exp $
  */
 
 /*
@@ -170,6 +170,7 @@ typedef struct
    BYTE * atomAlias;       /* The logical name of the data store */
    BOOL   fShared;         /* Share mode of the data store */
    BOOL   fReadonly;       /* Readonly mode of the data store */
+   BYTE * cdpId;           /* Id of a codepage */
    void * lpdbHeader;      /* Pointer to a header of the data store */
 } DBOPENINFO;
 

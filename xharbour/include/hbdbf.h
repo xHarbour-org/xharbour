@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.1.1.1 2001/12/21 10:47:18 ronpinkas Exp $
+ * $Id: hbdbf.h,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
  */
 
 /*
@@ -78,6 +78,7 @@ typedef struct _DBFHEADER
    USHORT uiRecordLen;
    BYTE   bReserved1[ 16 ];
    BYTE   bHasTags;
+   BYTE   bCodePage;
    BYTE   bReserved2[ 3 ];
 } DBFHEADER;
 

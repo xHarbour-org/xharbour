@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.9 2003/01/06 12:40:55 horacioroldan Exp $
+ * $Id: hbrddntx.h,v 1.10 2003/04/18 01:51:26 lculik Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_RDDNTX_H_
 
 #include "hbapirdd.h"
+#include "hbapicdp.h"
 
 #if defined(HB_EXTERN_C)
 extern "C" {
@@ -281,6 +282,7 @@ typedef struct _NTXAREA
    char * szMemoFileName;        /* Name of memo file */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
+   BYTE bCodePage;
    BOOL fShared;                 /* Shared file */
    BOOL fReadonly;               /* Read only file */
    USHORT * pFieldOffset;        /* Pointer to field offset array */
@@ -299,6 +301,7 @@ typedef struct _NTXAREA
    BYTE bDay;
    ULONG * pLocksPos;            /* List of records locked */
    ULONG ulNumLocksPos;          /* Number of records locked */
+   PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
 
    /*
    *  NTX's additions to the workarea structure

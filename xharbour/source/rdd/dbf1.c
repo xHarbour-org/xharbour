@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.25 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.26 2003/05/25 22:03:31 lculik Exp $
  */
 
 /*
@@ -62,10 +62,12 @@
 #include "hbdate.h"
 #include "hbdbsort.h"
 #include "error.ch"
-
+#include "hbapicdp.h"
 #include <errno.h>
 
 #define __PRG_SOURCE__ __FILE__
+
+extern PHB_CODEPAGE s_cdpage;
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
 #define HB_MAX_DOUBLE_LENGTH 320
@@ -1043,6 +1045,7 @@ ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_STRING:
          hb_itemPutCL( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        pField->uiLen );
+         hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
          break;
 
       case HB_IT_LOGICAL:
@@ -1251,6 +1254,8 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                uiSize = pField->uiLen;
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
+            if( HB_IS_STRING( pItem ) )
+               hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], s_cdpage, pArea->cdPage, uiSize );
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
          }
@@ -1761,6 +1766,14 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
+   if( pOpenInfo->cdpId )
+   {
+      pArea->cdPage = hb_cdpFind( (char *) pOpenInfo->cdpId );
+      if( !pArea->cdPage )
+         pArea->cdPage = s_cdpage;
+   }
+   else
+      pArea->cdPage = s_cdpage;
    pArea->fShared = pOpenInfo->fShared;
    pArea->fReadonly = pOpenInfo->fReadonly;
    uiFlags = pOpenInfo->fReadonly ? FO_READ : FO_READWRITE;
@@ -2557,6 +2570,7 @@ ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    pArea->ulRecCount = HB_ULONG_FROM_LE( dbHeader.ulRecCount );
    pArea->fHasMemo = ( dbHeader.bVersion == 0x83 );
    pArea->fHasTags = dbHeader.bHasTags;
+   pArea->bCodePage = dbHeader.bCodePage;
    return SUCCESS;
 }
 
@@ -2577,6 +2591,7 @@ ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    dbfHeader.bMonth = ( BYTE ) lMonth;
    dbfHeader.bDay = ( BYTE ) lDay;
    dbfHeader.bHasTags = ( BYTE ) pArea->fHasTags;
+   dbfHeader.bCodePage = pArea->bCodePage;
 
    /* Update record count */
    if( pArea->fShared )

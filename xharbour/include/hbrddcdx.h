@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.9 2003/01/12 01:52:50 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.10 2003/01/17 19:57:32 horacioroldan Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_RDDCDX_H_
 
 #include "hbapirdd.h"
+#include "hbapicdp.h"
 
 #if defined(HB_EXTERN_C)
 extern "C" {
@@ -340,6 +341,7 @@ typedef struct _CDXAREA
    char * szMemoFileName;        /* Name of memo file */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
+   BYTE bCodePage;
    BOOL fShared;                 /* Shared file */
    BOOL fReadonly;               /* Read only file */
    USHORT * pFieldOffset;        /* Pointer to field offset array */
@@ -358,6 +360,7 @@ typedef struct _CDXAREA
    BYTE bDay;
    ULONG * pLocksPos;            /* List of records locked */
    ULONG ulNumLocksPos;          /* Number of records locked */
+   PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
 
    /*
    *  CDX's additions to the workarea structure
