@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.487 2002/11/13 04:37:14 walito Exp $
+ * $Id: ChangeLog,v 1.488 2002/11/13 04:41:57 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-13 11:44 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    * More compatibility when freezing columns.
+      Report by Luiz Culik.
+    * The cell contains the width of the data. Same of Cl*pper.
+    * Optimizations of speed making previous calculations.
+    * Optimizations made by Pritpal Bedi. (::nRowData, ::aColsPict)
+    * Optimizacions of speed using commands and functions specifics of
+      xHarbour. (FOR EACH - HB_EnumIndex(), AIns(...,<data>,.T.),
+                 ADel(...,.T.) )
 
 2002-11-13 01:07 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/achoice.prg
