@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.48 2003/09/26 20:18:58 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.49 2003/09/27 17:25:51 ronpinkas Exp $
  */
 
 /*
@@ -278,7 +278,6 @@ Source     : Crlf
            | Statement
            | Line
            | ProcReq
-           | error  Crlf  { yyclearin; yyerrok; }
            | Source Crlf
            | Source VarDefs
            | Source FieldsDef
@@ -289,7 +288,6 @@ Source     : Crlf
            | Source Statement
            | Source Line
            | Source ProcReq
-           | Source error Crlf  { yyclearin; yyerrok; }
            ;
 
 Line       : LINE NUM_INTEGER LITERAL Crlf
@@ -467,6 +465,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                else
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUPL_ANNOUNCE, $2, NULL );
              } Crlf
+           | error  { if( hb_comp_bError == FALSE ) yyerror( NULL ); } Crlf  { yyclearin; yyerrok; }
            ;
 
 CrlfStmnt  : { hb_compLinePushIfInside(); } Crlf
@@ -2655,6 +2654,8 @@ int hb_compYACCMain( char * szName )
 
 void yyerror( char * s )
 {
+   //printf( "Error: %i Line: %i Error at '%s'\n", hb_comp_bError, hb_comp_iLine, yytext );
+
    if( yytext[ 0 ] == '\n' )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<eol>" );
@@ -2690,6 +2691,10 @@ void yyerror( char * s )
             {
                hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, "", NULL );
             }
+         }
+         else
+         {
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, yytext );
          }
 
          /*
