@@ -35,10 +35,10 @@ linking the VMGUI library code into it.
 
 
 // these are the flags for CallDll
-#define  DC_MICROSOFT           0x0000      // Microsoft compatible
-#define  DC_BORLAND             0x0001      // Borland compat - default
-#define  DC_CALL_CDECL          0x0010      // __cdecl
-#define  DC_CALL_STD            0x0020      // __stdcall
+#define  DC_MICROSOFT           0      // Microsoft compatible
+#define  DC_BORLAND             1      // Borland compat - default
+#define  DC_CALL_CDECL          16      // __cdecl
+#define  DC_CALL_STD            32      // __stdcall
 
 
 //----------------------------------------------------------------------------//
@@ -153,14 +153,14 @@ linking the VMGUI library code into it.
 
 #xcommand DLL [<static:STATIC>] FUNCTION <FuncName>( [ <uParam1> AS <type1> ] ;
                                                      [, <uParamN> AS <typeN> ] ) ;
-             AS <return> LIB <*DllName*> [FLAGS <flags>]  ;
+             AS <return> LIB <DllName> [FLAGS <flags>]  ;
        => ;
           [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
              local uResult ;;
              Local hInstDLL  :=LoadLibrary(<DllName>);;
-             Local nProcAddr :=GetProcAddress(hInstDLL,<(alias>));;
+             Local nProcAddr :=GetProcAddress(hInstDLL,<(FuncName)>);;
              uResult = CallDLL(hInstDLL, nProcAddr, [<flags>], <return> [, <type1>, <uParam1> ] [, <typeN>, <uParamN> ] ) ;;
-             FreeLibrary(<hInstDLL>);;
+             FreeLibrary(hInstDLL);;
              return uResult
 
 //----------------------------------------------------------------------------//
@@ -172,9 +172,9 @@ linking the VMGUI library code into it.
           [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
              local uResult ;;
              Local hInstDLL  :=LoadLibrary(<DllName>);;
-             Local nProcAddr :=GetProcAddress(hInstDLL,<(alias>));;
+             Local nProcAddr :=GetProcAddress(hInstDLL,<(alias)>);;
              uResult = CallDLL(hInstDLL, nProcAddr, [<flags>], <return> [, <type1>, <uParam1> ] [, <typeN>, <uParamN> ] ) ;;
-             FreeLibrary(<hInstDLL>);;
+             FreeLibrary(hInstDLL);;
              return uResult
 
 

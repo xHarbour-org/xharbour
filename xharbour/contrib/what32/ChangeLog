@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.45 2002/11/09 03:18:27 what32 Exp $
+ * $Id: ChangeLog,v 1.46 2002/12/19 18:32:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-28 20:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+   * include/import.ch
+     ! Fixed the Dll commands definition
 
 2002-12-19 10:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * contrib/what32/DEMO/demo.RES
