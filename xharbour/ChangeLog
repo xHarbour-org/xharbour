@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3755 2005/01/19 22:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3755 2005/01/19 21:19:12 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-20 00:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * improve the speed of indexing DBFs with very big number of
+      records in small DBFs less then 100'000 records the new
+      algorithm can even decrease the speed by ~0.5% due to static
+      costs but in bigger it becomes faster. For 1'000'000 records
+      DBFs is about 20% faster, for 10'000'000 records about twice
+      faster. With bigger DBFs more. Please test it. If you will
+      have any troubles (I hope not) then please comment out in
+      dbfcdx.c:
+        #define HB_CDX_NEW_SORT
+      I should done it before when I was rewriting the indexing but
+      sorry I was too lazy. Now I've found a while. Current cost
+      of comparisons is always n*log2(n) and cannot be more improved.
+      Some small optimizations still can be done but the static cost
+      for small database will be bigger then ~0.5% as in this case
+      so I do not plan to do it in the nearest future.
 
 2005-01-19 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/win32prn.prg

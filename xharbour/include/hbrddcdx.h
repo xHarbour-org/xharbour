@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.36 2004/09/21 02:52:34 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.37 2004/09/21 22:31:12 druzus Exp $
  */
 
 /*
@@ -386,6 +386,8 @@ typedef struct
    BYTE *   pKeyPool;         /* memory buffer for current page then for pages */
    LPCDXSWAPPAGE pSwapPage;   /* list of pages */
    LPCDXPAGE NodeList[ CDX_STACKSIZE ];   /* Stack of pages */
+   ULONG    ulFirst;
+   ULONG *  pSortedPages;
    BYTE     pLastKey[ CDX_MAXKEY ]; /* last key val */
    ULONG    ulLastRec;
    BYTE *   pRecBuff;
