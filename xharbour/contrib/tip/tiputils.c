@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.4 2003/12/03 15:07:05 jonnymind Exp $
+* $Id: tiputils.c,v 1.5 2004/03/23 10:00:31 mauriliolongo Exp $
 ************************************************/
 
 #include "hbapi.h"
@@ -12,9 +12,7 @@
 
 #ifndef HB_OS_WIN_32
    #include <time.h>
-#endif
-
-#if defined _MSC_VER || defined __BORLANDC__
+#else
    #include <windows.h>
 #endif
 
