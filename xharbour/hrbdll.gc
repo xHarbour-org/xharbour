@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.3 2005/02/17 12:22:26 andijahja Exp $
+# $Id: hrbdll.gc,v 1.1 2005/02/19 11:22:29 andijahja Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -531,7 +531,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/smtpcln.o \
    $(OBJ_DIR)/url.o
 
-harbour.dll : $(DLL_OBJECTS)
+$(HARBOUR_DLL) : $(DLL_OBJECTS)
 	$(RM) $@
 	$(CC) -s -shared -Wl,--out-implib,$(HRBDLL_LIB),--output-def,$(HRBDLL_DEF) -o $(HARBOUR_DLL) --warn-duplicate-exports  \
 	$(DLL_OBJECTS) -lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool -loleaut32 -luuid -lmpr
