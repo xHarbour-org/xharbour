@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.152 2002/04/16 16:16:35 map Exp $
+ * $Id: ChangeLog,v 1.153 2002/04/17 00:35:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-16 18:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+    * Minor corrections to recent change.
 
 2002-04-16 17:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.23 2002/04/17 00:35:43 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.24 2002/04/17 00:52:50 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hbset.h"
 
-static const char *s_sNull = "";
+extern char *hb_vm_sNull;
 
 extern unsigned char hb_vm_acAscii[256][2];
 
@@ -247,7 +247,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
    if( szText == NULL || szText[0] == '\0' )
    {
       pItem->item.asString.length  = 0;
-      pItem->item.asString.value   = (char *) s_sNull;
+      pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
    }
    else if( szText[1] == '\0' )
@@ -290,7 +290,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    if( szText == NULL || ulLen == 0 )
    {
       pItem->item.asString.length  = 0;
-      pItem->item.asString.value   = (char *) s_sNull;
+      pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
    }
    else if( ulLen == 1 )
