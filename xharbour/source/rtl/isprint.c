@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.10 2002/07/23 01:52:46 ronpinkas Exp $
+ * $Id: isprint.c,v 1.11 2002/07/23 03:30:03 lculik Exp $
  */
 
 /*
@@ -432,13 +432,9 @@ HB_FUNC(GETPRINTERS)
     unsigned char *buffer;
     unsigned long needed = 0 , returned , a ;
     BOOL res;
-    DWORD err;
 
-    err = 0;
     buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ) ;
-
-    res = FALSE;
-                                                                                             
+                                                                                           
     res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,
           NULL ,
           5 ,
