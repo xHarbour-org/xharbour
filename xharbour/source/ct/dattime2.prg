@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.3 2005/01/14 20:00:00 ptsarenko Exp $
+ * $Id: dattime2.prg,v 1.4 2005/01/15 17:00:00 ptsarenko Exp $
  */
 
 /*
@@ -244,7 +244,7 @@ HB_FUNC( ADDMONTH )
    if( ISDATE( 1 ) )
    {
       PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
       iNum = hb_parni( 2 );
    }
    else if( ISNUM(1) )
@@ -286,7 +286,7 @@ HB_FUNC( DOY )
 
    if( pDate )
    {
-      lDate = pDate->item.asDate.value;
+      lDate = hb_itemGetDL( pDate );
    }
    else
    {
@@ -303,9 +303,9 @@ HB_FUNC( ISLEAP )
    int iYear, iMonth, iDay;
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
-   if( pDate && pDate->item.asDate.value )
+   if( pDate && hb_itemGetDL( pDate ) )
    {
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
    }
    else
    {
@@ -340,9 +340,9 @@ HB_FUNC( QUARTER )
 
    if( pDate )
    {
-      if( pDate->item.asDate.value )
+      if( hb_itemGetDL( pDate ) )
       {
-         hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+         hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
       }
       else
       {
@@ -366,7 +366,7 @@ HB_FUNC( LASTDAYOM )
    if ( ISDATE(1) )
    {
       PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-      LONG lDate = pDate->item.asDate.value;
+      LONG lDate = hb_itemGetDL( pDate );
       if( lDate )
       {
          hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
@@ -409,7 +409,7 @@ HB_FUNC( WEEK )
 
    if( ISDATE(1) )
    {
-      lDate = pDate->item.asDate.value;
+      lDate = hb_itemGetDL( pDate );
       if( ! lDate )
       {
          hb_retni( 0 );
@@ -439,7 +439,7 @@ HB_FUNC( WEEK )
    {
       LONG lDate2 = lDate + 3 - ((hb_dateDOW( iYear, iMonth, iDay ) + 5) % 7);
 
-      iWeek = (ct_doy(lDate2) + 1) / 7 + 1;
+      iWeek = (ct_doy(lDate2) - 1) / 7 + 1;
    }
 
    hb_retni( iWeek );

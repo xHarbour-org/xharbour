@@ -233,7 +233,7 @@ RETURN ( nYear % 4 == 0 ) .AND. ( ( nYear % 100 != 0 ) .OR. ( nYear % 400 == 0 )
 METHOD IsValid() CLASS TDateTime
  // we allow for the leap seconds, although we don't use them (yet)
 RETURN ( ::GetYear() >= 1601 .AND. ::GetYear() <= 30827 ) .AND. ;
-       ( ::GetMonth() >= 1 .AND. ::GetMont() <= 12 ) .AND.;
+       ( ::GetMonth() >= 1 .AND. ::GetMonth() <= 12 ) .AND.;
        ( ::GetMonthDay() <= ::GetNumOfDaysInMonth(::Year, ::Month ) ) .AND. ;
        ( ::GetHour() >= 0 .AND. ::GetHour() < 24 ) .AND. ;
        ( ::GetMinute() >= 0 .AND. ::GetMinute() < 60 ) .AND. ;
