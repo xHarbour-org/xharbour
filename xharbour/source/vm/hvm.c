@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.234 2003/07/14 23:27:56 jonnymind Exp $
+ * $Id: hvm.c,v 1.235 2003/07/15 09:15:34 andijahja Exp $
  */
 
 /*
@@ -4799,6 +4799,14 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          pAlias->type = HB_IT_NIL;
          break;
 
+      /*
+       These types were added for Clipper compatibility
+      */
+      case HB_IT_NIL:
+      case HB_IT_BLOCK:
+      case HB_IT_LOGICAL:
+      case HB_IT_ARRAY:
+
       case HB_IT_DOUBLE:
          /* Alias was evaluated from an expression, (nWorkArea)->field
           */
@@ -6010,12 +6018,22 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
    pAlias = hb_stackItemFromTop( -1 );
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
-   /* NOTE: hb_vmSelecWorkarea clears passed item
-    */
-   if( hb_vmSelectWorkarea( pAlias ) == SUCCESS )
-      hb_rddGetFieldValue( pAlias, pSym );
+   /*
+    This was added for Clipper compatibility
+   */
+   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) || ( pAlias->type == HB_IT_BLOCK ) )
+   {
+      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
+   }
+   else
+   {
+      /* NOTE: hb_vmSelecWorkarea clears passed item
+       */
+      if( hb_vmSelectWorkarea( pAlias ) == SUCCESS )
+         hb_rddGetFieldValue( pAlias, pSym );
 
-   hb_rddSelectWorkAreaNumber( iCurrArea );
+      hb_rddSelectWorkAreaNumber( iCurrArea );
+   }
 }
 
 /* It pops the last item from the stack to use it to select a workarea

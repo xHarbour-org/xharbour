@@ -1,5 +1,5 @@
 /*
- * $Id: rt_array.prg,v 1.1.1.1 2001/12/21 10:44:38 ronpinkas Exp $
+ * $Id: rt_array.prg,v 1.2 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ FUNCTION Main_ARRAY()
    TEST_LINE( aTail()                         , NIL                                        )
 #endif
    TEST_LINE( aTail( NIL )                    , NIL                                        )
-   TEST_LINE( aTail( "" )                     , NIL                                        )
+   TEST_LINE( aTail( "" )                     , ""                                         )
    TEST_LINE( aTail( {} )                     , NIL                                        )
    TEST_LINE( aTail( { 1, 2 } )               , 2                                          )
 #ifdef __HARBOUR__
