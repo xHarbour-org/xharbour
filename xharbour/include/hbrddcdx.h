@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.10 2003/01/17 19:57:32 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.1 2003/02/16 17:23:23 horacioroldan Exp $
  */
 
 /*
@@ -175,12 +175,14 @@ typedef struct _CDXTAG
    //USHORT     KeyLength;
    USHORT     MaxKeys;
    LPCDXKEYINFO  CurKeyInfo;    /* current value of key expression */
-   LPPAGEINFO RootPage;
+   LPCDXPAGEINFO RootPage;
    LPCDXKEYINFO  HotKey;        /* value of hot key expression */
    PHB_ITEM   topScope;
    LPCDXKEYINFO  topScopeKey;
    PHB_ITEM   bottomScope;
    LPCDXKEYINFO  bottomScopeKey;
+   LPCDXPAGEINFO pagePool;
+   ULONG     ulVersion;
 } CDXTAG;
 typedef CDXTAG * LPCDXTAG;
 

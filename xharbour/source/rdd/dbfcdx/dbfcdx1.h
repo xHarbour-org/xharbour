@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.13 2002/10/12 00:42:30 horacioroldan Exp $
+ * $Id: dbfcdx1.h,v 1.1 2003/02/16 17:23:07 horacioroldan Exp $
  */
 
 /*
@@ -176,12 +176,14 @@ typedef CDXKEYINFO * LPCDXKEYINFO;
 
 struct _CDXTAG;    /* forward declaration */
 
-typedef struct HB_PAGEINFO_STRU
+typedef struct HB_CDXPAGEINFO_STRU
 {
    LONG      Page;
    LONG      Left;
    LONG      Right;
    BOOL      Changed;
+   BOOL      keyAdded;
+   BYTE      bUsed;
    BOOL      NewRoot;
    BOOL      LastEntry;
    BOOL      Reload;
@@ -195,16 +197,19 @@ typedef struct HB_PAGEINFO_STRU
    BYTE      TCBits;
    BYTE      DCMask;
    BYTE      TCMask;
-   USHORT    Space;
+   /* USHORT     Space; */
+   SHORT     FreeSpace;
    LPCDXKEYINFO pKeys;
    USHORT    uiKeys;
    SHORT     CurKey;
-   struct HB_PAGEINFO_STRU * Owner;
-   struct HB_PAGEINFO_STRU * Child;
+   struct HB_CDXPAGEINFO_STRU * Owner;
+   struct HB_CDXPAGEINFO_STRU * Child;
    struct _CDXTAG * TagParent;
-} HB_PAGEINFO;
+   struct HB_CDXPAGEINFO_STRU * pPoolPrev;
+   struct HB_CDXPAGEINFO_STRU * pPoolNext;
+} HB_CDXPAGEINFO;
 
-typedef HB_PAGEINFO * LPPAGEINFO;
+typedef HB_CDXPAGEINFO * LPCDXPAGEINFO;
 
 
 /*SORT stuff*/
