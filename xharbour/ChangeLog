@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1609 2003/10/20 02:37:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1610 2003/10/20 02:39:28 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-10-20 11:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    + Added support for DO <proc> WITH @VarName ...
+      /* Clipper compatability. */
+
+  * tests/pp.prg
+  * source/pp/ppcore.c
+    ! Fixed support for stringify of a macro exp.
+      /* Clipper compatability. */
+
+  * source/vm/codebloc.c
+    % Optimized and improved detached locals support.
 
 2003-10-20 04:10 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * makefile.bc
@@ -26,14 +39,14 @@
 
   * tests/service.prg
     % Beautify
-    + Recording on file. 
+    + Recording on file.
 
 2003-10-19 23:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rdd/dbcmd.c
     ! Fixed rddMoveFields() to use the proper workarea method to
       retrieve filed names.
 
-2003-10-19 95:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2003-10-19 19:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c
     * Corrected minor typo.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.80 2003/10/13 05:21:33 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.81 2003/10/14 02:51:23 ronpinkas Exp $
  */
 
 /*
@@ -3912,6 +3912,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 {
   int rmlen = lenreal, ifou, lenitem, i;
   char sQuotes[ 4 ] = "\"\",";
+  char *pTemp;
 
   HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
 
@@ -3930,6 +3931,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
   case '0':  /* Regular result marker  */
     hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
     break;
+
   case '1':  /* Dumb stringify result marker  */
     pp_rQuotes( expreal, sQuotes );
     hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
@@ -3939,6 +3941,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     }
     rmlen = lenreal + 2;
     break;
+
   case '2':  /* Normal stringify result marker  */
     if( !lenreal )
       hb_pp_Stuff( "", ptro, 0, 4, lenres );
@@ -3947,112 +3950,146 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         hb_pp_Stuff( "", ptro, 0, 4, lenres );
         lenres -= 4;
         rmlen = 0;
+
         do
-          {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
-            lenitem = (ifou)? ifou-1:lenreal;
-            if( *expreal != '\0' )
+        {
+           ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
+           lenitem = (ifou)? ifou-1:lenreal;
+
+           if( *expreal != '\0' )
+           {
+              /* Ron Pinkas added 2000-01-21 */
+              if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenitem )
               {
-                /* Ron Pinkas added 2000-01-21 */
-                if( *expreal == '&' )
-                {
-                  i = 0;
-                  if( ! ifou )
-                  {
+                 i = 0;
+                 if( ! ifou )
+                 {
                     lenitem--;
+
                     if( expreal[lenitem - 1] == '.' )
                     {
                        lenitem--;
                     }
-                  }
-                  hb_pp_Stuff( expreal + 1, ptro, lenitem, 0, lenres );
-                }
-                else /* END Ron Pinkas 2000-01-21 */
-                {
-                  i = (ifou)? 3:2;
-                  pp_rQuotes( expreal, sQuotes );
-                  hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
-                  hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
-                }
-                ptro += i + lenitem;
-                rmlen += i + lenitem;
+                 }
+
+                 hb_pp_Stuff( expreal + 1, ptro, lenitem, 0, lenres );
               }
-            expreal += ifou;
-            lenreal -= ifou;
-          }
+              else /* END Ron Pinkas 2000-01-21 */
+              {
+                 i = (ifou)? 3:2;
+                 pp_rQuotes( expreal, sQuotes );
+                 hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
+                 hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
+              }
+
+              ptro += i + lenitem;
+              rmlen += i + lenitem;
+           }
+
+           expreal += ifou;
+           lenreal -= ifou;
+        }
         while( ifou > 0 );
-      }
+    }
     else
-      {
-        /* Ron Pinkas added 2000-01-21 */
-        if( *expreal == '&' )
-        {
+    {
+       /* Ron Pinkas added 2000-01-21 */
+       if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenreal )
+       {
           rmlen--;
+
           if( expreal[lenreal - 1] == '.' )
           {
-            rmlen--;
-            lenreal--;
+             rmlen--;
+             lenreal--;
           }
+
           hb_pp_Stuff( expreal + 1, ptro, lenreal - 1, 4, lenres );
-        }
-        else /* END Ron Pinkas 2000-01-21 */
-        {
+       }
+       else /* END Ron Pinkas 2000-01-21 */
+       {
           pp_rQuotes( expreal, sQuotes );
           hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
           hb_pp_Stuff( expreal, ptro+1, lenreal, 0, lenres );
           rmlen = lenreal + 2;
-        }
-      }
+       }
+    }
+
     break;
+
   case '3':  /* Smart stringify result marker  */
     if( patttype == '1' )          /* list match marker */
-      {
+    {
         hb_pp_Stuff( "", ptro, 0, 4, lenres );
         lenres -= 4;
         rmlen = 0;
+
         do
-          {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
-            lenitem = (ifou)? ifou-1:lenreal;
-            if( *expreal != '\0' )
-              {
-                if( !lenitem || *expreal == '(' || (*expreal=='&' && lenreal>1) ||
-                     ( *expreal=='\"' && *(expreal+lenitem-1)=='\"' ) ||
-                     ( *expreal == '\'' && *(expreal+lenitem-1)=='\'' ) )
-                  {
-                    if( ifou ) lenitem++;
-                    if( *expreal == '&' )
-                    {
-                       lenitem--;
-                       if( expreal[lenitem - 1] == '.' )
-                       {
-                          lenitem--;
-                       }
-                    }
-                    hb_pp_Stuff( ( *expreal=='&' ) ? expreal + 1 : expreal, ptro,
-                              lenitem, 0, lenres );
-                  }
-                else
-                  {
-                    i = (ifou)? 3:2;
-                    pp_rQuotes( expreal, sQuotes );
-                    hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
-                    hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
-                    ptro += i;
-                    rmlen += i;
-                  }
-                ptro += lenitem;
-                rmlen += lenitem;
-              }
-            expreal += ifou;
-            lenreal -= ifou;
-          }
+        {
+           ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
+           lenitem = (ifou) ? ifou - 1 : lenreal;
+
+           if( *expreal != '\0' )
+           {
+               if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) && pTemp - expreal < lenitem )
+               {
+                   i = (ifou)? 3:2;
+                   pp_rQuotes( expreal, sQuotes );
+                   hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
+                   hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
+                   ptro += i;
+                   rmlen += i;
+               }
+               else if( !lenitem || *expreal == '(' || (*expreal=='&' && lenreal > 1 ) ||
+                    ( *expreal=='\"' && *(expreal+lenitem-1)=='\"' ) ||
+                    ( *expreal == '\'' && *(expreal+lenitem-1)=='\'' ) )
+               {
+                   if( ifou )
+                   {
+                      lenitem++;
+                   }
+
+                   if( *expreal == '&' )
+                   {
+                      lenitem--;
+                      if( expreal[lenitem - 1] == '.' )
+                      {
+                         lenitem--;
+                      }
+                   }
+
+                   hb_pp_Stuff( ( *expreal == '&' ) ? expreal + 1 : expreal, ptro, lenitem, 0, lenres );
+               }
+               else
+               {
+                   i = (ifou)? 3:2;
+                   pp_rQuotes( expreal, sQuotes );
+                   hb_pp_Stuff( sQuotes, ptro, i, 0, lenres );
+                   hb_pp_Stuff( expreal, ptro+1, lenitem, 0, lenres+i );
+                   ptro += i;
+                   rmlen += i;
+               }
+
+               ptro += lenitem;
+               rmlen += lenitem;
+           }
+
+           expreal += ifou;
+           lenreal -= ifou;
+        }
         while( ifou > 0 );
-      }
+    }
+    else if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) && pTemp - expreal < lenitem )
+    {
+        pp_rQuotes( expreal, sQuotes );
+        hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
+        hb_pp_Stuff( expreal, ptro + 1, lenreal, 0, lenres );
+        rmlen = lenreal + 2;
+    }
     else if( !lenreal || *expreal == '(' || (*expreal=='&' && lenreal>1) ||
              ( *expreal == '\"' && *( expreal + lenreal - 1 ) == '\"' ) ||
              ( *expreal == '\'' && *( expreal + lenreal - 1 ) == '\'' ) )
-      {
+    {
         if( *expreal == '&' )
         {
           rmlen--;
@@ -4062,17 +4099,18 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
             lenreal--;
           }
         }
-        hb_pp_Stuff( ( *expreal == '&' ) ? expreal + 1 : expreal, ptro,
-                ( *expreal == '&' ) ? lenreal - 1 : lenreal, 4, lenres );
-      }
+
+        hb_pp_Stuff( ( *expreal == '&' ) ? expreal + 1 : expreal, ptro, ( *expreal == '&' ) ? lenreal - 1 : lenreal, 4, lenres );
+    }
     else
-      {
+    {
         pp_rQuotes( expreal, sQuotes );
         hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
         hb_pp_Stuff( expreal, ptro + 1, lenreal, 0, lenres );
         rmlen = lenreal + 2;
-      }
+    }
     break;
+
   case '4':  /* Blockify result marker  */
     if( !lenreal )
       hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );

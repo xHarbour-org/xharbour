@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.35 2003/10/19 22:40:07 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.36 2003/10/20 02:37:26 ronpinkas Exp $
  */
 
 /*
@@ -125,22 +125,22 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
           */
          pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable++ ) );
 
-         if( HB_IS_BYREF( pLocal ) )
-         {
-            pValue = hb_itemUnRef( pLocal );
-         }
-         else
-         {
-            pValue = pLocal;
-         }
-
-         if( ! HB_IS_MEMVAR( pValue ) ) // Should we use pLocal instead???
+         if( ! HB_IS_MEMVAR( pLocal ) )
          {
             /* Change the value only if this variable is not referenced
              * by another codeblock yet.
              * In this case we have to copy the current value to a global memory
              * pool so it can be shared by codeblocks
              */
+
+            if( HB_IS_BYREF( pLocal ) )
+            {
+               pValue = hb_itemUnRef( pLocal );
+            }
+            else
+            {
+               pValue = pLocal;
+            }
 
             hMemvar = hb_memvarValueNew( pValue, FALSE );
 
@@ -152,30 +152,26 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
 
             // Need to refelct in the local as well.
-            if( pLocal != pValue && HB_VM_STACK.pBase > HB_VM_STACK.pItems )
+            if( pLocal != pValue )
             {
-               PHB_ITEM *pItem = HB_VM_STACK.pBase - 1;
-
-               pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
-               pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
-               pLocal->item.asMemvar.offset    = 0;
-               pLocal->item.asMemvar.value     = hMemvar;
-
-               hb_memvarValueIncRef( pLocal->item.asMemvar.value );
+               PHB_ITEM *pItem = HB_VM_STACK.pPos - 1;
 
                // Scan the stack for possible additional refrences to the now *detached* value!
                while( pItem != HB_VM_STACK.pItems )
                {
-                  if( ( *pItem )->type & HB_IT_BYREF )
+                  if( ( *pItem ) == pLocal )
+                  {
+                     hb_memvarValueIncRef( hMemvar );
+                  }
+                  else if( ( *pItem ) == pValue )
+                  {
+                     // Done.
+                  }
+                  else if( ( *pItem )->type & HB_IT_BYREF )
                   {
                      if( hb_itemUnRef( *pItem ) == pValue )
                      {
-                        ( *pItem )->type = HB_IT_BYREF | HB_IT_MEMVAR;
-                        ( *pItem )->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
-                        ( *pItem )->item.asMemvar.offset    = 0;
-                        ( *pItem )->item.asMemvar.value     = hMemvar;
-
-                        hb_memvarValueIncRef( ( *pItem )->item.asMemvar.value );
+                        hb_memvarValueIncRef( hMemvar );
                      }
                   }
 
@@ -191,7 +187,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             /* Increment the reference counter so this value will not be
              * released if other codeblock will be deleted
              */
-            memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
+            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
             //TraceLog( NULL, "Detach: %p to %p\n", pLocal, pCBlock->pLocals + ui );
          }
 

@@ -5628,6 +5628,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
   LOCAL xValue, nRepeats := 0, nDependee, nGroupStart, sDumb, aBackUp := aClone( aMarkers )
   LOCAL nMarkers, anMarkers, bBuildList
   LOCAL nGroupIterator
+  LOCAL lMacro, lComplexMacro, sTemp
 
   IF aResults[1] == NIL
      nResults := 0
@@ -5889,6 +5890,17 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               nMatches := Len( xValue )
               FOR nMatch := 1 TO nMatches
                  IF Left( xValue[nMatch], 1 ) == '&'
+                    lMacro := .T.
+                    sTemp := SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
+
+                    IF '.' $ sTemp .OR. '&' $ sTemp
+                       lComplexMacro := .T.
+                    ENDIF
+                 ELSE
+                    lMacro := .F.
+                 ENDIF
+
+                 IF lMacro .AND. ! lComplexMacro
                     IF Right( xValue[nMatch], 1 ) == '.'
                        sResult += SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
                     ELSE
@@ -5911,6 +5923,17 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            ELSE
               IF ! ( xValue == NIL )
                  IF Left( xValue, 1 ) == '&'
+                    lMacro := .T.
+                    sTemp := SubStr( xValue, 2, Len( xValue ) - 2 )
+
+                    IF '.' $ sTemp .OR. '&' $ sTemp
+                       lComplexMacro := .T.
+                    ENDIF
+                 ELSE
+                    lMacro := .F.
+                 ENDIF
+
+                 IF lMacro .AND. ! lComplexMacro
                     IF Right( xValue, 1 ) == '.'
                        sResult += SubStr( xValue, 2, Len( xValue ) - 2 )
                     ELSE
@@ -5937,6 +5960,17 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                     sResult += xValue[nMatch]
                  ELSE
                     IF Left( xValue[nMatch], 1 ) == '&'
+                       lMacro := .T.
+                       sTemp := SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
+
+                       IF '.' $ sTemp .OR. '&' $ sTemp
+                          lComplexMacro := .T.
+                       ENDIF
+                    ELSE
+                       lMacro := .F.
+                    ENDIF
+
+                    IF lMacro .AND. ! lComplexMacro
                        IF Right( xValue[nMatch], 1 ) == '.'
                           sResult += SubStr( xValue[nMatch], 2, Len( xValue[nMatch] ) - 2 )
                        ELSE
@@ -5957,6 +5991,17 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                     sResult += xValue
                  ELSE
                     IF Left( xValue, 1 ) == '&'
+                       lMacro := .T.
+                       sTemp := SubStr( xValue, 2, Len( xValue ) - 2 )
+
+                       IF '.' $ sTemp .OR. '&' $ sTemp
+                          lComplexMacro := .T.
+                       ENDIF
+                    ELSE
+                       lMacro := .F.
+                    ENDIF
+
+                    IF lMacro .AND. ! lComplexMacro
                        IF Right( xValue, 1 ) == '.'
                           sResult += SubStr( xValue, 2, Len( xValue ) - 2 )
                        ELSE
