@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2262 2004/02/11 15:09:11 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2263 2004/02/11 16:07:45 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-11 09:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() support for List Marker, when the input is a comma (implied NIL).
+
 2004-02-11 17:06 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
   * makefile.vc
@@ -15,9 +19,9 @@
 
   * source/rtl/filestat.c
     ! Fixed Windows and "unknown system" compilation
-    ! Declared INVALID_FILE_ATTRIBUTES if not present (BORLANDC 
+    ! Declared INVALID_FILE_ATTRIBUTES if not present (BORLANDC
       headers/free version lacks it).
-  
+
   * source/rtl/dateshb.c
     ! TimeOfDay() Returns 00:00:00 if seconds == 0; check to see how
       is done on hb_pcount() instead of hb_parni()
@@ -58,9 +62,9 @@
      contrib/htmllib/oframe.prg
      contrib/htmllib/ohtm.prg
      contrib/htmllib/include/default.ch
-     contrib/htmllib/include/html.ch 
+     contrib/htmllib/include/html.ch
      ! minor fix to some method on this classes since it was not matching the def on html.ch
- 
+
 
 2004-02-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/vm/hvm.c
@@ -79,7 +83,7 @@
       To your knowledge: if this test doesn't fail then it means
       that it's not LONGLONG number but double. Proper behavior for
       LONGLONG should be:
-         !  968 MAIN_MATH(260)  val("9223372036854775807")              
+         !  968 MAIN_MATH(260)  val("9223372036854775807")
                 Result: 9223372036854775807
               Expected: 9223372036854776000
       We hacked in some places xHarbour libs for LONGLONG support

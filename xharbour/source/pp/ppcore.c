@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.124 2004/01/28 01:54:33 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.125 2004/02/10 06:43:17 ronpinkas Exp $
  */
 
 /*
@@ -2715,7 +2715,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
           ptr = ptri;
 
-          if( *ptri == ',' || MatchToken( &ptri, &ptrmp, !com_or_xcom ) == FALSE )
+          if( *ptri == ',' || ! MatchToken( &ptri, &ptrmp, !com_or_xcom ) )
           {
              ptri = ptr;
 
@@ -3217,7 +3217,14 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
        ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) ||
        ( ( *ptri )[0] == '-' && ( *ptri )[1] == '>' ) )
    {
-      return 0;
+      if( cMarkerType == '1' && ( *ptri )[0] == ',' )
+      {
+         goto ProcessExp;
+      }
+      else
+      {
+         return 0;
+      }
    }
 
    if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
@@ -3253,7 +3260,9 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       goto Done;
    }
 
-   State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
+ ProcessExp:
+
+   State = ( **ptri == '\'' || **ptri =='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
    {
@@ -4097,7 +4106,7 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
          default:    /*   Key word    */
            ptr = ptri;
 
-           if( *ptri == ',' || MatchToken( &ptri, &ptrmp, !com_or_xcom ) == FALSE )
+           if( *ptri == ',' || ! MatchToken( &ptri, &ptrmp, !com_or_xcom ) )
            {
               ptri = ptr;
 
