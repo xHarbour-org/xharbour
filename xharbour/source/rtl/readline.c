@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.10 2004/04/01 22:00:42 druzus Exp $
+ * $Id: readline.c,v 1.11 2004/06/29 22:14:13 ronpinkas Exp $
  */
 
 /*
@@ -85,9 +85,6 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int
 
    do
    {
-
-// printf( "1st turn, nTries = %i, lOffset = %d, uiBuffLen = %i \n", nTries, lOffset, uiBuffLen );
-
       if(nTries>0)
       {
          /* pBuff can be enlarged to hold the line as needed.. */
@@ -98,7 +95,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int
 
       /* read from file */
       lRead = hb_fsReadLarge( hFileHandle, pBuff + lOffset, uiSize-lOffset );
-// printf( "read %d bytes\n", lRead );
+
       /* scan the read buffer */
 
       if (lRead>0)
@@ -153,10 +150,12 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int
             if( nTries == 0 )
             {
                pBuff[0] = '\0';
+               *puiBuffLen = 0;
             }
             else
             {
-               pBuff[ lOffset + lRead - 1] = '\0';
+               pBuff[ lOffset + lRead ] = '\0';
+               *puiBuffLen = lOffset + lRead;
             }
 
             *bEOF = 1;
@@ -241,8 +240,6 @@ HB_FUNC( HB_FREADLINE )
    }
 
    pBuffer = hb_fsReadLine( hFileHandle, &uSize, Term, iTermSizes, iTerms, &bFound, &bEOF  );
-
-   //TraceLog( NULL, "Len: %i, >%s<\n", uSize, pBuffer );
 
    hb_storclenAdopt( (char*) pBuffer, uSize, 2 );
    hb_retnl( bEOF ? -1 : 0 );
