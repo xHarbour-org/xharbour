@@ -116,8 +116,11 @@
 
    #INCLUDE "hbextern.ch"
    #DEFINE  CRLF HB_OsNewLine()
+
    #ifdef FW
-      #INCLUDE "fwextern.ch"
+      #ifdef REQUEST_FWALL
+         #INCLUDE "fwextern.ch"
+      #endif
    #else
       #ifdef MINIGUI
          #define WIN
@@ -913,13 +916,13 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       FOR nVar := 1 TO nVars
          s_aProcStack[s_nProcStack][4][nVar][1] := s_asLocals[nVar]
-         
+
          #ifdef __HARBOUR__
             s_aProcStack[s_nProcStack][4][nVar][2] := __MVGet( s_asLocals[nVar] )
          #else
             s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
          #endif
-         
+
          __MXRelease( s_asLocals[nVar] )
          //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
          //TraceLog( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
@@ -936,9 +939,9 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       FOR nVar := 1 TO nVars
          #ifdef __HARBOUR__
             __QQPub( s_aStatics[nVar][1] )
-            
+
             __MVPut( s_aStatics[nVar][1], s_aStatics[nVar][2] )
-            
+
             //Alert( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1] )
             //TraceLog( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1], s_aStatics[nVar][2] )
          #else
@@ -1192,7 +1195,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       nVars := Len( s_aProcStack[s_nProcStack][4] )
       FOR nVar := 1 TO nVars
          aAdd( s_asLocals, s_aProcStack[s_nProcStack][4][nVar][1] )
-         
+
          #ifdef __HARBOUR__
             __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
             __MVPut( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
@@ -2065,7 +2068,7 @@ PROCEDURE PP_LocalParams( aVars )
    //TraceLog( ValToPrg( s_aParams ) )
 
 //   MessageBox( 0, "PP_LocalParams", "Debug", 0 )
-   
+
    FOR nVar := 1 TO nVars
       IF ( nParams := Len( s_aParams ) ) > 0
          xInit := s_aParams[1]
@@ -2077,7 +2080,7 @@ PROCEDURE PP_LocalParams( aVars )
 
       //? nVar, aVars[nVar], xInit
       //Inkey(0)
-      
+
       cVar := Upper( aVars[nVar] )
 
     #ifdef __XHARBOUR__
@@ -2086,13 +2089,13 @@ PROCEDURE PP_LocalParams( aVars )
       IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0
     #endif
          __QQPub( cVar )
-         
+
          #ifdef __HARBOUR__
             __MVPUT( cVar, xInit )
          #else
             &( cVar ) := xInit
          #endif
-         
+
          aAdd( s_asLocals, cVar )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
@@ -2124,13 +2127,13 @@ PROCEDURE PP_Params( aVars )
       IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
          __QQPub( cVar )
-         
+
          #ifdef __HARBOUR__
             __MVPUT( cVar, xInit )
          #else
             &( cVar ) := xInit
          #endif
-         
+
          aAdd( s_asPrivates, cVar )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
@@ -2161,13 +2164,13 @@ PROCEDURE PP_Privates( aVars )
       IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
          __QQPub( cVar )
-         
+
          #ifdef __HARBOUR__
             __MVPut( cVar, &( cInit ) )
          #else
             &( cVar ) := &( cInit )
          #endif
-         
+
          aAdd( s_asPrivates, cVar )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Private redeclaration: ], aVars ) )
@@ -2198,13 +2201,13 @@ PROCEDURE PP_Locals( aVars )
       IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
          __QQPub( cVar )
-         
+
          #ifdef __HARBOUR__
             __MVPut( cVar, &( cInit ) )
          #else
             &( cVar ) := &( cInit )
          #endif
-         
+
          aAdd( s_asLocals, cVar )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Local redeclaration: ], aVars ) )
@@ -2234,13 +2237,13 @@ PROCEDURE PP_Publics( aVars )
       IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
          __QQPub( cVar )
-         
+
          #ifdef __HARBOUR__
             __MVPut( cVar, &( cInit ) )
          #else
             &( cVar ) := &( cInit )
          #endif
-         
+
          aAdd( s_asPublics, cVar )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Public redeclaration: ], aVars ) )
@@ -2260,7 +2263,7 @@ PROCEDURE PP_Statics( aVars )
    IF s_aStatics == NIL
       s_aStatics := {}
    ENDIF
-      
+
    FOR nVar := 1 TO nVars
       IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
          cInit := LTrim( SubStr( aVars[nVar], nAt + 2 ) )
@@ -2270,7 +2273,7 @@ PROCEDURE PP_Statics( aVars )
       ENDIF
 
       cVar := Upper( aVars[nVar] )
-      
+
     #ifdef __XHARBOUR__
       IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0
     #else
@@ -2288,7 +2291,7 @@ PROCEDURE PP_Statics( aVars )
          aAdd( s_aStatics, { cVar, NIL } )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Static redeclaration: ], aVars ) )
-      ENDIF   
+      ENDIF
    NEXT
 
    IF s_nProcStack > 0
@@ -9944,7 +9947,7 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
    LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure, bPreset, aPresetProcedures
    LOCAL nProc
-   
+
    #ifdef __XHARBOUR__
       #ifdef DYN
          LOCAL nPresetDyn
