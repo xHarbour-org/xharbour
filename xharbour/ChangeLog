@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2577 2004/03/16 01:42:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.2578 2004/03/16 02:40:25 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-16 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * More optimizations, formatting.
+      Again TBrowse has gained, now % is getting out of my hands, more speed.
+      Please inform if something is broken.
+
 2004-03-16 09:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.c
     ! minor fix for undetected declared public in ie (due to recent fix):
