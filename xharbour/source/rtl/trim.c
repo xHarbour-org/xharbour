@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.4 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: trim.c,v 1.5 2004/02/21 00:26:44 andijahja Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ extern char *hb_vm_sNull;
 extern char *hb_vm_acAscii[256];
 
 /* Memo type is handled here */
-static PHB_ITEM HB_EXPORT hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen )
+static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLM(%p, %s, %lu)", pItem, szText, ulLen));
 
