@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.42 2005/01/10 18:45:19 druzus Exp $
+# $Id: hb-func.sh,v 1.43 2005/01/20 23:12:16 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -321,19 +321,26 @@ for gt in \${HB_GT_REQ}; do
 done
 [ -n "\${HB_FM_REQ}" ] && HB_LNK_REQ="\${HB_LNK_REQ} HB_FM_\${HB_FM_REQ}"
 
+HB_LNK_ATTR=""
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
     libs="${hb_libs} ${hb_libsc}"
 else
     l="${name}"
     if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
-        ext="dylib"
+        pref="lib"
+        ext=".dylib"
         LINK_OPT="-bind_at_load -multiply_defined suppress"
+    elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
+        pref=""
+        ext=".dll"
+	HB_LNK_ATTR="__attribute__ ((dllimport))"
     else
-        ext="so"
+        pref="lib"
+        ext=".so"
     fi
-    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.\${ext}" ] && l="\${l}mt"
-    [ -f "\${HB_LIB_INSTALL}/lib\${l}.\${ext}" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}mt\${ext}" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/\${pref}\${l}\${ext}" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     libs="gtalleg hbodbc debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
@@ -420,8 +427,10 @@ hb_lnk_request()
     gt="\${HB_GT_REQ%% *}"
     if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         echo "#include \\"hbinit.h\\""
-        echo "extern char * s_defaultGT;"
-        echo "extern char * s_pszLinkedMain;"
+        echo "HB_EXTERN_BEGIN"
+        echo "extern \${HB_LNK_ATTR} char * s_defaultGT;"
+        echo "extern \${HB_LNK_ATTR} char * s_pszLinkedMain;"
+        echo "HB_EXTERN_END"
         echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
         if [ -n "\$gt" ]; then
             echo "   s_defaultGT = \\"\$gt\\";"
@@ -528,6 +537,9 @@ mk_hblibso()
         full_lib_name="lib${name}.${hb_ver}.dylib"
         full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
         linker_options="-L/sw/lib $linker_options"
+    elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
+        full_lib_name="${name}.dll"
+        full_lib_name_mt="${name}mt.dll"
     else
         full_lib_name="lib${name}-${hb_ver}.so"
         full_lib_name_mt="lib${name}mt-${hb_ver}.so"
@@ -544,21 +556,25 @@ mk_hblibso()
         then
             if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
                 ll=${l%.${hb_ver}.dylib}.dylib
+            elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
+                ll=""
             else
                 ll=${l%-${hb_ver}.so}.so
                 ln -sf $l $ll
             fi
-            case $HB_LIB_INSTALL in
-                */usr/lib/*|*/usr/lib64/*|*/usr/local/lib/*|*/usr/local/lib64/*)
-                    ln -sf ${name}/$l ../$ll
-                    ;;
-                */usr/local/*)
-                    mkdir -p ../../lib
-                    ln -sf ../${name}/lib/$l ../../lib/$ll
-                    ;;
-                *)
-                    ;;
-            esac
+            if [ -n "$ll" ]; then
+                case $HB_LIB_INSTALL in
+                    */usr/lib/*|*/usr/lib64/*|*/usr/local/lib/*|*/usr/local/lib64/*)
+                        ln -sf ${name}/$l ../$ll
+                        ;;
+                    */usr/local/*)
+                        mkdir -p ../../lib
+                        ln -sf ../${name}/lib/$l ../../lib/$ll
+                        ;;
+                    *)
+                        ;;
+                esac
+            fi
         fi
     done
     )

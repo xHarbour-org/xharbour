@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3760 2005/01/21 20:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3760 2005/01/21 18:27:46 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-21 19:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_gnu.sh
+  * xharbour/make_tgz.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/hb-mkslib.sh
+  * xharbour/bin/postinst.sh
+  * xharbour/config/w32/mingw32.cf
+    * moddified to add dynamic library support for MinGW32.
+      Now in postinst procedure the xharbour.dll and xharbourmt.dll
+      is built from the static libraries created in standard make
+      pass.
+    * hb-mkslib.sh now works in Windows MinGW environment
+    * xhblnk / xhbmk scripts now works with -shared switch
+      in Windows MinGW environment and creates dynamic executables
+      which use xharbour{mt}.dll
+
+  * xharbour/source/rtl/filesys.c
+    * fixed my typo which could break compilation in some C compilers
+      which don't accept C99 extension
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+    * workaround for missing declaration in MinGW32
+      This library has to be fixed. It contains unnecessary cross
+      references between its files so always extended modules are
+      linked even when user doesn't need it and when _WIN32_IE <= 0x0400
+      produce buggy binaries with unexisting referneces.
+      Anyone who wants to use harbour.dll have to force C compilation
+      with -D_WIN32_IE=0x0401
+      It's a hack and I do not know what it can break - I'm not a
+      windows developer so I have to ask someone to create proper fix.
 
 2005-01-21 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/spread.prg

@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.26 2005/01/15 18:58:08 lf_sfnet Exp $
+# $Id: mingw32.cf,v 1.27 2005/01/20 23:12:17 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -101,8 +101,8 @@ ifneq ($(LNK_USR_LIB),)
 LDLIBS += $(foreach lib, $(LNK_USR_LIB), -l$(lib))
 endif
 
-SYSLIBS = -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32 -lmapi32
-
+SYSLIBS = -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 \
+          -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32
 
 # NOTE: The empty line directly before 'endef' HAVE TO exist!
 # It causes that every echo command will be separated by LF

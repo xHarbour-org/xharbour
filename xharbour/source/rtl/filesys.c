@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.133 2005/01/13 08:24:57 druzus Exp $
+ * $Id: filesys.c,v 1.134 2005/01/20 23:12:17 druzus Exp $
  */
 
 /*
@@ -2444,11 +2444,13 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.
     */
-   HB_THREAD_STUB
-   HB_STACK_UNLOCK
-   HB_TEST_CANCEL_ENABLE_ASYN
    {
+      HB_THREAD_STUB
+
       struct flock64 lock_info;
+
+      HB_STACK_UNLOCK
+      HB_TEST_CANCEL_ENABLE_ASYN
 
       switch( uiMode & FL_MASK )
       {
@@ -2480,9 +2482,10 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
             bResult = FALSE;
       }
       hb_fsSetIOError( bResult, 0 );
+
+      HB_DISABLE_ASYN_CANC
+      HB_STACK_LOCK
    }
-   HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
 #else
    bResult = hb_fsLock( hFileHandle, (ULONG) ulStart, (ULONG) ulLength, uiMode );
 #endif
@@ -2602,11 +2605,14 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.
     */
-   HB_THREAD_STUB
-   HB_STACK_UNLOCK
-   HB_TEST_CANCEL_ENABLE_ASYN
    {
+      HB_THREAD_STUB
+
       USHORT Flags = convert_seek_flags( uiFlags );
+
+      HB_STACK_UNLOCK
+      HB_TEST_CANCEL_ENABLE_ASYN
+
       llPos = lseek64( hFileHandle, llOffset, Flags );
       hb_fsSetIOError( llPos != (HB_FOFFSET) -1, 0 );
 
@@ -2614,9 +2620,10 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       {
          llPos = lseek64( hFileHandle, 0L, SEEK_CUR );
       }
+
+      HB_DISABLE_ASYN_CANC
+      HB_STACK_LOCK
    }
-   HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
 #else
    llPos = (HB_FOFFSET) hb_fsSeek( hFileHandle, (LONG) llOffset, uiFlags );
 #endif

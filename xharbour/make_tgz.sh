@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.39 2005/01/12 16:36:00 druzus Exp $
+# $Id: make_tgz.sh,v 1.40 2005/01/20 23:11:40 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -86,7 +86,6 @@ case "$HB_ARCHITECTURE" in
     w32)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         HB_INSTALL_GROUP=0
-        hb_lnkso="no"
         hb_sysdir="no"
         hb_exesuf=".exe"
         hb_instfile=""
@@ -142,6 +141,10 @@ case "$HB_ARCHITECTURE" in
         if [ `uname -r | sed "s/\..*//g"` -lt 6 ]; then
             export HB_NCURSES_FINK=yes
         fi
+        [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
+        ;;
+    dos|w32)
+        [ -z "${HB_WITHOUT_GTSLN}" ] && export HB_WITHOUT_GTSLN=yes
         [ -z "$HB_WITHOUT_X11" ] && export HB_WITHOUT_X11=yes
         ;;
     *)
@@ -218,15 +221,16 @@ fi
 # check if we should rebuild tools with shared libs
 if [ "${hb_lnkso}" = yes ]
 then
-    ADD_LIBS=""
     case $HB_ARCHITECTURE in
-        linux)  [ "${HB_GPM_MOUSE}" = yes ] && ADD_LIBS="$ADD_LIBS -lgpm" ;;
-        darwin) ADD_LIBS="$ADD_LIBS -L/sw/lib" ;;
+        darwin)     ADD_LIBS="$ADD_LIBS -lncurses -L/sw/lib" ;;
+        dos|w32)    ADD_LIBS="" ;;
+        *)          ADD_LIBS="$ADD_LIBS -lncurses" ;;
     esac 
+    [ "${HB_GPM_MOUSE}" = yes ] && ADD_LIBS="$ADD_LIBS -lgpm"
     [ "${HB_WITHOUT_GTSLN}" != yes ] && ADD_LIBS="$ADD_LIBS -lslang"
     [ "${HB_WITHOUT_X11}" != yes ] && ADD_LIBS="$ADD_LIBS -L/usr/X11R6/$HB_LIBDIRNAME -lX11"
 
-    export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses ${ADD_LIBS}"
+    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
 
     for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
@@ -234,13 +238,20 @@ then
         (cd "utils/${utl}"
          rm -fR "./${HB_ARCHITECTURE}"
          $MAKE -r install
-         strip "${HB_BIN_INSTALL}/${utl}")
+         strip "${HB_BIN_INSTALL}/${utl}${hb_exesuf}")
     done
 fi
 
+
 (cd ${HB_BIN_INSTALL}
+    if [ "$HB_ARCHITECTURE" = "w32" ]; then
+        cp -f "${HB_LIB_INSTALL}/${name}.dll" .
+        echo '#!/bin/sh' > xprompt.sh
+        echo 'xbscript "$@"' >> xprompt.sh
+    else
+        ln -s xbscript${hb_exesuf} xprompt${hb_exesuf}
+    fi
     ln -s xbscript${hb_exesuf} pprun${hb_exesuf}
-    ln -s xbscript${hb_exesuf} xprompt${hb_exesuf}
 )
 
 CURDIR=$(pwd)

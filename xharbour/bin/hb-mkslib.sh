@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.7 2004/11/04 00:26:18 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.8 2004/11/26 14:33:19 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,11 +12,18 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-if [ `uname` = "Darwin" ]; then
-   SLIB_EXT=".dylib"
-else
-   SLIB_EXT=".so"
-fi
+hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
+case "$hb_arch" in
+    *windows*|*mingw32*)    hb_arch="w32" ;;
+    *dos)   hb_arch="dos" ;;
+    *bsd)   hb_arch="bsd" ;;
+esac
+
+case "$hb_arch" in
+    darwin) SLIB_EXT=".dylib" ;;
+    w32)    SLIB_EXT=".dll" ;;
+    *)      SLIB_EXT=".so" ;;
+esac
 
 NAME="${1%${SLIB_EXT}}"
 LIB_NAME="${NAME##*/}"
@@ -93,7 +100,7 @@ done
 OBJLST=`find . -name \*.o`
 
 cd "${OTMPDIR}"
-if [ `uname` = "Darwin" ]; then
+if [ "${SLIB_EXT}" = ".dylib" ]; then
     FULLNAME="${BASE}.${VERSION}${SLIB_EXT}"
     ld -r -o "${FULLNAME}.o" $OBJLST && \
     gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
@@ -104,6 +111,13 @@ if [ `uname` = "Darwin" ]; then
     mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}" && \
     ln -sf "${FULLNAME}" "${DSTDIR}${BASE}.${MAJOR}${SLIB_EXT}" && \
     ln -sf "${FULLNAME}" "${DSTDIR}${BASE}${SLIB_EXT}"
+elif [ "${SLIB_EXT}" = ".dll" ]; then
+    FULLNAME="${LIB_NAME}${SLIB_EXT}"
+    SYSLIBS="-luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32"
+    SYSLIBS="${SYSLIBS} -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32"
+    gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} ${SYSLIBS} && \
+        cd "${dir}" && \
+        mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}"
 else
     #FULLNAME="${BASE}-${VERSION}${SLIB_EXT}"
     #FULLNAME="${BASE}{SLIB_EXT}.${VERSION}"

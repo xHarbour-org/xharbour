@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.19 2004/11/23 17:04:23 lf_sfnet Exp $
+ * $Id: wvtutils.c,v 1.20 2005/01/09 06:08:25 likewolf Exp $
  */
 
 /*
@@ -74,6 +74,11 @@
 //-------------------------------------------------------------------//
 
 #include "hbgtwvt.h"
+
+/* workaround for missing declaration in MinGW32 */
+#if !defined(TTM_SETTITLE) && defined(TTM_SETTITLEA)
+   #define TTM_SETTITLE TTM_SETTITLEA
+#endif
 
 //-------------------------------------------------------------------//
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.13 2004/11/21 21:43:17 druzus Exp $
+# $Id: postinst.sh,v 1.14 2005/01/11 23:53:27 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -53,8 +53,9 @@ then
         install -c -m 755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
-    [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
-
+    if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ]; then
+        mk_hblibso "${hb_root}"
+    fi
     # build fm lib with memory statistic
     (cd ${hb_root}/source/vm
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
