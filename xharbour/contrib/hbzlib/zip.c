@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.37 2004/05/22 04:17:56 lculik Exp $
+ * $Id: zip.c,v 1.38 2004/05/25 13:36:56 srobert Exp $
  */
 
 /*
@@ -330,7 +330,11 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                   hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
                   hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szEntry ) ) );
                   hb_itemClear( &Temp );
+                  #if defined(HB_OS_LINUX)
                   SetFileAttributes( szEntry, 0777 );
+                  #else
+                  SetFileAttributes( szEntry, FA_ARCH );
+                  #endif
                }
 
                hb_xfree( szEntry );
@@ -343,7 +347,11 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
             hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
             hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szArrEntry ) ) );
             hb_itemClear( &Temp );
-            SetFileAttributes( szArrEntry, 0777 );
+                  #if defined(HB_OS_LINUX)
+                  SetFileAttributes( szArrEntry, 0777 );
+                  #else
+                  SetFileAttributes( szArrEntry, FA_ARCH );
+                  #endif
          }
 
          hb_xfree( szArrEntry );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.118 2004/04/20 23:47:38 lculik Exp $
+ * $Id: hbmake.prg,v 1.119 2004/05/03 12:56:50 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -107,7 +107,7 @@ STATIC s_lxFwh         := .F.
 STATIC s_nFilesToAdd   := 5
 STATIC s_nWarningLevel := 0
 STATIC s_AppName       := ""
-
+Static s_lasDll        := .F.
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    LOCAL nPos
@@ -264,11 +264,14 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    Outstd( s_cLinkComm )
    __RUN( (s_cLinkComm) )
 
-   IF s_lCompress .AND. !s_lLibrary
+   IF s_lCompress .AND. !s_lLibrary 
       setpos(9,0)
       __Run( " upx -9 "+ (s_cAppName) )
    ENDIF
-
+   tracelog( s_lasdll)
+   if s_lasdll .or. lower(right(s_cAppName,3)) == 'dll'
+       __Run( Replacemacros("implib $(BHC)\lib\" + left(s_cAppName,at(".",s_cAppName)-1)+".lib " +s_cAppName ))
+   endif
 RETURN NIL
 
 FUNCTION ParseMakeFile( cFile )
@@ -1177,6 +1180,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL lSupressline := .f.
    LOCAL nPos
    LOCAL cDefHarOpts  := ""
+
 // LOCAL nWarningLevel :=0
 
    LOCAL lUseXharbourDll := .F.
@@ -1343,14 +1347,19 @@ FUNC CreateMakeFile( cFile )
    @ 02,30 Get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[o ]" message s_aLangMessages[ 54 ]
    @ 02,53 Get lUseXharbourDll CheckBox caption "use Xharbour[.dll|.so]" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
    @ 03,01 SAY "Obj Files Dir" GET cObjDir PICT "@s15" message s_aLangMessages[ 56 ]
-   @ 04,01 SAY  s_aLangMessages[ 45 ] GET cAppName valid !Empty( cAppName ) message s_aLangMessages[ 57 ]
+   @ 04,01 SAY  s_aLangMessages[ 45 ] GET cAppName  pict "@s15"valid !Empty( cAppName ) message s_aLangMessages[ 57 ]
+   @ 4,53 get s_lasdll CheckBox  Caption "Create dll" style "[o ]" valid asDll(@lUseXharbourDll)
 
    IF nO == 1
       READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
 
       s_cAppName := alltrim(cAppName)
       IF cOs != "Linux"
-         s_cAppName += ".exe"
+         if s_lasdll
+            s_cAppName += ".dll"
+         else
+            s_cAppName += ".exe"
+         endif
       ENDIF
 
    ENDIF
@@ -1364,9 +1373,10 @@ FUNC CreateMakeFile( cFile )
    lWhoo     := "Whoo"     IN cGui
    lGtWvt    := "Gtwvt"    IN cGui
    lXwt      := "Xwt"    IN cGui
-
+   tracelog(lUseXharbourDll)
    IF lUseXharbourDll
       cDefLibGccLibs   := cHARso
+      cDefBccLibs      := cHarbDll
    ENDIF
 
    IF lFwh
@@ -1524,7 +1534,7 @@ FUNC CreateMakeFile( cFile )
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+IIF( lWhoo," -I$(WHOO)\include ","")+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -D__EXPORT__ -n"+if(s_lasdll,"1","")+" -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+IIF( lWhoo," -I$(WHOO)\include ","")+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
       ELSE
          aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) )) + " -o$* $**" } )
       ENDIF
@@ -1537,7 +1547,7 @@ FUNC CreateMakeFile( cFile )
          aAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
          IF s_lExtended
-            aAdd( s_aCommands, { ".prg.o:", "harbour -n  -go -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.o:", "harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+"  -go -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
          ELSE
             aAdd( s_aCommands, { ".prg.c:", "harbour -n -I/usr/include/xharbour $(HARBOURFLAGS) -I.  -o$* $**" } )
          ENDIF
@@ -1547,7 +1557,7 @@ FUNC CreateMakeFile( cFile )
          aAdd( s_aCommands, { ".c.o:", "$(BCB)\bin\gcc -I$(BHC)/include $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
          IF s_lExtended
-            aAdd( s_aCommands, { ".prg.o:", "$(BHC)\bin\harbour -n -go -I$(BHC)/include $(HARBOURFLAGS)  -o$* $**" } )
+            aAdd( s_aCommands, { ".prg.o:", "$(BHC)\bin\harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+" -go -I$(BHC)/include $(HARBOURFLAGS)  -o$* $**" } )
          ELSE
             aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)/include $(HARBOURFLAGS)  -o$* $**" } )
          ENDIF
@@ -1559,7 +1569,7 @@ FUNC CreateMakeFile( cFile )
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\bin\cl -I$(BHC)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS) -go  -I$(C4W)\include" + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -D__EXPORT__  -n -I$(BHC)\include $(HARBOURFLAGS) -go  -I$(C4W)\include" + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
       ELSE
          aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS) -I$(C4W)\include -o$* $**" } )
       ENDIF
@@ -1793,7 +1803,7 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ELSE
-      fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + ".exe"  + " $(PR) " + CRLF )
+      fWrite( s_nLinkHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + if(s_lasdll,".dll",".exe" ) + " $(PR) " + CRLF )
    ENDIF
 
 
@@ -2021,7 +2031,7 @@ FUNC CreateMakeFile( cFile )
          cDefBccLibs := strtran(cDefBccLibs,"gtwin","gtwvt")
          cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvt")
       endif
-         fWrite( s_nLinkHandle, "LIBFILES = " + iif( lgtWvt,"optgui","optcon") + IIF( ! s_lMt, "", "mt" ) + ".lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = " + iif( lgtWvt,"optgui",if(!s_lasdll,"optcon","")) + IIF( ! s_lMt, "", "mt" ) + ".lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2044,11 +2054,11 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui .or. lWhoo , " -aa", IIF( lHwgui .or. lgtWvt, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tp"+ if(s_lasdll,"d","e") + IIF( lFWH, " -aa", IIF( lMiniGui .or. lWhoo , " -aa", IIF( lHwgui .or. lgtWvt, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = ilink32" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
-      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lgtWvt ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
+      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lgtWvt ), "c0w32.obj", if(s_lasdll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
                + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
@@ -3812,3 +3822,7 @@ For each n in AtempLibs
 NEXT
 return c
 
+function asdll(x)
+Local y :=x
+ x := !y
+return .t.
