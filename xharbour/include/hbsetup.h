@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.17 2003/12/23 00:49:09 druzus Exp $
+ * $Id: hbsetup.h,v 1.18 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -131,7 +131,7 @@
 #endif
 
 /* ***********************************************************************
- * 
+ *
 */
 #ifndef HB_ARRAY_USE_COUNTER_OFF
 #  define HB_ARRAY_USE_COUNTER
@@ -247,6 +247,7 @@
       #define OS_DOS_COMPATIBLE
       #define OS_PATH_LIST_SEPARATOR    ';'
       #define OS_PATH_DELIMITER         '\\'
+      #define OS_PATH_DELIMITER_STRING  "\\"
       #define OS_PATH_DELIMITER_LIST    "\\/:"
       #define OS_DRIVE_DELIMITER        ':'
       #define OS_HAS_DRIVE_LETTER
@@ -256,6 +257,7 @@
       #define OS_UNIX_COMPATIBLE
       #define OS_PATH_LIST_SEPARATOR    ':'
       #define OS_PATH_DELIMITER         '/'
+      #define OS_PATH_DELIMITER_STRING  "/"
       #define OS_PATH_DELIMITER_LIST    "/"
       #undef  OS_DRIVE_DELIMITER
       #undef  OS_HAS_DRIVE_LETTER
@@ -267,6 +269,7 @@
    #define OS_DOS_COMPATIBLE
    #define OS_PATH_LIST_SEPARATOR    ';'
    #define OS_PATH_DELIMITER         '\\'
+   #define OS_PATH_DELIMITER_STRING  "\\"
    #define OS_PATH_DELIMITER_LIST    "\\/:"
    #define OS_DRIVE_DELIMITER        ':'
    #define OS_HAS_DRIVE_LETTER

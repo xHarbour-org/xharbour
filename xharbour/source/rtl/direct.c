@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.41 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: direct.c,v 1.42 2004/03/19 17:42:23 likewolf Exp $
  */
 
 /*
@@ -317,7 +317,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
-            char *szSubdir = hb_xstrcpy( NULL, szEntry, "\\", HB_DIR_ALL_FILES_MASK, NULL );
+            char *szSubdir = hb_xstrcpy( NULL, szEntry, OS_PATH_DELIMITER_STRING, HB_DIR_ALL_FILES_MASK, NULL );
             HB_ITEM SubDir;
 
             SubDir.type = HB_IT_NIL;
