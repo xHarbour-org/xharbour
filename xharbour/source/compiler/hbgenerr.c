@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.11 2003/06/21 06:59:23 jonnymind Exp $
+ * $Id: hbgenerr.c,v 1.12 2003/09/26 20:18:58 ronpinkas Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ char * hb_comp_szErrors[] =
    "ELSE does not match IF",
    "ELSEIF does not match IF",
    "Syntax error: \'%s\'",
-   "Unclosed control structure (at line: %s)",
+   "Unclosed control structure %s",
    "%s statement with no loop in sight",
    "Syntax error: \'%s\' in: \'%s\'",
    "Incomplete statement: %s",
