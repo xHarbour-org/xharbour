@@ -1,5 +1,5 @@
 /*
- * $Id: screen2.prg,v 1.1 2003/03/04 21:04:52 lculik Exp $
+ * $Id: screen2.prg,v 1.2 2004/05/12 12:21:47 likewolf Exp $
  */
 
 /*
@@ -132,9 +132,9 @@ FUNCTION SAYSCREEN( cStr, nRow, nCol )
    DEFAULT nRow TO Row()
    DEFAULT nCol TO Col()
    
-   nRight := Min( nCol + Len( cStr ), MaxCol() )
+   nRight := Min( nCol + Len( cStr ) - 1, MaxCol() )
    cBuf := SaveScreen( nRow, nCol, nRow, nRight )
-   FOR i := 1 TO nRight - nCol
+   FOR i := 1 TO nRight - nCol + 1
      cBuf[ i * 2 - 1 ] := cStr[ i ]
    NEXT
    RestScreen( nRow, nCol, nRow, nRight, cBuf )
