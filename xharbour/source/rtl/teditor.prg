@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.50 2004/09/02 08:01:51 mauriliolongo Exp $
+/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.50 2004/09/02 08:01:51 mauriliolongo Exp $
+/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -760,11 +760,15 @@ RETURN Self
 METHOD PageDown() CLASS HBEditor
    LOCAL nJump
 
-   nJump := min( ::nNumRows - 1, ::naTextLen - ::nFirstRow - ( ::nPhysRow - ::nTop ) )
+   nJump := min( ::nNumRows, ::naTextLen - ::nFirstRow - ( ::nPhysRow - ::nTop ) )
 
-   ::nFirstRow += nJump
-   ::nRow      += nJump
-   ::RefreshWindow()
+   IF nJump < ::nNumRows
+      ::Bottom()
+   ELSE
+      ::nFirstRow += nJump
+      ::nRow      += nJump
+      ::RefreshWindow()
+   ENDIF
    // ::GotoLine( min( ::nRow + ::nNumRows - 1, ::naTextLen ) )
 
 Return Self
@@ -772,7 +776,7 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLen )
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows - 1, ::naTextLen )
 
    ::GotoLine( nRowTo )  // , ::nLineLength( nRowTo ) + 1 )
 
@@ -802,7 +806,7 @@ Return Self
 METHOD PageUp() CLASS HBEditor
    LOCAL nJump
 
-   nJump := min( ::nNumRows - 1, ::nFirstRow - 1 )
+   nJump := min( ::nNumRows, ::nFirstRow - 1 )
 
    if nJump == 0
       ::GoToLine( 1 )
@@ -844,13 +848,17 @@ METHOD Right() CLASS HBEditor
       IF ::nCol == ::LineLen( ::nRow ) + 1 .and. ::nRow < ::naTextLen
          ::GotoPos( ::nRow + 1, 1, .T. )
       ELSE
+         /* ::GotoCol( ::nCol + 1 ) does not correctly redraw the screen
+          * if K_RIGHT is stuffed into the keyboard buffer; use GotoPos() */
+         ::GotoPos( ::nRow, ::nCol + 1, .T.)
          // Gotocol checks for line bounds also; as the IF should check for a
          // method too, theres no spare in IF here.
-         ::GotoCol( ::nCol + 1 )
+         //::GotoCol( ::nCol + 1 )
       ENDIF
    else
       if ::nCol <= ::nWordWrapCol
-         ::GotoCol( ::nCol + 1 )
+         ::GotoPos( ::nRow, ::nCol + 1, .T. )
+         //::GotoCol( ::nCol + 1 )
       endif
    endif
 
@@ -958,10 +966,10 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
       endif
       exit
    case K_MWFORWARD
-      ::Up()
+      ::Down()
       exit
    case K_MWBACKWARD
-      ::Down()
+      ::Up()
       exit
    end
 

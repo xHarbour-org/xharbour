@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3599 2004/11/13 18:36:29 paultucker Exp $
+ * $Id: ChangeLog,v 1.3600 2004/11/13 18:56:50 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-15 00:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/teditor.prg
+    ! Swapped K_MWFORWARD and K_MWBACKWARD actions. Fixed PageUp, PageDown
+      and K_RIGHT behaviour. (Thanks to Valery Belorustsev).
 
 2004-11-14 01:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h
