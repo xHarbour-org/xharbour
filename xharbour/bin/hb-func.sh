@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.18 2004/05/29 21:49:25 likewolf Exp $
+# $Id: hb-func.sh,v 1.19 2004/05/30 20:37:17 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -240,7 +240,7 @@ if [ -f "\${HB_LIB_INSTALL}/libgtcrs.a" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_CRS_LIB:-ncurses}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
 fi
-if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ]; then
+if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ] && [ "\${HB_WITHOUT_X11}" != "yes" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
 fi
 [ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -l\${HB_GPM_LIB}"

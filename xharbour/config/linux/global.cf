@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.8 2004/01/28 04:14:34 maurifull Exp $
+# $Id: global.cf,v 1.9 2004/02/03 14:01:13 druzus Exp $
 #
 
 all : first
@@ -10,8 +10,11 @@ HB_GT_LIBS=\
         gtpca \
         gtsln \
         gtstd \
-        gtxvt \
         gtnul \
+
+ifneq ($(HB_WITHOUT_X11),yes)
+   HB_GT_LIBS += gtxvt
+endif
 
 ifeq ($(HB_GTALLEG),yes)
    HB_GT_LIBS += gtalleg

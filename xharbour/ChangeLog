@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3069 2004/06/13 08:41:20 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3070 2004/06/15 02:32:15 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-15 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    + added SUSE and FEDORA linux detection
+    + new switches: --without gpm, --without x11
+
+  * xharbour/xhbgtmk.sh
+  * xharbour/make_rpm.sh
+    + new switches: --without gpm, --without x11
+    * autodetect if gpm-devel is installed
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/config/linux/global.cf
+    + do not link with GTXVT and X11 libs when env var HB_WITHOUT_X11=yes
 
 2004-06-14 19:30 UTC-0800 Luis Krause Mantilla
   * source/rtl/minmax.c

@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.57 2004/05/28 00:00:44 druzus Exp $
+# $Id: xharbour.spec,v 1.58 2004/06/12 13:23:07 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,6 +18,8 @@
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --without nf       - do not build nanforum lib
 # --without ct       - do not build clipper tools lib
+# --without x11      - do not build GTXVT
+# --without gpm      - build GTSLN and GTCRS without GPM support
 ######################################################################
 
 ######################################################################
@@ -31,11 +33,17 @@
 %if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
 %if "%{platform}" == ""
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' fedora-release 2>/dev/null) && echo "fc$release"|tr -d ".")
+%if "%{platform}" == ""
+%define platform %(release=$(rpm -q --queryformat='%{VERSION}' suse-release 2>/dev/null) && echo "sus$release"|tr -d ".")
+%if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
 %if "%{platform}" == ""
 %define platform %(release=$(rpm -q --queryformat='%{VERSION}' aurox-release 2>/dev/null) && echo "aur$release"|tr -d ".")
 %if "%{platform}" == ""
 %define platform %([ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/')
+%endif
+%endif
 %endif
 %endif
 %endif
@@ -47,24 +55,21 @@
 %define releasen 0
 %define prefix   /usr
 %define hb_pref  xhb
-%define hb_gt    crs
-%define hb_gpm   yes
-%define hb_mt    MT
-%define hb_mgt   yes
 %define hb_lnkso yes
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 %define hb_arch  export HB_ARCHITECTURE=linux
-%define hb_cmt   export HB_MT=%{hb_mt}
-%define hb_cgt   export HB_GT_LIB=gt%{hb_gt}
-%define hb_cgpm  export HB_GPM_MOUSE=%{hb_gpm}
-%define hb_cmgt  export HB_MULTI_GT=%{hb_mgt}
+%define hb_mt    export HB_MT=MT
+%define hb_mgt   export HB_MULTI_GT=yes
+%define hb_gt    export HB_GT_LIB=gtcrs
+%define hb_gpm   export HB_GPM_MOUSE=%{!?_without_gpm:yes}
+%define hb_x11   export HB_WITHOUT_X11=%{?_without_x11:yes}
 %define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
 %define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_plat  export HB_PLAT=%{platform}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
+%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}; %{hb_opt}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -86,7 +91,7 @@ Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
-BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel gpm-devel
+BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel %{!?_without_gpm: gpm-devel}
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
@@ -283,7 +288,7 @@ rm -rf $RPM_BUILD_ROOT
 make -r
 
 # build contrib libraries
-libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
+libs="%{!?_without_ct:libct} %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}"
 for l in $libs
 do
     pushd contrib/$l
@@ -315,7 +320,7 @@ mkdir -p $HB_LIB_INSTALL
 make -r -i install
 
 # install contrib libraries
-libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
+libs="%{!?_without_ct:libct} %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql}"
 for l in $libs
 do
     pushd contrib/$l
@@ -345,7 +350,7 @@ cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
 %{hb_bdir}
 %{hb_idir}
 %{hb_ldir}
-%{hb_cgt}
+%{hb_gt}
 export HB_LEX="SIMPLEX"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 EOF
@@ -359,8 +364,8 @@ fi
 if [ "%{hb_lnkso}" = yes ]
 then
     unset HB_GTALLEG
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
-    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11}"
+    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11} %{?_with_allegro:%(allegro-config --static)}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.16 2003/12/07 19:36:17 druzus Exp $
+# $Id: make_rpm.sh,v 1.17 2004/01/30 02:06:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,6 +19,8 @@
 # --with allegro     - build GTALLEG - Allegro based GT driver
 # --without nf       - do not build nanforum lib
 # --without ct       - do not build clipper tools lib
+# --without x11      - do not build GTXVT
+# --without gpm      - build GTSLN and GTCRS without GPM support
 ######################################################################
 
 test_reqrpm()
@@ -46,7 +48,7 @@ get_rpmmacro()
     echo -n "${R}"
 }
 
-NEED_RPM="gcc binutils bash bison ncurses ncurses-devel gpm-devel"
+NEED_RPM="gcc binutils bash bison ncurses ncurses-devel"
 
 FORCE=""
 BUGGY_RPM=""
@@ -91,6 +93,10 @@ fi
 if test_reqrpm "allegro-devel"
 then
     INST_PARAM="${INST_PARAM} --with allegro"
+fi
+if ! test_reqrpm "gpm-devel"
+then
+    INST_PARAM="${INST_PARAM} --without gpm"
 fi
 
 TOINST_LST=""
