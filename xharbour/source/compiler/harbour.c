@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.32 2003/01/16 15:59:51 walito Exp $
+ * $Id: harbour.c,v 1.33 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -335,6 +335,72 @@ int main( int argc, char * argv[] )
 
    return iStatus;
 }
+
+#if defined(HB_OS_WIN_32)
+#include <windows.h>
+
+int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
+                    HINSTANCE hPrevInstance,  /* handle to previous instance */
+                    LPSTR lpCmdLine,          /* pointer to command line */
+                    int iCmdShow )            /* show state of window */
+{
+   int argc = 0;
+   char *argv[ 20 ];
+   LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
+   char szAppName[ _POSIX_PATH_MAX + 1 ];
+   int iResult;
+
+   strcpy( pArgs, lpCmdLine );
+
+   HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
+
+   HB_SYMBOL_UNUSED( hPrevInstance );
+   HB_SYMBOL_UNUSED( iCmdShow );
+
+   GetModuleFileName( hInstance, szAppName, _POSIX_PATH_MAX );
+   argv[ 0 ] = szAppName;
+
+   if( * pArgs != 0 )
+   {
+      argv[ ++argc ] = pArgs;
+   }
+
+   while( *pArg != 0 )
+   {
+      if( *pArg == ' ' )
+      {
+         *pArg++ = 0;
+         argc++;
+
+         while( *pArg == ' ' )
+         {
+            pArg++;
+         }
+
+         if( *pArg != 0 )
+         {
+            argv[ argc ] = pArg++;
+         }
+         else
+         {
+            argc--;
+         }
+      }
+      else
+      {
+         pArg++;
+      }
+   }
+
+   argc++;
+
+   iResult = main( argc, argv );
+
+   LocalFree( pArgs );
+
+   return iResult;
+}
+#endif
 
 #if defined(__IBMCPP__) || defined(_MSC_VER) || (defined(__BORLANDC__) && defined(__cplusplus))
 int isatty( int handle )
@@ -3414,7 +3480,7 @@ void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec )
 
 #ifdef BIG_ENDIAN
    memcpy( ( BYTE * ) &( pBuffer[ 1 ] ), ( BYTE * ) &dLENumber, sizeof( double ) );
-#else   
+#else
    memcpy( ( BYTE * ) &( pBuffer[ 1 ] ), ( BYTE * ) &dNumber, sizeof( double ) );
 #endif
 
