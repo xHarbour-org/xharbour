@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.13 2004/05/06 23:42:02 peterrees Exp $
+ * $Id: cmdarg.c,v 1.14 2004/05/07 16:13:05 ronpinkas Exp $
  */
 
 /*
@@ -70,10 +70,10 @@ static char ** s_argv = NULL;
 
 
   BOOL b_MouseEnable = TRUE;
+  HB_EXTERN_BEGIN
   HANDLE hb_hInstance = 0;
   HANDLE hb_hPrevInstance = 0;
   int    hb_iCmdShow;
-
 void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
 {
    hb_hInstance = hInstance;
@@ -81,7 +81,7 @@ void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, 
    hb_iCmdShow = iCmdShow;
    return ;
 }
-
+  HB_EXTERN_END
 #endif
 
 void HB_EXPORT hb_cmdargInit( int argc, char * argv[] )
