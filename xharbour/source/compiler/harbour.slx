@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.42 2003/12/04 09:26:54 druzus Exp $
+ * $Id: harbour.slx,v 1.43 2003/12/11 05:09:26 andijahja Exp $
  */
 
 /*
@@ -607,7 +607,7 @@ LANGUAGE_RULES_ARE {
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == SELF || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || \
                                    iLastToken == ')' || iLastToken == '}' || iLastToken == LITERAL || iLastToken == WANTS_EOL || iLastToken == WANTS_ID || \
                                    iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || \
-                                   iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL )
+                                   iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL || iLastToken == HB_TEXT )
 
 /* Support Functions. */
 static int hb_comp_SLX_InterceptAction( int iRet )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1965 2003/12/30 11:52:45 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1966 2003/12/30 12:32:55 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-30  11:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    * Added HB_TEXT to IF_BELONG_LEFT (fixed Text[...] support).
 
 2003-12-30 10:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   + lib/bcc640mt.lib
