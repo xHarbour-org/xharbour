@@ -15,6 +15,14 @@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+2002-09-06 August Infante  Started to remove API calls already in What32.lib - updated makefile.bc
+           so far i have built demo.exe successfully
+
+
+
+
 WoopGUI 1.03 ( 2002-06-02 ) alpha release (for the moment this changelog isn't aligned with files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~                 because the changes are so much)
 

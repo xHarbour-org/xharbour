@@ -46,7 +46,7 @@ BOOL CALLBACK WG_DlgProc(HWND, UINT, WPARAM, LPARAM);
 PHB_ITEM pArray;
 extern BOOL WG_DebugTrace( char* cMsg );
 
-HB_FUNC ( DIALOGBOX )
+HB_FUNC ( WG_DIALOGBOX )
 {
 //   PHB_DYNS pSymTest;
    char *cIdDlg;
@@ -71,8 +71,8 @@ HB_FUNC ( DIALOGBOX )
 //HB_FUNC ( GETDLGITEM )
 //{
 //   HWND hWnd = GetDlgItem(
-//                 (HWND) hb_parnl( 1 ),	// handle of dialog box
-//                 hb_parni( 2 )	        // identifier of control
+//                 (HWND) hb_parnl( 1 ),  // handle of dialog box
+//                 hb_parni( 2 )         // identifier of control
 //               );
 //   hb_retnl( (LONG) hWnd );
 //}
@@ -101,9 +101,9 @@ HB_FUNC ( DIALOGBOX )
 //HB_FUNC ( SETDLGITEMTEXT )
 //{
 //    SetDlgItemText(
-//       (HWND) hb_parnl( 1 ),	// handle of dialog box
-//       hb_parni( 2 ),	        // identifier of control
-//       (LPCTSTR) hb_parc( 3 ) 	// text to set
+//       (HWND) hb_parnl( 1 ),   // handle of dialog box
+//       hb_parni( 2 ),         // identifier of control
+//       (LPCTSTR) hb_parc( 3 )  // text to set
 //    );
 //}
 //
@@ -113,10 +113,10 @@ HB_FUNC ( DIALOGBOX )
 //   char *cText = (char*) hb_xgrab( iLen+1 );
 //
 //   GetDlgItemText(
-//       (HWND) hb_parnl( 1 ),	// handle of dialog box
-//    hb_parni( 2 ),          	// identifier of control
-//    (LPTSTR) cText,       	// address of buffer for text
-//    iLen                   	// maximum size of string
+//       (HWND) hb_parnl( 1 ),   // handle of dialog box
+//    hb_parni( 2 ),             // identifier of control
+//    (LPTSTR) cText,         // address of buffer for text
+//    iLen                    // maximum size of string
 //   );
 //   hb_retc( cText );
 //   hb_xfree( cText );
@@ -130,10 +130,10 @@ HB_FUNC ( GETEDITTEXT )
    char *cText = (char*) hb_xgrab( iLen+2 );
 
    GetDlgItemText(
-       hDlg,	// handle of dialog box
-    id,        	// identifier of control
-    (LPTSTR) cText,       	// address of buffer for text
-    iLen+1                   	// maximum size of string
+       hDlg,   // handle of dialog box
+    id,           // identifier of control
+    (LPTSTR) cText,        // address of buffer for text
+    iLen+1                    // maximum size of string
    );
    hb_retc( cText );
    hb_xfree( cText );
@@ -142,19 +142,19 @@ HB_FUNC ( GETEDITTEXT )
 //HB_FUNC ( CHECKDLGBUTTON )
 //{
 //    CheckDlgButton(
-//       (HWND) hb_parnl( 1 ),	// handle of dialog box
-//       hb_parni( 2 ),	        // identifier of control
-//       ( hb_parl( 3 ) )? BST_CHECKED:BST_UNCHECKED 	// value to set
+//       (HWND) hb_parnl( 1 ),   // handle of dialog box
+//       hb_parni( 2 ),         // identifier of control
+//       ( hb_parl( 3 ) )? BST_CHECKED:BST_UNCHECKED  // value to set
 //    );
 //}
 //
 //HB_FUNC ( CHECKRADIOBUTTON )
 //{
 //    CheckRadioButton(
-//       (HWND) hb_parnl( 1 ),	// handle of dialog box
-//       hb_parni( 2 ),	        // identifier of first radio button in group
-//       hb_parni( 3 ),	        // identifier of last radio button in group
-//       hb_parni( 4 )	        // identifier of radio button to select
+//       (HWND) hb_parnl( 1 ),   // handle of dialog box
+//       hb_parni( 2 ),         // identifier of first radio button in group
+//       hb_parni( 3 ),         // identifier of last radio button in group
+//       hb_parni( 4 )          // identifier of radio button to select
 //    );
 //}
 //

@@ -1,7 +1,7 @@
 #
-# File:		makefile.b32
-# Author:	Francesco Saverio Giudice (on a makefile by Julian Smart)
-# Created:	2002
+# File:     makefile.b32
+# Author:   Francesco Saverio Giudice (on a makefile by Julian Smart)
+# Created:  2002
 # Updated:
 # Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
 #
@@ -46,18 +46,16 @@ WOOPGUIOBJ = tobject.obj twindowdef.obj \
              txget.obj \
              tget.obj tgetlist.obj \
              errorsys.obj \
-             whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
+             cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
 
 WOOPGUIRC  = woopgui.rc
 
-WAPIOBJ    =  _WinDate.obj _WinGDI.obj _WinSys.obj _WinBrsh.obj \
-              _WinMisc.obj _WinMain.obj _WinKbrd.obj _WinText.obj _WinDC.obj \
-              _WinDlg.obj _WinMsg.obj _WinCret.obj cdate.obj \
+WAPIOBJ    =  cdate.obj \
               ccontrols.obj ccommon.obj cwindowdef.obj capplication.obj cwindow.obj \
               cmenu.obj cfont.obj \
               cdialog.obj cstatusbar.obj ctooltip.obj
 
-#UTILSOBJ   = whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
+#UTILSOBJ   = cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
 
 
 !include $(WG_DIR)\env\makelib.b32

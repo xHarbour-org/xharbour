@@ -6,7 +6,7 @@ if exist error.log del error.log
 set HB_INSTALL=..\..\..
 set WGUI_INSTALL=..
 set BCC_DIR=c:\bcc55
-
+set WHAT32_LIB=c:\what32a\lib
 ECHO Compiling...
 
 %HB_INSTALL%\bin\harbour %1 -p -n -w -i%HB_INSTALL%\include;%WGUI_INSTALL%\include > clip.log
@@ -32,7 +32,7 @@ echo %1.exe, + >> b32.bc
 echo %1.map, + >> b32.bc
 echo %WGUI_INSTALL%\lib\woopgui.lib  + >> b32.bc
 echo %WGUI_INSTALL%\lib\wapilib.lib  + >> b32.bc
-rem echo %WGUI_INSTALL%\lib\utils.lib + >> b32.bc
+echo %WHAT32_LIB%\What32.lib + >> b32.bc
 echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
 echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
 echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc
