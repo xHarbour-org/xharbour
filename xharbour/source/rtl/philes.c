@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.21 2004/05/04 17:03:31 jonnymind Exp $
+ * $Id: philes.c,v 1.22 2004/05/11 16:29:51 ronpinkas Exp $
  */
 
 /*
@@ -224,14 +224,33 @@ HB_FUNC( FREADSTR )
       {
          FHANDLE fhnd = ( FHANDLE ) hb_parnl( 1 );
          BYTE * buffer = ( BYTE * ) hb_xgrab( ulToRead + 1 );
-         ULONG ulRead;
+         ULONG ulRead, ulBack;
 
          ulRead = hb_fsReadLarge( fhnd, buffer, ulToRead );
-         buffer[ ulRead ] = '\0';
-
-         /* NOTE: Clipper will not return zero chars from this functions. */
-
-         hb_retcAdopt( ( char * ) buffer );
+         if( ulRead > 0 )
+         {
+            /* NOTE: Clipper will not return zero chars from this functions. */
+            ulBack = ulRead;
+            while( ulBack )
+            {
+               if( buffer[ ulRead - ulBack ] == 0 )
+               {
+                  ulRead = ulRead - ulBack;
+                  ulBack--;
+                  if( ulBack != 0 )
+                  {
+                     hb_fsSeek( fhnd, -ulBack, FS_RELATIVE );
+                  }
+                  ulBack = 0;
+               }
+               else
+               {
+                  ulBack--;
+               }
+            }
+         }
+         hb_retclen( buffer, ulRead );
+         hb_xfree( buffer );
       }
       else
       {

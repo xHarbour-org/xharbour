@@ -1,5 +1,5 @@
 /*
- * $Id: fileio.ch,v 1.1.1.1 2001/12/21 10:47:14 ronpinkas Exp $
+ * $Id: fileio.ch,v 1.2 2002/08/27 20:16:07 horacioroldan Exp $
  */
 
 /*
@@ -81,7 +81,7 @@
 
 /* File seek mode flags */
 #define FS_SET        0        /* Seek from beginning of file    */
-#define FS_RELATIVE   1        /* Seek from current file poitner */
+#define FS_RELATIVE   1        /* Seek from current file pointer */
 #define FS_END        2        /* Seek from end of file          */
 
 /* File mode flags */
