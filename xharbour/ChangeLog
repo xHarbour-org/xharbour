@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2509 2004/03/06 12:56:56 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2510 2004/03/06 13:20:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-06 11:59 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hberrors.h
+    + Added: #define HB_PP_ERR_TOO_MANY_OPTIONALS            25
+  * source/pp/ppcore.c
+    + Added: #define HB_PP_MAX_NESTED_OPTIONALS 32
+    * Increased s_aIsRepeate[] and lastopi[] to HB_PP_MAX_NESTED_OPTIONALS
+    + Added logic to raise an error if excesive nesting of optional groups.
+
+  * tests/pp.prg
+    - Removed residual TraceLog()
 
 2004-03-07 14:25 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/hbserv.c
@@ -16,23 +27,23 @@
   * include/thread.h
   * source/vm/thread.c
     ! Added hb_threadCancelInternal to linux compilation.
-   
+
   * source/rtl/hbserv.c
-    + Now multiplatform signal/error handlers are insolated from 
+    + Now multiplatform signal/error handlers are insolated from
       service management. HB_PushSignalHandler is enough to catch
       windows GPFs and unix signals.
     ! Cleaned up termination sequence if the PRG signal handler
       request the application to quit.
-      
+
   * tests/service.prg
     + new parameter to send the process in background.
 
 2004-03-07 12:42 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/hbini.prg
     ! fixed main section output
-    ! using now CStr to write string output, as hash keys may be 
+    ! using now CStr to write string output, as hash keys may be
       also not strigns.
-    
+
 2004-03-06 11:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/inet.c
     ! pass proper argument to error handler in INETGETHOST() and INETGETALIAS()
@@ -73,18 +84,18 @@
 2004-03-07 00:41 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/hbini.prg
     ! Reverted latest changes that completely broke the code.
-    
-    /* Even the simplest test wasn't running (and cannot ever 
+
+    /* Even the simplest test wasn't running (and cannot ever
        be running under any condition). So, I don't know what
        the last commiter wanted to achieve, but it was not
        even in the right path to achieve it.
-       
+
        Also, formatting and case was completely mixed up.
-       
+
        So, before commiting, at least test and respect previous
        work.
     */
-    
+
 2004-03-05 15:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
     - Removed redundant hb_itemClear() on basic temp items.

@@ -3670,7 +3670,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          PP_CompileLine( sOut, nLine, s_aProcedures, s_aInitExit, @s_nProcId )
       ENDIF
    RECOVER USING oError
-      TraceLog()
       Eval( bErrHandler, oError )
    END SEQUENCE
 

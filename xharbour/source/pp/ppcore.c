@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.131 2004/02/29 23:10:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.132 2004/03/02 21:05:16 ronpinkas Exp $
  */
 
 /*
@@ -171,6 +171,8 @@ int hb_pp_NextToken( char** pLine, char *sToken );
 
 #define HB_PP_MAX_INCLUDES FOPEN_MAX - 5 - 1
 
+#define HB_PP_MAX_NESTED_OPTIONALS 32
+
 /* Ron Pinkas added 2000-01-24 */
 #define IS_2CHAR_OPERATOR( p ) ( p[0] && p[1] && ( strncmp( p, ":=", 2 ) == 0 || \
                                                    strncmp( p, "+=", 2 ) == 0 || \
@@ -193,7 +195,7 @@ static int  s_kolAddComs = 0;
 static int  s_kolAddTras = 0;
 static int  s_ParseState;
 static int  s_maxCondCompile;
-static int  s_aIsRepeate[ 5 ];
+static int  s_aIsRepeate[ HB_PP_MAX_NESTED_OPTIONALS ];
 static int  s_Repeate;
 static BOOL s_bReplacePat = TRUE, s_bNewLine = FALSE;
 static int  s_numBrackets;
@@ -243,7 +245,8 @@ char * hb_pp_szErrors[] =
    "Unclosed optional group '[%s'",
    "Unclosed repeatable group '[%s'",
    "Unknown result marker <%s> in #directive",
-   "Too many instanced of marker or group"
+   "Too many instanced of marker or group",
+   "Too many nested optional groups"
 };
 
 /* Table with warnings */
@@ -2471,7 +2474,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 {
   BOOL endTranslation = FALSE;
   int ipos;
-  char * lastopti[ 3 ], * strtopti = NULL, * strtptri = NULL;
+  char * lastopti[ 64 ], * strtopti = NULL, * strtptri = NULL;
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
   int isWordInside = 0;
 
@@ -2549,9 +2552,17 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
              isWordInside = 0;
           }
 
-          s_numBrackets++;
           s_aIsRepeate[ s_Repeate ] = 0;
-          lastopti[s_Repeate++] = ptrmp;
+          lastopti[ s_Repeate ] = ptrmp;
+
+          s_numBrackets++;
+          s_Repeate++;
+
+          if( s_Repeate == HB_PP_MAX_NESTED_OPTIONALS )
+          {
+             hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_OPTIONALS, NULL, NULL );
+          }
+
           ptrmp++;
 
           //printf( "CHECK >%s< in >%s<\n", ptrmp, ptri );

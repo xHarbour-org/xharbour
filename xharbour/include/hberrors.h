@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.14 2004/01/10 05:51:26 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.15 2004/02/18 10:50:44 andijahja Exp $
  */
 
 /*
@@ -179,6 +179,7 @@ HB_EXTERN_BEGIN
 #define HB_PP_ERR_UNCLOSED_REPEATABLE           22
 #define HB_PP_ERR_UNKNOWN_RESULTMARKER          23
 #define HB_PP_ERR_TOO_MANY_INSTANCES            24
+#define HB_PP_ERR_TOO_MANY_OPTIONALS            25
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2
