@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.33 2003/02/25 08:07:05 ronpinkas Exp $
+ * $Id: classes.c,v 1.34 2003/02/25 16:59:35 ronpinkas Exp $
  */
 
 /*
@@ -228,6 +228,7 @@ static void     hb_clsRelease( PCLASS );
 
        char *   hb_objGetClsName( PHB_ITEM pObject );
        char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
+       USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
        PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
        PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor );
        PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
@@ -518,7 +519,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             //printf( "Object: %s, Caller: %s CallerMessage: %s, CallerMessageClass: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName, szCallerMessage, hb_objGetRealClsName( pCaller, szCallerMessage ) );
 
             // It's possible that the Caller Message is a Super Messge, and Super is also where this Derived  Method is defined.
-            if( strcmp( hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName ), hb_objGetRealClsName( pCaller, szCallerMessage ) ) == 0 )
+            if( hb_objGetRealCls( pObject, pMethod->pMessage->pSymbol->szName ) == hb_objGetRealCls( pCaller, szCallerMessage ) )
             {
                return TRUE;
             }
@@ -716,80 +717,89 @@ char * hb_objGetClsName( PHB_ITEM pObject )
  * of inheritance.
  *
  */
+USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
+{
+   PHB_DYNS pMsg = hb_dynsymFindName( szName );
+   USHORT uiClass;
+   USHORT uiCurCls;
+   USHORT uiClsTree;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetRealCls(%p, %s)", pObject, szName));
+
+   uiClass = pObject->item.asArray.value->uiClass;
+
+   /* default value to current class object */
+   if( pObject->item.asArray.value->puiClsTree && pObject->item.asArray.value->puiClsTree[0] )
+   {
+      uiClsTree = pObject->item.asArray.value->puiClsTree[0] ;
+      uiCurCls  = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
+   }
+   else
+   {
+      uiClsTree = 1;          /* Flag value */
+      uiCurCls = uiClass;
+   }
+
+   while (uiClsTree)
+   {
+      if( uiCurCls && uiCurCls <= s_uiClasses )
+      {
+         PCLASS pClass  = s_pClasses + ( uiCurCls - 1 );
+         USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
+         USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+         USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
+
+         while( uiAt != uiLimit )
+         {
+            if( pClass->pMethods[ uiAt ].pMessage == pMsg )
+            {
+               uiClass = (pClass->pMethods + uiAt)->uiSprClass;
+               uiClsTree=1; /* Flag Value */
+               break;
+            }
+
+            uiAt++;
+
+            if( uiAt == uiMask )
+            {
+               uiAt = 0;
+            }
+         }
+      }
+
+      if( --uiClsTree )
+      {
+         uiCurCls = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
+      }
+
+   }
+
+   return uiClass;
+}
+
 char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
 {
    char * szClassName;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p)", pObject));
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p, %s)", pObject, szName));
 
    if( HB_IS_ARRAY( pObject ) )
    {
       if( ! pObject->item.asArray.value->uiClass )
       {
-         szClassName = "ARRAY";
+         return "ARRAY";
       }
       else
       {
-         PHB_DYNS pMsg = hb_dynsymFindName( szName );
-         USHORT uiClass;
-         USHORT uiCurCls;
-         USHORT uiClsTree;
-
-         uiClass = pObject->item.asArray.value->uiClass;
-
-         /* default value to current class object */
-         if( pObject->item.asArray.value->puiClsTree && pObject->item.asArray.value->puiClsTree[0] )
-         {
-            uiClsTree = pObject->item.asArray.value->puiClsTree[0] ;
-            uiCurCls  = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
-         }
-         else
-         {
-            uiClsTree = 1;          /* Flag value */
-            uiCurCls = uiClass;
-         }
-
-         while (uiClsTree)
-         {
-            if( uiCurCls && uiCurCls <= s_uiClasses )
-            {
-               PCLASS pClass  = s_pClasses + ( uiCurCls - 1 );
-               USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
-               USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
-               USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
-
-               while( uiAt != uiLimit )
-               {
-                  if( pClass->pMethods[ uiAt ].pMessage == pMsg )
-                  {
-                     uiClass = (pClass->pMethods + uiAt)->uiSprClass;
-                     uiClsTree=1; /* Flag Value */
-                     break;
-                  }
-
-                  uiAt++;
-
-                  if( uiAt == uiMask )
-                  {
-                     uiAt = 0;
-                  }
-               }
-            }
-
-            if( --uiClsTree )
-            {
-               uiCurCls = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
-            }
-
-         }
+         USHORT uiClass = hb_objGetRealCls( pObject, szName );
 
          if( uiClass && uiClass <= s_uiClasses )
          {
-            szClassName = ( s_pClasses + uiClass - 1 )->szName;
+            return ( s_pClasses + uiClass - 1 )->szName;
          }
          else
          {
-            szClassName = "UNKNOWN";
+            return "";
          }
       }
    }
@@ -798,44 +808,32 @@ char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
       switch( pObject->type )
       {
          case HB_IT_NIL:
-            szClassName = "NIL";
-            break;
+            return "NIL";
 
          case HB_IT_STRING:
-            szClassName = "CHARACTER";
-            break;
+            return "CHARACTER";
 
          case HB_IT_BLOCK:
-            szClassName = "BLOCK";
-            break;
+            return "BLOCK";
 
          case HB_IT_SYMBOL:
-            szClassName = "SYMBOL";
-            break;
+            return "SYMBOL";
 
          case HB_IT_DATE:
-            szClassName = "DATE";
-            break;
+            return "DATE";
 
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
-            szClassName = "NUMERIC";
-            break;
+            return "NUMERIC";
 
          case HB_IT_LOGICAL:
-            szClassName = "LOGICAL";
-            break;
-
-         default:
-            szClassName = "UNKNOWN";
-            break;
+            return "LOGICAL";
       }
    }
 
-   return szClassName;
+   return "UNKNOWN";
 }
-
 
 /*
  * <pFunc> = hb_objGetMethod( <pObject>, <pMessage> )
