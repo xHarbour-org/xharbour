@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.61 2003/03/30 21:07:30 lculik Exp $
+ * $Id: hbmake.prg,v 1.62 2003/03/31 16:21:23 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2404,7 +2404,7 @@ FUNC CreateLibMakeFile( cFile )
 
    IF s_lBcc
       fWrite( s_nLinkHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include;" + Alltrim( cUserInclude ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include -I$(BCB)\include -I" + Alltrim( cUserInclude ) + CRLF )
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS = /P32 /0" + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
