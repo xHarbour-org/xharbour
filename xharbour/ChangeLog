@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.261 2002/06/06 14:35:18 walito Exp $
+ * $Id: ChangeLog,v 1.262 2002/06/07 15:21:46 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-08 14:51 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+     + added hb_cdxOrderDestroy, hb_cdxIndexDelTag functions,
+       ordDestroy() is working now for dbfcdx rdd.
 
 2002-06-07 12:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/gtwin/gtwin.c
