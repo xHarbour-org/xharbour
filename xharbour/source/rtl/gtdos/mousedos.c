@@ -1,5 +1,5 @@
 /*
- * $Id: mousedos.c,v 1.3 2003/05/21 09:35:36 druzus Exp $
+ * $Id: mousedos.c,v 1.4 2004/06/30 10:05:16 likewolf Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ static int  s_iButtons = 0;              /* Mouse buttons */
 static int  s_iInitCol = 0;              /* Init mouse pos */
 static int  s_iInitRow = 0;              /* Init mouse pos */
 
-void hb_mouse_Init( void )
+void HB_GT_FUNC(mouse_Init( void ))
 {
    union REGS regs;
 
@@ -80,18 +80,18 @@ void hb_mouse_Init( void )
    }
 }
 
-void hb_mouse_Exit( void )
+void HB_GT_FUNC(mouse_Exit( void ))
 {
    hb_mouse_SetPos( s_iInitRow, s_iInitCol );
    hb_mouse_SetBounds( 0, 0, hb_gtMaxCol(), hb_gtMaxRow() );
 }
 
-BOOL hb_mouse_IsPresent( void )
+BOOL HB_GT_FUNC(mouse_IsPresent( void ))
 {
    return s_bPresent;
 }
 
-void hb_mouse_Show( void )
+void HB_GT_FUNC(mouse_Show( void ))
 {
    if( s_bPresent )
    {
@@ -105,7 +105,7 @@ void hb_mouse_Show( void )
 
 }
 
-void hb_mouse_Hide( void )
+void HB_GT_FUNC(mouse_Hide( void ))
 {
    if( s_bPresent )
    {
@@ -118,7 +118,7 @@ void hb_mouse_Hide( void )
    }
 }
 
-int hb_mouse_Col( void )
+int HB_GT_FUNC(mouse_Col( void ))
 {
    if( s_bPresent )
    {
@@ -133,7 +133,7 @@ int hb_mouse_Col( void )
       return -1;
 }
 
-int hb_mouse_Row( void )
+int HB_GT_FUNC(mouse_Row( void ))
 {
    if( s_bPresent )
    {
@@ -148,7 +148,7 @@ int hb_mouse_Row( void )
       return -1;
 }
 
-void hb_mouse_SetPos( int iRow, int iCol )
+void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
    if( s_bPresent )
    {
@@ -161,7 +161,7 @@ void hb_mouse_SetPos( int iRow, int iCol )
    }
 }
 
-BOOL hb_mouse_IsButtonPressed( int iButton )
+BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
    if( s_bPresent )
    {
@@ -177,7 +177,7 @@ BOOL hb_mouse_IsButtonPressed( int iButton )
       return FALSE;
 }
 
-int hb_mouse_CountButton( void )
+int HB_GT_FUNC(mouse_CountButton( void ))
 {
    if( s_bPresent )
    {
@@ -189,7 +189,7 @@ int hb_mouse_CountButton( void )
    }
 }
 
-void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
    if( s_bPresent )
    {
@@ -213,7 +213,7 @@ void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
    }
 }
 
-void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
    if( s_bPresent )
    {
@@ -230,4 +230,3 @@ void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRigh
       *piBottom = regs.HB_XREGS.dx / 8;
    }
 }
-

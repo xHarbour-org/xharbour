@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.17 2004/06/23 14:09:45 likewolf Exp $
+ * $Id: gtdos.c,v 1.18 2004/08/02 01:46:14 maurifull Exp $
  */
 
 /*
@@ -126,9 +126,9 @@
 static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch );
 static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch );
 
-static char hb_gt_GetScreenMode( void );
-static void hb_gt_SetCursorSize( char start, char end );
-static void hb_gt_GetCursorSize( char * start, char * end );
+static char HB_GT_FUNC(gt_GetScreenMode( void ));
+static void HB_GT_FUNC(gt_SetCursorSize( char start, char end ));
+static void HB_GT_FUNC(gt_GetCursorSize( char * start, char * end ));
 
 static char *s_clipboard = NULL;
 static ULONG s_clipsize = 0;
@@ -178,7 +178,7 @@ static int kbhit( void )
 
 #if !defined(__DJGPP__) && !defined(__RSX32__)
 #if defined(__WATCOMC__) || defined(_MSC_VER)
-static void hb_gt_CtrlBreak_Handler( int iSignal )
+static void HB_GT_FUNC(gt_CtrlBreak_Handler( int iSignal ))
 {
    /* Ctrl-Break was pressed */
    /* NOTE: the layout of this function is forced by the compiler
@@ -189,7 +189,7 @@ static void hb_gt_CtrlBreak_Handler( int iSignal )
 #else
 static int s_iOldCtrlBreak = 0;
 
-static int hb_gt_CtrlBrkHandler( void )
+static int HB_GT_FUNC(gt_CtrlBrkHandler( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_CtrlBrkHandler()"));
    s_bBreak = TRUE;
@@ -197,7 +197,7 @@ static int hb_gt_CtrlBrkHandler( void )
 }
 #endif
 
-static void hb_gt_CtrlBrkRestore( void )
+static void HB_GT_FUNC(gt_CtrlBrkRestore( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_CtrlBrkRestore()"));
    #if defined(__WATCOMC__)
@@ -210,7 +210,7 @@ static void hb_gt_CtrlBrkRestore( void )
 }
 #endif
 
-void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
+void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
@@ -239,13 +239,13 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
 #elif defined(__WATCOMC__)
 
-   signal( SIGBREAK, hb_gt_CtrlBreak_Handler );
-   atexit( hb_gt_CtrlBrkRestore );
+   signal( SIGBREAK, HB_GT_FUNC(gt_CtrlBreak_Handler ));
+   atexit( HB_GT_FUNC(gt_CtrlBrkRestore) );
 
 #elif defined(_MSC_VER)
 
-   signal( SIGINT, hb_gt_CtrlBreak_Handler );
-   atexit( hb_gt_CtrlBrkRestore );
+   signal( SIGINT, HB_GT_FUNC(gt_CtrlBreak_Handler));
+   atexit( HB_GT_FUNC(gt_CtrlBrkRestore));
 
 #elif defined(__RSX32__)
 
@@ -253,10 +253,10 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
 #else
 
-   ctrlbrk( hb_gt_CtrlBrkHandler );
+   ctrlbrk( HB_GT_FUNC(gt_CtrlBrkHandler));
    s_iOldCtrlBreak = getcbrk();
    setcbrk( 1 );
-   atexit( hb_gt_CtrlBrkRestore );
+   atexit( HB_GT_FUNC(gt_CtrlBrkRestore));
 
 #endif
 
@@ -270,10 +270,10 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    scrnPtr = NULL;
 #endif
 
-   hb_mouse_Init();
+   HB_GT_FUNC(mouse_Init());
 }
 
-void hb_gt_Exit( void )
+void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
@@ -282,18 +282,18 @@ void hb_gt_Exit( void )
       hb_xfree( s_clipboard );
    }
 
-   hb_mouse_Exit();
+   HB_GT_FUNC(mouse_Exit());
 #if !defined(__DJGPP__)
   if( scrnStealth != ( char * ) -1 )
      hb_xfree( scrnStealth );
 #endif
 }
 
-int hb_gt_ExtendedKeySupport()
+int HB_GT_FUNC(gt_ExtendedKeySupport())
 {
    return 0;
 }
-int hb_gt_ReadKey( HB_inkey_enum eventmask )
+int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int ch = 0;
 
@@ -460,7 +460,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
    return ch;
 }
 
-BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
+BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
 {
    union REGS regs;
 
@@ -478,11 +478,11 @@ BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
    return TRUE;
 }
 
-BOOL hb_gt_IsColor( void )
+BOOL HB_GT_FUNC(gt_IsColor( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_IsColor()"));
 
-   return hb_gt_GetScreenMode() != 7;
+   return HB_GT_FUNC(gt_GetScreenMode()) != 7;
 }
 
 #if !defined(__DJGPP__)
@@ -524,7 +524,7 @@ char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
 }
 #endif
 
-static char hb_gt_GetScreenMode( void )
+static char HB_GT_FUNC(gt_GetScreenMode( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenMode()"));
 
@@ -537,7 +537,7 @@ static char hb_gt_GetScreenMode( void )
 #endif
 }
 
-USHORT hb_gt_GetScreenWidth( void )
+USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
 
@@ -557,7 +557,7 @@ USHORT hb_gt_GetScreenWidth( void )
    return scrnWidth;
 }
 
-USHORT hb_gt_GetScreenHeight( void )
+USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeigth()"));
 
@@ -577,7 +577,7 @@ USHORT hb_gt_GetScreenHeight( void )
    return scrnHeight;
 }
 
-void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
+void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 {
    union REGS regs;
 
@@ -600,7 +600,7 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
    }
 }
 
-static void hb_gt_SetCursorSize( char start, char end )
+static void HB_GT_FUNC(gt_SetCursorSize( char start, char end ))
 {
    union REGS regs;
 
@@ -612,7 +612,7 @@ static void hb_gt_SetCursorSize( char start, char end )
    HB_DOS_INT86( 0x10, &regs, &regs );
 }
 
-static void hb_gt_GetCursorSize( char * start, char *end )
+static void HB_GT_FUNC(gt_GetCursorSize( char * start, char *end ))
 {
    union REGS regs;
 
@@ -625,14 +625,14 @@ static void hb_gt_GetCursorSize( char * start, char *end )
    *end = regs.h.cl;
 }
 
-USHORT hb_gt_GetCursorStyle( void )
+USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 {
    char start, end;
    int rc;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
 
-   hb_gt_GetCursorSize( &start, &end );
+   HB_GT_FUNC(gt_GetCursorSize( &start, &end ));
 
    if( ( start == 32 ) && ( end == 32 ) )
       rc = SC_NONE;
@@ -655,30 +655,30 @@ USHORT hb_gt_GetCursorStyle( void )
    return rc;
 }
 
-void hb_gt_SetCursorStyle( USHORT style )
+void HB_GT_FUNC(gt_SetCursorStyle( USHORT style ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", style));
 
    switch( style )
    {
    case SC_NONE:
-      hb_gt_SetCursorSize( 32, 32 );
+      HB_GT_FUNC(gt_SetCursorSize( 32, 32 ));
       break;
 
    case SC_NORMAL:
-      hb_gt_SetCursorSize( 6, 7 );
+      HB_GT_FUNC(gt_SetCursorSize( 6, 7 ));
       break;
 
    case SC_INSERT:
-      hb_gt_SetCursorSize( 4, 7 );
+      HB_GT_FUNC(gt_SetCursorSize( 4, 7 ));
       break;
 
    case SC_SPECIAL1:
-      hb_gt_SetCursorSize( 0, 7 );
+      HB_GT_FUNC(gt_SetCursorSize( 0, 7 ));
       break;
 
    case SC_SPECIAL2:
-      hb_gt_SetCursorSize( 0, 3 );
+      HB_GT_FUNC(gt_SetCursorSize( 0, 3 ));
       break;
 
    default:
@@ -775,7 +775,7 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
 #endif
 }
 
-void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
+void HB_GT_FUNC(gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu", cRow, cCol, (int) attr, str, len));
 
@@ -863,14 +863,16 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
 #endif
 }
 
-int hb_gt_RectSize( USHORT rows, USHORT cols )
+int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
 {
    return rows * cols * 2;
 }
 
-void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * dest )
+void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * dest ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p", usTop, usLeft, usBottom, usRight, dest));
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, dest));
+
 
 #if defined(__DJGPP__TEXT) || defined(__DJGPP__)
    {
@@ -906,7 +908,7 @@ void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 #endif
 }
 
-void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * srce )
+void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * srce ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p", usTop, usLeft, usBottom, usRight, srce));
 
@@ -944,7 +946,7 @@ void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 #endif
 }
 
-void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr )
+void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr ))
 {
    USHORT x, y;
 
@@ -963,7 +965,7 @@ void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT us
    }
 }
 
-SHORT hb_gt_Col( void )
+SHORT HB_GT_FUNC(gt_Col( void ))
 {
    union REGS regs;
 
@@ -983,7 +985,7 @@ SHORT hb_gt_Col( void )
    }
 }
 
-SHORT hb_gt_Row( void )
+SHORT HB_GT_FUNC(gt_Row( void ))
 {
    union REGS regs;
 
@@ -1003,7 +1005,7 @@ SHORT hb_gt_Row( void )
    }
 }
 
-void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz )
+void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz ))
 {
    int iRows = sVert, iCols = sHoriz;
 
@@ -1069,7 +1071,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
    hb_gtSetPos( usRow, usCol );
 }
 
-void hb_gt_DispBegin( void )
+void HB_GT_FUNC(gt_DispBegin( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
 
@@ -1107,7 +1109,7 @@ void hb_gt_DispBegin( void )
 #endif
 }
 
-void hb_gt_DispEnd( void )
+void HB_GT_FUNC(gt_DispEnd( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
 
@@ -1144,7 +1146,7 @@ void hb_gt_DispEnd( void )
 #endif
 }
 
-BOOL hb_gt_GetBlink()
+BOOL HB_GT_FUNC(gt_GetBlink())
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
 
@@ -1157,7 +1159,7 @@ BOOL hb_gt_GetBlink()
 #endif
 }
 
-void hb_gt_SetBlink( BOOL bBlink )
+void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 {
    union REGS regs;
 
@@ -1170,7 +1172,7 @@ void hb_gt_SetBlink( BOOL bBlink )
    HB_DOS_INT86( 0x10, &regs, &regs );
 }
 
-void hb_gt_Tone( double dFrequency, double dDuration )
+void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
@@ -1195,17 +1197,17 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 #endif
 }
 
-char * hb_gt_Version( void )
+char * HB_GT_FUNC(gt_Version( void ))
 {
    return "Harbour Terminal: DOS console";
 }
 
-USHORT hb_gt_DispCount()
+USHORT HB_GT_FUNC(gt_DispCount())
 {
    return s_uiDispCount;
 }
 
-void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength )
+void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
 
@@ -1290,8 +1292,8 @@ void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULON
 #endif
 }
 
-USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
-                  BYTE * szBox, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
+                  BYTE * szBox, BYTE byAttr ))
 {
    USHORT ret = 1;
    SHORT Row;
@@ -1398,17 +1400,17 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    return ret;
 }
 
-USHORT hb_gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
    return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
 }
 
-USHORT hb_gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
    return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
 }
 
-USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ))
 {
    USHORT ret = 1;
    if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
@@ -1432,7 +1434,7 @@ USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE by
    return ret;
 }
 
-USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ))
 {
    USHORT ret = 1;
    SHORT Row;
@@ -1622,7 +1624,7 @@ static USHORT hb_gt_GetDisplay( void )
    return ( regs.h.al == 0x1A ) ? regs.h.bl : 0xFF;
 }
 
-BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )
+BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
 {
    /* hb_gt_IsColor() test for color card, we need to know if it is a VGA board...*/
    BOOL bIsVGA     = ( hb_gt_GetDisplay() == 8 );
@@ -1691,32 +1693,32 @@ BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )
    return bSuccess;
 }
 
-BOOL hb_gt_PreExt()
+BOOL HB_GT_FUNC(gt_PreExt())
 {
    return TRUE;
 }
 
-BOOL hb_gt_PostExt()
+BOOL HB_GT_FUNC(gt_PostExt())
 {
    return TRUE;
 }
 
-BOOL hb_gt_Suspend()
+BOOL HB_GT_FUNC(gt_Suspend())
 {
    return TRUE;
 }
 
-BOOL hb_gt_Resume()
+BOOL HB_GT_FUNC(gt_Resume())
 {
    return TRUE;
 }
 
-void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
-void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
@@ -1758,7 +1760,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /**************************************************************/
 
-int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
+int HB_GT_FUNC(gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ))
 {
    HB_SYMBOL_UNUSED( bUpdate );
    HB_SYMBOL_UNUSED( iParam );
@@ -1792,3 +1794,108 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
 }
 
 /* ******** Graphics API end ******** */
+
+/* ******** Graphics API end ******** */
+
+#ifdef HB_MULTI_GT
+
+static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
+{
+    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
+
+    gt_funcs->Init                  = HB_GT_FUNC( gt_Init );
+    gt_funcs->Exit                  = HB_GT_FUNC( gt_Exit );
+    gt_funcs->GetScreenWidth        = HB_GT_FUNC( gt_GetScreenWidth );
+    gt_funcs->GetScreenHeight       = HB_GT_FUNC( gt_GetScreenHeight );
+    gt_funcs->Col                   = HB_GT_FUNC( gt_Col );
+    gt_funcs->Row                   = HB_GT_FUNC( gt_Row );
+    gt_funcs->SetPos                = HB_GT_FUNC( gt_SetPos );
+    gt_funcs->AdjustPos             = HB_GT_FUNC( gt_AdjustPos );
+    gt_funcs->IsColor               = HB_GT_FUNC( gt_IsColor );
+    gt_funcs->GetCursorStyle        = HB_GT_FUNC( gt_GetCursorStyle );
+    gt_funcs->SetCursorStyle        = HB_GT_FUNC( gt_SetCursorStyle );
+    gt_funcs->DispBegin             = HB_GT_FUNC( gt_DispBegin );
+    gt_funcs->DispEnd               = HB_GT_FUNC( gt_DispEnd );
+    gt_funcs->DispCount             = HB_GT_FUNC( gt_DispCount );
+    gt_funcs->Puts                  = HB_GT_FUNC( gt_Puts );
+    gt_funcs->Replicate             = HB_GT_FUNC( gt_Replicate );
+    gt_funcs->RectSize              = HB_GT_FUNC( gt_RectSize );
+    gt_funcs->GetText               = HB_GT_FUNC( gt_GetText );
+    gt_funcs->PutText               = HB_GT_FUNC( gt_PutText );
+    gt_funcs->SetAttribute          = HB_GT_FUNC( gt_SetAttribute );
+    gt_funcs->Scroll                = HB_GT_FUNC( gt_Scroll );
+    gt_funcs->SetMode               = HB_GT_FUNC( gt_SetMode );
+    gt_funcs->GetBlink              = HB_GT_FUNC( gt_GetBlink );
+    gt_funcs->SetBlink              = HB_GT_FUNC( gt_SetBlink );
+    gt_funcs->Version               = HB_GT_FUNC( gt_Version );
+    gt_funcs->Box                   = HB_GT_FUNC( gt_Box );
+    gt_funcs->BoxD                  = HB_GT_FUNC( gt_BoxD );
+    gt_funcs->BoxS                  = HB_GT_FUNC( gt_BoxS );
+    gt_funcs->HorizLine             = HB_GT_FUNC( gt_HorizLine );
+    gt_funcs->VertLine              = HB_GT_FUNC( gt_VertLine );
+    gt_funcs->Suspend               = HB_GT_FUNC( gt_Suspend );
+    gt_funcs->Resume                = HB_GT_FUNC( gt_Resume );
+    gt_funcs->PreExt                = HB_GT_FUNC( gt_PreExt );
+    gt_funcs->PostExt               = HB_GT_FUNC( gt_PostExt );
+    gt_funcs->OutStd                = HB_GT_FUNC( gt_OutStd );
+    gt_funcs->OutErr                = HB_GT_FUNC( gt_OutErr );
+    gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
+    gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
+    gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    
+    /* Graphics API */
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
+}
+
+/* ********************************************************************** */
+
+static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
+{
+    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
+
+    gt_funcs->mouse_Init            = HB_GT_FUNC( mouse_Init );
+    gt_funcs->mouse_Exit            = HB_GT_FUNC( mouse_Exit );
+    gt_funcs->mouse_IsPresent       = HB_GT_FUNC( mouse_IsPresent );
+    gt_funcs->mouse_Show            = HB_GT_FUNC( mouse_Show );
+    gt_funcs->mouse_Hide            = HB_GT_FUNC( mouse_Hide );
+    gt_funcs->mouse_Col             = HB_GT_FUNC( mouse_Col );
+    gt_funcs->mouse_Row             = HB_GT_FUNC( mouse_Row );
+    gt_funcs->mouse_SetPos          = HB_GT_FUNC( mouse_SetPos );
+    gt_funcs->mouse_IsButtonPressed = HB_GT_FUNC( mouse_IsButtonPressed );
+    gt_funcs->mouse_CountButton     = HB_GT_FUNC( mouse_CountButton );
+    gt_funcs->mouse_SetBounds       = HB_GT_FUNC( mouse_SetBounds );
+    gt_funcs->mouse_GetBounds       = HB_GT_FUNC( mouse_GetBounds );
+}
+
+
+/* ********************************************************************** */
+
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
+                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
+
+HB_GT_ANNOUNCE( HB_GT_NAME );
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
+   hb_gtRegister( &gtInit );
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_Init_
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_;
+   #pragma data_seg()
+#endif
+
+#endif  /* HB_MULTI_GT */
+
+/* *********************************************************************** */

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.52 2004/05/09 23:40:05 druzus Exp $
+# $Id: Makefile,v 1.53 2004/05/11 16:29:51 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -213,6 +213,7 @@ PRG_SOURCES=\
         typefile.prg \
         wait.prg     \
         win32ole.prg \
+        win32prn.prg \
         stream.prg \
 
 ifeq ($(HB_MT),MT)
