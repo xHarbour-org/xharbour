@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.2 2003/03/14 20:35:28 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.3 2003/03/14 22:23:29 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ char * argv[ 20 ];
 
 HANDLE hb_hInstance = 0;
 HANDLE hb_hPrevInstance = 0;
+int    hb_iCmdShow;
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
@@ -79,6 +80,8 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    HB_SYMBOL_UNUSED( iCmdShow );
 
    hb_hInstance = hInstance;
+   hb_iCmdShow = iCmdShow;
+
    GetModuleFileName( hInstance, szAppName, 249 );
    argv[ 0 ] = szAppName;
 
