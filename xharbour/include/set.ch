@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.1.1.1 2001/12/21 10:47:52 ronpinkas Exp $
+ * $Id: set.ch,v 1.2 2002/01/31 05:08:31 ronpinkas Exp $
  */
 
 /*
@@ -117,6 +117,9 @@
 #define _SET_LANGUAGE     100 /* Harbour extension */
 #define _SET_IDLEREPEAT   101 /* Harbour extension */
 #define _SET_TRACE        102 /* Harbour extension */
+#define _SET_FILECASE     103 /* Harbour extension */
+#define _SET_DIRCASE      104 /* Harbour extension */
+#define _SET_DIRSEPARATOR 105 /* Harbour extension */
 
 #define HB_SET_BASE       100
 #define HB_SET_COUNT      2

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.5 2002/05/01 22:54:59 ronpinkas Exp $
+ * $Id: hbset.h,v 1.6 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -125,7 +125,11 @@ typedef enum
    /* Harbour SET extensions start at 100 */
    HB_SET_LANGUAGE      = 100,
    HB_SET_IDLEREPEAT    = 101,
-   HB_SET_TRACE         = 102
+   HB_SET_TRACE         = 102,
+   HB_SET_FILECASE      = 103,
+   HB_SET_DIRCASE       = 104,
+   HB_SET_DIRSEPARATOR  = 105
+
 
 } HB_set_enum;
 
@@ -188,8 +192,16 @@ typedef struct
    BOOL    HB_SET_UNIQUE;
    int     HB_SET_VIDEOMODE;
    BOOL    HB_SET_WRAP;
+   int     HB_SET_FILECASE;
+   int     HB_SET_DIRCASE;
+   char    HB_SET_DIRSEPARATOR;
 
 } HB_SET_STRUCT;
+
+#define HB_SET_CASE_MIXED  0
+#define HB_SET_CASE_LOWER  1
+#define HB_SET_CASE_UPPER  2
+
 
 extern HB_EXPORT HB_SET_STRUCT hb_set;
 

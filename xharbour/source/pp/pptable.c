@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.10 2002/12/18 13:43:56 ronpinkas Exp $
+ * $Id: pptable.c,v 1.11 2003/01/12 01:52:16 horacioroldan Exp $
  */
 
 /*
@@ -122,6 +122,9 @@ void hb_pp_Table( void )
    static DEFINES sD___51 = {"_SET_LANGUAGE",NULL,-1,"100", &sD___50 };
    static DEFINES sD___52 = {"_SET_IDLEREPEAT",NULL,-1,"101", &sD___51 };
    static DEFINES sD___53 = {"_SET_TRACE",NULL,-1,"102", &sD___52 };
+   static DEFINES sD___54 = {"_SET_FILECASE",NULL,-1,"102", &sD___53 };
+   static DEFINES sD___55 = {"_SET_DIRCASE",NULL,-1,"103", &sD___54 };
+   static DEFINES sD___56 = {"_SET_DIRSEPARATOR",NULL,-1,"104", &sD___55 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -426,7 +429,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___244 = {0,"SET","AUTOPEN \1A20 ON,OFF,&>","Set(_SET_AUTOPEN,\1A30 )",&sC___243 };
    static COMMANDS sC___245 = {0,"SET","AUTOPEN (\1A00)","Set(_SET_AUTOPEN,\1A00 )",&sC___244 };
 
-   hb_pp_topDefine = &sD___53;
+   hb_pp_topDefine = &sD___56;
    hb_pp_topCommand = &sC___245;
    hb_pp_topTranslate = NULL;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.616 2003/01/12 05:31:46 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.617 2003/01/12 08:28:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-12 10:00 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbapifs.h
+  * include/hbset.h
+  * include/set.ch
+  * source/pp/pptable.c
+  * source/rtl/file.c
+  * source/rtl/filesys.c
+  * source/rtl/set.c
+    ! Implement SET FILECASE, DIRCASE and DIRSEPARATOR
+      This Changes are Borrow from Harbour (author Gustavo Junior Alves <alves@coslinux.com.br>)
 
 2003-01-12 00:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/getsys.prg

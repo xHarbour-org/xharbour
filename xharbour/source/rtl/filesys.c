@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.21 2003/01/06 14:11:47 lculik Exp $
+ * $Id: filesys.c,v 1.22 2003/01/06 20:37:44 ronpinkas Exp $
  */
 
 /*
@@ -97,6 +97,7 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hb_io.h"
+#include "hbset.h"
 
 #if defined(OS_UNIX_COMPATIBLE)
    #include <unistd.h>
@@ -433,6 +434,48 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
 
 #endif
 
+BYTE * HB_EXPORT hb_filecase(char *str) {
+   // Convert file and dir case. The allowed SET options are:
+   // LOWER - Convert all caracters of file to lower
+   // UPPER - Convert all caracters of file to upper
+   // MIXED - Leave as is
+
+   // The allowed environment options are:
+   // FILECASE - define the case of file
+   // DIRCASE - define the case of path
+   // DIRSEPARATOR - define separator of path (Ex. "/")
+
+   size_t a;
+   char *filename;
+   char *dirname=str;
+   size_t dirlen;
+
+   // Look for filename (Last "\" or DIRSEPARATOR)
+   if( hb_set.HB_SET_DIRSEPARATOR != '\\' ) {
+      for(a=0;a<strlen(str);a++)
+         if( str[a] == '\\' )
+            str[a] = hb_set.HB_SET_DIRSEPARATOR;
+   }
+   if(( filename = strrchr( str, hb_set.HB_SET_DIRSEPARATOR )) != NULL)
+      filename++;
+   else
+      filename=str;
+   dirlen=filename-str;
+
+   // FILECASE
+   if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
+      hb_strLower( filename, strlen(filename) );
+   else if( hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER )
+      hb_strUpper( filename, strlen(filename) );
+
+   // DIRCASE
+   if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )
+      hb_strLower(dirname,dirlen);
+   else if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      hb_strUpper(dirname,dirlen);
+   return (( BYTE * ) str);
+}
+
 
 /*
  * FILESYS.API FUNCTIONS --
@@ -503,6 +546,8 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    FHANDLE hFileHandle;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
+
+   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
 
 #if defined(X__WIN32__)
 
@@ -622,7 +667,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    s_uiErrorLast = FS_ERROR;
 
 #endif
-
+   hb_xfree( pFilename );
    return hFileHandle;
 }
 
@@ -634,6 +679,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
+   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
    s_uiErrorLast = 0;
 
 #if defined(X__WIN32__)
@@ -682,6 +728,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
 #endif
 
+   hb_xfree( pFilename );
    return hFileHandle;
 }
 
@@ -699,6 +746,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreateEx(%p, %hu, %hu)", pFilename, uiAttr, uiFlags));
 
+   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
    s_uiErrorLast = 0;
 
 #if defined(HB_FS_FILE_IO)
@@ -720,7 +768,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
    s_uiErrorLast = FS_ERROR;
 
 #endif
-
+   hb_xfree( pFilename );
    return hFileHandle;
 }
 
