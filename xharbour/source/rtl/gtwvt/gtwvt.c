@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.26 2004/01/07 14:14:52 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.27 2004/01/07 16:19:34 vouchcac Exp $
  */
 
 /*
@@ -2748,10 +2748,10 @@ static void hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, B
   if ( length + index <= _s.BUFFERSIZE )
   {
     memcpy( ( _s.pBuffer+index ), sBuffer, length );
-    if ( attr != ' ' ) // if no attribute, don't overwrite
-    {
-      memset( ( _s.pAttributes+index ), attr, length );
-    }
+//    if ( attr != ' ' ) // if no attribute, don't overwrite
+//    {
+    memset( ( _s.pAttributes+index ), attr, length );
+//    }
 
     //  determine bounds of rect around character to refresh
     //
@@ -3031,74 +3031,95 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 //
 BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image )
 {
-   IStream  *iStream;
-   IPicture *iPicture;
-   HGLOBAL  hGlobal;
-   HANDLE   hFile;
-   DWORD    nFileSize;
-   DWORD    nReadByte;
-   long     lWidth,lHeight;
-   int      x,y,xe,ye;
-   int      c   = x1 ;
-   int      r   = y1 ;
-   int      dc  = wd ;
-   int      dr  = ht ;
-   int      tor =  0 ;
-   int      toc =  0 ;
-   HRGN     hrgn1;
-   POINT    lpp;
+  IStream  *iStream;
+  IPicture *iPicture;
+  HGLOBAL  hGlobal;
+  HANDLE   hFile;
+  DWORD    nFileSize;
+  DWORD    nReadByte;
+  long     lWidth,lHeight;
+  int      x,y,xe,ye;
+  int      c   = x1 ;
+  int      r   = y1 ;
+  int      dc  = wd ;
+  int      dr  = ht ;
+  int      tor =  0 ;
+  int      toc =  0 ;
+  HRGN     hrgn1;
+  POINT    lpp;
+  BOOL     bResult = FALSE;
 
-   hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING,
+  hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING,
                                       FILE_ATTRIBUTE_NORMAL, NULL );
-   if ( hFile == INVALID_HANDLE_VALUE )
-      return ( FALSE );
+  if ( hFile != INVALID_HANDLE_VALUE )
+  {
+    nFileSize = GetFileSize( hFile, NULL );
 
-   nFileSize = GetFileSize( hFile, NULL );
-   hGlobal   = GlobalAlloc( GPTR, nFileSize );
+    if ( nFileSize != INVALID_FILE_SIZE )
+    {
+      hGlobal   = GlobalAlloc( GPTR, nFileSize );
 
-   ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL );
-
-   CloseHandle( hFile );
-
-   CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-   OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
-   if ( iPicture == NULL )
-      return ( FALSE );
-
-   iPicture->lpVtbl->get_Width( iPicture,&lWidth );
-   iPicture->lpVtbl->get_Height( iPicture,&lHeight );
-
-   if ( dc  == 0 ) { dc = ( int ) ( ( float ) dr * lWidth  / lHeight ); }
-   if ( dr  == 0 ) { dr = ( int ) ( ( float ) dc * lHeight / lWidth  ); }
-   if ( tor == 0 ) { tor = dr; }
-   if ( toc == 0 ) { toc = dc; }
-   x  = c;
-   y  = r;
-   xe = c + toc - 1;
-   ye = r + tor - 1;
-
-   GetViewportOrgEx( _s.hdc, &lpp );
-
-   hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
-   SelectClipRgn( _s.hdc, hrgn1 );
-
-   while ( x < xe )
-   {  while ( y < ye )
+      if ( hGlobal )
       {
-         iPicture->lpVtbl->  Render( iPicture, _s.hdc, x, y, dc, dr, 0,
-                                     lHeight, lWidth, -lHeight, NULL );
-         y += dr;
+        if (ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ))
+        {
+          CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
+          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
+          if ( iPicture )
+          {
+            iPicture->lpVtbl->get_Width( iPicture,&lWidth );
+            iPicture->lpVtbl->get_Height( iPicture,&lHeight );
+
+            if ( dc  == 0 )
+            {
+              dc = ( int ) ( ( float ) dr * lWidth  / lHeight );
+            }
+            if ( dr  == 0 )
+            {
+              dr = ( int ) ( ( float ) dc * lHeight / lWidth  );
+            }
+            if ( tor == 0 )
+            {
+              tor = dr;
+            }
+            if ( toc == 0 )
+            {
+              toc = dc;
+            }
+            x  = c;
+            y  = r;
+            xe = c + toc - 1;
+            ye = r + tor - 1;
+
+            GetViewportOrgEx( _s.hdc, &lpp );
+
+            hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
+            SelectClipRgn( _s.hdc, hrgn1 );
+
+            while ( x < xe )
+            {
+              while ( y < ye )
+              {
+                iPicture->lpVtbl->  Render( iPicture, _s.hdc, x, y, dc, dr, 0,
+                                             lHeight, lWidth, -lHeight, NULL );
+                y += dr;
+              }
+              y =  r;
+              x += dc;
+            }
+
+            SelectClipRgn( _s.hdc, NULL );
+
+            iPicture->lpVtbl->Release( iPicture );
+            bResult = TRUE ;
+          }
+        }
+        GlobalFree( hGlobal );
       }
-      y =  r;
-      x += dc;
-   }
-
-   SelectClipRgn( _s.hdc, NULL );
-
-   return( TRUE );
-
-   iPicture->lpVtbl->Release( iPicture );
-   GlobalFree( hGlobal );
+    }
+    CloseHandle( hFile );
+  }
+  return( bResult );
 }
 
 //-------------------------------------------------------------------//
