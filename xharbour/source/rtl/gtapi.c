@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.4 2002/10/22 02:08:33 paultucker Exp $
+ * $Id: gtapi.c,v 1.5 2003/02/21 12:15:48 iananderson Exp $
  */
 
 /*
@@ -848,7 +848,13 @@ USHORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetMode(%hu, %hu)", uiRows, uiCols));
 
-   return hb_gt_SetMode( uiRows, uiCols ) ? 0 : 1;
+   if (hb_gt_SetMode( uiRows, uiCols ))
+   {
+	  s_Height = uiRows;
+      s_Width = uiCols;
+      return 0;
+   }
+   else return 1;
 }
 
 /* NOTE: This is a compatibility function.
