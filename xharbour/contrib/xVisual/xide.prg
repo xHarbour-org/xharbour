@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.105 2002/10/29 15:39:24 what32 Exp $
+ * $Id: xide.prg,v 1.106 2002/10/30 08:14:01 ronpinkas Exp $
  */
 
 /*
@@ -74,13 +74,15 @@ RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
 
-CLASS MainFrame FROM TForm
-   METHOD New( oParent ) INLINE ::Caption := 'xHarbour xIde',;
-                                ::left    := 0,;
-                                ::top     := 0,;
-                                ::width   := GetWindowRect(GetDesktopWindow())[3],;
-                                ::height  := 125,;
-                                ::Icon    := LoadIcon( oApp:Instance,'0IDE'),;
+CLASS MainFrame FROM TFrame
+   METHOD New( oParent ) INLINE ::Caption   := 'xHarbour xIde',;
+                                ::left      := 0,;
+                                ::top       := 0,;
+                                ::width     := GetWindowRect( GetDesktopWindow() )[3],;
+                                ::height    := 125,;
+                                ::ExStyle   := WS_EX_APPWINDOW,;
+                                ::FrameWnd  := .T.,;
+                                ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES,;
