@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.441 2002/10/15 03:22:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.442 2002/10/15 05:02:56 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-15 15:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/hvm.c
+    ! Fixed eternal loop when error 1003 is issued and errorsys creates 
+      the undefined sysmbol and returns ES_RETRY
+  * source/vm/memvars.c
+    ! __MVPUT : fixed symbol name trailing spaces problem
+    ! __MVSCOPE : fixed symbol name trailing spaces problem
+    ! hb_memvarFindSymbol() : speed improved and fixed symbol name trailing 
+                              spaces problem
+    ! hb_memvarScope() : speed improved, fixed symbol name trailing 
+                         spaces problem and removed the second parameter
+  * source/vm/macro.c
+    ! hb_compMemvarCheck() - hb_memvarScope call parameter adjusted
+  * include/hbapi.h
+    ! hb_memvarScope prototype - parameter adjusted
+
 2002-10-15 02:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
     ! fixed get (value and display) involving negative with decimal
