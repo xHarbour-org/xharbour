@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.10 2003/05/07 20:05:53 walito Exp $
+ * $Id: teditor.prg,v 1.11 2003/06/09 20:55:30 lculik Exp $
  */
 
 /*
@@ -896,7 +896,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
       BrowseText(Self,nPassedKey)
 
    else
-
+      ::RefreshWindow()
       // If user pressed an exiting key (K_ESC or K_ALT_W) or I've received a key to handle and then exit
       while ! ::lExitEdit .AND. ! lSingleKeyProcess
 
@@ -911,7 +911,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
          else
             lSingleKeyProcess := .T.
             nKey := nPassedKey
-            
+
          endif
 
       if (bKeyBlock := Setkey( nKey )) <> NIL

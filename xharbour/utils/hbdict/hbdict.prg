@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.2 2003/06/24 00:41:05 jonnymind Exp $
+* $Id: hbdict.prg,v 1.3 2003/06/24 02:17:21 fsgiudice Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -17,6 +17,52 @@
 * more functionality.
 *
 #include "inkey.ch"
+#include "hbclass.ch"
+
+***************************************************
+* redefining the keyboard hook of xharbour teditor
+*
+
+CLASS THBdictEdit FROM HBEditor
+   DATA cOrigin
+
+   METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin )
+
+   METHOD KeyboardHook( nKey )
+   METHOD IdleHook()
+ENDCLASS
+
+METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin ) CLASS THBdictEdit
+   ::cOrigin := cOrigin
+   ::Super:New( cString, nTop, nLeft, nBottom, nRight )
+RETURN Self
+
+METHOD KeyboardHook( nKey ) CLASS THBdictEdit
+   // Control enter has become a common way to exit multiline
+   // editors
+   IF nKey == K_CTRL_ENTER
+      ::lSaved := .T.
+      ::lExitEdit := .T.
+   ENDIF
+
+   IF nKey == K_F2
+      IF ::naTextLen < Len( ::cOrigin )
+         ::LoadText( padr( ::GetText(), Len( ::cOrigin) ) )
+      ENDIF
+      ::lSaved := .T.
+      ::lExitEdit := .T.
+   ENDIF
+RETURN nKey
+
+METHOD IdleHook() CLASS THBDictEdit
+   ThreadSleep( 10 ) // release CPU
+RETURN Self
+
+
+
+******************************************************
+* Main Program
+*
 
 PROCEDURE Main( cInput, cOutput )
    LOCAL aInput, aOutput
@@ -27,7 +73,7 @@ PROCEDURE Main( cInput, cOutput )
    SET COLOR TO W+/B
    CLEAR SCREEN
 
-   @0,18 SAY i18n( "X H A R B O U R - Dictionary Editor (preview)" )
+   @0,18 SAY i18n( "X H A R B O U R - Dictionary Editor (preview,2nd)" )
 
    DisplayMask()
 
@@ -70,8 +116,8 @@ PROCEDURE Main( cInput, cOutput )
    ShowHeader( aInput[1] )
 
    @6,3 SAY i18n("Saving to: ") + cOutput
-   @3,40 SAY i18n("Press 'S' to save")
-   @4,40 SAY i18n("Press 'E' to edit header")
+   @3,50 SAY i18n("Press 'S' to save")
+   @4,50 SAY i18n("Press 'E' to edit header")
    recpos := 1
 
    DO WHILE .T.
@@ -81,7 +127,7 @@ PROCEDURE Main( cInput, cOutput )
       nKey := Inkey(0)
       IF nKey == K_ESC
          IF lModified
-            IF( Alert( i18n( "Dictionary modified !;Do you really want to exit ?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1 )
+            IF( Alert( i18n( "Dictionary modified ! Do you really want to exit?" ), { i18n( "Yes" ), i18n( "No" ) } ) == 1 )
               EXIT
             ENDIF
          ELSE
@@ -98,11 +144,55 @@ PROCEDURE Main( cInput, cOutput )
             ENDIF
          EXIT
 
+         CASE K_CTRL_LEFT
+         CASE K_CTRL_UP
+            IF recpos > 10
+               recpos-= 10
+            ELSE
+               recpos := 1
+            ENDIF
+         EXIT
+
+         CASE K_ALT_LEFT
+         CASE K_ALT_UP
+            IF recpos > 50
+               recpos-= 50
+            ELSE
+               recpos := 1
+            ENDIF
+         EXIT
+
          CASE K_RIGHT
          CASE K_DOWN
             IF recpos < Len ( aInput[2] )
                recpos++
             ENDIF
+         EXIT
+
+         CASE K_CTRL_RIGHT
+         CASE K_CTRL_DOWN
+            IF recpos + 10 < Len ( aInput[2] )
+               recpos += 10
+            ELSE
+               recpos := Len( aInput[2] )
+            ENDIF
+         EXIT
+
+         CASE K_ALT_RIGHT
+         CASE K_ALT_DOWN
+            IF recpos + 50 < Len ( aInput[2] )
+               recpos += 50
+            ELSE
+               recpos := Len( aInput[2] )
+            ENDIF
+         EXIT
+
+         CASE K_END
+            recpos := Len( aInput[2] )
+         EXIT
+
+         CASE K_HOME
+            recpos := 1
          EXIT
 
          CASE K_ENTER
@@ -135,11 +225,12 @@ RETURN
 
 
 PROCEDURE DisplayMask()
-   MakeBox( 8,5, 13,75 )
-   MakeBox( 15,5, 21,75 )
+   MakeBox( 8,4, 13,76 )
+   MakeBox( 15,4, 21,76 )
    @8,8 SAY " " + i18n("International string") + " "
    @15,8 SAY " " + i18n("Local language string") + " "
    @22,12 SAY i18n("Press ENTER to edit entry and then CTRL+W to save it")
+   @23,12 SAY i18n("While editing, press F2 for 'autopadding' feature")
 RETURN
 
 
@@ -149,14 +240,17 @@ PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
         Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 RETURN
 
-PROCEDURE PopUp( cMessage )
+PROCEDURE MakeBoxShadow( nRow, nCol, nRowTo, nColTo )
    SET COLOR TO W+/N
-   @11,11 clear to 16, 71
+   @nRow+1,nCol +1 clear to nRowTo, nColTo
    SET COLOR TO W+/b
-   @10,10 clear to 15, 70
-   MakeBox( 10,10, 15, 70 )
-   @10,20 SAY " " +cMessage + " "
+   @nRow, nCol clear to nRowTo-1, nColTo -1
+   MakeBox( nRow, nCol, nRowTo-1, nColTo -1 )
+RETURN
 
+PROCEDURE PopUp( cMessage )
+   MakeBoxShadow( 10,10, 16, 71 )
+   @10,20 SAY " " +cMessage + " "
 RETURN
 
 PROCEDURE DrawPos( recpos, aTable )
@@ -169,13 +263,13 @@ PROCEDURE ShowRecord( nPos, aTable )
    LOCAL cLocal := aTable[nPos][2]
 
    IF cInter != NIL
-      @9,7 SAY cInter
+      @9,5 SAY ">>"+cInter+"<<"
    ELSE
       @9,7 SAY i18n( "<Nothing>" )
    ENDIF
 
    IF cLocal != NIL
-      @16,7 SAY cLocal
+      @16,5 SAY ">>"+cLocal+"<<"
    ELSE
       @16,7 SAY i18n( "<Not Yet translated>" )
    ENDIF
@@ -184,15 +278,21 @@ RETURN
 
 
 PROCEDURE EditEntry( nPos, aTable )
-   Local cInput := aTable[nPos][2]
+   LOCAL cInput := aTable[nPos][2]
+   LOCAL oEditor
+
    IF cInput == NIL
       cInput := ""
    ENDIF
 
-   cInput := MemoEdit( cInput, 16, 7, 20,73 )
+   oEditor := THBDictEdit():New( cInput, 16, 7, 20,73, aTable[ nPos ][1] )
 
-   IF Len( cInput ) > 0
-      aTable[nPos][2] := cInput
+   oEditor:Edit()
+   IF oEditor:lSaved
+      cInput := oEditor:GetText()
+      IF Len( cInput ) > 0
+         aTable[nPos][2] := cInput
+      ENDIF
    ENDIF
 
 RETURN
@@ -226,21 +326,36 @@ RETURN lOk
 
 PROCEDURE ReadHeader( aHeader )
    LOCAL GetList := {}
+   LOCAL cAuthor, cLanguage, cCode
 
-   @3,3 SAY i18n("Author:    ") GET aHeader[2]
-   @4,3 SAY i18n("Language:  ") GET aHeader[3]
-   @5,3 SAY i18n("Code:      ") GET aHeader[5]
+   SAVE SCREEN
+   cAuthor   := padr( aHeader[2], 40 )
+   cLanguage := padr( aHeader[3], 40 )
+   cCode := padr( aHeader[5], 5 )
+
+   MakeBoxShadow( 10,10, 15, 70 )
+   SET CONFIRM ON
+   @10,14 SAY i18n("Change language header")
+   @11,12 SAY i18n("Author:    ") GET cAuthor
+   @12,12 SAY i18n("Language:  ") GET cLanguage
+   @13,12 SAY i18n("Code:      ") GET cCode
    READ
 
+   IF LastKey() != K_ESC
+      aHeader[2] := AllTrim( cAuthor )
+      aHeader[3] := AllTrim( cLanguage )
+      aHeader[5] := AllTrim( cCode )
+   ENDIF
+
+   RESTORE SCREEN
    ShowHeader( aHeader )
 RETURN
 
 PROCEDURE ShowHeader( aHeader )
-   * Due to a flaw In GET, I have to add a space here...
-   @2,3 SAY i18n("File Type: ") +" "+ SubStr( aHeader[1], 2 )
-   @3,3 SAY i18n("Author:    ") +" "+ aHeader[2]
-   @4,3 SAY i18n("Language:  ") +" "+ aHeader[3]
-   @5,3 SAY i18n("Code:      ") +" "+ aHeader[5]
+   @2,3 SAY i18n("File Type: ") + SubStr( aHeader[1], 2 )
+   @3,3 SAY i18n("Author:    ") + padr( aHeader[2], 37 )
+   @4,3 SAY i18n("Language:  ") + padr( aHeader[3], 37 )
+   @5,3 SAY i18n("Code:      ") + padr( aHeader[5], 37 )
 RETURN
 
 PROCEDURE MergeDuplicates( aTable )
@@ -275,4 +390,5 @@ PROCEDURE MergeTables( aInTable, aOutTable )
    NEXT
 
 RETURN
+
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1265 2003/07/18 18:06:46 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1266 2003/07/18 21:42:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-19 04:20 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * utils/hbdict/hbdict.prg
+  * utils/hbdict/i18n/it_IT.hit
+    + Updated hbdict:
+      + now CTRL arrows go forward/backward 10 items
+      + Home/end go to the first/last element
+      + The "header" editing is done in a separate window
+      + Items are surrounded by ">>" "<<" signs to see whitespaces
+      ! using HBEditor() object instad of Memoedit() function
+      + F2 key while editing does auto-padding (adds whitespaces
+        up to the size of the original string).
+      + shadowed windows :-)
+    ! Finished italian traslation.
+
+  * source/rtl/teditor.prg
+    ! Don't know if that was an error, but calling :Edit() cleared
+      the window; the string to be modified become invisible up
+      to the first non-arrow key pressed. It went fine by adding
+      a RefreshWindow() just before the main Edit() loop.
+      Is it right? - I think this is a linux specific issue.
+
 2003-07-19 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/vm/extend.c
    * source/vm/arrayshb.c
