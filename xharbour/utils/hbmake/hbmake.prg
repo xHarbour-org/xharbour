@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.87 2003/08/20 22:13:05 lculik Exp $
+ * $Id: hbmake.prg,v 1.88 2003/08/20 23:55:44 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -110,7 +110,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nLang    := GETUSERLANG()
 
 
-   
+
    Ferase( s_cLinker )
    SET(39,159)
    IF Pcount() == 0
@@ -263,20 +263,20 @@ FUNCTION ParseMakeFile( cFile )
 //      s_lBcc    := .F.
 //      s_lGcc    := .T.
 //      s_lVcc    := .F.
-//   ENDIF 
+//   ENDIF
 
-   
+
    s_nHandle := FT_FUSE( cFile )
 
    IF s_nHandle < 0
       RETURN NIL
    ENDIF
-   
+
    IF "linux" in Lower( Os () )
       IF !FILE("hbtemp.c")
-        CreateLink()
+        &( "CreateLink()" )
       ENDIF
-   ENDIF      	
+   ENDIF
 
    cBuffer := Trim( Substr( ReadLN( @s_lEof ), 1 ) )
 
@@ -324,20 +324,20 @@ FUNCTION ParseMakeFile( cFile )
          cTemp := Strtran( cTemp, " //", "" )
 
       ENDIF
-      
-/*      IF "LINUX" IN Upper( Os() ) 
+
+/*      IF "LINUX" IN Upper( Os() )
         IF AT("OBJCFILES", cTemp) >0
 	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
     	   cTemp := ct +" hbtemp.o" +" $(OBC)"
 	ENDIF
       ENDIF	   */
-      
-/*      IF "LINUX" IN Upper( Os() ) 
+
+/*      IF "LINUX" IN Upper( Os() )
         IF AT( "CFILES" , cTemp) >0
 	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
     	   cTemp := ct +" hbtemp.c" +" $(CF)"
 	ENDIF
-      ENDIF*/	   
+      ENDIF*/
 
       aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
 
@@ -351,7 +351,7 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                       aAdd( s_aMacros, { aTemp[ 1 ], Strtran( Replacemacros( aTemp[ 2 ] ), "\", "/" ) } )
-                      
+
                       x++
                    ELSE
                      IF aTemp[ 1 ] == "GUI" .AND. aTemp[ 2 ] == "YES"
@@ -361,7 +361,7 @@ FUNCTION ParseMakeFile( cFile )
                      IF aTemp[ 1 ] == "MT" .AND. aTemp[ 2 ] == "YES"
                         lMt := .T.
                      ENDIF
-                     
+
                      IF aTemp[ 1 ] == "LIBFILES" .AND. ! lMt
                         aLib := ListAsArray2( aTemp[ 2 ], ' ' )
 
@@ -375,11 +375,11 @@ FUNCTION ParseMakeFile( cFile )
                               lGui := .T.
                            ENDIF
 
-                           IF "-l" in Lower( aLibx ) 
+                           IF "-l" in Lower( aLibx )
                               s_lBcc    := .F.
                               s_lGcc    := .T.
                               s_lVcc    := .F.
-                           
+
                            s_aDefines[2] := { "MAKEDIR", GetGccDir() }
                            ENDIF
 
@@ -399,7 +399,7 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                      aAdd( s_aMacros, { aTemp[ 1 ], Strtran( aTemp[ 2 ], "\", "/" ) } )
-                      
+
                       x++
 
                   ELSE
@@ -416,17 +416,17 @@ FUNCTION ParseMakeFile( cFile )
                               lGui := .T.
                            ENDIF
 
-                           IF "-l" in Lower( aLibx ) 
+                           IF "-l" in Lower( aLibx )
                               s_lBcc    := .F.
                               s_lGcc    := .T.
                               s_lVcc    := .F.
-                           
+
                            s_aDefines[2] := { "MAKEDIR", GetGccDir() }
-                           s_aMacros[2,2] :=  GetGccDir() 
+                           s_aMacros[2,2] :=  GetGccDir()
                            ENDIF
 
                         NEXT
-                             
+
                      ENDIF
                         aAdd( s_aMacros, { aTemp[ 1 ], aTemp[ 2 ] } )
                   ENDIF
@@ -455,7 +455,7 @@ FUNCTION ParseMakeFile( cFile )
             ENDIF
 
             IF aTemp[ 1 ] == "OBJCFILES"
-	       		   
+
                aTemp1 := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
 
                IF Len( aTemp1 ) == 1
@@ -498,9 +498,9 @@ FUNCTION ParseMakeFile( cFile )
                ELSE
                   s_aCs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
                ENDIF
-	       
-        
-    
+
+
+
             ENDIF
 
             IF aTemp[ 1 ] == "RESFILES"
@@ -526,11 +526,11 @@ FUNCTION ParseMakeFile( cFile )
       IF lbuildSec
          s_szProject   := cTemp
          s_aBuildOrder := ListAsArray2( cTemp, ":" )
- 
+
 	 TRacelog(s_aMacros)
 
       	 TRacelog(s_aMacros)
-	      
+
          IF ! s_lLibrary
             SetBuild()
          ELSE
@@ -876,7 +876,7 @@ FUNCTION CompileFiles()
                       cComm := Strtran( cComm, "o$*", "o" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
                   ENDIF
 
-                  cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] ) 
+                  cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
                   cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
                   Outstd( cComm )
@@ -1159,7 +1159,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lncurses -lgpm -lpthread -lm"
    LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib codepage.lib"
-   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm" 
+   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage"
    LOCAL cHarbDll         := "bcc640.lib hbdll_"
@@ -1197,10 +1197,10 @@ FUNC CreateMakeFile( cFile )
    LOCAL oMake
    Local cAllRes := ""
    Local cTemp
-   
+
    IF  File( cFile )
       nO := Alert( "The makefile " + cFile +" Exist ",{ "Create new" , "Edit" } )
-      
+
       IF nO == 1
          s_nLinkHandle := Fcreate( cFile )
          WriteMakeFileHeader()
@@ -1247,10 +1247,10 @@ FUNC CreateMakeFile( cFile )
    @  1,  1 SAY s_aLangMessages[ 28 ]
 
 //   @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }   VALID ! Empty( cos )
-   @ 1,12, 6,18 get cOs listbox { "Win32", "OS/2", "Linux" }   message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cos)  DROPDOWN 
+   @ 1,12, 6,18 get cOs listbox { "Win32", "OS/2", "Linux" }   message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cos)  DROPDOWN
    @  1, 21 SAY s_aLangMessages[ 29 ]
 //   @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID ! Empty( cCompiler )
- @ 1,40, 6,46 get cCompiler listbox { "BCC", "MSVC", "GCC" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN 
+ @ 1,40, 6,46 get cCompiler listbox { "BCC", "MSVC", "GCC" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN
    @  1, 48 SAY s_aLangMessages[ 30 ]
 //   @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
 //   @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
@@ -1284,7 +1284,7 @@ FUNC CreateMakeFile( cFile )
       cDefLibGccLibs   := cHARso
    ENDIF
 
-   
+
    IF lFwh
       @  3, 40 SAY "FWH path" GET cfwhpath PICT "@s20"
    ELSEIF lCw
@@ -1299,7 +1299,7 @@ FUNC CreateMakeFile( cFile )
    ENDIF
    IF lApollo
       @  3, 40 SAY "Apollo path" GET cmedpath PICT "@s20"
-   ENDIF 
+   ENDIF
 cResname += cAllRes
 
 //   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
@@ -1343,10 +1343,10 @@ cResname += cAllRes
    cObjDir := Alltrim( cObjDir )
    IF "Linux" in cOs
           cCurrentDir:='/'+CurDirx()
-   ELSE 
+   ELSE
        cCurrentDir:=CurDrive()+":\"+CurDirx()
-   ENDIF              
-   
+   ENDIF
+
    IF ! Empty( cObjDir )
 
       IF DirChange( cObjDir ) != 0
@@ -3513,7 +3513,7 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Vocˆ usa Rdd's de terceiros")
       aAdd( aLang, "Comprimir app")
       aAdd( aLang, "Comprimir a app depois de linkada(usa upx)")
-      aAdd( aLang, "Sua aplica‡Æo Sera linkada para usar a harbour.dll")   
+      aAdd( aLang, "Sua aplica‡Æo Sera linkada para usar a harbour.dll")
       aadd( aLang, "Onde os Arquivos .obj/.o serÆo gerados")
 
    ENDIF
@@ -3532,7 +3532,7 @@ FUNCTION GetSelFiles( aIn, aOut )
 
       IF nPos > 0
          aAdd( aRet, cItem )
-         
+
       ENDIF
 
    NEXT

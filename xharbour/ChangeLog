@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1371 2003/08/20 23:17:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1372 2003/08/21 01:56:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-20 20:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/pvalue.c
+    + Added Varible Pararmeters support to HB_PValue()
+
+  * utils/hbmake/hbmake.prg
+    * Moved CreateLink() to a macro to avoid link error on Windows.
+      /* Luiz you might want to use __Platform_* instead. */
 
 2003-08-20 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
