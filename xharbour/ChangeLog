@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2322 2004/02/19 04:41:56 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2323 2004/02/19 06:09:22 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -23,6 +23,10 @@
 2004-02-19 09:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/achoice.prg
     ! initialize position at nTop, nLeft after painting.
+
+2004-02-18 23:00 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + contrib/xhwgui/*
+    ! added hwgui sources into xharbour contrib dir
 
 2004-02-18 22:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
