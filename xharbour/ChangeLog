@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3232 2004/07/29 10:58:41 likewolf Exp $
+ * $Id: ChangeLog,v 1.3233 2004/07/29 14:33:08 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 21:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    - hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+    + hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+    - HB_FUNC( WVT_CREATEDIALOG )
+    + HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
+      Basic function to create modeless dialogs.
+    + A lot more functions supporting dialog creation and supporting 
+      different behaviors.
+
+  * xharbour/source/rtl/gtwvt/wvtpaint.prg
+    + Wvt_MakeDlgTemplate( nTop, nLeft, nRows, nCols, aOffSet, cTitle, nStyle, ;
+    + Wvt_AddDlgItem( aDlg, nTop, nLeft, nRows, nCols, aOffSet,;
+    + Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu )
+      Functions to create modeless dialogs dynamically.
+
+  * xharbour/include/hbgtwvt.h
+    + #define WVT_DLGML_MAX   20
+    - _s.hDlgModeless 
+    + HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
+    + PHB_ITEM  pFunc[ WVT_DLGML_MAX ];        // Function pointer for WndProc
+    + int       iType[ WVT_DLGML_MAX ];        // Type of Function Pointers - Function 1, Block 2, Method 3
+
+  * xharbour/tests/wvtgui.prg
+    Updated to demonstrate modeless dialogs.
+
+  /*
+      At present only 20 modeless dialogs at any given time can be opened. 
+      These dialogs can be created dynamically at run time or can be created   
+      any resource editor and embedded in .exe which can be called either with
+      Resource Id or Name. The behavior of such dialogs can be controlled 
+      through user function at prg level just like user function of 
+      memoedit() or achoice() empowering the developer with precise control.
+      
+      At present I could only manipulate function pointers as callback WndProc, 
+      have tried hard to use code blocks or ( for future class methods ) but 
+      could not succeed. Hope someone will help in this direction.
+  */
 
 2004-07-29 16:40 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/gtxvt/gtxvt.c
