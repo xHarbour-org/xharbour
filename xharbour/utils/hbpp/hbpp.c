@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.4 2003/11/14 01:18:02 ronpinkas Exp $
+ * $Id: hbpp.c,v 1.5 2004/05/11 01:22:42 druzus Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ BOOL hb_comp_bForceMemvars = FALSE;             /* holds if memvars are assumed 
 BOOL hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
 int  hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
 FILE *hb_comp_yyppo = NULL;
+FILE *hb_comp_PPTrace = NULL;
 
 int  hb_comp_iLinePRG;
 int  hb_comp_iLineINLINE = 0;
