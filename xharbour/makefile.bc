@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.25 2003/01/11 11:57:40 patrickmast Exp $
+# $Id: makefile.bc,v 1.26 2003/01/12 21:01:33 ronpinkas Exp $
 #
 
 #
@@ -146,11 +146,16 @@ HBMAKE_DIR   = utils\hbmake
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
-CLIBFLAGSDEBUG = -v $(CLIBFLAGS)
-HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
-LDFLAGS        = $(LDFLAGS)
+CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
+CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
+CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
+HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS              = $(LDFLAGS)
+
+HVM_OBJ_FLAGS        = $(CLIBFLAGS) -DSIMPLEX
+HVM_MT_OBJ_FLAGS     = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT
+HVM_GUI_OBJ_FLAGS    = $(CLIBFLAGS) -DSIMPLEX -DHB_GUI
+HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 
 !if $d(HB_THREAD_SUPPORT)
    CLIBFLAGS = -DHB_THREAD_SUPPORT $(CLIBFLAGS)
@@ -168,17 +173,21 @@ LDFLAGS        = $(LDFLAGS)
 # Macros to access our library names
 #
 
-COMMON_LIB   = $(LIB_DIR)\common.lib
-DBFCDX_LIB   = $(LIB_DIR)\dbfcdx.lib
-DBFNTX_LIB   = $(LIB_DIR)\dbfntx.lib
-DEBUG_LIB    = $(LIB_DIR)\debug.lib
-LANG_LIB     = $(LIB_DIR)\lang.lib
-MACRO_LIB    = $(LIB_DIR)\macro.lib
-NULSYS_LIB   = $(LIB_DIR)\nulsys.lib
-PP_LIB       = $(LIB_DIR)\pp.lib
-RDD_LIB      = $(LIB_DIR)\rdd.lib
-RTL_LIB      = $(LIB_DIR)\rtl.lib
-VM_LIB       = $(LIB_DIR)\vm.lib
+HVM_OBJ        = $(LIB_DIR)\hvm.obj
+HVM_MT_OBJ     = $(LIB_DIR)\hvmmt.obj
+HVM_GUI_OBJ    = $(LIB_DIR)\hvmgui.obj
+HVM_GUI_MT_OBJ = $(LIB_DIR)\hvmguimt.obj
+COMMON_LIB     = $(LIB_DIR)\common.lib
+DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
+DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
+DEBUG_LIB      = $(LIB_DIR)\debug.lib
+LANG_LIB       = $(LIB_DIR)\lang.lib
+MACRO_LIB      = $(LIB_DIR)\macro.lib
+NULSYS_LIB     = $(LIB_DIR)\nulsys.lib
+PP_LIB         = $(LIB_DIR)\pp.lib
+RDD_LIB        = $(LIB_DIR)\rdd.lib
+RTL_LIB        = $(LIB_DIR)\rtl.lib
+VM_LIB         = $(LIB_DIR)\vm.lib
 
 !if $d(HB_THREAD_SUPPORT)
    VM_LIB     = $(LIB_DIR)\vmmt.lib
@@ -771,7 +780,12 @@ all: \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
-   $(HBMAKE_EXE)
+   $(HBMAKE_EXE) \
+   \
+   $(HVM_OBJ) \
+   $(HVM_MT_OBJ) \
+   $(HVM_GUI_OBJ) \
+   $(HVM_GUI_MT_OBJ)
 #
 # Library dependencies and build rules
 #
@@ -792,6 +806,22 @@ $(GTDOS_LIB)  : $(GTDOS_LIB_OBJS)
 $(GTPCA_LIB)  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)  : $(GTWIN_LIB_OBJS)
+
+#
+# HVM*.OBJ dependencies
+#
+
+$(HVM_OBJ) : $(VM_DIR)\hvm.c
+   $(CC) $(HVM_OBJ_FLAGS) -o$@ $**
+
+$(HVM_MT_OBJ) : $(VM_DIR)\hvm.c
+   $(CC) $(HVM_MT_OBJ_FLAGS) -o$@ $**
+
+$(HVM_GUI_OBJ) : $(VM_DIR)\hvm.c
+   $(CC) $(HVM_GUI_OBJ_FLAGS) -o$@ $**
+
+$(HVM_GUI_MT_OBJ) : $(VM_DIR)\hvm.c
+   $(CC) $(HVM_GUI_MT_OBJ_FLAGS) -o$@ $**
 
 #
 # COMMON.LIB dependencies

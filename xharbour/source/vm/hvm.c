@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.151 2003/01/21 04:56:18 likewolf Exp $
+ * $Id: hvm.c,v 1.152 2003/01/23 03:25:12 ronpinkas Exp $
  */
 
 /*
@@ -590,9 +590,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
    LONG lOffset;
+#ifdef __PROFILER__
    ULONG ulLastOpcode = 0; /* opcodes profiler support */
    ULONG ulPastClock = 0;  /* opcodes profiler support */
-
+#endif
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
 
@@ -610,6 +611,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    while( pCode[ w ] != HB_P_ENDPROC )
    {
 
+#ifdef __PROFILER__
       if( hb_bProfiler )
       {
          ULONG ulActualClock = ( ULONG ) clock();
@@ -619,8 +621,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          ulLastOpcode = pCode[ w ];
          hb_ulOpcodesCalls[ ulLastOpcode ]++;
       }
+#endif
 
-      #ifndef HB_GUI
+#ifndef HB_GUI
       if( hb_set.HB_SET_CANCEL )
       {
          static unsigned short s_iCancel = 0;
@@ -637,7 +640,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
          }
       }
-      #endif
+#endif
 
       switch( pCode[ w ] )
       {

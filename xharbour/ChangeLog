@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.639 2003/01/23 05:00:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.640 2003/01/23 05:02:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-01-24 04:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    ! add $ifdef __PROFILER__ #endif to activate profiler.
+      Note:
+       Disabling this feature make application a bit faster. It is recommended
+       for final application.
+  * makefile.bc
+    + add creation of hvm.obj, hvmmt.obj, hvmgui.obj, hvmguimt.obj.
+      Purpose/Usage:
+       hvm.obj -> console mode application ST
+       hvmmt.obj -> console application MT
+       hvmgui.obj -> GUI mode application ST
+       hvmguimt.obj -> GUI application MT
+      Note:
+       These four object files are to be located in LIB_DIR. Make sure you
+       link appropriate hvm*.obj __BEFORE__ hvm.lib during creating application.
 
 2003-01-22 21:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/simplex.c
