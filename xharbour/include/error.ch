@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.4 2003/11/27 20:18:04 jonnymind Exp $
+ * $Id: error.ch,v 1.5 2004/03/29 18:04:00 ronpinkas Exp $
  */
 
 /*
@@ -137,5 +137,6 @@
 #define HB_EI_XALLOCNULLSIZE    9025 /* "hb_xalloc requested to allocate zero byte" */
 #define HB_EI_MEMCORRUPT        9026 /* "Memory corruption detected" */
 #define HB_EI_PREMATURE_RELEASE 9027 /* "Premature Array/Object Release detected" */
+#define HB_EI_ITEMBADSTRING     9028 /* "Invalid String value detected in hb_itemReleaseString()" */
 
 #endif /* _ERROR_CH */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2685 2004/03/30 15:46:16 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2686 2004/03/30 16:43:28 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-30 10:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/error.ch
+    + Added: #define HB_EI_ITEMBADSTRING     9028 /* "Invalid String value detected in hb_itemReleaseString()" */
+  * source/vm/fastitem.c
+    + Added detection and generation of internal error of invalid strings in hb_ClrearString()
+
+  * source/vm/errorapi.c
+    ! Added missing szPar1, szPar2 arguments to TraceLog() in hb_errInternal()
+
+  * source/vm/memvars.c
+    + Added missing check on asString.puiHolders.
+
+  * source/vm/arrays.c
+    + Added reset of asArray.value.ulLen to -1 and -2 in hb_arrayReleaseBase() hb_arrayReleaseGarbage()
+      to force early GPF on invalid reuse of already released array.
+
+  * source/vm/garbage.c
+    * Enabled cleanup functions in hb_gcReleasAll()
+
+  * source/vm/hvm.c
+    * Few fixes related to hb_itemRelease() NOT resetting ->type to HB_IT_NIL
+
+  * source/vm/itemapi.c
+    * Corrected comments.
 
 2004-03-30 18:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c

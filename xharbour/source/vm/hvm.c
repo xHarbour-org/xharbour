@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.365 2004/03/25 21:54:19 ronpinkas Exp $
+ * $Id: hvm.c,v 1.366 2004/03/26 05:17:27 ronpinkas Exp $
  */
 
 /*
@@ -746,14 +746,12 @@ int HB_EXPORT hb_vmQuit( void )
    {
       --HB_VM_STACK.pPos;
 
-      if( ( *HB_VM_STACK.pPos )->type == HB_IT_STRING )
+      if( HB_IS_STRING( *HB_VM_STACK.pPos ) )
       {
          hb_itemReleaseString( *HB_VM_STACK.pPos );
       }
-      else
-      {
-         ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
-      }
+
+      ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
    }
 
    //printf("After Stack\n" );
@@ -2519,7 +2517,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      sString = (char*) hb_xgrab( iNewLen + 1 );
                      memcpy( sString, pString->item.asString.value, iNewLen );
                      sString[ iNewLen ] = '\0';
+
                      hb_itemReleaseStringX( pString );
+
                      pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
                      *( pString->item.asString.puiHolders ) = 1;
                      pString->item.asString.value = sString;
@@ -2571,7 +2571,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      sString = (char*) hb_xgrab( iNewLen + 1 );
                      memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                      sString[ iNewLen ] = '\0';
+
                      hb_itemReleaseStringX( pString );
+
                      pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
                      *( pString->item.asString.puiHolders ) = 1;
                      pString->item.asString.value = sString;
@@ -3177,6 +3179,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 {
                    hb_vm_wEnumCollectionCounter--;
                    hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+                   hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
                    hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
                 }
 
@@ -3262,6 +3265,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    {
       hb_vm_wEnumCollectionCounter--;
       hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+      //hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
    }
 
@@ -3369,6 +3373,7 @@ static void hb_vmPlus( void )
 
              hb_itemReleaseString( pItem1 );
 
+             pItem1->type = HB_IT_STRING;
              pItem1->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
              *( pItem1->item.asString.puiHolders ) = 1;
              pItem1->item.asString.bStatic = FALSE;
@@ -3482,6 +3487,7 @@ static void hb_vmMinus( void )
 
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
 
+         //pItem1->type = HB_IT_STRING;
          pItem1->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
          *( pItem1->item.asString.puiHolders ) = 1;
          pItem1->item.asString.bStatic = FALSE;
@@ -4841,7 +4847,7 @@ static void hb_vmArrayPush( void )
       }
       else
       {
-         if( ! pArray->item.asString.bStatic )
+         if( pArray->item.asString.bStatic == FALSE )
          {
             hb_itemReleaseStringX( pArray );
          }
@@ -8159,7 +8165,6 @@ static void hb_itemReleaseStringX( PHB_ITEM pItem )
       hb_xfree( pItem->item.asString.puiHolders );
       hb_xfree( pItem->item.asString.value );
    }
-   pItem->item.asString.value = NULL;
 }
 
 HB_FUNC( HB_FUNCPTR )

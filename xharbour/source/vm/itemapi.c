@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.88 2004/03/07 14:42:22 likewolf Exp $
+ * $Id: itemapi.c,v 1.89 2004/03/21 21:48:49 druzus Exp $
  */
 
 /*
@@ -1246,9 +1246,8 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
          {
             if( pItem->item.asRefer.offset == 0 )
             {
-               /* a reference to a static variable */
-               pItem = *( pItem->item.asRefer.BasePtr.itemsbase ) +
-                       pItem->item.asRefer.value;
+               /* a reference to an Array Member (like static var) */
+               pItem = *( pItem->item.asRefer.BasePtr.itemsbase ) + pItem->item.asRefer.value;
             }
             else
             {

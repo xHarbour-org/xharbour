@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.60 2004/02/25 15:32:49 lculik Exp $
+ * $Id: fastitem.c,v 1.61 2004/03/29 18:04:01 ronpinkas Exp $
  */
 
 /*
@@ -152,8 +152,13 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 
    if( pItem->item.asString.bStatic == FALSE )
    {
-      if( --*( pItem->item.asString.puiHolders ) == 0 )
+      if( --*( pItem->item.asString.puiHolders ) == 0  )
       {
+         if( pItem->item.asString.value == NULL )
+         {
+            hb_errInternal( HB_EI_ITEMBADSTRING, NULL, "Invalid String value detected in hb_itemReleaseString()", NULL );
+         }
+
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
          hb_xfree( pItem->item.asString.puiHolders );
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
@@ -162,6 +167,7 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
    }
 
    //pItem->item.asString.bStatic = FALSE;
+   //pItem->type = HB_IT_NIL;
    pItem->item.asString.value = NULL;
    //pItem->item.asString.length = 0;
 
@@ -173,10 +179,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 
    if( HB_IS_STRING( pItem ) )
    {
-      if( pItem->item.asString.value )
-      {
-         hb_itemReleaseString( pItem );
-      }
+      hb_itemReleaseString( pItem );
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
@@ -188,7 +191,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 
          if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
          {
-            hb_arrayRelease( pItem );
+            //hb_arrayRelease( pItem );
          }
       #else
          hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );

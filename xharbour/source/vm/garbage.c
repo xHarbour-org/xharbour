@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.76 2004/03/05 23:00:05 andijahja Exp $
+ * $Id: garbage.c,v 1.77 2004/03/21 15:55:06 druzus Exp $
  */
 
 /*
@@ -544,7 +544,7 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
          past this point; depending on settings, this thread may prevents others
          to regain control or just wait for a time where no thread is active. */
       hb_threadWaitForIdle();
-      
+
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
@@ -757,7 +757,7 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
 */
 void hb_gcReleaseAll( void )
 {
-   HB_GARBAGE_PTR pDelete;
+   HB_GARBAGE_PTR pDelete, pAlloc;
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
@@ -766,7 +766,6 @@ void hb_gcReleaseAll( void )
 
    if( s_pLockedBlock )
    {
-      #if 0
       pAlloc = s_pLockedBlock;
       do
       {
@@ -780,7 +779,6 @@ void hb_gcReleaseAll( void )
          s_pLockedBlock = s_pLockedBlock->pNext;
 
       } while ( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
-      #endif
 
       do
       {
@@ -795,7 +793,6 @@ void hb_gcReleaseAll( void )
 
    if( s_pCurrBlock )
    {
-      #if 0
       pAlloc = s_pCurrBlock;
       do
       {
@@ -810,7 +807,6 @@ void hb_gcReleaseAll( void )
          s_pCurrBlock = s_pCurrBlock->pNext;
 
       } while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
-      #endif
 
       do
       {

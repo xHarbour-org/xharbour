@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.67 2004/03/18 04:05:28 ronpinkas Exp $
+ * $Id: memvars.c,v 1.68 2004/03/29 17:04:19 ronpinkas Exp $
  */
 
 /*
@@ -193,13 +193,13 @@ void hb_memvarsRelease( void )
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
           */
          {
-            if( HB_IS_STRING( &s_globalTable[ ulCnt ].item ) )
-            {
-               hb_itemReleaseString( &s_globalTable[ ulCnt ].item );
-            }
-            else if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
                hb_itemClear( &s_globalTable[ ulCnt ].item );
+            }
+            else
+            {
+               s_globalTable[ ulCnt ].item.type = HB_IT_NIL;
             }
 
             s_globalTable[ ulCnt ].counter = 0;
@@ -252,13 +252,13 @@ void hb_memvarsRelease( HB_STACK *pStack )
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
           */
          {
-            if( HB_IS_STRING( &pStack->globalTable[ ulCnt ].item ) )
-            {
-               hb_itemReleaseString( &pStack->globalTable[ ulCnt ].item );
-            }
-            else if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
+            if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
                hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
+            }
+            else
+            {
+               pStack->globalTable[ ulCnt ].item.type = HB_IT_NIL;
             }
          }
 
@@ -697,6 +697,8 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
    	        hb_itemReleaseString( &pValue->item );
    	     }
 
+         pValue->item.type = HB_IT_NIL;
+
    	     #ifndef HB_THREAD_SUPPORT
    	        hb_memvarRecycle( hValue );
    	     #else
@@ -865,7 +867,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
          pReference = &s_globalTable[ pDyn->hMemvar ].item;
 
-         if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
+         if( pReference->type == HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
          {
             char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 

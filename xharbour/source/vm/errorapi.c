@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.39 2004/03/17 08:29:44 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.40 2004/03/18 04:05:27 ronpinkas Exp $
  */
 
 /*
@@ -1521,19 +1521,27 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
       if( fpError )
       {
          fclose( fpError );
-         TraceLog( "error.log", szText );
+         TraceLog( "error.log", szText, szPar1, szPar2 );
       }
    }
 
    hb_conOutErr( hb_conNewLine(), 0 );
+
    sprintf( title, bLang ?
                       ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR ) :
                       "Unrecoverable error %lu: ", ulIntCode );
+
    hb_conOutErr( title, 0 );
+
    if( szText != NULL )
+   {
       sprintf( buffer, szText, szPar1, szPar2 );
+   }
    else if (bLang)
+   {
       sprintf( buffer, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
+   }
+
    hb_conOutErr( buffer, 0 );
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_stackDispCall();
@@ -1556,5 +1564,6 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
        *pGPF = 0;
        *(--pGPF) = 0;
    }
+
    exit( EXIT_FAILURE );
 }

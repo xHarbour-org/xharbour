@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.98 2004/03/29 17:04:19 ronpinkas Exp $
+ * $Id: arrays.c,v 1.99 2004/03/29 18:04:01 ronpinkas Exp $
  */
 
 /*
@@ -480,15 +480,8 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
          memcpy( sString, pElement->item.asString.value, pElement->item.asString.length + 1 );
 
-         if( pElement->item.asString.bStatic == FALSE )
-         {
-            if( --*( pElement->item.asString.puiHolders ) == 0 )
-            {
-               hb_xfree( pElement->item.asString.puiHolders );
-               hb_xfree( pElement->item.asString.value );
-            }
-            pElement->item.asString.value = NULL;
-         }
+         // Does NOT clear ->type.
+         hb_itemReleaseString( pElement );
 
          pElement->item.asString.value = sString;
          pElement->item.asString.bStatic = FALSE;
@@ -1165,6 +1158,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       hb_xfree( pItems );
 
       pBaseArray->pItems = NULL;
+      pBaseArray->ulLen = -1 //Intentionally - might cause earlier GPF on invalid reuse.;
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
@@ -1541,7 +1535,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 		 // All other complex types will be released directly by the GC.
          if( HB_IS_STRING( pItem ) )
          {
-            hb_itemReleaseString( pItem );
+            hb_itemClear( pItem );
          }
 
          ++pItem;
@@ -1550,6 +1544,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
+      pBaseArray->ulLen = -2 //Intentionally - might cause earlier GPF on invalid reuse.;
    }
 
    // Has to be AFTER the array elements have been released!
