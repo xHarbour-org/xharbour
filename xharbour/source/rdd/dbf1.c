@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.80 2004/05/12 04:32:54 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.81 2004/05/12 14:11:22 lf_sfnet Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ static RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                              ( DBENTRYP_SVP ) hb_dbfWhoCares
                            };
 
-static BYTE s_dbfVersion = 0x03 ;  /* Stores the current default DBF type for DBCREATE() */
+static BYTE s_dbfVersion = 0x03;  /* Stores the current default DBF type for DBCREATE() */
 
 /*
  * Common functions.
@@ -1726,10 +1726,10 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    pBuffer = ( DBFFIELD * ) hb_xgrab( uiSize );
    memset( pBuffer, 0, uiSize );
-   pThisField = pBuffer ;
+   pThisField = pBuffer;
 
    pArea->uiRecordLen = 1;
-   pArea->bVersion = s_dbfVersion ;
+   pArea->bVersion = s_dbfVersion;
 
    fHasMemo = FALSE;
 
@@ -1755,7 +1755,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_IT_MEMO:
             pThisField->bType = 'M';
-            pThisField->bLen = pArea->lpFields[ uiCount ].uiLen;
+            pThisField->bLen = ( BYTE ) pArea->lpFields[ uiCount ].uiLen;
             if ( pThisField->bLen != 4 )
                pThisField->bLen = 10;
             pThisField->bDec = 0;
@@ -1765,7 +1765,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_IT_DATE:
             pThisField->bType = 'D';
-            pThisField->bLen = pArea->lpFields[ uiCount ].uiLen;
+            pThisField->bLen = ( BYTE ) pArea->lpFields[ uiCount ].uiLen;
             if ( pThisField->bLen != 3 )
                pThisField->bLen = 8;
             pThisField->bDec = 0;
@@ -1788,9 +1788,9 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_IT_INTEGER:
             pThisField->bType = 'I';
-            pThisField->bLen = ( pArea->lpFields[ uiCount ].uiLen == 2 ||
-                                 pArea->lpFields[ uiCount ].uiLen == 8 ) ?
-                                 pArea->lpFields[ uiCount ].uiLen : 4;
+            pThisField->bLen = ( BYTE ) pArea->lpFields[ uiCount ].uiLen;
+            if ( pThisField->bLen != 2 && pThisField->bLen != 8 )
+               pThisField->bLen = 4;
             pThisField->bDec = 0;
             pArea->uiRecordLen += pArea->lpFields[ uiCount ].uiLen;
             break;
@@ -1914,16 +1914,20 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, pArea->szDataFileName);
          break;
 
-      case DBI_SHARED:
-         hb_itemPutL( pItem, pArea->fShared );
-         break;
-
       case DBI_FILEHANDLE:
          hb_itemPutNL( pItem, (LONG)pArea->hDataFile );
          break;
 
       case DBI_MEMOHANDLE:
          hb_itemPutNL( pItem, (LONG)pArea->hMemoFile );
+         break;
+
+      case DBI_SHARED:
+         hb_itemPutL( pItem, pArea->fShared );
+         break;
+
+      case DBI_ISFLOCK:
+         hb_itemPutL( pItem, pArea->fFLocked );
          break;
 
       case DBI_LOCKSCHEME:
@@ -3102,15 +3106,16 @@ HB_FUNC( DBF_GETFUNCTABLE )
 
 HB_FUNC( DBSETDBFVERSION )
 {
-  BYTE bOldVersion = s_dbfVersion ;
-  if (  hb_pcount() > 0 )
-  {
-    BYTE bVersion = ( BYTE ) hb_parni( 1 ) ;
-    if ( bVersion == 0x30 || bVersion == 0x03 )
-    {
-      s_dbfVersion = bVersion  ;
-    }
-  }
-  hb_retni( bOldVersion ) ;
+   BYTE bOldVersion = s_dbfVersion;
+
+   if (  hb_pcount() > 0 )
+   {
+      BYTE bVersion = ( BYTE ) hb_parni( 1 );
+      if ( bVersion == 0x30 || bVersion == 0x03 )
+      {
+         s_dbfVersion = bVersion;
+      }
+   }
+   hb_retni( bOldVersion );
 }
 
