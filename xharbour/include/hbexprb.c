@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.71 2004/01/27 09:56:08 likewolf Exp $
+ * $Id: hbexprb.c,v 1.72 2004/02/16 06:07:11 ronpinkas Exp $
  */
 
 /*
@@ -427,7 +427,10 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
                    * macro := "1,2"
                    * EVAL( {|| &macro} )
                   */
-                  pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                  if( pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
+                  {
+                     pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                  }
                }
 
                /* store next expression in case the current  will be reduced
@@ -834,7 +837,10 @@ static HB_EXPR_FUNC( hb_compExprUseList )
                {
                   if( pSelf->value.asList.pExprList->ExprType == HB_ET_MACRO )
                   {
-                     pSelf->value.asList.pExprList->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                     if( pSelf->value.asList.pExprList->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
+                     {
+                        pSelf->value.asList.pExprList->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                     }
                   }
                }
             }
@@ -881,7 +887,10 @@ static HB_EXPR_FUNC( hb_compExprUseList )
                   {
                      if( pExpr->ExprType == HB_ET_MACRO )
                      {
-                        pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                        if( pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
+                        {
+                           pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                        }
                      }
                   }
 
@@ -909,7 +918,10 @@ static HB_EXPR_FUNC( hb_compExprUseList )
                {
                   if( pExpr->ExprType == HB_ET_MACRO )
                   {
-                      pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                      if( pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
+                      {
+                         pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
+                      }
                   }
                }
 

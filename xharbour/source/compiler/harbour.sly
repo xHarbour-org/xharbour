@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.58 2004/01/27 09:56:09 likewolf Exp $
+ * $Id: harbour.sly,v 1.59 2004/01/27 11:45:13 likewolf Exp $
  */
 
 /*
@@ -854,8 +854,15 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                                   $2->value.asAlias.pAlias = NULL;
                                                   hb_compExprDelete( $2 );
 
-                                                  $$->ExprType = HB_ET_MEMVARREF;
-                                                  $$->ValType = HB_EV_VARREF;
+                                                  if( $$->ExprType == HB_ET_MACRO )
+                                                  {
+                                                     $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF;
+                                                  }
+                                                  else
+                                                  {
+                                                     $$->ExprType = HB_ET_MEMVARREF;
+                                                     $$->ValType = HB_EV_VARREF;
+                                                  }
                                                }
                                                break;
                                              }
