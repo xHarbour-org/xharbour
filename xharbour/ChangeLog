@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1912 2003/12/21 02:59:47 walito Exp $
+ * $Id: ChangeLog,v 1.1913 2003/12/21 03:26:31 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-22 08:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  + added source/rtl/gtwvt gtwvt.c gtwvt.h
+  * new Windows colsole mode gt system
+
 
 2003-12-21 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/valtype.c
@@ -38,11 +43,11 @@
 
 2003-12-20 11:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/vm/cmdarg.c
-    * use the //F:n parameter to open more than 20 files 
+    * use the //F:n parameter to open more than 20 files
       with OpenWatcom 1.1 DOS
   * config/rules.cf
   * config/w32/watcom.cf
-  * config/dos/watcom.cf 
+  * config/dos/watcom.cf
     * all libraries now look for HB_LIB_COMPILE path
     * added support of HB_USER_LIBS to build user apps
     with gnu make and the config dir can be used for user applications
@@ -50,7 +55,7 @@
     xHarbour ones using lib, bin, dir config files and adding app libraries to HB_USER_LIBS.
     The build script should set HB_BIN_COMPILE, HB_LIB_COMPILE, HB_INC_COMPILE to xHarbour directories
     and use HB_USER_FLAGS for app defines flags and include dirs
-    
+
 2003-12-19 00:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/sprintf.prg
     + Added xHarbour header
