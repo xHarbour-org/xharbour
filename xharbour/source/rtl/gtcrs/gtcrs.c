@@ -1,5 +1,5 @@
 ;/*
- * $Id: gtcrs.c,v 1.9 2003/05/26 13:32:49 druzus Exp $
+ * $Id: gtcrs.c,v 1.10 2003/05/27 14:02:08 druzus Exp $
  */
 
 /*
@@ -1286,6 +1286,21 @@ static void init_keys(InOutBase *ioBase)
       addKeyMap( ioBase, EXKEY_INS   |KEY_CTRLMASK, "\033[2;5~" );
       addKeyMap( ioBase, EXKEY_PGUP  |KEY_CTRLMASK, "\033[5;5~" );
       addKeyMap( ioBase, EXKEY_PGDN  |KEY_CTRLMASK, "\033[6;5~" );
+
+      addKeyMap( ioBase, EXKEY_F1    |KEY_CTRLMASK|KEY_ALTMASK, "\033O2P" );
+      addKeyMap( ioBase, EXKEY_F2    |KEY_CTRLMASK|KEY_ALTMASK, "\033O2Q" );
+      addKeyMap( ioBase, EXKEY_F3    |KEY_CTRLMASK|KEY_ALTMASK, "\033O2R" );
+      addKeyMap( ioBase, EXKEY_F4    |KEY_CTRLMASK|KEY_ALTMASK, "\033O2S" );
+      addKeyMap( ioBase, EXKEY_F5    |KEY_CTRLMASK|KEY_ALTMASK, "\033[15;2~" );
+      addKeyMap( ioBase, EXKEY_F6    |KEY_CTRLMASK|KEY_ALTMASK, "\033[17;2~" );
+      addKeyMap( ioBase, EXKEY_F7    |KEY_CTRLMASK|KEY_ALTMASK, "\033[18;2~" );
+      addKeyMap( ioBase, EXKEY_F8    |KEY_CTRLMASK|KEY_ALTMASK, "\033[19;2~" );
+      addKeyMap( ioBase, EXKEY_F9    |KEY_CTRLMASK|KEY_ALTMASK, "\033[20;2~" );
+      addKeyMap( ioBase, EXKEY_F10   |KEY_CTRLMASK|KEY_ALTMASK, "\033[21;2~" );
+      addKeyMap( ioBase, EXKEY_F11   |KEY_CTRLMASK|KEY_ALTMASK, "\033[23;2~" );
+      addKeyMap( ioBase, EXKEY_F12   |KEY_CTRLMASK|KEY_ALTMASK, "\033[24;2~" );
+
+      addKeyMap( ioBase, EXKEY_TAB   |KEY_CTRLMASK|KEY_ALTMASK, "\033[Z" );
 
     } else if( ioBase->terminal_type == TERM_LINUX ) {
 

@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: xharbour.spec,v 1.2 2003/05/17 15:55:13 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,20 +21,20 @@
 %define platform rh73
 %define prefix   /usr
 %define hb_pref  xhb
-%define hb_gt    gtcrs
+%define hb_gt    crs
 %define hb_mt    MT
 %define hb_mgt   yes
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug
 
-%define hb_cc    export HB_COMPILER=gcc
+%define hb_cc    export HB_COMPILER="gcc"
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
-%define hb_arch  export HB_ARCHITECTURE=linux
-%define hb_cmt   export HB_MT=%{hb_mt}
-%define hb_cgt   export HB_GT_LIB=%{hb_gt}
-%define hb_cmgt  export HB_MULTI_GT=%{hb_mgt}
-%define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin/
-%define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}/
-%define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}/
+%define hb_arch  export HB_ARCHITECTURE="linux"
+%define hb_cmt   export HB_MT="%{hb_mt}"
+%define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
+%define hb_cmgt  export HB_MULTI_GT="%{hb_mgt}"
+%define hb_bdir  export HB_BIN_INSTALL="%{prefix}/bin/"
+%define hb_idir  export HB_INC_INSTALL="%{prefix}/include/%{name}/"
+%define hb_ldir  export HB_LIB_INSTALL="%{prefix}/lib/%{name}/"
 %define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -138,6 +138,7 @@ make
 # Install harbour itself.
 
 %{hb_env}
+_DEFAULT_INC_DIR=$HB_INC_INSTALL
 export HB_BIN_INSTALL=$RPM_BUILD_ROOT/$HB_BIN_INSTALL
 export HB_INC_INSTALL=$RPM_BUILD_ROOT/$HB_INC_INSTALL
 export HB_LIB_INSTALL=$RPM_BUILD_ROOT/$HB_LIB_INSTALL
@@ -183,116 +184,85 @@ for l in lib%{name}.so lib%{name}mt.so
 do
     [ -f %{name}/$l ] && ln -s %{name}/$l $l
 done
+LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
 popd
-
 
 # Add a harbour compiler wrapper.
 cat > $HB_BIN_INSTALL/%{hb_pref}-build <<EOF
 #!/bin/bash
 
-## defaults
-HB_STATIC="no"
-HB_MT=""
-HB_GT_LIB=%{hb_gt}
-
-## parse params
-n=0
-P=( "\$@" )
-DIROUT="."
-FILEOUT=""
-while [ \$n -lt \${#P[@]} ]; do
-    v=\${P[\$n]}
-    case "\$v" in
-	-o*)
-	    d="\${v#-o}"
-	    if [ -d "\${d}" ]; then
-		DIROUT="\${d%/}"
-	    elif [ -d "\${d%/*}" ]; then
-		DIROUT="\${d%/*}"
-		FILEOUT="\${d##*/}"
-		v="-o\${d%.*}"
-	    elif [ -n "\${d}" ]; then
-		FILEOUT="\${d}"
-		v="-o\${d%.*}"
-	    fi
-	    ;;
-	-static)
-	    HB_STATIC="yes"
-	    v=""
-	    ;;
-	-shared)
-	    HB_STATIC="no"
-	    v=""
-	    ;;
-	-mt)
-	    HB_MT="MT"
-	    v=""
-	    ;;
-	-gt*)
-	    HB_GT_LIB="\${v#-}"
-	    v=""
-	    ;;
-	-*)
-	    ;;
-	*)
-	    [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"
-	    ;;
-    esac
-    if [ -n "\$v" ]; then
-      PP[\$n]="\$v"
-    fi
-    n=\$[\$n + 1]
-done
-P=( "\${PP[@]}" )
-
 if [ \$# == 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]"
     exit 1
+elif [ "\$*" == "mk-links" ]; then
+    DIR="\${0%/*}"
+    NAME="\${0##*/}"
+    if [ "\${DIR}" != "\${NAME}" ]; then
+	for n in %{hb_pref}cc %{hb_pref}cmp %{hb_pref}mk %{hb_pref}lnk gharbour harbour-link; do
+	    ln -sf "\${NAME}" "\${DIR}/\${n}"
+	done
+    fi
+    exit
 fi
 
-## get basename
-HB="\${0##*/}"
+## default parameters
+HB_STATIC="no"
+HB_MT=""
+HB_GT="%{hb_gt}"
+
+
+HB_GT_REQ=""
+_TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
+
+## parse params
+P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""
+while [ \$n -lt \${#P[@]} ]; do
+    v=\${P[\$n]}; p=""
+    case "\$v" in
+	-o*)
+	    d="\${v#-o}"; p="\${v}"
+	    if [ -d "\${d}" ]; then
+		DIROUT="\${d%/}"
+	    elif [ -d "\${d%/*}" ]; then
+		DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
+	    elif [ -n "\${d}" ]; then
+		FILEOUT="\${d}"; p="-o\${d%.*}"
+	    fi ;;
+	-static)    HB_STATIC="yes" ;;
+	-shared)    HB_STATIC="no" ;;
+	-mt)        HB_MT="MT" ;;
+	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-*)         p="\${v}" ;;
+	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
+    esac
+    [ -n "\$p" ] && PP[\$n]="\$p"
+    n=\$[\$n + 1]
+done
+P=( "\${PP[@]}" )
 
 case "\${HB_MT}" in
     [Mm][Tt]|[Yy][Ee][Ss]|1)	HB_MT="MT";;
     *)	HB_MT="";;
 esac
 
-# Attempt to get the GT library setting from the user's environment.
-if [ "\${HB_STATIC}" != "yes" ]; then
-    HB_GT_LIB=%{hb_gt}
-fi
-
-# Work out which system library is needed for the choice of GT library.
-if [ "\${HB_STATIC}" = "yes" ]; then
-    case "\${HB_GT_LIB}" in
-        gtcrs*)	TERM_LIB="-lncurses -lgpm";;
-        gtsln*)	TERM_LIB="-lslang -lgpm";;
-        *)	TERM_LIB="";;
-    esac
-else
-    TERM_LIB="-lncurses -lslang -lgpm"
-fi
-
-SYSTEM_LIBS="-lm \${TERM_LIB}"
+SYSTEM_LIBS="-lm -lncurses -lslang -lgpm"
 # use pthread system library for MT programs
 if [ "\${HB_MT}" = "MT" ]; then
     SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
 fi
 
+[ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
+HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+
 # set environment variables
 %{hb_cc}
-%{hb_cflag}
 %{hb_arch}
-%{hb_bdir}
-%{hb_idir}
-%{hb_ldir}
-export HB_GT_LIB
-export HB_MT
+[ -z "\${HB_BIN_INSTALL}" ] && %{hb_bdir}
+[ -z "\${HB_INC_INSTALL}" ] && %{hb_idir}
+[ -z "\${HB_LIB_INSTALL}" ] && %{hb_ldir}
 
-# be sure that harbour binaries are in your path
+# be sure that %{name} binaries are in your path
 export PATH="\${HB_BIN_INSTALL}:\${PATH}"
-
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
@@ -301,29 +271,12 @@ if [ "\${HB_STATIC}" = "yes" ]; then
     HARBOUR_LIBS=""
     for l in %{hb_libs}
     do
-	case "\${l}" in
-	    gtnul) ;;
-	    gt*)
-		if [ "\${l}" != "\${HB_GT_LIB}" ]
-		then
-		    l="--"
-		fi
-		;;
-	    *) ;;
-	esac
-	if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ]
-	then
-	    l="\${l}mt"
-	fi
-	if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]
-	then
-	    HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-	fi
+	[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+	[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     done
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 else
-    if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib%{name}mt.so" ]
-    then
+    if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib%{name}mt.so" ]; then
 	HARBOUR_LIBS="-l%{name}mt"
     else
 	HARBOUR_LIBS="-l%{name}"
@@ -335,37 +288,100 @@ FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
 FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
 FOUTE="\${FOUTE%.[oc]}"
 
+hb_cc()
+{
+    harbour "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
+}
+
+hb_link()
+{
+    if [ -n "\${HB_GT_REQ}" ]; then
+	hb_gt_request \${HB_GT_REQ} > \${_TMP_FILE_} && \\
+	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+    else
+	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+    fi
+}
+
+hb_cmp()
+{
+    hb_cc "\$@" && \\
+    gcc -g -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
+    rm -f "\${FOUTC}"
+}
+
+hb_gt_request()
+{
+    echo "#include \\"hbapi.h\\""
+    if [ "\${HB_STATIC}" = "yes" ]; then
+	for gt in "\$@"; do
+	    echo "extern HB_FUNC( HB_GT_\${gt} );"
+	done
+	echo "void hb_gt_ForceLink_build( void )"
+	echo "{"
+	for gt in "\$@"; do
+	    echo "HB_FUNCNAME( HB_GT_\${gt} )();"
+	done
+	echo "}"
+    fi
+    if [ -n "\$1" ]; then
+	echo "#include \\"hbinit.h\\""
+	echo "extern char * s_defaultGT;"
+	echo "HB_CALL_ON_STARTUP_BEGIN( hb_gt_SetDefault_build )"
+	echo "   s_defaultGT = \\"\$1\\";"
+	echo "HB_CALL_ON_STARTUP_END( hb_gt_SetDefault_build )"
+    fi
+}
+
+hb_cleanup()
+{
+    rm -f "\${_TMP_FILE_}"
+}
+
+trap hb_cleanup EXIT &>/dev/null
+
+## get basename
+HB="\${0##*/}"
+
 case "\${HB}" in
+    *cc)
+	hb_cc "\${P[@]}"
+	;;
     *cmp|gharbour)
-	harbour "\${P[@]}" \${HB_PATHS} && [ -f "\${FOUTC}" ] && \\
-	    gcc -g -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
-	    rm -f "\${FOUTC}"
+	hb_cmp "\${P[@]}"
 	;;
     *lnk|harbour-link)
-	gcc "\${P[@]}" -L\${HB_LIB_INSTALL} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+	hb_link "\${P[@]}"
 	;;
     *mk)
-	harbour "\${P[@]}" \${HB_PATHS} && [ -f "\${FOUTC}" ] && \\
-	    gcc -g -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
-	    rm -f "\${FOUTC}" && \\
-	    gcc "\${FOUTO}" -L\${HB_LIB_INSTALL} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}" && \\
-	    strip "\${FOUTE}" && \\
-	    rm -f "\${FOUTO}"
+	hb_cmp "\${P[@]}" && \\
+	hb_link "\${FOUTO}" && \\
+	strip "\${FOUTE}" && \\
+	rm -f "\${FOUTO}"
 	;;
 esac
 EOF
 chmod 755 $HB_BIN_INSTALL/%{hb_pref}-build
-for i in %{hb_pref}cmp %{hb_pref}lnk %{hb_pref}mk gharbour harbour-link
-do
-    ln -s %{hb_pref}-build $HB_BIN_INSTALL/$i
-done
+$HB_BIN_INSTALL/%{hb_pref}-build mk-links
+
+
+# Create PP
+pushd tests
+$HB_BIN_INSTALL/xhbmk pp -n -w -es2 -D_DEFAULT_INC_DIR=\"$_DEFAULT_INC_DIR\"
+install pp $HB_BIN_INSTALL/pp
+ln -s pp $HB_BIN_INSTALL/pprun
+install rp_dot.ch $HB_INC_INSTALL/
+popd
 
 
 # Create a README file for people using this RPM.
 cat > doc/%{readme} <<EOF
-This RPM distribution of %{dname} includes three extra commands to make
-compiling and linking with harbour a little easier. There are a compiler
-and linker wrappers called "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk"
+This RPM distribution of %{dname} includes extra commands to make compiling
+and linking with harbour a little easier. There are a compiler and linker
+wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk"
+
+"%{hb_pref}cc" is a wrapper to harbour compiler only. It only sets environment
+variables. The result of its work is an C file.
 
 Use "%{hb_pref}cmp" exactly as you would use the harbour compiler itself.
 The main difference with %{hb_pref}cmp is that it results in an object file,
@@ -383,12 +399,14 @@ equivalent of cl.bat from CA-Clipper distribution.
 all this scripts accept command line switches:
 -o<outputfilename>      # output file name
 -static                 # link with static libs
--shared                 # link with shared libs
+-shared                 # link with shared libs (default)
 -mt                     # link with multi-thread libs
--gt<hbgt>               # link with <hbgt> GT driver (only for -static)
+-gt<hbgt>               # link with <hbgt> GT driver, can be repeated to
+                        # link with more GTs. The first one will be default
+                        # on runtime
 
 link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and has no effect
-in "%{hb_pref}cmp"
+in "%{hb_pref}cc" and "%{hb_pref}cmp"
 To save compatibility with older rpm distribution "gharbour" can be used
 as synonym of "%{hb_pref}cmp" and "harbor-link" as synonym of "%{hb_pref}lnk"
 
@@ -431,6 +449,25 @@ Generating C source output to 'foo.c'... Done.
 druzus@uran:~/tmp$ ls -l foo
 -rwxrwxr-x    1 druzus   druzus       3824 maj 17 02:46 foo
 ----------------------------------------------------------------------
+
+
+In this RPM you will find additional wonderful tools: /usr/bin/pprun
+You can run clipper/xbase compatible source files with it if you only
+put in their first line:
+#!/usr/bin/pprun
+
+For example:
+----------------------------------------------------------------------
+druzus@uran:~/tmp$ cat foo.prg
+#!/usr/bin/pprun
+function main()
+? "Hello, World!, This is a script !!! :-)"
+return nil
+
+druzus@uran:~/tmp$ chmod +x foo.prg
+
+druzus@uran:~/tmp$ ./foo.prg
+
 
 I hope this RPM is useful. Have fun with %{dname}.
 
@@ -481,6 +518,8 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/hbrun
 %{prefix}/bin/hbpp
 %{prefix}/bin/hbmake
+%{prefix}/bin/pp
+%{prefix}/bin/pprun
 %dir %{prefix}/include/%{name}
 %{prefix}/include/%{name}/*
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1078 2003/05/28 11:58:56 druzus Exp $
+ * $Id: ChangeLog,v 1.1079 2003/05/28 23:22:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,44 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-05-29 22:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/tests/pp.prg
+    * some additional modification for running .prg files as script
+      and to make pp working on *nix systems - '/' as as directory
+      delimiter, ':' as a path separator
+      _DEFAULT_INC_DIR macro added and passing parameters to .prg
+      if pp is called pprun - now you can create a link 'pprun' to 'pp'
+      and use it as a script interpreter.
+      Ron, I hope I didn't break anything in PP with these changes.
+
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/xharbour.spec
+    + new binary RPM with Ron's PP
+    + new tools: xhbcc, xhbcmp, xhblnk and xhbmk, now you can
+      specify GT during linking time by -gt<name> option. You don't
+      have to add REQUEST HB_GT_<name> to your source code. The
+      fallowing switches can be used:
+        -o<outputfilename> # output file name
+        -static         # link with static libs
+        -shared         # link with shared libs (default)
+        -mt             # link with multi-thread libs
+        -gt<hbgt>       # link with <hbgt> GT driver, can be repeated to
+                        # link with more GTs. The first one will be default
+                        # on runtime
+
+  * xharbour/include/hbextern.ch
+    * some functions added to use it with PP
+      I think the files wasn't updated for a long time. Maybe
+      developers should add their new functions to them.
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    * some keys for XTERM4 added.
+
+  * xharbour/source/rtl/trace.c
+    * commented out the code which makes empty trace.log file if you
+      run program linked with TRACELOG function. I have too many such
+      empty files on my disk :-( - is it really necessary.
 
 2003-05-28 26:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.9 2003/03/02 15:22:31 jonnymind Exp $
+ * $Id: trace.c,v 1.10 2003/03/16 22:19:39 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,9 @@ void hb_traceInit( void )
 #ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_INIT( s_CriticalMutex );
 #endif
-
+/* is this really necessary to produce empty trace.log files if we don't log
+   anything or use other log file */
+#if 0
    if( pTraceLog && pTraceLog->pSymbol->pFunPtr )
    {
       /* Create trace.log for tracing. */
@@ -84,6 +86,7 @@ void hb_traceInit( void )
          //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
       }
    }
+#endif
 }
 
 void hb_traceExit( void )

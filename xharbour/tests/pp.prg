@@ -354,7 +354,7 @@ STATIC s_aSwitchDefs := {}
 #endif
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
-   LOCAL nAt, sParams, sPPOExt, aParams
+   LOCAL nAt, sParams, sPPOExt, aParams := {}
    LOCAL sDefine, sCH
 
    IF p1 != NIL
@@ -404,6 +404,21 @@ STATIC s_aSwitchDefs := {}
       ?
       QUIT
    endif
+
+   #ifdef __XHARBOUR__
+      #ifdef __PLATFORM__Linux
+         if right( hb_argv( 0 ), 6 ) == "/pprun"
+            bCount := .F.
+            sSwitch := ""
+            aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9 }
+	    aSize( aParams, PCount() )
+	 endif
+      #endif
+   #endif
+
+   #ifdef _DEFAULT_INC_DIR
+      aAdd( s_asPaths, _DEFAULT_INC_DIR )
+   #endif
 
    sIncludePath := GetE( "INCLUDE" )
 
@@ -2804,36 +2819,34 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
         #ifdef __XHARBOUR__
           #ifdef __PLATFORM__Linux
-             CASE ( nLine == 0 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
-                IF LTrim( sLine ) == ''
-                   WHILE .T.
-                      nClose := At( Chr(10), sBuffer, nPosition + 1 )
+             CASE ( nLine == 0 .AND. nPosition == 1 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
+                WHILE .T.
+                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                      IF nClose == 0
-                         //FSeek( hSource, -1, 1 )
-                         nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                         IF nLen < 2
-                            BREAK "*"
-                         ENDIF
-                         nMaxPos   := nLen - 1
-                         nPosition := 1
-                         LOOP
-                      ELSE
-                         nClose -= nPosition
-                         nLine++
-                         IF bCount
-                            @ Row(), 0 SAY nLine
-                         ENDIF
-                         IF bBlanks
-                            FWrite( hPP, CRLF )
-                         ENDIF
-                         nPosition += ( nClose )
-                         sLine := ''
-                         cChar := ''
-                         EXIT
+                   IF nClose == 0
+                      //FSeek( hSource, -1, 1 )
+                      nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                      IF nLen < 2
+                         BREAK "*"
                       ENDIF
-                   ENDDO
-                ENDIF
+                      nMaxPos   := nLen - 1
+                      nPosition := 1
+                      LOOP
+                   ELSE
+                      nClose -= nPosition
+                      nLine++
+                      IF bCount
+                         @ Row(), 0 SAY nLine
+                      ENDIF
+                      IF bBlanks
+                         FWrite( hPP, CRLF )
+                      ENDIF
+                      nPosition += ( nClose )
+                      sLine := ''
+                      cChar := ''
+                      EXIT
+                   ENDIF
+                ENDDO
           #endif
         #endif
 
@@ -3253,9 +3266,9 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             DropTrailingWS( @sLine )
 
             // Strip the ""
-            sLine := Upper( SubStr( sLine, 2, Len( sLine ) - 2 ) )
+            sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
 
-            IF sLine == "HBCLASS.CH"
+            IF Upper( sLine ) == "HBCLASS.CH"
                IF ! s_lClsLoaded
                   s_lClsLoaded := .T.
                   InitClsRules()
@@ -3272,7 +3285,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                ENDIF
 
           #ifdef FW
-            ELSEIF sLine == "FIVEWIN.CH"
+            ELSEIF Upper( sLine ) == "FIVEWIN.CH"
                IF ! s_lFWLoaded
                   s_lFWLoaded := .T.
                   IF ! s_lClsLoaded
@@ -3304,7 +3317,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
           #endif
 
           #ifdef MINIGUI
-            ELSEIF sLine == "MINIGUI.CH"
+            ELSEIF Upper( sLine ) == "MINIGUI.CH"
                IF ! s_lMiniGUILoaded
                   s_lMiniGUILoaded := .T.
                   IF ! s_lClsLoaded

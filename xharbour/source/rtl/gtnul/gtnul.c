@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.4 2003/05/26 05:58:54 paultucker Exp $
+ * $Id: gtnul.c,v 1.5 2003/05/28 11:59:06 druzus Exp $
  */
 
 /*
@@ -65,21 +65,21 @@
 static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
 
 #if defined(HB_DEFAULT_GT)
-   static char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
+   char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
    HB_GT_REQUEST( HB_DEFAULT_GT );
 #elif defined(HB_GT_LIB)
-   static char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
+   char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
    HB_GT_REQUEST( HB_GT_LIB );
 #elif defined(HB_OS_LINUX)
-   static char * s_defaultGT = "crs";
+   char * s_defaultGT = "crs";
 #elif defined(HB_OS_WIN_32)
-   static char * s_defaultGT = "win";
+   char * s_defaultGT = "win";
 #elif defined(HB_OS_DOS)
-   static char * s_defaultGT = "dos";
+   char * s_defaultGT = "dos";
 #elif defined(HB_OS_OS2)
-   static char * s_defaultGT = "os2";
+   char * s_defaultGT = "os2";
 #else
-   static char * s_defaultGT = "std";
+   char * s_defaultGT = "std";
 #endif
 
 static PHB_GT_INIT s_gtInit[ HB_GT_MAX_ ];

@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.4 2002/04/26 23:27:10 ronpinkas Exp $
+ * $Id: hbextern.ch,v 1.5 2003/05/09 02:53:00 ronpinkas Exp $
  */
 
 /*
@@ -652,6 +652,9 @@ EXTERNAL HB_SHADOW
 EXTERNAL HB_TRACELEVEL
 EXTERNAL HB_TRACESTATE
 EXTERNAL HB_VALTOSTR
+EXTERNAL HB_GT_VERSION
+
+EXTERNAL SECONDSCPU
 
 #endif /* HB_EXTENSION */
 
