@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.54 2003/12/14 21:23:36 andijahja Exp $
+ * $Id: genc.c,v 1.55 2003/12/17 03:53:18 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    hb_fsFNameMerge( szFileName, pFileName );
 
    pFileName->szExtension = szSourceExtension;
-   pFileName->szPath = szSourcePath;
+   pFileName->szPath = NULL;
    hb_fsFNameMerge( szSourceName, pFileName );
 
    while( ( pTmp = strchr( szSourceName, '\\' ) ) != NULL )

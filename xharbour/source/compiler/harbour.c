@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.56 2003/12/17 03:53:18 ronpinkas Exp $
+ * $Id: harbour.c,v 1.57 2003/12/19 01:12:06 druzus Exp $
  */
 
 /*
@@ -1772,7 +1772,13 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
+   char szFileName[ _POSIX_PATH_MAX ];
+   PHB_FNAME hb_FileName;
 
+   hb_FileName = hb_fsFNameSplit( hb_comp_files.pLast->szFileName );
+   hb_FileName->szPath = NULL;
+   hb_fsFNameMerge( szFileName, hb_FileName );
+   
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
@@ -1853,17 +1859,17 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    {
       BYTE * pBuffer;
 
-      pBuffer = ( BYTE * ) hb_xgrab( 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( szFunName ) );
+      pBuffer = ( BYTE * ) hb_xgrab( 3 + strlen( szFileName ) + strlen( szFunName ) );
 
       pBuffer[0] = HB_P_MODULENAME;
 
-      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, strlen( hb_comp_files.pLast->szFileName ) );
+      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) szFileName, strlen( szFileName ) );
 
-      pBuffer[ strlen( hb_comp_files.pLast->szFileName ) + 1 ] = ':';
+      pBuffer[ strlen( szFileName ) + 1 ] = ':';
 
-      memcpy( ( BYTE * ) ( &( pBuffer[ strlen( hb_comp_files.pLast->szFileName ) + 2 ] ) ), ( BYTE * ) szFunName, strlen( szFunName ) + 1 );
+      memcpy( ( BYTE * ) ( &( pBuffer[ strlen( szFileName ) + 2 ] ) ), ( BYTE * ) szFunName, strlen( szFunName ) + 1 );
 
-      hb_compGenPCodeN( pBuffer, 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( szFunName ), 0 );
+      hb_compGenPCodeN( pBuffer, 3 + strlen( szFileName ) + strlen( szFunName ), 0 );
 
       hb_xfree( pBuffer );
    }

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.31 2003/12/21 21:31:52 druzus Exp $
+rem $Id: bld.bat,v 1.32 2003/12/22 13:58:02 lf_sfnet Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -111,11 +111,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :COMPILE
 
-   %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
-   IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' SET HB_2nd_prg=%2.c
    IF '%2'=='' SET HB_2nd_prg=
-   IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -q0 -gc0 -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%3'=='' SET HB_3rd_prg=%3.c
    IF '%3'=='' SET HB_3rd_prg=
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1963 2003/12/30 05:21:56 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1964 2003/12/30 10:24:44 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-30 12:45 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+    * changed -gc0 to -gc to help the debug of the pcode
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    * strip relative path from the debug informations
+  * source/debug/debugger.prg
+    * fix callstack management
+    * add lookup to HB_DBG_PATH before PATH to look for prg sources
 
 2003-12-30 11:20 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/gtxvt/gtxvt.c

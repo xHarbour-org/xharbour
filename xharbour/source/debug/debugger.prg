@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.15 2003/11/23 01:21:00 likewolf Exp $
+ * $Id: debugger.prg,v 1.16 2003/12/03 11:48:37 lf_sfnet Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ return
 
 procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
 
-   local cModuleName, cProcName
+   local cModuleName, cProcName, cProcPrec
    local nStaticsBase, nStaticIndex, cStaticName
    local cLocalName, nLocalIndex
    local nAt
@@ -114,6 +114,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
            endif
 
            cProcName := ProcName( 1 )
+           cProcPrec := ProcName( 2 )
+
            if cProcName == "(_INITSTATICS)"
               nStaticsBase := uParam1
               cStaticName  := uParam2
@@ -127,7 +129,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
 
            if s_oDebugger != nil
               if PCount() == 3 // called from hvm.c hb_vmLocalName() and hb_vmStaticName()
-                 if cProcName == "__EVAL" .OR. cProcName == "EVAL"
+                 if cProcName == "__EVAL" .OR. cProcName == "EVAL" .OR. ;
+                    cProcPrec == "AEVAL" .OR. cProcPrec == "DBEVAL"
                     if !s_oDebugger:lCodeblock
                        ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
                        AIns( s_oDebugger:aCallStack, 1 )
@@ -158,7 +161,7 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                           AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", cProcName } )
                        endif
                     endif
-		    IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, 2 ])=='A'
+                    if Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, 2 ])=='A'
                       AAdd( s_oDebugger:aCallStack[ 1 ][ 2 ], { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
                     endif
                  endif
@@ -176,16 +179,18 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  endif
               endif
 
-              s_oDebugger:aCallStack [1] [3] := uParam1  // set the current line number on the CallStack
-              if s_oDebugger:lGo
-                 s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack [1] [4] )
-              endif
-              if !s_oDebugger:lGo .or. InvokeDebug()
-                 s_oDebugger:lGo := .F.
-                 s_oDebugger:SaveAppStatus()
-                 // new function ShowCodeLine( nline, cFilename)
-                 s_oDebugger:ShowCodeLine( uParam1, s_oDebugger:aCallStack [1] [4])
-                 s_oDebugger:HandleEvent()
+              if Len( s_oDebugger:aCallStack ) > 0 
+                 s_oDebugger:aCallStack [1] [3] := uParam1  // set the current line number on the CallStack
+                 if s_oDebugger:lGo
+                    s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack [1] [4] )
+                 endif
+                 if !s_oDebugger:lGo .or. InvokeDebug()
+                    s_oDebugger:lGo := .F.
+                    s_oDebugger:SaveAppStatus()
+                    // new function ShowCodeLine( nline, cFilename)
+                    s_oDebugger:ShowCodeLine( uParam1, s_oDebugger:aCallStack [1] [4])
+                    s_oDebugger:HandleEvent()
+                 endif
               endif
            endif
 
@@ -194,11 +199,12 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
             return
          endif
          if s_oDebugger != nil
-            if s_oDebugger:lCodeblock
+            if s_oDebugger:lCodeblock 
                s_oDebugger:lCodeblock := .F.
+            else
+               s_oDebugger:EndProc()
+               s_oDebugger:LoadVars()
             endif
-            s_oDebugger:EndProc()
-            s_oDebugger:LoadVars()
          endif
    endcase
 
@@ -331,7 +337,7 @@ METHOD New() CLASS TDebugger
    ::lTrace            := .f.
    ::aBreakPoints      := {}
    ::aCallStack        := {}
-   ::lGo               := .f.
+   ::lGo               := .t.
    ::aVars             := {}
    ::lCaseSensitive    := .f.
    ::cSearchString     := ""
@@ -339,7 +345,10 @@ METHOD New() CLASS TDebugger
    // default the search path for files to the current directory
    // that way if the source is in the same directory it will still be found even if the application
    // changes the current directory with the SET DEFAULT command
-   ::cPathForFiles     := getenv( "PATH" )
+   ::cPathForFiles     := getenv( "HB_DBG_PATH" )
+   if empty( ::cPathForFiles )
+      ::cPathForFiles     := getenv( "PATH" )
+   endif
    ::nTabWidth         := 4
    ::nSpeed            := 0
    ::lShowCallStack    := .f.
@@ -895,7 +904,7 @@ return nil
 
 METHOD EndProc() CLASS TDebugger
 
-   if Len( ::aCallStack ) > 1
+   if Len( ::aCallStack ) > 0
       ADel( ::aCallStack, 1 )
       ASize( ::aCallStack, Len( ::aCallStack ) - 1 )
       if ::oBrwStack != nil .and. ! ::lTrace
@@ -1476,6 +1485,7 @@ return ""
 static function CompareLine( Self )
 
 return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
+
 METHOD StackProc(cModuleName) CLASS TDebugger
    // always treat filename as lower case - we need it consistent for comparisons   
    local cFunction := SubStr( cModuleName, RAt( ":", cModuleName ) + 1 )
@@ -1487,6 +1497,7 @@ METHOD StackProc(cModuleName) CLASS TDebugger
    // nil means that no line number is stored yet
    ::aCallStack[1]:= { cFunction, {} , nil, cPrgName }   // function name and locals array
                                                          // and the function and program name
+
 return nil
 
 METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
@@ -1496,7 +1507,7 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
       if ::oWndStack != nil
          ::oBrwStack:RefreshAll()
       endif
-        
+       
       if cPrgName != ::cPrgName
          if ! File( cPrgName ) .and. ! Empty( ::cPathForFiles )
             cPrgName := ::LocatePrgPath( cPrgName )
@@ -2331,4 +2342,4 @@ static function PathToArray( cList )
 
    endif
 
-return aList 
+return aList
