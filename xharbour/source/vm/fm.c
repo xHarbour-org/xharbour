@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.38 2003/08/01 18:29:37 jacekp Exp $
+ * $Id: fm.c,v 1.39 2003/08/05 16:37:35 druzus Exp $
  */
 
 /*
@@ -158,11 +158,11 @@ void hb_paraniodMemInit( void *pMem, ULONG ulSize )
 
       bParanoidMemInit = TRUE;
    }
-   pTmp = pMem + ulSize - sizeof(HB_ITEM);
+   ( char * ) pTmp = ( char * ) pMem + ulSize - sizeof(HB_ITEM);
    while( pTmp >= pMem )
    {
       memcpy(pTmp, &itmMemStat, sizeof(HB_ITEM));
-      pTmp -= sizeof(HB_ITEM);
+      ( char * ) pTmp -= sizeof(HB_ITEM);
    }
    //memset(pMem, 0, ulSize);
 }
