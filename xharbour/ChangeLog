@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1932 2003/12/23 00:49:08 druzus Exp $
+ * $Id: ChangeLog,v 1.1933 2003/12/23 02:51:58 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-12-23 15:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/gtwvt/gtwvt.c
+  + Fix handling of K_LBUTTONUP & K_RBUTTONUP
+
 2003-12-23 15:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/vm/mainwin.c
   + update to use HB_FM_WIN32_ALLOC so malloc() is default not LocalAlloc()
