@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.11 2003/05/06 13:17:26 jonnymind Exp $
+   $Id: xwt.ch,v 1.12 2003/05/11 15:14:43 jonnymind Exp $
 
    Definitions
 */
@@ -90,7 +90,9 @@
 #define XWT_PROP_MODAL      101 // bool
 #define XWT_PROP_VISIBILITY 102 // int (see widget visibility)
 
-/* Fake propertyes */
+#define XWT_PROP_TITLES     110 //PHB_ITEM (HB_IT_ARRAY) in data
+
+/* Fake properties */
 #define XWT_PROP_SETMENUBAR 1000 // PHB_ITEM (HB_IT_ARRAY) in data
 #define XWT_PROP_RSTMENUBAR 1001 // idem
 
@@ -159,5 +161,7 @@
 #define XWT_TYPE_IMAGE    50
 #define XWT_TYPE_FILESEL  60
 #define XWT_TYPE_SPLITTER 70
+#define XWT_TYPE_TREEITEM 80
+#define XWT_TYPE_TREELIST 81
 
 #endif

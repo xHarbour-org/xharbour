@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.16 2003/05/14 10:03:57 jonnymind Exp $
+ * $Id: Changelog,v 1.17 2003/05/26 15:46:30 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-05 19:15 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  + src/treeitem.prg
+  + src/treelist.prg
+  + src/xwt_gtk/xwt_gtk_treelist.c
+    + Started developement of the treelist widget, which can be a list,
+      a tree list, a table or a tree table.
+
+  * include/xwt.ch
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+    + Added support for treelist
+
+  * test/xwt_test.prg
+    + Added a minimal test
 
 2003-05-14 10:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   + doc/es/createwidgets.txt

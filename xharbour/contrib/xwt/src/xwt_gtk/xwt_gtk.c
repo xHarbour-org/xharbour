@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.12 2003/04/22 19:03:35 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.13 2003/05/11 15:14:43 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -467,7 +467,21 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             }
             return TRUE;
          }
-     return FALSE;
+      return FALSE;
+
+      case XWT_PROP_CONTENT:
+         if( wWidget->type == XWT_TYPE_TREELIST )
+         {
+            return xwt_gtk_treelist_set_content( wWidget, prop->value.data );
+         }
+      return FALSE;
+
+      case XWT_PROP_TITLES:
+         if( wWidget->type == XWT_TYPE_TREELIST )
+         {
+            return xwt_gtk_treelist_set_columns( wWidget, prop->value.data );
+         }
+      return FALSE;
 
 
    }
@@ -784,6 +798,7 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
       case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( pSelf );
       case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( pSelf );
+      case XWT_TYPE_TREELIST: return xwt_gtk_createTreelist( pSelf );
    }
    return FALSE;
 }
@@ -1008,4 +1023,18 @@ void xwt_gtk_set_alignment( XWT_GTK_ALIGN* widget )
       gtk_alignment_set( GTK_ALIGNMENT( widget->align), hpos, vpos, 0.0, 0.0 );
    }
 
+}
+
+/***********************************************************/
+int xwt_gtk_translate_type( int iType )
+{
+   switch( iType )
+   {
+      case HB_IT_INTEGER: return GTK_TYPE_INT;
+      case HB_IT_LONG: return GTK_TYPE_LONG;
+      case HB_IT_DOUBLE: return GTK_TYPE_DOUBLE;
+      case HB_IT_LOGICAL: return GTK_TYPE_BOOL;
+      case HB_IT_STRING: return GTK_TYPE_STRING;
+   }
+   return GTK_TYPE_INVALID;
 }

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.10 2003/04/22 19:03:36 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.11 2003/05/11 15:14:43 jonnymind Exp $
 
    GTK interface
 */
@@ -143,6 +143,7 @@ PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createSplitter( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createToggleButton( PHB_ITEM pSelf );
+PXWT_WIDGET xwt_gtk_createTreelist( PHB_ITEM pSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
@@ -164,11 +165,17 @@ void *xwt_gtk_get_topwidget_base( void *data );
 void *xwt_gtk_get_topwidget_align( void *data );
 void *xwt_gtk_get_topwidget_sensible( void *data );
 
+BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent );
+BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols );
+
 /*** Putting a widget in a frame ****/
 GtkWidget *xwt_gtk_enframe( GtkWidget *framed );
 void xwt_gtk_deframe( GtkWidget *frame, GtkWidget *framed );
 
 /*** XWT GTK ALIGNMENT ***/
 void xwt_gtk_set_alignment( XWT_GTK_ALIGN* widget );
+
+/*** Type translation between xharbour and gtk type representation ***/
+int xwt_gtk_translate_type( int iType );
 
 #endif

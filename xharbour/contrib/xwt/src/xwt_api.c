@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.9 2003/04/18 13:28:50 jonnymind Exp $
+   $Id: xwt_api.c,v 1.10 2003/04/22 19:03:35 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -262,6 +262,8 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:
       case XWT_PROP_ATTACH:
+      case XWT_PROP_CONTENT:
+      case XWT_PROP_TITLES:
          prop.value.data = hb_param( 3, HB_IT_ARRAY );
          if ( prop.value.data == NULL )
          {

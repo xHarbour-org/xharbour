@@ -10,6 +10,7 @@ PROCEDURE MAIN()
    LOCAL oMenuSec, oTextbox, oLabel, oViewPort, oPane
    LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
    LOCAL oGrid, obtnStatus
+   LOCAL oList
 
    XwtInit()
 
@@ -116,6 +117,13 @@ PROCEDURE MAIN()
    oRadioPanel:add( XWTRadioButton():New( "Option 3" ) )
 
    oVLay2:Add( oRadioPanel )
+   /***** A list **********/
+   oList := XWTTreeList():New( ;
+         { {"uno", 2, 3.12, "fir"}, ;
+           {"dos",3,4,5} },;  //the table
+         { "C1", "C2", "C3", "C4" } ; // the titles
+         )
+   oVLay:Add( oList )
    /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )
 
