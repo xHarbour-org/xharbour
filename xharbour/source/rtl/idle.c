@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.8 2003/03/08 02:06:44 jonnymind Exp $
+ * $Id: idle.c,v 1.9 2003/03/16 06:00:33 jonnymind Exp $
  */
 
 /*
@@ -162,7 +162,6 @@ static void hb_releaseCPU( void )
 /* performs all tasks defined for idle state */
 void hb_idleState( void )
 {
-   
    if( ! s_bIamIdle )
    {
       s_bIamIdle = TRUE;
@@ -171,30 +170,22 @@ void hb_idleState( void )
       {
          hb_vm_bCollectGarbage = FALSE;
          hb_gcCollectAll();
-         s_bIamIdle = FALSE;
-         return;
       }
-
-      if( s_pIdleTasks && s_uiIdleTask < s_uiIdleMaxTask )
+      else if ( s_uiIdleTask < s_uiIdleMaxTask )
       {
          hb_vmEvalBlock( s_pIdleTasks[ s_uiIdleTask ] );
          ++s_uiIdleTask;
-         s_bIamIdle = FALSE;
-         return;
       }
-
-      if( hb_set.HB_SET_IDLEREPEAT && s_uiIdleTask == s_uiIdleMaxTask )
+      else
       {
-         s_uiIdleTask = 0;
-         hb_vm_bCollectGarbage = TRUE;
-
+         if( s_uiIdleMaxTask && hb_set.HB_SET_IDLEREPEAT &&
+             s_uiIdleTask == s_uiIdleMaxTask )
+         {
+            s_uiIdleTask = 0;
+            hb_vm_bCollectGarbage = TRUE;
+         }
          hb_releaseCPU();
-         s_bIamIdle = FALSE;
-         return;
       }
-
-      hb_releaseCPU();
-
       s_bIamIdle = FALSE;
    }
 }
@@ -227,12 +218,12 @@ void hb_idleShutDown( void )
 HB_FUNC( HB_IDLESTATE )
 {
    hb_idleState();
+}
 
-   if( s_uiIdleTask == s_uiIdleMaxTask )
-   {
-      s_uiIdleTask = 0;
-      hb_vm_bCollectGarbage = TRUE;
-   }
+/* call from user code to reset idle state */
+HB_FUNC( HB_IDLERESET )
+{
+   hb_idleReset();
 }
 
 /* add a new background task and return its handle */
