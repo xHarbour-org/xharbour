@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.49 2002/10/28 18:45:20 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.50 2002/10/28 23:39:04 ronpinkas Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ METHOD SetBrowserData( oObj, bCurrent ) CLASS ObjInspect
          // Do nothing - already selected.
          RETURN Self
       ELSE
-         TraceLog()
+         //TraceLog()
          FOR EACH aProp IN ::Browser:source
             aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
          NEXT
