@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.50 2005/02/27 15:00:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.51 2005/03/17 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -1900,6 +1900,22 @@ HB_FUNC( ADSVERSION )
    hb_retc( ucVersion );
 }
 
+HB_FUNC( ADSCACHEOPENTABLES )
+{
+   UNSIGNED16 usOpen = hb_parni( 1 );
+   UNSIGNED32 ulRetVal = AdsCacheOpenTables( usOpen );
+
+   hb_retnl( ulRetVal );
+}
+
+HB_FUNC( ADSCACHEOPENCURSORS )
+{
+   UNSIGNED16 usOpen = hb_parni( 1 );
+   UNSIGNED32 ulRetVal = AdsCacheOpenCursors( usOpen );
+
+   hb_retnl( ulRetVal );
+}
+
 #if ADS_REQUIRE_VERSION >= 6
 
 HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 !
@@ -2258,4 +2274,24 @@ HB_FUNC( ADSCOPYTABLECONTENTS )
 }
 
 #endif   /* ADS_REQUIRE_VERSION >= 6  */
+
+#if ADS_REQUIRE_VERSION >= 7
+
+HB_FUNC( ADSCLOSECACHEDTABLES )
+{
+   ADSHANDLE hConnect = ISNUM( 1 ) ? (ADSHANDLE) hb_parnl( 1 ) : adsConnectHandle;
+
+   if( hConnect )
+   {
+      AdsCloseCachedTables( hConnect );
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+
+#endif   /* ADS_REQUIRE_VERSION >= 7  */
+
 /*  Please add all-version functions above this block */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3955 2005/03/17 16:02:46 snaiperis Exp $
+ * $Id: ChangeLog,v 1.3957 2005/03/17 22:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-17 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * contrib/rdd_ads/adsfunc.c
+    * added: AdsCacheOpenTables() and AdsCacheOpenCursors() functions
+      (for all versions Ads) and AdsCloseCachedTables() for Ads 7.x
+      and above. ADS_REQUIRE_VERSION 7 must be set for the last function
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    * updated documentation
 
 2005-03-17 17:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h

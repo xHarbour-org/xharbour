@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.10 2005/02/23 23:00:00 ptsarenko Exp $
+ * $Id: adsfuncs.txt,v 1.11 2005/03/17 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -1313,6 +1313,120 @@
  *      Header is ads.ch
  *  $SEEALSO$
  *      ADSUSEDICTIONARY(),ADSDDADDTABLE()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSCACHEOPENTABLES()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Provides caching of open tables
+ *  $SYNTAX$
+ *      ADSCACHEOPENTABLES(<nOpen>) -> nRetVal
+ *  $ARGUMENTS$
+ *      <nOpen>       Number of tables to cache.
+ *
+ *  $RETURNS$
+ *      <nRetVal>     ???
+ *  $DESCRIPTION$
+ *      AdsCacheOpenTables allows table closes to be cached in order for
+ *      subsequent opens to occur faster. A call to AdsCloseTable with
+ *      the table cache greater than zero results in the table appearing
+ *      closed to an application, but still open on the Advantage server.
+ *      AdsCacheOpenTables is a global setting that affects the behavior
+ *      of the entire application. The default number of open tables that
+ *      are cached is 0.
+ *  $EXAMPLES$
+ *      AdsCacheOpenTables( 25 )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      AdsCacheOpenCursors()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSCACHEOPENCURSORS()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Provides caching of open cursors
+ *  $SYNTAX$
+ *      ADSCACHEOPENCURSORS(<nOpen>) -> nRetVal
+ *  $ARGUMENTS$
+ *      <nOpen>       Number of cursors to cache.
+ *
+ *  $RETURNS$
+ *      <nRetVal>     ???
+ *  $DESCRIPTION$
+ *      AdsCacheOpenCursors allows cursor closes to be cached in
+ *      order for subsequent SELECTS to occur faster. A call to
+ *      AdsCloseTable with the cursor cache greater than zero results
+ *      in the cursor appearing closed to an application, but still
+ *      open on the Advantage server.
+ *      AdsCacheOpenCursors is a global setting that affects the
+ *      behavior of the entire application. The default number of
+ *      open cursors that are cached is 25.
+ *  $EXAMPLES$
+ *      AdsCacheOpenCursors( 0 )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      AdsCacheOpenTables()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSCLOSECACHEDTABLES()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Close all cached tables on the given connection
+ *  $SYNTAX$
+ *      ADSCLOSECACHEDTABLES([<hConnection>]) -> nRetVal
+ *  $ARGUMENTS$
+ *      <hConnection>    A connection handle retrieved via AdsConnect()
+ *      or AdsConnect60(). If omitted, the RDD's current connection
+ *      handle is used, but this only exists if AdsConnect() or AdsConnect60()
+ *      were previously called.
+ *  $RETURNS$
+ *      <nRetVal>     ???
+ *  $DESCRIPTION$
+ *      AdsCloseCachedTables can be used to close all cached tables
+ *      on a given connection. All cached closed tables on the client
+ *      will be closed, as well as all cache closed tables on the server
+ *      that might have been used when executing SQL statements.
+ *  $EXAMPLES$
+ *      AdsCloseCachedTables()
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Ads 7.x and above, Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      AdsCacheOpenTables(), AdsCacheOpenCursors()
  *  $END$
  */
 
