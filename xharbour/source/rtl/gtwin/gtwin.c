@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.60 2004/08/06 02:25:55 maurifull Exp $
+ * $Id: gtwin.c,v 1.61 2004/08/27 05:42:19 paultucker Exp $
  */
 
 /*
@@ -1694,7 +1694,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                    ch = clipKey->key;
                 }
              }
-          printf("\n%ld %ld %ld",extKey,wChar,ch);
           }
        }
        else if( b_MouseEnable && 
