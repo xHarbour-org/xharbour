@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.43 2003/07/02 17:58:47 walito Exp $
+ * $Id: tbrowse.prg,v 1.44 2003/08/08 22:31:51 walito Exp $
  */
 
 /*
@@ -421,7 +421,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    // Find out highest header and footer
    FOR EACH aCol IN ::aColsInfo
 
-      if nMode <= 1
+      if nMode <= 1 .or. ::lNeverDisplayed
          xVal := Eval( aCol[ o_Obj ]:block )
 
          aCol[ o_Type      ] := valtype( xVal )
@@ -586,7 +586,9 @@ METHOD Configure( nMode ) CLASS TBrowse
 #endif
 
    //   Flag that browser has been configured properly
-   ::lConfigured := .t.
+   if !::lNeverDisplayed
+      ::lConfigured := .t.
+   endif
 
 return Self
 
@@ -614,7 +616,9 @@ METHOD AddColumn( oCol ) CLASS TBrowse
       ::nColPos     := 1
    endif
 
-   ::Configure(1)
+   if !::lNeverDisplayed
+      ::Configure(1)
+   endif
    ::lConfigured := .f.
 
 return Self
@@ -635,7 +639,9 @@ METHOD InsColumn( nPos, oCol )
                                  '', '', '', 0, '', 0, oCol:DefColor, .f. }, .t. )
       ::aColumns := ::aColsInfo
 
-      ::Configure( 1 )
+      if !::lNeverDisplayed
+         ::Configure( 1 )
+      endif
       ::lConfigured := .f.
    endif
 
@@ -666,7 +672,9 @@ METHOD SetColumn( nColumn, oCol )
       ::aColsInfo[ nColumn ] := { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
                                   '', '', '', 0, '', 0, oCol:DefColor, .f. }
 
-      ::Configure( 1 )
+      if !::lNeverDisplayed
+         ::Configure( 1 )
+      endif
       ::lConfigured := .f.
    endif
 
@@ -708,7 +716,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    ::nColumns--
 
    aDel( ::aColsInfo, nPos, .t. )
-   ::Acolumns :=    ::aColsInfo
+   ::aColumns := ::aColsInfo
 
    if ::nColumns < ::nFrozenCols
       ::nFrozenCols := 0
@@ -719,7 +727,9 @@ METHOD DelColumn( nPos ) CLASS TBrowse
       ::aRedraw := {}
    endif
 
-   ::Configure( 1 )
+   if !::lNeverDisplayed
+      ::Configure( 1 )
+   endif
    ::lConfigured := .f.
 
 return oCol
