@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3082 2004/06/17 23:33:16 modalsist Exp $
+ * $Id: ChangeLog,v 1.3083 2004/06/18 00:52:01 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,9 +9,9 @@
 */
 
 
-2004-06-17 20:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+2004-06-17 21:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtapi.c
-    ! Fixed a long standing issue with how the 'border' color is handled
+    ! Fixed a long standing issue with how the 'unselected' color is handled
     ! in SetColor().
   * include/hbver.h
     * Refreshed.
