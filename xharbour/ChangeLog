@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1576 2003/10/10 00:12:16 peterrees Exp $
+ * $Id: ChangeLog,v 1.1577 2003/10/10 04:19:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-09 23:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    ! Fixed minor bug with aAdd(), aIns(), aDel(), aSize(), aCopy(), aFill(), aEval() when params were passed BYREF.
+      the passed value would be lost when it is also the return value of the function. (Reported by Brian Hays.)
+
+  /*
+     For aAdd() and aIns() I believe that the correct fix is to actually add the item BYREF as is the case with:
+
+      aVar := { @VarByRef }
+
+     The fix will be very simple, and the code will actually be faster, but I wanted to wait till after build 91,
+     and to possibly receive your input.
+  */
 
 2003-10-09 21:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.32 2003/07/30 09:44:19 toninhofwi Exp $
+ * $Id: arrayshb.c,v 1.33 2003/09/07 02:55:08 ronpinkas Exp $
  */
 
 /*
@@ -137,7 +137,14 @@ HB_FUNC( AADD )
 
       if( pValue && hb_arrayAdd( pArray, pValue ) )
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+         if( hb_stackItemFromBase( 2 )->type & HB_IT_BYREF )
+         {
+            hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+         }
+         else
+         {
+            hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+         }
       }
       else
       {
@@ -177,7 +184,15 @@ HB_FUNC( ASIZE )
 
       hb_arraySize( pArray, HB_MAX( lSize, 0 ) );
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* ASize() returns the array itself */
+      /* ASize() returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
    }
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
@@ -224,7 +239,15 @@ HB_FUNC( AINS )
       }
     #endif
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AIns() returns the array itself */
+      /* AIns() returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
    }
 }
 
@@ -254,7 +277,15 @@ HB_FUNC( ADEL )
       }
     #endif
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* ADel() returns the array itself */
+      /* ADel() returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
    }
 }
 
@@ -274,7 +305,16 @@ HB_FUNC( AFILL )
          /* Explicy ulCount of 0 - Nothing to do! */
          if( ISNUM(4) && ulCount == 0 )
          {
-            hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+            /* AFill() returns the array itself */
+            if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+            {
+               hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+            }
+            else
+            {
+               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+            }
+
             return;
          }
 
@@ -283,10 +323,19 @@ HB_FUNC( AFILL )
             /* Clipper allows Start to be of wrong type, or 0, and corrects it to 1. */
             ulStart = 1;
          }
+         /* Clipper aborts if negative start. */
          else if( ulStart < 0 )
          {
-            /* Clipper aborts if negative start. */
-            hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+            /* AFill() returns the array itself */
+            if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+            {
+               hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+            }
+            else
+            {
+               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+            }
+
             return;
          }
 
@@ -302,10 +351,19 @@ HB_FUNC( AFILL )
                /* Clipper allows the Count to be negative, if start is 1, and corrects it to maximum elements. */
                ulCount = pArray->item.asArray.value->ulLen;
             }
+            /* Clipper aborts if negative count and start is not at 1. */
             else
             {
-               /* Clipper aborts if negative count and start is not at 1. */
-               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+               /* AFill() returns the array itself */
+               if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+               {
+                  hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+               }
+               else
+               {
+                  hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+               }
+
                return;
             }
          }
@@ -313,7 +371,15 @@ HB_FUNC( AFILL )
          hb_arrayFill( pArray, pValue, (ULONG) ulStart, (ULONG) ulCount );
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+      /* AFill() returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
    }
    else
    {
@@ -365,7 +431,15 @@ HB_FUNC( AEVAL )
                     ISNUM( 3 ) ? &ulStart : NULL,
                     ISNUM( 4 ) ? &ulCount : NULL );
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
+      /* AEval() returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
    }
    else
    {
@@ -394,7 +468,15 @@ HB_FUNC( ACOPY )
                        ISNUM( 5 ) ? &ulTarget : NULL );
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
+      /* ACopy() returns the target array */
+      if( hb_stackItemFromBase( 2 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pDstArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pDstArray );
+      }
    }
 }
 
