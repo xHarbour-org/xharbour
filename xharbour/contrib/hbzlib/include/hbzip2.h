@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.6 2004/02/28 03:45:09 andijahja Exp $
+ * $Id: hbzip2.h,v 1.7 2004/02/28 23:05:11 andijahja Exp $
  */
 
 /*
@@ -122,7 +122,9 @@ extern void     hb_SetZipBuff(int a,int b,int c);
 extern void     hb_SetZipComment(char *szComment);
 extern const char *hb_GetZipComment(char *szFile);
 extern BOOL     hb_IsPassWord(char *szName);
+extern int hb_UnzipAll(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress);
 /*
+
 extern BOOL     hb_SaveZipFileFromMemory(char *szFile);
 extern BOOL     hb_CreateZipInMemory(char *szFileToCompress,char *szFile);
 */
