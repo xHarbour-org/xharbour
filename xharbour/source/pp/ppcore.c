@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.141 2004/03/19 16:39:17 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.142 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -1471,7 +1471,6 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   UINT uiOpenBrackets = 0;
   char *pOpen = NULL;
   BOOL bMarkers = FALSE;
-  int mplen = strlen( mpatt ), rplen;
 
   HB_TRACE(HB_TR_DEBUG, ("ConvertPatterns(%s, %d, %s, %d)", mpatt, mlen, rpatt, rlen));
 
@@ -1512,8 +1511,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( i && mpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mplen - i + 1 );
-           mplen--;
+           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
+           mlen--;
            continue;
         }
         else
@@ -1531,8 +1530,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if ( i && mpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mplen - i + 1 );
-           mplen--;
+           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
+           mlen--;
            continue;
         }
         else if( uiOpenBrackets )
@@ -1550,8 +1549,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( i && mpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mplen - i + 1 );
-           mplen--;
+           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
+           mlen--;
            continue;
         }
         else if( mpatt[ i + 1 ] == '>' )
@@ -1691,12 +1690,14 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            exptype = '0';
            ptr = mpatt + i;
 
-           //printf( "Marker: >%.*s<\n", explen, exppatt );
+           //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, mlen - i, mlen - i, ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
-           while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, mlen ) ) > 0 )
+           while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
            {
               char *pTmp = ptr + ifou - 2, *pStart;
+
+              //printf( "At: %i >%s<\n", ifou, pTmp );
 
               while( pTmp > ptr && *pTmp != '<' )
               {
@@ -1910,7 +1911,6 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNCLOSED_OPTIONAL, pOpen + 1, NULL );
   }
 
-  rplen = strlen( rpatt );
   uiOpenBrackets = 0;
   i = 0;
 
@@ -1942,8 +1942,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( rpatt[ i + 1 ] != '[' && rpatt[ i + 1 ] != ']' && rpatt[ i + 1 ] != '<' && rpatt[ i + 1 ] != '\\' )
         {
-           hb_pp_Stuff( "", rpatt + i, 0, 1, rplen - i );
-           rplen--;
+           hb_pp_Stuff( "", rpatt + i, 0, 1, rlen - i );
+           rlen--;
            continue;
         }
      }
@@ -1951,8 +1951,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( i && rpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rplen - i + 1 );
-           rplen--;
+           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
+           rlen--;
            continue;
         }
         else
@@ -1967,8 +1967,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( i && rpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rplen - i + 1 );
-           rplen--;
+           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
+           rlen--;
            continue;
         }
         else if( uiOpenBrackets )
@@ -1988,8 +1988,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      {
         if( i && rpatt[ i - 1 ] == '\\' )
         {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rplen - i + 1 );
-           rplen--;
+           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
+           rlen--;
            continue;
         }
         else if( rpatt[ i + 1 ] != '>' && rpatt[ i + 1 ] != '=' )
