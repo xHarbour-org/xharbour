@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.112 2004/03/21 15:55:06 druzus Exp $
+ * $Id: classes.c,v 1.113 2004/03/25 16:02:42 ronpinkas Exp $
  */
 
 /*
@@ -2233,7 +2233,7 @@ HB_FUNC( __CLSMODMSG )
    }
    else
    {
-      uiClass = 0;
+      uiClass = (USHORT) hb_parnl( 1 );
    }
 
    if( uiClass && uiClass <= s_uiClasses && pString )

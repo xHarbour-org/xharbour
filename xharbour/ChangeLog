@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2768 2004/04/07 09:33:29 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2769 2004/04/07 12:36:57 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-07 17:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    * Enhanced __CLSMODMSG() to also accept Class Handle as 1st param.
+
 2004-04-07 19:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/common/hbver.c
     + add __POCC__ and __XCC__ in compiler section.
