@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.10 2003/01/28 10:40:12 jonnymind Exp $
+* $Id: inet.c,v 1.11 2003/01/31 18:39:27 jonnymind Exp $
 */
 
 /*
@@ -608,17 +608,18 @@ HB_FUNC( INETRECV )
    if( hb_selectReadSocket( Socket ) )
    {
       iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_WAITALL );
+      if ( iLen <= 0 )
+      {
+         HB_SOCKET_SET_ERROR( Socket );
+      }
+      hb_retni( iLen );
    }
-
-   if ( iLen == 0 )
+   else
    {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
+      hb_retni( 0 );
    }
-   else if ( iLen < 0 )
-   {
-      HB_SOCKET_SET_ERROR( Socket );
-   }
-   hb_retni( iLen );
+
 }
 
 HB_FUNC( INETRECVALL )
@@ -671,21 +672,22 @@ HB_FUNC( INETRECVALL )
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
+         if( iLen > 0 )
+         {
+               iReceived += iLen;
+         }
+      }
+      else
+      {
+         HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
+         hb_retni( iReceived );
+         return;
       }
 
-      if( iLen > 0 )
-      {
-            iReceived += iLen;
-      }
    }
    while( iReceived < iMax && iLen > 0 );
 
    Socket->count = iReceived;
-
-   if ( iLen == 0 )
-   {
-      HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
-   }
 
    if ( iLen >= 0 )
    {
@@ -800,7 +802,7 @@ HB_FUNC( INETRECVLINE )
       }
 
       hb_xfree( (void *) Buffer );
-      hb_retc( NULL );
+      hb_ret();
    }
    else
    {
