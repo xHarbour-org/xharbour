@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.txt,v 1.1 2001/12/18 20:51:20 vszakats Exp $
+ * $Id: dbdelim.txt,v 1.1.1.1 2001/12/21 10:49:18 ronpinkas Exp $
  */
 
 /*
@@ -19,8 +19,7 @@
  *  $CATEGORY$
  *      Conversion
  *  $ONELINER$
- *      Copies the contents of a database to a delimited text file or
- *      appends the contents of a delimited text file to a database.
+ *      Import records from a database (.dbf) file or ASCII text file
  *  $SYNTAX$
  *      __dbDelim( <lExport>, <xcFile>, [<xcDelim>], [<aFields>],
  *      [<bFor>], [<bWhile>], [<nNext>], [<nRecord>], <lRest>  ) --> NIL
