@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.111 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: classes.c,v 1.112 2004/03/21 15:55:06 druzus Exp $
  */
 
 /*
@@ -539,7 +539,8 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
       }
       else
       {
-         if( pRealClass->pModuleSymbols == NULL || (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols == NULL )
+         if( pRealClass->pModuleSymbols == NULL || (*pBase)->item.asSymbol.value->pDynSym == NULL ||
+             (*pBase)->item.asSymbol.value->pDynSym == (PHB_DYNS) 1 || (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols == NULL )
          {
             // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
          }
@@ -550,7 +551,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
             #endif
 
             // Same module as the module where the Super Method is defined.
-            if( pRealClass->pModuleSymbols && pRealClass->pModuleSymbols == (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+            if( pRealClass->pModuleSymbols == (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
             {
                // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
                return TRUE;
@@ -3732,7 +3733,7 @@ void hb_clsSetModule( USHORT uiClass )
 {
    HB_THREAD_STUB
 
-   if( uiClass && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+   if( uiClass && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
    {
       ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
 
