@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.349 2004/03/05 23:14:01 ronpinkas Exp $
+ * $Id: hvm.c,v 1.351 2004/03/07 21:42:52 andijahja Exp $
  */
 
 /*
@@ -5717,7 +5717,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
          if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
-            PHB_ITEM pRealSelf;
+            HB_ITEM RealSelf;
             USHORT nPos;
             USHORT uiClass;
 
@@ -5725,13 +5725,13 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             uiClass = pSelfBase->uiClass;
             pItem->item.asSymbol.uiSuperClass = uiClass;
 
-            pRealSelf = hb_itemNew( NULL ) ;
+            RealSelf.type = HB_IT_NIL;
 
             //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
 
             if( pSelfBase )
             {
-               hb_itemCopy( pRealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+               hb_itemCopy( &RealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
             }
             else
             {
@@ -5740,11 +5740,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             }
 
             /* and take back the good pSelfBase */
-            pSelfBase = pRealSelf->item.asArray.value;
+            pSelfBase = (&RealSelf)->item.asArray.value;
 
             /* Now I should exchnage it with the current stacked value */
-            hb_itemSwap( pSelf, pRealSelf );
-            hb_itemRelease( pRealSelf ) ; /* and release the fake one */
+            hb_itemSwap( pSelf, &RealSelf );
+            hb_itemClear( &RealSelf ) ; /* and release the fake one */
 
             /* Push current SuperClass handle */
             lPopSuper = TRUE ;
