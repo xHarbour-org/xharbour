@@ -973,8 +973,6 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
       // ******* modified to add exit with K_LEFT when in non-edit mode
       if nKey == K_ESC .or. nkey == K_CTRL_W
          oSelf:lExitEdit := .T.
-      elseif nKey == K_LEFT
-         oSelf:lExitEdit := .T.
       else
          if !oSelf:MoveCursor(nKey)
             oSelf:KeyboardHook(nKey)
@@ -1006,7 +1004,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
    //  [::lDirty := .T.] marks memoedit() return as "file change made."
 
    if ! ::lEditAllow
-
+      tracelog(nPassedKey)
       BrowseText(Self,nPassedKey)
 
    else
@@ -1340,7 +1338,8 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                exit
 
             case K_SPACE
-              // Space is a very tricky key, and requires its own routine to avoid array errors in Getparagraph()
+	      // Space is a very tricky key, and requires its own routine to avoid array errors in Getparagraph()
+
               ::lDirty := .T.
               nLastLine =  ::nRow
               if !(::nRow=::naTextLen .or. ::aText[::nRow]:lSoftCR = .F.)  // not the last line, not a HardCR
@@ -1357,19 +1356,19 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
                   ::RefreshLine()
                   ::SplitLine(::nRow)
-                  if nLastLine = ::nRow .or. ::lInsert
-                      ::lRightScroll := .F.
+                  if nLastLine =  ::nRow .or. ::lInsert
+		      ::lRightScroll := .F.
                       ::MoveCursor(K_RIGHT)
-                      ::lRightScroll := .T.
+		      ::lRightScroll := .T.
                   endif
-              else   // The last line or a HardCR line
-                  if ::lWordWrap .and. ::nCol >= ::nWordWrapCol  // if at wordwrap of Hard CR line
+              else      					// The last line or a HardCR line
+                  if ::nCol >= ::nWordWrapCol      		// if at wordwrap of Hard CR line
                       ::aText[::nRow]:lSoftCR = .T.		// wrap by adding a line and move down, merge CR status
                       ::InsertLine("", .F. , ::nRow +1 )
                       ::MoveCursor(K_DOWN)
                       ::RefreshLine()
 
-                  else // Not at wordwrap of line
+                  else						// Not at wordwrap of line
                      if Empty( substr(::aText[::nRow]:cText, ::nCol) )  // if spaces already exist, move over them to EOL
                         ::lRightScroll := .F.
                         ::MoveCursor(K_RIGHT)

@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.3 2002/11/29 20:15:50 walito Exp $
+ * $Id: treport.prg,v 1.4 2003/01/27 03:44:13 walito Exp $
  */
 
 /*
@@ -277,15 +277,15 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
       ::aReportTotals := ARRAY( LEN(::aReportData[RPT_GROUPS]) + 1, ;
                         LEN(::aReportData[RPT_COLUMNS]) )
 
-      // Column total elements
-//      nCol := 1
+      // Column total elements      
+      // nCol := 1
       FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
          IF aReport[RCT_TOTAL]
             FOR EACH aTotal IN ::aReportTotals
                aTotal[ HB_EnumIndex() ] := 0
             NEXT
-         ENDIF
-//         nCol++
+         ENDIF       
+         // nCol++
       NEXT
 
       // Initialize ::aGroupTotals as an array
@@ -559,7 +559,11 @@ METHOD ExecuteReport() CLASS HBReportForm
 
    LOCAL aRecordHeader  := {}          // Header for the current record
    LOCAL aRecordToPrint := {}          // Current record to print
-   LOCAL nCol                          // Counter for the column work
+   
+   // 2004-02-14 Piemonte Gianluca
+   // nCol should be initialized
+   LOCAL nCol := 0                     // Counter for the column work
+   
    LOCAL nGroup                        // Counter for the group work
    LOCAL lGroupChanged  := .F.         // Has any group changed?
    LOCAL lEjectGrp := .F.              // Group eject indicator
@@ -572,14 +576,21 @@ METHOD ExecuteReport() CLASS HBReportForm
    LOCAL lAnySubTotals
 
    // Add to the main column totals
-//   nCol := 1
+   nCol := 1
    FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
       IF aReport[RCT_TOTAL]
+
+           // 2004-02-14 Piemonte Gianluca       
+           // Initialize aReportTotals[1,HB_EnumIndex()] if it's NIL
+           if valtype( ::aReportTotals[ 1 ,HB_EnumIndex()] ) == "U"
+              ::aReportTotals[ 1 ,HB_EnumIndex()] := 0
+           endif
+           
          // If this column should be totaled, do it
          ::aReportTotals[ 1 ,HB_EnumIndex()] += ;
                   EVAL( aReport[RCT_EXP] )
       ENDIF
-//      nCol++
+      nCol++
    NEXT
 
    // Determine if any of the groups have changed.  If so, add the appropriate
@@ -749,6 +760,14 @@ METHOD ExecuteReport() CLASS HBReportForm
       IF aReport[RCT_TOTAL]
          // Cycle through the groups
          FOR nGroup := 1 TO LEN( ::aReportTotals ) - 1
+         
+             // 2004-02-14 Piemonte Gianluca 
+             // Initialize aReportTotals[1,HB_EnumIndex()] if it's NIL
+	     if valtype( ::aReportTotals[ nGroup+1,HB_EnumIndex() ] ) == "U"
+	        ::aReportTotals[ nGroup+1,HB_EnumIndex() ] := 0
+	     endif
+
+         
             ::aReportTotals[nGroup+1,HB_EnumIndex()] += ;
                EVAL( aReport[RCT_EXP] )
          NEXT
@@ -785,6 +804,7 @@ METHOD ExecuteReport() CLASS HBReportForm
       AFILL( aRecordToPrint, "" )
 
       // Load the current record into aRecordToPrint
+      nCol := 1
       FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
          FOR nLine := 1 TO nMaxLines
             // Check to see if it's a memo or character
@@ -810,11 +830,14 @@ METHOD ExecuteReport() CLASS HBReportForm
                ENDIF
             ENDIF
             // Add it to the existing report line
-            IF nCol > 1
+            // 2004-02-14 Gianluca Piemonte
+            // Correct the mechanism for adding a space between columns 
+            IF nCol > 1 .and. nCol <= len(::aReportData[RPT_COLUMNS])
                aRecordToPrint[ nLine ] += " "
-            ENDIF
+            ENDIF        
             aRecordToPrint[ nLine ] += cLine
          NEXT
+         nCol ++
       NEXT
 
       // Determine if aRecordToPrint will fit on the current page
@@ -1293,7 +1316,7 @@ METHOD GetColumn( cFieldsBuffer, nOffset ) CLASS HBReportForm
 
    // Total column?
    aColumn[ RCT_TOTAL ] := iif(SUBSTR(cFieldsBuffer, nOffset + ;
-    FIELD_TOTALS_OFFSET, 1) IN "YyTt", .T., .F.)
+    FIELD_TOTALS_OFFSET, 1) IN "YyTt", .T., .F.)   
 
    // Decimals width
    aColumn[ RCT_DECIMALS ] := BIN2W(SUBSTR(cFieldsBuffer, nOffset + ;
@@ -1307,8 +1330,8 @@ METHOD GetColumn( cFieldsBuffer, nOffset ) CLASS HBReportForm
                FIELD_CONTENT_EXPR_OFFSET, 2))
    aColumn[ RCT_TEXT ] := ::GetExpr( nPointer )
    cExpr := aColumn[ RCT_TEXT ]
-   aColumn[ RCT_EXP ] := &( "{ || " + cExpr + "}" )
-
+   aColumn[ RCT_EXP ] := &( "{ || " + cExpr + "}" )   
+   
    // Header expression
    nPointer := BIN2W(SUBSTR(cFieldsBuffer, nOffset +;
                FIELD_HEADER_EXPR_OFFSET, 2))
@@ -1392,19 +1415,25 @@ STATIC FUNCTION ListAsArray( cList, cDelimiter )
 
 STATIC FUNCTION MakeAStr( uVar, cType )
    LOCAL cString
-
+   
+   // 2004-02-14 Piemonte Gianluca
+   // Add EXIT 
    SWITCH UPPER(cType)
    CASE "D"
       cString := DTOC( uVar )
+      EXIT
 
    CASE "L"
       cString := iif( uVar, "T", "F" )
+      EXIT
 
    CASE "N"
       cString := STR( uVar )
+      EXIT
 
    CASE "C"
       cString := uVar
+      EXIT
 
    DEFAULT
       cString := "INVALID EXPRESSION"
