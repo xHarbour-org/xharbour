@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.91 2003/07/20 17:50:03 jonnymind Exp $
+* $Id: thread.c,v 1.92 2003/07/20 19:43:08 jonnymind Exp $
 */
 
 /*
@@ -253,35 +253,28 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    /* Initialization of private and public memvars */
    hb_memvarsInit( tc );
+
+   /* Initialization of dynsym pointers to memvars */
+   tc->hMemvars = (HB_HANDLE *) hb_xgrab( sizeof( HB_HANDLE ) * TABLE_INITHB_VALUE );
+   tc->hMemvarsAllocated = TABLE_INITHB_VALUE;
+   tc->hMemvarsLastFree = 0;
 }
 
-/*
-void hb_threadCopyDynSym( HB_STACK *target, HB_STACK *source )
+/* TODO: collecting of unused old memvars. */
+void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 {
-   UINT uiCount;
-   PHB_DYNS tg, sr;
+   HB_THREAD_STUB
 
-   target->uiDynSymbols = source->uiDynSymbols;
-   target->pDynItems = ( PDYNHB_ITEM ) hb_xgrab(  ( target->uiDynSymbols ) * sizeof( DYNHB_ITEM ) );
-
-   for ( uiCount = 0; uiCount < target->uiDynSymbols; uiCount ++ )
+   if ( _pStack_->hMemvarsAllocated <= _pStack_->hMemvarsLastFree )
    {
-      target->pDynItems[ uiCount ].pDynSym =
-               (PHB_DYNS) hb_xgrab( sizeof( HB_DYNS ) );
-
-      tg = target->pDynItems[ uiCount ].pDynSym;
-      sr = source->pDynItems[ uiCount ].pDynSym;
-      tg->hArea = sr->hArea;
-      tg->hMemvar = sr->hMemvar;
-      tg->ulCalls = sr->ulCalls;
-      tg->ulTime = sr->ulTime;
-      tg->ulRecurse = sr->ulRecurse;
-      tg->pFunPtr = sr->pFunPtr;
-      tg->pModuleSymbols = sr->pModuleSymbols;
-      tg->pSymbol = sr->pSymbol;
+      _pStack_->hMemvars = ( HB_HANDLE *) hb_xrealloc( _pStack_->hMemvars,
+             sizeof( HB_HANDLE ) * (_pStack_->hMemvarsAllocated + TABLE_EXPANDHB_VALUE) );
+      _pStack_->hMemvarsAllocated += TABLE_EXPANDHB_VALUE;
    }
+
+   pDyn->hMemvar = _pStack_->hMemvarsLastFree;
+   _pStack_->hMemvars[ _pStack_->hMemvarsLastFree++ ] = hv;
 }
-*/
 
 HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
@@ -447,6 +440,9 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_memvarsRelease( pStack );
    }
    hb_memvarsFree( pStack );
+
+   if( pStack->hMemvars )
+      hb_xfree( pStack->hMemvars );
 
    /*
    #ifdef HB_OS_WIN_32

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1299 2003/07/26 16:35:03 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1300 2003/07/27 01:23:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-07-24 03:55 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/memvars.c
+  * source/vm/thread.c
+    ! Support for multithreading dynsym added. Now, PHB_DYNS->hMemvar
+      member points to a middle-level strucuture (hMemvars) in the
+      thread's private stack under MT. This avoid clashes between
+      threads; both private and public memvars are now local to the
+      thread that uses them.
+    % Implementation of MT in memvars.c has been beautified by removing
+      almost all ifdef MT sections, and using the standard conversion
+      s_SingleThread --> HB_VM_STACK.multiThread if MT is on.
 
 2003-07-26 18:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/nulsys/nulsys.prg

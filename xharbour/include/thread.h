@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.53 2003/07/20 19:43:08 jonnymind Exp $
+* $Id: thread.h,v 1.54 2003/07/23 12:35:57 druzus Exp $
 */
 
 /*
@@ -363,6 +363,10 @@ typedef struct tag_HB_STACK
    ULONG globalFreeCnt;
    HB_VALUE_PTR globalTable;
 
+   /* Pointers to hMemvar for thread aware dynsyms */
+   HB_HANDLE *hMemvars;
+   ULONG hMemvarsAllocated;
+   ULONG hMemvarsLastFree;
 
    struct tag_HB_STACK *next;
 
@@ -606,6 +610,9 @@ extern void hb_memvarsRelease( HB_STACK * );
 extern void hb_memvarsFree( HB_STACK * );
 extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack );
 extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
+
+/* Used by dynsym thread specific system */
+void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 
 /* Win 32 specific functions */
 #ifdef HB_OS_WIN_32

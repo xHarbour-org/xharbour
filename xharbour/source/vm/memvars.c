@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.23 2003/07/19 22:08:05 jonnymind Exp $
+ * $Id: memvars.c,v 1.24 2003/07/20 17:50:03 jonnymind Exp $
  */
 
 /*
@@ -98,6 +98,23 @@ static ULONG s_globalFirstFree = 0;
 static ULONG s_globalLastFree  = 0;
 static ULONG s_globalFreeCnt   = 0;
 static HB_VALUE_PTR s_globalTable = NULL;
+
+#define hb_threadGetHMemvar( pDyn )      ( pDyn->hMemvar )
+#define hb_threadSetHMemvar( pDyn, hv )  ( pDyn->hMemvar = hv )
+#else
+
+#define  s_privateStack       (HB_VM_STACK.privateStack)
+#define  s_privateStackSize   (HB_VM_STACK.privateStackSize)
+#define  s_privateStackCnt    (HB_VM_STACK.privateStackCnt)
+#define  s_privateStackBase   (HB_VM_STACK.privateStackBase)
+
+#define  s_globalTableSize   (HB_VM_STACK.globalTableSize)
+#define  s_globalFirstFree   (HB_VM_STACK.globalFirstFree)
+#define  s_globalLastFree    (HB_VM_STACK.globalLastFree)
+#define  s_globalFreeCnt     (HB_VM_STACK.globalFreeCnt)
+#define  s_globalTable       (HB_VM_STACK.globalTable)
+
+#define hb_threadGetHMemvar( pDyn )      ( HB_VM_STACK.hMemvars[ pDyn->hMemvar ] )
 #endif
 
 #define TABLE_INITHB_VALUE   100
@@ -180,7 +197,6 @@ void hb_memvarsInit( HB_STACK *pStack )
 
    pStack->privateStackSize = TABLE_INITHB_VALUE;
    pStack->privateStackCnt  = pStack->privateStackBase = 0;
-
 }
 
 /* clear all variables except the detached ones
@@ -188,15 +204,12 @@ void hb_memvarsInit( HB_STACK *pStack )
 */
 void hb_memvarsRelease( HB_STACK *pStack )
 {
-/* TODO
    ULONG ulCnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
 
-
    ulCnt = pStack->globalLastFree;
 
-   printf ("Releasing for: %d, ulCnt:%d\n", pStack->th_vm_id, ulCnt );
    if( pStack->globalTable )
    {
       while( --ulCnt )
@@ -211,7 +224,6 @@ void hb_memvarsRelease( HB_STACK *pStack )
          }
       }
    }
-   */
 }
 
 
@@ -222,6 +234,7 @@ void hb_memvarsFree( HB_STACK *pStack )
 
    if( pStack->privateStack )
       hb_xfree( pStack->privateStack );
+
 }
 
 #endif
@@ -235,11 +248,7 @@ HB_VALUE_PTR *hb_memvarValueBaseAddress( void )
 {
    HB_THREAD_STUB
 
-   #ifdef HB_THREAD_SUPPORT
-   return &HB_VM_STACK.globalTable;
-   #else
    return &s_globalTable;
-   #endif
 }
 
 /*
@@ -268,7 +277,6 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueNew(%p, %d)", pSource, (int) bTrueMemvar));
 
-   #ifndef HB_THREAD_SUPPORT
    if( s_globalFreeCnt )
    {
       /* There are holes in the table
@@ -312,53 +320,6 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    }
 
    pValue = s_globalTable + hValue;
-
-   #else
-
-   if( HB_VM_STACK.globalFreeCnt )
-   {
-      /* There are holes in the table
-         * Get a first available hole
-         */
-      hValue = HB_VM_STACK.globalFirstFree;
-      --HB_VM_STACK.globalFreeCnt;
-
-      /* Now find the next hole
-         */
-      if( HB_VM_STACK.globalFreeCnt )
-      {
-         ++HB_VM_STACK.globalFirstFree;
-         while( HB_VM_STACK.globalTable[ HB_VM_STACK.globalFirstFree ].counter )
-            ++HB_VM_STACK.globalFirstFree;
-      }
-      else
-         /* No more holes
-            */
-         HB_VM_STACK.globalFirstFree = HB_VM_STACK.globalLastFree;
-   }
-   else
-   {
-      /* Allocate the value from the end of table
-         */
-      if( HB_VM_STACK.globalFirstFree < HB_VM_STACK.globalTableSize )
-      {
-         hValue = HB_VM_STACK.globalFirstFree;
-         HB_VM_STACK.globalFirstFree = ++HB_VM_STACK.globalLastFree;
-      }
-      else
-      {
-         /* No more free values in the table - expand the table
-            */
-         hValue = HB_VM_STACK.globalTableSize;
-         HB_VM_STACK.globalFirstFree = HB_VM_STACK.globalLastFree = HB_VM_STACK.globalTableSize + 1;
-         HB_VM_STACK.globalTableSize += TABLE_EXPANDHB_VALUE;
-         HB_VM_STACK.globalTable = ( HB_VALUE_PTR ) hb_xrealloc( HB_VM_STACK.globalTable, sizeof( HB_VALUE ) * HB_VM_STACK.globalTableSize );
-      }
-   }
-
-   pValue = HB_VM_STACK.globalTable + hValue;
-
-   #endif
 
    pValue->counter = 1;
    pValue->item.type = HB_IT_NIL;
@@ -404,7 +365,6 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
 
    /* Allocate the value from the end of table
     */
-   #ifndef HB_THREAD_SUPPORT
 
    if( s_privateStackCnt == s_privateStackSize )
    {
@@ -415,18 +375,6 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
    }
 
    s_privateStack[ s_privateStackCnt++ ] = pDynSym;
-
-   #else
-
-   if( HB_VM_STACK.privateStackCnt == HB_VM_STACK.privateStackSize )
-   {
-      HB_VM_STACK.privateStackSize += TABLE_EXPANDHB_VALUE;
-      HB_VM_STACK.privateStack = ( PHB_DYNS * ) hb_xrealloc( HB_VM_STACK.privateStack, sizeof( PHB_DYNS ) * HB_VM_STACK.privateStackSize );
-   }
-
-   HB_VM_STACK.privateStack[ HB_VM_STACK.privateStackCnt++ ] = pDynSym;
-
-   #endif
 }
 
 /*
@@ -436,23 +384,12 @@ ULONG hb_memvarGetPrivatesBase( void )
 {
    HB_THREAD_STUB
 
-   #ifndef HB_THREAD_SUPPORT
-
    ULONG ulBase = s_privateStackBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetPrivatesBase()"));
 
    s_privateStackBase = s_privateStackCnt;
 
-   #else
-
-   ULONG ulBase = HB_VM_STACK.privateStackBase;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetPrivatesBase()"));
-
-   HB_VM_STACK.privateStackBase = HB_VM_STACK.privateStackCnt;
-
-   #endif
    return ulBase;
 }
 
@@ -465,14 +402,9 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
    HB_THREAD_STUB
 
    HB_HANDLE hVar;
-
-   #ifndef HB_THREAD_SUPPORT
    HB_HANDLE hOldValue;
-   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarSetPrivatesBase(%lu)", ulBase));
-
-   #ifndef HB_THREAD_SUPPORT
 
    while( s_privateStackCnt > s_privateStackBase )
    {
@@ -489,25 +421,6 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
       }
    }
    s_privateStackBase = ulBase;
-
-   #else
-
-   while( HB_VM_STACK.privateStackCnt > HB_VM_STACK.privateStackBase )
-   {
-      --HB_VM_STACK.privateStackCnt;
-      hVar = HB_VM_STACK.privateStack[ HB_VM_STACK.privateStackCnt ]->hMemvar;
-      if( hVar )
-      {
-          // AJ: de-activated pending re-enabling of PRIVATES
-          // hOldValue = HB_VM_STACK.globalTable[ hVar ].hPrevMemvar;
-          hb_memvarValueDecRef( hVar );
-          // JC1: PRIVATES de-activated now. We'll bring them back asap
-          // HB_VM_STACK.privateStack[ HB_VM_STACK.privateStackCnt ]->hMemvar = hOldValue;
-      }
-   }
-   HB_VM_STACK.privateStackBase = ulBase;
-
-   #endif
 }
 
 /*
@@ -520,11 +433,7 @@ void hb_memvarValueIncRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueIncRef(%lu)", hValue));
 
-   #ifndef HB_THREAD_SUPPORT
    s_globalTable[ hValue ].counter++;
-   #else
-   HB_VM_STACK.globalTable[ hValue ].counter++;
-   #endif
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) increment refCounter=%li", hValue, s_globalTable[ hValue ].counter));
 }
@@ -589,11 +498,7 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   #ifndef HB_THREAD_SUPPORT
    pValue = s_globalTable + hValue;
-   #else
-   pValue = HB_VM_STACK.globalTable + hValue;
-   #endif
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
 
@@ -674,11 +579,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
-   #ifndef HB_THREAD_SUPPORT
    pValue = s_globalTable + hValue;
-   #else
-   pValue = HB_VM_STACK.globalTable + hValue;
-   #endif
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
 
@@ -728,18 +629,14 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    if( pDyn )
    {
-      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) assigned", pDyn->hMemvar, pMemvarSymb->szName));
+      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) assigned", hb_threadGetHMemvar( pDyn ), pMemvarSymb->szName));
 
-      if( pDyn->hMemvar )
+      if( hb_threadGetHMemvar( pDyn ) )
       {
          /* value is already created */
          HB_ITEM_PTR pSetItem;
 
-         #ifndef HB_THREAD_SUPPORT
-         pSetItem = &s_globalTable[ pDyn->hMemvar ].item;
-         #else
-         pSetItem = &HB_VM_STACK.globalTable[ pDyn->hMemvar ].item;
-         #endif
+         pSetItem = &s_globalTable[ hb_threadGetHMemvar( pDyn ) ].item;
 
          // JC1: the variable we have now can't be destroyed in the meanwhile.
          // It could be changed, but this is a race condition that must be
@@ -759,11 +656,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
       }
 
       /* Remove MEMOFLAG if exists (assignment from field). */
-      #ifndef HB_THREAD_SUPPORT
-      s_globalTable[ pDyn->hMemvar ].item.type &= ~HB_IT_MEMOFLAG;
-      #else
-      HB_VM_STACK.globalTable[ pDyn->hMemvar ].item.type &= ~HB_IT_MEMOFLAG;
-      #endif
+      s_globalTable[ hb_threadGetHMemvar( pDyn ) ].item.type &= ~HB_IT_MEMOFLAG;
    }
    else
    {
@@ -782,17 +675,13 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    if( pDyn )
    {
-      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) queried", pDyn->hMemvar, pMemvarSymb->szName));
+      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) queried", hb_threadGetHMemvar( pDyn ), pMemvarSymb->szName));
 
-      if( pDyn->hMemvar )
+      if( hb_threadGetHMemvar( pDyn ) )
       {
          /* value is already created
           */
-         #ifndef HB_THREAD_SUPPORT
-         HB_ITEM_PTR pGetItem = &s_globalTable[ pDyn->hMemvar ].item;
-         #else
-         HB_ITEM_PTR pGetItem = &HB_VM_STACK.globalTable[ pDyn->hMemvar ].item;
-         #endif
+         HB_ITEM_PTR pGetItem = &s_globalTable[ hb_threadGetHMemvar( pDyn ) ].item;
 
          if( HB_IS_BYREF( pGetItem ) )
          {
@@ -851,16 +740,12 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    if( pDyn )
    {
-      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) referenced", pDyn->hMemvar, pMemvarSymb->szName));
+      HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) referenced", hb_threadGetHMemvar( pDyn ), pMemvarSymb->szName));
 
-      if( pDyn->hMemvar )
+      if( hb_threadGetHMemvar( pDyn ) )
       {
          PHB_ITEM pReference;
-         #ifndef HB_THREAD_SUPPORT
-         pReference = &s_globalTable[ pDyn->hMemvar ].item;
-         #else
-         pReference = &HB_VM_STACK.globalTable[ pDyn->hMemvar ].item;
-         #endif
+         pReference = &s_globalTable[ hb_threadGetHMemvar( pDyn ) ].item;
 
          if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
          {
@@ -877,14 +762,9 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          /* value is already created */
          pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
          pItem->item.asMemvar.offset = 0;
-         pItem->item.asMemvar.value = pDyn->hMemvar;
-         #ifndef HB_THREAD_SUPPORT
+         pItem->item.asMemvar.value = hb_threadGetHMemvar( pDyn );
          pItem->item.asMemvar.itemsbase = &s_globalTable;
-         ++s_globalTable[ pDyn->hMemvar ].counter;
-         #else
-         pItem->item.asMemvar.itemsbase = &HB_VM_STACK.globalTable;
-         ++HB_VM_STACK.globalTable[ pDyn->hMemvar ].counter;
-         #endif
+         ++s_globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
       }
       else
       {
@@ -902,18 +782,18 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             uiAction = hb_errLaunch( pError );
             if( uiAction == E_RETRY )
             {
-               if( pDyn->hMemvar )
+               if( hb_threadGetHMemvar( pDyn ) )
                {
                   /* value is already created */
                   pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
                   pItem->item.asMemvar.offset = 0;
-                  pItem->item.asMemvar.value = pDyn->hMemvar;
+                  pItem->item.asMemvar.value = hb_threadGetHMemvar( pDyn );
                   #ifndef HB_THREAD_SUPPORT
                   pItem->item.asMemvar.itemsbase = &s_globalTable;
-                  ++s_globalTable[ pDyn->hMemvar ].counter;
+                  ++s_globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
                   #else
                   pItem->item.asMemvar.itemsbase = &HB_VM_STACK.globalTable;
-                  ++HB_VM_STACK.globalTable[ pDyn->hMemvar ].counter;
+                  ++HB_VM_STACK.globalTable[ hb_threadGetHMemvar( pDyn ) ].counter;
                   #endif
                   uiAction = E_DEFAULT;
                }
@@ -955,15 +835,11 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
       /* there is dynamic symbol with the requested name - check if it is
        * a memvar variable
        */
-      if( pDynVar->hMemvar )
+      if( hb_threadGetHMemvar( pDynVar ) )
       {
          /* variable contains some data
           */
-         #ifndef HB_THREAD_SUPPORT
-         HB_ITEM_PTR pItem = &s_globalTable[ pDynVar->hMemvar ].item;
-         #else
-         HB_ITEM_PTR pItem = &HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item;
-         #endif
+         HB_ITEM_PTR pItem = &s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item;
 
          if( HB_IS_BYREF( pItem ) )
          {
@@ -1022,40 +898,23 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
       /* If the variable with the same name exists already
        * then the current value have to be unchanged
        */
-      if( ! pDynVar->hMemvar )
+      if( ! hb_threadGetHMemvar( pDynVar ) )
       {
-         pDynVar->hMemvar = hb_memvarValueNew( pValue, TRUE );
+         hb_threadSetHMemvar( pDynVar,  hb_memvarValueNew( pValue, TRUE ));
          if( !pValue )
          {
             /* new PUBLIC variable - initialize it to .F.
              */
-            #ifndef HB_THREAD_SUPPORT
-
-            s_globalTable[ pDynVar->hMemvar ].item.type = HB_IT_LOGICAL;
+            s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item.type = HB_IT_LOGICAL;
 
             /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized */
             /*       to .T., this is normal Clipper behaviour. [vszakats] */
 
             if( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 ||
                  strcmp( pDynVar->pSymbol->szName, "CLIPPER" ) == 0 )
-               s_globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = TRUE;
+               s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item.item.asLogical.value = TRUE;
             else
-               s_globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = FALSE;
-
-            #else
-
-            HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item.type = HB_IT_LOGICAL;
-
-            /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized */
-            /*       to .T., this is normal Clipper behaviour. [vszakats] */
-
-            if( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 ||
-                 strcmp( pDynVar->pSymbol->szName, "CLIPPER" ) == 0 )
-               HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = TRUE;
-            else
-               HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item.item.asLogical.value = FALSE;
-
-            #endif
+               s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item.item.asLogical.value = FALSE;
          }
       }
    }
@@ -1067,12 +926,8 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, BYTE bScope, PHB_ITE
        */
       HB_HANDLE hCurrentValue = pDynVar->hMemvar;
 
-      pDynVar->hMemvar = hb_memvarValueNew( pValue, TRUE );
-      #ifndef HB_THREAD_SUPPORT
-      s_globalTable[ pDynVar->hMemvar ].hPrevMemvar = hCurrentValue;
-      #else
-      HB_VM_STACK.globalTable[ pDynVar->hMemvar ].hPrevMemvar = hCurrentValue;
-      #endif
+      hb_threadSetHMemvar( pDynVar, hb_memvarValueNew( pValue, TRUE ));
+      s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].hPrevMemvar = hCurrentValue;
       /* Add this variable to the PRIVATE variables stack
        */
       hb_memvarAddPrivate( pDynVar );
@@ -1090,11 +945,7 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
 
    if( HB_IS_STRING( pMemvar ) )
    {
-      #ifndef HB_THREAD_SUPPORT
       ULONG ulBase = s_privateStackCnt;
-      #else
-      ULONG ulBase = HB_VM_STACK.privateStackCnt;
-      #endif
 
       /* Find the variable with a requested name that is currently visible
        * Start from the top of the stack.
@@ -1104,25 +955,17 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
          PHB_DYNS pDynVar;
 
          --ulBase;
-         #ifndef HB_THREAD_SUPPORT
          pDynVar = s_privateStack[ ulBase ];
-         #else
-         pDynVar = HB_VM_STACK.privateStack[ ulBase ];
-         #endif
 
          /* reset current value to NIL - the overriden variables will be
          * visible after exit from current procedure
          */
-         if( pDynVar->hMemvar )
+         if( hb_threadGetHMemvar( pDynVar ) )
          {
             if( hb_stricmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
             {
                PHB_ITEM pRef;
-               #ifndef HB_THREAD_SUPPORT
-               pRef = &s_globalTable[ pDynVar->hMemvar ].item;
-               #else
-               pRef = &HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item;
-               #endif
+               pRef = &s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item;
 
                if( HB_IS_COMPLEX( pRef ) )
                {
@@ -1157,7 +1000,6 @@ static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
 {
    HB_THREAD_STUB
 
-#ifndef HB_THREAD_SUPPORT
    ULONG ulBase = s_privateStackCnt;
    PHB_DYNS pDynVar;
 
@@ -1168,32 +1010,14 @@ static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
       --ulBase;
       pDynVar = s_privateStack[ ulBase ];
 
-#else
-
-   ULONG ulBase = HB_VM_STACK.privateStackCnt;
-   PHB_DYNS pDynVar;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", szMask, (int) bInclude));
-
-   while( ulBase > HB_VM_STACK.privateStackBase )
-   {
-      --ulBase;
-      pDynVar = HB_VM_STACK.privateStack[ ulBase ];
-
-#endif
-
       /* reset current value to NIL - the overriden variables will be
        * visible after exit from current procedure
        */
-      if( pDynVar->hMemvar )
+      if( hb_threadGetHMemvar( pDynVar ) )
       {
          PHB_ITEM pRef;
 
-         #ifndef HB_THREAD_SUPPORT
-         pRef = &s_globalTable[ pDynVar->hMemvar ].item;
-         #else
-         pRef = &HB_VM_STACK.globalTable[ pDynVar->hMemvar ].item;
-         #endif
+         pRef = &s_globalTable[ hb_threadGetHMemvar( pDynVar ) ].item;
 
          if( bInclude )
          {
@@ -1232,12 +1056,10 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScopeGet(%p)", pDynVar));
 
-   if( pDynVar->hMemvar == 0 )
+   if( hb_threadGetHMemvar( pDynVar ) == 0 )
       return HB_MV_UNKNOWN;
    else
    {
-      #ifndef HB_THREAD_SUPPORT
-
       ULONG ulBase = s_privateStackCnt;    /* start from the top of the stack */
       int iMemvar = HB_MV_PUBLIC;
 
@@ -1254,25 +1076,6 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
          }
       }
 
-      #else
-
-      ULONG ulBase = HB_VM_STACK.privateStackCnt;    /* start from the top of the stack */
-      int iMemvar = HB_MV_PUBLIC;
-
-      while( ulBase )
-      {
-         --ulBase;
-         if( pDynVar == HB_VM_STACK.privateStack[ ulBase ] )
-         {
-            if( ulBase >= HB_VM_STACK.privateStackBase )
-               iMemvar = HB_MV_PRIVATE_LOCAL;
-            else
-               iMemvar = HB_MV_PRIVATE_GLOBAL;
-            ulBase = 0;
-         }
-      }
-
-      #endif
       return iMemvar;
    }
 }
@@ -1302,15 +1105,11 @@ static HB_DYNS_FUNC( hb_memvarClear )
    HB_THREAD_STUB
    HB_SYMBOL_UNUSED( Cargo );
 
-   if( pDynSymbol->hMemvar )
+   if( hb_threadGetHMemvar( pDynSymbol ) )
    {
-      #ifndef HB_THREAD_SUPPORT
-      s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
-      #else
-      HB_VM_STACK.globalTable[ pDynSymbol->hMemvar ].counter = 1;
-      #endif
-      hb_memvarValueDecRef( pDynSymbol->hMemvar );
-      pDynSymbol->hMemvar = 0;
+      s_globalTable[ hb_threadGetHMemvar( pDynSymbol ) ].counter = 1;
+      hb_memvarValueDecRef( hb_threadGetHMemvar( pDynSymbol ) );
+      hb_threadSetHMemvar( pDynSymbol, 0 );
    }
 
    return TRUE;
@@ -1335,13 +1134,9 @@ static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
    {
       if( hb_stricmp( pDynSymbol->pSymbol->szName, (char *) Cargo ) == 0 )
       {
-         #ifndef HB_THREAD_SUPPORT
-         s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
-         #else
-         HB_VM_STACK.globalTable[ pDynSymbol->hMemvar ].counter = 1;
-         #endif
-         hb_memvarValueDecRef( pDynSymbol->hMemvar );
-         pDynSymbol->hMemvar = 0;
+         s_globalTable[ hb_threadGetHMemvar( pDynSymbol ) ].counter = 1;
+         hb_memvarValueDecRef( hb_threadGetHMemvar( pDynSymbol ) );
+         hb_threadSetHMemvar( pDynSymbol, 0 );
          return FALSE;
       }
    }
@@ -1375,11 +1170,7 @@ static int hb_memvarCount( int iScope )
    }
    else
    {
-      #ifndef HB_THREAD_SUPPORT
       return s_privateStackCnt;  /* number of PRIVATE variables */
-      #else
-      return HB_VM_STACK.privateStackCnt;  /* number of PRIVATE variables */
-      #endif
    }
 }
 
@@ -1433,27 +1224,16 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
          hb_dynsymEval( hb_memvarFindPublicByPos, ( void * ) &struPub );
          if( struPub.bFound )
          {
-            #ifndef HB_THREAD_SUPPORT
-            pValue =&s_globalTable[ struPub.pDynSym->hMemvar ].item;
-            #else
-            pValue =&HB_VM_STACK.globalTable[ struPub.pDynSym->hMemvar ].item;
-            #endif
+            pValue =&s_globalTable[ hb_threadGetHMemvar( struPub.pDynSym ) ].item;
             *pszName =struPub.pDynSym->pSymbol->szName;
          }
       }
       else
       {
-         #ifndef HB_THREAD_SUPPORT
          if( ( ULONG ) iPos < s_privateStackCnt )
          {
             HB_DYNS_PTR pDynSym = s_privateStack[ iPos ];
-            pValue =&s_globalTable[ pDynSym->hMemvar ].item;
-         #else
-         if( ( ULONG ) iPos < HB_VM_STACK.privateStackCnt )
-         {
-            HB_DYNS_PTR pDynSym = HB_VM_STACK.privateStack[ iPos ];
-            pValue =&HB_VM_STACK.globalTable[ pDynSym->hMemvar ].item;
-         #endif
+            pValue =&s_globalTable[ hb_threadGetHMemvar( pDynSym ) ].item;
             *pszName = pDynSym->pSymbol->szName;
          }
       }
@@ -1724,7 +1504,7 @@ HB_FUNC( __MVEXIST )
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS pDyn = NULL;
 
-   hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && pDyn->hMemvar );
+   hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && hb_threadGetHMemvar( pDyn ) );
 }
 
 HB_FUNC( __MVGET )
@@ -1875,17 +1655,13 @@ static HB_DYNS_FUNC( hb_memvarSave )
             structure is not flexible enough to allow for it.
             [vszakats] */
 
-   if( pDynSymbol->hMemvar )
+   if( hb_threadGetHMemvar( pDynSymbol ) )
    {
       BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynSymbol->pSymbol->szName, pszMask ) );
 
       PHB_ITEM pItem;
 
-      #ifndef HB_THREAD_SUPPORT
-      pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
-      #else
-      pItem = &HB_VM_STACK.globalTable[ pDynSymbol->hMemvar ].item;
-      #endif
+      pItem = &s_globalTable[ hb_threadGetHMemvar( pDynSymbol ) ].item;
 
       /* Process it if it matches the passed mask */
       if( bIncludeMask ? bMatch : ! bMatch )
@@ -2175,7 +1951,6 @@ void hb_memvarsIsMemvarRef( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsIsMemvarRef()"));
 
-   #ifndef HB_THREAD_SUPPORT
    if( s_globalTable )
    {
       ULONG ulCnt = s_globalLastFree;
@@ -2191,32 +1966,16 @@ void hb_memvarsIsMemvarRef( void )
          }
       }
    }
-   #else
-   if( HB_VM_STACK.globalTable )
-   {
-      ULONG ulCnt = HB_VM_STACK.globalLastFree;
-
-      while( --ulCnt )
-      {
-         /* do not check detached variables - for these variables only
-          * references from the eval stack are meaningfull for the GC
-         */
-         if( HB_VM_STACK.globalTable[ ulCnt ].counter && HB_VM_STACK.globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
-         {
-            hb_gcItemRef( &HB_VM_STACK.globalTable[ ulCnt ].item );
-         }
-      }
-   }
-   #endif
-
 }
 
 HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {
+   HB_THREAD_STUB
+
    PHB_DYNS pDyn;
 
    if( ( pDyn = hb_dynsymFindName( szName ) ) != NULL )
-      return  pDyn->hMemvar;
+      return  hb_threadGetHMemvar( pDyn );
    else
       return 0; /* invalid handle */
 }
@@ -2225,22 +1984,10 @@ PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
 {
    HB_THREAD_STUB
 
-#ifndef HB_THREAD_SUPPORT
-
    if( hMemvar && hMemvar < s_globalTableSize )
    {
       return &s_globalTable[ hMemvar ].item;
    }
-
-#else
-
-   if( hMemvar && hMemvar < HB_VM_STACK.globalTableSize )
-   {
-      return &HB_VM_STACK.globalTable[ hMemvar ].item;
-   }
-
-#endif
-
    else
    {
       return NULL;
