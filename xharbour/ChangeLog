@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3173 2004/07/20 02:35:28 peterrees Exp $
+ * $Id: ChangeLog,v 1.3174 2004/07/20 12:15:20 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-20 13:45 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/cstr.prg
+    ! Fixed typo.
+
+  * source/rtl/str2ptr.c
+    * Revised HB_POINTER2STRING() to not require 2nd argument <nLen>.
+
+  * source/vm/arrayshb.c
+    ! Global revisions for better consistency.
+    + Added HB_IT_STRING as valid value for CTYPE_VOID_PTR
+    /* Lot's of C&P so hopefully no new mistakes. */
 
 2004-07-20 08:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/libct/disk.c
