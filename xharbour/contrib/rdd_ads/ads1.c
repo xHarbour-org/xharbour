@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.56 2005/02/27 09:30:00 ptsarenko Exp $
+ * $Id: ads1.c,v 1.56 2005/02/27 07:44:25 ptsarenko Exp $
  */
 
 /*
@@ -102,9 +102,7 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)
    #pragma startup ads1__InitSymbols
-#elif defined(__DMC__)
-   static int hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols();
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )
@@ -113,7 +111,7 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols;
    #pragma data_seg()
-#elif ! defined(__GNUC__)
+#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
    #pragma startup ads1__InitSymbols
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.12 2005/02/11 18:58:53 druzus Exp $
+ * $Id: hbinit.h,v 1.13 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -64,6 +64,12 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_STATIC_STARTUP
 #endif
 
+#if defined (__DMC__ )
+   #if !defined(HB_CPP_STARTUP)
+      #define HB_CPP_STARTUP
+   #endif
+#endif
+
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -78,7 +84,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) func( void ) {
    #define HB_CALL_ON_STARTUP_END( func ) }
 
-#elif defined(__DMC__)
+#elif defined(HB_CPP_STARTUP)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
@@ -88,7 +94,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
          return 0; \
-      }
+      } \
+      static int hb_vm_auto_##func = func();
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) {
@@ -172,6 +179,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       static int static_int_##func = func();
 
 #elif defined(_MSC_VER)
+
+   #if !defined(HB_MSC_STARTUP)
+      #define HB_MSC_STARTUP
+   #endif
 
    typedef int (* HB_$INITSYM)( void );
 

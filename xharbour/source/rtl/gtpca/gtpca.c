@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.19 2005/01/10 18:45:37 druzus Exp $
+ * $Id: gtpca.c,v 1.20 2005/02/25 10:43:47 andijahja Exp $
  */
 
 /*
@@ -888,9 +888,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(__DMC__)
-   static int hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_();
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

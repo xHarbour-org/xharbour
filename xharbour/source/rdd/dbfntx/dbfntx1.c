@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.95 2005/02/14 21:14:10 druzus Exp $
+ * $Id: dbfntx1.c,v 1.96 2005/02/24 10:44:06 andijahja Exp $
  */
 
 /*
@@ -154,9 +154,7 @@ HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbfntx1__InitSymbols
-#elif defined(__DMC__)
-   static int hb_vm_auto_dbfntx1__InitSymbols = dbfntx1__InitSymbols();
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )

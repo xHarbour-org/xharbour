@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.82 2005/01/02 03:31:13 guerra000 Exp $
+ * $Id: genc.c,v 1.83 2005/02/24 11:12:35 andijahja Exp $
  */
 
 /*
@@ -490,11 +490,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       }
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
-                    "#if defined(__DMC__)\n"
-                    "   static int hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s();\n"
-                    "#elif defined(HB_PRAGMA_STARTUP)\n"
+                    "#if defined(HB_PRAGMA_STARTUP)\n"
                     "   #pragma startup hb_vm_SymbolInit_%s%s\n"
-                    "#elif defined(_MSC_VER)\n"
+                    "#elif defined(HB_MSC_STARTUP)\n"
                     "   #if _MSC_VER >= 1010\n"
                     /* [pt] First version of MSC I have that supports this */
                     /* is msvc4.1 (which is msc 10.10) */
@@ -506,8 +504,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                     "   static HB_$INITSYM hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s;\n"
                     "   #pragma data_seg()\n"
                     "#endif\n\n",
-                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
-                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
@@ -813,7 +809,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       hb_xfree( ( void * ) pPubSymFirst );
       pPubSymFirst = pStatSymTemp;
    }
-
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3881 2005/02/27 09:30:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3881 2005/02/27 07:44:25 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2005-02-27 18:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbf1.c
+  * source/rdd/sdf1.C
+  * source/rdd/delim1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * contrib/rdd_ads/ads1.c
+  * source/rtl/gtwin/gtwin.c
+  * source/compiler/genc.c
+  * source/rtl/cdpapi.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtnul/gtnul.c
+  * source/rtl/gtalleg/gtalleg.c
+  * include/hbinit.h
+    * move initialization for __DMC__ to hbinit.h
+    + HB_CPP_STARTUP, to write initialization of CPP the common way
+    + HB_MSC_STARTUP, to write initialization of MSVC the current way
 
 2005-02-23 23:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/ads1.c

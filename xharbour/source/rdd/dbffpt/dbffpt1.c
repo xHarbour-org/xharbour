@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.36 2005/02/06 20:35:40 druzus Exp $
+ * $Id: dbffpt1.c,v 1.37 2005/02/24 10:44:06 andijahja Exp $
  */
 
 /*
@@ -256,9 +256,7 @@ HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)
 #  pragma startup dbffpt1__InitSymbols
-#elif defined(__DMC__)
-   static int hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols();
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
 #  if _MSC_VER >= 1010
 #     pragma data_seg( ".CRT$XIY" )
 #     pragma comment( linker, "/Merge:.CRT=.data" )
@@ -267,7 +265,7 @@ HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 #  endif
    static HB_$INITSYM hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols;
 #  pragma data_seg()
-#elif ! defined(__GNUC__)
+#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
 #  pragma startup dbffpt1__InitSymbols
 #endif
 

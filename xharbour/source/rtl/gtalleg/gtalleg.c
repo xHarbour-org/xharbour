@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.34 2004/11/25 05:11:57 guerra000 Exp $
+ * $Id: gtalleg.c,v 1.35 2004/11/25 17:07:25 maurifull Exp $
  */
 
 /*
@@ -2273,7 +2273,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )
