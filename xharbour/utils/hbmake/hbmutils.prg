@@ -125,7 +125,7 @@ Static Function GetDirs( cPattern )
             { | xItem | If( xItem[ 5 ] = "D" .and. ;
             ( xItem[ 1 ] != "." .and. xItem[ 1 ] != ".." ), ;
             ( Aadd( aDir, cPattern + xItem[ 1 ] + If( llinux, "/", '\' ) ), ;
-            Outstd( "." ) ), "" ) } )
+             ), "" ) } )
 
 Return ( aDir )
 
