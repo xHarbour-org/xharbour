@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.11 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.12 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
       DEFAULT
          //TraceLog( xVal, cName, nPad )
          IF xVal == NIL
-            cRet := "NIL; "
+            cRet := "NIL"
          ELSE
             Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF

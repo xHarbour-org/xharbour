@@ -5715,12 +5715,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                  FOR nMarker := 1 TO nMarkers
                     // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
                     IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
-                       aDel( aMarkers[ anMarkers[nMarker] ], 1 )
-                       aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
                        IF bDbgPPO
-                          ? nMarker, "Removed Repeatable"
+                          ? nMarker, "- Removing Repeatable", aMarkers[ anMarkers[nMarker] ][1]
                           WAIT
                        ENDIF
+                       aDel( aMarkers[ anMarkers[nMarker] ], 1 )
+                       aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
                     ELSE
                        IF bDbgPPO
                           ? nMarker, Len( aBackup[ anMarkers[1] ] ), Len( aMarkers[ anMarkers[nMarker] ] ),"Removed Repeatable"
@@ -5750,12 +5750,12 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
            FOR nMarker := 1 TO nMarkers
               // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
               IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. Len( aMarkers[ anMarkers[nMarker] ] ) > 1
-                 aDel( aMarkers[ anMarkers[nMarker] ], 1 )
-                 aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
                  IF bDbgPPO
-                    ? nMarker, "Removed Repeatable"
+                    ? nMarker, "+ Removing Repeatable", ValToPrg( aMarkers[ anMarkers[nMarker] ][1] )
                     WAIT
                  ENDIF
+                 aDel( aMarkers[ anMarkers[nMarker] ], 1 )
+                 aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
               ELSE
                  IF bDbgPPO
                     ? nMarker, "Removed Repeatable skipped"

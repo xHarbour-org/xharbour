@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.27 2003/02/26 05:36:09 jonnymind Exp $
+ * $Id: arrayshb.c,v 1.28 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -415,7 +415,7 @@ HB_FUNC( HB_AEXPRESSIONS )
    }
 
    hb_arrayNew( pArray, 0 );
-      
+
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
       switch( pLine->item.asString.value[i] )
@@ -490,10 +490,10 @@ HB_FUNC( HB_AEXPRESSIONS )
    {
       PHB_ITEM pExp = hb_itemNew( NULL );
 
-      
+
       hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
-      hb_itemRelease( pExp );      
+      hb_itemRelease( pExp );
    }
 }
 
@@ -508,7 +508,7 @@ HB_FUNC( HB_ATOKENS )
       PHB_ITEM pToken = hb_itemNew( NULL );
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
-      
+
       hb_arrayNew( pArray, 0 );
 
       for( i = 0; i < pLine->item.asString.length; i++ )
@@ -526,7 +526,7 @@ HB_FUNC( HB_ATOKENS )
       }
 
       hb_itemRelease( pToken );
-      
+
    }
    else
    {
@@ -635,6 +635,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
                else
                {
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "SizeOfCStructure", 1, hb_paramError( 1 ) );
+                  return 0;
                }
             }
             else
@@ -847,12 +848,13 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                else
                {
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+                  return NULL;
                }
             }
             else
             {
                hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
-               return 0;
+               return NULL;
             }
          }
       }

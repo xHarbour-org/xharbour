@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.52 2003/05/09 04:21:19 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.53 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -1424,7 +1424,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                HB_EXPR_PTR pName = pSelf->value.asFunCall.pFunName;
                HB_EXPR_PTR pParms = pSelf->value.asFunCall.pParms;
                HB_EXPR_PTR pReduced;
-               USHORT usCount;
+               USHORT usCount = 0;
 
                if( pParms )
                {
