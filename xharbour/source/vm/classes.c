@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.121 2004/05/10 08:54:25 ronpinkas Exp $
+ * $Id: classes.c,v 1.122 2004/05/28 22:20:21 ronpinkas Exp $
  */
 
 /*
@@ -2653,9 +2653,9 @@ HB_FUNC( __CLSINSTSUPER )
          hb_dynsymUnlock();
 
          hb_vmPushNil();
-         hb_vmFunction( 0 );                         /* Execute super class      */
+         hb_vmDo( 0 );                         /* Execute super class      */
 
-         if( HB_IS_OBJECT( hb_stackItemFromTop( -1 ) ) )
+         if( HB_IS_OBJECT( &HB_VM_STACK.Return ) )
          {
             for( uiClass = 0; ! bFound && uiClass < s_uiClasses; uiClass++ )
             {                                      /* Locate the entry         */
