@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.7 2003/07/15 00:57:04 jonnymind Exp $
+ * $Id: hbxml.c,v 1.8 2003/07/15 09:15:34 andijahja Exp $
  */
 
 /*
@@ -1291,12 +1291,12 @@ MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style )
       break;
 
       case MXML_TYPE_COMMENT:
-            mxml_output_string_len( out, "<!--", 4 );
+            mxml_output_string_len( out, "<!-- ", 5 );
             hb_objSendMsg( pNode, "CDATA", 0 );
             mxml_output_string_len( out,
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
-            mxml_output_string_len( out, "-->\n", 4 );
+            mxml_output_string_len( out, " -->\n", 5 );
       break;
 
       case MXML_TYPE_DATA:
@@ -1325,6 +1325,7 @@ MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style )
          hb_objSendMsg( pNode, "CDATA", 0 );
 
          if ( HB_VM_STACK.Return.type != HB_IT_NIL ) {
+            mxml_output_char( out, ' ' );
             mxml_output_string_len( out,
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
@@ -1342,6 +1343,7 @@ MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style )
          hb_objSendMsg( pNode, "CDATA", 0 );
 
          if ( HB_VM_STACK.Return.type != HB_IT_NIL ) {
+            mxml_output_char( out, ' ' );
             mxml_output_string_len( out,
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );

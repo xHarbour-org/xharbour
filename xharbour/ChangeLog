@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1260 2003/07/17 03:08:21 andijahja Exp $
+ * $Id: ChangeLog,v 1.1261 2003/07/17 19:19:34 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-17 23:11 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbxml.c
+    ! Processing instructions and directives were missing an
+      extra space between the node name and the data.
+    * Added an extra space around comments for nicer display.
+
+2003-07-17 22:48 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/txml.prg
+    ! Name of unamed programs now defaults to the "basename", or
+      the name of the binary program without path and extensions.
+      (Tnx Luiz :-)
+
+2003-07-17 21:45 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/txml.prg
+    ! In AddBelow() method of class TXmlNode (and related metods),
+      the order of objects was wrong, causing the child to become
+      the partent of its parent. Fixed.
 
 2003-07-17 21:18 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
