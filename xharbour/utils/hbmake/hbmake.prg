@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.22 2002/06/01 00:10:02 lculik Exp $
+ * $Id: hbmake.prg,v 1.23 2002/06/02 23:31:38 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1755,7 +1755,7 @@ FUNC crtmakfile( cFile )
     IF lRddads
 
         cDefBccLibs += " rddads.lib ace32.lib"
-
+        cDeflibGccLibs += " -lrddads -ladsloc "
     ENDIF
 
     IF Len( alibsout ) > 0 .and. lExternalLib
