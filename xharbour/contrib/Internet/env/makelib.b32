@@ -1,0 +1,22 @@
+
+!include $(INET_DIR)\env\makeb32.env
+
+lib: $(INETLIB) 
+
+$(INETLIB): $(INETOBJ)
+   -erase $(INETLIB)
+   $(lib) "$(INETLIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+
+clean:
+        -erase *.obj
+        -erase *.exe
+        -erase *.res
+        -erase *.map
+        -erase *.rws
+        -erase $(INETLIB)
+
+

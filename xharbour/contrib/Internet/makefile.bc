@@ -1,0 +1,16 @@
+# Global paths
+#
+HBR_DIR=..\..
+INET_DIR=.
+WH_DIR=..\what32
+
+!include <env\bccwin32.mak>
+
+# library
+#
+INETLIB    = $(LIBDIR)\internet.lib
+
+INETOBJ    = xhFtp.obj
+
+!include $(INET_DIR)\env\makelib.b32
+

@@ -1,0 +1,16 @@
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2002-11-10 12:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   + Internet\Source\xhFtp.prg
+
+     xhFtp Class Initial Release.
+
+     Class to execute the Directory and File operations on the remote server.
+     A different protocol than sockets. Very easy to implement and very reliable.
+
+
+
