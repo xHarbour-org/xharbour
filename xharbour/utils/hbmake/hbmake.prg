@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.124 2004/08/03 10:36:05 paultucker Exp $
+ * $Id: hbmake.prg,v 1.125 2004/08/03 22:05:39 ath1 Exp $
  */
 /*
  * Harbour Project source code:
@@ -2819,7 +2819,7 @@ FUNC CreateLibMakeFile( cFile )
    Local aUserDefs
    Local cCurrentDef     := ""
 
-   IF nLenaSrc == 0
+   IF nLenaSrc == 0 .AND. !s_lRecurse
       IF s_nLang == 1 // Portuguese-BR
          Alert("NÆo h  prg na pasta "+curdir())
       ELSEIF s_nLang == 3 // Spanish
@@ -3078,7 +3078,7 @@ FUNC CreateLibMakeFile( cFile )
    IF s_lGcc
 
       IF  "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) ) .OR. cOs == "Linux"
-         fWrite( s_nLinkHandle, "PROJECT = " + IIF( lInstallLibrary, "$(BHC)\lib\", "" ) + Alltrim( cFwhPath ) + ".a " + CRLF )
+         fWrite( s_nLinkHandle, "PROJECT = " + IIF( lInstallLibrary, "$(BHC)/lib/", "" ) + Alltrim( cFwhPath ) + ".a " + CRLF )
       ELSE
          fWrite( s_nLinkHandle, "PROJECT = " + IIF( lInstallLibrary, "$(BHC)\lib\", "" ) + Alltrim( Lower( cFwhPath ) ) + ".a " + CRLF )
       ENDIF

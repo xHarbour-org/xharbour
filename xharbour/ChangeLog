@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3343 2004/08/26 08:00:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3344 2004/08/26 08:20:09 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-26 08:51 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
+  * utils/hbmake/hbmake.prg
+    ! fix to createlibmakefile (to allow create of makefile when 
+       Recurse directory is used)
+       
 2004-08-26 01:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c
     * added error handling to adsSysName to trap errors in calls to
