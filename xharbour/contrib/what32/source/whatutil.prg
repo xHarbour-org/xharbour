@@ -776,7 +776,7 @@ return hFont
 
 //-----------------------------------------------------------------------------
 
-FUNCTION GetMessageFont() // retrieves the current font used in MessageBox
+FUNCTION GetMessageFont( nWeight ) // retrieves the current font used in MessageBox
 
    LOCAL cBuff, n
    LOCAL ncm IS NONCLIENTMETRICS
@@ -786,6 +786,10 @@ FUNCTION GetMessageFont() // retrieves the current font used in MessageBox
 
    SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:sizeof(), @cBuff, 0 )
    ncm:Buffer( cBuff )
+
+   IF nWeight != NIL
+      ncm:lfMessageFont:lfWeight := nWeight
+   ENDIF
    
 RETURN CreateFontIndirect( ncm:lfMessageFont:value )
 
