@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.167 2002/04/24 04:04:23 walito Exp $
+ * $Id: ChangeLog,v 1.168 2002/04/24 04:08:52 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-24 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   - source/rdd/dblist.new
+     - Removed unneeded file.
+
+   * bin/!pack_bin.bat
+     * Corrected typo.
+
+   + bin/!pack_src.bat
+     + Added batch file to create source archive.
 
 2002-04-24 00:42 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/workarea.c

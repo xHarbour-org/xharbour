@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_bin.bat,v 1.5 2002/02/01 01:05:58 ronpinkas Exp $
+rem $Id: !pack_bin.bat,v 1.6 2002/03/31 17:39:12 ronpinkas Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
@@ -65,7 +65,7 @@ if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_compiler%"     == "icc"     %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
 if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% lib/*.lib
 
-set hb_filename=harbour-%hb_ver%.log.%hb_architecture%.%hb_compiler%%hb_ext%
+set hb_filename=xharbour-%hb_ver%.log.%hb_architecture%.%hb_compiler%%hb_ext%
 
 if exist %hb_filename% del %hb_filename%
 
