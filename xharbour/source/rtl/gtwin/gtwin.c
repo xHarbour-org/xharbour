@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.62 2004/08/27 06:00:23 paultucker Exp $
+ * $Id: gtwin.c,v 1.63 2004/08/30 11:50:02 paultucker Exp $
  */
 
 /*
@@ -998,7 +998,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
         BYTE * fpBlank = ( BYTE * ) hb_xgrab( iLength );
         BYTE * fpBuff = ( BYTE * ) hb_xgrab( iLength * 2 );
 
-        memset( fpBlank, ' ', iLength );
+        memset( fpBlank, 0xFF, iLength );
 
         iColOld = iColNew = usLeft;
         iColSize = iLength -1;
@@ -1480,7 +1480,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                       /*
                          on Keydown, it better be the alt or a numpad key,
                          or bail
-                      */ 
+                      */
                       switch(sc)
                       {
                          case 0x38:
@@ -1701,8 +1701,8 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              }
           }
        }
-       else if( b_MouseEnable && 
-                eventmask & ~( INKEY_KEYBOARD | INKEY_RAW ) && 
+       else if( b_MouseEnable &&
+                eventmask & ~( INKEY_KEYBOARD | INKEY_RAW ) &&
                 s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
        {
 
