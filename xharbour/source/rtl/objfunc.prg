@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.6 2002/10/06 01:23:06 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.7 2002/10/06 02:19:41 ronpinkas Exp $
  */
 
 /*
@@ -245,7 +245,7 @@ FUNCTION __objModMethod( oObject, cSymbol, nFuncPtr )
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISNUMBER( nFuncPtr )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF __objHasMethod( oObject, cSymbol )
-      __clsModMsg( oObject:ClassH, cSymbol, nFuncPtr )
+      __clsModMsg( oObject, cSymbol, nFuncPtr )
    ENDIF
 
 RETURN oObject
@@ -255,7 +255,7 @@ FUNCTION __objModInline( oObject, cSymbol, bInline )
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISBLOCK( bInline )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF __objHasMethod( oObject, cSymbol )
-      __clsModMsg( oObject:ClassH, cSymbol, bInline )
+      __clsModMsg( oObject, cSymbol, bInline )
    ENDIF
 
 RETURN oObject
@@ -281,9 +281,9 @@ FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
    ENDIF
 
    IF __objHasMsg( oObject, cMsg )
-      __ClsModMsg( oObject:ClassH, cMsg, FuncOrBlock )
+      __ClsModMsg( oObject, cMsg, FuncOrBlock )
    ELSE
-      __ClsAddMsg( oObject:ClassH, cMsg, FuncOrBlock, IIF( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
+      __ClsAddMsg( oObject, cMsg, FuncOrBlock, IIF( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
    ENDIF
 
 RETURN oObject

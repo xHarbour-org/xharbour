@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.25 2002/10/06 21:24:04 ronpinkas Exp $
+ * $Id: classes.c,v 1.26 2002/10/06 21:41:09 ronpinkas Exp $
  */
 
 /*
@@ -993,7 +993,7 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 /* ================================================ */
 
 /*
- * __clsAddMsg( <hClass>, <cMessage>, <pFunction>, <nType>, [xInit], <uiScope>, <lPersistent> )
+ * __clsAddMsg( <hClass/pObject>, <cMessage>, <pFunction>, <nType>, [xInit], <uiScope>, <lPersistent> )
  *
  * Add a message to the class.
  *
@@ -1027,8 +1027,19 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 HB_FUNC( __CLSADDMSG )
 {
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM pObject;
    USHORT uiScope = ( USHORT ) ( ISNUM( 6 ) ? hb_parni( 6 ) : HB_OO_CLSTP_EXPORTED );
    BOOL   bPersistent = hb_parl( 7 );
+
+   if( uiClass == 0 )
+   {
+      pObject = hb_param( 1, HB_IT_ARRAY );
+
+      if( pObject )
+      {
+         uiClass = pObject->item.asArray.value->uiClass;
+      }
+   }
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1740,8 +1751,18 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
  */
 HB_FUNC( __CLSMODMSG )
 {
-   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   USHORT uiClass;
+
+   if( pObject )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      uiClass = 0;
+   }
 
    if( uiClass && uiClass <= s_uiClasses && pString )
    {
@@ -1821,7 +1842,7 @@ HB_FUNC( __CLSMODMSG )
 HB_FUNC( __CLSMSGASSIGNED )
 {
 
-   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    USHORT uiClass;
 
