@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.17 2003/12/30 11:52:45 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.18 2003/12/31 13:37:50 lf_sfnet Exp $
  */
 
 /*
@@ -59,9 +59,6 @@
          the debugger output may interfere with the applications output
          redirection, and is also slower. [vszakats] */
 
-/* Information structure hold by DATA aCallStack
-   aCallStack = { { cFunctionName, aLocalVariables, nStartLine , cPrgName }, ... } */
-
 //#pragma -es0
 
 #include "hbclass.ch"
@@ -70,7 +67,25 @@
 #include "inkey.ch"
 #include "common.ch"
 #include "setcurs.ch"
+#include "hbdebug.ch"   // for "nMode" of __dbgEntry
 
+
+/* Information structure hold by DATA aCallStack
+   aCallStack = { { cFunctionName, aLocalVariables, nStartLine , cPrgName }, ... } */
+#define CSTACK_FUNCTION    1  //function name
+#define CSTACK_LOCALS      2  //an array with local variables
+#define CSTACK_LINE        3  //start line
+#define CSTACK_MODULE      4  //module name (.PRG file)
+#define CSTACK_STATICS     5  //an array with static variables
+
+/* Information structure hold by aCallStack[n][ CSTACK_LOCALS ]
+   { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } */
+#define VAR_NAME        1
+#define VAR_POS         2
+#define VAR_TYPE        3
+#define VAR_FUNCNAME    4
+
+   
 static s_oDebugger
 static s_lExit := .F.
 Static nDump
@@ -82,124 +97,125 @@ procedure __dbgAltDEntry()
    if !s_oDebugger==nil		// protects if altd() in code and debugger
                                 // linked but not active
       s_oDebugger:lGo := .F.
-      __dbgEntry( ProcLine( 2 ) )
+      __dbgEntry( HB_DBG_SHOWLINE, ProcLine( 2 ) )
    endif
 return
 
-procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
+procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry point
 
    local cModuleName, cProcName, cProcPrec
    local nStaticsBase, nStaticIndex, cStaticName
    local cLocalName, nLocalIndex
+   local nVarIndex, cVarName
    local nAt
 
+   IF s_lExit
+     RETURN
+   ENDIF
+
+   IF s_oDebugger == NIL
+     s_oDebugger := TDebugger():New()
+     public __DbgStatics
+     __DbgStatics := {}
+   ENDIF
+
    do case
-      case ValType( uParam1 ) == "C"   // called from hvm.c hb_vmModuleName()
-           cModuleName := uParam1
-           if ! s_lExit
-              if s_oDebugger == nil
-                 s_oDebugger := TDebugger():New()
-                 s_oDebugger:Activate( cModuleName )
-              else
-                 // add a call to the stack but don't try to show the code yet
-                 s_oDebugger:StackProc( cModuleName )
-                 s_oDebugger:LoadVars()
-              endif
-           endif
+      case nMode == HB_DBG_SHOWLINE
+        // set the current line number on the CallStack
+        if s_oDebugger:lTrace
+          //In TRACE mode (step over procedure)
+          IF( s_oDebugger:nTraceLevel < Len( s_oDebugger:aCallStack ) )
+            s_oDebugger:lTrace := (! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
+                                 .AND. !InvokeDebug())
+            IF s_oDebugger:lTrace
+              RETURN
+            ENDIF
+          ELSE
+            //Return back into a current procedure
+            s_oDebugger:lTrace := .f.
+          ENDIF
+        endif
+        
+        if s_oDebugger:lGo
+          s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] )
+        endif
+        
+        s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1  
+        if !s_oDebugger:lGo .or. InvokeDebug()
+          s_oDebugger:lGo := .F.
+          s_oDebugger:Activate()
+        endif
+        
+      case nMode == HB_DBG_MODULENAME  // called from hvm.c hb_vmModuleName()
+        // add a call to the stack but don't try to show the code yet
+        cProcName := ProcName( 1 )
+        if cProcName == "__EVAL" .OR. cProcName == "EVAL"
+          s_oDebugger:lCodeblock := .T.
+        endif
+        s_oDebugger:StackProc( uParam1 )
+        s_oDebugger:LoadVars()
+        
+      case nMode == HB_DBG_LOCALNAME
+        cProcName := ProcName( 1 )
+        nVarIndex := uParam1
+        cVarName  := IIF(valtype(uParam2)=='C',uParam2,'NIL')
+        /*
+        if s_oDebugger:lShowLocals
+          if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
+            { | aVar | aVar[ 1 ] == cVarName } ) ) != 0
+            s_oDebugger:aVars[ nAt ] := { cVarName, nVarIndex, "Local", cProcName }
+          else
+            AAdd( s_oDebugger:aVars, { cVarName, nVarIndex, "Local", cProcName } )
+          endif
+        endif
+        */      
+        IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, CSTACK_LOCALS ])=='A'
+          AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ], { cVarName, nVarIndex, "Local", cProcName } )
+        endif
+        //      if s_oDebugger:oBrwVars != nil
+        //         s_oDebugger:oBrwVars:RefreshAll()
+        //      endif
 
-      case ValType( uParam1 ) == "N"   // called from hvm.c both hb_vmDebuggerShowLines()
-           public __DbgStatics         // hb_vmStaticName() and hb_vmLocalName()
-           if Type( "__DbgStatics" ) == "L"
-              __DbgStatics := {}
-           endif
-
-           cProcName := ProcName( 1 )
-           cProcPrec := ProcName( 2 )
-
-           if cProcName == "(_INITSTATICS)"
-              nStaticsBase := uParam1
-              cStaticName  := uParam2
-              if AScan( __DbgStatics, { | a | a[ 1 ] == nStaticsBase } ) == 0
-                 AAdd( __DbgStatics, { nStaticsBase, { cStaticName } } )
-              else
-                 AAdd( ATail( __DbgStatics )[ 2 ], cStaticName )
-              endif
-              return  // We can not use s_oDebugger yet, so we return
-           endif
-
-           if s_oDebugger != nil
-              if PCount() == 3 // called from hvm.c hb_vmLocalName() and hb_vmStaticName()
-
-                 if !empty( cProcName ) .AND. ( "(b)" $ cProcName ) .AND. ascan( s_oDebugger:aCallStack, { | aProc | aProc[1] == cProcName } ) == 0
-                    ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
-                    AIns( s_oDebugger:aCallStack, 1 )
-                    // nil means no line number stored yet
-                    s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil, nil }
-                 endif
-
-                 if uParam3 == 1 // in-function static variable
-                    cStaticName  := uParam2
-                    nStaticIndex := uParam1
-                    if s_oDebugger:lShowStatics
-                       if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
-                            { | aVar | aVar[ 1 ] == cStaticName } ) ) != 0
-                          s_oDebugger:aVars[ nAt ] := { cStaticName, nStaticIndex, "Static" }
-                       else
-                          AAdd( s_oDebugger:aVars, { cStaticName, nStaticIndex, "Static" } )
-                       endif
-                    endif
-                 else            // local variable
-                    cLocalName  := IIF(valtype(uParam2)=='C',uParam2,'NIL')
-                    nLocalIndex := uParam1
-                    if s_oDebugger:lShowLocals
-                       if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
-                            { | aVar | aVar[ 1 ] == cLocalName } ) ) != 0
-                          s_oDebugger:aVars[ nAt ] := { cLocalName, nLocalIndex, "Local", cProcName }
-                       else
-                          AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", cProcName } )
-                       endif
-                    endif
-                    if Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, 2 ])=='A'
-                      AAdd( s_oDebugger:aCallStack[ 1 ][ 2 ], { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
-                    endif
-                 endif
-                 if s_oDebugger:oBrwVars != nil
-                    s_oDebugger:oBrwVars:RefreshAll()
-                 endif
-                 return
-              endif
-
-              if s_oDebugger:lTrace
-                 if s_oDebugger:nTraceLevel < Len( s_oDebugger:aCallStack )
-                    return
-                 else
-                    s_oDebugger:lTrace := .f.
-                 endif
-              endif
-
-              if Len( s_oDebugger:aCallStack ) > 0 
-                 s_oDebugger:aCallStack [1] [3] := uParam1  // set the current line number on the CallStack
-                 if s_oDebugger:lGo
-                    s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack [1] [4] )
-                 endif
-                 if !s_oDebugger:lGo .or. InvokeDebug()
-                    s_oDebugger:lGo := .F.
-                    s_oDebugger:SaveAppStatus()
-                    // new function ShowCodeLine( nline, cFilename)
-                    s_oDebugger:ShowCodeLine( uParam1, s_oDebugger:aCallStack [1] [4])
-                    s_oDebugger:HandleEvent()
-                 endif
-              endif
-           endif
-
-      otherwise   // called from hvm.c hb_vmDebuggerEndProc()
-         if Empty( ProcName( 1 ) ) // ending (_INITSTATICS)
-            return
-         endif
-         if s_oDebugger != nil
-            s_oDebugger:EndProc()
-            s_oDebugger:LoadVars()
-         endif
+      case nMode == HB_DBG_STATICNAME
+        nVarIndex := uParam1
+        cVarName  := uParam2
+        cProcName := ProcName( 1 )
+        if cProcName == "(_INITSTATICS)"
+          if AScan( __DbgStatics, { | a | a[ 1 ] == nVarIndex } ) == 0
+            AAdd( __DbgStatics, { nVarIndex, { cVarName } } )
+          else
+            AAdd( ATail( __DbgStatics )[ 2 ], cVarName )
+          endif
+          return  // We can not use s_oDebugger yet, so we return
+        endif
+        
+        IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1, CSTACK_STATICS ])=='A'
+          AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_STATICS ], { cVarName, nVarIndex, "Static" } )
+        endif
+        /*
+        if s_oDebugger:lShowStatics
+          if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
+            { | aVar | aVar[ 1 ] == cVarName } ) ) != 0
+            s_oDebugger:aVars[ nAt ] := { cVarName, nVarIndex, "Static" }
+          else
+            AAdd( s_oDebugger:aVars, { cVarName, nVarIndex, "Static" } )
+          endif
+          if s_oDebugger:oBrwVars != nil
+            s_oDebugger:oBrwVars:RefreshAll()
+          endif
+        endif
+        */
+        
+      case nMode == HB_DBG_ENDPROC   // called from hvm.c hb_vmDebuggerEndProc()
+        if Empty( ProcName( 1 ) ) // ending (_INITSTATICS)
+          return
+        endif
+        if s_oDebugger:lCodeblock
+          s_oDebugger:lCodeblock := .F.
+        endif
+        s_oDebugger:EndProc()
+        s_oDebugger:LoadVars()
+         
    endcase
 
 return
@@ -213,17 +229,21 @@ CLASS TDebugger
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   aBreakPoints, aCallStack, aColors
+   DATA   aWatchPoints, aTracePoints
    DATA   aLastCommands, nCommand, oGetListCommand
-   DATA   lAnimate, lEnd, lGo, lTrace, lCaseSensitive, lMonoDisplay, lSortVars
+   DATA   lAnimate, lEnd, lCaseSensitive, lMonoDisplay, lSortVars
    DATA   cSearchString, cPathForFiles, cSettingsFileName, aPathDirs
    DATA   nTabWidth, nSpeed
    DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lAll
    DATA   lShowCallStack
-   DATA   nTraceLevel
+   DATA   lGo           //stores if GO was requested
+   DATA   lTrace        //stores if TRACE over procedure was requested
+   DATA   nTraceLevel   //procedure level where TRACE was requested
    DATA   lCodeblock INIT .F.
-
+   DATA   lActive INIT .F.
+   
    METHOD New()
-   METHOD Activate( cModuleName )
+   METHOD Activate()
 
    METHOD All()
 
@@ -330,6 +350,8 @@ METHOD New() CLASS TDebugger
    ::lEnd              := .f.
    ::lTrace            := .f.
    ::aBreakPoints      := {}
+   ::aWatchPoints      := {}
+   ::aTracePoints      := {}
    ::aCallStack        := {}
    ::lGo               := .t.
    ::aVars             := {}
@@ -384,16 +406,22 @@ METHOD PathForFiles() CLASS TDebugger
 
 return Self
 
-METHOD Activate( cModuleName ) CLASS TDebugger
+METHOD Activate() CLASS TDebugger
 
-   ::Show()
-   ::StackProc(cModuleName)
-   ::ShowCodeLine( 1, cModuleName )
-   if ::lShowCallStack
+  ::SaveAppStatus()
+  ::loadVars()
+  IF ! ::lActive
+    ::lActive := .T.
+    ::Show()
+    if ::lShowCallStack
       ::ShowCallStack()
-   endif
-   ::ShowVars()
-   ::RestoreAppStatus()
+    endif
+    ::ShowVars()
+    //::RestoreAppStatus()
+  ENDIF
+  // new function ShowCodeLine( nline, cFilename)
+  ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] )
+  ::HandleEvent()
 
 return nil
 
@@ -478,7 +506,7 @@ METHOD BuildBrowseStack() CLASS TDebugger
       ::oBrwStack:Cargo := 1 // Actual highligthed row
 
       ::oBrwStack:AddColumn( TBColumnNew( "", { || If( Len( ::aCallStack ) > 0,;
-            PadC( ::aCallStack[ ::oBrwStack:Cargo ][ 1 ], 14 ), Space( 14 ) ) } ) )
+            PadC( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_FUNCTION ], 14 ), Space( 14 ) ) } ) )
    endif
 
 return nil
@@ -546,8 +574,8 @@ METHOD CallStackProcessKey( nKey ) CLASS TDebugger
 
    if lUpdate
       // jump to source line for a function
-      if ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] != nil
-         ::ShowCodeLine( ::aCallStack[ ::oBrwStack:Cargo ][ 3 ], ::aCallStack[ ::oBrwStack:Cargo ][ 4 ] )
+      if ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
+         ::ShowCodeLine( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ], ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ] )
       else
          ::GotoLine( 1 )
       endif
@@ -1189,6 +1217,8 @@ METHOD ShowCallStack() CLASS TDebugger
       if ::oWndVars != nil
          ::oWndVars:Hide()
          ::oWndVars:nRight -= 16
+         ::oBrwVars:nRight -= 16
+         ::oBrwVars:configure()
          ::oWndVars:Show( .f. )
       endif
       DispEnd()
@@ -1312,12 +1342,15 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
                AAdd( ::aVars, { cStaticName, nStaticIndex, "Static" } )
             next
          next
-      endif
+         for n := 1 to Len( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ] )
+           AAdd( ::aVars, ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ][ n ] )
+         next
+       endif
    endif
 
    if ::lShowLocals
-      for n := 1 to Len( ::aCallStack[ ::oBrwStack:Cargo ][ 2 ] )
-         AAdd( ::aVars, ::aCallStack[ ::oBrwStack:Cargo ][ 2 ][ n ] )
+      for n := 1 to Len( ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LOCALS ] )
+         AAdd( ::aVars, ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LOCALS ][ n ] )
       next
    endif
 
@@ -1384,9 +1417,13 @@ METHOD ShowVars() CLASS TDebugger
                                If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
 
       nWidth := ::oWndVars:nWidth() - 1
-      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
-         ::oWndVars:nWidth() - 5 ), "" ) } ) )
+      oCol := TBColumnNew( "", ;
+        { || PadR( If( Len( ::aVars ) > 0, ;
+          AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+          GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ), ;
+          " " ), ;
+          ::oWndVars:nWidth() - 2 ) } )
+      ::oBrwVars:AddColumn( oCol )
       AAdd(::oBrwVars:Cargo[2],::avars)
       oCol:DefColor:={1,2}
       if Len( ::aVars ) > 0
@@ -1482,15 +1519,18 @@ return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
 
 METHOD StackProc(cModuleName) CLASS TDebugger
    // always treat filename as lower case - we need it consistent for comparisons   
-   local cFunction := SubStr( cModuleName, RAt( ":", cModuleName ) + 1 )
-   local cPrgName  := lower(SubStr( cModuleName, 1, RAt( ":", cModuleName ) - 1 ))
+   LOCAL nPos:=RAT( ":", cModuleName )
 
    ASize( ::aCallStack, Len( ::aCallStack ) + 1 )
    AIns( ::aCallStack, 1 )
-   
+
    // nil means that no line number is stored yet
-   ::aCallStack[1]:= { cFunction, {} , nil, cPrgName }   // function name and locals array
-                                                         // and the function and program name
+   ::aCallStack[1]:= { ;
+     IIF(::lCodeBlock,"(b)","")+SubStr( cModuleName, nPos + 1 ),;    //function name
+     {},;   //local vars
+     nil,;  //line no
+     lower(LEFT( cModuleName, nPos - 1 )),; // and the module name
+     {} }  // static vars
 
 return nil
 
@@ -1737,8 +1777,8 @@ METHOD GotoLine( nLine ) CLASS TDebugger
 
    // no source code line stored yet
    if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
-      ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] == nil
-      ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] = nLine
+      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] == nil
+      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] = nLine
    endif
 
    if ::oWndStack != nil .and. ! ::oBrwStack:Stable
@@ -2266,17 +2306,17 @@ return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
        Len(oBrwSets:cargo[ 2 ][ 1 ]) - oBrwSets:cargo[ 1 ], nPos ) )
       
 static function DoCommand( o,cCommand )
-   local bLastHandler, cResult, nLocals := len( o:aCallStack[1][2] )
+   local bLastHandler, cResult, nLocals := len( o:aCallStack[1][CSTACK_LOCALS] )
    local nProcLevel := 1, oE, i, vtmp
 
    if nLocals > 0
-      while ProcName( nProcLevel ) != o:aCallStack[1][2][1][4]
+      while ProcName( nProcLevel ) != o:aCallStack[1][CSTACK_LOCALS][1][VAR_FUNCNAME]
          nProcLevel++
       enddo
       for i := 1 to nLocals
-         __mvPrivate( o:aCallStack[1][2][i][1] )
-         __mvPut( o:aCallStack[1][2][i][1], ;
-              __vmVarLGet( nProcLevel, o:aCallStack[1][2][i][2] ) )
+         __mvPrivate( o:aCallStack[1][CSTACK_LOCALS][i][VAR_NAME] )
+         __mvPut( o:aCallStack[1][CSTACK_LOCALS][i][VAR_NAME], ;
+              __vmVarLGet( nProcLevel, o:aCallStack[1][CSTACK_LOCALS][i][VAR_POS] ) )
       next
    endif
 
@@ -2312,9 +2352,9 @@ static function DoCommand( o,cCommand )
    ErrorBlock(bLastHandler)
 
    for i := 1 to nLocals
-      vtmp := __mvGet( o:aCallStack[1][2][i][1] )
+      vtmp := __mvGet( o:aCallStack[1][CSTACK_LOCALS][i][VAR_NAME] )
       if !(Valtype( vtmp ) $ "AO")
-         __vmVarLSet( nProcLevel, o:aCallStack[1][2][i][2], vtmp )
+         __vmVarLSet( nProcLevel, o:aCallStack[1][CSTACK_LOCALS][i][VAR_POS], vtmp )
       endif
    next
 

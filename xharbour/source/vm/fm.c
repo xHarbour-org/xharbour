@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.51 2003/12/23 00:49:09 druzus Exp $
+ * $Id: fm.c,v 1.52 2004/01/27 03:07:00 ronpinkas Exp $
  */
 
 /*
@@ -808,7 +808,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       sprintf( buffer, "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( buffer, "Highest total allocated %li, bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
+      sprintf( buffer, "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
       hb_conOutErr( buffer, 0 );
 
       if( s_lMemoryBlocks )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.308 2004/01/21 23:08:46 walito Exp $
+ * $Id: hvm.c,v 1.309 2004/01/27 03:07:00 ronpinkas Exp $
  */
 
 /*
@@ -98,6 +98,7 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
+#include "hbdebug.ch"
 
 #include "hbi18n.h"
 #include "hashapi.h"
@@ -842,7 +843,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       ULONG ulLastOpcode = 0; /* opcodes profiler support */
       ULONG ulPastClock = 0;  /* opcodes profiler support */
    #endif
-
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
    //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
@@ -5912,9 +5913,9 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPushNil();
+   hb_vmPushLongConst( HB_DBG_LOCALNAME );
    hb_vmPushLongConst( uiLocal );
    hb_vmPushString( szLocalName, strlen( szLocalName ) );
-   hb_vmPushLongConst( 2 ); /* 1 for statics, 2 for locals */
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 3 );
    s_bDebuggerIsWorking = FALSE;
@@ -5933,7 +5934,7 @@ static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticNam
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPushNil();
-
+   hb_vmPushLongConst( HB_DBG_STATICNAME );
    if( bIsGlobal )
    {
       hb_vmPushLongConst( hb_arrayLen( &s_aStatics ) - s_uiStatics );
@@ -5943,7 +5944,6 @@ static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticNam
       hb_vmPushLongConst( HB_VM_STACK.iStatics + uiStatic );
    }
    hb_vmPushString( szStaticName, strlen( szStaticName ) );
-   hb_vmPushLongConst( 1 ); /* 1 for statics, 2 for locals */
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 3 );
    s_bDebuggerIsWorking = FALSE;
@@ -5960,9 +5960,10 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPushNil();
+   hb_vmPushLongConst( HB_DBG_MODULENAME );
    hb_vmPushString( szModuleName, strlen( szModuleName ) );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 1 );
+   hb_vmDo( 2 );
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -6085,8 +6086,9 @@ static void hb_vmDebuggerEndProc( void )
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPushNil();
+   hb_vmPushLongConst( HB_DBG_ENDPROC );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 0 );
+   hb_vmDo( 1 );
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 
@@ -6102,9 +6104,10 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
    hb_dynsymUnlock();
    hb_vmPushNil();
+   hb_vmPushLongConst( HB_DBG_SHOWLINE );
    hb_vmPushInteger( uiLine );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 1 );
+   hb_vmDo( 2 );
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }

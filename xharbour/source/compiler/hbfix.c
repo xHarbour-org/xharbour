@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.21 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.22 2003/06/29 04:42:33 andijahja Exp $
  */
 
 /*
@@ -257,7 +257,7 @@ static HB_FIX_FUNC( hb_p_staticname )
    ULONG ulStart = lPCodePos;
 
    HB_SYMBOL_UNUSED( cargo );
-   lPCodePos += 3;
+   lPCodePos += 4;
    while( pFunc->pCode[ lPCodePos ] )
       ++lPCodePos;
 

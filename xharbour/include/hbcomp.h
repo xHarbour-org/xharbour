@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.21 2003/10/06 21:31:34 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.22 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -397,6 +397,7 @@ extern int hb_compFieldsCount( void );
 /* Static variables */
 extern void hb_compStaticDefStart( void );
 extern void hb_compStaticDefEnd( void );
+extern void hb_compGenStaticName( char * );
 
 /* Global variables */
 extern void hb_compGlobalsDefStart( void );

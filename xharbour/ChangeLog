@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2154 2004/01/27 04:08:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2155 2004/01/27 04:25:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-27 13:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  + include/hbdebug.ch
+  * include/hbcomp.h
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/debug/debugger.prg
+  * source/macro/macrob.c
+  * source/vm/hvm.c
+    * Merged in a part of recent updates to Harbour by Ryszard Glab:
+      * generate correct pcode with static variable name when debug info
+        is requested (previously did not work with -gc0).
+      * the pcode of a codeblock contains the module name (in debug mode).
+      * changed the parameters of __dbgEntry() to make it more flexible.
+      * fixed monitoring of local and static variables in debugger
+      * when a codeblock is evaluated debugger shows the code where the
+        codeblock was created
+  * source/vm/fm.c:
+    * Fixed a typo.
+      
 2004-01-26 20:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * hrbdll.vc
     - Commented out uc437.c ( hb_uniTbl_437 already defined in cdpapi.c )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.69 2003/10/26 03:34:10 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.70 2003/11/09 21:32:34 ronpinkas Exp $
  */
 
 /*
@@ -414,6 +414,8 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
                         pVar =pVar->pNext;
                }
             }
+            
+            HB_EXPR_PCODE0( hb_compLinePushIfDebugger );
 #endif
             pExpr = pSelf->value.asList.pExprList;
             pPrev = &pSelf->value.asList.pExprList;
