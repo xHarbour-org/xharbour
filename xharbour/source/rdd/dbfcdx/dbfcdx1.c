@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.181 2005/02/04 01:11:55 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.182 2005/02/06 20:35:38 druzus Exp $
  */
 
 /*
@@ -3453,6 +3453,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
         HB_GET_LE_UINT16( pHeader.keySize ) > CDX_MAXKEY )
    {
       /* TODO: pTag->RootBlock = 0; || {internal,RT}Error ? */
+      pTag->RootBlock = 0;
       return;
    }
    pTag->uiLen     = HB_GET_LE_UINT16( pHeader.keySize );
@@ -3534,38 +3535,6 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
 }
 
 /*
- * Creates a new structure with a tag information
- * TagHdr = offset of index page where a tag header is stored
- *            if CDX_DUMMYNODE then allocate space ofor a new tag header
- */
-static LPCDXTAG hb_cdxTagNew( LPCDXINDEX pIndex, char *szTagName, ULONG TagHdr )
-{
-   LPCDXTAG pTag;
-
-   pTag = ( LPCDXTAG ) hb_xgrab( sizeof( CDXTAG ) );
-   memset( pTag, 0, sizeof( CDXTAG ) );
-   pTag->szName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
-   hb_strncpyUpperTrim( pTag->szName, szTagName, CDX_MAXTAGNAMELEN );
-   pTag->pIndex = pIndex;
-   pTag->AscendKey = pTag->UsrAscend = TRUE;
-   pTag->UsrUnique = FALSE;
-   pTag->uiType = 'C';
-   pTag->CurKey = hb_cdxKeyNew();
-   if ( TagHdr == CDX_DUMMYNODE )
-   {
-      pTag->TagBlock = hb_cdxIndexGetAvailPage( pIndex, TRUE );
-      pTag->TagChanged = TRUE;
-      pTag->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND;
-   }
-   else
-   {
-      pTag->TagBlock = TagHdr;
-      hb_cdxTagLoad( pTag );
-   }
-   return pTag;
-}
-
-/*
  * release structure with a tag information from memory
  */
 static void hb_cdxTagFree( LPCDXTAG pTag )
@@ -3603,6 +3572,46 @@ static void hb_cdxTagFree( LPCDXTAG pTag )
    hb_cdxTagClearScope( pTag, 0);
    hb_cdxTagClearScope( pTag, 1);
    hb_xfree( pTag );
+}
+
+/*
+ * Creates a new structure with a tag information
+ * TagHdr = offset of index page where a tag header is stored
+ *            if CDX_DUMMYNODE then allocate space ofor a new tag header
+ */
+static LPCDXTAG hb_cdxTagNew( LPCDXINDEX pIndex, char *szTagName, ULONG TagHdr )
+{
+   LPCDXTAG pTag;
+
+   pTag = ( LPCDXTAG ) hb_xgrab( sizeof( CDXTAG ) );
+   memset( pTag, 0, sizeof( CDXTAG ) );
+   pTag->szName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
+   hb_strncpyUpperTrim( pTag->szName, szTagName, CDX_MAXTAGNAMELEN );
+   pTag->pIndex = pIndex;
+   pTag->AscendKey = pTag->UsrAscend = TRUE;
+   pTag->UsrUnique = FALSE;
+   pTag->uiType = 'C';
+   pTag->CurKey = hb_cdxKeyNew();
+   if ( TagHdr == CDX_DUMMYNODE )
+   {
+      pTag->TagBlock = hb_cdxIndexGetAvailPage( pIndex, TRUE );
+      pTag->TagChanged = TRUE;
+      pTag->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND;
+   }
+   else
+   {
+      pTag->TagBlock = TagHdr;
+      hb_cdxTagLoad( pTag );
+      if ( pTag->RootBlock == 0 )
+      {
+         /* index file is corrupted */
+         hb_cdxTagFree( pTag );
+         pTag = NULL;
+         hb_cdxErrorRT( pIndex->pArea, EG_CORRUPTION, EDBF_CORRUPT,
+                        pIndex->szFileName, hb_fsError(), EF_CANDEFAULT );
+      }
+   }
+   return pTag;
 }
 
 /*
@@ -4421,12 +4430,20 @@ static void hb_cdxReorderTagList( LPCDXTAG * TagListPtr )
 /*
  * create new order header, store it and then make an order
  */
-static void hb_cdxTagIndexTagNew( LPCDXTAG pTag,
-                                  char * KeyExp, PHB_ITEM pKeyItem,
-                                  BYTE bType, USHORT uiLen,
-                                  char * ForExp, PHB_ITEM pForItem,
-                                  BOOL fAscnd, BOOL fUniq, BOOL fCustom )
+static LPCDXTAG hb_cdxIndexCreateTag( BOOL fStruct, LPCDXINDEX pIndex,
+                                      char * szTagName,
+                                      char * KeyExp, PHB_ITEM pKeyItem,
+                                      BYTE bType, USHORT uiLen,
+                                      char * ForExp, PHB_ITEM pForItem,
+                                      BOOL fAscnd, BOOL fUniq, BOOL fCustom )
 {
+   LPCDXTAG pTag;
+
+   pTag = hb_cdxTagNew( pIndex, szTagName, CDX_DUMMYNODE );
+
+   if ( fStruct )
+      pTag->OptFlags |= CDX_TYPE_STRUCTURE;
+
    if ( bType == 'C' )
       hb_cdxMakeSortTab( pTag->pIndex->pArea );
    if ( KeyExp != NULL )
@@ -4451,6 +4468,18 @@ static void hb_cdxTagIndexTagNew( LPCDXTAG pTag,
    pTag->MaxKeys = CDX_INT_FREESPACE / ( uiLen + 8 );
    pTag->TagChanged = TRUE;
    hb_cdxTagDoIndex( pTag );
+
+   return pTag;
+}
+
+/*
+ * create structural (compound) tag
+ */
+static void hb_cdxIndexCreateStruct( LPCDXINDEX pIndex, char * szTagName )
+{
+   pIndex->pCompound = hb_cdxIndexCreateTag( TRUE, pIndex, szTagName,
+                           NULL, NULL, 'C', CDX_MAXTAGNAMELEN, NULL, NULL,
+                           TRUE, FALSE, FALSE );
 }
 
 /*
@@ -4531,10 +4560,9 @@ static LPCDXTAG hb_cdxIndexAddTag( LPCDXINDEX pIndex, char * szTagName,
    hb_cdxIndexDelTag( pIndex, szTagName );
 
    /* Create new tag an add to tag list */
-   pTag = hb_cdxTagNew( pIndex, szTagName, CDX_DUMMYNODE );
-   hb_cdxTagIndexTagNew( pTag, szKeyExp, pKeyItem, bType, uiLen,
-                         szForExp, pForItem,
-                         fAscend, fUnique, fCustom );
+   pTag = hb_cdxIndexCreateTag( FALSE, pIndex, szTagName, szKeyExp, pKeyItem,
+                                bType, uiLen, szForExp, pForItem,
+                                fAscend, fUnique, fCustom );
    pTagPtr = &pIndex->TagList;
    while ( *pTagPtr )
       pTagPtr = &(*pTagPtr)->pNext;
@@ -4570,10 +4598,7 @@ static void hb_cdxIndexReindex( LPCDXINDEX pIndex )
    /* Rebuild the compound (master) tag */
    if ( pCompound )
    {
-      pIndex->pCompound = hb_cdxTagNew( pIndex, pCompound->szName, CDX_DUMMYNODE );
-      pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
-      hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C',
-                            CDX_MAXTAGNAMELEN, NULL, NULL, TRUE, FALSE, FALSE );
+      hb_cdxIndexCreateStruct( pIndex, pCompound->szName );
       hb_cdxTagFree( pCompound );
    }
 
@@ -4607,14 +4632,11 @@ static LPCDXINDEX hb_cdxIndexNew( CDXAREAP pArea )
 }
 
 /*
- * free (close) index and all tags in it
+ * free (close) all tag in index file
  */
-static void hb_cdxIndexFree( LPCDXINDEX pIndex )
+static void hb_cdxIndexFreeTags( LPCDXINDEX pIndex )
 {
    LPCDXTAG pTag;
-
-   /* Free List of Free Pages */
-   hb_cdxIndexDropAvailPage( pIndex );
 
    /* Free Compound tag */
    if ( pIndex->pCompound != NULL )
@@ -4623,13 +4645,25 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
       pIndex->pCompound = NULL;
    }
 
-   /* Free all tags */
    while ( pIndex->TagList )
    {
       pTag = pIndex->TagList;
       pIndex->TagList = pTag->pNext;
       hb_cdxTagFree( pTag );
    }
+}
+
+/*
+ * free (close) index and all tags in it
+ */
+static void hb_cdxIndexFree( LPCDXINDEX pIndex )
+{
+   /* Free List of Free Pages */
+   hb_cdxIndexDropAvailPage( pIndex );
+
+   /* free all tags */
+   hb_cdxIndexFreeTags( pIndex );
+
    /* Close file */
    if ( pIndex->hFile != FS_ERROR )
       hb_fsClose( pIndex->hFile );
@@ -4650,35 +4684,51 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
 /*
  * load orders from index file
  */
-static void hb_cdxIndexLoad( LPCDXINDEX pIndex, char * szBaseName )
+static BOOL hb_cdxIndexLoad( LPCDXINDEX pIndex, char * szBaseName )
 {
    LPCDXTAG TagList, * pTagPtr;
+   BOOL fResult = FALSE;
 
-   /* TODO: check if index file is not corrupted */
+   TagList = NULL;
+   pTagPtr = &TagList;
 
    hb_cdxIndexLockRead( pIndex );
    /* load the tags*/
    pIndex->pCompound = hb_cdxTagNew( pIndex, szBaseName, 0L );
-   pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
-   TagList = NULL;
-   pTagPtr = &TagList;
-   hb_cdxTagGoTop( pIndex->pCompound );
-   while ( !pIndex->pCompound->TagEOF )
+
+   /* check if index is not corrupted */
+   if ( pIndex->pCompound )
    {
-      (*pTagPtr) = hb_cdxTagNew( pIndex, (char *) pIndex->pCompound->CurKey->val,
-                                 pIndex->pCompound->CurKey->rec );
-      pTagPtr = &(*pTagPtr)->pNext;
-      hb_cdxTagSkipNext( pIndex->pCompound );
+      fResult = TRUE;
+      pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
+      hb_cdxTagGoTop( pIndex->pCompound );
+      while ( !pIndex->pCompound->TagEOF )
+      {
+         *pTagPtr = hb_cdxTagNew( pIndex, (char *) pIndex->pCompound->CurKey->val,
+                                  pIndex->pCompound->CurKey->rec );
+         /* tag is corrupted - break tags loading */
+         if ( *pTagPtr == NULL )
+         {
+            fResult = FALSE;
+            break;
+         }
+         pTagPtr = &(*pTagPtr)->pNext;
+         hb_cdxTagSkipNext( pIndex->pCompound );
+      }
    }
+
    hb_cdxIndexUnLockRead( pIndex );
    hb_cdxReorderTagList( &TagList );
    pTagPtr = &pIndex->TagList;
    while ( *pTagPtr != NULL )
       pTagPtr = &(*pTagPtr)->pNext;
    (*pTagPtr) = TagList;
+
 #ifdef HB_CDX_DSPDBG_INFO
    hb_cdxDspTags( pIndex );
 #endif
+
+   return fResult;
 }
 
 /*
@@ -5989,7 +6039,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkip(%p, %ld)", pArea, lToSkip));
 
    pTag = lToSkip == 0 ? NULL : hb_cdxGetActiveTag( pArea );
-   ulPos = ( pTag && CURKEY_LOGPOS( pTag ) ) ? pTag->logKeyPos : 0;
+   ulPos = ( pTag && pArea->fPositioned && CURKEY_LOGPOS( pTag ) ) ? pTag->logKeyPos : 0;
 
    if ( SUPER_SKIP( ( AREAP ) pArea, lToSkip ) == FAILURE )
       return FAILURE;
@@ -6600,8 +6650,11 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
       pIndexTmp->pNext = pIndex;
    }
 
-   /* TODO: check if index file is not corrupted */
-   hb_cdxIndexLoad( pIndex, szBaseName );
+   if ( ! hb_cdxIndexLoad( pIndex, szBaseName ) )
+   {
+      /* index file is corrupted */
+      return FAILURE;
+   }
 
    /* dbfcdx specific: If there was no controlling order, set this one.
     * This is the behaviour of Clipper's dbfcdx, although
@@ -6947,6 +7000,36 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
       } while ( bRetry );
 
+      if ( hFile != FS_ERROR )
+      {
+         pIndex = hb_cdxIndexNew( pArea );
+         pIndex->hFile      = hFile;
+         pIndex->fShared    = pArea->fShared;
+         pIndex->fReadonly  = FALSE;
+         pIndex->szFileName = hb_strdup( szSpFile );
+
+         if ( !fNewFile )
+         {
+            /* TODO: check if index file is not corrupted */
+            /* cut corrupted files */
+            fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
+         }
+         if ( !fNewFile )
+         {
+            /* index file is corrupted? */
+            if ( ! hb_cdxIndexLoad( pIndex, szCpndTagName ) )
+            {
+               /* What should be default? */
+               /*
+               hb_cdxIndexFree( pIndex );
+               hFile = FS_ERROR;
+               */
+               hb_cdxIndexFreeTags( pIndex );
+               fNewFile = TRUE;
+            }
+         }
+      }
+
       if ( hFile == FS_ERROR )
       {
          hb_itemRelease( pKeyExp );
@@ -6959,21 +7042,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return FAILURE;
       }
-
-      pIndex = hb_cdxIndexNew( pArea );
-      pIndex->hFile      = hFile;
-      pIndex->fShared    = pArea->fShared;
-      pIndex->fReadonly  = FALSE;
-      pIndex->szFileName = hb_strdup( szSpFile );
-
-      if ( !fNewFile )
-      {
-         /* TODO: check if index file is not corrupted */
-         /* cut corrupted files */
-         fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
-      }
-      if ( !fNewFile )
-         hb_cdxIndexLoad( pIndex, szCpndTagName );
    }
 
    hb_cdxIndexLockWrite( pIndex );
@@ -6993,10 +7061,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       if ( pIndex->pCompound != NULL )
          hb_cdxTagFree( pIndex->pCompound );
       pIndex->nextAvail = pIndex->freePage = 0;
-      pIndex->pCompound = hb_cdxTagNew( pIndex, szCpndTagName, CDX_DUMMYNODE );
-      pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
-      hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C', 10, NULL, NULL,
-                            TRUE, FALSE, FALSE );
+      hb_cdxIndexCreateStruct( pIndex, szCpndTagName );
    }
 
    /* Update DBF header */
@@ -8591,7 +8656,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       hb_set.HB_SET_DELETED = bSaveDeleted;
       pArea->dbfi.itmCobExpr = pSaveFilter;
       pArea->uiTag = uiSaveTag;
-      pTag->TagChanged = TRUE;
    }
    pTag->pIndex->pArea->ulRecNo = 0;
 #ifndef HB_CDP_SUPPORT_OFF
