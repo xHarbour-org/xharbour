@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.23 2003/08/09 20:45:24 druzus Exp $
+ * $Id: gtcrs.c,v 1.24 2003/08/20 18:06:00 druzus Exp $
  */
 
 /*
@@ -2732,7 +2732,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         }
 
         /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
-	HB_GT_FUNC(gt_DispEnd());
+        HB_GT_FUNC(gt_DispEnd());
         ret = 0;
     }
 
