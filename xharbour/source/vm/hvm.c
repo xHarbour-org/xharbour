@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.89 2002/08/11 04:03:32 ronpinkas Exp $
+ * $Id: hvm.c,v 1.90 2002/08/12 03:21:10 ronpinkas Exp $
  */
 
 /*
@@ -2439,6 +2439,12 @@ static void hb_vmPlus( void )
    /* Intentionally using HB_IS_NUMERIC() instead of HB_IS_NUMBER() on the right
       Clipper consider DATE + NUMBER => DATE and DATE + DATE => DATE
    */
+   else if( ( HB_IS_STRING( pItem1 ) || HB_IS_STRING( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
+   {
+      double dNumber2 = hb_vmPopNumber();
+
+      pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) + dNumber2 ) ];
+   }
    else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
       hb_vmPushDate( (long) hb_vmPopNumber() + (long) hb_vmPopNumber() );
@@ -2516,6 +2522,12 @@ static void hb_vmMinus( void )
       {
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
+   }
+   else if( ( HB_IS_STRING( pItem1 ) || HB_IS_STRING( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
+   {
+      double dNumber2 = hb_vmPopNumber();
+
+      pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) - dNumber2 ) ];
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
@@ -2738,7 +2750,11 @@ static void hb_vmInc( void )
 
    pItem = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_DATE( pItem ) )
+   if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+   {
+      pItem->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pItem->item.asString.value[0] + 1 ) ];
+   }
+   else if( HB_IS_DATE( pItem ) )
    {
       pItem->item.asDate.value++;
    }
@@ -2773,7 +2789,11 @@ static void hb_vmDec( void )
 
    pItem = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_DATE( pItem ) )
+   if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+   {
+      pItem->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pItem->item.asString.value[0] - 1 ) ];
+   }
+   else if( HB_IS_DATE( pItem ) )
    {
       pItem->item.asDate.value--;
    }
