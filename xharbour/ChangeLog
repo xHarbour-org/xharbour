@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.935 2003/04/09 19:47:06 paultucker Exp $
+ * $Id: ChangeLog,v 1.936 2003/04/09 19:48:24 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-09 16:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/debug/debugger.prg
+    ! Fix to make more compatible with new tbrowse class
+  * source/rtl/tbrowse.prg
+    ! Added ::Acoluns Data that is an copy of ::aColsinfo Data(this data is hidden) for debugger work properly
 
 2003-04-09 15:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt

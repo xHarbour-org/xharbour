@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.33 2003/04/04 19:40:13 walito Exp $
+ * $Id: tbrowse.prg,v 1.34 2003/04/09 19:11:44 walito Exp $
  */
 
 /*
@@ -127,6 +127,7 @@ CLASS TBrowse
    DATA rowPos                // Current cursor row position
    DATA skipBlock             // Code block used to reposition data source
    DATA stable                // Indicates if the TBrowse object is stable
+   DATA aColumns
 
 #ifdef HB_COMPAT_C53
    DATA nRow                  // Row number for the actual cell
@@ -332,6 +333,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cBorder         := ""
 
    ::aColsInfo       := {}
+   ::AColumns        := {}
    ::nVisWidth       := nRight - nLeft + 1
    ::lConfigured     := .f.
 
@@ -599,6 +601,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
    ::nColumns++
 
    aadd( ::aColsInfo, { oCol, '', 0, '', '', '', 0, '', 0, {}, .f. } )
+   ::AColumns := ::aColsInfo
 
    if ::nColumns == 1
       ::leftVisible := 1
@@ -624,6 +627,7 @@ METHOD InsColumn( nPos, oCol )
 
       aIns( ::aColsInfo, nPos, { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
                                  '', '', '', 0, '', 0, oCol:DefColor, .f. }, .t. )
+      ::aColumns := ::aColsInfo
 
       ::Configure( 1 )
       ::lConfigured := .f.
@@ -698,6 +702,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    ::nColumns--
 
    aDel( ::aColsInfo, nPos, .t. )
+   ::Acolumns :=    ::aColsInfo
 
    if ::nColumns < ::nFrozenCols
       ::nFrozenCols := 0
