@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.220 2003/06/24 03:35:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.221 2003/06/26 03:58:08 ronpinkas Exp $
  */
 
 /*
@@ -101,6 +101,9 @@
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
 #endif
+
+/* Mouse Disabling */
+extern BOOL b_MouseEnable;
 
 /* DEBUG only*/
 /*#include <windows.h>*/
@@ -341,12 +344,18 @@ void hb_vmDoInitRdd( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
+
+   PHB_DYNS pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
+
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
       APIRET rc = NO_ERROR;                           /* Return code                   */
    #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
+
+   if( pDynSymHbNoMouse )
+      b_MouseEnable = FALSE;
 
    hb_gcInit();
 
@@ -6471,8 +6480,11 @@ static void hb_vmReleaseLocalSymbols( void )
       pDestroy = s_pSymbols;
       s_pSymbols = s_pSymbols->pNext;
 
-      hb_xfree( pDestroy->szModuleName );
-      hb_xfree( pDestroy );
+      if( pDestroy->szModuleName )
+         hb_xfree( pDestroy->szModuleName );
+
+      if( pDestroy )
+         hb_xfree( pDestroy );
    }
 
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmReleaseLocalSymbols()"));
@@ -7478,3 +7490,5 @@ HB_FUNC( HB_RESTOREBLOCK )
       hb_itemClear( &ParamCount );
    }
 }
+
+HB_FUNC( HB_NOMOUSE ){}
