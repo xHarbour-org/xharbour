@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/01/10 16:13:05 jonnymind Exp $
+# $Id: Makefile,v 1.3 2003/01/12 22:50:21 jonnymind Exp $
 #
 
 ROOT = ../../../
@@ -11,7 +11,7 @@ PRG_SOURCES=\
 	dbfntx0.prg \
 
 ifeq ($(HB_MT),MT)
-   LIBNAME=dbfntxmt
+   MT_LIBNAME=dbfntxmt
 endif
 
 LIBNAME=dbfntx

@@ -1,10 +1,10 @@
 /*
-* $Id: inet.h,v 1.14 2003/01/02 06:32:35 jonnymind Exp $
+* $Id: inet.h,v 1.15 2003/01/14 02:40:26 jonnymind Exp $
 */
 
 /*
 * xHarbour Project source code:
-* The Internet Protocl / TCP support
+* The Internet Protocol / TCP support
 *
 * Copyright 2002 Giancarlo Niccolai [gian@niccolai.ws]
 * www - http://www.xharbour.org
@@ -76,7 +76,10 @@
          extern int h_errno;
          #define HB_INET_CLOSE( x )    close( x )
          #ifdef HB_OS_DARWIN
-             #include <netinet/in.h>
+            #include <netinet/in.h>
+            #ifndef socklen_t
+               #define socklen_t int
+            #endif
          #endif
          #include <errno.h>
       #endif

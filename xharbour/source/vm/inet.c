@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.7 2003/01/14 02:40:39 jonnymind Exp $
+* $Id: inet.c,v 1.8 2003/01/14 23:45:37 jonnymind Exp $
 */
 
 /*
@@ -59,6 +59,11 @@
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
+#endif
+
+#if defined( HB_OS_BSD )
+	/* On BSD and Darwin, we need sys/time.h for struct timeval. */
+	#include <sys/time.h>
 #endif
 
 

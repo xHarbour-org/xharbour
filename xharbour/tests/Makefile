@@ -9,8 +9,13 @@ ifeq ($(HB_ARCHITECTURE),linux)
 GT_LIBS=-lgtsln -lslang -lgpm -lpthread
 EXE_EXT=
 else
+ifeq ($(HB_ARCHITECTURE),darwin)
+GT_LIBS=-lgtstd
+EXE_EXT=
+else
 GT_LIBS=-lgtwin -lwsock32 -lwinspool
 EXE_EXT=.exe
+endif
 endif
 
 %.c: %.prg
