@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.4 2005/02/17 07:39:06 andijahja Exp $
+ * $Id: hbgtwvw.h,v 1.5 2005/02/24 10:44:02 andijahja Exp $
  */
 
 /*
@@ -81,13 +81,13 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
+#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER) || defined(__DMC__)
    #include <unknwn.h>
    #include <ole2.h>
    #include <ocidl.h>
    #include <olectl.h>
 
-   #if defined(_MSC_VER)
+   #if defined(_MSC_VER) || defined( __DMC__ )
       #include <conio.h>
 
       #if !defined( __POCC__ )

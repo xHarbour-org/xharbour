@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.19 2005/03/24 06:20:56 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.20 2005/03/24 06:24:33 ronpinkas Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
-#elif ( defined(HB_MSC_STARTUP) || defined( _MSC_VER ) ) && ! ( defined( HB_STATIC_STARTUP ) || defined(__XCC__) || defined(__POCC__) )
+#elif ( defined(HB_MSC_STARTUP) || defined( _MSC_VER ) ) && ! ( defined( HB_STATIC_STARTUP ) || defined(__XCC__) || defined(__POCC__) || defined(__DMC__) )
 
    /* In order to maintain compatibility with other products, MSVC should
       always use this startup.  If you know that you can use HB_STATIC_STARTUP

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.46 2004/11/21 21:44:26 druzus Exp $
+ * $Id: extend.c,v 1.47 2004/12/14 00:15:40 druzus Exp $
  */
 
 /*
@@ -1266,7 +1266,8 @@ LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
       {
          pItem = hb_itemUnRef( pItem );
       }
-      else if( HB_IS_DOUBLE( pItem ) )
+
+      if( HB_IS_DOUBLE( pItem ) )
       {
 #ifdef __GNUC__
          return ( LONGLONG ) ( ULONGLONG ) pItem->item.asDouble.value;

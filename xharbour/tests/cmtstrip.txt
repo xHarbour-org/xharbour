@@ -1,0 +1,25 @@
+//
+// $Id:$
+//
+// This is a sample file for cmtstrip.prg
+//
+// Andi Jahja <xharbour@cbn.net.id>
+//
+// The above comments will be stripped
+
+This is the uncommented part of this file
+
+/*
+  TEXT UNDER THIS WILL ALSO BE STRIPPED OUT
+*/
+
+// So this line
+// This too
+
+/* End comment */  Should appear   // SHOULD NOT APPEAR
+
+/* THIS COMMENT IS OK /* /* /* */ Should aprear too
+
+Below is wrong comment:
+
+/* Wrong comments */ */

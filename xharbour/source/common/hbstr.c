@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.13 2005/03/16 16:01:35 druzus Exp $
+ * $Id: hbstr.c,v 1.14 2005/03/18 22:35:31 andijahja Exp $
  */
 
 /*
@@ -788,4 +788,58 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
    }
 
    return pBuf;
+}
+
+/*
+  AJ: 2005-03-26
+  Simple routine to extract uncommented part of (read) buffer
+*/
+HB_EXPORT char *hb_stripOutComments( char* buffer )
+{
+   if( buffer && *buffer )
+   {
+      USHORT ui = strlen( buffer );
+      char *szOut = (char*) hb_xgrab( ui + 1 );
+      int i;
+      int uu = 0;
+
+      for ( i = 0; i < ui; i ++ )
+      {
+         if ( buffer[ i ] == '/' )
+         {
+            if( buffer [ i + 1 ] == '*' )
+            {
+               while ( ++ i < ui )
+               {
+                  if ( buffer [ i ] == '*' && buffer [ i + 1 ] == '/' )
+	          {
+                     break;
+	          }
+               }
+            }
+            else if ( buffer[ i + 1 ] == '/' )
+            {
+               while ( ++ i < ui )
+               {
+                  if ( buffer [ i ] == '\n' || buffer [ i ] == '\r' )
+	          {
+                     break;
+	          }
+               }
+            }
+         }
+         else
+         {
+            szOut[ uu ++ ] = buffer[ i ];
+         }
+      }
+
+      szOut[ uu ] = 0;
+
+      return( szOut );
+   }
+   else
+   {
+     return ( NULL );
+   }
 }

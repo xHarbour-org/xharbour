@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.32 2005/02/26 19:28:55 likewolf Exp $
+ * $Id: hbsetup.h,v 1.33 2005/02/28 02:12:31 druzus Exp $
  */
 
 /*
@@ -387,7 +387,7 @@
       #define snprintf(s, len, args...) sprintf( (s), ##args )
    #endif
 #else
-   #if defined( _MSC_VER ) && !defined(__XCC__)
+   #if ( defined( _MSC_VER ) && !defined(__XCC__) ) || defined( __DMC__ )
       #define snprintf _snprintf
    #endif
 #endif

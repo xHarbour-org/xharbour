@@ -1,5 +1,5 @@
 /*
- * $Id: inline_c.prg,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
+ * $Id: inline_c.prg,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
  */
 PROCEDURE MAIN( cLine, cDelim )
 
@@ -20,6 +20,31 @@ PROCEDURE MAIN( cLine, cDelim )
    QOut( C_Func() )
 
    QOut( PostDumpTest() )
+
+   QOut( HB_INLINE() )
+         {
+	    REQUEST HB_BUILDINFO /* Force HB_BUILDINFO To be Linked */
+            #define _HB_VER_AS_STRING  5
+            PHB_ITEM pSymbol;
+            HB_ITEM  pInfo;
+            (&pInfo)->type = HB_IT_NIL;
+
+            hb_itemPutNI( &pInfo, _HB_VER_AS_STRING );
+
+            pSymbol = hb_itemDoC("HB_BUILDINFO",1,&pInfo);
+            hb_itemClear( &pInfo );
+
+            if( pSymbol != NULL )
+            {
+               hb_retc(pSymbol->item.asString.value);
+               hb_itemRelease( pSymbol );
+            }
+	    else
+               hb_retc("HB_BUILDINFO does not exist in symbol table\nPlease do a REQUEST");
+
+	 }
+
+   QOut( PostDumpTest_1() )
 
 RETURN
 
@@ -89,3 +114,19 @@ HB_FUNC( C_FUNC )
 
 Function PostDumpTest()
 RETURN "Post Dump Test"
+
+#pragma BEGINDUMP
+#include "hbapi.h"
+HB_FUNC( POSTDUMPTEST_1 )
+{
+   EXTERNAL HB_MULTITHREAD // To Check if Harbour Is MultiThread
+   PHB_ITEM pMT = hb_itemDoC( "HB_MULTITHREAD", 0, 0 );
+
+   if( pMT->item.asLogical.value )
+      hb_retc( "Harbour Is MULTI THREAD" );
+   else
+      hb_retc( "Harbour Is SINGLE THREAD" );
+
+   hb_itemRelease( pMT );
+}
+#pragma ENDDUMP

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3980 2005/03/24 05:54:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3981 2005/03/30 20:49:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,100 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/xbscript/xbscript.prg
+    ! change starting procedure to 'PROCEDURE MAIN()' instead of uncommon
+      (if not erroneus) 'STATIC PROCEDURE MAIN()'.
+
+  * source/vm/extend.c
+    * very bad typo in hb_parnll()
+
+  * source/ct/settime.c
+  * source/rtl/inkey.c
+  * source/rtl/gtwin/gtwin.c
+    * commented some unused variables
+
+  * include/hberrors.h
+  * source/compiler/harbour.slx
+  * source/compiler/hbgenerr.c
+  * source/pp/ppcomp.c
+  * source/pp/ppcore.c
+    + HB_PP_ERR_UNTERMINATED_COMMENTS
+      error trap for unterminated /* */ in common PRG codes
+
+    + HB_COMP_ERR_UNTERMINATED_COMMENTS
+      error trap for unterminated /* */ in C INLINE codes
+
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + char *hb_stripOutComments( char* buffer ), a simple function to extract
+      uncommented contents from (read) buffer.
+
+  + tests/cmtstrip.prg
+  + tests/cmtstrip.txt
+    ! sample programs for hb_stripOutComments()
+
+  * source/compiler/harbour.c
+  * source/compiler/cmcheck.c
+  * source/compiler/genc.c
+    + more info on created C file
+    * fixed "parsing" problems with HB_FUNCNAME, HB_FUNC_PTR, HB_FUNC_EXTERN
+      and PHB_FUNC ( all contain 'HB_FUNC' )
+    + allow creation of EXE from a PRG file which does not contain
+      PRG code ( C codes only )
+    + REQUEST/EXTERNAL from within dump area/inline C
+    + Function address for static function is not consistently assigned.
+      Ie. for static functions in PRG code, it has (PHB_DYNS) 1. However,
+      if the static function is coded in C (dump area) it is a NULL.
+      This is fixed now.
+    + Application will now seek for the first public function exists in
+      program body as program startup no matter if it is previously an
+      HB_FS_FIRST or not. This in effect will not allow a static function
+      becomes application startup (see utils/xbscript/xbscript.prg as sample)
+      This is a departure from Clipper compatibility which assumes the
+      toppest function as application startup no matter if it is a static or
+      public function.	(IMO, this compatibility is no good to duplicate)
+
+  + tests/hello1.prg
+  + tests/hello2.prg
+  + tests/hello3.prg
+  + tests/hello4.prg
+  + tests/hello5.prg
+  + tests/hello6.prg
+  + tests/hello7.prg
+  + tests/hello8.prg
+  + tests/hello9.prg
+    ! sample program for changes effected per above
+
+  + tests/inline_c.prg
+    + added REQUEST/EXTERNAL statements
+
+  * source/vm/fm.c
+    ! use internal date and time functions when writing fm.log
+
+  * include/hbdefs.h
+    + definition of HB_IMPORT
+    + definition of HB_FUNC_EXEC (see tests/hello8.prg for application sample)
+
+  * makefile.dc
+  * hrbdll.dc
+    - -D"_MSC_VER"
+    - some include directives because it is configured in SC.INI
+
+  * contrib/gtwvw/hbgtwvw.h
+    ! minor modification for __DMC__
+
+  * include/hbsetup.h
+    ! changes requires for DMC's _snprintf
+
+  * include/hbinit.h
+    ! changes requires for DMC startup codes
+
+  * source/rtl/run.c
+  * source/rtl/filesys.c
+  * source/rtl/fserror.c
+  * source/rtl/philes.c
+    ! modifications for __DMC__
 
 2005-03-30 12:48 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * include/hbver.h

@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.dc,v 1.1 2005/02/26 02:11:24 andijahja Exp $
+# $Id: hrbdll.dc,v 1.2 2005/03/03 14:16:44 andijahja Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -22,10 +22,10 @@ DMLINK       = $(DMCMAIN)\BIN\LINK.EXE
 DMLIB        = $(DMCMAIN)\BIN\LIB.EXE
 DMLIB_DIR    = $(DMCMAIN)\LIB
 INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
-HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0
 MAINFLAGS    = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
-CFLAGS       = -D"__EXPORT__" -Jm -cpp -mn -D"_MSC_VER" -I"$(INCLUDE_DIR)" -I"$(DMCMAIN)\INCLUDE" -I"$(DMCMAIN)\INCLUDE\WIN32" -I"$(DMCMAIN)\INCLUDE\SYS" -c
-CFLAGS       = -6 -WD -o $(CFLAGS) -D"HB_OS_WIN_32" -D"__WIN32__" $(USR_FLAGS)
+CFLAGS       = -D"__EXPORT__" -Jm -cpp -mn -I"$(INCLUDE_DIR)" -c
+CFLAGS       = -6 -WD -o $(CFLAGS) -D"__WIN32__" $(USR_FLAGS)
 
 HARBOUR_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD      = $(CC) $(CFLAGS) -o$@ $**

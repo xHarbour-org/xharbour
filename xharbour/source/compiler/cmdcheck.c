@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.20 2004/11/21 21:43:44 druzus Exp $
+ * $Id: cmdcheck.c,v 1.21 2005/02/12 19:54:02 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 extern int  hb_pp_ParseDefine( char * );
 extern int  hb_pp_ParseDirective( char * );
 extern BOOL hb_comp_iGenVarList;
+extern char *hb_Command_Line;
 
 /* TODO: Add support for this compiler switches
    -r -t || hb_getenv( "TMP" )
@@ -118,6 +119,8 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
       */
       for( i = 0; i < iArg; i++ )
       {
+	 hb_xstrcat( hb_Command_Line, Args[ i ], " ", NULL );
+
          if( ! HB_ISOPTSEP( Args[ i ][0] ) )
          {
             continue;

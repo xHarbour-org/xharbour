@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.155 2005/03/09 07:16:27 andijahja Exp $
+ * $Id: hbapi.h,v 1.156 2005/03/10 02:41:44 ronpinkas Exp $
  */
 
 /*
@@ -470,6 +470,7 @@ extern BOOL     HB_EXPORT hb_strMatchWild(const char *szString, const char *szPa
 extern BOOL     HB_EXPORT hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
 extern void     HB_EXPORT hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
 extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */
+extern char     HB_EXPORT * hb_stripOutComments( char* buffer ); /* extract uncommented part of read buffer */
 extern char     HB_EXPORT * hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
 extern char     HB_EXPORT * hb_strUpperCopy( char * szText, ULONG ulLen );
 extern char     HB_EXPORT * hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.141 2005/02/15 21:06:05 andijahja Exp $
+ * $Id: filesys.c,v 1.142 2005/02/24 10:44:07 andijahja Exp $
  */
 
 /*
@@ -127,7 +127,7 @@
    #endif
 #endif
 
-#if ( defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || \
+#if ( defined(__DMC__) || defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || \
       defined(__MINGW32__) || defined(__WATCOMC__) ) && !defined( HB_OS_UNIX )
    #include <sys/stat.h>
    #include <share.h>
@@ -142,7 +142,7 @@
       #include <dos.h>
    #endif
 
-   #if defined(_MSC_VER) || defined(__MINGW32__)
+   #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__)
       #include <sys/locking.h>
       #define ftruncate _chsize
       #if defined(__MINGW32__) && !defined(_LK_UNLCK)
@@ -184,7 +184,7 @@
 #if defined( HB_WIN32_IO )
    #include <windows.h>
 
-   #if ( defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
+   #if ( defined(__DMC__) || defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
       #define INVALID_SET_FILE_POINTER ((DWORD)-1)
    #endif
 #endif
@@ -311,12 +311,12 @@
    #define SH_DENYNO    0x40    /* Deny nothing */
 #endif
 
-#if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__)
+#if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__) || defined(__DMC__)
 /* Only compilers with Posix or Posix-like I/O support are supported */
    #define HB_FS_FILE_IO
 #endif
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__IBMCPP__) || defined(__WATCOMC__) || defined(HB_OS_OS2)
+#if defined(__DMC__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__IBMCPP__) || defined(__WATCOMC__) || defined(HB_OS_OS2)
 /* These compilers use sopen() rather than open(), because their
    versions of open() do not support combined O_ and SH_ flags */
    #define HB_FS_SOPEN
@@ -339,8 +339,7 @@
       }
    #endif
 
-   #if ( ( defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || ! defined( HandleToLong ) || defined(__USE_INLINE__) ) && ! defined( __POCC__ ) ) || defined( __DMC__ ))
-
+   #if ( defined(__DMC__) || ( defined( _MSC_VER ) && ( _MSC_VER >= 1010 ) && ( ! defined( _BASETSD_H_) || ! defined( HandleToLong ) || defined(__USE_INLINE__) ) && ! defined( __POCC__ ) ) )
        #if defined(__DMC__) && !defined(INT_PTR)
           #ifdef _WIN64
              typedef __int64 INT_PTR, *PINT_PTR;
@@ -1367,7 +1366,7 @@ ret_close_1:
 int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 {
    HB_THREAD_STUB
-   int iRetStatus = -1;
+   int iRetStatus;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsProcessValue(%d, %d )", fhProc, bWait));
 
@@ -1496,7 +1495,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 
 BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
 {
-   BOOL bRet = FALSE;
+   BOOL bRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
 
 #if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_OS2)
@@ -1508,6 +1507,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    }
    else
    {
+      bRet = FALSE;
       hb_fsSetError( FS_ERROR );
    }
 #elif defined( HB_WIN32_IO )
@@ -1529,6 +1529,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
 
    HB_SYMBOL_UNUSED( fhProc );
    HB_SYMBOL_UNUSED( bGentle );
+   bRet = FALSE;
    hb_fsSetError( FS_ERROR );
 
 #endif
@@ -1565,7 +1566,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
       hFileHandle = HandleToLong(hFile);
    }
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__DMC__)
    {
       int iShare = _SH_DENYNO;
 
@@ -1801,7 +1802,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
    }
    hb_fsSetIOError( iRet != -1, 0 );
 }
-#elif defined(_MSC_VER) || defined(__MINGW32__)
+#elif defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__)
 {
    int iRet = 0;
 
@@ -2337,7 +2338,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
    }
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__DMC__)
    {
       ULONG ulOldPos = lseek( hFileHandle, 0L, SEEK_CUR );
 
@@ -2836,7 +2837,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
    bResult = ( remove( ( char * ) pFilename ) == 0 );
    hb_fsSetIOError( bResult, 0 );
 
-#elif defined(_MSC_VER) || defined(__MINGW32__)
+#elif defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__)
 
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN

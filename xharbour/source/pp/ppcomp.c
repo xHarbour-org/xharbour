@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.9 2003/12/22 18:56:15 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.10 2004/10/22 02:40:35 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,8 @@ static char s_szLine[ HB_PP_STR_SIZE ];
 static char s_szOutLine[ HB_PP_STR_SIZE ];
 int hb_pp_LastOutLine = 1;
 
+BOOL hb_pp_bInComment = FALSE;
+
 /*
 BOOL bDebug = FALSE;
 */
@@ -102,7 +104,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
         lens += rdlen;
         hb_comp_iLine ++;
 
-        //printf( "Line: %i Len: %i <%s>\n", hb_comp_iLine, lens, s_szLine );
+        // printf( "Line: %i Len: %i <%s>\n", hb_comp_iLine, lens, s_szLine );
 
         if( lens >= HB_PP_STR_SIZE )
         {
@@ -202,6 +204,11 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
 
            break;
         }
+     }
+
+     if( hb_pp_bInComment )
+     {
+        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNTERMINATED_COMMENTS, NULL, NULL );
      }
 
      if( rdlen < 0 )
@@ -373,6 +380,11 @@ int hb_pp_ReadRules( void )
 
            break;
         }
+     }
+
+     if( hb_pp_bInComment )
+     {
+        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_UNTERMINATED_COMMENTS, NULL, NULL );
      }
 
      if( rdlen < 0 )

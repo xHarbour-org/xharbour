@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.66 2005/02/27 07:41:21 andijahja Exp $
+ * $Id: hbdefs.h,v 1.67 2005/03/17 17:07:34 druzus Exp $
  */
 
 /*
@@ -1004,6 +1004,34 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXPORT
 #endif
 
+#if defined( __RSXNT__ )
+   /* RSXNT does not support any type of export keyword.
+      Exported (i.e., public) names can be obtained via
+      the emxexp utility and the output can be used for
+      input to a module definition file. See emxdev.doc
+      in the RSXNT doc/ directory for more information. */
+   #define HB_IMPORT
+
+#elif defined( __GNUC__ ) && defined( HB_OS_WIN_32 )
+   #define HB_IMPORT __attribute__ (( dllimport ))
+
+#elif defined( __BORLANDC__ )
+   #define HB_IMPORT _declspec( dllimport )
+
+#elif defined( __WATCOMC__ )
+   #define HB_IMPORT __declspec( dllimport )
+
+#elif defined( ASANLM ) || defined( ASANT )
+   #define HB_IMPORT
+
+#elif defined( WIN32 )
+   #define HB_IMPORT _declspec( dllimport )
+
+#else
+   #define HB_IMPORT
+
+#endif
+
 /* Function declaration macros */
 
 /* NOTE: The prefix is "HB_FUN_" currently, this is needed to
@@ -1019,6 +1047,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXTERN_C_
 #endif
 
+#define HB_FUNC_EXEC( funcname )   HB_FUN_##funcname();
 #define HB_FUNC( funcname )        HB_EXTERN_C_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
 #define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_EXTERN( funcname ) HB_EXTERN_C_ extern HARBOUR HB_FUN_##funcname ( void )

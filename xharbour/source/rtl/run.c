@@ -1,5 +1,5 @@
 /*
- * $Id: run.c,v 1.4 2004/11/21 21:44:20 druzus Exp $
+ * $Id: run.c,v 1.5 2004/12/28 15:30:41 mauriliolongo Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 HB_FUNC( __RUN )
 {
 #if defined(__TURBOC__) || defined(__BORLANDC__) || defined(_MSC_VER) || \
-    defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__)
+    defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__) || defined(__DMC__)
 
 	int iret;
 

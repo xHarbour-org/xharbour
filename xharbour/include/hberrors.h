@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.19 2005/03/09 21:19:56 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.20 2005/03/10 23:19:38 andijahja Exp $
  */
 
 /*
@@ -123,6 +123,7 @@ HB_EXTERN_BEGIN
 #define HB_COMP_ERR_ILLEGAL_CHARACTER           61
 #define HB_COMP_ERR_CREATE_PPT                  62
 #define HB_COMP_ERR_UNBALANCE_PRAGMAS           63
+#define HB_COMP_ERR_UNTERMINATED_COMMENTS       64
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2
@@ -185,6 +186,7 @@ HB_EXTERN_BEGIN
 #define HB_PP_ERR_INVALID_CONSTANT_EXPRESSION   26
 #define HB_PP_ERR_EMPTY_OPTIONAL                27
 #define HB_PP_ERR_EMPTY_REPEATABLE              28
+#define HB_PP_ERR_UNTERMINATED_COMMENTS         29
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2

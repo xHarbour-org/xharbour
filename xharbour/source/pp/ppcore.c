@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.204 2005/03/19 20:09:25 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.205 2005/03/20 16:07:39 ronpinkas Exp $
  */
 
 /*
@@ -226,6 +226,9 @@ int *hb_pp_aiLastIf = NULL, *hb_pp_aiOuterIfLevel = NULL;
 int iBeginDump = 0;
 int iEndDump = 0;
 
+/* Counter for comment */
+extern BOOL hb_pp_bInComment;
+
 /* Table with parse errors */
 char * hb_pp_szErrors[] =
 {
@@ -256,7 +259,8 @@ char * hb_pp_szErrors[] =
    "Too many nested optional groups",
    "Parse error in constant expression '%s'",
    "Empty optional match clause in #directive.",
-   "Empty repeatable result group in #directive."
+   "Empty repeatable result group in #directive.",
+   "Unterminated /* */ comment"
 };
 
 /* Table with warnings */
@@ -5993,6 +5997,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
         case STATE_COMMENT:
           if( cha == '/' && cLast == '*' )
           {
+             hb_pp_bInComment = FALSE;
              s_ParseState = STATE_NORMAL;
              cha = ' ';
           }
@@ -6101,6 +6106,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
             case '*':
               if( readed > 0 && buffer[readed-1] == '/' )
               {
+                hb_pp_bInComment = TRUE;
                 s_ParseState = STATE_COMMENT;
                 readed--;
               }

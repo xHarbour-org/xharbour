@@ -442,11 +442,16 @@ STATIC s_cVer := "1.0.RC12" + Stringify( REVISION )
 #endif
 
 //--------------------------------------------------------------//
+/*
 #ifdef __HARBOUR__
+  AJ: 2003-03-28 Why the hell is a static function become starting procedure ?
   STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 #else
   PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 #endif
+*/
+
+  PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}

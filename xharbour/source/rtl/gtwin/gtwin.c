@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.88 2005/03/08 03:36:27 paultucker Exp $
+ * $Id: gtwin.c,v 1.89 2005/03/18 13:09:44 paultucker Exp $
  */
 
 /*
@@ -1082,7 +1082,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    BOOL Ret = FALSE;
    SMALL_RECT srWin;
    COORD coBuf;
-   USHORT uiDispCount = s_uiDispCount, uR, uC;
+   USHORT uiDispCount = s_uiDispCount; // , uR, uC;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
 
@@ -1095,8 +1095,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 
       coBuf = GetLargestConsoleWindowSize( s_HOutput );
 
-      uR = usRows;
-      uC = usCols;
+      // uR = usRows;
+      // uC = usCols;
 
       if ( usRows > coBuf.Y )
       {

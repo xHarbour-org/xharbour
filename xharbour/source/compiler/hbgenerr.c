@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.19 2004/10/20 03:14:40 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.20 2005/03/10 23:19:39 andijahja Exp $
  */
 
 /*
@@ -95,7 +95,8 @@ char * hb_comp_szErrors[] =
 /* 60 */   "Cannot write HIL table to \'%s\'.",
    "Illegal character \'%s\'.",
    "Can't create preprocessed tracing file: \'%s\'",
-   "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP"
+   "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP",
+   "Unterminated /* */ comment"
 };
 
 /* Table with parse warnings */

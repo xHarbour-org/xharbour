@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.67 2004/12/28 06:39:24 druzus Exp $
+ * $Id: fm.c,v 1.68 2005/02/25 13:37:57 andijahja Exp $
  */
 
 /*
@@ -83,6 +83,7 @@
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbapi.h"
+#include "hbdate.h"
 #include "hbver.h"
 #include "hbapifs.h"
 #include "hbstack.h"
@@ -112,7 +113,6 @@
 #endif
 
 #ifdef HB_FM_STATISTICS
-#include <time.h>
 #ifndef HB_MEMFILER
 #  define HB_MEMFILER  0xff
 #endif
@@ -714,17 +714,9 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       USHORT ui;
       char buffer[ 100 ];
       FILE *hLog = NULL;
-      char szResult_Date[ 11 ];
-      char szResult_Time[ 11 ];
-      time_t t;
-      struct tm * oTime;
 
       if( s_lMemoryBlocks )
       {
-         time( &t );
-         oTime = localtime( &t );
-         sprintf( szResult_Date, "%04d.%02d.%02d", oTime->tm_year + 1900, oTime->tm_mon + 1, oTime->tm_mday );
-         sprintf( szResult_Time, "%02d:%02d:%02d", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
          hLog = fopen( "fm.log", "a+" );
       }
 
@@ -737,16 +729,21 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          char *szPlatform = hb_verPlatform();
          char *szCompiler = hb_verCompiler();
          char *szHarbour  = hb_verHarbour();
+         char *szTime     = (char *) hb_xgrab(9);
+         int iYear, iMonth, iDay;
+         hb_dateToday( &iYear, &iMonth, &iDay );
+         hb_dateTimeStr( szTime );
          fprintf( hLog, "Memory Allocation Report\n");
          fprintf( hLog, "Application: %s\n", hb_cmdargARGV()[0] );
          fprintf( hLog, "xHarbour Version: %s\n", szHarbour );
          fprintf( hLog, "Compiler: %s\n", szCompiler );
          fprintf( hLog, "Platform: %s\n", szPlatform );
-         fprintf( hLog, "Time Occured: %s %s\n", szResult_Date, szResult_Time );
+         fprintf( hLog, "Time Occured: %04d.%02d.%02d %s\n", iYear, iMonth, iDay, szTime );
          fprintf( hLog, "%s\n", buffer );
          hb_xfree( szPlatform );
          hb_xfree( szCompiler );
          hb_xfree( szHarbour  );
+	 hb_xfree( szTime );
       }
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );

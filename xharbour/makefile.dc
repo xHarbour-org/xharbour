@@ -3,7 +3,7 @@
 # юддддддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъъъъъ
 #
-# $Id: makefile.dc,v 1.2 2005/02/24 14:19:12 andijahja Exp $
+# $Id: makefile.dc,v 1.3 2005/03/02 21:59:30 andijahja Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -14,10 +14,10 @@ DMLINK       = $(DMCMAIN)\BIN\LINK.EXE /EXETYPE:NT /SUBSYSTEM:CONSOLE
 DMLIB        = $(DMCMAIN)\BIN\LIB.EXE
 DMCLIB_DIR   = $(DMCMAIN)\LIB
 INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
-HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0
 MAINFLAGS    = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
-CFLAGS       = -Jm -cpp -mn -D"_MSC_VER" -I"$(INCLUDE_DIR)" -I"$(DMCMAIN)\INCLUDE" -I"$(DMCMAIN)\INCLUDE\WIN32" -I"$(DMCMAIN)\INCLUDE\SYS" -c
-CFLAGS       = -6 -W -o $(CFLAGS) -D"HB_OS_WIN_32" -D"__WIN32__"
+CFLAGS       = -Jm -cpp -mn -I"$(INCLUDE_DIR)" -c
+CFLAGS       = -6 -W -o $(CFLAGS) -D"__WIN32__"
 CFLAGS       = $(CFLAGS) $(MTFLAGS)
 
 # здддддддддддддддддддд©

@@ -200,6 +200,7 @@ BOOL           hb_comp_bSyntaxCheckOnly = FALSE;          /* syntax check only *
 int            hb_comp_iLanguage = LANG_C;                /* default Harbour generated output language */
 int            hb_comp_iJumpOptimize = 1;
 char *         hb_comp_szDeclaredFun = NULL;
+char *         hb_Command_Line;	 /* Switches to be documented in generated C file */
 
 BOOL           hb_comp_bAutoOpen = TRUE;
 BOOL           hb_comp_bError = FALSE;
@@ -230,6 +231,11 @@ int            hb_comp_iHidden = 0;
 
 static BOOL hb_comp_bExternal   = FALSE;
 */
+
+/*
+  Force compiler to exit upon error when generating C code
+*/
+BOOL hb_comp_Failure = FALSE;
 
 /* Limit the warning that stop compilation into ambiguous reference only so
    that warnings on uninitialized locals would not stop compilation when
@@ -279,6 +285,8 @@ FILE *hb_comp_PPTrace = NULL;
 extern int iBeginDump;
 extern int iEndDump;
 
+#define MAX_MEM_COMMAND_LINE 10240
+
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
@@ -297,6 +305,8 @@ int main( int argc, char * argv[] )
    hb_comp_Supported |= HB_COMPFLAG_HB_INLINE;
 
    /* First check the environment variables */
+   hb_Command_Line = (char*) hb_xgrab( MAX_MEM_COMMAND_LINE );
+   hb_xmemset( hb_Command_Line, 0, MAX_MEM_COMMAND_LINE );
    hb_compChkCompilerSwitch( 0, NULL );
 
    /* Then check command line arguments
@@ -313,12 +323,14 @@ int main( int argc, char * argv[] )
       printf( "\n" );
       szBuildInfo = hb_verBuildInfo( TRUE );
       hb_xfree( szBuildInfo );
+      hb_xfree( hb_Command_Line );
       return iStatus;
    }
 
    if( hb_comp_bCredits )
    {
       hb_compPrintCredits();
+      hb_xfree( hb_Command_Line );
       return iStatus;
    }
 
@@ -359,9 +371,7 @@ int main( int argc, char * argv[] )
 	    /* Reset BEGINDUMP and ENDDUMP Counters */
             iBeginDump = 0;
             iEndDump = 0;
-
             iStatus = hb_compCompile( argv[ i ], argc, argv );
-
          }
 
          if( ! bAnyFiles )
@@ -375,6 +385,8 @@ int main( int argc, char * argv[] )
          }
       }
    }
+
+   hb_xfree( hb_Command_Line );
 
    hb_compIdentifierClose();
 
@@ -467,7 +479,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    return iResult;
 }
 
-#endif /* _HB_DLL */
+#endif
 
 #if defined(__IBMCPP__) || defined(_MSC_VER) || (defined(__BORLANDC__) && defined(__cplusplus))
 int isatty( int handle )
@@ -1948,7 +1960,6 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    hb_FileName = hb_fsFNameSplit( hb_comp_files.pLast->szFileName );
    hb_FileName->szPath = NULL;
    hb_fsFNameMerge( szFileName, hb_FileName );
-
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
@@ -4915,7 +4926,6 @@ static void hb_compInitVars( void )
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
 {
 
-
    switch( iLanguage )
    {
       case LANG_C:
@@ -4938,6 +4948,7 @@ static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
          hb_compGenCObj( hb_comp_pFileName, szSourceExtension );
          break;
    }
+
 }
 
 static void hb_compOutputFile( void )
@@ -5335,6 +5346,11 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                }
 
                hb_compGenOutput( hb_comp_iLanguage, szSourceExtension );
+
+               if ( hb_comp_Failure )
+	       {
+                  iStatus = EXIT_FAILURE;
+	       }
             }
          }
          else

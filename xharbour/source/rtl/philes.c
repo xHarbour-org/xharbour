@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.25 2004/08/27 15:47:35 mauriliolongo Exp $
+ * $Id: philes.c,v 1.26 2005/01/26 21:46:36 druzus Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ HB_FUNC( FWRITE )
 HB_FUNC( FERROR )
 {
 // For clipper compatibility MSC return 32 for file open in share mode !
-   #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__MINGW32__)
+   #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__MINGW32__) || defined(__DMC__)
    USHORT uError = hb_fsError();
    if( uError == ERROR_SHARING_VIOLATION )
    {
