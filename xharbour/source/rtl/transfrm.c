@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.6 2002/01/27 10:34:18 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.7 2002/07/03 21:49:35 walito Exp $
  */
 
 /*
@@ -403,7 +403,7 @@ HB_FUNC( TRANSFORM )
 
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
-         BOOL     bEnd   = FALSE;
+         BOOL     bPDec  = FALSE;
 
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
@@ -493,9 +493,6 @@ HB_FUNC( TRANSFORM )
                {
                   cPic = szPic[ i ];
 
-                  if( bInit && cPic == ' ' )
-                     bEnd  = TRUE;
-
                   if( !bInit && ( cPic == '9' || cPic == '#' || cPic == '$' || cPic == '*' ) )
                      bInit = TRUE;
                   if( cPic == '9' || cPic == '#' )
@@ -505,16 +502,18 @@ HB_FUNC( TRANSFORM )
                      else
                         szResult[ i ] = ' ';
                   }
-                  else if( cPic == '.' && bInit && !bEnd )
+                  else if( cPic == '.' && bInit )
                   {
-                     if( uiPicFlags & PF_EXCHANG ) /* Exchange . and ,         */
+                     bPDec = TRUE;
+
+                     if( uiPicFlags & PF_EXCHANG )  /* Exchange . and ,         */
                      {
                         szResult[ i ] = ',';
                         iCount++;
                      }
                      else
                      {
-                        if( uiPicFlags & PF_NUMDATE )    /* Dot in date              */
+                        if( uiPicFlags & PF_NUMDATE || bPDec )    /* Dot in date              */
                         {
                            szResult[ i ] = cPic;
                            iCount++;
@@ -525,7 +524,7 @@ HB_FUNC( TRANSFORM )
                         }
                      }
                   }
-                  else if( ( cPic == '$' || cPic == '*' ) && !bEnd )
+                  else if( cPic == '$' || cPic == '*' )
                   {
                      if( szStr[ iCount ] == ' ' )
                      {
@@ -535,7 +534,7 @@ HB_FUNC( TRANSFORM )
                      else
                         szResult[ i ] = szStr[ iCount++ ];
                   }
-                  else if( cPic == ',' && bInit && !bEnd )    /* Comma                    */
+                  else if( cPic == ',' && bInit )    /* Comma                    */
                   {
                      if( iCount && isdigit( ( int ) szStr[ iCount - 1 ] ) )
                      {                                /* May we place it     */
