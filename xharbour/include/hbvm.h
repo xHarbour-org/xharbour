@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.10 2003/10/06 21:31:34 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.11 2003/10/07 23:48:23 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ HB_EXPORT extern void    hb_vmFunction( USHORT uiParams ); /* executes a functio
 HB_EXPORT extern void    hb_vmSend( USHORT uiParams ); /* sends a message to an object */
 HB_EXPORT extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
 /* executes passed codeblock with variable number of arguments */
-HB_EXPORT extern PHB_ITEM HB_EXPORT hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
+HB_EXPORT extern PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
 
 /* Push */
 HB_EXPORT extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic item onto the stack */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.84 2003/09/24 01:20:34 druzus Exp $
+ * $Id: hbapi.h,v 1.85 2003/10/05 05:25:07 paultucker Exp $
  */
 
 /*
@@ -415,12 +415,12 @@ extern BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a c
 extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
 
 /* object management */
-extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
-extern char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
-extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
-extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
-extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+HB_EXPORT extern char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
+HB_EXPORT extern char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
+HB_EXPORT extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
+HB_EXPORT extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
+HB_EXPORT extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
+HB_EXPORT extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 
 /* dynamic symbol table management */
 extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
