@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.93 2004/08/12 14:08:53 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.94 2004/11/02 08:39:18 bdj Exp $
  */
 
 /*
@@ -113,6 +113,10 @@
 #define TBC_CLR_HEADING   3
 #define TBC_CLR_FOOTING   4
 
+
+// 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
+#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2, 1, 1 }[ nColor ] )
+
 //-------------------------------------------------------------------//
 
 CLASS TBrowse
@@ -155,14 +159,14 @@ CLASS TBrowse
                                      iif(::nColPos < ::leftVisible .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., NIL),;
                                      ::nColPos
 
-   ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
-   ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif(::cBorder=="",0,1)
-   ACCESS nLeft               INLINE ::nwLeft   -  iif(::cBorder=="",0,1)
-   ASSIGN nLeft( nLeft )      INLINE ::lConfigured := .f., ::nwLeft   := nLeft   + iif(::cBorder=="",0,1)
-   ACCESS nRight              INLINE ::nwRight  +  iif(::cBorder=="",0,1)
-   ASSIGN nRight( nRight )    INLINE ::lConfigured := .f., ::nwRight  := nRight  - iif(::cBorder=="",0,1)
-   ACCESS nTop                INLINE ::nwTop    -  iif(::cBorder=="",0,1)
-   ASSIGN nTop( nTop )        INLINE ::lConfigured := .f., ::nwTop    := nTop    + iif(::cBorder=="",0,1)
+   ACCESS nBottom             INLINE ::nwBottom +  iif( ::cBorder == "", 0, 1 )
+   ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif( ::cBorder == "", 0, 1 )
+   ACCESS nLeft               INLINE ::nwLeft   -  iif( ::cBorder == "", 0, 1 )
+   ASSIGN nLeft( nLeft )      INLINE ::lConfigured := .f., ::nwLeft   := nLeft   + iif( ::cBorder == "", 0, 1 )
+   ACCESS nRight              INLINE ::nwRight  +  iif( ::cBorder == "", 0, 1 )
+   ASSIGN nRight( nRight )    INLINE ::lConfigured := .f., ::nwRight  := nRight  - iif( ::cBorder == "", 0, 1 )
+   ACCESS nTop                INLINE ::nwTop    -  iif( ::cBorder == "", 0, 1 )
+   ASSIGN nTop( nTop )        INLINE ::lConfigured := .f., ::nwTop    := nTop    + iif( ::cBorder == "", 0, 1 )
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
    ASSIGN colSep( cColSep )   INLINE ::lConfigured := .f., ::cColSep  := cColSep
@@ -230,7 +234,7 @@ CLASS TBrowse
 
    METHOD PosCursor()                     // Positions the cursor to the beginning of the call, used only when autolite==.F.
    METHOD LeftDetermine()                 // Determine leftmost unfrozen column in display
-   METHOD DispCell( nColumn, nColor, aColors )  // Displays a single cell and returns cell type as a single letter like Valtype()
+   METHOD DispCell( nColumn, nColor, aColors )  // Displays a single cell and returns position of first char of displayed value
    METHOD HowManyCol()                    // Counts how many cols can be displayed
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
    METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
@@ -242,7 +246,6 @@ CLASS TBrowse
    METHOD SetColumnWidth( oCol )          // Calcs width of given column
    METHOD SetBorder( cBorder )
    METHOD DrawARow()                      // Draws any row in stabilization
-   METHOD DispCellNormal()                // Most often used cell display method, removing all ifs and buts
    METHOD CheckRowsToBeRedrawn()
    METHOD CheckRowPos()
    METHOD AColInfo()
@@ -2104,7 +2107,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
 
             if ! ::lRect
                for nCol:= nColFrom to ::rightVisible
-                  ::DispCellNormal( nCol )
+                  ::DispCell( nCol , TBC_CLR_STANDARD )
 
                   if nCol < ::rightVisible .and. ::aColsInfo[ nCol, o_lColSep ]
                      DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
@@ -2117,7 +2120,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                   if lInRect .and. ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
                      ::DispCell( nCol, TBC_CLR_STANDARD, ::aRectColor )
                   else
-                     ::DispCellNormal( nCol )
+                     ::DispCell( nCol , TBC_CLR_STANDARD )
                   endif
 
                   if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
@@ -2349,6 +2352,7 @@ METHOD Hilite() CLASS TBrowse
 
    LOCAL nRow := ::RowPos + ::nRowData
    LOCAL nCol
+   LOCAL nNotLeftCol    // Screen col position of first char of not left justified columns
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
 
@@ -2360,16 +2364,16 @@ METHOD Hilite() CLASS TBrowse
          ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
          ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
 
-         ::DispCell( ::nColPos, TBC_CLR_ENHANCED, ::aRectColor )
+         nNotLeftCol := ::DispCell( ::nColPos, TBC_CLR_ENHANCED, ::aRectColor )
       else
-         ::DispCell( ::nColPos, TBC_CLR_ENHANCED )
+         nNotLeftCol := ::DispCell( ::nColPos, TBC_CLR_ENHANCED )
       endif
 
-      SetPos( nRow, nCol )
+      SetPos( nRow, iif( nNotLeftCol <> NIL, nNotLeftCol, nCol ) )
 
       #ifdef HB_COMPAT_C53
       ::nRow := nRow
-      ::nCol := nCol
+      ::nCol := iif( nNotLeftCol <> NIL, nNotLeftCol, nCol )
       #endif
 
    endif
@@ -2381,50 +2385,76 @@ Return Self
 METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
 
    LOCAL aColsInfo := ::aColsInfo[ nColumn ]
-   LOCAL oCol      := aColsInfo[ o_Obj       ]
-   LOCAL nWidth    := aColsInfo[ o_Width     ]
+   LOCAL oCol      := aColsInfo[ o_Obj ]
+   LOCAL nWidth    := aColsInfo[ o_Width ]
    LOCAL nLen      := aColsInfo[ o_WidthCell ]
    LOCAL ftmp      := Eval( oCol:block )
+
+   // Screen col position of first char for not left justified columns
+   LOCAL nNotLeftCol
 
    // NOTE: When nColor is used as an array index we need to increment
    // it by one since CLR_STANDARD is 0
    //
-   LOCAL cColor
+   LOCAL cColor, cColorBKG
 
    // if called when the column type is not defined, then do nothing
-   if empty( aColsInfo[ o_Type ] )
+   if Empty( aColsInfo[ o_Type ] )
       Return nil // nCol
    endif
 
    if aColors == NIL
       if oCol:ColorBlock == NIL
          cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
+         cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
       else
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( (::aHighCellColor := Eval( oCol:ColorBlock, ftmp ) ), nColor ) - 1 )
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ( ::aHighCellColor := Eval( oCol:ColorBlock, ftmp ) ), nColor ) - 1 )
+         cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, TBC_CLR_STANDARD ) - 1 )
 
       endif
+
    else
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, nColor ) - 1 )
+      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, TBC_CLR_STANDARD ) - 1 )
 
    endif
 
    Switch aColsInfo[ o_Type ]
    case "C"
    case "M"
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+      // If there is not an explicit width use that of the first item
+      if oCol:Width == NIL
+         DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
+         DispOut( Space( nWidth - nLen ), cColorBKG )
+      else
+         DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+      endif
+
       exit
 
    case "N"
-      DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+      if oCol:Width == NIL
+         DispOut( Space( nWidth - nLen ), cColorBKG )
+         nNotLeftCol := Col()
+         DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
+      else
+         DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+      endif
+
       exit
 
    case "D"
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
+      DispOut( Space( nWidth - nLen ), cColorBKG )
       exit
 
    case "L"
-      DispOut( padc( iif( ftmp, "T", "F" ), nWidth ), cColor )
+      // Always centered inside column
+      DispOut( Space( Round( ( nWidth - nLen ) / 2, 0 ) ), cColorBKG )
+      nNotLeftCol := Col()
+      DispOut( iif( ftmp, "T", "F" ), cColor )
+      DispOut( Space( Round( ( nWidth - nLen ) / 2, 0 ) ), cColorBKG )
       exit
 
    default
@@ -2432,48 +2462,9 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
 
    end
 
-   Return nil
+Return nNotLeftCol
 
-//-------------------------------------------------------------------//
 
-METHOD DispCellNormal( nColumn ) CLASS TBrowse
-   LOCAL ftmp := Eval( ::aColsInfo[ nColumn, o_Obj ]:block )
-   LOCAL cColor
-
-   if ::aColsInfo[ nColumn, o_Obj ]:ColorBlock == NIL
-      cColor := ::aColorSpec[ ::aColsInfo[ nColumn, o_DefColor, TBC_CLR_STANDARD ] ]
-   else
-      cColor := ::aColorSpec[ ColorToDisp( Eval( ::aColsInfo[ nColumn, o_Obj ]:ColorBlock, ftmp ), TBC_CLR_STANDARD ) ]
-   endif
-
-   Switch ::aColsInfo[ nColumn, o_Type  ]
-
-   case "C"
-   case "M"
-      DispOut( PadR( Transform( ftmp, ::aColsInfo[ nColumn,o_Pict ] ), ::aColsInfo[ nColumn,o_Width ] ), @cColor )
-      exit
-
-   case "N"
-      DispOut( PadL( Transform( ftmp, ::aColsInfo[ nColumn,o_Pict ] ), ::aColsInfo[ nColumn,o_Width ] ), @cColor )
-      exit
-
-   case "D"
-      DispOut( PadR( Transform( ftmp, ::aColsInfo[ nColumn,o_Pict ] ), ::aColsInfo[ nColumn,o_Width ] ), @cColor )
-      exit
-
-   case "L"
-      DispOut( padc( iif( ftmp, "T", "F" ), ::aColsInfo[ nColumn,o_Width ] ), @cColor )
-      exit
-
-   default
-      DispOut( Space( ::aColsInfo[ nColumn,o_Width ] ), @cColor )
-
-   end
-
-   Return nil
-
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //
 //   NOTE: Not tested, could be broken
@@ -2872,6 +2863,7 @@ static function LenVal( xVal, cType, cPict )
 
 //-------------------------------------------------------------------//
 
+/* inlined at the top
 static function ColorToDisp( aColor, nColor )
 
    if Len( aColor ) >= nColor
@@ -2879,6 +2871,7 @@ static function ColorToDisp( aColor, nColor )
    endif
 
    Return { 1, 2, 1, 1 }[ nColor ]
+*/
 
 //-------------------------------------------------------------------//
 
