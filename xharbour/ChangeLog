@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2566 2004/03/12 19:32:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.2567 2004/03/13 06:17:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-13 18:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * Introduced a new variable ::aColorSpec which parses and holds the oBrw:colorSpec 
+      which is parsed at the time of assignment of oBrw:ColorSpec := cColorString
+      and is used in ::DispCell() method instead of calling hb_colorIndex() with 
+      each cell display. Now Tbrowse is almost as fast as Clipper, measured with gtwvt.
+
+      Also, array browsers were showing a weired behaviour where the length of cells
+      were based on first record encountered, well asked in NG, has been fixed.
+
+      /* Here is a request, please post your amendments either to Walter or to me
+         as far as tbrowse is concerned. I have done this amendment 2nd time as someone 
+         broke it earlier also. I have kept the old code as well which will be removed
+         a few days hence.
+      */
+ 
 2004-03-12 22:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbexprb.c
    * source/compiler/harbour.sly
