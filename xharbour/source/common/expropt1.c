@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.6 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.7 2003/10/10 04:19:49 ronpinkas Exp $
  */
 
 /*
@@ -477,7 +477,7 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, szMessage));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, pMessage));
 
    pExpr = hb_compExprNew( HB_ET_SEND );
    pExpr->value.asMessage.pObject       = pObject;
@@ -504,7 +504,7 @@ HB_EXPR_PTR hb_compExprNewWithSend( HB_EXPR_PTR pMessage )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%p, %s)", szMessage));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSend(%p, %s)", pMessage));
 
    pExpr = hb_compExprNew( HB_ET_WITHSEND );
    pExpr->value.asMessage.pObject   = NULL;
