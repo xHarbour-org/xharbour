@@ -95,7 +95,7 @@ CLASS oCtrlMask FROM TWindow
    METHOD Refresh()
    METHOD SelectCtrl()
    METHOD DeSelectCtrl()
-
+   
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
