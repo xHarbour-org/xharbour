@@ -28,7 +28,7 @@ GLOBAL EXTERNAL oApp
    DATA yBmpSize
    DATA CtrlName
 
-   METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
+   METHOD New( oParent )     INLINE ::Caption := 'TForm1', ;
                                     ::Editing := .F.        ,;
                                     ::aCtrl   := {}         ,;
                                     ::left    := 200        ,;

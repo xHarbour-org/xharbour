@@ -107,12 +107,14 @@ METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
    if hiword(nwParam)==CBN_SELCHANGE
       oObj := ::Parent:Objects[::GetCurSel()+1]
       ::Parent:SetBrowserData( oObj )
+/*
       if aScan(::Parent:Objects[1]:oMask:aSelected,{|a| a[1]==oObj:handle })==0
-         ::Parent:Objects[1]:oMask:OnLButtonDown(,oObj:Left,oObj:Top)
          ::Parent:Objects[1]:oMask:mousedown:=.T.
+         ::Parent:Objects[1]:oMask:OnLButtonDown(,oObj:Left,oObj:Top)
          ::Parent:Objects[1]:oMask:OnLButtonUp(,oObj:Left,oObj:Top)
          ::SetFocus()
       endif
+*/
    endif
 return(0)
 
