@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2263 2004/02/11 16:07:45 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2264 2004/02/11 17:34:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-12 02:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filestat.c
+    ! fix compilation for MSVC
+
+  * source/rtl/val.c
+    ! re-introduce fixes for MSVC to work properly without LONGLONG.
+      ( MSVC with LONGLONG is still a problem )
 
 2004-02-11 09:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

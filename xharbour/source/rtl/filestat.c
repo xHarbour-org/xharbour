@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.1 2004/02/11 15:09:45 jonnymind Exp $
+ * $Id: filestat.c,v 1.2 2004/02/11 16:07:56 jonnymind Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
    #include <sys/stat.h>
 #elif defined( HB_OS_WIN_32 )
    #include <windows.h>
-   #if defined(__BORLANDC__) && ! defined( INVALID_FILE_ATTRIBUTES )
+   #if ( defined(__BORLANDC__) || defined(_MSC_VER) ) && ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES ((DWORD)(-1))
    #endif
 #endif
@@ -214,17 +214,17 @@ BOOL hb_fsFileStats(
    SYSTEMTIME time;
 
    /* Get attributes... */
-   dwAttribs = GetFileAttributes( pszFileName );
+   dwAttribs = GetFileAttributes( (char*) pszFileName );
    if ( dwAttribs == INVALID_FILE_ATTRIBUTES )
    {
       /* return */
       return FALSE;
    }
 
-   hb_fsAttrDecode( hb_fsAttrFromRaw( dwAttribs ), pszAttr );
+   hb_fsAttrDecode( hb_fsAttrFromRaw( dwAttribs ), (char*) pszAttr );
 
    /* If file existed, do a findfirst */
-   hFind = FindFirstFile( pszFileName, &ffind );
+   hFind = FindFirstFile( (char*) pszFileName, &ffind );
    if ( hFind == INVALID_HANDLE_VALUE )
    {
       return FALSE;
@@ -318,12 +318,12 @@ HB_FUNC( FILESTATS )
       return;
    }
 
-   if ( hb_fsFileStats( hb_itemGetCPtr( pFileName ),
+   if ( hb_fsFileStats( (BYTE*) hb_itemGetCPtr( pFileName ),
             szAttr, &llSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
    {
       if ( pAttr != NULL )
       {
-         hb_itemPutC( pAttr, szAttr );
+         hb_itemPutC( pAttr, (char*) szAttr );
       }
       if ( pSize != NULL )
       {

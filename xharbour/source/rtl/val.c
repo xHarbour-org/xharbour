@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.11 2004/02/10 22:34:33 andijahja Exp $
+ * $Id: val.c,v 1.12 2004/02/11 04:02:54 druzus Exp $
  */
 
 /*
@@ -213,11 +213,13 @@ HB_FUNC( VAL )
 
          lValue = hb_strValInt( szText, &iOverflow );
 
+#ifndef _MSC_VER
          if( !iOverflow )
          {
             hb_retnintlen( lValue, iLen );
             return;
          }
+#endif
       }
 
       {
@@ -234,6 +236,7 @@ HB_FUNC( VAL )
             iWidth++;
          }
 
+#ifdef _MSC_VER
          if( iWidth == 1 && szText[ 0 ] == 0 )
          {
             iWidth = 10;
@@ -248,6 +251,7 @@ HB_FUNC( VAL )
             hb_retnlen( dValue, iWidth, 0 );
          }
          else
+#endif
             hb_retnlen( dValue, iWidth, iDec );
       }
    }
