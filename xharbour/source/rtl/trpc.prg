@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.16 2003/04/17 21:22:23 jonnymind Exp $
+ * $Id: trpc.prg,v 1.17 2003/04/18 18:30:53 jonnymind Exp $
  */
 
 /*
@@ -1231,19 +1231,13 @@ RETURN .T.
 METHOD Accept() CLASS tRPCService
    LOCAL skIn
 
-   ? "Starting accept"
-   ? ""
    DO WHILE .T.
       skIn := InetAccept( ::skServer )
       // todo: better sync
-      ? "STATUS:", InetStatus( ::skServer )
-      ? ""
       IF InetStatus( ::skServer ) < 0
          EXIT
       ENDIF
       IF skIn != NIL
-         ? "Starting service"
-         ? ""
          ::StartService( skIn )
       ENDIF
    ENDDO
