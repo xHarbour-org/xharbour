@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.155 2002/04/17 02:47:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.156 2002/04/17 17:16:07 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-17 19:59 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbapiitm.h
+    + Add definition for hb_itemUnRefOnce().
+  * source/vm/itemapi.c
+    * Subdivision of the function hb_itemUnRef() in
+      hb_itemUnRef() and hb_itemUnRefOnce().
+  * source/rtl/valtype.c
+    + Add function: HB_ISBYREF().
+      This function allows in PRGs to know if a parameter has been
+      passed by value or by reference.
+
+2002-04-17 18:17 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix bug in DeleteAll method. Change DTOC() for CTOD().
+
+    * Bug fixed, reported by Lorenzo Fiorini.
+
+2002-04-17 18:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/teditor.prg
+    + Added of calls to IdleHook and KeyboardHook for handling of
+      special keys when the mode edition is not used.
+
+    * Bug fixed, reported by Marek Horodyski.
 
 2002-04-17 02:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/filesys.c
