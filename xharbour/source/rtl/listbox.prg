@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.6 2002/11/29 20:11:12 walito Exp $
+ * $Id: listbox.prg,v 1.7 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -463,8 +463,8 @@ Method _SCROLL( nMethod ) Class HBListBox
      Local nKey
      Local nStart
 
-     Switch -nMethod
-         Case 3074
+     Switch nMethod
+         Case -3074
              If ( ::topitem > 1 )
                 ::topitem --
                 ::vScroll:current := lbadjustcu( Self )
@@ -472,7 +472,7 @@ Method _SCROLL( nMethod ) Class HBListBox
              Endif
              Exit
 
-         Case 3075
+         Case -3075
              If ( ( ::topitem + ::bottom - ::top ) <= ::itemCount + 1 )
                 ::topitem ++
                 ::vScroll:current( lbadjustcu( Self ) )
@@ -480,7 +480,7 @@ Method _SCROLL( nMethod ) Class HBListBox
              Endif
              Exit
 
-         Case 3077
+         Case -3077
              nPos     := ::bottom - ::top - 1
              nCount   := ::itemCount
              nTopItem := ::topitem + nPos
@@ -495,7 +495,7 @@ Method _SCROLL( nMethod ) Class HBListBox
              Endif
              Exit
 
-         Case 3076
+         Case -3076
              nPos := ::bottom - ::top - Iif( ::bitmap, 2, ;
                      1 )
              nCount   := ::itemCount
@@ -511,7 +511,7 @@ Method _SCROLL( nMethod ) Class HBListBox
              Endif
              Exit
 
-         Case 3073
+         Case -3073
              nMouseRow := Mrow()
              Do While ( ( nKey := Inkey( 0 ) ) != 1003 )
                If ( nKey == 1001 )

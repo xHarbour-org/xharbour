@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.15 2003/01/27 03:57:24 walito Exp $
+ * $Id: tgetlist.prg,v 1.16 2003/02/04 23:43:44 ronpinkas Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
 
          while oGet:exitState == GE_NOEXIT .and. !::lKillRead
             setCursor( iif( ::nSaveCursor == SC_NONE, SC_NORMAL, ::nSaveCursor ) )
-	    nKey := INKEY( 0 )
+            nKey := INKEY( 0 )
             setCursor( SC_NONE )
             ::GetApplyKey( nKey, oMenu, oGetMsg )
             oGetMsg:Show( oGet )
@@ -937,18 +937,18 @@ METHOD GuiReader( oGet, oMenu, oGetMsg ) CLASS HBGetList
             oGUI:Select( ::nHitCode )
 
          ELSEIF ( ::nHitCode == HTCAPTION )
-	    oGUI:Select()
+            oGUI:Select()
 
          ELSEIF ( ::nHitCode == HTCLIENT )
-	    oGUI:Select( K_LBUTTONDOWN )
+            oGUI:Select( K_LBUTTONDOWN )
 
          ELSEIF ( ::nHitCode == HTDROPBUTTON )
-	    oGUI:Open()
+            oGUI:Open()
 
          ELSEIF ( ( ::nHitCode >= HTSCROLLFIRST ) .AND. ;
                   ( ::nHitCode <= HTSCROLLLAST ) )
             oGUI:Scroll( ::nHitCode )
-	 ENDIF
+         ENDIF
 
       ENDIF  // Added.
 
@@ -979,11 +979,11 @@ METHOD GuiReader( oGet, oMenu, oGetMsg ) CLASS HBGetList
 
          // De-activate the GET
       IF ( ( oGUI:ClassName() $ "LISTBOX_RADIOGROUP" ) .AND. ;
-	 VALTYPE( oGet:VarGet() ) == "N" )
-	 // Need to test the Value here:
-	 oGet:VarPut( oGUI:Value )
+         VALTYPE( oGet:VarGet() ) == "N" )
+         // Need to test the Value here:
+         oGet:VarPut( oGUI:Value )
       ELSE
-	 oGet:VarPut( oGUI:Buffer )
+         oGet:VarPut( oGUI:Buffer )
       ENDIF
       oGUI:killFocus()
 
@@ -1279,10 +1279,10 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
       uOldData := oGet:VarGet()
 
       IF ( oGUI:ClassName() $ "LISTBOX_RADIOGROUP" .AND. ;
-	 VALTYPE( oGet:VarGet() ) == "N" )
-	 uNewData := oGUI:Value
+         VALTYPE( oGet:VarGet() ) == "N" )
+         uNewData := oGUI:Value
       ELSE
-	 uNewData := oGUI:Buffer
+         uNewData := oGUI:Buffer
       ENDIF
 
    ENDIF
