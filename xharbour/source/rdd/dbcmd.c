@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.86 2004/03/07 21:42:51 andijahja Exp $
+ * $Id: dbcmd.c,v 1.88 2004/03/10 12:15:37 andijahja Exp $
  */
 
 /*
@@ -2299,8 +2299,6 @@ static void hb_dbfStructure( PHB_ITEM pStruct )
 
 HB_FUNC( DBSTRUCT )
 {
-   HB_THREAD_STUB
-
    HB_ITEM Struct;
 
    Struct.type = HB_IT_NIL;
@@ -5129,6 +5127,8 @@ static BOOL ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 
 static BOOL hb___Eval( PHB_ITEM pItem )
 {
+   HB_THREAD_STUB
+
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pItem );
    hb_vmDo( 0 );
@@ -5137,6 +5137,8 @@ static BOOL hb___Eval( PHB_ITEM pItem )
 
 HB_FUNC( DBF2TEXT )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pWhile = hb_param( 1, HB_IT_BLOCK );
    PHB_ITEM pFor = hb_param( 2, HB_IT_BLOCK );
    PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );

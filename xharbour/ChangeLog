@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2541 2004/03/10 10:29:24 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2542 2004/03/10 12:15:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-10 21:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    * minor fix for MT compilation
+
 2004-03-10 19:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/dbdelim.prg
     ! More enhancement by using C functions for APPENDTODB() and DBF2TEXT()
