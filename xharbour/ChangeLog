@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3530 2004/10/23 19:26:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3531 2004/10/23 23:42:37 oh1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,31 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-10-24 12:00 UTC+0200 Henryk Olkowski <oh1@op.pl>
+  * source/rtl/gt_tpl/gt_tpl.c
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxwc/gtxwc.c
+
+    * replaced fpBlank value ( ' ' --> hb_ctGetClearB() )
+
+
 2004-10-23 23:00 UTC+0200 Henryk Olkowski <oh1@op.pl>
   + source/ct/ctwin.c
   - source/ct/ctwin.prg ( --> source/ct/alt/ctwin.prg )
   + source/ct/setclear.c
-  * source/include/ctwin.h
-  * source/include/hbapigt.h
-  * source/source/rtl/console.c
-  * source/source/rtl/gtapi.c
-  * source/source/rtl/maxrow.c
-  * source/source/rtl/setpos.c
-  + source/tests/cttest/wmove.prg
+  * include/ctwin.h
+  * include/hbapigt.h
+  * source/rtl/console.c
+  * source/rtl/gtapi.c
+  * source/rtl/maxrow.c
+  * source/rtl/setpos.c
+  + tests/cttest/wmove.prg
 
     * replaced CT3 Windows API ( source/ct/ctwin.prg --> source/rtl/gtapi.c )
        added new functions hb_ct***()
