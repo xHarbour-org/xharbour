@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.8 2004/03/10 02:54:53 andijahja Exp $
+ * $Id: dbdelim.prg,v 1.9 2004/03/10 03:12:18 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.8 2004/03/10 02:54:53 andijahja Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.9 2004/03/10 03:12:18 andijahja Exp $" )
 
 #define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
@@ -165,6 +165,14 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
             // This simplifies the looping logic.
             bWhile := {||.T.}
          ENDIF
+
+#ifndef __USE_OLD__
+/*
+   AJ: Enhancement in speed
+   2004-03-10
+*/
+         DBF2TEXT( bWhile, bFor, aFields, cDelim, handle, cSeparator, nCount )
+#else
          // Set up for the start of the first record.
          lWriteSep := .F.
          // Process the records to copy delimited.
@@ -198,6 +206,7 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
             SKIP
          ENDDO
          AppendEOF( handle )
+#endif
          FClose( handle )
       ENDIF
    ELSE
@@ -221,9 +230,8 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
             bWhile := {||.T.}
          ENDIF
 
-         aStruct  := DBStruct()
-
 #ifdef __USE_OLD__
+         aStruct  := DBStruct()
          nFileLen := FSeek(handle,0,FS_END)
          nDimBuff := Min(nFileLen,nDimBuff)
          cByte    := Space(nDimBuff)
@@ -246,18 +254,17 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
 #else
 /*
    AJ: Enhancement in speed
-   2003-03-10
+   2004-03-10
 */
          FClose( handle )
-         IF !Empty( aTextContent := FParseEX( cFileName, cSeparator ) )
-            AppendToDb( aTextContent, aStruct )
-         ENDIF
+         AppendToDb( cFileName, cSeparator )
 
 #endif
       endif
    endif
 RETURN
 
+#ifdef __USE_OLD__
 STATIC FUNCTION ExportVar( handle, xField, cDelim )
    SWITCH VALTYPE( xField )
       CASE "C"
@@ -277,7 +284,6 @@ STATIC FUNCTION ExportVar( handle, xField, cDelim )
    END
 RETURN .T.
 
-#ifdef __USE_OLD__
 STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
 
    local lenrow:=len(cLine)
@@ -327,43 +333,6 @@ STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
 
       FIELDPUT(ii,vRes)
    next
-#else
-/*
-   AJ: Enhancement in speed
-   2003-03-10
-*/
-STATIC FUNCTION AppendToDb( aTextContent, aStruct )
-
-   local aContent
-   local nDBFfields
-   local nStructLen := Len( aStruct )
-   local ii
-   local vRes
-   local cBuffer
-
-   FOR EACH aContent IN aTextContent
-      nDBFfields := min( len( aContent ), nStructLen )
-      append blank
-      for ii := 1 to nDBFfields
-         cBuffer := aContent[ ii ]
-         SWITCH aStruct[ ii,2 ]
-            CASE "D"
-               vRes := HB_STOD( cBuffer )
-               EXIT
-            CASE "L"
-               vRes := Upper( cBuffer ) $ "T1Y"
-               EXIT
-            CASE "N"
-               vRes := VAL( cBuffer )
-               EXIT
-            DEFAULT
-               vRes := cBuffer
-         END
-         FIELDPUT(ii,vRes)
-      next
-   NEXT
-
-#endif
 return .T.
 
 Static Function AtToken( cToken, cLine, nStart )
@@ -400,3 +369,4 @@ Static Function RemoveQuote( cStr )
    EndIf
 
 Return cStr
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2540 2004/03/10 10:05:27 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2541 2004/03/10 10:29:24 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-10 19:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/dbdelim.prg
+    ! More enhancement by using C functions for APPENDTODB() and DBF2TEXT()
+      Append/Copy from/to text delimited now should be faster.
+
+    - put all PRG sun-routines into #ifdef __USE_OLD__
+    % tests/tstdelim.prg now 0.15 seconds from 0.22 seconds
+
+  * source/rdd/dbcmd.c
+    + PRG level function DBF2TEXT() for __DBDELIM()
+    + PRG level function APPENDTODB() for __DBDELIM()
+    + Force FPARSEEX() to be linked for __DBDELIM()
+
+  + tests/tstcopy.prg
+    + a simple program for copy to textfile
+      It was : 0.38 seconds before enhancement
+      Now    : 0.11 seconds
 
 2004-03-10 16:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c

@@ -99,6 +99,27 @@ extern HB_FUNC( _SDF );
 extern HB_FUNC( _DELIM );
 extern HB_FUNC( RDDSYS );
 
+#define __PRG_SOURCE__ __FILE__
+extern HB_FUNC( FPARSEEX );
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
+HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_DBCMD )
+{ "FPARSEEX", HB_FS_PUBLIC, HB_FUNCNAME( FPARSEEX ), NULL }
+HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_DBCMD )
+
+#if defined(HB_PRAGMA_STARTUP)
+   #pragma startup hb_vm_SymbolInit_DBCMD
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_SymbolInit_DBCMD = hb_vm_SymbolInit_DBCMD;
+   #pragma data_seg()
+#endif
+
 static char * s_szDefDriver = NULL;    /* Default RDD name */
 static LPRDDNODE s_pRddList = NULL;    /* Registered RDD's */
 static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
@@ -2239,13 +2260,12 @@ HB_FUNC( DBSKIP )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
 }
 
-HB_FUNC( DBSTRUCT )
+static void hb_dbfStructure( PHB_ITEM pStruct )
 {
    HB_THREAD_STUB
+
    HB_ITEM Item, Data;
    USHORT uiFields, uiCount;
-
-   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
    if( s_pCurrArea )
    {
@@ -2253,6 +2273,8 @@ HB_FUNC( DBSTRUCT )
 
       Data.type = HB_IT_NIL;
       Item.type = HB_IT_NIL;
+
+      hb_arrayNew( pStruct, 0 );
 
       for( uiCount = 1; uiCount <= uiFields; uiCount++ )
       {
@@ -2270,10 +2292,21 @@ HB_FUNC( DBSTRUCT )
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, &Data );
          hb_arraySetForward( &Item, 4, &Data );
 
-         hb_arrayAddForward( &(HB_VM_STACK.Return), &Item );
+         hb_arrayAddForward( pStruct, &Item );
       }
-
    }
+}
+
+HB_FUNC( DBSTRUCT )
+{
+   HB_THREAD_STUB
+
+   HB_ITEM Struct;
+
+   Struct.type = HB_IT_NIL;
+
+   hb_dbfStructure( &Struct );
+   hb_itemReturn( &Struct );
 }
 
 HB_FUNC( DBTABLEEXT )
@@ -4932,4 +4965,267 @@ HB_FUNC( DBSKIPPER )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPPER" );
+}
+
+/*
+  AJ: Added 2004-03-10
+*/
+HB_FUNC( APPENDTODB )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pDelimitedFile = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pDelimiter = hb_param( 2, HB_IT_STRING );
+
+   if ( pDelimitedFile )
+   {
+      PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
+
+      if( s_pCurrArea )
+      {
+         ULONG ulContent = pContent->item.asArray.value->ulLen;
+         HB_ITEM Structure;
+         USHORT uiStruct;
+         ULONG ulData;
+
+         Structure.type = HB_IT_NIL;
+         hb_dbfStructure( &Structure );
+         uiStruct = ( USHORT ) (&Structure)->item.asArray.value->ulLen;
+
+         if ( ulContent > 0 )
+         {
+            for ( ulData = 0; ulData < ulContent; ulData ++ )
+            {
+               PHB_ITEM pData = hb_arrayGetItemPtr( pContent, ulData + 1 );
+               USHORT uiData = ( USHORT ) pData->item.asArray.value->ulLen;
+               USHORT uiField = ( uiData < uiStruct ) ? uiData : uiStruct;
+               USHORT ui;
+
+               s_bNetError = FALSE;
+
+               if( SELF_APPEND( ( AREAP ) s_pCurrArea->pArea, TRUE ) == FAILURE )
+               {
+                  s_bNetError = TRUE;
+               }
+               else
+               {
+                  for ( ui = 0; ui < uiField ; ui ++ )
+                  {
+                     HB_ITEM FieldValue;
+                     PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
+                     char *cBuffer = hb_arrayGetC( pData, ui + 1 );
+                     char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
+
+                     ( &FieldValue )->type = HB_IT_NIL;
+
+                     /* Create PHB_ITEM to be FIELDPUTted */
+                     switch( cFieldType[0] )
+                     {
+                        /* It's a DATE field */
+                        case 'D':
+                           hb_itemPutDS( &FieldValue, cBuffer );
+                           break;
+
+                        /* It's a LOGICAL field '*/
+                        case 'L':
+                        {
+                           BOOL bTrue;
+                           hb_strupr( cBuffer );
+                           bTrue = ( cBuffer[0] == 'T' );
+                           hb_itemPutL( &FieldValue, bTrue );
+                           break;
+                        }
+
+                        /* It's a NUMERIC field */
+                        case 'N':
+                           hb_itemPutND( &FieldValue, hb_strVal( cBuffer ) );
+                           break;
+
+                        /* It's a CHARACTER field */
+                        default:
+                           hb_itemPutC( &FieldValue, cBuffer );
+                           break;
+                     }
+
+                     /* FieldPut */
+                     SELF_PUTVALUE( ( AREAP ) s_pCurrArea->pArea, ui + 1, &FieldValue );
+
+                     /* Clean Ups */
+                     hb_itemClear( &FieldValue );
+                     hb_xfree( cBuffer );
+                     hb_xfree( cFieldType );
+                  }
+               }
+            }
+         }
+         /* Clean Ups */
+         hb_itemClear( &Structure );
+         hb_itemRelease( pContent );
+      }
+      else
+      {
+         hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "APPENDTODB" );
+      }
+   }
+}
+
+static BOOL ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
+{
+   switch( pValue->type )
+   {
+      case HB_IT_STRING:
+      {
+         char *szString;
+         char *szText = pValue->item.asString.value;
+         USHORT iSzLen = ( USHORT ) pValue->item.asString.length;
+
+         while( iSzLen && HB_ISSPACE( szText[ iSzLen - 1 ] ) )
+         {
+            iSzLen--;
+         }
+         szText[ iSzLen ] = '\0';
+
+         szString = hb_xstrcpy( NULL,cDelim,szText,cDelim,NULL);
+
+         hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
+         hb_xfree( szString );
+         break;
+      }
+      case HB_IT_DATE:
+      {
+         char *szDate = (char*) hb_xgrab( 9 );
+
+         hb_itemGetDS( pValue, szDate );
+         hb_fsWriteLarge( handle, (BYTE*) szDate, strlen( szDate ) );
+         hb_xfree( szDate );
+         break;
+      }
+      case HB_IT_LOGICAL:
+      {
+         hb_fsWriteLarge( handle, (BYTE*) ( pValue->item.asLogical.value ? "T" : "F" ), 1 );
+         break;
+      }
+      case HB_IT_NUMERIC:
+      {
+         char * szResult = hb_itemStr( pValue, NULL, NULL );
+
+         if ( szResult )
+         {
+            szResult ++;
+            while( HB_ISSPACE( *szResult ) )
+            {
+               szResult++ ;
+            }
+            hb_fsWriteLarge( handle, (BYTE*) szResult, strlen( szResult ) );
+            hb_xfree( szResult );
+         }
+         break;
+      }
+      default:
+         return FALSE;
+   }
+   return TRUE;
+}
+
+static BOOL hb___Eval( PHB_ITEM pItem )
+{
+   hb_vmPushSymbol( &hb_symEval );
+   hb_vmPush( pItem );
+   hb_vmDo( 0 );
+   return (&HB_VM_STACK.Return)->item.asLogical.value ;
+}
+
+HB_FUNC( DBF2TEXT )
+{
+   PHB_ITEM pWhile = hb_param( 1, HB_IT_BLOCK );
+   PHB_ITEM pFor = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
+   char *cDelim = hb_parc( 4 );
+   int handle = hb_parnl( 5 );
+   BYTE *cSep = (BYTE*) hb_parc( 6 );
+   int iSepLen = hb_parclen( 6 );
+   int nCount = hb_parni( 7 );
+   USHORT uiFields = 0;
+   USHORT ui;
+   HB_ITEM Tmp;
+   BOOL bWriteSep = FALSE;
+
+   BOOL bEof = TRUE;
+   BOOL bBof = TRUE;
+
+   SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
+
+   Tmp.type = HB_IT_NIL;
+
+   while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+   {
+      SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bEof );
+      SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBof );
+
+      if ( bEof || bBof )
+      {
+         break;
+      }
+
+      if ( hb___Eval ( pFor ) )
+      {
+         if ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 )
+         {
+            for ( ui = 1; ui <= uiFields; ui ++ )
+            {
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, ui, &Tmp );
+               bWriteSep = ExportVar( handle, &Tmp, cDelim );
+               hb_itemClear( &Tmp );
+            }
+         }
+         else
+         {
+            USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
+            USHORT uiItter;
+
+            for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
+            {
+               char *szFieldName = hb_arrayGetC( pFields, uiItter );
+
+               if ( bWriteSep )
+               {
+                  hb_fsWriteLarge( handle, cSep, iSepLen );
+               }
+
+               if ( szFieldName )
+               {
+                  int iFieldLen = strlen( szFieldName );
+                  char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
+                  int iPos;
+
+                  hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
+                  iPos = hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName );
+                  hb_xfree( szName );
+
+                  SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, iPos, &Tmp );
+                  bWriteSep = ExportVar( handle, &Tmp, cDelim );
+                  hb_itemClear( &Tmp );
+               }
+
+               hb_xfree( szFieldName );
+            }
+         }
+         hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );
+         bWriteSep = FALSE;
+      }
+
+      if ( nCount != -1 )
+      {
+         nCount-- ;
+      }
+
+      SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+   }
+
+   hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
 }
