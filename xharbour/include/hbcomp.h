@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.10 2002/12/18 13:43:55 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.11 2003/01/10 05:40:02 ronpinkas Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ typedef struct _COMDECLARED
    {
       struct _COMCLASS *pClass;
       struct _ENUMDEF  *pEnum;
-   };
+   } Extended;
    struct _COMCLASS    * ( * pParamClasses );
    struct _COMDECLARED * pNext;               /* pointer to the next declared function */
 } COMDECLARED, * PCOMDECLARED;
@@ -149,7 +149,7 @@ typedef struct _VAR
    {
       PCOMCLASS pClass;
       PENUMDEF  pEnum;
-   };
+   } Extended;
    struct _VAR * pNext;            /* pointer to next defined variable */
 } VAR, * PVAR;
 
@@ -226,7 +226,7 @@ typedef struct _COMSYMBOL
    {
       PCOMCLASS pClass;
       PENUMDEF  pEnum;
-   };
+   } Extended;
    struct _COMSYMBOL * pNext;   /* pointer to the next defined symbol */
 } COMSYMBOL, * PCOMSYMBOL;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.628 2003/01/15 20:13:39 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.629 2003/01/15 20:23:24 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-15 17:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbpcode.c
+    * Removed usage of UN named union as it's not supported by older versions of gcc.
 
 2003-01-15 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * samples/sitesvr/sitesvr.prg
@@ -24,7 +31,6 @@
       ! fixed when recreating an existing tag of an open index
       * work in progress: support for temporary indexes
 
->>>>>>> 1.628
 2003-01-15 12:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/hbusage.c
     ! fix serious bug on header file: 2002 -> 2003 :-)

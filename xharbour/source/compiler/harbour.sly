@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.29 2002/12/04 23:06:56 likewolf Exp $
+ * $Id: harbour.sly,v 1.30 2002/12/08 20:10:50 ronpinkas Exp $
  */
 
 /*
@@ -1611,8 +1611,8 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
 
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
-                   hb_comp_pLastDeclared->pClass = hb_compClassFind( hb_comp_szFromClass );
-                   if( ! hb_comp_pLastDeclared->pClass )
+                   hb_comp_pLastDeclared->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
+                   if( ! hb_comp_pLastDeclared->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastDeclared->szName );
                      hb_comp_pLastDeclared->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' : 'o' );
@@ -1649,8 +1649,8 @@ DecMethod  : IdentName '(' { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLa
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
-                   hb_comp_pLastMethod->pClass = hb_compClassFind( hb_comp_szFromClass );
-                   if( ! hb_comp_pLastMethod->pClass )
+                   hb_comp_pLastMethod->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
+                   if( ! hb_comp_pLastMethod->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastMethod->szName );
                      hb_comp_pLastMethod->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' : 'o' );
@@ -1678,8 +1678,8 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
                    pClass = hb_compClassFind( hb_comp_szFromClass );
-                   hb_comp_pLastMethod->pClass = pClass;
-                   if( ! hb_comp_pLastMethod->pClass )
+                   hb_comp_pLastMethod->Extended.pClass = pClass;
+                   if( ! hb_comp_pLastMethod->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastMethod->szName );
                      hb_comp_pLastMethod->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' :'o' );
@@ -1702,7 +1702,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
 
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
-                   hb_comp_pLastMethod->pClass = pClass;
+                   hb_comp_pLastMethod->Extended.pClass = pClass;
                    hb_comp_szFromClass = NULL;
                  }
                }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.12 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.13 2002/11/12 17:24:14 ronpinkas Exp $
  */
 
 /*
@@ -371,9 +371,9 @@ void hb_compStrongType( int iSize )
 
              cType2 = pDeclared->cType;
              if( cType2 == 'S' )
-                sprintf( ( char * ) szType2, "%s", pDeclared->pClass->szName );
+                sprintf( ( char * ) szType2, "%s", pDeclared->Extended.pClass->szName );
              else if( cType2 == 's' )
-                sprintf( ( char * ) szType2, "ARRAY OF %s", pDeclared->pClass->szName );
+                sprintf( ( char * ) szType2, "ARRAY OF %s", pDeclared->Extended.pClass->szName );
              else if( cType2 == '-' )
                 sprintf( ( char * ) szType2, "NIL" );
              else
@@ -896,9 +896,9 @@ void hb_compStrongType( int iSize )
            if( toupper( pFunc->pStack[ pFunc->iStackIndex - 1 ] ) == 'S' && pFunc->iStackClasses < 8 )
            {
               /*
-              printf( "\nNested CLASS!!! Stack: %i Type: %c Class: %s\n", pFunc->iStackIndex, pFunc->pStack[ pFunc->iStackIndex - 1 ], pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pClass->szName );
+              printf( "\nNested CLASS!!! Stack: %i Type: %c Class: %s\n", pFunc->iStackIndex, pFunc->pStack[ pFunc->iStackIndex - 1 ], pFunc->pStackFunctions[ pFunc->iStackFunctions ]->Extended.pClass->szName );
               */
-              pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->pClass;
+              pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pFunc->pStackFunctions[ pFunc->iStackFunctions ]->Extended.pClass;
            }
         }
         else
@@ -1795,7 +1795,7 @@ void hb_compStrongType( int iSize )
 
                 if( toupper( pDeclared->cType ) == 'S' && pFunc->iStackClasses < 8 )
                 {
-                   pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pDeclared->pClass;
+                   pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pDeclared->Extended.pClass;
                 }
              }
              else
@@ -1923,7 +1923,7 @@ void hb_compStrongType( int iSize )
           if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
           {
             /* Object of declared class */
-            pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->pClass;
+            pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
           }
 
           if( pFunc->pCode[ ulPos ] == HB_P_PUSHLOCALREF )
@@ -1985,7 +1985,7 @@ void hb_compStrongType( int iSize )
           if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
           {
              /* Object of declared class */
-             pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->pClass;
+             pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
           }
 
           if( pFunc->pCode[ ulPos ] == HB_P_PUSHSTATICREF )
@@ -2104,7 +2104,7 @@ void hb_compStrongType( int iSize )
              else if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
              {
                 /* Object of declared class */
-                pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->pClass;
+                pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pVar->Extended.pClass;
                 pFunc->pStack[ pFunc->iStackIndex++ ] = pVar->cType;
              }
              else
@@ -2130,7 +2130,7 @@ void hb_compStrongType( int iSize )
              else if( toupper( cType ) == 'S' && pFunc->iStackClasses < 8 )
              {
                 /* Object of declared class */
-                pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pSym->pClass;
+                pFunc->pStackClasses[ pFunc->iStackClasses++ ] = pSym->Extended.pClass;
                 pFunc->pStack[ pFunc->iStackIndex++ ] = pSym->cType;
              }
              else
@@ -2453,11 +2453,11 @@ void hb_compStrongType( int iSize )
 
                 if( toupper( cType ) == 'S' && pFunc->iStackClasses )
                 {
-                   pVar->pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
+                   pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
                 }
                 else
                 {
-                   pVar->pClass = NULL;
+                   pVar->Extended.pClass = NULL;
                 }
 
                 /*
@@ -2468,9 +2468,9 @@ void hb_compStrongType( int iSize )
              {
                 char szType[2];
                 if( pVar->cType == 'S' )
-                  sprintf( ( char * ) szType, "%s", pVar->pClass->szName );
+                  sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
                 else if( pVar->cType == 's' )
-                  sprintf( ( char * ) szType, "ARRAY OF %s", pVar->pClass->szName );
+                  sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
                 else if( islower( pVar->cType ) )
                   sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
                 else
@@ -2549,7 +2549,7 @@ void hb_compStrongType( int iSize )
                 }
                 else if( pVar->cType == 'S' && pFunc->pStack[ pFunc->iStackIndex ] == 'S' )
                 {
-                   if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+                   if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
 			       {
                       /* Same class */
 			       }
@@ -2560,7 +2560,7 @@ void hb_compStrongType( int iSize )
                 }
                 else if( pVar->cType == 's' && pFunc->pStack[ pFunc->iStackIndex ] == 's' )
                 {
-                   if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+                   if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
 			       {
                       /* Same class */
 			       }
@@ -2596,7 +2596,7 @@ void hb_compStrongType( int iSize )
                 /* Will need the Class Handle. */
                 if( toupper( pFunc->pStack[ pFunc->iStackIndex ] ) == 'S' && pFunc->iStackClasses )
                 {
-                   pSym->pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
+                   pSym->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
                 }
              }
              else
@@ -2605,11 +2605,11 @@ void hb_compStrongType( int iSize )
 
                 if( pSym->cType == 'S' )
                 {
-                   sprintf( ( char * ) szType, "%s", pSym->pClass->szName );
+                   sprintf( ( char * ) szType, "%s", pSym->Extended.pClass->szName );
                 }
                 else if( pSym->cType == 's' )
                 {
-                   sprintf( ( char * ) szType, "ARRAY OF %s", pSym->pClass->szName );
+                   sprintf( ( char * ) szType, "ARRAY OF %s", pSym->Extended.pClass->szName );
                 }
                 else if( islower( pSym->cType ) )
                 {
@@ -2659,7 +2659,7 @@ void hb_compStrongType( int iSize )
                 }
                 else if( pSym->cType == 'S' && pFunc->pStack[ pFunc->iStackIndex ] == 'S' )
                 {
-                   if( pFunc->iStackClasses && pSym->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+                   if( pFunc->iStackClasses && pSym->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
                    {
                       /* Same class */
                    }
@@ -2670,7 +2670,7 @@ void hb_compStrongType( int iSize )
                 }
                 else if( pSym->cType == 's' && pFunc->pStack[ pFunc->iStackIndex ] == 's' )
                 {
-                   if( pFunc->iStackClasses && pSym->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+                   if( pFunc->iStackClasses && pSym->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
                       ; /* Same class */
                    else
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pSym->szName, ( char * ) szType );
@@ -2764,11 +2764,11 @@ void hb_compStrongType( int iSize )
 
             if( toupper( cType ) == 'S' && pFunc->iStackClasses )
             {
-               pVar->pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
+               pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
             }
             else
             {
-               pVar->pClass = NULL;
+               pVar->Extended.pClass = NULL;
             }
          }
          else
@@ -2776,9 +2776,9 @@ void hb_compStrongType( int iSize )
             char szType[2];
 
             if( pVar->cType == 'S' )
-               sprintf( ( char * ) szType, "%s", pVar->pClass->szName );
+               sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
             else if( pVar->cType == 's' )
-               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->pClass->szName );
+               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
             else if( islower( pVar->cType ) )
                sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
             else
@@ -2855,7 +2855,7 @@ void hb_compStrongType( int iSize )
             }
             else if( pVar->cType == 'S' && pFunc->pStack[ pFunc->iStackIndex ] == 'S' )
             {
-               if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+               if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
 		       {
                   /* Same class */
 		       }
@@ -2866,7 +2866,7 @@ void hb_compStrongType( int iSize )
             }
             else if( pVar->cType == 's' && pFunc->pStack[ pFunc->iStackIndex ] == 's' )
             {
-               if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+               if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
                  ; /* Same class */
                else
                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ARRAY_ASSIGN_TYPE, pVar->szName, ( char * ) szType );
@@ -2924,11 +2924,11 @@ void hb_compStrongType( int iSize )
             }
             if( toupper( cType ) == 'S' && pFunc->iStackClasses )
             {
-               pVar->pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
+               pVar->Extended.pClass = pFunc->pStackClasses[ pFunc->iStackClasses - 1 ];
             }
             else
             {
-               pVar->pClass = NULL;
+               pVar->Extended.pClass = NULL;
             }
 
             /*
@@ -2939,9 +2939,9 @@ void hb_compStrongType( int iSize )
          {
             char szType[2];
             if( pVar->cType == 'S' )
-               sprintf( ( char * ) szType, "%s", pVar->pClass->szName );
+               sprintf( ( char * ) szType, "%s", pVar->Extended.pClass->szName );
             else if( pVar->cType == 's' )
-               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->pClass->szName );
+               sprintf( ( char * ) szType, "ARRAY OF %s", pVar->Extended.pClass->szName );
             else if( islower( pVar->cType ) )
                sprintf( ( char * ) szType, "ARRAY OF %c", toupper( pVar->cType ) );
             else
@@ -3018,7 +3018,7 @@ void hb_compStrongType( int iSize )
             }
             else if( pVar->cType == 'S' && pFunc->pStack[ pFunc->iStackIndex ] == 'S' )
             {
-               if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+               if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
 		       {
                   /* Same class */
 		       }
@@ -3029,7 +3029,7 @@ void hb_compStrongType( int iSize )
             }
             else if( pVar->cType == 's' && pFunc->pStack[ pFunc->iStackIndex ] == 's' )
             {
-               if( pFunc->iStackClasses && pVar->pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
+               if( pFunc->iStackClasses && pVar->Extended.pClass == pFunc->pStackClasses[ pFunc->iStackClasses - 1 ] )
 		       {
                   /* Same class */
 		       }

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.29 2002/12/04 23:06:52 likewolf Exp $
+ * $Id: harbour.c,v 1.30 2003/01/07 10:48:18 likewolf Exp $
  */
 
 /*
@@ -616,8 +616,8 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       printf( "\nVariable %s is of Class: %s\n", szVarName, hb_comp_szFromClass );
       */
 
-      pVar->pClass = hb_compClassFind( hb_comp_szFromClass );
-      if( ! pVar->pClass )
+      pVar->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
+      if( ! pVar->Extended.pClass )
       {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, szVarName );
          pVar->cType = 'O';
@@ -960,7 +960,7 @@ PCOMCLASS hb_compClassAdd( char * szClassName )
    /* Auto declaration for the Class Function. */
    pDeclared = hb_compDeclaredAdd( szClassName );
    pDeclared->cType = 'S';
-   pDeclared->pClass = pClass;
+   pDeclared->Extended.pClass = pClass;
 
    return pClass;
 }
