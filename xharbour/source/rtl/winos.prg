@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg, $
+ * $Id: winos.prg,v 1.1 2004/12/08 01:01:08 peterrees Exp $
  */
 
 /*
@@ -127,15 +127,15 @@ FUNCTION OS_NETREGOK( lSetIt )
 
     // Server settings
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "CachedOpenLimit", 0, lSetIt )
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocks", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocksForceClose", 1, lSetIt)
+    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLocks", 0, lSetIt) // Q124916
+    rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "EnableOpLockForceClose", 1, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationDelay", 0, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeySrv, "SharingViolationRetries", 0, lSetIt)
 
     // Workstation settings
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseOpportunisticLocking", 0, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLocks", 0, lSetIt)
-    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLocksForceClose", 1, lSetIt)
+    rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "EnableOpLockForceClose", 1, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UtilizeNtCaching", 0, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseLockReadUnlock", 0, lSetIt)
 
