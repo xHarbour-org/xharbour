@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.62 2004/03/23 17:24:43 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.63 2004/03/24 02:55:37 vouchcac Exp $
  */
 
 /*
@@ -783,14 +783,15 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
    // If I've never displayed this TBrowse before I cannot calc occupied space since
    // columns:width is not yet set, ::Stabilize() will call me later
    //
-   if ! ::lNeverDisplayed
+   if !( ::lNeverDisplayed )
 
       if nHowMany > 0
          for each aCol in ::aColsInfo
-            if HB_EnumIndex() <= nHowMany
+            nCol := HB_EnumIndex()
+            if nCol <= nHowMany
                ::nFrozenWidth += aCol[ o_Width ]
-               if HB_EnumIndex() < ::nColumns
-                  ::nFrozenWidth += aCol[ o_SepWidth ]
+               if nCol < ::nColumns .and. aCol[ o_Width ] > 0
+                  ::nFrozenWidth += ::aColsInfo[ nCol + 1, o_SepWidth ]
                endif
             else
                exit
@@ -1217,8 +1218,8 @@ METHOD LeftDetermine() CLASS TBrowse
 
       if nWidth <= ::nVisWidth
          nCol--
-         if nCol > 0
-            nWidth += ::aColsInfo[ nCol, o_SepWidth ]
+         if nCol > 0 .and. nCol > ::nFrozenCols .and. ::aColsInfo[ nCol,o_Width ] > 0
+            nWidth += ::aColsInfo[ nCol + 1,o_SepWidth ]
          endif
       else
          exit
@@ -1239,13 +1240,6 @@ METHOD HowManyCol() CLASS TBrowse
    Local nToAdd       := 0
    Local nColsVisible, nColsWidth, n, nColumns
 
-   do while .t.
-      if ( n := ascan( ::aColsInfo, {|e_| e_[ o_Width ] == 0 } ) ) == 0
-         exit
-      endif
-      adel( ::aColsInfo, n, .t. )
-      ::nColumns--
-   enddo
    ::aColumns := ::aColsInfo
    nColumns   := ::nColumns
 
@@ -1259,7 +1253,8 @@ METHOD HowManyCol() CLASS TBrowse
       while nColsVisible < ::nFrozenCols .and. nColsVisible < ::nColumns
          nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
 
-         if nColsVisible >= 1 .and. nColsVisible < ::nColumns
+         if nColsVisible >= 1 .and. nColsVisible < ::nColumns .and.;
+                                               ::aColsInfo[ nColsVisible,o_Width ] > 0
             nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
          endif
 
@@ -1293,7 +1288,8 @@ METHOD HowManyCol() CLASS TBrowse
    while nColsVisible < ::nColumns   // .and. nColsVisible < ::nColumns
       nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
 
-      if nColsVisible >= ::leftVisible .or. ::nFrozenCols > 0
+      if ( nColsVisible >= ::leftVisible .or. ::nFrozenCols > 0 ) .and.;
+                                          ::aColsInfo[ nColsVisible,o_Width ] > 0
          nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
       endif
 
@@ -1308,7 +1304,7 @@ METHOD HowManyCol() CLASS TBrowse
    ::rightVisible := nColsVisible
    ::nColsVisible := nColsVisible
    ::nColsWidth   := nColsWidth
-   ::cSpacePre    := space( ( ::nVisWidth - ::nColsWidth ) / 2  )
+   ::cSpacePre    := space( INT( ( ::nVisWidth - ::nColsWidth ) / 2 ) )
    ::cSpaceLast   := space( ::nVisWidth - len( ::cSpacePre ) - ::nColsWidth )
 
    Return Self
@@ -1326,7 +1322,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    Local nColFrom
 
    aCol     := ARRAY( ::rightVisible )
-   nCol     := ::nwLeft + iif( ::nFrozenCols > 0, 0, ( nWidth - ::nColsWidth ) / 2 )
+   nCol     := ::nwLeft + iif( ::nFrozenCols > 0, 0, INT( ( nWidth - ::nColsWidth ) / 2 ) )
 
    nColFrom := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
@@ -1334,20 +1330,20 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
    for n := nColFrom to ::rightVisible
       aCol[ n ] := nCol
-      ::aColsInfo[ n,o_Obj ]:ColPos := nCol         // Calculate it once only
+      ::aColsInfo[ n,o_Obj ]:ColPos := nCol
 
       nCol += ::aColsInfo[ n, o_Width ]
 
-      if ::nFrozenCols > 0 .and. n == ::nFrozenCols
-         n    := ::leftVisible - 1
-         nCol += ( nWidth - ::nColsWidth ) / 2
+      if n < ::rightVisible
+         if ::aColsInfo[ n,o_Width ] > 0
+            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n+1, o_SepWidth ] / 2 ) )
+            nCol += ::aColsInfo[ n+1, o_SepWidth ]
+         endif
       endif
 
-      if n <= ::rightVisible
-         if n < ::rightVisible
-            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n, o_SepWidth ] / 2 ) )
-         endif
-         nCol += ::aColsInfo[ n, o_SepWidth ]
+      if ::nFrozenCols > 0 .and. n == ::nFrozenCols
+         n    := ::leftVisible - 1
+         nCol += INT( ( nWidth - ::nColsWidth ) / 2 )
       endif
    next
 
@@ -1384,19 +1380,23 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    for n := iif( ::nFrozenCols > 0, 1, ::leftVisible ) to ::rightVisible
       if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
          n     := ::leftVisible
-         nTPos += ( nWidth - ::nColsWidth ) / 2
-         nBPos += ( nWidth - ::nColsWidth ) / 2
+         nTPos += INT( ( nWidth - ::nColsWidth ) / 2 )
+         nBPos += INT( ( nWidth - ::nColsWidth ) / 2 )
       endif
 
       if n < ::rightVisible
-         nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
+         if ::aColsInfo[n, o_Width] > 0            //x
+            nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
+         else
+            nLCS := 0
+         endif
 
-         if ::lHeadSep  // .and. ! Empty( ::HeadSep )
+         if ::lHeadSep
             DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n, o_Width ] ), ::HeadSep, ::cColorSpec )
             nTPos += nLCS
          endif
 
-         if ::lFootSep  // .and. ! Empty( ::FootSep )
+         if ::lFootSep
             DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ::FootSep, ::cColorSpec )
             nBPos += nLCS
          endif
@@ -1935,7 +1935,7 @@ METHOD DrawRows() CLASS TBrowse
    aColsInfo  := ::aColsInfo
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
    cSpacePre  := ::cSpacePre
-   cSpaceLast := Space( Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) )
+   cSpaceLast := space( ::nVisWidth - len( ::cSpacePre ) - ::nColsWidth )
    lInRect    := .f.
 
    DispBegin()
@@ -1966,7 +1966,7 @@ METHOD DrawRows() CLASS TBrowse
                DispOutAt( nRow + ::nRowData, ::nwLeft, @cSpacePre, ColorSpec )
                for n := nColFrom to ::rightVisible
                   DispOut( Space( aColsInfo[ n, o_Width ] ), ColorSpec )
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -1980,7 +1980,7 @@ METHOD DrawRows() CLASS TBrowse
                   endif
                   DispOut( Space( aColsInfo[ n, o_Width ] ), ColorSpec )
 
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -1996,7 +1996,7 @@ METHOD DrawRows() CLASS TBrowse
                   for n := nColFrom to ::rightVisible
                      ::DispCellNormal( @n )
 
-                     if n < ::rightVisible
+                     if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                         DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                      endif
                   next
@@ -2010,7 +2010,7 @@ METHOD DrawRows() CLASS TBrowse
                         ::DispCellNormal( @n )
                      endif
 
-                     if n < ::rightVisible
+                     if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                         DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                      endif
                   next
@@ -2034,7 +2034,7 @@ METHOD DrawRows() CLASS TBrowse
                      ::DispCell( @n, TBC_CLR_STANDARD )
                   endif
 
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -2072,7 +2072,7 @@ METHOD DrawARow() CLASS TBrowse
    aColsInfo  := ::aColsInfo
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
    cSpacePre  := ::cSpacePre
-   cSpaceLast := Space( Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) )
+   cSpaceLast := space( ::nVisWidth - len( ::cSpacePre ) - ::nColsWidth )
    lInRect    := .f.
 
    // Data source is alredy at correct record number, now we need
@@ -2102,7 +2102,7 @@ METHOD DrawARow() CLASS TBrowse
                for n := nColFrom to ::rightVisible
                   DispOut( Space( aColsInfo[ n, o_Width ] ), ColorSpec )
 
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -2118,7 +2118,7 @@ METHOD DrawARow() CLASS TBrowse
 
                   DispOut( Space( aColsInfo[ n, o_Width ] ), ColorSpec )
 
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -2135,7 +2135,7 @@ METHOD DrawARow() CLASS TBrowse
                   for n := nColFrom to ::rightVisible
                      ::DispCellNormal( @n )
 
-                     if n < ::rightVisible
+                     if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                         DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                      endif
                   next
@@ -2149,7 +2149,7 @@ METHOD DrawARow() CLASS TBrowse
                         ::DispCellNormal( @n )
                      endif
 
-                     if n < ::rightVisible
+                     if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                         DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                      endif
                   next
@@ -2172,7 +2172,7 @@ METHOD DrawARow() CLASS TBrowse
                      ::DispCell( @n, TBC_CLR_STANDARD )
                   endif
 
-                  if n < ::rightVisible
+                  if n < ::rightVisible .and. aColsInfo[ n,o_Width ] > 0
                      DispOut( aColsInfo[ n + 1, o_ColSep ], ColorSpec )
                   endif
                next
@@ -2400,7 +2400,7 @@ METHOD MGotoYX( nRow, nCol ) CLASS TBrowse
 
          nColsLen += ::aColsInfo[ nI, o_Width ]
          if nI >= 1 .AND. nI < ::nColumns
-            nColsLen += ::aColsInfo[ nI, o_SepWidth ]
+            nColsLen += ::aColsInfo[ nI+1, o_SepWidth ]
          endif
 
          nI++
