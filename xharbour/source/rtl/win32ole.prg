@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.0 2002/05/02 14:43:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.1 2002/05/02 22:28:58 ronpinkas Exp $
  */
 
 /*
@@ -104,13 +104,15 @@ CLASS TOleAuto
    METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
    METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
 
-   ERROR HANDLER OnError( cMsg, nError )
+   ERROR HANDLER OnError()
 
 ENDCLASS
 
 //--------------------------------------------------------------------
 
 METHOD New( uObj, cClass ) CLASS TOleAuto
+
+   //TraceLog( uObj, cClass )
 
    IF ValType( uObj ) = 'C'
       ::hObj := CreateOleObject( uObj )
@@ -145,6 +147,8 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
 
    LOCAL uObj, nParams := PCount(), Counter
    LOCAL OleRefFlags := Space( nParams - 1 )
+
+   //TraceLog( cMethod, nParams )
 
    IF ProcName( 1 ) != "TOLEAUTO:" + cMethod
       IF nParams >= 7
@@ -181,9 +185,9 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
          IF HB_ISBYREF( @uParam1 )
             OleRefFlags[6] = 'Y'
          ENDIF
-      ENDIF
 
-      SetOleRefFlags( OleRefFlags )
+         SetOleRefFlags( OleRefFlags )
+      ENDIF
    ENDIF
 
    IF nParams == 7
@@ -224,6 +228,8 @@ METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
 
    LOCAL uObj, nParams := PCount()
 
+   //TraceLog( cProperty, nParams )
+
    IF nParams == 7
       OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
    ELSEIF nParams == 6
@@ -241,6 +247,8 @@ METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
       RETURN NIL
    ENDIF
 
+   SetOleRefFlags()
+
    IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
       OLEShowException()
    ELSEIF ::bShowException .AND. OleError() != 0
@@ -254,6 +262,8 @@ RETURN nil
 METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
 
    LOCAL uObj, nParams := PCount()
+
+   //TraceLog( cProperty, nParams )
 
    IF nParams == 7
       uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
@@ -292,49 +302,70 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
    LOCAL cError
    LOCAL nParams := PCount(), OleRefFlags := Space( nParams )
 
-   IF LEFT( cMsg, 1 ) == '_'
-      ::Set( SUBS( cMsg, 2 ), @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-   ELSE
-      IF nParams >= 6
-         IF HB_ISBYREF( @uParam6 )
-            OleRefFlags[6] = 'Y'
-         ENDIF
-      ENDIF
+   //TraceLog( cMsg, nParams )
 
-      IF nParams >= 5
-         IF HB_ISBYREF( @uParam5 )
-            OleRefFlags[5] = 'Y'
-         ENDIF
+   IF nParams >= 6
+      IF HB_ISBYREF( @uParam6 )
+         OleRefFlags[6] = 'Y'
       ENDIF
+   ENDIF
 
-      IF nParams >= 4
-         IF HB_ISBYREF( @uParam4 )
-            OleRefFlags[4] = 'Y'
-         ENDIF
+   IF nParams >= 5
+      IF HB_ISBYREF( @uParam5 )
+         OleRefFlags[5] = 'Y'
       ENDIF
+   ENDIF
 
-      IF nParams >= 3
-         IF HB_ISBYREF( @uParam3 )
-            OleRefFlags[3] = 'Y'
-         ENDIF
+   IF nParams >= 4
+      IF HB_ISBYREF( @uParam4 )
+         OleRefFlags[4] = 'Y'
       ENDIF
+   ENDIF
 
-      IF nParams >= 2
-         IF HB_ISBYREF( @uParam2 )
-            OleRefFlags[2] = 'Y'
-         ENDIF
+   IF nParams >= 3
+      IF HB_ISBYREF( @uParam3 )
+         OleRefFlags[3] = 'Y'
       ENDIF
+   ENDIF
 
-      IF nParams >= 1
-         IF HB_ISBYREF( @uParam1 )
-            OleRefFlags[1] = 'Y'
-         ENDIF
+   IF nParams >= 2
+      IF HB_ISBYREF( @uParam2 )
+         OleRefFlags[2] = 'Y'
       ENDIF
+   ENDIF
 
-      ::bShowException := .F.
+   IF nParams >= 1
+      IF HB_ISBYREF( @uParam1 )
+         OleRefFlags[1] = 'Y'
+      ENDIF
 
       SetOleRefFlags( OleRefFlags )
+   ENDIF
 
+   ::bShowException := .F.
+
+   IF LEFT( cMsg, 1 ) == '_'
+      cMsg := SubStr( cMsg, 2 )
+
+      IF nParams == 6
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+      ELSEIF nParams == 5
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+      ELSEIF nParams == 4
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+      ELSEIF nParams == 3
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3 )
+      ELSEIF nParams == 2
+         uObj := ::Set( cMsg, @uParam1, @uParam2 )
+      ELSEIF nParams == 1
+         uObj := ::Set( cMsg, @uParam1 )
+      ELSE
+         uObj := ::Set( cMsg )
+      ENDIF
+
+      // Reset in ::Set()
+      //SetOleRefFlags()
+   ELSE
       IF nParams == 6
          uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
       ELSEIF nParams == 5
@@ -351,15 +382,34 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
          uObj := ::Invoke( cMsg )
       ENDIF
 
-      // Reset in :Invoke()
+      // Reset in ::Invoke()
       //SetOleRefFlags()
 
       IF Ole2TxtError() != "S_OK"
-         uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-      ENDIF
+         //TraceLog( cMsg )
 
-      ::bShowException := bPresetShowException
+         IF nParams == 6
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+         ELSEIF nParams == 5
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+         ELSEIF nParams == 4
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+         ELSEIF nParams == 3
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3 )
+         ELSEIF nParams == 2
+            uObj := ::Get( cMsg, @uParam1, @uParam2 )
+         ELSEIF nParams == 1
+            uObj := ::Get( cMsg, @uParam1 )
+         ELSE
+            uObj := ::Get( cMsg )
+         ENDIF
+
+        // Reset in ::Get()
+        //SetOleRefFlags()
+      ENDIF
    ENDIF
+
+   ::bShowException := bPresetShowException
 
    IF ::bShowException .AND. ( cError := Ole2TxtError() ) != "S_OK"
       Alert( "Error! " + ::cClassName + ":" + cMsg + " " + cError )
@@ -633,8 +683,6 @@ RETURN uObj
      {
         for( n = 0; n < ( int ) dParams->cArgs; n++ )
         {
-           #if 1
-
            nParam = dParams->cArgs - n;
 
            //printf( "*** N: %i, Param: %i\n", n, nParam );
@@ -657,28 +705,28 @@ RETURN uObj
                  // Already using the PHB_ITEM allocated value
                  /*
                  case VT_BYREF | VT_BOOL:
-                   printf( "Logical\n" );
+                   //printf( "Logical\n" );
                    ( aPrgParams[ n ] )->type = HB_IT_LOGICAL;
                    ( aPrgParams[ n ] )->item.asLogical.value = dParams->rgvarg[ n ].n1.n2.n3.boolVal ;
                    break;
 
                  case VT_BYREF | VT_DISPATCH:
-                   printf( "Dispatch\n" );
+                   //printf( "Dispatch\n" );
                    hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                    break;
 
                  case VT_BYREF | VT_I2:
-                   printf( "Int %i\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                   //printf( "Int %i\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
                    hb_itemPutNI( aPrgParams[ n ], ( int ) dParams->rgvarg[ n ].n1.n2.n3.iVal );
                    break;
 
                  case VT_BYREF | VT_I4:
-                   printf( "Long %ld\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                   //printf( "Long %ld\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
                    hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.iVal );
                    break;
 
                  case VT_BYREF | VT_R8:
-                   printf( "Double\n" );
+                   //printf( "Double\n" );
                    hb_itemPutND( aPrgParams[ n ],  dParams->rgvarg[ n ].n1.n2.n3.dblVal );
                    break;
                  */
@@ -690,7 +738,7 @@ RETURN uObj
 
                  /*
                  case VT_BYREF | VT_EMPTY:
-                   printf( "Nil\n" );
+                   //printf( "Nil\n" );
                    hb_itemClear( aPrgParams[ n ] );
                    break;
                  */
@@ -700,7 +748,6 @@ RETURN uObj
                    ;
               }
            }
-           #endif
 
            VariantClear( &(dParams->rgvarg[ n ] ) );
         }
