@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2844 2004/04/28 15:04:02 kaddath Exp $
+ * $Id: ChangeLog,v 1.2845 2004/04/28 18:16:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 15:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Moved HB_EXPORT qualifier infront of pointer type (really we should always use HB_EXPORT as *first* token)
+
+  * source/vm/codebloc.c
+  * source/vm/fastitem.c
+    + Added commented-out debugging TraceLog().
+
+  * source/vm/memvars.c
+    ! Fixed hb_memvarsRelease() to avoid double releasing.
+
+  * tests/pp_harb.ch
+    ! Fixed to support recent changes to Symbol structure.
 
 2004-04-28 20:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/linux/gcc.cf
@@ -19,7 +33,7 @@
     + proper casting for stack macros on 64bit platform
 
   * xharbour/include/hbvmpub.h
-    * added 
+    * added
        union {
           PHB_FUNC pFunPtr;
           int iStaticsBase;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.138 2004/04/20 14:33:08 jacekp Exp $
+ * $Id: hbapi.h,v 1.139 2004/04/28 18:22:06 druzus Exp $
  */
 
 /*
@@ -402,12 +402,12 @@ extern ULONG    HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * 
 extern char     HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
 extern char     HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
 extern ULONG    HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
-extern void *   HB_EXPORT hb_arrayGetPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the pointer contained on an array element */
+HB_EXPORT       extern void * hb_arrayGetPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the pointer contained on an array element */
 extern BOOL     HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
 extern int      HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
 extern LONG     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the LONG numeric value contained on an array element */
 extern double   HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
-extern char     HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
+HB_EXPORT       extern char * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
 extern LONG     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a LONG integer */
 extern USHORT   HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern void     HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */

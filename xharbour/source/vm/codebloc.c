@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.43 2004/04/08 13:26:54 druzus Exp $
+ * $Id: codebloc.c,v 1.44 2004/04/27 22:04:11 ronpinkas Exp $
  */
 
 /*
@@ -160,6 +160,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * - copy the reference to a value
              */
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            //TraceLog( NULL, "Already detached: %i\n", pLocal->type );
 
             /* Increment the reference counter so this value will not be
              * released if other codeblock will be deleted

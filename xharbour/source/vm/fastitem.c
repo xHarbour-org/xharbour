@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.68 2004/04/08 13:26:54 druzus Exp $
+ * $Id: fastitem.c,v 1.69 2004/04/14 10:32:14 druzus Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
          #ifdef HB_ARRAY_USE_COUNTER
            if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
            {
-              hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
+              hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected %p", (char *) ( pItem->item.asArray.value ), NULL );
            }
 
            if( --( pItem->item.asArray.value->ulHolders ) == 0 )
@@ -222,13 +222,15 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
          {
             HB_ITEM FakeArray;
 
-            FakeArray.type = HB_IT_NIL;
+            //TraceLog( NULL, "BYREF Faked %p\n", pItem->item.asRefer.BasePtr.pBaseArray );
+
+            FakeArray.type = HB_IT_ARRAY;
             FakeArray.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
             #ifdef HB_ARRAY_USE_COUNTER
                if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
                {
-                  hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
+                  hb_errInternal( HB_EI_PREMATURE_RELEASE, "BYREF Premature Array/Object Release detected", NULL, NULL );
                }
 
                if( --( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )

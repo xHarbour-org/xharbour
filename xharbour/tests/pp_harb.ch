@@ -2585,7 +2585,7 @@
             pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
 
             pDynSym = hb_dynsymGet( sFunctionName );
-            pDynSym->pSymbol->pFunPtr = pDynFunc->pFunPtr;
+            pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
 
             if( s_iDyn == 0 )
             {
@@ -2621,14 +2621,14 @@
                   TraceLog( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
                                  s_pDynList[i].pAsm,
                                  s_pDynList[i].pcode,
-                                 s_pDynList[i].pDyn->pSymbol->pFunPtr );
+                                 s_pDynList[i].pDyn->pSymbol->value.pFunPtr );
                #endif
 
                hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
                hb_xfree( (void *) ( s_pDynList[i].pcode ) );
-               hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->pFunPtr ) );
+               hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->value.pFunPtr ) );
 
-               s_pDynList[i].pDyn->pSymbol->pFunPtr = NULL;
+               s_pDynList[i].pDyn->pSymbol->value.pFunPtr = NULL;
             }
 
             if( s_iDyn )

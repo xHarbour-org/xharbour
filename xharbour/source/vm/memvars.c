@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.78 2004/04/24 11:52:22 lf_sfnet Exp $
+ * $Id: memvars.c,v 1.79 2004/04/27 22:04:12 ronpinkas Exp $
  */
 
 /*
@@ -193,7 +193,14 @@ void hb_memvarsRelease( void )
    {
       while( --ulCnt )
       {
-         //if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         #if 0
+            if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
+            {
+               TraceLog( NULL, "Detached type: %i Counter: %i\n", s_globalTable[ ulCnt ].item.type, s_globalTable[ ulCnt ].counter );
+            }
+         #endif
+
+         if( --( s_globalTable[ ulCnt ].counter ) == 0 )//&& s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
@@ -249,7 +256,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         //if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )//&& pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
