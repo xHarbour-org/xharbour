@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.230 2002/05/21 17:15:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.231 2002/05/21 20:46:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,7 +13,7 @@
     utils/hbmake/hbmutils.prg
     ! Some For x := 1 to Len( array )  replaced with fastern FOR EACH xxx IN Array
   * include/hbver.h
-    * Updated to 0.72.0 in preparation for new Release.
+    * Updated entry
 
 2002-05-21 13:35 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * include/hbrddntx.h
