@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.33 2004/01/04 16:39:01 paultucker Exp $
+ * $Id: gtwin.c,v 1.34 2004/01/05 21:09:03 paultucker Exp $
  */
 
 /*
@@ -468,7 +468,13 @@ void HB_GT_FUNC(gt_Exit( void ))
     if( s_HOutput != INVALID_HANDLE_VALUE )
     {
         SetConsoleScreenBufferSize( s_HOutput, s_origCsbi.dwSize );
-        SetConsoleWindowInfo( s_HOutput, FALSE, &s_origCsbi.srWindow );
+
+        s_origCsbi.srWindow.Right -= s_origCsbi.srWindow.Left;
+        s_origCsbi.srWindow.Bottom -= s_origCsbi.srWindow.Top;
+        s_origCsbi.srWindow.Top = s_origCsbi.srWindow.Left = 0;
+
+        SetConsoleWindowInfo( s_HOutput, TRUE, &s_origCsbi.srWindow );
+
         CloseHandle( s_HOutput );
     }
     /* Remove Ctrl+Break handler */
