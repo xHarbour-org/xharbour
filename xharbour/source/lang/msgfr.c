@@ -1,5 +1,5 @@
 /*
- * $Id: msgfr.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: msgfr.c,v 1.5 2004/01/25 21:48:51 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "fran‡ais",                  /* Name (in native language) */
       "FR",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2004/01/25 21:48:51 $",         /* Version */
 
       /* Month names */
 
@@ -74,7 +74,7 @@ static HB_LANG s_lang =
       "F‚vrier",
       "Mars",
       "Avril",
-      "May",
+      "Mai",
       "Juin",
       "Juillet",
       "Ao–t",
