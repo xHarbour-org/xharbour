@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.8 2004/02/08 12:19:59 andijahja Exp $
+ * $Id: round.c,v 1.10 2004/02/09 18:00:37 druzus Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ static double hb_numPow10( int nPrecision )
       }
       else if ( nPrecision > -16 )
       {
-         return 1 / s_dPow10[ -nPrecision ];
+         return 1.0 / s_dPow10[ -nPrecision ];
       }
    }
    return pow(doBase, (double) nPrecision);
@@ -152,13 +152,15 @@ double hb_numRound( double dNum, int iDec )
    dPow = hb_numPow10( iDec );
    doComplete5 = dNum * dPow * doBase;
 
-#if 0
+#if 1
    /*
     * this is a hack for people who cannot live without hacked FL values
     * in rounding
     */
+   if( dNum == 0.0 )
+      return 0.0;
    if( dNum < 0.0f )
-      doComplete5 -= 5.0f - hb_numPow10( (int) log10( -doComplete5 ) - 15 );
+      doComplete5 -= 5.0f + hb_numPow10( (int) log10( -doComplete5 ) - 15 );
    else
       doComplete5 += 5.0f + hb_numPow10( (int) log10( doComplete5 ) - 15 );
 #else
