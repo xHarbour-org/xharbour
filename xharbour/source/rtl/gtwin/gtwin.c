@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.14 2001/08/21 03:37:25 dholm Exp $
+ * $Id: gtwin.c,v 1.6 2002/09/28 11:55:13 map Exp $
  */
 
 /*
@@ -673,7 +673,7 @@ void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 {
     USHORT x, y, i;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, usBottom, usRight, pbySrc));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, pbySrc));
 
     if ( s_pCharInfoScreen != NULL )
     {
@@ -907,7 +907,7 @@ static void hb_gt_xPutch( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byChar )
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", usRow, usCol, (int) byAttr, byChar));
 
-    if ( s_pCharInfoScreen != NULL && 
+    if ( s_pCharInfoScreen != NULL &&
          usRow < s_csbi.dwSize.Y && usCol < s_csbi.dwSize.X )
     {
         int i;
