@@ -6823,3 +6823,12 @@ HB_FUNC( HB_REGEXCOMP )
       3, pRegEx, hb_paramError( 3 ), hb_paramError( 4 ));
    }
 }
+
+HB_FUNC( HB_ISREGEXSTRING )
+{
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+  hb_retl( pRegEx && hb_isregexstring( pRegEx ) ) ;
+}
