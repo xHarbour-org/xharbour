@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.191 2002/03/18 12:08:06 alkresin Exp $
+ * $Id: dbcmd.c,v 1.192 2002/03/19 06:26:11 alkresin Exp $
  */
 
 /*
@@ -597,6 +597,10 @@ static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
  * -- FUNCTIONS ACCESSED FROM VIRTUAL MACHINE --
  */
 
+/*
+ * Return the current WorkArea number.
+ */
+
 USHORT hb_rddGetCurrentFieldPos( char * szName )
 {
    USHORT uiCount;
@@ -630,9 +634,7 @@ USHORT hb_rddGetCurrentFieldPos( char * szName )
    return 0;
 }
 
-/*
- * Return the current WorkArea number.
- */
+
 int  hb_rddGetCurrentWorkAreaNumber( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaNumber()"));
@@ -2891,13 +2893,18 @@ HB_FUNC( ORDSCOPE )
 
       SELF_SCOPEINFO( ( AREAP ) s_pCurrArea->pArea, sInfo.nScope, pScopeValue );
 
-      if( hb_pcount() < 2 || ISNIL( 2 ) )     /* explicitly passed NIL, clear it */
-         sInfo.scopeValue = NULL;
-      else
-         sInfo.scopeValue = hb_param( 2, HB_IT_ANY) ;
+      if( hb_pcount() > 1 )
+      {
+         if ( ISNIL( 2 ) )                /* explicitly passed NIL, clear it */
+            sInfo.scopeValue = NULL;
+         else
+            sInfo.scopeValue = hb_param( 2, HB_IT_ANY) ;
 
-      /* rdd must not alter the scopeValue item -- it's not a copy */
-      SELF_SETSCOPE( ( AREAP ) s_pCurrArea->pArea, (LPDBORDSCOPEINFO) &sInfo );
+         /* rdd must not alter the scopeValue item -- it's not a copy */
+         SELF_SETSCOPE( ( AREAP ) s_pCurrArea->pArea, (LPDBORDSCOPEINFO) &sInfo );
+
+      }else
+         sInfo.scopeValue = NULL;
 
       hb_itemRelease( hb_itemReturn( pScopeValue ) );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.6 2002/03/19 01:07:58 ronpinkas Exp $
+ * $Id: macro.c,v 1.7 2002/03/19 02:48:32 ronpinkas Exp $
  */
 
 /*
@@ -1291,15 +1291,20 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      if( hb_rddGetCurrentFieldPos( szVarName ) )
-      {
-         hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
-      }
-      else
-      {
-         hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+      #if 0
+         if( hb_rddGetCurrentFieldPos( szVarName ) )
+         {
+            hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
+         }
+         else
+         {
+            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+            hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
+         }
+      #else
+         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
          hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
-      }
+      #endif
    }
 }
 

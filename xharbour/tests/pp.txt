@@ -1,3 +1,22 @@
+Command line switches and syntax.
+
+
+   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-H] [--help][-I<path>] 
+                     [-P] [-R] [-STRICT] [-U[<ch-file>]]
+
+    -CCH     = Generate a .cch file (compiled command header).
+    -D<id>   = #define <id>.
+    -D:E     = Show tracing information into the Expression Scanner.
+    -D:M     = Show tracing information into the Match Engine.
+    -D:P     = Show tracing information into the Output Generator.
+    -H       = Syntax and command line switches description.
+    --help   = Syntax and command line switches description.
+    -I<path> = #include file search path(s) (';' seperated).
+    -P       = Generate .pp$ pre-processed output file.
+    -R       = Run filename as a script.
+    -STRICT  = Strict Clipper compatability (clone Clipper PreProcessor bugs).
+    -U       = Use command definitions set in <ch-file> (or none).
+
 PP has 3 personalities which are tied tightly together.
 
 1. What is supposed to be 100% Clipper compatible Pre-Processor
@@ -7,17 +26,20 @@ PP has 3 personalities which are tied tightly together.
    create <filename.pp$> which is the equivalent of the Clipper
    <filename.ppo> file.
 
+   This syntax is:
+
+     PP filename[.ext] -P
+
    In this mode these are the optional command line switches.
 
-   PP filename[.ext] [-U][-DM][-DE][-DP][-CCH]
-
-     -CCH   = Generate a .cch file (compiled command header).
-     -D<id> = #define <id>.
-     -D:M   = Show tracing information into the Match Engine.
-     -D:E   = Show tracing information into the Expression Scanner.
-     -D:P   = Show tracing information into the Output Generator.
-     -P     = Generate .pp$ pre-processed output file.
-     -U     = Don't load standard rules.
+    -CCH     = Generate a .cch file (compiled command header).
+    -D<id>   = #define <id>.
+    -D:E     = Show tracing information into the Expression Scanner.
+    -D:M     = Show tracing information into the Match Engine.
+    -D:P     = Show tracing information into the Output Generator.
+    -I<path> = #include file search path(s) (';' seperated).
+    -STRICT  = Strict Clipper compatability (clone Clipper PreProcessor bugs).
+    -U       = Use command definitions set in <ch-file> (or none).
 
 2. DOT prompt, which suppose to allow most of Clipper syntax. Please
    report any syntax you expect to work, but is not supported.
@@ -56,14 +78,27 @@ PP has 3 personalities which are tied tightly together.
 
   This will create rp_dot.pp$ compilation trace file.
 
-3. Finally, PP is a limited Harbour Interpreter. Subject to those same few
-   limitations it can execute most of Harbour syntax. Executing PP followed
-   by a source file name and the -R switch, will "RUN" that source (it will
-   also create the rp_run.pp$ compilation trace file).
+3. Finally, PP is a limited Clipper/Harbour/xBase Interpreter. Subject 
+   to those same few limitations it can execute most of Harbour syntax.
+   Executing PP followed by a source file name and the -R switch, will
+   "RUN" that source (it will also create the rp_run.pp$ compilation 
+   trace file).
 
    This syntax is:
 
      PP filename[.ext] -R
+
+   In this mode these are the optional command line switches.
+
+    -CCH     = Generate a .cch file (compiled command header).
+    -D<id>   = #define <id>.
+    -D:E     = Show tracing information into the Expression Scanner.
+    -D:M     = Show tracing information into the Match Engine.
+    -D:P     = Show tracing information into the Output Generator.
+    -I<path> = #include file search path(s) (';' seperated).
+    -P       = Generate .pp$ pre-processed output file.
+    -STRICT  = Strict Clipper compatability (clone Clipper PreProcessor bugs).
+    -U       = Use command definitions set in <ch-file> (or none).
 
      a. It does support LOCAL/STATIC/PRIVATE/PUBLIC, but:
 
@@ -81,4 +116,8 @@ PP has 3 personalities which are tied tightly together.
      d. It does support ALL control flow structures *except* BEGIN
         SEQUENCE [BREAK] [RECOVER] END SEQUENCE.
 
-     e. The executed module is compiled with -n option (for now).
+     e. The compiled module is automatically using -n (No implicit startup
+        procedure) if the script starts with a Procedure/Function definition.
+
+     f. Built-in OLE COM Client gateway is included when PP is compiled with 
+        Harbour and using -dWIN (harbour pp -dWIN -w ... )
