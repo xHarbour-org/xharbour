@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.30 2004/04/05 13:32:47 lf_sfnet Exp $
+ * $Id: Changelog,v 1.31 2004/05/04 14:45:06 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 14:22 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * contrib/tip/tipclienthttp.prg
+    + Added automatic authorization basic scheme if new field
+      cAuthMode is set to "Basic". The cUserID and cPassword fields
+      inside the oUrl object.
+    + Added inline method UseBasicAuth() to set cAuthMode to "Basic"
+    
+2004-04-23 18:28 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * contrib/tip/tipclienthttp.prg
+  * contrib/tip/tipencoderurl.prg
+    ! Fixed an offbyone error in URLEncode routines
 
 2004-05-04 16:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * Rules.make

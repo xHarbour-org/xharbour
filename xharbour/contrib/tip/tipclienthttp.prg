@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.10 2003/12/10 13:30:46 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.11 2004/04/23 16:30:21 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -25,12 +25,14 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA hCookies     INIT  {=>}
    DATA hFields      INIT  {=>}
    DATA cUserAgent   INIT  "Mozilla/3.0 (compatible XHarbour-Tip/1.0)"
+   DATA cAuthMode    INIT ""
 
    METHOD New()
    METHOD Get( cQuery )
    METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
    METHOD Read( nLen )
+   METHOD UseBasicAuth()      INLINE   ::cAuthMode := "Basic"
 
 HIDDEN:
    METHOD StandardFields()
@@ -111,11 +113,21 @@ RETURN .F.
 
 METHOD StandardFields() CLASS tIPClientHTTP
    LOCAL iCount
+   LOCAL oEncoder
 
    InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    InetSendAll( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
    InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
 
+   // Perform a basic authentication request
+   IF ::cAuthMode == "Basic" .and. .not. ("Authorization" in ::hFields)
+      oEncoder := TIPEncoderBase64():New()
+      oEncoder:bHttpExcept := .T.
+      InetSendAll( ::SocketCon, "Authorization: Basic " +;
+          oEncoder:Encode(  ::oUrl:cUserID + ":" + ::oUrl:cPassword ) + ::cCRLF )
+   ENDIF
+          
+   
    // send cookies
    IF ! Empty( ::hCookies )
       InetSendAll( ::SocketCon, "Cookie: " )
